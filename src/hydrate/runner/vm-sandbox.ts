@@ -1,10 +1,10 @@
-import vm from 'vm';
-import fs from 'fs';
 import path from 'path';
+import fs from 'fs';
+import vm from 'vm';
 
 
-export function getHydrateAppSandbox(win: Window) {
-  const appScript = loadAppScript();
+export function createHydrateAppSandbox(win: Window) {
+  const appScript = loadHydrateAppScript();
   const sandbox = createSandbox(win);
   const context = vm.createContext(sandbox);
 
@@ -14,21 +14,19 @@ export function getHydrateAppSandbox(win: Window) {
 }
 
 
-let cachedScript: any = null;
+let cachedAppScript: any = null;
 
-function loadAppScript() {
-  if (cachedScript != null) {
-    return cachedScript;
+function loadHydrateAppScript() {
+  if (cachedAppScript == null) {
+    const filePath = path.join(__dirname, 'app.js');
+    const appCode = fs.readFileSync(filePath, 'utf8');
+
+    const code = `StencilHydrateApp = (exports => {${appCode};return exports; })({});`;
+
+    cachedAppScript = new vm.Script(code, { filename: filePath });
   }
 
-  const filePath = path.join(__dirname, 'app.js');
-  const appCode = fs.readFileSync(filePath, 'utf8');
-
-  const code = `StencilHydrateApp = (exports => {${appCode}\n;return exports; })({});`;
-
-  cachedScript = new vm.Script(code, { filename: filePath });
-
-  return cachedScript;
+  return cachedAppScript;
 }
 
 

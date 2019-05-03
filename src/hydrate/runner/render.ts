@@ -1,10 +1,10 @@
-import * as d from '../declarations';
-import { buildError } from '@utils';
-import { crawlDocument } from './crawl-document';
+import * as d from '../../declarations';
+import { BootstrapHydrateResults } from '../platform/bootstrap-hydrate';
+import { createHydrateAppSandbox } from './vm-sandbox';
 import { finalizeWindow } from './window-finalize';
-import { generateHydrateResults, normalizeHydrateOptions, renderError } from './render-utils';
-import { getHydrateAppSandbox } from './run-in-context';
+import { generateHydrateResults, normalizeHydrateOptions, renderBuildError, renderCatchError } from './render-utils';
 import { initializeWindow } from './window-initialize';
+import { inspectElement } from './inspect-document';
 import { MockWindow, serializeNodeToHtml } from '@mock-doc';
 import { polyfillDocumentImplementation } from './polyfill-implementation';
 
@@ -18,8 +18,7 @@ export async function renderToString(html: string, opts: d.RenderToStringOptions
   }
 
   if (typeof html !== 'string') {
-    const err = buildError(results.diagnostics);
-    err.messageText = `Invalid html`;
+    renderBuildError(results, `Invalid html`);
     return results;
   }
 
@@ -34,7 +33,7 @@ export async function renderToString(html: string, opts: d.RenderToStringOptions
           await rtn;
         }
       } catch (e) {
-        renderError(results, e);
+        renderCatchError(results, e);
       }
     }
 
@@ -47,7 +46,7 @@ export async function renderToString(html: string, opts: d.RenderToStringOptions
           await rtn;
         }
       } catch (e) {
-        renderError(results, e);
+        renderCatchError(results, e);
       }
     }
 
@@ -64,7 +63,7 @@ export async function renderToString(html: string, opts: d.RenderToStringOptions
     }
 
   } catch (e) {
-    renderError(results, e);
+    renderCatchError(results, e);
   }
 
   return results;
@@ -80,8 +79,7 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateDocumentOpti
   }
 
   if (doc == null || doc.nodeType !== 9 || doc.documentElement == null || doc.documentElement.nodeType !== 1) {
-    const err = buildError(results.diagnostics);
-    err.messageText = `Invalid document`;
+    renderBuildError(results, `Invalid document`);
     return results;
   }
 
@@ -99,7 +97,7 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateDocumentOpti
     await render(win, doc, opts, results);
 
   } catch (e) {
-    renderError(results, e);
+    renderCatchError(results, e);
   }
 
   return results;
@@ -113,26 +111,41 @@ async function render(win: Window, doc: Document, opts: d.HydrateDocumentOptions
 
   await new Promise(resolve => {
     const tmr = setTimeout(() => {
-      win.console.error(`Hydrate exceeded timeout: ${opts.timeout}ms`);
+      renderBuildError(results, `Hydrate exceeded timeout: ${opts.timeout}ms`);
       resolve();
     }, opts.timeout);
 
     try {
-      const sandbox = getHydrateAppSandbox(win);
+      const sandbox = createHydrateAppSandbox(win);
 
-      sandbox.initConnect(win, doc, opts, results, () => {
+      sandbox.bootstrapHydrate(win, opts, (bootstrapResults: BootstrapHydrateResults) => {
         clearTimeout(tmr);
+
+        try {
+          results.hydratedCount = bootstrapResults.hydratedCount;
+          bootstrapResults.hydratedTags.forEach(hydratedTag => {
+            results.components.push({
+              tag: hydratedTag,
+              count: 0,
+              depth: -1
+            });
+          });
+          bootstrapResults = null;
+
+        } catch (e) {
+          renderCatchError(results, e);
+        }
         resolve();
       });
 
     } catch (e) {
-      renderError(results, e);
+      renderCatchError(results, e);
       clearTimeout(tmr);
       resolve();
     }
   });
 
-  crawlDocument(doc, results);
+  inspectElement(results, doc.documentElement, 0);
 
   finalizeWindow(doc, opts, results);
 }
@@ -145,6 +158,6 @@ function catchUnhandledErrors(results: d.HydrateResults) {
   (process as any).__stencilErrors = true;
 
   process.on('unhandledRejection', e => {
-    renderError(results, e);
+    renderCatchError(results, e);
   });
 }

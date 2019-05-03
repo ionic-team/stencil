@@ -36,7 +36,7 @@
         "../mock-doc/index.ts"
       ],
       "@platform": [
-        "./platform.ts"
+        "./platform/index.ts"
       ],
       "@runtime": [
         "../runtime/index.ts"
@@ -53,7 +53,7 @@
     "../../types/*.d.ts"
   ],
   "files": [
-    "index.ts",
-    "platform.ts"
+    "runner/index.ts",
+    "platform/index.ts"
   ]
 }

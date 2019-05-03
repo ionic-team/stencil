@@ -4,54 +4,88 @@ const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
 const { run, transpile, updateBuildIds, relativeResolve } = require('./script-utils');
-const { urlPlugin } = require('./plugin-url');
 
 const DIST_DIR = path.join(__dirname, '..', 'dist');
 const TRANSPILED_DIR = path.join(DIST_DIR, 'transpiled-hydrate');
-const INDEX_INDEX_INPUT_FILE = path.join(TRANSPILED_DIR, 'hydrate', 'index.js');
-const INDEX_PLATFORM_INPUT_FILE = path.join(TRANSPILED_DIR, 'hydrate', 'platform.js');
-const SERVER_DIST_DIR = path.join(DIST_DIR, 'hydrate');
+const RUNNER_INDEX_FILE = path.join(TRANSPILED_DIR, 'hydrate', 'runner', 'index.js');
+const PLATFORM_INDEX_FILE = path.join(TRANSPILED_DIR, 'hydrate', 'platform', 'index.js');
+const HYDRATE_DIST_DIR = path.join(DIST_DIR, 'hydrate');
 
 
-async function bundleHydrate() {
+async function bundleHydrateRunner() {
   const rollupBuild = await rollup.rollup({
-    input: [
-      INDEX_INDEX_INPUT_FILE,
-      INDEX_PLATFORM_INPUT_FILE
-    ],
+    input: RUNNER_INDEX_FILE,
     external: [
-      '@stencil/core/build-conditionals',
-      '@stencil/core/global-scripts',
       'fs',
       'path',
+      'url',
       'vm'
     ],
     plugins: [
       (() => {
         return {
-          resolveId(importee, importer) {
-            if (importee === '@build-conditionals') {
-              return '@stencil/core/build-conditionals';
-            }
-            if (importee === '@global-scripts') {
-              return '@stencil/core/global-scripts';
-            }
+          resolveId(importee) {
             if (importee === '@mock-doc') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'mock-doc');
-            }
-            if (importee === '@runtime') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'runtime');
-            }
-            if (importee === '@utils') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
-            }
-            if (importee === '@platform') {
-              return path.join(TRANSPILED_DIR, 'hydrate', 'platform.js');
+              return path.join(TRANSPILED_DIR, 'mock-doc', 'index.js');
             }
           }
         }
       })(),
-      urlPlugin(),
+      rollupResolve({
+        preferBuiltins: true
+      }),
+      rollupCommonjs()
+    ],
+    onwarn: (message) => {
+      if (message.code === 'CIRCULAR_DEPENDENCY') return;
+      console.error(message);
+    }
+  });
+
+  const { output } = await rollupBuild.generate({
+    format: 'cjs'
+  });
+
+  const filePath = path.join(HYDRATE_DIST_DIR, output[0].fileName);
+  const outputText = updateBuildIds(output[0].code);
+  await fs.writeFile(filePath, outputText);
+}
+
+
+async function generateHydrateDts() {
+  const hydrateDtsSrc = path.join(TRANSPILED_DIR, 'declarations', 'hydrate.d.ts');
+  const hydrateDtsContent = fs.readFileSync(hydrateDtsSrc, 'utf8').trim();
+
+  const output = [
+    hydrateDtsContent,
+    `export declare function renderToString(html: string, opts?: RenderToStringOptions): Promise<HydrateResults>;`,
+    `export declare function hydrateDocument(doc: any, opts?: HydrateDocumentOptions): Promise<HydrateResults>;`
+  ];
+
+  const outputPath = path.join(HYDRATE_DIST_DIR, `index.d.ts`);
+  await fs.writeFile(outputPath, output.join('\n'));
+}
+
+
+async function bundleHydratePlatform() {
+  const rollupBuild = await rollup.rollup({
+    input: PLATFORM_INDEX_FILE,
+    plugins: [
+      (() => {
+        return {
+          resolveId(importee) {
+            if (importee === '@runtime') {
+              return {
+                id: '@stencil/core/runtime',
+                external: true
+              };
+            }
+            if (importee === '@platform') {
+              return PLATFORM_INDEX_FILE;
+            }
+          }
+        }
+      })(),
       rollupResolve({
         preferBuiltins: true
       }),
@@ -65,23 +99,25 @@ async function bundleHydrate() {
 
   const { output } = await rollupBuild.generate({
     format: 'esm',
-    dir: SERVER_DIST_DIR
+    file: 'platform.mjs'
   });
 
-  await fs.emptyDir(SERVER_DIST_DIR);
-
-  await Promise.all(output.map(async o => {
-    const filePath = path.join(SERVER_DIST_DIR, o.fileName).replace('.js', '.mjs');
-    const outputText = updateBuildIds(o.code);
-    await fs.writeFile(filePath, outputText);
-  }));
+  const filePath = path.join(HYDRATE_DIST_DIR, output[0].fileName);
+  const outputText = updateBuildIds(output[0].code);
+  await fs.writeFile(filePath, outputText);
 }
 
 
 run(async () => {
   transpile(path.join('..', 'src', 'hydrate', 'tsconfig.json'))
 
-  await bundleHydrate();
+  await fs.emptyDir(HYDRATE_DIST_DIR);
+
+  await Promise.all([
+    bundleHydrateRunner(),
+    generateHydrateDts(),
+    bundleHydratePlatform()
+  ]);
 
   await fs.remove(TRANSPILED_DIR);
 });

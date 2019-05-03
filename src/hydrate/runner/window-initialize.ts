@@ -1,16 +1,13 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import { constrainTimeouts } from '@mock-doc';
-import { renderError } from './render-utils';
+import { renderCatchError } from './render-utils';
 
 
 export function initializeWindow(win: Window, doc: Document, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
-  const url = (typeof opts.url === 'string' && opts.url.trim().length > 0) ? opts.url.trim() : '/';
-
   try {
-    const parsedUrl = new URL(url, 'http://hydrate.stenciljs.com');
-    win.location.href = parsedUrl.href;
+    win.location.href = results.url;
   } catch (e) {
-    renderError(results, e);
+    renderCatchError(results, e);
   }
 
   if (typeof opts.userAgent === 'string') {
@@ -82,6 +79,6 @@ export function initializeWindow(win: Window, doc: Document, opts: d.HydrateDocu
     };
 
   } catch (e) {
-    renderError(results, e);
+    renderCatchError(results, e);
   }
 }

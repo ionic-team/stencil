@@ -1,12 +1,7 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 
 
-export function crawlDocument(doc: Document, results: d.HydrateResults) {
-  crawlElement(results, doc.documentElement, 0);
-}
-
-
-function crawlElement(results: d.HydrateResults, elm: Element, depth: number) {
+export function inspectElement(results: d.HydrateResults, elm: Element, depth: number) {
   const children = elm.children;
 
   for (let i = 0, ii = children.length; i < ii; i++) {
@@ -74,7 +69,8 @@ function crawlElement(results: d.HydrateResults, elm: Element, depth: number) {
     }
 
     depth++;
-    crawlElement(results, childElm, depth);
+
+    inspectElement(results, childElm, depth);
   }
 }
 

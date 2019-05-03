@@ -14,13 +14,12 @@ async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   const hydrateCoreIndexPath = config.sys.path.join(hydrateAppDirPath, 'index.js');
   const hydrateCoreIndexDtsFilePath = config.sys.path.join(hydrateAppDirPath, 'index.d.ts');
-  const hydrateCoreIndexDtsContent = await generateHydrateDtsContent(config, compilerCtx);
 
   const pkgJsonPath = config.sys.path.join(hydrateAppDirPath, 'package.json');
   const pkgJsonCode = await getHydratePackageJson(config, compilerCtx, hydrateCoreIndexPath, hydrateCoreIndexDtsFilePath);
 
   const writePromises: Promise<any>[] = [
-    compilerCtx.fs.writeFile(hydrateCoreIndexDtsFilePath, hydrateCoreIndexDtsContent),
+    copyHydrateRunner(config, hydrateAppDirPath),
     compilerCtx.fs.writeFile(pkgJsonPath, pkgJsonCode)
   ];
 
@@ -57,18 +56,20 @@ async function getHydratePackageJson(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-async function generateHydrateDtsContent(config: d.Config, compilerCtx: d.CompilerCtx) {
-  const hydrateDtsSourcePath = config.sys.path.join(config.sys.compiler.distDir, 'declarations', 'hydrate.d.ts');
+async function copyHydrateRunner(config: d.Config, hydrateAppDirPath: string) {
+  const srcHydrateDir = config.sys.path.join(config.sys.compiler.distDir, 'hydrate');
 
-  let dts = await compilerCtx.fs.readFile(hydrateDtsSourcePath);
+  const runnerIndexFileName = 'index.js';
+  const runnerDtsFileName = 'index.d.ts';
 
-  dts += HYDRATE_DTS_CODE;
+  const runnerSrcPath = config.sys.path.join(srcHydrateDir, runnerIndexFileName);
+  const runnerDtsSrcPath = config.sys.path.join(srcHydrateDir, runnerDtsFileName);
 
-  return dts;
+  const runnerDestPath = config.sys.path.join(hydrateAppDirPath, runnerIndexFileName);
+  const runnerDtsDestPath = config.sys.path.join(hydrateAppDirPath, runnerDtsFileName);
+
+  await Promise.all([
+    config.sys.fs.copyFile(runnerSrcPath, runnerDestPath),
+    config.sys.fs.copyFile(runnerDtsSrcPath, runnerDtsDestPath)
+  ]);
 }
-
-
-const HYDRATE_DTS_CODE = `
-export declare function renderToString(html: string, opts?: RenderToStringOptions): Promise<HydrateResults>;
-export declare function hydrateDocument(doc: any, opts?: HydrateDocumentOptions): Promise<HydrateResults>;
-`;

@@ -1,29 +1,25 @@
 import * as d from '../../declarations';
 import { bundleJson } from '../rollup-plugins/json';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
-import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
+import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
+import { loaderPlugin } from '../rollup-plugins/loader';
 import { RollupBuild, RollupOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilHydratePlugin } from '../rollup-plugins/stencil-hydrate';
-import { loaderPlugin } from '../rollup-plugins/loader';
 
 
 export async function bundleHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, appEntryCode: string) {
   try {
     const rollupOptions: RollupOptions = {
-      input: [
-        'index',
-        'app'
-      ],
+      input: '@app-entry',
+      inlineDynamicImports: true,
       plugins: [
         loaderPlugin({
-          'index': CORE_ENTRY,
-          'app': appEntryCode
+          '@app-entry': appEntryCode
         }),
         stencilHydratePlugin(config),
-
         stencilBuildConditionalsPlugin(build, config.fsNamespace),
         globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
@@ -38,11 +34,6 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
         bundleJson(config),
         inMemoryFsRead(config, compilerCtx),
         ...config.plugins
-      ],
-      external: [
-        'fs',
-        'path',
-        'vm'
       ],
       treeshake: {
         annotations: true,
@@ -68,5 +59,3 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
 
   return undefined;
 }
-
-const CORE_ENTRY = `export { hydrateDocument, renderToString } from '@stencil/core/hydrate';`;

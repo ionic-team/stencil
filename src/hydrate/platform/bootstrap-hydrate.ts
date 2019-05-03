@@ -1,10 +1,15 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import { getComponent, getHostRef } from '@platform';
 import { hydrateComponent } from './hydrate-component';
 import { insertVdomAnnotations, postUpdateComponent } from '@runtime';
 
 
-export function initConnect(win: Window, doc: Document, opts: d.HydrateDocumentOptions, results: d.HydrateResults, resolve: Function) {
+export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, done: (results: BootstrapHydrateResults) => void) {
+  const results: BootstrapHydrateResults = {
+    hydratedCount: 0,
+    hydratedTags: []
+  };
+
   try {
     const connectedElements = new Set<any>();
     const waitPromises: Promise<any>[] = [];
@@ -38,6 +43,7 @@ export function initConnect(win: Window, doc: Document, opts: d.HydrateDocumentO
       }
     };
 
+    const doc = win.document;
     const orgDocumentCreateElement = doc.createElement;
     doc.createElement = function patchedCreateElement(tagName: string) {
       const elm = orgDocumentCreateElement.call(doc, tagName);
@@ -75,28 +81,34 @@ export function initConnect(win: Window, doc: Document, opts: d.HydrateDocumentO
 
     Promise.all(waitPromises)
       .then(() => {
-        waitPromises.length = 0;
-        connectedElements.clear();
-        if (opts.clientHydrateAnnotations) {
-          insertVdomAnnotations(doc);
+        try {
+          waitPromises.length = 0;
+          connectedElements.clear();
+          if (opts.clientHydrateAnnotations) {
+            insertVdomAnnotations(doc);
+          }
+        } catch (e) {
+          win.console.error(e);
         }
-        resolve();
+        done(results);
       })
       .catch(e => {
-        waitPromises.length = 0;
-        connectedElements.clear();
-        win.console.error(e);
-        resolve();
+        try {
+          waitPromises.length = 0;
+          connectedElements.clear();
+          win.console.error(e);
+        } catch (e) {}
+        done(results);
       });
 
   } catch (e) {
     win.console.error(e);
-    resolve();
+    done(results);
   }
 }
 
 
-function connectElements(win: Window, opts: d.HydrateDocumentOptions, results: d.HydrateResults, elm: HTMLElement, connectedElements: Set<any>, waitPromises: Promise<any>[]) {
+function connectElements(win: Window, opts: d.HydrateDocumentOptions, results: BootstrapHydrateResults, elm: HTMLElement, connectedElements: Set<any>, waitPromises: Promise<any>[]) {
   if (elm != null && elm.nodeType === 1 && results.hydratedCount < opts.maxHydrateCount) {
 
     const tagName = elm.nodeName.toLowerCase();
@@ -117,6 +129,11 @@ function connectElements(win: Window, opts: d.HydrateDocumentOptions, results: d
   }
 }
 
+
+export interface BootstrapHydrateResults {
+  hydratedCount: number;
+  hydratedTags: string[];
+}
 
 const NO_HYDRATE_TAGS = new Set([
   'code',

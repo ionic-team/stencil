@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 
 const cstrs = new Map<string, d.ComponentNativeConstructor>();
 
@@ -123,7 +123,7 @@ export const Build: d.UserBuildConditionals = {
 export const styles: d.StyleMap = new Map();
 export const cssVarShim: d.CssVarSim = false as any;
 
-export { initConnect } from './connect-elements';
+export { bootstrapHydrate } from './bootstrap-hydrate';
 
 export {
   connectedCallback,

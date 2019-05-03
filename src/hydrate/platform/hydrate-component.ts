@@ -1,27 +1,16 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import { connectedCallback, getComponent, registerHost } from '@platform';
 import { proxyHostElement } from './proxy-host-element';
+import { BootstrapHydrateResults } from './bootstrap-hydrate';
 
 
-export function hydrateComponent(win: Window, results: d.HydrateResults, tagName: string, elm: d.HostElement, waitPromises: Promise<any>[]) {
+export function hydrateComponent(win: Window, results: BootstrapHydrateResults, tagName: string, elm: d.HostElement, waitPromises: Promise<any>[]) {
   const Cstr = getComponent(tagName);
 
   if (Cstr != null) {
     const cmpMeta = Cstr.cmpMeta;
 
     if (cmpMeta != null) {
-      results.hydratedCount++;
-
-      if (!results.components.some(c => c.tag === tagName)) {
-        // only collect up which components were hydrated
-        // but count them and get their depth later;
-        results.components.push({
-          tag: tagName,
-          count: 0,
-          depth: 0
-        });
-      }
-
       const hydratePromise = new Promise(async resolve => {
         try {
           registerHost(elm);
@@ -29,6 +18,12 @@ export function hydrateComponent(win: Window, results: d.HydrateResults, tagName
           connectedCallback(elm, cmpMeta);
 
           await elm.componentOnReady();
+
+          results.hydratedCount++;
+
+          if (!results.hydratedTags.includes(tagName)) {
+            results.hydratedTags.push(tagName);
+          }
 
         } catch (e) {
           win.console.error(e);

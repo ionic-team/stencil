@@ -28,9 +28,6 @@
       "@build-conditionals": [
         "./app-core/build-conditionals.ts"
       ],
-      "@hydrate": [
-        "../hydrate/index.ts"
-      ],
       "@platform": [
         "../client/index.ts"
       ],

@@ -1,8 +1,8 @@
-import * as d from '../declarations';
-import { relocateMetaCharset } from '../compiler/html/relocate-meta-charset';
-import { removeUnusedStyles } from '../compiler/html/remove-unused-styles';
-import { renderError } from './render-utils';
-import { updateCanonicalLink } from '../compiler/html/canonical-link';
+import * as d from '../../declarations';
+import { relocateMetaCharset } from '../../compiler/html/relocate-meta-charset';
+import { removeUnusedStyles } from '../../compiler/html/remove-unused-styles';
+import { renderCatchError } from './render-utils';
+import { updateCanonicalLink } from '../../compiler/html/canonical-link';
 
 
 export function finalizeWindow(doc: Document, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
@@ -10,7 +10,7 @@ export function finalizeWindow(doc: Document, opts: d.HydrateDocumentOptions, re
     try {
       removeUnusedStyles(doc, results);
     } catch (e) {
-      renderError(results, e);
+      renderCatchError(results, e);
     }
   }
 
@@ -18,7 +18,7 @@ export function finalizeWindow(doc: Document, opts: d.HydrateDocumentOptions, re
     try {
       doc.title = opts.title;
     } catch (e) {
-      renderError(results, e);
+      renderCatchError(results, e);
     }
   }
 
@@ -29,7 +29,7 @@ export function finalizeWindow(doc: Document, opts: d.HydrateDocumentOptions, re
   try {
     updateCanonicalLink(doc, opts.canonicalUrl);
   } catch (e) {
-    renderError(results, e);
+    renderCatchError(results, e);
   }
 
   try {

@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import { consoleError, getHostRef } from '@platform';
 import { getValue, parsePropertyValue, setValue } from '@runtime';
 import { MEMBER_FLAGS } from '@utils';

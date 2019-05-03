@@ -17,6 +17,7 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
     if (rollupAppBuild != null) {
       const rollupOutput = await rollupAppBuild.generate({
         format: 'cjs',
+        file: 'app.js',
         chunkFileNames: '[name].js',
       });
 
@@ -36,7 +37,7 @@ async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerC
   const coreText: string[] = [];
   const hydrateCmps = await updateToHydrateComponents(config, compilerCtx, buildCtx, cmps);
 
-  coreText.push(`import { initConnect, registerComponents, styles } from '@stencil/core/platform';`);
+  coreText.push(`import { bootstrapHydrate, registerComponents, styles } from '@stencil/core/platform';`);
   coreText.push(`import '@stencil/core/global-scripts';`);
 
   hydrateCmps.forEach(cmpData => coreText.push(cmpData.importLine));
@@ -65,7 +66,7 @@ async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerC
     });
   });
 
-  coreText.push(`export { initConnect }`);
+  coreText.push(`export { bootstrapHydrate }`);
 
   return coreText.join('\n');
 }
