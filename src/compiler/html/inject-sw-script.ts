@@ -4,13 +4,10 @@ import { UNREGISTER_SW, getRegisterSW } from '../service-worker/generate-sw';
 
 
 export async function updateIndexHtmlServiceWorker(config: d.Config, buildCtx: d.BuildCtx, doc: Document, outputTarget: d.OutputTargetWww) {
-  if (!outputTarget.serviceWorker && config.devMode) {
-    // if we're not generating a sw, and this is a dev build
-    // then let's inject a script that always unregisters any service workers
+  const serviceWorker = outputTarget.serviceWorker;
+  if ((serviceWorker && serviceWorker.unregister) || (!serviceWorker && config.devMode)) {
     injectUnregisterServiceWorker(doc);
-
-  } else if (outputTarget.serviceWorker) {
-    // we have a valid sw config, so we'll need to inject the register sw script
+  } else if (serviceWorker) {
     await injectRegisterServiceWorker(config, buildCtx, outputTarget, doc);
   }
 }
