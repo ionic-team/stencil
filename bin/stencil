@@ -1,4 +1,4 @@
-#!/usr/bin/env node --expose-gc
+#!/usr/bin/env node
 'use strict';
 
 try {
