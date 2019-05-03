@@ -40,7 +40,7 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
     }
 
     if (results != null && Array.isArray(results.diagnostics)) {
-      const hasError = results.diagnostics.some(d => d.level === 'error' && d.type === 'runtime');
+      const hasError = results.diagnostics.some(d => d.level === 'error' || d.type === 'runtime');
       if (hasError) {
         config.sys.destroy();
         exit(1);
