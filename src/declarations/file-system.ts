@@ -1,10 +1,11 @@
+import { MakeDirectoryOptions } from 'fs';
 
 export interface FileSystem {
   access(path: string): Promise<void>;
   copyFile(src: string, dest: string): Promise<void>;
   createReadStream(filePath: string): any;
   existsSync(filePath: string): boolean;
-  mkdir(dirPath: string): Promise<void>;
+  mkdir(dirPath: string, opts?: MakeDirectoryOptions): Promise<void>;
   mkdirSync(dirPath: string): void;
   readdir(dirPath: string): Promise<string[]>;
   readdirSync(dirPath: string): string[];

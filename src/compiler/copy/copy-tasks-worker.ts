@@ -28,6 +28,7 @@ export async function copyTasksWorker(copyTasks: d.CopyTask[]) {
 
     // figure out which directories we'll need to make first
     const mkDirs = ensureDirs(allCopyTasks);
+
     for (const mkDir of mkDirs) {
       try {
         await fs.mkdir(mkDir);

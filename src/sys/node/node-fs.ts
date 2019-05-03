@@ -31,9 +31,9 @@ export class NodeFs implements d.FileSystem {
     return fs.createReadStream(filePath);
   }
 
-  mkdir(dirPath: string) {
+  mkdir(dirPath: string, opts?: fs.MakeDirectoryOptions) {
     return new Promise<void>((resolve, reject) => {
-      fs.mkdir(dirPath, (err: any) => {
+      fs.mkdir(dirPath, opts, (err: any) => {
         if (err) {
           reject(err);
         } else {

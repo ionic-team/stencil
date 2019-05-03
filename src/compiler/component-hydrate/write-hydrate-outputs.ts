@@ -68,6 +68,7 @@ async function copyHydrateRunner(config: d.Config, hydrateAppDirPath: string) {
   const runnerDestPath = config.sys.path.join(hydrateAppDirPath, runnerIndexFileName);
   const runnerDtsDestPath = config.sys.path.join(hydrateAppDirPath, runnerDtsFileName);
 
+  await config.sys.fs.mkdir(hydrateAppDirPath, { recursive: true });
   await Promise.all([
     config.sys.fs.copyFile(runnerSrcPath, runnerDestPath),
     config.sys.fs.copyFile(runnerDtsSrcPath, runnerDtsDestPath)
