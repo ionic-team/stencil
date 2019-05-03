@@ -51,14 +51,14 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/stencil
-      - run: npm run test.end-to-end -- --ci --debug --maxWorkers=4
+      - run: npm run test.end-to-end -- --ci --debug --max-workers=4
 
   test_jest:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/stencil
-      - run: npm run test.jest -- --maxWorkers=4
+      - run: npm run test.jest -- --max-workers=4
 
   test_sys_node:
     <<: *defaults
