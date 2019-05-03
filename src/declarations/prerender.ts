@@ -3,7 +3,6 @@ import * as d from '.';
 
 export interface PrerenderManager {
   basePath: string;
-  compilerCtx: d.CompilerCtx;
   config: d.Config;
   devServerHostUrl: string;
   diagnostics: d.Diagnostic[];

@@ -13,8 +13,8 @@ export function inlineStyleSheets(config: d.Config, compilerCtx: d.CompilerCtx, 
       if (!await compilerCtx.fs.access(fsPath)) {
         return;
       }
-      const styles = await compilerCtx.fs.readFile(fsPath);;
-      if (maxSize >= 0 && styles.length > maxSize) {
+      const styles = await compilerCtx.fs.readFile(fsPath);
+      if (styles.length > maxSize) {
         return;
       }
 
@@ -23,17 +23,6 @@ export function inlineStyleSheets(config: d.Config, compilerCtx: d.CompilerCtx, 
       inlinedStyles.innerHTML = styles;
       link.parentNode.insertBefore(inlinedStyles, link);
       link.remove();
-
-      if (maxSize < 0) {
-        // mark inlinedStyle as treeshakable
-        inlinedStyles.setAttribute('data-styles', '');
-
-        // since it's not longer a critical resource
-        link.setAttribute('importance', 'low');
-
-        // move <link rel="stylesheet"> to the end of <body>
-        doc.body.appendChild(link);
-      }
     })
   );
 }

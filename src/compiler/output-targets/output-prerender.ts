@@ -6,7 +6,7 @@ import { generateTemplateHtml } from '../prerender/prerender-template-html';
 import { buildError } from '@utils';
 
 
-export async function outputPrerender(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function outputPrerender(config: d.Config, buildCtx: d.BuildCtx) {
   if (typeof config.srcIndexHtml !== 'string') {
     return;
   }
@@ -26,12 +26,12 @@ export async function outputPrerender(config: d.Config, compilerCtx: d.CompilerC
     .filter(o => typeof o.indexHtml === 'string');
 
   await Promise.all(outputTargets.map(outputTarget => {
-    return prerenderOutputTarget(config, compilerCtx, buildCtx, outputTarget);
+    return prerenderOutputTarget(config, buildCtx, outputTarget);
   }));
 }
 
 
-async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
+async function prerenderOutputTarget(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   // if there was src index.html file, then the process before this one
   // would have already loaded and updated the src index to its www path
   // get the www index html content for the template for all prerendered pages
@@ -40,6 +40,6 @@ async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCt
     return;
   }
 
-  const templateHtml = await generateTemplateHtml(config, compilerCtx, buildCtx, outputTarget);
-  await runPrerenderMain(config, compilerCtx, buildCtx, outputTarget, templateHtml);
+  const templateHtml = await generateTemplateHtml(config, buildCtx, outputTarget);
+  await runPrerenderMain(config, buildCtx, outputTarget, templateHtml);
 }

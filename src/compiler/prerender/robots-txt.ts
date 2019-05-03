@@ -67,7 +67,7 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
       results.url = robotsTxtUrl.href;
     }
 
-    await manager.compilerCtx.fs.writeFile(results.filePath, results.content, { immediateWrite: true });
+    await manager.config.sys.fs.writeFile(results.filePath, results.content);
 
     return results;
 

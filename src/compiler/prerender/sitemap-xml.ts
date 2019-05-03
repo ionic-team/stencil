@@ -64,7 +64,7 @@ export async function generateSitemapXml(manager: d.PrerenderManager) {
       results.url = sitemapUrl.href;
     }
 
-    await manager.compilerCtx.fs.writeFile(results.filePath, results.content, { immediateWrite: true });
+    await manager.config.sys.fs.writeFile(results.filePath, results.content);
 
     return results;
 

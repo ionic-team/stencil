@@ -25,7 +25,16 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
     buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
-    await outputPrerender(config, compilerCtx, buildCtx);
+    if (!config.watch) {
+      compilerCtx.reset();
+      if (global && global.gc) {
+        buildCtx.debug(`triggering forced gc`);
+        global.gc();
+        buildCtx.debug(`forced gc finished`);
+      }
+    }
+
+    await outputPrerender(config, buildCtx);
     await outputServiceWorkers(config, buildCtx);
 
   } catch (e) {

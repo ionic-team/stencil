@@ -9,7 +9,7 @@ import { getRelativeBuildDir } from '../html/utils';
 import { URL } from 'url';
 
 
-export async function runPrerenderMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, templateHtml: string) {
+export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, templateHtml: string) {
   // main thread!
   if (buildCtx.hasError) {
     return;
@@ -34,7 +34,6 @@ export async function runPrerenderMain(config: d.Config, compilerCtx: d.Compiler
     componentGraphPath: null,
     diagnostics: prerenderDiagnostics,
     config: config,
-    compilerCtx: compilerCtx,
     devServerHostUrl: devServerHostUrl,
     hydrateAppFilePath: buildCtx.hydrateAppFilePath,
     isDebug: (config.logLevel === 'debug'),
