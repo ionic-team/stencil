@@ -219,7 +219,7 @@ That means, developers will be able to call component methods safely without usi
 @Component(...)
 export class Cmp {
   @Method()
-  await doSomething() {
+  async doSomething() {
     console.log('called');
   }
 }
