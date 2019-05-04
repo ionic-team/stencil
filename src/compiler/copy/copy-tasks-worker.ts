@@ -12,7 +12,7 @@ export async function copyTasksWorker(copyTasks: d.CopyTask[]) {
   };
 
   try {
-    const fs = new NodeFs();
+    const fs = new NodeFs(process);
 
     const allCopyTasks: d.CopyTask[] = [];
 

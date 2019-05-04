@@ -8,7 +8,7 @@ import path from 'path';
 async function startServer(devServerConfig: d.DevServerConfig) {
   // received a message from main to start the server
   try {
-    const fs = new NodeFs();
+    const fs = new NodeFs(process);
     devServerConfig.contentTypes = await loadContentTypes(fs);
     startDevServerWorker(process, devServerConfig, fs);
 

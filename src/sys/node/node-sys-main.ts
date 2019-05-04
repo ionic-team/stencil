@@ -46,7 +46,7 @@ export class NodeSystem implements d.StencilSystem {
   };
 
   constructor(fs?: d.FileSystem) {
-    this.fs = fs || new NodeFs();
+    this.fs = fs || new NodeFs(process);
     this.path = Object.assign({}, path);
 
     const orgPathJoin = path.join;
