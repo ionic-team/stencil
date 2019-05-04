@@ -111,7 +111,12 @@ async function render(win: Window, doc: Document, opts: d.HydrateDocumentOptions
 
   await new Promise(resolve => {
     const tmr = setTimeout(() => {
-      renderBuildError(results, `Hydrate exceeded timeout: ${opts.timeout}ms`);
+      let msg = `Hydrate exceeded timeout: ${opts.timeout}ms`;
+      if (typeof opts.url === 'string') {
+        msg += `, url: ${opts.url}`;
+      }
+
+      renderBuildError(results, msg);
       resolve();
     }, opts.timeout);
 
@@ -130,11 +135,12 @@ async function render(win: Window, doc: Document, opts: d.HydrateDocumentOptions
               depth: -1
             });
           });
-          bootstrapResults = null;
 
         } catch (e) {
           renderCatchError(results, e);
         }
+
+        bootstrapResults = null;
         resolve();
       });
 

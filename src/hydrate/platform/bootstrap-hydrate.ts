@@ -43,10 +43,9 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
       }
     };
 
-    const doc = win.document;
-    const orgDocumentCreateElement = doc.createElement;
-    doc.createElement = function patchedCreateElement(tagName: string) {
-      const elm = orgDocumentCreateElement.call(doc, tagName);
+    let orgDocumentCreateElement = win.document.createElement;
+    win.document.createElement = function patchedCreateElement(tagName: string) {
+      const elm = orgDocumentCreateElement.call(win.document, tagName);
       patchComponent(elm);
       return elm;
     };
@@ -62,8 +61,7 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
       }
     };
 
-    const body = doc.body;
-    patchChild(body);
+    patchChild(win.document.body);
 
     const initConnectElement = (elm: d.HostElement) => {
       if (elm != null && elm.nodeType === 1) {
@@ -77,7 +75,7 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
       }
     };
 
-    initConnectElement(body);
+    initConnectElement(win.document.body);
 
     Promise.all(waitPromises)
       .then(() => {
@@ -85,24 +83,31 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
           waitPromises.length = 0;
           connectedElements.clear();
           if (opts.clientHydrateAnnotations) {
-            insertVdomAnnotations(doc);
+            insertVdomAnnotations(win.document);
           }
+          win.document.createElement = orgDocumentCreateElement;
+          win = opts = orgDocumentCreateElement = null;
         } catch (e) {
           win.console.error(e);
         }
+
         done(results);
       })
       .catch(e => {
         try {
+          win.console.error(e);
           waitPromises.length = 0;
           connectedElements.clear();
-          win.console.error(e);
+          win.document.createElement = orgDocumentCreateElement;
+          win = opts = orgDocumentCreateElement = null;
         } catch (e) {}
+
         done(results);
       });
 
   } catch (e) {
     win.console.error(e);
+    win = opts = null;
     done(results);
   }
 }
