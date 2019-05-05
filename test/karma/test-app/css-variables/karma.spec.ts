@@ -1,7 +1,7 @@
 import { setupDomTests } from '../util';
 
 
-fdescribe('css-variables', function() {
+describe('css-variables', function() {
   const {setupDom, tearDownDom} = setupDomTests(document);
   let app: HTMLElement;
 
@@ -19,7 +19,7 @@ fdescribe('css-variables', function() {
     const backgroundCheck = app.querySelector('css-variables-root > css-variables > header');
     const headerStyles = window.getComputedStyle(backgroundCheck)
 
-    expect(headerStyles.color).toBe('maroon')
+    expect(headerStyles.color).toBe('rgb(128, 0, 0)')
     })
 
 });
