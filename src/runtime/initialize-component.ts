@@ -28,42 +28,43 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
 
     if (BUILD.lazyLoad || BUILD.hydrateServerSide) {
       // lazy loaded components
+      // request the component's implementation to be
+      // wired up with the host element
+      Cstr = await loadModule(cmpMeta, hostRef, hmrVersionId);
+      if ((BUILD.isDev || BUILD.isDebug) && !Cstr) {
+        throw new Error(`Constructor for "${cmpMeta.$tagName$}#${hostRef.$modeName$}" was not found`);
+      }
+      if (BUILD.member && !Cstr.isProxied) {
+        // we'eve never proxied this Constructor before
+        // let's add the getters/setters to its prototype before
+        // the first time we create an instance of the implementation
+        if (BUILD.watchCallback) {
+          cmpMeta.$watchers$ = Cstr.watchers;
+        }
+        proxyComponent(Cstr, cmpMeta, 0, 1);
+        Cstr.isProxied = true;
+      }
+
+      // ok, time to construct the instance
+      // but let's keep track of when we start and stop
+      // so that the getters/setters don't incorrectly step on data
+      if (BUILD.member) {
+        hostRef.$flags$ |= HOST_FLAGS.isConstructingInstance;
+      }
+      // construct the lazy-loaded component implementation
+      // passing the hostRef is very important during
+      // construction in order to directly wire together the
+      // host element and the lazy-loaded instance
       try {
-        // request the component's implementation to be
-        // wired up with the host element
-        Cstr = await loadModule(cmpMeta, hostRef, hmrVersionId);
-
-        if (BUILD.member && !Cstr.isProxied) {
-          // we'eve never proxied this Constructor before
-          // let's add the getters/setters to its prototype before
-          // the first time we create an instance of the implementation
-          if (BUILD.watchCallback) {
-            cmpMeta.$watchers$ = Cstr.watchers;
-          }
-          proxyComponent(Cstr, cmpMeta, 0, 1);
-          Cstr.isProxied = true;
-        }
-
-        // ok, time to construct the instance
-        // but let's keep track of when we start and stop
-        // so that the getters/setters don't incorrectly step on data
-        if (BUILD.member) {
-          hostRef.$flags$ |= HOST_FLAGS.isConstructingInstance;
-        }
-        // construct the lazy-loaded component implementation
-        // passing the hostRef is very important during
-        // construction in order to directly wire together the
-        // host element and the lazy-loaded instance
         new (Cstr as any)(hostRef);
-
-        if (BUILD.member) {
-          hostRef.$flags$ &= ~HOST_FLAGS.isConstructingInstance;
-        }
-        fireConnectedCallback(hostRef.$lazyInstance$);
-
       } catch (e) {
         consoleError(e);
       }
+
+      if (BUILD.member) {
+        hostRef.$flags$ &= ~HOST_FLAGS.isConstructingInstance;
+      }
+      fireConnectedCallback(hostRef.$lazyInstance$);
 
     } else {
       Cstr = elm.constructor as any;
