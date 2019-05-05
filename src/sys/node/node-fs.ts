@@ -44,7 +44,7 @@ export class NodeFs implements d.FileSystem {
     return fs.createReadStream(filePath);
   }
 
-  mkdir(dirPath: string, opts: fs.MakeDirectoryOptions = {}) {
+  mkdir(dirPath: string, opts: d.MakeDirectoryOptions = {}) {
     if (opts.recursive) {
       if (this.supportsMkdirRecursive) {
         // supports mkdir recursive
