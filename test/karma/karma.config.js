@@ -87,9 +87,8 @@ module.exports = function(config) {
     ],
 
     browserStack: {
-    username: 'jessereckley1',
-      accessKey: 'VsxgWTpLWhHXtDkxgbQ3'
-  },
+      project: 'stencil_core'
+    },
 
     preprocessors: {
       '**/*.ts': 'karma-typescript'
