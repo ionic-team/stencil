@@ -1,5 +1,4 @@
 import { setMode } from '@stencil/core';
-//import 'get-root-node-polyfill/implement'
 
 declare const Context: any;
 

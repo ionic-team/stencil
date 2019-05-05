@@ -33,6 +33,9 @@
     "test-app/**/*.tsx",
     "test-app/util.ts",
     "test-sibling/**/*.spec.ts",
-    "test-sibling/**/*.tsx"
+    "test-sibling/**/*.tsx",
+    "test-edge-isolation/components.d.ts",
+    "test-edge-isolation/**/*.spec.ts",
+    "test-edge-isolation/**/*.tsx"
   ]
 }

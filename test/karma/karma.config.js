@@ -46,6 +46,12 @@ const localLaunchers = {
 			'--remote-debugging-port=9333'
 		]
   },
+  IEGeneral: {
+    base: 'IE'
+  },
+  EdgeGeneral: {
+    base:'Edge'
+  }
   // 'Firefox': {
   //   base: 'Firefox'
   // }
@@ -57,6 +63,8 @@ module.exports = function(config) {
       'karma-chrome-launcher',
       'karma-firefox-launcher',
       'karma-safari-launcher',
+      'karma-ie-launcher',
+      'karma-edge-launcher',
       'karma-browserstack-launcher',
       'karma-jasmine',
       'karma-typescript',
@@ -79,8 +87,9 @@ module.exports = function(config) {
     ],
 
     browserStack: {
-      project: 'stencil_core'
-    },
+    username: 'jessereckley1',
+      accessKey: 'VsxgWTpLWhHXtDkxgbQ3'
+  },
 
     preprocessors: {
       '**/*.ts': 'karma-typescript'

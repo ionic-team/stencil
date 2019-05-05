@@ -12,18 +12,23 @@
     "karma": "karma start karma.config.js",
     "karma.chrome": "karma start karma.config.js --browsers=Chrome --single-run=false",
     "karma.firefox": "karma start karma.config.js --browsers=Firefox --single-run=false",
+    "karma.ie": "karma start karma.config.js --browsers=IE --single-run=false",
+    "karma.edge": "karma start karma.config.js --browsers=Edge --single-run=false",
     "karma.prod": "npm run tsc && npm run build.app && npm run karma.webpack && karma start karma.config.js --browsers=Chrome",
     "karma.webpack": "webpack --config test-app/esm-webpack/webpack.config.js",
-    "start": "node ../../bin/stencil build --dev --watch --serve",
+    "start": "node ../../bin/stencil build --dev --watch --serve --es5",
     "tsc": "node ../../node_modules/typescript/lib/tsc -p tsconfig.json"
   },
   "devDependencies": {
     "@stencil/sass": "^0.2.0",
+    "get-root-node-polyfill": "^1.0.0",
     "jasmine-core": "^3.4.0",
     "karma": "^2.0.0",
     "karma-browserstack-launcher": "^1.5.1",
     "karma-chrome-launcher": "^2.2.0",
+    "karma-edge-launcher": "^0.4.2",
     "karma-firefox-launcher": "^1.1.0",
+    "karma-ie-launcher": "^1.0.0",
     "karma-jasmine": "^1.1.1",
     "karma-polyfill": "^1.0.0",
     "karma-safari-launcher": "^1.0.0",
@@ -34,5 +39,6 @@
     "webpack": "^4.30.0",
     "webpack-cli": "^3.3.1",
     "workbox-build": "4.3.1"
-  }
+  },
+  "dependencies": {}
 }

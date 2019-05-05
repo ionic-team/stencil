@@ -57,6 +57,7 @@ export namespace Components {
   interface DynamicImport {
     'update': () => Promise<void>;
   }
+  interface EdgeGetRootNode {}
   interface Es5AddclassSvg {}
   interface EsmImport {
     'propVal': number;
@@ -209,6 +210,7 @@ declare namespace LocalJSX {
   }
   interface DynamicCssVariable extends JSXBase.HTMLAttributes {}
   interface DynamicImport extends JSXBase.HTMLAttributes {}
+  interface EdgeGetRootNode extends JSXBase.HTMLAttributes {}
   interface Es5AddclassSvg extends JSXBase.HTMLAttributes {}
   interface EsmImport extends JSXBase.HTMLAttributes {
     'onSomeEvent'?: (event: CustomEvent<any>) => void;
@@ -342,6 +344,7 @@ declare namespace LocalJSX {
     'DomReattach': Components.DomReattach;
     'DynamicCssVariable': Components.DynamicCssVariable;
     'DynamicImport': Components.DynamicImport;
+    'EdgeGetRootNode': Components.EdgeGetRootNode;
     'Es5AddclassSvg': Components.Es5AddclassSvg;
     'EsmImport': Components.EsmImport;
     'ExternalImportA': Components.ExternalImportA;
@@ -427,6 +430,7 @@ declare namespace LocalJSX {
     'DomReattach': LocalJSX.DomReattach;
     'DynamicCssVariable': LocalJSX.DynamicCssVariable;
     'DynamicImport': LocalJSX.DynamicImport;
+    'EdgeGetRootNode': LocalJSX.EdgeGetRootNode;
     'Es5AddclassSvg': LocalJSX.Es5AddclassSvg;
     'EsmImport': LocalJSX.EsmImport;
     'ExternalImportA': LocalJSX.ExternalImportA;
@@ -611,6 +615,12 @@ declare global {
   var HTMLDynamicImportElement: {
     prototype: HTMLDynamicImportElement;
     new (): HTMLDynamicImportElement;
+  };
+
+  interface HTMLEdgeGetRootNodeElement extends Components.EdgeGetRootNode, HTMLStencilElement {}
+  var HTMLEdgeGetRootNodeElement: {
+    prototype: HTMLEdgeGetRootNodeElement;
+    new (): HTMLEdgeGetRootNodeElement;
   };
 
   interface HTMLEs5AddclassSvgElement extends Components.Es5AddclassSvg, HTMLStencilElement {}
@@ -1015,6 +1025,7 @@ declare global {
     'dom-reattach': HTMLDomReattachElement
     'dynamic-css-variable': HTMLDynamicCssVariableElement
     'dynamic-import': HTMLDynamicImportElement
+    'edge-get-root-node': HTMLEdgeGetRootNodeElement
     'es5-addclass-svg': HTMLEs5AddclassSvgElement
     'esm-import': HTMLEsmImportElement
     'external-import-a': HTMLExternalImportAElement
@@ -1100,6 +1111,7 @@ declare global {
     'dom-reattach': HTMLDomReattachElement;
     'dynamic-css-variable': HTMLDynamicCssVariableElement;
     'dynamic-import': HTMLDynamicImportElement;
+    'edge-get-root-node': HTMLEdgeGetRootNodeElement;
     'es5-addclass-svg': HTMLEs5AddclassSvgElement;
     'esm-import': HTMLEsmImportElement;
     'external-import-a': HTMLExternalImportAElement;
