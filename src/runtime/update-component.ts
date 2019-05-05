@@ -7,34 +7,41 @@ import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 
 
+export const safeCall = (instance: any, method: string) => {
+  if (instance && instance[method]) {
+    try {
+      return instance[method]();
+    } catch (e) {
+      consoleError(e);
+    }
+  }
+  return undefined;
+};
+
 export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   if (BUILD.taskQueue && BUILD.updatable) {
     hostRef.$flags$ |= HOST_FLAGS.isQueuedForUpdate;
   }
   const instance = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm as any;
-  try {
-    if (isInitialLoad) {
-      emitLifecycleEvent(elm, 'componentWillLoad');
-      if (BUILD.cmpWillLoad &&  instance.componentWillLoad) {
-        await instance.componentWillLoad();
-      }
-
-    } else {
-      emitLifecycleEvent(elm, 'componentWillUpdate');
-
-      if (BUILD.cmpWillUpdate && instance.componentWillUpdate) {
-        await instance.componentWillUpdate();
-      }
+  if (isInitialLoad) {
+    emitLifecycleEvent(elm, 'componentWillLoad');
+    if (BUILD.cmpWillLoad) {
+      await safeCall(instance, 'componentWillLoad');
     }
 
-    emitLifecycleEvent(elm, 'componentWillRender');
-    if (BUILD.cmpWillRender && instance.componentWillRender) {
-      await instance.componentWillRender();
-    }
+  } else {
+    emitLifecycleEvent(elm, 'componentWillUpdate');
 
-  } catch (e) {
-    consoleError(e);
+    if (BUILD.cmpWillUpdate) {
+      await safeCall(instance, 'componentWillUpdate');
+    }
   }
+
+  emitLifecycleEvent(elm, 'componentWillRender');
+  if (BUILD.cmpWillRender) {
+    await safeCall(instance, 'componentWillRender');
+  }
+
   // there is no ancestorc omponent or the ancestor component
   // has already fired off its lifecycle update then
   // fire off the initial update
@@ -124,8 +131,8 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
     const instance = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm as any;
     const ancestorComponent = hostRef.$ancestorComponent$;
 
-    if (BUILD.cmpDidRender && instance.componentDidRender) {
-      instance.componentDidRender();
+    if (BUILD.cmpDidRender) {
+      safeCall(instance, 'componentDidRender');
     }
     emitLifecycleEvent(elm, 'componentDidRender');
 
@@ -138,8 +145,8 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
         elm.classList.add(HYDRATED_CLASS);
       }
 
-      if (BUILD.cmpDidLoad && instance.componentDidLoad) {
-        instance.componentDidLoad();
+      if (BUILD.cmpDidLoad) {
+        safeCall(instance, 'componentDidLoad');
       }
 
       emitLifecycleEvent(elm, 'componentDidLoad');
@@ -161,12 +168,12 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
       }
 
     } else {
-      if (BUILD.cmpDidUpdate && instance.componentDidUpdate) {
+      if (BUILD.cmpDidUpdate) {
         // we've already loaded this component
         // fire off the user's componentDidUpdate method (if one was provided)
         // componentDidUpdate runs AFTER render() has been called
         // and all child components have finished updating
-        instance.componentDidUpdate();
+        safeCall(instance, 'componentDidUpdate');
       }
       emitLifecycleEvent(elm, 'componentDidUpdate');
     }

@@ -1,7 +1,8 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, cssVarShim, getHostRef, plt } from '@platform';
+import { cssVarShim, getHostRef, plt } from '@platform';
 import { PLATFORM_FLAGS } from './runtime-constants';
+import { safeCall } from './update-component';
 
 
 export const disconnectedCallback = (elm: d.HostElement) => {
@@ -21,19 +22,11 @@ export const disconnectedCallback = (elm: d.HostElement) => {
     }
 
     const instance: any = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm;
-    if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.disconnectedCallback && instance && instance.disconnectedCallback) {
-      try {
-        instance.disconnectedCallback();
-      } catch (e) {
-        consoleError(e);
-      }
+    if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.disconnectedCallback) {
+      safeCall(instance, 'disconnectedCallback');
     }
-    if (BUILD.cmpDidUnload && instance && instance.componentDidUnload) {
-      try {
-        instance.componentDidUnload();
-      } catch (e) {
-        consoleError(e);
-      }
+    if (BUILD.cmpDidUnload) {
+      safeCall(instance, 'componentDidUnload');
     }
   }
 };

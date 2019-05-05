@@ -7,10 +7,11 @@ import { doc, getHostRef, plt, supportsShadowDom, tick } from '@platform';
 import { HYDRATE_ID, PLATFORM_FLAGS } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
+import { safeCall } from './update-component';
 
 export const fireConnectedCallback = (instance: any) => {
-  if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.connectedCallback && instance && instance.connectedCallback) {
-    instance.connectedCallback();
+  if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.connectedCallback) {
+    safeCall(instance, 'connectedCallback');
   }
 };
 
