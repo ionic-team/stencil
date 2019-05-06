@@ -58,6 +58,10 @@ export function isOutputTargetDistLazy(o: d.OutputTarget): o is d.OutputTargetDi
   return o.type === DIST_LAZY;
 }
 
+export function isOutputTargetAngular(o: d.OutputTarget): o is d.OutputTargetAngular {
+  return o.type === 'angular';
+}
+
 export function isOutputTargetDistLazyLoader(o: d.OutputTarget): o is d.OutputTargetDistLazyLoader {
   return o.type === DIST_LAZY_LOADER;
 }
@@ -72,6 +76,26 @@ export function isOutputTargetDistSelfContained(o: d.OutputTarget): o is d.Outpu
 
 export function isOutputTargetHydrate(o: d.OutputTarget): o is d.OutputTargetHydrate {
   return o.type === DIST_HYDRATE_SCRIPT;
+}
+
+export function isOutputTargetCustom(o: d.OutputTarget): o is d.OutputTargetCustom {
+  return o.type === CUSTOM;
+}
+
+export function isOutputTargetDocsReadme(o: d.OutputTarget): o is d.OutputTargetDocsReadme {
+  return o.type === DOCS;
+}
+
+export function isOutputTargetDocsJson(o: d.OutputTarget): o is d.OutputTargetDocsJson {
+  return o.type === DOCS_JSON;
+}
+
+export function isOutputTargetDocsCustom(o: d.OutputTarget): o is d.OutputTargetDocsCustom {
+  return o.type === DOCS_CUSTOM;
+}
+
+export function isOutputTargetDocsVscode(o: d.OutputTarget): o is d.OutputTargetDocsVscode {
+  return o.type === DOCS_VSCODE;
 }
 
 export function isOutputTargetWww(o: d.OutputTarget): o is d.OutputTargetWww {
@@ -96,6 +120,8 @@ export function canSkipAppCoreBuild(buildCtx: d.BuildCtx) {
   return true;
 }
 
+export const ANGULAR = `angular`;
+export const CUSTOM = `custom`;
 export const DIST = `dist`;
 export const DIST_COLLECTION = `dist-collection`;
 export const DIST_HYDRATE_SCRIPT = `dist-hydrate-script`;
@@ -103,16 +129,28 @@ export const DIST_LAZY = `dist-lazy`;
 export const DIST_LAZY_LOADER = `dist-lazy-loader`;
 export const DIST_MODULE = `experimental-dist-module`;
 export const DIST_SELF_CONTAINED = `dist-self-contained`;
+export const DOCS = `docs`;
+export const DOCS_CUSTOM = 'docs-custom';
+export const DOCS_JSON = `docs-json`;
+export const DOCS_README = `docs-readme`;
+export const DOCS_VSCODE = `docs-vscode`;
 export const STATS = `stats`;
 export const WWW = `www`;
 
 export const VALID_TYPES = [
+  ANGULAR,
+  CUSTOM,
   DIST,
   DIST_COLLECTION,
   DIST_HYDRATE_SCRIPT,
   DIST_LAZY,
   DIST_MODULE,
   DIST_SELF_CONTAINED,
+  DOCS,
+  DOCS_JSON,
+  DOCS_README,
+  DOCS_VSCODE,
+  DOCS_CUSTOM,
   STATS,
   WWW,
 ];

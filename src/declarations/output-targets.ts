@@ -1,5 +1,14 @@
 import * as d from '.';
 
+export interface OutputTargetAngular extends OutputTargetBase {
+  type: 'angular';
+
+  componentCorePackage: string;
+  directivesProxyFile?: string;
+  directivesArrayFile?: string;
+  directivesUtilsFile?: string;
+  excludeComponents?: string[];
+}
 
 export interface OutputTargetWww extends OutputTargetBase {
   /**
@@ -160,6 +169,13 @@ export interface OutputTargetHydrate extends OutputTargetBase {
   empty?: boolean;
 }
 
+export interface OutputTargetCustom extends OutputTargetBase {
+  type: 'custom';
+  name: string;
+  validate?: (config: d.Config, diagnostics: d.Diagnostic[]) => Promise<void>;
+  generator: (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, docs: d.JsonDocs) => Promise<void>;
+}
+
 export interface OutputTargetDocsVscode extends OutputTargetBase {
   type: 'docs-vscode';
   file?: string;
@@ -214,12 +230,17 @@ export type OutputTargetBuild =
 
 export type OutputTarget =
  OutputPluginTarget
+ | OutputTargetAngular
  | OutputTargetDist
  | OutputTargetDistCollection
  | OutputTargetDistLazy
  | OutputTargetDistLazyLoader
  | OutputTargetDistModule
  | OutputTargetDistSelfContained
+ | OutputTargetDocsJson
+ | OutputTargetDocsCustom
+ | OutputTargetDocsReadme
+ | OutputTargetDocsVscode
  | OutputTargetWww
  | OutputTargetHydrate
  | OutputTargetStats;

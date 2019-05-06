@@ -4,8 +4,8 @@ import { validateOutputTargetDist } from './validate-outputs-dist';
 import { validateOutputTargetDistHydrateScript } from './validate-outputs-hydrate-script';
 import { validateOutputTargetWww } from './validate-outputs-www';
 import { validateOutputTargetDistModule } from './validate-outputs-dist-module';
-import { getPluginOutputTypeNames } from '../output-plugins/output-plugin-utils';
-import { validatePluginOutputs } from '../output-plugins/validate';
+import { validateOutputTargetAngular } from './validate-outputs-angular';
+import { validateDocs } from './validate-docs';
 import { VALID_TYPES, WWW } from '../output-targets/output-utils';
 
 
@@ -13,7 +13,6 @@ export function validateOutputTargets(config: d.Config) {
 
   // setup outputTargets from deprecated config properties
   if (Array.isArray(config.outputTargets)) {
-    const validTargetTypes = VALID_TYPES.slice().concat(getPluginOutputTypeNames(config)).sort();
 
     config.outputTargets.forEach(outputTarget => {
       if (typeof outputTarget.type !== 'string') {
@@ -22,20 +21,20 @@ export function validateOutputTargets(config: d.Config) {
 
       outputTarget.type = outputTarget.type.trim().toLowerCase() as any;
 
-      if (!validTargetTypes.includes(outputTarget.type)) {
-        throw new Error(`invalid outputTarget type "${outputTarget.type}". Valid outputTarget types include: ${validTargetTypes.map(t => `"${t}"`).join(', ')}`);
+      if (!VALID_TYPES.includes(outputTarget.type)) {
+        throw new Error(`invalid outputTarget type "${outputTarget.type}". Valid outputTarget types include: ${VALID_TYPES.map(t => `"${t}"`).join(', ')}`);
       }
     });
   }
 
   validateOutputTargetWww(config);
   validateOutputTargetDist(config);
+  validateOutputTargetAngular(config);
   validateOutputTargetDistHydrateScript(config);
   validateOutputTargetDistModule(config);
+  validateDocs(config);
   validateOutputStats(config);
 
-  // Validate Plugins for outputs
-  validatePluginOutputs(config);
 
   if (!config.outputTargets || config.outputTargets.length === 0) {
     throw new Error(`outputTarget required`);

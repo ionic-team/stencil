@@ -6,8 +6,11 @@ import { outputModule } from './output-module';
 import { outputTypes } from './output-types';
 import { outputLazyLoader } from './output-lazy-loader';
 import { outputWww } from './output-www';
-import { createPluginOutput } from '../output-plugins/create-plugin-output';
+import { outputDocs } from './output-docs';
+import { outputAngular } from './output-angular';
+
 import { canSkipAppCoreBuild } from './output-utils';
+
 
 
 export async function generateOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -19,8 +22,10 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     outputCollections(config, compilerCtx, buildCtx),
     outputModulesApp(config, compilerCtx, buildCtx),
     outputHydrate(config, compilerCtx, buildCtx),
-    createPluginOutput(config, compilerCtx, buildCtx),
+    outputDocs(config, compilerCtx, buildCtx),
+    outputAngular(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
+
     // outputSelfContainedWebComponents(config, compilerCtx, buildCtx),
     buildCtx.stylesPromise
   ];

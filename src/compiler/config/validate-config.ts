@@ -4,7 +4,6 @@ import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace, validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
 import { validatePaths } from './validate-paths';
-import { validatePlugins } from './validate-plugins';
 import { validateRollupConfig } from './validate-rollup-config';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
@@ -74,13 +73,6 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
   setBooleanConfig(config, 'buildDist', 'esm', config.buildEs5);
   setBooleanConfig(config, 'buildScoped', null, config.buildEs5);
-
-  /**
-   * validate plugins becore output targets because some plugins will be registered
-   * for output targets
-   */
-
-  validatePlugins(config);
 
   // setup the outputTargets
   validateOutputTargets(config);
