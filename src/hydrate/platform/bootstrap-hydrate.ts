@@ -114,42 +114,57 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
 
 
 function connectElements(win: Window, opts: d.HydrateDocumentOptions, results: BootstrapHydrateResults, elm: HTMLElement, connectedElements: Set<any>, waitPromises: Promise<any>[]) {
-  if (elm != null && elm.nodeType === 1 && results.hydratedCount < opts.maxHydrateCount) {
-
+  if (elm != null && elm.nodeType === 1 && results.hydratedCount < opts.maxHydrateCount && shouldHydrate(elm)) {
     const tagName = elm.nodeName.toLowerCase();
 
-    if (!NO_HYDRATE_TAGS.has(tagName) && !elm.hasAttribute('no-prerender')) {
-      if (tagName.includes('-') && !connectedElements.has(elm)) {
-        connectedElements.add(elm);
-        hydrateComponent(win, results, tagName, elm, waitPromises);
-      }
+    if (tagName.includes('-') && !connectedElements.has(elm)) {
+      connectedElements.add(elm);
+      hydrateComponent(win, results, tagName, elm, waitPromises);
+    }
 
-      const children = elm.children;
-      if (children != null) {
-        for (let i = 0, ii = children.length; i < ii; i++) {
-          connectElements(win, opts, results, children[i] as any, connectedElements, waitPromises);
-        }
+    const children = elm.children;
+    if (children != null) {
+      for (let i = 0, ii = children.length; i < ii; i++) {
+        connectElements(win, opts, results, children[i] as any, connectedElements, waitPromises);
       }
     }
   }
 }
 
 
+function shouldHydrate(elm: Element): boolean {
+  if (NO_HYDRATE_TAGS.has(elm.nodeName)) {
+    return false;
+  }
+  if (elm.hasAttribute('no-prerender')) {
+    return false;
+  }
+  const parentNode = elm.parentNode;
+  if (parentNode == null) {
+    return true;
+  }
+
+  return shouldHydrate(parentNode as Element);
+}
+
+const NO_HYDRATE_TAGS = new Set([
+  'CODE',
+  'HEAD',
+  'IFRAME',
+  'INPUT',
+  'OBJECT',
+  'OUTPUT',
+  'NOSCRIPT',
+  'PRE',
+  'SCRIPT',
+  'SELECT',
+  'STYLE',
+  'TEMPLATE',
+  'TEXTAREA'
+]);
+
+
 export interface BootstrapHydrateResults {
   hydratedCount: number;
   hydratedTags: string[];
 }
-
-const NO_HYDRATE_TAGS = new Set([
-  'code',
-  'iframe',
-  'input',
-  'object',
-  'output',
-  'noscript',
-  'pre',
-  'select',
-  'style',
-  'template',
-  'textarea'
-]);
