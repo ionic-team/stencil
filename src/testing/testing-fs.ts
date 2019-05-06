@@ -31,7 +31,7 @@ export class TestingFs implements d.FileSystem {
       process.nextTick(() => {
         this.diskReads++;
         const data = this.data.get(srcPath);
-        if (data != null) {
+        if (data == null) {
           reject(`copyFile, srcPath doesn't exists: ${srcPath}`);
 
         } else {

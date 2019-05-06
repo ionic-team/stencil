@@ -73,6 +73,11 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     return hasAccess;
   }
 
+  async copyFile(src: string, dest: string) {
+    const item = this.getItem(src);
+    item.queueCopyFileToDest = dest;
+  }
+
   async emptyDir(dirPath: string) {
     const item = this.getItem(dirPath);
 
@@ -379,6 +384,9 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     // write all queued the files
     const filesWritten = await this.commitWriteFiles(instructions.filesToWrite);
 
+    // write all queued the files to copy
+    const filesCopied = await this.commitCopyFiles(instructions.filesToCopy);
+
     // remove all the queued files to be deleted
     const filesDeleted = await this.commitDeleteFiles(instructions.filesToDelete);
 
@@ -395,6 +403,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
     // return only the files that were
     return {
+      filesCopied,
       filesWritten,
       filesDeleted,
       dirsDeleted,
@@ -445,6 +454,16 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     return dirsAdded;
   }
 
+  private commitCopyFiles(filesToCopy: string[][]) {
+    const copiedFiles = Promise.all(filesToCopy.map(async data => {
+      const src = data[0];
+      const dest = data[1];
+      await this.disk.copyFile(src, dest);
+      return [src, dest];
+    }));
+    return copiedFiles;
+  }
+
   private commitWriteFiles(filesToWrite: string[]) {
     const writtenFiles = Promise.all(filesToWrite.map(async filePath => {
       if (typeof filePath !== 'string') {
@@ -461,7 +480,6 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     if (item.fileText == null) {
       throw new Error(`unable to find item fileText to write: ${filePath}`);
     }
-
     await this.disk.writeFile(filePath, item.fileText);
 
     if (item.useCache === false) {
@@ -546,6 +564,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       mtimeMs: null,
       isDirectory: null,
       isFile: null,
+      queueCopyFileToDest: null,
       queueDeleteFromDisk: null,
       queueWriteToDisk: null,
       useCache: null
@@ -572,6 +591,7 @@ export function getCommitInstructions(path: d.Path, d: d.FsItems) {
   const instructions = {
     filesToDelete: [] as string[],
     filesToWrite: [] as string[],
+    filesToCopy: [] as string[][],
     dirsToDelete: [] as string[],
     dirsToEnsure: [] as string[]
   };
@@ -615,6 +635,26 @@ export function getCommitInstructions(path: d.Path, d: d.FsItems) {
 
       } else if (item.isFile && !instructions.filesToWrite.includes(itemPath)) {
         instructions.filesToDelete.push(itemPath);
+      }
+
+    } else if (typeof item.queueCopyFileToDest === 'string') {
+      const src = itemPath;
+      const dest = item.queueCopyFileToDest;
+      instructions.filesToCopy.push([src, dest]);
+
+      const dir = normalizePath(path.dirname(dest));
+      if (!instructions.dirsToEnsure.includes(dir)) {
+        instructions.dirsToEnsure.push(dir);
+      }
+
+      const dirDeleteIndex = instructions.dirsToDelete.indexOf(dir);
+      if (dirDeleteIndex > -1) {
+        instructions.dirsToDelete.splice(dirDeleteIndex, 1);
+      }
+
+      const fileDeleteIndex = instructions.filesToDelete.indexOf(dest);
+      if (fileDeleteIndex > -1) {
+        instructions.filesToDelete.splice(fileDeleteIndex, 1);
       }
     }
 

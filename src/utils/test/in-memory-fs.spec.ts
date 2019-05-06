@@ -216,6 +216,25 @@ describe(`in-memory-fs`, () => {
     expect(mockedFs.diskReads).toBe(1);
   });
 
+  it(`copyFile`, async () => {
+    await fs.writeFile(`/src/file1.js`, `1`);
+    await fs.commit();
+    expect(mockedFs.diskWrites).toBe(2);
+    mockedFs.diskWrites = 0;
+    expect(mockedFs.diskWrites).toBe(0);
+
+    await fs.copyFile(`/src/file1.js`, `/dest/file2.js`);
+    const results = await fs.commit();
+    expect(mockedFs.diskWrites).toBe(2);
+    expect(results.dirsAdded).toEqual([`/dest`]);
+    expect(results.dirsDeleted).toEqual([]);
+    expect(results.filesWritten).toEqual([]);
+    expect(results.filesCopied).toEqual([[`/src/file1.js`, `/dest/file2.js`]]);
+
+    const file = await fs.readFile(`/dest/file2.js`);
+    expect(file).toBe(`1`);
+  });
+
   it(`readdir combines both in-memory read w/ inMemoryOnly option and disk readdir reads`, async () => {
     await fs.writeFile(`/dir/file1.js`, `1`);
     await fs.commit();

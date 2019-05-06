@@ -19,7 +19,7 @@ async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, 
   const pkgJsonCode = await getHydratePackageJson(config, compilerCtx, hydrateCoreIndexPath, hydrateCoreIndexDtsFilePath);
 
   const writePromises: Promise<any>[] = [
-    copyHydrateRunner(config, hydrateAppDirPath),
+    copyHydrateRunner(config, compilerCtx, hydrateAppDirPath),
     compilerCtx.fs.writeFile(pkgJsonPath, pkgJsonCode)
   ];
 
@@ -56,7 +56,7 @@ async function getHydratePackageJson(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-async function copyHydrateRunner(config: d.Config, hydrateAppDirPath: string) {
+async function copyHydrateRunner(config: d.Config, compilerCtx: d.CompilerCtx, hydrateAppDirPath: string) {
   const srcHydrateDir = config.sys.path.join(config.sys.compiler.distDir, 'hydrate');
 
   const runnerIndexFileName = 'index.js';
@@ -68,9 +68,8 @@ async function copyHydrateRunner(config: d.Config, hydrateAppDirPath: string) {
   const runnerDestPath = config.sys.path.join(hydrateAppDirPath, runnerIndexFileName);
   const runnerDtsDestPath = config.sys.path.join(hydrateAppDirPath, runnerDtsFileName);
 
-  await config.sys.fs.mkdir(hydrateAppDirPath, { recursive: true });
   await Promise.all([
-    config.sys.fs.copyFile(runnerSrcPath, runnerDestPath),
-    config.sys.fs.copyFile(runnerDtsSrcPath, runnerDtsDestPath)
+    compilerCtx.fs.copyFile(runnerSrcPath, runnerDestPath),
+    compilerCtx.fs.copyFile(runnerDtsSrcPath, runnerDtsDestPath)
   ]);
 }

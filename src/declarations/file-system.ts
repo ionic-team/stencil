@@ -102,6 +102,7 @@ export interface FsItem {
   size: number;
   mtimeMs: number;
   exists: boolean;
+  queueCopyFileToDest: string;
   queueWriteToDisk: boolean;
   queueDeleteFromDisk?: boolean;
   useCache: boolean;
