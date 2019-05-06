@@ -3,10 +3,11 @@ const URL = `
 const URL_ = /*@__PURE__*/(function(){
   if (typeof URL === 'function') {
     return URL;
-
-  } else if (typeof require === 'function') {
+  }
+  const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
+  if (typeof requireFunc === 'function') {
     try {
-      return require('url').URL;
+      return requireFunc('url').URL;
     } catch (e) {}
   }
   return function() {}

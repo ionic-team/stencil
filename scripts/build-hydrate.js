@@ -3,7 +3,8 @@ const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
-const { run, transpile, updateBuildIds, relativeResolve } = require('./script-utils');
+const { run, transpile, updateBuildIds } = require('./script-utils');
+const { urlPlugin } = require('./plugin-url');
 
 const DIST_DIR = path.join(__dirname, '..', 'dist');
 const TRANSPILED_DIR = path.join(DIST_DIR, 'transpiled-hydrate');
@@ -18,7 +19,6 @@ async function bundleHydrateRunner() {
     external: [
       'fs',
       'path',
-      'url',
       'vm'
     ],
     plugins: [
@@ -31,6 +31,7 @@ async function bundleHydrateRunner() {
           }
         }
       })(),
+      urlPlugin(),
       rollupResolve({
         preferBuiltins: true
       }),
