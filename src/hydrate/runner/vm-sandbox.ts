@@ -1,6 +1,5 @@
-import path from 'path';
-import fs from 'fs';
-import vm from 'vm';
+const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
+const vm = requireFunc('vm');
 
 
 export function createHydrateAppSandbox(win: Window) {
@@ -18,6 +17,8 @@ let cachedAppScript: any = null;
 
 function loadHydrateAppScript() {
   if (cachedAppScript == null) {
+    const fs = requireFunc('fs');
+    const path = requireFunc('path');
     const filePath = path.join(__dirname, 'app.js');
     const appCode = fs.readFileSync(filePath, 'utf8');
 
@@ -40,7 +41,7 @@ function createSandbox(win: any) {
     global: global,
     module: module,
     process: process,
-    require: require,
+    require: requireFunc,
     window: win
   };
 
@@ -120,3 +121,6 @@ const WINDOW_PROPS = [
   'top',
   'URL'
 ];
+
+declare const __webpack_require__: Function;
+declare const __non_webpack_require__: Function;
