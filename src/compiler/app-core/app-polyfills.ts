@@ -1,15 +1,17 @@
 import * as d from '../../declarations';
 
 
-export async function getAppBrowserCorePolyfills(config: d.Config) {
-  // first load up all of the polyfill content
-  const readFilePromises = INLINE_POLYFILLS.map(polyfillFile => {
-    const staticName = config.sys.path.join('polyfills', polyfillFile);
-    return config.sys.getClientCoreFile({ staticName: staticName });
-  });
+export async function getClientPolyfill(config: d.Config, polyfillFile: string) {
+  const staticName = config.sys.path.join('polyfills', polyfillFile);
+  return config.sys.getClientCoreFile({ staticName: staticName });
+}
 
+export async function getAppBrowserCorePolyfills(config: d.Config) {
   // read all the polyfill content, in this particular order
-  const results = await Promise.all(readFilePromises);
+  const results = await Promise.all(
+    INLINE_POLYFILLS
+      .map(polyfillFile => getClientPolyfill(config, polyfillFile))
+  );
 
   // concat the polyfills
   return results.join('\n').trim();

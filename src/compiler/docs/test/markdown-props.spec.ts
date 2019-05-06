@@ -1,4 +1,4 @@
-import { propsToMarkdown } from '../../output-plugins/docs/markdown-props';
+import { propsToMarkdown } from '../../docs/readme/markdown-props';
 
 
 describe('markdown props', () => {

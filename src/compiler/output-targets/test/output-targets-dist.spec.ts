@@ -23,6 +23,7 @@ describe('outputTarget, dist', () => {
     compiler = new Compiler(config);
 
     await compiler.fs.writeFiles({
+      [path.join(root, config.sys.getClientPath('polyfills/index.js'))]: `/* polyfills */`,
       [path.join(root, 'User', 'testing', 'package.json')]: `{
         "module": "dist/index.mjs",
         "main": "dist/index.js",
@@ -58,6 +59,9 @@ describe('outputTarget, dist', () => {
       path.join(root, 'User', 'testing', 'dist', 'collection', 'global.js'),
 
       path.join(root, 'User', 'testing', 'dist', 'esm', 'index.esm.js'),
+      path.join(root, 'User', 'testing', 'dist', 'esm', 'legacy', 'index.esm.js'),
+
+      path.join(root, 'User', 'testing', 'dist', 'esm', 'polyfills', 'index.js'),
 
       path.join(root, 'User', 'testing', 'dist', 'loader'),
 

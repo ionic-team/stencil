@@ -3,8 +3,11 @@ import { bundleApp } from '../app-core/bundle-app-core';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
 import { isOutputTargetHydrate } from '../output-targets/output-utils';
 import { generateEsm } from './generate-esm';
+import { generateEsmBrowser } from './generate-esm-browser';
+
 import { generateSystem } from './generate-system';
 import { generateCjs } from './generate-cjs';
+import { generateModuleGraph } from '../entries/component-graph';
 
 export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[]) {
   const timespan = buildCtx.createTimeSpan(`bundling components started`);
@@ -18,15 +21,15 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
 
   await buildCtx.stylesPromise;
 
-  const [componentGraph] = await Promise.all([
-    generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, true, outputTargets.filter(o => !!o.isBrowserBuild)),
-    generateEsm(config, compilerCtx, buildCtx, build, rollupBuild, false, outputTargets.filter(o => !o.isBrowserBuild)),
+  const [componentBundle] = await Promise.all([
+    generateEsmBrowser(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
+    generateEsm(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
     generateSystem(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
     generateCjs(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
   ]);
 
   timespan.finish(`bundling components finished`);
-  buildCtx.componentGraph = componentGraph;
+  buildCtx.componentGraph = generateModuleGraph(buildCtx.components, componentBundle);
 }
 
 function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
@@ -91,9 +94,11 @@ patchBrowser().then(resourcesUrl => {
 
 // This is for webpack
 const EXTERNAL_ENTRY = `
-import { bootstrapLazy } from '@stencil/core';
+import { bootstrapLazy, patchEsm } from '@stencil/core';
 
 export const defineCustomElements = (win, options) => {
-  bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
+  patchEsm().then(() => {
+    return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
+  });
 };
 `;

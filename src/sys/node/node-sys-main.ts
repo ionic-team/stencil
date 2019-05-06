@@ -166,8 +166,12 @@ export class NodeSystem implements d.StencilSystem {
     return hash;
   }
 
+  getClientPath(staticName: string) {
+    return normalizePath(path.join(this.distDir, 'client', staticName));
+  }
+
   getClientCoreFile(opts: any) {
-    const filePath = normalizePath(path.join(this.distDir, 'client', opts.staticName));
+    const filePath = this.getClientPath(opts.staticName);
     return this.fs.readFile(filePath);
   }
 

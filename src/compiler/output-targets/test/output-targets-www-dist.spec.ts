@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/declarations';
+ import * as d from '@stencil/core/declarations';
 import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
@@ -47,6 +47,7 @@ describe('outputTarget, www / dist / docs', () => {
         "types": "custom-dist/custom-types/components.d.ts"
       }`,
       [path.join(root, 'User', 'testing', 'src', 'index.html')]: `<cmp-a></cmp-a>`,
+      [path.join(root, config.sys.getClientPath('polyfills/index.js'))]: `/* polyfills */`,
       [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     });
     await compiler.fs.commit();
@@ -56,6 +57,7 @@ describe('outputTarget, www / dist / docs', () => {
 
     expectFiles(compiler.fs, [
       path.join(root, 'User', 'testing', 'custom-dist', 'cjs'),
+      path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js'),
     ]);
 
     doNotExpectFiles(compiler.fs, [

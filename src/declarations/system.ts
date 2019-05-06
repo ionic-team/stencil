@@ -22,6 +22,7 @@ export interface StencilSystem {
   fs?: d.FileSystem;
   generateContentHash?(content: string, length: number): string;
   getLatestCompilerVersion?(logger: d.Logger, forceCheck: boolean): Promise<string>;
+  getClientPath?(staticName: string): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
   glob?(pattern: string, options: {
     cwd?: string;

@@ -27,7 +27,7 @@ export async function generateLazyModules(config: d.Config, compilerCtx: d.Compi
   const entryResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && rollupResult.isEntry);
   await Promise.all(
     entryResults.map(rollupResult => {
-      return writeLazyEntry(config, compilerCtx, buildCtx, rollupResult, destinations, lazyRuntimeData, sourceTarget, isBrowserBuild);
+      return writeLazyEntry(config, compilerCtx, buildCtx, rollupResult, destinations, lazyRuntimeData, sourceTarget, shouldMinify, isBrowserBuild);
     })
   );
   return bundleModules;
@@ -79,6 +79,7 @@ async function writeLazyEntry(
   rollupResult: d.RollupResult, destinations: string[],
   lazyRuntimeData: string,
   sourceTarget: d.SourceTarget,
+  shouldMinify: boolean,
   isBrowserBuild: boolean,
 ) {
   if (isBrowserBuild && ['index', 'loader'].includes(rollupResult.entryKey)) {
@@ -88,7 +89,7 @@ async function writeLazyEntry(
     `[/*!__STENCIL_LAZY_DATA__*/]`,
     `${lazyRuntimeData}`
   );
-  code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, config.minifyJs, false, isBrowserBuild, code);
+  code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, code);
 
   await Promise.all(destinations.map(dst => {
     const filePath = config.sys.path.join(dst, rollupResult.fileName);

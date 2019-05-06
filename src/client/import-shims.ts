@@ -2,6 +2,15 @@ import { NAMESPACE } from '@build-conditionals';
 import { doc, win } from './client-window';
 import { getDynamicImportFunction } from '@utils';
 
+export const patchEsm = () => {
+  // @ts-ignore
+  if (!(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'))) {
+    // @ts-ignore
+    return import('./polyfills/css-shim.js');
+  }
+  return Promise.resolve();
+};
+
 export const patchBrowser = async () => {
   const scriptElm = Array.from(doc.querySelectorAll('script')).find(a => a.src.includes(NAMESPACE));
   const resourcesUrl = new URL('.', new URL(scriptElm ? scriptElm.src : '', doc.baseURI));
@@ -9,7 +18,7 @@ export const patchBrowser = async () => {
 
   if (!window.customElements) {
     // @ts-ignore
-    await import('./polyfills/custom-elements.js');
+    await import('./polyfills/dom.js');
   }
   return resourcesUrl.pathname;
 };

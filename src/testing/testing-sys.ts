@@ -37,8 +37,12 @@ export class TestingSystem extends NodeSystem {
     return compiler;
   }
 
+  getClientPath(staticName: string) {
+    return normalizePath(path.join(relDistPath, 'client', staticName));
+  }
+
   getClientCoreFile(opts: any) {
-    const filePath = path.join(relDistPath, 'client', opts.staticName);
+    const filePath = this.getClientPath(opts.staticName);
 
     return new Promise<string>((resolve, reject) => {
       fs.readFile(filePath, 'utf8', (err, data) => {

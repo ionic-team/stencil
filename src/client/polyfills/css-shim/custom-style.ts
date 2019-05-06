@@ -4,10 +4,6 @@ import { CSSScope } from './interfaces';
 import { addGlobalStyle, parseCSS, reScope, updateGlobalScopes } from './scope';
 import { getActiveSelectors, resolveValues } from './selectors';
 
-export function supportsCssVars(win: Window) {
-  return !!((win as any).CSS && (win as any).CSS.supports && (win as any).CSS.supports('color', 'var(--c)'));
-}
-
 export class CustomStyle {
 
   private count = 0;
