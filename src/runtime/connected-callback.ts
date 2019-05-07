@@ -4,7 +4,7 @@ import { addStyle } from './styles';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS } from '@utils';
 import { doc, getHostRef, plt, supportsShadowDom, tick } from '@platform';
-import { HYDRATE_ID, PLATFORM_FLAGS } from './runtime-constants';
+import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
 import { safeCall } from './update-component';
@@ -65,7 +65,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         while ((ancestorComponent = (ancestorComponent.parentNode as any || ancestorComponent.host as any))) {
           // climb up the ancestors looking for the first
           // component that hasn't finished its lifecycle update yet
-          if (ancestorComponent['s-init'] && !ancestorComponent['s-lr']) {
+          if ((ancestorComponent['s-init'] && !ancestorComponent['s-lr']) || (BUILD.hydrateClientSide && ancestorComponent.nodeType === NODE_TYPE.ElementNode && ancestorComponent.hasAttribute('s-id'))) {
             // we found this components first ancestor component
             // keep a reference to this component's ancestor component
             hostRef.$ancestorComponent$ = ancestorComponent;
