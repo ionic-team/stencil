@@ -163,10 +163,25 @@ The event name should be provided excl
 
 This feature was deprecated a long time ago, and it is being removed definitely from Stencil.
 
-### Removed: 'angular' output target
-
 
 ## DEPRECATIONS
+
+### outputTarget "docs"
+
+The output target "docs" has been renamed to "docs-readme":
+
+In your `stencil.config.ts` file:
+```diff
+export const config = {
+  outputTargets: [
+    {
+-     type: 'docs',
++     type: 'docs-readme',
+    }
+  ]
+};
+```
+
 
 ### `hostData()`
 

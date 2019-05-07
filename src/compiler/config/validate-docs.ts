@@ -24,9 +24,9 @@ export function validateDocs(config: d.Config) {
   // readme docs flag
   if (config.flags.docs) {
     buildDocs = true;
-    if (!config.outputTargets.some(o => o.type === 'docs')) {
+    if (!config.outputTargets.some(isOutputTargetDocsReadme)) {
       // didn't provide a docs config, so let's add one
-      config.outputTargets.push({ type: 'docs' });
+      config.outputTargets.push({ type: 'docs-readme' });
     }
   }
   const readmeDocsOutputs = config.outputTargets.filter(isOutputTargetDocsReadme);
@@ -45,6 +45,10 @@ export function validateDocs(config: d.Config) {
 
 
 function validateReadmeOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsReadme) {
+  if (outputTarget.type === 'docs') {
+    config.logger.warn(`The output target { type: "docs" } has been deprecated, please use "docs-readme" instead.`);
+    outputTarget.type = 'docs-readme';
+  }
   if (typeof outputTarget.dir !== 'string') {
     outputTarget.dir = config.srcDir;
   }

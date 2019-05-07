@@ -83,7 +83,7 @@ export function isOutputTargetCustom(o: d.OutputTarget): o is d.OutputTargetCust
 }
 
 export function isOutputTargetDocsReadme(o: d.OutputTarget): o is d.OutputTargetDocsReadme {
-  return o.type === DOCS;
+  return o.type === DOCS_README || o.type === DOCS;
 }
 
 export function isOutputTargetDocsJson(o: d.OutputTarget): o is d.OutputTargetDocsJson {
