@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS } from '@utils';
 import { cssVarShim, doc, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
-import { HYDRATE_ID } from './runtime-constants';
+import { HYDRATE_ID, NODE_TYPE } from './runtime-constants';
 
 declare global {
   export interface CSSStyleSheet {
@@ -27,6 +27,10 @@ export const registerStyle = (scopeId: string, cssText: string) => {
 export const addStyle = (styleContainerNode: any, tagName: string, mode: string, hostElm?: HTMLElement) => {
   let scopeId = getScopeId(tagName, mode);
   let style = styles.get(scopeId);
+
+  // if an element is NOT connected then getRootNode() will return the wrong root node
+  // so the fallback is to always use the document for the root node in those cases
+  styleContainerNode = (styleContainerNode.nodeType === NODE_TYPE.DocumentFragment ? styleContainerNode : doc);
 
   if (BUILD.mode && !style) {
     scopeId = getScopeId(tagName);
@@ -85,9 +89,11 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
 };
 
 export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string) => {
-  const styleId = addStyle((BUILD.shadowDom && elm.shadowRoot && supportsShadowDom)
-    ? elm.shadowRoot
-    : elm.parentElement ? elm.getRootNode() : doc, cmpMeta.$tagName$, mode, elm);
+
+  const styleId = addStyle(
+    (BUILD.shadowDom && elm.shadowRoot && supportsShadowDom)
+      ? elm.shadowRoot
+      : elm.getRootNode(), cmpMeta.$tagName$, mode, elm);
 
   if ((BUILD.shadowDom || BUILD.scoped) && cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation) {
     // only required when we're NOT using native shadow dom (slot)
