@@ -7,7 +7,10 @@ export const enum VNODE_FLAGS {
 
 export const enum PLATFORM_FLAGS {
   isTmpDisconnected = 1 << 0,
-  queueAsync = 1 << 1,
+  appLoaded = 1 << 1,
+  queueSync = 1 << 2,
+
+  queueMask = appLoaded | queueSync,
 }
 
 export const enum NODE_TYPE {

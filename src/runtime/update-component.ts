@@ -162,7 +162,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
         doc.documentElement.classList.add(HYDRATED_CLASS);
 
         if (!BUILD.hydrateServerSide) {
-          setTimeout(() => plt.$flags$ |= PLATFORM_FLAGS.queueAsync, 999);
+          setTimeout(() => plt.$flags$ |= PLATFORM_FLAGS.appLoaded, 999);
         }
 
         emitLifecycleEvent(elm, 'appload');

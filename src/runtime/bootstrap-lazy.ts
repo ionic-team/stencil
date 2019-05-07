@@ -7,7 +7,7 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
-import { HYDRATE_ID } from './runtime-constants';
+import { HYDRATE_ID, PLATFORM_FLAGS } from './runtime-constants';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
 
 
@@ -20,7 +20,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || '/', doc.baseURI).href;
-
+  if (options.syncQueue) {
+    plt.$flags$ |= PLATFORM_FLAGS.queueSync;
+  }
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
     const styles = doc.querySelectorAll('style[s-id]');
     let globalStyles = '';

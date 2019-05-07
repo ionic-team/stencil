@@ -73,6 +73,7 @@ export * from '${relativeImport(config, indexDtsPath, componentsDtsPath, '.d.ts'
 export interface CustomElementsDefineOptions {
   exclude?: string[];
   resourcesUrl?: string;
+  syncQueue?: boolean;
   raf?: (c: FrameRequestCallback) => number;
   ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
