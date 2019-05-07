@@ -31,8 +31,8 @@ describe('setAccessor for custom elements', () => {
       setAccessor(elm, 'onClick', orgValue, undefined, false, 0);
 
       expect(addEventSpy).toHaveBeenCalledTimes(1);
-      expect(addEventSpy).toHaveBeenCalledWith('click', orgValue);
-      expect(removeEventSpy).toHaveBeenCalledWith('click', orgValue);
+      expect(addEventSpy).toHaveBeenCalledWith('click', orgValue, false);
+      expect(removeEventSpy).toHaveBeenCalledWith('click', orgValue, false);
     });
 
     it('should remove standardized multiple-word then add event listener w/ different value', () => {
@@ -44,8 +44,8 @@ describe('setAccessor for custom elements', () => {
 
       setAccessor(elm, 'onMouseOver', orgValue, undefined, false, 0);
 
-      expect(addEventSpy).toHaveBeenCalledWith('mouseover', orgValue);
-      expect(removeEventSpy).toHaveBeenCalledWith('mouseover', orgValue);
+      expect(addEventSpy).toHaveBeenCalledWith('mouseover', orgValue, false);
+      expect(removeEventSpy).toHaveBeenCalledWith('mouseover', orgValue, false);
     });
 
     it('should remove standardized then add event listener w/ different value', () => {
@@ -70,7 +70,7 @@ describe('setAccessor for custom elements', () => {
 
       setAccessor(elm, 'onIonChange', undefined, newValue, false, 0);
 
-      expect(addEventSpy).toHaveBeenCalledWith('ionChange', newValue);
+      expect(addEventSpy).toHaveBeenCalledWith('ionChange', newValue, false);
       expect(removeEventSpy).not.toHaveBeenCalled();
     });
 
@@ -82,7 +82,7 @@ describe('setAccessor for custom elements', () => {
 
       setAccessor(elm, 'onMouseOver', undefined, newValue, false, 0);
 
-      expect(addEventSpy).toHaveBeenCalledWith('mouseover', newValue);
+      expect(addEventSpy).toHaveBeenCalledWith('mouseover', newValue, false);
       expect(removeEventSpy).not.toHaveBeenCalled();
     });
 
@@ -94,7 +94,7 @@ describe('setAccessor for custom elements', () => {
 
       setAccessor(elm, 'onClick', undefined, newValue, false, 0);
 
-      expect(addEventSpy).toHaveBeenCalledWith('click', newValue);
+      expect(addEventSpy).toHaveBeenCalledWith('click', newValue, false);
       expect(removeEventSpy).not.toHaveBeenCalled();
     });
 
