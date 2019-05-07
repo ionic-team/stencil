@@ -86,19 +86,21 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
 }
 
 const BROWSER_ENTRY = `
-import { bootstrapLazy, patchBrowser } from '@stencil/core';
+import { bootstrapLazy, patchBrowser, globals } from '@stencil/core';
 patchBrowser().then(resourcesUrl => {
+  globals();
   return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], { resourcesUrl });
 });
 `;
 
 // This is for webpack
 const EXTERNAL_ENTRY = `
-import { bootstrapLazy, patchEsm } from '@stencil/core';
+import { bootstrapLazy, patchEsm, globals } from '@stencil/core';
 
 export const defineCustomElements = (win, options) => {
-  return patchEsm().then(
-    () => bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options)
-  );
+  return patchEsm().then(() => {
+    globals();
+    bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
+  });
 };
 `;

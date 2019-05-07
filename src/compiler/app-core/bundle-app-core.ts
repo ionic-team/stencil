@@ -91,7 +91,8 @@ export async function generateRollupOutput(build: RollupBuild, options: OutputOp
 
 export const DEFAULT_CORE = `
 export * from '@stencil/core/platform';
-import '@stencil/core/global-scripts';
+import globals from '@stencil/core/global-scripts';
+export { globals };
 `;
 
 export const DEFAULT_ENTRY = `

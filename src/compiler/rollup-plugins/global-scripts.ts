@@ -29,15 +29,26 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
     },
     load(id) {
       if (id === GLOBAL_ID) {
-        return globalPaths
-          .map(path => `import '${path}';`)
-          .join('\n');
+        const imports = globalPaths
+          .map((path, i) => `import global${i} from '${path}';`);
+
+        return [
+          ...imports,
+          'export default function() {',
+          ...globalPaths.map((_, i) => `  global${i}();`),
+          '}'
+        ].join('\n');
       }
       return null;
     },
     transform(code, id) {
       if (globalPaths.includes(id)) {
-        return INJECT_CONTEXT + code;
+        const program = this.parse(code, {});
+        const needsDefault = !program.body.some(s => s.type === 'ExportDefaultDeclaration');
+        const defaultExport = needsDefault
+          ? '\nexport default function(){}'
+          : '';
+        return INJECT_CONTEXT + code + defaultExport;
       }
       return null;
     }

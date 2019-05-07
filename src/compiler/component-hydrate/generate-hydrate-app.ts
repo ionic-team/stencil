@@ -38,9 +38,11 @@ async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerC
   const hydrateCmps = await updateToHydrateComponents(config, compilerCtx, buildCtx, cmps);
 
   coreText.push(`import { bootstrapHydrate, registerComponents, styles } from '@stencil/core/platform';`);
-  coreText.push(`import '@stencil/core/global-scripts';`);
+  coreText.push(`import globals from '@stencil/core/global-scripts';`);
 
   hydrateCmps.forEach(cmpData => coreText.push(cmpData.importLine));
+
+  coreText.push(`globals();`);
 
   coreText.push(`const cmps = [`);
   hydrateCmps.forEach(cmpData => {
