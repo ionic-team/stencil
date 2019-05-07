@@ -8,15 +8,11 @@ export const doc = document;
 
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
-  $resourcesUrl$: '/',
+  $resourcesUrl$: '',
   raf: (h) => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
 };
-
-if (BUILD.taskQueue) {
-  plt.$resourcesUrl$ = '/';
-}
 
 export const supportsShadowDom = (BUILD.shadowDom) ? !!doc.documentElement.attachShadow : false;
 

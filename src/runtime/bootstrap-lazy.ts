@@ -18,10 +18,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const customElements = win.customElements;
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
-  if (options.resourcesUrl) {
-    plt.$resourcesUrl$ = new URL(options.resourcesUrl, doc.baseURI).href;
-  }
   Object.assign(plt, options);
+  plt.$resourcesUrl$ = new URL(options.resourcesUrl || '/', doc.baseURI).href;
 
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
     const styles = doc.querySelectorAll('style[s-id]');
