@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { isOutputTargetCustom } from './output-utils';
-import {catchError} from '@utils';
+import { catchError } from '@utils';
 
 
 export async function outputCustom(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, docs: d.JsonDocs, outputTargets: d.OutputTarget[]) {

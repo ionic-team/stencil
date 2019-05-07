@@ -30,20 +30,20 @@ describe('validateDocs', () => {
         dir: 'my-dir'
       } as d.OutputTargetDocsReadme
     );
-    validateConfig(config);
-    const o = config.outputTargets.find(o => o.type === 'docs') as d.OutputTargetDocsReadme;
+    validateConfig(config, [], false);
+    const o = config.outputTargets.find(o => o.type === 'docs-readme') as d.OutputTargetDocsReadme;
     expect(o.dir).toContain('my-dir');
   });
 
   it('default no docs, not remove docs output target', () => {
     config.outputTargets.push({ type: 'docs' });
-    validateConfig(config);
-    expect(config.outputTargets.some(o => o.type === 'docs')).toBe(true);
+    validateConfig(config, [], false);
+    expect(config.outputTargets.some(o => o.type === 'docs-readme')).toBe(true);
   });
 
   it('default no docs, no output target', () => {
-    validateConfig(config);
-    expect(config.outputTargets.some(o => o.type === 'docs')).toBe(false);
+    validateConfig(config, [], false);
+    expect(config.outputTargets.some(o => o.type === 'docs-readme')).toBe(false);
   });
 
 });

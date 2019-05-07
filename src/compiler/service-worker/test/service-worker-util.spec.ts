@@ -18,7 +18,7 @@ describe('generateServiceWorkerUrl', () => {
         baseUrl: '/docs'
       } as d.OutputTargetWww
     ];
-    validateConfig(config);
+    validateConfig(config, [], false);
     outputTarget = config.outputTargets[0] as d.OutputTargetWww;
     const swUrl = generateServiceWorkerUrl(config, outputTarget);
     expect(swUrl).toBe('/docs/sw.js');
@@ -27,7 +27,7 @@ describe('generateServiceWorkerUrl', () => {
   it('default sw url', () => {
     config = mockConfig();
     config.devMode = false;
-    validateConfig(config);
+    validateConfig(config, [], false);
     outputTarget = config.outputTargets[0] as d.OutputTargetWww;
     const swUrl = generateServiceWorkerUrl(config, outputTarget);
     expect(swUrl).toBe('/sw.js');

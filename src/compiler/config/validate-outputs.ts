@@ -9,7 +9,7 @@ import { validateDocs } from './validate-docs';
 import { VALID_TYPES, WWW } from '../output-targets/output-utils';
 
 
-export function validateOutputTargets(config: d.Config) {
+export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnostic[]) {
 
   // setup outputTargets from deprecated config properties
   if (Array.isArray(config.outputTargets)) {
@@ -32,7 +32,7 @@ export function validateOutputTargets(config: d.Config) {
   validateOutputTargetAngular(config);
   validateOutputTargetDistHydrateScript(config);
   validateOutputTargetDistModule(config);
-  validateDocs(config);
+  validateDocs(config, diagnostics);
   validateOutputStats(config);
 
 

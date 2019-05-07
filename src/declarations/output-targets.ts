@@ -172,7 +172,7 @@ export interface OutputTargetHydrate extends OutputTargetBase {
 export interface OutputTargetCustom extends OutputTargetBase {
   type: 'custom';
   name: string;
-  validate?: (config: d.Config, diagnostics: d.Diagnostic[]) => Promise<void>;
+  validate?: (config: d.Config, diagnostics: d.Diagnostic[]) => void;
   generator: (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, docs: d.JsonDocs) => Promise<void>;
 }
 
@@ -212,12 +212,6 @@ export interface OutputTargetStats extends OutputTargetBase {
   file?: string;
 }
 
-export interface OutputPluginTarget extends OutputTargetBase {
-  type: string;
-
-  [key: string]: any;
-}
-
 export interface OutputTargetBase {
   type: string;
 }
@@ -230,8 +224,8 @@ export type OutputTargetBuild =
 
 
 export type OutputTarget =
- OutputPluginTarget
  | OutputTargetAngular
+ | OutputTargetCustom
  | OutputTargetDist
  | OutputTargetDistCollection
  | OutputTargetDistLazy

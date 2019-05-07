@@ -8,9 +8,9 @@ import { validateRollupConfig } from './validate-rollup-config';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
 import { sortBy } from '@utils';
+import { validateOutputTargetCustom } from './validate-outputs-custom';
 
-
-export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
+export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], setEnvVariables: boolean) {
   if (config == null) {
     throw new Error(`invalid build config`);
   }
@@ -75,7 +75,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'buildScoped', null, config.buildEs5);
 
   // setup the outputTargets
-  validateOutputTargets(config);
+  validateOutputTargets(config, diagnostics);
 
   if (!config._isTesting) {
     validateDistNamespace(config);
@@ -132,6 +132,7 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
 
   validateRollupConfig(config);
   validateTesting(config);
+  validateOutputTargetCustom(config, diagnostics);
 
   return config;
 }

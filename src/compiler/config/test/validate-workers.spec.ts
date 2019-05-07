@@ -31,13 +31,13 @@ describe('validate-workers', () => {
 
   it('set maxConcurrentWorkers, but dont let it go under 1', () => {
     config.maxConcurrentWorkers = 0;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.maxConcurrentWorkers).toBe(1);
   });
 
   it('set maxConcurrentWorkers, but dont let it get over the number of cpus', () => {
     config.maxConcurrentWorkers = 8000;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.maxConcurrentWorkers).toBe(8);
   });
 
@@ -46,41 +46,41 @@ describe('validate-workers', () => {
       maxWorkers: 1
     };
     config.maxConcurrentWorkers = 4;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.maxConcurrentWorkers).toBe(1);
   });
 
   it('set maxConcurrentWorkers', () => {
     config.maxConcurrentWorkers = 4;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.maxConcurrentWorkers).toBe(4);
   });
 
   it('default maxConcurrentWorkers from number of cpus', () => {
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.maxConcurrentWorkers).toBe(8);
   });
 
   it('set maxConcurrentTasksPerWorker but dont let it go below 1', () => {
     config.maxConcurrentTasksPerWorker = 0;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.maxConcurrentTasksPerWorker).toBe(1);
   });
 
   it('set maxConcurrentTasksPerWorker but dont let it get too many', () => {
     config.maxConcurrentTasksPerWorker = 88;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.maxConcurrentTasksPerWorker).toBe(20);
   });
 
   it('set maxConcurrentTasksPerWorker', () => {
     config.maxConcurrentTasksPerWorker = 5;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.maxConcurrentTasksPerWorker).toBe(5);
   });
 
   it('default maxConcurrentTasksPerWorker', () => {
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.maxConcurrentTasksPerWorker).toBe(2);
   });
 

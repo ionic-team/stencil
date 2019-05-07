@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { build } from './build/build';
 import { BuildContext } from './build/build-ctx';
-import { catchError, normalizePath } from '@utils';
+import { hasError, catchError, normalizePath } from '@utils';
 import { CompilerContext } from './build/compiler-ctx';
 import { COMPILER_BUILD } from './build/compiler-build-id';
 import { docs } from './docs/docs';
@@ -218,20 +218,20 @@ export class Compiler implements d.Compiler {
 
 
 function isValid(config: d.Config): [ boolean, d.Config | null] {
+  const diagnostics: d.Diagnostic[] = [];
   try {
     // validate the build config
-    config = validateConfig(config, true);
-    return [ true, config ];
+    config = validateConfig(config, diagnostics, true);
 
   } catch (e) {
-    if (config.logger) {
-      const diagnostics: d.Diagnostic[] = [];
-      catchError(diagnostics, e, e.message);
-      config.logger.printDiagnostics(diagnostics, config.rootDir);
-
-    } else {
-      console.error(e);
-    }
+    catchError(diagnostics, e, e.message);
+  }
+  if (config.logger) {
+    config.logger.printDiagnostics(diagnostics, config.rootDir);
+  }
+  if (hasError(diagnostics)) {
     return [ false, null ];
+  } else {
+    return [ true, config ];
   }
 }

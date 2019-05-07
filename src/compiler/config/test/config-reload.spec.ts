@@ -30,7 +30,7 @@ describe('config-reload', () => {
       debug: true,
       es5: true
     };
-    validateConfig(config);
+    validateConfig(config, [], false);
 
     expect(config.devMode).toBe(true);
     expect(logger.level).toBe('debug');
@@ -47,7 +47,7 @@ describe('config-reload', () => {
   });
 
   it('should update outputTarget', () => {
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect((config.outputTargets[0] as d.OutputTargetWww).dir).toBe(normalizePath(path.join(root, 'my-app', 'www')));
 
     updateConfig.outputTargets = [
@@ -63,7 +63,7 @@ describe('config-reload', () => {
   });
 
   it('should keep outputTarget', () => {
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect((config.outputTargets[0] as d.OutputTargetWww).dir).toBe(normalizePath(path.join(root, 'my-app', 'www')));
 
     configReload(config, updateConfig);
@@ -73,7 +73,7 @@ describe('config-reload', () => {
 
   it('should keep watch the same', () => {
     config.watch = true;
-    validateConfig(config);
+    validateConfig(config, [], false);
 
     const orgWatch: any = config.watch;
 
@@ -83,7 +83,7 @@ describe('config-reload', () => {
   });
 
   it('should keep sys and logger the same', () => {
-    validateConfig(config);
+    validateConfig(config, [], false);
 
     const orgSys = config.sys;
     const orgLogger = config.logger;
@@ -97,7 +97,7 @@ describe('config-reload', () => {
   it('should keep rootDir and cwd the same', () => {
     const orgCwd = config.cwd;
     const rootCwd = config.rootDir;
-    validateConfig(config);
+    validateConfig(config, [], false);
 
     configReload(config, updateConfig);
 

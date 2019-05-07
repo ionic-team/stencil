@@ -42,7 +42,7 @@ describe('fs-watch, init', () => {
   });
 
   it('should ignore common web files not used in builds', () => {
-    validateConfig(config);
+    validateConfig(config, [], false);
     const reg = config.watchIgnoredRegex;
 
     expect(reg.test('/asdf/.gitignore')).toBe(true);

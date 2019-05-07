@@ -30,20 +30,20 @@ describe('validateTesting', () => {
   it('set headless false w/ flag', () => {
     config.flags.e2e = true;
     config.flags.headless = false;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.testing.browserHeadless).toBe(false);
   });
 
   it('set headless true w/ flag', () => {
     config.flags.e2e = true;
     config.flags.headless = true;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.testing.browserHeadless).toBe(true);
   });
 
   it('default headless true', () => {
     config.flags.e2e = true;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.testing.browserHeadless).toBe(true);
   });
 
@@ -51,14 +51,14 @@ describe('validateTesting', () => {
     config.flags.e2e = true;
     config.flags.headless = false;
     config.flags.ci = true;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.testing.browserHeadless).toBe(true);
   });
 
   it('default to no-sandbox browser args with ci flag', () => {
     config.flags.e2e = true;
     config.flags.ci = true;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.testing.browserArgs).toEqual([
       '--disable-gpu',
       '--disable-canvas-aa',
@@ -70,7 +70,7 @@ describe('validateTesting', () => {
 
   it('default browser args', () => {
     config.flags.e2e = true;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.testing.browserArgs).toEqual([
       '--disable-gpu',
       '--disable-canvas-aa',
@@ -80,7 +80,7 @@ describe('validateTesting', () => {
 
   it('set default testPathIgnorePatterns', () => {
     config.flags.e2e = true;
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.testing.testPathIgnorePatterns).toEqual([
       sys.path.join(ROOT, 'User', 'some', 'path', '.vscode'),
       sys.path.join(ROOT, 'User', 'some', 'path', '.stencil'),
@@ -96,7 +96,7 @@ describe('validateTesting', () => {
       { type: 'www', dir: 'www-folder' },
       { type: 'docs', dir: 'docs' },
     ];
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(config.testing.testPathIgnorePatterns).toEqual([
       sys.path.join(ROOT, 'User', 'some', 'path', '.vscode'),
       sys.path.join(ROOT, 'User', 'some', 'path', '.stencil'),
