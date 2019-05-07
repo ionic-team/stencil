@@ -11,7 +11,8 @@ export function setupGlobal(global: any) {
           return win[fnName].bind(win);
         },
         configurable: true,
-        enumerable: true
+        enumerable: true,
+        writable: true
       });
     });
 

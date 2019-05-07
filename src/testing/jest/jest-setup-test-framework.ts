@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { expectExtend } from '../matchers';
 import { setupGlobal, teardownGlobal } from '@mock-doc';
+import { setupMockFetch } from '../mock-fetch';
 
 
 declare const global: d.JestEnvironmentGlobal;
@@ -12,6 +13,7 @@ export function jestSetupTestFramework() {
   expect.extend(expectExtend);
 
   setupGlobal(global);
+  setupMockFetch(global);
 
   beforeEach(() => {
     const bc = require('@stencil/core/build-conditionals');
