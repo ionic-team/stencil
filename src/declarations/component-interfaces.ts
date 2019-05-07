@@ -136,10 +136,6 @@ export interface EventEmitter<T= any> {
   emit: (data?: T) => CustomEvent<T>;
 }
 
-export interface EventListenerEnable {
-  (instance: any, eventName: string, enabled: boolean, attachTo?: string|Element, passive?: boolean): void;
-}
-
 export interface QueueApi {
   tick: (cb: RafCallback) => void;
   read: (cb: RafCallback) => void;

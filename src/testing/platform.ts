@@ -21,7 +21,10 @@ export const Build: d.UserBuildConditionals = {
 
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
-  $resourcesUrl$: '/'
+  $resourcesUrl$: '/',
+  raf: (h) => requestAnimationFrame(h),
+  ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
+  rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
 };
 
 export const supportsShadowDom = true;

@@ -17,8 +17,7 @@ const queueTask = (queue: d.RafCallback[]) => (cb: d.RafCallback) => {
 
   if (!queuePending) {
     queuePending = true;
-
-    requestAnimationFrame(flush);
+    plt.raf(flush);
   }
 };
 
@@ -78,7 +77,7 @@ const flush = () => {
   if (queuePending = ((queueDomReads.length + queueDomWrites.length + queueDomWritesLow.length) > 0)) {
     // still more to do yet, but we've run out of time
     // let's let this thing cool off and try again in the next tick
-    requestAnimationFrame(flush);
+    plt.raf(flush);
 
 
   } else {

@@ -10,7 +10,6 @@ export {
   ComponentInstance as ComponentInterface,
   StencilConfig as Config,
   EventEmitter,
-  EventListenerEnable,
   FunctionalComponent,
   QueueApi,
   JSXBase,

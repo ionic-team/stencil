@@ -99,6 +99,9 @@ export interface HostRef {
 export interface PlatformRuntime {
   $flags$: number;
   $resourcesUrl$: string;
+  raf: (c: FrameRequestCallback) => number;
+  ael: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
+  rel: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   $orgLocNodes$?: Map<string, d.RenderNode>;
 }
 

@@ -89,6 +89,9 @@ export const getContext = (_ref: d.RuntimeRef, context: string) => {
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '/',
+  raf: (h) => requestAnimationFrame(h),
+  ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
+  rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
 };
 
 export const supportsShadowDom = false;

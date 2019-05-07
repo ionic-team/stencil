@@ -88,7 +88,7 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
 const BROWSER_ENTRY = `
 import { bootstrapLazy, patchBrowser } from '@stencil/core';
 patchBrowser().then(resourcesUrl => {
-  bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], { resourcesUrl });
+  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], { resourcesUrl });
 });
 `;
 
@@ -97,8 +97,8 @@ const EXTERNAL_ENTRY = `
 import { bootstrapLazy, patchEsm } from '@stencil/core';
 
 export const defineCustomElements = (win, options) => {
-  patchEsm().then(() => {
-    return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
-  });
+  return patchEsm().then(
+    () => bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options)
+  );
 };
 `;

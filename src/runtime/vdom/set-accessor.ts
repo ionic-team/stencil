@@ -8,7 +8,7 @@
  */
 
 import { BUILD } from '@build-conditionals';
-import { isMemberInElement } from '@platform';
+import { isMemberInElement, plt } from '@platform';
 import { toLowerCase } from '@utils';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
@@ -86,10 +86,10 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       memberName = toLowerCase(memberName[2]) + memberName.substring(3);
     }
     if (oldValue) {
-      elm.removeEventListener(memberName, oldValue);
+      plt.rel(elm, memberName, oldValue, false);
     }
     if (newValue) {
-      elm.addEventListener(memberName, newValue);
+      plt.ael(elm, memberName, newValue, false);
     }
 
   } else {

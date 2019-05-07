@@ -21,6 +21,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   if (options.resourcesUrl) {
     plt.$resourcesUrl$ = new URL(options.resourcesUrl, doc.baseURI).href;
   }
+  Object.assign(plt, options);
 
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
     const styles = doc.querySelectorAll('style[s-id]');

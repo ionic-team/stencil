@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, doc, supportsListenerOptions, win } from '@platform';
+import { consoleError, doc, plt, supportsListenerOptions, win } from '@platform';
 import { LISTENER_FLAGS } from '@utils';
 
 
@@ -9,8 +9,8 @@ export const addEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listen
     const target = (BUILD.hostListenerTarget ? getHostListenerTarget(elm, flags) : elm);
     const handler = hostListenerProxy(hostRef, method);
     const opts = hostListenerOpts(flags);
-    target.addEventListener(name, handler, opts);
-    return () => target.removeEventListener(name, handler, opts);
+    plt.ael(target, name, handler, opts);
+    return () => plt.rel(target, name, handler, opts);
   });
   return () => removeFns.forEach(fn => fn());
 };
