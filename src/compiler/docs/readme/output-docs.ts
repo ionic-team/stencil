@@ -6,16 +6,15 @@ import { usageToMarkdown } from './markdown-usage';
 import { stylesToMarkdown } from './markdown-css-props';
 import { slotsToMarkdown } from './markdown-slots';
 import { depsToMarkdown } from './markdown-dependencies';
-import { AUTO_GENERATE_COMMENT, NOTE } from '../../docs/constants';
+import { AUTO_GENERATE_COMMENT } from '../../docs/constants';
 
 export async function generateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docsData: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) {
   const isUpdate = !!docsData.readme;
   const userContent = isUpdate ? docsData.readme : getDefaultReadme(docsData);
-  const content = generateMarkdown(config, userContent, docsData, cmps);
-  const readmeContent = content.join('\n');
 
   await Promise.all(readmeOutputs.map(async readmeOutput => {
     if (readmeOutput.dir) {
+      const readmeContent = generateMarkdown(config, userContent, docsData, cmps, readmeOutput.footer);
       const relPath = config.sys.path.relative(config.srcDir, docsData.readmePath);
       const absPath = config.sys.path.join(readmeOutput.dir, relPath);
       const results = await compilerCtx.fs.writeFile(absPath, readmeContent);
@@ -30,7 +29,7 @@ export async function generateReadme(config: d.Config, compilerCtx: d.CompilerCt
   }));
 }
 
-export function generateMarkdown(config: d.Config, userContent: string, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) {
+export function generateMarkdown(config: d.Config, userContent: string, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[], footer: string) {
   return [
     userContent,
     AUTO_GENERATE_COMMENT,
@@ -45,9 +44,9 @@ export function generateMarkdown(config: d.Config, userContent: string, cmp: d.J
     ...depsToMarkdown(config, cmp, cmps),
     `----------------------------------------------`,
     '',
-    NOTE,
+    footer,
     ''
-  ];
+  ].join('\n');
 }
 
 function getDefaultReadme(docsData: d.JsonDocsComponent) {

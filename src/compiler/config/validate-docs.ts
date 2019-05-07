@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme } from '../output-targets/output-utils';
+import { NOTE } from '../docs/constants';
 
 
 export function validateDocs(config: d.Config) {
@@ -50,6 +51,10 @@ function validateReadmeOutputTarget(config: d.Config, outputTarget: d.OutputTarg
 
   if (!config.sys.path.isAbsolute(outputTarget.dir)) {
     outputTarget.dir = config.sys.path.join(config.rootDir, outputTarget.dir);
+  }
+
+  if (outputTarget.footer == null) {
+    outputTarget.footer = NOTE;
   }
   outputTarget.strict = !!outputTarget.strict;
 }

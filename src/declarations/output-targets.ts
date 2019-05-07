@@ -185,6 +185,7 @@ export interface OutputTargetDocsReadme extends OutputTargetBase {
   type: 'docs';
 
   dir?: string;
+  footer?: string;
   strict?: boolean;
 }
 
