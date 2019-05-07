@@ -120,6 +120,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
     // waiting on this parent element to load
     // let's fire off all update callbacks waiting
     elm['s-rc'].forEach(cb => cb());
+    elm['s-rc'].length = 0;
   }
 
   postUpdateComponent(elm, hostRef);
