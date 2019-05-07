@@ -91,9 +91,13 @@ export declare function readTask(task: d.RafCallback): void;
 /**
  * Host
  */
-interface HostAttributes extends d.JSXBase.HTMLAttributes {
+interface HostAttributes {
+  class?: string | { [className: string]: boolean };
+  style?: { [key: string]: string };
+
   [prop: string]: any;
 }
+
 export declare const Host: d.FunctionalComponent<HostAttributes>;
 
 declare namespace LocalJSX {
