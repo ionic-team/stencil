@@ -98,7 +98,8 @@ async function writeLazyEntry(
 }
 
 function formatLazyBundlesRuntimeMeta(bundleModules: d.BundleModule[]) {
-  const lazyBundles = bundleModules.map(formatLazyRuntimeBundle);
+  const sortedBundles = bundleModules.slice().sort(sortBundleModules);
+  const lazyBundles = sortedBundles.map(formatLazyRuntimeBundle);
   return stringifyRuntimeData(lazyBundles);
 }
 
@@ -120,11 +121,97 @@ function formatLazyRuntimeBundle(bundleModule: d.BundleModule): d.LazyBundleRunt
     bundleId = bundleModule.outputs[0].bundleId;
   }
 
+  const bundleCmps = bundleModule.cmps.slice().sort(sortBundleComponents);
+
   return [
     bundleId,
-    bundleModule.cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
+    bundleCmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
   ];
 }
+
+export function sortBundleModules(a: d.BundleModule, b: d.BundleModule) {
+  const aDependants = a.cmps.reduce((dependants, cmp) => {
+    dependants.push(...cmp.dependants);
+    return dependants;
+  }, [] as string[]);
+  const bDependants = b.cmps.reduce((dependants, cmp) => {
+    dependants.push(...cmp.dependants);
+    return dependants;
+  }, [] as string[]);
+
+  if (a.cmps.some(cmp => bDependants.includes(cmp.tagName))) return 1;
+  if (b.cmps.some(cmp => aDependants.includes(cmp.tagName))) return -1;
+
+  const aDependencies = a.cmps.reduce((dependencies, cmp) => {
+    dependencies.push(...cmp.dependencies);
+    return dependencies;
+  }, [] as string[]);
+  const bDependencies = b.cmps.reduce((dependencies, cmp) => {
+    dependencies.push(...cmp.dependencies);
+    return dependencies;
+  }, [] as string[]);
+
+  if (a.cmps.some(cmp => bDependencies.includes(cmp.tagName))) return -1;
+  if (b.cmps.some(cmp => aDependencies.includes(cmp.tagName))) return 1;
+
+  if (aDependants.length < bDependants.length) return -1;
+  if (aDependants.length > bDependants.length) return 1;
+
+  if (aDependencies.length > bDependencies.length) return -1;
+  if (aDependencies.length < bDependencies.length) return 1;
+
+  const aTags = a.cmps.map(cmp => cmp.tagName);
+  const bTags = b.cmps.map(cmp => cmp.tagName);
+
+  if (aTags.length > bTags.length) return -1;
+  if (aTags.length < bTags.length) return 1;
+
+  const aTagsStr = aTags.sort().join('.');
+  const bTagsStr = bTags.sort().join('.');
+
+  if (aTagsStr < bTagsStr) return -1;
+  if (aTagsStr > bTagsStr) return 1;
+
+  return 0;
+}
+
+
+export function sortBundleComponents(a: d.ComponentCompilerMeta, b: d.ComponentCompilerMeta) {
+  // <cmp-a>
+  //   <cmp-b>
+  //     <cmp-c></cmp-c>
+  //   </cmp-b>
+  // </cmp-a>
+
+  // cmp-c is a dependency of cmp-a and cmp-b
+  // cmp-c is a directDependency of cmp-b
+  // cmp-a is a dependant of cmp-b and cmp-c
+  // cmp-a is a directDependant of cmp-b
+
+  if (a.directDependants.includes(b.tagName)) return 1;
+  if (b.directDependants.includes(a.tagName)) return -1;
+
+  if (a.directDependencies.includes(b.tagName)) return 1;
+  if (b.directDependencies.includes(a.tagName)) return -1;
+
+  if (a.dependants.includes(b.tagName)) return 1;
+  if (b.dependants.includes(a.tagName)) return -1;
+
+  if (a.dependencies.includes(b.tagName)) return 1;
+  if (b.dependencies.includes(a.tagName)) return -1;
+
+  if (a.dependants.length < b.dependants.length) return -1;
+  if (a.dependants.length > b.dependants.length) return 1;
+
+  if (a.dependencies.length > b.dependencies.length) return -1;
+  if (a.dependencies.length < b.dependencies.length) return 1;
+
+  if (a.tagName < b.tagName) return -1;
+  if (a.tagName > b.tagName) return 1;
+
+  return 0;
+}
+
 
 async function convertChunk(
   config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx,
