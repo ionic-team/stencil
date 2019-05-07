@@ -33,10 +33,9 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       } else if (BUILD.lazyLoad && BUILD.method && isElementConstructor && (memberFlags & MEMBER_FLAGS.Method)) {
         // proxyComponent - method
         Object.defineProperty((Cstr as any).prototype, memberName, {
-          value(this: d.HostElement) {
+          value(this: d.HostElement, ...args: any[]) {
             const ref = getHostRef(this);
-            const args = arguments;
-            return ref.$onReadyPromise$.then(() => ref.$lazyInstance$[memberName].apply(ref.$lazyInstance$, args));
+            return ref.$onReadyPromise$.then(() => ref.$lazyInstance$[memberName](...args));
           }
         });
       }

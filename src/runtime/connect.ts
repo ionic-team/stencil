@@ -12,9 +12,9 @@ export const getConnect = (_ref: d.HostRef, tagName: string) => {
     return 'componentOnReady' in elm ? elm.componentOnReady() : Promise.resolve(elm);
   }
 
-  function create() {
+  function create(...args: any[]) {
     return componentOnReady()
-      .then(el => el.create(...arguments));
+      .then(el => el.create(...args));
   }
   return {
     create,

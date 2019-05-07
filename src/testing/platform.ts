@@ -45,7 +45,7 @@ export function resetPlatform() {
     plt.$orgLocNodes$ = undefined;
   }
 
-  plt.$resourcesUrl$ = `http://testing.stenciljs.com/`;
+  win.location.href = plt.$resourcesUrl$ = `http://testing.stenciljs.com/`;
 
   resetTaskQueue();
 
