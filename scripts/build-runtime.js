@@ -184,11 +184,11 @@ run(async ()=> {
 
   await fs.emptyDir(DIST_RUNTIME_DIR);
 
+  await buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir);
   await bundleRuntime();
 
   await Promise.all([
     bundleClient(),
-    buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir),
     createDts(),
     createPublicTypeExports(),
     createPublicJavaScriptExports()

@@ -79,7 +79,7 @@ export interface Semver {
   lte(v1: string, v2: string): boolean;
   gt(v1: string, v2: string): boolean;
   gte(v1: string, v2: string): boolean;
-  prerelease(v: string): string[] | null;
+  prerelease(v: string): readonly string[] | null;
   satisfies(version: string, range: string): boolean;
 }
 

@@ -11,16 +11,14 @@ const SRC_DIR = path.join(ROOT_DIR, 'src', 'client', 'polyfills');
 module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir) {
   await fs.emptyDir(outputPolyfillsDir);
 
-  const files = (await fs.readdir(SRC_DIR)).filter(f => f.endsWith('.js'));
-
+  const filesSrc = (await fs.readdir(SRC_DIR)).filter(f => f.endsWith('.js'));
   await Promise.all(
-    files.map(fileName => {
+    filesSrc.map(fileName => {
       const srcFilePath = path.join(SRC_DIR, fileName);
-      const dstfilePath = path.join(outputPolyfillsDir, fileName);
+      const dstfilePath = path.join(transpiledPolyfillsDir, fileName);
       return fs.copyFile(srcFilePath, dstfilePath);
     })
   );
-
 
   const rollupBuild = await rollup.rollup({
     input: path.join(transpiledPolyfillsDir, 'css-shim', 'index.js'),
@@ -37,18 +35,16 @@ module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPol
     }
   });
 
-  // const minify = terser.minify(transpile.outputText);
-
   const cssShimOutput = transpile.outputText;
+  const filePath = path.join(transpiledPolyfillsDir, 'css-shim.js');
+  await fs.writeFile(filePath, cssShimOutput);
 
-  const mapPolyfillFilePath = path.join(SRC_DIR, 'map.js');
-  const mapPolyfill = await fs.readFile(mapPolyfillFilePath, 'utf8');
-
-  const cssShimMapPolyfill = mapPolyfill + '\n' + cssShimOutput;
-
-  const filePath = path.join(outputPolyfillsDir, 'css-shim.js');
-
-  await Promise.all([
-    fs.writeFile(filePath, cssShimMapPolyfill)
-  ]);
+  const filesTranspiled = (await fs.readdir(transpiledPolyfillsDir)).filter(f => f.endsWith('.js'));
+  await Promise.all(
+    filesTranspiled.map(fileName => {
+      const srcFilePath = path.join(transpiledPolyfillsDir, fileName);
+      const dstfilePath = path.join(outputPolyfillsDir, fileName);
+      return fs.copyFile(srcFilePath, dstfilePath);
+    })
+  );
 };
