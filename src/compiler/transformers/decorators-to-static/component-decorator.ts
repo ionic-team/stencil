@@ -78,6 +78,13 @@ function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], compon
     return false;
   }
 
+  if (componentOptions.shadow && componentOptions.scoped) {
+    const err = buildError(diagnostics);
+    err.messageText = `Components cannot be "scoped" and "shadow" at the same time, they are mutually exclusive configurations.`;
+    augmentDiagnosticWithNode(config, err, findTagNode('scoped', componentDecorator));
+    return false;
+  }
+
   // check if class has more than one decorator
   const otherDecorator = cmpNode.decorators && cmpNode.decorators.find(d => d !== componentDecorator);
   if (otherDecorator) {
@@ -100,19 +107,19 @@ function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], compon
   if (tagError) {
     const err = buildError(diagnostics);
     err.messageText = `${tagError}. Please refer to https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name for more info.`;
-    augmentDiagnosticWithNode(config, err, findTagNode(componentDecorator));
+    augmentDiagnosticWithNode(config, err, findTagNode('tag', componentDecorator));
     return false;
   }
   return true;
 }
 
-function findTagNode(node: ts.Node) {
+function findTagNode(propName: string, node: ts.Node) {
   if (ts.isDecorator(node) && ts.isCallExpression(node.expression)) {
     const arg = node.expression.arguments[0];
     if (ts.isObjectLiteralExpression(arg)) {
       arg.properties.forEach(p => {
         if (ts.isPropertyAssignment(p)) {
-          if (p.name.getText() === 'tag') {
+          if (p.name.getText() === propName) {
             node = p.initializer;
           }
         }
