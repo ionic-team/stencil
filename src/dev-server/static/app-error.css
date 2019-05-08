@@ -78,6 +78,7 @@
 
 a.dev-server-diagnostic-file-header {
   color: #0000EE;
+  text-decoration: underline;
 }
 
 a.dev-server-diagnostic-file-header:hover {

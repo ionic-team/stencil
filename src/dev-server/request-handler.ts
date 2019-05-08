@@ -33,6 +33,10 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
         return res.end();
       }
 
+      if (isDevClient(req.pathname) && devServerConfig.websocket) {
+        return serveDevClient(devServerConfig, fs, req, res);
+      }
+
       if (!req.url.startsWith(devServerConfig.basePath)) {
         if (devServerConfig.logRequests) {
           sendMsg(process, {
@@ -45,10 +49,6 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
         }
 
         return serve404Content(devServerConfig, req, res, `404 File Not Found, base path: ${devServerConfig.basePath}`);
-      }
-
-      if (isDevClient(req.pathname) && devServerConfig.websocket) {
-        return serveDevClient(devServerConfig, fs, req, res);
       }
 
       try {
@@ -99,7 +99,7 @@ function normalizeHttpRequest(devServerConfig: d.DevServerConfig, incomingReq: h
   const parts = (parsedUrl.pathname || '').replace(/\\/g, '/').split('/');
 
   req.pathname = parts.map(part => decodeURIComponent(part)).join('/');
-  if (req.pathname.length > 0) {
+  if (req.pathname.length > 0 && !isDevClient(req.pathname)) {
     req.pathname = '/' + req.pathname.substring(devServerConfig.basePath.length);
   }
 
