@@ -62,7 +62,7 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
     compilerOptions.declaration = false;
   }
 
-  if (compilerOptions.module !== DEFAULT_COMPILER_OPTIONS.module) {
+  if (compilerOptions.module !== DEFAULT_COMPILER_OPTIONS.module && !config._isTesting) {
     config.logger.warn(`To improve bundling, it is always recommended to set the tsconfig.json “module” setting to “esnext”. Note that the compiler will automatically handle bundling both modern and legacy builds.`);
   }
 

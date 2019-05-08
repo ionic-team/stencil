@@ -98,7 +98,7 @@ render(): JSX.Element {
 - `HTMLAttributes` might not be available as a global
 - `JSX`
 
-### Removed: Global `HTMLAttributes` was removed
+### Removed: Global `HTMLAttributes`
 
 `HTMLAttributes` used to be exposed as a global interface, just like the `JSX` namespace, but that caused type conflicts when mixing different versions of stencil in the same project.
 
@@ -111,12 +111,12 @@ JSXBase.HTMLAttributes
 
 ```
 
-### Removed: Global `HTMLStencilElement` was removed
+### Removed: Global `HTMLStencilElement`
 
 The global type for `HTMLStencilElement` has been removed. Instead, it's better is to use the exact type of your component, such as `HTMLIonButtonElement`. The HTML types are automatically generated within the `components.d.ts` file.
 
 
-### Removed: `StencilIntrinsicElement`
+### Removed: Global `StencilIntrinsicElement`
 
 The global type `StencilIntrinsicElement` has been removed. It can be replaced by importing the `JSX` namespace from `@stencil/core`:
 
@@ -163,6 +163,15 @@ The event name should be provided excl
 
 This feature was deprecated a long time ago, and it is being removed definitely from Stencil.
 
+### `mockDocument()` and `mockWindow()` has been moved
+
+The `mockDocument()` and `mockWindow()` functions previously in `@stencil/core/mock-dom` has been moved to:
+`@stencil/core/testing`:
+
+```diff
+- import { mockDocument, mockWindow } from '@stencil/core/mock-dom';
++ import { mockDocument, mockWindow } from '@stencil/core/testing';
+```
 
 ## DEPRECATIONS
 

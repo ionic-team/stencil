@@ -137,10 +137,12 @@ export {
   createEvent,
   getElement,
   getConnect,
+  getMode,
   getValue,
   insertVdomAnnotations,
   h,
   parsePropertyValue,
   postUpdateComponent,
-  setValue
+  setValue,
+  setMode
 } from '@runtime';

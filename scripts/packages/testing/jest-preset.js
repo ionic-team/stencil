@@ -16,7 +16,7 @@ module.exports = {
     "^@stencil/core/cli$": path.join(distDir, 'cli'),
     "^@stencil/core/compiler$": path.join(rootDir, 'compiler'),
     "^@stencil/core/internal$": path.join(rootDir, 'internal'),
-    "^@stencil/core/mock-doc$": path.join(distDir, 'testing', 'mock-doc'),
+    "^@stencil/core/mock-doc$": path.join(distDir, 'mock-doc'),
     "^@stencil/core/platform$": path.join(distDir, 'testing', 'platform'),
     "^@stencil/core/sys$": path.join(distDir, 'sys', 'node'),
     "^@stencil/core/testing$": path.join(distDir, 'testing'),
