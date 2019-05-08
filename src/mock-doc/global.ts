@@ -6,23 +6,28 @@ export function setupGlobal(global: any) {
     const win: any = global.window = new MockWindow();
 
     WINDOW_FUNCTIONS.forEach(fnName => {
-      Object.defineProperty(global, fnName, {
-        value() {
-          return win[fnName].bind(win);
-        },
-        configurable: true,
-        enumerable: true,
-        writable: true
-      });
+      if (!(fnName in global)) {
+        Object.defineProperty(global, fnName, {
+          value() {
+            return win[fnName].bind(win);
+          },
+          configurable: true,
+          enumerable: true,
+          writable: true
+        });
+      }
     });
 
     WINDOW_PROPS.forEach(propName => {
-      Object.defineProperty(global, propName, {
-        get() { return win[propName]; },
-        set(val: any) { win[propName] = val; },
-        configurable: true,
-        enumerable: true
-      });
+      if (!(propName in global)) {
+        Object.defineProperty(global, propName, {
+          get() { return win[propName]; },
+          set(val: any) { win[propName] = val; },
+          configurable: true,
+          enumerable: true
+        });
+
+      }
     });
   }
 
