@@ -54,11 +54,12 @@ export class CustomStyle {
       styleEl.innerHTML = cssText;
     } else {
       if (isDynamicScoped) {
-        cssScopeId = `${baseScope.cssScopeId}-${this.count}`;
+        (styleEl as any)['s-sc'] = cssScopeId = `${baseScope.cssScopeId}-${this.count}`;
         styleEl.innerHTML = '/*needs update*/';
         this.hostStyleMap.set(hostEl, styleEl);
         this.hostScopeMap.set(hostEl, reScope(baseScope, cssScopeId));
         this.count++;
+
       } else {
         baseScope.styleEl = styleEl;
         if (!baseScope.isDynamic) {
@@ -69,8 +70,6 @@ export class CustomStyle {
         this.hostScopeMap.set(hostEl, baseScope);
       }
     }
-
-    (styleEl as any)['s-sc'] = cssScopeId;
     return styleEl;
   }
 

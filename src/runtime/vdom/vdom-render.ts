@@ -85,7 +85,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       updateElement(null, newVNode, isSvgMode);
     }
 
-    if ((BUILD.slotRelocation || BUILD.scoped) && isDef(scopeId) && elm['s-si'] !== scopeId) {
+    if ((BUILD.shadowDom || BUILD.scoped) && isDef(scopeId) && elm['s-si'] !== scopeId) {
       // if there is a scopeId and this is the initial render
       // then let's add the scopeId as a css class
       elm.classList.add((elm['s-si'] = scopeId));
@@ -591,10 +591,12 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   hostRef.$vnode$ = renderFnResults;
   renderFnResults.$elm$ = oldVNode.$elm$ = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm) as any;
 
+  if (BUILD.scoped || BUILD.shadowDom) {
+    scopeId = hostElm['s-sc'];
+  }
   if (BUILD.slotRelocation) {
     contentRef = hostElm['s-cr'];
     useNativeShadowDom = !!(supportsShadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation);
-    scopeId = hostElm['s-sc'];
 
     // always reset
     checkSlotRelocate = checkSlotFallbackVisibility = false;

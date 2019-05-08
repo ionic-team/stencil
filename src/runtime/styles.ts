@@ -53,11 +53,15 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
         } else {
           if (cssVarShim) {
             styleElm = cssVarShim.createHostStyle(hostElm, scopeId, style);
-            scopeId = (styleElm as any)['s-sc'];
-            // we don't want to add this styleID to the appliedStyles Set
-            // since the cssVarShim might need to apply several different
-            // stylesheets for the same component
-            appliedStyles = null;
+            const newScopeId = (styleElm as any)['s-sc'];
+            if (newScopeId) {
+              scopeId = newScopeId;
+
+              // we don't want to add this styleID to the appliedStyles Set
+              // since the cssVarShim might need to apply several different
+              // stylesheets for the same component
+              appliedStyles = null;
+            }
 
           } else {
             styleElm = doc.createElement('style');

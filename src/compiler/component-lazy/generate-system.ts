@@ -46,7 +46,7 @@ async function getSystemLoader(config: d.Config, corePath: string, includePolyfi
   const polyfills = includePolyfills ? await getAppBrowserCorePolyfills(config) : '';
   return `
 ${polyfills}
-// Find resourceUrl
+
 var doc = document;
 var allScripts = doc.querySelectorAll('script');
 var scriptElm;
@@ -57,10 +57,14 @@ for (var x = allScripts.length - 1; x >= 0; x--) {
   }
 }
 var resourcesUrl = scriptElm ? scriptElm.getAttribute('data-resources-url') || scriptElm.src : '';
-
-// Load resource
-__stencil_cssshim.initShim().then(function() {
+var start = function() {
   System.import(new URL('${corePath}', resourcesUrl).pathname);
-});
+};
+
+if (win.__stencil_cssshim) {
+  win.__stencil_cssshim.initShim().then(start);
+} else {
+  start();
+}
 `;
 }
