@@ -42,7 +42,7 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
       return null;
     },
     transform(code, id) {
-      if (globalPaths.includes(id)) {
+      if (globalPaths.includes(normalizePath(id))) {
         const program = this.parse(code, {});
         const needsDefault = !program.body.some(s => s.type === 'ExportDefaultDeclaration');
         const defaultExport = needsDefault
