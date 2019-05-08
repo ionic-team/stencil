@@ -1,37 +1,37 @@
 #dev-server-modal * {
-  box-sizing: border-box;
+  box-sizing: border-box !important;
 }
 
 #dev-server-modal {
-  direction: ltr;
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  direction: ltr !important;
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
   z-index: 100000;
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, "Roboto", BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  font-size: 14px;
-  line-height: 1.5;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: -apple-system, "Roboto", BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
   -webkit-font-smoothing: antialiased;
   font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   text-size-adjust: none;
   word-wrap: break-word;
-  color: #333;
-  background-color: white;
-  box-sizing: border-box;
+  color: #333 !important;
+  background-color: white !important;
+  box-sizing: border-box !important;
   overflow: hidden;
   user-select: auto;
 }
 
 #dev-server-modal-inner {
-  position: relative;
-  padding: 0 0 30px 0;
-  width: 100%;
+  position: relative !important;
+  padding: 0 0 30px 0 !important;
+  width: 100% !important;
   height: 100%;
   overflow-x: hidden;
   overflow-y: scroll;
@@ -39,141 +39,147 @@
 }
 
 .dev-server-diagnostic {
-  margin: 20px;
-  border: 1px solid #ddd;
-  border-radius: 3px;
+  margin: 20px !important;
+  border: 1px solid #ddd !important;
+  border-radius: 3px !important;
 }
 
 .dev-server-diagnostic-masthead {
-  padding: 8px 12px 12px 12px;
+  padding: 8px 12px 12px 12px !important;
 }
 
 .dev-server-diagnostic-title {
-  margin: 0;
-  font-weight: bold;
-  color: #222;
+  margin: 0 !important;
+  font-weight: bold !important;
+  color: #222 !important;
 }
 
 .dev-server-diagnostic-message {
-  margin-top: 4px;
-  color: #555;
+  margin-top: 4px !important;
+  color: #555 !important;
 }
 
 .dev-server-diagnostic-file {
-  position: relative;
-  border-top: 1px solid #ddd;
+  position: relative !important;
+  border-top: 1px solid #ddd !important;
 }
 
 .dev-server-diagnostic-file-header {
-  display: block;
-  padding: 5px 10px;
-  color: #555;
-  border-bottom: 1px solid #ddd;
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
-  background-color: #f9f9f9;
-  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  font-size: 12px;
+  display: block !important;
+  padding: 5px 10px !important;
+  color: #555 !important;
+  border-bottom: 1px solid #ddd !important;
+  border-top-left-radius: 2px !important;
+  border-top-right-radius: 2px !important;
+  background-color: #f9f9f9 !important;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace !important;
+  font-size: 12px !important;
 }
 
 a.dev-server-diagnostic-file-header {
-  color: #0000EE;
-  text-decoration: underline;
+  color: #0000EE !important;
+  text-decoration: underline !important;
 }
 
 a.dev-server-diagnostic-file-header:hover {
-  text-decoration: none;
-  background-color: #f4f4f4;
+  text-decoration: none !important;
+  background-color: #f4f4f4 !important;
 }
 
 .dev-server-diagnostic-file-name {
-  font-weight: bold;
+  font-weight: bold !important;
 }
 
 .dev-server-diagnostic-blob {
-  overflow-x: auto;
-  overflow-y: hidden;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  border-bottom-right-radius: 3px !important;
+  border-bottom-left-radius: 3px !important;
 }
 
 .dev-server-diagnostic-table {
-  border-spacing: 0;
-  border-collapse: collapse;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-spacing: 0 !important;;
+  border-collapse: collapse !important;;
+  border-width: 0 !important;
+  border-style: none !important;
   -moz-tab-size: 2;
   tab-size: 2;
 }
 
 .dev-server-diagnostic-table td,
 .dev-server-diagnostic-table th {
-  padding: 0;
+  padding: 0 !important;
+  border-width: 0 !important;
+  border-style: none !important;
 }
 
 td.dev-server-diagnostic-blob-num {
-  padding-right: 10px;
-  padding-left: 10px;
-  width: 1%;
-  min-width: 50px;
-  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  font-size: 12px;
-  line-height: 20px;
-  color: rgba(0, 0, 0, 0.3);
-  text-align: right;
-  white-space: nowrap;
-  vertical-align: top;
+  padding-right: 10px !important;
+  padding-left: 10px !important;
+  width: 1% !important;
+  min-width: 50px !important;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace !important;
+  font-size: 12px !important;
+  line-height: 20px !important;
+  color: rgba(0, 0, 0, 0.3) !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+  vertical-align: top !important;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  border: solid #eee;
-  border-width: 0 1px 0 0;
+  border: solid #eee !important;
+  border-width: 0 1px 0 0 !important;
 }
 
 td.dev-server-diagnostic-blob-num::before {
-  content: attr(data-line-number);
+  content: attr(data-line-number) !important;
 }
 
 .dev-server-diagnostic-error-line td.dev-server-diagnostic-blob-num {
-  background-color: #ffdddd;
-  border-color: #ffc9c9;
+  background-color: #ffdddd !important;
+  border-color: #ffc9c9 !important;
 }
 
 .dev-server-diagnostic-error-line td.dev-server-diagnostic-blob-code {
-  background: rgba(255, 221, 221, 0.25);
+  background: rgba(255, 221, 221, 0.25) !important;
   z-index: -1;
 }
 
 td.dev-server-diagnostic-blob-code {
-  position: relative;
-  padding-right: 10px;
-  padding-left: 10px;
-  line-height: 20px;
-  vertical-align: top;
-  overflow: visible;
-  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  font-size: 12px;
-  color: #333;
-  word-wrap: normal;
-  white-space: pre;
+  position: relative !important;
+  padding-right: 10px !important;
+  padding-left: 10px !important;
+  line-height: 20px !important;
+  vertical-align: top !important;
+  overflow: visible !important;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace !important;
+  font-size: 12px !important;
+  color: #333 !important;
+  word-wrap: normal !important;
+  white-space: pre !important;
 }
 
 td.dev-server-diagnostic-blob-code::before {
-  content: "";
+  content: "" !important;
 }
 
 .dev-server-diagnostic-error-chr {
-  position: relative;
+  position: relative !important;
 }
 
 .dev-server-diagnostic-error-chr::before {
-  position: absolute;
+  position: absolute !important;
   z-index: -1;
-  top: -3px;
-  left: 0px;
-  width: 8px;
-  height: 20px;
-  background-color: #ffdddd;
-  content: "";
+  top: -3px !important;
+  left: 0px !important;
+  width: 8px !important;
+  height: 20px !important;
+  background-color: #ffdddd !important;
+  content: "" !important;
 }
 
 /**
