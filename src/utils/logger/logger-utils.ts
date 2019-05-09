@@ -2,7 +2,8 @@ import * as d from '../../declarations';
 
 
 export function normalizeDiagnostics(compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]) {
-  const normalized: d.Diagnostic[] = [];
+  const normalizedErrors: d.Diagnostic[] = [];
+  const normalizedOthers: d.Diagnostic[] = [];
   const dups = new Set<string>();
 
   for (let i = 0; i < diagnostics.length; i++) {
@@ -14,14 +15,18 @@ export function normalizeDiagnostics(compilerCtx: d.CompilerCtx, diagnostics: d.
     }
     dups.add(key);
 
-    normalized.push(d);
-
-    if (normalized.length >= MAX_ERRORS) {
-      break;
+    const total = normalizedErrors.length + normalizedOthers.length;
+    if (d.level === 'error') {
+      normalizedErrors.push(d);
+    } else if (total < MAX_ERRORS) {
+      normalizedOthers.push(d);
     }
   }
 
-  return normalized;
+  return [
+    ...normalizedErrors,
+    ...normalizedOthers
+  ];
 }
 
 
