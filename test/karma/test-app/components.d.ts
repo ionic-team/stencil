@@ -102,6 +102,7 @@ export namespace Components {
   interface ListenJsxRoot {}
   interface ListenWindow {}
   interface NodeGlobals {}
+  interface NodeResolution {}
   interface ReflectToAttr {
     'bool': boolean;
     'disabled': boolean;
@@ -260,6 +261,7 @@ declare namespace LocalJSX {
   interface ListenJsxRoot extends JSXBase.HTMLAttributes {}
   interface ListenWindow extends JSXBase.HTMLAttributes {}
   interface NodeGlobals extends JSXBase.HTMLAttributes {}
+  interface NodeResolution extends JSXBase.HTMLAttributes {}
   interface ReflectToAttr extends JSXBase.HTMLAttributes {
     'bool'?: boolean;
     'disabled'?: boolean;
@@ -368,6 +370,7 @@ declare namespace LocalJSX {
     'ListenJsxRoot': Components.ListenJsxRoot;
     'ListenWindow': Components.ListenWindow;
     'NodeGlobals': Components.NodeGlobals;
+    'NodeResolution': Components.NodeResolution;
     'ReflectToAttr': Components.ReflectToAttr;
     'SassCmp': Components.SassCmp;
     'ScopedBasic': Components.ScopedBasic;
@@ -453,6 +456,7 @@ declare namespace LocalJSX {
     'ListenJsxRoot': LocalJSX.ListenJsxRoot;
     'ListenWindow': LocalJSX.ListenWindow;
     'NodeGlobals': LocalJSX.NodeGlobals;
+    'NodeResolution': LocalJSX.NodeResolution;
     'ReflectToAttr': LocalJSX.ReflectToAttr;
     'SassCmp': LocalJSX.SassCmp;
     'ScopedBasic': LocalJSX.ScopedBasic;
@@ -769,6 +773,12 @@ declare global {
     new (): HTMLNodeGlobalsElement;
   };
 
+  interface HTMLNodeResolutionElement extends Components.NodeResolution, HTMLStencilElement {}
+  var HTMLNodeResolutionElement: {
+    prototype: HTMLNodeResolutionElement;
+    new (): HTMLNodeResolutionElement;
+  };
+
   interface HTMLReflectToAttrElement extends Components.ReflectToAttr, HTMLStencilElement {}
   var HTMLReflectToAttrElement: {
     prototype: HTMLReflectToAttrElement;
@@ -1041,6 +1051,7 @@ declare global {
     'listen-jsx-root': HTMLListenJsxRootElement
     'listen-window': HTMLListenWindowElement
     'node-globals': HTMLNodeGlobalsElement
+    'node-resolution': HTMLNodeResolutionElement
     'reflect-to-attr': HTMLReflectToAttrElement
     'sass-cmp': HTMLSassCmpElement
     'scoped-basic': HTMLScopedBasicElement
@@ -1126,6 +1137,7 @@ declare global {
     'listen-jsx-root': HTMLListenJsxRootElement;
     'listen-window': HTMLListenWindowElement;
     'node-globals': HTMLNodeGlobalsElement;
+    'node-resolution': HTMLNodeResolutionElement;
     'reflect-to-attr': HTMLReflectToAttrElement;
     'sass-cmp': HTMLSassCmpElement;
     'scoped-basic': HTMLScopedBasicElement;
