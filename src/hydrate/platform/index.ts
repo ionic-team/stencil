@@ -63,15 +63,7 @@ export const consoleError = (e: any) => {
   }
 };
 
-const Context = {
-  isServer: true,
-  enableListener: () => console.log('TODO'),
-  queue: {
-    write: writeTask,
-    read: readTask,
-    tick
-  }
-};
+export const Context: any = {};
 
 export const getContext = (_ref: d.RuntimeRef, context: string) => {
   if (context === 'window') {
