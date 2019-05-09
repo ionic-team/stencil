@@ -11,3 +11,10 @@ export { newSpecPage } from './spec-page';
 export { shuffleArray } from './testing-utils';
 export { Testing } from './testing';
 export { transpile } from './test-transpile';
+
+
+import { URL as nodeURL } from 'url';
+if (typeof URL === 'undefined') {
+  // polyfill global URL for Node version < 10.0.0
+  (global as any).URL = nodeURL;
+}
