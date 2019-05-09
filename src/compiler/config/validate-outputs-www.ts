@@ -18,6 +18,10 @@ export function validateOutputTargetWww(config: d.Config) {
   }
 
   const wwwOutputTargets = config.outputTargets.filter(isOutputTargetWww);
+
+  if (config.flags.prerender && wwwOutputTargets.length === 0) {
+    throw new Error(`You need at least one "www" output target configured in your stencil.config.ts, when the "--prerender" flag is used`);
+  }
   wwwOutputTargets.forEach(outputTarget => {
     validateOutputTarget(config, outputTarget);
   });
