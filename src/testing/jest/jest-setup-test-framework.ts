@@ -25,6 +25,9 @@ export function jestSetupTestFramework() {
   });
 
   afterEach(() => {
+    const platform = require('@stencil/core/platform');
+    platform.stopContinuosFlush();
+
     teardownGlobal(global);
     global.Context = {};
     global.resourcesUrl = '/build';

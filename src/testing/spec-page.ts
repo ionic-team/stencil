@@ -153,6 +153,10 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     platform.insertVdomAnnotations(doc);
   }
 
+  if (opts.continuosFlush) {
+    platform.startContinuosFlush();
+    page.waitForChanges = undefined;
+  }
   return page;
 }
 

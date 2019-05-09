@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { resetTaskQueue } from './task-queue';
 import { resetWindow, setupGlobal } from '@mock-doc';
-import { URL } from 'url';
+import { flushAll } from './task-queue';
 
 export * from './task-queue';
 
@@ -33,6 +33,9 @@ export const supportsListenerOptions = true;
 
 export const supportsConstructibleStylesheets = false;
 
+let isAutoFlushing = false;
+let autoFlushTimer: any = undefined;
+
 export function resetPlatform() {
   resetWindow(win);
 
@@ -49,11 +52,30 @@ export function resetPlatform() {
   win.location.href = plt.$resourcesUrl$ = `http://testing.stenciljs.com/`;
 
   resetTaskQueue();
+  stopContinuosFlush();
 
   cstrs.clear();
 }
 
 
+export function stopContinuosFlush() {
+  isAutoFlushing = false;
+  if (autoFlushTimer) {
+    clearTimeout(autoFlushTimer);
+    autoFlushTimer = undefined;
+  }
+}
+
+export async function startContinuosFlush() {
+  isAutoFlushing = true;
+  flushAll().then(() => {
+    if (isAutoFlushing) {
+      autoFlushTimer = setTimeout(() => {
+        startContinuosFlush();
+      }, 100);
+    }
+  });
+}
 
 
 export function registerContext(context: any) {
