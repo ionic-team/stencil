@@ -191,7 +191,7 @@ export class MockWindow {
     }
     return locStorage;
   }
-  set localStorage(locStorage: any) {
+  set localStorage(locStorage: MockStorage) {
     localStorageMap.set(this, locStorage);
   }
 

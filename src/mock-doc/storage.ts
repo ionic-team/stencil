@@ -8,15 +8,23 @@ export class MockStorage {
   }
 
   getItem(key: string) {
-    return this.items.get(key);
+    key = String(key);
+
+    if (this.items.has(key)) {
+      return this.items.get(key);
+    }
+    return null;
   }
 
   setItem(key: string, value: string) {
-    this.items.set(key, String(value));
+    if (value == null) {
+      value = 'null';
+    }
+    this.items.set(String(key), String(value));
   }
 
   removeItem(key: string) {
-    this.items.delete(key);
+    this.items.delete(String(key));
   }
 
   clear() {
