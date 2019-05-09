@@ -22,6 +22,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
   platform.resetPlatform();
   bc.resetBuildConditionals(bc.BUILD);
 
+  platform.registerContext(opts.context);
   platform.registerComponents(opts.components);
 
   if (opts.hydrateServerSide) {

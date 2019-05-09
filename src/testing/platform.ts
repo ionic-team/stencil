@@ -39,6 +39,7 @@ export function resetPlatform() {
   hostRefs.clear();
   styles.clear();
   plt.$flags$ = 0;
+  Object.keys(Context).forEach(key => delete Context[key]);
 
   if (plt.$orgLocNodes$ != null) {
     plt.$orgLocNodes$.clear();
@@ -52,6 +53,14 @@ export function resetPlatform() {
   cstrs.clear();
 }
 
+
+
+
+export function registerContext(context: any) {
+  if (context) {
+    Object.assign(Context, context);
+  }
+}
 
 export const getHostRef = (elm: d.RuntimeRef) => {
   return hostRefs.get(elm);
@@ -85,24 +94,7 @@ export const registerHost = (elm: d.HostElement) => {
   hostRefs.set(elm, hostRef);
 };
 
-const Context = {
-  isServer: false,
-  enableListener: () => console.log('TODO'),
-  queue: {}
-};
-
-export const getContext = (_elm: Node, context: string) => {
-  if (context === 'window') {
-    return win;
-  }
-  if (context === 'document') {
-    return doc;
-  }
-  if (context === 'isServer') {
-    return true;
-  }
-  return (Context as any)[context];
-};
+export const Context: any = {};
 
 const cstrs = new Map<string, d.ComponentTestingConstructor>();
 
@@ -127,22 +119,4 @@ export const isMemberInElement = (elm: any, memberName: string) => {
 
 export const patchDynamicImport = (_: string) => { return; };
 
-export const getAssetPath = (path: string) => {
-  return new URL(path, plt.$resourcesUrl$).pathname;
-};
-
-export {
-  Host,
-  bootstrapLazy,
-  createEvent,
-  getElement,
-  getConnect,
-  getMode,
-  getValue,
-  insertVdomAnnotations,
-  h,
-  parsePropertyValue,
-  postUpdateComponent,
-  setValue,
-  setMode
-} from '@runtime';
+export * from '@runtime';

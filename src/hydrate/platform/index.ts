@@ -65,18 +65,6 @@ export const consoleError = (e: any) => {
 
 export const Context: any = {};
 
-export const getContext = (_ref: d.RuntimeRef, context: string) => {
-  if (context === 'window') {
-    return win;
-  }
-  if (context === 'document') {
-    return doc;
-  }
-  if (context === 'isServer') {
-    return true;
-  }
-  return (Context as any)[context];
-};
 
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
@@ -120,19 +108,5 @@ export const cssVarShim: d.CssVarSim = false as any;
 
 export { bootstrapHydrate } from './bootstrap-hydrate';
 
-export {
-  connectedCallback,
-  createEvent,
-  getConnect,
-  getElement,
-  getMode,
-  getValue,
-  getAssetPath,
-  Host,
-  h,
-  insertVdomAnnotations,
-  parsePropertyValue,
-  postUpdateComponent,
-  setMode,
-  setValue
-} from '@runtime';
+export * from '@runtime';
+

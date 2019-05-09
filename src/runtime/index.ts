@@ -5,6 +5,7 @@ export { createEvent } from './event-emitter';
 export { disconnectedCallback } from './disconnected-callback';
 export { getAssetPath } from './get-asset-path';
 export { getConnect } from './connect';
+export { getContext } from './context';
 export { getElement } from './element';
 export { getValue, setValue } from './set-value';
 export { h, Host } from './vdom/h';

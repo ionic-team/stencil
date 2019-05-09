@@ -491,4 +491,6 @@ export interface NewSpecPageOptions {
   serializedShadowDom?: boolean;
   url?: string;
   userAgent?: string;
+  /** @deprecated */
+  context?: {[key: string]: any};
 }
