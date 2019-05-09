@@ -20,7 +20,7 @@ describe('legacy props', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a>true-object</cmp-a>
+      <cmp-a>false-object</cmp-a>
     `);
   });
 
