@@ -50,7 +50,7 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
   initializePrerenderEntryUrls(manager);
 
   if (manager.urlsPending.size === 0) {
-    timeSpan.finish(`prerendering failed: no urls found in the prerender config`);
+    timeSpan.finish(`prerendering failed: no urls found in the prerender config`, 'red');
     return;
   }
 
@@ -159,7 +159,12 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
     if (manager.isDebug) {
       const pathname = new URL(url).pathname;
       const filePath = manager.config.sys.path.relative(manager.config.rootDir, results.filePath);
-      timespan.finish(`prerender finish: ${pathname}, ${filePath}`);
+      const hasError = results.diagnostics.some(d => d.level === 'error');
+      if (hasError) {
+        timespan.finish(`prerender failed: ${pathname}, ${filePath}`, 'red');
+      } else {
+        timespan.finish(`prerender finish: ${pathname}, ${filePath}`);
+      }
     }
 
     manager.diagnostics.push(...results.diagnostics);
