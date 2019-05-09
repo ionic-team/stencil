@@ -2,36 +2,54 @@ import * as d from '../../declarations';
 import { URL } from 'url';
 
 
-export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputUrl: string) {
-  const url = new URL(inputUrl, manager.devServerHostUrl);
+export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputHref: string) {
+  const baseUrl = new URL(manager.outputTarget.baseUrl, manager.devServerHostUrl);
+  const basePathname = baseUrl.pathname.toLowerCase();
 
+  const inputUrl = new URL(inputHref, manager.devServerHostUrl);
+  const inputPathname = inputUrl.pathname.toLowerCase();
 
-  let prerenderPathname = url.pathname;
-  if (prerenderPathname.startsWith(manager.basePath)) {
-    prerenderPathname = prerenderPathname.substring(manager.basePath.length);
+  const basePathParts = basePathname.split('/');
+  const inputPathParts = inputPathname.split('/');
 
-  } else if (manager.outputTarget.baseUrl === prerenderPathname + '/') {
-    prerenderPathname = '/';
+  const isPrerrenderRoot = (basePathname === inputPathname);
+
+  let fileName: string;
+
+  if (isPrerrenderRoot) {
+    fileName = manager.config.sys.path.basename(manager.outputTarget.indexHtml);
+  } else {
+    fileName = 'index.html';
   }
+
+  const pathParts: string[] = [];
+
+  for (let i = 0; i < inputPathParts.length; i++) {
+    const basePathPart = basePathParts[i];
+    const inputPathPart = inputPathParts[i];
+
+    if (typeof basePathPart === 'string' && basePathPart === inputPathPart) {
+      continue;
+    }
+
+    if (i === inputPathParts.length - 1) {
+      const lastPart = inputPathParts[i].toLowerCase();
+      if (lastPart.endsWith('.html') || lastPart.endsWith('.htm')) {
+        fileName = inputPathParts[i];
+        break;
+      }
+    }
+
+    pathParts.push(inputPathPart);
+  }
+
+  pathParts.push(fileName);
 
   // figure out the directory where this file will be saved
-  const dir = manager.config.sys.path.join(
+  const filePath = manager.config.sys.path.join(
     manager.outputTarget.dir,
-    prerenderPathname
+    ...pathParts
   );
-
-  // create the full path where this will be saved (normalize for windowz)
-  let filePath: string;
-
-  if (dir + '/' === manager.outputTarget.dir + '/') {
-    // this is the root of the output target directory
-    // use the configured index.html
-    const basename = manager.outputTarget.indexHtml.substr(dir.length + 1);
-    filePath = manager.config.sys.path.join(dir, basename);
-
-  } else {
-    filePath = manager.config.sys.path.join(dir, `index.html`);
-  }
 
   return filePath;
 }

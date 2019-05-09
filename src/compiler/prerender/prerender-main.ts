@@ -24,12 +24,8 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
   const devServerHostUrl = devServerBaseUrl.origin;
   config.logger.debug(`prerender dev server: ${devServerHostUrl}`);
 
-  const baseUrl = new URL(outputTarget.baseUrl, devServerHostUrl);
-  const basePath = baseUrl.pathname;
-
   // get the prerender urls to queue up
   const manager: d.PrerenderManager = {
-    basePath: basePath,
     templateId: null,
     componentGraphPath: null,
     diagnostics: prerenderDiagnostics,
