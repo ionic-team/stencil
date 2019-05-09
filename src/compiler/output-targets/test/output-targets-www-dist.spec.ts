@@ -47,7 +47,7 @@ describe('outputTarget, www / dist / docs', () => {
         "types": "custom-dist/custom-types/components.d.ts"
       }`,
       [path.join(root, 'User', 'testing', 'src', 'index.html')]: `<cmp-a></cmp-a>`,
-      [path.join(root, config.sys.getClientPath('polyfills/index.js'))]: `/* polyfills */`,
+      [path.join(config.sys.getClientPath('polyfills/index.js'))]: `/* polyfills */`,
       [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     });
     await compiler.fs.commit();
