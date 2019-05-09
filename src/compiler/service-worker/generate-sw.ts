@@ -37,6 +37,15 @@ async function copyLib(buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, wo
 async function generateSW(buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerConfig, workbox: d.Workbox) {
   const timeSpan = buildCtx.createTimeSpan(`generate service worker started`);
 
+  if (!serviceWorker.navigateFallback) {
+    serviceWorker.navigateFallback = INDEX_ORG;
+    if (!serviceWorker.navigateFallbackBlacklist && serviceWorker.navigateFallback) {
+      serviceWorker.navigateFallbackBlacklist = [
+        /\.[a-z]{2,4}$/i
+      ];
+    }
+  }
+
   try {
     await workbox.generateSW(serviceWorker);
     timeSpan.finish(`generate service worker finished`);
@@ -85,14 +94,6 @@ async function getServiceWorker(outputTarget: d.OutputTargetWww) {
     delete serviceWorker.unregister;
   }
 
-  if (!serviceWorker.navigateFallback) {
-    serviceWorker.navigateFallback = INDEX_ORG;
-    if (!serviceWorker.navigateFallbackBlacklist && serviceWorker.navigateFallback) {
-      serviceWorker.navigateFallbackBlacklist = [
-        /\.[a-z]{2,4}$/i
-      ];
-    }
-  }
   return serviceWorker;
 }
 
