@@ -5,7 +5,7 @@ try {
   var v = process.version.replace('v', '').split('.');
   var major = parseInt(v[0], 10);
   var minor = parseInt(v[1], 10);
-  if (major < 8 || (major === 8 && minor < 9)) {
+  if (major < 10 || (major === 10 && minor < 13)) {
     console.log('\nYour current version of Node is ' + process.version + ', however the recommendation is a minimum of Node LTS (https://github.com/nodejs/Release). Note that future versions of Stencil will eventually remove support for non-LTS Node versions.\n');
   }
 } catch (e) {}
