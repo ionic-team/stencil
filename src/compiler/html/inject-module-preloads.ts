@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
-import { getRelativeBuildDir } from './utils';
+import { getAbsoluteBuildDir } from './utils';
 
 export function optimizeCriticalPath(config: d.Config, doc: Document, criticalBundlers: string[], outputTarget: d.OutputTargetWww) {
-  const buildDir = '/' + getRelativeBuildDir(config, outputTarget);
+  const buildDir = getAbsoluteBuildDir(config, outputTarget);
   const paths = criticalBundlers.map(path => config.sys.path.join(buildDir, path));
   injectModulePreloads(doc, paths);
 }

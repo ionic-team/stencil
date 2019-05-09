@@ -1,11 +1,11 @@
 import * as d from '../../declarations';
-import { getRelativeBuildDir } from './utils';
+import { getAbsoluteBuildDir } from './utils';
 
 export function updateGlobalStylesLink(config: d.Config, doc: Document, globalScriptFilename: string, outputTarget: d.OutputTargetWww) {
   if (!globalScriptFilename) {
     return;
   }
-  const buildDir = getRelativeBuildDir(config, outputTarget);
+  const buildDir = getAbsoluteBuildDir(config, outputTarget);
   const originalPath = config.sys.path.join(
     buildDir,
     config.fsNamespace + '.css'

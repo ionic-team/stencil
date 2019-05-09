@@ -5,7 +5,7 @@ import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
 import { getPrerenderConfig } from './prerender-config';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
-import { getRelativeBuildDir } from '../html/utils';
+import { getAbsoluteBuildDir } from '../html/utils';
 import { URL } from 'url';
 
 
@@ -207,7 +207,7 @@ async function createComponentGraphPath(config: d.Config, buildCtx: d.BuildCtx, 
 }
 
 function getComponentPathContent(config: d.Config, componentGraph: Map<string, string[]>, outputTarget: d.OutputTargetWww) {
-  const buildDir = '/' + getRelativeBuildDir(config, outputTarget);
+  const buildDir = getAbsoluteBuildDir(config, outputTarget);
   const object: {[key: string]: string[]} = {};
   for (const [key, chunks] of componentGraph.entries()) {
     object[key] = chunks.map(filename => config.sys.path.join(buildDir, filename));
