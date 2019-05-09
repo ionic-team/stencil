@@ -95,7 +95,7 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
 export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string) => {
 
   const styleId = addStyle(
-    (BUILD.shadowDom && elm.shadowRoot && supportsShadowDom)
+    (BUILD.shadowDom && supportsShadowDom && elm.shadowRoot)
       ? elm.shadowRoot
       : elm.getRootNode(), cmpMeta.$tagName$, mode, elm);
 

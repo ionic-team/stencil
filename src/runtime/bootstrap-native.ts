@@ -26,7 +26,7 @@ export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompac
   if (BUILD.reflect) {
     cmpMeta.$attrsToReflect$ = [];
   }
-  if (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && !supportsShadowDom) {
+  if (BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
     cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
   }
 

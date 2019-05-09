@@ -596,7 +596,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   }
   if (BUILD.slotRelocation) {
     contentRef = hostElm['s-cr'];
-    useNativeShadowDom = !!(supportsShadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation);
+    useNativeShadowDom = supportsShadowDom && (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) !== 0;
 
     // always reset
     checkSlotRelocate = checkSlotFallbackVisibility = false;
