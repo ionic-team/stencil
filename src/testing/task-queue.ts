@@ -3,6 +3,7 @@ import * as d from '../declarations';
 
 const queuedTicks: Function[] = [];
 const queuedWriteTasks: d.RafCallback[] = [];
+const queuedReadTasks: d.RafCallback[] = [];
 const moduleLoaded = new Map();
 const queuedLoadModules: QueuedLoadModule[] = [];
 const caughtErrors: Error[] = [];
@@ -16,6 +17,7 @@ export const consoleError = (e: any) => {
 export function resetTaskQueue() {
   queuedTicks.length = 0;
   queuedWriteTasks.length = 0;
+  queuedReadTasks.length = 0;
   moduleLoaded.clear();
   queuedLoadModules.length = 0;
   caughtErrors.length = 0;
@@ -66,12 +68,29 @@ export function writeTask(cb: d.RafCallback) {
   queuedWriteTasks.push(cb);
 }
 
+export function readTask(cb: d.RafCallback) {
+  queuedReadTasks.push(cb);
+}
 
 export function flushQueue() {
   return new Promise((resolve, reject) => {
 
     async function drain() {
       try {
+        if (queuedReadTasks.length > 0) {
+          const readTasks = queuedReadTasks.slice();
+
+          queuedReadTasks.length = 0;
+
+          let cb: Function;
+          while ((cb = readTasks.shift())) {
+            const result = cb(Date.now());
+            if (result != null && typeof result.then === 'function') {
+              await result;
+            }
+          }
+        }
+
         if (queuedWriteTasks.length > 0) {
           const writeTasks = queuedWriteTasks.slice();
 
@@ -86,7 +105,7 @@ export function flushQueue() {
           }
         }
 
-        if (queuedWriteTasks.length > 0) {
+        if ((queuedReadTasks.length + queuedWriteTasks.length) > 0) {
           process.nextTick(drain);
 
         } else {
@@ -104,7 +123,12 @@ export function flushQueue() {
 
 
 export async function flushAll() {
-  while (queuedTicks.length > 0 || queuedLoadModules.length > 0 || queuedWriteTasks.length > 0) {
+  while ((
+    queuedTicks.length +
+    queuedLoadModules.length +
+    queuedWriteTasks.length +
+    queuedReadTasks.length
+    ) > 0) {
     await flushTicks();
     await flushLoadModule();
     await flushQueue();
