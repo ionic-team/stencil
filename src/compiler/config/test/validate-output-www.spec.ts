@@ -119,7 +119,7 @@ describe('validateOutputTargetWww', () => {
 
   it('should default to add www when outputTargets is undefined', () => {
     validateOutputTargetWww(config);
-    expect(config.outputTargets).toHaveLength(2);
+    expect(config.outputTargets).toHaveLength(3);
 
     const outputTarget = config.outputTargets.find(isOutputTargetWww);
     expect(outputTarget.dir).toBe(path.join(rootDir, 'www'));

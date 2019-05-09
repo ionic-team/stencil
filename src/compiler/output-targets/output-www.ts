@@ -8,7 +8,6 @@ import { optimizeCriticalPath } from '../html/inject-module-preloads';
 import { processCopyTasks } from '../copy/local-copy-tasks';
 import { performCopyTasks } from '../copy/copy-tasks';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
-import { writeGlobalStyles } from '../style/global-styles';
 import { updateGlobalStylesLink } from '../html/update-global-styles-link';
 import { getScopeId } from '../style/scope-css';
 import { inlineStyleSheets } from '../html/inline-style-sheets';
@@ -55,13 +54,29 @@ async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
   }
 
   // Copy global styles into the build directory
-  const globalStylesFilename = await writeGlobalStyles(config, compilerCtx, buildCtx, outputTarget.buildDir);
+  const globalStylesFilename = await generateHashedStylesheet(config, compilerCtx, outputTarget);
 
   // Process
   if (buildCtx.indexDoc && outputTarget.indexHtml) {
     await generateIndexHtml(config, compilerCtx, buildCtx, criticalPath, globalStylesFilename, outputTarget);
   }
   await generateHostConfig(config, compilerCtx, outputTarget);
+}
+
+async function generateHashedStylesheet(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
+  const cssPath = config.sys.path.join(outputTarget.buildDir, `${config.fsNamespace}.css`);
+  const hasCss = await compilerCtx.fs.access(cssPath);
+  if (hasCss) {
+    const cssText = await compilerCtx.fs.readFile(cssPath);
+    const hash = config.sys.generateContentHash(cssText, config.hashedFileNameLength);
+    const hashedFileName = `p-${hash}.css`;
+    await compilerCtx.fs.writeFile(
+      config.sys.path.join(outputTarget.buildDir, hashedFileName),
+      cssText
+    );
+    return hashedFileName;
+  }
+  return undefined;
 }
 
 function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {

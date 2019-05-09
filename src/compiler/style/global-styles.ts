@@ -3,48 +3,50 @@ import { buildError, normalizePath } from '@utils';
 import { getCssImports } from './css-imports';
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
+import { isOutputTargetDistGlobalStyles } from '../output-targets/output-utils';
 
-export async function writeGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dest: string) {
-  if (!buildCtx.globalStyle) {
-    return undefined;
-  }
-  const originalFilename = config.fsNamespace + '.css';
-  await compilerCtx.fs.writeFile(config.sys.path.join(dest, originalFilename), buildCtx.globalStyle);
 
-  if (config.hashFileNames) {
-    const hashedFilename = 'p-' + config.sys.generateContentHash(buildCtx.globalStyle, config.hashedFileNameLength) + '.css';
-    await compilerCtx.fs.writeFile(config.sys.path.join(dest, hashedFilename), buildCtx.globalStyle);
-    return hashedFilename;
+export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistGlobalStyles);
+  if (outputTargets.length === 0) {
+    return;
   }
-  return originalFilename;
+
+  const globalStyles = await buildGlobalStyles(config, compilerCtx, buildCtx);
+  if (!globalStyles) {
+    return;
+  }
+  await Promise.all(
+    outputTargets.map(o => compilerCtx.fs.writeFile(o.file, globalStyles))
+  );
 }
 
-export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filePath: string) {
-  if (!config.globalStyle) {
-    return;
+
+export async function buildGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  let globalStylePath = config.globalStyle;
+  if (!globalStylePath) {
+    return null;
   }
 
   const canSkip = await canSkipGlobalStyles(config, compilerCtx, buildCtx);
   if (canSkip) {
-    buildCtx.globalStyle = compilerCtx.cachedGlobalStyle;
-    return;
+    return compilerCtx.cachedGlobalStyle;
   }
 
   try {
-    filePath = normalizePath(filePath);
+    globalStylePath = normalizePath(globalStylePath);
 
-    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, filePath);
+    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, globalStylePath);
 
-    buildCtx.globalStyle = compilerCtx.cachedGlobalStyle = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, transformResults.code, filePath, true);
+    return compilerCtx.cachedGlobalStyle = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, transformResults.code, globalStylePath, true);
 
   } catch (e) {
     const d = buildError(buildCtx.diagnostics);
     d.messageText = e + '';
-    d.absFilePath = filePath;
-    compilerCtx.cachedGlobalStyle = buildCtx.globalStyle = null;
+    d.absFilePath = globalStylePath;
+    return compilerCtx.cachedGlobalStyle = null;
   }
 }
-
 
 async function canSkipGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!compilerCtx.cachedGlobalStyle) {

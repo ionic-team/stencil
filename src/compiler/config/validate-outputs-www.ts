@@ -4,7 +4,7 @@ import { validatePrerender } from './validate-prerender';
 import { validateResourcesUrl } from './validate-resources-url';
 import { validateServiceWorker } from './validate-service-worker';
 import { validateCopy } from './validate-copy';
-import { DIST_LAZY, WWW, isOutputTargetWww } from '../output-targets/output-utils';
+import { DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export function validateOutputTargetWww(config: d.Config) {
@@ -63,14 +63,21 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   outputTarget.polyfills = !!outputTarget.polyfills;
 
   // Add dist-lazy output target
+  const buildDir = outputTarget.buildDir;
   config.outputTargets.push({
     type: DIST_LAZY,
-    copyDir: outputTarget.buildDir,
-    esmDir: outputTarget.buildDir,
-    systemDir: outputTarget.buildDir,
+    copyDir: buildDir,
+    esmDir: buildDir,
+    systemDir: buildDir,
     polyfills: outputTarget.polyfills,
-    systemLoaderFile: config.sys.path.join(outputTarget.buildDir, `${config.fsNamespace}.js`),
+    systemLoaderFile: config.sys.path.join(buildDir, `${config.fsNamespace}.js`),
     isBrowserBuild: true,
+  });
+
+  // Generate global style with original name
+  config.outputTargets.push({
+    type: DIST_GLOBAL_STYLES,
+    file: config.sys.path.join(buildDir, `${config.fsNamespace}.css`),
   });
 }
 

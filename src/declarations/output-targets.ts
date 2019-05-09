@@ -129,6 +129,10 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   systemLoaderFile?: string;
 }
 
+export interface OutputTargetDistGlobalStyles extends OutputTargetBase {
+  type: 'dist-global-styles';
+  file: string;
+}
 
 export interface OutputTargetDistLazyLoader extends OutputTargetBase {
   type: 'dist-lazy-loader';
@@ -229,6 +233,7 @@ export type OutputTarget =
  | OutputTargetDist
  | OutputTargetDistCollection
  | OutputTargetDistLazy
+ | OutputTargetDistGlobalStyles
  | OutputTargetDistLazyLoader
  | OutputTargetDistModule
  | OutputTargetDistSelfContained

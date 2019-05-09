@@ -66,6 +66,10 @@ export function isOutputTargetDistLazyLoader(o: d.OutputTarget): o is d.OutputTa
   return o.type === DIST_LAZY_LOADER;
 }
 
+export function isOutputTargetDistGlobalStyles(o: d.OutputTarget): o is d.OutputTargetDistGlobalStyles {
+  return o.type === DIST_GLOBAL_STYLES;
+}
+
 export function isOutputTargetDistModule(o: d.OutputTarget): o is d.OutputTargetDistModule {
   return o.type === DIST_MODULE;
 }
@@ -129,6 +133,7 @@ export const DIST_LAZY = `dist-lazy`;
 export const DIST_LAZY_LOADER = `dist-lazy-loader`;
 export const DIST_MODULE = `experimental-dist-module`;
 export const DIST_SELF_CONTAINED = `dist-self-contained`;
+export const DIST_GLOBAL_STYLES = 'dist-global-styles';
 export const DOCS = `docs`;
 export const DOCS_CUSTOM = 'docs-custom';
 export const DOCS_JSON = `docs-json`;
@@ -142,6 +147,7 @@ export const VALID_TYPES = [
   CUSTOM,
   DIST,
   DIST_COLLECTION,
+  DIST_GLOBAL_STYLES,
   DIST_HYDRATE_SCRIPT,
   DIST_LAZY,
   DIST_MODULE,

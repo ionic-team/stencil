@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { DIST_COLLECTION, DIST_LAZY, isOutputTargetDist, DIST_LAZY_LOADER, getComponentsDtsTypesFilePath } from '../output-targets/output-utils';
+import { DIST_COLLECTION, DIST_GLOBAL_STYLES, DIST_LAZY, DIST_LAZY_LOADER, getComponentsDtsTypesFilePath, isOutputTargetDist } from '../output-targets/output-utils';
 import { normalizePath } from '@utils';
 import { validateResourcesUrl } from './validate-resources-url';
 import { validateCopy } from './validate-copy';
@@ -78,6 +78,12 @@ export function validateOutputTargetDist(config: d.Config) {
       systemLoaderFile: path.join(lazyDir, namespace + '.js'),
       polyfills: true,
       isBrowserBuild: true,
+    });
+
+    // Emit global styles
+    config.outputTargets.push({
+      type: DIST_GLOBAL_STYLES,
+      file: config.sys.path.join(lazyDir, `${config.fsNamespace}.css`),
     });
 
     if (config.buildDist) {

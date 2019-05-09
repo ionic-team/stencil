@@ -18,7 +18,7 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     return;
   }
 
-  const generateOutputs = [
+  await Promise.all([
     outputCollections(config, compilerCtx, buildCtx),
     outputModulesApp(config, compilerCtx, buildCtx),
     outputHydrate(config, compilerCtx, buildCtx),
@@ -28,9 +28,7 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
 
     // outputSelfContainedWebComponents(config, compilerCtx, buildCtx),
     buildCtx.stylesPromise
-  ];
-
-  await Promise.all(generateOutputs);
+  ]);
 
   // must run after all the other outputs
   // since it validates files were created

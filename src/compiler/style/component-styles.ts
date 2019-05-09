@@ -5,9 +5,21 @@ import { getComponentStylesCache, setComponentStylesCache } from './cached-style
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
+import { isOutputTargetHydrate } from '../output-targets/output-utils';
 
 
-export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, modeName: string, commentOriginalSelector: boolean) {
+export function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  const commentOriginalSelector = config.outputTargets.some(isOutputTargetHydrate);
+
+  return Promise.all(
+    buildCtx.components.map(cmp => {
+      return Promise.all(cmp.styles.map(style => {
+        return generateComponentStylesMode(config, compilerCtx, buildCtx, cmp, style, style.modeName, commentOriginalSelector);
+      }));
+  }));
+}
+
+async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, modeName: string, commentOriginalSelector: boolean) {
   if (buildCtx.isRebuild) {
     const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, cmp, styleMeta, commentOriginalSelector);
     if (cachedCompiledStyles) {
