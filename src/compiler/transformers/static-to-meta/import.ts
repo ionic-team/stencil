@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { addCollection } from '../collections/add-collection';
+import { addExternalImport } from '../collections/add-external-import';
 import { normalizePath } from '@utils';
 import ts from 'typescript';
 
@@ -19,25 +19,20 @@ export function parseImport(config: d.Config, compilerCtx: d.CompilerCtx, buildC
       moduleFile.localImports.push(importPath);
 
     } else {
-      // node resolve import
-      if (!importNode.importClause) {
-        // node resolve side effect import
-        addCollection(config, compilerCtx, buildCtx, moduleFile, config.rootDir, importPath);
+      // node resolve side effect import
+      addExternalImport(config, compilerCtx, buildCtx, moduleFile, config.rootDir, importPath);
 
-        // test if this side effect import is a collection
-        const isCollectionImport = compilerCtx.collections.some(c => {
-          return c.collectionName === importPath;
-        });
+      // test if this side effect import is a collection
+      const isCollectionImport = compilerCtx.collections.some(c => {
+        return c.collectionName === importPath;
+      });
 
-        if (isCollectionImport) {
-          // turns out this is a side effect import is a collection,
-          // we actually don't want to include this in the JS output
-          // we've already gather the types we needed, kthxbai
-          return null;
-        }
+      if (!importNode.importClause && isCollectionImport) {
+        // turns out this is a side effect import is a collection,
+        // we actually don't want to include this in the JS output
+        // we've already gather the types we needed, kthxbai
+        return null;
       }
-
-      moduleFile.externalImports.push(importPath);
     }
   }
 
