@@ -70,14 +70,15 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           }
 
           registerHost(self);
-          if (BUILD.shadowDom && cmpMeta.$flags$ === CMP_FLAGS.shadowDomEncapsulation) {
+          if (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
             // this component is using shadow dom
             // and this browser supports shadow dom
             // add the read-only property "shadowRoot" to the host element
-            self.attachShadow({ 'mode': 'open' });
-          }
-          if (BUILD.shadowDom && !BUILD.hydrateServerSide && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
-            (self as any).shadowRoot = self;
+            if (supportsShadowDom) {
+              self.attachShadow({ 'mode': 'open' });
+            } else if (!BUILD.hydrateServerSide && !('shadowRoot' in self)) {
+              (self as any).shadowRoot = self;
+            }
           }
         }
 
