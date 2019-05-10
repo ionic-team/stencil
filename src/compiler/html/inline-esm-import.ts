@@ -1,8 +1,11 @@
 import * as d from '../../declarations';
+import { getAbsoluteBuildDir } from './utils';
 
 
 export async function inlineEsmImport(config: d.Config, compilerCtx: d.CompilerCtx, doc: Document, outputTarget: d.OutputTargetWww) {
-  const expectedSrc = `/build/${config.fsNamespace}.esm.js`;
+  const buildDir = getAbsoluteBuildDir(config, outputTarget);
+  const filename = `${config.fsNamespace}.esm.js`;
+  const expectedSrc = config.sys.path.join(buildDir, filename);
   const script = Array.from(doc.querySelectorAll('script'))
     .find(s => s.getAttribute('type') === 'module' && s.getAttribute('src') === expectedSrc);
 
@@ -10,7 +13,7 @@ export async function inlineEsmImport(config: d.Config, compilerCtx: d.CompilerC
     return;
   }
 
-  let content = await compilerCtx.fs.readFile(config.sys.path.join(outputTarget.dir, expectedSrc));
+  let content = await compilerCtx.fs.readFile(config.sys.path.join(outputTarget.buildDir, filename));
   const result = content.match(/import.*from\s*(?:'|")(.*)(?:'|");/);
   if (!result) {
     return;

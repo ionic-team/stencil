@@ -10,7 +10,8 @@ export function inlineStyleSheets(config: d.Config, compilerCtx: d.CompilerCtx, 
         return;
       }
       const fsPath = config.sys.path.join(outputTarget.dir, href);
-      if (!await compilerCtx.fs.access(fsPath)) {
+      const cssExists = await compilerCtx.fs.access(fsPath);
+      if (!cssExists) {
         return;
       }
       const styles = await compilerCtx.fs.readFile(fsPath);
