@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
 import { catchError, normalizePath } from '@utils';
-import { getPrerenderConfig, normalizeHref } from '../prerender-config';
+import { crawlAnchorsForNextUrls } from '../crawl-urls';
+import { getPrerenderConfig } from '../prerender-config';
 import { MockWindow, cloneWindow, serializeNodeToHtml } from '@mock-doc';
 import { patchNodeGlobal, patchWindowGlobal } from '../prerender-global-patch';
 import { generateModulePreloads } from '../prerender-modulepreload';
@@ -13,7 +14,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   // worker thread!
   const results: d.PrerenderResults = {
     diagnostics: [],
-    anchorUrls: null,
+    anchorUrls: [],
     filePath: prerenderRequest.writeToFilePath
   };
 
@@ -29,8 +30,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     const prerenderConfig = getPrerenderConfig(
       results.diagnostics,
-      prerenderRequest.prerenderConfigPath,
-      prerenderRequest.devServerHostUrl
+      prerenderRequest.prerenderConfigPath
     );
 
     const opts = getRenderToStringOptions(prerenderConfig, url, results);
@@ -74,7 +74,8 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       serializeShadowRoot: false
     });
 
-    results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, url, hydrateResults.anchors);
+    const baseUrl = new URL(prerenderRequest.baseUrl);
+    results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, baseUrl, url, hydrateResults.anchors);
 
     if (typeof prerenderConfig.filePath === 'function') {
       try {
@@ -207,35 +208,8 @@ function getComponentGraph(componentGraphPath: string) {
   return componentGraph;
 }
 
-function crawlAnchorsForNextUrls(prerenderConfig: d.PrerenderConfig, diagnostics: d.Diagnostic[], base: URL, parsedAnchors: d.HydrateAnchorElement[]) {
-  if (!Array.isArray(parsedAnchors) || parsedAnchors.length === 0) {
-    return [];
-  }
-
-  return parsedAnchors
-    .filter(anchor => prerenderConfig.filterAnchor(anchor, base))
-    .map(anchor => prerenderConfig.normalizeUrl(anchor.href, base))
-    .filter(url => prerenderConfig.filterUrl(url, base))
-    .map(url => normalizeHref(prerenderConfig, diagnostics, url))
-    .reduce((hrefs, href) => {
-      if (!hrefs.includes(href)) {
-        hrefs.push(href);
-      }
-      return hrefs;
-    }, [] as string[])
-    .sort(sortHrefs);
-}
 
 
-function sortHrefs(a: string, b: string) {
-  const partsA = a.split('/').length;
-  const partsB = b.split('/').length;
-  if (partsA < partsB) return -1;
-  if (partsA > partsB) return 1;
-  if (a < b) return -1;
-  if (a > b) return 1;
-  return 0;
-}
 
 
 declare const __webpack_require__: any;

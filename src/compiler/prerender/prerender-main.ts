@@ -27,17 +27,17 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
 
   // get the prerender urls to queue up
   const manager: d.PrerenderManager = {
-    templateId: null,
     componentGraphPath: null,
-    diagnostics: prerenderDiagnostics,
     config: config,
+    diagnostics: prerenderDiagnostics,
     devServerHostUrl: devServerHostUrl,
     hydrateAppFilePath: buildCtx.hydrateAppFilePath,
     isDebug: (config.logLevel === 'debug'),
     logCount: 0,
     outputTarget: outputTarget,
-    prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig, devServerHostUrl),
+    prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
     prerenderConfigPath: outputTarget.prerenderConfig,
+    templateId: null,
     urlsCompleted: new Set(),
     urlsPending: new Set(),
     urlsProcessing: new Set(),
@@ -143,6 +143,7 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
     }
 
     const prerenderRequest: d.PrerenderRequest = {
+      baseUrl: manager.outputTarget.baseUrl,
       componentGraphPath: manager.componentGraphPath,
       devServerHostUrl: manager.devServerHostUrl,
       hydrateAppFilePath: manager.hydrateAppFilePath,
@@ -170,9 +171,7 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
 
     if (Array.isArray(results.anchorUrls)) {
       results.anchorUrls.forEach(anchorUrl => {
-        if (anchorUrl.startsWith(manager.outputTarget.baseUrl)) {
-          addUrlToPendingQueue(manager, anchorUrl, url);
-        }
+        addUrlToPendingQueue(manager, anchorUrl, url);
       });
     }
 

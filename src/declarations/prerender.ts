@@ -8,7 +8,6 @@ export interface ProgressLogger {
 
 export interface PrerenderManager {
   config: d.Config;
-  progressLogger?: ProgressLogger;
   devServerHostUrl: string;
   diagnostics: d.Diagnostic[];
   hydrateAppFilePath: string;
@@ -17,6 +16,7 @@ export interface PrerenderManager {
   outputTarget: d.OutputTargetWww;
   prerenderConfig: d.PrerenderConfig;
   prerenderConfigPath: string;
+  progressLogger?: ProgressLogger;
   resolve: Function;
   templateId: string;
   componentGraphPath: string;
@@ -27,6 +27,7 @@ export interface PrerenderManager {
 
 
 export interface PrerenderRequest {
+  baseUrl: string;
   componentGraphPath: string;
   devServerHostUrl: string;
   hydrateAppFilePath: string;

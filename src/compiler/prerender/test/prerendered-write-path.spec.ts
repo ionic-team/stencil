@@ -34,6 +34,14 @@ describe('prerender-utils', () => {
       };
     });
 
+    it('/subdir, custom indexHtml', () => {
+      const inputUrl = 'http://stenciljs.com/subdir';
+      manager.outputTarget.baseUrl = 'http://stenciljs.com/';
+      manager.outputTarget.indexHtml = 'my-index.htm';
+      const filePath = getWriteFilePathFromUrlPath(manager, inputUrl);
+      expect(filePath).toBe(config.sys.path.join(rootDir, '/www/subdir/index.html'));
+    });
+
     it('/docs/my-index.htm, custom indexHtml', () => {
       const inputUrl = 'http://stenciljs.com/docs/my-index.htm';
       manager.outputTarget.baseUrl = 'http://stenciljs.com/docs/';
