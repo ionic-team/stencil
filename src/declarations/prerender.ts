@@ -3,7 +3,7 @@ import * as d from '.';
 
 export interface ProgressLogger {
   update(text: string): Promise<void>;
-  clear(): Promise<void>;
+  stop(): Promise<void>;
 }
 
 export interface PrerenderManager {

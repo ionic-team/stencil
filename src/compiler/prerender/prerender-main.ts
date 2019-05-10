@@ -45,7 +45,7 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
   };
 
   if (!config.flags.ci) {
-    manager.progressLogger = createProgressLogger();
+    manager.progressLogger = startProgressLogger();
   }
 
   initializePrerenderEntryUrls(manager);
@@ -93,7 +93,7 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
 
   // Clear progress logger
   if (manager.progressLogger) {
-    await manager.progressLogger.clear();
+    await manager.progressLogger.stop();
   }
 
   const totalUrls = manager.urlsCompleted.size;
@@ -224,7 +224,7 @@ function getComponentPathContent(config: d.Config, componentGraph: Map<string, s
   return JSON.stringify(object);
 }
 
-const createProgressLogger = (): d.ProgressLogger => {
+const startProgressLogger = (): d.ProgressLogger => {
   let promise = Promise.resolve();
   const update = (text: string) => {
     text = text.substr(0, process.stdout.columns - 5) + '\x1b[0m';
@@ -236,11 +236,13 @@ const createProgressLogger = (): d.ProgressLogger => {
       });
     });
   };
-  const clear = () => {
-    return update('');
+  const stop = () => {
+    return update('\x1B[?25h');
   };
+  // hide cursor
+  process.stdout.write('\x1B[?25l');
   return {
     update,
-    clear
+    stop
   };
 };
