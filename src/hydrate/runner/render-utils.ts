@@ -18,7 +18,7 @@ export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
   }
 
   if (typeof outputOpts.timeout !== 'number') {
-    outputOpts.timeout = 5000;
+    outputOpts.timeout = 10000;
   }
 
   return outputOpts;
