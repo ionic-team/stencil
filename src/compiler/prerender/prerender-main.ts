@@ -167,7 +167,9 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
 
     if (Array.isArray(results.anchorUrls)) {
       results.anchorUrls.forEach(anchorUrl => {
-        addUrlToPendingQueue(manager, anchorUrl, url);
+        if (anchorUrl.startsWith(manager.outputTarget.baseUrl)) {
+          addUrlToPendingQueue(manager, anchorUrl, url);
+        }
       });
     }
 
