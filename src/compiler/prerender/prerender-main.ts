@@ -7,6 +7,7 @@ import { getPrerenderConfig } from './prerender-config';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 import { getAbsoluteBuildDir } from '../html/utils';
 import { URL } from 'url';
+import readline from 'readline';
 
 
 export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, templateHtml: string) {
@@ -42,6 +43,10 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
     urlsProcessing: new Set(),
     resolve: null
   };
+
+  if (!config.flags.ci) {
+    manager.progressLogger = createProgressLogger();
+  }
 
   initializePrerenderEntryUrls(manager);
 
@@ -86,6 +91,11 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
   }
   buildCtx.diagnostics.push(...prerenderRuntimeErrors);
 
+  // Clear progress logger
+  if (manager.progressLogger) {
+    await manager.progressLogger.clear();
+  }
+
   const totalUrls = manager.urlsCompleted.size;
   if (totalUrls > 1) {
     const average = Math.round(duration / totalUrls);
@@ -120,13 +130,6 @@ function drainPrerenderQueue(manager: d.PrerenderManager) {
       manager.resolve = null;
     }
 
-  } else {
-    const counter = 200;
-    const urlsCompletedSize = manager.urlsCompleted.size;
-    if (urlsCompletedSize >= (manager.logCount + counter)) {
-      manager.logCount = Math.floor(urlsCompletedSize / counter) * counter;
-      manager.config.logger.info(`prerendered ${manager.logCount} urls ${manager.config.logger.dim(`...`)}`);
-    }
   }
 }
 
@@ -181,6 +184,10 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
   manager.urlsProcessing.delete(url);
   manager.urlsCompleted.add(url);
 
+  const urlsCompletedSize = manager.urlsCompleted.size;
+  if (manager.progressLogger && urlsCompletedSize > 1) {
+    manager.progressLogger.update(`           prerendered ${urlsCompletedSize} urls: ${manager.config.sys.color.dim(url)}`);
+  }
   // let's try to drain the queue again and let this
   // next call figure out if we're actually done or not
   manager.config.sys.nextTick(() => {
@@ -216,3 +223,24 @@ function getComponentPathContent(config: d.Config, componentGraph: Map<string, s
   }
   return JSON.stringify(object);
 }
+
+const createProgressLogger = (): d.ProgressLogger => {
+  let promise = Promise.resolve();
+  const update = (text: string) => {
+    text = text.substr(0, process.stdout.columns - 5) + '\x1b[0m';
+    return promise = promise.then(() => {
+      return new Promise<any>(resolve => {
+        readline.clearLine(process.stdout, 0);
+        readline.cursorTo(process.stdout, 0);
+        process.stdout.write(text, resolve);
+      });
+    });
+  };
+  const clear = () => {
+    return update('');
+  };
+  return {
+    update,
+    clear
+  };
+};

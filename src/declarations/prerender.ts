@@ -1,8 +1,14 @@
 import * as d from '.';
 
 
+export interface ProgressLogger {
+  update(text: string): Promise<void>;
+  clear(): Promise<void>;
+}
+
 export interface PrerenderManager {
   config: d.Config;
+  progressLogger?: ProgressLogger;
   devServerHostUrl: string;
   diagnostics: d.Diagnostic[];
   hydrateAppFilePath: string;
