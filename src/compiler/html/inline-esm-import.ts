@@ -10,13 +10,13 @@ export async function inlineEsmImport(config: d.Config, compilerCtx: d.CompilerC
     .find(s => s.getAttribute('type') === 'module' && s.getAttribute('src') === expectedSrc);
 
   if (!script) {
-    return;
+    return false;
   }
 
   let content = await compilerCtx.fs.readFile(config.sys.path.join(outputTarget.buildDir, filename));
   const result = content.match(/import.*from\s*(?:'|")(.*)(?:'|");/);
   if (!result) {
-    return;
+    return false;
   }
   const corePath = result[1];
   const newPath = config.sys.path.join(
@@ -28,9 +28,11 @@ export async function inlineEsmImport(config: d.Config, compilerCtx: d.CompilerC
   // insert inline script
   const inlinedScript = doc.createElement('script');
   inlinedScript.setAttribute('type', 'module');
+  inlinedScript.setAttribute('data-resources-url', buildDir);
   inlinedScript.innerHTML = content;
   doc.body.appendChild(inlinedScript);
 
   // remove original script
   script.remove();
+  return true;
 }

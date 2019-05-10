@@ -5,7 +5,11 @@ import {injectModulePreloads} from '../html/inject-module-preloads';
 
 export function generateModulePreloads(doc: Document, hydrateResults: d.HydrateResults, componnentGraph: Map<string, string[]>) {
   if (!componnentGraph) {
-    return;
+    return false;
+  }
+  const hasImportScript = !!doc.querySelector('script[type=module][data-resources-url]');
+  if (!hasImportScript) {
+    return false;
   }
   const modulePreloads = unique(
     flatOne(
@@ -16,4 +20,5 @@ export function generateModulePreloads(doc: Document, hydrateResults: d.HydrateR
   );
 
   injectModulePreloads(doc, modulePreloads);
+  return true;
 }
