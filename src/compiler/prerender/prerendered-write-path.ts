@@ -47,7 +47,7 @@ export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputHr
 
   // figure out the directory where this file will be saved
   const filePath = manager.config.sys.path.join(
-    manager.outputTarget.dir,
+    manager.outputTarget.appDir,
     ...pathParts
   );
 

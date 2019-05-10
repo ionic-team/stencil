@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { catchError, flatOne, normalizePath, unique } from '@utils';
+import { catchError, flatOne, unique } from '@utils';
 import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
 import { getUsedComponents } from '../html/used-components';
 import { inlineEsmImport } from '../html/inline-esm-import';
@@ -12,6 +12,7 @@ import { updateGlobalStylesLink } from '../html/update-global-styles-link';
 import { getScopeId } from '../style/scope-css';
 import { inlineStyleSheets } from '../html/inline-style-sheets';
 import { INDEX_ORG } from '../service-worker/generate-sw';
+import { getAbsoluteBuildDir } from '../html/utils';
 
 
 export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -47,7 +48,7 @@ function getCriticalPath(buildCtx: d.BuildCtx) {
 async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) {
   // Copy assets into www
   performCopyTasks(config, compilerCtx, buildCtx,
-    await processCopyTasks(config, outputTarget.dir, outputTarget.copy),
+    await processCopyTasks(config, outputTarget.appDir, outputTarget.copy),
   );
   if (!config.buildEs5) {
     await generateEs5DisabledMessage(config, compilerCtx, outputTarget);
@@ -80,13 +81,13 @@ async function generateHashedStylesheet(config: d.Config, compilerCtx: d.Compile
 }
 
 function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
-  const buildDir = normalizePath(config.sys.path.relative(outputTarget.dir, outputTarget.buildDir));
-  const hostConfigPath = config.sys.path.join(outputTarget.dir, 'host.config.json');
+  const buildDir = getAbsoluteBuildDir(config, outputTarget);
+  const hostConfigPath = config.sys.path.join(outputTarget.appDir, 'host.config.json');
   const hostConfigContent = JSON.stringify({
     'hosting': {
       'headers': [
         {
-          'source': `/${buildDir}/p-*`,
+          'source': `${buildDir}/p-*`,
           'headers': [ {
             'key': 'Cache-Control',
             'value': 'max-age=365000000, immutable'
@@ -112,16 +113,18 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
     // validateHtml(config, buildCtx, doc);
     await updateIndexHtmlServiceWorker(config, buildCtx, doc, outputTarget);
     if (!config.watch && !config.devMode) {
-      await inlineEsmImport(config, compilerCtx, doc, outputTarget);
+      const scriptFound = await inlineEsmImport(config, compilerCtx, doc, outputTarget);
       await inlineStyleSheets(config, compilerCtx, doc, MAX_CSS_INLINE_SIZE, outputTarget);
       updateGlobalStylesLink(config, doc, globalStylesFilename, outputTarget);
-      optimizeCriticalPath(config, doc, criticalPath, outputTarget);
+      if (scriptFound) {
+        optimizeCriticalPath(config, doc, criticalPath, outputTarget);
+      }
     }
 
     const indexContent = config.sys.serializeNodeToHtml(doc);
     await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexContent);
     if (outputTarget.serviceWorker) {
-      await compilerCtx.fs.writeFile(config.sys.path.join(outputTarget.dir, INDEX_ORG), indexContent);
+      await compilerCtx.fs.writeFile(config.sys.path.join(outputTarget.appDir, INDEX_ORG), indexContent);
     }
 
     buildCtx.debug(`generateIndexHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);

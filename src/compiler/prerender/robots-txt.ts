@@ -63,7 +63,7 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
     }
 
     if (typeof results.url !== 'string') {
-      const robotsTxtUrl = new URL(`robots.txt`, manager.outputTarget.baseUrl);
+      const robotsTxtUrl = new URL(`/robots.txt`, manager.outputTarget.baseUrl);
       results.url = robotsTxtUrl.href;
     }
 

@@ -23,7 +23,7 @@ export async function generateHostConfig(config: d.Config, compilerCtx: d.Compil
 
   addDefaults(config, outputTarget, hostConfig);
 
-  const hostConfigFilePath = config.sys.path.join(outputTarget.dir, HOST_CONFIG_FILENAME);
+  const hostConfigFilePath = config.sys.path.join(outputTarget.appDir, HOST_CONFIG_FILENAME);
 
   await mergeUserHostConfigFile(config, compilerCtx, hostConfig);
 
@@ -119,7 +119,7 @@ function getBundleUrl(config: d.Config, outputTarget: d.OutputTargetWww, _bundle
 
 
 export function getUrlFromFilePath(config: d.Config, outputTarget: d.OutputTargetWww, filePath: string) {
-  let url = config.sys.path.join('/', config.sys.path.relative(outputTarget.dir, filePath));
+  let url = config.sys.path.join('/', config.sys.path.relative(outputTarget.appDir, filePath));
 
   url = outputTarget.baseUrl + url.substring(1);
 

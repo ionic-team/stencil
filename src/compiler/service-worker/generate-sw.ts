@@ -23,7 +23,7 @@ async function copyLib(buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, wo
   const timeSpan = buildCtx.createTimeSpan(`copy service worker library started`, true);
 
   try {
-    await workbox.copyWorkboxLibraries(outputTarget.dir);
+    await workbox.copyWorkboxLibraries(outputTarget.appDir);
 
   } catch (e) {
     const d = buildWarn(buildCtx.diagnostics);

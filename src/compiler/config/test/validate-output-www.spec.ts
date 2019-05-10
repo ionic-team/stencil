@@ -95,6 +95,7 @@ describe('validateOutputTargetWww', () => {
     validateOutputTargetWww(config);
 
     expect(outputTarget.dir).toBe(path.join(rootDir, 'www', 'docs'));
+    expect(outputTarget.appDir).toBe(path.join(rootDir, 'www', 'docs/'));
     expect(outputTarget.buildDir).toBe(path.join(rootDir, 'www', 'docs', 'build'));
     expect(outputTarget.indexHtml).toBe(path.join(rootDir, 'www', 'docs', 'index.html'));
   });
@@ -132,6 +133,61 @@ describe('validateOutputTargetWww', () => {
     config.outputTargets = [];
     validateOutputTargetWww(config);
     expect(config.outputTargets.some(isOutputTargetWww)).toBe(false);
+  });
+
+  describe('baseUrl', () => {
+    it('baseUrl does not end with /', () => {
+      const outputTarget: d.OutputTargetWww = {
+        type: 'www',
+        dir: 'my-www',
+        baseUrl: '/docs',
+      };
+      config.outputTargets = [outputTarget];
+      validateOutputTargetWww(config);
+
+      expect(outputTarget.type).toBe('www');
+      expect(outputTarget.dir).toBe(path.join(rootDir, 'my-www'));
+      expect(outputTarget.baseUrl).toBe(path.join(rootDir, '/docs/'));
+      expect(outputTarget.appDir).toBe(path.join(rootDir, 'my-www/docs/'));
+
+      expect(outputTarget.buildDir).toBe(path.join(rootDir, 'my-www', 'docs', 'build'));
+      expect(outputTarget.indexHtml).toBe(path.join(rootDir, 'my-www', 'docs', 'index.html'));
+    });
+
+    it('baseUrl does not end with /', () => {
+      const outputTarget: d.OutputTargetWww = {
+        type: 'www',
+        baseUrl: '/docs/',
+      };
+      config.outputTargets = [outputTarget];
+      validateOutputTargetWww(config);
+
+      expect(outputTarget.type).toBe('www');
+      expect(outputTarget.dir).toBe(path.join(rootDir, 'www'));
+      expect(outputTarget.baseUrl).toBe(path.join(rootDir, '/docs/'));
+      expect(outputTarget.appDir).toBe(path.join(rootDir, 'www/docs/'));
+
+      expect(outputTarget.buildDir).toBe(path.join(rootDir, 'www', 'docs', 'build'));
+      expect(outputTarget.indexHtml).toBe(path.join(rootDir, 'www', 'docs', 'index.html'));
+    });
+
+
+    it('baseUrl is a full url', () => {
+      const outputTarget: d.OutputTargetWww = {
+        type: 'www',
+        baseUrl: 'https://example.com/docs',
+      };
+      config.outputTargets = [outputTarget];
+      validateOutputTargetWww(config);
+
+      expect(outputTarget.type).toBe('www');
+      expect(outputTarget.dir).toBe(path.join(rootDir, 'www'));
+      expect(outputTarget.baseUrl).toBe('https://example.com/docs/');
+      expect(outputTarget.appDir).toBe(path.join(rootDir, 'www/docs/'));
+
+      expect(outputTarget.buildDir).toBe(path.join(rootDir, 'www', 'docs', 'build'));
+      expect(outputTarget.indexHtml).toBe(path.join(rootDir, 'www', 'docs', 'index.html'));
+    });
   });
 
 });

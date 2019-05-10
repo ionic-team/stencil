@@ -29,7 +29,7 @@ export async function generateSitemapXml(manager: d.PrerenderManager) {
     const opts: d.SitemapXmpOpts = {
       urls: getSitemapUrls(manager),
       baseUrl: manager.outputTarget.baseUrl,
-      dir: manager.outputTarget.dir
+      dir: manager.outputTarget.appDir
     };
 
     const userResults = manager.prerenderConfig.sitemapXml(opts);
@@ -56,7 +56,7 @@ export async function generateSitemapXml(manager: d.PrerenderManager) {
     }
 
     if (typeof results.filePath !== 'string') {
-      results.filePath = manager.config.sys.path.join(manager.outputTarget.dir, `sitemap.xml`);
+      results.filePath = manager.config.sys.path.join(manager.outputTarget.appDir, `sitemap.xml`);
     }
 
     if (typeof results.url !== 'string') {

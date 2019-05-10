@@ -47,6 +47,7 @@ export function validateDevServer(config: d.Config) {
 
   if (config.flags.open === false) {
     config.devServer.openBrowser = false;
+
   } else if (config.flags.prerender && !config.watch) {
     config.devServer.openBrowser = false;
   }
@@ -56,10 +57,9 @@ export function validateDevServer(config: d.Config) {
   const wwwOutputTarget = config.outputTargets.find(isOutputTargetWww);
 
   if (wwwOutputTarget) {
-    serveDir = wwwOutputTarget.dir;
-    const defaultPath = wwwOutputTarget.baseUrl || '/';
-    const baseUrl = new URL(defaultPath, 'http://config.stenciljs.com');
+    const baseUrl = new URL(wwwOutputTarget.baseUrl, 'http://config.stenciljs.com');
     basePath = baseUrl.pathname;
+    serveDir = wwwOutputTarget.appDir;
     config.logger.debug(`dev server www root: ${serveDir}, base path: ${basePath}`);
 
   } else {

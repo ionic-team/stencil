@@ -57,7 +57,9 @@ export interface OutputTargetWww extends OutputTargetBase {
   copy?: d.CopyTask[];
 
   /**
-   * The base url of the app, which should be a relative path.
+   * The base url of the app, it's required during prerendering to be the absolute path
+   * of your app, such as: `https://my.app.com/app`.
+   *
    * Default: `/`
    */
   baseUrl?: string;
@@ -83,6 +85,7 @@ export interface OutputTargetWww extends OutputTargetBase {
 
   serviceWorker?: d.ServiceWorkerConfig | null;
   resourcesUrl?: string;
+  appDir?: string;
 }
 
 

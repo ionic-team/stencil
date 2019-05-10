@@ -26,7 +26,7 @@ function inlineStyleSheets(config: d.Config, doc: Document, outputTarget: d.Outp
       if (!href.startsWith('/') || link.getAttribute('media') !== null) {
         return;
       }
-      const fsPath = config.sys.path.join(outputTarget.dir, href);
+      const fsPath = config.sys.path.join(outputTarget.appDir, href);
       if (!config.sys.fs.existsSync(fsPath)) {
         return;
       }

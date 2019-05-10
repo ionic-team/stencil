@@ -37,7 +37,7 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
   }
 
   if (typeof outputTarget.serviceWorker.globDirectory !== 'string') {
-    outputTarget.serviceWorker.globDirectory = outputTarget.dir;
+    outputTarget.serviceWorker.globDirectory = outputTarget.appDir;
   }
 
   if (typeof outputTarget.serviceWorker.globIgnores === 'string') {
@@ -51,11 +51,11 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
   outputTarget.serviceWorker.dontCacheBustURLsMatching = /p-\w{8}/;
 
   if (!outputTarget.serviceWorker.swDest) {
-    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, DEFAULT_FILENAME);
+    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.appDir, DEFAULT_FILENAME);
   }
 
   if (!config.sys.path.isAbsolute(outputTarget.serviceWorker.swDest)) {
-    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, outputTarget.serviceWorker.swDest);
+    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.appDir, outputTarget.serviceWorker.swDest);
   }
 }
 

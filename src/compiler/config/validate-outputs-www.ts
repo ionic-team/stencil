@@ -5,6 +5,7 @@ import { validateResourcesUrl } from './validate-resources-url';
 import { validateServiceWorker } from './validate-service-worker';
 import { validateCopy } from './validate-copy';
 import { DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww } from '../output-targets/output-utils';
+import { URL } from 'url';
 
 
 export function validateOutputTargetWww(config: d.Config) {
@@ -38,16 +39,24 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
     outputTarget.dir = path.join(config.rootDir, outputTarget.dir);
   }
 
+  // Make sure the baseUrl always finish with "/"
+  if (!outputTarget.baseUrl.endsWith('/')) {
+    outputTarget.baseUrl += '/';
+  }
+
+  // Fix "dir" to account
+  outputTarget.appDir = path.join(outputTarget.dir, getPathName(outputTarget.baseUrl));
+
   setStringConfig(outputTarget, 'buildDir', DEFAULT_BUILD_DIR);
 
   if (!path.isAbsolute(outputTarget.buildDir)) {
-    outputTarget.buildDir = path.join(outputTarget.dir, outputTarget.buildDir);
+    outputTarget.buildDir = path.join(outputTarget.appDir, outputTarget.buildDir);
   }
 
   setStringConfig(outputTarget, 'indexHtml', DEFAULT_INDEX_HTML);
 
   if (!path.isAbsolute(outputTarget.indexHtml)) {
-    outputTarget.indexHtml = path.join(outputTarget.dir, outputTarget.indexHtml);
+    outputTarget.indexHtml = path.join(outputTarget.appDir, outputTarget.indexHtml);
   }
 
   setBooleanConfig(outputTarget, 'empty', null, DEFAULT_EMPTY_DIR);
@@ -85,6 +94,10 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   });
 }
 
+function getPathName(url: string) {
+  const parsedUrl = new URL(url, 'http://localhost/');
+  return parsedUrl.pathname;
+}
 
 const DEFAULT_WWW_COPY = [
   { src: 'assets', warn: false },
