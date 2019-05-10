@@ -153,9 +153,12 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     platform.insertVdomAnnotations(doc);
   }
 
-  if (opts.continuosFlush) {
-    platform.startContinuosFlush();
-    page.waitForChanges = undefined;
+  if (opts.autoApplyChanges) {
+    platform.startAutoApplyChanges();
+    page.waitForChanges = () => {
+      console.error('waitForChanges() cannot be used manually if the "startAutoApplyChanges" option is enabled');
+      return Promise.resolve();
+    };
   }
   return page;
 }

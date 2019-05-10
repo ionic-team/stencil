@@ -33,8 +33,8 @@ export const supportsListenerOptions = true;
 
 export const supportsConstructibleStylesheets = false;
 
-let isAutoFlushing = false;
-let autoFlushTimer: any = undefined;
+let isAutoApplyingChanges = false;
+let autoApplyTimer: any = undefined;
 
 export function resetPlatform() {
   resetWindow(win);
@@ -52,26 +52,26 @@ export function resetPlatform() {
   win.location.href = plt.$resourcesUrl$ = `http://testing.stenciljs.com/`;
 
   resetTaskQueue();
-  stopContinuosFlush();
+  stopAutoApplyChanges();
 
   cstrs.clear();
 }
 
 
-export function stopContinuosFlush() {
-  isAutoFlushing = false;
-  if (autoFlushTimer) {
-    clearTimeout(autoFlushTimer);
-    autoFlushTimer = undefined;
+export function stopAutoApplyChanges() {
+  isAutoApplyingChanges = false;
+  if (autoApplyTimer) {
+    clearTimeout(autoApplyTimer);
+    autoApplyTimer = undefined;
   }
 }
 
-export async function startContinuosFlush() {
-  isAutoFlushing = true;
+export async function startAutoApplyChanges() {
+  isAutoApplyingChanges = true;
   flushAll().then(() => {
-    if (isAutoFlushing) {
-      autoFlushTimer = setTimeout(() => {
-        startContinuosFlush();
+    if (isAutoApplyingChanges) {
+      autoApplyTimer = setTimeout(() => {
+        startAutoApplyChanges();
       }, 100);
     }
   });

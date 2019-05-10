@@ -26,7 +26,7 @@ export function jestSetupTestFramework() {
 
   afterEach(() => {
     const platform = require('@stencil/core/platform');
-    platform.stopContinuosFlush();
+    platform.stopAutoApplyChanges();
 
     teardownGlobal(global);
     global.Context = {};
