@@ -3,9 +3,12 @@ import { isOutputTargetAngular } from './output-utils';
 import { dashToPascalCase, readPackageJson, relativeImport, sortBy } from '@utils';
 
 export async function outputAngular(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const timespan = buildCtx.createTimeSpan(`generate angular proxies started`, true);
-
   const angularOutputTargets = config.outputTargets.filter(isOutputTargetAngular);
+  if (angularOutputTargets.length === 0) {
+    return;
+  }
+
+  const timespan = buildCtx.createTimeSpan(`generate angular proxies started`, true);
   await Promise.all(
     angularOutputTargets.map(outputTarget => (
       angularDirectiveProxyOutput(config, compilerCtx, buildCtx, outputTarget))

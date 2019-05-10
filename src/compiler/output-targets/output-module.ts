@@ -21,9 +21,9 @@ export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx,
 }
 
 export async function generateModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModule[]) {
-  const timespan = buildCtx.createTimeSpan(`generate module web components started`, true);
-
   await buildCtx.stylesPromise;
+
+  const timespan = buildCtx.createTimeSpan(`generate module web components started`, true);
 
   await Promise.all([
     bundleRawComponents(config, compilerCtx, buildCtx, outputTargets.filter(o => o.externalRuntime), true),
