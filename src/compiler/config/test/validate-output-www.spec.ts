@@ -147,7 +147,7 @@ describe('validateOutputTargetWww', () => {
 
       expect(outputTarget.type).toBe('www');
       expect(outputTarget.dir).toBe(path.join(rootDir, 'my-www'));
-      expect(outputTarget.baseUrl).toBe(path.join(rootDir, '/docs/'));
+      expect(outputTarget.baseUrl).toBe('/docs/');
       expect(outputTarget.appDir).toBe(path.join(rootDir, 'my-www/docs/'));
 
       expect(outputTarget.buildDir).toBe(path.join(rootDir, 'my-www', 'docs', 'build'));
@@ -164,7 +164,7 @@ describe('validateOutputTargetWww', () => {
 
       expect(outputTarget.type).toBe('www');
       expect(outputTarget.dir).toBe(path.join(rootDir, 'www'));
-      expect(outputTarget.baseUrl).toBe(path.join(rootDir, '/docs/'));
+      expect(outputTarget.baseUrl).toBe('/docs/');
       expect(outputTarget.appDir).toBe(path.join(rootDir, 'www/docs/'));
 
       expect(outputTarget.buildDir).toBe(path.join(rootDir, 'www', 'docs', 'build'));
