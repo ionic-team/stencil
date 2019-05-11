@@ -8,9 +8,19 @@ import exit from 'exit';
 
 export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger: d.Logger) {
 
-  process.on(`unhandledRejection`, (r: any) => {
-    if (!shouldIgnoreError(r)) {
-      logger.error(`unhandledRejection`, r);
+  process.on(`unhandledRejection`, (e: any) => {
+    if (!shouldIgnoreError(e)) {
+      let msg = 'unhandledRejection';
+      if (e != null) {
+        if (e.stack) {
+          msg += ': ' + e.stack;
+        } else if (e.message) {
+          msg += ': ' + e.message;
+        } else {
+          msg += ': ' + e;
+        }
+      }
+      logger.error(msg);
     }
   });
 
