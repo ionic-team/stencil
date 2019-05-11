@@ -21,8 +21,8 @@ async function bundleCompiler() {
   const rollupBuild = await rollup.rollup({
     input: INPUT_FILE,
     external: [
-      'typescript',
-      'readline'
+      'readline',
+      'typescript'
     ],
     plugins: [
       (() => {

@@ -1,5 +1,6 @@
 import { normalizePath } from '@utils';
 import { TestingFs } from './testing-fs';
+import { TestingLogger } from './testing-logger';
 import { StencilSystem } from '../declarations';
 import fs from 'fs';
 import path from 'path';
@@ -27,7 +28,11 @@ export class TestingSystem extends NodeSystem {
     };
 
     this.createFsWatcher = null;
-    this.initWorkers(1, 1);
+
+    const logger = new TestingLogger();
+    logger.enable = true;
+
+    this.initWorkers(1, 1, logger);
   }
 
   get compiler() {

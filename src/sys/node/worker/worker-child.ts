@@ -45,3 +45,20 @@ export function attachMessageHandler(process: NodeJS.Process, runner: d.WorkerRu
   const w = new WorkerChild(process, runner);
   process.on('message', w.receiveMessageFromMain.bind(w));
 }
+
+
+process.on(`unhandledRejection`, (e: any) => {
+  const msgToMain: d.WorkerMessage = {
+    error: 'worker unhandledRejection'
+  };
+  if (typeof e === 'string') {
+    msgToMain.error = e;
+  } else if (e != null) {
+    if (e.stack) {
+      msgToMain.error += ': ' + e.stack;
+    } else if (e.message) {
+      msgToMain.error += ': ' + e.message;
+    }
+  }
+  process.send(msgToMain);
+});

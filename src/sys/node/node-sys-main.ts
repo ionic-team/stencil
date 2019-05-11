@@ -75,7 +75,7 @@ export class NodeSystem implements d.StencilSystem {
     }
   }
 
-  initWorkers(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number) {
+  initWorkers(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number, logger: d.Logger) {
     if (this.sysWorker) {
       return this.sysWorker.options;
     }
@@ -90,7 +90,8 @@ export class NodeSystem implements d.StencilSystem {
 
     this.sysWorker = new WorkerManager(workerModulePath, {
       maxConcurrentWorkers: maxConcurrentWorkers,
-      maxConcurrentTasksPerWorker: maxConcurrentTasksPerWorker
+      maxConcurrentTasksPerWorker: maxConcurrentTasksPerWorker,
+      logger: logger
     });
 
     this.addDestroy(() => {

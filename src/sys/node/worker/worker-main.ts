@@ -92,10 +92,13 @@ export class WorkerMain extends EventEmitter {
 
     const task = this.tasks.find(t => t.taskId === responseFromWorker.taskId);
     if (!task) {
+      if (responseFromWorker.error != null) {
+        this.emit('error', responseFromWorker.error);
+      }
       return;
     }
 
-    if (responseFromWorker.error) {
+    if (responseFromWorker.error != null) {
       task.reject(responseFromWorker.error);
     } else {
       task.resolve(responseFromWorker.value);

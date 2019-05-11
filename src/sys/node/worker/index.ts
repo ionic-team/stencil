@@ -24,9 +24,12 @@ export class WorkerManager extends EventEmitter {
     }
   }
 
-  onError(error: NodeJS.ErrnoException, workerId: number) {
-    if (error.code === 'ERR_IPC_CHANNEL_CLOSED') {
+  onError(err: NodeJS.ErrnoException, workerId: number) {
+    if (err.code === 'ERR_IPC_CHANNEL_CLOSED') {
       return this.stopWorker(workerId);
+    }
+    if (this.options.logger) {
+      this.options.logger.error(err);
     }
   }
 

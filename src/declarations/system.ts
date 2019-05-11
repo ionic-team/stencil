@@ -28,7 +28,7 @@ export interface StencilSystem {
     cwd?: string;
     nodir?: boolean;
   }): Promise<string[]>;
-  initWorkers?(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number): d.WorkerOptions;
+  initWorkers?(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number, logger: d.Logger): d.WorkerOptions;
   lazyRequire?: d.LazyRequire;
   loadConfigFile?(configPath: string, process?: any): d.Config;
   minifyJs?(input: string, opts?: any): Promise<{
