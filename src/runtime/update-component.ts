@@ -10,10 +10,7 @@ import { renderVdom } from './vdom/vdom-render';
 export const safeCall = async (instance: any, method: string) => {
   if (instance && instance[method]) {
     try {
-      const rtn = instance[method]();
-      if (rtn) {
-        await rtn;
-      }
+      await instance[method]();
     } catch (e) {
       consoleError(e);
     }
