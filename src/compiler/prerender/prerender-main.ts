@@ -3,6 +3,7 @@ import { addUrlToPendingQueue, initializePrerenderEntryUrls } from './prerender-
 import { catchError } from '@utils';
 import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
+import { generateTemplateHtml } from './prerender-template-html';
 import { getPrerenderConfig } from './prerender-config';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 import { getAbsoluteBuildDir } from '../html/utils';
@@ -10,7 +11,7 @@ import { URL } from 'url';
 import readline from 'readline';
 
 
-export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, templateHtml: string) {
+export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   // main thread!
   if (buildCtx.hasError) {
     return;
@@ -55,6 +56,7 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
     return;
   }
 
+  const templateHtml = await generateTemplateHtml(config, buildCtx, outputTarget);
   manager.templateId = await createPrerenderTemplate(config, templateHtml);
   manager.componentGraphPath = await createComponentGraphPath(config, buildCtx, outputTarget);
 

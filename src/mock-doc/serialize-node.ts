@@ -1,4 +1,5 @@
 import { cloneAttributes } from './attribute';
+import { CONTENT_REF_ID, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from '../runtime/runtime-constants';
 import { MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
@@ -29,6 +30,10 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToH
 
   if (typeof opts.removeEmptyAttributes !== 'boolean') {
     opts.removeEmptyAttributes = true;
+  }
+
+  if (typeof opts.removeAttributeQuotes !== 'boolean') {
+    opts.removeAttributeQuotes = false;
   }
 
   if (typeof opts.removeBooleanAttributeQuotes !== 'boolean') {
@@ -161,8 +166,14 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
           }
         }
 
-        output.text.push('="' + escapeString(attrValue, true) + '"');
+        if (opts.removeAttributeQuotes && CAN_REMOVE_ATTR_QUOTES.test(attrValue)) {
+          output.text.push('=' + escapeString(attrValue, true));
+          output.currentLineWidth += (attrValue.length + 1);
+
+        } else {
+          output.text.push('="' + escapeString(attrValue, true) + '"');
           output.currentLineWidth += (attrValue.length + 3);
+        }
       }
 
       if ((node as Element).hasAttribute('style')) {
@@ -354,7 +365,16 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       }
     }
 
-  } else if (node.nodeType === NODE_TYPES.COMMENT_NODE && opts.removeHtmlComments === false) {
+  } else if (node.nodeType === NODE_TYPES.COMMENT_NODE) {
+    const nodeValue = node.nodeValue;
+
+    if (opts.removeHtmlComments) {
+      const isHydrateAnnotation = nodeValue.startsWith(CONTENT_REF_ID + '.') || nodeValue.startsWith(ORG_LOCATION_ID + '.') || nodeValue.startsWith(SLOT_NODE_ID + '.') || nodeValue.startsWith(TEXT_NODE_ID + '.');
+      if (!isHydrateAnnotation) {
+        return;
+      }
+    }
+
     if (opts.newLines) {
       output.text.push('\n');
       output.currentLineWidth = 0;
@@ -367,8 +387,8 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       output.currentLineWidth += output.indent;
     }
 
-    output.text.push('<!--' + node.nodeValue + '-->');
-    output.currentLineWidth += (node.nodeValue.length + 7);
+    output.text.push('<!--' + nodeValue + '-->');
+    output.currentLineWidth += (nodeValue.length + 7);
 
   } else if (node.nodeType === NODE_TYPES.DOCUMENT_TYPE_NODE) {
     output.text.push('<!doctype html>');
@@ -380,6 +400,7 @@ const NBSP_REGEX = /\u00a0/g;
 const DOUBLE_QUOTE_REGEX = /"/g;
 const LT_REGEX = /</g;
 const GT_REGEX = />/g;
+const CAN_REMOVE_ATTR_QUOTES = /^[^ \t\n\f\r"'`=<>\/\\-]+$/;
 
 function escapeString(str: string, attrMode: boolean) {
   str = str.replace(AMP_REGEX, '&amp;').replace(NBSP_REGEX, '&nbsp;');
@@ -401,7 +422,7 @@ function escapeString(str: string, attrMode: boolean) {
 
 /*@__PURE__*/const BOOLEAN_ATTR = new Set(['allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'compact', 'controls', 'declare', 'default', 'defaultchecked', 'defaultmuted', 'defaultselected', 'defer', 'disabled', 'enabled', 'formnovalidate', 'hidden', 'indeterminate', 'inert', 'ismap', 'itemscope', 'loop', 'multiple', 'muted', 'nohref', 'noresize', 'noshade', 'novalidate', 'nowrap', 'open', 'pauseonexit', 'readonly', 'required', 'reversed', 'scoped', 'seamless', 'selected', 'sortable', 'truespeed', 'typemustmatch', 'visible']);
 
-/*@__PURE__*/const STRUCTURE_ELEMENTS = new Set(['html', 'body', 'head', 'meta', 'link', 'title', 'script', 'iframe', 'style']);
+/*@__PURE__*/const STRUCTURE_ELEMENTS = new Set(['html', 'body', 'head', 'iframe', 'meta', 'link', 'title', 'script', 'style']);
 
 
 interface SerializeOutput {
@@ -420,8 +441,9 @@ export interface SerializeNodeToHtmlOptions {
   newLines?: boolean;
   outerHtml?: boolean;
   prettyHtml?: boolean;
+  removeAttributeQuotes?: boolean;
   removeBooleanAttributeQuotes?: boolean;
-  removeHtmlComments?: boolean;
   removeEmptyAttributes?: boolean;
+  removeHtmlComments?: boolean;
   serializeShadowRoot?: boolean;
 }

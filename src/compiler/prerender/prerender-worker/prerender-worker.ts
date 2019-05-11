@@ -72,9 +72,10 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       approximateLineWidth: opts.approximateLineWidth,
       outerHtml: false,
       prettyHtml: opts.prettyHtml,
+      removeAttributeQuotes: opts.removeAttributeQuotes,
       removeBooleanAttributeQuotes: opts.removeBooleanAttributeQuotes,
       removeEmptyAttributes: opts.removeEmptyAttributes,
-      removeHtmlComments: false,
+      removeHtmlComments: opts.removeHtmlComments,
       serializeShadowRoot: false
     });
 
@@ -109,8 +110,10 @@ function getRenderToStringOptions(prerenderConfig: d.PrerenderConfig, url: URL, 
   const opts: d.RenderToStringOptions = {
     url: prerenderUrl,
     approximateLineWidth: 100,
+    removeAttributeQuotes: true,
     removeBooleanAttributeQuotes: true,
-    removeEmptyAttributes: true
+    removeEmptyAttributes: true,
+    removeHtmlComments: true,
   };
 
   if (typeof prerenderConfig.canonicalUrl === 'function') {

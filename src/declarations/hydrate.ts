@@ -5,8 +5,10 @@ export interface RenderToStringOptions extends HydrateDocumentOptions {
   approximateLineWidth?: number;
   beforeHydrate?(document: any): any | Promise<any>;
   prettyHtml?: boolean;
+  removeAttributeQuotes?: boolean;
   removeBooleanAttributeQuotes?: boolean;
   removeEmptyAttributes?: boolean;
+  removeHtmlComments?: boolean;
 }
 
 export interface HydrateDocumentOptions {

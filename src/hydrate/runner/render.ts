@@ -55,9 +55,10 @@ export async function renderToString(html: string, opts: d.RenderToStringOptions
         approximateLineWidth: opts.approximateLineWidth,
         outerHtml: false,
         prettyHtml: opts.prettyHtml,
+        removeAttributeQuotes: opts.removeAttributeQuotes,
         removeBooleanAttributeQuotes: opts.removeBooleanAttributeQuotes,
         removeEmptyAttributes: opts.removeEmptyAttributes,
-        removeHtmlComments: false,
+        removeHtmlComments: opts.removeHtmlComments,
         serializeShadowRoot: false
       });
     }

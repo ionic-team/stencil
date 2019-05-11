@@ -1,9 +1,7 @@
 import * as d from '../../declarations';
+import { buildError } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 import { runPrerenderMain } from '../prerender/prerender-main';
-import { generateTemplateHtml } from '../prerender/prerender-template-html';
-
-import { buildError } from '@utils';
 
 
 export async function outputPrerender(config: d.Config, buildCtx: d.BuildCtx) {
@@ -40,6 +38,5 @@ async function prerenderOutputTarget(config: d.Config, buildCtx: d.BuildCtx, out
     return;
   }
 
-  const templateHtml = await generateTemplateHtml(config, buildCtx, outputTarget);
-  await runPrerenderMain(config, buildCtx, outputTarget, templateHtml);
+  await runPrerenderMain(config, buildCtx, outputTarget);
 }
