@@ -7,15 +7,17 @@ import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 
 
-export const safeCall = (instance: any, method: string) => {
+export const safeCall = async (instance: any, method: string) => {
   if (instance && instance[method]) {
     try {
-      return instance[method]();
+      const rtn = instance[method]();
+      if (rtn) {
+        await rtn;
+      }
     } catch (e) {
       consoleError(e);
     }
   }
-  return undefined;
 };
 
 export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
