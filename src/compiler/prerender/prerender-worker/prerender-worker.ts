@@ -64,6 +64,10 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       }
     }
 
+    if (typeof hydrateResults.httpStatus === 'number' && hydrateResults.httpStatus >= 400) {
+      return results;
+    }
+
     const html = serializeNodeToHtml(doc, {
       approximateLineWidth: opts.approximateLineWidth,
       outerHtml: false,

@@ -36,6 +36,10 @@ export function finalizeWindow(doc: Document, opts: d.HydrateDocumentOptions, re
     relocateMetaCharset(doc);
   } catch (e) {}
 
+  try {
+    getHttpStatus(doc, results);
+  } catch (e) {}
+
   if (opts.clientHydrateAnnotations) {
     doc.documentElement.classList.add('hydrated');
   }
@@ -52,6 +56,17 @@ function removeScripts(elm: HTMLElement) {
 
     if (child.nodeName === 'SCRIPT') {
       child.remove();
+    }
+  }
+}
+
+
+export function getHttpStatus(doc: Document, results: d.HydrateResults) {
+  const metaStatus = doc.head.querySelector('meta[http-equiv="status"]');
+  if (metaStatus != null) {
+    const content = metaStatus.getAttribute('content');
+    if (content != null) {
+      results.httpStatus = parseInt(content, 10);
     }
   }
 }

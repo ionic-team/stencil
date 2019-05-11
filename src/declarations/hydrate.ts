@@ -44,6 +44,7 @@ export interface HydrateResults {
   imgs: HydrateImgElement[];
   title: string;
   hydratedCount: number;
+  httpStatus?: number;
 }
 
 export interface HydrateComponent {
