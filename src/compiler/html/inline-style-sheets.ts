@@ -6,24 +6,23 @@ export function inlineStyleSheets(config: d.Config, compilerCtx: d.CompilerCtx, 
   return Promise.all(
     globalLinks.map(async link => {
       const href = link.getAttribute('href');
-      if (!href.startsWith('/') || link.getAttribute('media') !== null) {
-        return;
-      }
-      const fsPath = config.sys.path.join(outputTarget.dir, href);
-      const cssExists = await compilerCtx.fs.access(fsPath);
-      if (!cssExists) {
-        return;
-      }
-      const styles = await compilerCtx.fs.readFile(fsPath);
-      if (styles.length > maxSize) {
+      if (typeof href !== 'string' || !href.startsWith('/') || link.getAttribute('media') !== null) {
         return;
       }
 
-      // insert inline <style>
-      const inlinedStyles = doc.createElement('style');
-      inlinedStyles.innerHTML = styles;
-      link.parentNode.insertBefore(inlinedStyles, link);
-      link.remove();
+      try {
+        const fsPath = config.sys.path.join(outputTarget.dir, href);
+        const styles = await compilerCtx.fs.readFile(fsPath);
+        if (styles.length > maxSize) {
+          return;
+        }
+
+        // insert inline <style>
+        const inlinedStyles = doc.createElement('style');
+        inlinedStyles.innerHTML = styles;
+        link.parentNode.insertBefore(inlinedStyles, link);
+        link.remove();
+      } catch (e) {}
     })
   );
 }
