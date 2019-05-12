@@ -24,8 +24,13 @@ export function parseDocumentUtil(ownerDocument: any, html: string) {
 
 
 export function parseFragmentUtil(ownerDocument: any, html: string) {
+  if (typeof html === 'string') {
+    html = html.trim();
+  } else {
+    html = '';
+  }
   const frag = parseFragment(
-    html.trim(),
+    html,
     getParser(ownerDocument)
   ) as any;
   return frag;

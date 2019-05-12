@@ -5,6 +5,7 @@ import { MockDocumentTypeNode } from './document-type-node';
 import { MockElement, MockTextNode, resetElement } from './node';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { parseDocumentUtil } from './parse-util';
+import { parseHtmlToFragment } from './parse-html';
 import { resetEventListeners } from './event';
 import { MockWindow } from './window';
 
@@ -211,6 +212,10 @@ export class MockDocument extends MockElement {
 
 export function createDocument(html: string | boolean = null): Document {
   return new MockWindow(html).document;
+}
+
+export function createFragment(html?: string): DocumentFragment {
+  return parseHtmlToFragment(html, null);
 }
 
 export function resetDocument(doc: Document) {

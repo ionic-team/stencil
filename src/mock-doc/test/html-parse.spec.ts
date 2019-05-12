@@ -1,12 +1,32 @@
+import { createFragment } from '../document';
 import { MockDocument } from '../document';
-import { parseHtmlToDocument, parseHtmlToFragment } from '../parse-html';
 import { NODE_TYPES } from '../constants';
+import { parseHtmlToDocument, parseHtmlToFragment } from '../parse-html';
 
 
 describe('parseHtml', () => {
   let doc: MockDocument;
   beforeEach(() => {
     doc = new MockDocument();
+  });
+
+  it('should create multiple node documentFragment', () => {
+    const frag = createFragment('<div>1</div><div>2</div>');
+    expect(frag.childNodes.length).toBe(2);
+    expect(frag.childNodes[0].textContent).toBe('1');
+    expect(frag.childNodes[1].textContent).toBe('2');
+  });
+
+  it('should create one node documentFragment', () => {
+    const frag = createFragment('<div>1</div>');
+    expect(frag.childNodes.length).toBe(1);
+    expect(frag.childNodes[0].textContent).toBe('1');
+  });
+
+  it('should create empty documentFragment', () => {
+    const frag = createFragment();
+    expect(frag.childNodes.length).toBe(0);
+    expect(frag.nodeType).toBe(NODE_TYPES.DOCUMENT_FRAGMENT_NODE);
   });
 
   it('body innerHTML/querySelector', () => {
