@@ -9,7 +9,6 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToH
     currentLineWidth: 0,
     indent: 0,
     isWithinBody: false,
-    isWithinWhitespaceSensitive: false,
     text: [],
   };
 
@@ -22,6 +21,15 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToH
       opts.newLines = true;
     }
     opts.approximateLineWidth = -1;
+
+  } else {
+    opts.prettyHtml = false;
+    if (typeof opts.newLines !== 'boolean') {
+      opts.newLines = false;
+    }
+    if (typeof opts.indentSpaces !== 'number') {
+      opts.indentSpaces = 0;
+    }
   }
 
   if (typeof opts.approximateLineWidth !== 'number') {
@@ -77,15 +85,9 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       output.isWithinBody = true;
     }
 
-    let isElementWhitespaceSensitive = false;
     const ignoreTag = (opts.excludeTags != null && opts.excludeTags.includes(tagName));
 
     if (ignoreTag === false) {
-      if (!output.isWithinWhitespaceSensitive) {
-        isElementWhitespaceSensitive = WHITESPACE_SENSITIVE.has(tagName);
-        output.isWithinWhitespaceSensitive = isElementWhitespaceSensitive;
-      }
-
       if (opts.newLines) {
         output.text.push('\n');
         output.currentLineWidth = 0;
@@ -257,9 +259,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       output.currentLineWidth = 0;
     }
 
-    if (isElementWhitespaceSensitive) {
-      output.isWithinWhitespaceSensitive = false;
-    } else if (tagName === 'body') {
+    if (tagName === 'body') {
       output.isWithinBody = false;
     }
 
@@ -271,7 +271,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       if (textContent.trim() === '') {
         // this text node is whitespace only
 
-        if (output.isWithinWhitespaceSensitive) {
+        if (isWithinWhitespaceSensitive(node)) {
           // whitespace matters within this element
           // just add the exact text we were given
           output.text.push(textContent);
@@ -333,7 +333,10 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
 
             } else {
               // not pretty printing the text node
-              if (!output.isWithinWhitespaceSensitive) {
+              if (isWithinWhitespaceSensitive(node)) {
+                output.currentLineWidth += textContentLength;
+
+              } else {
                 // this element is not a whitespace sensitive one, like <pre> or <code> so
                 // any whitespace at the start and end can be cleaned up to just be one space
                 if (/\s/.test(textContent.charAt(0))) {
@@ -352,9 +355,6 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
                     }
                   }
                 }
-                output.currentLineWidth += textContentLength;
-
-              } else {
                 output.currentLineWidth += textContentLength;
               }
 
@@ -412,9 +412,19 @@ function escapeString(str: string, attrMode: boolean) {
   return str.replace(LT_REGEX, '&lt;').replace(GT_REGEX, '&gt;');
 }
 
+function isWithinWhitespaceSensitive(node: Node) {
+  while (node != null) {
+    if (WHITESPACE_SENSITIVE.has(node.nodeName)) {
+      return true;
+    }
+    node = node.parentNode;
+  }
+  return false;
+}
+
 /*@__PURE__*/export const NON_ESCAPABLE_CONTENT = new Set(['STYLE', 'SCRIPT', 'IFRAME', 'NOSCRIPT', 'XMP', 'NOEMBED', 'NOFRAMES', 'PLAINTEXT']);
 
-/*@__PURE__*/export const WHITESPACE_SENSITIVE = new Set(['code', 'output', 'pre', 'plaintext', 'template', 'textarea']);
+/*@__PURE__*/export const WHITESPACE_SENSITIVE = new Set(['CODE', 'OUTPUT', 'PLAINTEXT', 'PRE', 'TEMPLATE', 'TEXTAREA']);
 
 /*@__PURE__*/const EMPTY_ELEMENTS = new Set(['area', 'base', 'basefont', 'bgsound', 'br', 'col', 'embed', 'frame', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'trace', 'wbr']);
 
@@ -429,7 +439,6 @@ interface SerializeOutput {
   currentLineWidth: number;
   indent: number;
   isWithinBody: boolean;
-  isWithinWhitespaceSensitive: boolean;
   text: string[];
 }
 
