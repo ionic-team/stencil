@@ -9,10 +9,35 @@ describe('removeUnusedStyles', () => {
 
   beforeEach(() => {
     results = {
-      diagnostics: [],
-      title: '',
-      hydratedCount: 0
-    };
+      diagnostics: []
+    } as any;
+  });
+
+  it('should not remove used attr contains selectors', () => {
+    const doc = mockDocument(`
+      <html>
+        <head>
+          <style data-styles>
+            pre[class*="language-"] { font: used; }
+          </style>
+        </head>
+        <body>
+          <pre class="language-tsx">
+            <code class="language-tsx">
+              Used
+            </code>
+          </pre>
+        </body>
+      </html>
+    `);
+
+    removeUnusedStyles(doc, results);
+
+    expect(results.diagnostics).toHaveLength(0);
+
+    const css = doc.querySelector('style').innerHTML;
+
+    expectSelector(css, 'pre[class*="language-"]');
   });
 
   it('should remove unused nested selectors', () => {
