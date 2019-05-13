@@ -67,6 +67,9 @@ export namespace Components {
   interface ExternalImportC {}
   interface FactoryJsx {}
   interface InitCssRoot {}
+  interface InputBasicRoot {
+    'value': string;
+  }
   interface KeyReorder {
     'num': number;
   }
@@ -220,6 +223,9 @@ declare namespace LocalJSX {
   interface ExternalImportC extends JSXBase.HTMLAttributes {}
   interface FactoryJsx extends JSXBase.HTMLAttributes {}
   interface InitCssRoot extends JSXBase.HTMLAttributes {}
+  interface InputBasicRoot extends JSXBase.HTMLAttributes {
+    'value'?: string;
+  }
   interface KeyReorder extends JSXBase.HTMLAttributes {
     'num'?: number;
   }
@@ -351,6 +357,7 @@ declare namespace LocalJSX {
     'ExternalImportC': Components.ExternalImportC;
     'FactoryJsx': Components.FactoryJsx;
     'InitCssRoot': Components.InitCssRoot;
+    'InputBasicRoot': Components.InputBasicRoot;
     'KeyReorder': Components.KeyReorder;
     'KeyReorderRoot': Components.KeyReorderRoot;
     'LegacyContext': Components.LegacyContext;
@@ -437,6 +444,7 @@ declare namespace LocalJSX {
     'ExternalImportC': LocalJSX.ExternalImportC;
     'FactoryJsx': LocalJSX.FactoryJsx;
     'InitCssRoot': LocalJSX.InitCssRoot;
+    'InputBasicRoot': LocalJSX.InputBasicRoot;
     'KeyReorder': LocalJSX.KeyReorder;
     'KeyReorderRoot': LocalJSX.KeyReorderRoot;
     'LegacyContext': LocalJSX.LegacyContext;
@@ -657,6 +665,12 @@ declare global {
   var HTMLInitCssRootElement: {
     prototype: HTMLInitCssRootElement;
     new (): HTMLInitCssRootElement;
+  };
+
+  interface HTMLInputBasicRootElement extends Components.InputBasicRoot, HTMLStencilElement {}
+  var HTMLInputBasicRootElement: {
+    prototype: HTMLInputBasicRootElement;
+    new (): HTMLInputBasicRootElement;
   };
 
   interface HTMLKeyReorderElement extends Components.KeyReorder, HTMLStencilElement {}
@@ -1032,6 +1046,7 @@ declare global {
     'external-import-c': HTMLExternalImportCElement
     'factory-jsx': HTMLFactoryJsxElement
     'init-css-root': HTMLInitCssRootElement
+    'input-basic-root': HTMLInputBasicRootElement
     'key-reorder': HTMLKeyReorderElement
     'key-reorder-root': HTMLKeyReorderRootElement
     'legacy-context': HTMLLegacyContextElement
@@ -1118,6 +1133,7 @@ declare global {
     'external-import-c': HTMLExternalImportCElement;
     'factory-jsx': HTMLFactoryJsxElement;
     'init-css-root': HTMLInitCssRootElement;
+    'input-basic-root': HTMLInputBasicRootElement;
     'key-reorder': HTMLKeyReorderElement;
     'key-reorder-root': HTMLKeyReorderRootElement;
     'legacy-context': HTMLLegacyContextElement;

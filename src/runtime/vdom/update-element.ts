@@ -16,7 +16,7 @@ export const updateElement = (oldVnode: d.VNode | null, newVnode: d.VNode, isSvg
   if (BUILD.updatable) {
     // remove attributes no longer present on the vnode by setting them to undefined
     for (memberName in oldVnodeAttrs) {
-      if (!(newVnodeAttrs && newVnodeAttrs[memberName] != null) && oldVnodeAttrs[memberName] != null) {
+      if (newVnodeAttrs[memberName] == null && oldVnodeAttrs[memberName] != null) {
         setAccessor(elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode, newVnode.$flags$);
       }
     }
@@ -24,8 +24,6 @@ export const updateElement = (oldVnode: d.VNode | null, newVnode: d.VNode, isSvg
 
   // add new & update changed attributes
   for (memberName in newVnodeAttrs) {
-    if (!(memberName in oldVnodeAttrs) || newVnodeAttrs[memberName] !== (memberName === 'value' || memberName === 'checked' ? elm[memberName] : oldVnodeAttrs[memberName])) {
-      setAccessor(elm, memberName, oldVnodeAttrs[memberName], newVnodeAttrs[memberName], isSvgMode, newVnode.$flags$);
-    }
+    setAccessor(elm, memberName, oldVnodeAttrs[memberName], newVnodeAttrs[memberName], isSvgMode, newVnode.$flags$);
   }
 };

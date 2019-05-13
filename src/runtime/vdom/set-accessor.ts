@@ -13,22 +13,17 @@ import { toLowerCase } from '@utils';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
 export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, flags: number) => {
+  if (oldValue === newValue) {
+    return;
+  }
   if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
     // Class
     if (BUILD.updatable) {
-      if (oldValue !== newValue) {
-        const oldList = parseClassList(oldValue);
-        const newList = parseClassList(newValue);
-        const toRemove = oldList.filter(item => !newList.includes(item));
-        const classList = parseClassList(elm.className)
-          .filter(item => !toRemove.includes(item));
-
-        // add classes from newValue that are not in oldList or classList
-        const toAdd = newList.filter(item => !oldList.includes(item) && !classList.includes(item));
-        classList.push(...toAdd);
-
-        elm.className = classList.join(' ');
-      }
+      const oldList = parseClassList(oldValue);
+      const baseList = parseClassList(elm.className).filter(item => !oldList.includes(item));
+      elm.className = baseList.concat(
+        parseClassList(newValue).filter(item => !baseList.includes(item))
+      ).join(' ');
 
     } else {
       elm.className = newValue;
@@ -39,7 +34,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     if (BUILD.updatable) {
       for (const prop in oldValue) {
         if (!newValue || newValue[prop] == null) {
-          if (!BUILD.hydrateServerSide && /-/.test(prop)) {
+          if (!BUILD.hydrateServerSide && prop.includes('-')) {
             elm.style.removeProperty(prop);
           } else {
             (elm as any).style[prop] = '';
@@ -50,7 +45,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
 
     for (const prop in newValue) {
       if (!oldValue || newValue[prop] !== oldValue[prop]) {
-        if (!BUILD.hydrateServerSide && /-/.test(prop)) {
+        if (!BUILD.hydrateServerSide && prop.includes('-')) {
           elm.style.setProperty(prop, newValue[prop]);
         } else {
           (elm as any).style[prop] = newValue[prop];
@@ -128,4 +123,4 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
 };
 
 const parseClassList = (value: string | undefined | null): string[] =>
-  (value == null || value === '') ? [] : value.split(' ');
+  (!value) ? [] : value.split(' ');

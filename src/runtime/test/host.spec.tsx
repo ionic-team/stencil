@@ -12,6 +12,7 @@ describe('hostData', () => {
 
       hostData() {
         return {
+          'value': 'somevalue',
           'role': 'alert',
           'aria-hidden': this.hidden ? 'true' : null,
           'hidden': this.hidden
@@ -24,14 +25,14 @@ describe('hostData', () => {
       html: `<cmp-a></cmp-a>`,
     });
     expect(root).toEqualHtml(`
-      <cmp-a role="alert"></cmp-a>
+      <cmp-a role="alert" value="somevalue"></cmp-a>
     `);
 
     root.hidden = true;
     await waitForChanges();
 
     expect(root).toEqualHtml(`
-      <cmp-a role="alert" aria-hidden="true" hidden></cmp-a>
+      <cmp-a role="alert" aria-hidden="true" value="somevalue" hidden></cmp-a>
     `);
   });
 
@@ -44,6 +45,7 @@ describe('hostData', () => {
       render() {
         return (
           <Host
+            value='hello'
             role='alert'
             aria-hidden={this.hidden ? 'true' : null}
             hidden={this.hidden}
@@ -57,18 +59,18 @@ describe('hostData', () => {
       html: `<cmp-a></cmp-a>`,
     });
     expect(root).toEqualHtml(`
-      <cmp-a role="alert"></cmp-a>
+      <cmp-a role="alert" value="hello"></cmp-a>
     `);
 
     root.hidden = true;
     await waitForChanges();
 
     expect(root).toEqualHtml(`
-      <cmp-a role="alert" aria-hidden="true" hidden></cmp-a>
+      <cmp-a role="alert" value="hello" aria-hidden="true" hidden></cmp-a>
     `);
   });
 
-  it('register <host> listeners', async () => {
+  it('register <Host> listeners', async () => {
     @Component({ tag: 'cmp-a'})
     class CmpA {
 

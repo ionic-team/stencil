@@ -552,7 +552,7 @@ const relocateSlotContent = (
   }
 };
 
-export const callNodeRefs = (vNode: d.VNode, isDestroy?: boolean) => {
+export const callNodeRefs = (vNode: d.VNode, isDestroy: boolean) => {
   if (BUILD.vdomRef && vNode) {
     vNode.$attrs$ && vNode.$attrs$.ref && vNode.$attrs$.ref(isDestroy ? null : vNode.$elm$);
 

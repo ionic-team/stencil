@@ -176,7 +176,7 @@ describe('updateElement', () => {
     spy.mockReset();
 
     updateElement(firstVNode, secondVNode, false);
-    expect(spy).toHaveBeenCalledTimes(5);
+    expect(spy).toHaveBeenCalledTimes(6);
     expect(spy).toHaveBeenNthCalledWith(1, elm, 'content', 'attributes removed', 'attributes added', false, 0);
     expect(spy).toHaveBeenNthCalledWith(2, elm, 'padding', false, true, false, 0);
     expect(spy).toHaveBeenNthCalledWith(3, elm, 'bold', 'false', 'true', false, 0);
@@ -185,7 +185,7 @@ describe('updateElement', () => {
     spy.mockReset();
 
     updateElement(secondVNode, firstVNode, false);
-    expect(spy).toHaveBeenCalledTimes(5);
+    expect(spy).toHaveBeenCalledTimes(6);
     expect(spy).toHaveBeenNthCalledWith(1, elm, 'margin', '', undefined, false, 0);
     expect(spy).toHaveBeenNthCalledWith(2, elm, 'color', 'lime', undefined, false, 0);
     expect(spy).toHaveBeenNthCalledWith(3, elm, 'content', 'attributes added', 'attributes removed', false, 0);
