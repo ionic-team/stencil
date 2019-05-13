@@ -94,6 +94,7 @@ export declare function readTask(task: d.RafCallback): void;
 interface HostAttributes {
   class?: string | { [className: string]: boolean };
   style?: { [key: string]: string };
+  ref?: (el: HTMLElement | null) => void;
 
   [prop: string]: any;
 }
