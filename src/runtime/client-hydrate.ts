@@ -142,6 +142,7 @@ const clientHydrate = (
 
       if (childNodeType === TEXT_NODE_ID) {
         childVNode.$elm$ = node.nextSibling as any;
+        childVNode.$text$ = childVNode.$elm$.textContent;
         if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.TextNode) {
           childRenderNodes.push(childVNode);
 
