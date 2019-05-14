@@ -9,7 +9,6 @@ export const config: Config = {
     },
     {
       type: 'experimental-dist-module',
-      externalRuntime: true
     }
   ],
 };

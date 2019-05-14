@@ -7,53 +7,45 @@ import { Component, State, h } from '@stencil/core';
 export class AppRoot {
 
   @State() list: TodoItem[] = [
-    { text: 'my initial todo', checked: false },
+    { text: 'my initial todo' },
     { text: 'Learn about Web Components', checked: true }
   ];
 
-  private inputSubmiHandler = (e: CustomEvent) => {
-    this.list = [...this.list, { text: e.detail, checked: false, }];
-  }
-
-  private itemCheckedHandler = (e: CustomEvent) => {
-    const list = [...this.list];
-    const item = list[e.detail];
-    list[e.detail] = Object.assign({}, item, { checked: !item.checked });
-    this.list = list;
-  }
-
-  private itemRemoveHandler = (e: CustomEvent) => {
-    this.list = [...this.list.slice(0, e.detail), ...this.list.slice(e.detail + 1)];
-  }
-
-  private toggleAllHandler = (e: CustomEvent) => {
-    this.list = this.list.map(item => {
-      item.checked = !!(e.target as HTMLInputElement).checked;
-      return item;
-    });
-  }
-
   render() {
-    const allChecked = this.list.every(item => item.checked);
+    const list = this.list;
+    const allChecked = list.every(item => item.checked);
     return (
       <div>
         <header class="header">
           <h1>Todos Stencil</h1>
-          <todo-input onInputSubmit={this.inputSubmiHandler}></todo-input>
+          <todo-input onInputSubmit={(e: CustomEvent) => {
+            this.list = [...list, { text: e.detail }];
+          }}></todo-input>
         </header>
-        <section class="main" hidden={this.list.length === 0}>
+        <section class="main" hidden={!list.length}>
           <input
             id="toggle-all"
-            onInput={this.toggleAllHandler}
+            onInput={(e: CustomEvent) => {
+              this.list = list.map(item => {
+                item.checked = !!(e.target as HTMLInputElement).checked;
+                return item;
+              });
+            }}
             class="toggle-all"
             type="checkbox"
             checked={allChecked}/>
           <label htmlFor="toggle-all"/>
           <ul class="todo-list">
-            {this.list.map((item, index) => (
+            {list.map((item, index) => (
               <todo-item
-                onItemCheck={this.itemCheckedHandler}
-                onItemRemove={this.itemRemoveHandler}
+                onItemCheck={(e: CustomEvent) => {
+                  const item = list[e.detail];
+                  list[e.detail] = Object.assign({}, item, { checked: !item.checked });
+                  this.list = list.slice();
+                }}
+                onItemRemove={(e: CustomEvent) => {
+                  this.list = [...list.slice(0, e.detail), ...list.slice(e.detail + 1)];
+                }}
                 checked={item.checked}
                 text={item.text}
                 index={index}
@@ -68,5 +60,5 @@ export class AppRoot {
 
 interface TodoItem {
   text: string;
-  checked: boolean;
+  checked?: boolean;
 }
