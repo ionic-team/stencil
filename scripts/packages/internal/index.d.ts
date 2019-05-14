@@ -6,4 +6,5 @@ export {
   JSXBase,
   OutputTargetCustom,
   Plugin,
+  Diagnostic
 } from '../dist/declarations';
