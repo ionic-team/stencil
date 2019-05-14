@@ -57,7 +57,9 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
 
   } else if (BUILD.vdomRef && memberName === 'ref') {
     // minifier will clean this up
-    newValue(elm);
+    if (newValue) {
+      newValue(elm);
+    }
 
   } else if (BUILD.vdomListener && memberName.startsWith('on') && !isMemberInElement(elm, memberName)) {
     // Event Handlers

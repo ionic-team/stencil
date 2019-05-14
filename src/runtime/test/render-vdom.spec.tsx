@@ -204,5 +204,39 @@ describe('render-vdom', () => {
 
       expect(rootInstance.counter).toEqual(1);
     });
+
+    it('should set once', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        counter = 0;
+        setRef = () => {
+          this.counter++;
+        }
+        @Prop() state = true;
+
+        render() {
+          return (this.state
+            ? <div ref={this.setRef}>Hello VDOM</div>
+            : <div>Hello VDOM</div>
+          );
+        }
+      }
+
+      const { root, rootInstance, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      });
+
+      expect(rootInstance.counter).toEqual(1);
+
+      root.state = false;
+      await waitForChanges();
+      expect(rootInstance.counter).toEqual(1);
+
+      root.state = true;
+      await waitForChanges();
+      expect(rootInstance.counter).toEqual(2);
+    });
+
   });
 });
