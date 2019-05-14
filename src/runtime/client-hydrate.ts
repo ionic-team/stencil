@@ -142,8 +142,8 @@ const clientHydrate = (
 
       if (childNodeType === TEXT_NODE_ID) {
         childVNode.$elm$ = node.nextSibling as any;
-        childVNode.$text$ = childVNode.$elm$.textContent;
         if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.TextNode) {
+          childVNode.$text$ = childVNode.$elm$.textContent;
           childRenderNodes.push(childVNode);
 
           // remove the text comment since it's no longer needed
