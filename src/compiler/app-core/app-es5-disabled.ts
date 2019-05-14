@@ -16,10 +16,8 @@ export async function generateEs5DisabledMessage(config: d.Config, compilerCtx: 
 function getDisabledMessageScript(config: d.Config) {
   const style = `
 <style>
-html {
-  display: block;
-}
 body {
+  display: block !important;
   font-family: sans-serif;
   padding: 20px;
   line-height:22px;
