@@ -112,12 +112,7 @@ async function render(win: Window, doc: Document, opts: d.HydrateDocumentOptions
 
   await new Promise(resolve => {
     const tmr = setTimeout(() => {
-      let msg = `Hydrate exceeded timeout: ${opts.timeout}ms`;
-      if (typeof opts.url === 'string') {
-        msg += `, url: ${opts.url}`;
-      }
-
-      renderBuildError(results, msg);
+      renderBuildError(results, `Hydrate exceeded timeout`);
       resolve();
     }, opts.timeout);
 

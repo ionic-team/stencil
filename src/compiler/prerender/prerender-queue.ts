@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
-import { buildError } from '@utils';
+import { buildError, catchError } from '@utils';
 import { crawlAnchorsForNextUrls } from './crawl-urls';
+import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 import { URL } from 'url';
 
 
@@ -44,7 +45,7 @@ export function initializePrerenderEntryUrls(manager: d.PrerenderManager) {
 }
 
 
-export function addUrlToPendingQueue(manager: d.PrerenderManager, queueUrl: string, fromUrl: string) {
+function addUrlToPendingQueue(manager: d.PrerenderManager, queueUrl: string, fromUrl: string) {
   if (typeof queueUrl !== 'string' || queueUrl === '') {
     return;
   }
@@ -66,3 +67,116 @@ export function addUrlToPendingQueue(manager: d.PrerenderManager, queueUrl: stri
     manager.config.logger.debug(`prerender queue: ${url} (from ${from})`);
   }
 }
+
+
+export async function drainPrerenderQueue(manager: d.PrerenderManager) {
+  const url = getNextUrl(manager);
+
+  if (url != null) {
+    // looks like we're ready to prerender more
+    // remove from pending
+    manager.urlsPending.delete(url);
+
+    // move to processing
+    manager.urlsProcessing.add(url);
+
+    // kick off async prerendering
+    prerenderUrl(manager, url);
+
+    // could be more ready for prerendering
+    // let's check again after a tick
+    manager.config.sys.nextTick(() => {
+      drainPrerenderQueue(manager);
+    });
+  }
+
+  if (manager.urlsProcessing.size === 0) {
+    if (typeof manager.resolve === 'function') {
+      // we're not actively processing anything
+      // and there aren't anymore urls in the queue to be prerendered
+      // so looks like our job here is done, good work team
+      manager.resolve();
+      manager.resolve = null;
+    }
+  }
+}
+
+
+function getNextUrl(manager: d.PrerenderManager) {
+  const next = manager.urlsPending.values().next();
+  if (next.done) {
+    // all emptied out, no more pending
+    return null;
+  }
+
+  if (manager.urlsProcessing.size >= DEFAULT_MAX_CONCURRENT) {
+    // slow it down there buddy, too many at one time
+    return null;
+  }
+
+  return next.value;
+}
+
+
+async function prerenderUrl(manager: d.PrerenderManager, url: string) {
+  try {
+    let timespan: d.LoggerTimeSpan;
+    if (manager.isDebug) {
+      const pathname = new URL(url).pathname;
+      timespan = manager.config.logger.createTimeSpan(`prerender start: ${pathname}`, true);
+    }
+
+    const prerenderRequest: d.PrerenderRequest = {
+      baseUrl: manager.outputTarget.baseUrl,
+      componentGraphPath: manager.componentGraphPath,
+      devServerHostUrl: manager.devServerHostUrl,
+      hydrateAppFilePath: manager.hydrateAppFilePath,
+      prerenderConfigPath: manager.prerenderConfigPath,
+      templateId: manager.templateId,
+      url: url,
+      writeToFilePath: getWriteFilePathFromUrlPath(manager, url)
+    };
+
+    // prender this path and wait on the results
+    const results = await manager.config.sys.prerenderUrl(prerenderRequest);
+
+    if (manager.isDebug) {
+      const pathname = new URL(url).pathname;
+      const filePath = manager.config.sys.path.relative(manager.config.rootDir, results.filePath);
+      const hasError = results.diagnostics.some(d => d.level === 'error');
+      if (hasError) {
+        timespan.finish(`prerender failed: ${pathname}, ${filePath}`, 'red');
+      } else {
+        timespan.finish(`prerender finish: ${pathname}, ${filePath}`);
+      }
+    }
+
+    manager.diagnostics.push(...results.diagnostics);
+
+    if (Array.isArray(results.anchorUrls)) {
+      results.anchorUrls.forEach(anchorUrl => {
+        addUrlToPendingQueue(manager, anchorUrl, url);
+      });
+    }
+
+  } catch (e) {
+    // darn, idk, bad news
+    catchError(manager.diagnostics, e);
+  }
+
+  manager.urlsProcessing.delete(url);
+  manager.urlsCompleted.add(url);
+
+  const urlsCompletedSize = manager.urlsCompleted.size;
+  if (manager.progressLogger && urlsCompletedSize > 1) {
+    manager.progressLogger.update(`           prerendered ${urlsCompletedSize} urls: ${manager.config.sys.color.dim(url)}`);
+  }
+  // let's try to drain the queue again and let this
+  // next call figure out if we're actually done or not
+  manager.config.sys.nextTick(() => {
+    drainPrerenderQueue(manager);
+  });
+}
+
+
+const DEFAULT_MAX_CONCURRENT = 5;

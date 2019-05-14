@@ -1,11 +1,9 @@
 import * as d from '../../declarations';
-import { addUrlToPendingQueue, initializePrerenderEntryUrls } from './prerender-queue';
-import { catchError } from '@utils';
+import { drainPrerenderQueue, initializePrerenderEntryUrls } from './prerender-queue';
 import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
 import { generateTemplateHtml } from './prerender-template-html';
 import { getPrerenderConfig } from './prerender-config';
-import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 import { getAbsoluteBuildDir } from '../html/utils';
 import { URL } from 'url';
 import readline from 'readline';
@@ -111,92 +109,6 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
 }
 
 
-function drainPrerenderQueue(manager: d.PrerenderManager) {
-  manager.urlsPending.forEach(url => {
-    // remove from pending
-    manager.urlsPending.delete(url);
-
-    // move to processing
-    manager.urlsProcessing.add(url);
-
-    // kick off async prerendering
-    prerenderUrl(manager, url);
-  });
-
-  if (manager.urlsProcessing.size === 0) {
-    if (typeof manager.resolve === 'function') {
-      // we're not actively processing anything
-      // and there aren't anymore urls in the queue to be prerendered
-      // so looks like our job here is done, good work team
-      manager.resolve();
-      manager.resolve = null;
-    }
-
-  }
-}
-
-
-async function prerenderUrl(manager: d.PrerenderManager, url: string) {
-  try {
-    let timespan: d.LoggerTimeSpan;
-    if (manager.isDebug) {
-      const pathname = new URL(url).pathname;
-      timespan = manager.config.logger.createTimeSpan(`prerender start: ${pathname}`, true);
-    }
-
-    const prerenderRequest: d.PrerenderRequest = {
-      baseUrl: manager.outputTarget.baseUrl,
-      componentGraphPath: manager.componentGraphPath,
-      devServerHostUrl: manager.devServerHostUrl,
-      hydrateAppFilePath: manager.hydrateAppFilePath,
-      prerenderConfigPath: manager.prerenderConfigPath,
-      templateId: manager.templateId,
-      url: url,
-      writeToFilePath: getWriteFilePathFromUrlPath(manager, url)
-    };
-
-    // prender this path and wait on the results
-    const results = await manager.config.sys.prerenderUrl(prerenderRequest);
-
-    if (manager.isDebug) {
-      const pathname = new URL(url).pathname;
-      const filePath = manager.config.sys.path.relative(manager.config.rootDir, results.filePath);
-      const hasError = results.diagnostics.some(d => d.level === 'error');
-      if (hasError) {
-        timespan.finish(`prerender failed: ${pathname}, ${filePath}`, 'red');
-      } else {
-        timespan.finish(`prerender finish: ${pathname}, ${filePath}`);
-      }
-    }
-
-    manager.diagnostics.push(...results.diagnostics);
-
-    if (Array.isArray(results.anchorUrls)) {
-      results.anchorUrls.forEach(anchorUrl => {
-        addUrlToPendingQueue(manager, anchorUrl, url);
-      });
-    }
-
-  } catch (e) {
-    // darn, idk, bad news
-    catchError(manager.diagnostics, e);
-  }
-
-  manager.urlsProcessing.delete(url);
-  manager.urlsCompleted.add(url);
-
-  const urlsCompletedSize = manager.urlsCompleted.size;
-  if (manager.progressLogger && urlsCompletedSize > 1) {
-    manager.progressLogger.update(`           prerendered ${urlsCompletedSize} urls: ${manager.config.sys.color.dim(url)}`);
-  }
-  // let's try to drain the queue again and let this
-  // next call figure out if we're actually done or not
-  manager.config.sys.nextTick(() => {
-    drainPrerenderQueue(manager);
-  });
-}
-
-
 async function createPrerenderTemplate(config: d.Config, templateHtml: string) {
   const templateFileName = `prerender-template-${config.sys.generateContentHash(templateHtml, 12)}.html`;
   const templateId = config.sys.path.join(config.sys.details.tmpDir, templateFileName);
@@ -216,6 +128,7 @@ async function createComponentGraphPath(config: d.Config, buildCtx: d.BuildCtx, 
   return null;
 }
 
+
 function getComponentPathContent(config: d.Config, componentGraph: Map<string, string[]>, outputTarget: d.OutputTargetWww) {
   const buildDir = getAbsoluteBuildDir(config, outputTarget);
   const object: {[key: string]: string[]} = {};
@@ -224,6 +137,7 @@ function getComponentPathContent(config: d.Config, componentGraph: Map<string, s
   }
   return JSON.stringify(object);
 }
+
 
 const startProgressLogger = (): d.ProgressLogger => {
   let promise = Promise.resolve();
