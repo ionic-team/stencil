@@ -117,6 +117,7 @@ export class NodeLogger implements d.Logger {
 
     if (debug) {
       if (this.shouldLog('debug')) {
+        msg.push(this.dim(` MEM: ${(process.memoryUsage().rss / 1000000).toFixed(1)}MB`));
         const lines = wordWrap(msg, getColumns());
         this.debugPrefix(lines);
         console.log(lines.join('\n'));
@@ -148,7 +149,9 @@ export class NodeLogger implements d.Logger {
 
     if (debug) {
       if (this.shouldLog('debug')) {
-        const lines = wordWrap([msg], getColumns());
+        const m = [msg];
+        m.push(this.dim(` MEM: ${(process.memoryUsage().rss / 1000000).toFixed(1)}MB`));
+        const lines = wordWrap(m, getColumns());
         this.debugPrefix(lines);
         console.log(lines.join('\n'));
       }
