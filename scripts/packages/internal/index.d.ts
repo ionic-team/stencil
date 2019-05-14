@@ -4,5 +4,6 @@ export {
   Config,
   HTMLStencilElement,
   JSXBase,
+  OutputTargetCustom,
   Plugin,
 } from '../dist/declarations';
