@@ -9,6 +9,8 @@ export const config: Config = {
     },
     {
       type: 'experimental-dist-module',
+      dir: 'public',
+      empty: false
     }
   ],
 };

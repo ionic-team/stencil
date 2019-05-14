@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Stencil TodoMVC</title>
+  <script type="module">
+  import {AppRoot, TodoInput, TodoItem} from './index.js';
+  customElements.define('app-root', AppRoot);
+  customElements.define('todo-input', TodoInput);
+  customElements.define('todo-item', TodoItem);
+  </script>
+  <link href="/app.css" rel="stylesheet">
+</head>
+<body class="learn-bar">
+  <app-root class="todoapp"></app-root>
+</body>
+</html>
