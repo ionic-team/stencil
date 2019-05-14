@@ -33,6 +33,7 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
     hydrateAppFilePath: buildCtx.hydrateAppFilePath,
     isDebug: (config.logLevel === 'debug'),
     logCount: 0,
+    maxConcurrency: (config.maxConcurrentWorkers * 2 - 1),
     outputTarget: outputTarget,
     prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
     prerenderConfigPath: outputTarget.prerenderConfig,

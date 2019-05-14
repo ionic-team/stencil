@@ -23,6 +23,7 @@ export interface PrerenderManager {
   urlsProcessing: Set<string>;
   urlsPending: Set<string>;
   urlsCompleted: Set<string>;
+  maxConcurrency: number;
 }
 
 

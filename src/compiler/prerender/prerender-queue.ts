@@ -109,7 +109,7 @@ function getNextUrl(manager: d.PrerenderManager) {
     return null;
   }
 
-  if (manager.urlsProcessing.size >= DEFAULT_MAX_CONCURRENT) {
+  if (manager.urlsProcessing.size >= manager.maxConcurrency) {
     // slow it down there buddy, too many at one time
     return null;
   }
@@ -179,4 +179,3 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
 }
 
 
-const DEFAULT_MAX_CONCURRENT = 5;
