@@ -12,15 +12,26 @@ export const patchEsm = () => {
 };
 
 export const patchBrowser = async () => {
-  const scriptElm = Array.from(doc.querySelectorAll('script')).find(a => a.src.includes(NAMESPACE));
-  const resourcesUrl = new URL('.', new URL(scriptElm ? scriptElm.src : '', doc.baseURI));
-  patchDynamicImport(resourcesUrl.href);
+  // @ts-ignore
+  const importMeta = import.meta.url;
+  if (importMeta !== '') {
+    return Promise.resolve(new URL('.', importMeta).pathname);
+  } else {
+    const allScripts = Array.from(doc.querySelectorAll('script'));
+    const scriptElm = (
+      allScripts.find(s => s.hasAttribute(DATA_RESOURCES_URL)) ||
+      allScripts.find(s => s.src.includes(`/${NAMESPACE}.esm.js`))
+    );
 
-  if (!window.customElements) {
-    // @ts-ignore
-    await import('./polyfills/dom.js');
+    const resourcesUrl = new URL('.', new URL(scriptElm.getAttribute(DATA_RESOURCES_URL) || scriptElm.src, doc.baseURI));
+    patchDynamicImport(resourcesUrl.href);
+
+    if (!window.customElements) {
+      // @ts-ignore
+      await import('./polyfills/dom.js');
+    }
+    return resourcesUrl.pathname;
   }
-  return resourcesUrl.pathname;
 };
 
 export const patchDynamicImport = (base: string) => {
@@ -49,3 +60,5 @@ export const patchDynamicImport = (base: string) => {
     };
   }
 };
+
+const DATA_RESOURCES_URL = 'data-resources-url';
