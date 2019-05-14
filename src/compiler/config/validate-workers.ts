@@ -12,8 +12,12 @@ export function validateWorkers(config: d.Config) {
     config.maxConcurrentWorkers = cpus;
   }
 
-  if (config.flags && typeof config.flags.maxWorkers === 'number') {
-    config.maxConcurrentWorkers = config.flags.maxWorkers;
+  if (config.flags) {
+    if (typeof config.flags.maxWorkers === 'number') {
+      config.maxConcurrentWorkers = config.flags.maxWorkers;
+    } else if (config.flags.ci) {
+      config.maxConcurrentWorkers = DEFAULT_CI_MAX_WORKERS;
+    }
   }
 
   config.maxConcurrentWorkers = Math.max(Math.min(config.maxConcurrentWorkers, cpus), 1);
@@ -27,3 +31,4 @@ export function validateWorkers(config: d.Config) {
 
 
 const DEFAULT_MAX_TASKS_PER_WORKER = 2;
+const DEFAULT_CI_MAX_WORKERS = 4;

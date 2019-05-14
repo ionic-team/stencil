@@ -41,6 +41,15 @@ describe('validate-workers', () => {
     expect(config.maxConcurrentWorkers).toBe(8);
   });
 
+  it('set maxConcurrentWorkers from ci flags', () => {
+    config.flags = {
+      ci: true
+    };
+    config.maxConcurrentWorkers = 2;
+    validateConfig(config, [], false);
+    expect(config.maxConcurrentWorkers).toBe(4);
+  });
+
   it('set maxConcurrentWorkers from flags', () => {
     config.flags = {
       maxWorkers: 1
