@@ -33,6 +33,9 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
         }),
         bundleJson(config),
         inMemoryFsRead(config, compilerCtx),
+        config.sys.rollup.plugins.replace({
+          'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
+        }),
         ...config.plugins
       ],
       treeshake: {
