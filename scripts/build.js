@@ -14,10 +14,6 @@ const start = Date.now();
 
 
 run(async () => {
-  execSync('npm install resolve@1.8.1', {
-    cwd: path.join(__dirname, '..', 'node_modules', 'rollup-plugin-node-resolve')
-  });
-
   await fs.emptyDir(DIST_DIR);
 
   const scripts = [
