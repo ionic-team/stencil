@@ -118,7 +118,7 @@ export function canSkipAppCoreBuild(buildCtx: d.BuildCtx) {
   if (buildCtx.requiresFullBuild) {
     return false;
   }
-  if (buildCtx.isRebuild && (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges || buildCtx.hasIndexHtmlChanges)) {
+  if (buildCtx.isRebuild && (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges || buildCtx.hasHtmlChanges)) {
     return false;
   }
   return true;

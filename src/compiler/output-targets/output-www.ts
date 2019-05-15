@@ -101,7 +101,7 @@ function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, output
 }
 
 async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], globalStylesFilename: string, outputTarget: d.OutputTargetWww) {
-  if (compilerCtx.hasSuccessfulBuild && !buildCtx.hasIndexHtmlChanges) {
+  if (compilerCtx.hasSuccessfulBuild && !buildCtx.hasHtmlChanges) {
     // no need to rebuild index.html if there were no app file changes
     return;
   }

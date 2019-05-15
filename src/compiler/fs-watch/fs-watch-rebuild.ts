@@ -47,7 +47,7 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
   buildCtx.hasStyleChanges = hasStyleChanges(buildCtx);
 
   // figure out if any changed files were index.html files
-  buildCtx.hasIndexHtmlChanges = hasIndexHtmlChanges(config, buildCtx);
+  buildCtx.hasHtmlChanges = hasHtmlChanges(config, buildCtx);
 
   buildCtx.hasServiceWorkerChanges = hasServiceWorkerChanges(config, buildCtx);
 
@@ -164,10 +164,11 @@ export function isStyleExt(ext: string) {
 const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
 
 
-function hasIndexHtmlChanges(config: d.Config, buildCtx: d.BuildCtx) {
-  const anyIndexHtmlChanged = buildCtx.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === 'index.html');
-  if (anyIndexHtmlChanged) {
-    // any index.html in any directory that changes counts too
+function hasHtmlChanges(config: d.Config, buildCtx: d.BuildCtx) {
+  const anyHtmlChanged = buildCtx.filesChanged.some(f => f.toLowerCase().endsWith('.html'));
+  
+  if (anyHtmlChanged) {
+    // any *.html in any directory that changes counts and rebuilds
     return true;
   }
 
