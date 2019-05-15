@@ -51,22 +51,24 @@ Stencil used to generate a loader `.js` file that automatically decided which en
 Stencil One has chaged the internal folder structure of the `dist` folder, and some entry-points are located in different location:
 
 - **"module"**: `dist/esm/index.js` => `dist/index.mjs`
-- **"jsnext:main**": `dist/esm/es2017/index.mjs.js` => `dist/esm/index.mjs.js`
+- **"jsnext:main**": `dist/esm/es2017/index.js` => `dist/esm/index.mjs`
 
 
 Make sure you update the `package.json` in the root of your project, like this:
 
 ```diff
   {
+     "main": "dist/index.js",
+
 -    "module": "dist/esm/index.js",
 +    "module": "dist/index.mjs",
 
 -    "es2015": "dist/esm/es2017/index.js",
--    "es2017": "dist/esm/es2017/index.mjs.js",
--    "jsnext:main": "dist/esm/es2017/index.mjs.js",
-+    "es2015": "dist/esm/index.mjs.js",
-+    "es2017": "dist/esm/index.mjs.js",
-+    "jsnext:main": "dist/esm/index.mjs.js",
+-    "es2017": "dist/esm/es2017/index.js",
+-    "jsnext:main": "dist/esm/es2017/index.js",
++    "es2015": "dist/esm/index.mjs",
++    "es2017": "dist/esm/index.mjs",
++    "jsnext:main": "dist/esm/index.mjs",
   }
 ```
 
