@@ -52,7 +52,7 @@ describe('fs-watch, rebuild', () => {
   });
 
   it('hasHtmlChanges', () => {
-    compilerCtx.activeFilesUpdated = ['file.HTML' , 'file2.html'];
+    compilerCtx.activeFilesUpdated = ['file.HTML', 'file2.html'];
     const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx).toBeDefined();
     expect(buildCtx.hasHtmlChanges).toBe(true);
