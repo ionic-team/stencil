@@ -29,7 +29,7 @@ export function generateComponentBundles(
   return [
     ...defaultBundles,
     ...optimizeBundlers(bundlers, 0.6)
-  ];
+  ].filter(b => b.length > 0);
 }
 
 
