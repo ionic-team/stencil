@@ -7,14 +7,7 @@ export function setupGlobal(global: any) {
 
     WINDOW_FUNCTIONS.forEach(fnName => {
       if (!(fnName in global)) {
-        Object.defineProperty(global, fnName, {
-          value() {
-            return win[fnName].bind(win);
-          },
-          configurable: true,
-          enumerable: true,
-          writable: true
-        });
+        global[fnName] = win[fnName].bind(win);
       }
     });
 
