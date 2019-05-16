@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { build } from './build/build';
 import { BuildContext } from './build/build-ctx';
-import { hasError, catchError, normalizePath } from '@utils';
+import { catchError, hasError, normalizePath } from '@utils';
 import { CompilerContext } from './build/compiler-ctx';
 import { COMPILER_BUILD } from './build/compiler-build-id';
 import { docs } from './docs/docs';
@@ -25,6 +25,7 @@ export class Compiler implements d.Compiler {
       const sys = config.sys;
       const logger = config.logger;
       const details = sys.details;
+      const isDebug = (logger.level === 'debug');
 
       let startupMsg = `${sys.compiler.name} v${sys.compiler.version} `;
       if (details.platform !== 'win32') {
@@ -45,7 +46,16 @@ export class Compiler implements d.Compiler {
           logger.warn(`Disabling cache during development will slow down incremental builds.`);
         }
 
-        logger.debug(`${details.platform}, ${details.cpuModel}, cpus: ${details.cpus}`);
+        const platformInfo = `${details.platform}, ${details.cpuModel}`;
+        const statsInfo = `cpus: ${details.cpus}, freemem: ${Math.round(details.freemem() / 1000000)}MB, totalmem: ${Math.round(details.totalmem / 1000000)}MB`;
+        if (isDebug) {
+          logger.debug(platformInfo);
+          logger.debug(statsInfo);
+        } else if (config.flags && config.flags.ci) {
+          logger.info(platformInfo);
+          logger.info(statsInfo);
+        }
+
         logger.debug(`${details.runtime} ${details.runtimeVersion}`);
 
         logger.debug(`compiler runtime: ${sys.compiler.runtime}`);
@@ -55,7 +65,13 @@ export class Compiler implements d.Compiler {
       }
 
       const workerOpts = sys.initWorkers(config.maxConcurrentWorkers, config.maxConcurrentTasksPerWorker, logger);
-      logger.debug(`compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`);
+      const workerInfo = `compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`;
+      if (isDebug) {
+        logger.debug(workerInfo);
+      } else if (config.flags && config.flags.ci) {
+        logger.info(workerInfo);
+      }
+
 
       this.ctx = new CompilerContext(config);
 

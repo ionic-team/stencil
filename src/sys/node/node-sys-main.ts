@@ -16,7 +16,7 @@ import semver from 'semver';
 import { WorkerManager } from './worker/index';
 
 import { createHash } from 'crypto';
-import { cpus, platform, release, tmpdir } from 'os';
+import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
 import path from 'path';
 import * as url from 'url';
 
@@ -219,11 +219,15 @@ export class NodeSystem implements d.StencilSystem {
     const details: d.SystemDetails = {
       cpuModel: '',
       cpus: -1,
+      freemem() {
+        return freemem();
+      },
       platform: '',
       release: '',
       runtime: 'node',
       runtimeVersion: '',
-      tmpDir: tmpdir()
+      tmpDir: tmpdir(),
+      totalmem: -1
     };
     try {
       const sysCpus = cpus();
@@ -232,6 +236,7 @@ export class NodeSystem implements d.StencilSystem {
       details.platform = platform();
       details.release = release();
       details.runtimeVersion = process.version;
+      details.totalmem = totalmem();
     } catch (e) {}
     return details;
   }

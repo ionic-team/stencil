@@ -95,10 +95,12 @@ export interface LazyRequire {
 export interface SystemDetails {
   cpuModel: string;
   cpus: number;
+  freemem(): number;
   platform: string;
   runtime: string;
   runtimeVersion: string;
   release: string;
+  totalmem: number;
   tmpDir: string;
 }
 
