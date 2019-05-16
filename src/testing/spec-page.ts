@@ -144,9 +144,18 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     await page.waitForChanges();
   }
 
-  page.root = findRoot(cmpTags, page.body);
+  page.root = findRootComponent(cmpTags, page.body);
   if (page.root != null) {
-    page.rootInstance = platform.getHostRef(page.root).$lazyInstance$;
+    const hostRef = platform.getHostRef(page.root);
+    if (hostRef != null) {
+      page.rootInstance = hostRef.$lazyInstance$;
+    }
+
+  } else {
+    const firstElementChild = page.body.firstElementChild;
+    if (firstElementChild != null) {
+      page.root = firstElementChild as any;
+    }
   }
 
   if (opts.hydrateServerSide) {
@@ -219,7 +228,7 @@ function proxyComponentLifeCycles(platform: any, Cstr: d.ComponentTestingConstru
 }
 
 
-function findRoot(cmpTags: Set<string>, node: Element): any {
+function findRootComponent(cmpTags: Set<string>, node: Element): any {
   if (node != null) {
     const children = node.children;
     const childrenLength = children.length;
@@ -232,7 +241,7 @@ function findRoot(cmpTags: Set<string>, node: Element): any {
     }
 
     for (let i = 0; i < childrenLength; i++) {
-      const r = findRoot(cmpTags, children[i]);
+      const r = findRootComponent(cmpTags, children[i]);
       if (r != null) {
         return r;
       }
