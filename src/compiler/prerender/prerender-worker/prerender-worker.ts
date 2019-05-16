@@ -129,7 +129,12 @@ function getRenderToStringOptions(prerenderConfig: d.PrerenderConfig, url: URL, 
   if (typeof prerenderConfig.hydrateOptions === 'function') {
     try {
       const userOpts = prerenderConfig.hydrateOptions(url);
-      Object.assign(opts, userOpts);
+      if (userOpts != null) {
+        if (userOpts.prettyHtml && typeof userOpts.removeAttributeQuotes !== 'boolean') {
+          opts.removeAttributeQuotes = false;
+        }
+        Object.assign(opts, userOpts);
+      }
     } catch (e) {
       catchError(results.diagnostics, e);
     }
