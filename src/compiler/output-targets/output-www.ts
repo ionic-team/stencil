@@ -2,11 +2,12 @@ import * as d from '../../declarations';
 import { catchError, flatOne, unique } from '@utils';
 import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
 import { getUsedComponents } from '../html/used-components';
-import { inlineEsmImport } from '../html/inline-esm-import';
+import { optimizeEsmImport } from '../html/inline-esm-import';
 import { isOutputTargetWww } from './output-utils';
 import { optimizeCriticalPath } from '../html/inject-module-preloads';
 import { processCopyTasks } from '../copy/local-copy-tasks';
 import { performCopyTasks } from '../copy/copy-tasks';
+import { generateHashedCopy } from '../copy/hashed-copy';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 import { updateGlobalStylesLink } from '../html/update-global-styles-link';
 import { getScopeId } from '../style/scope-css';
@@ -55,29 +56,11 @@ async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
   }
 
   // Copy global styles into the build directory
-  const globalStylesFilename = await generateHashedStylesheet(config, compilerCtx, outputTarget);
-
   // Process
   if (buildCtx.indexDoc && outputTarget.indexHtml) {
-    await generateIndexHtml(config, compilerCtx, buildCtx, criticalPath, globalStylesFilename, outputTarget);
+    await generateIndexHtml(config, compilerCtx, buildCtx, criticalPath, outputTarget);
   }
   await generateHostConfig(config, compilerCtx, outputTarget);
-}
-
-async function generateHashedStylesheet(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
-  const cssPath = config.sys.path.join(outputTarget.buildDir, `${config.fsNamespace}.css`);
-  const hasCss = await compilerCtx.fs.access(cssPath);
-  if (hasCss) {
-    const cssText = await compilerCtx.fs.readFile(cssPath);
-    const hash = config.sys.generateContentHash(cssText, config.hashedFileNameLength);
-    const hashedFileName = `p-${hash}.css`;
-    await compilerCtx.fs.writeFile(
-      config.sys.path.join(outputTarget.buildDir, hashedFileName),
-      cssText
-    );
-    return hashedFileName;
-  }
-  return undefined;
 }
 
 function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
@@ -100,7 +83,7 @@ function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, output
   return compilerCtx.fs.writeFile(hostConfigPath, hostConfigContent);
 }
 
-async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], globalStylesFilename: string, outputTarget: d.OutputTargetWww) {
+async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) {
   if (compilerCtx.hasSuccessfulBuild && !buildCtx.hasIndexHtmlChanges) {
     // no need to rebuild index.html if there were no app file changes
     return;
@@ -113,7 +96,8 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
     // validateHtml(config, buildCtx, doc);
     await updateIndexHtmlServiceWorker(config, buildCtx, doc, outputTarget);
     if (!config.watch && !config.devMode) {
-      const scriptFound = await inlineEsmImport(config, compilerCtx, doc, outputTarget);
+      const globalStylesFilename = await generateHashedCopy(config, compilerCtx, config.sys.path.join(outputTarget.buildDir, `${config.fsNamespace}.css`));
+      const scriptFound = await optimizeEsmImport(config, compilerCtx, doc, outputTarget);
       await inlineStyleSheets(config, compilerCtx, doc, MAX_CSS_INLINE_SIZE, outputTarget);
       updateGlobalStylesLink(config, doc, globalStylesFilename, outputTarget);
       if (scriptFound) {
