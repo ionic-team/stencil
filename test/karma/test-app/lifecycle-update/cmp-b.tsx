@@ -6,14 +6,14 @@ import { Component, Prop, h } from '@stencil/core';
 export class LifecycleUpdateB {
 
   @Prop() value = 0;
-  start: number;
+  start?: number;
 
   componentWillLoad() {
     this.start = Date.now();
 
     const li = document.createElement('li');
     li.innerHTML = `<span style="color:red">lifecycle-update-b</span> <span style="color:blue">componentWillLoad</span> ${this.value}`;
-    document.getElementById('output').appendChild(li);
+    document.getElementById('output')!.appendChild(li);
 
     return new Promise(resolve => {
       setTimeout(resolve, 20);
@@ -23,7 +23,7 @@ export class LifecycleUpdateB {
   componentDidLoad() {
     const li = document.createElement('li');
     li.innerHTML = `<span style="color:red">lifecycle-update-b</span> <span style="color:green">componentDidLoad</span> ${this.value}`;
-    document.getElementById('output').appendChild(li);
+    document.getElementById('output')!.appendChild(li);
   }
 
   render() {

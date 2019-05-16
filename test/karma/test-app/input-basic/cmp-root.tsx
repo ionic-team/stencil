@@ -5,8 +5,8 @@ import { Component, Element, h, Prop, Watch } from '@stencil/core';
 })
 export class InputBasicRoot {
 
-  @Element() el: HTMLElement;
-  @Prop({ mutable: true }) value: string;
+  @Element() el!: HTMLElement;
+  @Prop({ mutable: true }) value?: string;
   @Watch('value')
   onValueChanges(v: any) {
     console.log('onValueChanges', v);

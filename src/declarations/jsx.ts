@@ -639,7 +639,7 @@ export namespace JSXBase {
     slot?: string;
     spellCheck?: boolean;
     spellcheck?: boolean | string;
-    style?: { [key: string]: string };
+    style?: { [key: string]: string | undefined };
     tabIndex?: number;
     tabindex?: number | string;
     title?: string;
@@ -701,7 +701,7 @@ export namespace JSXBase {
     method?: string;
     min?: number | string;
     name?: string;
-    style?: { [key: string]: any; };
+    style?: { [key: string]: string | undefined; };
     target?: string;
     type?: string;
     width?: number | string;

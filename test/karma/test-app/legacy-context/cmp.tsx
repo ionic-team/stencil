@@ -14,7 +14,7 @@ export class LegacyContextRoot {
   @Prop({context: 'myService'}) myService: any;
 
   @Method()
-  getData() {
+  async getData() {
     return {
       win: this.win,
       doc: this.doc,

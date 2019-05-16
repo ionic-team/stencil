@@ -1,5 +1,8 @@
 import { Component, h, getMode } from '@stencil/core';
 
+/**
+ * @virtualProp {string} colormode - The mode determines which platform styles to use.
+ */
 @Component({
   tag: 'shadow-dom-mode',
   styleUrls: {

@@ -11,7 +11,7 @@ import { Component, Prop, h } from '@stencil/core';
 })
 export class ShadowDomSlotNested {
 
-  @Prop() i: number;
+  @Prop() i?: number;
 
   render() {
     return [

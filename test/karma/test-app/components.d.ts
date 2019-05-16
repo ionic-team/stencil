@@ -17,28 +17,28 @@ export namespace Components {
   }
   interface AttributeBasicRoot {}
   interface AttributeBoolean {
-    'boolState': boolean;
-    'noreflect': boolean;
-    'strState': string;
+    'boolState'?: boolean;
+    'noreflect'?: boolean;
+    'strState'?: string;
   }
   interface AttributeBooleanRoot {
     'toggleState': () => Promise<void>;
   }
   interface AttributeComplex {
     'bool0': boolean;
-    'bool1': boolean;
-    'bool2': boolean;
+    'bool1'?: boolean;
+    'bool2'?: boolean;
     'getInstance': () => Promise<this>;
     'nu0': number;
-    'nu1': number;
+    'nu1'?: number;
     'str0': string;
-    'str1': string;
+    'str1'?: string;
   }
   interface AttributeHost {}
   interface AttributeHtmlRoot {
-    'anyAttr': any | null;
-    'nuAttr': number | null;
-    'strAttr': string;
+    'anyAttr'?: any;
+    'nuAttr'?: number;
+    'strAttr'?: string;
   }
   interface BadSharedJsx {}
   interface ConditionalBasic {}
@@ -60,7 +60,7 @@ export namespace Components {
   interface Es5AddclassSvg {}
   interface EsmImport {
     'propVal': number;
-    'someMethod': () => void;
+    'someMethod': () => Promise<void>;
   }
   interface ExternalImportA {}
   interface ExternalImportB {}
@@ -68,14 +68,14 @@ export namespace Components {
   interface FactoryJsx {}
   interface InitCssRoot {}
   interface InputBasicRoot {
-    'value': string;
+    'value'?: string;
   }
   interface KeyReorder {
-    'num': number;
+    'num'?: number;
   }
   interface KeyReorderRoot {}
   interface LegacyContext {
-    'getData': () => { win: Window; doc: Document; hasQueue: boolean; isServer: boolean; unknown: any; myService: any; };
+    'getData': () => Promise<{ win: Window; doc: Document; hasQueue: boolean; isServer: boolean; unknown: any; myService: any; }>;
   }
   interface LifecycleAsyncA {}
   interface LifecycleAsyncB {
@@ -109,13 +109,13 @@ export namespace Components {
   interface ReflectToAttr {
     'bool': boolean;
     'disabled': boolean;
-    'dynamicNu': number;
-    'dynamicStr': string;
+    'dynamicNu'?: number;
+    'dynamicStr'?: string;
     'nu': number;
-    'null': string;
+    'null': string | null;
     'otherBool': boolean;
     'str': string;
-    'undef': string;
+    'undef'?: string;
   }
   interface SassCmp {}
   interface ScopedBasic {}
@@ -126,11 +126,16 @@ export namespace Components {
   interface ShadowDomArrayRoot {}
   interface ShadowDomBasic {}
   interface ShadowDomBasicRoot {}
-  interface ShadowDomMode {}
+  interface ShadowDomMode {
+    /**
+    * The mode determines which platform styles to use.
+    */
+    'colormode'?: string;
+  }
   interface ShadowDomModeRoot {}
   interface ShadowDomSlotBasic {}
   interface ShadowDomSlotNested {
-    'i': number;
+    'i'?: number;
   }
   interface ShadowDomSlotNestedRoot {}
   interface SlotArrayBasic {}
@@ -161,7 +166,7 @@ export namespace Components {
   }
   interface SlotReorderRoot {}
   interface SlotReplaceWrapper {
-    'href': string;
+    'href'?: string;
   }
   interface SlotReplaceWrapperRoot {}
   interface SvgAttr {}
@@ -194,8 +199,8 @@ declare namespace LocalJSX {
   }
   interface AttributeHost extends JSXBase.HTMLAttributes {}
   interface AttributeHtmlRoot extends JSXBase.HTMLAttributes {
-    'anyAttr'?: any | null;
-    'nuAttr'?: number | null;
+    'anyAttr'?: any;
+    'nuAttr'?: number;
     'strAttr'?: string;
   }
   interface BadSharedJsx extends JSXBase.HTMLAttributes {}
@@ -274,7 +279,7 @@ declare namespace LocalJSX {
     'dynamicNu'?: number;
     'dynamicStr'?: string;
     'nu'?: number;
-    'null'?: string;
+    'null'?: string | null;
     'otherBool'?: boolean;
     'str'?: string;
     'undef'?: string;
@@ -288,7 +293,12 @@ declare namespace LocalJSX {
   interface ShadowDomArrayRoot extends JSXBase.HTMLAttributes {}
   interface ShadowDomBasic extends JSXBase.HTMLAttributes {}
   interface ShadowDomBasicRoot extends JSXBase.HTMLAttributes {}
-  interface ShadowDomMode extends JSXBase.HTMLAttributes {}
+  interface ShadowDomMode extends JSXBase.HTMLAttributes {
+    /**
+    * The mode determines which platform styles to use.
+    */
+    'colormode'?: string;
+  }
   interface ShadowDomModeRoot extends JSXBase.HTMLAttributes {}
   interface ShadowDomSlotBasic extends JSXBase.HTMLAttributes {}
   interface ShadowDomSlotNested extends JSXBase.HTMLAttributes {
@@ -331,190 +341,106 @@ declare namespace LocalJSX {
   interface Tag3dComponent extends JSXBase.HTMLAttributes {}
   interface Tag88 extends JSXBase.HTMLAttributes {}
 
-  interface ElementInterfaces {
-    'AttributeBasic': Components.AttributeBasic;
-    'AttributeBasicRoot': Components.AttributeBasicRoot;
-    'AttributeBoolean': Components.AttributeBoolean;
-    'AttributeBooleanRoot': Components.AttributeBooleanRoot;
-    'AttributeComplex': Components.AttributeComplex;
-    'AttributeHost': Components.AttributeHost;
-    'AttributeHtmlRoot': Components.AttributeHtmlRoot;
-    'BadSharedJsx': Components.BadSharedJsx;
-    'ConditionalBasic': Components.ConditionalBasic;
-    'ConditionalRerender': Components.ConditionalRerender;
-    'ConditionalRerenderRoot': Components.ConditionalRerenderRoot;
-    'CssCmp': Components.CssCmp;
-    'CssVariables': Components.CssVariables;
-    'CssVariablesRoot': Components.CssVariablesRoot;
-    'CustomEventRoot': Components.CustomEventRoot;
-    'DomReattach': Components.DomReattach;
-    'DynamicCssVariable': Components.DynamicCssVariable;
-    'DynamicImport': Components.DynamicImport;
-    'Es5AddclassSvg': Components.Es5AddclassSvg;
-    'EsmImport': Components.EsmImport;
-    'ExternalImportA': Components.ExternalImportA;
-    'ExternalImportB': Components.ExternalImportB;
-    'ExternalImportC': Components.ExternalImportC;
-    'FactoryJsx': Components.FactoryJsx;
-    'InitCssRoot': Components.InitCssRoot;
-    'InputBasicRoot': Components.InputBasicRoot;
-    'KeyReorder': Components.KeyReorder;
-    'KeyReorderRoot': Components.KeyReorderRoot;
-    'LegacyContext': Components.LegacyContext;
-    'LifecycleAsyncA': Components.LifecycleAsyncA;
-    'LifecycleAsyncB': Components.LifecycleAsyncB;
-    'LifecycleAsyncC': Components.LifecycleAsyncC;
-    'LifecycleBasicA': Components.LifecycleBasicA;
-    'LifecycleBasicB': Components.LifecycleBasicB;
-    'LifecycleBasicC': Components.LifecycleBasicC;
-    'LifecycleUnloadA': Components.LifecycleUnloadA;
-    'LifecycleUnloadB': Components.LifecycleUnloadB;
-    'LifecycleUnloadRoot': Components.LifecycleUnloadRoot;
-    'LifecycleUpdateA': Components.LifecycleUpdateA;
-    'LifecycleUpdateB': Components.LifecycleUpdateB;
-    'LifecycleUpdateC': Components.LifecycleUpdateC;
-    'ListenJsx': Components.ListenJsx;
-    'ListenJsxRoot': Components.ListenJsxRoot;
-    'ListenWindow': Components.ListenWindow;
-    'NodeGlobals': Components.NodeGlobals;
-    'NodeResolution': Components.NodeResolution;
-    'ReflectToAttr': Components.ReflectToAttr;
-    'SassCmp': Components.SassCmp;
-    'ScopedBasic': Components.ScopedBasic;
-    'ScopedBasicRoot': Components.ScopedBasicRoot;
-    'ShadowDomArray': Components.ShadowDomArray;
-    'ShadowDomArrayRoot': Components.ShadowDomArrayRoot;
-    'ShadowDomBasic': Components.ShadowDomBasic;
-    'ShadowDomBasicRoot': Components.ShadowDomBasicRoot;
-    'ShadowDomMode': Components.ShadowDomMode;
-    'ShadowDomModeRoot': Components.ShadowDomModeRoot;
-    'ShadowDomSlotBasic': Components.ShadowDomSlotBasic;
-    'ShadowDomSlotNested': Components.ShadowDomSlotNested;
-    'ShadowDomSlotNestedRoot': Components.ShadowDomSlotNestedRoot;
-    'SlotArrayBasic': Components.SlotArrayBasic;
-    'SlotArrayComplex': Components.SlotArrayComplex;
-    'SlotArrayComplexRoot': Components.SlotArrayComplexRoot;
-    'SlotArrayTop': Components.SlotArrayTop;
-    'SlotBasic': Components.SlotBasic;
-    'SlotBasicOrder': Components.SlotBasicOrder;
-    'SlotBasicOrderRoot': Components.SlotBasicOrderRoot;
-    'SlotBasicRoot': Components.SlotBasicRoot;
-    'SlotDynamicWrapper': Components.SlotDynamicWrapper;
-    'SlotDynamicWrapperRoot': Components.SlotDynamicWrapperRoot;
-    'SlotFallback': Components.SlotFallback;
-    'SlotFallbackRoot': Components.SlotFallbackRoot;
-    'SlotHtml': Components.SlotHtml;
-    'SlotLightDomContent': Components.SlotLightDomContent;
-    'SlotLightDomRoot': Components.SlotLightDomRoot;
-    'SlotMapOrder': Components.SlotMapOrder;
-    'SlotMapOrderRoot': Components.SlotMapOrderRoot;
-    'SlotReorder': Components.SlotReorder;
-    'SlotReorderRoot': Components.SlotReorderRoot;
-    'SlotReplaceWrapper': Components.SlotReplaceWrapper;
-    'SlotReplaceWrapperRoot': Components.SlotReplaceWrapperRoot;
-    'SvgAttr': Components.SvgAttr;
-    'SvgClass': Components.SvgClass;
-    'Tag3dComponent': Components.Tag3dComponent;
-    'Tag88': Components.Tag88;
-  }
-
   interface IntrinsicElements {
-    'AttributeBasic': LocalJSX.AttributeBasic;
-    'AttributeBasicRoot': LocalJSX.AttributeBasicRoot;
-    'AttributeBoolean': LocalJSX.AttributeBoolean;
-    'AttributeBooleanRoot': LocalJSX.AttributeBooleanRoot;
-    'AttributeComplex': LocalJSX.AttributeComplex;
-    'AttributeHost': LocalJSX.AttributeHost;
-    'AttributeHtmlRoot': LocalJSX.AttributeHtmlRoot;
-    'BadSharedJsx': LocalJSX.BadSharedJsx;
-    'ConditionalBasic': LocalJSX.ConditionalBasic;
-    'ConditionalRerender': LocalJSX.ConditionalRerender;
-    'ConditionalRerenderRoot': LocalJSX.ConditionalRerenderRoot;
-    'CssCmp': LocalJSX.CssCmp;
-    'CssVariables': LocalJSX.CssVariables;
-    'CssVariablesRoot': LocalJSX.CssVariablesRoot;
-    'CustomEventRoot': LocalJSX.CustomEventRoot;
-    'DomReattach': LocalJSX.DomReattach;
-    'DynamicCssVariable': LocalJSX.DynamicCssVariable;
-    'DynamicImport': LocalJSX.DynamicImport;
-    'Es5AddclassSvg': LocalJSX.Es5AddclassSvg;
-    'EsmImport': LocalJSX.EsmImport;
-    'ExternalImportA': LocalJSX.ExternalImportA;
-    'ExternalImportB': LocalJSX.ExternalImportB;
-    'ExternalImportC': LocalJSX.ExternalImportC;
-    'FactoryJsx': LocalJSX.FactoryJsx;
-    'InitCssRoot': LocalJSX.InitCssRoot;
-    'InputBasicRoot': LocalJSX.InputBasicRoot;
-    'KeyReorder': LocalJSX.KeyReorder;
-    'KeyReorderRoot': LocalJSX.KeyReorderRoot;
-    'LegacyContext': LocalJSX.LegacyContext;
-    'LifecycleAsyncA': LocalJSX.LifecycleAsyncA;
-    'LifecycleAsyncB': LocalJSX.LifecycleAsyncB;
-    'LifecycleAsyncC': LocalJSX.LifecycleAsyncC;
-    'LifecycleBasicA': LocalJSX.LifecycleBasicA;
-    'LifecycleBasicB': LocalJSX.LifecycleBasicB;
-    'LifecycleBasicC': LocalJSX.LifecycleBasicC;
-    'LifecycleUnloadA': LocalJSX.LifecycleUnloadA;
-    'LifecycleUnloadB': LocalJSX.LifecycleUnloadB;
-    'LifecycleUnloadRoot': LocalJSX.LifecycleUnloadRoot;
-    'LifecycleUpdateA': LocalJSX.LifecycleUpdateA;
-    'LifecycleUpdateB': LocalJSX.LifecycleUpdateB;
-    'LifecycleUpdateC': LocalJSX.LifecycleUpdateC;
-    'ListenJsx': LocalJSX.ListenJsx;
-    'ListenJsxRoot': LocalJSX.ListenJsxRoot;
-    'ListenWindow': LocalJSX.ListenWindow;
-    'NodeGlobals': LocalJSX.NodeGlobals;
-    'NodeResolution': LocalJSX.NodeResolution;
-    'ReflectToAttr': LocalJSX.ReflectToAttr;
-    'SassCmp': LocalJSX.SassCmp;
-    'ScopedBasic': LocalJSX.ScopedBasic;
-    'ScopedBasicRoot': LocalJSX.ScopedBasicRoot;
-    'ShadowDomArray': LocalJSX.ShadowDomArray;
-    'ShadowDomArrayRoot': LocalJSX.ShadowDomArrayRoot;
-    'ShadowDomBasic': LocalJSX.ShadowDomBasic;
-    'ShadowDomBasicRoot': LocalJSX.ShadowDomBasicRoot;
-    'ShadowDomMode': LocalJSX.ShadowDomMode;
-    'ShadowDomModeRoot': LocalJSX.ShadowDomModeRoot;
-    'ShadowDomSlotBasic': LocalJSX.ShadowDomSlotBasic;
-    'ShadowDomSlotNested': LocalJSX.ShadowDomSlotNested;
-    'ShadowDomSlotNestedRoot': LocalJSX.ShadowDomSlotNestedRoot;
-    'SlotArrayBasic': LocalJSX.SlotArrayBasic;
-    'SlotArrayComplex': LocalJSX.SlotArrayComplex;
-    'SlotArrayComplexRoot': LocalJSX.SlotArrayComplexRoot;
-    'SlotArrayTop': LocalJSX.SlotArrayTop;
-    'SlotBasic': LocalJSX.SlotBasic;
-    'SlotBasicOrder': LocalJSX.SlotBasicOrder;
-    'SlotBasicOrderRoot': LocalJSX.SlotBasicOrderRoot;
-    'SlotBasicRoot': LocalJSX.SlotBasicRoot;
-    'SlotDynamicWrapper': LocalJSX.SlotDynamicWrapper;
-    'SlotDynamicWrapperRoot': LocalJSX.SlotDynamicWrapperRoot;
-    'SlotFallback': LocalJSX.SlotFallback;
-    'SlotFallbackRoot': LocalJSX.SlotFallbackRoot;
-    'SlotHtml': LocalJSX.SlotHtml;
-    'SlotLightDomContent': LocalJSX.SlotLightDomContent;
-    'SlotLightDomRoot': LocalJSX.SlotLightDomRoot;
-    'SlotMapOrder': LocalJSX.SlotMapOrder;
-    'SlotMapOrderRoot': LocalJSX.SlotMapOrderRoot;
-    'SlotReorder': LocalJSX.SlotReorder;
-    'SlotReorderRoot': LocalJSX.SlotReorderRoot;
-    'SlotReplaceWrapper': LocalJSX.SlotReplaceWrapper;
-    'SlotReplaceWrapperRoot': LocalJSX.SlotReplaceWrapperRoot;
-    'SvgAttr': LocalJSX.SvgAttr;
-    'SvgClass': LocalJSX.SvgClass;
-    'Tag3dComponent': LocalJSX.Tag3dComponent;
-    'Tag88': LocalJSX.Tag88;
+    'attribute-basic': AttributeBasic;
+    'attribute-basic-root': AttributeBasicRoot;
+    'attribute-boolean': AttributeBoolean;
+    'attribute-boolean-root': AttributeBooleanRoot;
+    'attribute-complex': AttributeComplex;
+    'attribute-host': AttributeHost;
+    'attribute-html-root': AttributeHtmlRoot;
+    'bad-shared-jsx': BadSharedJsx;
+    'conditional-basic': ConditionalBasic;
+    'conditional-rerender': ConditionalRerender;
+    'conditional-rerender-root': ConditionalRerenderRoot;
+    'css-cmp': CssCmp;
+    'css-variables': CssVariables;
+    'css-variables-root': CssVariablesRoot;
+    'custom-event-root': CustomEventRoot;
+    'dom-reattach': DomReattach;
+    'dynamic-css-variable': DynamicCssVariable;
+    'dynamic-import': DynamicImport;
+    'es5-addclass-svg': Es5AddclassSvg;
+    'esm-import': EsmImport;
+    'external-import-a': ExternalImportA;
+    'external-import-b': ExternalImportB;
+    'external-import-c': ExternalImportC;
+    'factory-jsx': FactoryJsx;
+    'init-css-root': InitCssRoot;
+    'input-basic-root': InputBasicRoot;
+    'key-reorder': KeyReorder;
+    'key-reorder-root': KeyReorderRoot;
+    'legacy-context': LegacyContext;
+    'lifecycle-async-a': LifecycleAsyncA;
+    'lifecycle-async-b': LifecycleAsyncB;
+    'lifecycle-async-c': LifecycleAsyncC;
+    'lifecycle-basic-a': LifecycleBasicA;
+    'lifecycle-basic-b': LifecycleBasicB;
+    'lifecycle-basic-c': LifecycleBasicC;
+    'lifecycle-unload-a': LifecycleUnloadA;
+    'lifecycle-unload-b': LifecycleUnloadB;
+    'lifecycle-unload-root': LifecycleUnloadRoot;
+    'lifecycle-update-a': LifecycleUpdateA;
+    'lifecycle-update-b': LifecycleUpdateB;
+    'lifecycle-update-c': LifecycleUpdateC;
+    'listen-jsx': ListenJsx;
+    'listen-jsx-root': ListenJsxRoot;
+    'listen-window': ListenWindow;
+    'node-globals': NodeGlobals;
+    'node-resolution': NodeResolution;
+    'reflect-to-attr': ReflectToAttr;
+    'sass-cmp': SassCmp;
+    'scoped-basic': ScopedBasic;
+    'scoped-basic-root': ScopedBasicRoot;
+    'shadow-dom-array': ShadowDomArray;
+    'shadow-dom-array-root': ShadowDomArrayRoot;
+    'shadow-dom-basic': ShadowDomBasic;
+    'shadow-dom-basic-root': ShadowDomBasicRoot;
+    'shadow-dom-mode': ShadowDomMode;
+    'shadow-dom-mode-root': ShadowDomModeRoot;
+    'shadow-dom-slot-basic': ShadowDomSlotBasic;
+    'shadow-dom-slot-nested': ShadowDomSlotNested;
+    'shadow-dom-slot-nested-root': ShadowDomSlotNestedRoot;
+    'slot-array-basic': SlotArrayBasic;
+    'slot-array-complex': SlotArrayComplex;
+    'slot-array-complex-root': SlotArrayComplexRoot;
+    'slot-array-top': SlotArrayTop;
+    'slot-basic': SlotBasic;
+    'slot-basic-order': SlotBasicOrder;
+    'slot-basic-order-root': SlotBasicOrderRoot;
+    'slot-basic-root': SlotBasicRoot;
+    'slot-dynamic-wrapper': SlotDynamicWrapper;
+    'slot-dynamic-wrapper-root': SlotDynamicWrapperRoot;
+    'slot-fallback': SlotFallback;
+    'slot-fallback-root': SlotFallbackRoot;
+    'slot-html': SlotHtml;
+    'slot-light-dom-content': SlotLightDomContent;
+    'slot-light-dom-root': SlotLightDomRoot;
+    'slot-map-order': SlotMapOrder;
+    'slot-map-order-root': SlotMapOrderRoot;
+    'slot-reorder': SlotReorder;
+    'slot-reorder-root': SlotReorderRoot;
+    'slot-replace-wrapper': SlotReplaceWrapper;
+    'slot-replace-wrapper-root': SlotReplaceWrapperRoot;
+    'svg-attr': SvgAttr;
+    'svg-class': SvgClass;
+    'tag-3d-component': Tag3dComponent;
+    'tag-88': Tag88;
   }
 }
+
 export { LocalJSX as JSX };
+
 
 declare module "@stencil/core" {
   export namespace JSX {
-    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
     interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
   }
 }
 
+
 declare global {
+
 
 
   interface HTMLAttributeBasicElement extends Components.AttributeBasic, HTMLStencilElement {}
@@ -1020,94 +946,8 @@ declare global {
     prototype: HTMLTag88Element;
     new (): HTMLTag88Element;
   };
-  interface HTMLElementTagNameMap {
-    'attribute-basic': HTMLAttributeBasicElement
-    'attribute-basic-root': HTMLAttributeBasicRootElement
-    'attribute-boolean': HTMLAttributeBooleanElement
-    'attribute-boolean-root': HTMLAttributeBooleanRootElement
-    'attribute-complex': HTMLAttributeComplexElement
-    'attribute-host': HTMLAttributeHostElement
-    'attribute-html-root': HTMLAttributeHtmlRootElement
-    'bad-shared-jsx': HTMLBadSharedJsxElement
-    'conditional-basic': HTMLConditionalBasicElement
-    'conditional-rerender': HTMLConditionalRerenderElement
-    'conditional-rerender-root': HTMLConditionalRerenderRootElement
-    'css-cmp': HTMLCssCmpElement
-    'css-variables': HTMLCssVariablesElement
-    'css-variables-root': HTMLCssVariablesRootElement
-    'custom-event-root': HTMLCustomEventRootElement
-    'dom-reattach': HTMLDomReattachElement
-    'dynamic-css-variable': HTMLDynamicCssVariableElement
-    'dynamic-import': HTMLDynamicImportElement
-    'es5-addclass-svg': HTMLEs5AddclassSvgElement
-    'esm-import': HTMLEsmImportElement
-    'external-import-a': HTMLExternalImportAElement
-    'external-import-b': HTMLExternalImportBElement
-    'external-import-c': HTMLExternalImportCElement
-    'factory-jsx': HTMLFactoryJsxElement
-    'init-css-root': HTMLInitCssRootElement
-    'input-basic-root': HTMLInputBasicRootElement
-    'key-reorder': HTMLKeyReorderElement
-    'key-reorder-root': HTMLKeyReorderRootElement
-    'legacy-context': HTMLLegacyContextElement
-    'lifecycle-async-a': HTMLLifecycleAsyncAElement
-    'lifecycle-async-b': HTMLLifecycleAsyncBElement
-    'lifecycle-async-c': HTMLLifecycleAsyncCElement
-    'lifecycle-basic-a': HTMLLifecycleBasicAElement
-    'lifecycle-basic-b': HTMLLifecycleBasicBElement
-    'lifecycle-basic-c': HTMLLifecycleBasicCElement
-    'lifecycle-unload-a': HTMLLifecycleUnloadAElement
-    'lifecycle-unload-b': HTMLLifecycleUnloadBElement
-    'lifecycle-unload-root': HTMLLifecycleUnloadRootElement
-    'lifecycle-update-a': HTMLLifecycleUpdateAElement
-    'lifecycle-update-b': HTMLLifecycleUpdateBElement
-    'lifecycle-update-c': HTMLLifecycleUpdateCElement
-    'listen-jsx': HTMLListenJsxElement
-    'listen-jsx-root': HTMLListenJsxRootElement
-    'listen-window': HTMLListenWindowElement
-    'node-globals': HTMLNodeGlobalsElement
-    'node-resolution': HTMLNodeResolutionElement
-    'reflect-to-attr': HTMLReflectToAttrElement
-    'sass-cmp': HTMLSassCmpElement
-    'scoped-basic': HTMLScopedBasicElement
-    'scoped-basic-root': HTMLScopedBasicRootElement
-    'shadow-dom-array': HTMLShadowDomArrayElement
-    'shadow-dom-array-root': HTMLShadowDomArrayRootElement
-    'shadow-dom-basic': HTMLShadowDomBasicElement
-    'shadow-dom-basic-root': HTMLShadowDomBasicRootElement
-    'shadow-dom-mode': HTMLShadowDomModeElement
-    'shadow-dom-mode-root': HTMLShadowDomModeRootElement
-    'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement
-    'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement
-    'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement
-    'slot-array-basic': HTMLSlotArrayBasicElement
-    'slot-array-complex': HTMLSlotArrayComplexElement
-    'slot-array-complex-root': HTMLSlotArrayComplexRootElement
-    'slot-array-top': HTMLSlotArrayTopElement
-    'slot-basic': HTMLSlotBasicElement
-    'slot-basic-order': HTMLSlotBasicOrderElement
-    'slot-basic-order-root': HTMLSlotBasicOrderRootElement
-    'slot-basic-root': HTMLSlotBasicRootElement
-    'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement
-    'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement
-    'slot-fallback': HTMLSlotFallbackElement
-    'slot-fallback-root': HTMLSlotFallbackRootElement
-    'slot-html': HTMLSlotHtmlElement
-    'slot-light-dom-content': HTMLSlotLightDomContentElement
-    'slot-light-dom-root': HTMLSlotLightDomRootElement
-    'slot-map-order': HTMLSlotMapOrderElement
-    'slot-map-order-root': HTMLSlotMapOrderRootElement
-    'slot-reorder': HTMLSlotReorderElement
-    'slot-reorder-root': HTMLSlotReorderRootElement
-    'slot-replace-wrapper': HTMLSlotReplaceWrapperElement
-    'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement
-    'svg-attr': HTMLSvgAttrElement
-    'svg-class': HTMLSvgClassElement
-    'tag-3d-component': HTMLTag3dComponentElement
-    'tag-88': HTMLTag88Element
-  }
 
-  interface ElementTagNameMap {
+  interface HTMLElementTagNameMap {
     'attribute-basic': HTMLAttributeBasicElement;
     'attribute-basic-root': HTMLAttributeBasicRootElement;
     'attribute-boolean': HTMLAttributeBooleanElement;
@@ -1193,5 +1033,7 @@ declare global {
     'tag-3d-component': HTMLTag3dComponentElement;
     'tag-88': HTMLTag88Element;
   }
+
+  interface ElementTagNameMap extends HTMLElementTagNameMap {}
 }
 
