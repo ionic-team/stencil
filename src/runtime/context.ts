@@ -11,7 +11,7 @@ export const getContext = (_elm: HTMLElement, context: string) => {
     return doc;
   } else if (context === 'isServer') {
     return BUILD.hydrateServerSide;
-  } else if (context === 'resourcesUrl') {
+  } else if (context === 'resourcesUrl' || context === 'publicPath') {
     return getAssetPath('.');
   } else if (context === 'queue') {
     return {
