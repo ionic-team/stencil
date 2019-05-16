@@ -1,7 +1,5 @@
 import * as d from '../../declarations';
 
-/www/build/app.css
-
 export async function generateHashedCopy(config: d.Config, compilerCtx: d.CompilerCtx, path: string) {
   try {
     const content = await compilerCtx.fs.readFile(path);

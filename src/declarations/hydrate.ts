@@ -25,6 +25,7 @@ export interface HydrateDocumentOptions {
   referrer?: string;
   removeScripts?: boolean;
   removeUnusedStyles?: boolean;
+  resourcesUrl?: string;
   timeout?: number;
   title?: string;
   url?: string;
