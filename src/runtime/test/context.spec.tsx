@@ -14,6 +14,7 @@ describe('context', () => {
       @Prop({ context: 'document' }) doc: Document;
       @Prop({ context: 'isServer' }) isServer: boolean;
       @Prop({ context: 'resourcesUrl' }) resourcesUrl: string;
+      @Prop({ context: 'publicPath' }) publicPath: string;
       @Prop({ context: 'queue' }) queue: QueueApi;
     }
     const {win, doc, rootInstance} = await newSpecPage({
@@ -24,6 +25,7 @@ describe('context', () => {
     expect(rootInstance.win).toEqual(win);
     expect(rootInstance.doc).toEqual(doc);
     expect(rootInstance.resourcesUrl).toEqual('/');
+    expect(rootInstance.publicPath).toEqual('/');
     expect(rootInstance.queue.write).toEqual(writeTask);
     expect(rootInstance.queue.read).toEqual(readTask);
     expect(rootInstance.queue.tick).not.toBeUndefined();
@@ -35,15 +37,18 @@ describe('context', () => {
     })
     class CmpA {
       @Prop({ context: 'resourcesUrl' }) resourcesUrl: boolean;
+      @Prop({ context: 'publicPath' }) publicPath: boolean;
     }
     const {rootInstance} = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
       context: {
-        resourcesUrl: '/blabla'
+        resourcesUrl: '/blabla',
+        publicPath: '/blubblub'
       }
     });
     expect(rootInstance.resourcesUrl).toEqual('/blabla');
+    expect(rootInstance.publicPath).toEqual('/blubblub');
   });
 
   it('should extend context', async () => {
