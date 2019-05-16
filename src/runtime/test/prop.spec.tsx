@@ -1,8 +1,30 @@
-import { Component, Prop } from '@stencil/core';
+import { Component, Prop, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
 describe('prop', () => {
+
+  it('"value" attribute', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      @Prop() value: string;
+
+      render() {
+        return <code>{ this.value.trim() }</code>;
+      }
+    }
+
+    const { root } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a value="#005a00"></cmp-a>`
+    });
+
+    expect(root).toEqualHtml(`
+      <cmp-a value="#005a00">
+        <code>#005a00</code>
+      </cmp-a>
+    `);
+  });
 
   it('override default values from attribute', async () => {
     @Component({ tag: 'cmp-a'})
