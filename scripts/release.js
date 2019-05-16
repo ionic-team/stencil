@@ -131,10 +131,6 @@ function runTasks(opts) {
         task: () => execa('npm', ['run', 'build'], { cwd: rootDir })
       },
       {
-        title: 'Optimize for release',
-        task: () => execa('npm', ['run', 'build.prod'], { cwd: rootDir })
-      },
-      {
         title: 'Run dist tests',
         task: () => execa('npm', ['run', 'test.dist'], { cwd: rootDir })
       },
@@ -267,7 +263,7 @@ function prepareUI() {
       type: 'confirm',
       name: 'confirm',
       message: answers => {
-        return `Will bump from ${color.cyan(oldVersion)} to ${color.cyan(answers.version)}. Continue?`;
+        return `Optimize for release${color.cyan(oldVersion)} to ${color.cyan(answers.version)}. Continue?`;
       }
     }
   ];
