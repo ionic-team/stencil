@@ -8,9 +8,6 @@ import { generateVscodeDocs } from '../docs/vscode';
 import { outputCustom } from './output-custom';
 
 export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (config.devMode) {
-    return;
-  }
   const docsOutputTargets = config.outputTargets.filter(o => (
     isOutputTargetCustom(o) ||
     isOutputTargetDocsReadme(o) ||
