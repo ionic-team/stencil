@@ -10,8 +10,8 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
       keep_fargs: false,
       passes: 2,
       pure_funcs: [
-        'Console.log',
-        'Console.debug'
+        'console.log',
+        'console.debug'
       ]
     },
     mangle: {
