@@ -13,6 +13,8 @@ describe('context', () => {
       @Prop({ context: 'window' }) win: Window;
       @Prop({ context: 'document' }) doc: Document;
       @Prop({ context: 'isServer' }) isServer: boolean;
+      @Prop({ context: 'isPrerender' }) isPrerender: boolean;
+      @Prop({ context: 'isClient' }) isClient: boolean;
       @Prop({ context: 'resourcesUrl' }) resourcesUrl: string;
       @Prop({ context: 'publicPath' }) publicPath: string;
       @Prop({ context: 'queue' }) queue: QueueApi;
@@ -24,6 +26,9 @@ describe('context', () => {
 
     expect(rootInstance.win).toEqual(win);
     expect(rootInstance.doc).toEqual(doc);
+    expect(rootInstance.isServer).toEqual(false);
+    expect(rootInstance.isPrerender).toEqual(false);
+    expect(rootInstance.isClient).toEqual(true);
     expect(rootInstance.resourcesUrl).toEqual('/');
     expect(rootInstance.publicPath).toEqual('/');
     expect(rootInstance.queue.write).toEqual(writeTask);
