@@ -8,7 +8,7 @@ import { generateVscodeDocs } from '../docs/vscode';
 import { outputCustom } from './output-custom';
 
 export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (config.devMode) {
+  if (!config.buildDocs) {
     return;
   }
   const docsOutputTargets = config.outputTargets.filter(o => (
