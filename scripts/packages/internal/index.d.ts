@@ -2,9 +2,11 @@ export {
   CompilerCtx,
   ComponentCompilerMeta,
   Config,
+  Diagnostic,
   HTMLStencilElement,
   JSXBase,
   OutputTargetCustom,
   Plugin,
-  Diagnostic
+  PluginCtx,
+  PrintLine
 } from '../dist/declarations';
