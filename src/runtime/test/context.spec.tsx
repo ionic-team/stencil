@@ -1,5 +1,5 @@
 import { newSpecPage } from '@stencil/core/testing';
-import { Component, Prop, writeTask, readTask } from '@stencil/core';
+import { Component, Prop, readTask, writeTask } from '@stencil/core';
 import { QueueApi } from '../../declarations';
 
 

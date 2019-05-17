@@ -1,11 +1,10 @@
 import { newSpecPage } from '@stencil/core/testing';
-import { Component, Prop, readTask, writeTask, Method } from '@stencil/core';
-import { QueueApi } from '../../declarations';
+import { Component, Method, Prop, readTask, writeTask } from '@stencil/core';
 
 
 describe('queue', () => {
 
-  it('should return default values of context', async () => {
+  it('should execute tasks in the right order', async () => {
     let log = '';
     @Component({
       tag: 'cmp-a',
