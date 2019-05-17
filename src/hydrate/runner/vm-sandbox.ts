@@ -31,7 +31,7 @@ function loadHydrateAppScript() {
 }
 
 
-function createSandbox(win: any) {
+export function createSandbox(win: any) {
   const sandbox: any = {
     __filename: __filename,
     __dirname: __dirname,
@@ -47,11 +47,7 @@ function createSandbox(win: any) {
 
   WINDOW_PROPS.forEach(prop => {
     if (typeof win[prop] === 'function') {
-      Object.defineProperty(sandbox, prop, {
-        value() { return win[prop].bind(win); },
-        configurable: true,
-        enumerable: true
-      });
+      sandbox[prop] = win[prop].bind(win);
 
     } else {
       Object.defineProperty(sandbox, prop, {

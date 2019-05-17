@@ -48,28 +48,39 @@ Stencil used to generate a loader `.js` file that automatically decided which en
 
 ### Collection's package.json
 
-Stencil One has chaged the internal folder structure of the `dist` folder, and some entry-points are located in different location:
+Stencil One has changed the internal folder structure of the `dist` folder, and some entry-points are located in different location:
 
 - **"module"**: `dist/esm/index.js` => `dist/index.mjs`
-- **"jsnext:main**": `dist/esm/es2017/index.mjs.js` => `dist/esm/index.mjs.js`
+- **"jsnext:main**": `dist/esm/es2017/index.js` => `dist/esm/index.mjs`
 
 
 Make sure you update the `package.json` in the root of your project, like this:
 
 ```diff
   {
+     "main": "dist/index.js",
+
 -    "module": "dist/esm/index.js",
 +    "module": "dist/index.mjs",
 
 -    "es2015": "dist/esm/es2017/index.js",
--    "es2017": "dist/esm/es2017/index.mjs.js",
--    "jsnext:main": "dist/esm/es2017/index.mjs.js",
-+    "es2015": "dist/esm/index.mjs.js",
-+    "es2017": "dist/esm/index.mjs.js",
-+    "jsnext:main": "dist/esm/index.mjs.js",
+-    "es2017": "dist/esm/es2017/index.js",
+-    "jsnext:main": "dist/esm/es2017/index.js",
++    "es2015": "dist/esm/index.mjs",
++    "es2017": "dist/esm/index.mjs",
++    "jsnext:main": "dist/esm/index.mjs",
   }
 ```
 
+### Dependencies
+
+Some packages, specially the ones from the Stencil and Ionic core teams used some private APIs of Stencil, that's why if your collection depends of `@ionic/core`, `@stencil/router` or `@stencil/state-tunnel`, you might need to update your `package.json` to point these dependencies to the `"one"` tag.
+
+```
+"@stencil/router": "one",
+"@stencil/state-tunnel": "one",
+"@ionic/core": "one",
+```
 
 ### `window.NAMESPACE` is no longer a thing
 
@@ -153,7 +164,7 @@ onEnter(ev: KeyboardEvent) {
 
 ### Removed: @Listen('event’, { enabled })
 
-It's not possible to programatically enable/disable an event listener defined using the `@Listen()` decorator. Please use the DOM API directly (`addEventListener` / `removeEventListener`).
+It's not possible to programmatically enable/disable an event listener defined using the `@Listen()` decorator. Please use the DOM API directly (`addEventListener` / `removeEventListener`).
 
 ### Removed: @Listen('event’, { eventName })
 
@@ -362,7 +373,7 @@ It will not be recommended to use `@Prop(connect)` in order to lazily load compo
 
 ### OutputTarget local copy tasks
 
-The root `copy` property in `stencil.config.ts` has been deprecated in favour of local copy tasks per output-target, ie. now the copy tasks are specific under the context of each output-target.
+The root `copy` property in `stencil.config.ts` has been deprecated in favor of local copy tasks per output-target, ie. now the copy tasks are specific under the context of each output-target.
 
 ```diff
   const copy =
@@ -412,7 +423,7 @@ In the example above, the `main.html` file is actually copied into 5 different p
 - dist-app/app/main.html
 - www/main.html
 
-If the old behaviour is still desired, the config can be refactored to:
+If the old behavior is still desired, the config can be refactored to:
 
 ```ts
 const copy = [

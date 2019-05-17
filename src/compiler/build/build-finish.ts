@@ -56,20 +56,18 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
       compilerCtx.hasSuccessfulBuild = true;
     }
 
-    if (!aborted || (aborted && !compilerCtx.hasSuccessfulBuild)) {
-      // print out the time it took to build
-      // and add the duration to the build results
-      if (!buildCtx.hasPrintedResults) {
-        buildCtx.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
-        buildCtx.hasPrintedResults = true;
+    // print out the time it took to build
+    // and add the duration to the build results
+    if (!buildCtx.hasPrintedResults) {
+      buildCtx.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
+      buildCtx.hasPrintedResults = true;
 
-        // write the build stats
-        await generateBuildStats(config, compilerCtx, buildCtx, buildCtx.buildResults);
-      }
-
-      // emit a buildFinish event for anyone who cares
-      compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
+      // write the build stats
+      await generateBuildStats(config, compilerCtx, buildCtx, buildCtx.buildResults);
     }
+
+    // emit a buildFinish event for anyone who cares
+    compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
 
     // write all of our logs to disk if config'd to do so
     // do this even if there are errors or not the active build

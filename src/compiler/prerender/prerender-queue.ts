@@ -119,11 +119,12 @@ function getNextUrl(manager: d.PrerenderManager) {
 
 
 async function prerenderUrl(manager: d.PrerenderManager, url: string) {
+  let previewUrl = url;
   try {
+    previewUrl = new URL(url).pathname;
     let timespan: d.LoggerTimeSpan;
     if (manager.isDebug) {
-      const pathname = new URL(url).pathname;
-      timespan = manager.config.logger.createTimeSpan(`prerender start: ${pathname}`, true);
+      timespan = manager.config.logger.createTimeSpan(`prerender start: ${previewUrl}`, true);
     }
 
     const prerenderRequest: d.PrerenderRequest = {
@@ -141,13 +142,12 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
     const results = await manager.config.sys.prerenderUrl(prerenderRequest);
 
     if (manager.isDebug) {
-      const pathname = new URL(url).pathname;
       const filePath = manager.config.sys.path.relative(manager.config.rootDir, results.filePath);
       const hasError = results.diagnostics.some(d => d.level === 'error');
       if (hasError) {
-        timespan.finish(`prerender failed: ${pathname}, ${filePath}`, 'red');
+        timespan.finish(`prerender failed: ${previewUrl}, ${filePath}`, 'red');
       } else {
-        timespan.finish(`prerender finish: ${pathname}, ${filePath}`);
+        timespan.finish(`prerender finish: ${previewUrl}, ${filePath}`);
       }
     }
 
@@ -169,7 +169,7 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
 
   const urlsCompletedSize = manager.urlsCompleted.size;
   if (manager.progressLogger && urlsCompletedSize > 1) {
-    manager.progressLogger.update(`           prerendered ${urlsCompletedSize} urls: ${manager.config.sys.color.dim(url)}`);
+    manager.progressLogger.update(`           prerendered ${urlsCompletedSize} urls: ${manager.config.sys.color.dim(previewUrl)}`);
   }
   // let's try to drain the queue again and let this
   // next call figure out if we're actually done or not

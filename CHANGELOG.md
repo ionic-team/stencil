@@ -1,3 +1,10 @@
+# 🎹 [1.0.0-beta.0](https://github.com/ionic-team/stencil/compare/v1.0.0-alpha.35...v1.0.0-beta.0) (2019-05-16)
+
+Check out the [blog post](https://blog.ionicframework.com/announcing-stencil-one-beta/) to know everything coming in Stencil One!
+Also, it might be interesting to take a quick look at the [breaking change files](https://github.com/ionic-team/stencil/blob/master/BREAKING_CHANGES.md), to know what changes you might need to apply to you components.
+
+Enjoy! 🎈
+
 <a name="0.18.1"></a>
 ## 😎 [0.18.1](https://github.com/ionic-team/stencil/compare/v0.18.0...v0.18.1) (2019-03-15)
 

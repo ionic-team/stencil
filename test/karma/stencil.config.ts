@@ -34,6 +34,5 @@ export const config = {
       disableDotRule: true,
       index: 'index.html'
     }
-  },
-  _isTesting: true
+  }
 };

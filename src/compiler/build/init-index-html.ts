@@ -186,19 +186,27 @@ const APP_LOADING_HTML = `
       document.querySelector('.toast').classList.add('active');
     }, 100);
 
-    setInterval(function() {
+    var tmrId = setInterval(function() {
       try {
+        var url = window.location.pathname + '?r=' + Date.now();
         var xhr = new XMLHttpRequest();
         xhr.addEventListener('load', function() {
           try {
-            if (this.responseText.indexOf('app-dev-first-build-loader') === -1) {
-              window.location.reload(true);
+            if (this.status < 300) {
+              if (this.responseText.indexOf('app-dev-first-build-loader') === -1) {
+                window.location.reload(true);
+              }
+            } else if (window.location.pathname !== '/') {
+              url = '/?r=' + Date.now();
+
+            } else if (this.status > 299) {
+              clearInterval(tmrId);
             }
+
           } catch (e) {
             console.error(e);
           }
         });
-        var url = window.location.pathname + '?' + Math.random();
         xhr.open('GET', url);
         xhr.send();
       } catch (e) {

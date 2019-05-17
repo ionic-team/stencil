@@ -83,12 +83,12 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
   }
 
   // we've successfully created a lazy instance
-
-  if (BUILD.lifecycle && hostRef.$ancestorComponent$ && !hostRef.$ancestorComponent$['s-lr']) {
+  const ancestorComponent = hostRef.$ancestorComponent$;
+  if (BUILD.lifecycle && ancestorComponent && !ancestorComponent['s-lr'] && ancestorComponent['s-rc']) {
     // this is the intial load and this component it has an ancestor component
     // but the ancestor component has NOT fired its will update lifecycle yet
     // so let's just cool our jets and wait for the ancestor to continue first
-    hostRef.$ancestorComponent$['s-rc'].push(() =>
+    ancestorComponent['s-rc'].push(() =>
       // this will get fired off when the ancestor component
       // finally gets around to rendering its lazy self
       // fire off the initial update

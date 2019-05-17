@@ -15,7 +15,7 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
   if (esmOutputs.length + esmEs5Outputs.length > 0) {
     const esmOpts: OutputOptions = {
       format: 'esm',
-      entryFileNames: '[name].esm.js',
+      entryFileNames: '[name].mjs',
       preferConst: true
     };
 

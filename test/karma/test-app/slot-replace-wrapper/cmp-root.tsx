@@ -5,7 +5,7 @@ import { Component, State, h } from '@stencil/core';
 })
 export class SlotReplaceWrapperRoot {
 
-  @State() href: string = null;
+  @State() href?: string;
 
   componentDidLoad() {
     this.href = 'http://stenciljs.com/';

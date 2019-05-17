@@ -49,7 +49,6 @@ async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx
   const jsxAugmentation = `
 declare module "@stencil/core" {
   export namespace JSX {
-    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
     interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
   }
 }
@@ -70,26 +69,25 @@ export namespace Components {
 declare namespace LocalJSX {
   ${modules.map(m => `${m.jsx}`).join('\n').trim()}
 
-  interface ElementInterfaces {
-  ${modules.map(m => `'${m.tagNameAsPascal}': Components.${m.tagNameAsPascal};`).join('\n')}
-  }
-
   interface IntrinsicElements {
-  ${modules.map(m => `'${m.tagNameAsPascal}': LocalJSX.${m.tagNameAsPascal};`).join('\n')}
+  ${modules.map(m => `'${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
   }
 }
+
 export { LocalJSX as JSX };
+
 ${jsxAugmentation}
+
 declare global {
   ${jsxElementGlobal}
+
   ${modules.map(m => m.element).join('\n')}
+
   interface HTMLElementTagNameMap {
-  ${modules.map(m => m.HTMLElementTagNameMap).join('\n')}
+    ${modules.map(m => `'${m.tagName}': ${m.htmlElementName};`).join('\n')}
   }
 
-  interface ElementTagNameMap {
-  ${modules.map(m => m.ElementTagNameMap).join('\n')}
-  }
+  interface ElementTagNameMap extends HTMLElementTagNameMap {}
 }
 `;
 

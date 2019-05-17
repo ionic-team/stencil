@@ -302,6 +302,10 @@ export class MockElement extends MockNode {
     return node;
   }
 
+  hasChildNodes() {
+    return (this.childNodes.length > 0);
+  }
+
   get id() { return this.getAttributeNS(null, 'id') || ''; }
   set id(value: string) { this.setAttribute('id', value); }
 

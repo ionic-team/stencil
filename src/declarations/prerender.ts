@@ -54,7 +54,7 @@ export interface PrerenderConfig {
   filterAnchor?(attrs: {[attrName: string]: string}, base?: URL): boolean;
   filterUrl?(url?: URL, base?: URL): boolean;
   filePath?(url?: URL, filePath?: string): string;
-  hydrateOptions?(url?: URL): d.HydrateDocumentOptions;
+  hydrateOptions?(url?: URL): d.SerializeDocumentOptions;
   normalizeUrl?(href?: string, base?: URL): URL;
   robotsTxt?(opts: RobotsTxtOpts): string | RobotsTxtResults;
   sitemapXml?(opts: SitemapXmpOpts): string | SitemapXmpResults;

@@ -6,8 +6,8 @@ import { store } from './external-store'
   tag: 'external-import-a'
 })
 export class ExternalImportA {
-  first: string;
-  last: string;
+  first?: string;
+  last?: string;
 
   componentWillLoad() {
     const data = store().data;

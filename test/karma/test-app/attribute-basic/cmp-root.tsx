@@ -5,15 +5,15 @@ import { Component, Element, h } from '@stencil/core';
 })
 export class AttributeBasicRoot {
 
-  @Element() el: HTMLElement;
-  url: URL;
+  @Element() el!: HTMLElement;
+  url?: URL;
 
   componentWillLoad() {
     this.url = new URL(window.location.href);
   }
 
   testClick() {
-    const cmp = this.el.querySelector('attribute-basic');
+    const cmp = this.el.querySelector('attribute-basic')!;
 
     cmp.setAttribute('single', 'single-update');
     cmp.setAttribute('multi-word', 'multiWord-update');
@@ -25,7 +25,7 @@ export class AttributeBasicRoot {
       <div>
         <button onClick={this.testClick.bind(this)}>Test</button>
         <attribute-basic></attribute-basic>
-        <div>hostname: {this.url.hostname}, pathname: {this.url.pathname}</div>
+        <div>hostname: {this.url!.hostname}, pathname: {this.url!.pathname}</div>
       </div>
     );
   }

@@ -69,6 +69,7 @@ export interface RollupInterface {
   plugins: {
     nodeResolve(opts: any): any;
     emptyJsResolver(): any;
+    replace(opts: any): any;
     commonjs(opts: any): any;
   };
 }
@@ -94,10 +95,12 @@ export interface LazyRequire {
 export interface SystemDetails {
   cpuModel: string;
   cpus: number;
+  freemem(): number;
   platform: string;
   runtime: string;
   runtimeVersion: string;
   release: string;
+  totalmem: number;
   tmpDir: string;
 }
 
