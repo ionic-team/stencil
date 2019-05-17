@@ -186,9 +186,9 @@ const APP_LOADING_HTML = `
       document.querySelector('.toast').classList.add('active');
     }, 100);
 
-    setInterval(function() {
+    var tmrId = setInterval(function() {
       try {
-        var url = window.location.pathname + '?' + Math.random();
+        var url = window.location.pathname + '?r=' + Date.now();
         var xhr = new XMLHttpRequest();
         xhr.addEventListener('load', function() {
           try {
@@ -197,7 +197,10 @@ const APP_LOADING_HTML = `
                 window.location.reload(true);
               }
             } else if (window.location.pathname !== '/') {
-              url = '/' + Math.random();
+              url = '/?r=' + Date.now();
+
+            } else if (this.status > 299) {
+              clearInterval(tmrId);
             }
 
           } catch (e) {
