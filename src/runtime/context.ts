@@ -12,7 +12,7 @@ export const getContext = (_elm: HTMLElement, context: string) => {
   } else if (context === 'isServer' || context === 'isPrerender') {
     return BUILD.hydrateServerSide;
   } else if (context === 'isClient') {
-    return BUILD.hydrateClientSide;
+    return !BUILD.hydrateServerSide;
   } else if (context === 'resourcesUrl' || context === 'publicPath') {
     return getAssetPath('.');
   } else if (context === 'queue') {
