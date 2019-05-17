@@ -9,6 +9,10 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
       pure_getters: true,
       keep_fargs: false,
       passes: 2,
+      pure_funcs: [
+        'Console.log',
+        'Console.debug'
+      ]
     },
     mangle: {
       toplevel: true,
@@ -19,7 +23,7 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
 
   if (isCore) {
     opts.compress.passes = 4;
-    opts.compress.pure_funcs = ['getHostRef'];
+    opts.compress.pure_funcs = ['getHostRef', ...opts.compress.pure_funcs];
     opts.mangle.properties = {
       regex: '^\\$.+\\$$',
       debug: isDebug
@@ -59,6 +63,7 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
     opts.mangle.keep_fnames = true;
     opts.compress.drop_console = false;
     opts.compress.drop_debugger = false;
+    opts.compress.pure_funcs = [];
     opts.output.beautify = true;
     opts.output.indent_level = 2;
     opts.output.comments = 'all';
