@@ -105,7 +105,9 @@ function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig,
 
       const tdNum = doc.createElement('td');
       tdNum.className = 'dev-server-diagnostic-blob-num';
-      tdNum.setAttribute('data-line-number', l.lineNumber + '');
+      if (l.lineNumber > -1) {
+        tdNum.setAttribute('data-line-number', l.lineNumber + '');
+      }
       tr.appendChild(tdNum);
 
       const tdCode = doc.createElement('td');
