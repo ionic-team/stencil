@@ -34,7 +34,6 @@
     "polyfills": "node scripts/build-polyfills.js",
     "prod": "node scripts/build-prod.js",
     "release": "node scripts/release.js",
-    "release.alpha": "npm version prerelease && npm publish --tag one --access public",
     "release.prepare": "node scripts/release.js --prepare",
     "runtime": "node scripts/build-runtime.js",
     "screenshot": "node scripts/build-screenshot.js",
