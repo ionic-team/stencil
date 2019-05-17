@@ -34,11 +34,11 @@ describe('newSpecPage, spec testing', () => {
   it('renders changes to the name data', async () => {
     expect(root).toEqualHtml(`
       <cmp-a class="hydrated">
-        <shadow-root>
+        <mock:shadow-root>
           <div>
             Hello, World! I'm
           </div>
-        </shadow-root>
+        </mock:shadow-root>
       </cmp-a>
     `);
     expect(root).toHaveClass('hydrated');

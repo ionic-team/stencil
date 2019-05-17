@@ -488,9 +488,9 @@ it('override default values from attribute', async () => {
 ```
 
 
-### Serialized `<shadow-root>`
+### Serialized `<mock:shadow-root>`
 
-Traditionally, when a component is serialized to a string its shadow-root is ignored and not include within the HTML output. However, when building web components and using Shadow DOM, the nodes generated within the components are just as important as any other nodes to be tested. For this reason, both spec and e2e tests will serialize the shadow-root content into a mocked `<shadow-root>` element. Note that this serialized shadow-root is simply for testing and comparing values, and is not used at browser runtime.
+Traditionally, when a component is serialized to a string its shadow-root is ignored and not include within the HTML output. However, when building web components and using Shadow DOM, the nodes generated within the components are just as important as any other nodes to be tested. For this reason, both spec and e2e tests will serialize the shadow-root content into a mocked `<mock:shadow-root>` element. Note that this serialized shadow-root is simply for testing and comparing values, and is not used at browser runtime.
 
 ```tsx
 import { Component } from '@stencil/core';
@@ -520,11 +520,11 @@ it('test shadow root innerHTML', async () => {
 
   expect(page.root).toEqualHtml(`
     <cmp-a>
-      <shadow-root>
+      <mock:shadow-root>
         <div>
           Shadow Content
         </div>
-      </shadow-root>
+      </mock:shadow-root>
       Light Content
     </cmp-a>
   `);

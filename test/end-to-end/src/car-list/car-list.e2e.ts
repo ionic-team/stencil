@@ -16,7 +16,7 @@ describe('car-list', () => {
   it('should work without parameters', async () => {
     expect(elm).toEqualHtml(`
       <car-list class="hydrated">
-        <shadow-root></shadow-root>
+        <mock:shadow-root></mock:shadow-root>
       </car-list>
     `);
 
@@ -37,7 +37,7 @@ describe('car-list', () => {
 
     expect(elm).toEqualHtml(`
       <car-list class="hydrated">
-        <shadow-root>
+        <mock:shadow-root>
           <ul>
             <li class="">
               <car-detail class="hydrated">
@@ -61,7 +61,7 @@ describe('car-list', () => {
               </car-detail>
             </li>
           </ul>
-        </shadow-root>
+        </mock:shadow-root>
       </car-list>
     `);
 

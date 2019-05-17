@@ -51,11 +51,11 @@ describe('hydrate, shadow parent', () => {
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
-        <shadow-root>
+        <mock:shadow-root>
           <div>
             <slot></slot>
           </div>
-        </shadow-root>
+        </mock:shadow-root>
         <!---->
         middle
       </cmp-a>
@@ -111,11 +111,11 @@ describe('hydrate, shadow parent', () => {
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
-        <shadow-root>
+        <mock:shadow-root>
           top
           <slot></slot>
           bottom
-        </shadow-root>
+        </mock:shadow-root>
         <!---->
         middle
       </cmp-a>
@@ -163,9 +163,9 @@ describe('hydrate, shadow parent', () => {
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
-        <shadow-root>
+        <mock:shadow-root>
           shadow-text
-        </shadow-root>
+        </mock:shadow-root>
       </cmp-a>
     `);
   });
@@ -216,12 +216,12 @@ describe('hydrate, shadow parent', () => {
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
-        <shadow-root>
+        <mock:shadow-root>
           <div>
             <slot></slot>
           </div>
           <slot name="fixed"></slot>
-        </shadow-root>
+        </mock:shadow-root>
       </cmp-a>
     `);
   });
@@ -271,20 +271,22 @@ describe('hydrate, shadow parent', () => {
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true,
-      serializedShadowDom: true
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
-        <shadow-root>
+        <mock:shadow-root>
           <cmp-b>
             <!--r.2-->
             <!---->
             <!--s.2.0.0.0.-->
             cmp-a-light-dom
           </cmp-b>
-        </shadow-root>
+        </mock:shadow-root>
       </cmp-a>
+    `);
+    expect(clientHydrated.root).toEqualLightHtml(`
+      <cmp-a></cmp-a>
     `);
   });
 
@@ -340,12 +342,11 @@ describe('hydrate, shadow parent', () => {
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true,
-      serializedShadowDom: true
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
-        <shadow-root>
+        <mock:shadow-root>
           <section>
             <slot name="start"></slot>
             <slot name="secondary"></slot>
@@ -355,11 +356,17 @@ describe('hydrate, shadow parent', () => {
             <slot name="primary"></slot>
             <slot name="end"></slot>
           </section>
-        </shadow-root>
+        </mock:shadow-root>
         <!---->
         Title
       </cmp-a>
     `);
+    expect(clientHydrated.root).toEqualLightHtml(`
+    <cmp-a>
+      <!---->
+      Title
+    </cmp-a>
+  `);
   });
 
   it('root level component, nested shadow slot', async () => {
@@ -429,25 +436,24 @@ describe('hydrate, shadow parent', () => {
       components: [Badge, RippleEffect, TabButton],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true,
-      serializedShadowDom: true
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <ion-tab-button>
-        <shadow-root>
+        <mock:shadow-root>
           <a>
             <slot></slot>
             <ion-ripple-effect>
-              <shadow-root>
-              </shadow-root>
+              <mock:shadow-root>
+              </mock:shadow-root>
             </ion-ripple-effect>
           </a>
-        </shadow-root>
+        </mock:shadow-root>
         <!---->
         <ion-badge>
-          <shadow-root>
+          <mock:shadow-root>
             <slot></slot>
-          </shadow-root>
+          </mock:shadow-root>
           <!---->
           root-text
         </ion-badge>

@@ -53,20 +53,20 @@ describe('hydrate, shadow in shadow', () => {
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true,
-      serializedShadowDom: true
+      serializedShadowDom: false
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
-        <shadow-root>
+        <mock:shadow-root>
           <cmp-b>
-            <shadow-root>
+            <mock:shadow-root>
               <slot></slot>
-            </shadow-root>
+            </mock:shadow-root>
             <!---->
             <slot></slot>
           </cmp-b>
-        </shadow-root>
+        </mock:shadow-root>
         <!---->
         light-dom
       </cmp-a>
@@ -118,20 +118,19 @@ describe('hydrate, shadow in shadow', () => {
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true,
-      serializedShadowDom: true
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
-        <shadow-root>
+        <mock:shadow-root>
           <cmp-b>
-            <shadow-root>
+            <mock:shadow-root>
               <slot></slot>
-            </shadow-root>
+            </mock:shadow-root>
             <!---->
             light-dom
           </cmp-b>
-        </shadow-root>
+        </mock:shadow-root>
       </cmp-a>
     `);
   });
@@ -180,17 +179,16 @@ describe('hydrate, shadow in shadow', () => {
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true,
-      serializedShadowDom: true
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
         <!--r.1-->
         <cmp-b>
-          <shadow-root>
+          <mock:shadow-root>
             <header></header>
             <slot></slot>
-          </shadow-root>
+          </mock:shadow-root>
         </cmp-b>
       </cmp-a>
     `);
@@ -241,17 +239,16 @@ describe('hydrate, shadow in shadow', () => {
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true,
-      serializedShadowDom: true
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
         <!--r.1-->
         <cmp-b>
-          <shadow-root>
+          <mock:shadow-root>
             shadow-header
             <slot></slot>
-          </shadow-root>
+          </mock:shadow-root>
         </cmp-b>
       </cmp-a>
     `);
@@ -310,10 +307,10 @@ describe('hydrate, shadow in shadow', () => {
       <cmp-a>
         <!--r.1-->
         <cmp-b>
-          <shadow-root>
+          <mock:shadow-root>
             <header></header>
             <slot></slot>
-          </shadow-root>
+          </mock:shadow-root>
           <!---->
           light-dom
         </cmp-b>
@@ -369,19 +366,18 @@ describe('hydrate, shadow in shadow', () => {
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true,
-      serializedShadowDom: true
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
         <!--r.1-->
         <cmp-b>
-          <shadow-root>
+          <mock:shadow-root>
             shadow-header
             <footer>
               shadow-footer
             </footer>
-          </shadow-root>
+          </mock:shadow-root>
         </cmp-b>
       </cmp-a>
     `);
@@ -442,11 +438,11 @@ describe('hydrate, shadow in shadow', () => {
       <cmp-a>
         <!--r.1-->
         <cmp-b>
-          <shadow-root>
+          <mock:shadow-root>
             <header></header>
             <slot></slot>
             <footer></footer>
-          </shadow-root>
+          </mock:shadow-root>
           <!---->
           light-dom
         </cmp-b>

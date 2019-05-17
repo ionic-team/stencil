@@ -6,7 +6,7 @@ import { URL } from 'url';
 
 
 export function createElement(ownerDocument: any, tagName: string) {
-  if (typeof tagName !== 'string' || tagName === '' || !(/^[a-z0-9-_]+$/i.test(tagName))) {
+  if (typeof tagName !== 'string' || tagName === '' || !(/^[a-z0-9-_:]+$/i.test(tagName))) {
     throw new Error(`The tag name provided (${tagName}) is not a valid name.`);
   }
   tagName = tagName.toLowerCase();

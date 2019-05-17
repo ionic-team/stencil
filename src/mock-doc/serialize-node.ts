@@ -79,7 +79,7 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToH
 
 function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: SerializeOutput, isShadowRoot: boolean) {
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE || isShadowRoot) {
-    const tagName = isShadowRoot ? 'shadow-root' : node.nodeName.toLowerCase();
+    const tagName = isShadowRoot ? 'mock:shadow-root' : node.nodeName.toLowerCase();
 
     if (tagName === 'body') {
       output.isWithinBody = true;

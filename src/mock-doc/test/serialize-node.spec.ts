@@ -99,7 +99,7 @@ describe('serializeNodeToHtml', () => {
 
     expect(elm).toEqualHtml(`
       <cmp-a>
-        <shadow-root>
+        <mock:shadow-root>
           <article>
             shadow top
           </article>
@@ -107,7 +107,7 @@ describe('serializeNodeToHtml', () => {
           <section>
             shadow bottom
           </section>
-        </shadow-root>
+        </mock:shadow-root>
         <div>
           light dom
         </div>

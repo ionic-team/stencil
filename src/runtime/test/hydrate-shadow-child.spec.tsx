@@ -41,11 +41,11 @@ describe('hydrate, shadow child', () => {
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
-        <shadow-root>
+        <mock:shadow-root>
           <p>
             Hello
           </p>
-        </shadow-root>
+        </mock:shadow-root>
       </cmp-a>
     `);
   });
@@ -95,16 +95,15 @@ describe('hydrate, shadow child', () => {
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true,
-      serializedShadowDom: true
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
         <!--r.1-->
         <cmp-b>
-          <shadow-root>
+          <mock:shadow-root>
             <slot></slot>
-          </shadow-root>
+          </mock:shadow-root>
           <!---->
           light-dom
         </cmp-b>
@@ -156,17 +155,16 @@ describe('hydrate, shadow child', () => {
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true,
-      serializedShadowDom: true
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
         <!--r.1-->
         <cmp-b>
-          <shadow-root>
+          <mock:shadow-root>
             <header></header>
             <slot></slot>
-          </shadow-root>
+          </mock:shadow-root>
         </cmp-b>
       </cmp-a>
     `);
@@ -217,17 +215,16 @@ describe('hydrate, shadow child', () => {
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true,
-      serializedShadowDom: true
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
         <!--r.1-->
         <cmp-b>
-          <shadow-root>
+          <mock:shadow-root>
             shadow-header
             <slot></slot>
-          </shadow-root>
+          </mock:shadow-root>
         </cmp-b>
       </cmp-a>
     `);
@@ -286,10 +283,10 @@ describe('hydrate, shadow child', () => {
       <cmp-a>
         <!--r.1-->
         <cmp-b>
-          <shadow-root>
+          <mock:shadow-root>
             <header></header>
             <slot></slot>
-          </shadow-root>
+          </mock:shadow-root>
           <!---->
           light-dom
         </cmp-b>
@@ -345,19 +342,18 @@ describe('hydrate, shadow child', () => {
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true,
-      serializedShadowDom: true
     });
 
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a>
         <!--r.1-->
         <cmp-b>
-          <shadow-root>
+          <mock:shadow-root>
             shadow-header
             <footer>
               shadow-footer
             </footer>
-          </shadow-root>
+          </mock:shadow-root>
         </cmp-b>
       </cmp-a>
     `);
@@ -418,11 +414,11 @@ describe('hydrate, shadow child', () => {
       <cmp-a>
         <!--r.1-->
         <cmp-b>
-          <shadow-root>
+          <mock:shadow-root>
             <header></header>
             <slot></slot>
             <footer></footer>
-          </shadow-root>
+          </mock:shadow-root>
           <!---->
           light-dom
         </cmp-b>
@@ -510,20 +506,20 @@ describe('hydrate, shadow child', () => {
       <cmp-a>
         <!--r.1-->
         <cmp-b>
-          <shadow-root>
+          <mock:shadow-root>
             <section>
               <slot></slot>
             </section>
-          </shadow-root>
+          </mock:shadow-root>
           <!---->
           cmp-b-top-text
           <!---->
           <cmp-c>
-            <shadow-root>
+            <mock:shadow-root>
               <article>
                 cmp-c
               </article>
-            </shadow-root>
+            </mock:shadow-root>
           </cmp-c>
         </cmp-b>
       </cmp-a>
@@ -554,11 +550,11 @@ describe('hydrate, shadow child', () => {
 
     expect(page.root).toEqualHtml(`
       <cmp-a>
-        <shadow-root>
+        <mock:shadow-root>
           <div>
             Shadow Content
           </div>
-        </shadow-root>
+        </mock:shadow-root>
         Light Content
       </cmp-a>
     `);
