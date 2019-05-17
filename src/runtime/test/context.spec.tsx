@@ -28,7 +28,7 @@ describe('context', () => {
     expect(rootInstance.doc).toEqual(doc);
     expect(rootInstance.isServer).toEqual(false);
     expect(rootInstance.isPrerender).toEqual(false);
-    expect(rootInstance.isClient).toEqual(false);
+    expect(rootInstance.isClient).toEqual(true);
     expect(rootInstance.resourcesUrl).toEqual('/');
     expect(rootInstance.publicPath).toEqual('/');
     expect(rootInstance.queue.write).toEqual(writeTask);
