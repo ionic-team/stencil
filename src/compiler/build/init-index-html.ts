@@ -188,17 +188,22 @@ const APP_LOADING_HTML = `
 
     setInterval(function() {
       try {
+        var url = window.location.pathname + '?' + Math.random();
         var xhr = new XMLHttpRequest();
         xhr.addEventListener('load', function() {
           try {
-            if (this.responseText.indexOf('app-dev-first-build-loader') === -1) {
-              window.location.reload(true);
+            if (this.status < 300) {
+              if (this.responseText.indexOf('app-dev-first-build-loader') === -1) {
+                window.location.reload(true);
+              }
+            } else if (window.location.pathname !== '/') {
+              url = '/' + Math.random();
             }
+
           } catch (e) {
             console.error(e);
           }
         });
-        var url = window.location.pathname + '?' + Math.random();
         xhr.open('GET', url);
         xhr.send();
       } catch (e) {
