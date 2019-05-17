@@ -28,7 +28,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
   if (opts.hydrateServerSide) {
     platform.supportsShadowDom = false;
   } else {
-    if (opts.serializedShadowDom === false) {
+    if (opts.supportsShadowDom === false) {
       platform.supportsShadowDom = false;
     } else {
       platform.supportsShadowDom = true;
