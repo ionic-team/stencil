@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { appReset } from './app-update';
 import { DEV_SERVER_INIT_URL } from '../dev-server-utils';
 import { initClientWebSocket } from './client-web-socket';
+import { initFavIcons } from './build-status';
 
 
 export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig) {
@@ -12,6 +13,8 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
       return;
     }
     win['s-dev-server'] = true;
+
+    initFavIcons(doc);
 
     if (isInitialDevServerLoad(win, config)) {
       win['s-initial-load'] = true;

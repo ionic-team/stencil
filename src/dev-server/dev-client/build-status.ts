@@ -10,38 +10,27 @@ export function updateBuildStatus(doc: Document, status: 'pending' | 'error' | '
 
 
 export function updateFavIcon(linkElm: HTMLLinkElement, status: 'pending' | 'error' | 'disabled' | 'default') {
-  if (status === 'default') {
+  if (status === 'pending') {
+    linkElm.href = ICON_PENDING;
+    linkElm.type = ICON_TYPE;
+
+  } else if (status === 'error') {
+    linkElm.href = ICON_ERROR;
+    linkElm.type = ICON_TYPE;
+
+  } else if (status === 'disabled') {
+    linkElm.href = ICON_DISABLED;
+    linkElm.type = ICON_TYPE;
+
+  } else {
     if (linkElm.dataset.href) {
       linkElm.href = linkElm.dataset.href;
       linkElm.type = linkElm.dataset.type;
-      delete linkElm.dataset.href;
-      delete linkElm.dataset.type;
 
     } else {
       linkElm.href = ICON_DEFAULT;
       linkElm.type = ICON_TYPE;
     }
-
-  } else {
-    if (linkElm.href !== ICON_DEFAULT && linkElm.href !== ICON_PENDING && linkElm.href !== ICON_ERROR && linkElm.href !== ICON_DISABLED) {
-      linkElm.dataset.href = linkElm.href;
-      linkElm.dataset.type = linkElm.type;
-    }
-    switch (status) {
-      case 'pending':
-        linkElm.href = ICON_PENDING;
-        break;
-      case 'error':
-        linkElm.href = ICON_ERROR;
-        break;
-      case 'disabled':
-        linkElm.href = ICON_DISABLED;
-        break;
-      default:
-        linkElm.href = ICON_DEFAULT;
-    }
-
-    linkElm.type = ICON_TYPE;
   }
 }
 
@@ -64,6 +53,18 @@ function getFavIcons(doc: Document) {
   }
 
   return iconElms;
+}
+
+
+export function initFavIcons(doc: Document) {
+  const iconElms = getFavIcons(doc);
+
+  iconElms.forEach(iconElm => {
+    if (iconElm.href) {
+      iconElm.dataset.href = iconElm.href;
+      iconElm.dataset.type = iconElm.type;
+    }
+  });
 }
 
 
