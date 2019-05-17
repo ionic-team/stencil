@@ -165,6 +165,7 @@ export interface RollupConfig {
 export interface RollupInputOptions {
   context?: string;
   moduleContext?: ((id: string) => string) | { [id: string]: string };
+  treeshake?: boolean;
 }
 
 export interface RollupOutputOptions {

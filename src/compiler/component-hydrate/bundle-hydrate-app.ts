@@ -12,7 +12,10 @@ import { stencilHydratePlugin } from '../rollup-plugins/stencil-hydrate';
 
 export async function bundleHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, appEntryCode: string) {
   try {
+    const treeshake = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false;
     const rollupOptions: RollupOptions = {
+      ...config.rollupConfig.inputOptions,
+
       input: '@app-entry',
       inlineDynamicImports: true,
       plugins: [
@@ -38,11 +41,7 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
         }),
         ...config.plugins
       ],
-      treeshake: {
-        annotations: true,
-        propertyReadSideEffects: false,
-        pureExternalModules: false
-      },
+      treeshake,
       cache: compilerCtx.rollupCacheHydrate,
       onwarn: createOnWarnFn(buildCtx.diagnostics),
     };

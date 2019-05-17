@@ -17,7 +17,10 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
     : [];
 
   try {
+    const treeshake = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false;
     const rollupOptions: RollupOptions = {
+      ...config.rollupConfig.inputOptions,
+
       input: bundleAppOptions.inputs,
       plugins: [
         stencilExternalRuntimePlugin(bundleAppOptions.externalRuntime),
@@ -47,11 +50,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         }),
         ...config.plugins
       ],
-      treeshake: config.devMode ? false : {
-        annotations: true,
-        propertyReadSideEffects: false,
-        pureExternalModules: false
-      },
+      treeshake,
       cache: bundleAppOptions.cache,
       onwarn: createOnWarnFn(buildCtx.diagnostics),
       external
