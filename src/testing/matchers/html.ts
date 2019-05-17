@@ -2,6 +2,14 @@ import { NODE_TYPES, parseHtmlToFragment, serializeNodeToHtml } from '@mock-doc'
 
 
 export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqual: string) {
+  return compareHtml(input, shouldEqual, true);
+}
+
+export function toEqualLightHtml(input: string | HTMLElement | ShadowRoot, shouldEqual: string) {
+  return compareHtml(input, shouldEqual, false);
+}
+
+export function compareHtml(input: string | HTMLElement | ShadowRoot,  shouldEqual: string, serializeShadowRoot: boolean) {
   if (input == null) {
     throw new Error(`expect toEqualHtml() value is "${input}"`);
   }
@@ -17,7 +25,7 @@ export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqua
       prettyHtml: true,
       outerHtml: true,
       excludeTags: ['body'],
-      serializeShadowRoot: true
+      serializeShadowRoot
     });
 
   } else if ((input as HTMLElement).nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
@@ -25,14 +33,14 @@ export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqua
       prettyHtml: true,
       excludeTags: ['style'],
       excludeTagContent: ['style'],
-      serializeShadowRoot: true
+      serializeShadowRoot
     });
 
   } else if (typeof input === 'string') {
     const parseA = parseHtmlToFragment(input);
     serializeA = serializeNodeToHtml(parseA, {
       prettyHtml: true,
-      serializeShadowRoot: true
+      serializeShadowRoot
     });
 
   } else {
