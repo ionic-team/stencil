@@ -37,6 +37,7 @@ async function bundleTesting() {
       'path',
       'process',
       'puppeteer',
+      'puppeteer-core',
       'readline',
       'rollup',
       'rollup-plugin-commonjs',

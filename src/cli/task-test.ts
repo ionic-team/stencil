@@ -12,10 +12,12 @@ export async function taskTest(config: d.Config) {
 
   if (config.flags && config.flags.e2e) {
     // if it's an e2e test, also make sure we're got
-    // puppeteer modules installed
+    // puppeteer modules installed and if browserExecutablePath is provided don't download Chromium use only puppeteer-core instead
+    const puppeteer = config.testing.browserExecutablePath ? 'puppeteer-core' : 'puppeteer';
+
     ensureModuleIds.push(
       '@types/puppeteer',
-      'puppeteer'
+      puppeteer
     );
 
     if (config.flags.screenshot) {
