@@ -12,7 +12,7 @@ export const getValue = (ref: d.RuntimeRef, propName: string) =>
 export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta) => {
   // check our new property value against our internal value
   const hostRef = getHostRef(ref);
-  const elm = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$hostElement$ : ref as d.HostElement;
+  const elm = BUILD.lazyLoad ? hostRef.$hostElement$ : ref as d.HostElement;
   const oldVal = hostRef.$instanceValues$.get(propName);
   const flags = hostRef.$flags$;
   newVal = parsePropertyValue(newVal, cmpMeta.$members$[propName][0]);
@@ -33,8 +33,8 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           watchMethods.forEach(watchMethodName => {
             try {
               // fire off each of the watch methods that are watching this property
-              (BUILD.lazyLoad || BUILD.hydrateServerSide ? hostRef.$lazyInstance$ : elm as any)[watchMethodName].call(
-                (BUILD.lazyLoad || BUILD.hydrateServerSide ? hostRef.$lazyInstance$ : elm as any),
+              (BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any)[watchMethodName].call(
+                (BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any),
                 newVal,
                 oldVal,
                 propName

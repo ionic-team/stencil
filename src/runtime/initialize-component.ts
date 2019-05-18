@@ -11,7 +11,7 @@ import { fireConnectedCallback } from './connected-callback';
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: d.ComponentConstructor) => {
   // initializeComponent
-  if ((BUILD.lazyLoad || BUILD.style || BUILD.hydrateServerSide) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
+  if ((BUILD.lazyLoad || BUILD.style) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
     // we haven't initialized this element yet
     hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
 
@@ -26,7 +26,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       elm.setAttribute('s-mode', hostRef.$modeName$);
     }
 
-    if (BUILD.lazyLoad || BUILD.hydrateServerSide) {
+    if (BUILD.lazyLoad) {
       // lazy loaded components
       // request the component's implementation to be
       // wired up with the host element

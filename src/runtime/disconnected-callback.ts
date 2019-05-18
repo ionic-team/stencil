@@ -21,8 +21,8 @@ export const disconnectedCallback = (elm: d.HostElement) => {
       cssVarShim.removeHost(elm);
     }
 
-    const instance: any = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm;
-    if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.disconnectedCallback) {
+    const instance: any = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
+    if (BUILD.lazyLoad && BUILD.disconnectedCallback) {
       safeCall(instance, 'disconnectedCallback');
     }
     if (BUILD.cmpDidUnload) {

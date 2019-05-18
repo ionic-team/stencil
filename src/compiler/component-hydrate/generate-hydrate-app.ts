@@ -77,7 +77,7 @@ async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerC
 function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
   const build = getBuildFeatures(cmps) as d.Build;
 
-  build.lazyLoad = false;
+  build.lazyLoad = true;
   build.hydrateClientSide = false;
   build.hydrateServerSide = true;
 
