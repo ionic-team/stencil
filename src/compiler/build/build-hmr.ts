@@ -26,7 +26,7 @@ export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     hmr.excludeHmr = excludeHmr.slice();
   }
 
-  if (buildCtx.hasIndexHtmlChanges) {
+  if (buildCtx.hasHtmlChanges) {
     hmr.indexHtmlUpdated = true;
   }
 

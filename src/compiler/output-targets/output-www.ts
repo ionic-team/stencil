@@ -83,8 +83,9 @@ function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, output
   return compilerCtx.fs.writeFile(hostConfigPath, hostConfigContent);
 }
 
+
 async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) {
-  if (compilerCtx.hasSuccessfulBuild && !buildCtx.hasIndexHtmlChanges) {
+  if (compilerCtx.hasSuccessfulBuild && !buildCtx.hasHtmlChanges) {
     // no need to rebuild index.html if there were no app file changes
     return;
   }

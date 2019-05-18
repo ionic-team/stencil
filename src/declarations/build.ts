@@ -49,7 +49,7 @@ export interface BuildCtx {
   hasCopyChanges: boolean;
   hasError: boolean;
   hasFinished: boolean;
-  hasIndexHtmlChanges: boolean;
+  hasHtmlChanges: boolean;
   hasPrintedResults: boolean;
   hasServiceWorkerChanges: boolean;
   hasScriptChanges: boolean;

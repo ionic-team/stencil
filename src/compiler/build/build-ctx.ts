@@ -31,7 +31,7 @@ export class BuildContext implements d.BuildCtx {
   hasConfigChanges = false;
   hasCopyChanges = false;
   hasFinished = false;
-  hasIndexHtmlChanges = false;
+  hasHtmlChanges = false;
   hasPrintedResults = false;
   hasServiceWorkerChanges = false;
   hasScriptChanges = true;
