@@ -1,8 +1,9 @@
 import * as d from '../../declarations';
 import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
+import { buildError } from '@utils';
 
 
-export function validateTesting(config: d.Config) {
+export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
   const testing = config.testing = config.testing || {};
 
   if (!config.flags || (!config.flags.e2e && !config.flags.spec)) {
@@ -105,7 +106,8 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.allowableMismatchedPixels === 'number') {
     if (testing.allowableMismatchedPixels < 0) {
-      throw new Error(`allowableMismatchedPixels must be a value that is 0 or greater`);
+      const err = buildError(diagnostics);
+      err.messageText = `allowableMismatchedPixels must be a value that is 0 or greater`;
     }
 
   } else {
@@ -114,13 +116,15 @@ export function validateTesting(config: d.Config) {
 
   if (typeof testing.allowableMismatchedRatio === 'number') {
     if (testing.allowableMismatchedRatio < 0 || testing.allowableMismatchedRatio > 1) {
-      throw new Error(`allowableMismatchedRatio must be a value ranging from 0 to 1`);
+      const err = buildError(diagnostics);
+      err.messageText = `allowableMismatchedRatio must be a value ranging from 0 to 1`;
     }
   }
 
   if (typeof testing.pixelmatchThreshold === 'number') {
     if (testing.pixelmatchThreshold < 0 || testing.pixelmatchThreshold > 1) {
-      throw new Error(`pixelmatchThreshold must be a value ranging from 0 to 1`);
+      const err = buildError(diagnostics);
+      err.messageText = `pixelmatchThreshold must be a value ranging from 0 to 1`;
     }
 
   } else {

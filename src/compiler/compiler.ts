@@ -243,6 +243,11 @@ function isValid(config: d.Config): [ boolean, d.Config | null] {
     catchError(diagnostics, e, e.message);
   }
   if (config.logger) {
+    diagnostics.forEach(d => {
+      d.type = 'config';
+      d.header = 'configuration';
+      d.absFilePath = config.configPath;
+    });
     config.logger.printDiagnostics(diagnostics, config.rootDir);
   }
   if (hasError(diagnostics)) {

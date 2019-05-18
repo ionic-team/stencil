@@ -1,11 +1,11 @@
 import * as d from '../../declarations';
-import { normalizePath } from '@utils';
+import { normalizePath, buildError } from '@utils';
 import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 import { URL } from 'url';
 
 
-export function validateDevServer(config: d.Config) {
+export function validateDevServer(config: d.Config, diagnostics: d.Diagnostic[]) {
   if (config.devServer === false || config.devServer === null) {
     return config.devServer = null;
   }
@@ -92,7 +92,8 @@ export function validateDevServer(config: d.Config) {
   setStringConfig(config.devServer, 'basePath', basePath);
 
   if (typeof (config.devServer as any).baseUrl === 'string') {
-    throw new Error(`devServer config "baseUrl" has been renamed to "basePath", and should not include a domain or protocol.`);
+    const err = buildError(diagnostics);
+    err.messageText = `devServer config "baseUrl" has been renamed to "basePath", and should not include a domain or protocol.`;
   }
 
   if (!config.sys.path.isAbsolute(config.devServer.root)) {
@@ -101,7 +102,8 @@ export function validateDevServer(config: d.Config) {
 
   if (config.devServer.excludeHmr) {
     if (!Array.isArray(config.devServer.excludeHmr)) {
-      config.logger.error(`dev server excludeHmr must be an array of glob strings`);
+      const err = buildError(diagnostics);
+      err.messageText = `dev server excludeHmr must be an array of glob strings`;
     }
 
   } else {
