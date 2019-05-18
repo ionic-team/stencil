@@ -23,7 +23,7 @@ module.exports = {
     "^@stencil/core/utils$": path.join(distDir, 'utils'),
     "^@stencil/core$": path.join(distDir, 'testing', 'core')
   },
-  setupTestFrameworkScriptFile: path.join(testingDir, 'jest-setuptestframework.js'),
+  setupFilesAfterEnv: [path.join(testingDir, 'jest-setuptestframework.js')],
   testEnvironment: path.join(testingDir, 'jest-environment.js'),
   testPathIgnorePatterns: [
     '/.stencil',
