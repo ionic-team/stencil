@@ -15,6 +15,8 @@ export const captializeFirstLetter = (str: string) => str.charAt(0).toUpperCase(
 
 export const noop = (): any => { /* noop*/ };
 
+export const isComplexType = (o: any) => ['object', 'function'].includes(typeof o);
+
 export function sortBy<T>(array: T[], prop: ((item: T) => string | number)) {
   return array.slice().sort((a, b) => {
     const nameA = prop(a);

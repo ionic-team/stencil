@@ -57,7 +57,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         }
       }
 
-      if (BUILD.lifecycle) {
+      if (BUILD.lifecycle && BUILD.lazyLoad) {
         // find the first ancestor component (if there is one) and register
         // this component as one of the actively loading child components for its ancestor
         let ancestorComponent = elm;
@@ -80,7 +80,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
 
       // Lazy properties
       // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
-      if (BUILD.prop && !BUILD.hydrateServerSide && cmpMeta.$members$) {
+      if (BUILD.prop && BUILD.lazyLoad && !BUILD.hydrateServerSide && cmpMeta.$members$) {
         Object.entries(cmpMeta.$members$).forEach(([memberName, [memberFlags]]) => {
           if (memberFlags & MEMBER_FLAGS.Prop && elm.hasOwnProperty(memberName)) {
             const value = (elm as any)[memberName];

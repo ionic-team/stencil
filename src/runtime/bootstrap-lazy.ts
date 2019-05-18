@@ -7,7 +7,7 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
-import { HYDRATE_ID, PLATFORM_FLAGS } from './runtime-constants';
+import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
 
 
@@ -127,7 +127,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
         customElements.define(
           tagName,
-          proxyComponent(HostElement as any, cmpMeta, 1, 0) as any
+          proxyComponent(HostElement as any, cmpMeta, PROXY_FLAGS.isElementConstructor) as any
         );
       }
     }));

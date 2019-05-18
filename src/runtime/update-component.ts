@@ -45,20 +45,20 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
   // has already fired off its lifecycle update then
   // fire off the initial update
   if (BUILD.taskQueue) {
-    writeTask(() => updateComponent(elm, hostRef, cmpMeta, isInitialLoad, instance));
+    writeTask(() => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad));
   } else {
     // syncronuously write DOM
-    updateComponent(elm, hostRef, cmpMeta, isInitialLoad, instance);
+    updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
   }
 };
 
-const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean, instance: any) => {
+const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, instance: any, isInitialLoad: boolean) => {
   // updateComponent
   if (BUILD.updatable && BUILD.taskQueue) {
     hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
   }
 
-  if (BUILD.lifecycle) {
+  if (BUILD.lifecycle && BUILD.lazyLoad) {
     elm['s-lr'] = false;
   }
 
@@ -107,14 +107,14 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
   }
 
   // set that this component lifecycle rendering has completed
-  if (BUILD.lifecycle) {
+  if (BUILD.lifecycle && BUILD.lazyLoad) {
     elm['s-lr'] = true;
   }
   if (BUILD.updatable || BUILD.lazyLoad) {
     hostRef.$flags$ |= HOST_FLAGS.hasRendered;
   }
 
-  if (BUILD.lifecycle && elm['s-rc'].length > 0) {
+  if (BUILD.lifecycle && BUILD.lazyLoad && elm['s-rc'].length > 0) {
     // ok, so turns out there are some child host elements
     // waiting on this parent element to load
     // let's fire off all update callbacks waiting
@@ -155,7 +155,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
         hostRef.$onReadyResolve$(elm);
       }
 
-      if (!ancestorComponent) {
+      if (BUILD.lazyLoad && !ancestorComponent) {
         // on appload
         // we have finish the first big initial render
         doc.documentElement.classList.add(HYDRATED_CLASS);
@@ -184,7 +184,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
 
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up
-    if (BUILD.lifecycle && ancestorComponent) {
+    if (BUILD.lifecycle && BUILD.lazyLoad && ancestorComponent) {
       // ok so this element already has a known ancestor component
       // let's make sure we remove this element from its ancestor's
       // known list of child elements which are actively loading

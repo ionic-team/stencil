@@ -26,6 +26,9 @@ export interface ComponentCompilerFeatures {
   hasMethod: boolean;
   hasMode: boolean;
   hasProp: boolean;
+  hasPropBoolean: boolean;
+  hasPropNumber: boolean;
+  hasPropString: boolean;
   hasPropMutable: boolean;
   hasReflect: boolean;
   hasRenderFn: boolean;

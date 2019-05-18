@@ -5,6 +5,11 @@ export const enum VNODE_FLAGS {
   isHost = 1 << 2,
 }
 
+export const enum PROXY_FLAGS {
+  isElementConstructor = 1 << 0,
+  proxyState = 1 << 1,
+}
+
 export const enum PLATFORM_FLAGS {
   isTmpDisconnected = 1 << 0,
   appLoaded = 1 << 1,

@@ -51,6 +51,9 @@ export interface BuildFeatures {
   watchCallback: boolean;
   member: boolean;
   updatable: boolean;
+  propBoolean: boolean;
+  propNumber: boolean;
+  propString: boolean;
 
   // lifecycle events
   lifecycle: boolean;

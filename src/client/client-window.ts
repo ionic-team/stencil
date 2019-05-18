@@ -6,6 +6,8 @@ export const win = window;
 
 export const doc = document;
 
+export const H = HTMLElement;
+
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
@@ -36,3 +38,5 @@ export const supportsConstructibleStylesheets = BUILD.constructableCSS ? /*@__PU
   } catch (e) {}
   return false;
 })() : false;
+
+export {H as HTMLElement};

@@ -1,11 +1,11 @@
 import * as d from '../declarations';
-import { getHostRef, postUpdateComponent, supportsShadowDom } from '@platform';
+import { supportsShadowDom } from '@platform';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS } from '@utils';
-import { scheduleUpdate } from './update-component';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
 import { proxyComponent } from './proxy-component';
+import { PROXY_FLAGS } from './runtime-constants';
 
 export const attachShadow = (el: HTMLElement) => {
   if (supportsShadowDom) {
@@ -31,26 +31,17 @@ export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompac
   }
 
   Object.assign(Cstr.prototype, {
-    's-init'() {
-      const hostRef = getHostRef(this);
-      if (hostRef.$lazyInstance$) {
-        postUpdateComponent(this, hostRef);
-      }
-    },
-    forceUpdate() {
-      if (BUILD.updatable) {
-        const hostRef = getHostRef(this);
-        scheduleUpdate(
-          this,
-          hostRef,
-          cmpMeta,
-          false
-        );
-      }
-    },
-    componentOnReady() {
-      return getHostRef(this).$onReadyPromise$;
-    },
+    // forceUpdate() {
+    //   if (BUILD.updatable) {
+    //     const hostRef = getHostRef(this);
+    //     scheduleUpdate(
+    //       this,
+    //       hostRef,
+    //       cmpMeta,
+    //       false
+    //     );
+    //   }
+    // },
     connectedCallback() {
       connectedCallback(this, cmpMeta);
     },
@@ -58,5 +49,5 @@ export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompac
       disconnectedCallback(this);
     }
   });
-  return proxyComponent(Cstr, cmpMeta, 1, 1);
+  return proxyComponent(Cstr, cmpMeta, PROXY_FLAGS.isElementConstructor || PROXY_FLAGS.proxyState);
 };

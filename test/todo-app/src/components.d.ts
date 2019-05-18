@@ -14,7 +14,6 @@ export namespace Components {
   interface TodoInput {}
   interface TodoItem {
     'checked': boolean;
-    'index': number;
     'text': string;
   }
 }
@@ -26,34 +25,30 @@ declare namespace LocalJSX {
   }
   interface TodoItem extends JSXBase.HTMLAttributes {
     'checked'?: boolean;
-    'index'?: number;
     'onItemCheck'?: (event: CustomEvent<any>) => void;
     'onItemRemove'?: (event: CustomEvent<any>) => void;
     'text'?: string;
   }
 
-  interface ElementInterfaces {
-    'AppRoot': Components.AppRoot;
-    'TodoInput': Components.TodoInput;
-    'TodoItem': Components.TodoItem;
-  }
-
   interface IntrinsicElements {
-    'AppRoot': LocalJSX.AppRoot;
-    'TodoInput': LocalJSX.TodoInput;
-    'TodoItem': LocalJSX.TodoItem;
+    'app-root': AppRoot;
+    'todo-input': TodoInput;
+    'todo-item': TodoItem;
   }
 }
+
 export { LocalJSX as JSX };
+
 
 declare module "@stencil/core" {
   export namespace JSX {
-    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
     interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
   }
 }
 
+
 declare global {
+
 
 
   interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
@@ -73,16 +68,13 @@ declare global {
     prototype: HTMLTodoItemElement;
     new (): HTMLTodoItemElement;
   };
-  interface HTMLElementTagNameMap {
-    'app-root': HTMLAppRootElement
-    'todo-input': HTMLTodoInputElement
-    'todo-item': HTMLTodoItemElement
-  }
 
-  interface ElementTagNameMap {
+  interface HTMLElementTagNameMap {
     'app-root': HTMLAppRootElement;
     'todo-input': HTMLTodoInputElement;
     'todo-item': HTMLTodoItemElement;
   }
+
+  interface ElementTagNameMap extends HTMLElementTagNameMap {}
 }
 
