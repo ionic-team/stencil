@@ -25,6 +25,7 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
     if (hashedFile) {
       script.setAttribute('src', config.sys.path.join(resourcesUrl, hashedFile));
       script.setAttribute('data-resources-url', resourcesUrl);
+      script.setAttribute('data-namespace', config.fsNamespace);
       return true;
     }
     return false;
@@ -46,6 +47,7 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
   const inlinedScript = doc.createElement('script');
   inlinedScript.setAttribute('type', 'module');
   inlinedScript.setAttribute('data-resources-url', resourcesUrl);
+  inlinedScript.setAttribute('data-namespace', config.fsNamespace);
   inlinedScript.innerHTML = content;
   doc.body.appendChild(inlinedScript);
 
