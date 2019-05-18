@@ -261,6 +261,7 @@ export namespace JSXBase {
   }
 
   export interface DialogHTMLAttributes<T> extends HTMLAttributes<T> {
+    onClose?: (event: Event) => void;
     open?: boolean;
     returnValue?: string;
   }
