@@ -11,12 +11,12 @@ export class TodoInput {
   render() {
     const value = this.value;
     return (
-      <form onSubmit={() => {
+      <form onSubmit={(ev) => {
         if (value) {
+          ev.preventDefault();
           this.inputSubmit.emit(value);
           this.value = '';
         }
-        return false;
       }}>
         <input
           class="new-todo"

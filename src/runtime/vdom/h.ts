@@ -18,23 +18,20 @@ import { isComplexType } from '@utils';
 export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.VNode => {
   let simple = false;
   let lastSimple = false;
-  const vNodeChildren: d.VNode[] = [];
+  let vNodeChildren: d.VNode[] = [];
   children.flat().forEach(child => {
     if (child != null) {
-      if ((simple = typeof nodeName !== 'function')) {
-        if (isComplexType(child)) {
-          simple = false;
-        } else {
-          child = String(child);
-        }
+      if (simple = typeof nodeName !== 'function' && !isComplexType(child)) {
+        child = String(child);
       }
 
       if (simple && lastSimple) {
+        // If the previous child was simple (string), we merge both
         vNodeChildren[vNodeChildren.length - 1].$text$ += child;
       } else {
+        // Append a new vNode, if it's text, we create a text vNode
         vNodeChildren.push(simple ? { $flags$: 0, $text$: child } : child);
       }
-
       lastSimple = simple;
     }
   });
@@ -53,13 +50,13 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
 
   if (BUILD.vdomFunctional && typeof nodeName === 'function') {
     // nodeName is a functional component
-    return (nodeName as d.FunctionalComponent<any>)(vnodeData, vNodeChildren || [], vdomFnUtils) as any;
+    return (nodeName as d.FunctionalComponent<any>)(vnodeData, vNodeChildren, vdomFnUtils) as any;
   }
 
   const vnode: d.VNode = {
     $flags$: 0,
     $tag$: nodeName,
-    $children$: vNodeChildren.length > 0 ? vNodeChildren : null,
+    $children$: vNodeChildren.length > 0 ? vNodeChildren : undefined,
     $elm$: undefined,
     $attrs$: vnodeData,
   };

@@ -25,7 +25,8 @@ let isSvgMode = false;
 
 
 const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode) => {
-  const newVNode = newParentVNode.$children$[childIndex];
+  // tslint:disable-next-line: prefer-const
+  let newVNode = newParentVNode.$children$[childIndex];
   let i = 0;
   let elm: d.RenderNode;
   let childNode: d.RenderNode;
@@ -352,14 +353,11 @@ export const isSameVnode = (vnode1: d.VNode, vnode2: d.VNode) => {
 };
 
 const referenceNode = (node: d.RenderNode) => {
-  if (node && node['s-ol']) {
-    // this node was relocated to a new location in the dom
-    // because of some other component's slot
-    // but we still have an html comment in place of where
-    // it's original location was according to it's original vdom
-    return node['s-ol'];
-  }
-  return node;
+  // this node was relocated to a new location in the dom
+  // because of some other component's slot
+  // but we still have an html comment in place of where
+  // it's original location was according to it's original vdom
+  return node && node['s-ol'];
 };
 
 const parentReferenceNode = (node: d.RenderNode) => (node['s-ol'] ? node['s-ol'] : node).parentNode;
@@ -420,14 +418,11 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
   } else if (BUILD.vdomText && oldVNode.$text$ !== newVNode.$text$) {
     // update the text content for the text only vnode
     // and also only if the text is different than before
-    elm.textContent = newVNode.$text$;
+    elm.data = newVNode.$text$;
   }
 
-  if (BUILD.svg) {
-    // reset svgMode when svg node is fully patched
-    if (isSvgMode && 'svg' === newVNode.$tag$) {
-      isSvgMode = false;
-    }
+  if (BUILD.svg && isSvgMode && newVNode.$tag$ === 'svg') {
+    isSvgMode = false;
   }
 };
 
