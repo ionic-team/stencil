@@ -139,7 +139,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
     if (!(hostRef.$flags$ & HOST_FLAGS.hasLoadedComponent)) {
       hostRef.$flags$ |= HOST_FLAGS.hasLoadedComponent;
 
-      if (BUILD.lazyLoad && BUILD.style) {
+      if (BUILD.lazyLoad && BUILD.style && BUILD.cssAnnotations) {
         // DOM WRITE!
         // add the css class that this element has officially hydrated
         elm.classList.add(HYDRATED_CLASS);

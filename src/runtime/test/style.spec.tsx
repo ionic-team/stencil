@@ -17,6 +17,7 @@ describe('style', () => {
 
     const { root, styles } = await newSpecPage({
       components: [CmpA],
+      includeAnnotations: true,
       html: `<cmp-a></cmp-a>`,
     });
 

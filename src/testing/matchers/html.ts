@@ -1,3 +1,5 @@
+import * as d from '../../declarations';
+
 import { NODE_TYPES, parseHtmlToFragment, serializeNodeToHtml } from '@mock-doc';
 
 
@@ -21,9 +23,11 @@ export function compareHtml(input: string | HTMLElement | ShadowRoot,  shouldEqu
   let serializeA: string;
 
   if ((input as HTMLElement).nodeType === NODE_TYPES.ELEMENT_NODE) {
+    const options = getSpecOptions(input as any);
     serializeA = serializeNodeToHtml((input as any), {
       prettyHtml: true,
       outerHtml: true,
+      removeHtmlComments: options.includeAnnotations === false,
       excludeTags: ['body'],
       serializeShadowRoot
     });
@@ -66,4 +70,12 @@ export function compareHtml(input: string | HTMLElement | ShadowRoot,  shouldEqu
     message: () => 'expect HTML to match',
     pass: true,
   };
+}
+
+function getSpecOptions(el: HTMLElement): Partial<d.NewSpecPageOptions> {
+  if (el && el.ownerDocument && el.ownerDocument.defaultView) {
+    return (el.ownerDocument.defaultView as any)['__stencil_spec_options'] || {};
+  }
+
+  return {};
 }

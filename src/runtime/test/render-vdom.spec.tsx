@@ -65,6 +65,7 @@ describe('render-vdom', () => {
 
     const { root } = await newSpecPage({
       components: [CmpA],
+      includeAnnotations: true,
       html: `<cmp-a>Hello</cmp-a>`,
     });
 

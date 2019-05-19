@@ -28,6 +28,7 @@ describe('shadow', () => {
   it('render with shadow-dom enabled', async () => {
     const page = await newSpecPage({
       components: [CmpA],
+      includeAnnotations: true,
       html: `
       <cmp-a>
         <span slot="end">End</span>
@@ -76,6 +77,7 @@ describe('shadow', () => {
     const page = await newSpecPage({
       components: [CmpA],
       supportsShadowDom: false,
+      includeAnnotations: true,
       html: `
       <cmp-a>
         <span slot="end">End</span>
@@ -104,5 +106,38 @@ describe('shadow', () => {
     expect(page.root).toEqualHtml(expected);
     expect(page.root).toEqualLightHtml(expected);
   });
+
+  it('render scoped html with shadow-dom disabled without annotations', async () => {
+    const page = await newSpecPage({
+      components: [CmpA],
+      supportsShadowDom: false,
+      html: `
+      <cmp-a>
+        <span slot="end">End</span>
+        Text
+        <span slot="start">Start</span>
+      </cmp-a>`,
+    });
+
+    const expected = `
+    <cmp-a>
+      <div>
+        <span slot=\"start\">
+          Start
+        </span>
+        <span>
+          Text
+        </span>
+        <div class='end'>
+          <span slot=\"end\">
+            End
+          </span>
+        </div>
+      </div>
+    </cmp-a>`;
+    expect(page.root).toEqualHtml(expected);
+    expect(page.root).toEqualLightHtml(expected);
+  });
+
 
 });

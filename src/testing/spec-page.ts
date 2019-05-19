@@ -25,19 +25,27 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
   platform.registerContext(opts.context);
   platform.registerComponents(opts.components);
 
+
+  if (opts.hydrateClientSide) {
+    opts.includeAnnotations = true;
+  }
   if (opts.hydrateServerSide) {
+    opts.includeAnnotations = true;
     platform.supportsShadowDom = false;
   } else {
+    opts.includeAnnotations = !!opts.includeAnnotations;
     if (opts.supportsShadowDom === false) {
       platform.supportsShadowDom = false;
     } else {
       platform.supportsShadowDom = true;
     }
   }
+  bc.BUILD.cssAnnotations = opts.includeAnnotations;
 
   const cmpTags = new Set<string>();
 
   const win = platform.win as Window;
+  (win as any)['__stencil_spec_options'] = opts;
   const doc = win.document;
 
   const page: d.SpecPage = {

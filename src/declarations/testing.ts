@@ -499,6 +499,7 @@ export interface NewSpecPageOptions {
   hydrateServerSide?: boolean;
   referrer?: string;
   supportsShadowDom?: boolean;
+  includeAnnotations?: boolean;
   url?: string;
   userAgent?: string;
   autoApplyChanges?: boolean;
