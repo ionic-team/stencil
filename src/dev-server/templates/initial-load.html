@@ -12,6 +12,8 @@
             }
           });
         }
+      }).catch(function(err) {
+        console.error(err.message || err);
       });
     }
   </script>
@@ -33,7 +35,7 @@
     }
     .toast {
       position: absolute;
-      top: 10px;
+      top: 13px;
       right: 10px;
       left: 10px;
       margin: auto;
@@ -123,9 +125,18 @@
       color: #5a5a5a;
       line-height: 1.5;
     }
+    #progress-bar {
+      position: absolute;
+      width: 0;
+      height: 3px;
+      background: #5851ff;
+      transition: width 1s ease-in-out;
+    }
   </style>
 </head>
 <body>
+
+  <div id="progress-bar"></div>
 
   <div class="toast">
     <div class="content">
@@ -146,8 +157,11 @@
     }, 100);
 
     var logOutput = document.getElementById('log-output');
+    var progressBar = document.getElementById('progress-bar');
     window.addEventListener('buildLog', function(ev) {
-      logOutput.innerText = ev.detail.messages.join('\n');
+      var buildLog = ev.detail;
+      logOutput.innerText = buildLog.messages.join('\n');
+      progressBar.style.width = (buildLog.progress * 100) + '%';
     });
   </script>
 

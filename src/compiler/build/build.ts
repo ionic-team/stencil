@@ -6,6 +6,7 @@ import { generateEntryModules } from '../entries/entry-modules';
 import { generateOutputTargets } from '../output-targets';
 import { generateStyles } from '../style/generate-styles';
 import { initIndexHtmls } from './init-index-html';
+import { ProgressTask } from './build-ctx';
 import { transpileApp } from '../transpile/transpile-app';
 import { waitForCopyTasks } from '../copy/copy-tasks';
 import { writeBuildFiles } from './write-build';
@@ -36,6 +37,8 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     buildCtx.hasScriptChanges = await transpileApp(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
 
+    buildCtx.progress(ProgressTask.transpileApp);
+
     if (config.srcIndexHtml) {
       const hasIndex = await compilerCtx.fs.access(config.srcIndexHtml);
       if (hasIndex) {
@@ -49,6 +52,8 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     generateEntryModules(config, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
 
+    buildCtx.progress(ProgressTask.generateEntryModules);
+
     // start copy tasks from the config.copy and component assets
     // but don't wait right now (running in worker)
     buildCtx.skipAssetsCopy = canSkipAssetsCopy(config, compilerCtx, buildCtx.entryModules, buildCtx.filesChanged);
@@ -57,9 +62,13 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     buildCtx.stylesPromise = generateStyles(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
 
+    buildCtx.progress(ProgressTask.transpileApp);
+
     // generate the core app files
     await generateOutputTargets(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
+
+    buildCtx.progress(ProgressTask.generateOutputTargets);
 
     // wait on some promises we kicked off earlier
     await Promise.all([
@@ -75,9 +84,13 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     ]);
     if (buildCtx.hasError) return buildCtx.abort();
 
+    buildCtx.progress(ProgressTask.validateTypesBuild);
+
     // write all the files and copy asset files
     await writeBuildFiles(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
+
+    buildCtx.progress(ProgressTask.validateTypesBuild);
 
   } catch (e) {
     // ¯\_(ツ)_/¯

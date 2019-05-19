@@ -27,22 +27,18 @@ export interface BuildCtx {
   collections: d.Collection[];
   components: d.ComponentCompilerMeta[];
   componentGraph: Map<string, string[]>;
-  moduleFiles: d.Module[];
-  entryModules: d.EntryModule[];
-  indexDoc: Document;
-  packageJson: d.PackageJsonData;
   createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
   data: any;
   debug: (msg: string) => void;
   diagnostics: d.Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
+  entryModules: d.EntryModule[];
   filesAdded: string[];
   filesChanged: string[];
   filesDeleted: string[];
   filesUpdated: string[];
   filesWritten: string[];
-  skipAssetsCopy: boolean;
   finish(): Promise<BuildResults>;
   globalStyle: string | undefined;
   hasConfigChanges: boolean;
@@ -57,11 +53,17 @@ export interface BuildCtx {
   hasWarning: boolean;
   hydrateAppFilePath: string;
   indexBuildCount: number;
+  indexDoc: Document;
   isRebuild: boolean;
+  moduleFiles: d.Module[];
+  packageJson: d.PackageJsonData;
+  pendingCopyTasks: Promise<d.CopyResults>[];
+  progress(task: BuildTask): void;
   requiresFullBuild: boolean;
   rollupResults?: RollupResults;
   scriptsAdded: string[];
   scriptsDeleted: string[];
+  skipAssetsCopy: boolean;
   startTime: number;
   styleBuildCount: number;
   stylesPromise: Promise<void>;
@@ -69,10 +71,9 @@ export interface BuildCtx {
   timeSpan: d.LoggerTimeSpan;
   timestamp: string;
   transpileBuildCount: number;
-  pendingCopyTasks: Promise<d.CopyResults>[];
+  validateTypesBuild?(): Promise<void>;
   validateTypesHandler?: (results: d.ValidateTypesResults) => Promise<void>;
   validateTypesPromise?: Promise<d.ValidateTypesResults>;
-  validateTypesBuild?(): Promise<void>;
 }
 
 
@@ -82,10 +83,11 @@ export interface BuildStyleUpdate {
   styleMode: string;
 }
 
-
+export type BuildTask = any;
 
 export interface BuildLog {
   messages: string[];
+  progress: number;
 }
 
 
