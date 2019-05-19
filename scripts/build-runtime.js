@@ -168,9 +168,16 @@ async function createDts() {
     path.join(SRC_DIR, 'declarations', 'vdom.ts')
   ];
 
+  const JSX = `
+declare namespace LocalJSX {
+  interface Element {}
+  interface IntrinsicElements {}
+}
+export { LocalJSX as JSX };
+`;
   const declarationsFileContents = declarationSrcFiles
     .map(sf => fs.readFileSync(sf, { encoding: 'utf8'} ).toString())
-    .join('\n');
+    .join('\n') + JSX;
 
   const declarationsFilePath = path.join(DIST_CLIENT_DIR, 'declarations', 'stencil.core.d.ts');
 
