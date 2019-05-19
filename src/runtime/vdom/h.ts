@@ -18,6 +18,8 @@ import { isComplexType } from '@utils';
 export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.VNode => {
   let simple = false;
   let lastSimple = false;
+  let key: string;
+  let slotName: string;
   let vNodeChildren: d.VNode[] = [];
   children.flat().forEach(child => {
     if (child != null) {
@@ -35,15 +37,22 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
       lastSimple = simple;
     }
   });
-  if (BUILD.vdomAttribute) {
-    vnodeData = vnodeData || {};
+  if (BUILD.vdomAttribute && vnodeData) {
     // normalize class / classname attributes
+    if (BUILD.vdomKey) {
+      key = vnodeData.key || undefined;
+    }
+    if (BUILD.slotRelocation) {
+      slotName = vnodeData.name;
+    }
     if (BUILD.vdomClass) {
       const classData = vnodeData.className || vnodeData.class;
-      if (classData && typeof classData === 'object') {
-        vnodeData.class = Object.keys(classData)
-          .filter(k => classData[k])
-          .join(' ');
+      if (classData) {
+        vnodeData.class = typeof classData !== 'object'
+          ? classData
+          : Object.keys(classData)
+            .filter(k => classData[k])
+            .join(' ');
       }
     }
   }
@@ -56,15 +65,15 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
   const vnode: d.VNode = {
     $flags$: 0,
     $tag$: nodeName,
-    $children$: vNodeChildren.length > 0 ? vNodeChildren : undefined,
+    $children$: vNodeChildren.length > 0 ? vNodeChildren : null,
     $elm$: undefined,
     $attrs$: vnodeData,
   };
   if (BUILD.vdomKey) {
-    vnode.$key$ = vnodeData.key;
+    vnode.$key$ = key;
   }
   if (BUILD.slotRelocation) {
-    vnode.$name$ = vnodeData.name;
+    vnode.$name$ = slotName;
   }
   return vnode;
 };

@@ -76,7 +76,6 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 
   updateBuildConditionals(config, build);
   build.taskQueue = false;
-  build.observeAttribute = false;
 
   return build;
 }

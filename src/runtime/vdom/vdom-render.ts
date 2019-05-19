@@ -357,7 +357,7 @@ const referenceNode = (node: d.RenderNode) => {
   // because of some other component's slot
   // but we still have an html comment in place of where
   // it's original location was according to it's original vdom
-  return node && node['s-ol'];
+  return (node && node['s-ol']) || node;
 };
 
 const parentReferenceNode = (node: d.RenderNode) => (node['s-ol'] ? node['s-ol'] : node).parentNode;
@@ -418,7 +418,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
   } else if (BUILD.vdomText && oldVNode.$text$ !== newVNode.$text$) {
     // update the text content for the text only vnode
     // and also only if the text is different than before
-    elm.data = newVNode.$text$;
+    elm.textContent = newVNode.$text$;
   }
 
   if (BUILD.svg && isSvgMode && newVNode.$tag$ === 'svg') {
