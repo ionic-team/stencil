@@ -40,6 +40,7 @@ export class CompilerContext implements d.CompilerCtx {
   rootTsFiles: string[] = [];
   tsService: d.TsService = null;
   cachedGlobalStyle: string;
+  styleModeNames = new Set();
 
   constructor(config: d.Config) {
     const cacheFs = (config.enableCache && config.sys.fs != null) ? new InMemoryFileSystem(config.sys.fs, config.sys.path) : null;

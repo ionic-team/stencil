@@ -5,7 +5,7 @@ import { normalizeStyles } from '../../style/normalize-styles';
 import ts from 'typescript';
 
 
-export function parseStaticStyles(config: d.Config, tagName: string, componentFilePath: string, isCollectionDependency: boolean, staticMembers: ts.ClassElement[]) {
+export function parseStaticStyles(config: d.Config, compilerCtx: d.CompilerCtx, tagName: string, componentFilePath: string, isCollectionDependency: boolean, staticMembers: ts.ClassElement[]) {
   const styles: d.StyleCompiler[] = [];
 
   let parsedStyleStr: string = getStaticValue(staticMembers, 'styles');
@@ -22,6 +22,7 @@ export function parseStaticStyles(config: d.Config, tagName: string, componentFi
         compiledStyleTextScopedCommented: null,
         externalStyles: []
       });
+      compilerCtx.styleModeNames.add(DEFAULT_STYLE_MODE);
     }
   }
 
@@ -51,6 +52,7 @@ export function parseStaticStyles(config: d.Config, tagName: string, componentFi
           compiledStyleTextScopedCommented: null,
           externalStyles: externalStyles
         });
+        compilerCtx.styleModeNames.add(modeName);
       }
     });
   }

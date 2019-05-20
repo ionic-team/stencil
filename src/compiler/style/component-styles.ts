@@ -250,7 +250,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 }
 
 
-function getStyleId(cmp: d.ComponentCompilerMeta, modeName: string, isScopedStyles: boolean) {
+export function getStyleId(cmp: d.ComponentCompilerMeta, modeName: string, isScopedStyles: boolean) {
   return `${cmp.tagName}${modeName}${isScopedStyles ? '.sc' : ''}`;
 }
 

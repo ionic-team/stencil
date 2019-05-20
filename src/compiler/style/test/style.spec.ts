@@ -46,6 +46,66 @@ describe('component-styles', () => {
     expect(content).toContain('\\\\2014 \\\\00A0');
   });
 
+  it('should build one component w/ out inline style, and re-compile when adding inline styles', async () => {
+    compiler.config.watch = true;
+    await compiler.fs.writeFiles({
+      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+    });
+    await compiler.fs.commit();
+
+    let r = await compiler.build();
+    expect(r.diagnostics).toHaveLength(0);
+    expect(r.styleBuildCount).toBe(0);
+
+    const rebuildListener = compiler.once('buildFinish');
+
+    await compiler.fs.writeFiles({
+      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styles: 'body { color: green; }' }) export class CmpA {}`,
+    }, { clearFileCache: true });
+    await compiler.fs.commit();
+
+    compiler.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.tsx'));
+
+    r = await rebuildListener;
+    expect(r.diagnostics).toHaveLength(0);
+    expect(r.hmr.inlineStylesUpdated).toHaveLength(1);
+    expect(r.hmr.inlineStylesUpdated[0].styleText).toBe(`body { color: green; }`);
+
+    const content = await compiler.fs.readFile(path.join(root, 'www', 'build', 'cmp-a.entry.js'));
+    expect(content).toContain(`color: green`);
+    expect(r.styleBuildCount).toBe(1);
+  });
+
+  it('should build one component w/ inline style, and re-compile when removing inline styles', async () => {
+    compiler.config.watch = true;
+    await compiler.fs.writeFiles({
+      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styles: 'body { color: green; }' }) export class CmpA {}`,
+    });
+    await compiler.fs.commit();
+
+    let r = await compiler.build();
+    expect(r.diagnostics).toHaveLength(0);
+    expect(r.styleBuildCount).toBe(1);
+
+    const rebuildListener = compiler.once('buildFinish');
+
+    await compiler.fs.writeFiles({
+      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+    }, { clearFileCache: true });
+    await compiler.fs.commit();
+
+    compiler.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.tsx'));
+
+    r = await rebuildListener;
+    expect(r.diagnostics).toHaveLength(0);
+    expect(r.hmr.inlineStylesUpdated).toHaveLength(1);
+    expect(r.hmr.inlineStylesUpdated[0].styleText).toBe(``);
+
+    const content = await compiler.fs.readFile(path.join(root, 'www', 'build', 'cmp-a.entry.js'));
+    expect(content).not.toContain(`color: green`);
+    expect(r.styleBuildCount).toBe(0);
+  });
+
   it('should build one component w/ inline style, and re-compile on module file changes', async () => {
     compiler.config.watch = true;
     await compiler.fs.writeFiles({
@@ -71,6 +131,9 @@ describe('component-styles', () => {
 
     r = await rebuildListener;
     expect(r.diagnostics).toHaveLength(0);
+    expect(r.diagnostics).toHaveLength(0);
+    expect(r.hmr.inlineStylesUpdated).toHaveLength(1);
+    expect(r.hmr.inlineStylesUpdated[0].styleText).toContain(`color: green`);
 
     content = await compiler.fs.readFile(path.join(root, 'www', 'build', 'cmp-a.entry.js'));
     expect(content).toContain(`color: green`);

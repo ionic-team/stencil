@@ -1,9 +1,11 @@
 import * as d from '../../declarations';
 import { generateComponentStyles } from './component-styles';
 import { generateGlobalStyles } from './global-styles';
+import { hasComponentDecoratorStyleChanges, updateLastStyleComponetInputs } from './cached-styles';
+
 
 export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (canSkipGenerateStyles(compilerCtx, buildCtx)) {
+  if (canSkipGenerateStyles(config, compilerCtx, buildCtx)) {
     return;
   }
 
@@ -14,11 +16,13 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
     generateComponentStyles(config, compilerCtx, buildCtx),
   ]);
 
+  updateLastStyleComponetInputs(config, compilerCtx, buildCtx);
+
   timeSpan.finish(`generate styles finished`);
 }
 
 
-function canSkipGenerateStyles(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+function canSkipGenerateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (buildCtx.requiresFullBuild) {
     return false;
   }
@@ -42,7 +46,9 @@ function canSkipGenerateStyles(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx)
           // see if any of the changed scripts are module files
           const moduleFile = compilerCtx.moduleMap.get(filePath);
           if (moduleFile != null && moduleFile.cmps != null) {
-            return moduleFile.cmps.some(cmp => cmp.hasStyle);
+            return moduleFile.cmps.some(cmp => {
+              return cmp.hasStyle || hasComponentDecoratorStyleChanges(config, compilerCtx, cmp);
+            });
           }
           // not a module with a component
           return false;

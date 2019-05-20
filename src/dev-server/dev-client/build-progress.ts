@@ -20,13 +20,15 @@ export function initBuildProgress(win: Window, doc: Document) {
       progressBar = doc.createElement('div');
       progressBar.id = PROGRESS_BAR_ID;
       progressBar.style.position = `absolute`;
+      progressBar.style.top = `0`;
+      progressBar.style.left = `0`;
       progressBar.style.zIndex = `100001`;
       progressBar.style.width = `100%`;
       progressBar.style.height = `2px`;
       progressBar.style.transform = `scaleX(0)`;
       progressBar.style.background = `#5851ff`;
       progressBar.style.transformOrigin = `left center`;
-      progressBar.style.transition = `transform .5s ease-in-out, opacity .5s ease-in`;
+      progressBar.style.transition = `transform .2s ease-in-out, opacity .5s ease-in`;
       (progressBar.style as any).contain = `strict`;
       doc.body.appendChild(progressBar);
     }
@@ -69,7 +71,7 @@ export function initBuildProgress(win: Window, doc: Document) {
         try {
           progressBar.style.opacity = `0`;
         } catch (e) {}
-      }, 750);
+      }, 250);
 
       removeTimerId = setTimeout(() => {
         try {
