@@ -214,6 +214,12 @@ const clientHydrate = (
         }
       }
     }
+  } else if (parentVNode && parentVNode.$tag$ === 'style') {
+    parentVNode.$children$ = [{
+      $index$: '0',
+      $text$: node.textContent,
+      $elm$: node
+    } as any];
   }
 };
 
