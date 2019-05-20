@@ -45,6 +45,10 @@ export function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevCl
 function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
   let shouldWindowReload = false;
 
+  if (hmr.reloadStrategy === 'pageReload') {
+    shouldWindowReload = true;
+  }
+
   if (hmr.indexHtmlUpdated) {
     logReload(`Updated index.html`);
     shouldWindowReload = true;

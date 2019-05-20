@@ -63,7 +63,7 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isDev = !!config.devMode;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting);
   b.profile = !!(config.flags && config.flags.profile);
-  b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.hotReplacement);
+  b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.reloadStrategy === 'hmr');
   b.updatable = (b.updatable || b.hydrateClientSide || b.hotModuleReplacement);
   b.member = (b.member || b.updatable || b.mode || b.lifecycle);
   b.taskQueue = (b.updatable || b.mode || b.lifecycle);

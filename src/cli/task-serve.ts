@@ -15,7 +15,7 @@ export async function taskServe(process: NodeJS.Process, config: d.Config, flags
 
   config.flags.serve = true;
   config.devServer.openBrowser = flags.open;
-  config.devServer.hotReplacement = false;
+  config.devServer.reloadStrategy = null;
   config.devServer.initialLoadUrl = '/';
   config.devServer.websocket = false;
   config.maxConcurrentWorkers = 1;

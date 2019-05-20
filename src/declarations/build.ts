@@ -121,6 +121,7 @@ export interface HotModuleReplacement {
   imagesUpdated?: string[];
   indexHtmlUpdated?: boolean;
   inlineStylesUpdated?: HmrStyleUpdate[];
+  reloadStrategy: d.PageReloadStrategy;
   scriptsAdded?: string[];
   scriptsDeleted?: string[];
   serviceWorkerUpdated?: boolean;
