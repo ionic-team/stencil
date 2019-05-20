@@ -3,6 +3,7 @@ import { appReset } from './app-update';
 import { DEV_SERVER_INIT_URL } from '../dev-server-utils';
 import { initClientWebSocket } from './client-web-socket';
 import { initFavIcons } from './build-status';
+import { initBuildProgress } from './build-progress';
 
 
 export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig) {
@@ -15,6 +16,7 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
     win['s-dev-server'] = true;
 
     initFavIcons(doc);
+    initBuildProgress(win, doc);
 
     if (isInitialDevServerLoad(win, config)) {
       win['s-initial-load'] = true;
