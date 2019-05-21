@@ -14,7 +14,7 @@ export class BuildEvents implements d.BuildEvents {
   subscribe(eventName: 'buildLog', cb: (buildLog: d.BuildLog) => void): Function;
   subscribe(eventName: d.CompilerEventName, cb: Function): Function {
     const evName = getEventName(eventName);
-    const callbacks = this.evCallbacks.get(eventName);
+    const callbacks = this.evCallbacks.get(evName);
 
     if (callbacks == null) {
       this.evCallbacks.set(evName, [cb]);
