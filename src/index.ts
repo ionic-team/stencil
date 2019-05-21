@@ -90,6 +90,11 @@ export declare function writeTask(task: d.RafCallback): void;
 export declare function readTask(task: d.RafCallback): void;
 
 /**
+ * prefetchComponent
+ */
+export declare function prefetchComponent(tagName: string, mode?: string): Promise<void>;
+
+/**
  * Host
  */
 interface HostAttributes {

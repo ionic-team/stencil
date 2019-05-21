@@ -37,6 +37,7 @@ const KEEP_IMPORTS = new Set([
   'getMode',
   'Build',
   'Host',
+  'prefetchComponent',
   'getAssetPath',
   'writeTask',
   'readTask',

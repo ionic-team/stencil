@@ -9,6 +9,7 @@ import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@pla
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS } from './runtime-constants';
 import { postUpdateComponent, scheduleUpdate } from './update-component';
+import { cmpMetaMap } from './initialize-component';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
@@ -18,11 +19,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const customElements = win.customElements;
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
+
+  // Apply user options
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || '/', doc.baseURI).href;
-  if (options.syncQueue) {
-    plt.$flags$ |= PLATFORM_FLAGS.queueSync;
-  }
+  plt.$flags$ |= (options.syncQueue) ? PLATFORM_FLAGS.queueSync : 0;
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
     const styles = doc.querySelectorAll('style[s-id]');
     let globalStyles = '';
@@ -42,6 +43,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         $tagName$: compactMeta[1],
         $members$: compactMeta[2],
         $listeners$: compactMeta[3],
+        $lazyBundleIds$: lazyBundle[0],
       };
       if (BUILD.reflect) {
         cmpMeta.$attrsToReflect$ = [];
@@ -97,12 +99,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           }
         }
 
-        's-hmr'(hmrVersionId: string) {
-          if (BUILD.hotModuleReplacement) {
-            hmrStart(this, cmpMeta, hmrVersionId);
-          }
-        }
-
         forceUpdate() {
           if (BUILD.updatable) {
             const hostRef = getHostRef(this);
@@ -119,19 +115,25 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           return getHostRef(this).$onReadyPromise$;
         }
       };
-      cmpMeta.$lazyBundleIds$ = lazyBundle[0];
-
+      if (BUILD.hotModuleReplacement) {
+        (HostElement.prototype as any)['s-hmr'] = function(hmrVersionId: string) {
+          if (BUILD.hotModuleReplacement) {
+            hmrStart(this, cmpMeta, hmrVersionId);
+          }
+        };
+      }
       if (!exclude.includes(tagName) && !customElements.get(tagName)) {
+        cmpMetaMap.set(tagName, cmpMeta);
         cmpTags.push(tagName);
         customElements.define(
           tagName,
           proxyComponent(HostElement as any, cmpMeta, 1, 0) as any
         );
       }
-    }));
+    })
+  );
 
-  // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
-  visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
+  visibilityStyle.innerHTML = Array.from(cmpMetaMap.keys()) + '{visibility:hidden}.hydrated{visibility:inherit}';
   visibilityStyle.setAttribute('data-styles', '');
   head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
 };

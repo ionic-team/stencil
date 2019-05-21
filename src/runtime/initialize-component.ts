@@ -8,6 +8,16 @@ import { computeMode } from './mode';
 import { getScopeId, registerStyle } from './styles';
 import { fireConnectedCallback } from './connected-callback';
 
+export const cmpMetaMap = new Map<string, d.ComponentRuntimeMeta>();
+
+export const prefetchComponent = async (tagName: string, mode?: string) => {
+  if (BUILD.lazyLoad && !BUILD.hydrateServerSide) {
+    const cmpMeta = cmpMetaMap.get(tagName);
+    if (cmpMeta) {
+      await getConstructor(cmpMeta, mode);
+    }
+  }
+};
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: d.ComponentConstructor) => {
   // initializeComponent
@@ -30,20 +40,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       // lazy loaded components
       // request the component's implementation to be
       // wired up with the host element
-      Cstr = await loadModule(cmpMeta, hostRef, hmrVersionId);
-      if ((BUILD.isDev || BUILD.isDebug) && !Cstr) {
-        throw new Error(`Constructor for "${cmpMeta.$tagName$}#${hostRef.$modeName$}" was not found`);
-      }
-      if (BUILD.member && !Cstr.isProxied) {
-        // we'eve never proxied this Constructor before
-        // let's add the getters/setters to its prototype before
-        // the first time we create an instance of the implementation
-        if (BUILD.watchCallback) {
-          cmpMeta.$watchers$ = Cstr.watchers;
-        }
-        proxyComponent(Cstr, cmpMeta, 0, 1);
-        Cstr.isProxied = true;
-      }
+      Cstr = await getConstructor(cmpMeta, hostRef.$modeName$, hmrVersionId);
 
       // ok, time to construct the instance
       // but let's keep track of when we start and stop
@@ -98,4 +95,22 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
   } else {
     scheduleUpdate(elm, hostRef, cmpMeta, true);
   }
+};
+
+const getConstructor = async (cmpMeta: d.ComponentRuntimeMeta, mode: string, hmrVersionId?: string) => {
+  const Cstr = await loadModule(cmpMeta, mode, hmrVersionId);
+  if ((BUILD.isDev || BUILD.isDebug) && !Cstr) {
+    throw new Error(`Constructor for "${cmpMeta.$tagName$}#${mode}" was not found`);
+  }
+  if (BUILD.member && !Cstr.isProxied) {
+    // we'eve never proxied this Constructor before
+    // let's add the getters/setters to its prototype before
+    // the first time we create an instance of the implementation
+    if (BUILD.watchCallback) {
+      cmpMeta.$watchers$ = Cstr.watchers;
+    }
+    proxyComponent(Cstr, cmpMeta, 0, 1);
+    Cstr.isProxied = true;
+  }
+  return Cstr;
 };

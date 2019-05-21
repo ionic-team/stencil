@@ -1,4 +1,5 @@
 export { bootstrapLazy } from './bootstrap-lazy';
+export { prefetchComponent } from './initialize-component';
 export { proxyNative, attachShadow } from './bootstrap-native';
 export { connectedCallback } from './connected-callback';
 export { createEvent } from './event-emitter';
