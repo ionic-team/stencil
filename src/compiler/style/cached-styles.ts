@@ -177,19 +177,6 @@ function getComponentStylesCacheKey(cmp: d.ComponentCompilerMeta, modeName: stri
 }
 
 
-export function hasComponentDecoratorStyleChanges(config: d.Config, compilerCtx: d.CompilerCtx, cmp: d.ComponentCompilerMeta) {
-  const cacheKey = cmp.tagName;
-  const currentInputHash = getComponentDecoratorStyleHash(config, cmp);
-
-  const lastInputHash = compilerCtx.lastComponentStyleInput.get(cacheKey);
-  if (lastInputHash === currentInputHash) {
-    return false;
-  }
-
-  return true;
-}
-
-
 export function updateLastStyleComponetInputs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (config.watch) {
     compilerCtx.moduleMap.forEach(m => {
