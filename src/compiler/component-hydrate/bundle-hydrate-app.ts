@@ -33,7 +33,8 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
         config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,
-          sourceMap: false
+          sourceMap: false,
+          ...config.commonjs
         }),
         bundleJson(config),
         inMemoryFsRead(config, compilerCtx),
