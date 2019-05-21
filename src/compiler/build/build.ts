@@ -31,6 +31,8 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     await emptyOutputTargets(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
 
+    buildCtx.progress(ProgressTask.emptyOutputTargets);
+
     // async scan the src directory for ts files
     // then transpile them all in one go
     // buildCtx.moduleFiles is populated here
@@ -52,8 +54,6 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     generateEntryModules(config, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
 
-    buildCtx.progress(ProgressTask.generateEntryModules);
-
     // start copy tasks from the config.copy and component assets
     // but don't wait right now (running in worker)
     buildCtx.skipAssetsCopy = canSkipAssetsCopy(config, compilerCtx, buildCtx.entryModules, buildCtx.filesChanged);
@@ -62,7 +62,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     buildCtx.stylesPromise = generateStyles(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
 
-    buildCtx.progress(ProgressTask.transpileApp);
+    buildCtx.progress(ProgressTask.generateStyles);
 
     // generate the core app files
     await generateOutputTargets(config, compilerCtx, buildCtx);
@@ -90,7 +90,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     await writeBuildFiles(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
 
-    buildCtx.progress(ProgressTask.validateTypesBuild);
+    buildCtx.progress(ProgressTask.writeBuildFiles);
 
   } catch (e) {
     // ¯\_(ツ)_/¯

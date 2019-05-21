@@ -86,6 +86,7 @@ export interface BuildStyleUpdate {
 export type BuildTask = any;
 
 export interface BuildLog {
+  buildId: number;
   messages: string[];
   progress: number;
 }
@@ -113,6 +114,7 @@ export interface BuildResults {
   transpileBuildCount: number;
 }
 
+export type BuildStatus = 'pending' | 'error' | 'disabled' | 'default';
 
 export interface HotModuleReplacement {
   componentsUpdated?: string[];

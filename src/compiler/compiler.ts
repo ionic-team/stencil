@@ -116,11 +116,6 @@ export class Compiler implements d.Compiler {
       this.ctx.activeFilesUpdated.length = 0;
 
       // Run Build
-      this.ctx.events.emit('buildLog', {
-        messages: [],
-        progress: 0
-      } as d.BuildLog);
-
       buildResults = await build(this.config, this.ctx, buildCtx);
       didError = buildResults.hasError;
 

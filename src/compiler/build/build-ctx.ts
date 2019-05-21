@@ -64,6 +64,13 @@ export class BuildContext implements d.BuildCtx {
     // print out a good message
     const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${this.config.fsNamespace}, ${this.config.devMode ? 'dev' : 'prod'} mode, started`;
 
+    const buildLog: d.BuildLog = {
+      buildId: this.buildId,
+      messages: [],
+      progress: 0
+    };
+    this.compilerCtx.events.emit('buildLog', buildLog);
+
     // create a timespan for this build
     this.timeSpan = this.createTimeSpan(msg);
 
@@ -85,6 +92,7 @@ export class BuildContext implements d.BuildCtx {
 
       if (!debug && this.compilerCtx.events) {
         const buildLog: d.BuildLog = {
+          buildId: this.buildId,
           messages: this.buildMessages,
           progress: getProgress(this.completedTasks)
         };
@@ -106,10 +114,12 @@ export class BuildContext implements d.BuildCtx {
             timeSpan.finish(finishedMsg, color, bold, newLineSuffix);
 
             if (!debug) {
-              this.compilerCtx.events.emit('buildLog', {
+              const buildLog: d.BuildLog = {
+                buildId: this.buildId,
                 messages: this.buildMessages.slice(),
-                progress: 1
-              } as d.BuildLog);
+                progress: getProgress(this.completedTasks)
+              };
+              this.compilerCtx.events.emit('buildLog', buildLog);
             }
           }
           return timeSpan.duration();
@@ -144,7 +154,16 @@ export class BuildContext implements d.BuildCtx {
   }
 
   async finish() {
-    return buildFinish(this.config, this.compilerCtx, this as any, false);
+    const results = await buildFinish(this.config, this.compilerCtx, this as any, false);
+
+    const buildLog: d.BuildLog = {
+      buildId: this.buildId,
+      messages: this.buildMessages.slice(),
+      progress: 1
+    };
+    this.compilerCtx.events.emit('buildLog', buildLog);
+
+    return results;
   }
 
   progress(t: d.BuildTask) {
@@ -205,11 +224,10 @@ function getProgress(completedTasks: d.BuildTask[]) {
 }
 
 export const ProgressTask = {
+  emptyOutputTargets: {},
   transpileApp: {},
-  generateEntryModules: {},
   generateStyles: {},
   generateOutputTargets: {},
   validateTypesBuild: {},
   writeBuildFiles: {},
-  completed: {}
 };

@@ -5,9 +5,17 @@ import { hmrExternalStyles } from './hmr-external-styles';
 import { hmrImages } from './hmr-images';
 import { hmrInlineStyles } from './hmr-inline-styles';
 import { logBuild, logReload } from './logger';
+import { onBuildResults } from './build-events';
 
 
-export function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.BuildResults) {
+export function initAppUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig) {
+  onBuildResults(win, buildResults => {
+    appUpdate(win, doc, config, buildResults);
+  });
+}
+
+
+function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.BuildResults) {
   try {
     // remove any app errors that may already be showing
     clearDevServerModal(doc);
