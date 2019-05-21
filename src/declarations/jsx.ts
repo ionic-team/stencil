@@ -1,4 +1,9 @@
 
+declare namespace LocalJSX {
+  export interface Element {}
+  export interface IntrinsicElements {}
+}
+export { LocalJSX as JSX };
 
 export namespace JSXBase {
   export interface IntrinsicElements {
