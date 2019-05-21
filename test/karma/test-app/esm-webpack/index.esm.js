@@ -1,3 +1,3 @@
-import { defineCustomElements } from '../../test-dist/loader';
+import { defineCustomElements } from '../../loader';
 
 defineCustomElements(window);
