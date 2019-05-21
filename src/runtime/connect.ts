@@ -9,7 +9,7 @@ export const getConnect = (_ref: d.HostRef, tagName: string) => {
       elm = doc.createElement(tagName) as any;
       doc.body.appendChild(elm);
     }
-    return 'componentOnReady' in elm ? elm.componentOnReady() : Promise.resolve(elm);
+    return typeof elm.componentOnReady === 'function' ? elm.componentOnReady() : Promise.resolve(elm);
   }
 
   function create(...args: any[]) {

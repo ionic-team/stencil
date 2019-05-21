@@ -58,7 +58,8 @@ for (var x = allScripts.length - 1; x >= 0; x--) {
 }
 var resourcesUrl = scriptElm ? scriptElm.getAttribute('data-resources-url') || scriptElm.src : '';
 var start = function() {
-  System.import(new URL('${corePath}', resourcesUrl).pathname);
+  var url = new URL('${corePath}', resourcesUrl);
+  System.import('//' + url.host + url.pathname);
 };
 
 if (win.__stencil_cssshim) {

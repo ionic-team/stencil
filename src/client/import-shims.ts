@@ -15,7 +15,7 @@ export const patchBrowser = async () => {
   // @ts-ignore
   const importMeta = import.meta.url;
   if (importMeta !== '') {
-    return Promise.resolve(new URL('.', importMeta).pathname);
+    return Promise.resolve(new URL('.', importMeta).href);
   } else {
     const scriptElm = Array.from(doc.querySelectorAll('script')).find(s => (
       s.src.includes(`/${NAMESPACE}.esm.js`) ||
@@ -29,7 +29,7 @@ export const patchBrowser = async () => {
       // @ts-ignore
       await import('./polyfills/dom.js');
     }
-    return resourcesUrl.pathname;
+    return resourcesUrl.href;
   }
 };
 
