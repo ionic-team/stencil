@@ -13,7 +13,7 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
   const timespan = buildCtx.createTimeSpan(`bundling components started`);
 
   const cmps = buildCtx.components;
-  const build = getBuildConditionals(config, compilerCtx, cmps);
+  const build = getBuildConditionals(config, cmps);
   const rollupBuild = await bundleLazyApp(config, compilerCtx, buildCtx, build);
   if (buildCtx.hasError) {
     return;
@@ -33,8 +33,8 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
   buildCtx.componentGraph = generateModuleGraph(buildCtx.components, componentBundle);
 }
 
-function getBuildConditionals(config: d.Config, compilerCtx: d.CompilerCtx, cmps: d.ComponentCompilerMeta[]) {
-  const build = getBuildFeatures(compilerCtx.moduleMap, cmps) as d.Build;
+function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
+  const build = getBuildFeatures(cmps) as d.Build;
 
   build.lazyLoad = true;
   build.hydrateServerSide = false;

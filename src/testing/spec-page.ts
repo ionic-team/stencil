@@ -89,10 +89,9 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     return lazyBundleRuntimeMeta;
   });
 
-  const moduleMap = new Map();
-  const cmpCompilerMeta = opts.components.map(Cstr => Cstr.COMPILER_META);
+  const cmpCompilerMeta = opts.components.map(Cstr => Cstr.COMPILER_META as d.ComponentCompilerMeta);
 
-  const cmpBuild = getBuildFeatures(moduleMap, cmpCompilerMeta) as any;
+  const cmpBuild = getBuildFeatures(cmpCompilerMeta) as any;
   Object.keys(cmpBuild).forEach(key => {
     if ((cmpBuild as any)[key] === true) {
       (bc.BUILD as any)[key] = true;
