@@ -94,6 +94,12 @@ export interface BuildLog {
 
 export interface BuildResults {
   buildId: number;
+  buildConditionals: {
+    shadow: boolean;
+    slot: boolean;
+    svg: boolean;
+    vdom: boolean;
+  };
   bundleBuildCount: number;
   components: BuildComponent[];
   diagnostics: d.Diagnostic[];

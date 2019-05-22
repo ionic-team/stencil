@@ -33,7 +33,7 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
   buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());
   buildCtx.components = getComponentsFromModules(buildCtx.moduleFiles);
-  resolveComponentDependencies(buildCtx.components);
+  resolveComponentDependencies(compilerCtx, buildCtx.components);
 
   if (doTranspile && !buildCtx.hasError) {
     // ts changes have happened!!

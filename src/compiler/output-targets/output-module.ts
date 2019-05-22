@@ -35,7 +35,7 @@ export async function generateModuleWebComponents(config: d.Config, compilerCtx:
 
 async function bundleRawComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModule[], externalRuntime: boolean) {
   const cmps = buildCtx.components;
-  const build = getBuildConditionals(config, cmps);
+  const build = getBuildConditionals(config, compilerCtx, cmps);
 
   if (build.mode) {
     const warn = buildWarn(buildCtx.diagnostics);
@@ -67,8 +67,8 @@ async function bundleRawComponents(config: d.Config, compilerCtx: d.CompilerCtx,
 }
 
 
-function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
-  const build = getBuildFeatures(cmps) as d.Build;
+function getBuildConditionals(config: d.Config, compilerCtx: d.CompilerCtx, cmps: d.ComponentCompilerMeta[]) {
+  const build = getBuildFeatures(compilerCtx.moduleMap, cmps) as d.Build;
 
   build.lazyLoad = false;
   build.hydrateClientSide = false;

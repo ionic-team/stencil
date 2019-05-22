@@ -90,10 +90,22 @@ export function getModule(config: d.Config, compilerCtx: d.CompilerCtx, sourceFi
       dtsFilePath: null,
       excludeFromCollection: false,
       externalImports: [],
+      hasVdomAttribute: false,
+      hasVdomClass: false,
+      hasVdomFunctional: false,
+      hasVdomKey: false,
+      hasVdomListener: false,
+      hasVdomRef: false,
+      hasVdomRender: false,
+      hasVdomStyle: false,
+      hasVdomText: false,
+      htmlAttrNames: [],
+      htmlTagNames: [],
       isCollectionDependency: false,
-      localImports: [],
       isLegacy: false,
-      originalCollectionComponentPath: null
+      localImports: [],
+      originalCollectionComponentPath: null,
+      potentialCmpRefs: []
     };
     compilerCtx.moduleMap.set(sourceFilePath, moduleFile);
     return moduleFile;
@@ -110,4 +122,17 @@ export function resetModule(moduleFile: d.Module) {
   moduleFile.isCollectionDependency = false;
   moduleFile.localImports.length = 0;
   moduleFile.originalCollectionComponentPath = null;
+
+  moduleFile.hasVdomAttribute = true;
+  moduleFile.hasVdomClass = true;
+  moduleFile.hasVdomFunctional = true;
+  moduleFile.hasVdomKey = true;
+  moduleFile.hasVdomListener = true;
+  moduleFile.hasVdomRef = true;
+  moduleFile.hasVdomRender = false;
+  moduleFile.hasVdomStyle = true;
+  moduleFile.hasVdomText = true;
+  moduleFile.htmlAttrNames.length = 0;
+  moduleFile.htmlTagNames.length = 0;
+  moduleFile.potentialCmpRefs.length = 0;
 }

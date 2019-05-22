@@ -9,7 +9,7 @@ import { writeHydrateOutputs } from './write-hydrate-outputs';
 export async function generateHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[]) {
   try {
     const cmps = buildCtx.components;
-    const build = getBuildConditionals(config, cmps);
+    const build = getBuildConditionals(config, compilerCtx, cmps);
 
     const appEntryCode = await generateHydrateAppCore(config, compilerCtx, buildCtx);
 
@@ -74,8 +74,8 @@ async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerC
 }
 
 
-function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
-  const build = getBuildFeatures(cmps) as d.Build;
+function getBuildConditionals(config: d.Config, compilerCtx: d.CompilerCtx, cmps: d.ComponentCompilerMeta[]) {
+  const build = getBuildFeatures(compilerCtx.moduleMap, cmps) as d.Build;
 
   build.lazyLoad = true;
   build.hydrateClientSide = false;
