@@ -24,7 +24,7 @@ export function imagePlugin(config: d.Config, buildCtx: d.BuildCtx): Plugin {
 
       try {
         const data = await config.sys.fs.readFile(id, 'base64');
-        if (data.length > MAX_IMAGE_SIZE) {
+        if (config.devMode && data.length > MAX_IMAGE_SIZE) {
           const warn = buildWarn(buildCtx.diagnostics);
           warn.messageText = 'Importing big images will bloat your bundle, please use assets instead.';
           warn.absFilePath = id;

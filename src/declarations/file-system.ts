@@ -60,7 +60,6 @@ export interface FsStats {
 export interface FsReadOptions {
   useCache?: boolean;
   setHash?: boolean;
-  base64?: boolean;
 }
 
 

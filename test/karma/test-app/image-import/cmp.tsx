@@ -1,5 +1,5 @@
 import { Component, h } from '@stencil/core';
-import icon from './icon.svg';
+import stencilLogo from './stencil-logo.svg';
 
 @Component({
   tag: 'image-import'
@@ -9,7 +9,7 @@ export class ImageImport {
   render() {
     return (
       <div>
-        <img src={icon} />
+        <img src={stencilLogo} />
       </div>
     );
   }
