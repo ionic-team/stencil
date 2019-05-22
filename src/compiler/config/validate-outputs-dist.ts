@@ -43,7 +43,7 @@ export function validateOutputTargetDist(config: d.Config) {
     }
 
     if (!path.isAbsolute(outputTarget.esmLoaderPath)) {
-      outputTarget.esmLoaderPath = normalizePath(path.resolve(config.rootDir, outputTarget.esmLoaderPath));
+      outputTarget.esmLoaderPath = normalizePath(path.resolve(outputTarget.dir, outputTarget.esmLoaderPath));
     }
 
     if (!outputTarget.typesDir) {

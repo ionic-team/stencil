@@ -137,16 +137,6 @@ import { JSX } from '@stencil/core';
 export type StencilIntrinsicElement = JSX.IntrinsicElement;
 ```
 
-### Moved loader entrypoint
-
-Now the `loader` entrypoint, useful to register the web components in webpack projects, has been moved outside the `dist` folder.
-By default `loader` will be a sibling of `dist` now:
-
-```diff
-- import { defineCustomElements } from 'my-collection/dist/loader';
-+ import { defineCustomElements } from 'my-collection/loader';
-```
-
 ### Removed: @Listen('event.KEY’)
 
 It's no longer possible to use the `event.KEY` syntax in the `@Listen` decorator in order to only listen for specific key strokes.
