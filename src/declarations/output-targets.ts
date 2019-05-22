@@ -130,6 +130,7 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   esmIndexFile?: string;
   cjsIndexFile?: string;
   systemLoaderFile?: string;
+  legacyLoaderFile?: string;
 }
 
 export interface OutputTargetDistGlobalStyles extends OutputTargetBase {
