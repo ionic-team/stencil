@@ -64,7 +64,7 @@ describe('outputTarget, dist', () => {
       path.join(root, 'User', 'testing', 'dist', 'esm', 'legacy', 'loader.mjs'),
       path.join(root, 'User', 'testing', 'dist', 'esm', 'polyfills', 'index.js'),
 
-      path.join(root, 'User', 'testing',  'loader'),
+      path.join(root, 'User', 'testing', 'dist', 'loader'),
 
       path.join(root, 'User', 'testing', 'dist', 'types'),
 
