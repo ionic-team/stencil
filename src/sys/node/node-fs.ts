@@ -119,9 +119,9 @@ export class NodeFs implements d.FileSystem {
     return fs.readdirSync(dirPath);
   }
 
-  readFile(filePath: string) {
+  readFile(filePath: string, format = 'utf8') {
     return new Promise<string>((resolve, reject) => {
-      fs.readFile(filePath, 'utf8', (err: any, content: any) => {
+      fs.readFile(filePath, format, (err: any, content: any) => {
         if (err) {
           reject(err);
         } else {
@@ -141,8 +141,8 @@ export class NodeFs implements d.FileSystem {
     return fs.existsSync(filePath);
   }
 
-  readFileSync(filePath: string) {
-    return fs.readFileSync(filePath, 'utf8');
+  readFileSync(filePath: string, format = 'utf8') {
+    return fs.readFileSync(filePath, format);
   }
 
   rmdir(dirPath: string) {

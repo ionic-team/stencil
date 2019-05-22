@@ -9,7 +9,7 @@ import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-
 import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
 import { loaderPlugin } from '../rollup-plugins/loader';
 import { stencilExternalRuntimePlugin } from '../rollup-plugins/stencil-external-runtime';
-
+import { imagePlugin } from '../rollup-plugins/image-plugin';
 
 export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleAppOptions: d.BundleAppOptions) {
   const external = bundleAppOptions.skipDeps
@@ -45,6 +45,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
           ...config.commonjs
         }),
         bundleJson(config),
+        imagePlugin(config, buildCtx),
         inMemoryFsRead(config, compilerCtx),
         config.sys.rollup.plugins.replace({
           'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
