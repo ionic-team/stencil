@@ -3,10 +3,6 @@ import { buildWarn, normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
 const mimeTypes: any = {
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.png': 'image/png',
-  '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
 };
 
@@ -40,4 +36,4 @@ export function imagePlugin(config: d.Config, buildCtx: d.BuildCtx): Plugin {
   };
 }
 
-const MAX_IMAGE_SIZE = 10 * 1024; // 10KB
+const MAX_IMAGE_SIZE = 4 * 1024; // 10KB
