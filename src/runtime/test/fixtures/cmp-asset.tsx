@@ -11,6 +11,8 @@ export class CmpAsset {
     return (
       <Host>
         <img src={ getAssetPath(`assets/icons/${this.icon}.png`) } />
+        <img src={ getAssetPath(`https://google.com/`) } />
+
       </Host>
     );
   }
