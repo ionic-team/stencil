@@ -91,7 +91,18 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
 
   const cmpCompilerMeta = opts.components.map(Cstr => Cstr.COMPILER_META as d.ComponentCompilerMeta);
 
-  const cmpBuild = getBuildFeatures(cmpCompilerMeta) as any;
+  const cmpBuild = getBuildFeatures(cmpCompilerMeta);
+  cmpBuild.vdomAttribute = true;
+  cmpBuild.vdomClass = true;
+  cmpBuild.vdomStyle = true;
+  cmpBuild.vdomKey = true;
+  cmpBuild.vdomRef = true;
+  cmpBuild.vdomListener = true;
+  cmpBuild.vdomFunctional = true;
+  cmpBuild.vdomText = true;
+  cmpBuild.slot = true;
+  cmpBuild.svg = true;
+
   Object.keys(cmpBuild).forEach(key => {
     if ((cmpBuild as any)[key] === true) {
       (bc.BUILD as any)[key] = true;
