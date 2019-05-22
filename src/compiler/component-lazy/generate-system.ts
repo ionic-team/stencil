@@ -61,7 +61,7 @@ for (var x = allScripts.length - 1; x >= 0; x--) {
 var resourcesUrl = scriptElm ? scriptElm.getAttribute('data-resources-url') || scriptElm.src : '';
 var start = function() {
   var url = new URL('${corePath}', resourcesUrl);
-  System.import('//' + url.host + url.pathname);
+  System.import(url.href);
 };
 
 if (win.__stencil_cssshim) {
