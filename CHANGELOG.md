@@ -1,3 +1,13 @@
+# 🍷 [1.0.0-beta.5](https://github.com/ionic-team/stencil/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2019-05-22)
+
+
+### Bug Fixes
+
+* **system:** use same scheme ([345fcc7](https://github.com/ionic-team/stencil/commit/345fcc7))
+* generate legacy loader for CDN ([9dde96a](https://github.com/ionic-team/stencil/commit/9dde96a))
+
+
+
 # 🎡 [1.0.0-beta.4](https://github.com/ionic-team/stencil/compare/v1.0.0-beta.2...v1.0.0-beta.4) (2019-05-22)
 
 
