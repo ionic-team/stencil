@@ -13,7 +13,6 @@ export namespace Components {
   interface TodoInput {}
   interface TodoItem {
     'checked': boolean;
-    'index': number;
     'text': string;
   }
 }
@@ -25,7 +24,6 @@ declare namespace LocalJSX {
   }
   interface TodoItem extends JSXBase.HTMLAttributes {
     'checked'?: boolean;
-    'index'?: number;
     'onItemCheck'?: (event: CustomEvent<any>) => void;
     'onItemRemove'?: (event: CustomEvent<any>) => void;
     'text'?: string;

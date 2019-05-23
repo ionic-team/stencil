@@ -8,6 +8,9 @@ export function setComponentBuildConditionals(cmpMeta: d.ComponentCompilerMeta) 
     cmpMeta.hasPropMutable = cmpMeta.properties.some(p => p.mutable);
     cmpMeta.hasReflect = cmpMeta.properties.some(p => p.reflect);
     cmpMeta.hasAttribute = cmpMeta.properties.some(p => typeof p.attribute === 'string');
+    cmpMeta.hasPropBoolean = cmpMeta.properties.some(p => p.type === 'boolean');
+    cmpMeta.hasPropNumber = cmpMeta.properties.some(p => p.type === 'number');
+    cmpMeta.hasPropString = cmpMeta.properties.some(p => p.type === 'string');
   }
 
   if (cmpMeta.states.length > 0) {

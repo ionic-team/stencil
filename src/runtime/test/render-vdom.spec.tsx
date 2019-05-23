@@ -136,6 +136,42 @@ describe('render-vdom', () => {
     expect(error.message).toContain('JSX');
   });
 
+  it('should render nested arrays', async () => {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      @Prop() excitement = '';
+      render() {
+        const jsx = [
+          <h1>H1</h1>,
+          <h2>h2</h2>,
+          [
+            'Outside',
+            <h3>h3</h3>,
+          ]
+        ];
+        return <div>
+          Text0
+          {jsx}
+        </div>;
+      }
+    }
+    const { root } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+    expect(root).toEqualHtml(`
+      <cmp-a>
+        <div>
+          Text0
+          <h1>H1</h1>
+          <h2>h2</h2>
+          Outside
+          <h3>h3</h3>
+        </div>
+      </cmp-a>
+    `);
+  });
+
   describe('ref property', () => {
     it('should set on Host', async () => {
       @Component({ tag: 'cmp-a'})

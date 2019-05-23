@@ -262,6 +262,39 @@ describe('h()', () => {
     expect(vnode.$children$[0].$text$).toEqual('I am a string');
   });
 
+  it('should merge all simple children', () => {
+    const vnode = h('a', null, 'Str0', [12, ['Str2']] as any);
+    expect(vnode.$children$.length).toBe(1);
+    expect(vnode.$children$[0].$text$).toEqual('Str012Str2');
+  });
+
+  it('should walk nested arrays', () => {
+    const vnode = h('a', null, [
+      'Str0',
+      [h('b', null, 'Str1'),
+        ['Str2']
+      ]
+    ]as any);
+
+    expect(vnode.$children$).toEqual([
+      {'$flags$': 0, '$text$': 'Str0'},
+      {
+        '$attrs$': null,
+        '$children$': [
+          {'$flags$': 0, '$text$': 'Str1'}
+        ],
+        '$elm$': undefined,
+        '$flags$': 0,
+        '$key$': undefined,
+        '$name$': undefined,
+        '$tag$': 'b'
+      },
+      {'$flags$': 0, '$text$': 'Str2'}
+    ]);
+
+
+  });
+
   describe('functional components', () => {
 
     it('should receive props, array, and utils as props', async () => {

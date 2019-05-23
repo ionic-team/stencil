@@ -9,7 +9,7 @@
 
 import { BUILD } from '@build-conditionals';
 import { isMemberInElement, plt } from '@platform';
-import { toLowerCase } from '@utils';
+import { isComplexType, toLowerCase } from '@utils';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
 export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, flags: number) => {
@@ -92,7 +92,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   } else {
     // Set property if it exists and it's not a SVG
     const isProp = isMemberInElement(elm, memberName);
-    const isComplex = ['object', 'function'].includes(typeof newValue);
+    const isComplex = isComplexType(newValue);
     if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {
         (elm as any)[memberName] = newValue == null && elm.tagName.indexOf('-') === -1 ? '' : newValue;

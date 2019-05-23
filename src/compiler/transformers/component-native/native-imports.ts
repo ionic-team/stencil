@@ -9,6 +9,7 @@ export function addNativeImports(transformCtx: ts.TransformationContext, compile
     ...COMMON_IMPORTS,
     `attachShadow as ${ATTACH_SHADOW}`,
     `registerHost as ${REGISTER_HOST}`,
+    `HTMLElement`
   ];
   const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
   if (moduleFile && moduleFile.isLegacy) {

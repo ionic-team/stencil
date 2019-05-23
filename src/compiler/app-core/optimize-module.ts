@@ -83,6 +83,10 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
 
   const results = await config.sys.minifyJs(input, opts);
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
+    if (isCore) {
+      results.output = results.output
+        .replace(/disconnectedCallback\(\)\{\}/g, '');
+    }
     await compilerCtx.cache.put(cacheKey, results.output);
   }
 

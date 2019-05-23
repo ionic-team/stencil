@@ -7,6 +7,7 @@ import { scheduleUpdate } from './update-component';
 import { computeMode } from './mode';
 import { getScopeId, registerStyle } from './styles';
 import { fireConnectedCallback } from './connected-callback';
+import { PROXY_FLAGS } from './runtime-constants';
 
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: d.ComponentConstructor) => {
@@ -41,7 +42,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         if (BUILD.watchCallback) {
           cmpMeta.$watchers$ = Cstr.watchers;
         }
-        proxyComponent(Cstr, cmpMeta, 0, 1);
+        proxyComponent(Cstr, cmpMeta, PROXY_FLAGS.proxyState);
         Cstr.isProxied = true;
       }
 
@@ -84,7 +85,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
 
   // we've successfully created a lazy instance
   const ancestorComponent = hostRef.$ancestorComponent$;
-  if (BUILD.lifecycle && ancestorComponent && !ancestorComponent['s-lr'] && ancestorComponent['s-rc']) {
+  if (BUILD.lifecycle && BUILD.lazyLoad && ancestorComponent && !ancestorComponent['s-lr'] && ancestorComponent['s-rc']) {
     // this is the intial load and this component it has an ancestor component
     // but the ancestor component has NOT fired its will update lifecycle yet
     // so let's just cool our jets and wait for the ancestor to continue first
