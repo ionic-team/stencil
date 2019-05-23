@@ -157,7 +157,7 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
   const appUrl = (process.env as d.E2EProcessEnv).__STENCIL_APP_URL__;
   if (typeof appUrl !== 'string') {
     await closePage(page);
-    return 'invalid e2eSetContent() loader script url';
+    return 'invalid e2eSetContent() app script url';
   }
 
   const url = [
