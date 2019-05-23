@@ -1,8 +1,9 @@
 import * as d from '../../declarations';
-import { appReset } from './app-update';
+import { appReset, initAppUpdate } from './app-update';
 import { DEV_SERVER_INIT_URL } from '../dev-server-utils';
+import { initBuildProgress } from './build-progress';
+import { initBuildStatus } from './build-status';
 import { initClientWebSocket } from './client-web-socket';
-import { initFavIcons } from './build-status';
 
 
 export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig) {
@@ -14,7 +15,9 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
     }
     win['s-dev-server'] = true;
 
-    initFavIcons(doc);
+    initBuildStatus(win, doc);
+    initBuildProgress(win, doc);
+    initAppUpdate(win, doc, config);
 
     if (isInitialDevServerLoad(win, config)) {
       win['s-initial-load'] = true;
@@ -26,11 +29,11 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
       // we're doing this so we can force the server
       // worker to unregister, but do not fully reload the page yet
       appReset(win, config).then(() => {
-        initClientWebSocket(win, doc, config);
+        initClientWebSocket(win);
       });
 
     } else {
-      initClientWebSocket(win, doc, config);
+      initClientWebSocket(win);
     }
 
   } catch (e) {

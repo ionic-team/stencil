@@ -118,6 +118,7 @@ export class Compiler implements d.Compiler {
       // Run Build
       buildResults = await build(this.config, this.ctx, buildCtx);
       didError = buildResults.hasError;
+
     } catch (e) {
       console.error(e);
       didError = true;

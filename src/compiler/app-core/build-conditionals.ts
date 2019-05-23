@@ -61,16 +61,63 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
 }
 
 
+export function updateComponentBuildConditionals(moduleMap: d.ModuleMap, cmps: d.ComponentCompilerMeta[]) {
+  cmps.forEach(cmp => {
+    const importedModules = getModuleImports(moduleMap, cmp.sourceFilePath, []);
+    importedModules.forEach(importedModule => {
+      // if the component already has a boolean true value it'll keep it
+      // otherwise we get the boolean value from the imported module
+      cmp.hasVdomAttribute = cmp.hasVdomAttribute || importedModule.hasVdomAttribute;
+      cmp.hasVdomClass = cmp.hasVdomClass || importedModule.hasVdomClass;
+      cmp.hasVdomFunctional = cmp.hasVdomFunctional || importedModule.hasVdomFunctional;
+      cmp.hasVdomKey = cmp.hasVdomKey || importedModule.hasVdomKey;
+      cmp.hasVdomListener = cmp.hasVdomListener || importedModule.hasVdomListener;
+      cmp.hasVdomRef = cmp.hasVdomRef || importedModule.hasVdomRef;
+      cmp.hasVdomRender = cmp.hasVdomRender || importedModule.hasVdomRender;
+      cmp.hasVdomStyle = cmp.hasVdomStyle || importedModule.hasVdomStyle;
+      cmp.hasVdomText = cmp.hasVdomText || importedModule.hasVdomText;
+      cmp.htmlAttrNames.push(...importedModule.htmlAttrNames);
+      cmp.htmlTagNames.push(...importedModule.htmlTagNames);
+      cmp.potentialCmpRefs.push(...importedModule.potentialCmpRefs);
+    });
+  });
+}
+
+
+function getModuleImports(moduleMap: d.ModuleMap, filePath: string, importedModules: d.Module[]) {
+  let moduleFile = moduleMap.get(filePath);
+  if (moduleFile == null) {
+    moduleFile = moduleMap.get(filePath + '.tsx');
+    if (moduleFile == null) {
+      moduleFile = moduleMap.get(filePath + '.ts');
+      if (moduleFile == null) {
+        moduleFile = moduleMap.get(filePath + '.js');
+      }
+    }
+  }
+
+  if (moduleFile != null && !importedModules.some(m => m.sourceFilePath === moduleFile.sourceFilePath)) {
+    importedModules.push(moduleFile);
+
+    moduleFile.localImports.forEach(localImport => {
+      getModuleImports(moduleMap, localImport, importedModules);
+    });
+  }
+  return importedModules;
+}
+
+
 export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isDebug = (config.logLevel === 'debug');
   b.isDev = !!config.devMode;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting);
   b.profile = !!(config.flags && config.flags.profile);
-  b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.hotReplacement);
+  b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.reloadStrategy === 'hmr');
   b.updatable = (b.updatable || b.hydrateClientSide || b.hotModuleReplacement);
   b.member = (b.member || b.updatable || b.mode || b.lifecycle);
   b.taskQueue = (b.updatable || b.mode || b.lifecycle);
   b.constructableCSS = !b.hotModuleReplacement || config._isTesting;
+  b.cssAnnotations = true;
 }
 
 

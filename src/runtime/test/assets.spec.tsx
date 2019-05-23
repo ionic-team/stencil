@@ -14,6 +14,7 @@ describe('assets', () => {
     expect(page.root).toEqualHtml(`
       <cmp-asset icon="delorean">
         <img src="/assets/icons/delorean.png">
+        <img src="https://google.com/">
       </cmp-asset>
     `);
   });

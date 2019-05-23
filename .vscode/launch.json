@@ -87,6 +87,21 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Hello VDom Watch",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--dev",
+        "--serve",
+        "--watch",
+        "--config",
+        "${workspaceFolder}/test/hello-vdom/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Hello World Prerender",
       "args": [
         "${workspaceFolder}/test/hello-world/prerender.js"

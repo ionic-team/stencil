@@ -1,52 +1,41 @@
-import { Component, Host, Prop, h } from '@stencil/core';
+import { Component, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
-describe('hydrate prop types', () => {
+describe('hydrate style element', () => {
 
-  it('number', async () => {
+  it('style element text', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
-      @Prop() num: number;
 
       render() {
-        this.num += 100;
-
         return (
-          <Host>
-            {this.num}
-          </Host>
+          (h as any)('style', null, 'div { color: red; }')
         );
       }
     }
-    // @ts-ignore
     const serverHydrated = await newSpecPage({
       components: [CmpA],
-      html: `<cmp-a num="1"></cmp-a>`,
+      html: `<cmp-a></cmp-a>`,
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" num="1" s-id="1">
+      <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
-        <!--t.1.0.0.0-->
-        101
+        <style c-id="1.0.0.0">div { color: red; }</style>
       </cmp-a>
     `);
 
-    // @ts-ignore
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
       hydrateClientSide: true
     });
-    expect(clientHydrated.root['s-id']).toBe('1');
-    expect(clientHydrated.root['s-cr'].nodeType).toBe(8);
-    expect(clientHydrated.root['s-cr']['s-cn']).toBe(true);
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" num="1">
+      <cmp-a class="hydrated">
         <!--r.1-->
-        101
+        <style>div { color: red; }</style>
       </cmp-a>
     `);
   });

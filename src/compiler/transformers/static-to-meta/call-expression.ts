@@ -4,49 +4,49 @@ import ts from 'typescript';
 import { H } from '../exports';
 
 
-export function parseCallExpression(cmpMeta: d.ComponentCompilerMeta, node: ts.CallExpression) {
+export function parseCallExpression(m: d.Module | d.ComponentCompilerMeta, node: ts.CallExpression) {
   if (node.arguments != null && node.arguments.length > 0) {
 
     if (node.expression.kind === ts.SyntaxKind.Identifier) {
       // h('tag')
-      visitCallExpressionArgs(cmpMeta, node.expression as ts.Identifier, node.arguments);
+      visitCallExpressionArgs(m, node.expression as ts.Identifier, node.arguments);
 
     } else if (node.expression.kind === ts.SyntaxKind.PropertyAccessExpression) {
       // document.createElement('tag')
       if ((node.expression as ts.PropertyAccessExpression).name) {
-        visitCallExpressionArgs(cmpMeta, (node.expression as ts.PropertyAccessExpression).name as ts.Identifier, node.arguments);
+        visitCallExpressionArgs(m, (node.expression as ts.PropertyAccessExpression).name as ts.Identifier, node.arguments);
       }
     }
   }
 }
 
 
-function visitCallExpressionArgs(cmpMeta: d.ComponentCompilerMeta, callExpressionName: ts.Identifier, args: ts.NodeArray<ts.Expression>) {
+function visitCallExpressionArgs(m: d.Module | d.ComponentCompilerMeta, callExpressionName: ts.Identifier, args: ts.NodeArray<ts.Expression>) {
   const fnName = callExpressionName.escapedText as string;
 
   if (fnName === 'h' || fnName === H || fnName === 'createElement') {
-    visitCallExpressionArg(cmpMeta, args[0]);
+    visitCallExpressionArg(m, args[0]);
 
     if (fnName === 'h' || fnName === H) {
-      gatherVdomMeta(cmpMeta, args);
+      gatherVdomMeta(m, args);
     }
 
   } else if (args.length > 1 && fnName === 'createElementNS') {
-    visitCallExpressionArg(cmpMeta, args[1]);
+    visitCallExpressionArg(m, args[1]);
   }
 }
 
 
-function visitCallExpressionArg(cmpMeta: d.ComponentCompilerMeta, arg: ts.Expression) {
+function visitCallExpressionArg(m: d.Module | d.ComponentCompilerMeta, arg: ts.Expression) {
   if (arg.kind === ts.SyntaxKind.StringLiteral) {
     let tag = (arg as ts.StringLiteral).text;
 
     if (typeof tag === 'string') {
       tag = tag.toLowerCase();
-      cmpMeta.htmlTagNames.push(tag);
+      m.htmlTagNames.push(tag);
 
       if (tag.includes('-')) {
-        cmpMeta.potentialCmpRefs.push(tag);
+        m.potentialCmpRefs.push(tag);
       }
     }
   }

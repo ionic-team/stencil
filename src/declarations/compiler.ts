@@ -39,6 +39,7 @@ export interface CompilerCtx {
   rollupCacheLazy: any;
   rollupCacheNative: any;
   rootTsFiles: string[];
+  styleModeNames: Set<string>;
   tsService: TsService;
 
   reset(): void;

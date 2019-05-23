@@ -25,19 +25,27 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
   platform.registerContext(opts.context);
   platform.registerComponents(opts.components);
 
+
+  if (opts.hydrateClientSide) {
+    opts.includeAnnotations = true;
+  }
   if (opts.hydrateServerSide) {
+    opts.includeAnnotations = true;
     platform.supportsShadowDom = false;
   } else {
+    opts.includeAnnotations = !!opts.includeAnnotations;
     if (opts.supportsShadowDom === false) {
       platform.supportsShadowDom = false;
     } else {
       platform.supportsShadowDom = true;
     }
   }
+  bc.BUILD.cssAnnotations = opts.includeAnnotations;
 
   const cmpTags = new Set<string>();
 
   const win = platform.win as Window;
+  (win as any)['__stencil_spec_options'] = opts;
   const doc = win.document;
 
   const page: d.SpecPage = {
@@ -81,9 +89,20 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     return lazyBundleRuntimeMeta;
   });
 
-  const cmpBuild = getBuildFeatures(
-    opts.components.map(Cstr => Cstr.COMPILER_META)
-  ) as any;
+  const cmpCompilerMeta = opts.components.map(Cstr => Cstr.COMPILER_META as d.ComponentCompilerMeta);
+
+  const cmpBuild = getBuildFeatures(cmpCompilerMeta);
+  cmpBuild.vdomAttribute = true;
+  cmpBuild.vdomClass = true;
+  cmpBuild.vdomStyle = true;
+  cmpBuild.vdomKey = true;
+  cmpBuild.vdomRef = true;
+  cmpBuild.vdomListener = true;
+  cmpBuild.vdomFunctional = true;
+  cmpBuild.vdomText = true;
+  cmpBuild.slot = true;
+  cmpBuild.svg = true;
+
   Object.keys(cmpBuild).forEach(key => {
     if ((cmpBuild as any)[key] === true) {
       (bc.BUILD as any)[key] = true;

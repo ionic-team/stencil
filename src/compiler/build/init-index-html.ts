@@ -4,6 +4,12 @@ import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export async function initIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  // The initial loading page connects with the stencil's devServer
+  // If we are building without server, it does not make sense to write the
+  // initial index.html
+  if (!config.devServer) {
+    return;
+  }
   await Promise.all(config.outputTargets.map(async outputTarget => {
     await initIndexHtml(config, compilerCtx, buildCtx, outputTarget);
   }));

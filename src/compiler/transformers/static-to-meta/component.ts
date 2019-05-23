@@ -17,7 +17,7 @@ import ts from 'typescript';
 import { normalizePath, unique } from '@utils';
 
 
-export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) {
+export function parseStaticComponentMeta(config: d.Config, compilerCtx: d.CompilerCtx, transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) {
   if (cmpNode.members == null) {
     return cmpNode;
   }
@@ -46,7 +46,7 @@ export function parseStaticComponentMeta(config: d.Config, transformCtx: ts.Tran
     listeners: parseStaticListeners(staticMembers),
     events: parseStaticEvents(staticMembers),
     watchers: parseStaticWatchers(staticMembers),
-    styles: parseStaticStyles(config, tagName, moduleFile.sourceFilePath, isCollectionDependency, staticMembers),
+    styles: parseStaticStyles(config, compilerCtx, tagName, moduleFile.sourceFilePath, isCollectionDependency, staticMembers),
     legacyConnect: getStaticValue(staticMembers, 'connectProps') || [],
     legacyContext: getStaticValue(staticMembers, 'contextProps') || [],
     internal: isInternal(docs),

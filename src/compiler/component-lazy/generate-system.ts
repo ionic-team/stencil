@@ -31,15 +31,17 @@ function generateSystemLoaders(config: d.Config, compilerCtx: d.CompilerCtx, rol
   const loaderFilename = rollupResult.find(r => r.isBrowserLoader).fileName;
 
   return Promise.all(
-    systemOutputs.map(async o => {
-      if (o.systemLoaderFile) {
-        const entryPointPath = config.sys.path.join(o.systemDir, loaderFilename);
-        const relativePath = relativeImport(config, o.systemLoaderFile, entryPointPath);
-        const loaderContent = await getSystemLoader(config, relativePath, o.polyfills);
-        await compilerCtx.fs.writeFile(o.systemLoaderFile, loaderContent);
-      }
-    })
+    systemOutputs.map((o) => writeSystemLoader(config, compilerCtx, loaderFilename, o))
   );
+}
+
+async function writeSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, loaderFilename: string, outputTarget: d.OutputTargetDistLazy) {
+  if (outputTarget.systemLoaderFile) {
+    const entryPointPath = config.sys.path.join(outputTarget.systemDir, loaderFilename);
+    const relativePath = relativeImport(config, outputTarget.systemLoaderFile, entryPointPath);
+    const loaderContent = await getSystemLoader(config, relativePath, outputTarget.polyfills);
+    await compilerCtx.fs.writeFile(outputTarget.systemLoaderFile, loaderContent);
+  }
 }
 
 async function getSystemLoader(config: d.Config, corePath: string, includePolyfills: boolean) {
@@ -58,7 +60,8 @@ for (var x = allScripts.length - 1; x >= 0; x--) {
 }
 var resourcesUrl = scriptElm ? scriptElm.getAttribute('data-resources-url') || scriptElm.src : '';
 var start = function() {
-  System.import(new URL('${corePath}', resourcesUrl).pathname);
+  var url = new URL('${corePath}', resourcesUrl);
+  System.import(url.href);
 };
 
 if (win.__stencil_cssshim) {

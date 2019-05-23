@@ -26,20 +26,22 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
         stencilBuildConditionalsPlugin(build, config.fsNamespace),
         globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
+        ...config.plugins,
         config.sys.rollup.plugins.nodeResolve({
-          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main']
+          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
+          ...config.nodeResolve
         }),
         config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,
-          sourceMap: false
+          sourceMap: false,
+          ...config.commonjs
         }),
         bundleJson(config),
         inMemoryFsRead(config, compilerCtx),
         config.sys.rollup.plugins.replace({
           'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
         }),
-        ...config.plugins
       ],
       treeshake,
       cache: compilerCtx.rollupCacheHydrate,

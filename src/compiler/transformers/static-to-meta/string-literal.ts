@@ -2,13 +2,13 @@ import * as d from '../../../declarations';
 import ts from 'typescript';
 
 
-export function parseStringLiteral(cmpMeta: d.ComponentCompilerMeta, node: ts.StringLiteral) {
+export function parseStringLiteral(m: d.Module | d.ComponentCompilerMeta, node: ts.StringLiteral) {
   if (typeof node.text === 'string' && node.text.includes('</')) {
     if (node.text.includes('<slot')) {
-      cmpMeta.htmlTagNames.push('slot');
+      m.htmlTagNames.push('slot');
     }
     if (node.text.includes('<svg')) {
-      cmpMeta.htmlTagNames.push('svg');
+      m.htmlTagNames.push('svg');
     }
   }
 }

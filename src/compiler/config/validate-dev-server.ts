@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import { normalizePath, buildError } from '@utils';
-import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
+import { buildError, normalizePath } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
+import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { URL } from 'url';
 
 
@@ -23,8 +23,18 @@ export function validateDevServer(config: d.Config, diagnostics: d.Diagnostic[])
     setNumberConfig(config.devServer, 'port', null, 3333);
   }
 
-  if (typeof config.devServer.hotReplacement !== 'boolean') {
-    config.devServer.hotReplacement = true;
+  if ((config.devServer as any).hotReplacement === true) {
+    // DEPRECATED: 2019-05-20
+    config.devServer.reloadStrategy = 'hmr';
+  } else if ((config.devServer as any).hotReplacement === false || (config.devServer as any).hotReplacement === null) {
+    // DEPRECATED: 2019-05-20
+    config.devServer.reloadStrategy = null;
+  } else {
+    if (config.devServer.reloadStrategy === undefined) {
+      config.devServer.reloadStrategy = 'hmr';
+    } else if (config.devServer.reloadStrategy !== 'hmr' && config.devServer.reloadStrategy !== 'pageReload' && config.devServer.reloadStrategy !== null) {
+      throw new Error(`Invalid devServer reloadStrategy "${config.devServer.reloadStrategy}". Valid configs include "hmr", "pageReload" and null.`);
+    }
   }
 
   setBooleanConfig(config.devServer, 'gzip', null, true);

@@ -56,6 +56,8 @@ function removeScripts(elm: HTMLElement) {
 
     if (child.nodeName === 'SCRIPT') {
       child.remove();
+    } else if (child.nodeName === 'LINK' && child.getAttribute('rel') === 'modulepreload') {
+      child.remove();
     }
   }
 }

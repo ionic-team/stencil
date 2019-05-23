@@ -81,6 +81,7 @@ export interface Build extends Partial<BuildFeatures> {
   hydrateServerSide?: boolean;
   hydrateClientSide?: boolean;
   lifecycleDOMEvents?: boolean;
+  cssAnnotations?: boolean;
   lazyLoad?: boolean;
   profile?: boolean;
   cssVarShim?: boolean;

@@ -1,9 +1,11 @@
 import * as d from '../../declarations';
 import { generateComponentStyles } from './component-styles';
 import { generateGlobalStyles } from './global-styles';
+import { updateLastStyleComponetInputs } from './cached-styles';
+
 
 export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (canSkipGenerateStyles(compilerCtx, buildCtx)) {
+  if (canSkipGenerateStyles(buildCtx)) {
     return;
   }
 
@@ -14,11 +16,13 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
     generateComponentStyles(config, compilerCtx, buildCtx),
   ]);
 
+  updateLastStyleComponetInputs(config, compilerCtx, buildCtx);
+
   timeSpan.finish(`generate styles finished`);
 }
 
 
-function canSkipGenerateStyles(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+function canSkipGenerateStyles(buildCtx: d.BuildCtx) {
   if (buildCtx.requiresFullBuild) {
     return false;
   }
@@ -33,21 +37,7 @@ function canSkipGenerateStyles(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx)
       // this is a rebuild and there are script changes
       // changes to scripts are important too because it could be
       // a change to the style url or style text in the component decorator
-      const hasChangedComponent = buildCtx.filesChanged
-        .filter(filePath => {
-          // get all the changed scripts
-          return filePath.endsWith('.ts') || filePath.endsWith('.tsx') || filePath.endsWith('.js') || filePath.endsWith('.jsx');
-        })
-        .some(filePath => {
-          // see if any of the changed scripts are module files
-          const moduleFile = compilerCtx.moduleMap.get(filePath);
-          if (moduleFile != null && moduleFile.cmps != null) {
-            return moduleFile.cmps.some(cmp => cmp.hasStyle);
-          }
-          // not a module with a component
-          return false;
-        });
-      return !hasChangedComponent;
+      return false;
     }
 
     // cool! There were no changes to any style files

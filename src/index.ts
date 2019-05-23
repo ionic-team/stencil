@@ -10,7 +10,8 @@ export {
   StencilConfig as Config,
   EventEmitter,
   FunctionalComponent,
-  QueueApi
+  QueueApi,
+  JSX
 } from './declarations';
 
 /**
@@ -101,11 +102,6 @@ interface HostAttributes {
 
 export declare const Host: d.FunctionalComponent<HostAttributes>;
 
-declare namespace LocalJSX {
-  interface Element {}
-  interface IntrinsicElements {}
-}
-
 /**
  * The "h" namespace is used to import JSX types for elements and attributes.
  * It is imported in order to avoid conflicting global JSX issues.
@@ -121,10 +117,8 @@ export declare namespace h {
   export function h(sel: any, data: d.VNodeData, children: d.VNode): d.VNode;
 
   export namespace JSX {
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements, d.JSXBase.IntrinsicElements {
+    interface IntrinsicElements extends d.JSX.IntrinsicElements, d.JSXBase.IntrinsicElements {
       [tagName: string]: any;
     }
   }
 }
-
-export { LocalJSX as JSX };

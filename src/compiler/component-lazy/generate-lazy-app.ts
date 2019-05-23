@@ -27,6 +27,7 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
     generateSystem(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
     generateCjs(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
   ]);
+  await generateLegacyLoader(config, compilerCtx, outputTargets);
 
   timespan.finish(`bundling components finished`);
   buildCtx.componentGraph = generateModuleGraph(buildCtx.components, componentBundle);
@@ -115,3 +116,46 @@ export const defineCustomElements = (win, options) => {
   });
 };
 `;
+
+function generateLegacyLoader(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) {
+  return Promise.all(
+    outputTargets.map(async o => {
+      if (o.legacyLoaderFile) {
+        const loaderContent = getLegacyLoader(config);
+        await compilerCtx.fs.writeFile(o.legacyLoaderFile, loaderContent);
+      }
+    })
+  );
+}
+
+
+function getLegacyLoader(config: d.Config) {
+  const namespace = config.fsNamespace;
+  return `
+(function(doc){
+  var scriptElm = doc.scripts[doc.scripts.length - 1];
+  var warn = ['[${namespace}] Deprecated script, please remove: ' + scriptElm.outerHTML];
+
+  warn.push('To improve performance it is recommended to set the differential scripts in the head as follows:')
+
+  var parts = scriptElm.src.split('/');
+  parts.pop();
+  parts.push('${namespace}');
+  var url = parts.join('/');
+
+  var scriptElm = doc.createElement('script');
+  scriptElm.setAttribute('type', 'module');
+  scriptElm.src = url + '/${namespace}.esm.js';
+  doc.head.appendChild(scriptElm);
+  warn.push(scriptElm.outerHTML);
+
+  scriptElm = doc.createElement('script');
+  scriptElm.setAttribute('nomodule', '');
+  scriptElm.src = url + '/${namespace}.js';
+  doc.head.appendChild(scriptElm);
+  warn.push(scriptElm.outerHTML);
+
+  console.warn(warn.join('\\n'));
+
+})(document);`;
+}
