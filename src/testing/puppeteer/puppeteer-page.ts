@@ -157,30 +157,16 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
   const appUrl = (process.env as d.E2EProcessEnv).__STENCIL_APP_URL__;
   if (typeof appUrl !== 'string') {
     await closePage(page);
-    return 'invalid e2eSetContent() app script url';
+    return 'invalid e2eSetContent() loader script url';
   }
 
-  const url = (process.env as d.E2EProcessEnv).__STENCIL_BROWSER_URL__;
-  const body = [
-    `<script type="module" src="${appUrl}"></script>`,
+  const url = [
+    `data:text/html;charset=UTF-8,`,
+    `<script src="${appUrl}"></script>`,
     html
-  ].join('\n');
+  ];
 
-  await page.setRequestInterception(true);
-  page.on('request', interceptedRequest => {
-    if (url === interceptedRequest.url()) {
-      interceptedRequest.respond({
-        status: 200,
-        contentType: 'text/html',
-        body: body
-      });
-
-    } else {
-      interceptedRequest.continue();
-    }
-  });
-
-  const rsp = await page._e2eGoto(url);
+  const rsp = await page._e2eGoto(url.join(''));
 
   if (!rsp.ok()) {
     await closePage(page);
