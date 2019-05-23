@@ -85,17 +85,6 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   build.lifecycleDOMEvents = false;
   build.hotModuleReplacement = false;
 
-  // TODO: remove this reset
-  build.vdomAttribute = true;
-  build.vdomClass = true;
-  build.vdomFunctional = true;
-  build.vdomKey = true;
-  build.vdomListener = true;
-  build.vdomRef = true;
-  build.vdomRender = true;
-  build.vdomStyle = true;
-  build.vdomText = true;
-
   return build;
 }
 
