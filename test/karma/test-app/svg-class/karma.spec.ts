@@ -14,9 +14,9 @@ describe('svg class', () => {
     const circle = app.querySelector('circle');
     const rect = app.querySelector('rect');
 
-    expect(svg.getAttribute('class')).toBe('');
-    expect(circle.getAttribute('class')).toBe('');
-    expect(rect.getAttribute('class')).toBe('');
+    expect(svg.getAttribute('class')).toBe(null);
+    expect(circle.getAttribute('class')).toBe(null);
+    expect(rect.getAttribute('class')).toBe(null);
 
     const button = app.querySelector('button');
     button.click();

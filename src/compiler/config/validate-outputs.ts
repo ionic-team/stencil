@@ -7,6 +7,7 @@ import { validateOutputTargetDistModule } from './validate-outputs-dist-module';
 import { validateOutputTargetAngular } from './validate-outputs-angular';
 import { validateDocs } from './validate-docs';
 import { VALID_TYPES, WWW } from '../output-targets/output-utils';
+import { buildError } from '@utils';
 
 
 export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnostic[]) {
@@ -22,12 +23,13 @@ export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnosti
       outputTarget.type = outputTarget.type.trim().toLowerCase() as any;
 
       if (!VALID_TYPES.includes(outputTarget.type)) {
-        throw new Error(`invalid outputTarget type "${outputTarget.type}". Valid outputTarget types include: ${VALID_TYPES.map(t => `"${t}"`).join(', ')}`);
+        const err = buildError(diagnostics);
+        err.messageText = `invalid outputTarget type "${outputTarget.type}". Valid outputTarget types include: ${VALID_TYPES.map(t => `"${t}"`).join(', ')}`;
       }
     });
   }
 
-  validateOutputTargetWww(config);
+  validateOutputTargetWww(config, diagnostics);
   validateOutputTargetDist(config);
   validateOutputTargetAngular(config);
   validateOutputTargetDistHydrateScript(config);
@@ -37,6 +39,7 @@ export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnosti
 
 
   if (!config.outputTargets || config.outputTargets.length === 0) {
-    throw new Error(`outputTarget required`);
+    const err = buildError(diagnostics);
+    err.messageText = `outputTarget required`;
   }
 }

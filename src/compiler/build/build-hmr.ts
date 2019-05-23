@@ -7,11 +7,18 @@ import { getScopeId } from '../style/scope-css';
 
 
 export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!config.devServer || !config.devServer.hotReplacement || !buildCtx.isRebuild) {
+  if (!config.devServer || !buildCtx.isRebuild) {
     return null;
   }
 
-  const hmr: d.HotModuleReplacement = {};
+  if (config.devServer.reloadStrategy == null) {
+    return null;
+  }
+
+  const hmr: d.HotModuleReplacement = {
+    reloadStrategy: config.devServer.reloadStrategy,
+    versionId: Date.now().toString().substring(6) + '' + Math.round((Math.random() * 89999) + 10000)
+  };
 
   if (buildCtx.scriptsAdded.length > 0) {
     hmr.scriptsAdded = buildCtx.scriptsAdded.slice();
@@ -26,7 +33,7 @@ export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     hmr.excludeHmr = excludeHmr.slice();
   }
 
-  if (buildCtx.hasIndexHtmlChanges) {
+  if (buildCtx.hasHtmlChanges) {
     hmr.indexHtmlUpdated = true;
   }
 
@@ -62,8 +69,6 @@ export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   if (Object.keys(hmr).length === 0) {
     return null;
   }
-
-  hmr.versionId = Date.now().toString().substring(6);
 
   return hmr;
 }

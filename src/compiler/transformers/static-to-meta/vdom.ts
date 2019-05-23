@@ -2,11 +2,11 @@ import * as d from '../../../declarations';
 import ts from 'typescript';
 
 
-export function gatherVdomMeta(cmpMeta: d.ComponentCompilerMeta, args: ts.NodeArray<ts.Expression>) {
-  cmpMeta.hasVdomRender = true;
+export function gatherVdomMeta(m: d.Module | d.ComponentCompilerMeta, args: ts.NodeArray<ts.Expression>) {
+  m.hasVdomRender = true;
 
   if (args[0].kind === ts.SyntaxKind.Identifier) {
-    cmpMeta.hasVdomFunctional = true;
+    m.hasVdomFunctional = true;
   }
 
   if (args.length > 1) {
@@ -21,43 +21,43 @@ export function gatherVdomMeta(cmpMeta: d.ComponentCompilerMeta, args: ts.NodeAr
         const attrs = new Set(Array.from(propsWithText));
 
         if (attrs.has('key')) {
-          cmpMeta.hasVdomKey = true;
+          m.hasVdomKey = true;
           attrs.delete('key');
         }
 
         if (attrs.has('ref')) {
-          cmpMeta.hasVdomRef = true;
+          m.hasVdomRef = true;
           attrs.delete('ref');
         }
 
         attrs.forEach(attr => {
           if (attr.startsWith('on') && attr.length > 2 && /[A-Z]/.test(attr.charAt(2))) {
-            cmpMeta.hasVdomListener = true;
+            m.hasVdomListener = true;
             attrs.delete(attr);
           }
         });
 
         if (attrs.size > 0) {
-          cmpMeta.hasVdomAttribute = true;
+          m.hasVdomAttribute = true;
 
           if (attrs.has('class') || attrs.has('className')) {
-            cmpMeta.hasVdomClass = true;
+            m.hasVdomClass = true;
           }
           if (attrs.has('style')) {
-            cmpMeta.hasVdomStyle = true;
+            m.hasVdomStyle = true;
           }
 
           attrs.forEach(attrName => {
-            cmpMeta.htmlAttrNames.push(attrName);
+            m.htmlAttrNames.push(attrName);
           });
         }
       }
     }
 
-    if (!cmpMeta.hasVdomText) {
+    if (!m.hasVdomText) {
       for (let i = 2; i < args.length; i++) {
         if (ts.isStringLiteral(args[i])) {
-          cmpMeta.hasVdomText = true;
+          m.hasVdomText = true;
           break;
         }
       }

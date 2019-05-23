@@ -1,13 +1,14 @@
+import { validateRollupConfig } from './validate-rollup-config';
 import * as d from '../../declarations';
-import { setArrayConfig, setBooleanConfig, setNumberConfig } from './config-utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace, validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
 import { validatePaths } from './validate-paths';
-import { validateRollupConfig } from './validate-rollup-config';
+import { setArrayConfig, setBooleanConfig, setNumberConfig } from './config-utils';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
-import { sortBy } from '@utils';
+import { validatePlugins } from './validate-plugins';
+import { buildError, sortBy } from '@utils';
 import { validateOutputTargetCustom } from './validate-outputs-custom';
 
 export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], setEnvVariables: boolean) {
@@ -53,7 +54,7 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
   config.copy = config.copy || [];
 
   // get a good namespace
-  validateNamespace(config);
+  validateNamespace(config, diagnostics);
 
   // figure out all of the config paths and absolute paths
   validatePaths(config);
@@ -78,7 +79,7 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
   validateOutputTargets(config, diagnostics);
 
   if (!config._isTesting) {
-    validateDistNamespace(config);
+    validateDistNamespace(config, diagnostics);
   }
 
   if (typeof config.validateTypes !== 'boolean') {
@@ -90,15 +91,17 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
 
   if (config.hashFileNames) {
     if (config.hashedFileNameLength < MIN_HASHED_FILENAME_LENTH) {
-      throw new Error(`config.hashedFileNameLength must be at least ${MIN_HASHED_FILENAME_LENTH} characters`);
+      const err = buildError(diagnostics);
+      err.messageText = `config.hashedFileNameLength must be at least ${MIN_HASHED_FILENAME_LENTH} characters`;
     }
     if (config.hashedFileNameLength > MAX_HASHED_FILENAME_LENTH) {
-      throw new Error(`config.hashedFileNameLength cannot be more than ${MAX_HASHED_FILENAME_LENTH} characters`);
+      const err = buildError(diagnostics);
+      err.messageText = `config.hashedFileNameLength cannot be more than ${MAX_HASHED_FILENAME_LENTH} characters`;
     }
   }
 
 
-  validateDevServer(config);
+  validateDevServer(config, diagnostics);
 
   if (!config.watchIgnoredRegex) {
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
@@ -119,7 +122,7 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
     });
   }
 
-  setArrayConfig(config, 'plugins');
+  validatePlugins(config, diagnostics);
   setArrayConfig(config, 'bundles');
   config.bundles = sortBy(config.bundles, (a: d.ConfigBundle) => a.components.length);
 
@@ -131,7 +134,7 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
   }
 
   validateRollupConfig(config);
-  validateTesting(config);
+  validateTesting(config, diagnostics);
   validateOutputTargetCustom(config, diagnostics);
 
   return config;

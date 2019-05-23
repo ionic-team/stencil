@@ -4,6 +4,12 @@ import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export async function initIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  // The initial loading page connects with the stencil's devServer
+  // If we are building without server, it does not make sense to write the
+  // initial index.html
+  if (!config.devServer) {
+    return;
+  }
   await Promise.all(config.outputTargets.map(async outputTarget => {
     await initIndexHtml(config, compilerCtx, buildCtx, outputTarget);
   }));
@@ -186,19 +192,27 @@ const APP_LOADING_HTML = `
       document.querySelector('.toast').classList.add('active');
     }, 100);
 
-    setInterval(function() {
+    var tmrId = setInterval(function() {
       try {
+        var url = window.location.pathname + '?r=' + Date.now();
         var xhr = new XMLHttpRequest();
         xhr.addEventListener('load', function() {
           try {
-            if (this.responseText.indexOf('app-dev-first-build-loader') === -1) {
-              window.location.reload(true);
+            if (this.status < 300) {
+              if (this.responseText.indexOf('app-dev-first-build-loader') === -1) {
+                window.location.reload(true);
+              }
+            } else if (window.location.pathname !== '/') {
+              url = '/?r=' + Date.now();
+
+            } else if (this.status > 299) {
+              clearInterval(tmrId);
             }
+
           } catch (e) {
             console.error(e);
           }
         });
-        var url = window.location.pathname + '?' + Math.random();
         xhr.open('GET', url);
         xhr.send();
       } catch (e) {

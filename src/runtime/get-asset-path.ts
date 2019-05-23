@@ -1,6 +1,9 @@
-import { plt } from '@platform';
+import { plt, win } from '@platform';
 
 export const getAssetPath = (path: string) => {
-  return new URL(path, plt.$resourcesUrl$).pathname;
+  const assetUrl = new URL(path, plt.$resourcesUrl$);
+  return (assetUrl.origin !== win.location.origin)
+    ? assetUrl.href
+    : assetUrl.pathname;
 };
 

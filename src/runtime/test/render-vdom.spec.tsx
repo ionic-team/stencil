@@ -65,11 +65,12 @@ describe('render-vdom', () => {
 
     const { root } = await newSpecPage({
       components: [CmpA],
+      includeAnnotations: true,
       html: `<cmp-a>Hello</cmp-a>`,
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a>
+      <cmp-a class="hydrated">
         <!---->
         <a href="#">Hello</a>
       </cmp-a>

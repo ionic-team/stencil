@@ -122,9 +122,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       cmpMeta.$lazyBundleIds$ = lazyBundle[0];
 
       if (!exclude.includes(tagName) && !customElements.get(tagName)) {
-        if (BUILD.style) {
-          cmpTags.push(tagName);
-        }
+        cmpTags.push(tagName);
         customElements.define(
           tagName,
           proxyComponent(HostElement as any, cmpMeta, 1, 0) as any
@@ -132,11 +130,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       }
     }));
 
-
-  if (BUILD.style) {
-    // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
-    visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
-    visibilityStyle.setAttribute('data-styles', '');
-    head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
-  }
+  // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
+  visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
+  visibilityStyle.setAttribute('data-styles', '');
+  head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
 };

@@ -12,13 +12,12 @@ export interface TypesMemberNameData {
 
 export interface TypesModule {
   isDep: boolean;
+  tagName: string;
   tagNameAsPascal: string;
+  htmlElementName: string;
   component: string;
   jsx: string;
   element: string;
-
-  HTMLElementTagNameMap: string;
-  ElementTagNameMap: string;
 }
 
 

@@ -70,12 +70,14 @@ export function validateOutputTargetDist(config: d.Config) {
 
     const namespace = config.fsNamespace || 'app';
     const lazyDir = path.join(outputTarget.buildDir, namespace);
+    // Lazy build for CDN in dist
     config.outputTargets.push({
       type: DIST_LAZY,
       copyDir: lazyDir,
       esmDir: lazyDir,
       systemDir: lazyDir,
       systemLoaderFile: path.join(lazyDir, namespace + '.js'),
+      legacyLoaderFile: path.join(outputTarget.buildDir, namespace + '.js'),
       polyfills: true,
       isBrowserBuild: true,
     });

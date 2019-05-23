@@ -25,19 +25,27 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
   platform.registerContext(opts.context);
   platform.registerComponents(opts.components);
 
+
+  if (opts.hydrateClientSide) {
+    opts.includeAnnotations = true;
+  }
   if (opts.hydrateServerSide) {
+    opts.includeAnnotations = true;
     platform.supportsShadowDom = false;
   } else {
-    if (opts.serializedShadowDom === false) {
+    opts.includeAnnotations = !!opts.includeAnnotations;
+    if (opts.supportsShadowDom === false) {
       platform.supportsShadowDom = false;
     } else {
       platform.supportsShadowDom = true;
     }
   }
+  bc.BUILD.cssAnnotations = opts.includeAnnotations;
 
   const cmpTags = new Set<string>();
 
   const win = platform.win as Window;
+  (win as any)['__stencil_spec_options'] = opts;
   const doc = win.document;
 
   const page: d.SpecPage = {
@@ -81,9 +89,20 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     return lazyBundleRuntimeMeta;
   });
 
-  const cmpBuild = getBuildFeatures(
-    opts.components.map(Cstr => Cstr.COMPILER_META)
-  ) as any;
+  const cmpCompilerMeta = opts.components.map(Cstr => Cstr.COMPILER_META as d.ComponentCompilerMeta);
+
+  const cmpBuild = getBuildFeatures(cmpCompilerMeta);
+  cmpBuild.vdomAttribute = true;
+  cmpBuild.vdomClass = true;
+  cmpBuild.vdomStyle = true;
+  cmpBuild.vdomKey = true;
+  cmpBuild.vdomRef = true;
+  cmpBuild.vdomListener = true;
+  cmpBuild.vdomFunctional = true;
+  cmpBuild.vdomText = true;
+  cmpBuild.slot = true;
+  cmpBuild.svg = true;
+
   Object.keys(cmpBuild).forEach(key => {
     if ((cmpBuild as any)[key] === true) {
       (bc.BUILD as any)[key] = true;
@@ -144,9 +163,18 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     await page.waitForChanges();
   }
 
-  page.root = findRoot(cmpTags, page.body);
+  page.root = findRootComponent(cmpTags, page.body);
   if (page.root != null) {
-    page.rootInstance = platform.getHostRef(page.root).$lazyInstance$;
+    const hostRef = platform.getHostRef(page.root);
+    if (hostRef != null) {
+      page.rootInstance = hostRef.$lazyInstance$;
+    }
+
+  } else {
+    const firstElementChild = page.body.firstElementChild;
+    if (firstElementChild != null) {
+      page.root = firstElementChild as any;
+    }
   }
 
   if (opts.hydrateServerSide) {
@@ -219,7 +247,7 @@ function proxyComponentLifeCycles(platform: any, Cstr: d.ComponentTestingConstru
 }
 
 
-function findRoot(cmpTags: Set<string>, node: Element): any {
+function findRootComponent(cmpTags: Set<string>, node: Element): any {
   if (node != null) {
     const children = node.children;
     const childrenLength = children.length;
@@ -232,7 +260,7 @@ function findRoot(cmpTags: Set<string>, node: Element): any {
     }
 
     for (let i = 0; i < childrenLength; i++) {
-      const r = findRoot(cmpTags, children[i]);
+      const r = findRootComponent(cmpTags, children[i]);
       if (r != null) {
         return r;
       }

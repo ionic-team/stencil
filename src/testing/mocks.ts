@@ -69,6 +69,7 @@ export function mockCompilerCtx() {
     rollupCacheLazy: null,
     rollupCacheNative: null,
     rootTsFiles: [],
+    styleModeNames: new Set(),
     tsService: null,
     reset: () => {/**/}
   };

@@ -49,7 +49,7 @@ export function setupDomTests(document: Document) {
     app.addEventListener('stencil_componentDidRender', (ev) => didRender(ev.target))
 
     app.className = 'test-spec';
-    testBed.appendChild(app)
+    testBed!.appendChild(app)
 
     if (url) {
       app.setAttribute('data-url', url);
@@ -63,7 +63,7 @@ export function setupDomTests(document: Document) {
    * Run this after each test
    */
   function tearDownDom() {
-    testBed.innerHTML = '';
+    testBed!.innerHTML = '';
   };
 
   /**
@@ -74,7 +74,7 @@ export function setupDomTests(document: Document) {
 
     return new Promise<HTMLElement>((resolve, reject) => {
       try {
-        const indexLoaded = function() {
+        const indexLoaded = function(this: XMLHttpRequest) {
           if (this.status !== 200) {
             reject(`404: ${url}`);
             return;
@@ -108,14 +108,14 @@ export function setupDomTests(document: Document) {
               script.setAttribute('nomodule', '');
             }
             if (tmpScripts[i].hasAttribute('type')) {
-              script.setAttribute('type', tmpScripts[i].getAttribute('type'));
+              script.setAttribute('type', tmpScripts[i].getAttribute('type')!);
             }
             script.innerHTML = tmpScripts[i].innerHTML;
 
             script.addEventListener('error', scriptErrored);
 
-            tmpScripts[i].parentNode.insertBefore(script, tmpScripts[i]);
-            tmpScripts[i].parentNode.removeChild(tmpScripts[i]);
+            tmpScripts[i].parentNode!.insertBefore(script, tmpScripts[i]);
+            tmpScripts[i].parentNode!.removeChild(tmpScripts[i]);
           }
 
           elm.innerHTML = '';

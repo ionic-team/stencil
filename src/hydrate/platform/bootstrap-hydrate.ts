@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { getComponent, getHostRef } from '@platform';
+import { getComponent, getHostRef, plt } from '@platform';
 import { hydrateComponent } from './hydrate-component';
 import { insertVdomAnnotations, postUpdateComponent } from '@runtime';
 
@@ -9,6 +9,8 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
     hydratedCount: 0,
     hydratedTags: []
   };
+  plt.$resourcesUrl$ = new URL(opts.resourcesUrl || '/', win.location.href).href;
+
 
   try {
     const connectedElements = new Set<any>();

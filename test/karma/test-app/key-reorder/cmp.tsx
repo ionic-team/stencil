@@ -5,7 +5,7 @@ import { Component, Prop, h } from '@stencil/core';
 })
 export class KeyReorder {
 
-  @Prop() num: number;
+  @Prop() num?: number;
 
   render() {
     return (

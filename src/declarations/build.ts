@@ -27,29 +27,25 @@ export interface BuildCtx {
   collections: d.Collection[];
   components: d.ComponentCompilerMeta[];
   componentGraph: Map<string, string[]>;
-  moduleFiles: d.Module[];
-  entryModules: d.EntryModule[];
-  indexDoc: Document;
-  packageJson: d.PackageJsonData;
   createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
   data: any;
   debug: (msg: string) => void;
   diagnostics: d.Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
+  entryModules: d.EntryModule[];
   filesAdded: string[];
   filesChanged: string[];
   filesDeleted: string[];
   filesUpdated: string[];
   filesWritten: string[];
-  skipAssetsCopy: boolean;
   finish(): Promise<BuildResults>;
   globalStyle: string | undefined;
   hasConfigChanges: boolean;
   hasCopyChanges: boolean;
   hasError: boolean;
   hasFinished: boolean;
-  hasIndexHtmlChanges: boolean;
+  hasHtmlChanges: boolean;
   hasPrintedResults: boolean;
   hasServiceWorkerChanges: boolean;
   hasScriptChanges: boolean;
@@ -57,11 +53,17 @@ export interface BuildCtx {
   hasWarning: boolean;
   hydrateAppFilePath: string;
   indexBuildCount: number;
+  indexDoc: Document;
   isRebuild: boolean;
+  moduleFiles: d.Module[];
+  packageJson: d.PackageJsonData;
+  pendingCopyTasks: Promise<d.CopyResults>[];
+  progress(task: BuildTask): void;
   requiresFullBuild: boolean;
   rollupResults?: RollupResults;
   scriptsAdded: string[];
   scriptsDeleted: string[];
+  skipAssetsCopy: boolean;
   startTime: number;
   styleBuildCount: number;
   stylesPromise: Promise<void>;
@@ -69,10 +71,9 @@ export interface BuildCtx {
   timeSpan: d.LoggerTimeSpan;
   timestamp: string;
   transpileBuildCount: number;
-  pendingCopyTasks: Promise<d.CopyResults>[];
+  validateTypesBuild?(): Promise<void>;
   validateTypesHandler?: (results: d.ValidateTypesResults) => Promise<void>;
   validateTypesPromise?: Promise<d.ValidateTypesResults>;
-  validateTypesBuild?(): Promise<void>;
 }
 
 
@@ -82,15 +83,23 @@ export interface BuildStyleUpdate {
   styleMode: string;
 }
 
-
+export type BuildTask = any;
 
 export interface BuildLog {
+  buildId: number;
   messages: string[];
+  progress: number;
 }
 
 
 export interface BuildResults {
   buildId: number;
+  buildConditionals: {
+    shadow: boolean;
+    slot: boolean;
+    svg: boolean;
+    vdom: boolean;
+  };
   bundleBuildCount: number;
   components: BuildComponent[];
   diagnostics: d.Diagnostic[];
@@ -111,6 +120,7 @@ export interface BuildResults {
   transpileBuildCount: number;
 }
 
+export type BuildStatus = 'pending' | 'error' | 'disabled' | 'default';
 
 export interface HotModuleReplacement {
   componentsUpdated?: string[];
@@ -119,6 +129,7 @@ export interface HotModuleReplacement {
   imagesUpdated?: string[];
   indexHtmlUpdated?: boolean;
   inlineStylesUpdated?: HmrStyleUpdate[];
+  reloadStrategy: d.PageReloadStrategy;
   scriptsAdded?: string[];
   scriptsDeleted?: string[];
   serviceWorkerUpdated?: boolean;

@@ -14,6 +14,16 @@ declare global {
       toEqualHtml(expectHtml: string): void;
 
       /**
+       * Compares HTML light DOKM only, but first normalizes the HTML so all
+       * whitespace, attribute order and css class order are
+       * the same. When given an element, it will compare
+       * the element's `outerHTML`. When given a Document Fragment,
+       * such as a Shadow Root, it'll compare its `innerHTML`.
+       * Otherwise it'll compare two strings representing HTML.
+       */
+      toEqualLightHtml(expectLightHtml: string): void;
+
+      /**
        * When given an element, it'll compare the element's
        * `textContent`. Otherwise it'll compare two strings. This
        * matcher will also `trim()` each string before comparing.
@@ -488,7 +498,8 @@ export interface NewSpecPageOptions {
   hydrateClientSide?: boolean;
   hydrateServerSide?: boolean;
   referrer?: string;
-  serializedShadowDom?: boolean;
+  supportsShadowDom?: boolean;
+  includeAnnotations?: boolean;
   url?: string;
   userAgent?: string;
   autoApplyChanges?: boolean;

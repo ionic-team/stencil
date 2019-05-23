@@ -99,7 +99,7 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
       ? elm.shadowRoot
       : elm.getRootNode(), cmpMeta.$tagName$, mode, elm);
 
-  if ((BUILD.shadowDom || BUILD.scoped) && cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation) {
+  if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom
     // and this host element was NOT created with SSR

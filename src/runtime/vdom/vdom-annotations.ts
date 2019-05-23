@@ -113,10 +113,13 @@ const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, cmpData
     childElm.setAttribute(HYDRATE_CHILD_ID, childId);
 
   } else if (childElm.nodeType === NODE_TYPE.TextNode) {
-    const textNodeId = `${TEXT_NODE_ID}.${childId}`;
+    const parentNode = childElm.parentNode;
+    if (parentNode.nodeName !== 'STYLE') {
+      const textNodeId = `${TEXT_NODE_ID}.${childId}`;
 
-    const commentBeforeTextNode = doc.createComment(textNodeId);
-    childElm.parentNode.insertBefore(commentBeforeTextNode, childElm);
+      const commentBeforeTextNode = doc.createComment(textNodeId);
+      parentNode.insertBefore(commentBeforeTextNode, childElm);
+    }
 
   } else if (childElm.nodeType === NODE_TYPE.CommentNode) {
     if (childElm['s-sr']) {

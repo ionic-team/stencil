@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme } from '../output-targets/output-utils';
 import { NOTE } from '../docs/constants';
+import { buildError } from '@utils';
 
 export function validateDocs(config: d.Config, diagnostics: d.Diagnostic[]) {
   config.outputTargets = config.outputTargets || [];
@@ -17,7 +18,7 @@ export function validateDocs(config: d.Config, diagnostics: d.Diagnostic[]) {
   }
   const jsonDocsOutputs = config.outputTargets.filter(isOutputTargetDocsJson);
   jsonDocsOutputs.forEach(jsonDocsOutput => {
-    validateJsonDocsOutputTarget(config, jsonDocsOutput);
+    validateJsonDocsOutputTarget(config, diagnostics, jsonDocsOutput);
   });
 
   // readme docs flag
@@ -30,20 +31,20 @@ export function validateDocs(config: d.Config, diagnostics: d.Diagnostic[]) {
   }
   const readmeDocsOutputs = config.outputTargets.filter(isOutputTargetDocsReadme);
   readmeDocsOutputs.forEach(readmeDocsOutput => {
-    validateReadmeOutputTarget(config, readmeDocsOutput, diagnostics);
+    validateReadmeOutputTarget(config, diagnostics, readmeDocsOutput);
   });
 
   // custom docs
   const customDocsOutputs = config.outputTargets.filter(isOutputTargetDocsCustom);
   customDocsOutputs.forEach(jsonDocsOutput => {
-    validateCustomDocsOutputTarget(jsonDocsOutput);
+    validateCustomDocsOutputTarget(diagnostics, jsonDocsOutput);
   });
 
   config.buildDocs = buildDocs;
 }
 
 
-function validateReadmeOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsReadme, diagnostics: d.Diagnostic[]) {
+function validateReadmeOutputTarget(config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsReadme) {
   if (outputTarget.type === 'docs') {
     diagnostics.push({
       type: 'config',
@@ -69,9 +70,10 @@ function validateReadmeOutputTarget(config: d.Config, outputTarget: d.OutputTarg
 }
 
 
-function validateJsonDocsOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsJson) {
+function validateJsonDocsOutputTarget(config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsJson) {
   if (typeof outputTarget.file !== 'string') {
-    throw new Error(`docs-json outputTarget missing the "file" option`);
+    const err = buildError(diagnostics);
+    err.messageText = `docs-json outputTarget missing the "file" option`;
   }
 
   outputTarget.file = config.sys.path.join(config.rootDir, outputTarget.file);
@@ -79,9 +81,10 @@ function validateJsonDocsOutputTarget(config: d.Config, outputTarget: d.OutputTa
 }
 
 
-function validateCustomDocsOutputTarget(outputTarget: d.OutputTargetDocsCustom) {
+function validateCustomDocsOutputTarget(diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsCustom) {
   if (typeof outputTarget.generator !== 'function') {
-    throw new Error(`docs-custom outputTarget missing the "generator" function`);
+    const err = buildError(diagnostics);
+    err.messageText = `docs-custom outputTarget missing the "generator" function`;
   }
 
   outputTarget.strict = !!outputTarget.strict;

@@ -47,7 +47,7 @@ async function serveDevClientScript(devServerConfig: d.DevServerConfig, fs: d.Fi
   const devClientConfig: d.DevClientConfig = {
     basePath: devServerConfig.basePath,
     editors: devServerConfig.editors,
-    hmr: devServerConfig.hotReplacement
+    reloadStrategy: devServerConfig.reloadStrategy
   };
 
   content = content.replace('__DEV_CLIENT_CONFIG__', JSON.stringify(devClientConfig));

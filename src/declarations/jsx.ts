@@ -1,4 +1,9 @@
 
+declare namespace LocalJSX {
+  export interface Element {}
+  export interface IntrinsicElements {}
+}
+export { LocalJSX as JSX };
 
 export namespace JSXBase {
   export interface IntrinsicElements {
@@ -261,6 +266,7 @@ export namespace JSXBase {
   }
 
   export interface DialogHTMLAttributes<T> extends HTMLAttributes<T> {
+    onClose?: (event: Event) => void;
     open?: boolean;
     returnValue?: string;
   }
@@ -443,6 +449,33 @@ export namespace JSXBase {
     muted?: boolean;
     preload?: string;
     src?: string;
+
+    // https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events
+    onAbort?: (event: Event) => void;
+    onCanPlay?: (event: Event) => void;
+    onCanPlayThrough?: (event: Event) => void;
+    onDurationChange?: (event: Event) => void;
+    onEmptied?: (event: Event) => void;
+    onEnded?: (event: Event) => void;
+    onError?: (event: Event) => void;
+    onInterruptBegin?: (event: Event) => void;
+    onInterruptEnd?: (event: Event) => void;
+    onLoadedData?: (event: Event) => void;
+    onLoadedMetaData?: (event: Event) => void;
+    onLoadStart?: (event: Event) => void;
+    onMozAudioAvailable?: (event: Event) => void;
+    onPause?: (event: Event) => void;
+    onPlay?: (event: Event) => void;
+    onPlaying?: (event: Event) => void;
+    onProgress?: (event: Event) => void;
+    onRateChange?: (event: Event) => void;
+    onSeeked?: (event: Event) => void;
+    onSeeking?: (event: Event) => void;
+    onStalled?: (event: Event) => void;
+    onSuspend?: (event: Event) => void;
+    onTimeUpdate?: (event: Event) => void;
+    onVolumeChange?: (event: Event) => void;
+    onWaiting?: (event: Event) => void;
   }
 
   export interface MetaHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -626,7 +659,7 @@ export namespace JSXBase {
 
     // Standard HTML Attributes
     accessKey?: string;
-    class?: string |  { [className: string]: boolean };
+    class?: string | { [className: string]: boolean };
     contentEditable?: boolean | string;
     contenteditable?: boolean | string;
     contextMenu?: string;
@@ -639,7 +672,7 @@ export namespace JSXBase {
     slot?: string;
     spellCheck?: boolean;
     spellcheck?: boolean | string;
-    style?: { [key: string]: string };
+    style?: { [key: string]: string | undefined };
     tabIndex?: number;
     tabindex?: number | string;
     title?: string;
@@ -701,7 +734,7 @@ export namespace JSXBase {
     method?: string;
     min?: number | string;
     name?: string;
-    style?: { [key: string]: any; };
+    style?: { [key: string]: string | undefined };
     target?: string;
     type?: string;
     width?: number | string;

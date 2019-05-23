@@ -136,15 +136,15 @@ describe('validateDevServer', () => {
     expect(config.devServer.historyApiFallback).toBe(null);
   });
 
-  it('should default hotReplacement', () => {
+  it('should default reloadStrategy hmr', () => {
     validateConfig(config, [], false);
-    expect(config.devServer.hotReplacement).toBe(true);
+    expect(config.devServer.reloadStrategy).toBe('hmr');
   });
 
-  it('should set hotReplacement', () => {
-    config.devServer.hotReplacement = false;
+  it('should set reloadStrategy pageReload', () => {
+    config.devServer.reloadStrategy = 'pageReload';
     validateConfig(config, [], false);
-    expect(config.devServer.hotReplacement).toBe(false);
+    expect(config.devServer.reloadStrategy).toBe('pageReload');
   });
 
   it('should default openBrowser', () => {

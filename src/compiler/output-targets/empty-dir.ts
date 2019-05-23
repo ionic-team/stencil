@@ -1,6 +1,6 @@
 
 import * as d from '../../declarations';
-import {isOutputTargetDist, isOutputTargetDistLazyLoader, isOutputTargetDistModule, isOutputTargetDistSelfContained, isOutputTargetWww, isOutputTargetHydrate} from './output-utils';
+import {isOutputTargetDist, isOutputTargetDistLazyLoader, isOutputTargetDistModule, isOutputTargetDistSelfContained, isOutputTargetHydrate, isOutputTargetWww } from './output-utils';
 
 type OutputTargetEmptiable =
   d.OutputTargetDist |

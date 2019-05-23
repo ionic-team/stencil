@@ -3,4 +3,4 @@ import { BUILD } from '@build-conditionals';
 import { getHostRef } from '@platform';
 
 
-export const getElement = (ref: any) => (BUILD.lazyLoad || BUILD.hydrateServerSide) ? getHostRef(ref).$hostElement$ : ref as d.HostElement;
+export const getElement = (ref: any) => BUILD.lazyLoad ? getHostRef(ref).$hostElement$ : ref as d.HostElement;

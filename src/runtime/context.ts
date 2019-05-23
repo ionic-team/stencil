@@ -9,9 +9,11 @@ export const getContext = (_elm: HTMLElement, context: string) => {
     return win;
   } else if (context === 'document') {
     return doc;
-  } else if (context === 'isServer') {
-    return BUILD.hydrateServerSide;
-  } else if (context === 'resourcesUrl') {
+  } else if (context === 'isServer' || context === 'isPrerender') {
+    return !!BUILD.hydrateServerSide;
+  } else if (context === 'isClient') {
+    return !BUILD.hydrateServerSide;
+  } else if (context === 'resourcesUrl' || context === 'publicPath') {
     return getAssetPath('.');
   } else if (context === 'queue') {
     return {

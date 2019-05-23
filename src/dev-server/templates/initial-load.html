@@ -12,6 +12,8 @@
             }
           });
         }
+      }).catch(function(err) {
+        console.error(err.message || err);
       });
     }
   </script>
@@ -33,7 +35,7 @@
     }
     .toast {
       position: absolute;
-      top: 10px;
+      top: 12px;
       right: 10px;
       left: 10px;
       margin: auto;
@@ -146,8 +148,11 @@
     }, 100);
 
     var logOutput = document.getElementById('log-output');
-    window.addEventListener('buildLog', function(ev) {
-      logOutput.innerText = ev.detail.messages.join('\n');
+    window.addEventListener('devserver:buildlog', function(ev) {
+      var buildLog = ev.detail;
+      if (buildLog && buildLog.messages) {
+        logOutput.innerText = buildLog.messages.join('\n');
+      }
     });
   </script>
 

@@ -9,8 +9,8 @@ export class LifecycleAsyncB {
   @Prop() value = '';
   @State() rendered = 0;
 
-  @Event() lifecycleLoad: EventEmitter;
-  @Event() lifecycleUpdate: EventEmitter;
+  @Event() lifecycleLoad!: EventEmitter;
+  @Event() lifecycleUpdate!: EventEmitter;
 
   async componentWillLoad() {
     this.lifecycleLoad.emit('componentWillLoad-b');

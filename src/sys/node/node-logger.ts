@@ -331,7 +331,12 @@ export class NodeLogger implements d.Logger {
           return;
         }
 
-        let msg = `L${l.lineNumber}:  `;
+        let msg = ``;
+
+        if (l.lineNumber > -1) {
+          msg = `L${l.lineNumber}:  `;
+        }
+
         while (msg.length < INDENT.length) {
           msg = ' ' + msg;
         }

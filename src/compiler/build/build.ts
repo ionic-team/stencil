@@ -6,6 +6,7 @@ import { generateEntryModules } from '../entries/entry-modules';
 import { generateOutputTargets } from '../output-targets';
 import { generateStyles } from '../style/generate-styles';
 import { initIndexHtmls } from './init-index-html';
+import { ProgressTask } from './build-ctx';
 import { transpileApp } from '../transpile/transpile-app';
 import { waitForCopyTasks } from '../copy/copy-tasks';
 import { writeBuildFiles } from './write-build';
@@ -30,11 +31,15 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     await emptyOutputTargets(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
 
+    buildCtx.progress(ProgressTask.emptyOutputTargets);
+
     // async scan the src directory for ts files
     // then transpile them all in one go
     // buildCtx.moduleFiles is populated here
     buildCtx.hasScriptChanges = await transpileApp(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
+
+    buildCtx.progress(ProgressTask.transpileApp);
 
     if (config.srcIndexHtml) {
       const hasIndex = await compilerCtx.fs.access(config.srcIndexHtml);
@@ -57,9 +62,13 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     buildCtx.stylesPromise = generateStyles(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
 
+    buildCtx.progress(ProgressTask.generateStyles);
+
     // generate the core app files
     await generateOutputTargets(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
+
+    buildCtx.progress(ProgressTask.generateOutputTargets);
 
     // wait on some promises we kicked off earlier
     await Promise.all([
@@ -75,9 +84,13 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     ]);
     if (buildCtx.hasError) return buildCtx.abort();
 
+    buildCtx.progress(ProgressTask.validateTypesBuild);
+
     // write all the files and copy asset files
     await writeBuildFiles(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
+
+    buildCtx.progress(ProgressTask.writeBuildFiles);
 
   } catch (e) {
     // ¯\_(ツ)_/¯

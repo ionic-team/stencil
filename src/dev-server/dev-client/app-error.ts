@@ -1,10 +1,10 @@
 import * as d from '../../declarations';
 import { DEV_SERVER_URL, OPEN_IN_EDITOR_URL } from '../dev-server-utils';
+import { emitBuildStatus } from './build-events';
 import { logDiagnostic } from './logger';
-import { updateBuildStatus } from './build-status';
 
 
-export function appError(win: Window, doc: Document, config: d.DevClientConfig, buildResults: d.BuildResults) {
+export function appError(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.BuildResults) {
   if (!Array.isArray(buildResults.diagnostics)) {
     return;
   }
@@ -22,7 +22,7 @@ export function appError(win: Window, doc: Document, config: d.DevClientConfig, 
     appendDiagnostic(win, doc, config, modal, diagnostic);
   });
 
-  updateBuildStatus(doc, 'error');
+  emitBuildStatus(win, 'error');
 }
 
 
@@ -105,7 +105,9 @@ function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig,
 
       const tdNum = doc.createElement('td');
       tdNum.className = 'dev-server-diagnostic-blob-num';
-      tdNum.setAttribute('data-line-number', l.lineNumber + '');
+      if (l.lineNumber > -1) {
+        tdNum.setAttribute('data-line-number', l.lineNumber + '');
+      }
       tr.appendChild(tdNum);
 
       const tdCode = doc.createElement('td');

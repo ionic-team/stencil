@@ -26,7 +26,7 @@ export async function generateCjs(config: d.Config, compilerCtx: d.CompilerCtx, 
 }
 
 function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], outputTargets: d.OutputTargetDistLazy[]) {
-  const indexFilename = rollupResult.find(r => r.isBrowserLoader).fileName;
+  const indexFilename = rollupResult.find(r => r.isIndex).fileName;
   return Promise.all(outputTargets.map(async o => {
     if (o.cjsIndexFile) {
       const entryPointPath = config.sys.path.join(o.cjsDir, indexFilename);

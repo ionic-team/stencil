@@ -10,7 +10,7 @@ import { initializeComponent } from './initialize-component';
 import { safeCall } from './update-component';
 
 export const fireConnectedCallback = (instance: any) => {
-  if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.connectedCallback) {
+  if (BUILD.lazyLoad && BUILD.connectedCallback) {
     safeCall(instance, 'connectedCallback');
   }
 };

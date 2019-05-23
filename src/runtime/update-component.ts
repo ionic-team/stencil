@@ -21,7 +21,7 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
   if (BUILD.taskQueue && BUILD.updatable) {
     hostRef.$flags$ |= HOST_FLAGS.isQueuedForUpdate;
   }
-  const instance = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm as any;
+  const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   if (isInitialLoad) {
     emitLifecycleEvent(elm, 'componentWillLoad');
     if (BUILD.cmpWillLoad) {
@@ -110,7 +110,7 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
   if (BUILD.lifecycle) {
     elm['s-lr'] = true;
   }
-  if (BUILD.updatable || BUILD.lazyLoad || BUILD.hydrateServerSide) {
+  if (BUILD.updatable || BUILD.lazyLoad) {
     hostRef.$flags$ |= HOST_FLAGS.hasRendered;
   }
 
@@ -127,8 +127,8 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
 
 
 export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
-  if ((BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.lifecycle || BUILD.lifecycleDOMEvents) && !elm['s-al']) {
-    const instance = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$lazyInstance$ : elm as any;
+  if ((BUILD.lazyLoad || BUILD.lifecycle || BUILD.lifecycleDOMEvents) && !elm['s-al']) {
+    const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
     const ancestorComponent = hostRef.$ancestorComponent$;
 
     if (BUILD.cmpDidRender) {
@@ -139,7 +139,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
     if (!(hostRef.$flags$ & HOST_FLAGS.hasLoadedComponent)) {
       hostRef.$flags$ |= HOST_FLAGS.hasLoadedComponent;
 
-      if ((BUILD.lazyLoad || BUILD.hydrateServerSide) && BUILD.style) {
+      if (BUILD.lazyLoad && BUILD.cssAnnotations) {
         // DOM WRITE!
         // add the css class that this element has officially hydrated
         elm.classList.add(HYDRATED_CLASS);
@@ -151,7 +151,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
 
       emitLifecycleEvent(elm, 'componentDidLoad');
 
-      if (BUILD.lazyLoad || BUILD.hydrateServerSide) {
+      if (BUILD.lazyLoad) {
         hostRef.$onReadyResolve$(elm);
       }
 

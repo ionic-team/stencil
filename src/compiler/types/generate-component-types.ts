@@ -31,7 +31,9 @@ export function generateComponentTypes(cmp: d.ComponentCompilerMeta): d.TypesMod
   ], true);
   return {
     isDep,
+    tagName,
     tagNameAsPascal,
+    htmlElementName,
     component: `interface ${tagNameAsPascal} {${stencilComponentAttributes}}`,
     jsx: `interface ${tagNameAsPascal} extends JSXBase.HTMLAttributes {${stencilComponentJSXAttributes}}`,
     element: `
@@ -40,8 +42,6 @@ var ${htmlElementName}: {
   prototype: ${htmlElementName};
   new (): ${htmlElementName};
 };`,
-    HTMLElementTagNameMap: `'${tagName}': ${htmlElementName}`,
-    ElementTagNameMap: `'${tagName}': ${htmlElementName};`,
   };
 }
 

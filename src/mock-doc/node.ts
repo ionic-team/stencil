@@ -1,6 +1,7 @@
 import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } from './custom-element-registry';
 import { closest, matches, selectAll, selectOne } from './selector';
 import { CSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
+import { dataset } from './dataset';
 import { MockAttr, MockAttributeMap, cloneAttributes } from './attribute';
 import { MockClassList } from './class-list';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
@@ -251,6 +252,10 @@ export class MockElement extends MockNode {
     return closest(selector, this);
   }
 
+  get dataset() {
+    return dataset(this);
+  }
+
   get dir() { return this.getAttributeNS(null, 'dir') || ''; }
   set dir(value: string) { this.setAttributeNS(null, 'dir', value); }
 
@@ -300,6 +305,10 @@ export class MockElement extends MockNode {
     }
 
     return node;
+  }
+
+  hasChildNodes() {
+    return (this.childNodes.length > 0);
   }
 
   get id() { return this.getAttributeNS(null, 'id') || ''; }

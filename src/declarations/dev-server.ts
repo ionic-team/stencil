@@ -17,15 +17,18 @@ export interface DevServerConfig {
   excludeHmr?: string[];
   gzip?: boolean;
   historyApiFallback?: HistoryApiFallback;
-  hotReplacement?: boolean;
   initialLoadUrl?: string;
   logRequests?: boolean;
   openBrowser?: boolean;
   port?: number;
   protocol?: 'http' | 'https';
+  reloadStrategy?: PageReloadStrategy;
   root?: string;
   websocket?: boolean;
 }
+
+
+export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
 
 export interface DevServerStartResponse {
@@ -44,7 +47,7 @@ export interface DevClientWindow extends Window {
 export interface DevClientConfig {
   basePath: string;
   editors: d.DevServerEditor[];
-  hmr: boolean;
+  reloadStrategy: PageReloadStrategy;
 }
 
 

@@ -6,9 +6,10 @@ import { validateServiceWorker } from './validate-service-worker';
 import { validateCopy } from './validate-copy';
 import { DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww } from '../output-targets/output-utils';
 import { URL } from 'url';
+import { buildError } from '@utils';
 
 
-export function validateOutputTargetWww(config: d.Config) {
+export function validateOutputTargetWww(config: d.Config, diagnostics: d.Diagnostic[]) {
   const hasOutputTargets = Array.isArray(config.outputTargets);
   const hasE2eTests = !!(config.flags && config.flags.e2e);
 
@@ -21,15 +22,16 @@ export function validateOutputTargetWww(config: d.Config) {
   const wwwOutputTargets = config.outputTargets.filter(isOutputTargetWww);
 
   if (config.flags.prerender && wwwOutputTargets.length === 0) {
-    throw new Error(`You need at least one "www" output target configured in your stencil.config.ts, when the "--prerender" flag is used`);
+    const err = buildError(diagnostics);
+    err.messageText = `You need at least one "www" output target configured in your stencil.config.ts, when the "--prerender" flag is used`;
   }
   wwwOutputTargets.forEach(outputTarget => {
-    validateOutputTarget(config, outputTarget);
+    validateOutputTarget(config, diagnostics, outputTarget);
   });
 }
 
 
-function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww) {
+function validateOutputTarget(config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetWww) {
   const path = config.sys.path;
 
   setStringConfig(outputTarget, 'baseUrl', '/');
@@ -60,7 +62,7 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   }
 
   setBooleanConfig(outputTarget, 'empty', null, DEFAULT_EMPTY_DIR);
-  validatePrerender(config, outputTarget);
+  validatePrerender(config, diagnostics, outputTarget);
 
   outputTarget.copy = validateCopy(outputTarget.copy, [
     ...(config.copy || []),
