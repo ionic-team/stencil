@@ -16,27 +16,34 @@ import { isComplexType } from '@utils';
 // export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, child?: d.ChildType): d.VNode;
 // export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
 export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.VNode => {
+  let child = null;
   let simple = false;
   let lastSimple = false;
   let key: string;
   let slotName: string;
   let vNodeChildren: d.VNode[] = [];
-  children.flat().forEach(child => {
-    if (child != null) {
-      if (simple = typeof nodeName !== 'function' && !isComplexType(child)) {
-        child = String(child);
-      }
+  const walk = (c: any[]) => {
+    for (let i = 0; i < c.length; i++) {
+      child = c[i];
+      if (Array.isArray(child)) {
+        walk(child);
+      } else if (child != null) {
+        if (simple = typeof nodeName !== 'function' && !isComplexType(child)) {
+          child = String(child);
+        }
 
-      if (simple && lastSimple) {
-        // If the previous child was simple (string), we merge both
-        vNodeChildren[vNodeChildren.length - 1].$text$ += child;
-      } else {
-        // Append a new vNode, if it's text, we create a text vNode
-        vNodeChildren.push(simple ? { $flags$: 0, $text$: child } : child);
+        if (simple && lastSimple) {
+          // If the previous child was simple (string), we merge both
+          vNodeChildren[vNodeChildren.length - 1].$text$ += child;
+        } else {
+          // Append a new vNode, if it's text, we create a text vNode
+          vNodeChildren.push(simple ? { $flags$: 0, $text$: child } : child);
+        }
+        lastSimple = simple;
       }
-      lastSimple = simple;
     }
-  });
+  };
+  walk(children);
   if (BUILD.vdomAttribute && vnodeData) {
     // normalize class / classname attributes
     if (BUILD.vdomKey) {
