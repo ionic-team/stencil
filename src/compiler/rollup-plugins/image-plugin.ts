@@ -36,4 +36,4 @@ export function imagePlugin(config: d.Config, buildCtx: d.BuildCtx): Plugin {
   };
 }
 
-const MAX_IMAGE_SIZE = 4 * 1024; // 10KB
+const MAX_IMAGE_SIZE = 4 * 1024; // 4KiB
