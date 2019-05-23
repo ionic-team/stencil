@@ -58,7 +58,9 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
     return rollupBuild;
 
   } catch (e) {
-    loadRollupDiagnostics(compilerCtx, buildCtx, e);
+    if (!buildCtx.hasError) {
+      loadRollupDiagnostics(buildCtx, e);
+    }
   }
 
   return undefined;

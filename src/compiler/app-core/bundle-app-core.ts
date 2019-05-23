@@ -65,7 +65,9 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
     return rollupBuild;
 
   } catch (e) {
-    loadRollupDiagnostics(compilerCtx, buildCtx, e);
+    if (!buildCtx.hasError) {
+      loadRollupDiagnostics(buildCtx, e);
+    }
   }
 
   return undefined;

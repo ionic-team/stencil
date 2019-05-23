@@ -3,7 +3,7 @@ import { buildWarn } from '../message-utils';
 import { toTitleCase } from '../helpers';
 
 
-export function loadRollupDiagnostics(_compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: any) {
+export function loadRollupDiagnostics(buildCtx: d.BuildCtx, rollupError: any) {
   const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'bundling',
