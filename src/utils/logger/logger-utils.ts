@@ -124,4 +124,4 @@ export function escapeHtml(unsafe: any) {
 }
 
 
-export const MAX_ERRORS = 15;
+export const MAX_ERRORS = 25;

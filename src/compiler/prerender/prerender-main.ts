@@ -70,7 +70,7 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
   if (manager.isDebug) {
     const debugDiagnostics = prerenderDiagnostics.filter(d => d.level === 'debug');
     if (debugDiagnostics.length > 0) {
-      config.logger.printDiagnostics(debugDiagnostics, config.rootDir);
+      config.logger.printDiagnostics(debugDiagnostics);
     }
   }
 

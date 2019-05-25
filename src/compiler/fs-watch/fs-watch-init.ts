@@ -29,10 +29,9 @@ export async function initFsWatcher(config: d.Config, compilerCtx: d.CompilerCtx
     }
 
   } catch (e) {
-    console.log(e)
     const diagnostics: d.Diagnostic[] = [];
     catchError(diagnostics, e);
-    config.logger.printDiagnostics(diagnostics, config.rootDir);
+    config.logger.printDiagnostics(diagnostics);
     return false;
   }
 
