@@ -35,6 +35,64 @@ export function buildWarn(diagnostics: d.Diagnostic[]) {
 }
 
 
+export function buildJsonFileWarn(compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], jsonFilePath: string, msg: string, warnKey: string) {
+  const warn = buildWarn(diagnostics);
+  warn.messageText = msg;
+  warn.absFilePath = jsonFilePath;
+
+  if (typeof warnKey === 'string') {
+    try {
+      const jsonStr = compilerCtx.fs.readFileSync(jsonFilePath);
+      const lines = jsonStr.replace(/\r/g, '\n').split('\n');
+
+      for (let i = 0; i < lines.length; i++) {
+        const txtLine = lines[i];
+        const txtIndex = txtLine.indexOf(warnKey);
+
+        if (txtIndex > -1) {
+          const warnLine: d.PrintLine = {
+            lineIndex: i,
+            lineNumber: i + 1,
+            text: txtLine,
+            errorCharStart: txtIndex,
+            errorLength: warnKey.length
+          };
+          warn.lineNumber = warnLine.lineNumber;
+          warn.columnNumber = txtIndex + 1;
+          warn.lines.push(warnLine);
+
+          if (i >= 0) {
+            const beforeWarnLine: d.PrintLine = {
+              lineIndex: warnLine.lineIndex - 1,
+              lineNumber: warnLine.lineNumber - 1,
+              text: lines[i - 1],
+              errorCharStart: -1,
+              errorLength: -1
+            };
+            warn.lines.unshift(beforeWarnLine);
+          }
+
+          if (i < lines.length) {
+            const afterWarnLine: d.PrintLine = {
+              lineIndex: warnLine.lineIndex + 1,
+              lineNumber: warnLine.lineNumber + 1,
+              text: lines[i + 1],
+              errorCharStart: -1,
+              errorLength: -1
+            };
+            warn.lines.push(afterWarnLine);
+          }
+
+          break;
+        }
+      }
+    } catch (e) {}
+  }
+
+  return warn;
+}
+
+
 export function catchError(diagnostics: d.Diagnostic[], err: Error, msg?: string) {
   const diagnostic: d.Diagnostic = {
     level: 'error',

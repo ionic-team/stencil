@@ -42,7 +42,7 @@ export function getComponentsDtsSrcFilePath(config: d.Config) {
   return config.sys.path.join(config.srcDir, GENERATED_DTS);
 }
 
-export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDist) {
+export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDist | d.OutputTargetDistCollection) {
   return config.sys.path.join(outputTarget.typesDir, GENERATED_DTS);
 }
 
@@ -59,7 +59,7 @@ export function isOutputTargetDistLazy(o: d.OutputTarget): o is d.OutputTargetDi
 }
 
 export function isOutputTargetAngular(o: d.OutputTarget): o is d.OutputTargetAngular {
-  return o.type === 'angular';
+  return o.type === ANGULAR;
 }
 
 export function isOutputTargetDistLazyLoader(o: d.OutputTarget): o is d.OutputTargetDistLazyLoader {

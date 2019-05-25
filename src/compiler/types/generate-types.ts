@@ -2,26 +2,19 @@ import * as d from '../../declarations';
 import { copyStencilCoreDts, updateStencilTypesImports } from './stencil-types';
 import { generateAppTypes } from './generate-app-types';
 import { isDtsFile } from '@utils';
-import * as v from './validate-package-json';
 
 
-export async function generateTypesAndValidate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDist) {
-  v.validatePackageFiles(config, outputTarget, buildCtx.diagnostics, pkgData);
-  v.validateCollection(config, outputTarget, buildCtx.diagnostics, pkgData);
-  v.validateTypes(config, outputTarget, buildCtx.diagnostics, pkgData);
-
+export async function generateTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDist) {
   if (!buildCtx.hasError) {
     await generateTypesOutput(config, compilerCtx, buildCtx, pkgData, outputTarget);
 
-    const existsTypes = await v.validateTypesExist(config, compilerCtx, outputTarget, buildCtx.diagnostics, pkgData);
-    if (existsTypes) {
-      await copyStencilCoreDts(config, compilerCtx);
+    if (typeof pkgData.types === 'string') {
+      const pkgFile = config.sys.path.join(config.rootDir, pkgData.types);
+      const fileExists = await compilerCtx.fs.access(pkgFile);
+      if (fileExists) {
+        await copyStencilCoreDts(config, compilerCtx);
+      }
     }
-
-    v.validateModule(config, outputTarget, buildCtx.diagnostics, pkgData);
-    v.validateMain(config, outputTarget, buildCtx.diagnostics, pkgData);
-    // v.validateCollectionMain(config, outputTarget, buildCtx.diagnostics, pkgData);
-    v.validateBrowser(buildCtx.diagnostics, pkgData);
   }
 }
 

@@ -57,6 +57,7 @@ export interface BuildCtx {
   isRebuild: boolean;
   moduleFiles: d.Module[];
   packageJson: d.PackageJsonData;
+  packageJsonFilePath: string;
   pendingCopyTasks: Promise<d.CopyResults>[];
   progress(task: BuildTask): void;
   requiresFullBuild: boolean;

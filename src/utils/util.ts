@@ -158,9 +158,11 @@ export async function readPackageJson(config: d.Config, compilerCtx: d.CompilerC
     const diagnostic = buildError(buildCtx.diagnostics);
     diagnostic.header = `Error parsing "package.json"`;
     diagnostic.messageText = `${pkgJsonPath}, ${e}`;
+    diagnostic.absFilePath = pkgJsonPath;
     return null;
   }
 
+  buildCtx.packageJsonFilePath = pkgJsonPath;
   return pkgData;
 }
 
