@@ -4,7 +4,7 @@ import { getComponentsDtsTypesFilePath, isOutputTargetDistCollection } from '../
 
 
 export function validatePackageJson(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (buildCtx.packageJson == null || buildCtx.hasError) {
+  if (buildCtx.packageJson == null) {
     return null;
   }
 
