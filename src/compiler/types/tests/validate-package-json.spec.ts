@@ -11,7 +11,7 @@ describe('validate-package-json', () => {
   let outputTarget: d.OutputTargetDistCollection;
   const root = path.resolve('/');
 
-  beforeEach(() => {
+  beforeEach(async () => {
     outputTarget = {
       type: 'dist-collection',
       dir: '/dist',
@@ -25,37 +25,47 @@ describe('validate-package-json', () => {
     compilerCtx = mockCompilerCtx();
     buildCtx = mockBuildCtx(config, compilerCtx);
     buildCtx.packageJson = {};
+    buildCtx.packageJsonFilePath = path.join(root, 'package.json');
+    await compilerCtx.fs.writeFile(buildCtx.packageJsonFilePath, JSON.stringify(buildCtx.packageJson));
   });
 
   describe('files', () => {
 
     it('should validate files "dist/"', async () => {
+      const distPath = path.join(root, 'dist');
+      await compilerCtx.fs.emptyDir(distPath);
       buildCtx.packageJson.files = ['dist/'];
-      v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
+      await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
     it('should validate files "./dist/"', async () => {
+      const distPath = path.join(root, 'dist');
+      await compilerCtx.fs.emptyDir(distPath);
       buildCtx.packageJson.files = ['./dist/'];
-      v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
+      await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
     it('should validate files "./dist"', async () => {
+      const distPath = path.join(root, 'dist');
+      await compilerCtx.fs.emptyDir(distPath);
       buildCtx.packageJson.files = ['./dist'];
-      v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
+      await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
     it('should validate files "dist"', async () => {
+      const distPath = path.join(root, 'dist');
+      await compilerCtx.fs.emptyDir(distPath);
       buildCtx.packageJson.files = ['dist'];
-      v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
+      await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
     it('should error when files array misses dist/', async () => {
       buildCtx.packageJson.files = [];
-      v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
+      await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics[0].messageText).toMatch(/array must contain the distribution directory/);
       expect(buildCtx.diagnostics[0].messageText).toMatch(/"dist\/"/);
     });
