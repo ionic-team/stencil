@@ -145,6 +145,9 @@ export namespace Components {
   interface SlotBasicOrder {}
   interface SlotBasicOrderRoot {}
   interface SlotBasicRoot {}
+  interface SlotDynamicList {
+    'items': Array<string>;
+  }
   interface SlotDynamicWrapper {
     'tag': string;
   }
@@ -158,7 +161,10 @@ export namespace Components {
   }
   interface SlotLightDomContent {}
   interface SlotLightDomRoot {}
-
+  interface SlotLightList {}
+  interface SlotListLightRoot {
+    'items': string[];
+  }
   interface SlotMapOrder {}
   interface SlotMapOrderRoot {}
   interface SlotReorder {
@@ -175,272 +181,7 @@ export namespace Components {
   interface Tag88 {}
 }
 
-declare namespace LocalJSX {
-  interface AttributeBasic extends JSXBase.HTMLAttributes {
-    'customAttr'?: string;
-    'multiWord'?: string;
-    'single'?: string;
-  }
-  interface AttributeBasicRoot extends JSXBase.HTMLAttributes {}
-  interface AttributeBoolean extends JSXBase.HTMLAttributes {
-    'boolState'?: boolean;
-    'noreflect'?: boolean;
-    'strState'?: string;
-  }
-  interface AttributeBooleanRoot extends JSXBase.HTMLAttributes {}
-  interface AttributeComplex extends JSXBase.HTMLAttributes {
-    'bool0'?: boolean;
-    'bool1'?: boolean;
-    'bool2'?: boolean;
-    'nu0'?: number;
-    'nu1'?: number;
-    'str0'?: string;
-    'str1'?: string;
-  }
-  interface AttributeHost extends JSXBase.HTMLAttributes {}
-  interface AttributeHtmlRoot extends JSXBase.HTMLAttributes {
-    'anyAttr'?: any;
-    'nuAttr'?: number;
-    'strAttr'?: string;
-  }
-  interface BadSharedJsx extends JSXBase.HTMLAttributes {}
-  interface ConditionalBasic extends JSXBase.HTMLAttributes {}
-  interface ConditionalRerender extends JSXBase.HTMLAttributes {}
-  interface ConditionalRerenderRoot extends JSXBase.HTMLAttributes {}
-  interface CssCmp extends JSXBase.HTMLAttributes {}
-  interface CssVariables extends JSXBase.HTMLAttributes {}
-  interface CssVariablesRoot extends JSXBase.HTMLAttributes {}
-  interface CustomEventRoot extends JSXBase.HTMLAttributes {}
-  interface DomReattach extends JSXBase.HTMLAttributes {
-    'didLoad'?: number;
-    'didUnload'?: number;
-    'willLoad'?: number;
-  }
-  interface DynamicCssVariable extends JSXBase.HTMLAttributes {}
-  interface DynamicImport extends JSXBase.HTMLAttributes {}
-  interface Es5AddclassSvg extends JSXBase.HTMLAttributes {}
-  interface EsmImport extends JSXBase.HTMLAttributes {
-    'onSomeEvent'?: (event: CustomEvent<any>) => void;
-    'propVal'?: number;
-  }
-  interface ExternalImportA extends JSXBase.HTMLAttributes {}
-  interface ExternalImportB extends JSXBase.HTMLAttributes {}
-  interface ExternalImportC extends JSXBase.HTMLAttributes {}
-  interface FactoryJsx extends JSXBase.HTMLAttributes {}
-  interface InitCssRoot extends JSXBase.HTMLAttributes {}
-  interface InputBasicRoot extends JSXBase.HTMLAttributes {
-    'value'?: string;
-  }
-  interface KeyReorder extends JSXBase.HTMLAttributes {
-    'num'?: number;
-  }
-  interface KeyReorderRoot extends JSXBase.HTMLAttributes {}
-  interface LegacyContext extends JSXBase.HTMLAttributes {}
-  interface LifecycleAsyncA extends JSXBase.HTMLAttributes {}
-  interface LifecycleAsyncB extends JSXBase.HTMLAttributes {
-    'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
-    'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
-    'value'?: string;
-  }
-  interface LifecycleAsyncC extends JSXBase.HTMLAttributes {
-    'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
-    'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
-    'value'?: string;
-  }
-  interface LifecycleBasicA extends JSXBase.HTMLAttributes {}
-  interface LifecycleBasicB extends JSXBase.HTMLAttributes {
-    'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
-    'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
-    'value'?: string;
-  }
-  interface LifecycleBasicC extends JSXBase.HTMLAttributes {
-    'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
-    'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
-    'value'?: string;
-  }
-  interface LifecycleUnloadA extends JSXBase.HTMLAttributes {}
-  interface LifecycleUnloadB extends JSXBase.HTMLAttributes {}
-  interface LifecycleUnloadRoot extends JSXBase.HTMLAttributes {}
-  interface LifecycleUpdateA extends JSXBase.HTMLAttributes {}
-  interface LifecycleUpdateB extends JSXBase.HTMLAttributes {
-    'value'?: number;
-  }
-  interface LifecycleUpdateC extends JSXBase.HTMLAttributes {
-    'value'?: number;
-  }
-  interface ListenJsx extends JSXBase.HTMLAttributes {}
-  interface ListenJsxRoot extends JSXBase.HTMLAttributes {}
-  interface ListenWindow extends JSXBase.HTMLAttributes {}
-  interface NodeGlobals extends JSXBase.HTMLAttributes {}
-  interface NodeResolution extends JSXBase.HTMLAttributes {}
-  interface ReflectToAttr extends JSXBase.HTMLAttributes {
-    'bool'?: boolean;
-    'disabled'?: boolean;
-    'dynamicNu'?: number;
-    'dynamicStr'?: string;
-    'nu'?: number;
-    'null'?: string | null;
-    'otherBool'?: boolean;
-    'str'?: string;
-    'undef'?: string;
-  }
-  interface SassCmp extends JSXBase.HTMLAttributes {}
-  interface ScopedBasic extends JSXBase.HTMLAttributes {}
-  interface ScopedBasicRoot extends JSXBase.HTMLAttributes {}
-  interface ShadowDomArray extends JSXBase.HTMLAttributes {
-    'values'?: number[];
-  }
-  interface ShadowDomArrayRoot extends JSXBase.HTMLAttributes {}
-  interface ShadowDomBasic extends JSXBase.HTMLAttributes {}
-  interface ShadowDomBasicRoot extends JSXBase.HTMLAttributes {}
-  interface ShadowDomMode extends JSXBase.HTMLAttributes {
-    /**
-    * The mode determines which platform styles to use.
-    */
-    'colormode'?: string;
-  }
-  interface ShadowDomModeRoot extends JSXBase.HTMLAttributes {}
-  interface ShadowDomSlotBasic extends JSXBase.HTMLAttributes {}
-  interface ShadowDomSlotNested extends JSXBase.HTMLAttributes {
-    'i'?: number;
-  }
-  interface ShadowDomSlotNestedRoot extends JSXBase.HTMLAttributes {}
-  interface SlotArrayBasic extends JSXBase.HTMLAttributes {}
-  interface SlotArrayComplex extends JSXBase.HTMLAttributes {}
-  interface SlotArrayComplexRoot extends JSXBase.HTMLAttributes {}
-  interface SlotArrayTop extends JSXBase.HTMLAttributes {}
-  interface SlotBasic extends JSXBase.HTMLAttributes {}
-  interface SlotBasicOrder extends JSXBase.HTMLAttributes {}
-  interface SlotBasicOrderRoot extends JSXBase.HTMLAttributes {}
-  interface SlotBasicRoot extends JSXBase.HTMLAttributes {}
-  interface SlotDynamicWrapper extends JSXBase.HTMLAttributes {
-    'tag'?: string;
-  }
-  interface SlotDynamicWrapperRoot extends JSXBase.HTMLAttributes {}
-  interface SlotFallback extends JSXBase.HTMLAttributes {
-    'inc'?: number;
-  }
-  interface SlotFallbackRoot extends JSXBase.HTMLAttributes {}
-  interface SlotHtml extends JSXBase.HTMLAttributes {
-    'inc'?: number;
-  }
-  interface SlotLightDomContent extends JSXBase.HTMLAttributes {}
-  interface SlotLightDomRoot extends JSXBase.HTMLAttributes {}
-  interface SlotMapOrder extends JSXBase.HTMLAttributes {}
-  interface SlotMapOrderRoot extends JSXBase.HTMLAttributes {}
-  interface SlotReorder extends JSXBase.HTMLAttributes {
-    'reordered'?: boolean;
-  }
-  interface SlotReorderRoot extends JSXBase.HTMLAttributes {}
-  interface SlotReplaceWrapper extends JSXBase.HTMLAttributes {
-    'href'?: string;
-  }
-  interface SlotReplaceWrapperRoot extends JSXBase.HTMLAttributes {}
-  interface SvgAttr extends JSXBase.HTMLAttributes {}
-  interface SvgClass extends JSXBase.HTMLAttributes {}
-  interface Tag3dComponent extends JSXBase.HTMLAttributes {}
-  interface Tag88 extends JSXBase.HTMLAttributes {}
-
-  interface IntrinsicElements {
-    'attribute-basic': AttributeBasic;
-    'attribute-basic-root': AttributeBasicRoot;
-    'attribute-boolean': AttributeBoolean;
-    'attribute-boolean-root': AttributeBooleanRoot;
-    'attribute-complex': AttributeComplex;
-    'attribute-host': AttributeHost;
-    'attribute-html-root': AttributeHtmlRoot;
-    'bad-shared-jsx': BadSharedJsx;
-    'conditional-basic': ConditionalBasic;
-    'conditional-rerender': ConditionalRerender;
-    'conditional-rerender-root': ConditionalRerenderRoot;
-    'css-cmp': CssCmp;
-    'css-variables': CssVariables;
-    'css-variables-root': CssVariablesRoot;
-    'custom-event-root': CustomEventRoot;
-    'dom-reattach': DomReattach;
-    'dynamic-css-variable': DynamicCssVariable;
-    'dynamic-import': DynamicImport;
-    'es5-addclass-svg': Es5AddclassSvg;
-    'esm-import': EsmImport;
-    'external-import-a': ExternalImportA;
-    'external-import-b': ExternalImportB;
-    'external-import-c': ExternalImportC;
-    'factory-jsx': FactoryJsx;
-    'init-css-root': InitCssRoot;
-    'input-basic-root': InputBasicRoot;
-    'key-reorder': KeyReorder;
-    'key-reorder-root': KeyReorderRoot;
-    'legacy-context': LegacyContext;
-    'lifecycle-async-a': LifecycleAsyncA;
-    'lifecycle-async-b': LifecycleAsyncB;
-    'lifecycle-async-c': LifecycleAsyncC;
-    'lifecycle-basic-a': LifecycleBasicA;
-    'lifecycle-basic-b': LifecycleBasicB;
-    'lifecycle-basic-c': LifecycleBasicC;
-    'lifecycle-unload-a': LifecycleUnloadA;
-    'lifecycle-unload-b': LifecycleUnloadB;
-    'lifecycle-unload-root': LifecycleUnloadRoot;
-    'lifecycle-update-a': LifecycleUpdateA;
-    'lifecycle-update-b': LifecycleUpdateB;
-    'lifecycle-update-c': LifecycleUpdateC;
-    'listen-jsx': ListenJsx;
-    'listen-jsx-root': ListenJsxRoot;
-    'listen-window': ListenWindow;
-    'node-globals': NodeGlobals;
-    'node-resolution': NodeResolution;
-    'reflect-to-attr': ReflectToAttr;
-    'sass-cmp': SassCmp;
-    'scoped-basic': ScopedBasic;
-    'scoped-basic-root': ScopedBasicRoot;
-    'shadow-dom-array': ShadowDomArray;
-    'shadow-dom-array-root': ShadowDomArrayRoot;
-    'shadow-dom-basic': ShadowDomBasic;
-    'shadow-dom-basic-root': ShadowDomBasicRoot;
-    'shadow-dom-mode': ShadowDomMode;
-    'shadow-dom-mode-root': ShadowDomModeRoot;
-    'shadow-dom-slot-basic': ShadowDomSlotBasic;
-    'shadow-dom-slot-nested': ShadowDomSlotNested;
-    'shadow-dom-slot-nested-root': ShadowDomSlotNestedRoot;
-    'slot-array-basic': SlotArrayBasic;
-    'slot-array-complex': SlotArrayComplex;
-    'slot-array-complex-root': SlotArrayComplexRoot;
-    'slot-array-top': SlotArrayTop;
-    'slot-basic': SlotBasic;
-    'slot-basic-order': SlotBasicOrder;
-    'slot-basic-order-root': SlotBasicOrderRoot;
-    'slot-basic-root': SlotBasicRoot;
-    'slot-dynamic-wrapper': SlotDynamicWrapper;
-    'slot-dynamic-wrapper-root': SlotDynamicWrapperRoot;
-    'slot-fallback': SlotFallback;
-    'slot-fallback-root': SlotFallbackRoot;
-    'slot-html': SlotHtml;
-    'slot-light-dom-content': SlotLightDomContent;
-    'slot-light-dom-root': SlotLightDomRoot;
-    'slot-map-order': SlotMapOrder;
-    'slot-map-order-root': SlotMapOrderRoot;
-    'slot-reorder': SlotReorder;
-    'slot-reorder-root': SlotReorderRoot;
-    'slot-replace-wrapper': SlotReplaceWrapper;
-    'slot-replace-wrapper-root': SlotReplaceWrapperRoot;
-    'svg-attr': SvgAttr;
-    'svg-class': SvgClass;
-    'tag-3d-component': Tag3dComponent;
-    'tag-88': Tag88;
-  }
-}
-
-export { LocalJSX as JSX };
-
-
-declare module "@stencil/core" {
-  export namespace JSX {
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
-  }
-}
-
-
 declare global {
-
 
 
   interface HTMLAttributeBasicElement extends Components.AttributeBasic, HTMLStencilElement {}
@@ -845,6 +586,12 @@ declare global {
     new (): HTMLSlotBasicRootElement;
   };
 
+  interface HTMLSlotDynamicListElement extends Components.SlotDynamicList, HTMLStencilElement {}
+  var HTMLSlotDynamicListElement: {
+    prototype: HTMLSlotDynamicListElement;
+    new (): HTMLSlotDynamicListElement;
+  };
+
   interface HTMLSlotDynamicWrapperElement extends Components.SlotDynamicWrapper, HTMLStencilElement {}
   var HTMLSlotDynamicWrapperElement: {
     prototype: HTMLSlotDynamicWrapperElement;
@@ -885,6 +632,18 @@ declare global {
   var HTMLSlotLightDomRootElement: {
     prototype: HTMLSlotLightDomRootElement;
     new (): HTMLSlotLightDomRootElement;
+  };
+
+  interface HTMLSlotLightListElement extends Components.SlotLightList, HTMLStencilElement {}
+  var HTMLSlotLightListElement: {
+    prototype: HTMLSlotLightListElement;
+    new (): HTMLSlotLightListElement;
+  };
+
+  interface HTMLSlotListLightRootElement extends Components.SlotListLightRoot, HTMLStencilElement {}
+  var HTMLSlotListLightRootElement: {
+    prototype: HTMLSlotListLightRootElement;
+    new (): HTMLSlotListLightRootElement;
   };
 
   interface HTMLSlotMapOrderElement extends Components.SlotMapOrder, HTMLStencilElement {}
@@ -946,7 +705,6 @@ declare global {
     prototype: HTMLTag88Element;
     new (): HTMLTag88Element;
   };
-
   interface HTMLElementTagNameMap {
     'attribute-basic': HTMLAttributeBasicElement;
     'attribute-basic-root': HTMLAttributeBasicRootElement;
@@ -1015,6 +773,7 @@ declare global {
     'slot-basic-order': HTMLSlotBasicOrderElement;
     'slot-basic-order-root': HTMLSlotBasicOrderRootElement;
     'slot-basic-root': HTMLSlotBasicRootElement;
+    'slot-dynamic-list': HTMLSlotDynamicListElement;
     'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement;
     'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement;
     'slot-fallback': HTMLSlotFallbackElement;
@@ -1022,6 +781,8 @@ declare global {
     'slot-html': HTMLSlotHtmlElement;
     'slot-light-dom-content': HTMLSlotLightDomContentElement;
     'slot-light-dom-root': HTMLSlotLightDomRootElement;
+    'slot-light-list': HTMLSlotLightListElement;
+    'slot-list-light-root': HTMLSlotListLightRootElement;
     'slot-map-order': HTMLSlotMapOrderElement;
     'slot-map-order-root': HTMLSlotMapOrderRootElement;
     'slot-reorder': HTMLSlotReorderElement;
@@ -1036,4 +797,278 @@ declare global {
 
   interface ElementTagNameMap extends HTMLElementTagNameMap {}
 }
+
+declare namespace LocalJSX {
+  interface AttributeBasic extends JSXBase.HTMLAttributes<HTMLAttributeBasicElement> {
+    'customAttr'?: string;
+    'multiWord'?: string;
+    'single'?: string;
+  }
+  interface AttributeBasicRoot extends JSXBase.HTMLAttributes<HTMLAttributeBasicRootElement> {}
+  interface AttributeBoolean extends JSXBase.HTMLAttributes<HTMLAttributeBooleanElement> {
+    'boolState'?: boolean;
+    'noreflect'?: boolean;
+    'strState'?: string;
+  }
+  interface AttributeBooleanRoot extends JSXBase.HTMLAttributes<HTMLAttributeBooleanRootElement> {}
+  interface AttributeComplex extends JSXBase.HTMLAttributes<HTMLAttributeComplexElement> {
+    'bool0'?: boolean;
+    'bool1'?: boolean;
+    'bool2'?: boolean;
+    'nu0'?: number;
+    'nu1'?: number;
+    'str0'?: string;
+    'str1'?: string;
+  }
+  interface AttributeHost extends JSXBase.HTMLAttributes<HTMLAttributeHostElement> {}
+  interface AttributeHtmlRoot extends JSXBase.HTMLAttributes<HTMLAttributeHtmlRootElement> {
+    'anyAttr'?: any;
+    'nuAttr'?: number;
+    'strAttr'?: string;
+  }
+  interface BadSharedJsx extends JSXBase.HTMLAttributes<HTMLBadSharedJsxElement> {}
+  interface ConditionalBasic extends JSXBase.HTMLAttributes<HTMLConditionalBasicElement> {}
+  interface ConditionalRerender extends JSXBase.HTMLAttributes<HTMLConditionalRerenderElement> {}
+  interface ConditionalRerenderRoot extends JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement> {}
+  interface CssCmp extends JSXBase.HTMLAttributes<HTMLCssCmpElement> {}
+  interface CssVariables extends JSXBase.HTMLAttributes<HTMLCssVariablesElement> {}
+  interface CssVariablesRoot extends JSXBase.HTMLAttributes<HTMLCssVariablesRootElement> {}
+  interface CustomEventRoot extends JSXBase.HTMLAttributes<HTMLCustomEventRootElement> {}
+  interface DomReattach extends JSXBase.HTMLAttributes<HTMLDomReattachElement> {
+    'didLoad'?: number;
+    'didUnload'?: number;
+    'willLoad'?: number;
+  }
+  interface DynamicCssVariable extends JSXBase.HTMLAttributes<HTMLDynamicCssVariableElement> {}
+  interface DynamicImport extends JSXBase.HTMLAttributes<HTMLDynamicImportElement> {}
+  interface Es5AddclassSvg extends JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement> {}
+  interface EsmImport extends JSXBase.HTMLAttributes<HTMLEsmImportElement> {
+    'onSomeEvent'?: (event: CustomEvent<any>) => void;
+    'propVal'?: number;
+  }
+  interface ExternalImportA extends JSXBase.HTMLAttributes<HTMLExternalImportAElement> {}
+  interface ExternalImportB extends JSXBase.HTMLAttributes<HTMLExternalImportBElement> {}
+  interface ExternalImportC extends JSXBase.HTMLAttributes<HTMLExternalImportCElement> {}
+  interface FactoryJsx extends JSXBase.HTMLAttributes<HTMLFactoryJsxElement> {}
+  interface InitCssRoot extends JSXBase.HTMLAttributes<HTMLInitCssRootElement> {}
+  interface InputBasicRoot extends JSXBase.HTMLAttributes<HTMLInputBasicRootElement> {
+    'value'?: string;
+  }
+  interface KeyReorder extends JSXBase.HTMLAttributes<HTMLKeyReorderElement> {
+    'num'?: number;
+  }
+  interface KeyReorderRoot extends JSXBase.HTMLAttributes<HTMLKeyReorderRootElement> {}
+  interface LegacyContext extends JSXBase.HTMLAttributes<HTMLLegacyContextElement> {}
+  interface LifecycleAsyncA extends JSXBase.HTMLAttributes<HTMLLifecycleAsyncAElement> {}
+  interface LifecycleAsyncB extends JSXBase.HTMLAttributes<HTMLLifecycleAsyncBElement> {
+    'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
+    'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
+    'value'?: string;
+  }
+  interface LifecycleAsyncC extends JSXBase.HTMLAttributes<HTMLLifecycleAsyncCElement> {
+    'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
+    'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
+    'value'?: string;
+  }
+  interface LifecycleBasicA extends JSXBase.HTMLAttributes<HTMLLifecycleBasicAElement> {}
+  interface LifecycleBasicB extends JSXBase.HTMLAttributes<HTMLLifecycleBasicBElement> {
+    'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
+    'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
+    'value'?: string;
+  }
+  interface LifecycleBasicC extends JSXBase.HTMLAttributes<HTMLLifecycleBasicCElement> {
+    'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
+    'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
+    'value'?: string;
+  }
+  interface LifecycleUnloadA extends JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement> {}
+  interface LifecycleUnloadB extends JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement> {}
+  interface LifecycleUnloadRoot extends JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement> {}
+  interface LifecycleUpdateA extends JSXBase.HTMLAttributes<HTMLLifecycleUpdateAElement> {}
+  interface LifecycleUpdateB extends JSXBase.HTMLAttributes<HTMLLifecycleUpdateBElement> {
+    'value'?: number;
+  }
+  interface LifecycleUpdateC extends JSXBase.HTMLAttributes<HTMLLifecycleUpdateCElement> {
+    'value'?: number;
+  }
+  interface ListenJsx extends JSXBase.HTMLAttributes<HTMLListenJsxElement> {}
+  interface ListenJsxRoot extends JSXBase.HTMLAttributes<HTMLListenJsxRootElement> {}
+  interface ListenWindow extends JSXBase.HTMLAttributes<HTMLListenWindowElement> {}
+  interface NodeGlobals extends JSXBase.HTMLAttributes<HTMLNodeGlobalsElement> {}
+  interface NodeResolution extends JSXBase.HTMLAttributes<HTMLNodeResolutionElement> {}
+  interface ReflectToAttr extends JSXBase.HTMLAttributes<HTMLReflectToAttrElement> {
+    'bool'?: boolean;
+    'disabled'?: boolean;
+    'dynamicNu'?: number;
+    'dynamicStr'?: string;
+    'nu'?: number;
+    'null'?: string | null;
+    'otherBool'?: boolean;
+    'str'?: string;
+    'undef'?: string;
+  }
+  interface SassCmp extends JSXBase.HTMLAttributes<HTMLSassCmpElement> {}
+  interface ScopedBasic extends JSXBase.HTMLAttributes<HTMLScopedBasicElement> {}
+  interface ScopedBasicRoot extends JSXBase.HTMLAttributes<HTMLScopedBasicRootElement> {}
+  interface ShadowDomArray extends JSXBase.HTMLAttributes<HTMLShadowDomArrayElement> {
+    'values'?: number[];
+  }
+  interface ShadowDomArrayRoot extends JSXBase.HTMLAttributes<HTMLShadowDomArrayRootElement> {}
+  interface ShadowDomBasic extends JSXBase.HTMLAttributes<HTMLShadowDomBasicElement> {}
+  interface ShadowDomBasicRoot extends JSXBase.HTMLAttributes<HTMLShadowDomBasicRootElement> {}
+  interface ShadowDomMode extends JSXBase.HTMLAttributes<HTMLShadowDomModeElement> {
+    /**
+    * The mode determines which platform styles to use.
+    */
+    'colormode'?: string;
+  }
+  interface ShadowDomModeRoot extends JSXBase.HTMLAttributes<HTMLShadowDomModeRootElement> {}
+  interface ShadowDomSlotBasic extends JSXBase.HTMLAttributes<HTMLShadowDomSlotBasicElement> {}
+  interface ShadowDomSlotNested extends JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement> {
+    'i'?: number;
+  }
+  interface ShadowDomSlotNestedRoot extends JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement> {}
+  interface SlotArrayBasic extends JSXBase.HTMLAttributes<HTMLSlotArrayBasicElement> {}
+  interface SlotArrayComplex extends JSXBase.HTMLAttributes<HTMLSlotArrayComplexElement> {}
+  interface SlotArrayComplexRoot extends JSXBase.HTMLAttributes<HTMLSlotArrayComplexRootElement> {}
+  interface SlotArrayTop extends JSXBase.HTMLAttributes<HTMLSlotArrayTopElement> {}
+  interface SlotBasic extends JSXBase.HTMLAttributes<HTMLSlotBasicElement> {}
+  interface SlotBasicOrder extends JSXBase.HTMLAttributes<HTMLSlotBasicOrderElement> {}
+  interface SlotBasicOrderRoot extends JSXBase.HTMLAttributes<HTMLSlotBasicOrderRootElement> {}
+  interface SlotBasicRoot extends JSXBase.HTMLAttributes<HTMLSlotBasicRootElement> {}
+  interface SlotDynamicList extends JSXBase.HTMLAttributes<HTMLSlotDynamicListElement> {
+    'items'?: Array<string>;
+  }
+  interface SlotDynamicWrapper extends JSXBase.HTMLAttributes<HTMLSlotDynamicWrapperElement> {
+    'tag'?: string;
+  }
+  interface SlotDynamicWrapperRoot extends JSXBase.HTMLAttributes<HTMLSlotDynamicWrapperRootElement> {}
+  interface SlotFallback extends JSXBase.HTMLAttributes<HTMLSlotFallbackElement> {
+    'inc'?: number;
+  }
+  interface SlotFallbackRoot extends JSXBase.HTMLAttributes<HTMLSlotFallbackRootElement> {}
+  interface SlotHtml extends JSXBase.HTMLAttributes<HTMLSlotHtmlElement> {
+    'inc'?: number;
+  }
+  interface SlotLightDomContent extends JSXBase.HTMLAttributes<HTMLSlotLightDomContentElement> {}
+  interface SlotLightDomRoot extends JSXBase.HTMLAttributes<HTMLSlotLightDomRootElement> {}
+  interface SlotLightList extends JSXBase.HTMLAttributes<HTMLSlotLightListElement> {}
+  interface SlotListLightRoot extends JSXBase.HTMLAttributes<HTMLSlotListLightRootElement> {
+    'items'?: string[];
+  }
+  interface SlotMapOrder extends JSXBase.HTMLAttributes<HTMLSlotMapOrderElement> {}
+  interface SlotMapOrderRoot extends JSXBase.HTMLAttributes<HTMLSlotMapOrderRootElement> {}
+  interface SlotReorder extends JSXBase.HTMLAttributes<HTMLSlotReorderElement> {
+    'reordered'?: boolean;
+  }
+  interface SlotReorderRoot extends JSXBase.HTMLAttributes<HTMLSlotReorderRootElement> {}
+  interface SlotReplaceWrapper extends JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement> {
+    'href'?: string;
+  }
+  interface SlotReplaceWrapperRoot extends JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement> {}
+  interface SvgAttr extends JSXBase.HTMLAttributes<HTMLSvgAttrElement> {}
+  interface SvgClass extends JSXBase.HTMLAttributes<HTMLSvgClassElement> {}
+  interface Tag3dComponent extends JSXBase.HTMLAttributes<HTMLTag3dComponentElement> {}
+  interface Tag88 extends JSXBase.HTMLAttributes<HTMLTag88Element> {}
+
+  interface IntrinsicElements {
+    'attribute-basic': AttributeBasic;
+    'attribute-basic-root': AttributeBasicRoot;
+    'attribute-boolean': AttributeBoolean;
+    'attribute-boolean-root': AttributeBooleanRoot;
+    'attribute-complex': AttributeComplex;
+    'attribute-host': AttributeHost;
+    'attribute-html-root': AttributeHtmlRoot;
+    'bad-shared-jsx': BadSharedJsx;
+    'conditional-basic': ConditionalBasic;
+    'conditional-rerender': ConditionalRerender;
+    'conditional-rerender-root': ConditionalRerenderRoot;
+    'css-cmp': CssCmp;
+    'css-variables': CssVariables;
+    'css-variables-root': CssVariablesRoot;
+    'custom-event-root': CustomEventRoot;
+    'dom-reattach': DomReattach;
+    'dynamic-css-variable': DynamicCssVariable;
+    'dynamic-import': DynamicImport;
+    'es5-addclass-svg': Es5AddclassSvg;
+    'esm-import': EsmImport;
+    'external-import-a': ExternalImportA;
+    'external-import-b': ExternalImportB;
+    'external-import-c': ExternalImportC;
+    'factory-jsx': FactoryJsx;
+    'init-css-root': InitCssRoot;
+    'input-basic-root': InputBasicRoot;
+    'key-reorder': KeyReorder;
+    'key-reorder-root': KeyReorderRoot;
+    'legacy-context': LegacyContext;
+    'lifecycle-async-a': LifecycleAsyncA;
+    'lifecycle-async-b': LifecycleAsyncB;
+    'lifecycle-async-c': LifecycleAsyncC;
+    'lifecycle-basic-a': LifecycleBasicA;
+    'lifecycle-basic-b': LifecycleBasicB;
+    'lifecycle-basic-c': LifecycleBasicC;
+    'lifecycle-unload-a': LifecycleUnloadA;
+    'lifecycle-unload-b': LifecycleUnloadB;
+    'lifecycle-unload-root': LifecycleUnloadRoot;
+    'lifecycle-update-a': LifecycleUpdateA;
+    'lifecycle-update-b': LifecycleUpdateB;
+    'lifecycle-update-c': LifecycleUpdateC;
+    'listen-jsx': ListenJsx;
+    'listen-jsx-root': ListenJsxRoot;
+    'listen-window': ListenWindow;
+    'node-globals': NodeGlobals;
+    'node-resolution': NodeResolution;
+    'reflect-to-attr': ReflectToAttr;
+    'sass-cmp': SassCmp;
+    'scoped-basic': ScopedBasic;
+    'scoped-basic-root': ScopedBasicRoot;
+    'shadow-dom-array': ShadowDomArray;
+    'shadow-dom-array-root': ShadowDomArrayRoot;
+    'shadow-dom-basic': ShadowDomBasic;
+    'shadow-dom-basic-root': ShadowDomBasicRoot;
+    'shadow-dom-mode': ShadowDomMode;
+    'shadow-dom-mode-root': ShadowDomModeRoot;
+    'shadow-dom-slot-basic': ShadowDomSlotBasic;
+    'shadow-dom-slot-nested': ShadowDomSlotNested;
+    'shadow-dom-slot-nested-root': ShadowDomSlotNestedRoot;
+    'slot-array-basic': SlotArrayBasic;
+    'slot-array-complex': SlotArrayComplex;
+    'slot-array-complex-root': SlotArrayComplexRoot;
+    'slot-array-top': SlotArrayTop;
+    'slot-basic': SlotBasic;
+    'slot-basic-order': SlotBasicOrder;
+    'slot-basic-order-root': SlotBasicOrderRoot;
+    'slot-basic-root': SlotBasicRoot;
+    'slot-dynamic-list': SlotDynamicList;
+    'slot-dynamic-wrapper': SlotDynamicWrapper;
+    'slot-dynamic-wrapper-root': SlotDynamicWrapperRoot;
+    'slot-fallback': SlotFallback;
+    'slot-fallback-root': SlotFallbackRoot;
+    'slot-html': SlotHtml;
+    'slot-light-dom-content': SlotLightDomContent;
+    'slot-light-dom-root': SlotLightDomRoot;
+    'slot-light-list': SlotLightList;
+    'slot-list-light-root': SlotListLightRoot;
+    'slot-map-order': SlotMapOrder;
+    'slot-map-order-root': SlotMapOrderRoot;
+    'slot-reorder': SlotReorder;
+    'slot-reorder-root': SlotReorderRoot;
+    'slot-replace-wrapper': SlotReplaceWrapper;
+    'slot-replace-wrapper-root': SlotReplaceWrapperRoot;
+    'svg-attr': SvgAttr;
+    'svg-class': SvgClass;
+    'tag-3d-component': Tag3dComponent;
+    'tag-88': Tag88;
+  }
+}
+
+export { LocalJSX as JSX };
+
+
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
+
 
