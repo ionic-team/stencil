@@ -111,7 +111,7 @@ export async function validateTypesExist(config: d.Config, compilerCtx: d.Compil
   }
 
   const pkgFile = config.sys.path.join(config.rootDir, buildCtx.packageJson.types);
-  const fileExists = config.sys.fs.exists(pkgFile);
+  const fileExists = await compilerCtx.fs.access(pkgFile);
   if (!fileExists) {
     const recommendedPath = getRecommendedTypesPath(config, outputTarget);
     let msg = `package.json "types" property is set to "${buildCtx.packageJson.types}" but cannot be found.`;

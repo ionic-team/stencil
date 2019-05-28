@@ -16,7 +16,6 @@ export interface FileSystem {
   access(path: string): Promise<void>;
   copyFile(src: string, dest: string): Promise<void>;
   createReadStream(filePath: string): any;
-  exists(filePath: string): Promise<boolean>;
   existsSync(filePath: string): boolean;
   mkdir(dirPath: string, opts?: MakeDirectoryOptions): Promise<void>;
   mkdirSync(dirPath: string): void;

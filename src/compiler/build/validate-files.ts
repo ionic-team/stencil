@@ -3,12 +3,12 @@ import { validateManifestJson } from '../html/validate-manifest-json';
 import { validatePackageJson } from '../types/validate-package-json';
 
 
-export async function validateFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export function validateFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (buildCtx.hasError) {
-    return;
+    return null;
   }
 
-  await Promise.all([
+  return Promise.all([
     validateManifestJson(config, compilerCtx, buildCtx),
     validatePackageJson(config, compilerCtx, buildCtx)
   ]);
