@@ -43,6 +43,12 @@ export class TestingFs implements d.FileSystem {
     });
   }
 
+  exists(filePath: string) {
+    return new Promise<boolean>(resolve => {
+      fs.exists(filePath, resolve);
+    });
+  }
+
   existsSync(filePath: string) {
     return this.data.has(normalizePath(filePath));
   }
