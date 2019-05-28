@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { outputPrerender } from '../output-targets/output-prerender';
 import { outputServiceWorkers } from '../output-targets/output-service-workers';
-import { validateFiles as validateBuildFiles } from './validate-files';
+import { validateBuildFiles } from './validate-files';
 
 
 export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

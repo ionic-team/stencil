@@ -46,7 +46,9 @@ async function processMetadata(config: d.Config, compilerCtx: d.CompilerCtx, bui
     if (!config._isTesting) {
       // now that we've updated the components.d.ts file
       // lets do a full typescript build (but in another thread)
-      validateTypesMain(config, compilerCtx, buildCtx);
+      validateTypesMain(config, compilerCtx, buildCtx).catch(err => {
+        catchError(buildCtx.diagnostics, err);
+      });
     }
   }
 }

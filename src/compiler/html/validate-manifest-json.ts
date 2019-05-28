@@ -1,9 +1,13 @@
 import * as d from '../../declarations';
-import { buildError, buildJsonFileWarn } from '@utils';
+import { buildError, buildJsonFileError } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
 export function validateManifestJson(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (config.devMode) {
+    return null;
+  }
+
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
 
   return Promise.all(outputTargets.map(async outputsTarget => {
@@ -40,7 +44,7 @@ async function validateManifestJsonIcon(config: d.Config, compilerCtx: d.Compile
   let iconSrc = manifestIcon.src;
   if (typeof iconSrc !== 'string') {
     const msg = `Manifest icon missing "src"`;
-    buildJsonFileWarn(compilerCtx, buildCtx.diagnostics, manifestFilePath, msg, `"icons"`);
+    buildJsonFileError(compilerCtx, buildCtx.diagnostics, manifestFilePath, msg, `"icons"`);
     return;
   }
 
@@ -53,6 +57,6 @@ async function validateManifestJsonIcon(config: d.Config, compilerCtx: d.Compile
   const hasAccess = await compilerCtx.fs.access(iconPath);
   if (!hasAccess) {
     const msg = `Unable to find manifest icon "${manifestIcon.src}"`;
-    buildJsonFileWarn(compilerCtx, buildCtx.diagnostics, manifestFilePath, msg, `"${manifestIcon.src}"`);
+    buildJsonFileError(compilerCtx, buildCtx.diagnostics, manifestFilePath, msg, `"${manifestIcon.src}"`);
   }
 }

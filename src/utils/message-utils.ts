@@ -22,7 +22,7 @@ export function buildWarn(diagnostics: d.Diagnostic[]) {
   const diagnostic: d.Diagnostic = {
     level: 'warn',
     type: 'build',
-    header: 'build warn',
+    header: 'Build Warn',
     messageText: 'build warn',
     relFilePath: null,
     absFilePath: null,
@@ -35,19 +35,19 @@ export function buildWarn(diagnostics: d.Diagnostic[]) {
 }
 
 
-export function buildJsonFileWarn(compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], jsonFilePath: string, msg: string, warnKey: string) {
-  const warn = buildWarn(diagnostics);
-  warn.messageText = msg;
-  warn.absFilePath = jsonFilePath;
+export function buildJsonFileError(compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], jsonFilePath: string, msg: string, pkgKey: string) {
+  const err = buildError(diagnostics);
+  err.messageText = msg;
+  err.absFilePath = jsonFilePath;
 
-  if (typeof warnKey === 'string') {
+  if (typeof pkgKey === 'string') {
     try {
       const jsonStr = compilerCtx.fs.readFileSync(jsonFilePath);
       const lines = jsonStr.replace(/\r/g, '\n').split('\n');
 
       for (let i = 0; i < lines.length; i++) {
         const txtLine = lines[i];
-        const txtIndex = txtLine.indexOf(warnKey);
+        const txtIndex = txtLine.indexOf(pkgKey);
 
         if (txtIndex > -1) {
           const warnLine: d.PrintLine = {
@@ -55,11 +55,11 @@ export function buildJsonFileWarn(compilerCtx: d.CompilerCtx, diagnostics: d.Dia
             lineNumber: i + 1,
             text: txtLine,
             errorCharStart: txtIndex,
-            errorLength: warnKey.length
+            errorLength: pkgKey.length
           };
-          warn.lineNumber = warnLine.lineNumber;
-          warn.columnNumber = txtIndex + 1;
-          warn.lines.push(warnLine);
+          err.lineNumber = warnLine.lineNumber;
+          err.columnNumber = txtIndex + 1;
+          err.lines.push(warnLine);
 
           if (i >= 0) {
             const beforeWarnLine: d.PrintLine = {
@@ -69,7 +69,7 @@ export function buildJsonFileWarn(compilerCtx: d.CompilerCtx, diagnostics: d.Dia
               errorCharStart: -1,
               errorLength: -1
             };
-            warn.lines.unshift(beforeWarnLine);
+            err.lines.unshift(beforeWarnLine);
           }
 
           if (i < lines.length) {
@@ -80,7 +80,7 @@ export function buildJsonFileWarn(compilerCtx: d.CompilerCtx, diagnostics: d.Dia
               errorCharStart: -1,
               errorLength: -1
             };
-            warn.lines.push(afterWarnLine);
+            err.lines.push(afterWarnLine);
           }
 
           break;
@@ -89,7 +89,7 @@ export function buildJsonFileWarn(compilerCtx: d.CompilerCtx, diagnostics: d.Dia
     } catch (e) {}
   }
 
-  return warn;
+  return err;
 }
 
 

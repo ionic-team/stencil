@@ -20,6 +20,7 @@ describe('validate-package-json', () => {
       copy: []
     };
     config = mockConfig();
+    config.devMode = false;
     config.namespace = 'SomeNamespace';
     config.fsNamespace = config.namespace.toLowerCase();
     compilerCtx = mockCompilerCtx();
@@ -117,8 +118,7 @@ describe('validate-package-json', () => {
     it('validate types', async () => {
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'types', 'components.d.ts'), '');
       buildCtx.packageJson.types = 'dist/types/components.d.ts';
-      v.validateTypes(config, compilerCtx, buildCtx, outputTarget);
-      await v.validateTypesExist(config, compilerCtx, buildCtx, outputTarget);
+      await v.validateTypes(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
@@ -131,8 +131,7 @@ describe('validate-package-json', () => {
 
     it('missing types file', async () => {
       buildCtx.packageJson.types = 'dist/types/components.d.ts';
-      v.validateTypes(config, compilerCtx, buildCtx, outputTarget);
-      await v.validateTypesExist(config, compilerCtx, buildCtx, outputTarget);
+      await v.validateTypes(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics).toHaveLength(1);
     });
 

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { COLLECTION_MANIFEST_FILE_NAME, buildJsonFileWarn, normalizePath } from '@utils';
+import { COLLECTION_MANIFEST_FILE_NAME, buildJsonFileError, normalizePath } from '@utils';
 import { getComponentsDtsTypesFilePath, isOutputTargetDistCollection } from '../output-targets/output-utils';
 
 
@@ -23,14 +23,13 @@ function validatePackageJsonOutput(config: d.Config, compilerCtx: d.CompilerCtx,
     validateModule(config, compilerCtx, buildCtx, outputTarget),
     validateCollection(config, compilerCtx, buildCtx, outputTarget),
     validateTypes(config, compilerCtx, buildCtx, outputTarget),
-    validateTypesExist(config, compilerCtx, buildCtx, outputTarget),
     validateBrowser(compilerCtx, buildCtx)
   ]);
 }
 
 
 export async function validatePackageFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistCollection) {
-  if (Array.isArray(buildCtx.packageJson.files)) {
+  if (!config.devMode && Array.isArray(buildCtx.packageJson.files)) {
     const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, outputTarget.dir));
 
     const validPaths = [
@@ -52,10 +51,11 @@ export async function validatePackageFiles(config: d.Config, compilerCtx: d.Comp
     await Promise.all(buildCtx.packageJson.files.map(async pkgFile => {
       const packageJsonDir = config.sys.path.dirname(buildCtx.packageJsonFilePath);
       const absPath = config.sys.path.join(packageJsonDir, pkgFile);
+
       const hasAccess = await compilerCtx.fs.access(absPath);
       if (!hasAccess) {
         const msg = `Unable to find "${pkgFile}" within the package.json "files" array.`;
-        packageJsonWarn(compilerCtx, buildCtx, msg, `"${pkgFile}"`);
+        packageJsonError(compilerCtx, buildCtx, msg, `"${pkgFile}"`);
       }
     }));
   }
@@ -92,7 +92,11 @@ export function validateModule(config: d.Config, compilerCtx: d.CompilerCtx, bui
 }
 
 
-export function validateTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistCollection) {
+export async function validateTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistCollection) {
+  if (config.devMode) {
+    return;
+  }
+
   if (typeof buildCtx.packageJson.types !== 'string' || buildCtx.packageJson.types === '') {
     const recommendedPath = getRecommendedTypesPath(config, outputTarget);
     const msg = `package.json "types" property is required when generating a distribution. It's recommended to set the "types" property to: ${recommendedPath}`;
@@ -101,24 +105,18 @@ export function validateTypes(config: d.Config, compilerCtx: d.CompilerCtx, buil
   } else if (!buildCtx.packageJson.types.endsWith('.d.ts')) {
     const msg  = `package.json "types" file must have a ".d.ts" extension: ${buildCtx.packageJson.types}`;
     packageJsonWarn(compilerCtx, buildCtx, msg, `"types"`);
-  }
-}
 
-
-export async function validateTypesExist(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistCollection) {
-  if (typeof buildCtx.packageJson.types !== 'string') {
-    return;
-  }
-
-  const pkgFile = config.sys.path.join(config.rootDir, buildCtx.packageJson.types);
-  const fileExists = await compilerCtx.fs.access(pkgFile);
-  if (!fileExists) {
-    const recommendedPath = getRecommendedTypesPath(config, outputTarget);
-    let msg = `package.json "types" property is set to "${buildCtx.packageJson.types}" but cannot be found.`;
-    if (buildCtx.packageJson.types !== recommendedPath) {
-      msg += ` It's recommended to set the "types" property to: ${recommendedPath}`;
+  } else {
+    const typesFile = config.sys.path.join(config.rootDir, buildCtx.packageJson.types);
+    const typesFileExists = await compilerCtx.fs.access(typesFile);
+    if (!typesFileExists) {
+      const recommendedPath = getRecommendedTypesPath(config, outputTarget);
+      let msg = `package.json "types" property is set to "${buildCtx.packageJson.types}" but cannot be found.`;
+      if (buildCtx.packageJson.types !== recommendedPath) {
+        msg += ` It's recommended to set the "types" property to: ${recommendedPath}`;
+      }
+      packageJsonError(compilerCtx, buildCtx, msg, `"types"`);
     }
-    packageJsonWarn(compilerCtx, buildCtx, msg, `"types"`);
   }
 }
 
@@ -148,8 +146,15 @@ export function getRecommendedTypesPath(config: d.Config, outputTarget: d.Output
 }
 
 
+function packageJsonError(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, msg: string, warnKey: string) {
+  const err = buildJsonFileError(compilerCtx, buildCtx.diagnostics, buildCtx.packageJsonFilePath, msg, warnKey);
+  err.header = `Package Json`;
+  return err;
+}
+
 function packageJsonWarn(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, msg: string, warnKey: string) {
-  const warn = buildJsonFileWarn(compilerCtx, buildCtx.diagnostics, buildCtx.packageJsonFilePath, msg, warnKey);
+  const warn = buildJsonFileError(compilerCtx, buildCtx.diagnostics, buildCtx.packageJsonFilePath, msg, warnKey);
   warn.header = `Package Json`;
+  warn.level = 'warn';
   return warn;
 }
