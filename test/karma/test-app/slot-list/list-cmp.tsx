@@ -1,4 +1,4 @@
-import { Component } from '../../../../dist';
+import { Component, h } from '../../../../dist';
 
 @Component({
   tag: 'slot-light-list'
