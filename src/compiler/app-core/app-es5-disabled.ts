@@ -91,7 +91,7 @@ h2 {
   <h2>BEFORE:</h2>
   <p>Previously, a single script was included that handled loading the correct JavaScript based on browser support.</p>
   <pre>
-    <code>${escapeHtml(`<script src="build/${config.fsNamespace}.js"></script>
+    <code>${escapeHtml(`<script src="/build/${config.fsNamespace}.js"></script>
 `)}</code>
   </pre>
 
@@ -101,8 +101,8 @@ h2 {
   For more info, please see <a href="https://developers.google.com/web/fundamentals/primers/modules#browser" target="_blank">Using JavaScript modules on the web</a>.
   </p>
   <pre>
-  <code>${escapeHtml(`<script`)} <span style="background:yellow">type="module"</span> src="build/${config.fsNamespace}<span style="background:yellow">.esm</span>.js"${escapeHtml(`></script>`)}
-  ${escapeHtml(`<script`)} <span style="background:yellow">nomodule</span> ${escapeHtml(`src="build/${config.fsNamespace}.js"></script>`)}</code>
+  <code>${escapeHtml(`<script`)} <span style="background:yellow">type="module"</span> src="/build/${config.fsNamespace}<span style="background:yellow">.esm</span>.js"${escapeHtml(`></script>`)}
+  ${escapeHtml(`<script`)} <span style="background:yellow">nomodule</span> ${escapeHtml(`src="/build/${config.fsNamespace}.js"></script>`)}</code>
     </pre>
   `;
   const script = `
