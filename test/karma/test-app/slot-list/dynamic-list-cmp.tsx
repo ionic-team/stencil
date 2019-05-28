@@ -1,11 +1,11 @@
-import { Component, Prop, h } from '../../../../dist';
+import { Component, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'slot-dynamic-list',
   shadow: true
 })
 export class DynamicListComponent {
-  @Prop() items: Array<string>;
+  @Prop() items: Array<string> = [];
 
   render() {
     return (

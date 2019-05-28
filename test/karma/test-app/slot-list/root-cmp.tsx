@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '../../../../dist';
+import { Component, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'slot-list-light-root'
