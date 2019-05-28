@@ -24,7 +24,7 @@ export function createEntryModule(cmps: d.ComponentCompilerMeta[]): d.EntryModul
   cmps = sortBy(cmps, c => c.tagName);
   const entryKey = cmps
     .map(c => c.tagName)
-    .join('.');
+    .join('.') + '.entry';
 
   return {
     cmps,
