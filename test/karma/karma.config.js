@@ -98,7 +98,7 @@ module.exports = function(config) {
     },
 
     customLaunchers: browserStack ? browserStackLaunchers : {},
-
+    urlRoot: '/__karma__/',
     files: [
       // 'test-app/attribute-basic/karma.spec.ts',
       // 'test-app/attribute-complex/karma.spec.ts',
@@ -110,10 +110,9 @@ module.exports = function(config) {
     ],
 
     proxies: {
-      '/build/': '/base/www/build/',
+      '/': '/base/www/',
       // '/build/testsibling.js': '/base/www/noscript.js',
       // '/esm-webpack/main.js': '/base/www/noscript.js',
-      '/prerender/': '/base/www/prerender/'
     },
 
     colors: true,
