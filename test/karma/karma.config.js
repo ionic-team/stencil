@@ -46,9 +46,9 @@ const localLaunchers = {
 			'--remote-debugging-port=9333'
 		]
   },
-  // 'Firefox': {
-  //   base: 'Firefox'
-  // }
+  'Firefox': {
+    base: 'Firefox'
+  }
 };
 
 module.exports = function(config) {
@@ -58,6 +58,8 @@ module.exports = function(config) {
       'karma-firefox-launcher',
       'karma-safari-launcher',
       'karma-browserstack-launcher',
+      'karma-ie-launcher',
+      'karma-edge-launcher',
       'karma-jasmine',
       'karma-typescript',
       'karma-polyfill'
