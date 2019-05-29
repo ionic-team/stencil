@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
+import { Plugin } from 'rollup';
 
-
-export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx) {
+export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx): Plugin {
   const path = config.sys.path;
   return {
     name: 'inMemoryFsRead',
@@ -28,8 +28,8 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx) {
       // 1. load(importee)
       let accessData = await compilerCtx.fs.accessData(importee);
       if (accessData.exists && accessData.isFile) {
-          // exact importee file path exists
-          return importee;
+        // exact importee file path exists
+        return importee;
       }
 
       // 2. load(importee.js)
@@ -64,6 +64,12 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx) {
     },
 
     async load(sourcePath: string) {
+      if (/\.tsx?/i.test(sourcePath)) {
+        this.warn({
+          message: `An import was resolved to a Tyepscript file (${sourcePath}) but Rollup treated it as Javascript. You should instead resolve to the absolute path of its transpiled Javascript equivalent (${path.resolve(sourcePath.replace(/\.tsx?/i, '.js'))}).`,
+        });
+      }
+
       return compilerCtx.fs.readFile(sourcePath);
     }
   };
