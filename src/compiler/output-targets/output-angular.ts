@@ -42,7 +42,7 @@ async function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
   const imports = `/* tslint:disable */
 /* auto-generated angular directive proxies */
-import { Component, ElementRef, ChangeDetectorRef, EventEmitter } from '@angular/core';`;
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter } from '@angular/core';`;
 
   const sourceImports = !outputTarget.componentCorePackage ?
     `import { Components } from '${componentsTypeFile}';` :
@@ -80,7 +80,7 @@ function getProxy(cmpMeta: d.ComponentCompilerMeta) {
   // Generate Angular @Directive
   const directiveOpts = [
     `selector: \'${cmpMeta.tagName}\'`,
-    `changeDetection: 0`,
+    `changeDetection: ChangeDetectionStrategy.OnPush`,
     `template: '<ng-content></ng-content>'`
   ];
   if (inputs.length > 0) {
