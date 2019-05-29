@@ -94,9 +94,9 @@ export function setupDomTests(document: Document) {
 
           window.addEventListener('stencil_appload', appLoad);
 
-          function scriptErrored(ev: any) {
-            console.error('script error', ev);
-          }
+          // function scriptErrored(ev: any) {
+          //   console.error('script error', ev);
+          // }
 
           const tmpScripts = app.querySelectorAll('script') as NodeListOf<HTMLScriptElement>;
           for (let i = 0; i < tmpScripts.length; i++) {
@@ -112,7 +112,7 @@ export function setupDomTests(document: Document) {
             }
             script.innerHTML = tmpScripts[i].innerHTML;
 
-            script.addEventListener('error', scriptErrored);
+            // script.addEventListener('error', scriptErrored);
 
             tmpScripts[i].parentNode!.insertBefore(script, tmpScripts[i]);
             tmpScripts[i].parentNode!.removeChild(tmpScripts[i]);

@@ -48,7 +48,13 @@ const localLaunchers = {
   },
   'Firefox': {
     base: 'Firefox'
-  }
+  },
+  // IEGeneral: {
+  //   base: 'IE'
+  // },
+  // EdgeGeneral: {
+  //   base:'Edge'
+  // }
 };
 
 module.exports = function(config) {
