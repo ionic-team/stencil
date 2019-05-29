@@ -782,8 +782,6 @@ declare global {
     'tag-3d-component': HTMLTag3dComponentElement;
     'tag-88': HTMLTag88Element;
   }
-
-  interface ElementTagNameMap extends HTMLElementTagNameMap {}
 }
 
 declare namespace LocalJSX {

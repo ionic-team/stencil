@@ -89,7 +89,7 @@ export function setupDomTests(document: Document) {
             window.removeEventListener('stencil_appload', appLoad);
             setTimeout(() => {
               resolve(app);
-            }, 200);
+            }, 400);
           }
 
           window.addEventListener('stencil_appload', appLoad);
@@ -143,7 +143,7 @@ export function setupDomTests(document: Document) {
 /**
  * Wait for the component to asynchronously update
  */
-export function waitForChanges(timeout = 150) {
+export function waitForChanges(timeout = 250) {
   const win = window as any;
 
   return new Promise(resolve => {
