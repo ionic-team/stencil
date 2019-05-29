@@ -22,7 +22,7 @@ export const patchBrowser = async () => {
       s.getAttribute('data-namespace') === NAMESPACE
     ));
 
-    const resourcesUrl = new URL('.', new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, doc.location.href));
+    const resourcesUrl = new URL('.', new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href));
     patchDynamicImport(resourcesUrl.href);
 
     if (!window.customElements) {
