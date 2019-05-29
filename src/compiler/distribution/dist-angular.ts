@@ -42,7 +42,7 @@ async function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, com
 
   const imports = `/* tslint:disable */
 /* auto-generated angular directive proxies */
-import { Component, ElementRef, ChangeDetectorRef, EventEmitter } from '@angular/core';`;
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter } from '@angular/core';`;
 
   const sourceImports = !outputTarget.componentCorePackage ? ''
     : `type StencilComponents<T extends keyof StencilElementInterfaces> = StencilElementInterfaces[T];`;
@@ -78,7 +78,7 @@ function getProxy(cmpMeta: d.ComponentMeta) {
   // Generate Angular @Directive
   const directiveOpts = [
     `selector: \'${cmpMeta.tagNameMeta}\'`,
-    `changeDetection: 0`,
+    `changeDetection: ChangeDetectionStrategy.OnPush`,
     `template: '<ng-content></ng-content>'`
   ];
   if (inputs.length > 0) {
