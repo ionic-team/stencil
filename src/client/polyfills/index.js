@@ -15,26 +15,6 @@ export function applyPolyfills() {
     promises.push(import('./dom.js'));
   }
 
-  if ('function' !== typeof Object.assign || !Object.entries) {
-    promises.push(import('./object.js'));
-  }
-
-  if (!Array.prototype.find || !Array.prototype.includes) {
-    promises.push(import('./array.js'));
-  }
-
-  if (!String.prototype.startsWith || !String.prototype.endsWith) {
-    promises.push(import('./string.js'));
-  }
-
-  if (!win.fetch) {
-    promises.push(import('./fetch.js'));
-  }
-
-  if (typeof WeakMap == 'undefined' || !(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'))) {
-    promises.push(import('./css-shim.js'));
-  }
-
   function checkIfURLIsSupported() {
     try {
       var u = new URL('b', 'http://a');
@@ -44,9 +24,19 @@ export function applyPolyfills() {
       return false;
     }
   }
-  if (!checkIfURLIsSupported()) {
-    promises.push(import('./url.js'));
-  }
 
+  if (
+    'function' !== typeof Object.assign || !Object.entries ||
+    !Array.prototype.find || !Array.prototype.includes ||
+    !String.prototype.startsWith || !String.prototype.endsWith ||
+    !win.fetch ||
+    !checkIfURLIsSupported() ||
+    typeof WeakMap == 'undefined'
+  ) {
+    promises.push(import('./core-js.js'));
+  }
+  if (!(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'))) {
+    promises.push(import('./css-shim.js'));
+  }
   return Promise.all(promises);
 }
