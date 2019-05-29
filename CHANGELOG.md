@@ -1,3 +1,12 @@
+# ⛺️ [1.0.0-beta.7](https://github.com/ionic-team/stencil/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2019-05-29)
+
+
+### Bug Fixes
+
+* **vdom:** don't render booleans ([8106936](https://github.com/ionic-team/stencil/commit/8106936))
+
+
+
 # 👻 [1.0.0-beta.6](https://github.com/ionic-team/stencil/compare/v1.0.0-beta.4...v1.0.0-beta.6) (2019-05-29)
 
 
