@@ -9,8 +9,7 @@ export const config = {
   tsconfig: 'tsconfig-stencil.json',
   outputTargets: [
     {
-      type: 'www',
-      empty: false
+      type: 'www'
     },
     {
       type: 'dist',
@@ -29,6 +28,7 @@ export const config = {
     globals(),
     sass()
   ],
+  _lifecycleDOMEvents: true,
   devServer: {
     historyApiFallback: {
       disableDotRule: true,
