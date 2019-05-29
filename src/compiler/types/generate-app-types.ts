@@ -66,6 +66,16 @@ export namespace Components {
   ${modules.map(m => `${m.component}`).join('\n').trim()}
 }
 
+declare global {
+  ${jsxElementGlobal}
+  ${modules.map(m => m.element).join('\n')}
+  interface HTMLElementTagNameMap {
+    ${modules.map(m => `'${m.tagName}': ${m.htmlElementName};`).join('\n')}
+  }
+
+  interface ElementTagNameMap extends HTMLElementTagNameMap {}
+}
+
 declare namespace LocalJSX {
   ${modules.map(m => `${m.jsx}`).join('\n').trim()}
 
@@ -77,18 +87,6 @@ declare namespace LocalJSX {
 export { LocalJSX as JSX };
 
 ${jsxAugmentation}
-
-declare global {
-  ${jsxElementGlobal}
-
-  ${modules.map(m => m.element).join('\n')}
-
-  interface HTMLElementTagNameMap {
-    ${modules.map(m => `'${m.tagName}': ${m.htmlElementName};`).join('\n')}
-  }
-
-  interface ElementTagNameMap extends HTMLElementTagNameMap {}
-}
 `;
 
   const typeImportString = Object.keys(typeImportData).reduce((finalString: string, filePath: string) => {

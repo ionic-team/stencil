@@ -27,7 +27,7 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
       child = c[i];
       if (Array.isArray(child)) {
         walk(child);
-      } else if (child != null) {
+      } else if (child != null && typeof child !== 'boolean') {
         if (simple = typeof nodeName !== 'function' && !isComplexType(child)) {
           child = String(child);
         }

@@ -39,8 +39,8 @@ function getBundleId(config: d.Config, entryKey: string, shouldHash: boolean, co
 
   const components = entryKey.split('.');
   let bundleId = components[0];
-  if (components.length > 1) {
-    bundleId = `${bundleId}_${components.length}`;
+  if (components.length > 2) {
+    bundleId = `${bundleId}_${components.length - 1}`;
   }
   if (modeName !== DEFAULT_STYLE_MODE) {
     bundleId += '-' + modeName;

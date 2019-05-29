@@ -35,7 +35,7 @@ export function generateComponentTypes(cmp: d.ComponentCompilerMeta): d.TypesMod
     tagNameAsPascal,
     htmlElementName,
     component: `interface ${tagNameAsPascal} {${stencilComponentAttributes}}`,
-    jsx: `interface ${tagNameAsPascal} extends JSXBase.HTMLAttributes {${stencilComponentJSXAttributes}}`,
+    jsx: `interface ${tagNameAsPascal} extends JSXBase.HTMLAttributes<${htmlElementName}> {${stencilComponentJSXAttributes}}`,
     element: `
 interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {}
 var ${htmlElementName}: {

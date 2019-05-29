@@ -65,7 +65,11 @@ export function validateOutputTargetDist(config: d.Config) {
       dir: outputTarget.dir,
       collectionDir: outputTarget.collectionDir,
       typesDir: outputTarget.typesDir,
-      copy: outputTarget.copy
+      copy: [
+        ...outputTarget.copy,
+        { src: '**/*.svg' },
+        { src: '**/*.js' }
+      ]
     });
 
     const namespace = config.fsNamespace || 'app';

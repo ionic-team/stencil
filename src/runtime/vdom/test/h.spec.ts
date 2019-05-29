@@ -268,6 +268,22 @@ describe('h()', () => {
     expect(vnode.$children$[0].$text$).toEqual('Str012Str2');
   });
 
+  it('should not render booleans', () => {
+    const vnode = h('a', null, [false, true] as any);
+    expect(vnode.$children$).toBe(null);
+  });
+
+  it('should not render null and undefined', () => {
+    const vnode = h('a', null, [null, undefined] as any);
+    expect(vnode.$children$).toBe(null);
+  });
+
+  it('should merge with booleans around', () => {
+    const vnode = h('a', null, [false, 'one', true] as any, 'word');
+    expect(vnode.$children$.length).toBe(1);
+    expect(vnode.$children$[0].$text$).toBe('oneword');
+  });
+
   it('should walk nested arrays', () => {
     const vnode = h('a', null, [
       'Str0',
