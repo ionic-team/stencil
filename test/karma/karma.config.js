@@ -49,6 +49,9 @@ const localLaunchers = {
   'Firefox': {
     base: 'Firefox'
   },
+  'Safari': {
+    base: 'Safari'
+  }
   // IEGeneral: {
   //   base: 'IE'
   // },
