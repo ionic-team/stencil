@@ -65,6 +65,7 @@ export namespace Components {
   interface ExternalImportB {}
   interface ExternalImportC {}
   interface FactoryJsx {}
+  interface ImageImport {}
   interface InitCssRoot {}
   interface InputBasicRoot {
     'value'?: string;
@@ -226,6 +227,7 @@ declare namespace LocalJSX {
   interface ExternalImportB extends JSXBase.HTMLAttributes {}
   interface ExternalImportC extends JSXBase.HTMLAttributes {}
   interface FactoryJsx extends JSXBase.HTMLAttributes {}
+  interface ImageImport extends JSXBase.HTMLAttributes {}
   interface InitCssRoot extends JSXBase.HTMLAttributes {}
   interface InputBasicRoot extends JSXBase.HTMLAttributes {
     'value'?: string;
@@ -365,6 +367,7 @@ declare namespace LocalJSX {
     'external-import-b': ExternalImportB;
     'external-import-c': ExternalImportC;
     'factory-jsx': FactoryJsx;
+    'image-import': ImageImport;
     'init-css-root': InitCssRoot;
     'input-basic-root': InputBasicRoot;
     'key-reorder': KeyReorder;
@@ -584,6 +587,12 @@ declare global {
   var HTMLFactoryJsxElement: {
     prototype: HTMLFactoryJsxElement;
     new (): HTMLFactoryJsxElement;
+  };
+
+  interface HTMLImageImportElement extends Components.ImageImport, HTMLStencilElement {}
+  var HTMLImageImportElement: {
+    prototype: HTMLImageImportElement;
+    new (): HTMLImageImportElement;
   };
 
   interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLStencilElement {}
@@ -971,6 +980,7 @@ declare global {
     'external-import-b': HTMLExternalImportBElement;
     'external-import-c': HTMLExternalImportCElement;
     'factory-jsx': HTMLFactoryJsxElement;
+    'image-import': HTMLImageImportElement;
     'init-css-root': HTMLInitCssRootElement;
     'input-basic-root': HTMLInputBasicRootElement;
     'key-reorder': HTMLKeyReorderElement;

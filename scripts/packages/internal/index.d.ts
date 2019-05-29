@@ -1,3 +1,5 @@
+/// <reference path="./images.d.ts" />
+
 export {
   CompilerCtx,
   ComponentCompilerMeta,
@@ -12,4 +14,3 @@ export {
   PrintLine
 } from '../dist/declarations';
 export * from '../dist/declarations/docs';
-
