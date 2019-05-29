@@ -9,7 +9,7 @@ export function optimizeCriticalPath(config: d.Config, doc: Document, criticalBu
 
 export function injectModulePreloads(doc: Document, paths: string[]) {
   const existingLinks = (Array.from(doc.querySelectorAll('link[rel=modulepreload]')) as HTMLLinkElement[])
-    .map(link => link.href);
+    .map(link => link.getAttribute('href'));
 
   const addLinks = paths
     .filter(path => !existingLinks.includes(path))
