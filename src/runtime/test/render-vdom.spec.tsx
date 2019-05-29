@@ -172,6 +172,31 @@ describe('render-vdom', () => {
     `);
   });
 
+  it('should not render booleans ', async () => {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      @Prop() excitement = '';
+      render() {
+        return <div>
+          {false}
+          hola
+          {true}
+        </div>;
+      }
+    }
+    const { root } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+    expect(root).toEqualHtml(`
+      <cmp-a>
+        <div>
+          hola
+        </div>
+      </cmp-a>
+    `);
+  });
+
   describe('ref property', () => {
     it('should set on Host', async () => {
       @Component({ tag: 'cmp-a'})
