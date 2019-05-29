@@ -19,7 +19,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
   Object.assign(plt, options);
-  plt.$resourcesUrl$ = new URL(options.resourcesUrl || '/', doc.baseURI).href;
+  plt.$resourcesUrl$ = new URL(options.resourcesUrl || '/', doc.location.href).href;
   if (options.syncQueue) {
     plt.$flags$ |= PLATFORM_FLAGS.queueSync;
   }
