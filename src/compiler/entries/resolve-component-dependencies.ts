@@ -7,7 +7,7 @@ export function resolveComponentDependencies(cmps: d.ComponentCompilerMeta[]) {
 }
 
 function computeDependencies(cmps: d.ComponentCompilerMeta[]) {
-  const visited = new Set();
+  const visited = new Set<d.ComponentCompilerMeta>();
   cmps.forEach(cmp => {
     resolveTransitiveDependencies(cmp, cmps, visited);
     cmp.dependencies = unique(cmp.dependencies).sort();
