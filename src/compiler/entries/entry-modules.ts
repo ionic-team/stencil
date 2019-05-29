@@ -32,9 +32,6 @@ export function createEntryModule(cmps: d.ComponentCompilerMeta[]): d.EntryModul
 
     // get the modes used in this bundle
     modeNames: getEntryModes(cmps),
-
-    // figure out if we'll need a scoped css build
-    requiresScopedStyles: true
   };
 }
 
