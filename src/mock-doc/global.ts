@@ -59,5 +59,6 @@ const WINDOW_PROPS = [
   'CSS',
   'CustomEvent',
   'Event',
-  'HTMLElement'
+  'HTMLElement',
+  'KeyboardEvent'
 ];
