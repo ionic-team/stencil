@@ -42,7 +42,7 @@ export function getComponentsDtsSrcFilePath(config: d.Config) {
   return config.sys.path.join(config.srcDir, GENERATED_DTS);
 }
 
-export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDist | d.OutputTargetDistCollection) {
+export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDist | d.OutputTargetDistTypes) {
   return config.sys.path.join(outputTarget.typesDir, GENERATED_DTS);
 }
 
@@ -110,6 +110,10 @@ export function isOutputTargetStats(o: d.OutputTarget): o is d.OutputTargetStats
   return o.type === STATS;
 }
 
+export function isOutputTargetDistTypes(o: d.OutputTarget): o is d.OutputTargetDistTypes {
+  return o.type === DIST_TYPES;
+}
+
 export function getComponentsFromModules(moduleFiles: d.Module[]) {
   return sortBy(flatOne(moduleFiles.map(m => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
 }
@@ -128,6 +132,7 @@ export const ANGULAR = `angular`;
 export const CUSTOM = `custom`;
 export const DIST = `dist`;
 export const DIST_COLLECTION = `dist-collection`;
+export const DIST_TYPES = `dist-types`;
 export const DIST_HYDRATE_SCRIPT = `dist-hydrate-script`;
 export const DIST_LAZY = `dist-lazy`;
 export const DIST_LAZY_LOADER = `dist-lazy-loader`;

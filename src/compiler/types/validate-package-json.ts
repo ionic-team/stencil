@@ -1,28 +1,32 @@
 import * as d from '../../declarations';
 import { COLLECTION_MANIFEST_FILE_NAME, buildJsonFileError, normalizePath } from '@utils';
-import { getComponentsDtsTypesFilePath, isOutputTargetDistCollection } from '../output-targets/output-utils';
+import { getComponentsDtsTypesFilePath, isOutputTargetDistCollection, isOutputTargetDistTypes } from '../output-targets/output-utils';
 
 
-export function validatePackageJson(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function validatePackageJson(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (buildCtx.packageJson == null) {
-    return null;
+    return;
   }
 
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
-
-  return Promise.all(outputTargets.map(outputsTarget => {
-    return validatePackageJsonOutput(config, compilerCtx, buildCtx, outputsTarget);
-  }));
+  const typesOutputTargets = config.outputTargets.filter(isOutputTargetDistTypes);
+  await Promise.all([
+    ...outputTargets.map(outputsTarget => {
+      return validatePackageJsonOutput(config, compilerCtx, buildCtx, outputsTarget);
+    }),
+    ...typesOutputTargets.map(outputTarget => {
+      return validateTypes(config, compilerCtx, buildCtx, outputTarget);
+    })
+  ]);
 }
 
 
-function validatePackageJsonOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistCollection) {
-  return Promise.all([
+async function validatePackageJsonOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistCollection) {
+  await Promise.all([
     validatePackageFiles(config, compilerCtx, buildCtx, outputTarget),
     validateMain(config, compilerCtx, buildCtx, outputTarget),
     validateModule(config, compilerCtx, buildCtx, outputTarget),
     validateCollection(config, compilerCtx, buildCtx, outputTarget),
-    validateTypes(config, compilerCtx, buildCtx, outputTarget),
     validateBrowser(compilerCtx, buildCtx)
   ]);
 }
@@ -92,7 +96,7 @@ export function validateModule(config: d.Config, compilerCtx: d.CompilerCtx, bui
 }
 
 
-export async function validateTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistCollection) {
+export async function validateTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistTypes) {
   if (config.devMode) {
     return;
   }
@@ -140,7 +144,7 @@ export function validateBrowser(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx
 }
 
 
-export function getRecommendedTypesPath(config: d.Config, outputTarget: d.OutputTargetDistCollection) {
+export function getRecommendedTypesPath(config: d.Config, outputTarget: d.OutputTargetDistTypes) {
   const typesAbs = getComponentsDtsTypesFilePath(config, outputTarget);
   return normalizePath(config.sys.path.relative(config.rootDir, typesAbs));
 }
