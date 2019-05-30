@@ -48,17 +48,23 @@ const localLaunchers = {
   },
   'Firefox': {
     base: 'Firefox'
-  },
-  'Safari': {
-    base: 'Safari'
   }
-  // IEGeneral: {
-  //   base: 'IE'
-  // },
-  // EdgeGeneral: {
-  //   base:'Edge'
-  // }
 };
+
+if (process.platform === 'win32') {
+  localLaunchers.IE = {
+    base: 'IE'
+  };
+  localLaunchers.Edge = {
+    base: 'Edge'
+  };
+
+} else if (process.platform === 'darwin') {
+  localLaunchers.Safari = {
+    base: 'Safari'
+  };
+}
+
 
 module.exports = function(config) {
   config.set({
