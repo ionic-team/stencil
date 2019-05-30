@@ -120,7 +120,7 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string) {
 
   const fullUrl = browserUrl + url.substring(1);
 
-  const rsp = await page._e2eGoto(fullUrl);
+  const rsp = await page._e2eGoto(fullUrl, { waitUntil: 'networkidle0' });
 
   if (!rsp.ok()) {
     await closePage(page);
@@ -180,7 +180,7 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
     }
   });
 
-  const rsp = await page._e2eGoto(url);
+  const rsp = await page._e2eGoto(url, { waitUntil: 'networkidle0' });
 
   if (!rsp.ok()) {
     await closePage(page);
