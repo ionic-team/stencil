@@ -65,6 +65,7 @@ if (typeof (window as any).CustomEvent !== 'function') {
 }
 
 function buttonClick(button: HTMLButtonElement) {
-  const event = new (window as any).CustomEvent('click', { 'bubbles': true, composed: true } as any);
-  button.dispatchEvent(event);
+  // const event = new (window as any).CustomEvent('click', { 'bubbles': true, composed: true } as any);
+  // button.dispatchEvent(event);
+  button.click();
 }

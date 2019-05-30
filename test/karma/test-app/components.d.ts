@@ -65,6 +65,7 @@ export namespace Components {
   interface ExternalImportB {}
   interface ExternalImportC {}
   interface FactoryJsx {}
+  interface IePolyfills {}
   interface ImageImport {}
   interface InitCssRoot {}
   interface InputBasicRoot {
@@ -320,6 +321,12 @@ declare global {
   var HTMLFactoryJsxElement: {
     prototype: HTMLFactoryJsxElement;
     new (): HTMLFactoryJsxElement;
+  };
+
+  interface HTMLIePolyfillsElement extends Components.IePolyfills, HTMLStencilElement {}
+  var HTMLIePolyfillsElement: {
+    prototype: HTMLIePolyfillsElement;
+    new (): HTMLIePolyfillsElement;
   };
 
   interface HTMLImageImportElement extends Components.ImageImport, HTMLStencilElement {}
@@ -712,6 +719,7 @@ declare global {
     'external-import-b': HTMLExternalImportBElement;
     'external-import-c': HTMLExternalImportCElement;
     'factory-jsx': HTMLFactoryJsxElement;
+    'ie-polyfills': HTMLIePolyfillsElement;
     'image-import': HTMLImageImportElement;
     'init-css-root': HTMLInitCssRootElement;
     'input-basic-root': HTMLInputBasicRootElement;
@@ -774,8 +782,6 @@ declare global {
     'tag-3d-component': HTMLTag3dComponentElement;
     'tag-88': HTMLTag88Element;
   }
-
-  interface ElementTagNameMap extends HTMLElementTagNameMap {}
 }
 
 declare namespace LocalJSX {
@@ -830,6 +836,7 @@ declare namespace LocalJSX {
   interface ExternalImportB extends JSXBase.HTMLAttributes<HTMLExternalImportBElement> {}
   interface ExternalImportC extends JSXBase.HTMLAttributes<HTMLExternalImportCElement> {}
   interface FactoryJsx extends JSXBase.HTMLAttributes<HTMLFactoryJsxElement> {}
+  interface IePolyfills extends JSXBase.HTMLAttributes<HTMLIePolyfillsElement> {}
   interface ImageImport extends JSXBase.HTMLAttributes<HTMLImageImportElement> {}
   interface InitCssRoot extends JSXBase.HTMLAttributes<HTMLInitCssRootElement> {}
   interface InputBasicRoot extends JSXBase.HTMLAttributes<HTMLInputBasicRootElement> {
@@ -970,6 +977,7 @@ declare namespace LocalJSX {
     'external-import-b': ExternalImportB;
     'external-import-c': ExternalImportC;
     'factory-jsx': FactoryJsx;
+    'ie-polyfills': IePolyfills;
     'image-import': ImageImport;
     'init-css-root': InitCssRoot;
     'input-basic-root': InputBasicRoot;

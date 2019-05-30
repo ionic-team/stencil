@@ -33,16 +33,15 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         stencilBuildConditionalsPlugin(build, config.fsNamespace),
         globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
-        ...config.plugins,
-        config.sys.rollup.plugins.nodeResolve({
-          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
-          ...config.nodeResolve
-        }),
-        config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,
           sourceMap: false,
           ...config.commonjs
+        }),
+        ...config.plugins,
+        config.sys.rollup.plugins.nodeResolve({
+          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
+          ...config.nodeResolve
         }),
         bundleJson(config),
         imagePlugin(config, buildCtx),

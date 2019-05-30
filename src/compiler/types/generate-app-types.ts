@@ -72,8 +72,6 @@ declare global {
   interface HTMLElementTagNameMap {
     ${modules.map(m => `'${m.tagName}': ${m.htmlElementName};`).join('\n')}
   }
-
-  interface ElementTagNameMap extends HTMLElementTagNameMap {}
 }
 
 declare namespace LocalJSX {

@@ -230,9 +230,8 @@ async function convertChunk(
     }
   }
   if (shouldMinify) {
-    const optimizeResults = await optimizeModule(config, compilerCtx, sourceTarget, isCore, isBrowserBuild, code);
+    const optimizeResults = await optimizeModule(config, compilerCtx, sourceTarget, isCore, code);
     buildCtx.diagnostics.push(...optimizeResults.diagnostics);
-
     if (optimizeResults.diagnostics.length === 0 && typeof optimizeResults.output === 'string') {
       code = optimizeResults.output;
     }

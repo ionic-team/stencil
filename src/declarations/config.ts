@@ -155,6 +155,7 @@ export interface Config extends StencilConfig {
   suppressLogs?: boolean;
   _isValidated?: boolean;
   _isTesting?: boolean;
+  _lifecycleDOMEvents?: boolean;
 }
 
 export interface RollupConfig {

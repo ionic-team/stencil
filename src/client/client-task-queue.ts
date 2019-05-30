@@ -85,7 +85,7 @@ const flush = () => {
   }
 };
 
-export const tick = /*@__PURE__*/Promise.resolve();
+export const nextTick = /*@__PURE__*/(cb: () => void) => Promise.resolve().then(cb);
 
 export const readTask = /*@__PURE__*/queueTask(queueDomReads);
 

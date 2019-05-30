@@ -24,8 +24,4 @@ export class LegacyContextRoot {
       myService: this.myService
     }
   }
-
-  async componentWillLoad() {
-    console.log(await this.getData());
-  }
 }
