@@ -55,6 +55,26 @@ export class MockCustomEvent extends MockEvent {
 
 }
 
+export class MockKeyboardEvent extends MockEvent {
+  code = '';
+  key = '';
+  altKey = false;
+  ctrlKey = false;
+  metaKey = false;
+  shiftKey = false;
+  location = 0;
+  repeat = false;
+
+  constructor(type: string, keyboardEventInitDic?: KeyboardEventInit) {
+    super(type);
+
+    if (keyboardEventInitDic != null) {
+      Object.assign(this, keyboardEventInitDic);
+    }
+  }
+
+}
+
 
 export class MockEventListener {
   type: string;

@@ -2,7 +2,7 @@
 export { MockAttr, MockAttributeMap, cloneAttributes } from './attribute';
 export { MockComment } from './comment-node';
 export { MockElement, MockNode, MockTextNode } from './node';
-export { MockCustomEvent } from './event';
+export { MockCustomEvent, MockKeyboardEvent } from './event';
 export { MockDocument, createDocument, createFragment, resetDocument } from './document';
 export { MockWindow, cloneDocument, cloneWindow, constrainTimeouts, resetWindow } from './window';
 export { NODE_TYPES } from './constants';
