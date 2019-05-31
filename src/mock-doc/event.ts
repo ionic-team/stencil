@@ -56,14 +56,14 @@ export class MockCustomEvent extends MockEvent {
 }
 
 export class MockKeyboardEvent extends MockEvent {
-  code: string = null;
-  key: string = null;
-  altKey: boolean = null;
-  ctrlKey: boolean = null;
-  metaKey: boolean = null;
-  shiftKey: boolean = null;
-  location: number = null;
-  repeat: boolean = null;
+  code = '';
+  key = '';
+  altKey = false;
+  ctrlKey = false;
+  metaKey = false;
+  shiftKey = false;
+  location = 0;
+  repeat = false;
 
   constructor(type: string, keyboardEventInitDic?: KeyboardEventInit) {
     super(type);

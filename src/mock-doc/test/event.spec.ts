@@ -103,14 +103,14 @@ describe('event', () => {
     expect(ev.target).toBe(null);
     expect(typeof ev.timeStamp).toBe('number');
     expect(ev.type).toBe('keyup');
-    expect(ev.code).toBe(null);
-    expect(ev.key).toBe(null);
-    expect(ev.altKey).toBe(null);
-    expect(ev.ctrlKey).toBe(null);
-    expect(ev.metaKey).toBe(null);
-    expect(ev.shiftKey).toBe(null);
-    expect(ev.location).toBe(null);
-    expect(ev.repeat).toBe(null);
+    expect(ev.code).toBe('');
+    expect(ev.key).toBe('');
+    expect(ev.altKey).toBe(false);
+    expect(ev.ctrlKey).toBe(false);
+    expect(ev.metaKey).toBe(false);
+    expect(ev.shiftKey).toBe(false);
+    expect(ev.location).toBe(0);
+    expect(ev.repeat).toBe(false);
   });
 
   it('KeyboardEvent(type, eventInitDict)', () => {
@@ -124,7 +124,7 @@ describe('event', () => {
       metaKey: false,
       shiftKey: true,
       location: 0,
-      repeat: false
+      repeat: true
     };
     const ev = new win.KeyboardEvent('keyup', eventInitDict) as KeyboardEvent;
     expect(ev.bubbles).toBe(true);
@@ -144,6 +144,6 @@ describe('event', () => {
     expect(ev.metaKey).toBe(false);
     expect(ev.shiftKey).toBe(true);
     expect(ev.location).toBe(0);
-    expect(ev.repeat).toBe(false);
+    expect(ev.repeat).toBe(true);
   });
 });
