@@ -28,7 +28,7 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
       // what's expected like /
       // we're doing this so we can force the server
       // worker to unregister, but do not fully reload the page yet
-      appReset(win, config).then(() => {
+      appReset(win, config, () => {
         initClientWebSocket(win);
       });
 
