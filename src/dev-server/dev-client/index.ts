@@ -9,4 +9,4 @@ declare const config: d.DevClientConfig;
 
 applyPolyfills(iframeWindow);
 
-initClient(appWindow, appDoc, config);
+initClient(appWindow, appDoc, config || {} as any);

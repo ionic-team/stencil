@@ -2,6 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
 const { run, transpile } = require('./script-utils');
+const terser = require('terser');
 
 const ROOT_DIR = path.join(__dirname, '..');
 const DST_DIR = path.join(ROOT_DIR, 'dist');
@@ -26,26 +27,39 @@ async function bundleDevServerClient() {
   const { output } = await rollupBuild.generate({
     format: 'esm',
 
-    banner: [
-      '<meta charset="utf-8">',
-      '💎 Stencil Dev Server',
-      '<script>',
-      '/* Dev Server Client */'
-    ].join('\n'),
-
     intro: '(function(iframeWindow, appWindow, appDoc, config) {\n' +
           '"use strict";',
 
-    outro: '})(window, window.parent, window.parent.document, __DEV_CLIENT_CONFIG__);',
-
-    footer: '</script>'
-
+    outro: '})(window, window.parent, window.parent.document, window.__DEV_CLIENT_CONFIG__);',
   });
 
   let code = output[0].code.trim();
   code = code.replace('exports ', '');
 
-  await fs.writeFile(outputFile, code);
+  const results = terser.minify(code);
+
+  if (results.error) {
+    throw new Error(results.error);
+  }
+  code = results.code;
+
+  const html = [
+    '<!doctype html>',
+    '<html>',
+    '<head>',
+    '<meta charset="utf-8">',
+    '<title>Stencil Dev Server Connector &#9889;</title>',
+    '<script>',
+    code,
+    '</script>',
+    '</head>',
+    '<body style="background:black;color:white;font:24px monospace;text-align:center;">',
+    'Stencil Dev Server Connector &#9889;',
+    '</body>',
+    '</html>'
+  ];
+
+  await fs.writeFile(outputFile, html.join('\n'));
 }
 
 
