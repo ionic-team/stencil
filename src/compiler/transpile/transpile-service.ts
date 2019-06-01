@@ -80,7 +80,6 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
   compilerOptions.types = undefined;
   compilerOptions.noEmit = undefined;
   compilerOptions.noEmitOnError = undefined;
-  compilerOptions.paths = undefined;
   compilerOptions.rootDirs = undefined;
   compilerOptions.declaration = undefined;
   compilerOptions.declarationDir = undefined;

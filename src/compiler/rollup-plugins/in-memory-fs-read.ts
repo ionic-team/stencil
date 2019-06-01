@@ -1,15 +1,43 @@
+import { nodeModuleNameResolver, sys } from 'typescript';
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
 export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx): Plugin {
   const path = config.sys.path;
+  const { compilerOptions } = compilerCtx;
+
   return {
     name: 'inMemoryFsRead',
 
     async resolveId(importee: string, importer: string) {
       if (typeof importee !== 'string' || /\0/.test(importee)) {
         // ignore IDs with null character, these belong to other plugins
+        return null;
+      }
+
+      // check whether there's a matching path in the compiler options
+      const hasMatchingPath =
+        Boolean(compilerOptions.paths) &&
+        Object.keys(compilerOptions.paths).some(path => new RegExp(path.replace('*', '\\w*')).test(importee));
+
+      // resolve path from compiler options
+      if (hasMatchingPath) {
+        const { resolvedModule } = nodeModuleNameResolver(importee, importer, compilerOptions, sys);
+
+        if (resolvedModule) {
+          const { resolvedFileName } = resolvedModule; // this is the .ts(x) path
+
+          if (resolvedFileName && !resolvedFileName.endsWith('.d.ts')) {
+            const jsFilePath = path.resolve(resolvedFileName.replace(/\.tsx?$/i, '.js'));
+            const { exists } = await compilerCtx.fs.accessData(jsFilePath);
+
+            if (exists) {
+              return jsFilePath;
+            }
+          }
+        }
+
         return null;
       }
 
