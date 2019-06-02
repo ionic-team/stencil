@@ -28,4 +28,24 @@ describe('globals', () => {
     });
   });
 
+  it('allows access to the Element prototype', async () => {
+    @Component({ tag: 'cmp-el' })
+    class CmpEl {
+      // @ts-ignore
+      private proto: any;
+
+      constructor() {
+        this.proto = Element.prototype;
+      }
+    }
+
+    const page = await newSpecPage({
+      components: [CmpEl],
+      html: `<cmp-el></cmp-el>`
+    });
+
+    expect(page.root).toEqualHtml(`
+      <cmp-el></cmp-el>
+    `);
+  });
 });
