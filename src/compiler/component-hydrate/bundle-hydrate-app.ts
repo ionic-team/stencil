@@ -8,6 +8,7 @@ import { loaderPlugin } from '../rollup-plugins/loader';
 import { RollupBuild, RollupOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilHydratePlugin } from '../rollup-plugins/stencil-hydrate';
+import { pluginHelper } from '../rollup-plugins/plugin-helper';
 
 
 export async function bundleHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, appEntryCode: string) {
@@ -32,6 +33,7 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
           ...config.commonjs
         }),
         ...config.plugins,
+        pluginHelper(config, compilerCtx, buildCtx),
         config.sys.rollup.plugins.nodeResolve({
           mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
           ...config.nodeResolve

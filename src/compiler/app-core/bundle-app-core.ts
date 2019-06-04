@@ -10,6 +10,7 @@ import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
 import { loaderPlugin } from '../rollup-plugins/loader';
 import { stencilExternalRuntimePlugin } from '../rollup-plugins/stencil-external-runtime';
 import { imagePlugin } from '../rollup-plugins/image-plugin';
+import { pluginHelper } from '../rollup-plugins/plugin-helper';
 
 export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleAppOptions: d.BundleAppOptions) {
   const external = bundleAppOptions.skipDeps
@@ -39,6 +40,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
           ...config.commonjs
         }),
         ...config.plugins,
+        pluginHelper(config, compilerCtx, buildCtx),
         config.sys.rollup.plugins.nodeResolve({
           mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
           ...config.nodeResolve
