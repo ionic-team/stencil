@@ -1,14 +1,14 @@
+import { methodDecoratorsToStatic } from './method-decorator';
 import * as d from '../../../declarations';
-import { isDecoratorNamed, removeDecorators } from '../transform-utils';
 import { componentDecoratorToStatic } from './component-decorator';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
 import { listenDecoratorsToStatic } from './listen-decorator';
-import { methodDecoratorsToStatic } from './method-decorator';
+import { isDecoratorNamed, removeDecorators } from '../transform-utils';
 import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
-import { removeStencilImport } from '../remove-stencil-import';
+import { MEMBER_DECORATORS_TO_REMOVE, removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
 
 
@@ -74,17 +74,6 @@ function visitClass(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: 
 }
 
 function removeStencilDecorators(classMembers: ts.ClassElement[]) {
-  classMembers.forEach(member => removeDecorators(member, STENCIL_MEMBER_DECORATORS));
+  classMembers.forEach(member => removeDecorators(member, MEMBER_DECORATORS_TO_REMOVE));
 }
 
-const STENCIL_MEMBER_DECORATORS = [
-  'Element',
-  'Event',
-  'Listen',
-  'Method',
-  'Prop',
-  'PropDidChange',
-  'PropWillChange',
-  'State',
-  'Watch',
-];

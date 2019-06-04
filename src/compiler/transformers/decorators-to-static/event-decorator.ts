@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildWarn } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, getDeclarationParameters, isDecoratorNamed, resolveType, serializeSymbol } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, getDeclarationParameters, isDecoratorNamed, resolveType, serializeSymbol, validateReferences } from '../transform-utils';
 import ts from 'typescript';
 
 
@@ -35,7 +35,7 @@ function parseEventDecorator(config: d.Config, diagnostics: d.Diagnostic[], type
 
   validateEventEmitterMemberName(config, diagnostics, prop.name, memberName);
 
-  return {
+  const eventMeta = {
     method: memberName,
     name,
     bubbles: opts && typeof opts.bubbles === 'boolean' ? opts.bubbles : true,
@@ -44,6 +44,8 @@ function parseEventDecorator(config: d.Config, diagnostics: d.Diagnostic[], type
     docs: serializeSymbol(typeChecker, symbol),
     complexType: getComplexType(typeChecker, prop)
   };
+  validateReferences(config, diagnostics, eventMeta.complexType.references, prop.type);
+  return eventMeta;
 }
 
 export function getEventName(eventOptions: d.EventOptions, memberName: string) {

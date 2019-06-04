@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, catchError, toDashCase } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, isMemberPrivate, resolveType, serializeSymbol, typeToString } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, isMemberPrivate, resolveType, serializeSymbol, typeToString, validateReferences } from '../transform-utils';
 import ts from 'typescript';
 import { validatePublicName } from '../reserved-public-members';
 
@@ -71,6 +71,7 @@ function parsePropDecorator(config: d.Config, diagnostics: d.Diagnostic[], typeC
     optional: prop.questionToken !== undefined,
     docs: serializeSymbol(typeChecker, symbol)
   };
+  validateReferences(config, diagnostics, propMeta.complexType.references, prop.type);
 
   // prop can have an attribute if type is NOT "unknown"
   if (typeStr !== 'unknown') {
@@ -142,12 +143,11 @@ function getPropOptions(propDecorator: ts.Decorator, diagnostics: d.Diagnostic[]
 
 
 function getComplexType(typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration, type: ts.Type): d.ComponentCompilerPropertyComplexType {
-  const sourceFile = node.getSourceFile();
   const nodeType = node.type;
   return {
     original: nodeType ? nodeType.getText() : typeToString(typeChecker, type),
     resolved: resolveType(typeChecker, type),
-    references: getAttributeTypeInfo(node, sourceFile)
+    references: getAttributeTypeInfo(node, node.getSourceFile())
   };
 }
 

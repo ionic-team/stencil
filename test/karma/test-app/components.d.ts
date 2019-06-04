@@ -6,7 +6,9 @@
 
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-
+import {
+  SomeTypes,
+} from './util';
 
 export namespace Components {
   interface AttributeBasic {
@@ -30,8 +32,10 @@ export namespace Components {
     'getInstance': () => Promise<this>;
     'nu0': number;
     'nu1'?: number;
+    'nu2'?: SomeTypes.Number;
     'str0': string;
     'str1'?: string;
+    'str2'?: SomeTypes.String;
   }
   interface AttributeHost {}
   interface AttributeHtmlRoot {
@@ -803,8 +807,10 @@ declare namespace LocalJSX {
     'bool2'?: boolean;
     'nu0'?: number;
     'nu1'?: number;
+    'nu2'?: SomeTypes.Number;
     'str0'?: string;
     'str1'?: string;
+    'str2'?: SomeTypes.String;
   }
   interface AttributeHost extends JSXBase.HTMLAttributes<HTMLAttributeHostElement> {}
   interface AttributeHtmlRoot extends JSXBase.HTMLAttributes<HTMLAttributeHtmlRootElement> {
