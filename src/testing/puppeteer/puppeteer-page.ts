@@ -164,7 +164,7 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
     `data:text/html;charset=UTF-8,`,
     `<script type="module" src="${appUrl}"></script>`,
     html
-  ].join('');
+  ].join('\n');
 
   const rsp = await page._e2eGoto(url, { waitUntil: 'networkidle0' });
 
