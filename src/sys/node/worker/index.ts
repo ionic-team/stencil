@@ -28,7 +28,7 @@ export class WorkerManager extends EventEmitter {
     if (err.code === 'ERR_IPC_CHANNEL_CLOSED') {
       return this.stopWorker(workerId);
     }
-    if (this.options.logger) {
+    if (this.options.logger && err.code !== 'EPIPE') {
       this.options.logger.error(err);
     }
   }

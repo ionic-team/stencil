@@ -39,7 +39,6 @@ const WINDOW_FUNCTIONS = [
   'cancelAnimationFrame',
   'cancelIdleCallback',
   'dispatchEvent',
-  'fetch',
   'matchMedia',
   'removeEventListener',
   'requestAnimationFrame',
@@ -59,5 +58,6 @@ const WINDOW_PROPS = [
   'CSS',
   'CustomEvent',
   'Event',
-  'HTMLElement'
+  'HTMLElement',
+  'KeyboardEvent'
 ];

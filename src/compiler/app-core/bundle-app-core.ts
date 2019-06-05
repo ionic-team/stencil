@@ -9,7 +9,8 @@ import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-
 import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
 import { loaderPlugin } from '../rollup-plugins/loader';
 import { stencilExternalRuntimePlugin } from '../rollup-plugins/stencil-external-runtime';
-
+import { imagePlugin } from '../rollup-plugins/image-plugin';
+import { pluginHelper } from '../rollup-plugins/plugin-helper';
 
 export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleAppOptions: d.BundleAppOptions) {
   const external = bundleAppOptions.skipDeps
@@ -33,18 +34,19 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         stencilBuildConditionalsPlugin(build, config.fsNamespace),
         globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
-        ...config.plugins,
-        config.sys.rollup.plugins.nodeResolve({
-          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
-          ...config.nodeResolve
-        }),
-        config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,
           sourceMap: false,
           ...config.commonjs
         }),
+        ...config.plugins,
+        pluginHelper(config, compilerCtx, buildCtx),
+        config.sys.rollup.plugins.nodeResolve({
+          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
+          ...config.nodeResolve
+        }),
         bundleJson(config),
+        imagePlugin(config, buildCtx),
         inMemoryFsRead(config, compilerCtx),
         config.sys.rollup.plugins.replace({
           'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'

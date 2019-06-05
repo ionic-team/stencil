@@ -2,7 +2,7 @@ import { setupDomTests, waitForChanges } from '../util';
 
 
 describe('lifecycle-unload', function() {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;

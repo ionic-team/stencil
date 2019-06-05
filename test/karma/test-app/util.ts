@@ -3,6 +3,11 @@
 const activeRendering = new Set();
 const onAppReadyCallbacks: Function[] = [];
 
+export declare namespace SomeTypes {
+  type Number = number;
+  type String = string;
+}
+
 function willRender(elm: any) {
   activeRendering.add(elm);
 }
@@ -89,14 +94,14 @@ export function setupDomTests(document: Document) {
             window.removeEventListener('stencil_appload', appLoad);
             setTimeout(() => {
               resolve(app);
-            }, 200);
+            }, 400);
           }
 
           window.addEventListener('stencil_appload', appLoad);
 
-          function scriptErrored(ev: any) {
-            console.error('script error', ev);
-          }
+          // function scriptErrored(ev: any) {
+          //   console.error('script error', ev);
+          // }
 
           const tmpScripts = app.querySelectorAll('script') as NodeListOf<HTMLScriptElement>;
           for (let i = 0; i < tmpScripts.length; i++) {
@@ -112,7 +117,7 @@ export function setupDomTests(document: Document) {
             }
             script.innerHTML = tmpScripts[i].innerHTML;
 
-            script.addEventListener('error', scriptErrored);
+            // script.addEventListener('error', scriptErrored);
 
             tmpScripts[i].parentNode!.insertBefore(script, tmpScripts[i]);
             tmpScripts[i].parentNode!.removeChild(tmpScripts[i]);
@@ -143,7 +148,7 @@ export function setupDomTests(document: Document) {
 /**
  * Wait for the component to asynchronously update
  */
-export function waitForChanges(timeout = 150) {
+export function waitForChanges(timeout = 250) {
   const win = window as any;
 
   return new Promise(resolve => {

@@ -249,7 +249,7 @@ function isValid(config: d.Config): [ boolean, d.Config | null] {
       d.header = 'configuration';
       d.absFilePath = config.configPath;
     });
-    config.logger.printDiagnostics(diagnostics, config.rootDir);
+    config.logger.printDiagnostics(diagnostics);
   }
   if (hasError(diagnostics)) {
     return [ false, null ];

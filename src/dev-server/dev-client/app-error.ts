@@ -63,12 +63,7 @@ function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig,
       fileHeader.title = escapeHtml(diagnostic.absFilePath);
 
       if (canOpenInEditor) {
-        (fileHeader as HTMLAnchorElement).href = '#open-in-editor';
-        fileHeader.addEventListener('click', (ev) => {
-          ev.preventDefault();
-          ev.stopPropagation();
-          openInEditor(win, config, diagnostic);
-        });
+        addOpenInEditor(win, config, fileHeader, diagnostic.absFilePath, diagnostic.lineNumber, diagnostic.columnNumber);
       }
     }
 
@@ -98,15 +93,24 @@ function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig,
 
     prepareLines(diagnostic.lines).forEach(l => {
       const tr = doc.createElement('tr');
-      if (l.errorCharStart > -1) {
-        tr.className = 'dev-server-diagnostic-error-line';
+      if (l.errorCharStart > 0) {
+        tr.classList.add('dev-server-diagnostic-error-line');
+      }
+      if (canOpenInEditor) {
+        tr.classList.add('dev-server-diagnostic-open-in-editor');
       }
       table.appendChild(tr);
 
       const tdNum = doc.createElement('td');
       tdNum.className = 'dev-server-diagnostic-blob-num';
-      if (l.lineNumber > -1) {
+      if (l.lineNumber > 0) {
         tdNum.setAttribute('data-line-number', l.lineNumber + '');
+        tdNum.title = escapeHtml(diagnostic.relFilePath) + ', line ' + l.lineNumber;
+
+        if (canOpenInEditor) {
+          const column = l.lineNumber === diagnostic.lineNumber ? diagnostic.columnNumber : 1;
+          addOpenInEditor(win, config, tdNum, diagnostic.absFilePath, l.lineNumber, column);
+        }
       }
       tr.appendChild(tdNum);
 
@@ -121,17 +125,26 @@ function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig,
 }
 
 
-function openInEditor(win: Window, config: d.DevClientConfig, diagnostic: d.Diagnostic) {
-  const qs: d.OpenInEditorData = {
-    file: diagnostic.absFilePath,
-    line: diagnostic.lineNumber,
-    column: diagnostic.columnNumber,
-    editor: config.editors[0].id
-  };
+function addOpenInEditor(win: Window, config: d.DevClientConfig, elm: HTMLElement, file: string, line: number, column: number) {
+  if (elm.tagName === 'A') {
+    (elm as HTMLAnchorElement).href = '#open-in-editor';
+  }
+  if (typeof column !== 'number' || column < 1) {
+    column = 1;
+  }
+  elm.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    const qs: d.OpenInEditorData = {
+      file: file,
+      line: line,
+      column: column,
+      editor: config.editors[0].id
+    };
 
-  const url = `${OPEN_IN_EDITOR_URL}?${Object.keys(qs).map(k => `${k}=${(qs as any)[k]}`).join('&')}`;
-
-  win.fetch(url);
+    const url = `${OPEN_IN_EDITOR_URL}?${Object.keys(qs).map(k => `${k}=${(qs as any)[k]}`).join('&')}`;
+    win.fetch(url);
+  });
 }
 
 

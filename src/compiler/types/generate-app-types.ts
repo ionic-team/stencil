@@ -66,6 +66,14 @@ export namespace Components {
   ${modules.map(m => `${m.component}`).join('\n').trim()}
 }
 
+declare global {
+  ${jsxElementGlobal}
+  ${modules.map(m => m.element).join('\n')}
+  interface HTMLElementTagNameMap {
+    ${modules.map(m => `'${m.tagName}': ${m.htmlElementName};`).join('\n')}
+  }
+}
+
 declare namespace LocalJSX {
   ${modules.map(m => `${m.jsx}`).join('\n').trim()}
 
@@ -77,22 +85,9 @@ declare namespace LocalJSX {
 export { LocalJSX as JSX };
 
 ${jsxAugmentation}
-
-declare global {
-  ${jsxElementGlobal}
-
-  ${modules.map(m => m.element).join('\n')}
-
-  interface HTMLElementTagNameMap {
-    ${modules.map(m => `'${m.tagName}': ${m.htmlElementName};`).join('\n')}
-  }
-
-  interface ElementTagNameMap extends HTMLElementTagNameMap {}
-}
 `;
 
-  const typeImportString = Object.keys(typeImportData).reduce((finalString: string, filePath: string) => {
-
+  const typeImportString = Object.keys(typeImportData).map(filePath => {
     const typeData = typeImportData[filePath];
     let importFilePath: string;
     if (config.sys.path.isAbsolute(filePath)) {
@@ -102,19 +97,20 @@ declare global {
     } else {
       importFilePath = filePath;
     }
-    finalString +=
-`import {
+
+    return `import {
 ${typeData.sort(sortImportNames).map(td => {
   if (td.localName === td.importName) {
     return `${td.importName},`;
   } else {
     return `${td.localName} as ${td.importName},`;
   }
-}).join('\n')}
-} from '${importFilePath}';\n`;
+})
+.join('\n')
+}
+} from '${importFilePath}';`;
 
-    return finalString;
-  }, '');
+  }).join('\n');
 
   const code = `
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';

@@ -3,7 +3,7 @@ import { addEventListeners } from './host-listener';
 import { addStyle } from './styles';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS } from '@utils';
-import { doc, getHostRef, plt, supportsShadowDom, tick } from '@platform';
+import { doc, getHostRef, nextTick, plt, supportsShadowDom } from '@platform';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
@@ -57,7 +57,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         }
       }
 
-      if (BUILD.lifecycle) {
+      if (BUILD.lifecycle && BUILD.lazyLoad) {
         // find the first ancestor component (if there is one) and register
         // this component as one of the actively loading child components for its ancestor
         let ancestorComponent = elm;
@@ -80,7 +80,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
 
       // Lazy properties
       // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
-      if (BUILD.prop && !BUILD.hydrateServerSide && cmpMeta.$members$) {
+      if (BUILD.prop && BUILD.lazyLoad && !BUILD.hydrateServerSide && cmpMeta.$members$) {
         Object.entries(cmpMeta.$members$).forEach(([memberName, [memberFlags]]) => {
           if (memberFlags & MEMBER_FLAGS.Prop && elm.hasOwnProperty(memberName)) {
             const value = (elm as any)[memberName];
@@ -95,7 +95,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         // angular sets attribute AFTER connectCallback
         // https://github.com/angular/angular/issues/18909
         // https://github.com/angular/angular/issues/19940
-        tick.then(() => initializeComponent(elm, hostRef, cmpMeta));
+        nextTick(() => initializeComponent(elm, hostRef, cmpMeta));
 
       } else {
         initializeComponent(elm, hostRef, cmpMeta);

@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, isMemberPrivate, serializeSymbol, typeToString } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, isMemberPrivate, serializeSymbol, typeToString, validateReferences } from '../transform-utils';
 import { augmentDiagnosticWithNode, buildError, buildWarn } from '@utils';
 import { validatePublicName } from '../reserved-public-members';
 import ts from 'typescript';
@@ -78,6 +78,7 @@ function parseMethodDecorator(config: d.Config, diagnostics: d.Diagnostic[], sou
       tags: signature.getJsDocTags()
     }
   };
+  validateReferences(config, diagnostics, methodMeta.complexType.references, method.type);
 
   const staticProp = ts.createPropertyAssignment(
     ts.createLiteral(methodName),

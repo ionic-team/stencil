@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { DIST_COLLECTION, DIST_GLOBAL_STYLES, DIST_LAZY, DIST_LAZY_LOADER, getComponentsDtsTypesFilePath, isOutputTargetDist } from '../output-targets/output-utils';
+import { DIST_COLLECTION, DIST_GLOBAL_STYLES, DIST_LAZY, DIST_LAZY_LOADER, getComponentsDtsTypesFilePath, isOutputTargetDist, DIST_TYPES } from '../output-targets/output-utils';
 import { normalizePath } from '@utils';
 import { validateResourcesUrl } from './validate-resources-url';
 import { validateCopy } from './validate-copy';
@@ -30,11 +30,11 @@ export function validateOutputTargetDist(config: d.Config) {
       outputTarget.buildDir = normalizePath(path.join(outputTarget.dir, outputTarget.buildDir));
     }
 
-    if (!outputTarget.collectionDir) {
+    if (outputTarget.collectionDir === undefined) {
       outputTarget.collectionDir = DEFAULT_COLLECTION_DIR;
     }
 
-    if (!path.isAbsolute(outputTarget.collectionDir)) {
+    if (outputTarget.collectionDir && !path.isAbsolute(outputTarget.collectionDir)) {
       outputTarget.collectionDir = normalizePath(path.join(outputTarget.dir, outputTarget.collectionDir));
     }
 
@@ -60,12 +60,23 @@ export function validateOutputTargetDist(config: d.Config) {
 
     outputTarget.copy = validateCopy(outputTarget.copy, config.copy);
 
+    if (outputTarget.collectionDir) {
+      config.outputTargets.push({
+        type: DIST_COLLECTION,
+        dir: outputTarget.dir,
+        collectionDir: outputTarget.collectionDir,
+        copy: [
+          ...outputTarget.copy,
+          { src: '**/*.svg' },
+          { src: '**/*.js' }
+        ]
+      });
+    }
+
     config.outputTargets.push({
-      type: DIST_COLLECTION,
+      type: DIST_TYPES,
       dir: outputTarget.dir,
-      collectionDir: outputTarget.collectionDir,
-      typesDir: outputTarget.typesDir,
-      copy: outputTarget.copy
+      typesDir: outputTarget.typesDir
     });
 
     const namespace = config.fsNamespace || 'app';

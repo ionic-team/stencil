@@ -55,7 +55,7 @@ export const writeTask = (cb: Function) => {
   });
 };
 
-export const tick = Promise.resolve();
+export const nextTick = /*@__PURE__*/(cb: () => void) => Promise.resolve().then(cb);
 
 export const consoleError = (e: any) => {
   if (e != null) {

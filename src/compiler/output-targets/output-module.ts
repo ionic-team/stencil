@@ -49,7 +49,7 @@ async function bundleRawComponents(config: d.Config, compilerCtx: d.CompilerCtx,
         let code = result.code;
 
         if (!externalRuntime && config.minifyJs) {
-          const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', true, true, code);
+          const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', true, code);
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
 
           if (optimizeResults.diagnostics.length === 0 && typeof optimizeResults.output === 'string') {
@@ -75,6 +75,7 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   build.hydrateServerSide = false;
 
   updateBuildConditionals(config, build);
+  build.taskQueue = false;
 
   return build;
 }

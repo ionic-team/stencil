@@ -21,15 +21,9 @@ export async function getAppBrowserCorePolyfills(config: d.Config) {
 // order of the polyfills matters!! test test test
 // actual source of the polyfills are found in /src/client/polyfills/
 const INLINE_POLYFILLS = [
-  'array.js',
-  'object.js',
-  'string.js',
+  'core-js.js',
   'dom.js',
   'es5-html-element.js',
-  'promise.js',
-  'map.js',
-  'fetch.js',
-  'url.js',
   'system.js',
   'css-shim.js'
 ];

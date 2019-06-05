@@ -31,6 +31,9 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     noVdomRender: cmps.every(c => !c.hasVdomRender),
     observeAttribute: cmps.some(c => c.hasAttribute),
     prop: cmps.some(c => c.hasProp),
+    propBoolean: cmps.some(c => c.hasPropBoolean),
+    propNumber: cmps.some(c => c.hasPropNumber),
+    propString: cmps.some(c => c.hasPropString),
     propMutable: cmps.some(c => c.hasPropMutable),
     reflect: cmps.some(c => c.hasReflect),
     scoped: cmps.some(c => c.encapsulation === 'scoped'),
@@ -107,7 +110,7 @@ function getModuleImports(moduleMap: d.ModuleMap, filePath: string, importedModu
 export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isDebug = (config.logLevel === 'debug');
   b.isDev = !!config.devMode;
-  b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting);
+  b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config._lifecycleDOMEvents);
   b.profile = !!(config.flags && config.flags.profile);
   b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.reloadStrategy === 'hmr');
   b.updatable = (b.updatable || b.hydrateClientSide || b.hotModuleReplacement);

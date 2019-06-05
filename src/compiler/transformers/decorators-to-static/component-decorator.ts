@@ -2,10 +2,11 @@ import * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, removeDecorators } from '../transform-utils';
 import ts from 'typescript';
 import { DEFAULT_STYLE_MODE, augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
+import { CLASS_DECORATORS_TO_REMOVE } from '../remove-stencil-import';
 
 
 export function componentDecoratorToStatic(config: d.Config, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) {
-  removeDecorators(cmpNode, ['Component']);
+  removeDecorators(cmpNode, CLASS_DECORATORS_TO_REMOVE);
 
   const [ componentOptions ] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
   if (!componentOptions) {

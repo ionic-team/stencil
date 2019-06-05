@@ -43,6 +43,18 @@ export class MockDocument extends MockElement {
     }
   }
 
+  get location() {
+    if (this.defaultView != null) {
+      return (this.defaultView as Window).location;
+    }
+    return null;
+  }
+  set location(val: Location) {
+    if (this.defaultView != null) {
+      (this.defaultView as Window).location = val;
+    }
+  }
+
   get baseURI() {
     if (this.defaultView != null) {
       return (this.defaultView as Window).location.href;

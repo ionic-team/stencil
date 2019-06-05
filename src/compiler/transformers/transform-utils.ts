@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
-import { normalizePath } from '@utils';
+import { augmentDiagnosticWithNode, buildError, normalizePath } from '@utils';
 import ts from 'typescript';
+import { MEMBER_DECORATORS_TO_REMOVE } from './remove-stencil-import';
 
 
 export const LegacyScriptTarget = ts.ScriptTarget.ES5;
@@ -112,7 +113,7 @@ export function evalText(text: string) {
 }
 
 
-export function removeDecorators(node: ts.Node, decoratorNames: string[]) {
+export function removeDecorators(node: ts.Node, decoratorNames: Set<string>) {
   if (node.decorators) {
     const updatedDecoratorList = node.decorators.filter(dec => {
       const name = (
@@ -120,14 +121,13 @@ export function removeDecorators(node: ts.Node, decoratorNames: string[]) {
         ts.isIdentifier(dec.expression.expression) &&
         dec.expression.expression.text
       );
-      return !decoratorNames.includes(name);
+      return !decoratorNames.has(name);
     });
 
-    if (updatedDecoratorList.length !== node.decorators.length) {
+    if (updatedDecoratorList.length === 0) {
+      node.decorators = undefined;
+    } else if (updatedDecoratorList.length !== node.decorators.length) {
       node.decorators = ts.createNodeArray(updatedDecoratorList);
-      if (node.decorators.length === 0) {
-        node.decorators = undefined;
-      }
     }
   }
 }
@@ -281,11 +281,19 @@ export class ObjectMap {
 }
 
 export function getAttributeTypeInfo(baseNode: ts.Node, sourceFile: ts.SourceFile) {
-  return getAllTypeReferences(baseNode)
-    .reduce((allReferences, rt)  => {
-      allReferences[rt] = getTypeReferenceLocation(rt, sourceFile);
-      return allReferences;
-    }, {} as d.ComponentCompilerTypeReferences);
+  const allReferences: d.ComponentCompilerTypeReferences = {};
+  getAllTypeReferences(baseNode).forEach(rt => {
+    allReferences[rt] = getTypeReferenceLocation(rt, sourceFile);
+  });
+  return allReferences;
+}
+
+function getEntityName(entity: ts.EntityName): string {
+  if (ts.isIdentifier(entity)) {
+    return entity.escapedText.toString();
+  } else {
+    return getEntityName(entity.left);
+  }
 }
 
 function getAllTypeReferences(node: ts.Node): string[] {
@@ -293,10 +301,7 @@ function getAllTypeReferences(node: ts.Node): string[] {
 
   function visit(node: ts.Node): ts.VisitResult<ts.Node> {
     if (ts.isTypeReferenceNode(node)) {
-      if (ts.isIdentifier(node.typeName)) {
-        const typeName = node.typeName as ts.Identifier;
-        referencedTypes.push(typeName.escapedText.toString());
-      }
+      referencedTypes.push(getEntityName(node.typeName));
       if (node.typeArguments) {
         node.typeArguments
           .filter(ta => ts.isTypeReferenceNode(ta))
@@ -312,6 +317,16 @@ function getAllTypeReferences(node: ts.Node): string[] {
   visit(node);
 
   return referencedTypes;
+}
+
+export function validateReferences(config: d.Config, diagnostics: d.Diagnostic[], references: d.ComponentCompilerTypeReferences, node: ts.Node) {
+  Object.keys(references).forEach(refName => {
+    const ref = references[refName];
+    if (ref.path === '@stencil/core' && MEMBER_DECORATORS_TO_REMOVE.has(refName) ) {
+      const err = buildError(diagnostics);
+      augmentDiagnosticWithNode(config, err, node);
+    }
+  });
 }
 
 function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): d.ComponentCompilerTypeReference {
@@ -330,10 +345,10 @@ function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): 
       return false;
     }
     return true;
-  });
+  }) as ts.ImportDeclaration;
 
   if (importTypeDeclaration) {
-    const localImportPath = (<ts.StringLiteral>(<ts.ImportDeclaration>importTypeDeclaration).moduleSpecifier).text;
+    const localImportPath = (<ts.StringLiteral>importTypeDeclaration.moduleSpecifier).text;
     return {
       location: 'import',
       path: localImportPath

@@ -1,6 +1,6 @@
 import { createConsole } from './console';
 import { MockCustomElementRegistry, resetCustomElementRegistry } from './custom-element-registry';
-import { MockCustomEvent, MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
+import { MockCustomEvent, MockEvent, MockKeyboardEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { MockDocument, resetDocument } from './document';
 import { MockElement } from './node';
 import { MockHistory } from './history';
@@ -19,6 +19,7 @@ const navMap = new WeakMap<MockWindow, MockNavigator>();
 const sessionStorageMap = new WeakMap<MockWindow, MockStorage>();
 const eventClassMap = new WeakMap<MockWindow, any>();
 const customEventClassMap = new WeakMap<MockWindow, any>();
+const keyboardEventClassMap = new WeakMap<MockWindow, any>();
 
 
 export class MockWindow {
@@ -101,6 +102,17 @@ export class MockWindow {
     customEventClassMap.set(this, custEvClass);
   }
 
+  get KeyboardEvent() {
+    const kbEvClass = keyboardEventClassMap.get(this);
+    if (kbEvClass != null) {
+      return kbEvClass;
+    }
+    return MockKeyboardEvent;
+  }
+  set KeyboardEvent(kbEvClass: any) {
+    keyboardEventClassMap.set(this, kbEvClass);
+  }
+
   dispatchEvent(ev: MockEvent) {
     return dispatchEvent(this, ev);
   }
@@ -114,10 +126,6 @@ export class MockWindow {
   }
   set Event(ev: any) {
     eventClassMap.set(this, ev);
-  }
-
-  fetch() {
-    return Promise.reject(`fetch() unimplemented`);
   }
 
   getComputedStyle(_: any) {
@@ -408,6 +416,7 @@ export function resetWindow(win: Window) {
     sessionStorageMap.delete(win as any);
     eventClassMap.delete(win as any);
     customEventClassMap.delete(win as any);
+    keyboardEventClassMap.delete(win as any);
 
     if (win.document != null) {
       try {

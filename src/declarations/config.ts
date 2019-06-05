@@ -123,7 +123,7 @@ export interface StencilConfig {
   rollupConfig?: RollupConfig;
   devInspector?: boolean;
   devMode?: boolean;
-  devServer?: d.DevServerConfig;
+  devServer?: d.StencilDevServerConfig;
   enableCacheStats?: boolean;
   globalScript?: string;
   includeSrc?: string[];
@@ -148,6 +148,7 @@ export interface Config extends StencilConfig {
   buildDocs?: boolean;
   configPath?: string;
   cwd?: string;
+  devServer?: d.DevServerConfig;
   flags?: ConfigFlags;
   fsNamespace?: string;
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
@@ -155,6 +156,7 @@ export interface Config extends StencilConfig {
   suppressLogs?: boolean;
   _isValidated?: boolean;
   _isTesting?: boolean;
+  _lifecycleDOMEvents?: boolean;
 }
 
 export interface RollupConfig {

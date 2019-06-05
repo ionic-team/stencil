@@ -1,5 +1,5 @@
 import * as d from '@stencil/core/declarations';
-import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
+import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import * as v from '../validate-package-json';
 import path from 'path';
 
@@ -7,58 +7,68 @@ import path from 'path';
 describe('validate-package-json', () => {
   let config: d.Config;
   let compilerCtx: d.CompilerCtx;
-  let diagnostics: d.Diagnostic[];
-  let packageJsonData: d.PackageJsonData;
-  let outputTarget: d.OutputTargetDist;
+  let buildCtx: d.BuildCtx;
+  let outputTarget: d.OutputTargetDistCollection;
   const root = path.resolve('/');
 
-  beforeEach(() => {
+  beforeEach(async () => {
     outputTarget = {
-      type: 'dist',
+      type: 'dist-collection',
       dir: '/dist',
-      buildDir: '/dist',
       collectionDir: '/dist/collection',
-      typesDir: '/dist/types'
+      typesDir: '/dist/types',
+      copy: []
     };
     config = mockConfig();
+    config.devMode = false;
     config.namespace = 'SomeNamespace';
     config.fsNamespace = config.namespace.toLowerCase();
     compilerCtx = mockCompilerCtx();
-    diagnostics = [];
-    packageJsonData = {};
+    buildCtx = mockBuildCtx(config, compilerCtx);
+    buildCtx.packageJson = {};
+    buildCtx.packageJsonFilePath = path.join(root, 'package.json');
+    await compilerCtx.fs.writeFile(buildCtx.packageJsonFilePath, JSON.stringify(buildCtx.packageJson));
   });
 
   describe('files', () => {
 
     it('should validate files "dist/"', async () => {
-      packageJsonData.files = ['dist/'];
-      v.validatePackageFiles(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(0);
+      const distPath = path.join(root, 'dist');
+      await compilerCtx.fs.emptyDir(distPath);
+      buildCtx.packageJson.files = ['dist/'];
+      await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
     it('should validate files "./dist/"', async () => {
-      packageJsonData.files = ['./dist/'];
-      v.validatePackageFiles(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(0);
+      const distPath = path.join(root, 'dist');
+      await compilerCtx.fs.emptyDir(distPath);
+      buildCtx.packageJson.files = ['./dist/'];
+      await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
     it('should validate files "./dist"', async () => {
-      packageJsonData.files = ['./dist'];
-      v.validatePackageFiles(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(0);
+      const distPath = path.join(root, 'dist');
+      await compilerCtx.fs.emptyDir(distPath);
+      buildCtx.packageJson.files = ['./dist'];
+      await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
     it('should validate files "dist"', async () => {
-      packageJsonData.files = ['dist'];
-      v.validatePackageFiles(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(0);
+      const distPath = path.join(root, 'dist');
+      await compilerCtx.fs.emptyDir(distPath);
+      buildCtx.packageJson.files = ['dist'];
+      await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
     it('should error when files array misses dist/', async () => {
-      packageJsonData.files = [];
-      v.validatePackageFiles(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics[0].messageText).toMatch(/array must contain the distribution directory/);
-      expect(diagnostics[0].messageText).toMatch(/"dist\/"/);
+      buildCtx.packageJson.files = [];
+      await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics[0].messageText).toMatch(/array must contain the distribution directory/);
+      expect(buildCtx.diagnostics[0].messageText).toMatch(/"dist\/"/);
     });
 
   });
@@ -67,14 +77,14 @@ describe('validate-package-json', () => {
 
     it('validate module', async () => {
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.mjs'), '');
-      packageJsonData.module = 'dist/index.mjs';
-      v.validateModule(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(0);
+      buildCtx.packageJson.module = 'dist/index.mjs';
+      v.validateModule(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
     it('missing module', async () => {
-      v.validateModule(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(1);
+      v.validateModule(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(1);
     });
 
   });
@@ -84,21 +94,21 @@ describe('validate-package-json', () => {
     it('main cannot be the old loader', async () => {
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'somenamespace.js'), '');
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.js'), '');
-      packageJsonData.main = 'dist/somenamespace.js';
-      v.validateMain(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(1);
+      buildCtx.packageJson.main = 'dist/somenamespace.js';
+      v.validateMain(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(1);
     });
 
     it('validate main', async () => {
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.js'), '');
-      packageJsonData.main = 'dist/index.js';
-      v.validateMain(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(0);
+      buildCtx.packageJson.main = 'dist/index.js';
+      v.validateMain(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
     it('missing main', async () => {
-      v.validateMain(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(1);
+      v.validateMain(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(1);
     });
 
   });
@@ -107,29 +117,27 @@ describe('validate-package-json', () => {
 
     it('validate types', async () => {
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'types', 'components.d.ts'), '');
-      packageJsonData.types = 'dist/types/components.d.ts';
-      v.validateTypes(config, outputTarget, diagnostics, packageJsonData);
-      await v.validateTypesExist(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(0);
+      buildCtx.packageJson.types = 'dist/types/components.d.ts';
+      await v.validateTypes(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
     it('not d.ts file', async () => {
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'types', 'components.d.ts'), '');
-      packageJsonData.types = 'dist/types/components.ts';
-      v.validateTypes(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(1);
+      buildCtx.packageJson.types = 'dist/types/components.ts';
+      v.validateTypes(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(1);
     });
 
     it('missing types file', async () => {
-      packageJsonData.types = 'dist/types/components.d.ts';
-      v.validateTypes(config, outputTarget, diagnostics, packageJsonData);
-      await v.validateTypesExist(config, compilerCtx, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(1);
+      buildCtx.packageJson.types = 'dist/types/components.d.ts';
+      await v.validateTypes(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(1);
     });
 
     it('missing types', async () => {
-      v.validateTypes(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics).toHaveLength(1);
+      v.validateTypes(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(1);
     });
 
   });
@@ -137,9 +145,9 @@ describe('validate-package-json', () => {
   describe('collection', () => {
 
     it('should error when missing collection property', async () => {
-      v.validateCollection(config, outputTarget, diagnostics, packageJsonData);
-      expect(diagnostics[0].messageText).toMatch(/package.json "collection" property is required/);
-      expect(diagnostics[0].messageText).toMatch(/dist\/collection\/collection-manifest.json/);
+      v.validateCollection(config, compilerCtx, buildCtx, outputTarget);
+      expect(buildCtx.diagnostics[0].messageText).toMatch(/package.json "collection" property is required/);
+      expect(buildCtx.diagnostics[0].messageText).toMatch(/dist\/collection\/collection-manifest.json/);
     });
 
   });

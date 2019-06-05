@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { expectExtend } from '../matchers';
 import { setupGlobal, teardownGlobal } from '@mock-doc';
 import { setupMockFetch } from '../mock-fetch';
-
+import { HtmlSerializer } from './jest-serializer';
 
 declare const global: d.JestEnvironmentGlobal;
 
@@ -11,6 +11,7 @@ export function jestSetupTestFramework() {
   global.resourcesUrl = '/build';
 
   expect.extend(expectExtend);
+  expect.addSnapshotSerializer(HtmlSerializer);
 
   setupGlobal(global);
   setupMockFetch(global);

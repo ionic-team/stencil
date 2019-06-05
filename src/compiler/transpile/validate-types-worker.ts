@@ -18,7 +18,14 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
     compilerOptions.outDir = undefined;
 
     const tsHost = ts.createCompilerHost(compilerOptions);
-
+    const originalReadFile = tsHost.readFile;
+    tsHost.readFile = (filename: string) => {
+      const content = originalReadFile(filename);
+      if (filename.endsWith('components.d.ts')) {
+        return content.replace('interface ElementTagNameMap ', 'interface _LegacyElementTagNameMap ');
+      }
+      return content;
+    };
     tsHost.writeFile = (outputFileName: string, data: string, writeByteOrderMark: boolean) => {
       if (!emitDtsFiles) {
         return;

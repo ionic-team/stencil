@@ -96,7 +96,7 @@ export interface OutputTargetDist extends OutputTargetBase {
   dir?: string;
   resourcesUrl?: string;
 
-  collectionDir?: string;
+  collectionDir?: string | null;
   typesDir?: string;
   esmLoaderPath?: string;
   copy?: d.CopyTask[];
@@ -109,10 +109,15 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
 
   dir: string;
   collectionDir: string;
-  typesDir: string;
   copy: d.CopyTask[];
 }
 
+export interface OutputTargetDistTypes extends OutputTargetBase {
+  type: 'dist-types';
+
+  dir: string;
+  typesDir: string;
+}
 
 export interface OutputTargetDistLazy extends OutputTargetBase {
   type: 'dist-lazy';
@@ -224,8 +229,6 @@ export interface OutputTargetBase {
   type: string;
 }
 
-
-
 export type OutputTargetBuild =
  | OutputTargetDistCollection
  | OutputTargetDistLazy;
@@ -247,4 +250,5 @@ export type OutputTarget =
  | OutputTargetDocsVscode
  | OutputTargetWww
  | OutputTargetHydrate
- | OutputTargetStats;
+ | OutputTargetStats
+ | OutputTargetDistTypes;
