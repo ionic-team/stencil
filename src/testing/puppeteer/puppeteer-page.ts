@@ -162,7 +162,7 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
 
   const url = [
     `data:text/html;charset=UTF-8,`,
-    `<script src="${appUrl}"></script>`,
+    `<script type="module" src="${appUrl}"></script>`,
     html
   ];
 
