@@ -128,10 +128,6 @@ export class MockWindow {
     eventClassMap.set(this, ev);
   }
 
-  fetch() {
-    return Promise.reject(`fetch() unimplemented`);
-  }
-
   getComputedStyle(_: any) {
     return {
       cssText: '',

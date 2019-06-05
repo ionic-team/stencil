@@ -39,7 +39,6 @@ const WINDOW_FUNCTIONS = [
   'cancelAnimationFrame',
   'cancelIdleCallback',
   'dispatchEvent',
-  'fetch',
   'matchMedia',
   'removeEventListener',
   'requestAnimationFrame',
