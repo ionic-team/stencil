@@ -11,9 +11,16 @@ export const NodeRollup = {
     nodeResolve,
     replace,
     emptyJsResolver: () => {
+      const emptyFile = path.resolve(__dirname, '../src/empty.js');
       return {
+        resolveId(id: string) {
+          if (id === emptyFile) {
+            return id;
+          }
+          return null;
+        },
         load(id: string) {
-          if (id.endsWith('empty.js') && id.endsWith(path.join(__dirname, '../src/empty.js'))) {
+          if (id === emptyFile) {
             return 'export default {};';
           }
           return null;
