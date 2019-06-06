@@ -38,7 +38,7 @@ describe('attribute-complex', function() {
 
     expect(instance.str0).toBe('false');
     expect(instance.str1).toBe('123');
-    expect(instance.str1).toBe('321');
+    expect(instance.str2).toBe('321');
   });
 
   it('should cast element props', async () => {

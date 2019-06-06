@@ -60,9 +60,9 @@ if (process.platform === 'win32') {
   };
 
 } else if (process.platform === 'darwin') {
-  localLaunchers.Safari = {
-    base: 'Safari'
-  };
+  // localLaunchers.Safari = {
+  //   base: 'Safari'
+  // };
 }
 
 
