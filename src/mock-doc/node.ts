@@ -103,6 +103,10 @@ export class MockNode {
     return null;
   }
 
+  contains(otherNode: MockNode) {
+    return this.childNodes.includes(otherNode);
+  }
+
   removeChild(childNode: MockNode) {
     const index = this.childNodes.indexOf(childNode);
     if (index > -1) {

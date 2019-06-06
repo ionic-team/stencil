@@ -11,7 +11,9 @@ describe('element', () => {
     const elmParent = document.createElement('div');
     const elmChild = document.createElement('div');
     elmParent.appendChild(elmChild);
+    expect(document.body.contains(elmParent)).toBe(false);
     document.body.appendChild(elmParent);
+    expect(document.body.contains(elmParent)).toBe(true);
     expect(elmParent.isConnected).toBe(true);
     expect(elmChild.isConnected).toBe(true);
     expect(document.body.isConnected).toBe(true);
