@@ -52,6 +52,7 @@ function inlineStyleSheets(config: d.Config, doc: Document, outputTarget: d.Outp
       inlinedStyles.setAttribute('data-styles', '');
 
       // since it's not longer a critical resource
+      link.setAttribute('media', '(max-width: 1px)');
       link.setAttribute('importance', 'low');
 
       // move <link rel="stylesheet"> to the end of <body>
