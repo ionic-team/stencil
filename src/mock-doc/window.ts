@@ -20,9 +20,21 @@ const sessionStorageMap = new WeakMap<MockWindow, MockStorage>();
 const eventClassMap = new WeakMap<MockWindow, any>();
 const customEventClassMap = new WeakMap<MockWindow, any>();
 const keyboardEventClassMap = new WeakMap<MockWindow, any>();
-
+const nativeClearInterval = clearInterval;
+const nativeClearTimeout = clearTimeout;
+const nativeSetInterval = setInterval;
+const nativeSetTimeout = setTimeout;
+const nativeURL = URL;
 
 export class MockWindow {
+  __clearInterval: typeof nativeClearInterval;
+  __clearTimeout: typeof nativeClearTimeout;
+  __setInterval: typeof nativeSetInterval;
+  __setTimeout: typeof nativeSetTimeout;
+  __maxTimeout: number;
+  __allowInterval: boolean;
+  URL: typeof URL;
+
   console: Console;
   customElements: CustomElementRegistry;
   document: Document;
@@ -50,6 +62,7 @@ export class MockWindow {
     this.performance = new MockPerformance();
     this.customElements = new MockCustomElementRegistry(this as any);
     this.console = createConsole();
+    resetWindowDefaults(this);
     resetWindowDimensions(this);
   }
 
@@ -337,19 +350,17 @@ export class MockWindow {
   get window() {
     return this;
   }
-
-  URL = URL;
-
-  // used so the native setTimeout can actually be used
-  // but allows us to monkey patch the window.setTimeout
-  __clearInterval = clearInterval;
-  __clearTimeout = clearTimeout;
-  __setInterval = setInterval;
-  __setTimeout = setTimeout;
-  __maxTimeout = 30000;
-  __allowInterval = true;
 }
 
+function resetWindowDefaults(win: any) {
+  win.__clearInterval = nativeClearInterval;
+  win.__clearTimeout = nativeClearTimeout;
+  win.__setInterval = nativeSetInterval;
+  win.__setTimeout = nativeSetTimeout;
+  win.__maxTimeout = 30000;
+  win.__allowInterval = true;
+  win.URL = nativeURL;
+}
 
 export function createWindow(html: string | boolean = null): Window {
   return new MockWindow(html) as any;
@@ -403,7 +414,7 @@ export function resetWindow(win: Window) {
         delete (win as any)[key];
       }
     }
-
+    resetWindowDefaults(win);
     resetWindowDimensions(win);
 
     resetEventListeners(win);
