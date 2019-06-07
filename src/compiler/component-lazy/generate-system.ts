@@ -47,6 +47,7 @@ async function writeSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, l
 async function getSystemLoader(config: d.Config, corePath: string, includePolyfills: boolean) {
   const polyfills = includePolyfills ? await getAppBrowserCorePolyfills(config) : '';
   return `
+'use strict';
 ${polyfills}
 
 var doc = document;
