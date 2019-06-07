@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { PluginCtx, PluginTransformResults } from '../../declarations/plugin';
 import { parseCssImports } from '../style/css-imports';
-import { DOCS_README, DOCS, DOCS_JSON, DOCS_CUSTOM, DOCS_VSCODE } from 'output-targets/output-utils';
+import { DOCS_README, DOCS, DOCS_JSON, DOCS_CUSTOM, DOCS_VSCODE } from '../output-targets/output-utils';
 
 
 export async function runPluginResolveId(pluginCtx: PluginCtx, importee: string) {
