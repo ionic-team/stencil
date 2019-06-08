@@ -50,7 +50,7 @@ describe('plugin', () => {
       };
     }
 
-    config.plugins = [myPlugin()];
+    config.rollupPlugins = [myPlugin()];
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
@@ -79,7 +79,7 @@ describe('plugin', () => {
       };
     }
 
-    config.plugins = [myPlugin()];
+    config.rollupPlugins = [myPlugin()];
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
@@ -120,7 +120,7 @@ describe('plugin', () => {
       };
     }
 
-    config.plugins = [myPlugin()];
+    config.rollupPlugins = [myPlugin()];
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
@@ -160,7 +160,7 @@ describe('plugin', () => {
         name: 'myPlugin'
       };
     }
-    config.plugins = [myPlugin()];
+    config.rollupPlugins = [myPlugin()];
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);

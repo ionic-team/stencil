@@ -40,7 +40,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
           sourceMap: false,
           ...config.commonjs
         }),
-        ...config.plugins,
+        ...config.rollupPlugins,
         pluginHelper(config, compilerCtx, buildCtx),
         config.sys.rollup.plugins.nodeResolve({
           mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],

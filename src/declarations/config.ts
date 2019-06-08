@@ -105,7 +105,7 @@ export interface StencilConfig {
    * By default, Stencil does not come with Sass or PostCss support.
    * However, either can be added using the plugin array.
    */
-  plugins?: d.Plugin[];
+  plugins?: any[];
 
   /**
    * The srcDir config specifies the directory which should contain the source typescript files
@@ -141,6 +141,7 @@ export interface StencilConfig {
   watch?: boolean;
   watchIgnoredRegex?: RegExp;
   writeLog?: boolean;
+  rollupPlugins?: any[];
 }
 
 export interface Config extends StencilConfig {
