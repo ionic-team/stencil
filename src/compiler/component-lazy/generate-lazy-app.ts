@@ -10,6 +10,9 @@ import { generateCjs } from './generate-cjs';
 import { generateModuleGraph } from '../entries/component-graph';
 
 export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[]) {
+  if (canSkipLazyBuild(buildCtx)) {
+    return;
+  }
   const timespan = buildCtx.createTimeSpan(`bundling components started`);
 
   const cmps = buildCtx.components;
@@ -147,4 +150,14 @@ function getLegacyLoader(config: d.Config) {
   console.warn(warn.join('\\n'));
 
 })(document);`;
+}
+
+export function canSkipLazyBuild(buildCtx: d.BuildCtx) {
+  if (buildCtx.requiresFullBuild) {
+    return false;
+  }
+  if (buildCtx.isRebuild && (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges)) {
+    return false;
+  }
+  return true;
 }
