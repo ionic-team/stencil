@@ -23,7 +23,7 @@ export function validatePlugins(config: d.Config, diagnostics: d.Diagnostic[]) {
   config.plugins = getPlugins(config.plugins);
 }
 
-function getPlugins(plugins: any[]): Plugin[] {
+function getPlugins(plugins: any[]): d.Plugin[] {
   return plugins.filter(plugin => {
     return !!(plugin && typeof plugin === 'object');
   });
