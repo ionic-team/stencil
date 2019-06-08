@@ -1,5 +1,4 @@
 import * as d from '.';
-import ts from 'typescript';
 
 export interface Compiler {
   build(): Promise<d.BuildResults>;
@@ -45,6 +44,6 @@ export interface CompilerCtx {
   reset(): void;
 }
 
-export type NodeMap = WeakMap<ts.ClassDeclaration, d.ComponentCompilerMeta>;
+export type NodeMap = WeakMap<any, d.ComponentCompilerMeta>;
 
 export type TsService = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[], checkCacheKey: boolean, useFsCache: boolean) => Promise<boolean>;
