@@ -25,7 +25,7 @@ export function validatePlugins(config: d.Config, diagnostics: d.Diagnostic[]) {
 
 function getPlugins(plugins: any[]): d.Plugin[] {
   return plugins.filter(plugin => {
-    return !!(plugin && typeof plugin === 'object');
+    return !!(plugin && typeof plugin === 'object' && plugin.pluginType);
   });
 }
 
