@@ -20,7 +20,10 @@
     "tsc": "node ../../node_modules/typescript/lib/tsc -p tsconfig.json"
   },
   "devDependencies": {
-    "@stencil/sass": "^0.2.0",
+    "@stencil/less": "^1.0.0",
+    "@stencil/postcss": "^1.0.1",
+    "@stencil/sass": "^1.0.0",
+    "@stencil/stylus": "^1.0.0",
     "jasmine-core": "^3.4.0",
     "karma": "^4.1.0",
     "karma-browserstack-launcher": "^1.5.1",
@@ -35,6 +38,7 @@
     "puppeteer": "^1.17.0",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.4.0",
+    "rollup-plugin-node-polyfills": "^0.1.2",
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2",
     "workbox-build": "4.3.1"

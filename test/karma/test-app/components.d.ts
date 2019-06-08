@@ -82,6 +82,7 @@ export namespace Components {
   interface LegacyContext {
     'getData': () => Promise<{ win: Window; doc: Document; hasQueue: boolean; isServer: boolean; unknown: any; myService: any; }>;
   }
+  interface LessCmp {}
   interface LifecycleAsyncA {}
   interface LifecycleAsyncB {
     'value': string;
@@ -174,6 +175,7 @@ export namespace Components {
     'href'?: string;
   }
   interface SlotReplaceWrapperRoot {}
+  interface StylusCmp {}
   interface SvgAttr {}
   interface SvgClass {}
   interface Tag3dComponent {}
@@ -367,6 +369,12 @@ declare global {
   var HTMLLegacyContextElement: {
     prototype: HTMLLegacyContextElement;
     new (): HTMLLegacyContextElement;
+  };
+
+  interface HTMLLessCmpElement extends Components.LessCmp, HTMLStencilElement {}
+  var HTMLLessCmpElement: {
+    prototype: HTMLLessCmpElement;
+    new (): HTMLLessCmpElement;
   };
 
   interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLStencilElement {}
@@ -675,6 +683,12 @@ declare global {
     new (): HTMLSlotReplaceWrapperRootElement;
   };
 
+  interface HTMLStylusCmpElement extends Components.StylusCmp, HTMLStencilElement {}
+  var HTMLStylusCmpElement: {
+    prototype: HTMLStylusCmpElement;
+    new (): HTMLStylusCmpElement;
+  };
+
   interface HTMLSvgAttrElement extends Components.SvgAttr, HTMLStencilElement {}
   var HTMLSvgAttrElement: {
     prototype: HTMLSvgAttrElement;
@@ -730,6 +744,7 @@ declare global {
     'key-reorder': HTMLKeyReorderElement;
     'key-reorder-root': HTMLKeyReorderRootElement;
     'legacy-context': HTMLLegacyContextElement;
+    'less-cmp': HTMLLessCmpElement;
     'lifecycle-async-a': HTMLLifecycleAsyncAElement;
     'lifecycle-async-b': HTMLLifecycleAsyncBElement;
     'lifecycle-async-c': HTMLLifecycleAsyncCElement;
@@ -781,6 +796,7 @@ declare global {
     'slot-reorder-root': HTMLSlotReorderRootElement;
     'slot-replace-wrapper': HTMLSlotReplaceWrapperElement;
     'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement;
+    'stylus-cmp': HTMLStylusCmpElement;
     'svg-attr': HTMLSvgAttrElement;
     'svg-class': HTMLSvgClassElement;
     'tag-3d-component': HTMLTag3dComponentElement;
@@ -853,6 +869,7 @@ declare namespace LocalJSX {
   }
   interface KeyReorderRoot extends JSXBase.HTMLAttributes<HTMLKeyReorderRootElement> {}
   interface LegacyContext extends JSXBase.HTMLAttributes<HTMLLegacyContextElement> {}
+  interface LessCmp extends JSXBase.HTMLAttributes<HTMLLessCmpElement> {}
   interface LifecycleAsyncA extends JSXBase.HTMLAttributes<HTMLLifecycleAsyncAElement> {}
   interface LifecycleAsyncB extends JSXBase.HTMLAttributes<HTMLLifecycleAsyncBElement> {
     'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
@@ -953,6 +970,7 @@ declare namespace LocalJSX {
     'href'?: string;
   }
   interface SlotReplaceWrapperRoot extends JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement> {}
+  interface StylusCmp extends JSXBase.HTMLAttributes<HTMLStylusCmpElement> {}
   interface SvgAttr extends JSXBase.HTMLAttributes<HTMLSvgAttrElement> {}
   interface SvgClass extends JSXBase.HTMLAttributes<HTMLSvgClassElement> {}
   interface Tag3dComponent extends JSXBase.HTMLAttributes<HTMLTag3dComponentElement> {}
@@ -990,6 +1008,7 @@ declare namespace LocalJSX {
     'key-reorder': KeyReorder;
     'key-reorder-root': KeyReorderRoot;
     'legacy-context': LegacyContext;
+    'less-cmp': LessCmp;
     'lifecycle-async-a': LifecycleAsyncA;
     'lifecycle-async-b': LifecycleAsyncB;
     'lifecycle-async-c': LifecycleAsyncC;
@@ -1041,6 +1060,7 @@ declare namespace LocalJSX {
     'slot-reorder-root': SlotReorderRoot;
     'slot-replace-wrapper': SlotReplaceWrapper;
     'slot-replace-wrapper-root': SlotReplaceWrapperRoot;
+    'stylus-cmp': StylusCmp;
     'svg-attr': SvgAttr;
     'svg-class': SvgClass;
     'tag-3d-component': Tag3dComponent;
