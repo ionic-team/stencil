@@ -9,7 +9,7 @@ describe('globals', () => {
   })
   class CmpA {}
 
-  it('should mock json fetch, no input', async () => {
+  it('should resolve raf and setTimeout', async () => {
     const page = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
@@ -28,6 +28,11 @@ describe('globals', () => {
     });
   });
 
+  it('allows access to window.JSON', async () => {
+    expect(JSON.stringify([0])).toEqual('[0]');
+    expect((window as any).JSON.stringify([0])).toEqual('[0]');
+  });
+
   it('allows access to the Element prototype', async () => {
     @Component({ tag: 'cmp-el' })
     class CmpEl {
@@ -44,8 +49,10 @@ describe('globals', () => {
       html: `<cmp-el></cmp-el>`
     });
 
-    expect(page.root).toEqualHtml(`
-      <cmp-el></cmp-el>
-    `);
+    expect(page.rootInstance.proto).toBe(Element.prototype);
+    expect(page.rootInstance.proto).toBe((page.win as any).Element.prototype);
+    expect(page.rootInstance.proto).toBe((window as any).Element.prototype);
+    expect(page.rootInstance.proto).toBe((global as any).Element.prototype);
+    expect(page.rootInstance.proto).toBeTruthy();
   });
 });

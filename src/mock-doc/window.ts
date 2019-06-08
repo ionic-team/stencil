@@ -131,6 +131,10 @@ export class MockWindow {
     return dispatchEvent(this, ev);
   }
 
+  get JSON() {
+    return JSON;
+  }
+
   get Event() {
     const evClass = eventClassMap.get(this);
     if (evClass != null) {
