@@ -17,12 +17,39 @@ export namespace Components {
   }
 }
 
+declare global {
+
+
+  interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
+  var HTMLAppRootElement: {
+    prototype: HTMLAppRootElement;
+    new (): HTMLAppRootElement;
+  };
+
+  interface HTMLTodoInputElement extends Components.TodoInput, HTMLStencilElement {}
+  var HTMLTodoInputElement: {
+    prototype: HTMLTodoInputElement;
+    new (): HTMLTodoInputElement;
+  };
+
+  interface HTMLTodoItemElement extends Components.TodoItem, HTMLStencilElement {}
+  var HTMLTodoItemElement: {
+    prototype: HTMLTodoItemElement;
+    new (): HTMLTodoItemElement;
+  };
+  interface HTMLElementTagNameMap {
+    'app-root': HTMLAppRootElement;
+    'todo-input': HTMLTodoInputElement;
+    'todo-item': HTMLTodoItemElement;
+  }
+}
+
 declare namespace LocalJSX {
-  interface AppRoot extends JSXBase.HTMLAttributes {}
-  interface TodoInput extends JSXBase.HTMLAttributes {
+  interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
+  interface TodoInput extends JSXBase.HTMLAttributes<HTMLTodoInputElement> {
     'onInputSubmit'?: (event: CustomEvent<any>) => void;
   }
-  interface TodoItem extends JSXBase.HTMLAttributes {
+  interface TodoItem extends JSXBase.HTMLAttributes<HTMLTodoItemElement> {
     'checked'?: boolean;
     'onItemCheck'?: (event: CustomEvent<any>) => void;
     'onItemRemove'?: (event: CustomEvent<any>) => void;
@@ -45,35 +72,4 @@ declare module "@stencil/core" {
   }
 }
 
-
-declare global {
-
-
-
-  interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
-  var HTMLAppRootElement: {
-    prototype: HTMLAppRootElement;
-    new (): HTMLAppRootElement;
-  };
-
-  interface HTMLTodoInputElement extends Components.TodoInput, HTMLStencilElement {}
-  var HTMLTodoInputElement: {
-    prototype: HTMLTodoInputElement;
-    new (): HTMLTodoInputElement;
-  };
-
-  interface HTMLTodoItemElement extends Components.TodoItem, HTMLStencilElement {}
-  var HTMLTodoItemElement: {
-    prototype: HTMLTodoItemElement;
-    new (): HTMLTodoItemElement;
-  };
-
-  interface HTMLElementTagNameMap {
-    'app-root': HTMLAppRootElement;
-    'todo-input': HTMLTodoInputElement;
-    'todo-item': HTMLTodoItemElement;
-  }
-
-  interface ElementTagNameMap extends HTMLElementTagNameMap {}
-}
 

@@ -1,10 +1,9 @@
 const path = require('path');
 const cp = require('child_process');
 
-function relativeResolve(importer, TRANSPILED_DIR, relativePath) {
-  const absolutePath = path.resolve(TRANSPILED_DIR, relativePath);
+function relativeResolve(relativePath) {
   return {
-    id: path.posix.relative(path.posix.dirname(importer), absolutePath),
+    id: relativePath,
     external: true
   };
 }

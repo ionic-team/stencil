@@ -29,9 +29,6 @@
       "@mock-doc": [
         "../../mock-doc/index.ts"
       ],
-      "@sys": [
-        "./index.ts"
-      ],
       "@utils": [
         "../../utils/index.ts"
       ]

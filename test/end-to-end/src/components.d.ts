@@ -6,11 +6,9 @@
 
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-import { JSX } from '@stencil/core';
 import {
   CarData,
 } from './car-list/car-data';
-
 
 export namespace Components {
   interface AppRoot {}
@@ -43,76 +41,6 @@ export namespace Components {
     'lastName': string;
   }
   interface StateCmp {}
-}
-
-declare namespace LocalJSX {
-  interface AppRoot extends JSXBase.HTMLAttributes {}
-  interface CarDetail extends JSXBase.HTMLAttributes {
-    'car'?: CarData;
-  }
-  interface CarList extends JSXBase.HTMLAttributes {
-    'cars'?: CarData[];
-    'onCarSelected'?: (event: CustomEvent<CarData>) => void;
-    'selected'?: CarData;
-  }
-  interface DomApi extends JSXBase.HTMLAttributes {}
-  interface DomInteraction extends JSXBase.HTMLAttributes {}
-  interface DomVisible extends JSXBase.HTMLAttributes {}
-  interface ElementCmp extends JSXBase.HTMLAttributes {}
-  interface EventCmp extends JSXBase.HTMLAttributes {
-    'onMy-event-with-options'?: (event: CustomEvent<{ mph: number }>) => void;
-    'onMyDocumentEvent'?: (event: CustomEvent<any>) => void;
-    'onMyWindowEvent'?: (event: CustomEvent<number>) => void;
-  }
-  interface ListenCmp extends JSXBase.HTMLAttributes {
-    'opened'?: boolean;
-  }
-  interface MethodCmp extends JSXBase.HTMLAttributes {
-    'someProp'?: number;
-  }
-  interface PropCmp extends JSXBase.HTMLAttributes {
-    'first'?: string;
-    'lastName'?: string;
-  }
-  interface StateCmp extends JSXBase.HTMLAttributes {}
-
-  interface ElementInterfaces {
-    'AppRoot': Components.AppRoot;
-    'CarDetail': Components.CarDetail;
-    'CarList': Components.CarList;
-    'DomApi': Components.DomApi;
-    'DomInteraction': Components.DomInteraction;
-    'DomVisible': Components.DomVisible;
-    'ElementCmp': Components.ElementCmp;
-    'EventCmp': Components.EventCmp;
-    'ListenCmp': Components.ListenCmp;
-    'MethodCmp': Components.MethodCmp;
-    'PropCmp': Components.PropCmp;
-    'StateCmp': Components.StateCmp;
-  }
-
-  interface IntrinsicElements {
-    'AppRoot': LocalJSX.AppRoot;
-    'CarDetail': LocalJSX.CarDetail;
-    'CarList': LocalJSX.CarList;
-    'DomApi': LocalJSX.DomApi;
-    'DomInteraction': LocalJSX.DomInteraction;
-    'DomVisible': LocalJSX.DomVisible;
-    'ElementCmp': LocalJSX.ElementCmp;
-    'EventCmp': LocalJSX.EventCmp;
-    'ListenCmp': LocalJSX.ListenCmp;
-    'MethodCmp': LocalJSX.MethodCmp;
-    'PropCmp': LocalJSX.PropCmp;
-    'StateCmp': LocalJSX.StateCmp;
-  }
-}
-export { LocalJSX as JSX };
-
-declare module "@stencil/core" {
-  export namespace JSX {
-    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
-  }
 }
 
 declare global {
@@ -190,21 +118,6 @@ declare global {
     new (): HTMLStateCmpElement;
   };
   interface HTMLElementTagNameMap {
-    'app-root': HTMLAppRootElement
-    'car-detail': HTMLCarDetailElement
-    'car-list': HTMLCarListElement
-    'dom-api': HTMLDomApiElement
-    'dom-interaction': HTMLDomInteractionElement
-    'dom-visible': HTMLDomVisibleElement
-    'element-cmp': HTMLElementCmpElement
-    'event-cmp': HTMLEventCmpElement
-    'listen-cmp': HTMLListenCmpElement
-    'method-cmp': HTMLMethodCmpElement
-    'prop-cmp': HTMLPropCmpElement
-    'state-cmp': HTMLStateCmpElement
-  }
-
-  interface ElementTagNameMap {
     'app-root': HTMLAppRootElement;
     'car-detail': HTMLCarDetailElement;
     'car-list': HTMLCarListElement;
@@ -219,4 +132,61 @@ declare global {
     'state-cmp': HTMLStateCmpElement;
   }
 }
+
+declare namespace LocalJSX {
+  interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
+  interface CarDetail extends JSXBase.HTMLAttributes<HTMLCarDetailElement> {
+    'car'?: CarData;
+  }
+  interface CarList extends JSXBase.HTMLAttributes<HTMLCarListElement> {
+    'cars'?: CarData[];
+    'onCarSelected'?: (event: CustomEvent<CarData>) => void;
+    'selected'?: CarData;
+  }
+  interface DomApi extends JSXBase.HTMLAttributes<HTMLDomApiElement> {}
+  interface DomInteraction extends JSXBase.HTMLAttributes<HTMLDomInteractionElement> {}
+  interface DomVisible extends JSXBase.HTMLAttributes<HTMLDomVisibleElement> {}
+  interface ElementCmp extends JSXBase.HTMLAttributes<HTMLElementCmpElement> {}
+  interface EventCmp extends JSXBase.HTMLAttributes<HTMLEventCmpElement> {
+    'onMy-event-with-options'?: (event: CustomEvent<{ mph: number }>) => void;
+    'onMyDocumentEvent'?: (event: CustomEvent<any>) => void;
+    'onMyWindowEvent'?: (event: CustomEvent<number>) => void;
+  }
+  interface ListenCmp extends JSXBase.HTMLAttributes<HTMLListenCmpElement> {
+    'opened'?: boolean;
+  }
+  interface MethodCmp extends JSXBase.HTMLAttributes<HTMLMethodCmpElement> {
+    'someProp'?: number;
+  }
+  interface PropCmp extends JSXBase.HTMLAttributes<HTMLPropCmpElement> {
+    'first'?: string;
+    'lastName'?: string;
+  }
+  interface StateCmp extends JSXBase.HTMLAttributes<HTMLStateCmpElement> {}
+
+  interface IntrinsicElements {
+    'app-root': AppRoot;
+    'car-detail': CarDetail;
+    'car-list': CarList;
+    'dom-api': DomApi;
+    'dom-interaction': DomInteraction;
+    'dom-visible': DomVisible;
+    'element-cmp': ElementCmp;
+    'event-cmp': EventCmp;
+    'listen-cmp': ListenCmp;
+    'method-cmp': MethodCmp;
+    'prop-cmp': PropCmp;
+    'state-cmp': StateCmp;
+  }
+}
+
+export { LocalJSX as JSX };
+
+
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
+
 

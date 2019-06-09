@@ -27,12 +27,9 @@ async function bundleCompiler() {
     plugins: [
       (() => {
         return {
-          resolveId(id, importer) {
+          resolveId(id) {
             if (id === '@build-conditionals') {
               return path.join(TRANSPILED_DIR, 'compiler', 'app-core', 'build-conditionals.js');
-            }
-            if (id === '@sys') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
             }
             if (id === '@utils') {
               return path.join(TRANSPILED_DIR, 'utils', 'index.js');
@@ -87,15 +84,7 @@ async function buildUtils() {
   const build = await rollup.rollup({
     input: path.join(TRANSPILED_DIR, 'utils', 'index.js'),
     plugins: [
-      (() => {
-        return {
-          resolveId(id, importer) {
-            if (id === '@sys') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
-            }
-          }
-        }
-      })(),
+
       rollupResolve({
         preferBuiltins: true
       }),
