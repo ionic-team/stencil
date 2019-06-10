@@ -6,14 +6,13 @@ import { replaceStylePlaceholders } from '../app-core/component-styles';
 export async function writeLazyModule(
   config: d.Config, compilerCtx: d.CompilerCtx, destinations: string[],
   entryModule: d.EntryModule,
-  shouldMinify: boolean,
+  shouldHash: boolean,
   code: string,
   modeName: string,
   sufix: string
 ): Promise<d.BundleModuleOutput> {
   code = replaceStylePlaceholders(entryModule.cmps, modeName, code);
 
-  const shouldHash = config.hashFileNames && shouldMinify;
   const bundleId = getBundleId(config, entryModule.entryKey, shouldHash, code, modeName, sufix);
   const fileName = `${bundleId}.entry.js`;
 
