@@ -60,5 +60,6 @@ const WINDOW_PROPS = [
   'Event',
   'Element',
   'HTMLElement',
+  'NodeList',
   'KeyboardEvent'
 ];

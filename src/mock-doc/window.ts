@@ -14,6 +14,7 @@ import { URL } from 'url';
 const historyMap = new WeakMap<MockWindow, MockHistory>();
 const elementCstrMap = new WeakMap<MockWindow, any>();
 const htmlElementCstrMap = new WeakMap<MockWindow, any>();
+const nodeListCstrMap = new WeakMap<MockWindow, any>();
 const localStorageMap = new WeakMap<MockWindow, MockStorage>();
 const locMap = new WeakMap<MockWindow, MockLocation>();
 const navMap = new WeakMap<MockWindow, MockNavigator>();
@@ -198,6 +199,20 @@ export class MockWindow {
       elementCstrMap.set(this, ElementCstr);
     }
     return ElementCstr;
+  }
+
+  get NodeList() {
+    let NodeListCstr = nodeListCstrMap.get(this);
+    if (NodeListCstr == null) {
+      const ownerDocument = this.document;
+      NodeListCstr = class extends MockElement {
+        constructor() {
+          super(ownerDocument, '');
+          throw (new Error('Illegal constructor: cannot constructor'))
+        }
+      };
+      return NodeListCstr;
+    }
   }
 
   get HTMLElement() {
@@ -442,6 +457,7 @@ export function resetWindow(win: Window) {
     historyMap.delete(win as any);
     htmlElementCstrMap.delete(win as any);
     elementCstrMap.delete(win as any);
+    nodeListCstrMap.delete(win as any);
     localStorageMap.delete(win as any);
     locMap.delete(win as any);
     navMap.delete(win as any);

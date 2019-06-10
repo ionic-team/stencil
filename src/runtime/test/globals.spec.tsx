@@ -33,26 +33,40 @@ describe('globals', () => {
     expect((window as any).JSON.stringify([0])).toEqual('[0]');
   });
 
-  it('allows access to the Element prototype', async () => {
-    @Component({ tag: 'cmp-el' })
-    class CmpEl {
-      // @ts-ignore
-      private proto: any;
+  describe('globals/prototypes', () => {
+    let page;
+    beforeEach(async () => {
+      @Component({ tag: 'cmp-el' })
+      class CmpEl {
+        // @ts-ignore
+        private protoEl: any;
+        private protoNodeList: any;
 
-      constructor() {
-        this.proto = Element.prototype;
+        constructor() {
+          this.protoEl = Element.prototype;
+          this.protoNodeList = NodeList.prototype;
+        }
       }
-    }
 
-    const page = await newSpecPage({
-      components: [CmpEl],
-      html: `<cmp-el></cmp-el>`
+      page = await newSpecPage({
+        components: [CmpEl],
+        html: `<cmp-el></cmp-el>`
+      });
+    })
+    it('allows access to the NodeList prototype', async () => {
+      expect(page.rootInstance.protoNodeList).toEqual(NodeList.prototype);
+      expect(page.rootInstance.protoNodeList).toEqual((page.win as any).NodeList.prototype);
+      expect(page.rootInstance.protoNodeList).toEqual((window as any).NodeList.prototype);
+      expect(page.rootInstance.protoNodeList).toEqual((global as any).NodeList.prototype);
+      expect(page.rootInstance.protoNodeList).toBeTruthy();
     });
-
-    expect(page.rootInstance.proto).toBe(Element.prototype);
-    expect(page.rootInstance.proto).toBe((page.win as any).Element.prototype);
-    expect(page.rootInstance.proto).toBe((window as any).Element.prototype);
-    expect(page.rootInstance.proto).toBe((global as any).Element.prototype);
-    expect(page.rootInstance.proto).toBeTruthy();
+  
+    it('allows access to the Element prototype', async () => {
+      expect(page.rootInstance.protoEl).toBe(Element.prototype);
+      expect(page.rootInstance.protoEl).toBe((page.win as any).Element.prototype);
+      expect(page.rootInstance.protoEl).toBe((window as any).Element.prototype);
+      expect(page.rootInstance.protoEl).toBe((global as any).Element.prototype);
+      expect(page.rootInstance.protoEl).toBeTruthy();
+    });
   });
 });
