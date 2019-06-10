@@ -15,7 +15,13 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
     const prototype = (Cstr as any).prototype;
 
     members.forEach(([memberName, [memberFlags]]) => {
-      if ((BUILD.prop && (memberFlags & MEMBER_FLAGS.Prop)) || (BUILD.state && (!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) && (memberFlags & MEMBER_FLAGS.State))) {
+      if ((BUILD.prop || BUILD.state) && (
+        (memberFlags & MEMBER_FLAGS.Prop) ||
+        (
+          (!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) &&
+          (memberFlags & MEMBER_FLAGS.State)
+        )
+      )) {
         // proxyComponent - prop
         Object.defineProperty(prototype, memberName,
           {

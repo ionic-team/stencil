@@ -4,7 +4,7 @@ import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { createOnWarnFn, getDependencies, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
-import { OutputChunk, OutputOptions, RollupBuild, RollupOptions } from 'rollup'; // types only
+import { OutputChunk, OutputOptions, RollupBuild, RollupOptions, TreeshakingOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
 import { loaderPlugin } from '../rollup-plugins/loader';
@@ -18,7 +18,11 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
     : [];
 
   try {
-    const treeshake = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false;
+    const treeshake: TreeshakingOptions | boolean = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
+      ? {
+        tryCatchDeoptimization: false,
+      }
+      : false;
     const rollupOptions: RollupOptions = {
       ...config.rollupConfig.inputOptions,
 
