@@ -11,7 +11,7 @@ export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, hostRef: d.HostRef, 
 
   return import(
     /* webpackInclude: /\.entry\.js$/ */
-    /* webpackExclude: /\.(system|cjs)\.entry\.js$/ */
+    /* webpackExclude: /\.system\.entry\.js$/ */
     /* webpackMode: "lazy" */
     `./${bundleId}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`
   ).then(importedModule => importedModule[cmpMeta.$tagName$.replace(/-/g, '_')], consoleError);
