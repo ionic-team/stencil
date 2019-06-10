@@ -2,7 +2,7 @@ import { createConsole } from './console';
 import { MockCustomElementRegistry, resetCustomElementRegistry } from './custom-element-registry';
 import { MockCustomEvent, MockEvent, MockKeyboardEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { MockDocument, resetDocument } from './document';
-import { MockElement } from './node';
+import { MockElement, MockNodeList} from './node';
 import { MockHistory } from './history';
 import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
@@ -205,9 +205,9 @@ export class MockWindow {
     let NodeListCstr = nodeListCstrMap.get(this);
     if (NodeListCstr == null) {
       const ownerDocument = this.document;
-      NodeListCstr = class extends MockElement {
+      NodeListCstr = class extends MockNodeList {
         constructor() {
-          super(ownerDocument, '');
+          super(ownerDocument, [], 0);
           throw (new Error('Illegal constructor: cannot constructor'))
         }
       };
