@@ -62,10 +62,10 @@ describe('globals', () => {
     });
   
     it('allows access to the Element prototype', async () => {
-      expect(page.rootInstance.protoEl).toBe(Element.prototype);
-      expect(page.rootInstance.protoEl).toBe((page.win as any).Element.prototype);
-      expect(page.rootInstance.protoEl).toBe((window as any).Element.prototype);
-      expect(page.rootInstance.protoEl).toBe((global as any).Element.prototype);
+      expect(page.rootInstance.protoEl).toEqual(Element.prototype);
+      expect(page.rootInstance.protoEl).toEqual((page.win as any).Element.prototype);
+      expect(page.rootInstance.protoEl).toEqual((window as any).Element.prototype);
+      expect(page.rootInstance.protoEl).toEqual((global as any).Element.prototype);
       expect(page.rootInstance.protoEl).toBeTruthy();
     });
   });
