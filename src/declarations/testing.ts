@@ -489,19 +489,58 @@ export interface SpecPage {
 
 
 export interface NewSpecPageOptions {
+  /**
+   * An array of components to test. Component classes can be imported into the spec file, then their reference should be added to the `component` array in order to be used throughout the test.
+   */
   components: any[];
+  /**
+   * Sets the mocked `document.cookie`.
+   */
   cookie?: string;
+  /**
+   * Sets the mocked `dir` attribute on `<html>`.
+   */
   direction?: string;
   flushQueue?: boolean;
+  /**
+   * The initial HTML used to generate the test. This can be useful to construct a collection of components working together, and assign HTML attributes. This value sets the mocked `document.body.innerHTML`.
+   */
   html?: string;
+  /**
+   * Sets the mocked `lang` attribute on `<html>`.
+   */
   language?: string;
+  /**
+   * Useful for debugging hydrating components client-side. Sets that the `html` option already includes annotated prerender attributes and comments.
+   */
   hydrateClientSide?: boolean;
+  /**
+   * Useful for debugging hydrating components server-side. The output HTML will also include prerender annotations.
+   */
   hydrateServerSide?: boolean;
+  /**
+   * Sets the mocked `document.referrer`.
+   */
   referrer?: string;
+  /**
+   * Manually set if the mocked document supports Shadow DOM or not. Default is `true`.
+   */
   supportsShadowDom?: boolean;
+  /**
+   * When a component is prerendered it includes HTML annotations, such as `s-id` attributes and `<!-t.0->` comments. This information is used by clientside hydrating. Default is `false`.
+   */
   includeAnnotations?: boolean;
+  /**
+   * Sets the mocked browser's `location.href`.
+   */
   url?: string;
+  /**
+   * Sets the mocked browser's `navigator.userAgent`.
+   */
   userAgent?: string;
+  /**
+   * By default, any changes to component properties and attributes must `page.waitForChanges()` in order to test the updates. As an option, `autoAppluChanges` continuously flushes the queue on the background. Default is `false`.
+   */
   autoApplyChanges?: boolean;
 
   /** @deprecated */
