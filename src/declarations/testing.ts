@@ -474,17 +474,39 @@ export interface AnyHTMLElement extends HTMLElement {
 }
 
 export interface SpecPage {
-  win: Window;
-  doc: HTMLDocument;
+  /**
+   * Mocked testing `document.body`.
+   */
   body: HTMLBodyElement;
+  /**
+   * Mocked testing `document`.
+   */
+  doc: HTMLDocument;
+  /**
+   * The first component found within the mocked `document.body`. If a component isn't found, then it'll return `document.body.firstElementChild`.
+   */
   root?: AnyHTMLElement;
+  /**
+   * Similar to `root`, except returns the component instance. If a root component was not found it'll return `null`.
+   */
   rootInstance?: any;
-  build: d.Build;
-  styles: Map<string, string>;
+  /**
+   * Convenience function to set `document.body.innerHTML` and `waitForChanges()`. Function argument should be an html string.
+   */
   setContent: (html: string) => Promise<any>;
+  /**
+   * After changes have been made to a component, such as a update to a property or attribute, the test page does not automatically apply the changes. In order to wait for, and apply the update, call `await page.waitForChanges()`.
+   */
   waitForChanges: () => Promise<any>;
+  /**
+   * Mocked testing `window`.
+   */
+  win: Window;
+
+  build: d.Build;
   flushLoadModule: (bundleId?: string) => Promise<any>;
   flushQueue: () => Promise<any>;
+  styles: Map<string, string>;
 }
 
 
