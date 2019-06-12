@@ -2,47 +2,29 @@ import * as d from '../../declarations';
 import { buildError } from '@utils';
 
 
-export function pluginHelper(config: d.Config, compilerCtx: d.CompilerCtx, builtCtx: d.BuildCtx) {
+export function pluginHelper(config: d.Config, builtCtx: d.BuildCtx) {
   return {
     name: 'pluginHelper',
-
-    async resolveId(importee: string, importer: string): Promise<string> {
-      if (importee) {
-        if (/\0/.test(importee)) {
-          // ignore IDs with null character, these belong to other plugins
-          return null;
-        }
-        if (importee.slice(-1) === '/') {
-          importee === importee.slice(0, -1);
-        }
-
-        if (builtIns.has(importee) || globals.has(importee)) {
-          let fromMsg = '';
-          if (importer) {
-            if (importer.endsWith('.js')) {
-              const tsxFile = importer.substr(0, importer.length - 2) + 'tsx';
-              const tsxFileExists = await compilerCtx.fs.access(tsxFile);
-              if (tsxFileExists) {
-                importer = tsxFile;
-
-              } else {
-                const tsFile = importer.substr(0, importer.length - 2) + 'ts';
-                const tsFileExists = await compilerCtx.fs.access(tsFile);
-                if (tsFileExists) {
-                  importer = tsFile;
-                }
-              }
-            }
-
-            fromMsg = ` from ${config.sys.path.relative(config.rootDir, importer)}`;
-          }
-
-          const diagnostic = buildError(builtCtx.diagnostics);
-          diagnostic.header = `Bundling Node Builtin${globals.has(importee) ? ` and Global` : ``}`;
-          diagnostic.messageText = `For the import "${importee}" to be bundled${fromMsg}, ensure the "rollup-plugin-node-builtins" plugin${globals.has(importee) ? ` and "rollup-plugin-node-globals" plugin` : ``} is installed and added to the stencil config plugins. Please see the bundling docs for more information.`;
-        }
+    resolveId(importee: string, importer: string): null {
+      if (/\0/.test(importee)) {
+        // ignore IDs with null character, these belong to other plugins
+        return null;
       }
 
+      if (importee.endsWith('/')) {
+        importee = importee.slice(0, -1);
+      }
+
+      if (builtIns.has(importee)) {
+        let fromMsg = '';
+        if (importer) {
+          fromMsg = ` from ${config.sys.path.relative(config.rootDir, importer)}`;
+        }
+        const diagnostic = buildError(builtCtx.diagnostics);
+        diagnostic.header = `Bundling Node Builtin or Global`;
+        diagnostic.messageText = `For the import "${importee}" to be bundled${fromMsg}, ensure the "rollup-plugin-node-polyfills" plugin is installed and added to the stencil config plugins. Please see the bundling docs for more information.
+        Further information: https://stenciljs.com/docs/module-bundling`;
+      }
       return null;
     }
   };
@@ -79,10 +61,7 @@ const builtIns = new Set([
 
   'crypto',
   'fs',
-]);
 
-const globals = new Set([
-  'assert',
   'Buffer',
   'buffer',
   'global',
