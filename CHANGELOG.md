@@ -1,5 +1,14 @@
 ## 🍭 [1.0.3](https://github.com/ionic-team/stencil/compare/v1.0.2...v1.0.3) (2019-06-12)
 
+If you are using any of the following plugins:
+
+- `@stencil/sass`
+- `@stencil/less`
+- `@stencil/stylus`
+- `@stencil/postcss`
+
+Please, make sure you are using the latest version (1.0.x) of those plugins.
+
 
 ### Bug Fixes
 
