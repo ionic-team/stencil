@@ -7,6 +7,20 @@ describe('element', () => {
     doc = new MockDocument();
   });
 
+  it('document.title', () => {
+    document.title = 'Hello Title';
+    expect(document.title).toBe('Hello Title');
+
+    const titleElm = document.head.querySelector('title');
+    expect(titleElm.textContent).toBe('Hello Title');
+    expect(titleElm.text).toBe('Hello Title');
+
+    titleElm.text = 'Hello Text';
+    expect(document.title).toBe('Hello Text');
+    expect(titleElm.text).toBe('Hello Text');
+    expect(titleElm.textContent).toBe('Hello Text');
+  });
+
   it('isConnected nested true', () => {
     const elmParent = document.createElement('div');
     const elmChild = document.createElement('div');

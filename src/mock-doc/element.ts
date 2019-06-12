@@ -38,6 +38,9 @@ export function createElement(ownerDocument: any, tagName: string) {
 
     case 'template':
       return new MockTemplateElement(ownerDocument);
+
+    case 'title':
+      return new MockTitleElement(ownerDocument);
   }
 
   if (ownerDocument != null && tagName.includes('-')) {
@@ -228,6 +231,21 @@ export class MockTemplateElement extends MockElement {
     return cloned;
   }
 }
+
+
+class MockTitleElement extends MockElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'title');
+  }
+
+  get text() {
+    return this.textContent;
+  }
+  set text(value: string) {
+    this.textContent = value;
+  }
+}
+
 
 
 function fullUrl(elm: MockElement, attrName: string) {
