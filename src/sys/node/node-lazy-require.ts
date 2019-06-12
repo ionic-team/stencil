@@ -134,6 +134,7 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
       'install',
       ...moduleIds,
       '--no-audit',
+      '--production',
       '--save-exact',
       '--save-dev'
     ];
@@ -148,6 +149,8 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
 
     if (logger.level === 'debug') {
       args.push('--verbose');
+    } else {
+      args.push('--silent');
     }
 
     logger.debug(`${cmd} ${args.join(' ')}`);
