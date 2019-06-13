@@ -1,10 +1,53 @@
 import { MockDocument } from '../document';
+import { MockWindow, cloneWindow } from '../window';
 
 
 describe('element', () => {
   let doc: MockDocument;
   beforeEach(() => {
     doc = new MockDocument();
+  });
+
+  it('clone elements', () => {
+    const win = new MockWindow(`
+      <html>
+        <head>
+          <meta id="test">
+        </head>
+        <body></body>
+      </head>
+    `);
+
+    const clonedWin = cloneWindow(win as any);
+
+    const elm = clonedWin.document.getElementById('test') as any;
+    expect((elm as HTMLMetaElement).content).toBe('');
+    expect(elm).toEqualHtml(`<meta id="test">`);
+
+    (elm as HTMLMetaElement).content = 'value';
+    expect((elm as HTMLMetaElement).content).toBe('value');
+    expect(elm).toEqualHtml(`<meta content="value" id="test">`);
+
+    clonedWin.document.title = 'Hello Title!';
+    const titleElm = clonedWin.document.head.querySelector('title');
+    expect(titleElm).toEqualHtml(`<title>Hello Title!</title>`);
+
+    titleElm.text = 'Hello Text!';
+    expect(titleElm).toEqualHtml(`<title>Hello Text!</title>`);
+  });
+
+  it('meta content', () => {
+    const metaElm = doc.createElement('meta');
+    metaElm.content = 'value';
+    metaElm.id = 'test';
+    doc.head.appendChild(metaElm);
+    expect(metaElm).toEqualHtml(`<meta content="value" id="test">`);
+
+    const elm = doc.getElementById('test');
+    expect(elm).toEqualHtml(`<meta content="value" id="test">`);
+
+    elm['content'] = 'updated';
+    expect(elm).toEqualHtml(`<meta content="updated" id="test">`);
   });
 
   it('document.title', () => {

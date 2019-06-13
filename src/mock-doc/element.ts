@@ -305,3 +305,23 @@ function patchPropAttributes(prototype: any, attrs: any) {
     }
   });
 }
+
+
+MockElement.prototype.cloneNode = function(this: MockElement, deep?: boolean) {
+  const cloned = createElement(null, this.nodeName);
+  cloned.attributes = cloneAttributes(this.attributes);
+
+  const styleCssText = this.getAttribute('style');
+  if (styleCssText != null && styleCssText.length > 0) {
+    cloned.setAttribute('style', styleCssText);
+  }
+
+  if (deep) {
+    for (let i = 0, ii = this.childNodes.length; i < ii; i++) {
+      const clonedChildNode = this.childNodes[i].cloneNode(true);
+      cloned.appendChild(clonedChildNode);
+    }
+  }
+
+  return cloned;
+};
