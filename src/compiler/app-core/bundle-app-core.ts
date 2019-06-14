@@ -63,11 +63,6 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
       onwarn: createOnWarnFn(buildCtx.diagnostics),
       external
     };
-    if (bundleAppOptions.emitCoreChunk) {
-      rollupOptions.manualChunks = {
-        [config.fsNamespace]: ['@stencil/core']
-      };
-    }
 
     const rollupBuild: RollupBuild = await config.sys.rollup.rollup(rollupOptions);
     return rollupBuild;
@@ -89,18 +84,21 @@ export async function generateRollupOutput(build: RollupBuild, options: OutputOp
   const { output } = await build.generate(options);
   return output
     .filter(chunk => !('isAsset' in chunk))
-    .map((chunk: OutputChunk) => ({
-      fileName: chunk.fileName,
-      code: chunk.code,
-      moduleFormat: options.format,
-      entryKey: chunk.name,
-      imports: chunk.imports,
-      isEntry: !!chunk.isEntry,
-      isComponent: !!chunk.isEntry && entryModules.some(m => m.entryKey === chunk.name),
-      isCore: !chunk.isEntry && chunk.name === config.fsNamespace,
-      isBrowserLoader: chunk.isEntry && chunk.name === config.fsNamespace,
-      isIndex: chunk.isEntry && chunk.name === 'index',
-    }));
+    .map((chunk: OutputChunk) => {
+      const isCore = Object.keys(chunk.modules).includes('@stencil/core');
+      return {
+        fileName: chunk.fileName,
+        code: chunk.code,
+        moduleFormat: options.format,
+        entryKey: chunk.name,
+        imports: chunk.imports,
+        isEntry: !!chunk.isEntry,
+        isComponent: !!chunk.isEntry && entryModules.some(m => m.entryKey === chunk.name),
+        isBrowserLoader: chunk.isEntry && chunk.name === config.fsNamespace,
+        isIndex: chunk.isEntry && chunk.name === 'index',
+        isCore,
+    };
+  });
 }
 
 export const DEFAULT_CORE = `
