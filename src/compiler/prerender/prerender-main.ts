@@ -44,7 +44,7 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
     resolve: null
   };
 
-  if (!config.flags.ci) {
+  if (!config.flags.ci && config.logLevel !== 'debug') {
     manager.progressLogger = startProgressLogger();
   }
 
