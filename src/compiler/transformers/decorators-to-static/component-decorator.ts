@@ -120,7 +120,7 @@ function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], typeCh
 
     nonTypeExports.forEach(symbol => {
       const err = buildError(diagnostics);
-      err.messageText = `To allow efficient bundling with rollup, modules using @Component() can only have a single export which is the component class itself.
+      err.messageText = `To allow efficient bundling, modules using @Component() can only have a single export which is the component class itself.
       Any other exports should be moved to a separate file.
       For further information check out: https://stenciljs.com/docs/module-bundling`;
       const errorNode = symbol.valueDeclaration
