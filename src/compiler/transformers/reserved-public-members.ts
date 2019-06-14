@@ -30,7 +30,7 @@ const HTML_ELEMENT_KEYS = [
   // 'autocapitalize',
   'contentEditable',
   'isContentEditable',
-  'inputMode',
+  // 'inputMode',
   'offsetParent',
   'offsetTop',
   'offsetLeft',
