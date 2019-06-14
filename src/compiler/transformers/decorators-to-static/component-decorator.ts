@@ -5,7 +5,7 @@ import { DEFAULT_STYLE_MODE, augmentDiagnosticWithNode, buildError, validateComp
 import { CLASS_DECORATORS_TO_REMOVE } from '../remove-stencil-import';
 
 
-export function componentDecoratorToStatic(config: d.Config, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) {
+export function componentDecoratorToStatic(config: d.Config, typeChecker: ts.TypeChecker, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) {
   removeDecorators(cmpNode, CLASS_DECORATORS_TO_REMOVE);
 
   const [ componentOptions ] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
@@ -13,7 +13,7 @@ export function componentDecoratorToStatic(config: d.Config, diagnostics: d.Diag
     return;
   }
 
-  if (!validateComponent(config, diagnostics, componentOptions, cmpNode, componentDecorator)) {
+  if (!validateComponent(config, diagnostics, typeChecker, componentOptions, cmpNode, componentDecorator)) {
     return;
   }
 
@@ -67,9 +67,10 @@ export function componentDecoratorToStatic(config: d.Config, diagnostics: d.Diag
       newMembers.push(createStaticGetter('styles', convertValueToLiteral(styles)));
     }
   }
+
 }
 
-function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], componentOptions: d.ComponentOptions, cmpNode: ts.ClassDeclaration, componentDecorator: ts.Node) {
+function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, componentOptions: d.ComponentOptions, cmpNode: ts.ClassDeclaration, componentDecorator: ts.Node) {
   const extendNode = cmpNode.heritageClauses && cmpNode.heritageClauses.find(c => c.token === ts.SyntaxKind.ExtendsKeyword);
   if (extendNode) {
     const err = buildError(diagnostics);
@@ -110,6 +111,23 @@ function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], compon
     err.messageText = `${tagError}. Please refer to https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name for more info.`;
     augmentDiagnosticWithNode(config, err, findTagNode('tag', componentDecorator));
     return false;
+  }
+
+  if (!config._isTesting) {
+    const nonTypeExports = typeChecker.getExportsOfModule(typeChecker.getSymbolAtLocation(cmpNode.getSourceFile()))
+      .filter(symbol => (symbol.flags & (ts.SymbolFlags.Interface | ts.SymbolFlags.TypeAlias)) === 0)
+      .filter(symbol => symbol.name !== cmpNode.name.text);
+
+    nonTypeExports.forEach(symbol => {
+      const err = buildError(diagnostics);
+      err.messageText = `To allow efficient bundling with rollup, modules using @Component() can only have a single export which is the component class itself.
+      Any other exports should be moved to a separate file.
+      For further information check out: https://stenciljs.com/docs/module-bundling`;
+      augmentDiagnosticWithNode(config, err, symbol.valueDeclaration.modifiers[0]);
+    });
+    if (nonTypeExports.length > 0) {
+      return false;
+    }
   }
   return true;
 }
