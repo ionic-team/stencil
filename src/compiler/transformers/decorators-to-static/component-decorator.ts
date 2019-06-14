@@ -123,7 +123,11 @@ function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], typeCh
       err.messageText = `To allow efficient bundling with rollup, modules using @Component() can only have a single export which is the component class itself.
       Any other exports should be moved to a separate file.
       For further information check out: https://stenciljs.com/docs/module-bundling`;
-      augmentDiagnosticWithNode(config, err, symbol.valueDeclaration.modifiers[0]);
+      const errorNode = symbol.valueDeclaration
+        ? symbol.valueDeclaration.modifiers[0]
+        : symbol.declarations[0];
+
+      augmentDiagnosticWithNode(config, err, errorNode);
     });
     if (nonTypeExports.length > 0) {
       return false;
