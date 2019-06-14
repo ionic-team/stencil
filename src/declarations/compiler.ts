@@ -22,7 +22,7 @@ export interface CompilerCtx {
   cachedStyleMeta: Map<string, d.StyleCompiler>;
   cachedGlobalStyle: string;
   collections: d.CollectionCompilerMeta[];
-  compilerOptions: ts.CompilerOptions;
+  compilerOptions: any;
   events: d.BuildEvents;
   fs: d.InMemoryFileSystem;
   fsWatcher: d.FsWatcher;

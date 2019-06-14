@@ -5,6 +5,8 @@ import { Plugin } from 'rollup';
 
 export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx): Plugin {
   const path = config.sys.path;
+  const compilerOptions: CompilerOptions = compilerCtx.compilerOptions;
+
   return {
     name: 'inMemoryFsRead',
 
@@ -15,7 +17,7 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx): Pl
       }
 
       // resolve path that matches a path alias from the compiler options
-      if (compilerCtx.compilerOptions.paths && hasMatchingPathAlias(importee, compilerCtx.compilerOptions.paths)) {
+      if (compilerOptions.paths && hasMatchingPathAlias(importee, compilerOptions)) {
         return resolveWithPathAlias(importee, importer, compilerCtx, path);
       }
 
@@ -84,8 +86,8 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx): Pl
 /**
  * Check whether an importee has a matching path alias.
  */
-const hasMatchingPathAlias = (importee: string, paths?: CompilerOptions['paths']) =>
-  Object.keys(paths).some(path => new RegExp(path.replace('*', '\\w*')).test(importee));
+const hasMatchingPathAlias = (importee: string, compilerOptions: CompilerOptions) =>
+  Object.keys(compilerOptions.paths).some(path => new RegExp(path.replace('*', '\\w*')).test(importee));
 
 /**
  * Resolve an import using the path aliases of the compiler options.
