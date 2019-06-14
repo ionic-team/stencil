@@ -3,7 +3,7 @@ import { COMPILER_BUILD } from '../build/compiler-build-id';
 
 
 export async function transpileToEs5Main(config: d.Config, compilerCtx: d.CompilerCtx, input: string, inlineHelpers = true) {
-  const cacheKey = compilerCtx.cache.createKey('transpileToEs5', COMPILER_BUILD.transpiler, input);
+  const cacheKey = await compilerCtx.cache.createKey('transpileToEs5', COMPILER_BUILD.transpiler, input);
 
   const cachedContent = await compilerCtx.cache.get(cacheKey);
   if (cachedContent != null) {

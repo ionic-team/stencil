@@ -160,6 +160,11 @@ export interface Config extends StencilConfig {
   _lifecycleDOMEvents?: boolean;
 }
 
+export interface BrowserConfig extends d.StencilConfig {
+  fs: d.FileSystem;
+  window?: Window;
+}
+
 export interface RollupConfig {
   inputOptions?: RollupInputOptions;
   outputOptions?: RollupOutputOptions;

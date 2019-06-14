@@ -154,17 +154,19 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   generateContentHash(content: any, length?: number) {
-    let hash = createHash('md5')
-               .update(content)
-               .digest('base64');
+    return new Promise<string>(resolve => {
+      let hash = createHash('md5')
+        .update(content)
+        .digest('base64');
 
-    if (typeof length === 'number') {
-      hash = hash.replace(/\W/g, '')
-                 .substr(0, length)
-                 .toLowerCase();
-    }
+      if (typeof length === 'number') {
+        hash = hash.replace(/\W/g, '')
+                .substr(0, length)
+                .toLowerCase();
+      }
 
-    return hash;
+      resolve(hash);
+    });
   }
 
   getClientPath(staticName: string) {

@@ -142,7 +142,9 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
 
 
 export function setProcessEnvironment(config: d.Config) {
-  process.env.NODE_ENV = config.devMode ? 'development' : 'production';
+  if (typeof process !== 'undefined' && process.env) {
+    process.env.NODE_ENV = config.devMode ? 'development' : 'production';
+  }
 }
 
 

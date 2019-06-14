@@ -123,6 +123,9 @@ export function getComponentsFromModules(moduleFiles: d.Module[]) {
 }
 
 export function canSkipAppCoreBuild(buildCtx: d.BuildCtx) {
+  if (buildCtx.components.length === 0) {
+    return true;
+  }
   if (buildCtx.requiresFullBuild) {
     return false;
   }

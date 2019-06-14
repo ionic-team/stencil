@@ -62,7 +62,7 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
 
   let cacheKey: string;
   if (compilerCtx) {
-    cacheKey = compilerCtx.cache.createKey('minifyModule', COMPILER_BUILD.id, opts, input);
+    cacheKey = await compilerCtx.cache.createKey('minifyModule', COMPILER_BUILD.id, opts, input);
     const cachedContent = await compilerCtx.cache.get(cacheKey);
     if (cachedContent != null) {
       return {
