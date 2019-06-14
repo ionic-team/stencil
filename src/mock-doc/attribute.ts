@@ -8,7 +8,6 @@ export class MockAttributeMap {
   }
 
   getNamedItem(attrName: string) {
-    attrName = attrName.toLowerCase();
     return this.items.find(attr => attr.name === attrName && (attr.namespaceURI == null || attr.namespaceURI === 'http://www.w3.org/1999/xlink')) || null;
   }
 
@@ -29,8 +28,6 @@ export class MockAttributeMap {
     if (namespaceURI == null || namespaceURI === 'http://www.w3.org/1999/xlink') {
       return this.getNamedItem(attrName);
     }
-
-    attrName = attrName.toLowerCase();
     return this.items.find(attr => attr.name === attrName && attr.namespaceURI === namespaceURI) || null;
   }
 
@@ -39,7 +36,7 @@ export class MockAttributeMap {
       attr.value = String(attr.value);
     }
 
-    const existingAttr = this.items.find(a => a.name.toLowerCase() === attr.name.toLowerCase() && a.namespaceURI === attr.namespaceURI);
+    const existingAttr = this.items.find(a => a.name === attr.name && a.namespaceURI === attr.namespaceURI);
     if (existingAttr != null) {
       existingAttr.value = attr.value;
     } else {
@@ -49,7 +46,7 @@ export class MockAttributeMap {
 
   removeNamedItemNS(attr: MockAttr) {
     for (let i = 0, ii = this.items.length; i < ii; i++) {
-      if (this.items[i].name.toLowerCase() === attr.name && this.items[i].namespaceURI === attr.namespaceURI) {
+      if (this.items[i].name === attr.name && this.items[i].namespaceURI === attr.namespaceURI) {
         this.items.splice(i, 1);
         break;
       }
@@ -66,7 +63,7 @@ export function cloneAttributes(srcAttrs: MockAttributeMap, sortByName = false) 
       const sortedAttrs: MockAttr[] = [];
       for (let i = 0; i < attrLen; i++) {
         const srcAttr = srcAttrs.item(i);
-        const dstAttr = new MockAttr(srcAttr.name.toLowerCase(), srcAttr.value, srcAttr.namespaceURI);
+        const dstAttr = new MockAttr(srcAttr.name, srcAttr.value, srcAttr.namespaceURI);
         sortedAttrs.push(dstAttr);
       }
 
@@ -98,10 +95,10 @@ export class MockAttr {
   private _value: string;
   private _namespaceURI: string;
 
-  constructor(attrName: string, attrValue = '', namespaceURL: string = null) {
-    this._name = attrName.toLowerCase();
+  constructor(attrName: string, attrValue = '', namespaceURI: string = null) {
+    this._name = attrName;
     this._value = String(attrValue || '');
-    this._namespaceURI = (namespaceURL != null) ? namespaceURL.toLowerCase() : namespaceURL;
+    this._namespaceURI = namespaceURI;
   }
 
   get name() {
@@ -122,7 +119,7 @@ export class MockAttr {
     return this._name;
   }
   set nodeName(value) {
-    this._name = value.toLowerCase();
+    this._name = value;
   }
 
   get nodeValue() {
@@ -136,6 +133,6 @@ export class MockAttr {
     return this._namespaceURI;
   }
   set namespaceURI(namespaceURI) {
-    this._namespaceURI = (namespaceURI != null) ? namespaceURI.toLowerCase() : namespaceURI;
+    this._namespaceURI = namespaceURI;
   }
 }

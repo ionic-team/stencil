@@ -3,10 +3,10 @@ import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 import { EventSpy, addE2EListener } from './puppeteer-events';
 import { find, findAll } from './puppeteer-find';
-import { MockElement, cloneAttributes, parseHtmlToFragment } from '@mock-doc';
+import { MockHTMLElement, cloneAttributes, parseHtmlToFragment } from '@mock-doc';
 
 
-export class E2EElement extends MockElement implements pd.E2EElementInternal {
+export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal {
   private _queuedActions: ElementAction[] = [];
 
   private _queueAction(action: ElementAction) {

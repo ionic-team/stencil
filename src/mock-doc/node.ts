@@ -210,6 +210,7 @@ export class MockElement extends MockNode {
     }
     return attrs;
   }
+
   set attributes(attrs: MockAttributeMap) {
     attrsMap.set(this, attrs);
   }
@@ -258,7 +259,6 @@ export class MockElement extends MockNode {
   }
 
   getAttribute(attrName: string) {
-    attrName = attrName.toLowerCase();
     if (attrName === 'style') {
       const style = stylesMap.get(this);
       if (style != null && style.length > 0) {
@@ -302,7 +302,7 @@ export class MockElement extends MockNode {
   }
 
   get id() { return this.getAttributeNS(null, 'id') || ''; }
-  set id(value: string) { this.setAttribute('id', value); }
+  set id(value: string) { this.setAttributeNS(null, 'id', value); }
 
   get innerHTML() {
     if (this.childNodes.length === 0) {
@@ -343,12 +343,11 @@ export class MockElement extends MockNode {
   }
 
   hasAttribute(attrName: string) {
-    attrName = attrName.toLowerCase();
     if (attrName === 'style') {
       const style = stylesMap.get(this);
       return (style != null && style.length > 0);
     }
-    return this.getAttributeNS(null, attrName) !== null;
+    return this.getAttribute(attrName) !== null;
   }
 
   hasAttributeNS(namespaceURI: string, name: string) {
@@ -413,7 +412,6 @@ export class MockElement extends MockNode {
   }
 
   removeAttribute(attrName: string) {
-    attrName = attrName.toLowerCase();
     if (attrName === 'style') {
       stylesMap.delete(this);
     } else {
@@ -436,7 +434,6 @@ export class MockElement extends MockNode {
   }
 
   setAttribute(attrName: string, value: any) {
-    attrName = attrName.toLowerCase();
     if (attrName === 'style') {
       this.style = value;
     } else {
@@ -455,7 +452,7 @@ export class MockElement extends MockNode {
         attr.value = String(value);
 
         if (oldValue !== attr.value) {
-          attributeChanged(this, attrName, oldValue, attr.value);
+          attributeChanged(this, attr.name, oldValue, attr.value);
         }
       } else {
         attr.value = String(value);
@@ -633,6 +630,17 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
   return newNode;
 }
 
+export class MockHTMLElement extends MockElement {
+  getAttribute(attrName: string) {
+    return super.getAttribute(attrName.toLowerCase())
+  }
+  setAttribute(attrName: string, value: any) {
+    super.setAttribute(attrName.toLowerCase(), value);
+  }
+  removeAttribute(attrName: string) {
+    super.removeAttribute(attrName.toLowerCase());
+  }
+}
 
 export class MockTextNode extends MockNode {
 

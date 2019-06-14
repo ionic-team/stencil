@@ -1,8 +1,8 @@
-import { MockElement } from './node';
+import { MockHTMLElement } from './node';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 
 
-export class MockDocumentFragment extends MockElement {
+export class MockDocumentFragment extends MockHTMLElement {
 
   constructor(ownerDocument: any) {
     super(ownerDocument, null);
