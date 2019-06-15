@@ -78,7 +78,7 @@ function parseMethodDecorator(config: d.Config, diagnostics: d.Diagnostic[], sou
       tags: signature.getJsDocTags()
     }
   };
-  validateReferences(config, diagnostics, methodMeta.complexType.references, method.type);
+  validateReferences(config, diagnostics, methodMeta.complexType.references, method.type || method.name);
 
   const staticProp = ts.createPropertyAssignment(
     ts.createLiteral(methodName),
