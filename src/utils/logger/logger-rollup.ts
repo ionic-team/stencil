@@ -10,11 +10,15 @@ export function loadRollupDiagnostics(buildCtx: d.BuildCtx, rollupError: any) {
     language: 'javascript',
     code: rollupError.code,
     header: `Rollup: ${formatErrorCode(rollupError.code)}`,
-    messageText: rollupError.message,
+    messageText: rollupError.message || '',
     relFilePath: null,
     absFilePath: null,
     lines: []
   };
+
+  if (rollupError.plugin) {
+    diagnostic.messageText += ` (plugin: ${rollupError.plugin}${rollupError.hook ? `, ${rollupError.hook}` : ''})`;
+  }
 
   if (rollupError.loc) {
     diagnostic.absFilePath = rollupError.loc.file;

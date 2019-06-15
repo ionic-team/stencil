@@ -10,9 +10,11 @@ export async function performCopyTasks(config: d.Config, compilerCtx: d.Compiler
       buildCtx.pendingCopyTasks.push(promise);
 
       const copyResults = await promise;
-      buildCtx.diagnostics.push(...copyResults.diagnostics);
-      compilerCtx.fs.cancelDeleteDirectoriesFromDisk(copyResults.dirPaths);
-      compilerCtx.fs.cancelDeleteFilesFromDisk(copyResults.filePaths);
+      if (copyResults != null) {
+        buildCtx.diagnostics.push(...copyResults.diagnostics);
+        compilerCtx.fs.cancelDeleteDirectoriesFromDisk(copyResults.dirPaths);
+        compilerCtx.fs.cancelDeleteFilesFromDisk(copyResults.filePaths);
+      }
 
       timeSpan.finish(`copyTasks finished`);
     }
