@@ -1,7 +1,8 @@
 import * as d from '../../declarations';
+import { BrowserRollup } from './browser-rollup';
+import { isOutputTargetWww } from '../../compiler/output-targets/output-utils';
 import { setBrowserTypescriptSys } from './browser-typescript';
 import path from 'path';
-import { isOutputTargetWww } from '../../compiler/output-targets/output-utils';
 
 
 export class BrowserSystem implements d.StencilSystem {
@@ -20,7 +21,7 @@ export class BrowserSystem implements d.StencilSystem {
       cpus: 1,
       freemem() { return 0; },
       platform: config.window.navigator.userAgent,
-      runtime: '',
+      runtime: 'browser',
       runtimeVersion: '',
       release: '',
       totalmem: 0,
@@ -31,10 +32,12 @@ export class BrowserSystem implements d.StencilSystem {
     this.fs = config.fs;
     setBrowserTypescriptSys(config);
 
-    config.outputTargets.filter(isOutputTargetWww).forEach(output => {
-      output.prerenderConfig = null;
-      output.serviceWorker = null;
-    });
+    if (config.outputTargets) {
+      config.outputTargets.filter(isOutputTargetWww).forEach(output => {
+        output.prerenderConfig = null;
+        output.serviceWorker = null;
+      });
+    }
   }
 
   cancelWorkerTasks() {/**/}
@@ -81,13 +84,10 @@ export class BrowserSystem implements d.StencilSystem {
     return Promise.resolve(null);
   }
 
-  // rollup?: RollupInterface;
-  // scopeCss?: (cssText: string, scopeId: string, commentOriginalSelector: boolean) => Promise<string>;
-  // semver?: Semver;
-  // serializeNodeToHtml?(elm: Element | Document): string;
-  // storage?: Storage;
-  // transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults>;
-  // validateTypes?(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]): Promise<d.ValidateTypesResults>;
+  get rollup() {
+    return BrowserRollup;
+  }
+
 }
 
 

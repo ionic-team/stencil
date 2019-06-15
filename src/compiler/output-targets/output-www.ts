@@ -106,13 +106,15 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
       }
     }
 
-    const indexContent = config.sys.serializeNodeToHtml(doc);
-    await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexContent);
-    if (outputTarget.serviceWorker && config.flags.prerender) {
-      await compilerCtx.fs.writeFile(config.sys.path.join(outputTarget.appDir, INDEX_ORG), indexContent);
-    }
+    if (config.sys.serializeNodeToHtml != null) {
+      const indexContent = config.sys.serializeNodeToHtml(doc);
+      await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexContent);
+      if (outputTarget.serviceWorker && config.flags.prerender) {
+        await compilerCtx.fs.writeFile(config.sys.path.join(outputTarget.appDir, INDEX_ORG), indexContent);
+      }
 
-    buildCtx.debug(`generateIndexHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
+      buildCtx.debug(`generateIndexHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
+    }
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

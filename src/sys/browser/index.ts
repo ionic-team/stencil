@@ -18,6 +18,7 @@ class BrowserCompiler extends Compiler {
     }
 
     config.enableCache = false;
+    config.validateTypes = false;
 
     const sys = new BrowserSystem(config);
     config.sys = sys;

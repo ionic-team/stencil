@@ -225,9 +225,11 @@ async function convertChunk(
   if (sourceTarget === 'es5') {
     const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
     const transpileResults = await transpileToEs5Main(config, compilerCtx, code, inlineHelpers);
-    buildCtx.diagnostics.push(...transpileResults.diagnostics);
-    if (transpileResults.diagnostics.length === 0) {
-      code = transpileResults.code;
+    if (transpileResults != null) {
+      buildCtx.diagnostics.push(...transpileResults.diagnostics);
+      if (transpileResults.diagnostics.length === 0) {
+        code = transpileResults.code;
+      }
     }
   }
   if (shouldMinify) {

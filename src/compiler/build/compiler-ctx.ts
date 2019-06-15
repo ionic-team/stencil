@@ -81,10 +81,14 @@ export function getModule(config: d.Config, compilerCtx: d.CompilerCtx, sourceFi
     return moduleFile;
 
   } else {
-    const p = config.sys.path.parse(sourceFilePath);
+    const sourceFileDir = config.sys.path.dirname(sourceFilePath);
+    const sourceFileExt = config.sys.path.extname(sourceFilePath);
+    const sourceFileName = config.sys.path.basename(sourceFilePath, sourceFileExt);
+    const jsFilePath = config.sys.path.join(sourceFileDir, sourceFileName + '.js');
+
     const moduleFile: d.Module = {
       sourceFilePath: sourceFilePath,
-      jsFilePath: config.sys.path.join(p.dir, p.name + '.js'),
+      jsFilePath: jsFilePath,
       cmps: [],
       collectionName: null,
       dtsFilePath: null,

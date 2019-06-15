@@ -111,7 +111,7 @@ export class Cache implements d.Cache {
   }
 
   async clearExpiredCache() {
-    if (this.cacheFs == null) {
+    if (this.cacheFs == null || this.sys.storage == null) {
       return;
     }
 

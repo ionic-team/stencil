@@ -160,9 +160,11 @@ function normalizeExtension(config: d.Config, styleUrls: d.CompilerModeStyles): 
   return compilerStyleUrls;
 }
 
-function useCss(config: d.Config, path: string) {
-  const p = config.sys.path.parse(path);
-  return config.sys.path.join(p.dir, p.name + '.css');
+function useCss(config: d.Config, stylePath: string) {
+  const sourceFileDir = config.sys.path.dirname(stylePath);
+  const sourceFileExt = config.sys.path.extname(stylePath);
+  const sourceFileName = config.sys.path.basename(stylePath, sourceFileExt);
+  return config.sys.path.join(sourceFileDir, sourceFileName + '.css');
 }
 
 function normalizeStyleUrls(styleUrls: d.ModeStyles): d.CompilerModeStyles {

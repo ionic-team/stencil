@@ -23,29 +23,29 @@ async function bundleBrowserSys() {
     plugins: [
       (() => {
         return {
-          resolveId(importee, importer) {
-            if (importee === 'resolve') {
-              return path.join(__dirname, 'helpers', 'resolve.js');
-            }
-            if (importee === 'fs' || importee === 'crypto' || importee === 'module' || importee === 'buffer') {
+          resolveId(importee) {
+            if (importee === 'buffer' || importee === 'crypto' || importee === 'module' || importee === 'utils') {
               return path.resolve(__dirname, 'helpers', 'empty.js');
+            }
+            if (importee === 'events') {
+              return path.resolve(__dirname, 'helpers', 'events.js');
+            }
+            if (importee === 'fs') {
+              return path.resolve(__dirname, 'helpers', 'empty-fs.js');
+            }
+            if (importee === 'os') {
+              return path.join(__dirname, 'helpers', 'browser-os.js');
             }
             if (importee === 'path') {
               return require.resolve('path-browserify');
             }
-            if (importee === '@mock-doc') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'mock-doc');
-            }
-            if (importee === '@sys') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
+            if (importee === 'resolve') {
+              return path.join(__dirname, 'helpers', 'resolve.js');
             }
             if (importee === '@utils') {
               return path.resolve(TRANSPILED_DIR, 'utils', 'index.js');
             }
             if (importee.endsWith('output-prerender.js')) {
-              return importee;
-            }
-            if (importee === 'os') {
               return importee;
             }
           },
@@ -54,13 +54,6 @@ async function bundleBrowserSys() {
               return `
                 export function outputPrerender(config, buildCtx) {
                   return Promise.resolve();
-                }
-              `;
-            }
-            if (id === 'os') {
-              return `
-                export function platform() {
-                  return 'browser';
                 }
               `;
             }
@@ -88,7 +81,7 @@ async function bundleBrowserSys() {
   const { output } = await rollupBuild.generate({
     format: 'esm',
     file: outputPath,
-    intro: `var Buffer = {};`
+    intro: fs.readFileSync(path.resolve(__dirname, 'helpers', 'browser-intro.js'), 'utf8')
   });
 
   let outputText = updateBuildIds(output[0].code);
