@@ -266,11 +266,15 @@ export class MockElement extends MockNode {
       }
       return null;
     }
-    return this.getAttributeNS(null, attrName);
+    const attr = this.attributes.getNamedItem(attrName);
+    if (attr != null) {
+      return attr.value;
+    }
+    return null;
   }
 
-  getAttributeNS(namespaceURI: string, name: string) {
-    const attr = this.attributes.getNamedItemNS(namespaceURI, name);
+  getAttributeNS(namespaceURI: string, attrName: string) {
+    const attr = this.attributes.getNamedItemNS(namespaceURI, attrName);
     if (attr != null) {
       return attr.value;
     }
@@ -415,7 +419,13 @@ export class MockElement extends MockNode {
     if (attrName === 'style') {
       stylesMap.delete(this);
     } else {
-      this.removeAttributeNS(null, attrName);
+      const attr = this.attributes.getNamedItem(attrName);
+      if (attr != null) {
+        this.attributes.removeNamedItemNS(attr);
+        if (checkAttributeChanged(this) === true) {
+          attributeChanged(this, attrName, attr.value, null);
+        }
+      }
     }
   }
 
@@ -437,7 +447,33 @@ export class MockElement extends MockNode {
     if (attrName === 'style') {
       this.style = value;
     } else {
-      this.setAttributeNS(null, attrName, value);
+      const attributes = this.attributes;
+      let attr = attributes.getNamedItem(attrName);
+      const checkAttrChanged = checkAttributeChanged(this);
+
+      if (attr != null) {
+        if (checkAttrChanged === true) {
+          const oldValue = attr.value;
+          attr.value = String(value);
+
+          if (oldValue !== attr.value) {
+            attributeChanged(this, attr.name, oldValue, attr.value);
+          }
+        } else {
+          attr.value = String(value);
+        }
+
+      } else {
+        if (attributes.caseInsensitive) {
+          attrName = attrName.toLowerCase();
+        }
+        attr = new MockAttr(attrName, value);
+        attributes.items.push(attr);
+
+        if (checkAttrChanged === true) {
+          attributeChanged(this, attrName, null, attr.value);
+        }
+      }
     }
   }
 
@@ -631,14 +667,16 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
 }
 
 export class MockHTMLElement extends MockElement {
-  getAttribute(attrName: string) {
-    return super.getAttribute(attrName.toLowerCase())
+  get attributes() {
+    let attrs = attrsMap.get(this);
+    if (attrs == null) {
+      attrs = new MockAttributeMap(true);
+      attrsMap.set(this, attrs);
+    }
+    return attrs;
   }
-  setAttribute(attrName: string, value: any) {
-    super.setAttribute(attrName.toLowerCase(), value);
-  }
-  removeAttribute(attrName: string) {
-    super.removeAttribute(attrName.toLowerCase());
+  set attributes(attrs: MockAttributeMap) {
+    attrsMap.set(this, attrs);
   }
 }
 

@@ -1,34 +1,24 @@
+import { XLINK_NS } from '../runtime/runtime-constants';
 
 
 export class MockAttributeMap {
   items: MockAttr[] = [];
 
+  constructor(
+    public caseInsensitive = false
+  ) {}
+
   get length() {
     return this.items.length;
-  }
-
-  getNamedItem(attrName: string) {
-    return this.items.find(attr => attr.name === attrName && (attr.namespaceURI == null || attr.namespaceURI === 'http://www.w3.org/1999/xlink')) || null;
-  }
-
-  setNamedItem(attr: MockAttr) {
-    attr.namespaceURI = null;
-    this.setNamedItemNS(attr);
-  }
-
-  removeNamedItem(attr: MockAttr) {
-    this.removeNamedItemNS(attr);
   }
 
   item(index: number) {
     return this.items[index] || null;
   }
 
-  getNamedItemNS(namespaceURI: string, attrName: string) {
-    if (namespaceURI == null || namespaceURI === 'http://www.w3.org/1999/xlink') {
-      return this.getNamedItem(attrName);
-    }
-    return this.items.find(attr => attr.name === attrName && attr.namespaceURI === namespaceURI) || null;
+  setNamedItem(attr: MockAttr) {
+    attr.namespaceURI = null;
+    this.setNamedItemNS(attr);
   }
 
   setNamedItemNS(attr: MockAttr) {
@@ -44,6 +34,22 @@ export class MockAttributeMap {
     }
   }
 
+  getNamedItem(attrName: string) {
+    if (this.caseInsensitive) {
+      attrName = attrName.toLowerCase();
+    }
+    return this.getNamedItemNS(null, attrName);
+  }
+
+  getNamedItemNS(namespaceURI: string, attrName: string) {
+    namespaceURI = getNamespaceURI(namespaceURI);
+    return this.items.find(attr => attr.name === attrName && getNamespaceURI(attr.namespaceURI) === namespaceURI) || null;
+  }
+
+  removeNamedItem(attr: MockAttr) {
+    this.removeNamedItemNS(attr);
+  }
+
   removeNamedItemNS(attr: MockAttr) {
     for (let i = 0, ii = this.items.length; i < ii; i++) {
       if (this.items[i].name === attr.name && this.items[i].namespaceURI === attr.namespaceURI) {
@@ -54,8 +60,12 @@ export class MockAttributeMap {
   }
 }
 
+function getNamespaceURI(namespaceURI: string) {
+  return namespaceURI === XLINK_NS ? null : namespaceURI;
+}
+
 export function cloneAttributes(srcAttrs: MockAttributeMap, sortByName = false) {
-  const dstAttrs = new MockAttributeMap();
+  const dstAttrs = new MockAttributeMap(srcAttrs.caseInsensitive);
   if (srcAttrs != null) {
     const attrLen = srcAttrs.length;
 
