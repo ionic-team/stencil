@@ -75,6 +75,7 @@ export namespace Components {
   interface InputBasicRoot {
     'value'?: string;
   }
+  interface JsonBasic {}
   interface KeyReorder {
     'num'?: number;
   }
@@ -351,6 +352,12 @@ declare global {
   var HTMLInputBasicRootElement: {
     prototype: HTMLInputBasicRootElement;
     new (): HTMLInputBasicRootElement;
+  };
+
+  interface HTMLJsonBasicElement extends Components.JsonBasic, HTMLStencilElement {}
+  var HTMLJsonBasicElement: {
+    prototype: HTMLJsonBasicElement;
+    new (): HTMLJsonBasicElement;
   };
 
   interface HTMLKeyReorderElement extends Components.KeyReorder, HTMLStencilElement {}
@@ -741,6 +748,7 @@ declare global {
     'image-import': HTMLImageImportElement;
     'init-css-root': HTMLInitCssRootElement;
     'input-basic-root': HTMLInputBasicRootElement;
+    'json-basic': HTMLJsonBasicElement;
     'key-reorder': HTMLKeyReorderElement;
     'key-reorder-root': HTMLKeyReorderRootElement;
     'legacy-context': HTMLLegacyContextElement;
@@ -864,6 +872,7 @@ declare namespace LocalJSX {
   interface InputBasicRoot extends JSXBase.HTMLAttributes<HTMLInputBasicRootElement> {
     'value'?: string;
   }
+  interface JsonBasic extends JSXBase.HTMLAttributes<HTMLJsonBasicElement> {}
   interface KeyReorder extends JSXBase.HTMLAttributes<HTMLKeyReorderElement> {
     'num'?: number;
   }
@@ -1005,6 +1014,7 @@ declare namespace LocalJSX {
     'image-import': ImageImport;
     'init-css-root': InitCssRoot;
     'input-basic-root': InputBasicRoot;
+    'json-basic': JsonBasic;
     'key-reorder': KeyReorder;
     'key-reorder-root': KeyReorderRoot;
     'legacy-context': LegacyContext;
