@@ -10,8 +10,5 @@ export const BrowserRollup = {
     commonjs,
     nodeResolve,
     replace,
-    emptyJsResolver: () => {
-      return {};
-    }
   }
 };
