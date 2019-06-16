@@ -1,6 +1,5 @@
 import { Component, Host, h, State } from '@stencil/core';
-import { Compiler, Config, Fs } from '@stencil/core/browser';
-
+import { Compiler, Config } from '@stencil/core/browser';
 
 @Component({
   tag: 'app-root',
@@ -35,18 +34,15 @@ export class AppRoot {
   }
 
   async build() {
-    const { Compiler, Fs } = await this.loadCompiler()
+    const { Compiler, fs } = await this.loadCompiler()
 
-    const fs = new Fs() as Fs;
     fs.mkdirSync('/src');
 
     FILES.forEach(f => {
       fs.writeFileSync(f.filePath, f.content);
     });
 
-    const config: Config = {
-      fs
-    };
+    const config: Config = {};
     const compiler = new Compiler(config) as Compiler;
 
     compiler.on('buildFinish', results => {

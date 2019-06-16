@@ -161,8 +161,7 @@ export interface Config extends StencilConfig {
 }
 
 export interface BrowserConfig extends d.StencilConfig {
-  fs: d.FileSystem;
-  window?: Window;
+  win?: Window;
 }
 
 export interface RollupConfig {

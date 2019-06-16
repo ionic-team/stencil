@@ -10,6 +10,7 @@ const { run, transpile, updateBuildIds, relativeResolve } = require('./script-ut
 
 const ROOT_DIR = path.join(__dirname, '..');
 const TRANSPILED_DIR = path.join(ROOT_DIR, 'dist', 'transpiled-sys-browser');
+const HELPERS = path.join(__dirname, 'helpers');
 
 
 async function bundleBrowserSys() {
@@ -24,26 +25,35 @@ async function bundleBrowserSys() {
       (() => {
         return {
           resolveId(importee) {
-            if (importee === 'buffer' || importee === 'crypto' || importee === 'module' || importee === 'utils') {
-              return path.resolve(__dirname, 'helpers', 'empty.js');
+            if (importee === 'buffer') {
+              return require.resolve(path.join(ROOT_DIR, 'node_modules', 'buffer'));
+            }
+            if (importee === 'crypto' || importee === 'module') {
+              return path.join(HELPERS, 'empty.js');
             }
             if (importee === 'events') {
-              return path.resolve(__dirname, 'helpers', 'events.js');
+              return path.join(HELPERS, 'browser-events.js');
             }
             if (importee === 'fs') {
-              return path.resolve(__dirname, 'helpers', 'empty-fs.js');
+              return path.join(HELPERS, 'browser-fs.js');
             }
             if (importee === 'os') {
-              return path.join(__dirname, 'helpers', 'browser-os.js');
+              return path.join(HELPERS, 'browser-os.js');
             }
             if (importee === 'path') {
               return require.resolve('path-browserify');
             }
             if (importee === 'resolve') {
-              return path.join(__dirname, 'helpers', 'resolve.js');
+              return path.join(HELPERS, 'resolve.js');
+            }
+            if (importee === 'stream') {
+              return path.join(HELPERS, 'browser-stream.js');
+            }
+            if (importee === 'util') {
+              return require.resolve(path.join(ROOT_DIR, 'node_modules', 'util'));
             }
             if (importee === '@utils') {
-              return path.resolve(TRANSPILED_DIR, 'utils', 'index.js');
+              return path.join(TRANSPILED_DIR, 'utils', 'index.js');
             }
             if (importee.endsWith('output-prerender.js')) {
               return importee;
@@ -93,6 +103,15 @@ async function bundleBrowserSys() {
   // }
   // outputText = results.code;
 
+  outputText = outputText.replace('$CORE_PACKAGE_JSON$', JSON.stringify({
+    name: '@stencil/core',
+    version: '0.0.0'
+  }));
+
+  const clientMjsPath = path.join(ROOT_DIR, 'dist', 'client', 'index.mjs');
+  const clientMjs = escapeForJs(fs.readFileSync(clientMjsPath, 'utf8'));
+  outputText = outputText.replace('$COMPILER_CLIENT_INDEX$', clientMjs);
+
   await fs.emptyDir(path.dirname(outputPath));
   await fs.writeFile(outputPath, outputText);
 
@@ -101,11 +120,19 @@ async function bundleBrowserSys() {
   await fs.copyFile(srcDtsPath, dstDtsPath);
 }
 
+function escapeForJs(code) {
+  return code
+    .replace(/\r\n|\r|\n/g, `\\n`)
+    .replace(/\"/g, `\\"`)
+    .replace(/\'/g, `\\'`)
+    .replace(/\@/g, `\\@`);
+}
+
 
 run(async () => {
   transpile(path.join('..', 'src', 'sys', 'browser', 'tsconfig.json'));
 
   await bundleBrowserSys();
 
-  // await fs.remove(TRANSPILED_DIR);
+  await fs.remove(TRANSPILED_DIR);
 });
