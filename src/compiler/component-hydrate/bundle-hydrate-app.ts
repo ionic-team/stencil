@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { bundleJson } from '../rollup-plugins/json';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
@@ -42,7 +41,7 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
           mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
           ...config.nodeResolve
         }),
-        bundleJson(config),
+        config.sys.rollup.plugins.json(),
         inMemoryFsRead(config, compilerCtx),
         config.sys.rollup.plugins.replace({
           'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'

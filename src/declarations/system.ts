@@ -65,6 +65,7 @@ export interface RollupInterface {
     nodeResolve(opts: any): any;
     replace(opts: any): any;
     commonjs(opts: any): any;
+    json(): any;
   };
 }
 

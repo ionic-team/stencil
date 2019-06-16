@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { bundleJson } from '../rollup-plugins/json';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { createOnWarnFn, getDependencies, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
@@ -50,7 +49,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
           browser: true,
           ...config.nodeResolve
         }),
-        bundleJson(config),
+        config.sys.rollup.plugins.json(),
         imagePlugin(config, buildCtx),
         inMemoryFsRead(config, compilerCtx),
         config.sys.rollup.plugins.replace({
