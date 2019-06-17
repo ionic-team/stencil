@@ -1,5 +1,5 @@
 import { cloneAttributes } from './attribute';
-import { CONTENT_REF_ID, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from '../runtime/runtime-constants';
+import { CONTENT_REF_ID, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID, XLINK_NS } from '../runtime/runtime-constants';
 import { MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
@@ -146,7 +146,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
             output.currentLineWidth += (attrName.length + 1);
           }
 
-        } else if (attrNamespaceURI === 'http://www.w3.org/1999/xlink') {
+        } else if (attrNamespaceURI === XLINK_NS) {
           output.text.push(' xlink:' + attrName);
           output.currentLineWidth += (attrName.length + 7);
 

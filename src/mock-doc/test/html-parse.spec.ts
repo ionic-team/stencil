@@ -206,4 +206,10 @@ describe('parseHtml', () => {
     expect(elm.children[0].firstChild.nextSibling.firstChild.firstChild.nodeValue).toBe('hello');
   });
 
+  it('should respect case in svg', () => {
+    const elm = parseHtmlToFragment('<svg  viewbox="0 0 97 20"><symbol viewbox="0 0 97 20"></symbol></svg>');
+    expect(elm.children.length).toBe(1);
+    expect(elm.children[0].attributes.item(0).name).toBe('viewBox');
+    expect(elm.children[0].children[0].attributes.item(0).name).toBe('viewBox');
+  });
 });

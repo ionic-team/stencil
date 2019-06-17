@@ -1,16 +1,17 @@
+import { NODE_NAMES, NODE_TYPES } from './constants';
 import { createElement } from './element';
-import { MockComment } from './comment-node';
 import { MockDocumentFragment } from './document-fragment';
 import { MockDocumentTypeNode } from './document-type-node';
-import { MockElement, MockTextNode, resetElement } from './node';
-import { NODE_NAMES, NODE_TYPES } from './constants';
+import { MockElement, MockHTMLElement, MockTextNode, resetElement } from './node';
+import { MockComment } from './comment-node';
 import { parseDocumentUtil } from './parse-util';
 import { parseHtmlToFragment } from './parse-html';
 import { resetEventListeners } from './event';
 import { MockWindow } from './window';
+import { MockAttr } from './attribute';
 
 
-export class MockDocument extends MockElement {
+export class MockDocument extends MockHTMLElement {
   defaultView: any;
   cookie: string;
   referrer: string;
@@ -35,11 +36,11 @@ export class MockDocument extends MockElement {
       }
 
     } else if (html !== false) {
-      const documentElement = new MockElement(this, 'html');
+      const documentElement = new MockHTMLElement(this, 'html');
       this.appendChild(documentElement);
 
-      documentElement.appendChild(new MockElement(this, 'head'));
-      documentElement.appendChild(new MockElement(this, 'body'));
+      documentElement.appendChild(new MockHTMLElement(this, 'head'));
+      documentElement.appendChild(new MockHTMLElement(this, 'body'));
     }
   }
 
@@ -74,7 +75,7 @@ export class MockDocument extends MockElement {
       }
     }
 
-    const documentElement = new MockElement(this, 'html');
+    const documentElement = new MockHTMLElement(this, 'html');
     this.appendChild(documentElement);
     return documentElement;
   }
@@ -98,7 +99,7 @@ export class MockDocument extends MockElement {
       }
     }
 
-    const head = new MockElement(this, 'head');
+    const head = new MockHTMLElement(this, 'head');
     documentElement.insertBefore(head, documentElement.firstChild);
     return head;
   }
@@ -123,7 +124,7 @@ export class MockDocument extends MockElement {
       }
     }
 
-    const body = new MockElement(this, 'body');
+    const body = new MockHTMLElement(this, 'body');
     documentElement.appendChild(body);
     return body;
   }
@@ -149,6 +150,14 @@ export class MockDocument extends MockElement {
 
   createComment(data: string) {
     return new MockComment(this, data);
+  }
+
+  createAttribute(attrName: string) {
+    return new MockAttr(attrName.toLowerCase());
+  }
+
+  createAttributeNS(namespaceURI: string, attrName: string) {
+    return new MockAttr(attrName, undefined, namespaceURI);
   }
 
   createElement(tagName: string) {

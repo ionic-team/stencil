@@ -1,5 +1,7 @@
 import { MockDocument } from '../document';
 import { MockWindow, cloneWindow } from '../window';
+import { MockElement, MockHTMLElement } from '../node';
+import { XLINK_NS } from '../../runtime/runtime-constants';
 
 
 describe('element', () => {
@@ -96,6 +98,100 @@ describe('element', () => {
     expect(rect).toEqual({
       bottom: 0, height: 0, left: 0, right: 0, top: 0, width: 0, x: 0, y: 0
     });
+  });
+
+  describe('attributes', () => {
+    it('attributes are case sensible in Element', () => {
+      const element = new MockElement(doc, 'div');
+
+      element.setAttribute('viewBox', '0 0 10 10');
+      expect(element.getAttribute('viewBox')).toEqual('0 0 10 10');
+      expect(element.getAttribute('viewbox')).toEqual(null);
+
+      element.removeAttribute('viewbox');
+      expect(element.getAttribute('viewBox')).toEqual('0 0 10 10');
+      expect(element.getAttribute('viewbox')).toEqual(null);
+
+      element.removeAttribute('viewBox');
+      expect(element.getAttribute('viewBox')).toEqual(null);
+
+      element.setAttribute('viewBox', '0 0 10 10');
+      element.setAttribute('viewbox', '0 0 20 20');
+
+      expect(element.attributes.length).toBe(2);
+      expect(element.attributes.getNamedItem('viewBox').value).toEqual('0 0 10 10');
+      expect(element.attributes.getNamedItem('viewbox').value).toEqual('0 0 20 20');
+
+      expect(element.attributes.getNamedItemNS(null, 'viewBox').value).toEqual('0 0 10 10');
+      expect(element.attributes.getNamedItemNS(null, 'viewbox').value).toEqual('0 0 20 20');
+
+      element.removeAttribute('viewBox');
+      element.removeAttribute('viewbox');
+
+      testNsAttributes(element);
+    });
+
+    it('attributes are case insensible in HTMLElement', () => {
+      const element = new MockHTMLElement(doc, 'div');
+
+      element.setAttribute('viewBox', '0 0 10 10');
+      expect(element.getAttribute('viewBox')).toEqual('0 0 10 10');
+      expect(element.getAttribute('viewbox')).toEqual('0 0 10 10');
+      expect(element.getAttributeNS(null, 'viewbox')).toEqual('0 0 10 10');
+      expect(element.getAttributeNS(null, 'viewBox')).toEqual(null);
+
+      expect(element.attributes.length).toEqual(1);
+      expect(element.attributes.item(0).name).toEqual('viewbox');
+
+      element.removeAttribute('viewBox');
+
+      expect(element.getAttribute('viewBox')).toEqual(null);
+      expect(element.getAttribute('viewbox')).toEqual(null);
+
+      element.setAttribute('viewBox', '0 0 10 10');
+      element.setAttribute('viewbox', '0 0 20 20');
+      expect(element.attributes.getNamedItem('viewBox').value).toEqual('0 0 20 20');
+      expect(element.attributes.getNamedItem('viewbox').value).toEqual('0 0 20 20');
+
+      expect(element.attributes.getNamedItemNS(null, 'viewBox')).toEqual(null);
+      expect(element.attributes.getNamedItemNS(null, 'viewbox').value).toEqual('0 0 20 20');
+
+      element.removeAttribute('viewbox');
+
+      testNsAttributes(element);
+    });
+
+    it('xlink_ns namespaces should be reset', () => {
+      const element = new MockHTMLElement(doc, 'div');
+      element.setAttributeNS(XLINK_NS, 'href', 'google.com');
+      expect(element.getAttribute('href')).toEqual('google.com');
+    });
+
+    function testNsAttributes(element) {
+      element.setAttributeNS('tEst', 'viewBox', '1');
+      element.setAttributeNS('tEst', 'viewbox', '2');
+
+      expect(element.attributes.length).toBe(2);
+      expect(element.attributes.getNamedItemNS('test', 'viewBox')).toEqual(null);
+      expect(element.attributes.getNamedItemNS('test', 'viewbox')).toEqual(null);
+      expect(element.attributes.getNamedItemNS('tEst', 'viewBox').name).toEqual('viewBox');
+      expect(element.attributes.getNamedItemNS('tEst', 'viewbox').name).toEqual('viewbox');
+      expect(element.attributes.getNamedItemNS('tEst', 'viewBox').value).toEqual('1');
+      expect(element.attributes.getNamedItemNS('tEst', 'viewbox').value).toEqual('2');
+
+      element.removeAttributeNS('test', 'viewBox');
+      element.removeAttributeNS('test', 'viewbox');
+
+      expect(element.attributes.length).toBe(2);
+
+      element.removeAttributeNS('tEst', 'viewBox');
+      element.removeAttributeNS('tEst', 'viewbox');
+
+      expect(element.attributes.length).toBe(0);
+
+      element.setAttribute('value', '123');
+      expect(element.getAttributeNS(null, 'Value')).toBe(null);
+    }
   });
 
 });
