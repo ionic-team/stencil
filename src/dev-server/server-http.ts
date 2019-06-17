@@ -1,10 +1,13 @@
 import * as d from '../declarations';
 import { createRequestHandler } from './request-handler';
 import { findClosestOpenPort } from './find-closest-port';
-import { getSSL } from './ssl';
 import * as http from 'http';
 import * as https from 'https';
+import * as crypto from 'crypto';
+import { promisify } from 'util';
 
+const forge = require('../sys/node/node-forge') as Forge;
+const generateKeyPair = promisify(crypto.generateKeyPair);
 
 export async function createHttpServer(devServerConfig: d.DevServerConfig, fs: d.FileSystem, destroys: d.DevServerDestroy[]) {
   // figure out the port to be listening on
@@ -17,11 +20,17 @@ export async function createHttpServer(devServerConfig: d.DevServerConfig, fs: d
   let server: http.Server;
 
   if (devServerConfig.protocol === 'https') {
-    // https server
-    server = https.createServer(await getSSL(), reqHandler) as any;
+    const { publicKey, privateKey } = await generateKeyPair('rsa', {
+      modulusLength: 4096,
+      publicKeyEncoding: { type: 'spki', format: 'pem' },
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    });
+
+    const cert = generateCert(publicKey, privateKey);
+
+    server = https.createServer({ key: privateKey, cert }, reqHandler);
 
   } else {
-    // http server
     server = http.createServer(reqHandler);
   }
 
@@ -32,4 +41,36 @@ export async function createHttpServer(devServerConfig: d.DevServerConfig, fs: d
   });
 
   return server;
+}
+
+function generateCert(publicKey: string, privateKey: string) {
+  const cert = forge.createCertificate();
+
+  cert.publicKey = forge.publicKeyFromPem(publicKey);
+  cert.serialNumber = '01';
+  cert.validity.notBefore = new Date();
+  cert.validity.notAfter = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+
+  const attributes = [
+    { name: 'commonName', value: 'localhost' },
+    { name: 'countryName', value: 'US' },
+    { shortName: 'ST', value: 'Wisconsin' },
+    { name: 'localityName', value: 'Madison' },
+    { name: 'organizationName', value: 'Ionic' },
+    { shortName: 'OU', value: 'Stencil' }
+  ];
+
+  cert.setSubject(attributes);
+  cert.setIssuer(attributes);
+
+  cert.sign(forge.privateKeyFromPem(privateKey));
+
+  return forge.certificateToPem(cert);
+}
+
+interface Forge {
+  createCertificate: () => any;
+  certificateToPem: (cert: any) => any;
+  publicKeyFromPem: (pem: string) => any;
+  privateKeyFromPem: (pem: string) => any;
 }

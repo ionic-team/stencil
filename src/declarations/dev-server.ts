@@ -17,6 +17,10 @@ export interface StencilDevServerConfig {
    */
   basePath?: string;
   /**
+   * When `true`, the dev server will use a SSL certificate to run over https. Defaults to `false`.
+   */
+  https?: boolean;
+  /**
    * The URL the dev server should first open to. Defaults to `/`.
    */
   initialLoadUrl?: string;

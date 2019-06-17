@@ -102,6 +102,7 @@
     "minimatch": "3.0.4",
     "mkdirp": "^0.5.1",
     "node-fetch": "2.6.0",
+    "node-forge": "0.8.4",
     "open": "6.3.0",
     "open-in-editor": "2.2.0",
     "parse5": "5.1.0",
