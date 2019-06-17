@@ -2,7 +2,7 @@
   "name": "@stencil/hello-shadow",
   "private": true,
   "scripts": {
-    "build": "node ../../bin/stencil build",
+    "build": "node ../../bin/stencil build --prerender",
     "start": "node ../../bin/stencil build --dev --watch --serve",
     "start.prod": "node ../../bin/stencil build --watch --serve"
   }

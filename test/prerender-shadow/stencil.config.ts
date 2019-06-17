@@ -7,6 +7,7 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
+      baseUrl: 'http://testing.stenciljs.com',
       serviceWorker: null
     },
     {

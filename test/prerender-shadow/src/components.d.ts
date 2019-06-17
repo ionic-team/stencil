@@ -6,35 +6,28 @@
 
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-import { JSX } from '@stencil/core';
 
 
 export namespace Components {
+  interface CmpA {}
+  interface CmpB {}
   interface CmpC {}
-}
-
-declare namespace LocalJSX {
-  interface CmpC extends JSXBase.HTMLAttributes {}
-
-  interface ElementInterfaces {
-    'CmpC': Components.CmpC;
-  }
-
-  interface IntrinsicElements {
-    'CmpC': LocalJSX.CmpC;
-  }
-}
-export { LocalJSX as JSX };
-
-declare module "@stencil/core" {
-  export namespace JSX {
-    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
-  }
 }
 
 declare global {
 
+
+  interface HTMLCmpAElement extends Components.CmpA, HTMLStencilElement {}
+  var HTMLCmpAElement: {
+    prototype: HTMLCmpAElement;
+    new (): HTMLCmpAElement;
+  };
+
+  interface HTMLCmpBElement extends Components.CmpB, HTMLStencilElement {}
+  var HTMLCmpBElement: {
+    prototype: HTMLCmpBElement;
+    new (): HTMLCmpBElement;
+  };
 
   interface HTMLCmpCElement extends Components.CmpC, HTMLStencilElement {}
   var HTMLCmpCElement: {
@@ -42,11 +35,31 @@ declare global {
     new (): HTMLCmpCElement;
   };
   interface HTMLElementTagNameMap {
-    'cmp-c': HTMLCmpCElement
-  }
-
-  interface ElementTagNameMap {
+    'cmp-a': HTMLCmpAElement;
+    'cmp-b': HTMLCmpBElement;
     'cmp-c': HTMLCmpCElement;
   }
 }
+
+declare namespace LocalJSX {
+  interface CmpA extends JSXBase.HTMLAttributes<HTMLCmpAElement> {}
+  interface CmpB extends JSXBase.HTMLAttributes<HTMLCmpBElement> {}
+  interface CmpC extends JSXBase.HTMLAttributes<HTMLCmpCElement> {}
+
+  interface IntrinsicElements {
+    'cmp-a': CmpA;
+    'cmp-b': CmpB;
+    'cmp-c': CmpC;
+  }
+}
+
+export { LocalJSX as JSX };
+
+
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
+
 

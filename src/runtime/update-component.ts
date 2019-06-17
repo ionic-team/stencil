@@ -1,8 +1,8 @@
 import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
+import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { consoleError, cssVarShim, doc, plt, writeTask } from '@platform';
-import { HOST_FLAGS } from '@utils';
 import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 
@@ -52,7 +52,7 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
   }
 };
 
-const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, instance: any, isInitialLoad: boolean) => {
+const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, instance: any, isInitialLoad: boolean) => {
   // updateComponent
   if (BUILD.updatable && BUILD.taskQueue) {
     hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
@@ -100,6 +100,11 @@ const updateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.Comp
     try {
       // manually connected child components during server-side hydrate
       serverSideConnected(elm);
+
+      if (isInitialLoad && (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation)) {
+        // using only during server-side hydrate
+        elm['s-sd'] = true;
+      }
 
     } catch (e) {
       consoleError(e);
