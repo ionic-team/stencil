@@ -1,3 +1,24 @@
+## 🐔 [1.0.5](https://github.com/ionic-team/stencil/compare/v1.0.4...v1.0.5) (2019-06-17)
+
+
+### Bug Fixes
+
+* install dev deps ([16588cb](https://github.com/ionic-team/stencil/commit/16588cb))
+* **hydrate:** fix light-dom nodes relocated within shadow ([95cbc3b](https://github.com/ionic-team/stencil/commit/95cbc3b))
+* **mock-doc:** case sensible attributes in element ([#1642](https://github.com/ionic-team/stencil/issues/1642)) ([e0c2ba5](https://github.com/ionic-team/stencil/commit/e0c2ba5))
+* **sys:** update sys.browser ([51efaa5](https://github.com/ionic-team/stencil/commit/51efaa5))
+* **testing:** fix e2e tests when without www output ([13f0c2f](https://github.com/ionic-team/stencil/commit/13f0c2f))
+* **transform:** fix crash will undefined node ([8f2d82c](https://github.com/ionic-team/stencil/commit/8f2d82c))
+* **validate:** don't validate in watch mode ([46f78ab](https://github.com/ionic-team/stencil/commit/46f78ab)), closes [#1647](https://github.com/ionic-team/stencil/issues/1647)
+* empty.js resolver is not longer needed ([97c0ed0](https://github.com/ionic-team/stencil/commit/97c0ed0))
+* **sys:** update sys.browser ([e835203](https://github.com/ionic-team/stencil/commit/e835203))
+* **testing:** run e2e tests ([89102e3](https://github.com/ionic-team/stencil/commit/89102e3))
+* add all public members from HTMLElement ([#1639](https://github.com/ionic-team/stencil/issues/1639)) ([d43f210](https://github.com/ionic-team/stencil/commit/d43f210))
+* allow inputMode ([5c737d6](https://github.com/ionic-team/stencil/commit/5c737d6))
+* update screenshot app ([4557148](https://github.com/ionic-team/stencil/commit/4557148))
+
+
+
 ## 🐯 [1.0.4](https://github.com/ionic-team/stencil/compare/v1.0.3...v1.0.4) (2019-06-14)
 
 
