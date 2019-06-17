@@ -30,7 +30,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     styles.forEach(styleElm => {
       registerStyle(
         styleElm.getAttribute(HYDRATE_ID),
-        globalStyles + convertScopedToShadow(styleElm.innerHTML)
+        globalStyles + convertScopedToShadow(styleElm.innerHTML),
+        true,
       );
     });
   }

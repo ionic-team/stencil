@@ -13,9 +13,9 @@ declare global {
 
 const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/new WeakMap();
 
-export const registerStyle = (scopeId: string, cssText: string) => {
+export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean) => {
   let style = styles.get(scopeId);
-  if (supportsConstructibleStylesheets) {
+  if (supportsConstructibleStylesheets && allowCS) {
     style = (style || new CSSStyleSheet()) as CSSStyleSheet;
     style.replace(cssText);
   } else {
