@@ -170,14 +170,8 @@ describe('validateDevServer', () => {
   });
 
   it('should set https protocol', () => {
-    config.devServer.protocol = 'HTTPS' as any;
+    config.devServer.https = true;
     validateConfig(config, [], false);
     expect(config.devServer.protocol).toBe('https');
   });
-
-  it('should default protocol http', () => {
-    validateConfig(config, [], false);
-    expect(config.devServer.protocol).toBe('http');
-  });
-
 });
