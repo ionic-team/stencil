@@ -7,10 +7,6 @@ import { processCopyTasks } from '../copy/local-copy-tasks';
 
 
 export async function outputCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!config.buildDist) {
-    return;
-  }
-
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
   if (outputTargets.length === 0) {
     return;
