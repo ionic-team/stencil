@@ -174,4 +174,10 @@ describe('validateDevServer', () => {
     validateConfig(config, [], false);
     expect(config.devServer.protocol).toBe('https');
   });
+
+  it('should set https protocol if credentials are set', () => {
+    config.devServer.https = { key: '/path/to/key', cert: '/path/to/cert' };
+    validateConfig(config, [], false);
+    expect(config.devServer.protocol).toBe('https');
+  });
 });

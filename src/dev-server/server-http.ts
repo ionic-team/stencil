@@ -6,9 +6,6 @@ import * as https from 'https';
 import * as crypto from 'crypto';
 import { promisify } from 'util';
 
-const forge = require('../sys/node/node-forge') as Forge;
-const generateKeyPair = promisify(crypto.generateKeyPair);
-
 export async function createHttpServer(devServerConfig: d.DevServerConfig, fs: d.FileSystem, destroys: d.DevServerDestroy[]) {
   // figure out the port to be listening on
   // by figuring out the first one available
@@ -19,17 +16,12 @@ export async function createHttpServer(devServerConfig: d.DevServerConfig, fs: d
 
   let server: http.Server;
 
-  if (devServerConfig.protocol === 'https') {
-    const { publicKey, privateKey } = await generateKeyPair('rsa', {
-      modulusLength: 4096,
-      publicKeyEncoding: { type: 'spki', format: 'pem' },
-      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
-    });
+  if (devServerConfig.https) {
+    const credentials = typeof devServerConfig.https === 'object'
+      ? devServerConfig.https
+      : await generateCredentials();
 
-    const cert = generateCert(publicKey, privateKey);
-
-    server = https.createServer({ key: privateKey, cert }, reqHandler);
-
+    server = https.createServer(credentials, reqHandler);
   } else {
     server = http.createServer(reqHandler);
   }
@@ -43,7 +35,23 @@ export async function createHttpServer(devServerConfig: d.DevServerConfig, fs: d
   return server;
 }
 
+async function generateCredentials(): Promise<d.Credentials> {
+  const generateKeyPair = promisify(crypto.generateKeyPair);
+
+  const { publicKey, privateKey } = await generateKeyPair('rsa', {
+    modulusLength: 4096,
+    publicKeyEncoding: { type: 'spki', format: 'pem' },
+    privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+  });
+
+  const cert = generateCert(publicKey, privateKey);
+
+  return { key: privateKey, cert };
+}
+
 function generateCert(publicKey: string, privateKey: string) {
+  const forge = require('../sys/node/node-forge') as Forge;
+
   const cert = forge.createCertificate();
 
   cert.publicKey = forge.publicKeyFromPem(publicKey);
