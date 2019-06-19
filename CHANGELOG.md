@@ -1,3 +1,12 @@
+## 🍵 [1.0.7](https://github.com/ionic-team/stencil/compare/v1.0.6...v1.0.7) (2019-06-19)
+
+
+### Bug Fixes
+
+* **styles:** add styles before links ([05d242d](https://github.com/ionic-team/stencil/commit/05d242d))
+
+
+
 ## 😋 [1.0.6](https://github.com/ionic-team/stencil/compare/v1.0.5...v1.0.6) (2019-06-17)
 
 
