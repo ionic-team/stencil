@@ -176,7 +176,7 @@ describe('validateDevServer', () => {
   });
 
   it('should set https protocol if credentials are set', () => {
-    config.devServer.https = { key: '/path/to/key', cert: '/path/to/cert' };
+    config.devServer.https = { key: 'fake-key', cert: 'fake-cert' };
     validateConfig(config, [], false);
     expect(config.devServer.protocol).toBe('https');
   });
