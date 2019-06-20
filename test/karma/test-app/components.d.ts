@@ -124,6 +124,8 @@ export namespace Components {
     'str': string;
     'undef'?: string;
   }
+  interface ReparentStyleNoVars {}
+  interface ReparentStyleWithVars {}
   interface SassCmp {}
   interface ScopedBasic {}
   interface ScopedBasicRoot {}
@@ -492,6 +494,18 @@ declare global {
     new (): HTMLReflectToAttrElement;
   };
 
+  interface HTMLReparentStyleNoVarsElement extends Components.ReparentStyleNoVars, HTMLStencilElement {}
+  var HTMLReparentStyleNoVarsElement: {
+    prototype: HTMLReparentStyleNoVarsElement;
+    new (): HTMLReparentStyleNoVarsElement;
+  };
+
+  interface HTMLReparentStyleWithVarsElement extends Components.ReparentStyleWithVars, HTMLStencilElement {}
+  var HTMLReparentStyleWithVarsElement: {
+    prototype: HTMLReparentStyleWithVarsElement;
+    new (): HTMLReparentStyleWithVarsElement;
+  };
+
   interface HTMLSassCmpElement extends Components.SassCmp, HTMLStencilElement {}
   var HTMLSassCmpElement: {
     prototype: HTMLSassCmpElement;
@@ -771,6 +785,8 @@ declare global {
     'node-globals': HTMLNodeGlobalsElement;
     'node-resolution': HTMLNodeResolutionElement;
     'reflect-to-attr': HTMLReflectToAttrElement;
+    'reparent-style-no-vars': HTMLReparentStyleNoVarsElement;
+    'reparent-style-with-vars': HTMLReparentStyleWithVarsElement;
     'sass-cmp': HTMLSassCmpElement;
     'scoped-basic': HTMLScopedBasicElement;
     'scoped-basic-root': HTMLScopedBasicRootElement;
@@ -927,6 +943,8 @@ declare namespace LocalJSX {
     'str'?: string;
     'undef'?: string;
   }
+  interface ReparentStyleNoVars extends JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement> {}
+  interface ReparentStyleWithVars extends JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement> {}
   interface SassCmp extends JSXBase.HTMLAttributes<HTMLSassCmpElement> {}
   interface ScopedBasic extends JSXBase.HTMLAttributes<HTMLScopedBasicElement> {}
   interface ScopedBasicRoot extends JSXBase.HTMLAttributes<HTMLScopedBasicRootElement> {}
@@ -1037,6 +1055,8 @@ declare namespace LocalJSX {
     'node-globals': NodeGlobals;
     'node-resolution': NodeResolution;
     'reflect-to-attr': ReflectToAttr;
+    'reparent-style-no-vars': ReparentStyleNoVars;
+    'reparent-style-with-vars': ReparentStyleWithVars;
     'sass-cmp': SassCmp;
     'scoped-basic': ScopedBasic;
     'scoped-basic-root': ScopedBasicRoot;
