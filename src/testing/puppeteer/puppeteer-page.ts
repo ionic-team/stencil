@@ -58,13 +58,13 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
     page.on('requestfailed', requestFailed);
 
     if (typeof opts.html === 'string') {
-      const errMsg = await e2eSetContent(page, opts.html);
+      const errMsg = await e2eSetContent(page, opts.html, { waitUntil: opts.waitUntil });
       if (errMsg) {
         throw errMsg;
       }
 
     } else if (typeof opts.url === 'string') {
-      const errMsg = await e2eGoTo(page, opts.url);
+      const errMsg = await e2eGoTo(page, opts.url, { waitUntil: opts.waitUntil });
       if (errMsg) {
         throw errMsg;
       }
@@ -93,7 +93,7 @@ function failedPage() {
   return page;
 }
 
-async function e2eGoTo(page: pd.E2EPageInternal, url: string) {
+async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer.NavigationOptions) {
   try {
     if (page.isClosed()) {
       return 'e2eGoTo unavailable: page already closed';
@@ -120,7 +120,10 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string) {
 
   const fullUrl = browserUrl + url.substring(1);
 
-  const rsp = await page._e2eGoto(fullUrl, { waitUntil: 'networkidle0' });
+  if (!options.waitUntil) {
+    options.waitUntil = DEFAULT_WAIT_FOR;
+  }
+  const rsp = await page._e2eGoto(fullUrl, options);
 
   if (!rsp.ok()) {
     await closePage(page);
@@ -140,7 +143,7 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string) {
 }
 
 
-async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
+async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: puppeteer.NavigationOptions = {}) {
   try {
     if (page.isClosed()) {
       return 'e2eSetContent unavailable: page already closed';
@@ -180,7 +183,10 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
     }
   });
 
-  const rsp = await page._e2eGoto(url, { waitUntil: 'networkidle0' });
+  if (!options.waitUntil) {
+    options.waitUntil = DEFAULT_WAIT_FOR;
+  }
+  const rsp = await page._e2eGoto(url, options);
 
   if (!rsp.ok()) {
     await closePage(page);
@@ -310,3 +316,5 @@ function pageError(e: any) {
 function requestFailed(req: puppeteer.Request) {
   console.error('requestfailed', req.url());
 }
+
+const DEFAULT_WAIT_FOR = 'load';
