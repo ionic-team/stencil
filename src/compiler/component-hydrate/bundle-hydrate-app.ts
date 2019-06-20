@@ -14,6 +14,7 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
   try {
     const treeshake: TreeshakingOptions | boolean = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
       ? {
+        propertyReadSideEffects: false,
         tryCatchDeoptimization: false,
       }
       : false;
