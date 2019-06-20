@@ -81,13 +81,14 @@ export function validateOutputTargetDist(config: d.Config) {
 
     const namespace = config.fsNamespace || 'app';
     const lazyDir = path.join(outputTarget.buildDir, namespace);
+
     // Lazy build for CDN in dist
     config.outputTargets.push({
       type: DIST_LAZY,
       copyDir: lazyDir,
       esmDir: lazyDir,
-      systemDir: lazyDir,
-      systemLoaderFile: path.join(lazyDir, namespace + '.js'),
+      systemDir: config.buildEs5 ? lazyDir : undefined,
+      systemLoaderFile: config.buildEs5 ? path.join(lazyDir, namespace + '.js') : undefined,
       legacyLoaderFile: path.join(outputTarget.buildDir, namespace + '.js'),
       polyfills: true,
       isBrowserBuild: true,
@@ -101,7 +102,7 @@ export function validateOutputTargetDist(config: d.Config) {
 
     if (config.buildDist) {
       const esmDir = path.join(outputTarget.dir, 'esm');
-      const esmEs5Dir = path.join(outputTarget.dir, 'esm', 'legacy');
+      const esmEs5Dir = config.buildEs5 ? path.join(outputTarget.dir, 'esm', 'legacy') : undefined;
       const cjsDir = path.join(outputTarget.dir, 'cjs');
 
       // Create lazy output-target

@@ -72,8 +72,7 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
 
   setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
-  setBooleanConfig(config, 'buildDist', 'esm', config.buildEs5);
-  setBooleanConfig(config, 'buildScoped', null, config.buildEs5);
+  setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
 
   // setup the outputTargets
   validateOutputTargets(config, diagnostics);
@@ -99,7 +98,6 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
       err.messageText = `config.hashedFileNameLength cannot be more than ${MAX_HASHED_FILENAME_LENTH} characters`;
     }
   }
-
 
   validateDevServer(config, diagnostics);
 
