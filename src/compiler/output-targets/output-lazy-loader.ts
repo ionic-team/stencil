@@ -21,11 +21,11 @@ export async function outputLazyLoader(config: d.Config, compilerCtx: d.Compiler
 
 async function generateLoader(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistLazyLoader) {
   const loaderPath = outputTarget.dir;
-  const es5Dir = outputTarget.esmEs5Dir;
   const es2017Dir = outputTarget.esmDir;
+  const es5Dir = outputTarget.esmEs5Dir || es2017Dir;
   const cjsDir = outputTarget.cjsDir;
 
-  if (!loaderPath || !es5Dir || !es2017Dir || !cjsDir) {
+  if (!loaderPath || !es2017Dir || !cjsDir) {
     return;
   }
 
