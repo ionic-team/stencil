@@ -1,5 +1,5 @@
+import * as d from './declarations';
 
-import * as d from './declarations/index';
 export {
   ComponentDidLoad,
   ComponentDidUnload,
@@ -9,12 +9,10 @@ export {
   ComponentInstance as ComponentInterface,
   StencilConfig as Config,
   EventEmitter,
-  EventListenerEnable,
   FunctionalComponent,
   QueueApi,
-  JSXElements,
-  Hyperscript
-} from './declarations/index';
+  JSX
+} from './declarations';
 
 /**
  * Build
@@ -62,13 +60,65 @@ export declare const State: d.StateDecorator;
 export declare const Watch: d.WatchDecorator;
 
 /**
- * Deprecated: Please use @Watch decorator instead
+ * setMode
  */
-export declare const PropWillChange: d.WatchDecorator;
+export declare const setMode: (handler: ((elm: HTMLElement) => string | undefined | null)) => void;
 
 /**
- * Deprecated: Please use @Watch decorator instead
+ * getMode
  */
-export declare const PropDidChange: d.WatchDecorator;
+export declare function getMode<T = (string | undefined)>(ref: any): T;
 
-export interface HostElement extends HTMLElement {}
+/**
+ * getAssetPath
+ */
+export declare function getAssetPath(path: string): string;
+
+/**
+ * getElement
+ */
+export declare function getElement(ref: any): d.HTMLStencilElement;
+
+/**
+ * writeTask
+ */
+export declare function writeTask(task: d.RafCallback): void;
+
+/**
+ * readTask
+ */
+export declare function readTask(task: d.RafCallback): void;
+
+/**
+ * Host
+ */
+interface HostAttributes {
+  class?: string | { [className: string]: boolean };
+  style?: { [key: string]: string | undefined };
+  ref?: (el: HTMLElement | null) => void;
+
+  [prop: string]: any;
+}
+
+export declare const Host: d.FunctionalComponent<HostAttributes>;
+
+/**
+ * The "h" namespace is used to import JSX types for elements and attributes.
+ * It is imported in order to avoid conflicting global JSX issues.
+ */
+export declare namespace h {
+  export function h(sel: any): d.VNode;
+  export function h(sel: Node, data: d.VNodeData): d.VNode;
+  export function h(sel: any, data: d.VNodeData): d.VNode;
+  export function h(sel: any, text: string): d.VNode;
+  export function h(sel: any, children: Array<d.VNode | undefined | null>): d.VNode;
+  export function h(sel: any, data: d.VNodeData, text: string): d.VNode;
+  export function h(sel: any, data: d.VNodeData, children: Array<d.VNode | undefined | null>): d.VNode;
+  export function h(sel: any, data: d.VNodeData, children: d.VNode): d.VNode;
+
+  export namespace JSX {
+    interface IntrinsicElements extends d.JSX.IntrinsicElements, d.JSXBase.IntrinsicElements {
+      [tagName: string]: any;
+    }
+  }
+}

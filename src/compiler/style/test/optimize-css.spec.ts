@@ -1,8 +1,8 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { optimizeCss } from '../optimize-css';
-import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
-import * as path from 'path';
-import * as os from 'os';
+import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
+import path from 'path';
+import os from 'os';
 
 
 describe('optimizeCss',  () => {

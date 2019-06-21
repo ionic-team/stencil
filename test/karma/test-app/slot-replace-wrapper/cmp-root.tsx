@@ -1,11 +1,11 @@
-import { Component, State } from '../../../../dist';
+import { Component, State, h } from '@stencil/core';
 
 @Component({
   tag: 'slot-replace-wrapper-root'
 })
 export class SlotReplaceWrapperRoot {
 
-  @State() href: string = null;
+  @State() href?: string;
 
   componentDidLoad() {
     this.href = 'http://stenciljs.com/';

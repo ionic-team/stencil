@@ -1,5 +1,16 @@
 import * as d from '.';
 
+export type ModuleFormat =
+  | 'amd'
+  | 'cjs'
+  | 'commonjs'
+  | 'es'
+  | 'esm'
+  | 'iife'
+  | 'module'
+  | 'system'
+  | 'umd';
+
 export interface RollupResultModule {
   id: string;
 }
@@ -9,14 +20,13 @@ export interface RollupResults {
 
 export interface BuildCtx {
   abort(): Promise<BuildResults>;
-  appFileBuildCount: number;
   buildId: number;
   buildResults: d.BuildResults;
   buildMessages: string[];
-  timestamp: string;
   bundleBuildCount: number;
   collections: d.Collection[];
-  components: string[];
+  components: d.ComponentCompilerMeta[];
+  componentGraph: Map<string, string[]>;
   createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
   data: any;
   debug: (msg: string) => void;
@@ -24,42 +34,47 @@ export interface BuildCtx {
   dirsAdded: string[];
   dirsDeleted: string[];
   entryModules: d.EntryModule[];
-  entryPoints: d.EntryPoint[];
   filesAdded: string[];
   filesChanged: string[];
   filesDeleted: string[];
   filesUpdated: string[];
   filesWritten: string[];
   finish(): Promise<BuildResults>;
-  global: d.ModuleFile;
-  graphData: GraphData;
+  globalStyle: string | undefined;
   hasConfigChanges: boolean;
   hasCopyChanges: boolean;
+  hasError: boolean;
   hasFinished: boolean;
-  hasIndexHtmlChanges: boolean;
+  hasHtmlChanges: boolean;
   hasPrintedResults: boolean;
   hasServiceWorkerChanges: boolean;
   hasScriptChanges: boolean;
-  hasSlot: boolean;
   hasStyleChanges: boolean;
-  hasSvg: boolean;
+  hasWarning: boolean;
+  hydrateAppFilePath: string;
   indexBuildCount: number;
-  isActiveBuild: boolean;
+  indexDoc: Document;
   isRebuild: boolean;
+  moduleFiles: d.Module[];
+  packageJson: d.PackageJsonData;
+  packageJsonFilePath: string;
+  pendingCopyTasks: Promise<d.CopyResults>[];
+  progress(task: BuildTask): void;
   requiresFullBuild: boolean;
+  rollupResults?: RollupResults;
   scriptsAdded: string[];
   scriptsDeleted: string[];
-  hasError: boolean;
-  hasWarning: boolean;
-  rollupResults?: RollupResults;
+  skipAssetsCopy: boolean;
   startTime: number;
   styleBuildCount: number;
+  stylesPromise: Promise<void>;
   stylesUpdated: BuildStyleUpdate[];
   timeSpan: d.LoggerTimeSpan;
+  timestamp: string;
   transpileBuildCount: number;
+  validateTypesBuild?(): Promise<void>;
   validateTypesHandler?: (results: d.ValidateTypesResults) => Promise<void>;
   validateTypesPromise?: Promise<d.ValidateTypesResults>;
-  validateTypesBuild?(): Promise<void>;
 }
 
 
@@ -67,20 +82,25 @@ export interface BuildStyleUpdate {
   styleTag: string;
   styleText: string;
   styleMode: string;
-  isScoped: boolean;
 }
 
-
-export type GraphData = Map<string, string[]>;
-
+export type BuildTask = any;
 
 export interface BuildLog {
+  buildId: number;
   messages: string[];
+  progress: number;
 }
 
 
 export interface BuildResults {
   buildId: number;
+  buildConditionals: {
+    shadow: boolean;
+    slot: boolean;
+    svg: boolean;
+    vdom: boolean;
+  };
   bundleBuildCount: number;
   components: BuildComponent[];
   diagnostics: d.Diagnostic[];
@@ -95,14 +115,13 @@ export interface BuildResults {
   filesWritten: string[];
   hasError: boolean;
   hasSuccessfulBuild: boolean;
-  hasSlot: boolean;
-  hasSvg: boolean;
   hmr?: HotModuleReplacement;
   isRebuild: boolean;
   styleBuildCount: number;
   transpileBuildCount: number;
 }
 
+export type BuildStatus = 'pending' | 'error' | 'disabled' | 'default';
 
 export interface HotModuleReplacement {
   componentsUpdated?: string[];
@@ -111,6 +130,7 @@ export interface HotModuleReplacement {
   imagesUpdated?: string[];
   indexHtmlUpdated?: boolean;
   inlineStylesUpdated?: HmrStyleUpdate[];
+  reloadStrategy: d.PageReloadStrategy;
   scriptsAdded?: string[];
   scriptsDeleted?: string[];
   serviceWorkerUpdated?: boolean;
@@ -119,10 +139,9 @@ export interface HotModuleReplacement {
 
 
 export interface HmrStyleUpdate {
+  styleId: string;
   styleTag: string;
   styleText: string;
-  styleMode: string;
-  isScoped: boolean;
 }
 
 
@@ -169,7 +188,7 @@ export interface BuildEntry {
   bundles: BuildBundle[];
   inputs: string[];
   modes?: string[];
-  encapsulations: string[];
+  encapsulations: d.Encapsulation[];
 }
 
 
@@ -195,46 +214,68 @@ export interface BuildComponent {
 }
 
 
-export interface FilesMap {
-  [filePath: string]: string;
-}
-
-
 export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'fsChange' | 'buildFinish' | 'buildNoChange' | 'buildLog';
 
 
-export interface JSModuleList {
-  [key: string]: {
-    code: string,
-    imports?: string[],
-    exports?: string[],
-    modules?: {
-      [modulePath: string]: {
-        renderedExports: string[],
-        removedExports: string[],
-        renderedLength: number,
-        originalLength: number
-      }
+export interface BundleOutputChunk {
+  code: string;
+  fileName: string;
+  isDynamicEntry: boolean;
+  isEntry: boolean;
+  map: any;
+  dynamicImports: string[];
+  imports: string[];
+  exports: string[];
+  modules: {
+    [modulePath: string]: {
+      renderedExports: string[];
+      removedExports: string[];
+      renderedLength: number;
+      originalLength: number;
     }
   };
+  name: string;
 }
-
-export interface JSModuleFormats {
-  esm?: JSModuleList;
-  amd?: JSModuleList;
-}
-
-export interface DerivedChunk {
-  entryKey: string;
-  filename: string;
-  code: string;
-}
-
-export interface DerivedModule {
-  list: DerivedChunk[];
-  sourceTarget: d.SourceTarget;
-  isBrowser: boolean;
-}
-
 
 export type SourceTarget = 'es5' | 'es2017';
+
+export interface BundleAppOptions {
+  inputs: BundleEntryInputs;
+  loader: {[id: string]: string};
+  cache?: any;
+  externalRuntime?: string;
+  skipDeps?: boolean;
+  isServer?: boolean;
+}
+
+export interface BundleEntryInputs {
+  [entryKey: string]: string;
+}
+
+export interface RollupResult {
+  entryKey: string;
+  fileName: string;
+  code: string;
+  isEntry: boolean;
+  isComponent: boolean;
+  isCore: boolean;
+  isIndex: boolean;
+  isBrowserLoader: boolean;
+  imports: string[];
+  moduleFormat: ModuleFormat;
+}
+
+export interface BundleModule {
+  entryKey: string;
+  modeNames: string[];
+  rollupResult: RollupResult;
+  cmps: d.ComponentCompilerMeta[];
+  outputs: BundleModuleOutput[];
+}
+
+export interface BundleModuleOutput {
+  bundleId: string;
+  fileName: string;
+  code: string;
+  modeName: string;
+}

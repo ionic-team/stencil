@@ -1,4 +1,4 @@
-import { Component, Element, Event, EventEmitter, Listen, Method, Prop, State } from '../../../../dist';
+import { Component, Element, Event, EventEmitter, Listen, Method, Prop, State, h } from '@stencil/core';
 
 
 @Component({
@@ -8,13 +8,13 @@ import { Component, Element, Event, EventEmitter, Listen, Method, Prop, State } 
 })
 export class EsmImport {
 
-  @Element() el: any;
+  @Element() el!: any;
   @Prop() propVal = 0;
   @State() isReady = 'false';
-  @State() stateVal: string;
+  @State() stateVal?: string;
   @State() listenVal = 0;
   @State() someEventInc = 0;
-  @Event() someEvent: EventEmitter;
+  @Event() someEvent!: EventEmitter;
 
   @Listen('click')
   testClick() {
@@ -22,7 +22,7 @@ export class EsmImport {
   }
 
   @Method()
-  someMethod() {
+  async someMethod() {
     this.someEvent.emit();
   }
 

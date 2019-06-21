@@ -1,4 +1,4 @@
-import { MarkdownTable } from '../docs-util';
+import { MarkdownTable } from '../../docs/readme/docs-util';
 
 
 describe('markdown-table', () => {

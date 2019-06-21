@@ -3,49 +3,57 @@ const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
-const transpile = require('./transpile');
+const { run, transpile, relativeResolve } = require('./script-utils');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-cli');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'cli', 'index.js');
 const DEST_FILE = path.join(__dirname, '..', 'dist', 'cli', 'index.js');
 
 
-const success = transpile(path.join('..', 'src', 'cli', 'tsconfig.json'));
+async function buildCli() {
+  const rollupBuild = await rollup.rollup({
+    input: ENTRY_FILE,
+    external: [
+      'child_process',
+      'crypto',
+      'fs',
+      'https',
+      'os',
+      'path',
+    ],
+    plugins: [
+      (() => {
+        return {
+          resolveId(id) {
 
-if (success) {
-
-  async function buildCli() {
-    const build = await rollup.rollup({
-      input: ENTRY_FILE,
-      external: [
-        'child_process',
-        'crypto',
-        'fs',
-        'https',
-        'os',
-        'path'
-      ],
-      plugins: [
-        rollupResolve(),
-        rollupCommonjs()
-      ],
-      onwarn: (message) => {
-        if (/top level of an ES module/.test(message)) return;
-        console.error( message );
-      }
-    });
-
-    await build.write({
-      format: 'cjs',
-      file: DEST_FILE
-    });
-  }
-
-  buildCli();
-
-  process.on('exit', () => {
-    fs.removeSync(TRANSPILED_DIR);
-    console.log(`✅ cli: ${DEST_FILE}`);
+            if (id === '@utils') {
+              return relativeResolve('../utils');
+            }
+          }
+        }
+      })(),
+      rollupResolve({
+        preferBuiltins: true
+      }),
+      rollupCommonjs()
+    ],
+    onwarn: (message) => {
+      if (message.code === 'CIRCULAR_DEPENDENCY') return;
+      console.error(message);
+    }
   });
 
+  await rollupBuild.write({
+    format: 'cjs',
+    file: DEST_FILE
+  });
 }
+
+
+run(async () => {
+  transpile(path.join('..', 'src', 'cli', 'tsconfig.json'));
+
+  await buildCli();
+
+  await fs.remove(TRANSPILED_DIR);
+});

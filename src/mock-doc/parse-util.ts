@@ -1,10 +1,12 @@
 import { MockComment } from './comment-node';
 import { MockDocument } from './document';
-import { MockElement, MockNode } from './node';
+import { MockElement, MockNode, MockTextNode } from './node';
 import { MockTemplateElement } from './element';
-import { MockTextNode } from './text-node';
-import { NODE_TYPES } from './constants';
+import { NODE_NAMES, NODE_TYPES } from './constants';
 import { Attribute, ParserOptions, TreeAdapter, parse, parseFragment } from 'parse5';
+
+
+const docParser = new WeakMap<any, any>();
 
 
 export function parseDocumentUtil(ownerDocument: any, html: string) {
@@ -22,23 +24,30 @@ export function parseDocumentUtil(ownerDocument: any, html: string) {
 
 
 export function parseFragmentUtil(ownerDocument: any, html: string) {
+  if (typeof html === 'string') {
+    html = html.trim();
+  } else {
+    html = '';
+  }
   const frag = parseFragment(
-    html.trim(),
+    html,
     getParser(ownerDocument)
   ) as any;
   return frag;
 }
 
 
-function getParser(ownerDocument: any) {
-  if (ownerDocument._parser) {
-    return ownerDocument._parser;
+function getParser(ownerDocument: MockDocument) {
+  let parseOptions: ParserOptions = docParser.get(ownerDocument);
+
+  if (parseOptions != null) {
+    return parseOptions;
   }
 
   const treeAdapter: TreeAdapter = {
 
     createDocument() {
-      const doc = ownerDocument.createElement('#document');
+      const doc = ownerDocument.createElement(NODE_NAMES.DOCUMENT_NODE);
       (doc as any)['x-mode'] = 'no-quirks';
       return doc;
     },
@@ -87,7 +96,7 @@ function getParser(ownerDocument: any) {
     setDocumentType(doc: MockDocument, name: string, publicId: string, systemId: string) {
       let doctypeNode = doc.childNodes.find(n => n.nodeType === NODE_TYPES.DOCUMENT_TYPE_NODE);
 
-      if (!doctypeNode) {
+      if (doctypeNode == null) {
         doctypeNode = ownerDocument.createDocumentTypeNode();
         doc.insertBefore(doctypeNode, doc.firstChild);
       }
@@ -113,7 +122,7 @@ function getParser(ownerDocument: any) {
     insertText(parentNode: MockNode, text: string) {
       const lastChild = parentNode.lastChild;
 
-      if (lastChild && lastChild.nodeType === NODE_TYPES.TEXT_NODE) {
+      if (lastChild != null && lastChild.nodeType === NODE_TYPES.TEXT_NODE) {
         lastChild.nodeValue += text;
       } else {
 
@@ -124,7 +133,7 @@ function getParser(ownerDocument: any) {
     insertTextBefore(parentNode: MockNode, text: string, referenceNode: MockNode) {
       const prevNode = parentNode.childNodes[parentNode.childNodes.indexOf(referenceNode) - 1];
 
-      if (prevNode && prevNode.nodeType === NODE_TYPES.TEXT_NODE) {
+      if (prevNode != null && prevNode.nodeType === NODE_TYPES.TEXT_NODE) {
         prevNode.nodeValue += text;
       } else {
         parentNode.insertBefore(ownerDocument.createTextNode(text), referenceNode);
@@ -135,7 +144,7 @@ function getParser(ownerDocument: any) {
       for (let i = 0; i < attrs.length; i++) {
         const attr = attrs[i];
 
-        if (!recipient.hasAttributeNS(attr.namespace, attr.name)) {
+        if (recipient.hasAttributeNS(attr.namespace, attr.name) === false) {
           recipient.setAttributeNS(attr.namespace, attr.name, attr.value);
         }
       }
@@ -210,11 +219,11 @@ function getParser(ownerDocument: any) {
     }
   };
 
-  const parseOptions: ParserOptions = {
+  parseOptions = {
     treeAdapter: treeAdapter
   };
 
-  ownerDocument._parser = parseOptions;
+  docParser.set(ownerDocument, parseOptions);
 
   return parseOptions;
 }

@@ -1,9 +1,11 @@
 import * as d from '../../declarations';
-import { normalizePath, pathJoin } from '../util';
+import { buildError, normalizePath } from '@utils';
+import { isOutputTargetWww } from '../output-targets/output-utils';
 import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
+import { URL } from 'url';
 
 
-export function validateDevServer(config: d.Config) {
+export function validateDevServer(config: d.Config, diagnostics: d.Diagnostic[]) {
   if (config.devServer === false || config.devServer === null) {
     return config.devServer = null;
   }
@@ -21,9 +23,23 @@ export function validateDevServer(config: d.Config) {
     setNumberConfig(config.devServer, 'port', null, 3333);
   }
 
+  if ((config.devServer as any).hotReplacement === true) {
+    // DEPRECATED: 2019-05-20
+    config.devServer.reloadStrategy = 'hmr';
+  } else if ((config.devServer as any).hotReplacement === false || (config.devServer as any).hotReplacement === null) {
+    // DEPRECATED: 2019-05-20
+    config.devServer.reloadStrategy = null;
+  } else {
+    if (config.devServer.reloadStrategy === undefined) {
+      config.devServer.reloadStrategy = 'hmr';
+    } else if (config.devServer.reloadStrategy !== 'hmr' && config.devServer.reloadStrategy !== 'pageReload' && config.devServer.reloadStrategy !== null) {
+      throw new Error(`Invalid devServer reloadStrategy "${config.devServer.reloadStrategy}". Valid configs include "hmr", "pageReload" and null.`);
+    }
+  }
+
   setBooleanConfig(config.devServer, 'gzip', null, true);
-  setBooleanConfig(config.devServer, 'hotReplacement', null, true);
   setBooleanConfig(config.devServer, 'openBrowser', null, true);
+  setBooleanConfig(config.devServer, 'websocket', null, true);
 
   validateProtocol(config.devServer);
 
@@ -39,18 +55,22 @@ export function validateDevServer(config: d.Config) {
     }
   }
 
-  if (config.flags && config.flags.open === false) {
+  if (config.flags.open === false) {
+    config.devServer.openBrowser = false;
+
+  } else if (config.flags.prerender && !config.watch) {
     config.devServer.openBrowser = false;
   }
 
   let serveDir: string = null;
-  let baseUrl: string = null;
-  const wwwOutputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
+  let basePath: string = null;
+  const wwwOutputTarget = config.outputTargets.find(isOutputTargetWww);
 
   if (wwwOutputTarget) {
-    serveDir = wwwOutputTarget.dir;
-    baseUrl = wwwOutputTarget.baseUrl;
-    config.logger.debug(`dev server www root: ${serveDir}, base url: ${baseUrl}`);
+    const baseUrl = new URL(wwwOutputTarget.baseUrl, 'http://config.stenciljs.com');
+    basePath = baseUrl.pathname;
+    serveDir = wwwOutputTarget.appDir;
+    config.logger.debug(`dev server www root: ${serveDir}, base path: ${basePath}`);
 
   } else {
     serveDir = config.rootDir;
@@ -60,30 +80,40 @@ export function validateDevServer(config: d.Config) {
     }
   }
 
-  if (typeof baseUrl !== 'string') {
-    baseUrl = `/`;
+  if (typeof basePath !== 'string' || basePath.trim() === '') {
+    basePath = `/`;
   }
 
-  baseUrl = normalizePath(baseUrl);
+  basePath = normalizePath(basePath);
 
-  if (!baseUrl.startsWith('/')) {
-    baseUrl = '/' + baseUrl;
+  if (!basePath.startsWith('/')) {
+    basePath = '/' + basePath;
   }
 
-  if (!baseUrl.endsWith('/')) {
-    baseUrl += '/';
+  if (!basePath.endsWith('/')) {
+    basePath += '/';
+  }
+
+  if (typeof config.devServer.logRequests !== 'boolean') {
+    config.devServer.logRequests = (config.logLevel === 'debug');
   }
 
   setStringConfig(config.devServer, 'root', serveDir);
-  setStringConfig(config.devServer, 'baseUrl', baseUrl);
+  setStringConfig(config.devServer, 'basePath', basePath);
+
+  if (typeof (config.devServer as any).baseUrl === 'string') {
+    const err = buildError(diagnostics);
+    err.messageText = `devServer config "baseUrl" has been renamed to "basePath", and should not include a domain or protocol.`;
+  }
 
   if (!config.sys.path.isAbsolute(config.devServer.root)) {
-    config.devServer.root = pathJoin(config, config.rootDir, config.devServer.root);
+    config.devServer.root = config.sys.path.join(config.rootDir, config.devServer.root);
   }
 
   if (config.devServer.excludeHmr) {
     if (!Array.isArray(config.devServer.excludeHmr)) {
-      config.logger.error(`dev server excludeHmr must be an array of glob strings`);
+      const err = buildError(diagnostics);
+      err.messageText = `dev server excludeHmr must be an array of glob strings`;
     }
 
   } else {

@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { pathJoin } from '../util';
 
 
 export function writeCacheStats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -7,7 +6,7 @@ export function writeCacheStats(config: d.Config, compilerCtx: d.CompilerCtx, bu
     return;
   }
 
-  const statsPath = pathJoin(config, config.rootDir, 'stencil-cache-stats.json');
+  const statsPath = config.sys.path.join(config.rootDir, 'stencil-cache-stats.json');
 
   config.logger.warn(`cache stats enabled for debugging, which is horrible for build times. Only enableCacheStats when debugging memory issues.`);
 

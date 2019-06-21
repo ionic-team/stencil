@@ -21,6 +21,10 @@ export async function startPuppeteerBrowser(config: d.Config) {
     config.logger.debug(`puppeteer args: ${config.testing.browserArgs.join(' ')}`);
   }
 
+  if (typeof config.testing.browserDevtools === 'boolean') {
+    config.logger.debug(`puppeteer devtools: ${config.testing.browserDevtools}`);
+  }
+
   if (typeof config.testing.browserSlowMo === 'number') {
     config.logger.debug(`puppeteer slowMo: ${config.testing.browserSlowMo}`);
   }
@@ -29,6 +33,7 @@ export async function startPuppeteerBrowser(config: d.Config) {
     ignoreHTTPSErrors: true,
     args: config.testing.browserArgs,
     headless: config.testing.browserHeadless,
+    devtools: config.testing.browserDevtools,
     slowMo: config.testing.browserSlowMo
   };
 
@@ -38,9 +43,10 @@ export async function startPuppeteerBrowser(config: d.Config) {
 
   let browser;
   if (config.testing.browserWSEndpoint) {
-    let connectOpts: puppeteer.ConnectOptions = launchOpts;
+    const connectOpts: puppeteer.ConnectOptions = launchOpts;
     connectOpts.browserWSEndpoint = config.testing.browserWSEndpoint;
     browser = await puppeteer.connect(connectOpts);
+
   } else {
     browser = await puppeteer.launch(launchOpts);
   }

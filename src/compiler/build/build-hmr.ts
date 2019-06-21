@@ -1,15 +1,24 @@
 import * as d from '../../declarations';
-import { normalizePath } from '../util';
+import { normalizePath, sortBy } from '@utils';
 import isGlob from 'is-glob';
 import minimatch from 'minimatch';
+import { isOutputTargetWww } from '../output-targets/output-utils';
+import { getScopeId } from '../style/scope-css';
 
 
 export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!config.devServer || !config.devServer.hotReplacement || !buildCtx.isRebuild) {
+  if (!config.devServer || !buildCtx.isRebuild) {
     return null;
   }
 
-  const hmr: d.HotModuleReplacement = {};
+  if (config.devServer.reloadStrategy == null) {
+    return null;
+  }
+
+  const hmr: d.HotModuleReplacement = {
+    reloadStrategy: config.devServer.reloadStrategy,
+    versionId: Date.now().toString().substring(6) + '' + Math.round((Math.random() * 89999) + 10000)
+  };
 
   if (buildCtx.scriptsAdded.length > 0) {
     hmr.scriptsAdded = buildCtx.scriptsAdded.slice();
@@ -24,7 +33,7 @@ export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     hmr.excludeHmr = excludeHmr.slice();
   }
 
-  if (buildCtx.hasIndexHtmlChanges) {
+  if (buildCtx.hasHtmlChanges) {
     hmr.indexHtmlUpdated = true;
   }
 
@@ -38,18 +47,13 @@ export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   }
 
   if (Object.keys(buildCtx.stylesUpdated).length > 0) {
-    hmr.inlineStylesUpdated = buildCtx.stylesUpdated.map(s => {
+    hmr.inlineStylesUpdated = sortBy(buildCtx.stylesUpdated.map(s => {
       return {
+        styleId: getScopeId(s.styleTag, s.styleMode),
         styleTag: s.styleTag,
-        styleMode: s.styleMode,
         styleText: s.styleText,
-        isScoped: s.isScoped
       } as d.HmrStyleUpdate;
-    }).sort((a, b) => {
-      if (a.styleTag < b.styleTag) return -1;
-      if (a.styleTag > b.styleTag) return 1;
-      return 0;
-    });
+    }), s => s.styleId);
   }
 
   const externalStylesUpdated = getExternalStylesUpdated(config, buildCtx);
@@ -65,8 +69,6 @@ export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   if (Object.keys(hmr).length === 0) {
     return null;
   }
-
-  hmr.versionId = Date.now().toString().substring(6);
 
   return hmr;
 }
@@ -87,11 +89,8 @@ function getComponentsUpdated(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
   }
 
   const changedScriptFiles: string[] = [];
-  const checkedFiles: string[] = [];
-
-  const allModuleFiles = Object.keys(compilerCtx.moduleFiles)
-    .map(tsFilePath => compilerCtx.moduleFiles[tsFilePath])
-    .filter(moduleFile => moduleFile.localImports && moduleFile.localImports.length > 0);
+  const checkedFiles = new Set<string>();
+  const allModuleFiles = buildCtx.moduleFiles.filter(m => m.localImports && m.localImports.length > 0);
 
   while (filesToLookForImporters.length > 0) {
     const scriptFile = filesToLookForImporters.shift();
@@ -99,11 +98,15 @@ function getComponentsUpdated(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
   }
 
   const tags = changedScriptFiles.reduce((tags, changedTsFile) => {
-    const moduleFile = compilerCtx.moduleFiles[changedTsFile];
-    if (moduleFile && moduleFile.cmpMeta && moduleFile.cmpMeta.tagNameMeta) {
-      if (!tags.includes(moduleFile.cmpMeta.tagNameMeta)) {
-        tags.push(moduleFile.cmpMeta.tagNameMeta);
-      }
+    const moduleFile = compilerCtx.moduleMap.get(changedTsFile);
+    if (moduleFile != null) {
+      moduleFile.cmps.forEach(cmp => {
+        if (typeof cmp.tagName === 'string') {
+          if (!tags.includes(cmp.tagName)) {
+            tags.push(cmp.tagName);
+          }
+        }
+      });
     }
     return tags;
   }, [] as string[]);
@@ -116,17 +119,17 @@ function getComponentsUpdated(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
 }
 
 
-function addTsFileImporters(allModuleFiles: d.ModuleFile[], filesToLookForImporters: string[], checkedFiles: string[], changedScriptFiles: string[], scriptFile: string) {
+function addTsFileImporters(allModuleFiles: d.Module[], filesToLookForImporters: string[], checkedFiles: Set<string>, changedScriptFiles: string[], scriptFile: string) {
   if (!changedScriptFiles.includes(scriptFile)) {
     // add it to our list of files to transpile
     changedScriptFiles.push(scriptFile);
   }
 
-  if (checkedFiles.includes(scriptFile)) {
+  if (checkedFiles.has(scriptFile)) {
     // already checked this file
     return;
   }
-  checkedFiles.push(scriptFile);
+  checkedFiles.add(scriptFile);
 
   // get all the ts files that import this ts file
   const tsFilesThatImportsThisTsFile = allModuleFiles.reduce((arr, moduleFile) => {
@@ -172,7 +175,7 @@ function getExternalStylesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
     return null;
   }
 
-  const outputTargets = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www');
+  const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
     return null;
   }
@@ -189,7 +192,7 @@ function getExternalStylesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
 
 
 function getImagesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
-  const outputTargets = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www');
+  const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
     return null;
   }

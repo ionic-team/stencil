@@ -8,9 +8,10 @@
     "forceConsistentCasingInFileNames": true,
     "lib": [
       "dom",
-      "es2017"
+      "es2017",
+      "esnext.array"
     ],
-    "module": "es2015",
+    "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -20,7 +21,8 @@
     "outDir": "../../../dist/transpiled-dev-server-client",
     "pretty": true,
     "rootDir": "../../",
-    "target": "es5"
+    "target": "es5",
+    "baseUrl": "."
   },
   "files": [
     "./index.ts"

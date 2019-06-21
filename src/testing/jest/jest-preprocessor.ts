@@ -9,7 +9,7 @@ export const jestPreprocessor = {
       return '';
     }
 
-    if (filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
+    if (filePath.endsWith('.ts') || filePath.endsWith('.tsx') || filePath.endsWith('.jsx')) {
       const opts = Object.assign({}, this.getCompilerOptions(jestConfig.rootDir));
 
       const results = transpile(sourceText, opts, filePath);
@@ -44,7 +44,6 @@ export const jestPreprocessor = {
 
     const key = [
       process.version,
-      CACHE_BUSTER,
       this._tsCompilerOptionsKey,
       code,
       filePath,
@@ -52,9 +51,7 @@ export const jestPreprocessor = {
       !!transformOptions.instrument
     ];
 
-    return key.join(':');
+    return key.join(':') + Math.random();
   }
 
 };
-
-const CACHE_BUSTER = 0;

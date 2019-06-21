@@ -1,4 +1,4 @@
-import { Config } from '../../declarations';
+import * as d from '../../declarations';
 
 
 export function setBooleanConfig(config: any, configName: string, flagName: string, defaultValue: boolean) {
@@ -54,7 +54,6 @@ export function setStringConfig(config: any, configName: string, defaultValue: s
   }
 }
 
-
 export function setArrayConfig(config: any, configName: string, defaultValue?: any[]) {
   const userConfigName = getUserConfigName(config, configName);
 
@@ -71,8 +70,7 @@ export function setArrayConfig(config: any, configName: string, defaultValue?: a
   }
 }
 
-
-function getUserConfigName(config: Config, correctConfigName: string) {
+function getUserConfigName(config: d.Config, correctConfigName: string) {
   const userConfigNames = Object.keys(config);
 
   for (const userConfigName of userConfigNames) {

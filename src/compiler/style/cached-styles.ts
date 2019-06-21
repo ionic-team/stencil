@@ -1,9 +1,10 @@
 import * as d from '../../declarations';
 import { getCssImports } from './css-imports';
+import { getStyleId } from './component-styles';
 
 
-export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, styleMeta: d.StyleMeta, modeName: string) {
-  const cacheKey = getComponentStylesCacheKey(moduleFile, modeName);
+export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, commentOriginalSelector: boolean) {
+  const cacheKey = getComponentStylesCacheKey(cmp, styleMeta.modeName);
 
   const cachedStyleMeta = compilerCtx.cachedStyleMeta.get(cacheKey);
   if (!cachedStyleMeta) {
@@ -11,7 +12,7 @@ export async function getComponentStylesCache(config: d.Config, compilerCtx: d.C
     return null;
   }
 
-  if (isChangedTsFile(moduleFile, buildCtx) && hasDecoratorStyleChanges(compilerCtx, moduleFile, cacheKey)) {
+  if (isChangedTsFile(cmp.sourceFilePath, buildCtx) && hasDecoratorStyleChanges(compilerCtx, cmp, cacheKey)) {
     // this module is one of the changed ts files
     // and the changed ts file has different
     // styleUrls or styleStr in the component decorator
@@ -35,27 +36,31 @@ export async function getComponentStylesCache(config: d.Config, compilerCtx: d.C
     return null;
   }
 
+  if (commentOriginalSelector && typeof cachedStyleMeta.compiledStyleTextScopedCommented !== 'string') {
+    return null;
+  }
+
   // woot! let's use the cached data we already compiled
   return cachedStyleMeta;
 }
 
 
-function isChangedTsFile(moduleFile: d.ModuleFile, buildCtx: d.BuildCtx) {
-  return (buildCtx.filesChanged.includes(moduleFile.sourceFilePath));
+function isChangedTsFile(sourceFilePath: string, buildCtx: d.BuildCtx) {
+  return (buildCtx.filesChanged.includes(sourceFilePath));
 }
 
 
-function hasDecoratorStyleChanges(compilerCtx: d.CompilerCtx, moduleFile: d.ModuleFile, cacheKey: string) {
+function hasDecoratorStyleChanges(compilerCtx: d.CompilerCtx, cmp: d.ComponentCompilerMeta, cacheKey: string) {
   const lastStyleInput = compilerCtx.lastComponentStyleInput.get(cacheKey);
   if (!lastStyleInput) {
     return true;
   }
 
-  return (lastStyleInput !== getComponentStyleInputKey(moduleFile));
+  return (lastStyleInput !== getComponentStyleInputKey(cmp));
 }
 
 
-export function isChangedStyleEntryFile(buildCtx: d.BuildCtx, styleMeta: d.StyleMeta) {
+export function isChangedStyleEntryFile(buildCtx: d.BuildCtx, styleMeta: d.StyleCompiler) {
   if (!styleMeta.externalStyles) {
     return false;
   }
@@ -66,7 +71,7 @@ export function isChangedStyleEntryFile(buildCtx: d.BuildCtx, styleMeta: d.Style
 }
 
 
-async function isChangedStyleEntryImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, styleMeta: d.StyleMeta) {
+async function isChangedStyleEntryImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, styleMeta: d.StyleCompiler) {
   if (!styleMeta.externalStyles) {
     return false;
   }
@@ -134,17 +139,17 @@ async function hasChangedImportContent(config: d.Config, compilerCtx: d.Compiler
 }
 
 
-function getComponentStyleInputKey(moduleFile: d.ModuleFile) {
+function getComponentStyleInputKey(cmp: d.ComponentCompilerMeta) {
   const input: string[] = [];
 
-  if (moduleFile.cmpMeta.stylesMeta) {
-    Object.keys(moduleFile.cmpMeta.stylesMeta).forEach(modeName => {
-      input.push(modeName);
+  if (Array.isArray(cmp.styles)) {
+    cmp.styles.forEach(styleMeta => {
+      input.push(styleMeta.modeName);
 
-      const styleMeta = moduleFile.cmpMeta.stylesMeta[modeName];
-      if (styleMeta.styleStr) {
+      if (typeof styleMeta.styleStr === 'string') {
         input.push(styleMeta.styleStr);
       }
+
       if (styleMeta.externalStyles) {
         styleMeta.externalStyles.forEach(s => {
           input.push(s.absolutePath);
@@ -157,16 +162,56 @@ function getComponentStyleInputKey(moduleFile: d.ModuleFile) {
 }
 
 
-export function setComponentStylesCache(compilerCtx: d.CompilerCtx, moduleFile: d.ModuleFile, modeName: string, styleMeta: d.StyleMeta) {
-  const cacheKey = getComponentStylesCacheKey(moduleFile, modeName);
+export function setComponentStylesCache(compilerCtx: d.CompilerCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler) {
+  const cacheKey = getComponentStylesCacheKey(cmp, styleMeta.modeName);
 
   compilerCtx.cachedStyleMeta.set(cacheKey, styleMeta);
 
-  const styleInput = getComponentStyleInputKey(moduleFile);
+  const styleInput = getComponentStyleInputKey(cmp);
   compilerCtx.lastComponentStyleInput.set(cacheKey, styleInput);
 }
 
 
-function getComponentStylesCacheKey(moduleFile: d.ModuleFile, modeName: string) {
-  return `${moduleFile.sourceFilePath}#${modeName}`;
+function getComponentStylesCacheKey(cmp: d.ComponentCompilerMeta, modeName: string) {
+  return `${cmp.sourceFilePath}#${cmp.tagName}#${modeName}`;
+}
+
+
+export async function updateLastStyleComponetInputs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (config.watch) {
+    const promises: Promise<any>[] = [];
+    compilerCtx.moduleMap.forEach(m => {
+      if (Array.isArray(m.cmps)) {
+        promises.push(...m.cmps.map(async cmp => {
+          const cacheKey = cmp.tagName;
+          const currentInputHash = await getComponentDecoratorStyleHash(config, cmp);
+
+          if (cmp.styles == null || cmp.styles.length === 0) {
+            compilerCtx.styleModeNames.forEach(modeName => {
+              const lastInputHash = compilerCtx.lastComponentStyleInput.get(cacheKey);
+              if (lastInputHash !== currentInputHash) {
+                buildCtx.stylesUpdated.push({
+                  styleTag: cmp.tagName,
+                  styleText: '',
+                  styleMode: modeName
+                });
+
+                const cacheKey = getComponentStylesCacheKey(cmp, modeName);
+                compilerCtx.cachedStyleMeta.delete(cacheKey);
+
+                const styleId = getStyleId(cmp, modeName, false);
+                compilerCtx.lastBuildStyles.delete(styleId);
+              }
+            });
+          }
+          compilerCtx.lastComponentStyleInput.set(cacheKey, currentInputHash);
+        }));
+      }
+    });
+    await Promise.all(promises);
+  }
+}
+
+function getComponentDecoratorStyleHash(config: d.Config, cmp: d.ComponentCompilerMeta) {
+  return config.sys.generateContentHash(getComponentStyleInputKey(cmp), 8);
 }

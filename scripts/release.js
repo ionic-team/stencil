@@ -131,10 +131,6 @@ function runTasks(opts) {
         task: () => execa('npm', ['run', 'build'], { cwd: rootDir })
       },
       {
-        title: 'Optimize for release',
-        task: () => execa('npm', ['run', 'build.prod'], { cwd: rootDir })
-      },
-      {
         title: 'Run dist tests',
         task: () => execa('npm', ['run', 'test.dist'], { cwd: rootDir })
       },
@@ -144,11 +140,11 @@ function runTasks(opts) {
       },
       {
         title: 'Run karma tests',
-        task: () => execa('npm', ['run', 'test.karma'], { cwd: rootDir })
+        task: () => execa('npm', ['run', 'test.karma.prod'], { cwd: rootDir })
       },
       {
-        title: 'Run server tests',
-        task: () => execa('npm', ['run', 'test.server'], { cwd: rootDir })
+        title: 'Run hydrate tests',
+        task: () => execa('npm', ['run', 'test.hydrate'], { cwd: rootDir })
       },
       {
         title: 'Run sys/node tests',
@@ -267,7 +263,7 @@ function prepareUI() {
       type: 'confirm',
       name: 'confirm',
       message: answers => {
-        return `Will bump from ${color.cyan(oldVersion)} to ${color.cyan(answers.version)}. Continue?`;
+        return `Optimize for release${color.cyan(oldVersion)} to ${color.cyan(answers.version)}. Continue?`;
       }
     }
   ];

@@ -15,6 +15,7 @@ export interface InMemoryFileSystem {
    * @param filePath
    */
   accessSync(filePath: string): boolean;
+  copyFile(srcFile: string, dest: string): Promise<void>;
   emptyDir(dirPath: string): Promise<void>;
   readdir(dirPath: string, opts?: d.FsReaddirOptions): Promise<d.FsReaddirItem[]>;
   readFile(filePath: string, opts?: d.FsReadOptions): Promise<string>;
@@ -45,6 +46,7 @@ export interface InMemoryFileSystem {
   commit(): Promise<{
       filesWritten: string[];
       filesDeleted: string[];
+      filesCopied: string[][];
       dirsDeleted: string[];
       dirsAdded: string[];
   }>;

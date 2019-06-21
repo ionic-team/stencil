@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
+    "jsxFactory": "h",
+    "lib": [
+      "dom",
+      "es2017",
+      "esnext.array"
+    ],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "../../dist/transpiled-client",
+    "pretty": true,
+    "target": "es2017",
+    "baseUrl": ".",
+    "paths": {
+      "@build-conditionals": [
+        "../compiler/app-core/build-conditionals.ts"
+      ],
+      "@runtime": [
+        "../runtime/index.ts"
+      ],
+      "@utils": [
+        "../utils/index.ts"
+      ]
+    }
+  },
+  "files": [
+    "./index.ts",
+    "../index.ts",
+    "./polyfills/css-shim/index.ts"
+  ]
+}

@@ -148,6 +148,8 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
 
     if (logger.level === 'debug') {
       args.push('--verbose');
+    } else {
+      args.push('--silent');
     }
 
     logger.debug(`${cmd} ${args.join(' ')}`);

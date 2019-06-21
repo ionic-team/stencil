@@ -62,6 +62,9 @@ export interface ComponentDidUnload {
 }
 
 export interface ComponentInstance {
+  connectedCallback?: () => void;
+  disconnectedCallback?: () => void;
+
   /**
    * The component is about to load and it has not
    * rendered yet.
@@ -133,10 +136,6 @@ export interface EventEmitter<T= any> {
   emit: (data?: T) => CustomEvent<T>;
 }
 
-export interface EventListenerEnable {
-  (instance: any, eventName: string, enabled: boolean, attachTo?: string|Element, passive?: boolean): void;
-}
-
 export interface QueueApi {
   tick: (cb: RafCallback) => void;
   read: (cb: RafCallback) => void;
@@ -147,4 +146,9 @@ export interface QueueApi {
 
 export interface RafCallback {
   (timeStamp: number): void;
+}
+
+export interface HTMLStencilElement extends HTMLElement {
+  componentOnReady(): Promise<this>;
+  forceUpdate(): void;
 }

@@ -18,9 +18,6 @@ describe('shadow-dom-slot-nested', () => {
 
     if ('attachShadow' in HTMLElement.prototype) {
       expect(elm.shadowRoot.nodeType).toBe(11);
-      expect(elm.shadowRoot.firstElementChild.nodeName.toLowerCase()).toBe('style')
-      expect(elm.shadowRoot.firstElementChild.textContent).toContain(':host');
-      expect(elm.shadowRoot.firstElementChild.textContent).toContain('green');
 
       const section = elm.shadowRoot.querySelector('section');
       expect(window.getComputedStyle(section).color).toBe('rgb(0, 128, 0)');
@@ -33,8 +30,6 @@ describe('shadow-dom-slot-nested', () => {
       const testShadowNested = function(i: number) {
         const nestedElm = article.children[i];
         const shadowRoot = nestedElm.shadowRoot;
-        expect(shadowRoot.firstElementChild.nodeName.toLowerCase()).toBe('style');
-        expect(shadowRoot.firstElementChild.textContent).toContain('red');
 
         const header = shadowRoot.querySelector('header');
         expect(header.textContent.trim()).toBe('shadow dom: ' + i);

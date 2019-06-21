@@ -1,25 +1,24 @@
 import * as d from '../../declarations';
-import { normalizePath } from '../util';
+import { isOutputTargetAngular } from '../output-targets/output-utils';
+import { normalizePath } from '@utils';
 
 
 export function validateOutputTargetAngular(config: d.Config) {
-  const path = config.sys.path;
+  const angularOutputTargets = config.outputTargets.filter(isOutputTargetAngular);
 
-  const distOutputTargets = config.outputTargets.filter(o => o.type === 'angular') as d.OutputTargetAngular[];
-
-  distOutputTargets.forEach(outputTarget => {
+  angularOutputTargets.forEach(outputTarget => {
     outputTarget.excludeComponents = outputTarget.excludeComponents || [];
 
-    if (!path.isAbsolute(outputTarget.directivesProxyFile)) {
-      outputTarget.directivesProxyFile = normalizePath(path.join(config.rootDir, outputTarget.directivesProxyFile));
+    if (outputTarget.directivesProxyFile && !config.sys.path.isAbsolute(outputTarget.directivesProxyFile)) {
+      outputTarget.directivesProxyFile = normalizePath(config.sys.path.join(config.rootDir, outputTarget.directivesProxyFile));
     }
 
-    if (outputTarget.directivesArrayFile && !path.isAbsolute(outputTarget.directivesArrayFile)) {
-      outputTarget.directivesArrayFile = normalizePath(path.join(config.rootDir, outputTarget.directivesArrayFile));
+    if (outputTarget.directivesArrayFile && !config.sys.path.isAbsolute(outputTarget.directivesArrayFile)) {
+      outputTarget.directivesArrayFile = normalizePath(config.sys.path.join(config.rootDir, outputTarget.directivesArrayFile));
     }
 
-    if (outputTarget.directivesUtilsFile && !path.isAbsolute(outputTarget.directivesUtilsFile)) {
-      outputTarget.directivesUtilsFile = normalizePath(path.join(config.rootDir, outputTarget.directivesUtilsFile));
+    if (outputTarget.directivesUtilsFile && !config.sys.path.isAbsolute(outputTarget.directivesUtilsFile)) {
+      outputTarget.directivesUtilsFile = normalizePath(config.sys.path.join(config.rootDir, outputTarget.directivesUtilsFile));
     }
   });
 }

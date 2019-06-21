@@ -1,7 +1,8 @@
 import * as d from '../../declarations';
-import { catchError } from '../util';
+import { catchError } from '@utils';
 import { PluginCtx, PluginTransformResults } from '../../declarations/plugin';
 import { parseCssImports } from '../style/css-imports';
+import { isOutputTargetDocs } from '../output-targets/output-utils';
 
 
 export async function runPluginResolveId(pluginCtx: PluginCtx, importee: string) {
@@ -64,7 +65,7 @@ export async function runPluginLoad(pluginCtx: PluginCtx, id: string) {
 }
 
 
-export async function runPluginTransforms(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, id: string, moduleFile?: d.ModuleFile) {
+export async function runPluginTransforms(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, id: string, cmp?: d.ComponentCompilerMeta) {
   const pluginCtx: PluginCtx = {
     config: config,
     sys: config.sys,
@@ -82,18 +83,15 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
   };
 
   const isRawCssFile = transformResults.id.toLowerCase().endsWith('.css');
+  const shouldParseCssDocs = (cmp != null && config.outputTargets.some(isOutputTargetDocs));
 
   if (isRawCssFile) {
     // concat all css @imports into one file
     // when the entry file is a .css file (not .scss)
     // do this BEFORE transformations on css files
-    const shouldParseCssDocs = (!!moduleFile && config.outputTargets.some(o => {
-      return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
-    }));
-
-    if (shouldParseCssDocs && moduleFile.cmpMeta) {
-      moduleFile.cmpMeta.styleDocs = moduleFile.cmpMeta.styleDocs || [];
-      transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code, moduleFile.cmpMeta.styleDocs);
+    if (shouldParseCssDocs && cmp != null) {
+      cmp.styleDocs = cmp.styleDocs || [];
+      transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code, cmp.styleDocs);
 
     } else {
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code);
@@ -104,7 +102,7 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
 
     if (typeof plugin.transform === 'function') {
       try {
-        let pluginTransformResults: PluginTransformResults;
+        let pluginTransformResults: PluginTransformResults | string;
         const results = plugin.transform(transformResults.code, transformResults.id, pluginCtx);
 
         if (results != null) {
@@ -144,13 +142,9 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
     // but only updated it to use url() instead. Let's go ahead and concat the url() css
     // files into one file like we did for raw .css files.
     // do this AFTER transformations on non-css files
-    const shouldParseCssDocs = (!!moduleFile && config.outputTargets.some(o => {
-      return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
-    }));
-
-    if (shouldParseCssDocs && moduleFile.cmpMeta) {
-      moduleFile.cmpMeta.styleDocs = moduleFile.cmpMeta.styleDocs || [];
-      transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code, moduleFile.cmpMeta.styleDocs);
+    if (shouldParseCssDocs && cmp != null) {
+      cmp.styleDocs = cmp.styleDocs || [];
+      transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code, cmp.styleDocs);
 
     } else {
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code);

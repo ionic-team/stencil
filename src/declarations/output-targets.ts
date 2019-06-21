@@ -1,6 +1,14 @@
 import * as d from '.';
-import { JsonDocs } from './docs';
 
+export interface OutputTargetAngular extends OutputTargetBase {
+  type: 'angular';
+
+  componentCorePackage: string;
+  directivesProxyFile?: string;
+  directivesArrayFile?: string;
+  directivesUtilsFile?: string;
+  excludeComponents?: string[];
+}
 
 export interface OutputTargetWww extends OutputTargetBase {
   /**
@@ -28,8 +36,6 @@ export interface OutputTargetWww extends OutputTargetBase {
    */
   empty?: boolean;
 
-  resourcesUrl?: string;
-
   /**
    * The default index html file of the app, commonly found at the
    * root of the `src` directory.
@@ -37,123 +43,49 @@ export interface OutputTargetWww extends OutputTargetBase {
    */
   indexHtml?: string;
 
-  serviceWorker?: d.ServiceWorkerConfig | null;
+  /**
+   * The copy config is an array of objects that defines any files or folders that should
+   * be copied over to the build directory.
+   *
+   * Each object in the array must include a src property which can be either an absolute path,
+   * a relative path or a glob pattern. The config can also provide an optional dest property
+   * which can be either an absolute path or a path relative to the build directory.
+   * Also note that any files within src/assets are automatically copied to www/assets for convenience.
+   *
+   * In the copy config below, it will copy the entire directory from src/docs-content over to www/docs-content.
+   */
+  copy?: d.CopyTask[];
 
   /**
-   * The base url of the app, which should be a relative path.
+   * The base url of the app, it's required during prerendering to be the absolute path
+   * of your app, such as: `https://my.app.com/app`.
+   *
    * Default: `/`
    */
   baseUrl?: string;
 
   /**
-   * Add a canonical link to the `<head>`. Default: `true`
+   * By default, stencil will include all the polyfills required by legacy browsers in the ES5 build.
+   * If it's `false`, stencil will not emit this polyfills anymore and it's your responsability to provide them before
+   * stencil initializes.
    */
-  canonicalLink?: boolean;
+  polyfills?: boolean;
 
   /**
-   * If extra whitespace should be removed from the prerendered
-   * HTML or not. Default: `true`
+   * Path to an external node module which has exports of the prerender config object.
+   * ```
+   * module.exports = {
+   *   afterHydrate(document, url) {
+   *     document.title = `URL: ${url.href}`;
+   *   }
+   * }
+   * ```
    */
-  collapseWhitespace?: boolean;
+  prerenderConfig?: string;
 
-  /**
-   * If components should be hydrated while prerendering.
-   * Default: `true`
-   */
-  hydrateComponents?: boolean;
-
-  /**
-   * If styles should be inlined during prerendering.
-   * Default: `true`
-   */
-  inlineStyles?: boolean;
-
-  /**
-   * If the loader script should be inlined into the prerendered
-   * page or not. Inlining the loader script allows the first render
-   * to have one less request, but adds a small amount more to the file size.
-   * Default: `true`
-   */
-  inlineLoaderScript?: boolean;
-
-
-  inlineAssetsMaxSize?: number;
-
-  /**
-   * If prerendering should continue to crawl local links and prerender.
-   * Default: `true`
-   */
-  prerenderUrlCrawl?: boolean;
-
-  /**
-   * The starting points for prerendering. This should be relative
-   * paths. Default config is to starting at the index page: `/`.
-   * Default: `[{ path: '/' }]`
-   */
-  prerenderLocations?: { path: string; }[];
-
-  /**
-   * This filter is called for every url found while crawling. Returning
-   * `true` allows the URL to be crawled, and returning `false` will skip
-   * the URL for prerendering. Default: `undefined`
-   */
-  prerenderFilter?: (url: d.Url) => boolean;
-
-  /**
-   * Format the HTML all pretty-like. Great for debugging, bad for build performance.
-   */
-  prettyHtml?: boolean;
-
-  /**
-   * Maximum number of pages to be prerendering at one time. The optimal number
-   * varies between machines and any feedback regarding the number that best
-   * works for your setup would help. Default: `12`
-   */
-  prerenderMaxConcurrent?: number;
-
-  /**
-   * Keep hashes in the URL while prerendering. Default: `false`
-   */
-  prerenderPathHash?: boolean;
-
-  /**
-   * Keep querystrings in the URL while prerendering. Default: `false`
-   */
-  prerenderPathQuery?: boolean;
-
-  /**
-   * Network requests to abort while prerendering. Default is to ignore
-   * some common analytic and advertisement urls such `google-analytics.com`
-   * and `doubleclick`.
-   */
-  prerenderAbortRequests?: {
-    domain?: string;
-  }[];
-
-  /**
-   * Remove `<!--html comments-->` from prerendered output. Default: `true`
-   */
-  removeHtmlComments?: boolean;
-
-  /**
-   * Analyze each page after prerendering and removes any CSS not used.
-   * Default: `true`
-   */
-  removeUnusedStyles?: boolean;
-}
-
-export interface OutputTargetHydrate extends OutputTargetWww, d.HydrateOptions {
-  html?: string;
-  url?: string;
-  path?: string;
-  referrer?: string;
-  userAgent?: string;
-  cookie?: string;
-  direction?: string;
-  language?: string;
-  isPrerender?: boolean;
-  serializeHtml?: boolean;
-  destroyDom?: boolean;
+  serviceWorker?: d.ServiceWorkerConfig | null;
+  resourcesUrl?: string;
+  appDir?: string;
 }
 
 
@@ -162,18 +94,111 @@ export interface OutputTargetDist extends OutputTargetBase {
 
   buildDir?: string;
   dir?: string;
-  empty?: boolean;
   resourcesUrl?: string;
 
-  collectionDir?: string;
+  collectionDir?: string | null;
   typesDir?: string;
   esmLoaderPath?: string;
+  copy?: d.CopyTask[];
+
+  empty?: boolean;
+}
+
+export interface OutputTargetDistCollection extends OutputTargetBase {
+  type: 'dist-collection';
+
+  dir: string;
+  collectionDir: string;
+  copy: d.CopyTask[];
+}
+
+export interface OutputTargetDistTypes extends OutputTargetBase {
+  type: 'dist-types';
+
+  dir: string;
+  typesDir: string;
+}
+
+export interface OutputTargetDistLazy extends OutputTargetBase {
+  type: 'dist-lazy';
+
+  copyDir?: string;
+  esmDir?: string;
+  esmEs5Dir?: string;
+  systemDir?: string;
+  cjsDir?: string;
+  resourcesUrl?: string;
+  polyfills?: boolean;
+  copy?: d.CopyTask[];
+  isBrowserBuild?: boolean;
+
+  esmIndexFile?: string;
+  cjsIndexFile?: string;
+  systemLoaderFile?: string;
+  legacyLoaderFile?: string;
+}
+
+export interface OutputTargetDistGlobalStyles extends OutputTargetBase {
+  type: 'dist-global-styles';
+  file: string;
+}
+
+export interface OutputTargetDistLazyLoader extends OutputTargetBase {
+  type: 'dist-lazy-loader';
+  dir: string;
+
+  esmDir: string;
+  esmEs5Dir: string;
+  cjsDir: string;
+  componentDts: string;
+
+  empty: boolean;
+}
+
+export interface OutputTargetDistModule extends OutputTargetBase {
+  type: 'experimental-dist-module';
+
+  dir?: string;
+  externalRuntime?: boolean;
+  empty?: boolean;
+}
+
+
+export interface OutputTargetDistSelfContained extends OutputTargetBase {
+  type: 'dist-self-contained';
+
+  dir?: string;
+  buildDir?: string;
+  resourcesUrl?: string;
+
+  empty?: boolean;
+}
+
+
+export interface OutputTargetHydrate extends OutputTargetBase {
+  type: 'dist-hydrate-script';
+  dir?: string;
+
+  empty?: boolean;
+}
+
+export interface OutputTargetCustom extends OutputTargetBase {
+  type: 'custom';
+  name: string;
+  validate?: (config: d.Config, diagnostics: d.Diagnostic[]) => void;
+  generator: (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, docs: d.JsonDocs) => Promise<void>;
+}
+
+export interface OutputTargetDocsVscode extends OutputTargetBase {
+  type: 'docs-vscode';
+  file?: string;
 }
 
 export interface OutputTargetDocsReadme extends OutputTargetBase {
-  type: 'docs';
+  type: 'docs-readme' | 'docs';
 
   dir?: string;
+  footer?: string;
   strict?: boolean;
 }
 
@@ -189,7 +214,7 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
 export interface OutputTargetDocsCustom extends OutputTargetBase {
   type: 'docs-custom';
 
-  generator: (docs: JsonDocs) => void | Promise<void>;
+  generator: (docs: d.JsonDocs) => void | Promise<void>;
   strict?: boolean;
 }
 
@@ -200,36 +225,30 @@ export interface OutputTargetStats extends OutputTargetBase {
   file?: string;
 }
 
-
-export interface OutputTargetAngular extends OutputTargetBase {
-  type: 'angular';
-
-  componentCorePackage?: string;
-  directivesProxyFile?: string;
-  directivesArrayFile?: string;
-  directivesUtilsFile?: string;
-  excludeComponents?: string[];
-}
-
-
 export interface OutputTargetBase {
   type: string;
-  appBuild?: boolean;
 }
 
-
 export type OutputTargetBuild =
- | OutputTargetDist
- | OutputTargetHydrate
- | OutputTargetWww;
+ | OutputTargetDistCollection
+ | OutputTargetDistLazy;
 
 
 export type OutputTarget =
  | OutputTargetAngular
- | OutputTargetStats
+ | OutputTargetCustom
+ | OutputTargetDist
+ | OutputTargetDistCollection
+ | OutputTargetDistLazy
+ | OutputTargetDistGlobalStyles
+ | OutputTargetDistLazyLoader
+ | OutputTargetDistModule
+ | OutputTargetDistSelfContained
  | OutputTargetDocsJson
  | OutputTargetDocsCustom
  | OutputTargetDocsReadme
+ | OutputTargetDocsVscode
+ | OutputTargetWww
  | OutputTargetHydrate
- | OutputTargetDist
- | OutputTargetWww;
+ | OutputTargetStats
+ | OutputTargetDistTypes;

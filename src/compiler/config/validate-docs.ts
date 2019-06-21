@@ -1,10 +1,9 @@
 import * as d from '../../declarations';
-import { pathJoin } from '../util';
-import { _deprecatedDocsConfig } from './_deprecated-validate-docs';
+import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme } from '../output-targets/output-utils';
+import { NOTE } from '../docs/constants';
+import { buildError } from '@utils';
 
-
-export function validateDocs(config: d.Config) {
-  _deprecatedDocsConfig(config);
+export function validateDocs(config: d.Config, diagnostics: d.Diagnostic[]) {
   config.outputTargets = config.outputTargets || [];
 
   let buildDocs = !config.devMode;
@@ -17,59 +16,75 @@ export function validateDocs(config: d.Config) {
       file: config.flags.docsJson
     });
   }
-  const jsonDocsOutputs = config.outputTargets.filter(o => o.type === 'docs-json') as d.OutputTargetDocsJson[];
+  const jsonDocsOutputs = config.outputTargets.filter(isOutputTargetDocsJson);
   jsonDocsOutputs.forEach(jsonDocsOutput => {
-    validateJsonDocsOutputTarget(config, jsonDocsOutput);
+    validateJsonDocsOutputTarget(config, diagnostics, jsonDocsOutput);
   });
 
   // readme docs flag
   if (config.flags.docs) {
     buildDocs = true;
-    if (!config.outputTargets.some(o => o.type === 'docs')) {
+    if (!config.outputTargets.some(isOutputTargetDocsReadme)) {
       // didn't provide a docs config, so let's add one
-      config.outputTargets.push({ type: 'docs' });
+      config.outputTargets.push({ type: 'docs-readme' });
     }
   }
-  const readmeDocsOutputs = config.outputTargets.filter(o => o.type === 'docs') as d.OutputTargetDocsReadme[];
+  const readmeDocsOutputs = config.outputTargets.filter(isOutputTargetDocsReadme);
   readmeDocsOutputs.forEach(readmeDocsOutput => {
-    validateReadmeOutputTarget(config, readmeDocsOutput);
+    validateReadmeOutputTarget(config, diagnostics, readmeDocsOutput);
   });
 
   // custom docs
-  const customDocsOutputs = config.outputTargets.filter(o => o.type === 'docs-custom') as d.OutputTargetDocsCustom[];
+  const customDocsOutputs = config.outputTargets.filter(isOutputTargetDocsCustom);
   customDocsOutputs.forEach(jsonDocsOutput => {
-    validateCustomDocsOutputTarget(jsonDocsOutput);
+    validateCustomDocsOutputTarget(diagnostics, jsonDocsOutput);
   });
 
   config.buildDocs = buildDocs;
 }
 
 
-function validateReadmeOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsReadme) {
+function validateReadmeOutputTarget(config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsReadme) {
+  if (outputTarget.type === 'docs') {
+    diagnostics.push({
+      type: 'config',
+      level: 'warn',
+      header: 'Deprecated "docs"',
+      messageText: `The output target { type: "docs" } has been deprecated, please use "docs-readme" instead.`,
+      absFilePath: config.configPath
+    });
+    outputTarget.type = 'docs-readme';
+  }
   if (typeof outputTarget.dir !== 'string') {
     outputTarget.dir = config.srcDir;
   }
 
   if (!config.sys.path.isAbsolute(outputTarget.dir)) {
-    outputTarget.dir = pathJoin(config, config.rootDir, outputTarget.dir);
+    outputTarget.dir = config.sys.path.join(config.rootDir, outputTarget.dir);
+  }
+
+  if (outputTarget.footer == null) {
+    outputTarget.footer = NOTE;
   }
   outputTarget.strict = !!outputTarget.strict;
 }
 
 
-function validateJsonDocsOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocsJson) {
+function validateJsonDocsOutputTarget(config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsJson) {
   if (typeof outputTarget.file !== 'string') {
-    throw new Error(`docs-json outputTarget missing the "file" option`);
+    const err = buildError(diagnostics);
+    err.messageText = `docs-json outputTarget missing the "file" option`;
   }
 
-  outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
+  outputTarget.file = config.sys.path.join(config.rootDir, outputTarget.file);
   outputTarget.strict = !!outputTarget.strict;
 }
 
 
-function validateCustomDocsOutputTarget(outputTarget: d.OutputTargetDocsCustom) {
+function validateCustomDocsOutputTarget(diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsCustom) {
   if (typeof outputTarget.generator !== 'function') {
-    throw new Error(`docs-custom outputTarget missing the "generator" function`);
+    const err = buildError(diagnostics);
+    err.messageText = `docs-custom outputTarget missing the "generator" function`;
   }
 
   outputTarget.strict = !!outputTarget.strict;

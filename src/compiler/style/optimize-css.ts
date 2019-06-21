@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
-import { hasError, normalizePath } from '../util';
+import { COMPILER_BUILD } from '../build/compiler-build-id';
+import { hasError, normalizePath } from '@utils';
 
 
 export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], styleText: string, filePath: string, legacyBuild: boolean) {
@@ -25,7 +26,7 @@ export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, 
     legecyBuild: legacyBuild
   };
 
-  const cacheKey = compilerCtx.cache.createKey('optimizeCss', '__BUILDID:OPTIMIZECSS__', opts);
+  const cacheKey = await compilerCtx.cache.createKey('optimizeCss', COMPILER_BUILD.optimizeCss, opts);
   const cachedContent = await compilerCtx.cache.get(cacheKey);
   if (cachedContent != null) {
     // let's use the cached data we already figured out

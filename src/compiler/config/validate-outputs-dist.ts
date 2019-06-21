@@ -1,15 +1,20 @@
 import * as d from '../../declarations';
-import { normalizePath } from '../util';
+import { DIST_COLLECTION, DIST_GLOBAL_STYLES, DIST_LAZY, DIST_LAZY_LOADER, getComponentsDtsTypesFilePath, isOutputTargetDist, DIST_TYPES } from '../output-targets/output-utils';
+import { normalizePath } from '@utils';
+import { validateResourcesUrl } from './validate-resources-url';
+import { validateCopy } from './validate-copy';
 
 
 export function validateOutputTargetDist(config: d.Config) {
   const path = config.sys.path;
 
-  const distOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.type === 'dist');
+  const distOutputTargets = config.outputTargets.filter(isOutputTargetDist);
 
   distOutputTargets.forEach(outputTarget => {
 
-    if (!outputTarget.dir) {
+    outputTarget.resourcesUrl = validateResourcesUrl(outputTarget.resourcesUrl);
+
+    if (typeof outputTarget.dir !== 'string') {
       outputTarget.dir = DEFAULT_DIR;
     }
 
@@ -17,7 +22,7 @@ export function validateOutputTargetDist(config: d.Config) {
       outputTarget.dir = normalizePath(path.join(config.rootDir, outputTarget.dir));
     }
 
-    if (!outputTarget.buildDir) {
+    if (typeof outputTarget.buildDir !== 'string') {
       outputTarget.buildDir = DEFAULT_BUILD_DIR;
     }
 
@@ -25,16 +30,20 @@ export function validateOutputTargetDist(config: d.Config) {
       outputTarget.buildDir = normalizePath(path.join(outputTarget.dir, outputTarget.buildDir));
     }
 
-    if (!outputTarget.collectionDir) {
+    if (outputTarget.collectionDir === undefined) {
       outputTarget.collectionDir = DEFAULT_COLLECTION_DIR;
     }
 
-    if (!path.isAbsolute(outputTarget.collectionDir)) {
+    if (outputTarget.collectionDir && !path.isAbsolute(outputTarget.collectionDir)) {
       outputTarget.collectionDir = normalizePath(path.join(outputTarget.dir, outputTarget.collectionDir));
     }
 
     if (!outputTarget.esmLoaderPath) {
       outputTarget.esmLoaderPath = DEFAULT_ESM_LOADER_DIR;
+    }
+
+    if (!path.isAbsolute(outputTarget.esmLoaderPath)) {
+      outputTarget.esmLoaderPath = normalizePath(path.resolve(outputTarget.dir, outputTarget.esmLoaderPath));
     }
 
     if (!outputTarget.typesDir) {
@@ -46,11 +55,79 @@ export function validateOutputTargetDist(config: d.Config) {
     }
 
     if (typeof outputTarget.empty !== 'boolean') {
-      outputTarget.empty = DEFAULT_EMPTY_DIR;
+      outputTarget.empty = true;
     }
 
-    if (typeof outputTarget.appBuild !== 'boolean') {
-      outputTarget.appBuild = true;
+    outputTarget.copy = validateCopy(outputTarget.copy, config.copy);
+
+    if (outputTarget.collectionDir) {
+      config.outputTargets.push({
+        type: DIST_COLLECTION,
+        dir: outputTarget.dir,
+        collectionDir: outputTarget.collectionDir,
+        copy: [
+          ...outputTarget.copy,
+          { src: '**/*.svg' },
+          { src: '**/*.js' }
+        ]
+      });
+    }
+
+    config.outputTargets.push({
+      type: DIST_TYPES,
+      dir: outputTarget.dir,
+      typesDir: outputTarget.typesDir
+    });
+
+    const namespace = config.fsNamespace || 'app';
+    const lazyDir = path.join(outputTarget.buildDir, namespace);
+
+    // Lazy build for CDN in dist
+    config.outputTargets.push({
+      type: DIST_LAZY,
+      copyDir: lazyDir,
+      esmDir: lazyDir,
+      systemDir: config.buildEs5 ? lazyDir : undefined,
+      systemLoaderFile: config.buildEs5 ? path.join(lazyDir, namespace + '.js') : undefined,
+      legacyLoaderFile: path.join(outputTarget.buildDir, namespace + '.js'),
+      polyfills: true,
+      isBrowserBuild: true,
+    });
+
+    // Emit global styles
+    config.outputTargets.push({
+      type: DIST_GLOBAL_STYLES,
+      file: config.sys.path.join(lazyDir, `${config.fsNamespace}.css`),
+    });
+
+    if (config.buildDist) {
+      const esmDir = path.join(outputTarget.dir, 'esm');
+      const esmEs5Dir = config.buildEs5 ? path.join(outputTarget.dir, 'esm', 'legacy') : undefined;
+      const cjsDir = path.join(outputTarget.dir, 'cjs');
+
+      // Create lazy output-target
+      config.outputTargets.push({
+        type: DIST_LAZY,
+        esmDir,
+        esmEs5Dir,
+        cjsDir,
+
+        cjsIndexFile: path.join(outputTarget.dir, 'index.js'),
+        esmIndexFile: path.join(outputTarget.dir, 'index.mjs'),
+        polyfills: true,
+      });
+
+      // Create output target that will generate the /loader entry-point
+      config.outputTargets.push({
+        type: DIST_LAZY_LOADER,
+        dir: outputTarget.esmLoaderPath,
+
+        esmDir,
+        esmEs5Dir,
+        cjsDir,
+        componentDts: getComponentsDtsTypesFilePath(config, outputTarget),
+        empty: outputTarget.empty
+      });
     }
   });
 }
@@ -58,7 +135,6 @@ export function validateOutputTargetDist(config: d.Config) {
 
 const DEFAULT_DIR = 'dist';
 const DEFAULT_BUILD_DIR = '';
-const DEFAULT_EMPTY_DIR = true;
 const DEFAULT_COLLECTION_DIR = 'collection';
 const DEFAULT_TYPES_DIR = 'types';
 const DEFAULT_ESM_LOADER_DIR = 'loader';

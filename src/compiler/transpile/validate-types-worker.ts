@@ -1,34 +1,31 @@
 import * as d from '../../declarations';
-import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
-import { removeCollectionImports } from './transformers/remove-collection-imports';
-import { removeDecorators } from './transformers/remove-decorators';
-import { removeStencilImports } from './transformers/remove-stencil-imports';
-import { updateStencilTypesImports } from '../distribution/stencil-types';
-
-import * as path from 'path';
+import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import { removeCollectionImports } from '../transformers/remove-collection-imports';
+import { removeStencilDecorators, removeStencilImports } from '../transformers/validate-types-transform';
+import { updateStencilTypesImports } from '../types/stencil-types';
+import path from 'path';
 import ts from 'typescript';
-import { normalizePath } from '../util';
 
 
-export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: boolean, compilerOptions: ts.CompilerOptions, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: boolean, compilerOptions: ts.CompilerOptions, _currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
   const results: d.ValidateTypesResults = {
     diagnostics: [],
     dirPaths: [],
     filePaths: []
   };
 
-  const config: d.Config = {
-    cwd: currentWorkingDir,
-    sys: {
-      path: path
-    } as any
-  };
-
   if (!workerCtx.tsHost) {
     compilerOptions.outDir = undefined;
 
     const tsHost = ts.createCompilerHost(compilerOptions);
-
+    const originalReadFile = tsHost.readFile;
+    tsHost.readFile = (filename: string) => {
+      const content = originalReadFile(filename);
+      if (filename.endsWith('components.d.ts')) {
+        return content.replace('interface ElementTagNameMap ', 'interface _LegacyElementTagNameMap ');
+      }
+      return content;
+    };
     tsHost.writeFile = (outputFileName: string, data: string, writeByteOrderMark: boolean) => {
       if (!emitDtsFiles) {
         return;
@@ -49,7 +46,7 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
       }
 
       if (typeof compilerOptions.declarationDir === 'string') {
-        data = updateStencilTypesImports(config, compilerOptions.declarationDir, outputFileName, data);
+        data = updateStencilTypesImports(path, compilerOptions.declarationDir, outputFileName, data);
       }
 
       ts.sys.writeFile(outputFileName, data, writeByteOrderMark);
@@ -65,11 +62,11 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
     collections: collectionNames.map(n => {
       return { collectionName: n };
     })
-  };
+  } as any;
 
   program.emit(undefined, undefined, undefined, true, {
     before: [
-      removeDecorators()
+      removeStencilDecorators()
     ],
     after: [
       removeStencilImports(),
@@ -82,7 +79,7 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
   program.getSemanticDiagnostics().forEach(d => tsDiagnostics.push(d));
   program.getOptionsDiagnostics().forEach(d => tsDiagnostics.push(d));
 
-  loadTypeScriptDiagnostics(config, results.diagnostics, tsDiagnostics);
+  loadTypeScriptDiagnostics(results.diagnostics, tsDiagnostics);
 
   return results;
 }

@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { EventEmitter } from 'events';
-import { TASK_CANCELED_MSG } from '../../../compiler/util';
+import { TASK_CANCELED_MSG } from '@utils';
 import { WorkerMain } from './worker-main';
 
 
@@ -24,9 +24,12 @@ export class WorkerManager extends EventEmitter {
     }
   }
 
-  onError(error: NodeJS.ErrnoException, workerId: number) {
-    if (error.code === 'ERR_IPC_CHANNEL_CLOSED') {
+  onError(err: NodeJS.ErrnoException, workerId: number) {
+    if (err.code === 'ERR_IPC_CHANNEL_CLOSED') {
       return this.stopWorker(workerId);
+    }
+    if (this.options.logger && err.code !== 'EPIPE') {
+      this.options.logger.error(err);
     }
   }
 

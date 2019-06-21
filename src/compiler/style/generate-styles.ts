@@ -1,48 +1,29 @@
 import * as d from '../../declarations';
-import { generateComponentStylesMode } from './component-styles';
+import { generateComponentStyles } from './component-styles';
 import { generateGlobalStyles } from './global-styles';
+import { updateLastStyleComponetInputs } from './cached-styles';
 
 
-export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
+export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (canSkipGenerateStyles(buildCtx)) {
     return;
   }
 
   const timeSpan = buildCtx.createTimeSpan(`generate styles started`);
 
-  const componentStyles = await Promise.all(entryModules.map(async bundle => {
-    await Promise.all(bundle.moduleFiles.map(async moduleFile => {
-      await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile);
-    }));
-  }));
-
-  // create the global styles
-  const globalStyles = await Promise.all(config.outputTargets
-    .filter(outputTarget => outputTarget.type !== 'stats')
-    .map(async (outputTarget: d.OutputTargetBuild) => {
-      await generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget);
-    }));
-
   await Promise.all([
-    componentStyles,
-    globalStyles
+    generateGlobalStyles(config, compilerCtx, buildCtx),
+    generateComponentStyles(config, compilerCtx, buildCtx),
   ]);
+
+  await updateLastStyleComponetInputs(config, compilerCtx, buildCtx);
 
   timeSpan.finish(`generate styles finished`);
 }
 
 
-export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile) {
-  const stylesMeta = moduleFile.cmpMeta.stylesMeta = moduleFile.cmpMeta.stylesMeta || {};
-
-  await Promise.all(Object.keys(stylesMeta).map(async modeName => {
-    await generateComponentStylesMode(config, compilerCtx, buildCtx, moduleFile, stylesMeta[modeName], modeName);
-  }));
-}
-
-
 function canSkipGenerateStyles(buildCtx: d.BuildCtx) {
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
+  if (buildCtx.components.length === 0) {
     return true;
   }
 
@@ -51,10 +32,22 @@ function canSkipGenerateStyles(buildCtx: d.BuildCtx) {
   }
 
   if (buildCtx.isRebuild) {
-    if (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges) {
+    if (buildCtx.hasStyleChanges) {
+      // this is a rebuild and there are style changes
       return false;
     }
 
+    if (buildCtx.hasScriptChanges) {
+      // this is a rebuild and there are script changes
+      // changes to scripts are important too because it could be
+      // a change to the style url or style text in the component decorator
+      return false;
+    }
+
+    // cool! There were no changes to any style files
+    // and there were no changes to any scripts that
+    // contain components with styles! SKIP
+    // ♪┏(・o･)┛♪┗ ( ･o･) ┓♪
     return true;
   }
 

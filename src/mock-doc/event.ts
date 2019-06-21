@@ -1,5 +1,6 @@
 import { MockDocument } from './document';
 import { MockElement } from './node';
+import { NODE_NAMES } from './constants';
 
 
 export class MockEvent {
@@ -14,7 +15,7 @@ export class MockEvent {
   timeStamp: number;
   type: string;
 
-  constructor(type: string, eventInitDict?: any) {
+  constructor(type: string, eventInitDict?: EventInit) {
     if (typeof type !== 'string') {
       throw new Error(`Event type required`);
     }
@@ -44,11 +45,31 @@ export class MockEvent {
 export class MockCustomEvent extends MockEvent {
   detail: any = null;
 
-  constructor(type: string, eventInitDict?: any) {
+  constructor(type: string, customEventInitDic?: CustomEventInit) {
     super(type);
 
-    if (eventInitDict != null) {
-      Object.assign(this, eventInitDict);
+    if (customEventInitDic != null) {
+      Object.assign(this, customEventInitDic);
+    }
+  }
+
+}
+
+export class MockKeyboardEvent extends MockEvent {
+  code = '';
+  key = '';
+  altKey = false;
+  ctrlKey = false;
+  metaKey = false;
+  shiftKey = false;
+  location = 0;
+  repeat = false;
+
+  constructor(type: string, keyboardEventInitDic?: KeyboardEventInit) {
+    super(type);
+
+    if (keyboardEventInitDic != null) {
+      Object.assign(this, keyboardEventInitDic);
     }
   }
 
@@ -60,7 +81,7 @@ export class MockEventListener {
   handler: (ev?: any) => void;
 
   constructor(type: string, handler: any) {
-    this.type = type.toLowerCase();
+    this.type = type;
     this.handler = handler;
   }
 }
@@ -69,48 +90,58 @@ export class MockEventListener {
 export function addEventListener(elm: any, type: string, handler: any) {
   const target: EventTarget = elm;
 
-  if (!target._listeners) {
-    target._listeners = [];
+  if (target.__listeners == null) {
+    target.__listeners = [];
   }
 
-  target._listeners.push(new MockEventListener(type, handler));
+  target.__listeners.push(new MockEventListener(type, handler));
 }
 
 
 export function removeEventListener(elm: any, type: string, handler: any) {
   const target: EventTarget = elm;
-  type = type.toLowerCase();
 
-  if (target._listeners) {
-    const elmListener = target._listeners.find(e => e.type === type && e.handler === handler);
-    if (elmListener) {
-      const index = target._listeners.indexOf(elmListener);
-      target._listeners.splice(index, 1);
+  if (target != null && Array.isArray(target.__listeners) === true) {
+    const elmListener = target.__listeners.find(e => e.type === type && e.handler === handler);
+    if (elmListener != null) {
+      const index = target.__listeners.indexOf(elmListener);
+      target.__listeners.splice(index, 1);
     }
   }
 }
 
 
+export function resetEventListeners(target: any) {
+  if (target != null && (target as EventTarget).__listeners != null) {
+    (target as EventTarget).__listeners = null;
+  }
+}
+
+
 function triggerEventListener(elm: any, ev: MockEvent) {
-  if (!elm || ev.cancelBubble) {
+  if (elm == null || ev.cancelBubble === true) {
     return;
   }
 
   const target: EventTarget = elm;
   ev.currentTarget = elm;
 
-  if (target._listeners) {
-    const listeners = target._listeners.filter(e => e.type === ev.type);
+  if (Array.isArray(target.__listeners) === true) {
+    const listeners = target.__listeners.filter(e => e.type === ev.type);
     listeners.forEach(listener => {
-      listener.handler(ev);
+      try {
+        listener.handler.call(target, ev);
+      } catch (err) {
+        console.error(err);
+      }
     });
   }
 
-  if (!ev.bubbles) {
+  if (ev.bubbles === false) {
     return;
   }
 
-  if (elm.nodeName === '#document') {
+  if (elm.nodeName === NODE_NAMES.DOCUMENT_NODE) {
     triggerEventListener((elm as MockDocument).defaultView, ev);
   } else {
     triggerEventListener(elm.parentElement, ev);
@@ -119,16 +150,11 @@ function triggerEventListener(elm: any, ev: MockEvent) {
 
 export function dispatchEvent(currentTarget: any, ev: MockEvent) {
   ev.target = currentTarget;
-  ev.currentTarget = currentTarget;
-  ev.bubbles = true;
-  ev.cancelable = true;
-  ev.composed = true;
-  ev.defaultPrevented = false;
   triggerEventListener(currentTarget, ev);
   return true;
 }
 
 
 export interface EventTarget {
-  _listeners: MockEventListener[];
+  __listeners: MockEventListener[];
 }

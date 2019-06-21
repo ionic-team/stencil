@@ -1,51 +1,61 @@
 import * as d from '../../declarations';
-import { buildError, catchError, hasFileExtension, normalizePath } from '../util';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
+import { buildError, catchError, hasFileExtension, normalizePath } from '@utils';
+import { DEFAULT_STYLE_MODE } from '@utils';
 import { getComponentStylesCache, setComponentStylesCache } from './cached-styles';
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
+import { isOutputTargetHydrate } from '../output-targets/output-utils';
 
 
-export async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, styleMeta: d.StyleMeta, modeName: string) {
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
-    return;
-  }
+export function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  const commentOriginalSelector = config.outputTargets.some(isOutputTargetHydrate);
 
+  return Promise.all(
+    buildCtx.components.map(cmp => {
+      return Promise.all(cmp.styles.map(style => {
+        return generateComponentStylesMode(config, compilerCtx, buildCtx, cmp, style, style.modeName, commentOriginalSelector);
+      }));
+  }));
+}
+
+async function generateComponentStylesMode(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, modeName: string, commentOriginalSelector: boolean) {
   if (buildCtx.isRebuild) {
-    const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, moduleFile, styleMeta, modeName);
+    const cachedCompiledStyles = await getComponentStylesCache(config, compilerCtx, buildCtx, cmp, styleMeta, commentOriginalSelector);
     if (cachedCompiledStyles) {
       styleMeta.compiledStyleText = cachedCompiledStyles.compiledStyleText;
       styleMeta.compiledStyleTextScoped = cachedCompiledStyles.compiledStyleTextScoped;
+      styleMeta.compiledStyleTextScopedCommented = cachedCompiledStyles.compiledStyleTextScopedCommented;
       return;
     }
   }
 
   // compile each mode style
-  const compiledStyles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, styleMeta);
+  const compiledStyles = await compileStyles(config, compilerCtx, buildCtx, cmp, styleMeta);
 
   // format and set the styles for use later
-  const compiledStyleMeta = await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, modeName, styleMeta.externalStyles, compiledStyles);
+  const compiledStyleMeta = await setStyleText(config, compilerCtx, buildCtx, cmp, modeName, styleMeta.externalStyles, compiledStyles, commentOriginalSelector);
 
-  styleMeta.compiledStyleText = compiledStyleMeta.compiledStyleText;
-  styleMeta.compiledStyleTextScoped = compiledStyleMeta.compiledStyleTextScoped;
+  styleMeta.compiledStyleText = compiledStyleMeta.styleText;
+  styleMeta.compiledStyleTextScoped = compiledStyleMeta.styleTextScoped;
+  styleMeta.compiledStyleTextScopedCommented = compiledStyleMeta.styleTextScopedCommented;
 
   if (config.watch) {
     // since this is a watch and we'll be checking this again
     // let's cache what we've learned today
-    setComponentStylesCache(compilerCtx, moduleFile, modeName, styleMeta);
+    setComponentStylesCache(compilerCtx, cmp, styleMeta);
   }
 }
 
 
-async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, styleMeta: d.StyleMeta) {
+async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler) {
   // get all the absolute paths for each style
   const extStylePaths = styleMeta.externalStyles.map(extStyle => extStyle.absolutePath);
 
   if (typeof styleMeta.styleStr === 'string') {
     // plain styles just in a string
     // let's put these file in an in-memory file
-    const inlineAbsPath = moduleFile.jsFilePath + '.css';
+    const inlineAbsPath = cmp.jsFilePath + '.css';
     extStylePaths.push(inlineAbsPath);
 
     await compilerCtx.fs.writeFile(inlineAbsPath, styleMeta.styleStr, { inMemoryOnly: true });
@@ -53,24 +63,21 @@ async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, build
 
   // build an array of style strings
   const compiledStyles = await Promise.all(extStylePaths.map(extStylePath => {
-    return compileExternalStyle(config, compilerCtx, buildCtx, moduleFile, extStylePath);
+    return compileExternalStyle(config, compilerCtx, buildCtx, cmp, extStylePath);
   }));
 
   return compiledStyles;
 }
 
 
-async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, extStylePath: string) {
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
-    return '/* build aborted */';
-  }
+async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, extStylePath: string) {
 
   extStylePath = normalizePath(extStylePath);
 
   // see if we can used a cached style first
   let styleText: string;
 
-  if (moduleFile.isCollectionDependency) {
+  if (cmp.isCollectionDependency) {
     // if it's a collection dependency and it's a preprocessor file like sass
     // AND we have the correct plugin then let's compile it
     const hasPlugin = hasPluginInstalled(config, extStylePath);
@@ -90,9 +97,9 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
   }
 
   try {
-    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath, moduleFile);
+    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath, cmp);
 
-    if (!moduleFile.isCollectionDependency) {
+    if (!cmp.isCollectionDependency) {
       const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
 
       const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
@@ -111,7 +118,7 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
     if (e.code === 'ENOENT') {
       const d = buildError(buildCtx.diagnostics);
       const relExtStyle = config.sys.path.relative(config.cwd, extStylePath);
-      const relSrc = config.sys.path.relative(config.cwd, moduleFile.sourceFilePath);
+      const relSrc = config.sys.path.relative(config.cwd, cmp.sourceFilePath);
       d.messageText = `Unable to load style ${relExtStyle} from ${relSrc}`;
     } else {
       catchError(buildCtx.diagnostics, e);
@@ -173,11 +180,13 @@ function hasPluginInstalled(config: d.Config, filePath: string) {
 }
 
 
-async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, modeName: string, externalStyles: d.ExternalStyleMeta[], compiledStyles: string[]) {
-  const styleMeta: d.StyleMeta = {};
-
+async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, modeName: string, externalStyles: d.ExternalStyleCompiler[], compiledStyles: string[], commentOriginalSelector: boolean) {
   // join all the component's styles for this mode together into one line
-  styleMeta.compiledStyleText = compiledStyles.join('\n\n').trim();
+  const compiledStyle = {
+    styleText: compiledStyles.join('\n\n').trim(),
+    styleTextScoped: null as string,
+    styleTextScopedCommented: null as string
+  };
 
   let filePath: string = null;
   const externalStyle = externalStyles && externalStyles.length && externalStyles[0];
@@ -186,42 +195,39 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   }
 
   // auto add css prefixes and minifies when configured
-  styleMeta.compiledStyleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText, filePath, true);
-
-  if (requiresScopedStyles(cmpMeta.encapsulationMeta, config)) {
+  compiledStyle.styleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, compiledStyle.styleText, filePath, true);
+  if (requiresScopedStyles(cmp.encapsulation, commentOriginalSelector)) {
     // only create scoped styles if we need to
-    const compiledStyleTextScoped = await scopeComponentCss(config, buildCtx, cmpMeta, modeName, styleMeta.compiledStyleText);
-    styleMeta.compiledStyleTextScoped = compiledStyleTextScoped;
-    if (cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss) {
-      styleMeta.compiledStyleText = compiledStyleTextScoped;
+    compiledStyle.styleTextScoped = await scopeComponentCss(config, buildCtx, cmp, modeName, compiledStyle.styleText, false);
+    if (cmp.encapsulation === 'scoped') {
+      compiledStyle.styleText = compiledStyle.styleTextScoped;
+    }
+
+    if (commentOriginalSelector && cmp.encapsulation === 'shadow') {
+      compiledStyle.styleTextScopedCommented = await scopeComponentCss(config, buildCtx, cmp, modeName, compiledStyle.styleText, true);
     }
   }
 
   // by default the compiledTextScoped === compiledStyleText
-  if (!styleMeta.compiledStyleTextScoped) {
-    styleMeta.compiledStyleTextScoped = styleMeta.compiledStyleText;
+  if (!compiledStyle.styleTextScoped) {
+    compiledStyle.styleTextScoped = compiledStyle.styleText;
   }
 
   let addStylesUpdate = false;
-  let addScopedStylesUpdate = false;
 
   // test to see if the last styles are different
-  const styleId = getStyleId(cmpMeta, modeName, false);
-  if (compilerCtx.lastBuildStyles.get(styleId) !== styleMeta.compiledStyleText) {
-    compilerCtx.lastBuildStyles.set(styleId, styleMeta.compiledStyleText);
+  const styleId = getStyleId(cmp, modeName, false);
+  if (compilerCtx.lastBuildStyles.get(styleId) !== compiledStyle.styleText) {
+    compilerCtx.lastBuildStyles.set(styleId, compiledStyle.styleText);
 
     if (buildCtx.isRebuild) {
       addStylesUpdate = true;
     }
   }
 
-  const scopedStyleId = getStyleId(cmpMeta, modeName, true);
-  if (compilerCtx.lastBuildStyles.get(scopedStyleId) !== styleMeta.compiledStyleTextScoped) {
-    compilerCtx.lastBuildStyles.set(scopedStyleId, styleMeta.compiledStyleTextScoped);
-
-    if (buildCtx.isRebuild) {
-      addScopedStylesUpdate = true;
-    }
+  const scopedStyleId = getStyleId(cmp, modeName, true);
+  if (compilerCtx.lastBuildStyles.get(scopedStyleId) !== compiledStyle.styleTextScoped) {
+    compilerCtx.lastBuildStyles.set(scopedStyleId, compiledStyle.styleTextScoped);
   }
 
   const styleMode = (modeName === DEFAULT_STYLE_MODE ? null : modeName);
@@ -230,31 +236,22 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     buildCtx.stylesUpdated = buildCtx.stylesUpdated || [];
 
     buildCtx.stylesUpdated.push({
-      styleTag: cmpMeta.tagNameMeta,
+      styleTag: cmp.tagName,
       styleMode: styleMode,
-      styleText: styleMeta.compiledStyleText,
-      isScoped: false
+      styleText: compiledStyle.styleText,
     });
   }
 
-  if (addScopedStylesUpdate) {
-    buildCtx.stylesUpdated.push({
-      styleTag: cmpMeta.tagNameMeta,
-      styleMode: styleMode,
-      styleText: styleMeta.compiledStyleTextScoped,
-      isScoped: true
-    });
-  }
+  compiledStyle.styleText = escapeCssForJs(compiledStyle.styleText);
+  compiledStyle.styleTextScoped = escapeCssForJs(compiledStyle.styleTextScoped);
+  compiledStyle.styleTextScopedCommented = escapeCssForJs(compiledStyle.styleTextScopedCommented);
 
-  styleMeta.compiledStyleText = escapeCssForJs(styleMeta.compiledStyleText);
-  styleMeta.compiledStyleTextScoped = escapeCssForJs(styleMeta.compiledStyleTextScoped);
-
-  return styleMeta;
+  return compiledStyle;
 }
 
 
-function getStyleId(cmpMeta: d.ComponentMeta, modeName: string, isScopedStyles: boolean) {
-  return `${cmpMeta.tagNameMeta}${modeName}${isScopedStyles ? '.sc' : ''}`;
+export function getStyleId(cmp: d.ComponentCompilerMeta, modeName: string, isScopedStyles: boolean) {
+  return `${cmp.tagName}${modeName}${isScopedStyles ? '.sc' : ''}`;
 }
 
 
@@ -264,17 +261,15 @@ export function escapeCssForJs(style: string) {
       .replace(/\\[\D0-7]/g, (v) => '\\' + v)
       .replace(/\r\n|\r|\n/g, `\\n`)
       .replace(/\"/g, `\\"`)
+      .replace(/\'/g, `\\'`)
       .replace(/\@/g, `\\@`);
   }
   return style;
 }
 
 
-export function requiresScopedStyles(encapsulation: ENCAPSULATION, config: d.Config) {
-  return (
-    (encapsulation === ENCAPSULATION.ShadowDom && config.buildScoped) ||
-    (encapsulation === ENCAPSULATION.ScopedCss)
-  );
+function requiresScopedStyles(encapsulation: d.Encapsulation, commentOriginalSelector: boolean) {
+  return (encapsulation === 'scoped' || (encapsulation === 'shadow' && commentOriginalSelector));
 }
 
 

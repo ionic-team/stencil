@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
-import { getComponentsDtsSrcFilePath } from '../app/app-file-naming';
+import { getComponentsDtsSrcFilePath, isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { getUserCompilerOptions } from './compiler-options';
 
 
@@ -8,11 +8,6 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
   if (config.validateTypes === false) {
     // probably unit testing that doesn't
     // want to take time to validate the types
-    return;
-  }
-
-  if (!buildCtx.isActiveBuild) {
-    buildCtx.debug(`validateTypesMain aborted, not active build`);
     return;
   }
 
@@ -24,7 +19,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
   // send data over to our worker process to validate types
   // don't let this block the main thread and we'll check
   // its response sometime later
-  const timeSpan = buildCtx.createTimeSpan(`validateTypes started`, true);
+  const timeSpan = buildCtx.createTimeSpan(`type checking started`);
 
   const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
   const rootTsFiles = compilerCtx.rootTsFiles.slice();
@@ -37,7 +32,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
   const collectionNames = compilerCtx.collections.map(c => c.collectionName);
 
   buildCtx.validateTypesHandler = async (results: d.ValidateTypesResults) => {
-    timeSpan.finish(`validateTypes finished`);
+    timeSpan.finish(`type checking finished`);
 
     compilerCtx.fs.cancelDeleteDirectoriesFromDisk(results.dirPaths);
     compilerCtx.fs.cancelDeleteFilesFromDisk(results.filePaths);
@@ -56,13 +51,11 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
       // the build has already finished before the
       // type checking transpile finished, which is fine for watch
       // we'll need to create build to show the diagnostics
-      if (buildCtx.isActiveBuild) {
-        buildCtx.debug(`validateTypesHandler, build already finished, creating a new build`);
-        const diagnosticsBuildCtx = new BuildContext(config, compilerCtx);
-        diagnosticsBuildCtx.start();
-        diagnosticsBuildCtx.diagnostics.push(...results.diagnostics);
-        diagnosticsBuildCtx.finish();
-      }
+      buildCtx.debug(`validateTypesHandler, build already finished, creating a new build`);
+      const diagnosticsBuildCtx = new BuildContext(config, compilerCtx);
+      diagnosticsBuildCtx.start();
+      diagnosticsBuildCtx.diagnostics.push(...results.diagnostics);
+      diagnosticsBuildCtx.finish();
 
     } else {
       // cool the build hasn't finished yet
@@ -82,7 +75,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
   const compilerOptions = await getUserCompilerOptions(config, compilerCtx, buildCtx);
 
   // only write dts files when we have an output target with a types directory
-  const emitDtsFiles = (config.outputTargets as d.OutputTargetDist[]).some(o => !!o.typesDir);
+  const emitDtsFiles = config.outputTargets.some(isOutputTargetDistTypes);
 
   // kick off validating types by sending the data over to the worker process
   buildCtx.validateTypesPromise = config.sys.validateTypes(compilerOptions, emitDtsFiles, config.cwd, collectionNames, rootTsFiles);

@@ -1,68 +1,56 @@
 import * as d from '../../declarations';
-import { buildError, catchError, normalizePath, pathJoin } from '../util';
+import { buildError, normalizePath } from '@utils';
 import { getCssImports } from './css-imports';
-import { getGlobalStyleFilename } from '../app/app-file-naming';
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
+import { isOutputTargetDistGlobalStyles } from '../output-targets/output-utils';
 
 
-export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild) {
-  const canSkip = await canSkipGlobalStyles(config, compilerCtx, buildCtx, outputTarget);
-  if (canSkip) {
+export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistGlobalStyles);
+  if (outputTargets.length === 0) {
     return;
   }
 
-  const timeSpan = buildCtx.createTimeSpan(`compile global style start`);
-
-  try {
-    const styleText = await loadGlobalStyle(config, compilerCtx, buildCtx, config.globalStyle);
-
-    const fileName = getGlobalStyleFilename(config);
-
-    const filePath = pathJoin(config, outputTarget.buildDir, fileName);
-    buildCtx.debug(`global style: ${config.sys.path.relative(config.rootDir, filePath)}`);
-    await compilerCtx.fs.writeFile(filePath, styleText);
-
-  } catch (e) {
-    catchError(buildCtx.diagnostics, e);
+  const globalStyles = await buildGlobalStyles(config, compilerCtx, buildCtx);
+  if (!globalStyles) {
+    return;
   }
-
-  timeSpan.finish(`compile global style finish`);
+  await Promise.all(
+    outputTargets.map(o => compilerCtx.fs.writeFile(o.file, globalStyles))
+  );
 }
 
 
-async function loadGlobalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filePath: string) {
-  let styleText = '';
+export async function buildGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  let globalStylePath = config.globalStyle;
+  if (!globalStylePath) {
+    return null;
+  }
+
+  const canSkip = await canSkipGlobalStyles(config, compilerCtx, buildCtx);
+  if (canSkip) {
+    return compilerCtx.cachedGlobalStyle;
+  }
 
   try {
-    filePath = normalizePath(filePath);
+    globalStylePath = normalizePath(globalStylePath);
 
-    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, filePath);
+    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, globalStylePath);
 
-    styleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, transformResults.code, filePath, true);
+    return compilerCtx.cachedGlobalStyle = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, transformResults.code, globalStylePath, true);
 
   } catch (e) {
     const d = buildError(buildCtx.diagnostics);
     d.messageText = e + '';
-    d.absFilePath = normalizePath(filePath);
-    d.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, filePath));
+    d.absFilePath = globalStylePath;
+    return compilerCtx.cachedGlobalStyle = null;
   }
-
-  return styleText;
 }
 
-
-async function canSkipGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetBuild) {
-  if (typeof config.globalStyle !== 'string') {
-    return true;
-  }
-
-  if (buildCtx.hasError || !buildCtx.isActiveBuild) {
-    return true;
-  }
-
-  if (!outputTarget.buildDir) {
-    return true;
+async function canSkipGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (!compilerCtx.cachedGlobalStyle) {
+    return false;
   }
 
   if (buildCtx.requiresFullBuild) {

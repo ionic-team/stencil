@@ -1,8 +1,13 @@
-import { Config } from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { validateNamespace } from '../validate-namespace';
 
 
 describe('validateNamespace', () => {
+
+  let config: d.Config;
+  beforeEach(() => {
+    config = {};
+  });
 
   it('should not allow special characters in namespace', () => {
     expect(() => {
@@ -86,11 +91,6 @@ describe('validateNamespace', () => {
     validateNamespace(config);
     expect(config.namespace).toBe('App');
     expect(config.fsNamespace).toBe('app');
-  });
-
-  var config: Config;
-  beforeEach(() => {
-    config = {};
   });
 
 });

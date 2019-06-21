@@ -1,8 +1,6 @@
 import * as d from '../../declarations';
-import { cleanDiagnostics } from '../../util/logger/logger-util';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
+import { hasError, normalizeDiagnostics } from '@utils';
 import { generateHmr } from './build-hmr';
-import { hasError, normalizePath } from '../util';
 
 
 export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -10,8 +8,9 @@ export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCt
 
   const buildResults: d.BuildResults = {
     buildId: buildCtx.buildId,
+    buildConditionals: getBuildConditionals(buildCtx),
     bundleBuildCount: buildCtx.bundleBuildCount,
-    diagnostics: cleanDiagnostics(buildCtx.diagnostics),
+    diagnostics: normalizeDiagnostics(compilerCtx, buildCtx.diagnostics),
     dirsAdded: buildCtx.dirsAdded.slice().sort(),
     dirsDeleted: buildCtx.dirsDeleted.slice().sort(),
     duration: Date.now() - buildCtx.startTime,
@@ -21,21 +20,47 @@ export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCt
     filesUpdated: buildCtx.filesUpdated.slice().sort(),
     filesWritten: buildCtx.filesWritten.sort(),
     hasError: hasError(buildCtx.diagnostics),
-    hasSlot: buildCtx.hasSlot,
     hasSuccessfulBuild: compilerCtx.hasSuccessfulBuild,
-    hasSvg: buildCtx.hasSvg,
     isRebuild: buildCtx.isRebuild,
     styleBuildCount: buildCtx.styleBuildCount,
     transpileBuildCount: buildCtx.transpileBuildCount,
 
     components: [],
-    entries: generateBuildResultsEntries(config, buildCtx)
+    entries: []
   };
 
+  compilerCtx.lastBuildResults = Object.assign({}, buildResults);
+
   const hmr = generateHmr(config, compilerCtx, buildCtx);
-  if (hmr) {
+  if (hmr != null) {
     buildResults.hmr = hmr;
   }
+
+  buildCtx.entryModules.forEach(en => {
+    const buildEntry: d.BuildEntry = {
+      entryId: en.entryKey,
+      components: [],
+      bundles: [],
+      inputs: [],
+      modes: en.modeNames.slice(),
+      encapsulations: []
+    };
+    en.cmps.forEach(cmp => {
+      if (!buildEntry.inputs.includes(cmp.sourceFilePath)) {
+        buildEntry.inputs.push(cmp.sourceFilePath);
+      }
+      if (!buildEntry.encapsulations.includes(cmp.encapsulation)) {
+        buildEntry.encapsulations.push(cmp.encapsulation);
+      }
+      const buildCmp: d.BuildComponent = {
+        tag: cmp.tagName,
+        dependencyOf: cmp.dependants.slice(),
+        dependencies: cmp.dependencies.slice()
+      };
+      buildEntry.components.push(buildCmp);
+    });
+    buildResults.entries.push(buildEntry);
+  });
 
   buildResults.entries.forEach(en => {
     buildResults.components.push(...en.components);
@@ -46,98 +71,20 @@ export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCt
   return buildResults;
 }
 
-function generateBuildResultsEntries(config: d.Config, buildCtx: d.BuildCtx) {
-  const entries = buildCtx.entryModules.map(en => {
-    return getEntryModule(config, buildCtx, en);
-  });
-
-  return entries;
-}
-
-function getEntryModule(config: d.Config, buildCtx: d.BuildCtx, en: d.EntryModule) {
-  en.modeNames = en.modeNames || [];
-  en.entryBundles = en.entryBundles || [];
-  en.moduleFiles = en.moduleFiles || [];
-
-  const entryCmps: d.EntryComponent[] = [];
-
-  buildCtx.entryPoints.forEach(ep => {
-    entryCmps.push(...ep);
-  });
-
-  const buildEntry = getBuildEntry(config, entryCmps, en);
-
-  const modes = en.modeNames.slice();
-  if (modes.length > 1 || (modes.length === 1 && modes[0] !== DEFAULT_STYLE_MODE)) {
-    buildEntry.modes = modes.sort();
-  }
-
-  en.moduleFiles.forEach(m => {
-    const encap = m.cmpMeta.encapsulationMeta === ENCAPSULATION.ScopedCss ? 'scoped' : m.cmpMeta.encapsulationMeta === ENCAPSULATION.ShadowDom ? 'shadow' : 'none';
-    if (!buildEntry.encapsulations.includes(encap)) {
-      buildEntry.encapsulations.push(encap);
-    }
-  });
-  buildEntry.encapsulations.sort();
-
-  return buildEntry;
-}
-
-
-function getBuildEntry(config: d.Config, entryCmps: d.EntryComponent[], en: d.EntryModule) {
-  const buildEntry: d.BuildEntry = {
-    entryId: en.entryKey,
-
-    components: en.moduleFiles.map(m => {
-      const entryCmp = entryCmps.find(ec => {
-        return ec.tag === m.cmpMeta.tagNameMeta;
-      });
-      const dependencyOf = ((entryCmp && entryCmp.dependencyOf) || []).slice().sort();
-
-      const buildCmp: d.BuildComponent = {
-        tag: m.cmpMeta.tagNameMeta,
-        dependencies: m.cmpMeta.dependencies.slice(),
-        dependencyOf: dependencyOf
-      };
-      return buildCmp;
-    }),
-
-    bundles: en.entryBundles.map(entryBundle => {
-      return getBuildBundle(config, entryBundle);
-    }),
-
-    inputs: en.moduleFiles.map(m => {
-      return normalizePath(config.sys.path.relative(config.rootDir, m.jsFilePath));
-    }).sort(),
-
-    encapsulations: []
+function getBuildConditionals(buildCtx: d.BuildCtx) {
+  const b = {
+    shadow: false,
+    slot: false,
+    svg: false,
+    vdom: false
   };
 
-  return buildEntry;
-}
+  buildCtx.components.forEach(cmp => {
+    b.shadow = b.shadow || (cmp.encapsulation === 'shadow');
+    b.slot = b.slot || cmp.htmlTagNames.includes('slot');
+    b.svg = b.svg || cmp.htmlTagNames.includes('svg');
+    b.vdom = b.vdom || cmp.hasVdomRender;
+  });
 
-
-function getBuildBundle(config: d.Config, entryBundle: d.EntryBundle) {
-  const buildBundle: d.BuildBundle = {
-    fileName: entryBundle.fileName,
-    outputs: entryBundle.outputs.map(filePath => {
-      return normalizePath(config.sys.path.relative(config.rootDir, filePath));
-    }).sort()
-  };
-
-  buildBundle.size = entryBundle.text.length;
-
-  if (typeof entryBundle.sourceTarget === 'string') {
-    buildBundle.target = entryBundle.sourceTarget;
-  }
-
-  if (entryBundle.modeName !== DEFAULT_STYLE_MODE) {
-    buildBundle.mode = entryBundle.modeName;
-  }
-
-  if (entryBundle.isScopedStyles) {
-    buildBundle.scopedStyles = entryBundle.isScopedStyles;
-  }
-
-  return buildBundle;
+  return b;
 }

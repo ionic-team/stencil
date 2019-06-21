@@ -1,11 +1,11 @@
 import * as d from '../declarations';
-import * as util from './util';
+import * as util from './dev-server-utils';
 import { serve404 } from './serve-404';
 import { serve500 } from './serve-500';
 import { serveFile } from './serve-file';
 import { serveOpenInEditor } from './open-in-editor';
 import * as http  from 'http';
-import * as path from 'path';
+import path from 'path';
 
 
 export async function serveDevClient(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
@@ -15,7 +15,7 @@ export async function serveDevClient(devServerConfig: d.DevServerConfig, fs: d.F
     }
 
     if (util.isDevServerClient(req.pathname)) {
-      return serveDevClientScript(devServerConfig, fs, res);
+      return serveDevClientScript(devServerConfig, fs, req, res);
     }
 
     if (util.isInitialDevServerLoad(req.pathname)) {
@@ -34,27 +34,37 @@ export async function serveDevClient(devServerConfig: d.DevServerConfig, fs: d.F
     }
 
   } catch (e) {
-    return serve500(res, e);
+    return serve500(devServerConfig, req, res, e);
   }
 }
 
 
-async function serveDevClientScript(devServerConfig: d.DevServerConfig, fs: d.FileSystem, res: http.ServerResponse) {
+async function serveDevClientScript(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
   const filePath = path.join(devServerConfig.devServerDir, 'static', 'dev-server-client.html');
 
   let content = await fs.readFile(filePath);
 
   const devClientConfig: d.DevClientConfig = {
-    baseUrl: devServerConfig.baseUrl,
+    basePath: devServerConfig.basePath,
     editors: devServerConfig.editors,
-    hmr: devServerConfig.hotReplacement
+    reloadStrategy: devServerConfig.reloadStrategy
   };
 
-  content = content.replace('__DEV_CLIENT_CONFIG__', JSON.stringify(devClientConfig));
+  content = content.replace('window.__DEV_CLIENT_CONFIG__', JSON.stringify(devClientConfig));
 
   res.writeHead(200, util.responseHeaders({
     'Content-Type': 'text/html'
   }));
   res.write(content);
   res.end();
+
+  if (devServerConfig.logRequests) {
+    util.sendMsg(process, {
+      requestLog: {
+        method: req.method,
+        url: req.url,
+        status: 200
+      }
+    });
+  }
 }

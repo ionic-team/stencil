@@ -2,10 +2,11 @@
 
 export interface Diagnostic {
   level: 'error'|'warn'|'info'|'log'|'debug';
-  type: 'typescript'|'bundling'|'build'|'runtime'|'hydrate'|'css';
+  type: string; // 'typescript'|'bundling'|'build'|'runtime'|'hydrate'|'css'|'config'
   header?: string;
   language?: string;
   messageText: string;
+  debugText?: string;
   code?: string;
   absFilePath?: string;
   relFilePath?: string;

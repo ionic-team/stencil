@@ -1,31 +1,38 @@
 import * as d from '../../declarations';
-import { FsWatchNormalizer } from './fs-watch-normalizer';
-import { normalizePath } from '../util';
+import { catchError, normalizePath } from '@utils';
 
 
-export function initFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function initFsWatcher(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   // only create the watcher if this is a watch build
   // and we haven't created a watch listener already
-  if (compilerCtx.hasWatch || !config.watch) {
+  if (!config.watch || compilerCtx.fsWatcher != null) {
     return false;
   }
 
-  buildCtx.debug(`initFsWatch: ${config.sys.path.relative(config.rootDir, config.srcDir)}`);
+  if (typeof config.sys.createFsWatcher !== 'function') {
+    return false;
+  }
 
-  const fsWatchNormalizer = new FsWatchNormalizer(config, compilerCtx.events);
-  fsWatchNormalizer.subscribe();
-  compilerCtx.hasWatch = true;
+  try {
+    buildCtx.debug(`initFsWatcher: ${config.sys.path.relative(config.rootDir, config.srcDir)}`);
 
-  if (config.sys.createFsWatcher) {
-    const fsWatcher = config.sys.createFsWatcher(compilerCtx.events, config.srcDir, {
-      ignored: config.watchIgnoredRegex,
-      ignoreInitial: true
-    });
+    // since creation is async, let's make sure multiple don't get created
+    compilerCtx.fsWatcher = (true as any);
 
-    if (fsWatcher && config.configPath) {
+    compilerCtx.fsWatcher = await config.sys.createFsWatcher(config, config.sys.fs, compilerCtx.events);
+
+    await compilerCtx.fsWatcher.addDirectory(config.srcDir);
+
+    if (typeof config.configPath === 'string') {
       config.configPath = normalizePath(config.configPath);
-      fsWatcher.add(config.configPath);
+      await compilerCtx.fsWatcher.addFile(config.configPath);
     }
+
+  } catch (e) {
+    const diagnostics: d.Diagnostic[] = [];
+    catchError(diagnostics, e);
+    config.logger.printDiagnostics(diagnostics);
+    return false;
   }
 
   return true;

@@ -1,6 +1,57 @@
 import { MockDocument } from '../document';
+import { MockElement } from '../node';
+
 
 describe('selector', () => {
+
+  it('closest', () => {
+    const doc = new MockDocument(`
+      <div>
+        <span>
+          <p></p>
+        </span>
+      </div>
+    `);
+
+    const p = doc.querySelector('p');
+    const div = doc.querySelector('div');
+    expect(p.closest('div')).toBe(div);
+  });
+
+  it('no closest', () => {
+    const doc = new MockDocument(`
+      <div>
+        <span>
+          <p></p>
+        </span>
+      </div>
+    `);
+
+    const p = doc.querySelector('p');
+    expect(p.closest('div#my-id')).toBe(null);
+  });
+
+  it('matches, tag/class/id', () => {
+    const elm = new MockElement(null, 'h1');
+    elm.classList.add('my-class');
+    elm.id = 'my-id';
+    expect(elm.matches('h1.my-class#my-id')).toBe(true);
+  });
+
+  it('no matches, tag/class/id', () => {
+    const elm = new MockElement(null, 'h1');
+    expect(elm.matches('h1.my-class#my-id')).toBe(false);
+  });
+
+  it('matches, tag', () => {
+    const elm = new MockElement(null, 'h1');
+    expect(elm.matches('h1')).toBe(true);
+  });
+
+  it('no matches, tag', () => {
+    const elm = new MockElement(null, 'h1');
+    expect(elm.matches('div')).toBe(false);
+  });
 
   it('not find input.checked.a.b', () => {
     const doc = new MockDocument(`

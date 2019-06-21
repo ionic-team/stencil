@@ -1,20 +1,16 @@
 import * as d from '../../declarations';
-import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
-import * as path from 'path';
+import { loadTypeScriptDiagnostics } from '@utils';
 import ts from 'typescript';
 
 
-export async function transpileToEs5Worker(cwd: string, input: string, inlineHelpers: boolean) {
-  const config: d.Config = {
-    cwd: cwd,
-    sys: {
-      path: path
-    } as any
-  };
-
+export async function transpileToEs5Worker(_cwd: string, input: string, inlineHelpers: boolean) {
   const results: d.TranspileResults = {
+    sourceFilePath: null,
     code: input,
-    diagnostics: []
+    map: null,
+    diagnostics: [],
+    moduleFile: null,
+    build: {}
   };
 
   const transpileOpts: ts.TranspileOptions = {
@@ -34,7 +30,7 @@ export async function transpileToEs5Worker(cwd: string, input: string, inlineHel
 
   const tsResults = ts.transpileModule(input, transpileOpts);
 
-  loadTypeScriptDiagnostics(config, results.diagnostics, tsResults.diagnostics);
+  loadTypeScriptDiagnostics(results.diagnostics, tsResults.diagnostics);
 
   if (results.diagnostics.length === 0) {
     results.code = tsResults.outputText;

@@ -12,71 +12,88 @@ declare const global: d.JestEnvironmentGlobal;
 
 export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2EPage> {
   if (!global.__NEW_TEST_PAGE__) {
-    throw new Error(`newE2EPage() is only available from E2E tests, and ran with the --e2e cmd line flag.`);
+    console.error(`newE2EPage() is only available from E2E tests, and ran with the --e2e cmd line flag.`);
+    return failedPage();
   }
 
-  const page: pd.E2EPageInternal = await global.__NEW_TEST_PAGE__();
+  try {
+    const page: pd.E2EPageInternal = await global.__NEW_TEST_PAGE__();
 
-  page._e2eElements = [];
+    page._e2eElements = [];
 
-  page._e2eGoto = page.goto;
+    page._e2eGoto = page.goto;
 
-  await setPageEmulate(page as any);
+    await setPageEmulate(page as any);
 
-  await page.setCacheEnabled(false);
+    await page.setCacheEnabled(false);
 
-  await initPageEvents(page);
+    await initPageEvents(page);
 
-  initPageScreenshot(page);
+    initPageScreenshot(page);
 
-  let docPromise: Promise<puppeteer.JSHandle> = null;
+    let docPromise: Promise<puppeteer.JSHandle> = null;
 
-  page.find = async (selector: string) => {
-    if (!docPromise) {
-      docPromise = page.evaluateHandle('document');
+    page.find = async (selector: pd.FindSelector) => {
+      if (!docPromise) {
+        docPromise = page.evaluateHandle('document');
+      }
+      const documentJsHandle = await docPromise;
+      const docHandle = documentJsHandle.asElement();
+      return find(page, docHandle, selector) as any;
+    };
+
+    page.findAll = async (selector: pd.FindSelector) => {
+      if (!docPromise) {
+        docPromise = page.evaluateHandle('document');
+      }
+      const documentJsHandle = await docPromise;
+      const docHandle = documentJsHandle.asElement();
+      return findAll(page, docHandle, selector) as any;
+    };
+
+    page.waitForChanges = waitForChanges.bind(null, page);
+
+    page.on('console', consoleMessage);
+    page.on('pageerror', pageError);
+    page.on('requestfailed', requestFailed);
+
+    if (typeof opts.html === 'string') {
+      const errMsg = await e2eSetContent(page, opts.html, { waitUntil: opts.waitUntil });
+      if (errMsg) {
+        throw errMsg;
+      }
+
+    } else if (typeof opts.url === 'string') {
+      const errMsg = await e2eGoTo(page, opts.url, { waitUntil: opts.waitUntil });
+      if (errMsg) {
+        throw errMsg;
+      }
+
+    } else {
+      page.goto = e2eGoTo.bind(null, page);
+      page.setContent = e2eSetContent.bind(null, page);
     }
-    const documentJsHandle = await docPromise;
-    const docHandle = documentJsHandle.asElement();
-    return find(page, docHandle, selector);
-  };
 
-  page.findAll = async (selector: string) => {
-    if (!docPromise) {
-      docPromise = page.evaluateHandle('document');
-    }
-    const documentJsHandle = await docPromise;
-    const docHandle = documentJsHandle.asElement();
-    return findAll(page, docHandle, selector);
-  };
+    return page;
 
-  page.waitForChanges = waitForChanges.bind(null, page);
-
-  page.on('console', consoleMessage);
-  page.on('pageerror', pageError);
-  page.on('requestfailed', requestFailed);
-
-  if (typeof opts.html === 'string') {
-    const errMsg = await e2eSetContent(page, opts.html);
-    if (errMsg) {
-      throw errMsg;
-    }
-
-  } else if (typeof opts.url === 'string') {
-    const errMsg = await e2eGoTo(page, opts.url);
-    if (errMsg) {
-      throw errMsg;
-    }
-
-  } else {
-    page.goto = e2eGoTo.bind(null, page);
-    page.setContent = e2eSetContent.bind(null, page);
+  } catch (e) {
+    console.error(e);
   }
 
+  return failedPage();
+}
+
+function failedPage() {
+  const page: pd.E2EPageInternal = {
+    isClosed: () => true,
+    setContent: () => Promise.resolve(),
+    waitForChanges: () => Promise.resolve(),
+    find: () => Promise.resolve(null)
+  } as any;
   return page;
 }
 
-
-async function e2eGoTo(page: pd.E2EPageInternal, url: string) {
+async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer.NavigationOptions) {
   try {
     if (page.isClosed()) {
       return 'e2eGoTo unavailable: page already closed';
@@ -103,7 +120,10 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string) {
 
   const fullUrl = browserUrl + url.substring(1);
 
-  const rsp = await page._e2eGoto(fullUrl);
+  if (!options.waitUntil) {
+    options.waitUntil = DEFAULT_WAIT_FOR;
+  }
+  const rsp = await page._e2eGoto(fullUrl, options);
 
   if (!rsp.ok()) {
     await closePage(page);
@@ -123,7 +143,7 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string) {
 }
 
 
-async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
+async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: puppeteer.NavigationOptions = {}) {
   try {
     if (page.isClosed()) {
       return 'e2eSetContent unavailable: page already closed';
@@ -137,19 +157,36 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
     return 'invalid e2eSetContent() html';
   }
 
-  const loaderUrl = (process.env as d.E2EProcessEnv).__STENCIL_LOADER_URL__;
-  if (typeof loaderUrl !== 'string') {
+  const appUrl = (process.env as d.E2EProcessEnv).__STENCIL_APP_URL__;
+  if (typeof appUrl !== 'string') {
     await closePage(page);
-    return 'invalid e2eSetContent() loader script url';
+    return 'invalid e2eSetContent() app script url';
   }
 
-  const url = [
-    `data:text/html;charset=UTF-8,`,
-    `<script src="${loaderUrl}"></script>`,
+  const url = (process.env as d.E2EProcessEnv).__STENCIL_BROWSER_URL__;
+  const body = [
+    `<script type="module" src="${appUrl}"></script>`,
     html
-  ];
+  ].join('\n');
 
-  const rsp = await page._e2eGoto(url.join(''));
+  await page.setRequestInterception(true);
+  page.on('request', interceptedRequest => {
+    if (url === interceptedRequest.url()) {
+      interceptedRequest.respond({
+        status: 200,
+        contentType: 'text/html',
+        body: body
+      });
+
+    } else {
+      interceptedRequest.continue();
+    }
+  });
+
+  if (!options.waitUntil) {
+    options.waitUntil = DEFAULT_WAIT_FOR;
+  }
+  const rsp = await page._e2eGoto(url, options);
 
   if (!rsp.ok()) {
     await closePage(page);
@@ -208,32 +245,54 @@ async function waitForChanges(page: pd.E2EPageInternal) {
       return;
     }
 
-    await Promise.all(page._e2eElements.map(async elm => {
-      await elm.e2eRunActions();
-    }));
+    await Promise.all(page._e2eElements.map(elm => elm.e2eRunActions()));
 
     if (page.isClosed()) {
       return;
     }
 
     await page.evaluate(() => {
+      // BROWSER CONTEXT
+      return new Promise(resolve => {
+        requestAnimationFrame(() => {
+          const promises: Promise<any>[] = [];
 
-      const promises = (window as d.WindowData)['s-apps'].map((appNamespace: string) => {
-        return (window as any)[appNamespace].onReady();
+          const waitComponentOnReady = (elm: Element, promises: Promise<any>[]) => {
+            if (elm != null) {
+              const children = elm.children;
+              const len = children.length;
+              for (let i = 0; i < len; i++) {
+                const childElm = children[i];
+                if (childElm != null) {
+                  if (childElm.tagName.includes('-') && typeof (childElm as d.HostElement).componentOnReady === 'function') {
+                    promises.push((childElm as d.HostElement).componentOnReady());
+                  }
+                  waitComponentOnReady(childElm, promises);
+                }
+              }
+            }
+          };
+
+          waitComponentOnReady(document.documentElement, promises);
+
+          Promise.all(promises)
+            .then(() => {
+              resolve();
+            })
+            .catch(() => {
+              resolve();
+            });
+        });
       });
-
-      return Promise.all(promises);
     });
 
     if (page.isClosed()) {
       return;
     }
 
-    await Promise.all(page._e2eElements.map(async elm => {
-      await elm.e2eSync();
-    }));
+    await page.waitFor(100);
 
-    await page.waitFor(4);
+    await Promise.all(page._e2eElements.map(elm => elm.e2eSync()));
 
   } catch (e) {}
 }
@@ -257,3 +316,5 @@ function pageError(e: any) {
 function requestFailed(req: puppeteer.Request) {
   console.error('requestfailed', req.url());
 }
+
+const DEFAULT_WAIT_FOR = 'load';

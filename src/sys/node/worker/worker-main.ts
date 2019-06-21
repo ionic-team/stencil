@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import * as cp from 'child_process';
 import { EventEmitter } from 'events';
-import { TASK_CANCELED_MSG } from '../../../compiler/util';
+import { TASK_CANCELED_MSG } from '@utils';
 
 
 export class WorkerMain extends EventEmitter {
@@ -92,10 +92,13 @@ export class WorkerMain extends EventEmitter {
 
     const task = this.tasks.find(t => t.taskId === responseFromWorker.taskId);
     if (!task) {
+      if (responseFromWorker.error != null) {
+        this.emit('error', responseFromWorker.error);
+      }
       return;
     }
 
-    if (responseFromWorker.error) {
+    if (responseFromWorker.error != null) {
       task.reject(responseFromWorker.error);
     } else {
       task.resolve(responseFromWorker.value);

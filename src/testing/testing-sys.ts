@@ -1,7 +1,9 @@
+import { normalizePath } from '@utils';
 import { TestingFs } from './testing-fs';
+import { TestingLogger } from './testing-logger';
 import { StencilSystem } from '../declarations';
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
 
 
 const relDistPath = path.join(__dirname, '..', '..', 'dist');
@@ -18,8 +20,19 @@ export class TestingSystem extends NodeSystem {
   constructor() {
     const fs = new TestingFs();
     super(fs);
+    this.path = Object.assign({}, path);
+
+    const orgPathJoin = path.join;
+    this.path.join = function(...paths) {
+      return normalizePath(orgPathJoin.apply(path, paths));
+    };
+
     this.createFsWatcher = null;
-    this.initWorkers(1, 1);
+
+    const logger = new TestingLogger();
+    logger.enable = true;
+
+    this.initWorkers(1, 1, logger);
   }
 
   get compiler() {
@@ -29,8 +42,12 @@ export class TestingSystem extends NodeSystem {
     return compiler;
   }
 
+  getClientPath(staticName: string) {
+    return normalizePath(path.join(relDistPath, 'client', staticName));
+  }
+
   getClientCoreFile(opts: any) {
-    const filePath = path.join(relDistPath, 'client', opts.staticName);
+    const filePath = this.getClientPath(opts.staticName);
 
     return new Promise<string>((resolve, reject) => {
       fs.readFile(filePath, 'utf8', (err, data) => {

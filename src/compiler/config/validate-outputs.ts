@@ -1,56 +1,45 @@
 import * as d from '../../declarations';
-import { validateDocs } from './validate-docs';
-import { validateOutputTargetAngular } from './validate-outputs-angular';
+import { validateOutputStats } from './validate-output-stats';
 import { validateOutputTargetDist } from './validate-outputs-dist';
+import { validateOutputTargetDistHydrateScript } from './validate-outputs-hydrate-script';
 import { validateOutputTargetWww } from './validate-outputs-www';
-import { validateResourcesUrl } from './validate-resources-url';
-import { validateServiceWorker } from './validate-service-worker';
-import { validateStats } from './validate-stats';
-import { _deprecatedToMultipleTarget } from './_deprecated-validate-multiple-targets';
+import { validateOutputTargetDistModule } from './validate-outputs-dist-module';
+import { validateOutputTargetAngular } from './validate-outputs-angular';
+import { validateDocs } from './validate-docs';
+import { VALID_TYPES, WWW } from '../output-targets/output-utils';
+import { buildError } from '@utils';
 
 
-export function validateOutputTargets(config: d.Config) {
+export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnostic[]) {
 
   // setup outputTargets from deprecated config properties
-  _deprecatedToMultipleTarget(config);
-
   if (Array.isArray(config.outputTargets)) {
+
     config.outputTargets.forEach(outputTarget => {
       if (typeof outputTarget.type !== 'string') {
-        outputTarget.type = 'www';
+        outputTarget.type = WWW;
       }
 
       outputTarget.type = outputTarget.type.trim().toLowerCase() as any;
 
       if (!VALID_TYPES.includes(outputTarget.type)) {
-        throw new Error(`invalid outputTarget type "${outputTarget.type}". Valid target types: ${VALID_TYPES.join(', ')}`);
+        const err = buildError(diagnostics);
+        err.messageText = `invalid outputTarget type "${outputTarget.type}". Valid outputTarget types include: ${VALID_TYPES.map(t => `"${t}"`).join(', ')}`;
       }
     });
   }
 
-  validateOutputTargetWww(config);
+  validateOutputTargetWww(config, diagnostics);
   validateOutputTargetDist(config);
   validateOutputTargetAngular(config);
-  validateDocs(config);
-  validateStats(config);
+  validateOutputTargetDistHydrateScript(config);
+  validateOutputTargetDistModule(config);
+  validateDocs(config, diagnostics);
+  validateOutputStats(config);
+
 
   if (!config.outputTargets || config.outputTargets.length === 0) {
-    throw new Error(`outputTarget required`);
+    const err = buildError(diagnostics);
+    err.messageText = `outputTarget required`;
   }
-
-  config.outputTargets.forEach(outputTarget => {
-    validateResourcesUrl(outputTarget as d.OutputTargetBuild);
-    validateServiceWorker(config, outputTarget as d.OutputTargetWww);
-  });
 }
-
-
-const VALID_TYPES = [
-  'angular',
-  'dist',
-  'docs',
-  'docs-json',
-  'docs-custom',
-  'stats',
-  'www'
-];

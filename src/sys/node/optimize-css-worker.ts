@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import { catchError } from '../../compiler/util';
+import { catchError } from '@utils';
 import cssnano, { CssNanoOptions } from 'cssnano';
-import autoprefixer, { Options } from 'autoprefixer';
+import autoprefixer from 'autoprefixer';
 import postcss, { AcceptedPlugin } from 'postcss';
 
 
@@ -24,21 +24,72 @@ export async function optimizeCssWorker(inputOpts: d.OptimizeCssInput) {
 
     const processor = postcss(plugins);
 
-    const result = await processor.process(inputOpts.css, {
-      map: null,
-      from: inputOpts.filePath
-    });
-
-    result.warnings().forEach(warning => {
-      output.diagnostics.push({
-        header: `Optimize CSS: ${warning.plugin}`,
-        messageText: warning.text,
-        level: 'warn',
-        type: 'css'
+    try {
+      const result = await processor.process(inputOpts.css, {
+        map: null,
+        from: inputOpts.filePath
       });
-    });
 
-    output.css = result.css;
+      result.warnings().forEach(warning => {
+        output.diagnostics.push({
+          header: `Optimize CSS: ${warning.plugin}`,
+          messageText: warning.text,
+          level: 'warn',
+          type: 'css',
+          absFilePath: inputOpts.filePath
+        });
+      });
+
+      output.css = result.css;
+
+    } catch (e) {
+      const diagnostic: d.Diagnostic = {
+        header: `Optimize CSS`,
+        messageText: `CSS Error` + e,
+        level: `error`,
+        type: `css`,
+        absFilePath: inputOpts.filePath
+      };
+
+      if (typeof e.name === 'string') {
+        diagnostic.header = e.name;
+      }
+
+      if (typeof e.reason === 'string') {
+        diagnostic.messageText = e.reason;
+      }
+
+      if (typeof e.source === 'string' && typeof e.line === 'number') {
+        const lines = (e.source as string).replace(/\r/g, '\n').split('\n');
+
+        if (lines.length > 0) {
+          const addLine = (lineNumber: number) => {
+            const line = lines[lineNumber];
+            if (typeof line === 'string') {
+              const printLine: d.PrintLine = {
+                lineIndex: -1,
+                lineNumber: -1,
+                text: line,
+                errorCharStart: -1,
+                errorLength: -1
+              };
+              diagnostic.lines = diagnostic.lines || [];
+              diagnostic.lines.push(printLine);
+            }
+          };
+
+          addLine(e.line - 3);
+          addLine(e.line - 2);
+          addLine(e.line - 1);
+          addLine(e.line);
+          addLine(e.line + 1);
+          addLine(e.line + 2);
+          addLine(e.line + 3);
+        }
+      }
+
+      output.diagnostics.push(diagnostic);
+    }
 
   } catch (e) {
     catchError(output.diagnostics, e);
@@ -55,8 +106,8 @@ export function addAutoprefixer(inputOpts: d.OptimizeCssInput) {
 }
 
 
-const DEFAULT_AUTOPREFIX_LEGACY: Options = {
-  browsers: [
+const DEFAULT_AUTOPREFIX_LEGACY = {
+  overrideBrowserslist: [
     'last 2 versions',
     'iOS >= 9',
     'Android >= 4.4',

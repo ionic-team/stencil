@@ -1,34 +1,26 @@
 import * as d from '../declarations';
-import { loadTypeScriptDiagnostic } from '../util/logger/logger-typescript';
-import { mockStencilSystem } from './mocks';
-import { normalizePath } from '../compiler/util';
-import { TestLogger } from './test-logger';
-import { transpileModule } from '../compiler/transpile/transpile-module';
+import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
+import { transpileModule } from '../compiler';
+import path from 'path';
 import ts from 'typescript';
 
 
-const sys = mockStencilSystem();
+const TRANSPILE_CONFIG: d.Config = {
+  cwd: process.cwd(),
+  rootDir: '/',
+  srcDir: '/',
+  devMode: true,
+  _isTesting: true,
+  validateTypes: false,
+  enableCache: false,
+  sys: {
+    path: path
+  }
+};
 
 
 export function transpile(input: string, opts: ts.CompilerOptions = {}, sourceFilePath?: string) {
-  const logger = new TestLogger();
-
-  const config = {
-    sys: sys,
-    logger: logger,
-    cwd: process.cwd(),
-    rootDir: '/',
-    srcDir: '/',
-    devMode: true,
-    _isTesting: true,
-    validateTypes: false
-  };
-
-  const results = transpileModule(config, input, opts, sourceFilePath);
-
-  logger.printLogs();
-
-  return results;
+  return transpileModule(TRANSPILE_CONFIG, input, opts, sourceFilePath);
 }
 
 
@@ -110,7 +102,7 @@ function getUserCompilerOptions(rootDir: string) {
   const tsconfigResults = ts.readConfigFile(tsconfigFilePath, ts.sys.readFile);
 
   if (tsconfigResults.error) {
-    throw new Error(formatDiagnostic(loadTypeScriptDiagnostic(null, tsconfigResults.error)));
+    throw new Error(formatDiagnostic(loadTypeScriptDiagnostic(tsconfigResults.error)));
   }
 
   const parseResult = ts.parseJsonConfigFileContent(tsconfigResults.config, ts.sys, rootDir, undefined, tsconfigFilePath);

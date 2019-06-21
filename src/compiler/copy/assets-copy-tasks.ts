@@ -1,76 +1,40 @@
 import * as d from '../../declarations';
-import { getAppBuildDir } from '../app/app-file-naming';
-import { normalizePath, pathJoin } from '../util';
+import { normalizePath } from '@utils';
 
 
-export function getComponentAssetsCopyTasks(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], filesChanged: string[]) {
-  const copyTasks: d.CopyTask[] = [];
-
-  if (canSkipAssetsCopy(config, compilerCtx, entryModules, filesChanged)) {
-    // no need to recopy all assets again
-    return copyTasks;
-  }
-
-  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(outputTarget => {
-    return outputTarget.appBuild;
-  });
-
-  if (outputTargets.length === 0) {
-    return copyTasks;
+export function getComponentAssetsCopyTasks(config: d.Config,  buildCtx: d.BuildCtx, dest: string, collectionsPath: boolean) {
+  if (buildCtx.skipAssetsCopy || !dest) {
+    return [];
   }
 
   // get a list of all the directories to copy
   // these paths should be absolute
-  const copyToBuildDir: d.AssetsMeta[] = [];
-  const copyToCollectionDir: d.AssetsMeta[] = [];
+  const copyTasks: d.CopyTask[] = [];
+  const cmps = buildCtx.components;
 
-  entryModules.forEach(entryModule => {
-    const moduleFiles = entryModule.moduleFiles.filter(m => {
-      return m.cmpMeta.assetsDirsMeta && m.cmpMeta.assetsDirsMeta.length;
-    });
-
-    moduleFiles.forEach(moduleFile => {
-      moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsMeta => {
-        copyToBuildDir.push(assetsMeta);
-
-        if (!moduleFile.excludeFromCollection && !moduleFile.isCollectionDependency) {
-          copyToCollectionDir.push(assetsMeta);
-        }
-      });
-    });
-  });
-
-  // copy all of the files in asset directories to the app's build and/or dist directory
-  copyToBuildDir.forEach(assetsMeta => {
-    // figure out what the path is to the component directory
-
-    outputTargets.forEach(outputTarget => {
-      const buildDirDestination = pathJoin(config, getAppBuildDir(config, outputTarget), assetsMeta.cmpRelativePath);
-
-      copyTasks.push({
-        src: assetsMeta.absolutePath,
-        dest: buildDirDestination
-      });
-    });
-  });
-
-  outputTargets.forEach(outputTarget => {
-    if (outputTarget.collectionDir) {
-      // copy all of the files in asset directories to the app's collection directory
-      copyToCollectionDir.forEach(assetsMeta => {
-        // figure out what the path is to the component directory
-        const collectionDirDestination = pathJoin(config,
-          outputTarget.collectionDir,
-          config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
-        );
-
-        copyTasks.push({
-          src: assetsMeta.absolutePath,
-          dest: collectionDirDestination
+  cmps
+    .filter(cmp => cmp.assetsDirs != null && cmp.assetsDirs.length > 0)
+    .forEach(cmp => {
+      if (!collectionsPath) {
+        cmp.assetsDirs.forEach(assetsMeta => {
+          copyTasks.push({
+            src: assetsMeta.absolutePath,
+            dest: config.sys.path.join(dest, assetsMeta.cmpRelativePath)
+          });
         });
-      });
-    }
-  });
+      } else if (!cmp.excludeFromCollection && !cmp.isCollectionDependency) {
+        cmp.assetsDirs.forEach(assetsMeta => {
+          const collectionDirDestination = config.sys.path.join(
+            dest,
+            config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
+          );
+          copyTasks.push({
+            src: assetsMeta.absolutePath,
+            dest: collectionDirDestination
+          });
+        });
+      }
+    });
 
   buildCtx.debug(`getComponentAssetsCopyTasks: ${copyTasks.length}`);
 
@@ -95,11 +59,11 @@ export function canSkipAssetsCopy(config: d.Config, compilerCtx: d.CompilerCtx, 
 
     // loop through all the possible asset directories
     entryModules.forEach(entryModule => {
-      entryModule.moduleFiles.forEach(moduleFile => {
-        if (moduleFile.cmpMeta && moduleFile.cmpMeta.assetsDirsMeta) {
+      entryModule.cmps.forEach(cmp => {
+        if (cmp.assetsDirs != null) {
 
           // loop through each of the asset directories of each component
-          moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsDir => {
+          cmp.assetsDirs.forEach(assetsDir => {
             // get the absolute of the asset directory
             const assetDirPath = normalizePath(assetsDir.absolutePath);
 

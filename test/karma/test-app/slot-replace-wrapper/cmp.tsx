@@ -1,11 +1,11 @@
-import { Component, Prop } from '../../../../dist';
+import { Component, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'slot-replace-wrapper'
 })
 export class SlotReplaceWrapper {
 
-  @Prop() href: string = null;
+  @Prop() href?: string;;
 
   render() {
     const TagType = (this.href != null ? 'a' : 'div') as any;

@@ -1,7 +1,9 @@
+import * as d from '.';
 
 export interface WorkerOptions {
   maxConcurrentWorkers?: number;
   maxConcurrentTasksPerWorker?: number;
+  logger?: d.Logger;
 }
 
 export interface WorkerTask {

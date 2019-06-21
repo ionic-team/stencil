@@ -29,22 +29,8 @@ function hmrStyleElement(elm: Element, versionId: string, stylesUpdated: d.HmrSt
     return;
   }
 
-  const styleTag = elm.getAttribute('data-style-tag');
-  if (styleTag !== stylesUpdated.styleTag || !stylesUpdated.styleText) {
-    return;
-  }
-
-  const elmStyleMode = elm.getAttribute('data-style-mode');
-  const elmIsScoped = elm.hasAttribute('data-style-scoped');
-
-  if (stylesUpdated.styleMode && elmStyleMode !== stylesUpdated.styleMode) {
-    // this updating style has a style mode
-    // but this element does not have the same style mode
-    return;
-  }
-
-  if (stylesUpdated.isScoped !== elmIsScoped) {
-    // the style scope and the element scope are not the same
+  const styleId = elm.getAttribute('s-id');
+  if (styleId !== stylesUpdated.styleId || !stylesUpdated.styleText) {
     return;
   }
 

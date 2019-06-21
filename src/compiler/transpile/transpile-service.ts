@@ -1,18 +1,13 @@
 import * as d from '../../declarations';
-import { addCollection } from './datacollection/discover-collections';
-import addComponentMetadata from './transformers/add-component-metadata';
-import { componentDependencies } from './transformers/component-dependencies';
-import { gatherMetadata } from './datacollection/gather-metadata';
-import { getComponentsDtsSrcFilePath } from '../app/app-file-naming';
-import { getModuleFile } from '../build/compiler-ctx';
-import { getModuleImports } from './transformers/module-imports';
+import { addExternalImport } from '../transformers/collections/add-external-import';
+import { COMPILER_BUILD } from '../build/compiler-build-id';
+import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
+import { getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
+import { getModule } from '../build/compiler-ctx';
 import { getUserCompilerOptions } from './compiler-options';
-import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
+import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import minimatch from 'minimatch';
-import { normalizePath, pathJoin } from '../util';
-import { removeCollectionImports } from './transformers/remove-collection-imports';
-import { removeDecorators } from './transformers/remove-decorators';
-import { removeStencilImports } from './transformers/remove-stencil-imports';
+import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import ts from 'typescript';
 
 
@@ -38,11 +33,9 @@ export async function transpileService(config: d.Config, compilerCtx: d.Compiler
     });
   }
 
-  if (!compilerCtx.tsService) {
+  if (compilerCtx.tsService == null) {
     // create the typescript language service
-    const timeSpan = buildCtx.createTimeSpan(`buildTsService started`, true);
     compilerCtx.tsService = await buildTsService(config, compilerCtx, buildCtx);
-    timeSpan.finish(`buildTsService finished`);
   }
 
   const doTranspile = (changedTsFiles.length > 0);
@@ -55,12 +48,13 @@ export async function transpileService(config: d.Config, compilerCtx: d.Compiler
     const useFsCache = config.enableCache && !buildCtx.isRebuild;
 
     // go ahead and kick off the ts service
-    await compilerCtx.tsService(compilerCtx, buildCtx, changedTsFiles, true, useFsCache);
+    const changedContent = await compilerCtx.tsService(compilerCtx, buildCtx, changedTsFiles, true, useFsCache);
 
     timeSpan.finish(`transpile finished`);
+    return changedContent;
   }
 
-  return doTranspile;
+  return false;
 }
 
 
@@ -80,7 +74,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
   compilerOptions.isolatedModules = false;
   compilerOptions.suppressOutputPathCheck = true;
   compilerOptions.allowNonTsExtensions = true;
-  compilerOptions.removeComments = !config.devMode;
+  compilerOptions.removeComments = false;
   compilerOptions.sourceMap = false;
   compilerOptions.lib = undefined;
   compilerOptions.types = undefined;
@@ -95,7 +89,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
   compilerOptions.outDir = undefined;
 
   // create a config key that will be used as part of the file's cache key
-  transpileCtx.configKey = createConfiKey(config, compilerOptions);
+  transpileCtx.configKey = await createConfigKey(config, compilerOptions);
 
   const servicesHost: ts.LanguageServiceHost = {
     getScriptFileNames: () => transpileCtx.compilerCtx.rootTsFiles,
@@ -121,17 +115,17 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
     getCustomTransformers: () => {
       const typeChecker = services.getProgram().getTypeChecker();
 
+      const transformOpts: d.TransformOptions = {
+        addCompilerMeta: false,
+        addStyle: true
+      };
+
       return {
         before: [
-          gatherMetadata(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker),
-          removeDecorators(),
-          addComponentMetadata(transpileCtx.compilerCtx.moduleFiles),
+          convertDecoratorsToStatic(config, transpileCtx.buildCtx.diagnostics, typeChecker)
         ],
         after: [
-          removeStencilImports(),
-          removeCollectionImports(transpileCtx.compilerCtx),
-          getModuleImports(config, transpileCtx.compilerCtx),
-          componentDependencies(transpileCtx.compilerCtx)
+          convertStaticToMeta(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null, transformOpts)
         ]
       };
     }
@@ -150,8 +144,8 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
     tsFilePaths = tsFilePaths.filter(tsFilePath => tsFilePath !== cmpDts);
 
     // loop through each ts file that has changed
-    await Promise.all(tsFilePaths.map(async tsFilePath => {
-      await tranpsileTsFile(config, services, transpileCtx, tsFilePath, checkCacheKey, useFsCache);
+    const changedContent = await Promise.all(tsFilePaths.map(tsFilePath => {
+      return transpileTsFile(config, services, transpileCtx, tsFilePath, checkCacheKey, useFsCache);
     }));
 
     if (config.watch && !transpileCtx.hasQueuedTsServicePrime) {
@@ -159,6 +153,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
       transpileCtx.hasQueuedTsServicePrime = true;
       primeTsServiceCache(transpileCtx);
     }
+    return changedContent.some(Boolean);
   };
 }
 
@@ -173,35 +168,31 @@ interface TranspileContext {
 }
 
 
-async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, ctx: TranspileContext, tsFilePath: string, checkCacheKey: boolean, useFsCache: boolean) {
-  if (!ctx.buildCtx.isActiveBuild) {
-    ctx.buildCtx.debug(`tranpsileTsFile aborted, not active build: ${tsFilePath}`);
-    return;
-  }
-
+async function transpileTsFile(config: d.Config, services: ts.LanguageService, ctx: TranspileContext, sourceFilePath: string, checkCacheKey: boolean, useFsCache: boolean) {
   if (ctx.buildCtx.hasError) {
-    ctx.buildCtx.debug(`tranpsileTsFile aborted: ${tsFilePath}`);
-    return;
+    ctx.buildCtx.debug(`tranpsileTsFile aborted: ${sourceFilePath}`);
+    return false;
   }
 
   const hasWarning = ctx.buildCtx.hasWarning && !config._isTesting;
 
   // look up the old cache key using the ts file path
-  const oldCacheKey = ctx.snapshotVersions.get(tsFilePath);
+  const oldCacheKey = ctx.snapshotVersions.get(sourceFilePath);
 
   // read the file content to be transpiled
-  const content = await ctx.compilerCtx.fs.readFile(tsFilePath);
+  const content = await ctx.compilerCtx.fs.readFile(sourceFilePath);
 
   // create a cache key out of the content and compiler options
-  const cacheKey = `transpileService_${config.sys.generateContentHash(content + tsFilePath + ctx.configKey, 32)}` ;
+  const contentHash = await config.sys.generateContentHash(content + sourceFilePath + ctx.configKey, 32);
+  const cacheKey = `transpileService_${contentHash}` ;
 
   if (oldCacheKey === cacheKey && checkCacheKey && !hasWarning) {
     // file is unchanged, thanks typescript caching!
-    return;
+    return false;
   }
 
   // save the cache key for future lookups
-  ctx.snapshotVersions.set(tsFilePath, cacheKey);
+  ctx.snapshotVersions.set(sourceFilePath, cacheKey);
 
   let ensureExternalImports: string[] = null;
 
@@ -212,37 +203,37 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
     if (cachedStr != null) {
       // remember which files we were able to get from cached versions
       // so we can later fully prime the ts service cache
-      ctx.filesFromFsCache.push(tsFilePath);
+      ctx.filesFromFsCache.push(sourceFilePath);
 
       // whoa cool, we found we already cached this in our filesystem
       const cachedModuleFile = JSON.parse(cachedStr) as CachedModuleFile;
 
       // and there you go, thanks fs cache!
       // put the cached module file data in our context
-      ctx.compilerCtx.moduleFiles[tsFilePath] = cachedModuleFile.moduleFile;
+      ctx.compilerCtx.moduleMap.set(sourceFilePath, cachedModuleFile.moduleFile);
 
       // add any collections to the context which this cached file may know about
       cachedModuleFile.moduleFile.externalImports.forEach(moduleId => {
-        addCollection(config, ctx.compilerCtx, ctx.compilerCtx.collections, cachedModuleFile.moduleFile, config.rootDir, moduleId);
+        addExternalImport(config, ctx.compilerCtx, ctx.buildCtx, cachedModuleFile.moduleFile, config.rootDir, moduleId);
       });
 
       // write the cached js output too
-      await outputFile(config, ctx, cachedModuleFile.moduleFile.jsFilePath, cachedModuleFile.jsText);
-      return;
+      await outputFile(ctx, cachedModuleFile.moduleFile.jsFilePath, cachedModuleFile.jsText);
+      return true;
     }
 
   } else {
     // purposely not using the fs cache
     // this is probably when we want to prime the
     // in-memory ts cache after the first build has completed
-    const existingModuleFile = ctx.compilerCtx.moduleFiles[tsFilePath];
+    const existingModuleFile = ctx.compilerCtx.moduleMap.get(sourceFilePath);
     if (existingModuleFile && Array.isArray(existingModuleFile.externalImports)) {
       ensureExternalImports = existingModuleFile.externalImports.slice();
     }
   }
 
   // let's do this!
-  const output = services.getEmitOutput(tsFilePath);
+  const output = services.getEmitOutput(sourceFilePath);
 
   // keep track of how many files we transpiled (great for debugging/testing)
   ctx.buildCtx.transpileBuildCount++;
@@ -250,33 +241,27 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
   if (output.emitSkipped) {
     // oh no! we've got some typescript diagnostics for this file!
     const tsDiagnostics = services.getCompilerOptionsDiagnostics()
-      .concat(services.getSyntacticDiagnostics(tsFilePath));
+      .concat(services.getSyntacticDiagnostics(sourceFilePath));
 
-    loadTypeScriptDiagnostics(config, ctx.buildCtx.diagnostics, tsDiagnostics);
-    return;
+    loadTypeScriptDiagnostics(ctx.buildCtx.diagnostics, tsDiagnostics);
+
+    return false;
   }
 
-  await Promise.all(output.outputFiles.map(async tsOutput => {
+  const changedContent = await Promise.all(output.outputFiles.map(async tsOutput => {
     const outputFilePath = normalizePath(tsOutput.name);
 
-    if (!ctx.buildCtx.isActiveBuild) {
-      ctx.buildCtx.debug(`tranpsileTsFile write aborted, not active build: ${tsFilePath}`);
-      return;
-    }
-
     if (ctx.buildCtx.hasError) {
-      ctx.buildCtx.debug(`tranpsileTsFile write aborted: ${tsFilePath}`);
-      return;
+      ctx.buildCtx.debug(`transpileTsFile write aborted: ${sourceFilePath}`);
+      return false;
     }
 
     if (outputFilePath.endsWith('.js')) {
       // this is the JS output of the typescript file transpiling
-      const moduleFile = getModuleFile(ctx.compilerCtx, tsFilePath);
-      moduleFile.jsFilePath = outputFilePath;
-
+      const moduleFile = getModule(config, ctx.compilerCtx, sourceFilePath);
       if (Array.isArray(ensureExternalImports)) {
         ensureExternalImports.forEach(moduleId => {
-          addCollection(config, ctx.compilerCtx, ctx.compilerCtx.collections, moduleFile, config.rootDir, moduleId);
+          addExternalImport(config, ctx.compilerCtx, ctx.buildCtx, moduleFile, config.rootDir, moduleId);
         });
       }
 
@@ -294,33 +279,26 @@ async function tranpsileTsFile(config: d.Config, services: ts.LanguageService, c
     }
 
     // write the text to our in-memory fs and output targets
-    await outputFile(config, ctx, outputFilePath, tsOutput.text);
+    return outputFile(ctx, outputFilePath, tsOutput.text);
   }));
+  return changedContent.some(Boolean);
 }
 
 
-async function outputFile(config: d.Config, ctx: TranspileContext, outputFilePath: string, outputText: string) {
+async function outputFile(ctx: TranspileContext, outputFilePath: string, outputText: string) {
   // the in-memory .js version is be virtually next to the source ts file
   // but it never actually gets written to disk, just there in spirit
-  await ctx.compilerCtx.fs.writeFile(
+  const { changedContent } = await ctx.compilerCtx.fs.writeFile(
     outputFilePath,
     outputText,
     { inMemoryOnly: true }
   );
-
-  // also write the output to each of the output targets
-  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.type === 'dist');
-  await Promise.all(outputTargets.map(async outputTarget => {
-    const relPath = config.sys.path.relative(config.srcDir, outputFilePath);
-    const outputTargetFilePath = pathJoin(config, outputTarget.collectionDir, relPath);
-
-    await ctx.compilerCtx.fs.writeFile(outputTargetFilePath, outputText);
-  }));
+  return changedContent;
 }
 
 
 interface CachedModuleFile {
-  moduleFile: d.ModuleFile;
+  moduleFile: d.Module;
   jsText: string;
 }
 
@@ -411,6 +389,17 @@ const PRIME_TS_CACHE_TIMEOUT = 1000;
 
 
 export function isFileIncludePath(config: d.Config, readPath: string) {
+  // filter e2e tests
+  if (readPath.includes('.e2e.') || readPath.includes('/e2e.')) {
+    // keep this test if it's an e2e file and we should be testing e2e
+    return false;
+  }
+
+  // filter spec tests
+  if (readPath.includes('.spec.') || readPath.includes('/spec.')) {
+    return false;
+  }
+
   for (var i = 0; i < config.excludeSrc.length; i++) {
     if (minimatch(readPath, config.excludeSrc[i])) {
       // this file is a file we want to exclude
@@ -430,7 +419,7 @@ export function isFileIncludePath(config: d.Config, readPath: string) {
 }
 
 
-function createConfiKey(config: d.Config, compilerOptions: ts.CompilerOptions) {
+function createConfigKey(config: d.Config, compilerOptions: ts.CompilerOptions) {
   // create a unique config key with stuff that "might" matter for typescript builds
   // not using the entire config object
   // since not everything is a primitive and could have circular references
@@ -449,12 +438,11 @@ function createConfiKey(config: d.Config, compilerOptions: ts.CompilerOptions) {
       config.hashFileNames,
       config.outputTargets,
       config.enableCache,
-      config.assetVersioning,
       config.buildAppCore,
       config.excludeSrc,
       config.includeSrc,
       compilerOptions,
-      '__BUILDID:TRANSPILE__'
+      COMPILER_BUILD.id
     ]
   ), 32);
 }

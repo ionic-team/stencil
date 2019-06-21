@@ -1,10 +1,9 @@
 import * as d from '../../declarations';
-import { appUpdate } from './app-update';
+import { emitBuildLog, emitBuildResults, emitBuildStatus } from './build-events';
 import { logDisabled, logReload, logWarn } from './logger';
-import { updateBuildStatus } from './build-status';
 
 
-export function initClientWebSocket(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig) {
+export function initClientWebSocket(win: d.DevClientWindow) {
   const wsUrl = getSocketUrl(win.location);
   let clientWs: WebSocket;
   let reconnectTmrId: any;
@@ -17,7 +16,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document, confi
     if (reconnectAttempts > 0) {
       // we just reconnected
       // we'll request the build results and wait on its response
-      updateBuildStatus(doc, 'pending');
+      emitBuildStatus(win, 'pending');
     }
 
     if (!hasGottenBuildResults) {
@@ -30,7 +29,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document, confi
         } else {
           clearInterval(requestBuildResultsTmrId);
         }
-      }, 1000);
+      }, REQUEST_BUILD_RESULTS_INTERVAL_MS);
     }
 
     // we just connected, let's just
@@ -45,7 +44,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document, confi
   }
 
   function onClose(event: { code: number; reason: string }) {
-    updateBuildStatus(doc, 'disabled');
+    emitBuildStatus(win, 'disabled');
 
     if (event.code > NORMAL_CLOSURE_CODE) {
       // the browser's web socket has closed w/ an unexpected code
@@ -82,9 +81,11 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document, confi
     }
 
     if (msg.buildLog) {
-      const statusMsg = new CustomEvent('buildLog', { detail: msg.buildLog });
-      win.dispatchEvent(statusMsg);
-      updateBuildStatus(doc, 'pending');
+      if (msg.buildLog.progress < 1) {
+        emitBuildStatus(win, 'pending');
+      }
+
+      emitBuildLog(win, msg.buildLog);
       return;
     }
 
@@ -93,8 +94,9 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document, confi
       // let's update our app with the data received
       hasGottenBuildResults = true;
       clearInterval(requestBuildResultsTmrId);
-      updateBuildStatus(doc, 'default');
-      appUpdate(win, doc, config, msg.buildResults);
+
+      emitBuildStatus(win, 'default');
+      emitBuildResults(win, msg.buildResults);
       return;
     }
   }
@@ -135,7 +137,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document, confi
     // ensure clear out any other pending reconnect timeouts
     clearTimeout(reconnectTmrId);
 
-    if (reconnectAttempts > RECONNECT_ATTEMPTS) {
+    if (reconnectAttempts >= RECONNECT_ATTEMPTS) {
       logWarn(`Dev Server`, `Canceling reconnect attempts`);
 
     } else {
@@ -145,7 +147,7 @@ export function initClientWebSocket(win: d.DevClientWindow, doc: Document, confi
       // queue up a reconnect in a few seconds
       reconnectTmrId = setTimeout(connect, RECONNECT_RETRY_MS);
 
-      updateBuildStatus(doc, 'disabled');
+      emitBuildStatus(win, 'disabled');
     }
   }
 
@@ -160,6 +162,7 @@ function getSocketUrl(location: Location) {
 }
 
 
-const RECONNECT_ATTEMPTS = 500;
+const RECONNECT_ATTEMPTS = 1000;
 const RECONNECT_RETRY_MS = 2500;
 const NORMAL_CLOSURE_CODE = 1000;
+const REQUEST_BUILD_RESULTS_INTERVAL_MS = 500;

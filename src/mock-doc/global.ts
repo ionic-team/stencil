@@ -1,44 +1,64 @@
-import { MockWindow } from './window';
+import { MockWindow, resetWindow } from './window';
 
 
-export function applyWindowToGlobal(global: any) {
-  global._window = null;
+export function setupGlobal(global: any) {
+  if (global.window == null) {
+    const win: any = global.window = new MockWindow();
 
-  Object.defineProperty(global, 'window', {
-    get: function() {
-      if (!this._window) {
-        this._window = new MockWindow();
-      }
-      return this._window;
-    }
-  });
-
-  WINDOW_PROPERTIES.forEach(winProperty => {
-    Object.defineProperty(global, winProperty, {
-      get: function() {
-        if (!this._window) {
-          this._window = new MockWindow();
-        }
-        return this._window[winProperty];
+    WINDOW_FUNCTIONS.forEach(fnName => {
+      if (!(fnName in global)) {
+        global[fnName] = win[fnName].bind(win);
       }
     });
-  });
+
+    WINDOW_PROPS.forEach(propName => {
+      if (!(propName in global)) {
+        Object.defineProperty(global, propName, {
+          get() { return win[propName]; },
+          set(val: any) { win[propName] = val; },
+          configurable: true,
+          enumerable: true
+        });
+
+      }
+    });
+  }
+
+  return global.window;
 }
 
-const WINDOW_PROPERTIES = [
-  'customElements',
+
+export function teardownGlobal(global: any) {
+  const win = global.window as Window;
+  resetWindow(win);
+}
+
+
+const WINDOW_FUNCTIONS = [
+  'addEventListener',
+  'cancelAnimationFrame',
+  'cancelIdleCallback',
   'dispatchEvent',
+  'matchMedia',
+  'removeEventListener',
+  'requestAnimationFrame',
+  'requestIdleCallback'
+];
+
+
+const WINDOW_PROPS = [
+  'customElements',
   'document',
-  'fetch',
   'history',
   'localStorage',
   'location',
-  'matchMedia',
   'navigator',
   'performance',
-  'removeEventListener',
-  'requestAnimationFrame',
   'sessionStorage',
+  'CSS',
+  'CustomEvent',
   'Event',
-  'CustomEvent'
+  'Element',
+  'HTMLElement',
+  'KeyboardEvent'
 ];

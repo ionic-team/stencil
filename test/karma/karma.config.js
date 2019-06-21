@@ -1,4 +1,3 @@
-var path = require('path');
 const browserStack = !!process.env.CI;
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
@@ -52,6 +51,21 @@ const localLaunchers = {
   }
 };
 
+if (process.platform === 'win32') {
+  localLaunchers.IE = {
+    base: 'IE'
+  };
+  localLaunchers.Edge = {
+    base: 'Edge'
+  };
+
+} else if (process.platform === 'darwin') {
+  // localLaunchers.Safari = {
+  //   base: 'Safari'
+  // };
+}
+
+
 module.exports = function(config) {
   config.set({
     plugins: [
@@ -59,6 +73,8 @@ module.exports = function(config) {
       'karma-firefox-launcher',
       'karma-safari-launcher',
       'karma-browserstack-launcher',
+      'karma-ie-launcher',
+      'karma-edge-launcher',
       'karma-jasmine',
       'karma-typescript',
       'karma-polyfill'
@@ -88,21 +104,21 @@ module.exports = function(config) {
     },
 
     customLaunchers: browserStack ? browserStackLaunchers : {},
-
+    urlRoot: '/__karma__/',
     files: [
+      // 'test-app/attribute-basic/karma.spec.ts',
+      // 'test-app/attribute-complex/karma.spec.ts',
+      // 'test-app/reflect-to-attr/karma.spec.ts',
+
       'test-app/**/*.spec.ts',
       'test-app/util.ts',
-      'www/build/testapp.js',
-      'www/build/testsibling.js',
-      { pattern: 'www/**/*', watched: false, included: false, served: true, nocache: true }
+      { pattern: 'www/**/*', watched: false, included: false, served: true, nocache: true, type: 'module' }
     ],
 
     proxies: {
-      '/www/': '/base/www/',
-      '/build/testapp.js': '/base/www/noscript.js',
-      '/build/testsibling.js': '/base/www/noscript.js',
-      '/esm-webpack/main.js': '/base/www/noscript.js',
-      '/prerender/': '/base/www/prerender/'
+      '/': '/base/www/',
+      // '/build/testsibling.js': '/base/www/noscript.js',
+      // '/esm-webpack/main.js': '/base/www/noscript.js',
     },
 
     colors: true,

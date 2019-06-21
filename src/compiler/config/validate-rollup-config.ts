@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { isObject, pluck } from '../../util/helpers';
+import { isObject, pluck } from '@utils';
 
 export function validateRollupConfig(config: d.Config) {
   const cleanRollupConfig = getCleanRollupConfig(config.rollupConfig);
@@ -16,7 +16,7 @@ function getCleanRollupConfig(rollupConfig: d.RollupConfig): d.RollupConfig {
   if (rollupConfig.inputOptions && isObject(rollupConfig.inputOptions)) {
     cleanRollupConfig = {
       ...cleanRollupConfig,
-      inputOptions: pluck(rollupConfig.inputOptions, ['context', 'moduleContext']),
+      inputOptions: pluck(rollupConfig.inputOptions, ['context', 'moduleContext', 'treeshake']),
     };
   }
 

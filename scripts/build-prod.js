@@ -42,7 +42,7 @@ fs.emptyDirSync(DIST_LICENSES);
   'is-glob',
   'minimatch',
   'node-fetch',
-  'opn',
+  'open',
   'parse5',
   'pixelmatch',
   'pngjs',
@@ -99,5 +99,5 @@ function copyLicense(moduleId) {
 process.on('exit', () => {
   const buildConditionals = path.join(__dirname, '..', 'dist', 'transpiled-build-conditionals');
   fs.removeSync(buildConditionals);
-  console.log(`✅ prod build optimized`);
+  console.log(`✅  prod build optimized`);
 });

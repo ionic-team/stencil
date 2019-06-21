@@ -1,4 +1,4 @@
-import { Component } from '../../../../dist';
+import { Component, h } from '@stencil/core';
 import { data } from './external-data'
 
 
@@ -6,8 +6,8 @@ import { data } from './external-data'
   tag: 'external-import-c'
 })
 export class ExternalImportB {
-  first: string;
-  last: string;
+  first?: string;
+  last?: string;
 
   componentWillLoad() {
     this.first = data().first;

@@ -1,6 +1,5 @@
 import * as d from '../declarations';
-import { getLatestCompilerVersion, validateCompilerVersion } from '../sys/node/check-version';
-import { hasError } from './cli-utils';
+import { validateCompilerVersion } from './task-version';
 import exit from 'exit';
 
 
@@ -13,7 +12,7 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
   }
 
   let devServerStart: Promise<d.DevServer> = null;
-  if (config.devServer && flags.serve) {
+  if (shouldStartDevServer(config, flags)) {
     try {
       devServerStart = compiler.startDevServer();
     } catch (e) {
@@ -22,36 +21,50 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
     }
   }
 
-  const latestVersion = getLatestCompilerVersion(config.sys, config.logger);
-
-  const results = await compiler.build();
+  let latestVersionPromise: Promise<string>;
+  if (config.devMode && config.watch) {
+    latestVersionPromise = config.sys.getLatestCompilerVersion(config.logger, false);
+  }
 
   let devServer: d.DevServer = null;
   if (devServerStart) {
     devServer = await devServerStart;
   }
 
-  if (!config.watch && hasError(results && results.diagnostics)) {
-    config.sys.destroy();
+  const results = await compiler.build();
 
-    if (devServer) {
+  if (!config.watch) {
+    if (devServer != null) {
       await devServer.close();
+      devServer = null;
     }
 
-    exit(1);
+    if (results != null && Array.isArray(results.diagnostics)) {
+      const hasError = results.diagnostics.some(d => d.level === 'error' || d.type === 'runtime');
+      if (hasError) {
+        config.sys.destroy();
+        exit(1);
+      }
+    }
   }
 
   if (config.watch || devServerStart) {
     process.once('SIGINT', () => {
       config.sys.destroy();
 
-      if (devServer) {
+      if (devServer != null) {
         devServer.close();
       }
     });
   }
 
-  await validateCompilerVersion(config, latestVersion);
+  if (latestVersionPromise != null) {
+    await validateCompilerVersion(config.sys, config.logger, latestVersionPromise);
+  }
 
   return results;
+}
+
+function shouldStartDevServer(config: d.Config, flags: d.ConfigFlags) {
+  return (config.devServer && (flags.serve || flags.prerender));
 }

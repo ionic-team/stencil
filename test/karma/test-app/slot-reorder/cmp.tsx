@@ -1,4 +1,4 @@
-import { Component, Prop } from '../../../../dist';
+import { Component, Prop, h } from '@stencil/core';
 
 
 @Component({
@@ -7,7 +7,7 @@ import { Component, Prop } from '../../../../dist';
 export class SlotReorder {
   @Prop() reordered = false;
 
-  render(): JSX.Element {
+  render() {
     if (this.reordered) {
       return (
         <div class='reordered'>

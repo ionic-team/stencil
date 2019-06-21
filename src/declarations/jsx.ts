@@ -1,138 +1,187 @@
-/**
- * This file gets copied to all distributions of stencil component collections.
- * - no imports
- */
 
-declare global {
-  interface HTMLStencilElement extends HTMLElement {
-    componentOnReady(): Promise<this>;
-    forceUpdate(): void;
-  }
-  interface StencilHTMLAttributes extends JSXElements.HTMLAttributes {}
-  interface StencilIntrinsicElements extends JSXElements.DefaultIntrinsicElements {}
-  interface StencilElementInterfaces {}
-  interface StencilGlobalHTMLAttributes {}
+declare namespace LocalJSX {
+  export interface Element {}
+  export interface IntrinsicElements {}
 }
+export { LocalJSX as JSX };
 
-export namespace JSXElements {
-  export interface DefaultIntrinsicElements {
+export namespace JSXBase {
+  export interface IntrinsicElements {
     // Stencil elements
-    slot: JSXElements.SlotAttributes;
+    slot: JSXBase.SlotAttributes;
 
     // HTML
-    a: JSXElements.AnchorHTMLAttributes<HTMLAnchorElement>;
-    abbr: JSXElements.HTMLAttributes;
-    address: JSXElements.HTMLAttributes;
-    area: JSXElements.AreaHTMLAttributes<HTMLAreaElement>;
-    article: JSXElements.HTMLAttributes;
-    aside: JSXElements.HTMLAttributes;
-    audio: JSXElements.AudioHTMLAttributes<HTMLAudioElement>;
-    b: JSXElements.HTMLAttributes;
-    base: JSXElements.BaseHTMLAttributes<HTMLBaseElement>;
-    bdi: JSXElements.HTMLAttributes;
-    bdo: JSXElements.HTMLAttributes;
-    big: JSXElements.HTMLAttributes;
-    blockquote: JSXElements.BlockquoteHTMLAttributes<HTMLQuoteElement>;
-    body: JSXElements.HTMLAttributes<HTMLBodyElement>;
-    br: JSXElements.HTMLAttributes<HTMLBRElement>;
-    button: JSXElements.ButtonHTMLAttributes<HTMLButtonElement>;
-    canvas: JSXElements.CanvasHTMLAttributes<HTMLCanvasElement>;
-    caption: JSXElements.HTMLAttributes<HTMLTableCaptionElement>;
-    cite: JSXElements.HTMLAttributes;
-    code: JSXElements.HTMLAttributes;
-    col: JSXElements.ColHTMLAttributes<HTMLTableColElement>;
-    colgroup: JSXElements.ColgroupHTMLAttributes<HTMLTableColElement>;
-    data: JSXElements.HTMLAttributes<HTMLDataElement>;
-    datalist: JSXElements.HTMLAttributes<HTMLDataListElement>;
-    dd: JSXElements.HTMLAttributes;
-    del: JSXElements.DelHTMLAttributes<HTMLModElement>;
-    details: JSXElements.DetailsHTMLAttributes<HTMLElement>;
-    dfn: JSXElements.HTMLAttributes;
-    dialog: JSXElements.DialogHTMLAttributes<HTMLDialogElement>;
-    div: JSXElements.HTMLAttributes<HTMLDivElement>;
-    dl: JSXElements.HTMLAttributes<HTMLDListElement>;
-    dt: JSXElements.HTMLAttributes;
-    em: JSXElements.HTMLAttributes;
-    embed: JSXElements.EmbedHTMLAttributes<HTMLEmbedElement>;
-    fieldset: JSXElements.FieldsetHTMLAttributes<HTMLFieldSetElement>;
-    figcaption: JSXElements.HTMLAttributes;
-    figure: JSXElements.HTMLAttributes;
-    footer: JSXElements.HTMLAttributes;
-    form: JSXElements.FormHTMLAttributes<HTMLFormElement>;
-    h1: JSXElements.HTMLAttributes<HTMLHeadingElement>;
-    h2: JSXElements.HTMLAttributes<HTMLHeadingElement>;
-    h3: JSXElements.HTMLAttributes<HTMLHeadingElement>;
-    h4: JSXElements.HTMLAttributes<HTMLHeadingElement>;
-    h5: JSXElements.HTMLAttributes<HTMLHeadingElement>;
-    h6: JSXElements.HTMLAttributes<HTMLHeadingElement>;
-    head: JSXElements.HTMLAttributes<HTMLHeadElement>;
-    header: JSXElements.HTMLAttributes;
-    hgroup: JSXElements.HTMLAttributes;
-    hr: JSXElements.HTMLAttributes<HTMLHRElement>;
-    html: JSXElements.HTMLAttributes<HTMLHtmlElement>;
-    i: JSXElements.HTMLAttributes;
-    iframe: JSXElements.IframeHTMLAttributes<HTMLIFrameElement>;
-    img: JSXElements.ImgHTMLAttributes<HTMLImageElement>;
-    input: JSXElements.InputHTMLAttributes<HTMLInputElement>;
-    ins: JSXElements.InsHTMLAttributes<HTMLModElement>;
-    kbd: JSXElements.HTMLAttributes;
-    keygen: JSXElements.KeygenHTMLAttributes<HTMLElement>;
-    label: JSXElements.LabelHTMLAttributes<HTMLLabelElement>;
-    legend: JSXElements.HTMLAttributes<HTMLLegendElement>;
-    li: JSXElements.LiHTMLAttributes<HTMLLIElement>;
-    link: JSXElements.LinkHTMLAttributes<HTMLLinkElement>;
-    main: JSXElements.HTMLAttributes;
-    map: JSXElements.MapHTMLAttributes<HTMLMapElement>;
-    mark: JSXElements.HTMLAttributes;
-    menu: JSXElements.MenuHTMLAttributes<HTMLMenuElement>;
-    menuitem: JSXElements.HTMLAttributes;
-    meta: JSXElements.MetaHTMLAttributes<HTMLMetaElement>;
-    meter: JSXElements.MeterHTMLAttributes<HTMLMeterElement>;
-    nav: JSXElements.HTMLAttributes;
-    noscript: JSXElements.HTMLAttributes;
-    object: JSXElements.ObjectHTMLAttributes<HTMLObjectElement>;
-    ol: JSXElements.OlHTMLAttributes<HTMLOListElement>;
-    optgroup: JSXElements.OptgroupHTMLAttributes<HTMLOptGroupElement>;
-    option: JSXElements.OptionHTMLAttributes<HTMLOptionElement>;
-    output: JSXElements.OutputHTMLAttributes<HTMLOutputElement>;
-    p: JSXElements.HTMLAttributes<HTMLParagraphElement>;
-    param: JSXElements.ParamHTMLAttributes<HTMLParamElement>;
-    picture: JSXElements.HTMLAttributes<HTMLPictureElement>;
-    pre: JSXElements.HTMLAttributes<HTMLPreElement>;
-    progress: JSXElements.ProgressHTMLAttributes<HTMLProgressElement>;
-    q: JSXElements.QuoteHTMLAttributes<HTMLQuoteElement>;
-    rp: JSXElements.HTMLAttributes;
-    rt: JSXElements.HTMLAttributes;
-    ruby: JSXElements.HTMLAttributes;
-    s: JSXElements.HTMLAttributes;
-    samp: JSXElements.HTMLAttributes;
-    script: JSXElements.ScriptHTMLAttributes<HTMLScriptElement>;
-    section: JSXElements.HTMLAttributes;
-    select: JSXElements.SelectHTMLAttributes<HTMLSelectElement>;
-    small: JSXElements.HTMLAttributes;
-    source: JSXElements.SourceHTMLAttributes<HTMLSourceElement>;
-    span: JSXElements.HTMLAttributes<HTMLSpanElement>;
-    strong: JSXElements.HTMLAttributes;
-    style: JSXElements.StyleHTMLAttributes<HTMLStyleElement>;
-    sub: JSXElements.HTMLAttributes;
-    summary: JSXElements.HTMLAttributes;
-    sup: JSXElements.HTMLAttributes;
-    table: JSXElements.TableHTMLAttributes<HTMLTableElement>;
-    tbody: JSXElements.HTMLAttributes<HTMLTableSectionElement>;
-    td: JSXElements.TdHTMLAttributes<HTMLTableDataCellElement>;
-    textarea: JSXElements.TextareaHTMLAttributes<HTMLTextAreaElement>;
-    tfoot: JSXElements.HTMLAttributes<HTMLTableSectionElement>;
-    th: JSXElements.ThHTMLAttributes<HTMLTableHeaderCellElement>;
-    thead: JSXElements.HTMLAttributes<HTMLTableSectionElement>;
-    time: JSXElements.TimeHTMLAttributes<HTMLTimeElement>;
-    title: JSXElements.HTMLAttributes<HTMLTitleElement>;
-    tr: JSXElements.HTMLAttributes<HTMLTableRowElement>;
-    track: JSXElements.TrackHTMLAttributes<HTMLTrackElement>;
-    u: JSXElements.HTMLAttributes;
-    ul: JSXElements.HTMLAttributes<HTMLUListElement>;
-    'var': JSXElements.HTMLAttributes;
-    video: JSXElements.VideoHTMLAttributes<HTMLVideoElement>;
-    wbr: JSXElements.HTMLAttributes;
+    a: JSXBase.AnchorHTMLAttributes<HTMLAnchorElement>;
+    abbr: JSXBase.HTMLAttributes;
+    address: JSXBase.HTMLAttributes;
+    area: JSXBase.AreaHTMLAttributes<HTMLAreaElement>;
+    article: JSXBase.HTMLAttributes;
+    aside: JSXBase.HTMLAttributes;
+    audio: JSXBase.AudioHTMLAttributes<HTMLAudioElement>;
+    b: JSXBase.HTMLAttributes;
+    base: JSXBase.BaseHTMLAttributes<HTMLBaseElement>;
+    bdi: JSXBase.HTMLAttributes;
+    bdo: JSXBase.HTMLAttributes;
+    big: JSXBase.HTMLAttributes;
+    blockquote: JSXBase.BlockquoteHTMLAttributes<HTMLQuoteElement>;
+    body: JSXBase.HTMLAttributes<HTMLBodyElement>;
+    br: JSXBase.HTMLAttributes<HTMLBRElement>;
+    button: JSXBase.ButtonHTMLAttributes<HTMLButtonElement>;
+    canvas: JSXBase.CanvasHTMLAttributes<HTMLCanvasElement>;
+    caption: JSXBase.HTMLAttributes<HTMLTableCaptionElement>;
+    cite: JSXBase.HTMLAttributes;
+    code: JSXBase.HTMLAttributes;
+    col: JSXBase.ColHTMLAttributes<HTMLTableColElement>;
+    colgroup: JSXBase.ColgroupHTMLAttributes<HTMLTableColElement>;
+    data: JSXBase.HTMLAttributes<HTMLDataElement>;
+    datalist: JSXBase.HTMLAttributes<HTMLDataListElement>;
+    dd: JSXBase.HTMLAttributes;
+    del: JSXBase.DelHTMLAttributes<HTMLModElement>;
+    details: JSXBase.DetailsHTMLAttributes<HTMLElement>;
+    dfn: JSXBase.HTMLAttributes;
+    dialog: JSXBase.DialogHTMLAttributes<HTMLDialogElement>;
+    div: JSXBase.HTMLAttributes<HTMLDivElement>;
+    dl: JSXBase.HTMLAttributes<HTMLDListElement>;
+    dt: JSXBase.HTMLAttributes;
+    em: JSXBase.HTMLAttributes;
+    embed: JSXBase.EmbedHTMLAttributes<HTMLEmbedElement>;
+    fieldset: JSXBase.FieldsetHTMLAttributes<HTMLFieldSetElement>;
+    figcaption: JSXBase.HTMLAttributes;
+    figure: JSXBase.HTMLAttributes;
+    footer: JSXBase.HTMLAttributes;
+    form: JSXBase.FormHTMLAttributes<HTMLFormElement>;
+    h1: JSXBase.HTMLAttributes<HTMLHeadingElement>;
+    h2: JSXBase.HTMLAttributes<HTMLHeadingElement>;
+    h3: JSXBase.HTMLAttributes<HTMLHeadingElement>;
+    h4: JSXBase.HTMLAttributes<HTMLHeadingElement>;
+    h5: JSXBase.HTMLAttributes<HTMLHeadingElement>;
+    h6: JSXBase.HTMLAttributes<HTMLHeadingElement>;
+    head: JSXBase.HTMLAttributes<HTMLHeadElement>;
+    header: JSXBase.HTMLAttributes;
+    hgroup: JSXBase.HTMLAttributes;
+    hr: JSXBase.HTMLAttributes<HTMLHRElement>;
+    html: JSXBase.HTMLAttributes<HTMLHtmlElement>;
+    i: JSXBase.HTMLAttributes;
+    iframe: JSXBase.IframeHTMLAttributes<HTMLIFrameElement>;
+    img: JSXBase.ImgHTMLAttributes<HTMLImageElement>;
+    input: JSXBase.InputHTMLAttributes<HTMLInputElement>;
+    ins: JSXBase.InsHTMLAttributes<HTMLModElement>;
+    kbd: JSXBase.HTMLAttributes;
+    keygen: JSXBase.KeygenHTMLAttributes<HTMLElement>;
+    label: JSXBase.LabelHTMLAttributes<HTMLLabelElement>;
+    legend: JSXBase.HTMLAttributes<HTMLLegendElement>;
+    li: JSXBase.LiHTMLAttributes<HTMLLIElement>;
+    link: JSXBase.LinkHTMLAttributes<HTMLLinkElement>;
+    main: JSXBase.HTMLAttributes;
+    map: JSXBase.MapHTMLAttributes<HTMLMapElement>;
+    mark: JSXBase.HTMLAttributes;
+    menu: JSXBase.MenuHTMLAttributes<HTMLMenuElement>;
+    menuitem: JSXBase.HTMLAttributes;
+    meta: JSXBase.MetaHTMLAttributes<HTMLMetaElement>;
+    meter: JSXBase.MeterHTMLAttributes<HTMLMeterElement>;
+    nav: JSXBase.HTMLAttributes;
+    noscript: JSXBase.HTMLAttributes;
+    object: JSXBase.ObjectHTMLAttributes<HTMLObjectElement>;
+    ol: JSXBase.OlHTMLAttributes<HTMLOListElement>;
+    optgroup: JSXBase.OptgroupHTMLAttributes<HTMLOptGroupElement>;
+    option: JSXBase.OptionHTMLAttributes<HTMLOptionElement>;
+    output: JSXBase.OutputHTMLAttributes<HTMLOutputElement>;
+    p: JSXBase.HTMLAttributes<HTMLParagraphElement>;
+    param: JSXBase.ParamHTMLAttributes<HTMLParamElement>;
+    picture: JSXBase.HTMLAttributes<HTMLPictureElement>;
+    pre: JSXBase.HTMLAttributes<HTMLPreElement>;
+    progress: JSXBase.ProgressHTMLAttributes<HTMLProgressElement>;
+    q: JSXBase.QuoteHTMLAttributes<HTMLQuoteElement>;
+    rp: JSXBase.HTMLAttributes;
+    rt: JSXBase.HTMLAttributes;
+    ruby: JSXBase.HTMLAttributes;
+    s: JSXBase.HTMLAttributes;
+    samp: JSXBase.HTMLAttributes;
+    script: JSXBase.ScriptHTMLAttributes<HTMLScriptElement>;
+    section: JSXBase.HTMLAttributes;
+    select: JSXBase.SelectHTMLAttributes<HTMLSelectElement>;
+    small: JSXBase.HTMLAttributes;
+    source: JSXBase.SourceHTMLAttributes<HTMLSourceElement>;
+    span: JSXBase.HTMLAttributes<HTMLSpanElement>;
+    strong: JSXBase.HTMLAttributes;
+    style: JSXBase.StyleHTMLAttributes<HTMLStyleElement>;
+    sub: JSXBase.HTMLAttributes;
+    summary: JSXBase.HTMLAttributes;
+    sup: JSXBase.HTMLAttributes;
+    table: JSXBase.TableHTMLAttributes<HTMLTableElement>;
+    tbody: JSXBase.HTMLAttributes<HTMLTableSectionElement>;
+    td: JSXBase.TdHTMLAttributes<HTMLTableDataCellElement>;
+    textarea: JSXBase.TextareaHTMLAttributes<HTMLTextAreaElement>;
+    tfoot: JSXBase.HTMLAttributes<HTMLTableSectionElement>;
+    th: JSXBase.ThHTMLAttributes<HTMLTableHeaderCellElement>;
+    thead: JSXBase.HTMLAttributes<HTMLTableSectionElement>;
+    time: JSXBase.TimeHTMLAttributes<HTMLTimeElement>;
+    title: JSXBase.HTMLAttributes<HTMLTitleElement>;
+    tr: JSXBase.HTMLAttributes<HTMLTableRowElement>;
+    track: JSXBase.TrackHTMLAttributes<HTMLTrackElement>;
+    u: JSXBase.HTMLAttributes;
+    ul: JSXBase.HTMLAttributes<HTMLUListElement>;
+    'var': JSXBase.HTMLAttributes;
+    video: JSXBase.VideoHTMLAttributes<HTMLVideoElement>;
+    wbr: JSXBase.HTMLAttributes;
+
+
+    // SVG
+    animate: JSXBase.SVGAttributes;
+    circle: JSXBase.SVGAttributes;
+    clipPath: JSXBase.SVGAttributes;
+    defs: JSXBase.SVGAttributes;
+    desc: JSXBase.SVGAttributes;
+    ellipse: JSXBase.SVGAttributes;
+    feBlend: JSXBase.SVGAttributes;
+    feColorMatrix: JSXBase.SVGAttributes;
+    feComponentTransfer: JSXBase.SVGAttributes;
+    feComposite: JSXBase.SVGAttributes;
+    feConvolveMatrix: JSXBase.SVGAttributes;
+    feDiffuseLighting: JSXBase.SVGAttributes;
+    feDisplacementMap: JSXBase.SVGAttributes;
+    feDistantLight: JSXBase.SVGAttributes;
+    feDropShadow: JSXBase.SVGAttributes;
+    feFlood: JSXBase.SVGAttributes;
+    feFuncA: JSXBase.SVGAttributes;
+    feFuncB: JSXBase.SVGAttributes;
+    feFuncG: JSXBase.SVGAttributes;
+    feFuncR: JSXBase.SVGAttributes;
+    feGaussianBlur: JSXBase.SVGAttributes;
+    feImage: JSXBase.SVGAttributes;
+    feMerge: JSXBase.SVGAttributes;
+    feMergeNode: JSXBase.SVGAttributes;
+    feMorphology: JSXBase.SVGAttributes;
+    feOffset: JSXBase.SVGAttributes;
+    fePointLight: JSXBase.SVGAttributes;
+    feSpecularLighting: JSXBase.SVGAttributes;
+    feSpotLight: JSXBase.SVGAttributes;
+    feTile: JSXBase.SVGAttributes;
+    feTurbulence: JSXBase.SVGAttributes;
+    filter: JSXBase.SVGAttributes;
+    foreignObject: JSXBase.SVGAttributes;
+    g: JSXBase.SVGAttributes;
+    image: JSXBase.SVGAttributes;
+    line: JSXBase.SVGAttributes;
+    linearGradient: JSXBase.SVGAttributes;
+    marker: JSXBase.SVGAttributes;
+    mask: JSXBase.SVGAttributes;
+    metadata: JSXBase.SVGAttributes;
+    path: JSXBase.SVGAttributes;
+    pattern: JSXBase.SVGAttributes;
+    polygon: JSXBase.SVGAttributes;
+    polyline: JSXBase.SVGAttributes;
+    radialGradient: JSXBase.SVGAttributes;
+    rect: JSXBase.SVGAttributes;
+    stop: JSXBase.SVGAttributes;
+    svg: JSXBase.SVGAttributes;
+    switch: JSXBase.SVGAttributes;
+    symbol: JSXBase.SVGAttributes;
+    text: JSXBase.SVGAttributes;
+    textPath: JSXBase.SVGAttributes;
+    tspan: JSXBase.SVGAttributes;
+    use: JSXBase.SVGAttributes;
+    view: JSXBase.SVGAttributes;
   }
 
   export interface SlotAttributes {
@@ -217,6 +266,7 @@ export namespace JSXElements {
   }
 
   export interface DialogHTMLAttributes<T> extends HTMLAttributes<T> {
+    onClose?: (event: Event) => void;
     open?: boolean;
     returnValue?: string;
   }
@@ -260,7 +310,9 @@ export namespace JSXElements {
     allowtransparency?: string | boolean;
     frameBorder?: number | string;
     frameborder?: number | string;
+    importance?: 'low' | 'auto' | 'high';
     height?: number | string;
+    loading?: 'lazy' | 'auto' | 'eager';
     marginHeight?: number;
     marginheight?: string | number;
     marginWidth?: number;
@@ -278,7 +330,9 @@ export namespace JSXElements {
   export interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
     alt?: string;
     decoding?: 'async' | 'auto' | 'sync';
+    importance?: 'low' | 'auto' | 'high';
     height?: number | string;
+    loading?: 'lazy' | 'auto' | 'eager';
     sizes?: string;
     src?: string;
     srcSet?: string;
@@ -367,6 +421,7 @@ export namespace JSXElements {
     href?: string;
     hrefLang?: string;
     hreflang?: string;
+    importance?: 'low' | 'auto' | 'high';
     integrity?: string;
     media?: string;
     rel?: string;
@@ -394,6 +449,33 @@ export namespace JSXElements {
     muted?: boolean;
     preload?: string;
     src?: string;
+
+    // https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events
+    onAbort?: (event: Event) => void;
+    onCanPlay?: (event: Event) => void;
+    onCanPlayThrough?: (event: Event) => void;
+    onDurationChange?: (event: Event) => void;
+    onEmptied?: (event: Event) => void;
+    onEnded?: (event: Event) => void;
+    onError?: (event: Event) => void;
+    onInterruptBegin?: (event: Event) => void;
+    onInterruptEnd?: (event: Event) => void;
+    onLoadedData?: (event: Event) => void;
+    onLoadedMetaData?: (event: Event) => void;
+    onLoadStart?: (event: Event) => void;
+    onMozAudioAvailable?: (event: Event) => void;
+    onPause?: (event: Event) => void;
+    onPlay?: (event: Event) => void;
+    onPlaying?: (event: Event) => void;
+    onProgress?: (event: Event) => void;
+    onRateChange?: (event: Event) => void;
+    onSeeked?: (event: Event) => void;
+    onSeeking?: (event: Event) => void;
+    onStalled?: (event: Event) => void;
+    onSuspend?: (event: Event) => void;
+    onTimeUpdate?: (event: Event) => void;
+    onVolumeChange?: (event: Event) => void;
+    onWaiting?: (event: Event) => void;
   }
 
   export interface MetaHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -474,6 +556,7 @@ export namespace JSXElements {
     crossOrigin?: string;
     crossorigin?: string;
     defer?: boolean;
+    importance?: 'low' | 'auto' | 'high';
     integrity?: string;
     nonce?: string;
     src?: string;
@@ -568,15 +651,14 @@ export namespace JSXElements {
     width?: number | string;
   }
 
-  export interface HTMLAttributes<T = HTMLElement> extends StencilGlobalHTMLAttributes, DOMAttributes {
+  export interface HTMLAttributes<T = HTMLElement> extends DOMAttributes<T> {
     // vdom specific
     innerHTML?: string;
-    ref?: (elm?: T) => void;
     key?: string | number;
 
     // Standard HTML Attributes
     accessKey?: string;
-    class?: string |  { [className: string]: boolean };
+    class?: string | { [className: string]: boolean };
     contentEditable?: boolean | string;
     contenteditable?: boolean | string;
     contextMenu?: string;
@@ -589,7 +671,7 @@ export namespace JSXElements {
     slot?: string;
     spellCheck?: boolean;
     spellcheck?: boolean | string;
-    style?: { [key: string]: string };
+    style?: { [key: string]: string | undefined };
     tabIndex?: number;
     tabindex?: number | string;
     title?: string;
@@ -600,6 +682,7 @@ export namespace JSXElements {
     is?: string;
     radioGroup?: string; // <command>, <menuitem>
     radiogroup?: string;
+    part?: string;
 
     // WAI-ARIA
     role?: string;
@@ -637,7 +720,7 @@ export namespace JSXElements {
     unselectable?: boolean;
   }
 
-  export interface SVGAttributes extends StencilGlobalHTMLAttributes, DOMAttributes {
+  export interface SVGAttributes<T = SVGElement> extends DOMAttributes<T> {
     // Attributes which also defined in HTMLAttributes
     // See comment in SVGDOMPropertyConfig.js
     class?: string | { [className: string]: boolean };
@@ -650,7 +733,7 @@ export namespace JSXElements {
     method?: string;
     min?: number | string;
     name?: string;
-    style?: { [key: string]: any; };
+    style?: { [key: string]: string | undefined };
     target?: string;
     type?: string;
     width?: number | string;
@@ -902,7 +985,9 @@ export namespace JSXElements {
     zoomAndPan?: string;
   }
 
-  export interface DOMAttributes {
+  export interface DOMAttributes<T = Element> {
+    ref?: (elm?: T) => void;
+
     // Clipboard Events
     onCopy?: (event: ClipboardEvent) => void;
     onCopyCapture?: (event: ClipboardEvent) => void;
@@ -997,6 +1082,28 @@ export namespace JSXElements {
     onTouchMoveCapture?: (event: TouchEvent) => void;
     onTouchStart?: (event: TouchEvent) => void;
     onTouchStartCapture?: (event: TouchEvent) => void;
+
+    // Pointer Events
+    onPointerDown?: (event: PointerEvent) => void;
+    onPointerDownCapture?: (event: PointerEvent) => void;
+    onPointerMove?: (event: PointerEvent) => void;
+    onPointerMoveCapture?: (event: PointerEvent) => void;
+    onPointerUp?: (event: PointerEvent) => void;
+    onPointerUpCapture?: (event: PointerEvent) => void;
+    onPointerCancel?: (event: PointerEvent) => void;
+    onPointerCancelCapture?: (event: PointerEvent) => void;
+    onPointerEnter?: (event: PointerEvent) => void;
+    onPointerEnterCapture?: (event: PointerEvent) => void;
+    onPointerLeave?: (event: PointerEvent) => void;
+    onPointerLeaveCapture?: (event: PointerEvent) => void;
+    onPointerOver?: (event: PointerEvent) => void;
+    onPointerOverCapture?: (event: PointerEvent) => void;
+    onPointerOut?: (event: PointerEvent) => void;
+    onPointerOutCapture?: (event: PointerEvent) => void;
+    onGotPointerCapture?: (event: PointerEvent) => void;
+    onGotPointerCaptureCapture?: (event: PointerEvent) => void;
+    onLostPointerCapture?: (event: PointerEvent) => void;
+    onLostPointerCaptureCapture?: (event: PointerEvent) => void;
 
     // UI Events
     onScroll?: (event: UIEvent) => void;

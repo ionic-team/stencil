@@ -18,7 +18,8 @@ describe('node-globals', function() {
     ids.forEach(id => {
       const tmpdir = app.querySelector(`#${id}`);
       expect(tmpdir.textContent.trim()).not.toBe('');
-    })
+    });
+    expect(app.querySelector(`#node_env`).textContent).toBe('production');
   });
 
 });

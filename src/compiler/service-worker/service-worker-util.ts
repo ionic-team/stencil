@@ -1,10 +1,11 @@
 import * as d from '../../declarations';
-import { normalizePath } from '../util';
+import { normalizePath } from '@utils';
+import { URL } from 'url';
 
 
 export function generateServiceWorkerUrl(config: d.Config, outputTarget: d.OutputTargetWww) {
   let swUrl = normalizePath(config.sys.path.relative(
-    outputTarget.dir,
+    outputTarget.appDir,
     outputTarget.serviceWorker.swDest
   ));
 
@@ -12,23 +13,13 @@ export function generateServiceWorkerUrl(config: d.Config, outputTarget: d.Outpu
     swUrl = '/' + swUrl;
   }
 
-  swUrl = outputTarget.baseUrl + swUrl.substring(1);
+  const baseUrl = new URL(outputTarget.baseUrl, 'http://config.stenciljs.com');
+  let basePath = baseUrl.pathname;
+  if (!basePath.endsWith('/')) {
+    basePath += '/';
+  }
+
+  swUrl = basePath + swUrl.substring(1);
 
   return swUrl;
 }
-
-
-export function appendSwScript(indexHtml: string, htmlToAppend: string) {
-  const match = indexHtml.match(BODY_CLOSE_REG);
-
-  if (match) {
-    indexHtml = indexHtml.replace(match[0], `${htmlToAppend}\n${match[0]}`);
-  } else {
-    indexHtml += '\n' + htmlToAppend;
-  }
-
-  return indexHtml;
-}
-
-
-const BODY_CLOSE_REG = /<\/body>/i;

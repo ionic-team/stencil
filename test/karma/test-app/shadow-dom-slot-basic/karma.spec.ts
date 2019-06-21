@@ -17,13 +17,8 @@ describe('shadow-dom-slot-basic', () => {
     if ('attachShadow' in HTMLElement.prototype) {
       expect(elm.shadowRoot).not.toBe(elm);
       expect(elm.shadowRoot.nodeType).toBe(11);
-      expect(elm.shadowRoot.firstElementChild.nodeName.toLowerCase()).toBe('style')
-      expect(elm.shadowRoot.firstElementChild.textContent).toContain(':host');
-      expect(elm.shadowRoot.firstElementChild.textContent).toContain('red');
-
     } else {
       expect(elm.shadowRoot).toBe(elm);
-
     }
   });
 

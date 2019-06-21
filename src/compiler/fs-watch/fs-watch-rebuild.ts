@@ -1,19 +1,22 @@
 import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { configFileReload } from '../config/config-reload';
-import { isCopyTaskFile } from '../copy/config-copy-tasks';
-import { hasServiceWorkerChanges, normalizePath, pathJoin } from '../util';
+import { hasServiceWorkerChanges } from '../service-worker/generate-sw';
+import { isCopyTaskFile } from '../copy/local-copy-tasks';
+import { normalizePath, unique } from '@utils';
 
 
-export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.CompilerCtx, fsWatchResults: d.FsWatchResults) {
+export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.CompilerCtx) {
   const buildCtx = new BuildContext(config, compilerCtx);
 
   // copy watch results over to build ctx data
-  buildCtx.filesUpdated.push(...fsWatchResults.filesUpdated);
-  buildCtx.filesAdded.push(...fsWatchResults.filesAdded);
-  buildCtx.filesDeleted.push(...fsWatchResults.filesDeleted);
-  buildCtx.dirsDeleted.push(...fsWatchResults.dirsDeleted);
-  buildCtx.dirsAdded.push(...fsWatchResults.dirsAdded);
+  // also add in any active build data that
+  // hasn't gone though a full build yet
+  buildCtx.filesAdded = unique(compilerCtx.activeFilesAdded);
+  buildCtx.filesDeleted = unique(compilerCtx.activeFilesDeleted);
+  buildCtx.filesUpdated = unique(compilerCtx.activeFilesUpdated);
+  buildCtx.dirsAdded = unique(compilerCtx.activeDirsAdded);
+  buildCtx.dirsDeleted = unique(compilerCtx.activeDirsDeleted);
 
   // recursively drill down through any directories added and fill up more data
   buildCtx.dirsAdded.forEach(dirAdded => {
@@ -44,7 +47,7 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
   buildCtx.hasStyleChanges = hasStyleChanges(buildCtx);
 
   // figure out if any changed files were index.html files
-  buildCtx.hasIndexHtmlChanges = hasIndexHtmlChanges(config, buildCtx);
+  buildCtx.hasHtmlChanges = hasHtmlChanges(config, buildCtx);
 
   buildCtx.hasServiceWorkerChanges = hasServiceWorkerChanges(config, buildCtx);
 
@@ -61,7 +64,6 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
   return buildCtx;
 }
 
-
 function addDir(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dir: string) {
   dir = normalizePath(dir);
 
@@ -72,7 +74,7 @@ function addDir(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildC
   const items = compilerCtx.fs.disk.readdirSync(dir);
 
   items.forEach(dirItem => {
-    const itemPath = pathJoin(config, dir, dirItem);
+    const itemPath = normalizePath(config.sys.path.join(dir, dirItem));
     const stat = compilerCtx.fs.disk.statSync(itemPath);
 
     if (stat.isDirectory()) {
@@ -89,13 +91,11 @@ function addDir(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildC
 
 export function filesChanged(buildCtx: d.BuildCtx) {
   // files changed include updated, added and deleted
-  return buildCtx.filesUpdated.concat(buildCtx.filesAdded, buildCtx.filesDeleted).reduce((filesChanged, filePath: string) => {
-    if (!filesChanged.includes(filePath)) {
-      filesChanged.push(filePath);
-    }
-
-    return filesChanged;
-  }, [] as string[]).sort();
+  return unique([
+    ...buildCtx.filesUpdated,
+    ...buildCtx.filesAdded,
+    ...buildCtx.filesDeleted
+  ]).sort();
 }
 
 
@@ -164,10 +164,11 @@ export function isStyleExt(ext: string) {
 const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
 
 
-function hasIndexHtmlChanges(config: d.Config, buildCtx: d.BuildCtx) {
-  const anyIndexHtmlChanged = buildCtx.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === 'index.html');
-  if (anyIndexHtmlChanged) {
-    // any index.html in any directory that changes counts too
+function hasHtmlChanges(config: d.Config, buildCtx: d.BuildCtx) {
+  const anyHtmlChanged = buildCtx.filesChanged.some(f => f.toLowerCase().endsWith('.html'));
+  
+  if (anyHtmlChanged) {
+    // any *.html in any directory that changes counts and rebuilds
     return true;
   }
 

@@ -4,8 +4,15 @@ import * as d from '../declarations';
 export class Cache implements d.Cache {
   private failed = 0;
   private skip = false;
+  private sys: d.StencilSystem;
+  private path: d.Path;
+  private logger: d.Logger;
 
-  constructor(private config: d.Config, private cacheFs: d.InMemoryFileSystem) {}
+  constructor(private config: d.Config, private cacheFs: d.InMemoryFileSystem) {
+    this.sys = config.sys;
+    this.path = config.sys.path;
+    this.logger = config.logger;
+  }
 
   async initCacheDir() {
     if (this.config._isTesting) {
@@ -21,11 +28,11 @@ export class Cache implements d.Cache {
     this.config.logger.debug(`cache enabled, cacheDir: ${this.config.cacheDir}`);
 
     try {
-      const readmeFilePath = this.config.sys.path.join(this.config.cacheDir, '_README.log');
+      const readmeFilePath = this.path.join(this.config.cacheDir, '_README.log');
       await this.cacheFs.writeFile(readmeFilePath, CACHE_DIR_README);
 
     } catch (e) {
-      this.config.logger.error(`Cache, initCacheDir: ${e}`);
+      this.logger.error(`Cache, initCacheDir: ${e}`);
       this.config.enableCache = false;
     }
   }
@@ -38,7 +45,7 @@ export class Cache implements d.Cache {
     if (this.failed >= MAX_FAILED) {
       if (!this.skip) {
         this.skip = true;
-        this.config.logger.debug(`cache had ${this.failed} failed ops, skip disk ops for remander of build`);
+        this.logger.debug(`cache had ${this.failed} failed ops, skip disk ops for remander of build`);
       }
       return null;
     }
@@ -75,11 +82,17 @@ export class Cache implements d.Cache {
     return result;
   }
 
-  createKey(domain: string, ...args: any[]) {
+  async has(key: string) {
+    const val = await this.get(key);
+    return (typeof val === 'string');
+  }
+
+  async createKey(domain: string, ...args: any[]) {
     if (!this.config.enableCache) {
-      return '';
+      return domain + (Math.random() * 9999999);
     }
-    return domain + '_' + this.config.sys.generateContentHash(JSON.stringify(args), 32);
+    const hash = await this.sys.generateContentHash(JSON.stringify(args), 32);
+    return domain + '_' + hash;
   }
 
   async commit() {
@@ -92,13 +105,19 @@ export class Cache implements d.Cache {
   }
 
   clear() {
-    this.cacheFs.clearCache();
+    if (this.cacheFs != null) {
+      this.cacheFs.clearCache();
+    }
   }
 
   async clearExpiredCache() {
+    if (this.cacheFs == null || this.sys.storage == null) {
+      return;
+    }
+
     const now = Date.now();
 
-    const lastClear = await this.config.sys.storage.get(EXP_STORAGE_KEY) as number;
+    const lastClear = await this.sys.storage.get(EXP_STORAGE_KEY) as number;
     if (lastClear != null) {
       const diff = now - lastClear;
       if (diff < ONE_DAY) {
@@ -106,8 +125,8 @@ export class Cache implements d.Cache {
       }
 
       const fs = this.cacheFs.disk;
-      const cachedFileNames = await fs.readdirSync(this.config.cacheDir);
-      const cachedFilePaths = cachedFileNames.map(f => this.config.sys.path.join(this.config.cacheDir, f));
+      const cachedFileNames = await fs.readdir(this.config.cacheDir);
+      const cachedFilePaths = cachedFileNames.map(f => this.path.join(this.config.cacheDir, f));
 
       let totalCleared = 0;
 
@@ -124,26 +143,32 @@ export class Cache implements d.Cache {
 
       await Promise.all(promises);
 
-      this.config.logger.debug(`clearExpiredCache, cachedFileNames: ${cachedFileNames.length}, totalCleared: ${totalCleared}`);
+      this.logger.debug(`clearExpiredCache, cachedFileNames: ${cachedFileNames.length}, totalCleared: ${totalCleared}`);
     }
 
-    this.config.logger.debug(`clearExpiredCache, set last clear`);
-    await this.config.sys.storage.set(EXP_STORAGE_KEY, now);
+    this.logger.debug(`clearExpiredCache, set last clear`);
+    await this.sys.storage.set(EXP_STORAGE_KEY, now);
   }
 
   async clearDiskCache() {
-    if (await this.cacheFs.access(this.config.cacheDir)) {
-      await this.cacheFs.remove(this.config.cacheDir);
-      await this.cacheFs.commit();
+    if (this.cacheFs != null) {
+      const hasAccess = await this.cacheFs.access(this.config.cacheDir);
+      if (hasAccess) {
+        await this.cacheFs.remove(this.config.cacheDir);
+        await this.cacheFs.commit();
+      }
     }
   }
 
   private getCacheFilePath(key: string) {
-    return this.config.sys.path.join(this.config.cacheDir, key) + '.log';
+    return this.path.join(this.config.cacheDir, key) + '.log';
   }
 
   getMemoryStats() {
-    return this.cacheFs.getMemoryStats();
+    if (this.cacheFs != null) {
+      return this.cacheFs.getMemoryStats();
+    }
+    return null;
   }
 
 }

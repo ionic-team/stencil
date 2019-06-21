@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import * as puppeteer from 'puppeteer';
 
 
-export interface NewE2EPageOptions {
+export interface NewE2EPageOptions extends puppeteer.NavigationOptions {
   url?: string;
   html?: string;
 }
@@ -80,7 +80,7 @@ export interface E2EPage extends PuppeteerPage {
    * a localhost address. A shortcut to `page.goto(url)` is to set the `url` option
    * when creating a new page, such as `const page = await newE2EPage({ url })`.
    */
-  goTo(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
+  goTo(url: string, options?: puppeteer.NavigationOptions): Promise<puppeteer.Response | null>;
 
   /**
    * Instead of testing a url directly, html content can be mocked using
@@ -88,7 +88,7 @@ export interface E2EPage extends PuppeteerPage {
    * the `html` option when creating a new page, such as
    * `const page = await newE2EPage({ html })`.
    */
-  setContent(html: string): Promise<void>;
+  setContent(html: string, options?: puppeteer.NavigationOptions): Promise<void>;
 
   /**
    * Used to test if an event was, or was not dispatched. This method
@@ -196,7 +196,7 @@ export interface E2EElement {
    * `element.findAll('my-cmp >>> li')`. Returns an empty array if
    * no elements were found.
    */
-  findAll(selector: string): Promise<E2EElement[]>;
+  findAll(selector: FindSelector): Promise<E2EElement[]>;
 
   /**
    * Sets focus on the element.

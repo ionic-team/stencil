@@ -45,7 +45,7 @@ function getMessage(config: d.Config, buildCtx: d.BuildCtx) {
 }
 
 function getBaseName(config: d.Config, items: string[]) {
-  return items.map(f => config.sys.path.basename(f)).join(', ');
+  return items.map(f => config.sys.path.relative(config.srcDir, f)).join(', ');
 }
 
 const MAX_FILE_PRINT = 5;

@@ -1,4 +1,4 @@
-
+import * as d from '.';
 
 declare global {
   namespace jest {
@@ -12,6 +12,16 @@ declare global {
        * Otherwise it'll compare two strings representing HTML.
        */
       toEqualHtml(expectHtml: string): void;
+
+      /**
+       * Compares HTML light DOKM only, but first normalizes the HTML so all
+       * whitespace, attribute order and css class order are
+       * the same. When given an element, it will compare
+       * the element's `outerHTML`. When given a Document Fragment,
+       * such as a Shadow Root, it'll compare its `innerHTML`.
+       * Otherwise it'll compare two strings representing HTML.
+       */
+      toEqualLightHtml(expectLightHtml: string): void;
 
       /**
        * When given an element, it'll compare the element's
@@ -148,7 +158,6 @@ export interface EventInitDict {
 
 
 export interface JestEnvironmentGlobal {
-  _BUILD_: any;
   __NEW_TEST_PAGE__: () => Promise<any>;
   Context: any;
   loadTestWindow: (testWindow: any) => Promise<void>;
@@ -174,7 +183,7 @@ export interface E2EProcessEnv {
   __STENCIL_EMULATE_CONFIGS__?: string;
   __STENCIL_EMULATE__?: string;
   __STENCIL_BROWSER_URL__?: string;
-  __STENCIL_LOADER_URL__?: string;
+  __STENCIL_APP_URL__?: string;
   __STENCIL_BROWSER_WS_ENDPOINT__?: string;
 
   __STENCIL_SCREENSHOT__?: 'true';
@@ -311,6 +320,7 @@ export interface JestConfig {
   testEnvironmentOptions?: any;
   testMatch?: string[];
   testPathIgnorePatterns?: string[];
+  testPreset?: string;
   testRegex?: string;
   testResultsProcessor?: string;
   testRunner?: string;
@@ -392,6 +402,12 @@ export interface TestingConfig extends JestConfig {
   browserSlowMo?: number;
 
   /**
+   * Whether to auto-open a DevTools panel for each tab.
+   * If this option is true, the headless option will be set false
+   */
+  browserDevtools?: boolean;
+
+  /**
    * Array of browser emulations to be using during e2e tests. A full e2e
    * test is ran for each emulation.
    */
@@ -451,5 +467,104 @@ export interface EmulateViewport {
    * Specifies if viewport is in landscape mode. Defaults to false.
    */
   isLandscape?: boolean;
+}
 
+export interface AnyHTMLElement extends HTMLElement {
+  [key: string]: any;
+}
+
+export interface SpecPage {
+  /**
+   * Mocked testing `document.body`.
+   */
+  body: HTMLBodyElement;
+  /**
+   * Mocked testing `document`.
+   */
+  doc: HTMLDocument;
+  /**
+   * The first component found within the mocked `document.body`. If a component isn't found, then it'll return `document.body.firstElementChild`.
+   */
+  root?: AnyHTMLElement;
+  /**
+   * Similar to `root`, except returns the component instance. If a root component was not found it'll return `null`.
+   */
+  rootInstance?: any;
+  /**
+   * Convenience function to set `document.body.innerHTML` and `waitForChanges()`. Function argument should be an html string.
+   */
+  setContent: (html: string) => Promise<any>;
+  /**
+   * After changes have been made to a component, such as a update to a property or attribute, the test page does not automatically apply the changes. In order to wait for, and apply the update, call `await page.waitForChanges()`.
+   */
+  waitForChanges: () => Promise<any>;
+  /**
+   * Mocked testing `window`.
+   */
+  win: Window;
+
+  build: d.Build;
+  flushLoadModule: (bundleId?: string) => Promise<any>;
+  flushQueue: () => Promise<any>;
+  styles: Map<string, string>;
+}
+
+
+export interface NewSpecPageOptions {
+  /**
+   * An array of components to test. Component classes can be imported into the spec file, then their reference should be added to the `component` array in order to be used throughout the test.
+   */
+  components: any[];
+  /**
+   * Sets the mocked `document.cookie`.
+   */
+  cookie?: string;
+  /**
+   * Sets the mocked `dir` attribute on `<html>`.
+   */
+  direction?: string;
+  flushQueue?: boolean;
+  /**
+   * The initial HTML used to generate the test. This can be useful to construct a collection of components working together, and assign HTML attributes. This value sets the mocked `document.body.innerHTML`.
+   */
+  html?: string;
+  /**
+   * Sets the mocked `lang` attribute on `<html>`.
+   */
+  language?: string;
+  /**
+   * Useful for debugging hydrating components client-side. Sets that the `html` option already includes annotated prerender attributes and comments.
+   */
+  hydrateClientSide?: boolean;
+  /**
+   * Useful for debugging hydrating components server-side. The output HTML will also include prerender annotations.
+   */
+  hydrateServerSide?: boolean;
+  /**
+   * Sets the mocked `document.referrer`.
+   */
+  referrer?: string;
+  /**
+   * Manually set if the mocked document supports Shadow DOM or not. Default is `true`.
+   */
+  supportsShadowDom?: boolean;
+  /**
+   * When a component is prerendered it includes HTML annotations, such as `s-id` attributes and `<!-t.0->` comments. This information is used by clientside hydrating. Default is `false`.
+   */
+  includeAnnotations?: boolean;
+  /**
+   * Sets the mocked browser's `location.href`.
+   */
+  url?: string;
+  /**
+   * Sets the mocked browser's `navigator.userAgent`.
+   */
+  userAgent?: string;
+  /**
+   * By default, any changes to component properties and attributes must `page.waitForChanges()` in order to test the updates. As an option, `autoAppluChanges` continuously flushes the queue on the background. Default is `false`.
+   */
+  autoApplyChanges?: boolean;
+
+  /** @deprecated */
+  context?: {[key: string]: any};
 }

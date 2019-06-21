@@ -1,20 +1,18 @@
+import { validateRollupConfig } from './validate-rollup-config';
 import * as d from '../../declarations';
-import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
-import { validateAssetVerioning } from './validate-asset-versioning';
-import { validateCopy } from './validate-copy';
 import { validateDevServer } from './validate-dev-server';
-import { validateNamespace } from './validate-namespace';
+import { validateDistNamespace, validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
 import { validatePaths } from './validate-paths';
-import { validatePlugins } from './validate-plugins';
-import { validateRollupConfig } from './validate-rollup-config';
+import { setArrayConfig, setBooleanConfig, setNumberConfig } from './config-utils';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
-import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
+import { validatePlugins } from './validate-plugins';
+import { buildError, sortBy } from '@utils';
+import { validateOutputTargetCustom } from './validate-outputs-custom';
 
-
-export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
-  if (!config) {
+export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], setEnvVariables: boolean) {
+  if (config == null) {
     throw new Error(`invalid build config`);
   }
 
@@ -23,19 +21,13 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
     return config;
   }
 
-  if (!config.logger) {
-    throw new Error(`config.logger required`);
-  }
-  if (!config.rootDir) {
+  if (typeof config.rootDir !== 'string') {
     throw new Error('config.rootDir required');
-  }
-  if (!config.sys) {
-    throw new Error('config.sys required');
   }
 
   config.flags = config.flags || {};
 
-  if (config.flags.debug) {
+  if (config.flags.debug || config.flags.verbose) {
     config.logLevel = 'debug';
   } else if (config.flags.logLevel) {
     config.logLevel = config.flags.logLevel;
@@ -58,14 +50,14 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
     setBooleanConfig(config, 'devMode', null, DEFAULT_DEV_MODE);
   }
 
+  // Default copy
+  config.copy = config.copy || [];
+
   // get a good namespace
-  validateNamespace(config);
+  validateNamespace(config, diagnostics);
 
   // figure out all of the config paths and absolute paths
   validatePaths(config);
-
-  // setup the outputTargets
-  validateOutputTargets(config);
 
   // validate how many workers we can use
   validateWorkers(config);
@@ -80,38 +72,39 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
 
   setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
-  setBooleanConfig(config, 'buildEsm', 'esm', config.buildEs5);
-  setBooleanConfig(config, 'buildScoped', null, config.buildEs5);
+  setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
+
+  // setup the outputTargets
+  validateOutputTargets(config, diagnostics);
+
+  if (!config._isTesting) {
+    validateDistNamespace(config, diagnostics);
+  }
 
   if (typeof config.validateTypes !== 'boolean') {
     config.validateTypes = true;
   }
 
-  setBooleanConfig(config, 'hashFileNames', null, !(config.devMode || config.watch));
+  setBooleanConfig(config, 'hashFileNames', null, !config.devMode);
   setNumberConfig(config, 'hashedFileNameLength', null, DEFAULT_HASHED_FILENAME_LENTH);
 
   if (config.hashFileNames) {
     if (config.hashedFileNameLength < MIN_HASHED_FILENAME_LENTH) {
-      throw new Error(`config.hashedFileNameLength must be at least ${MIN_HASHED_FILENAME_LENTH} characters`);
+      const err = buildError(diagnostics);
+      err.messageText = `config.hashedFileNameLength must be at least ${MIN_HASHED_FILENAME_LENTH} characters`;
     }
     if (config.hashedFileNameLength > MAX_HASHED_FILENAME_LENTH) {
-      throw new Error(`config.hashedFileNameLength cannot be more than ${MAX_HASHED_FILENAME_LENTH} characters`);
+      const err = buildError(diagnostics);
+      err.messageText = `config.hashedFileNameLength cannot be more than ${MAX_HASHED_FILENAME_LENTH} characters`;
     }
   }
 
-  validateCopy(config);
-
-  validatePlugins(config);
-
-  validateAssetVerioning(config);
-
-  validateDevServer(config);
+  validateDevServer(config, diagnostics);
 
   if (!config.watchIgnoredRegex) {
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
   }
 
-  setStringConfig(config, 'hydratedCssClass', DEFAULT_HYDRATED_CSS_CLASS);
   setBooleanConfig(config, 'generateDocs', 'docs', false);
   setBooleanConfig(config, 'enableCache', 'cache', true);
 
@@ -122,16 +115,14 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   }
 
   if (!Array.isArray(config.excludeSrc)) {
-    config.excludeSrc = DEFAULT_EXCLUDES.slice();
+    config.excludeSrc = DEFAULT_EXCLUDES.map(include => {
+      return config.sys.path.join(config.srcDir, include);
+    });
   }
 
-  /**
-   * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
-   */
-  _deprecatedValidateConfigCollections(config);
-
-  setArrayConfig(config, 'plugins');
+  validatePlugins(config, diagnostics);
   setArrayConfig(config, 'bundles');
+  config.bundles = sortBy(config.bundles, (a: d.ConfigBundle) => a.components.length);
 
   // set to true so it doesn't bother going through all this again on rebuilds
   config._isValidated = true;
@@ -141,14 +132,17 @@ export function validateConfig(config: d.Config, setEnvVariables?: boolean) {
   }
 
   validateRollupConfig(config);
-  validateTesting(config);
+  validateTesting(config, diagnostics);
+  validateOutputTargetCustom(config, diagnostics);
 
   return config;
 }
 
 
 export function setProcessEnvironment(config: d.Config) {
-  process.env.NODE_ENV = config.devMode ? 'development' : 'production';
+  if (typeof process !== 'undefined' && process.env) {
+    process.env.NODE_ENV = config.devMode ? 'development' : 'production';
+  }
 }
 
 
@@ -157,6 +151,5 @@ const DEFAULT_HASHED_FILENAME_LENTH = 8;
 const MIN_HASHED_FILENAME_LENTH = 4;
 const MAX_HASHED_FILENAME_LENTH = 32;
 const DEFAULT_INCLUDES = ['**/*.ts', '**/*.tsx'];
-const DEFAULT_EXCLUDES = ['**/*.+(spec|e2e).*'];
+const DEFAULT_EXCLUDES = ['**/test/**'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$/i;
-const DEFAULT_HYDRATED_CSS_CLASS = 'hydrated';

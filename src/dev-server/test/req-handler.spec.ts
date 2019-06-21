@@ -1,18 +1,18 @@
-import * as d from '../../declarations';
+import * as d from '@stencil/core/declarations';
 import { createRequestHandler } from '../request-handler';
-import { mockConfig } from '../../testing/mocks';
-import { normalizePath } from '../../compiler/util';
-import { TestingFs } from '../../testing/testing-fs';
+import { mockConfig, mockFs } from '@stencil/core/testing';
+import { normalizePath } from '@stencil/core/utils';
+import { validateConfig } from '@stencil/core/compiler';
 import { validateDevServer } from '../../compiler/config/validate-dev-server';
-import * as nodeFs from 'fs';
-import * as http from 'http';
-import * as path from 'path';
+import nodeFs from 'fs';
+import http from 'http';
+import path from 'path';
 
 
-describe('request-handler', async () => {
+describe('request-handler', () => {
 
   let config: d.DevServerConfig;
-  let fs: TestingFs;
+  let fs: d.FileSystem;
   let req: http.IncomingMessage;
   let res: TestServerResponse;
   const root = path.resolve('/');
@@ -26,16 +26,16 @@ describe('request-handler', async () => {
   };
 
   beforeEach(async () => {
-    fs = new TestingFs();
+    fs = mockFs();
 
-    const stencilConfig = mockConfig();
+    const stencilConfig = validateConfig(mockConfig());
     stencilConfig.flags.serve = true;
 
     stencilConfig.devServer = {
       contentTypes: contentTypes,
       devServerDir: normalizePath(path.join(__dirname, '..')),
       root: normalizePath(path.join(root, 'www')),
-      baseUrl: '/'
+      basePath: '/'
     };
 
     await fs.mkdir(stencilConfig.devServer.root);
@@ -45,13 +45,13 @@ describe('request-handler', async () => {
     req = {} as any;
     res = {} as any;
 
-    res.writeHead = (statusCode, headers) => {
+    res.writeHead = (statusCode: number, headers: any) => {
       res.$statusCode = statusCode;
       res.$headers = headers;
       res.$contentType = headers['Content-Type'];
     };
 
-    res.write = (content) => {
+    res.write = (content: any) => {
       res.$contentWrite = content;
       return true;
     };
@@ -239,7 +239,7 @@ describe('request-handler', async () => {
     });
 
     it('get directory index.html with trailing slash and base url', async () => {
-      config.baseUrl = '/my-base-url/';
+      config.basePath = '/my-base-url/';
       await fs.mkdir(path.join(root, 'www', 'about-us'));
       await fs.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
       const handler = createRequestHandler(config, fs);
@@ -312,7 +312,7 @@ describe('request-handler', async () => {
     });
 
     it('serve root index.html w/ base url', async () => {
-      config.baseUrl = '/my-base-url/';
+      config.basePath = '/my-base-url/';
       await fs.writeFile(path.join(root, 'www', 'index.html'), `hello`);
       const handler = createRequestHandler(config, fs);
 

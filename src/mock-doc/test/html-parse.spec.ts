@@ -1,12 +1,44 @@
+import { createFragment } from '../document';
 import { MockDocument } from '../document';
-import { parseHtmlToDocument, parseHtmlToFragment } from '../parse-html';
 import { NODE_TYPES } from '../constants';
+import { parseHtmlToDocument, parseHtmlToFragment } from '../parse-html';
 
 
 describe('parseHtml', () => {
   let doc: MockDocument;
   beforeEach(() => {
     doc = new MockDocument();
+  });
+
+  it('should create multiple node documentFragment', () => {
+    const frag = createFragment('<div>1</div><div>2</div>');
+    expect(frag.childNodes.length).toBe(2);
+    expect(frag.childNodes[0].textContent).toBe('1');
+    expect(frag.childNodes[1].textContent).toBe('2');
+  });
+
+  it('should create one node documentFragment', () => {
+    const frag = createFragment('<div>1</div>');
+    expect(frag.childNodes.length).toBe(1);
+    expect(frag.childNodes[0].textContent).toBe('1');
+  });
+
+  it('should create empty documentFragment', () => {
+    const frag = createFragment();
+    expect(frag.childNodes.length).toBe(0);
+    expect(frag.nodeType).toBe(NODE_TYPES.DOCUMENT_FRAGMENT_NODE);
+  });
+
+  it('body innerHTML/querySelector', () => {
+    doc = new MockDocument();
+
+    doc.body.innerHTML = '<cmp-a>text</cmp-a>';
+
+    expect(doc.body.innerHTML).toBe(`<cmp-a>text</cmp-a>`);
+    expect(doc.body.outerHTML).toBe(`<body><cmp-a>text</cmp-a></body>`);
+
+    const article = doc.querySelector('cmp-a');
+    expect(article.tagName).toBe('CMP-A');
   });
 
   it('template', () => {
@@ -174,4 +206,10 @@ describe('parseHtml', () => {
     expect(elm.children[0].firstChild.nextSibling.firstChild.firstChild.nodeValue).toBe('hello');
   });
 
+  it('should respect case in svg', () => {
+    const elm = parseHtmlToFragment('<svg  viewbox="0 0 97 20"><symbol viewbox="0 0 97 20"></symbol></svg>');
+    expect(elm.children.length).toBe(1);
+    expect(elm.children[0].attributes.item(0).name).toBe('viewBox');
+    expect(elm.children[0].children[0].attributes.item(0).name).toBe('viewBox');
+  });
 });

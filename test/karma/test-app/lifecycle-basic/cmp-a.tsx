@@ -1,4 +1,4 @@
-import { Component, Listen, State } from '../../../../dist';
+import { Component, Listen, State, h } from '@stencil/core';
 
 @Component({
   tag: 'lifecycle-basic-a'

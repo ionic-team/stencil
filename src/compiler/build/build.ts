@@ -1,17 +1,14 @@
 import * as d from '../../declarations';
-import { buildAuxiliaries } from './build-auxiliaries';
-import { catchError } from '../util';
-import { copyTasksMain } from '../copy/copy-tasks-main';
-import { emptyOutputTargetDirs } from './empty-dir';
-import { generateAppFiles } from '../app/generate-app-files';
-import { generateBundles } from '../bundle/generate-bundles';
+import { canSkipAssetsCopy } from '../copy/assets-copy-tasks';
+import { catchError, readPackageJson } from '@utils';
+import { emptyOutputTargets } from '../output-targets/empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';
-import { generateIndexHtmls } from '../html/generate-index-html';
-import { generateModuleMap } from '../bundle/bundle';
+import { generateOutputTargets } from '../output-targets';
 import { generateStyles } from '../style/generate-styles';
-import { initCollections } from '../collections/init-collections';
-import { initIndexHtmls } from '../html/init-index-html';
+import { initIndexHtmls } from './init-index-html';
+import { ProgressTask } from './build-ctx';
 import { transpileApp } from '../transpile/transpile-app';
+import { waitForCopyTasks } from '../copy/copy-tasks';
 import { writeBuildFiles } from './write-build';
 
 
@@ -21,78 +18,79 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     // and we've got a clean slate
     config.sys.cancelWorkerTasks();
 
+    buildCtx.packageJson = await readPackageJson(config, compilerCtx, buildCtx);
+    if (buildCtx.hasError) return buildCtx.abort();
+
     if (!config.devServer || !config.flags.serve) {
       // create an initial index.html file if one doesn't already exist
       await initIndexHtmls(config, compilerCtx, buildCtx);
-      if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+      if (buildCtx.hasError) return buildCtx.abort();
     }
 
     // empty the directories on the first build
-    await emptyOutputTargetDirs(config, compilerCtx, buildCtx);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    await emptyOutputTargets(config, compilerCtx, buildCtx);
+    if (buildCtx.hasError) return buildCtx.abort();
+
+    buildCtx.progress(ProgressTask.emptyOutputTargets);
 
     // async scan the src directory for ts files
     // then transpile them all in one go
-    await transpileApp(config, compilerCtx, buildCtx);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    // buildCtx.moduleFiles is populated here
+    buildCtx.hasScriptChanges = await transpileApp(config, compilerCtx, buildCtx);
+    if (buildCtx.hasError) return buildCtx.abort();
 
-    // initialize all the collections we found when transpiling
-    // async copy collection files and upgrade collections as needed
-    await initCollections(config, compilerCtx, buildCtx);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    buildCtx.progress(ProgressTask.transpileApp);
+
+    if (config.srcIndexHtml) {
+      const hasIndex = await compilerCtx.fs.access(config.srcIndexHtml);
+      if (hasIndex) {
+        const indexSrcHtml = await compilerCtx.fs.readFile(config.srcIndexHtml);
+        buildCtx.indexDoc = config.sys.createDocument(indexSrcHtml);
+      }
+    }
 
     // we've got the compiler context filled with app modules and collection dependency modules
     // figure out how all these components should be connected
-    const entryModules = generateEntryModules(config, compilerCtx, buildCtx);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    generateEntryModules(config, buildCtx);
+    if (buildCtx.hasError) return buildCtx.abort();
 
     // start copy tasks from the config.copy and component assets
     // but don't wait right now (running in worker)
-    const copyTaskPromise = copyTasksMain(config, compilerCtx, buildCtx, entryModules);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    buildCtx.skipAssetsCopy = canSkipAssetsCopy(config, compilerCtx, buildCtx.entryModules, buildCtx.filesChanged);
 
-    // bundle js modules and create each of the components's styles
-    // these can run in parallel
-    const [rawModules] = await Promise.all([
-      generateModuleMap(config, compilerCtx, buildCtx, entryModules),
-      generateStyles(config, compilerCtx, buildCtx, entryModules)
-    ]);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    // preprocess and generate styles before any outputTarget starts
+    buildCtx.stylesPromise = generateStyles(config, compilerCtx, buildCtx);
+    if (buildCtx.hasError) return buildCtx.abort();
 
-    // both styles and modules are done bundling
-    // inject the styles into the modules and
-    // generate each of the output bundles
-    const cmpRegistry = await generateBundles(config, compilerCtx, buildCtx, entryModules, rawModules);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    buildCtx.progress(ProgressTask.generateStyles);
 
-    // generate the app files, such as app.js, app.core.js
-    await generateAppFiles(config, compilerCtx, buildCtx, entryModules, cmpRegistry);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    // generate the core app files
+    await generateOutputTargets(config, compilerCtx, buildCtx);
+    if (buildCtx.hasError) return buildCtx.abort();
 
-    // build index file and service worker
-    await generateIndexHtmls(config, compilerCtx, buildCtx);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    buildCtx.progress(ProgressTask.generateOutputTargets);
 
-    if (buildCtx.isActiveBuild) {
+    // wait on some promises we kicked off earlier
+    await Promise.all([
       // await on the validate types build to finish
       // do this before we attempt to write build files
-      await buildCtx.validateTypesBuild();
+      buildCtx.validateTypesBuild(),
 
-      // we started the copy tasks long ago
+      // we started the copy tasks a long long time ago
       // i'm sure it's done by now, but let's double check
       // make sure this finishes before the write build files
       // so they're not stepping on each other writing files
-      await copyTaskPromise;
-      if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
-    }
+      waitForCopyTasks(buildCtx)
+    ]);
+    if (buildCtx.hasError) return buildCtx.abort();
+
+    buildCtx.progress(ProgressTask.validateTypesBuild);
 
     // write all the files and copy asset files
     await writeBuildFiles(config, compilerCtx, buildCtx);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    if (buildCtx.hasError) return buildCtx.abort();
 
-    // await on our other optional stuff like docs, service workers, etc.
-    await buildAuxiliaries(config, compilerCtx, buildCtx, entryModules, cmpRegistry);
-    if (buildCtx.hasError || !buildCtx.isActiveBuild) return buildCtx.abort();
+    buildCtx.progress(ProgressTask.writeBuildFiles);
 
   } catch (e) {
     // ¯\_(ツ)_/¯

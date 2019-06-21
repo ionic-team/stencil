@@ -1,4 +1,4 @@
-import { Component } from '../../../../dist';
+import { Component, h } from '@stencil/core';
 import { store } from './external-store'
 
 
@@ -6,8 +6,8 @@ import { store } from './external-store'
   tag: 'external-import-a'
 })
 export class ExternalImportA {
-  first: string;
-  last: string;
+  first?: string;
+  last?: string;
 
   componentWillLoad() {
     const data = store().data;

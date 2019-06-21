@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildError, normalizePath, pathJoin } from '../util';
+import { buildError, normalizePath } from '@utils';
 import { parseStyleDocs } from '../docs/style-docs';
 
 
@@ -15,7 +15,7 @@ async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
   }
   noLoop.push(resolvedFilePath);
 
-  if (styleDocs) {
+  if (styleDocs != null) {
     parseStyleDocs(styleDocs, styleText);
   }
 
@@ -41,8 +41,7 @@ async function concatCssImport(config: d.Config, compilerCtx: d.CompilerCtx, bui
   } else {
     const err = buildError(buildCtx.diagnostics);
     err.messageText = `Unable to read css import: ${cssImportData.srcImport}`;
-    err.absFilePath = normalizePath(srcFilePath);
-    err.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, srcFilePath));
+    err.absFilePath = srcFilePath;
   }
 }
 
@@ -112,7 +111,7 @@ export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: 
         const fileName = '_' + config.sys.path.basename(cssImportData.filePath);
         const dirPath = config.sys.path.dirname(cssImportData.filePath);
 
-        cssImportData.altFilePath = pathJoin(config, dirPath, fileName);
+        cssImportData.altFilePath = config.sys.path.join(dirPath, fileName);
       }
     }
 
@@ -144,8 +143,7 @@ export function resolveCssNodeModule(config: d.Config, diagnostics: d.Diagnostic
   } catch (e) {
     const d = buildError(diagnostics);
     d.messageText = `Unable to resolve node module for CSS @import: ${cssImportData.url}`;
-    d.absFilePath = normalizePath(filePath);
-    d.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, filePath));
+    d.absFilePath = filePath;
   }
 }
 

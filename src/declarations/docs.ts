@@ -22,16 +22,23 @@ export interface JsonDocsComponent {
   tag: string;
   readme: string;
   docs: string;
-  docsTags: JsonDocsTags[];
+  docsTags: JsonDocsTag[];
   usage: JsonDocsUsage;
   props: JsonDocsProp[];
   methods: JsonDocsMethod[];
   events: JsonDocsEvent[];
   styles: JsonDocsStyle[];
   slots: JsonDocsSlot[];
+  dependants: string[];
+  dependencies: string[];
+  dependencyGraph: JsonDocsDependencyGraph;
 }
 
-export interface JsonDocsTags {
+export interface JsonDocsDependencyGraph {
+  [tagName: string]: string[];
+}
+
+export interface JsonDocsTag {
   name: string;
   text?: string;
 }
@@ -48,8 +55,9 @@ export interface JsonDocsProp {
   attr: string | undefined;
   reflectToAttr: boolean;
   docs: string;
-  docsTags: JsonDocsTags[];
+  docsTags: JsonDocsTag[];
   default: string;
+  deprecation?: string | undefined;
 
   optional: boolean;
   required: boolean;
@@ -59,21 +67,22 @@ export interface JsonDocsProp {
 export interface JsonDocsMethod {
   name: string;
   docs: string;
-  docsTags: JsonDocsTags[];
+  docsTags: JsonDocsTag[];
+  deprecation: string | undefined;
   signature: string;
   returns: JsonDocsMethodReturn;
   parameters: JsonDocMethodParameter[];
 }
 
 export interface JsonDocsMethodReturn {
-  type?: string;
-  docs?: string;
+  type: string;
+  docs: string;
 }
 
 export interface JsonDocMethodParameter {
-  name?: string;
-  type?: string;
-  docs?: string;
+  name: string;
+  type: string;
+  docs: string;
 }
 
 export interface JsonDocsEvent {
@@ -82,7 +91,8 @@ export interface JsonDocsEvent {
   cancelable: boolean;
   composed: boolean;
   docs: string;
-  docsTags: JsonDocsTags[];
+  docsTags: JsonDocsTag[];
+  deprecation: string | undefined;
   detail: string;
 }
 
@@ -96,4 +106,10 @@ export interface JsonDocsStyle {
 export interface JsonDocsSlot {
   name: string;
   docs: string;
+}
+
+export interface StyleDoc {
+  name: string;
+  docs: string;
+  annotation: 'prop';
 }

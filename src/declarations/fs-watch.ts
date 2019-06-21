@@ -1,10 +1,4 @@
 
-
-export interface FsWatchNormalizer {
-  subscribe(): void;
-}
-
-
 export interface FsWatchResults {
   dirsAdded: string[];
   dirsDeleted: string[];
@@ -15,8 +9,12 @@ export interface FsWatchResults {
 
 
 export interface FsWatcher {
-  add(path: string|string[]): void;
+  addFile(path: string): Promise<boolean>;
+  addDirectory(path: string): Promise<boolean>;
+  close(): void;
 }
 
 
-export type BuildHashes = Map<string, string>;
+export interface FsWatcherItem {
+  close(): void;
+}

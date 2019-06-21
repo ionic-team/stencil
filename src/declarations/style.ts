@@ -1,26 +1,25 @@
 
-
-export interface StylesMeta {
-  [modeName: string]: StyleMeta;
+export interface StyleCompiler {
+  modeName: string;
+  styleId: string;
+  styleStr: string;
+  externalStyles: ExternalStyleCompiler[];
+  compiledStyleText: string;
+  compiledStyleTextScoped: string;
+  compiledStyleTextScopedCommented: string;
 }
 
 
-export interface StyleMeta {
-  styleId?: string;
-  styleStr?: string;
-  externalStyles?: ExternalStyleMeta[];
-  compiledStyleText?: string;
-  compiledStyleTextScoped?: string;
+export interface ExternalStyleCompiler {
+  absolutePath: string;
+  relativePath: string;
+  originalComponentPath: string;
 }
 
 
-export interface ExternalStyleMeta {
-  absolutePath?: string;
-  cmpRelativePath?: string;
-  originalComponentPath?: string;
-  originalCollectionPath?: string;
+export interface CompilerModeStyles {
+  [modeName: string]: string[];
 }
-
 
 export interface ModeStyles {
   [modeName: string]: string | string[];

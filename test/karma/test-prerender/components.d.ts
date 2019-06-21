@@ -5,7 +5,7 @@
  */
 
 
-import '@stencil/core';
+import { JSXElements } from '@stencil/core';
 
 
 
@@ -13,29 +13,25 @@ import '@stencil/core';
 export namespace Components {
 
   interface AppRoot {}
-  interface AppRootAttributes extends StencilHTMLAttributes {}
+  interface AppRootAttributes extends JSXElements.HTMLAttributes {}
 
   interface CmpA {}
-  interface CmpAAttributes extends StencilHTMLAttributes {}
+  interface CmpAAttributes extends JSXElements.HTMLAttributes {}
 
   interface CmpB {}
-  interface CmpBAttributes extends StencilHTMLAttributes {}
+  interface CmpBAttributes extends JSXElements.HTMLAttributes {}
 
   interface CmpC {}
-  interface CmpCAttributes extends StencilHTMLAttributes {}
+  interface CmpCAttributes extends JSXElements.HTMLAttributes {}
 
-  interface CmpD {
-    'uniqueId': string;
-  }
-  interface CmpDAttributes extends StencilHTMLAttributes {
-    'uniqueId'?: string;
-  }
+  interface CmpD {}
+  interface CmpDAttributes extends JSXElements.HTMLAttributes {}
 
   interface CmpScopedA {}
-  interface CmpScopedAAttributes extends StencilHTMLAttributes {}
+  interface CmpScopedAAttributes extends JSXElements.HTMLAttributes {}
 
   interface CmpScopedB {}
-  interface CmpScopedBAttributes extends StencilHTMLAttributes {}
+  interface CmpScopedBAttributes extends JSXElements.HTMLAttributes {}
 }
 
 declare global {
@@ -60,43 +56,43 @@ declare global {
   }
 
 
-  interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
+  interface HTMLAppRootElement extends Components.AppRoot, HTMLElement {}
   var HTMLAppRootElement: {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
   };
 
-  interface HTMLCmpAElement extends Components.CmpA, HTMLStencilElement {}
+  interface HTMLCmpAElement extends Components.CmpA, HTMLElement {}
   var HTMLCmpAElement: {
     prototype: HTMLCmpAElement;
     new (): HTMLCmpAElement;
   };
 
-  interface HTMLCmpBElement extends Components.CmpB, HTMLStencilElement {}
+  interface HTMLCmpBElement extends Components.CmpB, HTMLElement {}
   var HTMLCmpBElement: {
     prototype: HTMLCmpBElement;
     new (): HTMLCmpBElement;
   };
 
-  interface HTMLCmpCElement extends Components.CmpC, HTMLStencilElement {}
+  interface HTMLCmpCElement extends Components.CmpC, HTMLElement {}
   var HTMLCmpCElement: {
     prototype: HTMLCmpCElement;
     new (): HTMLCmpCElement;
   };
 
-  interface HTMLCmpDElement extends Components.CmpD, HTMLStencilElement {}
+  interface HTMLCmpDElement extends Components.CmpD, HTMLElement {}
   var HTMLCmpDElement: {
     prototype: HTMLCmpDElement;
     new (): HTMLCmpDElement;
   };
 
-  interface HTMLCmpScopedAElement extends Components.CmpScopedA, HTMLStencilElement {}
+  interface HTMLCmpScopedAElement extends Components.CmpScopedA, HTMLElement {}
   var HTMLCmpScopedAElement: {
     prototype: HTMLCmpScopedAElement;
     new (): HTMLCmpScopedAElement;
   };
 
-  interface HTMLCmpScopedBElement extends Components.CmpScopedB, HTMLStencilElement {}
+  interface HTMLCmpScopedBElement extends Components.CmpScopedB, HTMLElement {}
   var HTMLCmpScopedBElement: {
     prototype: HTMLCmpScopedBElement;
     new (): HTMLCmpScopedBElement;
@@ -121,14 +117,5 @@ declare global {
     'cmp-scoped-a': HTMLCmpScopedAElement;
     'cmp-scoped-b': HTMLCmpScopedBElement;
   }
-
-
-  export namespace JSX {
-    export interface Element {}
-    export interface IntrinsicElements extends StencilIntrinsicElements {
-      [tagName: string]: any;
-    }
-  }
-  export interface HTMLAttributes extends StencilHTMLAttributes {}
 
 }

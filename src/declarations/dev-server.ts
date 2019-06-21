@@ -7,9 +7,40 @@ export interface DevServer {
 }
 
 
-export interface DevServerConfig {
+export interface StencilDevServerConfig {
+  /**
+   * IP address used by the dev server. The default is `0.0.0.0`, which points to all IPv4 addresses on the local machine, such as `localhost`.
+   */
   address?: string;
-  baseUrl?: string;
+  /**
+   * Base path to be used by the server. Defaults to the root pathname.
+   */
+  basePath?: string;
+  /**
+   * The URL the dev server should first open to. Defaults to `/`.
+   */
+  initialLoadUrl?: string;
+  /**
+   * When `true`, every request to the server will be logged within the terminal. Defaults to `false`.
+   */
+  logRequests?: boolean;
+  /**
+   * By default, when dev server is started the local dev URL is opened in your default browser. However, to prevent this URL to be opened change this value to `false`. Defaults to `true`.
+   */
+  openBrowser?: boolean;
+  /**
+   * Sets the server's port. Defaults to `3333`.
+   */
+  port?: number;
+  /**
+   * When files are watched and udated, by default the dev server will use `hmr` (Hot Module Replacement) to update the page without a full page refresh. To have the page do a full refresh use `pageReload`. To disable any reloading, use `null`. Defaults to `hmr`.
+   */
+  reloadStrategy?: PageReloadStrategy;
+  root?: string;
+  websocket?: boolean;
+}
+
+export interface DevServerConfig extends StencilDevServerConfig {
   browserUrl?: string;
   contentTypes?: { [ext: string]: string };
   devServerDir?: string;
@@ -17,13 +48,12 @@ export interface DevServerConfig {
   excludeHmr?: string[];
   gzip?: boolean;
   historyApiFallback?: HistoryApiFallback;
-  hotReplacement?: boolean;
-  initialLoadUrl?: string;
   openBrowser?: boolean;
-  port?: number;
   protocol?: 'http' | 'https';
-  root?: string;
 }
+
+
+export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
 
 export interface DevServerStartResponse {
@@ -40,9 +70,9 @@ export interface DevClientWindow extends Window {
 
 
 export interface DevClientConfig {
-  baseUrl: string;
+  basePath: string;
   editors: d.DevServerEditor[];
-  hmr: boolean;
+  reloadStrategy: PageReloadStrategy;
 }
 
 
@@ -72,6 +102,11 @@ export interface DevServerMessage {
   requestBuildResults?: boolean;
   error?: { message?: string; type?: string; stack?: any; };
   isActivelyBuilding?: boolean;
+  requestLog?: {
+    method: string;
+    url: string;
+    status: number;
+  };
 }
 
 

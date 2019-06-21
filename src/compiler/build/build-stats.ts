@@ -1,9 +1,10 @@
 import * as d from '../../declarations';
-import { normalizePath } from '../util';
+import { normalizePath, sortBy } from '@utils';
+import { isOutputTargetStats } from '../output-targets/output-utils';
 
 
 export async function generateBuildStats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, buildResults: d.BuildResults) {
-  const statsTargets = (config.outputTargets as d.OutputTargetStats[]).filter(o => o.type === 'stats');
+  const statsTargets = config.outputTargets.filter(isOutputTargetStats);
 
   await Promise.all(statsTargets.map(async outputTarget => {
     await generateStatsOutputTarget(config, compilerCtx, buildCtx, buildResults, outputTarget);
@@ -60,22 +61,12 @@ export async function generateStatsOutputTarget(config: d.Config, compilerCtx: d
         })
       };
 
-      const moduleFiles = compilerCtx.rootTsFiles.map(rootTsFile => {
-        return compilerCtx.moduleFiles[rootTsFile];
+      sortBy(buildCtx.moduleFiles, m => m.sourceFilePath).forEach(moduleFile => {
+        const key = normalizePath(config.sys.path.relative(config.rootDir, moduleFile.sourceFilePath));
+        stats.sourceGraph[key] = moduleFile.localImports.map(localImport => {
+          return normalizePath(config.sys.path.relative(config.rootDir, localImport));
+        }).sort();
       });
-
-      moduleFiles
-        .sort((a, b) => {
-          if (a.sourceFilePath < b.sourceFilePath) return -1;
-          if (a.sourceFilePath > b.sourceFilePath) return 1;
-          return 0;
-
-        }).forEach(moduleFile => {
-          const key = normalizePath(config.sys.path.relative(config.rootDir, moduleFile.sourceFilePath));
-          stats.sourceGraph[key] = moduleFile.localImports.map(localImport => {
-            return normalizePath(config.sys.path.relative(config.rootDir, localImport));
-          }).sort();
-        });
 
       jsonData = stats;
     }

@@ -1,186 +1,151 @@
-import { MockCustomElementRegistry } from './custom-element-registry';
-import { MockCustomEvent, MockEvent, addEventListener, dispatchEvent, removeEventListener } from './event';
-import { MockDocument } from './document';
+import { createConsole } from './console';
+import { MockCustomElementRegistry, resetCustomElementRegistry } from './custom-element-registry';
+import { MockCustomEvent, MockEvent, MockKeyboardEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
+import { MockDocument, resetDocument } from './document';
+import { MockElement, MockHTMLElement } from './node';
 import { MockHistory } from './history';
 import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
-import { MockPerformance } from './performance';
+import { MockPerformance, resetPerformance } from './performance';
 import { MockStorage } from './storage';
+import { URL } from 'url';
 
+
+const historyMap = new WeakMap<MockWindow, MockHistory>();
+const elementCstrMap = new WeakMap<MockWindow, any>();
+const htmlElementCstrMap = new WeakMap<MockWindow, any>();
+const localStorageMap = new WeakMap<MockWindow, MockStorage>();
+const locMap = new WeakMap<MockWindow, MockLocation>();
+const navMap = new WeakMap<MockWindow, MockNavigator>();
+const sessionStorageMap = new WeakMap<MockWindow, MockStorage>();
+const eventClassMap = new WeakMap<MockWindow, any>();
+const customEventClassMap = new WeakMap<MockWindow, any>();
+const keyboardEventClassMap = new WeakMap<MockWindow, any>();
+const nativeClearInterval = clearInterval;
+const nativeClearTimeout = clearTimeout;
+const nativeSetInterval = setInterval;
+const nativeSetTimeout = setTimeout;
+const nativeURL = URL;
 
 export class MockWindow {
+  __clearInterval: typeof nativeClearInterval;
+  __clearTimeout: typeof nativeClearTimeout;
+  __setInterval: typeof nativeSetInterval;
+  __setTimeout: typeof nativeSetTimeout;
+  __maxTimeout: number;
+  __allowInterval: boolean;
+  URL: typeof URL;
+
+  console: Console;
+  customElements: CustomElementRegistry;
+  document: Document;
+  performance: Performance;
+
+  devicePixelRatio: number;
+  innerHeight: number;
+  innerWidth: number;
+  pageXOffset: number;
+  pageYOffset: number;
+  screen: Screen;
+  screenLeft: number;
+  screenTop: number;
+  screenX: number;
+  screenY: number;
+  scrollX: number;
+  scrollY: number;
+
+  constructor(html: string | boolean = null) {
+    if (html !== false) {
+      this.document = new MockDocument(html, this) as any;
+    } else {
+      this.document = null;
+    }
+    this.performance = new MockPerformance();
+    this.customElements = new MockCustomElementRegistry(this as any);
+    this.console = createConsole();
+    resetWindowDefaults(this);
+    resetWindowDimensions(this);
+  }
 
   addEventListener(type: string, handler: (ev?: any) => void) {
     addEventListener(this, type, handler);
   }
 
-  private _customElements: MockCustomElementRegistry;
-  get customElements() {
-    if (!this._customElements) {
-      this._customElements = new MockCustomElementRegistry();
-    }
-    return this._customElements;
+  alert(msg: string) {
+    this.console.debug(msg);
   }
-  set customElements(val: any) {
-    this._customElements = val;
+
+  cancelAnimationFrame(id: any) {
+    this.__clearTimeout(id);
+  }
+
+  cancelIdleCallback(id: any) {
+    this.__clearTimeout(id);
+  }
+
+  clearInterval(id: any) {
+    this.__clearInterval(id);
+  }
+
+  clearTimeout(id: any) {
+    this.__clearTimeout(id);
+  }
+
+  close() {
+    resetWindow(this as any);
+  }
+
+  confirm() {
+    return false;
+  }
+
+  get CSS() {
+    return {
+      supports: () => true
+    };
+  }
+
+  get CustomEvent() {
+    const custEvClass = customEventClassMap.get(this);
+    if (custEvClass != null) {
+      return custEvClass;
+    }
+    return MockCustomEvent;
+  }
+  set CustomEvent(custEvClass: any) {
+    customEventClassMap.set(this, custEvClass);
+  }
+
+  get KeyboardEvent() {
+    const kbEvClass = keyboardEventClassMap.get(this);
+    if (kbEvClass != null) {
+      return kbEvClass;
+    }
+    return MockKeyboardEvent;
+  }
+  set KeyboardEvent(kbEvClass: any) {
+    keyboardEventClassMap.set(this, kbEvClass);
   }
 
   dispatchEvent(ev: MockEvent) {
     return dispatchEvent(this, ev);
   }
 
-  private _document: Document;
-  get document() {
-    if (!this._document) {
-      (this._document as any) = new MockDocument();
-      (this._document as any).defaultView = this;
-    }
-    return this._document;
-  }
-  set document(value) {
-    this._document = value;
-    (this._document as any).defaultView = this;
+  get JSON() {
+    return JSON;
   }
 
-  fetch() {
-    return Promise.resolve();
-  }
-
-  private _history: MockHistory;
-  get history() {
-    if (!this._history) {
-      this._history = new MockHistory();
-    }
-    return this._history;
-  }
-  set history(value) {
-    this._history = value;
-  }
-
-  private _localStorage: MockStorage;
-  get localStorage() {
-    if (!this._localStorage) {
-      this._localStorage = new MockStorage();
-    }
-    return this._localStorage;
-  }
-  set localStorage(value) {
-    this._localStorage = value;
-  }
-
-  private _location: MockLocation;
-  get location() {
-    if (!this._location) {
-      this._location = new MockLocation();
-    }
-    return this._location;
-  }
-  set location(value) {
-    if (typeof value === 'string') {
-      if (!this._location) {
-        this._location = new MockLocation();
-      }
-      this._location.href = value;
-
-    } else {
-      this._location = value;
-    }
-  }
-
-  matchMedia() {
-    return {
-      matches: false
-    };
-  }
-
-  private _navigator: MockNavigator;
-  get navigator() {
-    if (!this._navigator) {
-      this._navigator = new MockNavigator();
-    }
-    return this._navigator;
-  }
-  set navigator(value) {
-    this._navigator = value;
-  }
-
-  private _performance: any = null;
-  get performance() {
-    if (!this._performance) {
-      this._performance = new MockPerformance();
-    }
-    return this._performance;
-  }
-  set performance(value) {
-    this._performance = value;
-  }
-
-  private _parent: any = null;
-  get parent() {
-    return this._parent;
-  }
-  set parent(value) {
-    this._parent = value;
-  }
-
-  removeEventListener(type: string, handler: any) {
-    removeEventListener(this, type, handler);
-  }
-
-  requestAnimationFrame(cb: (timestamp: number) => void) {
-    setTimeout(() => cb(Date.now()));
-  }
-
-  get self() {
-    return this;
-  }
-
-  private _sessionStorage: MockStorage;
-  get sessionStorage() {
-    if (!this._sessionStorage) {
-      this._sessionStorage = new MockStorage();
-    }
-    return this._sessionStorage;
-  }
-  set sessionStorage(val: any) {
-    this._sessionStorage = val;
-  }
-
-  get top() {
-    return this;
-  }
-
-  get window() {
-    return this;
-  }
-
-  static get CSS() {
-    return {
-      supports: () => true
-    };
-  }
-
-  private _MockEvent: MockEvent;
   get Event() {
-    if (this._MockEvent) {
-      return this._MockEvent;
+    const evClass = eventClassMap.get(this);
+    if (evClass != null) {
+      return evClass;
     }
     return MockEvent;
   }
-  set Event(value: any) {
-    this._MockEvent = value;
+  set Event(ev: any) {
+    eventClassMap.set(this, ev);
   }
 
-  private _MockCustomEvent: MockCustomEvent;
-  get CustomEvent() {
-    if (this._MockCustomEvent) {
-      return this._MockCustomEvent;
-    }
-    return MockCustomEvent;
-  }
-  set CustomEvent(value: any) {
-    this._MockCustomEvent = value;
-  }
   getComputedStyle(_: any) {
     return {
       cssText: '',
@@ -203,4 +168,327 @@ export class MockWindow {
       }
     } as any;
   }
+
+  get globalThis() {
+    return this;
+  }
+
+  get history() {
+    let hsty = historyMap.get(this);
+    if (hsty == null) {
+      hsty = new MockHistory();
+      historyMap.set(this, hsty);
+    }
+    return hsty;
+  }
+  set history(hsty: any) {
+    historyMap.set(this, hsty);
+  }
+
+  get Element() {
+    let ElementCstr = elementCstrMap.get(this);
+    if (ElementCstr == null) {
+      const ownerDocument = this.document;
+      ElementCstr = class extends MockElement {
+        constructor() {
+          super(ownerDocument, '');
+          throw (new Error('Illegal constructor: cannot construct Element'));
+        }
+      };
+      elementCstrMap.set(this, ElementCstr);
+    }
+    return ElementCstr;
+  }
+
+  get HTMLElement() {
+    let HtmlElementCstr = htmlElementCstrMap.get(this);
+    if (HtmlElementCstr == null) {
+      const ownerDocument = this.document;
+      HtmlElementCstr = class extends MockHTMLElement {
+        constructor() {
+          super(ownerDocument, '');
+
+          const observedAttributes = (this.constructor as any).observedAttributes;
+          if (Array.isArray(observedAttributes) && typeof (this as any).attributeChangedCallback === 'function') {
+            observedAttributes.forEach(attrName => {
+              const attrValue = this.getAttribute(attrName);
+              if (attrValue != null) {
+                (this as any).attributeChangedCallback(attrName, null, attrValue);
+              }
+            });
+          }
+        }
+      };
+      htmlElementCstrMap.set(this, HtmlElementCstr);
+    }
+    return HtmlElementCstr;
+  }
+
+  get localStorage() {
+    let locStorage = localStorageMap.get(this);
+    if (locStorage == null) {
+      locStorage = new MockStorage();
+      localStorageMap.set(this, locStorage);
+    }
+    return locStorage;
+  }
+  set localStorage(locStorage: MockStorage) {
+    localStorageMap.set(this, locStorage);
+  }
+
+  get location(): Location {
+    let loc = locMap.get(this);
+    if (loc == null) {
+      loc = new MockLocation();
+      locMap.set(this, loc);
+    }
+    return loc;
+  }
+  set location(val: Location) {
+    if (typeof val === 'string') {
+      let loc = locMap.get(this);
+      if (loc == null) {
+        loc = new MockLocation();
+        locMap.set(this, loc);
+      }
+      loc.href = val;
+
+    } else {
+      locMap.set(this, val as any);
+    }
+  }
+
+  matchMedia() {
+    return {
+      matches: false
+    };
+  }
+
+  get navigator() {
+    let nav = navMap.get(this);
+    if (nav == null) {
+      nav = new MockNavigator();
+      navMap.set(this, nav);
+    }
+    return nav;
+  }
+  set navigator(nav: any) {
+    navMap.set(this, nav);
+  }
+
+  get parent(): any {
+    return null;
+  }
+
+  prompt() {
+    return '';
+  }
+
+  get origin() {
+    return this.location.origin;
+  }
+
+  removeEventListener(type: string, handler: any) {
+    removeEventListener(this, type, handler);
+  }
+
+  requestAnimationFrame(callback: (timestamp: number) => void) {
+    return this.setTimeout(() => {
+      callback(Date.now());
+    }, 0) as number;
+  }
+
+  requestIdleCallback(callback: (deadline: { didTimeout: boolean; timeRemaining: () => number }) => void) {
+    return this.setTimeout(() => {
+      callback({
+        didTimeout: false,
+        timeRemaining: () => 0
+      });
+    }, 0);
+  }
+
+  scroll(_x?: number, _y?: number) {/**/}
+
+  scrollBy(_x?: number, _y?: number) {/**/}
+
+  scrollTo(_x?: number, _y?: number) {/**/}
+
+  get self() {
+    return this;
+  }
+
+  get sessionStorage() {
+    let sessStorage = sessionStorageMap.get(this);
+    if (sessStorage == null) {
+      sessStorage = new MockStorage();
+      sessionStorageMap.set(this, sessStorage);
+    }
+    return sessStorage;
+  }
+  set sessionStorage(locStorage: any) {
+    sessionStorageMap.set(this, locStorage);
+  }
+
+  setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): number {
+    ms = Math.min(ms, this.__maxTimeout);
+
+    if (this.__allowInterval) {
+      return this.__setInterval(() => {
+        try {
+          callback(...args);
+        } catch (e) {
+          this.console.error(e);
+        }
+      }, ms) as any;
+    }
+
+    return this.__setTimeout(() => {
+      try {
+        callback(...args);
+      } catch (e) {
+        this.console.error(e);
+      }
+    }, ms) as any;
+  }
+
+  setTimeout(callback: (...args: any[]) => void, ms: number, ...args: any[]): number {
+    ms = Math.min(ms, this.__maxTimeout);
+
+    return (this.__setTimeout(() => {
+      try {
+        callback(...args);
+      } catch (e) {
+        this.console.error(e);
+      }
+    }, ms) as any) as number;
+  }
+
+  get top() {
+    return this;
+  }
+
+  get window() {
+    return this;
+  }
+}
+
+function resetWindowDefaults(win: any) {
+  win.__clearInterval = nativeClearInterval;
+  win.__clearTimeout = nativeClearTimeout;
+  win.__setInterval = nativeSetInterval;
+  win.__setTimeout = nativeSetTimeout;
+  win.__maxTimeout = 30000;
+  win.__allowInterval = true;
+  win.URL = nativeURL;
+}
+
+export function createWindow(html: string | boolean = null): Window {
+  return new MockWindow(html) as any;
+}
+
+export function cloneWindow(srcWin: Window) {
+  if (srcWin == null) {
+    return null;
+  }
+
+  const clonedWin = new MockWindow(false);
+  if (srcWin.document != null) {
+    const clonedDoc = new MockDocument(false, clonedWin);
+    clonedWin.document = clonedDoc as any;
+    clonedDoc.documentElement = srcWin.document.documentElement.cloneNode(true) as any;
+
+  } else {
+    clonedWin.document = new MockDocument(null, clonedWin) as any;
+  }
+  return clonedWin;
+}
+
+
+export function cloneDocument(srcDoc: Document) {
+  if (srcDoc == null) {
+    return null;
+  }
+
+  const dstWin = cloneWindow(srcDoc.defaultView);
+  return dstWin.document;
+}
+
+/**
+ * Constrain setTimeout() to 1ms, but still async. Also
+ * only allow setInterval() to fire once, also constrained to 1ms.
+ */
+export function constrainTimeouts(win: any) {
+  (win as MockWindow).__allowInterval = false;
+  (win as MockWindow).__maxTimeout = 0;
+}
+
+
+export function resetWindow(win: Window) {
+  if (win != null) {
+    resetCustomElementRegistry(win.customElements);
+    resetDocument(win.document);
+    resetPerformance(win.performance);
+
+    for (const key in win) {
+      if (win.hasOwnProperty(key) && key !== 'document' && key !== 'performance' && key !== 'customElements') {
+        delete (win as any)[key];
+      }
+    }
+    resetWindowDefaults(win);
+    resetWindowDimensions(win);
+
+    resetEventListeners(win);
+
+    historyMap.delete(win as any);
+    htmlElementCstrMap.delete(win as any);
+    elementCstrMap.delete(win as any);
+    localStorageMap.delete(win as any);
+    locMap.delete(win as any);
+    navMap.delete(win as any);
+    sessionStorageMap.delete(win as any);
+    eventClassMap.delete(win as any);
+    customEventClassMap.delete(win as any);
+    keyboardEventClassMap.delete(win as any);
+
+    if (win.document != null) {
+      try {
+        (win.document as any).defaultView = win;
+      } catch (e) {}
+    }
+  }
+}
+
+function resetWindowDimensions(win: any) {
+  try {
+    win.devicePixelRatio = 1;
+
+    win.innerHeight = 768;
+    win.innerWidth = 1366;
+
+    win.pageXOffset = 0;
+    win.pageYOffset = 0;
+
+    win.screenLeft = 0;
+    win.screenTop = 0;
+    win.screenX = 0;
+    win.screenY = 0;
+    win.scrollX = 0;
+    win.scrollY = 0;
+
+    win.screen = {
+      availHeight: win.innerHeight,
+      availLeft: 0,
+      availTop: 0,
+      availWidth: win.innerWidth,
+      colorDepth: 24,
+      height: win.innerHeight,
+      keepAwake: false,
+      orientation: {
+        angle: 0,
+        type: 'portrait-primary'
+      },
+      pixelDepth: 24,
+      width: win.innerWidth
+    };
+  } catch (e) {}
 }

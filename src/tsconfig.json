@@ -10,7 +10,8 @@
     "jsxFactory": "h",
     "lib": [
       "dom",
-      "es2017"
+      "es2017",
+      "esnext.array"
     ],
     "module": "esnext",
     "moduleResolution": "node",
@@ -23,14 +24,23 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core/mock-doc": [
-        "../dist/mock-doc"
+      "@build-conditionals": [
+        "./compiler/app-core/build-conditionals.ts"
+      ],
+      "@mock-doc": [
+        "./mock-doc/index.ts"
+      ],
+      "@testing": [
+        "../testing/index.js"
+      ],
+      "@utils": [
+        "./utils/index.ts"
       ]
     }
   },
   "include": [
     "index.ts",
     "../types/*.d.ts",
-    "client/**/*.ts"
+    "runtime/**/*.ts"
   ]
 }

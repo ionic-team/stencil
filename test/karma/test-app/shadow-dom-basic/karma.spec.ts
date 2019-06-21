@@ -11,33 +11,33 @@ describe('shadow-dom-basic', function() {
   afterEach(tearDownDom);
 
   it('render', async () => {
-    const result = app.querySelector('shadow-dom-basic-root');
+    const elm = app.querySelector('shadow-dom-basic-root');
 
     if ('attachShadow' in HTMLElement.prototype) {
-      testNativeShadow(result);
+      testNativeShadow(elm);
     } else {
-      testPolyfilledShadow(result);
+      testPolyfilledShadow(elm);
     }
   });
-
 
   function testNativeShadow(elm: Element) {
     expect(elm.shadowRoot).toBeDefined();
 
-    expect(elm.shadowRoot.children[0].nodeName).toBe('STYLE');
+    const shadowDomBasic = elm.shadowRoot.lastElementChild;
+    const lightDiv = elm.shadowRoot.lastElementChild.children[0];
 
-    expect(elm.shadowRoot.children[1].children[0].nodeName).toBe('DIV');
-    expect(elm.shadowRoot.children[1].children[0].textContent.trim()).toBe('light');
+    expect(lightDiv.nodeName).toBe('DIV');
+    expect(lightDiv.textContent.trim()).toBe('light');
 
-    expect(elm.shadowRoot.children[1].nodeName).toBe('SHADOW-DOM-BASIC');
-    expect(elm.shadowRoot.children[1].shadowRoot.children[0].nodeName).toBe('STYLE');
-    expect(elm.shadowRoot.children[1].shadowRoot.children[1].nodeName).toBe('DIV');
-    expect(elm.shadowRoot.children[1].shadowRoot.children[1].textContent.trim()).toBe('shadow');
+    expect(shadowDomBasic.nodeName).toBe('SHADOW-DOM-BASIC');
+    const shadowDiv = shadowDomBasic.shadowRoot.lastElementChild.previousElementSibling;
+    expect(shadowDiv.nodeName).toBe('DIV');
+    expect(shadowDiv.textContent.trim()).toBe('shadow');
 
-    const shadowBG = window.getComputedStyle(elm.shadowRoot.children[1].shadowRoot.children[1]).backgroundColor;
+    const shadowBG = window.getComputedStyle(shadowDiv).backgroundColor;
     expect(shadowBG).toBe('rgb(0, 0, 0)');
 
-    const lightBG = window.getComputedStyle(elm.shadowRoot.children[1].children[0]).backgroundColor;
+    const lightBG = window.getComputedStyle(shadowDomBasic.lastElementChild).backgroundColor;
     expect(lightBG).toBe('rgb(255, 255, 0)');
   }
 

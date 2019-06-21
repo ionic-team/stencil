@@ -1,41 +1,27 @@
-import * as d from '../../declarations';
 
 
-export function updateCanonicalLink(config: d.Config, doc: Document, windowLocationPath: string) {
-
+export function updateCanonicalLink(doc: Document, href: string) {
   // https://webmasters.googleblog.com/2009/02/specify-your-canonical.html
   // <link rel="canonical" href="http://www.example.com/product.php?item=swedish-fish" />
-
-  if (typeof windowLocationPath !== 'string') {
-    return;
-  }
-
-  const canonicalLink = doc.querySelector('link[rel="canonical"]');
-  if (!canonicalLink) {
-    return;
-  }
-
-  const existingHref = canonicalLink.getAttribute('href');
-
-  const updatedRref = updateCanonicalLinkHref(config, existingHref, windowLocationPath);
-
-  canonicalLink.setAttribute('href', updatedRref);
-}
-
-
-export function updateCanonicalLinkHref(config: d.Config, href: string, windowLocationPath: string) {
-  const parsedUrl = config.sys.url.parse(windowLocationPath);
+  let canonicalLinkElm = doc.head.querySelector('link[rel="canonical"]');
 
   if (typeof href === 'string') {
-    href = href.trim();
-
-    if (href.endsWith('/')) {
-      href = href.substr(0, href.length - 1);
+    // have a valid href to add
+    if (canonicalLinkElm == null) {
+      // don't have a <link> element yet, create one
+      canonicalLinkElm = doc.createElement('link');
+      canonicalLinkElm.setAttribute('rel', 'canonical');
+      doc.head.appendChild(canonicalLinkElm);
     }
 
-  } else {
-    href = '';
-  }
+    // set the href attribute
+    canonicalLinkElm.setAttribute('href', href);
 
-  return `${href}${parsedUrl.path}`;
+  } else {
+    // don't have a href
+    if (canonicalLinkElm != null) {
+      // but there is a canonical link in the head so let's remove it
+      canonicalLinkElm.parentNode.removeChild(canonicalLinkElm);
+    }
+  }
 }

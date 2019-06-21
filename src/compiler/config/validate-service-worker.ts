@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { getGlobalFileName, getRegistryFileName } from '../app/app-file-naming';
 import { HOST_CONFIG_FILENAME } from '../prerender/host-config';
 
 
@@ -10,11 +9,6 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
   }
 
   if (outputTarget.serviceWorker === false || outputTarget.serviceWorker === null) {
-    outputTarget.serviceWorker = null;
-    return;
-  }
-
-  if (!outputTarget.serviceWorker && outputTarget.type !== 'www') {
     outputTarget.serviceWorker = null;
     return;
   }
@@ -38,12 +32,12 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
       outputTarget.serviceWorker.globPatterns = [outputTarget.serviceWorker.globPatterns];
 
     } else if (typeof outputTarget.serviceWorker.globPatterns !== 'string') {
-      outputTarget.serviceWorker.globPatterns = [DEFAULT_GLOB_PATTERNS];
+      outputTarget.serviceWorker.globPatterns = DEFAULT_GLOB_PATTERNS.slice();
     }
   }
 
   if (typeof outputTarget.serviceWorker.globDirectory !== 'string') {
-    outputTarget.serviceWorker.globDirectory = outputTarget.dir;
+    outputTarget.serviceWorker.globDirectory = outputTarget.appDir;
   }
 
   if (typeof outputTarget.serviceWorker.globIgnores === 'string') {
@@ -54,27 +48,33 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
 
   addGlobIgnores(config, outputTarget.serviceWorker.globIgnores);
 
+  outputTarget.serviceWorker.dontCacheBustURLsMatching = /p-\w{8}/;
+
   if (!outputTarget.serviceWorker.swDest) {
-    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, DEFAULT_FILENAME);
+    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.appDir, DEFAULT_FILENAME);
   }
 
   if (!config.sys.path.isAbsolute(outputTarget.serviceWorker.swDest)) {
-    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, outputTarget.serviceWorker.swDest);
+    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.appDir, outputTarget.serviceWorker.swDest);
   }
 }
 
 
 function addGlobIgnores(config: d.Config, globIgnores: string[]) {
-  const appRegistry = `**/${getRegistryFileName(config)}`;
-  globIgnores.push(appRegistry);
-
-  const appGlobal = `**/${getGlobalFileName(config)}`;
-  globIgnores.push(appGlobal);
-
-  const hostConfigJson = `**/${HOST_CONFIG_FILENAME}`;
-  globIgnores.push(hostConfigJson);
+  globIgnores.push(
+    `**/${HOST_CONFIG_FILENAME}`,
+    `**/*.system.entry.js`,
+    `**/*.system.js`,
+    `**/${config.fsNamespace}.js`,
+    `**/${config.fsNamespace}.esm.js`,
+    `**/${config.fsNamespace}.css`,
+  );
 }
 
 
-const DEFAULT_GLOB_PATTERNS = '**/*.{js,css,json,html}';
+const DEFAULT_GLOB_PATTERNS = [
+  '*.html',
+  '**/*.{js,css,json}',
+];
+
 const DEFAULT_FILENAME = 'sw.js';

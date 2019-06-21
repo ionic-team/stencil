@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, Prop, State } from '../../../../dist';
+import { Component, Event, EventEmitter, Prop, State, h } from '@stencil/core';
 import { timeout } from './util';
 
 @Component({
@@ -9,8 +9,8 @@ export class LifecycleAsyncC {
   @Prop() value = '';
   @State() rendered = 0;
 
-  @Event() lifecycleLoad: EventEmitter;
-  @Event() lifecycleUpdate: EventEmitter;
+  @Event() lifecycleLoad!: EventEmitter;
+  @Event() lifecycleUpdate!: EventEmitter;
 
   async componentWillLoad() {
     this.lifecycleLoad.emit('componentWillLoad-c');

@@ -1,11 +1,11 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { BuildEvents } from '../../events';
-import { mockBuildCtx, mockCompilerCtx, mockConfig } from '../../../testing/mocks';
-import { initFsWatch } from '../fs-watch-init';
-import { validateConfig } from '../../../compiler/config/validate-config';
+import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
+import { initFsWatcher } from '../fs-watch-init';
+import { validateConfig } from '@stencil/core/compiler';
 
 
-describe('watcher', () => {
+describe('fs-watch, init', () => {
 
   let config: d.Config;
   let compilerCtx: d.CompilerCtx;
@@ -14,28 +14,35 @@ describe('watcher', () => {
   beforeEach(() => {
     config = mockConfig();
     config.watch = true;
+    config.srcDir = 'src';
+    config.sys.createFsWatcher = (() => {
+      return {
+        addDirectory() {/**/}
+      };
+    }) as any;
     compilerCtx = mockCompilerCtx();
+
     buildCtx = mockBuildCtx(config, compilerCtx);
     compilerCtx.events = new BuildEvents();
   });
 
 
-  it('should only create the watch listener once', () => {
-    let didCreateWatcher = initFsWatch(config, compilerCtx, buildCtx);
+  it('should only create the watch listener once', async () => {
+    let didCreateWatcher = await initFsWatcher(config, compilerCtx, buildCtx);
     expect(didCreateWatcher).toBe(true);
 
-    didCreateWatcher = initFsWatch(config, compilerCtx, buildCtx);
+    didCreateWatcher = await initFsWatcher(config, compilerCtx, buildCtx);
     expect(didCreateWatcher).toBe(false);
   });
 
-  it('should not create watcher if config.watch falsy', () => {
+  it('should not create watcher if config.watch falsy', async () => {
     config.watch = false;
-    const didCreateWatcher = initFsWatch(config, compilerCtx, buildCtx);
+    const didCreateWatcher = await initFsWatcher(config, compilerCtx, buildCtx);
     expect(didCreateWatcher).toBe(false);
   });
 
   it('should ignore common web files not used in builds', () => {
-    validateConfig(config);
+    validateConfig(config, [], false);
     const reg = config.watchIgnoredRegex;
 
     expect(reg.test('/asdf/.gitignore')).toBe(true);

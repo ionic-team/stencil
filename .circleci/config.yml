@@ -12,10 +12,10 @@ aliases:
       command: ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY &
 
   - &restore-cache-deps
-      key: dependency-cache-{{ checksum "package.json" }}-2
+      key: dependency-cache-{{ checksum "package.json" }}-3
 
   - &save-cache-deps
-      key: dependency-cache-{{ checksum "package.json" }}-2
+      key: dependency-cache-{{ checksum "package.json" }}-3
       paths:
         - node_modules
 
@@ -33,7 +33,7 @@ jobs:
       - run: npm install npm@latest
       - run: npm install
       - save_cache: *save-cache-deps
-      - run: npm run build
+      - run: npm run build -- --ci
       - persist_to_workspace:
           root: ~/stencil
           paths:
@@ -46,26 +46,19 @@ jobs:
           at: ~/stencil
       - run: npm run test.dist && npm run test.testing
 
-  test_example:
+  test_end_to_end:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/stencil
-      - run: npm run test.example -- --ci --debug --maxWorkers=4
+      - run: npm run test.end-to-end -- --ci --debug --max-workers=4
 
   test_jest:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/stencil
-      - run: npm run test.jest -- --maxWorkers=4
-
-  test_server:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/stencil
-      - run: npm run test.server
+      - run: npm run test.jest -- --max-workers=4
 
   test_sys_node:
     <<: *defaults
@@ -93,21 +86,18 @@ workflows:
   build:
     jobs:
       - build
-      - test_dist:
-          requires:
-            - build
-      - test_example:
+      - test_karma:
           requires:
             - build
       - test_jest:
           requires:
             - build
-      - test_server:
+      - test_end_to_end:
           requires:
             - build
       - test_sys_node:
           requires:
             - build
-      - test_karma:
+      - test_dist:
           requires:
             - build

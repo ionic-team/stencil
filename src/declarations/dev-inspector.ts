@@ -25,7 +25,7 @@ export interface DevInspectorComponentData {
 
 export interface DevInspectorComponentMeta {
   tag: string;
-  bundle: string | d.BundleIds;
+  bundle: string | d.ModeBundleIds;
   encapsulation: d.Encapsulation;
   props: DevInspectorPropMeta[];
   states: DevInspectorStateMeta[];
@@ -75,7 +75,6 @@ export interface DevInspectorMembersMap {
 export interface DevInspectorListenerMeta {
   event: string;
   capture: boolean;
-  disabled: boolean;
   passive: boolean;
   method: string;
 }

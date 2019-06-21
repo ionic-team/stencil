@@ -9,67 +9,42 @@ const SRC_DIR = path.join(ROOT_DIR, 'src', 'client', 'polyfills');
 
 
 module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir) {
-  fs.emptyDirSync(outputPolyfillsDir);
+  await fs.emptyDir(outputPolyfillsDir);
 
-  const esmDir = path.join(outputPolyfillsDir, 'esm');
-  fs.emptyDirSync(esmDir);
+  const filesSrc = (await fs.readdir(SRC_DIR)).filter(f => f.endsWith('.js'));
+  await Promise.all(
+    filesSrc.map(fileName => {
+      const srcFilePath = path.join(SRC_DIR, fileName);
+      const dstfilePath = path.join(transpiledPolyfillsDir, fileName);
+      return fs.copyFile(srcFilePath, dstfilePath);
+    })
+  );
 
-  const es5Dir = path.join(outputPolyfillsDir, 'es5');
-  fs.emptyDirSync(es5Dir);
-
-  const files = fs.readdirSync(SRC_DIR).filter(f => f.endsWith('.js'));
-
-  files.forEach(fileName => {
-    const srcFilePath = path.join(SRC_DIR, fileName);
-    const esmFilePath = path.join(esmDir, fileName);
-    const es5FilePath = path.join(es5Dir, fileName);
-
-    const polyfillContent = fs.readFileSync(srcFilePath, 'utf8');
-
-    const esmWrapped = (fileName === 'tslib.js')
-      ? polyfillContent
-      : esmWrap(polyfillContent);
-
-    fs.writeFileSync(esmFilePath, esmWrapped);
-    fs.writeFileSync(es5FilePath, polyfillContent);
-  });
-
-
-  const build = await rollup.rollup({
+  const rollupBuild = await rollup.rollup({
     input: path.join(transpiledPolyfillsDir, 'css-shim', 'index.js'),
     onwarn: (message) => {
       if (/top level of an ES module/.test(message)) return;
-      console.error( message );
+      console.error(message);
     }
   });
 
-  const bundleResults = await build.generate({
-    format: 'es'
-  });
-
-  const transpile = ts.transpileModule(bundleResults.output[0].code, {
+  const { output } = await rollupBuild.generate({ format: 'esm' });
+  const transpile = ts.transpileModule(output[0].code, {
     compilerOptions: {
       target: ts.ScriptTarget.ES5
     }
   });
 
-  const minify = terser.minify(transpile.outputText);
+  const cssShimOutput = transpile.outputText;
+  const filePath = path.join(transpiledPolyfillsDir, 'css-shim.js');
+  await fs.writeFile(filePath, cssShimOutput);
 
-  const cssShimOutput = minify.code;
-
-  const mapPolyfillFilePath = path.join(SRC_DIR, 'map.js');
-  const mapPolyfill = fs.readFileSync(mapPolyfillFilePath, 'utf8');
-
-  const cssShimMapPolyfill = mapPolyfill + '\n' + cssShimOutput;
-
-  const esmFilePath = path.join(esmDir, 'css-shim.js');
-  const es5FilePath = path.join(es5Dir, 'css-shim.js');
-
-  fs.writeFileSync(esmFilePath, esmWrap(cssShimMapPolyfill));
-  fs.writeFileSync(es5FilePath, cssShimMapPolyfill);
+  const filesTranspiled = (await fs.readdir(transpiledPolyfillsDir)).filter(f => f.endsWith('.js'));
+  await Promise.all(
+    filesTranspiled.map(fileName => {
+      const srcFilePath = path.join(transpiledPolyfillsDir, fileName);
+      const dstfilePath = path.join(outputPolyfillsDir, fileName);
+      return fs.copyFile(srcFilePath, dstfilePath);
+    })
+  );
 };
-
-
-function esmWrap(polyfillContent) {
-  return `export function applyPolyfill(window, document) {${polyfillContent}}`;
-}

@@ -2,14 +2,25 @@ import * as d from '../declarations';
 import { getConfigFilePath } from './cli-utils';
 import { parseFlags } from './parse-flags';
 import { runTask } from './run-task';
-import { shouldIgnoreError } from '../compiler/util';
+import { shouldIgnoreError } from '@utils';
 import exit from 'exit';
 
 
 export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger: d.Logger) {
-  process.on(`unhandledRejection`, (r: any) => {
-    if (!shouldIgnoreError(r)) {
-      logger.error(`unhandledRejection`, r);
+
+  process.on(`unhandledRejection`, (e: any) => {
+    if (!shouldIgnoreError(e)) {
+      let msg = 'unhandledRejection';
+      if (e != null) {
+        if (e.stack) {
+          msg += ': ' + e.stack;
+        } else if (e.message) {
+          msg += ': ' + e.message;
+        } else {
+          msg += ': ' + e;
+        }
+      }
+      logger.error(msg);
     }
   });
 
@@ -28,25 +39,17 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
     }
     config = sys.loadConfigFile(configPath, process);
 
+    config.sys = (config.sys || sys);
+    config.logger = (config.logger || logger);
+
   } catch (e) {
     logger.error(e);
     exit(1);
   }
 
   try {
-    if (!config.logger) {
-      // if a logger was not provided then use the
-      // default stencil command line logger
-      config.logger = logger;
-    }
-
-    if (config.logLevel) {
+    if (typeof config.logLevel === 'string') {
       config.logger.level = config.logLevel;
-    }
-
-    if (!config.sys) {
-      // if the config was not provided then use the default node sys
-      config.sys = sys;
     }
 
     config.flags = flags;
@@ -57,8 +60,10 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
 
   } catch (e) {
     if (!shouldIgnoreError(e)) {
-      config.logger.error(`uncaught cli error: ${e}`);
+      config.logger.error(`uncaught cli error: ${e}${config.logger.level === 'debug' ? e.stack : ''}`);
       exit(1);
     }
   }
 }
+
+export { parseFlags } from './parse-flags';

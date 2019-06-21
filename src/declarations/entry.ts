@@ -3,10 +3,8 @@ import * as d from '.';
 
 export interface EntryModule {
   entryKey?: string;
-  filePath?: string;
   dependencies?: string[];
-  moduleFiles: d.ModuleFile[];
-  requiresScopedStyles?: boolean;
+  cmps: d.ComponentCompilerMeta[];
   modeNames?: string[];
   entryBundles?: EntryBundle[];
 }
@@ -20,8 +18,6 @@ export interface EntryBundle {
   sourceTarget: string;
 }
 
-export type EntryPoint = EntryComponent[];
-
 export interface EntryComponent {
   tag: string;
   dependencyOf?: string[];
@@ -30,11 +26,6 @@ export interface EntryComponent {
 export interface ComponentRef {
   tag: string;
   filePath: string;
-}
-
-export interface PotentialComponentRef {
-  tag?: string;
-  html?: string;
 }
 
 export interface ModuleGraph {

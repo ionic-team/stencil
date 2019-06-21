@@ -1,24 +1,41 @@
 import * as d from '../../declarations';
 import { expectExtend } from '../matchers';
-import { getDefaultBuildConditionals } from '../../build-conditionals';
-import { h } from '../../renderer/vdom/h';
-import { applyWindowToGlobal } from '@stencil/core/mock-doc';
-
+import { setupGlobal, teardownGlobal } from '@mock-doc';
+import { setupMockFetch } from '../mock-fetch';
+import { HtmlSerializer } from './jest-serializer';
 
 declare const global: d.JestEnvironmentGlobal;
 
 export function jestSetupTestFramework() {
-  global._BUILD_ = getDefaultBuildConditionals();
   global.Context = {};
-  global.h = h;
   global.resourcesUrl = '/build';
 
-  applyWindowToGlobal(global);
-
   expect.extend(expectExtend);
+  expect.addSnapshotSerializer(HtmlSerializer);
+
+  setupGlobal(global);
+  setupMockFetch(global);
+
+  beforeEach(() => {
+    const bc = require('@stencil/core/build-conditionals');
+    const platform = require('@stencil/core/platform');
+
+    // reset the platform for this new test
+    platform.resetPlatform();
+    bc.resetBuildConditionals(bc.BUILD);
+  });
+
+  afterEach(() => {
+    const platform = require('@stencil/core/platform');
+    platform.stopAutoApplyChanges();
+
+    teardownGlobal(global);
+    global.Context = {};
+    global.resourcesUrl = '/build';
+  });
 
   const jasmineEnv = (jasmine as any).getEnv();
-  if (jasmineEnv) {
+  if (jasmineEnv != null) {
     jasmineEnv.addReporter({
       specStarted: (spec: any) => {
         global.currentSpec = spec;

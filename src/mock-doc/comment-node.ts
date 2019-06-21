@@ -1,27 +1,20 @@
 import { MockNode } from './node';
-import { NODE_TYPES } from './constants';
+import { NODE_NAMES, NODE_TYPES } from './constants';
 
 
 export class MockComment extends MockNode {
 
   constructor(ownerDocument: any, data: string) {
-    super(ownerDocument);
-    this.nodeType = NODE_TYPES.COMMENT_NODE;
-    this.nodeName = '#comment';
-    this.nodeValue = data;
+    super(
+      ownerDocument,
+      NODE_TYPES.COMMENT_NODE,
+      NODE_NAMES.COMMENT_NODE,
+      data
+    );
   }
 
-  cloneNode(deep?: boolean) {
-    const cloned = new MockComment(null, this.nodeValue);
-
-    if (deep) {
-      for (let i = 0; i < this.childNodes.length; i++) {
-        const clonedChildNode = this.childNodes[i].cloneNode(true);
-        cloned.appendChild(clonedChildNode);
-      }
-    }
-
-    return cloned;
+  cloneNode(_deep?: boolean) {
+    return new MockComment(null, this.nodeValue);
   }
 
   get textContent() {

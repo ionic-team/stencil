@@ -1,12 +1,10 @@
 import * as d from '../../declarations';
-import { buildWarn, isDocsPublic, normalizePath } from '../util';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
-import { getEventDetailType, getMemberDocumentation, getMemberType, getMethodParameters, getMethodReturns } from './docs-util';
 import { AUTO_GENERATE_COMMENT } from './constants';
+import { flatOne, isDocsPublic, normalizePath, sortBy } from '@utils';
 import { getBuildTimestamp } from '../build/build-ctx';
 
 
-export async function generateDocData(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]): Promise<d.JsonDocs> {
+export async function generateDocData(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocs> {
   return {
     timestamp: getBuildTimestamp(),
     compiler: {
@@ -14,156 +12,164 @@ export async function generateDocData(config: d.Config, compilerCtx: d.CompilerC
       version: config.sys.compiler.version,
       typescriptVersion: config.sys.compiler.typescriptVersion
     },
-    components: await getComponents(config, compilerCtx, diagnostics)
+    components: await getComponents(config, compilerCtx, buildCtx)
   };
 }
 
-async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]): Promise<d.JsonDocsComponent[]> {
-  const cmpDirectories: Set<string> = new Set();
-  const promises = Object.keys(compilerCtx.moduleFiles)
-    .sort()
-    .filter(filePath => {
-      const moduleFile = compilerCtx.moduleFiles[filePath];
-      if (!moduleFile.cmpMeta || moduleFile.isCollectionDependency) {
-        return false;
-      }
-      if (!isDocsPublic(moduleFile.cmpMeta.jsdoc)) {
-        return false;
-      }
-      const dirPath = normalizePath(config.sys.path.dirname(filePath));
-      if (cmpDirectories.has(dirPath)) {
-        const warn = buildWarn(diagnostics);
-        warn.relFilePath = dirPath;
-        warn.messageText = `multiple components found in: ${dirPath}`;
-        return false;
-      }
-      cmpDirectories.add(dirPath);
-      return true;
-    })
-    .map(async filePath => {
-      const moduleFile = compilerCtx.moduleFiles[filePath];
-      const dirPath = normalizePath(config.sys.path.dirname(filePath));
-      const readmePath = normalizePath(config.sys.path.join(dirPath, 'readme.md'));
-      const usagesDir = normalizePath(config.sys.path.join(dirPath, 'usage'));
-
-      const membersMeta = Object.keys(moduleFile.cmpMeta.membersMeta)
-        .sort()
-        .map(memberName => [memberName, moduleFile.cmpMeta.membersMeta[memberName]] as [string, d.MemberMeta])
-        .filter(([_, member]) => isDocsPublic(member.jsdoc));
-
-      const readme = await getUserReadmeContent(compilerCtx, readmePath);
-      const docsTags = generateDocsTags(moduleFile.cmpMeta.jsdoc);
-
-      return {
+async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> {
+  const results = await Promise.all(buildCtx.moduleFiles.map(async moduleFile => {
+    const filePath = moduleFile.sourceFilePath;
+    const dirPath = normalizePath(config.sys.path.dirname(filePath));
+    const readmePath = normalizePath(config.sys.path.join(dirPath, 'readme.md'));
+    const usagesDir = normalizePath(config.sys.path.join(dirPath, 'usage'));
+    const readme = await getUserReadmeContent(compilerCtx, readmePath);
+    const usage = await generateUsages(config, compilerCtx, usagesDir);
+    return moduleFile.cmps
+      .filter(cmp => isDocsPublic(cmp.docs) && !cmp.isCollectionDependency)
+      .map(cmp => ({
         dirPath,
         filePath,
         fileName: config.sys.path.basename(filePath),
         readmePath,
         usagesDir,
-        tag: moduleFile.cmpMeta.tagNameMeta,
+        tag: cmp.tagName,
         readme,
-        docsTags,
-        docs: generateDocs(readme, moduleFile.cmpMeta.jsdoc),
-        usage: await generateUsages(config, compilerCtx, usagesDir),
-        encapsulation: getEncapsulation(moduleFile.cmpMeta),
+        usage,
+        docs: generateDocs(readme, cmp.docs),
+        docsTags: cmp.docs.tags,
+        encapsulation: getEncapsulation(cmp),
+        dependants: cmp.directDependants,
+        dependencies: cmp.directDependencies,
+        dependencyGraph: buildDepGraph(cmp, buildCtx.components),
 
-        props: getProperties(membersMeta),
-        methods: getMethods(membersMeta),
-        events: getEvents(moduleFile.cmpMeta),
-        styles: getStyles(moduleFile.cmpMeta),
-        slots: getSlots(docsTags)
-      };
-    });
-  return Promise.all(promises);
+        props: getProperties(cmp),
+        methods: getMethods(cmp.methods),
+        events: getEvents(cmp.events),
+        styles: getStyles(cmp),
+        slots: getSlots(cmp.docs.tags)
+      }));
+    }));
+
+  return sortBy(flatOne(results), cmp => cmp.tag);
 }
 
-function getEncapsulation(cmpMeta: d.ComponentMeta): 'shadow' | 'scoped' | 'none' {
-  const encapsulation = cmpMeta.encapsulationMeta;
-  if (encapsulation === ENCAPSULATION.ShadowDom) {
+function buildDepGraph(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) {
+  const dependencies: d.JsonDocsDependencyGraph = {};
+  function walk(tagName: string) {
+    if (!dependencies[tagName]) {
+      const cmp = cmps.find(c => c.tagName === tagName);
+      const deps = cmp.directDependencies;
+      if (deps.length > 0) {
+        dependencies[tagName] = deps;
+        deps.forEach(walk);
+      }
+    }
+  }
+  walk(cmp.tagName);
+
+  // load dependants
+  cmp.directDependants.forEach(tagName => {
+    if (dependencies[tagName] && !dependencies[tagName].includes(tagName)) {
+      dependencies[tagName].push(cmp.tagName);
+    } else {
+      dependencies[tagName] = [cmp.tagName];
+    }
+  });
+  return dependencies;
+}
+
+function getEncapsulation(cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped' | 'none' {
+  if (cmp.encapsulation === 'shadow') {
     return 'shadow';
-  } else if (encapsulation === ENCAPSULATION.ScopedCss) {
+  } else if (cmp.encapsulation === 'scoped') {
     return 'scoped';
   } else {
     return 'none';
   }
 }
 
-function getProperties(members: [string, d.MemberMeta][]): d.JsonDocsProp[] {
-  return members
-    .filter(([_, member]) => member.memberType & (MEMBER_TYPE.Prop | MEMBER_TYPE.PropMutable))
-    .map(([memberName, member]) => {
-      return {
-        name: memberName,
-        type: member.jsdoc.type,
-        mutable: member.memberType === MEMBER_TYPE.PropMutable,
-        attr: getAttrName(member),
-        reflectToAttr: !!member.reflectToAttrib,
-        docs: getMemberDocumentation(member.jsdoc),
-        docsTags: generateDocsTags(member.jsdoc),
-        default: member.jsdoc.default,
-
-        optional: member.attribType ? member.attribType.optional : true,
-        required: member.attribType ? member.attribType.required : false,
-      };
-    });
+function getProperties(cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] {
+  return sortBy([
+    ...getRealProperties(cmpMeta.properties),
+    ...getVirtualProperties(cmpMeta.virtualProperties)
+  ], p => p.name);
 }
 
-function getMethods(members: [string, d.MemberMeta][]): d.JsonDocsMethod[] {
-  return members
-    .filter(([_, member]) => member.memberType & (MEMBER_TYPE.Method))
-    .map(([memberName, member]) => {
-      return {
-        name: memberName,
-        returns: getMethodReturns(member.jsdoc),
-        signature: getMethodSignature(memberName, member.jsdoc),
-        parameters: getMethodParameters(member.jsdoc),
-        docs: getMemberDocumentation(member.jsdoc),
-        docsTags: generateDocsTags(member.jsdoc),
-      };
-    });
+function getRealProperties(properties: d.ComponentCompilerProperty[]): d.JsonDocsProp[] {
+  return properties.filter(member => isDocsPublic(member.docs))
+    .map(member => ({
+      name: member.name,
+      type: member.complexType.resolved,
+      mutable: member.mutable,
+      attr: member.attribute,
+      reflectToAttr: !!member.reflect,
+      docs: member.docs.text,
+      docsTags: member.docs.tags,
+      default: member.defaultValue,
+      deprecation: getDeprecation(member.docs.tags),
+
+      optional: member.optional,
+      required: member.required,
+    }));
 }
 
-function getEvents(cmpMeta: d.ComponentMeta): d.JsonDocsEvent[] {
-  if (!Array.isArray(cmpMeta.eventsMeta)) {
-    return [];
-  }
+function getVirtualProperties(virtualProps: d.ComponentCompilerVirtualProperty[]): d.JsonDocsProp[] {
+  return virtualProps.map(member => ({
+    name: member.name,
+    type: member.type,
+    mutable: false,
+    attr: member.name,
+    reflectToAttr: false,
+    docs: member.docs,
+    docsTags: [],
+    default: undefined,
+    deprecation: undefined,
 
-  return cmpMeta.eventsMeta.sort((a, b) => {
-    if (a.eventName.toLowerCase() < b.eventName.toLowerCase()) return -1;
-    if (a.eventName.toLowerCase() > b.eventName.toLowerCase()) return 1;
-    return 0;
-  })
-  .filter(eventMeta => isDocsPublic(eventMeta.jsdoc))
-  .map(eventMeta => {
-    return {
-      event: eventMeta.eventName,
-      detail: getEventDetailType(eventMeta.eventType),
-      bubbles: !!eventMeta.eventBubbles,
-      cancelable: !!eventMeta.eventCancelable,
-      composed: !!eventMeta.eventComposed,
-      docs: getMemberDocumentation(eventMeta.jsdoc),
-      docsTags: generateDocsTags(eventMeta.jsdoc),
-    };
-  });
+    optional: true,
+    required: false,
+  }));
 }
 
-function getMethodSignature(memberName: string, jsdoc: d.JsDoc) {
-  return memberName + getMemberType(jsdoc);
+function getMethods(methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] {
+  return sortBy(methods, member => member.name)
+    .filter(member => isDocsPublic(member.docs))
+    .map(member => ({
+      name: member.name,
+      returns: {
+        type: member.complexType.return,
+        docs: member.docs.tags.filter(t => t.name === 'return').join('\n'),
+      },
+      signature: `${member.name}${member.complexType.signature}`,
+      parameters: [], // TODO
+      docs: member.docs.text,
+      docsTags: member.docs.tags,
+      deprecation: getDeprecation(member.docs.tags)
+    }));
 }
 
-function getStyles(cmpMeta: d.ComponentMeta): d.JsonDocsStyle[] {
+
+function getEvents(events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] {
+  return sortBy(events, eventMeta => eventMeta.name.toLowerCase())
+    .filter(eventMeta => isDocsPublic(eventMeta.docs))
+    .map(eventMeta => ({
+      event: eventMeta.name,
+      detail: eventMeta.complexType.resolved,
+      bubbles: eventMeta.bubbles,
+      cancelable: eventMeta.cancelable,
+      composed: eventMeta.composed,
+      docs: eventMeta.docs.text,
+      docsTags: eventMeta.docs.tags,
+      deprecation: getDeprecation(eventMeta.docs.tags)
+    }));
+}
+
+
+function getStyles(cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] {
   if (!cmpMeta.styleDocs) {
     return [];
   }
 
-  return cmpMeta.styleDocs.sort((a, b) => {
-    if (a.annotation < b.annotation) return -1;
-    if (a.annotation > b.annotation) return 1;
-    if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-    if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-    return 0;
-
-  }).map(styleDoc => {
+  return sortBy(cmpMeta.styleDocs, o => o.name.toLowerCase()).map(styleDoc => {
     return {
       name: styleDoc.name,
       annotation: styleDoc.annotation || '',
@@ -172,7 +178,15 @@ function getStyles(cmpMeta: d.ComponentMeta): d.JsonDocsStyle[] {
   });
 }
 
-function getSlots(tags: d.JsonDocsTags[]): d.JsonDocsSlot[] {
+function getDeprecation(tags: d.JsonDocsTag[]) {
+  const deprecation = tags.find(t => t.name === 'deprecated');
+  if (deprecation) {
+    return deprecation.text || '';
+  }
+  return undefined;
+}
+
+function getSlots(tags: d.JsonDocsTag[]): d.JsonDocsSlot[] {
   return tags
     .filter(tag => tag.name === 'slot' && tag.text)
     .map(({text}) => {
@@ -189,17 +203,6 @@ function getSlots(tags: d.JsonDocsTags[]): d.JsonDocsSlot[] {
     });
 }
 
-function getAttrName(memberMeta: d.MemberMeta) {
-  if (memberMeta.attribName) {
-    const propType = memberMeta.propType;
-
-    if (propType !== PROP_TYPE.Unknown) {
-      return memberMeta.attribName;
-    }
-  }
-  return undefined;
-}
-
 async function getUserReadmeContent(compilerCtx: d.CompilerCtx, readmePath: string) {
   try {
     const existingContent = await compilerCtx.fs.readFile(readmePath);
@@ -212,8 +215,8 @@ async function getUserReadmeContent(compilerCtx: d.CompilerCtx, readmePath: stri
 }
 
 
-function generateDocs(readme: string, jsdoc: d.JsDoc) {
-  const docs = getMemberDocumentation(jsdoc);
+function generateDocs(readme: string, jsdoc: d.CompilerJsDoc) {
+  const docs = jsdoc.text;
   if (docs !== '' || !readme) {
     return docs;
   }
@@ -234,10 +237,6 @@ function generateDocs(readme: string, jsdoc: d.JsDoc) {
     }
   }
   return contentLines.join('\n').trim();
-}
-
-function generateDocsTags(jsdoc: d.JsDoc): d.JsonDocsTags[] {
-  return jsdoc.tags || [];
 }
 
 async function generateUsages(config: d.Config, compilerCtx: d.CompilerCtx, usagesDir: string) {

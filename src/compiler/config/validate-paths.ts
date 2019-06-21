@@ -1,5 +1,5 @@
 import { Config } from '../../declarations';
-import { normalizePath } from '../util';
+import { normalizePath } from '@utils';
 import { setStringConfig } from './config-utils';
 import ts from 'typescript';
 
@@ -12,14 +12,6 @@ export function validatePaths(config: Config) {
       config.globalScript = path.join(config.rootDir, config.globalScript);
     }
     config.globalScript = normalizePath(config.globalScript);
-  }
-
-  if (Array.isArray(config.globalStyle)) {
-    // DEPRECATED 2018-05-31
-    config.logger.warn(`"globalStyle" config no longer accepts an array. Please update to only use a single entry point for a global style css file.`);
-    if (config.globalStyle.length > 0) {
-      config.globalStyle = config.globalStyle[0];
-    }
   }
 
   if (typeof config.globalStyle === 'string') {

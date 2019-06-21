@@ -37,6 +37,8 @@ export interface StencilConfig {
    * Also note that any files within src/assets are automatically copied to www/assets for convenience.
    *
    * In the copy config below, it will copy the entire directory from src/docs-content over to www/docs-content.
+   *
+   * @deprecated
    */
   copy?: d.CopyTask[];
 
@@ -103,7 +105,7 @@ export interface StencilConfig {
    * By default, Stencil does not come with Sass or PostCss support.
    * However, either can be added using the plugin array.
    */
-  plugins?: d.Plugin[];
+  plugins?: any[];
 
   /**
    * The srcDir config specifies the directory which should contain the source typescript files
@@ -111,36 +113,69 @@ export interface StencilConfig {
    */
   srcDir?: string;
 
-  assetVersioning?: ConfigAssetVersioning;
-  buildEs5?: boolean;
-  buildEsm?: boolean;
-  buildScoped?: boolean;
-  buildLogFilePath?: string;
-  cacheDir?: string;
+  /**
+   * Passes custom configuration down to the "rollup-plugin-commonjs" that Stencil uses under the hood.
+   * For further information: https://stenciljs.com/docs/module-bundling
+   */
   commonjs?: BundlingConfig;
+
+  /**
+   * Passes custom configuration down to the "rollup-plugin-node-resolve" that Stencil uses under the hood.
+   * For further information: https://stenciljs.com/docs/module-bundling
+   */
   nodeResolve?: NodeResolveConfig;
+
+  /**
+   * Passes custom configuration down to rollup itself, not all rollup options can be overriden.
+   */
   rollupConfig?: RollupConfig;
-  devInspector?: boolean;
+
+  /**
+   * Sets if the ES5 build must be generated or not. It defaults to `false` in dev mode, and `true` in production mode.
+   * Notice that Stencil always generates a modern build too, this setting will just disable the additional `es5` build.
+   */
+  buildEs5?: boolean;
+
+  /**
+   * Sets if the JS browser files are minified or not. Stencil uses `terser` under the hood.
+   * Defaults to `false` in dev mode and `true` in production mode.
+   */
+  minifyCss?: boolean;
+
+  /**
+   * Sets if the CSS is minified or not. Stencil uses `cssnano` under the hood.
+   * Defaults to `false` in dev mode and `true` in production mode.
+   */
+  minifyJs?: boolean;
+
+  /**
+   * Forces Stencil to run in `dev` mode if the value is `true` and `production` mode
+   * if it's `false`.
+   *
+   * Defaults to `false` (ie. production) unless the `--dev` flag is used in the CLI.
+   */
   devMode?: boolean;
-  devServer?: d.DevServerConfig;
-  enableCacheStats?: boolean;
+
   globalScript?: string;
-  hydratedCssClass?: string;
-  includeSrc?: string[];
-  logger?: d.Logger;
+  srcIndexHtml?: string;
+  watch?: boolean;
+  testing?: d.TestingConfig;
   maxConcurrentWorkers?: number;
   maxConcurrentTasksPerWorker?: number;
-  minifyCss?: boolean;
-  minifyJs?: boolean;
   preamble?: string;
-  srcIndexHtml?: string;
+  includeSrc?: string[];
+
+  entryComponentsHint?: string[];
+  buildDist?: boolean;
+  buildLogFilePath?: string;
+  cacheDir?: string;
+  devInspector?: boolean;
+  devServer?: d.StencilDevServerConfig;
+  enableCacheStats?: boolean;
   sys?: d.StencilSystem;
-  testing?: d.TestingConfig;
   tsconfig?: string;
   validateTypes?: boolean;
-  watch?: boolean;
   watchIgnoredRegex?: RegExp;
-  writeLog?: boolean;
 }
 
 export interface Config extends StencilConfig {
@@ -148,12 +183,22 @@ export interface Config extends StencilConfig {
   buildDocs?: boolean;
   configPath?: string;
   cwd?: string;
+  logger?: d.Logger;
+  writeLog?: boolean;
+  rollupPlugins?: any[];
+  devServer?: d.DevServerConfig;
   flags?: ConfigFlags;
   fsNamespace?: string;
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
   rootDir?: string;
+  suppressLogs?: boolean;
   _isValidated?: boolean;
   _isTesting?: boolean;
+  _lifecycleDOMEvents?: boolean;
+}
+
+export interface BrowserConfig extends d.StencilConfig {
+  win?: Window;
 }
 
 export interface RollupConfig {
@@ -164,6 +209,7 @@ export interface RollupConfig {
 export interface RollupInputOptions {
   context?: string;
   moduleContext?: ((id: string) => string) | { [id: string]: string };
+  treeshake?: boolean;
 }
 
 export interface RollupOutputOptions {
@@ -231,11 +277,11 @@ export interface ConfigFlags {
   help?: boolean;
   log?: boolean;
   logLevel?: string;
+  verbose?: boolean;
   maxWorkers?: number;
   open?: boolean;
   port?: number;
   prerender?: boolean;
-  prerenderExternal?: boolean;
   prod?: boolean;
   profile?: boolean;
   root?: string;
@@ -244,69 +290,10 @@ export interface ConfigFlags {
   serve?: boolean;
   serviceWorker?: boolean;
   spec?: boolean;
-  ssr?: boolean;
   stats?: boolean;
   updateScreenshot?: boolean;
   version?: boolean;
   watch?: boolean;
-}
-
-
-export interface ConfigAssetVersioning {
-  /**
-   * An array of strings of which CSS properties to version.
-   */
-  cssProperties?: string[];
-
-  /**
-   * The length of the hash. Defaults to config.hashedFileNameLength.
-   */
-  hashLength?: number;
-
-  /**
-   * If true, the plugin will put the hash to the query string instead of the filename. Defaults to false;
-   */
-  queryMode?: boolean;
-
-  /**
-   * Glob search pattern for urls to version. Defaults to include css,js,png,jpg,jpeg,gif,svg,json,woff,woff2,eot,ttf
-   */
-  pattern?: string;
-
-  /**
-   * Function used to filter which assets to version. First argument is the url. Return true for the url to be versioned. The "pattern" config will not be used if a "filter" function is given.
-   */
-  filter?: (url: string) => boolean;
-
-  /**
-   * Function used to create the filename with the file's hash. First argument is the filename, and the second argument is the hash.
-   */
-  generateFileName?: (fileName: string, hash: string) => string;
-
-  /**
-   * The prefix to prepended to the file path. Defaults to "".
-   */
-  prefix?: string;
-
-  /**
-   * The separator between the filename and hash. Defaults to "."
-   */
-  separator?: string;
-
-  /**
-   * Version assets found in HTML elements, such as CSS urls in <link> and JS urls in <script>. Defaults to true;
-   */
-  versionHtml?: boolean;
-
-  /**
-   * Version assets found in mainfest, such as the manifest.json file itself and all assets referenced within. Defaults to true;
-   */
-  versionManifest?: boolean;
-
-  /**
-   * Version assets that are found in styles and css, such as background-url and @font-face urls. Defaults to true;
-   */
-  versionCssProperties?: boolean;
 }
 
 
@@ -317,6 +304,8 @@ export interface ConfigBundle {
 
 export interface ServiceWorkerConfig {
   // https://developers.google.com/web/tools/workbox/modules/workbox-build#full_generatesw_config
+  unregister?: boolean;
+
   swDest?: string;
   swSrc?: string;
   globPatterns?: string[];
@@ -326,9 +315,10 @@ export interface ServiceWorkerConfig {
   maximumFileSizeToCacheInBytes?: number;
   manifestTransforms?: any;
   modifyUrlPrefix?: any;
-  dontCacheBustUrlsMatching?: any;
+  dontCacheBustURLsMatching?: RegExp;
   navigateFallback?: string;
-  navigateFallbackWhitelist?: any[];
+  navigateFallbackWhitelist?: RegExp[];
+  navigateFallbackBlacklist?: RegExp[];
   cacheId?: string;
   skipWaiting?: boolean;
   clientsClaim?: boolean;

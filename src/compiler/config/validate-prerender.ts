@@ -1,135 +1,34 @@
 import * as d from '../../declarations';
-import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
-import { normalizePath } from '../util';
+import { buildError, normalizePath } from '@utils';
+import { URL } from 'url';
 
 
-export function validatePrerender(config: d.Config, outputTarget: d.OutputTargetWww) {
-  let defaults: d.OutputTargetWww;
-
-  if (config.flags.prerender) {
-    // forcing a prerender build
-    defaults = FULL_PRERENDER_DEFAULTS;
-
-  } else if (config.flags.ssr) {
-    // forcing a ssr build
-    defaults = SSR_DEFAULTS;
-
-  } else {
-    // not forcing a prerender build
-
-    if (config.devMode) {
-      // not forcing a prerender build
-      // but we're in dev mode
-      defaults = DEV_MODE_DEFAULTS;
-
-    } else {
-      // not forcing a prerender build
-      // but we're in prod mode
-      defaults = PROD_NON_HYDRATE_DEFAULTS;
-    }
+export function validatePrerender(config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetWww) {
+  if (!config.flags || !config.flags.prerender) {
+    return;
   }
 
-  setStringConfig(outputTarget, 'baseUrl', defaults.baseUrl);
-  setBooleanConfig(outputTarget, 'canonicalLink', null, defaults.canonicalLink);
-  setBooleanConfig(outputTarget, 'collapseWhitespace', null, defaults.collapseWhitespace);
-  setBooleanConfig(outputTarget, 'hydrateComponents', null, defaults.hydrateComponents);
-  setBooleanConfig(outputTarget, 'inlineStyles', null, defaults.inlineStyles);
-  setBooleanConfig(outputTarget, 'inlineLoaderScript', null, defaults.inlineLoaderScript);
-  setNumberConfig(outputTarget, 'inlineAssetsMaxSize', null, defaults.inlineAssetsMaxSize);
-  setBooleanConfig(outputTarget, 'prerenderUrlCrawl', null, defaults.prerenderUrlCrawl);
-  setArrayConfig(outputTarget, 'prerenderLocations', defaults.prerenderLocations);
-  setBooleanConfig(outputTarget, 'prerenderPathHash', null, defaults.prerenderPathHash);
-  setBooleanConfig(outputTarget, 'prerenderPathQuery', null, defaults.prerenderPathQuery);
-  setNumberConfig(outputTarget, 'prerenderMaxConcurrent', null, defaults.prerenderMaxConcurrent);
-  setBooleanConfig(outputTarget, 'removeUnusedStyles', null, defaults.removeUnusedStyles);
+  outputTarget.baseUrl = normalizePath(outputTarget.baseUrl);
 
-  defaults.baseUrl = normalizePath(defaults.baseUrl);
-  if (!outputTarget.baseUrl.startsWith('/')) {
-    throw new Error(`baseUrl "${outputTarget.baseUrl}" must start with a slash "/". This represents an absolute path to the root of the domain.`);
+  if (!outputTarget.baseUrl.startsWith('http://') && !outputTarget.baseUrl.startsWith('https://')) {
+    const err = buildError(diagnostics);
+    err.messageText = `When prerendering, the "baseUrl" output target config must be a full URL and start with either "http://" or "https://". The config can be updated in the "www" output target within the stencil config.`;
   }
+
+  try {
+    new URL(outputTarget.baseUrl);
+  } catch (e) {
+    const err = buildError(diagnostics);
+    err.messageText = `invalid "baseUrl": ${e}`;
+  }
+
   if (!outputTarget.baseUrl.endsWith('/')) {
     outputTarget.baseUrl += '/';
   }
 
-  if (config.flags.prerender && outputTarget.prerenderLocations.length === 0) {
-    outputTarget.prerenderLocations.push({
-      path: outputTarget.baseUrl
-    });
-  }
-
-  if (outputTarget.hydrateComponents) {
-    config.buildEs5 = true;
+  if (typeof outputTarget.prerenderConfig === 'string') {
+    if (!config.sys.path.isAbsolute(outputTarget.prerenderConfig)) {
+      outputTarget.prerenderConfig = config.sys.path.join(config.rootDir, outputTarget.prerenderConfig);
+    }
   }
 }
-
-
-const FULL_PRERENDER_DEFAULTS: d.OutputTargetWww = {
-  type: 'www',
-
-  baseUrl: '/',
-  canonicalLink: true,
-  collapseWhitespace: true,
-  hydrateComponents: true,
-  inlineStyles: true,
-  inlineLoaderScript: true,
-  inlineAssetsMaxSize: 5000,
-  prerenderUrlCrawl: true,
-  prerenderPathHash: false,
-  prerenderPathQuery: false,
-  prerenderMaxConcurrent: 4,
-  removeUnusedStyles: true
-};
-
-
-const SSR_DEFAULTS: d.OutputTargetWww = {
-  type: 'www',
-
-  baseUrl: '/',
-  canonicalLink: true,
-  collapseWhitespace: true,
-  hydrateComponents: true,
-  inlineStyles: true,
-  inlineLoaderScript: true,
-  inlineAssetsMaxSize: 0,
-  prerenderUrlCrawl: false,
-  prerenderPathHash: false,
-  prerenderPathQuery: false,
-  prerenderMaxConcurrent: 0,
-  removeUnusedStyles: false
-};
-
-
-const PROD_NON_HYDRATE_DEFAULTS: d.OutputTargetWww = {
-  type: 'www',
-
-  baseUrl: '/',
-  canonicalLink: false,
-  collapseWhitespace: true,
-  hydrateComponents: false,
-  inlineStyles: false,
-  inlineLoaderScript: true,
-  inlineAssetsMaxSize: 0,
-  prerenderUrlCrawl: false,
-  prerenderPathHash: false,
-  prerenderPathQuery: false,
-  prerenderMaxConcurrent: 0,
-  removeUnusedStyles: false
-};
-
-
-const DEV_MODE_DEFAULTS: d.OutputTargetWww = {
-  type: 'www',
-
-  baseUrl: '/',
-  canonicalLink: false,
-  collapseWhitespace: false,
-  hydrateComponents: false,
-  inlineStyles: false,
-  inlineLoaderScript: false,
-  inlineAssetsMaxSize: 0,
-  prerenderUrlCrawl: false,
-  prerenderPathHash: false,
-  prerenderPathQuery: false,
-  prerenderMaxConcurrent: 0,
-  removeUnusedStyles: false
-};

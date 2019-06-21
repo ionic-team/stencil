@@ -1,4 +1,4 @@
-import { Component } from '../../../../dist';
+import { Component, h } from '@stencil/core';
 import os from 'os';
 import fs from 'fs';
 
@@ -25,7 +25,7 @@ export class NodeGlobals {
   render() {
     return (
       <section>
-
+        <div>NODE_ENV: <span id="node_env">{process.env.NODE_ENV}</span></div>
         <div>os.tmpdir(): <span id="tmpdir">{this.tmpdir}</span></div>
 
         <div>fs: <span id="fs">{this.fileSystem.toString()}</span></div>

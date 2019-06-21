@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { generateBuildResults } from './build-results';
 import { generateBuildStats } from './build-stats';
-import { initFsWatch } from '../fs-watch/fs-watch-init';
+import { initFsWatcher } from '../fs-watch/fs-watch-init';
 import { writeCacheStats } from './cache-stats';
 
 
@@ -31,10 +31,11 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
       compilerCtx.hasLoggedServerUrl = true;
     }
 
-    if (buildCtx.isRebuild && buildCtx.buildResults.hmr && !aborted && buildCtx.isActiveBuild) {
+    const hasChanges = buildCtx.hasScriptChanges || buildCtx.hasStyleChanges;
+    if (buildCtx.isRebuild && hasChanges && buildCtx.buildResults.hmr && !aborted) {
       // this is a rebuild, and we've got hmr data
       // and this build hasn't been aborted
-      logHmr(config, buildCtx);
+      logHmr(config.logger, buildCtx);
     }
 
     // create a nice pretty message stating what happend
@@ -46,7 +47,6 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
     if (buildCtx.hasError) {
       // gosh darn, build had errors
       // ಥ_ಥ
-      compilerCtx.lastBuildHadError = true;
       buildStatus = 'failed';
       statusColor = 'red';
 
@@ -54,21 +54,20 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
       // successful build!
       // ┏(°.°)┛ ┗(°.°)┓ ┗(°.°)┛ ┏(°.°)┓
       compilerCtx.hasSuccessfulBuild = true;
-      compilerCtx.lastBuildHadError = false;
     }
 
-    if (!aborted || (aborted && !compilerCtx.hasSuccessfulBuild)) {
-      // print out the time it took to build
-      // and add the duration to the build results
+    // print out the time it took to build
+    // and add the duration to the build results
+    if (!buildCtx.hasPrintedResults) {
       buildCtx.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
       buildCtx.hasPrintedResults = true;
 
       // write the build stats
       await generateBuildStats(config, compilerCtx, buildCtx, buildCtx.buildResults);
-
-      // emit a buildFinish event for anyone who cares
-      compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
     }
+
+    // emit a buildFinish event for anyone who cares
+    compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
 
     // write all of our logs to disk if config'd to do so
     // do this even if there are errors or not the active build
@@ -77,7 +76,7 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
     if (config.watch) {
       // this is a watch build
       // setup watch if we haven't done so already
-      initFsWatch(config, compilerCtx, buildCtx);
+      await initFsWatcher(config, compilerCtx, buildCtx);
 
     } else {
       // not a watch build, so lets destroy anything left open
@@ -91,20 +90,16 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
   // it's official, this build has finished
   buildCtx.hasFinished = true;
 
-  if (buildCtx.isActiveBuild) {
-    compilerCtx.isActivelyBuilding = false;
-  }
-
   return buildCtx.buildResults;
 }
 
 
-function logHmr(config: d.Config, buildCtx: d.BuildCtx) {
+function logHmr(logger: d.Logger, buildCtx: d.BuildCtx) {
   // this is a rebuild, and we've got hmr data
   // and this build hasn't been aborted
   const hmr = buildCtx.buildResults.hmr;
   if (hmr.componentsUpdated) {
-    cleanupUpdateMsg(config, `updated component`, hmr.componentsUpdated);
+    cleanupUpdateMsg(logger, `updated component`, hmr.componentsUpdated);
   }
 
   if (hmr.inlineStylesUpdated) {
@@ -114,20 +109,20 @@ function logHmr(config: d.Config, buildCtx: d.BuildCtx) {
       }
       return arr;
     }, [] as string[]);
-    cleanupUpdateMsg(config, `updated style`, inlineStyles);
+    cleanupUpdateMsg(logger, `updated style`, inlineStyles);
   }
 
   if (hmr.externalStylesUpdated) {
-    cleanupUpdateMsg(config, `updated stylesheet`, hmr.externalStylesUpdated);
+    cleanupUpdateMsg(logger, `updated stylesheet`, hmr.externalStylesUpdated);
   }
 
   if (hmr.imagesUpdated) {
-    cleanupUpdateMsg(config, `updated image`, hmr.imagesUpdated);
+    cleanupUpdateMsg(logger, `updated image`, hmr.imagesUpdated);
   }
 }
 
 
-function cleanupUpdateMsg(config: d.Config, msg: string, fileNames: string[]) {
+function cleanupUpdateMsg(logger: d.Logger, msg: string, fileNames: string[]) {
   if (fileNames.length > 0) {
     let fileMsg = '';
 
@@ -144,6 +139,6 @@ function cleanupUpdateMsg(config: d.Config, msg: string, fileNames: string[]) {
       msg += 's';
     }
 
-    config.logger.info(`${msg}: ${config.logger.cyan(fileMsg)}`);
+    logger.info(`${msg}: ${logger.cyan(fileMsg)}`);
   }
 }

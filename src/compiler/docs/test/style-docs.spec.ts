@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { parseStyleDocs } from '../style-docs';
 
 

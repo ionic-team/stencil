@@ -1,4 +1,4 @@
-import { Component, State } from '../../../../dist';
+import { Component, State, h } from '@stencil/core';
 
 @Component({
   tag: 'conditional-rerender-root'
@@ -15,7 +15,7 @@ export class ConditionalRerenderRoot {
 
   render() {
     return (
-      <conditional-rerender>
+      <conditional-rerender >
         <header>Header</header>
         {this.showContent ? <section>Content</section> : null }
         {this.showFooter ? <footer>Footer</footer> : null }

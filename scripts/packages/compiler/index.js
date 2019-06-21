@@ -1,2 +1,2 @@
 /*  @stencil/core/compiler  */
-module.exports = require('../dist/compiler/index.js');
+module.exports = require('../dist/compiler');

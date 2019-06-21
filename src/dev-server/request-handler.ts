@@ -1,13 +1,13 @@
 import * as d from '../declarations';
-import { isDevClient } from './util';
-import { normalizePath } from '../compiler/util';
+import { isDevClient, sendMsg } from './dev-server-utils';
+import { normalizePath } from '@utils';
 import { serveDevClient } from './serve-dev-client';
 import { serveFile } from './serve-file';
 import { serve404, serve404Content } from './serve-404';
 import { serve500 } from './serve-500';
 import { serveDirectoryIndex } from './serve-directory-index';
 import * as http from 'http';
-import * as path from 'path';
+import path from 'path';
 import * as url from 'url';
 
 
@@ -19,15 +19,36 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
 
       if (req.url === '') {
         res.writeHead(302, { 'location': '/' });
+
+        if (devServerConfig.logRequests) {
+          sendMsg(process, {
+            requestLog: {
+              method: req.method,
+              url: req.url,
+              status: 302
+            }
+          });
+        }
+
         return res.end();
       }
 
-      if (!req.url.startsWith(devServerConfig.baseUrl)) {
-        return serve404Content(res, `404 File Not Found, base url: ${devServerConfig.baseUrl}`);
+      if (isDevClient(req.pathname) && devServerConfig.websocket) {
+        return serveDevClient(devServerConfig, fs, req, res);
       }
 
-      if (isDevClient(req.pathname)) {
-        return serveDevClient(devServerConfig, fs, req, res);
+      if (!req.url.startsWith(devServerConfig.basePath)) {
+        if (devServerConfig.logRequests) {
+          sendMsg(process, {
+            requestLog: {
+              method: req.method,
+              url: req.url,
+              status: 404
+            }
+          });
+        }
+
+        return serve404Content(devServerConfig, req, res, `404 File Not Found, base path: ${devServerConfig.basePath}`);
       }
 
       try {
@@ -59,7 +80,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
       return serve404(devServerConfig, fs, req, res);
 
     } catch (e) {
-      return serve500(res, e);
+      return serve500(devServerConfig, incomingReq as any, res, e);
     }
   };
 }
@@ -78,8 +99,8 @@ function normalizeHttpRequest(devServerConfig: d.DevServerConfig, incomingReq: h
   const parts = (parsedUrl.pathname || '').replace(/\\/g, '/').split('/');
 
   req.pathname = parts.map(part => decodeURIComponent(part)).join('/');
-  if (req.pathname.length > 0) {
-    req.pathname = '/' + req.pathname.substring(devServerConfig.baseUrl.length);
+  if (req.pathname.length > 0 && !isDevClient(req.pathname)) {
+    req.pathname = '/' + req.pathname.substring(devServerConfig.basePath.length);
   }
 
   req.filePath = normalizePath(path.normalize(

@@ -1,7 +1,8 @@
 import { URL } from 'url';
 
 
-export class MockLocation {
+export class MockLocation implements Location {
+  ancestorOrigins: any = null;
   protocol = '';
   host = '';
   hostname = '';
@@ -18,7 +19,8 @@ export class MockLocation {
     return this._href;
   }
   set href(value) {
-    const url = new URL(value);
+    const url = new URL(value, 'http://mockdoc.stenciljs.com');
+    this._href = url.href;
     this.protocol = url.protocol;
     this.host = url.host;
     this.port = url.port;

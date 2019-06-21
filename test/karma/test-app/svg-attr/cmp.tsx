@@ -1,4 +1,4 @@
-import { Component, State } from '../../../../dist';
+import { Component, State, h } from '@stencil/core';
 
 @Component({
   tag: 'svg-attr'

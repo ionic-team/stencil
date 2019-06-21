@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import { buildError, catchError, normalizePath } from '../util';
+import { buildError, catchError, normalizePath } from '@utils';
 import { NodeFs } from '../../sys/node/node-fs';
-import * as path from 'path';
+import path from 'path';
 
 
 export async function copyTasksWorker(copyTasks: d.CopyTask[]) {
@@ -12,28 +12,36 @@ export async function copyTasksWorker(copyTasks: d.CopyTask[]) {
   };
 
   try {
-    const fs = new NodeFs();
+    const fs = new NodeFs(process);
 
     const allCopyTasks: d.CopyTask[] = [];
 
     // figure out all the file copy tasks we'll have
     // by digging down through any directory copy tasks
-    await Promise.all(copyTasks.map(async copyTask => {
-      await processCopyTask(fs, results, allCopyTasks, copyTask);
-    }));
+    while (copyTasks.length > 0) {
+      const tasks = copyTasks.splice(0, 100);
+
+      await Promise.all(tasks.map(async copyTask => {
+        await processCopyTask(fs, results, allCopyTasks, copyTask);
+      }));
+    }
 
     // figure out which directories we'll need to make first
     const mkDirs = ensureDirs(allCopyTasks);
+
     for (const mkDir of mkDirs) {
       try {
         await fs.mkdir(mkDir);
       } catch (mkDirErr) {}
     }
 
-    // begin copying all the files
-    await Promise.all(allCopyTasks.map(async copyTask => {
-      await fs.copyFile(copyTask.src, copyTask.dest);
-    }));
+    while (allCopyTasks.length > 0) {
+      const tasks = allCopyTasks.splice(0, 100);
+
+      await Promise.all(tasks.map(async copyTask => {
+        await fs.copyFile(copyTask.src, copyTask.dest);
+      }));
+    }
 
   } catch (e) {
     catchError(results.diagnostics, e);

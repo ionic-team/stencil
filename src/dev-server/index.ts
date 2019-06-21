@@ -1,14 +1,14 @@
 import * as d from '../declarations';
-import { NodeFs } from '../sys/node/node-fs';
-import { sendError } from './util';
+import { NodeFs } from '@sys';
+import { sendError } from './dev-server-utils';
 import { startDevServerWorker } from './start-server-worker';
-import * as path from 'path';
+import path from 'path';
 
 
 async function startServer(devServerConfig: d.DevServerConfig) {
   // received a message from main to start the server
   try {
-    const fs = new NodeFs();
+    const fs = new NodeFs(process);
     devServerConfig.contentTypes = await loadContentTypes(fs);
     startDevServerWorker(process, devServerConfig, fs);
 

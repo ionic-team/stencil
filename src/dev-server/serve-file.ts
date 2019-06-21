@@ -1,8 +1,8 @@
 import * as d from '../declarations';
-import * as util from './util';
+import * as util from './dev-server-utils';
 import { serve500 } from './serve-500';
 import * as http  from 'http';
-import * as path from 'path';
+import path from 'path';
 import * as querystring from 'querystring';
 import * as Url from 'url';
 import * as zlib from 'zlib';
@@ -15,7 +15,7 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
       // easy text file, use the internal cache
       let content = await fs.readFile(req.filePath);
 
-      if (util.isHtmlFile(req.filePath) && !util.isDevServerClient(req.pathname)) {
+      if (devServerConfig.websocket && util.isHtmlFile(req.filePath) && !util.isDevServerClient(req.pathname)) {
         // auto inject our dev server script
         content += getDevServerClientScript(devServerConfig, req);
 
@@ -55,8 +55,18 @@ export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSy
       fs.createReadStream(req.filePath).pipe(res);
     }
 
+    if (devServerConfig.logRequests) {
+      util.sendMsg(process, {
+        requestLog: {
+          method: req.method,
+          url: req.url,
+          status: 200
+        }
+      });
+    }
+
   } catch (e) {
-    serve500(res, e);
+    serve500(devServerConfig, req, res, e);
   }
 }
 
@@ -107,5 +117,5 @@ const urlVersionIds = new Map<string, string>();
 
 function getDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
   const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.host);
-  return `\n<iframe src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0"></iframe>`;
+  return `\n<iframe title="Stencil Dev Server Connector &#9889;" src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0"></iframe>`;
 }

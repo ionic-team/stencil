@@ -1,6 +1,7 @@
 import * as d from '.';
 
 
+/** OLD WAY */
 export interface Collection {
   collectionName?: string;
   moduleDir?: string;
@@ -36,28 +37,29 @@ export interface AppRegistry {
 
 export interface AppRegistryComponents {
   [tagName: string]: {
-    bundleIds: d.BundleIds,
+    bundleIds: d.ModeBundleIds,
     encapsulation?: 'shadow' | 'scoped';
   };
 }
 
-
+/** OLD WAY */
 export interface ModuleFiles {
   [filePath: string]: ModuleFile;
 }
 
 
+/** OLD WAY */
 export interface ModuleFile {
   sourceFilePath: string;
   jsFilePath?: string;
   dtsFilePath?: string;
-  cmpMeta?: d.ComponentMeta;
+  cmpMeta?: any;
   isCollectionDependency?: boolean;
   excludeFromCollection?: boolean;
   originalCollectionComponentPath?: string;
   externalImports?: string[];
   localImports?: string[];
-  potentialCmpRefs?: d.PotentialComponentRef[];
+  potentialCmpRefs?: string[];
   hasSlot?: boolean;
   hasSvg?: boolean;
 }
@@ -81,6 +83,7 @@ export interface CollectionData {
   components?: ComponentData[];
   collections?: CollectionDependencyData[];
   global?: string;
+  modules?: string[];
   compiler?: {
     name: string;
     version: string;

@@ -8,6 +8,113 @@ describe('serializeNodeToHtml', () => {
     doc = new MockDocument();
   });
 
+  it('remove most whitespace between elements, but not all of it when not in pretty print', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<div>\n\n\n   <span></span>\t\t  \n<b></b><code>  \t<b>var</b>    <span>88 </span>  </code>  </div>`;
+
+    const html = serializeNodeToHtml(elm);
+    expect(html).toBe(`<div> <span></span> <b></b><code>  \t<b>var</b>    <span>88 </span>  </code> </div>`);
+  });
+
+  it('remove most whitespace in text nodes, but not all of it when not in pretty print', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<div><span>var \n \t </span><b>\n\n\n\t     value\n\n\n\n\n    \t</b><span>    =</span><code>     88     </code>;</div>`;
+
+    const html = serializeNodeToHtml(elm);
+    expect(html).toBe(`<div><span>var </span><b> value </b><span> =</span><code>     88     </code>;</div>`);
+  });
+
+  it('do not remove whitespace within <code>', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `
+      <p>
+        <code>
+          <span>var</span>
+          <b>value</b>
+          <strong>=</strong>
+          <em>88</em><i>;</i>
+        </code>
+      </p>
+    `;
+
+    const html = serializeNodeToHtml(elm);
+    expect(html).toBe(`<p> <code>
+          <span>var</span>
+          <b>value</b>
+          <strong>=</strong>
+          <em>88</em><i>;</i>
+        </code> </p>`);
+  });
+
+  it('pretty print with comments', () => {
+    const elm = doc.createElement('div');
+    elm.innerHTML =  `
+      <p>
+        <!--comment1-->
+        <!--comment2-->
+        <span>Hello</span>
+        <!--comment3-->
+        <!--comment4-->
+      </p>
+    `;
+
+    expect(elm).toEqualHtml(`
+      <div>
+        <p>
+          <!--comment1-->
+          <!--comment2-->
+          <span>Hello</span>
+          <!--comment3-->
+          <!--comment4-->
+        </p>
+      </div>
+    `);
+  });
+
+  it('shadow root to template', () => {
+    const elm = doc.createElement('cmp-a');
+    expect(elm.shadowRoot).toEqual(null);
+
+    const shadowRoot = elm.attachShadow({ mode: 'open' });
+    expect(shadowRoot.nodeType).toEqual(11);
+    expect(elm.shadowRoot.nodeType).toEqual(11);
+
+    expect(shadowRoot.host).toEqual(elm);
+
+    const shadowTop = doc.createElement('article');
+    shadowTop.innerHTML = 'shadow top';
+    shadowRoot.appendChild(shadowTop);
+
+    const slot = doc.createElement('slot');
+    shadowRoot.appendChild(slot);
+
+    const shadowBottom = doc.createElement('section');
+    shadowBottom.innerHTML = 'shadow bottom';
+    shadowRoot.appendChild(shadowBottom);
+
+    elm.innerHTML = '<div>light dom</div>';
+
+    expect(elm).toEqualHtml(`
+      <cmp-a>
+        <mock:shadow-root>
+          <article>
+            shadow top
+          </article>
+          <slot></slot>
+          <section>
+            shadow bottom
+          </section>
+        </mock:shadow-root>
+        <div>
+          light dom
+        </div>
+      </cmp-a>
+    `);
+  });
+
   it('template', () => {
     const input = `<template>text</template>`;
     doc.body.innerHTML = input;
@@ -24,11 +131,11 @@ describe('serializeNodeToHtml', () => {
     expect(input).toBe(output);
   });
 
-  it('collapse boolean attributes', () => {
+  it('remove boolean attributes', () => {
     const input = `<input type="checkbox" checked="">`;
     doc.body.innerHTML = input;
 
-    const output = serializeNodeToHtml(doc.body, { collapseBooleanAttributes: true});
+    const output = serializeNodeToHtml(doc.body, { removeBooleanAttributeQuotes: true});
     expect(output).toBe(`<input type="checkbox" checked>`);
   });
 
@@ -52,7 +159,7 @@ describe('serializeNodeToHtml', () => {
     elm.setAttribute('name', '');
     elm.setAttribute('title', '');
 
-    const html = serializeNodeToHtml(elm, { outerHTML: true, removeEmptyAttributes: false });
+    const html = serializeNodeToHtml(elm, { outerHtml: true, removeEmptyAttributes: false });
     expect(html).toBe(`<button class="" dir="" my-attr="" id="" data-custom="" lang="" name="" title=""></button>`);
   });
 
@@ -68,7 +175,7 @@ describe('serializeNodeToHtml', () => {
     elm.setAttribute('name', '');
     elm.setAttribute('title', '');
 
-    const html = serializeNodeToHtml(elm, { outerHTML: true });
+    const html = serializeNodeToHtml(elm, { outerHtml: true });
     expect(html).toBe(`<button my-attr="" data-custom></button>`);
   });
 
@@ -77,7 +184,7 @@ describe('serializeNodeToHtml', () => {
     elm.setAttribute('type', 'submit');
     elm.setAttribute('id', 'btn');
     elm.textContent = `Text`;
-    const html = serializeNodeToHtml(elm, { outerHTML: true, pretty: true });
+    const html = serializeNodeToHtml(elm, { outerHtml: true, prettyHtml: true });
     expect(html).toBe(`<button id="btn" type="submit">
   Text
 </button>`);
@@ -88,23 +195,14 @@ describe('serializeNodeToHtml', () => {
     elm.setAttribute('type', 'submit');
     elm.setAttribute('id', 'btn');
     elm.textContent = `Text`;
-    const html = serializeNodeToHtml(elm, { outerHTML: true });
+    const html = serializeNodeToHtml(elm, { outerHtml: true });
     expect(html).toBe(`<button type="submit" id="btn">Text</button>`);
-  });
-
-  it('set attributes, removeAttributeQuotes', () => {
-    const elm = doc.createElement('button');
-    elm.setAttribute('type', 'submit');
-    elm.setAttribute('id', 'btn');
-    elm.textContent = `Text`;
-    const html = serializeNodeToHtml(elm, { outerHTML: true, removeAttributeQuotes: true });
-    expect(html).toBe(`<button type=submit id=btn>Text</button>`);
   });
 
   it('do not escape scripts', () => {
     const elm = doc.createElement('script');
     elm.innerHTML = `if (true && false) { console.log('hi); }`;
-    const html = serializeNodeToHtml(elm, { outerHTML: true });
+    const html = serializeNodeToHtml(elm, { outerHtml: true });
     expect(html).toBe(`<script>if (true && false) { console.log('hi); }</script>`);
   });
 
@@ -114,7 +212,7 @@ describe('serializeNodeToHtml', () => {
   });
 
   it('empty document, pretty', () => {
-    const html = serializeNodeToHtml(doc, { pretty: true });
+    const html = serializeNodeToHtml(doc, { prettyHtml: true });
     expect(html).toBe(`<!doctype html>
 <html>
   <head></head>

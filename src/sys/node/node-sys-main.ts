@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
+import { cloneDocument, createDocument, serializeNodeToHtml } from '@mock-doc';
 import color from 'ansi-colors';
-import { createContext, runInContext } from './node-context';
-import { createFsWatcher } from './node-fs-watcher';
-import { createDom } from './node-dom';
+import { FsWatcher } from './node-fs-watcher';
+import { getLatestCompilerVersion } from './check-version';
 import glob from 'glob';
 import { loadConfigFile } from './node-config';
 import { NodeFs } from './node-fs';
@@ -10,16 +10,14 @@ import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
 import { NodeRollup } from './node-rollup';
 import { NodeStorage } from './node-storage';
-import { normalizePath } from '../../compiler/util';
-import opn from 'opn';
+import { normalizePath } from '@utils';
+import open from 'open';
 import semver from 'semver';
 import { WorkerManager } from './worker/index';
 
-
 import { createHash } from 'crypto';
-import { cpus, platform, release, tmpdir } from 'os';
-import * as path from 'path';
-import * as url from 'url';
+import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
+import path from 'path';
 
 
 export class NodeSystem implements d.StencilSystem {
@@ -32,6 +30,7 @@ export class NodeSystem implements d.StencilSystem {
   private nodeLazyRequire: NodeLazyRequire;
   private nodeResolveModule: NodeResolveModule;
   storage: NodeStorage;
+  nextTick: (cb: Function) => void;
 
   fs: d.FileSystem;
   path: d.Path;
@@ -46,13 +45,21 @@ export class NodeSystem implements d.StencilSystem {
   };
 
   constructor(fs?: d.FileSystem) {
-    this.fs = fs || new NodeFs();
-    this.path = path;
+    this.fs = fs || new NodeFs(process);
+    this.path = Object.assign({}, path);
+
+    const orgPathJoin = path.join;
+    this.path.join = function(...paths) {
+      return normalizePath(orgPathJoin.apply(path, paths));
+    };
+
     this.nodeResolveModule = new NodeResolveModule();
     this.storage = new NodeStorage(this.fs);
 
     this.packageDir = path.join(__dirname, '..', '..', '..');
     this.distDir = path.join(this.packageDir, 'dist');
+
+    this.nextTick = process.nextTick.bind(process);
 
     try {
       this.packageJsonData = require(path.join(this.packageDir, 'package.json'));
@@ -67,7 +74,7 @@ export class NodeSystem implements d.StencilSystem {
     }
   }
 
-  initWorkers(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number) {
+  initWorkers(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number, logger: d.Logger) {
     if (this.sysWorker) {
       return this.sysWorker.options;
     }
@@ -82,7 +89,8 @@ export class NodeSystem implements d.StencilSystem {
 
     this.sysWorker = new WorkerManager(workerModulePath, {
       maxConcurrentWorkers: maxConcurrentWorkers,
-      maxConcurrentTasksPerWorker: maxConcurrentTasksPerWorker
+      maxConcurrentTasksPerWorker: maxConcurrentTasksPerWorker,
+      logger: logger
     });
 
     this.addDestroy(() => {
@@ -111,12 +119,17 @@ export class NodeSystem implements d.StencilSystem {
     this.destroys.push(fn);
   }
 
+  cloneDocument(doc: Document) {
+    return cloneDocument(doc);
+  }
+
   get compiler() {
     return {
       name: this.packageJsonData.name,
       version: this.packageJsonData.version,
       runtime: path.join(this.distDir, 'compiler', 'index.js'),
       packageDir: this.packageDir,
+      distDir: this.distDir,
       typescriptVersion: this.typescriptPackageJson.version
     };
   }
@@ -125,21 +138,12 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('copy', [copyTasks], { isLongRunningTask: true });
   }
 
-  private _existingDom: () => d.CreateDom;
-
-  get createDom() {
-    if (this._existingDom) {
-      return this._existingDom;
-    }
-    return createDom;
+  createDocument(html: string) {
+    return createDocument(html);
   }
 
-  set createDom(val) {
-    this._existingDom = val;
-  }
-
-  createFsWatcher(events: d.BuildEvents, paths: string, opts: any) {
-    const fsWatcher = createFsWatcher(events, paths, opts);
+  async createFsWatcher(config: d.Config, fs: d.FileSystem, events: d.BuildEvents) {
+    const fsWatcher = new FsWatcher(config, fs, events);
 
     this.addDestroy(() => {
       fsWatcher.close();
@@ -148,23 +152,33 @@ export class NodeSystem implements d.StencilSystem {
     return fsWatcher;
   }
 
-  generateContentHash(content: any, length: number) {
-    let hash = createHash('md5')
-               .update(content)
-               .digest('base64');
+  generateContentHash(content: any, length?: number) {
+    return new Promise<string>(resolve => {
+      let hash = createHash('md5')
+        .update(content)
+        .digest('base64');
 
-    if (typeof length === 'number') {
-      hash = hash.replace(/\W/g, '')
-                 .substr(0, length)
-                 .toLowerCase();
-    }
+      if (typeof length === 'number') {
+        hash = hash.replace(/\W/g, '')
+                .substr(0, length)
+                .toLowerCase();
+      }
 
-    return hash;
+      resolve(hash);
+    });
+  }
+
+  getClientPath(staticName: string) {
+    return normalizePath(path.join(this.distDir, 'client', staticName));
   }
 
   getClientCoreFile(opts: any) {
-    const filePath = normalizePath(path.join(this.distDir, 'client', opts.staticName));
+    const filePath = this.getClientPath(opts.staticName);
     return this.fs.readFile(filePath);
+  }
+
+  getLatestCompilerVersion(logger: d.Logger, forceCheck: boolean) {
+    return getLatestCompilerVersion(this.storage, logger, forceCheck);
   }
 
   glob(pattern: string, opts: any) {
@@ -180,13 +194,7 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   loadConfigFile(configPath: string, process?: NodeJS.Process) {
-    const config = loadConfigFile(this.fs, configPath, process);
-
-    if (!config.sys) {
-      config.sys = this;
-    }
-
-    return config;
+    return loadConfigFile(this.fs, configPath, process);
   }
 
   get lazyRequire() {
@@ -197,26 +205,30 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   optimizeCss(inputOpts: d.OptimizeCssInput) {
-    return this.sysWorker.run('optimizeCss', [inputOpts]);
+    return this.sysWorker.run('optimizeCss', [inputOpts]) as Promise<d.OptimizeCssOutput>;
   }
 
-  minifyJs(input: string, opts?: any) {
+  minifyJs(input: string, opts?: any): Promise<{output: string, sourceMap: any, diagnostics: d.Diagnostic[]}> {
     return this.sysWorker.run('minifyJs', [input, opts]);
   }
 
-  open(target: string, opts: any) {
-    return opn(target, opts) as Promise<any>;
+  open(target: string, opts?: any) {
+    return open(target, opts) as Promise<any>;
   }
 
   get details() {
     const details: d.SystemDetails = {
       cpuModel: '',
       cpus: -1,
+      freemem() {
+        return freemem();
+      },
       platform: '',
       release: '',
       runtime: 'node',
       runtimeVersion: '',
-      tmpDir: tmpdir()
+      tmpDir: tmpdir(),
+      totalmem: -1
     };
     try {
       const sysCpus = cpus();
@@ -225,12 +237,13 @@ export class NodeSystem implements d.StencilSystem {
       details.platform = platform();
       details.release = release();
       details.runtimeVersion = process.version;
+      details.totalmem = totalmem();
     } catch (e) {}
     return details;
   }
 
-  requestLatestCompilerVersion() {
-    return this.sysWorker.run('requestLatestCompilerVersion');
+  prerenderUrl(prerenderRequest: d.PrerenderRequest): Promise<d.PrerenderResults> {
+    return this.sysWorker.run('prerenderUrl', [prerenderRequest]);
   }
 
   resolveModule(fromDir: string, moduleId: string, opts?: d.ResolveModuleOptions) {
@@ -241,20 +254,20 @@ export class NodeSystem implements d.StencilSystem {
     return NodeRollup;
   }
 
-  scopeCss(cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) {
-    return this.sysWorker.run('scopeCss', [cssText, scopeId, hostScopeId, slotScopeId]);
+  scopeCss(cssText: string, scopeId: string, commentOriginalSelector: boolean) {
+    return this.sysWorker.run('scopeCss', [cssText, scopeId, commentOriginalSelector]);
   }
 
   get color() {
     return color;
   }
 
-  async transpileToEs5(cwd: string, input: string, inlineHelpers: boolean) {
-    return this.sysWorker.run('transpileToEs5', [cwd, input, inlineHelpers]);
+  serializeNodeToHtml(elm: Element | Document) {
+    return serializeNodeToHtml(elm);
   }
 
-  get url() {
-    return url;
+  async transpileToEs5(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults> {
+    return this.sysWorker.run('transpileToEs5', [cwd, input, inlineHelpers]);
   }
 
   validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
@@ -263,13 +276,6 @@ export class NodeSystem implements d.StencilSystem {
       [compilerOptions, emitDtsFiles, currentWorkingDir, collectionNames, rootTsFiles],
       { isLongRunningTask: true, workerKey: 'validateTypes' }
     );
-  }
-
-  get vm(): any {
-    return {
-      createContext,
-      runInContext
-    };
   }
 
 }

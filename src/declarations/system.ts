@@ -9,22 +9,26 @@ export interface StencilSystem {
     typescriptVersion?: string;
     runtime?: string;
     packageDir?: string;
+    distDir?: string;
   };
   copy?(copyTasks: d.CopyTask[]): Promise<d.CopyResults>;
-  createDom?(): CreateDom;
   color?: any;
-  createFsWatcher?(events: d.BuildEvents, paths: string, opts?: any): d.FsWatcher;
+  cloneDocument?(doc: Document): Document;
+  createFsWatcher?(config: d.Config, fs: d.FileSystem, events: d.BuildEvents): Promise<d.FsWatcher>;
+  createDocument?(html: string): Document;
   destroy?(): void;
   addDestroy?(fn: Function): void;
   details?: SystemDetails;
   fs?: d.FileSystem;
-  generateContentHash?(content: string, length: number): string;
+  generateContentHash?(content: string, length: number): Promise<string>;
+  getLatestCompilerVersion?(logger: d.Logger, forceCheck: boolean): Promise<string>;
+  getClientPath?(staticName: string): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
   glob?(pattern: string, options: {
     cwd?: string;
     nodir?: boolean;
   }): Promise<string[]>;
-  initWorkers?(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number): d.WorkerOptions;
+  initWorkers?(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number, logger: d.Logger): d.WorkerOptions;
   lazyRequire?: d.LazyRequire;
   loadConfigFile?(configPath: string, process?: any): d.Config;
   minifyJs?(input: string, opts?: any): Promise<{
@@ -32,26 +36,19 @@ export interface StencilSystem {
     sourceMap?: any;
     diagnostics?: d.Diagnostic[];
   }>;
+  nextTick?(cb: Function): void;
   open?: (url: string, opts?: any) => Promise<void>;
   optimizeCss?(inputOpts: d.OptimizeCssInput): Promise<d.OptimizeCssOutput>;
   path?: Path;
-  requestLatestCompilerVersion?(): Promise<string>;
+  prerenderUrl?: (prerenderRequest: d.PrerenderRequest) => Promise<d.PrerenderResults>;
   resolveModule?(fromDir: string, moduleId: string, opts?: ResolveModuleOptions): string;
   rollup?: RollupInterface;
-  scopeCss?: (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) => Promise<string>;
+  scopeCss?: (cssText: string, scopeId: string, commentOriginalSelector: boolean) => Promise<string>;
   semver?: Semver;
+  serializeNodeToHtml?(elm: Element | Document): string;
   storage?: Storage;
   transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults>;
-  url?: {
-    parse(urlStr: string, parseQueryString?: boolean, slashesDenoteHost?: boolean): Url;
-    format(url: Url): string;
-    resolve(from: string, to: string): string;
-  };
-  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]): Promise<d.ValidateTypesResults>;
-  vm?: {
-    createContext(ctx: d.CompilerCtx, outputTarget: d.OutputTargetWww, sandbox?: any): any;
-    runInContext(code: string, contextifiedSandbox: any, options?: any): any;
-  };
+  validateTypes?(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]): Promise<d.ValidateTypesResults>;
 }
 
 
@@ -66,8 +63,9 @@ export interface RollupInterface {
   };
   plugins: {
     nodeResolve(opts: any): any;
-    emptyJsResolver(): any;
+    replace(opts: any): any;
     commonjs(opts: any): any;
+    json(): any;
   };
 }
 
@@ -77,7 +75,7 @@ export interface Semver {
   lte(v1: string, v2: string): boolean;
   gt(v1: string, v2: string): boolean;
   gte(v1: string, v2: string): boolean;
-  prerelease(v: string): string[] | null;
+  prerelease(v: string): readonly string[] | null;
   satisfies(version: string, range: string): boolean;
 }
 
@@ -92,10 +90,12 @@ export interface LazyRequire {
 export interface SystemDetails {
   cpuModel: string;
   cpus: number;
+  freemem(): number;
   platform: string;
   runtime: string;
   runtimeVersion: string;
   release: string;
+  totalmem: number;
   tmpDir: string;
 }
 
@@ -103,13 +103,6 @@ export interface SystemDetails {
 export interface Storage {
   get(key: string): Promise<any>;
   set(key: string, value: any): Promise<void>;
-}
-
-
-export interface CreateDom {
-  parse(hydrateOptions: d.OutputTargetHydrate): Window;
-  serialize(): string;
-  destroy(): void;
 }
 
 
@@ -134,11 +127,12 @@ export interface PackageJsonData {
   browser?: string;
   module?: string;
   'jsnext:main'?: string;
+  'collection:main'?: string;
   unpkg?: string;
   collection?: string;
   types?: string;
   files?: string[];
-  ['dist-tags']: {
+  ['dist-tags']?: {
     latest: string;
   };
   dependencies?: {

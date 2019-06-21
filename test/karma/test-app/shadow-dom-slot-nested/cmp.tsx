@@ -1,4 +1,4 @@
-import { Component, Prop } from '../../../../dist';
+import { Component, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'shadow-dom-slot-nested',
@@ -11,7 +11,7 @@ import { Component, Prop } from '../../../../dist';
 })
 export class ShadowDomSlotNested {
 
-  @Prop() i: number;
+  @Prop() i?: number;
 
   render() {
     return [

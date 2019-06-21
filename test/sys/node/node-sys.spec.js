@@ -14,6 +14,19 @@ describe('test/sys/node', () => {
   });
 
 
+  it('parse error', () => {
+    const input = {
+      css: `
+        div
+          flex: 1;
+        }
+      `
+    };
+    return sys.optimizeCss(input).then(output => {
+      expect(output.diagnostics).toHaveLength(1);
+    });
+  });
+
   it('autoprefixCss', () => {
     const input = {
       css: `
@@ -146,7 +159,7 @@ describe('test/sys/node', () => {
     const slotScopeAttr = `sc-ion-tag-s`;
 
     return sys.scopeCss(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr).then(scopeCss => {
-      expect(scopeCss).toBe(`.sc-ion-tag-s > * {}`);
+      expect(scopeCss).toBe(`/*!@::slotted(*)*/.sc-ion-tag-s > * {}`);
     });
   });
 

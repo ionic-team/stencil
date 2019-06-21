@@ -1,11 +1,9 @@
 
 
 export function relocateMetaCharset(doc: Document) {
-  if (!doc || !doc.head) {
-    return;
-  }
+  const head = doc.head;
 
-  let charsetElm = doc.head.querySelector('meta[charset]');
+  let charsetElm = head.querySelector('meta[charset]');
   if (charsetElm == null) {
     // doesn't have <meta charset>, so create it
     charsetElm = doc.createElement('meta');
@@ -17,5 +15,5 @@ export function relocateMetaCharset(doc: Document) {
   }
 
   // ensure the <meta charset> is the first node in <head>
-  doc.head.insertBefore(charsetElm, doc.head.firstChild);
+  head.insertBefore(charsetElm, head.firstChild);
 }

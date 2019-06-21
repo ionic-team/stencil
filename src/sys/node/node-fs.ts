@@ -1,29 +1,36 @@
 import * as d from '../../declarations';
 import fs from 'graceful-fs';
+import mkdirp from 'mkdirp';
 
 
 export class NodeFs implements d.FileSystem {
+  supportsMkdirRecursive = false;
 
-  copyFile(src: string, dest: string) {
+  constructor(process: NodeJS.Process) {
+    try {
+      const segments = process.version.split('.').map(v => parseInt(v, 10));
+      const major = segments[0];
+      const minor = segments[1];
+
+      // mkdir recursive support started in v10.12.0
+      this.supportsMkdirRecursive = (major >= 11 || (major === 10 && minor >= 12));
+    } catch (e) {}
+  }
+
+  access(path: string) {
     return new Promise<void>((resolve, reject) => {
-      const readStream = fs.createReadStream(src);
-      readStream.on('error', reject);
-
-      const writeStream = fs.createWriteStream(dest);
-      writeStream.on('error', reject);
-      writeStream.on('close', resolve);
-
-      readStream.pipe(writeStream);
+      fs.access(path, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
     });
   }
-
-  createReadStream(filePath: string) {
-    return fs.createReadStream(filePath);
-  }
-
-  mkdir(dirPath: string) {
+  copyFile(src: string, dest: string) {
     return new Promise<void>((resolve, reject) => {
-      fs.mkdir(dirPath, (err: any) => {
+      return fs.copyFile(src, dest, 0, (err) => {
         if (err) {
           reject(err);
         } else {
@@ -33,8 +40,67 @@ export class NodeFs implements d.FileSystem {
     });
   }
 
-  mkdirSync(dirPath: string) {
-    fs.mkdirSync(dirPath);
+  createReadStream(filePath: string) {
+    return fs.createReadStream(filePath);
+  }
+
+  mkdir(dirPath: string, opts: d.MakeDirectoryOptions = {}) {
+    if (opts.recursive) {
+      if (this.supportsMkdirRecursive) {
+        // supports mkdir recursive
+        return new Promise<void>((resolve, reject) => {
+          fs.mkdir(dirPath, opts, err => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        });
+
+      } else {
+        // does NOT support mkdir recursive
+        // use good ol' mkdirp
+        return new Promise<void>((resolve, reject) => {
+          mkdirp(dirPath, err => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        });
+      }
+    }
+
+    // not doing recursive
+    return new Promise<void>((resolve, reject) => {
+      fs.mkdir(dirPath, opts, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  mkdirSync(dirPath: string, opts: fs.MakeDirectoryOptions = {}) {
+    if (opts.recursive) {
+      if (this.supportsMkdirRecursive) {
+        // supports mkdir recursive
+        fs.mkdirSync(dirPath, opts);
+
+      } else {
+        // does NOT support mkdir recursive
+        // use good ol' mkdirp
+        mkdirp.sync(dirPath, opts);
+      }
+
+    } else {
+      // not doing recursive
+      fs.mkdirSync(dirPath, opts);
+    }
   }
 
   readdir(dirPath: string) {
@@ -53,9 +119,9 @@ export class NodeFs implements d.FileSystem {
     return fs.readdirSync(dirPath);
   }
 
-  readFile(filePath: string) {
+  readFile(filePath: string, format = 'utf8') {
     return new Promise<string>((resolve, reject) => {
-      fs.readFile(filePath, 'utf8', (err: any, content: any) => {
+      fs.readFile(filePath, format, (err: any, content: any) => {
         if (err) {
           reject(err);
         } else {
@@ -75,8 +141,8 @@ export class NodeFs implements d.FileSystem {
     return fs.existsSync(filePath);
   }
 
-  readFileSync(filePath: string) {
-    return fs.readFileSync(filePath, 'utf8');
+  readFileSync(filePath: string, format = 'utf8') {
+    return fs.readFileSync(filePath, format);
   }
 
   rmdir(dirPath: string) {

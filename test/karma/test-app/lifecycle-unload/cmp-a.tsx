@@ -1,4 +1,4 @@
-import { Component, Element } from '../../../../dist';
+import { Component, Element, h } from '@stencil/core';
 
 @Component({
   tag: 'lifecycle-unload-a',
@@ -6,17 +6,17 @@ import { Component, Element } from '../../../../dist';
 })
 export class LifecycleUnloadA {
 
-  @Element() elm: HTMLElement;
-  results: HTMLDivElement;
+  @Element() el!: HTMLElement;
+  results?: HTMLDivElement | null;
 
   componentDidLoad() {
-    this.results = this.elm.ownerDocument.body.querySelector('#lifecycle-unload-results');
+    this.results = this.el.ownerDocument!.body.querySelector('#lifecycle-unload-results') as HTMLDivElement;
   }
 
   componentDidUnload() {
     const elm = document.createElement('div');
     elm.textContent = 'cmp-a unload';
-    this.results.appendChild(elm);
+    this.results!.appendChild(elm);
   }
 
   render() {

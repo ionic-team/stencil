@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { resetCompilerCtx } from '../build/compiler-ctx';
 import { validateConfig } from './validate-config';
 
 
@@ -10,7 +9,7 @@ export function configFileReload(config: d.Config, compilerCtx: d.CompilerCtx) {
     configReload(config, updatedConfig);
 
     // reset the compiler context cache
-    resetCompilerCtx(compilerCtx);
+    compilerCtx.reset();
 
   } catch (e) {
     config.logger.error(e);
@@ -42,7 +41,7 @@ export function configReload(config: d.Config, updatedConfig: d.Config) {
   config._isValidated = false;
 
   // validate our new config data
-  validateConfig(config);
+  validateConfig(config, [], false);
 
   // ensure we're using the correct original config data
   for (const key in keepers) {
@@ -56,10 +55,10 @@ export function configReload(config: d.Config, updatedConfig: d.Config) {
 // using the correct keys, but the value doesn't matter here
 const CONFIG_RELOAD_KEEPERS: d.Config = {
   flags: null,
-  sys: null,
-  logger: null,
   cwd: null,
+  logger: null,
   rootDir: null,
+  sys: null,
   watch: null
 };
 

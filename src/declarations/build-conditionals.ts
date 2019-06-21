@@ -1,77 +1,94 @@
 
-
-export type BuildCoreIds = 'core' | 'core.pf' | 'esm.es5' | 'esm.es2017';
-
-export interface BuildConditionals {
-  [key: string]: any;
-  coreId: BuildCoreIds;
-  polyfills: boolean;
-  es5: boolean;
-  cssVarShim: boolean;
-  clientSide: boolean;
-  browserModuleLoader: boolean;
-  externalModuleLoader: boolean;
-
-  // dev
-  isDev: boolean;
-  isProd: boolean;
-  devInspector: boolean;
-  hotModuleReplacement: boolean;
-  verboseError: boolean;
-  profile: boolean;
-
-  // ssr
-  ssrServerSide: boolean;
-  prerenderClientSide: boolean;
-  prerenderExternal: boolean;
-
+export interface BuildFeatures {
   // encapsulation
-  styles: boolean;
-  hasMode: boolean;
+  style: boolean;
+  mode: boolean;
 
   // dom
   shadowDom: boolean;
   scoped: boolean;
-  slotPolyfill: boolean;
+
+  // render
+  /**
+   * Every component has a render function
+   */
+  allRenderFn: boolean;
+  /**
+   * At least one component has a render function
+   */
+  hasRenderFn: boolean;
 
   // vdom
-  hostData: boolean;
-  hostTheme: boolean;
-  reflectToAttr: boolean;
+  vdomRender: boolean;
+  noVdomRender: boolean;
+  vdomAttribute: boolean;
+  vdomClass: boolean;
+  vdomStyle: boolean;
+  vdomKey: boolean;
+  vdomRef: boolean;
+  vdomListener: boolean;
+  vdomFunctional: boolean;
+  vdomText: boolean;
+  slotRelocation: boolean;
+
+  // elements
+  slot: boolean;
+  svg: boolean;
 
   // decorators
   element: boolean;
   event: boolean;
-  listener: boolean;
+  hostListener: boolean;
+  hostListenerTargetWindow: boolean;
+  hostListenerTargetDocument: boolean;
+  hostListenerTargetBody: boolean;
+  hostListenerTargetParent: boolean;
+  hostListenerTarget: boolean;
   method: boolean;
-  propConnect: boolean;
-  propContext: boolean;
   prop: boolean;
   propMutable: boolean;
   state: boolean;
   watchCallback: boolean;
-  hasMembers: boolean;
+  member: boolean;
   updatable: boolean;
+  propBoolean: boolean;
+  propNumber: boolean;
+  propString: boolean;
 
   // lifecycle events
+  lifecycle: boolean;
   cmpDidLoad: boolean;
   cmpWillLoad: boolean;
   cmpDidUpdate: boolean;
   cmpWillUpdate: boolean;
+  cmpWillRender: boolean;
+  cmpDidRender: boolean;
   cmpDidUnload: boolean;
+  connectedCallback: boolean;
+  disconnectedCallback: boolean;
 
   // attr
-  observeAttr: boolean;
+  observeAttribute: boolean;
+  reflect: boolean;
 
-  // elements
-  hasSlot: boolean;
-  hasSvg: boolean;
+  taskQueue: boolean;
 }
 
-declare global {
-  var _BUILD_: BuildConditionals;
+export interface Build extends Partial<BuildFeatures> {
+  hotModuleReplacement?: boolean;
+  isDebug?: boolean;
+  isDev?: boolean;
+  hydrateServerSide?: boolean;
+  hydrateClientSide?: boolean;
+  lifecycleDOMEvents?: boolean;
+  cssAnnotations?: boolean;
+  lazyLoad?: boolean;
+  profile?: boolean;
+  cssVarShim?: boolean;
+  constructableCSS?: boolean;
 }
 
 export interface UserBuildConditionals {
   isDev: boolean;
+  isBrowser: boolean;
 }

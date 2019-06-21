@@ -1,12 +1,12 @@
-import { MockElement } from './node';
-import { NODE_TYPES } from './constants';
+import { MockHTMLElement } from './node';
+import { NODE_NAMES, NODE_TYPES } from './constants';
 
 
-export class MockDocumentFragment extends MockElement {
+export class MockDocumentFragment extends MockHTMLElement {
 
   constructor(ownerDocument: any) {
     super(ownerDocument, null);
-    this.nodeName = '#document-fragment';
+    this.nodeName = NODE_NAMES.DOCUMENT_FRAGMENT_NODE;
     this.nodeType = NODE_TYPES.DOCUMENT_FRAGMENT_NODE;
   }
 
@@ -14,7 +14,7 @@ export class MockDocumentFragment extends MockElement {
     const cloned = new MockDocumentFragment(null);
 
     if (deep) {
-      for (let i = 0; i < this.childNodes.length; i++) {
+      for (let i = 0, ii = this.childNodes.length; i < ii; i++) {
         const childNode = this.childNodes[i];
         if (childNode.nodeType === NODE_TYPES.ELEMENT_NODE || childNode.nodeType === NODE_TYPES.TEXT_NODE || childNode.nodeType === NODE_TYPES.COMMENT_NODE) {
           const clonedChildNode = this.childNodes[i].cloneNode(true);

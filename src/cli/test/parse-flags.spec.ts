@@ -291,6 +291,19 @@ describe('parseFlags', () => {
     expect(flags.headless).toBe(true);
   });
 
+  it('should parse --logLevel', () => {
+    process.argv[2] = '--logLevel';
+    process.argv[3] = 'error';
+    const flags = parseFlags(process);
+    expect(flags.logLevel).toBe('error');
+  });
+
+  it('should parse --logLevel=error', () => {
+    process.argv[2] = '--logLevel=error';
+    const flags = parseFlags(process);
+    expect(flags.logLevel).toBe('error');
+  });
+
   it('should parse --log-level', () => {
     process.argv[2] = '--log-level';
     process.argv[3] = 'error';
@@ -302,6 +315,19 @@ describe('parseFlags', () => {
     process.argv[2] = '--log';
     const flags = parseFlags(process);
     expect(flags.log).toBe(true);
+  });
+
+  it('should parse --maxWorkers 4', () => {
+    process.argv[2] = '--maxWorkers';
+    process.argv[3] = '4';
+    const flags = parseFlags(process);
+    expect(flags.maxWorkers).toBe(4);
+  });
+
+  it('should parse --maxWorkers=4', () => {
+    process.argv[2] = '--maxWorkers=4';
+    const flags = parseFlags(process);
+    expect(flags.maxWorkers).toBe(4);
   });
 
   it('should parse --max-workers 4', () => {
@@ -360,12 +386,6 @@ describe('parseFlags', () => {
     expect(flags.prerender).toBe(true);
   });
 
-  it('should parse --prerender-external', () => {
-    process.argv[2] = '--prerender-external';
-    const flags = parseFlags(process);
-    expect(flags.prerenderExternal).toBe(true);
-  });
-
   it('should parse --root', () => {
     process.argv[2] = '--root';
     process.argv[3] = 'custom-www';
@@ -419,6 +439,18 @@ describe('parseFlags', () => {
     process.argv[2] = '--stats';
     const flags = parseFlags(process);
     expect(flags.stats).toBe(true);
+  });
+
+  it('should parse --noUpdateScreenshot', () => {
+    process.argv[2] = '--noUpdateScreenshot';
+    const flags = parseFlags(process);
+    expect(flags.updateScreenshot).toBe(false);
+  });
+
+  it('should parse --updateScreenshot', () => {
+    process.argv[2] = '--updateScreenshot';
+    const flags = parseFlags(process);
+    expect(flags.updateScreenshot).toBe(true);
   });
 
   it('should parse --update-screenshot', () => {

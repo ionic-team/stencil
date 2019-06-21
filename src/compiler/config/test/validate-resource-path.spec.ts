@@ -1,7 +1,7 @@
-import * as d from '../../../declarations';
-import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
+import * as d from '@stencil/core/declarations';
+import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import { validateConfig } from '../validate-config';
-import * as path from 'path';
+import path from 'path';
 
 
 describe('validateResourcesUrl', () => {
@@ -15,7 +15,8 @@ describe('validateResourcesUrl', () => {
     config = {
       sys: sys,
       logger: logger,
-      rootDir: '/User/some/path/'
+      rootDir: '/User/some/path/',
+      namespace: 'Testing'
     };
   });
 
@@ -38,7 +39,7 @@ describe('validateResourcesUrl', () => {
       resourcesUrl: '/somewhere/else'
     };
     config.outputTargets = [outputTarget];
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect((config.outputTargets[0] as d.OutputTargetWww).resourcesUrl).toBe('/somewhere/else/');
     expect(path.isAbsolute(outputTarget.resourcesUrl)).toBe(true);
   });
@@ -49,7 +50,7 @@ describe('validateResourcesUrl', () => {
       resourcesUrl: 'somewhere/else'
     };
     config.outputTargets = [outputTarget];
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(outputTarget.resourcesUrl).toBe('somewhere/else/');
     expect(path.isAbsolute(outputTarget.resourcesUrl)).toBe(false);
   });
@@ -61,7 +62,7 @@ describe('validateResourcesUrl', () => {
       buildDir: 'some-build'
     };
     config.outputTargets = [outputTarget];
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(outputTarget.resourcesUrl).toBeUndefined();
   });
 
@@ -71,7 +72,7 @@ describe('validateResourcesUrl', () => {
       buildDir: 'some-build'
     };
     config.outputTargets = [outputTarget];
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(outputTarget.resourcesUrl).toBeUndefined();
   });
 
@@ -80,7 +81,7 @@ describe('validateResourcesUrl', () => {
       type: 'www'
     };
     config.outputTargets = [outputTarget];
-    validateConfig(config);
+    validateConfig(config, [], false);
     expect(outputTarget.resourcesUrl).toBeUndefined();
   });
 

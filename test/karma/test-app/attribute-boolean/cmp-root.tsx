@@ -1,16 +1,16 @@
-import { Component, Element, State, Method } from '../../../../dist';
+import { Component, Element, State, Method, h } from '@stencil/core';
 
 @Component({
   tag: 'attribute-boolean-root'
 })
 export class AttributeBooleanRoot {
 
-  @Element() el: HTMLElement;
+  @Element() el!: HTMLElement;
 
   @State() state = false;
 
   @Method()
-  toggleState() {
+  async toggleState() {
     this.state = !this.state;
   }
 

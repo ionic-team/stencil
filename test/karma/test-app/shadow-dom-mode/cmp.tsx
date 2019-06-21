@@ -1,5 +1,8 @@
-import { Component, Prop } from '../../../../dist';
+import { Component, h, getMode } from '@stencil/core';
 
+/**
+ * @virtualProp {string} colormode - The mode determines which platform styles to use.
+ */
 @Component({
   tag: 'shadow-dom-mode',
   styleUrls: {
@@ -10,10 +13,9 @@ import { Component, Prop } from '../../../../dist';
 })
 export class ShadowDomMode {
 
-  @Prop() mode: string;
+  private mode = getMode(this);
 
   render() {
     return <div>{this.mode}</div>;
   }
-
 }

@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
+    "strict": true,
     "alwaysStrict": true,
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
     "declaration": false,
+    "resolveJsonModule": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
@@ -23,7 +25,8 @@
     "outDir": "www",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core": ["../../"]
+      "@stencil/core": ["../../dist"],
+      "@stencil/core/internal": ["../../internal"]
     }
   },
   "include": [

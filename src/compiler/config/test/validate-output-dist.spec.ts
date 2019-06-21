@@ -1,6 +1,6 @@
-import * as d from '../../../declarations';
+import * as d from '@stencil/core/declarations';
 import { validateOutputTargetDist } from '../validate-outputs-dist';
-import * as path from 'path';
+import path from 'path';
 
 
 describe('validateDistOutputTarget', () => {
@@ -24,7 +24,7 @@ describe('validateDistOutputTarget', () => {
     };
     config.outputTargets = [outputTarget];
     validateOutputTargetDist(config);
-    expect(config.outputTargets).toHaveLength(1);
+    expect(config.outputTargets).toHaveLength(5);
     expect(outputTarget).toBeDefined();
     expect(outputTarget.dir).toBe('/my-dist');
     expect(outputTarget.buildDir).toBe('/my-dist/my-build');

@@ -1,6 +1,6 @@
 import * as d from '../declarations';
-import { getLoaderPath } from '../compiler/app/app-file-naming';
-import { hasError } from '../compiler/util';
+import { hasError } from '@utils';
+import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { runJest } from './jest/jest-runner';
 import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
@@ -38,11 +38,7 @@ export class Testing implements d.Testing {
     const env: d.E2EProcessEnv = process.env;
     const compiler = this.compiler;
     const config = this.config;
-    const { isValid, outputTarget } = getOutputTarget(config);
-    if (!isValid) {
-      this.isValid = false;
-      return false;
-    }
+    config.outputTargets = getOutputTargets(config);
 
     const msg: string[] = [];
 
@@ -56,16 +52,16 @@ export class Testing implements d.Testing {
       env.__STENCIL_SPEC_TESTS__ = 'true';
     }
 
-    config.logger.info(config.logger.magenta(`testing ${msg.join(' and ')} files`));
+    this.config.logger.info(this.config.logger.magenta(`testing ${msg.join(' and ')} files`));
 
     const doScreenshots = !!(config.flags.e2e && config.flags.screenshot);
     if (doScreenshots) {
       env.__STENCIL_SCREENSHOT__ = 'true';
 
       if (config.flags.updateScreenshot) {
-        config.logger.info(config.logger.magenta(`updating master screenshots`));
+        this.config.logger.info(this.config.logger.magenta(`updating master screenshots`));
       } else {
-        config.logger.info(config.logger.magenta(`comparing against master screenshots`));
+        this.config.logger.info(this.config.logger.magenta(`comparing against master screenshots`));
       }
     }
 
@@ -103,10 +99,10 @@ export class Testing implements d.Testing {
 
       if (this.devServer) {
         env.__STENCIL_BROWSER_URL__ = this.devServer.browserUrl;
-        config.logger.debug(`dev server url: ${env.__STENCIL_BROWSER_URL__}`);
+        this.config.logger.debug(`e2e dev server url: ${env.__STENCIL_BROWSER_URL__}`);
 
-        env.__STENCIL_LOADER_URL__ = getLoaderScriptUrl(config, outputTarget, this.devServer.browserUrl);
-        config.logger.debug(`dev server loader: ${env.__STENCIL_LOADER_URL__}`);
+        env.__STENCIL_APP_URL__ = getAppUrl(config, this.devServer.browserUrl);
+        this.config.logger.debug(`e2e app url: ${env.__STENCIL_APP_URL__}`);
       }
     }
 
@@ -118,10 +114,10 @@ export class Testing implements d.Testing {
       } else {
         passed = await runJest(config, env);
       }
-      config.logger.info('');
+      this.config.logger.info('');
 
     } catch (e) {
-      config.logger.error(e);
+      this.config.logger.error(e);
     }
 
     return passed;
@@ -153,6 +149,7 @@ function setupTestingConfig(config: d.Config) {
   config.devMode = true;
   config.maxConcurrentWorkers = 1;
   config.validateTypes = false;
+  config._isTesting = true;
 
   config.flags = config.flags || {};
   config.flags.serve = false;
@@ -162,35 +159,31 @@ function setupTestingConfig(config: d.Config) {
 }
 
 
-function getOutputTarget(config: d.Config) {
-  let isValid = true;
-
-  let outputTarget = config.outputTargets.find(o => o.type === 'www') as d.OutputTargetWww;
-  if (!outputTarget) {
-    outputTarget = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetWww;
-    if (!outputTarget) {
-      config.logger.error(`Test missing config output target`);
-      isValid = false;
-    }
-  }
-  outputTarget.serviceWorker = null;
-
-  config.outputTargets = [outputTarget];
-
-  return { isValid, outputTarget };
+function getOutputTargets(config: d.Config) {
+  return config.outputTargets.filter(o => {
+    return isOutputTargetWww(o) || isOutputTargetDistLazy(o);
+  });
 }
 
 
-function getLoaderScriptUrl(config: d.Config, outputTarget: d.OutputTargetWww, browserUrl: string) {
-  const appLoaderFilePath = getLoaderPath(config, outputTarget);
+function getAppUrl(config: d.Config, browserUrl: string) {
+  const appFileName = `${config.fsNamespace}.esm.js`;
 
-  let appLoadUrlPath: string;
-
-  if (outputTarget.type === 'www') {
-    appLoadUrlPath = config.sys.path.relative(outputTarget.dir, appLoaderFilePath);
-  } else {
-    appLoadUrlPath = config.sys.path.relative(config.rootDir, appLoaderFilePath);
+  const wwwOutput = config.outputTargets.find(isOutputTargetWww);
+  if (wwwOutput) {
+    const appBuildDir = wwwOutput.buildDir;
+    const appFilePath = config.sys.path.join(appBuildDir, appFileName);
+    const appUrlPath = config.sys.path.relative(wwwOutput.dir, appFilePath);
+    return browserUrl + appUrlPath;
   }
 
-  return browserUrl + appLoadUrlPath;
+  const distOutput = config.outputTargets.find(isOutputTargetDistLazy);
+  if (distOutput) {
+    const appBuildDir = distOutput.esmDir;
+    const appFilePath = config.sys.path.join(appBuildDir, appFileName);
+    const appUrlPath = config.sys.path.relative(config.rootDir, appFilePath);
+    return browserUrl + appUrlPath;
+  }
+
+  return browserUrl;
 }

@@ -1,14 +1,10 @@
 import * as d from '../../declarations';
-import addComponentMetadata from './transformers/add-component-metadata';
 import { BuildContext } from '../build/build-ctx';
-import { gatherMetadata } from './datacollection/gather-metadata';
-import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
-import { noop } from '../../util/helpers';
-import { normalizePath } from '../util';
-import { removeCollectionImports } from './transformers/remove-collection-imports';
-import { removeDecorators } from './transformers/remove-decorators';
-import { removeStencilImports } from './transformers/remove-stencil-imports';
-import { validateConfig } from '../config/validate-config';
+import { CompilerContext } from '../build/compiler-ctx';
+import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
+import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
+import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
+import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import ts from 'typescript';
 
 
@@ -16,7 +12,8 @@ import ts from 'typescript';
  * Mainly used as the typescript preprocessor for unit tests
  */
 export function transpileModule(config: d.Config, input: string, opts: ts.CompilerOptions = {}, sourceFilePath?: string) {
-  config = validateConfig(config);
+  const compilerCtx = new CompilerContext(config);
+  const buildCtx = new BuildContext(config, compilerCtx);
 
   if (typeof sourceFilePath === 'string') {
     sourceFilePath = normalizePath(sourceFilePath);
@@ -29,34 +26,27 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     code: null,
     map: null,
     diagnostics: [],
-    cmpMeta: null
+    moduleFile: null,
+    build: {}
   };
 
-  const compilerCtx: d.CompilerCtx = {
-    collections: [],
-    moduleFiles: {},
-    resolvedCollections: [],
-    events: {
-      emit: noop,
-      subscribe: noop,
-      unsubscribe: noop,
-      unsubscribeAll: noop
-    }
-  };
-  const buildCtx = new BuildContext(config, compilerCtx);
-
-  if (sourceFilePath.endsWith('.tsx')) {
+  if ((sourceFilePath.endsWith('.tsx') || sourceFilePath.endsWith('.jsx')) && opts.jsx == null) {
     // ensure we're setup for JSX in typescript
     opts.jsx = ts.JsxEmit.React;
+  }
+
+  if (opts.jsx != null && typeof opts.jsxFactory !== 'string') {
     opts.jsxFactory = 'h';
   }
 
   const sourceFile = ts.createSourceFile(sourceFilePath, input, opts.target);
 
   // Create a compilerHost object to allow the compiler to read and write files
-  const compilerHost = {
-    getSourceFile: (fileName: string) => normalizePath(fileName) === normalizePath(sourceFilePath) ? sourceFile : undefined,
-    writeFile: function (name: string, text: string) {
+  const compilerHost: ts.CompilerHost = {
+    getSourceFile: fileName => {
+      return normalizePath(fileName) === normalizePath(sourceFilePath) ? sourceFile : undefined;
+    },
+    writeFile: (name, text) => {
       if (name.endsWith('.map')) {
         results.map = text;
       } else {
@@ -65,28 +55,30 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     },
     getDefaultLibFileName: () => `lib.d.ts`,
     useCaseSensitiveFileNames: () => false,
-    getCanonicalFileName: (fileName: string) => fileName,
+    getCanonicalFileName: fileName => fileName,
     getCurrentDirectory: () => '',
     getNewLine: () => ts.sys.newLine,
-    fileExists: (fileName: string) => normalizePath(fileName) === normalizePath(sourceFilePath),
+    fileExists: fileName => normalizePath(fileName) === normalizePath(sourceFilePath),
     readFile: () => '',
     directoryExists: () => true,
-    getDirectories: () => [] as string[]
+    getDirectories: () => []
   };
 
   const program = ts.createProgram([sourceFilePath], opts, compilerHost);
   const typeChecker = program.getTypeChecker();
 
-  // Emit
+  const transformOpts: d.TransformOptions = {
+    addCompilerMeta: true,
+    addStyle: false
+  };
+
   program.emit(undefined, undefined, undefined, false, {
     before: [
-      gatherMetadata(config, compilerCtx, buildCtx, typeChecker),
-      removeDecorators(),
-      addComponentMetadata(compilerCtx.moduleFiles)
+      convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker)
     ],
     after: [
-      removeStencilImports(),
-      removeCollectionImports(compilerCtx)
+      convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
+      lazyComponentTransform(compilerCtx, transformOpts)
     ]
   });
 
@@ -96,13 +88,11 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     tsDiagnostics.push(...program.getOptionsDiagnostics());
   }
 
-  loadTypeScriptDiagnostics(config, buildCtx.diagnostics, tsDiagnostics);
+  loadTypeScriptDiagnostics(buildCtx.diagnostics, tsDiagnostics);
 
   results.diagnostics.push(...buildCtx.diagnostics);
 
-  const moduleFile = compilerCtx.moduleFiles[results.sourceFilePath];
-
-  results.cmpMeta = moduleFile ? moduleFile.cmpMeta : null;
+  results.moduleFile = compilerCtx.moduleMap.get(results.sourceFilePath);
 
   return results;
 }

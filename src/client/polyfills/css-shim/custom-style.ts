@@ -4,10 +4,6 @@ import { CSSScope } from './interfaces';
 import { addGlobalStyle, parseCSS, reScope, updateGlobalScopes } from './scope';
 import { getActiveSelectors, resolveValues } from './selectors';
 
-export function supportsCssVars(win: Window) {
-  return !!((win as any).CSS && (win as any).CSS.supports && (win as any).CSS.supports('color', 'var(--c)'));
-}
-
 export class CustomStyle {
 
   private count = 0;
@@ -43,36 +39,36 @@ export class CustomStyle {
 
   createHostStyle(
     hostEl: HTMLElement,
-    templateName: string,
+    cssScopeId: string,
     cssText: string,
   ) {
     if (this.hostScopeMap.has(hostEl)) {
-      return null;
+      throw new Error('host style already created');
     }
-    const cssScopeId = (hostEl as any)['s-sc'];
-    const baseScope = this.registerHostTemplate(cssText, templateName, cssScopeId);
-    const isDynamicScoped = baseScope.isDynamic && baseScope.cssScopeId;
+    const baseScope = this.registerHostTemplate(cssText, cssScopeId);
+    const isDynamicScoped = !!(baseScope.isDynamic && baseScope.cssScopeId);
     const needStyleEl = isDynamicScoped || !baseScope.styleEl;
-    if (!needStyleEl) {
-      return null;
-    }
-
     const styleEl = this.doc.createElement('style');
-    if (isDynamicScoped) {
-      const newScopeId = `${baseScope.cssScopeId}-${this.count}`;
-      (hostEl as any)['s-sc'] = newScopeId;
 
-      this.hostStyleMap.set(hostEl, styleEl);
-      this.hostScopeMap.set(hostEl, reScope(baseScope, newScopeId));
-      this.count++;
+    if (!needStyleEl) {
+      styleEl.innerHTML = cssText;
     } else {
-      baseScope.styleEl = styleEl;
-      if (!baseScope.isDynamic) {
-        styleEl.innerHTML = executeTemplate(baseScope.template, {});
+      if (isDynamicScoped) {
+        (styleEl as any)['s-sc'] = cssScopeId = `${baseScope.cssScopeId}-${this.count}`;
+        styleEl.innerHTML = '/*needs update*/';
+        this.hostStyleMap.set(hostEl, styleEl);
+        this.hostScopeMap.set(hostEl, reScope(baseScope, cssScopeId));
+        this.count++;
+
+      } else {
+        baseScope.styleEl = styleEl;
+        if (!baseScope.isDynamic) {
+          styleEl.innerHTML = executeTemplate(baseScope.template, {});
+        }
+        this.globalScopes.push(baseScope);
+        this.updateGlobal();
+        this.hostScopeMap.set(hostEl, baseScope);
       }
-      this.globalScopes.push(baseScope);
-      this.updateGlobal();
-      this.hostScopeMap.set(hostEl, baseScope);
     }
     return styleEl;
   }
@@ -102,12 +98,12 @@ export class CustomStyle {
     updateGlobalScopes(this.globalScopes);
   }
 
-  private registerHostTemplate(cssText: string, scopeName: string, cssScopeId: string) {
-    let scope = this.scopesMap.get(scopeName);
+  private registerHostTemplate(cssText: string, scopeId: string) {
+    let scope = this.scopesMap.get(scopeId);
     if (!scope) {
       scope = parseCSS(cssText);
-      scope.cssScopeId = cssScopeId;
-      this.scopesMap.set(scopeName, scope);
+      scope.cssScopeId = scopeId;
+      this.scopesMap.set(scopeId, scope);
     }
     return scope;
   }
