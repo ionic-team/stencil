@@ -4,7 +4,7 @@ import {
   Plugin as RollupPlugin,
   PluginContext as RollupPluginContext,
   ResolveIdHook,
-  TransformHook
+  TransformSourceDescription
 } from 'rollup';
 
 export interface Plugin extends RollupPlugin {
@@ -36,10 +36,10 @@ export interface Plugin extends RollupPlugin {
 
 type LoadHookReturnType = ReturnType<LoadHook>;
 type ResolveIdHookReturnType = ReturnType<ResolveIdHook>;
-type TransformHookReturnType = ReturnType<TransformHook> | Promise<PluginTransformResults>;
+type TransformHookReturnType = Promise<TransformResult> | TransformResult;
+type TransformResult = string | null | undefined | PluginTransformResults;
 
-export interface PluginTransformResults {
-  code: string;
+export interface PluginTransformResults extends TransformSourceDescription {
   id?: string;
 }
 
