@@ -10,11 +10,15 @@ import {
 export interface Plugin extends RollupPlugin {
   /**
    * Defines a custom loader. Returning `null` defers to other `load` functions (and eventually the default behavior of loading from the file system).
+   *
+   * @see https://rollupjs.org/guide/en#hooks
    */
   load?(this: RollupPluginContext, id: string, pluginContext?: PluginCtx): LoadHookReturnType;
 
   /**
    * Defines a custom resolver. A resolver can be useful for e.g. locating third-party dependencies. Returning `null` defers to other `resolveId` functions and eventually the default resolution behavior; returning `false` signals that source should be treated as an external module and not included in the bundle. If this happens for a relative import, the id will be renormalized the same way as when the `external` option is used.
+   *
+   * @see https://rollupjs.org/guide/en#hooks
    */
   resolveId?(
     this: RollupPluginContext,
@@ -25,6 +29,8 @@ export interface Plugin extends RollupPlugin {
 
   /**
    * Can be used to transform individual modules.
+   *
+   * @see https://rollupjs.org/guide/en#hooks
    */
   transform?(
     this: RollupPluginContext,
