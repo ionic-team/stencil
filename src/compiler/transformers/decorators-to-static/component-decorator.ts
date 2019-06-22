@@ -92,7 +92,7 @@ function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], typeCh
   if (otherDecorator) {
     const err = buildError(diagnostics);
     err.messageText = `Classes decorated with @Component can not be decorated with more decorators.
-    Stencil performs extensive static analysis on top of your components in order to generate the necesary metadata, runtime decorators at the components level make this task very hard.`;
+    Stencil performs extensive static analysis on top of your components in order to generate the necessary metadata, runtime decorators at the components level make this task very hard.`;
     augmentDiagnosticWithNode(config, err, otherDecorator);
     return false;
   }
