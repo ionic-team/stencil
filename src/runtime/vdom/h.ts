@@ -64,6 +64,12 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
     }
   }
 
+  if (BUILD.isDev && vNodeChildren.some(isHost)) {
+    throw new Error(`The <Host> must be the single root component. Make sure:
+- You are NOT using hostData() and <Host> in the same component.
+- <Host> is used once, and it's the single root component of the render() function.`);
+  }
+
   if (BUILD.vdomFunctional && typeof nodeName === 'function') {
     // nodeName is a functional component
     return (nodeName as d.FunctionalComponent<any>)(vnodeData, vNodeChildren, vdomFnUtils) as any;
@@ -86,6 +92,10 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
 };
 
 export const Host = {};
+
+export const isHost = (node: any): node is d.VNode => {
+  return node && node.$tag$ === Host;
+};
 
 const vdomFnUtils: d.FunctionalUtilities = {
   'forEach': (children, cb) => children.map(convertToPublic).forEach(cb),
