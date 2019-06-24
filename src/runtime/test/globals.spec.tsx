@@ -49,10 +49,10 @@ describe('globals', () => {
       html: `<cmp-el></cmp-el>`
     });
 
-    expect(page.rootInstance.proto).toBe(Element.prototype);
-    expect(page.rootInstance.proto).toBe((page.win as any).Element.prototype);
-    expect(page.rootInstance.proto).toBe((window as any).Element.prototype);
-    expect(page.rootInstance.proto).toBe((global as any).Element.prototype);
+    expect(page.rootInstance.proto).toEqual(Element.prototype);
+    expect(page.rootInstance.proto).toEqual((page.win as any).Element.prototype);
+    expect(page.rootInstance.proto).toEqual((window as any).Element.prototype);
+    expect(page.rootInstance.proto).toEqual((global as any).Element.prototype);
     expect(page.rootInstance.proto).toBeTruthy();
   });
 });

@@ -9,11 +9,10 @@ export function buildJestArgv(config: d.Config) {
     ...config.flags.knownArgs.slice()
   ];
 
-  if (config.flags.e2e && config.flags.ci && !args.some(a => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
-    args.push('--maxWorkers=4');
-  }
-  if (config.flags.devtools) {
-    args.push('--maxWorkers=1');
+  if (config.flags.e2e && (config.flags.ci || config.flags.devtools)) {
+    if (!args.some(a => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
+      args.push('--max-workers=1');
+    }
     args.push('--runInBand');
   }
 
@@ -21,7 +20,6 @@ export function buildJestArgv(config: d.Config) {
 
   const { options } = require('jest-cli/build/cli/args');
   const jestArgv = yargs(args).options(options).argv as d.JestArgv;
-
   jestArgv.config = buildJestConfig(config);
 
   return jestArgv;

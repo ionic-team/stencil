@@ -84,24 +84,20 @@ export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: d.E2E
   const emulateConfig = JSON.parse(env.__STENCIL_EMULATE__) as d.EmulateConfig;
   const screenshotBuildData = JSON.parse(env.__STENCIL_SCREENSHOT_BUILD__) as d.ScreenshotBuildData;
 
-  await (page as any).waitForNavigation({
-    timeout: screenshotBuildData.timeoutBeforeScreenshot,
-    waitUntil: 'networkidle0'
-  });
-
+  await wait(screenshotBuildData.timeoutBeforeScreenshot);
   await page.evaluate(() => {
     return new Promise(resolve => {
-      window.requestAnimationFrame(() => {
-        resolve();
-      });
+      (window as any).requestIdleCallback(() => {
+        window.requestAnimationFrame(() => {
+          resolve();
+        });
+      }, { timeout: 100 });
     });
   });
 
   const screenshotOpts = createPuppeteerScreenshopOptions(opts);
   const screenshotBuf = await page.screenshot(screenshotOpts);
-
   const pixelmatchThreshold = (typeof opts.pixelmatchThreshold === 'number' ? opts.pixelmatchThreshold : screenshotBuildData.pixelmatchThreshold);
-
   const results = await compareScreenshot(emulateConfig, screenshotBuildData, screenshotBuf, desc, testPath, pixelmatchThreshold);
 
   return results;
@@ -126,4 +122,8 @@ function createPuppeteerScreenshopOptions(opts: d.ScreenshotOptions) {
   }
 
   return puppeteerOpts;
+}
+
+function wait(ms: number) {
+  return new Promise<void>(resolve => setTimeout(resolve, ms));
 }

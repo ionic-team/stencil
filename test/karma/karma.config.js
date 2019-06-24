@@ -30,7 +30,7 @@ var browserStackLaunchers = {
     base: 'BrowserStack',
     browser: 'safari',
     os: 'OS X',
-    os_version: 'High Sierra'
+    os_version: 'Mojave'
   }
 };
 
