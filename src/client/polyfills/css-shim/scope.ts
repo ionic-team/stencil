@@ -12,7 +12,7 @@ export function parseCSS(original: string): CSSScope {
     original,
     template,
     selectors,
-    isDynamic: template.length > 1
+    usesCssVars: template.length > 1
   };
 }
 
@@ -26,24 +26,24 @@ export function updateGlobalScopes(scopes: CSSScope[]) {
   const selectors = getSelectorsForScopes(scopes);
   const props = resolveValues(selectors);
   scopes.forEach(scope => {
-    if (scope.isDynamic) {
+    if (scope.usesCssVars) {
       scope.styleEl.innerHTML = executeTemplate(scope.template, props);
     }
   });
 }
 
-export function reScope(scope: CSSScope, cssScopeId: string): CSSScope {
+export function reScope(scope: CSSScope, scopeId: string): CSSScope {
 
   const template = scope.template.map(segment => {
     return (typeof segment === 'string')
-      ? replaceScope(segment, scope.cssScopeId, cssScopeId)
+      ? replaceScope(segment, scope.scopeId, scopeId)
       : segment;
   });
 
   const selectors = scope.selectors.map(sel => {
     return {
       ...sel,
-      selector: replaceScope(sel.selector, scope.cssScopeId, cssScopeId)
+      selector: replaceScope(sel.selector, scope.scopeId, scopeId)
     };
   });
 
@@ -51,7 +51,7 @@ export function reScope(scope: CSSScope, cssScopeId: string): CSSScope {
     ...scope,
     template,
     selectors,
-    cssScopeId,
+    scopeId,
   };
 }
 

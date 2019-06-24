@@ -20,6 +20,7 @@ export const config = {
   ],
   copy: [
     { src: '**/*.html' },
+    { src: '**/*.css' },
     { src: 'noscript.js' }
   ],
   excludeSrc: [],
