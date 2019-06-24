@@ -13,8 +13,14 @@ export async function startPuppeteerBrowser(config: d.Config) {
   const puppeteerModulePath = config.sys.lazyRequire.getModulePath('puppeteer');
   const puppeteer = require(puppeteerModulePath);
   env.__STENCIL_PUPPETEER_MODULE__ = puppeteerModulePath;
-  config.logger.debug(`puppeteer: ${puppeteerModulePath}`);
 
+  if (config.flags.devtools) {
+    config.testing.browserDevtools = true;
+    config.testing.browserHeadless = false;
+    env.__STENCIL_E2E_DEVTOOLS__ = 'true';
+  }
+
+  config.logger.debug(`puppeteer: ${puppeteerModulePath}`);
   config.logger.debug(`puppeteer headless: ${config.testing.browserHeadless}`);
 
   if (Array.isArray(config.testing.browserArgs)) {

@@ -16,6 +16,9 @@ export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
     } else {
       env.__STENCIL_DEFAULT_TIMEOUT__ = '15000';
     }
+    if (config.flags.devtools) {
+      env.__STENCIL_DEFAULT_TIMEOUT__ = '300000000';
+    }
 
     // build up our args from our already know list of args in the config
     const jestArgv = buildJestArgv(config);

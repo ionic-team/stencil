@@ -42,6 +42,19 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
       return find(page, docHandle, selector) as any;
     };
 
+    page.debugger = () => {
+      if ((process.env as d.E2EProcessEnv).__STENCIL_E2E_DEVTOOLS__ !== 'true') {
+        throw new Error('Set the --devtools flag in order to use E2EPage.debugger()');
+      }
+      return page.evaluate(() => {
+        return new Promise((resolve) => {
+          // tslint:disable-next-line: no-debugger
+          debugger;
+          resolve();
+        });
+      }) as any;
+    };
+
     page.findAll = async (selector: pd.FindSelector) => {
       if (!docPromise) {
         docPromise = page.evaluateHandle('document');
@@ -130,14 +143,12 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer
     return `Testing unable to load ${url}, HTTP status: ${rsp.status()}`;
   }
 
-  const tmr = setTimeout(async () => {
-    await closePage(page);
-    throw new Error(`App did not load in allowed time. Please ensure the url ${url} loads a stencil application.`);
-  }, 4500);
+  try {
+    await page.waitForFunction('window.stencilAppLoaded', {timeout: 4500});
 
-  await page.waitForFunction('window.stencilAppLoaded');
-
-  clearTimeout(tmr);
+  } catch (e) {
+    throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
+  }
 
   return null;
 }
@@ -193,14 +204,13 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: pu
     return `Testing unable to load content`;
   }
 
-  const tmr = setTimeout(async () => {
-    await closePage(page);
+  try {
+    await page.waitForFunction('window.stencilAppLoaded', {timeout: 4500});
+
+  } catch (e) {
     throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
-  }, 4500);
+  }
 
-  await page.waitForFunction('window.stencilAppLoaded');
-
-  clearTimeout(tmr);
 
   return null;
 }
