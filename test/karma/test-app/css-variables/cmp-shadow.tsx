@@ -20,7 +20,7 @@ export class CssVariablesRoot {
         <div class="inner-div">
           Shadow: { this.isGreen ? 'Green' : 'Red' } background
         </div>
-        <div class="black-global">
+        <div class="black-global-shadow">
           Shadow: Black background (global)
         </div>
         <button onClick={() => {

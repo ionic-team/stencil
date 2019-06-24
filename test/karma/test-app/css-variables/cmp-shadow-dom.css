@@ -13,7 +13,7 @@
   color: var(--color);
 }
 
-.black-global {
+.black-global-shadow {
   background: var(--global-background);
   color: var(--global-color);
   font-weight: var(--font-weight);
