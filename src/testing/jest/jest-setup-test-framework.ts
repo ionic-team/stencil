@@ -25,7 +25,10 @@ export function jestSetupTestFramework() {
     bc.resetBuildConditionals(bc.BUILD);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    if (global.__CLOSE_OPEN_PAGES__) {
+      await global.__CLOSE_OPEN_PAGES__();
+    }
     const platform = require('@stencil/core/platform');
     platform.stopAutoApplyChanges();
 
