@@ -47,15 +47,12 @@ export async function startPuppeteerBrowser(config: d.Config) {
     launchOpts.executablePath = config.testing.browserExecutablePath;
   }
 
-  let browser;
-  if (config.testing.browserWSEndpoint) {
-    const connectOpts: puppeteer.ConnectOptions = launchOpts;
-    connectOpts.browserWSEndpoint = config.testing.browserWSEndpoint;
-    browser = await puppeteer.connect(connectOpts);
-
-  } else {
-    browser = await puppeteer.launch(launchOpts);
-  }
+  const browser = (config.testing.browserWSEndpoint)
+    ? await puppeteer.connect({
+        ...launchOpts,
+        browserWSEndpoint: config.testing.browserWSEndpoint
+      })
+    : await puppeteer.launch(launchOpts);
 
   env.__STENCIL_BROWSER_WS_ENDPOINT__ = browser.wsEndpoint();
 
@@ -89,10 +86,7 @@ export async function connectBrowser() {
 
 
 export async function disconnectBrowser(browser: puppeteer.Browser, pages: puppeteer.Page[]) {
-  if (Array.isArray(pages)) {
-    await Promise.all(pages.map(closePage));
-    pages.length = 0;
-  }
+  await closePages(pages);
   if (browser) {
     try {
       browser.disconnect();
@@ -100,9 +94,16 @@ export async function disconnectBrowser(browser: puppeteer.Browser, pages: puppe
   }
 }
 
+export async function closePages(pages: puppeteer.Page[]) {
+  if (Array.isArray(pages)) {
+    await Promise.all(pages.map(closePage));
+    pages.length = 0;
+  }
+}
 
-export function newBrowserPage(browser: puppeteer.Browser) {
-  return browser.newPage();
+
+export function newBrowserPage(browserContext: puppeteer.BrowserContext) {
+  return browserContext.newPage();
 }
 
 

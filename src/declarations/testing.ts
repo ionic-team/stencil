@@ -159,6 +159,7 @@ export interface EventInitDict {
 
 export interface JestEnvironmentGlobal {
   __NEW_TEST_PAGE__: () => Promise<any>;
+  __CLOSE_OPEN_PAGES__: () => Promise<any>;
   Context: any;
   loadTestWindow: (testWindow: any) => Promise<void>;
   h: any;
