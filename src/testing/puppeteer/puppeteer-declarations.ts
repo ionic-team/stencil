@@ -55,6 +55,11 @@ export interface E2EPage extends PuppeteerPage {
   compareScreenshot(description: string, opts: d.ScreenshotOptions): Promise<d.ScreenshotDiff>;
 
   /**
+   * Sets a debugger;
+   */
+  debugger(): Promise<void>;
+
+  /**
    * Find an element that matches the selector, which is the same as
    * `document.querySelector(selector)`. Use `>>>` within the
    * selector to find an element within the host element's shadow root.

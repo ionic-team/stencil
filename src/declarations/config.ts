@@ -294,6 +294,7 @@ export interface ConfigFlags {
   updateScreenshot?: boolean;
   version?: boolean;
   watch?: boolean;
+  devtools?: boolean;
 }
 
 

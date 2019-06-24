@@ -190,6 +190,7 @@ export interface E2EProcessEnv {
   __STENCIL_SCREENSHOT_BUILD__?: string;
 
   __STENCIL_E2E_TESTS__?: 'true';
+  __STENCIL_E2E_DEVTOOLS__?: 'true';
   __STENCIL_SPEC_TESTS__?: 'true';
 
   __STENCIL_PUPPETEER_MODULE__?: string;

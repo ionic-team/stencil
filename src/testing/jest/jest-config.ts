@@ -12,6 +12,10 @@ export function buildJestArgv(config: d.Config) {
   if (config.flags.e2e && config.flags.ci && !args.some(a => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
     args.push('--maxWorkers=4');
   }
+  if (config.flags.devtools) {
+    args.push('--maxWorkers=1');
+    args.push('--runInBand');
+  }
 
   config.logger.debug(`jest args: ${args.join(' ')}`);
 
