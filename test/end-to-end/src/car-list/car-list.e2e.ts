@@ -24,7 +24,7 @@ describe('car-list', () => {
     expect(elm.shadowRoot).toEqualHtml(``);
   });
 
-  fit('should set car list data', async () => {
+  it('should set car list data', async () => {
     const cars: CarData[] = [
       new CarData('Cord', 'Model 812', 1934),
       new CarData('Duesenberg', 'SSJ', 1935),
