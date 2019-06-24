@@ -188,6 +188,8 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: pu
         contentType: 'text/html',
         body: body
       });
+      (page as any).removeAllListeners('request');
+      page.setRequestInterception(false);
 
     } else {
       interceptedRequest.continue();
