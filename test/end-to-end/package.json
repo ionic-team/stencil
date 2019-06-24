@@ -9,16 +9,16 @@
     "build": "node ../../bin/stencil build",
     "start": "node ../../bin/stencil build --debug --watch --dev --serve",
     "test": "node ../../bin/stencil test --e2e --spec --screenshot",
-    "test.e2e": "node ../../bin/stencil test --e2e --debug",
+    "test.e2e": "node ../../bin/stencil test --e2e",
     "test.screenshot": "node ../../bin/stencil test --e2e --debug --screenshot",
     "test.spec": "node ../../bin/stencil test --spec --debug",
     "jest": "jest --coverage"
   },
   "devDependencies": {
-    "@types/jest": "23.3.14",
-    "@types/puppeteer": "1.12.3",
-    "jest": "23.6.0",
-    "jest-cli": "23.6.0",
+    "@types/jest": "24.0.15",
+    "@types/puppeteer": "1.12.4",
+    "jest": "24.8.0",
+    "jest-cli": "24.8.0",
     "puppeteer": "1.14.0",
     "workbox-build": "4.3.1"
   },

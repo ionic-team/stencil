@@ -3,8 +3,7 @@ import { CarData } from '../car-list/car-data';
 
 
 @Component({
-  tag: 'car-detail',
-  styleUrl: 'car-detail.css'
+  tag: 'car-detail'
 })
 export class CarDetail {
   @Prop() car: CarData;
