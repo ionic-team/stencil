@@ -22,13 +22,13 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
 
   testing.browserArgs = testing.browserArgs || [];
   addOption(testing.browserArgs, '--disable-gpu');
-  addOption(testing.browserArgs, '--disable-canvas-aa');
-  addOption(testing.browserArgs, '--disable-composited-antialiasing');
-  addOption(testing.browserArgs, '--disable-composited-antialiasing');
+  addOption(testing.browserArgs, '--font-render-hinting=medium');
+  addOption(testing.browserArgs, '--enable-font-antialiasing');
 
   if (config.flags.ci) {
     addOption(testing.browserArgs, '--no-sandbox');
     addOption(testing.browserArgs, '--disable-setuid-sandbox');
+    addOption(testing.browserArgs, '--disable-dev-shm-usage');
     testing.browserHeadless = true;
   }
 
