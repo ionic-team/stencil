@@ -18,6 +18,7 @@ export class Testing implements d.Testing {
     const { Compiler } = require('../compiler/index.js');
 
     this.compiler = new Compiler(setupTestingConfig(config));
+    config.maxConcurrentWorkers = Math.min(config.maxConcurrentWorkers, 6);
     this.config = this.compiler.config;
 
     this.isValid = this.compiler.isValid;
@@ -147,7 +148,6 @@ export class Testing implements d.Testing {
 function setupTestingConfig(config: d.Config) {
   config.buildEs5 = false;
   config.devMode = true;
-  config.maxConcurrentWorkers = Math.min(config.maxConcurrentWorkers, 6);
   config.validateTypes = false;
   config._isTesting = true;
 

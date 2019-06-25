@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
-import { buildError } from '@utils';
+import { buildError, buildWarn } from '@utils';
 
 
 export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
@@ -58,10 +58,6 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
     );
   }
 
-  if (!Array.isArray(testing.moduleFileExtensions)) {
-    testing.moduleFileExtensions = DEFAULT_MODULE_FILE_EXTENSIONS;
-  }
-
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
     testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map(ignorePattern => {
       return path.join(testing.rootDir, ignorePattern);
@@ -84,28 +80,26 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
     );
   }
 
-  if (typeof testing.setupTestFrameworkScriptFile !== 'string') {
-    testing.setupTestFrameworkScriptFile = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest-setuptestframework.js'
-    );
+  if (!Array.isArray(testing.setupFilesAfterEnv)) {
+    testing.setupFilesAfterEnv = [];
 
-  } else if (!path.isAbsolute(testing.setupTestFrameworkScriptFile)) {
-    testing.setupTestFrameworkScriptFile = path.join(
-      config.configPath,
-      testing.setupTestFrameworkScriptFile
-    );
   }
 
-  if (typeof testing.testEnvironment !== 'string') {
-    testing.testEnvironment = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest-environment.js'
-    );
+  testing.setupFilesAfterEnv.unshift(
+    path.join(config.sys.compiler.packageDir, 'testing', 'jest-setuptestframework.js')
+  );
+  if (testing.setupTestFrameworkScriptFile) {
+    const err = buildWarn(diagnostics);
+    err.messageText = `setupTestFrameworkScriptFile has been deprecated.`;
+  }
 
-  } else if (!path.isAbsolute(testing.testEnvironment)) {
-    testing.testEnvironment = path.join(
-      config.configPath,
-      testing.testEnvironment
-    );
+  if (typeof testing.testEnvironment === 'string') {
+    if (!path.isAbsolute(testing.testEnvironment)) {
+      testing.testEnvironment = path.join(
+        config.configPath,
+        testing.testEnvironment
+      );
+    }
   }
 
   if (typeof testing.allowableMismatchedPixels === 'number') {
@@ -141,8 +135,6 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
   } else if (typeof testing.testRegex === 'string') {
     delete testing.testMatch;
 
-  } else {
-    testing.testRegex = '(/__tests__/.*|\\.?(test|spec|e2e))\\.(tsx?|ts?|jsx?|js?)$';
   }
 
   if (typeof testing.runner !== 'string') {
@@ -175,37 +167,8 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
       }
     ];
   }
-
-  testing.transform = testing.transform || {};
-
-  if (typeof testing.transform[DEFAULT_TS_TRANSFORM] !== 'string') {
-    testing.transform[DEFAULT_TS_TRANSFORM] = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest-preprocessor.js'
-    );
-
-  } else if (!path.isAbsolute(testing.transform[DEFAULT_TS_TRANSFORM])) {
-    testing.transform[DEFAULT_TS_TRANSFORM] = path.join(
-      config.configPath,
-      testing.transform[DEFAULT_TS_TRANSFORM]
-    );
-  }
-
 }
 
-const DEFAULT_TS_TRANSFORM = '^.+\\.(ts|tsx)$';
-
-const DEFAULT_MODULE_FILE_EXTENSIONS = [
-  'ts',
-  'tsx',
-  'js',
-  'json'
-];
-
-const DEFAULT_IGNORE_PATTERNS = [
-  '.vscode',
-  '.stencil',
-  'node_modules',
-];
 
 function addOption(setArray: string[], option: string) {
   if (!setArray.includes(option)) {
@@ -216,3 +179,8 @@ function addOption(setArray: string[], option: string) {
 
 const DEFAULT_ALLOWABLE_MISMATCHED_PIXELS = 100;
 const DEFAULT_PIXEL_MATCH_THRESHOLD = 0.1;
+const DEFAULT_IGNORE_PATTERNS = [
+  '.vscode',
+  '.stencil',
+  'node_modules',
+];

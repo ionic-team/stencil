@@ -88,20 +88,16 @@ export function createTestRunner(): any {
 export function includeTestFile(testPath: string, env: d.E2EProcessEnv) {
   testPath = testPath.toLowerCase().replace(/\\/g, '/');
 
-  if (!(testPath.endsWith('.ts') || testPath.endsWith('.tsx'))) {
-    return false;
-  }
-
-  if ((testPath.includes('.e2e.') || testPath.includes('/e2e.')) && env.__STENCIL_E2E_TESTS__ === 'true') {
+  const hasE2E = testPath.includes('.e2e.') || testPath.includes('/e2e.');
+  if (env.__STENCIL_E2E_TESTS__ === 'true' && hasE2E) {
     // keep this test if it's an e2e file and we should be testing e2e
     return true;
   }
 
-  if ((testPath.includes('.spec.') || testPath.includes('/spec.')) && env.__STENCIL_SPEC_TESTS__ === 'true') {
+  if (env.__STENCIL_SPEC_TESTS__ === 'true' && !hasE2E) {
     // keep this test if it's a spec file and we should be testing unit tests
     return true;
   }
-
   return false;
 }
 

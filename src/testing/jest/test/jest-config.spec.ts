@@ -83,7 +83,7 @@ describe('jest-config', () => {
 
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.ci).toBe(true);
-    expect(jestArgv.maxWorkers).toBeUndefined();
+    expect(jestArgv.maxWorkers).toBe(config.maxConcurrentWorkers);
   });
 
   it('pass test spec arg to jest', () => {
