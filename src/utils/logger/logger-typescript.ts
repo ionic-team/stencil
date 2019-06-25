@@ -5,58 +5,62 @@ import { normalizePath } from '../normalize-path';
 
 
 export function augmentDiagnosticWithNode(config: d.Config, d: d.Diagnostic, node: ts.Node) {
+  if (!node) {
+    return d;
+  }
 
   const sourceFile = node.getSourceFile();
+  if (!sourceFile) {
+    return d;
+  }
 
-  if (sourceFile) {
-    d.absFilePath = normalizePath(sourceFile.fileName);
-    d.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
+  d.absFilePath = normalizePath(sourceFile.fileName);
+  d.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
 
-    const sourceText = sourceFile.text;
-    const srcLines = splitLineBreaks(sourceText);
+  const sourceText = sourceFile.text;
+  const srcLines = splitLineBreaks(sourceText);
 
-    const start = node.getStart();
-    const end = node.getEnd();
-    const posStart = sourceFile.getLineAndCharacterOfPosition(start);
+  const start = node.getStart();
+  const end = node.getEnd();
+  const posStart = sourceFile.getLineAndCharacterOfPosition(start);
 
-    const errorLine: d.PrintLine = {
-      lineIndex: posStart.line,
-      lineNumber: posStart.line + 1,
-      text: srcLines[posStart.line],
-      errorCharStart: posStart.character,
-      errorLength: Math.max(end - start, 1)
+  const errorLine: d.PrintLine = {
+    lineIndex: posStart.line,
+    lineNumber: posStart.line + 1,
+    text: srcLines[posStart.line],
+    errorCharStart: posStart.character,
+    errorLength: Math.max(end - start, 1)
+  };
+  d.lineNumber = errorLine.lineNumber;
+  d.columnNumber = errorLine.errorCharStart + 1;
+  d.lines.push(errorLine);
+  if (errorLine.errorLength === 0 && errorLine.errorCharStart > 0) {
+    errorLine.errorLength = 1;
+    errorLine.errorCharStart--;
+  }
+
+  if (errorLine.lineIndex > 0) {
+    const previousLine: d.PrintLine = {
+      lineIndex: errorLine.lineIndex - 1,
+      lineNumber: errorLine.lineNumber - 1,
+      text: srcLines[errorLine.lineIndex - 1],
+      errorCharStart: -1,
+      errorLength: -1
     };
-    d.lineNumber = errorLine.lineNumber;
-    d.columnNumber = errorLine.errorCharStart + 1;
-    d.lines.push(errorLine);
-    if (errorLine.errorLength === 0 && errorLine.errorCharStart > 0) {
-      errorLine.errorLength = 1;
-      errorLine.errorCharStart--;
-    }
 
-    if (errorLine.lineIndex > 0) {
-      const previousLine: d.PrintLine = {
-        lineIndex: errorLine.lineIndex - 1,
-        lineNumber: errorLine.lineNumber - 1,
-        text: srcLines[errorLine.lineIndex - 1],
-        errorCharStart: -1,
-        errorLength: -1
-      };
+    d.lines.unshift(previousLine);
+  }
 
-      d.lines.unshift(previousLine);
-    }
+  if (errorLine.lineIndex + 1 < srcLines.length) {
+    const nextLine: d.PrintLine = {
+      lineIndex: errorLine.lineIndex + 1,
+      lineNumber: errorLine.lineNumber + 1,
+      text: srcLines[errorLine.lineIndex + 1],
+      errorCharStart: -1,
+      errorLength: -1
+    };
 
-    if (errorLine.lineIndex + 1 < srcLines.length) {
-      const nextLine: d.PrintLine = {
-        lineIndex: errorLine.lineIndex + 1,
-        lineNumber: errorLine.lineNumber + 1,
-        text: srcLines[errorLine.lineIndex + 1],
-        errorCharStart: -1,
-        errorLength: -1
-      };
-
-      d.lines.push(nextLine);
-    }
+    d.lines.push(nextLine);
   }
 
   return d;

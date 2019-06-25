@@ -2,7 +2,7 @@ import { createConsole } from './console';
 import { MockCustomElementRegistry, resetCustomElementRegistry } from './custom-element-registry';
 import { MockCustomEvent, MockEvent, MockKeyboardEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { MockDocument, resetDocument } from './document';
-import { MockElement, MockNodeList} from './node';
+import { MockElement, MockHTMLElement, MockNodeList} from './node';
 import { MockHistory } from './history';
 import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
@@ -219,7 +219,7 @@ export class MockWindow {
     let HtmlElementCstr = htmlElementCstrMap.get(this);
     if (HtmlElementCstr == null) {
       const ownerDocument = this.document;
-      HtmlElementCstr = class extends MockElement {
+      HtmlElementCstr = class extends MockHTMLElement {
         constructor() {
           super(ownerDocument, '');
 

@@ -82,7 +82,7 @@ describe('hydrate, shadow child', () => {
         <!--r.1-->
         <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--o.1.1-->
+          <!--o.1.1.-->
           <!--s.2.0.0.0.-->
           <!--t.1.1.1.0-->
           light-dom
@@ -263,7 +263,7 @@ describe('hydrate, shadow child', () => {
         <!--r.1-->
         <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--o.1.1-->
+          <!--o.1.1.-->
           <header c-id="2.0.0.0"></header>
           <!--s.2.1.0.1.-->
           <!--t.1.1.1.0-->
@@ -393,7 +393,7 @@ describe('hydrate, shadow child', () => {
         <!--r.1-->
         <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--o.1.1-->
+          <!--o.1.1.-->
           <header c-id="2.0.0.0"></header>
           <!--s.2.1.0.1.-->
           <!--t.1.1.1.0-->
@@ -477,8 +477,8 @@ describe('hydrate, shadow child', () => {
         <!--r.1-->
         <cmp-b class="hydrated" s-id="2">
           <!--r.2-->
-          <!--o.0.1-->
-          <!--o.0.2-->
+          <!--o.0.1.-->
+          <!--o.0.2.-->
           <section c-id="2.0.0.0">
             <!--s.2.1.1.0.-->
             <!--t.0.1-->

@@ -10,7 +10,7 @@ export async function updateToLazyComponent(config: d.Config, compilerCtx: d.Com
   const inputFileName = config.sys.path.basename(inputFilePath);
   const inputText = await compilerCtx.fs.readFile(inputFilePath);
 
-  const cacheKey = compilerCtx.cache.createKey('lazy', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, inputText);
+  const cacheKey = await compilerCtx.cache.createKey('lazy', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, inputText);
   const outputFileName = `${cacheKey}-${inputFileName}`;
   const outputFilePath = config.sys.path.join(inputFileDir, outputFileName);
 

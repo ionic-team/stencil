@@ -243,7 +243,6 @@ export interface BundleAppOptions {
   inputs: BundleEntryInputs;
   loader: {[id: string]: string};
   cache?: any;
-  emitCoreChunk?: boolean;
   externalRuntime?: string;
   skipDeps?: boolean;
   isServer?: boolean;

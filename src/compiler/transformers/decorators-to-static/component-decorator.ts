@@ -5,7 +5,7 @@ import { DEFAULT_STYLE_MODE, augmentDiagnosticWithNode, buildError, validateComp
 import { CLASS_DECORATORS_TO_REMOVE } from '../remove-stencil-import';
 
 
-export function componentDecoratorToStatic(config: d.Config, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) {
+export function componentDecoratorToStatic(config: d.Config, typeChecker: ts.TypeChecker, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) {
   removeDecorators(cmpNode, CLASS_DECORATORS_TO_REMOVE);
 
   const [ componentOptions ] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
@@ -13,7 +13,7 @@ export function componentDecoratorToStatic(config: d.Config, diagnostics: d.Diag
     return;
   }
 
-  if (!validateComponent(config, diagnostics, componentOptions, cmpNode, componentDecorator)) {
+  if (!validateComponent(config, diagnostics, typeChecker, componentOptions, cmpNode, componentDecorator)) {
     return;
   }
 
@@ -67,9 +67,10 @@ export function componentDecoratorToStatic(config: d.Config, diagnostics: d.Diag
       newMembers.push(createStaticGetter('styles', convertValueToLiteral(styles)));
     }
   }
+
 }
 
-function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], componentOptions: d.ComponentOptions, cmpNode: ts.ClassDeclaration, componentDecorator: ts.Node) {
+function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, componentOptions: d.ComponentOptions, cmpNode: ts.ClassDeclaration, componentDecorator: ts.Node) {
   const extendNode = cmpNode.heritageClauses && cmpNode.heritageClauses.find(c => c.token === ts.SyntaxKind.ExtendsKeyword);
   if (extendNode) {
     const err = buildError(diagnostics);
@@ -91,7 +92,7 @@ function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], compon
   if (otherDecorator) {
     const err = buildError(diagnostics);
     err.messageText = `Classes decorated with @Component can not be decorated with more decorators.
-    Stencil performs extensive static analysis on top of your components in order to generate the necesary metadata, runtime decorators at the components level make this task very hard.`;
+    Stencil performs extensive static analysis on top of your components in order to generate the necessary metadata, runtime decorators at the components level make this task very hard.`;
     augmentDiagnosticWithNode(config, err, otherDecorator);
     return false;
   }
@@ -110,6 +111,27 @@ function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], compon
     err.messageText = `${tagError}. Please refer to https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name for more info.`;
     augmentDiagnosticWithNode(config, err, findTagNode('tag', componentDecorator));
     return false;
+  }
+
+  if (!config._isTesting) {
+    const nonTypeExports = typeChecker.getExportsOfModule(typeChecker.getSymbolAtLocation(cmpNode.getSourceFile()))
+      .filter(symbol => (symbol.flags & (ts.SymbolFlags.Interface | ts.SymbolFlags.TypeAlias)) === 0)
+      .filter(symbol => symbol.name !== cmpNode.name.text);
+
+    nonTypeExports.forEach(symbol => {
+      const err = buildError(diagnostics);
+      err.messageText = `To allow efficient bundling, modules using @Component() can only have a single export which is the component class itself.
+      Any other exports should be moved to a separate file.
+      For further information check out: https://stenciljs.com/docs/module-bundling`;
+      const errorNode = symbol.valueDeclaration
+        ? symbol.valueDeclaration.modifiers[0]
+        : symbol.declarations[0];
+
+      augmentDiagnosticWithNode(config, err, errorNode);
+    });
+    if (nonTypeExports.length > 0) {
+      return false;
+    }
   }
   return true;
 }
@@ -138,9 +160,11 @@ function normalizeExtension(config: d.Config, styleUrls: d.CompilerModeStyles): 
   return compilerStyleUrls;
 }
 
-function useCss(config: d.Config, path: string) {
-  const p = config.sys.path.parse(path);
-  return config.sys.path.join(p.dir, p.name + '.css');
+function useCss(config: d.Config, stylePath: string) {
+  const sourceFileDir = config.sys.path.dirname(stylePath);
+  const sourceFileExt = config.sys.path.extname(stylePath);
+  const sourceFileName = config.sys.path.basename(stylePath, sourceFileExt);
+  return config.sys.path.join(sourceFileDir, sourceFileName + '.css');
 }
 
 function normalizeStyleUrls(styleUrls: d.ModeStyles): d.CompilerModeStyles {

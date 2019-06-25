@@ -87,11 +87,12 @@ export class Cache implements d.Cache {
     return (typeof val === 'string');
   }
 
-  createKey(domain: string, ...args: any[]) {
+  async createKey(domain: string, ...args: any[]) {
     if (!this.config.enableCache) {
       return domain + (Math.random() * 9999999);
     }
-    return domain + '_' + this.sys.generateContentHash(JSON.stringify(args), 32);
+    const hash = await this.sys.generateContentHash(JSON.stringify(args), 32);
+    return domain + '_' + hash;
   }
 
   async commit() {
@@ -110,7 +111,7 @@ export class Cache implements d.Cache {
   }
 
   async clearExpiredCache() {
-    if (this.cacheFs == null) {
+    if (this.cacheFs == null || this.sys.storage == null) {
       return;
     }
 

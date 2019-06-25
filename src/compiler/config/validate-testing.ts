@@ -138,7 +138,7 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
     delete testing.testMatch;
 
   } else {
-    testing.testRegex = '(/__tests__/.*|\\.(test|spec|e2e))\\.(tsx?|ts?|jsx?|js?)$';
+    testing.testRegex = '(/__tests__/.*|\\.?(test|spec|e2e))\\.(tsx?|ts?|jsx?|js?)$';
   }
 
   if (typeof testing.runner !== 'string') {

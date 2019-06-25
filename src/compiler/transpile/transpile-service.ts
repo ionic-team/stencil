@@ -89,7 +89,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
   compilerOptions.outDir = undefined;
 
   // create a config key that will be used as part of the file's cache key
-  transpileCtx.configKey = createConfigKey(config, compilerOptions);
+  transpileCtx.configKey = await createConfigKey(config, compilerOptions);
 
   const servicesHost: ts.LanguageServiceHost = {
     getScriptFileNames: () => transpileCtx.compilerCtx.rootTsFiles,
@@ -183,7 +183,8 @@ async function transpileTsFile(config: d.Config, services: ts.LanguageService, c
   const content = await ctx.compilerCtx.fs.readFile(sourceFilePath);
 
   // create a cache key out of the content and compiler options
-  const cacheKey = `transpileService_${config.sys.generateContentHash(content + sourceFilePath + ctx.configKey, 32)}` ;
+  const contentHash = await config.sys.generateContentHash(content + sourceFilePath + ctx.configKey, 32);
+  const cacheKey = `transpileService_${contentHash}` ;
 
   if (oldCacheKey === cacheKey && checkCacheKey && !hasWarning) {
     // file is unchanged, thanks typescript caching!

@@ -42,6 +42,19 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
       return find(page, docHandle, selector) as any;
     };
 
+    page.debugger = () => {
+      if ((process.env as d.E2EProcessEnv).__STENCIL_E2E_DEVTOOLS__ !== 'true') {
+        throw new Error('Set the --devtools flag in order to use E2EPage.debugger()');
+      }
+      return page.evaluate(() => {
+        return new Promise((resolve) => {
+          // tslint:disable-next-line: no-debugger
+          debugger;
+          resolve();
+        });
+      }) as any;
+    };
+
     page.findAll = async (selector: pd.FindSelector) => {
       if (!docPromise) {
         docPromise = page.evaluateHandle('document');
@@ -58,13 +71,13 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
     page.on('requestfailed', requestFailed);
 
     if (typeof opts.html === 'string') {
-      const errMsg = await e2eSetContent(page, opts.html);
+      const errMsg = await e2eSetContent(page, opts.html, { waitUntil: opts.waitUntil });
       if (errMsg) {
         throw errMsg;
       }
 
     } else if (typeof opts.url === 'string') {
-      const errMsg = await e2eGoTo(page, opts.url);
+      const errMsg = await e2eGoTo(page, opts.url, { waitUntil: opts.waitUntil });
       if (errMsg) {
         throw errMsg;
       }
@@ -93,7 +106,7 @@ function failedPage() {
   return page;
 }
 
-async function e2eGoTo(page: pd.E2EPageInternal, url: string) {
+async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer.NavigationOptions) {
   try {
     if (page.isClosed()) {
       return 'e2eGoTo unavailable: page already closed';
@@ -120,27 +133,28 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string) {
 
   const fullUrl = browserUrl + url.substring(1);
 
-  const rsp = await page._e2eGoto(fullUrl, { waitUntil: 'networkidle0' });
+  if (!options.waitUntil) {
+    options.waitUntil = DEFAULT_WAIT_FOR;
+  }
+  const rsp = await page._e2eGoto(fullUrl, options);
 
   if (!rsp.ok()) {
     await closePage(page);
     return `Testing unable to load ${url}, HTTP status: ${rsp.status()}`;
   }
 
-  const tmr = setTimeout(async () => {
-    await closePage(page);
-    throw new Error(`App did not load in allowed time. Please ensure the url ${url} loads a stencil application.`);
-  }, 4500);
+  try {
+    await page.waitForFunction('window.stencilAppLoaded', {timeout: 4500});
 
-  await page.waitForFunction('window.stencilAppLoaded');
-
-  clearTimeout(tmr);
+  } catch (e) {
+    throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
+  }
 
   return null;
 }
 
 
-async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
+async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: puppeteer.NavigationOptions = {}) {
   try {
     if (page.isClosed()) {
       return 'e2eSetContent unavailable: page already closed';
@@ -174,27 +188,31 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
         contentType: 'text/html',
         body: body
       });
+      (page as any).removeAllListeners('request');
+      page.setRequestInterception(false);
 
     } else {
       interceptedRequest.continue();
     }
   });
 
-  const rsp = await page._e2eGoto(url, { waitUntil: 'networkidle0' });
+  if (!options.waitUntil) {
+    options.waitUntil = DEFAULT_WAIT_FOR;
+  }
+  const rsp = await page._e2eGoto(url, options);
 
   if (!rsp.ok()) {
     await closePage(page);
     return `Testing unable to load content`;
   }
 
-  const tmr = setTimeout(async () => {
-    await closePage(page);
+  try {
+    await page.waitForFunction('window.stencilAppLoaded', {timeout: 4500});
+
+  } catch (e) {
     throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
-  }, 4500);
+  }
 
-  await page.waitForFunction('window.stencilAppLoaded');
-
-  clearTimeout(tmr);
 
   return null;
 }
@@ -310,3 +328,5 @@ function pageError(e: any) {
 function requestFailed(req: puppeteer.Request) {
   console.error('requestfailed', req.url());
 }
+
+const DEFAULT_WAIT_FOR = 'load';

@@ -7,6 +7,8 @@ export function componentEntryPlugin(config: d.Config, compilerCtx: d.CompilerCt
   const entrys = new Map<string, d.EntryModule>();
 
   return {
+    name: 'componentEntryPlugin',
+
     resolveId(id: string) {
       if (typeof id === 'string') {
         const entryModule = entryModules.find(entryModule => entryModule.entryKey === id);
@@ -33,8 +35,6 @@ export function componentEntryPlugin(config: d.Config, compilerCtx: d.CompilerCt
           .join('\n');
       }
       return null;
-    },
-
-    name: 'componentEntryPlugin'
+    }
   };
 }

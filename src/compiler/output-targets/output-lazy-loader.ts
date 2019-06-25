@@ -5,10 +5,6 @@ import { normalizePath, relativeImport } from '@utils';
 import { getClientPolyfill } from '../app-core/app-polyfills';
 
 export async function outputLazyLoader(config: d.Config, compilerCtx: d.CompilerCtx) {
-  if (!config.buildDist) {
-    return;
-  }
-
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazyLoader);
   if (outputTargets.length === 0) {
     return;
@@ -21,11 +17,11 @@ export async function outputLazyLoader(config: d.Config, compilerCtx: d.Compiler
 
 async function generateLoader(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistLazyLoader) {
   const loaderPath = outputTarget.dir;
-  const es5Dir = outputTarget.esmEs5Dir;
   const es2017Dir = outputTarget.esmDir;
+  const es5Dir = outputTarget.esmEs5Dir || es2017Dir;
   const cjsDir = outputTarget.cjsDir;
 
-  if (!loaderPath || !es5Dir || !es2017Dir || !cjsDir) {
+  if (!loaderPath || !es2017Dir || !cjsDir) {
     return;
   }
 
@@ -44,17 +40,21 @@ async function generateLoader(config: d.Config, compilerCtx: d.CompilerCtx, outp
   const es5EntryPoint = config.sys.path.join(es5Dir, 'loader.mjs');
   const es2017EntryPoint = config.sys.path.join(es2017Dir, 'loader.mjs');
   const polyfillsEntryPoint = config.sys.path.join(es2017Dir, 'polyfills/index.js');
-
   const cjsEntryPoint = config.sys.path.join(cjsDir, 'loader.cjs.js');
-
-  const polyfillsExport = `export * from '${normalizePath(config.sys.path.relative(loaderPath, polyfillsEntryPoint))}';\n`;
-  const indexPath = config.buildEs5 ? es5EntryPoint : es2017EntryPoint;
-  const indexContent = `${es5HtmlElement}\n${polyfillsExport}export * from '${normalizePath(config.sys.path.relative(loaderPath, indexPath))}';`;
-  const indexES2017Content = `${polyfillsExport}export * from '${normalizePath(config.sys.path.relative(loaderPath, es2017EntryPoint))}';`;
+  const polyfillsExport = `export * from '${normalizePath(config.sys.path.relative(loaderPath, polyfillsEntryPoint))}';`;
+  const indexContent = `
+${es5HtmlElement}
+${polyfillsExport}
+export * from '${normalizePath(config.sys.path.relative(loaderPath, es5EntryPoint))}';
+`;
+  const indexES2017Content = `
+${polyfillsExport}
+export * from '${normalizePath(config.sys.path.relative(loaderPath, es2017EntryPoint))}';
+`;
   const indexCjsContent = `
-  module.exports = require('${normalizePath(config.sys.path.relative(loaderPath, cjsEntryPoint))}');
-  module.exports.applyPolyfills = function() { return Promise.resolve() };
-  `;
+module.exports = require('${normalizePath(config.sys.path.relative(loaderPath, cjsEntryPoint))}');
+module.exports.applyPolyfills = function() { return Promise.resolve() };
+`;
 
   const indexDtsPath = config.sys.path.join(loaderPath, 'index.d.ts');
   await Promise.all([

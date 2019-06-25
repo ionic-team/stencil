@@ -4,7 +4,7 @@ import { validatePrerender } from './validate-prerender';
 import { validateResourcesUrl } from './validate-resources-url';
 import { validateServiceWorker } from './validate-service-worker';
 import { validateCopy } from './validate-copy';
-import { DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww } from '../output-targets/output-utils';
+import { DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 import { URL } from 'url';
 import { buildError } from '@utils';
 
@@ -13,7 +13,7 @@ export function validateOutputTargetWww(config: d.Config, diagnostics: d.Diagnos
   const hasOutputTargets = Array.isArray(config.outputTargets);
   const hasE2eTests = !!(config.flags && config.flags.e2e);
 
-  if (!hasOutputTargets || (hasE2eTests && !config.outputTargets.some(isOutputTargetWww))) {
+  if (!hasOutputTargets || (hasE2eTests && !config.outputTargets.some(isOutputTargetWww)) && !config.outputTargets.some(isOutputTargetDist)) {
     config.outputTargets = [
       { type: WWW }
     ];

@@ -151,5 +151,5 @@ export function sortSelectors(selectors: CSSSelector[]) {
 }
 
 export function matches(el: HTMLElement, selector: string) {
-  return el.matches(selector);
+  return selector === ':root' || selector === 'html' || el.matches(selector);
 }

@@ -10,7 +10,6 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
 
   // for CI, let's wait a little longer than locally before taking the screenshot
   const timeoutBeforeScreenshot = config.flags.ci ? 30 : 10;
-
   const pixelmatchModulePath = config.sys.path.join(config.sys.compiler.packageDir, 'screenshot', 'pixel-match.js');
   config.logger.debug(`pixelmatch module: ${pixelmatchModulePath}`);
 

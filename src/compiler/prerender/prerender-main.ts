@@ -44,7 +44,7 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
     resolve: null
   };
 
-  if (!config.flags.ci) {
+  if (!config.flags.ci && config.logLevel !== 'debug') {
     manager.progressLogger = startProgressLogger();
   }
 
@@ -111,7 +111,8 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
 
 
 async function createPrerenderTemplate(config: d.Config, templateHtml: string) {
-  const templateFileName = `prerender-template-${config.sys.generateContentHash(templateHtml, 12)}.html`;
+  const hash = await config.sys.generateContentHash(templateHtml, 12);
+  const templateFileName = `prerender-template-${hash}.html`;
   const templateId = config.sys.path.join(config.sys.details.tmpDir, templateFileName);
   await config.sys.fs.writeFile(templateId, templateHtml);
   return templateId;
@@ -121,7 +122,8 @@ async function createPrerenderTemplate(config: d.Config, templateHtml: string) {
 async function createComponentGraphPath(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   if (buildCtx.componentGraph) {
     const content = getComponentPathContent(config, buildCtx.componentGraph, outputTarget);
-    const fileName = `prerender-component-graph-${config.sys.generateContentHash(content, 12)}.json`;
+    const hash = await config.sys.generateContentHash(content, 12);
+    const fileName = `prerender-component-graph-${hash}.json`;
     const componentGraphPath = config.sys.path.join(config.sys.details.tmpDir, fileName);
     await config.sys.fs.writeFile(componentGraphPath, content);
     return componentGraphPath;

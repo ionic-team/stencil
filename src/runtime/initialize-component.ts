@@ -78,7 +78,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       if (!BUILD.hydrateServerSide && BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
         style = await import('../utils/shadow-css').then(m => m.scopeCss(style, scopeId, false));
       }
-      registerStyle(scopeId, style);
+      registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation));
       Cstr.isStyleRegistered = true;
     }
   }

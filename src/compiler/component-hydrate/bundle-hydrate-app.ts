@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { bundleJson } from '../rollup-plugins/json';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
@@ -15,6 +14,7 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
   try {
     const treeshake: TreeshakingOptions | boolean = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
       ? {
+        propertyReadSideEffects: false,
         tryCatchDeoptimization: false,
       }
       : false;
@@ -31,19 +31,18 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
         stencilBuildConditionalsPlugin(build, config.fsNamespace),
         globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
-        config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,
           sourceMap: false,
           ...config.commonjs
         }),
         ...config.rollupPlugins,
-        pluginHelper(config, compilerCtx, buildCtx),
+        pluginHelper(config, buildCtx),
         config.sys.rollup.plugins.nodeResolve({
           mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
           ...config.nodeResolve
         }),
-        bundleJson(config),
+        config.sys.rollup.plugins.json(),
         inMemoryFsRead(config, compilerCtx),
         config.sys.rollup.plugins.replace({
           'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'

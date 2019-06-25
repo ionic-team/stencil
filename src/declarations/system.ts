@@ -20,7 +20,7 @@ export interface StencilSystem {
   addDestroy?(fn: Function): void;
   details?: SystemDetails;
   fs?: d.FileSystem;
-  generateContentHash?(content: string, length: number): string;
+  generateContentHash?(content: string, length: number): Promise<string>;
   getLatestCompilerVersion?(logger: d.Logger, forceCheck: boolean): Promise<string>;
   getClientPath?(staticName: string): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
@@ -48,11 +48,6 @@ export interface StencilSystem {
   serializeNodeToHtml?(elm: Element | Document): string;
   storage?: Storage;
   transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults>;
-  url?: {
-    parse(urlStr: string, parseQueryString?: boolean, slashesDenoteHost?: boolean): Url;
-    format(url: Url): string;
-    resolve(from: string, to: string): string;
-  };
   validateTypes?(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]): Promise<d.ValidateTypesResults>;
 }
 
@@ -68,9 +63,9 @@ export interface RollupInterface {
   };
   plugins: {
     nodeResolve(opts: any): any;
-    emptyJsResolver(): any;
     replace(opts: any): any;
     commonjs(opts: any): any;
+    json(): any;
   };
 }
 

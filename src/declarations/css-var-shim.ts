@@ -8,6 +8,7 @@ export interface CssVarSim {
     hostEl: HTMLElement,
     templateName: string,
     cssText: string,
+    isScoped: boolean
   ): HTMLStyleElement;
 
   removeHost(hostEl: HTMLElement): void;

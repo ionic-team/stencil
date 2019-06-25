@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { bundleJson } from '../rollup-plugins/json';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { createOnWarnFn, getDependencies, loadRollupDiagnostics } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
@@ -20,6 +19,7 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
   try {
     const treeshake: TreeshakingOptions | boolean = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
       ? {
+        propertyReadSideEffects: false,
         tryCatchDeoptimization: false,
       }
       : false;
@@ -38,20 +38,19 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
         stencilBuildConditionalsPlugin(build, config.fsNamespace),
         globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
-        config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,
           sourceMap: false,
           ...config.commonjs
         }),
         ...config.rollupPlugins,
-        pluginHelper(config, compilerCtx, buildCtx),
+        pluginHelper(config, buildCtx),
         config.sys.rollup.plugins.nodeResolve({
           mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
           browser: true,
           ...config.nodeResolve
         }),
-        bundleJson(config),
+        config.sys.rollup.plugins.json(),
         imagePlugin(config, buildCtx),
         inMemoryFsRead(config, compilerCtx),
         config.sys.rollup.plugins.replace({
@@ -63,11 +62,6 @@ export async function bundleApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
       onwarn: createOnWarnFn(buildCtx.diagnostics),
       external
     };
-    if (bundleAppOptions.emitCoreChunk) {
-      rollupOptions.manualChunks = {
-        [config.fsNamespace]: ['@stencil/core']
-      };
-    }
 
     const rollupBuild: RollupBuild = await config.sys.rollup.rollup(rollupOptions);
     return rollupBuild;
@@ -89,18 +83,21 @@ export async function generateRollupOutput(build: RollupBuild, options: OutputOp
   const { output } = await build.generate(options);
   return output
     .filter(chunk => !('isAsset' in chunk))
-    .map((chunk: OutputChunk) => ({
-      fileName: chunk.fileName,
-      code: chunk.code,
-      moduleFormat: options.format,
-      entryKey: chunk.name,
-      imports: chunk.imports,
-      isEntry: !!chunk.isEntry,
-      isComponent: !!chunk.isEntry && entryModules.some(m => m.entryKey === chunk.name),
-      isCore: !chunk.isEntry && chunk.name === config.fsNamespace,
-      isBrowserLoader: chunk.isEntry && chunk.name === config.fsNamespace,
-      isIndex: chunk.isEntry && chunk.name === 'index',
-    }));
+    .map((chunk: OutputChunk) => {
+      const isCore = Object.keys(chunk.modules).includes('@stencil/core');
+      return {
+        fileName: chunk.fileName,
+        code: chunk.code,
+        moduleFormat: options.format,
+        entryKey: chunk.name,
+        imports: chunk.imports,
+        isEntry: !!chunk.isEntry,
+        isComponent: !!chunk.isEntry && entryModules.some(m => m.entryKey === chunk.name),
+        isBrowserLoader: chunk.isEntry && chunk.name === config.fsNamespace,
+        isIndex: chunk.isEntry && chunk.name === 'index',
+        isCore,
+    };
+  });
 }
 
 export const DEFAULT_CORE = `

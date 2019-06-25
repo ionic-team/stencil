@@ -1,3 +1,90 @@
+## 🍵 [1.0.7](https://github.com/ionic-team/stencil/compare/v1.0.6...v1.0.7) (2019-06-19)
+
+
+### Bug Fixes
+
+* **styles:** add styles before links ([05d242d](https://github.com/ionic-team/stencil/commit/05d242d))
+
+
+
+## 😋 [1.0.6](https://github.com/ionic-team/stencil/compare/v1.0.5...v1.0.6) (2019-06-17)
+
+
+### Bug Fixes
+
+* **collection:** generate dist/collection in dev mode ([3082c02](https://github.com/ionic-team/stencil/commit/3082c02))
+* **runtime:** disable constructable stylesheets in document ([adedb82](https://github.com/ionic-team/stencil/commit/adedb82))
+
+
+
+## 🐔 [1.0.5](https://github.com/ionic-team/stencil/compare/v1.0.4...v1.0.5) (2019-06-17)
+
+
+### Bug Fixes
+
+* install dev deps ([16588cb](https://github.com/ionic-team/stencil/commit/16588cb))
+* **hydrate:** fix light-dom nodes relocated within shadow ([95cbc3b](https://github.com/ionic-team/stencil/commit/95cbc3b))
+* **mock-doc:** case sensible attributes in element ([#1642](https://github.com/ionic-team/stencil/issues/1642)) ([e0c2ba5](https://github.com/ionic-team/stencil/commit/e0c2ba5))
+* **sys:** update sys.browser ([51efaa5](https://github.com/ionic-team/stencil/commit/51efaa5))
+* **testing:** fix e2e tests when without www output ([13f0c2f](https://github.com/ionic-team/stencil/commit/13f0c2f))
+* **transform:** fix crash will undefined node ([8f2d82c](https://github.com/ionic-team/stencil/commit/8f2d82c))
+* **validate:** don't validate in watch mode ([46f78ab](https://github.com/ionic-team/stencil/commit/46f78ab)), closes [#1647](https://github.com/ionic-team/stencil/issues/1647)
+* empty.js resolver is not longer needed ([97c0ed0](https://github.com/ionic-team/stencil/commit/97c0ed0))
+* **sys:** update sys.browser ([e835203](https://github.com/ionic-team/stencil/commit/e835203))
+* **testing:** run e2e tests ([89102e3](https://github.com/ionic-team/stencil/commit/89102e3))
+* add all public members from HTMLElement ([#1639](https://github.com/ionic-team/stencil/issues/1639)) ([d43f210](https://github.com/ionic-team/stencil/commit/d43f210))
+* allow inputMode ([5c737d6](https://github.com/ionic-team/stencil/commit/5c737d6))
+* update screenshot app ([4557148](https://github.com/ionic-team/stencil/commit/4557148))
+
+
+
+## 🐯 [1.0.4](https://github.com/ionic-team/stencil/compare/v1.0.3...v1.0.4) (2019-06-14)
+
+
+### Bug Fixes
+
+* **bundler:** treat core as a normal chunk ([2453ba8](https://github.com/ionic-team/stencil/commit/2453ba8))
+* ensure only components are exported ([0712e88](https://github.com/ionic-team/stencil/commit/0712e88))
+* only emit index-org on prerendering ([5f75c03](https://github.com/ionic-team/stencil/commit/5f75c03))
+* **mock-doc:** use correct element base class within cloneNode() ([0578dda](https://github.com/ionic-team/stencil/commit/0578dda))
+
+
+### Features
+
+* **sys:** init sys.browser for browser based compiler ([d058b44](https://github.com/ionic-team/stencil/commit/d058b44))
+
+
+
+## 🍭 [1.0.3](https://github.com/ionic-team/stencil/compare/v1.0.2...v1.0.3) (2019-06-12)
+
+If you are using any of the following plugins:
+
+- `@stencil/sass`
+- `@stencil/less`
+- `@stencil/stylus`
+- `@stencil/postcss`
+
+Please, make sure you are using the latest version (1.0.x) of those plugins.
+
+
+### Bug Fixes
+
+* **bundle:** fix tree-shaking regression ([f9fe153](https://github.com/ionic-team/stencil/commit/f9fe153))
+* **bundle:** only exclude system ([0581dec](https://github.com/ionic-team/stencil/commit/0581dec))
+* **bundle:** plugin helper ([0db4650](https://github.com/ionic-team/stencil/commit/0db4650))
+* **compiler:** always emit hashed filenames in prod ([282dd66](https://github.com/ionic-team/stencil/commit/282dd66))
+* **config:** filter rollup plugins ([0163e58](https://github.com/ionic-team/stencil/commit/0163e58))
+* **mock-doc:** title.text ([c92bf41](https://github.com/ionic-team/stencil/commit/c92bf41))
+* **prerendering:** apply low priority css ([cd87b30](https://github.com/ionic-team/stencil/commit/cd87b30))
+* **testing:** get page.root when using setContent() ([8544d1e](https://github.com/ionic-team/stencil/commit/8544d1e))
+
+
+### Performance Improvements
+
+* **build:** skip lazy build when html change ([c8a0ab6](https://github.com/ionic-team/stencil/commit/c8a0ab6))
+
+
+
 ## 🍯 [1.0.2](https://github.com/ionic-team/stencil/compare/v1.0.1...v1.0.2) (2019-06-08)
 
 

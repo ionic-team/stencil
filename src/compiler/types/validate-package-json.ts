@@ -4,6 +4,9 @@ import { getComponentsDtsTypesFilePath, isOutputTargetDistCollection, isOutputTa
 
 
 export async function validatePackageJson(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (config.watch) {
+    return;
+  }
   if (buildCtx.packageJson == null) {
     return;
   }
@@ -97,10 +100,6 @@ export function validateModule(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
 
 export async function validateTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistTypes) {
-  if (config.devMode) {
-    return;
-  }
-
   if (typeof buildCtx.packageJson.types !== 'string' || buildCtx.packageJson.types === '') {
     const recommendedPath = getRecommendedTypesPath(config, outputTarget);
     const msg = `package.json "types" property is required when generating a distribution. It's recommended to set the "types" property to: ${recommendedPath}`;

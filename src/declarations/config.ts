@@ -113,35 +113,69 @@ export interface StencilConfig {
    */
   srcDir?: string;
 
-  entryComponentsHint?: string[];
+  /**
+   * Passes custom configuration down to the "rollup-plugin-commonjs" that Stencil uses under the hood.
+   * For further information: https://stenciljs.com/docs/module-bundling
+   */
+  commonjs?: BundlingConfig;
+
+  /**
+   * Passes custom configuration down to the "rollup-plugin-node-resolve" that Stencil uses under the hood.
+   * For further information: https://stenciljs.com/docs/module-bundling
+   */
+  nodeResolve?: NodeResolveConfig;
+
+  /**
+   * Passes custom configuration down to rollup itself, not all rollup options can be overriden.
+   */
+  rollupConfig?: RollupConfig;
+
+  /**
+   * Sets if the ES5 build must be generated or not. It defaults to `false` in dev mode, and `true` in production mode.
+   * Notice that Stencil always generates a modern build too, this setting will just disable the additional `es5` build.
+   */
   buildEs5?: boolean;
+
+  /**
+   * Sets if the JS browser files are minified or not. Stencil uses `terser` under the hood.
+   * Defaults to `false` in dev mode and `true` in production mode.
+   */
+  minifyCss?: boolean;
+
+  /**
+   * Sets if the CSS is minified or not. Stencil uses `cssnano` under the hood.
+   * Defaults to `false` in dev mode and `true` in production mode.
+   */
+  minifyJs?: boolean;
+
+  /**
+   * Forces Stencil to run in `dev` mode if the value is `true` and `production` mode
+   * if it's `false`.
+   *
+   * Defaults to `false` (ie. production) unless the `--dev` flag is used in the CLI.
+   */
+  devMode?: boolean;
+
+  globalScript?: string;
+  srcIndexHtml?: string;
+  watch?: boolean;
+  testing?: d.TestingConfig;
+  maxConcurrentWorkers?: number;
+  maxConcurrentTasksPerWorker?: number;
+  preamble?: string;
+  includeSrc?: string[];
+
+  entryComponentsHint?: string[];
   buildDist?: boolean;
   buildLogFilePath?: string;
   cacheDir?: string;
-  commonjs?: BundlingConfig;
-  nodeResolve?: NodeResolveConfig;
-  rollupConfig?: RollupConfig;
   devInspector?: boolean;
-  devMode?: boolean;
   devServer?: d.StencilDevServerConfig;
   enableCacheStats?: boolean;
-  globalScript?: string;
-  includeSrc?: string[];
-  logger?: d.Logger;
-  maxConcurrentWorkers?: number;
-  maxConcurrentTasksPerWorker?: number;
-  minifyCss?: boolean;
-  minifyJs?: boolean;
-  preamble?: string;
-  srcIndexHtml?: string;
   sys?: d.StencilSystem;
-  testing?: d.TestingConfig;
   tsconfig?: string;
   validateTypes?: boolean;
-  watch?: boolean;
   watchIgnoredRegex?: RegExp;
-  writeLog?: boolean;
-  rollupPlugins?: any[];
 }
 
 export interface Config extends StencilConfig {
@@ -149,6 +183,9 @@ export interface Config extends StencilConfig {
   buildDocs?: boolean;
   configPath?: string;
   cwd?: string;
+  logger?: d.Logger;
+  writeLog?: boolean;
+  rollupPlugins?: any[];
   devServer?: d.DevServerConfig;
   flags?: ConfigFlags;
   fsNamespace?: string;
@@ -158,6 +195,10 @@ export interface Config extends StencilConfig {
   _isValidated?: boolean;
   _isTesting?: boolean;
   _lifecycleDOMEvents?: boolean;
+}
+
+export interface BrowserConfig extends d.StencilConfig {
+  win?: Window;
 }
 
 export interface RollupConfig {
@@ -253,6 +294,7 @@ export interface ConfigFlags {
   updateScreenshot?: boolean;
   version?: boolean;
   watch?: boolean;
+  devtools?: boolean;
 }
 
 

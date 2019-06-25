@@ -72,7 +72,6 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
       'loader': '@external-entrypoint',
       'index': usersIndexJsPath
     },
-    emitCoreChunk: true,
     cache: compilerCtx.rollupCacheLazy
   };
 

@@ -18,7 +18,6 @@ import { WorkerManager } from './worker/index';
 import { createHash } from 'crypto';
 import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
 import path from 'path';
-import * as url from 'url';
 
 
 export class NodeSystem implements d.StencilSystem {
@@ -154,17 +153,19 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   generateContentHash(content: any, length?: number) {
-    let hash = createHash('md5')
-               .update(content)
-               .digest('base64');
+    return new Promise<string>(resolve => {
+      let hash = createHash('md5')
+        .update(content)
+        .digest('base64');
 
-    if (typeof length === 'number') {
-      hash = hash.replace(/\W/g, '')
-                 .substr(0, length)
-                 .toLowerCase();
-    }
+      if (typeof length === 'number') {
+        hash = hash.replace(/\W/g, '')
+                .substr(0, length)
+                .toLowerCase();
+      }
 
-    return hash;
+      resolve(hash);
+    });
   }
 
   getClientPath(staticName: string) {
@@ -267,10 +268,6 @@ export class NodeSystem implements d.StencilSystem {
 
   async transpileToEs5(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults> {
     return this.sysWorker.run('transpileToEs5', [cwd, input, inlineHelpers]);
-  }
-
-  get url() {
-    return url;
   }
 
   validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
