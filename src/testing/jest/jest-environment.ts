@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { closePages, connectBrowser, disconnectBrowser, newBrowserPage } from '../puppeteer/puppeteer-browser';
+import { connectBrowser, disconnectBrowser, newBrowserPage } from '../puppeteer/puppeteer-browser';
 import NodeEnvironment from 'jest-environment-node';
 
 
@@ -8,10 +8,8 @@ export function createJestPuppeteerEnvironment() {
   const JestEnvironment = class extends NodeEnvironment {
 
     global: d.JestEnvironmentGlobal;
-    browser: any = null;
     browserContext: any = null;
     pages: any[] = [];
-
 
     constructor(config: any) {
       super(config);
@@ -25,34 +23,36 @@ export function createJestPuppeteerEnvironment() {
     }
 
     async newPuppeteerPage() {
-      if (!this.browser) {
+      if (!this.browserContext) {
         // load the browser and page on demand
-        this.browser = await connectBrowser();
-        this.browserContext = await this.browser.createIncognitoBrowserContext();
+        const browser = await connectBrowser();
+        this.browserContext = await browser.createIncognitoBrowserContext();
       }
 
-      if (!this.browser) {
+      if (!this.browserContext) {
         return null;
       }
 
       const page = await newBrowserPage(this.browserContext);
+      this.pages.push(page);
       const env: d.E2EProcessEnv = process.env;
       if (typeof env.__STENCIL_DEFAULT_TIMEOUT__ === 'string') {
         page.setDefaultTimeout(parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10));
       }
-      this.pages.push(page);
       return page;
     }
 
-    closeOpenPages() {
-      return closePages(this.pages);
+    async closeOpenPages() {
+      await Promise.all(
+        this.pages.map(page => page.close())
+      );
+      this.pages.length = 0;
     }
 
     async teardown() {
       await super.teardown();
-      await disconnectBrowser(this.browser, this.pages);
-      this.pages.length = 0;
-      this.browser = null;
+      await this.closeOpenPages();
+      await disconnectBrowser(this.browserContext);
       this.browserContext = null;
     }
   };

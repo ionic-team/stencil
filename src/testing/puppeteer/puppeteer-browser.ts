@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 
 
@@ -89,54 +88,18 @@ export async function connectBrowser() {
 }
 
 
-export async function disconnectBrowser(browser: puppeteer.Browser, pages: puppeteer.Page[]) {
-  await closePages(pages);
-  if (browser) {
+export async function disconnectBrowser(browserContext: puppeteer.BrowserContext) {
+  if (browserContext) {
+    const browser = browserContext.browser();
+    try {
+      await browserContext.close();
+    } catch (e) {}
     try {
       browser.disconnect();
     } catch (e) {}
   }
 }
 
-export async function closePages(pages: puppeteer.Page[]) {
-  if (Array.isArray(pages)) {
-    await Promise.all(pages.map(closePage));
-    pages.length = 0;
-  }
-}
-
-
 export function newBrowserPage(browserContext: puppeteer.BrowserContext) {
   return browserContext.newPage();
-}
-
-
-export async function closePage(page: any) {
-  try {
-    if (Array.isArray((page as pd.E2EPageInternal)._e2eElements)) {
-      const disposes = (page as pd.E2EPageInternal)._e2eElements.map(async elmHande => {
-        if (typeof elmHande.e2eDispose === 'function') {
-          await elmHande.e2eDispose();
-        }
-      });
-      await Promise.all(disposes);
-    }
-  } catch (e) {}
-
-  (page as pd.E2EPageInternal)._e2eElements = null;
-  (page as pd.E2EPageInternal)._e2eEvents = null;
-  (page as pd.E2EPageInternal)._e2eGoto = null;
-  (page as pd.E2EPageInternal).find = null;
-  (page as pd.E2EPageInternal).findAll = null;
-  (page as pd.E2EPageInternal).compareScreenshot = null;
-  (page as pd.E2EPageInternal).setContent = null;
-  (page as pd.E2EPageInternal).spyOnEvent = null;
-  (page as pd.E2EPageInternal).waitForChanges = null;
-  (page as pd.E2EPageInternal).waitForEvent = null;
-
-  try {
-    if (!(page as puppeteer.Page).isClosed()) {
-      await (page as puppeteer.Page).close();
-    }
-  } catch (e) {}
 }

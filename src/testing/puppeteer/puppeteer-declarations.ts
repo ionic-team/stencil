@@ -10,7 +10,7 @@ export interface NewE2EPageOptions extends puppeteer.NavigationOptions {
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
 type PuppeteerPage = Omit<puppeteer.Page,
-'bringToFront' | 'browser' | 'screenshot' | 'close' | 'emulate' | 'emulateMedia' | 'frames' | 'goBack' | 'goForward' | 'isClosed' | 'mainFrame' | 'pdf' | 'reload' | 'target' | 'title' | 'viewport' | 'waitForNavigation' | 'screenshot' | 'workers' | 'addListener' | 'prependListener' | 'prependOnceListener' | 'removeListener' | 'removeAllListeners' | 'setMaxListeners' | 'getMaxListeners' | 'listeners' | 'rawListeners' | 'emit' | 'eventNames' | 'listenerCount' | '$x' | 'waitForXPath'
+'bringToFront' | 'browser' | 'screenshot' | 'emulate' | 'emulateMedia' | 'frames' | 'goBack' | 'goForward' | 'isClosed' | 'mainFrame' | 'pdf' | 'reload' | 'target' | 'title' | 'viewport' | 'waitForNavigation' | 'screenshot' | 'workers' | 'addListener' | 'prependListener' | 'prependOnceListener' | 'removeListener' | 'removeAllListeners' | 'setMaxListeners' | 'getMaxListeners' | 'listeners' | 'rawListeners' | 'emit' | 'eventNames' | 'listenerCount' | '$x' | 'waitForXPath'
 >;
 
 
@@ -117,7 +117,7 @@ export interface E2EPage extends PuppeteerPage {
    * Waits for the event to be received on `window`. The optional second argument
    * allows the listener to be set to `document` if needed.
    */
-  waitForEvent(eventName: string, selector?: 'window' | 'document'): Promise<CustomEvent>;
+  waitForEvent(eventName: string): Promise<Event>;
 }
 
 
@@ -127,6 +127,7 @@ export interface E2EPageInternal extends E2EPage {
   _e2eEvents: WaitForEvent[];
   _e2eEventIds: number;
   _e2eGoto(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
+  _e2eClose(options?: puppeteer.PageCloseOptions): Promise<void>;
   screenshot(options?: puppeteer.ScreenshotOptions): Promise<Buffer>;
 }
 
@@ -387,6 +388,11 @@ export interface E2EElement {
    * is no longer connected to the document.
    */
   waitForNotVisible(): Promise<void>;
+
+  /**
+   * Waits until the given event is listened in the element.
+   */
+  waitForEvent(eventName: string): Promise<any>;
 }
 
 

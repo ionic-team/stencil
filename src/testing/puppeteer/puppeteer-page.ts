@@ -1,8 +1,7 @@
 import * as d from '../../declarations';
 import * as pd from './puppeteer-declarations';
-import { closePage } from './puppeteer-browser';
 import { find, findAll } from './puppeteer-find';
-import { initPageEvents } from './puppeteer-events';
+import { initPageEvents, waitForEvent } from './puppeteer-events';
 import { initPageScreenshot } from './puppeteer-screenshot';
 import * as puppeteer from 'puppeteer';
 
@@ -22,25 +21,71 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
     page._e2eElements = [];
 
     page._e2eGoto = page.goto;
+    page._e2eClose = page.close;
 
     await setPageEmulate(page as any);
-
     await page.setCacheEnabled(false);
-
     await initPageEvents(page);
 
     initPageScreenshot(page);
 
     let docPromise: Promise<puppeteer.JSHandle> = null;
 
-    page.find = async (selector: pd.FindSelector) => {
+    page.close = async (options?: puppeteer.PageCloseOptions) => {
+      try {
+        if (Array.isArray(page._e2eElements)) {
+          const disposes = page._e2eElements.map(async elmHande => {
+            if (typeof elmHande.e2eDispose === 'function') {
+              await elmHande.e2eDispose();
+            }
+          });
+          await Promise.all(disposes);
+        }
+      } catch (e) {}
+
+      page._e2eElements = null;
+      page._e2eEvents = null;
+      page._e2eGoto = null;
+      page.find = null;
+      page.debugger = null;
+      page.findAll = null;
+      page.compareScreenshot = null;
+      page.setContent = null;
+      page.spyOnEvent = null;
+      page.waitForChanges = null;
+      page.waitForEvent = null;
+
+      try {
+        if (!page.isClosed()) {
+          await page._e2eClose(options);
+        }
+      } catch (e) {}
+    };
+
+    const getDocHandle = async () => {
       if (!docPromise) {
         docPromise = page.evaluateHandle('document');
       }
       const documentJsHandle = await docPromise;
-      const docHandle = documentJsHandle.asElement();
+      return documentJsHandle.asElement();
+    };
+
+    page.find = async (selector: pd.FindSelector) => {
+      const docHandle = await getDocHandle();
       return find(page, docHandle, selector) as any;
     };
+
+    page.findAll = async (selector: pd.FindSelector) => {
+      const docHandle = await getDocHandle();
+      return findAll(page, docHandle, selector) as any;
+    };
+
+    page.waitForEvent = async (eventName) => {
+      const docHandle = await getDocHandle();
+      return waitForEvent(page, eventName, docHandle);
+    };
+
+    page.waitForChanges = waitForChanges.bind(null, page);
 
     page.debugger = () => {
       if (env.__STENCIL_E2E_DEVTOOLS__ !== 'true') {
@@ -55,40 +100,24 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
       }) as any;
     };
 
-    page.findAll = async (selector: pd.FindSelector) => {
-      if (!docPromise) {
-        docPromise = page.evaluateHandle('document');
-      }
-      const documentJsHandle = await docPromise;
-      const docHandle = documentJsHandle.asElement();
-      return findAll(page, docHandle, selector) as any;
-    };
-
-    page.waitForChanges = waitForChanges.bind(null, page);
-
     page.on('console', consoleMessage);
     page.on('pageerror', pageError);
     page.on('requestfailed', requestFailed);
 
     if (typeof opts.html === 'string') {
-      const errMsg = await e2eSetContent(page, opts.html, { waitUntil: opts.waitUntil });
-      if (errMsg) {
-        throw errMsg;
-      }
+      await e2eSetContent(page, opts.html, { waitUntil: opts.waitUntil });
 
     } else if (typeof opts.url === 'string') {
-      const errMsg = await e2eGoTo(page, opts.url, { waitUntil: opts.waitUntil });
-      if (errMsg) {
-        throw errMsg;
-      }
+      await e2eGoTo(page, opts.url, { waitUntil: opts.waitUntil });
 
     } else {
       page.goto = e2eGoTo.bind(null, page);
       page.setContent = e2eSetContent.bind(null, page);
     }
+
   } catch (e) {
     if (page) {
-      await closePage(page);
+      page.close();
     }
     throw e;
   }
@@ -96,28 +125,22 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
 }
 
 async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer.NavigationOptions) {
-  try {
-    if (page.isClosed()) {
-      return 'e2eGoTo unavailable: page already closed';
-    }
-  } catch (e) {
-    return null;
+
+  if (page.isClosed()) {
+    throw new Error('e2eGoTo unavailable: page already closed');
   }
 
   if (typeof url !== 'string') {
-    await closePage(page);
-    return 'invalid gotoTest() url';
+    throw new Error('invalid gotoTest() url');
   }
 
   if (!url.startsWith('/')) {
-    await closePage(page);
-    return 'gotoTest() url must start with /';
+    throw new Error('gotoTest() url must start with /');
   }
 
   const browserUrl = env.__STENCIL_BROWSER_URL__;
   if (typeof browserUrl !== 'string') {
-    await closePage(page);
-    return 'invalid gotoTest() browser url';
+    throw new Error('invalid gotoTest() browser url');
   }
 
   const fullUrl = browserUrl + url.substring(1);
@@ -128,8 +151,7 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer
   const rsp = await page._e2eGoto(fullUrl, options);
 
   if (!rsp.ok()) {
-    await closePage(page);
-    return `Testing unable to load ${url}, HTTP status: ${rsp.status()}`;
+    throw new Error(`Testing unable to load ${url}, HTTP status: ${rsp.status()}`);
   }
 
   try {
@@ -139,28 +161,22 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer
     throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
   }
 
-  return null;
+  return rsp;
 }
 
 
 async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: puppeteer.NavigationOptions = {}) {
-  try {
-    if (page.isClosed()) {
-      return 'e2eSetContent unavailable: page already closed';
-    }
-  } catch (e) {
-    return null;
+  if (page.isClosed()) {
+    throw new Error('e2eSetContent unavailable: page already closed');
   }
 
   if (typeof html !== 'string') {
-    await closePage(page);
-    return 'invalid e2eSetContent() html';
+    throw new Error('invalid e2eSetContent() html');
   }
 
   const appUrl = env.__STENCIL_APP_URL__;
   if (typeof appUrl !== 'string') {
-    await closePage(page);
-    return 'invalid e2eSetContent() app script url';
+    throw new Error('invalid e2eSetContent() app script url');
   }
 
   const url = env.__STENCIL_BROWSER_URL__;
@@ -191,8 +207,7 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: pu
   const rsp = await page._e2eGoto(url, options);
 
   if (!rsp.ok()) {
-    await closePage(page);
-    return `Testing unable to load content`;
+    throw new Error(`Testing unable to load content`);
   }
 
   try {
@@ -202,17 +217,12 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: pu
     throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
   }
 
-
-  return null;
+  return rsp;
 }
 
 
 async function setPageEmulate(page: puppeteer.Page) {
-  try {
-    if (page.isClosed()) {
-      return;
-    }
-  } catch (e) {
+  if (page.isClosed()) {
     return;
   }
 
@@ -221,20 +231,14 @@ async function setPageEmulate(page: puppeteer.Page) {
     return;
   }
 
-  try {
-    const screenshotEmulate = JSON.parse(emulateJsonContent) as d.EmulateConfig;
+  const screenshotEmulate = JSON.parse(emulateJsonContent) as d.EmulateConfig;
 
-    const emulateOptions: puppeteer.EmulateOptions = {
-      viewport: screenshotEmulate.viewport,
-      userAgent: screenshotEmulate.userAgent
-    };
+  const emulateOptions: puppeteer.EmulateOptions = {
+    viewport: screenshotEmulate.viewport,
+    userAgent: screenshotEmulate.userAgent
+  };
 
-    await (page as puppeteer.Page).emulate(emulateOptions);
-
-  } catch (e) {
-    console.error('setPageEmulate', e);
-    await closePage(page);
-  }
+  await (page as puppeteer.Page).emulate(emulateOptions);
 }
 
 
@@ -243,7 +247,6 @@ async function waitForChanges(page: pd.E2EPageInternal) {
     if (page.isClosed()) {
       return;
     }
-
     await Promise.all(page._e2eElements.map(elm => elm.e2eRunActions()));
 
     if (page.isClosed()) {
