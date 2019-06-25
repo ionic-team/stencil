@@ -170,6 +170,6 @@ export interface BootstrapHydrateResults {
   hydratedCount: number;
   hydratedComponents: {
     tag: string,
-    mode: string | undefined
+    mode: string
   }[];
 }

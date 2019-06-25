@@ -22,7 +22,7 @@ export function hydrateComponent(win: Window, results: BootstrapHydrateResults, 
           results.hydratedCount++;
 
           const ref = getHostRef(elm);
-          const modeName = ref.$modeName$;
+          const modeName = !ref.$modeName$ ? '$' : ref.$modeName$;
           if (!results.hydratedComponents.some(c => c.tag === tagName && c.mode === modeName)) {
             results.hydratedComponents.push({
               tag: tagName,
