@@ -9,8 +9,9 @@ export async function startPuppeteerBrowser(config: d.Config) {
   }
 
   const env: d.E2EProcessEnv = process.env;
+  const puppeteerDep = config.testing.browserExecutablePath ? 'puppeteer-core' : 'puppeteer';
 
-  const puppeteerModulePath = config.sys.lazyRequire.getModulePath('puppeteer');
+  const puppeteerModulePath = config.sys.lazyRequire.getModulePath(puppeteerDep);
   const puppeteer = require(puppeteerModulePath);
   env.__STENCIL_PUPPETEER_MODULE__ = puppeteerModulePath;
   env.__STENCIL_BROWSER_WAIT_UNTIL = config.testing.browserWaitUntil;
