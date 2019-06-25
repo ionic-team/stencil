@@ -61,10 +61,11 @@ describe('validateTesting', () => {
     validateConfig(config, [], false);
     expect(config.testing.browserArgs).toEqual([
       '--disable-gpu',
-      '--disable-canvas-aa',
-      '--disable-composited-antialiasing',
+      '--font-render-hinting=medium',
+      '--enable-font-antialiasing',
       '--no-sandbox',
-      '--disable-setuid-sandbox'
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
     ]);
   });
 
@@ -73,8 +74,8 @@ describe('validateTesting', () => {
     validateConfig(config, [], false);
     expect(config.testing.browserArgs).toEqual([
       '--disable-gpu',
-      '--disable-canvas-aa',
-      '--disable-composited-antialiasing'
+      '--font-render-hinting=medium',
+      '--enable-font-antialiasing',
     ]);
   });
 
