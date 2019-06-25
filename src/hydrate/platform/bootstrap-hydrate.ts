@@ -7,7 +7,7 @@ import { insertVdomAnnotations, postUpdateComponent } from '@runtime';
 export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, done: (results: BootstrapHydrateResults) => void) {
   const results: BootstrapHydrateResults = {
     hydratedCount: 0,
-    hydratedTags: []
+    hydratedComponents: []
   };
   plt.$resourcesUrl$ = new URL(opts.resourcesUrl || '/', win.location.href).href;
 
@@ -168,5 +168,8 @@ const NO_HYDRATE_TAGS = new Set([
 
 export interface BootstrapHydrateResults {
   hydratedCount: number;
-  hydratedTags: string[];
+  hydratedComponents: {
+    tag: string,
+    mode: string | undefined
+  }[];
 }

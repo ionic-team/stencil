@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { connectedCallback, getComponent, registerHost } from '@platform';
+import { connectedCallback, getComponent, getHostRef, registerHost } from '@platform';
 import { proxyHostElement } from './proxy-host-element';
 import { BootstrapHydrateResults } from './bootstrap-hydrate';
 
@@ -21,10 +21,14 @@ export function hydrateComponent(win: Window, results: BootstrapHydrateResults, 
 
           results.hydratedCount++;
 
-          if (!results.hydratedTags.includes(tagName)) {
-            results.hydratedTags.push(tagName);
+          const ref = getHostRef(elm);
+          const modeName = ref.$modeName$;
+          if (!results.hydratedComponents.some(c => c.tag === tagName && c.mode === modeName)) {
+            results.hydratedComponents.push({
+              tag: tagName,
+              mode: modeName
+            });
           }
-
         } catch (e) {
           win.console.error(e);
         }

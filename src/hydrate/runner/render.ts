@@ -124,9 +124,10 @@ async function render(win: Window, doc: Document, opts: d.HydrateDocumentOptions
 
         try {
           results.hydratedCount = bootstrapResults.hydratedCount;
-          bootstrapResults.hydratedTags.forEach(hydratedTag => {
+          bootstrapResults.hydratedComponents.forEach(component => {
             results.components.push({
-              tag: hydratedTag,
+              tag: component.tag,
+              mode: component.mode,
               count: 0,
               depth: -1
             });
