@@ -117,7 +117,7 @@ export interface E2EPage extends PuppeteerPage {
    * Waits for the event to be received on `window`. The optional second argument
    * allows the listener to be set to `document` if needed.
    */
-  waitForEvent(eventName: string): Promise<Event>;
+  waitForEvent(eventName: string): Promise<any>;
 }
 
 

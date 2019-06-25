@@ -41,7 +41,7 @@ export async function waitForEvent(page: pd.E2EPageInternal, eventName: string, 
         reject(`waitForEvent() timeout, eventName: ${eventName}`);
       }, 10000);
 
-      element.addEventListener(eventName, () => {
+      element.addEventListener(eventName, ev => {
         clearTimeout(tmr);
         resolve((window as pd.BrowserWindow).stencilSerializeEvent(ev as any));
       }, {once: true});
