@@ -16,6 +16,10 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
     testing.browserHeadless = true;
   }
 
+  if (!testing.browserWaitUntil) {
+    testing.browserWaitUntil = 'load';
+  }
+
   testing.browserArgs = testing.browserArgs || [];
   addOption(testing.browserArgs, '--disable-gpu');
   addOption(testing.browserArgs, '--disable-canvas-aa');
@@ -145,6 +149,15 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
     testing.runner = path.join(
       config.sys.compiler.packageDir, 'testing', 'jest-runner.js'
     );
+  }
+
+  if (typeof testing.waitBeforeScreenshot === 'number') {
+    if (testing.waitBeforeScreenshot < 0) {
+      const err = buildError(diagnostics);
+      err.messageText = `waitBeforeScreenshot must be a value that is 0 or greater`;
+    }
+  } else {
+    testing.waitBeforeScreenshot = 10;
   }
 
   if (!Array.isArray(testing.emulate) || testing.emulate.length === 0) {

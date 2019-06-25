@@ -13,6 +13,7 @@ export async function startPuppeteerBrowser(config: d.Config) {
   const puppeteerModulePath = config.sys.lazyRequire.getModulePath('puppeteer');
   const puppeteer = require(puppeteerModulePath);
   env.__STENCIL_PUPPETEER_MODULE__ = puppeteerModulePath;
+  env.__STENCIL_BROWSER_WAIT_UNTIL = config.testing.browserWaitUntil;
 
   if (config.flags.devtools) {
     config.testing.browserDevtools = true;
@@ -47,12 +48,14 @@ export async function startPuppeteerBrowser(config: d.Config) {
     launchOpts.executablePath = config.testing.browserExecutablePath;
   }
 
-  const browser = (config.testing.browserWSEndpoint)
-    ? await puppeteer.connect({
+  const browser = await ((config.testing.browserWSEndpoint)
+    ? puppeteer.connect({
         ...launchOpts,
         browserWSEndpoint: config.testing.browserWSEndpoint
       })
-    : await puppeteer.launch(launchOpts);
+    : puppeteer.launch({
+        ...launchOpts,
+      }));
 
   env.__STENCIL_BROWSER_WS_ENDPOINT__ = browser.wsEndpoint();
 

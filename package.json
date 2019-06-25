@@ -108,7 +108,7 @@
     "path-browserify": "0.0.0",
     "pixelmatch": "4.0.2",
     "postcss": "7.0.17",
-    "puppeteer": "~1.18.0",
+    "puppeteer": "~1.17.0",
     "rollup": "1.16.2",
     "rollup-plugin-commonjs": "10.0.0",
     "rollup-plugin-json": "^4.0.0",
@@ -131,7 +131,7 @@
     "jest": "~24.8.0",
     "jest-cli": "~24.8.0",
     "pixelmatch": "4.0.2",
-    "puppeteer": "~1.18.0",
+    "puppeteer": "~1.17.0",
     "workbox-build": "~4.3.1"
   },
   "engines": {

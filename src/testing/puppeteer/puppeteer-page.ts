@@ -10,15 +10,15 @@ import * as puppeteer from 'puppeteer';
 declare const global: d.JestEnvironmentGlobal;
 
 
+const env: d.E2EProcessEnv = process.env;
 export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2EPage> {
   if (!global.__NEW_TEST_PAGE__) {
-    console.error(`newE2EPage() is only available from E2E tests, and ran with the --e2e cmd line flag.`);
-    return failedPage();
+    throw new Error(`newE2EPage() is only available from E2E tests, and ran with the --e2e cmd line flag.`);
   }
 
-  try {
-    const page: pd.E2EPageInternal = await global.__NEW_TEST_PAGE__();
+  const page: pd.E2EPageInternal = await global.__NEW_TEST_PAGE__();
 
+  try {
     page._e2eElements = [];
 
     page._e2eGoto = page.goto;
@@ -43,7 +43,7 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
     };
 
     page.debugger = () => {
-      if ((process.env as d.E2EProcessEnv).__STENCIL_E2E_DEVTOOLS__ !== 'true') {
+      if (env.__STENCIL_E2E_DEVTOOLS__ !== 'true') {
         throw new Error('Set the --devtools flag in order to use E2EPage.debugger()');
       }
       return page.evaluate(() => {
@@ -86,23 +86,12 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
       page.goto = e2eGoTo.bind(null, page);
       page.setContent = e2eSetContent.bind(null, page);
     }
-
-    return page;
-
   } catch (e) {
-    console.error(e);
+    if (page) {
+      await closePage(page);
+    }
+    throw e;
   }
-
-  return failedPage();
-}
-
-function failedPage() {
-  const page: pd.E2EPageInternal = {
-    isClosed: () => true,
-    setContent: () => Promise.resolve(),
-    waitForChanges: () => Promise.resolve(),
-    find: () => Promise.resolve(null)
-  } as any;
   return page;
 }
 
@@ -125,7 +114,7 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer
     return 'gotoTest() url must start with /';
   }
 
-  const browserUrl = (process.env as d.E2EProcessEnv).__STENCIL_BROWSER_URL__;
+  const browserUrl = env.__STENCIL_BROWSER_URL__;
   if (typeof browserUrl !== 'string') {
     await closePage(page);
     return 'invalid gotoTest() browser url';
@@ -134,7 +123,7 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer
   const fullUrl = browserUrl + url.substring(1);
 
   if (!options.waitUntil) {
-    options.waitUntil = DEFAULT_WAIT_FOR;
+    options.waitUntil = env.__STENCIL_BROWSER_WAIT_UNTIL as any;
   }
   const rsp = await page._e2eGoto(fullUrl, options);
 
@@ -168,13 +157,13 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: pu
     return 'invalid e2eSetContent() html';
   }
 
-  const appUrl = (process.env as d.E2EProcessEnv).__STENCIL_APP_URL__;
+  const appUrl = env.__STENCIL_APP_URL__;
   if (typeof appUrl !== 'string') {
     await closePage(page);
     return 'invalid e2eSetContent() app script url';
   }
 
-  const url = (process.env as d.E2EProcessEnv).__STENCIL_BROWSER_URL__;
+  const url = env.__STENCIL_BROWSER_URL__;
   const body = [
     `<script type="module" src="${appUrl}"></script>`,
     html
@@ -197,7 +186,7 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: pu
   });
 
   if (!options.waitUntil) {
-    options.waitUntil = DEFAULT_WAIT_FOR;
+    options.waitUntil = env.__STENCIL_BROWSER_WAIT_UNTIL as any;
   }
   const rsp = await page._e2eGoto(url, options);
 
@@ -226,8 +215,6 @@ async function setPageEmulate(page: puppeteer.Page) {
   } catch (e) {
     return;
   }
-
-  const env = (process.env) as d.E2EProcessEnv;
 
   const emulateJsonContent = env.__STENCIL_EMULATE__;
   if (!emulateJsonContent) {
@@ -328,5 +315,3 @@ function pageError(e: any) {
 function requestFailed(req: puppeteer.Request) {
   console.error('requestfailed', req.url());
 }
-
-const DEFAULT_WAIT_FOR = 'load';
