@@ -18,7 +18,6 @@ export class Testing implements d.Testing {
     const { Compiler } = require('../compiler/index.js');
 
     this.compiler = new Compiler(setupTestingConfig(config));
-    config.maxConcurrentWorkers = Math.min(config.maxConcurrentWorkers, 6);
     this.config = this.compiler.config;
 
     this.isValid = this.compiler.isValid;
