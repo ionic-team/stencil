@@ -6,6 +6,7 @@ export {
   ComponentDidUpdate,
   ComponentWillLoad,
   ComponentWillUpdate,
+  ComponentInstance,
   ComponentInstance as ComponentInterface,
   StencilConfig as Config,
   EventEmitter,
