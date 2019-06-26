@@ -32,9 +32,10 @@ async function generateLoader(config: d.Config, compilerCtx: d.CompilerCtx, outp
     'typings': './index.d.ts',
     'module': './index.mjs',
     'main': './index.cjs.js',
+    'node:main': './node-main.js',
     'jsnext:main': './index.es2017.mjs',
     'es2015': './index.es2017.mjs',
-    'es2017': './index.es2017.mjs'
+    'es2017': './index.es2017.mjs',
   }, null, 2);
 
   const es5EntryPoint = config.sys.path.join(es5Dir, 'loader.mjs');
@@ -55,6 +56,10 @@ export * from '${normalizePath(config.sys.path.relative(loaderPath, es2017EntryP
 module.exports = require('${normalizePath(config.sys.path.relative(loaderPath, cjsEntryPoint))}');
 module.exports.applyPolyfills = function() { return Promise.resolve() };
 `;
+  const nodeMainContent = `
+module.exports.applyPolyfills = function() { return Promise.resolve() };
+module.exports.defineCustomElements = function() { return Promise.resolve() };
+`;
 
   const indexDtsPath = config.sys.path.join(loaderPath, 'index.d.ts');
   await Promise.all([
@@ -62,7 +67,8 @@ module.exports.applyPolyfills = function() { return Promise.resolve() };
     compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.d.ts'), generateIndexDts(config, indexDtsPath, outputTarget.componentDts)),
     compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.mjs'), indexContent),
     compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.cjs.js'), indexCjsContent),
-    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.es2017.mjs'), indexES2017Content)
+    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.es2017.mjs'), indexES2017Content),
+    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'node-main.js'), nodeMainContent)
   ]);
 }
 
