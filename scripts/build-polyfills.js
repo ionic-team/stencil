@@ -23,6 +23,7 @@ function buildCoreJs() {
       'es.typed-array',
       'es.reflect'
     ],
+    targets: 'ie 11',
     filename: path.join(SRC_DIR, 'core-js.js'),
   });
 }

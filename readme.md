@@ -159,6 +159,7 @@ This subset is generated using the [`core-js-builder` tool](https://github.com/z
 
 ```js
 require('core-js-builder')({
+  targets: 'ie 11',
   modules: [
     'es',
     'web.url',
