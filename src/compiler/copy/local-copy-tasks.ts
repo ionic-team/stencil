@@ -101,32 +101,28 @@ export function getDestAbsPath(config: d.Config, src: string, destAbsPath: strin
 
 
 export function isCopyTaskFile(config: d.Config, filePath: string) {
-  if (!Array.isArray(config.copy)) {
-    // there is no copy config
-    return false;
-  }
-
   filePath = normalizePath(filePath);
 
-  // go through all the copy tasks and see if this path matches
-  for (let i = 0; i < config.copy.length; i++) {
-    var copySrc = config.copy[i].src;
+  return config.outputTargets.some((o) => {
+    if ('copy' in o && Array.isArray(o.copy)) {
+      for (let i = 0; i < o.copy.length; i++) {
+        var copySrc = o.copy[i].src;
+        if (isGlob(copySrc)) {
+          // test the glob
+          copySrc = config.sys.path.join(config.srcDir, copySrc);
+          if (minimatch(filePath, copySrc)) {
+            return true;
+          }
 
-    if (isGlob(copySrc)) {
-      // test the glob
-      copySrc = config.sys.path.join(config.srcDir, copySrc);
-      if (minimatch(filePath, copySrc)) {
-        return true;
-      }
+        } else {
+          copySrc = normalizePath(getSrcAbsPath(config, copySrc));
 
-    } else {
-      copySrc = normalizePath(getSrcAbsPath(config, copySrc));
-
-      if (!config.sys.path.relative(copySrc, filePath).startsWith('.')) {
-        return true;
+          if (!config.sys.path.relative(copySrc, filePath).startsWith('..')) {
+            return true;
+          }
+        }
       }
     }
-  }
-
-  return false;
+    return false;
+  });
 }

@@ -166,7 +166,7 @@ const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
 
 function hasHtmlChanges(config: d.Config, buildCtx: d.BuildCtx) {
   const anyHtmlChanged = buildCtx.filesChanged.some(f => f.toLowerCase().endsWith('.html'));
-  
+
   if (anyHtmlChanged) {
     // any *.html in any directory that changes counts and rebuilds
     return true;

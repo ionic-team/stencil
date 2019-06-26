@@ -122,14 +122,14 @@ export function getComponentsFromModules(moduleFiles: d.Module[]) {
   return sortBy(flatOne(moduleFiles.map(m => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
 }
 
-export function canSkipAppCoreBuild(buildCtx: d.BuildCtx) {
+export function canSkipOutputTargets(buildCtx: d.BuildCtx) {
   if (buildCtx.components.length === 0) {
     return true;
   }
   if (buildCtx.requiresFullBuild) {
     return false;
   }
-  if (buildCtx.isRebuild && (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges || buildCtx.hasHtmlChanges)) {
+  if (buildCtx.isRebuild && (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges || buildCtx.hasHtmlChanges ||   buildCtx.hasCopyChanges)) {
     return false;
   }
   return true;
