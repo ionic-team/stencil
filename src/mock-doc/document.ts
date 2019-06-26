@@ -172,7 +172,7 @@ export class MockDocument extends MockHTMLElement {
   }
 
   createElementNS(namespaceURI: string, tagName: string) {
-    const elmNs = new MockElement(this, tagName);
+    const elmNs = createElement(this, tagName);
     elmNs.namespaceURI = namespaceURI;
     return elmNs;
   }
