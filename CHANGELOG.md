@@ -1,3 +1,23 @@
+## 🐏 [1.1.2](https://github.com/ionic-team/stencil/compare/v1.1.1...v1.1.2) (2019-06-25)
+
+
+### Bug Fixes
+
+* **testing:** ev is not defined ([c6bd82d](https://github.com/ionic-team/stencil/commit/c6bd82d))
+* normalize default mode ([b15c6a5](https://github.com/ionic-team/stencil/commit/b15c6a5))
+* **e2e:** consistent font rendering ([3b2cc94](https://github.com/ionic-team/stencil/commit/3b2cc94))
+* **prerendering:** filter download links ([2f664f0](https://github.com/ionic-team/stencil/commit/2f664f0))
+* **testing:** close browser context and better error reporting ([0a2fcf3](https://github.com/ionic-team/stencil/commit/0a2fcf3))
+* **testing:** disable concurrency ([e12993b](https://github.com/ionic-team/stencil/commit/e12993b))
+
+
+### Performance Improvements
+
+* don't cap max workers ([82d8094](https://github.com/ionic-team/stencil/commit/82d8094))
+* generate modulepreload for mode ([29d87c2](https://github.com/ionic-team/stencil/commit/29d87c2))
+
+
+
 ## 🚨 [1.1.1](https://github.com/ionic-team/stencil/compare/v1.1.0...v1.1.1) (2019-06-25)
 
 
