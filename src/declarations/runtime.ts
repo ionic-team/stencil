@@ -88,7 +88,7 @@ export interface HostRef {
   $flags$: number;
   $hostElement$?: d.HostElement;
   $instanceValues$?: Map<string, any>;
-  $lazyInstance$?: d.ComponentInstance;
+  $lazyInstance$?: d.ComponentInterface;
   $onReadyPromise$?: Promise<any>;
   $onReadyResolve$?: (elm: any) => void;
   $vnode$?: d.VNode;
