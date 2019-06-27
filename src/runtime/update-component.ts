@@ -216,6 +216,19 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
   }
 };
 
+export const forceUpdate = (elm: d.RenderNode, cmpMeta: d.ComponentRuntimeMeta) => {
+  if (BUILD.updatable) {
+    const hostRef = getHostRef(this);
+    if (hostRef.$flags$ & HOST_FLAGS.hasRendered) {
+      scheduleUpdate(
+        elm,
+        hostRef,
+        cmpMeta,
+        false
+      );
+    }
+  }
+};
 
 const emitLifecycleEvent = (elm: d.HostElement, lifecycleName: string) => {
   if (BUILD.lifecycleDOMEvents) {

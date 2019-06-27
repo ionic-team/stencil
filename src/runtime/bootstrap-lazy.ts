@@ -8,7 +8,7 @@ import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
-import { postUpdateComponent, scheduleUpdate } from './update-component';
+import { postUpdateComponent, forceUpdate } from './update-component';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
@@ -105,15 +105,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         forceUpdate() {
-          if (BUILD.updatable) {
-            const hostRef = getHostRef(this);
-            scheduleUpdate(
-              this,
-              hostRef,
-              cmpMeta,
-              false
-            );
-          }
+          forceUpdate(this, cmpMeta);
         }
 
         componentOnReady() {
