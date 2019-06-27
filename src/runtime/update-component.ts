@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
-import { consoleError, cssVarShim, doc, plt, writeTask } from '@platform';
+import { consoleError, cssVarShim, doc, getHostRef, plt, writeTask } from '@platform';
 import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 
@@ -23,6 +23,9 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
   }
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   if (isInitialLoad) {
+    if (BUILD.watchCallback) {
+      hostRef.$flags$ |= HOST_FLAGS.isWatchReady;
+    }
     emitLifecycleEvent(elm, 'componentWillLoad');
     if (BUILD.cmpWillLoad) {
       await safeCall(instance, 'componentWillLoad');
@@ -218,7 +221,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
 
 export const forceUpdate = (elm: d.RenderNode, cmpMeta: d.ComponentRuntimeMeta) => {
   if (BUILD.updatable) {
-    const hostRef = getHostRef(this);
+    const hostRef = getHostRef(elm);
     if (hostRef.$flags$ & HOST_FLAGS.hasRendered) {
       scheduleUpdate(
         elm,
