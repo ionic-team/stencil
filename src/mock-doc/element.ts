@@ -57,11 +57,14 @@ export function createElement(ownerDocument: any, tagName: string) {
   return new MockHTMLElement(ownerDocument, tagName);
 }
 
-export function createElementNS(ownerDocument: any, tagName: string) {
-  if (SVG_TAGS.has(tagName)) {
+export function createElementNS(ownerDocument: any, namespaceURI: string, tagName: string) {
+  if (namespaceURI === 'http://www.w3.org/1999/xhtml') {
+    return createElement(ownerDocument, tagName);
+  } else if (namespaceURI === 'http://www.w3.org/2000/svg') {
     return new MockSVGElement(ownerDocument, tagName);
+  } else {
+    return new MockElement(ownerDocument, tagName);
   }
-  return new MockElement(ownerDocument, tagName);
 }
 
 // This set is intentionally incomplete. More tags can be added as needed.
