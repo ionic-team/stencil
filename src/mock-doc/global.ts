@@ -1,36 +1,57 @@
 import { MockWindow, resetWindow } from './window';
 
 
-export function setupGlobal(global: any) {
-  if (global.window == null) {
-    const win: any = global.window = new MockWindow();
+export function setupGlobal(gbl: any) {
+  if (gbl.window == null) {
+    const win: any = gbl.window = new MockWindow();
 
     WINDOW_FUNCTIONS.forEach(fnName => {
-      if (!(fnName in global)) {
-        global[fnName] = win[fnName].bind(win);
+      if (!(fnName in gbl)) {
+        gbl[fnName] = win[fnName].bind(win);
       }
     });
 
     WINDOW_PROPS.forEach(propName => {
-      if (!(propName in global)) {
-        Object.defineProperty(global, propName, {
+      if (!(propName in gbl)) {
+        Object.defineProperty(gbl, propName, {
           get() { return win[propName]; },
           set(val: any) { win[propName] = val; },
           configurable: true,
           enumerable: true
         });
-
       }
     });
   }
 
-  return global.window;
+  return gbl.window;
 }
 
 
-export function teardownGlobal(global: any) {
-  const win = global.window as Window;
+export function teardownGlobal(gbl: any) {
+  const win = gbl.window as Window;
   resetWindow(win);
+}
+
+
+export function patchWindow(winToBePatched: any) {
+  const mockWin: any = new MockWindow(false);
+
+  WINDOW_FUNCTIONS.forEach(fnName => {
+    if (typeof winToBePatched[fnName] !== 'function') {
+      winToBePatched[fnName] = mockWin[fnName].bind(mockWin);
+    }
+  });
+
+  WINDOW_PROPS.forEach(propName => {
+    if (winToBePatched === undefined) {
+      Object.defineProperty(winToBePatched, propName, {
+        get() { return mockWin[propName]; },
+        set(val: any) { mockWin[propName] = val; },
+        configurable: true,
+        enumerable: true
+      });
+    }
+  });
 }
 
 
@@ -42,18 +63,30 @@ const WINDOW_FUNCTIONS = [
   'matchMedia',
   'removeEventListener',
   'requestAnimationFrame',
-  'requestIdleCallback'
+  'requestIdleCallback',
+  'URL'
 ];
 
 
 const WINDOW_PROPS = [
   'customElements',
+  'devicePixelRatio',
   'document',
   'history',
+  'innerHeight',
+  'innerWidth',
   'localStorage',
   'location',
   'navigator',
+  'pageXOffset',
+  'pageYOffset',
   'performance',
+  'screenLeft',
+  'screenTop',
+  'screenX',
+  'screenY',
+  'scrollX',
+  'scrollY',
   'sessionStorage',
   'CSS',
   'CustomEvent',

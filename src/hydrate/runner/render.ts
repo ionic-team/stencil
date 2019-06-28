@@ -6,7 +6,7 @@ import { generateHydrateResults, normalizeHydrateOptions, renderBuildError, rend
 import { initializeWindow } from './window-initialize';
 import { inspectElement } from './inspect-document';
 import { MockWindow, serializeNodeToHtml } from '@mock-doc';
-import { polyfillDocumentImplementation } from './polyfill-implementation';
+import { patchDomImplementation } from './patch-dom-implementation';
 
 
 export async function renderToString(html: string, opts: d.RenderToStringOptions = {}) {
@@ -85,17 +85,9 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateDocumentOpti
   }
 
   try {
-    const win: Window = doc.defaultView || new MockWindow(false) as any;
-    if (win.document !== doc) {
-      (win as any).document = doc;
-    }
-    if (doc.defaultView !== win) {
-      (doc as any).defaultView = win;
-    }
+    const win = patchDomImplementation(doc);
 
-    polyfillDocumentImplementation(win, doc);
-
-    await render(win, doc, opts, results);
+    await render(win, win.document, opts, results);
 
   } catch (e) {
     renderCatchError(results, e);

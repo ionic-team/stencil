@@ -135,6 +135,9 @@ function connectElements(win: Window, opts: d.HydrateDocumentOptions, results: B
 
 
 function shouldHydrate(elm: Element): boolean {
+  if (elm.nodeType === 9) {
+    return true;
+  }
   if (NO_HYDRATE_TAGS.has(elm.nodeName)) {
     return false;
   }

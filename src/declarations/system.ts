@@ -123,6 +123,7 @@ export interface PackageJsonData {
   name?: string;
   version?: string;
   main?: string;
+  description?: string;
   bin?: {[key: string]: string};
   browser?: string;
   module?: string;

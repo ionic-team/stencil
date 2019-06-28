@@ -1,4 +1,9 @@
-const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
+
+const hydrateAppFileName = '$$HYDRATE_APP_FILENAME$$';
+const hydrateAppPackageName = '$$HYDRATE_APP_PACKAGE_NAME$$';
+
+
+const requireFunc: any = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
 const vm = requireFunc('vm');
 
 
@@ -19,12 +24,23 @@ function loadHydrateAppScript() {
   if (cachedAppScript == null) {
     const fs = requireFunc('fs');
     const path = requireFunc('path');
-    const filePath = path.join(__dirname, 'app.js');
-    const appCode = fs.readFileSync(filePath, 'utf8');
 
-    const code = `StencilHydrateApp = (exports => {${appCode};return exports; })({});`;
+    let hydrateAppFilePath: string;
+    let hydrateAppCode: string;
+    try {
+      hydrateAppFilePath = path.join(__dirname, hydrateAppFileName);
+      hydrateAppCode = fs.readFileSync(hydrateAppFilePath, 'utf8');
 
-    cachedAppScript = new vm.Script(code, { filename: filePath });
+    } catch (e) {
+      const hydrateAppPackageIndex = requireFunc.resolve(hydrateAppPackageName);
+      const hydrateAppPackageDir = path.dirname(hydrateAppPackageIndex);
+      hydrateAppFilePath = path.join(hydrateAppPackageDir, hydrateAppFileName);
+      hydrateAppCode = fs.readFileSync(hydrateAppFilePath, 'utf8');
+    }
+
+    const code = `StencilHydrateApp = (exports => {${hydrateAppCode};return exports; })({});`;
+
+    cachedAppScript = new vm.Script(code, { filename: hydrateAppFilePath });
   }
 
   return cachedAppScript;
