@@ -9,11 +9,7 @@ describe('vdom-relocation', () => {
       tag: 'my-root',
     })
     class Root {
-      /**
-       * The first name
-       */
       @State() data = [1, 2, 3];
-
       @Listen('click')
       onclick() {
         this.data = [...this.data, this.data.length + 1];
@@ -35,7 +31,7 @@ describe('vdom-relocation', () => {
 
       render() {
         return (
-          <div class='wrappper'>
+          <div class='wrapper'>
             <slot></slot>
           </div>
         );
@@ -50,7 +46,7 @@ describe('vdom-relocation', () => {
     expect(root).toEqualHtml(`
 <my-root>
   <my-child>
-    <div class=\"wrappper\">
+    <div class=\"wrapper\">
       <div>1</div>
       <div>2</div>
       <div>3</div>
@@ -58,13 +54,13 @@ describe('vdom-relocation', () => {
   </my-child>
 </my-root>`);
 
-    root.click();
+  root.click();
   await waitForChanges();
 
   expect(root).toEqualHtml(`
   <my-root>
     <my-child>
-      <div class=\"wrappper\">
+      <div class=\"wrapper\">
         <div>1</div>
         <div>2</div>
         <div>3</div>

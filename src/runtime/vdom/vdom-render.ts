@@ -642,19 +642,19 @@ render() {
         // after the slot reference node
         const parentNodeRef = relocateNode.slotRefNode.parentNode;
         let insertBeforeNode = relocateNode.slotRefNode.nextSibling;
-
         let orgLocationNode = relocateNode.nodeToRelocate['s-ol'] as any;
 
         while (orgLocationNode = orgLocationNode.previousSibling as any) {
           let refNode = orgLocationNode['s-nr'];
-          if (refNode && refNode) {
-            if (refNode['s-sn'] === relocateNode.nodeToRelocate['s-sn']) {
-              if (parentNodeRef === refNode.parentNode) {
-                if ((refNode = refNode.nextSibling as any) && refNode && !refNode['s-nr']) {
-                  insertBeforeNode = refNode;
-                  break;
-                }
-              }
+          if (
+            refNode &&
+            refNode['s-sn'] === relocateNode.nodeToRelocate['s-sn'] &&
+            parentNodeRef === refNode.parentNode
+          ) {
+            refNode = refNode.nextSibling;
+            if (!refNode || !refNode['s-nr']) {
+              insertBeforeNode = refNode;
+              break;
             }
           }
         }
