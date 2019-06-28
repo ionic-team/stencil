@@ -41,10 +41,10 @@ export function createElement(ownerDocument: any, tagName: string) {
 
     case 'title':
       return new MockTitleElement(ownerDocument);
+  }
 
-    case 'svg':
-    case 'symbol':
-      return new MockElement(ownerDocument, tagName);
+  if (SVG_TAGS.has(tagName)) {
+    return new MockSVGElement(ownerDocument, tagName);
   }
 
   if (ownerDocument != null && tagName.includes('-')) {
@@ -57,6 +57,15 @@ export function createElement(ownerDocument: any, tagName: string) {
   return new MockHTMLElement(ownerDocument, tagName);
 }
 
+export function createElementNS(ownerDocument: any, tagName: string) {
+  if (SVG_TAGS.has(tagName)) {
+    return new MockSVGElement(ownerDocument, tagName);
+  }
+  return new MockElement(ownerDocument, tagName);
+}
+
+// This set is intentionally incomplete. More tags can be added as needed.
+const SVG_TAGS = new Set(['circle', 'line', 'g', 'path', 'svg', 'symbol', 'viewbox']);
 
 class MockAnchorElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -98,7 +107,6 @@ patchPropAttributes(MockImgElement.prototype, {
   height: Number,
   width: Number
 });
-
 
 class MockInputElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -197,6 +205,22 @@ class MockScriptElement extends MockHTMLElement {
 patchPropAttributes(MockScriptElement.prototype, {
   type: String
 });
+
+class MockSVGElement extends MockElement {
+  // SVGElement properties and methods
+  get ownerSVGElement(): SVGSVGElement { return null; }
+  get viewportElement(): SVGElement { return null; }
+
+  focus() {/**/}
+  onunload() {/**/}
+
+  // SVGGeometryElement properties and methods
+  get pathLength(): number { return 0; }
+
+  isPointInFill(_pt: DOMPoint): boolean { return false; }
+  isPointInStroke(_pt: DOMPoint): boolean { return false; }
+  getTotalLength(): number { return 0; }
+}
 
 
 export class MockTemplateElement extends MockHTMLElement {

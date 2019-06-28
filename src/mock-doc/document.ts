@@ -1,5 +1,5 @@
 import { NODE_NAMES, NODE_TYPES } from './constants';
-import { createElement } from './element';
+import { createElement, createElementNS } from './element';
 import { MockDocumentFragment } from './document-fragment';
 import { MockDocumentTypeNode } from './document-type-node';
 import { MockElement, MockHTMLElement, MockTextNode, resetElement } from './node';
@@ -172,7 +172,7 @@ export class MockDocument extends MockHTMLElement {
   }
 
   createElementNS(namespaceURI: string, tagName: string) {
-    const elmNs = new MockElement(this, tagName);
+    const elmNs = createElementNS(this, tagName);
     elmNs.namespaceURI = namespaceURI;
     return elmNs;
   }
