@@ -1,7 +1,6 @@
 import * as d from '@stencil/core/declarations';
 import { validateOutputTargetDist } from '../validate-outputs-dist';
-import path, { join } from 'path';
-import { root } from 'postcss';
+import path from 'path';
 
 
 describe('validateDistOutputTarget', () => {
@@ -28,19 +27,19 @@ describe('validateDistOutputTarget', () => {
     validateOutputTargetDist(config);
     expect(config.outputTargets).toEqual([
       {
-        'buildDir': join(rootDir, 'my-dist' , 'my-build'),
-        'collectionDir': join(rootDir, 'my-dist', 'collection'),
+        'buildDir': path.join(rootDir, 'my-dist', 'my-build'),
+        'collectionDir': path.join(rootDir, 'my-dist', 'collection'),
         'copy': [],
-        'dir': join(rootDir, 'my-dist'),
+        'dir': path.join(rootDir, 'my-dist'),
         'empty': false,
-        'esmLoaderPath': join(rootDir, 'my-dist', 'loader'),
+        'esmLoaderPath': path.join(rootDir, 'my-dist', 'loader'),
         'resourcesUrl': undefined,
         'type': 'dist',
-        'typesDir': join(rootDir, 'my-dist', 'types')
+        'typesDir': path.join(rootDir, 'my-dist', 'types')
       },
       {
-        'collectionDir': join(rootDir, 'my-dist', 'collection'),
-        'dir': join(rootDir, '/my-dist'),
+        'collectionDir': path.join(rootDir, 'my-dist', 'collection'),
+        'dir': path.join(rootDir, '/my-dist'),
         'type': 'dist-collection'
       },
       {
@@ -49,29 +48,29 @@ describe('validateDistOutputTarget', () => {
           {'src': '**/*.js'}
         ],
         'copyAssets': 'collection',
-        'dir': join(rootDir, 'my-dist', 'collection'),
+        'dir': path.join(rootDir, 'my-dist', 'collection'),
         'type': 'copy'
       },
       {
-        'dir': join(rootDir, 'my-dist'),
+        'dir': path.join(rootDir, 'my-dist'),
         'type': 'dist-types',
-        'typesDir': join(rootDir, 'my-dist', 'types')
+        'typesDir': path.join(rootDir, 'my-dist', 'types')
       },
       {
-        'esmDir': join(rootDir, 'my-dist', 'my-build', 'app'),
+        'esmDir': path.join(rootDir, 'my-dist', 'my-build', 'app'),
         'isBrowserBuild': true,
-        'legacyLoaderFile': join(rootDir, 'my-dist', 'my-build', 'app.js'),
+        'legacyLoaderFile': path.join(rootDir, 'my-dist', 'my-build', 'app.js'),
         'polyfills': true,
         'systemDir': undefined,
         'systemLoaderFile': undefined,
         'type': 'dist-lazy'},
         {
           'copyAssets': 'dist',
-          'dir': join(rootDir, 'my-dist', 'my-build', 'app'),
+          'dir': path.join(rootDir, 'my-dist', 'my-build', 'app'),
           'type': 'copy'
         },
         {
-          'file': join(rootDir, 'my-dist', 'my-build', 'app', 'undefined.css'),
+          'file': path.join(rootDir, 'my-dist', 'my-build', 'app', 'undefined.css'),
           'type': 'dist-global-styles'
         }
       ]);
@@ -84,8 +83,8 @@ describe('validateDistOutputTarget', () => {
     validateOutputTargetDist(config);
     const outputTarget = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     expect(outputTarget).toBeDefined();
-    expect(outputTarget.dir).toBe('/dist');
-    expect(outputTarget.buildDir).toBe('/dist');
+    expect(outputTarget.dir).toBe(path.join(rootDir, 'dist'));
+    expect(outputTarget.buildDir).toBe(path.join(rootDir, '/dist'));
     expect(outputTarget.empty).toBe(true);
   });
 

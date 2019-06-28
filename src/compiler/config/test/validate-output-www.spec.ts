@@ -44,7 +44,7 @@ describe('validateOutputTargetWww', () => {
         'globDirectory': path.join(rootDir, 'www', 'docs/'),
         'globIgnores': ['**/host.config.json', '**/*.system.entry.js', '**/*.system.js', '**/undefined.js', '**/undefined.esm.js', '**/undefined.css'],
         'globPatterns': ['*.html', '**/*.{js,css,json}'],
-        'swDest': path.join('/www', 'docs', 'sw.js')
+        'swDest': path.join(rootDir, 'www', 'docs', 'sw.js')
       },
       'type': 'www'
     }, {
