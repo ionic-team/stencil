@@ -57,6 +57,13 @@ export function createElement(ownerDocument: any, tagName: string) {
   return new MockHTMLElement(ownerDocument, tagName);
 }
 
+export function createElementNS(ownerDocument: any, tagName: string) {
+  if (SVG_TAGS.has(tagName)) {
+    return new MockSVGElement(ownerDocument, tagName);
+  }
+  return new MockElement(ownerDocument, tagName);
+}
+
 // This set is intentionally incomplete. More tags can be added as needed.
 const SVG_TAGS = new Set(['circle', 'line', 'g', 'path', 'svg', 'symbol', 'viewbox']);
 
