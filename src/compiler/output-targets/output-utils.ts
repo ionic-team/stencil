@@ -54,6 +54,10 @@ export function isOutputTargetDistCollection(o: d.OutputTarget): o is d.OutputTa
   return o.type === DIST_COLLECTION;
 }
 
+export function isOutputTargetCopy(o: d.OutputTarget): o is d.OutputTargetCopy {
+  return o.type === COPY;
+}
+
 export function isOutputTargetDistLazy(o: d.OutputTarget): o is d.OutputTargetDistLazy {
   return o.type === DIST_LAZY;
 }
@@ -129,13 +133,14 @@ export function canSkipOutputTargets(buildCtx: d.BuildCtx) {
   if (buildCtx.requiresFullBuild) {
     return false;
   }
-  if (buildCtx.isRebuild && (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges || buildCtx.hasHtmlChanges ||   buildCtx.hasCopyChanges)) {
+  if (buildCtx.isRebuild && (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges || buildCtx.hasHtmlChanges)) {
     return false;
   }
   return true;
 }
 
 export const ANGULAR = `angular`;
+export const COPY = 'copy';
 export const CUSTOM = `custom`;
 export const DIST = `dist`;
 export const DIST_COLLECTION = `dist-collection`;
@@ -156,6 +161,7 @@ export const WWW = `www`;
 
 export const VALID_TYPES = [
   ANGULAR,
+  COPY,
   CUSTOM,
   DIST,
   DIST_COLLECTION,

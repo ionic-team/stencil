@@ -1,13 +1,11 @@
 import * as d from '../../declarations';
 import { setBooleanConfig, setStringConfig } from './config-utils';
 import { validatePrerender } from './validate-prerender';
-import { validateResourcesUrl } from './validate-resources-url';
 import { validateServiceWorker } from './validate-service-worker';
 import { validateCopy } from './validate-copy';
-import { DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
+import { COPY, DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 import { URL } from 'url';
 import { buildError } from '@utils';
-
 
 export function validateOutputTargetWww(config: d.Config, diagnostics: d.Diagnostic[]) {
   const hasOutputTargets = Array.isArray(config.outputTargets);
@@ -63,13 +61,6 @@ function validateOutputTarget(config: d.Config, diagnostics: d.Diagnostic[], out
 
   setBooleanConfig(outputTarget, 'empty', null, DEFAULT_EMPTY_DIR);
   validatePrerender(config, diagnostics, outputTarget);
-
-  outputTarget.copy = validateCopy(outputTarget.copy, [
-    ...(config.copy || []),
-    ...DEFAULT_WWW_COPY,
-  ]);
-
-  outputTarget.resourcesUrl = validateResourcesUrl(outputTarget.resourcesUrl);
   validateServiceWorker(config, outputTarget);
 
   if (outputTarget.polyfills === undefined) {
@@ -81,12 +72,28 @@ function validateOutputTarget(config: d.Config, diagnostics: d.Diagnostic[], out
   const buildDir = outputTarget.buildDir;
   config.outputTargets.push({
     type: DIST_LAZY,
-    copyDir: buildDir,
     esmDir: buildDir,
     systemDir: buildDir,
     polyfills: outputTarget.polyfills,
     systemLoaderFile: config.sys.path.join(buildDir, `${config.fsNamespace}.js`),
     isBrowserBuild: true,
+  });
+
+  // Copy for dist
+  config.outputTargets.push({
+    type: COPY,
+    dir: buildDir,
+    copyAssets: 'dist'
+  });
+
+  // Copy for www
+  config.outputTargets.push({
+    type: COPY,
+    dir: outputTarget.dir,
+    copy: validateCopy(outputTarget.copy, [
+      ...(config.copy || []),
+      ...DEFAULT_WWW_COPY,
+    ]),
   });
 
   // Generate global style with original name

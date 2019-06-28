@@ -42,7 +42,6 @@ export interface BuildCtx {
   finish(): Promise<BuildResults>;
   globalStyle: string | undefined;
   hasConfigChanges: boolean;
-  hasCopyChanges: boolean;
   hasError: boolean;
   hasFinished: boolean;
   hasHtmlChanges: boolean;
@@ -64,7 +63,6 @@ export interface BuildCtx {
   rollupResults?: RollupResults;
   scriptsAdded: string[];
   scriptsDeleted: string[];
-  skipAssetsCopy: boolean;
   startTime: number;
   styleBuildCount: number;
   stylesPromise: Promise<void>;

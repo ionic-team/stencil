@@ -24,11 +24,55 @@ describe('validateDistOutputTarget', () => {
     };
     config.outputTargets = [outputTarget];
     validateOutputTargetDist(config);
-    expect(config.outputTargets).toHaveLength(5);
-    expect(outputTarget).toBeDefined();
-    expect(outputTarget.dir).toBe('/my-dist');
-    expect(outputTarget.buildDir).toBe('/my-dist/my-build');
-    expect(outputTarget.empty).toBe(false);
+    expect(config.outputTargets).toEqual([
+      {
+        'buildDir': '/my-dist/my-build',
+        'collectionDir': '/my-dist/collection',
+        'copy': [],
+        'dir': '/my-dist',
+        'empty': false,
+        'esmLoaderPath': '/my-dist/loader',
+        'resourcesUrl': undefined,
+        'type': 'dist',
+        'typesDir': '/my-dist/types'
+      },
+      {
+        'collectionDir': '/my-dist/collection',
+        'dir': '/my-dist',
+        'type': 'dist-collection'
+      },
+      {
+        'copy': [
+          {'src': '**/*.svg'},
+          {'src': '**/*.js'}
+        ],
+        'copyAssets': 'collection',
+        'dir': '/my-dist/collection',
+        'type': 'copy'
+      },
+      {
+        'dir': '/my-dist',
+        'type': 'dist-types',
+        'typesDir': '/my-dist/types'
+      },
+      {
+        'esmDir': '/my-dist/my-build/app',
+        'isBrowserBuild': true,
+        'legacyLoaderFile': '/my-dist/my-build/app.js',
+        'polyfills': true,
+        'systemDir': undefined,
+        'systemLoaderFile': undefined,
+        'type': 'dist-lazy'},
+        {
+          'copyAssets': 'dist',
+          'dir': '/my-dist/my-build/app',
+          'type': 'copy'
+        },
+        {
+          'file': '/my-dist/my-build/app/undefined.css',
+          'type': 'dist-global-styles'
+        }
+      ]);
   });
 
   it('should set defaults when outputTargets dist is empty', () => {

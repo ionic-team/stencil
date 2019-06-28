@@ -28,7 +28,6 @@ export class BuildContext implements d.BuildCtx {
   filesWritten: string[] = [];
   globalStyle: string = undefined;
   hasConfigChanges = false;
-  hasCopyChanges = false;
   hasFinished = false;
   hasHtmlChanges = false;
   hasPrintedResults = false;
@@ -46,7 +45,6 @@ export class BuildContext implements d.BuildCtx {
   requiresFullBuild = true;
   scriptsAdded: string[] = [];
   scriptsDeleted: string[] = [];
-  skipAssetsCopy = false;
   startTime = Date.now();
   styleBuildCount = 0;
   stylesPromise: Promise<void> = null;

@@ -11,7 +11,7 @@ export interface StencilSystem {
     packageDir?: string;
     distDir?: string;
   };
-  copy?(copyTasks: d.CopyTask[]): Promise<d.CopyResults>;
+  copy?(copyTasks: Required<d.CopyTask>[], srcDir: string): Promise<d.CopyResults>;
   color?: any;
   cloneDocument?(doc: Document): Document;
   createFsWatcher?(config: d.Config, fs: d.FileSystem, events: d.BuildEvents): Promise<d.FsWatcher>;

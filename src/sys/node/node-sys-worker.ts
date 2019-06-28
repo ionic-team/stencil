@@ -15,8 +15,8 @@ const Terser = require('terser/dist/bundle.js');
 export class NodeSystemWorker {
   workerContext: d.WorkerContext = {};
 
-  copy(copyTasks: d.CopyTask[]) {
-    return copyTasksWorker(copyTasks);
+  copy(copyTasks: Required<d.CopyTask>[], srcDir: string) {
+    return copyTasksWorker(copyTasks, srcDir);
   }
 
   optimizeCss(inputOpts: d.OptimizeCssInput) {

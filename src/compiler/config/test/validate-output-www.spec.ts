@@ -1,6 +1,11 @@
 import * as d from '@stencil/core/declarations';
-import { validateOutputTargetWww } from '../validate-outputs-www';
-import { isOutputTargetWww } from '../../output-targets/output-utils';
+import {
+  validateOutputTargetWww
+} from '../validate-outputs-www';
+import {
+  isOutputTargetCopy,
+  isOutputTargetWww
+} from '../../output-targets/output-utils';
 import path from 'path';
 
 
@@ -18,73 +23,57 @@ describe('validateOutputTargetWww', () => {
     } as any;
   });
 
-  it('should have default copy tasks', () => {
+  it('should have default value', () => {
     const outputTarget: d.OutputTargetWww = {
       type: 'www',
       dir: path.join('www', 'docs')
     };
     config.outputTargets = [outputTarget];
-    validateOutputTargetWww(config);
+    validateOutputTargetWww(config, []);
 
-    expect(outputTarget.copy).toEqual([
-      {'src': 'assets', 'warn': false},
-      {'src': 'manifest.json', 'warn': false}
-    ]);
-  });
-
-  it('should add copy tasks', () => {
-    const outputTarget: d.OutputTargetWww = {
-      type: 'www',
-      dir: path.join('www', 'docs'),
-      copy: [{
-        src: 'index-modules.html',
-        dest: 'index-2.html'
+    expect(config.outputTargets).toEqual([{
+      'appDir': '/www/docs/',
+      'baseUrl': '/',
+      'buildDir': '/www/docs/build',
+      'dir': '/www/docs',
+      'empty': true,
+      'indexHtml': '/www/docs/index.html',
+      'polyfills': true,
+      'serviceWorker': {
+        'dontCacheBustURLsMatching': /p-\w{8}/,
+        'globDirectory': '/www/docs/',
+        'globIgnores': ['**/host.config.json', '**/*.system.entry.js', '**/*.system.js', '**/undefined.js', '**/undefined.esm.js', '**/undefined.css'],
+        'globPatterns': ['*.html', '**/*.{js,css,json}'],
+        'swDest': '/www/docs/sw.js'
       },
-    ]
-    };
-    config.outputTargets = [outputTarget];
-    validateOutputTargetWww(config);
-
-    expect(outputTarget.copy).toEqual([
-      {
-        src: 'index-modules.html',
-        dest: 'index-2.html'
-      },
-      {'src': 'assets', 'warn': false},
-      {'src': 'manifest.json', 'warn': false}
-    ]);
+      'type': 'www'
+    }, {
+      'esmDir': '/www/docs/build',
+      'isBrowserBuild': true,
+      'polyfills': true,
+      'systemDir': '/www/docs/build',
+      'systemLoaderFile': '/www/docs/build/undefined.js',
+      'type': 'dist-lazy'
+    }, {
+      'copyAssets': 'dist',
+      'dir': '/www/docs/build',
+      'type': 'copy'
+    }, {
+      'copy': [{
+        'src': 'assets',
+        'warn': false
+      }, {
+        'src': 'manifest.json',
+        'warn': false
+      }],
+      'dir': '/www/docs',
+      'type': 'copy'
+    }, {
+      'file': '/www/docs/build/undefined.css',
+      'type': 'dist-global-styles'
+    }]);
   });
 
-  it('should replace copy tasks', () => {
-    const outputTarget: d.OutputTargetWww = {
-      type: 'www',
-      dir: path.join('www', 'docs'),
-      copy: [{
-        src: 'assets',
-        dest: 'assets2'
-      },
-    ]
-    };
-    config.outputTargets = [outputTarget];
-    validateOutputTargetWww(config);
-
-    expect(outputTarget.copy).toEqual([
-      {'src': 'assets', 'dest': 'assets2'},
-      {'src': 'manifest.json', 'warn': false}
-    ]);
-  });
-
-  it('should disable copy tasks', () => {
-    const outputTarget: d.OutputTargetWww = {
-      type: 'www',
-      dir: path.join('www', 'docs'),
-      copy: null
-    };
-    config.outputTargets = [outputTarget];
-    validateOutputTargetWww(config);
-
-    expect(outputTarget.copy).toEqual([]);
-  });
 
   it('should www with sub directory', () => {
     const outputTarget: d.OutputTargetWww = {
@@ -92,7 +81,7 @@ describe('validateOutputTargetWww', () => {
       dir: path.join('www', 'docs')
     };
     config.outputTargets = [outputTarget];
-    validateOutputTargetWww(config);
+    validateOutputTargetWww(config, []);
 
     expect(outputTarget.dir).toBe(path.join(rootDir, 'www', 'docs'));
     expect(outputTarget.appDir).toBe(path.join(rootDir, 'www', 'docs/'));
@@ -109,7 +98,7 @@ describe('validateOutputTargetWww', () => {
       empty: false
     };
     config.outputTargets = [outputTarget];
-    validateOutputTargetWww(config);
+    validateOutputTargetWww(config, []);
 
     expect(outputTarget.type).toBe('www');
     expect(outputTarget.dir).toBe(path.join(rootDir, 'my-www'));
@@ -119,8 +108,8 @@ describe('validateOutputTargetWww', () => {
   });
 
   it('should default to add www when outputTargets is undefined', () => {
-    validateOutputTargetWww(config);
-    expect(config.outputTargets).toHaveLength(3);
+    validateOutputTargetWww(config, []);
+    expect(config.outputTargets).toHaveLength(5);
 
     const outputTarget = config.outputTargets.find(isOutputTargetWww);
     expect(outputTarget.dir).toBe(path.join(rootDir, 'www'));
@@ -131,7 +120,7 @@ describe('validateOutputTargetWww', () => {
 
   it('should default to not add www when outputTargets exists, but without www', () => {
     config.outputTargets = [];
-    validateOutputTargetWww(config);
+    validateOutputTargetWww(config, []);
     expect(config.outputTargets.some(isOutputTargetWww)).toBe(false);
   });
 
@@ -143,7 +132,7 @@ describe('validateOutputTargetWww', () => {
         baseUrl: '/docs',
       };
       config.outputTargets = [outputTarget];
-      validateOutputTargetWww(config);
+      validateOutputTargetWww(config, []);
 
       expect(outputTarget.type).toBe('www');
       expect(outputTarget.dir).toBe(path.join(rootDir, 'my-www'));
@@ -160,7 +149,7 @@ describe('validateOutputTargetWww', () => {
         baseUrl: '/docs/',
       };
       config.outputTargets = [outputTarget];
-      validateOutputTargetWww(config);
+      validateOutputTargetWww(config, []);
 
       expect(outputTarget.type).toBe('www');
       expect(outputTarget.dir).toBe(path.join(rootDir, 'www'));
@@ -178,7 +167,7 @@ describe('validateOutputTargetWww', () => {
         baseUrl: 'https://example.com/docs',
       };
       config.outputTargets = [outputTarget];
-      validateOutputTargetWww(config);
+      validateOutputTargetWww(config, []);
 
       expect(outputTarget.type).toBe('www');
       expect(outputTarget.dir).toBe(path.join(rootDir, 'www'));
@@ -190,4 +179,94 @@ describe('validateOutputTargetWww', () => {
     });
   });
 
+  describe('copy', () => {
+
+    it('should add copy tasks', () => {
+      const outputTarget: d.OutputTargetWww = {
+        type: 'www',
+        dir: path.join('www', 'docs'),
+        copy: [{
+          src: 'index-modules.html',
+          dest: 'index-2.html'
+        }]
+      };
+      config.outputTargets = [outputTarget];
+      validateOutputTargetWww(config, []);
+
+      const copyTargets = config.outputTargets.filter(isOutputTargetCopy);
+      expect(copyTargets).toEqual([{
+        'copyAssets': 'dist',
+        'dir': '/www/docs/build',
+        'type': 'copy'
+      }, {
+        'copy': [{
+          'dest': 'index-2.html',
+          'src': 'index-modules.html'
+        }, {
+          'src': 'assets',
+          'warn': false
+        }, {
+          'src': 'manifest.json',
+          'warn': false
+        }],
+        'dir': '/www/docs',
+        'type': 'copy'
+      }]);
+    });
+
+    it('should replace copy tasks', () => {
+      const outputTarget: d.OutputTargetWww = {
+        type: 'www',
+        dir: path.join('www', 'docs'),
+        copy: [{
+          src: 'assets',
+          dest: 'assets2'
+        }]
+      };
+      config.outputTargets = [outputTarget];
+      validateOutputTargetWww(config, []);
+
+      const copyTargets = config.outputTargets.filter(isOutputTargetCopy);
+      expect(copyTargets).toEqual([{
+          'copyAssets': 'dist',
+          'dir': '/www/docs/build',
+          'type': 'copy'
+        },
+        {
+          'copy': [{
+              'dest': 'assets2',
+              'src': 'assets'
+            },
+            {
+              'src': 'manifest.json',
+              'warn': false
+            }
+          ],
+          'dir': '/www/docs',
+          'type': 'copy'
+        }
+      ]);
+    });
+
+    it('should disable copy tasks', () => {
+      const outputTarget: d.OutputTargetWww = {
+        type: 'www',
+        dir: path.join('www', 'docs'),
+        copy: null
+      };
+      config.outputTargets = [outputTarget];
+      validateOutputTargetWww(config, []);
+
+      const copyTargets = config.outputTargets.filter(isOutputTargetCopy);
+      expect(copyTargets).toEqual([{
+        'copyAssets': 'dist',
+        'dir': '/www/docs/build',
+        'type': 'copy'
+      }, {
+        'copy': [],
+        'dir': '/www/docs',
+        'type': 'copy'
+      }]);
+    });
+  });
 });

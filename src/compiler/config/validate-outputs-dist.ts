@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
-import { DIST_COLLECTION, DIST_GLOBAL_STYLES, DIST_LAZY, DIST_LAZY_LOADER, getComponentsDtsTypesFilePath, isOutputTargetDist, DIST_TYPES } from '../output-targets/output-utils';
+import { DIST_COLLECTION, DIST_GLOBAL_STYLES, DIST_LAZY, DIST_LAZY_LOADER, getComponentsDtsTypesFilePath, isOutputTargetDist, DIST_TYPES, COPY } from '../output-targets/output-utils';
 import { normalizePath } from '@utils';
-import { validateResourcesUrl } from './validate-resources-url';
 import { validateCopy } from './validate-copy';
 
 
@@ -11,8 +10,6 @@ export function validateOutputTargetDist(config: d.Config) {
   const distOutputTargets = config.outputTargets.filter(isOutputTargetDist);
 
   distOutputTargets.forEach(outputTarget => {
-
-    outputTarget.resourcesUrl = validateResourcesUrl(outputTarget.resourcesUrl);
 
     if (typeof outputTarget.dir !== 'string') {
       outputTarget.dir = DEFAULT_DIR;
@@ -65,6 +62,11 @@ export function validateOutputTargetDist(config: d.Config) {
         type: DIST_COLLECTION,
         dir: outputTarget.dir,
         collectionDir: outputTarget.collectionDir,
+      });
+      config.outputTargets.push({
+        type: COPY,
+        dir: outputTarget.collectionDir,
+        copyAssets: 'collection',
         copy: [
           ...outputTarget.copy,
           { src: '**/*.svg' },
@@ -85,13 +87,17 @@ export function validateOutputTargetDist(config: d.Config) {
     // Lazy build for CDN in dist
     config.outputTargets.push({
       type: DIST_LAZY,
-      copyDir: lazyDir,
       esmDir: lazyDir,
       systemDir: config.buildEs5 ? lazyDir : undefined,
       systemLoaderFile: config.buildEs5 ? path.join(lazyDir, namespace + '.js') : undefined,
       legacyLoaderFile: path.join(outputTarget.buildDir, namespace + '.js'),
       polyfills: true,
       isBrowserBuild: true,
+    });
+    config.outputTargets.push({
+      type: COPY,
+      dir: lazyDir,
+      copyAssets: 'dist'
     });
 
     // Emit global styles

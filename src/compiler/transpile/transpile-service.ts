@@ -400,6 +400,10 @@ export function isFileIncludePath(config: d.Config, readPath: string) {
     return false;
   }
 
+  if (!/\.(ts|tsx|js|mjs|jsx)$/.test(readPath)) {
+    return false;
+  }
+
   for (var i = 0; i < config.excludeSrc.length; i++) {
     if (minimatch(readPath, config.excludeSrc[i])) {
       // this file is a file we want to exclude

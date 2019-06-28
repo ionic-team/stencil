@@ -134,8 +134,8 @@ export class NodeSystem implements d.StencilSystem {
     };
   }
 
-  async copy(copyTasks: d.CopyTask[]): Promise<d.CopyResults> {
-    return this.sysWorker.run('copy', [copyTasks], { isLongRunningTask: true });
+  async copy(copyTasks: d.CopyTask[], srcDir: string): Promise<d.CopyResults> {
+    return this.sysWorker.run('copy', [copyTasks, srcDir], { isLongRunningTask: true });
   }
 
   createDocument(html: string) {
