@@ -85,7 +85,6 @@ async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): 
 
 
 function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, globRelPath: string): Required<d.CopyTask> {
-  console.log(copyTask.dest);
   return {
     src: path.join(srcDir, globRelPath),
     dest: path.join(copyTask.dest, globRelPath),

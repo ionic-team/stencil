@@ -6,7 +6,7 @@ import {
   isOutputTargetCopy,
   isOutputTargetWww
 } from '../../output-targets/output-utils';
-import path from 'path';
+import path, { join } from 'path';
 
 
 describe('validateOutputTargetWww', () => {
@@ -32,31 +32,31 @@ describe('validateOutputTargetWww', () => {
     validateOutputTargetWww(config, []);
 
     expect(config.outputTargets).toEqual([{
-      'appDir': '/www/docs/',
+      'appDir': path.join(rootDir, 'www', 'docs/'),
       'baseUrl': '/',
-      'buildDir': '/www/docs/build',
-      'dir': '/www/docs',
+      'buildDir': path.join(rootDir, 'www', 'docs', 'build'),
+      'dir': path.join(rootDir, 'www', 'docs'),
       'empty': true,
-      'indexHtml': '/www/docs/index.html',
+      'indexHtml': path.join(rootDir, 'www', 'docs', 'index.html'),
       'polyfills': true,
       'serviceWorker': {
         'dontCacheBustURLsMatching': /p-\w{8}/,
-        'globDirectory': '/www/docs/',
+        'globDirectory': path.join(rootDir, 'www', 'docs/'),
         'globIgnores': ['**/host.config.json', '**/*.system.entry.js', '**/*.system.js', '**/undefined.js', '**/undefined.esm.js', '**/undefined.css'],
         'globPatterns': ['*.html', '**/*.{js,css,json}'],
-        'swDest': '/www/docs/sw.js'
+        'swDest': path.join('/www', 'docs', 'sw.js')
       },
       'type': 'www'
     }, {
-      'esmDir': '/www/docs/build',
+      'esmDir': path.join(rootDir, 'www', 'docs', 'build'),
       'isBrowserBuild': true,
       'polyfills': true,
-      'systemDir': '/www/docs/build',
-      'systemLoaderFile': '/www/docs/build/undefined.js',
+      'systemDir': path.join(rootDir, 'www', 'docs', 'build'),
+      'systemLoaderFile': path.join(rootDir, '/www/docs/build/undefined.js'),
       'type': 'dist-lazy'
     }, {
       'copyAssets': 'dist',
-      'dir': '/www/docs/build',
+      'dir': path.join(rootDir, 'www', 'docs', 'build'),
       'type': 'copy'
     }, {
       'copy': [{
@@ -66,10 +66,10 @@ describe('validateOutputTargetWww', () => {
         'src': 'manifest.json',
         'warn': false
       }],
-      'dir': '/www/docs',
+      'dir': path.join(rootDir, 'www', 'docs'),
       'type': 'copy'
     }, {
-      'file': '/www/docs/build/undefined.css',
+      'file': path.join(rootDir, 'www', 'docs', 'build', 'undefined.css'),
       'type': 'dist-global-styles'
     }]);
   });
@@ -196,7 +196,7 @@ describe('validateOutputTargetWww', () => {
       const copyTargets = config.outputTargets.filter(isOutputTargetCopy);
       expect(copyTargets).toEqual([{
         'copyAssets': 'dist',
-        'dir': '/www/docs/build',
+        'dir': join(rootDir, 'www', 'docs', 'build'),
         'type': 'copy'
       }, {
         'copy': [{
@@ -209,7 +209,7 @@ describe('validateOutputTargetWww', () => {
           'src': 'manifest.json',
           'warn': false
         }],
-        'dir': '/www/docs',
+        'dir': join(rootDir, 'www', 'docs'),
         'type': 'copy'
       }]);
     });
@@ -229,7 +229,7 @@ describe('validateOutputTargetWww', () => {
       const copyTargets = config.outputTargets.filter(isOutputTargetCopy);
       expect(copyTargets).toEqual([{
           'copyAssets': 'dist',
-          'dir': '/www/docs/build',
+          'dir': join(rootDir, 'www', 'docs', 'build'),
           'type': 'copy'
         },
         {
@@ -242,7 +242,7 @@ describe('validateOutputTargetWww', () => {
               'warn': false
             }
           ],
-          'dir': '/www/docs',
+          'dir': join(rootDir, 'www', 'docs'),
           'type': 'copy'
         }
       ]);
@@ -260,11 +260,11 @@ describe('validateOutputTargetWww', () => {
       const copyTargets = config.outputTargets.filter(isOutputTargetCopy);
       expect(copyTargets).toEqual([{
         'copyAssets': 'dist',
-        'dir': '/www/docs/build',
+        'dir': join(rootDir, 'www', 'docs', 'build'),
         'type': 'copy'
       }, {
         'copy': [],
-        'dir': '/www/docs',
+        'dir': join(rootDir, 'www', 'docs'),
         'type': 'copy'
       }]);
     });
