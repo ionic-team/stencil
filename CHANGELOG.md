@@ -1,3 +1,31 @@
+## 🎀 [1.1.3](https://github.com/ionic-team/stencil/compare/v1.1.2...v1.1.3) (2019-06-28)
+
+
+### Bug Fixes
+
+* **copy:** copy files on watch ([3ea354a](https://github.com/ionic-team/stencil/commit/3ea354a))
+* **copy:** glob copy ([f39b376](https://github.com/ionic-team/stencil/commit/f39b376))
+* **ie11:** remove unnecessary polyfills ([fb6606d](https://github.com/ionic-team/stencil/commit/fb6606d)), closes [#1668](https://github.com/ionic-team/stencil/issues/1668)
+* **runtime:** prevent call Watch before willLoad ([91fb61d](https://github.com/ionic-team/stencil/commit/91fb61d))
+* **runtime:** prevent forceUpdate before first render ([67b4ae8](https://github.com/ionic-team/stencil/commit/67b4ae8))
+* **vdom:** relocation bug ([e953e22](https://github.com/ionic-team/stencil/commit/e953e22))
+* back-compatibility with old stencil runtime ([10a5704](https://github.com/ionic-team/stencil/commit/10a5704))
+* core-js only targeting ie11 ([07a5296](https://github.com/ionic-team/stencil/commit/07a5296))
+* update ComponentInterface definition ([e5bae1b](https://github.com/ionic-team/stencil/commit/e5bae1b))
+
+
+### Features
+
+* generate empty entry point for loader ([144e966](https://github.com/ionic-team/stencil/commit/144e966))
+
+
+### Performance Improvements
+
+* only inline <1KB entry-point ([a2a8033](https://github.com/ionic-team/stencil/commit/a2a8033))
+* use JSON.parse() when metadata is > 10KB ([ab0e9d6](https://github.com/ionic-team/stencil/commit/ab0e9d6))
+
+
+
 ## 🐏 [1.1.2](https://github.com/ionic-team/stencil/compare/v1.1.1...v1.1.2) (2019-06-25)
 
 
