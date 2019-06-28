@@ -77,17 +77,18 @@ function getSrcAbsPath(srcDir: string, src: string) {
 
 async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): Promise<Required<d.CopyTask>[]> {
   const files = await asyncGlob(copyTask.src, {
-    nodir: true,
-    cwd: srcDir
+    cwd: srcDir,
+    nodir: true
   });
   return files.map(globRelPath => createGlobCopyTask(copyTask, srcDir, globRelPath));
 }
 
 
 function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, globRelPath: string): Required<d.CopyTask> {
+  console.log(copyTask.dest);
   return {
     src: path.join(srcDir, globRelPath),
-    dest: path.join(copyTask.dest, path.basename(globRelPath)),
+    dest: path.join(copyTask.dest, globRelPath),
     warn: copyTask.warn
   };
 }
