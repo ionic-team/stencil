@@ -163,6 +163,18 @@ export class MockNode {
 }
 
 
+export class MockNodeList {
+  childNodes: MockNode[];
+  length: number;
+  ownerDocument: any;
+
+  constructor(ownerDocument: any, childNodes: MockNode[], length: number) {
+    this.ownerDocument = ownerDocument;
+    this.childNodes = childNodes;
+    this.length = length;
+  }
+}
+
 const attrsMap = new WeakMap<MockElement, MockAttributeMap>();
 const shadowRootMap = new WeakMap<MockElement, ShadowRoot>();
 const stylesMap = new WeakMap<MockElement, CSSStyleDeclaration>();
