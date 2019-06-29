@@ -124,7 +124,7 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
   return page;
 }
 
-async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer.NavigationOptions) {
+async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer.NavigationOptions = {}) {
 
   if (page.isClosed()) {
     throw new Error('e2eGoTo unavailable: page already closed');
