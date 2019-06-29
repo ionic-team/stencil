@@ -37,11 +37,11 @@ describe('SVG element', () => {
     expect(path.getTotalLength()).toEqual(0);
   });
 
-  it('allows access to the isPoingInFill() method', () => {
+  it('allows access to the isPointInFill() method', () => {
     expect(path.isPointInFill()).toEqual(false);
   });
 
-  it('allows access to the isPoingInStroke() method', () => {
+  it('allows access to the isPointInStroke() method', () => {
     expect(path.isPointInStroke()).toEqual(false);
   });
 });
