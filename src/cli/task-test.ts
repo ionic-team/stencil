@@ -41,7 +41,8 @@ export async function taskTest(config: d.Config) {
     await config.sys.lazyRequire.ensure(
       config.logger,
       config.rootDir,
-      ensureModuleIds
+      ensureModuleIds,
+      config.lazyDependencies
     );
 
     const passed = await testing.runTests();

@@ -81,7 +81,7 @@ export interface Semver {
 
 
 export interface LazyRequire {
-  ensure(logger: d.Logger, fromDir: string, moduleIds: string[]): Promise<void>;
+  ensure(logger: d.Logger, fromDir: string, moduleIds: string[] , lazyDependencies: boolean): Promise<void>;
   require(moduleId: string): any;
   getModulePath(moduleId: string): string;
 }
