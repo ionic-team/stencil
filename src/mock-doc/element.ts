@@ -15,6 +15,9 @@ export function createElement(ownerDocument: any, tagName: string) {
     case 'a':
       return new MockAnchorElement(ownerDocument);
 
+    case 'base':
+      return new MockBaseElement(ownerDocument);
+
     case 'button':
       return new MockButtonElement(ownerDocument);
 
@@ -225,6 +228,19 @@ class MockSVGElement extends MockElement {
   getTotalLength(): number { return 0; }
 }
 
+
+export class MockBaseElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'base');
+  }
+
+  get href() {
+    return fullUrl(this, 'href');
+  }
+  set href(value: string) {
+    this.setAttribute('href', value);
+  }
+}
 
 export class MockTemplateElement extends MockHTMLElement {
   content: MockDocumentFragment;

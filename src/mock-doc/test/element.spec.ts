@@ -66,6 +66,25 @@ describe('element', () => {
     expect(titleElm.textContent).toBe('Hello Text');
   });
 
+  it('document.baseURI', () => {
+    const win = new MockWindow(`
+    <html>
+      <head>
+        <base href="/en">
+      </head>
+    </head>
+    `);
+    win.location.href = 'http://stenciljs.com/path/to/page';
+    expect(win.document.baseURI).toBe('http://stenciljs.com/en');
+    expect(win.document.URL).toBe('http://stenciljs.com/path/to/page');
+    expect(win.document.location.href).toBe('http://stenciljs.com/path/to/page');
+
+    win.document.querySelector('base').remove();
+    expect(win.document.baseURI).toBe('http://stenciljs.com/path/to/page');
+    expect(win.document.URL).toBe('http://stenciljs.com/path/to/page');
+    expect(win.document.location.href).toBe('http://stenciljs.com/path/to/page');
+  });
+
   it('isConnected nested true', () => {
     const elmParent = document.createElement('div');
     const elmChild = document.createElement('div');

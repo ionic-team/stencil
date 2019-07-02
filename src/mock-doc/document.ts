@@ -1,9 +1,9 @@
+import { MockComment } from './comment-node';
 import { NODE_NAMES, NODE_TYPES } from './constants';
-import { createElement, createElementNS } from './element';
 import { MockDocumentFragment } from './document-fragment';
 import { MockDocumentTypeNode } from './document-type-node';
 import { MockElement, MockHTMLElement, MockTextNode, resetElement } from './node';
-import { MockComment } from './comment-node';
+import { MockBaseElement, createElement, createElementNS } from './element';
 import { parseDocumentUtil } from './parse-util';
 import { parseHtmlToFragment } from './parse-html';
 import { resetEventListeners } from './event';
@@ -57,15 +57,15 @@ export class MockDocument extends MockHTMLElement {
   }
 
   get baseURI() {
-    if (this.defaultView != null) {
-      return (this.defaultView as Window).location.href;
+    const baseNode = this.head.childNodes.find(node => node.nodeName === 'BASE') as MockBaseElement;
+    if (baseNode) {
+      return baseNode.href;
     }
-    return '';
+    return this.URL;
   }
-  set baseURI(value: string) {
-    if (this.defaultView != null) {
-      (this.defaultView as Window).location.href = value;
-    }
+
+  get URL() {
+    return this.location.href;
   }
 
   get documentElement() {

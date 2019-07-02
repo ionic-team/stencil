@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { getComponent, getHostRef, plt } from '@platform';
+import { doc, getComponent, getHostRef, plt } from '@platform';
 import { hydrateComponent } from './hydrate-component';
 import { insertVdomAnnotations, postUpdateComponent } from '@runtime';
 
@@ -9,7 +9,7 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
     hydratedCount: 0,
     hydratedComponents: []
   };
-  plt.$resourcesUrl$ = new URL(opts.resourcesUrl || '/', win.location.href).href;
+  plt.$resourcesUrl$ = new URL(opts.resourcesUrl || './', doc.baseURI).href;
 
 
   try {
