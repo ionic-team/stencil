@@ -92,6 +92,7 @@ export interface HostRef {
   $onReadyPromise$?: Promise<any>;
   $onReadyResolve$?: (elm: any) => void;
   $vnode$?: d.VNode;
+  $queuedListeners$?: [string, any][];
   $rmListeners$?: () => void;
   $modeName$?: string;
 }

@@ -7,10 +7,10 @@ import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 
 
-export const safeCall = async (instance: any, method: string) => {
+export const safeCall = async (instance: any, method: string, arg?: any) => {
   if (instance && instance[method]) {
     try {
-      await instance[method]();
+      await instance[method](arg);
     } catch (e) {
       consoleError(e);
     }
@@ -23,8 +23,12 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
   }
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   if (isInitialLoad) {
-    if (BUILD.watchCallback) {
-      hostRef.$flags$ |= HOST_FLAGS.isWatchReady;
+    if (BUILD.watchCallback || BUILD.hostListener) {
+      hostRef.$flags$ |= HOST_FLAGS.isMethodsCallable;
+    }
+    if (BUILD.hostListener && hostRef.$queuedListeners$) {
+      hostRef.$queuedListeners$.forEach(([methodName, event]) => safeCall(instance, methodName, event));
+      hostRef.$queuedListeners$ = null;
     }
     emitLifecycleEvent(elm, 'componentWillLoad');
     if (BUILD.cmpWillLoad) {

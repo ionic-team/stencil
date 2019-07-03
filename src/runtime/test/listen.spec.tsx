@@ -133,6 +133,57 @@ describe('listen', () => {
     expect(root).toEqualHtml(`
       <cmp-a>1,2,4,5,6</cmp-a>
     `);
-
   });
+
+  it('listen before load', async () => {
+    let log = '';
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      @Listen('event')
+      onEvent(ev: CustomEvent<string>) {
+        log += ev.detail;
+      }
+
+      connectedCallback() {
+        log += 'connectedCallback ';
+      }
+
+      componentWillLoad() {
+        log += 'componentWillLoad ';
+      }
+
+      componentDidLoad() {
+        log += 'componentDidLoad ';
+      }
+
+      render() {
+        return `${log}`;
+      }
+    }
+
+    const { doc, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+      html: '',
+    });
+
+    const a = doc.createElement('cmp-a');
+    doc.body.appendChild(a);
+
+    a.dispatchEvent(new CustomEvent('event', {
+      detail: 'event1 '
+    }));
+    a.dispatchEvent(new CustomEvent('event', {
+      detail: 'event2 '
+    }));
+    a.dispatchEvent(new CustomEvent('event', {
+      detail: 'event3 '
+    }));
+
+    await Promise.resolve();
+    expect(log).toEqualHtml('');
+
+    await waitForChanges();
+    expect(log).toEqualHtml(`connectedCallback event1 event2 event3 componentWillLoad componentDidLoad`);
+  });
+
 });

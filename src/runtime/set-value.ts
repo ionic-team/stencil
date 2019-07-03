@@ -24,7 +24,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
 
     if (!BUILD.lazyLoad || hostRef.$lazyInstance$) {
       // get an array of method names of watch functions to call
-      if (BUILD.watchCallback && cmpMeta.$watchers$ && flags & HOST_FLAGS.isWatchReady) {
+      if (BUILD.watchCallback && cmpMeta.$watchers$ && flags & HOST_FLAGS.isMethodsCallable) {
         const watchMethods = cmpMeta.$watchers$[propName];
 
         if (watchMethods) {
