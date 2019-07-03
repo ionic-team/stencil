@@ -20,7 +20,8 @@ export function getComponentAssetsCopyTasks(config: d.Config, buildCtx: d.BuildC
           copyTasks.push({
             src: assetsMeta.absolutePath,
             dest: config.sys.path.join(dest, assetsMeta.cmpRelativePath),
-            warn: false
+            warn: false,
+            relative: false,
           });
         });
       } else if (!cmp.excludeFromCollection && !cmp.isCollectionDependency) {
@@ -32,7 +33,8 @@ export function getComponentAssetsCopyTasks(config: d.Config, buildCtx: d.BuildC
           copyTasks.push({
             src: assetsMeta.absolutePath,
             dest: collectionDirDestination,
-            warn: false
+            warn: false,
+            relative: false,
           });
         });
       }

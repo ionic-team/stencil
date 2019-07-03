@@ -19,7 +19,8 @@ export async function copyTasksWorker(copyTasks: Required<d.CopyTask>[], srcDir:
     copyTasks = flatOne(await Promise.all(
       copyTasks.map(task => processGlobs(task, srcDir))
     ));
-    copyTasks = unique(copyTasks, task => `${task.src}:::${task.dest}`);
+
+    copyTasks = unique(copyTasks, task => task.dest);
 
     const allCopyTasks: d.CopyTask[] = [];
 
@@ -63,8 +64,11 @@ async function processGlobs(copyTask: Required<d.CopyTask>, srcDir: string): Pro
     ? await processGlobTask(copyTask, srcDir)
     : [{
       src: getSrcAbsPath(srcDir, copyTask.src),
-      dest: copyTask.dest,
-      warn: copyTask.warn
+      dest: copyTask.relative
+        ? path.join(copyTask.dest, copyTask.src)
+        : copyTask.dest,
+      warn: copyTask.warn,
+      relative: copyTask.relative
     }];
 }
 
@@ -85,10 +89,15 @@ async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): 
 
 
 function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, globRelPath: string): Required<d.CopyTask> {
+  const dest = path.join(copyTask.dest, copyTask.relative
+    ? globRelPath
+    : path.basename(globRelPath)
+  );
   return {
     src: path.join(srcDir, globRelPath),
-    dest: path.join(copyTask.dest, globRelPath),
-    warn: copyTask.warn
+    dest,
+    warn: copyTask.warn,
+    relative: copyTask.relative
   };
 }
 

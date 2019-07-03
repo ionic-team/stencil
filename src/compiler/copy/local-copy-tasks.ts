@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import isGlob from 'is-glob';
 
 export function getSrcAbsPath(config: d.Config, src: string) {
   if (config.sys.path.isAbsolute(src)) {
@@ -23,7 +22,5 @@ export function getDestAbsPath(config: d.Config, src: string, destAbsPath: strin
     throw new Error(`copy task, "dest" property must exist if "src" property is an absolute path: ${src}`);
   }
 
-  return isGlob(src)
-    ? destAbsPath
-    : config.sys.path.join(destAbsPath, src);
+  return destAbsPath;
 }
