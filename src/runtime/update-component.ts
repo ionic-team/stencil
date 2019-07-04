@@ -58,13 +58,10 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   // has already fired off its lifecycle update then
   // fire off the initial update
   const update = () => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
-  if (promise) {
-    return promise.then(BUILD.taskQueue
-      ? () => writeTask(update)
-      : update
-    );
-  }
-  return update();
+  return then(promise, BUILD.taskQueue
+    ? () => writeTask(update)
+    : update
+  );
 };
 
 const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, instance: any, isInitialLoad: boolean) => {

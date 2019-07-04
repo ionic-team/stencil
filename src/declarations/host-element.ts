@@ -73,6 +73,7 @@ export interface CustomElementsDefineOptions {
   exclude?: string[];
   resourcesUrl?: string;
   syncQueue?: boolean;
+  jmp?: (c: Function) => any;
   raf?: (c: FrameRequestCallback) => number;
   ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;

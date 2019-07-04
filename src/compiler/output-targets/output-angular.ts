@@ -42,7 +42,7 @@ async function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
   const imports = `/* tslint:disable */
 /* auto-generated angular directive proxies */
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, NgZone } from '@angular/core';`;
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, NgZone } from '@angular/core';`;
 
   const sourceImports = !outputTarget.componentCorePackage ?
     `import { Components } from '${componentsTypeFile}';` :
@@ -99,7 +99,8 @@ export class ${tagNameAsPascal} {`];
   });
 
   lines.push('  protected el: HTMLElement;');
-  lines.push(`  constructor(r: ElementRef, protected z: NgZone) {
+  lines.push(`  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
+    c.detach();
     this.el = r.nativeElement;`);
   if (hasOutputs) {
     lines.push(`    proxyOutputs(this, this.el, ['${outputs.join(`', '`)}']);`);
