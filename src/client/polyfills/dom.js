@@ -55,16 +55,13 @@ if (typeof document.baseURI !== 'string') {
 
 // Polyfill CustomEvent
 if (typeof window.CustomEvent !== 'function') {
-  function CustomEvent(event, params) {
+  window.CustomEvent = function CustomEvent(event, params) {
     params = params || { bubbles: false, cancelable: false, detail: undefined };
     var evt = document.createEvent( 'CustomEvent' );
     evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
     return evt;
   }
-
-  CustomEvent.prototype = window.Event.prototype;
-
-  window.CustomEvent = CustomEvent;
+  window.CustomEvent.prototype = window.Event.prototype;
 }
 
 // Event.composedPath
