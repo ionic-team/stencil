@@ -1,14 +1,14 @@
+import * as d from '../declarations';
 import { disconnectedCallback } from './disconnected-callback';
-import { proxyComponent } from './proxy-component';
 import { CMP_FLAGS } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
-import * as d from '../declarations';
+import { proxyComponent } from './proxy-component';
 import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
-import { postUpdateComponent, forceUpdate } from './update-component';
+import { forceUpdate, postUpdateComponent } from './update-component';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
@@ -84,11 +84,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         connectedCallback() {
-          connectedCallback(this, cmpMeta);
+          plt.jmp(() => connectedCallback(this, cmpMeta));
         }
 
         disconnectedCallback() {
-          disconnectedCallback(this);
+          plt.jmp(() => disconnectedCallback(this));
         }
 
         's-init'() {

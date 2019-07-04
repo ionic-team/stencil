@@ -11,12 +11,16 @@ const queueDomReads: d.RafCallback[] = [];
 const queueDomWrites: d.RafCallback[] = [];
 const queueDomWritesLow: d.RafCallback[] = [];
 
-const queueTask = (queue: d.RafCallback[]) => (cb: d.RafCallback) => {
+const queueTask = (queue: d.RafCallback[], write: boolean) => (cb: d.RafCallback) => {
   queue.push(cb);
 
   if (!queuePending) {
     queuePending = true;
-    plt.raf(flush);
+    if (write && plt.$flags$ & PLATFORM_FLAGS.queueSync) {
+      nextTick(flush);
+    } else {
+      plt.raf(flush);
+    }
   }
 };
 
@@ -61,7 +65,7 @@ const flush = () => {
   consume(queueDomReads);
 
   const timeout = (plt.$flags$ & PLATFORM_FLAGS.queueMask) === PLATFORM_FLAGS.appLoaded
-    ? performance.now() + (7 * Math.ceil(queueCongestion * (1.0 / 22.0)))
+    ? performance.now() + (10 * Math.ceil(queueCongestion * (1.0 / 22.0)))
     : Infinity;
 
   // DOM WRITES!!!
@@ -86,6 +90,6 @@ const flush = () => {
 
 export const nextTick = /*@__PURE__*/(cb: () => void) => Promise.resolve().then(cb);
 
-export const readTask = /*@__PURE__*/queueTask(queueDomReads);
+export const readTask = /*@__PURE__*/queueTask(queueDomReads, false);
 
-export const writeTask = /*@__PURE__*/queueTask(queueDomWrites);
+export const writeTask = /*@__PURE__*/queueTask(queueDomWrites, true);

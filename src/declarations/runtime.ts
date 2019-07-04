@@ -100,6 +100,7 @@ export interface HostRef {
 export interface PlatformRuntime {
   $flags$: number;
   $resourcesUrl$: string;
+  jmp: (c: Function) => any;
   raf: (c: FrameRequestCallback) => number;
   ael: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   rel: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
