@@ -65,6 +65,9 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       if (BUILD.member) {
         hostRef.$flags$ &= ~HOST_FLAGS.isConstructingInstance;
       }
+      if (BUILD.watchCallback) {
+        hostRef.$flags$ |= HOST_FLAGS.isWatchReady;
+      }
       fireConnectedCallback(hostRef.$lazyInstance$);
 
     } else {

@@ -1,4 +1,4 @@
-import { Component, Listen, State, h } from '@stencil/core';
+import { Component, Event, EventEmitter, Listen, State, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
@@ -137,27 +137,43 @@ describe('listen', () => {
 
   it('listen before load', async () => {
     let log = '';
+    let eventId = 0;
+    function getEventDetail() {
+      return `event${eventId++} `;
+    }
     @Component({ tag: 'cmp-a'})
     class CmpA {
+      nuRenders = 0;
+
+      @Event() event: EventEmitter;
+      @State() nuEvents = 0;
+
       @Listen('event')
       onEvent(ev: CustomEvent<string>) {
         log += ev.detail;
+        this.nuEvents++;
       }
 
       connectedCallback() {
+        this.event.emit(getEventDetail());
         log += 'connectedCallback ';
+        this.event.emit(getEventDetail());
       }
 
       componentWillLoad() {
+        this.event.emit(getEventDetail());
         log += 'componentWillLoad ';
+        this.event.emit(getEventDetail());
       }
 
       componentDidLoad() {
+        // this.event.emit(getEventDetail());
         log += 'componentDidLoad ';
       }
 
       render() {
-        return `${log}`;
+        this.nuRenders++;
+        return `${this.nuRenders} ${this.nuEvents}`;
       }
     }
 
@@ -170,20 +186,24 @@ describe('listen', () => {
     doc.body.appendChild(a);
 
     a.dispatchEvent(new CustomEvent('event', {
-      detail: 'event1 '
+      detail: getEventDetail()
     }));
     a.dispatchEvent(new CustomEvent('event', {
-      detail: 'event2 '
+      detail: getEventDetail()
     }));
     a.dispatchEvent(new CustomEvent('event', {
-      detail: 'event3 '
+      detail: getEventDetail()
     }));
 
     await Promise.resolve();
-    expect(log).toEqualHtml('');
+    expect(log).toEqual('');
+    expect(a).toEqualHtml(`<cmp-a></cmp-a>`);
 
     await waitForChanges();
-    expect(log).toEqualHtml(`connectedCallback event1 event2 event3 componentWillLoad componentDidLoad`);
+    expect(log).toEqual(`connectedCallback event0 event1 event2 event3 event4 event5 componentWillLoad event6 componentDidLoad `);
+    expect(a).toEqualHtml(`<cmp-a>1 7</cmp-a>`);
+    await waitForChanges();
+    expect(a).toEqualHtml(`<cmp-a>1 7</cmp-a>`);
   });
 
 });

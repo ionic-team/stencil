@@ -23,8 +23,8 @@ export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmp
   }
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   if (isInitialLoad) {
-    if (BUILD.watchCallback || BUILD.hostListener) {
-      hostRef.$flags$ |= HOST_FLAGS.isMethodsCallable;
+    if (BUILD.hostListener) {
+      hostRef.$flags$ |= HOST_FLAGS.isListenReady;
     }
     if (BUILD.hostListener && hostRef.$queuedListeners$) {
       hostRef.$queuedListeners$.forEach(([methodName, event]) => safeCall(instance, methodName, event));

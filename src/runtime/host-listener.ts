@@ -19,7 +19,7 @@ export const addEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listen
 const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
   return (ev: Event) => {
     if (BUILD.lazyLoad) {
-      if (hostRef.$flags$ & HOST_FLAGS.isMethodsCallable) {
+      if (hostRef.$flags$ & HOST_FLAGS.isListenReady) {
         // instance is ready, let's call it's member method for this event
         hostRef.$lazyInstance$[methodName](ev);
 

@@ -43,7 +43,8 @@ export const enum HOST_FLAGS {
   isQueuedForUpdate = 1 << 4,
   hasInitializedComponent = 1 << 5,
   hasLoadedComponent = 1 << 6,
-  isMethodsCallable = 1 << 7,
+  isWatchReady = 1 << 7,
+  isListenReady = 1 << 8,
 }
 
 export const enum CMP_FLAGS {
