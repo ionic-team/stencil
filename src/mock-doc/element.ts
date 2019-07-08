@@ -44,6 +44,9 @@ export function createElement(ownerDocument: any, tagName: string) {
 
     case 'title':
       return new MockTitleElement(ownerDocument);
+
+    case 'canvas':
+      return new MockCanvasElement(ownerDocument);
   }
 
   if (SVG_TAGS.has(tagName)) {
@@ -294,6 +297,45 @@ class MockTitleElement extends MockHTMLElement {
 }
 
 
+class MockCanvasElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'canvas');
+  }
+  getContext() {
+    return {
+      fillRect: function () { },
+      clearRect: function () { },
+      getImageData: function (_: number, __: number, w: number, h: number) {
+        return {
+          data: new Array(w * h * 4)
+        };
+      },
+      putImageData: function () { },
+      createImageData: function (): any[] { return [] },
+      setTransform: function () { },
+      drawImage: function () { },
+      save: function () { },
+      fillText: function () { },
+      restore: function () { },
+      beginPath: function () { },
+      moveTo: function () { },
+      lineTo: function () { },
+      closePath: function () { },
+      stroke: function () { },
+      translate: function () { },
+      scale: function () { },
+      rotate: function () { },
+      arc: function () { },
+      fill: function () { },
+      measureText: function () {
+        return { width: 0 };
+      },
+      transform: function () { },
+      rect: function () { },
+      clip: function () { },
+    }
+  }
+}
 
 function fullUrl(elm: MockElement, attrName: string) {
   const val = elm.getAttribute(attrName) || '';
