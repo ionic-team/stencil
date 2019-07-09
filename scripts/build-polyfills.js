@@ -21,7 +21,8 @@ function buildCoreJs() {
       'es.array-buffer',
       'es.data-view',
       'es.typed-array',
-      'es.reflect'
+      'es.reflect',
+      'es.promise'
     ],
     targets: 'ie 11',
     filename: path.join(SRC_DIR, 'core-js.js'),
