@@ -4,13 +4,13 @@ import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { loaderPlugin } from '../rollup-plugins/loader';
+import { pluginHelper } from '../rollup-plugins/plugin-helper';
 import { RollupBuild, RollupOptions, TreeshakingOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilHydratePlugin } from '../rollup-plugins/stencil-hydrate';
-import { pluginHelper } from '../rollup-plugins/plugin-helper';
 
 
-export async function bundleHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, appEntryCode: string) {
+export const bundleHydrateApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, appEntryCode: string) => {
   try {
     const treeshake: TreeshakingOptions | boolean = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
       ? {
@@ -18,6 +18,7 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
         tryCatchDeoptimization: false,
       }
       : false;
+
     const rollupOptions: RollupOptions = {
       ...config.rollupConfig.inputOptions,
 
@@ -64,9 +65,9 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
 
   } catch (e) {
     if (!buildCtx.hasError) {
-      loadRollupDiagnostics(buildCtx, e);
+      loadRollupDiagnostics(compilerCtx, buildCtx, e);
     }
   }
 
   return undefined;
-}
+};
