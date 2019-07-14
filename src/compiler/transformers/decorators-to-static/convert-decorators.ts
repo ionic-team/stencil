@@ -12,7 +12,7 @@ import { MEMBER_DECORATORS_TO_REMOVE, removeStencilImport } from '../remove-sten
 import ts from 'typescript';
 
 
-export function convertDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker): ts.TransformerFactory<ts.SourceFile> {
+export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker): ts.TransformerFactory<ts.SourceFile> => {
 
   return transformCtx => {
 
@@ -30,10 +30,10 @@ export function convertDecoratorsToStatic(config: d.Config, diagnostics: d.Diagn
       return visit(tsSourceFile, tsSourceFile) as ts.SourceFile;
     };
   };
-}
+};
 
 
-function visitClass(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration) {
+const visitClass = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration) => {
   if (!cmpNode.decorators) {
     return cmpNode;
   }
@@ -71,9 +71,8 @@ function visitClass(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: 
     cmpNode.heritageClauses,
     newMembers
   );
-}
+};
 
-function removeStencilDecorators(classMembers: ts.ClassElement[]) {
+const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {
   classMembers.forEach(member => removeDecorators(member, MEMBER_DECORATORS_TO_REMOVE));
-}
-
+};

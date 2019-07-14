@@ -1,8 +1,8 @@
-import { removeStencilImport, MEMBER_DECORATORS_TO_REMOVE, CLASS_DECORATORS_TO_REMOVE } from './remove-stencil-import';
+import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE, removeStencilImport } from './remove-stencil-import';
 import { removeDecorators } from './transform-utils';
 import ts from 'typescript';
 
-export function removeStencilDecorators(): ts.TransformerFactory<ts.SourceFile> {
+export const removeStencilDecorators = (): ts.TransformerFactory<ts.SourceFile> => {
 
   return transformCtx => {
 
@@ -14,10 +14,10 @@ export function removeStencilDecorators(): ts.TransformerFactory<ts.SourceFile> 
     }
     return (tsSourceFile) => visit(tsSourceFile) as ts.SourceFile;
   };
-}
+};
 
 
-function visitComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaration {
+const visitComponentClass = (classNode: ts.ClassDeclaration): ts.ClassDeclaration => {
   removeDecorators(classNode, CLASS_DECORATORS_TO_REMOVE);
 
   classNode.members.forEach((member) => {
@@ -27,10 +27,10 @@ function visitComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaratio
   });
 
   return classNode;
-}
+};
 
 
-export function removeStencilImports(): ts.TransformerFactory<ts.SourceFile> {
+export const removeStencilImports = (): ts.TransformerFactory<ts.SourceFile> => {
 
   return transformCtx => {
 
@@ -46,4 +46,4 @@ export function removeStencilImports(): ts.TransformerFactory<ts.SourceFile> {
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };
   };
-}
+};

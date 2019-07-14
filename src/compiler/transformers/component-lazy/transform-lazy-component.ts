@@ -6,7 +6,7 @@ import { updateLazyComponentClass } from './lazy-component';
 import ts from 'typescript';
 
 
-export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, opts: d.TransformOptions, cmp: d.ComponentCompilerMeta, inputText: string) {
+export const transformToLazyComponentText = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, opts: d.TransformOptions, cmp: d.ComponentCompilerMeta, inputText: string) => {
   let outputText: string = null;
 
   try {
@@ -39,10 +39,10 @@ export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCt
   }
 
   return outputText;
-}
+};
 
 
-export function lazyComponentTransform(compilerCtx: d.CompilerCtx, opts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> {
+export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, opts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
 
   return transformCtx => {
 
@@ -65,4 +65,4 @@ export function lazyComponentTransform(compilerCtx: d.CompilerCtx, opts: d.Trans
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };
   };
-}
+};
