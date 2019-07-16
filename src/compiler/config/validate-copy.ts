@@ -14,5 +14,5 @@ export function validateCopy(copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTa
       copy.push(task);
     }
   }
-  return unique(copy, task => `${task.src}:${task.dest}:${task.relative}`);
+  return unique(copy, task => `${task.src}:${task.dest}:${task.keepDirStructure}`);
 }
