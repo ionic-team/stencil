@@ -90,7 +90,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         });
       }
 
-      if (BUILD.initialiceNextTick) {
+      if (BUILD.initializeNextTick) {
         // connectedCallback, taskQueue, initialLoad
         // angular sets attribute AFTER connectCallback
         // https://github.com/angular/angular/issues/18909
