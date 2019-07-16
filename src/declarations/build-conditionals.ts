@@ -86,6 +86,7 @@ export interface Build extends Partial<BuildFeatures> {
   profile?: boolean;
   cssVarShim?: boolean;
   constructableCSS?: boolean;
+  initialiceNextTick?: boolean;
 }
 
 export interface UserBuildConditionals {

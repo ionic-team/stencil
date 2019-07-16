@@ -117,6 +117,7 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.member = (b.member || b.updatable || b.mode || b.lifecycle);
   b.taskQueue = (b.updatable || b.mode || b.lifecycle);
   b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
+  b.initialiceNextTick = true; // config.outputTargets.some(isOutputTargetAngular);
   b.cssAnnotations = true;
 }
 
