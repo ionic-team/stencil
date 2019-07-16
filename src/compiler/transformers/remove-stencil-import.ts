@@ -1,7 +1,7 @@
 import ts from 'typescript';
 
 
-export function removeStencilImport(importNode: ts.ImportDeclaration) {
+export const removeStencilImport = (importNode: ts.ImportDeclaration) => {
   if (importNode.moduleSpecifier != null && ts.isStringLiteral(importNode.moduleSpecifier)) {
     if (importNode.moduleSpecifier.text === '@stencil/core') {
       if (importNode.importClause && importNode.importClause.namedBindings && importNode.importClause.namedBindings.kind === ts.SyntaxKind.NamedImports) {
@@ -29,7 +29,7 @@ export function removeStencilImport(importNode: ts.ImportDeclaration) {
     }
   }
   return importNode;
-}
+};
 
 const KEEP_IMPORTS = new Set([
   'h',
@@ -55,4 +55,3 @@ export const MEMBER_DECORATORS_TO_REMOVE = new Set([
   'State',
   'Watch'
 ]);
-

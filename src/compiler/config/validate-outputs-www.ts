@@ -89,7 +89,7 @@ function validateOutputTarget(config: d.Config, diagnostics: d.Diagnostic[], out
   // Copy for www
   config.outputTargets.push({
     type: COPY,
-    dir: outputTarget.dir,
+    dir: outputTarget.appDir,
     copy: validateCopy(outputTarget.copy, [
       ...(config.copy || []),
       ...DEFAULT_WWW_COPY,

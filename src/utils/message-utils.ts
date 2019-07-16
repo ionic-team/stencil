@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 
 
-export function buildError(diagnostics: d.Diagnostic[]) {
+export const buildError = (diagnostics: d.Diagnostic[]) => {
   const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'build',
@@ -15,10 +15,10 @@ export function buildError(diagnostics: d.Diagnostic[]) {
   diagnostics.push(diagnostic);
 
   return diagnostic;
-}
+};
 
 
-export function buildWarn(diagnostics: d.Diagnostic[]) {
+export const buildWarn = (diagnostics: d.Diagnostic[]) => {
   const diagnostic: d.Diagnostic = {
     level: 'warn',
     type: 'build',
@@ -32,10 +32,10 @@ export function buildWarn(diagnostics: d.Diagnostic[]) {
   diagnostics.push(diagnostic);
 
   return diagnostic;
-}
+};
 
 
-export function buildJsonFileError(compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], jsonFilePath: string, msg: string, pkgKey: string) {
+export const buildJsonFileError = (compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], jsonFilePath: string, msg: string, pkgKey: string) => {
   const err = buildError(diagnostics);
   err.messageText = msg;
   err.absFilePath = jsonFilePath;
@@ -90,10 +90,10 @@ export function buildJsonFileError(compilerCtx: d.CompilerCtx, diagnostics: d.Di
   }
 
   return err;
-}
+};
 
 
-export function catchError(diagnostics: d.Diagnostic[], err: Error, msg?: string) {
+export const catchError = (diagnostics: d.Diagnostic[], err: Error, msg?: string) => {
   const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'build',
@@ -126,26 +126,26 @@ export function catchError(diagnostics: d.Diagnostic[], err: Error, msg?: string
   }
 
   return diagnostic;
-}
+};
 
-export function hasError(diagnostics: d.Diagnostic[]): boolean {
+export const hasError = (diagnostics: d.Diagnostic[]): boolean => {
   if (diagnostics == null || diagnostics.length === 0) {
     return false;
   }
   return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
-}
+};
 
 
-export function hasWarning(diagnostics: d.Diagnostic[]): boolean {
+export const hasWarning = (diagnostics: d.Diagnostic[]): boolean => {
   if (diagnostics == null || diagnostics.length === 0) {
     return false;
   }
   return diagnostics.some(d => d.level === 'warn');
-}
+};
 
 
-export function shouldIgnoreError(msg: any) {
+export const shouldIgnoreError = (msg: any) => {
   return (msg === TASK_CANCELED_MSG);
-}
+};
 
 export const TASK_CANCELED_MSG = `task canceled`;

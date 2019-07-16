@@ -64,11 +64,11 @@ async function processGlobs(copyTask: Required<d.CopyTask>, srcDir: string): Pro
     ? await processGlobTask(copyTask, srcDir)
     : [{
       src: getSrcAbsPath(srcDir, copyTask.src),
-      dest: copyTask.relative
+      dest: copyTask.keepDirStructure
         ? path.join(copyTask.dest, copyTask.src)
         : copyTask.dest,
       warn: copyTask.warn,
-      relative: copyTask.relative
+      keepDirStructure: copyTask.keepDirStructure
     }];
 }
 
@@ -89,7 +89,7 @@ async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): 
 
 
 function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, globRelPath: string): Required<d.CopyTask> {
-  const dest = path.join(copyTask.dest, copyTask.relative
+  const dest = path.join(copyTask.dest, copyTask.keepDirStructure
     ? globRelPath
     : path.basename(globRelPath)
   );
@@ -97,7 +97,7 @@ function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, glob
     src: path.join(srcDir, globRelPath),
     dest,
     warn: copyTask.warn,
-    relative: copyTask.relative
+    keepDirStructure: copyTask.keepDirStructure
   };
 }
 

@@ -8,7 +8,7 @@ import { buildError } from './message-utils';
  * However, d.ts files and spec.ts files return false.
  * @param filePath
  */
-export function isTsFile(filePath: string) {
+export const isTsFile = (filePath: string) => {
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 1) {
     if (parts[parts.length - 1] === 'ts' || parts[parts.length - 1] === 'tsx') {
@@ -19,19 +19,19 @@ export function isTsFile(filePath: string) {
     }
   }
   return false;
-}
+};
 
 
-export function isDtsFile(filePath: string) {
+export const isDtsFile = (filePath: string) => {
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 2) {
     return (parts[parts.length - 2] === 'd' && parts[parts.length - 1] === 'ts');
   }
   return false;
-}
+};
 
 
-export function isJsFile(filePath: string) {
+export const isJsFile = (filePath: string) => {
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 1) {
     if (parts[parts.length - 1] === 'js') {
@@ -42,36 +42,36 @@ export function isJsFile(filePath: string) {
     }
   }
   return false;
-}
+};
 
 
-export function hasFileExtension(filePath: string, extensions: string[]) {
+export const hasFileExtension = (filePath: string, extensions: string[]) => {
   filePath = filePath.toLowerCase();
   return extensions.some(ext => filePath.endsWith('.' + ext));
-}
+};
 
 
-export function isCssFile(filePath: string) {
+export const isCssFile = (filePath: string) => {
   return hasFileExtension(filePath, ['css']);
-}
+};
 
 
-export function isHtmlFile(filePath: string) {
+export const isHtmlFile = (filePath: string) => {
   return hasFileExtension(filePath, ['html', 'htm']);
-}
+};
 
 /**
  * Only web development text files, like ts, tsx,
  * js, html, css, scss, etc.
  * @param filePath
  */
-export function isWebDevFile(filePath: string) {
+export const isWebDevFile = (filePath: string) => {
   return (hasFileExtension(filePath, WEB_DEV_EXT) || isTsFile(filePath));
-}
+};
 const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass', 'less', 'styl', 'pcss'];
 
 
-export function generatePreamble(config: d.Config, opts: { prefix?: string; suffix?: string, defaultBanner?: boolean } = {}) {
+export const generatePreamble = (config: d.Config, opts: { prefix?: string; suffix?: string, defaultBanner?: boolean } = {}) => {
   let preamble: string[] = [];
 
   if (config.preamble) {
@@ -108,33 +108,33 @@ export function generatePreamble(config: d.Config, opts: { prefix?: string; suff
     return `/*! ${BANNER} */`;
   }
   return '';
-}
+};
 
 
-export function isDocsPublic(jsDocs: d.JsDoc | d.CompilerJsDoc | undefined) {
+export const isDocsPublic = (jsDocs: d.JsDoc | d.CompilerJsDoc | undefined) => {
   return !(jsDocs && jsDocs.tags.some((s) => s.name === 'internal'));
-}
+};
 
 
-export function getDependencies(buildCtx: d.BuildCtx) {
+export const getDependencies = (buildCtx: d.BuildCtx) => {
   if (buildCtx.packageJson != null && buildCtx.packageJson.dependencies != null) {
     return Object.keys(buildCtx.packageJson.dependencies)
       .filter(pkgName => !SKIP_DEPS.includes(pkgName));
   }
   return [];
-}
+};
 
-export function hasDependency(buildCtx: d.BuildCtx, depName: string) {
+export const hasDependency = (buildCtx: d.BuildCtx, depName: string) => {
   return getDependencies(buildCtx).includes(depName);
-}
+};
 
-export function getDynamicImportFunction(namespace: string) {
+export const getDynamicImportFunction = (namespace: string) => {
   return `__sc_import_${
     namespace.replace(/\s|-/g, '_')
   }`;
-}
+};
 
-export async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const pkgJsonPath = config.sys.path.join(config.rootDir, 'package.json');
 
   let pkgJson: string;
@@ -164,6 +164,6 @@ export async function readPackageJson(config: d.Config, compilerCtx: d.CompilerC
 
   buildCtx.packageJsonFilePath = pkgJsonPath;
   return pkgData;
-}
+};
 
 const SKIP_DEPS = ['@stencil/core'];
