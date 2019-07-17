@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { loadTypeScriptDiagnostic, loadTypeScriptDiagnostics, normalizePath } from '@utils';
-import { ModuleKind, ScriptTarget } from '../transformers/transform-utils';
+import { getScriptTarget } from '../transformers/transform-utils';
 import ts from 'typescript';
 import { isOutputTargetDistTypes } from '../output-targets/output-utils';
 
@@ -134,10 +134,10 @@ export const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
   experimentalDecorators: true,
 
   // transpile down to es2017
-  target: ScriptTarget,
+  target: getScriptTarget(),
 
   // create esNext modules
-  module: ModuleKind,
+  module: ts.ModuleKind.ES2015,
 
   // resolve using NodeJs style
   moduleResolution: ts.ModuleResolutionKind.NodeJs,

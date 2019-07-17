@@ -1,6 +1,8 @@
-import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE, removeStencilImport } from './remove-stencil-import';
+import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/convert-decorators';
 import { removeDecorators } from './transform-utils';
 import ts from 'typescript';
+import { updateStencilCoreImport } from './update-stencil-core-import';
+
 
 export const removeStencilDecorators = (): ts.TransformerFactory<ts.SourceFile> => {
 
@@ -37,7 +39,7 @@ export const removeStencilImports = (): ts.TransformerFactory<ts.SourceFile> => 
     return tsSourceFile => {
       function visitNode(node: ts.Node): any {
         if (node.kind === ts.SyntaxKind.ImportDeclaration) {
-          return removeStencilImport(node as ts.ImportDeclaration);
+          return updateStencilCoreImport(node as ts.ImportDeclaration, '@stencil/core');
         }
 
         return ts.visitEachChild(node, visitNode, transformCtx);

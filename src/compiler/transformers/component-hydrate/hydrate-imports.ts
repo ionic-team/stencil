@@ -4,7 +4,7 @@ import { COMMON_IMPORTS, CONNECTED_CALLBACK, REGISTER_INSTANCE } from '../export
 import ts from 'typescript';
 
 
-export function addHydrateImports(transformCtx: ts.TransformationContext, compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile) {
+export function addHydrateImports(transformCtx: ts.TransformationContext, compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile, coreImportPath: string) {
   const importFns = [
     ...COMMON_IMPORTS,
     `connectedCallback as ${CONNECTED_CALLBACK}`,
@@ -16,7 +16,7 @@ export function addHydrateImports(transformCtx: ts.TransformationContext, compil
     importFns.push('h');
   }
 
-  tsSourceFile = addImports(transformCtx, tsSourceFile, importFns, '@stencil/core');
+  tsSourceFile = addImports(transformCtx, tsSourceFile, importFns, coreImportPath);
 
   return tsSourceFile;
 }

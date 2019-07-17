@@ -9,6 +9,7 @@ const Listr = require('listr');
 const fs = require('fs-extra');
 const path = require('path');
 const semver = require('semver');
+const { updateReleaseVersion } = require('./script-utils');
 
 
 const rootDir = path.join(__dirname, '../');
@@ -35,7 +36,7 @@ function runTasks(opts) {
           }
         }
       }
-    )
+    );
   }
 
   if (opts.publish) {
@@ -152,7 +153,10 @@ function runTasks(opts) {
       },
       {
         title: 'Set package.json version',
-        task: () => execa('npm', ['run', 'set.version', opts.version], { cwd: rootDir }),
+        task: async () => {
+          await updateReleaseVersion(opts.version);
+          return execa('npm', ['run', 'set.version', opts.version], { cwd: rootDir });
+        }
       },
       {
         title: 'Generate Changelog',
@@ -263,7 +267,7 @@ function prepareUI() {
       type: 'confirm',
       name: 'confirm',
       message: answers => {
-        return `Optimize for release${color.cyan(oldVersion)} to ${color.cyan(answers.version)}. Continue?`;
+        return `Optimize for release ${color.cyan(oldVersion)} to ${color.cyan(answers.version)}. Continue?`;
       }
     }
   ];

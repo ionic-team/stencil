@@ -9,20 +9,29 @@ import { transformHostData } from '../transforms/host-data-transform';
 import { createStaticGetter } from '../transform-utils';
 
 
-export function updateNativeComponentClass(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
+export const updateNativeComponentClass = (classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta, removeExport: boolean) => {
+
+  let modifiers = Array.isArray(classNode.modifiers) ? classNode.modifiers.slice() : [];
+
+  if (removeExport) {
+    modifiers = modifiers.filter(m => {
+      return m.kind !== ts.SyntaxKind.ExportKeyword;
+    });
+  }
+
   return ts.updateClassDeclaration(
     classNode,
     classNode.decorators,
-    classNode.modifiers,
+    modifiers,
     classNode.name,
     classNode.typeParameters,
     updateNativeHostComponentHeritageClauses(classNode),
     updateNativeHostComponentMembers(classNode, cmp)
   );
-}
+};
 
 
-function updateNativeHostComponentHeritageClauses(classNode: ts.ClassDeclaration) {
+const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration) => {
   if (classNode.heritageClauses != null && classNode.heritageClauses.length > 0) {
     return classNode.heritageClauses;
   }
@@ -34,10 +43,10 @@ function updateNativeHostComponentHeritageClauses(classNode: ts.ClassDeclaration
   );
 
   return [heritageClause];
-}
+};
 
 
-function updateNativeHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
+const updateNativeHostComponentMembers = (classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateNativeConstructor(classMembers, cmp, true);
@@ -48,9 +57,9 @@ function updateNativeHostComponentMembers(classNode: ts.ClassDeclaration, cmp: d
   transformHostData(classMembers);
 
   return classMembers;
-}
+};
 
-export function addComponentStyle(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
+export const addComponentStyle = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   if (!cmp.hasStyle) {
     return;
   }
@@ -59,4 +68,4 @@ export function addComponentStyle(classMembers: ts.ClassElement[], cmp: d.Compon
     console.log(cmp);
   }
   classMembers.push(createStaticGetter('style', ts.createStringLiteral(style.compiledStyleText)));
-}
+};

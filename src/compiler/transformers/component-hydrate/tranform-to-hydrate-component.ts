@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { addHydrateImports } from './hydrate-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, ScriptTarget, getComponentMeta } from '../transform-utils';
+import { getComponentMeta, getScriptTarget } from '../transform-utils';
 import { updateHydrateComponentClass } from './hydrate-component';
 import ts from 'typescript';
 
@@ -12,8 +12,8 @@ export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buil
   try {
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
-        module: ModuleKind,
-        target: ScriptTarget,
+        module: ts.ModuleKind.ES2015,
+        target: getScriptTarget(),
         skipLibCheck: true,
         noResolve: true,
         noLib: true,
@@ -61,7 +61,7 @@ function hydrateComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFa
 
       tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
-      return addHydrateImports(transformCtx, compilerCtx, tsSourceFile);
+      return addHydrateImports(transformCtx, compilerCtx, tsSourceFile, '@stencil/core');
     };
   };
 }

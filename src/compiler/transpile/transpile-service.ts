@@ -2,12 +2,13 @@ import * as d from '../../declarations';
 import { addExternalImport } from '../transformers/collections/add-external-import';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
+import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import { getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { getModule } from '../build/compiler-ctx';
 import { getUserCompilerOptions } from './compiler-options';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
 import minimatch from 'minimatch';
-import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import ts from 'typescript';
 
 
@@ -116,13 +117,15 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
       const typeChecker = services.getProgram().getTypeChecker();
 
       const transformOpts: d.TransformOptions = {
-        addCompilerMeta: false,
-        addStyle: true
+        coreImportPath: '@stencil/core',
+        metadata: null,
+        styleImport: 'inline'
       };
 
       return {
         before: [
-          convertDecoratorsToStatic(config, transpileCtx.buildCtx.diagnostics, typeChecker)
+          convertDecoratorsToStatic(config, transpileCtx.buildCtx.diagnostics, typeChecker),
+          updateStencilCoreImports(transformOpts.coreImportPath)
         ],
         after: [
           convertStaticToMeta(config, transpileCtx.compilerCtx, transpileCtx.buildCtx, typeChecker, null, transformOpts)

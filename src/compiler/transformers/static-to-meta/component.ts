@@ -129,7 +129,7 @@ export function parseStaticComponentMeta(config: d.Config, compilerCtx: d.Compil
   cmp.potentialCmpRefs = unique(cmp.potentialCmpRefs);
   setComponentBuildConditionals(cmp);
 
-  if (transformOpts.addCompilerMeta) {
+  if (transformOpts.metadata === 'static') {
     // no need to copy all compiler meta data to the static getter
     const copyCmp = Object.assign({}, cmp);
     delete copyCmp.assetsDirs;

@@ -1,11 +1,32 @@
 import ts from 'typescript';
 
 
-export const removeStencilImport = (importNode: ts.ImportDeclaration) => {
+export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.TransformerFactory<ts.SourceFile> => {
+
+  return transformCtx => {
+
+    function visit(tsSourceFile: ts.SourceFile, node: ts.Node): ts.VisitResult<ts.Node> {
+      if (ts.isImportDeclaration(node)) {
+        return updateStencilCoreImport(node, updatedCoreImportPath);
+      }
+
+      return ts.visitEachChild(node, node => visit(tsSourceFile, node), transformCtx);
+    }
+
+    return tsSourceFile => {
+      return visit(tsSourceFile, tsSourceFile) as ts.SourceFile;
+    };
+  };
+};
+
+
+export const updateStencilCoreImport = (importNode: ts.ImportDeclaration, updatedCoreImportPath: string) => {
   if (importNode.moduleSpecifier != null && ts.isStringLiteral(importNode.moduleSpecifier)) {
     if (importNode.moduleSpecifier.text === '@stencil/core') {
       if (importNode.importClause && importNode.importClause.namedBindings && importNode.importClause.namedBindings.kind === ts.SyntaxKind.NamedImports) {
+
         const origImports = importNode.importClause.namedBindings.elements;
+
         const keepImports = origImports
           .map(e => e.getText())
           .filter(name => KEEP_IMPORTS.has(name));
@@ -21,7 +42,7 @@ export const removeStencilImport = (importNode: ts.ImportDeclaration) => {
                 ts.createIdentifier(name)
               ))
             )),
-            importNode.moduleSpecifier
+            ts.createStringLiteral(updatedCoreImportPath)
           );
         }
       }
@@ -41,17 +62,4 @@ const KEEP_IMPORTS = new Set([
   'writeTask',
   'readTask',
   'getElement'
-]);
-
-export const CLASS_DECORATORS_TO_REMOVE = new Set(['Component']);
-export const MEMBER_DECORATORS_TO_REMOVE = new Set([
-  'Element',
-  'Event',
-  'Listen',
-  'Method',
-  'Prop',
-  'PropDidChange',
-  'PropWillChange',
-  'State',
-  'Watch'
 ]);

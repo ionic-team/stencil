@@ -29,7 +29,7 @@ function updateLazyComponentMembers(opts: d.TransformOptions, classNode: ts.Clas
   addWatchers(classMembers, cmp);
   transformHostData(classMembers);
 
-  if (opts.addStyle) {
+  if (opts.styleImport === 'inline') {
     addComponentStylePlaceholders(classMembers, cmp);
   }
 

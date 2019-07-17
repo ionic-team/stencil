@@ -4,7 +4,7 @@ import * as d from '../../../declarations';
 import { ATTACH_SHADOW, COMMON_IMPORTS, REGISTER_HOST } from '../exports';
 
 
-export function addNativeImports(transformCtx: ts.TransformationContext, compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile, coreImportPath: string) {
+export const addCustomElementDefine = (transformCtx: ts.TransformationContext, compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile) => {
   const importFns = [
     ...COMMON_IMPORTS,
     `attachShadow as ${ATTACH_SHADOW}`,
@@ -16,5 +16,5 @@ export function addNativeImports(transformCtx: ts.TransformationContext, compile
     importFns.push('h');
   }
 
-  return addImports(transformCtx, tsSourceFile, importFns, coreImportPath);
-}
+  return addImports(transformCtx, tsSourceFile, importFns, '@stencil/core');
+};

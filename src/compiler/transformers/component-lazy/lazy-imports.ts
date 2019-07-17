@@ -4,7 +4,7 @@ import { COMMON_IMPORTS, REGISTER_INSTANCE } from '../exports';
 import ts from 'typescript';
 
 
-export function addLazyImports(transformCtx: ts.TransformationContext, compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile) {
+export function addLazyImports(transformCtx: ts.TransformationContext, compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile, coreImportPath: string) {
   const importFns = [
     ...COMMON_IMPORTS,
     `registerInstance as ${REGISTER_INSTANCE}`,
@@ -15,5 +15,5 @@ export function addLazyImports(transformCtx: ts.TransformationContext, compilerC
     importFns.push('h');
   }
 
-  return addImports(transformCtx, tsSourceFile, importFns, '@stencil/core');
+  return addImports(transformCtx, tsSourceFile, importFns, coreImportPath);
 }

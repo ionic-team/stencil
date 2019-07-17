@@ -19,7 +19,17 @@ const TRANSPILE_CONFIG: d.Config = {
 };
 
 
-export function transpile(input: string, opts: ts.CompilerOptions = {}, sourceFilePath?: string) {
+const DEFAULT_TRANSFORM_OPTS: d.TransformOptions = {
+  coreImportPath: '@stencil/core',
+  metadata: 'static',
+  styleImport: 'inline',
+  transformOutput: 'lazy'
+};
+
+
+export function transpile(input: string, opts?: d.TransformOptions, sourceFilePath?: string) {
+  opts = opts || ({} as any);
+  Object.assign(opts, DEFAULT_TRANSFORM_OPTS);
   return transpileModule(TRANSPILE_CONFIG, input, opts, sourceFilePath);
 }
 

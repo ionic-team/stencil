@@ -62,8 +62,8 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
   const buildCtx = mockBuildCtx(config, compilerCtx);
 
   const transformOpts: d.TransformOptions = {
-    addCompilerMeta: false,
-    addStyle: false,
+    metadata: null,
+    styleImport: null
   };
 
   program.emit(undefined, undefined, undefined, undefined, {

@@ -8,7 +8,6 @@ import { isDecoratorNamed, removeDecorators } from '../transform-utils';
 import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
-import { MEMBER_DECORATORS_TO_REMOVE, removeStencilImport } from '../remove-stencil-import';
 import ts from 'typescript';
 
 
@@ -19,8 +18,6 @@ export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagn
     function visit(tsSourceFile: ts.SourceFile, node: ts.Node): ts.VisitResult<ts.Node> {
       if (ts.isClassDeclaration(node)) {
         node = visitClass(config, diagnostics, typeChecker, tsSourceFile, node);
-      } else if (ts.isImportDeclaration(node)) {
-        return removeStencilImport(node);
       }
 
       return ts.visitEachChild(node, node => visit(tsSourceFile, node), transformCtx);
@@ -76,3 +73,16 @@ const visitClass = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: 
 const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {
   classMembers.forEach(member => removeDecorators(member, MEMBER_DECORATORS_TO_REMOVE));
 };
+
+export const CLASS_DECORATORS_TO_REMOVE = new Set(['Component']);
+export const MEMBER_DECORATORS_TO_REMOVE = new Set([
+  'Element',
+  'Event',
+  'Listen',
+  'Method',
+  'Prop',
+  'PropDidChange',
+  'PropWillChange',
+  'State',
+  'Watch'
+]);

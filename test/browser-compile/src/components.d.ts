@@ -10,9 +10,6 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
 export namespace Components {
   interface AppRoot {}
-  interface SrcFile {
-    'file': { filePath: string, content: string };
-  }
 }
 
 declare global {
@@ -23,27 +20,16 @@ declare global {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
   };
-
-  interface HTMLSrcFileElement extends Components.SrcFile, HTMLStencilElement {}
-  var HTMLSrcFileElement: {
-    prototype: HTMLSrcFileElement;
-    new (): HTMLSrcFileElement;
-  };
   interface HTMLElementTagNameMap {
     'app-root': HTMLAppRootElement;
-    'src-file': HTMLSrcFileElement;
   }
 }
 
 declare namespace LocalJSX {
   interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
-  interface SrcFile extends JSXBase.HTMLAttributes<HTMLSrcFileElement> {
-    'file'?: { filePath: string, content: string };
-  }
 
   interface IntrinsicElements {
     'app-root': AppRoot;
-    'src-file': SrcFile;
   }
 }
 

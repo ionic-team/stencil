@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { addLazyImports } from './lazy-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, ScriptTarget, getComponentMeta } from '../transform-utils';
+import { getComponentMeta, getScriptTarget } from '../transform-utils';
 import { updateLazyComponentClass } from './lazy-component';
 import ts from 'typescript';
 
@@ -12,8 +12,8 @@ export const transformToLazyComponentText = (compilerCtx: d.CompilerCtx, buildCt
   try {
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
-        module: ModuleKind,
-        target: ScriptTarget,
+        module: ts.ModuleKind.ES2015,
+        target: getScriptTarget(),
         skipLibCheck: true,
         noResolve: true,
         noLib: true,
@@ -60,7 +60,7 @@ export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, opts: d.Trans
         return ts.visitEachChild(node, visitNode, transformCtx);
       }
 
-      tsSourceFile = addLazyImports(transformCtx, compilerCtx, tsSourceFile);
+      tsSourceFile = addLazyImports(transformCtx, compilerCtx, tsSourceFile, '@stencil/core');
 
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };

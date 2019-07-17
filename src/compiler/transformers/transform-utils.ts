@@ -1,22 +1,23 @@
 import * as d from '../../declarations';
 import { augmentDiagnosticWithNode, buildError, normalizePath } from '@utils';
+import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/convert-decorators';
 import ts from 'typescript';
-import { MEMBER_DECORATORS_TO_REMOVE } from './remove-stencil-import';
 
 
-export const LegacyScriptTarget = ts.ScriptTarget.ES5;
-export const ScriptTarget = ts.ScriptTarget.ES2017;
-export const ModuleKind = ts.ModuleKind.ESNext;
+export const getScriptTarget = () => {
+  // using a fn so the browser compiler doesn't require the global ts for startup
+  return ts.ScriptTarget.ES2017;
+};
 
-export function isMemberPrivate(member: ts.ClassElement) {
+export const isMemberPrivate = (member: ts.ClassElement) => {
   if (member.modifiers && member.modifiers.some(m => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword)) {
     return true;
   }
   return false;
-}
+};
 
 
-export function convertValueToLiteral(val: any, refs: WeakSet<any> = null) {
+export const convertValueToLiteral = (val: any, refs: WeakSet<any> = null) => {
   if (refs == null) {
     refs = new WeakSet();
   }
@@ -42,18 +43,18 @@ export function convertValueToLiteral(val: any, refs: WeakSet<any> = null) {
     return objectToObjectLiteral(val, refs);
   }
   return ts.createLiteral(val);
-}
+};
 
 
-function arrayToArrayLiteral(list: any[], refs: WeakSet<any>): ts.ArrayLiteralExpression {
+const arrayToArrayLiteral = (list: any[], refs: WeakSet<any>): ts.ArrayLiteralExpression => {
   const newList: any[] = list.map(l => {
     return convertValueToLiteral(l, refs);
   });
   return ts.createArrayLiteral(newList);
-}
+};
 
 
-function objectToObjectLiteral(obj: { [key: string]: any }, refs: WeakSet<any>): ts.ObjectLiteralExpression {
+const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>): ts.ObjectLiteralExpression => {
   if (refs.has(obj)) {
     return ts.createIdentifier('undefined') as any;
   }
@@ -66,7 +67,7 @@ function objectToObjectLiteral(obj: { [key: string]: any }, refs: WeakSet<any>):
   });
 
   return ts.createObjectLiteral(newProperties, true);
-}
+};
 
 
 export function isDecoratorNamed(propName: string) {
@@ -76,7 +77,7 @@ export function isDecoratorNamed(propName: string) {
 }
 
 
-export function createStaticGetter(propName: string, returnExpression: ts.Expression) {
+export const createStaticGetter = (propName: string, returnExpression: ts.Expression) => {
   return ts.createGetAccessor(
     undefined,
     [ts.createToken(ts.SyntaxKind.StaticKeyword)],
@@ -87,7 +88,7 @@ export function createStaticGetter(propName: string, returnExpression: ts.Expres
       ts.createReturn(returnExpression)
     ])
   );
-}
+};
 
 
 export interface GetDeclarationParameters {
@@ -107,13 +108,13 @@ export const getDeclarationParameters: GetDeclarationParameters = (decorator: ts
 };
 
 
-export function evalText(text: string) {
+export const evalText = (text: string) => {
   const fnStr = `return ${text};`;
   return new Function(fnStr)();
-}
+};
 
 
-export function removeDecorators(node: ts.Node, decoratorNames: Set<string>) {
+export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
   if (node.decorators) {
     const updatedDecoratorList = node.decorators.filter(dec => {
       const name = (
@@ -130,10 +131,10 @@ export function removeDecorators(node: ts.Node, decoratorNames: Set<string>) {
       node.decorators = ts.createNodeArray(updatedDecoratorList);
     }
   }
-}
+};
 
 
-export function getStaticValue(staticMembers: ts.ClassElement[], staticName: string): any {
+export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {
   const staticMember: ts.GetAccessorDeclaration = staticMembers.find(member => (member.name as any).escapedText === staticName) as any;
   if (!staticMember || !staticMember.body || !staticMember.body.statements) {
     return null;
@@ -165,10 +166,10 @@ export function getStaticValue(staticMembers: ts.ClassElement[], staticName: str
   }
 
   return null;
-}
+};
 
 
-export function arrayLiteralToArray(arr: ts.ArrayLiteralExpression) {
+export const arrayLiteralToArray = (arr: ts.ArrayLiteralExpression) => {
   return arr.elements.map(element => {
     let val: any;
 
@@ -207,10 +208,10 @@ export function arrayLiteralToArray(arr: ts.ArrayLiteralExpression) {
 
     return val;
   });
-}
+};
 
 
-export function objectLiteralToObjectMap(objectLiteral: ts.ObjectLiteralExpression): ObjectMap {
+export const objectLiteralToObjectMap = (objectLiteral: ts.ObjectLiteralExpression): ObjectMap => {
   const attrs: ts.ObjectLiteralElementLike[] = (objectLiteral.properties as any);
 
   return attrs.reduce((final: ObjectMap, attr: ts.PropertyAssignment) => {
@@ -258,48 +259,48 @@ export function objectLiteralToObjectMap(objectLiteral: ts.ObjectLiteralExpressi
     return final;
 
   }, <ObjectMap>{});
-}
+};
 
-function getTextOfPropertyName(propName: ts.PropertyName): string {
+const getTextOfPropertyName = (propName: ts.PropertyName) => {
   switch (propName.kind) {
-  case ts.SyntaxKind.Identifier:
-    return (<ts.Identifier>propName).text;
-  case ts.SyntaxKind.StringLiteral:
-  case ts.SyntaxKind.NumericLiteral:
-    return (<ts.LiteralExpression>propName).text;
-  case ts.SyntaxKind.ComputedPropertyName:
-    const expression = (<ts.ComputedPropertyName>propName).expression;
-    if (ts.isStringLiteral(expression) || ts.isNumericLiteral(expression)) {
-      return (<ts.LiteralExpression>(<ts.ComputedPropertyName>propName).expression).text;
-    }
+    case ts.SyntaxKind.Identifier:
+      return (<ts.Identifier>propName).text;
+    case ts.SyntaxKind.StringLiteral:
+    case ts.SyntaxKind.NumericLiteral:
+      return (<ts.LiteralExpression>propName).text;
+    case ts.SyntaxKind.ComputedPropertyName:
+      const expression = (<ts.ComputedPropertyName>propName).expression;
+      if (ts.isStringLiteral(expression) || ts.isNumericLiteral(expression)) {
+        return (<ts.LiteralExpression>(<ts.ComputedPropertyName>propName).expression).text;
+      }
   }
   return undefined;
-}
+};
 
 export class ObjectMap {
   [key: string]: ts.Expression | ObjectMap
 }
 
-export function getAttributeTypeInfo(baseNode: ts.Node, sourceFile: ts.SourceFile) {
+export const getAttributeTypeInfo = (baseNode: ts.Node, sourceFile: ts.SourceFile) => {
   const allReferences: d.ComponentCompilerTypeReferences = {};
   getAllTypeReferences(baseNode).forEach(rt => {
     allReferences[rt] = getTypeReferenceLocation(rt, sourceFile);
   });
   return allReferences;
-}
+};
 
-function getEntityName(entity: ts.EntityName): string {
+const getEntityName = (entity: ts.EntityName): string => {
   if (ts.isIdentifier(entity)) {
     return entity.escapedText.toString();
   } else {
     return getEntityName(entity.left);
   }
-}
+};
 
-function getAllTypeReferences(node: ts.Node): string[] {
+const getAllTypeReferences = (node: ts.Node) => {
   const referencedTypes: string[] = [];
 
-  function visit(node: ts.Node): ts.VisitResult<ts.Node> {
+  const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
     if (ts.isTypeReferenceNode(node)) {
       referencedTypes.push(getEntityName(node.typeName));
       if (node.typeArguments) {
@@ -312,14 +313,14 @@ function getAllTypeReferences(node: ts.Node): string[] {
       }
     }
     return ts.forEachChild(node, visit);
-  }
+  };
 
   visit(node);
 
   return referencedTypes;
-}
+};
 
-export function validateReferences(config: d.Config, diagnostics: d.Diagnostic[], references: d.ComponentCompilerTypeReferences, node: ts.Node) {
+export const validateReferences = (config: d.Config, diagnostics: d.Diagnostic[], references: d.ComponentCompilerTypeReferences, node: ts.Node) => {
   Object.keys(references).forEach(refName => {
     const ref = references[refName];
     if (ref.path === '@stencil/core' && MEMBER_DECORATORS_TO_REMOVE.has(refName) ) {
@@ -327,9 +328,9 @@ export function validateReferences(config: d.Config, diagnostics: d.Diagnostic[]
       augmentDiagnosticWithNode(config, err, node);
     }
   });
-}
+};
 
-function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): d.ComponentCompilerTypeReference {
+const getTypeReferenceLocation = (typeName: string, sourceFile: ts.SourceFile): d.ComponentCompilerTypeReference => {
   const sourceFileObj = sourceFile.getSourceFile();
 
   // Loop through all top level imports to find any reference to the type for 'import' reference location
@@ -387,9 +388,9 @@ function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): 
   return {
     location: 'global',
   };
-}
+};
 
-export function resolveType(checker: ts.TypeChecker, type: ts.Type): string {
+export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
   const set = new Set<string>();
   parseDocsType(checker, type, set);
 
@@ -409,18 +410,18 @@ export function resolveType(checker: ts.TypeChecker, type: ts.Type): string {
   } else {
     return parts.join(' | ');
   }
-}
+};
 
-const TYPE_FORMAT_FLAGS =
-  ts.TypeFormatFlags.NoTruncation |
-  ts.TypeFormatFlags.InTypeAlias |
-  ts.TypeFormatFlags.InElementType;
+export const typeToString = (checker: ts.TypeChecker, type: ts.Type) => {
+  const TYPE_FORMAT_FLAGS =
+    ts.TypeFormatFlags.NoTruncation |
+    ts.TypeFormatFlags.InTypeAlias |
+    ts.TypeFormatFlags.InElementType;
 
-export function typeToString(checker: ts.TypeChecker, type: ts.Type) {
   return checker.typeToString(type, undefined, TYPE_FORMAT_FLAGS);
-}
+};
 
-export function parseDocsType(checker: ts.TypeChecker, type: ts.Type, parts: Set<string>) {
+export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set<string>) => {
   if (type.isUnion()) {
     (type as ts.UnionType).types.forEach(t => {
       parseDocsType(checker, t, parts);
@@ -429,9 +430,9 @@ export function parseDocsType(checker: ts.TypeChecker, type: ts.Type, parts: Set
     const text = typeToString(checker, type);
     parts.add(text);
   }
-}
+};
 
-export function getModuleFromSourceFile(compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile) {
+export const getModuleFromSourceFile = (compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile) => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
   if (moduleFile != null) {
@@ -440,9 +441,9 @@ export function getModuleFromSourceFile(compilerCtx: d.CompilerCtx, tsSourceFile
 
   const moduleFiles = Array.from(compilerCtx.moduleMap.values());
   return moduleFiles.find(m => m.jsFilePath === sourceFilePath);
-}
+};
 
-export function getComponentMeta(compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile, node: ts.ClassDeclaration) {
+export const getComponentMeta = (compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile, node: ts.ClassDeclaration) => {
   const meta = compilerCtx.nodeMap.get(node);
   if (meta) {
     return meta;
@@ -457,9 +458,9 @@ export function getComponentMeta(compilerCtx: d.CompilerCtx, tsSourceFile: ts.So
     }
   }
   return undefined;
-}
+};
 
-export function getComponentTagName(staticMembers: ts.ClassElement[]) {
+export const getComponentTagName = (staticMembers: ts.ClassElement[]) => {
   if (staticMembers.length > 0) {
     const tagName = getStaticValue(staticMembers, 'is') as string;
 
@@ -469,18 +470,16 @@ export function getComponentTagName(staticMembers: ts.ClassElement[]) {
   }
 
   return null;
-}
+};
 
-
-export function isStaticGetter(member: ts.ClassElement) {
+export const isStaticGetter = (member: ts.ClassElement) => {
   return (
     member.kind === ts.SyntaxKind.GetAccessor &&
     member.modifiers && member.modifiers.some(({kind}) => kind === ts.SyntaxKind.StaticKeyword)
   );
-}
+};
 
-
-export function createImportDeclaration(importPath: string, importFnName: string, importAs: string = null) {
+export const createImportDeclaration = (importPath: string, importFnName: string, importAs: string = null) => {
   return ts.createImportDeclaration(
     undefined,
     undefined,
@@ -492,52 +491,87 @@ export function createImportDeclaration(importPath: string, importFnName: string
     ])),
     ts.createLiteral(importPath)
   );
-}
+};
 
-
-export function addImports(transformCtx: ts.TransformationContext, tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) {
+export const addImports = (transformCtx: ts.TransformationContext, tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) => {
   const { module } = transformCtx.getCompilerOptions();
 
   if (module === ts.ModuleKind.CommonJS) {
-    // CommonJS
-    // const varName = require(importPath).importName;
-    const requires = importFnNames.map(importKey => {
-      const splt = importKey.split(' as ');
-      let varName = importKey;
-      let importName = importKey;
-
-      if (splt.length > 1) {
-        varName = splt[1];
-        importName = splt[0];
-      }
-
-      return ts.createVariableStatement(
-        undefined,
-        ts.createVariableDeclarationList([
-          ts.createVariableDeclaration(
-            varName,
-            undefined,
-            ts.createPropertyAccess(
-              ts.createCall(
-                ts.createIdentifier('require'),
-                [],
-                [ts.createLiteral(importPath)]
-              ),
-              ts.createIdentifier(importName)
-            )
-          )
-        ])
-      );
-    });
-
-    return ts.updateSourceFileNode(tsSourceFile, [
-      ...requires,
-      ...tsSourceFile.statements
-    ]);
+    // CommonJS require()
+    return addCjsRequires(tsSourceFile, importFnNames, importPath);
   }
 
-  // ESM
+  // ESM Imports
+  return addEsmImports(tsSourceFile, importFnNames, importPath);
+};
+
+
+const addCjsRequires = (tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) => {
+  // CommonJS require()
+  // var __stencil_require = require(importPath);
+
+  let addRequires = false;
+  const statements: ts.Statement[] = [];
+
+  const stencilRequire = ts.createVariableStatement(
+    undefined,
+    ts.createVariableDeclarationList([
+      ts.createVariableDeclaration(
+        '__stencil_require',
+        undefined,
+        ts.createCall(
+          ts.createIdentifier('require'),
+          [],
+          [ts.createLiteral(importPath)]
+        )
+      )
+    ])
+  );
+
+  const requires = importFnNames.map(importKey => {
+    const splt = importKey.split(' as ');
+    let varName = importKey;
+    let importName = importKey;
+
+    if (splt.length > 1) {
+      varName = splt[1];
+      importName = splt[0];
+    }
+
+    return ts.createVariableStatement(
+      undefined,
+      ts.createVariableDeclarationList([
+        ts.createVariableDeclaration(
+          varName,
+          undefined,
+          ts.createPropertyAccess(
+            ts.createIdentifier('__stencil_require'),
+            ts.createIdentifier(importName)
+          )
+        )
+      ])
+    );
+  });
+
+  tsSourceFile.statements.forEach(statement => {
+    statements.push(statement);
+    if (!addRequires && statement.kind === ts.SyntaxKind.ExpressionStatement) {
+      const exp = (statement as ts.ExpressionStatement).expression;
+      if (exp && exp.kind === ts.SyntaxKind.StringLiteral && (exp as ts.StringLiteral).text === 'use strict') {
+        addRequires = true;
+        statements.push(stencilRequire, ...requires);
+      }
+    }
+  });
+
+  return ts.updateSourceFileNode(tsSourceFile, statements);
+};
+
+
+const addEsmImports = (tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) => {
+  // ESM Imports
   // import { importNames } from 'importPath';
+
   return ts.updateSourceFileNode(tsSourceFile, [
     ...importFnNames.map(importKey => {
       const splt = importKey.split(' as ');
@@ -553,16 +587,17 @@ export function addImports(transformCtx: ts.TransformationContext, tsSourceFile:
     }),
     ...tsSourceFile.statements
   ]);
-}
+};
 
-export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): d.CompilerJsDoc {
+
+export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.CompilerJsDoc => {
   return {
     tags: symbol.getJsDocTags().map(tag => ({text: tag.text, name: tag.name})),
     text: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
   };
-}
+};
 
-export function serializeDocsSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): string {
+export const serializeDocsSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) => {
   const type = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
   const set = new Set<string>();
   parseDocsType(checker, type, set);
@@ -583,19 +618,17 @@ export function serializeDocsSymbol(checker: ts.TypeChecker, symbol: ts.Symbol):
   } else {
     return parts.join(' | ');
   }
-}
+};
 
-
-export function isInternal(jsDocs: d.CompilerJsDoc | undefined) {
+export const isInternal = (jsDocs: d.CompilerJsDoc | undefined) => {
   return jsDocs && jsDocs.tags.some((s) => s.name === 'internal');
-}
+};
 
-export function isMethod(member: ts.ClassElement, methodName: string): member is ts.MethodDeclaration {
+export const isMethod = (member: ts.ClassElement, methodName: string): member is ts.MethodDeclaration => {
   return ts.isMethodDeclaration(member) && member.name && (member.name as any).escapedText === methodName;
-}
+};
 
-
-export function isAsyncFn(typeChecker: ts.TypeChecker, methodDeclaration: ts.MethodDeclaration) {
+export const isAsyncFn = (typeChecker: ts.TypeChecker, methodDeclaration: ts.MethodDeclaration) => {
   if (methodDeclaration.modifiers) {
     if (methodDeclaration.modifiers.some(m => m.kind === ts.SyntaxKind.AsyncKeyword)) {
       return true;
@@ -607,4 +640,4 @@ export function isAsyncFn(typeChecker: ts.TypeChecker, methodDeclaration: ts.Met
   const typeStr = typeChecker.typeToString(returnType, undefined, ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType);
 
   return typeStr.includes('Promise<');
-}
+};
