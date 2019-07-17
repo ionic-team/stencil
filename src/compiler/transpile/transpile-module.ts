@@ -3,7 +3,7 @@ import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../build/compiler-ctx';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
-import { customElementDefineTransform, nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
+import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
@@ -73,11 +73,8 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)
   ];
 
-  if (transformOpts.transformOutput === 'customelement') {
-    after.push(customElementDefineTransform(compilerCtx, transformOpts.coreImportPath));
-
-  } else if (transformOpts.transformOutput === 'native') {
-    after.push(nativeComponentTransform(compilerCtx, transformOpts.coreImportPath));
+  if (transformOpts.transformOutput === 'customelement' || transformOpts.transformOutput === 'native') {
+    after.push(nativeComponentTransform(compilerCtx, transformOpts));
 
   } else {
     after.push(lazyComponentTransform(compilerCtx, transformOpts));

@@ -9,6 +9,11 @@ import ts from 'typescript';
 export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) => {
   let outputText: string = null;
 
+  const transformOpts: d.TransformOptions = {
+    coreImportPath: '@stencil/core',
+    metadata: null
+  };
+
   try {
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
@@ -18,7 +23,7 @@ export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, build
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          nativeComponentTransform(compilerCtx, '@stencil/core')
+          nativeComponentTransform(compilerCtx, transformOpts)
         ]
       }
     };
@@ -39,93 +44,82 @@ export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, build
 };
 
 
-export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, coreImportPath: string): ts.TransformerFactory<ts.SourceFile> => {
-
-  return transformCtx => {
-
-    return tsSourceFile => {
-      function visitNode(node: ts.Node): any {
-        if (ts.isClassDeclaration(node)) {
-          const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
-          if (cmp != null) {
-            return updateNativeComponentClass(node, cmp, false);
-          }
-        }
-
-        return ts.visitEachChild(node, visitNode, transformCtx);
-      }
-
-      tsSourceFile = addNativeImports(transformCtx, compilerCtx, tsSourceFile, coreImportPath);
-      return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
-    };
-  };
-};
-
-
-export const customElementDefineTransform = (compilerCtx: d.CompilerCtx, coreImportPath: string): ts.TransformerFactory<ts.SourceFile> => {
+export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
+  const exportAsCustomElement = (transformOpts.transformOutput === 'customelement');
 
   return transformCtx => {
 
     return tsSourceFile => {
       const cmps = new Map<string, ts.ClassDeclaration>();
-      const cmpClassNames = new Set<string>();
 
-      function visitNode(node: ts.Node): any {
+      const visitNode = (node: ts.Node): any => {
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
             cmps.set(cmp.tagName, node);
-            cmpClassNames.add(node.name.text);
-            return updateNativeComponentClass(node, cmp, true);
+            return updateNativeComponentClass(node, cmp, exportAsCustomElement);
           }
         }
 
         return ts.visitEachChild(node, visitNode, transformCtx);
-      }
+      };
 
-      tsSourceFile = addNativeImports(transformCtx, compilerCtx, tsSourceFile, coreImportPath);
+      tsSourceFile = addNativeImports(transformCtx, compilerCtx, tsSourceFile, transformOpts.coreImportPath);
       tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
-      let statements = tsSourceFile.statements.slice();
+      if (exportAsCustomElement) {
+        tsSourceFile = defineCustomElement(tsSourceFile, cmps, transformOpts);
+      }
 
-      cmps.forEach((cmpNode, tagName) => {
-        statements.push(ts.createPropertyAccess(
-          ts.createIdentifier('customElements'),
-          ts.createCall(
-            ts.createIdentifier('define'),
-            [],
-            [
-              ts.createLiteral(tagName),
-              ts.createIdentifier(cmpNode.name.text)
-            ]
-          ) as any
-        ) as any);
-      });
+      return tsSourceFile;
+    };
+  };
+};
 
-      statements = statements.filter(s => {
-        if (s.kind === ts.SyntaxKind.ExpressionStatement) {
-          const exp = (s as ts.ExpressionStatement).expression as ts.BinaryExpression;
-          if (exp && exp.kind === ts.SyntaxKind.BinaryExpression) {
-            const left = exp.left as ts.PropertyAccessExpression;
-            if (left && left.kind === ts.SyntaxKind.PropertyAccessExpression) {
-              if (left.expression && left.expression.kind === ts.SyntaxKind.Identifier) {
-                const leftText = left.expression as ts.Identifier;
-                if (leftText.text === 'exports') {
-                  const right = exp.right as ts.Identifier;
-                  if (right && cmpClassNames.has(right.text)) {
-                    return false;
-                  }
+
+const defineCustomElement = (tsSourceFile: ts.SourceFile, cmps: Map<string, ts.ClassDeclaration>, transformOpts: d.TransformOptions) => {
+  let statements = tsSourceFile.statements.slice();
+  const cmpClassNames = new Set<string>();
+
+  // add customElements.define('cmp-a', CmpClass);
+  cmps.forEach((cmpNode, tagName) => {
+    statements.push(ts.createPropertyAccess(
+      ts.createIdentifier('customElements'),
+      ts.createCall(
+        ts.createIdentifier('define'),
+        [],
+        [
+          ts.createLiteral(tagName),
+          ts.createIdentifier(cmpNode.name.text)
+        ]
+      ) as any
+    ) as any);
+    cmpClassNames.add(cmpNode.name.text);
+  });
+
+  if (transformOpts.module === ts.ModuleKind.CommonJS) {
+    // remove commonjs exports keyword from component classes
+    statements = statements.filter(s => {
+      if (s.kind === ts.SyntaxKind.ExpressionStatement) {
+        const exp = (s as ts.ExpressionStatement).expression as ts.BinaryExpression;
+        if (exp && exp.kind === ts.SyntaxKind.BinaryExpression) {
+          const left = exp.left as ts.PropertyAccessExpression;
+          if (left && left.kind === ts.SyntaxKind.PropertyAccessExpression) {
+            if (left.expression && left.expression.kind === ts.SyntaxKind.Identifier) {
+              const leftText = left.expression as ts.Identifier;
+              if (leftText.text === 'exports') {
+                const right = exp.right as ts.Identifier;
+                if (right && cmpClassNames.has(right.text)) {
+                  return false;
                 }
               }
             }
           }
         }
-        return true;
-      });
+      }
+      return true;
+    });
+  }
 
-      tsSourceFile = ts.updateSourceFileNode(tsSourceFile, statements);
-
-      return tsSourceFile;
-    };
-  };
+  return ts.updateSourceFileNode(tsSourceFile, statements);
 };
