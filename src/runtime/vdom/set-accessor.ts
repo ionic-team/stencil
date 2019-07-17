@@ -16,18 +16,10 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   if (oldValue === newValue) {
     return;
   }
-  if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
-    // Class
-    if (BUILD.updatable) {
-      const oldList = parseClassList(oldValue);
-      const baseList = parseClassList(elm.className).filter(item => !oldList.includes(item));
-      elm.className = baseList.concat(
-        parseClassList(newValue).filter(item => !baseList.includes(item))
-      ).join(' ');
-
-    } else {
-      elm.className = newValue;
-    }
+  if (BUILD.vdomClass && memberName === 'class') {
+    const classList = elm.classList;
+    classList.remove(...parseClassList(oldValue));
+    classList.add(...parseClassList(newValue));
 
   } else if (BUILD.vdomStyle && memberName === 'style') {
     // update style attribute, css properties and values

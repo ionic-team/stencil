@@ -77,7 +77,6 @@ describe('render-vdom', () => {
     `);
   });
 
-
   it('Hello VDOM, body.innerHTML, await flush', async () => {
     @Component({ tag: 'cmp-a'})
     class CmpA {
@@ -195,6 +194,89 @@ describe('render-vdom', () => {
         </div>
       </cmp-a>
     `);
+  });
+
+  describe('svg', () => {
+    it('should not override classes', async () => {
+      @Component({
+        tag: 'cmp-a',
+        styles: ':host{}',
+        scoped: true
+      })
+      class CmpA {
+        @Prop() addClass = false;
+        render() {
+          return (
+            <svg class={{'hello': this.addClass}}></svg>
+          );
+        }
+      }
+
+      const { root, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+        includeAnnotations: true
+      });
+      expect(root).toEqualHtml(`
+    <cmp-a class="hydrated sc-cmp-a-h sc-cmp-a-s">
+      <svg class="sc-cmp-a"></svg>
+    </cmp-a>
+    `);
+
+      root.querySelector('svg').classList.add('manual');
+      root.addClass = true;
+      await waitForChanges();
+
+      expect(root).toEqualHtml(`
+      <cmp-a class="hydrated sc-cmp-a-h sc-cmp-a-s">
+        <svg class="manual hello sc-cmp-a"></svg>
+      </cmp-a>
+      `);
+    });
+
+    it('should update attributes', async () => {
+      @Component({
+        tag: 'svg-attr'
+      })
+      class SvgAttr {
+
+        @Prop() isOpen = false;
+
+        render() {
+          return (
+            <div>
+              <div>
+              { this.isOpen ? (
+                  <svg viewBox='0 0 54 54'>
+                    <rect transform='rotate(45 27 27)' y='22' width='54' height='10' rx='2'/>
+                  </svg>
+                ) : (
+                  <svg viewBox='0 0 54 54'>
+                    <rect y='0' width='54' height='10' rx='2'/>
+                  </svg>
+                )}
+              </div>
+            </div>
+          );
+        }
+      }
+
+      const { root, waitForChanges } = await newSpecPage({
+        components: [SvgAttr],
+        html: `<svg-attr></svg-attr>`,
+      });
+
+      const rect = root.querySelector('rect');
+      expect(rect.getAttribute('transform')).toBe(null);
+
+      root.isOpen = true;
+      await waitForChanges();
+      expect(rect.getAttribute('transform')).toBe('rotate(45 27 27)');
+
+      root.isOpen = false;
+      await waitForChanges();
+      expect(rect.getAttribute('transform')).toBe(null);
+    });
   });
 
   describe('ref property', () => {
