@@ -16,7 +16,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   if (oldValue === newValue) {
     return;
   }
-  if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
+  if (BUILD.vdomClass && memberName === 'class') {
     // Class
     if (BUILD.updatable) {
       const oldList = parseClassList(oldValue);
@@ -93,9 +93,14 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     // Set property if it exists and it's not a SVG
     const isProp = isMemberInElement(elm, memberName);
     const isComplex = isComplexType(newValue);
+    const isCustomElement = elm.tagName.includes('-');
     if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {
-        (elm as any)[memberName] = newValue == null && elm.tagName.indexOf('-') === -1 ? '' : newValue;
+        if (isCustomElement) {
+          (elm as any)[memberName] = newValue;
+        } else if ((elm as any)[memberName] !== newValue || '') {
+          (elm as any)[memberName] = newValue || '';
+        }
       } catch (e) {}
     }
 
