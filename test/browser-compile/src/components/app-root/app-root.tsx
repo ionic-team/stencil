@@ -1,4 +1,5 @@
 import { Component, Host, h, State } from '@stencil/core';
+import { loadDeps } from './load-deps';
 import { templates } from './templates';
 
 
@@ -10,6 +11,8 @@ export class AppRoot {
 
   file: HTMLInputElement;
   sourceCodeInput: HTMLTextAreaElement;
+  transpiledInput: HTMLTextAreaElement;
+  bundledInput: HTMLTextAreaElement;
   htmlCodeInput: HTMLTextAreaElement;
   metadata: HTMLSelectElement;
   module: HTMLSelectElement;
@@ -20,50 +23,20 @@ export class AppRoot {
   fileTemplate: HTMLSelectElement;
   iframe: HTMLIFrameElement;
 
-  fetchPromises: Promise<any>;
   fs = new Map<string, string>();
   resolveLookup = new Map<string, string>();
-  wrap = 'off';
 
-  @State() transpiledCode = '';
-  @State() bundledCode = '';
+  @State() wrap = 'off';
   @State() buildView: 'transpiled' | 'bundled' = 'transpiled';
   @State() minified: 'uncompressed' | 'pretty' | 'minified' = 'uncompressed';
+  @State() bundledLength = 0;
   @State() diagnostics: any = [];
 
-  async componentWillLoad() {
-    this.resolveLookup.set('@stencil/core/internal/client', '/@stencil/core/internal/client.mjs');
-    this.resolveLookup.set('@stencil/core/internal/build-conditionals', '/@stencil/core/internal/build-conditionals.mjs');
-
-    const browserCompiler = await loadDep('/@stencil/core/compiler/browser.js');
-
-    browserCompiler;
-    const deps = Promise.all([
-      loadDep('https://unpkg.com/terser@4.1.2/dist/bundle.js'),
-      loadDep(`https://unpkg.com/rollup@1.17.0/dist/rollup.browser.js`),
-      loadDep(`https://unpkg.com/typescript@3.5.3/lib/typescript.js`),
-    ]);
-
-    return Promise.all([
-      await fetch('/@stencil/core/internal/client.mjs'),
-      await fetch('/@stencil/core/internal/build-conditionals.mjs'),
-      await fetch('/@stencil/core/internal/css-shim.mjs'),
-      await fetch('/@stencil/core/internal/dom.mjs'),
-      await fetch('/@stencil/core/internal/shadow-css.mjs'),
-
-    ]).then(results => {
-      console.log(4)
-      return Promise.all(results.map(async r => {
-        const file = (new URL(r.url)).pathname;
-        const code = await r.text();
-        this.fs.set(file, code);
-      }));
-    }).then(() => {
-      return deps;
-    });
+  componentWillLoad() {
+    return loadDeps(this.resolveLookup, this.fs);
   }
 
-  componentDidLoad() {
+  async componentDidLoad() {
     this.file.value = this.fileTemplate.value;
     const tmp = templates.get('hello-world.tsx');
     this.sourceCodeInput.value = tmp.source.trim();
@@ -74,8 +47,6 @@ export class AppRoot {
   async compile() {
     console.clear();
     console.log(`compile: stencil v${stencil.version}, typescript v${ts.version}`);
-
-    await this.fetchPromises;
 
     const opts = {
       file: this.file.value,
@@ -89,7 +60,7 @@ export class AppRoot {
 
     const results = await stencil.compile(this.sourceCodeInput.value, opts);
 
-    this.transpiledCode = results.code;
+    this.transpiledInput.value = results.code;
     this.diagnostics = results.diagnostics;
     this.wrap = 'off';
 
@@ -114,7 +85,7 @@ export class AppRoot {
       entryId = '/' + entryId;
     }
 
-    this.fs.set(entryId, this.transpiledCode);
+    this.fs.set(entryId, this.transpiledInput.value);
 
     const inputOptions = {
       input: entryId,
@@ -161,25 +132,33 @@ export class AppRoot {
     const build = await rollup.rollup(inputOptions);
     const generated = await build.generate(generateOptions);
 
-    this.bundledCode = generated.output[0].code;
+    this.bundledInput.value = generated.output[0].code;
     this.wrap = 'off';
 
     if (this.minified === 'minified') {
-      const opts = {};
-      const results = Terser.minify(this.bundledCode, opts);
-      this.bundledCode = results.code;
+      const opts = stencil.getMinifyScriptOptions({
+        script: this.script.value,
+        pretty: false
+      });
+      const results = Terser.minify(this.bundledInput.value, opts);
+      this.bundledInput.value = results.code;
       this.wrap = 'on';
 
     } else if (this.minified === 'pretty') {
-      const opts = {};
-      const results = Terser.minify(this.bundledCode, opts);
-      this.bundledCode = results.code;
+      const opts = stencil.getMinifyScriptOptions({
+        script: this.script.value,
+        pretty: true
+      });
+      const results = Terser.minify(this.bundledInput.value, opts);
+      this.bundledInput.value = results.code;
     }
 
     this.preview();
   }
 
   preview() {
+    this.bundledLength = this.bundledInput.value.length;
+
     this.iframe.contentWindow.location.reload();
 
     setTimeout(() => {
@@ -189,15 +168,14 @@ export class AppRoot {
       script.setAttribute('type', 'module');
       script.innerHTML = [
         '(function(){',
-        this.bundledCode,
+        this.bundledInput.value,
         '})()'
       ].join('\n');
 
       doc.head.appendChild(script);
 
-      doc.body.innerHTML = '<hello-world></hello-world>';
-    })
-
+      doc.body.innerHTML = this.htmlCodeInput.value;
+    });
   }
 
   render() {
@@ -250,11 +228,11 @@ export class AppRoot {
             <label>
               <span>Script:</span>
               <select ref={el => this.script = el} onInput={this.compile.bind(this)}>
-                <option value="latest">latest</option>
-                <option value="esnext">esnext</option>
                 <option value="es2017">es2017</option>
                 <option value="es2015">es2015</option>
                 <option value="es5">es5</option>
+                <option value="latest">latest</option>
+                <option value="esnext">esnext</option>
               </select>
             </label>
             <label>
@@ -279,18 +257,20 @@ export class AppRoot {
           <header>{this.buildView === 'transpiled' ? 'Transpiled Build' : 'Bundled Build'}</header>
 
           <textarea
+            ref={el => this.transpiledInput = el}
+            onInput={this.bundle.bind(this)}
             hidden={this.buildView !== 'transpiled'}
             spellCheck={false}
             autocapitalize="off"
-            wrap="off"
-            >{this.transpiledCode}</textarea>
+            wrap="off"/>
 
           <textarea
+            ref={el => this.bundledInput = el}
+            onInput={this.preview.bind(this)}
             hidden={this.buildView !== 'bundled'}
             spellCheck={false}
             autocapitalize="off"
-            wrap={this.wrap}
-            >{this.bundledCode}</textarea>
+            wrap={this.wrap}/>
 
           <div class="options">
             <label>
@@ -314,7 +294,7 @@ export class AppRoot {
                 <option value="minified">Minified</option>
               </select>
               <span class="file-size">
-                {this.bundledCode.length}b
+                {this.bundledLength} b
               </span>
             </label>
           </div>
@@ -336,6 +316,7 @@ export class AppRoot {
               wrap="off"
               autocapitalize="off"
               ref={el => this.htmlCodeInput = el}
+              onInput={this.preview.bind(this)}
             />
             <div class="options">
 
@@ -353,19 +334,6 @@ export class AppRoot {
 
 }
 
-
-const loadDep = (url: string) => {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.onload = () => {
-      console.log('loaded')
-      setTimeout(resolve);
-    };
-    script.onerror = reject;
-    script.src = url;
-    document.head.appendChild(script);
-  });
-};
 
 
 declare const stencil: any;

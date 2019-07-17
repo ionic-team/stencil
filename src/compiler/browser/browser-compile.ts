@@ -12,16 +12,16 @@ export const compile = async (code: string, opts: d.CompileOptions = {}): Promis
     map: null,
     inputFilePath: (typeof opts.file === 'string' ? opts.file.trim() : 'module.tsx'),
     outputFilePath: null,
-    options: null
+    inputOptions: null
   };
 
   try {
     initTypescript();
 
-    results.options = getCompileOptions(opts);
+    results.inputOptions = getCompileOptions(opts);
 
-    const config = getCompilerConfig(results.options);
-    const transformOpts = getTransformOptions(results.options);
+    const config = getCompilerConfig(results.inputOptions);
+    const transformOpts = getTransformOptions(results.inputOptions);
 
     const transpileResults = transpileModule(config, code, transformOpts, results.inputFilePath);
 

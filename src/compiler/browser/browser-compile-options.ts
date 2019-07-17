@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { getTerserOptions } from '../app-core/optimize-module';
 import path from 'path';
 import ts from 'typescript';
 
@@ -83,8 +84,8 @@ export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
   if (compilerOpts.script === 'esnext') {
     transformOpts.target = ts.ScriptTarget.ESNext;
 
-  } else if (compilerOpts.script === 'es2017') {
-    transformOpts.target = ts.ScriptTarget.ES2017;
+  } else if (compilerOpts.script === 'latest') {
+    transformOpts.target = ts.ScriptTarget.Latest;
 
   } else if (compilerOpts.script === 'es2015') {
     transformOpts.target = ts.ScriptTarget.ES2015;
@@ -93,8 +94,8 @@ export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
     transformOpts.target = ts.ScriptTarget.ES5;
 
   } else {
-    compilerOpts.script = 'latest';
-    transformOpts.target = ts.ScriptTarget.Latest;
+    transformOpts.target = ts.ScriptTarget.ES2017;
+    compilerOpts.script = 'es2017';
   }
 
   if (compilerOpts.output === 'lazy') {
@@ -126,4 +127,11 @@ export const getCompilerConfig = (opts: d.CompileOptions) => {
   };
 
   return config;
+};
+
+
+export const getMinifyScriptOptions = (opts: d.CompileScriptMinifyOptions) => {
+  const sourceTarget: d.SourceTarget = (opts.script === 'es5') ? 'es5' : 'es2017';
+  const isPretty = !!opts.pretty;
+  return getTerserOptions(sourceTarget, isPretty);
 };
