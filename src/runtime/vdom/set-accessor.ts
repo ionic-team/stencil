@@ -16,7 +16,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   if (oldValue === newValue) {
     return;
   }
-  if (BUILD.vdomClass && memberName === 'class') {
+  if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
     // Class
     if (BUILD.updatable) {
       const oldList = parseClassList(oldValue);
