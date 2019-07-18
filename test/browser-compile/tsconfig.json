@@ -22,7 +22,6 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core/browser": ["../../dist/sys/browser"],
       "@stencil/core/testing": ["../../src/testing/index.ts"],
       "@stencil/core": ["../../dist"],
       "@stencil/core/internal": ["../../internal"]

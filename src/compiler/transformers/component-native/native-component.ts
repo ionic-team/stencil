@@ -1,16 +1,16 @@
 import * as d from '../../../declarations';
-import ts from 'typescript';
 import { addNativeConnectedCallback } from './native-connected-callback';
 import { addNativeElementGetter } from './native-element-getter';
-import { removeStaticMetaProperties } from '../remove-static-meta-properties';
-import { updateNativeConstructor } from './native-constructor';
 import { addWatchers } from '../transforms/watcher-meta-transform';
-import { transformHostData } from '../transforms/host-data-transform';
 import { createStaticGetter } from '../transform-utils';
+import { HTML_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
+import { removeStaticMetaProperties } from '../remove-static-meta-properties';
+import { transformHostData } from '../transforms/host-data-transform';
+import { updateNativeConstructor } from './native-constructor';
+import ts from 'typescript';
 
 
-export const updateNativeComponentClass = (classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta, removeExport: boolean) => {
-
+export const updateNativeComponentClass = (classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, removeExport: boolean) => {
   let modifiers = Array.isArray(classNode.modifiers) ? classNode.modifiers.slice() : [];
 
   if (removeExport) {
@@ -25,20 +25,24 @@ export const updateNativeComponentClass = (classNode: ts.ClassDeclaration, cmp: 
     modifiers,
     classNode.name,
     classNode.typeParameters,
-    updateNativeHostComponentHeritageClauses(classNode),
-    updateNativeHostComponentMembers(classNode, cmp)
+    updateNativeHostComponentHeritageClauses(classNode, moduleFile),
+    updateNativeHostComponentMembers(classNode, moduleFile, cmp)
   );
 };
 
 
-const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration) => {
+const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration, moduleFile: d.Module) => {
   if (classNode.heritageClauses != null && classNode.heritageClauses.length > 0) {
     return classNode.heritageClauses;
   }
 
+  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.HTMLElement);
+
   const heritageClause = ts.createHeritageClause(
     ts.SyntaxKind.ExtendsKeyword, [
-      ts.createExpressionWithTypeArguments([], ts.createIdentifier('HTMLElement'))
+      ts.createExpressionWithTypeArguments([],
+        ts.createIdentifier(HTML_ELEMENT)
+      )
     ]
   );
 
@@ -46,15 +50,15 @@ const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration
 };
 
 
-const updateNativeHostComponentMembers = (classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) => {
+const updateNativeHostComponentMembers = (classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
-  updateNativeConstructor(classMembers, cmp, true);
+  updateNativeConstructor(classMembers, moduleFile, cmp, true);
   addNativeConnectedCallback(classMembers, cmp);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
   addComponentStyle(classMembers, cmp);
-  transformHostData(classMembers);
+  transformHostData(classMembers, moduleFile);
 
   return classMembers;
 };

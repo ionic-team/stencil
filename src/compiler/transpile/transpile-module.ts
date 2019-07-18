@@ -73,7 +73,7 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)
   ];
 
-  if (transformOpts.transformOutput === 'customelement' || transformOpts.transformOutput === 'native') {
+  if (transformOpts.componentExport === 'customelement' || transformOpts.componentExport === 'native') {
     after.push(nativeComponentTransform(compilerCtx, transformOpts));
 
   } else {

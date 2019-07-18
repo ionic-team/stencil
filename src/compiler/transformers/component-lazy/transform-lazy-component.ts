@@ -1,12 +1,11 @@
 import * as d from '../../../declarations';
-import { addLazyImports } from './lazy-imports';
+import { addImports, getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { getComponentMeta, getScriptTarget } from '../transform-utils';
 import { updateLazyComponentClass } from './lazy-component';
 import ts from 'typescript';
 
 
-export const transformToLazyComponentText = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, opts: d.TransformOptions, cmp: d.ComponentCompilerMeta, inputText: string) => {
+export const transformToLazyComponentText = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, transformOpts: d.TransformOptions, cmp: d.ComponentCompilerMeta, inputText: string) => {
   let outputText: string = null;
 
   try {
@@ -21,7 +20,7 @@ export const transformToLazyComponentText = (compilerCtx: d.CompilerCtx, buildCt
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          lazyComponentTransform(compilerCtx, opts)
+          lazyComponentTransform(compilerCtx, transformOpts)
         ]
       }
     };
@@ -42,27 +41,29 @@ export const transformToLazyComponentText = (compilerCtx: d.CompilerCtx, buildCt
 };
 
 
-export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, opts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
+export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
 
   return transformCtx => {
 
     return tsSourceFile => {
+      const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
 
-      function visitNode(node: ts.Node): any {
+      const visitNode = (node: ts.Node): any => {
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateLazyComponentClass(opts, node, cmp);
+            return updateLazyComponentClass(transformOpts, node, moduleFile, cmp);
           }
-
         }
 
         return ts.visitEachChild(node, visitNode, transformCtx);
-      }
+      };
 
-      tsSourceFile = addLazyImports(transformCtx, compilerCtx, tsSourceFile, '@stencil/core');
+      tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
-      return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
+      tsSourceFile = addImports(transformCtx, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
+
+      return tsSourceFile;
     };
   };
 };

@@ -13,10 +13,11 @@ export const convertStaticToMeta = (config: d.Config, compilerCtx: d.CompilerCtx
 
     let dirPath: string;
     let moduleFile: d.Module;
+    const fileCmpNodes: ts.ClassDeclaration[] = [];
 
-    function visitNode(node: ts.Node): ts.VisitResult<ts.Node> {
+    const visitNode = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
-        return parseStaticComponentMeta(config, compilerCtx, transformCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap, transformOpts);
+        return parseStaticComponentMeta(config, compilerCtx, transformCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap, transformOpts, fileCmpNodes);
       } else if (ts.isImportDeclaration(node)) {
         return parseImport(config, compilerCtx, buildCtx, moduleFile, dirPath, node);
       } else if (ts.isCallExpression(node)) {
@@ -25,7 +26,7 @@ export const convertStaticToMeta = (config: d.Config, compilerCtx: d.CompilerCtx
         parseStringLiteral(moduleFile, node);
       }
       return ts.visitEachChild(node, visitNode, transformCtx);
-    }
+    };
 
     return tsSourceFile => {
       dirPath = config.sys.path.dirname(tsSourceFile.fileName);
@@ -40,6 +41,7 @@ export const convertStaticToMeta = (config: d.Config, compilerCtx: d.CompilerCtx
         moduleFile.isCollectionDependency = false;
         moduleFile.collectionName = null;
       }
+
       return visitNode(tsSourceFile) as ts.SourceFile;
     };
   };

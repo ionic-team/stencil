@@ -4,7 +4,7 @@ import { normalizePath } from '@utils';
 import { transformToLazyComponentText } from '../transformers/component-lazy/transform-lazy-component';
 
 
-export async function updateToLazyComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta): Promise<d.ComponentCompilerData> {
+export const updateToLazyComponent = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta): Promise<d.ComponentCompilerData> => {
   const inputFilePath = cmp.jsFilePath;
   const inputFileDir = config.sys.path.dirname(inputFilePath);
   const inputFileName = config.sys.path.basename(inputFilePath);
@@ -18,7 +18,7 @@ export async function updateToLazyComponent(config: d.Config, compilerCtx: d.Com
   if (outputJsText == null) {
     const transformOpts: d.TransformOptions = {
       coreImportPath: '@stencil/core',
-      metadata: null,
+      componentMetadata: null,
       styleImport: 'inline'
     };
     outputJsText = transformToLazyComponentText(compilerCtx, buildCtx, transformOpts, cmp, inputText);
@@ -33,12 +33,12 @@ export async function updateToLazyComponent(config: d.Config, compilerCtx: d.Com
     exportLine: createComponentExport(cmp, outputFilePath),
     cmp
   };
-}
+};
 
 
-function createComponentExport(cmp: d.ComponentCompilerMeta, lazyModuleFilePath: string) {
+const createComponentExport = (cmp: d.ComponentCompilerMeta, lazyModuleFilePath: string) => {
   const originalClassName = cmp.componentClassName;
   const underscoredClassName = cmp.tagName.replace(/-/g, '_');
   const filePath = normalizePath(lazyModuleFilePath);
   return `export { ${originalClassName} as ${underscoredClassName} } from '${filePath}';`;
-}
+};

@@ -14,10 +14,10 @@ export class AppRoot {
   transpiledInput: HTMLTextAreaElement;
   bundledInput: HTMLTextAreaElement;
   htmlCodeInput: HTMLTextAreaElement;
-  metadata: HTMLSelectElement;
+  componentMetadata: HTMLSelectElement;
   module: HTMLSelectElement;
   script: HTMLSelectElement;
-  output: HTMLSelectElement;
+  componentExport: HTMLSelectElement;
   styleImport: HTMLSelectElement;
   build: HTMLSelectElement;
   fileTemplate: HTMLSelectElement;
@@ -50,12 +50,11 @@ export class AppRoot {
 
     const opts = {
       file: this.file.value,
-      metadata: this.metadata.value,
-      mode: 'dev',
+      componentExport: this.componentExport.value,
+      componentMetadata: this.componentMetadata.value,
       module: this.module.value,
-      output: this.output.value,
       script: this.script.value,
-      styleImport: this.styleImport.value,
+      styleImport: this.styleImport.value
     };
 
     const results = await stencil.compile(this.sourceCodeInput.value, opts);
@@ -212,8 +211,8 @@ export class AppRoot {
               <input ref={el => this.file = el} onInput={this.compile.bind(this)}/>
             </label>
             <label>
-              <span>Output:</span>
-              <select ref={el => this.output = el} onInput={this.compile.bind(this)}>
+              <span>Export:</span>
+              <select ref={el => this.componentExport = el} onInput={this.compile.bind(this)}>
                 <option value="customelement">customelement</option>
                 <option value="module">module</option>
               </select>
@@ -245,7 +244,7 @@ export class AppRoot {
             </label>
             <label>
               <span>Metadata:</span>
-              <select ref={el => this.metadata = el} onInput={this.compile.bind(this)}>
+              <select ref={el => this.componentMetadata = el} onInput={this.compile.bind(this)}>
                 <option value="proxy">proxy</option>
                 <option value="static">static</option>
               </select>

@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
-import { addNativeImports } from './native-imports';
+import { addImports, getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
+import { addMetadataProxy as addComponentMetaProxy } from '../add-component-meta-proxy';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { getComponentMeta, getScriptTarget } from '../transform-utils';
 import { updateNativeComponentClass } from './native-component';
 import ts from 'typescript';
 
@@ -11,7 +11,7 @@ export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, build
 
   const transformOpts: d.TransformOptions = {
     coreImportPath: '@stencil/core',
-    metadata: null
+    componentMetadata: null
   };
 
   try {
@@ -45,31 +45,37 @@ export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, build
 
 
 export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
-  const exportAsCustomElement = (transformOpts.transformOutput === 'customelement');
+  const exportAsCustomElement = (transformOpts.componentExport === 'customelement');
 
   return transformCtx => {
 
     return tsSourceFile => {
-      const cmps = new Map<string, ts.ClassDeclaration>();
+      const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
 
       const visitNode = (node: ts.Node): any => {
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            cmps.set(cmp.tagName, node);
-            return updateNativeComponentClass(node, cmp, exportAsCustomElement);
+            return updateNativeComponentClass(node, moduleFile, cmp, exportAsCustomElement);
           }
         }
 
         return ts.visitEachChild(node, visitNode, transformCtx);
       };
 
-      tsSourceFile = addNativeImports(transformCtx, compilerCtx, tsSourceFile, transformOpts.coreImportPath);
       tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
-      if (exportAsCustomElement) {
-        tsSourceFile = defineCustomElement(tsSourceFile, cmps, transformOpts);
+      if (moduleFile.cmps.length > 0) {
+        if (exportAsCustomElement) {
+          tsSourceFile = defineCustomElement(tsSourceFile, moduleFile, transformOpts);
+        }
+
+        if (transformOpts.componentMetadata === 'proxy') {
+          tsSourceFile = addComponentMetaProxy(tsSourceFile, moduleFile);
+        }
       }
+
+      tsSourceFile = addImports(transformCtx, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
 
       return tsSourceFile;
     };
@@ -77,24 +83,24 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
 };
 
 
-const defineCustomElement = (tsSourceFile: ts.SourceFile, cmps: Map<string, ts.ClassDeclaration>, transformOpts: d.TransformOptions) => {
+const defineCustomElement = (tsSourceFile: ts.SourceFile, moduleFile: d.Module, transformOpts: d.TransformOptions) => {
   let statements = tsSourceFile.statements.slice();
   const cmpClassNames = new Set<string>();
 
   // add customElements.define('cmp-a', CmpClass);
-  cmps.forEach((cmpNode, tagName) => {
+  moduleFile.cmps.forEach(cmpMeta => {
     statements.push(ts.createPropertyAccess(
       ts.createIdentifier('customElements'),
       ts.createCall(
         ts.createIdentifier('define'),
         [],
         [
-          ts.createLiteral(tagName),
-          ts.createIdentifier(cmpNode.name.text)
+          ts.createLiteral(cmpMeta.tagName),
+          ts.createIdentifier(cmpMeta.componentClassName)
         ]
       ) as any
     ) as any);
-    cmpClassNames.add(cmpNode.name.text);
+    cmpClassNames.add(cmpMeta.componentClassName);
   });
 
   if (transformOpts.module === ts.ModuleKind.CommonJS) {

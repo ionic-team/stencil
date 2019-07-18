@@ -20,7 +20,7 @@ export const compile = async (code: string, opts: d.CompileOptions = {}): Promis
 
     results.inputOptions = getCompileOptions(opts);
 
-    const config = getCompilerConfig(results.inputOptions);
+    const config = getCompilerConfig();
     const transformOpts = getTransformOptions(results.inputOptions);
 
     const transpileResults = transpileModule(config, code, transformOpts, results.inputFilePath);

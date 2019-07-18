@@ -21,7 +21,7 @@ export interface ValidateTypesResults {
 
 export interface TransformOptions extends ts.CompilerOptions {
   coreImportPath: string;
-  metadata: 'static' | null;
+  componentMetadata: 'proxy' | 'static' | null;
   styleImport?: 'cjs' | 'esm' | 'inline' | null;
-  transformOutput?: 'lazy' | 'native' | 'customelement' | null;
+  componentExport?: 'lazy' | 'native' | 'customelement' | null;
 }

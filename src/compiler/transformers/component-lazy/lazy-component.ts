@@ -1,14 +1,14 @@
 import * as d from '../../../declarations';
 import { addComponentStylePlaceholders } from '../component-style';
 import { addLazyElementGetter } from './lazy-element-getter';
+import { addWatchers } from '../transforms/watcher-meta-transform';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
+import { transformHostData } from '../transforms/host-data-transform';
 import { updateLazyComponentConstructor } from './lazy-constructor';
 import ts from 'typescript';
-import { addWatchers } from '../transforms/watcher-meta-transform';
-import { transformHostData } from '../transforms/host-data-transform';
 
 
-export function updateLazyComponentClass(opts: d.TransformOptions, classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
+export const updateLazyComponentClass = (opts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   return ts.updateClassDeclaration(
     classNode,
     classNode.decorators,
@@ -16,22 +16,22 @@ export function updateLazyComponentClass(opts: d.TransformOptions, classNode: ts
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    updateLazyComponentMembers(opts, classNode, cmp)
+    updateLazyComponentMembers(opts, classNode, moduleFile, cmp)
   );
-}
+};
 
 
-function updateLazyComponentMembers(opts: d.TransformOptions, classNode: ts.ClassDeclaration, cmp: d.ComponentCompilerMeta) {
+const updateLazyComponentMembers = (transformOpts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
-  updateLazyComponentConstructor(classMembers, cmp);
-  addLazyElementGetter(classMembers, cmp);
+  updateLazyComponentConstructor(classMembers, moduleFile, cmp);
+  addLazyElementGetter(classMembers, moduleFile, cmp);
   addWatchers(classMembers, cmp);
-  transformHostData(classMembers);
+  transformHostData(classMembers, moduleFile);
 
-  if (opts.styleImport === 'inline') {
+  if (transformOpts.styleImport === 'inline') {
     addComponentStylePlaceholders(classMembers, cmp);
   }
 
   return classMembers;
-}
+};

@@ -90,6 +90,7 @@ export const getModule = (config: d.Config, compilerCtx: d.CompilerCtx, sourceFi
       sourceFilePath: sourceFilePath,
       jsFilePath: jsFilePath,
       cmps: [],
+      coreRuntimeApis: [],
       collectionName: null,
       dtsFilePath: null,
       excludeFromCollection: false,
@@ -119,6 +120,7 @@ export const getModule = (config: d.Config, compilerCtx: d.CompilerCtx, sourceFi
 
 export const resetModule = (moduleFile: d.Module) => {
   moduleFile.cmps.length = 0;
+  moduleFile.coreRuntimeApis.length = 0;
   moduleFile.collectionName = null;
   moduleFile.dtsFilePath = null;
   moduleFile.excludeFromCollection = false;

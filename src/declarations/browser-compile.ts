@@ -2,10 +2,9 @@ import * as d from '.';
 
 export interface CompileOptions {
   file?: string;
-  metadata?: 'proxy' | 'static' | string | undefined;
-  mode?: 'dev' | 'prod' | string;
+  componentMetadata?: 'proxy' | 'static' | string | undefined;
   module?: 'cjs' | 'esm' | string;
-  output?: 'customelement' | 'module' | string | undefined;
+  componentExport?: 'customelement' | 'module' | string | undefined;
   script?: CompileScript;
   styleImport?: 'cjs' | 'esm' | 'inline' | string | undefined;
 }

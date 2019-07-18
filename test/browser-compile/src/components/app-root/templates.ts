@@ -11,7 +11,7 @@ export const templates = new Map<string, QuickTemplate>();
 templates.set(`hello-world.tsx`, {
 
 source:  `
-import { Component, h } from '@stencil/core';
+import { Component } from '@stencil/core';
 
 @Component({
   tag: 'hello-world'

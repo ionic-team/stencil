@@ -6,24 +6,19 @@ import ts from 'typescript';
 
 export const getCompileOptions = (input: d.CompileOptions) => {
   const rtn: d.CompileOptions = {
-    metadata: (typeof input.metadata === 'string' ? input.metadata.toLowerCase().trim() : ''),
-    mode: (typeof input.mode === 'string' ? input.mode.toLowerCase().trim() : ''),
+    componentExport: (typeof input.componentExport === 'string' ? input.componentExport.toLowerCase().trim() : ''),
+    componentMetadata: (typeof input.componentMetadata === 'string' ? input.componentMetadata.toLowerCase().trim() : ''),
     module: (typeof input.module === 'string' ? input.module.toLowerCase().trim() : ''),
-    output: (typeof input.output === 'string' ? input.output.toLowerCase().trim() : ''),
     script: (typeof input.script === 'string' ? input.script.toLowerCase().trim() : ''),
     styleImport: (typeof input.styleImport === 'string' ? input.styleImport.toLowerCase().trim() : '')
   };
 
-  if (!VALID_METADATA.has(rtn.metadata)) {
-    rtn.metadata = 'proxy';
+  if (!VALID_METADATA.has(rtn.componentMetadata)) {
+    rtn.componentMetadata = 'proxy';
   }
 
-  if (!VALID_MODE.has(rtn.mode)) {
-    rtn.mode = 'dev';
-  }
-
-  if (!VALID_OUTPUT.has(rtn.output)) {
-    rtn.output = 'customelement';
+  if (!VALID_OUTPUT.has(rtn.componentExport)) {
+    rtn.componentExport = 'customelement';
   }
 
   if (!VALID_STYLE_IMPORT.has(rtn.styleImport)) {
@@ -35,7 +30,6 @@ export const getCompileOptions = (input: d.CompileOptions) => {
 
 
 const VALID_METADATA = new Set(['pending', 'static']);
-const VALID_MODE = new Set(['prod', 'dev']);
 const VALID_OUTPUT = new Set(['customelement', 'module']);
 const VALID_STYLE_IMPORT = new Set(['cjs', 'esm', 'inline']);
 
@@ -68,7 +62,7 @@ export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
     noResolve: true,
 
     coreImportPath: '@stencil/core/internal/client',
-    metadata: compilerOpts.metadata as any,
+    componentMetadata: compilerOpts.componentMetadata as any,
     styleImport: compilerOpts.styleImport as any,
   };
 
@@ -98,26 +92,26 @@ export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
     compilerOpts.script = 'es2017';
   }
 
-  if (compilerOpts.output === 'lazy') {
-    transformOpts.transformOutput = 'lazy';
+  if (compilerOpts.componentExport === 'lazy') {
+    transformOpts.componentExport = 'lazy';
 
-  } else if (compilerOpts.output === 'module') {
-    transformOpts.transformOutput = 'native';
+  } else if (compilerOpts.componentExport === 'module') {
+    transformOpts.componentExport = 'native';
 
   } else {
-    transformOpts.transformOutput = 'customelement';
+    transformOpts.componentExport = 'customelement';
   }
 
   return transformOpts;
 };
 
 
-export const getCompilerConfig = (opts: d.CompileOptions) => {
+export const getCompilerConfig = () => {
   const config: d.Config = {
     cwd: '/',
     rootDir: '/',
     srcDir: '/',
-    devMode: (opts.mode === 'dev'),
+    devMode: true,
     _isTesting: true,
     validateTypes: false,
     enableCache: false,

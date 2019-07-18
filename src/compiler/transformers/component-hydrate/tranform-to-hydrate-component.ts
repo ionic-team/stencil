@@ -1,15 +1,19 @@
 import * as d from '../../../declarations';
-import { addHydrateImports } from './hydrate-imports';
+import { addImports, getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { getComponentMeta, getScriptTarget } from '../transform-utils';
 import { updateHydrateComponentClass } from './hydrate-component';
 import ts from 'typescript';
 
 
-export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) {
+export const transformToHydrateComponentText = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) => {
   let outputText: string = null;
 
   try {
+    const transformOpts: d.TransformOptions = {
+      coreImportPath: '@stencil/core',
+      componentMetadata: null,
+      styleImport: 'inline'
+    };
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
         module: ts.ModuleKind.ES2015,
@@ -21,7 +25,7 @@ export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buil
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          hydrateComponentTransform(compilerCtx)
+          hydrateComponentTransform(compilerCtx, transformOpts)
         ]
       }
     };
@@ -39,29 +43,32 @@ export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buil
   }
 
   return outputText;
-}
+};
 
 
-function hydrateComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
+const hydrateComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
 
   return transformCtx => {
 
     return tsSourceFile => {
+      const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
 
-      function visitNode(node: ts.Node): any {
+      const visitNode = (node: ts.Node): any => {
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateHydrateComponentClass(node, cmp);
+            return updateHydrateComponentClass(node, moduleFile, cmp);
           }
         }
 
         return ts.visitEachChild(node, visitNode, transformCtx);
-      }
+      };
 
       tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
-      return addHydrateImports(transformCtx, compilerCtx, tsSourceFile, '@stencil/core');
+      tsSourceFile = addImports(transformCtx, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
+
+      return tsSourceFile;
     };
   };
-}
+};

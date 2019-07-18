@@ -1,7 +1,9 @@
+import * as d from '../../../declarations';
+import { H, HOST, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
 import ts from 'typescript';
-import { H, HOST } from '../exports';
 
-export function transformHostData(classElements: ts.ClassElement[]) {
+
+export const transformHostData = (classElements: ts.ClassElement[], moduleFile: d.Module) => {
   const hasHostData = classElements.some(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'hostData');
   if (hasHostData) {
     const renderIndex = classElements.findIndex(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'render');
@@ -20,11 +22,14 @@ export function transformHostData(classElements: ts.ClassElement[]) {
         renderMethod.body
       );
     }
-    classElements.push(syntheticRender(renderIndex >= 0));
+    classElements.push(syntheticRender(moduleFile, renderIndex >= 0));
   }
-}
+};
 
-function syntheticRender(hasRender: boolean) {
+const syntheticRender = (moduleFile: d.Module, hasRender: boolean) => {
+  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.Host);
+  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.h);
+
   const hArguments = [
     // __stencil_Host
     ts.createIdentifier(HOST),
@@ -70,6 +75,6 @@ function syntheticRender(hasRender: boolean) {
       )
     ])
   );
-}
+};
 
 const INTERNAL_RENDER = '__stencil_render';
