@@ -5,7 +5,7 @@ import ts from 'typescript';
 import { CMP_FLAGS } from '@utils';
 
 
-export function addHydrateRuntimeCmpMeta(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
+export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   const compactMeta: d.ComponentRuntimeMetaCompact = formatComponentRuntimeMeta(cmp, true);
   const cmpMeta: d.ComponentRuntimeMeta = {
     $flags$: compactMeta[0],

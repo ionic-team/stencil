@@ -1,9 +1,9 @@
 import * as d from '../../../declarations';
 import { addComponentStylePlaceholders } from '../component-style';
 import { addLazyElementGetter } from './lazy-element-getter';
-import { addWatchers } from '../transforms/watcher-meta-transform';
+import { addWatchers } from '../watcher-meta-transform';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
-import { transformHostData } from '../transforms/host-data-transform';
+import { transformHostData } from '../host-data-transform';
 import { updateLazyComponentConstructor } from './lazy-constructor';
 import ts from 'typescript';
 

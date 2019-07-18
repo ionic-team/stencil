@@ -1,7 +1,7 @@
 import ts from 'typescript';
 
 
-export function removeStaticMetaProperties(classNode: ts.ClassDeclaration) {
+export const removeStaticMetaProperties = (classNode: ts.ClassDeclaration) => {
   if (classNode.members == null) {
     return [];
   }
@@ -16,7 +16,7 @@ export function removeStaticMetaProperties(classNode: ts.ClassDeclaration) {
     }
     return true;
   });
-}
+};
 
 
 const REMOVE_STATIC_GETTERS = new Set([

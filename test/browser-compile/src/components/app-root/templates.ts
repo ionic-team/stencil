@@ -35,7 +35,7 @@ html: `
 templates.set(`my-name.tsx`, {
 source: `
 
-import { Component, h } from '@stencil/core';
+import { Component, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'my-name'

@@ -1,5 +1,5 @@
-import * as d from '../../../declarations';
-import { H, HOST, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
+import * as d from '../../declarations';
+import { H, HOST, RUNTIME_APIS, addCoreRuntimeApi } from './core-runtime-apis';
 import ts from 'typescript';
 
 

@@ -203,7 +203,7 @@ export class AppRoot {
                 this.compile();
               }}>
                 <option value="hello-world.tsx">Hello World</option>
-                <option value="my-name.tsx">My Name</option>
+                <option value="my-name.tsx">Properties</option>
               </select>
             </label>
             <label>

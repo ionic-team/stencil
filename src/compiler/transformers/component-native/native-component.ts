@@ -1,11 +1,11 @@
 import * as d from '../../../declarations';
 import { addNativeConnectedCallback } from './native-connected-callback';
 import { addNativeElementGetter } from './native-element-getter';
-import { addWatchers } from '../transforms/watcher-meta-transform';
+import { addWatchers } from '../watcher-meta-transform';
 import { createStaticGetter } from '../transform-utils';
 import { HTML_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
-import { transformHostData } from '../transforms/host-data-transform';
+import { transformHostData } from '../host-data-transform';
 import { updateNativeConstructor } from './native-constructor';
 import ts from 'typescript';
 

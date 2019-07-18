@@ -10,14 +10,12 @@ export const HOST = '__stencil_Host';
 export const HTML_ELEMENT = 'HTMLElement';
 export const REGISTER_INSTANCE = '__stencil_registerInstance';
 export const REGISTER_HOST = '__stencil_registerHost';
-// export const CONNECTED_CALLBACK = '__stencil_connectedCallback';
 export const PROXY_COMPONENT = '__stencil_proxyComponent';
 export const H = '__stencil_h';
 
 
 export const RUNTIME_APIS = {
   attachShadow: `attachShadow as ${ATTACH_SHADOW}`,
-  // connectedCallback: `connectedCallback as ${CONNECTED_CALLBACK}`,
   createEvent: `createEvent as ${CREATE_EVENT}`,
   getConnect: `getConnect as ${GET_CONNECT}`,
   getContext: `getContext as ${GET_CONTEXT}`,

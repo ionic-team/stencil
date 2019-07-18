@@ -4,12 +4,9 @@ import ts from 'typescript';
 
 export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   // function call to stencil's exported connectedCallback(elm, plt)
-  const methodName = 'connectedCallback';
 
   // TODO: fast path
   if (cmp.isPlain && cmp.hasRenderFn) {
-    // addCoreRuntimeApi(moduleFile, RUNTIME_APIS.connectedCallback);
-
     const fnCall = ts.createExpressionStatement(ts.createAssignment(
       ts.createPropertyAccess(
         ts.createThis(),
@@ -25,7 +22,7 @@ export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp:
       )
     ));
     const connectedCallback = classMembers.find(classMember => {
-      return (ts.isMethodDeclaration(classMember) && (classMember.name as any).escapedText === methodName);
+      return (ts.isMethodDeclaration(classMember) && (classMember.name as any).escapedText === 'connectedCallback');
     }) as ts.MethodDeclaration;
 
     const prependBody = [
@@ -44,7 +41,7 @@ export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp:
         undefined,
         undefined,
         undefined,
-        methodName, undefined, undefined, undefined, undefined,
+        'connectedCallback', undefined, undefined, undefined, undefined,
         ts.createBlock(prependBody, true)
       );
       classMembers.push(callbackMethod);

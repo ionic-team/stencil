@@ -1,9 +1,9 @@
 import * as d from '../../../declarations';
 import { addLazyElementGetter } from '../component-lazy/lazy-element-getter';
 import { addHydrateRuntimeCmpMeta } from './hydrate-runtime-cmp-meta';
-import { addWatchers } from '../transforms/watcher-meta-transform';
+import { addWatchers } from '../watcher-meta-transform';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
-import { transformHostData } from '../transforms/host-data-transform';
+import { transformHostData } from '../host-data-transform';
 import { updateLazyComponentConstructor } from '../component-lazy/lazy-constructor';
 import ts from 'typescript';
 
