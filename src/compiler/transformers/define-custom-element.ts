@@ -8,10 +8,10 @@ import ts from 'typescript';
 export const defineCustomElement = (tsSourceFile: ts.SourceFile, moduleFile: d.Module, transformOpts: d.TransformOptions) => {
   let statements = tsSourceFile.statements.slice();
 
-  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.defineCustomElement);
-
   statements.push(
-    ...moduleFile.cmps.map(addDefineCustomElement)
+    ...moduleFile.cmps.map(cmp => {
+      return addDefineCustomElement(moduleFile, cmp);
+    })
   );
 
   if (transformOpts.module === ts.ModuleKind.CommonJS) {
@@ -23,23 +23,25 @@ export const defineCustomElement = (tsSourceFile: ts.SourceFile, moduleFile: d.M
 };
 
 
-const addDefineCustomElement = (compilerMeta: d.ComponentCompilerMeta) => {
-  // TODO! SIMPLE CASE THAT DOESN'T REQUIRE THE COMPONENT TO BE PROXIED
-  // add customElements.define('cmp-a', CmpClass);
-  // moduleFile.cmps.forEach(cmpMeta => {
-  //   statements.push(ts.createPropertyAccess(
-  //     ts.createIdentifier('customElements'),
-  //     ts.createCall(
-  //       ts.createIdentifier('define'),
-  //       [],
-  //       [
-  //         ts.createLiteral(cmpMeta.tagName),
-  //         ts.createIdentifier(cmpMeta.componentClassName)
-  //       ]
-  //     ) as any
-  //   ) as any);
-  //   cmpClassNames.add(cmpMeta.componentClassName);
+const addDefineCustomElement = (moduleFile: d.Module, compilerMeta: d.ComponentCompilerMeta) => {
+  if (compilerMeta.isPlain) {
+    // add customElements.define('cmp-a', CmpClass);
+    return ts.createStatement(
+      ts.createCall(
+        ts.createPropertyAccess(
+          ts.createIdentifier('customElements'),
+          ts.createIdentifier('define')
+        ),
+        [],
+        [
+          ts.createLiteral(compilerMeta.tagName),
+          ts.createIdentifier(compilerMeta.componentClassName)
+        ]
+      )
+    );
+  }
 
+  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.defineCustomElement);
   const compactMeta: d.ComponentRuntimeMetaCompact = formatComponentRuntimeMeta(compilerMeta, true);
 
   const liternalCmpClassName = ts.createIdentifier(compilerMeta.componentClassName);
