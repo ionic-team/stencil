@@ -542,7 +542,7 @@ export class MockElement extends MockNode {
   set tabIndex(value: number) { this.setAttributeNS(null, 'tabindex', value); }
 
   get tagName() { return this.nodeName; }
-  set tagName(value: string) { this.nodeName = value.toUpperCase(); }
+  set tagName(value: string) { this.nodeName = value; }
 
   get textContent() {
     const text: string[] = [];
@@ -688,6 +688,8 @@ export class MockHTMLElement extends MockElement {
       typeof nodeName === 'string' ? nodeName.toUpperCase() : null,
     );
   }
+
+  set tagName(value: string) { this.nodeName = value; }
 
   get attributes() {
     let attrs = attrsMap.get(this);
