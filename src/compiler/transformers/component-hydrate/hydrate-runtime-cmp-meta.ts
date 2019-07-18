@@ -1,8 +1,8 @@
 import * as d from '../../../declarations';
+import { CMP_FLAGS } from '@utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { formatComponentRuntimeMeta } from '../../app-core/format-component-runtime-meta';
 import ts from 'typescript';
-import { CMP_FLAGS } from '@utils';
 
 
 export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
@@ -20,4 +20,4 @@ export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d
   }
   const staticMember = createStaticGetter('cmpMeta', convertValueToLiteral(cmpMeta));
   classMembers.push(staticMember);
-}
+};

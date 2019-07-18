@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { addImports, getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
-import { addMetadataProxy as addComponentMetaProxy } from '../add-component-meta-proxy';
+import { addModuleMetadataProxies } from '../add-component-meta-proxy';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { defineCustomElement } from '../define-custom-element';
 import { updateNativeComponentClass } from './native-component';
@@ -67,12 +67,11 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
       tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
       if (moduleFile.cmps.length > 0) {
+        if (transformOpts.componentMetadata === 'proxy') {
+          tsSourceFile = addModuleMetadataProxies(tsSourceFile, moduleFile);
+        }
         if (exportAsCustomElement) {
           tsSourceFile = defineCustomElement(tsSourceFile, moduleFile, transformOpts);
-        }
-
-        if (transformOpts.componentMetadata === 'proxy') {
-          tsSourceFile = addComponentMetaProxy(tsSourceFile, moduleFile);
         }
       }
 

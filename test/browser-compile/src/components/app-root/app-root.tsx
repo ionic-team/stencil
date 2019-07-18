@@ -88,6 +88,7 @@ export class AppRoot {
 
     const inputOptions = {
       input: entryId,
+      treeshake: true,
       plugins: [{
 				resolveId: (importee: string, importer: string) => {
           console.log('bundle resolveId, importee:', importee, 'importer:', importer);
