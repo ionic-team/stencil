@@ -205,6 +205,7 @@ export class AppRoot {
               }}>
                 <option value="hello-world.tsx">Hello World</option>
                 <option value="my-name.tsx">Properties</option>
+                <option value="my-button.tsx">Shadow/Slot</option>
               </select>
             </label>
             <label>

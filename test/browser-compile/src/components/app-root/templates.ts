@@ -24,7 +24,6 @@ export class HelloWorld {
 
 }
 `,
-
 html: `
 <hello-world></hello-world>
 `
@@ -54,9 +53,39 @@ export class MyName {
 }
 
 `,
-
 html: `
 <my-name first="Stencil" last="JS"></my-name>
+`});
+
+
+
+templates.set(`my-button.tsx`, {
+source: `
+
+import { Component, Prop, h } from '@stencil/core';
+
+@Component({
+  tag: 'my-button',
+  shadow: true,
+  style: 'button { font-size: 18px; color: white; font-weight: bold; }'
+})
+export class MyButton {
+
+  @Prop() color = 'blue';
+
+  render() {
+    return (
+      <button style={{background: this.color}}>
+        <slot/>
+      </button>
+    );
+  }
+
+}
+
+`,
+html: `
+<my-button color="red">My Button</my-button>
 `
 
 });
