@@ -16,7 +16,7 @@ export const updateElement = (oldVnode: d.VNode | null, newVnode: d.VNode, isSvg
   if (BUILD.updatable) {
     // remove attributes no longer present on the vnode by setting them to undefined
     for (memberName in oldVnodeAttrs) {
-      if (newVnodeAttrs[memberName] == null && oldVnodeAttrs[memberName] != null) {
+      if (!(memberName in newVnodeAttrs))  {
         setAccessor(elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode, newVnode.$flags$);
       }
     }
