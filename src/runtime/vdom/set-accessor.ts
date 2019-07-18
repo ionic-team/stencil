@@ -16,18 +16,10 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   if (oldValue === newValue) {
     return;
   }
-  if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
-    // Class
-    if (BUILD.updatable) {
-      const oldList = parseClassList(oldValue);
-      const baseList = parseClassList(elm.className).filter(item => !oldList.includes(item));
-      elm.className = baseList.concat(
-        parseClassList(newValue).filter(item => !baseList.includes(item))
-      ).join(' ');
-
-    } else {
-      elm.className = newValue;
-    }
+  if (BUILD.vdomClass && memberName === 'class') {
+    const classList = elm.classList;
+    classList.remove(...parseClassList(oldValue));
+    classList.add(...parseClassList(newValue));
 
   } else if (BUILD.vdomStyle && memberName === 'style') {
     // update style attribute, css properties and values
@@ -93,9 +85,14 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     // Set property if it exists and it's not a SVG
     const isProp = isMemberInElement(elm, memberName);
     const isComplex = isComplexType(newValue);
+    const isCustomElement = elm.tagName.includes('-');
     if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {
-        (elm as any)[memberName] = newValue == null && elm.tagName.indexOf('-') === -1 ? '' : newValue;
+        if (isCustomElement) {
+          (elm as any)[memberName] = newValue;
+        } else if ((elm as any)[memberName] !== newValue || '') {
+          (elm as any)[memberName] = newValue || '';
+        }
       } catch (e) {}
     }
 

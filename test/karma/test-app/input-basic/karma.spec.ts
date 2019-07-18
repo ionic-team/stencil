@@ -10,7 +10,7 @@ describe('attribute-basic', function() {
   });
   afterEach(tearDownDom);
 
-  it('button click rerenders', async () => {
+  it('should change value prop both ways', async () => {
     const cmp = app.querySelector('input-basic-root');
 
     const input = app.querySelector('input');
