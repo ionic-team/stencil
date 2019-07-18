@@ -67,11 +67,13 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
       tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
       if (moduleFile.cmps.length > 0) {
-        if (transformOpts.componentMetadata === 'proxy') {
-          tsSourceFile = addModuleMetadataProxies(tsSourceFile, moduleFile);
-        }
         if (exportAsCustomElement) {
+          // define custom element, and remove "export" from components
           tsSourceFile = defineCustomElement(tsSourceFile, moduleFile, transformOpts);
+
+        } else if (transformOpts.componentMetadata === 'proxy') {
+          // exporting as a module, but also add the component proxy fn
+          tsSourceFile = addModuleMetadataProxies(tsSourceFile, moduleFile);
         }
       }
 
@@ -81,4 +83,3 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
     };
   };
 };
-

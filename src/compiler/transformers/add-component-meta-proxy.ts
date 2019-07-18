@@ -10,21 +10,21 @@ export const addModuleMetadataProxies = (tsSourceFile: ts.SourceFile, moduleFile
 
   addCoreRuntimeApi(moduleFile, RUNTIME_APIS.proxyCustomElement);
 
-  moduleFile.cmps.forEach(compilerMeta => {
-    addComponentMetadataProxy(statements, compilerMeta);
-  });
+  statements.push(
+    ...moduleFile.cmps.map(addComponentMetadataProxy)
+  );
 
   return ts.updateSourceFileNode(tsSourceFile, statements);
 };
 
 
-const addComponentMetadataProxy = (statements: ts.Statement[], compilerMeta: d.ComponentCompilerMeta) => {
+const addComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta) => {
   const compactMeta: d.ComponentRuntimeMetaCompact = formatComponentRuntimeMeta(compilerMeta, true);
 
   const liternalCmpClassName = ts.createIdentifier(compilerMeta.componentClassName);
   const liternalMeta = convertValueToLiteral(compactMeta);
 
-  const proxyFn = ts.createStatement(
+  return ts.createStatement(
     ts.createCall(
       ts.createIdentifier(PROXY_CUSTOM_ELEMENT),
       [],
@@ -34,6 +34,4 @@ const addComponentMetadataProxy = (statements: ts.Statement[], compilerMeta: d.C
       ]
     )
   );
-
-  statements.push(proxyFn);
 };
