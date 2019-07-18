@@ -3,7 +3,7 @@ export const loadDeps = async (resolveLookup: Map<string, string>, fs: Map<strin
   resolveLookup.set('@stencil/core/internal/client', '/@stencil/core/internal/client.mjs');
   resolveLookup.set('@stencil/core/internal/build-conditionals', '/@stencil/core/internal/build-conditionals.mjs');
 
-  await loadDep('/@stencil/core/compiler/browser.js');
+  await loadDep('/@stencil/core/compiler/stencil.js');
 
   const deps = Promise.all(stencil.dependencies.map((dep: any) => {
     return loadDep(dep.url);

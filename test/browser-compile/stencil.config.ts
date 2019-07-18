@@ -9,8 +9,8 @@ export const config: Config = {
       serviceWorker: null,
       copy: [
         {
-          src: '../../../compiler/browser.js',
-          dest: './@stencil/core/compiler/browser.js',
+          src: '../../../compiler/',
+          dest: './@stencil/core/compiler/',
           warn: true
         },
         {
