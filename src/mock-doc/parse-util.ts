@@ -173,7 +173,7 @@ function getParser(ownerDocument: MockDocument) {
     },
 
     getTagName(element: MockElement) {
-      if (!element.namespaceURI || element.namespaceURI === 'http://www.w3.org/1999/xhtml') {
+      if (element.namespaceURI === 'http://www.w3.org/1999/xhtml') {
         return element.nodeName.toLowerCase();
       } else {
         return element.nodeName;

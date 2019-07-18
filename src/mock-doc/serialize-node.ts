@@ -79,7 +79,7 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToH
 
 function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: SerializeOutput, isShadowRoot: boolean) {
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE || isShadowRoot) {
-    const tagName = isShadowRoot ? 'mock:shadow-root' : getTagName(node.nodeName);
+    const tagName = isShadowRoot ? 'mock:shadow-root' : getTagName(node as Element);
 
     if (tagName === 'body') {
       output.isWithinBody = true;
@@ -402,11 +402,11 @@ const LT_REGEX = /</g;
 const GT_REGEX = />/g;
 const CAN_REMOVE_ATTR_QUOTES = /^[^ \t\n\f\r"'`=<>\/\\-]+$/;
 
-function getTagName(nodeName: string) {
-  if (nodeName === nodeName.toUpperCase()) {
-    return nodeName.toLowerCase();
+function getTagName(element: Element) {
+  if (element.namespaceURI === 'http://www.w3.org/1999/xhtml') {
+    return element.nodeName.toLowerCase();
   } else {
-    return nodeName;
+    return element.nodeName;
   }
 }
 
