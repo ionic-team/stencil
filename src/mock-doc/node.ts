@@ -186,7 +186,7 @@ export class MockElement extends MockNode {
     super(
       ownerDocument,
       NODE_TYPES.ELEMENT_NODE,
-      typeof nodeName === 'string' ? nodeName.toUpperCase() : null,
+      typeof nodeName === 'string' ? nodeName : null,
       null
     );
     this.namespaceURI = null;
@@ -679,6 +679,16 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
 }
 
 export class MockHTMLElement extends MockElement {
+
+  namespaceURI = 'http://www.w3.org/1999/xhtml';
+
+  constructor(ownerDocument: any, nodeName: string) {
+    super(
+      ownerDocument,
+      typeof nodeName === 'string' ? nodeName.toUpperCase() : null,
+    );
+  }
+
   get attributes() {
     let attrs = attrsMap.get(this);
     if (attrs == null) {
