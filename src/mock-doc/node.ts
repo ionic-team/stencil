@@ -689,6 +689,7 @@ export class MockHTMLElement extends MockElement {
     );
   }
 
+  get tagName() { return this.nodeName; }
   set tagName(value: string) { this.nodeName = value; }
 
   get attributes() {
