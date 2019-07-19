@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, buildWarn, flatOne } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, isDecoratorNamed } from '../transform-utils';
+import { getDeclarationParameters } from './decorator-utils';
 import ts from 'typescript';
 
 

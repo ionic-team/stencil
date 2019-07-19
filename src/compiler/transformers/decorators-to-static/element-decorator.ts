@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
+import { buildError } from '@utils';
 import { createStaticGetter, isDecoratorNamed } from '../transform-utils';
 import ts from 'typescript';
-import { buildError } from '@utils';
 
 
 export const elementDecoratorsToStatic = (diagnostics: d.Diagnostic[], decoratedMembers: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {

@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildWarn } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, getDeclarationParameters, isDecoratorNamed, resolveType, serializeSymbol, validateReferences } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, resolveType, serializeSymbol, validateReferences } from '../transform-utils';
+import { getDeclarationParameters } from './decorator-utils';
 import ts from 'typescript';
 
 

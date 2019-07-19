@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { augmentDiagnosticWithNode, buildError, normalizePath } from '@utils';
-import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorator-constants';
+import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorator-utils';
 import ts from 'typescript';
 
 
@@ -88,29 +88,6 @@ export const createStaticGetter = (propName: string, returnExpression: ts.Expres
       ts.createReturn(returnExpression)
     ])
   );
-};
-
-
-export interface GetDeclarationParameters {
-  <T>(decorator: ts.Decorator): [T];
-  <T, T1>(decorator: ts.Decorator): [T, T1];
-  <T, T1, T2>(decorator: ts.Decorator): [T, T1, T2];
-}
-
-export const getDeclarationParameters: GetDeclarationParameters = (decorator: ts.Decorator): any => {
-  if (!ts.isCallExpression(decorator.expression)) {
-    return [];
-  }
-
-  return decorator.expression.arguments.map((arg) => {
-    return evalText(arg.getText().trim());
-  });
-};
-
-
-export const evalText = (text: string) => {
-  const fnStr = `return ${text};`;
-  return new Function(fnStr)();
 };
 
 

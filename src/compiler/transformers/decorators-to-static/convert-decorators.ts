@@ -1,11 +1,11 @@
-import { methodDecoratorsToStatic } from './method-decorator';
 import * as d from '../../../declarations';
 import { componentDecoratorToStatic } from './component-decorator';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
-import { listenDecoratorsToStatic } from './listen-decorator';
 import { isDecoratorNamed, removeDecorators } from '../transform-utils';
-import { MEMBER_DECORATORS_TO_REMOVE } from './decorator-constants';
+import { listenDecoratorsToStatic } from './listen-decorator';
+import { MEMBER_DECORATORS_TO_REMOVE } from './decorator-utils';
+import { methodDecoratorsToStatic } from './method-decorator';
 import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';

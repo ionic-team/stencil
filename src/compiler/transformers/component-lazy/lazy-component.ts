@@ -1,7 +1,8 @@
 import * as d from '../../../declarations';
-import { addComponentStylePlaceholders } from '../component-style';
 import { addLazyElementGetter } from './lazy-element-getter';
 import { addWatchers } from '../watcher-meta-transform';
+import { createStaticGetter } from '../transform-utils';
+import { getStyleTextPlaceholder } from '../../app-core/component-styles';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { transformHostData } from '../host-data-transform';
 import { updateLazyComponentConstructor } from './lazy-constructor';
@@ -34,4 +35,11 @@ const updateLazyComponentMembers = (transformOpts: d.TransformOptions, classNode
   }
 
   return classMembers;
+};
+
+
+const addComponentStylePlaceholders = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
+  if (cmp.hasStyle) {
+    classMembers.push(createStaticGetter('style', ts.createStringLiteral(getStyleTextPlaceholder(cmp))));
+  }
 };

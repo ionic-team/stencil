@@ -1,8 +1,8 @@
 import * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, catchError, toDashCase } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, isMemberPrivate, resolveType, serializeSymbol, typeToString, validateReferences } from '../transform-utils';
-import ts from 'typescript';
 import { validatePublicName } from '../reserved-public-members';
+import ts from 'typescript';
 
 
 export const propDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
