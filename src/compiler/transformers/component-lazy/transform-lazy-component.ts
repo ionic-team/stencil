@@ -11,7 +11,7 @@ export const transformToLazyComponentText = (compilerCtx: d.CompilerCtx, buildCt
   try {
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
-        module: ts.ModuleKind.ES2015,
+        module: ts.ModuleKind.ESNext,
         target: getScriptTarget(),
         skipLibCheck: true,
         noResolve: true,

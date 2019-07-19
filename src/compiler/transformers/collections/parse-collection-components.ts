@@ -39,7 +39,7 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
   options.outFile = undefined;
   options.noResolve = true;
 
-  options.module = ts.ModuleKind.ES2015;
+  options.module = ts.ModuleKind.ESNext;
   options.target = ts.ScriptTarget.ES2017;
 
   const sourceFile = ts.createSourceFile(inputFileName, sourceText, options.target);

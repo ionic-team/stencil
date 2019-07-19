@@ -16,7 +16,7 @@ export const transformToHydrateComponentText = (compilerCtx: d.CompilerCtx, buil
     };
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
-        module: ts.ModuleKind.ES2015,
+        module: ts.ModuleKind.ESNext,
         target: getScriptTarget(),
         skipLibCheck: true,
         noResolve: true,

@@ -36,7 +36,9 @@ const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration
     return classNode.heritageClauses;
   }
 
-  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.HTMLElement);
+  if (moduleFile.cmps.length > 1) {
+    addCoreRuntimeApi(moduleFile, RUNTIME_APIS.HTMLElement);
+  }
 
   const heritageClause = ts.createHeritageClause(
     ts.SyntaxKind.ExtendsKeyword, [

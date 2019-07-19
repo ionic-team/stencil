@@ -14,7 +14,8 @@ source:  `
 import { Component } from '@stencil/core';
 
 @Component({
-  tag: 'hello-world'
+  tag: 'hello-world',
+  styles: 'button { font-size: 18px; color: white; font-weight: bold; }'
 })
 export class HelloWorld {
 
@@ -67,7 +68,7 @@ import { Component, Prop, h } from '@stencil/core';
 @Component({
   tag: 'my-button',
   shadow: true,
-  style: 'button { font-size: 18px; color: white; font-weight: bold; }'
+  styles: 'button { font-size: 18px; color: white; font-weight: bold; }'
 })
 export class MyButton {
 

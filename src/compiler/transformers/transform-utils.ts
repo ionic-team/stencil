@@ -70,13 +70,6 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
 };
 
 
-export const isDecoratorNamed = (propName: string) => {
-  return (dec: ts.Decorator): boolean => {
-    return (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === propName);
-  };
-};
-
-
 export const createStaticGetter = (propName: string, returnExpression: ts.Expression) => {
   return ts.createGetAccessor(
     undefined,

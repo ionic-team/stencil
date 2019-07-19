@@ -4,7 +4,7 @@ import { getStyleTextPlaceholder } from '../app-core/component-styles';
 import ts from 'typescript';
 
 
-export const addComponentStylePlaceholders = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
+export const addComponentStyle = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   if (!cmp.hasStyle) {
     return;
   }

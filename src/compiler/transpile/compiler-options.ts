@@ -137,7 +137,7 @@ export const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
   target: getScriptTarget(),
 
   // create esNext modules
-  module: ts.ModuleKind.ES2015,
+  module: ts.ModuleKind.ESNext,
 
   // resolve using NodeJs style
   moduleResolution: ts.ModuleResolutionKind.NodeJs,

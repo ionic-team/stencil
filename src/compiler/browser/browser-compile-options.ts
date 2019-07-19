@@ -72,7 +72,7 @@ export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
 
   } else {
     compilerOpts.module = 'esm';
-    transformOpts.module = ts.ModuleKind.ES2015;
+    transformOpts.module = ts.ModuleKind.ESNext;
   }
 
   if (compilerOpts.script === 'esnext') {

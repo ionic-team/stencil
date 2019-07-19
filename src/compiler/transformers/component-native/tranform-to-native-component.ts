@@ -18,7 +18,7 @@ export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, build
   try {
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
-        module: ts.ModuleKind.ES2015,
+        module: ts.ModuleKind.ESNext,
         target: getScriptTarget(),
       },
       fileName: cmp.jsFilePath,
