@@ -186,7 +186,7 @@ export class MockElement extends MockNode {
     super(
       ownerDocument,
       NODE_TYPES.ELEMENT_NODE,
-      typeof nodeName === 'string' ? nodeName.toUpperCase() : null,
+      typeof nodeName === 'string' ? nodeName : null,
       null
     );
     this.namespaceURI = null;
@@ -542,7 +542,7 @@ export class MockElement extends MockNode {
   set tabIndex(value: number) { this.setAttributeNS(null, 'tabindex', value); }
 
   get tagName() { return this.nodeName; }
-  set tagName(value: string) { this.nodeName = value.toUpperCase(); }
+  set tagName(value: string) { this.nodeName = value; }
 
   get textContent() {
     const text: string[] = [];
@@ -679,6 +679,19 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
 }
 
 export class MockHTMLElement extends MockElement {
+
+  namespaceURI = 'http://www.w3.org/1999/xhtml';
+
+  constructor(ownerDocument: any, nodeName: string) {
+    super(
+      ownerDocument,
+      typeof nodeName === 'string' ? nodeName.toUpperCase() : null,
+    );
+  }
+
+  get tagName() { return this.nodeName; }
+  set tagName(value: string) { this.nodeName = value; }
+
   get attributes() {
     let attrs = attrsMap.get(this);
     if (attrs == null) {
