@@ -31,7 +31,7 @@ async function generateLoader(config: d.Config, compilerCtx: d.CompilerCtx, outp
     'name': config.fsNamespace + '-loader',
     'typings': './index.d.ts',
     'module': './index.mjs',
-    'main': './unpkg.js',
+    'main': './index.cjs.js',
     'node:main': './node-main.js',
     'jsnext:main': './index.es2017.mjs',
     'es2015': './index.es2017.mjs',
