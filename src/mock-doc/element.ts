@@ -49,10 +49,6 @@ export function createElement(ownerDocument: any, tagName: string) {
       return new MockCanvasElement(ownerDocument);
   }
 
-  if (SVG_TAGS.has(tagName)) {
-    return new MockSVGElement(ownerDocument, tagName);
-  }
-
   if (ownerDocument != null && tagName.includes('-')) {
     const win = ownerDocument.defaultView;
     if (win != null && win.customElements != null) {
@@ -72,9 +68,6 @@ export function createElementNS(ownerDocument: any, namespaceURI: string, tagNam
     return new MockElement(ownerDocument, tagName);
   }
 }
-
-// This set is intentionally incomplete. More tags can be added as needed.
-const SVG_TAGS = new Set(['circle', 'line', 'g', 'path', 'svg', 'symbol', 'viewbox']);
 
 class MockAnchorElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -215,7 +208,7 @@ patchPropAttributes(MockScriptElement.prototype, {
   type: String
 });
 
-class MockSVGElement extends MockElement {
+export class MockSVGElement extends MockElement {
   // SVGElement properties and methods
   get ownerSVGElement(): SVGSVGElement { return null; }
   get viewportElement(): SVGElement { return null; }
