@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
-import { isDocsPublic } from '@utils';
-
+import { getTextDocs, isDocsPublic } from '@utils';
 
 export function generatePropTypes(cmpMeta: d.ComponentCompilerMeta): d.TypeInfo {
   return [
@@ -10,7 +9,7 @@ export function generatePropTypes(cmpMeta: d.ComponentCompilerMeta): d.TypeInfo 
       optional: cmpProp.optional,
       required: cmpProp.required,
       public: isDocsPublic(cmpProp.docs),
-      jsdoc: (cmpProp.docs != null && typeof cmpProp.docs.text === 'string') ? cmpProp.docs.text : undefined,
+      jsdoc: getTextDocs(cmpProp.docs),
     })),
     ...cmpMeta.virtualProperties.map(cmpProp => ({
       name: cmpProp.name,

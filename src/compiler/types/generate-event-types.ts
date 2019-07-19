@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { captializeFirstLetter, isDocsPublic } from '@utils';
+import { captializeFirstLetter, getTextDocs, isDocsPublic } from '@utils';
 
 
 export function generateEventTypes(cmpEvents: d.ComponentCompilerEvent[]): d.TypeInfo {
@@ -12,7 +12,7 @@ export function generateEventTypes(cmpEvents: d.ComponentCompilerEvent[]): d.Typ
       optional: false,
       required: false,
       public: isDocsPublic(cmpEvent.docs),
-      jsdoc: (cmpEvent.docs != null && typeof cmpEvent.docs.text === 'string') ? cmpEvent.docs.text : undefined
+      jsdoc: getTextDocs(cmpEvent.docs),
     };
   });
 }
