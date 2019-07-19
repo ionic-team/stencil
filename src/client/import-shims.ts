@@ -1,3 +1,4 @@
+import * as d from '../declarations';
 import { NAMESPACE } from '@build-conditionals';
 import { doc, win } from './client-window';
 import { getDynamicImportFunction } from '@utils';
@@ -11,17 +12,21 @@ export const patchEsm = () => {
   return Promise.resolve();
 };
 
-export const patchBrowser = async () => {
+export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => {
   // @ts-ignore
   const importMeta = import.meta.url;
+  const regex = new RegExp(`\/${NAMESPACE}(\.esm)?\.js$`);
+  const scriptElm = Array.from(doc.querySelectorAll('script')).find(s => (
+    regex.test(s.src) ||
+    s.getAttribute('data-namespace') === NAMESPACE
+  ));
+  const opts = (scriptElm as any)['data-opts'];
   if (importMeta !== '') {
-    return Promise.resolve(new URL('.', importMeta).href);
+    return {
+      ...opts,
+      resourcesUrl: new URL('.', importMeta).href
+    };
   } else {
-    const scriptElm = Array.from(doc.querySelectorAll('script')).find(s => (
-      s.src.includes(`/${NAMESPACE}.esm.js`) ||
-      s.getAttribute('data-namespace') === NAMESPACE
-    ));
-
     const resourcesUrl = new URL('.', new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href));
     patchDynamicImport(resourcesUrl.href);
 
@@ -29,7 +34,10 @@ export const patchBrowser = async () => {
       // @ts-ignore
       await import('./polyfills/dom.js');
     }
-    return resourcesUrl.href;
+    return {
+      ...opts,
+      resourcesUrl: resourcesUrl.href,
+    };
   }
 };
 
