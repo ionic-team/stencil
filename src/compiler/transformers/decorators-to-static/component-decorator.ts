@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
+import { CLASS_DECORATORS_TO_REMOVE } from './decorator-constants';
 import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, removeDecorators } from '../transform-utils';
-import { CLASS_DECORATORS_TO_REMOVE } from './convert-decorators';
 import { DEFAULT_STYLE_MODE, augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
 import ts from 'typescript';
 

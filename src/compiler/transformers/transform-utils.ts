@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { augmentDiagnosticWithNode, buildError, normalizePath } from '@utils';
-import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/convert-decorators';
+import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorator-constants';
 import ts from 'typescript';
 
 
@@ -70,11 +70,11 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
 };
 
 
-export function isDecoratorNamed(propName: string) {
+export const isDecoratorNamed = (propName: string) => {
   return (dec: ts.Decorator): boolean => {
     return (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === propName);
   };
-}
+};
 
 
 export const createStaticGetter = (propName: string, returnExpression: ts.Expression) => {

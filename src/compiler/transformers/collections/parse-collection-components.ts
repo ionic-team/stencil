@@ -1,6 +1,5 @@
 import * as d from '../../../declarations';
 import { convertStaticToMeta } from '../static-to-meta/visitor';
-import { getScriptTarget } from '../transform-utils';
 import { noop } from '@utils';
 import { parseComponentsDeprecated } from './parse-collection-deprecated';
 import ts from 'typescript';
@@ -41,7 +40,7 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
   options.noResolve = true;
 
   options.module = ts.ModuleKind.ES2015;
-  options.target = getScriptTarget();
+  options.target = ts.ScriptTarget.ES2017;
 
   const sourceFile = ts.createSourceFile(inputFileName, sourceText, options.target);
 

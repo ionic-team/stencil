@@ -5,6 +5,7 @@ import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
 import { listenDecoratorsToStatic } from './listen-decorator';
 import { isDecoratorNamed, removeDecorators } from '../transform-utils';
+import { MEMBER_DECORATORS_TO_REMOVE } from './decorator-constants';
 import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
@@ -73,16 +74,3 @@ const visitClass = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: 
 const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {
   classMembers.forEach(member => removeDecorators(member, MEMBER_DECORATORS_TO_REMOVE));
 };
-
-export const CLASS_DECORATORS_TO_REMOVE = new Set(['Component']);
-export const MEMBER_DECORATORS_TO_REMOVE = new Set([
-  'Element',
-  'Event',
-  'Listen',
-  'Method',
-  'Prop',
-  'PropDidChange',
-  'PropWillChange',
-  'State',
-  'Watch'
-]);

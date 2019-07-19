@@ -4,7 +4,7 @@ import { flatOne } from '@utils';
 import ts from 'typescript';
 
 
-export function watchDecoratorsToStatic(diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], newMembers: ts.ClassElement[]) {
+export const watchDecoratorsToStatic = (diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], newMembers: ts.ClassElement[]) => {
   const watchers = decoratedProps
     .filter(ts.isMethodDeclaration)
     .map(method => parseWatchDecorator(diagnostics, method));
@@ -13,13 +13,13 @@ export function watchDecoratorsToStatic(diagnostics: d.Diagnostic[], decoratedPr
   if (flatWatchers.length > 0) {
     newMembers.push(createStaticGetter('watchers', convertValueToLiteral(flatWatchers)));
   }
-}
+};
 
 const isWatchDecorator = isDecoratorNamed('Watch');
 const isPropWillChangeDecorator = isDecoratorNamed('PropWillChange');
 const isPropDidChangeDecorator = isDecoratorNamed('PropDidChange');
 
-function parseWatchDecorator(_diagnostics: d.Diagnostic[], method: ts.MethodDeclaration): d.ComponentCompilerWatch[] {
+const parseWatchDecorator = (_diagnostics: d.Diagnostic[], method: ts.MethodDeclaration): d.ComponentCompilerWatch[] => {
   const methodName = method.name.getText();
   return method.decorators
     .filter(decorator => (
@@ -34,10 +34,10 @@ function parseWatchDecorator(_diagnostics: d.Diagnostic[], method: ts.MethodDecl
         methodName
       };
     });
-}
+};
 
 // TODO
-// function isPropWatchable(cmpMeta: d.ComponentMeta, propName: string) {
+// const isPropWatchable = (cmpMeta: d.ComponentMeta, propName: string) => {
 //   const membersMeta = cmpMeta.membersMeta;
 //   if (!membersMeta) {
 //     return false;
@@ -48,4 +48,4 @@ function parseWatchDecorator(_diagnostics: d.Diagnostic[], method: ts.MethodDecl
 //   }
 // const type = member.memberType;
 // return type === MEMBER_FLAGS.State || type === MEMBER_FLAGS.Prop || type === MEMBER_FLAGS.PropMutable;
-// }
+// };

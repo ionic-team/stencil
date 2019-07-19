@@ -24,7 +24,7 @@ export const parseCollectionManifest = (config: d.Config, compilerCtx: d.Compile
   parseCollectionComponents(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
 
   return collection;
-}
+};
 
 
 export const parseCollectionDependencies = (collectionManifest: d.CollectionManifest) => {
