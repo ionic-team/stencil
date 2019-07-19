@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
 import { buildError } from '@utils';
-import { createStaticGetter, isDecoratorNamed } from '../transform-utils';
+import { createStaticGetter } from '../transform-utils';
+import { isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
 

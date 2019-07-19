@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, catchError, toDashCase } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, isMemberPrivate, resolveType, serializeSymbol, typeToString, validateReferences } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isMemberPrivate, resolveType, serializeSymbol, typeToString, validateReferences } from '../transform-utils';
+import { isDecoratorNamed } from './decorator-utils';
 import { validatePublicName } from '../reserved-public-members';
 import ts from 'typescript';
 
