@@ -2,6 +2,7 @@ import { MockDocument } from '../document';
 import { MockWindow, cloneWindow } from '../window';
 import { MockElement, MockHTMLElement } from '../node';
 import { XLINK_NS } from '../../runtime/runtime-constants';
+import { MockSVGElement } from '../element';
 
 
 describe('element', () => {
@@ -116,6 +117,69 @@ describe('element', () => {
 
     expect(rect).toEqual({
       bottom: 0, height: 0, left: 0, right: 0, top: 0, width: 0, x: 0, y: 0
+    });
+  });
+
+  describe('namespaceURI', () => {
+    it('HTMLElement namespaceURI is always http://www.w3.org/1999/xhtml', () => {
+      const htmlElement = new MockHTMLElement(doc, 'svg');
+      expect(htmlElement.namespaceURI).toEqual('http://www.w3.org/1999/xhtml');
+
+      const createdElement1 = doc.createElement('div');
+      expect(createdElement1.namespaceURI).toEqual('http://www.w3.org/1999/xhtml');
+
+      const createdElement2 = doc.createElement('svg');
+      expect(createdElement2.namespaceURI).toEqual('http://www.w3.org/1999/xhtml');
+      expect(createdElement2 instanceof MockHTMLElement).toBe(true);
+
+      const createdElement3 = doc.createElementNS('http://www.w3.org/1999/xhtml', 'svg');
+      expect(createdElement3.namespaceURI).toEqual('http://www.w3.org/1999/xhtml');
+      expect(createdElement3 instanceof MockHTMLElement).toBe(true);
+    });
+
+    it('Element namespace is null by defualt', () => {
+      const element = new MockElement(doc, 'svg');
+      expect(element.namespaceURI).toEqual(null);
+    });
+
+    it('createElementNS sets the namespace', () => {
+      const element = doc.createElementNS('random', 'svg');
+      expect(element.namespaceURI).toEqual('random');
+      expect(element instanceof MockSVGElement).toBe(false);
+
+      const element1 = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      expect(element1.namespaceURI).toEqual('http://www.w3.org/2000/svg');
+      expect(element1 instanceof MockSVGElement).toBe(true);
+    });
+  });
+
+  describe('tagName', () => {
+    it('Element tagName/nodeName is case sensible', () => {
+      const element = new MockElement(doc, 'myElement');
+      expect(element.tagName).toEqual('myElement');
+      expect(element.nodeName).toEqual('myElement');
+
+      const foreignObject = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+      expect(foreignObject.tagName).toEqual('foreignObject');
+      expect(foreignObject.nodeName).toEqual('foreignObject');
+    });
+
+    it('HTMLElement tagName/nodeName is case insensible', () => {
+      const element = new MockHTMLElement(doc, 'myElement');
+      expect(element.tagName).toEqual('MYELEMENT');
+      expect(element.nodeName).toEqual('MYELEMENT');
+
+      const foreignObject = document.createElement('foreignObject');
+      expect(foreignObject.tagName).toEqual('FOREIGNOBJECT');
+      expect(foreignObject.nodeName).toEqual('FOREIGNOBJECT');
+
+      const foreignObject2 = document.createElementNS('http://www.w3.org/1999/xhtml', 'foreignObject');
+      expect(foreignObject2.tagName).toEqual('FOREIGNOBJECT');
+      expect(foreignObject2.nodeName).toEqual('FOREIGNOBJECT');
+
+      const createdElement = document.createElement('myElement');
+      expect(createdElement.tagName).toEqual('MYELEMENT');
+      expect(createdElement.nodeName).toEqual('MYELEMENT');
     });
   });
 
