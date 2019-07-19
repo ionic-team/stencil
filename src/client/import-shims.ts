@@ -20,7 +20,7 @@ export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => 
     regex.test(s.src) ||
     s.getAttribute('data-namespace') === NAMESPACE
   ));
-  const opts = JSON.parse(scriptElm.getAttribute('data-opts'));
+  const opts = (scriptElm as any)['data-opts'];
   if (importMeta !== '') {
     return {
       ...opts,
