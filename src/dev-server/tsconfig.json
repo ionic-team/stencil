@@ -39,7 +39,6 @@
   },
   "files": [
     "./index.ts",
-    "../../types/css-what.d.ts",
     "../../types/rollup-plugin-commonjs.d.ts",
     "../../types/rollup-plugin-node-globals.d.ts",
     "../../types/rollup-plugin-json.d.ts",
