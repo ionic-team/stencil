@@ -5,8 +5,6 @@ import { getUsedComponents } from '../html/used-components';
 import { optimizeEsmImport } from '../html/inline-esm-import';
 import { isOutputTargetWww } from './output-utils';
 import { optimizeCriticalPath } from '../html/inject-module-preloads';
-import { processCopyTasks } from '../copy/local-copy-tasks';
-import { performCopyTasks } from '../copy/copy-tasks';
 import { generateHashedCopy } from '../copy/hashed-copy';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 import { updateGlobalStylesLink } from '../html/update-global-styles-link';
@@ -47,10 +45,6 @@ function getCriticalPath(buildCtx: d.BuildCtx) {
 }
 
 async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) {
-  // Copy assets into www
-  performCopyTasks(config, compilerCtx, buildCtx,
-    await processCopyTasks(config, outputTarget.appDir, outputTarget.copy),
-  );
   if (!config.buildEs5) {
     await generateEs5DisabledMessage(config, compilerCtx, outputTarget);
   }

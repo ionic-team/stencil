@@ -15,6 +15,9 @@ export function createElement(ownerDocument: any, tagName: string) {
     case 'a':
       return new MockAnchorElement(ownerDocument);
 
+    case 'base':
+      return new MockBaseElement(ownerDocument);
+
     case 'button':
       return new MockButtonElement(ownerDocument);
 
@@ -42,9 +45,12 @@ export function createElement(ownerDocument: any, tagName: string) {
     case 'title':
       return new MockTitleElement(ownerDocument);
 
-    case 'svg':
-    case 'symbol':
-      return new MockElement(ownerDocument, tagName);
+    case 'canvas':
+      return new MockCanvasElement(ownerDocument);
+  }
+
+  if (SVG_TAGS.has(tagName)) {
+    return new MockSVGElement(ownerDocument, tagName);
   }
 
   if (ownerDocument != null && tagName.includes('-')) {
@@ -57,6 +63,18 @@ export function createElement(ownerDocument: any, tagName: string) {
   return new MockHTMLElement(ownerDocument, tagName);
 }
 
+export function createElementNS(ownerDocument: any, namespaceURI: string, tagName: string) {
+  if (namespaceURI === 'http://www.w3.org/1999/xhtml') {
+    return createElement(ownerDocument, tagName);
+  } else if (namespaceURI === 'http://www.w3.org/2000/svg') {
+    return new MockSVGElement(ownerDocument, tagName);
+  } else {
+    return new MockElement(ownerDocument, tagName);
+  }
+}
+
+// This set is intentionally incomplete. More tags can be added as needed.
+const SVG_TAGS = new Set(['circle', 'line', 'g', 'path', 'svg', 'symbol', 'viewbox']);
 
 class MockAnchorElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -98,7 +116,6 @@ patchPropAttributes(MockImgElement.prototype, {
   height: Number,
   width: Number
 });
-
 
 class MockInputElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -198,6 +215,35 @@ patchPropAttributes(MockScriptElement.prototype, {
   type: String
 });
 
+class MockSVGElement extends MockElement {
+  // SVGElement properties and methods
+  get ownerSVGElement(): SVGSVGElement { return null; }
+  get viewportElement(): SVGElement { return null; }
+
+  focus() {/**/}
+  onunload() {/**/}
+
+  // SVGGeometryElement properties and methods
+  get pathLength(): number { return 0; }
+
+  isPointInFill(_pt: DOMPoint): boolean { return false; }
+  isPointInStroke(_pt: DOMPoint): boolean { return false; }
+  getTotalLength(): number { return 0; }
+}
+
+
+export class MockBaseElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'base');
+  }
+
+  get href() {
+    return fullUrl(this, 'href');
+  }
+  set href(value: string) {
+    this.setAttribute('href', value);
+  }
+}
 
 export class MockTemplateElement extends MockHTMLElement {
   content: MockDocumentFragment;
@@ -251,6 +297,45 @@ class MockTitleElement extends MockHTMLElement {
 }
 
 
+class MockCanvasElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'canvas');
+  }
+  getContext() {
+    return {
+      fillRect: function () { },
+      clearRect: function () { },
+      getImageData: function (_: number, __: number, w: number, h: number) {
+        return {
+          data: new Array(w * h * 4)
+        };
+      },
+      putImageData: function () { },
+      createImageData: function (): any[] { return [] },
+      setTransform: function () { },
+      drawImage: function () { },
+      save: function () { },
+      fillText: function () { },
+      restore: function () { },
+      beginPath: function () { },
+      moveTo: function () { },
+      lineTo: function () { },
+      closePath: function () { },
+      stroke: function () { },
+      translate: function () { },
+      scale: function () { },
+      rotate: function () { },
+      arc: function () { },
+      fill: function () { },
+      measureText: function () {
+        return { width: 0 };
+      },
+      transform: function () { },
+      rect: function () { },
+      clip: function () { },
+    }
+  }
+}
 
 function fullUrl(elm: MockElement, attrName: string) {
   const val = elm.getAttribute(attrName) || '';

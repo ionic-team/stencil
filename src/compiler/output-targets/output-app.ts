@@ -1,11 +1,8 @@
 import * as d from '../../declarations';
 import { isOutputTargetDistLazy } from './output-utils';
 import { generateLazyLoadedApp } from '../component-lazy/generate-lazy-app';
-import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
-import { dashToPascalCase, flatOne } from '@utils';
+import { dashToPascalCase } from '@utils';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
-import { performCopyTasks } from '../copy/copy-tasks';
-import { processCopyTasks } from '../copy/local-copy-tasks';
 import { RollupOptions } from 'rollup';
 import { loaderPlugin } from '../rollup-plugins/loader';
 
@@ -16,21 +13,7 @@ export async function outputApp(config: d.Config, compilerCtx: d.CompilerCtx, bu
     return;
   }
 
-  copyAssets(config, compilerCtx, buildCtx, outputTargets);
-
   await generateLazyLoadedApp(config, compilerCtx, buildCtx, outputTargets);
-}
-
-async function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[]) {
-  const allCopyTasks = flatOne(
-    await Promise.all(
-      outputTargets.map(async o => [
-        ...getComponentAssetsCopyTasks(config, buildCtx, o.copyDir, false),
-        ...await processCopyTasks(config, o.copyDir, o.copy)
-      ])
-    )
-  );
-  return performCopyTasks(config, compilerCtx, buildCtx, allCopyTasks);
 }
 
 export async function generateNativeApp(config: d.Config, compilerCtx: d.CompilerCtx, cmps: d.ComponentCompilerMeta[]) {

@@ -25,13 +25,13 @@ describe('jest-config', () => {
 
   it('pass --maxWorkers=2 arg when e2e test and --ci', () => {
     const process: any = {
-      argv: ['node', 'stencil', 'test', '--ci', '--e2e', '--maxWorkers=2']
+      argv: ['node', 'stencil', 'test', '--ci', '--e2e', '--max-workers=2']
     };
     const config = mockConfig();
     config.flags = parseFlags(process);
     config.testing = {};
 
-    expect(config.flags.args).toEqual(['--ci', '--e2e', '--maxWorkers=2']);
+    expect(config.flags.args).toEqual(['--ci', '--e2e', '--max-workers=2']);
     expect(config.flags.unknownArgs).toEqual([]);
 
     const jestArgv = buildJestArgv(config);
@@ -52,7 +52,7 @@ describe('jest-config', () => {
 
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.ci).toBe(true);
-    expect(jestArgv.maxWorkers).toBe(4);
+    expect(jestArgv.maxWorkers).toBe(1);
   });
 
   it('pass --maxWorkers=2 arg to jest', () => {
@@ -83,7 +83,7 @@ describe('jest-config', () => {
 
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.ci).toBe(true);
-    expect(jestArgv.maxWorkers).toBeUndefined();
+    expect(jestArgv.maxWorkers).toBe(config.maxConcurrentWorkers);
   });
 
   it('pass test spec arg to jest', () => {

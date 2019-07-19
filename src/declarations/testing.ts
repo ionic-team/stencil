@@ -159,6 +159,7 @@ export interface EventInitDict {
 
 export interface JestEnvironmentGlobal {
   __NEW_TEST_PAGE__: () => Promise<any>;
+  __CLOSE_OPEN_PAGES__: () => Promise<any>;
   Context: any;
   loadTestWindow: (testWindow: any) => Promise<void>;
   h: any;
@@ -185,11 +186,13 @@ export interface E2EProcessEnv {
   __STENCIL_BROWSER_URL__?: string;
   __STENCIL_APP_URL__?: string;
   __STENCIL_BROWSER_WS_ENDPOINT__?: string;
+  __STENCIL_BROWSER_WAIT_UNTIL?: string;
 
   __STENCIL_SCREENSHOT__?: 'true';
   __STENCIL_SCREENSHOT_BUILD__?: string;
 
   __STENCIL_E2E_TESTS__?: 'true';
+  __STENCIL_E2E_DEVTOOLS__?: 'true';
   __STENCIL_SPEC_TESTS__?: 'true';
 
   __STENCIL_PUPPETEER_MODULE__?: string;
@@ -314,6 +317,11 @@ export interface JestConfig {
    */
   setupFiles?: string[];
 
+  setupFilesAfterEnv?: string[];
+
+  /**
+   * @deprecated Use setupFilesAfterEnv instead.
+   */
   setupTestFrameworkScriptFile?: string;
   snapshotSerializers?: any[];
   testEnvironment?: string;
@@ -402,6 +410,12 @@ export interface TestingConfig extends JestConfig {
   browserSlowMo?: number;
 
   /**
+   * By default, all E2E pages wait until the "load" event, this global setting can be used
+   * to change the default `waitUntil` behaviour.
+   */
+  browserWaitUntil?: 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
+
+  /**
    * Whether to auto-open a DevTools panel for each tab.
    * If this option is true, the headless option will be set false
    */
@@ -417,8 +431,12 @@ export interface TestingConfig extends JestConfig {
    * Path to the Screenshot Connector module.
    */
   screenshotConnector?: string;
-}
 
+  /**
+   * Amount of time in milliseconds to wait before a screenshot is taken.
+   */
+  waitBeforeScreenshot?: number;
+}
 
 export interface EmulateConfig {
   /**

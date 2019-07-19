@@ -20,23 +20,23 @@ var browserStackLaunchers = {
     os: 'Windows',
     os_version: '10'
   },
-  bs_ie: {
-    base: 'BrowserStack',
-    browser: 'ie',
-    os: 'Windows',
-    os_version: '10'
-  },
+  // bs_ie: {
+  //   base: 'BrowserStack',
+  //   browser: 'ie',
+  //   os: 'Windows',
+  //   os_version: '10'
+  // },
   bs_safari: {
     base: 'BrowserStack',
     browser: 'safari',
     os: 'OS X',
-    os_version: 'High Sierra'
+    os_version: 'Mojave'
   }
 };
 
 const localLaunchers = {
   ChromeHeadless: {
-    base: 'Chrome',
+    base: 'ChromeHeadless',
     flags: [
 			'--no-sandbox',
 			// See https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md

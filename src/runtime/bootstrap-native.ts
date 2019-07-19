@@ -1,12 +1,12 @@
 import * as d from '../declarations';
-import { getHostRef, supportsShadowDom } from '@platform';
+import { supportsShadowDom } from '@platform';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
 import { proxyComponent } from './proxy-component';
 import { PROXY_FLAGS } from './runtime-constants';
-import { scheduleUpdate } from './update-component';
+import { forceUpdate } from './update-component';
 
 export const attachShadow = (el: HTMLElement) => {
   if (supportsShadowDom) {
@@ -33,15 +33,7 @@ export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompac
 
   Object.assign(Cstr.prototype, {
     forceUpdate() {
-      if (BUILD.updatable) {
-        const hostRef = getHostRef(this);
-        scheduleUpdate(
-          this,
-          hostRef,
-          cmpMeta,
-          false
-        );
-      }
+      forceUpdate(this, cmpMeta);
     },
     connectedCallback() {
       connectedCallback(this, cmpMeta);

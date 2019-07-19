@@ -13,7 +13,10 @@ export const jestPreprocessor = {
       const opts = Object.assign({}, this.getCompilerOptions(jestConfig.rootDir));
 
       const results = transpile(sourceText, opts, filePath);
-      if (results.diagnostics && results.diagnostics.length > 0) {
+
+      const hasErrors = results.diagnostics.some((diagnostic) => diagnostic.level === 'error');
+
+      if (results.diagnostics && hasErrors) {
         const msg = results.diagnostics.map(formatDiagnostic).join('\n\n');
         throw new Error(msg);
       }

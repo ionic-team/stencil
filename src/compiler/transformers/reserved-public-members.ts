@@ -276,6 +276,5 @@ const RESERVED_PUBLIC_MEMBERS = new Set([
 
 
 function isReservedMember(memberName: string) {
-  memberName = memberName.toLowerCase();
-  return RESERVED_PUBLIC_MEMBERS.has(memberName);
+  return RESERVED_PUBLIC_MEMBERS.has(memberName.toLowerCase());
 }

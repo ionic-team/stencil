@@ -13,9 +13,9 @@ declare global {
 
 const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/new WeakMap();
 
-export const registerStyle = (scopeId: string, cssText: string) => {
+export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean) => {
   let style = styles.get(scopeId);
-  if (supportsConstructibleStylesheets) {
+  if (supportsConstructibleStylesheets && allowCS) {
     style = (style || new CSSStyleSheet()) as CSSStyleSheet;
     style.replace(cssText);
   } else {
@@ -24,8 +24,8 @@ export const registerStyle = (scopeId: string, cssText: string) => {
   styles.set(scopeId, style);
 };
 
-export const addStyle = (styleContainerNode: any, tagName: string, mode: string, hostElm?: HTMLElement) => {
-  let scopeId = getScopeId(tagName, mode);
+export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMeta, mode: string, hostElm?: HTMLElement) => {
+  let scopeId = getScopeId(cmpMeta.$tagName$, mode);
   let style = styles.get(scopeId);
 
   // if an element is NOT connected then getRootNode() will return the wrong root node
@@ -33,7 +33,7 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
   styleContainerNode = (styleContainerNode.nodeType === NODE_TYPE.DocumentFragment ? styleContainerNode : doc);
 
   if (BUILD.mode && !style) {
-    scopeId = getScopeId(tagName);
+    scopeId = getScopeId(cmpMeta.$tagName$);
     style = styles.get(scopeId);
   }
 
@@ -52,7 +52,7 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
 
         } else {
           if (cssVarShim) {
-            styleElm = cssVarShim.createHostStyle(hostElm, scopeId, style);
+            styleElm = cssVarShim.createHostStyle(hostElm, scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation));
             const newScopeId = (styleElm as any)['s-sc'];
             if (newScopeId) {
               scopeId = newScopeId;
@@ -72,8 +72,9 @@ export const addStyle = (styleContainerNode: any, tagName: string, mode: string,
             styleElm.setAttribute(HYDRATE_ID, scopeId);
           }
 
-          styleContainerNode.appendChild(
+          styleContainerNode.insertBefore(
             styleElm,
+            styleContainerNode.querySelector('link')
           );
         }
 
@@ -97,7 +98,7 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
   const styleId = addStyle(
     (BUILD.shadowDom && supportsShadowDom && elm.shadowRoot)
       ? elm.shadowRoot
-      : elm.getRootNode(), cmpMeta.$tagName$, mode, elm);
+      : elm.getRootNode(), cmpMeta, mode, elm);
 
   if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation) {
     // only required when we're NOT using native shadow dom (slot)

@@ -2,8 +2,8 @@ import * as d from '../../declarations';
 import { bundleHydrateApp } from './bundle-hydrate-app';
 import { DEFAULT_STYLE_MODE, catchError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
+import { getHydrateAppFileName, writeHydrateOutputs } from './write-hydrate-outputs';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
-import { writeHydrateOutputs } from './write-hydrate-outputs';
 
 
 export async function generateHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[]) {
@@ -17,7 +17,7 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
     if (rollupAppBuild != null) {
       const rollupOutput = await rollupAppBuild.generate({
         format: 'cjs',
-        file: 'app.js',
+        file: getHydrateAppFileName(config),
         chunkFileNames: '[name].js',
       });
 

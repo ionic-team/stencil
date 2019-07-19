@@ -10,7 +10,7 @@ import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS, SVG_NS, isDef, toLowerCase } from '@utils';
 import { consoleError, doc, plt, supportsShadowDom } from '@platform';
-import { Host, h } from './h';
+import { h, isHost } from './h';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
 import { updateElement } from './update-element';
 
@@ -562,29 +562,38 @@ interface RelocateNode {
   nodeToRelocate: d.RenderNode;
 }
 
-const isHost = (node: any): node is d.VNode => {
-  return node && node.$tag$ === Host;
-};
-
 export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: d.VNode | d.VNode[]) => {
-  const oldVNode: d.VNode = hostRef.$vnode$ || { $flags$: 0 };
   hostTagName = toLowerCase(hostElm.tagName);
+  // <Host> runtime check
+  if (BUILD.isDev && Array.isArray(renderFnResults) && renderFnResults.some(isHost)) {
+    throw new Error(`The <Host> must be the single root component.
+Looks like the render() function of "${hostTagName}" is returning an array that contains the <Host>.
 
-  if (isHost(renderFnResults)) {
-    renderFnResults.$tag$ = null;
-  } else {
-    renderFnResults = h(null, null, renderFnResults as any);
+The render() function should look like this instead:
+
+render() {
+  // Do not return an array
+  return (
+    <Host>{content}</Host>
+  );
+}
+`);
   }
+  const oldVNode: d.VNode = hostRef.$vnode$ || { $flags$: 0 };
+  const rootVnode = isHost(renderFnResults)
+    ? renderFnResults
+    : h(null, null, renderFnResults as any);
 
   if (BUILD.reflect && cmpMeta.$attrsToReflect$) {
-    (renderFnResults as d.VNode).$attrs$ = (renderFnResults as d.VNode).$attrs$ || {};
+    rootVnode.$attrs$ = rootVnode.$attrs$ || {};
     cmpMeta.$attrsToReflect$.forEach(([propName, attribute]) =>
-      (renderFnResults as d.VNode).$attrs$[attribute] = (hostElm as any)[propName]);
+      rootVnode.$attrs$[attribute] = (hostElm as any)[propName]);
   }
 
-  renderFnResults.$flags$ |= VNODE_FLAGS.isHost;
-  hostRef.$vnode$ = renderFnResults;
-  renderFnResults.$elm$ = oldVNode.$elm$ = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm) as any;
+  rootVnode.$tag$ = null;
+  rootVnode.$flags$ |= VNODE_FLAGS.isHost;
+  hostRef.$vnode$ = rootVnode;
+  rootVnode.$elm$ = oldVNode.$elm$ = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm) as any;
 
   if (BUILD.scoped || BUILD.shadowDom) {
     scopeId = hostElm['s-sc'];
@@ -598,11 +607,11 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   }
 
   // synchronous patch
-  patch(oldVNode, renderFnResults);
+  patch(oldVNode, rootVnode);
 
   if (BUILD.slotRelocation) {
     if (checkSlotRelocate) {
-      relocateSlotContent(renderFnResults.$elm$);
+      relocateSlotContent(rootVnode.$elm$);
 
       for (let i = 0; i < relocateNodes.length; i++) {
         const relocateNode = relocateNodes[i];
@@ -633,19 +642,19 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
         // after the slot reference node
         const parentNodeRef = relocateNode.slotRefNode.parentNode;
         let insertBeforeNode = relocateNode.slotRefNode.nextSibling;
-
         let orgLocationNode = relocateNode.nodeToRelocate['s-ol'] as any;
 
         while (orgLocationNode = orgLocationNode.previousSibling as any) {
           let refNode = orgLocationNode['s-nr'];
-          if (refNode && refNode) {
-            if (refNode['s-sn'] === relocateNode.nodeToRelocate['s-sn']) {
-              if (parentNodeRef === refNode.parentNode) {
-                if ((refNode = refNode.nextSibling as any) && refNode && !refNode['s-nr']) {
-                  insertBeforeNode = refNode;
-                  break;
-                }
-              }
+          if (
+            refNode &&
+            refNode['s-sn'] === relocateNode.nodeToRelocate['s-sn'] &&
+            parentNodeRef === refNode.parentNode
+          ) {
+            refNode = refNode.nextSibling;
+            if (!refNode || !refNode['s-nr']) {
+              insertBeforeNode = refNode;
+              break;
             }
           }
         }
@@ -671,7 +680,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     }
 
     if (checkSlotFallbackVisibility) {
-      updateFallbackSlotVisibility(renderFnResults.$elm$);
+      updateFallbackSlotVisibility(rootVnode.$elm$);
     }
 
     // always reset

@@ -147,7 +147,6 @@ export class Testing implements d.Testing {
 function setupTestingConfig(config: d.Config) {
   config.buildEs5 = false;
   config.devMode = true;
-  config.maxConcurrentWorkers = 1;
   config.validateTypes = false;
   config._isTesting = true;
 

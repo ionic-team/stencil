@@ -48,8 +48,8 @@ export namespace Components {
   interface ConditionalRerender {}
   interface ConditionalRerenderRoot {}
   interface CssCmp {}
-  interface CssVariables {}
-  interface CssVariablesRoot {}
+  interface CssVariablesNoEncapsulation {}
+  interface CssVariablesShadowDom {}
   interface CustomEventRoot {}
   interface DomReattach {
     'didLoad': number;
@@ -124,6 +124,8 @@ export namespace Components {
     'str': string;
     'undef'?: string;
   }
+  interface ReparentStyleNoVars {}
+  interface ReparentStyleWithVars {}
   interface SassCmp {}
   interface ScopedBasic {}
   interface ScopedBasicRoot {}
@@ -258,16 +260,16 @@ declare global {
     new (): HTMLCssCmpElement;
   };
 
-  interface HTMLCssVariablesElement extends Components.CssVariables, HTMLStencilElement {}
-  var HTMLCssVariablesElement: {
-    prototype: HTMLCssVariablesElement;
-    new (): HTMLCssVariablesElement;
+  interface HTMLCssVariablesNoEncapsulationElement extends Components.CssVariablesNoEncapsulation, HTMLStencilElement {}
+  var HTMLCssVariablesNoEncapsulationElement: {
+    prototype: HTMLCssVariablesNoEncapsulationElement;
+    new (): HTMLCssVariablesNoEncapsulationElement;
   };
 
-  interface HTMLCssVariablesRootElement extends Components.CssVariablesRoot, HTMLStencilElement {}
-  var HTMLCssVariablesRootElement: {
-    prototype: HTMLCssVariablesRootElement;
-    new (): HTMLCssVariablesRootElement;
+  interface HTMLCssVariablesShadowDomElement extends Components.CssVariablesShadowDom, HTMLStencilElement {}
+  var HTMLCssVariablesShadowDomElement: {
+    prototype: HTMLCssVariablesShadowDomElement;
+    new (): HTMLCssVariablesShadowDomElement;
   };
 
   interface HTMLCustomEventRootElement extends Components.CustomEventRoot, HTMLStencilElement {}
@@ -490,6 +492,18 @@ declare global {
   var HTMLReflectToAttrElement: {
     prototype: HTMLReflectToAttrElement;
     new (): HTMLReflectToAttrElement;
+  };
+
+  interface HTMLReparentStyleNoVarsElement extends Components.ReparentStyleNoVars, HTMLStencilElement {}
+  var HTMLReparentStyleNoVarsElement: {
+    prototype: HTMLReparentStyleNoVarsElement;
+    new (): HTMLReparentStyleNoVarsElement;
+  };
+
+  interface HTMLReparentStyleWithVarsElement extends Components.ReparentStyleWithVars, HTMLStencilElement {}
+  var HTMLReparentStyleWithVarsElement: {
+    prototype: HTMLReparentStyleWithVarsElement;
+    new (): HTMLReparentStyleWithVarsElement;
   };
 
   interface HTMLSassCmpElement extends Components.SassCmp, HTMLStencilElement {}
@@ -732,8 +746,8 @@ declare global {
     'conditional-rerender': HTMLConditionalRerenderElement;
     'conditional-rerender-root': HTMLConditionalRerenderRootElement;
     'css-cmp': HTMLCssCmpElement;
-    'css-variables': HTMLCssVariablesElement;
-    'css-variables-root': HTMLCssVariablesRootElement;
+    'css-variables-no-encapsulation': HTMLCssVariablesNoEncapsulationElement;
+    'css-variables-shadow-dom': HTMLCssVariablesShadowDomElement;
     'custom-event-root': HTMLCustomEventRootElement;
     'dom-reattach': HTMLDomReattachElement;
     'dynamic-css-variable': HTMLDynamicCssVariableElement;
@@ -771,6 +785,8 @@ declare global {
     'node-globals': HTMLNodeGlobalsElement;
     'node-resolution': HTMLNodeResolutionElement;
     'reflect-to-attr': HTMLReflectToAttrElement;
+    'reparent-style-no-vars': HTMLReparentStyleNoVarsElement;
+    'reparent-style-with-vars': HTMLReparentStyleWithVarsElement;
     'sass-cmp': HTMLSassCmpElement;
     'scoped-basic': HTMLScopedBasicElement;
     'scoped-basic-root': HTMLScopedBasicRootElement;
@@ -847,8 +863,8 @@ declare namespace LocalJSX {
   interface ConditionalRerender extends JSXBase.HTMLAttributes<HTMLConditionalRerenderElement> {}
   interface ConditionalRerenderRoot extends JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement> {}
   interface CssCmp extends JSXBase.HTMLAttributes<HTMLCssCmpElement> {}
-  interface CssVariables extends JSXBase.HTMLAttributes<HTMLCssVariablesElement> {}
-  interface CssVariablesRoot extends JSXBase.HTMLAttributes<HTMLCssVariablesRootElement> {}
+  interface CssVariablesNoEncapsulation extends JSXBase.HTMLAttributes<HTMLCssVariablesNoEncapsulationElement> {}
+  interface CssVariablesShadowDom extends JSXBase.HTMLAttributes<HTMLCssVariablesShadowDomElement> {}
   interface CustomEventRoot extends JSXBase.HTMLAttributes<HTMLCustomEventRootElement> {}
   interface DomReattach extends JSXBase.HTMLAttributes<HTMLDomReattachElement> {
     'didLoad'?: number;
@@ -927,6 +943,8 @@ declare namespace LocalJSX {
     'str'?: string;
     'undef'?: string;
   }
+  interface ReparentStyleNoVars extends JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement> {}
+  interface ReparentStyleWithVars extends JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement> {}
   interface SassCmp extends JSXBase.HTMLAttributes<HTMLSassCmpElement> {}
   interface ScopedBasic extends JSXBase.HTMLAttributes<HTMLScopedBasicElement> {}
   interface ScopedBasicRoot extends JSXBase.HTMLAttributes<HTMLScopedBasicRootElement> {}
@@ -998,8 +1016,8 @@ declare namespace LocalJSX {
     'conditional-rerender': ConditionalRerender;
     'conditional-rerender-root': ConditionalRerenderRoot;
     'css-cmp': CssCmp;
-    'css-variables': CssVariables;
-    'css-variables-root': CssVariablesRoot;
+    'css-variables-no-encapsulation': CssVariablesNoEncapsulation;
+    'css-variables-shadow-dom': CssVariablesShadowDom;
     'custom-event-root': CustomEventRoot;
     'dom-reattach': DomReattach;
     'dynamic-css-variable': DynamicCssVariable;
@@ -1037,6 +1055,8 @@ declare namespace LocalJSX {
     'node-globals': NodeGlobals;
     'node-resolution': NodeResolution;
     'reflect-to-attr': ReflectToAttr;
+    'reparent-style-no-vars': ReparentStyleNoVars;
+    'reparent-style-with-vars': ReparentStyleWithVars;
     'sass-cmp': SassCmp;
     'scoped-basic': ScopedBasic;
     'scoped-basic-root': ScopedBasicRoot;

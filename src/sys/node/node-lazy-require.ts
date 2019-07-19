@@ -134,7 +134,6 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
       'install',
       ...moduleIds,
       '--no-audit',
-      '--production',
       '--save-exact',
       '--save-dev'
     ];

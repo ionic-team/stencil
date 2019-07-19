@@ -1,4 +1,4 @@
-import { Component, Prop, State, Watch } from '@stencil/core';
+import { Component, Prop, State, Watch, Method } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
@@ -109,5 +109,64 @@ describe('watch', () => {
 
     root.value = 1300;
     expect(rootInstance.method).toHaveBeenLastCalledWith(1300, 30, 'value');
+  });
+
+  it('should Watch from lifecycles', async () => {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      nuRenders = 0;
+      watchCalled = 0;
+
+      @State() state = 0;
+      @Watch('state')
+      method() {
+        this.watchCalled++;
+      }
+
+      @Method()
+      async pushState() {
+        this.state++;
+      }
+
+      connectedCallback() {
+        expect(this.watchCalled).toBe(0);
+        this.state = 1;
+        expect(this.watchCalled).toBe(1);
+        this.state = 1;
+        expect(this.watchCalled).toBe(1);
+        this.state = 2;
+        expect(this.watchCalled).toBe(2);
+      }
+
+      componentWillLoad() {
+        expect(this.watchCalled).toBe(2);
+        this.state = 3;
+        expect(this.watchCalled).toBe(3);
+      }
+
+      componentDidLoad() {
+        this.state = 4;
+        expect(this.watchCalled).toBe(4);
+      }
+
+      render() {
+        this.nuRenders++;
+        return `${this.nuRenders} ${this.state} ${this.watchCalled}`;
+      }
+    }
+
+    const { root, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml(`<cmp-a>2 4 4</cmp-a>`);
+    await waitForChanges();
+    await waitForChanges();
+    expect(root).toEqualHtml(`<cmp-a>2 4 4</cmp-a>`);
+
+    await root.pushState();
+    await waitForChanges();
+    expect(root).toEqualHtml(`<cmp-a>3 5 5</cmp-a>`);
   });
 });

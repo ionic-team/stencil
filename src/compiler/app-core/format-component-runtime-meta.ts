@@ -33,8 +33,13 @@ export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta
 
 
 export function stringifyRuntimeData(data: any) {
-  // stringify the data, then remove property double-quotes so they can be property renamed
-  return JSON.stringify(data);
+  const json = JSON.stringify(data);
+  if (json.length > 10000) {
+    // JSON metadata is big, JSON.parse() is faster
+    // https://twitter.com/mathias/status/1143551692732030979
+    return `JSON.parse(${JSON.stringify(json)})`;
+  }
+  return json;
 }
 
 

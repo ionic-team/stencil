@@ -1,10 +1,12 @@
 import * as d from '../../declarations';
-import { buildError, catchError, normalizePath } from '@utils';
+import { buildError, catchError, flatOne, normalizePath, unique } from '@utils';
 import { NodeFs } from '../../sys/node/node-fs';
 import path from 'path';
+import glob from 'glob';
+import isGlob from 'is-glob';
 
 
-export async function copyTasksWorker(copyTasks: d.CopyTask[]) {
+export async function copyTasksWorker(copyTasks: Required<d.CopyTask>[], srcDir: string) {
   const results: d.CopyResults = {
     diagnostics: [],
     dirPaths: [],
@@ -13,6 +15,12 @@ export async function copyTasksWorker(copyTasks: d.CopyTask[]) {
 
   try {
     const fs = new NodeFs(process);
+
+    copyTasks = flatOne(await Promise.all(
+      copyTasks.map(task => processGlobs(task, srcDir))
+    ));
+
+    copyTasks = unique(copyTasks, task => task.dest);
 
     const allCopyTasks: d.CopyTask[] = [];
 
@@ -29,11 +37,11 @@ export async function copyTasksWorker(copyTasks: d.CopyTask[]) {
     // figure out which directories we'll need to make first
     const mkDirs = ensureDirs(allCopyTasks);
 
-    for (const mkDir of mkDirs) {
-      try {
-        await fs.mkdir(mkDir);
-      } catch (mkDirErr) {}
-    }
+    try {
+      await Promise.all(
+        mkDirs.map(dir => fs.mkdir(dir, { recursive: true }))
+      );
+    } catch (mkDirErr) {}
 
     while (allCopyTasks.length > 0) {
       const tasks = allCopyTasks.splice(0, 100);
@@ -48,6 +56,49 @@ export async function copyTasksWorker(copyTasks: d.CopyTask[]) {
   }
 
   return results;
+}
+
+
+async function processGlobs(copyTask: Required<d.CopyTask>, srcDir: string): Promise<Required<d.CopyTask>[]> {
+  return isGlob(copyTask.src)
+    ? await processGlobTask(copyTask, srcDir)
+    : [{
+      src: getSrcAbsPath(srcDir, copyTask.src),
+      dest: copyTask.keepDirStructure
+        ? path.join(copyTask.dest, copyTask.src)
+        : copyTask.dest,
+      warn: copyTask.warn,
+      keepDirStructure: copyTask.keepDirStructure
+    }];
+}
+
+function getSrcAbsPath(srcDir: string, src: string) {
+  if (path.isAbsolute(src)) {
+    return src;
+  }
+  return path.join(srcDir, src);
+}
+
+async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): Promise<Required<d.CopyTask>[]> {
+  const files = await asyncGlob(copyTask.src, {
+    cwd: srcDir,
+    nodir: true
+  });
+  return files.map(globRelPath => createGlobCopyTask(copyTask, srcDir, globRelPath));
+}
+
+
+function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, globRelPath: string): Required<d.CopyTask> {
+  const dest = path.join(copyTask.dest, copyTask.keepDirStructure
+    ? globRelPath
+    : path.basename(globRelPath)
+  );
+  return {
+    src: path.join(srcDir, globRelPath),
+    dest,
+    warn: copyTask.warn,
+    keepDirStructure: copyTask.keepDirStructure
+  };
 }
 
 
@@ -104,7 +155,7 @@ async function processCopyTaskDirectory(fs: NodeFs, results: d.CopyResults, allC
 }
 
 
-export function ensureDirs(copyTasks: d.CopyTask[]) {
+function ensureDirs(copyTasks: d.CopyTask[]) {
   const mkDirs: string[] = [];
 
   copyTasks.forEach(copyTask => {
@@ -136,15 +187,6 @@ function addMkDir(mkDirs: string[], destDir: string) {
   if (!mkDirs.includes(destDir)) {
     mkDirs.push(destDir);
   }
-
-  const parts = destDir.split('/');
-  if (parts.length === 1) {
-    return;
-  }
-  parts.pop();
-
-  const subDestDir = parts.join('/');
-  addMkDir(mkDirs, subDestDir);
 }
 
 
@@ -162,3 +204,16 @@ const IGNORE = [
   'desktop.ini',
   'thumbs.db'
 ];
+
+
+function asyncGlob(pattern: string, opts: any) {
+  return new Promise<string[]>((resolve, reject) => {
+    glob(pattern, opts, (err: any, files: string[]) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(files);
+      }
+    });
+  });
+}

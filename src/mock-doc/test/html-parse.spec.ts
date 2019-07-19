@@ -212,4 +212,13 @@ describe('parseHtml', () => {
     expect(elm.children[0].attributes.item(0).name).toBe('viewBox');
     expect(elm.children[0].children[0].attributes.item(0).name).toBe('viewBox');
   });
+
+  it('should mock canvas api', () => {
+    const elm = parseHtmlToFragment('<canvas id="canvas" width="300" height="300"></canvas>');
+    const canvas = elm.children[0];    
+    const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
+    expect(elm.children.length).toBe(1);
+    expect(elm.children[0].nodeName).toBe('CANVAS');
+    expect(ctx.getImageData(0, 0, 300, 300).data.length).toBe(300 * 300 * 4);
+  });
 });

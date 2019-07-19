@@ -1,6 +1,25 @@
+import { MockWindow, patchWindow } from '@mock-doc';
 
 
-export function polyfillDocumentImplementation(win: any, doc: any) {
+export function patchDomImplementation(doc: any) {
+  let win: any;
+
+  if (doc.defaultView != null) {
+    patchWindow(doc.defaultView);
+    win = doc.defaultView;
+
+  } else {
+    win = new MockWindow(false) as any;
+  }
+
+  if (win.document !== doc) {
+    win.document = doc;
+  }
+
+  if (doc.defaultView !== win) {
+    doc.defaultView = win;
+  }
+
   const HTMLElement = doc.documentElement.constructor.prototype;
   if (typeof HTMLElement.getRootNode !== 'function') {
     const elm = doc.createElement('unknown-element');
@@ -14,6 +33,8 @@ export function polyfillDocumentImplementation(win: any, doc: any) {
         win.CustomEvent = CustomEvent;
     }
   }
+
+  return win as Window;
 }
 
 

@@ -1,5 +1,5 @@
 
-export function normalizePath(str: string) {
+export const normalizePath = (str: string) => {
   // Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar
   // https://github.com/sindresorhus/slash MIT
   // By Sindre Sorhus
@@ -29,7 +29,7 @@ export function normalizePath(str: string) {
   }
 
   return str;
-}
+};
 
 const EXTENDED_PATH_REGEX = /^\\\\\?\\/;
 const NON_ASCII_REGEX = /[^\x00-\x80]+/;

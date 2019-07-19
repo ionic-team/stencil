@@ -1,4 +1,4 @@
-
+export { SpecPage } from '../declarations';
 export { createJestPuppeteerEnvironment } from './jest/jest-environment';
 export { createTestRunner } from './jest/jest-runner';
 export { E2EElement, E2EPage } from './puppeteer/puppeteer-declarations';

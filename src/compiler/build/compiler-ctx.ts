@@ -73,7 +73,7 @@ export class CompilerContext implements d.CompilerCtx {
 }
 
 
-export function getModule(config: d.Config, compilerCtx: d.CompilerCtx, sourceFilePath: string) {
+export const getModule = (config: d.Config, compilerCtx: d.CompilerCtx, sourceFilePath: string) => {
   sourceFilePath = normalizePath(sourceFilePath);
 
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
@@ -114,10 +114,10 @@ export function getModule(config: d.Config, compilerCtx: d.CompilerCtx, sourceFi
     compilerCtx.moduleMap.set(sourceFilePath, moduleFile);
     return moduleFile;
   }
-}
+};
 
 
-export function resetModule(moduleFile: d.Module) {
+export const resetModule = (moduleFile: d.Module) => {
   moduleFile.cmps.length = 0;
   moduleFile.collectionName = null;
   moduleFile.dtsFilePath = null;
@@ -139,4 +139,4 @@ export function resetModule(moduleFile: d.Module) {
   moduleFile.htmlAttrNames.length = 0;
   moduleFile.htmlTagNames.length = 0;
   moduleFile.potentialCmpRefs.length = 0;
-}
+};

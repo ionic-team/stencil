@@ -1,14 +1,14 @@
+import * as d from '../declarations';
 import { disconnectedCallback } from './disconnected-callback';
-import { proxyComponent } from './proxy-component';
 import { CMP_FLAGS } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
-import * as d from '../declarations';
+import { proxyComponent } from './proxy-component';
 import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
-import { postUpdateComponent, scheduleUpdate } from './update-component';
+import { forceUpdate, postUpdateComponent } from './update-component';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
@@ -19,7 +19,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
   Object.assign(plt, options);
-  plt.$resourcesUrl$ = new URL(options.resourcesUrl || '/', win.location.href).href;
+  plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
   if (options.syncQueue) {
     plt.$flags$ |= PLATFORM_FLAGS.queueSync;
   }
@@ -30,7 +30,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     styles.forEach(styleElm => {
       registerStyle(
         styleElm.getAttribute(HYDRATE_ID),
-        globalStyles + convertScopedToShadow(styleElm.innerHTML)
+        globalStyles + convertScopedToShadow(styleElm.innerHTML),
+        true,
       );
     });
   }
@@ -83,11 +84,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         connectedCallback() {
-          connectedCallback(this, cmpMeta);
+          plt.jmp(() => connectedCallback(this, cmpMeta));
         }
 
         disconnectedCallback() {
-          disconnectedCallback(this);
+          plt.jmp(() => disconnectedCallback(this));
         }
 
         's-init'() {
@@ -104,15 +105,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         forceUpdate() {
-          if (BUILD.updatable) {
-            const hostRef = getHostRef(this);
-            scheduleUpdate(
-              this,
-              hostRef,
-              cmpMeta,
-              false
-            );
-          }
+          forceUpdate(this, cmpMeta);
         }
 
         componentOnReady() {

@@ -38,18 +38,30 @@
   a,b);d!==e&&c.attributeChangedCallback(this,b,d,e,a)});ua?b(HTMLElement.prototype,ua):ma?b(Element.prototype,ma):console.warn("Custom Elements: `Element#insertAdjacentElement` was not patched.");va?d(HTMLElement.prototype,va):na?d(Element.prototype,na):console.warn("Custom Elements: `Element#insertAdjacentHTML` was not patched.");Y(c,Element.prototype,{h:oa,append:pa});Aa(c)};var Z=window.customElements;if(!Z||Z.forcePolyfill||"function"!=typeof Z.define||"function"!=typeof Z.get){var X=new u;xa();ya();Y(X,DocumentFragment.prototype,{h:ka,append:la});za();Ba();document.__CE_hasRegistry=!0;var customElements=new E(X);Object.defineProperty(window,"customElements",{configurable:!0,enumerable:!0,value:customElements})};
 }).call(self);
 
+// Polyfill document.baseURI
+if (typeof document.baseURI !== 'string') {
+  Object.defineProperty(Document.prototype, 'baseURI', {
+    enumerable: true,
+    configurable: true,
+    get: function () {
+      var base = document.querySelector('base');
+      if (base) {
+        return base.href;
+      }
+      return document.URL;
+    }
+  });
+}
+
 // Polyfill CustomEvent
 if (typeof window.CustomEvent !== 'function') {
-  function CustomEvent(event, params) {
+  window.CustomEvent = function CustomEvent(event, params) {
     params = params || { bubbles: false, cancelable: false, detail: undefined };
     var evt = document.createEvent( 'CustomEvent' );
     evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
     return evt;
   }
-
-  CustomEvent.prototype = window.Event.prototype;
-
-  window.CustomEvent = CustomEvent;
+  window.CustomEvent.prototype = window.Event.prototype;
 }
 
 // Event.composedPath

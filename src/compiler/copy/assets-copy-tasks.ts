@@ -2,14 +2,14 @@ import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 
 
-export function getComponentAssetsCopyTasks(config: d.Config,  buildCtx: d.BuildCtx, dest: string, collectionsPath: boolean) {
-  if (buildCtx.skipAssetsCopy || !dest) {
+export function getComponentAssetsCopyTasks(config: d.Config, buildCtx: d.BuildCtx, dest: string, collectionsPath: boolean) {
+  if (!dest) {
     return [];
   }
 
   // get a list of all the directories to copy
   // these paths should be absolute
-  const copyTasks: d.CopyTask[] = [];
+  const copyTasks: Required<d.CopyTask>[] = [];
   const cmps = buildCtx.components;
 
   cmps
@@ -19,7 +19,9 @@ export function getComponentAssetsCopyTasks(config: d.Config,  buildCtx: d.Build
         cmp.assetsDirs.forEach(assetsMeta => {
           copyTasks.push({
             src: assetsMeta.absolutePath,
-            dest: config.sys.path.join(dest, assetsMeta.cmpRelativePath)
+            dest: config.sys.path.join(dest, assetsMeta.cmpRelativePath),
+            warn: false,
+            keepDirStructure: false,
           });
         });
       } else if (!cmp.excludeFromCollection && !cmp.isCollectionDependency) {
@@ -30,7 +32,9 @@ export function getComponentAssetsCopyTasks(config: d.Config,  buildCtx: d.Build
           );
           copyTasks.push({
             src: assetsMeta.absolutePath,
-            dest: collectionDirDestination
+            dest: collectionDirDestination,
+            warn: false,
+            keepDirStructure: false,
           });
         });
       }

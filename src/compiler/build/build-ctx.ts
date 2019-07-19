@@ -28,7 +28,6 @@ export class BuildContext implements d.BuildCtx {
   filesWritten: string[] = [];
   globalStyle: string = undefined;
   hasConfigChanges = false;
-  hasCopyChanges = false;
   hasFinished = false;
   hasHtmlChanges = false;
   hasPrintedResults = false;
@@ -46,7 +45,6 @@ export class BuildContext implements d.BuildCtx {
   requiresFullBuild = true;
   scriptsAdded: string[] = [];
   scriptsDeleted: string[] = [];
-  skipAssetsCopy = false;
   startTime = Date.now();
   styleBuildCount = 0;
   stylesPromise: Promise<void> = null;
@@ -197,7 +195,7 @@ export class BuildContext implements d.BuildCtx {
 }
 
 
-export function getBuildTimestamp() {
+export const getBuildTimestamp = () => {
   const d = new Date();
 
   // YYYY-MM-DDThh:mm:ss
@@ -209,9 +207,9 @@ export function getBuildTimestamp() {
   timestamp += ('0' + d.getUTCSeconds()).slice(-2);
 
   return timestamp;
-}
+};
 
-function getProgress(completedTasks: d.BuildTask[]) {
+const getProgress = (completedTasks: d.BuildTask[]) => {
   let progressIndex = 0;
   const taskKeys = Object.keys(ProgressTask);
 
@@ -222,7 +220,7 @@ function getProgress(completedTasks: d.BuildTask[]) {
   });
 
   return (progressIndex + 1) / taskKeys.length;
-}
+};
 
 export const ProgressTask = {
   emptyOutputTargets: {},

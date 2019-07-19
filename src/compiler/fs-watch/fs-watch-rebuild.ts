@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { configFileReload } from '../config/config-reload';
 import { hasServiceWorkerChanges } from '../service-worker/generate-sw';
-import { isCopyTaskFile } from '../copy/local-copy-tasks';
 import { normalizePath, unique } from '@utils';
 
 
@@ -25,18 +24,6 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
 
   // files changed include updated, added and deleted
   buildCtx.filesChanged = filesChanged(buildCtx);
-
-  // see if any of the changed files/directories are copy tasks
-  buildCtx.hasCopyChanges = hasCopyChanges(config, buildCtx);
-
-  // see if we should rebuild or not
-  if (!shouldRebuild(buildCtx)) {
-    // nothing actually changed!!!
-    if (compilerCtx.events) {
-      compilerCtx.events.emit('buildNoChange', { noChange: true });
-    }
-    return null;
-  }
 
   // collect all the scripts that were added/deleted
   buildCtx.scriptsAdded = scriptsAdded(config, buildCtx);
@@ -99,22 +86,6 @@ export function filesChanged(buildCtx: d.BuildCtx) {
 }
 
 
-function hasCopyChanges(config: d.Config, buildCtx: d.BuildCtx) {
-  return buildCtx.filesUpdated.some(f => isCopyTaskFile(config, f)) ||
-         buildCtx.filesAdded.some(f => isCopyTaskFile(config, f)) ||
-         buildCtx.dirsAdded.some(f => isCopyTaskFile(config, f));
-}
-
-export function shouldRebuild(buildCtx: d.BuildCtx) {
-  return buildCtx.hasCopyChanges ||
-    buildCtx.dirsAdded.length > 0 ||
-    buildCtx.dirsDeleted.length > 0 ||
-    buildCtx.filesAdded.length > 0 ||
-    buildCtx.filesDeleted.length > 0 ||
-    buildCtx.filesUpdated.length > 0;
-}
-
-
 function scriptsAdded(config: d.Config, buildCtx: d.BuildCtx) {
   // collect all the scripts that were added
   return buildCtx.filesAdded.filter(f => {
@@ -166,7 +137,7 @@ const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
 
 function hasHtmlChanges(config: d.Config, buildCtx: d.BuildCtx) {
   const anyHtmlChanged = buildCtx.filesChanged.some(f => f.toLowerCase().endsWith('.html'));
-  
+
   if (anyHtmlChanged) {
     // any *.html in any directory that changes counts and rebuilds
     return true;

@@ -7,5 +7,5 @@ export { MockDocument, createDocument, createFragment, resetDocument } from './d
 export { MockWindow, cloneDocument, cloneWindow, constrainTimeouts, resetWindow } from './window';
 export { NODE_TYPES } from './constants';
 export { parseHtmlToDocument, parseHtmlToFragment} from './parse-html';
+export { patchWindow, setupGlobal, teardownGlobal } from './global';
 export { serializeNodeToHtml } from './serialize-node';
-export { setupGlobal, teardownGlobal } from './global';

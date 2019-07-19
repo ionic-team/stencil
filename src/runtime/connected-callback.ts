@@ -36,7 +36,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         hostId = elm.getAttribute(HYDRATE_ID);
         if (hostId) {
           if (BUILD.shadowDom && supportsShadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
-            const scopeId = addStyle(elm.shadowRoot, cmpMeta.$tagName$, elm.getAttribute('s-mode'));
+            const scopeId = addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode'));
             elm.classList.remove(scopeId + '-h');
             elm.classList.remove(scopeId + '-s');
           }
@@ -65,7 +65,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         while ((ancestorComponent = (ancestorComponent.parentNode as any || ancestorComponent.host as any))) {
           // climb up the ancestors looking for the first
           // component that hasn't finished its lifecycle update yet
-          if ((BUILD.hydrateClientSide && ancestorComponent.nodeType === NODE_TYPE.ElementNode && ancestorComponent.hasAttribute('s-id')) || (ancestorComponent['s-init'] && !ancestorComponent['s-lr'])) {
+          if ((BUILD.hydrateClientSide && ancestorComponent.nodeType === NODE_TYPE.ElementNode && ancestorComponent.hasAttribute('s-id')) || (ancestorComponent['s-init'] && ancestorComponent['s-lr'] === false)) {
             // we found this components first ancestor component
             // keep a reference to this component's ancestor component
             hostRef.$ancestorComponent$ = ancestorComponent;
@@ -90,7 +90,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         });
       }
 
-      if (BUILD.taskQueue && BUILD.mode) {
+      if (BUILD.initializeNextTick) {
         // connectedCallback, taskQueue, initialLoad
         // angular sets attribute AFTER connectCallback
         // https://github.com/angular/angular/issues/18909

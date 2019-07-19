@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { canSkipAssetsCopy } from '../copy/assets-copy-tasks';
 import { catchError, readPackageJson } from '@utils';
 import { emptyOutputTargets } from '../output-targets/empty-dir';
 import { generateEntryModules } from '../entries/entry-modules';
@@ -8,8 +7,8 @@ import { generateStyles } from '../style/generate-styles';
 import { initIndexHtmls } from './init-index-html';
 import { ProgressTask } from './build-ctx';
 import { transpileApp } from '../transpile/transpile-app';
-import { waitForCopyTasks } from '../copy/copy-tasks';
 import { writeBuildFiles } from './write-build';
+import { outputCopy } from '../output-targets/output-copy';
 
 
 export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -49,14 +48,12 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
       }
     }
 
+    const copyPromise = outputCopy(config, compilerCtx, buildCtx);
+
     // we've got the compiler context filled with app modules and collection dependency modules
     // figure out how all these components should be connected
     generateEntryModules(config, buildCtx);
     if (buildCtx.hasError) return buildCtx.abort();
-
-    // start copy tasks from the config.copy and component assets
-    // but don't wait right now (running in worker)
-    buildCtx.skipAssetsCopy = canSkipAssetsCopy(config, compilerCtx, buildCtx.entryModules, buildCtx.filesChanged);
 
     // preprocess and generate styles before any outputTarget starts
     buildCtx.stylesPromise = generateStyles(config, compilerCtx, buildCtx);
@@ -80,7 +77,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
       // i'm sure it's done by now, but let's double check
       // make sure this finishes before the write build files
       // so they're not stepping on each other writing files
-      waitForCopyTasks(buildCtx)
+      copyPromise
     ]);
     if (buildCtx.hasError) return buildCtx.abort();
 

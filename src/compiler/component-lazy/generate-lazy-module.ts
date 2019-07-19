@@ -24,6 +24,7 @@ export async function generateLazyModules(config: d.Config, compilerCtx: d.Compi
   ]);
 
   const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
+  config.logger.debug(`Upfront metadata is ${lazyRuntimeData.length} bytes`);
   const entryResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && rollupResult.isEntry);
   await Promise.all(
     entryResults.map(rollupResult => {

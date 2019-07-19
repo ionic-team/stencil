@@ -56,4 +56,5 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
   return true;
 }
 
-const MAX_JS_INLINE_SIZE = 4 * 1024;
+// https://twitter.com/addyosmani/status/1143938175926095872
+const MAX_JS_INLINE_SIZE = 1 * 1024;

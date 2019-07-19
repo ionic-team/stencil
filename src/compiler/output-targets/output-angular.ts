@@ -42,11 +42,11 @@ async function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
   const imports = `/* tslint:disable */
 /* auto-generated angular directive proxies */
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter } from '@angular/core';`;
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, NgZone } from '@angular/core';`;
 
   const sourceImports = !outputTarget.componentCorePackage ?
     `import { Components } from '${componentsTypeFile}';` :
-    `import { Components } from '${outputTarget.componentCorePackage}'`;
+    `import { Components } from '${outputTarget.componentCorePackage}';`;
 
   const final: string[] = [
     imports,
@@ -99,7 +99,7 @@ export class ${tagNameAsPascal} {`];
   });
 
   lines.push('  protected el: HTMLElement;');
-  lines.push(`  constructor(c: ChangeDetectorRef, r: ElementRef) {
+  lines.push(`  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;`);
   if (hasOutputs) {
@@ -176,7 +176,9 @@ export function proxyInputs(Cmp: any, inputs: string[]) {
   inputs.forEach(item => {
     Object.defineProperty(Prototype, item, {
       get() { return this.el[item]; },
-      set(val: any) { this.el[item] = val; },
+      set(val: any) {
+        this.z.runOutsideAngular(() => this.el[item] = val);
+      },
     });
   });
 }
@@ -186,7 +188,7 @@ export function proxyMethods(Cmp: any, methods: string[]) {
   methods.forEach(methodName => {
     Prototype[methodName] = function() {
       const args = arguments;
-      return this.el.componentOnReady().then((el: any) => el[methodName].apply(el, args));
+      return this.z.runOutsideAngular(() => this.el[methodName].apply(this.el, args));
     };
   });
 }

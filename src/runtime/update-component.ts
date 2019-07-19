@@ -2,54 +2,66 @@ import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
-import { consoleError, cssVarShim, doc, plt, writeTask } from '@platform';
+import { consoleError, cssVarShim, doc, getHostRef, plt, writeTask } from '@platform';
 import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 
 
-export const safeCall = async (instance: any, method: string) => {
+export const safeCall = (instance: any, method: string, arg?: any) => {
   if (instance && instance[method]) {
     try {
-      await instance[method]();
+      return instance[method](arg);
     } catch (e) {
       consoleError(e);
     }
   }
+  return undefined;
 };
 
-export const scheduleUpdate = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
+const then = (promise: Promise<any>, thenFn: () => any) => {
+  return promise && promise.then ? promise.then(thenFn) : thenFn();
+};
+
+export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   if (BUILD.taskQueue && BUILD.updatable) {
     hostRef.$flags$ |= HOST_FLAGS.isQueuedForUpdate;
   }
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
+  let promise: Promise<void>;
   if (isInitialLoad) {
+    if (BUILD.hostListener) {
+      hostRef.$flags$ |= HOST_FLAGS.isListenReady;
+    }
+    if (BUILD.hostListener && hostRef.$queuedListeners$) {
+      hostRef.$queuedListeners$.forEach(([methodName, event]) => safeCall(instance, methodName, event));
+      hostRef.$queuedListeners$ = null;
+    }
     emitLifecycleEvent(elm, 'componentWillLoad');
     if (BUILD.cmpWillLoad) {
-      await safeCall(instance, 'componentWillLoad');
+      promise = safeCall(instance, 'componentWillLoad');
     }
 
   } else {
     emitLifecycleEvent(elm, 'componentWillUpdate');
 
     if (BUILD.cmpWillUpdate) {
-      await safeCall(instance, 'componentWillUpdate');
+      promise = safeCall(instance, 'componentWillUpdate');
     }
   }
 
   emitLifecycleEvent(elm, 'componentWillRender');
   if (BUILD.cmpWillRender) {
-    await safeCall(instance, 'componentWillRender');
+    promise = then(promise, () => safeCall(instance, 'componentWillRender'));
   }
 
   // there is no ancestorc omponent or the ancestor component
   // has already fired off its lifecycle update then
   // fire off the initial update
-  if (BUILD.taskQueue) {
-    writeTask(() => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad));
-  } else {
-    // syncronuously write DOM
-    updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
-  }
+  const update = () => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
+  return then(promise, BUILD.taskQueue
+    ? () => writeTask(update)
+    : update
+  );
 };
 
 const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, instance: any, isInitialLoad: boolean) => {
@@ -216,6 +228,19 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
   }
 };
 
+export const forceUpdate = (elm: d.RenderNode, cmpMeta: d.ComponentRuntimeMeta) => {
+  if (BUILD.updatable) {
+    const hostRef = getHostRef(elm);
+    if (hostRef.$flags$ & HOST_FLAGS.hasRendered) {
+      scheduleUpdate(
+        elm,
+        hostRef,
+        cmpMeta,
+        false
+      );
+    }
+  }
+};
 
 const emitLifecycleEvent = (elm: d.HostElement, lifecycleName: string) => {
   if (BUILD.lifecycleDOMEvents) {

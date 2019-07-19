@@ -66,7 +66,7 @@ export interface ScreenshotConnectorOptions {
   allowableMismatchedPixels?: number;
   allowableMismatchedRatio?: number;
   pixelmatchThreshold?: number;
-  timeoutBeforeScreenshot?: number;
+  waitBeforeScreenshot?: number;
   pixelmatchModulePath?: string;
 }
 

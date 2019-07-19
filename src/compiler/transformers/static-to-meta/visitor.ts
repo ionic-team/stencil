@@ -7,7 +7,7 @@ import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
 
 
-export function convertStaticToMeta(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> {
+export const convertStaticToMeta = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
 
   return transformCtx => {
 
@@ -43,4 +43,4 @@ export function convertStaticToMeta(config: d.Config, compilerCtx: d.CompilerCtx
       return visitNode(tsSourceFile) as ts.SourceFile;
     };
   };
-}
+};
