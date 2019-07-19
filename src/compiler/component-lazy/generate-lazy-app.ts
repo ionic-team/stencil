@@ -90,9 +90,9 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
 
 const BROWSER_ENTRY = `
 import { bootstrapLazy, patchBrowser, globals } from '@stencil/core';
-patchBrowser().then(resourcesUrl => {
+patchBrowser().then(options => {
   globals();
-  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], { resourcesUrl });
+  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
 });
 `;
 

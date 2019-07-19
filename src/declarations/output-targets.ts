@@ -105,6 +105,7 @@ export interface OutputTargetDist extends OutputTargetBase {
   collectionDir?: string | null;
   typesDir?: string;
   esmLoaderPath?: string;
+  experimentalCdnUrl?: string;
   copy?: d.CopyTask[];
 
   empty?: boolean;
@@ -153,6 +154,7 @@ export interface OutputTargetDistLazyLoader extends OutputTargetBase {
   esmEs5Dir: string;
   cjsDir: string;
   componentDts: string;
+  cdnUrl?: string;
 
   empty: boolean;
 }

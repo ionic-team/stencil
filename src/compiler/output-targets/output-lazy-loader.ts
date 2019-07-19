@@ -31,11 +31,12 @@ async function generateLoader(config: d.Config, compilerCtx: d.CompilerCtx, outp
     'name': config.fsNamespace + '-loader',
     'typings': './index.d.ts',
     'module': './index.mjs',
-    'main': './index.cjs.js',
+    'main': './unpkg.js',
     'node:main': './node-main.js',
     'jsnext:main': './index.es2017.mjs',
     'es2015': './index.es2017.mjs',
     'es2017': './index.es2017.mjs',
+    'unpkg': outputTarget.cdnUrl ? './unpkg.js' : undefined,
   }, null, 2);
 
   const es5EntryPoint = config.sys.path.join(es5Dir, 'loader.mjs');
@@ -61,6 +62,7 @@ module.exports.applyPolyfills = function() { return Promise.resolve() };
 module.exports.defineCustomElements = function() { return Promise.resolve() };
 `;
 
+
   const indexDtsPath = config.sys.path.join(loaderPath, 'index.d.ts');
   await Promise.all([
     compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'package.json'), packageJsonContent),
@@ -70,6 +72,10 @@ module.exports.defineCustomElements = function() { return Promise.resolve() };
     compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.es2017.mjs'), indexES2017Content),
     compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'node-main.js'), nodeMainContent)
   ]);
+  if (outputTarget.cdnUrl) {
+    const cdnContent = generateCDNFallback(config.fsNamespace, outputTarget.cdnUrl);
+    await compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'unpkg.js'), cdnContent);
+  }
 }
 
 
@@ -87,5 +93,34 @@ export interface CustomElementsDefineOptions {
 }
 export declare function defineCustomElements(win: Window, opts?: CustomElementsDefineOptions): Promise<void>;
 export declare function applyPolyfills(): Promise<void>;
+`;
+}
+
+function generateCDNFallback(namespace: string, cdnPath: string) {
+  return `
+module.exports.applyPolyfills = function() { return Promise.resolve() };
+module.exports.defineCustomElements = function(_, opts = {}) {
+  const doc = document;
+  const strOpts = JSON.stringify(opts);
+  const mod = doc.createElement('script');
+  mod.setAttribute('type', 'module');
+  mod.setAttribute('data-opts', strOpts);
+  mod.src = '${cdnPath}/${namespace}.esm.js';
+  doc.head.appendChild(mod);
+
+  const legacy = doc.createElement('script');
+  legacy.setAttribute('nomodule', '');
+  legacy.setAttribute('data-opts', strOpts);
+  legacy.src = '${cdnPath}/${namespace}.js';
+  doc.head.appendChild(legacy);
+
+  return new Promise((resolve, reject) => {
+    mod.onload = resolve;
+    mod.onerror = reject;
+
+    legacy.onload = resolve;
+    legacy.onerror = reject;
+  });
+}
 `;
 }

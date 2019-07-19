@@ -131,6 +131,7 @@ export function validateOutputTargetDist(config: d.Config) {
         esmEs5Dir,
         cjsDir,
         componentDts: getComponentsDtsTypesFilePath(config, outputTarget),
+        cdnUrl: outputTarget.experimentalCdnUrl,
         empty: outputTarget.empty
       });
     }
