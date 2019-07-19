@@ -189,7 +189,6 @@ run(async () => {
   await Promise.all([
     bundleExternal('graceful-fs.js'),
     bundleExternal('node-fetch.js'),
-    bundleExternal('node-forge.js'),
     bundleExternal('open-in-editor.js'),
     bundleExternal('sys-worker.js'),
     bundleExternal('websocket.js'),

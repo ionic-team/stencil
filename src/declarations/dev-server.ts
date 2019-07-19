@@ -17,9 +17,9 @@ export interface StencilDevServerConfig {
    */
   basePath?: string;
   /**
-   * When `true`, the dev server will run with https using a self-signed SSL certificate. To provide your own key and certificate, set this to an object `{ key, cert }` (use `fs` if you need to read them from files). Defaults to `false`.
+   * When set, the dev server will run via https using the SSL certificate and key you provide (use `fs` if you want to read them from files).
    */
-  https?: boolean | Credentials;
+  https?: Credentials;
   /**
    * The URL the dev server should first open to. Defaults to `/`.
    */
