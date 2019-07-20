@@ -70,8 +70,11 @@ export const addComponentStyle = (classMembers: ts.ClassElement[], cmp: d.Compon
     return;
   }
   const style = cmp.styles[0];
-  if (style == null || style.compiledStyleText == null) {
-    console.log(cmp);
+  if (style == null) {
+    return;
   }
-  classMembers.push(createStaticGetter('style', ts.createStringLiteral(style.compiledStyleText)));
+
+  if (typeof style.styleStr === 'string') {
+    classMembers.push(createStaticGetter('style', ts.createStringLiteral(style.styleStr)));
+  }
 };

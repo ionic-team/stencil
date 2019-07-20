@@ -7,8 +7,11 @@ import ts from 'typescript';
 
 export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, tagName: string, componentFilePath: string, isCollectionDependency: boolean, staticMembers: ts.ClassElement[]) => {
   const styles: d.StyleCompiler[] = [];
+  const styleUrlsProp = isCollectionDependency ? 'styleUrls' : 'originalStyleUrls';
+  const parsedStyleUrls = getStaticValue(staticMembers, styleUrlsProp) as d.CompilerModeStyles;
 
   let parsedStyleStr: string = getStaticValue(staticMembers, 'styles');
+
   if (typeof parsedStyleStr === 'string') {
     // styles: 'div { padding: 10px }'
     parsedStyleStr = parsedStyleStr.trim();
@@ -26,8 +29,6 @@ export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, 
     }
   }
 
-  const styleUrlsProp = isCollectionDependency ? 'styleUrls' : 'originalStyleUrls';
-  const parsedStyleUrls = getStaticValue(staticMembers, styleUrlsProp) as d.CompilerModeStyles;
   if (parsedStyleUrls && typeof parsedStyleUrls === 'object') {
     Object.keys(parsedStyleUrls).forEach(modeName => {
       const externalStyles: d.ExternalStyleCompiler[] = [];
