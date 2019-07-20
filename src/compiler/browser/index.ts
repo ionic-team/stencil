@@ -1,6 +1,7 @@
 
 export { compile } from './browser-compile';
 export { getMinifyScriptOptions } from './browser-compile-options';
+export { scopeCss } from './browser-scope-css';
 
 export const version = '0.0.0-stencil-dev';
 

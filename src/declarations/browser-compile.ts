@@ -25,3 +25,15 @@ export interface CompileScriptMinifyOptions {
 
 
 export type CompileScript = 'latest' | 'esnext' | 'es2017' | 'es2015' | 'es5' | string | undefined;
+
+
+export interface ScopeCssOptions {
+  commentOriginalSelector?: boolean;
+  mode?: string;
+}
+
+export interface ScopeCssResults {
+  diagnostics: d.Diagnostic[];
+  code: string;
+  map: any;
+}

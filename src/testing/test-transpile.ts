@@ -21,7 +21,9 @@ const TRANSPILE_CONFIG: d.Config = {
 
 const DEFAULT_TRANSFORM_OPTS: d.TransformOptions = {
   coreImportPath: '@stencil/core',
+  componentExport: null,
   componentMetadata: 'static',
+  scopeCss: false,
   styleImport: null,
   transformOutput: 'lazy'
 };

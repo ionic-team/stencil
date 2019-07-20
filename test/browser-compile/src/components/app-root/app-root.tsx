@@ -37,8 +37,12 @@ export class AppRoot {
   }
 
   async componentDidLoad() {
-    this.file.value = this.fileTemplate.value;
-    const tmp = templates.get('hello-world.tsx');
+    this.loadTemplate(templates.keys().next().value);
+  }
+
+  loadTemplate(fileName: string) {
+    this.file.value = fileName;
+    const tmp = templates.get(fileName);
     this.sourceCodeInput.value = tmp.source.trim();
     this.htmlCodeInput.value = tmp.html.trim();
     this.compile();
@@ -166,12 +170,7 @@ export class AppRoot {
 
       const script = doc.createElement('script');
       script.setAttribute('type', 'module');
-      script.innerHTML = [
-        '(function(){',
-        this.bundledInput.value,
-        '})()'
-      ].join('\n');
-
+      script.innerHTML = this.bundledInput.value;
       doc.head.appendChild(script);
 
       doc.body.innerHTML = this.htmlCodeInput.value;
@@ -189,23 +188,16 @@ export class AppRoot {
             wrap="off"
             autocapitalize="off"
             ref={el => this.sourceCodeInput = el}
-            onInput={() => {
-              this.compile();
-            }}/>
+            onInput={() => this.compile()}/>
 
           <div class="options">
             <label>
               <span>Templates:</span>
               <select ref={el => this.fileTemplate = el} onInput={(ev: any) => {
-                this.file.value = ev.target.value;
-                const tmp = templates.get(this.file.value);
-                this.sourceCodeInput.value = tmp.source.trim();
-                this.htmlCodeInput.value = tmp.html.trim();
-                this.compile();
-              }}>
-                <option value="hello-world.tsx">Hello World</option>
-                <option value="my-name.tsx">Properties</option>
-                <option value="my-button.tsx">Shadow/Slot</option>
+                this.loadTemplate(ev.target.value);
+              }}>{Array.from(templates).map(([fileName]) => (
+                <option value={fileName}>{fileName.replace('.tsx', '')}</option>
+              ))}
               </select>
             </label>
             <label>

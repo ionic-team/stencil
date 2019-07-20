@@ -62,7 +62,9 @@ export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
     noResolve: true,
 
     coreImportPath: '@stencil/core/internal/client',
+    componentExport: null,
     componentMetadata: compilerOpts.componentMetadata as any,
+    scopeCss: true,
     styleImport: compilerOpts.styleImport as any,
   };
 

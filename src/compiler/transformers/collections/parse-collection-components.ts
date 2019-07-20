@@ -66,7 +66,9 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
     after: [
       convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, collection, {
         coreImportPath: '@stencil/core',
+        componentExport: null,
         componentMetadata: null,
+        scopeCss: false,
         styleImport: 'inline'
       })
     ]

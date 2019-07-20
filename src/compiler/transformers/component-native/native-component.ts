@@ -3,14 +3,16 @@ import { addNativeConnectedCallback } from './native-connected-callback';
 import { addNativeElementGetter } from './native-element-getter';
 import { addWatchers } from '../watcher-meta-transform';
 import { createStaticGetter } from '../transform-utils';
+import { getScopeId } from '../../style/scope-css';
 import { HTML_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
+import { scopeCss } from '../../../utils/shadow-css';
 import { transformHostData } from '../host-data-transform';
 import { updateNativeConstructor } from './native-constructor';
 import ts from 'typescript';
 
 
-export const updateNativeComponentClass = (classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, removeExport: boolean) => {
+export const updateNativeComponentClass = (classNode: ts.ClassDeclaration, transformOpts: d.TransformOptions, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, removeExport: boolean) => {
   let modifiers = Array.isArray(classNode.modifiers) ? classNode.modifiers.slice() : [];
 
   if (removeExport) {
@@ -26,7 +28,7 @@ export const updateNativeComponentClass = (classNode: ts.ClassDeclaration, modul
     classNode.name,
     classNode.typeParameters,
     updateNativeHostComponentHeritageClauses(classNode, moduleFile),
-    updateNativeHostComponentMembers(classNode, moduleFile, cmp)
+    updateNativeHostComponentMembers(classNode, transformOpts, moduleFile, cmp)
   );
 };
 
@@ -52,20 +54,20 @@ const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration
 };
 
 
-const updateNativeHostComponentMembers = (classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
+const updateNativeHostComponentMembers = (classNode: ts.ClassDeclaration, transformOpts: d.TransformOptions, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateNativeConstructor(classMembers, moduleFile, cmp, true);
   addNativeConnectedCallback(classMembers, cmp);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
-  addComponentStyle(classMembers, cmp);
+  addStatictStyle(classMembers, transformOpts, cmp);
   transformHostData(classMembers, moduleFile);
 
   return classMembers;
 };
 
-export const addComponentStyle = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
+export const addStatictStyle = (classMembers: ts.ClassElement[], transformOpts: d.TransformOptions, cmp: d.ComponentCompilerMeta) => {
   if (!cmp.hasStyle) {
     return;
   }
@@ -75,6 +77,13 @@ export const addComponentStyle = (classMembers: ts.ClassElement[], cmp: d.Compon
   }
 
   if (typeof style.styleStr === 'string') {
-    classMembers.push(createStaticGetter('style', ts.createStringLiteral(style.styleStr)));
+    let styleStr = style.styleStr;
+
+    if (transformOpts.scopeCss && cmp.encapsulation === 'scoped') {
+      const scopeId = getScopeId(cmp.tagName);
+      styleStr = scopeCss(styleStr, scopeId, false);
+    }
+
+    classMembers.push(createStaticGetter('style', ts.createStringLiteral(styleStr)));
   }
 };

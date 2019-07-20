@@ -12,7 +12,10 @@ export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, build
 
   const transformOpts: d.TransformOptions = {
     coreImportPath: '@stencil/core',
-    componentMetadata: null
+    componentExport: null,
+    componentMetadata: null,
+    scopeCss: false,
+    styleImport: null
   };
 
   try {
@@ -57,7 +60,7 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateNativeComponentClass(node, moduleFile, cmp, exportAsCustomElement);
+            return updateNativeComponentClass(node, transformOpts, moduleFile, cmp, exportAsCustomElement);
           }
         }
 

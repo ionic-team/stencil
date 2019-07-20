@@ -18,7 +18,9 @@ export const updateToLazyComponent = async (config: d.Config, compilerCtx: d.Com
   if (outputJsText == null) {
     const transformOpts: d.TransformOptions = {
       coreImportPath: '@stencil/core',
+      componentExport: null,
       componentMetadata: null,
+      scopeCss: false,
       styleImport: 'inline'
     };
     outputJsText = transformToLazyComponentText(compilerCtx, buildCtx, transformOpts, cmp, inputText);

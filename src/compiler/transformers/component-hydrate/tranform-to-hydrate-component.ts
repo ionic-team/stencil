@@ -11,7 +11,9 @@ export const transformToHydrateComponentText = (compilerCtx: d.CompilerCtx, buil
   try {
     const transformOpts: d.TransformOptions = {
       coreImportPath: '@stencil/core',
+      componentExport: null,
       componentMetadata: null,
+      scopeCss: false,
       styleImport: 'inline'
     };
     const transpileOpts: ts.TranspileOptions = {

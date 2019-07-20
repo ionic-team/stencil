@@ -31,7 +31,7 @@ html: `
 
 
 
-templates.set(`my-name.tsx`, {
+templates.set(`properties.tsx`, {
 source: `
 
 import { Component, Prop, h } from '@stencil/core';
@@ -59,7 +59,7 @@ html: `
 
 
 
-templates.set(`my-button.tsx`, {
+templates.set(`shadow-inline-styles.tsx`, {
 source: `
 
 import { Component, Prop, h } from '@stencil/core';
@@ -67,11 +67,9 @@ import { Component, Prop, h } from '@stencil/core';
 @Component({
   tag: 'my-button',
   shadow: true,
-  styles: 'button { font-size: 24px; color: white; font-weight: bold; }'
+  styles: ':host { padding: 20px; background: #ddd; } :host::before { content: "shadow :host"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: red; color: white; font-weight: bold; }'
 })
 export class MyButton {
-
-  @Prop() color = 'blue';
 
   render() {
     return (
@@ -85,7 +83,36 @@ export class MyButton {
 
 `,
 html: `
-<my-button color="red">My Button</my-button>
+<my-button>Shadow / Inline Styles</my-button>
 `
+});
 
+
+
+templates.set(`scoped-inline-styles.tsx`, {
+source: `
+
+import { Component, Prop, h } from '@stencil/core';
+
+@Component({
+  tag: 'my-button',
+  scoped: true,
+  styles: ':host { padding: 20px; background: #ddd; } :host::before { content: "scoped :host"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: green; color: white; font-weight: bold; }'
+})
+export class MyButton {
+
+  render() {
+    return (
+      <button>
+        <slot/>
+      </button>
+    );
+  }
+
+}
+
+`,
+html: `
+<my-button>Scoped / Styles Urls</my-button>
+`
 });

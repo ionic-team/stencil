@@ -118,7 +118,9 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
 
       const transformOpts: d.TransformOptions = {
         coreImportPath: '@stencil/core',
+        componentExport: null,
         componentMetadata: null,
+        scopeCss: false,
         styleImport: 'inline'
       };
 
