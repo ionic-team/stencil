@@ -52,7 +52,9 @@ function attributesToMultiLineString(attributes: d.TypeInfo, jsxAttributes: bool
     .reduce((fullList, type) => {
       if (type.jsdoc) {
         fullList.push(`/**`);
-        fullList.push(` * ${type.jsdoc.replace(/\r?\n|\r/g, ' ')}`);
+        fullList.push(
+          ...type.jsdoc.split('\n').map(line => '  * ' + line)
+        );
         fullList.push(` */`);
       }
       const optional = (jsxAttributes)

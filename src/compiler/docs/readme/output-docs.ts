@@ -35,6 +35,7 @@ export function generateMarkdown(config: d.Config, userContent: string, cmp: d.J
     AUTO_GENERATE_COMMENT,
     '',
     '',
+    ...getDeprecation(cmp),
     ...usageToMarkdown(cmp.usage),
     ...propsToMarkdown(cmp.props),
     ...eventsToMarkdown(cmp.events),
@@ -47,6 +48,16 @@ export function generateMarkdown(config: d.Config, userContent: string, cmp: d.J
     footer,
     ''
   ].join('\n');
+}
+
+function getDeprecation(cmp: d.JsonDocsComponent) {
+  if (cmp.deprecation !== undefined) {
+    return [
+      `> **[DEPRECATED]** ${cmp.deprecation}`,
+      ''
+    ];
+  }
+  return [];
 }
 
 function getDefaultReadme(docsData: d.JsonDocsComponent) {
