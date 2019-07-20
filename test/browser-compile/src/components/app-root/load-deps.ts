@@ -1,7 +1,7 @@
 
 export const loadDeps = async (resolveLookup: Map<string, string>, fs: Map<string, string>) => {
-  resolveLookup.set('@stencil/core/internal/client', '/@stencil/core/internal/client.mjs');
-  resolveLookup.set('@stencil/core/internal/build-conditionals', '/@stencil/core/internal/build-conditionals.mjs');
+  resolveLookup.set('@stencil/core/internal/client', '/@stencil/core/internal/client/index.mjs');
+  resolveLookup.set('@stencil/core/internal/client/build-conditionals', '/@stencil/core/internal/client/build-conditionals.mjs');
 
   await loadDep('/@stencil/core/compiler/stencil.js');
 
@@ -10,11 +10,11 @@ export const loadDeps = async (resolveLookup: Map<string, string>, fs: Map<strin
   }));
 
   const fetchResults = await Promise.all([
-    await fetch('/@stencil/core/internal/client.mjs'),
-    await fetch('/@stencil/core/internal/build-conditionals.mjs'),
-    await fetch('/@stencil/core/internal/css-shim.mjs'),
-    await fetch('/@stencil/core/internal/dom.mjs'),
-    await fetch('/@stencil/core/internal/shadow-css.mjs'),
+    await fetch('/@stencil/core/internal/client/index.mjs'),
+    await fetch('/@stencil/core/internal/client/build-conditionals.mjs'),
+    await fetch('/@stencil/core/internal/client/css-shim.mjs'),
+    await fetch('/@stencil/core/internal/client/dom.mjs'),
+    await fetch('/@stencil/core/internal/client/shadow-css.mjs'),
   ]);
 
   await Promise.all(fetchResults.map(async r => {

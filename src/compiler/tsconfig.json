@@ -47,6 +47,7 @@
     "../client/index.ts",
     "../client/polyfills/css-shim/index.ts",
     "./browser/index.ts",
+    "./browser/build-conditionals-client.ts",
     "../runtime/index.ts",
     "../sys/browser/index.ts",
     "../../types/rollup-plugin-commonjs.d.ts",

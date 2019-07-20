@@ -11,13 +11,16 @@ const ROOT_DIR = path.join(__dirname, '..');
 const DIST_DIR = path.join(ROOT_DIR, 'dist');
 const TRANSPILED_DIR = path.join(DIST_DIR, 'transpiled-compiler');
 const COMPILER_INPUT_FILE = path.join(TRANSPILED_DIR, 'compiler', 'index.js');
-const INTERNAL_CLIENT_INPUT_FILE = path.join(TRANSPILED_DIR, 'client', 'index.js');
-const BROWSER_INPUT_FILE = path.join(TRANSPILED_DIR, 'compiler', 'browser', 'index.js');
+
+const INTERNAL_CLIENT_INPUT = path.join(TRANSPILED_DIR, 'client', 'index.js');
+const INTERNAL_CLIENT_CONDITIONALS_INPUT = path.join(TRANSPILED_DIR, 'compiler', 'browser', 'build-conditionals-client.js');
+const INTERNAL_CLIENT_DIST_DIR = path.join(ROOT_DIR, 'internal', 'client');
+
+const BROWSER_COMPILER_INPUT_FILE = path.join(TRANSPILED_DIR, 'compiler', 'browser', 'index.js');
+const BROWSER_COMPILER_DIST_FILE = path.join(ROOT_DIR, 'compiler', 'stencil.js');
 
 const COMPILER_DIST_DIR = path.join(DIST_DIR, 'compiler');
 const COMPILER_DIST_FILE = path.join(COMPILER_DIST_DIR, 'index.js');
-const INTERNAL_DIST_DIR = path.join(ROOT_DIR, 'internal');
-const BROWSER_COMPILER_DIST_FILE = path.join(ROOT_DIR, 'compiler', 'stencil.js');
 const UTILS_DIST_DIR = path.join(DIST_DIR, 'utils');
 const DECLARATIONS_SRC_DIR = path.join(TRANSPILED_DIR, 'declarations');
 const DECLARATIONS_DST_DIR = path.join(DIST_DIR, 'declarations');
@@ -86,12 +89,13 @@ async function bundleCompiler() {
 
 async function bundleInternalClient() {
   const transpiledPolyfillsDir = path.join(TRANSPILED_DIR, 'client', 'polyfills');
-  const outputPolyfillsDir = path.join(INTERNAL_DIST_DIR, 'polyfills');
+  const outputPolyfillsDir = path.join(INTERNAL_CLIENT_DIST_DIR, 'polyfills');
   await buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir);
 
   const rollupBuild = await rollup.rollup({
     input: {
-      'client': INTERNAL_CLIENT_INPUT_FILE
+      'index': INTERNAL_CLIENT_INPUT,
+      'build-conditionals': INTERNAL_CLIENT_CONDITIONALS_INPUT
     },
 
     plugins: [
@@ -99,7 +103,7 @@ async function bundleInternalClient() {
         resolveId(importee) {
           if (importee === '@build-conditionals') {
             return {
-              id: '@stencil/core/internal/build-conditionals',
+              id: '@stencil/core/internal/client/build-conditionals',
               external: true
             }
           }
@@ -123,19 +127,15 @@ async function bundleInternalClient() {
 
   const { output } = await rollupBuild.generate({
     format: 'esm',
-    dir: INTERNAL_DIST_DIR,
+    dir: INTERNAL_CLIENT_DIST_DIR,
     entryFileNames: '[name].mjs',
     chunkFileNames: '[name].mjs'
   });
 
-  await fs.ensureDir(INTERNAL_DIST_DIR);
-
-  const buildConditinalHelper = path.join(ROOT_DIR, 'scripts', 'packages', 'build-conditionals', 'index.mjs');
-  const buildConditinalInternal = path.join(INTERNAL_DIST_DIR, 'build-conditionals.mjs');
-  fs.copyFileSync(buildConditinalHelper, buildConditinalInternal);
+  await fs.ensureDir(INTERNAL_CLIENT_DIST_DIR);
 
   output.forEach(o => {
-    const outputFilePath = path.join(INTERNAL_DIST_DIR, o.fileName);
+    const outputFilePath = path.join(INTERNAL_CLIENT_DIST_DIR, o.fileName);
     const outputText = updateBuildIds(o.code);
     fs.writeFileSync(outputFilePath, outputText);
   });
@@ -144,7 +144,7 @@ async function bundleInternalClient() {
 
 async function bundleBrowserCompiler() {
   const rollupBuild = await rollup.rollup({
-    input: BROWSER_INPUT_FILE,
+    input: BROWSER_COMPILER_INPUT_FILE,
 
     plugins: [
       {
