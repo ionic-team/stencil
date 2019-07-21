@@ -1,6 +1,7 @@
 import { Component, Host, h, State } from '@stencil/core';
-import { loadDeps } from './load-deps';
-import { templates } from './templates';
+import { cssPlugin } from '../../utils/rollup-css-plugin';
+import { loadDeps } from '../../utils/load-deps';
+import { templates, templateList } from '../../utils/templates';
 
 
 @Component({
@@ -18,7 +19,7 @@ export class AppRoot {
   module: HTMLSelectElement;
   script: HTMLSelectElement;
   componentExport: HTMLSelectElement;
-  styleImport: HTMLSelectElement;
+  style: HTMLSelectElement;
   build: HTMLSelectElement;
   fileTemplate: HTMLSelectElement;
   iframe: HTMLIFrameElement;
@@ -58,7 +59,7 @@ export class AppRoot {
       componentMetadata: this.componentMetadata.value,
       module: this.module.value,
       script: this.script.value,
-      styleImport: this.styleImport.value
+      styleImport: this.style.value
     };
 
     const results = await stencil.compile(this.sourceCodeInput.value, opts);
@@ -93,29 +94,32 @@ export class AppRoot {
     const inputOptions = {
       input: entryId,
       treeshake: true,
-      plugins: [{
-				resolveId: (importee: string, importer: string) => {
-          console.log('bundle resolveId, importee:', importee, 'importer:', importer);
+      plugins: [
+        {
+          resolveId: (importee: string, importer: string) => {
+            console.log('bundle resolveId, importee:', importee, 'importer:', importer);
 
-          if (importee.startsWith('.')) {
-            var u = new URL(importee, 'http://url.resolve' + (importer || ''));
-            console.log('bundle path resolve:', u.pathname);
-            return u.pathname;
-          }
+            if (importee.startsWith('.')) {
+              var u = new URL(importee, 'http://url.resolve' + (importer || ''));
+              console.log('bundle path resolve:', u.pathname);
+              return u.pathname;
+            }
 
-          const resolved = this.resolveLookup.get(importee);
-          if (resolved) {
-            console.log('bundle resolveLookup:', resolved);
-            return resolved;
+            const resolved = this.resolveLookup.get(importee);
+            if (resolved) {
+              console.log('bundle resolveLookup:', resolved);
+              return resolved;
+            }
+            return importee;
+          },
+          load: (id: string) => {
+            console.log('bundle load:', id);
+            const code = this.fs.get(id);
+            return code;
           }
-          return importee;
-				},
-				load: (id: string) => {
-          console.log('bundle load:', id);
-          const code = this.fs.get(id);
-					return code;
-				}
-      }],
+        },
+        cssPlugin()
+      ],
       onwarn(warning: any) {
 				console.group(warning.loc ? warning.loc.file : '');
 				console.warn(warning.message);
@@ -133,31 +137,38 @@ export class AppRoot {
       format: this.module.value,
     };
 
-    const build = await rollup.rollup(inputOptions);
-    const generated = await build.generate(generateOptions);
+    try {
+      const build = await rollup.rollup(inputOptions);
+      const generated = await build.generate(generateOptions);
 
-    this.bundledInput.value = generated.output[0].code;
-    this.wrap = 'off';
+      this.bundledInput.value = generated.output[0].code;
+      this.wrap = 'off';
 
-    if (this.minified === 'minified') {
-      const opts = stencil.getMinifyScriptOptions({
-        script: this.script.value,
-        pretty: false
-      });
-      const results = Terser.minify(this.bundledInput.value, opts);
-      this.bundledInput.value = results.code;
+      if (this.minified === 'minified') {
+        const opts = stencil.getMinifyScriptOptions({
+          script: this.script.value,
+          pretty: false
+        });
+        const results = Terser.minify(this.bundledInput.value, opts);
+        this.bundledInput.value = results.code;
+        this.wrap = 'on';
+
+      } else if (this.minified === 'pretty') {
+        const opts = stencil.getMinifyScriptOptions({
+          script: this.script.value,
+          pretty: true
+        });
+        const results = Terser.minify(this.bundledInput.value, opts);
+        this.bundledInput.value = results.code;
+      }
+
+      this.preview();
+
+    } catch (e) {
+      this.bundledInput.value = e;
       this.wrap = 'on';
-
-    } else if (this.minified === 'pretty') {
-      const opts = stencil.getMinifyScriptOptions({
-        script: this.script.value,
-        pretty: true
-      });
-      const results = Terser.minify(this.bundledInput.value, opts);
-      this.bundledInput.value = results.code;
+      this.iframe.contentWindow.document.body.innerHTML = '';
     }
-
-    this.preview();
   }
 
   preview() {
@@ -195,7 +206,7 @@ export class AppRoot {
               <span>Templates:</span>
               <select ref={el => this.fileTemplate = el} onInput={(ev: any) => {
                 this.loadTemplate(ev.target.value);
-              }}>{Array.from(templates).map(([fileName]) => (
+              }}>{templateList.map(fileName => (
                 <option value={fileName}>{fileName.replace('.tsx', '')}</option>
               ))}
               </select>
@@ -229,11 +240,10 @@ export class AppRoot {
               </select>
             </label>
             <label>
-              <span>Style Import:</span>
-              <select ref={el => this.styleImport = el} onInput={this.compile.bind(this)}>
+              <span>Style:</span>
+              <select ref={el => this.style = el} onInput={this.compile.bind(this)}>
                 <option value="inline">inline</option>
-                <option value="cjs">cjs</option>
-                <option value="esm">esm</option>
+                <option value="import">import</option>
               </select>
             </label>
             <label>

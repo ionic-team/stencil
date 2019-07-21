@@ -121,7 +121,7 @@ async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buil
         componentExport: null,
         componentMetadata: null,
         scopeCss: false,
-        styleImport: 'inline'
+        style: 'inline'
       };
 
       return {

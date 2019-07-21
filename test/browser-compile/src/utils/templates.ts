@@ -113,6 +113,39 @@ export class MyButton {
 
 `,
 html: `
-<my-button>Scoped / Styles Urls</my-button>
+<my-button>Scoped / Inline Styles</my-button>
 `
 });
+
+
+
+templates.set(`style-esm-import.tsx`, {
+source: `
+
+import { Component, Prop, h } from '@stencil/core';
+import styleEsmImport from './style-import.css';
+
+@Component({
+  tag: 'my-button',
+  styles: styleEsmImport
+})
+export class MyButton {
+
+  render() {
+    return (
+      <button>
+        <slot/>
+      </button>
+    );
+  }
+
+}
+
+`,
+html: `
+<my-button>Style ESM Import</my-button>
+`
+});
+
+
+export const templateList = Array.from(templates).map(([fileName]) => fileName);

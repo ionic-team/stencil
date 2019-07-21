@@ -6,7 +6,7 @@ export interface CompileOptions {
   module?: 'cjs' | 'esm' | string;
   componentExport?: 'customelement' | 'module' | string | undefined;
   script?: CompileScript;
-  styleImport?: 'cjs' | 'esm' | 'inline' | string | undefined;
+  style?: 'import' | 'inline' | string | undefined;
 }
 
 export interface CompileResults {

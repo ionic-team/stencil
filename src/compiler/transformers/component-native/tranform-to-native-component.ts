@@ -15,7 +15,7 @@ export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, build
     componentExport: null,
     componentMetadata: null,
     scopeCss: false,
-    styleImport: null
+    style: 'inline'
   };
 
   try {

@@ -85,5 +85,8 @@ export const addStatictStyle = (classMembers: ts.ClassElement[], transformOpts: 
     }
 
     classMembers.push(createStaticGetter('style', ts.createStringLiteral(styleStr)));
+
+  } else if (typeof style.styleIdentifier === 'string') {
+    classMembers.push(createStaticGetter('style', ts.createIdentifier(style.styleIdentifier)));
   }
 };

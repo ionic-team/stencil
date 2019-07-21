@@ -14,7 +14,7 @@ export const transformToHydrateComponentText = (compilerCtx: d.CompilerCtx, buil
       componentExport: null,
       componentMetadata: null,
       scopeCss: false,
-      styleImport: 'inline'
+      style: 'inline'
     };
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {

@@ -24,5 +24,5 @@ export interface TransformOptions extends ts.CompilerOptions {
   componentExport: 'lazy' | 'native' | 'customelement' | null;
   componentMetadata: 'proxy' | 'static' | null;
   scopeCss: boolean;
-  styleImport: 'cjs' | 'esm' | 'inline' | null;
+  style: 'import' | 'inline' | null;
 }

@@ -40,6 +40,9 @@ export const convertValueToLiteral = (val: any, refs: WeakSet<any> = null) => {
     return arrayToArrayLiteral(val, refs);
   }
   if (typeof val === 'object') {
+    if ((val as ConvertIdentifier).__identifier && (val as ConvertIdentifier).__escapedText) {
+      return ts.createLiteral((val as ConvertIdentifier).__escapedText);
+    }
     return objectToObjectLiteral(val, refs);
   }
   return ts.createLiteral(val);
@@ -135,6 +138,13 @@ export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: str
     return arrayLiteralToArray(rtnStatement.expression as any);
   }
 
+  if (rtnStatement.expression.kind === ts.SyntaxKind.Identifier) {
+    return {
+      __identifier: true,
+      __escapedText: (rtnStatement.expression as ts.Identifier).escapedText
+    } as ConvertIdentifier;
+  }
+
   return null;
 };
 
@@ -217,6 +227,11 @@ export const objectLiteralToObjectMap = (objectLiteral: ts.ObjectLiteralExpressi
           val = Number;
         } else if (escapedText === 'Boolean') {
           val = Boolean;
+        } else {
+          val = {
+            __identifier: true,
+            __escapedText: escapedText
+          } as ConvertIdentifier;
         }
         break;
 
@@ -611,3 +626,8 @@ export const isAsyncFn = (typeChecker: ts.TypeChecker, methodDeclaration: ts.Met
 
   return typeStr.includes('Promise<');
 };
+
+export interface ConvertIdentifier {
+  __identifier: boolean;
+  __escapedText: string;
+}

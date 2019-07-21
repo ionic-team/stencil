@@ -10,7 +10,7 @@ export const getCompileOptions = (input: d.CompileOptions) => {
     componentMetadata: (typeof input.componentMetadata === 'string' ? input.componentMetadata.toLowerCase().trim() : ''),
     module: (typeof input.module === 'string' ? input.module.toLowerCase().trim() : ''),
     script: (typeof input.script === 'string' ? input.script.toLowerCase().trim() : ''),
-    styleImport: (typeof input.styleImport === 'string' ? input.styleImport.toLowerCase().trim() : '')
+    style: (typeof input.style === 'string' ? input.style.toLowerCase().trim() : '')
   };
 
   if (!VALID_METADATA.has(rtn.componentMetadata)) {
@@ -21,8 +21,8 @@ export const getCompileOptions = (input: d.CompileOptions) => {
     rtn.componentExport = 'customelement';
   }
 
-  if (!VALID_STYLE_IMPORT.has(rtn.styleImport)) {
-    rtn.styleImport = 'inline';
+  if (!VALID_STYLE_IMPORT.has(rtn.style)) {
+    rtn.style = 'inline';
   }
 
   return rtn;
@@ -65,7 +65,7 @@ export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
     componentExport: null,
     componentMetadata: compilerOpts.componentMetadata as any,
     scopeCss: true,
-    styleImport: compilerOpts.styleImport as any,
+    style: compilerOpts.style as any,
   };
 
   if (compilerOpts.module === 'cjs' || compilerOpts.module === 'commonjs') {

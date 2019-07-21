@@ -69,7 +69,7 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
         componentExport: null,
         componentMetadata: null,
         scopeCss: false,
-        styleImport: 'inline'
+        style: 'inline'
       })
     ]
   });

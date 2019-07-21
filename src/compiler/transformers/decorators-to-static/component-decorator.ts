@@ -1,7 +1,8 @@
 import * as d from '../../../declarations';
+import { augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
 import { CLASS_DECORATORS_TO_REMOVE, getDeclarationParameters } from './decorator-utils';
 import { convertValueToLiteral, createStaticGetter, removeDecorators } from '../transform-utils';
-import { DEFAULT_STYLE_MODE, augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
+import { styleToStatic } from './style-to-static';
 import ts from 'typescript';
 
 
@@ -26,30 +27,7 @@ export const componentDecoratorToStatic = (config: d.Config, typeChecker: ts.Typ
     newMembers.push(createStaticGetter('encapsulation', convertValueToLiteral('scoped')));
   }
 
-  const defaultModeStyles = [];
-  if (componentOptions.styleUrls) {
-    if (Array.isArray(componentOptions.styleUrls)) {
-      defaultModeStyles.push(...normalizeStyle(componentOptions.styleUrls));
-    } else {
-      defaultModeStyles.push(...normalizeStyle(componentOptions.styleUrls[DEFAULT_STYLE_MODE]));
-    }
-  }
-  if (componentOptions.styleUrl) {
-    defaultModeStyles.push(...normalizeStyle(componentOptions.styleUrl));
-  }
-
-  let styleUrls: d.CompilerModeStyles = {};
-  if (componentOptions.styleUrls && !Array.isArray(componentOptions.styleUrls)) {
-    styleUrls = normalizeStyleUrls(componentOptions.styleUrls);
-  }
-  if (defaultModeStyles.length > 0) {
-    styleUrls[DEFAULT_STYLE_MODE] = defaultModeStyles;
-  }
-
-  if (Object.keys(styleUrls).length > 0) {
-    newMembers.push(createStaticGetter('originalStyleUrls', convertValueToLiteral(styleUrls)));
-    newMembers.push(createStaticGetter('styleUrls', convertValueToLiteral(normalizeExtension(config, styleUrls))));
-  }
+  styleToStatic(config, newMembers, componentOptions);
 
   let assetsDirs = componentOptions.assetsDirs || [];
   if (componentOptions.assetsDir) {
@@ -60,12 +38,6 @@ export const componentDecoratorToStatic = (config: d.Config, typeChecker: ts.Typ
   }
   if (assetsDirs.length > 0) {
     newMembers.push(createStaticGetter('assetsDirs', convertValueToLiteral(assetsDirs)));
-  }
-  if (typeof componentOptions.styles === 'string') {
-    const styles = componentOptions.styles.trim();
-    if (styles.length > 0) {
-      newMembers.push(createStaticGetter('styles', convertValueToLiteral(styles)));
-    }
   }
 };
 
@@ -149,37 +121,4 @@ const findTagNode = (propName: string, node: ts.Node) => {
     }
   }
   return node;
-};
-
-const normalizeExtension = (config: d.Config, styleUrls: d.CompilerModeStyles) => {
-  const compilerStyleUrls: d.CompilerModeStyles = {};
-  Object.keys(styleUrls).forEach(key => {
-    compilerStyleUrls[key] = styleUrls[key].map(s => useCss(config, s));
-  });
-  return compilerStyleUrls;
-};
-
-const useCss = (config: d.Config, stylePath: string) => {
-  const sourceFileDir = config.sys.path.dirname(stylePath);
-  const sourceFileExt = config.sys.path.extname(stylePath);
-  const sourceFileName = config.sys.path.basename(stylePath, sourceFileExt);
-  return config.sys.path.join(sourceFileDir, sourceFileName + '.css');
-};
-
-const normalizeStyleUrls = (styleUrls: d.ModeStyles): d.CompilerModeStyles => {
-  const compilerStyleUrls: d.CompilerModeStyles = {};
-  Object.keys(styleUrls).forEach(key => {
-    compilerStyleUrls[key] = normalizeStyle(styleUrls[key]);
-  });
-  return compilerStyleUrls;
-};
-
-const normalizeStyle = (style: string | string[] | undefined) => {
-  if (Array.isArray(style)) {
-    return style;
-  }
-  if (style) {
-    return [style];
-  }
-  return [];
 };
