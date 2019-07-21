@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
 import { addImports, getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
 import { addModuleMetadataProxies } from '../add-component-meta-proxy';
+import { addStyleImports } from '../static-to-meta/styles';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { defineCustomElement } from '../define-custom-element';
 import { updateNativeComponentClass } from './native-component';
@@ -77,6 +78,10 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
         } else if (transformOpts.componentMetadata === 'proxy') {
           // exporting as a module, but also add the component proxy fn
           tsSourceFile = addModuleMetadataProxies(tsSourceFile, moduleFile);
+        }
+
+        if (transformOpts.style === 'import') {
+          tsSourceFile = addStyleImports(transformCtx, tsSourceFile, moduleFile);
         }
       }
 

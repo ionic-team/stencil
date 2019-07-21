@@ -61,13 +61,13 @@ const updateNativeHostComponentMembers = (classNode: ts.ClassDeclaration, transf
   addNativeConnectedCallback(classMembers, cmp);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
-  addStatictStyle(classMembers, transformOpts, cmp);
+  addStaticStyle(classMembers, transformOpts, cmp);
   transformHostData(classMembers, moduleFile);
 
   return classMembers;
 };
 
-export const addStatictStyle = (classMembers: ts.ClassElement[], transformOpts: d.TransformOptions, cmp: d.ComponentCompilerMeta) => {
+export const addStaticStyle = (classMembers: ts.ClassElement[], transformOpts: d.TransformOptions, cmp: d.ComponentCompilerMeta) => {
   if (!cmp.hasStyle) {
     return;
   }

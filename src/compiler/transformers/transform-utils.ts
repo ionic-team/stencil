@@ -494,6 +494,7 @@ export const addImports = (transformCtx: ts.TransformationContext, tsSourceFile:
 const addCjsRequires = (tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) => {
   // CommonJS require()
   // var __stencil_require = require(importPath);
+  const varName = `__stencil_require`;
 
   let addRequires = false;
   const statements: ts.Statement[] = [];
@@ -502,7 +503,7 @@ const addCjsRequires = (tsSourceFile: ts.SourceFile, importFnNames: string[], im
     undefined,
     ts.createVariableDeclarationList([
       ts.createVariableDeclaration(
-        '__stencil_require',
+        varName,
         undefined,
         ts.createCall(
           ts.createIdentifier('require'),
@@ -530,7 +531,7 @@ const addCjsRequires = (tsSourceFile: ts.SourceFile, importFnNames: string[], im
           varName,
           undefined,
           ts.createPropertyAccess(
-            ts.createIdentifier('__stencil_require'),
+            ts.createIdentifier(varName),
             ts.createIdentifier(importName)
           )
         )

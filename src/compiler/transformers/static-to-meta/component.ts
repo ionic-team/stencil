@@ -47,7 +47,7 @@ export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.Compil
     listeners: parseStaticListeners(staticMembers),
     events: parseStaticEvents(staticMembers),
     watchers: parseStaticWatchers(staticMembers),
-    styles: parseStaticStyles(config, compilerCtx, tagName, moduleFile.sourceFilePath, isCollectionDependency, staticMembers),
+    styles: parseStaticStyles(config, compilerCtx, transformOpts, tagName, moduleFile.sourceFilePath, isCollectionDependency, staticMembers),
     legacyConnect: getStaticValue(staticMembers, 'connectProps') || [],
     legacyContext: getStaticValue(staticMembers, 'contextProps') || [],
     internal: isInternal(docs),

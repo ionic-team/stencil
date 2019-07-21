@@ -59,7 +59,7 @@ export class AppRoot {
       componentMetadata: this.componentMetadata.value,
       module: this.module.value,
       script: this.script.value,
-      styleImport: this.style.value
+      style: this.style.value
     };
 
     const results = await stencil.compile(this.sourceCodeInput.value, opts);
@@ -242,8 +242,8 @@ export class AppRoot {
             <label>
               <span>Style:</span>
               <select ref={el => this.style = el} onInput={this.compile.bind(this)}>
-                <option value="inline">inline</option>
                 <option value="import">import</option>
+                <option value="inline">inline</option>
               </select>
             </label>
             <label>

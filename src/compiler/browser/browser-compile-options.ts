@@ -21,8 +21,8 @@ export const getCompileOptions = (input: d.CompileOptions) => {
     rtn.componentExport = 'customelement';
   }
 
-  if (!VALID_STYLE_IMPORT.has(rtn.style)) {
-    rtn.style = 'inline';
+  if (!VALID_STYLE.has(rtn.style)) {
+    rtn.style = 'import';
   }
 
   return rtn;
@@ -31,7 +31,7 @@ export const getCompileOptions = (input: d.CompileOptions) => {
 
 const VALID_METADATA = new Set(['pending', 'static']);
 const VALID_OUTPUT = new Set(['customelement', 'module']);
-const VALID_STYLE_IMPORT = new Set(['cjs', 'esm', 'inline']);
+const VALID_STYLE = new Set(['import', 'inline']);
 
 
 export const getTransformOptions = (compilerOpts: d.CompileOptions) => {

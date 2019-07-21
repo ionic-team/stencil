@@ -148,4 +148,33 @@ html: `
 });
 
 
+
+templates.set(`style-url.tsx`, {
+source: `
+
+import { Component, Prop, h } from '@stencil/core';
+
+@Component({
+  tag: 'my-button',
+  styleUrl: 'style-import.css'
+})
+export class MyButton {
+
+  render() {
+    return (
+      <button>
+        <slot/>
+      </button>
+    );
+  }
+
+}
+
+`,
+html: `
+<my-button>Style Url</my-button>
+`
+});
+
+
 export const templateList = Array.from(templates).map(([fileName]) => fileName);
