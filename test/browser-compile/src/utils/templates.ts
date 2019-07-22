@@ -185,6 +185,7 @@ import { Component, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'my-button',
+  scoped: true,
   styleUrl: 'scoped-style-import.css'
 })
 export class MyButton {

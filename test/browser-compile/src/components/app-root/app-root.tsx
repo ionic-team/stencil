@@ -99,6 +99,16 @@ export class AppRoot {
           resolveId: (importee: string, importer: string) => {
             console.log('bundle resolveId, importee:', importee, 'importer:', importer);
 
+            if (importee.includes('.stencil-client.')) {
+              const parts = importee.split('/');
+              const filename = parts[parts.length - 1];
+              const url = `/@stencil/core/internal/client/${filename}`;
+              return {
+                id: url,
+                external: true
+              };
+            }
+
             if (importee.startsWith('.')) {
               var u = new URL(importee, 'http://url.resolve' + (importer || ''));
               console.log('bundle path resolve:', u.pathname);

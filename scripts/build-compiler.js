@@ -129,7 +129,7 @@ async function bundleInternalClient() {
     format: 'esm',
     dir: INTERNAL_CLIENT_DIST_DIR,
     entryFileNames: '[name].mjs',
-    chunkFileNames: '[name].mjs'
+    chunkFileNames: '[name].stencil-client.mjs'
   });
 
   await fs.ensureDir(INTERNAL_CLIENT_DIST_DIR);
