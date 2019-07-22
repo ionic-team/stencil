@@ -5,7 +5,7 @@ import { initFsWatcher } from '../fs-watch/fs-watch-init';
 import { writeCacheStats } from './cache-stats';
 
 
-export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, aborted: boolean) {
+export const buildFinish = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, aborted: boolean) => {
   if (buildCtx.hasFinished && buildCtx.buildResults) {
     // we've already marked this build as finished and
     // already created the build results, just return these
@@ -91,10 +91,10 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
   buildCtx.hasFinished = true;
 
   return buildCtx.buildResults;
-}
+};
 
 
-function logHmr(logger: d.Logger, buildCtx: d.BuildCtx) {
+const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {
   // this is a rebuild, and we've got hmr data
   // and this build hasn't been aborted
   const hmr = buildCtx.buildResults.hmr;
@@ -119,10 +119,10 @@ function logHmr(logger: d.Logger, buildCtx: d.BuildCtx) {
   if (hmr.imagesUpdated) {
     cleanupUpdateMsg(logger, `updated image`, hmr.imagesUpdated);
   }
-}
+};
 
 
-function cleanupUpdateMsg(logger: d.Logger, msg: string, fileNames: string[]) {
+const cleanupUpdateMsg = (logger: d.Logger, msg: string, fileNames: string[]) => {
   if (fileNames.length > 0) {
     let fileMsg = '';
 
@@ -141,4 +141,4 @@ function cleanupUpdateMsg(logger: d.Logger, msg: string, fileNames: string[]) {
 
     logger.info(`${msg}: ${logger.cyan(fileMsg)}`);
   }
-}
+};

@@ -5,13 +5,13 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
 
   return transformCtx => {
 
-    function visit(tsSourceFile: ts.SourceFile, node: ts.Node): ts.VisitResult<ts.Node> {
+    const visit = (tsSourceFile: ts.SourceFile, node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isImportDeclaration(node)) {
         return updateStencilCoreImport(node, updatedCoreImportPath);
       }
 
       return ts.visitEachChild(node, node => visit(tsSourceFile, node), transformCtx);
-    }
+    };
 
     return tsSourceFile => {
       return visit(tsSourceFile, tsSourceFile) as ts.SourceFile;

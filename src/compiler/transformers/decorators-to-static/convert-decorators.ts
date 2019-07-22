@@ -16,13 +16,13 @@ export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagn
 
   return transformCtx => {
 
-    function visit(tsSourceFile: ts.SourceFile, node: ts.Node): ts.VisitResult<ts.Node> {
+    const visit = (tsSourceFile: ts.SourceFile, node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
         node = visitClass(config, diagnostics, typeChecker, tsSourceFile, node);
       }
 
       return ts.visitEachChild(node, node => visit(tsSourceFile, node), transformCtx);
-    }
+    };
 
     return tsSourceFile => {
       return visit(tsSourceFile, tsSourceFile) as ts.SourceFile;
