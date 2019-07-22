@@ -14,11 +14,10 @@ const getDeclarationParameter = (arg: ts.Expression): any => {
     return objectLiteralToObjectMap(arg);
 
   } else if (ts.isStringLiteral(arg)) {
-    return arg.getText();
-
-  } else {
-    throw new Error(`invalid decorator argument: ${arg.getText()}`);
+    return arg.text;
   }
+
+  throw new Error(`invalid decorator argument: ${arg.getText()}`);
 };
 
 export const isDecoratorNamed = (propName: string) => {

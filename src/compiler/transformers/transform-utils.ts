@@ -211,6 +211,10 @@ export const objectLiteralToObjectMap = (objectLiteral: ts.ObjectLiteralExpressi
         val = (attr.initializer as ts.StringLiteral).text;
         break;
 
+      case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
+        val = (attr.initializer as ts.StringLiteral).text;
+        break;
+
       case ts.SyntaxKind.TrueKeyword:
         val = true;
         break;
@@ -227,6 +231,10 @@ export const objectLiteralToObjectMap = (objectLiteral: ts.ObjectLiteralExpressi
           val = Number;
         } else if (escapedText === 'Boolean') {
           val = Boolean;
+        } else if (escapedText === 'undefined') {
+          val = undefined;
+        } else if (escapedText === 'null') {
+          val = null;
         } else {
           val = {
             __identifier: true,

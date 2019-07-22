@@ -1,4 +1,4 @@
-import { escapeCssForJs } from '../component-styles';
+import { escapeCssForJs } from '../style-utils';
 
 
 describe('escapeCssForJs', () => {
