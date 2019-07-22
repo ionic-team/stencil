@@ -5,7 +5,26 @@ import { initFsWatcher } from '../fs-watch/fs-watch-init';
 import { writeCacheStats } from './cache-stats';
 
 
-export const buildFinish = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, aborted: boolean) => {
+export const buildFinish = async (buildCtx: d.BuildCtx) => {
+  const results = await buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, false);
+
+  const buildLog: d.BuildLog = {
+    buildId: buildCtx.buildId,
+    messages: buildCtx.buildMessages.slice(),
+    progress: 1
+  };
+  buildCtx.compilerCtx.events.emit('buildLog', buildLog);
+
+  return results;
+};
+
+
+export const buildAbort = (buildCtx: d.BuildCtx) => {
+  return buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, true);
+};
+
+
+const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, aborted: boolean) => {
   if (buildCtx.hasFinished && buildCtx.buildResults) {
     // we've already marked this build as finished and
     // already created the build results, just return these

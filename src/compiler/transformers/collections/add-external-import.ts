@@ -3,7 +3,7 @@ import { normalizePath } from '@utils';
 import { parseCollection } from './parse-collection-module';
 
 
-export function addExternalImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, resolveFromDir: string, moduleId: string) {
+export const addExternalImport = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, resolveFromDir: string, moduleId: string) => {
   moduleFile.externalImports = moduleFile.externalImports || [];
   if (!moduleFile.externalImports.includes(moduleId)) {
     moduleFile.externalImports.push(moduleId);
@@ -75,4 +75,4 @@ export function addExternalImport(config: d.Config, compilerCtx: d.CompilerCtx, 
       addExternalImport(config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId);
     });
   }
-}
+};

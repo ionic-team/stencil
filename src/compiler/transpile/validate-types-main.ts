@@ -1,10 +1,11 @@
 import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
+import { buildFinish } from '../build/build-finish';
 import { getComponentsDtsSrcFilePath, isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { getUserCompilerOptions } from './compiler-options';
 
 
-export async function validateTypesMain(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export const validateTypesMain = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (config.validateTypes === false) {
     // probably unit testing that doesn't
     // want to take time to validate the types
@@ -55,7 +56,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
       const diagnosticsBuildCtx = new BuildContext(config, compilerCtx);
       diagnosticsBuildCtx.start();
       diagnosticsBuildCtx.diagnostics.push(...results.diagnostics);
-      diagnosticsBuildCtx.finish();
+      buildFinish(diagnosticsBuildCtx);
 
     } else {
       // cool the build hasn't finished yet
@@ -67,7 +68,7 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
       buildCtx.validateTypesHandler = null;
       buildCtx.validateTypesPromise = null;
 
-      await buildCtx.finish();
+      await buildFinish(buildCtx);
     }
   };
 
@@ -83,4 +84,4 @@ export async function validateTypesMain(config: d.Config, compilerCtx: d.Compile
   // when the validate types build finishes
   // let's run the handler we put on the build context
   buildCtx.validateTypesPromise.then(buildCtx.validateTypesHandler.bind(buildCtx));
-}
+};
