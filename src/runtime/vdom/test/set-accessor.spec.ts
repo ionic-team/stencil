@@ -650,14 +650,14 @@ describe('setAccessor for standard html elements', () => {
   describe('class attribute', () => {
     it('should add classes', () => {
       const elm = document.createElement('section');
-      setAccessor(elm, 'class', undefined, 'class1 class2   class3', false, 0);
+      setAccessor(elm, 'class', undefined, 'class1 class2   class3  ', false, 0);
       expect(elm).toHaveClasses(['class1', 'class2', 'class3']);
 
       setAccessor(elm, 'class', undefined, 'new', false, 0);
       expect(elm).toHaveClasses(['class1', 'class2', 'class3', 'new']);
 
       setAccessor(elm, 'class',
-        'class1 class2',
+        '  class1 class2',
         'new class4', false, 0);
       expect(elm).toHaveClasses(['class3', 'new', 'class4']);
     });
