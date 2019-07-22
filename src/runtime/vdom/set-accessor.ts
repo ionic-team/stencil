@@ -122,4 +122,4 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
 };
 
 const parseClassList = (value: string | undefined | null): string[] =>
-  (!value) ? [] : value.split(' ');
+  (!value) ? [] : value.split(/ +/g);
