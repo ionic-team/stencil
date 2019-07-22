@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
-import { addImports, getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
+import { addImports } from '../add-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
+import { getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
 import { updateLazyComponentClass } from './lazy-component';
 import ts from 'typescript';
 

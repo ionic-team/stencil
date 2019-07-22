@@ -12,7 +12,7 @@ import { updateNativeConstructor } from './native-constructor';
 import ts from 'typescript';
 
 
-export const updateNativeComponentClass = (classNode: ts.ClassDeclaration, transformOpts: d.TransformOptions, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, removeExport: boolean) => {
+export const updateNativeComponentClass = (transformCtx: ts.TransformationContext, classNode: ts.ClassDeclaration, transformOpts: d.TransformOptions, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, removeExport: boolean) => {
   let modifiers = Array.isArray(classNode.modifiers) ? classNode.modifiers.slice() : [];
 
   if (removeExport) {
@@ -28,7 +28,7 @@ export const updateNativeComponentClass = (classNode: ts.ClassDeclaration, trans
     classNode.name,
     classNode.typeParameters,
     updateNativeHostComponentHeritageClauses(classNode, moduleFile),
-    updateNativeHostComponentMembers(classNode, transformOpts, moduleFile, cmp)
+    updateNativeHostComponentMembers(transformCtx, classNode, transformOpts, moduleFile, cmp)
   );
 };
 
@@ -54,20 +54,20 @@ const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration
 };
 
 
-const updateNativeHostComponentMembers = (classNode: ts.ClassDeclaration, transformOpts: d.TransformOptions, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
+const updateNativeHostComponentMembers = (transformCtx: ts.TransformationContext, classNode: ts.ClassDeclaration, transformOpts: d.TransformOptions, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateNativeConstructor(classMembers, moduleFile, cmp, true);
   addNativeConnectedCallback(classMembers, cmp);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
-  addStaticStyle(classMembers, transformOpts, cmp);
+  addStaticStyle(transformCtx, classMembers, transformOpts, cmp);
   transformHostData(classMembers, moduleFile);
 
   return classMembers;
 };
 
-export const addStaticStyle = (classMembers: ts.ClassElement[], transformOpts: d.TransformOptions, cmp: d.ComponentCompilerMeta) => {
+export const addStaticStyle = (transformCtx: ts.TransformationContext, classMembers: ts.ClassElement[], transformOpts: d.TransformOptions, cmp: d.ComponentCompilerMeta) => {
   if (!cmp.hasStyle) {
     return;
   }
@@ -83,10 +83,27 @@ export const addStaticStyle = (classMembers: ts.ClassElement[], transformOpts: d
       const scopeId = getScopeId(cmp.tagName);
       styleStr = scopeCss(styleStr, scopeId, false);
     }
-
     classMembers.push(createStaticGetter('style', ts.createStringLiteral(styleStr)));
 
   } else if (typeof style.styleIdentifier === 'string') {
-    classMembers.push(createStaticGetter('style', ts.createIdentifier(style.styleIdentifier)));
+    const { module } = transformCtx.getCompilerOptions();
+    let rtnExpr: ts.Expression;
+
+    if (module === ts.ModuleKind.CommonJS) {
+      let importPath = style.externalStyles[0].originalComponentPath;
+      if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('\\')) {
+        importPath = './' + importPath;
+      }
+
+      rtnExpr = ts.createCall(
+        ts.createIdentifier('require'),
+        undefined,
+        [ ts.createStringLiteral(importPath) ]
+      );
+
+    } else {
+      rtnExpr = ts.createIdentifier(style.styleIdentifier);
+    }
+    classMembers.push(createStaticGetter('style', rtnExpr));
   }
 };

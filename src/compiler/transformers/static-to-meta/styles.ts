@@ -92,7 +92,8 @@ export const addStyleImports = (transformCtx: ts.TransformationContext, tsSource
   const { module } = transformCtx.getCompilerOptions();
 
   if (module === ts.ModuleKind.CommonJS) {
-    //
+    // require() already added within static get style()
+    return tsSourceFile;
   }
 
   return addEsmStyleImports(tsSourceFile, moduleFile);
@@ -111,7 +112,7 @@ const addEsmStyleImports = (tsSourceFile: ts.SourceFile, moduleFile: d.Module) =
 
   if (styleImports.length > 0) {
     const sourceFileImports = tsSourceFile.statements.slice();
-    let lastImportIndex = 0;
+    let lastImportIndex = -1;
 
     for (let i = 0; i < sourceFileImports.length; i++) {
       if (ts.isImportDeclaration(sourceFileImports[i])) {

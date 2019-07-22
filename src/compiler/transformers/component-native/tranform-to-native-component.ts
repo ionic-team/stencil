@@ -1,7 +1,8 @@
 import * as d from '../../../declarations';
-import { addImports, getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
+import { addImports } from '../add-imports';
 import { addModuleMetadataProxies } from '../add-component-meta-proxy';
 import { addStyleImports } from '../static-to-meta/styles';
+import { getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { defineCustomElement } from '../define-custom-element';
 import { updateNativeComponentClass } from './native-component';
@@ -61,7 +62,7 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateNativeComponentClass(node, transformOpts, moduleFile, cmp, exportAsCustomElement);
+            return updateNativeComponentClass(transformCtx, node, transformOpts, moduleFile, cmp, exportAsCustomElement);
           }
         }
 
