@@ -62,7 +62,7 @@ export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts
 
       tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
-      tsSourceFile = addImports(transformCtx, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
+      tsSourceFile = addImports(transformOpts, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
 
       return tsSourceFile;
     };

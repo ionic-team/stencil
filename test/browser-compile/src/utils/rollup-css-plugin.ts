@@ -2,11 +2,19 @@
 
 export const styleImports = new Map<string, string>();
 styleImports.set(`/style-import.css`, `
-:host { padding: 20px; background: #ddd; }
+my-button { display: block; padding: 40px; background: #ddd; }
 
-:host::before { content: "style-import.css"; position: absolute; left: 0; top: 0; }
+my-button::before { content: "style-import.css"; position: absolute; left: 0; top: 0; }
 
 button { font-size: 24px; background: purple; color: white; font-weight: bold; }
+`);
+
+styleImports.set(`/scoped-style-import.css`, `
+:host { display: block; padding: 40px; background: #ddd; }
+
+:host::before { content: "scoped-style-import.css"; position: absolute; left: 0; top: 0; }
+
+button { font-size: 24px; background: maroon; color: white; font-weight: bold; }
 `);
 
 

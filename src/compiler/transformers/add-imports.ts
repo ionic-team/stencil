@@ -1,14 +1,13 @@
+import * as d from '../../declarations';
 import ts from 'typescript';
 
 
-export const addImports = (transformCtx: ts.TransformationContext, tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) => {
+export const addImports = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) => {
   if (importFnNames.length === 0) {
     return tsSourceFile;
   }
 
-  const { module } = transformCtx.getCompilerOptions();
-
-  if (module === ts.ModuleKind.CommonJS) {
+  if (transformOpts.module === ts.ModuleKind.CommonJS) {
     // CommonJS require()
     return addCjsRequires(tsSourceFile, importFnNames, importPath);
   }

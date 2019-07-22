@@ -67,7 +67,7 @@ import { Component, Prop, h } from '@stencil/core';
 @Component({
   tag: 'my-button',
   shadow: true,
-  styles: ':host { padding: 20px; background: #ddd; } :host::before { content: "shadow :host"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: red; color: white; font-weight: bold; }'
+  styles: ':host { display: block; padding: 40px; background: #ddd; } :host::before { content: "shadow :host"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: red; color: white; font-weight: bold; }'
 })
 export class MyButton {
 
@@ -97,7 +97,7 @@ import { Component, Prop, h } from '@stencil/core';
 @Component({
   tag: 'my-button',
   scoped: true,
-  styles: ':host { padding: 20px; background: #ddd; } :host::before { content: "scoped :host"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: green; color: white; font-weight: bold; }'
+  styles: ':host { display: block; padding: 40px; background: #ddd; } :host::before { content: "scoped :host"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: green; color: white; font-weight: bold; }'
 })
 export class MyButton {
 
@@ -173,6 +173,35 @@ export class MyButton {
 `,
 html: `
 <my-button>Style Url</my-button>
+`
+});
+
+
+
+templates.set(`scoped-style-url.tsx`, {
+source: `
+
+import { Component, Prop, h } from '@stencil/core';
+
+@Component({
+  tag: 'my-button',
+  styleUrl: 'scoped-style-import.css'
+})
+export class MyButton {
+
+  render() {
+    return (
+      <button>
+        <slot/>
+      </button>
+    );
+  }
+
+}
+
+`,
+html: `
+<my-button>Scoped Style Url</my-button>
 `
 });
 

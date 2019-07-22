@@ -4,6 +4,7 @@ import { addNativeElementGetter } from './native-element-getter';
 import { addWatchers } from '../watcher-meta-transform';
 import { createStaticGetter } from '../transform-utils';
 import { getScopeId } from '../../style/scope-css';
+import { getStyleImportPath } from '../static-to-meta/styles';
 import { HTML_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { scopeCss } from '../../../utils/shadow-css';
@@ -12,7 +13,7 @@ import { updateNativeConstructor } from './native-constructor';
 import ts from 'typescript';
 
 
-export const updateNativeComponentClass = (transformCtx: ts.TransformationContext, classNode: ts.ClassDeclaration, transformOpts: d.TransformOptions, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, removeExport: boolean) => {
+export const updateNativeComponentClass = (transformOpts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, removeExport: boolean) => {
   let modifiers = Array.isArray(classNode.modifiers) ? classNode.modifiers.slice() : [];
 
   if (removeExport) {
@@ -28,7 +29,7 @@ export const updateNativeComponentClass = (transformCtx: ts.TransformationContex
     classNode.name,
     classNode.typeParameters,
     updateNativeHostComponentHeritageClauses(classNode, moduleFile),
-    updateNativeHostComponentMembers(transformCtx, classNode, transformOpts, moduleFile, cmp)
+    updateNativeHostComponentMembers(transformOpts, classNode, moduleFile, cmp)
   );
 };
 
@@ -54,20 +55,20 @@ const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration
 };
 
 
-const updateNativeHostComponentMembers = (transformCtx: ts.TransformationContext, classNode: ts.ClassDeclaration, transformOpts: d.TransformOptions, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
+const updateNativeHostComponentMembers = (transformOpts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateNativeConstructor(classMembers, moduleFile, cmp, true);
   addNativeConnectedCallback(classMembers, cmp);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
-  addStaticStyle(transformCtx, classMembers, transformOpts, cmp);
+  addStaticStyle(transformOpts, classMembers, cmp);
   transformHostData(classMembers, moduleFile);
 
   return classMembers;
 };
 
-export const addStaticStyle = (transformCtx: ts.TransformationContext, classMembers: ts.ClassElement[], transformOpts: d.TransformOptions, cmp: d.ComponentCompilerMeta) => {
+export const addStaticStyle = (transformOpts: d.TransformOptions, classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   if (!cmp.hasStyle) {
     return;
   }
@@ -86,14 +87,10 @@ export const addStaticStyle = (transformCtx: ts.TransformationContext, classMemb
     classMembers.push(createStaticGetter('style', ts.createStringLiteral(styleStr)));
 
   } else if (typeof style.styleIdentifier === 'string') {
-    const { module } = transformCtx.getCompilerOptions();
     let rtnExpr: ts.Expression;
 
-    if (module === ts.ModuleKind.CommonJS) {
-      let importPath = style.externalStyles[0].originalComponentPath;
-      if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('\\')) {
-        importPath = './' + importPath;
-      }
+    if (transformOpts.module === ts.ModuleKind.CommonJS) {
+      const importPath = getStyleImportPath(cmp, style);
 
       rtnExpr = ts.createCall(
         ts.createIdentifier('require'),

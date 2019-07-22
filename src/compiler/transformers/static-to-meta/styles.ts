@@ -88,10 +88,8 @@ export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, 
   return sortBy(styles, s => s.modeName);
 };
 
-export const addStyleImports = (transformCtx: ts.TransformationContext, tsSourceFile: ts.SourceFile, moduleFile: d.Module) => {
-  const { module } = transformCtx.getCompilerOptions();
-
-  if (module === ts.ModuleKind.CommonJS) {
+export const addStyleImports = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, moduleFile: d.Module) => {
+  if (transformOpts.module === ts.ModuleKind.CommonJS) {
     // require() already added within static get style()
     return tsSourceFile;
   }
@@ -105,7 +103,7 @@ const addEsmStyleImports = (tsSourceFile: ts.SourceFile, moduleFile: d.Module) =
   moduleFile.cmps.forEach(cmp => {
     cmp.styles.forEach(style => {
       if (style.styleIdentifier && style.externalStyles.length > 0) {
-        styleImports.push(createStyleImport(style));
+        styleImports.push(createStyleImport(cmp, style));
       }
     });
   });
@@ -129,10 +127,10 @@ const addEsmStyleImports = (tsSourceFile: ts.SourceFile, moduleFile: d.Module) =
 };
 
 
-const createStyleImport = (style: d.StyleCompiler) => {
+const createStyleImport = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
   const importName = ts.createIdentifier(style.styleIdentifier);
 
-  let importPath = style.externalStyles[0].originalComponentPath;
+  let importPath = getStyleImportPath(cmp, style);
   if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('\\')) {
     importPath = './' + importPath;
   }
@@ -146,4 +144,17 @@ const createStyleImport = (style: d.StyleCompiler) => {
     ),
     ts.createLiteral(importPath)
   );
+};
+
+export const getStyleImportPath = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+  let importPath = style.externalStyles[0].originalComponentPath;
+  if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('\\')) {
+    importPath = './' + importPath;
+  }
+
+  if (cmp.encapsulation === 'scoped') {
+    importPath += '#scopedcss';
+  }
+
+  return importPath;
 };

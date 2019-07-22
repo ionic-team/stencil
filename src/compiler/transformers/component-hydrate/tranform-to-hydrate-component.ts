@@ -69,7 +69,7 @@ const hydrateComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.
 
       tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
-      tsSourceFile = addImports(transformCtx, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
+      tsSourceFile = addImports(transformOpts, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
 
       return tsSourceFile;
     };

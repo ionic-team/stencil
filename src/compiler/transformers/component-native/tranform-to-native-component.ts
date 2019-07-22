@@ -62,7 +62,7 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateNativeComponentClass(transformCtx, node, transformOpts, moduleFile, cmp, exportAsCustomElement);
+            return updateNativeComponentClass(transformOpts, node, moduleFile, cmp, exportAsCustomElement);
           }
         }
 
@@ -82,11 +82,11 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
         }
 
         if (transformOpts.style === 'import') {
-          tsSourceFile = addStyleImports(transformCtx, tsSourceFile, moduleFile);
+          tsSourceFile = addStyleImports(transformOpts, tsSourceFile, moduleFile);
         }
       }
 
-      tsSourceFile = addImports(transformCtx, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
+      tsSourceFile = addImports(transformOpts, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
 
       return tsSourceFile;
     };
