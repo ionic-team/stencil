@@ -89,7 +89,7 @@ export const addStaticStyle = (transformOpts: d.TransformOptions, classMembers: 
   } else if (typeof style.styleIdentifier === 'string') {
     let rtnExpr: ts.Expression;
 
-    if (transformOpts.module === ts.ModuleKind.CommonJS) {
+    if (transformOpts.module === ts.ModuleKind.CommonJS && style.externalStyles.length > 0) {
       const importPath = getStyleImportPath(cmp, style);
 
       rtnExpr = ts.createCall(
