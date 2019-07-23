@@ -125,8 +125,8 @@ export class NodeSystem implements d.StencilSystem {
 
   get compiler() {
     return {
-      name: '0.0.0-stencil-dev',
-      version: this.packageJsonData.version,
+      name: this.packageJsonData.name,
+      version: '0.0.0-stencil-dev',
       runtime: path.join(this.distDir, 'compiler', 'index.js'),
       packageDir: this.packageDir,
       distDir: this.distDir,
