@@ -51,8 +51,8 @@ describe('validateOutputTargetWww', () => {
       'esmDir': path.join(rootDir, 'www', 'docs', 'build'),
       'isBrowserBuild': true,
       'polyfills': true,
-      'systemDir': path.join(rootDir, 'www', 'docs', 'build'),
-      'systemLoaderFile': path.join(rootDir, '/www/docs/build/undefined.js'),
+      'systemDir': undefined,
+      'systemLoaderFile': undefined,
       'type': 'dist-lazy'
     }, {
       'copyAssets': 'dist',

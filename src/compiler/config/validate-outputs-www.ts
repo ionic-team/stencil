@@ -73,9 +73,9 @@ function validateOutputTarget(config: d.Config, diagnostics: d.Diagnostic[], out
   config.outputTargets.push({
     type: DIST_LAZY,
     esmDir: buildDir,
-    systemDir: buildDir,
+    systemDir: config.buildEs5 ? buildDir : undefined,
+    systemLoaderFile: config.buildEs5 ? config.sys.path.join(buildDir, `${config.fsNamespace}.js`) : undefined,
     polyfills: outputTarget.polyfills,
-    systemLoaderFile: config.sys.path.join(buildDir, `${config.fsNamespace}.js`),
     isBrowserBuild: true,
   });
 
