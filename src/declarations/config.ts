@@ -182,6 +182,7 @@ export interface StencilConfig {
   tsconfig?: string;
   validateTypes?: boolean;
   watchIgnoredRegex?: RegExp;
+  lazyDependencies? : boolean;
 }
 
 export interface Config extends StencilConfig {

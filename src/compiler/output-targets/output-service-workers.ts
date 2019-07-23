@@ -16,7 +16,7 @@ export async function outputServiceWorkers(config: d.Config, buildCtx: d.BuildCt
   }
 
   // let's make sure they have what we need from workbox installed
-  await config.sys.lazyRequire.ensure(config.logger, config.rootDir, [WORKBOX_BUILD_MODULE_ID]);
+  await config.sys.lazyRequire.ensure(config.logger, config.rootDir, [WORKBOX_BUILD_MODULE_ID] , true /* Override LazyDependencies user config */);
 
   // we've ensure workbox is installed, so let's require it now
   const workbox: d.Workbox = config.sys.lazyRequire.require(WORKBOX_BUILD_MODULE_ID);

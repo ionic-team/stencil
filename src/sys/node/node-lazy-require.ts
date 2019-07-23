@@ -11,7 +11,8 @@ export class NodeLazyRequire implements d.LazyRequire {
   constructor(private semver: d.Semver, private nodeResolveModule: NodeResolveModule, private stencilPackageJson: d.PackageJsonData) {
   }
 
-  async ensure(logger: d.Logger, fromDir: string, ensureModuleIds: string[]) {
+  async ensure(logger: d.Logger, fromDir: string, ensureModuleIds: string[],  lazyDependencies : boolean ) {
+
     if (!this.stencilPackageJson || !this.stencilPackageJson.lazyDependencies) {
       return Promise.resolve();
     }
@@ -29,6 +30,7 @@ export class NodeLazyRequire implements d.LazyRequire {
         return;
       }
 
+
       const requiredVersionRange = this.stencilPackageJson.lazyDependencies[ensureModuleId];
 
       try {
@@ -38,7 +40,8 @@ export class NodeLazyRequire implements d.LazyRequire {
 
         isUpdate = true;
 
-        if (this.semver.satisfies(installedPkgJson.version, requiredVersionRange)) {
+        // In case lazyDependencies set to false will ignore versions  and not install dependencies only fill moduleData
+        if (!!lazyDependencies || this.semver.satisfies(installedPkgJson.version, requiredVersionRange)) {
           this.moduleData.set(ensureModuleId, {
             fromDir: fromDir,
             modulePath: dirname(resolvedPkgJsonPath)
@@ -47,10 +50,12 @@ export class NodeLazyRequire implements d.LazyRequire {
         }
       } catch (e) {}
 
-      depsToInstall.push({
-        moduleId: ensureModuleId,
-        requiredVersionRange: requiredVersionRange
-      });
+
+        depsToInstall.push({
+          moduleId: ensureModuleId,
+          requiredVersionRange: requiredVersionRange
+        });
+
     });
 
     await Promise.all(promises);
