@@ -78,15 +78,19 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       Cstr = elm.constructor as any;
     }
 
-    if (BUILD.style && !Cstr.isStyleRegistered && Cstr.style) {
+    if (BUILD.style && !Cstr.$isStyleRegistered$ && Cstr.style) {
       // this component has styles but we haven't registered them yet
       let style = Cstr.style;
       let scopeId = getScopeId(cmpMeta.$tagName$, hostRef.$modeName$);
-      if (!BUILD.hydrateServerSide && BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
+
+      const shadowCssPolyfill = (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim);
+      const runtimeScopedCss = (BUILD.runtimeScopeCss && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation);
+
+      if (!BUILD.hydrateServerSide && (shadowCssPolyfill || runtimeScopedCss)) {
         style = await import('../utils/shadow-css').then(m => m.scopeCss(style, scopeId, false));
       }
       registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation));
-      Cstr.isStyleRegistered = true;
+      Cstr.$isStyleRegistered$ = true;
     }
   }
 
