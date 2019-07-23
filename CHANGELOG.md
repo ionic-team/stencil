@@ -1,14 +1,21 @@
-# 😈 [1.2.0-0](https://github.com/ionic-team/stencil/compare/v1.1.9...v1.2.0-0) (2019-07-23)
+# 🏔 [1.2.0-1](https://github.com/ionic-team/stencil/compare/v1.1.9...v1.2.0-1) (2019-07-23)
 
 
 ### Bug Fixes
 
+* **vdom:** foreignObject rendering ([08bf9e3](https://github.com/ionic-team/stencil/commit/08bf9e3)), closes [#1733](https://github.com/ionic-team/stencil/issues/1733)
 * **vdom:** skip empty classes ([7004a59](https://github.com/ionic-team/stencil/commit/7004a59))
 
 
 ### Features
 
+* **build:** add excludeUnusedDependencies ([368b72f](https://github.com/ionic-team/stencil/commit/368b72f))
 * **compile:** browser compile ([33b11a4](https://github.com/ionic-team/stencil/commit/33b11a4))
+
+
+### Performance Improvements
+
+* **build:** speed up www dev build ([88d37a1](https://github.com/ionic-team/stencil/commit/88d37a1))
 
 
 
