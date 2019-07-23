@@ -126,8 +126,15 @@ export const getCompilerConfig = () => {
 };
 
 
-export const getMinifyScriptOptions = (opts: d.CompileScriptMinifyOptions) => {
+export const getMinifyScriptOptions = (opts: d.CompileScriptMinifyOptions = {}) => {
   const sourceTarget: d.SourceTarget = (opts.script === 'es5') ? 'es5' : 'es2017';
   const isPretty = !!opts.pretty;
-  return getTerserOptions(sourceTarget, isPretty);
+  return {
+    options: getTerserOptions(sourceTarget, isPretty),
+    minifier: {
+      name: 'terser',
+      version: '__VERSION:TERSER__',
+      url: 'https://cdn.jsdelivr.net/npm/terser@__VERSION:TERSER__/dist/bundle.js'
+    }
+  };
 };

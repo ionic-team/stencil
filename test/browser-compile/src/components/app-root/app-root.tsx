@@ -155,20 +155,20 @@ export class AppRoot {
       this.wrap = 'off';
 
       if (this.minified === 'minified') {
-        const opts = stencil.getMinifyScriptOptions({
+        const m = stencil.getMinifyScriptOptions({
           script: this.script.value,
           pretty: false
         });
-        const results = Terser.minify(this.bundledInput.value, opts);
+        const results = Terser.minify(this.bundledInput.value, m.options);
         this.bundledInput.value = results.code;
         this.wrap = 'on';
 
       } else if (this.minified === 'pretty') {
-        const opts = stencil.getMinifyScriptOptions({
+        const m = stencil.getMinifyScriptOptions({
           script: this.script.value,
           pretty: true
         });
-        const results = Terser.minify(this.bundledInput.value, opts);
+        const results = Terser.minify(this.bundledInput.value, m.options);
         this.bundledInput.value = results.code;
       }
 

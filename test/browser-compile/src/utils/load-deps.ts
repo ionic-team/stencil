@@ -5,9 +5,17 @@ export const loadDeps = async (resolveLookup: Map<string, string>, fs: Map<strin
 
   await loadDep('/@stencil/core/compiler/stencil.js');
 
-  const deps = Promise.all(stencil.dependencies.map((dep: any) => {
+  const deps = stencil.dependencies.map((dep: any) => {
     return loadDep(dep.url);
-  }));
+  });
+
+  deps.push(
+    loadDep('https://cdn.jsdelivr.net/npm/rollup@1.17.0/dist/rollup.browser.js'),
+    loadDep('https://cdn.jsdelivr.net/npm/terser@4.1.2/dist/bundle.js')
+  );
+
+  const depPromises = Promise.all(deps);
+
 
   const fetchResults = await Promise.all([
     await fetch('/@stencil/core/internal/client/index.mjs'),
@@ -23,7 +31,7 @@ export const loadDeps = async (resolveLookup: Map<string, string>, fs: Map<strin
     fs.set(file, code);
   }));
 
-  await deps;
+  await depPromises;
 }
 
 
