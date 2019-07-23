@@ -105,9 +105,14 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       }
     }
 
-    if (BUILD.svg && newVNode.$tag$ === 'svg') {
-      // Only reset the SVG context when we're exiting SVG element
-      isSvgMode = false;
+    if (BUILD.svg) {
+      if (newVNode.$tag$ === 'svg') {
+        // Only reset the SVG context when we're exiting <svg> element
+        isSvgMode = false;
+      } else if (newVNode.$elm$.tagName === 'foreignObject') {
+        // Reenter SVG context when we're exiting <foreignObject> element
+        isSvgMode = true;
+      }
     }
   }
 

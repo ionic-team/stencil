@@ -277,6 +277,69 @@ describe('render-vdom', () => {
       await waitForChanges();
       expect(rect.getAttribute('transform')).toBe(null);
     });
+
+    it('should render foreignObject properly', async () => {
+      @Component({
+        tag: 'cmp-a'
+      })
+      class CmpA {
+
+        render() {
+          return (
+            <svg class='is-svg'>
+              <foreignObject class='is-svg'>
+                <div class='is-html'>hello</div>
+                <svg class='is-svg'>
+                  <feGaussianBlur class='is-svg'></feGaussianBlur>
+                  <foreignObject class='is-svg'>
+                    <foreignObject class='is-html'></foreignObject>
+                    <div class='is-html'>Still outside svg</div>
+                  </foreignObject>
+                </svg>
+                <feGaussianBlur class='is-html'>bye</feGaussianBlur>
+              </foreignObject>
+              <feGaussianBlur class='is-svg'></feGaussianBlur>
+            </svg>
+          );
+        }
+      }
+
+      const { root } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      });
+
+      for (const el of Array.from(root.querySelectorAll('.is-html'))) {
+        expect(el.namespaceURI).toEqual('http://www.w3.org/1999/xhtml');
+      }
+      for (const el of Array.from(root.querySelectorAll('.is-svg'))) {
+        expect(el.namespaceURI).toEqual('http://www.w3.org/2000/svg');
+      }
+
+      expect(root).toEqualHtml(`
+      <cmp-a>
+        <svg class=\"is-svg\">
+          <foreignObject class=\"is-svg\">
+            <div class=\"is-html\">
+              hello
+            </div>
+            <svg class=\"is-svg\">
+              <feGaussianBlur class=\"is-svg\"></feGaussianBlur>
+              <foreignObject class=\"is-svg\">
+                <foreignobject class=\"is-html\"></foreignobject>
+                <div class=\"is-html\">
+                  Still outside svg
+                </div>
+              </foreignObject>
+            </svg>
+            <fegaussianblur class=\"is-html\">
+              bye
+            </fegaussianblur>
+          </foreignObject>
+          <feGaussianBlur class=\"is-svg\"></feGaussianBlur>
+        </svg>
+      </cmp-a>`);
+    });
   });
 
   describe('ref property', () => {

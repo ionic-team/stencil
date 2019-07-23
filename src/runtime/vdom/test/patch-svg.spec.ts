@@ -28,11 +28,14 @@ describe('renderer', () => {
       patch(vnode1, h('svg', null,
         h('foreignObject', null,
           h('div', null, 'I am HTML embedded in SVG')
-        )
+        ),
+        h('feGaussianBlur', null)
       ));
 
+      expect(svgElm.namespaceURI).toEqual(SVG_NS);
       expect(svgElm.firstChild.namespaceURI).toEqual(SVG_NS);
-      expect(svgElm.firstChild.firstChild.namespaceURI).not.toEqual(SVG_NS);
+      expect(svgElm.children[0].firstChild.namespaceURI).not.toEqual(SVG_NS);
+      expect(svgElm.children[1].namespaceURI).toEqual(SVG_NS);
       expect(svgElm).toEqualHtml(`
         <svg>
           <foreignObject>
@@ -40,6 +43,7 @@ describe('renderer', () => {
               I am HTML embedded in SVG
             </div>
           </foreignObject>
+          <feGaussianBlur></feGaussianBlur>
         </svg>`
       );
     });
