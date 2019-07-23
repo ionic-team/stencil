@@ -1,10 +1,11 @@
 import * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildWarn } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, getDeclarationParameters, isDecoratorNamed, resolveType, serializeSymbol, validateReferences } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, resolveType, serializeSymbol, validateReferences } from '../transform-utils';
+import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
 
-export function eventDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
+export const eventDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
   const events = decoratedProps
     .filter(ts.isPropertyDeclaration)
     .map(prop => parseEventDecorator(config, diagnostics, typeChecker, prop))
@@ -13,10 +14,10 @@ export function eventDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnos
   if (events.length > 0) {
     newMembers.push(createStaticGetter('events', convertValueToLiteral(events)));
   }
-}
+};
 
 
-function parseEventDecorator(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration): d.ComponentCompilerStaticEvent {
+const parseEventDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration): d.ComponentCompilerStaticEvent => {
   const eventDecorator = prop.decorators.find(isDecoratorNamed('Event'));
 
   if (eventDecorator == null) {
@@ -46,17 +47,17 @@ function parseEventDecorator(config: d.Config, diagnostics: d.Diagnostic[], type
   };
   validateReferences(config, diagnostics, eventMeta.complexType.references, prop.type);
   return eventMeta;
-}
+};
 
-export function getEventName(eventOptions: d.EventOptions, memberName: string) {
+export const getEventName = (eventOptions: d.EventOptions, memberName: string) => {
   if (eventOptions && typeof eventOptions.eventName === 'string' && eventOptions.eventName.trim().length > 0) {
     // always use the event name if given
     return eventOptions.eventName.trim();
   }
   return memberName;
-}
+};
 
-function getComplexType(typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration): d.ComponentCompilerPropertyComplexType {
+const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration): d.ComponentCompilerPropertyComplexType => {
   const sourceFile = node.getSourceFile();
   const eventType = node.type ? getEventType(node.type) : null;
   return {
@@ -64,9 +65,9 @@ function getComplexType(typeChecker: ts.TypeChecker, node: ts.PropertyDeclaratio
     resolved: eventType ? resolveType(typeChecker, typeChecker.getTypeFromTypeNode(eventType)) : 'any',
     references: eventType ? getAttributeTypeInfo(eventType, sourceFile) : {}
   };
-}
+};
 
-function getEventType(type: ts.TypeNode): ts.TypeNode | null {
+const getEventType = (type: ts.TypeNode): ts.TypeNode | null => {
   if (ts.isTypeReferenceNode(type) &&
     ts.isIdentifier(type.typeName) &&
     type.typeName.text === 'EventEmitter' &&
@@ -75,10 +76,9 @@ function getEventType(type: ts.TypeNode): ts.TypeNode | null {
       return type.typeArguments[0];
   }
   return null;
-}
+};
 
-function validateEventName(config: d.Config, diagnostics: d.Diagnostic[], node: ts.Node, eventName: string) {
-
+const validateEventName = (config: d.Config, diagnostics: d.Diagnostic[], node: ts.Node, eventName: string) => {
   if (/^[A-Z]/.test(eventName)) {
     const diagnostic = buildWarn(diagnostics);
     diagnostic.messageText = [
@@ -94,7 +94,7 @@ function validateEventName(config: d.Config, diagnostics: d.Diagnostic[], node: 
     diagnostic.messageText = `The event name conflicts with the "${eventName}" native DOM event name.`;
     augmentDiagnosticWithNode(config, diagnostic, node);
   }
-}
+};
 
 const DOM_EVENT_NAMES: Set<string> = new Set([
   'CheckboxStateChange',

@@ -55,6 +55,7 @@ export const BUILD = {
   lifecycleDOMEvents: false,
   lazyLoad: false,
   profile: false,
-  slotRelocation: true
+  slotRelocation: true,
+  runtimeScopeCss: false
 };
 export const NAMESPACE = 'app';

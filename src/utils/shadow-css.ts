@@ -9,10 +9,6 @@
  * https://github.com/webcomponents/webcomponentsjs/blob/4efecd7e0e/src/ShadowCSS/ShadowCSS.js
  * https://github.com/angular/angular/blob/master/packages/compiler/src/shadow_css.ts
  */
-export function scopeCss(cssText: string, scopeId: string, commentOriginalSelector: boolean) {
-  const sc = new ShadowCss();
-  return sc.shimCssText(cssText, scopeId, scopeId + '-h', scopeId + '-s', commentOriginalSelector);
-}
 
 export class ShadowCss {
   strictStyling = true;
@@ -93,7 +89,7 @@ export class ShadowCss {
   private _convertColonSlotted(cssText: string, slotAttr: string): string {
     const regExp = _cssColonSlottedRe;
 
-    return cssText.replace(regExp, function(...m: string[]) {
+    return cssText.replace(regExp, (...m: string[]) => {
       if (m[2]) {
         const compound = m[2].trim();
         const suffix = m[3];
@@ -130,7 +126,7 @@ export class ShadowCss {
 
   private _convertColonRule(cssText: string, regExp: RegExp, partReplacer: Function): string {
     // m[1] = :host(-context), m[2] = contents of (), m[3] rest of rule
-    return cssText.replace(regExp, function(...m: string[]) {
+    return cssText.replace(regExp, (...m: string[]) => {
       if (m[2]) {
         const parts = m[2].split(',');
         const r: string[] = [];
@@ -355,6 +351,14 @@ class SafeSelector {
   content(): string { return this._content; }
 }
 
+class CssRule {
+  constructor(public selector: string, public content: string) {}
+}
+
+class StringWithEscapedBlocks {
+  constructor(public escapedString: string, public blocks: string[]) {}
+}
+
 const _polyfillHost = '-shadowcsshost';
 const _polyfillSlotted = '-shadowcssslotted';
 // note: :host-context pre-processed to -shadowcsshostcontext.
@@ -380,15 +384,15 @@ const _colonHostContextRe = /:host-context/gim;
 
 const _commentRe = /\/\*\s*[\s\S]*?\*\//g;
 
-function stripComments(input: string): string {
+const stripComments = (input: string) => {
   return input.replace(_commentRe, '');
-}
+};
 
 const _commentWithHashRe = /\/\*\s*#\s*source(Mapping)?URL=[\s\S]+?\*\//g;
 
-function extractCommentsWithHash(input: string): string[] {
+const extractCommentsWithHash = (input: string): string[] => {
   return input.match(_commentWithHashRe) || [];
-}
+};
 
 const _ruleRe = /(\s*)([^;\{\}]+?)(\s*)((?:{%BLOCK%}?\s*;?)|(?:\s*;))/g;
 const _curlyRe = /([{}])/g;
@@ -396,14 +400,10 @@ const OPEN_CURLY = '{';
 const CLOSE_CURLY = '}';
 const BLOCK_PLACEHOLDER = '%BLOCK%';
 
-class CssRule {
-  constructor(public selector: string, public content: string) {}
-}
-
-function processRules(input: string, ruleCallback: (rule: CssRule) => CssRule): string {
+const processRules = (input: string, ruleCallback: (rule: CssRule) => CssRule): string => {
   const inputWithEscapedBlocks = escapeBlocks(input);
   let nextBlockIndex = 0;
-  return inputWithEscapedBlocks.escapedString.replace(_ruleRe, function(...m: string[]) {
+  return inputWithEscapedBlocks.escapedString.replace(_ruleRe, (...m: string[]) => {
     const selector = m[2];
     let content = '';
     let suffix = m[4];
@@ -416,13 +416,9 @@ function processRules(input: string, ruleCallback: (rule: CssRule) => CssRule): 
     const rule = ruleCallback(new CssRule(selector, content));
     return `${m[1]}${rule.selector}${m[3]}${contentPrefix}${rule.content}${suffix}`;
   });
-}
+};
 
-class StringWithEscapedBlocks {
-  constructor(public escapedString: string, public blocks: string[]) {}
-}
-
-function escapeBlocks(input: string): StringWithEscapedBlocks {
+const escapeBlocks = (input: string): StringWithEscapedBlocks => {
   const inputParts = input.split(_curlyRe);
   const resultParts: string[] = [];
   const escapedBlocks: string[] = [];
@@ -452,4 +448,9 @@ function escapeBlocks(input: string): StringWithEscapedBlocks {
     resultParts.push(BLOCK_PLACEHOLDER);
   }
   return new StringWithEscapedBlocks(resultParts.join(''), escapedBlocks);
-}
+};
+
+export const scopeCss = (cssText: string, scopeId: string, commentOriginalSelector: boolean) => {
+  const sc = new ShadowCss();
+  return sc.shimCssText(cssText, scopeId, scopeId + '-h', scopeId + '-s', commentOriginalSelector);
+};

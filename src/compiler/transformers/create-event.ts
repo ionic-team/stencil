@@ -1,11 +1,13 @@
 import * as d from '../../declarations';
+import { CREATE_EVENT, RUNTIME_APIS, addCoreRuntimeApi } from './core-runtime-apis';
 import { EVENT_FLAGS } from '@utils';
 import ts from 'typescript';
-import { CREATE_EVENT } from './exports';
 
 
-export function addCreateEvents(cmp: d.ComponentCompilerMeta) {
+export const addCreateEvents = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   return cmp.events.map(ev => {
+    addCoreRuntimeApi(moduleFile, RUNTIME_APIS.createEvent);
+
     return ts.createStatement(ts.createAssignment(
       ts.createPropertyAccess(
         ts.createThis(),
@@ -22,10 +24,10 @@ export function addCreateEvents(cmp: d.ComponentCompilerMeta) {
       )
     ));
   });
-}
+};
 
 
-function computeFlags(eventMeta: d.ComponentCompilerEvent) {
+const computeFlags = (eventMeta: d.ComponentCompilerEvent) => {
   let flags = 0;
   if (eventMeta.bubbles) {
     flags |= EVENT_FLAGS.Bubbles;
@@ -37,4 +39,4 @@ function computeFlags(eventMeta: d.ComponentCompilerEvent) {
     flags |= EVENT_FLAGS.Cancellable;
   }
   return flags;
-}
+};

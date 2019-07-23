@@ -98,7 +98,6 @@
     "jest-environment-node": "^24.0.0",
     "listr": "0.14.3",
     "magic-string": "^0.25.2",
-    "memfs": "^2.15.5",
     "mime-db": "1.40.0",
     "minimatch": "3.0.4",
     "mkdirp": "^0.5.1",

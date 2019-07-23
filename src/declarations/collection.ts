@@ -5,8 +5,8 @@ import * as d from '.';
 export interface Collection {
   collectionName?: string;
   moduleDir?: string;
-  moduleFiles?: ModuleFile[];
-  global?: ModuleFile;
+  moduleFiles?: any[];
+  global?: any;
   compiler?: CollectionCompiler;
   isInitialized?: boolean;
   hasExports?: boolean;
@@ -40,11 +40,6 @@ export interface AppRegistryComponents {
     bundleIds: d.ModeBundleIds,
     encapsulation?: 'shadow' | 'scoped';
   };
-}
-
-/** OLD WAY */
-export interface ModuleFiles {
-  [filePath: string]: ModuleFile;
 }
 
 

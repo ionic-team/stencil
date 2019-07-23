@@ -3,6 +3,7 @@ export interface StyleCompiler {
   modeName: string;
   styleId: string;
   styleStr: string;
+  styleIdentifier: string;
   externalStyles: ExternalStyleCompiler[];
   compiledStyleText: string;
   compiledStyleTextScoped: string;

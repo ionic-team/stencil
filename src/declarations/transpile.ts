@@ -1,4 +1,5 @@
 import * as d from '.';
+import ts from 'typescript';
 
 
 export interface TranspileResults {
@@ -18,7 +19,10 @@ export interface ValidateTypesResults {
 }
 
 
-export interface TransformOptions {
-  addCompilerMeta: boolean;
-  addStyle: boolean;
+export interface TransformOptions extends ts.CompilerOptions {
+  coreImportPath: string;
+  componentExport: 'lazy' | 'native' | 'customelement' | null;
+  componentMetadata: 'proxy' | 'static' | null;
+  scopeCss: boolean;
+  style: 'import' | 'inline' | null;
 }

@@ -1,9 +1,9 @@
-import * as d from '../../../declarations';
+import * as d from '../../declarations';
+import { convertValueToLiteral, createStaticGetter } from './transform-utils';
 import ts from 'typescript';
-import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 
 
-export function addWatchers(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
+export const addWatchers = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   if (cmp.watchers.length > 0) {
     const watcherObj: d.ComponentConstructorWatchers = {};
 
@@ -13,4 +13,4 @@ export function addWatchers(classMembers: ts.ClassElement[], cmp: d.ComponentCom
     });
     classMembers.push(createStaticGetter('watchers', convertValueToLiteral(watcherObj)));
   }
-}
+};

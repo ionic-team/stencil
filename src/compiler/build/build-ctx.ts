@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { buildFinish } from './build-finish';
 import { hasError, hasWarning } from '@utils';
 
 
@@ -14,8 +13,10 @@ export class BuildContext implements d.BuildCtx {
   bundleBuildCount = 0;
   collections: d.Collection[] = [];
   completedTasks: d.BuildTask[] = [];
+  compilerCtx: d.CompilerCtx;
   components: d.ComponentCompilerMeta[] = [];
   componentGraph = new Map<string, string[]>();
+  config: d.Config;
   data: any = {};
   diagnostics: d.Diagnostic[] = [];
   dirsAdded: string[] = [];
@@ -54,7 +55,9 @@ export class BuildContext implements d.BuildCtx {
   transpileBuildCount = 0;
   validateTypesPromise: Promise<d.ValidateTypesResults>;
 
-  constructor(private config: d.Config, private compilerCtx: d.CompilerCtx) {
+  constructor(config: d.Config, compilerCtx: d.CompilerCtx) {
+    this.config = config;
+    this.compilerCtx = compilerCtx;
     this.buildId = ++this.compilerCtx.activeBuildId;
   }
 
@@ -146,23 +149,6 @@ export class BuildContext implements d.BuildCtx {
 
   get hasWarning() {
     return hasWarning(this.diagnostics);
-  }
-
-  async abort() {
-    return buildFinish(this.config, this.compilerCtx, this as any, true);
-  }
-
-  async finish() {
-    const results = await buildFinish(this.config, this.compilerCtx, this as any, false);
-
-    const buildLog: d.BuildLog = {
-      buildId: this.buildId,
-      messages: this.buildMessages.slice(),
-      progress: 1
-    };
-    this.compilerCtx.events.emit('buildLog', buildLog);
-
-    return results;
   }
 
   progress(t: d.BuildTask) {
