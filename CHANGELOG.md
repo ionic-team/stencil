@@ -1,3 +1,17 @@
+# 😈 [1.2.0-0](https://github.com/ionic-team/stencil/compare/v1.1.9...v1.2.0-0) (2019-07-23)
+
+
+### Bug Fixes
+
+* **vdom:** skip empty classes ([7004a59](https://github.com/ionic-team/stencil/commit/7004a59))
+
+
+### Features
+
+* **compile:** browser compile ([33b11a4](https://github.com/ionic-team/stencil/commit/33b11a4))
+
+
+
 ## 🐕 [1.1.9](https://github.com/ionic-team/stencil/compare/v1.1.8...v1.1.9) (2019-07-22)
 
 
