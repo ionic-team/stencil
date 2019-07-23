@@ -3,7 +3,7 @@ import { updateToLazyComponent } from '../component-lazy/update-to-lazy-componen
 import { updateToNativeComponent } from '../component-native/update-to-native-component';
 
 
-export function componentEntryPlugin(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[]) {
+export const componentEntryPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[]) => {
   const entrys = new Map<string, d.EntryModule>();
 
   return {
@@ -37,4 +37,4 @@ export function componentEntryPlugin(config: d.Config, compilerCtx: d.CompilerCt
       return null;
     }
   };
-}
+};

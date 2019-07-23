@@ -4,7 +4,7 @@ import { normalizePath } from '@utils';
 import { parseCollectionComponents } from './parse-collection-components';
 
 
-export function parseCollectionManifest(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionName: string, collectionDir: string, collectionJsonStr: string) {
+export const parseCollectionManifest = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionName: string, collectionDir: string, collectionJsonStr: string) => {
   const collectionManifest: d.CollectionManifest = JSON.parse(collectionJsonStr);
 
   const compilerVersion: d.CollectionCompilerVersion = collectionManifest.compiler || {} as any;
@@ -24,15 +24,15 @@ export function parseCollectionManifest(config: d.Config, compilerCtx: d.Compile
   parseCollectionComponents(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
 
   return collection;
-}
+};
 
 
-export function parseCollectionDependencies(collectionManifest: d.CollectionManifest) {
+export const parseCollectionDependencies = (collectionManifest: d.CollectionManifest) => {
   return (collectionManifest.collections || []).map(c => c.name);
-}
+};
 
 
-export function parseGlobal(config: d.Config, compilerCtx: d.CompilerCtx, collectionDir: string, collectionManifest: d.CollectionManifest) {
+export const parseGlobal = (config: d.Config, compilerCtx: d.CompilerCtx, collectionDir: string, collectionManifest: d.CollectionManifest) => {
   if (typeof collectionManifest.global !== 'string') {
     return undefined;
   }
@@ -42,10 +42,10 @@ export function parseGlobal(config: d.Config, compilerCtx: d.CompilerCtx, collec
   const globalModule = getModule(config, compilerCtx, sourceFilePath);
   globalModule.jsFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
   return globalModule;
-}
+};
 
 
-export function parseBundles(collectionManifest: d.CollectionManifest) {
+export const parseBundles = (collectionManifest: d.CollectionManifest) => {
   if (invalidArrayData(collectionManifest.bundles)) {
     return [];
   }
@@ -55,9 +55,9 @@ export function parseBundles(collectionManifest: d.CollectionManifest) {
       components: b.components.slice().sort()
     };
   });
-}
+};
 
 
-function invalidArrayData(arr: any[]) {
+const invalidArrayData = (arr: any[]) => {
   return (!arr || !Array.isArray(arr) || arr.length === 0);
-}
+};

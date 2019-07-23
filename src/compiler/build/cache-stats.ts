@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 
 
-export function writeCacheStats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export const writeCacheStats = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (!config.enableCacheStats) {
     return;
   }
@@ -30,10 +30,10 @@ export function writeCacheStats(config: d.Config, compilerCtx: d.CompilerCtx, bu
   compilerCtx.fs.disk.writeFileSync(statsPath, JSON.stringify(statsData, null, 2));
 
   timeSpan.finish(`cache stats finished`);
-}
+};
 
 
-export function getObjectSize(data: any, obj: any) {
+export const getObjectSize = (data: any, obj: any) => {
   if (obj) {
     Object.keys(obj).forEach(key => {
       if (typeof obj[key] === 'object') {
@@ -45,10 +45,10 @@ export function getObjectSize(data: any, obj: any) {
       }
     });
   }
-}
+};
 
 
-export function objectSizeEstimate(obj: any) {
+export const objectSizeEstimate = (obj: any) => {
   if (!obj) {
     return 0;
   }
@@ -79,4 +79,4 @@ export function objectSizeEstimate(obj: any) {
   }
 
   return bytes;
-}
+};

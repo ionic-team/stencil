@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import ts from 'typescript';
 
 
-export function gatherVdomMeta(m: d.Module | d.ComponentCompilerMeta, args: ts.NodeArray<ts.Expression>) {
+export const gatherVdomMeta = (m: d.Module | d.ComponentCompilerMeta, args: ts.NodeArray<ts.Expression>) => {
   m.hasVdomRender = true;
 
   if (args[0].kind === ts.SyntaxKind.Identifier) {
@@ -63,5 +63,4 @@ export function gatherVdomMeta(m: d.Module | d.ComponentCompilerMeta, args: ts.N
       }
     }
   }
-}
-
+};

@@ -3,7 +3,7 @@ import { getStaticValue } from '../transform-utils';
 import ts from 'typescript';
 
 
-export function parseStaticListeners(staticMembers: ts.ClassElement[]): d.ComponentCompilerListener[] {
+export const parseStaticListeners = (staticMembers: ts.ClassElement[]): d.ComponentCompilerListener[] => {
   const parsedListeners: d.ComponentCompilerListener[] = getStaticValue(staticMembers, 'listeners');
   if (!parsedListeners || parsedListeners.length === 0) {
     return [];
@@ -18,4 +18,4 @@ export function parseStaticListeners(staticMembers: ts.ClassElement[]): d.Compon
       target: parsedListener.target
     };
   });
-}
+};

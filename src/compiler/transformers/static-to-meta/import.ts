@@ -4,7 +4,7 @@ import { normalizePath } from '@utils';
 import ts from 'typescript';
 
 
-export function parseImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, dirPath: string, importNode: ts.ImportDeclaration) {
+export const parseImport = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, dirPath: string, importNode: ts.ImportDeclaration) => {
   if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
     let importPath = importNode.moduleSpecifier.text;
 
@@ -37,4 +37,4 @@ export function parseImport(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   }
 
   return importNode;
-}
+};
