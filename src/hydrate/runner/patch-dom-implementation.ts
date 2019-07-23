@@ -34,6 +34,20 @@ export function patchDomImplementation(doc: any) {
     }
   }
 
+  try {
+    doc.baseURI;
+  } catch (e) {
+    Object.defineProperty(doc, 'baseURI', {
+      get() {
+        const baseElm = doc.querySelector('base[href]');
+        if (baseElm) {
+          return (new URL(baseElm.getAttribute('href'), win.location.href)).href;
+        }
+        return win.location.href;
+      }
+    });
+  }
+
   return win as Window;
 }
 
