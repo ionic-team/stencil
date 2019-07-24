@@ -120,5 +120,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   }
 };
 
-const parseClassList = (value: string | undefined | null): string[] =>
-  (!value) ? [] : value.split(' ').filter(c => c);
+const parseClassList = (value: string | undefined | null): string[] => {
+  value = value ? value.trim().replace(/\s+/g, ' ') : value;
+  return (!value) ? [] : value.split(' ');
+};
