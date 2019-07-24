@@ -3,46 +3,60 @@ import { sortBy } from '@utils';
 import { getDefaultBundles } from './default-bundles';
 
 
+export function computeUsedComponents(config: d.Config, defaultBundles: d.ComponentCompilerMeta[][], allCmps: d.ComponentCompilerMeta[]) {
+  if (!config.excludeUnusedDependencies) {
+    return new Set(allCmps.map(c => c.tagName));
+  }
+  const usedComponents = new Set<string>();
+
+  // All components
+  defaultBundles.forEach(entry => {
+    entry.forEach(cmp => usedComponents.add(cmp.tagName));
+  });
+  allCmps.forEach(cmp => {
+    if (!cmp.isCollectionDependency) {
+      usedComponents.add(cmp.tagName);
+    }
+  });
+  allCmps.forEach(cmp => {
+    if (cmp.isCollectionDependency) {
+      if (cmp.dependants.some(dep => usedComponents.has(dep))) {
+        usedComponents.add(cmp.tagName);
+      }
+    }
+  });
+
+  return usedComponents;
+}
+
 export function generateComponentBundles(
   config: d.Config,
   buildCtx: d.BuildCtx,
 ): d.ComponentCompilerMeta[][] {
   const cmps = sortBy(buildCtx.components, cmp => cmp.dependants.length);
-  if (config.devMode) {
-    const devCmps = (config.excludeUnusedDependencies)
-      ? filterUnusedDependencies(cmps, cmps)
-      : cmps;
-
-    return devCmps.map(cmp => [cmp]);
-  }
-
   const defaultBundles = getDefaultBundles(config, buildCtx, cmps);
+  const usedComponents = computeUsedComponents(config, defaultBundles, cmps);
+
+  if (config.devMode) {
+    return cmps
+      .filter(c => usedComponents.has(c.tagName))
+      .map(cmp => [cmp]);
+  }
 
   // Visit components that are already in one of the default bundlers
-  const visited = new Set();
+  const alreadyBundled = new Set();
   defaultBundles.forEach(entry => {
-    entry.forEach(cmp => visited.add(cmp));
+    entry.forEach(cmp => alreadyBundled.add(cmp));
   });
 
-  let remainingComponents: d.ComponentCompilerMeta[] = cmps
-    .filter(cmp => !visited.has(cmp));
+  const bundlers: d.ComponentCompilerMeta[][] = cmps
+    .filter(cmp => usedComponents.has(cmp.tagName) && !alreadyBundled.has(cmp))
+    .map(c => [c]);
 
-  if (config.excludeUnusedDependencies) {
-    remainingComponents = filterUnusedDependencies(remainingComponents, cmps);
-  }
-
-  const bundlers = remainingComponents.map(c => [c]);
-  return [
+    return [
     ...defaultBundles,
     ...optimizeBundlers(bundlers, 0.6)
   ].filter(b => b.length > 0);
-}
-
-function filterUnusedDependencies(remainingComponents: d.ComponentCompilerMeta[], allCmps: d.ComponentCompilerMeta[]) {
-  return remainingComponents.filter(c => (
-    !c.isCollectionDependency ||
-    c.dependants.some(dep => allCmps.some(c => c.tagName === dep && !c.isCollectionDependency))
-  ));
 }
 
 function optimizeBundlers(bundles: d.ComponentCompilerMeta[][], threshold: number) {
