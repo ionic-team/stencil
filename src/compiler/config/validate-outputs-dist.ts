@@ -107,7 +107,7 @@ export function validateOutputTargetDist(config: d.Config) {
 
     if (config.buildDist) {
       const esmDir = path.join(outputTarget.dir, 'esm');
-      const esmEs5Dir = config.buildEs5 ? path.join(outputTarget.dir, 'esm', 'legacy') : undefined;
+      const esmEs5Dir = config.buildEs5 ? path.join(outputTarget.dir, 'esm-es5') : undefined;
       const cjsDir = path.join(outputTarget.dir, 'cjs');
 
       // Create lazy output-target
