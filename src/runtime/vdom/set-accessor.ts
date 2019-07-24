@@ -18,9 +18,8 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   }
   if (BUILD.vdomClass && memberName === 'class') {
     const classList = elm.classList;
-    classList.remove(...parseClassList(oldValue));
-    classList.add(...parseClassList(newValue));
-
+    parseClassList(oldValue).forEach(cls => classList.remove(cls));
+    parseClassList(newValue).forEach(cls => classList.add(cls));
   } else if (BUILD.vdomStyle && memberName === 'style') {
     // update style attribute, css properties and values
     if (BUILD.updatable) {
