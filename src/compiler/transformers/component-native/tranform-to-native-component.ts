@@ -7,6 +7,7 @@ import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { defineCustomElement } from '../define-custom-element';
 import { updateNativeComponentClass } from './native-component';
 import ts from 'typescript';
+import { addLegacyApis } from '../core-runtime-apis';
 
 
 export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) => {
@@ -86,6 +87,9 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
         }
       }
 
+      if (moduleFile.isLegacy) {
+        addLegacyApis(moduleFile);
+      }
       tsSourceFile = addImports(transformOpts, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
 
       return tsSourceFile;

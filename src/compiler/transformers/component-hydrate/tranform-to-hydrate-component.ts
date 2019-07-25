@@ -4,6 +4,7 @@ import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
 import { updateHydrateComponentClass } from './hydrate-component';
 import ts from 'typescript';
+import { addLegacyApis } from '../core-runtime-apis';
 
 
 export const transformToHydrateComponentText = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) => {
@@ -69,6 +70,9 @@ const hydrateComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.
 
       tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
+      if (moduleFile.isLegacy) {
+        addLegacyApis(moduleFile);
+      }
       tsSourceFile = addImports(transformOpts, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
 
       return tsSourceFile;

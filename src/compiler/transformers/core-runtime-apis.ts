@@ -23,6 +23,7 @@ export const RUNTIME_APIS = {
   getContext: `getContext as ${GET_CONTEXT}`,
   getElement: `getElement as ${GET_ELEMENT}`,
   h: `h as ${H}`,
+  legacyH: `h`,
   Host: `Host as ${HOST}`,
   HTMLElement: HTML_ELEMENT,
   proxyCustomElement: `proxyCustomElement as ${PROXY_CUSTOM_ELEMENT}`,
@@ -35,4 +36,8 @@ export const addCoreRuntimeApi = (moduleFile: d.Module, coreRuntimeApi: string) 
   if (!moduleFile.coreRuntimeApis.includes(coreRuntimeApi)) {
     moduleFile.coreRuntimeApis.push(coreRuntimeApi);
   }
+};
+
+export const addLegacyApis = (moduleFile: d.Module) => {
+  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.legacyH);
 };

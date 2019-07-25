@@ -21,7 +21,7 @@ const addEsmImports = (tsSourceFile: ts.SourceFile, importFnNames: string[], imp
   // ESM Imports
   // import { importNames } from 'importPath';
 
-  let importSpecifiers = importFnNames.map(importKey => {
+  const importSpecifiers = importFnNames.map(importKey => {
     const splt = importKey.split(' as ');
     let importAs = importKey;
     let importFnName = importKey;
@@ -38,44 +38,16 @@ const addEsmImports = (tsSourceFile: ts.SourceFile, importFnNames: string[], imp
   });
 
   const statements = tsSourceFile.statements.slice();
-
-  const existingImportIndex = statements.findIndex(s => {
-    return ts.isImportDeclaration(s) &&
-           s.moduleSpecifier &&
-           (s.moduleSpecifier as ts.StringLiteral).text === importPath;
-  });
-
-  if (existingImportIndex > -1) {
-    const existingImport = statements[existingImportIndex] as ts.ImportDeclaration;
-
-    importSpecifiers = [
-      ...(existingImport.importClause.namedBindings as ts.NamedImports).elements.map(elm => elm),
-      ...importSpecifiers
-    ];
-
-    statements[existingImportIndex] = ts.updateImportDeclaration(
-      existingImport,
+  const newImport = ts.createImportDeclaration(
+    undefined,
+    undefined,
+    ts.createImportClause(
       undefined,
-      undefined,
-      ts.createImportClause(
-        undefined,
-        ts.createNamedImports(importSpecifiers)
-      ),
-      ts.createLiteral(importPath)
-    );
-
-  } else {
-    const newImport = ts.createImportDeclaration(
-      undefined,
-      undefined,
-      ts.createImportClause(
-        undefined,
-        ts.createNamedImports(importSpecifiers)
-      ),
-      ts.createLiteral(importPath)
-    );
-    statements.unshift(newImport);
-  }
+      ts.createNamedImports(importSpecifiers)
+    ),
+    ts.createLiteral(importPath)
+  );
+  statements.unshift(newImport);
 
   return ts.updateSourceFileNode(tsSourceFile, statements);
 };
