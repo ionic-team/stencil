@@ -64,6 +64,10 @@ export class AppRoot {
 
     const results = await stencil.compile(this.sourceCodeInput.value, opts);
 
+    results.imports.forEach((imprt: string) => {
+      console.log('import:', imprt);
+    });
+
     this.transpiledInput.value = results.code;
     this.diagnostics = results.diagnostics;
     this.wrap = 'off';

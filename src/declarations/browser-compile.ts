@@ -16,6 +16,7 @@ export interface CompileResults {
   inputFilePath: string;
   outputFilePath: string;
   inputOptions: CompileOptions;
+  imports: { path: string; }[];
 }
 
 export interface CompileScriptMinifyOptions {

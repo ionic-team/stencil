@@ -29,6 +29,7 @@ export interface Module {
   isLegacy: boolean;
   jsFilePath: string;
   localImports: string[];
+  originalImports: string[];
   originalCollectionComponentPath: string;
   potentialCmpRefs: string[];
   sourceFilePath: string;

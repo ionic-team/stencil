@@ -12,7 +12,8 @@ export const compile = async (code: string, opts: d.CompileOptions = {}): Promis
     map: null,
     inputFilePath: (typeof opts.file === 'string' ? opts.file.trim() : 'module.tsx'),
     outputFilePath: null,
-    inputOptions: null
+    inputOptions: null,
+    imports: []
   };
 
   try {
@@ -38,6 +39,14 @@ export const compile = async (code: string, opts: d.CompileOptions = {}): Promis
     }
 
     results.outputFilePath = transpileResults.moduleFile.jsFilePath;
+
+    if (transpileResults.moduleFile) {
+      transpileResults.moduleFile.originalImports.forEach(originalImport => {
+        results.imports.push({
+          path: originalImport
+        });
+      });
+    }
 
   } catch (e) {
     catchError(results.diagnostics, e);

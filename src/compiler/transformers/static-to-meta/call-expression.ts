@@ -33,13 +33,21 @@ const visitCallExpressionArgs = (m: d.Module | d.ComponentCompilerMeta, callExpr
 
   } else if (args.length > 1 && fnName === 'createElementNS') {
     visitCallExpressionArg(m, args[1]);
+
+  } else if (fnName === 'require' && args.length > 0 && (m as d.Module).originalImports) {
+    const arg = args[0];
+    if (ts.isStringLiteral(arg)) {
+      if (!(m as d.Module).originalImports.includes(arg.text)) {
+        (m as d.Module).originalImports.push(arg.text);
+      }
+    }
   }
 };
 
 
 const visitCallExpressionArg = (m: d.Module | d.ComponentCompilerMeta, arg: ts.Expression) => {
-  if (arg.kind === ts.SyntaxKind.StringLiteral) {
-    let tag = (arg as ts.StringLiteral).text;
+  if (ts.isStringLiteral(arg)) {
+    let tag = arg.text;
 
     if (typeof tag === 'string') {
       tag = tag.toLowerCase();

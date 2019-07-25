@@ -110,6 +110,7 @@ export const getModule = (config: d.Config, compilerCtx: d.CompilerCtx, sourceFi
       isLegacy: false,
       localImports: [],
       originalCollectionComponentPath: null,
+      originalImports: [],
       potentialCmpRefs: []
     };
     compilerCtx.moduleMap.set(sourceFilePath, moduleFile);
@@ -128,6 +129,7 @@ export const resetModule = (moduleFile: d.Module) => {
   moduleFile.isCollectionDependency = false;
   moduleFile.localImports.length = 0;
   moduleFile.originalCollectionComponentPath = null;
+  moduleFile.originalImports.length = 0;
 
   moduleFile.hasVdomAttribute = true;
   moduleFile.hasVdomClass = true;

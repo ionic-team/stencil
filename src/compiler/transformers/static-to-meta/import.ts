@@ -8,6 +8,10 @@ export const parseImport = (config: d.Config, compilerCtx: d.CompilerCtx, buildC
   if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
     let importPath = importNode.moduleSpecifier.text;
 
+    if (!moduleFile.originalImports.includes(importPath)) {
+      moduleFile.originalImports.push(importPath);
+    }
+
     if (config.sys.path.isAbsolute(importPath)) {
       // absolute import
       importPath = normalizePath(importPath);
