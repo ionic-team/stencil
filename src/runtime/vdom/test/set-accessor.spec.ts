@@ -660,6 +660,11 @@ describe('setAccessor for standard html elements', () => {
         '  class1 class2',
         'new class4', false, 0);
       expect(elm).toHaveClasses(['class3', 'new', 'class4']);
+
+      setAccessor(elm, 'class', undefined, `class1
+              class2
+       class3  `, false, 0);
+      expect(elm).toHaveClasses(['class1', 'class2', 'class3']);
     });
 
     it('should not add any classes', () => {
@@ -675,6 +680,9 @@ describe('setAccessor for standard html elements', () => {
 
       setAccessor(elm, 'class', undefined, undefined, false, 0);
       expect(elm).toHaveClasses([]);
+
+      setAccessor(elm, 'class', '', `\n      \n      \n     `, false, 0);
+      expect(elm).toHaveClasses([]);
     });
 
     it('should remove classes', () => {
@@ -683,6 +691,10 @@ describe('setAccessor for standard html elements', () => {
 
       setAccessor(elm, 'class', 'icon', 'icon2', false, 0);
       expect(elm).toHaveClasses(['ion-color', 'icon2']);
+
+      setAccessor(elm, 'class', `icon
+           ion-color`, 'icon2', false, 0);
+      expect(elm).toHaveClasses(['icon2']);
     });
 
     it('should not have duplicated classes', () => {
