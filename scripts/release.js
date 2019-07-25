@@ -181,7 +181,7 @@ function runTasks(opts) {
       },
       {
         title: 'Pushing to Github',
-        task: () => execa('git', ['push', '--tags'], { cwd: rootDir })
+        task: () => execa('git', ['push', '--follow-tags'], { cwd: rootDir })
       }
     );
 
