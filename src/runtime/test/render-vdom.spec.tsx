@@ -110,11 +110,9 @@ describe('render-vdom', () => {
     }
 
     const { body, waitForChanges } = await newSpecPage({
-      components: [CmpA]
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`
     });
-
-    body.innerHTML = `<cmp-a></cmp-a>`;
-    await waitForChanges();
 
     expect(body).toEqualHtml(`
       <cmp-a><div class="class1 class2 class3">Hello VDOM</div></cmp-a>
