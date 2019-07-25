@@ -97,6 +97,30 @@ describe('render-vdom', () => {
     `);
   });
 
+  it('should add classes', async () => {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      render() {
+        return <div class={
+          ` class1
+              class2
+              class3 `}
+        >Hello VDOM</div>;
+      }
+    }
+
+    const { body, waitForChanges } = await newSpecPage({
+      components: [CmpA]
+    });
+
+    body.innerHTML = `<cmp-a></cmp-a>`;
+    await waitForChanges();
+
+    expect(body).toEqualHtml(`
+      <cmp-a><div class="class1 class2 class3">Hello VDOM</div></cmp-a>
+    `);
+  });
+
   it('should error when reusing vnodes', async () => {
 
     @Component({ tag: 'cmp-a' })
