@@ -4,6 +4,7 @@ import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
 import { updateLazyComponentClass } from './lazy-component';
 import ts from 'typescript';
+import { addLegacyImports } from '../core-runtime-apis';
 
 
 export const transformToLazyComponentText = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, transformOpts: d.TransformOptions, cmp: d.ComponentCompilerMeta, inputText: string) => {
@@ -62,6 +63,9 @@ export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts
 
       tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
+      if (moduleFile.isLegacy) {
+        addLegacyImports(moduleFile);
+      }
       tsSourceFile = addImports(transformOpts, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
 
       return tsSourceFile;
