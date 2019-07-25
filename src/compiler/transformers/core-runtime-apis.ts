@@ -38,6 +38,6 @@ export const addCoreRuntimeApi = (moduleFile: d.Module, coreRuntimeApi: string) 
   }
 };
 
-export const addLegacyImports = (moduleFile: d.Module) => {
+export const addLegacyApis = (moduleFile: d.Module) => {
   addCoreRuntimeApi(moduleFile, RUNTIME_APIS.legacyH);
 };
