@@ -86,8 +86,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
         connectedCallback() {
           if (appLoadFallback) {
-            clearInterval(appLoadFallback);
-            appLoadFallback = undefined;
+            clearTimeout(appLoadFallback);
+            appLoadFallback = null;
           }
           plt.jmp(() => connectedCallback(this, cmpMeta));
         }
