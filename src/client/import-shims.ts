@@ -44,7 +44,7 @@ export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => 
 export const patchDynamicImport = (base: string) => {
   const importFunctionName = getDynamicImportFunction(NAMESPACE);
   try {
-    (win as any)[importFunctionName] = new Function('w', 'return import(w);');
+    (win as any)[importFunctionName] = (w: string) => import(w);
   } catch (e) {
     const moduleMap = new Map<string, any>();
     (win as any)[importFunctionName] = (src: string) => {
