@@ -267,8 +267,8 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
     let textContent = node.nodeValue;
 
     if (typeof textContent === 'string') {
-      const trimedTextContent = textContent.trim();
-      if (trimedTextContent === '') {
+      const trimmedTextContent = textContent.trim();
+      if (trimmedTextContent === '') {
         // this text node is whitespace only
         if (isWithinWhitespaceSensitive(node)) {
           // whitespace matters within this element
@@ -323,8 +323,8 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
             if (isWithinWhitespaceSensitive(node)) {
               output.text.push(textContent);
             } else {
-              output.text.push(trimedTextContent);
-              textContentLength = trimedTextContent.length;
+              output.text.push(trimmedTextContent);
+              textContentLength = trimmedTextContent.length;
             }
             output.currentLineWidth += textContentLength;
 
