@@ -267,11 +267,12 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
     let textContent = node.nodeValue;
 
     if (typeof textContent === 'string') {
-
-      if (textContent.trim() === '') {
+      const whitespaceSensitive = isWithinWhitespaceSensitive(node);
+      const trimedTextContent = textContent.trim();
+      if (trimedTextContent === '') {
         // this text node is whitespace only
 
-        if (isWithinWhitespaceSensitive(node)) {
+        if (whitespaceSensitive) {
           // whitespace matters within this element
           // just add the exact text we were given
           output.text.push(textContent);
@@ -321,7 +322,12 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
           if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
             // this text node cannot have its content escaped since it's going
             // into an element like <style> or <script>
-            output.text.push(textContent);
+            if (whitespaceSensitive) {
+              output.text.push(textContent);
+            } else {
+              output.text.push(trimedTextContent);
+              textContentLength = trimedTextContent.length;
+            }
             output.currentLineWidth += textContentLength;
 
           } else {
@@ -333,7 +339,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
 
             } else {
               // not pretty printing the text node
-              if (isWithinWhitespaceSensitive(node)) {
+              if (whitespaceSensitive) {
                 output.currentLineWidth += textContentLength;
 
               } else {

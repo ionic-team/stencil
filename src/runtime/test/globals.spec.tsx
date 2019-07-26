@@ -1,5 +1,5 @@
-import { Component } from "@stencil/core";
-import { newSpecPage } from "@stencil/core/testing";
+import { Component } from '@stencil/core';
+import { newSpecPage } from '@stencil/core/testing';
 
 
 describe('globals', () => {
@@ -52,7 +52,7 @@ describe('globals', () => {
         components: [CmpEl],
         html: `<cmp-el></cmp-el>`
       });
-    })
+    });
     it('allows access to the NodeList prototype', async () => {
       expect(page.rootInstance.protoNodeList).toEqual(NodeList.prototype);
       expect(page.rootInstance.protoNodeList).toEqual((page.win as any).NodeList.prototype);
@@ -60,7 +60,7 @@ describe('globals', () => {
       expect(page.rootInstance.protoNodeList).toEqual((global as any).NodeList.prototype);
       expect(page.rootInstance.protoNodeList).toBeTruthy();
     });
-  
+
     it('allows access to the Element prototype', async () => {
       expect(page.rootInstance.protoEl).toEqual(Element.prototype);
       expect(page.rootInstance.protoEl).toEqual((page.win as any).Element.prototype);

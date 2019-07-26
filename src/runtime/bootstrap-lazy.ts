@@ -1,14 +1,14 @@
+import { proxyComponent } from './proxy-component';
 import * as d from '../declarations';
-import { disconnectedCallback } from './disconnected-callback';
 import { CMP_FLAGS } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
-import { proxyComponent } from './proxy-component';
+import { disconnectedCallback } from './disconnected-callback';
 import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
-import { forceUpdate, postUpdateComponent } from './update-component';
+import { appDidLoad, forceUpdate, postUpdateComponent } from './update-component';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
@@ -18,6 +18,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const customElements = win.customElements;
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
+  let appLoadFallback: any;
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
   if (options.syncQueue) {
@@ -84,6 +85,10 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         connectedCallback() {
+          if (appLoadFallback) {
+            clearInterval(appLoadFallback);
+            appLoadFallback = undefined;
+          }
           plt.jmp(() => connectedCallback(this, cmpMeta));
         }
 
@@ -127,4 +132,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
   visibilityStyle.setAttribute('data-styles', '');
   head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
+
+  // Fallback appLoad event
+  plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30));
 };
