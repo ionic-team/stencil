@@ -2,7 +2,8 @@ import * as d from '.';
 
 export interface CompileOptions {
   file?: string;
-  componentMetadata?: 'proxy' | 'static' | string | undefined;
+  componentMetadata?: 'runtimestatic' | 'compilerstatic' | string | undefined;
+  proxy?: 'defineproperty' | string | undefined;
   module?: 'cjs' | 'esm' | string;
   componentExport?: 'customelement' | 'module' | string | undefined;
   script?: CompileScript;
@@ -17,6 +18,7 @@ export interface CompileResults {
   outputFilePath: string;
   inputOptions: CompileOptions;
   imports: { path: string; }[];
+  componentMeta: any[];
 }
 
 export interface CompileScriptMinifyOptions {

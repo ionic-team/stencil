@@ -52,7 +52,7 @@ textarea {
 }
 
 .source textarea {
-  height: calc(100% - 195px);
+  height: calc(100% - 215px);
 }
 
 .build textarea {

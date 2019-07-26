@@ -15,6 +15,7 @@ export const transformToHydrateComponentText = (compilerCtx: d.CompilerCtx, buil
       coreImportPath: '@stencil/core',
       componentExport: null,
       componentMetadata: null,
+      proxy: null,
       scopeCss: false,
       style: 'inline'
     };

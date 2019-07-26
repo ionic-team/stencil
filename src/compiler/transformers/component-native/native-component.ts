@@ -3,11 +3,9 @@ import { addNativeConnectedCallback } from './native-connected-callback';
 import { addNativeElementGetter } from './native-element-getter';
 import { addWatchers } from '../watcher-meta-transform';
 import { createStaticGetter } from '../transform-utils';
-import { getScopeId } from '../../style/scope-css';
 import { getStyleImportPath } from '../static-to-meta/styles';
 import { HTML_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
-import { scopeCss } from '../../../utils/shadow-css';
 import { transformHostData } from '../host-data-transform';
 import { updateNativeConstructor } from './native-constructor';
 import ts from 'typescript';
@@ -78,19 +76,13 @@ export const addStaticStyle = (transformOpts: d.TransformOptions, classMembers: 
   }
 
   if (typeof style.styleStr === 'string') {
-    let styleStr = style.styleStr;
-
-    if (transformOpts.scopeCss && cmp.encapsulation === 'scoped') {
-      const scopeId = getScopeId(cmp.tagName);
-      styleStr = scopeCss(styleStr, scopeId, false);
-    }
-    classMembers.push(createStaticGetter('style', ts.createStringLiteral(styleStr)));
+    classMembers.push(createStaticGetter('style', ts.createStringLiteral(style.styleStr)));
 
   } else if (typeof style.styleIdentifier === 'string') {
     let rtnExpr: ts.Expression;
 
     if (transformOpts.module === ts.ModuleKind.CommonJS && style.externalStyles.length > 0) {
-      const importPath = getStyleImportPath(cmp, style);
+      const importPath = getStyleImportPath(style);
 
       rtnExpr = ts.createCall(
         ts.createIdentifier('require'),

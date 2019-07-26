@@ -130,7 +130,7 @@ export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.Compil
   cmp.potentialCmpRefs = unique(cmp.potentialCmpRefs);
   setComponentBuildConditionals(cmp);
 
-  if (transformOpts.componentMetadata === 'static') {
+  if (transformOpts.componentMetadata === 'compilerstatic') {
     cmpNode = addComponentMetaStatic(cmpNode, cmp);
   }
 

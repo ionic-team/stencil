@@ -4,20 +4,9 @@ import ts from 'typescript';
 
 
 export const addComponentMetaStatic = (cmpNode: ts.ClassDeclaration, cmpMeta: d.ComponentCompilerMeta) => {
-  const copyCmp = Object.assign({}, cmpMeta);
+  const publicCompilerMeta = getPublicCompilerMeta(cmpMeta);
 
-  // no need to copy all compiler meta data to the static getter
-  delete copyCmp.assetsDirs;
-  delete copyCmp.dependencies;
-  delete copyCmp.excludeFromCollection;
-  delete copyCmp.isCollectionDependency;
-  delete copyCmp.docs;
-  delete copyCmp.jsFilePath;
-  delete copyCmp.potentialCmpRefs;
-  delete copyCmp.styleDocs;
-  delete copyCmp.sourceFilePath;
-
-  const cmpMetaStaticProp = createStaticGetter('COMPILER_META', convertValueToLiteral(copyCmp));
+  const cmpMetaStaticProp = createStaticGetter('COMPILER_META', convertValueToLiteral(publicCompilerMeta));
   const classMembers = [...cmpNode.members, cmpMetaStaticProp];
 
   return ts.updateClassDeclaration(
@@ -29,4 +18,22 @@ export const addComponentMetaStatic = (cmpNode: ts.ClassDeclaration, cmpMeta: d.
     cmpNode.heritageClauses,
     classMembers
   );
+};
+
+
+export const getPublicCompilerMeta = (cmpMeta: d.ComponentCompilerMeta) => {
+  const publicCompilerMeta = Object.assign({}, cmpMeta);
+
+  // no need to copy all compiler meta data
+  delete publicCompilerMeta.assetsDirs;
+  delete publicCompilerMeta.dependencies;
+  delete publicCompilerMeta.excludeFromCollection;
+  delete publicCompilerMeta.isCollectionDependency;
+  delete publicCompilerMeta.docs;
+  delete publicCompilerMeta.jsFilePath;
+  delete publicCompilerMeta.potentialCmpRefs;
+  delete publicCompilerMeta.styleDocs;
+  delete publicCompilerMeta.sourceFilePath;
+
+  return publicCompilerMeta;
 };

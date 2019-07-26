@@ -17,6 +17,7 @@ export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, build
     coreImportPath: '@stencil/core',
     componentExport: null,
     componentMetadata: null,
+    proxy: null,
     scopeCss: false,
     style: 'inline'
   };
@@ -77,7 +78,7 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
           // define custom element, and remove "export" from components
           tsSourceFile = defineCustomElement(tsSourceFile, moduleFile, transformOpts);
 
-        } else if (transformOpts.componentMetadata === 'proxy') {
+        } else if (transformOpts.proxy === 'defineproperty') {
           // exporting as a module, but also add the component proxy fn
           tsSourceFile = addModuleMetadataProxies(tsSourceFile, moduleFile);
         }

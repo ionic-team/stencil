@@ -103,7 +103,7 @@ const addEsmStyleImports = (tsSourceFile: ts.SourceFile, moduleFile: d.Module) =
   moduleFile.cmps.forEach(cmp => {
     cmp.styles.forEach(style => {
       if (style.styleIdentifier && style.externalStyles.length > 0) {
-        styleImports.push(createStyleImport(cmp, style));
+        styleImports.push(createStyleImport(style));
       }
     });
   });
@@ -127,10 +127,10 @@ const addEsmStyleImports = (tsSourceFile: ts.SourceFile, moduleFile: d.Module) =
 };
 
 
-const createStyleImport = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+const createStyleImport = (style: d.StyleCompiler) => {
   const importName = ts.createIdentifier(style.styleIdentifier);
 
-  let importPath = getStyleImportPath(cmp, style);
+  let importPath = getStyleImportPath(style);
   if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('\\')) {
     importPath = './' + importPath;
   }
@@ -146,14 +146,10 @@ const createStyleImport = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler)
   );
 };
 
-export const getStyleImportPath = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+export const getStyleImportPath = (style: d.StyleCompiler) => {
   let importPath = style.externalStyles[0].originalComponentPath;
   if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('\\')) {
     importPath = './' + importPath;
-  }
-
-  if (cmp.encapsulation === 'scoped') {
-    importPath += '#scopedcss';
   }
 
   return importPath;

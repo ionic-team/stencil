@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { getCompileOptions, getCompilerConfig, getTransformOptions } from './browser-compile-options';
+import { getPublicCompilerMeta } from '../transformers/add-component-meta-static';
 import { initTypescript } from '../../sys/browser/browser-typescript';
 import { transpileModule } from '../transpile/transpile-module';
 
@@ -13,7 +14,8 @@ export const compile = async (code: string, opts: d.CompileOptions = {}): Promis
     inputFilePath: (typeof opts.file === 'string' ? opts.file.trim() : 'module.tsx'),
     outputFilePath: null,
     inputOptions: null,
-    imports: []
+    imports: [],
+    componentMeta: []
   };
 
   try {
@@ -38,10 +40,15 @@ export const compile = async (code: string, opts: d.CompileOptions = {}): Promis
       results.inputFilePath = transpileResults.sourceFilePath;
     }
 
-    results.outputFilePath = transpileResults.moduleFile.jsFilePath;
+    const moduleFile = transpileResults.moduleFile;
+    if (moduleFile) {
+      results.outputFilePath = moduleFile.jsFilePath;
 
-    if (transpileResults.moduleFile) {
-      transpileResults.moduleFile.originalImports.forEach(originalImport => {
+      moduleFile.cmps.forEach(cmp => {
+        results.componentMeta.push(getPublicCompilerMeta(cmp));
+      });
+
+      moduleFile.originalImports.forEach(originalImport => {
         results.imports.push({
           path: originalImport
         });

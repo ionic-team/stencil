@@ -16,6 +16,7 @@ export class AppRoot {
   bundledInput: HTMLTextAreaElement;
   htmlCodeInput: HTMLTextAreaElement;
   componentMetadata: HTMLSelectElement;
+  proxy: HTMLSelectElement;
   module: HTMLSelectElement;
   script: HTMLSelectElement;
   componentExport: HTMLSelectElement;
@@ -57,6 +58,7 @@ export class AppRoot {
       file: this.file.value,
       componentExport: this.componentExport.value,
       componentMetadata: this.componentMetadata.value,
+      proxy: this.componentMetadata.value,
       module: this.module.value,
       script: this.script.value,
       style: this.style.value
@@ -261,10 +263,17 @@ export class AppRoot {
               </select>
             </label>
             <label>
+              <span>Proxy:</span>
+              <select ref={el => this.proxy = el} onInput={this.compile.bind(this)}>
+                <option value="defineproperty">defineproperty</option>
+                <option value="">null</option>
+              </select>
+            </label>
+            <label>
               <span>Metadata:</span>
               <select ref={el => this.componentMetadata = el} onInput={this.compile.bind(this)}>
-                <option value="proxy">proxy</option>
-                <option value="static">static</option>
+                <option value="">null</option>
+                <option value="compilerstatic">compilerstatic</option>
               </select>
             </label>
           </div>

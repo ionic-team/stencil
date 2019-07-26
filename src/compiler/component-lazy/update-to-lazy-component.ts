@@ -20,6 +20,7 @@ export const updateToLazyComponent = async (config: d.Config, compilerCtx: d.Com
       coreImportPath: '@stencil/core',
       componentExport: null,
       componentMetadata: null,
+      proxy: null,
       scopeCss: false,
       style: 'inline'
     };
