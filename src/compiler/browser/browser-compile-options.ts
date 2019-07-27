@@ -25,7 +25,7 @@ const getConfig = (value: any, validValues: Set<string>, defaultValue: string) =
 };
 
 const VALID_PROXY = new Set(['defineproperty', null]);
-const VALID_METADATA = new Set(['runtimestatic', 'compilerstatic', null]);
+const VALID_METADATA = new Set(['compilerstatic', null]);
 const VALID_EXPORT = new Set(['customelement', 'module']);
 const VALID_STYLE = new Set(['import', 'inline']);
 const VALID_MODULE = new Set(['esm', 'cjs']);
