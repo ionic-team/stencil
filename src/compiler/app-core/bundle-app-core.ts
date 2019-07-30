@@ -39,6 +39,11 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
         stencilBuildConditionalsPlugin(build, config.fsNamespace),
         globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
+        config.sys.rollup.plugins.nodeResolve({
+          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
+          browser: true,
+          ...config.nodeResolve
+        }),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,
           sourceMap: false,
@@ -46,11 +51,6 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
         }),
         ...config.rollupPlugins,
         pluginHelper(config, buildCtx),
-        config.sys.rollup.plugins.nodeResolve({
-          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
-          browser: true,
-          ...config.nodeResolve
-        }),
         config.sys.rollup.plugins.json(),
         imagePlugin(config, buildCtx),
         inMemoryFsRead(config, compilerCtx),
