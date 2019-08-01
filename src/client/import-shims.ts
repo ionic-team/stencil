@@ -15,7 +15,7 @@ export const patchEsm = () => {
 export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => {
   // @ts-ignore
   const importMeta = import.meta.url;
-  const regex = new RegExp(`\/${NAMESPACE}(\.esm)?\.js$`);
+  const regex = new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`);
   const scriptElm = Array.from(doc.querySelectorAll('script')).find(s => (
     regex.test(s.src) ||
     s.getAttribute('data-namespace') === NAMESPACE
