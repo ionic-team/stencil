@@ -34,7 +34,7 @@ export class MarkdownTable {
 
 function escapeMarkdownTableColumn(text: string) {
   text = text.replace(/\r?\n/g, ' ');
-  text = text.replace(/\|/g, '\\|');
+  text = text.replace(/\|/g, 'or');
   return text;
 }
 
