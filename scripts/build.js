@@ -19,7 +19,7 @@ run(async () => {
   const scripts = [
     ['CLI', 'build-cli.js'],
     ['Compiler', 'build-compiler.js'],
-    ['Dev Sever', 'build-dev-server.js'],
+    ['Dev Server', 'build-dev-server.js'],
     ['Dev Server Client', 'build-dev-server-client.js'],
     ['Hydrate', 'build-hydrate.js'],
     ['Mock Doc', 'build-mock-doc.js'],
