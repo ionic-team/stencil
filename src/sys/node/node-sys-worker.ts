@@ -9,7 +9,7 @@ import { transpileToEs5Worker } from '../../compiler/transpile/transpile-to-es5-
 import { validateTypesWorker } from '../../compiler/transpile/validate-types-worker';
 
 
-const Terser = require('terser/dist/bundle.js');
+const Terser = require('terser/dist/bundle.min.js');
 
 
 export class NodeSystemWorker {
