@@ -49,7 +49,7 @@ async function getSystemLoader(config: d.Config, corePath: string, includePolyfi
 ${polyfills}
 
 var doc = document;
-var scriptElm = doc.querySelector('script[data-resources-url]');
+var scriptElm = doc.querySelector('script[data-stencil-namespace="${config.fsNamespace}"]') || doc.querySelector('script[data-resources-url]');
 if (!scriptElm) {
   var allScripts = doc.querySelectorAll('script');
   for (var x = allScripts.length - 1; x >= 0; x--) {
