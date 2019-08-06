@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { captializeFirstLetter } from '@utils';
+import { toTitleCase } from '@utils';
 
 export function usageToMarkdown(usages: d.JsonDocsUsage) {
   const content: string[] = [];
@@ -12,7 +12,7 @@ export function usageToMarkdown(usages: d.JsonDocsUsage) {
 
   merged.forEach(({name, text}) => {
     content.push('');
-    content.push(`### ${captializeFirstLetter(name)}`);
+    content.push(`### ${toTitleCase(name)}`);
     content.push('');
     content.push(text);
     content.push('');

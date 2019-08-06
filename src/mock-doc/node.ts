@@ -479,7 +479,7 @@ export class MockElement extends MockNode {
         if (attributes.caseInsensitive) {
           attrName = attrName.toLowerCase();
         }
-        attr = new MockAttr(attrName, value);
+        attr = new MockAttr(attrName, String(value));
         attributes.items.push(attr);
 
         if (checkAttrChanged === true) {

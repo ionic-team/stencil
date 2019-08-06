@@ -87,10 +87,13 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     const isCustomElement = elm.tagName.includes('-');
     if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {
-        if (isCustomElement) {
+        if (!isCustomElement) {
+          newValue = newValue == null ? '' : newValue;
+          if ((elm as any)[memberName] !== newValue) {
+            (elm as any)[memberName] = newValue;
+          }
+        } else {
           (elm as any)[memberName] = newValue;
-        } else if ((elm as any)[memberName] !== newValue || '') {
-          (elm as any)[memberName] = newValue || '';
         }
       } catch (e) {}
     }
