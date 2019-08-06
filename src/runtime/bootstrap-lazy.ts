@@ -24,6 +24,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   if (options.syncQueue) {
     plt.$flags$ |= PLATFORM_FLAGS.queueSync;
   }
+  if (BUILD.hydrateClientSide) {
+    // If the app is already hydrated there is not point to disable the
+    // async queue. This will improve the first input delay
+    plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
+  }
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
     const styles = doc.querySelectorAll('style[s-id]');
     let globalStyles = '';
