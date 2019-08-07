@@ -13,7 +13,10 @@ export const toTitleCase = (str: string) => str.charAt(0).toUpperCase() + str.sl
 
 export const noop = (): any => { /* noop*/ };
 
-export const isComplexType = (o: any) => ['object', 'function'].includes(typeof o);
+export const isComplexType = (o: any) => {
+  o = (typeof o)[0];
+  return o === 'o' || o === 'f';
+};
 
 export const sortBy = <T>(array: T[], prop: ((item: T) => string | number)) => {
   return array.slice().sort((a, b) => {
