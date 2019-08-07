@@ -84,19 +84,21 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     // Set property if it exists and it's not a SVG
     const isProp = isMemberInElement(elm, memberName);
     const isComplex = isComplexType(newValue);
-    const isCustomElement = elm.tagName.includes('-');
     if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {
-        if (!isCustomElement) {
-          newValue = newValue == null ? '' : newValue;
-          if ((elm as any)[memberName] !== newValue) {
-            (elm as any)[memberName] = newValue;
+        if (!elm.tagName.includes('-')) {
+          const n = newValue == null ? '' : newValue;
+
+          // Workaround for Safari, moving the <input> caret when re-assigning the same valued
+          if ((elm as any)[memberName] !== n) {
+            (elm as any)[memberName] = n;
           }
         } else {
           (elm as any)[memberName] = newValue;
         }
       } catch (e) {}
     }
+
 
     /**
      * Need to manually update attribute if:
