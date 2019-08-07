@@ -71,6 +71,9 @@ if (win.__stencil_cssshim) {
 } else {
   start();
 }
+
+// Note: using .call(window) here because the self-executing function needs
+// to be scoped to the window object for the ES6Promise polyfill to work
 }).call(window);
 `;
 }
