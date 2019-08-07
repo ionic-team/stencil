@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const { execSync, fork } = require('child_process');
+const { fork } = require('child_process');
 const Listr = require('listr');
 const color = require('ansi-colors');
 const { getBuildId, run } = require('./script-utils');
@@ -83,5 +83,6 @@ run(async () => {
     errors.forEach(err => {
       console.error(err);
     });
+    process.exit(1);
   }
 });
