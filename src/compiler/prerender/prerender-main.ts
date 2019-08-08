@@ -149,7 +149,7 @@ const startProgressLogger = (): d.ProgressLogger => {
     return promise = promise.then(() => {
       return new Promise<any>(resolve => {
         readline.clearLine(process.stdout, 0);
-        readline.cursorTo(process.stdout, 0, 0);
+        readline.cursorTo(process.stdout, 0, null);
         process.stdout.write(text, resolve);
       });
     });
