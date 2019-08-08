@@ -7,28 +7,15 @@ import { getStyleImportPath } from '../static-to-meta/styles';
 import { HTML_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { transformHostData } from '../host-data-transform';
+import { updateComponentClass } from '../update-component-class';
 import { updateNativeConstructor } from './native-constructor';
 import ts from 'typescript';
 
 
-export const updateNativeComponentClass = (transformOpts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta, removeExport: boolean) => {
-  let modifiers = Array.isArray(classNode.modifiers) ? classNode.modifiers.slice() : [];
-
-  if (removeExport) {
-    modifiers = modifiers.filter(m => {
-      return m.kind !== ts.SyntaxKind.ExportKeyword;
-    });
-  }
-
-  return ts.updateClassDeclaration(
-    classNode,
-    classNode.decorators,
-    modifiers,
-    classNode.name,
-    classNode.typeParameters,
-    updateNativeHostComponentHeritageClauses(classNode, moduleFile),
-    updateNativeHostComponentMembers(transformOpts, classNode, moduleFile, cmp)
-  );
+export const updateNativeComponentClass = (transformOpts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
+  const heritageClauses = updateNativeHostComponentHeritageClauses(classNode, moduleFile);
+  const members = updateNativeHostComponentMembers(transformOpts, classNode, moduleFile, cmp);
+  return updateComponentClass(transformOpts, classNode, heritageClauses, members);
 };
 
 

@@ -5,20 +5,14 @@ import { createStaticGetter } from '../transform-utils';
 import { getStyleTextPlaceholder } from '../../app-core/component-styles';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { transformHostData } from '../host-data-transform';
+import { updateComponentClass } from '../update-component-class';
 import { updateLazyComponentConstructor } from './lazy-constructor';
 import ts from 'typescript';
 
 
-export const updateLazyComponentClass = (opts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
-  return ts.updateClassDeclaration(
-    classNode,
-    classNode.decorators,
-    classNode.modifiers,
-    classNode.name,
-    classNode.typeParameters,
-    classNode.heritageClauses,
-    updateLazyComponentMembers(opts, classNode, moduleFile, cmp)
-  );
+export const updateLazyComponentClass = (transformOpts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
+  const members = updateLazyComponentMembers(transformOpts, classNode, moduleFile, cmp);
+  return updateComponentClass(transformOpts, classNode, classNode.heritageClauses, members);
 };
 
 

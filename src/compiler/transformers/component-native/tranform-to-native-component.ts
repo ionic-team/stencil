@@ -53,8 +53,6 @@ export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, build
 
 
 export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
-  const exportAsCustomElement = (transformOpts.componentExport === 'customelement');
-
   return transformCtx => {
 
     return tsSourceFile => {
@@ -64,7 +62,7 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateNativeComponentClass(transformOpts, node, moduleFile, cmp, exportAsCustomElement);
+            return updateNativeComponentClass(transformOpts, node, moduleFile, cmp);
           }
         }
 
@@ -74,8 +72,8 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
       tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
       if (moduleFile.cmps.length > 0) {
-        if (exportAsCustomElement) {
-          // define custom element, and remove "export" from components
+        if (transformOpts.componentExport === 'customelement') {
+          // define custom element, will have no export
           tsSourceFile = defineCustomElement(tsSourceFile, moduleFile, transformOpts);
 
         } else if (transformOpts.proxy === 'defineproperty') {
