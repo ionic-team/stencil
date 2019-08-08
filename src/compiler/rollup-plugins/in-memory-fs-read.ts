@@ -66,7 +66,7 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx): Pl
     async load(sourcePath: string) {
       if (/\.tsx?$/i.test(sourcePath)) {
         this.warn({
-          message: `An import was resolved to a Tyepscript file (${sourcePath}) but Rollup treated it as Javascript. You should instead resolve to the absolute path of its transpiled Javascript equivalent (${path.resolve(sourcePath.replace(/\.tsx?/i, '.js'))}).`,
+          message: `An import was resolved to a Typescript file (${sourcePath}) but Rollup treated it as Javascript. You should instead resolve to the absolute path of its transpiled Javascript equivalent (${path.resolve(sourcePath.replace(/\.tsx?/i, '.js'))}).`,
         });
       }
 
