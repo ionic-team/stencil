@@ -83,8 +83,8 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       let style = Cstr.style;
       let scopeId = getScopeId(cmpMeta.$tagName$, hostRef.$modeName$);
 
-      const shadowCssPolyfill = (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim);
-      const runtimeScopedCss = (BUILD.runtimeScopeCss && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation);
+      const shadowCssPolyfill = BUILD.shadowDom ? cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim : false;
+      const runtimeScopedCss = BUILD.runtimeScopeCss ? cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation : false;
 
       if (!BUILD.hydrateServerSide && (shadowCssPolyfill || runtimeScopedCss)) {
         style = await import('../utils/shadow-css').then(m => m.scopeCss(style, scopeId, false));
