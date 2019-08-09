@@ -16,7 +16,7 @@ export const noop = (): any => { /* noop*/ };
 export const isComplexType = (o: any) => {
   // https://jsperf.com/typeof-fn-object/5
   o = typeof o;
-  return o === 'o' || o === 'f';
+  return o === 'object' || o === 'function';
 };
 
 export const sortBy = <T>(array: T[], prop: ((item: T) => string | number)) => {
