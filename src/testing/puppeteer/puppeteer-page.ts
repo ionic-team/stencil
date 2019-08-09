@@ -64,7 +64,7 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
 
     const getDocHandle = async () => {
       if (!docPromise) {
-        docPromise = page.evaluateHandle('document');
+        docPromise = page.evaluateHandle(() => document);
       }
       const documentJsHandle = await docPromise;
       return documentJsHandle.asElement();

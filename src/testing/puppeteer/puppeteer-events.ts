@@ -21,11 +21,11 @@ export async function initPageEvents(page: pd.E2EPageInternal) {
 async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selector: 'window' | 'document') {
   const eventSpy = new EventSpy(eventName);
 
-  if (selector !== 'document') {
-    selector = 'window';
-  }
+  const handler = (selector !== 'document')
+    ? () => window
+    : () => document;
 
-  const handle = await page.evaluateHandle(selector);
+  const handle = await page.evaluateHandle(handler);
 
   await addE2EListener(page, handle, eventName, (ev: any) => {
     eventSpy.events.push(ev);
