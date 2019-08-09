@@ -14,7 +14,8 @@ export const toTitleCase = (str: string) => str.charAt(0).toUpperCase() + str.sl
 export const noop = (): any => { /* noop*/ };
 
 export const isComplexType = (o: any) => {
-  o = (typeof o)[0];
+  // https://jsperf.com/typeof-fn-object/5
+  o = typeof o;
   return o === 'o' || o === 'f';
 };
 
