@@ -12,7 +12,8 @@ function buildCoreJs() {
       'es',
       'web.url',
       'web.url.to-json',
-      'web.url-search-params'
+      'web.url-search-params',
+      'web.dom-collections.for-each'
     ],
     blacklist: [
       'es.math',
