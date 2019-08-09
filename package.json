@@ -76,7 +76,7 @@
     "@types/parse5": "^5.0.0",
     "@types/pixelmatch": "^4.0.0",
     "@types/pngjs": "^3.3.2",
-    "@types/puppeteer": "~1.12.4",
+    "@types/puppeteer": "~1.19.0",
     "@types/semver": "^6.0.1",
     "@types/ws": "^6.0.1",
     "ansi-colors": "4.1.1",
@@ -127,7 +127,7 @@
   },
   "lazyDependencies": {
     "@types/jest": "~24.0.13",
-    "@types/puppeteer": "^1.12.4",
+    "@types/puppeteer": "~1.19.0",
     "jest": "~24.8.0",
     "jest-cli": "~24.8.0",
     "pixelmatch": "4.0.2",
