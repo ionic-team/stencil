@@ -19,6 +19,7 @@ export class AppRoot {
   proxy: HTMLSelectElement;
   module: HTMLSelectElement;
   script: HTMLSelectElement;
+  style: HTMLSelectElement;
   componentExport: HTMLSelectElement;
   build: HTMLSelectElement;
   fileTemplate: HTMLSelectElement;
@@ -57,9 +58,10 @@ export class AppRoot {
       file: this.file.value,
       componentExport: this.componentExport.value,
       componentMetadata: this.componentMetadata.value,
-      proxy: this.componentMetadata.value,
+      proxy: this.proxy.value,
       module: this.module.value,
-      script: this.script.value
+      script: this.script.value,
+      style: this.style.value
     };
 
     const results = await stencil.compile(this.sourceCodeInput.value, opts);
@@ -252,6 +254,13 @@ export class AppRoot {
                 <option value="es5">es5</option>
                 <option value="latest">latest</option>
                 <option value="esnext">esnext</option>
+              </select>
+            </label>
+            <label>
+              <span>Style:</span>
+              <select ref={el => this.style = el} onInput={this.compile.bind(this)}>
+                <option value="static">static</option>
+                <option value="">null</option>
               </select>
             </label>
             <label>

@@ -24,4 +24,5 @@ export interface TransformOptions extends ts.CompilerOptions {
   componentExport: 'lazy' | 'native' | 'customelement' | null;
   componentMetadata: 'runtimestatic' | 'compilerstatic' | null;
   proxy: 'defineproperty' | null;
+  style: 'static' | null;
 }

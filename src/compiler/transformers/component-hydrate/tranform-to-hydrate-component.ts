@@ -15,7 +15,8 @@ export const transformToHydrateComponentText = (compilerCtx: d.CompilerCtx, buil
       coreImportPath: '@stencil/core',
       componentExport: null,
       componentMetadata: null,
-      proxy: null
+      proxy: null,
+      style: 'static'
     };
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {

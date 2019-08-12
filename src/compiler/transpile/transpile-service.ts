@@ -120,7 +120,8 @@ const buildTsService = async (config: d.Config, compilerCtx: d.CompilerCtx, buil
         coreImportPath: '@stencil/core',
         componentExport: null,
         componentMetadata: null,
-        proxy: null
+        proxy: null,
+        style: 'static'
       };
 
       return {

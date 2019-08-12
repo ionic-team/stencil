@@ -17,7 +17,8 @@ export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, build
     coreImportPath: '@stencil/core',
     componentExport: null,
     componentMetadata: null,
-    proxy: null
+    proxy: null,
+    style: 'static'
   };
 
   try {

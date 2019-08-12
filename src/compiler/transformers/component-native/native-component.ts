@@ -13,7 +13,7 @@ import ts from 'typescript';
 
 export const updateNativeComponentClass = (transformOpts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   const heritageClauses = updateNativeHostComponentHeritageClauses(classNode, moduleFile);
-  const members = updateNativeHostComponentMembers(classNode, moduleFile, cmp);
+  const members = updateNativeHostComponentMembers(transformOpts, classNode, moduleFile, cmp);
   return updateComponentClass(transformOpts, classNode, heritageClauses, members);
 };
 
@@ -39,14 +39,18 @@ const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration
 };
 
 
-const updateNativeHostComponentMembers = (classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
+const updateNativeHostComponentMembers = (transformOpts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateNativeConstructor(classMembers, moduleFile, cmp, true);
   addNativeConnectedCallback(classMembers, cmp);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
-  addNativeStaticStyle(classMembers, cmp);
+
+  if (transformOpts.style === 'static') {
+    addNativeStaticStyle(classMembers, cmp);
+  }
+
   transformHostData(classMembers, moduleFile);
 
   return classMembers;

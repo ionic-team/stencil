@@ -20,7 +20,8 @@ export const updateToLazyComponent = async (config: d.Config, compilerCtx: d.Com
       coreImportPath: '@stencil/core',
       componentExport: null,
       componentMetadata: null,
-      proxy: null
+      proxy: null,
+      style: 'static'
     };
     outputJsText = transformToLazyComponentText(compilerCtx, buildCtx, transformOpts, cmp, inputText);
 

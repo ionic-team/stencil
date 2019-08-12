@@ -23,7 +23,7 @@ export const compile = async (code: string, opts: d.CompileOptions = {}): Promis
     const config = getCompilerConfig();
     r.inputOptions = getCompileOptions(opts, r.inputFilePath);
 
-    if (r.inputOptions.type === 'ts') {
+    if (r.inputOptions.type === 'tsx' || r.inputOptions.type === 'ts' || r.inputOptions.type === 'jsx') {
       initTypescript();
 
       const transformOpts = getTransformOptions(r.inputOptions);
