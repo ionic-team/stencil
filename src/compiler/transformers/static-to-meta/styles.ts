@@ -1,11 +1,11 @@
 import * as d from '../../../declarations';
-import { DEFAULT_STYLE_MODE, dashToPascalCase, sortBy } from '@utils';
+import { DEFAULT_STYLE_MODE, sortBy } from '@utils';
 import { ConvertIdentifier, getStaticValue } from '../transform-utils';
 import { normalizeStyles } from '../../style/normalize-styles';
 import ts from 'typescript';
 
 
-export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions, tagName: string, componentFilePath: string, isCollectionDependency: boolean, staticMembers: ts.ClassElement[]) => {
+export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, tagName: string, componentFilePath: string, isCollectionDependency: boolean, staticMembers: ts.ClassElement[]) => {
   const styles: d.StyleCompiler[] = [];
   const styleUrlsProp = isCollectionDependency ? 'styleUrls' : 'originalStyleUrls';
   const parsedStyleUrls = getStaticValue(staticMembers, styleUrlsProp) as d.CompilerModeStyles;
@@ -31,16 +31,7 @@ export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, 
       }
 
     } else if ((parsedStyle as ConvertIdentifier).__identifier) {
-      styles.push({
-        modeName: DEFAULT_STYLE_MODE,
-        styleId: null,
-        styleStr: null,
-        styleIdentifier: (parsedStyle as ConvertIdentifier).__escapedText,
-        compiledStyleText: null,
-        compiledStyleTextScoped: null,
-        compiledStyleTextScopedCommented: null,
-        externalStyles: []
-      });
+      styles.push(parseStyleIdentifier(parsedStyle));
       compilerCtx.styleModeNames.add(DEFAULT_STYLE_MODE);
     }
   }
@@ -62,9 +53,9 @@ export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, 
       if (externalStyles.length > 0) {
         const style: d.StyleCompiler = {
           modeName: modeName,
+          styleId: null,
           styleStr: null,
           styleIdentifier: null,
-          styleId: null,
           compiledStyleText: null,
           compiledStyleTextScoped: null,
           compiledStyleTextScopedCommented: null,
@@ -73,12 +64,6 @@ export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, 
 
         styles.push(style);
         compilerCtx.styleModeNames.add(modeName);
-
-        if (transformOpts.style === 'import') {
-          style.styleIdentifier = dashToPascalCase(tagName) + 'Style';
-          style.styleIdentifier = style.styleIdentifier.charAt(0).toLowerCase() + style.styleIdentifier.substring(1);
-          style.externalStyles = [style.externalStyles[0]];
-        }
       }
     });
   }
@@ -88,69 +73,16 @@ export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, 
   return sortBy(styles, s => s.modeName);
 };
 
-export const addStyleImports = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, moduleFile: d.Module) => {
-  if (transformOpts.module === ts.ModuleKind.CommonJS) {
-    // require() already added within static get style()
-    return tsSourceFile;
-  }
-
-  return addEsmStyleImports(tsSourceFile, moduleFile);
-};
-
-const addEsmStyleImports = (tsSourceFile: ts.SourceFile, moduleFile: d.Module) => {
-  const styleImports: ts.Statement[] = [];
-
-  moduleFile.cmps.forEach(cmp => {
-    cmp.styles.forEach(style => {
-      if (style.styleIdentifier && style.externalStyles.length > 0) {
-        styleImports.push(createStyleImport(style));
-      }
-    });
-  });
-
-  if (styleImports.length > 0) {
-    const sourceFileImports = tsSourceFile.statements.slice();
-    let lastImportIndex = -1;
-
-    for (let i = 0; i < sourceFileImports.length; i++) {
-      if (ts.isImportDeclaration(sourceFileImports[i])) {
-        lastImportIndex = i;
-      }
-    }
-
-    sourceFileImports.splice(lastImportIndex + 1, 0, ...styleImports);
-
-    return ts.updateSourceFileNode(tsSourceFile, sourceFileImports);
-  }
-
-  return tsSourceFile;
-};
-
-
-const createStyleImport = (style: d.StyleCompiler) => {
-  const importName = ts.createIdentifier(style.styleIdentifier);
-
-  let importPath = getStyleImportPath(style);
-  if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('\\')) {
-    importPath = './' + importPath;
-  }
-
-  return ts.createImportDeclaration(
-    undefined,
-    undefined,
-    ts.createImportClause(
-      importName,
-      undefined
-    ),
-    ts.createLiteral(importPath)
-  );
-};
-
-export const getStyleImportPath = (style: d.StyleCompiler) => {
-  let importPath = style.externalStyles[0].originalComponentPath;
-  if (!importPath.startsWith('.') && !importPath.startsWith('/') && !importPath.startsWith('\\')) {
-    importPath = './' + importPath;
-  }
-
-  return importPath;
+const parseStyleIdentifier = (parsedStyle: ConvertIdentifier) => {
+  const style: d.StyleCompiler = {
+    modeName: DEFAULT_STYLE_MODE,
+    styleId: null,
+    styleStr: null,
+    styleIdentifier: parsedStyle.__escapedText,
+    compiledStyleText: null,
+    compiledStyleTextScoped: null,
+    compiledStyleTextScopedCommented: null,
+    externalStyles: []
+  };
+  return style;
 };

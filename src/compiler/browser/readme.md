@@ -33,7 +33,6 @@ Since TypeScript is used, the compiler is able to transpile from TypeScript to J
 | `file`              | The filename of the code being compiled. | `module.tsx` |
 | `module`            | Module format of compiled code, which can be either `esm` or `cjs`. | `esm` |
 | `script`            | The JavaScript source target to transpile to. Values can be `latest`, `esnext`, `es2017`, `es2015`, or `es5`. | `es2017` |
-| `style`             | How component styles are associated to the component. The `import` value will update the `styleUrl` value to be an import. The `inline` value will inline the styles into the static style getter. | `import` |
 | `componentExport`   | A component can be defined as a custom element by using `customelement`, or the component class can be exported by using `module`. | `customelement` |
 | `componentMetadata` | Sets how and if component metadata should be assigned on the compiled component output. The `compilerstatic` value will set the metadata to a static `COMPILER_META` getter on the component class. | `null` |
 | `proxy`             | Sets how and if any properties, methods and events are proxied on the component class. The `defineproperty` value sets the getters and setters using Object.defineProperty. | `defineproperty` |

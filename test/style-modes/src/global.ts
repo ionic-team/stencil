@@ -1,6 +1,6 @@
 import { setMode } from "@stencil/core";
 
-
-export default function() {
+const global = () => {
   setMode((elm: any) => elm.mode || elm.getAttribute('mode') || document.documentElement.getAttribute('mode') || 'buford');
-}
+};
+export default global;

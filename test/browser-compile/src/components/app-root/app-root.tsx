@@ -1,5 +1,5 @@
 import { Component, Host, h, State } from '@stencil/core';
-import { cssPlugin } from '../../utils/rollup-css-plugin';
+import { cssTemplatePlugin } from '../../utils/css-template-plugin';
 import { loadDeps } from '../../utils/load-deps';
 import { templates, templateList } from '../../utils/templates';
 
@@ -20,7 +20,6 @@ export class AppRoot {
   module: HTMLSelectElement;
   script: HTMLSelectElement;
   componentExport: HTMLSelectElement;
-  style: HTMLSelectElement;
   build: HTMLSelectElement;
   fileTemplate: HTMLSelectElement;
   iframe: HTMLIFrameElement;
@@ -60,8 +59,7 @@ export class AppRoot {
       componentMetadata: this.componentMetadata.value,
       proxy: this.componentMetadata.value,
       module: this.module.value,
-      script: this.script.value,
-      style: this.style.value
+      script: this.script.value
     };
 
     const results = await stencil.compile(this.sourceCodeInput.value, opts);
@@ -101,6 +99,7 @@ export class AppRoot {
       input: entryId,
       treeshake: true,
       plugins: [
+        stencil.rollupPlugin(),
         {
           resolveId: (importee: string, importer: string) => {
             console.log('bundle resolveId, importee:', importee, 'importer:', importer);
@@ -130,11 +129,11 @@ export class AppRoot {
           },
           load: (id: string) => {
             console.log('bundle load:', id);
-            const code = this.fs.get(id);
+            const code = this.fs.get(id.split('?')[0]);
             return code;
           }
         },
-        cssPlugin()
+        cssTemplatePlugin
       ],
       onwarn(warning: any) {
 				console.group(warning.loc ? warning.loc.file : '');
@@ -253,13 +252,6 @@ export class AppRoot {
                 <option value="es5">es5</option>
                 <option value="latest">latest</option>
                 <option value="esnext">esnext</option>
-              </select>
-            </label>
-            <label>
-              <span>Style:</span>
-              <select ref={el => this.style = el} onInput={this.compile.bind(this)}>
-                <option value="import">import</option>
-                <option value="inline">inline</option>
               </select>
             </label>
             <label>

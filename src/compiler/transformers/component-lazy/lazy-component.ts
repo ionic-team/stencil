@@ -11,12 +11,12 @@ import ts from 'typescript';
 
 
 export const updateLazyComponentClass = (transformOpts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
-  const members = updateLazyComponentMembers(transformOpts, classNode, moduleFile, cmp);
+  const members = updateLazyComponentMembers(classNode, moduleFile, cmp);
   return updateComponentClass(transformOpts, classNode, classNode.heritageClauses, members);
 };
 
 
-const updateLazyComponentMembers = (transformOpts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
+const updateLazyComponentMembers = (classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateLazyComponentConstructor(classMembers, moduleFile, cmp);
@@ -24,9 +24,7 @@ const updateLazyComponentMembers = (transformOpts: d.TransformOptions, classNode
   addWatchers(classMembers, cmp);
   transformHostData(classMembers, moduleFile);
 
-  if (transformOpts.style === 'inline') {
-    addComponentStylePlaceholders(classMembers, cmp);
-  }
+  addComponentStylePlaceholders(classMembers, cmp);
 
   return classMembers;
 };

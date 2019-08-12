@@ -70,6 +70,8 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx): Pl
         });
       }
 
+      sourcePath = sourcePath.split('?')[0];
+
       return compilerCtx.fs.readFile(sourcePath);
     }
   };

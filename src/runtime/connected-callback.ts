@@ -36,7 +36,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         hostId = elm.getAttribute(HYDRATE_ID);
         if (hostId) {
           if (BUILD.shadowDom && supportsShadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
-            const scopeId = addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode'));
+            const scopeId = BUILD.mode ?  addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode')) : addStyle(elm.shadowRoot, cmpMeta);
             elm.classList.remove(scopeId + '-h');
             elm.classList.remove(scopeId + '-s');
           }
@@ -113,15 +113,7 @@ const setContentReference = (elm: d.HostElement, contentRefElm?: d.RenderNode) =
   // let's pick out the inner content for slot projection
   // create a node to represent where the original
   // content was first placed, which is useful later on
-  let crName: string;
-  if (BUILD.isDebug) {
-    crName = `content-ref:${elm.tagName}`;
-
-  } else {
-    crName = '';
-  }
-
-  contentRefElm = elm['s-cr'] = (doc.createComment(crName) as any);
+  contentRefElm = elm['s-cr'] = (doc.createComment(BUILD.isDebug ? `content-ref:${elm.tagName}` : '') as any);
   contentRefElm['s-cn'] = true;
   elm.insertBefore(contentRefElm, elm.firstChild);
 };

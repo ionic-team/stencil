@@ -10,7 +10,10 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   if (BUILD.taskQueue && BUILD.updatable) {
     hostRef.$flags$ |= HOST_FLAGS.isQueuedForUpdate;
   }
+
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
+  const update = () => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
+
   let promise: Promise<void>;
   if (isInitialLoad) {
     if (BUILD.hostListener) {
@@ -41,7 +44,6 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   // there is no ancestorc omponent or the ancestor component
   // has already fired off its lifecycle update then
   // fire off the initial update
-  const update = () => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
   return then(promise, BUILD.taskQueue
     ? () => writeTask(update)
     : update

@@ -35,3 +35,11 @@ export interface CssImportData {
   altFilePath?: string;
   styleText?: string;
 }
+
+
+export interface CssToEsmImportData {
+  srcImportText: string;
+  varName: string;
+  url: string;
+  filePath: string;
+}

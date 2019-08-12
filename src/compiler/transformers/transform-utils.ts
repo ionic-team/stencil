@@ -236,10 +236,7 @@ export const objectLiteralToObjectMap = (objectLiteral: ts.ObjectLiteralExpressi
         } else if (escapedText === 'null') {
           val = null;
         } else {
-          val = {
-            __identifier: true,
-            __escapedText: escapedText
-          } as ConvertIdentifier;
+          val = getIdentifierValue(attr.initializer as ts.Identifier);
         }
         break;
 
@@ -252,6 +249,17 @@ export const objectLiteralToObjectMap = (objectLiteral: ts.ObjectLiteralExpressi
     return final;
 
   }, <ObjectMap>{});
+};
+
+const getIdentifierValue = (initializer: ts.Identifier) => {
+  const escapedText = initializer.escapedText as string;
+
+  const identifier: ConvertIdentifier = {
+    __identifier: true,
+    __escapedText: escapedText
+  };
+
+  return identifier;
 };
 
 const getTextOfPropertyName = (propName: ts.PropertyName) => {

@@ -3,6 +3,20 @@ import { normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
 
+export function hasGlobalScriptPaths(config: d.Config, compilerCtx: d.CompilerCtx) {
+  if (typeof config.globalScript === 'string') {
+    const mod = compilerCtx.moduleMap.get(config.globalScript);
+    if (mod != null && mod.jsFilePath) {
+      return true;
+    }
+  }
+
+  return compilerCtx.collections.some(collection => {
+    return (collection.global != null && typeof collection.global.jsFilePath === 'string');
+  });
+}
+
+
 export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx): Plugin {
   const globalPaths: string[] = [];
 
@@ -34,9 +48,10 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
 
         return [
           ...imports,
-          'export default function() {',
+          `const globals = () => {`,
           ...globalPaths.map((_, i) => `  global${i}();`),
-          '}'
+          `};`,
+          `export default globals;`
         ].join('\n');
       }
       return null;
@@ -46,7 +61,7 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
         const program = this.parse(code, {});
         const needsDefault = !program.body.some(s => s.type === 'ExportDefaultDeclaration');
         const defaultExport = needsDefault
-          ? '\nexport default function(){}'
+          ? '\nexport const globalFn = () => {};\nexport default globalFn;'
           : '';
         return INJECT_CONTEXT + code + defaultExport;
       }

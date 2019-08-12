@@ -4,12 +4,6 @@ import { CMP_FLAGS } from '@utils';
 import { cssVarShim, doc, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
 import { HYDRATE_ID, NODE_TYPE } from './runtime-constants';
 
-declare global {
-  export interface CSSStyleSheet {
-    replaceSync(cssText: string): void;
-    replace(cssText: string): Promise<CSSStyleSheet>;
-  }
-}
 
 const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/new WeakMap();
 
@@ -24,8 +18,8 @@ export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean
   styles.set(scopeId, style);
 };
 
-export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMeta, mode: string, hostElm?: HTMLElement) => {
-  let scopeId = getScopeId(cmpMeta.$tagName$, mode);
+export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMeta, mode?: string, hostElm?: HTMLElement) => {
+  let scopeId = BUILD.mode ? getScopeId(cmpMeta.$tagName$, mode) : getScopeId(cmpMeta.$tagName$);
   let style = styles.get(scopeId);
 
   // if an element is NOT connected then getRootNode() will return the wrong root node
@@ -95,7 +89,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
 
 export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string) => {
 
-  const styleId = addStyle(
+  const scopeId = addStyle(
     (BUILD.shadowDom && supportsShadowDom && elm.shadowRoot)
       ? elm.shadowRoot
       : elm.getRootNode(), cmpMeta, mode, elm);
@@ -108,11 +102,11 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     // create a node to represent where the original
     // content was first placed, which is useful later on
     // DOM WRITE!!
-    elm['s-sc'] = styleId;
-    elm.classList.add(styleId + '-h');
+    elm['s-sc'] = scopeId;
+    elm.classList.add(scopeId + '-h');
 
     if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
-      elm.classList.add(styleId + '-s');
+      elm.classList.add(scopeId + '-s');
     }
   }
 };
@@ -123,3 +117,11 @@ export const getScopeId = (tagName: string, mode?: string) =>
 
 export const convertScopedToShadow = (css: string) =>
   css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');
+
+
+declare global {
+  export interface CSSStyleSheet {
+    replaceSync(cssText: string): void;
+    replace(cssText: string): Promise<CSSStyleSheet>;
+  }
+}
