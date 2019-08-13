@@ -24,7 +24,6 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     outputAngular(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
 
-    // outputSelfContainedWebComponents(config, compilerCtx, buildCtx),
     buildCtx.stylesPromise
   ]);
 
