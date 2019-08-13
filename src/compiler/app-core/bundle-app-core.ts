@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { createOnWarnFn, getDependencies, loadRollupDiagnostics } from '@utils';
+import { cssTransformer } from '../rollup-plugins/css-transformer';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { loaderPlugin } from '../rollup-plugins/loader';
 import { imagePlugin } from '../rollup-plugins/image-plugin';
@@ -53,6 +54,7 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
         }),
         config.sys.rollup.plugins.json(),
         imagePlugin(config, buildCtx),
+        cssTransformer(buildCtx),
         inMemoryFsRead(config, compilerCtx),
         config.sys.rollup.plugins.replace({
           'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'

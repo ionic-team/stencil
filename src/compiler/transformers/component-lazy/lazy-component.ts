@@ -24,7 +24,7 @@ const updateLazyComponentMembers = (transformOpts: d.TransformOptions, classNode
   addWatchers(classMembers, cmp);
   transformHostData(classMembers, moduleFile);
 
-  if (transformOpts.style === 'inline') {
+  if (transformOpts.style === 'static') {
     addComponentStylePlaceholders(classMembers, cmp);
   }
 

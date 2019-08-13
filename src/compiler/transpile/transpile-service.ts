@@ -121,8 +121,7 @@ const buildTsService = async (config: d.Config, compilerCtx: d.CompilerCtx, buil
         componentExport: null,
         componentMetadata: null,
         proxy: null,
-        scopeCss: false,
-        style: 'inline'
+        style: 'static'
       };
 
       return {

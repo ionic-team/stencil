@@ -21,8 +21,7 @@ export const updateToLazyComponent = async (config: d.Config, compilerCtx: d.Com
       componentExport: null,
       componentMetadata: null,
       proxy: null,
-      scopeCss: false,
-      style: 'inline'
+      style: 'static'
     };
     outputJsText = transformToLazyComponentText(compilerCtx, buildCtx, transformOpts, cmp, inputText);
 

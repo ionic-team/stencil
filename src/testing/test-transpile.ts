@@ -24,9 +24,7 @@ const DEFAULT_TRANSFORM_OPTS: d.TransformOptions = {
   componentExport: null,
   componentMetadata: 'compilerstatic',
   proxy: null,
-  scopeCss: false,
-  style: null,
-  transformOutput: 'lazy'
+  style: null
 };
 
 

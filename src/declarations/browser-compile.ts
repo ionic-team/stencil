@@ -7,7 +7,9 @@ export interface CompileOptions {
   module?: 'cjs' | 'esm' | string;
   componentExport?: 'customelement' | 'module' | string | undefined;
   script?: CompileScript;
-  style?: 'import' | 'inline' | string | undefined;
+  style?: 'static' | string | undefined;
+  type?: StencilDataType;
+  data?: d.StencilComponentData;
 }
 
 export interface CompileResults {
@@ -29,14 +31,21 @@ export interface CompileScriptMinifyOptions {
 
 export type CompileScript = 'latest' | 'esnext' | 'es2017' | 'es2015' | 'es5' | string | undefined;
 
+export type StencilDataType = 'css' | 'js' | 'ts' | 'tsx' | 'jsx' | 'dts';
 
-export interface ScopeCssOptions {
-  commentOriginalSelector?: boolean;
-  mode?: string;
+export interface ResolvedStencilData {
+  type: StencilDataType;
+  resolvedId: string;
+  filePath: string;
+  fileName: string;
+  data: StencilComponentData;
+  importee: string;
+  importer: string;
 }
 
-export interface ScopeCssResults {
-  diagnostics: d.Diagnostic[];
-  code: string;
-  map: any;
+export interface StencilComponentData {
+  tag: string;
+  scopeId: string;
+  encapsulation?: string;
+  mode?: string;
 }

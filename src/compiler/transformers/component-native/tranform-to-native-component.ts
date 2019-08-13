@@ -1,13 +1,13 @@
 import * as d from '../../../declarations';
 import { addImports } from '../add-imports';
+import { addLegacyApis } from '../core-runtime-apis';
 import { addModuleMetadataProxies } from '../add-component-meta-proxy';
-import { addStyleImports } from '../static-to-meta/styles';
 import { getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { defineCustomElement } from '../define-custom-element';
 import { updateNativeComponentClass } from './native-component';
+import { updateStyleImports } from '../style-imports';
 import ts from 'typescript';
-import { addLegacyApis } from '../core-runtime-apis';
 
 
 export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) => {
@@ -18,8 +18,7 @@ export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, build
     componentExport: null,
     componentMetadata: null,
     proxy: null,
-    scopeCss: false,
-    style: 'inline'
+    style: 'static'
   };
 
   try {
@@ -81,9 +80,7 @@ export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOp
           tsSourceFile = addModuleMetadataProxies(tsSourceFile, moduleFile);
         }
 
-        if (transformOpts.style === 'import') {
-          tsSourceFile = addStyleImports(transformOpts, tsSourceFile, moduleFile);
-        }
+        tsSourceFile = updateStyleImports(transformOpts, tsSourceFile, moduleFile);
       }
 
       if (moduleFile.isLegacy) {

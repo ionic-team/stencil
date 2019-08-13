@@ -1,9 +1,8 @@
 import * as d from '../../../declarations';
 import { addNativeConnectedCallback } from './native-connected-callback';
 import { addNativeElementGetter } from './native-element-getter';
+import { addNativeStaticStyle } from './native-static-style';
 import { addWatchers } from '../watcher-meta-transform';
-import { createStaticGetter } from '../transform-utils';
-import { getStyleImportPath } from '../static-to-meta/styles';
 import { HTML_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { transformHostData } from '../host-data-transform';
@@ -47,39 +46,12 @@ const updateNativeHostComponentMembers = (transformOpts: d.TransformOptions, cla
   addNativeConnectedCallback(classMembers, cmp);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
-  addStaticStyle(transformOpts, classMembers, cmp);
+
+  if (transformOpts.style === 'static') {
+    addNativeStaticStyle(classMembers, cmp);
+  }
+
   transformHostData(classMembers, moduleFile);
 
   return classMembers;
-};
-
-export const addStaticStyle = (transformOpts: d.TransformOptions, classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
-  if (!cmp.hasStyle) {
-    return;
-  }
-  const style = cmp.styles[0];
-  if (style == null) {
-    return;
-  }
-
-  if (typeof style.styleStr === 'string') {
-    classMembers.push(createStaticGetter('style', ts.createStringLiteral(style.styleStr)));
-
-  } else if (typeof style.styleIdentifier === 'string') {
-    let rtnExpr: ts.Expression;
-
-    if (transformOpts.module === ts.ModuleKind.CommonJS && style.externalStyles.length > 0) {
-      const importPath = getStyleImportPath(style);
-
-      rtnExpr = ts.createCall(
-        ts.createIdentifier('require'),
-        undefined,
-        [ ts.createStringLiteral(importPath) ]
-      );
-
-    } else {
-      rtnExpr = ts.createIdentifier(style.styleIdentifier);
-    }
-    classMembers.push(createStaticGetter('style', rtnExpr));
-  }
 };
