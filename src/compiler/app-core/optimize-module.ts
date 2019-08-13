@@ -69,7 +69,6 @@ export const getTerserOptions = (sourceTarget: d.SourceTarget, isDebug: boolean)
       keep_fargs: false,
       passes: 2,
       pure_funcs: [
-        'console.log',
         'console.debug'
       ]
     };
