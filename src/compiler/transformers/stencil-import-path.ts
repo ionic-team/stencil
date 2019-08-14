@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
-import { DEFAULT_STYLE_MODE, normalizePath } from '@utils';
-import { getScopeId } from '../style/scope-css';
+import { DEFAULT_STYLE_MODE, getFileExt, normalizePath } from '@utils';
 import path from 'path';
 
 
@@ -13,7 +12,6 @@ export const createStencilImportPath = (type: d.StencilDataType, tagName: string
 const serializeStencilImportPath = (type: d.StencilDataType, tagName: string, encapsulation: string, modeName: string) => {
   const data: d.StencilComponentData = {
     tag: tagName,
-    scopeId: getScopeId(tagName, modeName)
   };
   if (modeName && modeName !== DEFAULT_STYLE_MODE) {
     data.mode = modeName;
@@ -38,34 +36,39 @@ export const parseStencilImportPath = (importee: string, importer: string) => {
 
       const dataParts = importData.split('?');
       if (dataParts.length === 2) {
-        const paramsStr = dataParts[1];
-        const params = new URLSearchParams(paramsStr);
-        const type = params.get('type') as any;
+        const params = dataParts[1];
+        const urlParams = new URLSearchParams(params);
+        const type = urlParams.get('type') as any;
         const data: d.StencilComponentData = {
-          tag: params.get('tag'),
-          scopeId: params.get('scopeId'),
-          encapsulation: params.get('encapsulation') || 'none',
-          mode: params.get('mode') || DEFAULT_STYLE_MODE,
+          tag: urlParams.get('tag'),
+          encapsulation: urlParams.get('encapsulation') || 'none',
+          mode: urlParams.get('mode') || DEFAULT_STYLE_MODE,
         };
 
         importer = normalizePath(importer);
         const importerDir = path.dirname(importer);
-        const filePath = normalizePath(path.resolve(importerDir, importPath));
-        const fileName = path.basename(filePath);
+        const importerExt = getFileExt(importer.split('?')[0]);
 
-        let resolvedId = filePath;
+        const resolvedFilePath = normalizePath(path.resolve(importerDir, importPath));
+        const resolvedFileName = path.basename(resolvedFilePath);
+        const resolvedFileExt = getFileExt(resolvedFileName);
+
+        let resolvedId = resolvedFilePath;
         if (data.encapsulation === 'scoped' && data.mode && data.mode !== DEFAULT_STYLE_MODE) {
-          resolvedId += `?${paramsStr}`;
+          resolvedId += `?${params}`;
         }
 
         const r: d.ResolvedStencilData = {
           type,
           resolvedId,
-          filePath,
-          fileName,
+          resolvedFilePath,
+          resolvedFileName,
+          resolvedFileExt,
+          params,
           data,
           importee,
           importer,
+          importerExt,
         };
 
         return r;

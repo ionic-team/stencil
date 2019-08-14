@@ -14,14 +14,22 @@ export const createCompiler = () => {
     diagnostics.length = 0;
   };
 
+  const getResolvedData = (id: string) => {
+    return stencilResolved.get(id);
+  };
+
+  const setResolvedData = (id: string, r: d.ResolvedStencilData) => {
+    return stencilResolved.set(id, r);
+  };
+
   return {
 
     resolveId(importee: string, importer: string) {
       // import Css from 'stencil?tag=cmp-a&scopeId=sc-cmp-a-md&mode=md!./filepath.css
       const r = parseStencilImportPath(importee, importer);
       if (r != null) {
-        stencilResolved.set(r.resolvedId, r);
-        return r.resolvedId;
+        setResolvedData(r.resolvedId, r);
+        return r;
       }
       return null;
     },
@@ -34,10 +42,11 @@ export const createCompiler = () => {
     },
 
     async transform(code: string, filePath: string, opts?: d.CompileOptions) {
-      const r = stencilResolved.get(filePath);
+      const r = getResolvedData(filePath);
       if (r != null) {
         const compileOpts = Object.assign({}, defaultOpts, opts);
-        compileOpts.file = r.filePath;
+        compileOpts.type = r.type;
+        compileOpts.file = r.resolvedFilePath;
         compileOpts.data = r.data;
 
         const results = await compile(code, compileOpts);
@@ -55,6 +64,8 @@ export const createCompiler = () => {
       reset();
     },
 
-    reset
+    reset,
+    getResolvedData,
+    setResolvedData,
   };
 };

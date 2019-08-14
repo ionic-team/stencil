@@ -54,7 +54,7 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
         }),
         config.sys.rollup.plugins.json(),
         imagePlugin(config, buildCtx),
-        cssTransformer(buildCtx),
+        cssTransformer(config, compilerCtx, buildCtx),
         inMemoryFsRead(config, compilerCtx),
         config.sys.rollup.plugins.replace({
           'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'

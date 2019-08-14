@@ -36,16 +36,18 @@ export type StencilDataType = 'css' | 'js' | 'ts' | 'tsx' | 'jsx' | 'dts';
 export interface ResolvedStencilData {
   type: StencilDataType;
   resolvedId: string;
-  filePath: string;
-  fileName: string;
+  resolvedFilePath: string;
+  resolvedFileName: string;
+  resolvedFileExt: string;
+  params: string;
   data: StencilComponentData;
   importee: string;
   importer: string;
+  importerExt: string;
 }
 
 export interface StencilComponentData {
   tag: string;
-  scopeId: string;
   encapsulation?: string;
   mode?: string;
 }

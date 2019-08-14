@@ -3,6 +3,16 @@ import { BANNER } from './constants';
 import { buildError } from './message-utils';
 
 
+export const getFileExt = (fileName: string) => {
+  if (typeof fileName === 'string') {
+    const parts = fileName.split('.');
+    if (parts.length > 1) {
+      return parts[parts.length - 1].toLowerCase();
+    }
+  }
+  return null;
+};
+
 /**
  * Test if a file is a typescript source file, such as .ts or .tsx.
  * However, d.ts files and spec.ts files return false.

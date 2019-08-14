@@ -153,3 +153,59 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
 
   return transformResults;
 }
+
+
+export const runPluginTransformsEsmImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceText: string, id: string) => {
+  const pluginCtx: PluginCtx = {
+    config: config,
+    sys: config.sys,
+    fs: compilerCtx.fs,
+    cache: compilerCtx.cache,
+    diagnostics: []
+  };
+
+  const transformResults: PluginTransformResults = {
+    code: sourceText,
+    id: id
+  };
+
+  for (const plugin of pluginCtx.config.plugins) {
+
+    if (typeof plugin.transform === 'function') {
+      try {
+        let pluginTransformResults: PluginTransformResults | string;
+        const results = plugin.transform(transformResults.code, transformResults.id, pluginCtx);
+
+        if (results != null) {
+          if (typeof (results as any).then === 'function') {
+            pluginTransformResults = await results;
+
+          } else {
+            pluginTransformResults = results as PluginTransformResults;
+          }
+
+          if (pluginTransformResults != null) {
+            if (typeof pluginTransformResults === 'string') {
+              transformResults.code = pluginTransformResults as string;
+
+            } else {
+              if (typeof pluginTransformResults.code === 'string') {
+                transformResults.code = pluginTransformResults.code;
+              }
+              if (typeof pluginTransformResults.id === 'string') {
+                transformResults.id = pluginTransformResults.id;
+              }
+            }
+          }
+        }
+
+      } catch (e) {
+        catchError(buildCtx.diagnostics, e);
+      }
+    }
+  }
+
+  buildCtx.diagnostics.push(...pluginCtx.diagnostics);
+
+  return transformResults;
+};

@@ -10,7 +10,11 @@ export const stencilRollupPlugin = (): Plugin => {
     name: 'stencilPlugin',
 
     resolveId(importee: string, importer: string) {
-      return compiler.resolveId(importee, importer);
+      const r = compiler.resolveId(importee, importer);
+      if (r != null) {
+        return r.resolvedId;
+      }
+      return null;
     },
 
     async transform(code: string, id: string, opts: d.CompileOptions = {}) {
