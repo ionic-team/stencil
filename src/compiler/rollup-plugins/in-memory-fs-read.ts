@@ -1,4 +1,4 @@
-import { CompilerOptions, nodeModuleNameResolver, sys } from 'typescript';
+import { CompilerOptions, nodeModuleNameResolver } from 'typescript';
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 import { Plugin } from 'rollup';
@@ -96,7 +96,10 @@ const hasMatchingPathAlias = (importee: string, compilerOptions: CompilerOptions
  * if the import can't be resolved
  */
 const resolveWithPathAlias = async (importee: string, importer: string, compilerCtx: d.CompilerCtx, path: d.Path) => {
-  const { resolvedModule } = nodeModuleNameResolver(importee, importer, compilerCtx.compilerOptions, sys);
+  const { resolvedModule } = nodeModuleNameResolver(importee, importer, compilerCtx.compilerOptions, {
+    readFile: compilerCtx.fs.readFileSync,
+    fileExists: fileName => compilerCtx.fs.statSync(fileName).isFile,
+  });
 
   if (!resolvedModule) {
     return null;
