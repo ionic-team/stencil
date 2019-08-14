@@ -3,10 +3,12 @@ import { updateToLazyComponent } from '../component-lazy/update-to-lazy-componen
 import { updateToNativeComponent } from '../component-native/update-to-native-component';
 
 
-export function componentEntryPlugin(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[]) {
+export const componentEntryPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[]) => {
   const entrys = new Map<string, d.EntryModule>();
 
   return {
+    name: 'componentEntryPlugin',
+
     resolveId(id: string) {
       if (typeof id === 'string') {
         const entryModule = entryModules.find(entryModule => entryModule.entryKey === id);
@@ -33,8 +35,6 @@ export function componentEntryPlugin(config: d.Config, compilerCtx: d.CompilerCt
           .join('\n');
       }
       return null;
-    },
-
-    name: 'componentEntryPlugin'
+    }
   };
-}
+};

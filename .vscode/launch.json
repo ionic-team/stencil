@@ -23,7 +23,7 @@
       "program": "${workspaceFolder}/node_modules/.bin/jest",
       "args": [
         "--runInBand",
-        "src/runtime/test/hydrate-no-encapsulation.spec.tsx"
+        "src/runtime/test/hydrate-shadow.spec.tsx"
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -126,15 +126,6 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Prerender Shadow Debug",
-      "args": [
-        "${workspaceFolder}/test/prerender-shadow/prerender.js"
-      ],
-      "protocol": "inspector"
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "End-To-End",
       "args": [
         "${workspaceFolder}/bin/stencil",
@@ -185,6 +176,20 @@
         "--max-workers=1",
         "--config",
         "${workspaceFolder}/test/todo-app/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Style Modes",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--dev",
+        "--max-workers=1",
+        "--config",
+        "${workspaceFolder}/test/style-modes/stencil.config.ts"
       ],
       "protocol": "inspector"
     },

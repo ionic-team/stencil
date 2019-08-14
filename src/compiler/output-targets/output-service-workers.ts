@@ -11,6 +11,10 @@ export async function outputServiceWorkers(config: d.Config, buildCtx: d.BuildCt
     return;
   }
 
+  if (config.sys.lazyRequire == null) {
+    return;
+  }
+
   // let's make sure they have what we need from workbox installed
   await config.sys.lazyRequire.ensure(config.logger, config.rootDir, [WORKBOX_BUILD_MODULE_ID]);
 

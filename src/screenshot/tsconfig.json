@@ -24,9 +24,6 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@sys": [
-        "../sys/node/index.ts"
-      ],
       "@utils": [
         "../utils/index.ts"
       ]

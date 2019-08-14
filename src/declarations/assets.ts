@@ -11,6 +11,7 @@ export interface CopyTask {
   src: string;
   dest?: string;
   warn?: boolean;
+  keepDirStructure?: boolean;
 }
 
 

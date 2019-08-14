@@ -1,12 +1,12 @@
 import * as d from '../../declarations';
 import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
-import { EventSpy, addE2EListener } from './puppeteer-events';
+import { EventSpy, addE2EListener, waitForEvent } from './puppeteer-events';
 import { find, findAll } from './puppeteer-find';
-import { MockElement, cloneAttributes, parseHtmlToFragment } from '@mock-doc';
+import { MockHTMLElement, cloneAttributes, parseHtmlToFragment } from '@mock-doc';
 
 
-export class E2EElement extends MockElement implements pd.E2EElementInternal {
+export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal {
   private _queuedActions: ElementAction[] = [];
 
   private _queueAction(action: ElementAction) {
@@ -106,6 +106,10 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     } catch (e) {}
 
     return isVisible;
+  }
+
+  waitForEvent(eventName: string) {
+    return waitForEvent(this._page, eventName, this._elmHandle);
   }
 
   waitForVisible() {

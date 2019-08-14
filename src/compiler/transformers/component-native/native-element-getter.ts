@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import ts from 'typescript';
 
 
-export function addNativeElementGetter(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
+export const addNativeElementGetter = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   // @Element() element;
   // is transformed into:
   // get element() { return this; }
@@ -22,4 +22,4 @@ export function addNativeElementGetter(classMembers: ts.ClassElement[], cmp: d.C
       )
     );
   }
-}
+};

@@ -41,6 +41,45 @@ describe('parseHtml', () => {
     expect(article.tagName).toBe('CMP-A');
   });
 
+  it('svg', () => {
+    doc = new MockDocument(`
+      <div>
+        <svg>
+          <a>Hello</a>
+          <feImage></feImage>
+          <foreignObject>
+            <a>Hello</a>
+            <feImage></feImage>
+          </foreignObject>
+        <svg>
+      </div>
+    `);
+    expect(doc.body.firstElementChild.tagName).toEqual('DIV');
+    expect(doc.body.firstElementChild.firstElementChild.tagName).toEqual('svg');
+    expect(doc.body.firstElementChild.firstElementChild.children[0].tagName).toEqual('a');
+    expect(doc.body.firstElementChild.firstElementChild.children[1].tagName).toEqual('feImage');
+    expect(doc.body.firstElementChild.firstElementChild.children[2].tagName).toEqual('foreignObject');
+    expect(doc.body.firstElementChild.firstElementChild.children[2].children[0].tagName).toEqual('A');
+    expect(doc.body.firstElementChild.firstElementChild.children[2].children[1].tagName).toEqual('FEIMAGE');
+    expect(doc.body).toEqualHtml(`
+    <div>
+      <svg>
+        <a>
+          Hello
+        </a>
+        <feImage></feImage>
+        <foreignObject>
+          <a>
+            Hello
+          </a>
+          <feimage></feimage>
+        </foreignObject>
+        <svg></svg>
+      </svg>
+    </div>
+    `);
+  });
+
   it('template', () => {
     doc = new MockDocument(`
       <template>text</template>
@@ -206,4 +245,19 @@ describe('parseHtml', () => {
     expect(elm.children[0].firstChild.nextSibling.firstChild.firstChild.nodeValue).toBe('hello');
   });
 
+  it('should respect case in svg', () => {
+    const elm = parseHtmlToFragment('<svg  viewbox="0 0 97 20"><symbol viewbox="0 0 97 20"></symbol></svg>');
+    expect(elm.children.length).toBe(1);
+    expect(elm.children[0].attributes.item(0).name).toBe('viewBox');
+    expect(elm.children[0].children[0].attributes.item(0).name).toBe('viewBox');
+  });
+
+  it('should mock canvas api', () => {
+    const elm = parseHtmlToFragment('<canvas id="canvas" width="300" height="300"></canvas>');
+    const canvas = elm.children[0];
+    const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
+    expect(elm.children.length).toBe(1);
+    expect(elm.children[0].nodeName).toBe('CANVAS');
+    expect(ctx.getImageData(0, 0, 300, 300).data.length).toBe(300 * 300 * 4);
+  });
 });

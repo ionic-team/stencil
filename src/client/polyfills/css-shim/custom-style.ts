@@ -41,34 +41,35 @@ export class CustomStyle {
     hostEl: HTMLElement,
     cssScopeId: string,
     cssText: string,
+    isScoped: boolean
   ) {
     if (this.hostScopeMap.has(hostEl)) {
       throw new Error('host style already created');
     }
-    const baseScope = this.registerHostTemplate(cssText, cssScopeId);
-    const isDynamicScoped = !!(baseScope.isDynamic && baseScope.cssScopeId);
-    const needStyleEl = isDynamicScoped || !baseScope.styleEl;
+    const baseScope = this.registerHostTemplate(cssText, cssScopeId, isScoped);
     const styleEl = this.doc.createElement('style');
 
-    if (!needStyleEl) {
+    if (!baseScope.usesCssVars) {
+      // This component does not use (read) css variables
       styleEl.innerHTML = cssText;
-    } else {
-      if (isDynamicScoped) {
-        (styleEl as any)['s-sc'] = cssScopeId = `${baseScope.cssScopeId}-${this.count}`;
-        styleEl.innerHTML = '/*needs update*/';
-        this.hostStyleMap.set(hostEl, styleEl);
-        this.hostScopeMap.set(hostEl, reScope(baseScope, cssScopeId));
-        this.count++;
 
-      } else {
-        baseScope.styleEl = styleEl;
-        if (!baseScope.isDynamic) {
-          styleEl.innerHTML = executeTemplate(baseScope.template, {});
-        }
-        this.globalScopes.push(baseScope);
-        this.updateGlobal();
-        this.hostScopeMap.set(hostEl, baseScope);
+    } else if (isScoped) {
+      // This component is dynamic: uses css var and is scoped
+      (styleEl as any)['s-sc'] = cssScopeId = `${baseScope.scopeId}-${this.count}`;
+      styleEl.innerHTML = '/*needs update*/';
+      this.hostStyleMap.set(hostEl, styleEl);
+      this.hostScopeMap.set(hostEl, reScope(baseScope, cssScopeId));
+      this.count++;
+
+    } else {
+      // This component uses css vars, but it's no-encapsulation (global static)
+      baseScope.styleEl = styleEl;
+      if (!baseScope.usesCssVars) {
+        styleEl.innerHTML = executeTemplate(baseScope.template, {});
       }
+      this.globalScopes.push(baseScope);
+      this.updateGlobal();
+      this.hostScopeMap.set(hostEl, baseScope);
     }
     return styleEl;
   }
@@ -84,7 +85,7 @@ export class CustomStyle {
 
   updateHost(hostEl: HTMLElement) {
     const scope = this.hostScopeMap.get(hostEl);
-    if (scope && scope.isDynamic && scope.cssScopeId) {
+    if (scope && scope.usesCssVars && scope.isScoped) {
       const styleEl = this.hostStyleMap.get(hostEl);
       if (styleEl) {
         const selectors = getActiveSelectors(hostEl, this.hostScopeMap, this.globalScopes);
@@ -98,11 +99,12 @@ export class CustomStyle {
     updateGlobalScopes(this.globalScopes);
   }
 
-  private registerHostTemplate(cssText: string, scopeId: string) {
+  private registerHostTemplate(cssText: string, scopeId: string, isScoped: boolean) {
     let scope = this.scopesMap.get(scopeId);
     if (!scope) {
       scope = parseCSS(cssText);
-      scope.cssScopeId = scopeId;
+      scope.scopeId = scopeId;
+      scope.isScoped = isScoped;
       this.scopesMap.set(scopeId, scope);
     }
     return scope;

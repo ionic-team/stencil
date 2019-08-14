@@ -7,8 +7,8 @@
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| index.js                   | 86B      | 130B     | 133B     |
-| TOTAL                      | 86B      | 130B     | 133B     |
+| index.js                   | 90B      | 134B     | 143B     |
+| TOTAL                      | 90B      | 134B     | 143B     |
 
 
 
@@ -16,16 +16,18 @@
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| 0da263af.js                | 2.44KB   | 2.72KB   | 5.99KB   |
-| 836f163c.js                | 1.62KB   | 1.81KB   | 3.41KB   |
-| app.js                     | 2.61KB   | 2.92KB   | 7.63KB   |
-| app.mjs.js                 | ERROR    | 64B      | 44B      |
-| app.system.js              | 95B      | 132B     | 133B     |
-| hello-vdom.entry.js        | 108B     | 143B     | 141B     |
-| hello-vdom.system.entry.js | 157B     | 194B     | 254B     |
-| loader.mjs.js              | ERROR    | 73B      | 53B      |
-| loader.system.js           | 101B     | 138B     | 143B     |
-| TOTAL                      | 7.11KB   | 8.18KB   | 17.78KB  |
+| app.esm.js                 | 94B      | 117B     | 112B     |
+| app.js                     | 48.56KB  | 55.89KB  | 181.51KB |
+| hello-vdom.entry.js        | 109B     | 143B     | 138B     |
+| hello-vdom.system.entry.js | 174B     | 210B     | 276B     |
+| p-23cb3ca0.system.js       | 160B     | 182B     | 233B     |
+| p-39f11146.system.js       | 2.90KB   | 3.23KB   | 8.36KB   |
+| p-5cd8f2de.system.js       | 4.26KB   | 4.69KB   | 11.93KB  |
+| p-7da2a379.js              | 2.09KB   | 2.35KB   | 4.48KB   |
+| p-a0c82e31.js              | 4.60KB   | 5.23KB   | 17.21KB  |
+| p-a8fc097f.system.js       | 4.66KB   | 5.27KB   | 17.45KB  |
+| p-f7ddb189.js              | 2.75KB   | 3.02KB   | 7.47KB   |
+| TOTAL                      | 70.35KB  | 80.32KB  | 249.16KB |
 
 
 
@@ -33,24 +35,20 @@
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| p-229ebf7a.js              | 2.75KB   | 3.02KB   | 7.47KB   |
-| p-530ufqbn.system.entry.js | 280B     | 341B     | 617B     |
-| p-5df5954b.system.js       | 219B     | 257B     | 370B     |
-| p-748d43f6.js              | 3.31KB   | 3.67KB   | 7.47KB   |
-| p-7889326c.system.js       | 4.28KB   | 4.85KB   | 15.98KB  |
-| p-7eb7509a.js              | 4.24KB   | 4.81KB   | 15.91KB  |
-| p-a44eeb2a.system.js       | 4.14KB   | 4.61KB   | 10.42KB  |
-| p-atsh12qe.system.entry.js | 466B     | 552B     | 1.07KB   |
-| p-aundm8zo.entry.js        | 404B     | 493B     | 885B     |
-| p-d3lazwcq.system.entry.js | 269B     | 339B     | 560B     |
+| app.css                    | 1.46KB   | 1.74KB   | 5.76KB   |
+| app.esm.js                 | 141B     | 171B     | 191B     |
+| app.js                     | 48.60KB  | 55.89KB  | 181.51KB |
+| p-22d8cae6.system.js       | 198B     | 234B     | 312B     |
+| p-29787b35.system.js       | 5.43KB   | 5.99KB   | 15.64KB  |
+| p-39f11146.system.js       | 2.90KB   | 3.23KB   | 8.36KB   |
+| p-438e2ca6.js              | 3.21KB   | 3.56KB   | 7.18KB   |
+| p-a0c82e31.js              | 4.60KB   | 5.23KB   | 17.21KB  |
+| p-a8fc097f.system.js       | 4.66KB   | 5.27KB   | 17.45KB  |
+| p-aqb5bg7q.entry.js        | 569B     | 677B     | 1.45KB   |
 | p-ely6dzxe.css             | 1.46KB   | 1.74KB   | 5.76KB   |
-| p-f57d4852.system.js       | 2.77KB   | 3.05KB   | 7.54KB   |
-| p-fc9rcltf.entry.js        | 215B     | 276B     | 454B     |
-| p-gephcmcj.entry.js        | 215B     | 274B     | 405B     |
-| todomvc.css                | 1.46KB   | 1.74KB   | 5.76KB   |
-| todomvc.esm.js             | 164B     | 193B     | 235B     |
-| todomvc.js                 | 18.05KB  | 20.08KB  | 67.18KB  |
-| TOTAL                      | 44.65KB  | 50.23KB  | 147.99KB |
+| p-f7ddb189.js              | 2.75KB   | 3.02KB   | 7.47KB   |
+| p-hebbvmyh.system.entry.js | 645B     | 761B     | 1.80KB   |
+| TOTAL                      | 76.59KB  | 87.48KB  | 270.08KB |
 
 
 

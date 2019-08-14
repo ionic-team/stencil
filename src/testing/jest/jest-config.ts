@@ -9,15 +9,18 @@ export function buildJestArgv(config: d.Config) {
     ...config.flags.knownArgs.slice()
   ];
 
-  if (config.flags.e2e && config.flags.ci && !args.some(a => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
-    args.push('--maxWorkers=4');
+  if (!args.some(a => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
+    args.push(`--max-workers=${config.maxConcurrentWorkers}`);
   }
 
-  config.logger.debug(`jest args: ${args.join(' ')}`);
+  if (config.flags.devtools) {
+    args.push('--runInBand');
+  }
+
+  config.logger.info(config.logger.magenta(`jest args: ${args.join(' ')}`));
 
   const { options } = require('jest-cli/build/cli/args');
   const jestArgv = yargs(args).options(options).argv as d.JestArgv;
-
   jestArgv.config = buildJestConfig(config);
 
   return jestArgv;

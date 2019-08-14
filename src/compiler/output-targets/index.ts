@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { canSkipAppCoreBuild } from './output-utils';
+import { canSkipOutputTargets } from './output-utils';
 import { outputApp } from './output-app';
 import { outputCollections } from './output-collection';
 import { outputHydrate } from './output-hydrate';
@@ -12,7 +12,7 @@ import { outputAngular } from './output-angular';
 
 
 export async function generateOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (canSkipAppCoreBuild(buildCtx)) {
+  if (canSkipOutputTargets(buildCtx)) {
     return;
   }
 
@@ -24,7 +24,6 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     outputAngular(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
 
-    // outputSelfContainedWebComponents(config, compilerCtx, buildCtx),
     buildCtx.stylesPromise
   ]);
 

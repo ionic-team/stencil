@@ -24,12 +24,10 @@ async function buildCli() {
     plugins: [
       (() => {
         return {
-          resolveId(id, importer) {
-            if (id === '@sys') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
-            }
+          resolveId(id) {
+
             if (id === '@utils') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
+              return relativeResolve('../utils');
             }
           }
         }

@@ -1,7 +1,7 @@
 import { cloneAttributes } from './attribute';
 import { createCustomElement } from './custom-element-registry';
 import { MockDocumentFragment } from './document-fragment';
-import { MockElement } from './node';
+import { MockElement, MockHTMLElement } from './node';
 import { URL } from 'url';
 
 
@@ -14,6 +14,9 @@ export function createElement(ownerDocument: any, tagName: string) {
   switch (tagName) {
     case 'a':
       return new MockAnchorElement(ownerDocument);
+
+    case 'base':
+      return new MockBaseElement(ownerDocument);
 
     case 'button':
       return new MockButtonElement(ownerDocument);
@@ -38,6 +41,12 @@ export function createElement(ownerDocument: any, tagName: string) {
 
     case 'template':
       return new MockTemplateElement(ownerDocument);
+
+    case 'title':
+      return new MockTitleElement(ownerDocument);
+
+    case 'canvas':
+      return new MockCanvasElement(ownerDocument);
   }
 
   if (ownerDocument != null && tagName.includes('-')) {
@@ -47,11 +56,20 @@ export function createElement(ownerDocument: any, tagName: string) {
     }
   }
 
-  return new MockElement(ownerDocument, tagName);
+  return new MockHTMLElement(ownerDocument, tagName);
 }
 
+export function createElementNS(ownerDocument: any, namespaceURI: string, tagName: string) {
+  if (namespaceURI === 'http://www.w3.org/1999/xhtml') {
+    return createElement(ownerDocument, tagName);
+  } else if (namespaceURI === 'http://www.w3.org/2000/svg') {
+    return new MockSVGElement(ownerDocument, tagName);
+  } else {
+    return new MockElement(ownerDocument, tagName);
+  }
+}
 
-class MockAnchorElement extends MockElement {
+class MockAnchorElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'a');
   }
@@ -65,7 +83,7 @@ class MockAnchorElement extends MockElement {
 }
 
 
-class MockButtonElement extends MockElement {
+class MockButtonElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'button');
   }
@@ -75,7 +93,7 @@ patchPropAttributes(MockButtonElement.prototype, {
 });
 
 
-class MockImgElement extends MockElement {
+class MockImgElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'img');
   }
@@ -92,8 +110,7 @@ patchPropAttributes(MockImgElement.prototype, {
   width: Number
 });
 
-
-class MockInputElement extends MockElement {
+class MockInputElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'input');
   }
@@ -133,7 +150,7 @@ patchPropAttributes(MockInputElement.prototype, {
   width: Number
 });
 
-class MockFormElement extends MockElement {
+class MockFormElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'form');
   }
@@ -143,7 +160,7 @@ patchPropAttributes(MockFormElement.prototype, {
 });
 
 
-class MockLinkElement extends MockElement {
+class MockLinkElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'link');
   }
@@ -163,7 +180,7 @@ patchPropAttributes(MockLinkElement.prototype, {
 });
 
 
-class MockMetaElement extends MockElement {
+class MockMetaElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'meta');
   }
@@ -175,7 +192,7 @@ patchPropAttributes(MockMetaElement.prototype, {
 });
 
 
-class MockScriptElement extends MockElement {
+class MockScriptElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'script');
   }
@@ -191,8 +208,37 @@ patchPropAttributes(MockScriptElement.prototype, {
   type: String
 });
 
+export class MockSVGElement extends MockElement {
+  // SVGElement properties and methods
+  get ownerSVGElement(): SVGSVGElement { return null; }
+  get viewportElement(): SVGElement { return null; }
 
-export class MockTemplateElement extends MockElement {
+  focus() {/**/}
+  onunload() {/**/}
+
+  // SVGGeometryElement properties and methods
+  get pathLength(): number { return 0; }
+
+  isPointInFill(_pt: DOMPoint): boolean { return false; }
+  isPointInStroke(_pt: DOMPoint): boolean { return false; }
+  getTotalLength(): number { return 0; }
+}
+
+
+export class MockBaseElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'base');
+  }
+
+  get href() {
+    return fullUrl(this, 'href');
+  }
+  set href(value: string) {
+    this.setAttribute('href', value);
+  }
+}
+
+export class MockTemplateElement extends MockHTMLElement {
   content: MockDocumentFragment;
 
   constructor(ownerDocument: any) {
@@ -229,6 +275,60 @@ export class MockTemplateElement extends MockElement {
   }
 }
 
+
+class MockTitleElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'title');
+  }
+
+  get text() {
+    return this.textContent;
+  }
+  set text(value: string) {
+    this.textContent = value;
+  }
+}
+
+
+class MockCanvasElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'canvas');
+  }
+  getContext() {
+    return {
+      fillRect: function () { },
+      clearRect: function () { },
+      getImageData: function (_: number, __: number, w: number, h: number) {
+        return {
+          data: new Array(w * h * 4)
+        };
+      },
+      putImageData: function () { },
+      createImageData: function (): any[] { return [] },
+      setTransform: function () { },
+      drawImage: function () { },
+      save: function () { },
+      fillText: function () { },
+      restore: function () { },
+      beginPath: function () { },
+      moveTo: function () { },
+      lineTo: function () { },
+      closePath: function () { },
+      stroke: function () { },
+      translate: function () { },
+      scale: function () { },
+      rotate: function () { },
+      arc: function () { },
+      fill: function () { },
+      measureText: function () {
+        return { width: 0 };
+      },
+      transform: function () { },
+      rect: function () { },
+      clip: function () { },
+    }
+  }
+}
 
 function fullUrl(elm: MockElement, attrName: string) {
   const val = elm.getAttribute(attrName) || '';
@@ -287,3 +387,26 @@ function patchPropAttributes(prototype: any, attrs: any) {
     }
   });
 }
+
+
+MockElement.prototype.cloneNode = function(this: MockElement, deep?: boolean) {
+  // because we're creating elements, which extending specific HTML base classes there
+  // is a MockElement circular reference that bundling has trouble dealing with so
+  // the fix is to add cloneNode() to MockElement's prototype after the HTML classes
+  const cloned = createElement(null, this.nodeName);
+  cloned.attributes = cloneAttributes(this.attributes);
+
+  const styleCssText = this.getAttribute('style');
+  if (styleCssText != null && styleCssText.length > 0) {
+    cloned.setAttribute('style', styleCssText);
+  }
+
+  if (deep) {
+    for (let i = 0, ii = this.childNodes.length; i < ii; i++) {
+      const clonedChildNode = this.childNodes[i].cloneNode(true);
+      cloned.appendChild(clonedChildNode);
+    }
+  }
+
+  return cloned;
+};

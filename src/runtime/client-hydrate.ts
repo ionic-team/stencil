@@ -29,7 +29,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
     const orgLocationNode = plt.$orgLocNodes$.get(orgLocationId);
     const node = c.$elm$ as d.RenderNode;
 
-    if (orgLocationNode && c.$hostId$ === '0') {
+    if (orgLocationNode && (orgLocationNode['s-sd'] || c.$hostId$ === '0')) {
       orgLocationNode.parentNode.insertBefore(
         node,
         orgLocationNode.nextSibling
@@ -69,6 +69,7 @@ const clientHydrate = (
   let childNodeType: string;
   let childIdSplt: string[];
   let childVNode: RenderNodeData;
+  let i: number;
 
   if (node.nodeType === NODE_TYPE.ElementNode) {
 
@@ -111,8 +112,7 @@ const clientHydrate = (
     }
 
     // recursively drill down, end to start so we can remove nodes
-    let i = node.childNodes.length - 1;
-    for (; i >= 0; i--) {
+    for (i = node.childNodes.length - 1; i >= 0; i--) {
       clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.childNodes[i] as any, hostId);
     }
 
@@ -224,23 +224,27 @@ const clientHydrate = (
 };
 
 
-export const initializeDocumentHydrate = (node: d.HostElement, rootOriginalLocations: Map<string, any>) => {
+export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: Map<string, any>) => {
   if (node.nodeType === NODE_TYPE.ElementNode) {
     let i = 0;
     for (; i < node.childNodes.length; i++) {
-      initializeDocumentHydrate(node.childNodes[i] as any, rootOriginalLocations);
+      initializeDocumentHydrate(node.childNodes[i] as any, orgLocNodes);
     }
     if (node.shadowRoot) {
       for (i = 0; i < node.shadowRoot.childNodes.length; i++) {
-        initializeDocumentHydrate(node.shadowRoot.childNodes[i] as any, rootOriginalLocations);
+        initializeDocumentHydrate(node.shadowRoot.childNodes[i] as any, orgLocNodes);
       }
     }
 
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
     const childIdSplt = node.nodeValue.split('.');
     if (childIdSplt[0] === ORG_LOCATION_ID) {
-      rootOriginalLocations.set(childIdSplt[1] + '.' + childIdSplt[2], node);
+      orgLocNodes.set(childIdSplt[1] + '.' + childIdSplt[2], node);
       node.nodeValue = '';
+
+      // useful to know if the original location is
+      // the root light-dom of a shadow dom component
+      node['s-sd'] = (childIdSplt[3] === '');
     }
   }
 };

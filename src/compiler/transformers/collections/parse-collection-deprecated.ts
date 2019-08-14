@@ -209,6 +209,7 @@ function parseStyle(config: d.Config, collectionDir: string, cmpData: d.Componen
     modeName: modeName,
     styleId: cmpData.tag,
     styleStr: modeStyleData.style,
+    styleIdentifier: null,
     externalStyles: [],
     compiledStyleText: null,
     compiledStyleTextScoped: null,

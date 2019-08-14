@@ -1,5 +1,6 @@
 
 export * from './assets';
+export * from './browser-compile';
 export * from './build';
 export * from './build-conditionals';
 export * from './build-events';

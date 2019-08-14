@@ -12,8 +12,21 @@ export namespace Components {
   interface HelloVdom {}
 }
 
+declare global {
+
+
+  interface HTMLHelloVdomElement extends Components.HelloVdom, HTMLStencilElement {}
+  var HTMLHelloVdomElement: {
+    prototype: HTMLHelloVdomElement;
+    new (): HTMLHelloVdomElement;
+  };
+  interface HTMLElementTagNameMap {
+    'hello-vdom': HTMLHelloVdomElement;
+  }
+}
+
 declare namespace LocalJSX {
-  interface HelloVdom extends JSXBase.HTMLAttributes {}
+  interface HelloVdom extends JSXBase.HTMLAttributes<HTMLHelloVdomElement> {}
 
   interface IntrinsicElements {
     'hello-vdom': HelloVdom;
@@ -29,21 +42,4 @@ declare module "@stencil/core" {
   }
 }
 
-
-declare global {
-
-
-
-  interface HTMLHelloVdomElement extends Components.HelloVdom, HTMLStencilElement {}
-  var HTMLHelloVdomElement: {
-    prototype: HTMLHelloVdomElement;
-    new (): HTMLHelloVdomElement;
-  };
-
-  interface HTMLElementTagNameMap {
-    'hello-vdom': HTMLHelloVdomElement;
-  }
-
-  interface ElementTagNameMap extends HTMLElementTagNameMap {}
-}
 

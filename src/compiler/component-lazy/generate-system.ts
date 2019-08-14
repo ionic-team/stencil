@@ -6,9 +6,6 @@ import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
 
 export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
-  if (!config.buildEs5) {
-    return;
-  }
   const systemOutputs = outputTargets.filter(o => !!o.systemDir);
 
   if (systemOutputs.length > 0) {
@@ -47,6 +44,7 @@ async function writeSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, l
 async function getSystemLoader(config: d.Config, corePath: string, includePolyfills: boolean) {
   const polyfills = includePolyfills ? await getAppBrowserCorePolyfills(config) : '';
   return `
+'use strict';
 ${polyfills}
 
 var doc = document;

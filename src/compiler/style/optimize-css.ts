@@ -26,7 +26,7 @@ export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, 
     legecyBuild: legacyBuild
   };
 
-  const cacheKey = compilerCtx.cache.createKey('optimizeCss', COMPILER_BUILD.optimizeCss, opts);
+  const cacheKey = await compilerCtx.cache.createKey('optimizeCss', COMPILER_BUILD.optimizeCss, opts);
   const cachedContent = await compilerCtx.cache.get(cacheKey);
   if (cachedContent != null) {
     // let's use the cached data we already figured out

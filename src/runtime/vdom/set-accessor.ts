@@ -16,19 +16,10 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   if (oldValue === newValue) {
     return;
   }
-  if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
-    // Class
-    if (BUILD.updatable) {
-      const oldList = parseClassList(oldValue);
-      const baseList = parseClassList(elm.className).filter(item => !oldList.includes(item));
-      elm.className = baseList.concat(
-        parseClassList(newValue).filter(item => !baseList.includes(item))
-      ).join(' ');
-
-    } else {
-      elm.className = newValue;
-    }
-
+  if (BUILD.vdomClass && memberName === 'class') {
+    const classList = elm.classList;
+    parseClassList(oldValue).forEach(cls => classList.remove(cls));
+    parseClassList(newValue).forEach(cls => classList.add(cls));
   } else if (BUILD.vdomStyle && memberName === 'style') {
     // update style attribute, css properties and values
     if (BUILD.updatable) {
@@ -95,9 +86,19 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     const isComplex = isComplexType(newValue);
     if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {
-        (elm as any)[memberName] = newValue == null && elm.tagName.indexOf('-') === -1 ? '' : newValue;
+        if (!elm.tagName.includes('-')) {
+          const n = newValue == null ? '' : newValue;
+
+          // Workaround for Safari, moving the <input> caret when re-assigning the same valued
+          if ((elm as any)[memberName] !== n) {
+            (elm as any)[memberName] = n;
+          }
+        } else {
+          (elm as any)[memberName] = newValue;
+        }
       } catch (e) {}
     }
+
 
     /**
      * Need to manually update attribute if:
@@ -125,4 +126,4 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
 };
 
 const parseClassList = (value: string | undefined | null): string[] =>
-  (!value) ? [] : value.split(' ');
+  (!value) ? [] : value.split(/\s+/).filter(c => c);

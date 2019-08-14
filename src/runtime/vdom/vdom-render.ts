@@ -10,7 +10,7 @@ import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS, SVG_NS, isDef, toLowerCase } from '@utils';
 import { consoleError, doc, plt, supportsShadowDom } from '@platform';
-import { Host, h } from './h';
+import { h, isHost } from './h';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
 import { updateElement } from './update-element';
 
@@ -105,9 +105,14 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       }
     }
 
-    if (BUILD.svg && newVNode.$tag$ === 'svg') {
-      // Only reset the SVG context when we're exiting SVG element
-      isSvgMode = false;
+    if (BUILD.svg) {
+      if (newVNode.$tag$ === 'svg') {
+        // Only reset the SVG context when we're exiting <svg> element
+        isSvgMode = false;
+      } else if (newVNode.$elm$.tagName === 'foreignObject') {
+        // Reenter SVG context when we're exiting <foreignObject> element
+        isSvgMode = true;
+      }
     }
   }
 
@@ -523,7 +528,7 @@ const relocateSlotContent = (
             (nodeType === NODE_TYPE.ElementNode && node.getAttribute('slot') === slotNameAttr)
           ) {
             // it's possible we've already decided to relocate this node
-            if (!relocateNodes.some(r => r.nodeToRelocate === node)) {
+            if (!relocateNodes.some(r => r.$nodeToRelocate$ === node)) {
               // made some changes to slots
               // let's make sure we also double check
               // fallbacks are correctly hidden or shown
@@ -532,8 +537,8 @@ const relocateSlotContent = (
 
               // add to our list of nodes to relocate
               relocateNodes.push({
-                slotRefNode: childNode,
-                nodeToRelocate: node
+                $slotRefNode$: childNode,
+                $nodeToRelocate$: node
               });
             }
           }
@@ -558,33 +563,42 @@ export const callNodeRefs = (vNode: d.VNode, isDestroy: boolean) => {
 };
 
 interface RelocateNode {
-  slotRefNode: d.RenderNode;
-  nodeToRelocate: d.RenderNode;
+  $slotRefNode$: d.RenderNode;
+  $nodeToRelocate$: d.RenderNode;
 }
 
-const isHost = (node: any): node is d.VNode => {
-  return node && node.$tag$ === Host;
-};
-
 export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: d.VNode | d.VNode[]) => {
-  const oldVNode: d.VNode = hostRef.$vnode$ || { $flags$: 0 };
   hostTagName = toLowerCase(hostElm.tagName);
+  // <Host> runtime check
+  if (BUILD.isDev && Array.isArray(renderFnResults) && renderFnResults.some(isHost)) {
+    throw new Error(`The <Host> must be the single root component.
+Looks like the render() function of "${hostTagName}" is returning an array that contains the <Host>.
 
-  if (isHost(renderFnResults)) {
-    renderFnResults.$tag$ = null;
-  } else {
-    renderFnResults = h(null, null, renderFnResults as any);
+The render() function should look like this instead:
+
+render() {
+  // Do not return an array
+  return (
+    <Host>{content}</Host>
+  );
+}
+`);
   }
+  const oldVNode: d.VNode = hostRef.$vnode$ || { $flags$: 0 };
+  const rootVnode = isHost(renderFnResults)
+    ? renderFnResults
+    : h(null, null, renderFnResults as any);
 
   if (BUILD.reflect && cmpMeta.$attrsToReflect$) {
-    (renderFnResults as d.VNode).$attrs$ = (renderFnResults as d.VNode).$attrs$ || {};
+    rootVnode.$attrs$ = rootVnode.$attrs$ || {};
     cmpMeta.$attrsToReflect$.forEach(([propName, attribute]) =>
-      (renderFnResults as d.VNode).$attrs$[attribute] = (hostElm as any)[propName]);
+      rootVnode.$attrs$[attribute] = (hostElm as any)[propName]);
   }
 
-  renderFnResults.$flags$ |= VNODE_FLAGS.isHost;
-  hostRef.$vnode$ = renderFnResults;
-  renderFnResults.$elm$ = oldVNode.$elm$ = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm) as any;
+  rootVnode.$tag$ = null;
+  rootVnode.$flags$ |= VNODE_FLAGS.isHost;
+  hostRef.$vnode$ = rootVnode;
+  rootVnode.$elm$ = oldVNode.$elm$ = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm) as any;
 
   if (BUILD.scoped || BUILD.shadowDom) {
     scopeId = hostElm['s-sc'];
@@ -598,26 +612,26 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   }
 
   // synchronous patch
-  patch(oldVNode, renderFnResults);
+  patch(oldVNode, rootVnode);
 
   if (BUILD.slotRelocation) {
     if (checkSlotRelocate) {
-      relocateSlotContent(renderFnResults.$elm$);
+      relocateSlotContent(rootVnode.$elm$);
 
       for (let i = 0; i < relocateNodes.length; i++) {
         const relocateNode = relocateNodes[i];
 
-        if (!relocateNode.nodeToRelocate['s-ol']) {
+        if (!relocateNode.$nodeToRelocate$['s-ol']) {
           // add a reference node marking this node's original location
           // keep a reference to this node for later lookups
           const orgLocationNode = (BUILD.isDebug || BUILD.hydrateServerSide)
             ? doc.createComment(`org-loc`) as any
             : doc.createTextNode('') as any;
-          orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
+          orgLocationNode['s-nr'] = relocateNode.$nodeToRelocate$;
 
-          relocateNode.nodeToRelocate.parentNode.insertBefore(
-            (relocateNode.nodeToRelocate['s-ol'] = orgLocationNode),
-            relocateNode.nodeToRelocate
+          relocateNode.$nodeToRelocate$.parentNode.insertBefore(
+            (relocateNode.$nodeToRelocate$['s-ol'] = orgLocationNode),
+            relocateNode.$nodeToRelocate$
           );
         }
       }
@@ -631,36 +645,36 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
         // by default we're just going to insert it directly
         // after the slot reference node
-        const parentNodeRef = relocateNode.slotRefNode.parentNode;
-        let insertBeforeNode = relocateNode.slotRefNode.nextSibling;
-
-        let orgLocationNode = relocateNode.nodeToRelocate['s-ol'] as any;
+        const parentNodeRef = relocateNode.$slotRefNode$.parentNode;
+        let insertBeforeNode = relocateNode.$slotRefNode$.nextSibling;
+        let orgLocationNode = relocateNode.$nodeToRelocate$['s-ol'] as any;
 
         while (orgLocationNode = orgLocationNode.previousSibling as any) {
           let refNode = orgLocationNode['s-nr'];
-          if (refNode && refNode) {
-            if (refNode['s-sn'] === relocateNode.nodeToRelocate['s-sn']) {
-              if (parentNodeRef === refNode.parentNode) {
-                if ((refNode = refNode.nextSibling as any) && refNode && !refNode['s-nr']) {
-                  insertBeforeNode = refNode;
-                  break;
-                }
-              }
+          if (
+            refNode &&
+            refNode['s-sn'] === relocateNode.$nodeToRelocate$['s-sn'] &&
+            parentNodeRef === refNode.parentNode
+          ) {
+            refNode = refNode.nextSibling;
+            if (!refNode || !refNode['s-nr']) {
+              insertBeforeNode = refNode;
+              break;
             }
           }
         }
 
         if (
-          (!insertBeforeNode && parentNodeRef !== relocateNode.nodeToRelocate.parentNode) ||
-          (relocateNode.nodeToRelocate.nextSibling !== insertBeforeNode)
+          (!insertBeforeNode && parentNodeRef !== relocateNode.$nodeToRelocate$.parentNode) ||
+          (relocateNode.$nodeToRelocate$.nextSibling !== insertBeforeNode)
         ) {
           // we've checked that it's worth while to relocate
           // since that the node to relocate
           // has a different next sibling or parent relocated
 
-          if (relocateNode.nodeToRelocate !== insertBeforeNode) {
+          if (relocateNode.$nodeToRelocate$ !== insertBeforeNode) {
             // add it back to the dom but in its new home
-            parentNodeRef.insertBefore(relocateNode.nodeToRelocate, insertBeforeNode);
+            parentNodeRef.insertBefore(relocateNode.$nodeToRelocate$, insertBeforeNode);
           }
         }
       }
@@ -671,7 +685,7 @@ export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     }
 
     if (checkSlotFallbackVisibility) {
-      updateFallbackSlotVisibility(renderFnResults.$elm$);
+      updateFallbackSlotVisibility(rootVnode.$elm$);
     }
 
     // always reset

@@ -16,13 +16,17 @@ export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCt
     generateComponentStyles(config, compilerCtx, buildCtx),
   ]);
 
-  updateLastStyleComponetInputs(config, compilerCtx, buildCtx);
+  await updateLastStyleComponetInputs(config, compilerCtx, buildCtx);
 
   timeSpan.finish(`generate styles finished`);
 }
 
 
 function canSkipGenerateStyles(buildCtx: d.BuildCtx) {
+  if (buildCtx.components.length === 0) {
+    return true;
+  }
+
   if (buildCtx.requiresFullBuild) {
     return false;
   }

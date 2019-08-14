@@ -1,11 +1,11 @@
 import * as d from '../../../declarations';
 import { addCreateEvents } from '../create-event';
-import ts from 'typescript';
-import { ATTACH_SHADOW, REGISTER_HOST } from '../exports';
 import { addLegacyProps } from '../legacy-props';
+import { ATTACH_SHADOW, REGISTER_HOST, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
+import ts from 'typescript';
 
 
-export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, ensureSuper: boolean) {
+export const updateNativeConstructor = (classMembers: ts.ClassElement[], moduleFile: d.Module, cmp: d.ComponentCompilerMeta, ensureSuper: boolean) => {
   if (cmp.isPlain) {
     return;
   }
@@ -16,17 +16,17 @@ export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
 
     let statements: ts.Statement[] = [
-      ...nativeInit(cmp),
+      ...nativeInit(moduleFile, cmp),
       ...cstrMethod.body.statements,
-      ...addCreateEvents(cmp),
-      ...addLegacyProps(cmp)
+      ...addCreateEvents(moduleFile, cmp),
+      ...addLegacyProps(moduleFile, cmp)
     ];
 
     if (ensureSuper) {
       const hasSuper = cstrMethod.body.statements.some(s => s.kind === ts.SyntaxKind.SuperKeyword);
       if (!hasSuper) {
         statements = [
-          createSuper(),
+          createNativeConstructorSuper(),
           ...statements
         ];
       }
@@ -43,14 +43,14 @@ export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.
   } else {
     // create a constructor()
     let statements: ts.Statement[] = [
-      ...nativeInit(cmp),
-      ...addCreateEvents(cmp),
-      ...addLegacyProps(cmp),
+      ...nativeInit(moduleFile, cmp),
+      ...addCreateEvents(moduleFile, cmp),
+      ...addLegacyProps(moduleFile, cmp),
     ];
 
     if (ensureSuper) {
       statements = [
-        createSuper(),
+        createNativeConstructorSuper(),
         ...statements
       ];
     }
@@ -63,40 +63,43 @@ export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.
     );
     classMembers.unshift(cstrMethod);
   }
-}
+};
 
 
-function nativeInit(cmp: d.ComponentCompilerMeta) {
+const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   const initStatements =  [
-    nativeRegisterHostStatement(),
+    nativeRegisterHostStatement(moduleFile),
   ];
   if (cmp.encapsulation === 'shadow') {
-    initStatements.push(nativeAttachShadowStatement());
+    initStatements.push(nativeAttachShadowStatement(moduleFile));
   }
   return initStatements;
-}
+};
 
-function nativeRegisterHostStatement() {
+const nativeRegisterHostStatement = (moduleFile: d.Module) => {
+  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.registerHost);
+
   return ts.createStatement(ts.createCall(
     ts.createIdentifier(REGISTER_HOST),
     undefined,
     [ ts.createThis() ]
   ));
-}
+};
 
-function nativeAttachShadowStatement() {
+const nativeAttachShadowStatement = (moduleFile: d.Module) => {
+  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.attachShadow);
+
   return ts.createStatement(ts.createCall(
     ts.createIdentifier(ATTACH_SHADOW),
     undefined,
     [ ts.createThis() ]
   ));
-}
+};
 
-
-function createSuper() {
+const createNativeConstructorSuper = () => {
   return ts.createExpressionStatement(ts.createCall(
     ts.createIdentifier('super'),
     undefined,
     undefined
   ));
-}
+};

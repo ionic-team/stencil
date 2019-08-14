@@ -1,10 +1,11 @@
 import * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, buildWarn, flatOne } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, isDecoratorNamed } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
+import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
 
-export function listenDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnostic[], decoratedMembers: ts.ClassElement[], newMembers: ts.ClassElement[]) {
+export const listenDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], decoratedMembers: ts.ClassElement[], newMembers: ts.ClassElement[]) => {
   const listeners = decoratedMembers
     .filter(ts.isMethodDeclaration)
     .map(method => parseListenDecorators(config, diagnostics, method));
@@ -13,10 +14,10 @@ export function listenDecoratorsToStatic(config: d.Config, diagnostics: d.Diagno
   if (flatListeners.length > 0) {
     newMembers.push(createStaticGetter('listeners', convertValueToLiteral(flatListeners)));
   }
-}
+};
 
 
-function parseListenDecorators(config: d.Config, diagnostics: d.Diagnostic[], method: ts.MethodDeclaration) {
+const parseListenDecorators = (config: d.Config, diagnostics: d.Diagnostic[], method: ts.MethodDeclaration) => {
   const listenDecorators = method.decorators.filter(isDecoratorNamed('Listen'));
   if (listenDecorators.length === 0) {
     return [];
@@ -35,10 +36,10 @@ function parseListenDecorators(config: d.Config, diagnostics: d.Diagnostic[], me
 
     return parseListener(config, diagnostics, eventNames[0], listenOptions, methodName, listenDecorator);
   });
-}
+};
 
 
-export function parseListener(config: d.Config, diagnostics: d.Diagnostic[], eventName: string, opts: d.ListenOptions = {}, methodName: string, decoratorNode: ts.Decorator) {
+export const parseListener = (config: d.Config, diagnostics: d.Diagnostic[], eventName: string, opts: d.ListenOptions = {}, methodName: string, decoratorNode: ts.Decorator) => {
   let rawEventName = eventName.trim();
   let target = opts.target;
 
@@ -74,15 +75,15 @@ export function parseListener(config: d.Config, diagnostics: d.Diagnostic[], eve
       (PASSIVE_TRUE_DEFAULTS.has(rawEventName.toLowerCase())),
   };
   return listener;
-}
+};
 
-export function isValidTargetValue(prefix: string): prefix is d.ListenTargetOptions  {
+export const isValidTargetValue = (prefix: string): prefix is d.ListenTargetOptions => {
   return (VALID_ELEMENT_REF_PREFIXES.has(prefix));
-}
+};
 
-export function isValidKeycodeSuffix(prefix: string) {
+export const isValidKeycodeSuffix = (prefix: string) => {
   return (VALID_KEYCODE_SUFFIX.has(prefix));
-}
+};
 
 const PASSIVE_TRUE_DEFAULTS = new Set([
   'dragstart', 'drag', 'dragend', 'dragenter', 'dragover', 'dragleave', 'drop',

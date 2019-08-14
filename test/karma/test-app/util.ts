@@ -3,6 +3,11 @@
 const activeRendering = new Set();
 const onAppReadyCallbacks: Function[] = [];
 
+export declare namespace SomeTypes {
+  type Number = number;
+  type String = string;
+}
+
 function willRender(elm: any) {
   activeRendering.add(elm);
 }

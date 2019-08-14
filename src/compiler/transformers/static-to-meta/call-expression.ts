@@ -1,10 +1,10 @@
 import * as d from '../../../declarations';
 import { gatherVdomMeta } from '../static-to-meta/vdom';
+import { H } from '../core-runtime-apis';
 import ts from 'typescript';
-import { H } from '../exports';
 
 
-export function parseCallExpression(m: d.Module | d.ComponentCompilerMeta, node: ts.CallExpression) {
+export const parseCallExpression = (m: d.Module | d.ComponentCompilerMeta, node: ts.CallExpression) => {
   if (node.arguments != null && node.arguments.length > 0) {
 
     if (node.expression.kind === ts.SyntaxKind.Identifier) {
@@ -18,10 +18,10 @@ export function parseCallExpression(m: d.Module | d.ComponentCompilerMeta, node:
       }
     }
   }
-}
+};
 
 
-function visitCallExpressionArgs(m: d.Module | d.ComponentCompilerMeta, callExpressionName: ts.Identifier, args: ts.NodeArray<ts.Expression>) {
+const visitCallExpressionArgs = (m: d.Module | d.ComponentCompilerMeta, callExpressionName: ts.Identifier, args: ts.NodeArray<ts.Expression>) => {
   const fnName = callExpressionName.escapedText as string;
 
   if (fnName === 'h' || fnName === H || fnName === 'createElement') {
@@ -33,13 +33,21 @@ function visitCallExpressionArgs(m: d.Module | d.ComponentCompilerMeta, callExpr
 
   } else if (args.length > 1 && fnName === 'createElementNS') {
     visitCallExpressionArg(m, args[1]);
+
+  } else if (fnName === 'require' && args.length > 0 && (m as d.Module).originalImports) {
+    const arg = args[0];
+    if (ts.isStringLiteral(arg)) {
+      if (!(m as d.Module).originalImports.includes(arg.text)) {
+        (m as d.Module).originalImports.push(arg.text);
+      }
+    }
   }
-}
+};
 
 
-function visitCallExpressionArg(m: d.Module | d.ComponentCompilerMeta, arg: ts.Expression) {
-  if (arg.kind === ts.SyntaxKind.StringLiteral) {
-    let tag = (arg as ts.StringLiteral).text;
+const visitCallExpressionArg = (m: d.Module | d.ComponentCompilerMeta, arg: ts.Expression) => {
+  if (ts.isStringLiteral(arg)) {
+    let tag = arg.text;
 
     if (typeof tag === 'string') {
       tag = tag.toLowerCase();
@@ -50,4 +58,4 @@ function visitCallExpressionArg(m: d.Module | d.ComponentCompilerMeta, arg: ts.E
       }
     }
   }
-}
+};

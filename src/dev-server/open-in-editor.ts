@@ -48,13 +48,15 @@ async function parseData(devServerConfig: d.DevServerConfig, fs: d.FileSystem, r
 
   if (qs.line != null && !isNaN(qs.line)) {
     data.line = parseInt(qs.line, 10);
-  } else {
+  }
+  if (typeof data.line !== 'number' || data.line < 1) {
     data.line = 1;
   }
 
   if (qs.column != null && !isNaN(qs.column)) {
     data.column = parseInt(qs.column, 10);
-  } else {
+  }
+  if (typeof data.column !== 'number' || data.column < 1) {
     data.column = 1;
   }
 

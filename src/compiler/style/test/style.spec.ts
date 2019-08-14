@@ -50,7 +50,7 @@ describe('component-styles', () => {
     compiler.config.minifyJs = true;
     compiler.config.minifyCss = true;
     compiler.config.hashFileNames = true;
-    compiler.config.hashedFileNameLength = 1;
+    compiler.config.hashedFileNameLength = 2;
     await compiler.fs.writeFiles({
       [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({
         tag: 'cmp-a',

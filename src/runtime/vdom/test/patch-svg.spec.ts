@@ -18,7 +18,7 @@ describe('renderer', () => {
   describe('created element', () => {
 
     it('has tag', () => {
-      patch(vnode0, h('div', null), document);
+      patch(vnode0, h('div', null));
       expect(hostElm.tagName).toEqual('DIV');
     });
 
@@ -28,11 +28,24 @@ describe('renderer', () => {
       patch(vnode1, h('svg', null,
         h('foreignObject', null,
           h('div', null, 'I am HTML embedded in SVG')
-        )
-      ), document);
+        ),
+        h('feGaussianBlur', null)
+      ));
 
+      expect(svgElm.namespaceURI).toEqual(SVG_NS);
       expect(svgElm.firstChild.namespaceURI).toEqual(SVG_NS);
-      expect(svgElm.firstChild.firstChild.namespaceURI).not.toEqual(SVG_NS);
+      expect(svgElm.children[0].firstChild.namespaceURI).not.toEqual(SVG_NS);
+      expect(svgElm.children[1].namespaceURI).toEqual(SVG_NS);
+      expect(svgElm).toEqualHtml(`
+        <svg>
+          <foreignObject>
+            <div>
+              I am HTML embedded in SVG
+            </div>
+          </foreignObject>
+          <feGaussianBlur></feGaussianBlur>
+        </svg>`
+      );
     });
 
     it('should not affect subsequence element', () => {
@@ -42,11 +55,11 @@ describe('renderer', () => {
           h('circle', null)
         ] as any),
         h('div', null)
-      ] as any), document);
+      ] as any));
 
       expect(hostElm.tagName).toEqual('DIV');
       expect(hostElm.namespaceURI).not.toEqual(SVG_NS);
-      expect(hostElm.firstElementChild.tagName).toEqual('SVG');
+      expect(hostElm.firstElementChild.tagName).toEqual('svg');
       expect(hostElm.firstElementChild.namespaceURI).toEqual(SVG_NS);
       expect(hostElm.firstElementChild.firstChild.namespaceURI).toEqual(SVG_NS);
       expect(hostElm.firstElementChild.lastChild.namespaceURI).toEqual(SVG_NS);
@@ -62,7 +75,7 @@ describe('renderer', () => {
         h('div', null,
           h('svg', null)
         )
-      ), document);
+      ));
 
       const vnode1 = toVNode(vnode0.$elm$);
 
@@ -72,11 +85,11 @@ describe('renderer', () => {
           ),
           h('div', null)
         ] as any
-      ), document);
+      ));
 
       const vnode2 = toVNode(vnode1.$elm$);
       expect(vnode2.$children$[0].$elm$.tagName).toEqual('DIV');
-      expect(vnode2.$children$[0].$children$[0].$elm$.tagName).toEqual('SVG');
+      expect(vnode2.$children$[0].$children$[0].$elm$.tagName).toEqual('svg');
       expect(vnode2.$children$[1].$elm$.tagName).toEqual('DIV');
     });
   });

@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 
 
@@ -9,12 +8,20 @@ export async function startPuppeteerBrowser(config: d.Config) {
   }
 
   const env: d.E2EProcessEnv = process.env;
+  const puppeteerDep = config.testing.browserExecutablePath ? 'puppeteer-core' : 'puppeteer';
 
-  const puppeteerModulePath = config.sys.lazyRequire.getModulePath('puppeteer');
+  const puppeteerModulePath = config.sys.lazyRequire.getModulePath(puppeteerDep);
   const puppeteer = require(puppeteerModulePath);
   env.__STENCIL_PUPPETEER_MODULE__ = puppeteerModulePath;
-  config.logger.debug(`puppeteer: ${puppeteerModulePath}`);
+  env.__STENCIL_BROWSER_WAIT_UNTIL = config.testing.browserWaitUntil;
 
+  if (config.flags.devtools) {
+    config.testing.browserDevtools = true;
+    config.testing.browserHeadless = false;
+    env.__STENCIL_E2E_DEVTOOLS__ = 'true';
+  }
+
+  config.logger.debug(`puppeteer: ${puppeteerModulePath}`);
   config.logger.debug(`puppeteer headless: ${config.testing.browserHeadless}`);
 
   if (Array.isArray(config.testing.browserArgs)) {
@@ -41,15 +48,14 @@ export async function startPuppeteerBrowser(config: d.Config) {
     launchOpts.executablePath = config.testing.browserExecutablePath;
   }
 
-  let browser;
-  if (config.testing.browserWSEndpoint) {
-    const connectOpts: puppeteer.ConnectOptions = launchOpts;
-    connectOpts.browserWSEndpoint = config.testing.browserWSEndpoint;
-    browser = await puppeteer.connect(connectOpts);
-
-  } else {
-    browser = await puppeteer.launch(launchOpts);
-  }
+  const browser = await ((config.testing.browserWSEndpoint)
+    ? puppeteer.connect({
+        ...launchOpts,
+        browserWSEndpoint: config.testing.browserWSEndpoint
+      })
+    : puppeteer.launch({
+        ...launchOpts,
+      }));
 
   env.__STENCIL_BROWSER_WS_ENDPOINT__ = browser.wsEndpoint();
 
@@ -82,50 +88,18 @@ export async function connectBrowser() {
 }
 
 
-export async function disconnectBrowser(browser: puppeteer.Browser, pages: puppeteer.Page[]) {
-  if (Array.isArray(pages)) {
-    await Promise.all(pages.map(closePage));
-    pages.length = 0;
-  }
-  if (browser) {
+export async function disconnectBrowser(browserContext: puppeteer.BrowserContext) {
+  if (browserContext) {
+    const browser = browserContext.browser();
+    try {
+      await browserContext.close();
+    } catch (e) {}
     try {
       browser.disconnect();
     } catch (e) {}
   }
 }
 
-
-export function newBrowserPage(browser: puppeteer.Browser) {
-  return browser.newPage();
-}
-
-
-export async function closePage(page: any) {
-  try {
-    if (Array.isArray((page as pd.E2EPageInternal)._e2eElements)) {
-      const disposes = (page as pd.E2EPageInternal)._e2eElements.map(async elmHande => {
-        if (typeof elmHande.e2eDispose === 'function') {
-          await elmHande.e2eDispose();
-        }
-      });
-      await Promise.all(disposes);
-    }
-  } catch (e) {}
-
-  (page as pd.E2EPageInternal)._e2eElements = null;
-  (page as pd.E2EPageInternal)._e2eEvents = null;
-  (page as pd.E2EPageInternal)._e2eGoto = null;
-  (page as pd.E2EPageInternal).find = null;
-  (page as pd.E2EPageInternal).findAll = null;
-  (page as pd.E2EPageInternal).compareScreenshot = null;
-  (page as pd.E2EPageInternal).setContent = null;
-  (page as pd.E2EPageInternal).spyOnEvent = null;
-  (page as pd.E2EPageInternal).waitForChanges = null;
-  (page as pd.E2EPageInternal).waitForEvent = null;
-
-  try {
-    if (!(page as puppeteer.Page).isClosed()) {
-      await (page as puppeteer.Page).close();
-    }
-  } catch (e) {}
+export function newBrowserPage(browserContext: puppeteer.BrowserContext) {
+  return browserContext.newPage();
 }

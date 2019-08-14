@@ -66,4 +66,9 @@ export interface RenderNode extends d.HostElement {
    * Node Id (hydrate only)
    */
   ['s-node-id']?: number;
+
+  /**
+   * Used to tell if the element is shadow dom or not
+   */
+  ['s-sd']?: boolean;
 }

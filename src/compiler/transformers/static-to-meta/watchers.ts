@@ -3,7 +3,7 @@ import { getStaticValue } from '../transform-utils';
 import ts from 'typescript';
 
 
-export function parseStaticWatchers(staticMembers: ts.ClassElement[]): d.ComponentCompilerWatch[] {
+export const parseStaticWatchers = (staticMembers: ts.ClassElement[]): d.ComponentCompilerWatch[] => {
   const parsedWatchers: d.ComponentCompilerWatch[] = getStaticValue(staticMembers, 'watchers');
   if (!parsedWatchers || parsedWatchers.length === 0) {
     return [];
@@ -15,4 +15,4 @@ export function parseStaticWatchers(staticMembers: ts.ClassElement[]): d.Compone
       methodName: parsedWatch.methodName
     };
   });
-}
+};

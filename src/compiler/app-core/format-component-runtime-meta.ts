@@ -2,15 +2,15 @@ import * as d from '../../declarations';
 import { CMP_FLAGS, LISTENER_FLAGS, MEMBER_FLAGS } from '@utils';
 
 
-export function formatLazyBundleRuntimeMeta(bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData {
+export const formatLazyBundleRuntimeMeta = (bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData => {
   return [
     bundleId,
     cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
   ];
-}
+};
 
 
-export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta, includeMethods: boolean): d.ComponentRuntimeMetaCompact {
+export const formatComponentRuntimeMeta = (compilerMeta: d.ComponentCompilerMeta, includeMethods: boolean): d.ComponentRuntimeMetaCompact => {
   let flags = 0;
   if (compilerMeta.encapsulation === 'shadow') {
     flags |= CMP_FLAGS.shadowDomEncapsulation;
@@ -29,25 +29,30 @@ export function formatComponentRuntimeMeta(compilerMeta: d.ComponentCompilerMeta
     Object.keys(members).length > 0 ? members : undefined,
     hostListeners.length > 0 ? hostListeners : undefined
   ]);
-}
+};
 
 
-export function stringifyRuntimeData(data: any) {
-  // stringify the data, then remove property double-quotes so they can be property renamed
-  return JSON.stringify(data);
-}
+export const stringifyRuntimeData = (data: any) => {
+  const json = JSON.stringify(data);
+  if (json.length > 10000) {
+    // JSON metadata is big, JSON.parse() is faster
+    // https://twitter.com/mathias/status/1143551692732030979
+    return `JSON.parse(${JSON.stringify(json)})`;
+  }
+  return json;
+};
 
 
-function formatComponentRuntimeMembers(compilerMeta: d.ComponentCompilerMeta, includeMethods = true): d.ComponentRuntimeMembers {
+const formatComponentRuntimeMembers = (compilerMeta: d.ComponentCompilerMeta, includeMethods = true): d.ComponentRuntimeMembers => {
   return {
     ...formatPropertiesRuntimeMember(compilerMeta.properties),
     ...formatStatesRuntimeMember(compilerMeta.states),
     ...includeMethods ? formatMethodsRuntimeMember(compilerMeta.methods) : {},
   };
-}
+};
 
 
-function formatPropertiesRuntimeMember(properties: d.ComponentCompilerProperty[]) {
+const formatPropertiesRuntimeMember = (properties: d.ComponentCompilerProperty[]) => {
   const runtimeMembers: d.ComponentRuntimeMembers = {};
 
   properties.forEach(member => {
@@ -60,10 +65,10 @@ function formatPropertiesRuntimeMember(properties: d.ComponentCompilerProperty[]
     ]);
   });
   return runtimeMembers;
-}
+};
 
 
-function formatFlags(compilerProperty: d.ComponentCompilerProperty) {
+const formatFlags = (compilerProperty: d.ComponentCompilerProperty) => {
   let type = formatPropType(compilerProperty.type);
   if (compilerProperty.mutable) {
     type |= MEMBER_FLAGS.Mutable;
@@ -72,10 +77,10 @@ function formatFlags(compilerProperty: d.ComponentCompilerProperty) {
     type |= MEMBER_FLAGS.ReflectAttr;
   }
   return type;
-}
+};
 
 
-function formatAttrName(compilerProperty: d.ComponentCompilerProperty) {
+const formatAttrName = (compilerProperty: d.ComponentCompilerProperty) => {
   if (typeof compilerProperty.attribute === 'string') {
     // string attr name means we should observe this attribute
     if (compilerProperty.name === compilerProperty.attribute) {
@@ -92,10 +97,10 @@ function formatAttrName(compilerProperty: d.ComponentCompilerProperty) {
 
   // we shouldn't even observe an attribute for this property
   return undefined;
-}
+};
 
 
-function formatPropType(type: d.ComponentCompilerPropertyType) {
+const formatPropType = (type: d.ComponentCompilerPropertyType) => {
   if (type === 'string') {
     return MEMBER_FLAGS.String;
   }
@@ -109,10 +114,10 @@ function formatPropType(type: d.ComponentCompilerPropertyType) {
     return MEMBER_FLAGS.Any;
   }
   return MEMBER_FLAGS.Unknown;
-}
+};
 
 
-function formatStatesRuntimeMember(states: d.ComponentCompilerState[]) {
+const formatStatesRuntimeMember = (states: d.ComponentCompilerState[]) => {
   const runtimeMembers: d.ComponentRuntimeMembers = {};
 
   states.forEach(member => {
@@ -124,10 +129,10 @@ function formatStatesRuntimeMember(states: d.ComponentCompilerState[]) {
     ];
   });
   return runtimeMembers;
-}
+};
 
 
-function formatMethodsRuntimeMember(methods: d.ComponentCompilerMethod[]) {
+const formatMethodsRuntimeMember = (methods: d.ComponentCompilerMethod[]) => {
   const runtimeMembers: d.ComponentRuntimeMembers = {};
 
   methods.forEach(member => {
@@ -139,9 +144,9 @@ function formatMethodsRuntimeMember(methods: d.ComponentCompilerMethod[]) {
     ];
   });
   return runtimeMembers;
-}
+};
 
-function formatHostListeners(compilerMeta: d.ComponentCompilerMeta) {
+const formatHostListeners = (compilerMeta: d.ComponentCompilerMeta) => {
   return compilerMeta.listeners.map(compilerListener => {
     const hostListener: d.ComponentRuntimeHostListener = [
       computeListenerFlags(compilerListener),
@@ -150,9 +155,9 @@ function formatHostListeners(compilerMeta: d.ComponentCompilerMeta) {
     ];
     return hostListener;
   });
-}
+};
 
-function computeListenerFlags(listener: d.ComponentCompilerListener) {
+const computeListenerFlags = (listener: d.ComponentCompilerListener) => {
   let flags = 0;
   if (listener.capture) {
     flags |= LISTENER_FLAGS.Capture;
@@ -167,9 +172,9 @@ function computeListenerFlags(listener: d.ComponentCompilerListener) {
     case 'body': flags |= LISTENER_FLAGS.TargetBody; break;
   }
   return flags;
-}
+};
 
-function trimFalsy(data: any): any {
+const trimFalsy = (data: any): any => {
   const arr = (data as any[]);
   for (var i = arr.length - 1; i >= 0; i--) {
     if (arr[i]) {
@@ -180,4 +185,4 @@ function trimFalsy(data: any): any {
   }
 
   return arr;
-}
+};

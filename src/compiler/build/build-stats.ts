@@ -3,16 +3,16 @@ import { normalizePath, sortBy } from '@utils';
 import { isOutputTargetStats } from '../output-targets/output-utils';
 
 
-export async function generateBuildStats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, buildResults: d.BuildResults) {
+export const generateBuildStats = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, buildResults: d.BuildResults) => {
   const statsTargets = config.outputTargets.filter(isOutputTargetStats);
 
   await Promise.all(statsTargets.map(async outputTarget => {
     await generateStatsOutputTarget(config, compilerCtx, buildCtx, buildResults, outputTarget);
   }));
-}
+};
 
 
-export async function generateStatsOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, buildResults: d.BuildResults, outputTarget: d.OutputTargetStats) {
+export const generateStatsOutputTarget = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, buildResults: d.BuildResults, outputTarget: d.OutputTargetStats) => {
   try {
     let jsonData: any;
 
@@ -75,4 +75,4 @@ export async function generateStatsOutputTarget(config: d.Config, compilerCtx: d
     await compilerCtx.fs.commit();
 
   } catch (e) {}
-}
+};

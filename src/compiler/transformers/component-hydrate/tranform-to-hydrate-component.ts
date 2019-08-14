@@ -1,19 +1,27 @@
 import * as d from '../../../declarations';
-import { addHydrateImports } from './hydrate-imports';
+import { addImports } from '../add-imports';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, ScriptTarget, getComponentMeta } from '../transform-utils';
+import { getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
 import { updateHydrateComponentClass } from './hydrate-component';
 import ts from 'typescript';
+import { addLegacyApis } from '../core-runtime-apis';
 
 
-export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) {
+export const transformToHydrateComponentText = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) => {
   let outputText: string = null;
 
   try {
+    const transformOpts: d.TransformOptions = {
+      coreImportPath: '@stencil/core',
+      componentExport: null,
+      componentMetadata: null,
+      proxy: null,
+      style: 'static'
+    };
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
-        module: ModuleKind,
-        target: ScriptTarget,
+        module: ts.ModuleKind.ESNext,
+        target: getScriptTarget(),
         skipLibCheck: true,
         noResolve: true,
         noLib: true,
@@ -21,7 +29,7 @@ export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buil
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          hydrateComponentTransform(compilerCtx)
+          hydrateComponentTransform(compilerCtx, transformOpts)
         ]
       }
     };
@@ -39,29 +47,35 @@ export function transformToHydrateComponentText(compilerCtx: d.CompilerCtx, buil
   }
 
   return outputText;
-}
+};
 
 
-function hydrateComponentTransform(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
+const hydrateComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
 
   return transformCtx => {
 
     return tsSourceFile => {
+      const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
 
-      function visitNode(node: ts.Node): any {
+      const visitNode = (node: ts.Node): any => {
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateHydrateComponentClass(node, cmp);
+            return updateHydrateComponentClass(node, moduleFile, cmp);
           }
         }
 
         return ts.visitEachChild(node, visitNode, transformCtx);
-      }
+      };
 
       tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
 
-      return addHydrateImports(transformCtx, compilerCtx, tsSourceFile);
+      if (moduleFile.isLegacy) {
+        addLegacyApis(moduleFile);
+      }
+      tsSourceFile = addImports(transformOpts, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
+
+      return tsSourceFile;
     };
   };
-}
+};

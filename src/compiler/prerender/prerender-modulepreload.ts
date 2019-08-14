@@ -3,8 +3,8 @@ import { flatOne, unique } from '@utils';
 import { getScopeId } from '../style/scope-css';
 import {injectModulePreloads} from '../html/inject-module-preloads';
 
-export function generateModulePreloads(doc: Document, hydrateResults: d.HydrateResults, componnentGraph: Map<string, string[]>) {
-  if (!componnentGraph) {
+export function generateModulePreloads(doc: Document, hydrateResults: d.HydrateResults, componentGraph: Map<string, string[]>) {
+  if (!componentGraph) {
     return false;
   }
   const hasImportScript = !!doc.querySelector('script[type=module][data-resources-url]');
@@ -14,8 +14,8 @@ export function generateModulePreloads(doc: Document, hydrateResults: d.HydrateR
   const modulePreloads = unique(
     flatOne(
       hydrateResults.components
-        .map(cmp => getScopeId(cmp.tag))
-        .map(scopeId => componnentGraph.get(scopeId) || [])
+        .map(cmp => getScopeId(cmp.tag, cmp.mode))
+        .map(scopeId => componentGraph.get(scopeId) || [])
     )
   );
 

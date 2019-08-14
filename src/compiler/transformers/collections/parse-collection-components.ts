@@ -1,6 +1,5 @@
 import * as d from '../../../declarations';
 import { convertStaticToMeta } from '../static-to-meta/visitor';
-import { ModuleKind, ScriptTarget } from '../transform-utils';
 import { noop } from '@utils';
 import { parseComponentsDeprecated } from './parse-collection-deprecated';
 import ts from 'typescript';
@@ -40,8 +39,8 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
   options.outFile = undefined;
   options.noResolve = true;
 
-  options.module = ModuleKind;
-  options.target = ScriptTarget;
+  options.module = ts.ModuleKind.ESNext;
+  options.target = ts.ScriptTarget.ES2017;
 
   const sourceFile = ts.createSourceFile(inputFileName, sourceText, options.target);
 
@@ -66,8 +65,11 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
   program.emit(undefined, undefined, undefined, undefined, {
     after: [
       convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, collection, {
-        addCompilerMeta: false,
-        addStyle: true
+        coreImportPath: '@stencil/core',
+        componentExport: null,
+        componentMetadata: null,
+        proxy: null,
+        style: 'static'
       })
     ]
   });

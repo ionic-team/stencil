@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { loadTypeScriptDiagnostic, loadTypeScriptDiagnostics, normalizePath } from '@utils';
-import { ModuleKind, ScriptTarget } from '../transformers/transform-utils';
+import { getScriptTarget } from '../transformers/transform-utils';
 import ts from 'typescript';
 import { isOutputTargetDistTypes } from '../output-targets/output-utils';
 
@@ -12,32 +12,34 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
 
   let compilerOptions = Object.assign({}, DEFAULT_COMPILER_OPTIONS);
 
-  try {
-    const tsconfigFilePath = normalizePath(config.tsconfig);
+  if (typeof config.tsconfig === 'string') {
+    try {
+      const tsconfigFilePath = normalizePath(config.tsconfig);
 
-    const tsconfigResults = ts.readConfigFile(tsconfigFilePath, ts.sys.readFile);
+      const tsconfigResults = ts.readConfigFile(tsconfigFilePath, ts.sys.readFile);
 
-    if (tsconfigResults.error != null) {
-      if (!config._isTesting) {
-        buildCtx.diagnostics.push(loadTypeScriptDiagnostic(tsconfigResults.error));
-      }
-
-    } else {
-      const configBasePath = config.sys.path.dirname(config.configPath);
-      const parseResult = ts.convertCompilerOptionsFromJson(tsconfigResults.config.compilerOptions, configBasePath);
-      if (parseResult.errors && parseResult.errors.length > 0) {
-        loadTypeScriptDiagnostics(buildCtx.diagnostics, parseResult.errors);
+      if (tsconfigResults.error != null) {
+        if (!config._isTesting) {
+          buildCtx.diagnostics.push(loadTypeScriptDiagnostic(tsconfigResults.error));
+        }
 
       } else {
-        compilerOptions = {
-          ...compilerOptions,
-          ...parseResult.options
-        };
-      }
-    }
+        const configBasePath = config.sys.path.dirname(config.configPath);
+        const parseResult = ts.convertCompilerOptionsFromJson(tsconfigResults.config.compilerOptions, configBasePath);
+        if (parseResult.errors && parseResult.errors.length > 0) {
+          loadTypeScriptDiagnostics(buildCtx.diagnostics, parseResult.errors);
 
-  } catch (e) {
-    config.logger.debug(`getUserCompilerOptions: ${e}`);
+        } else {
+          compilerOptions = {
+            ...compilerOptions,
+            ...parseResult.options
+          };
+        }
+      }
+
+    } catch (e) {
+      config.logger.debug(`getUserCompilerOptions: ${e}`);
+    }
   }
 
   if (config._isTesting) {
@@ -62,7 +64,7 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
     compilerOptions.declaration = false;
   }
 
-  if (compilerOptions.module !== DEFAULT_COMPILER_OPTIONS.module && !config._isTesting) {
+  if ((compilerOptions.module !== DEFAULT_COMPILER_OPTIONS.module && compilerOptions.module !== ts.ModuleKind.ESNext) && !config._isTesting) {
     config.logger.warn(`To improve bundling, it is always recommended to set the tsconfig.json “module” setting to “esnext”. Note that the compiler will automatically handle bundling both modern and legacy builds.`);
   }
 
@@ -132,10 +134,10 @@ export const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
   experimentalDecorators: true,
 
   // transpile down to es2017
-  target: ScriptTarget,
+  target: getScriptTarget(),
 
   // create esNext modules
-  module: ModuleKind,
+  module: ts.ModuleKind.ESNext,
 
   // resolve using NodeJs style
   moduleResolution: ts.ModuleResolutionKind.NodeJs,

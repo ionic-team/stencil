@@ -10,6 +10,14 @@ export interface OutputTargetAngular extends OutputTargetBase {
   excludeComponents?: string[];
 }
 
+export interface OutputTargetCopy extends OutputTargetBase {
+  type: 'copy';
+
+  dir: string;
+  copy?: d.CopyTask[];
+  copyAssets?: 'collection' | 'dist';
+}
+
 export interface OutputTargetWww extends OutputTargetBase {
   /**
    * Webapp output target.
@@ -84,7 +92,6 @@ export interface OutputTargetWww extends OutputTargetBase {
   prerenderConfig?: string;
 
   serviceWorker?: d.ServiceWorkerConfig | null;
-  resourcesUrl?: string;
   appDir?: string;
 }
 
@@ -94,7 +101,6 @@ export interface OutputTargetDist extends OutputTargetBase {
 
   buildDir?: string;
   dir?: string;
-  resourcesUrl?: string;
 
   collectionDir?: string | null;
   typesDir?: string;
@@ -109,7 +115,6 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
 
   dir: string;
   collectionDir: string;
-  copy: d.CopyTask[];
 }
 
 export interface OutputTargetDistTypes extends OutputTargetBase {
@@ -122,14 +127,11 @@ export interface OutputTargetDistTypes extends OutputTargetBase {
 export interface OutputTargetDistLazy extends OutputTargetBase {
   type: 'dist-lazy';
 
-  copyDir?: string;
   esmDir?: string;
   esmEs5Dir?: string;
   systemDir?: string;
   cjsDir?: string;
-  resourcesUrl?: string;
   polyfills?: boolean;
-  copy?: d.CopyTask[];
   isBrowserBuild?: boolean;
 
   esmIndexFile?: string;
@@ -161,6 +163,7 @@ export interface OutputTargetDistModule extends OutputTargetBase {
   dir?: string;
   externalRuntime?: boolean;
   empty?: boolean;
+  copy?: d.CopyTask[];
 }
 
 
@@ -169,7 +172,6 @@ export interface OutputTargetDistSelfContained extends OutputTargetBase {
 
   dir?: string;
   buildDir?: string;
-  resourcesUrl?: string;
 
   empty?: boolean;
 }
@@ -236,6 +238,7 @@ export type OutputTargetBuild =
 
 export type OutputTarget =
  | OutputTargetAngular
+ | OutputTargetCopy
  | OutputTargetCustom
  | OutputTargetDist
  | OutputTargetDistCollection

@@ -15,19 +15,17 @@ export async function initPageEvents(page: pd.E2EPageInternal) {
   await page.evaluateOnNewDocument(browserContextEvents);
 
   page.spyOnEvent = pageSpyOnEvent.bind(page, page);
-
-  page.waitForEvent = pageWaitForEvent.bind(page, page);
 }
 
 
 async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selector: 'window' | 'document') {
   const eventSpy = new EventSpy(eventName);
 
-  if (selector !== 'document') {
-    selector = 'window';
-  }
+  const handler = (selector !== 'document')
+    ? () => window
+    : () => document;
 
-  const handle = await page.evaluateHandle(selector);
+  const handle = await page.evaluateHandle(handler);
 
   await addE2EListener(page, handle, eventName, (ev: any) => {
     eventSpy.events.push(ev);
@@ -36,32 +34,22 @@ async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selec
   return eventSpy;
 }
 
-
-async function pageWaitForEvent(page: pd.E2EPageInternal, eventName: string, selector: 'window' | 'document') {
-  if (selector !== 'document') {
-    selector = 'window';
-  }
-
-  const ev = await page.evaluate((selector: string, eventName: string) => {
-
-    return new Promise((resolve, reject) => {
+export async function waitForEvent(page: pd.E2EPageInternal, eventName: string, elementHandle: puppeteer.ElementHandle) {
+  const ev = await page.evaluate((element: Element, eventName: string) => {
+    return new Promise<any>((resolve, reject) => {
       const tmr = setTimeout(() => {
-        reject(`page.waitForEvent() timeout, eventName: ${eventName}, selector: ${selector}`);
+        reject(`waitForEvent() timeout, eventName: ${eventName}`);
       }, 10000);
 
-      function listener(ev: any) {
+      element.addEventListener(eventName, ev => {
         clearTimeout(tmr);
-        (window as any)[selector].removeEventListener(eventName, listener);
-        resolve((window as pd.BrowserWindow).stencilSerializeEvent(ev));
-      }
+        resolve((window as pd.BrowserWindow).stencilSerializeEvent(ev as any));
+      }, {once: true});
 
-      (window as any)[selector].addEventListener(eventName, listener);
     });
-
-  }, selector, eventName);
+  }, elementHandle, eventName);
 
   await page.waitForChanges();
-
   return ev;
 }
 

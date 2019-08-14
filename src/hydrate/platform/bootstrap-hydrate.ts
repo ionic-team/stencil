@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { getComponent, getHostRef, plt } from '@platform';
+import { doc, getComponent, getHostRef, plt } from '@platform';
 import { hydrateComponent } from './hydrate-component';
 import { insertVdomAnnotations, postUpdateComponent } from '@runtime';
 
@@ -7,9 +7,9 @@ import { insertVdomAnnotations, postUpdateComponent } from '@runtime';
 export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, done: (results: BootstrapHydrateResults) => void) {
   const results: BootstrapHydrateResults = {
     hydratedCount: 0,
-    hydratedTags: []
+    hydratedComponents: []
   };
-  plt.$resourcesUrl$ = new URL(opts.resourcesUrl || '/', win.location.href).href;
+  plt.$resourcesUrl$ = new URL(opts.resourcesUrl || './', doc.baseURI).href;
 
 
   try {
@@ -135,6 +135,9 @@ function connectElements(win: Window, opts: d.HydrateDocumentOptions, results: B
 
 
 function shouldHydrate(elm: Element): boolean {
+  if (elm.nodeType === 9) {
+    return true;
+  }
   if (NO_HYDRATE_TAGS.has(elm.nodeName)) {
     return false;
   }
@@ -168,5 +171,8 @@ const NO_HYDRATE_TAGS = new Set([
 
 export interface BootstrapHydrateResults {
   hydratedCount: number;
-  hydratedTags: string[];
+  hydratedComponents: {
+    tag: string,
+    mode: string
+  }[];
 }

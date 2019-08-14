@@ -9,6 +9,7 @@ export type ModuleMap = Map<string, Module>;
  */
 export interface Module {
   cmps: d.ComponentCompilerMeta[];
+  coreRuntimeApis: string[];
   collectionName: string;
   dtsFilePath: string;
   excludeFromCollection: boolean;
@@ -28,6 +29,7 @@ export interface Module {
   isLegacy: boolean;
   jsFilePath: string;
   localImports: string[];
+  originalImports: string[];
   originalCollectionComponentPath: string;
   potentialCmpRefs: string[];
   sourceFilePath: string;

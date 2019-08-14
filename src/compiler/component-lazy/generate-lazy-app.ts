@@ -10,6 +10,9 @@ import { generateCjs } from './generate-cjs';
 import { generateModuleGraph } from '../entries/component-graph';
 
 export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[]) {
+  if (canSkipLazyBuild(buildCtx)) {
+    return;
+  }
   const timespan = buildCtx.createTimeSpan(`bundling components started`);
 
   const cmps = buildCtx.components;
@@ -69,7 +72,6 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
       'loader': '@external-entrypoint',
       'index': usersIndexJsPath
     },
-    emitCoreChunk: true,
     cache: compilerCtx.rollupCacheLazy
   };
 
@@ -88,9 +90,9 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
 
 const BROWSER_ENTRY = `
 import { bootstrapLazy, patchBrowser, globals } from '@stencil/core';
-patchBrowser().then(resourcesUrl => {
+patchBrowser().then(options => {
   globals();
-  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], { resourcesUrl });
+  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
 });
 `;
 
@@ -147,4 +149,14 @@ function getLegacyLoader(config: d.Config) {
   console.warn(warn.join('\\n'));
 
 })(document);`;
+}
+
+export function canSkipLazyBuild(buildCtx: d.BuildCtx) {
+  if (buildCtx.requiresFullBuild) {
+    return false;
+  }
+  if (buildCtx.isRebuild && (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges)) {
+    return false;
+  }
+  return true;
 }

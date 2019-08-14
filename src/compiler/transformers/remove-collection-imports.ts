@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import ts from 'typescript';
 
 
-export function removeCollectionImports(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
+export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> => {
   /*
 
     // remove side effect collection imports like:
@@ -16,7 +16,7 @@ export function removeCollectionImports(compilerCtx: d.CompilerCtx): ts.Transfor
 
   return transformCtx => {
 
-    function visitImport(importNode: ts.ImportDeclaration) {
+    const visitImport = (importNode: ts.ImportDeclaration) => {
       if (!importNode.importClause && importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
         // must not have an import clause
         // must have a module specifier and
@@ -37,20 +37,19 @@ export function removeCollectionImports(compilerCtx: d.CompilerCtx): ts.Transfor
       }
 
       return importNode;
-    }
+    };
 
-
-    function visit(node: ts.Node): ts.VisitResult<ts.Node> {
+    const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
       switch (node.kind) {
         case ts.SyntaxKind.ImportDeclaration:
           return visitImport(node as ts.ImportDeclaration);
         default:
           return ts.visitEachChild(node, visit, transformCtx);
       }
-    }
+    };
 
     return (tsSourceFile) => {
       return visit(tsSourceFile) as ts.SourceFile;
     };
   };
-}
+};

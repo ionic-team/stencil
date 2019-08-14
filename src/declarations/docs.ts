@@ -32,6 +32,7 @@ export interface JsonDocsComponent {
   dependants: string[];
   dependencies: string[];
   dependencyGraph: JsonDocsDependencyGraph;
+  deprecation: string | undefined;
 }
 
 export interface JsonDocsDependencyGraph {
@@ -57,7 +58,7 @@ export interface JsonDocsProp {
   docs: string;
   docsTags: JsonDocsTag[];
   default: string;
-  deprecation?: string | undefined;
+  deprecation: string | undefined;
 
   optional: boolean;
   required: boolean;

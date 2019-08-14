@@ -9,14 +9,14 @@ import { transpileToEs5Worker } from '../../compiler/transpile/transpile-to-es5-
 import { validateTypesWorker } from '../../compiler/transpile/validate-types-worker';
 
 
-const Terser = require('terser/dist/bundle.js');
+const Terser = require('terser/dist/bundle.min.js');
 
 
 export class NodeSystemWorker {
   workerContext: d.WorkerContext = {};
 
-  copy(copyTasks: d.CopyTask[]) {
-    return copyTasksWorker(copyTasks);
+  copy(copyTasks: Required<d.CopyTask>[], srcDir: string) {
+    return copyTasksWorker(copyTasks, srcDir);
   }
 
   optimizeCss(inputOpts: d.OptimizeCssInput) {

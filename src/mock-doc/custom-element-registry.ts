@@ -1,4 +1,4 @@
-import { MockElement, MockNode } from './node';
+import { MockHTMLElement, MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
 
@@ -156,7 +156,7 @@ export function createCustomElement(customElements: MockCustomElementRegistry, o
     }
   });
 
-  const elm = new MockElement(ownerDocument, tagName);
+  const elm = new MockHTMLElement(ownerDocument, tagName);
 
   proxyElements.set(host, elm);
 

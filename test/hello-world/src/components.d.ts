@@ -12,8 +12,21 @@ export namespace Components {
   interface HelloWorld {}
 }
 
+declare global {
+
+
+  interface HTMLHelloWorldElement extends Components.HelloWorld, HTMLStencilElement {}
+  var HTMLHelloWorldElement: {
+    prototype: HTMLHelloWorldElement;
+    new (): HTMLHelloWorldElement;
+  };
+  interface HTMLElementTagNameMap {
+    'hello-world': HTMLHelloWorldElement;
+  }
+}
+
 declare namespace LocalJSX {
-  interface HelloWorld extends JSXBase.HTMLAttributes {}
+  interface HelloWorld extends JSXBase.HTMLAttributes<HTMLHelloWorldElement> {}
 
   interface IntrinsicElements {
     'hello-world': HelloWorld;
@@ -29,21 +42,4 @@ declare module "@stencil/core" {
   }
 }
 
-
-declare global {
-
-
-
-  interface HTMLHelloWorldElement extends Components.HelloWorld, HTMLStencilElement {}
-  var HTMLHelloWorldElement: {
-    prototype: HTMLHelloWorldElement;
-    new (): HTMLHelloWorldElement;
-  };
-
-  interface HTMLElementTagNameMap {
-    'hello-world': HTMLHelloWorldElement;
-  }
-
-  interface ElementTagNameMap extends HTMLElementTagNameMap {}
-}
 

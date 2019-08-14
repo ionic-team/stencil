@@ -2,13 +2,38 @@ const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
 const ts = require('typescript');
-const terser = require('terser');
 
 const ROOT_DIR = path.join(__dirname, '..');
 const SRC_DIR = path.join(ROOT_DIR, 'src', 'client', 'polyfills');
 
+function buildCoreJs() {
+  return require('core-js-builder')({
+    modules: [
+      'es',
+      'web.url',
+      'web.url.to-json',
+      'web.url-search-params',
+      'web.dom-collections.for-each'
+    ],
+    blacklist: [
+      'es.math',
+      'es.date',
+      'es.symbol',
+      'es.array-buffer',
+      'es.data-view',
+      'es.typed-array',
+      'es.reflect',
+      'es.promise'
+    ],
+    targets: 'ie 11',
+    filename: path.join(SRC_DIR, 'core-js.js'),
+  });
+}
 
 module.exports = async function buildPolyfills(transpiledPolyfillsDir, outputPolyfillsDir) {
+  // Only run when regenerating core-js polyfill
+  // await buildCoreJs();
+
   await fs.emptyDir(outputPolyfillsDir);
 
   const filesSrc = (await fs.readdir(SRC_DIR)).filter(f => f.endsWith('.js'));

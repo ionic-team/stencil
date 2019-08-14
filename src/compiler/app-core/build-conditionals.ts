@@ -112,11 +112,12 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isDev = !!config.devMode;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config._lifecycleDOMEvents);
   b.profile = !!(config.flags && config.flags.profile);
-  b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.reloadStrategy === 'hmr');
+  b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.reloadStrategy === 'hmr' && !config._isTesting);
   b.updatable = (b.updatable || b.hydrateClientSide || b.hotModuleReplacement);
   b.member = (b.member || b.updatable || b.mode || b.lifecycle);
   b.taskQueue = (b.updatable || b.mode || b.lifecycle);
-  b.constructableCSS = !b.hotModuleReplacement || config._isTesting;
+  b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
+  b.initializeNextTick = true; // config.outputTargets.some(isOutputTargetAngular);
   b.cssAnnotations = true;
 }
 

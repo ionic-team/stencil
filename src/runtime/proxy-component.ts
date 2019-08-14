@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { getHostRef } from '@platform';
+import { getHostRef, plt } from '@platform';
 import { getValue, setValue } from './set-value';
 import { MEMBER_FLAGS } from '../utils/constants';
 import { PROXY_FLAGS } from './runtime-constants';
@@ -15,7 +15,13 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
     const prototype = (Cstr as any).prototype;
 
     members.forEach(([memberName, [memberFlags]]) => {
-      if ((BUILD.prop && (memberFlags & MEMBER_FLAGS.Prop)) || (BUILD.state && (!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) && (memberFlags & MEMBER_FLAGS.State))) {
+      if ((BUILD.prop || BUILD.state) && (
+        (memberFlags & MEMBER_FLAGS.Prop) ||
+        (
+          (!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) &&
+          (memberFlags & MEMBER_FLAGS.State)
+        )
+      )) {
         // proxyComponent - prop
         Object.defineProperty(prototype, memberName,
           {
@@ -47,10 +53,12 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       const attrNameToPropName = new Map();
 
       prototype.attributeChangedCallback = function(attrName: string, _oldValue: string, newValue: string) {
-        const propName = attrNameToPropName.get(attrName);
-        this[propName] = newValue === null && typeof this[propName] === 'boolean'
-          ? false
-          : newValue;
+        plt.jmp(() => {
+          const propName = attrNameToPropName.get(attrName);
+          this[propName] = newValue === null && typeof this[propName] === 'boolean'
+            ? false
+            : newValue;
+        });
       };
 
       // create an array of attributes to observe

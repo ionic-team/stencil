@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import * as puppeteer from 'puppeteer';
 
 
-export interface NewE2EPageOptions {
+export interface NewE2EPageOptions extends puppeteer.NavigationOptions {
   url?: string;
   html?: string;
 }
@@ -10,7 +10,7 @@ export interface NewE2EPageOptions {
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
 type PuppeteerPage = Omit<puppeteer.Page,
-'bringToFront' | 'browser' | 'screenshot' | 'close' | 'emulate' | 'emulateMedia' | 'frames' | 'goBack' | 'goForward' | 'isClosed' | 'mainFrame' | 'pdf' | 'reload' | 'target' | 'title' | 'viewport' | 'waitForNavigation' | 'screenshot' | 'workers' | 'addListener' | 'prependListener' | 'prependOnceListener' | 'removeListener' | 'removeAllListeners' | 'setMaxListeners' | 'getMaxListeners' | 'listeners' | 'rawListeners' | 'emit' | 'eventNames' | 'listenerCount' | '$x' | 'waitForXPath'
+'bringToFront' | 'browser' | 'screenshot' | 'emulate' | 'emulateMedia' | 'frames' | 'goBack' | 'goForward' | 'isClosed' | 'mainFrame' | 'pdf' | 'reload' | 'target' | 'title' | 'viewport' | 'waitForNavigation' | 'screenshot' | 'workers' | 'addListener' | 'prependListener' | 'prependOnceListener' | 'removeListener' | 'removeAllListeners' | 'setMaxListeners' | 'getMaxListeners' | 'listeners' | 'rawListeners' | 'emit' | 'eventNames' | 'listenerCount' | '$x' | 'waitForXPath'
 >;
 
 
@@ -55,6 +55,11 @@ export interface E2EPage extends PuppeteerPage {
   compareScreenshot(description: string, opts: d.ScreenshotOptions): Promise<d.ScreenshotDiff>;
 
   /**
+   * Sets a debugger;
+   */
+  debugger(): Promise<void>;
+
+  /**
    * Find an element that matches the selector, which is the same as
    * `document.querySelector(selector)`. Use `>>>` within the
    * selector to find an element within the host element's shadow root.
@@ -80,7 +85,7 @@ export interface E2EPage extends PuppeteerPage {
    * a localhost address. A shortcut to `page.goto(url)` is to set the `url` option
    * when creating a new page, such as `const page = await newE2EPage({ url })`.
    */
-  goTo(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
+  goTo(url: string, options?: puppeteer.NavigationOptions): Promise<puppeteer.Response | null>;
 
   /**
    * Instead of testing a url directly, html content can be mocked using
@@ -88,7 +93,7 @@ export interface E2EPage extends PuppeteerPage {
    * the `html` option when creating a new page, such as
    * `const page = await newE2EPage({ html })`.
    */
-  setContent(html: string): Promise<void>;
+  setContent(html: string, options?: puppeteer.NavigationOptions): Promise<void>;
 
   /**
    * Used to test if an event was, or was not dispatched. This method
@@ -112,7 +117,7 @@ export interface E2EPage extends PuppeteerPage {
    * Waits for the event to be received on `window`. The optional second argument
    * allows the listener to be set to `document` if needed.
    */
-  waitForEvent(eventName: string, selector?: 'window' | 'document'): Promise<CustomEvent>;
+  waitForEvent(eventName: string): Promise<any>;
 }
 
 
@@ -122,6 +127,7 @@ export interface E2EPageInternal extends E2EPage {
   _e2eEvents: WaitForEvent[];
   _e2eEventIds: number;
   _e2eGoto(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
+  _e2eClose(options?: puppeteer.PageCloseOptions): Promise<void>;
   screenshot(options?: puppeteer.ScreenshotOptions): Promise<Buffer>;
 }
 
@@ -382,6 +388,11 @@ export interface E2EElement {
    * is no longer connected to the document.
    */
   waitForNotVisible(): Promise<void>;
+
+  /**
+   * Waits until the given event is listened in the element.
+   */
+  waitForEvent(eventName: string): Promise<any>;
 }
 
 

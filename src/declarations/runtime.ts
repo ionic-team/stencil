@@ -88,10 +88,11 @@ export interface HostRef {
   $flags$: number;
   $hostElement$?: d.HostElement;
   $instanceValues$?: Map<string, any>;
-  $lazyInstance$?: d.ComponentInstance;
+  $lazyInstance$?: d.ComponentInterface;
   $onReadyPromise$?: Promise<any>;
   $onReadyResolve$?: (elm: any) => void;
   $vnode$?: d.VNode;
+  $queuedListeners$?: [string, any][];
   $rmListeners$?: () => void;
   $modeName$?: string;
 }
@@ -99,6 +100,7 @@ export interface HostRef {
 export interface PlatformRuntime {
   $flags$: number;
   $resourcesUrl$: string;
+  jmp: (c: Function) => any;
   raf: (c: FrameRequestCallback) => number;
   ael: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   rel: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;

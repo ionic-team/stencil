@@ -45,7 +45,17 @@ export const insertVdomAnnotations = (doc: Document) => {
           }
         }
 
-        orgLocationNode.nodeValue = `${ORG_LOCATION_ID}.${childId}`;
+        let orgLocationNodeId = `${ORG_LOCATION_ID}.${childId}`;
+
+        const orgLocationParentNode = orgLocationNode.parentElement as d.RenderNode;
+        if (orgLocationParentNode && orgLocationParentNode['s-sd']) {
+          // ending with a . means that the parent element
+          // of this node's original location is a shadow dom element
+          // and this node is apart of the root level light dom
+          orgLocationNodeId += `.`;
+        }
+
+        orgLocationNode.nodeValue = orgLocationNodeId;
       }
     });
   }

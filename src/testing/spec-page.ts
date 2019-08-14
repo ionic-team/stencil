@@ -52,8 +52,6 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     win: win,
     doc: doc,
     body: doc.body as any,
-    root: null as any,
-    rootInstance: null as any,
     build: bc.BUILD as d.Build,
     styles: platform.styles as Map<string, string>,
     setContent: (html: string) => {
@@ -163,19 +161,32 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     await page.waitForChanges();
   }
 
-  page.root = findRootComponent(cmpTags, page.body);
-  if (page.root != null) {
-    const hostRef = platform.getHostRef(page.root);
-    if (hostRef != null) {
-      page.rootInstance = hostRef.$lazyInstance$;
+  let rootComponent: any = null;
+  Object.defineProperty(page, 'root', {
+    get() {
+      if (rootComponent == null) {
+        rootComponent = findRootComponent(cmpTags, page.body);
+        if (rootComponent != null) {
+          return rootComponent;
+        }
+      }
+      const firstElementChild = page.body.firstElementChild;
+      if (firstElementChild != null) {
+        return firstElementChild as any;
+      }
+      return null;
     }
+  });
 
-  } else {
-    const firstElementChild = page.body.firstElementChild;
-    if (firstElementChild != null) {
-      page.root = firstElementChild as any;
+  Object.defineProperty(page, 'rootInstance', {
+    get() {
+      const hostRef = platform.getHostRef(page.root);
+      if (hostRef != null) {
+        return hostRef.$lazyInstance$;
+      }
+      return null;
     }
-  }
+  });
 
   if (opts.hydrateServerSide) {
     platform.insertVdomAnnotations(doc);

@@ -144,9 +144,4 @@ describe('fs-watch, rebuild', () => {
     expect(buildCtx.requiresFullBuild).toBe(true);
   });
 
-  it('should not rebuild for no changes', () => {
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
-    expect(buildCtx).toBe(null);
-  });
-
 });

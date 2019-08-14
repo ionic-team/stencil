@@ -19,14 +19,15 @@ export interface RollupResults {
 }
 
 export interface BuildCtx {
-  abort(): Promise<BuildResults>;
   buildId: number;
   buildResults: d.BuildResults;
   buildMessages: string[];
   bundleBuildCount: number;
   collections: d.Collection[];
+  compilerCtx: d.CompilerCtx;
   components: d.ComponentCompilerMeta[];
   componentGraph: Map<string, string[]>;
+  config: d.Config;
   createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
   data: any;
   debug: (msg: string) => void;
@@ -39,10 +40,8 @@ export interface BuildCtx {
   filesDeleted: string[];
   filesUpdated: string[];
   filesWritten: string[];
-  finish(): Promise<BuildResults>;
   globalStyle: string | undefined;
   hasConfigChanges: boolean;
-  hasCopyChanges: boolean;
   hasError: boolean;
   hasFinished: boolean;
   hasHtmlChanges: boolean;
@@ -64,7 +63,6 @@ export interface BuildCtx {
   rollupResults?: RollupResults;
   scriptsAdded: string[];
   scriptsDeleted: string[];
-  skipAssetsCopy: boolean;
   startTime: number;
   styleBuildCount: number;
   stylesPromise: Promise<void>;
@@ -243,7 +241,6 @@ export interface BundleAppOptions {
   inputs: BundleEntryInputs;
   loader: {[id: string]: string};
   cache?: any;
-  emitCoreChunk?: boolean;
   externalRuntime?: string;
   skipDeps?: boolean;
   isServer?: boolean;

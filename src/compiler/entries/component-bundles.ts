@@ -3,35 +3,61 @@ import { sortBy } from '@utils';
 import { getDefaultBundles } from './default-bundles';
 
 
+export function computeUsedComponents(config: d.Config, defaultBundles: d.ComponentCompilerMeta[][], allCmps: d.ComponentCompilerMeta[]) {
+  if (!config.excludeUnusedDependencies) {
+    return new Set(allCmps.map(c => c.tagName));
+  }
+  const usedComponents = new Set<string>();
+
+  // All components
+  defaultBundles.forEach(entry => {
+    entry.forEach(cmp => usedComponents.add(cmp.tagName));
+  });
+  allCmps.forEach(cmp => {
+    if (!cmp.isCollectionDependency) {
+      usedComponents.add(cmp.tagName);
+    }
+  });
+  allCmps.forEach(cmp => {
+    if (cmp.isCollectionDependency) {
+      if (cmp.dependants.some(dep => usedComponents.has(dep))) {
+        usedComponents.add(cmp.tagName);
+      }
+    }
+  });
+
+  return usedComponents;
+}
+
 export function generateComponentBundles(
   config: d.Config,
   buildCtx: d.BuildCtx,
 ): d.ComponentCompilerMeta[][] {
-  let cmps = buildCtx.components;
+  const cmps = sortBy(buildCtx.components, cmp => cmp.dependants.length);
+  const defaultBundles = getDefaultBundles(config, buildCtx, cmps);
+  const usedComponents = computeUsedComponents(config, defaultBundles, cmps);
+
   if (config.devMode) {
-    return cmps.map(cmp => [cmp]);
+    return cmps
+      .filter(c => usedComponents.has(c.tagName))
+      .map(cmp => [cmp]);
   }
 
-  const defaultBundles = getDefaultBundles(config, buildCtx, cmps);
-
-  cmps = sortBy(cmps, cmp => cmp.dependants.length);
-
   // Visit components that are already in one of the default bundlers
-  const visited = new Set();
+  const alreadyBundled = new Set();
   defaultBundles.forEach(entry => {
-    entry.forEach(cmp => visited.add(cmp));
+    entry.forEach(cmp => alreadyBundled.add(cmp));
   });
 
   const bundlers: d.ComponentCompilerMeta[][] = cmps
-    .filter(cmp => !visited.has(cmp))
-    .map(cmp => [cmp]);
+    .filter(cmp => usedComponents.has(cmp.tagName) && !alreadyBundled.has(cmp))
+    .map(c => [c]);
 
-  return [
+    return [
     ...defaultBundles,
     ...optimizeBundlers(bundlers, 0.6)
   ].filter(b => b.length > 0);
 }
-
 
 function optimizeBundlers(bundles: d.ComponentCompilerMeta[][], threshold: number) {
   const cmpIndexMap = new Map<string, number>();

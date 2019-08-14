@@ -3,6 +3,7 @@ export interface StyleCompiler {
   modeName: string;
   styleId: string;
   styleStr: string;
+  styleIdentifier: string;
   externalStyles: ExternalStyleCompiler[];
   compiledStyleText: string;
   compiledStyleTextScoped: string;
@@ -33,4 +34,12 @@ export interface CssImportData {
   filePath?: string;
   altFilePath?: string;
   styleText?: string;
+}
+
+
+export interface CssToEsmImportData {
+  srcImportText: string;
+  varName: string;
+  url: string;
+  filePath: string;
 }

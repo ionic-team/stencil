@@ -23,7 +23,7 @@ export function eventsToMarkdown(events: d.JsonDocsEvent[]) {
   events.forEach(ev => {
     table.addRow([
       `\`${ev.event}\``,
-      ev.docs,
+      getDocsField(ev),
       `\`CustomEvent<${ev.detail}>\``,
     ]);
   });
@@ -33,4 +33,11 @@ export function eventsToMarkdown(events: d.JsonDocsEvent[]) {
   content.push(``);
 
   return content;
+}
+
+function getDocsField(prop: d.JsonDocsEvent) {
+  return `${prop.deprecation !== undefined
+    ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
+    : ''
+  }${prop.docs}`;
 }

@@ -3,17 +3,16 @@ import * as d from '.';
 
 export interface Plugin {
   name?: string;
-  load?: (id: string, context?: PluginCtx) => Promise<string> | string;
-  resolveId?: (importee: string, importer: string, context?: PluginCtx) => Promise<string> | string;
+  pluginType?: string;
+  load?: (id: string, context: PluginCtx) => Promise<string> | string;
+  resolveId?: (importee: string, importer: string, context: PluginCtx) => Promise<string> | string;
   transform?: (sourceText: string, id: string, context: PluginCtx) => Promise<PluginTransformResults> | PluginTransformResults | string;
 }
-
 
 export interface PluginTransformResults {
   code?: string;
   id?: string;
 }
-
 
 export interface PluginCtx {
   config: d.Config;

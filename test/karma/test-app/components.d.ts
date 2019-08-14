@@ -6,7 +6,9 @@
 
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-
+import {
+  SomeTypes,
+} from './util';
 
 export namespace Components {
   interface AttributeBasic {
@@ -30,8 +32,10 @@ export namespace Components {
     'getInstance': () => Promise<this>;
     'nu0': number;
     'nu1'?: number;
+    'nu2'?: SomeTypes.Number;
     'str0': string;
     'str1'?: string;
+    'str2'?: SomeTypes.String;
   }
   interface AttributeHost {}
   interface AttributeHtmlRoot {
@@ -44,8 +48,8 @@ export namespace Components {
   interface ConditionalRerender {}
   interface ConditionalRerenderRoot {}
   interface CssCmp {}
-  interface CssVariables {}
-  interface CssVariablesRoot {}
+  interface CssVariablesNoEncapsulation {}
+  interface CssVariablesShadowDom {}
   interface CustomEventRoot {}
   interface DomReattach {
     'didLoad': number;
@@ -71,6 +75,7 @@ export namespace Components {
   interface InputBasicRoot {
     'value'?: string;
   }
+  interface JsonBasic {}
   interface KeyReorder {
     'num'?: number;
   }
@@ -78,6 +83,7 @@ export namespace Components {
   interface LegacyContext {
     'getData': () => Promise<{ win: Window; doc: Document; hasQueue: boolean; isServer: boolean; unknown: any; myService: any; }>;
   }
+  interface LessCmp {}
   interface LifecycleAsyncA {}
   interface LifecycleAsyncB {
     'value': string;
@@ -118,6 +124,8 @@ export namespace Components {
     'str': string;
     'undef'?: string;
   }
+  interface ReparentStyleNoVars {}
+  interface ReparentStyleWithVars {}
   interface SassCmp {}
   interface ScopedBasic {}
   interface ScopedBasicRoot {}
@@ -170,6 +178,7 @@ export namespace Components {
     'href'?: string;
   }
   interface SlotReplaceWrapperRoot {}
+  interface StylusCmp {}
   interface SvgAttr {}
   interface SvgClass {}
   interface Tag3dComponent {}
@@ -251,16 +260,16 @@ declare global {
     new (): HTMLCssCmpElement;
   };
 
-  interface HTMLCssVariablesElement extends Components.CssVariables, HTMLStencilElement {}
-  var HTMLCssVariablesElement: {
-    prototype: HTMLCssVariablesElement;
-    new (): HTMLCssVariablesElement;
+  interface HTMLCssVariablesNoEncapsulationElement extends Components.CssVariablesNoEncapsulation, HTMLStencilElement {}
+  var HTMLCssVariablesNoEncapsulationElement: {
+    prototype: HTMLCssVariablesNoEncapsulationElement;
+    new (): HTMLCssVariablesNoEncapsulationElement;
   };
 
-  interface HTMLCssVariablesRootElement extends Components.CssVariablesRoot, HTMLStencilElement {}
-  var HTMLCssVariablesRootElement: {
-    prototype: HTMLCssVariablesRootElement;
-    new (): HTMLCssVariablesRootElement;
+  interface HTMLCssVariablesShadowDomElement extends Components.CssVariablesShadowDom, HTMLStencilElement {}
+  var HTMLCssVariablesShadowDomElement: {
+    prototype: HTMLCssVariablesShadowDomElement;
+    new (): HTMLCssVariablesShadowDomElement;
   };
 
   interface HTMLCustomEventRootElement extends Components.CustomEventRoot, HTMLStencilElement {}
@@ -347,6 +356,12 @@ declare global {
     new (): HTMLInputBasicRootElement;
   };
 
+  interface HTMLJsonBasicElement extends Components.JsonBasic, HTMLStencilElement {}
+  var HTMLJsonBasicElement: {
+    prototype: HTMLJsonBasicElement;
+    new (): HTMLJsonBasicElement;
+  };
+
   interface HTMLKeyReorderElement extends Components.KeyReorder, HTMLStencilElement {}
   var HTMLKeyReorderElement: {
     prototype: HTMLKeyReorderElement;
@@ -363,6 +378,12 @@ declare global {
   var HTMLLegacyContextElement: {
     prototype: HTMLLegacyContextElement;
     new (): HTMLLegacyContextElement;
+  };
+
+  interface HTMLLessCmpElement extends Components.LessCmp, HTMLStencilElement {}
+  var HTMLLessCmpElement: {
+    prototype: HTMLLessCmpElement;
+    new (): HTMLLessCmpElement;
   };
 
   interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLStencilElement {}
@@ -471,6 +492,18 @@ declare global {
   var HTMLReflectToAttrElement: {
     prototype: HTMLReflectToAttrElement;
     new (): HTMLReflectToAttrElement;
+  };
+
+  interface HTMLReparentStyleNoVarsElement extends Components.ReparentStyleNoVars, HTMLStencilElement {}
+  var HTMLReparentStyleNoVarsElement: {
+    prototype: HTMLReparentStyleNoVarsElement;
+    new (): HTMLReparentStyleNoVarsElement;
+  };
+
+  interface HTMLReparentStyleWithVarsElement extends Components.ReparentStyleWithVars, HTMLStencilElement {}
+  var HTMLReparentStyleWithVarsElement: {
+    prototype: HTMLReparentStyleWithVarsElement;
+    new (): HTMLReparentStyleWithVarsElement;
   };
 
   interface HTMLSassCmpElement extends Components.SassCmp, HTMLStencilElement {}
@@ -671,6 +704,12 @@ declare global {
     new (): HTMLSlotReplaceWrapperRootElement;
   };
 
+  interface HTMLStylusCmpElement extends Components.StylusCmp, HTMLStencilElement {}
+  var HTMLStylusCmpElement: {
+    prototype: HTMLStylusCmpElement;
+    new (): HTMLStylusCmpElement;
+  };
+
   interface HTMLSvgAttrElement extends Components.SvgAttr, HTMLStencilElement {}
   var HTMLSvgAttrElement: {
     prototype: HTMLSvgAttrElement;
@@ -707,8 +746,8 @@ declare global {
     'conditional-rerender': HTMLConditionalRerenderElement;
     'conditional-rerender-root': HTMLConditionalRerenderRootElement;
     'css-cmp': HTMLCssCmpElement;
-    'css-variables': HTMLCssVariablesElement;
-    'css-variables-root': HTMLCssVariablesRootElement;
+    'css-variables-no-encapsulation': HTMLCssVariablesNoEncapsulationElement;
+    'css-variables-shadow-dom': HTMLCssVariablesShadowDomElement;
     'custom-event-root': HTMLCustomEventRootElement;
     'dom-reattach': HTMLDomReattachElement;
     'dynamic-css-variable': HTMLDynamicCssVariableElement;
@@ -723,9 +762,11 @@ declare global {
     'image-import': HTMLImageImportElement;
     'init-css-root': HTMLInitCssRootElement;
     'input-basic-root': HTMLInputBasicRootElement;
+    'json-basic': HTMLJsonBasicElement;
     'key-reorder': HTMLKeyReorderElement;
     'key-reorder-root': HTMLKeyReorderRootElement;
     'legacy-context': HTMLLegacyContextElement;
+    'less-cmp': HTMLLessCmpElement;
     'lifecycle-async-a': HTMLLifecycleAsyncAElement;
     'lifecycle-async-b': HTMLLifecycleAsyncBElement;
     'lifecycle-async-c': HTMLLifecycleAsyncCElement;
@@ -744,6 +785,8 @@ declare global {
     'node-globals': HTMLNodeGlobalsElement;
     'node-resolution': HTMLNodeResolutionElement;
     'reflect-to-attr': HTMLReflectToAttrElement;
+    'reparent-style-no-vars': HTMLReparentStyleNoVarsElement;
+    'reparent-style-with-vars': HTMLReparentStyleWithVarsElement;
     'sass-cmp': HTMLSassCmpElement;
     'scoped-basic': HTMLScopedBasicElement;
     'scoped-basic-root': HTMLScopedBasicRootElement;
@@ -777,6 +820,7 @@ declare global {
     'slot-reorder-root': HTMLSlotReorderRootElement;
     'slot-replace-wrapper': HTMLSlotReplaceWrapperElement;
     'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement;
+    'stylus-cmp': HTMLStylusCmpElement;
     'svg-attr': HTMLSvgAttrElement;
     'svg-class': HTMLSvgClassElement;
     'tag-3d-component': HTMLTag3dComponentElement;
@@ -803,8 +847,10 @@ declare namespace LocalJSX {
     'bool2'?: boolean;
     'nu0'?: number;
     'nu1'?: number;
+    'nu2'?: SomeTypes.Number;
     'str0'?: string;
     'str1'?: string;
+    'str2'?: SomeTypes.String;
   }
   interface AttributeHost extends JSXBase.HTMLAttributes<HTMLAttributeHostElement> {}
   interface AttributeHtmlRoot extends JSXBase.HTMLAttributes<HTMLAttributeHtmlRootElement> {
@@ -817,8 +863,8 @@ declare namespace LocalJSX {
   interface ConditionalRerender extends JSXBase.HTMLAttributes<HTMLConditionalRerenderElement> {}
   interface ConditionalRerenderRoot extends JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement> {}
   interface CssCmp extends JSXBase.HTMLAttributes<HTMLCssCmpElement> {}
-  interface CssVariables extends JSXBase.HTMLAttributes<HTMLCssVariablesElement> {}
-  interface CssVariablesRoot extends JSXBase.HTMLAttributes<HTMLCssVariablesRootElement> {}
+  interface CssVariablesNoEncapsulation extends JSXBase.HTMLAttributes<HTMLCssVariablesNoEncapsulationElement> {}
+  interface CssVariablesShadowDom extends JSXBase.HTMLAttributes<HTMLCssVariablesShadowDomElement> {}
   interface CustomEventRoot extends JSXBase.HTMLAttributes<HTMLCustomEventRootElement> {}
   interface DomReattach extends JSXBase.HTMLAttributes<HTMLDomReattachElement> {
     'didLoad'?: number;
@@ -842,11 +888,13 @@ declare namespace LocalJSX {
   interface InputBasicRoot extends JSXBase.HTMLAttributes<HTMLInputBasicRootElement> {
     'value'?: string;
   }
+  interface JsonBasic extends JSXBase.HTMLAttributes<HTMLJsonBasicElement> {}
   interface KeyReorder extends JSXBase.HTMLAttributes<HTMLKeyReorderElement> {
     'num'?: number;
   }
   interface KeyReorderRoot extends JSXBase.HTMLAttributes<HTMLKeyReorderRootElement> {}
   interface LegacyContext extends JSXBase.HTMLAttributes<HTMLLegacyContextElement> {}
+  interface LessCmp extends JSXBase.HTMLAttributes<HTMLLessCmpElement> {}
   interface LifecycleAsyncA extends JSXBase.HTMLAttributes<HTMLLifecycleAsyncAElement> {}
   interface LifecycleAsyncB extends JSXBase.HTMLAttributes<HTMLLifecycleAsyncBElement> {
     'onLifecycleLoad'?: (event: CustomEvent<any>) => void;
@@ -895,6 +943,8 @@ declare namespace LocalJSX {
     'str'?: string;
     'undef'?: string;
   }
+  interface ReparentStyleNoVars extends JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement> {}
+  interface ReparentStyleWithVars extends JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement> {}
   interface SassCmp extends JSXBase.HTMLAttributes<HTMLSassCmpElement> {}
   interface ScopedBasic extends JSXBase.HTMLAttributes<HTMLScopedBasicElement> {}
   interface ScopedBasicRoot extends JSXBase.HTMLAttributes<HTMLScopedBasicRootElement> {}
@@ -947,6 +997,7 @@ declare namespace LocalJSX {
     'href'?: string;
   }
   interface SlotReplaceWrapperRoot extends JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement> {}
+  interface StylusCmp extends JSXBase.HTMLAttributes<HTMLStylusCmpElement> {}
   interface SvgAttr extends JSXBase.HTMLAttributes<HTMLSvgAttrElement> {}
   interface SvgClass extends JSXBase.HTMLAttributes<HTMLSvgClassElement> {}
   interface Tag3dComponent extends JSXBase.HTMLAttributes<HTMLTag3dComponentElement> {}
@@ -965,8 +1016,8 @@ declare namespace LocalJSX {
     'conditional-rerender': ConditionalRerender;
     'conditional-rerender-root': ConditionalRerenderRoot;
     'css-cmp': CssCmp;
-    'css-variables': CssVariables;
-    'css-variables-root': CssVariablesRoot;
+    'css-variables-no-encapsulation': CssVariablesNoEncapsulation;
+    'css-variables-shadow-dom': CssVariablesShadowDom;
     'custom-event-root': CustomEventRoot;
     'dom-reattach': DomReattach;
     'dynamic-css-variable': DynamicCssVariable;
@@ -981,9 +1032,11 @@ declare namespace LocalJSX {
     'image-import': ImageImport;
     'init-css-root': InitCssRoot;
     'input-basic-root': InputBasicRoot;
+    'json-basic': JsonBasic;
     'key-reorder': KeyReorder;
     'key-reorder-root': KeyReorderRoot;
     'legacy-context': LegacyContext;
+    'less-cmp': LessCmp;
     'lifecycle-async-a': LifecycleAsyncA;
     'lifecycle-async-b': LifecycleAsyncB;
     'lifecycle-async-c': LifecycleAsyncC;
@@ -1002,6 +1055,8 @@ declare namespace LocalJSX {
     'node-globals': NodeGlobals;
     'node-resolution': NodeResolution;
     'reflect-to-attr': ReflectToAttr;
+    'reparent-style-no-vars': ReparentStyleNoVars;
+    'reparent-style-with-vars': ReparentStyleWithVars;
     'sass-cmp': SassCmp;
     'scoped-basic': ScopedBasic;
     'scoped-basic-root': ScopedBasicRoot;
@@ -1035,6 +1090,7 @@ declare namespace LocalJSX {
     'slot-reorder-root': SlotReorderRoot;
     'slot-replace-wrapper': SlotReplaceWrapper;
     'slot-replace-wrapper-root': SlotReplaceWrapperRoot;
+    'stylus-cmp': StylusCmp;
     'svg-attr': SvgAttr;
     'svg-class': SvgClass;
     'tag-3d-component': Tag3dComponent;

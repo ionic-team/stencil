@@ -13,6 +13,7 @@ export async function generateJsonDocs(compilerCtx: d.CompilerCtx, docsData: d.J
       tag: cmp.tag,
       encapsulation: cmp.encapsulation,
       readme: cmp.readme,
+      deprecation: cmp.deprecation,
       docs: cmp.docs,
       docsTags: cmp.docsTags,
       usage: cmp.usage,

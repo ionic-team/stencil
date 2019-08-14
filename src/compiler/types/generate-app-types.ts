@@ -87,8 +87,7 @@ export { LocalJSX as JSX };
 ${jsxAugmentation}
 `;
 
-  const typeImportString = Object.keys(typeImportData).reduce((finalString: string, filePath: string) => {
-
+  const typeImportString = Object.keys(typeImportData).map(filePath => {
     const typeData = typeImportData[filePath];
     let importFilePath: string;
     if (config.sys.path.isAbsolute(filePath)) {
@@ -98,19 +97,20 @@ ${jsxAugmentation}
     } else {
       importFilePath = filePath;
     }
-    finalString +=
-`import {
+
+    return `import {
 ${typeData.sort(sortImportNames).map(td => {
   if (td.localName === td.importName) {
     return `${td.importName},`;
   } else {
     return `${td.localName} as ${td.importName},`;
   }
-}).join('\n')}
-} from '${importFilePath}';\n`;
+})
+.join('\n')
+}
+} from '${importFilePath}';`;
 
-    return finalString;
-  }, '');
+  }).join('\n');
 
   const code = `
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';

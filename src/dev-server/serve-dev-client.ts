@@ -50,7 +50,7 @@ async function serveDevClientScript(devServerConfig: d.DevServerConfig, fs: d.Fi
     reloadStrategy: devServerConfig.reloadStrategy
   };
 
-  content = content.replace('__DEV_CLIENT_CONFIG__', JSON.stringify(devClientConfig));
+  content = content.replace('window.__DEV_CLIENT_CONFIG__', JSON.stringify(devClientConfig));
 
   res.writeHead(200, util.responseHeaders({
     'Content-Type': 'text/html'

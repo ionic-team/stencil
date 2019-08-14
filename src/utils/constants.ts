@@ -41,11 +41,10 @@ export const enum HOST_FLAGS {
   isActiveRender = 1 << 2,
   isConstructingInstance = 1 << 3,
   isQueuedForUpdate = 1 << 4,
-  isShadowDom = 1 << 5,
-  isScoped = 1 << 6,
-  useNativeShadowDom = 1 << 7,
-  hasInitializedComponent = 1 << 8,
-  hasLoadedComponent = 1 << 9,
+  hasInitializedComponent = 1 << 5,
+  hasLoadedComponent = 1 << 6,
+  isWatchReady = 1 << 7,
+  isListenReady = 1 << 8,
 }
 
 export const enum CMP_FLAGS {

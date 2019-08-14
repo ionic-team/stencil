@@ -24,6 +24,7 @@ export async function generateLazyModules(config: d.Config, compilerCtx: d.Compi
   ]);
 
   const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
+  config.logger.debug(`Upfront metadata is ${lazyRuntimeData.length} bytes`);
   const entryResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && rollupResult.isEntry);
   await Promise.all(
     entryResults.map(rollupResult => {
@@ -44,9 +45,10 @@ async function generateLazyEntryModule(
 ): Promise<d.BundleModule> {
   const entryModule = buildCtx.entryModules.find(entryModule => entryModule.entryKey === rollupResult.entryKey);
   const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, rollupResult.code);
+  const shouldHash = config.hashFileNames && isBrowserBuild;
   const outputs = await Promise.all(
     entryModule.modeNames.map(modeName =>
-      writeLazyModule(config, compilerCtx, destinations, entryModule, shouldMinify, code, modeName, sufix)
+      writeLazyModule(config, compilerCtx, destinations, entryModule, shouldHash, code, modeName, sufix)
     )
   );
 
@@ -224,9 +226,11 @@ async function convertChunk(
   if (sourceTarget === 'es5') {
     const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
     const transpileResults = await transpileToEs5Main(config, compilerCtx, code, inlineHelpers);
-    buildCtx.diagnostics.push(...transpileResults.diagnostics);
-    if (transpileResults.diagnostics.length === 0) {
-      code = transpileResults.code;
+    if (transpileResults != null) {
+      buildCtx.diagnostics.push(...transpileResults.diagnostics);
+      if (transpileResults.diagnostics.length === 0) {
+        code = transpileResults.code;
+      }
     }
   }
   if (shouldMinify) {
