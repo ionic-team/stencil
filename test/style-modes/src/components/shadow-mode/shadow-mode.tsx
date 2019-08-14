@@ -7,7 +7,7 @@ import { Component, h } from '@stencil/core';
   tag: 'shadow-mode',
   shadow: true,
   styleUrls: {
-    buford: 'shadow-mode.buford.css',
+    buford: 'shadow-mode.buford.scss',
     griff: 'shadow-mode.griff.css'
   }
 })

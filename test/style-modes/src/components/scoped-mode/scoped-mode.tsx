@@ -7,7 +7,7 @@ import { Component, h } from '@stencil/core';
   tag: 'scoped-mode',
   scoped: true,
   styleUrls: {
-    buford: 'scoped-mode.buford.css',
+    buford: 'scoped-mode.buford.scss',
     griff: 'scoped-mode.griff.css'
   }
 })

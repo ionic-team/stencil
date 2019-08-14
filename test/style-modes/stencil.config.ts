@@ -1,4 +1,5 @@
 import { Config } from '../../dist';
+import { sass } from '@stencil/sass';
 
 export const config: Config = {
 
@@ -22,6 +23,9 @@ export const config: Config = {
     }
   ],
   globalScript: 'src/global.ts',
-  enableCache: false
+  enableCache: false,
+  plugins: [
+    sass()
+  ]
 
 };
