@@ -247,7 +247,9 @@ const transpileTsFile = async (config: d.Config, services: ts.LanguageService, c
     const tsDiagnostics = services.getCompilerOptionsDiagnostics()
       .concat(services.getSyntacticDiagnostics(sourceFilePath));
 
-    loadTypeScriptDiagnostics(ctx.buildCtx.diagnostics, tsDiagnostics);
+    ctx.buildCtx.diagnostics.push(
+      ...loadTypeScriptDiagnostics(tsDiagnostics)
+    );
 
     return false;
   }

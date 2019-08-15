@@ -27,7 +27,9 @@ export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.Co
         const configBasePath = config.sys.path.dirname(config.configPath);
         const parseResult = ts.convertCompilerOptionsFromJson(tsconfigResults.config.compilerOptions, configBasePath);
         if (parseResult.errors && parseResult.errors.length > 0) {
-          loadTypeScriptDiagnostics(buildCtx.diagnostics, parseResult.errors);
+          buildCtx.diagnostics.push(
+            ...loadTypeScriptDiagnostics(parseResult.errors)
+          );
 
         } else {
           compilerOptions = {

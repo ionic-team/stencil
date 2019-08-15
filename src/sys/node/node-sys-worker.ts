@@ -51,8 +51,8 @@ export class NodeSystemWorker {
     return transpileToEs5Worker(cwd, input, inlineHelpers);
   }
 
-  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
-    return validateTypesWorker(this.workerContext, emitDtsFiles, compilerOptions, currentWorkingDir, collectionNames, rootTsFiles);
+  validateTypes(compilerOptions: any, emitDtsFiles: boolean, collectionNames: string[], rootTsFiles: string[], isDevMode: boolean) {
+    return validateTypesWorker(this.workerContext, emitDtsFiles, compilerOptions, collectionNames, rootTsFiles, isDevMode);
   }
 
 }

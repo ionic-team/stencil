@@ -72,12 +72,15 @@ export const augmentDiagnosticWithNode = (config: d.Config, d: d.Diagnostic, nod
  * error reporting within a terminal. So, yeah, let's code it up, shall we?
  */
 
-export const loadTypeScriptDiagnostics = (resultsDiagnostics: d.Diagnostic[], tsDiagnostics: readonly ts.Diagnostic[]) => {
+export const loadTypeScriptDiagnostics = (tsDiagnostics: readonly ts.Diagnostic[]) => {
+  const diagnostics: d.Diagnostic[] = [];
   const maxErrors = Math.min(tsDiagnostics.length, 50);
 
   for (let i = 0; i < maxErrors; i++) {
-    resultsDiagnostics.push(loadTypeScriptDiagnostic(tsDiagnostics[i]));
+    diagnostics.push(loadTypeScriptDiagnostic(tsDiagnostics[i]));
   }
+
+  return diagnostics;
 };
 
 

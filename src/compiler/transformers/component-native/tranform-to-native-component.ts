@@ -37,7 +37,9 @@ export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, build
 
     const transpileOutput = ts.transpileModule(inputJsText, transpileOpts);
 
-    loadTypeScriptDiagnostics(buildCtx.diagnostics, transpileOutput.diagnostics);
+    buildCtx.diagnostics.push(
+      ...loadTypeScriptDiagnostics(transpileOutput.diagnostics)
+    );
 
     if (!buildCtx.hasError && typeof transpileOutput.outputText === 'string') {
       outputText = transpileOutput.outputText;
