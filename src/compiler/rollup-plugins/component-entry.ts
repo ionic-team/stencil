@@ -1,9 +1,10 @@
 import * as d from '../../declarations';
 import { updateToLazyComponent } from '../component-lazy/update-to-lazy-component';
 import { updateToNativeComponent } from '../component-native/update-to-native-component';
+import { Plugin } from 'rollup';
 
 
-export const componentEntryPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[]) => {
+export const componentEntryPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[]): Plugin => {
   const entrys = new Map<string, d.EntryModule>();
 
   return {
@@ -14,7 +15,10 @@ export const componentEntryPlugin = (config: d.Config, compilerCtx: d.CompilerCt
         const entryModule = entryModules.find(entryModule => entryModule.entryKey === id);
         if (entryModule != null) {
           entrys.set(id, entryModule);
-          return id;
+          return {
+            id,
+            moduleSideEffects: false
+          };
         }
       }
 
