@@ -4,6 +4,7 @@ import { taskDocs } from './task-docs';
 import { taskHelp } from './task-help';
 import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
+import { taskGenerate } from './task-generate';
 import { taskCheckVersion, taskVersion } from './task-version';
 import exit from 'exit';
 
@@ -34,6 +35,11 @@ export async function runTask(process: NodeJS.Process, config: d.Config, flags: 
 
       case 'test':
         await taskTest(config);
+        break;
+
+      case 'g':
+      case 'generate':
+        await taskGenerate(config, flags);
         break;
 
       default:

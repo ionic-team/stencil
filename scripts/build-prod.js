@@ -39,6 +39,7 @@ fs.emptyDirSync(DIST_LICENSES);
   'exit',
   'glob',
   'graceful-fs',
+  'inquirer',
   'is-glob',
   'minimatch',
   'node-fetch',
