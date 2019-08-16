@@ -37,7 +37,10 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
     name: 'globalScriptsPlugin',
     resolveId(id) {
       if (id === GLOBAL_ID) {
-        return id;
+        return {
+          id,
+          moduleSideEffects: true
+        };
       }
       return null;
     },

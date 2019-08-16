@@ -105,10 +105,10 @@ export function getActiveSelectors(
   const scopesForElement = getScopesForElement(hostScopeMap, hostEl);
 
   // globalScopes are always took into account
-  globalScopes.forEach(globalScope => scopes.push(globalScope));
+  globalScopes.forEach(s => scopes.push(s));
 
   // the parent scopes are computed by walking parent dom until <html> is reached
-  scopesForElement.forEach(globalScope => scopes.push(globalScope));
+  scopesForElement.forEach(s => scopes.push(s));
 
   // each scope might have an array of associated selectors
   // let's flatten the complete array of selectors from all the scopes
