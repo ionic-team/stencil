@@ -99,13 +99,16 @@ export function getActiveSelectors(
 ): CSSSelector[] {
 
   // computes the css scopes that might affect this particular element
-  const scopes = [
-    // globalScopes are always took into account
-    ...globalScopes,
+  // avoiding using spread arrays to avoid ts helper fns when in es5
+  const scopes: CSSScope[] = [];
 
-    // the parent scopes are computed by walking parent dom until <html> is reached
-    ...getScopesForElement(hostScopeMap, hostEl)
-  ];
+  const scopesForElement = getScopesForElement(hostScopeMap, hostEl);
+
+  // globalScopes are always took into account
+  globalScopes.forEach(s => scopes.push(s));
+
+  // the parent scopes are computed by walking parent dom until <html> is reached
+  scopesForElement.forEach(s => scopes.push(s));
 
   // each scope might have an array of associated selectors
   // let's flatten the complete array of selectors from all the scopes
