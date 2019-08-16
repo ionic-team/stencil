@@ -1,4 +1,5 @@
 import * as d from '.';
+import ts from 'typescript';
 
 export interface Compiler {
   build(): Promise<d.BuildResults>;
@@ -39,6 +40,12 @@ export interface CompilerCtx {
   rollupCacheNative: any;
   rootTsFiles: string[];
   styleModeNames: Set<string>;
+
+  tsLanguageService: ts.LanguageService;
+  tsSolutionBuilderHost: ts.SolutionBuilderWithWatchHost<ts.EmitAndSemanticDiagnosticsBuilderProgram>;
+  tsSolutionBuilder: ts.SolutionBuilder<ts.EmitAndSemanticDiagnosticsBuilderProgram>;
+
+  /** legacy, pre 3.6.0 way */
   tsService: TsService;
 
   reset(): void;

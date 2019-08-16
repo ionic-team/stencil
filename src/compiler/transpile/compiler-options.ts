@@ -5,7 +5,7 @@ import ts from 'typescript';
 import { isOutputTargetDistTypes } from '../output-targets/output-utils';
 
 
-export async function getUserCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export function getUserCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (compilerCtx.compilerOptions != null) {
     return compilerCtx.compilerOptions;
   }

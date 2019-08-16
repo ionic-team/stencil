@@ -232,5 +232,5 @@ run(async () => {
     bundleInternalClient()
   ]);
 
-  await fs.remove(TRANSPILED_DIR);
+  // await fs.remove(TRANSPILED_DIR);
 });

@@ -33,4 +33,5 @@ export interface Module {
   originalCollectionComponentPath: string;
   potentialCmpRefs: string[];
   sourceFilePath: string;
+  version: number;
 }

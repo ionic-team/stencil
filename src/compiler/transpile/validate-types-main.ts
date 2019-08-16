@@ -73,7 +73,7 @@ export const validateTypesMain = async (config: d.Config, compilerCtx: d.Compile
   };
 
   // get the typescript compiler options
-  const compilerOptions = await getUserCompilerOptions(config, compilerCtx, buildCtx);
+  const compilerOptions = getUserCompilerOptions(config, compilerCtx, buildCtx);
 
   // only write dts files when we have an output target with a types directory
   const emitDtsFiles = config.outputTargets.some(isOutputTargetDistTypes);

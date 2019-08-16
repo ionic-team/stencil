@@ -38,9 +38,16 @@ export class CompilerContext implements d.CompilerCtx {
   rollupCacheLazy: any = null;
   rollupCacheNative: any = null;
   rootTsFiles: string[] = [];
-  tsService: d.TsService = null;
   cachedGlobalStyle: string;
   styleModeNames = new Set<string>();
+
+  /** legacy, pre 3.6.0 */
+  tsService: d.TsService = null;
+
+  /** 3.6.0 */
+  tsLanguageService: any = null;
+  tsSolutionBuilderHost: any = null;
+  tsSolutionBuilder: any = null;
 
   constructor(config: d.Config) {
     const cacheFs = (config.enableCache && config.sys.fs != null) ? new InMemoryFileSystem(config.sys.fs, config.sys.path) : null;
@@ -111,7 +118,8 @@ export const getModule = (config: d.Config, compilerCtx: d.CompilerCtx, sourceFi
       localImports: [],
       originalCollectionComponentPath: null,
       originalImports: [],
-      potentialCmpRefs: []
+      potentialCmpRefs: [],
+      version: 0
     };
     compilerCtx.moduleMap.set(sourceFilePath, moduleFile);
     return moduleFile;
