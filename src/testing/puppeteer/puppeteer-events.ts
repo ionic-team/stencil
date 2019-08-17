@@ -37,9 +37,10 @@ async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selec
 export async function waitForEvent(page: pd.E2EPageInternal, eventName: string, elementHandle: puppeteer.ElementHandle) {
   const ev = await page.evaluate((element: Element, eventName: string) => {
     return new Promise<any>((resolve, reject) => {
+      const timeout = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
       const tmr = setTimeout(() => {
-        reject(`waitForEvent() timeout, eventName: ${eventName}`);
-      }, 10000);
+        reject(new Error(`waitForEvent() timeout, eventName: ${eventName}`));
+      }, timeout);
 
       element.addEventListener(eventName, ev => {
         clearTimeout(tmr);

@@ -43,17 +43,18 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
         }
       } catch (e) {}
 
-      page._e2eElements = null;
-      page._e2eEvents = null;
-      page._e2eGoto = null;
-      page.find = null;
-      page.debugger = null;
-      page.findAll = null;
-      page.compareScreenshot = null;
-      page.setContent = null;
-      page.spyOnEvent = null;
-      page.waitForChanges = null;
-      page.waitForEvent = null;
+      const noop: any = () => { throw new Error('The page was already closed'); };
+      page._e2eElements = noop;
+      page._e2eEvents = noop;
+      page._e2eGoto = noop;
+      page.find = noop;
+      page.debugger = noop;
+      page.findAll = noop;
+      page.compareScreenshot = noop;
+      page.setContent = noop;
+      page.spyOnEvent = noop;
+      page.waitForChanges = noop;
+      page.waitForEvent = noop;
 
       try {
         if (!page.isClosed()) {

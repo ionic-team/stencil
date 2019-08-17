@@ -37,7 +37,7 @@ export function createJestPuppeteerEnvironment() {
       this.pages.push(page);
       const env: d.E2EProcessEnv = process.env;
       if (typeof env.__STENCIL_DEFAULT_TIMEOUT__ === 'string') {
-        page.setDefaultTimeout(parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10));
+        page.setDefaultTimeout(parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10) * 0.5);
       }
       return page;
     }
