@@ -6,19 +6,10 @@ import { resolveComponentDependencies} from '../entries/resolve-component-depend
 import { transpileService } from './transpile-service';
 import { updateComponentBuildConditionals } from '../app-core/build-conditionals';
 import { validateTypesMain } from './validate-types-main';
-import { ensureTsProgram } from './solution-builder';
 
 
 export async function transpileApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   try {
-    // 3.6.0
-    await ensureTsProgram(config, compilerCtx, buildCtx);
-  } catch (e) {
-    catchError(buildCtx.diagnostics, e);
-  }
-
-  try {
-    // legacy, pre 3.6.0
     const doTranspile = await transpileService(config, compilerCtx, buildCtx);
 
     await processMetadata(config, compilerCtx, buildCtx, doTranspile);

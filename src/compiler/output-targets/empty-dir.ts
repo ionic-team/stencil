@@ -7,7 +7,7 @@ type OutputTargetEmptiable =
   d.OutputTargetWww |
   d.OutputTargetDistLazyLoader |
   d.OutputTargetDistSelfContained |
-  d.OutputTargetDistModule |
+  d.ExperimentalOutputTargetDistModule |
   d.OutputTargetHydrate;
 
 export function isEmptable(o: d.OutputTarget): o is OutputTargetEmptiable {

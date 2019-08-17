@@ -157,15 +157,6 @@ export interface OutputTargetDistLazyLoader extends OutputTargetBase {
   empty: boolean;
 }
 
-export interface OutputTargetDistModule extends OutputTargetBase {
-  type: 'experimental-dist-module';
-
-  dir?: string;
-  externalRuntime?: boolean;
-  empty?: boolean;
-  copy?: d.CopyTask[];
-}
-
 
 export interface OutputTargetDistSelfContained extends OutputTargetBase {
   type: 'dist-self-contained';
@@ -227,6 +218,27 @@ export interface OutputTargetStats extends OutputTargetBase {
   file?: string;
 }
 
+
+export interface ExperimentalOutputTargetDistCollection extends OutputTargetBase {
+  type: 'experimental-dist-collection';
+  dir?: string;
+}
+
+export interface ExperimentalOutputTargetDistCustomElement extends OutputTargetBase {
+  type: 'experimental-dist-custom-element';
+  dir?: string;
+}
+
+export interface ExperimentalOutputTargetDistModule extends OutputTargetBase {
+  type: 'experimental-dist-module';
+
+  dir?: string;
+  externalRuntime?: boolean;
+  empty?: boolean;
+  copy?: d.CopyTask[];
+}
+
+
 export interface OutputTargetBase {
   type: string;
 }
@@ -245,7 +257,6 @@ export type OutputTarget =
  | OutputTargetDistLazy
  | OutputTargetDistGlobalStyles
  | OutputTargetDistLazyLoader
- | OutputTargetDistModule
  | OutputTargetDistSelfContained
  | OutputTargetDocsJson
  | OutputTargetDocsCustom
@@ -254,4 +265,8 @@ export type OutputTarget =
  | OutputTargetWww
  | OutputTargetHydrate
  | OutputTargetStats
- | OutputTargetDistTypes;
+ | OutputTargetDistTypes
+
+ | ExperimentalOutputTargetDistCollection
+ | ExperimentalOutputTargetDistCustomElement
+ | ExperimentalOutputTargetDistModule;

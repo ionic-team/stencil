@@ -1,201 +1,171 @@
 import * as d from '../../declarations';
-import { COMPILER_BUILD } from '../build/compiler-build-id';
+import { BuildContext } from '../build/build-ctx';
+import { emitBuilds } from './emit-builds';
 import { getUserCompilerOptions } from './compiler-options';
-import { loadTypeScriptDiagnostic } from '@utils';
-import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
-import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
-import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
+import { loadTypeScriptDiagnostic, noop } from '@utils';
 import ts from 'typescript';
 
 
-export async function ensureTsProgram(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (compilerCtx.tsLanguageService == null) {
-    compilerCtx.tsLanguageService = await buildTsService(config, compilerCtx, buildCtx);
-  }
+export async function runTsBuilder(config: d.Config, compilerCtx: d.CompilerCtx) {
+  const filesToWrite = new Map<string, string>();
 
-  if (compilerCtx.tsSolutionBuilderHost == null) {
-    createSolutionBuilder(config, compilerCtx, buildCtx);
-  }
+  const tsSolutionBuilder = await getTsSolutionBuild(config, compilerCtx, filesToWrite);
 
-  if (compilerCtx.tsSolutionBuilder != null) {
-    compilerCtx.tsSolutionBuilder.buildReferences(config.tsconfig);
+  const buildCtx = new BuildContext(config, compilerCtx);
+  compilerCtx.activeBuildCtx = buildCtx;
+
+  tsSolutionBuilder.build();
+
+  if (filesToWrite.size > 0) {
+    await compilerCtx.fs.writeFiles(filesToWrite);
+    await compilerCtx.fs.commit();
+    filesToWrite.clear();
   }
 
   if (config.watch) {
-    // if (instance.hasUnaccountedModifiedFiles) {
-    //   if (instance.changedFilesList) {
-    //     instance.watchHost.updateRootFileNames();
-    //   }
-    //   if (instance.watchOfFilesAndCompilerOptions) {
-    //     instance.program = instance.watchOfFilesAndCompilerOptions
-    //       .getProgram()
-    //       .getProgram();
-    //   }
-    //   instance.hasUnaccountedModifiedFiles = false;
+    const fsWatcher = await config.sys.createFsWatcher(config, config.sys.fs, compilerCtx.events);
+
+    await fsWatcher.addDirectory(config.srcDir);
+
+    compilerCtx.events.subscribe('fsChange', async (fsWatchResults) => {
+      console.log('fsWatchResults', fsWatchResults);
+      // tsSolutionBuilder.clean();
+      tsSolutionBuilder.build();
+      console.log('filesToWrite', filesToWrite);
+
+      if (filesToWrite.size > 0) {
+        await compilerCtx.fs.writeFiles(filesToWrite);
+        await compilerCtx.fs.commit();
+        filesToWrite.clear();
+      }
+    });
+
+    // if (typeof config.configPath === 'string') {
+    //   config.configPath = normalizePath(config.configPath);
+    //   await compilerCtx.fsWatcher.addFile(config.configPath);
     // }
   }
 }
 
 
-function createSolutionBuilder(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const tsSolutionBuilderHost = createSolutionBuilderHost(config, compilerCtx, buildCtx);
+async function getTsSolutionBuild(config: d.Config, compilerCtx: d.CompilerCtx, filesToWrite: Map<string, string>) {
+  if (compilerCtx.tsSolutionBuilderHost == null) {
+    compilerCtx.tsSolutionBuilderHost = createTsSolutionBuilderHost(
+      config,
+      compilerCtx,
+      filesToWrite
+    );
+  }
 
-  compilerCtx.tsSolutionBuilder = ts.createSolutionBuilderWithWatch(
-    tsSolutionBuilderHost,
-    [config.tsconfig],
-    { verbose: true, watch: true }
-  );
+  if (compilerCtx.tsSolutionBuilder == null) {
+    if (config.watch) {
+      compilerCtx.tsSolutionBuilder = await createTsSolutionBuilderWithWatch(
+        config,
+        compilerCtx.tsSolutionBuilderHost
+      );
 
-  return tsSolutionBuilderHost;
+    } else {
+      compilerCtx.tsSolutionBuilder = createTsSolutionBuilder(
+        config,
+        compilerCtx.tsSolutionBuilderHost
+      );
+    }
+  }
+
+  return compilerCtx.tsSolutionBuilder;
 }
 
 
-function createSolutionBuilderHost(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+async function createTsSolutionBuilderWithWatch(config: d.Config, tsSolutionBuilderHost: ts.SolutionBuilderWithWatchHost<ts.EmitAndSemanticDiagnosticsBuilderProgram>) {
 
-  const getCurrentDirectory = () => config.cwd;
+  // tsSolutionBuilderHost.watchFile = noop;
+
+  // tsSolutionBuilderHost.watchDirectory = noop;
+
+  const builderWithWatch = ts.createSolutionBuilderWithWatch(
+    tsSolutionBuilderHost,
+    [config.tsconfig],
+    { incremental: true, watch: true, verbose: true }
+  );
+
+  return builderWithWatch;
+}
+
+
+function createTsSolutionBuilder(config: d.Config, tsSolutionBuilderHost: ts.SolutionBuilderWithWatchHost<ts.EmitAndSemanticDiagnosticsBuilderProgram>) {
+  const builder = ts.createSolutionBuilder(
+    tsSolutionBuilderHost,
+    [config.tsconfig],
+    { verbose: true }
+  );
+
+  return builder;
+}
+
+
+function createTsSolutionBuilderHost(config: d.Config, compilerCtx: d.CompilerCtx, filesToWrite: Map<string, string>) {
 
   const reportDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
-    buildCtx.diagnostics.push(loadTypeScriptDiagnostic(tsDiagnostic));
+    compilerCtx.activeBuildCtx.diagnostics.push(loadTypeScriptDiagnostic(tsDiagnostic));
   };
 
-  const reportSolutionBuilderStatus = (tsDiagnostic: ts.Diagnostic) => {
-    buildCtx.diagnostics.push(loadTypeScriptDiagnostic(tsDiagnostic));
+  const reportDebugLog = (tsDiagnostic: ts.Diagnostic) => {
+    const diagnostic = loadTypeScriptDiagnostic(tsDiagnostic);
+    diagnostic.header = null;
+    diagnostic.level = 'debug';
+    config.logger.printDiagnostics([diagnostic], config.cwd);
   };
 
-  const reportWatchStatus = (tsDiagnostic: ts.Diagnostic, _newLine: string, _options: ts.CompilerOptions) => {
-    // log.logInfo(
-    //   `${ts.flattenDiagnosticMessageText(
-    //     d.messageText,
-    //     compiler.sys.newLine
-    //   )}${newLine + newLine}`
-    // );
-    buildCtx.diagnostics.push(loadTypeScriptDiagnostic(tsDiagnostic));
-  };
+  const createTsProgram = (rootNames: ReadonlyArray<string> | undefined, options: ts.CompilerOptions | undefined, host: ts.CompilerHost, oldProgram: ts.EmitAndSemanticDiagnosticsBuilderProgram, configFileParsingDiagnostics: ReadonlyArray<ts.Diagnostic>, projectReferences: ReadonlyArray<ts.ProjectReference>) => {
+    const tsBuilderProgram = ts.createEmitAndSemanticDiagnosticsBuilderProgram(rootNames, options, host, oldProgram, configFileParsingDiagnostics, projectReferences);
+    const tsProgram = tsBuilderProgram.getProgram();
 
-  const compilerOptions = getCompilerOptions(config, compilerCtx, buildCtx);
+    emitBuilds(config, compilerCtx, tsProgram, filesToWrite);
+
+    return tsBuilderProgram;
+  };
 
   const solutionBuilderHost = ts.createSolutionBuilderWithWatchHost(
     ts.sys,
-    ts.createEmitAndSemanticDiagnosticsBuilderProgram,
+    createTsProgram,
     reportDiagnostic,
-    reportSolutionBuilderStatus,
-    reportWatchStatus
+    reportDebugLog,
+    reportDebugLog
   );
-  solutionBuilderHost.getCurrentDirectory = getCurrentDirectory;
-  solutionBuilderHost.trace = s => config.logger.info(s);
+
+  solutionBuilderHost.getCurrentDirectory = () => config.cwd;
+
+  solutionBuilderHost.trace = s => config.logger.debug(s);
+
   solutionBuilderHost.getParsedCommandLine = tsConfigFilePath => {
-    return getParsedCommandLine(tsConfigFilePath, compilerOptions);
+    const compilerOptions = getCompilerOptions(config, compilerCtx);
+    const c = getParsedCommandLine(tsConfigFilePath, compilerOptions);
+
+    if (c.raw) {
+      if ((!Array.isArray(c.raw.include) || c.raw.include.length === 0) && (!Array.isArray(c.raw.files) || c.raw.files.length === 0)) {
+        config.logger.error(`tsconfig.json should include either a "include" or "files" property: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html`);
+        config.logger.error(`Please update the tsconfig.json use { "include": ["src/**/*"] }`);
+      }
+    }
+
+    return c;
   };
 
-  // make a (sync) resolver that follows webpack's rules
-  // const resolveSync = makeResolver(loader._compiler.options);
-  // const resolvers = makeResolvers(
-  //   compilerOptions,
-  //   solutionBuilderHost,
-  //   customResolveTypeReferenceDirective,
-  //   customResolveModuleName,
-  //   resolveSync,
-  //   appendTsTsxSuffixesIfRequired,
-  //   scriptRegex
-  // );
+  solutionBuilderHost.writeFile = noop;
 
-  // used for (/// <reference types="...">) see https://github.com/Realytics/fork-ts-checker-webpack-plugin/pull/250#issuecomment-485061329
-  // solutionBuilderHost.resolveTypeReferenceDirectives = resolvers.resolveTypeReferenceDirectives;
-  // solutionBuilderHost.resolveModuleNames = resolvers.resolveModuleNames;
-  // solutionBuilderHost.buildReferences
   return solutionBuilderHost;
 }
 
 
-async function buildTsService(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const transpileCtx: TranspileContext = {
-    service: null,
-    buildCtx: buildCtx,
-    configKey: null,
-    snapshotVersions: new Map<string, string>(),
-    filesFromFsCache: [],
-    hasQueuedTsServicePrime: false
-  };
-
-  const compilerOptions = getCompilerOptions(config, compilerCtx, buildCtx);
-
-  // create a config key that will be used as part of the file's cache key
-  transpileCtx.configKey = COMPILER_BUILD.id;
-
-  const servicesHost: ts.LanguageServiceHost = {
-    getScriptFileNames: () => compilerCtx.rootTsFiles,
-    getScriptVersion: (filePath) => transpileCtx.snapshotVersions.get(filePath),
-    getScriptSnapshot: (filePath) => {
-      try {
-        const sourceText = compilerCtx.fs.readFileSync(filePath);
-        return ts.ScriptSnapshot.fromString(sourceText);
-      } catch (e) {}
-      return undefined;
-    },
-    getCurrentDirectory: () => config.cwd,
-    getCompilationSettings: () => compilerOptions,
-    getDefaultLibFileName: (options) => ts.getDefaultLibFilePath(options),
-    fileExists: (filePath) => compilerCtx.fs.accessSync(filePath),
-    readFile: (filePath) => {
-      try {
-        return compilerCtx.fs.readFileSync(filePath);
-      } catch (e) {}
-      return undefined;
-    },
-    readDirectory: ts.sys.readDirectory,
-    getCustomTransformers: () => {
-      return getCustomTransformers(config, compilerCtx, transpileCtx);
-    }
-  };
-
-  // create our typescript language service to be reused
-  transpileCtx.service = ts.createLanguageService(servicesHost, ts.createDocumentRegistry());
-
-  return transpileCtx.service;
-}
-
-function getCustomTransformers(config: d.Config, compilerCtx: d.CompilerCtx, transpileCtx: TranspileContext) {
-  const typeChecker = transpileCtx.service.getProgram().getTypeChecker();
-
-  const transformOpts: d.TransformOptions = {
-    coreImportPath: '@stencil/core',
-    componentExport: null,
-    componentMetadata: null,
-    proxy: null,
-    style: 'static'
-  };
-
-  return {
-    before: [
-      convertDecoratorsToStatic(config, transpileCtx.buildCtx.diagnostics, typeChecker),
-      updateStencilCoreImports(transformOpts.coreImportPath)
-    ],
-    after: [
-      convertStaticToMeta(config, compilerCtx, transpileCtx.buildCtx, typeChecker, null, transformOpts)
-    ]
-  };
-}
-
-
-function getCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const userCompilerOptions = getUserCompilerOptions(config, compilerCtx, buildCtx);
+function getCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx) {
+  const userCompilerOptions = getUserCompilerOptions(config, compilerCtx, compilerCtx.activeBuildCtx);
   const compilerOptions = Object.assign({}, userCompilerOptions) as ts.CompilerOptions;
 
-  compilerOptions.isolatedModules = false;
-  compilerOptions.suppressOutputPathCheck = true;
-  compilerOptions.allowNonTsExtensions = true;
-  compilerOptions.removeComments = false;
-  compilerOptions.sourceMap = false;
-  compilerOptions.lib = undefined;
-  compilerOptions.types = undefined;
-  compilerOptions.noEmit = undefined;
-  compilerOptions.noEmitOnError = undefined;
-  compilerOptions.rootDirs = undefined;
-  compilerOptions.declaration = undefined;
-  compilerOptions.declarationDir = undefined;
-  compilerOptions.out = undefined;
-  compilerOptions.outFile = undefined;
   compilerOptions.outDir = undefined;
+  compilerOptions.sourceMap = true;
+  compilerOptions.declaration = true;
+  compilerOptions.declarationDir = undefined;
+  compilerOptions.declaration = true;
 
   return compilerOptions;
 }
@@ -204,7 +174,7 @@ function getCompilerOptions(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 const extendedConfigCache = new Map() as ts.Map<ts.ExtendedConfigCacheEntry>;
 
 function getParsedCommandLine(configFilePath: string, compilerOptions: ts.CompilerOptions) {
-  const result = ts.getParsedCommandLineOfConfigFile(
+  const c = ts.getParsedCommandLineOfConfigFile(
     configFilePath,
     compilerOptions,
     {
@@ -213,14 +183,5 @@ function getParsedCommandLine(configFilePath: string, compilerOptions: ts.Compil
     },
     extendedConfigCache
   );
-  return result;
-}
-
-interface TranspileContext {
-  service: ts.LanguageService;
-  buildCtx: d.BuildCtx;
-  configKey: string;
-  snapshotVersions: Map<string, string>;
-  filesFromFsCache: string[];
-  hasQueuedTsServicePrime: boolean;
+  return c;
 }

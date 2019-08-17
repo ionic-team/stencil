@@ -12,6 +12,7 @@ export interface Compiler {
 
 
 export interface CompilerCtx {
+  activeBuildCtx: d.BuildCtx;
   activeBuildId: number;
   activeDirsAdded: string[];
   activeDirsDeleted: string[];
@@ -41,8 +42,8 @@ export interface CompilerCtx {
   rootTsFiles: string[];
   styleModeNames: Set<string>;
 
-  tsLanguageService: ts.LanguageService;
-  tsSolutionBuilderHost: ts.SolutionBuilderWithWatchHost<ts.EmitAndSemanticDiagnosticsBuilderProgram>;
+  tsProgram: ts.Program;
+  tsSolutionBuilderHost:  ts.SolutionBuilderWithWatchHost<ts.EmitAndSemanticDiagnosticsBuilderProgram>;
   tsSolutionBuilder: ts.SolutionBuilder<ts.EmitAndSemanticDiagnosticsBuilderProgram>;
 
   /** legacy, pre 3.6.0 way */

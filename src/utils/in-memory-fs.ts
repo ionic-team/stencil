@@ -369,10 +369,21 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     return results;
   }
 
-  writeFiles(files: { [filePath: string]: string }, opts?: d.FsWriteOptions) {
-    return Promise.all(Object.keys(files).map(filePath => {
-      return this.writeFile(filePath, files[filePath], opts);
-    }));
+  writeFiles(files: { [filePath: string]: string } | Map<string, string>, opts?: d.FsWriteOptions) {
+    const promises: Promise<any>[] = [];
+
+    if (files instanceof Map) {
+      files.forEach((content, filePath) => {
+        promises.push(this.writeFile(filePath, content, opts));
+      });
+
+    } else {
+      Object.keys(files).forEach(filePath => {
+        promises.push(this.writeFile(filePath, files[filePath], opts));
+      });
+    }
+
+    return Promise.all(promises);
   }
 
   async commit() {

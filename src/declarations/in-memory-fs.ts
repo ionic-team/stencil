@@ -42,7 +42,7 @@ export interface InMemoryFileSystem {
   writeFile(filePath: string, content: string, opts?: d.FsWriteOptions): Promise<d.FsWriteResults>;
   writeFiles(files: {
       [filePath: string]: string;
-  }, opts?: d.FsWriteOptions): Promise<d.FsWriteResults[]>;
+  } | Map<string, String>, opts?: d.FsWriteOptions): Promise<d.FsWriteResults[]>;
   commit(): Promise<{
       filesWritten: string[];
       filesDeleted: string[];

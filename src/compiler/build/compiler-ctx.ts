@@ -11,6 +11,7 @@ import { InMemoryFileSystem, normalizePath } from '@utils';
  * is always the same.
  */
 export class CompilerContext implements d.CompilerCtx {
+  activeBuildCtx: d.BuildCtx = null;
   activeBuildId = -1;
   activeFilesAdded: string[] = [];
   activeFilesDeleted: string[] = [];
@@ -45,7 +46,9 @@ export class CompilerContext implements d.CompilerCtx {
   tsService: d.TsService = null;
 
   /** 3.6.0 */
-  tsLanguageService: any = null;
+  tsProgram: any = null;
+  tsWatchHost: any = null;
+  tsWatchOfFilesAndCompilerOptions: any = null;
   tsSolutionBuilderHost: any = null;
   tsSolutionBuilder: any = null;
 

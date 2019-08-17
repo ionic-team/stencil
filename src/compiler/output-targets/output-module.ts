@@ -18,7 +18,7 @@ export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx,
   timespan.finish(`generate webcomponents module finished`);
 }
 
-export async function generateModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModule[]) {
+export async function generateModuleWebComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.ExperimentalOutputTargetDistModule[]) {
   await buildCtx.stylesPromise;
 
   const timespan = buildCtx.createTimeSpan(`generate module web components started`, true);
@@ -31,7 +31,7 @@ export async function generateModuleWebComponents(config: d.Config, compilerCtx:
   timespan.finish(`generate module web components finished`);
 }
 
-async function bundleRawComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistModule[], externalRuntime: boolean) {
+async function bundleRawComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.ExperimentalOutputTargetDistModule[], externalRuntime: boolean) {
   const cmps = buildCtx.components;
   const build = getBuildConditionals(config, cmps);
 

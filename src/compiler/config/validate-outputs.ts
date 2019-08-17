@@ -1,4 +1,6 @@
 import * as d from '../../declarations';
+import { validateOutputTargetDistCollection } from './validate-outputs-dist-collection';
+import { validateOutputTargetDistCustomElement } from './validate-outputs-dist-custom-element';
 import { validateOutputStats } from './validate-output-stats';
 import { validateOutputTargetDist } from './validate-outputs-dist';
 import { validateOutputTargetDistHydrateScript } from './validate-outputs-hydrate-script';
@@ -33,10 +35,12 @@ export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnosti
   validateOutputTargetDist(config);
   validateOutputTargetAngular(config);
   validateOutputTargetDistHydrateScript(config);
-  validateOutputTargetDistModule(config);
   validateDocs(config, diagnostics);
   validateOutputStats(config);
 
+  validateOutputTargetDistCollection(config);
+  validateOutputTargetDistCustomElement(config);
+  validateOutputTargetDistModule(config);
 
   if (!config.outputTargets || config.outputTargets.length === 0) {
     const err = buildError(diagnostics);

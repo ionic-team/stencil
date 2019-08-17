@@ -42,6 +42,7 @@ export function mockConfig() {
 
 export function mockCompilerCtx() {
   const compilerCtx: d.CompilerCtx = {
+    activeBuildCtx: null,
     activeBuildId: 0,
     activeDirsAdded: [],
     activeDirsDeleted: [],
@@ -71,6 +72,9 @@ export function mockCompilerCtx() {
     rootTsFiles: [],
     styleModeNames: new Set(),
     tsService: null,
+    tsProgram: null,
+    tsSolutionBuilder: null,
+    tsSolutionBuilderHost: null,
     reset: () => {/**/}
   };
 

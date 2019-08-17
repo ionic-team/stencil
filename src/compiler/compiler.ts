@@ -9,6 +9,7 @@ import { generateBuildFromFsWatch, updateCacheFromRebuild } from './fs-watch/fs-
 import { logFsWatchMessage } from './fs-watch/fs-watch-log';
 import { startDevServerMain } from '../dev-server/start-server-main';
 import { validateConfig } from '../compiler/config/validate-config';
+import { runTsBuilder } from './transpile/solution-builder';
 
 
 export class Compiler implements d.Compiler {
@@ -76,16 +77,24 @@ export class Compiler implements d.Compiler {
 
       this.ctx = new CompilerContext(config);
 
-      this.on('fsChange', fsWatchResults => {
-        this.queueFsChanges(fsWatchResults);
-      });
+      // this.on('fsChange', fsWatchResults => {
+      //   this.queueFsChanges(fsWatchResults);
+      // });
+
+      try {
+        runTsBuilder(config, this.ctx);
+
+      } catch (e) {
+        // catchError(buildCtx.diagnostics, e);
+      }
     }
   }
 
   build() {
-    const buildCtx = new BuildContext(this.config, this.ctx);
-    buildCtx.start();
-    return this.drainBuild(buildCtx);
+    // const buildCtx = new BuildContext(this.config, this.ctx);
+    // buildCtx.start();
+    // return this.drainBuild(buildCtx);
+    return Promise.resolve({}) as any;
   }
 
   rebuild() {

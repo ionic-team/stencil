@@ -182,11 +182,11 @@ const flattenDiagnosticMessageText = (diag: any) => {
     return '';
   }
 
-  let result = diag.messageText;
+  let msg = diag.messageText;
   if (diag.next) {
     for (let i = 0, a = diag.next; i < a.length; i++) {
-      result += flattenDiagnosticMessageText(a[i]);
+      msg += flattenDiagnosticMessageText(a[i]);
     }
   }
-  return result;
+  return msg;
 };

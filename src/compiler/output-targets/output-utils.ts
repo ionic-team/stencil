@@ -54,6 +54,14 @@ export const isOutputTargetDistCollection = (o: d.OutputTarget): o is d.OutputTa
   return o.type === DIST_COLLECTION;
 };
 
+export const isOutputTargetDistCollectionExperimental = (o: d.OutputTarget): o is d.ExperimentalOutputTargetDistCollection => {
+  return o.type === EXPERIMENTAL_DIST_COLLECTION;
+};
+
+export const isOutputTargetDistCustomElementExperimental = (o: d.OutputTarget): o is d.ExperimentalOutputTargetDistCustomElement => {
+  return o.type === EXPERIMENTAL_DIST_CUSTOM_ELEMENT;
+};
+
 export const isOutputTargetCopy = (o: d.OutputTarget): o is d.OutputTargetCopy => {
   return o.type === COPY;
 };
@@ -74,7 +82,7 @@ export const isOutputTargetDistGlobalStyles = (o: d.OutputTarget): o is d.Output
   return o.type === DIST_GLOBAL_STYLES;
 };
 
-export const isOutputTargetDistModule = (o: d.OutputTarget): o is d.OutputTargetDistModule => {
+export const isOutputTargetDistModule = (o: d.OutputTarget): o is d.ExperimentalOutputTargetDistModule => {
   return o.type === DIST_MODULE;
 };
 
@@ -149,6 +157,8 @@ export const DIST_HYDRATE_SCRIPT = `dist-hydrate-script`;
 export const DIST_LAZY = `dist-lazy`;
 export const DIST_LAZY_LOADER = `dist-lazy-loader`;
 export const DIST_MODULE = `experimental-dist-module`;
+export const EXPERIMENTAL_DIST_COLLECTION = `experimental-dist-collection`;
+export const EXPERIMENTAL_DIST_CUSTOM_ELEMENT = `experimental-dist-custom-element`;
 export const DIST_SELF_CONTAINED = `dist-self-contained`;
 export const DIST_GLOBAL_STYLES = 'dist-global-styles';
 export const DOCS = `docs`;
@@ -169,6 +179,8 @@ export const VALID_TYPES = [
   DIST_HYDRATE_SCRIPT,
   DIST_LAZY,
   DIST_MODULE,
+  EXPERIMENTAL_DIST_COLLECTION,
+  EXPERIMENTAL_DIST_CUSTOM_ELEMENT,
   DIST_SELF_CONTAINED,
   DOCS,
   DOCS_JSON,

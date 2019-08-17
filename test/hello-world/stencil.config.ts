@@ -3,10 +3,14 @@ import { Config } from '../../dist';
 export const config: Config = {
   namespace: 'HelloWorld',
   outputTargets: [
-    { type: 'dist' },
     {
-      type: 'experimental-dist-module',
-      dir: 'www'
+      type: 'dist'
+    },
+    {
+      type: 'experimental-dist-collection'
+    },
+    {
+      type: 'experimental-dist-custom-element'
     },
     {
       type: 'www',

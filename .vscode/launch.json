@@ -64,7 +64,6 @@
         "--dev",
         "--debug",
         "--max-workers=1",
-        "--prerender",
         "--config",
         "${workspaceFolder}/test/hello-world/stencil.config.ts"
       ],
