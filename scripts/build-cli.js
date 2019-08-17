@@ -3,6 +3,7 @@ const path = require('path');
 const rollup = require('rollup');
 const rollupResolve = require('rollup-plugin-node-resolve');
 const rollupCommonjs = require('rollup-plugin-commonjs');
+const rollupPluginJson = require('rollup-plugin-json');
 const { run, transpile, relativeResolve } = require('./script-utils');
 
 const TRANSPILED_DIR = path.join(__dirname, '..', 'dist', 'transpiled-cli');
@@ -14,12 +15,20 @@ async function buildCli() {
   const rollupBuild = await rollup.rollup({
     input: ENTRY_FILE,
     external: [
+      'assert',
+      'buffer',
       'child_process',
       'crypto',
+      'events',
       'fs',
       'https',
       'os',
       'path',
+      'readline',
+      'stream',
+      'string_decoder',
+      'tty',
+      'util',
     ],
     plugins: [
       (() => {
@@ -35,7 +44,8 @@ async function buildCli() {
       rollupResolve({
         preferBuiltins: true
       }),
-      rollupCommonjs()
+      rollupCommonjs(),
+      rollupPluginJson(),
     ],
     onwarn: (message) => {
       if (message.code === 'CIRCULAR_DEPENDENCY') return;
