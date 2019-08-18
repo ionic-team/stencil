@@ -2,6 +2,7 @@ import * as d from '../declarations';
 import fs from 'fs';
 import { join, parse, relative } from 'path';
 import { promisify } from 'util';
+import { validateComponentTag } from '@utils';
 import inquirer from 'inquirer';
 import exit from 'exit';
 
@@ -22,12 +23,13 @@ export async function taskGenerate(config: d.Config, flags: d.ConfigFlags) {
 
   const input =
     flags.unknownArgs.find(arg => !arg.startsWith('-')) ||
-    (await inquirer.prompt([{ name: 'name', message: 'Component name (dash-case):' }])).name;
+    (await inquirer.prompt([{ name: 'name', message: 'Component tag name (dash-case):' }])).name;
 
   const { dir, base: componentName } = parse(input);
 
-  if (!componentName.includes('-')) {
-    config.logger.error('The name needs to be in dash case.');
+  const tagError = validateComponentTag(componentName);
+  if (tagError) {
+    config.logger.error(tagError);
     return exit(1);
   }
 
@@ -46,11 +48,11 @@ export async function taskGenerate(config: d.Config, flags: d.ConfigFlags) {
     return exit(1);
   }
 
-  config.logger.info();
-  config.logger.info(`${config.logger.gray('$')} stencil generate ${input}`);
-  config.logger.info();
-  config.logger.info('The following files have been generated:');
-  writtenFiles.map(file => config.logger.info(`- ${relative(baseDir, file)}`));
+  console.log();
+  console.log(`${config.logger.gray('$')} stencil generate ${input}`);
+  console.log();
+  console.log('The following files have been generated:');
+  writtenFiles.map(file => console.log(` - ${relative(baseDir, file)}`));
 }
 
 /**
@@ -85,49 +87,71 @@ const writeFileByExtension = async (path: string, name: string, extension: Gener
 /**
  * Get the boilerplate for a file by its extension.
  */
-const getBoilerplateByExtension = (name: string, extension: GeneratableExtension, withCss: boolean) => {
+const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtension, withCss: boolean) => {
   switch (extension) {
     case 'tsx':
-      return getComponentBoilerplate(name, withCss);
+      return getComponentBoilerplate(tagName, withCss);
 
     case 'css':
-      return '';
+      return getStyleUrlBoilerplate();
 
     case 'spec.ts':
-      return getSpecTestBoilerplate(name);
+      return getSpecTestBoilerplate(tagName);
 
     case 'e2e.ts':
-      return getE2eTestBoilerplate(name);
+      return getE2eTestBoilerplate(tagName);
   }
 };
 
 /**
  * Get the boilerplate for a component.
  */
-const getComponentBoilerplate = (name: string, style = false) => `import { h, Component, Host } from '@stencil/core';
+const getComponentBoilerplate = (tagName: string, hasStyle: boolean) => {
+  const decorator = [`{`];
+  decorator.push(`  tag: '${tagName}',`);
+  if (hasStyle) {
+    decorator.push(`  styleUrl: '${tagName}.css',`);
+  }
+  decorator.push(`  shadow: true`);
+  decorator.push(`}`);
 
-@Component({ tag: '${name}'${style ? `, styleUrl: '${name}.css'` : ''}, shadow: true })
-export class ${toPascalCase(name)} {
-	render() {
-		return (
-			<Host>
-				<slot></slot>
-			</Host>
-		);
-	}
+  return `import { Component, Host, h } from '@stencil/core';
+
+@Component(${decorator.join('\n')})
+export class ${toPascalCase(tagName)} {
+
+  render() {
+    return (
+      <Host>
+        <slot></slot>
+      </Host>
+    );
+  }
+
 }
 `;
+};
+
 
 /**
  * Get the boilerplate for a spec test.
  */
-const getSpecTestBoilerplate = (name: string) => `import { ${toPascalCase(name)} } from './${name}';
+const getSpecTestBoilerplate = (tagName: string) => `import { ${toPascalCase(tagName)} } from './${tagName}';
 
-describe('${name}', () => {
+describe('${tagName}', () => {
   it('builds', () => {
-    expect(new ${toPascalCase(name)}()).toBeTruthy();
+    expect(new ${toPascalCase(tagName)}()).toBeTruthy();
   });
 });
+`;
+
+/**
+ * Get the boilerplate for style.
+ */
+const getStyleUrlBoilerplate = () => `
+:host {
+  display: block;
+}
 `;
 
 /**
