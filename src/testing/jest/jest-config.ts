@@ -23,6 +23,16 @@ export function buildJestArgv(config: d.Config) {
   const jestArgv = yargs(args).options(options).argv as d.JestArgv;
   jestArgv.config = buildJestConfig(config);
 
+  if (typeof jestArgv.maxWorkers === 'string') {
+    try {
+      jestArgv.maxWorkers = parseInt(jestArgv.maxWorkers, 10);
+    } catch (e) {}
+  }
+
+  if (typeof jestArgv.ci === 'string') {
+    jestArgv.ci = (jestArgv.ci === 'true' || jestArgv.ci === '');
+  }
+
   return jestArgv;
 }
 
