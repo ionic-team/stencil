@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { normalizePath } from '@utils';
+import { dashToPascalCase, normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
 
@@ -61,12 +61,27 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
     },
     transform(code, id) {
       if (globalPaths.includes(normalizePath(id))) {
+        const output = [
+          INJECT_CONTEXT
+        ];
+
         const program = this.parse(code, {});
         const needsDefault = !program.body.some(s => s.type === 'ExportDefaultDeclaration');
-        const defaultExport = needsDefault
-          ? '\nexport const globalFn = () => {};\nexport default globalFn;'
-          : '';
-        return INJECT_CONTEXT + code + defaultExport;
+
+        if (needsDefault) {
+          const fileName = config.sys.path.basename(id).toLowerCase();
+          let varName = dashToPascalCase(fileName.replace(/[|&;$%@"<>()+,.{}_]/g, '-')).trim();
+          varName = varName.charAt(0).toLowerCase() + varName.substr(1);
+          output.push(`export const ${varName} = () => {`);
+          output.push(code);
+          output.push(`};`);
+          output.push(`export default ${varName};`);
+
+        } else {
+          output.push(code);
+        }
+
+        return output.join('\n');
       }
       return null;
     }
