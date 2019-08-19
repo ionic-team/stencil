@@ -80,7 +80,8 @@ const chooseFilesToGenerate = async () =>
 const writeFileByExtension = async (path: string, name: string, extension: GeneratableExtension, withCss: boolean) => {
   const outFile = join(path, `${name}.${extension}`);
   const indent = await getIndentation(outFile);
-  const boilerplate = getBoilerplateByExtension(name, extension, withCss, indent);
+
+  const boilerplate = getBoilerplateByExtension(name, extension, withCss).replace(/\t/g, indent);
 
   await writeFile(outFile, boilerplate, { flag: 'wx' });
 
@@ -90,26 +91,29 @@ const writeFileByExtension = async (path: string, name: string, extension: Gener
 /**
  * Get the boilerplate for a file by its extension.
  */
-const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtension, withCss: boolean, indent: string) => {
+const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtension, withCss: boolean) => {
   switch (extension) {
     case 'tsx':
-      return getComponentBoilerplate(tagName, indent, withCss);
+      return getComponentBoilerplate(tagName, withCss);
 
     case 'css':
-      return getStyleUrlBoilerplate(indent);
+      return getStyleUrlBoilerplate();
 
     case 'spec.ts':
-      return getSpecTestBoilerplate(tagName, indent);
+      return getSpecTestBoilerplate(tagName);
 
     case 'e2e.ts':
-      return getE2eTestBoilerplate(tagName, indent);
+      return getE2eTestBoilerplate(tagName);
+
+    default:
+      throw new Error(`Unkown extension "${extension}".`);
   }
 };
 
 /**
  * Get the boilerplate for a component.
  */
-const getComponentBoilerplate = (tagName: string, indent: string, hasStyle: boolean) =>
+const getComponentBoilerplate = (tagName: string, hasStyle: boolean) =>
 `import { Component, Host, h } from '@stencil/core';
 
 @Component({
@@ -127,21 +131,21 @@ export class ${toPascalCase(tagName)} {
 \t}
 
 }
-`.replace(/\t/g, indent);
+`;
 
 /**
  * Get the boilerplate for style.
  */
-const getStyleUrlBoilerplate = (indent: string) =>
+const getStyleUrlBoilerplate = () =>
 `:host {
 \tdisplay: block;
 }
-`.replace(/\t/g, indent);
+`;
 
 /**
  * Get the boilerplate for a spec test.
  */
-const getSpecTestBoilerplate = (tagName: string, indent: string) =>
+const getSpecTestBoilerplate = (tagName: string) =>
 `import { ${toPascalCase(tagName)} } from './${tagName}';
 
 describe('${tagName}', () => {
@@ -149,12 +153,12 @@ describe('${tagName}', () => {
 \t\texpect(new ${toPascalCase(tagName)}()).toBeTruthy();
 \t});
 });
-`.replace(/\t/g, indent);
+`;
 
 /**
  * Get the boilerplate for an E2E test.
  */
-const getE2eTestBoilerplate = (name: string, indent: string) =>
+const getE2eTestBoilerplate = (name: string) =>
 `import { newE2EPage } from '@stencil/core/testing';
 
 describe('${name}', () => {
@@ -166,7 +170,7 @@ describe('${name}', () => {
 \t\texpect(element).toHaveClass('hydrated');
 \t});
 });
-`.replace(/\t/g, indent);
+`;
 
 /**
  * Convert a dash case string to pascal case.
