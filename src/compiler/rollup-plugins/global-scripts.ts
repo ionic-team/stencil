@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { dashToPascalCase, normalizePath } from '@utils';
+import { buildError, normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
 
@@ -17,7 +17,7 @@ export function hasGlobalScriptPaths(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx): Plugin {
+export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Plugin {
   const globalPaths: string[] = [];
 
   if (typeof config.globalScript === 'string') {
@@ -60,7 +60,8 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
       return null;
     },
     transform(code, id) {
-      if (globalPaths.includes(normalizePath(id))) {
+      id = normalizePath(id);
+      if (globalPaths.includes(id)) {
         const output = [
           INJECT_CONTEXT
         ];
@@ -69,13 +70,13 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
         const needsDefault = !program.body.some(s => s.type === 'ExportDefaultDeclaration');
 
         if (needsDefault) {
-          const fileName = config.sys.path.basename(id).toLowerCase();
-          let varName = dashToPascalCase(fileName.replace(/[|&;$%@"<>()+,.{}_]/g, '-')).trim();
-          varName = varName.charAt(0).toLowerCase() + varName.substr(1);
-          output.push(`export const ${varName} = () => {`);
-          output.push(code);
-          output.push(`};`);
-          output.push(`export default ${varName};`);
+          const diagnostic = buildError(buildCtx.diagnostics);
+          diagnostic.header = `Global Script`;
+          diagnostic.absFilePath = id;
+          diagnostic.messageText = `The code to be executed should be placed within a default function that is exported by the global script. Ensure all of the code in the global script is wrapped in the function() that is exported.`;
+
+          output.push(`export const fallbackGlobalFn = () => {}`);
+          output.push(`export default fallbackGlobalFn;`);
 
         } else {
           output.push(code);
