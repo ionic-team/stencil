@@ -28,10 +28,17 @@ export class MockNode {
   }
 
   appendChild(newNode: MockNode) {
-    newNode.remove();
-    newNode.parentNode = this;
-    this.childNodes.push(newNode);
-    connectNode(this.ownerDocument, newNode);
+    if (newNode.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
+      const nodes = newNode.childNodes.slice();
+      for (const child of nodes) {
+        this.appendChild(child);
+      }
+    } else {
+      newNode.remove();
+      newNode.parentNode = this;
+      this.childNodes.push(newNode);
+      connectNode(this.ownerDocument, newNode);
+    }
     return newNode;
   }
 
