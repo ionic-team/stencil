@@ -5,9 +5,11 @@ import { promisify } from 'util';
 import { validateComponentTag } from '@utils';
 import inquirer from 'inquirer';
 import exit from 'exit';
+import { getIndentation } from './cli-utils';
 
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
+
 
 /**
  * Task to generate component boilerplate.
@@ -51,8 +53,8 @@ export async function taskGenerate(config: d.Config, flags: d.ConfigFlags) {
   console.log();
   console.log(`${config.logger.gray('$')} stencil generate ${input}`);
   console.log();
-  console.log('The following files have been generated:');
-  writtenFiles.map(file => console.log(` - ${relative(baseDir, file)}`));
+  console.log(config.logger.bold('The following files have been generated:'));
+  writtenFiles.map(file => console.log(`  - ${relative(baseDir, file)}`));
 }
 
 /**
@@ -77,7 +79,8 @@ const chooseFilesToGenerate = async () =>
  */
 const writeFileByExtension = async (path: string, name: string, extension: GeneratableExtension, withCss: boolean) => {
   const outFile = join(path, `${name}.${extension}`);
-  const boilerplate = getBoilerplateByExtension(name, extension, withCss);
+  const indent = await getIndentation(outFile);
+  const boilerplate = getBoilerplateByExtension(name, extension, withCss, indent);
 
   await writeFile(outFile, boilerplate, { flag: 'wx' });
 
@@ -87,86 +90,81 @@ const writeFileByExtension = async (path: string, name: string, extension: Gener
 /**
  * Get the boilerplate for a file by its extension.
  */
-const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtension, withCss: boolean) => {
+const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtension, withCss: boolean, indent: string) => {
   switch (extension) {
     case 'tsx':
-      return getComponentBoilerplate(tagName, withCss);
+      return getComponentBoilerplate(tagName, indent, withCss);
 
     case 'css':
-      return getStyleUrlBoilerplate();
+      return getStyleUrlBoilerplate(indent);
 
     case 'spec.ts':
-      return getSpecTestBoilerplate(tagName);
+      return getSpecTestBoilerplate(tagName, indent);
 
     case 'e2e.ts':
-      return getE2eTestBoilerplate(tagName);
+      return getE2eTestBoilerplate(tagName, indent);
   }
 };
 
 /**
  * Get the boilerplate for a component.
  */
-const getComponentBoilerplate = (tagName: string, hasStyle: boolean) => {
-  const decorator = [`{`];
-  decorator.push(`  tag: '${tagName}',`);
-  if (hasStyle) {
-    decorator.push(`  styleUrl: '${tagName}.css',`);
-  }
-  decorator.push(`  shadow: true`);
-  decorator.push(`}`);
+const getComponentBoilerplate = (tagName: string, indent: string, hasStyle: boolean) =>
+`import { Component, Host, h } from '@stencil/core';
 
-  return `import { Component, Host, h } from '@stencil/core';
-
-@Component(${decorator.join('\n')})
+@Component({
+${indent}tag: '${tagName}',${hasStyle ? `\n${indent}styleUrl: '${tagName}.css',` : ''}
+${indent}shadow: true
+})
 export class ${toPascalCase(tagName)} {
 
-  render() {
-    return (
-      <Host>
-        <slot></slot>
-      </Host>
-    );
-  }
+${indent}render() {
+${indent}${indent}return (
+${indent}${indent}${indent}<Host>
+${indent}${indent}${indent}${indent}<slot></slot>
+${indent}${indent}${indent}</Host>
+${indent}${indent});
+${indent}}
 
 }
 `;
-};
-
 
 /**
  * Get the boilerplate for a spec test.
  */
-const getSpecTestBoilerplate = (tagName: string) => `import { ${toPascalCase(tagName)} } from './${tagName}';
+const getSpecTestBoilerplate = (tagName: string, indent: string) =>
+`import { ${toPascalCase(tagName)} } from './${tagName}';
 
 describe('${tagName}', () => {
-  it('builds', () => {
-    expect(new ${toPascalCase(tagName)}()).toBeTruthy();
-  });
+${indent}it('builds', () => {
+${indent}${indent}expect(new ${toPascalCase(tagName)}()).toBeTruthy();
+${indent}});
 });
 `;
 
 /**
  * Get the boilerplate for style.
  */
-const getStyleUrlBoilerplate = () => `
-:host {
-  display: block;
+const getStyleUrlBoilerplate = (indent: string) =>
+`:host {
+${indent}display: block;
 }
 `;
 
 /**
  * Get the boilerplate for an E2E test.
  */
-const getE2eTestBoilerplate = (name: string) => `import { newE2EPage } from '@stencil/core/testing';
+const getE2eTestBoilerplate = (name: string, indent: string) =>
+`import { newE2EPage } from '@stencil/core/testing';
 
 describe('${name}', () => {
-  it('renders', async () => {
-    const page = await newE2EPage();
-    await page.setContent('<${name}></${name}>');
+${indent}it('renders', async () => {
+${indent}${indent}const page = await newE2EPage();
+${indent}${indent}await page.setContent('<${name}></${name}>');
 
-    const element = await page.find('${name}');
-    expect(element).toHaveClass('hydrated');
-  });
+${indent}${indent}const element = await page.find('${name}');
+${indent}${indent}expect(element).toHaveClass('hydrated');
+${indent}});
 });
 `;
 
