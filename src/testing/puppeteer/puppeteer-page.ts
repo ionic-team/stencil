@@ -303,11 +303,26 @@ async function waitForChanges(page: pd.E2EPageInternal) {
 
 function consoleMessage(c: puppeteer.ConsoleMessage) {
   const type = c.type();
-  if (typeof (console as any)[type] === 'function') {
-    (console as any)[type](c.text());
+  const normalizedType = type === 'warning' ? 'warn' : type;
+  if (typeof (console as any)[normalizedType] === 'function') {
+    (console as any)[normalizedType](c.text(), serializeLocation(c.location()));
   } else {
-    console.log(type, c.text());
+    console.log(type, c.text(), serializeLocation(c.location()));
   }
+}
+
+function serializeLocation(loc: puppeteer.ConsoleMessageLocation) {
+  let locStr = '';
+  if (loc && loc.url) {
+    locStr = `\nLocation: ${loc.url}`;
+    if (loc.lineNumber) {
+      locStr += `:${loc.lineNumber}`;
+    }
+    if (loc.columnNumber) {
+      locStr += `:${loc.columnNumber}`;
+    }
+  }
+  return locStr;
 }
 
 
