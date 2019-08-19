@@ -113,21 +113,30 @@ const getComponentBoilerplate = (tagName: string, indent: string, hasStyle: bool
 `import { Component, Host, h } from '@stencil/core';
 
 @Component({
-${indent}tag: '${tagName}',${hasStyle ? `\n${indent}styleUrl: '${tagName}.css',` : ''}
-${indent}shadow: true
+\ttag: '${tagName}',${hasStyle ? `\n\tstyleUrl: '${tagName}.css',` : ''}
+\tshadow: true
 })
 export class ${toPascalCase(tagName)} {
 
-${indent}render() {
-${indent}${indent}return (
-${indent}${indent}${indent}<Host>
-${indent}${indent}${indent}${indent}<slot></slot>
-${indent}${indent}${indent}</Host>
-${indent}${indent});
-${indent}}
+\trender() {
+\t\treturn (
+\t\t\t<Host>
+\t\t\t\t<slot></slot>
+\t\t\t</Host>
+\t\t);
+\t}
 
 }
-`;
+`.replace(/\t/g, indent);
+
+/**
+ * Get the boilerplate for style.
+ */
+const getStyleUrlBoilerplate = (indent: string) =>
+`:host {
+\tdisplay: block;
+}
+`.replace(/\t/g, indent);
 
 /**
  * Get the boilerplate for a spec test.
@@ -136,20 +145,11 @@ const getSpecTestBoilerplate = (tagName: string, indent: string) =>
 `import { ${toPascalCase(tagName)} } from './${tagName}';
 
 describe('${tagName}', () => {
-${indent}it('builds', () => {
-${indent}${indent}expect(new ${toPascalCase(tagName)}()).toBeTruthy();
-${indent}});
+\tit('builds', () => {
+\t\texpect(new ${toPascalCase(tagName)}()).toBeTruthy();
+\t});
 });
-`;
-
-/**
- * Get the boilerplate for style.
- */
-const getStyleUrlBoilerplate = (indent: string) =>
-`:host {
-${indent}display: block;
-}
-`;
+`.replace(/\t/g, indent);
 
 /**
  * Get the boilerplate for an E2E test.
@@ -158,15 +158,15 @@ const getE2eTestBoilerplate = (name: string, indent: string) =>
 `import { newE2EPage } from '@stencil/core/testing';
 
 describe('${name}', () => {
-${indent}it('renders', async () => {
-${indent}${indent}const page = await newE2EPage();
-${indent}${indent}await page.setContent('<${name}></${name}>');
+\tit('renders', async () => {
+\t\tconst page = await newE2EPage();
+\t\tawait page.setContent('<${name}></${name}>');
 
-${indent}${indent}const element = await page.find('${name}');
-${indent}${indent}expect(element).toHaveClass('hydrated');
-${indent}});
+\t\tconst element = await page.find('${name}');
+\t\texpect(element).toHaveClass('hydrated');
+\t});
 });
-`;
+`.replace(/\t/g, indent);
 
 /**
  * Convert a dash case string to pascal case.
