@@ -26,7 +26,7 @@ describe('customElements', () => {
       }
     });
 
-    const cmpA = document.createElement('cmp-a');
+    const cmpA = document.createElement('CMP-a');
     cmpA.setAttribute('attr-a', 'value-a');
     expect(attrName).toBe('attr-a');
     expect(oldValue).toBe(null);

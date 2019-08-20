@@ -44,10 +44,9 @@ export function createElement(ownerDocument: any, tagName: string) {
 
     case 'title':
       return new MockTitleElement(ownerDocument);
-  }
 
-  if (SVG_TAGS.has(tagName)) {
-    return new MockSVGElement(ownerDocument, tagName);
+    case 'canvas':
+      return new MockCanvasElement(ownerDocument);
   }
 
   if (ownerDocument != null && tagName.includes('-')) {
@@ -69,9 +68,6 @@ export function createElementNS(ownerDocument: any, namespaceURI: string, tagNam
     return new MockElement(ownerDocument, tagName);
   }
 }
-
-// This set is intentionally incomplete. More tags can be added as needed.
-const SVG_TAGS = new Set(['circle', 'line', 'g', 'path', 'svg', 'symbol', 'viewbox']);
 
 class MockAnchorElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -212,7 +208,7 @@ patchPropAttributes(MockScriptElement.prototype, {
   type: String
 });
 
-class MockSVGElement extends MockElement {
+export class MockSVGElement extends MockElement {
   // SVGElement properties and methods
   get ownerSVGElement(): SVGSVGElement { return null; }
   get viewportElement(): SVGElement { return null; }
@@ -294,6 +290,45 @@ class MockTitleElement extends MockHTMLElement {
 }
 
 
+class MockCanvasElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'canvas');
+  }
+  getContext() {
+    return {
+      fillRect: function () { },
+      clearRect: function () { },
+      getImageData: function (_: number, __: number, w: number, h: number) {
+        return {
+          data: new Array(w * h * 4)
+        };
+      },
+      putImageData: function () { },
+      createImageData: function (): any[] { return [] },
+      setTransform: function () { },
+      drawImage: function () { },
+      save: function () { },
+      fillText: function () { },
+      restore: function () { },
+      beginPath: function () { },
+      moveTo: function () { },
+      lineTo: function () { },
+      closePath: function () { },
+      stroke: function () { },
+      translate: function () { },
+      scale: function () { },
+      rotate: function () { },
+      arc: function () { },
+      fill: function () { },
+      measureText: function () {
+        return { width: 0 };
+      },
+      transform: function () { },
+      rect: function () { },
+      clip: function () { },
+    }
+  }
+}
 
 function fullUrl(elm: MockElement, attrName: string) {
   const val = elm.getAttribute(attrName) || '';

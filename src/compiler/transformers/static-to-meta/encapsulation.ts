@@ -2,7 +2,7 @@ import { getStaticValue } from '../transform-utils';
 import ts from 'typescript';
 
 
-export function parseStaticEncapsulation(staticMembers: ts.ClassElement[]) {
+export const parseStaticEncapsulation = (staticMembers: ts.ClassElement[]) => {
   let encapsulation: string = getStaticValue(staticMembers, 'encapsulation');
 
   if (typeof encapsulation === 'string') {
@@ -13,4 +13,4 @@ export function parseStaticEncapsulation(staticMembers: ts.ClassElement[]) {
   }
 
   return 'none';
-}
+};

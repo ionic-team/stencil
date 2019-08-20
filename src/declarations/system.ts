@@ -48,7 +48,7 @@ export interface StencilSystem {
   serializeNodeToHtml?(elm: Element | Document): string;
   storage?: Storage;
   transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults>;
-  validateTypes?(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]): Promise<d.ValidateTypesResults>;
+  validateTypes?(compilerOptions: any, emitDtsFiles: boolean, collectionNames: string[], rootTsFiles: string[], isDevMode: boolean): Promise<d.ValidateTypesResults>;
 }
 
 

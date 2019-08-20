@@ -11,12 +11,13 @@ export const H = HTMLElement;
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
+  jmp: (h) => h(),
   raf: (h) => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
 };
 
-export const supportsShadowDom = (BUILD.shadowDom) ? !!doc.documentElement.attachShadow : false;
+export const supportsShadowDom = (BUILD.shadowDom) ? /*@__PURE__*/(() => !!doc.documentElement.attachShadow)() : false;
 
 export const supportsListenerOptions = /*@__PURE__*/(() => {
   let supportsListenerOptions = false;

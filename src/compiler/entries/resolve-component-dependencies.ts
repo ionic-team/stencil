@@ -28,7 +28,6 @@ function resolveTransitiveDependencies(cmp: d.ComponentCompilerMeta, cmps: d.Com
 
   const dependencies = cmp.potentialCmpRefs.filter(tagName => cmps.some(c => c.tagName === tagName));
   cmp.dependencies = cmp.directDependencies = dependencies;
-
   const transitiveDeps = flatOne(
     dependencies
       .map(tagName => cmps.find(c => c.tagName === tagName))

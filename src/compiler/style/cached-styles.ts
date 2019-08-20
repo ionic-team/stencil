@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { getCssImports } from './css-imports';
-import { getStyleId } from './component-styles';
+import { getStyleId } from './style-utils';
 
 
 export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, commentOriginalSelector: boolean) {

@@ -57,9 +57,7 @@ function getParser(ownerDocument: MockDocument) {
     },
 
     createElement(tagName: string, namespaceURI: string, attrs: Attribute[]) {
-      const elm = ownerDocument.createElement(tagName);
-      elm.namespaceURI = namespaceURI;
-
+      const elm = ownerDocument.createElementNS(namespaceURI, tagName);
       for (let i = 0; i < attrs.length; i++) {
         const attr = attrs[i];
 
@@ -175,7 +173,11 @@ function getParser(ownerDocument: MockDocument) {
     },
 
     getTagName(element: MockElement) {
-      return element.nodeName.toLowerCase();
+      if (element.namespaceURI === 'http://www.w3.org/1999/xhtml') {
+        return element.nodeName.toLowerCase();
+      } else {
+        return element.nodeName;
+      }
     },
 
     getNamespaceURI(element: MockElement) {

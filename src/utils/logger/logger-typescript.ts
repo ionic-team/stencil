@@ -4,7 +4,7 @@ import ts from 'typescript';
 import { normalizePath } from '../normalize-path';
 
 
-export function augmentDiagnosticWithNode(config: d.Config, d: d.Diagnostic, node: ts.Node) {
+export const augmentDiagnosticWithNode = (config: d.Config, d: d.Diagnostic, node: ts.Node) => {
   if (!node) {
     return d;
   }
@@ -64,7 +64,7 @@ export function augmentDiagnosticWithNode(config: d.Config, d: d.Diagnostic, nod
   }
 
   return d;
-}
+};
 
 
 /**
@@ -72,16 +72,19 @@ export function augmentDiagnosticWithNode(config: d.Config, d: d.Diagnostic, nod
  * error reporting within a terminal. So, yeah, let's code it up, shall we?
  */
 
-export function loadTypeScriptDiagnostics(resultsDiagnostics: d.Diagnostic[], tsDiagnostics: readonly ts.Diagnostic[]) {
+export const loadTypeScriptDiagnostics = (tsDiagnostics: readonly ts.Diagnostic[]) => {
+  const diagnostics: d.Diagnostic[] = [];
   const maxErrors = Math.min(tsDiagnostics.length, 50);
 
   for (let i = 0; i < maxErrors; i++) {
-    resultsDiagnostics.push(loadTypeScriptDiagnostic(tsDiagnostics[i]));
+    diagnostics.push(loadTypeScriptDiagnostic(tsDiagnostics[i]));
   }
-}
+
+  return diagnostics;
+};
 
 
-export function loadTypeScriptDiagnostic(tsDiagnostic: ts.Diagnostic) {
+export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
 
   const d: d.Diagnostic = {
     level: 'warn',
@@ -151,10 +154,10 @@ export function loadTypeScriptDiagnostic(tsDiagnostic: ts.Diagnostic) {
   }
 
   return d;
-}
+};
 
 
-function formatMessageText(tsDiagnostic: ts.Diagnostic) {
+const formatMessageText = (tsDiagnostic: ts.Diagnostic) => {
   let diagnosticChain = tsDiagnostic.messageText;
 
   if (typeof diagnosticChain === 'string') {
@@ -184,4 +187,4 @@ function formatMessageText(tsDiagnostic: ts.Diagnostic) {
   }
 
   return result.trim();
-}
+};

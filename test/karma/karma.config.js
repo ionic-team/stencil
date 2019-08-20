@@ -36,7 +36,7 @@ var browserStackLaunchers = {
 
 const localLaunchers = {
   ChromeHeadless: {
-    base: 'Chrome',
+    base: 'ChromeHeadless',
     flags: [
 			'--no-sandbox',
 			// See https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md

@@ -28,10 +28,17 @@ export class MockNode {
   }
 
   appendChild(newNode: MockNode) {
-    newNode.remove();
-    newNode.parentNode = this;
-    this.childNodes.push(newNode);
-    connectNode(this.ownerDocument, newNode);
+    if (newNode.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
+      const nodes = newNode.childNodes.slice();
+      for (const child of nodes) {
+        this.appendChild(child);
+      }
+    } else {
+      newNode.remove();
+      newNode.parentNode = this;
+      this.childNodes.push(newNode);
+      connectNode(this.ownerDocument, newNode);
+    }
     return newNode;
   }
 
@@ -186,7 +193,7 @@ export class MockElement extends MockNode {
     super(
       ownerDocument,
       NODE_TYPES.ELEMENT_NODE,
-      typeof nodeName === 'string' ? nodeName.toUpperCase() : null,
+      typeof nodeName === 'string' ? nodeName : null,
       null
     );
     this.namespaceURI = null;
@@ -479,7 +486,7 @@ export class MockElement extends MockNode {
         if (attributes.caseInsensitive) {
           attrName = attrName.toLowerCase();
         }
-        attr = new MockAttr(attrName, value);
+        attr = new MockAttr(attrName, String(value));
         attributes.items.push(attr);
 
         if (checkAttrChanged === true) {
@@ -542,7 +549,7 @@ export class MockElement extends MockNode {
   set tabIndex(value: number) { this.setAttributeNS(null, 'tabindex', value); }
 
   get tagName() { return this.nodeName; }
-  set tagName(value: string) { this.nodeName = value.toUpperCase(); }
+  set tagName(value: string) { this.nodeName = value; }
 
   get textContent() {
     const text: string[] = [];
@@ -679,6 +686,19 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
 }
 
 export class MockHTMLElement extends MockElement {
+
+  namespaceURI = 'http://www.w3.org/1999/xhtml';
+
+  constructor(ownerDocument: any, nodeName: string) {
+    super(
+      ownerDocument,
+      typeof nodeName === 'string' ? nodeName.toUpperCase() : null,
+    );
+  }
+
+  get tagName() { return this.nodeName; }
+  set tagName(value: string) { this.nodeName = value; }
+
   get attributes() {
     let attrs = attrsMap.get(this);
     if (attrs == null) {

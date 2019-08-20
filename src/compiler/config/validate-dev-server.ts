@@ -124,12 +124,5 @@ export function validateDevServer(config: d.Config, diagnostics: d.Diagnostic[])
 }
 
 function validateProtocol(devServer: d.DevServerConfig) {
-  if (typeof devServer.protocol === 'string') {
-    let protocol: string = devServer.protocol.trim().toLowerCase() as any;
-    protocol = protocol.replace(':', '').replace('/', '');
-    devServer.protocol = protocol as any;
-  }
-  if (devServer.protocol !== 'http' && devServer.protocol !== 'https') {
-    devServer.protocol = 'http';
-  }
+  devServer.protocol = devServer.https ? 'https' : 'http';
 }

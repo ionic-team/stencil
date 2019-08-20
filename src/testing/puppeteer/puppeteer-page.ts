@@ -43,17 +43,18 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
         }
       } catch (e) {}
 
-      page._e2eElements = null;
-      page._e2eEvents = null;
-      page._e2eGoto = null;
-      page.find = null;
-      page.debugger = null;
-      page.findAll = null;
-      page.compareScreenshot = null;
-      page.setContent = null;
-      page.spyOnEvent = null;
-      page.waitForChanges = null;
-      page.waitForEvent = null;
+      const noop: any = () => { throw new Error('The page was already closed'); };
+      page._e2eElements = noop;
+      page._e2eEvents = noop;
+      page._e2eGoto = noop;
+      page.find = noop;
+      page.debugger = noop;
+      page.findAll = noop;
+      page.compareScreenshot = noop;
+      page.setContent = noop;
+      page.spyOnEvent = noop;
+      page.waitForChanges = noop;
+      page.waitForEvent = noop;
 
       try {
         if (!page.isClosed()) {
@@ -64,7 +65,7 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
 
     const getDocHandle = async () => {
       if (!docPromise) {
-        docPromise = page.evaluateHandle('document');
+        docPromise = page.evaluateHandle(() => document);
       }
       const documentJsHandle = await docPromise;
       return documentJsHandle.asElement();
@@ -302,11 +303,26 @@ async function waitForChanges(page: pd.E2EPageInternal) {
 
 function consoleMessage(c: puppeteer.ConsoleMessage) {
   const type = c.type();
-  if (typeof (console as any)[type] === 'function') {
-    (console as any)[type](c.text());
+  const normalizedType = type === 'warning' ? 'warn' : type;
+  if (typeof (console as any)[normalizedType] === 'function') {
+    (console as any)[normalizedType](c.text(), serializeLocation(c.location()));
   } else {
-    console.log(type, c.text());
+    console.log(type, c.text(), serializeLocation(c.location()));
   }
+}
+
+function serializeLocation(loc: puppeteer.ConsoleMessageLocation) {
+  let locStr = '';
+  if (loc && loc.url) {
+    locStr = `\nLocation: ${loc.url}`;
+    if (loc.lineNumber) {
+      locStr += `:${loc.lineNumber}`;
+    }
+    if (loc.columnNumber) {
+      locStr += `:${loc.columnNumber}`;
+    }
+  }
+  return locStr;
 }
 
 

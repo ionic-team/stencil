@@ -1,5 +1,5 @@
 import { MockElement } from './node';
-import cssWhat from 'css-what';
+import { Selector, parse } from 'css-what';
 
 
 export function closest(selector: string, elm: MockElement) {
@@ -14,18 +14,18 @@ export function closest(selector: string, elm: MockElement) {
 
 
 export function matches(selector: string, elm: MockElement) {
-  const selectors = cssWhat(selector);
+  const selectors = parse(selector);
   return matchesSelectors(selectors, elm);
 }
 
 
 export function selectOne(selector: string, elm: MockElement) {
-  const selectors = cssWhat(selector);
+  const selectors = parse(selector);
   return selectOneRecursion(selectors, elm);
 }
 
 
-function selectOneRecursion(selectors: cssWhat.ParseResults, elm: MockElement): MockElement {
+function selectOneRecursion(selectors: Selector[][], elm: MockElement): MockElement {
   const children = elm.children;
   for (let i = 0, ii = children.length; i < ii; i++) {
     if (matchesSelectors(selectors, children[i]) === true) {
@@ -41,13 +41,13 @@ function selectOneRecursion(selectors: cssWhat.ParseResults, elm: MockElement): 
 
 
 export function selectAll(selector: string, elm: MockElement) {
-  const selectors = cssWhat(selector);
+  const selectors = parse(selector);
   const foundElms: MockElement[] = [];
   selectAllRecursion(selectors, elm, foundElms);
   return foundElms;
 }
 
-function selectAllRecursion(selectors: cssWhat.ParseResults, elm: MockElement, found: MockElement[]) {
+function selectAllRecursion(selectors: Selector[][], elm: MockElement, found: MockElement[]) {
   const children = elm.children;
   for (let i = 0, ii = children.length; i < ii; i++) {
     if (matchesSelectors(selectors, children[i]) === true) {
@@ -58,7 +58,7 @@ function selectAllRecursion(selectors: cssWhat.ParseResults, elm: MockElement, f
 }
 
 
-function matchesSelectors(selectors: cssWhat.ParseResults, elm: MockElement) {
+function matchesSelectors(selectors: Selector[][], elm: MockElement) {
   for (let i = 0, ii = selectors.length; i < ii; i++) {
     if (matchesEverySelector(selectors[i], elm) === true) {
       return true;
@@ -68,7 +68,7 @@ function matchesSelectors(selectors: cssWhat.ParseResults, elm: MockElement) {
 }
 
 
-function matchesEverySelector(selectorData: cssWhat.Selector[], elm: MockElement) {
+function matchesEverySelector(selectorData: Selector[], elm: MockElement) {
   for (let i = 0, ii = selectorData.length; i < ii; i++) {
     if (matchesSelector(selectorData[i], elm) === false) {
       return false;
@@ -78,7 +78,7 @@ function matchesEverySelector(selectorData: cssWhat.Selector[], elm: MockElement
 }
 
 
-function matchesSelector(selectorData: cssWhat.Selector, elm: MockElement) {
+function matchesSelector(selectorData: Selector, elm: MockElement) {
   switch (selectorData.type) {
     case 'tag':
       return elm.nodeName.toLowerCase() === selectorData.name.toLowerCase();

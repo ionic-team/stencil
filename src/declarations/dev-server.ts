@@ -17,6 +17,10 @@ export interface StencilDevServerConfig {
    */
   basePath?: string;
   /**
+   * When set, the dev server will run via https using the SSL certificate and key you provide (use `fs` if you want to read them from files).
+   */
+  https?: Credentials;
+  /**
    * The URL the dev server should first open to. Defaults to `/`.
    */
   initialLoadUrl?: string;
@@ -52,6 +56,10 @@ export interface DevServerConfig extends StencilDevServerConfig {
   protocol?: 'http' | 'https';
 }
 
+export interface Credentials {
+  key: string;
+  cert: string;
+}
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 

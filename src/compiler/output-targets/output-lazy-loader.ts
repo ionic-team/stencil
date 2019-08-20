@@ -36,6 +36,7 @@ async function generateLoader(config: d.Config, compilerCtx: d.CompilerCtx, outp
     'jsnext:main': './index.es2017.mjs',
     'es2015': './index.es2017.mjs',
     'es2017': './index.es2017.mjs',
+    'unpkg': './cdn.js',
   }, null, 2);
 
   const es5EntryPoint = config.sys.path.join(es5Dir, 'loader.mjs');
@@ -61,12 +62,14 @@ module.exports.applyPolyfills = function() { return Promise.resolve() };
 module.exports.defineCustomElements = function() { return Promise.resolve() };
 `;
 
+
   const indexDtsPath = config.sys.path.join(loaderPath, 'index.d.ts');
   await Promise.all([
     compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'package.json'), packageJsonContent),
     compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.d.ts'), generateIndexDts(config, indexDtsPath, outputTarget.componentDts)),
     compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.mjs'), indexContent),
     compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.cjs.js'), indexCjsContent),
+    compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'cdn.js'), indexCjsContent),
     compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'index.es2017.mjs'), indexES2017Content),
     compilerCtx.fs.writeFile(config.sys.path.join(loaderPath, 'node-main.js'), nodeMainContent)
   ]);
@@ -80,6 +83,7 @@ export interface CustomElementsDefineOptions {
   exclude?: string[];
   resourcesUrl?: string;
   syncQueue?: boolean;
+  jmp?: (c: Function) => any;
   raf?: (c: FrameRequestCallback) => number;
   ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;

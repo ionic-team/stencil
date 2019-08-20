@@ -3,8 +3,8 @@ import { augmentDiagnosticWithNode, buildWarn } from '@utils';
 import ts from 'typescript';
 
 
-export function validatePublicName(config: d.Config, diagnostics: d.Diagnostic[], memberName: string, decorator: string, memberType: string, node: ts.Node) {
-  if (isReservedMember(memberName)) {
+export const validatePublicName = (config: d.Config, diagnostics: d.Diagnostic[], memberName: string, decorator: string, memberType: string, node: ts.Node) => {
+  if (RESERVED_PUBLIC_MEMBERS.has(memberName.toLowerCase())) {
     const warn = buildWarn(diagnostics);
     warn.messageText = [
       `The ${decorator} name "${memberName}" is a reserved public name. `,
@@ -14,7 +14,7 @@ export function validatePublicName(config: d.Config, diagnostics: d.Diagnostic[]
     ].join('');
     augmentDiagnosticWithNode(config, warn, node);
   }
-}
+};
 
 const HTML_ELEMENT_KEYS = [
   'title',
@@ -273,8 +273,3 @@ const RESERVED_PUBLIC_MEMBERS = new Set([
   ...NODE_KEYS,
   ...JSX_KEYS,
 ].map(p => p.toLowerCase()));
-
-
-function isReservedMember(memberName: string) {
-  return RESERVED_PUBLIC_MEMBERS.has(memberName.toLowerCase());
-}

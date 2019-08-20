@@ -114,51 +114,41 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
   waitForVisible() {
     return new Promise<void>((resolve, reject) => {
-      let resolveTmr: any;
-
-      const timeout = 30000;
-
-      const rejectTmr = setTimeout(() => {
-        clearTimeout(resolveTmr);
-        reject(`waitForVisible timed out: ${timeout}ms`);
-      }, timeout);
-
       const checkVisible = async () => {
         const isVisible = await this.isVisible();
         if (isVisible) {
+          clearInterval(resolveTmr);
           clearTimeout(rejectTmr);
           resolve();
-        } else {
-          resolveTmr = setTimeout(checkVisible, 10);
         }
       };
-
-      checkVisible();
+      const resolveTmr = setInterval(checkVisible, 10);
+      const timeout = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
+      const timeoutError = new Error(`waitForVisible timed out: ${timeout}ms`);
+      const rejectTmr = setTimeout(() => {
+        clearTimeout(resolveTmr);
+        reject(timeoutError);
+      }, timeout);
     });
   }
 
   waitForNotVisible() {
     return new Promise<void>((resolve, reject) => {
-      let resolveTmr: any;
-
-      const timeout = 30000;
-
-      const rejectTmr = setTimeout(() => {
-        clearTimeout(resolveTmr);
-        reject(`waitForNotVisible timed out: ${timeout}ms`);
-      }, timeout);
-
       const checkVisible = async () => {
         const isVisible = await this.isVisible();
-        if (isVisible) {
-          resolveTmr = setTimeout(checkVisible, 10);
-        } else {
+        if (!isVisible) {
+          clearInterval(resolveTmr);
           clearTimeout(rejectTmr);
           resolve();
         }
       };
-
-      checkVisible();
+      const resolveTmr = setInterval(checkVisible, 10);
+      const timeout = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
+      const timeoutError = new Error(`waitForNotVisible timed out: ${timeout}ms`);
+      const rejectTmr = setTimeout(() => {
+        clearTimeout(resolveTmr);
+        reject(timeoutError);
+      }, timeout);
     });
   }
 

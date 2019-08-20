@@ -1,11 +1,15 @@
+import { Plugin } from 'rollup';
 
 
-export function loaderPlugin(entries: {[id: string]: string}) {
+export function loaderPlugin(entries: {[id: string]: string}): Plugin {
   return {
     name: 'stencilLoaderPlugin',
     resolveId(id: string) {
       if (id in entries) {
-        return id;
+        return {
+          id,
+          moduleSideEffects: false
+        };
       }
       return null;
     },

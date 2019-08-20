@@ -79,7 +79,7 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToH
 
 function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: SerializeOutput, isShadowRoot: boolean) {
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE || isShadowRoot) {
-    const tagName = isShadowRoot ? 'mock:shadow-root' : node.nodeName.toLowerCase();
+    const tagName = isShadowRoot ? 'mock:shadow-root' : getTagName(node as Element);
 
     if (tagName === 'body') {
       output.isWithinBody = true;
@@ -267,10 +267,9 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
     let textContent = node.nodeValue;
 
     if (typeof textContent === 'string') {
-
-      if (textContent.trim() === '') {
+      const trimmedTextContent = textContent.trim();
+      if (trimmedTextContent === '') {
         // this text node is whitespace only
-
         if (isWithinWhitespaceSensitive(node)) {
           // whitespace matters within this element
           // just add the exact text we were given
@@ -321,7 +320,12 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
           if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
             // this text node cannot have its content escaped since it's going
             // into an element like <style> or <script>
-            output.text.push(textContent);
+            if (isWithinWhitespaceSensitive(node)) {
+              output.text.push(textContent);
+            } else {
+              output.text.push(trimmedTextContent);
+              textContentLength = trimmedTextContent.length;
+            }
             output.currentLineWidth += textContentLength;
 
           } else {
@@ -401,6 +405,14 @@ const DOUBLE_QUOTE_REGEX = /"/g;
 const LT_REGEX = /</g;
 const GT_REGEX = />/g;
 const CAN_REMOVE_ATTR_QUOTES = /^[^ \t\n\f\r"'`=<>\/\\-]+$/;
+
+function getTagName(element: Element) {
+  if (element.namespaceURI === 'http://www.w3.org/1999/xhtml') {
+    return element.nodeName.toLowerCase();
+  } else {
+    return element.nodeName;
+  }
+}
 
 function escapeString(str: string, attrMode: boolean) {
   str = str.replace(AMP_REGEX, '&amp;').replace(NBSP_REGEX, '&nbsp;');

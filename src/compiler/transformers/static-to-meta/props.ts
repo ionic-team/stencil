@@ -3,7 +3,7 @@ import { getStaticValue, isInternal } from '../transform-utils';
 import ts from 'typescript';
 
 
-export function parseStaticProps(staticMembers: ts.ClassElement[]): d.ComponentCompilerProperty[] {
+export const parseStaticProps = (staticMembers: ts.ClassElement[]): d.ComponentCompilerProperty[] => {
   const parsedProps: {[key: string]: d.ComponentCompilerStaticProperty} = getStaticValue(staticMembers, 'properties');
   if (!parsedProps) {
     return [];
@@ -30,5 +30,4 @@ export function parseStaticProps(staticMembers: ts.ClassElement[]): d.ComponentC
       internal: isInternal(val.docs)
     };
   });
-}
-
+};

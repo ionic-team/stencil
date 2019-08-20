@@ -122,7 +122,7 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
 
 async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput: d.PixelMatchInput) {
   return new Promise<number>((resolve, reject) => {
-    const timeout = 30000;
+    const timeout = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
     const tmr = setTimeout(() => {
       reject(`getMismatchedPixels timeout: ${timeout}ms`);
     }, timeout);

@@ -6,42 +6,26 @@
 
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-import { JSX } from '@stencil/core';
 
 
 export namespace Components {
   interface AppRoot {}
-  interface ScopedMode {}
-  interface ShadowMode {}
-}
-
-declare namespace LocalJSX {
-  interface AppRoot extends JSXBase.HTMLAttributes {}
-  interface ScopedMode extends JSXBase.HTMLAttributes {}
-  interface ShadowMode extends JSXBase.HTMLAttributes {}
-
-  interface ElementInterfaces {
-    'AppRoot': Components.AppRoot;
-    'ScopedMode': Components.ScopedMode;
-    'ShadowMode': Components.ShadowMode;
+  interface ScopedMode {
+    /**
+    * This is the mode
+    */
+    'mode'?: 'buford' | 'griff';
   }
-
-  interface IntrinsicElements {
-    'AppRoot': LocalJSX.AppRoot;
-    'ScopedMode': LocalJSX.ScopedMode;
-    'ShadowMode': LocalJSX.ShadowMode;
-  }
-}
-export { LocalJSX as JSX };
-
-declare module "@stencil/core" {
-  export namespace JSX {
-    interface ElementInterfaces extends LocalJSX.ElementInterfaces {}
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  interface ShadowMode {
+    /**
+    * This is the mode
+    */
+    'mode'?: 'buford' | 'griff';
   }
 }
 
 declare global {
+
 
   interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
   var HTMLAppRootElement: {
@@ -61,15 +45,41 @@ declare global {
     new (): HTMLShadowModeElement;
   };
   interface HTMLElementTagNameMap {
-    'app-root': HTMLAppRootElement
-    'scoped-mode': HTMLScopedModeElement
-    'shadow-mode': HTMLShadowModeElement
-  }
-
-  interface ElementTagNameMap {
     'app-root': HTMLAppRootElement;
     'scoped-mode': HTMLScopedModeElement;
     'shadow-mode': HTMLShadowModeElement;
   }
 }
+
+declare namespace LocalJSX {
+  interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
+  interface ScopedMode extends JSXBase.HTMLAttributes<HTMLScopedModeElement> {
+    /**
+    * This is the mode
+    */
+    'mode'?: 'buford' | 'griff';
+  }
+  interface ShadowMode extends JSXBase.HTMLAttributes<HTMLShadowModeElement> {
+    /**
+    * This is the mode
+    */
+    'mode'?: 'buford' | 'griff';
+  }
+
+  interface IntrinsicElements {
+    'app-root': AppRoot;
+    'scoped-mode': ScopedMode;
+    'shadow-mode': ShadowMode;
+  }
+}
+
+export { LocalJSX as JSX };
+
+
+declare module "@stencil/core" {
+  export namespace JSX {
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+  }
+}
+
 

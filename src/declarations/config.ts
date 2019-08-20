@@ -156,6 +156,12 @@ export interface StencilConfig {
    */
   devMode?: boolean;
 
+  /**
+   * Object to provide a custom logger. By default a `logger` is already provided for the
+   * platform the compiler is running on, such as NodeJS or a browser.
+   */
+  logger?: d.Logger;
+
   globalScript?: string;
   srcIndexHtml?: string;
   watch?: boolean;
@@ -176,6 +182,7 @@ export interface StencilConfig {
   tsconfig?: string;
   validateTypes?: boolean;
   watchIgnoredRegex?: RegExp;
+  excludeUnusedDependencies?: boolean;
 }
 
 export interface Config extends StencilConfig {
@@ -183,7 +190,6 @@ export interface Config extends StencilConfig {
   buildDocs?: boolean;
   configPath?: string;
   cwd?: string;
-  logger?: d.Logger;
   writeLog?: boolean;
   rollupPlugins?: any[];
   devServer?: d.DevServerConfig;
@@ -253,7 +259,7 @@ export interface NodeResolveConfig {
 
 
 export interface ConfigFlags {
-  task?: 'build' | 'docs' | 'help' | 'serve' | 'test';
+  task?: 'build' | 'docs' | 'help' | 'serve' | 'test' | 'g' | 'generate';
   args?: string[];
   knownArgs?: string[];
   unknownArgs?: string[];

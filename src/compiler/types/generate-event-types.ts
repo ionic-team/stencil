@@ -1,10 +1,10 @@
 import * as d from '../../declarations';
-import { captializeFirstLetter, isDocsPublic } from '@utils';
+import { getTextDocs, isDocsPublic, toTitleCase } from '@utils';
 
 
 export function generateEventTypes(cmpEvents: d.ComponentCompilerEvent[]): d.TypeInfo {
   return cmpEvents.map(cmpEvent => {
-    const name = `on${captializeFirstLetter(cmpEvent.name)}`;
+    const name = `on${toTitleCase(cmpEvent.name)}`;
     const type = (cmpEvent.complexType.original) ? `(event: CustomEvent<${cmpEvent.complexType.original}>) => void` : `CustomEvent`;
     return {
       name,
@@ -12,7 +12,7 @@ export function generateEventTypes(cmpEvents: d.ComponentCompilerEvent[]): d.Typ
       optional: false,
       required: false,
       public: isDocsPublic(cmpEvent.docs),
-      jsdoc: (cmpEvent.docs != null && typeof cmpEvent.docs.text === 'string') ? cmpEvent.docs.text : undefined
+      jsdoc: getTextDocs(cmpEvent.docs),
     };
   });
 }

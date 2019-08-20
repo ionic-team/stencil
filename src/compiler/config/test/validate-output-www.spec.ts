@@ -51,8 +51,8 @@ describe('validateOutputTargetWww', () => {
       'esmDir': path.join(rootDir, 'www', 'docs', 'build'),
       'isBrowserBuild': true,
       'polyfills': true,
-      'systemDir': path.join(rootDir, 'www', 'docs', 'build'),
-      'systemLoaderFile': path.join(rootDir, '/www/docs/build/undefined.js'),
+      'systemDir': undefined,
+      'systemLoaderFile': undefined,
       'type': 'dist-lazy'
     }, {
       'copyAssets': 'dist',
@@ -66,7 +66,7 @@ describe('validateOutputTargetWww', () => {
         'src': 'manifest.json',
         'warn': false
       }],
-      'dir': path.join(rootDir, 'www', 'docs'),
+      'dir': path.join(rootDir, 'www', 'docs/'),
       'type': 'copy'
     }, {
       'file': path.join(rootDir, 'www', 'docs', 'build', 'undefined.css'),
@@ -209,7 +209,7 @@ describe('validateOutputTargetWww', () => {
           'src': 'manifest.json',
           'warn': false
         }],
-        'dir': join(rootDir, 'www', 'docs'),
+        'dir': join(rootDir, 'www', 'docs/'),
         'type': 'copy'
       }]);
     });
@@ -242,7 +242,7 @@ describe('validateOutputTargetWww', () => {
               'warn': false
             }
           ],
-          'dir': join(rootDir, 'www', 'docs'),
+          'dir': join(rootDir, 'www', 'docs/'),
           'type': 'copy'
         }
       ]);
@@ -264,7 +264,7 @@ describe('validateOutputTargetWww', () => {
         'type': 'copy'
       }, {
         'copy': [],
-        'dir': join(rootDir, 'www', 'docs'),
+        'dir': join(rootDir, 'www', 'docs/'),
         'type': 'copy'
       }]);
     });

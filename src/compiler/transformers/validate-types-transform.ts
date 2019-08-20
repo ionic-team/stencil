@@ -1,23 +1,25 @@
-import { removeStencilImport, MEMBER_DECORATORS_TO_REMOVE, CLASS_DECORATORS_TO_REMOVE } from './remove-stencil-import';
+import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorator-utils';
 import { removeDecorators } from './transform-utils';
 import ts from 'typescript';
+import { updateStencilCoreImport } from './update-stencil-core-import';
 
-export function removeStencilDecorators(): ts.TransformerFactory<ts.SourceFile> {
+
+export const removeStencilDecorators = (): ts.TransformerFactory<ts.SourceFile> => {
 
   return transformCtx => {
 
-    function visit(node: ts.Node): ts.VisitResult<ts.Node> {
+    const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
         return visitComponentClass(node);
       }
       return ts.visitEachChild(node, visit, transformCtx);
-    }
+    };
     return (tsSourceFile) => visit(tsSourceFile) as ts.SourceFile;
   };
-}
+};
 
 
-function visitComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaration {
+const visitComponentClass = (classNode: ts.ClassDeclaration): ts.ClassDeclaration => {
   removeDecorators(classNode, CLASS_DECORATORS_TO_REMOVE);
 
   classNode.members.forEach((member) => {
@@ -27,23 +29,23 @@ function visitComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaratio
   });
 
   return classNode;
-}
+};
 
 
-export function removeStencilImports(): ts.TransformerFactory<ts.SourceFile> {
+export const removeStencilImports = (): ts.TransformerFactory<ts.SourceFile> => {
 
   return transformCtx => {
 
     return tsSourceFile => {
-      function visitNode(node: ts.Node): any {
+      const visitNode = (node: ts.Node): any => {
         if (node.kind === ts.SyntaxKind.ImportDeclaration) {
-          return removeStencilImport(node as ts.ImportDeclaration);
+          return updateStencilCoreImport(node as ts.ImportDeclaration, '@stencil/core');
         }
 
         return ts.visitEachChild(node, visitNode, transformCtx);
-      }
+      };
 
       return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
     };
   };
-}
+};

@@ -9,7 +9,7 @@ import { transpileToEs5Worker } from '../../compiler/transpile/transpile-to-es5-
 import { validateTypesWorker } from '../../compiler/transpile/validate-types-worker';
 
 
-const Terser = require('terser/dist/bundle.js');
+const Terser = require('terser/dist/bundle.min.js');
 
 
 export class NodeSystemWorker {
@@ -51,8 +51,8 @@ export class NodeSystemWorker {
     return transpileToEs5Worker(cwd, input, inlineHelpers);
   }
 
-  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
-    return validateTypesWorker(this.workerContext, emitDtsFiles, compilerOptions, currentWorkingDir, collectionNames, rootTsFiles);
+  validateTypes(compilerOptions: any, emitDtsFiles: boolean, collectionNames: string[], rootTsFiles: string[], isDevMode: boolean) {
+    return validateTypesWorker(this.workerContext, emitDtsFiles, compilerOptions, collectionNames, rootTsFiles, isDevMode);
   }
 
 }

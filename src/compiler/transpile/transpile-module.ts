@@ -3,22 +3,24 @@ import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../build/compiler-ctx';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
+import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
 import ts from 'typescript';
 
 
 /**
  * Mainly used as the typescript preprocessor for unit tests
  */
-export function transpileModule(config: d.Config, input: string, opts: ts.CompilerOptions = {}, sourceFilePath?: string) {
+export const transpileModule = (config: d.Config, input: string, transformOpts: d.TransformOptions, sourceFilePath?: string) => {
   const compilerCtx = new CompilerContext(config);
   const buildCtx = new BuildContext(config, compilerCtx);
 
   if (typeof sourceFilePath === 'string') {
     sourceFilePath = normalizePath(sourceFilePath);
   } else {
-    sourceFilePath = (opts.jsx ? `module.tsx` : `module.ts`);
+    sourceFilePath = (transformOpts.jsx ? `module.tsx` : `module.ts`);
   }
 
   const results: d.TranspileResults = {
@@ -30,16 +32,16 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     build: {}
   };
 
-  if ((sourceFilePath.endsWith('.tsx') || sourceFilePath.endsWith('.jsx')) && opts.jsx == null) {
+  if ((sourceFilePath.endsWith('.tsx') || sourceFilePath.endsWith('.jsx')) && transformOpts.jsx == null) {
     // ensure we're setup for JSX in typescript
-    opts.jsx = ts.JsxEmit.React;
+    transformOpts.jsx = ts.JsxEmit.React;
   }
 
-  if (opts.jsx != null && typeof opts.jsxFactory !== 'string') {
-    opts.jsxFactory = 'h';
+  if (transformOpts.jsx != null && typeof transformOpts.jsxFactory !== 'string') {
+    transformOpts.jsxFactory = 'h';
   }
 
-  const sourceFile = ts.createSourceFile(sourceFilePath, input, opts.target);
+  const sourceFile = ts.createSourceFile(sourceFilePath, input, transformOpts.target);
 
   // Create a compilerHost object to allow the compiler to read and write files
   const compilerHost: ts.CompilerHost = {
@@ -64,22 +66,26 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     getDirectories: () => []
   };
 
-  const program = ts.createProgram([sourceFilePath], opts, compilerHost);
+  const program = ts.createProgram([sourceFilePath], transformOpts, compilerHost);
   const typeChecker = program.getTypeChecker();
 
-  const transformOpts: d.TransformOptions = {
-    addCompilerMeta: true,
-    addStyle: false
-  };
+  const after: ts.TransformerFactory<ts.SourceFile>[] = [
+    convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)
+  ];
+
+  if (transformOpts.componentExport === 'customelement' || transformOpts.componentExport === 'native') {
+    after.push(nativeComponentTransform(compilerCtx, transformOpts));
+
+  } else {
+    after.push(lazyComponentTransform(compilerCtx, transformOpts));
+  }
 
   program.emit(undefined, undefined, undefined, false, {
     before: [
-      convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker)
+      convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker),
+      updateStencilCoreImports(transformOpts.coreImportPath)
     ],
-    after: [
-      convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
-      lazyComponentTransform(compilerCtx, transformOpts)
-    ]
+    after
   });
 
   const tsDiagnostics = [...program.getSyntacticDiagnostics()];
@@ -88,11 +94,14 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     tsDiagnostics.push(...program.getOptionsDiagnostics());
   }
 
-  loadTypeScriptDiagnostics(buildCtx.diagnostics, tsDiagnostics);
+  buildCtx.diagnostics.push(
+    ...loadTypeScriptDiagnostics(tsDiagnostics)
+  );
 
   results.diagnostics.push(...buildCtx.diagnostics);
 
   results.moduleFile = compilerCtx.moduleMap.get(results.sourceFilePath);
 
   return results;
-}
+};
+

@@ -1,14 +1,14 @@
-import { disconnectedCallback } from './disconnected-callback';
 import { proxyComponent } from './proxy-component';
+import * as d from '../declarations';
 import { CMP_FLAGS } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
-import * as d from '../declarations';
+import { disconnectedCallback } from './disconnected-callback';
 import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
-import { postUpdateComponent, forceUpdate } from './update-component';
+import { appDidLoad, forceUpdate, postUpdateComponent } from './update-component';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
@@ -18,22 +18,32 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const customElements = win.customElements;
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
+  let appLoadFallback: any;
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
   if (options.syncQueue) {
     plt.$flags$ |= PLATFORM_FLAGS.queueSync;
   }
+  if (BUILD.hydrateClientSide) {
+    // If the app is already hydrated there is not point to disable the
+    // async queue. This will improve the first input delay
+    plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
+  }
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
     const styles = doc.querySelectorAll('style[s-id]');
     let globalStyles = '';
-    styles.forEach(styleElm => globalStyles += styleElm.innerHTML);
-    styles.forEach(styleElm => {
+    let i = 0;
+    for (; i < styles.length; i++) {
+      globalStyles += styles[i].innerHTML;
+    }
+    for (i = 0; i < styles.length; i++) {
+      const styleElm = styles[i];
       registerStyle(
         styleElm.getAttribute(HYDRATE_ID),
         globalStyles + convertScopedToShadow(styleElm.innerHTML),
         true,
       );
-    });
+    }
   }
 
   lazyBundles.forEach(lazyBundle =>
@@ -84,11 +94,15 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         connectedCallback() {
-          connectedCallback(this, cmpMeta);
+          if (appLoadFallback) {
+            clearTimeout(appLoadFallback);
+            appLoadFallback = null;
+          }
+          plt.jmp(() => connectedCallback(this, cmpMeta));
         }
 
         disconnectedCallback() {
-          disconnectedCallback(this);
+          plt.jmp(() => disconnectedCallback(this));
         }
 
         's-init'() {
@@ -127,4 +141,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
   visibilityStyle.setAttribute('data-styles', '');
   head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
+
+  // Fallback appLoad event
+  plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30));
 };

@@ -12,7 +12,8 @@ function buildCoreJs() {
       'es',
       'web.url',
       'web.url.to-json',
-      'web.url-search-params'
+      'web.url-search-params',
+      'web.dom-collections.for-each'
     ],
     blacklist: [
       'es.math',
@@ -21,7 +22,8 @@ function buildCoreJs() {
       'es.array-buffer',
       'es.data-view',
       'es.typed-array',
-      'es.reflect'
+      'es.reflect',
+      'es.promise'
     ],
     targets: 'ie 11',
     filename: path.join(SRC_DIR, 'core-js.js'),

@@ -7,7 +7,10 @@ export function stencilClientPlugin(config: d.Config): Plugin {
     name: 'stencilClientEntryPointPlugin',
     resolveId(id: string) {
       if (id === '@stencil/core/platform') {
-        return config.sys.path.join(config.sys.compiler.distDir, 'client', 'index.mjs');
+        return {
+          id: config.sys.path.join(config.sys.compiler.distDir, 'client', 'index.mjs'),
+          moduleSideEffects: false
+        };
       }
       return null;
     },

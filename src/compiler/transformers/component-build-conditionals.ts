@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
 
 
-export function setComponentBuildConditionals(cmpMeta: d.ComponentCompilerMeta) {
+export const setComponentBuildConditionals = (cmpMeta: d.ComponentCompilerMeta) => {
   if (cmpMeta.properties.length > 0) {
     cmpMeta.hasProp = true;
     cmpMeta.hasPropMutable = cmpMeta.properties.some(p => p.mutable);
@@ -47,4 +47,4 @@ export function setComponentBuildConditionals(cmpMeta: d.ComponentCompilerMeta) 
   }
   cmpMeta.hasLifecycle = (cmpMeta.hasComponentWillLoadFn || cmpMeta.hasComponentDidLoadFn || cmpMeta.hasComponentWillUpdateFn || cmpMeta.hasComponentDidUpdateFn || cmpMeta.hasComponentWillRenderFn || cmpMeta.hasComponentDidRenderFn);
   cmpMeta.isPlain = !cmpMeta.hasMember && !cmpMeta.hasStyle && !cmpMeta.hasLifecycle && !cmpMeta.hasListener && !cmpMeta.hasVdomRender;
-}
+};

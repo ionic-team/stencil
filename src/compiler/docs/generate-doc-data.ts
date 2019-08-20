@@ -41,6 +41,7 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, build
         dependants: cmp.directDependants,
         dependencies: cmp.directDependencies,
         dependencyGraph: buildDepGraph(cmp, buildCtx.components),
+        deprecation: getDeprecation(cmp.docs.tags),
 
         props: getProperties(cmp),
         methods: getMethods(cmp.methods),

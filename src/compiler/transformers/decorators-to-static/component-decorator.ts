@@ -1,11 +1,12 @@
 import * as d from '../../../declarations';
-import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, removeDecorators } from '../transform-utils';
+import { augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
+import { CLASS_DECORATORS_TO_REMOVE, getDeclarationParameters } from './decorator-utils';
+import { convertValueToLiteral, createStaticGetter, removeDecorators } from '../transform-utils';
+import { styleToStatic } from './style-to-static';
 import ts from 'typescript';
-import { DEFAULT_STYLE_MODE, augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
-import { CLASS_DECORATORS_TO_REMOVE } from '../remove-stencil-import';
 
 
-export function componentDecoratorToStatic(config: d.Config, typeChecker: ts.TypeChecker, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) {
+export const componentDecoratorToStatic = (config: d.Config, typeChecker: ts.TypeChecker, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) => {
   removeDecorators(cmpNode, CLASS_DECORATORS_TO_REMOVE);
 
   const [ componentOptions ] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
@@ -26,30 +27,7 @@ export function componentDecoratorToStatic(config: d.Config, typeChecker: ts.Typ
     newMembers.push(createStaticGetter('encapsulation', convertValueToLiteral('scoped')));
   }
 
-  const defaultModeStyles = [];
-  if (componentOptions.styleUrls) {
-    if (Array.isArray(componentOptions.styleUrls)) {
-      defaultModeStyles.push(...normalizeStyle(componentOptions.styleUrls));
-    } else {
-      defaultModeStyles.push(...normalizeStyle(componentOptions.styleUrls[DEFAULT_STYLE_MODE]));
-    }
-  }
-  if (componentOptions.styleUrl) {
-    defaultModeStyles.push(...normalizeStyle(componentOptions.styleUrl));
-  }
-
-  let styleUrls: d.CompilerModeStyles = {};
-  if (componentOptions.styleUrls && !Array.isArray(componentOptions.styleUrls)) {
-    styleUrls = normalizeStyleUrls(componentOptions.styleUrls);
-  }
-  if (defaultModeStyles.length > 0) {
-    styleUrls[DEFAULT_STYLE_MODE] = defaultModeStyles;
-  }
-
-  if (Object.keys(styleUrls).length > 0) {
-    newMembers.push(createStaticGetter('originalStyleUrls', convertValueToLiteral(styleUrls)));
-    newMembers.push(createStaticGetter('styleUrls', convertValueToLiteral(normalizeExtension(config, styleUrls))));
-  }
+  styleToStatic(config, newMembers, componentOptions);
 
   let assetsDirs = componentOptions.assetsDirs || [];
   if (componentOptions.assetsDir) {
@@ -61,16 +39,9 @@ export function componentDecoratorToStatic(config: d.Config, typeChecker: ts.Typ
   if (assetsDirs.length > 0) {
     newMembers.push(createStaticGetter('assetsDirs', convertValueToLiteral(assetsDirs)));
   }
-  if (typeof componentOptions.styles === 'string') {
-    const styles = componentOptions.styles.trim();
-    if (styles.length > 0) {
-      newMembers.push(createStaticGetter('styles', convertValueToLiteral(styles)));
-    }
-  }
+};
 
-}
-
-function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, componentOptions: d.ComponentOptions, cmpNode: ts.ClassDeclaration, componentDecorator: ts.Node) {
+const validateComponent = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, componentOptions: d.ComponentOptions, cmpNode: ts.ClassDeclaration, componentDecorator: ts.Node) => {
   const extendNode = cmpNode.heritageClauses && cmpNode.heritageClauses.find(c => c.token === ts.SyntaxKind.ExtendsKeyword);
   if (extendNode) {
     const err = buildError(diagnostics);
@@ -124,7 +95,7 @@ function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], typeCh
       Any other exports should be moved to a separate file.
       For further information check out: https://stenciljs.com/docs/module-bundling`;
       const errorNode = symbol.valueDeclaration
-        ? symbol.valueDeclaration.modifiers[0]
+        ? symbol.valueDeclaration
         : symbol.declarations[0];
 
       augmentDiagnosticWithNode(config, err, errorNode);
@@ -134,9 +105,9 @@ function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], typeCh
     }
   }
   return true;
-}
+};
 
-function findTagNode(propName: string, node: ts.Node) {
+const findTagNode = (propName: string, node: ts.Node) => {
   if (ts.isDecorator(node) && ts.isCallExpression(node.expression)) {
     const arg = node.expression.arguments[0];
     if (ts.isObjectLiteralExpression(arg)) {
@@ -150,37 +121,4 @@ function findTagNode(propName: string, node: ts.Node) {
     }
   }
   return node;
-}
-
-function normalizeExtension(config: d.Config, styleUrls: d.CompilerModeStyles): d.CompilerModeStyles {
-  const compilerStyleUrls: d.CompilerModeStyles = {};
-  Object.keys(styleUrls).forEach(key => {
-    compilerStyleUrls[key] = styleUrls[key].map(s => useCss(config, s));
-  });
-  return compilerStyleUrls;
-}
-
-function useCss(config: d.Config, stylePath: string) {
-  const sourceFileDir = config.sys.path.dirname(stylePath);
-  const sourceFileExt = config.sys.path.extname(stylePath);
-  const sourceFileName = config.sys.path.basename(stylePath, sourceFileExt);
-  return config.sys.path.join(sourceFileDir, sourceFileName + '.css');
-}
-
-function normalizeStyleUrls(styleUrls: d.ModeStyles): d.CompilerModeStyles {
-  const compilerStyleUrls: d.CompilerModeStyles = {};
-  Object.keys(styleUrls).forEach(key => {
-    compilerStyleUrls[key] = normalizeStyle(styleUrls[key]);
-  });
-  return compilerStyleUrls;
-}
-
-function normalizeStyle(style: string | string[] | undefined): string[] {
-  if (Array.isArray(style)) {
-    return style;
-  }
-  if (style) {
-    return [style];
-  }
-  return [];
-}
+};

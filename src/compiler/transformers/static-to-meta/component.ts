@@ -1,4 +1,6 @@
 import * as d from '../../../declarations';
+import { addComponentMetaStatic } from '../add-component-meta-static';
+import { normalizePath, unique } from '@utils';
 import { parseStaticMethods } from './methods';
 import { parseStaticListeners } from './listeners';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
@@ -6,7 +8,7 @@ import { parseClassMethods } from './class-methods';
 import { parseStaticElementRef } from './element-ref';
 import { parseStaticEncapsulation } from './encapsulation';
 import { parseStaticEvents } from './events';
-import { convertValueToLiteral, createStaticGetter, getComponentTagName, getStaticValue, isInternal, isStaticGetter, serializeSymbol } from '../transform-utils';
+import { getComponentTagName, getStaticValue, isInternal, isStaticGetter, serializeSymbol } from '../transform-utils';
 import { parseStaticProps } from './props';
 import { parseStaticStates } from './states';
 import { parseStaticWatchers } from './watchers';
@@ -14,10 +16,9 @@ import { parseStaticStyles } from './styles';
 import { parseCallExpression } from './call-expression';
 import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
-import { normalizePath, unique } from '@utils';
 
 
-export function parseStaticComponentMeta(config: d.Config, compilerCtx: d.CompilerCtx, transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) {
+export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.CompilerCtx, transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions, fileCmpNodes: ts.ClassDeclaration[]) => {
   if (cmpNode.members == null) {
     return cmpNode;
   }
@@ -105,14 +106,14 @@ export function parseStaticComponentMeta(config: d.Config, compilerCtx: d.Compil
     potentialCmpRefs: []
   };
 
-  function visitComponentChildNode(node: ts.Node): ts.VisitResult<ts.Node> {
+  const visitComponentChildNode = (node: ts.Node): ts.VisitResult<ts.Node> => {
     if (ts.isCallExpression(node)) {
       parseCallExpression(cmp, node);
     } else if (ts.isStringLiteral(node)) {
       parseStringLiteral(cmp, node);
     }
     return ts.visitEachChild(node, visitComponentChildNode, transformCtx);
-  }
+  };
   ts.visitEachChild(cmpNode, visitComponentChildNode, transformCtx);
 
   parseClassMethods(cmpNode, cmp);
@@ -129,31 +130,8 @@ export function parseStaticComponentMeta(config: d.Config, compilerCtx: d.Compil
   cmp.potentialCmpRefs = unique(cmp.potentialCmpRefs);
   setComponentBuildConditionals(cmp);
 
-  if (transformOpts.addCompilerMeta) {
-    // no need to copy all compiler meta data to the static getter
-    const copyCmp = Object.assign({}, cmp);
-    delete copyCmp.assetsDirs;
-    delete copyCmp.dependencies;
-    delete copyCmp.excludeFromCollection;
-    delete copyCmp.isCollectionDependency;
-    delete copyCmp.docs;
-    delete copyCmp.jsFilePath;
-    delete copyCmp.potentialCmpRefs;
-    delete copyCmp.styleDocs;
-    delete copyCmp.sourceFilePath;
-
-    const cmpMetaStaticProp = createStaticGetter('COMPILER_META', convertValueToLiteral(copyCmp));
-    const classMembers = [...cmpNode.members, cmpMetaStaticProp];
-
-    cmpNode = ts.updateClassDeclaration(
-      cmpNode,
-      cmpNode.decorators,
-      cmpNode.modifiers,
-      cmpNode.name,
-      cmpNode.typeParameters,
-      cmpNode.heritageClauses,
-      classMembers
-    );
+  if (transformOpts.componentMetadata === 'compilerstatic') {
+    cmpNode = addComponentMetaStatic(cmpNode, cmp);
   }
 
   // add to module map
@@ -162,17 +140,19 @@ export function parseStaticComponentMeta(config: d.Config, compilerCtx: d.Compil
   // add to node map
   nodeMap.set(cmpNode, cmp);
 
-  return cmpNode;
-}
+  fileCmpNodes.push(cmpNode);
 
-function parseVirtualProps(docs: d.CompilerJsDoc) {
+  return cmpNode;
+};
+
+const parseVirtualProps = (docs: d.CompilerJsDoc) => {
   return docs.tags
     .filter(({name}) => name === 'virtualProp')
     .map(parseVirtualProp)
     .filter(prop => !!prop);
-}
+};
 
-function parseVirtualProp(tag: d.CompilerJsDocTagInfo): d.ComponentCompilerVirtualProperty {
+const parseVirtualProp = (tag: d.CompilerJsDocTagInfo): d.ComponentCompilerVirtualProperty => {
   const results = /^\s*(?:\{([^}]+)\}\s+)?(\w+)\s+-\s+(.*)$/.exec(tag.text);
   if (!results) {
     return undefined;
@@ -183,9 +163,9 @@ function parseVirtualProp(tag: d.CompilerJsDocTagInfo): d.ComponentCompilerVirtu
     name: name.trim(),
     docs: docs.trim()
   };
-}
+};
 
-function parseAssetsDirs(config: d.Config, staticMembers: ts.ClassElement[], componentFilePath: string): d.AssetsMeta[] {
+const parseAssetsDirs = (config: d.Config, staticMembers: ts.ClassElement[], componentFilePath: string): d.AssetsMeta[] => {
   const dirs: string[] = getStaticValue(staticMembers, 'assetsDirs') || [];
   const componentDir = normalizePath(config.sys.path.dirname(componentFilePath));
 
@@ -208,4 +188,4 @@ function parseAssetsDirs(config: d.Config, staticMembers: ts.ClassElement[], com
       originalComponentPath: dir,
     };
   });
-}
+};
