@@ -39,7 +39,7 @@ export function setupDomTests(document: Document) {
   let testBed = document.getElementById('test-app');
   if (!testBed) {
     testBed = document.createElement('div');
-    testBed.id = 'test-bed';
+    testBed.id = 'test-app';
     document.body.appendChild(testBed);
   }
 
