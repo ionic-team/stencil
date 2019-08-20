@@ -3,7 +3,7 @@ import fs from 'fs';
 import { join, parse, relative } from 'path';
 import { promisify } from 'util';
 import { validateComponentTag } from '@utils';
-import prompts from 'prompts';
+import prompt from 'prompts';
 import exit from 'exit';
 
 const writeFile = promisify(fs.writeFile);
@@ -23,7 +23,7 @@ export async function taskGenerate(config: d.Config, flags: d.ConfigFlags) {
 
   const input =
     flags.unknownArgs.find(arg => !arg.startsWith('-')) ||
-    (await prompts({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string;
+    (await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string;
 
   const { dir, base: componentName } = parse(input);
 
@@ -51,15 +51,15 @@ export async function taskGenerate(config: d.Config, flags: d.ConfigFlags) {
   console.log();
   console.log(`${config.logger.gray('$')} stencil generate ${input}`);
   console.log();
-  console.log('The following files have been generated:');
-  writtenFiles.map(file => console.log(` - ${relative(baseDir, file)}`));
+  console.log(config.logger.bold('The following files have been generated:'));
+  writtenFiles.map(file => console.log(`  - ${relative(baseDir, file)}`));
 }
 
 /**
  * Show a checkbox prompt to select the files to be generated.
  */
 const chooseFilesToGenerate = async () =>
-  (await prompts({
+  (await prompt({
     name: 'filesToGenerate',
     type: 'multiselect',
     message: 'Which additional files do you want to generate?',
@@ -98,6 +98,9 @@ const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtens
 
     case 'e2e.ts':
       return getE2eTestBoilerplate(tagName);
+
+    default:
+      throw new Error(`Unkown extension "${extension}".`);
   }
 };
 
