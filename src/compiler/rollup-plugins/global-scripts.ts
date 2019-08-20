@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { normalizePath } from '@utils';
+import { buildError, normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
 
@@ -17,7 +17,7 @@ export function hasGlobalScriptPaths(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx): Plugin {
+export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Plugin {
   const globalPaths: string[] = [];
 
   if (typeof config.globalScript === 'string') {
@@ -60,13 +60,29 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
       return null;
     },
     transform(code, id) {
-      if (globalPaths.includes(normalizePath(id))) {
+      id = normalizePath(id);
+      if (globalPaths.includes(id)) {
+        const output = [
+          INJECT_CONTEXT
+        ];
+
         const program = this.parse(code, {});
         const needsDefault = !program.body.some(s => s.type === 'ExportDefaultDeclaration');
-        const defaultExport = needsDefault
-          ? '\nexport const globalFn = () => {};\nexport default globalFn;'
-          : '';
-        return INJECT_CONTEXT + code + defaultExport;
+
+        if (needsDefault) {
+          const diagnostic = buildError(buildCtx.diagnostics);
+          diagnostic.header = `Global Script`;
+          diagnostic.absFilePath = id;
+          diagnostic.messageText = `The code to be executed should be placed within a default function that is exported by the global script. Ensure all of the code in the global script is wrapped in the function() that is exported.`;
+
+          output.push(`export const fallbackGlobalFn = () => {}`);
+          output.push(`export default fallbackGlobalFn;`);
+
+        } else {
+          output.push(code);
+        }
+
+        return output.join('\n');
       }
       return null;
     }
