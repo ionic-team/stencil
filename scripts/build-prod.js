@@ -48,6 +48,7 @@ fs.emptyDirSync(DIST_LICENSES);
   'pixelmatch',
   'pngjs',
   'postcss',
+  'prompts',
   'rollup',
   'rollup-plugin-commonjs',
   'rollup-plugin-node-resolve',

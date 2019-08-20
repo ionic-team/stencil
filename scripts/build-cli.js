@@ -15,8 +15,6 @@ async function buildCli() {
   const rollupBuild = await rollup.rollup({
     input: ENTRY_FILE,
     external: [
-      'assert',
-      'buffer',
       'child_process',
       'crypto',
       'events',
@@ -25,9 +23,6 @@ async function buildCli() {
       'os',
       'path',
       'readline',
-      'stream',
-      'string_decoder',
-      'tty',
       'util',
     ],
     plugins: [
@@ -45,7 +40,6 @@ async function buildCli() {
         preferBuiltins: true
       }),
       rollupCommonjs(),
-      rollupPluginJson(),
     ],
     onwarn: (message) => {
       if (message.code === 'CIRCULAR_DEPENDENCY') return;

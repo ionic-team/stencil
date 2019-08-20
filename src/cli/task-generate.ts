@@ -3,7 +3,7 @@ import fs from 'fs';
 import { join, parse, relative } from 'path';
 import { promisify } from 'util';
 import { validateComponentTag } from '@utils';
-import inquirer from 'inquirer';
+import prompts from 'prompts';
 import exit from 'exit';
 
 const writeFile = promisify(fs.writeFile);
@@ -23,7 +23,7 @@ export async function taskGenerate(config: d.Config, flags: d.ConfigFlags) {
 
   const input =
     flags.unknownArgs.find(arg => !arg.startsWith('-')) ||
-    (await inquirer.prompt([{ name: 'name', message: 'Component tag name (dash-case):' }])).name;
+    (await prompts({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string;
 
   const { dir, base: componentName } = parse(input);
 
@@ -59,18 +59,16 @@ export async function taskGenerate(config: d.Config, flags: d.ConfigFlags) {
  * Show a checkbox prompt to select the files to be generated.
  */
 const chooseFilesToGenerate = async () =>
-  (await inquirer.prompt([
-    {
-      name: 'filesToGenerate',
-      type: 'checkbox',
-      message: 'Which additional files do you want to generate?',
-      choices: [
-        { value: 'css', name: 'Stylesheet', checked: true },
-        { value: 'spec.ts', name: 'Spec Test', checked: true },
-        { value: 'e2e.ts', name: 'E2E Test', checked: true },
-      ],
-    },
-  ])).filesToGenerate as GeneratableExtension[];
+  (await prompts({
+    name: 'filesToGenerate',
+    type: 'multiselect',
+    message: 'Which additional files do you want to generate?',
+    choices: [
+      { value: 'css', title: 'Stylesheet', selected: true },
+      { value: 'spec.ts', title: 'Spec Test', selected: true },
+      { value: 'e2e.ts', title: 'E2E Test', selected: true },
+    ] as any[],
+  })).filesToGenerate as GeneratableExtension[];
 
 /**
  * Get a file's boilerplate by its extension and write it to disk.
@@ -132,11 +130,20 @@ export class ${toPascalCase(tagName)} {
 `;
 };
 
+/**
+ * Get the boilerplate for style.
+ */
+const getStyleUrlBoilerplate = () =>
+`:host {
+  display: block;
+}
+`;
 
 /**
  * Get the boilerplate for a spec test.
  */
-const getSpecTestBoilerplate = (tagName: string) => `import { ${toPascalCase(tagName)} } from './${tagName}';
+const getSpecTestBoilerplate = (tagName: string) =>
+`import { ${toPascalCase(tagName)} } from './${tagName}';
 
 describe('${tagName}', () => {
   it('builds', () => {
@@ -146,18 +153,10 @@ describe('${tagName}', () => {
 `;
 
 /**
- * Get the boilerplate for style.
- */
-const getStyleUrlBoilerplate = () => `
-:host {
-  display: block;
-}
-`;
-
-/**
  * Get the boilerplate for an E2E test.
  */
-const getE2eTestBoilerplate = (name: string) => `import { newE2EPage } from '@stencil/core/testing';
+const getE2eTestBoilerplate = (name: string) =>
+`import { newE2EPage } from '@stencil/core/testing';
 
 describe('${name}', () => {
   it('renders', async () => {

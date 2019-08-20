@@ -55,11 +55,7 @@ if (typeof document.baseURI !== 'string') {
 
 // Polyfill CustomEvent
 if (typeof window.CustomEvent !== 'function') {
-<<<<<<< HEAD
-  CustomEvent = function(event, params) {
-=======
   window.CustomEvent = function CustomEvent(event, params) {
->>>>>>> 18fdd3e7c22f0567b05220ee4f0eecd91e276454
     params = params || { bubbles: false, cancelable: false, detail: undefined };
     var evt = document.createEvent( 'CustomEvent' );
     evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
