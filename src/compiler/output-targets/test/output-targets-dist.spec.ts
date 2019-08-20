@@ -41,7 +41,7 @@ describe('outputTarget, dist', () => {
         }) export class CmpA {}`,
         [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.ios.css')]: `cmp-a { color: blue; }`,
         [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.md.css')]: `cmp-a { color: green; }`,
-        [path.join(root, 'User', 'testing', 'src', 'global.ts')]: `export const MyGlobal: any = {};`
+        [path.join(root, 'User', 'testing', 'src', 'global.ts')]: `export default function() { console.log('my global'); }`
     });
     await compiler.fs.commit();
 
