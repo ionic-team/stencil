@@ -269,13 +269,4 @@ export class NodeSystem implements d.StencilSystem {
   async transpileToEs5(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults> {
     return this.sysWorker.run('transpileToEs5', [cwd, input, inlineHelpers]);
   }
-
-  validateTypes(compilerOptions: any, emitDtsFiles: boolean, collectionNames: string[], rootTsFiles: string[], isDevMode: boolean) {
-    return this.sysWorker.run(
-      'validateTypes',
-      [compilerOptions, emitDtsFiles, collectionNames, rootTsFiles, isDevMode],
-      { isLongRunningTask: true, workerKey: 'validateTypes' }
-    );
-  }
-
 }

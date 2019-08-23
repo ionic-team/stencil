@@ -97,13 +97,13 @@ export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => 
       );
       return !decoratorNames.has(name);
     });
-
     if (updatedDecoratorList.length === 0) {
-      node.decorators = undefined;
+      return undefined;
     } else if (updatedDecoratorList.length !== node.decorators.length) {
-      node.decorators = ts.createNodeArray(updatedDecoratorList);
+      return ts.createNodeArray(updatedDecoratorList);
     }
   }
+  return node.decorators;
 };
 
 

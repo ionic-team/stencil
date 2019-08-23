@@ -57,7 +57,7 @@
     "vermoji": "node scripts/vermoji.js"
   },
   "dependencies": {
-    "typescript": "^3.6.0-beta"
+    "typescript": "^3.6.1-rc"
   },
   "devDependencies": {
     "@types/autoprefixer": "^9.1.1",

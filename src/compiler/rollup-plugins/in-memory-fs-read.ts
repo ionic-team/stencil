@@ -1,11 +1,11 @@
-import { CompilerOptions, nodeModuleNameResolver } from 'typescript';
+// import { CompilerOptions } from 'typescript';
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
 export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx): Plugin {
   const path = config.sys.path;
-  const compilerOptions: CompilerOptions = compilerCtx.compilerOptions;
+  // const compilerOptions: CompilerOptions = compilerCtx.compilerOptions;
 
   return {
     name: 'inMemoryFsRead',
@@ -17,9 +17,9 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx): Pl
       }
 
       // resolve path that matches a path alias from the compiler options
-      if (compilerOptions.paths && hasMatchingPathAlias(importee, compilerOptions)) {
-        return resolveWithPathAlias(importee, importer, compilerCtx, path);
-      }
+      // if (compilerOptions.paths && hasMatchingPathAlias(importee, compilerOptions)) {
+      //   return resolveWithPathAlias(importee, importer, compilerCtx, path);
+      // }
 
       // skip non-paths
       if (importee[0] !== '.' && importee[0] !== '/' && importee[1] !== ':') {
@@ -88,8 +88,8 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx): Pl
 /**
  * Check whether an importee has a matching path alias.
  */
-const hasMatchingPathAlias = (importee: string, compilerOptions: CompilerOptions) =>
-  Object.keys(compilerOptions.paths).some(path => new RegExp(path.replace('*', '\\w*')).test(importee));
+// const hasMatchingPathAlias = (importee: string, compilerOptions: CompilerOptions) =>
+//   Object.keys(compilerOptions.paths).some(path => new RegExp(path.replace('*', '\\w*')).test(importee));
 
 /**
  * Resolve an import using the path aliases of the compiler options.
@@ -97,26 +97,26 @@ const hasMatchingPathAlias = (importee: string, compilerOptions: CompilerOptions
  * @returns the `.js` file corresponding to the resolved `.ts` file, or `null`
  * if the import can't be resolved
  */
-const resolveWithPathAlias = async (importee: string, importer: string, compilerCtx: d.CompilerCtx, path: d.Path) => {
-  const { resolvedModule } = nodeModuleNameResolver(importee, importer, compilerCtx.compilerOptions, {
-    readFile: compilerCtx.fs.readFileSync,
-    fileExists: fileName => compilerCtx.fs.statSync(fileName).isFile,
-  });
+// const resolveWithPathAlias = async (importee: string, importer: string, compilerCtx: d.CompilerCtx, path: d.Path) => {
+//   const { resolvedModule } = nodeModuleNameResolver(importee, importer, compilerCtx.compilerOptions, {
+//     readFile: compilerCtx.fs.readFileSync,
+//     fileExists: fileName => compilerCtx.fs.statSync(fileName).isFile,
+//   });
 
-  if (!resolvedModule) {
-    return null;
-  }
+//   if (!resolvedModule) {
+//     return null;
+//   }
 
-  const { resolvedFileName } = resolvedModule; // this is the .ts(x) path
+//   const { resolvedFileName } = resolvedModule; // this is the .ts(x) path
 
-  if (!resolvedFileName || resolvedFileName.endsWith('.d.ts')) {
-    return null;
-  }
+//   if (!resolvedFileName || resolvedFileName.endsWith('.d.ts')) {
+//     return null;
+//   }
 
-  // check whether the .js counterpart exists
-  const jsFilePath = path.resolve(resolvedFileName.replace(/\.tsx?$/i, '.js'));
-  const { exists } = await compilerCtx.fs.accessData(jsFilePath);
+//   // check whether the .js counterpart exists
+//   const jsFilePath = path.resolve(resolvedFileName.replace(/\.tsx?$/i, '.js'));
+//   const { exists } = await compilerCtx.fs.accessData(jsFilePath);
 
-  return exists ? jsFilePath : null;
-};
+//   return exists ? jsFilePath : null;
+// };
 

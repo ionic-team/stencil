@@ -7,7 +7,7 @@
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
-
+// aAAaaaaaaaaaaaaaaaaaa
 export namespace Components {
   interface HelloWorld {}
 }

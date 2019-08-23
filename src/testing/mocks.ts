@@ -44,11 +44,6 @@ export function mockCompilerCtx() {
   const compilerCtx: d.CompilerCtx = {
     activeBuildCtx: null,
     activeBuildId: 0,
-    activeDirsAdded: [],
-    activeDirsDeleted: [],
-    activeFilesAdded: [],
-    activeFilesDeleted: [],
-    activeFilesUpdated: [],
     fs: null,
     cachedGlobalStyle: null,
     collections: [],
@@ -56,7 +51,6 @@ export function mockCompilerCtx() {
     cache: null,
     cachedStyleMeta: new Map(),
     events: null,
-    fsWatcher: null,
     hasLoggedServerUrl: false,
     hasSuccessfulBuild: false,
     isActivelyBuilding: false,
@@ -71,10 +65,6 @@ export function mockCompilerCtx() {
     rollupCacheNative: null,
     rootTsFiles: [],
     styleModeNames: new Set(),
-    tsService: null,
-    tsProgram: null,
-    tsSolutionBuilder: null,
-    tsSolutionBuilderHost: null,
     reset: () => {/**/}
   };
 

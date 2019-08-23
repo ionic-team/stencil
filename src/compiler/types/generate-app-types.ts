@@ -16,6 +16,7 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
   // Generate d.ts files for component types
   let componentTypesFileContent = await generateComponentTypesFile(config, buildCtx, destination);
 
+  // console.log(componentTypesFileContent);
   // immediately write the components.d.ts file to disk and put it into fs memory
   let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
 
@@ -24,9 +25,13 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
     componentTypesFileContent = updateStencilTypesImports(config.sys.path, destination, componentsDtsFilePath, componentTypesFileContent);
   }
 
-  await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
+  const { changedContent } = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, {
+    useCache: true,
+    immediateWrite: true
+  });
 
   timespan.finish(`generated app types finished: ${config.sys.path.relative(config.rootDir, componentsDtsFilePath)}`);
+  return changedContent;
 }
 
 

@@ -348,12 +348,12 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
         item.queueWriteToDisk = false;
       }
     } else if (opts != null && opts.immediateWrite === true) {
-
-      // If this is an immediate write then write the file
-      // and do not add it to the queue
-      await this.ensureDir(filePath);
-      await this.disk.writeFile(filePath, item.fileText);
-
+      if (opts.useCache !== true || results.changedContent) {
+        // If this is an immediate write then write the file
+        // and do not add it to the queue
+        await this.ensureDir(filePath);
+        await this.disk.writeFile(filePath, item.fileText);
+      }
     } else {
       // we want to write this to disk (eventually)
       // but only if the content is different

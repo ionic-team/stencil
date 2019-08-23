@@ -1,15 +1,23 @@
-import * as d from '../declarations';
-import { build } from './build/build';
+import { validateConfig } from '../compiler/config/validate-config';
 import { BuildContext } from './build/build-ctx';
-import { catchError, hasError, normalizePath } from '@utils';
+import { catchError, hasError, loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { CompilerContext } from './build/compiler-ctx';
 import { COMPILER_BUILD } from './build/compiler-build-id';
 import { docs } from './docs/docs';
-import { generateBuildFromFsWatch, updateCacheFromRebuild } from './fs-watch/fs-watch-rebuild';
-import { logFsWatchMessage } from './fs-watch/fs-watch-log';
+import { filesChanged, hasHtmlChanges, hasScriptChanges, hasStyleChanges, scriptsAdded, scriptsDeleted } from './fs-watch/fs-watch-rebuild';
+import { build } from './build/build';
 import { startDevServerMain } from '../dev-server/start-server-main';
-import { validateConfig } from '../compiler/config/validate-config';
-import { runTsBuilder } from './transpile/solution-builder';
+import * as d from '../declarations';
+import ts from 'typescript';
+import { convertDecoratorsToStatic } from './transformers/decorators-to-static/convert-decorators';
+import { updateStencilCoreImports } from './transformers/update-stencil-core-import';
+import { buildAbort } from './build/build-finish';
+import { convertStaticToMeta } from './transformers/static-to-meta/visitor';
+import { getComponentsFromModules } from './output-targets/output-utils';
+import { updateComponentBuildConditionals } from './app-core/build-conditionals';
+import { resolveComponentDependencies } from './entries/resolve-component-dependencies';
+import { hasServiceWorkerChanges } from './service-worker/generate-sw';
+import { generateAppTypes } from './types/generate-app-types';
 
 
 export class Compiler implements d.Compiler {
@@ -76,18 +84,171 @@ export class Compiler implements d.Compiler {
       }
 
       this.ctx = new CompilerContext(config);
-
-      // this.on('fsChange', fsWatchResults => {
-      //   this.queueFsChanges(fsWatchResults);
-      // });
-
-      try {
-        runTsBuilder(config, this.ctx);
-
-      } catch (e) {
-        // catchError(buildCtx.diagnostics, e);
-      }
+      this.startWatch();
     }
+  }
+
+  async startWatch() {
+    const config = this.config;
+    const compilerCtx = this.ctx;
+    const filesAdded = new Set<string>();
+    const filesUpdated = new Set<string>();
+    const filesDeleted = new Set<string>();
+    const tsSys: ts.System = {
+      ...ts.sys,
+      watchFile(path, callback, pollingInterval) {
+        return ts.sys.watchFile(path, (file, eventKind) => {
+          if (eventKind === ts.FileWatcherEventKind.Created) {
+            filesAdded.add(file);
+          } else if (eventKind === ts.FileWatcherEventKind.Changed) {
+            filesUpdated.add(file);
+          } else if (eventKind === ts.FileWatcherEventKind.Deleted) {
+            filesDeleted.add(file);
+          }
+          callback(file, eventKind);
+        }, pollingInterval);
+      },
+      writeFile(path, data) {
+        const inMemoryOnly = !path.endsWith('.d.ts');
+        compilerCtx.fs.writeFile(path, data, { inMemoryOnly });
+      },
+      fileExists(filePath) {
+        return compilerCtx.fs.accessSync(filePath);
+      },
+      readFile(filePath) {
+        try {
+          return compilerCtx.fs.readFileSync(filePath, {useCache: false});
+        } catch (e) {}
+        return undefined;
+      },
+      setTimeout(callback, time) {
+        const id = setInterval(() => {
+          if (!running) {
+            callback();
+            clearInterval(id);
+          }
+        }, time);
+        return id;
+      },
+      clearTimeout(id) {
+        return clearInterval(id);
+      }
+    };
+
+    let running = false;
+    let isRebuild = false;
+    const host = ts.createWatchCompilerHost(
+      config.tsconfig,
+      {
+        noEmitOnError: false,
+        declaration: true,
+        declarationDir: config.sys.path.join(config.rootDir, 'dist', 'types'),
+        outDir: config.rootDir,
+        rootDir: config.rootDir,
+      },
+      tsSys,
+      ts.createEmitAndSemanticDiagnosticsBuilderProgram,
+      () => { return; },
+      () => { return; }
+    );
+
+    host.afterProgramCreate = async (builder) => {
+      const buildCtx = new BuildContext(this.config, compilerCtx);
+      buildCtx.filesAdded = Array.from(filesAdded.keys());
+      buildCtx.filesUpdated = Array.from(filesUpdated.keys());
+      buildCtx.filesDeleted = Array.from(filesDeleted.keys());
+      buildCtx.filesChanged = filesChanged(buildCtx);
+      buildCtx.scriptsAdded = scriptsAdded(config, buildCtx);
+      buildCtx.scriptsDeleted = scriptsDeleted(config, buildCtx);
+      buildCtx.hasScriptChanges = hasScriptChanges(buildCtx);
+      buildCtx.hasStyleChanges = hasStyleChanges(buildCtx);
+      buildCtx.hasHtmlChanges = hasHtmlChanges(config, buildCtx);
+      buildCtx.hasServiceWorkerChanges = hasServiceWorkerChanges(config, buildCtx);
+
+      buildCtx.isRebuild = isRebuild;
+      buildCtx.requiresFullBuild = !isRebuild;
+      buildCtx.start();
+
+      running = true;
+      try {
+        await this.startBuild(builder, buildCtx);
+        isRebuild = true;
+      } catch (e) {
+        console.error(e);
+      }
+      if (hasError(buildCtx.diagnostics)) {
+        buildAbort(buildCtx);
+      }
+      running = false;
+    };
+    ts.createWatchProgram(host);
+  }
+
+  async startBuild(builder: ts.EmitAndSemanticDiagnosticsBuilderProgram, buildCtx: BuildContext) {
+    const timeSpan = buildCtx.createTimeSpan('transpile started');
+    const needsBuild = await this.transpile(builder, buildCtx);
+    timeSpan.finish('transpile finished');
+
+    if (needsBuild) {
+      await build(this.config, this.ctx, buildCtx);
+    }
+  }
+
+  async transpile(builder: ts.EmitAndSemanticDiagnosticsBuilderProgram, buildCtx: BuildContext) {
+    const config = this.config;
+    const compilerCtx = this.ctx;
+    const syntactic = loadTypeScriptDiagnostics(builder.getSyntacticDiagnostics());
+    buildCtx.diagnostics.push(...syntactic);
+
+    if (hasError(buildCtx.diagnostics)) {
+      return false;
+    }
+
+    const typeChecker = builder.getProgram().getTypeChecker();
+    const transformOpts: d.TransformOptions = {
+      coreImportPath: '@stencil/core',
+      componentExport: null,
+      componentMetadata: null,
+      proxy: null,
+      style: 'static'
+    };
+
+    const customTransforms = {
+      before: [
+        convertDecoratorsToStatic(config, [], typeChecker),
+        updateStencilCoreImports(transformOpts.coreImportPath)
+      ],
+      after: [
+        convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)
+      ]
+    };
+
+    builder.emit(undefined, undefined, undefined, false, customTransforms);
+
+    buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());
+    buildCtx.components = getComponentsFromModules(buildCtx.moduleFiles);
+    updateComponentBuildConditionals(compilerCtx.moduleMap, buildCtx.components);
+    resolveComponentDependencies(buildCtx.components);
+
+    if (hasError(buildCtx.diagnostics)) {
+      return false;
+    }
+
+    // ts changes have happened!!
+    // create the components.d.ts file and write to disk
+    const changed = await generateAppTypes(config, compilerCtx, buildCtx, 'src');
+    if (changed) {
+      config.logger.info('component.d.ts changed, skipping build');
+      return false;
+    }
+    if (config.validateTypes) {
+      const semantic = loadTypeScriptDiagnostics(builder.getSemanticDiagnostics());
+      buildCtx.diagnostics.push(...semantic);
+    }
+    if (hasError(buildCtx.diagnostics)) {
+      return false;
+    }
+    return true;
   }
 
   build() {
@@ -98,66 +259,7 @@ export class Compiler implements d.Compiler {
   }
 
   rebuild() {
-    this.queuedRebuild = false;
-    const buildCtx = generateBuildFromFsWatch(this.config, this.ctx);
-    if (buildCtx != null) {
-      logFsWatchMessage(this.config, buildCtx);
-      buildCtx.start();
-      updateCacheFromRebuild(this.ctx, buildCtx);
-      this.drainBuild(buildCtx);
-    }
-  }
-
-  private async drainBuild(buildCtx: BuildContext) {
-    if (this.ctx.isActivelyBuilding) {
-      // already running
-      return undefined;
-    }
-
-    this.ctx.isActivelyBuilding = true;
-    let buildResults: d.BuildResults = undefined;
-    let didError = false;
-    try {
-      // clean
-      this.ctx.activeDirsAdded.length = 0;
-      this.ctx.activeDirsDeleted.length = 0;
-      this.ctx.activeFilesAdded.length = 0;
-      this.ctx.activeFilesDeleted.length = 0;
-      this.ctx.activeFilesUpdated.length = 0;
-
-      // Run Build
-      buildResults = await build(this.config, this.ctx, buildCtx);
-      didError = buildResults.hasError;
-
-    } catch (e) {
-      console.error(e);
-      didError = true;
-    }
-    if (didError) {
-      this.ctx.activeDirsAdded.push(...buildCtx.dirsAdded);
-      this.ctx.activeDirsDeleted.push(...buildCtx.dirsDeleted);
-      this.ctx.activeFilesAdded.push(...buildCtx.filesAdded);
-      this.ctx.activeFilesDeleted.push(...buildCtx.filesDeleted);
-      this.ctx.activeFilesUpdated.push(...buildCtx.filesUpdated);
-    }
-    this.ctx.isActivelyBuilding = false;
-    if (this.queuedRebuild) {
-      this.rebuild();
-    }
-    return buildResults;
-  }
-
-  queueFsChanges(fsWatchResults: d.FsWatchResults) {
-    this.ctx.activeDirsAdded.push(...fsWatchResults.dirsAdded);
-    this.ctx.activeDirsDeleted.push(...fsWatchResults.dirsDeleted);
-    this.ctx.activeFilesAdded.push(...fsWatchResults.filesAdded);
-    this.ctx.activeFilesDeleted.push(...fsWatchResults.filesDeleted);
-    this.ctx.activeFilesUpdated.push(...fsWatchResults.filesUpdated);
-    this.queuedRebuild = true;
-
-    if (!this.ctx.isActivelyBuilding) {
-      this.rebuild();
-    }
+    return;
   }
 
   async startDevServer() {

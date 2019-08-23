@@ -1,14 +1,12 @@
 import * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
-import { CLASS_DECORATORS_TO_REMOVE, getDeclarationParameters } from './decorator-utils';
-import { convertValueToLiteral, createStaticGetter, removeDecorators } from '../transform-utils';
+import { getDeclarationParameters } from './decorator-utils';
+import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { styleToStatic } from './style-to-static';
 import ts from 'typescript';
 
 
 export const componentDecoratorToStatic = (config: d.Config, typeChecker: ts.TypeChecker, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) => {
-  removeDecorators(cmpNode, CLASS_DECORATORS_TO_REMOVE);
-
   const [ componentOptions ] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
   if (!componentOptions) {
     return;

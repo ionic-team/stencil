@@ -6,7 +6,6 @@ import { loadMinifyJsDiagnostics } from '@utils';
 import { optimizeCssWorker } from './optimize-css-worker';
 import { prerenderWorker } from '../../compiler/prerender/prerender-worker/prerender-worker';
 import { transpileToEs5Worker } from '../../compiler/transpile/transpile-to-es5-worker';
-import { validateTypesWorker } from '../../compiler/transpile/validate-types-worker';
 
 
 const Terser = require('terser/dist/bundle.min.js');
@@ -49,10 +48,6 @@ export class NodeSystemWorker {
 
   transpileToEs5(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults> {
     return transpileToEs5Worker(cwd, input, inlineHelpers);
-  }
-
-  validateTypes(compilerOptions: any, emitDtsFiles: boolean, collectionNames: string[], rootTsFiles: string[], isDevMode: boolean) {
-    return validateTypesWorker(this.workerContext, emitDtsFiles, compilerOptions, collectionNames, rootTsFiles, isDevMode);
   }
 
 }

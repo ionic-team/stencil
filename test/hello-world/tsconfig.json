@@ -19,11 +19,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "target": "es2017",
-    "baseUrl": ".",
     "paths": {
       "@stencil/core": ["../../dist"],
       "@stencil/core/internal": ["../../internal"]
     }
   },
-  "include": ["src/**/*"]
+  "exclude": [
+    "node_modules"
+  ],
+  "include": ["src"]
 }

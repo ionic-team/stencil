@@ -53,7 +53,6 @@ export class BuildContext implements d.BuildCtx {
   timeSpan: d.LoggerTimeSpan = null;
   timestamp: string;
   transpileBuildCount = 0;
-  validateTypesPromise: Promise<d.ValidateTypesResults>;
 
   constructor(config: d.Config, compilerCtx: d.CompilerCtx) {
     this.config = config;
@@ -154,30 +153,6 @@ export class BuildContext implements d.BuildCtx {
   progress(t: d.BuildTask) {
     this.completedTasks.push(t);
   }
-
-  async validateTypesBuild() {
-    if (this.hasError) {
-      // no need to wait on this one since
-      // we already aborted this build
-      return;
-    }
-
-    if (!this.validateTypesPromise) {
-      // there is no pending validate types promise
-      // so it probably already finished
-      // so no need to wait on anything
-      return;
-    }
-
-    if (!this.config.watch) {
-      // this is not a watch build, so we need to make
-      // sure that the type validation has finished
-      this.debug(`build, non-watch, waiting on validateTypes`);
-      await this.validateTypesPromise;
-      this.debug(`build, non-watch, finished waiting on validateTypes`);
-    }
-  }
-
 }
 
 
@@ -213,6 +188,5 @@ export const ProgressTask = {
   transpileApp: {},
   generateStyles: {},
   generateOutputTargets: {},
-  validateTypesBuild: {},
   writeBuildFiles: {},
 };

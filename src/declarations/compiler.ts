@@ -1,5 +1,4 @@
 import * as d from '.';
-import ts from 'typescript';
 
 export interface Compiler {
   build(): Promise<d.BuildResults>;
@@ -14,11 +13,6 @@ export interface Compiler {
 export interface CompilerCtx {
   activeBuildCtx: d.BuildCtx;
   activeBuildId: number;
-  activeDirsAdded: string[];
-  activeDirsDeleted: string[];
-  activeFilesAdded: string[];
-  activeFilesDeleted: string[];
-  activeFilesUpdated: string[];
   cache: d.Cache;
   cachedStyleMeta: Map<string, d.StyleCompiler>;
   cachedGlobalStyle: string;
@@ -26,7 +20,6 @@ export interface CompilerCtx {
   compilerOptions: any;
   events: d.BuildEvents;
   fs: d.InMemoryFileSystem;
-  fsWatcher: d.FsWatcher;
   hasLoggedServerUrl: boolean;
   hasSuccessfulBuild: boolean;
   isActivelyBuilding: boolean;
@@ -41,13 +34,6 @@ export interface CompilerCtx {
   rollupCacheNative: any;
   rootTsFiles: string[];
   styleModeNames: Set<string>;
-
-  tsProgram: ts.Program;
-  tsSolutionBuilderHost:  ts.SolutionBuilderWithWatchHost<ts.EmitAndSemanticDiagnosticsBuilderProgram>;
-  tsSolutionBuilder: ts.SolutionBuilder<ts.EmitAndSemanticDiagnosticsBuilderProgram>;
-
-  /** legacy, pre 3.6.0 way */
-  tsService: TsService;
 
   reset(): void;
 }

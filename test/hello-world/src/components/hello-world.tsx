@@ -6,7 +6,7 @@ import { Component } from '@stencil/core';
 export class HelloWorld {
   render() {
     return (
-      'Hello World'
+      'Hello Worlas'
     );
   }
 }

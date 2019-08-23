@@ -70,9 +70,6 @@ export interface BuildCtx {
   timeSpan: d.LoggerTimeSpan;
   timestamp: string;
   transpileBuildCount: number;
-  validateTypesBuild?(): Promise<void>;
-  validateTypesHandler?: (results: d.ValidateTypesResults) => Promise<void>;
-  validateTypesPromise?: Promise<d.ValidateTypesResults>;
 }
 
 

@@ -98,6 +98,8 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
 
   if (tsDiagnostic.category === 1) {
     d.level = 'error';
+  } else if (tsDiagnostic.category === 2) {
+    d.level = 'info';
   }
 
   if (tsDiagnostic.file) {

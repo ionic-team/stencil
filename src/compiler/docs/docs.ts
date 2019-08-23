@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { catchError, hasError, normalizeDiagnostics } from '@utils';
 import { BuildContext } from '../build/build-ctx';
-import { transpileApp } from '../transpile/transpile-app';
+// import { transpileApp } from '../transpile/transpile-app';
 
 
 export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
@@ -16,7 +16,7 @@ export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
     // begin the build
     // async scan the src directory for ts files
     // then transpile them all in one go
-    await transpileApp(config, compilerCtx, buildCtx);
+    // await transpileApp(config, compilerCtx, buildCtx);
 
     // generate each of the docs
     // await createPluginOutput(config, compilerCtx, buildCtx, [docsPlugin, jsonDocsPlugin, vscodeDocsPlugin]);

@@ -24,7 +24,6 @@ export class CompilerContext implements d.CompilerCtx {
   compilerOptions: any = null;
   events = new BuildEvents();
   fs: d.InMemoryFileSystem;
-  fsWatcher: d.FsWatcher = null;
   hasFsWatcherEvents = false;
   hasLoggedServerUrl = false;
   hasSuccessfulBuild = false;
