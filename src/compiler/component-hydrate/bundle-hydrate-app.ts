@@ -30,7 +30,7 @@ export const bundleHydrateApp = async (config: d.Config, compilerCtx: d.Compiler
         }),
         stencilHydratePlugin(config),
         stencilBuildConditionalsPlugin(build, config.fsNamespace),
-        globalScriptsPlugin(config, compilerCtx, buildCtx),
+        globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,

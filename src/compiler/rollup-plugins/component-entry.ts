@@ -17,7 +17,6 @@ export const componentEntryPlugin = (config: d.Config, compilerCtx: d.CompilerCt
           entrys.set(id, entryModule);
           return {
             id,
-            moduleSideEffects: false
           };
         }
       }

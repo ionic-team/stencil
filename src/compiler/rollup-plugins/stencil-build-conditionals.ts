@@ -12,7 +12,6 @@ export const NAMESPACE = '${namespace}';
       if (id === '@stencil/core/build-conditionals') {
         return {
           id,
-          moduleSideEffects: false
         };
       }
       return null;

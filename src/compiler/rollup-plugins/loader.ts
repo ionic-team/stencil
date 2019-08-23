@@ -8,7 +8,6 @@ export function loaderPlugin(entries: {[id: string]: string}): Plugin {
       if (id in entries) {
         return {
           id,
-          moduleSideEffects: false
         };
       }
       return null;

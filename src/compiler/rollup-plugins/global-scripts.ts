@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildError, normalizePath } from '@utils';
+import { normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
 
@@ -17,7 +17,7 @@ export function hasGlobalScriptPaths(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Plugin {
+export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx): Plugin {
   const globalPaths: string[] = [];
 
   if (typeof config.globalScript === 'string') {
@@ -39,7 +39,6 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
       if (id === GLOBAL_ID) {
         return {
           id,
-          moduleSideEffects: true
         };
       }
       return null;
@@ -62,27 +61,12 @@ export function globalScriptsPlugin(config: d.Config, compilerCtx: d.CompilerCtx
     transform(code, id) {
       id = normalizePath(id);
       if (globalPaths.includes(id)) {
-        const output = [
-          INJECT_CONTEXT
-        ];
-
         const program = this.parse(code, {});
         const needsDefault = !program.body.some(s => s.type === 'ExportDefaultDeclaration');
-
-        if (needsDefault) {
-          const diagnostic = buildError(buildCtx.diagnostics);
-          diagnostic.header = `Global Script`;
-          diagnostic.absFilePath = id;
-          diagnostic.messageText = `The code to be executed should be placed within a default function that is exported by the global script. Ensure all of the code in the global script is wrapped in the function() that is exported.`;
-
-          output.push(`export const fallbackGlobalFn = () => {}`);
-          output.push(`export default fallbackGlobalFn;`);
-
-        } else {
-          output.push(code);
-        }
-
-        return output.join('\n');
+        const defaultExport = needsDefault
+          ? '\nexport const globalFn = () => {};\nexport default globalFn;'
+          : '';
+        return INJECT_CONTEXT + code + defaultExport;
       }
       return null;
     }
