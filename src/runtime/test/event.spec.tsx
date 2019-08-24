@@ -230,4 +230,74 @@ describe('event', () => {
       `);
     });
   });
+
+  describe('MouseEvent', () => {
+    it('can be dispatched', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        @State() counter = 0;
+
+        @Listen('onclick')
+        onClick() {
+          this.counter++;
+        }
+
+        render() {
+          return `${this.counter}`;
+        }
+      }
+
+      const { root, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      });
+
+      expect(root).toEqualHtml(`
+        <cmp-a>0</cmp-a>
+      `);
+
+      const ev = new MouseEvent('onclick');
+      root.dispatchEvent(ev);
+      await waitForChanges();
+
+      expect(root).toEqualHtml(`
+        <cmp-a>1</cmp-a>
+      `);
+    });
+
+    it('can be dispatched with custom data', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        @State() screenX: string;
+        @State() shift: string;
+
+        @Listen('onclick')
+        onClick(ev: MouseEvent) {
+          this.screenX = ev.screenX.toString();
+          this.shift = ev.shiftKey ? 'Yes' : 'No';
+        }
+
+        render() {
+          return `${this.screenX || ''} - ${this.shift || ''}`;
+        }
+      }
+
+      const { root, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      });
+
+      expect(root).toEqualHtml(`
+        <cmp-a> - </cmp-a>
+      `);
+
+      const ev = new MouseEvent('onclick', {screenX: 99, shiftKey: true});
+      root.dispatchEvent(ev);
+      await waitForChanges();
+
+      expect(root).toEqualHtml(`
+        <cmp-a>99 - Yes</cmp-a>
+      `);
+    });
+  });
 });

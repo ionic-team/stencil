@@ -55,6 +55,7 @@ export class MockCustomEvent extends MockEvent {
 
 }
 
+
 export class MockKeyboardEvent extends MockEvent {
   code = '';
   key = '';
@@ -70,6 +71,30 @@ export class MockKeyboardEvent extends MockEvent {
 
     if (keyboardEventInitDic != null) {
       Object.assign(this, keyboardEventInitDic);
+    }
+  }
+
+}
+
+
+export class MockMouseEvent extends MockEvent {
+  screenX = 0;
+  screenY = 0;
+  clientX = 0;
+  clientY = 0;
+  ctrlKey = false;
+  shiftKey = false;
+  altKey = false;
+  metaKey = false;
+  button = 0;
+  buttons = 0;
+  relatedTarget: EventTarget = null;
+
+  constructor(type: string, mouseEventInitDic?: MouseEventInit) {
+    super(type);
+
+    if (mouseEventInitDic != null) {
+      Object.assign(this, mouseEventInitDic);
     }
   }
 
