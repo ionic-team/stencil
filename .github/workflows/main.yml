@@ -12,17 +12,6 @@ on:
       - 'types'
       - 'package.json'
 
-  pull_request:
-    paths:
-      - '.github/workflows/*'
-      - 'bin/*'
-      - 'screenshot'
-      - 'scripts'
-      - 'src'
-      - 'test'
-      - 'types'
-      - 'package.json'
-
 jobs:
   build_and_test:
     strategy:
