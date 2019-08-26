@@ -91,16 +91,6 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
     // write all of our logs to disk if config'd to do so
     // do this even if there are errors or not the active build
     config.logger.writeLogs(buildCtx.isRebuild);
-
-    if (config.watch) {
-      // this is a watch build
-      // setup watch if we haven't done so already
-      // await initFsWatcher(config, compilerCtx, buildCtx);
-
-    } else {
-      // not a watch build, so lets destroy anything left open
-      config.sys.destroy();
-    }
   }
 
   // write cache stats only for memory debugging
