@@ -121,7 +121,7 @@ export interface MatchScreenshotOptions {
 }
 
 
-export interface EventSpy {
+export interface EventSpy extends AsyncIterableIterator<SerializedEvent> {
   events: SerializedEvent[];
   eventName: string;
   firstEvent: SerializedEvent;

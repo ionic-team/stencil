@@ -46,7 +46,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     const eventSpy = new EventSpy(eventName);
 
     await addE2EListener(this._page, this._elmHandle, eventName, (ev: d.SerializedEvent) => {
-      eventSpy.events.push(ev);
+      eventSpy.push(ev);
     });
 
     return eventSpy;

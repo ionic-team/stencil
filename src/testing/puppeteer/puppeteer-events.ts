@@ -28,7 +28,7 @@ async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selec
   const handle = await page.evaluateHandle(handler);
 
   await addE2EListener(page, handle, eventName, (ev: any) => {
-    eventSpy.events.push(ev);
+    eventSpy.push(ev);
   });
 
   return eventSpy;
@@ -57,7 +57,8 @@ export async function waitForEvent(page: pd.E2EPageInternal, eventName: string, 
 
 export class EventSpy implements d.EventSpy {
   events: d.SerializedEvent[] = [];
-
+  private cursor = 0;
+  private queuedHandler: (() => void)[] = [];
   constructor(public eventName: string) {}
 
   get length() {
@@ -71,6 +72,38 @@ export class EventSpy implements d.EventSpy {
   get lastEvent() {
     return this.events[this.events.length - 1] || null;
   }
+
+  [Symbol.asyncIterator]() {
+    return this;
+  }
+
+  next() {
+    const cursor = this.cursor;
+    this.cursor++;
+    const next = this.events[cursor];
+    if (next) {
+      return Promise.resolve({
+        done: false,
+        value: next
+      });
+    } else {
+      let resolve: () => void;
+      const promise = new Promise(r => resolve = r);
+      this.queuedHandler.push(resolve);
+      return promise.then(() => ({
+        done: false,
+        value: this.events[cursor]
+      }));
+    }
+  }
+
+  push(ev: d.SerializedEvent) {
+    this.events.push(ev);
+    const next = this.queuedHandler.shift();
+    if (next) {
+      next();
+    }
+}
 }
 
 
