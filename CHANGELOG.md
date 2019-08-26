@@ -1,3 +1,17 @@
+## 🐎 [1.3.2](https://github.com/ionic-team/stencil/compare/v1.3.1...v1.3.2) (2019-08-26)
+
+
+### Bug Fixes
+
+* **testing:** properly wait until stencil load ([897b659](https://github.com/ionic-team/stencil/commit/897b659))
+
+
+### Features
+
+* **testing:** spyOnEvent returns async iterator ([c9d543a](https://github.com/ionic-team/stencil/commit/c9d543a))
+
+
+
 ## 🐦 [1.3.1](https://github.com/ionic-team/stencil/compare/v1.3.0...v1.3.1) (2019-08-23)
 
 
