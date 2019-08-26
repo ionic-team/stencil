@@ -103,7 +103,7 @@ export class EventSpy implements d.EventSpy {
     if (next) {
       next();
     }
-}
+  }
 }
 
 
@@ -150,12 +150,13 @@ function nodeContextEvents(waitForEvents: pd.WaitForEvent[], browserEvent: pd.Br
 
 function browserContextEvents() {
   // BROWSER CONTEXT
-
-  const appLoaded = () => {
-    (window as unknown as pd.BrowserWindow).stencilAppLoaded = true;
+  const waitFrame = () => {
+    return new Promise(resolve => {
+      requestAnimationFrame(resolve);
+    });
   };
 
-  const domReady = () => {
+  const allReady = () => {
     const promises: Promise<any>[] = [];
     const waitForDidLoad = (promises: Promise<any>[], elm: Element) => {
       if (elm != null && elm.nodeType === 1) {
@@ -171,9 +172,17 @@ function browserContextEvents() {
 
     waitForDidLoad(promises, window.document.documentElement);
 
-    Promise.all(promises)
-      .then(appLoaded)
-      .catch(appLoaded);
+    return Promise.all(promises)
+      .catch((e) => console.error(e));
+  };
+
+  const stencilReady = () => {
+    return allReady()
+      .then(() => waitFrame())
+      .then(() => allReady())
+      .then(() => {
+        (window as unknown as pd.BrowserWindow).stencilAppLoaded = true;
+      });
   };
 
   (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget = (target: any) => {
@@ -225,9 +234,9 @@ function browserContextEvents() {
   };
 
   if (window.document.readyState === 'complete') {
-    domReady();
+    stencilReady();
 
   } else {
-    window.document.addEventListener('DOMContentLoaded', domReady);
+    window.addEventListener('load', stencilReady);
   }
 }

@@ -155,12 +155,7 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer
     throw new Error(`Testing unable to load ${url}, HTTP status: ${rsp.status()}`);
   }
 
-  try {
-    await page.waitForFunction('window.stencilAppLoaded', {timeout: 4500});
-
-  } catch (e) {
-    throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
-  }
+  await waitForStencil(page);
 
   return rsp;
 }
@@ -211,14 +206,19 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: pu
     throw new Error(`Testing unable to load content`);
   }
 
+  await waitForStencil(page);
+
+  return rsp;
+}
+
+
+async function waitForStencil(page: pd.E2EPage) {
   try {
     await page.waitForFunction('window.stencilAppLoaded', {timeout: 4500});
 
   } catch (e) {
     throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
   }
-
-  return rsp;
 }
 
 
