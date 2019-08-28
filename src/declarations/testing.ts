@@ -546,6 +546,12 @@ export interface NewSpecPageOptions {
    * The initial HTML used to generate the test. This can be useful to construct a collection of components working together, and assign HTML attributes. This value sets the mocked `document.body.innerHTML`.
    */
   html?: string;
+
+  /**
+   * This in
+   */
+  template?: () => void;
+
   /**
    * Sets the mocked `lang` attribute on `<html>`.
    */

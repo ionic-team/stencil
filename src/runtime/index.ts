@@ -16,3 +16,4 @@ export { postUpdateComponent } from './update-component';
 export { proxyComponent } from './proxy-component';
 export { renderVdom } from './vdom/vdom-render';
 export { setMode, getMode } from './mode';
+

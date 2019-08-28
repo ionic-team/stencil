@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { formatLazyBundleRuntimeMeta, getBuildFeatures } from '../compiler';
 
-
 export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPage> {
   if (opts == null) {
     throw new Error(`NewSpecPageOptions required`);
@@ -153,7 +152,19 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
 
   platform.bootstrapLazy(lazyBundles);
 
-  if (typeof opts.html === 'string') {
+  if (typeof opts.template === 'function') {
+    const ref: d.HostRef = {
+      $ancestorComponent$: undefined,
+      $flags$: 0,
+      $modeName$: undefined,
+      $hostElement$: page.body
+    };
+    const cmpMeta: d.ComponentRuntimeMeta = {
+      $flags$: 0,
+      $tagName$: 'body'
+    };
+    platform.renderVdom(page.body, ref, cmpMeta, opts.template());
+  } else if (typeof opts.html === 'string') {
     page.body.innerHTML = opts.html;
   }
 
