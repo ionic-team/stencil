@@ -546,6 +546,14 @@ export interface NewSpecPageOptions {
    * The initial HTML used to generate the test. This can be useful to construct a collection of components working together, and assign HTML attributes. This value sets the mocked `document.body.innerHTML`.
    */
   html?: string;
+
+  /**
+   * The initial JSX used to generate the test.
+   * Use `template` when you want to initialize a component using their properties, instead of their HTML attributes.
+   * It will render the specified template (JSX) into `document.body`.
+   */
+  template?: () => any;
+
   /**
    * Sets the mocked `lang` attribute on `<html>`.
    */
