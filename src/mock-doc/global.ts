@@ -94,5 +94,6 @@ const WINDOW_PROPS = [
   'Element',
   'HTMLElement',
   'NodeList',
-  'KeyboardEvent'
+  'KeyboardEvent',
+  'MouseEvent'
 ];

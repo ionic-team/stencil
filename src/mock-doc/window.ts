@@ -1,6 +1,6 @@
 import { createConsole } from './console';
 import { MockCustomElementRegistry, resetCustomElementRegistry } from './custom-element-registry';
-import { MockCustomEvent, MockEvent, MockKeyboardEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
+import { MockCustomEvent, MockEvent, MockKeyboardEvent, MockMouseEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { MockDocument, resetDocument } from './document';
 import { MockElement, MockHTMLElement, MockNodeList} from './node';
 import { MockHistory } from './history';
@@ -22,6 +22,7 @@ const sessionStorageMap = new WeakMap<MockWindow, MockStorage>();
 const eventClassMap = new WeakMap<MockWindow, any>();
 const customEventClassMap = new WeakMap<MockWindow, any>();
 const keyboardEventClassMap = new WeakMap<MockWindow, any>();
+const mouseEventClassMap = new WeakMap<MockWindow, any>();
 const nativeClearInterval = clearInterval;
 const nativeClearTimeout = clearTimeout;
 const nativeSetInterval = setInterval;
@@ -126,6 +127,17 @@ export class MockWindow {
   }
   set KeyboardEvent(kbEvClass: any) {
     keyboardEventClassMap.set(this, kbEvClass);
+  }
+
+  get MouseEvent() {
+    const mouseEvClass = mouseEventClassMap.get(this);
+    if (mouseEvClass != null) {
+      return mouseEvClass;
+    }
+    return MockMouseEvent;
+  }
+  set MouseEvent(mouseEvClass: any) {
+    mouseEventClassMap.set(this, mouseEvClass);
   }
 
   dispatchEvent(ev: MockEvent) {
@@ -465,6 +477,7 @@ export function resetWindow(win: Window) {
     eventClassMap.delete(win as any);
     customEventClassMap.delete(win as any);
     keyboardEventClassMap.delete(win as any);
+    mouseEventClassMap.delete(win as any);
 
     if (win.document != null) {
       try {
