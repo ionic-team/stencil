@@ -1,7 +1,7 @@
 
 import { MockNode, serializeNodeToHtml } from '@mock-doc';
 
-const print =  (val: HTMLElement | MockNode): string => {
+const print = (val: HTMLElement | MockNode): string => {
     return serializeNodeToHtml(val, {
         serializeShadowRoot: true,
         prettyHtml: true,

@@ -4,17 +4,16 @@ import * as puppeteer from 'puppeteer';
 
 
 export async function initPageEvents(page: pd.E2EPageInternal) {
-  page._e2eEvents = [];
+  page._e2eEvents = new Map();
   page._e2eEventIds = 0;
+  page.spyOnEvent = pageSpyOnEvent.bind(page, page);
 
-  await page.exposeFunction('stencilOnEvent', (browserEvent: pd.BrowserContextEvent) => {
+  await page.exposeFunction('stencilOnEvent', (id: number, ev: any) => {
     // NODE CONTEXT
-    nodeContextEvents(page._e2eEvents, browserEvent);
+    nodeContextEvents(page._e2eEvents, id, ev);
   });
 
   await page.evaluateOnNewDocument(browserContextEvents);
-
-  page.spyOnEvent = pageSpyOnEvent.bind(page, page);
 }
 
 
@@ -27,7 +26,7 @@ async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selec
 
   const handle = await page.evaluateHandle(handler);
 
-  await addE2EListener(page, handle, eventName, (ev: any) => {
+  await addE2EListener(page, handle, eventName, (ev) => {
     eventSpy.push(ev);
   });
 
@@ -107,15 +106,12 @@ export class EventSpy implements d.EventSpy {
 }
 
 
-export async function addE2EListener(page: pd.E2EPageInternal, elmHandle: puppeteer.JSHandle, eventName: string, resolve: (ev: any) => void, cancelRejectId?: any) {
+export async function addE2EListener(page: pd.E2EPageInternal, elmHandle: puppeteer.JSHandle, eventName: string, callback: (ev: any) => void) {
   // NODE CONTEXT
   const id = page._e2eEventIds++;
-
-  page._e2eEvents.push({
-    id: id,
-    eventName: eventName,
-    resolve: resolve,
-    cancelRejectId: cancelRejectId
+  page._e2eEvents.set(id, {
+    eventName,
+    callback,
   });
 
   const executionContext = elmHandle.executionContext();
@@ -123,27 +119,20 @@ export async function addE2EListener(page: pd.E2EPageInternal, elmHandle: puppet
   // add element event listener
   await executionContext.evaluate((elm: any, id: number, eventName: string) => {
     elm.addEventListener(eventName, (ev: any) => {
-      (window as unknown as pd.BrowserWindow).stencilOnEvent({
-        id: id,
-        event: (window as unknown as pd.BrowserWindow).stencilSerializeEvent(ev)
-      });
+      (window as unknown as pd.BrowserWindow).stencilOnEvent(
+        id,
+        (window as unknown as pd.BrowserWindow).stencilSerializeEvent(ev)
+      );
     });
   }, elmHandle, id, eventName);
 }
 
 
-function nodeContextEvents(waitForEvents: pd.WaitForEvent[], browserEvent: pd.BrowserContextEvent) {
+function nodeContextEvents(waitForEvents: Map<number, pd.WaitForEvent>, eventId: number, ev: any) {
   // NODE CONTEXT
-  const waitForEventData = waitForEvents.find(waitData => {
-    return waitData.id === browserEvent.id;
-  });
-
+  const waitForEventData = waitForEvents.get(eventId);
   if (waitForEventData) {
-    if (waitForEventData.cancelRejectId != null) {
-      clearTimeout(waitForEventData.cancelRejectId);
-    }
-
-    waitForEventData.resolve(browserEvent.event);
+    waitForEventData.callback(ev);
   }
 }
 

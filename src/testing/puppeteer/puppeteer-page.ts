@@ -16,7 +16,7 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
   }
 
   const page: pd.E2EPageInternal = await global.__NEW_TEST_PAGE__();
-
+  const diagnostics: pd.PageDiagnostic[] = [];
   try {
     page._e2eElements = [];
 
@@ -86,6 +86,10 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
       return waitForEvent(page, eventName, docHandle);
     };
 
+    page.getDiagnostics = () => {
+      return diagnostics;
+    };
+
     page.waitForChanges = waitForChanges.bind(null, page);
 
     page.debugger = () => {
@@ -101,9 +105,43 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
       }) as any;
     };
 
-    page.on('console', consoleMessage);
-    page.on('pageerror', pageError);
-    page.on('requestfailed', requestFailed);
+    const failOnConsoleError = opts.failOnConsoleError === true;
+    const failOnNetworkError = opts.failOnNetworkError === true;
+
+    page.on('console', (ev) => {
+      if (ev.type() === 'error') {
+        diagnostics.push({
+          type: 'error',
+          message: ev.text(),
+          location: ev.location().url
+        });
+        if (failOnConsoleError) {
+          fail(new Error(serializeConsoleMessage(ev)));
+          return;
+        }
+      }
+      consoleMessage(ev);
+    });
+    page.on('pageerror', (err: Error) => {
+      diagnostics.push({
+        type: 'pageerror',
+        message: err.message,
+        location: err.stack
+      });
+      fail(err);
+    });
+    page.on('requestfailed', (req) => {
+      diagnostics.push({
+        type: 'requestfailed',
+        message: req.failure().errorText,
+        location: req.url()
+      });
+      if (failOnNetworkError) {
+        fail(new Error(req.failure().errorText));
+      } else {
+        console.error('requestfailed', req.url());
+      }
+    });
 
     if (typeof opts.html === 'string') {
       await e2eSetContent(page, opts.html, { waitUntil: opts.waitUntil });
@@ -304,11 +342,16 @@ async function waitForChanges(page: pd.E2EPageInternal) {
 function consoleMessage(c: puppeteer.ConsoleMessage) {
   const type = c.type();
   const normalizedType = type === 'warning' ? 'warn' : type;
+  const message = serializeConsoleMessage(c);
   if (typeof (console as any)[normalizedType] === 'function') {
-    (console as any)[normalizedType](c.text(), serializeLocation(c.location()));
+    (console as any)[normalizedType](message);
   } else {
-    console.log(type, c.text(), serializeLocation(c.location()));
+    console.log(type, message);
   }
+}
+
+function serializeConsoleMessage(c: puppeteer.ConsoleMessage) {
+  return `${c.text()} ${serializeLocation(c.location())}`
 }
 
 function serializeLocation(loc: puppeteer.ConsoleMessageLocation) {
@@ -326,11 +369,3 @@ function serializeLocation(loc: puppeteer.ConsoleMessageLocation) {
 }
 
 
-function pageError(e: any) {
-  console.error('pageerror', e);
-}
-
-
-function requestFailed(req: puppeteer.Request) {
-  console.error('requestfailed', req.url());
-}
