@@ -138,9 +138,9 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
       });
       if (failOnNetworkError) {
         fail(new Error(req.failure().errorText));
-      } else {
-        console.error('requestfailed', req.url());
+        return;
       }
+      console.error('requestfailed', req.url());
     });
 
     if (typeof opts.html === 'string') {
