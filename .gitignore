@@ -16,6 +16,7 @@ node_modules/
 coverage/
 
 dist/
+dist-ts/
 **/www/build/
 
 # submodule packages
