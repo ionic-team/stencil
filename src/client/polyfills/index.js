@@ -21,6 +21,7 @@ export function applyPolyfills() {
     'function' !== typeof Object.assign || !Object.entries ||
     !Array.prototype.find || !Array.prototype.includes ||
     !String.prototype.startsWith || !String.prototype.endsWith ||
+    (win.NodeList && !win.NodeList.prototype.forEach) ||
     !win.fetch ||
     !checkIfURLIsSupported() ||
     typeof WeakMap == 'undefined'

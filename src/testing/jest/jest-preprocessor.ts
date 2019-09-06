@@ -1,4 +1,5 @@
 import { formatDiagnostic, getCompilerOptions, transpile } from '../test-transpile';
+import { basename } from 'path';
 
 
 export const jestPreprocessor = {
@@ -20,11 +21,17 @@ export const jestPreprocessor = {
         const msg = results.diagnostics.map(formatDiagnostic).join('\n\n');
         throw new Error(msg);
       }
+      const mapObject = JSON.parse(results.map);
+      const base = basename(filePath);
+      mapObject.file = filePath;
+      mapObject.sources = [filePath];
+      delete mapObject.sourceRoot;
 
-      return {
-        code: results.code,
-        map: results.map
-      };
+      const mapBase64 = Buffer.from(JSON.stringify(mapObject), 'utf8').toString('base64');
+      const sourceMapInlined = `data:application/json;charset=utf-8;base64,${mapBase64}`;
+      const sourceMapLength = `${base}.map`.length;
+
+      return results.code.slice(0, -sourceMapLength) + sourceMapInlined;
     }
 
     return sourceText;

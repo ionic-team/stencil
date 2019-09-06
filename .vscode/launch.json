@@ -182,6 +182,20 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Style Modes",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--dev",
+        "--max-workers=1",
+        "--config",
+        "${workspaceFolder}/test/style-modes/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Stencil Site Prerender",
       "args": [
         "${workspaceFolder}/bin/stencil",

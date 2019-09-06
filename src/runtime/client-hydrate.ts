@@ -69,6 +69,7 @@ const clientHydrate = (
   let childNodeType: string;
   let childIdSplt: string[];
   let childVNode: RenderNodeData;
+  let i: number;
 
   if (node.nodeType === NODE_TYPE.ElementNode) {
 
@@ -111,8 +112,7 @@ const clientHydrate = (
     }
 
     // recursively drill down, end to start so we can remove nodes
-    let i = node.childNodes.length - 1;
-    for (; i >= 0; i--) {
+    for (i = node.childNodes.length - 1; i >= 0; i--) {
       clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.childNodes[i] as any, hostId);
     }
 

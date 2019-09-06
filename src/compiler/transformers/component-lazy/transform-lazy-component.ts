@@ -29,7 +29,9 @@ export const transformToLazyComponentText = (compilerCtx: d.CompilerCtx, buildCt
 
     const transpileOutput = ts.transpileModule(inputText, transpileOpts);
 
-    loadTypeScriptDiagnostics(buildCtx.diagnostics, transpileOutput.diagnostics);
+    buildCtx.diagnostics.push(
+      ...loadTypeScriptDiagnostics(transpileOutput.diagnostics)
+    );
 
     if (!buildCtx.hasError && typeof transpileOutput.outputText === 'string') {
       outputText = transpileOutput.outputText;

@@ -10,8 +10,8 @@ export const loadDeps = async (resolveLookup: Map<string, string>, fs: Map<strin
   });
 
   deps.push(
-    loadDep('https://cdn.jsdelivr.net/npm/rollup@1.17.0/dist/rollup.browser.js'),
-    loadDep('https://cdn.jsdelivr.net/npm/terser@4.1.2/dist/bundle.js')
+    loadDep('https://cdn.jsdelivr.net/npm/rollup@1.19.3/dist/rollup.browser.js'),
+    loadDep('https://cdn.jsdelivr.net/npm/terser@4.1.3/dist/bundle.min.js')
   );
 
   const depPromises = Promise.all(deps);

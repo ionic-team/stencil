@@ -5,6 +5,8 @@ import * as puppeteer from 'puppeteer';
 export interface NewE2EPageOptions extends puppeteer.NavigationOptions {
   url?: string;
   html?: string;
+  failOnConsoleError?: boolean;
+  failOnNetworkError?: boolean;
 }
 
 
@@ -13,6 +15,11 @@ type PuppeteerPage = Omit<puppeteer.Page,
 'bringToFront' | 'browser' | 'screenshot' | 'emulate' | 'emulateMedia' | 'frames' | 'goBack' | 'goForward' | 'isClosed' | 'mainFrame' | 'pdf' | 'reload' | 'target' | 'title' | 'viewport' | 'waitForNavigation' | 'screenshot' | 'workers' | 'addListener' | 'prependListener' | 'prependOnceListener' | 'removeListener' | 'removeAllListeners' | 'setMaxListeners' | 'getMaxListeners' | 'listeners' | 'rawListeners' | 'emit' | 'eventNames' | 'listenerCount' | '$x' | 'waitForXPath'
 >;
 
+export interface PageDiagnostic {
+  type: 'error' | 'pageerror' | 'requestfailed';
+  message?: string;
+  location?: string;
+}
 
 /**
  * The E2EPage is a wrapper utility to Puppeteer in order to
@@ -118,13 +125,15 @@ export interface E2EPage extends PuppeteerPage {
    * allows the listener to be set to `document` if needed.
    */
   waitForEvent(eventName: string): Promise<any>;
+
+  getDiagnostics(): PageDiagnostic[];
 }
 
 
 export interface E2EPageInternal extends E2EPage {
   isClosed(): boolean;
   _e2eElements: E2EElementInternal[];
-  _e2eEvents: WaitForEvent[];
+  _e2eEvents: Map<number, WaitForEvent>;
   _e2eEventIds: number;
   _e2eGoto(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
   _e2eClose(options?: puppeteer.PageCloseOptions): Promise<void>;
@@ -425,21 +434,12 @@ export interface WaitForEventOptions {
 
 
 export interface WaitForEvent {
-  id: number;
   eventName: string;
-  resolve: (ev: any) => void;
-  cancelRejectId: any;
+  callback: (ev: any) => void;
 }
-
-
-export interface BrowserContextEvent {
-  id: number;
-  event: any;
-}
-
 
 export interface BrowserWindow extends Window {
-  stencilOnEvent(ev: BrowserContextEvent): void;
+  stencilOnEvent(id: number, event: any): void;
   stencilSerializeEvent(ev: CustomEvent): any;
   stencilSerializeEventTarget(target: any): any;
   stencilAppLoaded: boolean;

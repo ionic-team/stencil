@@ -164,7 +164,8 @@ require('core-js-builder')({
     'es',
     'web.url',
     'web.url.to-json',
-    'web.url-search-params'
+    'web.url-search-params',
+    'web.dom-collections.for-each'
   ],
   blacklist: [
     'es.math',
@@ -173,7 +174,8 @@ require('core-js-builder')({
     'es.array-buffer',
     'es.data-view',
     'es.typed-array',
-    'es.reflect'
+    'es.reflect',
+    'es.promise'
   ]
 });
 ```

@@ -163,6 +163,7 @@ export interface OutputTargetDistModule extends OutputTargetBase {
   dir?: string;
   externalRuntime?: boolean;
   empty?: boolean;
+  copy?: d.CopyTask[];
 }
 
 

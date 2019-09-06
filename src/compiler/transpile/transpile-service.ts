@@ -81,7 +81,6 @@ const buildTsService = async (config: d.Config, compilerCtx: d.CompilerCtx, buil
   compilerOptions.types = undefined;
   compilerOptions.noEmit = undefined;
   compilerOptions.noEmitOnError = undefined;
-  compilerOptions.paths = undefined;
   compilerOptions.rootDirs = undefined;
   compilerOptions.declaration = undefined;
   compilerOptions.declarationDir = undefined;
@@ -121,8 +120,7 @@ const buildTsService = async (config: d.Config, compilerCtx: d.CompilerCtx, buil
         componentExport: null,
         componentMetadata: null,
         proxy: null,
-        scopeCss: false,
-        style: 'inline'
+        style: 'static'
       };
 
       return {
@@ -249,7 +247,9 @@ const transpileTsFile = async (config: d.Config, services: ts.LanguageService, c
     const tsDiagnostics = services.getCompilerOptionsDiagnostics()
       .concat(services.getSyntacticDiagnostics(sourceFilePath));
 
-    loadTypeScriptDiagnostics(ctx.buildCtx.diagnostics, tsDiagnostics);
+    ctx.buildCtx.diagnostics.push(
+      ...loadTypeScriptDiagnostics(tsDiagnostics)
+    );
 
     return false;
   }

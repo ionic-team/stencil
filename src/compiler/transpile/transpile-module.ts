@@ -94,7 +94,9 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     tsDiagnostics.push(...program.getOptionsDiagnostics());
   }
 
-  loadTypeScriptDiagnostics(buildCtx.diagnostics, tsDiagnostics);
+  buildCtx.diagnostics.push(
+    ...loadTypeScriptDiagnostics(tsDiagnostics)
+  );
 
   results.diagnostics.push(...buildCtx.diagnostics);
 

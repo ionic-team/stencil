@@ -171,7 +171,7 @@ async function generateAngularUtils(compilerCtx: d.CompilerCtx, outputTarget: d.
 
 const PROXY_UTILS = `import { fromEvent } from 'rxjs';
 
-export function proxyInputs(Cmp: any, inputs: string[]) {
+export const proxyInputs = (Cmp: any, inputs: string[]) => {
   const Prototype = Cmp.prototype;
   inputs.forEach(item => {
     Object.defineProperty(Prototype, item, {
@@ -181,9 +181,9 @@ export function proxyInputs(Cmp: any, inputs: string[]) {
       },
     });
   });
-}
+};
 
-export function proxyMethods(Cmp: any, methods: string[]) {
+export const proxyMethods = (Cmp: any, methods: string[]) => {
   const Prototype = Cmp.prototype;
   methods.forEach(methodName => {
     Prototype[methodName] = function() {
@@ -191,11 +191,11 @@ export function proxyMethods(Cmp: any, methods: string[]) {
       return this.z.runOutsideAngular(() => this.el[methodName].apply(this.el, args));
     };
   });
-}
+};
 
-export function proxyOutputs(instance: any, el: any, events: string[]) {
+export const proxyOutputs = (instance: any, el: any, events: string[]) => {
   events.forEach(eventName => instance[eventName] = fromEvent(el, eventName));
-}
+};
 `;
 
 export const GENERATED_DTS = 'components.d.ts';

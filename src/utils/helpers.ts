@@ -9,13 +9,15 @@ export const toDashCase = (str: string) => toLowerCase(str.replace(/([A-Z0-9])/g
 
 export const dashToPascalCase = (str: string) => toLowerCase(str).split('-').map(segment => segment.charAt(0).toUpperCase() + segment.slice(1)).join('');
 
-export const toTitleCase = (str: string) => str.charAt(0).toUpperCase() + str.substr(1);
-
-export const captializeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+export const toTitleCase = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const noop = (): any => { /* noop*/ };
 
-export const isComplexType = (o: any) => ['object', 'function'].includes(typeof o);
+export const isComplexType = (o: any) => {
+  // https://jsperf.com/typeof-fn-object/5
+  o = typeof o;
+  return o === 'object' || o === 'function';
+};
 
 export const sortBy = <T>(array: T[], prop: ((item: T) => string | number)) => {
   return array.slice().sort((a, b) => {

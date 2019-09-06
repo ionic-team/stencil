@@ -79,7 +79,7 @@ export const validateTypesMain = async (config: d.Config, compilerCtx: d.Compile
   const emitDtsFiles = config.outputTargets.some(isOutputTargetDistTypes);
 
   // kick off validating types by sending the data over to the worker process
-  buildCtx.validateTypesPromise = config.sys.validateTypes(compilerOptions, emitDtsFiles, config.cwd, collectionNames, rootTsFiles);
+  buildCtx.validateTypesPromise = config.sys.validateTypes(compilerOptions, emitDtsFiles, collectionNames, rootTsFiles, config.devMode);
 
   // when the validate types build finishes
   // let's run the handler we put on the build context

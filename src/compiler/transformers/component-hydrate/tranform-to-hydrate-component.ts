@@ -16,8 +16,7 @@ export const transformToHydrateComponentText = (compilerCtx: d.CompilerCtx, buil
       componentExport: null,
       componentMetadata: null,
       proxy: null,
-      scopeCss: false,
-      style: 'inline'
+      style: 'static'
     };
     const transpileOpts: ts.TranspileOptions = {
       compilerOptions: {
@@ -37,7 +36,9 @@ export const transformToHydrateComponentText = (compilerCtx: d.CompilerCtx, buil
 
     const transpileOutput = ts.transpileModule(inputJsText, transpileOpts);
 
-    loadTypeScriptDiagnostics(buildCtx.diagnostics, transpileOutput.diagnostics);
+    buildCtx.diagnostics.push(
+      ...loadTypeScriptDiagnostics(transpileOutput.diagnostics)
+    );
 
     if (!buildCtx.hasError && typeof transpileOutput.outputText === 'string') {
       outputText = transpileOutput.outputText;

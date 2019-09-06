@@ -24,17 +24,26 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   if (options.syncQueue) {
     plt.$flags$ |= PLATFORM_FLAGS.queueSync;
   }
+  if (BUILD.hydrateClientSide) {
+    // If the app is already hydrated there is not point to disable the
+    // async queue. This will improve the first input delay
+    plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
+  }
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
     const styles = doc.querySelectorAll('style[s-id]');
     let globalStyles = '';
-    styles.forEach(styleElm => globalStyles += styleElm.innerHTML);
-    styles.forEach(styleElm => {
+    let i = 0;
+    for (; i < styles.length; i++) {
+      globalStyles += styles[i].innerHTML;
+    }
+    for (i = 0; i < styles.length; i++) {
+      const styleElm = styles[i];
       registerStyle(
         styleElm.getAttribute(HYDRATE_ID),
         globalStyles + convertScopedToShadow(styleElm.innerHTML),
         true,
       );
-    });
+    }
   }
 
   lazyBundles.forEach(lazyBundle =>

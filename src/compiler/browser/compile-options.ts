@@ -4,19 +4,42 @@ import path from 'path';
 import ts from 'typescript';
 
 
-export const getCompileOptions = (input: d.CompileOptions) => {
+export const getCompileOptions = (input: d.CompileOptions, filePath: string) => {
   const rtn: d.CompileOptions = {
     componentExport: getConfig(input.componentExport, VALID_EXPORT, 'customelement'),
     componentMetadata: getConfig(input.componentMetadata, VALID_METADATA, null),
     proxy: getConfig(input.proxy, VALID_PROXY, 'defineproperty'),
     module: getConfig(input.module, VALID_MODULE, 'esm'),
     script: getConfig(input.script, VALID_SCRIPT, 'es2017'),
-    style: getConfig(input.style, VALID_STYLE, 'import')
+    style: getConfig(input.style, VALID_STYLE, 'static'),
+    data: input.data ? Object.assign({}, input.data) : null,
+    type: input.type
   };
+
+  if (rtn.type == null) {
+    const fileName = path.basename(filePath).trim().toLowerCase();
+    if (fileName.endsWith('.d.ts')) {
+      rtn.type = 'dts';
+    } else if (fileName.endsWith('.tsx')) {
+      rtn.type = 'tsx';
+    } else if (fileName.endsWith('.ts')) {
+      rtn.type = 'ts';
+    } else if (fileName.endsWith('.jsx')) {
+      rtn.type = 'jsx';
+    } else if (fileName.endsWith('.js') || fileName.endsWith('.mjs')) {
+      rtn.type = 'js';
+    } else if (fileName.endsWith('.css') && rtn.data != null) {
+      rtn.type = 'css';
+    }
+  }
+
   return rtn;
 };
 
 const getConfig = (value: any, validValues: Set<string>, defaultValue: string) => {
+  if (value === 'null') {
+    return null;
+  }
   value = (typeof value === 'string' ? value.toLowerCase().trim() : null);
   if (validValues.has(value)) {
     return value;
@@ -27,9 +50,9 @@ const getConfig = (value: any, validValues: Set<string>, defaultValue: string) =
 const VALID_PROXY = new Set(['defineproperty', null]);
 const VALID_METADATA = new Set(['compilerstatic', null]);
 const VALID_EXPORT = new Set(['customelement', 'module']);
-const VALID_STYLE = new Set(['import', 'inline']);
 const VALID_MODULE = new Set(['esm', 'cjs']);
 const VALID_SCRIPT = new Set(['latest', 'esnext', 'es2017', 'es2015', 'es5']);
+const VALID_STYLE = new Set(['static']);
 
 
 export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
@@ -63,8 +86,7 @@ export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
     componentExport: null,
     componentMetadata: compilerOpts.componentMetadata as any,
     proxy: compilerOpts.proxy as any,
-    scopeCss: true,
-    style: compilerOpts.style as any,
+    style: compilerOpts.style as any
   };
 
   if (compilerOpts.module === 'cjs' || compilerOpts.module === 'commonjs') {

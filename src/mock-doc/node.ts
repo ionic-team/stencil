@@ -28,10 +28,17 @@ export class MockNode {
   }
 
   appendChild(newNode: MockNode) {
-    newNode.remove();
-    newNode.parentNode = this;
-    this.childNodes.push(newNode);
-    connectNode(this.ownerDocument, newNode);
+    if (newNode.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
+      const nodes = newNode.childNodes.slice();
+      for (const child of nodes) {
+        this.appendChild(child);
+      }
+    } else {
+      newNode.remove();
+      newNode.parentNode = this;
+      this.childNodes.push(newNode);
+      connectNode(this.ownerDocument, newNode);
+    }
     return newNode;
   }
 
@@ -479,7 +486,7 @@ export class MockElement extends MockNode {
         if (attributes.caseInsensitive) {
           attrName = attrName.toLowerCase();
         }
-        attr = new MockAttr(attrName, value);
+        attr = new MockAttr(attrName, String(value));
         attributes.items.push(attr);
 
         if (checkAttrChanged === true) {

@@ -36,6 +36,7 @@ export namespace Components {
     'someMethodWithArgs': (unit: string, value: number) => Promise<string>;
     'someProp': number;
   }
+  interface PathAliasCmp {}
   interface PropCmp {
     'first': string;
     'lastName': string;
@@ -106,6 +107,12 @@ declare global {
     new (): HTMLMethodCmpElement;
   };
 
+  interface HTMLPathAliasCmpElement extends Components.PathAliasCmp, HTMLStencilElement {}
+  var HTMLPathAliasCmpElement: {
+    prototype: HTMLPathAliasCmpElement;
+    new (): HTMLPathAliasCmpElement;
+  };
+
   interface HTMLPropCmpElement extends Components.PropCmp, HTMLStencilElement {}
   var HTMLPropCmpElement: {
     prototype: HTMLPropCmpElement;
@@ -128,6 +135,7 @@ declare global {
     'event-cmp': HTMLEventCmpElement;
     'listen-cmp': HTMLListenCmpElement;
     'method-cmp': HTMLMethodCmpElement;
+    'path-alias-cmp': HTMLPathAliasCmpElement;
     'prop-cmp': HTMLPropCmpElement;
     'state-cmp': HTMLStateCmpElement;
   }
@@ -158,6 +166,7 @@ declare namespace LocalJSX {
   interface MethodCmp extends JSXBase.HTMLAttributes<HTMLMethodCmpElement> {
     'someProp'?: number;
   }
+  interface PathAliasCmp extends JSXBase.HTMLAttributes<HTMLPathAliasCmpElement> {}
   interface PropCmp extends JSXBase.HTMLAttributes<HTMLPropCmpElement> {
     'first'?: string;
     'lastName'?: string;
@@ -175,6 +184,7 @@ declare namespace LocalJSX {
     'event-cmp': EventCmp;
     'listen-cmp': ListenCmp;
     'method-cmp': MethodCmp;
+    'path-alias-cmp': PathAliasCmp;
     'prop-cmp': PropCmp;
     'state-cmp': StateCmp;
   }

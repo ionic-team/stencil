@@ -95,7 +95,7 @@ const validateComponent = (config: d.Config, diagnostics: d.Diagnostic[], typeCh
       Any other exports should be moved to a separate file.
       For further information check out: https://stenciljs.com/docs/module-bundling`;
       const errorNode = symbol.valueDeclaration
-        ? symbol.valueDeclaration.modifiers[0]
+        ? symbol.valueDeclaration
         : symbol.declarations[0];
 
       augmentDiagnosticWithNode(config, err, errorNode);

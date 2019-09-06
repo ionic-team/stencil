@@ -10,6 +10,10 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
   if (sourceTarget !== 'es5' && isCore) {
     if (!isDebug) {
       opts.compress.passes = 3;
+      opts.compress.global_defs = {
+        supportsListenerOptions: true,
+        cssVarShim: false
+      };
       opts.compress.pure_funcs = ['getHostRef', ...opts.compress.pure_funcs];
     }
 
@@ -65,7 +69,6 @@ export const getTerserOptions = (sourceTarget: d.SourceTarget, isDebug: boolean)
       keep_fargs: false,
       passes: 2,
       pure_funcs: [
-        'console.log',
         'console.debug'
       ]
     };

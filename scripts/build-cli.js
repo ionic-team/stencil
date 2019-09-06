@@ -16,10 +16,13 @@ async function buildCli() {
     external: [
       'child_process',
       'crypto',
+      'events',
       'fs',
       'https',
       'os',
       'path',
+      'readline',
+      'util',
     ],
     plugins: [
       (() => {
@@ -35,7 +38,7 @@ async function buildCli() {
       rollupResolve({
         preferBuiltins: true
       }),
-      rollupCommonjs()
+      rollupCommonjs(),
     ],
     onwarn: (message) => {
       if (message.code === 'CIRCULAR_DEPENDENCY') return;

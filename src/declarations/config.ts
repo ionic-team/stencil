@@ -259,7 +259,7 @@ export interface NodeResolveConfig {
 
 
 export interface ConfigFlags {
-  task?: 'build' | 'docs' | 'help' | 'serve' | 'test';
+  task?: 'build' | 'docs' | 'help' | 'serve' | 'test' | 'g' | 'generate';
   args?: string[];
   knownArgs?: string[];
   unknownArgs?: string[];

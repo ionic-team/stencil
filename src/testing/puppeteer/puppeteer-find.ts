@@ -60,7 +60,7 @@ async function findWithText(page: pd.E2EPageInternal, rootHandle: puppeteer.Elem
   const jsHandle = await page.evaluateHandle((rootElm: HTMLElement, text: string, contains: string) => {
     let foundElm: any = null;
 
-    function checkContent(elm: HTMLElement) {
+    function checkContent(elm: Node) {
       if (!elm || foundElm) {
         return;
       }
@@ -74,13 +74,15 @@ async function findWithText(page: pd.E2EPageInternal, rootHandle: puppeteer.Elem
           foundElm = elm.parentElement;
           return;
         }
-      }
-
-      checkContent(elm.shadowRoot as any);
-
-      if (elm.childNodes) {
-        for (let i = 0; i < elm.childNodes.length; i++) {
-          checkContent(elm.childNodes[i] as any);
+      } else {
+        if (elm.nodeName === 'SCRIPT' || elm.nodeName === 'STYLE') {
+          return;
+        }
+        checkContent((elm as Element).shadowRoot);
+        if (elm.childNodes) {
+          for (let i = 0; i < elm.childNodes.length; i++) {
+            checkContent(elm.childNodes[i]);
+          }
         }
       }
     }

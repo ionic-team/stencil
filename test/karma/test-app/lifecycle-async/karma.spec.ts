@@ -25,7 +25,7 @@ describe('lifecycle-async', function() {
 
     const button = app.querySelector('button');
     button.click();
-    await waitForChanges(500);
+    await waitForChanges(750);
 
     loads = app.querySelectorAll('.lifecycle-loads-a li');
     expect(loads[0].textContent).toBe('componentWillLoad-a');

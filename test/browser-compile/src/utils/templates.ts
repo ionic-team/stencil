@@ -67,7 +67,7 @@ import { Component, Prop, h } from '@stencil/core';
 @Component({
   tag: 'my-button',
   shadow: true,
-  styles: ':host { display: block; padding: 40px; background: #ddd; } :host::before { content: "shadow :host"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: red; color: white; font-weight: bold; }'
+  styles: ':host { display: block; padding: 20px; background: #ddd; } :host::before { content: "shadow :host"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: red; color: white; font-weight: bold; }'
 })
 export class MyButton {
 
@@ -97,7 +97,7 @@ import { Component, Prop, h } from '@stencil/core';
 @Component({
   tag: 'my-button',
   scoped: true,
-  styles: ':host { display: block; padding: 40px; background: #ddd; } :host::before { content: "scoped :host"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: green; color: white; font-weight: bold; }'
+  styles: ':host { display: block; padding: 20px; background: #ddd; } :host::before { content: "scoped :host"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: green; color: white; font-weight: bold; }'
 })
 export class MyButton {
 
@@ -148,6 +148,36 @@ html: `
 });
 
 
+templates.set(`style-local-const.tsx`, {
+source: `
+
+import { Component, Prop, h } from '@stencil/core';
+const styleLocal = ':host { display: block; padding: 20px; background: #ddd; } :host::before { content: "styleLocal"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: maroon; color: white; font-weight: bold; }';
+
+@Component({
+  tag: 'my-button',
+  styles: styleLocal,
+  shadow: true
+})
+export class MyButton {
+
+  render() {
+    return (
+      <button>
+        <slot/>
+      </button>
+    );
+  }
+
+}
+
+`,
+html: `
+<my-button>Style Local Const</my-button>
+`
+});
+
+
 
 templates.set(`style-url.tsx`, {
 source: `
@@ -177,16 +207,52 @@ html: `
 });
 
 
-
 templates.set(`scoped-style-url.tsx`, {
+  source: `
+
+  import { Component, Prop, h } from '@stencil/core';
+
+  @Component({
+    tag: 'my-button',
+    scoped: true,
+    styleUrl: 'scoped-style-import.css'
+  })
+  export class MyButton {
+
+    render() {
+      return (
+        <button>
+          <slot/>
+        </button>
+      );
+    }
+
+  }
+
+  `,
+  html: `
+  <my-button>Scoped Style Url</my-button>
+  `
+  });
+
+
+
+templates.set(`shadow-modes.tsx`, {
 source: `
 
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop, h, setMode } from '@stencil/core';
+
+setMode(elm => {
+  return elm.getAttribute('mode');
+});
 
 @Component({
   tag: 'my-button',
-  scoped: true,
-  styleUrl: 'scoped-style-import.css'
+  shadow: true,
+  styleUrls: {
+    ios: 'ios.css',
+    md: 'md.css'
+  }
 })
 export class MyButton {
 
@@ -202,7 +268,45 @@ export class MyButton {
 
 `,
 html: `
-<my-button>Scoped Style Url</my-button>
+<my-button mode="ios">ios Shadow Url</my-button>
+<my-button mode="md">md Shadow Url</my-button>
+`
+});
+
+
+templates.set(`scoped-modes.tsx`, {
+source: `
+
+import { Component, Prop, h, setMode } from '@stencil/core';
+
+setMode(elm => {
+  return elm.getAttribute('mode');
+});
+
+@Component({
+  tag: 'my-button',
+  scoped: true,
+  styleUrls: {
+    ios: 'ios.css',
+    md: 'md.css'
+  }
+})
+export class MyButton {
+
+  render() {
+    return (
+      <button>
+        <slot/>
+      </button>
+    );
+  }
+
+}
+
+`,
+html: `
+<my-button mode="ios">ios Scoped Url</my-button>
+<my-button mode="md">md Scoped Url</my-button>
 `
 });
 

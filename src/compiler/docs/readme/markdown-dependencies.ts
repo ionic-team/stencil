@@ -1,4 +1,5 @@
 import * as d from '../../../declarations';
+import { normalizePath } from '@utils';
 
 export function depsToMarkdown(config: d.Config, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) {
   const content: string[] = [];
@@ -50,7 +51,7 @@ export function depsToMarkdown(config: d.Config, cmp: d.JsonDocsComponent, cmps:
 function getCmpLink(config: d.Config, from: d.JsonDocsComponent, to: string, cmps: d.JsonDocsComponent[]) {
   const destCmp = cmps.find(c => c.tag === to);
   if (destCmp) {
-    const cmpRelPath = config.sys.path.relative(from.dirPath, destCmp.dirPath);
+    const cmpRelPath = normalizePath(config.sys.path.relative(from.dirPath, destCmp.dirPath));
     return `[${to}](${cmpRelPath})`;
   }
   return to;

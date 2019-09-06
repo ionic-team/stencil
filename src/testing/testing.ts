@@ -38,8 +38,6 @@ export class Testing implements d.Testing {
     const env: d.E2EProcessEnv = process.env;
     const compiler = this.compiler;
     const config = this.config;
-    config.outputTargets = getOutputTargets(config);
-
     const msg: string[] = [];
 
     if (config.flags.e2e) {
@@ -149,6 +147,7 @@ function setupTestingConfig(config: d.Config) {
   config.devMode = true;
   config.validateTypes = false;
   config._isTesting = true;
+  config.buildDist = true;
 
   config.flags = config.flags || {};
   config.flags.serve = false;
@@ -157,12 +156,6 @@ function setupTestingConfig(config: d.Config) {
   return config;
 }
 
-
-function getOutputTargets(config: d.Config) {
-  return config.outputTargets.filter(o => {
-    return isOutputTargetWww(o) || isOutputTargetDistLazy(o);
-  });
-}
 
 
 function getAppUrl(config: d.Config, browserUrl: string) {

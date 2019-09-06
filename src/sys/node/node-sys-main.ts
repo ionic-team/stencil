@@ -270,10 +270,10 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('transpileToEs5', [cwd, input, inlineHelpers]);
   }
 
-  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+  validateTypes(compilerOptions: any, emitDtsFiles: boolean, collectionNames: string[], rootTsFiles: string[], isDevMode: boolean) {
     return this.sysWorker.run(
       'validateTypes',
-      [compilerOptions, emitDtsFiles, currentWorkingDir, collectionNames, rootTsFiles],
+      [compilerOptions, emitDtsFiles, collectionNames, rootTsFiles, isDevMode],
       { isLongRunningTask: true, workerKey: 'validateTypes' }
     );
   }

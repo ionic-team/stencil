@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, loadModule } from '@platform';
+import { consoleError, loadModule, styles } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { proxyComponent } from './proxy-component';
 import { scheduleUpdate } from './update-component';
@@ -78,19 +78,21 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       Cstr = elm.constructor as any;
     }
 
-    if (BUILD.style && !Cstr.$isStyleRegistered$ && Cstr.style) {
+    const scopeId = BUILD.mode ? getScopeId(cmpMeta.$tagName$, hostRef.$modeName$) : getScopeId(cmpMeta.$tagName$);
+
+    if (BUILD.style && !styles.has(scopeId) && Cstr.style) {
       // this component has styles but we haven't registered them yet
       let style = Cstr.style;
-      let scopeId = getScopeId(cmpMeta.$tagName$, hostRef.$modeName$);
 
-      const shadowCssPolyfill = (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim);
-      const runtimeScopedCss = (BUILD.runtimeScopeCss && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation);
+      if (BUILD.mode && typeof style !== 'string') {
+        style = style[hostRef.$modeName$];
+      }
 
-      if (!BUILD.hydrateServerSide && (shadowCssPolyfill || runtimeScopedCss)) {
+      if (!BUILD.hydrateServerSide && BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
         style = await import('../utils/shadow-css').then(m => m.scopeCss(style, scopeId, false));
       }
+
       registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation));
-      Cstr.$isStyleRegistered$ = true;
     }
   }
 
