@@ -121,12 +121,16 @@ export interface MatchScreenshotOptions {
 }
 
 
-export interface EventSpy extends AsyncIterableIterator<SerializedEvent> {
+export interface EventSpy {
   events: SerializedEvent[];
   eventName: string;
   firstEvent: SerializedEvent;
   lastEvent: SerializedEvent;
   length: number;
+  next(): Promise<{
+    done: boolean;
+    value: SerializedEvent;
+  }>;
 }
 
 
