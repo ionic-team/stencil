@@ -1,4 +1,14 @@
-import * as d from '.';
+import { BuildEvents } from './build-events';
+import { CopyResults, CopyTask } from './assets';
+import { Config } from './config';
+import { Diagnostic } from './diagnostics';
+import { FileSystem } from './file-system';
+import { FsWatcher } from './fs-watch';
+import { Logger } from './logger';
+import { OptimizeCssInput, OptimizeCssOutput } from './optimize-css';
+import { PrerenderRequest, PrerenderResults } from './prerender';
+import { TranspileResults, ValidateTypesResults } from './transpile';
+import { WorkerOptions } from './worker';
 
 
 export interface StencilSystem {
@@ -11,44 +21,44 @@ export interface StencilSystem {
     packageDir?: string;
     distDir?: string;
   };
-  copy?(copyTasks: Required<d.CopyTask>[], srcDir: string): Promise<d.CopyResults>;
+  copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
   color?: any;
   cloneDocument?(doc: Document): Document;
-  createFsWatcher?(config: d.Config, fs: d.FileSystem, events: d.BuildEvents): Promise<d.FsWatcher>;
+  createFsWatcher?(config: Config, fs: FileSystem, events: BuildEvents): Promise<FsWatcher>;
   createDocument?(html: string): Document;
   destroy?(): void;
   addDestroy?(fn: Function): void;
   details?: SystemDetails;
-  fs?: d.FileSystem;
+  fs?: FileSystem;
   generateContentHash?(content: string, length: number): Promise<string>;
-  getLatestCompilerVersion?(logger: d.Logger, forceCheck: boolean): Promise<string>;
+  getLatestCompilerVersion?(logger: Logger, forceCheck: boolean): Promise<string>;
   getClientPath?(staticName: string): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
   glob?(pattern: string, options: {
     cwd?: string;
     nodir?: boolean;
   }): Promise<string[]>;
-  initWorkers?(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number, logger: d.Logger): d.WorkerOptions;
-  lazyRequire?: d.LazyRequire;
-  loadConfigFile?(configPath: string, process?: any): d.Config;
+  initWorkers?(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number, logger: Logger): WorkerOptions;
+  lazyRequire?: LazyRequire;
+  loadConfigFile?(configPath: string, process?: any): Config;
   minifyJs?(input: string, opts?: any): Promise<{
     output: string;
     sourceMap?: any;
-    diagnostics?: d.Diagnostic[];
+    diagnostics?: Diagnostic[];
   }>;
   nextTick?(cb: Function): void;
   open?: (url: string, opts?: any) => Promise<void>;
-  optimizeCss?(inputOpts: d.OptimizeCssInput): Promise<d.OptimizeCssOutput>;
+  optimizeCss?(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
   path?: Path;
-  prerenderUrl?: (prerenderRequest: d.PrerenderRequest) => Promise<d.PrerenderResults>;
+  prerenderUrl?: (prerenderRequest: PrerenderRequest) => Promise<PrerenderResults>;
   resolveModule?(fromDir: string, moduleId: string, opts?: ResolveModuleOptions): string;
   rollup?: RollupInterface;
   scopeCss?: (cssText: string, scopeId: string, commentOriginalSelector: boolean) => Promise<string>;
   semver?: Semver;
   serializeNodeToHtml?(elm: Element | Document): string;
   storage?: Storage;
-  transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults>;
-  validateTypes?(compilerOptions: any, emitDtsFiles: boolean, collectionNames: string[], rootTsFiles: string[], isDevMode: boolean): Promise<d.ValidateTypesResults>;
+  transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<TranspileResults>;
+  validateTypes?(compilerOptions: any, emitDtsFiles: boolean, collectionNames: string[], rootTsFiles: string[], isDevMode: boolean): Promise<ValidateTypesResults>;
 }
 
 
@@ -81,7 +91,7 @@ export interface Semver {
 
 
 export interface LazyRequire {
-  ensure(logger: d.Logger, fromDir: string, moduleIds: string[]): Promise<void>;
+  ensure(logger: Logger, fromDir: string, moduleIds: string[]): Promise<void>;
   require(moduleId: string): any;
   getModulePath(moduleId: string): string;
 }

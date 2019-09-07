@@ -1,4 +1,4 @@
-import * as d from '.';
+import { ModeStyles } from './style';
 
 
 declare type CustomMethodDecorator<T> = (target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
@@ -37,7 +37,7 @@ export interface ComponentOptions {
   /**
    * Similar as `styleUrl` but allows to specify different stylesheets for different modes.
    */
-  styleUrls?: string[] | d.ModeStyles;
+  styleUrls?: string[] | ModeStyles;
 
   /**
    * String that contains inlined CSS instead of using an external stylesheet.

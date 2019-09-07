@@ -1,4 +1,5 @@
-import * as d from '.';
+import { Diagnostic } from './diagnostics';
+
 
 export interface CompileOptions {
   file?: string;
@@ -9,11 +10,11 @@ export interface CompileOptions {
   script?: CompileScript;
   style?: 'static' | string | undefined;
   type?: StencilDataType;
-  data?: d.StencilComponentData;
+  data?: StencilComponentData;
 }
 
 export interface CompileResults {
-  diagnostics: d.Diagnostic[];
+  diagnostics: Diagnostic[];
   code: string;
   map: any;
   inputFilePath: string;

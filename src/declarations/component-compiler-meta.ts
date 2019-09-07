@@ -1,4 +1,5 @@
-import * as d from '.';
+import { StyleCompiler } from './style';
+import { ListenTargetOptions } from './decorators';
 
 /** Must be serializable to JSON!! */
 export interface ComponentCompilerFeatures {
@@ -71,7 +72,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   sourceFilePath: string;
   states: ComponentCompilerState[];
   styleDocs: CompilerStyleDoc[];
-  styles: d.StyleCompiler[];
+  styles: StyleCompiler[];
   tagName: string;
   internal: boolean;
   legacyConnect: ComponentCompilerLegacyConnect[];
@@ -161,7 +162,7 @@ export interface ComponentCompilerListener {
   method: string;
   capture: boolean;
   passive: boolean;
-  target: d.ListenTargetOptions | undefined;
+  target: ListenTargetOptions | undefined;
 }
 
 export interface ComponentCompilerStaticMethod {
@@ -215,7 +216,7 @@ export interface CompilerAssetDir {
 export interface ComponentCompilerData {
   exportLine: string;
   filePath: string;
-  cmp: d.ComponentCompilerMeta;
+  cmp: ComponentCompilerMeta;
   uniqueComponentClassName?: string;
   importLine?: string;
 }

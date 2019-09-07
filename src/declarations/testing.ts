@@ -1,4 +1,4 @@
-import * as d from '.';
+import { Build } from './build-conditionals';
 
 declare global {
   namespace jest {
@@ -525,7 +525,7 @@ export interface SpecPage {
    */
   win: Window;
 
-  build: d.Build;
+  build: Build;
   flushLoadModule: (bundleId?: string) => Promise<any>;
   flushQueue: () => Promise<any>;
   styles: Map<string, string>;

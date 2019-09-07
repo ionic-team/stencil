@@ -1,24 +1,24 @@
-import * as d from '.';
+import { Logger } from './logger';
 
 
 export interface ScreenshotConnector {
-  initBuild(opts: d.ScreenshotConnectorOptions): Promise<void>;
-  completeBuild(masterBuild: d.ScreenshotBuild): Promise<ScreenshotBuildResults>;
-  getMasterBuild(): Promise<d.ScreenshotBuild>;
+  initBuild(opts: ScreenshotConnectorOptions): Promise<void>;
+  completeBuild(masterBuild: ScreenshotBuild): Promise<ScreenshotBuildResults>;
+  getMasterBuild(): Promise<ScreenshotBuild>;
   pullMasterBuild(): Promise<void>;
-  publishBuild(buildResults: d.ScreenshotBuildResults): Promise<d.ScreenshotBuildResults>;
-  getScreenshotCache(): Promise<d.ScreenshotCache>;
-  updateScreenshotCache(screenshotCache: d.ScreenshotCache, buildResults: d.ScreenshotBuildResults): Promise<d.ScreenshotCache>;
-  generateJsonpDataUris(build: d.ScreenshotBuild): Promise<void>;
-  sortScreenshots(screenshots: d.Screenshot[]): d.Screenshot[];
-  toJson(masterBuild: d.ScreenshotBuild, screenshotCache: d.ScreenshotCache): string;
+  publishBuild(buildResults: ScreenshotBuildResults): Promise<ScreenshotBuildResults>;
+  getScreenshotCache(): Promise<ScreenshotCache>;
+  updateScreenshotCache(screenshotCache: ScreenshotCache, buildResults: ScreenshotBuildResults): Promise<ScreenshotCache>;
+  generateJsonpDataUris(build: ScreenshotBuild): Promise<void>;
+  sortScreenshots(screenshots: Screenshot[]): Screenshot[];
+  toJson(masterBuild: ScreenshotBuild, screenshotCache: ScreenshotCache): string;
 }
 
 
 export interface ScreenshotBuildResults {
   appNamespace: string;
-  masterBuild: d.ScreenshotBuild;
-  currentBuild: d.ScreenshotBuild;
+  masterBuild: ScreenshotBuild;
+  currentBuild: ScreenshotBuild;
   compare: ScreenshotCompareResults;
 }
 
@@ -42,7 +42,7 @@ export interface ScreenshotCompareResults {
   timestamp: number;
   url: string;
   appNamespace: string;
-  diffs: d.ScreenshotDiff[];
+  diffs: ScreenshotDiff[];
 }
 
 
@@ -54,7 +54,7 @@ export interface ScreenshotConnectorOptions {
   previewUrl?: string;
   appNamespace: string;
   buildTimestamp: number;
-  logger: d.Logger;
+  logger: Logger;
   rootDir: string;
   cacheDir: string;
   packageDir: string;

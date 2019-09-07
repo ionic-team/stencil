@@ -1,4 +1,4 @@
-import * as d from '.';
+import { Diagnostic } from './diagnostics';
 
 
 export interface OptimizeCssInput {
@@ -12,5 +12,5 @@ export interface OptimizeCssInput {
 
 export interface OptimizeCssOutput {
   css: string;
-  diagnostics?: d.Diagnostic[];
+  diagnostics?: Diagnostic[];
 }
