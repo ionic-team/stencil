@@ -27,8 +27,10 @@ async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, 
   ];
 
   rollupOutput.output.forEach(output => {
-    const filePath = config.sys.path.join(hydrateAppDirPath, output.fileName);
-    writePromises.push(compilerCtx.fs.writeFile(filePath, output.code));
+    if (output.type === 'chunk') {
+      const filePath = config.sys.path.join(hydrateAppDirPath, output.fileName);
+      writePromises.push(compilerCtx.fs.writeFile(filePath, output.code));
+    }
   });
 
   // always remember a path to the hydrate app that the prerendering may need later on
