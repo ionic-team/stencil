@@ -28,7 +28,7 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, build
       .filter(cmp => isDocsPublic(cmp.docs) && !cmp.isCollectionDependency)
       .map(cmp => ({
         dirPath,
-        filePath,
+        filePath: config.sys.path.relative(config.rootDir, filePath),
         fileName: config.sys.path.basename(filePath),
         readmePath,
         usagesDir,
@@ -188,19 +188,20 @@ function getDeprecation(tags: d.JsonDocsTag[]) {
 }
 
 function getSlots(tags: d.JsonDocsTag[]): d.JsonDocsSlot[] {
+  return sortBy(getNameText('slot', tags)
+    .map(([name, docs]) => ({ name, docs }))
+  , a => a.name);
+}
+
+export function getNameText(name: string, tags: d.JsonDocsTag[]) {
   return tags
-    .filter(tag => tag.name === 'slot' && tag.text)
+    .filter(tag => tag.name === name && tag.text)
     .map(({text}) => {
       const [namePart, ...rest] = (' ' + text).split(' - ');
-      return {
-        name: namePart.trim(),
-        docs: rest.join(' - ').trim()
-      };
-    })
-    .sort((a, b) => {
-      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-      return 0;
+      return [
+        namePart.trim(),
+        rest.join(' - ').trim()
+      ];
     });
 }
 

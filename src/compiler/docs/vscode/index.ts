@@ -1,4 +1,5 @@
 import * as d from '../../../declarations';
+import { getNameText } from '../generate-doc-data';
 import { isOutputTargetDocsVscode } from '../../output-targets/output-utils';
 
 export async function generateVscodeDocs(compilerCtx: d.CompilerCtx, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) {
@@ -7,18 +8,37 @@ export async function generateVscodeDocs(compilerCtx: d.CompilerCtx, docsData: d
     return;
   }
 
-  const json = {
-    'tags': docsData.components.map(cmp => ({
-      'name': cmp.tag,
-      'description': cmp.docs,
-      'attributes': cmp.props.filter(p => p.attr).map(serializeAttribute)
-    }))
-  };
-  const jsonContent = JSON.stringify(json, null, 2);
-
   await Promise.all(vsCodeOutputTargets.map(async outputTarget => {
+    const json = {
+      'version': 1.1,
+      'tags': docsData.components.map(cmp => ({
+        'name': cmp.tag,
+        'description': {
+          'kind': 'markdown',
+          'value': cmp.docs,
+        },
+        'attributes': cmp.props.filter(p => p.attr).map(serializeAttribute),
+        'references': getReferences(cmp, outputTarget.sourceCodeBaseUrl)
+      }))
+    };
+    const jsonContent = JSON.stringify(json, null, 2);
     await compilerCtx.fs.writeFile(outputTarget.file, jsonContent);
   }));
+}
+
+function getReferences(cmp: d.JsonDocsComponent, repoBaseUrl: string) {
+  const references = getNameText('reference', cmp.docsTags)
+    .map(([name, url]) => ({ name, url }));
+  if (repoBaseUrl) {
+    references.push({
+      name: 'Source code',
+      url: repoBaseUrl + cmp.filePath
+    });
+  }
+  if (references.length > 0) {
+    return references;
+  }
+  return undefined;
 }
 
 function serializeAttribute(prop: d.JsonDocsProp) {
@@ -35,6 +55,5 @@ function serializeAttribute(prop: d.JsonDocsProp) {
       }));
     }
   }
+  return attribute;
 }
-
-export const WEB_COMPONENTS_JSON_FILE_NAME = 'web-components.json';
