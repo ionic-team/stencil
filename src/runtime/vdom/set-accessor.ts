@@ -16,7 +16,8 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   if (oldValue === newValue) {
     return;
   }
-  const isProp = isMemberInElement(elm, memberName);
+  let isProp = isMemberInElement(elm, memberName);
+  let ln = memberName.toLowerCase();
   if (BUILD.vdomClass && memberName === 'class') {
     const classList = elm.classList;
     parseClassList(oldValue).forEach(cls => classList.remove(cls));
@@ -55,7 +56,6 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     }
 
   } else if (BUILD.vdomListener && !isProp && memberName[0] === 'o' && memberName[1] === 'n') {
-    const ln = memberName.toLowerCase();
     // Event Handlers
     // so if the member name starts with "on" and the 3rd characters is
     // a capital letter, and it's not already a member on the element,
@@ -94,6 +94,17 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   } else {
     // Set property if it exists and it's not a SVG
     const isComplex = isComplexType(newValue);
+
+    /**
+     * Need to manually update attribute if:
+     * - memberName is not an attribute
+     * - if we are rendering the host element in order to reflect attribute
+     * - if it's a SVG, since properties might not work in <svg>
+     * - if the newValue is null/undefined or 'false'.
+     */
+    const namespace = BUILD.svg && isSvg && (ln !== (ln = ln.replace(/^xlink\:?/, '')))
+      ? XLINK_NS
+      : null;
     if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {
         if (!elm.tagName.includes('-')) {
@@ -109,28 +120,11 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       } catch (e) {}
     }
 
-
-    /**
-     * Need to manually update attribute if:
-     * - memberName is not an attribute
-     * - if we are rendering the host element in order to reflect attribute
-     * - if it's a SVG, since properties might not work in <svg>
-     * - if the newValue is null/undefined or 'false'.
-     */
-    const isXlinkNs = BUILD.svg && isSvg && (memberName !== (memberName = memberName.replace(/^xlink\:?/, ''))) ? true : false;
     if (newValue == null || newValue === false) {
-      if (isXlinkNs) {
-        elm.removeAttributeNS(XLINK_NS, memberName);
-      } else {
-        elm.removeAttribute(memberName);
-      }
+      elm.removeAttributeNS(namespace, ln);
     } else if ((!isProp || (flags & VNODE_FLAGS.isHost) || isSvg) && !isComplex) {
       newValue = newValue === true ? '' : newValue.toString();
-      if (isXlinkNs) {
-        elm.setAttributeNS(XLINK_NS, memberName, newValue);
-      } else {
-        elm.setAttribute(memberName, newValue);
-      }
+      elm.setAttributeNS(namespace, ln, newValue);
     }
   }
 };
