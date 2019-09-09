@@ -8,7 +8,7 @@
  */
 
 import { BUILD } from '@build-conditionals';
-import { plt } from '@platform';
+import { isMemberInElement, plt } from '@platform';
 import { isComplexType } from '@utils';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
@@ -16,8 +16,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   if (oldValue === newValue) {
     return;
   }
-  const ln = memberName.toLowerCase();
-  const isProp = memberName in elm;
+  const isProp = isMemberInElement(elm, memberName);
   if (BUILD.vdomClass && memberName === 'class') {
     const classList = elm.classList;
     parseClassList(oldValue).forEach(cls => classList.remove(cls));
@@ -56,6 +55,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     }
 
   } else if (BUILD.vdomListener && !isProp && memberName[0] === 'o' && memberName[1] === 'n') {
+    const ln = memberName.toLowerCase();
     // Event Handlers
     // so if the member name starts with "on" and the 3rd characters is
     // a capital letter, and it's not already a member on the element,
@@ -69,7 +69,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       // <my-cmp on-ionChange> // listens for "ionChange"
       // <my-cmp on-EVENTS> // listens for "EVENTS"
       memberName = memberName.substr(3);
-    } else if (ln in elm) {
+    } else if (isMemberInElement(elm, ln)) {
       // standard event
       // the JSX attribute could have been "onMouseOver" and the
       // member name "onmouseover" is on the element's prototype
@@ -120,14 +120,14 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     const isXlinkNs = BUILD.svg && isSvg && (memberName !== (memberName = memberName.replace(/^xlink\:?/, ''))) ? true : false;
     if (newValue == null || newValue === false) {
       if (isXlinkNs) {
-        elm.removeAttributeNS(XLINK_NS, ln);
+        elm.removeAttributeNS(XLINK_NS, memberName);
       } else {
         elm.removeAttribute(memberName);
       }
     } else if ((!isProp || (flags & VNODE_FLAGS.isHost) || isSvg) && !isComplex) {
       newValue = newValue === true ? '' : newValue.toString();
       if (isXlinkNs) {
-        elm.setAttributeNS(XLINK_NS, ln, newValue);
+        elm.setAttributeNS(XLINK_NS, memberName, newValue);
       } else {
         elm.setAttribute(memberName, newValue);
       }
