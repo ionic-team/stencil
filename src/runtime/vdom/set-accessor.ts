@@ -8,18 +8,21 @@
  */
 
 import { BUILD } from '@build-conditionals';
-import { isMemberInElement, plt } from '@platform';
-import { isComplexType, toLowerCase } from '@utils';
+import { plt } from '@platform';
+import { isComplexType } from '@utils';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
 export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, flags: number) => {
   if (oldValue === newValue) {
     return;
   }
+  const ln = memberName.toLowerCase();
+  const isProp = memberName in elm;
   if (BUILD.vdomClass && memberName === 'class') {
     const classList = elm.classList;
     parseClassList(oldValue).forEach(cls => classList.remove(cls));
     parseClassList(newValue).forEach(cls => classList.add(cls));
+
   } else if (BUILD.vdomStyle && memberName === 'style') {
     // update style attribute, css properties and values
     if (BUILD.updatable) {
@@ -52,18 +55,26 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       newValue(elm);
     }
 
-  } else if (BUILD.vdomListener && memberName.startsWith('on') && !isMemberInElement(elm, memberName)) {
+  } else if (BUILD.vdomListener && !isProp && memberName[0] === 'o' && memberName[1] === 'n') {
     // Event Handlers
     // so if the member name starts with "on" and the 3rd characters is
     // a capital letter, and it's not already a member on the element,
     // then we're assuming it's an event listener
-
-    if (isMemberInElement(elm, toLowerCase(memberName))) {
+    if (memberName[2] === '-') {
+      // on- prefixed events
+      // allows to be explicit about the dom event to listen without any magic
+      // under the hood:
+      // <my-cmp on-click> // listens for "click"
+      // <my-cmp on-Click> // listens for "Click"
+      // <my-cmp on-ionChange> // listens for "ionChange"
+      // <my-cmp on-EVENTS> // listens for "EVENTS"
+      memberName = memberName.substr(3);
+    } else if (ln in elm) {
       // standard event
       // the JSX attribute could have been "onMouseOver" and the
       // member name "onmouseover" is on the element's prototype
       // so let's add the listener "mouseover", which is all lowercased
-      memberName = toLowerCase(memberName.substring(2));
+      memberName = ln.substr(2);
 
     } else {
       // custom event
@@ -71,7 +82,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       // so let's trim off the "on" prefix and lowercase the first character
       // and add the listener "myCustomEvent"
       // except for the first character, we keep the event name case
-      memberName = toLowerCase(memberName[2]) + memberName.substring(3);
+      memberName = ln[2] + memberName.substr(3);
     }
     if (oldValue) {
       plt.rel(elm, memberName, oldValue, false);
@@ -82,7 +93,6 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
 
   } else {
     // Set property if it exists and it's not a SVG
-    const isProp = isMemberInElement(elm, memberName);
     const isComplex = isComplexType(newValue);
     if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {
@@ -110,14 +120,14 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     const isXlinkNs = BUILD.svg && isSvg && (memberName !== (memberName = memberName.replace(/^xlink\:?/, ''))) ? true : false;
     if (newValue == null || newValue === false) {
       if (isXlinkNs) {
-        elm.removeAttributeNS(XLINK_NS, toLowerCase(memberName));
+        elm.removeAttributeNS(XLINK_NS, ln);
       } else {
         elm.removeAttribute(memberName);
       }
     } else if ((!isProp || (flags & VNODE_FLAGS.isHost) || isSvg) && !isComplex) {
       newValue = newValue === true ? '' : newValue.toString();
       if (isXlinkNs) {
-        elm.setAttributeNS(XLINK_NS, toLowerCase(memberName), newValue);
+        elm.setAttributeNS(XLINK_NS, ln, newValue);
       } else {
         elm.setAttribute(memberName, newValue);
       }
