@@ -123,7 +123,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     if (newValue == null || newValue === false) {
       elm.removeAttributeNS(namespace, ln);
     } else if ((!isProp || (flags & VNODE_FLAGS.isHost) || isSvg) && !isComplex) {
-      newValue = newValue === true ? '' : newValue.toString();
+      newValue = newValue === true ? '' : newValue;
       elm.setAttributeNS(namespace, ln, newValue);
     }
   }
