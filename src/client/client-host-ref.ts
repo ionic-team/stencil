@@ -27,5 +27,4 @@ export const registerHost = (elm: d.HostElement) => {
     });
   }
 };
-
 export const isMemberInElement = (elm: any, memberName: string) => memberName in elm;

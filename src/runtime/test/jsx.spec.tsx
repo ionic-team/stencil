@@ -1,5 +1,6 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop, h, Host, State } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+import { CmpA } from 'fixtures/cmp-a';
 
 
 describe('jsx', () => {
@@ -33,4 +34,81 @@ describe('jsx', () => {
       </cmp-a>
     `);
   });
+
+  describe('event', () => {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      @State() lastEvent: any;
+      render() {
+        return (
+          <Host
+            onClick={() => this.lastEvent = 'onClick'}
+            on-Click={() => this.lastEvent = 'on-Click'}
+            on-scroll={() => this.lastEvent = 'on-scroll'}
+            onIonChange={() => this.lastEvent = 'onIonChange'}
+            on-IonChange={() => this.lastEvent = 'on-IonChange'}
+            on-ALLCAPS={() => this.lastEvent = 'on-ALLCAPS'}
+          >{this.lastEvent}</Host>
+        );
+      }
+    }
+
+    it('click', async () => {
+      const { root, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`
+      });
+      root.dispatchEvent(new CustomEvent('click'));
+      await waitForChanges();
+      expect(root.textContent).toBe('onClick');
+    });
+
+    it('Click', async () => {
+      const { root, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`
+      });
+      root.dispatchEvent(new CustomEvent('Click'));
+      await waitForChanges();
+      expect(root.textContent).toBe('on-Click');
+    });
+
+    it('scroll', async () => {
+      const { root, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`
+      });
+      root.dispatchEvent(new CustomEvent('scroll'));
+      await waitForChanges();
+      expect(root.textContent).toBe('on-scroll');
+    });
+    it('ionChange', async () => {
+      const { root, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`
+      });
+      root.dispatchEvent(new CustomEvent('ionChange'));
+      await waitForChanges();
+      expect(root.textContent).toBe('onIonChange');
+    });
+    it('IonChange', async () => {
+      const { root, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`
+      });
+      root.dispatchEvent(new CustomEvent('IonChange'));
+      await waitForChanges();
+      expect(root.textContent).toBe('on-IonChange');
+    });
+    it('ALLCAPS', async () => {
+      const { root, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`
+      });
+      root.dispatchEvent(new CustomEvent('ALLCAPS'));
+      await waitForChanges();
+      expect(root.textContent).toBe('on-ALLCAPS');
+    });
+  });
+
 });

@@ -2,7 +2,6 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from './runtime-constants';
 import { doc, plt } from '@platform';
-import { toLowerCase } from '@utils';
 
 
 export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string, hostId: string, hostRef: d.HostRef) => {
@@ -86,7 +85,7 @@ const clientHydrate = (
           $nodeId$: childIdSplt[1],
           $depth$: childIdSplt[2],
           $index$: childIdSplt[3],
-          $tag$: toLowerCase(node.tagName),
+          $tag$: node.tagName.toLowerCase(),
           $elm$: node
         };
 

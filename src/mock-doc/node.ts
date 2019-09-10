@@ -473,20 +473,20 @@ export class MockElement extends MockNode {
       if (attr != null) {
         if (checkAttrChanged === true) {
           const oldValue = attr.value;
-          attr.value = String(value);
+          attr.value = value;
 
           if (oldValue !== attr.value) {
             attributeChanged(this, attr.name, oldValue, attr.value);
           }
         } else {
-          attr.value = String(value);
+          attr.value = value;
         }
 
       } else {
         if (attributes.caseInsensitive) {
           attrName = attrName.toLowerCase();
         }
-        attr = new MockAttr(attrName, String(value));
+        attr = new MockAttr(attrName, value);
         attributes.items.push(attr);
 
         if (checkAttrChanged === true) {
@@ -504,13 +504,13 @@ export class MockElement extends MockNode {
     if (attr != null) {
       if (checkAttrChanged === true) {
         const oldValue = attr.value;
-        attr.value = String(value);
+        attr.value = value;
 
         if (oldValue !== attr.value) {
           attributeChanged(this, attr.name, oldValue, attr.value);
         }
       } else {
-        attr.value = String(value);
+        attr.value = value;
       }
 
     } else {

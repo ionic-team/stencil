@@ -153,11 +153,11 @@ export class MockDocument extends MockHTMLElement {
   }
 
   createAttribute(attrName: string) {
-    return new MockAttr(attrName.toLowerCase());
+    return new MockAttr(attrName.toLowerCase(), '');
   }
 
   createAttributeNS(namespaceURI: string, attrName: string) {
-    return new MockAttr(attrName, undefined, namespaceURI);
+    return new MockAttr(attrName, '', namespaceURI);
   }
 
   createElement(tagName: string) {

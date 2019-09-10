@@ -233,6 +233,25 @@ describe('element', () => {
       expect(element).toEqualHtml(`<div prop1=\"null\" prop2=\"undefined\" prop3=\"0\" prop4=\"1\" prop5=\"hola\" prop6></div>`);
     });
 
+    it('should cast attributeNS values to string', () => {
+      const element = new MockHTMLElement(doc, 'div');
+      element.setAttributeNS(null, 'prop1', null);
+      element.setAttributeNS(null, 'prop2', undefined);
+      element.setAttributeNS(null, 'prop3', 0);
+      element.setAttributeNS(null, 'prop4', 1);
+      element.setAttributeNS(null, 'prop5', 'hola');
+      element.setAttributeNS(null, 'prop6', '');
+
+      expect(element.getAttribute('prop1')).toBe('null');
+      expect(element.getAttribute('prop2')).toBe('undefined');
+      expect(element.getAttribute('prop3')).toBe('0');
+      expect(element.getAttribute('prop4')).toBe('1');
+      expect(element.getAttribute('prop5')).toBe('hola');
+      expect(element.getAttribute('prop6')).toBe('');
+
+      expect(element).toEqualHtml(`<div prop1=\"null\" prop2=\"undefined\" prop3=\"0\" prop4=\"1\" prop5=\"hola\" prop6></div>`);
+    });
+
     it('attributes are case insensible in HTMLElement', () => {
       const element = new MockHTMLElement(doc, 'div');
 
