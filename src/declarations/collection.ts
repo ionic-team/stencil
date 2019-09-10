@@ -1,4 +1,4 @@
-import * as d from '.';
+import { ModeBundleIds } from './runtime';
 
 
 /** OLD WAY */
@@ -37,7 +37,7 @@ export interface AppRegistry {
 
 export interface AppRegistryComponents {
   [tagName: string]: {
-    bundleIds: d.ModeBundleIds,
+    bundleIds: ModeBundleIds,
     encapsulation?: 'shadow' | 'scoped';
   };
 }

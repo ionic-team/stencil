@@ -1,10 +1,10 @@
-import * as d from '.';
+import { ComponentCompilerMeta } from './component-compiler-meta';
 
 
 export interface EntryModule {
   entryKey?: string;
   dependencies?: string[];
-  cmps: d.ComponentCompilerMeta[];
+  cmps: ComponentCompilerMeta[];
   modeNames?: string[];
   entryBundles?: EntryBundle[];
 }

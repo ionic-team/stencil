@@ -105,9 +105,9 @@ export class MockAttr {
   private _value: string;
   private _namespaceURI: string;
 
-  constructor(attrName: string, attrValue = '', namespaceURI: string = null) {
+  constructor(attrName: string, attrValue: string, namespaceURI: string = null) {
     this._name = attrName;
-    this._value = String(attrValue || '');
+    this._value = String(attrValue);
     this._namespaceURI = namespaceURI;
   }
 
@@ -122,7 +122,7 @@ export class MockAttr {
     return this._value;
   }
   set value(value) {
-    this._value = String(value || '');
+    this._value = String(value);
   }
 
   get nodeName() {
@@ -136,7 +136,7 @@ export class MockAttr {
     return this._value;
   }
   set nodeValue(value) {
-    this._value = String(value || '');
+    this._value = String(value);
   }
 
   get namespaceURI() {

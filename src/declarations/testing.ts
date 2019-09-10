@@ -1,4 +1,4 @@
-import * as d from '.';
+import { Build } from './build-conditionals';
 
 declare global {
   namespace jest {
@@ -121,12 +121,16 @@ export interface MatchScreenshotOptions {
 }
 
 
-export interface EventSpy extends AsyncIterableIterator<SerializedEvent> {
+export interface EventSpy {
   events: SerializedEvent[];
   eventName: string;
   firstEvent: SerializedEvent;
   lastEvent: SerializedEvent;
   length: number;
+  next(): Promise<{
+    done: boolean;
+    value: SerializedEvent;
+  }>;
 }
 
 
@@ -521,7 +525,7 @@ export interface SpecPage {
    */
   win: Window;
 
-  build: d.Build;
+  build: Build;
   flushLoadModule: (bundleId?: string) => Promise<any>;
   flushQueue: () => Promise<any>;
   styles: Map<string, string>;

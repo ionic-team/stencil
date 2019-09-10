@@ -1,4 +1,4 @@
-import * as d from '.';
+import { ComponentCompilerMeta } from './component-compiler-meta';
 
 
 export type ModuleMap = Map<string, Module>;
@@ -8,7 +8,7 @@ export type ModuleMap = Map<string, Module>;
  * cannot use Map or Set
  */
 export interface Module {
-  cmps: d.ComponentCompilerMeta[];
+  cmps: ComponentCompilerMeta[];
   coreRuntimeApis: string[];
   collectionName: string;
   dtsFilePath: string;

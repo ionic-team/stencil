@@ -1,4 +1,6 @@
-import * as d from '.';
+import { Build } from './build-conditionals';
+import { Diagnostic } from './diagnostics';
+import { Module } from './module';
 import ts from 'typescript';
 
 
@@ -6,14 +8,14 @@ export interface TranspileResults {
   sourceFilePath: string;
   code: string;
   map: any;
-  diagnostics: d.Diagnostic[];
-  moduleFile: d.Module;
-  build: d.Build;
+  diagnostics: Diagnostic[];
+  moduleFile: Module;
+  build: Build;
 }
 
 
 export interface ValidateTypesResults {
-  diagnostics: d.Diagnostic[];
+  diagnostics: Diagnostic[];
   dirPaths: string[];
   filePaths: string[];
 }

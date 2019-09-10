@@ -72,10 +72,6 @@ export class EventSpy implements d.EventSpy {
     return this.events[this.events.length - 1] || null;
   }
 
-  [Symbol.asyncIterator]() {
-    return this;
-  }
-
   next() {
     const cursor = this.cursor;
     this.cursor++;

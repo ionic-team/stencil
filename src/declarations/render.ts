@@ -1,11 +1,11 @@
-import * as d from '.';
+import { HostElement } from './host-element';
 
 
 /**
  * Generic node that represents all of the
  * different types of nodes we'd see when rendering
  */
-export interface RenderNode extends d.HostElement {
+export interface RenderNode extends HostElement {
 
   /**
    * Shadow root's host

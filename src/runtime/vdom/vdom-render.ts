@@ -8,7 +8,7 @@
  */
 import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
-import { CMP_FLAGS, SVG_NS, isDef, toLowerCase } from '@utils';
+import { CMP_FLAGS, SVG_NS, isDef } from '@utils';
 import { consoleError, doc, plt, supportsShadowDom } from '@platform';
 import { h, isHost } from './h';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
@@ -67,7 +67,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
   } else if (BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotReference) {
     // create a slot reference node
-    newVNode.$elm$ = (BUILD.isDebug || BUILD.hydrateServerSide) ? doc.createComment(`slot-reference:${hostTagName}`) : doc.createTextNode('') as any;
+    newVNode.$elm$ = (BUILD.isDebug || BUILD.hydrateServerSide) ? doc.createComment(`slot-reference:${hostTagName.toLowerCase()}`) : doc.createTextNode('') as any;
 
   } else {
     // create element
@@ -184,7 +184,7 @@ const addVnodes = (
 ) => {
   let containerElm = ((BUILD.slotRelocation && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm) as any;
   let childNode: Node;
-  if (BUILD.shadowDom && (containerElm as any).shadowRoot && toLowerCase(containerElm.tagName) === hostTagName) {
+  if (BUILD.shadowDom && (containerElm as any).shadowRoot && containerElm.tagName === hostTagName) {
     containerElm = (containerElm as any).shadowRoot;
   }
 
@@ -568,11 +568,11 @@ interface RelocateNode {
 }
 
 export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: d.VNode | d.VNode[]) => {
-  hostTagName = toLowerCase(hostElm.tagName);
+  hostTagName = hostElm.tagName;
   // <Host> runtime check
   if (BUILD.isDev && Array.isArray(renderFnResults) && renderFnResults.some(isHost)) {
     throw new Error(`The <Host> must be the single root component.
-Looks like the render() function of "${hostTagName}" is returning an array that contains the <Host>.
+Looks like the render() function of "${hostTagName.toLowerCase()}" is returning an array that contains the <Host>.
 
 The render() function should look like this instead:
 

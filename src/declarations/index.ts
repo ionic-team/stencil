@@ -14,7 +14,6 @@ export * from './component-constructor';
 export * from './component-interfaces';
 export * from './config';
 export * from './decorators';
-export * from './dev-inspector';
 export * from './dev-server';
 export * from './diagnostics';
 export * from './docs';

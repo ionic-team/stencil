@@ -1,4 +1,5 @@
-import * as d from '.';
+import { Config } from './config';
+import { Logger } from './logger';
 
 
 export interface ServerConfigInput {
@@ -8,8 +9,8 @@ export interface ServerConfigInput {
 
 
 export interface ServerConfigOutput {
-  config: d.Config;
-  logger: d.Logger;
+  config: Config;
+  logger: Logger;
   wwwDir: string;
   destroy?: () => void;
 }
@@ -21,6 +22,6 @@ export interface ExpressApp {
 
 
 export interface MiddlewareConfig {
-  config: string | d.Config;
+  config: string | Config;
   destroy?: () => void;
 }

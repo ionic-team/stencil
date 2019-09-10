@@ -37,6 +37,13 @@ describe('attributes', () => {
     expect(hostElm.getAttributeNS(XLINK_NS, 'href')).toEqual('#foo');
   });
 
+
+  it('are set correctly when namespaced (2)', () => {
+    const vnode1 = h('svg', { 'xlinkHref': '#foo' });
+    patch(vnode0, vnode1);
+    expect(hostElm.getAttributeNS(XLINK_NS, 'href')).toEqual('#foo');
+  });
+
   it('should not touch class nor id fields', () => {
     hostElm = document.createElement('div');
     hostElm.id = 'myId';

@@ -1,11 +1,11 @@
-import * as d from '.';
+import { Module } from './module';
 
 
 export interface CollectionCompilerMeta {
   collectionName?: string;
   moduleDir?: string;
-  moduleFiles?: d.Module[];
-  global?: d.Module;
+  moduleFiles?: Module[];
+  global?: Module;
   compiler?: CollectionCompilerVersion;
   isInitialized?: boolean;
   hasExports?: boolean;

@@ -1,4 +1,4 @@
-import * as d from '.';
+import { RenderNode } from './render';
 
 
 export interface HostElement extends HTMLElement {
@@ -23,7 +23,7 @@ export interface HostElement extends HTMLElement {
    * host element's original content. This comment is used to
    * always represent where host element's light dom is.
    */
-  ['s-cr']?: d.RenderNode;
+  ['s-cr']?: RenderNode;
 
   /**
    * Is Active Loading:

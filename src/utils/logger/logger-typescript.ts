@@ -92,7 +92,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
     language: 'typescript',
     header: 'TypeScript',
     code: tsDiagnostic.code.toString(),
-    messageText: formatMessageText(tsDiagnostic),
+    messageText: flattenDiagnosticMessageText(tsDiagnostic, tsDiagnostic.messageText),
     relFilePath: null,
     absFilePath: null,
     lines: []
@@ -157,11 +157,11 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
 };
 
 
-const formatMessageText = (tsDiagnostic: ts.Diagnostic) => {
-  let diagnosticChain = tsDiagnostic.messageText;
-
-  if (typeof diagnosticChain === 'string') {
-    return diagnosticChain;
+const flattenDiagnosticMessageText = (tsDiagnostic: ts.Diagnostic, diag: string | ts.DiagnosticMessageChain | undefined) => {
+  if (typeof diag === 'string') {
+    return diag;
+  } else if (diag === undefined) {
+    return '';
   }
 
   const ignoreCodes: number[] = [];
@@ -171,13 +171,13 @@ const formatMessageText = (tsDiagnostic: ts.Diagnostic) => {
   }
 
   let result = '';
-
-  while (diagnosticChain) {
-    if (!ignoreCodes.includes(diagnosticChain.code)) {
-      result += diagnosticChain.messageText + ' ';
+  if (!ignoreCodes.includes(diag.code)) {
+    result = diag.messageText;
+    if (diag.next) {
+      for (const kid of diag.next) {
+        result += flattenDiagnosticMessageText(tsDiagnostic, kid);
+      }
     }
-
-    diagnosticChain = diagnosticChain.next;
   }
 
   if (isStencilConfig) {
