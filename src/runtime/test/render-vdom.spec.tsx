@@ -218,6 +218,41 @@ describe('render-vdom', () => {
     `);
   });
 
+  describe('input', () => {
+    it('should render attributes', async () => {
+      @Component({
+        tag: 'cmp-a',
+      })
+      class CmpA {
+        render() {
+          return (
+            <Host>
+              <input type='text' value=''/>
+              <input type='number' />
+              <input type='password' />
+              <input type='email' />
+              <input type='date' />
+            </Host>
+          );
+        }
+      }
+
+      const { root } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      });
+      expect(root).toEqualHtml(`
+        <cmp-a>
+          <input type=\"text\" value=\"\">
+          <input type=\"number\">
+          <input type=\"password\">
+          <input type=\"email\">
+          <input type=\"date\">
+        </cmp-a>
+      `);
+    });
+  });
+
   describe('svg', () => {
     it('should not override classes', async () => {
       @Component({

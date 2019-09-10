@@ -37,7 +37,6 @@ describe('attributes', () => {
     expect(hostElm.getAttributeNS(XLINK_NS, 'href')).toEqual('#foo');
   });
 
-
   it('are set correctly when namespaced (2)', () => {
     const vnode1 = h('svg', { 'xlinkHref': '#foo' });
     patch(vnode0, vnode1);
