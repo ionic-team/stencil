@@ -61,7 +61,7 @@ export function hasCssVariables(css: string) {
 }
 
 // This regexp find all url() usages with relative urls
-const CSS_URL_REGEXP = /url[\s]*\([\s]*['"]?(?![http|/])([^\'\"\)]*)[\s]*['"]?\)[\s]*/gim;
+const CSS_URL_REGEXP = /url[\s]*\([\s]*['"]?(?!(?:https?|data)\:|\/)([^\'\"\)]*)[\s]*['"]?\)[\s]*/gim;
 
 export function hasRelativeUrls(css: string) {
   CSS_URL_REGEXP.lastIndex = 0;
