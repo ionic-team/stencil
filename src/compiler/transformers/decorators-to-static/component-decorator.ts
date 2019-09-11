@@ -58,6 +58,15 @@ const validateComponent = (config: d.Config, diagnostics: d.Diagnostic[], typeCh
     return false;
   }
 
+  const constructor = cmpNode.members.find(ts.isConstructorDeclaration);
+  if (constructor && constructor.parameters.length > 0) {
+    const err = buildError(diagnostics);
+    err.messageText = `Classes decorated with @Component can not have a "constructor" that takes arguments.
+    All data required by a component must be passed by using class properties decorated with @Prop()`;
+    augmentDiagnosticWithNode(config, err, constructor.parameters[0]);
+    return false;
+  }
+
   // check if class has more than one decorator
   const otherDecorator = cmpNode.decorators && cmpNode.decorators.find(d => d !== componentDecorator);
   if (otherDecorator) {

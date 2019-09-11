@@ -105,13 +105,14 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     const namespace = BUILD.svg && isSvg && (ln !== (ln = ln.replace(/^xlink\:?/, '')))
       ? XLINK_NS
       : null;
+
     if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {
         if (!elm.tagName.includes('-')) {
-          const n = newValue == null ? '' : newValue;
+          let n = newValue == null ? '' : newValue;
 
           // Workaround for Safari, moving the <input> caret when re-assigning the same valued
-          if ((elm as any)[memberName] !== n) {
+          if (oldValue == null || (elm as any)[memberName] !== (n = String(n))) {
             (elm as any)[memberName] = n;
           }
         } else {

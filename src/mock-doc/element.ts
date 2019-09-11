@@ -148,6 +148,8 @@ patchPropAttributes(MockInputElement.prototype, {
   type: String,
   value: String,
   width: Number
+}, {
+  type: 'text'
 });
 
 class MockFormElement extends MockHTMLElement {
@@ -326,7 +328,7 @@ class MockCanvasElement extends MockHTMLElement {
       transform: function () { },
       rect: function () { },
       clip: function () { },
-    }
+    };
   }
 }
 
@@ -346,9 +348,10 @@ function fullUrl(elm: MockElement, attrName: string) {
 }
 
 
-function patchPropAttributes(prototype: any, attrs: any) {
+function patchPropAttributes(prototype: any, attrs: any, defaults: any = {}) {
   Object.keys(attrs).forEach(propName => {
     const attr = attrs[propName];
+    const defaultValue = defaults[propName];
 
     if (attr === Boolean) {
       Object.defineProperty(prototype, propName, {
@@ -368,7 +371,10 @@ function patchPropAttributes(prototype: any, attrs: any) {
       Object.defineProperty(prototype, propName, {
         get(this: MockElement) {
           const value = this.getAttribute(propName);
-          return (value ? parseInt(value, 10) : 0);
+          return (value
+            ? parseInt(value, 10)
+            : defaultValue === undefined ? 0 : defaultValue
+          );
         },
         set(this: MockElement, value: boolean) {
           this.setAttribute(propName, value);
@@ -378,7 +384,9 @@ function patchPropAttributes(prototype: any, attrs: any) {
     } else {
       Object.defineProperty(prototype, propName, {
         get(this: MockElement) {
-          return this.getAttribute(propName) || '';
+          return this.hasAttribute(propName)
+            ? this.getAttribute(propName)
+            : defaultValue || '';
         },
         set(this: MockElement, value: boolean) {
           this.setAttribute(propName, value);
