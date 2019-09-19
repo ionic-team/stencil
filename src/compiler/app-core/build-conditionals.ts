@@ -6,6 +6,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
   const f: d.BuildFeatures = {
     allRenderFn: cmps.every(c => c.hasRenderFn),
     cmpDidLoad: cmps.some(c => c.hasComponentDidLoadFn),
+    cmpShouldUpdate:  cmps.some(c => c.hasComponentShouldUpdateFn),
     cmpDidUnload: cmps.some(c => c.hasComponentDidUnloadFn),
     cmpDidUpdate: cmps.some(c => c.hasComponentDidUpdateFn),
     cmpDidRender: cmps.some(c => c.hasComponentDidRenderFn),

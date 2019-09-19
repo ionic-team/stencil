@@ -60,6 +60,7 @@ export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.Compil
     hasAttributeChangedCallbackFn: false,
     hasComponentWillLoadFn: false,
     hasComponentDidLoadFn: false,
+    hasComponentShouldUpdateFn: false,
     hasComponentWillUpdateFn: false,
     hasComponentDidUpdateFn: false,
     hasComponentWillRenderFn: false,

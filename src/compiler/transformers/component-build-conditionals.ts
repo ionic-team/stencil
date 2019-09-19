@@ -45,6 +45,6 @@ export const setComponentBuildConditionals = (cmpMeta: d.ComponentCompilerMeta) 
     cmpMeta.hasStyle = true;
     cmpMeta.hasMode = cmpMeta.styles.some(s => s.modeName !== DEFAULT_STYLE_MODE);
   }
-  cmpMeta.hasLifecycle = (cmpMeta.hasComponentWillLoadFn || cmpMeta.hasComponentDidLoadFn || cmpMeta.hasComponentWillUpdateFn || cmpMeta.hasComponentDidUpdateFn || cmpMeta.hasComponentWillRenderFn || cmpMeta.hasComponentDidRenderFn);
+  cmpMeta.hasLifecycle = (cmpMeta.hasComponentWillLoadFn || cmpMeta.hasComponentDidLoadFn || cmpMeta.hasComponentShouldUpdateFn || cmpMeta.hasComponentWillUpdateFn || cmpMeta.hasComponentDidUpdateFn || cmpMeta.hasComponentWillRenderFn || cmpMeta.hasComponentDidRenderFn);
   cmpMeta.isPlain = !cmpMeta.hasMember && !cmpMeta.hasStyle && !cmpMeta.hasLifecycle && !cmpMeta.hasListener && !cmpMeta.hasVdomRender;
 };
