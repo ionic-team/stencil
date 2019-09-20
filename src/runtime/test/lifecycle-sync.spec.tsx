@@ -1,5 +1,6 @@
 import { Component, Prop, Watch, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+import { cmp } from 'semver';
 
 
 describe('lifecycle sync', () => {
@@ -154,6 +155,42 @@ describe('lifecycle sync', () => {
     expect(log.trim()).toBe(
       'propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate'
     );
+  });
+
+  it('implement deep equality', async () => {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      renders = 0;
+      @Prop() complex: any;
+
+      componentShouldUpdate(newValue: any, oldValue: any) {
+        try {
+          return JSON.stringify(newValue) !== JSON.stringify(oldValue);
+        } catch {}
+        return true;
+      }
+
+      render() {
+        this.renders++;
+      }
+    }
+
+    const { root, rootInstance, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+      template: () => (
+        <cmp-a complexObject={[1, 2, 3]}></cmp-a>
+      )
+    });
+
+    expect(rootInstance.renders).toBe(1);
+
+    root.complex = [3, 2, 1];
+    await waitForChanges();
+    expect(rootInstance.renders).toBe(2);
+
+    root.complex = [3, 2, 1];
+    await waitForChanges();
+    expect(rootInstance.renders).toBe(2);
   });
 
 });
