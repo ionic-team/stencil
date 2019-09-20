@@ -7,6 +7,7 @@ export interface ComponentCompilerFeatures {
   hasAttributeChangedCallbackFn: boolean;
   hasComponentWillLoadFn: boolean;
   hasComponentDidLoadFn: boolean;
+  hasComponentShouldUpdateFn: boolean;
   hasComponentWillUpdateFn: boolean;
   hasComponentDidUpdateFn: boolean;
   hasComponentWillRenderFn: boolean;

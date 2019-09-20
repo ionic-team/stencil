@@ -156,4 +156,41 @@ describe('lifecycle sync', () => {
     );
   });
 
+  it('implement deep equality', async () => {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      renders = 0;
+      @Prop() complex: any;
+
+      componentShouldUpdate(newValue: any, oldValue: any) {
+        try {
+          return JSON.stringify(newValue) !== JSON.stringify(oldValue);
+        } catch {}
+        return true;
+      }
+
+      render() {
+        this.renders++;
+      }
+    }
+
+    const { root, rootInstance, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+      template: () => (
+        <cmp-a complexObject={[1, 2, 3]}></cmp-a>
+      )
+    });
+
+    expect(rootInstance.renders).toBe(1);
+
+    root.complex = [3, 2, 1];
+    await waitForChanges();
+    expect(rootInstance.renders).toBe(2);
+
+    // Second does not trigger re-render
+    root.complex = [3, 2, 1];
+    await waitForChanges();
+    expect(rootInstance.renders).toBe(2);
+  });
+
 });

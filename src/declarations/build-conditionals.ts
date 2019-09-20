@@ -58,6 +58,7 @@ export interface BuildFeatures {
   // lifecycle events
   lifecycle: boolean;
   cmpDidLoad: boolean;
+  cmpShouldUpdate: boolean;
   cmpWillLoad: boolean;
   cmpDidUpdate: boolean;
   cmpWillUpdate: boolean;
