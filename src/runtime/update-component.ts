@@ -29,11 +29,6 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     }
 
   } else {
-    if (BUILD.cmpShouldUpdate) {
-      if (safeCall(instance, 'componentShouldUpdate') === false) {
-        return;
-      }
-    }
 
     emitLifecycleEvent(elm, 'componentWillUpdate');
 
