@@ -1,6 +1,5 @@
 import { Component, Prop, Watch, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { cmp } from 'semver';
 
 
 describe('lifecycle sync', () => {
@@ -188,6 +187,7 @@ describe('lifecycle sync', () => {
     await waitForChanges();
     expect(rootInstance.renders).toBe(2);
 
+    // Second does not trigger re-render
     root.complex = [3, 2, 1];
     await waitForChanges();
     expect(rootInstance.renders).toBe(2);
