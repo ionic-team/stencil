@@ -184,7 +184,7 @@ In addition, the following set of polyfills are also included:
 
  - [Promise](https://github.com/stefanpenner/es6-promise)
  - [fetch()](https://github.com/github/fetch)
- - [CSS variables](https://github.com/ionic-team/stencil/tree/master/src/client/polyfills/css-shim): We implemented our own CSS variables polyfill that integrates into the Stenciljs runtime
+ - [CSS variables](https://github.com/ionic-team/stencil/tree/master/src/client/polyfills/css-shim): We implemented our own CSS variables polyfill that integrates into the Stenciljs runtime.
 
 ### All browsers
 
