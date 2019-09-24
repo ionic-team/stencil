@@ -60,7 +60,6 @@ describe('validateTesting', () => {
     config.flags.ci = true;
     validateConfig(config, [], false);
     expect(config.testing.browserArgs).toEqual([
-      '--disable-gpu',
       '--font-render-hinting=medium',
       '--enable-font-antialiasing',
       '--no-sandbox',
@@ -73,7 +72,6 @@ describe('validateTesting', () => {
     config.flags.e2e = true;
     validateConfig(config, [], false);
     expect(config.testing.browserArgs).toEqual([
-      '--disable-gpu',
       '--font-render-hinting=medium',
       '--enable-font-antialiasing',
     ]);
