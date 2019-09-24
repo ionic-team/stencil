@@ -1,3 +1,18 @@
+## 🍋 [1.5.1-0](https://github.com/ionic-team/stencil/compare/v1.5.0...v1.5.1-0) (2019-09-24)
+
+
+### Bug Fixes
+
+* emit index on browser build ([eb259a9](https://github.com/ionic-team/stencil/commit/eb259a9))
+* emit pure JSX namespace ([#1886](https://github.com/ionic-team/stencil/issues/1886)) ([5ef9a47](https://github.com/ionic-team/stencil/commit/5ef9a47))
+
+
+### Performance Improvements
+
+* unknown globals are side effect free ([370636a](https://github.com/ionic-team/stencil/commit/370636a))
+
+
+
 # 🍬 [1.5.0](https://github.com/ionic-team/stencil/compare/v1.4.0...v1.5.0) (2019-09-24)
 
 
