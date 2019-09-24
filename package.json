@@ -130,12 +130,12 @@
   },
   "lazyDependencies": {
     "@types/jest": "~24.0.13",
-    "@types/puppeteer": "~1.19.0",
+    "@types/puppeteer": "^1.19.0",
     "jest": "~24.8.0",
     "jest-cli": "~24.8.0",
     "pixelmatch": "4.0.2",
-    "puppeteer": "~1.19.0",
-    "puppeteer-core": "~1.19.0",
+    "puppeteer": "^1.19.0",
+    "puppeteer-core": "^1.19.0",
     "workbox-build": "~4.3.1"
   },
   "engines": {
