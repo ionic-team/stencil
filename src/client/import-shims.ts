@@ -18,7 +18,7 @@ export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => 
   const regex = new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`);
   const scriptElm = Array.from(doc.querySelectorAll('script')).find(s => (
     regex.test(s.src) ||
-    s.getAttribute('data-namespace') === NAMESPACE
+    s.getAttribute('data-stencil-namespace') === NAMESPACE
   ));
   const opts = (scriptElm as any)['data-opts'];
   if (importMeta !== '') {

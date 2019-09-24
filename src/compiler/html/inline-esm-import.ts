@@ -27,7 +27,7 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
       const hashedPath = config.sys.path.join(resourcesUrl, hashedFile);
       script.setAttribute('src', hashedPath);
       script.setAttribute('data-resources-url', resourcesUrl);
-      script.setAttribute('data-namespace', config.fsNamespace);
+      script.setAttribute('data-stencil-namespace', config.fsNamespace);
 
       injectModulePreloads(doc, [hashedPath]);
       return true;
@@ -51,7 +51,7 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
   const inlinedScript = doc.createElement('script');
   inlinedScript.setAttribute('type', 'module');
   inlinedScript.setAttribute('data-resources-url', resourcesUrl);
-  inlinedScript.setAttribute('data-namespace', config.fsNamespace);
+  inlinedScript.setAttribute('data-stencil-namespace', config.fsNamespace);
   inlinedScript.innerHTML = content;
   doc.body.appendChild(inlinedScript);
 
