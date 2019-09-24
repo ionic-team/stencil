@@ -300,36 +300,36 @@ class MockCanvasElement extends MockHTMLElement {
   }
   getContext() {
     return {
-      fillRect: function () { },
-      clearRect: function () { },
+      fillRect: function () { return; },
+      clearRect: function () { return; },
       getImageData: function (_: number, __: number, w: number, h: number) {
         return {
           data: new Array(w * h * 4)
         };
       },
-      putImageData: function () { },
-      createImageData: function (): any[] { return [] },
-      setTransform: function () { },
-      drawImage: function () { },
-      save: function () { },
-      fillText: function () { },
-      restore: function () { },
-      beginPath: function () { },
-      moveTo: function () { },
-      lineTo: function () { },
-      closePath: function () { },
-      stroke: function () { },
-      translate: function () { },
-      scale: function () { },
-      rotate: function () { },
-      arc: function () { },
-      fill: function () { },
+      putImageData: function () { return; },
+      createImageData: function (): any[] { return []; },
+      setTransform: function () { return; },
+      drawImage: function () { return; },
+      save: function () { return; },
+      fillText: function () { return; },
+      restore: function () { return; },
+      beginPath: function () { return; },
+      moveTo: function () { return; },
+      lineTo: function () { return; },
+      closePath: function () { return; },
+      stroke: function () { return; },
+      translate: function () { return; },
+      scale: function () { return; },
+      rotate: function () { return; },
+      arc: function () { return; },
+      fill: function () { return; },
       measureText: function () {
         return { width: 0 };
       },
-      transform: function () { },
-      rect: function () { },
-      clip: function () { },
+      transform: function () { return; },
+      rect: function () { return; },
+      clip: function () { return; },
     };
   }
 }

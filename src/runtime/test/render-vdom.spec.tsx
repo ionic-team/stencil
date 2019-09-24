@@ -109,7 +109,7 @@ describe('render-vdom', () => {
       }
     }
 
-    const { body, waitForChanges } = await newSpecPage({
+    const { body } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`
     });
