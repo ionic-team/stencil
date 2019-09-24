@@ -7,7 +7,8 @@ export class HelloWorld {
 
   render() {
     return (
-      <h1>Hello VDOM</h1>
+      <h1>
+        Hello VDOM</h1>
     );
   }
 }
