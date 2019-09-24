@@ -90,6 +90,8 @@ class MockButtonElement extends MockHTMLElement {
 }
 patchPropAttributes(MockButtonElement.prototype, {
   type: String
+}, {
+  type: 'submit'
 });
 
 
