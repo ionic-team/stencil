@@ -84,7 +84,7 @@ async function writeLazyEntry(
   shouldMinify: boolean,
   isBrowserBuild: boolean,
 ) {
-  if (isBrowserBuild && ['index', 'loader'].includes(rollupResult.entryKey)) {
+  if (isBrowserBuild && ['loader'].includes(rollupResult.entryKey)) {
     return;
   }
   let code = rollupResult.code.replace(
