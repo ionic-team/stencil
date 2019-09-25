@@ -17,7 +17,7 @@ export function parseCSS(original: string): CSSScope {
 }
 
 export function addGlobalStyle(globalScopes: CSSScope[], styleEl: HTMLStyleElement) {
-  const css = parseCSS(styleEl.textContent || '');
+  const css = parseCSS(styleEl.textContent);
   css.styleEl = styleEl;
   globalScopes.push(css);
 }
