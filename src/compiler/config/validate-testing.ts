@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import os from 'os';
 import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 import { buildError, buildWarn } from '@utils';
 
@@ -24,9 +23,6 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
   testing.browserArgs = testing.browserArgs || [];
   addOption(testing.browserArgs, '--font-render-hinting=medium');
   addOption(testing.browserArgs, '--enable-font-antialiasing');
-  if (os.platform() === 'win32') {
-    addOption(testing.browserArgs, '--disable-gpu');
-  }
 
   if (config.flags.ci) {
     addOption(testing.browserArgs, '--no-sandbox');

@@ -96,6 +96,7 @@ export const getModule = (config: d.Config, compilerCtx: d.CompilerCtx, sourceFi
       excludeFromCollection: false,
       externalImports: [],
       hasVdomAttribute: false,
+      hasVdomXlink: false,
       hasVdomClass: false,
       hasVdomFunctional: false,
       hasVdomKey: false,
@@ -131,15 +132,16 @@ export const resetModule = (moduleFile: d.Module) => {
   moduleFile.originalCollectionComponentPath = null;
   moduleFile.originalImports.length = 0;
 
-  moduleFile.hasVdomAttribute = true;
-  moduleFile.hasVdomClass = true;
-  moduleFile.hasVdomFunctional = true;
-  moduleFile.hasVdomKey = true;
-  moduleFile.hasVdomListener = true;
-  moduleFile.hasVdomRef = true;
+  moduleFile.hasVdomXlink = false;
+  moduleFile.hasVdomAttribute = false;
+  moduleFile.hasVdomClass = false;
+  moduleFile.hasVdomFunctional = false;
+  moduleFile.hasVdomKey = false;
+  moduleFile.hasVdomListener = false;
+  moduleFile.hasVdomRef = false;
   moduleFile.hasVdomRender = false;
-  moduleFile.hasVdomStyle = true;
-  moduleFile.hasVdomText = true;
+  moduleFile.hasVdomStyle = false;
+  moduleFile.hasVdomText = false;
   moduleFile.htmlAttrNames.length = 0;
   moduleFile.htmlTagNames.length = 0;
   moduleFile.potentialCmpRefs.length = 0;

@@ -7,14 +7,14 @@ import ts from 'typescript';
 export const parseCallExpression = (m: d.Module | d.ComponentCompilerMeta, node: ts.CallExpression) => {
   if (node.arguments != null && node.arguments.length > 0) {
 
-    if (node.expression.kind === ts.SyntaxKind.Identifier) {
+    if (ts.isIdentifier(node.expression)) {
       // h('tag')
-      visitCallExpressionArgs(m, node.expression as ts.Identifier, node.arguments);
+      visitCallExpressionArgs(m, node.expression, node.arguments);
 
-    } else if (node.expression.kind === ts.SyntaxKind.PropertyAccessExpression) {
+    } else if (ts.isPropertyAccessExpression(node.expression)) {
       // document.createElement('tag')
-      if ((node.expression as ts.PropertyAccessExpression).name) {
-        visitCallExpressionArgs(m, (node.expression as ts.PropertyAccessExpression).name as ts.Identifier, node.arguments);
+      if (node.expression.name) {
+        visitCallExpressionArgs(m, node.expression.name, node.arguments);
       }
     }
   }

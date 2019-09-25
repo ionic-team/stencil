@@ -10,8 +10,10 @@ export const gatherVdomMeta = (m: d.Module | d.ComponentCompilerMeta, args: ts.N
   }
 
   if (args.length > 1) {
-    if (ts.isObjectLiteralExpression(args[1])) {
-      const props: ts.ObjectLiteralElementLike[] = ((args[1] as ts.ObjectLiteralExpression).properties as any);
+    const objectLiteral = args[1];
+
+    if (ts.isObjectLiteralExpression(objectLiteral)) {
+      const props = objectLiteral.properties;
 
       const propsWithText = props
         .filter(p => p.name && (p.name as any).text && (p.name as any).text.length > 0)
@@ -34,6 +36,9 @@ export const gatherVdomMeta = (m: d.Module | d.ComponentCompilerMeta, args: ts.N
           if (attr.startsWith('on') && attr.length > 2 && /[A-Z]/.test(attr.charAt(2))) {
             m.hasVdomListener = true;
             attrs.delete(attr);
+          }
+          if (attr.startsWith('xlink')) {
+            m.hasVdomXlink = true;
           }
         });
 

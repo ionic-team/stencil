@@ -6,4 +6,3 @@ export const getAssetPath = (path: string) => {
     ? assetUrl.href
     : assetUrl.pathname;
 };
-

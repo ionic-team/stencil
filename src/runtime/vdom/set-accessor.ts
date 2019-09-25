@@ -94,18 +94,6 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   } else {
     // Set property if it exists and it's not a SVG
     const isComplex = isComplexType(newValue);
-
-    /**
-     * Need to manually update attribute if:
-     * - memberName is not an attribute
-     * - if we are rendering the host element in order to reflect attribute
-     * - if it's a SVG, since properties might not work in <svg>
-     * - if the newValue is null/undefined or 'false'.
-     */
-    const namespace = BUILD.svg && isSvg && (ln !== (ln = ln.replace(/^xlink\:?/, '')))
-      ? XLINK_NS
-      : null;
-
     if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {
         if (!elm.tagName.includes('-')) {
@@ -121,11 +109,33 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       } catch (e) {}
     }
 
+    /**
+     * Need to manually update attribute if:
+     * - memberName is not an attribute
+     * - if we are rendering the host element in order to reflect attribute
+     * - if it's a SVG, since properties might not work in <svg>
+     * - if the newValue is null/undefined or 'false'.
+     */
+    let xlink = false;
+    if (BUILD.vdomXlink) {
+      if (ln !== (ln = ln.replace(/^xlink\:?/, ''))) {
+        memberName = ln;
+        xlink = true;
+      }
+    }
     if (newValue == null || newValue === false) {
-      elm.removeAttributeNS(namespace, ln);
+      if (BUILD.vdomXlink && xlink) {
+        elm.removeAttributeNS(XLINK_NS, memberName);
+      } else {
+        elm.removeAttribute(memberName);
+      }
     } else if ((!isProp || (flags & VNODE_FLAGS.isHost) || isSvg) && !isComplex) {
       newValue = newValue === true ? '' : newValue;
-      elm.setAttributeNS(namespace, ln, newValue);
+      if (BUILD.vdomXlink && xlink) {
+        elm.setAttributeNS(XLINK_NS, memberName, newValue);
+      } else {
+        elm.setAttribute(memberName, newValue);
+      }
     }
   }
 };
