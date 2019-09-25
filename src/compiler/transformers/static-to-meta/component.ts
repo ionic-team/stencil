@@ -18,7 +18,7 @@ import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
 
 
-export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.CompilerCtx, transformCtx: ts.TransformationContext, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions, fileCmpNodes: ts.ClassDeclaration[]) => {
+export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.CompilerCtx, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions, fileCmpNodes: ts.ClassDeclaration[]) => {
   if (cmpNode.members == null) {
     return cmpNode;
   }
@@ -91,6 +91,7 @@ export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.Compil
     hasState: false,
     hasStyle: false,
     hasVdomAttribute: false,
+    hasVdomXlink: false,
     hasVdomClass: false,
     hasVdomFunctional: false,
     hasVdomKey: false,
@@ -107,16 +108,15 @@ export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.Compil
     potentialCmpRefs: []
   };
 
-  const visitComponentChildNode = (node: ts.Node): ts.VisitResult<ts.Node> => {
+  const visitComponentChildNode = (node: ts.Node) => {
     if (ts.isCallExpression(node)) {
       parseCallExpression(cmp, node);
     } else if (ts.isStringLiteral(node)) {
       parseStringLiteral(cmp, node);
     }
-    return ts.visitEachChild(node, visitComponentChildNode, transformCtx);
+    node.forEachChild(visitComponentChildNode);
   };
-  ts.visitEachChild(cmpNode, visitComponentChildNode, transformCtx);
-
+  visitComponentChildNode(cmpNode);
   parseClassMethods(cmpNode, cmp);
 
   cmp.legacyConnect.forEach(({connect}) => {

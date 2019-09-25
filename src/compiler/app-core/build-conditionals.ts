@@ -46,6 +46,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     svg: cmps.some(c => c.htmlTagNames.includes('svg')),
     updatable: cmps.some(c => c.isUpdateable),
     vdomAttribute: cmps.some(c => c.hasVdomAttribute),
+    vdomXlink: cmps.some(c => c.hasVdomXlink),
     vdomClass: cmps.some(c => c.hasVdomClass),
     vdomFunctional: cmps.some(c => c.hasVdomFunctional),
     vdomKey: cmps.some(c => c.hasVdomKey),
@@ -69,6 +70,7 @@ export function updateComponentBuildConditionals(moduleMap: d.ModuleMap, cmps: d
       // if the component already has a boolean true value it'll keep it
       // otherwise we get the boolean value from the imported module
       cmp.hasVdomAttribute = cmp.hasVdomAttribute || importedModule.hasVdomAttribute;
+      cmp.hasVdomXlink = cmp.hasVdomXlink || importedModule.hasVdomXlink;
       cmp.hasVdomClass = cmp.hasVdomClass || importedModule.hasVdomClass;
       cmp.hasVdomFunctional = cmp.hasVdomFunctional || importedModule.hasVdomFunctional;
       cmp.hasVdomKey = cmp.hasVdomKey || importedModule.hasVdomKey;

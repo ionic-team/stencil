@@ -17,7 +17,7 @@ export const convertStaticToMeta = (config: d.Config, compilerCtx: d.CompilerCtx
 
     const visitNode = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
-        return parseStaticComponentMeta(config, compilerCtx, transformCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap, transformOpts, fileCmpNodes);
+        return parseStaticComponentMeta(config, compilerCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap, transformOpts, fileCmpNodes);
       } else if (ts.isImportDeclaration(node)) {
         return parseImport(config, compilerCtx, buildCtx, moduleFile, dirPath, node);
       } else if (ts.isCallExpression(node)) {

@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 
-export const BUILD: d.Build = {
+export const BUILD: Required<d.Build> = {
   allRenderFn: false,
   cmpDidLoad: true,
   cmpDidUnload: true,
@@ -9,6 +9,7 @@ export const BUILD: d.Build = {
   cmpWillLoad: true,
   cmpWillUpdate: true,
   cmpWillRender: true,
+  cmpShouldUpdate: true,
   connectedCallback: true,
   cssAnnotations: true,
   disconnectedCallback: true,
@@ -29,6 +30,9 @@ export const BUILD: d.Build = {
   observeAttribute: true,
   prop: true,
   propMutable: true,
+  propBoolean: true,
+  propNumber: true,
+  propString: true,
   reflect: true,
   scoped: true,
   shadowDom: true,
@@ -38,6 +42,7 @@ export const BUILD: d.Build = {
   svg: true,
   updatable: true,
   vdomAttribute: true,
+  vdomXlink: true,
   vdomClass: true,
   vdomFunctional: true,
   vdomKey: true,
@@ -52,6 +57,9 @@ export const BUILD: d.Build = {
   hotModuleReplacement: false,
   isDebug: false,
   isDev: false,
+  cssVarShim: false,
+  constructableCSS: true,
+  initializeNextTick: false,
   hydrateServerSide: false,
   hydrateClientSide: false,
   lifecycleDOMEvents: false,

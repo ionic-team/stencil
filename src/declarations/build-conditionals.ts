@@ -22,6 +22,7 @@ export interface BuildFeatures {
   vdomRender: boolean;
   noVdomRender: boolean;
   vdomAttribute: boolean;
+  vdomXlink: boolean;
   vdomClass: boolean;
   vdomStyle: boolean;
   vdomKey: boolean;

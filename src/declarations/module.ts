@@ -14,15 +14,6 @@ export interface Module {
   dtsFilePath: string;
   excludeFromCollection: boolean;
   externalImports: string[];
-  hasVdomAttribute: boolean;
-  hasVdomClass: boolean;
-  hasVdomFunctional: boolean;
-  hasVdomKey: boolean;
-  hasVdomListener: boolean;
-  hasVdomRef: boolean;
-  hasVdomRender: boolean;
-  hasVdomStyle: boolean;
-  hasVdomText: boolean;
   htmlAttrNames: string[];
   htmlTagNames: string[];
   isCollectionDependency: boolean;
@@ -33,4 +24,16 @@ export interface Module {
   originalCollectionComponentPath: string;
   potentialCmpRefs: string[];
   sourceFilePath: string;
+
+  // build features
+  hasVdomAttribute: boolean;
+  hasVdomXlink: boolean;
+  hasVdomClass: boolean;
+  hasVdomFunctional: boolean;
+  hasVdomKey: boolean;
+  hasVdomListener: boolean;
+  hasVdomRef: boolean;
+  hasVdomRender: boolean;
+  hasVdomStyle: boolean;
+  hasVdomText: boolean;
 }

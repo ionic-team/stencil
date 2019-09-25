@@ -91,6 +91,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
 
   const cmpBuild = getBuildFeatures(cmpCompilerMeta);
   cmpBuild.vdomAttribute = true;
+  cmpBuild.vdomXlink = true;
   cmpBuild.vdomClass = true;
   cmpBuild.vdomStyle = true;
   cmpBuild.vdomKey = true;

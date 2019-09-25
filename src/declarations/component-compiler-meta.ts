@@ -37,6 +37,7 @@ export interface ComponentCompilerFeatures {
   hasState: boolean;
   hasStyle: boolean;
   hasVdomAttribute: boolean;
+  hasVdomXlink: boolean;
   hasVdomClass: boolean;
   hasVdomFunctional: boolean;
   hasVdomKey: boolean;
