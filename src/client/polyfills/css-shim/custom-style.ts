@@ -51,12 +51,12 @@ export class CustomStyle {
 
     if (!baseScope.usesCssVars) {
       // This component does not use (read) css variables
-      styleEl.innerHTML = cssText;
+      styleEl.textContent = cssText;
 
     } else if (isScoped) {
       // This component is dynamic: uses css var and is scoped
       (styleEl as any)['s-sc'] = cssScopeId = `${baseScope.scopeId}-${this.count}`;
-      styleEl.innerHTML = '/*needs update*/';
+      styleEl.textContent = '/*needs update*/';
       this.hostStyleMap.set(hostEl, styleEl);
       this.hostScopeMap.set(hostEl, reScope(baseScope, cssScopeId));
       this.count++;
@@ -65,7 +65,7 @@ export class CustomStyle {
       // This component uses css vars, but it's no-encapsulation (global static)
       baseScope.styleEl = styleEl;
       if (!baseScope.usesCssVars) {
-        styleEl.innerHTML = executeTemplate(baseScope.template, {});
+        styleEl.textContent = executeTemplate(baseScope.template, {});
       }
       this.globalScopes.push(baseScope);
       this.updateGlobal();
@@ -90,7 +90,7 @@ export class CustomStyle {
       if (styleEl) {
         const selectors = getActiveSelectors(hostEl, this.hostScopeMap, this.globalScopes);
         const props = resolveValues(selectors);
-        styleEl.innerHTML = executeTemplate(scope.template, props);
+        styleEl.textContent = executeTemplate(scope.template, props);
       }
     }
   }

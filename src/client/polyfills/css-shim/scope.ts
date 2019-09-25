@@ -17,7 +17,7 @@ export function parseCSS(original: string): CSSScope {
 }
 
 export function addGlobalStyle(globalScopes: CSSScope[], styleEl: HTMLStyleElement) {
-  const css = parseCSS(styleEl.innerHTML);
+  const css = parseCSS(styleEl.textContent || '');
   css.styleEl = styleEl;
   globalScopes.push(css);
 }
@@ -27,7 +27,7 @@ export function updateGlobalScopes(scopes: CSSScope[]) {
   const props = resolveValues(selectors);
   scopes.forEach(scope => {
     if (scope.usesCssVars) {
-      scope.styleEl.innerHTML = executeTemplate(scope.template, props);
+      scope.styleEl.textContent = executeTemplate(scope.template, props);
     }
   });
 }

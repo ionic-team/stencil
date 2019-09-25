@@ -32,7 +32,7 @@ export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: 
       }
       const styleEl = doc.createElement('style');
       styleEl.setAttribute('data-styles', '');
-      styleEl.innerHTML = text;
+      styleEl.textContent = text;
 
       addGlobalStyle(globalScopes, styleEl);
       linkElm.parentNode.insertBefore(styleEl, linkElm);
