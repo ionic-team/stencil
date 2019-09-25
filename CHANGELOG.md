@@ -1,4 +1,4 @@
-## 💚 [1.5.1-1](https://github.com/ionic-team/stencil/compare/v1.5.0...v1.5.1-1) (2019-09-25)
+## 🐽 [1.5.1](https://github.com/ionic-team/stencil/compare/v1.5.0...v1.5.1) (2019-09-25)
 
 
 ### Bug Fixes
