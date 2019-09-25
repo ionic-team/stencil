@@ -10,7 +10,7 @@ log.txt
 
 .idea/
 .vscode/
-.history
+.history/
 .sass-cache/
 .versions/
 node_modules/
