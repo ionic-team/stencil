@@ -129,6 +129,9 @@ export namespace Components {
   interface SassCmp {}
   interface ScopedBasic {}
   interface ScopedBasicRoot {}
+  interface ScopedSlottedA {}
+  interface ScopedSlottedB {}
+  interface ScopedSlottedC {}
   interface ShadowDomArray {
     'values': number[];
   }
@@ -524,6 +527,24 @@ declare global {
     new (): HTMLScopedBasicRootElement;
   };
 
+  interface HTMLScopedSlottedAElement extends Components.ScopedSlottedA, HTMLStencilElement {}
+  var HTMLScopedSlottedAElement: {
+    prototype: HTMLScopedSlottedAElement;
+    new (): HTMLScopedSlottedAElement;
+  };
+
+  interface HTMLScopedSlottedBElement extends Components.ScopedSlottedB, HTMLStencilElement {}
+  var HTMLScopedSlottedBElement: {
+    prototype: HTMLScopedSlottedBElement;
+    new (): HTMLScopedSlottedBElement;
+  };
+
+  interface HTMLScopedSlottedCElement extends Components.ScopedSlottedC, HTMLStencilElement {}
+  var HTMLScopedSlottedCElement: {
+    prototype: HTMLScopedSlottedCElement;
+    new (): HTMLScopedSlottedCElement;
+  };
+
   interface HTMLShadowDomArrayElement extends Components.ShadowDomArray, HTMLStencilElement {}
   var HTMLShadowDomArrayElement: {
     prototype: HTMLShadowDomArrayElement;
@@ -790,6 +811,9 @@ declare global {
     'sass-cmp': HTMLSassCmpElement;
     'scoped-basic': HTMLScopedBasicElement;
     'scoped-basic-root': HTMLScopedBasicRootElement;
+    'scoped-slotted-a': HTMLScopedSlottedAElement;
+    'scoped-slotted-b': HTMLScopedSlottedBElement;
+    'scoped-slotted-c': HTMLScopedSlottedCElement;
     'shadow-dom-array': HTMLShadowDomArrayElement;
     'shadow-dom-array-root': HTMLShadowDomArrayRootElement;
     'shadow-dom-basic': HTMLShadowDomBasicElement;
@@ -948,6 +972,9 @@ declare namespace LocalJSX {
   interface SassCmp {}
   interface ScopedBasic {}
   interface ScopedBasicRoot {}
+  interface ScopedSlottedA {}
+  interface ScopedSlottedB {}
+  interface ScopedSlottedC {}
   interface ShadowDomArray {
     'values'?: number[];
   }
@@ -1060,6 +1087,9 @@ declare namespace LocalJSX {
     'sass-cmp': SassCmp;
     'scoped-basic': ScopedBasic;
     'scoped-basic-root': ScopedBasicRoot;
+    'scoped-slotted-a': ScopedSlottedA;
+    'scoped-slotted-b': ScopedSlottedB;
+    'scoped-slotted-c': ScopedSlottedC;
     'shadow-dom-array': ShadowDomArray;
     'shadow-dom-array-root': ShadowDomArrayRoot;
     'shadow-dom-basic': ShadowDomBasic;
@@ -1160,6 +1190,9 @@ declare module "@stencil/core" {
       'sass-cmp': LocalJSX.SassCmp & JSXBase.HTMLAttributes<HTMLSassCmpElement>;
       'scoped-basic': LocalJSX.ScopedBasic & JSXBase.HTMLAttributes<HTMLScopedBasicElement>;
       'scoped-basic-root': LocalJSX.ScopedBasicRoot & JSXBase.HTMLAttributes<HTMLScopedBasicRootElement>;
+      'scoped-slotted-a': LocalJSX.ScopedSlottedA & JSXBase.HTMLAttributes<HTMLScopedSlottedAElement>;
+      'scoped-slotted-b': LocalJSX.ScopedSlottedB & JSXBase.HTMLAttributes<HTMLScopedSlottedBElement>;
+      'scoped-slotted-c': LocalJSX.ScopedSlottedC & JSXBase.HTMLAttributes<HTMLScopedSlottedCElement>;
       'shadow-dom-array': LocalJSX.ShadowDomArray & JSXBase.HTMLAttributes<HTMLShadowDomArrayElement>;
       'shadow-dom-array-root': LocalJSX.ShadowDomArrayRoot & JSXBase.HTMLAttributes<HTMLShadowDomArrayRootElement>;
       'shadow-dom-basic': LocalJSX.ShadowDomBasic & JSXBase.HTMLAttributes<HTMLShadowDomBasicElement>;
