@@ -98,7 +98,18 @@ Element.getRootNode()
 /*!
 Element.isConnected()
 */
-!function(e){"function"!=typeof e.isConnected&&(e.isConnected=function(){var e=this.getRootNode({composed:!0});return e&&9===e.nodeType})}(Element.prototype);
+(function(prototype) {
+  if (!("isConnected" in prototype)) {
+    Object.defineProperty(prototype, 'isConnected', {
+      configurable: true,
+      enumerable: true,
+      get: function() {
+        var root = this.getRootNode({composed: true});
+        return root && root.nodeType === 9;
+      }
+    })
+  }
+})(Element.prototype);
 
 /*!
 Element.remove()
