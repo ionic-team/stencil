@@ -93,7 +93,7 @@ Creative Commons Zero v1.0 Universal
 /*!
 Element.getRootNode()
 */
-(function(c){function d(a){a=b(a);return 11===a.nodeType?d(a.host):a}function b(a){return a.parentNode?b(a.parentNode):a}"function"!==typeof c.getRootNode&&(c.getRootNode=function(a){return a&&a.composed?d(this):b(this)})})(Element.prototype);
+(function(c){function d(a){a=b(a);return a&&11===a.nodeType?d(a.host):a}function b(a){return a&&a.parentNode?b(a.parentNode):a}"function"!==typeof c.getRootNode&&(c.getRootNode=function(a){return a&&a.composed?d(this):b(this)})})(Element.prototype);
 
 /*!
 Element.isConnected()
