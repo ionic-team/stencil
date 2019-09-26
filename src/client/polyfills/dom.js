@@ -1,6 +1,5 @@
 (function(){
   /*
-
     Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
     This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
     The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -95,6 +94,11 @@ Creative Commons Zero v1.0 Universal
 Element.getRootNode()
 */
 (function(c){function d(a){a=b(a);return 11===a.nodeType?d(a.host):a}function b(a){return a.parentNode?b(a.parentNode):a}"function"!==typeof c.getRootNode&&(c.getRootNode=function(a){return a&&a.composed?d(this):b(this)})})(Element.prototype);
+
+/*!
+Element.isConnected()
+*/
+!function(e){"function"!=typeof e.isConnected&&(e.isConnected=function(){var e=this.getRootNode({composed:!0});return e&&9===e.nodeType})}(Element.prototype);
 
 /*!
 Element.remove()
