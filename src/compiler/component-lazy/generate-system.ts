@@ -46,34 +46,38 @@ async function getSystemLoader(config: d.Config, corePath: string, includePolyfi
   return `
 'use strict';
 (function () {
-${polyfills}
+  var doc = document;
+  var currentScript = doc.currentScript;
+  if (!currentScript || !currentScript.hasAttribute('nomodule') || !('onbeforeload' in currentScript)) {
 
-var doc = document;
-var scriptElm = doc.querySelector('script[data-stencil-namespace="${config.fsNamespace}"]');
-if (!scriptElm) {
-  var allScripts = doc.querySelectorAll('script');
-  for (var x = allScripts.length - 1; x >= 0; x--) {
-    scriptElm = allScripts[x];
-    if (scriptElm.src || scriptElm.hasAttribute('data-resources-url')) {
-      break;
+    ${polyfills}
+
+    var scriptElm = doc.querySelector('script[data-stencil-namespace="${config.fsNamespace}"]');
+    if (!scriptElm) {
+      var allScripts = doc.querySelectorAll('script');
+      for (var x = allScripts.length - 1; x >= 0; x--) {
+        scriptElm = allScripts[x];
+        if (scriptElm.src || scriptElm.hasAttribute('data-resources-url')) {
+          break;
+        }
+      }
     }
+
+    var resourcesUrl = scriptElm ? scriptElm.getAttribute('data-resources-url') || scriptElm.src : '';
+    var start = function() {
+      var url = new URL('${corePath}', resourcesUrl);
+      System.import(url.href);
+    };
+
+    if (win.__stencil_cssshim) {
+      win.__stencil_cssshim.initShim().then(start);
+    } else {
+      start();
+    }
+
+    // Note: using .call(window) here because the self-executing function needs
+    // to be scoped to the window object for the ES6Promise polyfill to work
   }
-}
-
-var resourcesUrl = scriptElm ? scriptElm.getAttribute('data-resources-url') || scriptElm.src : '';
-var start = function() {
-  var url = new URL('${corePath}', resourcesUrl);
-  System.import(url.href);
-};
-
-if (win.__stencil_cssshim) {
-  win.__stencil_cssshim.initShim().then(start);
-} else {
-  start();
-}
-
-// Note: using .call(window) here because the self-executing function needs
-// to be scoped to the window object for the ES6Promise polyfill to work
 }).call(window);
 `;
 }
