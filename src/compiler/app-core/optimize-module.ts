@@ -50,6 +50,7 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
 
 export const getTerserOptions = (sourceTarget: d.SourceTarget, isDebug: boolean) => {
   const opts: any = {
+    safari10: true,
     output: {},
   };
 
