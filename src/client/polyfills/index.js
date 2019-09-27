@@ -28,8 +28,5 @@ export function applyPolyfills() {
   ) {
     promises.push(import('./core-js.js'));
   }
-  if (!(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'))) {
-    promises.push(import('./css-shim.js'));
-  }
   return Promise.all(promises);
 }

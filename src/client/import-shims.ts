@@ -1,18 +1,27 @@
 import * as d from '../declarations';
-import { NAMESPACE } from '@build-conditionals';
-import { doc, win } from './client-window';
+import { BUILD, NAMESPACE } from '@build-conditionals';
+import { doc, plt, win } from './client-window';
 import { getDynamicImportFunction } from '@utils';
 
 export const patchEsm = () => {
   // @ts-ignore
-  if (!(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'))) {
+  if (BUILD.cssVarShim && !(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'))) {
     // @ts-ignore
-    return import('./polyfills/css-shim.js');
+    return import('./polyfills/css-shim.js').then(() => {
+      plt.$cssShim$ = (win as any).__stencil_cssshim;
+      if (plt.$cssShim$) {
+        return plt.$cssShim$.initShim();
+      }
+    });
   }
   return Promise.resolve();
 };
 
 export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => {
+  if (BUILD.cssVarShim) {
+    plt.$cssShim$ = (win as any).__stencil_cssshim;
+  }
+
   // @ts-ignore
   const importMeta = import.meta.url;
   const regex = new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`);

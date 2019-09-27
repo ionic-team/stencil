@@ -1,4 +1,4 @@
-import { addGlobalLink, loadDocument } from './load-link-styles';
+import { addGlobalLink, loadDocument, startWatcher } from './load-link-styles';
 import { executeTemplate } from './template';
 import { CSSScope } from './interfaces';
 import { addGlobalStyle, parseCSS, reScope, updateGlobalScopes } from './scope';
@@ -12,6 +12,7 @@ export class CustomStyle {
 
   private globalScopes: CSSScope[] = [];
   private scopesMap = new Map<string, CSSScope>();
+  private didInit = false;
 
   constructor(
     private win: Window,
@@ -19,11 +20,17 @@ export class CustomStyle {
   ) {}
 
   initShim() {
-    return new Promise(resolve => {
-      this.win.requestAnimationFrame(() => {
-        loadDocument(this.doc, this.globalScopes).then(() => resolve());
+    if (this.didInit) {
+      return Promise.resolve();
+    } else {
+      this.didInit = true;
+      return new Promise(resolve => {
+        this.win.requestAnimationFrame(() => {
+          startWatcher(this.doc, this.globalScopes);
+          loadDocument(this.doc, this.globalScopes).then(() => resolve());
+        });
       });
-    });
+    }
   }
 
   addLink(linkEl: HTMLLinkElement) {
@@ -33,8 +40,9 @@ export class CustomStyle {
   }
 
   addGlobalStyle(styleEl: HTMLStyleElement) {
-    addGlobalStyle(this.globalScopes, styleEl);
-    this.updateGlobal();
+    if (addGlobalStyle(this.globalScopes, styleEl)) {
+      this.updateGlobal();
+    }
   }
 
   createHostStyle(
@@ -48,6 +56,7 @@ export class CustomStyle {
     }
     const baseScope = this.registerHostTemplate(cssText, cssScopeId, isScoped);
     const styleEl = this.doc.createElement('style');
+    styleEl.setAttribute('data-styles', '');
 
     if (!baseScope.usesCssVars) {
       // This component does not use (read) css variables

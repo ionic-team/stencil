@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
-import { consoleError, cssVarShim, doc, getHostRef, plt, writeTask } from '@platform';
+import { consoleError, doc, getHostRef, plt, writeTask } from '@platform';
 import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 
@@ -90,8 +90,8 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
       elm.textContent = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
     }
   }
-  if (cssVarShim) {
-    cssVarShim.updateHost(elm);
+  if (BUILD.cssVarShim && plt.$cssShim$) {
+    plt.$cssShim$.updateHost(elm);
   }
 
   if (BUILD.hydrateServerSide) {
