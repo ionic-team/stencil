@@ -105,7 +105,6 @@ export const Build: d.UserBuildConditionals = {
 };
 
 export const styles: d.StyleMap = new Map();
-export const cssVarShim: d.CssVarSim = false as any;
 
 export { bootstrapHydrate } from './bootstrap-hydrate';
 

@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { cssVarShim, getHostRef, plt } from '@platform';
+import { getHostRef, plt } from '@platform';
 import { PLATFORM_FLAGS } from './runtime-constants';
 import { safeCall } from './update-component';
 
@@ -18,8 +18,8 @@ export const disconnectedCallback = (elm: d.HostElement) => {
     }
 
     // clear CSS var-shim tracking
-    if (cssVarShim) {
-      cssVarShim.removeHost(elm);
+    if (BUILD.cssVarShim && plt.$cssShim$) {
+      plt.$cssShim$.removeHost(elm);
     }
 
     if (BUILD.lazyLoad && BUILD.disconnectedCallback) {

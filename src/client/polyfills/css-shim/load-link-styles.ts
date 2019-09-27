@@ -1,15 +1,24 @@
 import { CSSScope } from './interfaces';
-import { addGlobalStyle } from './scope';
+import { addGlobalStyle, updateGlobalScopes } from './scope';
 
 export function loadDocument(doc: Document, globalScopes: CSSScope[]) {
   loadDocumentStyles(doc, globalScopes);
   return loadDocumentLinks(doc, globalScopes);
 }
 
+export function startWatcher(doc: Document, globalScopes: CSSScope[]) {
+  const mutation = new MutationObserver(() => {
+    if (loadDocumentStyles(doc, globalScopes)) {
+      updateGlobalScopes(globalScopes);
+    }
+  });
+  mutation.observe(document.head, { childList: true });
+}
+
 export function loadDocumentLinks(doc: Document, globalScopes: CSSScope[]) {
   const promises: Promise<any>[] = [];
 
-  const linkElms = doc.querySelectorAll('link[rel="stylesheet"][href]');
+  const linkElms = doc.querySelectorAll('link[rel="stylesheet"][href]:not([data-no-shim])');
   for (let i = 0; i < linkElms.length; i++) {
     promises.push(addGlobalLink(doc, globalScopes, linkElms[i] as HTMLLinkElement));
   }
@@ -17,10 +26,10 @@ export function loadDocumentLinks(doc: Document, globalScopes: CSSScope[]) {
 }
 
 export function loadDocumentStyles(doc: Document, globalScopes: CSSScope[]) {
-  const styleElms = doc.querySelectorAll('style:not([data-styles])') as NodeListOf<HTMLStyleElement>;
-  for (let i = 0; i < styleElms.length; i++) {
-    addGlobalStyle(globalScopes, styleElms[i]);
-  }
+  const styleElms = Array.from(doc.querySelectorAll('style:not([data-styles]):not([data-no-shim])')) as HTMLStyleElement[];
+  return styleElms
+    .map(style => addGlobalStyle(globalScopes, style))
+    .some(Boolean);
 }
 
 export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: HTMLLinkElement) {
