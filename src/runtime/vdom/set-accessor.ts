@@ -100,7 +100,8 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
           let n = newValue == null ? '' : newValue;
 
           // Workaround for Safari, moving the <input> caret when re-assigning the same valued
-          if (oldValue == null || (elm as any)[memberName] !== (n = String(n))) {
+          // tslint:disable-next-line: triple-equals
+          if (oldValue == null || (elm as any)[memberName] != n) {
             (elm as any)[memberName] = n;
           }
         } else {

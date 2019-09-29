@@ -321,6 +321,15 @@ describe('setAccessor for inputs', () => {
         testStraightForwardAttribute('spellCheck', undefined, undefined);
         testStraightForwardAttribute('spellCheck', null, undefined);
       });
+
+      it ('checked', () => {
+        const inputElm = document.createElement('input');
+        setAccessor(inputElm, 'checked', false, true, false, 0);
+        expect(inputElm.checked).toEqual(true);
+
+        setAccessor(inputElm, 'checked', true, false, false, 0);
+        expect(inputElm.checked).toEqual(false);
+      });
     });
 
     describe('should update when prop is defined', () => {
