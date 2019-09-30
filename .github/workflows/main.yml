@@ -15,7 +15,6 @@ on:
 jobs:
   build_and_test:
     strategy:
-      fail-fast: false # turn off for testing
       matrix:
         node: [12]
         os: ['ubuntu-latest', 'windows-latest']
