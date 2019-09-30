@@ -50,6 +50,7 @@ jobs:
         run: npm run test.sys.node
 
       - name: Pack build artifacts
+        if: matrix.os != 'windows-latest'
         run: mv `npm pack` stencil-build.tgz
 
       - name: Unload build artifacts
