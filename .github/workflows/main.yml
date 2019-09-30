@@ -46,6 +46,7 @@ jobs:
         run: npm run test.end-to-end -- --ci
 
       - name: Test sys-node
+        if: matrix.os != 'windows-latest'
         run: npm run test.sys.node
 
       - name: Pack build artifacts
