@@ -1,16 +1,6 @@
 name: Build & Test
 
-on:
-  push:
-    paths:
-      - '.github/workflows/*'
-      - 'bin/*'
-      - 'screenshot'
-      - 'scripts'
-      - 'src'
-      - 'test'
-      - 'types'
-      - 'package.json'
+on: push
 
 jobs:
   build_and_test:
