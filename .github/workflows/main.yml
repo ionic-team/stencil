@@ -18,7 +18,7 @@ jobs:
       fail-fast: false # turn off for testing
       matrix:
         node: [10, 12]
-        os: ['ubuntu-latest', 'windows-latest', 'macOS-latest']
+        os: ['ubuntu-latest', 'macOS-latest']
 
     name: Node ${{ matrix.node }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -48,3 +48,46 @@ jobs:
 
       - name: test sys-node
         run: npm run test.sys.node
+
+      - name: pack
+        run: mv `npm pack` stencil-build.tgz
+
+      - uses: actions/upload-artifact@master
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '12'
+        with:
+          name: stencil-build
+          path: stencil-build.tgz
+
+  karma:
+    name: Karma test
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          version: 12.x
+
+      - name: Install BrowserStack
+        run: |
+          wget "https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip" &&
+          unzip BrowserStackLocal-linux-x64.zip
+
+      - name: Run BrowserStack
+        run: ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY &
+        env:
+          BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
+
+      - name: install stencil
+        run: npm install
+
+      - name: build stencil
+        run: npm run build -- --ci
+
+      - name: install karma app
+        working-directory: ./test/karma
+        run: npm install
+
+      - name: karma.prod
+        working-directory: ./test/karma
+        run: npm run karma.prod
