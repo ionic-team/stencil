@@ -1,7 +1,5 @@
 [![npm][npm-badge]][npm-badge-url]
-[![Build Status][circle-badge]][circle-badge-url]
-[![Appveyor Build status][appveyor-badge]][appveyor-badge-url]
-[![BrowserStack Status][browserstack-badge]][browserstack-badge-url]
+![Build & Test](https://github.com/ionic-team/stencil/workflows/Build%20&%20Test/badge.svg)
 [![license][npm-license]][npm-license-url]
 
 
