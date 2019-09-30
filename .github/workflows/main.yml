@@ -1,0 +1,50 @@
+name: Build & Test
+
+on:
+  push:
+    paths:
+      - '.github/workflows/*'
+      - 'bin/*'
+      - 'screenshot'
+      - 'scripts'
+      - 'src'
+      - 'test'
+      - 'types'
+      - 'package.json'
+
+jobs:
+  build_and_test:
+    strategy:
+      fail-fast: false # turn off for testing
+      matrix:
+        node: [10, 12]
+        os: ['ubuntu-latest', 'windows-latest', 'macOS-latest']
+
+    name: Node ${{ matrix.node }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Use Node.js ${{ matrix.node }}.x
+        uses: actions/setup-node@v1
+        with:
+          version: ${{ matrix.node }}.x
+
+      - name: install
+        run: npm install
+
+      - name: build
+        run: npm run build -- --ci
+
+      - name: test dist
+        run: npm run test.dist && npm run test.testing
+
+      - name: test end-to-end
+        run: npm run test.end-to-end -- --ci
+
+      - name: test jest
+        run: npm run test.jest -- --maxWorkers=1
+
+      - name: test sys-node
+        run: npm run test.sys.node
