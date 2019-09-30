@@ -1,5 +1,5 @@
 [![npm][npm-badge]][npm-badge-url]
-![Build & Test](https://github.com/ionic-team/stencil/workflows/Build%20&%20Test/badge.svg)
+[![Build & Test](https://github.com/ionic-team/stencil/workflows/Build%20&%20Test/badge.svg)](https://github.com/ionic-team/stencil/actions)
 [![license][npm-license]][npm-license-url]
 
 
