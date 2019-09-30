@@ -79,6 +79,38 @@ export function setupDomTests(document: Document) {
 
     return new Promise<HTMLElement>((resolve, reject) => {
       try {
+        const waitFrame = () => {
+          return new Promise(resolve => {
+            requestAnimationFrame(resolve);
+          });
+        };
+
+        const allReady = () => {
+          const promises: Promise<any>[] = [];
+          const waitForDidLoad = (promises: Promise<any>[], elm: Element) => {
+            if (elm != null && elm.nodeType === 1) {
+              for (let i = 0; i < elm.children.length; i++) {
+                const childElm = elm.children[i];
+                if (childElm.tagName.includes('-') && typeof (childElm as any).componentOnReady === 'function') {
+                  promises.push((childElm as any).componentOnReady());
+                }
+                waitForDidLoad(promises, childElm);
+              }
+            }
+          };
+
+          waitForDidLoad(promises, window.document.documentElement);
+
+          return Promise.all(promises)
+            .catch((e) => console.error(e));
+        };
+
+        const stencilReady = () => {
+          return allReady()
+            .then(() => waitFrame())
+            .then(() => allReady());
+        };
+
         const indexLoaded = function(this: XMLHttpRequest) {
           if (this.status !== 200) {
             reject(`404: ${url}`);
@@ -92,9 +124,9 @@ export function setupDomTests(document: Document) {
 
           function appLoad() {
             window.removeEventListener('stencil_appload', appLoad);
-            setTimeout(() => {
+            stencilReady().then(() => {
               resolve(app);
-            }, 400);
+            });
           }
 
           window.addEventListener('stencil_appload', appLoad);
