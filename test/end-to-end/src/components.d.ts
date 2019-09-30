@@ -172,6 +172,22 @@ declare namespace LocalJSX {
     'lastName'?: string;
   }
   interface StateCmp {}
+
+  interface IntrinsicElements {
+    'app-root': AppRoot;
+    'car-detail': CarDetail;
+    'car-list': CarList;
+    'dom-api': DomApi;
+    'dom-interaction': DomInteraction;
+    'dom-visible': DomVisible;
+    'element-cmp': ElementCmp;
+    'event-cmp': EventCmp;
+    'listen-cmp': ListenCmp;
+    'method-cmp': MethodCmp;
+    'path-alias-cmp': PathAliasCmp;
+    'prop-cmp': PropCmp;
+    'state-cmp': StateCmp;
+  }
 }
 
 export { LocalJSX as JSX };
