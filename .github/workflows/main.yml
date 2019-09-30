@@ -31,28 +31,29 @@ jobs:
         with:
           version: ${{ matrix.node }}.x
 
-      - name: install
+      - name: Install dependencies
         run: npm install
 
-      - name: build
+      - name: Build
         run: npm run build -- --ci
 
-      - name: test dist
+      - name: Test dist
         run: npm run test.dist && npm run test.testing
 
-      - name: test end-to-end
+      - name: Test jest
+        run: npm run test.jest
+
+      - name: Test end-to-end
         run: npm run test.end-to-end -- --ci
 
-      - name: test jest
-        run: npm run test.jest -- --maxWorkers=1
-
-      - name: test sys-node
+      - name: Test sys-node
         run: npm run test.sys.node
 
-      - name: pack
+      - name: Pack build artifacts
         run: mv `npm pack` stencil-build.tgz
 
-      - uses: actions/upload-artifact@master
+      - name: Unload build artifacts
+        uses: actions/upload-artifact@master
         if: matrix.os == 'ubuntu-latest' && matrix.node == '12'
         with:
           name: stencil-build
@@ -67,10 +68,13 @@ jobs:
         env:
           BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
 
-      - name: Run karma
+      - name: Run karma tests
         working-directory: ./test/karma
         if: matrix.os == 'ubuntu-latest' && matrix.node == '12'
         run: |
           npm install
           npm run karma.prod
+        env:
+          CI: true
+
 
