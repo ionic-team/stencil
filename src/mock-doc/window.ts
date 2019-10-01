@@ -397,6 +397,93 @@ export class MockWindow {
   get window() {
     return this;
   }
+
+  onanimationstart() { /**/ }
+  onanimationend() { /**/ }
+  onanimationiteration() { /**/ }
+  onabort() {/**/}
+  onauxclick() {/**/}
+  onbeforecopy() {/**/}
+  onbeforecut() {/**/}
+  onbeforepaste() {/**/}
+  onblur() {/**/}
+  oncancel() {/**/}
+  oncanplay() {/**/}
+  oncanplaythrough() {/**/}
+  onchange() {/**/}
+  onclick() {/**/}
+  onclose() {/**/}
+  oncontextmenu() {/**/}
+  oncopy() {/**/}
+  oncuechange() {/**/}
+  oncut() {/**/}
+  ondblclick() {/**/}
+  ondrag() {/**/}
+  ondragend() {/**/}
+  ondragenter() {/**/}
+  ondragleave() {/**/}
+  ondragover() {/**/}
+  ondragstart() {/**/}
+  ondrop() {/**/}
+  ondurationchange() {/**/}
+  onemptied() {/**/}
+  onended() {/**/}
+  onerror() {/**/}
+  onfocus() {/**/}
+  onformdata() {/**/}
+  onfullscreenchange() {/**/}
+  onfullscreenerror() {/**/}
+  ongotpointercapture() {/**/}
+  oninput() {/**/}
+  oninvalid() {/**/}
+  onkeydown() {/**/}
+  onkeypress() {/**/}
+  onkeyup() {/**/}
+  onload() {/**/}
+  onloadeddata() {/**/}
+  onloadedmetadata() {/**/}
+  onloadstart() {/**/}
+  onlostpointercapture() {/**/}
+  onmousedown() {/**/}
+  onmouseenter() {/**/}
+  onmouseleave() {/**/}
+  onmousemove() {/**/}
+  onmouseout() {/**/}
+  onmouseover() {/**/}
+  onmouseup() {/**/}
+  onmousewheel() {/**/}
+  onpaste() {/**/}
+  onpause() {/**/}
+  onplay() {/**/}
+  onplaying() {/**/}
+  onpointercancel() {/**/}
+  onpointerdown() {/**/}
+  onpointerenter() {/**/}
+  onpointerleave() {/**/}
+  onpointermove() {/**/}
+  onpointerout() {/**/}
+  onpointerover() {/**/}
+  onpointerup() {/**/}
+  onprogress() {/**/}
+  onratechange() {/**/}
+  onreset() {/**/}
+  onresize() {/**/}
+  onscroll() {/**/}
+  onsearch() {/**/}
+  onseeked() {/**/}
+  onseeking() {/**/}
+  onselect() {/**/}
+  onselectstart() {/**/}
+  onstalled() {/**/}
+  onsubmit() {/**/}
+  onsuspend() {/**/}
+  ontimeupdate() {/**/}
+  ontoggle() {/**/}
+  onvolumechange() {/**/}
+  onwaiting() {/**/}
+  onwebkitfullscreenchange() {/**/}
+  onwebkitfullscreenerror() {/**/}
+  onwheel() {/**/}
 }
 
 function resetWindowDefaults(win: any) {

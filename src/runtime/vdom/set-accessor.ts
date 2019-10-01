@@ -8,7 +8,7 @@
  */
 
 import { BUILD } from '@build-conditionals';
-import { isMemberInElement, plt } from '@platform';
+import { isMemberInElement, plt, win } from '@platform';
 import { isComplexType } from '@utils';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
@@ -68,13 +68,13 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       // <my-cmp on-Click> // listens for "Click"
       // <my-cmp on-ionChange> // listens for "ionChange"
       // <my-cmp on-EVENTS> // listens for "EVENTS"
-      memberName = memberName.substr(3);
-    } else if (isMemberInElement(elm, ln)) {
+      memberName = memberName.slice(3);
+    } else if (isMemberInElement(win, ln)) {
       // standard event
       // the JSX attribute could have been "onMouseOver" and the
-      // member name "onmouseover" is on the element's prototype
+      // member name "onmouseover" is on the window's prototype
       // so let's add the listener "mouseover", which is all lowercased
-      memberName = ln.substr(2);
+      memberName = ln.slice(2);
 
     } else {
       // custom event
@@ -82,7 +82,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       // so let's trim off the "on" prefix and lowercase the first character
       // and add the listener "myCustomEvent"
       // except for the first character, we keep the event name case
-      memberName = ln[2] + memberName.substr(3);
+      memberName = ln[2] + memberName.slice(3);
     }
     if (oldValue) {
       plt.rel(elm, memberName, oldValue, false);

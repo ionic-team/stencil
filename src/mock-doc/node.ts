@@ -563,6 +563,9 @@ export class MockElement extends MockNode {
   get title() { return this.getAttributeNS(null, 'title') || ''; }
   set title(value: string) { this.setAttributeNS(null, 'title', value); }
 
+  onanimationstart() { /**/ }
+  onanimationend() { /**/ }
+  onanimationiteration() { /**/ }
   onabort() {/**/}
   onauxclick() {/**/}
   onbeforecopy() {/**/}
