@@ -106,14 +106,18 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
 };
 
 
-const setContentReference = (elm: d.HostElement, contentRefElm?: d.RenderNode) => {
+const setContentReference = (elm: d.HostElement) => {
   // only required when we're NOT using native shadow dom (slot)
   // or this browser doesn't support native shadow dom
   // and this host element was NOT created with SSR
   // let's pick out the inner content for slot projection
   // create a node to represent where the original
   // content was first placed, which is useful later on
-  contentRefElm = elm['s-cr'] = (doc.createComment(BUILD.isDebug ? `content-ref:${elm.tagName}` : '') as any);
+  const crName = (BUILD.isDebug)
+    ? `content-ref:${elm.tagName}`
+    : '';
+
+  const contentRefElm = elm['s-cr'] = (doc.createComment(crName) as any);
   contentRefElm['s-cn'] = true;
   elm.insertBefore(contentRefElm, elm.firstChild);
 };

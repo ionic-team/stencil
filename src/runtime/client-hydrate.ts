@@ -2,6 +2,7 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from './runtime-constants';
 import { doc, plt } from '@platform';
+import { newVNode } from './vdom/h';
 
 
 export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string, hostId: string, hostRef: d.HostRef) => {
@@ -9,10 +10,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
   const childRenderNodes: RenderNodeData[] = [];
   const slotNodes: RenderNodeData[] = [];
   const shadowRootNodes: d.RenderNode[] = (BUILD.shadowDom && shadowRoot ? [] : null);
-  const vnode: d.VNode = hostRef.$vnode$ = {
-    $flags$: 0,
-    $tag$: tagName
-  };
+  const vnode: d.VNode = hostRef.$vnode$ = newVNode(tagName, null);
 
   if (!plt.$orgLocNodes$) {
     initializeDocumentHydrate(doc.body, plt.$orgLocNodes$ = new Map());
@@ -86,7 +84,12 @@ const clientHydrate = (
           $depth$: childIdSplt[2],
           $index$: childIdSplt[3],
           $tag$: node.tagName.toLowerCase(),
-          $elm$: node
+          $elm$: node,
+          $attrs$: null,
+          $children$: null,
+          $key$: null,
+          $name$: null,
+          $text$: null
         };
 
         childRenderNodes.push(childVNode);
@@ -136,7 +139,13 @@ const clientHydrate = (
         $nodeId$: childIdSplt[2],
         $depth$: childIdSplt[3],
         $index$: childIdSplt[4],
-        $elm$: node
+        $elm$: node,
+        $attrs$: null,
+        $children$: null,
+        $key$: null,
+        $name$: null,
+        $tag$: null,
+        $text$: null
       };
 
       if (childNodeType === TEXT_NODE_ID) {
@@ -214,11 +223,10 @@ const clientHydrate = (
       }
     }
   } else if (parentVNode && parentVNode.$tag$ === 'style') {
-    parentVNode.$children$ = [{
-      $index$: '0',
-      $text$: node.textContent,
-      $elm$: node
-    } as any];
+    const vnode = newVNode(null, node.textContent) as any;
+    vnode.$elm$ = node;
+    vnode.$index$ = '0';
+    parentVNode.$children$ = [vnode];
   }
 };
 

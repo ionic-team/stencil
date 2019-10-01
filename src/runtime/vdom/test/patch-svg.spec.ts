@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { h } from '../h';
+import { h, newVNode } from '../h';
 import { patch } from '../vdom-render';
 import { SVG_NS } from '@utils';
 import { toVNode } from './to-vnode';
@@ -11,7 +11,7 @@ describe('renderer', () => {
 
   beforeEach(() => {
     hostElm = document.createElement('div');
-    vnode0 = {$flags$: 0};
+    vnode0 = newVNode(null, null);
     vnode0.$elm$ = hostElm;
   });
 

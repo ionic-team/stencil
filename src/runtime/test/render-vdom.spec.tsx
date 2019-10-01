@@ -494,11 +494,12 @@ describe('render-vdom', () => {
       expect(rootInstance.counter).toEqual(1);
     });
 
-    it('should set once', async () => {
+    fit('should set once (2)', async () => {
       @Component({ tag: 'cmp-a'})
       class CmpA {
         counter = 0;
         setRef = () => {
+          debugger;
           this.counter++;
         }
         @Prop() state = true;

@@ -2,6 +2,7 @@ import * as d from '../../../declarations';
 import { NODE_TYPE } from '../../runtime-constants';
 import { updateElement } from '../update-element';
 import * as setAccessor from '../set-accessor';
+import { newVNode } from '../h';
 
 
 describe('updateElement', () => {
@@ -55,12 +56,10 @@ describe('updateElement', () => {
 
   it('should add new classes when no oldVNode.vattrs', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
-    const oldVNode: d.VNode = { $flags$: 0 };
-    const newVnode: d.VNode = {
-      $flags$: 0,
-      $elm$: elm,
-      $attrs$: { class: 'mr fusion' }
-    };
+    const oldVNode: d.VNode = newVNode(null, null);
+    const newVnode: d.VNode = newVNode(null, null);
+    newVnode.$elm$ = elm;
+    newVnode.$attrs$ = { class: 'mr fusion' };
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
   });
