@@ -108,7 +108,7 @@ function getRealProperties(properties: d.ComponentCompilerProperty[]): d.JsonDoc
       docsTags: member.docs.tags,
       default: member.defaultValue,
       deprecation: getDeprecation(member.docs.tags),
-      values: parseTypeIntoValue(member.complexType.resolved),
+      values: parseTypeIntoValues(member.complexType.resolved),
 
       optional: member.optional,
       required: member.required,
@@ -126,14 +126,14 @@ function getVirtualProperties(virtualProps: d.ComponentCompilerVirtualProperty[]
     docsTags: [],
     default: undefined,
     deprecation: undefined,
-    values: parseTypeIntoValue(member.type),
+    values: parseTypeIntoValues(member.type),
 
     optional: true,
     required: false,
   }));
 }
 
-function parseTypeIntoValue(type: string) {
+function parseTypeIntoValues(type: string) {
   if (typeof type === 'string') {
     const unions = type.split('|').map(u => u.trim());
     const parsedUnions: (number | string | boolean | null)[] = [];
