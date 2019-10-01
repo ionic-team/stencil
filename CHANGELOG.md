@@ -1,3 +1,15 @@
+## 😜 [1.5.4](https://github.com/ionic-team/stencil/compare/v1.5.3...v1.5.4) (2019-10-01)
+
+
+### Bug Fixes
+
+* karma  waiting ([5bc76a7](https://github.com/ionic-team/stencil/commit/5bc76a7))
+* sys.node ([68408f6](https://github.com/ionic-team/stencil/commit/68408f6))
+* **compiler:** only treat unused diagnostics as warnings ([add1337](https://github.com/ionic-team/stencil/commit/add1337))
+* **vdom:** boolean properties in native elements ([ccce46e](https://github.com/ionic-team/stencil/commit/ccce46e)), closes [#1899](https://github.com/ionic-team/stencil/issues/1899)
+
+
+
 ## 🐊 [1.5.3](https://github.com/ionic-team/stencil/compare/v1.5.2...v1.5.3) (2019-09-27)
 
 
