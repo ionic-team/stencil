@@ -44,6 +44,10 @@ export interface JsonDocsTag {
   text?: string;
 }
 
+export interface JsonDocsValue {
+  value: string | number | boolean | null;
+}
+
 export interface JsonDocsUsage {
   [key: string]: string;
 }
@@ -59,6 +63,7 @@ export interface JsonDocsProp {
   docsTags: JsonDocsTag[];
   default: string;
   deprecation: string | undefined;
+  values: JsonDocsValue[];
 
   optional: boolean;
   required: boolean;

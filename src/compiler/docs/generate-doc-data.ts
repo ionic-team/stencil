@@ -108,6 +108,7 @@ function getRealProperties(properties: d.ComponentCompilerProperty[]): d.JsonDoc
       docsTags: member.docs.tags,
       default: member.defaultValue,
       deprecation: getDeprecation(member.docs.tags),
+      values: parseTypeIntoValue(member.complexType.resolved),
 
       optional: member.optional,
       required: member.required,
@@ -125,10 +126,51 @@ function getVirtualProperties(virtualProps: d.ComponentCompilerVirtualProperty[]
     docsTags: [],
     default: undefined,
     deprecation: undefined,
+    values: parseTypeIntoValue(member.type),
 
     optional: true,
     required: false,
   }));
+}
+
+function parseTypeIntoValue(type: string) {
+  if (typeof type === 'string') {
+    const unions = type.split('|').map(u => u.trim());
+    const parsedUnions: (number | string | boolean | null)[] = [];
+    unions.forEach(u => {
+      if (u === 'null') {
+        // union is null
+        parsedUnions.push(null);
+        return;
+      }
+      if (u === 'true') {
+        parsedUnions.push(true);
+        return;
+      }
+      if (u === 'false') {
+        parsedUnions.push(false);
+        return;
+      }
+      if (u === 'boolean') {
+        parsedUnions.push(true, false);
+        return;
+      }
+      const asNumber = parseFloat(u);
+      if (!Number.isNaN(asNumber)) {
+        // union is a number
+        parsedUnions.push(asNumber);
+        return;
+      }
+      if (/^("|').+("|')$/gm.test(u)) {
+        // ionic is a string
+        parsedUnions.push(u.slice(1, -1));
+        return;
+      }
+    });
+
+    return parsedUnions.map(u => ({ value: u }));
+  }
+  return [];
 }
 
 function getMethods(methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] {
