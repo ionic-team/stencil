@@ -230,7 +230,7 @@ describe('hydrate, shadow child', () => {
     `);
   });
 
-  fit('nested shadow, text slot, header', async () => {
+  it('nested shadow, text slot, header', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       render() {
