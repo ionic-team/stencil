@@ -72,7 +72,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     } else if (isMemberInElement(win, ln)) {
       // standard event
       // the JSX attribute could have been "onMouseOver" and the
-      // member name "onmouseover" is on the element's prototype
+      // member name "onmouseover" is on the window's prototype
       // so let's add the listener "mouseover", which is all lowercased
       memberName = ln.slice(2);
 
