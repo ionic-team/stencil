@@ -1,0 +1,67 @@
+name: Build & Test
+
+on: push
+
+jobs:
+  build_and_test:
+    strategy:
+      matrix:
+        node: [12]
+        os: ['ubuntu-latest', 'windows-latest']
+
+    name: Node ${{ matrix.node }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Use Node.js ${{ matrix.node }}.x
+        uses: actions/setup-node@v1
+        with:
+          version: ${{ matrix.node }}.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build -- --ci
+
+      - name: Test dist
+        run: npm run test.dist && npm run test.testing
+
+      - name: Test jest
+        run: npm run test.jest
+
+      - name: Test end-to-end
+        run: npm run test.end-to-end -- --ci
+
+      - name: Test sys-node
+        if: matrix.os != 'windows-latest'
+        run: npm run test.sys.node
+
+      - name: Pack build artifacts
+        if: matrix.os != 'windows-latest'
+        run: mv `npm pack` stencil-build.tgz
+
+      - name: Unload build artifacts
+        uses: actions/upload-artifact@master
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '12'
+        with:
+          name: stencil-build
+          path: stencil-build.tgz
+
+      - name: Run karma tests
+        working-directory: ./test/karma
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '12'
+        run: |
+          wget "https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip"
+          unzip BrowserStackLocal-linux-x64.zip
+          ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY &
+          npm install
+          npm run karma.prod
+        env:
+          BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
+          BROWSER_STACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
+          CI: true
+
+

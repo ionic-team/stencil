@@ -12,7 +12,7 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
       opts.compress.passes = 3;
       opts.compress.global_defs = {
         supportsListenerOptions: true,
-        cssVarShim: false
+        'plt.$cssShim$': false
       };
       opts.compress.pure_funcs = ['getHostRef', ...opts.compress.pure_funcs];
     }
@@ -50,6 +50,7 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
 
 export const getTerserOptions = (sourceTarget: d.SourceTarget, isDebug: boolean) => {
   const opts: any = {
+    safari10: true,
     output: {},
   };
 

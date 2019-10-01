@@ -21,6 +21,7 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
   try {
     const treeshake: TreeshakingOptions | boolean = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
       ? {
+        unknownGlobalSideEffects: false,
         propertyReadSideEffects: false,
         tryCatchDeoptimization: false,
       }

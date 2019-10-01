@@ -7,6 +7,7 @@ export interface ComponentCompilerFeatures {
   hasAttributeChangedCallbackFn: boolean;
   hasComponentWillLoadFn: boolean;
   hasComponentDidLoadFn: boolean;
+  hasComponentShouldUpdateFn: boolean;
   hasComponentWillUpdateFn: boolean;
   hasComponentDidUpdateFn: boolean;
   hasComponentWillRenderFn: boolean;
@@ -36,6 +37,7 @@ export interface ComponentCompilerFeatures {
   hasState: boolean;
   hasStyle: boolean;
   hasVdomAttribute: boolean;
+  hasVdomXlink: boolean;
   hasVdomClass: boolean;
   hasVdomFunctional: boolean;
   hasVdomKey: boolean;

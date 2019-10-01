@@ -21,7 +21,6 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
   }
 
   testing.browserArgs = testing.browserArgs || [];
-  addOption(testing.browserArgs, '--disable-gpu');
   addOption(testing.browserArgs, '--font-render-hinting=medium');
   addOption(testing.browserArgs, '--enable-font-antialiasing');
 

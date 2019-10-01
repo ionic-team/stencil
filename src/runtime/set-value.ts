@@ -15,6 +15,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
   const elm = BUILD.lazyLoad ? hostRef.$hostElement$ : ref as d.HostElement;
   const oldVal = hostRef.$instanceValues$.get(propName);
   const flags = hostRef.$flags$;
+  const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   newVal = parsePropertyValue(newVal, cmpMeta.$members$[propName][0]);
 
   if (newVal !== oldVal && (!BUILD.lazyLoad || !(flags & HOST_FLAGS.isConstructingInstance) || oldVal === undefined)) {
@@ -22,7 +23,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
     // set our new value!
     hostRef.$instanceValues$.set(propName, newVal);
 
-    if (!BUILD.lazyLoad || hostRef.$lazyInstance$) {
+    if (!BUILD.lazyLoad || instance) {
       // get an array of method names of watch functions to call
       if (BUILD.watchCallback && cmpMeta.$watchers$ && flags & HOST_FLAGS.isWatchReady) {
         const watchMethods = cmpMeta.$watchers$[propName];
@@ -32,8 +33,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           watchMethods.forEach(watchMethodName => {
             try {
               // fire off each of the watch methods that are watching this property
-              (BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any)[watchMethodName].call(
-                (BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any),
+              instance[watchMethodName](
                 newVal,
                 oldVal,
                 propName
@@ -47,6 +47,11 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
       }
 
       if (BUILD.updatable && (flags & (HOST_FLAGS.isActiveRender | HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
+        if (BUILD.cmpShouldUpdate && instance.componentShouldUpdate) {
+          if (instance.componentShouldUpdate(newVal, oldVal, propName) === false) {
+            return;
+          }
+        }
         // looks like this value actually changed, so we've got work to do!
         // but only if we've already rendered, otherwise just chill out
         // queue that we need to do an update, but don't worry about queuing

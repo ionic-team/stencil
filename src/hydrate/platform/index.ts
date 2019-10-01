@@ -17,9 +17,12 @@ export const isMemberInElement = (elm: any, memberName: string) => {
     if (memberName in elm) {
       return true;
     }
-    const hostRef: d.ComponentNativeConstructor = getComponent(elm.nodeName.toLowerCase());
-    if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
-      return memberName in hostRef.cmpMeta.$members$;
+    const nodeName = elm.nodeName;
+    if (nodeName) {
+      const hostRef: d.ComponentNativeConstructor = getComponent(nodeName.toLowerCase());
+      if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
+        return memberName in hostRef.cmpMeta.$members$;
+      }
     }
   }
   return false;
@@ -105,7 +108,6 @@ export const Build: d.UserBuildConditionals = {
 };
 
 export const styles: d.StyleMap = new Map();
-export const cssVarShim: d.CssVarSim = false as any;
 
 export { bootstrapHydrate } from './bootstrap-hydrate';
 

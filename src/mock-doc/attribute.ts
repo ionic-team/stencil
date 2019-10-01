@@ -115,7 +115,7 @@ export class MockAttr {
     return this._name;
   }
   set name(value) {
-    this._name = value.toLowerCase();
+    this._name = value;
   }
 
   get value() {

@@ -49,7 +49,9 @@ async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx
   const jsxAugmentation = `
 declare module "@stencil/core" {
   export namespace JSX {
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+    interface IntrinsicElements {
+      ${modules.map(m => `'${m.tagName}': LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`).join('\n')}
+    }
   }
 }
 `;
@@ -78,7 +80,7 @@ declare namespace LocalJSX {
   ${modules.map(m => `${m.jsx}`).join('\n').trim()}
 
   interface IntrinsicElements {
-  ${modules.map(m => `'${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
+    ${modules.map(m => `'${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
   }
 }
 

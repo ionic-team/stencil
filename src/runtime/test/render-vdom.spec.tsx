@@ -109,7 +109,7 @@ describe('render-vdom', () => {
       }
     }
 
-    const { body, waitForChanges } = await newSpecPage({
+    const { body } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`
     });
@@ -227,6 +227,8 @@ describe('render-vdom', () => {
         render() {
           return (
             <Host>
+              <button type='button'></button>
+              <button type='submit'></button>
               <input type='text' value=''/>
               <input type='number' />
               <input type='password' />
@@ -243,6 +245,8 @@ describe('render-vdom', () => {
       });
       expect(root).toEqualHtml(`
         <cmp-a>
+          <button type='button'></button>
+          <button type='submit'></button>
           <input type=\"text\" value=\"\">
           <input type=\"number\">
           <input type=\"password\">

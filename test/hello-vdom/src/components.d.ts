@@ -26,7 +26,7 @@ declare global {
 }
 
 declare namespace LocalJSX {
-  interface HelloVdom extends JSXBase.HTMLAttributes<HTMLHelloVdomElement> {}
+  interface HelloVdom {}
 
   interface IntrinsicElements {
     'hello-vdom': HelloVdom;
@@ -38,7 +38,9 @@ export { LocalJSX as JSX };
 
 declare module "@stencil/core" {
   export namespace JSX {
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+    interface IntrinsicElements {
+      'hello-vdom': LocalJSX.HelloVdom & JSXBase.HTMLAttributes<HTMLHelloVdomElement>;
+    }
   }
 }
 

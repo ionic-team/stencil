@@ -132,9 +132,12 @@ export const isMemberInElement = (elm: any, memberName: string) => {
     if (memberName in elm) {
       return true;
     }
-    const cstr = cstrs.get(elm.nodeName.toLowerCase());
-    if (cstr != null && cstr.COMPILER_META != null && cstr.COMPILER_META.properties != null) {
-      return cstr.COMPILER_META.properties.some(p => p.name === memberName);
+    const nodeName = elm.nodeName;
+    if (nodeName) {
+      const cstr = cstrs.get(nodeName.toLowerCase());
+      if (cstr != null && cstr.COMPILER_META != null && cstr.COMPILER_META.properties != null) {
+        return cstr.COMPILER_META.properties.some(p => p.name === memberName);
+      }
     }
   }
   return false;

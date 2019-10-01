@@ -17,9 +17,13 @@ export function parseCSS(original: string): CSSScope {
 }
 
 export function addGlobalStyle(globalScopes: CSSScope[], styleEl: HTMLStyleElement) {
-  const css = parseCSS(styleEl.innerHTML);
+  if (globalScopes.some(css => css.styleEl === styleEl)) {
+    return false;
+  }
+  const css = parseCSS(styleEl.textContent);
   css.styleEl = styleEl;
   globalScopes.push(css);
+  return true;
 }
 
 export function updateGlobalScopes(scopes: CSSScope[]) {
@@ -27,7 +31,7 @@ export function updateGlobalScopes(scopes: CSSScope[]) {
   const props = resolveValues(selectors);
   scopes.forEach(scope => {
     if (scope.usesCssVars) {
-      scope.styleEl.innerHTML = executeTemplate(scope.template, props);
+      scope.styleEl.textContent = executeTemplate(scope.template, props);
     }
   });
 }

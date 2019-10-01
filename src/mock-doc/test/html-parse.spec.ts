@@ -80,6 +80,14 @@ describe('parseHtml', () => {
     `);
   });
 
+  it('svg attributes', () => {
+    doc = new MockDocument(`
+      <svg viewBox="0 0 100 100"></svg>
+    `);
+
+    expect(doc.body.firstElementChild.attributes.item(0).name).toEqual('viewBox');
+  });
+
   it('template', () => {
     doc = new MockDocument(`
       <template>text</template>

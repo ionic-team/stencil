@@ -6,11 +6,7 @@ export const BUILD: d.Build = {};
 
 export function resetBuildConditionals(b: d.Build) {
   Object.keys(b).forEach(key => {
-    if (typeof (b as any)[key] === 'boolean') {
-      (b as any)[key] = true;
-    } else {
-      (b as any)[key] = null;
-    }
+    (b as any)[key] = true;
   });
 
   b.isDev = true;
@@ -23,6 +19,7 @@ export function resetBuildConditionals(b: d.Build) {
   b.svg = true;
   b.updatable = true;
   b.vdomAttribute = true;
+  b.vdomXlink = true;
   b.vdomClass = true;
   b.vdomStyle = true;
   b.vdomKey = true;

@@ -88,7 +88,9 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
     const semanticDiagnostics = loadTypeScriptDiagnostics(tsSemanticDiagnostics);
     if (isDevMode) {
       semanticDiagnostics.forEach(semanticDiagnostic => {
-        semanticDiagnostic.level = 'warn';
+        if (semanticDiagnostic.code === '6133') {
+          semanticDiagnostic.level = 'warn';
+        }
       });
     }
     results.diagnostics.push(

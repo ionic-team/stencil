@@ -1,7 +1,5 @@
 [![npm][npm-badge]][npm-badge-url]
-[![Build Status][circle-badge]][circle-badge-url]
-[![Appveyor Build status][appveyor-badge]][appveyor-badge-url]
-[![BrowserStack Status][browserstack-badge]][browserstack-badge-url]
+[![Build & Test](https://github.com/ionic-team/stencil/workflows/Build%20&%20Test/badge.svg)](https://github.com/ionic-team/stencil/actions)
 [![license][npm-license]][npm-license-url]
 
 
@@ -184,7 +182,7 @@ In addition, the following set of polyfills are also included:
 
  - [Promise](https://github.com/stefanpenner/es6-promise)
  - [fetch()](https://github.com/github/fetch)
- - [CSS variables](https://github.com/ionic-team/stencil/tree/master/src/client/polyfills/css-shim): We implemented out own CSS variables polyfill that integrates into the Stencil¡s run
+ - [CSS variables](https://github.com/ionic-team/stencil/tree/master/src/client/polyfills/css-shim): We implemented our own CSS variables polyfill that integrates into the Stenciljs runtime.
 
 ### All browsers
 

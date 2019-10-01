@@ -146,13 +146,13 @@ export interface StencilConfig {
    * Sets if the JS browser files are minified or not. Stencil uses `terser` under the hood.
    * Defaults to `false` in dev mode and `true` in production mode.
    */
-  minifyCss?: boolean;
+  minifyJs?: boolean;
 
   /**
    * Sets if the CSS is minified or not. Stencil uses `cssnano` under the hood.
    * Defaults to `false` in dev mode and `true` in production mode.
    */
-  minifyJs?: boolean;
+  minifyCss?: boolean;
 
   /**
    * Forces Stencil to run in `dev` mode if the value is `true` and `production` mode

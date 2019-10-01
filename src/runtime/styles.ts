@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS } from '@utils';
-import { cssVarShim, doc, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
+import { doc, plt, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
 import { HYDRATE_ID, NODE_TYPE } from './runtime-constants';
 
 
@@ -45,8 +45,8 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
           styleElm.innerHTML = style;
 
         } else {
-          if (cssVarShim) {
-            styleElm = cssVarShim.createHostStyle(hostElm, scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation));
+          if (BUILD.cssVarShim && plt.$cssShim$) {
+            styleElm = plt.$cssShim$.createHostStyle(hostElm, scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation));
             const newScopeId = (styleElm as any)['s-sc'];
             if (newScopeId) {
               scopeId = newScopeId;
@@ -59,6 +59,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
 
           } else {
             styleElm = doc.createElement('style');
+            styleElm.setAttribute('data-styles', '');
             styleElm.innerHTML = style;
           }
 

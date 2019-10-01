@@ -1,6 +1,5 @@
 (function(){
   /*
-
     Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
     This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
     The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -94,7 +93,23 @@ Creative Commons Zero v1.0 Universal
 /*!
 Element.getRootNode()
 */
-(function(c){function d(a){a=b(a);return 11===a.nodeType?d(a.host):a}function b(a){return a.parentNode?b(a.parentNode):a}"function"!==typeof c.getRootNode&&(c.getRootNode=function(a){return a&&a.composed?d(this):b(this)})})(Element.prototype);
+(function(c){function d(a){a=b(a);return a&&11===a.nodeType?d(a.host):a}function b(a){return a&&a.parentNode?b(a.parentNode):a}"function"!==typeof c.getRootNode&&(c.getRootNode=function(a){return a&&a.composed?d(this):b(this)})})(Element.prototype);
+
+/*!
+Element.isConnected()
+*/
+(function(prototype) {
+  if (!("isConnected" in prototype)) {
+    Object.defineProperty(prototype, 'isConnected', {
+      configurable: true,
+      enumerable: true,
+      get: function() {
+        var root = this.getRootNode({composed: true});
+        return root && root.nodeType === 9;
+      }
+    })
+  }
+})(Element.prototype);
 
 /*!
 Element.remove()
@@ -105,3 +120,27 @@ Element.remove()
 Element.classList
 */
 !function(e){'classList'in e||Object.defineProperty(e,"classList",{get:function(){var e=this,t=(e.getAttribute("class")||"").replace(/^\s+|\s$/g,"").split(/\s+/g);function n(){t.length>0?e.setAttribute("class",t.join(" ")):e.removeAttribute("class")}return""===t[0]&&t.splice(0,1),t.toggle=function(e,i){void 0!==i?i?t.add(e):t.remove(e):-1!==t.indexOf(e)?t.splice(t.indexOf(e),1):t.push(e),n()},t.add=function(){for(var e=[].slice.call(arguments),i=0,s=e.length;i<s;i++)-1===t.indexOf(e[i])&&t.push(e[i]);n()},t.remove=function(){for(var e=[].slice.call(arguments),i=0,s=e.length;i<s;i++)-1!==t.indexOf(e[i])&&t.splice(t.indexOf(e[i]),1);n()},t.item=function(e){return t[e]},t.contains=function(e){return-1!==t.indexOf(e)},t.replace=function(e,i){-1!==t.indexOf(e)&&t.splice(t.indexOf(e),1,i),n()},t.value=e.getAttribute("class")||"",t}})}(Element.prototype);
+
+/*!
+DOMTokenList
+*/
+(function(prototype){
+  try {
+    document.body.classList.add();
+  } catch (e) {
+    var originalAdd = prototype.add;
+    var originalRemove = prototype.remove;
+
+    prototype.add = function() {
+      for (var i = 0; i < arguments.length; i++) {
+        originalAdd.call(this, arguments[i]);
+      }
+    };
+
+    prototype.remove = function() {
+      for (var i = 0; i < arguments.length; i++) {
+        originalRemove.call(this, arguments[i]);
+      }
+    };
+  }
+}(DOMTokenList.prototype));

@@ -8,7 +8,7 @@
  */
 
 import { BUILD } from '@build-conditionals';
-import { isMemberInElement, plt } from '@platform';
+import { isMemberInElement, plt, win } from '@platform';
 import { isComplexType } from '@utils';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
@@ -68,13 +68,13 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       // <my-cmp on-Click> // listens for "Click"
       // <my-cmp on-ionChange> // listens for "ionChange"
       // <my-cmp on-EVENTS> // listens for "EVENTS"
-      memberName = memberName.substr(3);
-    } else if (isMemberInElement(elm, ln)) {
+      memberName = memberName.slice(3);
+    } else if (isMemberInElement(win, ln)) {
       // standard event
       // the JSX attribute could have been "onMouseOver" and the
-      // member name "onmouseover" is on the element's prototype
+      // member name "onmouseover" is on the window's prototype
       // so let's add the listener "mouseover", which is all lowercased
-      memberName = ln.substr(2);
+      memberName = ln.slice(2);
 
     } else {
       // custom event
@@ -82,7 +82,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       // so let's trim off the "on" prefix and lowercase the first character
       // and add the listener "myCustomEvent"
       // except for the first character, we keep the event name case
-      memberName = ln[2] + memberName.substr(3);
+      memberName = ln[2] + memberName.slice(3);
     }
     if (oldValue) {
       plt.rel(elm, memberName, oldValue, false);
@@ -94,25 +94,14 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   } else {
     // Set property if it exists and it's not a SVG
     const isComplex = isComplexType(newValue);
-
-    /**
-     * Need to manually update attribute if:
-     * - memberName is not an attribute
-     * - if we are rendering the host element in order to reflect attribute
-     * - if it's a SVG, since properties might not work in <svg>
-     * - if the newValue is null/undefined or 'false'.
-     */
-    const namespace = BUILD.svg && isSvg && (ln !== (ln = ln.replace(/^xlink\:?/, '')))
-      ? XLINK_NS
-      : null;
-
     if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
       try {
         if (!elm.tagName.includes('-')) {
           let n = newValue == null ? '' : newValue;
 
           // Workaround for Safari, moving the <input> caret when re-assigning the same valued
-          if (oldValue == null || (elm as any)[memberName] !== (n = String(n))) {
+          // tslint:disable-next-line: triple-equals
+          if (oldValue == null || (elm as any)[memberName] != n) {
             (elm as any)[memberName] = n;
           }
         } else {
@@ -121,11 +110,33 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       } catch (e) {}
     }
 
+    /**
+     * Need to manually update attribute if:
+     * - memberName is not an attribute
+     * - if we are rendering the host element in order to reflect attribute
+     * - if it's a SVG, since properties might not work in <svg>
+     * - if the newValue is null/undefined or 'false'.
+     */
+    let xlink = false;
+    if (BUILD.vdomXlink) {
+      if (ln !== (ln = ln.replace(/^xlink\:?/, ''))) {
+        memberName = ln;
+        xlink = true;
+      }
+    }
     if (newValue == null || newValue === false) {
-      elm.removeAttributeNS(namespace, ln);
+      if (BUILD.vdomXlink && xlink) {
+        elm.removeAttributeNS(XLINK_NS, memberName);
+      } else {
+        elm.removeAttribute(memberName);
+      }
     } else if ((!isProp || (flags & VNODE_FLAGS.isHost) || isSvg) && !isComplex) {
       newValue = newValue === true ? '' : newValue;
-      elm.setAttributeNS(namespace, ln, newValue);
+      if (BUILD.vdomXlink && xlink) {
+        elm.setAttributeNS(XLINK_NS, memberName, newValue);
+      } else {
+        elm.setAttribute(memberName, newValue);
+      }
     }
   }
 };

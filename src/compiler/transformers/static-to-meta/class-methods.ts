@@ -23,6 +23,7 @@ export const parseClassMethods = (cmpNode: ts.ClassDeclaration, cmpMeta: d.Compo
   cmpMeta.hasComponentWillRenderFn = classMethods.some(m => isMethod(m, 'componentWillRender'));
   cmpMeta.hasComponentDidRenderFn = classMethods.some(m => isMethod(m, 'componentDidRender'));
   cmpMeta.hasComponentDidLoadFn = classMethods.some(m => isMethod(m, 'componentDidLoad'));
+  cmpMeta.hasComponentShouldUpdateFn = classMethods.some(m => isMethod(m, 'componentShouldUpdate'));
   cmpMeta.hasComponentDidUpdateFn = classMethods.some(m => isMethod(m, 'componentDidUpdate'));
   cmpMeta.hasComponentDidUnloadFn = classMethods.some(m => isMethod(m, 'componentDidUnload'));
   cmpMeta.hasLifecycle = (cmpMeta.hasComponentWillLoadFn || cmpMeta.hasComponentDidLoadFn || cmpMeta.hasComponentWillUpdateFn || cmpMeta.hasComponentDidUpdateFn);

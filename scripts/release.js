@@ -180,8 +180,12 @@ function runTasks(opts) {
         task: () => execa('git', ['tag', `v${opts.version}`], { cwd: rootDir })
       },
       {
-        title: 'Pushing to Github',
-        task: () => execa('git', ['push', '--follow-tags'], { cwd: rootDir })
+        title: 'Pushing commits',
+        task: () => execa('git', ['push'], { cwd: rootDir })
+      },
+      {
+        title: 'Pushing tabs',
+        task: () => execa('git', ['push', '--tags'], { cwd: rootDir })
       }
     );
 
