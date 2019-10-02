@@ -122,9 +122,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           forceUpdate(this, cmpMeta);
         }
 
-        componentOnReady(waitForDidLoad?: boolean) {
+        componentOnReady(waitForRender?: boolean) {
           const hostRef = getHostRef(this);
-          return waitForDidLoad === false
+          return waitForRender === false
             ? hostRef.$onInstancePromise$
             : hostRef.$onReadyPromise$;
         }
