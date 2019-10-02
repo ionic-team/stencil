@@ -145,7 +145,7 @@ function getLegacyLoader(config: d.Config) {
   scriptElm.src = url + '/${namespace}.js';
   warn.push(scriptElm.outerHTML);
 
-  scriptElm.setAttribute('data-stencil-namespace', ${namespace});
+  scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
   doc.head.appendChild(scriptElm);
 
   console.warn(warn.join('\\n'));
