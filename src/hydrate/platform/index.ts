@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { BUILD } from '@build-conditionals';
 
 const cstrs = new Map<string, d.ComponentNativeConstructor>();
 
