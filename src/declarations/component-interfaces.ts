@@ -136,6 +136,6 @@ export interface RafCallback {
 }
 
 export interface HTMLStencilElement extends HTMLElement {
-  componentOnReady(): Promise<this>;
+  componentOnReady(waitForRender?: boolean): Promise<this>;
   forceUpdate(): void;
 }
