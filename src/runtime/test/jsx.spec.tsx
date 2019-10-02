@@ -1,6 +1,5 @@
-import { Component, Prop, h, Host, State } from '@stencil/core';
+import { Component, Host, Prop, State, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { CmpA } from 'fixtures/cmp-a';
 
 
 describe('jsx', () => {
