@@ -17,7 +17,9 @@ export const registerHost = (elm: d.HostElement) => {
       $hostElement$: elm,
       $instanceValues$: new Map()
     };
-    hostRef.$onInstancePromise$ = new Promise(r => hostRef.$onInstanceResolve$ = r);
+    if (BUILD.method) {
+      hostRef.$onInstancePromise$ = new Promise(r => hostRef.$onInstanceResolve$ = r);
+    }
     hostRef.$onReadyPromise$ = new Promise(r => hostRef.$onReadyResolve$ = r);
     return hostRefs.set(elm, hostRef);
   } else {

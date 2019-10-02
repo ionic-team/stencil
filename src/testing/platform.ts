@@ -2,6 +2,7 @@ import * as d from '../declarations';
 import { resetTaskQueue } from './task-queue';
 import { resetWindow, setupGlobal } from '@mock-doc';
 import { flushAll } from './task-queue';
+import { BUILD } from '@build-conditionals';
 
 export * from './task-queue';
 
