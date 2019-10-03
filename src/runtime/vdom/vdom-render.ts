@@ -423,7 +423,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
   } else if (BUILD.vdomText && oldVNode.$text$ !== newVNode.$text$) {
     // update the text content for the text only vnode
     // and also only if the text is different than before
-    elm.textContent = newVNode.$text$;
+    elm.data = newVNode.$text$;
   }
 
   if (BUILD.svg && isSvgMode && newVNode.$tag$ === 'svg') {

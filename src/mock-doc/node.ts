@@ -737,6 +737,13 @@ export class MockTextNode extends MockNode {
     this.nodeValue = text;
   }
 
+  get data() {
+    return this.nodeValue;
+  }
+  set data(text) {
+    this.nodeValue = text;
+  }
+
   get wholeText() {
     if (this.parentNode != null) {
       const text: string[] = [];
