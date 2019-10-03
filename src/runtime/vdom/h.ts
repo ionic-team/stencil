@@ -44,7 +44,7 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
     }
   };
   walk(children);
-  if (BUILD.vdomAttribute && vnodeData) {
+  if (vnodeData) {
     // normalize class / classname attributes
     if (BUILD.vdomKey) {
       key = vnodeData.key || undefined;
