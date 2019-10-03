@@ -11,8 +11,8 @@ export function depsToMarkdown(config: d.Config, cmp: d.JsonDocsComponent, cmps:
   content.push(`## Dependencies`);
   content.push(``);
 
-  if (cmp.dependants.length > 0) {
-    const usedBy = cmp.dependants
+  if (cmp.dependents.length > 0) {
+    const usedBy = cmp.dependents
       .map(tag => ' - ' + getCmpLink(config, cmp, tag, cmps));
 
     content.push(`### Used by`);

@@ -29,7 +29,7 @@ export interface JsonDocsComponent {
   events: JsonDocsEvent[];
   styles: JsonDocsStyle[];
   slots: JsonDocsSlot[];
-  dependants: string[];
+  dependents: string[];
   dependencies: string[];
   dependencyGraph: JsonDocsDependencyGraph;
   deprecation?: string;

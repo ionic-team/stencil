@@ -39,7 +39,7 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, build
         docs: generateDocs(readme, cmp.docs),
         docsTags: cmp.docs.tags,
         encapsulation: getEncapsulation(cmp),
-        dependants: cmp.directDependants,
+        dependents: cmp.directDependents,
         dependencies: cmp.directDependencies,
         dependencyGraph: buildDepGraph(cmp, buildCtx.components),
         deprecation: getDeprecation(cmp.docs.tags),
@@ -69,8 +69,8 @@ function buildDepGraph(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMe
   }
   walk(cmp.tagName);
 
-  // load dependants
-  cmp.directDependants.forEach(tagName => {
+  // load dependents
+  cmp.directDependents.forEach(tagName => {
     if (dependencies[tagName] && !dependencies[tagName].includes(tagName)) {
       dependencies[tagName].push(cmp.tagName);
     } else {

@@ -23,7 +23,7 @@ export async function generateJsonDocs(compilerCtx: d.CompilerCtx, docsData: d.J
       events: cmp.events,
       styles: cmp.styles,
       slots: cmp.slots,
-      dependants: cmp.dependants,
+      dependents: cmp.dependents,
       dependencies: cmp.dependencies,
       dependencyGraph: cmp.dependencyGraph,
       deprecation: cmp.deprecation,
