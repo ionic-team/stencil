@@ -10,11 +10,11 @@ export async function generateJsonDocs(compilerCtx: d.CompilerCtx, docsData: d.J
   const json = {
     ...docsData,
     components: docsData.components.map(cmp => ({
-      tag: cmp.tag,
       filePath: cmp.filePath,
+
       encapsulation: cmp.encapsulation,
+      tag: cmp.tag,
       readme: cmp.readme,
-      deprecation: cmp.deprecation,
       docs: cmp.docs,
       docsTags: cmp.docsTags,
       usage: cmp.usage,
@@ -22,7 +22,11 @@ export async function generateJsonDocs(compilerCtx: d.CompilerCtx, docsData: d.J
       methods: cmp.methods,
       events: cmp.events,
       styles: cmp.styles,
-      slots: cmp.slots
+      slots: cmp.slots,
+      dependants: cmp.dependants,
+      dependencies: cmp.dependencies,
+      dependencyGraph: cmp.dependencyGraph,
+      deprecation: cmp.deprecation,
     }))
   };
   const jsonContent = JSON.stringify(json, null, 2);
