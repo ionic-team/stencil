@@ -96,6 +96,8 @@ export interface HostRef {
   $lazyInstance$?: ComponentInterface;
   $onReadyPromise$?: Promise<any>;
   $onReadyResolve$?: (elm: any) => void;
+  $onInstancePromise$?: Promise<any>;
+  $onInstanceResolve$?: (elm: any) => void;
   $vnode$?: VNode;
   $queuedListeners$?: [string, any][];
   $rmListeners$?: () => void;

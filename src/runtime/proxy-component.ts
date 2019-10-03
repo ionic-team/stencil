@@ -43,7 +43,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         Object.defineProperty(prototype, memberName, {
           value(this: d.HostElement, ...args: any[]) {
             const ref = getHostRef(this);
-            return ref.$onReadyPromise$.then(() => ref.$lazyInstance$[memberName](...args));
+            return ref.$onInstancePromise$.then(() => ref.$lazyInstance$[memberName](...args));
           }
         });
       }
