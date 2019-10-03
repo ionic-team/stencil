@@ -137,14 +137,14 @@ function getLegacyLoader(config: d.Config) {
   var scriptElm = doc.createElement('script');
   scriptElm.setAttribute('type', 'module');
   scriptElm.src = url + '/${namespace}.esm.js';
-  doc.head.appendChild(scriptElm);
   warn.push(scriptElm.outerHTML);
+  scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
+  doc.head.appendChild(scriptElm);
 
   scriptElm = doc.createElement('script');
   scriptElm.setAttribute('nomodule', '');
   scriptElm.src = url + '/${namespace}.js';
   warn.push(scriptElm.outerHTML);
-
   scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
   doc.head.appendChild(scriptElm);
 
