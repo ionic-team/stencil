@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { flatOne, isDocsPublic, normalizePath, sortBy } from '@utils';
 import { getBuildTimestamp } from '../build/build-ctx';
+import { JsonDocsValue } from '../../declarations';
 
 
 export async function generateDocData(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocs> {
@@ -136,39 +137,70 @@ function getVirtualProperties(virtualProps: d.ComponentCompilerVirtualProperty[]
 function parseTypeIntoValues(type: string) {
   if (typeof type === 'string') {
     const unions = type.split('|').map(u => u.trim());
-    const parsedUnions: (number | string | boolean | null)[] = [];
+    const parsedUnions: JsonDocsValue[] = [];
     unions.forEach(u => {
       if (u === 'null') {
         // union is null
-        parsedUnions.push(null);
+        parsedUnions.push({
+          value: 'null',
+          type: 'null'
+        });
+        return;
+      }
+      if (u === 'undefined') {
+        // union is null
+        parsedUnions.push({
+          value: 'undefined',
+          type: 'undefined'
+        });
         return;
       }
       if (u === 'true') {
-        parsedUnions.push(true);
+        parsedUnions.push({
+          value: 'true',
+          type: 'boolean'
+        });
         return;
       }
       if (u === 'false') {
-        parsedUnions.push(false);
+        parsedUnions.push({
+          value: 'false',
+          type: 'boolean'
+        });
         return;
       }
       if (u === 'boolean') {
-        parsedUnions.push(true, false);
+        parsedUnions.push({
+          value: 'true',
+          type: 'boolean'
+        }, {
+          value: 'false',
+          type: 'boolean'
+        });
         return;
       }
-      const asNumber = parseFloat(u);
-      if (!Number.isNaN(asNumber)) {
+      if (!Number.isNaN(parseFloat(u))) {
         // union is a number
-        parsedUnions.push(asNumber);
+        parsedUnions.push({
+          value: u,
+          type: 'number'
+        });
         return;
       }
       if (/^("|').+("|')$/gm.test(u)) {
         // ionic is a string
-        parsedUnions.push(u.slice(1, -1));
+        parsedUnions.push({
+          value: u.slice(1, -1),
+          type: 'string'
+        });
         return;
       }
+      parsedUnions.push({
+        value: u,
+        type: 'unknown'
+      });
     });
-
-    return parsedUnions.map(u => ({ value: u }));
+    return parsedUnions;
   }
   return [];
 }

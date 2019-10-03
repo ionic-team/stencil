@@ -45,7 +45,8 @@ export interface JsonDocsTag {
 }
 
 export interface JsonDocsValue {
-  value: string | number | boolean | null;
+  value: string;
+  type: 'string' | 'number' | 'boolean' | 'null' | 'undefined' | 'unknown';
 }
 
 export interface JsonDocsUsage {

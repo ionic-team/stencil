@@ -47,7 +47,7 @@ function serializeAttribute(prop: d.JsonDocsProp) {
     'description': prop.docs,
   };
   const values = prop.values
-    .filter(({ value }) => typeof value === 'string')
+    .filter(({ type }) => type === 'string')
     .map(({ value }) => ({ name: value }));
 
   if (values.length > 0) {
