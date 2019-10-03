@@ -139,22 +139,6 @@ function parseTypeIntoValues(type: string) {
     const unions = type.split('|').map(u => u.trim());
     const parsedUnions: JsonDocsValue[] = [];
     unions.forEach(u => {
-      if (u === 'null') {
-        // union is null
-        parsedUnions.push({
-          value: 'null',
-          type: 'null'
-        });
-        return;
-      }
-      if (u === 'undefined') {
-        // union is null
-        parsedUnions.push({
-          value: 'undefined',
-          type: 'undefined'
-        });
-        return;
-      }
       if (u === 'true') {
         parsedUnions.push({
           value: 'true',
@@ -164,16 +148,6 @@ function parseTypeIntoValues(type: string) {
       }
       if (u === 'false') {
         parsedUnions.push({
-          value: 'false',
-          type: 'boolean'
-        });
-        return;
-      }
-      if (u === 'boolean') {
-        parsedUnions.push({
-          value: 'true',
-          type: 'boolean'
-        }, {
           value: 'false',
           type: 'boolean'
         });
@@ -196,8 +170,7 @@ function parseTypeIntoValues(type: string) {
         return;
       }
       parsedUnions.push({
-        value: u,
-        type: 'unknown'
+        type: u
       });
     });
     return parsedUnions;
