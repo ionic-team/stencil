@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { flatOne, isDocsPublic, normalizePath, sortBy } from '@utils';
 import { getBuildTimestamp } from '../build/build-ctx';
+import { JsonDocsValue } from '../../declarations';
 
 
 export async function generateDocData(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocs> {
@@ -108,6 +109,7 @@ function getRealProperties(properties: d.ComponentCompilerProperty[]): d.JsonDoc
       docsTags: member.docs.tags,
       default: member.defaultValue,
       deprecation: getDeprecation(member.docs.tags),
+      values: parseTypeIntoValues(member.complexType.resolved),
 
       optional: member.optional,
       required: member.required,
@@ -125,10 +127,55 @@ function getVirtualProperties(virtualProps: d.ComponentCompilerVirtualProperty[]
     docsTags: [],
     default: undefined,
     deprecation: undefined,
+    values: parseTypeIntoValues(member.type),
 
     optional: true,
     required: false,
   }));
+}
+
+function parseTypeIntoValues(type: string) {
+  if (typeof type === 'string') {
+    const unions = type.split('|').map(u => u.trim());
+    const parsedUnions: JsonDocsValue[] = [];
+    unions.forEach(u => {
+      if (u === 'true') {
+        parsedUnions.push({
+          value: 'true',
+          type: 'boolean'
+        });
+        return;
+      }
+      if (u === 'false') {
+        parsedUnions.push({
+          value: 'false',
+          type: 'boolean'
+        });
+        return;
+      }
+      if (!Number.isNaN(parseFloat(u))) {
+        // union is a number
+        parsedUnions.push({
+          value: u,
+          type: 'number'
+        });
+        return;
+      }
+      if (/^("|').+("|')$/gm.test(u)) {
+        // ionic is a string
+        parsedUnions.push({
+          value: u.slice(1, -1),
+          type: 'string'
+        });
+        return;
+      }
+      parsedUnions.push({
+        type: u
+      });
+    });
+    return parsedUnions;
+  }
+  return [];
 }
 
 function getMethods(methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] {

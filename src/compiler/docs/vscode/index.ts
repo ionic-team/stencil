@@ -46,14 +46,12 @@ function serializeAttribute(prop: d.JsonDocsProp) {
     'name': prop.attr,
     'description': prop.docs,
   };
-  if (typeof prop.type === 'string') {
-    const unions = prop.type.split('|').map(u => u.trim()).filter(u => u !== 'undefined' && u !== 'null');
-    const includeValues = unions.every(u => /^("|').+("|')$/gm.test(u));
-    if (includeValues) {
-      attribute.values = unions.map(u => ({
-        name: u.slice(1, -1)
-      }));
-    }
+  const values = prop.values
+    .filter(({ type, value }) => type === 'string' && value !== undefined)
+    .map(({ value }) => ({ name: value }));
+
+  if (values.length > 0) {
+    attribute.values = values;
   }
   return attribute;
 }
