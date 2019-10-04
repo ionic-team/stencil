@@ -129,8 +129,14 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
   }
 
   if (BUILD.lifecycle || BUILD.lazyLoad) {
-    Promise.all(elm['s-p']).then(() => postUpdateComponent(elm, hostRef));
-    elm['s-p'].length = 0;
+    const childrenPromises = elm['s-p'];
+    const postUpdate = () => postUpdateComponent(elm, hostRef);
+    if (childrenPromises.length === 0) {
+      postUpdate();
+    } else {
+      Promise.all(childrenPromises).then(postUpdate);
+      childrenPromises.length = 0;
+    }
   } else {
     postUpdateComponent(elm, hostRef);
   }
