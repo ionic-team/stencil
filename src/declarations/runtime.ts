@@ -98,6 +98,7 @@ export interface HostRef {
   $onReadyResolve$?: (elm: any) => void;
   $onInstancePromise$?: Promise<any>;
   $onInstanceResolve$?: (elm: any) => void;
+  $onRenderResolve$?: () => void;
   $vnode$?: VNode;
   $queuedListeners$?: [string, any][];
   $rmListeners$?: () => void;

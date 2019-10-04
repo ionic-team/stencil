@@ -26,12 +26,6 @@ export interface HostElement extends HTMLElement {
   ['s-cr']?: RenderNode;
 
   /**
-   * Is Active Loading:
-   * Set of child host elements that are actively loading.
-   */
-  ['s-al']?: Set<HostElement>;
-
-  /**
    * Lifecycle ready
    */
   ['s-lr']?: boolean;
@@ -50,13 +44,6 @@ export interface HostElement extends HTMLElement {
   ['s-sc']?: string;
 
   /**
-   * Component Initial Load:
-   * The component has fully loaded, instance creatd,
-   * and has rendered. Method is on the host element prototype.
-   */
-  ['s-init']?: () => void;
-
-  /**
    * Hot Module Replacement, dev mode only
    */
   ['s-hmr']?: (versionId: string) => void;
@@ -65,6 +52,8 @@ export interface HostElement extends HTMLElement {
    * Callback method for when HMR finishes
    */
   ['s-hmr-load']?: () => void;
+
+  ['s-p']?: Promise<void>[];
 
   componentOnReady?: () => Promise<this>;
 }

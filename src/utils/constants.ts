@@ -38,13 +38,14 @@ export const enum LISTENER_FLAGS {
 export const enum HOST_FLAGS {
   hasConnected = 1 << 0,
   hasRendered = 1 << 1,
-  isActiveRender = 1 << 2,
+  isWaitingForChildren = 1 << 2,
   isConstructingInstance = 1 << 3,
   isQueuedForUpdate = 1 << 4,
   hasInitializedComponent = 1 << 5,
   hasLoadedComponent = 1 << 6,
   isWatchReady = 1 << 7,
   isListenReady = 1 << 8,
+  needsRerender = 1 << 9,
 }
 
 export const enum CMP_FLAGS {

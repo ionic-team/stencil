@@ -2,17 +2,32 @@ import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
-import { consoleError, doc, getHostRef, plt, writeTask } from '@platform';
+import { consoleError, doc, getHostRef, plt, writeTask, nextTick } from '@platform';
 import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
+
+export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) =>  {
+  if (ancestorComponent && !hostRef.$onRenderResolve$) {
+    ancestorComponent['s-p'].push(new Promise(r => hostRef.$onRenderResolve$ = r));
+  }
+};
 
 export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   if (BUILD.taskQueue && BUILD.updatable) {
     hostRef.$flags$ |= HOST_FLAGS.isQueuedForUpdate;
   }
+  if (hostRef.$flags$ & HOST_FLAGS.isWaitingForChildren) {
+    hostRef.$flags$ |= HOST_FLAGS.needsRerender;
+    return;
+  }
 
+  const ancestorComponent = hostRef.$ancestorComponent$;
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   const update = () => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
+
+  if (BUILD.lifecycle || BUILD.lazyLoad) {
+    attachToAncestor(hostRef, ancestorComponent);
+  }
 
   let promise: Promise<void>;
   if (isInitialLoad) {
@@ -41,6 +56,14 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     promise = then(promise, () => safeCall(instance, 'componentWillRender'));
   }
 
+  if (BUILD.lifecycle && BUILD.lazyLoad && elm['s-rc']) {
+    // ok, so turns out there are some child host elements
+    // waiting on this parent element to load
+    // let's fire off all update callbacks waiting
+    elm['s-rc'].forEach(cb => cb());
+    elm['s-rc'] = undefined;
+  }
+
   // there is no ancestorc omponent or the ancestor component
   // has already fired off its lifecycle update then
   // fire off the initial update
@@ -52,14 +75,6 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
 const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, instance: any, isInitialLoad: boolean) => {
   // updateComponent
-  if (BUILD.updatable && BUILD.taskQueue) {
-    hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
-  }
-
-  if (BUILD.lifecycle && BUILD.lazyLoad) {
-    elm['s-lr'] = false;
-  }
-
   if (BUILD.style && isInitialLoad) {
     // DOM WRITE!
     attachStyles(elm, cmpMeta, hostRef.$modeName$);
@@ -67,11 +82,6 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
 
   if (BUILD.hasRenderFn || BUILD.reflect) {
     if (BUILD.vdomRender || BUILD.reflect) {
-      // tell the platform we're actively rendering
-      // if a value is changed within a render() then
-      // this tells the platform not to queue the change
-      hostRef.$flags$ |= HOST_FLAGS.isActiveRender;
-
       try {
         // looks like we've got child nodes to render into this host element
         // or we need to update the css class/attrs on the host element
@@ -85,13 +95,15 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
       } catch (e) {
         consoleError(e);
       }
-      hostRef.$flags$ &= ~HOST_FLAGS.isActiveRender;
     } else {
       elm.textContent = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
     }
   }
   if (BUILD.cssVarShim && plt.$cssShim$) {
     plt.$cssShim$.updateHost(elm);
+  }
+  if (BUILD.updatable && BUILD.taskQueue) {
+    hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
   }
 
   if (BUILD.hydrateServerSide) {
@@ -109,28 +121,28 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
     }
   }
 
-  // set that this component lifecycle rendering has completed
-  if (BUILD.lifecycle && BUILD.lazyLoad) {
-    elm['s-lr'] = true;
-  }
   if (BUILD.updatable || BUILD.lazyLoad) {
     hostRef.$flags$ |= HOST_FLAGS.hasRendered;
   }
 
-  if (BUILD.lifecycle && BUILD.lazyLoad && elm['s-rc'].length > 0) {
-    // ok, so turns out there are some child host elements
-    // waiting on this parent element to load
-    // let's fire off all update callbacks waiting
-    elm['s-rc'].forEach(cb => cb());
-    elm['s-rc'].length = 0;
+  if (BUILD.lifecycle || BUILD.lazyLoad) {
+    const childrenPromises = elm['s-p'];
+    const postUpdate = () => postUpdateComponent(elm, hostRef, cmpMeta);
+    if (childrenPromises.length === 0) {
+      postUpdate();
+    } else {
+      Promise.all(childrenPromises).then(postUpdate);
+      hostRef.$flags$ |= HOST_FLAGS.isWaitingForChildren;
+      childrenPromises.length = 0;
+    }
+  } else {
+    postUpdateComponent(elm, hostRef, cmpMeta);
   }
-
-  postUpdateComponent(elm, hostRef);
 };
 
 
-export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
-  if ((BUILD.lazyLoad || BUILD.lifecycle || BUILD.lifecycleDOMEvents) && !elm['s-al']) {
+export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta) => {
+  if ((BUILD.lazyLoad || BUILD.lifecycle || BUILD.lifecycleDOMEvents)) {
     const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
     const ancestorComponent = hostRef.$ancestorComponent$;
 
@@ -177,29 +189,19 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ance
       elm['s-hmr-load'] && elm['s-hmr-load']();
     }
 
+    if (BUILD.method) {
+      hostRef.$onInstanceResolve$(elm);
+    }
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up
-    if (BUILD.lifecycle && BUILD.lazyLoad && ancestorComponent) {
-      // ok so this element already has a known ancestor component
-      // let's make sure we remove this element from its ancestor's
-      // known list of child elements which are actively loading
-      if (ancestorsActivelyLoadingChildren = ancestorComponent['s-al']) {
-        // remove this element from the actively loading map
-        ancestorsActivelyLoadingChildren.delete(elm);
-
-        // the ancestor's initializeComponent method will do the actual checks
-        // to see if the ancestor is actually loaded or not
-        // then let's call the ancestor's initializeComponent method if there's no length
-        // (which actually ends up as this method again but for the ancestor)
-        if (ancestorsActivelyLoadingChildren.size === 0) {
-          ancestorComponent['s-al'] = undefined;
-          ancestorComponent['s-init']();
-        }
-      }
-
-      hostRef.$ancestorComponent$ = undefined;
+    if ((BUILD.lifecycle || BUILD.lazyLoad) && hostRef.$onRenderResolve$) {
+      hostRef.$onRenderResolve$();
+      hostRef.$onRenderResolve$ = undefined;
     }
-
+    if (hostRef.$flags$ & HOST_FLAGS.needsRerender) {
+      nextTick(() => scheduleUpdate(elm, hostRef, cmpMeta, false));
+    }
+    hostRef.$flags$ &= ~(HOST_FLAGS.isWaitingForChildren | HOST_FLAGS.needsRerender);
     // ( •_•)
     // ( •_•)>⌐■-■
     // (⌐■_■)

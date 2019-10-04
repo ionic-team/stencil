@@ -7,7 +7,7 @@ import { doc, getHostRef, nextTick, plt, supportsShadowDom } from '@platform';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
-import { safeCall } from './update-component';
+import { safeCall, attachToAncestor } from './update-component';
 
 export const fireConnectedCallback = (instance: any) => {
   if (BUILD.lazyLoad && BUILD.connectedCallback) {
@@ -57,7 +57,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         }
       }
 
-      if (BUILD.lifecycle && BUILD.lazyLoad) {
+      if (BUILD.lifecycle || BUILD.lazyLoad) {
         // find the first ancestor component (if there is one) and register
         // this component as one of the actively loading child components for its ancestor
         let ancestorComponent = elm;
@@ -65,14 +65,13 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         while ((ancestorComponent = (ancestorComponent.parentNode as any || ancestorComponent.host as any))) {
           // climb up the ancestors looking for the first
           // component that hasn't finished its lifecycle update yet
-          if ((BUILD.hydrateClientSide && ancestorComponent.nodeType === NODE_TYPE.ElementNode && ancestorComponent.hasAttribute('s-id')) || (ancestorComponent['s-init'] && ancestorComponent['s-lr'] === false)) {
+          if (
+            (BUILD.hydrateClientSide && ancestorComponent.nodeType === NODE_TYPE.ElementNode && ancestorComponent.hasAttribute('s-id')) ||
+            (ancestorComponent['s-p'])
+          ) {
             // we found this components first ancestor component
             // keep a reference to this component's ancestor component
-            hostRef.$ancestorComponent$ = ancestorComponent;
-
-            // ensure there is an array to contain a reference to each of the child components
-            // and set this component as one of the ancestor's child components it should wait on
-            (ancestorComponent['s-al'] = ancestorComponent['s-al'] || new Set()).add(elm);
+            attachToAncestor(hostRef, (hostRef.$ancestorComponent$ = ancestorComponent));
             break;
           }
         }

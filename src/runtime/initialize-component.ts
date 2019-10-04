@@ -72,9 +72,6 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       if (BUILD.watchCallback) {
         hostRef.$flags$ |= HOST_FLAGS.isWatchReady;
       }
-      if (BUILD.method) {
-        hostRef.$onInstanceResolve$(elm);
-      }
       fireConnectedCallback(hostRef.$lazyInstance$);
 
     } else {
@@ -103,7 +100,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
   const ancestorComponent = hostRef.$ancestorComponent$;
   const schedule = () => scheduleUpdate(elm, hostRef, cmpMeta, true);
 
-  if (BUILD.lifecycle && BUILD.lazyLoad && ancestorComponent && ancestorComponent['s-lr'] === false && ancestorComponent['s-rc']) {
+  if (BUILD.lifecycle && BUILD.lazyLoad && ancestorComponent && ancestorComponent['s-rc']) {
     // this is the intial load and this component it has an ancestor component
     // but the ancestor component has NOT fired its will update lifecycle yet
     // so let's just cool our jets and wait for the ancestor to continue first
