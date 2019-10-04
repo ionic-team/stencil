@@ -1,4 +1,4 @@
-# 🎙 [1.6.0-0](https://github.com/ionic-team/stencil/compare/v1.5.4...v1.6.0-0) (2019-10-03)
+# 🦂 [1.6.0-1](https://github.com/ionic-team/stencil/compare/v1.5.4...v1.6.0-1) (2019-10-04)
 
 
 ### Bug Fixes
@@ -14,7 +14,7 @@
 ### Features
 
 * **docs:** expose type as array of values ([#1913](https://github.com/ionic-team/stencil/issues/1913)) ([59b9a83](https://github.com/ionic-team/stencil/commit/59b9a83))
-
+* **docs:** typed json docs ([#1922](https://github.com/ionic-team/stencil/issues/1922)) ([fb0272e](https://github.com/ionic-team/stencil/commit/fb0272e))
 
 ### Performance Improvements
 
