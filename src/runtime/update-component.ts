@@ -21,7 +21,7 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   const update = () => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
 
-  if (BUILD.lifecycle && BUILD.lazyLoad) {
+  if (BUILD.lifecycle || BUILD.lazyLoad) {
     attachToAncestor(hostRef, ancestorComponent);
   }
 
@@ -50,6 +50,14 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   emitLifecycleEvent(elm, 'componentWillRender');
   if (BUILD.cmpWillRender) {
     promise = then(promise, () => safeCall(instance, 'componentWillRender'));
+  }
+
+  if (BUILD.lifecycle && BUILD.lazyLoad && elm['s-rc']) {
+    // ok, so turns out there are some child host elements
+    // waiting on this parent element to load
+    // let's fire off all update callbacks waiting
+    elm['s-rc'].forEach(cb => cb());
+    elm['s-rc'] = undefined;
   }
 
   // there is no ancestorc omponent or the ancestor component
@@ -120,16 +128,11 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
     hostRef.$flags$ |= HOST_FLAGS.hasRendered;
   }
 
-  if (BUILD.lifecycle && BUILD.lazyLoad) {
-    if (elm['s-rc']) {
-      // ok, so turns out there are some child host elements
-      // waiting on this parent element to load
-      // let's fire off all update callbacks waiting
-      elm['s-rc'].forEach(cb => cb());
-      elm['s-rc'] = undefined;
-    }
+  if (BUILD.lifecycle || BUILD.lazyLoad) {
     Promise.all(elm['s-p']).then(() => postUpdateComponent(elm, hostRef));
     elm['s-p'].length = 0;
+  } else {
+    postUpdateComponent(elm, hostRef);
   }
 };
 
@@ -187,7 +190,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef) => {
     }
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up
-    if (BUILD.lifecycle && BUILD.lazyLoad && hostRef.$onRenderResolve$) {
+    if ((BUILD.lifecycle || BUILD.lazyLoad) && hostRef.$onRenderResolve$) {
       hostRef.$onRenderResolve$();
       hostRef.$onRenderResolve$ = undefined;
     }

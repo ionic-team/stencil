@@ -57,7 +57,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         }
       }
 
-      if (BUILD.lifecycle && BUILD.lazyLoad) {
+      if (BUILD.lifecycle || BUILD.lazyLoad) {
         // find the first ancestor component (if there is one) and register
         // this component as one of the actively loading child components for its ancestor
         let ancestorComponent = elm;
