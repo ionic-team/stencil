@@ -46,7 +46,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
         }
       }
 
-      if (BUILD.updatable && (flags & (HOST_FLAGS.isActiveRender | HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
+      if (BUILD.updatable && (flags & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
         if (BUILD.cmpShouldUpdate && instance.componentShouldUpdate) {
           if (instance.componentShouldUpdate(newVal, oldVal, propName) === false) {
             return;
@@ -56,12 +56,16 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
         // but only if we've already rendered, otherwise just chill out
         // queue that we need to do an update, but don't worry about queuing
         // up millions cuz this function ensures it only runs once
-        scheduleUpdate(
-          elm,
-          hostRef,
-          cmpMeta,
-          false
-        );
+        if (flags & HOST_FLAGS.isWaitingForChildren) {
+          hostRef.$flags$ |= HOST_FLAGS.needsRerender;
+        } else {
+          scheduleUpdate(
+            elm,
+            hostRef,
+            cmpMeta,
+            false
+          );
+        }
       }
     }
   }

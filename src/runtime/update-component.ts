@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
-import { consoleError, doc, getHostRef, plt, writeTask } from '@platform';
+import { consoleError, doc, getHostRef, plt, writeTask, nextTick } from '@platform';
 import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 
@@ -71,10 +71,6 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
 const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, instance: any, isInitialLoad: boolean) => {
   // updateComponent
-  if (BUILD.updatable && BUILD.taskQueue) {
-    hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
-  }
-
   if (BUILD.style && isInitialLoad) {
     // DOM WRITE!
     attachStyles(elm, cmpMeta, hostRef.$modeName$);
@@ -82,11 +78,6 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
 
   if (BUILD.hasRenderFn || BUILD.reflect) {
     if (BUILD.vdomRender || BUILD.reflect) {
-      // tell the platform we're actively rendering
-      // if a value is changed within a render() then
-      // this tells the platform not to queue the change
-      hostRef.$flags$ |= HOST_FLAGS.isActiveRender;
-
       try {
         // looks like we've got child nodes to render into this host element
         // or we need to update the css class/attrs on the host element
@@ -100,13 +91,15 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
       } catch (e) {
         consoleError(e);
       }
-      hostRef.$flags$ &= ~HOST_FLAGS.isActiveRender;
     } else {
       elm.textContent = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
     }
   }
   if (BUILD.cssVarShim && plt.$cssShim$) {
     plt.$cssShim$.updateHost(elm);
+  }
+  if (BUILD.updatable && BUILD.taskQueue) {
+    hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
   }
 
   if (BUILD.hydrateServerSide) {
@@ -130,20 +123,21 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
 
   if (BUILD.lifecycle || BUILD.lazyLoad) {
     const childrenPromises = elm['s-p'];
-    const postUpdate = () => postUpdateComponent(elm, hostRef);
+    const postUpdate = () => postUpdateComponent(elm, hostRef, cmpMeta);
     if (childrenPromises.length === 0) {
       postUpdate();
     } else {
       Promise.all(childrenPromises).then(postUpdate);
+      hostRef.$flags$ |= HOST_FLAGS.isWaitingForChildren;
       childrenPromises.length = 0;
     }
   } else {
-    postUpdateComponent(elm, hostRef);
+    postUpdateComponent(elm, hostRef, cmpMeta);
   }
 };
 
 
-export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef) => {
+export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta) => {
   if ((BUILD.lazyLoad || BUILD.lifecycle || BUILD.lifecycleDOMEvents)) {
     const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
     const ancestorComponent = hostRef.$ancestorComponent$;
@@ -200,6 +194,10 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef) => {
       hostRef.$onRenderResolve$();
       hostRef.$onRenderResolve$ = undefined;
     }
+    if (hostRef.$flags$ & HOST_FLAGS.needsRerender) {
+      nextTick(() => scheduleUpdate(elm, hostRef, cmpMeta, false));
+    }
+    hostRef.$flags$ &= ~(HOST_FLAGS.isWaitingForChildren | HOST_FLAGS.needsRerender);
     // ( •_•)
     // ( •_•)>⌐■-■
     // (⌐■_■)
