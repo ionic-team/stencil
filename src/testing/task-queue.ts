@@ -110,6 +110,7 @@ export function flushQueue() {
         }
 
       } catch (e) {
+        debugger;
         reject(`flushQueue: ${e}`);
       }
     }
@@ -140,6 +141,7 @@ export async function flushAll() {
     }
     throw err;
   }
+  return new Promise(resolve => process.nextTick(resolve));
 }
 
 

@@ -1,4 +1,4 @@
-import { Component, Prop, Watch, h } from '@stencil/core';
+import { Component, Element, Host, Prop, Watch, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
@@ -193,4 +193,93 @@ describe('lifecycle sync', () => {
     expect(rootInstance.renders).toBe(2);
   });
 
+  describe('childrens', () => {
+    it ('sync', async () => {
+
+      const log: string[] = [];
+      @Component({
+        tag: 'cmp-a'
+      })
+      class CmpA {
+        @Prop() prop: string;
+        componentWillLoad() {
+          log.push('componentWillLoad a');
+        }
+        componentDidLoad() {
+          log.push('componentDidLoad a');
+        }
+        componentWillUpdate() {
+          log.push('componentWillUpdate a');
+        }
+        componentDidUpdate() {
+          log.push('componentDidUpdate a');
+        }
+        render() {
+          return (
+            <Host>
+              <cmp-b id='b1' prop={this.prop}>
+                <cmp-b id='b2' prop={this.prop}>
+                  <cmp-b id='b3' prop={this.prop}></cmp-b>
+                </cmp-b>
+              </cmp-b>
+            </Host>
+          );
+        }
+      }
+      @Component({
+        tag: 'cmp-b'
+      })
+      class CmpB {
+        @Element() el: HTMLElement;
+        @Prop() prop: string;
+        componentWillLoad() {
+          log.push(`componentWillLoad ${this.el.id}`);
+        }
+        componentDidLoad() {
+          log.push(`componentDidLoad ${this.el.id}`);
+        }
+        componentWillUpdate() {
+          log.push(`componentWillUpdate ${this.el.id}`);
+        }
+        componentDidUpdate() {
+          log.push(`componentDidUpdate ${this.el.id}`);
+        }
+      }
+      const {root, waitForChanges} = await newSpecPage({
+        components: [CmpA, CmpB],
+        template: () => <cmp-a></cmp-a>
+      });
+      expect(log).toEqual([
+        'componentWillLoad a',
+        'componentWillLoad b1',
+        'componentWillLoad b2',
+        'componentWillLoad b3',
+        'componentDidLoad b3',
+        'componentDidLoad b2',
+        'componentDidLoad b1',
+        'componentDidLoad a',
+      ]);
+      log.length = 0;
+      root.forceUpdate();
+      await waitForChanges();
+      expect(log).toEqual([
+        'componentWillUpdate a',
+        'componentDidUpdate a',
+      ]);
+
+      log.length = 0;
+      root.prop = 'something else';
+      await waitForChanges();
+      expect(log).toEqual([
+        'componentWillUpdate a',
+        'componentWillUpdate b1',
+        'componentWillUpdate b2',
+        'componentWillUpdate b3',
+        'componentDidUpdate b3',
+        'componentDidUpdate b2',
+        'componentDidUpdate b1',
+        'componentDidUpdate a',
+      ]);
+    });
+  });
 });

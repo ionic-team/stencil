@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import { doc, getComponent, getHostRef, plt } from '@platform';
+import { doc, getComponent, plt } from '@platform';
 import { hydrateComponent } from './hydrate-component';
-import { insertVdomAnnotations, postUpdateComponent } from '@runtime';
+import { insertVdomAnnotations } from '@runtime';
 
 
 export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, done: (results: BootstrapHydrateResults) => void) {
@@ -20,12 +20,12 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
       connectElements(win, opts, results, this, connectedElements, waitPromises);
     };
 
-    const patchedComponentInit = function patchedComponentInit(this: d.HostElement) {
-      const hostRef = getHostRef(this);
-      if (hostRef != null) {
-        postUpdateComponent(this, hostRef);
-      }
-    };
+    // const patchedComponentInit = function patchedComponentInit(this: d.HostElement) {
+    //   const hostRef = getHostRef(this);
+    //   if (hostRef != null) {
+    //     postUpdateComponent(this, hostRef);
+    //   }
+    // };
 
     const patchComponent = function(elm: d.HostElement) {
       const tagName = elm.nodeName.toLowerCase();
@@ -37,10 +37,11 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
             elm.connectedCallback = patchedConnectedCallback;
           }
 
-          if (typeof elm['s-init'] !== 'function') {
-            elm['s-rc'] = [];
-            elm['s-init'] = patchedComponentInit;
-          }
+          elm['s-p'] = [];
+          elm['s-rc'] = [];
+          // if (typeof elm['s-init'] !== 'function') {
+          //   elm['s-init'] = patchedComponentInit;
+          // }
         }
       }
     };

@@ -8,7 +8,7 @@ import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
-import { appDidLoad, forceUpdate, postUpdateComponent } from './update-component';
+import { appDidLoad, forceUpdate } from './update-component';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
@@ -66,7 +66,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       const tagName = cmpMeta.$tagName$;
       const HostElement = class extends HTMLElement {
 
-        ['s-lr']: boolean;
+        ['s-p']: Promise<void>[];
         ['s-rc']: (() => void)[];
 
         // StencilLazyHost
@@ -75,10 +75,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           super(self);
           self = this;
 
-          if (BUILD.lifecycle) {
-            this['s-lr'] = false;
-            this['s-rc'] = [];
-          }
+          this['s-p'] = [];
+          this['s-rc'] = [];
 
           registerHost(self);
           if (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
@@ -103,13 +101,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
         disconnectedCallback() {
           plt.jmp(() => disconnectedCallback(this));
-        }
-
-        's-init'() {
-          const hostRef = getHostRef(this);
-          if (hostRef.$lazyInstance$) {
-            postUpdateComponent(this, hostRef);
-          }
         }
 
         's-hmr'(hmrVersionId: string) {
