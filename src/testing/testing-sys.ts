@@ -42,10 +42,6 @@ export class TestingSystem extends NodeSystem {
     return compiler;
   }
 
-  getDeclarationsFile(staticName: string) {
-    return normalizePath(path.join(relDistPath, 'declarations', staticName));
-  }
-
   getClientPath(staticName: string) {
     return normalizePath(path.join(relDistPath, 'client', staticName));
   }
