@@ -77,6 +77,9 @@ function validateJsonDocsOutputTarget(config: d.Config, diagnostics: d.Diagnosti
   }
 
   outputTarget.file = config.sys.path.join(config.rootDir, outputTarget.file);
+  if (typeof outputTarget.typesFile === 'string') {
+    outputTarget.typesFile = config.sys.path.join(config.rootDir, outputTarget.typesFile);
+  }
   outputTarget.strict = !!outputTarget.strict;
 }
 

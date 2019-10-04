@@ -216,6 +216,7 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
   type: 'docs-json';
 
   file: string;
+  typesFile?: string;
   strict?: boolean;
 }
 
