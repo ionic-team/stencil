@@ -39,14 +39,6 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
       promise = safeCall(instance, 'componentWillLoad');
     }
 
-    if (BUILD.lifecycle && BUILD.lazyLoad && elm['s-rc']) {
-      // ok, so turns out there are some child host elements
-      // waiting on this parent element to load
-      // let's fire off all update callbacks waiting
-      elm['s-rc'].forEach(cb => cb());
-      elm['s-rc'] = undefined;
-    }
-
   } else {
     emitLifecycleEvent(elm, 'componentWillUpdate');
 
@@ -91,10 +83,6 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
         // looks like we've got child nodes to render into this host element
         // or we need to update the css class/attrs on the host element
         // DOM WRITE!
-
-        // Two things can happen SYNCRONUOUSLY
-        // NEW => connectedCallback() => attachToAncestor()
-        // UPDATED =>  setValue() => scheduleUpdate() => attachToAncestor()
         renderVdom(
           elm,
           hostRef,
@@ -132,8 +120,17 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
     hostRef.$flags$ |= HOST_FLAGS.hasRendered;
   }
 
-  Promise.all(elm['s-p']).then(() => postUpdateComponent(elm, hostRef));
-  elm['s-p'].length = 0;
+  if (BUILD.lifecycle && BUILD.lazyLoad) {
+    if (elm['s-rc']) {
+      // ok, so turns out there are some child host elements
+      // waiting on this parent element to load
+      // let's fire off all update callbacks waiting
+      elm['s-rc'].forEach(cb => cb());
+      elm['s-rc'] = undefined;
+    }
+    Promise.all(elm['s-p']).then(() => postUpdateComponent(elm, hostRef));
+    elm['s-p'].length = 0;
+  }
 };
 
 

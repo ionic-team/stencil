@@ -110,7 +110,6 @@ export function flushQueue() {
         }
 
       } catch (e) {
-        debugger;
         reject(`flushQueue: ${e}`);
       }
     }
