@@ -7,10 +7,8 @@ export const gatherVdomMeta = (m: d.Module | d.ComponentCompilerMeta, args: ts.N
 
   // Parse vdom tag
   const hTag = args[0];
-  if (ts.isIdentifier(hTag)) {
-    if (hTag.text !== 'Host') {
-      m.hasVdomFunctional = true;
-    }
+  if (!ts.isStringLiteral(hTag) && (!ts.isIdentifier(hTag) || hTag.text !== 'Host')) {
+    m.hasVdomFunctional = true;
   }
 
   // Parse attributes
@@ -65,7 +63,8 @@ export const gatherVdomMeta = (m: d.Module | d.ComponentCompilerMeta, args: ts.N
   // Parse children
   if (!m.hasVdomText) {
     for (let i = 2; i < args.length; i++) {
-      if (ts.isStringLiteral(args[i]) || ts.isIdentifier(args[i])) {
+      const arg = args[i];
+      if (!ts.isCallExpression(arg) || !ts.isIdentifier(arg.expression) || (arg.expression.text !== 'h')) {
         m.hasVdomText = true;
         break;
       }

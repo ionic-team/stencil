@@ -43,6 +43,20 @@ describe('parse vdom', () => {
     expect(t.cmp.hasVdomFunctional).toBe(true);
   });
 
+  it('hasVdomFunctional (2)', () => {
+    const t = transpileModule(`
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        render() {
+          return <Tunnel.Provider/>
+        }
+      }
+    `);
+
+    expect(t.cmp.hasVdomFunctional).toBe(true);
+  });
+
+
   it('hasVdomKey', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})

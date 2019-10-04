@@ -27,12 +27,58 @@ describe('render-vdom', () => {
       });
     });
 
-    it('dynamic vdomText', async () => {
+    it('vdomText from identifier', async () => {
       @Component({ tag: 'cmp-a'})
       class CmpA {
         render() {
           const text = 'Hello VDOM';
           return <div>{text}</div>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: false,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: false,
+        vdomText: true,
+      });
+    });
+
+    it('vdomText from call expression', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          const text = () => 'Hello VDOM';
+          return <div>{text()}</div>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: false,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: false,
+        vdomText: true,
+      });
+    });
+
+    it('vdomText from object access', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          const text = {text: 'Hello VDOM'};
+          return <div>{text.text}</div>;
         }
       }
 
@@ -187,6 +233,31 @@ describe('render-vdom', () => {
         render() {
           const H = () => { return; };
           return <H />;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: false,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: true,
+        vdomText: false,
+      });
+    });
+
+    it('vdomFunctional (2)', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          const Tunnel = {
+            Provider: () => { return; }
+          };
+          return <Tunnel.Provider />;
         }
       }
 
