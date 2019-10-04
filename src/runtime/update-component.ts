@@ -16,6 +16,10 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   if (BUILD.taskQueue && BUILD.updatable) {
     hostRef.$flags$ |= HOST_FLAGS.isQueuedForUpdate;
   }
+  if (hostRef.$flags$ & HOST_FLAGS.isWaitingForChildren) {
+    hostRef.$flags$ |= HOST_FLAGS.needsRerender;
+    return;
+  }
 
   const ancestorComponent = hostRef.$ancestorComponent$;
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
