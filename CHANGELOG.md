@@ -1,4 +1,4 @@
-# 🦂 [1.6.0-1](https://github.com/ionic-team/stencil/compare/v1.5.4...v1.6.0-1) (2019-10-04)
+# 💚 [1.6.0-2](https://github.com/ionic-team/stencil/compare/v1.5.4...v1.6.0-2) (2019-10-04)
 
 
 ### Bug Fixes
@@ -9,6 +9,7 @@
 * **lazy:** async methods resolve on instance load ([#1919](https://github.com/ionic-team/stencil/issues/1919)) ([f1c5fd5](https://github.com/ionic-team/stencil/commit/f1c5fd5))
 * **vdom:** fix onAnimationStart/End ([#1907](https://github.com/ionic-team/stencil/issues/1907)) ([34c77bd](https://github.com/ionic-team/stencil/commit/34c77bd)), closes [#1906](https://github.com/ionic-team/stencil/issues/1906)
 * **vdom:** fix vdom static analysis ([#1920](https://github.com/ionic-team/stencil/issues/1920)) ([eee6336](https://github.com/ionic-team/stencil/commit/eee6336)), closes [#1917](https://github.com/ionic-team/stencil/issues/1917)
+* update lifecycles respect hierarchy  ([#1924](https://github.com/ionic-team/stencil/issues/1924)) ([29bdd8f](https://github.com/ionic-team/stencil/commit/29bdd8f))
 
 
 ### Features
