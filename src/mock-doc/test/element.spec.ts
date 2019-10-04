@@ -53,6 +53,38 @@ describe('element', () => {
     expect(elm).toEqualHtml(`<meta content="updated" id="test">`);
   });
 
+  it('document.styleSheets', () => {
+    expect(document.styleSheets).toEqual([]);
+    const style = document.createElement('style');
+    document.head.appendChild(style);
+    expect(document.styleSheets).toEqual([style]);
+  });
+
+  it('document.forms', () => {
+    expect(document.forms).toEqual([]);
+    const form = document.createElement('form');
+    document.head.appendChild(form);
+    expect(document.forms).toEqual([form]);
+  });
+
+  it('document.scripts', () => {
+    expect(document.scripts).toEqual([]);
+    const script = document.createElement('script');
+    document.head.appendChild(script);
+    expect(document.scripts).toEqual([script]);
+  });
+
+  it('document.images', () => {
+    expect(document.images).toEqual([]);
+    const img = document.createElement('img');
+    document.head.appendChild(img);
+    expect(document.images).toEqual([img]);
+  });
+
+  it('document.scrollingElement', () => {
+    expect(document.scrollingElement).toBe(document.documentElement);
+  });
+
   it('document.title', () => {
     document.title = 'Hello Title';
     expect(document.title).toBe('Hello Title');
