@@ -20,13 +20,6 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
       connectElements(win, opts, results, this, connectedElements, waitPromises);
     };
 
-    // const patchedComponentInit = function patchedComponentInit(this: d.HostElement) {
-    //   const hostRef = getHostRef(this);
-    //   if (hostRef != null) {
-    //     postUpdateComponent(this, hostRef);
-    //   }
-    // };
-
     const patchComponent = function(elm: d.HostElement) {
       const tagName = elm.nodeName.toLowerCase();
       if (elm.tagName.includes('-')) {

@@ -71,8 +71,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
           ) {
             // we found this components first ancestor component
             // keep a reference to this component's ancestor component
-            hostRef.$ancestorComponent$ = ancestorComponent;
-            attachToAncestor(hostRef, ancestorComponent);
+            attachToAncestor(hostRef, (hostRef.$ancestorComponent$ = ancestorComponent));
             break;
           }
         }
