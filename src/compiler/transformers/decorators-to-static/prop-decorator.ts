@@ -100,8 +100,8 @@ const getAttributeName = (_diagnostics: d.Diagnostic[], propName: string, propOp
   }
 
   if (typeof propOptions.attr === 'string' && propOptions.attr.trim().length > 0) {
-    // const diagnostic = buildWarn(diagnostics);
-    // diagnostic.messageText = `@Prop option "attr" has been depreciated. Please use "attribute" instead.`;
+    const diagnostic = buildWarn(diagnostics);
+    diagnostic.messageText = `@Prop option "attr" has been depreciated. Please use "attribute" instead.`;
     return propOptions.attr.trim().toLowerCase();
   }
 
