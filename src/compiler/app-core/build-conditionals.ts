@@ -20,6 +20,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     event: cmps.some(c => c.hasEvent),
     hasRenderFn: cmps.some(c => c.hasRenderFn),
     lifecycle: cmps.some(c => c.hasLifecycle),
+    asyncLoading: false,
     hostListener: cmps.some(c => c.hasListener),
     hostListenerTargetWindow: cmps.some(c => c.hasListenerTargetWindow),
     hostListenerTargetDocument: cmps.some(c => c.hasListenerTargetDocument),
@@ -58,6 +59,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     watchCallback: cmps.some(c => c.hasWatchCallback),
     taskQueue: true,
   };
+  f.asyncLoading = f.cmpWillUpdate || f.cmpWillLoad || f.cmpWillRender;
 
   return f;
 }
@@ -118,9 +120,8 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.reloadStrategy === 'hmr' && !config._isTesting);
   b.updatable = (b.updatable || b.hydrateClientSide || b.hotModuleReplacement);
   b.member = (b.member || b.updatable || b.mode || b.lifecycle);
-  b.taskQueue = (b.updatable || b.mode || b.lifecycle);
   b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
-  b.initializeNextTick = true; // config.outputTargets.some(isOutputTargetAngular);
+  b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;
 }
 

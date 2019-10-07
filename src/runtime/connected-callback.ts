@@ -7,7 +7,7 @@ import { doc, getHostRef, nextTick, plt, supportsShadowDom } from '@platform';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
-import { safeCall, attachToAncestor } from './update-component';
+import { attachToAncestor, safeCall } from './update-component';
 
 export const fireConnectedCallback = (instance: any) => {
   if (BUILD.lazyLoad && BUILD.connectedCallback) {
@@ -57,7 +57,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         }
       }
 
-      if (BUILD.lifecycle || BUILD.lazyLoad) {
+      if (BUILD.asyncLoading) {
         // find the first ancestor component (if there is one) and register
         // this component as one of the actively loading child components for its ancestor
         let ancestorComponent = elm;

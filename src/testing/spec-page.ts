@@ -99,7 +99,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
       }
     });
   }
-
+  bc.BUILD.asyncLoading = true;
   if (opts.hydrateClientSide) {
     bc.BUILD.hydrateClientSide = true;
     bc.BUILD.hydrateServerSide = false;

@@ -68,6 +68,7 @@ export interface BuildFeatures {
   cmpDidUnload: boolean;
   connectedCallback: boolean;
   disconnectedCallback: boolean;
+  asyncLoading: boolean;
 
   // attr
   observeAttribute: boolean;
