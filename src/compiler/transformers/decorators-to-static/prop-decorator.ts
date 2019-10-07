@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { augmentDiagnosticWithNode, buildError, catchError, toDashCase } from '@utils';
+import { augmentDiagnosticWithNode, buildError, buildWarn, catchError, toDashCase } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isMemberPrivate, resolveType, serializeSymbol, typeToString, validateReferences } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 import { validatePublicName } from '../reserved-public-members';
@@ -94,7 +94,11 @@ const parsePropDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeC
   return staticProp;
 };
 
-const getAttributeName = (_diagnostics: d.Diagnostic[], propName: string, propOptions: d.PropOptions) => {
+const getAttributeName = (diagnostics: d.Diagnostic[], propName: string, propOptions: d.PropOptions) => {
+  if (propOptions.attribute === null) {
+    return  undefined;
+  }
+
   if (typeof propOptions.attribute === 'string' && propOptions.attribute.trim().length > 0) {
     return propOptions.attribute.trim().toLowerCase();
   }
