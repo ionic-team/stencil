@@ -89,16 +89,25 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
   return vnode;
 };
 
-export const newVNode = (tag: string, text: string): d.VNode => ({
-  $flags$: 0,
-  $tag$: tag,
-  $text$: text,
-  $elm$: null,
-  $children$: null,
-  $attrs$: null,
-  $key$: null,
-  $name$: null,
-});
+export const newVNode = (tag: string, text: string) => {
+  const vnode: d.VNode = {
+    $flags$: 0,
+    $tag$: tag,
+    $text$: text,
+    $elm$: null,
+    $children$: null
+  };
+  if (BUILD.vdomAttribute) {
+    vnode.$attrs$ = null;
+  }
+  if (BUILD.vdomKey)  {
+    vnode.$key$ = null;
+  }
+  if (BUILD.slotRelocation) {
+    vnode.$name$ = null;
+  }
+  return vnode;
+};
 
 export const Host = {};
 

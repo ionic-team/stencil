@@ -26,7 +26,7 @@ declare global {
 }
 
 declare namespace LocalJSX {
-  interface HelloWorld extends JSXBase.HTMLAttributes<HTMLHelloWorldElement> {}
+  interface HelloWorld {}
 
   interface IntrinsicElements {
     'hello-world': HelloWorld;
@@ -38,7 +38,9 @@ export { LocalJSX as JSX };
 
 declare module "@stencil/core" {
   export namespace JSX {
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+    interface IntrinsicElements {
+      'hello-world': LocalJSX.HelloWorld & JSXBase.HTMLAttributes<HTMLHelloWorldElement>;
+    }
   }
 }
 

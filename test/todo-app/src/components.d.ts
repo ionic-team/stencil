@@ -45,11 +45,11 @@ declare global {
 }
 
 declare namespace LocalJSX {
-  interface AppRoot extends JSXBase.HTMLAttributes<HTMLAppRootElement> {}
-  interface TodoInput extends JSXBase.HTMLAttributes<HTMLTodoInputElement> {
+  interface AppRoot {}
+  interface TodoInput {
     'onInputSubmit'?: (event: CustomEvent<any>) => void;
   }
-  interface TodoItem extends JSXBase.HTMLAttributes<HTMLTodoItemElement> {
+  interface TodoItem {
     'checked'?: boolean;
     'onItemCheck'?: (event: CustomEvent<any>) => void;
     'onItemRemove'?: (event: CustomEvent<any>) => void;
@@ -68,7 +68,11 @@ export { LocalJSX as JSX };
 
 declare module "@stencil/core" {
   export namespace JSX {
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+    interface IntrinsicElements {
+      'app-root': LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
+      'todo-input': LocalJSX.TodoInput & JSXBase.HTMLAttributes<HTMLTodoInputElement>;
+      'todo-item': LocalJSX.TodoItem & JSXBase.HTMLAttributes<HTMLTodoItemElement>;
+    }
   }
 }
 

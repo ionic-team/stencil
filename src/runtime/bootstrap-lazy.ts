@@ -54,6 +54,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         $members$: compactMeta[2],
         $listeners$: compactMeta[3],
       };
+      if (BUILD.member) {
+        cmpMeta.$members$ = compactMeta[2];
+      }
+      if (BUILD.hostListener) {
+        cmpMeta.$listeners$ = compactMeta[3];
+      }
       if (BUILD.reflect) {
         cmpMeta.$attrsToReflect$ = [];
       }
@@ -74,9 +80,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           // @ts-ignore
           super(self);
           self = this;
-
-          this['s-p'] = [];
-          this['s-rc'] = [];
 
           registerHost(self);
           if (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {

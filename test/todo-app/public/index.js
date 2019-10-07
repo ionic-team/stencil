@@ -1,1 +1,289 @@
-const e=document,t=HTMLElement,l=new WeakMap,n=e=>l.get(e),s=e=>l.set(e,{t:0,l:new Map}),o=(e,t)=>t in e,c={},i=e=>null!=e,r=e=>e.toLowerCase(),a=e=>["object","function"].includes(typeof e),u=(e,t,...l)=>{let n,s=null,o=!1,c=!1,i=[];const r=t=>{for(let l=0;l<t.length;l++)s=t[l],Array.isArray(s)?r(s):null!=s&&"boolean"!=typeof s&&((o="function"!=typeof e&&!a(s))&&(s=String(s)),o&&c?i[i.length-1].s+=s:i.push(o?{t:0,s}:s),c=o)};if(r(l),t){n=t.key||void 0;{const e=t.className||t.class;e&&(t.class="object"!=typeof e?e:Object.keys(e).filter(t=>e[t]).join(" "))}}if("function"==typeof e)return e(t,i,h);const u={t:0,o:e,i:i.length>0?i:null,u:void 0,h:t};return u.$=n,u},f={},h={forEach:(e,t)=>e.map(d).forEach(t),map:(e,t)=>e.map(d).map(t).map($)},d=e=>({vattrs:e.h,vchildren:e.i,vkey:e.$,vname:e.p,vtag:e.o,vtext:e.s}),$=e=>({t:0,h:e.vattrs,i:e.vchildren,$:e.vkey,p:e.vname,o:e.vtag,s:e.vtext}),p=(e,t,l,n,s,c)=>{if(l!==n)if("class"!==t||s)if("style"===t){for(const t in l)n&&null!=n[t]||(t.includes("-")?e.style.removeProperty(t):e.style[t]="");for(const t in n)l&&n[t]===l[t]||(t.includes("-")?e.style.setProperty(t,n[t]):e.style[t]=n[t])}else if("key"===t);else if("ref"===t)n&&n(e);else if(t.startsWith("on")&&!o(e,t))t=o(e,r(t))?r(t.substring(2)):r(t[2])+t.substring(3),l&&((e,t,l,n)=>e.removeEventListener(t,l,n))(e,t,l,!1),n&&((e,t,l,n)=>e.addEventListener(t,l,n))(e,t,n,!1);else{const l=o(e,t),i=a(n);if((l||i&&null!==n)&&!s)try{e[t]=null==n&&-1===e.tagName.indexOf("-")?"":n}catch(e){}null==n||!1===n?e.removeAttribute(t):(!l||4&c||s)&&!i&&(n=!0===n?"":n.toString(),e.setAttribute(t,n))}else{const t=m(l),s=m(e.className).filter(e=>!t.includes(e));e.className=s.concat(m(n).filter(e=>!s.includes(e))).join(" ")}},m=e=>e?e.split(" "):[],b=(e,t,l,n)=>{const s=11===t.u.nodeType&&t.u.host?t.u.host:t.u,o=e&&e.h||c,i=t.h||c;for(n in o)null==i[n]&&null!=o[n]&&p(s,n,o[n],void 0,l,t.t);for(n in i)p(s,n,o[n],i[n],l,t.t)};let g;const k=(t,l,n)=>{let s,o,c=l.i[n],r=0;if(i(c.s))c.u=e.createTextNode(c.s);else if(s=c.u=e.createElement(c.o),b(null,c,!1),c.i)for(r=0;r<c.i.length;++r)(o=k(t,c,r))&&s.appendChild(o);return c.u},y=(e,t,l,n,s,o)=>{let c,i=e;for(;s<=o;++s)n[s]&&(c=k(null,l,s))&&(n[s].u=c,i.insertBefore(c,t))},v=(e,t,l,n)=>{for(;t<=l;++t)i(e[t])&&(n=e[t].u,j(e[t],!0),n.remove())},x=(e,t)=>e.o===t.o&&e.$===t.$,C=(e,t)=>{const l=t.u=e.u,n=e.i,s=t.i;i(t.s)?e.s!==t.s&&(l.textContent=t.s):(b(e,t,!1),i(n)&&i(s)?((e,t,l,n)=>{let s,o,c=0,r=0,a=0,u=0,f=t.length-1,h=t[0],d=t[f],$=n.length-1,p=n[0],m=n[$];for(;c<=f&&r<=$;)if(null==h)h=t[++c];else if(null==d)d=t[--f];else if(null==p)p=n[++r];else if(null==m)m=n[--$];else if(x(h,p))C(h,p),h=t[++c],p=n[++r];else if(x(d,m))C(d,m),d=t[--f],m=n[--$];else if(x(h,m))C(h,m),e.insertBefore(h.u,d.u.nextSibling),h=t[++c],m=n[--$];else if(x(d,p))C(d,p),e.insertBefore(d.u,h.u),d=t[--f],p=n[++r];else{for(a=-1,u=c;u<=f;++u)if(t[u]&&i(t[u].$)&&t[u].$===p.$){a=u;break}a>=0?((o=t[a]).o!==p.o?s=k(t&&t[r],l,a):(C(o,p),t[a]=void 0,s=o.u),p=n[++r]):(s=k(t&&t[r],l,r),p=n[++r]),s&&h.u.parentNode.insertBefore(s,h.u)}c>f?y(e,null==n[$+1]?null:n[$+1].u,l,n,r,$):r>$&&v(t,c,f)})(l,n,t,s):i(s)?(i(e.s)&&(l.textContent=""),y(l,null,t,s,0,s.length-1)):i(n)&&v(n,0,n.length-1))},j=(e,t)=>{e&&(e.h&&e.h.ref&&e.h.ref(t?null:e.u),e.i&&e.i.forEach(e=>{j(e,t)}))},I=async(e,t,l)=>{w(e,t,l,e)},w=(e,t,l,n)=>{t.t|=4;try{((e,t,l,n)=>{const s=t.m||{t:0};g=r(e.tagName),(e=>e&&e.o===f)(n)?n.o=null:n=u(null,null,n),n.t|=4,t.m=n,n.u=s.u=e,C(s,n)})(e,t,0,n.render())}catch(e){(e=>console.error(e))(e)}t.t&=-5,t.t|=2},S=(e,t)=>{if(t.g){const l=Object.entries(t.g),s=e.prototype;l.forEach(([e,[l]])=>{(31&l||32&l)&&Object.defineProperty(s,e,{get(){return((e,t)=>n(e).l.get(t))(this,e)},set(l){((e,t,l,s)=>{const o=n(e),c=e,i=o.l.get(t),r=o.t;(l=((e,t)=>null==e||a(e)?e:4&t?"false"!==e&&(""===e||!!e):1&t?String(e):e)(l,s.g[t][0]))===i||(o.l.set(t,l),2==(22&r)&&I(c,o,s))})(this,e,l,t)},configurable:!0,enumerable:!0})});{const t=new Map;s.attributeChangedCallback=function(e,l,n){const s=t.get(e);this[s]=(null!==n||"boolean"!=typeof this[s])&&n},e.observedAttributes=l.filter(([e,t])=>15&t[0]).map(([e,l])=>{const n=l[1]||e;return t.set(n,e),n})}}return e},O=(e,t)=>{const l={t:t[0],k:t[1],g:t[2],v:t[3],C:e.C};return Object.assign(e.prototype,{forceUpdate(){I(this,n(this),l)},connectedCallback(){((e,t)=>{{const l=n(e);1&l.t||(l.t|=1,(async(e,t,l)=>{I(e,t,l)})(e,l,t))}})(this,l)},}),S(e,l)},M=(e,t,l)=>{const n=R(e);return{emit:e=>n.dispatchEvent(new CustomEvent(t,{bubbles:!!(4&l),composed:!!(2&l),cancelable:!!(1&l),detail:e}))}},R=e=>e;class T extends t{constructor(){super(),s(this),this.list=[]}render(){const e=this.list,t=e.every(e=>e.checked);return u("div",null,u("header",{class:"header"},u("h1",null,"Todos Stencil"),u("todo-input",{onInputSubmit:t=>{this.list=[...e,{text:t.detail}]}})),u("section",{class:"main",hidden:!e.length},u("input",{id:"toggle-all",onInput:t=>{this.list=e.map(e=>(e.checked=!!t.target.checked,e))},class:"toggle-all",type:"checkbox",checked:t}),u("label",{htmlFor:"toggle-all"}),u("ul",{class:"todo-list"},e.map((t,l)=>u("todo-item",{onItemCheck:()=>{e[l]=Object.assign({},t,{checked:!t.checked}),this.list=e.slice()},onItemRemove:()=>{this.list=[...e.slice(0,l),...e.slice(l+1)]},checked:t.checked,text:t.text})))))}}class E extends t{constructor(){super(),s(this),this.inputSubmit=M(this,"inputSubmit",7)}render(){const e=this.value;return u("form",{onSubmit:t=>{e&&(t.preventDefault(),this.inputSubmit.emit(e),this.value="")}},u("input",{class:"new-todo",value:e,type:"text",placeholder:"What needs to be done?",onInput:e=>this.value=e.target.value}))}}class A extends t{constructor(){super(),s(this),this.itemCheck=M(this,"itemCheck",7),this.itemRemove=M(this,"itemRemove",7)}render(){const{checked:e,text:t,itemCheck:l,itemRemove:n}=this;return u("li",{class:{completed:e}},u("input",{class:"toggle",type:"checkbox",checked:e,onChange:()=>l.emit()}),u("label",null,t),u("button",{class:"destroy",onClick:()=>n.emit()}))}}const W=O(T,[0,"app-root",{list:[32]}]),F=O(E,[0,"todo-input",{value:[32]}]),H=O(A,[0,"todo-item",{checked:[4],text:[1]}]);export{W as AppRoot,F as TodoInput,H as TodoItem};
+const t = window,
+  e = document,
+  l = new WeakMap,
+  n = t => l.get(t),
+  s = t => {
+    const e = {
+      t: 0,
+      l: t,
+      s: new Map
+    };
+    return l.set(t, e)
+  },
+  o = (t, e) => e in t,
+  c = {},
+  u = t => "object" == (t = typeof t) || "function" === t,
+  i = (t, e, ...l) => {
+    let n = null,
+      s = !1,
+      o = !1,
+      c = [];
+    const i = e => {
+      for (let l = 0; l < e.length; l++) n = e[l], Array.isArray(n) ? i(n) : null != n && "boolean" != typeof n && ((s = "function" != typeof t && !u(n)) && (n = String(n)), s && o ? c[c.length - 1].o += n : c.push(s ? r(null, n) : n), o = s)
+    };
+    if (i(l), e) {
+      const t = e.className || e.class;
+      t && (e.class = "object" != typeof t ? t : Object.keys(t).filter(e => t[e]).join(" "))
+    }
+    const a = r(t, null);
+    return a.u = e, c.length > 0 && (a.i = c), a
+  },
+  r = (t, e) => ({
+    t: 0,
+    h: t,
+    o: e,
+    m: null,
+    i: null,
+    u: null
+  }),
+  a = {},
+  h = (e, l, n, s, c, i) => {
+    if (n === s) return;
+    let r = o(e, l),
+      a = l.toLowerCase();
+    if ("class" === l) {
+      const t = e.classList,
+        l = m(n),
+        o = m(s);
+      t.remove(...l.filter(t => t && !o.includes(t))), t.add(...o.filter(t => t && !l.includes(t)))
+    } else if (r || "o" !== l[0] || "n" !== l[1]) {
+      const t = u(s);
+      if ((r || t && null !== s) && !c) try {
+        if (e.tagName.includes("-")) e[l] = s;
+        else {
+          let t = null == s ? "" : s;
+          null != n && e[l] == t || (e[l] = t)
+        }
+      } catch (h) {}
+      null == s || !1 === s ? e.removeAttribute(l) : (!r || 4 & i || c) && !t && e.setAttribute(l, s = !0 === s ? "" : s)
+    } else l = "-" === l[2] ? l.slice(3) : o(t, a) ? a.slice(2) : a[2] + l.slice(3), n && ((t, e, l) => t.removeEventListener(e, l, !1))(e, l, n), s && ((t, e, l) => t.addEventListener(e, l, !1))(e, l, s)
+  },
+  d = /\s/,
+  m = t => t ? t.split(d) : [],
+  p = (t, e, l, n) => {
+    const s = 11 === e.m.nodeType && e.m.host ? e.m.host : e.m,
+      o = t && t.u || c,
+      u = e.u || c;
+    for (n in o) n in u || h(s, n, o[n], void 0, l, e.t);
+    for (n in u) h(s, n, o[n], u[n], l, e.t)
+  },
+  f = (t, l, n) => {
+    let s, o, c = l.i[n],
+      u = 0;
+    if (null !== c.o) c.m = e.createTextNode(c.o);
+    else if (s = c.m = e.createElement(c.h), p(null, c, !1), c.i)
+      for (u = 0; u < c.i.length; ++u)(o = f(t, c, u)) && s.appendChild(o);
+    return c.m
+  },
+  $ = (t, e, l, n, s, o) => {
+    let c, u = t;
+    for (; s <= o; ++s) n[s] && (c = f(null, l, s)) && (n[s].m = c, u.insertBefore(c, e))
+  },
+  b = (t, e, l) => {
+    for (; e <= l; ++e) t[e] && t[e].m.remove()
+  },
+  g = (t, e) => t.h === e.h,
+  k = (t, e) => {
+    const l = e.m = t.m,
+      n = t.i,
+      s = e.i;
+    null === e.o ? (p(t, e, !1), null !== n && null !== s ? ((t, e, l, n) => {
+      let s, o = 0,
+        c = 0,
+        u = e.length - 1,
+        i = e[0],
+        r = e[u],
+        a = n.length - 1,
+        h = n[0],
+        d = n[a];
+      for (; o <= u && c <= a;) null == i ? i = e[++o] : null == r ? r = e[--u] : null == h ? h = n[++c] : null == d ? d = n[--a] : g(i, h) ? (k(i, h), i = e[++o], h = n[++c]) : g(r, d) ? (k(r, d), r = e[--u], d = n[--a]) : g(i, d) ? (k(i, d), t.insertBefore(i.m, r.m.nextSibling), i = e[++o], d = n[--a]) : g(r, h) ? (k(r, h), t.insertBefore(r.m, i.m), r = e[--u], h = n[++c]) : (s = f(e && e[c], l, c), h = n[++c], s && i.m.parentNode.insertBefore(s, i.m));
+      o > u ? $(t, null == n[a + 1] ? null : n[a + 1].m, l, n, c, a) : c > a && b(e, o, u)
+    })(l, n, e, s) : null !== s ? (null !== t.o && (l.textContent = ""), $(l, null, e, s, 0, s.length - 1)) : null !== n && b(n, 0, n.length - 1)) : t.o !== e.o && (l.data = e.o)
+  },
+  x = (t, e, l) => {
+    const n = t;
+    return C(void 0, () => y(t, e, l, n))
+  },
+  y = (t, e, l, n) => {
+    try {
+      ((t, e, l, n) => {
+        const s = e.p || r(null, null),
+          o = (t => t && t.h === a)(n) ? n : i(null, null, n);
+        o.h = null, o.t |= 4, e.p = o, o.m = s.m = t, k(s, o)
+      })(t, e, 0, n.render())
+    } catch (s) {
+      (t => console.error(t))(s)
+    }
+    e.t |= 2, v(t, e)
+  },
+  v = (t, e) => {
+    64 & e.t || (e.t |= 64)
+  },
+  C = (t, e) => t && t.then ? t.then(e) : e(),
+  j = (t, e) => {
+    if (e.$) {
+      const l = Object.entries(e.$),
+        s = t.prototype;
+      l.forEach(([t, [l]]) => {
+        (31 & l || 32 & l) && Object.defineProperty(s, t, {
+          get() {
+            return ((t, e) => n(t).s.get(e))(this, t)
+          },
+          set(l) {
+            ((t, e, l, s) => {
+              const o = n(t),
+                c = t,
+                i = o.s.get(e),
+                r = o.t;
+              (l = ((t, e) => null == t || u(t) ? t : 4 & e ? "false" !== t && ("" === t || !!t) : 1 & e ? String(t) : t)(l, s.$[e][0])) === i || (o.s.set(e, l), 2 == (18 & r) && x(c, o, s))
+            })(this, t, l, e)
+          },
+          configurable: !0,
+          enumerable: !0
+        })
+      })
+    }
+    return t
+  },
+  w = (t, e) => {
+    const l = {
+      t: e[0],
+      g: e[1],
+      $: e[2],
+      k: e[3],
+      v: t.v
+    };
+    return Object.assign(t.prototype, {
+      forceUpdate() {
+        ((t, e) => {
+          {
+            const l = n(t);
+            2 == (18 & l.t) && x(t, l, e)
+          }
+        })(this, l)
+      },
+      connectedCallback() {
+        ((t, e) => {
+          {
+            const l = n(t);
+            1 & l.t || (l.t |= 1, (async (t, e, l) => {
+              (() => x(t, e, l))()
+            })(t, l, e))
+          }
+        })(this, l)
+      },
+    }), j(t, l)
+  },
+  I = (t, e, l) => {
+    const n = S(t);
+    return {
+      emit: t => n.dispatchEvent(new CustomEvent(e, {
+        bubbles: !!(4 & l),
+        composed: !!(2 & l),
+        cancelable: !!(1 & l),
+        detail: t
+      }))
+    }
+  },
+  S = t => t,
+  T = class extends HTMLElement {
+    constructor() {
+      super(), s(this), this.inputSubmit = I(this, "inputSubmit", 7)
+    }
+    render() {
+      const t = this.value;
+      return i("form", {
+        onSubmit: e => {
+          t && (e.preventDefault(), this.inputSubmit.emit(t), this.value = "")
+        }
+      }, i("input", {
+        class: "new-todo",
+        value: t,
+        type: "text",
+        placeholder: "What needs to be done?",
+        onInput: t => this.value = t.target.value
+      }))
+    }
+  },
+  E = class extends HTMLElement {
+    constructor() {
+      super(), s(this), this.itemCheck = I(this, "itemCheck", 7), this.itemRemove = I(this, "itemRemove", 7)
+    }
+    render() {
+      const {
+        checked: t,
+        text: e,
+        itemCheck: l,
+        itemRemove: n
+      } = this;
+      return i("li", {
+        class: {
+          completed: t
+        }
+      }, i("input", {
+        class: "toggle",
+        type: "checkbox",
+        checked: t,
+        onChange: () => l.emit()
+      }), i("label", null, e), i("button", {
+        class: "destroy",
+        onClick: () => n.emit()
+      }))
+    }
+  },
+  M = w(class extends HTMLElement {
+    constructor() {
+      super(), s(this), this.list = []
+    }
+    render() {
+      const t = this.list,
+        e = t.every(t => t.checked);
+      return i("div", null, i("header", {
+        class: "header"
+      }, i("h1", null, "Todos Stencil"), i("todo-input", {
+        onInputSubmit: e => {
+          this.list = [...t, {
+            text: e.detail
+          }]
+        }
+      })), i("section", {
+        class: "main",
+        hidden: !t.length
+      }, i("input", {
+        id: "toggle-all",
+        onInput: e => {
+          this.list = t.map(t => (t.checked = !!e.target.checked, t))
+        },
+        class: "toggle-all",
+        type: "checkbox",
+        checked: e
+      }), i("label", {
+        htmlFor: "toggle-all"
+      }), i("ul", {
+        class: "todo-list"
+      }, t.map((e, l) => i("todo-item", {
+        onItemCheck: () => {
+          t[l] = Object.assign({}, e, {
+            checked: !e.checked
+          }), this.list = t.slice()
+        },
+        onItemRemove: () => {
+          this.list = [...t.slice(0, l), ...t.slice(l + 1)]
+        },
+        checked: e.checked,
+        text: e.text
+      })))))
+    }
+  }, [0, "app-root", {
+    list: [32]
+  }]),
+  O = w(T, [0, "todo-input", {
+    value: [32]
+  }]),
+  R = w(E, [0, "todo-item", {
+    checked: [4],
+    text: [1]
+  }]);
+export {
+  M as AppRoot, O as TodoInput, R as TodoItem
+};
