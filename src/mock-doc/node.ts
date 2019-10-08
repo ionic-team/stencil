@@ -42,6 +42,21 @@ export class MockNode {
     return newNode;
   }
 
+  append(...items: (MockNode | string)[]) {
+    items.forEach(item => {
+      const isNode = typeof item === 'object' && item !== null && 'nodeType' in item;
+      this.appendChild(isNode ? item : this.ownerDocument.createTextNode(String(item)));
+    });
+  }
+
+  prepend(...items: (MockNode | string)[]) {
+    const firstChild = this.firstChild;
+    items.forEach(item => {
+      const isNode = typeof item === 'object' && item !== null && 'nodeType' in item;
+      this.insertBefore(isNode ? item : this.ownerDocument.createTextNode(String(item)), firstChild);
+    });
+  }
+
   cloneNode(deep?: boolean): MockNode {
     throw new Error(`invalid node type to clone: ${this.nodeType}, deep: ${deep}`);
   }

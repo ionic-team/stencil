@@ -118,29 +118,98 @@ describe('element', () => {
     expect(win.document.location.href).toBe('http://stenciljs.com/path/to/page');
   });
 
-  it('isConnected nested true', () => {
-    const elmParent = document.createElement('div');
-    const elmChild = document.createElement('div');
-    elmParent.appendChild(elmChild);
-    expect(document.body.contains(elmParent)).toBe(false);
-    document.body.appendChild(elmParent);
-    expect(document.body.contains(elmParent)).toBe(true);
-    expect(elmParent.isConnected).toBe(true);
-    expect(elmChild.isConnected).toBe(true);
-    expect(document.body.isConnected).toBe(true);
-    expect(document.documentElement.isConnected).toBe(true);
-    expect(document.isConnected).toBe(true);
+  describe('isConnected', () => {
+    it('nested true', () => {
+      const elmParent = document.createElement('div');
+      const elmChild = document.createElement('div');
+      elmParent.appendChild(elmChild);
+      expect(document.body.contains(elmParent)).toBe(false);
+      document.body.appendChild(elmParent);
+      expect(document.body.contains(elmParent)).toBe(true);
+      expect(elmParent.isConnected).toBe(true);
+      expect(elmChild.isConnected).toBe(true);
+      expect(document.body.isConnected).toBe(true);
+      expect(document.documentElement.isConnected).toBe(true);
+      expect(document.isConnected).toBe(true);
+    });
+
+    it('true', () => {
+      const elm = document.createElement('div');
+      document.body.appendChild(elm);
+      expect(elm.isConnected).toBe(true);
+    });
+
+    it('false', () => {
+      const elm = document.createElement('div');
+      expect(elm.isConnected).toBe(false);
+    });
   });
 
-  it('isConnected true', () => {
-    const elm = document.createElement('div');
-    document.body.appendChild(elm);
-    expect(elm.isConnected).toBe(true);
+  describe('append', () => {
+    it('nothing', () => {
+      const elm = doc.createElement('div') as Element;
+      elm.append();
+      expect(elm.childNodes).toEqual([]);
+    });
+    it('one element', () => {
+      const elm = doc.createElement('div') as Element;
+      const child = doc.createElement('div') as Element;
+      elm.append(child);
+      expect(elm.childNodes).toEqual([child]);
+    });
+    it('one text', () => {
+      const elm = doc.createElement('div') as Element;
+      elm.append('text');
+      expect(elm.childNodes.length).toEqual(1);
+      expect((elm.childNodes[0] as Text).data).toEqual('text');
+    });
+    it('multiple texts', () => {
+      const elm = doc.createElement('div') as Element;
+      elm.append('text', 'some text');
+      expect(elm.childNodes.length).toEqual(2);
+      expect((elm.childNodes[0] as Text).data).toEqual('text');
+      expect((elm.childNodes[1] as Text).data).toEqual('some text');
+    });
+    it('mixed', () => {
+      const elm = doc.createElement('div') as Element;
+      const child = doc.createElement('div') as Element;
+
+      elm.append('text', 12 as any, child, null);
+      expect(elm.childNodes.length).toEqual(4);
+      expect((elm.childNodes[0] as Text).data).toEqual('text');
+      expect((elm.childNodes[1] as Text).data).toEqual('12');
+      expect(elm.childNodes[2]).toEqual(child);
+      expect((elm.childNodes[3] as Text).data).toEqual('null');
+    });
   });
 
-  it('isConnected false', () => {
-    const elm = document.createElement('div');
-    expect(elm.isConnected).toBe(false);
+  describe('prepend', () => {
+    it('before node', () => {
+      const elm = doc.createElement('div') as Element;
+      const original = doc.createElement('div') as Element;
+      const child = doc.createElement('div') as Element;
+      elm.append(original);
+      elm.prepend('text', 12 as any, child);
+
+      expect(elm.childNodes.length).toEqual(4);
+      expect((elm.childNodes[0] as Text).data).toEqual('text');
+      expect((elm.childNodes[1] as Text).data).toEqual('12');
+      expect(elm.childNodes[2]).toEqual(child);
+      expect(elm.childNodes[3]).toEqual(original);
+    });
+
+    it('before text', () => {
+      const elm = doc.createElement('div') as Element;
+      const child = doc.createElement('div') as Element;
+      elm.append('original');
+      elm.prepend('text', 12 as any, child);
+
+      expect(elm.childNodes.length).toEqual(4);
+      expect((elm.childNodes[0] as Text).data).toEqual('text');
+      expect((elm.childNodes[1] as Text).data).toEqual('12');
+      expect(elm.childNodes[2]).toEqual(child);
+      expect((elm.childNodes[3] as Text).data).toEqual('original');
+    });
   });
 
   it('getBoundingClientRect', () => {
