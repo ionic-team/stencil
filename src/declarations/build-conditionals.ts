@@ -93,6 +93,6 @@ export interface Build extends Partial<BuildFeatures> {
 }
 
 export interface UserBuildConditionals {
-  isDev: boolean;
-  isBrowser: boolean;
+  readonly isDev: boolean;
+  readonly isBrowser: boolean;
 }
