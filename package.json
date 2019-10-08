@@ -120,7 +120,7 @@
     "rollup-plugin-replace": "^2.2.0",
     "semver": "6.3.0",
     "stream-browserify": "^2.0.2",
-    "terser": "4.3.8",
+    "terser": "4.3.4",
     "tslib": "^1.10.0",
     "tslint": "^5.16.0",
     "tslint-ionic-rules": "0.0.13",

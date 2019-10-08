@@ -76,7 +76,7 @@ const parsePropDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeC
 
   // prop can have an attribute if type is NOT "unknown"
   if (typeStr !== 'unknown') {
-    propMeta.attribute = getAttributeName(diagnostics, propName, propOptions);
+    propMeta.attribute = getAttributeName(config, diagnostics, propName, propOptions, propDecorator);
     propMeta.reflect = getReflect(diagnostics, propOptions);
   }
 
@@ -94,7 +94,7 @@ const parsePropDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeC
   return staticProp;
 };
 
-const getAttributeName = (diagnostics: d.Diagnostic[], propName: string, propOptions: d.PropOptions) => {
+const getAttributeName = (config: d.Config, diagnostics: d.Diagnostic[], propName: string, propOptions: d.PropOptions, node: ts.Node) => {
   if (propOptions.attribute === null) {
     return  undefined;
   }
@@ -105,7 +105,8 @@ const getAttributeName = (diagnostics: d.Diagnostic[], propName: string, propOpt
 
   if (typeof propOptions.attr === 'string' && propOptions.attr.trim().length > 0) {
     const diagnostic = buildWarn(diagnostics);
-    diagnostic.messageText = `@Prop option "attr" has been depreciated. Please use "attribute" instead.`;
+    diagnostic.messageText = `@Prop option "attr" has been deprecated. Please use "attribute" instead.`;
+    augmentDiagnosticWithNode(config, diagnostic, node);
     return propOptions.attr.trim().toLowerCase();
   }
 

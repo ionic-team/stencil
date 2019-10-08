@@ -5,8 +5,8 @@
   "types": "test-dist/types/components.d.ts",
   "collection": "test-dist/collection/collection-manifest.json",
   "scripts": {
-    "build.app": "node ../../bin/stencil build --debug --profile --es5",
-    "build.prod": "node ../../bin/stencil build --es5",
+    "build.app": "node ../../bin/stencil build",
+    "build.prod": "node ../../bin/stencil build",
     "build.prerender": "node ../../bin/stencil build --profile --config stencil.config-prerender.js --prerender && node test-prerender/no-script-build.js",
     "build.sibling": "node ../../bin/stencil build --config stencil.config-sibling.js --debug --profile --es5",
     "karma": "karma start karma.config.js",
