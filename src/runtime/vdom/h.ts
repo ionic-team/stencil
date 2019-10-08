@@ -17,8 +17,8 @@ import { isComplexType } from '@utils';
 // export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
 export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.VNode => {
   let child = null;
-  let key: string;
-  let slotName: string;
+  let key: string = null;
+  let slotName: string = null;
   let simple = false;
   let lastSimple = false;
   let vNodeChildren: d.VNode[] = [];
@@ -46,10 +46,10 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
   walk(children);
   if (vnodeData) {
     // normalize class / classname attributes
-    if (BUILD.vdomKey) {
+    if (BUILD.vdomKey && vnodeData.key) {
       key = vnodeData.key;
     }
-    if (BUILD.slotRelocation) {
+    if (BUILD.slotRelocation && vnodeData.name) {
       slotName = vnodeData.name;
     }
     if (BUILD.vdomClass) {
@@ -81,10 +81,10 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
     vnode.$children$ = vNodeChildren;
   }
   if (BUILD.vdomKey) {
-    vnode.$key$ = key || null;
+    vnode.$key$ = key;
   }
   if (BUILD.slotRelocation) {
-    vnode.$name$ = slotName || null;
+    vnode.$name$ = slotName;
   }
   return vnode;
 };
