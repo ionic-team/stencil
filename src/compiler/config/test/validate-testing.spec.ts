@@ -61,7 +61,6 @@ describe('validateTesting', () => {
     validateConfig(config, [], false);
     expect(config.testing.browserArgs).toEqual([
       '--font-render-hinting=medium',
-      '--enable-font-antialiasing',
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
@@ -73,7 +72,6 @@ describe('validateTesting', () => {
     validateConfig(config, [], false);
     expect(config.testing.browserArgs).toEqual([
       '--font-render-hinting=medium',
-      '--enable-font-antialiasing',
     ]);
   });
 

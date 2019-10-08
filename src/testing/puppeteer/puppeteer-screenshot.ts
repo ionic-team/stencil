@@ -87,11 +87,9 @@ export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: d.E2E
   await wait(screenshotBuildData.timeoutBeforeScreenshot);
   await page.evaluate(() => {
     return new Promise(resolve => {
-      (window as any).requestIdleCallback(() => {
-        window.requestAnimationFrame(() => {
-          resolve();
-        });
-      }, { timeout: 100 });
+      window.requestAnimationFrame(() => {
+        resolve();
+      });
     });
   });
 
@@ -109,7 +107,7 @@ function createPuppeteerScreenshopOptions(opts: d.ScreenshotOptions) {
     type: 'png',
     fullPage: opts.fullPage,
     omitBackground: opts.omitBackground,
-    encoding: 'binary'
+    encoding: 'binary',
   };
 
   if (opts.clip) {
