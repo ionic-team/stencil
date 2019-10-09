@@ -110,6 +110,7 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
     plt.$cssShim$.updateHost(elm);
   }
   if (BUILD.isDev) {
+    hostRef.$renderCount$++;
     hostRef.$flags$ &= ~HOST_FLAGS.dev_stateMutation;
   }
   if (BUILD.updatable && BUILD.taskQueue) {

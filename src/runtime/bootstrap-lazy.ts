@@ -9,13 +9,15 @@ import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@pla
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
 import { appDidLoad, forceUpdate } from './update-component';
-import { createTime } from './profile';
+import { createTime, installDevTools } from './profile';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
   if (BUILD.profile) {
     performance.mark('st:app:start');
   }
+  installDevTools();
+
   const endBootstrap = createTime('bootstrapLazy');
   const cmpTags: string[] = [];
   const exclude = options.exclude || [];
