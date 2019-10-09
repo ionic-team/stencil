@@ -22,7 +22,7 @@
     "start": "npm run watch",
     "build": "npm run tsc && npm run rollup",
     "build.prod.ci": "npm run tsc && npm run rollup.prod.ci",
-    "build.prod": "npm run tsc && npm run rollup.prod",
+    "build.prod": "npm run tsc.scripts && npm run tsc && npm run rollup.prod",
     "tsc.scripts": "tsc -p scripts/tsconfig.json",
     "watch": "npm run tsc && concurrently \"npm run rollup.watch\" \"npm run tsc.watch\"",
     "release": "node build/scripts/release.js --publish",
