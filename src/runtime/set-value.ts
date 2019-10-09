@@ -25,10 +25,10 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
 
     if (BUILD.isDev && hostRef.$flags$ & HOST_FLAGS.dev_stateMutation) {
       console.warn(
-        `[STENCIL-DEV-MODE] The state/prop "${propName}" changed during rendering, triggering another re-render. This is not a recommended pattern since it can lead to infinite-loops and other bugs.`,
-        'Element', elm,
-        'New value', newVal,
-        'Old value', oldVal
+        `[STENCIL-DEV-MODE] The state/prop "${propName}" changed during rendering. This can potentially lead to infinite-loops and other bugs.`,
+        '\nElement', elm,
+        '\nNew value', newVal,
+        '\nOld value', oldVal
       );
     }
 

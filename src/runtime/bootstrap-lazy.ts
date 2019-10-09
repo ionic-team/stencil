@@ -13,9 +13,9 @@ import { createTime } from './profile';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
-  // if (BUILD.profile) {
-  //   performance.mark('st:app:start');
-  // }
+  if (BUILD.profile) {
+    performance.mark('st:app:start');
+  }
   const endBootstrap = createTime('bootstrapLazy');
   const cmpTags: string[] = [];
   const exclude = options.exclude || [];
@@ -23,8 +23,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const customElements = win.customElements;
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
-  let appLoadFallback: any;
   const deferredConnectedCallbacks: {connectedCallback: () => void}[] = [];
+  let appLoadFallback: any;
   let isBootstrapping = true;
 
   Object.assign(plt, options);
@@ -103,15 +103,14 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         connectedCallback() {
+          if (appLoadFallback) {
+            clearTimeout(appLoadFallback);
+            appLoadFallback = null;
+          }
           if (isBootstrapping) {
             // connectedCallback will be processed once all components have been registered
             deferredConnectedCallbacks.push(this);
           } else {
-            if (appLoadFallback) {
-              clearTimeout(appLoadFallback);
-              appLoadFallback = null;
-            }
-
             plt.jmp(() => connectedCallback(this, cmpMeta));
           }
         }
@@ -144,16 +143,18 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       }
     }));
 
-  // Process deferred connectedCallbacks now all components have been registered
-  isBootstrapping = false;
-  deferredConnectedCallbacks.forEach(host => host.connectedCallback());
-
   // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
   visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
   visibilityStyle.setAttribute('data-styles', '');
   head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
 
+  // Process deferred connectedCallbacks now all components have been registered
+  isBootstrapping = false;
+  if (deferredConnectedCallbacks.length > 0) {
+    deferredConnectedCallbacks.forEach(host => host.connectedCallback());
+  } else {
+    plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30, 'timeout'));
+  }
   // Fallback appLoad event
-  plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30));
   endBootstrap();
 };
