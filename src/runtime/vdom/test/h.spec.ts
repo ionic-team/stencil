@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { h } from '../h';
+import { h, newVNode } from '../h';
 
 
 describe('h()', () => {
@@ -132,24 +132,24 @@ describe('h()', () => {
     expect(vnode.$key$).toBe('my-key');
   });
 
-  it('should set vkey to undefined when key is undefined', () => {
+  it('should set vkey to null when key is undefined', () => {
     const vnode = h('div', { key: undefined });
-    expect(vnode.$key$).toBe(undefined);
+    expect(vnode.$key$).toBe(null);
   });
 
-  it('should set vkey to undefined when key is null', () => {
+  it('should set vkey to null when key is null', () => {
     const vnode = h('div', { key: null });
-    expect(vnode.$key$).toBe(undefined);
+    expect(vnode.$key$).toBe(null);
   });
 
   it('should set vkey to undefined when we have data, but no key', () => {
     const vnode = h('div', { some: 'data' });
-    expect(vnode.$key$).toBe(undefined);
+    expect(vnode.$key$).toBe(null);
   });
 
   it('should set vkey to undefined when no data', () => {
     const vnode = h('div', null);
-    expect(vnode.$key$).toBe(undefined);
+    expect(vnode.$key$).toBe(null);
   });
 
   it('should set vattrs ref', () => {
@@ -293,19 +293,20 @@ describe('h()', () => {
     ]as any);
 
     expect(vnode.$children$).toEqual([
-      {'$flags$': 0, '$text$': 'Str0'},
+      newVNode(null, 'Str0'),
       {
         '$attrs$': null,
         '$children$': [
-          {'$flags$': 0, '$text$': 'Str1'}
+          newVNode(null, 'Str1')
         ],
-        '$elm$': undefined,
+        '$elm$': null,
         '$flags$': 0,
-        '$key$': undefined,
-        '$name$': undefined,
-        '$tag$': 'b'
+        '$key$': null,
+        '$name$': null,
+        '$tag$': 'b',
+        '$text$': null
       },
-      {'$flags$': 0, '$text$': 'Str2'}
+      newVNode(null, 'Str2')
     ]);
 
 
@@ -362,14 +363,16 @@ describe('h()', () => {
       };
       const vnode = h(MyFunction, {});
       expect(vnode).toEqual({
-        '$elm$': undefined,
+        '$elm$': null,
         '$flags$': 0,
         '$attrs$': {'id': 'fn-cmp'},
-        '$children$': [{'$flags$': 0, '$text$': 'fn-cmp'}],
-        '$key$': undefined,
-        '$name$': undefined,
+        '$children$': [
+          newVNode(null, 'fn-cmp')
+        ],
+        '$key$': null,
+        '$name$': null,
         '$tag$': 'div',
-        '$text$': undefined
+        '$text$': null
       });
     });
   });
@@ -389,34 +392,33 @@ describe('h()', () => {
       h(FunctionalCmp, null, h('div', { id: 'blue' }, h('span', null)));
       expect(output).toEqual([
         {
-          $elm$: undefined,
           vattrs: {
             id: 'blue',
           },
           vchildren: [
             {
-              $elm$: undefined,
+              $elm$: null,
               $flags$: 0,
               $attrs$: null,
               $children$: null,
-              $key$: undefined,
-              $name$: undefined,
+              $key$: null,
+              $name$: null,
               $tag$: 'span',
-              $text$: undefined,
+              $text$: null,
             },
           ],
-          vkey: undefined,
-          vname: undefined,
+          vkey: null,
+          vname: null,
           vtag: 'div',
-          vtext: undefined,
+          vtext: null,
         },
         {
           vattrs: null,
           vchildren: null,
-          vkey: undefined,
-          vname: undefined,
+          vkey: null,
+          vname: null,
           vtag: 'span',
-          vtext: undefined,
+          vtext: null,
         },
       ]);
     });
@@ -436,34 +438,31 @@ describe('h()', () => {
       const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, 'innerText'), h('span', null));
       expect(vnode).toEqual([
         {
-          $elm$: undefined,
+          $elm$: null,
           $flags$: 0,
           $attrs$: {
             class: 'my-class',
             id: 'blue'
           },
           $children$: [
-            {
-              $flags$: 0,
-              $text$: 'innerText'
-            }
+            newVNode(null, 'innerText')
           ],
-          $key$: undefined,
-          $name$: undefined,
+          $key$: null,
+          $name$: null,
           $tag$: 'div',
-          $text$: undefined
+          $text$: null
         },
         {
-          $elm$: undefined,
+          $elm$: null,
           $flags$: 0,
           $attrs$: {
             class: 'my-class'
           },
           $children$: null,
-          $key$: undefined,
-          $name$: undefined,
+          $key$: null,
+          $name$: null,
           $tag$: 'span',
-          $text$: undefined
+          $text$: null
         }
       ]);
     });

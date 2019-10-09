@@ -68,8 +68,8 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   build.hydrateClientSide = false;
   build.hydrateServerSide = false;
 
-  updateBuildConditionals(config, build);
   build.taskQueue = false;
+  updateBuildConditionals(config, build);
 
   return build;
 }

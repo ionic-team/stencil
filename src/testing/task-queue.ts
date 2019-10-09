@@ -140,6 +140,7 @@ export async function flushAll() {
     }
     throw err;
   }
+  return new Promise(resolve => process.nextTick(resolve));
 }
 
 

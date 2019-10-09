@@ -68,6 +68,26 @@ export class MockDocument extends MockHTMLElement {
     return this.location.href;
   }
 
+  get styleSheets() {
+    return this.querySelectorAll('style');
+  }
+
+  get scripts() {
+    return this.querySelectorAll('script');
+  }
+
+  get forms() {
+    return this.querySelectorAll('form');
+  }
+
+  get images() {
+    return this.querySelectorAll('img');
+  }
+
+  get scrollingElement() {
+    return this.documentElement;
+  }
+
   get documentElement() {
     for (let i = this.childNodes.length - 1; i >= 0; i--) {
       if (this.childNodes[i].nodeName === 'HTML') {

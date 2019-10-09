@@ -17,10 +17,10 @@ import { isComplexType } from '@utils';
 // export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
 export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.VNode => {
   let child = null;
+  let key: string = null;
+  let slotName: string = null;
   let simple = false;
   let lastSimple = false;
-  let key: string;
-  let slotName: string;
   let vNodeChildren: d.VNode[] = [];
   const walk = (c: any[]) => {
     for (let i = 0; i < c.length; i++) {
@@ -37,19 +37,19 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
           vNodeChildren[vNodeChildren.length - 1].$text$ += child;
         } else {
           // Append a new vNode, if it's text, we create a text vNode
-          vNodeChildren.push(simple ? { $flags$: 0, $text$: child } : child);
+          vNodeChildren.push(simple ? newVNode(null, child) : child);
         }
         lastSimple = simple;
       }
     }
   };
   walk(children);
-  if (BUILD.vdomAttribute && vnodeData) {
+  if (vnodeData) {
     // normalize class / classname attributes
-    if (BUILD.vdomKey) {
-      key = vnodeData.key || undefined;
+    if (BUILD.vdomKey && vnodeData.key) {
+      key = vnodeData.key;
     }
-    if (BUILD.slotRelocation) {
+    if (BUILD.slotRelocation && vnodeData.name) {
       slotName = vnodeData.name;
     }
     if (BUILD.vdomClass) {
@@ -75,18 +75,36 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
     return (nodeName as d.FunctionalComponent<any>)(vnodeData, vNodeChildren, vdomFnUtils) as any;
   }
 
-  const vnode: d.VNode = {
-    $flags$: 0,
-    $tag$: nodeName,
-    $children$: vNodeChildren.length > 0 ? vNodeChildren : null,
-    $elm$: undefined,
-    $attrs$: vnodeData,
-  };
+  const vnode = newVNode(nodeName, null);
+  vnode.$attrs$ = vnodeData;
+  if (vNodeChildren.length > 0) {
+    vnode.$children$ = vNodeChildren;
+  }
   if (BUILD.vdomKey) {
     vnode.$key$ = key;
   }
   if (BUILD.slotRelocation) {
     vnode.$name$ = slotName;
+  }
+  return vnode;
+};
+
+export const newVNode = (tag: string, text: string) => {
+  const vnode: d.VNode = {
+    $flags$: 0,
+    $tag$: tag,
+    $text$: text,
+    $elm$: null,
+    $children$: null
+  };
+  if (BUILD.vdomAttribute) {
+    vnode.$attrs$ = null;
+  }
+  if (BUILD.vdomKey)  {
+    vnode.$key$ = null;
+  }
+  if (BUILD.slotRelocation) {
+    vnode.$name$ = null;
   }
   return vnode;
 };
@@ -114,13 +132,10 @@ const convertToPublic = (node: d.VNode): d.ChildNode => {
 };
 
 const convertToPrivate = (node: d.ChildNode): d.VNode => {
-  return {
-    $flags$: 0,
-    $attrs$: node.vattrs,
-    $children$: node.vchildren,
-    $key$: node.vkey,
-    $name$: node.vname,
-    $tag$: node.vtag,
-    $text$: node.vtext
-  };
+  const vnode = newVNode(node.vtag as any, node.vtext);
+  vnode.$attrs$ = node.vattrs;
+  vnode.$children$ = node.vchildren;
+  vnode.$key$ = node.vkey;
+  vnode.$name$ = node.vname;
+  return vnode;
 };

@@ -7,8 +7,8 @@
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| index.js                   | 90B      | 134B     | 143B     |
-| TOTAL                      | 90B      | 134B     | 143B     |
+| index.js                   | 85B      | 134B     | 140B     |
+| TOTAL                      | 85B      | 134B     | 140B     |
 
 
 
@@ -16,18 +16,20 @@
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| app.esm.js                 | 94B      | 117B     | 112B     |
-| app.js                     | 48.56KB  | 55.89KB  | 181.51KB |
-| hello-vdom.entry.js        | 109B     | 143B     | 138B     |
-| hello-vdom.system.entry.js | 174B     | 210B     | 276B     |
-| p-23cb3ca0.system.js       | 160B     | 182B     | 233B     |
-| p-39f11146.system.js       | 2.90KB   | 3.23KB   | 8.36KB   |
-| p-5cd8f2de.system.js       | 4.26KB   | 4.69KB   | 11.93KB  |
-| p-7da2a379.js              | 2.09KB   | 2.35KB   | 4.48KB   |
-| p-a0c82e31.js              | 4.60KB   | 5.23KB   | 17.21KB  |
-| p-a8fc097f.system.js       | 4.66KB   | 5.27KB   | 17.45KB  |
-| p-f7ddb189.js              | 2.75KB   | 3.02KB   | 7.47KB   |
-| TOTAL                      | 70.35KB  | 80.32KB  | 249.16KB |
+| app.esm.js                 | 87B      | 102B     | 97B      |
+| app.js                     | 36.72KB  | 41.28KB  | 132.10KB |
+| hello-vdom.entry.js        | 116B     | 146B     | 145B     |
+| hello-vdom.system.entry.js | 175B     | 213B     | 276B     |
+| index.esm.js               | ERROR    | ERROR    | ERROR    |
+| p-04a3b409.js              | 2.12KB   | 2.37KB   | 4.61KB   |
+| p-0e8365cd.system.js       | 3.35KB   | 3.73KB   | 9.20KB   |
+| p-1635c1a0.js              | 2.95KB   | 3.24KB   | 8.06KB   |
+| p-2ddc72bd.system.js       | 148B     | 175B     | 222B     |
+| p-50ea2036.system.js       | 59B      | 86B      | 76B      |
+| p-5b416380.system.js       | 4.91KB   | 5.56KB   | 18.63KB  |
+| p-9b741424.system.js       | 3.10KB   | 3.43KB   | 8.96KB   |
+| p-d0882b30.js              | 4.85KB   | 5.51KB   | 18.13KB  |
+| TOTAL                      | 58.57KB  | 65.83KB  | 200.48KB |
 
 
 
@@ -35,20 +37,8 @@
 
 | File                       | Brotli   | Gzipped  | Minified |
 |----------------------------|----------|----------|----------|
-| app.css                    | 1.46KB   | 1.74KB   | 5.76KB   |
-| app.esm.js                 | 141B     | 171B     | 191B     |
-| app.js                     | 48.60KB  | 55.89KB  | 181.51KB |
-| p-22d8cae6.system.js       | 198B     | 234B     | 312B     |
-| p-29787b35.system.js       | 5.43KB   | 5.99KB   | 15.64KB  |
-| p-39f11146.system.js       | 2.90KB   | 3.23KB   | 8.36KB   |
-| p-438e2ca6.js              | 3.21KB   | 3.56KB   | 7.18KB   |
-| p-a0c82e31.js              | 4.60KB   | 5.23KB   | 17.21KB  |
-| p-a8fc097f.system.js       | 4.66KB   | 5.27KB   | 17.45KB  |
-| p-aqb5bg7q.entry.js        | 569B     | 677B     | 1.45KB   |
-| p-ely6dzxe.css             | 1.46KB   | 1.74KB   | 5.76KB   |
-| p-f7ddb189.js              | 2.75KB   | 3.02KB   | 7.47KB   |
-| p-hebbvmyh.system.entry.js | 645B     | 761B     | 1.80KB   |
-| TOTAL                      | 76.59KB  | 87.48KB  | 270.08KB |
+| index.js                   | 2.18KB   | 2.44KB   | 5.16KB   |
+| TOTAL                      | 2.18KB   | 2.44KB   | 5.16KB   |
 
 
 

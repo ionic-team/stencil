@@ -48,20 +48,17 @@ async function getSystemLoader(config: d.Config, corePath: string, includePolyfi
 (function () {
   var doc = document;
   var currentScript = doc.currentScript;
+
+  // Safari 10 support type="module" but still download and executes the nomodule script
   if (!currentScript || !currentScript.hasAttribute('nomodule') || !('onbeforeload' in currentScript)) {
 
     ${polyfills}
 
-    var scriptElm = doc.querySelector('script[data-stencil-namespace="${config.fsNamespace}"]');
-    if (!scriptElm) {
-      var allScripts = doc.querySelectorAll('script');
-      for (var x = allScripts.length - 1; x >= 0; x--) {
-        scriptElm = allScripts[x];
-        if (scriptElm.src || scriptElm.hasAttribute('data-resources-url')) {
-          break;
-        }
-      }
-    }
+    // Figure out currentScript (for IE11, since it does not support currentScript)
+    var regex = /\\/${config.fsNamespace}(\\.esm)?\\.js($|\\?|#)/;
+    var scriptElm = currentScript || Array.from(doc.querySelectorAll('script')).find(function(s) {
+      return regex.test(s.src) || s.getAttribute('data-stencil-namespace') === "${config.fsNamespace}";
+    });
 
     var resourcesUrl = scriptElm ? scriptElm.getAttribute('data-resources-url') || scriptElm.src : '';
     var start = function() {

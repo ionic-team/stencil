@@ -29,10 +29,10 @@ export interface JsonDocsComponent {
   events: JsonDocsEvent[];
   styles: JsonDocsStyle[];
   slots: JsonDocsSlot[];
-  dependants: string[];
+  dependents: string[];
   dependencies: string[];
   dependencyGraph: JsonDocsDependencyGraph;
-  deprecation: string | undefined;
+  deprecation?: string;
 }
 
 export interface JsonDocsDependencyGraph {
@@ -44,6 +44,11 @@ export interface JsonDocsTag {
   text?: string;
 }
 
+export interface JsonDocsValue {
+  value?: string;
+  type: string;
+}
+
 export interface JsonDocsUsage {
   [key: string]: string;
 }
@@ -53,12 +58,13 @@ export interface JsonDocsProp {
   name: string;
   type: string;
   mutable: boolean;
-  attr: string | undefined;
+  attr?: string;
   reflectToAttr: boolean;
   docs: string;
   docsTags: JsonDocsTag[];
   default: string;
-  deprecation: string | undefined;
+  deprecation?: string;
+  values: JsonDocsValue[];
 
   optional: boolean;
   required: boolean;
@@ -69,7 +75,7 @@ export interface JsonDocsMethod {
   name: string;
   docs: string;
   docsTags: JsonDocsTag[];
-  deprecation: string | undefined;
+  deprecation?: string;
   signature: string;
   returns: JsonDocsMethodReturn;
   parameters: JsonDocMethodParameter[];
@@ -93,7 +99,7 @@ export interface JsonDocsEvent {
   composed: boolean;
   docs: string;
   docsTags: JsonDocsTag[];
-  deprecation: string | undefined;
+  deprecation?: string;
   detail: string;
 }
 

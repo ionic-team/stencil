@@ -68,6 +68,7 @@ export interface BuildFeatures {
   cmpDidUnload: boolean;
   connectedCallback: boolean;
   disconnectedCallback: boolean;
+  asyncLoading: boolean;
 
   // attr
   observeAttribute: boolean;
@@ -92,6 +93,6 @@ export interface Build extends Partial<BuildFeatures> {
 }
 
 export interface UserBuildConditionals {
-  isDev: boolean;
-  isBrowser: boolean;
+  readonly isDev: boolean;
+  readonly isBrowser: boolean;
 }

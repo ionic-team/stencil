@@ -8,9 +8,11 @@ import { computeMode } from './mode';
 import { getScopeId, registerStyle } from './styles';
 import { fireConnectedCallback } from './connected-callback';
 import { PROXY_FLAGS } from './runtime-constants';
+import { createTime } from './profile';
 
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: any) => {
+
   // initializeComponent
   if ((BUILD.lazyLoad || BUILD.style) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
     // we haven't initialized this element yet
@@ -40,6 +42,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         throw new Error(`Constructor for "${cmpMeta.$tagName$}#${hostRef.$modeName$}" was not found`);
       }
       if (BUILD.member && !Cstr.isProxied) {
+        const endProxyInstance = createTime('proxyInstance', cmpMeta.$tagName$);
         // we'eve never proxied this Constructor before
         // let's add the getters/setters to its prototype before
         // the first time we create an instance of the implementation
@@ -48,8 +51,10 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         }
         proxyComponent(Cstr, cmpMeta, PROXY_FLAGS.proxyState);
         Cstr.isProxied = true;
+        endProxyInstance();
       }
 
+      const endNewInstance = createTime('newInstance', cmpMeta.$tagName$);
       // ok, time to construct the instance
       // but let's keep track of when we start and stop
       // so that the getters/setters don't incorrectly step on data
@@ -72,14 +77,15 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       if (BUILD.watchCallback) {
         hostRef.$flags$ |= HOST_FLAGS.isWatchReady;
       }
+      endNewInstance();
       fireConnectedCallback(hostRef.$lazyInstance$);
 
     } else {
       Cstr = elm.constructor as any;
     }
 
+    const endRegisterStyles = createTime('registerStyles', cmpMeta.$tagName$);
     const scopeId = BUILD.mode ? getScopeId(cmpMeta.$tagName$, hostRef.$modeName$) : getScopeId(cmpMeta.$tagName$);
-
     if (BUILD.style && !styles.has(scopeId) && Cstr.style) {
       // this component has styles but we haven't registered them yet
       let style = Cstr.style;
@@ -94,13 +100,14 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
 
       registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation));
     }
+    endRegisterStyles();
   }
 
   // we've successfully created a lazy instance
   const ancestorComponent = hostRef.$ancestorComponent$;
   const schedule = () => scheduleUpdate(elm, hostRef, cmpMeta, true);
 
-  if (BUILD.lifecycle && BUILD.lazyLoad && ancestorComponent && ancestorComponent['s-lr'] === false && ancestorComponent['s-rc']) {
+  if (BUILD.asyncLoading && ancestorComponent && ancestorComponent['s-rc']) {
     // this is the intial load and this component it has an ancestor component
     // but the ancestor component has NOT fired its will update lifecycle yet
     // so let's just cool our jets and wait for the ancestor to continue first

@@ -2,26 +2,40 @@ import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
-import { consoleError, doc, getHostRef, plt, writeTask } from '@platform';
+import { consoleError, doc, getHostRef, nextTick, plt, writeTask } from '@platform';
 import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
+import { createTime } from './profile';
+
+export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) =>  {
+  if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$) {
+    ancestorComponent['s-p'].push(new Promise(r => hostRef.$onRenderResolve$ = r));
+  }
+};
 
 export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
   if (BUILD.taskQueue && BUILD.updatable) {
     hostRef.$flags$ |= HOST_FLAGS.isQueuedForUpdate;
   }
-
+  if (BUILD.asyncLoading && hostRef.$flags$ & HOST_FLAGS.isWaitingForChildren) {
+    hostRef.$flags$ |= HOST_FLAGS.needsRerender;
+    return;
+  }
+  const endSchedule = createTime('scheduleUpdate', cmpMeta.$tagName$);
+  const ancestorComponent = hostRef.$ancestorComponent$;
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   const update = () => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
+  const rc = elm['s-rc'];
+  attachToAncestor(hostRef, ancestorComponent);
 
   let promise: Promise<void>;
   if (isInitialLoad) {
-    if (BUILD.hostListener) {
+    if (BUILD.lazyLoad && BUILD.hostListener) {
       hostRef.$flags$ |= HOST_FLAGS.isListenReady;
-    }
-    if (BUILD.hostListener && hostRef.$queuedListeners$) {
-      hostRef.$queuedListeners$.forEach(([methodName, event]) => safeCall(instance, methodName, event));
-      hostRef.$queuedListeners$ = null;
+      if (hostRef.$queuedListeners$) {
+        hostRef.$queuedListeners$.forEach(([methodName, event]) => safeCall(instance, methodName, event));
+        hostRef.$queuedListeners$ = null;
+      }
     }
     emitLifecycleEvent(elm, 'componentWillLoad');
     if (BUILD.cmpWillLoad) {
@@ -41,6 +55,16 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     promise = then(promise, () => safeCall(instance, 'componentWillRender'));
   }
 
+  if (BUILD.asyncLoading && rc) {
+    // ok, so turns out there are some child host elements
+    // waiting on this parent element to load
+    // let's fire off all update callbacks waiting
+    rc.forEach(cb => cb());
+    elm['s-rc'] = undefined;
+  }
+
+  endSchedule();
+
   // there is no ancestorc omponent or the ancestor component
   // has already fired off its lifecycle update then
   // fire off the initial update
@@ -52,26 +76,19 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
 const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, instance: any, isInitialLoad: boolean) => {
   // updateComponent
-  if (BUILD.updatable && BUILD.taskQueue) {
-    hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
-  }
-
-  if (BUILD.lifecycle && BUILD.lazyLoad) {
-    elm['s-lr'] = false;
-  }
-
+  const endUpdate = createTime('update', cmpMeta.$tagName$);
   if (BUILD.style && isInitialLoad) {
     // DOM WRITE!
     attachStyles(elm, cmpMeta, hostRef.$modeName$);
   }
 
+  const endRender = createTime('render', cmpMeta.$tagName$);
+  if (BUILD.isDev)  {
+    hostRef.$flags$ |= HOST_FLAGS.dev_stateMutation;
+  }
+
   if (BUILD.hasRenderFn || BUILD.reflect) {
     if (BUILD.vdomRender || BUILD.reflect) {
-      // tell the platform we're actively rendering
-      // if a value is changed within a render() then
-      // this tells the platform not to queue the change
-      hostRef.$flags$ |= HOST_FLAGS.isActiveRender;
-
       try {
         // looks like we've got child nodes to render into this host element
         // or we need to update the css class/attrs on the host element
@@ -85,13 +102,18 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
       } catch (e) {
         consoleError(e);
       }
-      hostRef.$flags$ &= ~HOST_FLAGS.isActiveRender;
     } else {
       elm.textContent = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
     }
   }
   if (BUILD.cssVarShim && plt.$cssShim$) {
     plt.$cssShim$.updateHost(elm);
+  }
+  if (BUILD.isDev) {
+    hostRef.$flags$ &= ~HOST_FLAGS.dev_stateMutation;
+  }
+  if (BUILD.updatable && BUILD.taskQueue) {
+    hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
   }
 
   if (BUILD.hydrateServerSide) {
@@ -109,107 +131,106 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
     }
   }
 
-  // set that this component lifecycle rendering has completed
-  if (BUILD.lifecycle && BUILD.lazyLoad) {
-    elm['s-lr'] = true;
-  }
   if (BUILD.updatable || BUILD.lazyLoad) {
     hostRef.$flags$ |= HOST_FLAGS.hasRendered;
   }
+  endRender();
+  endUpdate();
 
-  if (BUILD.lifecycle && BUILD.lazyLoad && elm['s-rc'].length > 0) {
-    // ok, so turns out there are some child host elements
-    // waiting on this parent element to load
-    // let's fire off all update callbacks waiting
-    elm['s-rc'].forEach(cb => cb());
-    elm['s-rc'].length = 0;
+  if (BUILD.asyncLoading) {
+    const childrenPromises = elm['s-p'];
+    const postUpdate = () => postUpdateComponent(elm, hostRef, cmpMeta);
+    if (childrenPromises.length === 0) {
+      postUpdate();
+    } else {
+      Promise.all(childrenPromises).then(postUpdate);
+      hostRef.$flags$ |= HOST_FLAGS.isWaitingForChildren;
+      childrenPromises.length = 0;
+    }
+  } else {
+    postUpdateComponent(elm, hostRef, cmpMeta);
   }
-
-  postUpdateComponent(elm, hostRef);
 };
 
 
-export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, ancestorsActivelyLoadingChildren?: Set<d.HostElement>) => {
-  if ((BUILD.lazyLoad || BUILD.lifecycle || BUILD.lifecycleDOMEvents) && !elm['s-al']) {
-    const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
-    const ancestorComponent = hostRef.$ancestorComponent$;
+export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta) => {
+  const endPostUpdate = createTime('postUpdate', cmpMeta.$tagName$);
+  const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
+  const ancestorComponent = hostRef.$ancestorComponent$;
 
-    if (BUILD.cmpDidRender) {
-      safeCall(instance, 'componentDidRender');
+  if (BUILD.isDev) {
+    hostRef.$flags$ |= HOST_FLAGS.dev_stateMutation;
+  }
+  if (BUILD.cmpDidRender) {
+    safeCall(instance, 'componentDidRender');
+  }
+  emitLifecycleEvent(elm, 'componentDidRender');
+
+  if (!(hostRef.$flags$ & HOST_FLAGS.hasLoadedComponent)) {
+    hostRef.$flags$ |= HOST_FLAGS.hasLoadedComponent;
+
+    if (BUILD.asyncLoading && BUILD.cssAnnotations) {
+      // DOM WRITE!
+      // add the css class that this element has officially hydrated
+      elm.classList.add(HYDRATED_CLASS);
     }
-    emitLifecycleEvent(elm, 'componentDidRender');
 
-    if (!(hostRef.$flags$ & HOST_FLAGS.hasLoadedComponent)) {
-      hostRef.$flags$ |= HOST_FLAGS.hasLoadedComponent;
+    if (BUILD.cmpDidLoad) {
+      safeCall(instance, 'componentDidLoad');
+    }
 
-      if (BUILD.lazyLoad && BUILD.cssAnnotations) {
-        // DOM WRITE!
-        // add the css class that this element has officially hydrated
-        elm.classList.add(HYDRATED_CLASS);
-      }
+    emitLifecycleEvent(elm, 'componentDidLoad');
 
-      if (BUILD.cmpDidLoad) {
-        safeCall(instance, 'componentDidLoad');
-      }
-
-      emitLifecycleEvent(elm, 'componentDidLoad');
-
-      if (BUILD.lazyLoad) {
-        hostRef.$onReadyResolve$(elm);
-      }
-
-      if (BUILD.lazyLoad && !ancestorComponent) {
+    if (BUILD.asyncLoading) {
+      hostRef.$onReadyResolve$(elm);
+      if (!ancestorComponent)  {
         appDidLoad();
       }
-
-    } else {
-      if (BUILD.cmpDidUpdate) {
-        // we've already loaded this component
-        // fire off the user's componentDidUpdate method (if one was provided)
-        // componentDidUpdate runs AFTER render() has been called
-        // and all child components have finished updating
-        safeCall(instance, 'componentDidUpdate');
-      }
-      emitLifecycleEvent(elm, 'componentDidUpdate');
     }
 
-    if (BUILD.hotModuleReplacement) {
-      elm['s-hmr-load'] && elm['s-hmr-load']();
+  } else {
+    if (BUILD.cmpDidUpdate) {
+      // we've already loaded this component
+      // fire off the user's componentDidUpdate method (if one was provided)
+      // componentDidUpdate runs AFTER render() has been called
+      // and all child components have finished updating
+      safeCall(instance, 'componentDidUpdate');
     }
-
-    // load events fire from bottom to top
-    // the deepest elements load first then bubbles up
-    if (BUILD.lifecycle && BUILD.lazyLoad && ancestorComponent) {
-      // ok so this element already has a known ancestor component
-      // let's make sure we remove this element from its ancestor's
-      // known list of child elements which are actively loading
-      if (ancestorsActivelyLoadingChildren = ancestorComponent['s-al']) {
-        // remove this element from the actively loading map
-        ancestorsActivelyLoadingChildren.delete(elm);
-
-        // the ancestor's initializeComponent method will do the actual checks
-        // to see if the ancestor is actually loaded or not
-        // then let's call the ancestor's initializeComponent method if there's no length
-        // (which actually ends up as this method again but for the ancestor)
-        if (ancestorsActivelyLoadingChildren.size === 0) {
-          ancestorComponent['s-al'] = undefined;
-          ancestorComponent['s-init']();
-        }
-      }
-
-      hostRef.$ancestorComponent$ = undefined;
-    }
-
-    // ( •_•)
-    // ( •_•)>⌐■-■
-    // (⌐■_■)
+    emitLifecycleEvent(elm, 'componentDidUpdate');
   }
+
+  if (BUILD.hotModuleReplacement) {
+    elm['s-hmr-load'] && elm['s-hmr-load']();
+  }
+  if (BUILD.isDev) {
+    hostRef.$flags$ &= ~HOST_FLAGS.dev_stateMutation;
+  }
+
+  if (BUILD.method && BUILD.lazyLoad) {
+    hostRef.$onInstanceResolve$(elm);
+  }
+  // load events fire from bottom to top
+  // the deepest elements load first then bubbles up
+  if (BUILD.asyncLoading) {
+    if (hostRef.$onRenderResolve$) {
+      hostRef.$onRenderResolve$();
+      hostRef.$onRenderResolve$ = undefined;
+    }
+    if (hostRef.$flags$ & HOST_FLAGS.needsRerender) {
+      nextTick(() => scheduleUpdate(elm, hostRef, cmpMeta, false));
+    }
+    hostRef.$flags$ &= ~(HOST_FLAGS.isWaitingForChildren | HOST_FLAGS.needsRerender);
+  }
+  endPostUpdate();
+  // ( •_•)
+  // ( •_•)>⌐■-■
+  // (⌐■_■)
 };
 
 export const forceUpdate = (elm: d.RenderNode, cmpMeta: d.ComponentRuntimeMeta) => {
   if (BUILD.updatable) {
     const hostRef = getHostRef(elm);
-    if (hostRef.$flags$ & HOST_FLAGS.hasRendered) {
+    if ((hostRef.$flags$ & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
       scheduleUpdate(
         elm,
         hostRef,
@@ -230,6 +251,9 @@ export const appDidLoad = () => {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
   emitLifecycleEvent(doc, 'appload');
+  // if (BUILD.profile) {
+  //   performance.measure('[Stencil] App Did Load', 'st:app:start');
+  // }
 };
 
 export const safeCall = (instance: any, method: string, arg?: any) => {

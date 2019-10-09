@@ -7,7 +7,8 @@ import { doc, getHostRef, nextTick, plt, supportsShadowDom } from '@platform';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
-import { safeCall } from './update-component';
+import { attachToAncestor, safeCall } from './update-component';
+import { createTime } from './profile';
 
 export const fireConnectedCallback = (instance: any) => {
   if (BUILD.lazyLoad && BUILD.connectedCallback) {
@@ -17,6 +18,7 @@ export const fireConnectedCallback = (instance: any) => {
 
 export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
   if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {
+    const endConnected = createTime('connectedCallback', cmpMeta.$tagName$);
     // connectedCallback
     const hostRef = getHostRef(elm);
 
@@ -57,7 +59,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         }
       }
 
-      if (BUILD.lifecycle && BUILD.lazyLoad) {
+      if (BUILD.asyncLoading) {
         // find the first ancestor component (if there is one) and register
         // this component as one of the actively loading child components for its ancestor
         let ancestorComponent = elm;
@@ -65,14 +67,13 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         while ((ancestorComponent = (ancestorComponent.parentNode as any || ancestorComponent.host as any))) {
           // climb up the ancestors looking for the first
           // component that hasn't finished its lifecycle update yet
-          if ((BUILD.hydrateClientSide && ancestorComponent.nodeType === NODE_TYPE.ElementNode && ancestorComponent.hasAttribute('s-id')) || (ancestorComponent['s-init'] && ancestorComponent['s-lr'] === false)) {
+          if (
+            (BUILD.hydrateClientSide && ancestorComponent.nodeType === NODE_TYPE.ElementNode && ancestorComponent.hasAttribute('s-id')) ||
+            (ancestorComponent['s-p'])
+          ) {
             // we found this components first ancestor component
             // keep a reference to this component's ancestor component
-            hostRef.$ancestorComponent$ = ancestorComponent;
-
-            // ensure there is an array to contain a reference to each of the child components
-            // and set this component as one of the ancestor's child components it should wait on
-            (ancestorComponent['s-al'] = ancestorComponent['s-al'] || new Set()).add(elm);
+            attachToAncestor(hostRef, (hostRef.$ancestorComponent$ = ancestorComponent));
             break;
           }
         }
@@ -102,18 +103,23 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       }
     }
     fireConnectedCallback(hostRef.$lazyInstance$);
+    endConnected();
   }
 };
 
 
-const setContentReference = (elm: d.HostElement, contentRefElm?: d.RenderNode) => {
+const setContentReference = (elm: d.HostElement) => {
   // only required when we're NOT using native shadow dom (slot)
   // or this browser doesn't support native shadow dom
   // and this host element was NOT created with SSR
   // let's pick out the inner content for slot projection
   // create a node to represent where the original
   // content was first placed, which is useful later on
-  contentRefElm = elm['s-cr'] = (doc.createComment(BUILD.isDebug ? `content-ref:${elm.tagName}` : '') as any);
+  const crName = (BUILD.isDebug)
+    ? `content-ref:${elm.tagName}`
+    : '';
+
+  const contentRefElm = elm['s-cr'] = (doc.createComment(crName) as any);
   contentRefElm['s-cn'] = true;
   elm.insertBefore(contentRefElm, elm.firstChild);
 };

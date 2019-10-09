@@ -21,10 +21,16 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
   const cmpMeta: d.ComponentRuntimeMeta = {
     $flags$: compactMeta[0],
     $tagName$: compactMeta[1],
-    $members$: compactMeta[2],
-    $listeners$: compactMeta[3],
-    $watchers$: Cstr.$watchers$
   };
+  if (BUILD.member) {
+    cmpMeta.$members$ = compactMeta[2];
+  }
+  if (BUILD.hostListener) {
+    cmpMeta.$listeners$ = compactMeta[3];
+  }
+  if (BUILD.watchCallback) {
+    cmpMeta.$watchers$ = Cstr.$watchers$;
+  }
   if (BUILD.reflect) {
     cmpMeta.$attrsToReflect$ = [];
   }

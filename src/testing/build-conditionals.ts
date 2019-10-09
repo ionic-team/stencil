@@ -16,6 +16,7 @@ export function resetBuildConditionals(b: d.Build) {
   b.scoped = true;
   b.shadowDom = true;
   b.slotRelocation = true;
+  b.asyncLoading = true;
   b.svg = true;
   b.updatable = true;
   b.vdomAttribute = true;

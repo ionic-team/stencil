@@ -595,6 +595,7 @@ export interface NewSpecPageOptions {
    */
   autoApplyChanges?: boolean;
 
+  strictBuild?: boolean;
   /** @deprecated */
   context?: {[key: string]: any};
 }

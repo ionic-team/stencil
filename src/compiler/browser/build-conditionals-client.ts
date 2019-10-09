@@ -34,6 +34,7 @@ export const BUILD: Required<d.Build> = {
   propNumber: true,
   propString: true,
   reflect: true,
+  asyncLoading: true,
   scoped: true,
   shadowDom: true,
   slot: true,

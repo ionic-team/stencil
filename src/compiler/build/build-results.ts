@@ -54,7 +54,7 @@ export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCt
       }
       const buildCmp: d.BuildComponent = {
         tag: cmp.tagName,
-        dependencyOf: cmp.dependants.slice(),
+        dependencyOf: cmp.dependents.slice(),
         dependencies: cmp.dependencies.slice()
       };
       buildEntry.components.push(buildCmp);

@@ -81,9 +81,9 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   legacyContext: ComponentCompilerLegacyContext[];
 
   dependencies?: string[];
-  dependants?: string[];
+  dependents?: string[];
   directDependencies?: string[];
-  directDependants?: string[];
+  directDependents?: string[];
 }
 
 export interface ComponentCompilerLegacyConnect {

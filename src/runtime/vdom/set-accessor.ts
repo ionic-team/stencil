@@ -20,8 +20,10 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   let ln = memberName.toLowerCase();
   if (BUILD.vdomClass && memberName === 'class') {
     const classList = elm.classList;
-    parseClassList(oldValue).forEach(cls => classList.remove(cls));
-    parseClassList(newValue).forEach(cls => classList.add(cls));
+    const oldClasses = parseClassList(oldValue);
+    const newClasses = parseClassList(newValue);
+    classList.remove(...oldClasses.filter(c => c && !newClasses.includes(c)));
+    classList.add(...newClasses.filter(c => c && !oldClasses.includes(c)));
 
   } else if (BUILD.vdomStyle && memberName === 'style') {
     // update style attribute, css properties and values
@@ -140,6 +142,6 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     }
   }
 };
-
+const parseClassListRegex = /\s/;
 const parseClassList = (value: string | undefined | null): string[] =>
-  (!value) ? [] : value.split(/\s+/).filter(c => c);
+  (!value) ? [] : value.split(parseClassListRegex);

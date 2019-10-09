@@ -30,6 +30,16 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
               return getValue(this, memberName);
             },
             set(this: d.RuntimeRef, newValue) {
+              if (
+                // only during dev time
+                (BUILD.isDev) &&
+                // we are proxing the instance (not element)
+                (flags & PROXY_FLAGS.isElementConstructor) === 0 &&
+                // the member is a non-mutable prop
+                (memberFlags & (MEMBER_FLAGS.Prop | MEMBER_FLAGS.Mutable)) === MEMBER_FLAGS.Prop
+              ) {
+                console.warn(`[STENCIL-DEV-MODE] @Prop() "${memberName}" on "${cmpMeta.$tagName$}" cannot be modified.\nFurther information: https://stenciljs.com/docs/properties#prop-mutability`);
+              }
               // proxyComponent, set value
               setValue(this, memberName, newValue, cmpMeta);
             },
@@ -43,7 +53,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         Object.defineProperty(prototype, memberName, {
           value(this: d.HostElement, ...args: any[]) {
             const ref = getHostRef(this);
-            return ref.$onReadyPromise$.then(() => ref.$lazyInstance$[memberName](...args));
+            return ref.$onInstancePromise$.then(() => ref.$lazyInstance$[memberName](...args));
           }
         });
       }

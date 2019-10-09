@@ -4,6 +4,356 @@ import { newSpecPage } from '@stencil/core/testing';
 
 describe('render-vdom', () => {
 
+  describe('build conditionals', () => {
+    it('vdomText', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          return <div>Hello VDOM</div>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: false,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: false,
+        vdomText: true,
+      });
+    });
+
+    it('vdomText from identifier', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          const text = 'Hello VDOM';
+          return <div>{text}</div>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: false,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: false,
+        vdomText: true,
+      });
+    });
+
+    it('vdomText from call expression', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          const text = () => 'Hello VDOM';
+          return <div>{text()}</div>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: false,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: false,
+        vdomText: true,
+      });
+    });
+
+    it('vdomText from object access', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          const text = {text: 'Hello VDOM'};
+          return <div>{text.text}</div>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: false,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: false,
+        vdomText: true,
+      });
+    });
+
+    it('vdomClass', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          return <div class='hola'></div>;
+        }
+      }
+
+      const { build } = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: true,
+        vdomXlink: false,
+        vdomClass: true,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: false,
+        vdomText: false,
+      });
+    });
+    it('vdomStyle', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          return <div style={{position: 'relative'}}></div>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: true,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: true,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: false,
+        vdomText: false,
+      });
+    });
+
+    it('vdomKey', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          return <div key={1}></div>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: true,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: true,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: false,
+        vdomText: false,
+      });
+    });
+
+    it('vdomRef', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          return <div ref={() => { return; }}></div>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: true,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: true,
+        vdomListener: false,
+        vdomFunctional: false,
+        vdomText: false,
+      });
+    });
+
+    it('vdomListener onClick', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          return <div onClick={() => { return; }}></div>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: true,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: true,
+        vdomFunctional: false,
+        vdomText: false,
+      });
+    });
+
+    it('vdomListener on-click', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          return <div on-click={() => { return; }}></div>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: true,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: true,
+        vdomFunctional: false,
+        vdomText: false,
+      });
+    });
+
+    it('vdomFunctional', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          const H = () => { return; };
+          return <H />;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: false,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: true,
+        vdomText: false,
+      });
+    });
+
+    it('vdomFunctional (2)', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          const Tunnel = {
+            Provider: () => { return; }
+          };
+          return <Tunnel.Provider />;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: false,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: true,
+        vdomText: false,
+      });
+    });
+
+    it('fallback spread', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        props: any;
+        render() {
+          return <div {...this.props} role='dialog'></div>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: true,
+        vdomXlink: true,
+        vdomClass: true,
+        vdomStyle: true,
+        vdomKey: true,
+        vdomRef: true,
+        vdomListener: true,
+        vdomFunctional: false,
+        vdomText: false,
+      });
+    });
+
+    it('normal properties', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        prop: any;
+
+        render() {
+          return <Host role='hola' onevent='adios'></Host>;
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: true,
+        vdomXlink: false,
+        vdomClass: false,
+        vdomStyle: false,
+        vdomKey: false,
+        vdomRef: false,
+        vdomListener: false,
+        vdomFunctional: false,
+        vdomText: false,
+      });
+    });
+
+    it('all but style', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          const Span = 'span';
+          return (
+            <Host class={{hola: true}}>
+              <div aria-hidden='true' onClick={() => { return; }}>
+                Hello VDOM
+                <Span ref={() => { return; }} key='adios'>
+                </Span>
+              </div>
+            </Host>
+          );
+        }
+      }
+
+      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      expect(build).toMatchObject({
+        vdomAttribute: true,
+        vdomXlink: false,
+        vdomClass: true,
+        vdomStyle: false,
+        vdomKey: true,
+        vdomRef: true,
+        vdomListener: true,
+        vdomFunctional: true,
+        vdomText: true,
+      });
+    });
+  });
+
   it('Hello VDOM, re-render, flush', async () => {
     @Component({ tag: 'cmp-a'})
     class CmpA {
@@ -494,7 +844,7 @@ describe('render-vdom', () => {
       expect(rootInstance.counter).toEqual(1);
     });
 
-    it('should set once', async () => {
+    it('should set once (2)', async () => {
       @Component({ tag: 'cmp-a'})
       class CmpA {
         counter = 0;

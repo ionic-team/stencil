@@ -20,7 +20,7 @@ export function computeUsedComponents(config: d.Config, defaultBundles: d.Compon
   });
   allCmps.forEach(cmp => {
     if (cmp.isCollectionDependency) {
-      if (cmp.dependants.some(dep => usedComponents.has(dep))) {
+      if (cmp.dependents.some(dep => usedComponents.has(dep))) {
         usedComponents.add(cmp.tagName);
       }
     }
@@ -33,7 +33,7 @@ export function generateComponentBundles(
   config: d.Config,
   buildCtx: d.BuildCtx,
 ): d.ComponentCompilerMeta[][] {
-  const cmps = sortBy(buildCtx.components, cmp => cmp.dependants.length);
+  const cmps = sortBy(buildCtx.components, cmp => cmp.dependents.length);
   const defaultBundles = getDefaultBundles(config, buildCtx, cmps);
   const usedComponents = computeUsedComponents(config, defaultBundles, cmps);
 
@@ -71,7 +71,7 @@ function optimizeBundlers(bundles: d.ComponentCompilerMeta[][], threshold: numbe
   const matrix = bundles.map(entry => {
     const vector = new Uint8Array(bundles.length);
     entry.forEach(cmp => {
-      cmp.dependants.forEach(tag => {
+      cmp.dependents.forEach(tag => {
         const index = cmpIndexMap.get(tag);
         if (index !== undefined) {
           vector[index] = 1;

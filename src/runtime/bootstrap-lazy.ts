@@ -8,10 +8,15 @@ import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
-import { appDidLoad, forceUpdate, postUpdateComponent } from './update-component';
+import { appDidLoad, forceUpdate } from './update-component';
+import { createTime } from './profile';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
+  // if (BUILD.profile) {
+  //   performance.mark('st:app:start');
+  // }
+  const endBootstrap = createTime('bootstrapLazy');
   const cmpTags: string[] = [];
   const exclude = options.exclude || [];
   const head = doc.head;
@@ -19,6 +24,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
   let appLoadFallback: any;
+  const deferredConnectedCallbacks: {connectedCallback: () => void}[] = [];
+  let isBootstrapping = true;
+
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
   if (options.syncQueue) {
@@ -54,6 +62,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         $members$: compactMeta[2],
         $listeners$: compactMeta[3],
       };
+      if (BUILD.member) {
+        cmpMeta.$members$ = compactMeta[2];
+      }
+      if (BUILD.hostListener) {
+        cmpMeta.$listeners$ = compactMeta[3];
+      }
       if (BUILD.reflect) {
         cmpMeta.$attrsToReflect$ = [];
       }
@@ -66,7 +80,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       const tagName = cmpMeta.$tagName$;
       const HostElement = class extends HTMLElement {
 
-        ['s-lr']: boolean;
+        ['s-p']: Promise<void>[];
         ['s-rc']: (() => void)[];
 
         // StencilLazyHost
@@ -74,11 +88,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           // @ts-ignore
           super(self);
           self = this;
-
-          if (BUILD.lifecycle) {
-            this['s-lr'] = false;
-            this['s-rc'] = [];
-          }
 
           registerHost(self);
           if (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
@@ -94,22 +103,21 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         connectedCallback() {
-          if (appLoadFallback) {
-            clearTimeout(appLoadFallback);
-            appLoadFallback = null;
+          if (isBootstrapping) {
+            // connectedCallback will be processed once all components have been registered
+            deferredConnectedCallbacks.push(this);
+          } else {
+            if (appLoadFallback) {
+              clearTimeout(appLoadFallback);
+              appLoadFallback = null;
+            }
+
+            plt.jmp(() => connectedCallback(this, cmpMeta));
           }
-          plt.jmp(() => connectedCallback(this, cmpMeta));
         }
 
         disconnectedCallback() {
           plt.jmp(() => disconnectedCallback(this));
-        }
-
-        's-init'() {
-          const hostRef = getHostRef(this);
-          if (hostRef.$lazyInstance$) {
-            postUpdateComponent(this, hostRef);
-          }
         }
 
         's-hmr'(hmrVersionId: string) {
@@ -129,13 +137,16 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       cmpMeta.$lazyBundleIds$ = lazyBundle[0];
 
       if (!exclude.includes(tagName) && !customElements.get(tagName)) {
-        cmpTags.push(tagName);
         customElements.define(
           tagName,
           proxyComponent(HostElement as any, cmpMeta, PROXY_FLAGS.isElementConstructor) as any
         );
       }
     }));
+
+  // Process deferred connectedCallbacks now all components have been registered
+  isBootstrapping = false;
+  deferredConnectedCallbacks.forEach(host => host.connectedCallback());
 
   // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
   visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
@@ -144,4 +155,5 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
   // Fallback appLoad event
   plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30));
+  endBootstrap();
 };

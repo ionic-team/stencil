@@ -68,7 +68,7 @@ export interface PropOptions {
    * Stencil uses different heuristics to determine the default name of the attribute,
    * but using this property, you can override the default behaviour.
    */
-  attribute?: string;
+  attribute?: string | null;
 
   /**
    * A Prop is _by default_ immutable from inside the component logic.

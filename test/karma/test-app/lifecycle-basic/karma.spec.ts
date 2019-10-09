@@ -41,10 +41,10 @@ describe('lifecycle-basic', function() {
 
     expect(updates[0].textContent).toBe('componentWillUpdate-a');
     expect(updates[1].textContent).toBe('componentWillUpdate-b');
-    expect(updates[2].textContent).toBe('componentDidUpdate-a');
-    expect(updates[3].textContent).toBe('componentWillUpdate-c');
+    expect(updates[2].textContent).toBe('componentWillUpdate-c');
+    expect(updates[3].textContent).toBe('componentDidUpdate-c');
     expect(updates[4].textContent).toBe('componentDidUpdate-b');
-    expect(updates[5].textContent).toBe('componentDidUpdate-c');
+    expect(updates[5].textContent).toBe('componentDidUpdate-a');
   });
 
 });
