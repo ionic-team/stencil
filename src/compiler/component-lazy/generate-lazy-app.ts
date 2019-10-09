@@ -126,7 +126,7 @@ function getLegacyLoader(config: d.Config) {
   const namespace = config.fsNamespace;
   return `
 (function(doc){
-  var scriptElm = doc.scripts[doc.scripts.length - 1];
+  var scriptElm = doc.querySelector('script[data-resources-url]') || doc.scripts[doc.scripts.length - 1];
   var warn = ['[${namespace}] Deprecated script, please remove: ' + scriptElm.outerHTML];
 
   warn.push('To improve performance it is recommended to set the differential scripts in the head as follows:')
