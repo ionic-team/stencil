@@ -44,6 +44,9 @@ export namespace Components {
     'strAttr'?: string;
   }
   interface BadSharedJsx {}
+  interface CmpA {}
+  interface CmpB {}
+  interface CmpC {}
   interface ConditionalBasic {}
   interface ConditionalRerender {}
   interface ConditionalRerenderRoot {}
@@ -234,6 +237,24 @@ declare global {
   var HTMLBadSharedJsxElement: {
     prototype: HTMLBadSharedJsxElement;
     new (): HTMLBadSharedJsxElement;
+  };
+
+  interface HTMLCmpAElement extends Components.CmpA, HTMLStencilElement {}
+  var HTMLCmpAElement: {
+    prototype: HTMLCmpAElement;
+    new (): HTMLCmpAElement;
+  };
+
+  interface HTMLCmpBElement extends Components.CmpB, HTMLStencilElement {}
+  var HTMLCmpBElement: {
+    prototype: HTMLCmpBElement;
+    new (): HTMLCmpBElement;
+  };
+
+  interface HTMLCmpCElement extends Components.CmpC, HTMLStencilElement {}
+  var HTMLCmpCElement: {
+    prototype: HTMLCmpCElement;
+    new (): HTMLCmpCElement;
   };
 
   interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {}
@@ -742,6 +763,9 @@ declare global {
     'attribute-host': HTMLAttributeHostElement;
     'attribute-html-root': HTMLAttributeHtmlRootElement;
     'bad-shared-jsx': HTMLBadSharedJsxElement;
+    'cmp-a': HTMLCmpAElement;
+    'cmp-b': HTMLCmpBElement;
+    'cmp-c': HTMLCmpCElement;
     'conditional-basic': HTMLConditionalBasicElement;
     'conditional-rerender': HTMLConditionalRerenderElement;
     'conditional-rerender-root': HTMLConditionalRerenderRootElement;
@@ -859,6 +883,9 @@ declare namespace LocalJSX {
     'strAttr'?: string;
   }
   interface BadSharedJsx {}
+  interface CmpA {}
+  interface CmpB {}
+  interface CmpC {}
   interface ConditionalBasic {}
   interface ConditionalRerender {}
   interface ConditionalRerenderRoot {}
@@ -1012,6 +1039,9 @@ declare namespace LocalJSX {
     'attribute-host': AttributeHost;
     'attribute-html-root': AttributeHtmlRoot;
     'bad-shared-jsx': BadSharedJsx;
+    'cmp-a': CmpA;
+    'cmp-b': CmpB;
+    'cmp-c': CmpC;
     'conditional-basic': ConditionalBasic;
     'conditional-rerender': ConditionalRerender;
     'conditional-rerender-root': ConditionalRerenderRoot;
@@ -1112,6 +1142,9 @@ declare module "@stencil/core" {
       'attribute-host': LocalJSX.AttributeHost & JSXBase.HTMLAttributes<HTMLAttributeHostElement>;
       'attribute-html-root': LocalJSX.AttributeHtmlRoot & JSXBase.HTMLAttributes<HTMLAttributeHtmlRootElement>;
       'bad-shared-jsx': LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
+      'cmp-a': LocalJSX.CmpA & JSXBase.HTMLAttributes<HTMLCmpAElement>;
+      'cmp-b': LocalJSX.CmpB & JSXBase.HTMLAttributes<HTMLCmpBElement>;
+      'cmp-c': LocalJSX.CmpC & JSXBase.HTMLAttributes<HTMLCmpCElement>;
       'conditional-basic': LocalJSX.ConditionalBasic & JSXBase.HTMLAttributes<HTMLConditionalBasicElement>;
       'conditional-rerender': LocalJSX.ConditionalRerender & JSXBase.HTMLAttributes<HTMLConditionalRerenderElement>;
       'conditional-rerender-root': LocalJSX.ConditionalRerenderRoot & JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement>;

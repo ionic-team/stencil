@@ -24,6 +24,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
   let appLoadFallback: any;
+  const deferredConnectedCallbacks: {connectedCallback: () => void}[] = [];
+  let isBootstrapping = true;
+
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
   if (options.syncQueue) {
@@ -100,11 +103,17 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         connectedCallback() {
-          if (appLoadFallback) {
-            clearTimeout(appLoadFallback);
-            appLoadFallback = null;
+          if (isBootstrapping) {
+            // connectedCallback will be processed once all components have been registered
+            deferredConnectedCallbacks.push(this);
+          } else {
+            if (appLoadFallback) {
+              clearTimeout(appLoadFallback);
+              appLoadFallback = null;
+            }
+
+            plt.jmp(() => connectedCallback(this, cmpMeta));
           }
-          plt.jmp(() => connectedCallback(this, cmpMeta));
         }
 
         disconnectedCallback() {
@@ -134,6 +143,10 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         );
       }
     }));
+
+  // Process deferred connectedCallbacks now all components have been registered
+  isBootstrapping = false;
+  deferredConnectedCallbacks.forEach(host => host.connectedCallback());
 
   // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
   visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
