@@ -16,7 +16,8 @@ log.txt
 node_modules/
 coverage/
 
-build/
+/build/
+/scripts/build/
 dist/
 
 # submodule packages
