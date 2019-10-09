@@ -9,9 +9,14 @@ import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@pla
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
 import { appDidLoad, forceUpdate } from './update-component';
+import { createTime } from './profile';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
+  // if (BUILD.profile) {
+  //   performance.mark('st:app:start');
+  // }
+  const endBootstrap = createTime('bootstrapLazy');
   const cmpTags: string[] = [];
   const exclude = options.exclude || [];
   const head = doc.head;
@@ -123,7 +128,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       cmpMeta.$lazyBundleIds$ = lazyBundle[0];
 
       if (!exclude.includes(tagName) && !customElements.get(tagName)) {
-        cmpTags.push(tagName);
         customElements.define(
           tagName,
           proxyComponent(HostElement as any, cmpMeta, PROXY_FLAGS.isElementConstructor) as any
@@ -138,4 +142,5 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
   // Fallback appLoad event
   plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30));
+  endBootstrap();
 };

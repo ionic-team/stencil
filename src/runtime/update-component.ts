@@ -5,6 +5,7 @@ import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { consoleError, doc, getHostRef, nextTick, plt, writeTask } from '@platform';
 import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
+import { createTime } from './profile';
 
 export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) =>  {
   if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$) {
@@ -20,7 +21,7 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     hostRef.$flags$ |= HOST_FLAGS.needsRerender;
     return;
   }
-
+  const endSchedule = createTime('scheduleUpdate', cmpMeta.$tagName$);
   const ancestorComponent = hostRef.$ancestorComponent$;
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   const update = () => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
@@ -62,6 +63,8 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     elm['s-rc'] = undefined;
   }
 
+  endSchedule();
+
   // there is no ancestorc omponent or the ancestor component
   // has already fired off its lifecycle update then
   // fire off the initial update
@@ -73,14 +76,17 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 
 const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, instance: any, isInitialLoad: boolean) => {
   // updateComponent
+  const endUpdate = createTime('update', cmpMeta.$tagName$);
   if (BUILD.style && isInitialLoad) {
     // DOM WRITE!
     attachStyles(elm, cmpMeta, hostRef.$modeName$);
   }
 
+  const endRender = createTime('render', cmpMeta.$tagName$);
   if (BUILD.isDev)  {
     hostRef.$flags$ |= HOST_FLAGS.dev_stateMutation;
   }
+
   if (BUILD.hasRenderFn || BUILD.reflect) {
     if (BUILD.vdomRender || BUILD.reflect) {
       try {
@@ -128,6 +134,8 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
   if (BUILD.updatable || BUILD.lazyLoad) {
     hostRef.$flags$ |= HOST_FLAGS.hasRendered;
   }
+  endRender();
+  endUpdate();
 
   if (BUILD.asyncLoading) {
     const childrenPromises = elm['s-p'];
@@ -146,9 +154,13 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
 
 
 export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta) => {
+  const endPostUpdate = createTime('postUpdate', cmpMeta.$tagName$);
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   const ancestorComponent = hostRef.$ancestorComponent$;
 
+  if (BUILD.isDev) {
+    hostRef.$flags$ |= HOST_FLAGS.dev_stateMutation;
+  }
   if (BUILD.cmpDidRender) {
     safeCall(instance, 'componentDidRender');
   }
@@ -190,6 +202,9 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
   if (BUILD.hotModuleReplacement) {
     elm['s-hmr-load'] && elm['s-hmr-load']();
   }
+  if (BUILD.isDev) {
+    hostRef.$flags$ &= ~HOST_FLAGS.dev_stateMutation;
+  }
 
   if (BUILD.method && BUILD.lazyLoad) {
     hostRef.$onInstanceResolve$(elm);
@@ -206,6 +221,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
     }
     hostRef.$flags$ &= ~(HOST_FLAGS.isWaitingForChildren | HOST_FLAGS.needsRerender);
   }
+  endPostUpdate();
   // ( •_•)
   // ( •_•)>⌐■-■
   // (⌐■_■)
@@ -235,6 +251,9 @@ export const appDidLoad = () => {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
   emitLifecycleEvent(doc, 'appload');
+  // if (BUILD.profile) {
+  //   performance.measure('[Stencil] App Did Load', 'st:app:start');
+  // }
 };
 
 export const safeCall = (instance: any, method: string, arg?: any) => {
