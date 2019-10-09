@@ -23,6 +23,15 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
     // set our new value!
     hostRef.$instanceValues$.set(propName, newVal);
 
+    if (BUILD.isDev && hostRef.$flags$ & HOST_FLAGS.dev_stateMutation) {
+      console.warn(
+        `[STENCIL-DEV-MODE] The state/prop "${propName}" changed during rendering, triggering another re-render. This is not a recommended pattern since it can lead to infinite-loops and other bugs.`,
+        'Element', elm,
+        'New value', newVal,
+        'Old value', oldVal
+      );
+    }
+
     if (!BUILD.lazyLoad || instance) {
       // get an array of method names of watch functions to call
       if (BUILD.watchCallback && cmpMeta.$watchers$ && flags & HOST_FLAGS.isWatchReady) {

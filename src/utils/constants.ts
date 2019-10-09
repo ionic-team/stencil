@@ -46,6 +46,9 @@ export const enum HOST_FLAGS {
   isWatchReady = 1 << 7,
   isListenReady = 1 << 8,
   needsRerender = 1 << 9,
+
+  // DEV ONLY
+  dev_stateMutation = 1 << 10
 }
 
 export const enum CMP_FLAGS {

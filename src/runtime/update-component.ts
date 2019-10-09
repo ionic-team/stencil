@@ -78,6 +78,9 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
     attachStyles(elm, cmpMeta, hostRef.$modeName$);
   }
 
+  if (BUILD.isDev)  {
+    hostRef.$flags$ |= HOST_FLAGS.dev_stateMutation;
+  }
   if (BUILD.hasRenderFn || BUILD.reflect) {
     if (BUILD.vdomRender || BUILD.reflect) {
       try {
@@ -99,6 +102,9 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
   }
   if (BUILD.cssVarShim && plt.$cssShim$) {
     plt.$cssShim$.updateHost(elm);
+  }
+  if (BUILD.isDev) {
+    hostRef.$flags$ &= ~HOST_FLAGS.dev_stateMutation;
   }
   if (BUILD.updatable && BUILD.taskQueue) {
     hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
