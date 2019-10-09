@@ -36,7 +36,7 @@ import * as c from 'modules';
 
   const results = await config.sys.rollup.rollup(rollupOptions);
   await results.generate({
-    format: 'esm',
+    format: 'es',
     file: 'app.esm.js'
   });
 }

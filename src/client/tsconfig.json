@@ -24,11 +24,17 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
+      "@app-data": [
+        "../app-data/index.ts"
+      ],
       "@build-conditionals": [
-        "../compiler/app-core/build-conditionals.ts"
+        "../app-data/index.ts"
       ],
       "@runtime": [
         "../runtime/index.ts"
+      ],
+      "@stencil/core/internal": [
+        "../internal/index.ts"
       ],
       "@utils": [
         "../utils/index.ts"
@@ -38,6 +44,7 @@
   "files": [
     "./index.ts",
     "../index.ts",
+    "../app-data/index.ts",
     "./polyfills/css-shim/index.ts"
   ]
 }

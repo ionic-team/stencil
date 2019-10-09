@@ -1,4 +1,4 @@
-import { ListenOptions } from './decorators';
+import { ListenOptions } from './stencil-core';
 
 
 export interface AddEventListener {

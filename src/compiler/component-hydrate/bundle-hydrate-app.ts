@@ -1,23 +1,18 @@
 import * as d from '../../declarations';
+import { appDataPlugin } from '../../compiler_next/bundle/app-data-plugin';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
+import { coreResolvePlugin } from '../../compiler_next/bundle/core-resolve-plugin';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
-import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { loaderPlugin } from '../rollup-plugins/loader';
 import { pluginHelper } from '../rollup-plugins/plugin-helper';
-import { RollupBuild, RollupOptions, TreeshakingOptions } from 'rollup'; // types only
-import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
+import { RollupBuild, RollupOptions } from 'rollup'; // types only
 import { stencilHydratePlugin } from '../rollup-plugins/stencil-hydrate';
 
 
-export const bundleHydrateApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, appEntryCode: string) => {
+export const bundleHydrateApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.BuildConditionals, appEntryCode: string) => {
   try {
-    const treeshake: TreeshakingOptions | boolean = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
-      ? {
-        propertyReadSideEffects: false,
-        tryCatchDeoptimization: false,
-      }
-      : false;
+    const treeshake = false;
 
     const rollupOptions: RollupOptions = {
       ...config.rollupConfig.inputOptions,
@@ -25,12 +20,14 @@ export const bundleHydrateApp = async (config: d.Config, compilerCtx: d.Compiler
       input: '@app-entry',
       inlineDynamicImports: true,
       plugins: [
+        coreResolvePlugin(config, 'hydrate'),
         loaderPlugin({
           '@app-entry': appEntryCode
         }),
         stencilHydratePlugin(config),
-        stencilBuildConditionalsPlugin(build, config.fsNamespace),
-        globalScriptsPlugin(config, compilerCtx),
+        // stencilBuildConditionalsPlugin(build, config.fsNamespace),
+        // globalScriptsPlugin(config, compilerCtx),
+        appDataPlugin(config, compilerCtx, build, 'hydrate'),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,

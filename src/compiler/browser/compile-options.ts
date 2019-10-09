@@ -1,11 +1,11 @@
-import * as d from '../../declarations';
+import { CompileOptions, CompileScriptMinifyOptions, Config, SourceTarget, TransformOptions } from '../../declarations';
 import { getTerserOptions } from '../app-core/optimize-module';
 import path from 'path';
 import ts from 'typescript';
 
 
-export const getCompileOptions = (input: d.CompileOptions, filePath: string) => {
-  const rtn: d.CompileOptions = {
+export const getCompileOptions = (input: CompileOptions, filePath: string) => {
+  const rtn: CompileOptions = {
     componentExport: getConfig(input.componentExport, VALID_EXPORT, 'customelement'),
     componentMetadata: getConfig(input.componentMetadata, VALID_METADATA, null),
     proxy: getConfig(input.proxy, VALID_PROXY, 'defineproperty'),
@@ -55,8 +55,8 @@ const VALID_SCRIPT = new Set(['latest', 'esnext', 'es2017', 'es2015', 'es5']);
 const VALID_STYLE = new Set(['static']);
 
 
-export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
-  const transformOpts: d.TransformOptions = {
+export const getTransformOptions = (compilerOpts: CompileOptions) => {
+  const transformOpts: TransformOptions = {
 
     // best we always set this to true
     allowSyntheticDefaultImports: true,
@@ -130,7 +130,7 @@ export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
 
 
 export const getCompilerConfig = () => {
-  const config: d.Config = {
+  const config: Config = {
     cwd: '/',
     rootDir: '/',
     srcDir: '/',
@@ -147,8 +147,8 @@ export const getCompilerConfig = () => {
 };
 
 
-export const getMinifyScriptOptions = (opts: d.CompileScriptMinifyOptions = {}) => {
-  const sourceTarget: d.SourceTarget = (opts.script === 'es5') ? 'es5' : 'es2017';
+export const getMinifyScriptOptions = (opts: CompileScriptMinifyOptions = {}) => {
+  const sourceTarget: SourceTarget = (opts.script === 'es5') ? 'es5' : 'es2017';
   const isPretty = !!opts.pretty;
   return {
     options: getTerserOptions(sourceTarget, isPretty),

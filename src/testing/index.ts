@@ -11,6 +11,8 @@ export { newSpecPage } from './spec-page';
 export { shuffleArray } from './testing-utils';
 export { Testing } from './testing';
 export { transpile } from './test-transpile';
+export { TestingFs } from './testing-fs';
+export { createTestingSys } from './testing-sys';
 
 
 import { URL as nodeURL } from 'url';

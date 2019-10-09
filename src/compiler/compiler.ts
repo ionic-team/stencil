@@ -7,7 +7,6 @@ import { COMPILER_BUILD } from './build/compiler-build-id';
 import { docs } from './docs/docs';
 import { generateBuildFromFsWatch, updateCacheFromRebuild } from './fs-watch/fs-watch-rebuild';
 import { logFsWatchMessage } from './fs-watch/fs-watch-log';
-import { startDevServerMain } from '../dev-server/start-server-main';
 import { validateConfig } from '../compiler/config/validate-config';
 
 
@@ -29,7 +28,7 @@ export class Compiler implements d.Compiler {
 
       let startupMsg = `${sys.compiler.name} v${sys.compiler.version} `;
       if (details.platform !== 'win32') {
-        startupMsg += `💎`;
+        startupMsg += `__VERMOJI__`;
       }
 
       if (config.suppressLogs !== true) {
@@ -151,41 +150,23 @@ export class Compiler implements d.Compiler {
     }
   }
 
-  async startDevServer() {
-    // start up the dev server
-    const devServer = await startDevServerMain(this.config, this.ctx);
-
-    if (devServer != null) {
-      // get the browser url to be logged out at the end of the build
-      this.config.devServer.browserUrl = devServer.browserUrl;
-
-      this.config.logger.debug(`dev server started: ${devServer.browserUrl}`);
-    }
-
-    return devServer;
-  }
-
   on(eventName: 'fsChange', cb: (fsWatchResults?: d.FsWatchResults) => void): Function;
   on(eventName: 'buildNoChange', cb: (buildResults: d.BuildNoChangeResults) => void): Function;
   on(eventName: 'buildLog', cb: (buildResults: d.BuildLog) => void): Function;
   on(eventName: 'buildFinish', cb: (buildResults: d.BuildResults) => void): Function;
   on(eventName: d.CompilerEventName, cb: any) {
-    return this.ctx.events.subscribe(eventName as any, cb);
+    return this.ctx.events.on(eventName as any, cb);
   }
 
   once(eventName: 'buildFinish'): Promise<d.BuildResults>;
   once(eventName: 'buildNoChange'): Promise<d.BuildNoChangeResults>;
   once(eventName: d.CompilerEventName) {
     return new Promise<any>(resolve => {
-      const off = this.ctx.events.subscribe(eventName as any, (...args: any[]) => {
+      const off = this.ctx.events.on(eventName as any, (...args: any[]) => {
         off();
         resolve.apply(this, args);
       });
     });
-  }
-
-  off(eventName: string, cb: Function) {
-    this.ctx.events.unsubscribe(eventName, cb);
   }
 
   trigger(eventName: 'fileUpdate', path: string): void;
@@ -235,11 +216,14 @@ export class Compiler implements d.Compiler {
 }
 
 
-function isValid(config: d.Config): [ boolean, d.Config | null] {
+function isValid(userConfig: d.Config): [ boolean, d.Config | null] {
   const diagnostics: d.Diagnostic[] = [];
+  let config: d.Config = null;
   try {
     // validate the build config
-    config = validateConfig(config, diagnostics, true);
+    const validated = validateConfig(userConfig);
+    config = validated.config;
+    diagnostics.push(...validated.diagnostics);
 
   } catch (e) {
     catchError(diagnostics, e, e.message);

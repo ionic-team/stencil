@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { attachStyles } from './styles';
-import { BUILD } from '@build-conditionals';
+import { BUILD } from '@app-data';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { consoleError, doc, getHostRef, nextTick, plt, writeTask } from '@platform';
 import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';

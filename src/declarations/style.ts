@@ -22,10 +22,6 @@ export interface CompilerModeStyles {
   [modeName: string]: string[];
 }
 
-export interface ModeStyles {
-  [modeName: string]: string | string[];
-}
-
 
 export interface CssImportData {
   srcImport: string;

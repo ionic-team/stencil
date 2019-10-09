@@ -1,6 +1,6 @@
 import * as d from '@stencil/core/declarations';
 import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
-import { normalizePath } from '@stencil/core/utils';
+import { normalizePath } from '@utils';
 import { validateConfig } from '../validate-config';
 import path from 'path';
 

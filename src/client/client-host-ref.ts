@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { BUILD } from '@build-conditionals';
+import { BUILD } from '@app-data';
 
 
 const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = /*@__PURE__*/new WeakMap();

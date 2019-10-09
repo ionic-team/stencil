@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import { HydrateDocumentOptions, HydrateResults, RenderToStringOptions } from '../../declarations';
 import { BootstrapHydrateResults } from '../platform/bootstrap-hydrate';
 import { createHydrateAppSandbox } from './vm-sandbox';
 import { finalizeWindow } from './window-finalize';
@@ -9,7 +9,7 @@ import { MockWindow, serializeNodeToHtml } from '@mock-doc';
 import { patchDomImplementation } from './patch-dom-implementation';
 
 
-export async function renderToString(html: string, opts: d.RenderToStringOptions = {}) {
+export async function renderToString(html: string, opts: RenderToStringOptions = {}) {
   opts = normalizeHydrateOptions(opts);
 
   const results = generateHydrateResults(opts);
@@ -71,7 +71,7 @@ export async function renderToString(html: string, opts: d.RenderToStringOptions
 }
 
 
-export async function hydrateDocument(doc: Document, opts: d.HydrateDocumentOptions = {}) {
+export async function hydrateDocument(doc: Document, opts: HydrateDocumentOptions = {}) {
   opts = normalizeHydrateOptions(opts);
 
   const results = generateHydrateResults(opts);
@@ -97,7 +97,7 @@ export async function hydrateDocument(doc: Document, opts: d.HydrateDocumentOpti
 }
 
 
-async function render(win: Window, doc: Document, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
+async function render(win: Window, doc: Document, opts: HydrateDocumentOptions, results: HydrateResults) {
   catchUnhandledErrors(results);
 
   initializeWindow(win, doc, opts, results);
@@ -146,7 +146,7 @@ async function render(win: Window, doc: Document, opts: d.HydrateDocumentOptions
 }
 
 
-function catchUnhandledErrors(results: d.HydrateResults) {
+function catchUnhandledErrors(results: HydrateResults) {
   if ((process as any).__stencilErrors) {
     return;
   }

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { dashToPascalCase, buildError } from '@utils';
+import { buildError, dashToPascalCase } from '@utils';
 import { isOutputTargetDist } from '../output-targets/output-utils';
 import { setStringConfig } from './config-utils';
 

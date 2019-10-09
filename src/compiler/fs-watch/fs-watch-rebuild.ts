@@ -86,7 +86,7 @@ export function filesChanged(buildCtx: d.BuildCtx) {
 }
 
 
-function scriptsAdded(config: d.Config, buildCtx: d.BuildCtx) {
+export function scriptsAdded(config: d.Config, buildCtx: d.BuildCtx) {
   // collect all the scripts that were added
   return buildCtx.filesAdded.filter(f => {
     return SCRIPT_EXT.some(ext => f.endsWith(ext.toLowerCase()));
@@ -94,7 +94,7 @@ function scriptsAdded(config: d.Config, buildCtx: d.BuildCtx) {
 }
 
 
-function scriptsDeleted(config: d.Config, buildCtx: d.BuildCtx) {
+export function scriptsDeleted(config: d.Config, buildCtx: d.BuildCtx) {
   // collect all the scripts that were deleted
   return buildCtx.filesDeleted.filter(f => {
     return SCRIPT_EXT.some(ext => f.endsWith(ext.toLowerCase()));
@@ -102,7 +102,7 @@ function scriptsDeleted(config: d.Config, buildCtx: d.BuildCtx) {
 }
 
 
-function hasScriptChanges(buildCtx: d.BuildCtx) {
+export function hasScriptChanges(buildCtx: d.BuildCtx) {
   return buildCtx.filesChanged.some(f => {
     const ext = getExt(f);
     return SCRIPT_EXT.includes(ext);
@@ -110,7 +110,7 @@ function hasScriptChanges(buildCtx: d.BuildCtx) {
 }
 
 
-function hasStyleChanges(buildCtx: d.BuildCtx) {
+export function hasStyleChanges(buildCtx: d.BuildCtx) {
   return buildCtx.filesChanged.some(f => {
     const ext = getExt(f);
     return STYLE_EXT.includes(ext);
@@ -135,7 +135,7 @@ export function isStyleExt(ext: string) {
 const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
 
 
-function hasHtmlChanges(config: d.Config, buildCtx: d.BuildCtx) {
+export function hasHtmlChanges(config: d.Config, buildCtx: d.BuildCtx) {
   const anyHtmlChanged = buildCtx.filesChanged.some(f => f.toLowerCase().endsWith('.html'));
 
   if (anyHtmlChanged) {

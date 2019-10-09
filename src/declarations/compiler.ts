@@ -4,7 +4,7 @@ import { Cache } from './cache';
 import { CollectionCompilerMeta } from './collection-manifest';
 import { ComponentCompilerMeta } from './component-compiler-meta';
 import { Config } from './config';
-import { DevServer } from './dev-server';
+// import { DevServer } from './dev-server';
 import { FsWatcher } from './fs-watch';
 import { InMemoryFileSystem } from './in-memory-fs';
 import { ModuleMap } from './module';
@@ -17,7 +17,7 @@ export interface Compiler {
   docs(): Promise<void>;
   fs: InMemoryFileSystem;
   isValid: boolean;
-  startDevServer(): Promise<DevServer>;
+  // startDevServer(): Promise<DevServer>;
 }
 
 
@@ -36,7 +36,6 @@ export interface CompilerCtx {
   events: BuildEvents;
   fs: InMemoryFileSystem;
   fsWatcher: FsWatcher;
-  hasLoggedServerUrl: boolean;
   hasSuccessfulBuild: boolean;
   isActivelyBuilding: boolean;
   lastComponentStyleInput: Map<string, string>;
@@ -51,6 +50,8 @@ export interface CompilerCtx {
   rootTsFiles: string[];
   styleModeNames: Set<string>;
   tsService: TsService;
+
+  rollupCache: Map<string, any>;
 
   reset(): void;
 }

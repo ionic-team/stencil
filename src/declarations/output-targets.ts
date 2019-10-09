@@ -163,15 +163,6 @@ export interface OutputTargetDistLazyLoader extends OutputTargetBase {
   empty: boolean;
 }
 
-export interface OutputTargetDistModule extends OutputTargetBase {
-  type: 'experimental-dist-module';
-
-  dir?: string;
-  externalRuntime?: boolean;
-  empty?: boolean;
-  copy?: CopyTask[];
-}
-
 
 export interface OutputTargetDistSelfContained extends OutputTargetBase {
   type: 'dist-self-contained';
@@ -235,6 +226,33 @@ export interface OutputTargetStats extends OutputTargetBase {
   file?: string;
 }
 
+export interface OutputTargetBaseNext {
+  type: string;
+  dir?: string;
+}
+
+export interface OutputTargetCollectionNext extends OutputTargetBaseNext {
+  type: 'collection-next';
+}
+
+export interface OutputTargetCustomElementNext extends OutputTargetBaseNext {
+  type: 'custom-element-next';
+}
+
+export interface OutputTargetLazyNext extends OutputTargetBaseNext {
+  type: 'lazy-next';
+}
+
+// export interface OutputTargetDistModule extends OutputTargetBase {
+//   type: 'experimental-module';
+
+//   dir?: string;
+//   externalRuntime?: boolean;
+//   empty?: boolean;
+//   copy?: CopyTask[];
+// }
+
+
 export interface OutputTargetBase {
   type: string;
 }
@@ -253,7 +271,6 @@ export type OutputTarget =
  | OutputTargetDistLazy
  | OutputTargetDistGlobalStyles
  | OutputTargetDistLazyLoader
- | OutputTargetDistModule
  | OutputTargetDistSelfContained
  | OutputTargetDocsJson
  | OutputTargetDocsCustom
@@ -262,4 +279,8 @@ export type OutputTarget =
  | OutputTargetWww
  | OutputTargetHydrate
  | OutputTargetStats
- | OutputTargetDistTypes;
+ | OutputTargetDistTypes
+
+ | OutputTargetCollectionNext
+ | OutputTargetCustomElementNext
+ | OutputTargetLazyNext;

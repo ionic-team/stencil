@@ -1,65 +1,75 @@
 import * as d from '../declarations';
 
 
-export class BuildEvents implements d.BuildEvents {
-  private evCallbacks = new Map<string, Function[]>();
+export const buildEvents = (): d.BuildEvents => {
+  const evCallbacks: EventCallback[] = [];
 
-  subscribe(eventName: 'fileUpdate', cb: (path: string) => void): Function;
-  subscribe(eventName: 'fileAdd', cb: (path: string) => void): Function;
-  subscribe(eventName: 'fileDelete', cb: (path: string) => void): Function;
-  subscribe(eventName: 'dirAdd', cb: (path: string) => void): Function;
-  subscribe(eventName: 'dirDelete', cb: (path: string) => void): Function;
-  subscribe(eventName: 'fsChange', cb: (fsChange: d.FsWatchResults) => void): Function;
-  subscribe(eventName: 'buildFinish', cb: (buildResults: d.BuildResults) => void): Function;
-  subscribe(eventName: 'buildLog', cb: (buildLog: d.BuildLog) => void): Function;
-  subscribe(eventName: d.CompilerEventName, cb: Function): Function {
-    const evName = getEventName(eventName);
-    const callbacks = this.evCallbacks.get(evName);
-
-    if (callbacks == null) {
-      this.evCallbacks.set(evName, [cb]);
-    } else {
-      callbacks.push(cb);
+  const off = (callback: any) => {
+    const index = evCallbacks.findIndex(ev => ev.callback === callback);
+    if (index > -1) {
+      evCallbacks.splice(index, 1);
+      return true;
     }
+    return false;
+  };
 
-    return () => {
-      this.unsubscribe(evName, cb);
-    };
-  }
+  const on = (arg0: any, arg1?: any): d.BuildOnEventRemove => {
+    if (typeof arg0 === 'function') {
+      const eventName: string = null;
+      const callback = arg0;
+      evCallbacks.push({
+        eventName,
+        callback
+      });
+      return () => off(callback);
 
+    } else if (typeof arg0 === 'string' && typeof arg1 === 'function') {
+      const eventName = arg0.toLowerCase().trim();
+      const callback = arg1;
 
-  unsubscribe(eventName: string, cb: Function) {
-    const callbacks = this.evCallbacks.get(getEventName(eventName));
+      evCallbacks.push({
+        eventName,
+        callback
+      });
 
-    if (callbacks != null) {
-      const index = callbacks.indexOf(cb);
-      if (index > -1) {
-        callbacks.splice(index, 1);
+      return () => off(callback);
+    }
+    return () => false;
+  };
+
+  const emit = (eventName: d.CompilerEventName, data: any) => {
+    const normalizedEventName = eventName.toLowerCase().trim();
+
+    for (const ev of evCallbacks) {
+      if (ev.eventName == null) {
+        try {
+          ev.callback(eventName, data);
+        } catch (e) {
+          console.error(e);
+        }
+      } else if (ev.eventName === normalizedEventName) {
+        try {
+          ev.callback(data);
+        } catch (e) {
+          console.error(e);
+        }
       }
     }
-  }
+  };
 
-  unsubscribeAll() {
-    this.evCallbacks.clear();
-  }
+  const unsubscribeAll = () => {
+    evCallbacks.length = 0;
+  };
 
-
-  emit(eventName: d.CompilerEventName, ...args: any[]) {
-    const callbacks = this.evCallbacks.get(getEventName(eventName));
-
-    if (callbacks != null) {
-      callbacks.forEach(cb => {
-        try {
-          cb.apply(this, args);
-        } catch (e) {
-          console.log(e);
-        }
-      });
-    }
-  }
-
-}
-
-const getEventName = (evName: string) => {
-  return evName.trim().toLowerCase();
+  return {
+    emit,
+    on,
+    unsubscribeAll
+  };
 };
+
+
+interface EventCallback {
+  eventName: string;
+  callback: Function;
+}

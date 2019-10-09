@@ -1,5 +1,0 @@
-{
-  "name": "@stencil/core/runtime",
-  "private": true,
-  "module": "../dist/client/index.mjs"
-}

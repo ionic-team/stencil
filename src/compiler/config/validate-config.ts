@@ -1,5 +1,5 @@
-import { validateRollupConfig } from './validate-rollup-config';
 import * as d from '../../declarations';
+import { buildError, sortBy } from '@utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace, validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
@@ -7,34 +7,34 @@ import { validatePaths } from './validate-paths';
 import { setArrayConfig, setBooleanConfig, setNumberConfig } from './config-utils';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
-import { validatePlugins } from './validate-plugins';
-import { buildError, sortBy } from '@utils';
 import { validateOutputTargetCustom } from './validate-outputs-custom';
+import { validatePlugins } from './validate-plugins';
+import { validateRollupConfig } from './validate-rollup-config';
 
-export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], setEnvVariables: boolean) {
+export function validateConfig(config: d.Config): { config: d.Config, diagnostics: d.Diagnostic[] } {
+  const diagnostics: d.Diagnostic[] = [];
   if (config == null) {
-    throw new Error(`invalid build config`);
+    const err = buildError(diagnostics);
+    err.messageText = `invalid build config`;
+    return {
+      config: null,
+      diagnostics
+    };
   }
 
   if (config._isValidated) {
     // don't bother if we've already validated this config
-    return config;
+    return {
+      config,
+      diagnostics
+    };
   }
 
   if (typeof config.rootDir !== 'string') {
-    throw new Error('config.rootDir required');
+    config.rootDir = '/';
   }
 
   config.flags = config.flags || {};
-
-  if (config.flags.debug || config.flags.verbose) {
-    config.logLevel = 'debug';
-  } else if (config.flags.logLevel) {
-    config.logLevel = config.flags.logLevel;
-  } else if (typeof config.logLevel !== 'string') {
-    config.logLevel = 'info';
-  }
-  config.logger.level = config.logLevel;
 
   setBooleanConfig(config, 'writeLog', 'log', false);
   setBooleanConfig(config, 'buildAppCore', null, true);
@@ -127,22 +127,14 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
   // set to true so it doesn't bother going through all this again on rebuilds
   config._isValidated = true;
 
-  if (setEnvVariables !== false) {
-    setProcessEnvironment(config);
-  }
-
   validateRollupConfig(config);
   validateTesting(config, diagnostics);
   validateOutputTargetCustom(config, diagnostics);
 
-  return config;
-}
-
-
-export function setProcessEnvironment(config: d.Config) {
-  if (typeof process !== 'undefined' && process.env) {
-    process.env.NODE_ENV = config.devMode ? 'development' : 'production';
-  }
+  return {
+    config,
+    diagnostics
+  };
 }
 
 

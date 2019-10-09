@@ -1,10 +1,13 @@
 import * as d from '../../declarations';
-import { doc, getComponent, plt } from '@platform';
+import { cmpModules, doc, plt } from '@platform';
+import { globalScripts } from '@app-data';
 import { hydrateComponent } from './hydrate-component';
 import { insertVdomAnnotations } from '@runtime';
 
 
 export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, done: (results: BootstrapHydrateResults) => void) {
+  globalScripts();
+
   const results: BootstrapHydrateResults = {
     hydratedCount: 0,
     hydratedComponents: []
@@ -22,10 +25,10 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
 
     const patchComponent = function(elm: d.HostElement) {
       const tagName = elm.nodeName.toLowerCase();
-      if (elm.tagName.includes('-')) {
-        const Cstr = getComponent(tagName);
+      if (tagName.includes('-')) {
+        const hasCstr = cmpModules.has(tagName);
 
-        if (Cstr != null) {
+        if (hasCstr) {
           if (typeof elm.connectedCallback !== 'function') {
             elm.connectedCallback = patchedConnectedCallback;
           }

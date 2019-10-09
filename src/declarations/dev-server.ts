@@ -1,8 +1,10 @@
+import { BuildEmitEvents } from './build-events';
 import { BuildLog, BuildResults } from './build';
-import { FsStats } from './file-system';
+import { CompilerFsStats } from './compiler_next';
+import { Logger } from './logger';
 
 
-export interface DevServer {
+export interface DevServer extends BuildEmitEvents {
   browserUrl: string;
   close(): Promise<void>;
 }
@@ -43,6 +45,7 @@ export interface StencilDevServerConfig {
   reloadStrategy?: PageReloadStrategy;
   root?: string;
   websocket?: boolean;
+  logger?: Logger;
 }
 
 export interface DevServerConfig extends StencilDevServerConfig {
@@ -66,8 +69,9 @@ export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
 
 export interface DevServerStartResponse {
-  browserUrl?: string;
-  initialLoadUrl?: string;
+  browserUrl: string;
+  initialLoadUrl: string;
+  error: string;
 }
 
 
@@ -97,7 +101,7 @@ export interface HttpRequest {
   url: string;
   pathname?: string;
   filePath?: string;
-  stats?: FsStats;
+  stats?: CompilerFsStats;
   headers?: {[name: string]: string};
   host?: string;
 }
@@ -105,7 +109,7 @@ export interface HttpRequest {
 
 export interface DevServerMessage {
   startServer?: DevServerConfig;
-  serverStated?: DevServerStartResponse;
+  serverStarted?: DevServerStartResponse;
   buildLog?: BuildLog;
   buildResults?: BuildResults;
   requestBuildResults?: boolean;

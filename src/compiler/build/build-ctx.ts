@@ -10,6 +10,7 @@ export class BuildContext implements d.BuildCtx {
   buildId = -1;
   buildMessages: string[] = [];
   buildResults: d.BuildResults = null;
+  buildResults_next: d.CompilerBuildResults = null;
   bundleBuildCount = 0;
   collections: d.Collection[] = [];
   completedTasks: d.BuildTask[] = [];
@@ -40,6 +41,7 @@ export class BuildContext implements d.BuildCtx {
   indexDoc: Document = undefined;
   isRebuild = false;
   moduleFiles: d.Module[] = [];
+  outputs: d.BuildOutput[] = [];
   packageJson: d.PackageJsonData = {};
   packageJsonFilePath: string = null;
   pendingCopyTasks: Promise<d.CopyResults>[] = [];
@@ -81,6 +83,12 @@ export class BuildContext implements d.BuildCtx {
 
     // debug log our new build
     this.debug(`start build, ${this.timestamp}`);
+
+    const buildStart: d.CompilerBuildStart = {
+      buildId: this.buildId,
+      timestamp: this.timestamp
+    };
+    this.compilerCtx.events.emit('buildStart', buildStart);
   }
 
   createTimeSpan(msg: string, debug?: boolean) {

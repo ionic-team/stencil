@@ -1,15 +1,11 @@
 import * as d from '../../declarations';
 
-const cstrs = new Map<string, d.ComponentNativeConstructor>();
+export const cmpModules = new Map<string, {[exportName: string]: d.ComponentConstructor}>();
 
 export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef, _hmrVersionId?: string): any => {
   return new Promise(resolve => {
-    resolve(cstrs.get(cmpMeta.$tagName$));
+    resolve(cmpModules.get(cmpMeta.$tagName$));
   });
-};
-
-export const getComponent = (tagName: string) => {
-  return cstrs.get(tagName);
 };
 
 export const isMemberInElement = (elm: any, memberName: string) => {
@@ -17,9 +13,10 @@ export const isMemberInElement = (elm: any, memberName: string) => {
     if (memberName in elm) {
       return true;
     }
-    const nodeName = elm.nodeName;
-    if (nodeName) {
-      const hostRef: d.ComponentNativeConstructor = getComponent(nodeName.toLowerCase());
+    const tagName = elm.nodeName.toLowerCase();
+    const cmpModule = cmpModules.get(tagName);
+    if (cmpModule) {
+      const hostRef: d.ComponentNativeConstructor = cmpModule[tagName] as any;
       if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
         return memberName in hostRef.cmpMeta.$members$;
       }
@@ -30,7 +27,11 @@ export const isMemberInElement = (elm: any, memberName: string) => {
 
 export const registerComponents = (Cstrs: d.ComponentNativeConstructor[]) => {
   Cstrs.forEach(Cstr => {
-    cstrs.set(Cstr.cmpMeta.$tagName$, Cstr);
+    // using this format so it follows exactly how client-side modules work
+    const exportName = Cstr.cmpMeta.$tagName$;
+    cmpModules.set(exportName, {
+      [exportName]: Cstr
+    });
   });
 };
 
@@ -112,7 +113,7 @@ export const Build: d.UserBuildConditionals = {
 
 export const styles: d.StyleMap = new Map();
 
+export { BUILD, NAMESPACE, globalScripts } from '@app-data';
 export { bootstrapHydrate } from './bootstrap-hydrate';
 
 export * from '@runtime';
-

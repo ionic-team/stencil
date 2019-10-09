@@ -24,7 +24,7 @@
     "outDir": "www",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core": ["../../dist"],
+      "@stencil/core": ["../../internal"],
       "@stencil/core/internal": ["../../internal"]
     }
   },
@@ -32,6 +32,7 @@
     "test-app/components.d.ts",
     "test-app/**/*.spec.ts",
     "test-app/**/*.tsx",
+    "test-app/**/*.ts",
     "test-app/util.ts",
     "test-sibling/**/*.spec.ts",
     "test-sibling/**/*.tsx"

@@ -1,12 +1,11 @@
+import { methodDecoratorsToStatic } from './method-decorator';
 import * as d from '../../../declarations';
-import { componentDecoratorToStatic } from './component-decorator';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
 import { listenDecoratorsToStatic } from './listen-decorator';
-import { MEMBER_DECORATORS_TO_REMOVE, isDecoratorNamed } from './decorator-utils';
-import { methodDecoratorsToStatic } from './method-decorator';
+import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE, isDecoratorNamed } from './decorator-utils';
+import { componentDecoratorToStatic } from './component-decorator';
 import { propDecoratorsToStatic } from './prop-decorator';
-import { removeDecorators } from '../transform-utils';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
 import ts from 'typescript';
@@ -16,61 +15,110 @@ export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagn
 
   return transformCtx => {
 
-    const visit = (tsSourceFile: ts.SourceFile, node: ts.Node): ts.VisitResult<ts.Node> => {
+    const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
-        node = visitClass(config, diagnostics, typeChecker, tsSourceFile, node);
+        return visitClass(config, diagnostics, typeChecker, node);
       }
-
-      return ts.visitEachChild(node, node => visit(tsSourceFile, node), transformCtx);
+      return ts.visitEachChild(node, visit, transformCtx);
     };
 
     return tsSourceFile => {
-      return visit(tsSourceFile, tsSourceFile) as ts.SourceFile;
+      return ts.visitEachChild(tsSourceFile, visit, transformCtx);
     };
   };
 };
 
 
-const visitClass = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, tsSourceFile: ts.SourceFile, cmpNode: ts.ClassDeclaration) => {
-  if (!cmpNode.decorators) {
-    return cmpNode;
+export const visitClass = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, classNode: ts.ClassDeclaration) => {
+  if (!classNode.decorators) {
+    return classNode;
   }
 
-  const componentDecorator = cmpNode.decorators.find(isDecoratorNamed('Component'));
+  const componentDecorator = classNode.decorators.find(isDecoratorNamed('Component'));
   if (!componentDecorator) {
-    return cmpNode;
+    return classNode;
   }
 
-  const newMembers: ts.ClassElement[] = [...cmpNode.members];
+  const decoratedMembers = classNode.members.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
+  const newMembers = removeStencilDecorators(Array.from(classNode.members));
 
   // parser component decorator (Component)
-  componentDecoratorToStatic(config, typeChecker, diagnostics, cmpNode, newMembers, componentDecorator);
+  componentDecoratorToStatic(config, typeChecker, diagnostics, classNode, newMembers, componentDecorator);
 
   // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)
-  const decoratedMembers = newMembers.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
   if (decoratedMembers.length > 0) {
     propDecoratorsToStatic(config, diagnostics, decoratedMembers, typeChecker, newMembers);
-    stateDecoratorsToStatic(diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
+    stateDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, newMembers);
     eventDecoratorsToStatic(config, diagnostics, decoratedMembers, typeChecker, newMembers);
-    methodDecoratorsToStatic(config, diagnostics, tsSourceFile, decoratedMembers, typeChecker, newMembers);
+    methodDecoratorsToStatic(config, diagnostics, classNode, decoratedMembers, typeChecker, newMembers);
     elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, newMembers);
     watchDecoratorsToStatic(diagnostics, decoratedMembers, newMembers);
     listenDecoratorsToStatic(config, diagnostics, decoratedMembers, newMembers);
-
-    removeStencilDecorators(decoratedMembers);
   }
 
   return ts.updateClassDeclaration(
-    cmpNode,
-    cmpNode.decorators,
-    cmpNode.modifiers,
-    cmpNode.name,
-    cmpNode.typeParameters,
-    cmpNode.heritageClauses,
+    classNode,
+    removeDecorators(classNode, CLASS_DECORATORS_TO_REMOVE),
+    classNode.modifiers,
+    classNode.name,
+    classNode.typeParameters,
+    classNode.heritageClauses,
     newMembers
   );
 };
 
 const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {
-  classMembers.forEach(member => removeDecorators(member, MEMBER_DECORATORS_TO_REMOVE));
+  return classMembers.map(m => {
+    const currentDecorators = m.decorators;
+    const newDecorators = removeDecorators(m, MEMBER_DECORATORS_TO_REMOVE);
+    if (currentDecorators !== newDecorators) {
+      if (ts.isMethodDeclaration(m)) {
+        return ts.updateMethod(
+          m,
+          newDecorators,
+          m.modifiers,
+          m.asteriskToken,
+          m.name,
+          m.questionToken,
+          m.typeParameters,
+          m.parameters,
+          m.type,
+          m.body
+        );
+      } else if (ts.isPropertyDeclaration(m)) {
+        return ts.updateProperty(
+          m,
+          newDecorators,
+          m.modifiers,
+          m.name,
+          m.questionToken,
+          m.type,
+          m.initializer
+        );
+      } else {
+        console.log('unknown class node');
+      }
+    }
+    return m;
+  });
+};
+
+
+const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
+  if (node.decorators) {
+    const updatedDecoratorList = node.decorators.filter(dec => {
+      const name = (
+        ts.isCallExpression(dec.expression) &&
+        ts.isIdentifier(dec.expression.expression) &&
+        dec.expression.expression.text
+      );
+      return !decoratorNames.has(name);
+    });
+    if (updatedDecoratorList.length === 0) {
+      return undefined;
+    } else if (updatedDecoratorList.length !== node.decorators.length) {
+      return ts.createNodeArray(updatedDecoratorList);
+    }
+  }
+  return node.decorators;
 };

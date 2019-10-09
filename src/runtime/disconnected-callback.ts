@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { BUILD } from '@build-conditionals';
+import { BUILD } from '@app-data';
 import { getHostRef, plt } from '@platform';
 import { PLATFORM_FLAGS } from './runtime-constants';
 import { safeCall } from './update-component';

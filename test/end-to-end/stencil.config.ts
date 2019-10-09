@@ -19,7 +19,7 @@ export const config: Config = {
       type: 'dist',
     },
     {
-      type: 'experimental-dist-module',
+      type: 'experimental-module',
       externalRuntime: true
     }
   ],

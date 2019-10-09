@@ -7,9 +7,9 @@ import json from 'rollup-plugin-json';
 export const NodeRollup = {
   rollup,
   plugins: {
-    commonjs,
-    nodeResolve,
-    replace,
-    json
+    commonjs: commonjs as any,
+    nodeResolve: nodeResolve as any,
+    replace: replace as any,
+    json: json as any,
   }
 };

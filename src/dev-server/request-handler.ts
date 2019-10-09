@@ -11,7 +11,7 @@ import path from 'path';
 import * as url from 'url';
 
 
-export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.FileSystem) {
+export function createRequestHandler(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem) {
 
   return async function(incomingReq: http.IncomingMessage, res: http.ServerResponse) {
     try {
@@ -34,7 +34,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
       }
 
       if (isDevClient(req.pathname) && devServerConfig.websocket) {
-        return serveDevClient(devServerConfig, fs, req, res);
+        return serveDevClient(devServerConfig, sys, req, res);
       }
 
       if (!req.url.startsWith(devServerConfig.basePath)) {
@@ -52,14 +52,16 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
       }
 
       try {
-        req.stats = await fs.stat(req.filePath);
+        req.stats = await sys.stat(req.filePath);
 
-        if (req.stats.isFile()) {
-          return serveFile(devServerConfig, fs, req, res);
-        }
+        if (req.stats) {
+          if (req.stats.isFile()) {
+            return serveFile(devServerConfig, sys, req, res);
+          }
 
-        if (req.stats.isDirectory()) {
-          return serveDirectoryIndex(devServerConfig, fs, req, res);
+          if (req.stats.isDirectory()) {
+            return serveDirectoryIndex(devServerConfig, sys, req, res);
+          }
         }
 
       } catch (e) {}
@@ -68,16 +70,16 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.F
         try {
           const indexFilePath = path.join(devServerConfig.root, devServerConfig.historyApiFallback.index);
 
-          req.stats = await fs.stat(indexFilePath);
-          if (req.stats.isFile()) {
+          req.stats = await sys.stat(indexFilePath);
+          if (req.stats && req.stats.isFile()) {
             req.filePath = indexFilePath;
-            return serveFile(devServerConfig, fs, req, res);
+            return serveFile(devServerConfig, sys, req, res);
           }
 
         } catch (e) {}
       }
 
-      return serve404(devServerConfig, fs, req, res);
+      return serve404(devServerConfig, req, res);
 
     } catch (e) {
       return serve500(devServerConfig, incomingReq as any, res, e);

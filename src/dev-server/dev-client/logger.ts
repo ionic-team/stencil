@@ -56,12 +56,11 @@ export function logDiagnostic(diagnostic: d.Diagnostic) {
 
 
 function log(color: string, prefix: string, msg: string) {
-  const styledPrefix = [
+  console.log.apply(console, [
     '%c' + prefix,
-    `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`
-  ];
-
-  console.log(...styledPrefix, msg);
+    `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`,
+    msg
+  ]);
 }
 
 

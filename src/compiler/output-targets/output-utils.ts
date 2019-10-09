@@ -74,10 +74,6 @@ export const isOutputTargetDistGlobalStyles = (o: d.OutputTarget): o is d.Output
   return o.type === DIST_GLOBAL_STYLES;
 };
 
-export const isOutputTargetDistModule = (o: d.OutputTarget): o is d.OutputTargetDistModule => {
-  return o.type === DIST_MODULE;
-};
-
 export const isOutputTargetDistSelfContained = (o: d.OutputTarget): o is d.OutputTargetDistSelfContained => {
   return o.type === DIST_SELF_CONTAINED;
 };
@@ -126,6 +122,18 @@ export const getComponentsFromModules = (moduleFiles: d.Module[]) => {
   return sortBy(flatOne(moduleFiles.map(m => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
 };
 
+export const isOutputTargetCollectionNext = (o: d.OutputTarget): o is d.OutputTargetCollectionNext => {
+  return o.type === COLLECTION_NEXT;
+};
+
+export const isOutputTargetCustomElementNext = (o: d.OutputTarget): o is d.OutputTargetCustomElementNext => {
+  return o.type === CUSTOM_ELEMENT_NEXT;
+};
+
+export const isOutputTargetLazyNext = (o: d.OutputTarget): o is d.OutputTargetLazyNext => {
+  return o.type === LAZY_NEXT;
+};
+
 export const canSkipOutputTargets = (buildCtx: d.BuildCtx) => {
   if (buildCtx.components.length === 0) {
     return true;
@@ -148,7 +156,6 @@ export const DIST_TYPES = `dist-types`;
 export const DIST_HYDRATE_SCRIPT = `dist-hydrate-script`;
 export const DIST_LAZY = `dist-lazy`;
 export const DIST_LAZY_LOADER = `dist-lazy-loader`;
-export const DIST_MODULE = `experimental-dist-module`;
 export const DIST_SELF_CONTAINED = `dist-self-contained`;
 export const DIST_GLOBAL_STYLES = 'dist-global-styles';
 export const DOCS = `docs`;
@@ -159,6 +166,10 @@ export const DOCS_VSCODE = `docs-vscode`;
 export const STATS = `stats`;
 export const WWW = `www`;
 
+export const COLLECTION_NEXT = `collection-next`;
+export const LAZY_NEXT = `lazy-next`;
+export const CUSTOM_ELEMENT_NEXT = `custom-element-next`;
+
 export const VALID_TYPES = [
   ANGULAR,
   COPY,
@@ -168,7 +179,6 @@ export const VALID_TYPES = [
   DIST_GLOBAL_STYLES,
   DIST_HYDRATE_SCRIPT,
   DIST_LAZY,
-  DIST_MODULE,
   DIST_SELF_CONTAINED,
   DOCS,
   DOCS_JSON,
@@ -177,6 +187,12 @@ export const VALID_TYPES = [
   DOCS_CUSTOM,
   STATS,
   WWW,
+];
+
+export const VALID_TYPES_NEXT = [
+  COLLECTION_NEXT,
+  CUSTOM_ELEMENT_NEXT,
+  LAZY_NEXT,
 ];
 
 export const GENERATED_DTS = 'components.d.ts';

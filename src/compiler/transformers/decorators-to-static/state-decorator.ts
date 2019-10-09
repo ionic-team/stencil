@@ -4,7 +4,7 @@ import { isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
 
-export const stateDecoratorsToStatic = (diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
+export const stateDecoratorsToStatic = (diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
   const states = decoratedProps
     .filter(ts.isPropertyDeclaration)
     .map(prop => stateDecoratorToStatic(diagnostics, typeChecker, prop))

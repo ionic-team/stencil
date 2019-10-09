@@ -1,11 +1,13 @@
 import * as d from '../declarations';
 import * as http  from 'http';
-import * as path  from 'path';
+import fs  from 'fs';
+import path  from 'path';
+import util from 'util';
 import { responseHeaders, sendMsg } from './dev-server-utils';
 import { serve500 } from './serve-500';
 
 
-export async function serve404(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
+export async function serve404(devServerConfig: d.DevServerConfig, req: d.HttpRequest, res: http.ServerResponse) {
   try {
     if (req.pathname === '/favicon.ico') {
       try {
@@ -13,9 +15,20 @@ export async function serve404(devServerConfig: d.DevServerConfig, fs: d.FileSys
         res.writeHead(200, responseHeaders({
           'Content-Type': 'image/x-icon'
         }));
-        fs.createReadStream(defaultFavicon).pipe(res);
+        const rs = fs.createReadStream(defaultFavicon);
+        rs.on('error', err => {
+          res.writeHead(404, responseHeaders({
+            'Content-Type': 'text/plain'
+          }));
+          res.write(util.inspect(err));
+          res.end();
+        });
+        rs.pipe(res);
         return;
-      } catch (e) {}
+
+      } catch (e) {
+        serve500(devServerConfig, req, res, e);
+      }
     }
 
     const content = [

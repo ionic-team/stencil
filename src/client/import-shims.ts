@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { BUILD, NAMESPACE } from '@build-conditionals';
+import { BUILD, NAMESPACE } from '@app-data';
 import { doc, plt, win } from './client-window';
 import { getDynamicImportFunction } from '@utils';
 

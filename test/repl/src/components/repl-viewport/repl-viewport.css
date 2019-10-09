@@ -1,0 +1,21 @@
+
+:host {
+  display: block;
+  box-sizing: inherit;
+  padding-top: var(--repl-header-height);
+  width: 100%;
+  height: 100%;
+}
+
+section {
+  float: left;
+  height: 100%;
+}
+
+.left {
+  width: 60%;
+}
+
+.right {
+  width: 40%;
+}

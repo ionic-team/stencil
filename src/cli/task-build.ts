@@ -1,20 +1,37 @@
 import * as d from '../declarations';
+import { Compiler } from '@compiler_legacy';
+import { startServer } from '@dev-server';
 import { validateCompilerVersion } from './task-version';
 import exit from 'exit';
 
 
 export async function taskBuild(process: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
-  const { Compiler } = require('../compiler/index.js');
-
-  const compiler: d.Compiler = new Compiler(config);
+  const compiler = new Compiler(config);
   if (!compiler.isValid) {
     exit(1);
   }
 
-  let devServerStart: Promise<d.DevServer> = null;
+  let devServer: d.DevServer = null;
   if (shouldStartDevServer(config, flags)) {
     try {
-      devServerStart = compiler.startDevServer();
+      config.devServer.logger = config.logger;
+      devServer = await startServer(config.devServer);
+
+      let hasLoggedServerUrl = false;
+
+      compiler.on('buildFinish', buildResults => {
+        devServer.emit('buildFinish', buildResults as any);
+
+        if (!hasLoggedServerUrl && !buildResults.hasError) {
+          config.logger.info(`dev server: ${config.logger.cyan(devServer.browserUrl)}`);
+          hasLoggedServerUrl = true;
+        }
+      });
+
+      compiler.on('buildLog', buildLog => {
+        devServer.emit('buildLog', buildLog);
+      });
+
     } catch (e) {
       config.logger.error(e);
       exit(1);
@@ -24,11 +41,6 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
   let latestVersionPromise: Promise<string>;
   if (config.devMode && config.watch) {
     latestVersionPromise = config.sys.getLatestCompilerVersion(config.logger, false);
-  }
-
-  let devServer: d.DevServer = null;
-  if (devServerStart) {
-    devServer = await devServerStart;
   }
 
   const results = await compiler.build();
@@ -48,7 +60,7 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
     }
   }
 
-  if (config.watch || devServerStart) {
+  if (config.watch || devServer) {
     process.once('SIGINT', () => {
       config.sys.destroy();
 

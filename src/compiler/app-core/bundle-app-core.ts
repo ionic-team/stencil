@@ -1,19 +1,20 @@
 import * as d from '../../declarations';
+import { appDataPlugin } from '../../compiler_next/bundle/app-data-plugin';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
+import { coreResolvePlugin } from '../../compiler_next/bundle/core-resolve-plugin';
 import { createOnWarnFn, getDependencies, loadRollupDiagnostics } from '@utils';
 import { cssTransformer } from '../rollup-plugins/css-transformer';
-import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { loaderPlugin } from '../rollup-plugins/loader';
 import { imagePlugin } from '../rollup-plugins/image-plugin';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { OutputChunk, OutputOptions, RollupBuild, RollupOptions, TreeshakingOptions } from 'rollup'; // types only
 import { pluginHelper } from '../rollup-plugins/plugin-helper';
-import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
 import { stencilExternalRuntimePlugin } from '../rollup-plugins/stencil-external-runtime';
+import { STENCIL_INTERNAL_PLATFORM_ID } from '../../compiler_next/bundle/entry-alias-ids';
 
 
-export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, bundleAppOptions: d.BundleAppOptions) => {
+export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.BuildConditionals, bundleAppOptions: d.BundleAppOptions) => {
   const external = bundleAppOptions.skipDeps
     ? getDependencies(buildCtx)
     : [];
@@ -31,6 +32,7 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
 
       input: bundleAppOptions.inputs,
       plugins: [
+        coreResolvePlugin(config, 'client'),
         stencilExternalRuntimePlugin(bundleAppOptions.externalRuntime),
         loaderPlugin({
           '@stencil/core': DEFAULT_CORE,
@@ -38,8 +40,7 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
           ...bundleAppOptions.loader
         }),
         stencilClientPlugin(config),
-        stencilBuildConditionalsPlugin(build, config.fsNamespace),
-        globalScriptsPlugin(config, compilerCtx),
+        appDataPlugin(config, compilerCtx, build, 'client'),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,
@@ -105,9 +106,7 @@ export const generateRollupOutput = async (build: RollupBuild, options: OutputOp
 };
 
 export const DEFAULT_CORE = `
-export * from '@stencil/core/platform';
-import globals from '@stencil/core/global-scripts';
-export { globals };
+export * from '${STENCIL_INTERNAL_PLATFORM_ID}';
 `;
 
 export const DEFAULT_ENTRY = `

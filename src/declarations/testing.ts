@@ -1,4 +1,4 @@
-import { Build } from './build-conditionals';
+import { BuildConditionals } from './build-conditionals';
 
 declare global {
   namespace jest {
@@ -204,7 +204,7 @@ export interface E2EProcessEnv {
 }
 
 
-export interface Testing {
+export interface ITesting {
   isValid: boolean;
   runTests(): Promise<boolean>;
   destroy(): Promise<void>;
@@ -525,7 +525,7 @@ export interface SpecPage {
    */
   win: Window;
 
-  build: Build;
+  build: BuildConditionals;
   flushLoadModule: (bundleId?: string) => Promise<any>;
   flushQueue: () => Promise<any>;
   styles: Map<string, string>;

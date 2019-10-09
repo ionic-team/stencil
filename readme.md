@@ -96,7 +96,7 @@ Stencil components run directly in the browser through script includes just like
 Here's an example `index.html` file that runs a Stencil app:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
   <title>My App</title>

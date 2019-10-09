@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { supportsShadowDom } from '@platform';
-import { BUILD } from '@build-conditionals';
+import { BUILD } from '@app-data';
 import { CMP_FLAGS } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';

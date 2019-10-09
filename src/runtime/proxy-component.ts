@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { BUILD } from '@build-conditionals';
+import { BUILD } from '@app-data';
 import { getHostRef, plt } from '@platform';
 import { getValue, setValue } from './set-value';
 import { MEMBER_FLAGS } from '../utils/constants';

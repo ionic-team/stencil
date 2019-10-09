@@ -1,6 +1,6 @@
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
-import { normalizePath } from '@stencil/core/utils';
+import { normalizePath } from '@utils';
 import path from 'path';
 
 

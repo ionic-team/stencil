@@ -69,16 +69,16 @@ export function getHydrateAppFileName(config: d.Config) {
 
 
 async function copyHydrateRunner(config: d.Config, compilerCtx: d.CompilerCtx, hydrateAppDirPath: string, hydrateAppFileName: string, hydratePackageName: string) {
-  const srcHydrateDir = config.sys.path.join(config.sys.compiler.distDir, 'hydrate');
+  const srcHydrateDir = config.sys.path.join(config.sys.compiler.packageDir, 'internal', 'hydrate');
 
-  const runnerIndexFileName = 'index.js';
-  const runnerDtsFileName = 'index.d.ts';
+  const runnerSrcPath = config.sys.path.join(srcHydrateDir, 'runner.js');
+  const runnerDtsSrcPath = config.sys.path.join(srcHydrateDir, 'runner.d.ts');
 
-  const runnerSrcPath = config.sys.path.join(srcHydrateDir, runnerIndexFileName);
-  const runnerDtsSrcPath = config.sys.path.join(srcHydrateDir, runnerDtsFileName);
+  const appRunnerIndexFileName = 'index.js';
+  const appRunnerDtsFileName = 'index.d.ts';
 
-  const runnerDestPath = config.sys.path.join(hydrateAppDirPath, runnerIndexFileName);
-  const runnerDtsDestPath = config.sys.path.join(hydrateAppDirPath, runnerDtsFileName);
+  const runnerDestPath = config.sys.path.join(hydrateAppDirPath, appRunnerIndexFileName);
+  const runnerDtsDestPath = config.sys.path.join(hydrateAppDirPath, appRunnerDtsFileName);
 
   let runnerSrcCode = await compilerCtx.fs.readFile(runnerSrcPath);
 

@@ -1,0 +1,18 @@
+{
+  "name": "repl",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Stencil App Starter",
+  "scripts": {
+    "build": "stencil build",
+    "generate": "stencil generate",
+    "start": "stencil build --dev --watch --serve",
+    "test": "stencil test --spec --e2e",
+    "test.watch": "stencil test --spec --e2e --watchAll"
+  },
+  "dependencies": {
+    "@stencil/core": "^1.2.1",
+    "@stencil/router": "^1.0.1"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,34 @@
+
+:root {
+  --site-header-height: 30px;
+  --repl-header-height: 40px;
+  --stencil-purple: #5851ff;
+
+  --font-code: 'Courier New', Courier, monospace;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  height: 100%;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+}
+
+header {
+  height: var(--header-height);
+  padding: 5px;
+  font-weight: bold;
+  background: var(--stencil-purple);
+  color: white;
+}
+
+main {
+  background: #eee;
+  height: calc(100vh - var(--site-header-height));
+}

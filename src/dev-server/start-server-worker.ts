@@ -1,23 +1,28 @@
 import * as d from '../declarations';
 import { createHttpServer } from './server-http';
+import { createNodeSys } from '../sys/node_next/node-sys';
 import { createWebSocket } from './server-web-socket';
-import { DEV_SERVER_INIT_URL, getBrowserUrl, sendError, sendMsg } from './dev-server-utils';
+import { DEV_SERVER_INIT_URL } from './dev-server-constants';
+import { getBrowserUrl, sendError, sendMsg } from './dev-server-utils';
 import { getEditors } from './open-in-editor';
 import exit from 'exit';
 
 
-export async function startDevServerWorker(process: NodeJS.Process, devServerConfig: d.DevServerConfig, fs: d.FileSystem) {
+export async function startDevServerWorker(prcs: NodeJS.Process, devServerConfig: d.DevServerConfig) {
+  let hasStarted = false;
+
   try {
+    const sys = createNodeSys(prcs);
     const destroys: d.DevServerDestroy[] = [];
 
     devServerConfig.editors = await getEditors();
 
     // create the http server listening for and responding to requests from the browser
-    let httpServer = await createHttpServer(devServerConfig, fs, destroys);
+    let httpServer = await createHttpServer(devServerConfig, sys, destroys);
 
     if (devServerConfig.websocket) {
       // upgrade web socket requests the server receives
-      createWebSocket(process, httpServer, destroys);
+      createWebSocket(prcs, httpServer, destroys);
     }
 
     // start listening!
@@ -25,12 +30,14 @@ export async function startDevServerWorker(process: NodeJS.Process, devServerCon
 
     // have the server worker send a message to the main cli
     // process that the server has successfully started up
-    sendMsg(process, {
-      serverStated: {
+    sendMsg(prcs, {
+      serverStarted: {
         browserUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.basePath, '/'),
-        initialLoadUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.basePath, devServerConfig.initialLoadUrl || DEV_SERVER_INIT_URL)
+        initialLoadUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.basePath, devServerConfig.initialLoadUrl || DEV_SERVER_INIT_URL),
+        error: null
       }
     });
+    hasStarted = true;
 
     const closeServer = () => {
       // probably recived a SIGINT message from the parent cli process
@@ -46,12 +53,22 @@ export async function startDevServerWorker(process: NodeJS.Process, devServerCon
         exit(0);
       }, 5000).unref();
 
-      process.removeAllListeners('message');
+      prcs.removeAllListeners('message');
     };
 
-    process.once('SIGINT', closeServer);
+    prcs.once('SIGINT', closeServer);
 
   } catch (e) {
-    sendError(process, e);
+    if (!hasStarted) {
+      sendMsg(prcs, {
+        serverStarted: {
+          browserUrl: null,
+          initialLoadUrl: null,
+          error: String(e)
+        }
+      });
+    } else {
+      sendError(prcs, e);
+    }
   }
 }

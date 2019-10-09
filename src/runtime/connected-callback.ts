@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { addEventListeners } from './host-listener';
 import { addStyle } from './styles';
-import { BUILD } from '@build-conditionals';
+import { BUILD } from '@app-data';
 import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS } from '@utils';
 import { doc, getHostRef, nextTick, plt, supportsShadowDom } from '@platform';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';

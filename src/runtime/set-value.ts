@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { BUILD } from '@build-conditionals';
+import { BUILD } from '@app-data';
 import { consoleError, getHostRef } from '@platform';
 import { HOST_FLAGS } from '@utils';
 import { parsePropertyValue } from './parse-property-value';

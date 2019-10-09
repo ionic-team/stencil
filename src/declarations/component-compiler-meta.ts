@@ -1,5 +1,5 @@
 import { StyleCompiler } from './style';
-import { ListenTargetOptions } from './decorators';
+import { ListenTargetOptions } from './stencil-core';
 
 /** Must be serializable to JSON!! */
 export interface ComponentCompilerFeatures {

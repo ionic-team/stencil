@@ -38,7 +38,8 @@ export function validatePaths(config: Config) {
       config.tsconfig = path.join(config.rootDir, config.tsconfig);
     }
 
-  } else {
+  } else if (typeof ts !== 'undefined' && ts.findConfigFile) {
+    // TODO: remove typescript reference from here
     config.tsconfig = ts.findConfigFile(config.rootDir, ts.sys.fileExists);
   }
 

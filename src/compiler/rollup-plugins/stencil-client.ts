@@ -5,11 +5,9 @@ import { Plugin } from 'rollup';
 export function stencilClientPlugin(config: d.Config): Plugin {
   return {
     name: 'stencilClientEntryPointPlugin',
-    resolveId(id: string) {
-      if (id === '@stencil/core/platform') {
-        return {
-          id: config.sys.path.join(config.sys.compiler.distDir, 'client', 'index.mjs'),
-        };
+    resolveId(id) {
+      if (id === '@stencil/core/internal/client') {
+        return config.sys.path.join(config.sys.compiler.packageDir, 'internal', 'client', 'index.mjs');
       }
       return null;
     },

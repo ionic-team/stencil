@@ -4,10 +4,11 @@ import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-ta
 import { runJest } from './jest/jest-runner';
 import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
+import { startServer } from '@dev-server';
 import * as puppeteer from 'puppeteer';
 
 
-export class Testing implements d.Testing {
+export class Testing implements d.ITesting {
   isValid = false;
   compiler: d.Compiler;
   config: d.Config;
@@ -80,7 +81,7 @@ export class Testing implements d.Testing {
       }
 
       const startupResults = await Promise.all([
-        compiler.startDevServer(),
+        startServer(config.devServer),
         startPuppeteerBrowser(config),
       ]);
 

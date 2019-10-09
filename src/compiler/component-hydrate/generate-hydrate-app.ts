@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { bundleHydrateApp } from './bundle-hydrate-app';
 import { DEFAULT_STYLE_MODE, catchError } from '@utils';
-import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
+import { getBuildFeatures, updateBuildConditionals } from '../../compiler_next/build/app-data';
 import { getHydrateAppFileName, writeHydrateOutputs } from './write-hydrate-outputs';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
 
@@ -37,12 +37,9 @@ async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerC
   const coreText: string[] = [];
   const hydrateCmps = await updateToHydrateComponents(config, compilerCtx, buildCtx, cmps);
 
-  coreText.push(`import { bootstrapHydrate, registerComponents, styles } from '@stencil/core/platform';`);
-  coreText.push(`import globals from '@stencil/core/global-scripts';`);
+  coreText.push(`import { bootstrapHydrate, registerComponents, styles } from '@stencil/core/internal/hydrate';`);
 
   hydrateCmps.forEach(cmpData => coreText.push(cmpData.importLine));
-
-  coreText.push(`globals();`);
 
   coreText.push(`const cmps = [`);
   hydrateCmps.forEach(cmpData => {
@@ -75,7 +72,7 @@ async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerC
 
 
 function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
-  const build = getBuildFeatures(cmps) as d.Build;
+  const build = getBuildFeatures(cmps) as d.BuildConditionals;
 
   build.lazyLoad = true;
   build.hydrateClientSide = false;

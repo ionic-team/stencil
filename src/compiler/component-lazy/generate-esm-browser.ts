@@ -4,12 +4,12 @@ import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { getDynamicImportFunction } from '@utils';
 
-export async function generateEsmBrowser(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
+export async function generateEsmBrowser(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.BuildConditionals, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
   const esmOutputs = outputTargets.filter(o => !!o.esmDir && !!o.isBrowserBuild);
   const isProd = !build.isDev;
   if (esmOutputs.length) {
     const esmOpts: OutputOptions = {
-      format: 'esm',
+      format: 'es',
       entryFileNames: '[name].esm.js',
       chunkFileNames: isProd ? 'p-[hash].js' : '[name]-[hash].js',
       preferConst: true,

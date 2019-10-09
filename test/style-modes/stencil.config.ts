@@ -11,7 +11,7 @@ export const config: Config = {
       serviceWorker: null
     },
     {
-      type: 'experimental-dist-module',
+      type: 'experimental-module',
       dir: 'www/dist-module',
       copy: [
         {

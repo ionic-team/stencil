@@ -26,9 +26,8 @@ export async function copyStencilCoreDts(config: d.Config, compilerCtx: d.Compil
     .filter(isOutputTargetDist)
     .filter(o => o.typesDir);
 
-  const srcStencilCoreDts = await config.sys.getClientCoreFile({
-    staticName: 'declarations/stencil.core.d.ts'
-  });
+  const srcStencilDtsPath = config.sys.path.join(config.sys.compiler.packageDir, 'internal', 'stencil.core.d.ts');
+  const srcStencilCoreDts = await compilerCtx.fs.readFile(srcStencilDtsPath);
 
   return Promise.all(typesOutputTargets.map(outputTarget => {
     const coreDtsFilePath = config.sys.path.join(outputTarget.typesDir, CORE_DTS);

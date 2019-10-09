@@ -1,11 +1,11 @@
 import * as d from '../declarations';
+import { Compiler } from '@compiler_legacy';
 import { normalizePath } from '@utils';
+import { startServer } from '@dev-server';
 import exit from 'exit';
 
 
 export async function taskServe(process: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
-  const { Compiler } = require('../compiler/index.js');
-
   config.suppressLogs = true;
 
   const compiler: d.Compiler = new Compiler(config);
@@ -29,7 +29,7 @@ export async function taskServe(process: NodeJS.Process, config: d.Config, flags
   }
   config.devServer.root = normalizePath(config.devServer.root);
 
-  const devServer = await compiler.startDevServer();
+  const devServer = await startServer(config.devServer);
   if (devServer) {
     config.logger.info(`dev server: ${devServer.browserUrl}`);
   }

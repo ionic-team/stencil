@@ -1,12 +1,15 @@
 import * as d from '../declarations';
+import * as c from './dev-server-constants';
+import { compilerBuild } from '../version';
+import util from 'util';
 
 
-export function sendMsg(process: NodeJS.Process, msg: d.DevServerMessage) {
-  process.send(msg);
+export function sendMsg(prcs: NodeJS.Process, msg: d.DevServerMessage) {
+  prcs.send(msg);
 }
 
 
-export function sendError(process: NodeJS.Process, e: any) {
+export function sendError(prcs: NodeJS.Process, e: any) {
   const msg: d.DevServerMessage = {
     error: {
       message: e
@@ -17,16 +20,12 @@ export function sendError(process: NodeJS.Process, e: any) {
     msg.error.message = e + '';
 
   } else if (e) {
-    Object.keys(e).forEach(key => {
-      try {
-        (msg.error as any)[key] = e[key] + '';
-      } catch (idk) {
-        console.log(idk);
-      }
-    });
+    try {
+      msg.error.message = util.inspect(e) + '';
+    } catch (e) {}
   }
 
-  sendMsg(process, msg);
+  sendMsg(prcs, msg);
 }
 
 
@@ -38,7 +37,7 @@ export function responseHeaders(headers: d.DevResponseHeaders): any {
 const DEFAULT_HEADERS: d.DevResponseHeaders = {
   'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
   'Expires': '0',
-  'X-Powered-By': 'Stencil Dev Server',
+  'X-Powered-By': 'Stencil Dev Server ' + compilerBuild.stencilVersion,
   'Access-Control-Allow-Origin': '*'
 };
 
@@ -73,7 +72,7 @@ export function getDevServerClientUrl(devServerConfig: d.DevServerConfig, host: 
     address,
     port,
     devServerConfig.basePath,
-    DEV_SERVER_URL
+    c.DEV_SERVER_URL
   );
 }
 
@@ -110,30 +109,23 @@ export function isSimpleText(filePath: string) {
 
 
 export function isDevClient(pathname: string) {
-  return pathname.startsWith(DEV_SERVER_URL);
+  return pathname.startsWith(c.DEV_SERVER_URL);
 }
 
 
 export function isOpenInEditor(pathname: string) {
-  return pathname === OPEN_IN_EDITOR_URL;
+  return pathname === c.OPEN_IN_EDITOR_URL;
 }
 
 
 export function isInitialDevServerLoad(pathname: string) {
-  return pathname === DEV_SERVER_INIT_URL;
+  return pathname === c.DEV_SERVER_INIT_URL;
 }
 
 
 export function isDevServerClient(pathname: string) {
-  return pathname === DEV_SERVER_URL;
+  return pathname === c.DEV_SERVER_URL;
 }
-
-
-export const DEV_SERVER_URL = '/~dev-server';
-
-export const DEV_SERVER_INIT_URL = `${DEV_SERVER_URL}-init`;
-
-export const OPEN_IN_EDITOR_URL = `${DEV_SERVER_URL}-open-in-editor`;
 
 
 export function shouldCompress(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {

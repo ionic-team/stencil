@@ -56,7 +56,7 @@ export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateLazyComponentClass(transformOpts, node, moduleFile, cmp);
+            node = updateLazyComponentClass(transformOpts, node, moduleFile, cmp);
           }
         }
 

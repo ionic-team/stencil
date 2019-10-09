@@ -1,13 +1,12 @@
-
 import * as d from '../../declarations';
-import {isOutputTargetDist, isOutputTargetDistLazyLoader, isOutputTargetDistModule, isOutputTargetDistSelfContained, isOutputTargetHydrate, isOutputTargetWww } from './output-utils';
+import { isOutputTargetDist, isOutputTargetDistLazyLoader, isOutputTargetDistSelfContained, isOutputTargetHydrate, isOutputTargetWww } from './output-utils';
+
 
 type OutputTargetEmptiable =
   d.OutputTargetDist |
   d.OutputTargetWww |
   d.OutputTargetDistLazyLoader |
   d.OutputTargetDistSelfContained |
-  d.OutputTargetDistModule |
   d.OutputTargetHydrate;
 
 export function isEmptable(o: d.OutputTarget): o is OutputTargetEmptiable {
@@ -16,7 +15,6 @@ export function isEmptable(o: d.OutputTarget): o is OutputTargetEmptiable {
     isOutputTargetWww(o) ||
     isOutputTargetDistLazyLoader(o) ||
     isOutputTargetDistSelfContained(o) ||
-    isOutputTargetDistModule(o) ||
     isOutputTargetHydrate(o)
   );
 }

@@ -1,8 +1,8 @@
 import { ComponentConstructorWatchers } from './component-constructor';
-import { ComponentInterface } from './component-interfaces';
+import { ComponentInterface } from './stencil-core';
 import { HostElement } from './host-element';
 import { RenderNode } from './render';
-import { VNode } from './vdom';
+import { VNode } from './stencil-core';
 import { CssVarSim } from './css-var-shim';
 
 

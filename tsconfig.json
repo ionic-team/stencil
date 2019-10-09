@@ -1,0 +1,103 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
+    "jsxFactory": "h",
+    "lib": [
+      "dom",
+      "es2017",
+      "esnext.array"
+    ],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "build",
+    "pretty": true,
+    "target": "es2017",
+    "baseUrl": ".",
+    "paths": {
+      "@app-data": [
+        "src/app-data/index.ts"
+      ],
+      "@compiler": [
+        "src/compiler_next/index-core.ts"
+      ],
+      "@compiler_legacy": [
+        "src/compiler/index.ts"
+      ],
+      "@compiler-plugins": [
+        "src/compiler_next/sys/modules/compiler-plugins.ts"
+      ],
+      "@dev-server": [
+        "src/dev-server/index.ts"
+      ],
+      "@dts-core": [
+        "src/compiler_next/sys/modules/dts-core.ts"
+      ],
+      "@dts-internal": [
+        "src/compiler_next/sys/modules/dts-internal.ts"
+      ],
+      "@mock-doc": [
+        "src/mock-doc/index.ts"
+      ],
+      "@platform": [
+        "src/client/index.ts"
+      ],
+      "@runtime": [
+        "src/runtime/index.ts"
+      ],
+      "@testing": [
+        "src/testing/index.ts"
+      ],
+      "@stencil/core/internal/client": [
+        "src/client/index.ts"
+      ],
+      "@stencil/core/internal": [
+        "src/internal/index.ts"
+      ],
+      "@stencil/core/testing": [
+        "src/testing/index.ts"
+      ],
+      "@utils": [
+        "src/utils/index.ts"
+      ]
+    }
+  },
+
+  "files": [
+    "src/app-data/index.ts",
+    "src/client/index.ts",
+    "src/client/polyfills/css-shim/index.ts",
+    "src/cli/index.ts",
+    "src/cli_next/public.ts",
+    "src/compiler/index.ts",
+    "src/compiler_next/public-browser.ts",
+    "src/compiler_next/public-core.ts",
+    "src/compiler_next/sys/modules/index.ts",
+    "src/dev-server/index.ts",
+    "src/dev-server/public.ts",
+    "src/dev-server/server-worker.ts",
+    "src/dev-server/dev-client/index.ts",
+    "src/hydrate/platform/index.ts",
+    "src/hydrate/runner/index.ts",
+    "src/internal/default.ts",
+    "src/internal/index.ts",
+    "src/mock-doc/index.ts",
+    "src/sys/node/index.ts",
+    "src/sys/node/node-sys-worker.ts",
+    "src/testing/index.ts",
+    "src/testing/platform.ts"
+  ],
+
+  "include": [
+    "types/*.d.ts"
+  ]
+}

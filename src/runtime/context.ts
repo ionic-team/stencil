@@ -1,5 +1,6 @@
-import { Context, doc, getAssetPath, readTask, nextTick, win, writeTask } from '@platform';
-import { BUILD } from '@build-conditionals';
+import { BUILD,  } from '@app-data';
+import { Context, doc, nextTick, readTask, win, writeTask } from '@platform';
+import { getAssetPath } from './get-asset-path';
 
 export const getContext = (_elm: HTMLElement, context: string) => {
   if (context in Context) {

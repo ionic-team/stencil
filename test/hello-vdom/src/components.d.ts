@@ -9,7 +9,9 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
 
 export namespace Components {
-  interface HelloVdom {}
+  interface HelloVdom {
+    'getTab': (tab: string) => Promise<Whatever>;
+  }
 }
 
 declare global {

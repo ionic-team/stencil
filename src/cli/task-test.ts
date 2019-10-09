@@ -6,7 +6,7 @@ export async function taskTest(config: d.Config) {
   try {
     const { Testing } = require('../testing/index.js');
 
-    const testing: d.Testing = new Testing(config);
+    const testing: d.ITesting = new Testing(config);
     if (!testing.isValid) {
       exit(1);
     }

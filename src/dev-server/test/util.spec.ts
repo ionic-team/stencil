@@ -1,5 +1,6 @@
 import * as d from '@stencil/core/declarations';
-import { DEV_SERVER_URL, getBrowserUrl, getDevServerClientUrl } from '../dev-server-utils';
+import { getBrowserUrl, getDevServerClientUrl } from '../dev-server-utils';
+import { DEV_SERVER_URL } from '../dev-server-constants';
 
 
 describe('dev-server, util', () => {

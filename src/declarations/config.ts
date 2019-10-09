@@ -1,3 +1,4 @@
+import { CompilerSystem } from './compiler_next';
 import { CopyTask } from './assets';
 import { DevServerConfig, StencilDevServerConfig } from './dev-server';
 import { Logger } from './logger';
@@ -185,6 +186,7 @@ export interface StencilConfig {
   devServer?: StencilDevServerConfig;
   enableCacheStats?: boolean;
   sys?: StencilSystem;
+  sys_next?: CompilerSystem;
   tsconfig?: string;
   validateTypes?: boolean;
   watchIgnoredRegex?: RegExp;
@@ -267,7 +269,7 @@ export interface NodeResolveConfig {
 
 
 export interface ConfigFlags {
-  task?: 'build' | 'docs' | 'help' | 'serve' | 'test' | 'g' | 'generate';
+  task?: TaskCommand;
   args?: string[];
   knownArgs?: string[];
   unknownArgs?: string[];
@@ -310,6 +312,8 @@ export interface ConfigFlags {
   watch?: boolean;
   devtools?: boolean;
 }
+
+export type TaskCommand = 'build' | 'docs' | 'serve' | 'test' | 'generate' | 'version' | 'help';
 
 
 export interface ConfigBundle {

@@ -37,7 +37,6 @@ export async function runTask(process: NodeJS.Process, config: d.Config, flags: 
         await taskTest(config);
         break;
 
-      case 'g':
       case 'generate':
         await taskGenerate(config, flags);
         break;

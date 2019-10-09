@@ -29,8 +29,8 @@
       "@stencil/core/testing": [
         "../../../testing/index.ts"
       ],
-      "@build-conditionals": [
-        "../../../compiler/app-core/build-conditionals.ts"
+      "@app-data": [
+        "../../../app-data/index.ts"
       ],
       "@utils": [
         "../../../utils/index.ts"

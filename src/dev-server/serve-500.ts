@@ -1,6 +1,7 @@
 import * as d from '../declarations';
 import * as http  from 'http';
 import { responseHeaders, sendError, sendMsg } from './dev-server-utils';
+import util from 'util';
 
 
 export function serve500(devServerConfig: d.DevServerConfig, req: d.HttpRequest, res: http.ServerResponse, error: any) {
@@ -9,21 +10,7 @@ export function serve500(devServerConfig: d.DevServerConfig, req: d.HttpRequest,
       'Content-Type': 'text/plain'
     }));
 
-    let errorMsg = '';
-
-    if (typeof error === 'string') {
-      errorMsg = error;
-
-    } else if (error) {
-      if (error.message) {
-        errorMsg += error.message + '\n';
-      }
-      if (error.stack) {
-        errorMsg += error.stack + '\n';
-      }
-    }
-
-    res.write(errorMsg);
+    res.write(util.inspect(error));
     res.end();
 
     if (devServerConfig.logRequests) {
@@ -31,7 +18,7 @@ export function serve500(devServerConfig: d.DevServerConfig, req: d.HttpRequest,
         requestLog: {
           method: req.method,
           url: req.url,
-          status: 200
+          status: 500
         }
       });
     }

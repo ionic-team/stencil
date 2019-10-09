@@ -159,6 +159,7 @@ export interface PackageJsonData {
     type?: string;
     url?: string;
   };
+  private?: boolean;
 }
 
 

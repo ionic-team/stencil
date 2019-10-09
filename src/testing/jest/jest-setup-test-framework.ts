@@ -3,6 +3,8 @@ import { expectExtend } from '../matchers';
 import { setupGlobal, teardownGlobal } from '@mock-doc';
 import { setupMockFetch } from '../mock-fetch';
 import { HtmlSerializer } from './jest-serializer';
+import { resetBuildConditionals } from '../reset-build-conditionals';
+
 
 declare const global: d.JestEnvironmentGlobal;
 
@@ -17,20 +19,20 @@ export function jestSetupTestFramework() {
   setupMockFetch(global);
 
   beforeEach(() => {
-    const bc = require('@stencil/core/build-conditionals');
-    const platform = require('@stencil/core/platform');
+    const bc = require('@stencil/core/internal/app-data');
+    const testingPlatform = require('@stencil/core/internal/platform');
 
     // reset the platform for this new test
-    platform.resetPlatform();
-    bc.resetBuildConditionals(bc.BUILD);
+    testingPlatform.resetPlatform();
+    resetBuildConditionals(bc.BUILD);
   });
 
   afterEach(async () => {
     if (global.__CLOSE_OPEN_PAGES__) {
       await global.__CLOSE_OPEN_PAGES__();
     }
-    const platform = require('@stencil/core/platform');
-    platform.stopAutoApplyChanges();
+    const testingPlatform = require('@stencil/core/internal/platform');
+    testingPlatform.stopAutoApplyChanges();
 
     teardownGlobal(global);
     global.Context = {};

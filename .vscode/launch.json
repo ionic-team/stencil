@@ -73,12 +73,28 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Hello World NEXT",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--dev",
+        "--debug",
+        "--max-workers=1",
+        "--next",
+        "--watch",
+        "--config",
+        "${workspaceFolder}/test/hello-world/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Hello VDom",
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
         "--dev",
-        "--prerender",
         "--config",
         "${workspaceFolder}/test/hello-vdom/stencil.config.ts"
       ],

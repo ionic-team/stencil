@@ -4,13 +4,13 @@ import { findClosestOpenPort } from './find-closest-port';
 import * as http from 'http';
 import * as https from 'https';
 
-export async function createHttpServer(devServerConfig: d.DevServerConfig, fs: d.FileSystem, destroys: d.DevServerDestroy[]) {
+export async function createHttpServer(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem, destroys: d.DevServerDestroy[]) {
   // figure out the port to be listening on
   // by figuring out the first one available
   devServerConfig.port = await findClosestOpenPort(devServerConfig.address, devServerConfig.port);
 
   // create our request handler
-  const reqHandler = createRequestHandler(devServerConfig, fs);
+  const reqHandler = createRequestHandler(devServerConfig, sys);
 
   const credentials = devServerConfig.https;
 

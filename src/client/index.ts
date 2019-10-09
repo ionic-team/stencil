@@ -8,4 +8,5 @@ export * from './client-style';
 export * from './client-task-queue';
 export * from './client-build';
 export * from './import-shims';
+export { BUILD, NAMESPACE, globalScripts } from '@app-data';
 export * from '@runtime';

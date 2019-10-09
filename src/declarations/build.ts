@@ -1,3 +1,4 @@
+import { BuildOutput, CompilerBuildResults } from './compiler_next';
 import { Collection } from './collection';
 import { CompilerCtx } from './compiler';
 import { ComponentCompilerMeta, Encapsulation } from './component-compiler-meta';
@@ -33,6 +34,7 @@ export interface RollupResults {
 export interface BuildCtx {
   buildId: number;
   buildResults: BuildResults;
+  buildResults_next: CompilerBuildResults;
   buildMessages: string[];
   bundleBuildCount: number;
   collections: Collection[];
@@ -67,6 +69,7 @@ export interface BuildCtx {
   indexDoc: Document;
   isRebuild: boolean;
   moduleFiles: Module[];
+  outputs: BuildOutput[];
   packageJson: PackageJsonData;
   packageJsonFilePath: string;
   pendingCopyTasks: Promise<CopyResults>[];

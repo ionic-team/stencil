@@ -1,11 +1,13 @@
 import * as d from '../../declarations';
-import { connectedCallback, getComponent, getHostRef, registerHost } from '@platform';
-import { proxyHostElement } from './proxy-host-element';
 import { BootstrapHydrateResults } from './bootstrap-hydrate';
+import { cmpModules, getHostRef, registerHost } from '@platform';
+import { connectedCallback } from '@runtime';
+import { proxyHostElement } from './proxy-host-element';
 
 
 export function hydrateComponent(win: Window, results: BootstrapHydrateResults, tagName: string, elm: d.HostElement, waitPromises: Promise<any>[]) {
-  const Cstr = getComponent(tagName);
+  const cmpModule = cmpModules.get(tagName);
+  const Cstr = cmpModule && cmpModule[tagName];
 
   if (Cstr != null) {
     const cmpMeta = Cstr.cmpMeta;

@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { bundleApp } from '../app-core/bundle-app-core';
-import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
+import { getBuildFeatures, updateBuildConditionals } from '../../compiler_next/build/app-data';
 import { isOutputTargetHydrate } from '../output-targets/output-utils';
 import { generateEsm } from './generate-esm';
 import { generateEsmBrowser } from './generate-esm-browser';
@@ -37,7 +37,7 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
 }
 
 function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
-  const build = getBuildFeatures(cmps) as d.Build;
+  const build = getBuildFeatures(cmps) as d.BuildConditionals;
 
   build.lazyLoad = true;
   build.hydrateServerSide = false;
@@ -53,7 +53,7 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   return build;
 }
 
-async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build) {
+async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.BuildConditionals) {
   const loader: any = {
     '@core-entrypoint': BROWSER_ENTRY,
     '@external-entrypoint': EXTERNAL_ENTRY,
@@ -91,20 +91,20 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
 }
 
 const BROWSER_ENTRY = `
-import { bootstrapLazy, patchBrowser, globals } from '@stencil/core';
+import { bootstrapLazy, globalScripts, patchBrowser } from '@stencil/core/internal/client';
 patchBrowser().then(options => {
-  globals();
+  globalScripts();
   return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
 });
 `;
 
 // This is for webpack
 const EXTERNAL_ENTRY = `
-import { bootstrapLazy, patchEsm, globals } from '@stencil/core';
+import { bootstrapLazy, globalScripts, patchEsm } from '@stencil/core/internal/client';
 
 export const defineCustomElements = (win, options) => {
   return patchEsm().then(() => {
-    globals();
+    globalScripts();
     bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
   });
 };

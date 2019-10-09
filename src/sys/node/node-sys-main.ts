@@ -56,7 +56,7 @@ export class NodeSystem implements d.StencilSystem {
     this.nodeResolveModule = new NodeResolveModule();
     this.storage = new NodeStorage(this.fs);
 
-    this.packageDir = path.join(__dirname, '..', '..', '..');
+    this.packageDir = path.join(__dirname, '..', '..');
     this.distDir = path.join(this.packageDir, 'dist');
 
     this.nextTick = process.nextTick.bind(process);
@@ -78,7 +78,7 @@ export class NodeSystem implements d.StencilSystem {
     if (this.sysWorker) {
       return this.sysWorker.options;
     }
-    const workerModulePath = require.resolve(path.join(this.distDir, 'sys', 'node', 'sys-worker.js'));
+    const workerModulePath = require.resolve(path.join(this.packageDir, 'sys', 'node', 'sys-worker.js'));
 
     const availableCpus = cpus().length;
     if (typeof maxConcurrentWorkers === 'number') {
@@ -169,7 +169,7 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   getClientPath(staticName: string) {
-    return normalizePath(path.join(this.distDir, 'client', staticName));
+    return normalizePath(path.join(this.packageDir, 'internal', 'client', staticName));
   }
 
   getClientCoreFile(opts: any) {

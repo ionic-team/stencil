@@ -1,6 +1,0 @@
-{
-  "name": "@stencil/core/compiler",
-  "private": true,
-  "main": "./index.js",
-  "types": "../dist/compiler/index.d.ts"
-}

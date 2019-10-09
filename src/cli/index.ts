@@ -42,6 +42,15 @@ export async function run(process: NodeJS.Process, sys: d.StencilSystem, logger:
     config.sys = (config.sys || sys);
     config.logger = (config.logger || logger);
 
+    config.sys_next = {
+      getCurrentDirectory() {
+        return process.cwd();
+      },
+      getCompilerExecutingPath() {
+        return config.sys.path.join(config.sys.compiler.packageDir, 'compiler', 'index.js');
+      }
+    } as any;
+
   } catch (e) {
     logger.error(e);
     exit(1);

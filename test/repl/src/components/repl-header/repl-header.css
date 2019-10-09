@@ -1,0 +1,12 @@
+
+:host {
+  box-sizing: inherit;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--repl-header-height);
+  background: #ddd;
+  padding: 10px;
+}

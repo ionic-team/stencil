@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { addComponentMetaStatic } from '../add-component-meta-static';
+// import { addComponentMetaStatic } from '../add-component-meta-static';
 import { normalizePath, unique } from '@utils';
 import { parseStaticMethods } from './methods';
 import { parseStaticListeners } from './listeners';
@@ -16,9 +16,10 @@ import { parseStaticStyles } from './styles';
 import { parseCallExpression } from './call-expression';
 import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
+import { addComponentMetaStatic } from '../add-component-meta-static';
 
 
-export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.CompilerCtx, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions, fileCmpNodes: ts.ClassDeclaration[]) => {
+export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.CompilerCtx, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) => {
   if (cmpNode.members == null) {
     return cmpNode;
   }
@@ -131,7 +132,7 @@ export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.Compil
   cmp.potentialCmpRefs = unique(cmp.potentialCmpRefs);
   setComponentBuildConditionals(cmp);
 
-  if (transformOpts.componentMetadata === 'compilerstatic') {
+  if (transformOpts && transformOpts.componentMetadata === 'compilerstatic') {
     cmpNode = addComponentMetaStatic(cmpNode, cmp);
   }
 
@@ -140,8 +141,6 @@ export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.Compil
 
   // add to node map
   nodeMap.set(cmpNode, cmp);
-
-  fileCmpNodes.push(cmpNode);
 
   return cmpNode;
 };

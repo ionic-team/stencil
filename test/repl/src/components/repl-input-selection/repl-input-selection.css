@@ -1,0 +1,44 @@
+
+:host {
+  display: inline-block;
+  margin: 4px;
+  padding: 0;
+  border: 2px solid gray;
+  outline: none;
+  cursor: pointer;
+}
+
+:host(.selected) {
+  border-color: var(--stencil-purple);
+}
+
+:host(:hover) {
+  background: #eee;
+}
+
+button {
+  border: 0;
+  appearance: none;
+  outline: none;
+  background: unset;
+  cursor: pointer;
+}
+
+.name {
+  padding: 4px 6px;
+}
+
+.close {
+  font-weight: bold;
+  font-size: 10px;
+  color: #ccc;
+  margin: 2px;
+  padding: 2px 4px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.close:hover {
+  color: maroon;
+  border-color: maroon;
+}
