@@ -16,13 +16,17 @@ log.txt
 node_modules/
 coverage/
 
+/build/
+/scripts/build/
 dist/
 dist-ts/
 **/www/build/
 
 # submodule packages
+/cli
 /compiler
 /hydrate
+/dev-server
 /internal
 /mock-doc
 /polyfills
