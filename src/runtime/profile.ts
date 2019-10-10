@@ -70,6 +70,6 @@ export const installDevTools = () => {
         result = originalInspect(ref);
       }
       return result;
-    };fuc
+    };
   }
 };
