@@ -361,7 +361,7 @@ Repository: git+https://github.com/sindresorhus/open.git
 
 License: MIT
 
-Contributors: [object Object]
+Contributors: https://github.com/inikulin/parse5/graphs/contributors
 
 Homepage: https://github.com/inikulin/parse5
 
@@ -1158,9 +1158,9 @@ Repository: git+https://github.com/npm/node-semver.git
 
 License: BSD-2-Clause
 
-Homepage: https://github.com/terser/terser
+Homepage: https://terser.org
 
-Repository: git+https://github.com/fabiosantoscode/terser.git
+Repository: git+https://github.com/terser/terser.git
 
 > UglifyJS is released under the BSD license:
 > 

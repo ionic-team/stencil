@@ -100,7 +100,7 @@ function createBundledDepLicense(moduleId) {
 
   if (typeof pkgJson.contributors === 'string') {
     output.push(
-      `Contributors: ${pkgJson.author}`, ``
+      `Contributors: ${pkgJson.contributors}`, ``
     );
   }
 
