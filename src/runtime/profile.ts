@@ -76,7 +76,7 @@ const inspect = (ref: any) => {
 };
 
 export const installDevTools = () => {
-  if (BUILD.isDev) {
+  if (BUILD.isDev && BUILD.devTools) {
     const stencil = (win as any).stencil = (win as any).stencil || {};
     const originalInspect = stencil.inspect;
     stencil.inspect = (ref: any) => {

@@ -81,6 +81,7 @@ export interface Build extends Partial<BuildFeatures> {
   hotModuleReplacement?: boolean;
   isDebug?: boolean;
   isDev?: boolean;
+  devTools?: boolean;
   hydrateServerSide?: boolean;
   hydrateClientSide?: boolean;
   lifecycleDOMEvents?: boolean;

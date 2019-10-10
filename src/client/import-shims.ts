@@ -18,6 +18,9 @@ export const patchEsm = () => {
 };
 
 export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => {
+  if (BUILD.isDev) {
+    console.info('[STENCIL-DEV-MODE] Stencil is running in the development mode. Compile your collection without the `--dev` flag in order to generate a production build.');
+  }
   if (BUILD.cssVarShim) {
     plt.$cssShim$ = (win as any).__stencil_cssshim;
   }
