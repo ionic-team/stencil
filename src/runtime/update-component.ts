@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { attachStyles } from './styles';
-import { BUILD } from '@build-conditionals';
+import { BUILD, NAMESPACE } from '@build-conditionals';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { consoleError, doc, getHostRef, nextTick, plt, writeTask } from '@platform';
 import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
@@ -84,7 +84,7 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
 
   const endRender = createTime('render', cmpMeta.$tagName$);
   if (BUILD.isDev)  {
-    hostRef.$flags$ |= HOST_FLAGS.dev_onRender;
+    hostRef.$flags$ |= HOST_FLAGS.devOnRender;
   }
 
   if (BUILD.hasRenderFn || BUILD.reflect) {
@@ -111,7 +111,7 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
   }
   if (BUILD.isDev) {
     hostRef.$renderCount$++;
-    hostRef.$flags$ &= ~HOST_FLAGS.dev_onRender;
+    hostRef.$flags$ &= ~HOST_FLAGS.devOnRender;
   }
   if (BUILD.updatable && BUILD.taskQueue) {
     hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
@@ -161,11 +161,11 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
 
   if (BUILD.cmpDidRender) {
     if (BUILD.isDev) {
-      hostRef.$flags$ |= HOST_FLAGS.dev_onRender;
+      hostRef.$flags$ |= HOST_FLAGS.devOnRender;
     }
     safeCall(instance, 'componentDidRender');
     if (BUILD.isDev) {
-      hostRef.$flags$ &= ~HOST_FLAGS.dev_onRender;
+      hostRef.$flags$ &= ~HOST_FLAGS.devOnRender;
     }
   }
   emitLifecycleEvent(elm, 'componentDidRender');
@@ -181,11 +181,11 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
 
     if (BUILD.cmpDidLoad) {
       if (BUILD.isDev)  {
-        hostRef.$flags$ |= HOST_FLAGS.dev_onDidLoad;
+        hostRef.$flags$ |= HOST_FLAGS.devOnDidLoad;
       }
       safeCall(instance, 'componentDidLoad');
       if (BUILD.isDev)  {
-        hostRef.$flags$ &= ~HOST_FLAGS.dev_onDidLoad;
+        hostRef.$flags$ &= ~HOST_FLAGS.devOnDidLoad;
       }
     }
 
@@ -206,11 +206,11 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
       // componentDidUpdate runs AFTER render() has been called
       // and all child components have finished updating
       if (BUILD.isDev)  {
-        hostRef.$flags$ |= HOST_FLAGS.dev_onRender;
+        hostRef.$flags$ |= HOST_FLAGS.devOnRender;
       }
       safeCall(instance, 'componentDidUpdate');
       if (BUILD.isDev) {
-        hostRef.$flags$ &= ~HOST_FLAGS.dev_onRender;
+        hostRef.$flags$ &= ~HOST_FLAGS.devOnRender;
       }
     }
     emitLifecycleEvent(elm, 'componentDidUpdate');
@@ -266,7 +266,7 @@ export const appDidLoad = (who: string) => {
   }
   emitLifecycleEvent(doc, 'appload');
   if (BUILD.profile) {
-    performance.measure(`[Stencil] App Did Load (by ${who})`, 'st:app:start');
+    performance.measure(`[Stencil] ${NAMESPACE} initial load (by ${who})`, 'st:app:start');
   }
 };
 

@@ -48,8 +48,8 @@ export const enum HOST_FLAGS {
   needsRerender = 1 << 9,
 
   // DEV ONLY
-  dev_onRender = 1 << 10,
-  dev_onDidLoad = 1 << 11
+  devOnRender = 1 << 10,
+  devOnDidLoad = 1 << 11,
 }
 
 export const enum CMP_FLAGS {

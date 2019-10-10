@@ -4,6 +4,7 @@ import { consoleError, getHostRef } from '@platform';
 import { HOST_FLAGS } from '@utils';
 import { parsePropertyValue } from './parse-property-value';
 import { scheduleUpdate } from './update-component';
+import { STENCIL_DEV_MODE } from './profile';
 
 
 export const getValue = (ref: d.RuntimeRef, propName: string) =>
@@ -24,16 +25,18 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
     hostRef.$instanceValues$.set(propName, newVal);
 
     if (BUILD.isDev) {
-      if (hostRef.$flags$ & HOST_FLAGS.dev_onRender) {
+      if (hostRef.$flags$ & HOST_FLAGS.devOnRender) {
         console.warn(
-          `[STENCIL-DEV-MODE] The state/prop "${propName}" changed during rendering. This can potentially lead to infinite-loops and other bugs.`,
+          ...STENCIL_DEV_MODE,
+          `The state/prop "${propName}" changed during rendering. This can potentially lead to infinite-loops and other bugs.`,
           '\nElement', elm,
           '\nNew value', newVal,
           '\nOld value', oldVal
         );
-      } else if (hostRef.$flags$ & HOST_FLAGS.dev_onDidLoad) {
+      } else if (hostRef.$flags$ & HOST_FLAGS.devOnDidLoad) {
         console.debug(
-          `[STENCIL-DEV-MODE] The state/prop "${propName}" changed during "componentDidLoad()", this triggers extra re-renders, try to setup on "componentWillRender()"`,
+          ...STENCIL_DEV_MODE,
+          `The state/prop "${propName}" changed during "componentDidLoad()", this triggers extra re-renders, try to setup on "componentWillRender()"`,
           '\nElement', elm,
           '\nNew value', newVal,
           '\nOld value', oldVal
