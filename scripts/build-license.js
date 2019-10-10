@@ -92,35 +92,17 @@ function createBundledDepLicense(moduleId) {
     }
   }
 
-  if (typeof pkgJson.author === 'string') {
+  const author = getContributors(pkgJson.author);
+  if (typeof author === 'string') {
     output.push(
-      `Author: ${pkgJson.author}`, ``
+      `Author: ${author}`, ``
     );
   }
 
-  if (typeof pkgJson.contributors === 'string') {
+  const contributors = getContributors(pkgJson.contributors);
+  if (typeof contributors === 'string') {
     output.push(
-      `Contributors: ${pkgJson.contributors}`, ``
-    );
-  }
-
-  if (Array.isArray(pkgJson.contributors)) {
-    output.push(
-      `Contributors: ${pkgJson.contributors.map(c => {
-        if (typeof c === 'string') {
-          return c;
-        }
-        if (typeof c.name === 'string') {
-          if (typeof c.url === 'string') {
-            return `[${c.name}](${c.url})`;
-          } else {
-            return c.name;
-          }
-        } else if (typeof c.url === 'string') {
-          return c.url;
-        }
-        return '';
-      }).join(', ')}`, ``
+      `Contributors: ${contributors}`, ``
     );
   }
 
@@ -148,6 +130,36 @@ function createBundledDepLicense(moduleId) {
   return output.join('\n');
 }
 
+function getContributors(prop) {
+  if (typeof prop === 'string') {
+    return prop;
+  }
+
+  if (Array.isArray(prop)) {
+    return prop.map(getAuthor)
+      .filter(c => !!c).join(', ');
+  }
+
+  if (prop) {
+    return getAuthor(prop)
+  }
+}
+
+function getAuthor(c) {
+  if (typeof c === 'string') {
+    return c;
+  }
+  if (typeof c.name === 'string') {
+    if (typeof c.url === 'string') {
+      return `[${c.name}](${c.url})`;
+    } else {
+      return c.name;
+    }
+  }
+  if (typeof c.url === 'string') {
+    return c.url;
+  }
+}
 
 function getBundledDepLicenseContent(moduleId) {
   const nodeModulesDir = path.join(__dirname, '..', 'node_modules');

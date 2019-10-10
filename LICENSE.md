@@ -38,6 +38,8 @@ The published Stencil distribution contains the following licenses:
 
 License: MIT
 
+Author: [Brian Woodward](https://github.com/doowb)
+
 Contributors: [Brian Woodward](https://twitter.com/doowb), [Jason Schilling](https://sourecode.de), [Jon Schlinkert](http://twitter.com/jonschlinkert), [Jordan](https://github.com/Silic0nS0ldier)
 
 Homepage: https://github.com/doowb/ansi-colors
@@ -72,6 +74,8 @@ Repository: git+https://github.com/doowb/ansi-colors.git
 
 License: MIT
 
+Author: Andrey Sitnik
+
 Homepage: https://github.com/postcss/autoprefixer#readme
 
 Repository: git+https://github.com/postcss/autoprefixer.git
@@ -103,6 +107,8 @@ Repository: git+https://github.com/postcss/autoprefixer.git
 
 License: BSD-2-Clause
 
+Author: [Felix Böhm](http://feedic.com)
+
 Homepage: https://github.com/fb55/css-what#readme
 
 Repository: git+https://github.com/fb55/css-what.git
@@ -124,6 +130,8 @@ Repository: git+https://github.com/fb55/css-what.git
 ### `cssnano`
 
 License: MIT
+
+Author: [Ben Briggs](http://beneb.info)
 
 Homepage: https://github.com/cssnano/cssnano
 
@@ -158,6 +166,8 @@ Repository: git+https://github.com/cssnano/cssnano.git
 
 License: MIT
 
+Author: ["Cowboy" Ben Alman](http://benalman.com/)
+
 Homepage: https://github.com/cowboy/node-exit
 
 Repository: git://github.com/cowboy/node-exit.git
@@ -190,6 +200,8 @@ Repository: git://github.com/cowboy/node-exit.git
 ### `glob`
 
 License: ISC
+
+Author: [Isaac Z. Schlueter](http://blog.izs.me/)
 
 Homepage: https://github.com/isaacs/node-glob#readme
 
@@ -249,6 +261,8 @@ Repository: git+https://github.com/isaacs/node-graceful-fs.git
 
 License: MIT
 
+Author: [Jon Schlinkert](https://github.com/jonschlinkert)
+
 Contributors: [Brian Woodward](https://twitter.com/doowb), [Daniel Perez](https://tuvistavie.com), [Jon Schlinkert](http://twitter.com/jonschlinkert)
 
 Homepage: https://github.com/micromatch/is-glob
@@ -283,6 +297,8 @@ Repository: git+https://github.com/micromatch/is-glob.git
 
 License: ISC
 
+Author: [Isaac Z. Schlueter](http://blog.izs.me)
+
 Homepage: https://github.com/isaacs/minimatch#readme
 
 Repository: git://github.com/isaacs/minimatch.git
@@ -308,6 +324,8 @@ Repository: git://github.com/isaacs/minimatch.git
 ### `node-fetch`
 
 License: MIT
+
+Author: David Frank
 
 Homepage: https://github.com/bitinn/node-fetch
 
@@ -341,6 +359,8 @@ Repository: git+https://github.com/bitinn/node-fetch.git
 
 License: MIT
 
+Author: [Sindre Sorhus](sindresorhus.com)
+
 Homepage: https://github.com/sindresorhus/open#readme
 
 Repository: git+https://github.com/sindresorhus/open.git
@@ -361,6 +381,8 @@ Repository: git+https://github.com/sindresorhus/open.git
 
 License: MIT
 
+Author: [Ivan Nikulin](https://github.com/inikulin)
+
 Contributors: https://github.com/inikulin/parse5/graphs/contributors
 
 Homepage: https://github.com/inikulin/parse5
@@ -373,6 +395,8 @@ Repository: git://github.com/inikulin/parse5.git
 ### `pixelmatch`
 
 License: ISC
+
+Author: Vladimir Agafonkin
 
 Homepage: https://github.com/mapbox/pixelmatch#readme
 
@@ -433,6 +457,8 @@ Repository: git://github.com/lukeapage/pngjs2.git
 
 License: MIT
 
+Author: Andrey Sitnik
+
 Homepage: https://postcss.org/
 
 Repository: git+https://github.com/postcss/postcss.git
@@ -463,6 +489,8 @@ Repository: git+https://github.com/postcss/postcss.git
 ### `prompts`
 
 License: MIT
+
+Author: [Terkel Gjervig](https://terkel.com)
 
 Homepage: https://github.com/terkelg/prompts#readme
 
@@ -495,6 +523,8 @@ Repository: git+https://github.com/terkelg/prompts.git
 ### `rollup`
 
 License: MIT
+
+Author: Rich Harris
 
 Contributors: Oskar Segersvärd, Bogdan Chadkin
 
@@ -1089,6 +1119,8 @@ Repository: git+https://github.com/rollup/rollup.git
 
 License: MIT
 
+Author: Rich Harris
+
 Homepage: https://github.com/rollup/rollup-plugin-commonjs
 
 Repository: git+https://github.com/rollup/rollup-plugin-commonjs.git
@@ -1120,6 +1152,8 @@ Repository: git+https://github.com/rollup/rollup-plugin-commonjs.git
 ### `rollup-plugin-node-resolve`
 
 License: MIT
+
+Author: Rich Harris
 
 Homepage: https://github.com/rollup/rollup-plugin-node-resolve#readme
 
@@ -1157,6 +1191,8 @@ Repository: git+https://github.com/npm/node-semver.git
 ### `terser`
 
 License: BSD-2-Clause
+
+Author: [Mihai Bazon](http://lisperator.net/)
 
 Homepage: https://terser.org
 
@@ -1197,6 +1233,8 @@ Repository: git+https://github.com/terser/terser.git
 ### `ws`
 
 License: MIT
+
+Author: [Einar Otto Stangvik](http://2x.io)
 
 Homepage: https://github.com/websockets/ws
 
