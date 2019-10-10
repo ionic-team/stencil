@@ -138,6 +138,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       cmpMeta.$lazyBundleIds$ = lazyBundle[0];
 
       if (!exclude.includes(tagName) && !customElements.get(tagName)) {
+        cmpTags.push(tagName);
         customElements.define(
           tagName,
           proxyComponent(HostElement as any, cmpMeta, PROXY_FLAGS.isElementConstructor) as any

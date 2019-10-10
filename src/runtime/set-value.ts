@@ -23,13 +23,22 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
     // set our new value!
     hostRef.$instanceValues$.set(propName, newVal);
 
-    if (BUILD.isDev && hostRef.$flags$ & HOST_FLAGS.dev_stateMutation) {
-      console.warn(
-        `[STENCIL-DEV-MODE] The state/prop "${propName}" changed during rendering. This can potentially lead to infinite-loops and other bugs.`,
-        '\nElement', elm,
-        '\nNew value', newVal,
-        '\nOld value', oldVal
-      );
+    if (BUILD.isDev) {
+      if (hostRef.$flags$ & HOST_FLAGS.dev_onRender) {
+        console.warn(
+          `[STENCIL-DEV-MODE] The state/prop "${propName}" changed during rendering. This can potentially lead to infinite-loops and other bugs.`,
+          '\nElement', elm,
+          '\nNew value', newVal,
+          '\nOld value', oldVal
+        );
+      } else if (hostRef.$flags$ & HOST_FLAGS.dev_onDidLoad) {
+        console.debug(
+          `[STENCIL-DEV-MODE] The state/prop "${propName}" changed during "componentDidLoad()", this triggers extra re-renders, try to setup on "componentWillRender()"`,
+          '\nElement', elm,
+          '\nNew value', newVal,
+          '\nOld value', oldVal
+        );
+      }
     }
 
     if (!BUILD.lazyLoad || instance) {

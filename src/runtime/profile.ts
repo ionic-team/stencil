@@ -17,6 +17,21 @@ export const createTime = (fnName: string, tagName = '') => {
   }
 };
 
+export const uniqueTime = (key: string, measureText: string) => {
+  if (BUILD.profile) {
+    if (performance.getEntriesByName(key).length === 0) {
+      performance.mark(key);
+    }
+    return () => {
+      if (performance.getEntriesByName(measureText).length === 0) {
+        performance.measure(measureText, key);
+      }
+    };
+  } else {
+    return () => { return; };
+  }
+};
+
 const inspect = (ref: any) => {
   const hostRef = getHostRef(ref);
   if (!hostRef) {

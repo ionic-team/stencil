@@ -38,7 +38,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         hostId = elm.getAttribute(HYDRATE_ID);
         if (hostId) {
           if (BUILD.shadowDom && supportsShadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
-            const scopeId = BUILD.mode ?  addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode')) : addStyle(elm.shadowRoot, cmpMeta);
+            const scopeId = BUILD.mode ? addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode')) : addStyle(elm.shadowRoot, cmpMeta);
             elm.classList.remove(scopeId + '-h');
             elm.classList.remove(scopeId + '-s');
           }

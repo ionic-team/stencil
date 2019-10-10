@@ -1,4 +1,4 @@
-import { Component, Prop, State, Watch, Method } from '@stencil/core';
+import { Component, Method, Prop, State, Watch } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 

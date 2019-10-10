@@ -84,7 +84,7 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
 
   const endRender = createTime('render', cmpMeta.$tagName$);
   if (BUILD.isDev)  {
-    hostRef.$flags$ |= HOST_FLAGS.dev_stateMutation;
+    hostRef.$flags$ |= HOST_FLAGS.dev_onRender;
   }
 
   if (BUILD.hasRenderFn || BUILD.reflect) {
@@ -111,7 +111,7 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
   }
   if (BUILD.isDev) {
     hostRef.$renderCount$++;
-    hostRef.$flags$ &= ~HOST_FLAGS.dev_stateMutation;
+    hostRef.$flags$ &= ~HOST_FLAGS.dev_onRender;
   }
   if (BUILD.updatable && BUILD.taskQueue) {
     hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
@@ -159,11 +159,14 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   const ancestorComponent = hostRef.$ancestorComponent$;
 
-  if (BUILD.isDev) {
-    hostRef.$flags$ |= HOST_FLAGS.dev_stateMutation;
-  }
   if (BUILD.cmpDidRender) {
+    if (BUILD.isDev) {
+      hostRef.$flags$ |= HOST_FLAGS.dev_onRender;
+    }
     safeCall(instance, 'componentDidRender');
+    if (BUILD.isDev) {
+      hostRef.$flags$ &= ~HOST_FLAGS.dev_onRender;
+    }
   }
   emitLifecycleEvent(elm, 'componentDidRender');
 
@@ -177,15 +180,22 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
     }
 
     if (BUILD.cmpDidLoad) {
+      if (BUILD.isDev)  {
+        hostRef.$flags$ |= HOST_FLAGS.dev_onDidLoad;
+      }
       safeCall(instance, 'componentDidLoad');
+      if (BUILD.isDev)  {
+        hostRef.$flags$ &= ~HOST_FLAGS.dev_onDidLoad;
+      }
     }
 
     emitLifecycleEvent(elm, 'componentDidLoad');
+    endPostUpdate();
 
     if (BUILD.asyncLoading) {
       hostRef.$onReadyResolve$(elm);
       if (!ancestorComponent)  {
-        appDidLoad();
+        appDidLoad(cmpMeta.$tagName$);
       }
     }
 
@@ -195,16 +205,20 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
       // fire off the user's componentDidUpdate method (if one was provided)
       // componentDidUpdate runs AFTER render() has been called
       // and all child components have finished updating
+      if (BUILD.isDev)  {
+        hostRef.$flags$ |= HOST_FLAGS.dev_onRender;
+      }
       safeCall(instance, 'componentDidUpdate');
+      if (BUILD.isDev) {
+        hostRef.$flags$ &= ~HOST_FLAGS.dev_onRender;
+      }
     }
     emitLifecycleEvent(elm, 'componentDidUpdate');
+    endPostUpdate();
   }
 
   if (BUILD.hotModuleReplacement) {
     elm['s-hmr-load'] && elm['s-hmr-load']();
-  }
-  if (BUILD.isDev) {
-    hostRef.$flags$ &= ~HOST_FLAGS.dev_stateMutation;
   }
 
   if (BUILD.method && BUILD.lazyLoad) {
@@ -222,7 +236,6 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
     }
     hostRef.$flags$ &= ~(HOST_FLAGS.isWaitingForChildren | HOST_FLAGS.needsRerender);
   }
-  endPostUpdate();
   // ( •_•)
   // ( •_•)>⌐■-■
   // (⌐■_■)
@@ -242,7 +255,7 @@ export const forceUpdate = (elm: d.RenderNode, cmpMeta: d.ComponentRuntimeMeta) 
   }
 };
 
-export const appDidLoad = () => {
+export const appDidLoad = (who: string) => {
   // on appload
   // we have finish the first big initial render
   if (BUILD.cssAnnotations) {
@@ -252,9 +265,9 @@ export const appDidLoad = () => {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
   emitLifecycleEvent(doc, 'appload');
-  // if (BUILD.profile) {
-  //   performance.measure('[Stencil] App Did Load', 'st:app:start');
-  // }
+  if (BUILD.profile) {
+    performance.measure(`[Stencil] App Did Load (by ${who})`, 'st:app:start');
+  }
 };
 
 export const safeCall = (instance: any, method: string, arg?: any) => {
