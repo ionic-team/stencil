@@ -351,7 +351,7 @@ function consoleMessage(c: puppeteer.ConsoleMessage) {
 }
 
 function serializeConsoleMessage(c: puppeteer.ConsoleMessage) {
-  return `${c.text()} ${serializeLocation(c.location())}`
+  return `${c.text()} ${serializeLocation(c.location())}`;
 }
 
 function serializeLocation(loc: puppeteer.ConsoleMessageLocation) {
