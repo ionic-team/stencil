@@ -2,6 +2,7 @@ import * as d from '../declarations';
 
 
 export const BUILD: d.Build = {};
+export const NAMESPACE = 'app';
 
 
 export function resetBuildConditionals(b: d.Build) {
@@ -29,6 +30,7 @@ export function resetBuildConditionals(b: d.Build) {
   b.vdomFunctional = true;
   b.vdomText = true;
   b.allRenderFn = false;
+  b.devTools = false;
   b.hydrateClientSide = false;
   b.hydrateServerSide = false;
 }

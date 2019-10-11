@@ -42,9 +42,9 @@ declare global {
 }
 
 declare namespace LocalJSX {
-  interface CmpA extends JSXBase.HTMLAttributes<HTMLCmpAElement> {}
-  interface CmpB extends JSXBase.HTMLAttributes<HTMLCmpBElement> {}
-  interface CmpC extends JSXBase.HTMLAttributes<HTMLCmpCElement> {}
+  interface CmpA {}
+  interface CmpB {}
+  interface CmpC {}
 
   interface IntrinsicElements {
     'cmp-a': CmpA;
@@ -58,7 +58,11 @@ export { LocalJSX as JSX };
 
 declare module "@stencil/core" {
   export namespace JSX {
-    interface IntrinsicElements extends LocalJSX.IntrinsicElements {}
+    interface IntrinsicElements {
+      'cmp-a': LocalJSX.CmpA & JSXBase.HTMLAttributes<HTMLCmpAElement>;
+      'cmp-b': LocalJSX.CmpB & JSXBase.HTMLAttributes<HTMLCmpBElement>;
+      'cmp-c': LocalJSX.CmpC & JSXBase.HTMLAttributes<HTMLCmpCElement>;
+    }
   }
 }
 

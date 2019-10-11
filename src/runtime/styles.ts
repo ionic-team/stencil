@@ -60,7 +60,6 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
 
           } else {
             styleElm = doc.createElement('style');
-            styleElm.setAttribute('data-styles', '');
             styleElm.innerHTML = style;
           }
 

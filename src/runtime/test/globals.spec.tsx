@@ -40,10 +40,12 @@ describe('globals', () => {
       class CmpEl {
         // @ts-ignore
         private protoEl: any;
+        private protoNode: any;
         private protoNodeList: any;
 
         constructor() {
           this.protoEl = Element.prototype;
+          this.protoNode = Node.prototype;
           this.protoNodeList = NodeList.prototype;
         }
       }
@@ -52,6 +54,14 @@ describe('globals', () => {
         components: [CmpEl],
         html: `<cmp-el></cmp-el>`
       });
+    });
+
+    it('allows access to the Node prototype', async () => {
+      expect(page.rootInstance.protoNode).toEqual(Node.prototype);
+      expect(page.rootInstance.protoNode).toEqual((page.win as any).Node.prototype);
+      expect(page.rootInstance.protoNode).toEqual((window as any).Node.prototype);
+      expect(page.rootInstance.protoNode).toEqual((global as any).Node.prototype);
+      expect(page.rootInstance.protoNode).toBeTruthy();
     });
     it('allows access to the NodeList prototype', async () => {
       expect(page.rootInstance.protoNodeList).toEqual(NodeList.prototype);

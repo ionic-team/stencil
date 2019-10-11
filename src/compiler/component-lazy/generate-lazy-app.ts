@@ -25,10 +25,10 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
   await buildCtx.stylesPromise;
 
   const [componentBundle] = await Promise.all([
-    generateEsmBrowser(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
+    generateEsmBrowser(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
     generateEsm(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
-    generateSystem(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
-    generateCjs(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
+    generateSystem(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
+    generateCjs(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
   ]);
   await generateLegacyLoader(config, compilerCtx, outputTargets);
 

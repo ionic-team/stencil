@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { attachStyles } from './styles';
-import { BUILD } from '@build-conditionals';
+import { BUILD, NAMESPACE } from '@build-conditionals';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { consoleError, doc, getHostRef, nextTick, plt, writeTask } from '@platform';
 import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
@@ -25,7 +25,6 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   const ancestorComponent = hostRef.$ancestorComponent$;
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   const update = () => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
-  const rc = elm['s-rc'];
   attachToAncestor(hostRef, ancestorComponent);
 
   let promise: Promise<void>;
@@ -55,14 +54,6 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     promise = then(promise, () => safeCall(instance, 'componentWillRender'));
   }
 
-  if (BUILD.asyncLoading && rc) {
-    // ok, so turns out there are some child host elements
-    // waiting on this parent element to load
-    // let's fire off all update callbacks waiting
-    rc.forEach(cb => cb());
-    elm['s-rc'] = undefined;
-  }
-
   endSchedule();
 
   // there is no ancestorc omponent or the ancestor component
@@ -77,6 +68,7 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, instance: any, isInitialLoad: boolean) => {
   // updateComponent
   const endUpdate = createTime('update', cmpMeta.$tagName$);
+  const rc = elm['s-rc'];
   if (BUILD.style && isInitialLoad) {
     // DOM WRITE!
     attachStyles(elm, cmpMeta, hostRef.$modeName$);
@@ -84,7 +76,7 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
 
   const endRender = createTime('render', cmpMeta.$tagName$);
   if (BUILD.isDev)  {
-    hostRef.$flags$ |= HOST_FLAGS.dev_stateMutation;
+    hostRef.$flags$ |= HOST_FLAGS.devOnRender;
   }
 
   if (BUILD.hasRenderFn || BUILD.reflect) {
@@ -110,7 +102,8 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
     plt.$cssShim$.updateHost(elm);
   }
   if (BUILD.isDev) {
-    hostRef.$flags$ &= ~HOST_FLAGS.dev_stateMutation;
+    hostRef.$renderCount$++;
+    hostRef.$flags$ &= ~HOST_FLAGS.devOnRender;
   }
   if (BUILD.updatable && BUILD.taskQueue) {
     hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
@@ -134,6 +127,14 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
   if (BUILD.updatable || BUILD.lazyLoad) {
     hostRef.$flags$ |= HOST_FLAGS.hasRendered;
   }
+  if (BUILD.asyncLoading && rc) {
+    // ok, so turns out there are some child host elements
+    // waiting on this parent element to load
+    // let's fire off all update callbacks waiting
+    rc.forEach(cb => cb());
+    elm['s-rc'] = undefined;
+  }
+
   endRender();
   endUpdate();
 
@@ -158,11 +159,14 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   const ancestorComponent = hostRef.$ancestorComponent$;
 
-  if (BUILD.isDev) {
-    hostRef.$flags$ |= HOST_FLAGS.dev_stateMutation;
-  }
   if (BUILD.cmpDidRender) {
+    if (BUILD.isDev) {
+      hostRef.$flags$ |= HOST_FLAGS.devOnRender;
+    }
     safeCall(instance, 'componentDidRender');
+    if (BUILD.isDev) {
+      hostRef.$flags$ &= ~HOST_FLAGS.devOnRender;
+    }
   }
   emitLifecycleEvent(elm, 'componentDidRender');
 
@@ -176,15 +180,22 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
     }
 
     if (BUILD.cmpDidLoad) {
+      if (BUILD.isDev)  {
+        hostRef.$flags$ |= HOST_FLAGS.devOnDidLoad;
+      }
       safeCall(instance, 'componentDidLoad');
+      if (BUILD.isDev)  {
+        hostRef.$flags$ &= ~HOST_FLAGS.devOnDidLoad;
+      }
     }
 
     emitLifecycleEvent(elm, 'componentDidLoad');
+    endPostUpdate();
 
     if (BUILD.asyncLoading) {
       hostRef.$onReadyResolve$(elm);
       if (!ancestorComponent)  {
-        appDidLoad();
+        appDidLoad(cmpMeta.$tagName$);
       }
     }
 
@@ -194,16 +205,20 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
       // fire off the user's componentDidUpdate method (if one was provided)
       // componentDidUpdate runs AFTER render() has been called
       // and all child components have finished updating
+      if (BUILD.isDev)  {
+        hostRef.$flags$ |= HOST_FLAGS.devOnRender;
+      }
       safeCall(instance, 'componentDidUpdate');
+      if (BUILD.isDev) {
+        hostRef.$flags$ &= ~HOST_FLAGS.devOnRender;
+      }
     }
     emitLifecycleEvent(elm, 'componentDidUpdate');
+    endPostUpdate();
   }
 
   if (BUILD.hotModuleReplacement) {
     elm['s-hmr-load'] && elm['s-hmr-load']();
-  }
-  if (BUILD.isDev) {
-    hostRef.$flags$ &= ~HOST_FLAGS.dev_stateMutation;
   }
 
   if (BUILD.method && BUILD.lazyLoad) {
@@ -221,7 +236,6 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
     }
     hostRef.$flags$ &= ~(HOST_FLAGS.isWaitingForChildren | HOST_FLAGS.needsRerender);
   }
-  endPostUpdate();
   // ( •_•)
   // ( •_•)>⌐■-■
   // (⌐■_■)
@@ -241,7 +255,7 @@ export const forceUpdate = (elm: d.RenderNode, cmpMeta: d.ComponentRuntimeMeta) 
   }
 };
 
-export const appDidLoad = () => {
+export const appDidLoad = (who: string) => {
   // on appload
   // we have finish the first big initial render
   if (BUILD.cssAnnotations) {
@@ -251,9 +265,9 @@ export const appDidLoad = () => {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
   emitLifecycleEvent(doc, 'appload');
-  // if (BUILD.profile) {
-  //   performance.measure('[Stencil] App Did Load', 'st:app:start');
-  // }
+  if (BUILD.profile) {
+    performance.measure(`[Stencil] ${NAMESPACE} initial load (by ${who})`, 'st:app:start');
+  }
 };
 
 export const safeCall = (instance: any, method: string, arg?: any) => {

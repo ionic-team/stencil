@@ -1,4 +1,4 @@
-import { Component, Prop, State, Watch, Method } from '@stencil/core';
+import { Component, Method, Prop, State, Watch } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
@@ -114,7 +114,7 @@ describe('watch', () => {
   it('should Watch from lifecycles', async () => {
     @Component({ tag: 'cmp-a'})
     class CmpA {
-      nuRenders = 0;
+      renderCount = 0;
       watchCalled = 0;
 
       @State() state = 0;
@@ -150,8 +150,8 @@ describe('watch', () => {
       }
 
       render() {
-        this.nuRenders++;
-        return `${this.nuRenders} ${this.state} ${this.watchCalled}`;
+        this.renderCount++;
+        return `${this.renderCount} ${this.state} ${this.watchCalled}`;
       }
     }
 

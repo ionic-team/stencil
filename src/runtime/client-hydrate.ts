@@ -3,9 +3,11 @@ import { BUILD } from '@build-conditionals';
 import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from './runtime-constants';
 import { doc, plt } from '@platform';
 import { newVNode } from './vdom/h';
+import { createTime } from './profile';
 
 
 export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string, hostId: string, hostRef: d.HostRef) => {
+  const endHydrate = createTime('hydrateClient', tagName);
   const shadowRoot = hostElm.shadowRoot;
   const childRenderNodes: RenderNodeData[] = [];
   const slotNodes: RenderNodeData[] = [];
@@ -52,6 +54,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
       }
     });
   }
+  endHydrate();
 };
 
 const clientHydrate = (

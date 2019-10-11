@@ -8,7 +8,7 @@ import { computeMode } from './mode';
 import { getScopeId, registerStyle } from './styles';
 import { fireConnectedCallback } from './connected-callback';
 import { PROXY_FLAGS } from './runtime-constants';
-import { createTime } from './profile';
+import { createTime, uniqueTime } from './profile';
 
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: any) => {
@@ -36,13 +36,17 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       Cstr = loadModule(cmpMeta, hostRef, hmrVersionId);
       if (Cstr.then) {
         // Await creates a micro-task avoid if possible
+        const endLoad = uniqueTime(
+          `st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`,
+          `[Stencil] Load module for <${cmpMeta.$tagName$}>`
+        );
         Cstr = await Cstr;
+        endLoad();
       }
       if ((BUILD.isDev || BUILD.isDebug) && !Cstr) {
         throw new Error(`Constructor for "${cmpMeta.$tagName$}#${hostRef.$modeName$}" was not found`);
       }
       if (BUILD.member && !Cstr.isProxied) {
-        const endProxyInstance = createTime('proxyInstance', cmpMeta.$tagName$);
         // we'eve never proxied this Constructor before
         // let's add the getters/setters to its prototype before
         // the first time we create an instance of the implementation
@@ -51,10 +55,9 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         }
         proxyComponent(Cstr, cmpMeta, PROXY_FLAGS.proxyState);
         Cstr.isProxied = true;
-        endProxyInstance();
       }
 
-      const endNewInstance = createTime('newInstance', cmpMeta.$tagName$);
+      const endNewInstance = createTime('createInstance', cmpMeta.$tagName$);
       // ok, time to construct the instance
       // but let's keep track of when we start and stop
       // so that the getters/setters don't incorrectly step on data
@@ -84,9 +87,9 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       Cstr = elm.constructor as any;
     }
 
-    const endRegisterStyles = createTime('registerStyles', cmpMeta.$tagName$);
     const scopeId = BUILD.mode ? getScopeId(cmpMeta.$tagName$, hostRef.$modeName$) : getScopeId(cmpMeta.$tagName$);
     if (BUILD.style && !styles.has(scopeId) && Cstr.style) {
+      const endRegisterStyles = createTime('registerStyles', cmpMeta.$tagName$);
       // this component has styles but we haven't registered them yet
       let style = Cstr.style;
 
@@ -99,8 +102,8 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       }
 
       registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation));
+      endRegisterStyles();
     }
-    endRegisterStyles();
   }
 
   // we've successfully created a lazy instance

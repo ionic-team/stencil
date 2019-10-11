@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "1.6.1",
+  "version": "1.7.1",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,6 +30,7 @@
     "hydrate": "node scripts/build-hydrate.js",
     "jest.clearCache": "jest --clearCache",
     "lint": "tslint --project src/tsconfig.json",
+    "license": "node scripts/build-license.js",
     "mock.doc": "node scripts/build-mock-doc.js",
     "polyfills": "node scripts/build-polyfills.js",
     "prod": "node scripts/build-prod.js",

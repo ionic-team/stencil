@@ -201,7 +201,7 @@ Some modern browsers today like Edge does not include native support for web com
 
 ## License
 
- - [MIT](https://raw.githubusercontent.com/ionic-team/stencil/master/LICENSE)
+ - [MIT](https://raw.githubusercontent.com/ionic-team/stencil/master/LICENSE.md)
 
 
 [npm-badge]: https://img.shields.io/npm/v/@stencil/core.svg

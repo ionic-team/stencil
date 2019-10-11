@@ -3,9 +3,7 @@ import * as d from '../../declarations';
 const cstrs = new Map<string, d.ComponentNativeConstructor>();
 
 export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef, _hmrVersionId?: string): any => {
-  return new Promise(resolve => {
-    resolve(cstrs.get(cmpMeta.$tagName$));
-  });
+  return cstrs.get(cmpMeta.$tagName$);
 };
 
 export const getComponent = (tagName: string) => {
@@ -97,6 +95,7 @@ export const registerHost = (elm: d.HostElement) => {
     $flags$: 0,
     $hostElement$: elm,
     $instanceValues$: new Map(),
+    $renderCount$: 0
   };
   hostRef.$onInstancePromise$ = new Promise(r => hostRef.$onInstanceResolve$ = r);
   hostRef.$onReadyPromise$ = new Promise(r => hostRef.$onReadyResolve$ = r);
