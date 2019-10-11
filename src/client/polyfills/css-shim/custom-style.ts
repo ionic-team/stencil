@@ -56,7 +56,7 @@ export class CustomStyle {
     }
     const baseScope = this.registerHostTemplate(cssText, cssScopeId, isScoped);
     const styleEl = this.doc.createElement('style');
-    styleEl.setAttribute('data-styles', '');
+    styleEl.setAttribute('data-no-shim', '');
 
     if (!baseScope.usesCssVars) {
       // This component does not use (read) css variables
