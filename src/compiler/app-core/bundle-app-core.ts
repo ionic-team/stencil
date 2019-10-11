@@ -4,7 +4,7 @@ import { createOnWarnFn, getDependencies, loadRollupDiagnostics } from '@utils';
 import { cssTransformer } from '../rollup-plugins/css-transformer';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { loaderPlugin } from '../rollup-plugins/loader';
-import { imagePlugin } from '../rollup-plugins/image-plugin';
+import { imagePlugin } from '../rollup-plugins/image-plugin';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { OutputChunk, OutputOptions, RollupBuild, RollupOptions, TreeshakingOptions } from 'rollup'; // types only
 import { pluginHelper } from '../rollup-plugins/plugin-helper';
@@ -26,6 +26,8 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
         tryCatchDeoptimization: false,
       }
       : false;
+    const hasResolveNode = config.rollupPlugins.some(p => p.name === 'node-resolve');
+    const hasCommonjs = config.rollupPlugins.some(p => p.name === 'commonjs');
     const rollupOptions: RollupOptions = {
       ...config.rollupConfig.inputOptions,
 
@@ -41,18 +43,18 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
         stencilBuildConditionalsPlugin(build, config.fsNamespace),
         globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
-        config.sys.rollup.plugins.nodeResolve({
-          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
-          browser: true,
-          ...config.nodeResolve
-        }),
-        config.sys.rollup.plugins.commonjs({
+        !hasCommonjs && config.sys.rollup.plugins.commonjs({
           include: /node_modules/,
           sourceMap: false,
           ...config.commonjs
         }),
         ...config.rollupPlugins,
         pluginHelper(config, buildCtx),
+        !hasResolveNode && config.sys.rollup.plugins.nodeResolve({
+          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
+          browser: true,
+          ...config.nodeResolve
+        }),
         config.sys.rollup.plugins.json(),
         imagePlugin(config, buildCtx),
         cssTransformer(config, compilerCtx, buildCtx),
@@ -100,8 +102,8 @@ export const generateRollupOutput = async (build: RollupBuild, options: OutputOp
         isBrowserLoader: chunk.isEntry && chunk.name === config.fsNamespace,
         isIndex: chunk.isEntry && chunk.name === 'index',
         isCore,
-    };
-  });
+      };
+    });
 };
 
 export const DEFAULT_CORE = `
