@@ -14,8 +14,7 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
   let devServer: d.DevServer = null;
   if (shouldStartDevServer(config, flags)) {
     try {
-      config.devServer.logger = config.logger;
-      devServer = await startServer(config.devServer);
+      devServer = await startServer(config.devServer, config.logger);
 
       let hasLoggedServerUrl = false;
 

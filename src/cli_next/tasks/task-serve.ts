@@ -22,10 +22,7 @@ export async function taskServe(process: NodeJS.Process, config: d.Config) {
   }
   config.devServer.root = normalizePath(config.devServer.root);
 
-  const devServer = await startServer(config);
-  if (devServer) {
-    config.logger.info(`dev server: ${devServer.browserUrl}`);
-  }
+  const devServer = await startServer(config.devServer, config.logger);
 
   process.once('SIGINT', () => {
     devServer && devServer.close();

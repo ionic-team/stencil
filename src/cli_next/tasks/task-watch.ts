@@ -9,7 +9,7 @@ export async function taskWatch(prcs: NodeJS.Process, config: d.Config) {
   let devServer: d.DevServer = null;
 
   if (config.flags.serve) {
-    devServerPromise = startServer(config.devServer);
+    devServerPromise = startServer(config.devServer, config.logger);
   }
 
   const compiler = await createCompiler(config);

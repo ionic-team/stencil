@@ -1,13 +1,13 @@
-import { CompilerBuildResults, CompilerEventName, DevServer, DevServerConfig, DevServerMessage, StencilDevServerConfig } from '../declarations';
+import { CompilerBuildResults, CompilerEventName, DevServer, DevServerConfig, DevServerMessage, Logger, StencilDevServerConfig } from '../declarations';
 import { ChildProcess, fork } from 'child_process';
 import path from 'path';
 import open from 'open';
 
 
-export async function startServer(stencilDevServerConfig: StencilDevServerConfig) {
+export async function startServer(stencilDevServerConfig: StencilDevServerConfig, logger: Logger) {
   let devServer: DevServer = null;
   const devServerConfig = Object.assign({}, stencilDevServerConfig) as DevServerConfig;
-  const timespan = devServerConfig.logger.createTimeSpan(`starting dev server`, true);
+  const timespan = logger.createTimeSpan(`starting dev server`, true);
 
   try {
     // using the path stuff below because after the the bundles are created
@@ -37,7 +37,7 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
       lastBuildResults: null
     };
 
-    const starupDevServerConfig = await startWorkerServer(devServerConfig, serverProcess, devServerContext);
+    const starupDevServerConfig = await startWorkerServer(devServerConfig, logger, serverProcess, devServerContext);
 
     devServer = {
       browserUrl: starupDevServerConfig.browserUrl,
@@ -47,11 +47,7 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
             serverProcess.kill('SIGINT');
           }
         } catch (e) {}
-        if (devServerConfig.logger) {
-          devServerConfig.logger.debug(`dev server closed`);
-        } else {
-          console.log(`dev server closed`);
-        }
+        logger.debug(`dev server closed`);
         return Promise.resolve();
       },
       emit(eventName: any, data: any) {
@@ -69,18 +65,18 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
 }
 
 
-function startWorkerServer(config: DevServerConfig, serverProcess: ChildProcess, devServerContext: DevServerMainContext) {
+function startWorkerServer(devServerConfig: DevServerConfig, logger: Logger, serverProcess: ChildProcess, devServerContext: DevServerMainContext) {
   let hasStarted = false;
 
   return new Promise<DevServerConfig>((resolve, reject) => {
     serverProcess.stdout.on('data', (data: any) => {
       // the child server process has console logged data
-      config.logger.debug(`dev server: ${data}`);
+      logger.debug(`dev server: ${data}`);
     });
 
     serverProcess.stderr.on('data', (data: any) => {
       // the child server process has console logged an error
-      config.logger.error(`dev server error: ${data}, hasStarted: ${hasStarted}`);
+      logger.error(`dev server error: ${data}, hasStarted: ${hasStarted}`);
       if (!hasStarted) {
         reject(`dev server error: ${data}`);
       }
@@ -97,7 +93,7 @@ function startWorkerServer(config: DevServerConfig, serverProcess: ChildProcess,
         } else {
           hasStarted = true;
           // received a message from the child process that the server has successfully started
-          if (config.openBrowser && msg.serverStarted.initialLoadUrl) {
+          if (devServerConfig.openBrowser && msg.serverStarted.initialLoadUrl) {
             openInBrowser({ url: msg.serverStarted.initialLoadUrl });
           }
 
@@ -136,23 +132,22 @@ function startWorkerServer(config: DevServerConfig, serverProcess: ChildProcess,
         // received a message from the child process that is an error
         if (msg.error.message) {
           if (typeof msg.error.message === 'string') {
-            config.logger.error(msg.error.message);
+            logger.error(msg.error.message);
           } else {
             try {
-              config.logger.error(JSON.stringify(msg.error.message));
+              logger.error(JSON.stringify(msg.error.message));
             } catch (e) {
               console.error(e);
             }
           }
         }
 
-        config.logger.debug(msg.error);
+        logger.debug(msg.error);
         return;
       }
 
       if (msg.requestLog) {
         const req = msg.requestLog;
-        const logger = config.logger;
 
         let status: any;
         if (req.status >= 400) {
@@ -171,10 +166,10 @@ function startWorkerServer(config: DevServerConfig, serverProcess: ChildProcess,
     // have the main process send a message to the child server process
     // to start the http and web socket server
     serverProcess.send({
-      startServer: config
+      startServer: devServerConfig
     });
 
-    return config;
+    return devServerConfig;
   });
 }
 

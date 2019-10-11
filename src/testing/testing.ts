@@ -81,7 +81,7 @@ export class Testing implements d.ITesting {
       }
 
       const startupResults = await Promise.all([
-        startServer(config.devServer),
+        startServer(config.devServer, config.logger),
         startPuppeteerBrowser(config),
       ]);
 

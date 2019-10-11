@@ -1,5 +1,6 @@
 import { Config, ConfigBundle, Diagnostic } from '../../declarations';
 import { buildError, sortBy } from '@utils';
+import { validateDevServer } from './validate-dev-server';
 import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './outputs';
 import { validatePaths } from './validate-paths';
@@ -63,6 +64,9 @@ export const validateConfig = (userConfig?: Config) => {
   // rollup config
   validateRollupConfig(config);
 
+  // dev server
+  config.devServer = validateDevServer(config, config.flags, diagnostics);
+
   // testing
   validateTesting(config, diagnostics);
 
@@ -101,8 +105,6 @@ export const validateConfig = (userConfig?: Config) => {
   // if (typeof config.validateTypes !== 'boolean') {
   //   config.validateTypes = true;
   // }
-
-  // validateDevServer(config, diagnostics);
 
   // if (!config.watchIgnoredRegex) {
   //   config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;

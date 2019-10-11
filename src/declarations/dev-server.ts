@@ -1,7 +1,6 @@
 import { BuildEmitEvents } from './build-events';
 import { BuildLog, BuildResults } from './build';
 import { CompilerFsStats } from './compiler_next';
-import { Logger } from './logger';
 
 
 export interface DevServer extends BuildEmitEvents {
@@ -19,6 +18,10 @@ export interface StencilDevServerConfig {
    * Base path to be used by the server. Defaults to the root pathname.
    */
   basePath?: string;
+  /**
+   * If the dev server should respond with gzip compressed content. Defaults to `true`.
+   */
+  gzip?: boolean;
   /**
    * When set, the dev server will run via https using the SSL certificate and key you provide (use `fs` if you want to read them from files).
    */
@@ -45,7 +48,6 @@ export interface StencilDevServerConfig {
   reloadStrategy?: PageReloadStrategy;
   root?: string;
   websocket?: boolean;
-  logger?: Logger;
 }
 
 export interface DevServerConfig extends StencilDevServerConfig {
@@ -54,7 +56,6 @@ export interface DevServerConfig extends StencilDevServerConfig {
   devServerDir?: string;
   editors?: DevServerEditor[];
   excludeHmr?: string[];
-  gzip?: boolean;
   historyApiFallback?: HistoryApiFallback;
   openBrowser?: boolean;
   protocol?: 'http' | 'https';
