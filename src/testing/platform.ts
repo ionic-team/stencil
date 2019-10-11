@@ -112,6 +112,7 @@ export const registerHost = (elm: d.HostElement) => {
     $flags$: 0,
     $hostElement$: elm,
     $instanceValues$: new Map(),
+    $renderCount$: 0
   };
   hostRef.$onInstancePromise$ = new Promise(r => hostRef.$onInstanceResolve$ = r);
   hostRef.$onReadyPromise$ = new Promise(r => hostRef.$onReadyResolve$ = r);

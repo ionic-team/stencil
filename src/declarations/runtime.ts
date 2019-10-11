@@ -103,6 +103,7 @@ export interface HostRef {
   $queuedListeners$?: [string, any][];
   $rmListeners$?: () => void;
   $modeName$?: string;
+  $renderCount$?: number;
 }
 
 export interface PlatformRuntime {

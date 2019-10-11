@@ -208,6 +208,7 @@ export interface Config extends StencilConfig {
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
   rootDir?: string;
   suppressLogs?: boolean;
+  profile?: boolean;
   _isValidated?: boolean;
   _isTesting?: boolean;
   _lifecycleDOMEvents?: boolean;

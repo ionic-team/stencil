@@ -53,69 +53,72 @@ describe('element', () => {
     expect(elm).toEqualHtml(`<meta content="updated" id="test">`);
   });
 
-  it('document.styleSheets', () => {
-    expect(document.styleSheets).toEqual([]);
-    const style = document.createElement('style');
-    document.head.appendChild(style);
-    expect(document.styleSheets).toEqual([style]);
-  });
+  describe('document', () => {
 
-  it('document.forms', () => {
-    expect(document.forms).toEqual([]);
-    const form = document.createElement('form');
-    document.head.appendChild(form);
-    expect(document.forms).toEqual([form]);
-  });
+    it('styleSheets', () => {
+      expect(document.styleSheets).toEqual([]);
+      const style = document.createElement('style');
+      document.head.appendChild(style);
+      expect(document.styleSheets).toEqual([style]);
+    });
 
-  it('document.scripts', () => {
-    expect(document.scripts).toEqual([]);
-    const script = document.createElement('script');
-    document.head.appendChild(script);
-    expect(document.scripts).toEqual([script]);
-  });
+    it('forms', () => {
+      expect(document.forms).toEqual([]);
+      const form = document.createElement('form');
+      document.head.appendChild(form);
+      expect(document.forms).toEqual([form]);
+    });
 
-  it('document.images', () => {
-    expect(document.images).toEqual([]);
-    const img = document.createElement('img');
-    document.head.appendChild(img);
-    expect(document.images).toEqual([img]);
-  });
+    it('scripts', () => {
+      expect(document.scripts).toEqual([]);
+      const script = document.createElement('script');
+      document.head.appendChild(script);
+      expect(document.scripts).toEqual([script]);
+    });
 
-  it('document.scrollingElement', () => {
-    expect(document.scrollingElement).toBe(document.documentElement);
-  });
+    it('images', () => {
+      expect(document.images).toEqual([]);
+      const img = document.createElement('img');
+      document.head.appendChild(img);
+      expect(document.images).toEqual([img]);
+    });
 
-  it('document.title', () => {
-    document.title = 'Hello Title';
-    expect(document.title).toBe('Hello Title');
+    it('scrollingElement', () => {
+      expect(document.scrollingElement).toBe(document.documentElement);
+    });
 
-    const titleElm = document.head.querySelector('title');
-    expect(titleElm.textContent).toBe('Hello Title');
-    expect(titleElm.text).toBe('Hello Title');
+    it('title', () => {
+      document.title = 'Hello Title';
+      expect(document.title).toBe('Hello Title');
 
-    titleElm.text = 'Hello Text';
-    expect(document.title).toBe('Hello Text');
-    expect(titleElm.text).toBe('Hello Text');
-    expect(titleElm.textContent).toBe('Hello Text');
-  });
+      const titleElm = document.head.querySelector('title');
+      expect(titleElm.textContent).toBe('Hello Title');
+      expect(titleElm.text).toBe('Hello Title');
 
-  it('document.baseURI', () => {
-    const win = new MockWindow(`
-    <html>
-      <head>
-        <base href="/en">
+      titleElm.text = 'Hello Text';
+      expect(document.title).toBe('Hello Text');
+      expect(titleElm.text).toBe('Hello Text');
+      expect(titleElm.textContent).toBe('Hello Text');
+    });
+
+    it('document.baseURI', () => {
+      const win = new MockWindow(`
+      <html>
+        <head>
+          <base href="/en">
+        </head>
       </head>
-    </head>
-    `);
-    win.location.href = 'http://stenciljs.com/path/to/page';
-    expect(win.document.baseURI).toBe('http://stenciljs.com/en');
-    expect(win.document.URL).toBe('http://stenciljs.com/path/to/page');
-    expect(win.document.location.href).toBe('http://stenciljs.com/path/to/page');
+      `);
+      win.location.href = 'http://stenciljs.com/path/to/page';
+      expect(win.document.baseURI).toBe('http://stenciljs.com/en');
+      expect(win.document.URL).toBe('http://stenciljs.com/path/to/page');
+      expect(win.document.location.href).toBe('http://stenciljs.com/path/to/page');
 
-    win.document.querySelector('base').remove();
-    expect(win.document.baseURI).toBe('http://stenciljs.com/path/to/page');
-    expect(win.document.URL).toBe('http://stenciljs.com/path/to/page');
-    expect(win.document.location.href).toBe('http://stenciljs.com/path/to/page');
+      win.document.querySelector('base').remove();
+      expect(win.document.baseURI).toBe('http://stenciljs.com/path/to/page');
+      expect(win.document.URL).toBe('http://stenciljs.com/path/to/page');
+      expect(win.document.location.href).toBe('http://stenciljs.com/path/to/page');
+    });
   });
 
   describe('isConnected', () => {
@@ -281,6 +284,28 @@ describe('element', () => {
       const createdElement = document.createElement('myElement');
       expect(createdElement.tagName).toEqual('MYELEMENT');
       expect(createdElement.nodeName).toEqual('MYELEMENT');
+    });
+  });
+
+  describe('input', () => {
+    it('list is readonly prop', () => {
+      const input = doc.createElement('input');
+      const list = doc.createElement('datalist');
+      list.id = 'my-list';
+      doc.body.append(input, list);
+      expect(input.list).toEqual(null);
+
+      // it's readonly
+      expect(() => input.list = 'my-list').toThrow();
+      expect(input.list).toEqual(null);
+
+      // finds list
+      input.setAttribute('list', 'my-list');
+      expect(input.list).toEqual(list);
+
+      // unknown id
+      input.setAttribute('list', 'unknown');
+      expect(input.list).toEqual(null);
     });
   });
 

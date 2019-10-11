@@ -3,6 +3,7 @@ import { BUILD } from '@app-data';
 import { CMP_FLAGS } from '@utils';
 import { doc, plt, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
 import { HYDRATE_ID, NODE_TYPE } from './runtime-constants';
+import { createTime } from './profile';
 
 
 const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/new WeakMap();
@@ -89,7 +90,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
 };
 
 export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, mode: string) => {
-
+  const endAttachStyles = createTime('attachStyles', cmpMeta.$tagName$);
   const scopeId = addStyle(
     (BUILD.shadowDom && supportsShadowDom && elm.shadowRoot)
       ? elm.shadowRoot
@@ -110,6 +111,7 @@ export const attachStyles = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
       elm.classList.add(scopeId + '-s');
     }
   }
+  endAttachStyles();
 };
 
 

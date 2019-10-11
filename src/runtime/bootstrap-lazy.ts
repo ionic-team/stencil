@@ -9,16 +9,26 @@ import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@pla
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
 import { appDidLoad, forceUpdate } from './update-component';
+import { createTime, installDevTools } from './profile';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
+  if (BUILD.profile) {
+    performance.mark('st:app:start');
+  }
+  installDevTools();
+
+  const endBootstrap = createTime('bootstrapLazy');
   const cmpTags: string[] = [];
   const exclude = options.exclude || [];
   const head = doc.head;
   const customElements = win.customElements;
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
+  const deferredConnectedCallbacks: {connectedCallback: () => void}[] = [];
   let appLoadFallback: any;
+  let isBootstrapping = true;
+
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
   if (options.syncQueue) {
@@ -99,7 +109,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
             clearTimeout(appLoadFallback);
             appLoadFallback = null;
           }
-          plt.jmp(() => connectedCallback(this, cmpMeta));
+          if (isBootstrapping) {
+            // connectedCallback will be processed once all components have been registered
+            deferredConnectedCallbacks.push(this);
+          } else {
+            plt.jmp(() => connectedCallback(this, cmpMeta));
+          }
         }
 
         disconnectedCallback() {
@@ -136,6 +151,13 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   visibilityStyle.setAttribute('data-styles', '');
   head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
 
+  // Process deferred connectedCallbacks now all components have been registered
+  isBootstrapping = false;
+  if (deferredConnectedCallbacks.length > 0) {
+    deferredConnectedCallbacks.forEach(host => host.connectedCallback());
+  } else {
+    plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30, 'timeout'));
+  }
   // Fallback appLoad event
-  plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30));
+  endBootstrap();
 };

@@ -4,6 +4,15 @@ import ts from 'typescript';
 
 
 export const validatePublicName = (config: d.Config, diagnostics: d.Diagnostic[], memberName: string, decorator: string, memberType: string, node: ts.Node) => {
+  if (/^on(-|[A-Z])/.test(memberName)) {
+    const warn = buildWarn(diagnostics);
+    warn.messageText = [
+      `The ${decorator} name "${memberName}" looks like an event.`,
+      `Please use the "@Event()" decorator to expose events instead, not properties or methods.`,
+    ].join('');
+    augmentDiagnosticWithNode(config, warn, node);
+    return;
+  }
   if (RESERVED_PUBLIC_MEMBERS.has(memberName.toLowerCase())) {
     const warn = buildWarn(diagnostics);
     warn.messageText = [
@@ -13,6 +22,7 @@ export const validatePublicName = (config: d.Config, diagnostics: d.Diagnostic[]
       `unexpected runtime errors or user-interface issues on various browsers, so it's best to avoid them entirely.`
     ].join('');
     augmentDiagnosticWithNode(config, warn, node);
+    return;
   }
 };
 
@@ -267,9 +277,11 @@ const JSX_KEYS = [
   'key'
 ];
 
-const RESERVED_PUBLIC_MEMBERS = new Set([
+const ALL_KEYS = [
   ...HTML_ELEMENT_KEYS,
   ...ELEMENT_KEYS,
   ...NODE_KEYS,
   ...JSX_KEYS,
-].map(p => p.toLowerCase()));
+].map(p => p.toLowerCase());
+
+const RESERVED_PUBLIC_MEMBERS = new Set(ALL_KEYS);

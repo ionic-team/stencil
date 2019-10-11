@@ -116,7 +116,16 @@ class MockInputElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'input');
   }
+
+  get list() {
+    const listId = this.getAttribute('list');
+    if (listId) {
+      return (this.ownerDocument as Document).getElementById(listId);
+    }
+    return null;
+  }
 }
+
 patchPropAttributes(MockInputElement.prototype, {
   accept: String,
   autocomplete: String,
@@ -132,7 +141,6 @@ patchPropAttributes(MockInputElement.prototype, {
   formtarget: String,
   height: Number,
   inputmode: String,
-  list: String,
   max: String,
   maxLength: Number,
   min: String,

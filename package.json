@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "license": "MIT",
   "main": "internal/stencil.core.js",
   "types": "internal/stencil.core.d.ts",
@@ -35,6 +35,9 @@
     "rollup.prod.ci": "rollup --config --config-prod --config-ci",
     "rollup.watch": "rollup --watch --config",
     "hydrate": "node scripts/build-hydrate.js",
+    "jest.clearCache": "jest --clearCache",
+    "license": "node scripts/build-license.js",
+    "mock.doc": "node scripts/build-mock-doc.js",
     "polyfills": "node scripts/build-polyfills.js",
     "test": "jest",
     "test.dist": "node scripts/build/test/test-dist.js",

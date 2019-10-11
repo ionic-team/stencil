@@ -80,6 +80,7 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 
   updateBuildConditionals(config, build);
   build.lifecycleDOMEvents = false;
+  build.devTools = false;
   build.hotModuleReplacement = false;
 
   return build;

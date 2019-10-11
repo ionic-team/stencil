@@ -3,6 +3,7 @@ import { BUILD } from '@app-data';
 import { EVENT_FLAGS } from '@utils';
 import { getElement } from './element';
 import { win } from '@platform';
+import { STENCIL_DEV_MODE } from './profile';
 
 
 export const createEvent = (ref: d.RuntimeRef, name: string, flags: number) => {
@@ -10,7 +11,8 @@ export const createEvent = (ref: d.RuntimeRef, name: string, flags: number) => {
   return {
     emit: (detail: any) => {
       if (BUILD.isDev && !elm.isConnected) {
-        console.warn(`The "${name}" event was emitted, but the dispatcher node is not longer connected to the dom.`);
+        console.warn(...STENCIL_DEV_MODE,
+          `The "${name}" event was emitted, but the dispatcher node is not longer connected to the dom.`);
       }
       return elm.dispatchEvent(
         new (BUILD.hydrateServerSide ? (win as any).CustomEvent : CustomEvent)(name, {

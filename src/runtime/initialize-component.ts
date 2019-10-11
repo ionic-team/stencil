@@ -8,9 +8,11 @@ import { computeMode } from './mode';
 import { getScopeId, registerStyle } from './styles';
 import { fireConnectedCallback } from './connected-callback';
 import { PROXY_FLAGS } from './runtime-constants';
+import { createTime, uniqueTime } from './profile';
 
 
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: any) => {
+
   // initializeComponent
   if ((BUILD.lazyLoad || BUILD.style) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
     // we haven't initialized this element yet
@@ -34,7 +36,12 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       Cstr = loadModule(cmpMeta, hostRef, hmrVersionId);
       if (Cstr.then) {
         // Await creates a micro-task avoid if possible
+        const endLoad = uniqueTime(
+          `st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`,
+          `[Stencil] Load module for <${cmpMeta.$tagName$}>`
+        );
         Cstr = await Cstr;
+        endLoad();
       }
       if ((BUILD.isDev || BUILD.isDebug) && !Cstr) {
         throw new Error(`Constructor for "${cmpMeta.$tagName$}#${hostRef.$modeName$}" was not found`);
@@ -50,6 +57,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         Cstr.isProxied = true;
       }
 
+      const endNewInstance = createTime('createInstance', cmpMeta.$tagName$);
       // ok, time to construct the instance
       // but let's keep track of when we start and stop
       // so that the getters/setters don't incorrectly step on data
@@ -72,6 +80,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       if (BUILD.watchCallback) {
         hostRef.$flags$ |= HOST_FLAGS.isWatchReady;
       }
+      endNewInstance();
       fireConnectedCallback(hostRef.$lazyInstance$);
 
     } else {
@@ -79,8 +88,8 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     }
 
     const scopeId = BUILD.mode ? getScopeId(cmpMeta.$tagName$, hostRef.$modeName$) : getScopeId(cmpMeta.$tagName$);
-
     if (BUILD.style && !styles.has(scopeId) && Cstr.style) {
+      const endRegisterStyles = createTime('registerStyles', cmpMeta.$tagName$);
       // this component has styles but we haven't registered them yet
       let style = Cstr.style;
 
@@ -93,6 +102,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       }
 
       registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation));
+      endRegisterStyles();
     }
   }
 

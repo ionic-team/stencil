@@ -16,6 +16,9 @@ export const registerHost = (elm: d.HostElement) => {
     $hostElement$: elm,
     $instanceValues$: new Map()
   };
+  if (BUILD.isDev) {
+    hostRef.$renderCount$ = 0;
+  }
   if (BUILD.method && BUILD.lazyLoad) {
     hostRef.$onInstancePromise$ = new Promise(r => hostRef.$onInstanceResolve$ = r);
   }

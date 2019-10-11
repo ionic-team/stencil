@@ -23,6 +23,7 @@ dist/
 # submodule packages
 /cli
 /compiler
+/hydrate
 /dev-server
 /internal
 /mock-doc

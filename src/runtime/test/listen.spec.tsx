@@ -143,7 +143,7 @@ describe('listen', () => {
     }
     @Component({ tag: 'cmp-a'})
     class CmpA {
-      nuRenders = 0;
+      renderCount = 0;
 
       @Event() event: EventEmitter;
       @State() nuEvents = 0;
@@ -172,8 +172,8 @@ describe('listen', () => {
       }
 
       render() {
-        this.nuRenders++;
-        return `${this.nuRenders} ${this.nuEvents}`;
+        this.renderCount++;
+        return `${this.renderCount} ${this.nuEvents}`;
       }
     }
 

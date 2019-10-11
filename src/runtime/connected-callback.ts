@@ -8,6 +8,7 @@ import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent } from './initialize-component';
 import { attachToAncestor, safeCall } from './update-component';
+import { createTime } from './profile';
 
 export const fireConnectedCallback = (instance: any) => {
   if (BUILD.lazyLoad && BUILD.connectedCallback) {
@@ -17,6 +18,7 @@ export const fireConnectedCallback = (instance: any) => {
 
 export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
   if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {
+    const endConnected = createTime('connectedCallback', cmpMeta.$tagName$);
     // connectedCallback
     const hostRef = getHostRef(elm);
 
@@ -36,7 +38,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         hostId = elm.getAttribute(HYDRATE_ID);
         if (hostId) {
           if (BUILD.shadowDom && supportsShadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
-            const scopeId = BUILD.mode ?  addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode')) : addStyle(elm.shadowRoot, cmpMeta);
+            const scopeId = BUILD.mode ? addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode')) : addStyle(elm.shadowRoot, cmpMeta);
             elm.classList.remove(scopeId + '-h');
             elm.classList.remove(scopeId + '-s');
           }
@@ -101,6 +103,7 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
       }
     }
     fireConnectedCallback(hostRef.$lazyInstance$);
+    endConnected();
   }
 };
 
