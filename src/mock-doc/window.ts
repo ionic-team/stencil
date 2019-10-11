@@ -2,7 +2,7 @@ import { createConsole } from './console';
 import { MockCustomElementRegistry, resetCustomElementRegistry } from './custom-element-registry';
 import { MockCustomEvent, MockEvent, MockKeyboardEvent, MockMouseEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { MockDocument, resetDocument } from './document';
-import { MockElement, MockHTMLElement, MockNodeList} from './node';
+import { MockElement, MockHTMLElement, MockNode, MockNodeList } from './node';
 import { MockHistory } from './history';
 import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
@@ -14,6 +14,7 @@ import { URL } from 'url';
 const historyMap = new WeakMap<MockWindow, MockHistory>();
 const elementCstrMap = new WeakMap<MockWindow, any>();
 const htmlElementCstrMap = new WeakMap<MockWindow, any>();
+const nodeCstrMap = new WeakMap<MockWindow, any>();
 const nodeListCstrMap = new WeakMap<MockWindow, any>();
 const localStorageMap = new WeakMap<MockWindow, MockStorage>();
 const locMap = new WeakMap<MockWindow, MockLocation>();
@@ -211,6 +212,20 @@ export class MockWindow {
       elementCstrMap.set(this, ElementCstr);
     }
     return ElementCstr;
+  }
+
+  get Node() {
+    let NodeCstr = nodeCstrMap.get(this);
+    if (NodeCstr == null) {
+      const ownerDocument = this.document;
+      NodeCstr = class extends MockNode {
+        constructor() {
+          super(ownerDocument, 0, 'test', '');
+          throw (new Error('Illegal constructor: cannot constructor'));
+        }
+      };
+      return NodeCstr;
+    }
   }
 
   get NodeList() {
