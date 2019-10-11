@@ -5,14 +5,14 @@ import { getAppBrowserCorePolyfills } from '../app-core/app-polyfills';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
 
-export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
+export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
   const systemOutputs = outputTargets.filter(o => !!o.systemDir);
 
   if (systemOutputs.length > 0) {
     const esmOpts: OutputOptions = {
       format: 'system',
-      entryFileNames: build.isDev ? '[name].system.js' : 'p-[hash].system.js',
-      chunkFileNames: build.isDev ? '[name]-[hash].system.js' : 'p-[hash].system.js',
+      entryFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name].system.js',
+      chunkFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name]-[hash].system.js',
       preferConst: true
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
