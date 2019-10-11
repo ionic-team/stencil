@@ -124,7 +124,7 @@ export function appReset(win: d.DevClientWindow, config: d.DevClientConfig, cb: 
 
   if (!win.navigator.serviceWorker || !win.navigator.serviceWorker.getRegistration) {
     cb();
-    
+
   } else {
     // it's possible a service worker is already registered
     // for this localhost url from some other app's development

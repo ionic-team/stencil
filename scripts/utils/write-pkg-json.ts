@@ -34,4 +34,12 @@ export interface PackageData {
   types?: string;
   version?: string;
   private?: boolean;
+  license?: string | any;
+  licenses?: string | any;
+  author?: string | any;
+  contributors?: string | any;
+  homepage?: string;
+  repository?: any;
+  files?: string[];
+  bin?: {[key: string]: string};
 }

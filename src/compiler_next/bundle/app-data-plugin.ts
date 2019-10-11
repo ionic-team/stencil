@@ -91,5 +91,5 @@ const getContextImport = (platform: string) => {
     platform === 'hydrate' ?
       STENCIL_INTERNAL_HYDRATE_ID :
       STENCIL_INTERNAL_CLIENT_ID
-  }';\n`
+  }';\n`;
 };

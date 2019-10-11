@@ -38,13 +38,11 @@ The published Stencil distribution contains the following licenses:
 
 License: MIT
 
-Author: [Brian Woodward](https://github.com/doowb)
+Author: Brian Woodward (https://github.com/doowb)
 
-Contributors: [Brian Woodward](https://twitter.com/doowb), [Jason Schilling](https://sourecode.de), [Jon Schlinkert](http://twitter.com/jonschlinkert), [Jordan](https://github.com/Silic0nS0ldier)
+Contributors: Brian Woodward (https://twitter.com/doowb), Jason Schilling (https://sourecode.de), Jon Schlinkert (http://twitter.com/jonschlinkert), Jordan (https://github.com/Silic0nS0ldier)
 
 Homepage: https://github.com/doowb/ansi-colors
-
-Repository: git+https://github.com/doowb/ansi-colors.git
 
 > The MIT License (MIT)
 > 
@@ -74,11 +72,7 @@ Repository: git+https://github.com/doowb/ansi-colors.git
 
 License: MIT
 
-Author: Andrey Sitnik
-
-Homepage: https://github.com/postcss/autoprefixer#readme
-
-Repository: git+https://github.com/postcss/autoprefixer.git
+Author: Andrey Sitnik <andrey@sitnik.ru>
 
 > The MIT License (MIT)
 > 
@@ -107,11 +101,7 @@ Repository: git+https://github.com/postcss/autoprefixer.git
 
 License: BSD-2-Clause
 
-Author: [Felix Böhm](http://feedic.com)
-
-Homepage: https://github.com/fb55/css-what#readme
-
-Repository: git+https://github.com/fb55/css-what.git
+Author: Felix Böhm <me@feedic.com> (http://feedic.com)
 
 > Copyright (c) Felix Böhm
 > All rights reserved.
@@ -134,8 +124,6 @@ License: MIT
 Author: [Ben Briggs](http://beneb.info)
 
 Homepage: https://github.com/cssnano/cssnano
-
-Repository: git+https://github.com/cssnano/cssnano.git
 
 > Copyright (c) Ben Briggs <beneb.info@gmail.com> (http://beneb.info)
 > 
@@ -170,8 +158,6 @@ Author: ["Cowboy" Ben Alman](http://benalman.com/)
 
 Homepage: https://github.com/cowboy/node-exit
 
-Repository: git://github.com/cowboy/node-exit.git
-
 > Copyright (c) 2013 "Cowboy" Ben Alman
 > 
 > Permission is hereby granted, free of charge, to any person
@@ -201,11 +187,7 @@ Repository: git://github.com/cowboy/node-exit.git
 
 License: ISC
 
-Author: [Isaac Z. Schlueter](http://blog.izs.me/)
-
-Homepage: https://github.com/isaacs/node-glob#readme
-
-Repository: git://github.com/isaacs/node-glob.git
+Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)
 
 > The ISC License
 > 
@@ -235,10 +217,6 @@ Repository: git://github.com/isaacs/node-glob.git
 
 License: ISC
 
-Homepage: https://github.com/isaacs/node-graceful-fs#readme
-
-Repository: git+https://github.com/isaacs/node-graceful-fs.git
-
 > The ISC License
 > 
 > Copyright (c) Isaac Z. Schlueter, Ben Noordhuis, and Contributors
@@ -261,13 +239,11 @@ Repository: git+https://github.com/isaacs/node-graceful-fs.git
 
 License: MIT
 
-Author: [Jon Schlinkert](https://github.com/jonschlinkert)
+Author: Jon Schlinkert (https://github.com/jonschlinkert)
 
-Contributors: [Brian Woodward](https://twitter.com/doowb), [Daniel Perez](https://tuvistavie.com), [Jon Schlinkert](http://twitter.com/jonschlinkert)
+Contributors: Brian Woodward (https://twitter.com/doowb), Daniel Perez (https://tuvistavie.com), Jon Schlinkert (http://twitter.com/jonschlinkert)
 
 Homepage: https://github.com/micromatch/is-glob
-
-Repository: git+https://github.com/micromatch/is-glob.git
 
 > The MIT License (MIT)
 > 
@@ -297,11 +273,7 @@ Repository: git+https://github.com/micromatch/is-glob.git
 
 License: ISC
 
-Author: [Isaac Z. Schlueter](http://blog.izs.me)
-
-Homepage: https://github.com/isaacs/minimatch#readme
-
-Repository: git://github.com/isaacs/minimatch.git
+Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me)
 
 > The ISC License
 > 
@@ -328,8 +300,6 @@ License: MIT
 Author: David Frank
 
 Homepage: https://github.com/bitinn/node-fetch
-
-Repository: git+https://github.com/bitinn/node-fetch.git
 
 > The MIT License (MIT)
 > 
@@ -361,10 +331,6 @@ License: MIT
 
 Author: [Sindre Sorhus](sindresorhus.com)
 
-Homepage: https://github.com/sindresorhus/open#readme
-
-Repository: git+https://github.com/sindresorhus/open.git
-
 > MIT License
 > 
 > Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
@@ -381,13 +347,11 @@ Repository: git+https://github.com/sindresorhus/open.git
 
 License: MIT
 
-Author: [Ivan Nikulin](https://github.com/inikulin)
+Author: Ivan Nikulin <ifaaan@gmail.com> (https://github.com/inikulin)
 
 Contributors: https://github.com/inikulin/parse5/graphs/contributors
 
 Homepage: https://github.com/inikulin/parse5
-
-Repository: git://github.com/inikulin/parse5.git
 
 
 -----------------------------------------
@@ -399,8 +363,6 @@ License: ISC
 Author: Vladimir Agafonkin
 
 Homepage: https://github.com/mapbox/pixelmatch#readme
-
-Repository: git+https://github.com/mapbox/pixelmatch.git
 
 > ISC License
 > 
@@ -427,8 +389,6 @@ License: MIT
 Contributors: Alexandre Paré, Gaurav Mali, Gusts Kaksis, Kuba Niegowski, Luke Page, Pietajan De Potter, Steven Sojka, liangzeng, Michael Vogt, Xin-Xin Wang, toriningen, Eugene Kulabuhov
 
 Homepage: https://github.com/lukeapage/pngjs
-
-Repository: git://github.com/lukeapage/pngjs2.git
 
 > pngjs2 original work Copyright (c) 2015 Luke Page & Original Contributors
 > pngjs derived work Copyright (c) 2012 Kuba Niegowski
@@ -457,11 +417,9 @@ Repository: git://github.com/lukeapage/pngjs2.git
 
 License: MIT
 
-Author: Andrey Sitnik
+Author: Andrey Sitnik <andrey@sitnik.ru>
 
 Homepage: https://postcss.org/
-
-Repository: git+https://github.com/postcss/postcss.git
 
 > The MIT License (MIT)
 > 
@@ -491,10 +449,6 @@ Repository: git+https://github.com/postcss/postcss.git
 License: MIT
 
 Author: [Terkel Gjervig](https://terkel.com)
-
-Homepage: https://github.com/terkelg/prompts#readme
-
-Repository: git+https://github.com/terkelg/prompts.git
 
 > MIT License
 > 
@@ -526,11 +480,9 @@ License: MIT
 
 Author: Rich Harris
 
-Contributors: Oskar Segersvärd, Bogdan Chadkin
+Contributors: Oskar Segersvärd <victorystick@gmail.com>, Bogdan Chadkin <trysound@yandex.ru>
 
 Homepage: https://github.com/rollup/rollup
-
-Repository: git+https://github.com/rollup/rollup.git
 
 > # Rollup core license
 > Rollup is released under the MIT license:
@@ -1123,8 +1075,6 @@ Author: Rich Harris
 
 Homepage: https://github.com/rollup/rollup-plugin-commonjs
 
-Repository: git+https://github.com/rollup/rollup-plugin-commonjs.git
-
 > The MIT License (MIT)
 > 
 > Copyright (c) 2017 [these people](https://github.com/rollup/rollup-plugin-commonjs/graphs/contributors)
@@ -1153,11 +1103,9 @@ Repository: git+https://github.com/rollup/rollup-plugin-commonjs.git
 
 License: MIT
 
-Author: Rich Harris
+Author: Rich Harris <richard.a.harris@gmail.com>
 
 Homepage: https://github.com/rollup/rollup-plugin-node-resolve#readme
-
-Repository: git+https://github.com/rollup/rollup-plugin-node-resolve.git
 
 
 -----------------------------------------
@@ -1165,10 +1113,6 @@ Repository: git+https://github.com/rollup/rollup-plugin-node-resolve.git
 ### `semver`
 
 License: ISC
-
-Homepage: https://github.com/npm/node-semver#readme
-
-Repository: git+https://github.com/npm/node-semver.git
 
 > The ISC License
 > 
@@ -1192,11 +1136,9 @@ Repository: git+https://github.com/npm/node-semver.git
 
 License: BSD-2-Clause
 
-Author: [Mihai Bazon](http://lisperator.net/)
+Author: Mihai Bazon <mihai.bazon@gmail.com> (http://lisperator.net/)
 
 Homepage: https://terser.org
-
-Repository: git+https://github.com/terser/terser.git
 
 > UglifyJS is released under the BSD license:
 > 
@@ -1234,11 +1176,9 @@ Repository: git+https://github.com/terser/terser.git
 
 License: MIT
 
-Author: [Einar Otto Stangvik](http://2x.io)
+Author: Einar Otto Stangvik <einaros@gmail.com> (http://2x.io)
 
 Homepage: https://github.com/websockets/ws
-
-Repository: git+https://github.com/websockets/ws.git
 
 > The MIT License (MIT)
 > 

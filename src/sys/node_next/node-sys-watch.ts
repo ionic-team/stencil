@@ -1,9 +1,10 @@
+import { CompilerSystem } from '../../declarations';
 import { createNodeSys } from './node-sys';
 import { normalizePath } from '@utils';
 import ts from 'typescript';
 
 
-export function createNodeSysWithWatch(prcs: NodeJS.Process) {
+export function createNodeSysWithWatch(prcs: NodeJS.Process): CompilerSystem {
   const sys = createNodeSys(prcs);
 
   sys.fileWatchTimeout = 80;

@@ -220,7 +220,7 @@ export class MockWindow {
       NodeListCstr = class extends MockNodeList {
         constructor() {
           super(ownerDocument, [], 0);
-          throw (new Error('Illegal constructor: cannot constructor'))
+          throw (new Error('Illegal constructor: cannot constructor'));
         }
       };
       return NodeListCstr;

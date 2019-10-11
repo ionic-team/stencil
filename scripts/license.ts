@@ -1,5 +1,8 @@
-const fs = require('fs-extra');
-const path = require('path');
+import fs from 'fs-extra';
+import { join } from 'path';
+import { BuildOptions, getOptions } from './utils/options';
+import { PackageData } from './utils/write-pkg-json';
+
 
 const bundledDeps = [
   'ansi-colors',
@@ -27,12 +30,26 @@ const bundledDeps = [
 ].sort();
 
 
-const licenseCorePath = path.join(__dirname, 'LICENSE.md');
-const licenseRootPath = path.join(__dirname, '..', 'LICENSE.md');
-const allLicenses = [];
-const depLicenses = bundledDeps.map(createBundledDepLicense);
+export function createLicense(rootDir: string) {
+  const opts = getOptions(rootDir);
+  const licenseCorePath = join(opts.scriptsDir, 'LICENSE.md');
+  const licenseRootPath = join(opts.rootDir, 'LICENSE.md');
 
-const output = `
+  const depLicenses = bundledDeps.map(moduleId => {
+    return createBundledDepLicense(opts, moduleId);
+  });
+
+  const licenses = depLicenses
+    .map(l => l.license)
+    .reduce((arr, l) => {
+      if (!arr.includes(l)) {
+        arr.push(l)
+      }
+      return arr;
+    }, [])
+    .sort();
+
+  const output = `
 
 # Stencil Core License
 
@@ -43,22 +60,24 @@ ${fs.readFileSync(licenseCorePath, 'utf8').trim()}
 
 The published Stencil distribution contains the following licenses:
 
-${allLicenses.sort().map(l => `    ` + l).join('\n')}
+${licenses.map(l => `    ` + l).join('\n')}
 
 
 -----------------------------------------
 
-${depLicenses.join('\n')}
+${depLicenses.map(l => l.content).join('\n')}
 
 `.trimLeft();
 
-fs.writeFileSync(licenseRootPath, output);
+  fs.writeFileSync(licenseRootPath, output);
+}
 
 
-function createBundledDepLicense(moduleId) {
-  const pkgJsonFile = path.join(__dirname, '..', 'node_modules', moduleId, 'package.json');
-  const pkgJson = fs.readJsonSync(pkgJsonFile);
-  const output = [];
+function createBundledDepLicense(opts: BuildOptions, moduleId: string) {
+  const pkgJsonFile = join(opts.nodeModulesDir, moduleId, 'package.json');
+  const pkgJson: PackageData = fs.readJsonSync(pkgJsonFile);
+  const output: string[] = [];
+  let license: string = null;
 
   output.push(
     `### \`${moduleId}\``,
@@ -66,9 +85,7 @@ function createBundledDepLicense(moduleId) {
   );
 
   if (typeof pkgJson.license === 'string') {
-    if (!allLicenses.includes(pkgJson.license)) {
-      allLicenses.push(pkgJson.license);
-    }
+    license = pkgJson.license;
     output.push(
       `License: ${pkgJson.license}`, ``
     );
@@ -78,9 +95,7 @@ function createBundledDepLicense(moduleId) {
     const bundledLicenses = [];
     pkgJson.licenses.forEach(l => {
       if (l.type) {
-        if (!allLicenses.includes(l.type)) {
-          allLicenses.push(l.type);
-        }
+        license = l.type;
         bundledLicenses.push(l.type);
       }
     });
@@ -112,13 +127,7 @@ function createBundledDepLicense(moduleId) {
     );
   }
 
-  if (pkgJson.repository && pkgJson.repository.url) {
-    output.push(
-      `Repository: ${pkgJson.repository.url}`, ``
-    );
-  }
-
-  const depLicense = getBundledDepLicenseContent(moduleId, pkgJson);
+  const depLicense = getBundledDepLicenseContent(opts, moduleId);
   if (typeof depLicense === 'string') {
     depLicense.trim().split('\n').forEach(ln => {
       output.push(`> ${ln}`);
@@ -127,10 +136,13 @@ function createBundledDepLicense(moduleId) {
 
   output.push(``, `-----------------------------------------`, ``);
 
-  return output.join('\n');
+  return {
+    content: output.join('\n'),
+    license
+  };
 }
 
-function getContributors(prop) {
+function getContributors(prop: any) {
   if (typeof prop === 'string') {
     return prop;
   }
@@ -145,7 +157,7 @@ function getContributors(prop) {
   }
 }
 
-function getAuthor(c) {
+function getAuthor(c: any) {
   if (typeof c === 'string') {
     return c;
   }
@@ -161,26 +173,21 @@ function getAuthor(c) {
   }
 }
 
-function getBundledDepLicenseContent(moduleId) {
-  const nodeModulesDir = path.join(__dirname, '..', 'node_modules');
-
+function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string) {
   try {
-    const licensePath = path.join(nodeModulesDir, moduleId, 'LICENSE');
+    const licensePath = join(opts.nodeModulesDir, moduleId, 'LICENSE');
     return fs.readFileSync(licensePath, 'utf8');
-
   } catch (e) {
 
     try {
-      const licensePath = path.join(nodeModulesDir, moduleId, 'LICENSE.md');
+      const licensePath = join(opts.nodeModulesDir, moduleId, 'LICENSE.md');
       return fs.readFileSync(licensePath, 'utf8');
 
     } catch (e) {
       try {
-        const licensePath = path.join(nodeModulesDir, moduleId, 'LICENSE-MIT');
+        const licensePath = join(opts.nodeModulesDir, moduleId, 'LICENSE-MIT');
         return fs.readFileSync(licensePath, 'utf8');
       } catch (e) {}
     }
   }
 }
-
-console.log(`📝  Build License`);

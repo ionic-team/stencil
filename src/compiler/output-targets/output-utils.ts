@@ -193,6 +193,7 @@ export const VALID_TYPES_NEXT = [
   COLLECTION_NEXT,
   CUSTOM_ELEMENT_NEXT,
   LAZY_NEXT,
+  WWW,
 ];
 
 export const GENERATED_DTS = 'components.d.ts';

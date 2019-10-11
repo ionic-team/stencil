@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { IS_LOCATION_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV } from './environment';
+import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from './environment';
 import { normalizePath } from '@utils';
 import path from 'path';
 
@@ -27,20 +27,22 @@ export const createStencilSys = () => {
   const access = async (p: string) => accessSync(p);
 
   const copyFile = async (src: string, dest: string) => {
-    src = normalize(src);
-    dest = normalize(dest);
-    const data = readFileSync(src);
-    writeFileSync(dest, data);
+    writeFileSync(dest, readFileSync(src));
     return true;
   };
 
-  const getCurrentDirectory = () => '/';
+  const getCurrentDirectory = () => {
+    if (IS_NODE_ENV) {
+      return global['process'].cwd();
+    }
+    return '/';
+  };
 
   const getCompilerExecutingPath = () => {
     if (IS_NODE_ENV) {
       return __filename;
     }
-    if (IS_WEB_WORKER_ENV && IS_LOCATION_ENV) {
+    if (IS_WEB_WORKER_ENV) {
       return location.href;
     }
     throw new Error('unable to find executing path');

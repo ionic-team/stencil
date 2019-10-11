@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
 
 
-export function taskHelp(process: NodeJS.Process, config: d.Config) {
+export function taskHelp(prcs: NodeJS.Process, config: d.Config) {
   const logger = config.logger;
-  const p = logger.dim((process.platform === 'win32') ? '>' : '$');
+  const p = logger.dim((prcs.platform === 'win32') ? '>' : '$');
 
   console.log(`
   ${logger.bold('Build:')} ${logger.dim('Build components for development or production.')}

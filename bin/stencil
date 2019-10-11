@@ -2,7 +2,7 @@
 'use strict';
 
 if (process.argv.indexOf('--next') > -1) {
-  require('../cli/index_next.js').run();
+  require('../cli/index.js').run();
 
 } else {
   try {
@@ -18,7 +18,7 @@ if (process.argv.indexOf('--next') > -1) {
     }
   } catch (e) {}
 
-  var cli = require('../cli/index.js');
+  var cli = require('../cli/index_legacy.js');
   var node = require('../sys/node/index.js');
   var sys = new node.NodeSystem();
   var logger = new node.NodeLogger();

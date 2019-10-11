@@ -15,7 +15,7 @@ export async function cli(opts: BuildOptions) {
   // copy public d.ts
   await fs.copyFile(
     join(inputDir, 'public.d.ts'),
-    join(opts.output.cliDir, 'index_next.d.ts')
+    join(opts.output.cliDir, 'index.d.ts')
   );
 
   // write package.json
@@ -30,7 +30,7 @@ export async function cli(opts: BuildOptions) {
     input: join(inputDir, 'index.js'),
     output: {
       format: 'cjs',
-      file: join(opts.output.cliDir, 'index_next.js'),
+      file: join(opts.output.cliDir, 'index.js'),
     },
     external: [
       'assert',

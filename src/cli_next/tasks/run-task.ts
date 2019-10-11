@@ -38,7 +38,7 @@ export async function runTask(prcs: NodeJS.Process, config: Config, task: TaskCo
       break;
 
     default:
-      config.logger.error(`Invalid stencil command, please see the options below:`);
+      config.logger.error(`${(prcs.platform !== 'win32') ? '❌ ' : ''} Invalid stencil command, please see the options below:`);
       taskHelp(prcs, config.logger);
       exit(1);
   }

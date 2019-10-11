@@ -14,7 +14,7 @@ export async function cli_legacy(opts: BuildOptions) {
     input: join(inputDir, 'index.js'),
     output: {
       format: 'cjs',
-      file: join(opts.output.cliDir, 'index.js'),
+      file: join(opts.output.cliDir, 'index_legacy.js'),
     },
     external: [
       'assert',

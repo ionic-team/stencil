@@ -12,7 +12,7 @@ module.exports = {
     'json'
   ],
   moduleNameMapper: {
-    "^@stencil/core/cli$": path.join(rootDir, 'cli', 'index.js'),
+    "^@stencil/core/cli$": path.join(rootDir, 'cli', 'index_legacy.js'),
     "^@stencil/core/compiler$": path.join(rootDir, 'compiler', 'index.js'),
     "^@stencil/core/internal/app-data$": path.join(internalDir, 'app-data', 'index.js'),
     "^@stencil/core/internal/platform$": path.join(internalDir, 'testing', 'index.js'),

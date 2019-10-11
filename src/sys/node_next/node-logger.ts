@@ -33,7 +33,7 @@ export class NodeLogger implements Logger {
 
   info(...msg: any[]) {
     if (this.shouldLog('info')) {
-      const lines = wordWrap(msg, getColumns());
+      const lines = wordWrap(msg, getColumns(this.prcs));
       this.infoPrefix(lines);
       console.log(lines.join('\n'));
     }
@@ -55,7 +55,7 @@ export class NodeLogger implements Logger {
 
   warn(...msg: any[]) {
     if (this.shouldLog('warn')) {
-      const lines = wordWrap(msg, getColumns());
+      const lines = wordWrap(msg, getColumns(this.prcs));
       this.warnPrefix(lines);
       console.warn('\n' + lines.join('\n') + '\n');
     }
@@ -81,7 +81,7 @@ export class NodeLogger implements Logger {
     }
 
     if (this.shouldLog('error')) {
-      const lines = wordWrap(msg, getColumns());
+      const lines = wordWrap(msg, getColumns(this.prcs));
       this.errorPrefix(lines);
       console.error('\n' + lines.join('\n') + '\n');
     }
@@ -98,7 +98,7 @@ export class NodeLogger implements Logger {
   debug(...msg: any[]) {
     if (this.shouldLog('debug')) {
       msg.push(this.dim(` MEM: ${(this.prcs.memoryUsage().rss / 1000000).toFixed(1)}MB`));
-      const lines = wordWrap(msg, getColumns());
+      const lines = wordWrap(msg, getColumns(this.prcs));
       this.debugPrefix(lines);
       console.log(lines.join('\n'));
     }
@@ -124,14 +124,14 @@ export class NodeLogger implements Logger {
     if (debug) {
       if (this.shouldLog('debug')) {
         msg.push(this.dim(` MEM: ${(this.prcs.memoryUsage().rss / 1000000).toFixed(1)}MB`));
-        const lines = wordWrap(msg, getColumns());
+        const lines = wordWrap(msg, getColumns(this.prcs));
         this.debugPrefix(lines);
         console.log(lines.join('\n'));
         this.queueWriteLog('D', [`${startMsg} ...`]);
       }
 
     } else {
-      const lines = wordWrap(msg, getColumns());
+      const lines = wordWrap(msg, getColumns(this.prcs));
       this.infoPrefix(lines);
       console.log(lines.join('\n'));
       this.queueWriteLog('I', [`${startMsg} ...`]);
@@ -157,14 +157,14 @@ export class NodeLogger implements Logger {
       if (this.shouldLog('debug')) {
         const m = [msg];
         m.push(this.dim(` MEM: ${(this.prcs.memoryUsage().rss / 1000000).toFixed(1)}MB`));
-        const lines = wordWrap(m, getColumns());
+        const lines = wordWrap(m, getColumns(this.prcs));
         this.debugPrefix(lines);
         console.log(lines.join('\n'));
       }
       this.queueWriteLog('D', [`${finishMsg} ${timeSuffix}`]);
 
     } else {
-      const lines = wordWrap([msg], getColumns());
+      const lines = wordWrap([msg], getColumns(this.prcs));
       this.infoPrefix(lines);
       console.log(lines.join('\n'));
       this.queueWriteLog('I', [`${finishMsg} ${timeSuffix}`]);
@@ -285,7 +285,7 @@ export class NodeLogger implements Logger {
   }
 
   printDiagnostic(diagnostic: Diagnostic, cwd?: string) {
-    const outputLines = wordWrap([diagnostic.messageText], getColumns());
+    const outputLines = wordWrap([diagnostic.messageText], getColumns(this.prcs));
 
     let header = '';
 
@@ -387,7 +387,7 @@ export class NodeLogger implements Logger {
 
     if (diagnostic.debugText != null && this.level === 'debug') {
       outputLines.push(diagnostic.debugText);
-      this.debugPrefix(wordWrap([diagnostic.debugText], getColumns()));
+      this.debugPrefix(wordWrap([diagnostic.debugText], getColumns(this.prcs)));
     }
 
     return outputLines;
@@ -521,8 +521,8 @@ class CmdTimeSpan {
 const LOG_LEVELS = ['debug', 'info', 'warn', 'error'];
 
 
-function getColumns() {
-  const terminalWidth = (this.prcs.stdout && (this.prcs.stdout as any).columns) || 80;
+function getColumns(prcs: NodeJS.Process) {
+  const terminalWidth = (prcs.stdout && (prcs.stdout as any).columns) || 80;
   return Math.max(Math.min(MAX_COLUMNS, terminalWidth), MIN_COLUMNS);
 }
 

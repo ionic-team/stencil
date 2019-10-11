@@ -25,7 +25,7 @@ export async function run(opts: RunCliOptions = {}) {
     const validated = await loadConfig({
       sys_next: opts.sys,
       logger: opts.logger,
-      flags: parseFlags(opts.process),
+      flags: parseFlags(opts.process.argv.slice(2)),
     });
 
     if (validated.diagnostics.length > 0) {
@@ -84,4 +84,9 @@ function setupNodeProcess(prcs: NodeJS.Process, logger: Logger) {
   });
 }
 
-export { createNodeLogger as createLogger, createNodeSysWithWatch as createSys, runTask };
+export {
+  createNodeLogger as createLogger,
+  createNodeSysWithWatch as createSys,
+  parseFlags,
+  runTask
+};

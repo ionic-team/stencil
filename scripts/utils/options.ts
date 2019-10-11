@@ -1,8 +1,10 @@
 import { join } from 'path';
 import { getVermoji } from './vermoji';
+import { PackageData } from './write-pkg-json';
+import { readJSONSync } from 'fs-extra';
 
 
-export function getOptions(rootDir: string, inputOpts: BuildOptions) {
+export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
   const srcDir = join(rootDir, 'src');
   const packageJsonPath = join(rootDir, 'package.json');
   const changelogPath = join(rootDir, 'CHANGELOG.md');
@@ -32,6 +34,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions) {
       sysNodeDir: join(rootDir, 'sys', 'node'),
       testingDir: join(rootDir, 'testing'),
     },
+    packageJson: readJSONSync(packageJsonPath),
     replaceData: null,
     version: null,
     buildId: null,
@@ -142,6 +145,7 @@ export interface BuildOptions {
   isCI?: boolean,
   vermoji?: string;
   packageJsonPath?: string;
+  packageJson?: PackageData;
   changelogPath?: string;
   tag?: string;
   typescriptVersion?: string;

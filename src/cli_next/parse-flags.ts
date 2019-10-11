@@ -1,8 +1,8 @@
-import * as d from '../declarations';
+import { ConfigFlags } from '../declarations';
 import { dashToPascalCase } from '@utils';
 
 
-export function parseFlags(prcs: NodeJS.Process): d.ConfigFlags {
+export function parseFlags(args: string[]): ConfigFlags {
   const flags: any = {
     task: null,
     args: [],
@@ -11,13 +11,13 @@ export function parseFlags(prcs: NodeJS.Process): d.ConfigFlags {
   };
 
   // cmd line has more priority over npm scripts cmd
-  flags.args = prcs.argv.slice(2);
+  flags.args = args.slice();
   if (flags.args.length > 0 && flags.args[0] && !flags.args[0].startsWith('-')) {
     flags.task = flags.args[0];
   }
   parseArgs(flags, flags.args, flags.knownArgs);
 
-  const npmScriptCmdArgs = getNpmScriptArgs(prcs);
+  const npmScriptCmdArgs = getNpmScriptArgs();
   parseArgs(flags, npmScriptCmdArgs, flags.knownArgs);
 
   npmScriptCmdArgs.forEach(npmArg => {
@@ -41,7 +41,7 @@ export function parseFlags(prcs: NodeJS.Process): d.ConfigFlags {
 }
 
 
-export function parseArgs(flags: any, args: string[], knownArgs: string[]): d.ConfigFlags {
+function parseArgs(flags: any, args: string[], knownArgs: string[]) {
   ARG_OPTS.boolean.forEach(booleanName => {
 
     const alias = (ARG_OPTS.alias as any)[booleanName];
@@ -170,8 +170,6 @@ export function parseArgs(flags: any, args: string[], knownArgs: string[]): d.Co
       }
     }
   });
-
-  return flags;
 }
 
 
@@ -236,13 +234,13 @@ const ARG_OPTS = {
 };
 
 
-export function getNpmScriptArgs(prcs: NodeJS.Process) {
+function getNpmScriptArgs() {
   // process.env.npm_config_argv
   // {"remain":["4444"],"cooked":["run","serve","--port","4444"],"original":["run","serve","--port","4444"]}
   let args: string[] = [];
   try {
-    if (prcs.env) {
-      const npmConfigArgs = prcs.env.npm_config_argv;
+    if (typeof process !== 'undefined' &&  process.env) {
+      const npmConfigArgs = process.env.npm_config_argv;
       if (npmConfigArgs) {
         args = (JSON.parse(npmConfigArgs).original as string[]);
         if (args[0] === 'run') {
