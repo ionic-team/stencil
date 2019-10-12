@@ -64,9 +64,11 @@ export function createNodeSys(prcs: NodeJS.Process) {
     },
     readdirSync(p) {
       try {
-        return fs.readdirSync(p);
+        return fs.readdirSync(p).map(f => {
+          return normalizePath(path.join(p, f));
+        });
       } catch (e) {}
-      return undefined;
+      return [];
     },
     readFile(p) {
       return new Promise(resolve => {

@@ -1,15 +1,6 @@
 import * as d from '../../declarations';
 
 
-export const getLogger = (config: d.Config) => {
-  const logger = createLogger();
-  if (config.logger) {
-    Object.assign(logger, config.logger);
-  }
-  return logger;
-};
-
-
 export const createLogger = () => {
   const logger: d.Logger = {
     level: '',

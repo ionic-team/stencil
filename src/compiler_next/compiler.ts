@@ -5,7 +5,7 @@ import { createWatchBuild } from './build/watch-build';
 import { getConfig } from './sys/config';
 import { inMemoryFs } from './sys/in-memory-fs';
 import { patchFs } from './sys/fs-patch';
-import { patchTypescript } from './sys/typescript-patch';
+import { patchTypescript } from './sys/typescript/typescript-patch';
 
 
 export const createCompiler = async (config: Config) => {

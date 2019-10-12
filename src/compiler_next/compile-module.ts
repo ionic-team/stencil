@@ -2,7 +2,7 @@ import { CompileOptions, CompileResults } from '../declarations';
 import { catchError } from '@utils';
 import { getCompileConfig, getCompileOptions, getTransformOptions } from './config/compile-module-options';
 import { getPublicCompilerMeta } from '../compiler/transformers/add-component-meta-static';
-import { patchTypescript } from './sys/typescript-patch';
+import { patchTypescript } from './sys/typescript/typescript-patch';
 import { transformCssToEsm } from '../compiler/style/css-to-esm';
 import { transpileModule } from '../compiler/transpile/transpile-module';
 

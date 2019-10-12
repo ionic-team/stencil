@@ -1,13 +1,15 @@
 import * as d from '../../declarations';
 import { createStencilSys } from './stencil-sys';
-import { getLogger } from './logger';
+import { createLogger } from './logger';
 import path from 'path';
 
 
 export const getConfig = (userConfig: d.Config) => {
   const config = Object.assign(userConfig, {});
 
-  config.logger = getLogger(config);
+  if (!config.logger) {
+    config.logger = createLogger();
+  }
 
   if (!config.sys_next) {
     config.sys_next = createStencilSys();

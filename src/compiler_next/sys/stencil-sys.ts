@@ -3,7 +3,9 @@ import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from './environment';
 import { normalizePath } from '@utils';
 import path from 'path';
 
-
+/**
+ * In-memory Stencil System, used by the browser
+ */
 export const createStencilSys = () => {
   const items = new Map<string, FsItem>();
 

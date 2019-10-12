@@ -2,7 +2,7 @@ import { buildError, catchError, normalizePath } from '@utils';
 import { CompilerSystem, Config, Diagnostic } from '../../declarations';
 import { createLogger } from '../sys/logger';
 import { createStencilSys } from '../sys/stencil-sys';
-import { getTypescript } from '../sys/typescript-patch';
+import { loadTypescript } from '../sys/typescript/typescript-load';
 import { IS_NODE_ENV } from '../sys/environment';
 import { validateConfig } from './validate-config';
 import path from 'path';
@@ -208,7 +208,7 @@ const evaluateConfigFile = (sys: CompilerSystem, diagnostics: Diagnostic[], conf
 const transpileTypedConfig = (diagnostics: Diagnostic[], sourceText: string, filePath: string) => {
   // let's transpile an awesome stencil.config.ts file into
   // a boring stencil.config.js file
-  const ts = getTypescript(diagnostics);
+  const ts = loadTypescript(diagnostics);
   if (diagnostics.length > 0) {
     return sourceText;
   }

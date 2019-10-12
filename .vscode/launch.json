@@ -94,6 +94,9 @@
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
+        "--watch",
+        "--next",
+        "--debug",
         "--dev",
         "--config",
         "${workspaceFolder}/test/hello-vdom/stencil.config.ts"

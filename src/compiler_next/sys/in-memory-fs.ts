@@ -355,11 +355,18 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
       await ensureDir(filePath, true);
 
     } else if (opts != null && opts.immediateWrite === true) {
-
-      // If this is an immediate write then write the file
-      // and do not add it to the queue
-      await ensureDir(filePath, false);
-      await sys.writeFile(filePath, item.fileText);
+      // if this is an immediate write then write the file
+      // now and do not add it to the queue
+      if (results.changedContent || opts.useCache !== true) {
+        // writing the file to disk is a big deal and kicks off fs watchers
+        // so let's just double check that the file is actually different first
+        const existingFile = await sys.readFile(filePath);
+        results.changedContent = (existingFile !== item.fileText);
+        if (results.changedContent) {
+          await ensureDir(filePath, false);
+          await sys.writeFile(filePath, item.fileText);
+        }
+      }
 
     } else {
       // we want to write this to disk (eventually)

@@ -1,4 +1,4 @@
-import { Config } from '../../dist';
+import { Config } from '../../internal';
 
 // https://stenciljs.com/docs/config
 
