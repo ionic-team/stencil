@@ -20,9 +20,46 @@ export const validateWww = (config: d.Config, userOutputs: d.OutputTargetWww[], 
     err.messageText = `You need at least one "www" output target configured in your stencil.config.ts, when the "--prerender" flag is used`;
   }
 
-  return userOutputs.map(o => {
-    return validateWwwOutputTarget(config, o, diagnostics);
-  });
+  return userOutputs.reduce((outputs, o) => {
+    const outputTarget = validateWwwOutputTarget(config, o, diagnostics);
+
+    // Add dist-lazy output target
+    const buildDir = outputTarget.buildDir;
+    outputs.push({
+      type: DIST_LAZY,
+      esmDir: buildDir,
+      systemDir: config.buildEs5 ? buildDir : undefined,
+      systemLoaderFile: config.buildEs5 ? config.sys.path.join(buildDir, `${config.fsNamespace}.js`) : undefined,
+      polyfills: outputTarget.polyfills,
+      isBrowserBuild: true,
+    });
+
+    // Copy for dist
+    outputs.push({
+      type: COPY,
+      dir: buildDir,
+      copyAssets: 'dist'
+    });
+
+    // Copy for www
+    outputs.push({
+      type: COPY,
+      dir: outputTarget.appDir,
+      copy: validateCopy(outputTarget.copy, [
+        ...(config.copy || []),
+        { src: 'assets', warn: false },
+        { src: 'manifest.json', warn: false },
+      ]),
+    });
+
+    // Generate global style with original name
+    outputs.push({
+      type: DIST_GLOBAL_STYLES,
+      file: path.join(buildDir, `${config.fsNamespace}.css`),
+    });
+
+    return outputs;
+  }, []);
 };
 
 
@@ -74,41 +111,6 @@ const validateWwwOutputTarget = (config: d.Config, outputTarget: d.OutputTargetW
     outputTarget.polyfills = true;
   }
   outputTarget.polyfills = !!outputTarget.polyfills;
-
-  // Add dist-lazy output target
-  const buildDir = outputTarget.buildDir;
-  config.outputTargets.push({
-    type: DIST_LAZY,
-    esmDir: buildDir,
-    systemDir: config.buildEs5 ? buildDir : undefined,
-    systemLoaderFile: config.buildEs5 ? config.sys.path.join(buildDir, `${config.fsNamespace}.js`) : undefined,
-    polyfills: outputTarget.polyfills,
-    isBrowserBuild: true,
-  });
-
-  // Copy for dist
-  config.outputTargets.push({
-    type: COPY,
-    dir: buildDir,
-    copyAssets: 'dist'
-  });
-
-  // Copy for www
-  config.outputTargets.push({
-    type: COPY,
-    dir: outputTarget.appDir,
-    copy: validateCopy(outputTarget.copy, [
-      ...(config.copy || []),
-      { src: 'assets', warn: false },
-      { src: 'manifest.json', warn: false },
-    ]),
-  });
-
-  // Generate global style with original name
-  config.outputTargets.push({
-    type: DIST_GLOBAL_STYLES,
-    file: path.join(buildDir, `${config.fsNamespace}.css`),
-  });
 
   return outputTarget;
 };

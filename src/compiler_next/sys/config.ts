@@ -24,9 +24,11 @@ export const getConfig = (userConfig: d.Config) => {
   }
   config.logger.level = config.logLevel;
 
-  // old way
-  config.sys = config.sys || {};
-  config.sys.path = path;
+  if (!config.sys) {
+    // old way
+    config.sys = config.sys || {};
+    config.sys.path = path;
+  }
 
   return config;
 };

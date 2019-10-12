@@ -173,10 +173,10 @@ function parseArgs(flags: any, args: string[], knownArgs: string[]) {
 }
 
 
-function configCase(prop: string) {
+const configCase = (prop: string) => {
   prop = dashToPascalCase(prop);
   return prop.charAt(0).toLowerCase() + prop.substr(1);
-}
+};
 
 
 const ARG_OPTS = {
