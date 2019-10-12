@@ -18,8 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@stencil/core/testing": ["../../src/testing/index.ts"],
-      "@stencil/core": ["../../dist"],
-      "@stencil/core/compiler": ["../../dist/compiler"],
+      "@stencil/core": ["../../internal"],
+      "@stencil/core/compiler": ["../../compiler"],
       "@stencil/core/internal": ["../../internal"]
     }
   },
