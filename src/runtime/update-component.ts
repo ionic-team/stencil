@@ -25,7 +25,6 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   const ancestorComponent = hostRef.$ancestorComponent$;
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   const update = () => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
-  const rc = elm['s-rc'];
   attachToAncestor(hostRef, ancestorComponent);
 
   let promise: Promise<void>;
@@ -55,14 +54,6 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     promise = then(promise, () => safeCall(instance, 'componentWillRender'));
   }
 
-  if (BUILD.asyncLoading && rc) {
-    // ok, so turns out there are some child host elements
-    // waiting on this parent element to load
-    // let's fire off all update callbacks waiting
-    rc.forEach(cb => cb());
-    elm['s-rc'] = undefined;
-  }
-
   endSchedule();
 
   // there is no ancestorc omponent or the ancestor component
@@ -77,6 +68,7 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
 const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, instance: any, isInitialLoad: boolean) => {
   // updateComponent
   const endUpdate = createTime('update', cmpMeta.$tagName$);
+  const rc = elm['s-rc'];
   if (BUILD.style && isInitialLoad) {
     // DOM WRITE!
     attachStyles(elm, cmpMeta, hostRef.$modeName$);
@@ -135,6 +127,14 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
   if (BUILD.updatable || BUILD.lazyLoad) {
     hostRef.$flags$ |= HOST_FLAGS.hasRendered;
   }
+  if (BUILD.asyncLoading && rc) {
+    // ok, so turns out there are some child host elements
+    // waiting on this parent element to load
+    // let's fire off all update callbacks waiting
+    rc.forEach(cb => cb());
+    elm['s-rc'] = undefined;
+  }
+
   endRender();
   endUpdate();
 

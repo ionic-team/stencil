@@ -3,9 +3,7 @@ import * as d from '../../declarations';
 export const cmpModules = new Map<string, {[exportName: string]: d.ComponentConstructor}>();
 
 export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef, _hmrVersionId?: string): any => {
-  return new Promise(resolve => {
-    resolve(cmpModules.get(cmpMeta.$tagName$));
-  });
+  return cmpModules.get(cmpMeta.$tagName$);
 };
 
 export const isMemberInElement = (elm: any, memberName: string) => {

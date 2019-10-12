@@ -41,16 +41,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   }
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
     const styles = doc.querySelectorAll('style[s-id]');
-    let globalStyles = '';
-    let i = 0;
-    for (; i < styles.length; i++) {
-      globalStyles += styles[i].innerHTML;
-    }
-    for (i = 0; i < styles.length; i++) {
+    for (let i = 0; i < styles.length; i++) {
       const styleElm = styles[i];
       registerStyle(
         styleElm.getAttribute(HYDRATE_ID),
-        globalStyles + convertScopedToShadow(styleElm.innerHTML),
+        convertScopedToShadow(styleElm.innerHTML),
         true,
       );
     }

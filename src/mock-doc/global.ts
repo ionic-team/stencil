@@ -93,6 +93,7 @@ const WINDOW_PROPS = [
   'Event',
   'Element',
   'HTMLElement',
+  'Node',
   'NodeList',
   'KeyboardEvent',
   'MouseEvent'
