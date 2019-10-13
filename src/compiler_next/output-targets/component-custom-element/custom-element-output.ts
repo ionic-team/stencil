@@ -12,7 +12,7 @@ import path from 'path';
 import ts from 'typescript';
 
 
-export const customElementOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram, outputTargets: d.OutputTargetCustomElementNext[]) => {
+export const customElementOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram, outputTargets: d.OutputTargetDistCustomElement[]) => {
   const timespan = buildCtx.createTimeSpan(`generate custom element started`, true);
 
   try {

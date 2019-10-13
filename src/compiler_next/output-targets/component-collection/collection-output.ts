@@ -2,8 +2,8 @@ import * as d from '../../../declarations';
 import { catchError, normalizePath } from '@utils';
 import { convertDecoratorsToStatic } from '../../../compiler/transformers/decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../../../compiler/transformers/static-to-meta/visitor';
+import { isOutputTargetDistCollection } from '../../../compiler/output-targets/output-utils';
 import { STENCIL_CORE_ID } from '../../bundle/entry-alias-ids';
-import { isOutputTargetCollectionNext } from '../../../compiler/output-targets/output-utils';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import path from 'path';
 import ts from 'typescript';
@@ -15,7 +15,7 @@ export const collectionOutput = async (config: d.Config, compilerCtx: d.Compiler
   try {
     const tsTypeChecker = tsBuilder.getProgram().getTypeChecker();
 
-    const collectionOutputTargets = config.outputTargets.filter(isOutputTargetCollectionNext);
+    const collectionOutputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
 
     // always "emit" the collection, even if there are no collection output targets
     tsBuilder.emit(

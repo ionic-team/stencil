@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { customElementOutput } from './component-custom-element/custom-element-output';
-import { isOutputTargetCustomElementNext, isOutputTargetLazyNext } from '../../compiler/output-targets/output-utils';
+import { isOutputTargetDistCustomElement, isOutputTargetDistLazy } from '../../compiler/output-targets/output-utils';
 import { lazyOutput } from './component-lazy/lazy-output';
 import ts from 'typescript';
 
@@ -10,14 +10,14 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
 
   const outputPromises: Promise<any>[] = [];
 
-  const customElementOutputTargets = config.outputTargets.filter(isOutputTargetCustomElementNext);
+  const customElementOutputTargets = config.outputTargets.filter(isOutputTargetDistCustomElement);
   if (customElementOutputTargets.length > 0) {
     outputPromises.push(
       customElementOutput(config, compilerCtx, buildCtx, tsBuilder, customElementOutputTargets)
     );
   }
 
-  const lazyOutputTargets = config.outputTargets.filter(isOutputTargetLazyNext);
+  const lazyOutputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
   if (lazyOutputTargets.length > 0) {
     outputPromises.push(
       lazyOutput(config, compilerCtx, buildCtx, tsBuilder, lazyOutputTargets)

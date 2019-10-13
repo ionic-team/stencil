@@ -12,7 +12,7 @@ export class ReplOutputs {
   @Prop() selectedTarget: string;
   @State() selectedOutputName: string;
   @Event() targetUpdate: EventEmitter<string>;
-  outputTargets = ['collection-next', 'custom-element-next', 'lazy-next'];
+  outputTargets = ['dist-collection', 'dist-custom-element', 'dist-lazy'];
 
   render() {
     const outputs = this.outputs.filter(o => o.name.endsWith('.js'));

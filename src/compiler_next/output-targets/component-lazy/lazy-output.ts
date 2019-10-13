@@ -13,7 +13,7 @@ import { updateStencilCoreImports } from '../../../compiler/transformers/update-
 import ts from 'typescript';
 
 
-export const lazyOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram, outputTargets: d.OutputTargetLazyNext[]) => {
+export const lazyOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram, outputTargets: d.OutputTargetDistLazy[]) => {
   const timespan = buildCtx.createTimeSpan(`generate lazy started`, true);
 
   try {

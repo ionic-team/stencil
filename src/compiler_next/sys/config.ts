@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
-import { createStencilSys } from './stencil-sys';
 import { createLogger } from './logger';
+import { createStencilSys } from './stencil-sys';
 import path from 'path';
 
 
@@ -24,11 +24,9 @@ export const getConfig = (userConfig: d.Config) => {
   }
   config.logger.level = config.logLevel;
 
-  if (!config.sys) {
-    // old way
-    config.sys = config.sys || {};
-    config.sys.path = path;
-  }
+  // old way
+  config.sys = config.sys || {};
+  config.sys.path = path;
 
   return config;
 };

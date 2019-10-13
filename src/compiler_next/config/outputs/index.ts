@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { buildError } from '@utils';
-import { VALID_TYPES_NEXT, isOutputTargetCollectionNext, isOutputTargetCustomElementNext, isOutputTargetLazyNext, isOutputTargetWww } from '../../../compiler/output-targets/output-utils';
+import { VALID_TYPES_NEXT, isOutputTargetDistCollection, isOutputTargetDistCustomElement, isOutputTargetDistLazy, isOutputTargetWww } from '../../../compiler/output-targets/output-utils';
 import { validateCollection } from './validate-collection';
 import { validateCustomElement } from './validate-custom-element';
 import { validateLazy } from './validate-lazy';
@@ -18,9 +18,9 @@ export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnosti
   });
 
   config.outputTargets = [
-    ...validateCollection(config, userOutputs.filter(isOutputTargetCollectionNext), diagnostics),
-    ...validateCustomElement(config, userOutputs.filter(isOutputTargetCustomElementNext), diagnostics),
-    ...validateLazy(config, userOutputs.filter(isOutputTargetLazyNext), diagnostics),
+    ...validateCollection(config, userOutputs.filter(isOutputTargetDistCollection), diagnostics),
+    ...validateCustomElement(config, userOutputs.filter(isOutputTargetDistCustomElement), diagnostics),
+    ...validateLazy(config, userOutputs.filter(isOutputTargetDistLazy), diagnostics),
     ...validateWww(config, userOutputs.filter(isOutputTargetWww), diagnostics),
   ];
 }

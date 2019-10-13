@@ -1,10 +1,10 @@
 import * as d from '../../../declarations';
-import { COLLECTION_NEXT, isOutputTargetCollectionNext } from '../../../compiler/output-targets/output-utils';
+import { DIST_COLLECTION, isOutputTargetDistCollection } from '../../../compiler/output-targets/output-utils';
 import { buildError, normalizePath } from '@utils';
 import path from 'path';
 
 
-export const validateCollection = (config: d.Config, userOutputs: d.OutputTargetCollectionNext[], diagnostics: d.Diagnostic[]) => {
+export const validateCollection = (config: d.Config, userOutputs: d.OutputTargetDistCollection[], diagnostics: d.Diagnostic[]) => {
   let outputs = userOutputs.map(o => {
     const output = Object.assign({}, o);
     if (typeof output.dir !== 'string') {
@@ -19,7 +19,7 @@ export const validateCollection = (config: d.Config, userOutputs: d.OutputTarget
 
   if (outputs.length > 1) {
     const err = buildError(diagnostics);
-    err.messageText = `Only one "${COLLECTION_NEXT}" output target can be added to the stencil config.`;
+    err.messageText = `Only one "${DIST_COLLECTION}" output target can be added to the stencil config.`;
     outputs = [outputs[0]];
   }
 
@@ -28,7 +28,7 @@ export const validateCollection = (config: d.Config, userOutputs: d.OutputTarget
 
 
 export const getCollectionDistDir = (config: d.Config) => {
-  const collectionOutputTarget = config.outputTargets.find(isOutputTargetCollectionNext);
+  const collectionOutputTarget = config.outputTargets.find(isOutputTargetDistCollection);
   if (collectionOutputTarget) {
     return normalizePath(collectionOutputTarget.dir);
   }

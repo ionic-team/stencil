@@ -133,6 +133,7 @@ export interface OutputTargetDistTypes extends OutputTargetBase {
 export interface OutputTargetDistLazy extends OutputTargetBase {
   type: 'dist-lazy';
 
+  dir?: string;
   esmDir?: string;
   esmEs5Dir?: string;
   systemDir?: string;
@@ -231,27 +232,9 @@ export interface OutputTargetBaseNext {
   dir?: string;
 }
 
-export interface OutputTargetCollectionNext extends OutputTargetBaseNext {
-  type: 'collection-next';
+export interface OutputTargetDistCustomElement extends OutputTargetBaseNext {
+  type: 'dist-custom-element';
 }
-
-export interface OutputTargetCustomElementNext extends OutputTargetBaseNext {
-  type: 'custom-element-next';
-}
-
-export interface OutputTargetLazyNext extends OutputTargetBaseNext {
-  type: 'lazy-next';
-}
-
-// export interface OutputTargetDistModule extends OutputTargetBase {
-//   type: 'experimental-module';
-
-//   dir?: string;
-//   externalRuntime?: boolean;
-//   empty?: boolean;
-//   copy?: CopyTask[];
-// }
-
 
 export interface OutputTargetBase {
   type: string;
@@ -268,6 +251,7 @@ export type OutputTarget =
  | OutputTargetCustom
  | OutputTargetDist
  | OutputTargetDistCollection
+ | OutputTargetDistCustomElement
  | OutputTargetDistLazy
  | OutputTargetDistGlobalStyles
  | OutputTargetDistLazyLoader
@@ -279,8 +263,4 @@ export type OutputTarget =
  | OutputTargetWww
  | OutputTargetHydrate
  | OutputTargetStats
- | OutputTargetDistTypes
-
- | OutputTargetCollectionNext
- | OutputTargetCustomElementNext
- | OutputTargetLazyNext;
+ | OutputTargetDistTypes;

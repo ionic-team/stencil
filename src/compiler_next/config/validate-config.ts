@@ -14,11 +14,9 @@ export const validateConfig = (userConfig?: Config) => {
   const config = Object.assign({}, userConfig || {}); // not positive it's json safe
   const diagnostics: Diagnostic[] = [];
 
-  if (!config.sys) {
-    // old way
-    config.sys = config.sys || {};
-    config.sys.path = path;
-  }
+  // old way
+  config.sys = config.sys || {};
+  config.sys.path = path;
 
   // copy flags (we know it'll be json safe)
   config.flags = JSON.parse(JSON.stringify(config.flags || {}));

@@ -3,7 +3,7 @@ import { normalizePath } from '@utils';
 import path from 'path';
 
 
-export function validateCustomElement(config: d.Config, userOutputs: d.OutputTargetCustomElementNext[], _diagnostics: d.Diagnostic[]) {
+export function validateCustomElement(config: d.Config, userOutputs: d.OutputTargetDistCustomElement[], _diagnostics: d.Diagnostic[]) {
   return userOutputs.map(o => {
     const output = Object.assign({}, o);
     if (typeof output.dir !== 'string') {
