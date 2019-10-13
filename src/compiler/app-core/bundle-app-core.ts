@@ -32,7 +32,7 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
 
       input: bundleAppOptions.inputs,
       plugins: [
-        coreResolvePlugin(config, 'client'),
+        coreResolvePlugin(config.sys_next, 'client'),
         stencilExternalRuntimePlugin(bundleAppOptions.externalRuntime),
         loaderPlugin({
           '@stencil/core': DEFAULT_CORE,

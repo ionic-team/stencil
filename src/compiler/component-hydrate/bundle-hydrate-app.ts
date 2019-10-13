@@ -20,7 +20,7 @@ export const bundleHydrateApp = async (config: d.Config, compilerCtx: d.Compiler
       input: '@app-entry',
       inlineDynamicImports: true,
       plugins: [
-        coreResolvePlugin(config, 'hydrate'),
+        coreResolvePlugin(config.sys_next, 'hydrate'),
         loaderPlugin({
           '@app-entry': appEntryCode
         }),

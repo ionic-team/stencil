@@ -27,6 +27,7 @@ export const validateWww = (config: d.Config, userOutputs: d.OutputTargetWww[], 
     const buildDir = outputTarget.buildDir;
     outputs.push({
       type: DIST_LAZY,
+      dir: buildDir,
       esmDir: buildDir,
       systemDir: config.buildEs5 ? buildDir : undefined,
       systemLoaderFile: config.buildEs5 ? config.sys.path.join(buildDir, `${config.fsNamespace}.js`) : undefined,

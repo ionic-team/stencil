@@ -586,7 +586,7 @@ describe(`in-memory-fs`, () => {
 
     const content = await fs.readFile(`/dir/file2.js`);
     expect(content).toBe(`content`);
-    expect(sys.diskReads).toBe(0);
+    expect(sys.diskReads).toBe(1);
 
     let i = await fs.commit();
     expect(sys.diskWrites).toBe(3);

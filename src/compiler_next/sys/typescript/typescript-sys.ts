@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { dependencies, getRemoteDependencyUrl } from '../dependencies';
-import { fetchUrlSync } from '../resolve-module';
+import { fetchUrlSync } from '../resolve/resolve-module';
 import { IS_WEB_WORKER_ENV } from '../environment';
 import path from 'path';
 import ts from 'typescript';

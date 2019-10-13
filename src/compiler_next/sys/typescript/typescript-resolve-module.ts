@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { compilerBuild } from '../../../version';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../environment';
-import { resolveModuleIdSync, resolveRemotePackageJsonSync } from '../resolve-module';
+import { resolveModuleIdSync, resolveRemotePackageJsonSync } from '../resolve/resolve-module';
 import ts from 'typescript';
 
 

@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { appDataPlugin } from './app-data-plugin';
 import { BundleOptions } from './bundle-interface';
 import { coreResolvePlugin } from './core-resolve-plugin';
-import { createCustomResolverAsync } from '../sys/resolve-module';
+import { createCustomResolverAsync } from '../sys/resolve/resolve-module';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { extensionTransformerPlugin } from './extension-transformer-plugin';
 import { imagePlugin } from '../../compiler/rollup-plugins/image-plugin';
@@ -47,7 +47,7 @@ const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
     input: bundleOpts.inputs,
 
     plugins: [
-      coreResolvePlugin(config, bundleOpts.platform),
+      coreResolvePlugin(config.sys_next, bundleOpts.platform),
       appDataPlugin(config, compilerCtx, bundleOpts.conditionals, bundleOpts.platform),
       lazyComponentPlugin(buildCtx),
       lazyCorePlugin(config, buildCtx),

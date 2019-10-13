@@ -12,7 +12,8 @@ export const createWorkerCompiler = async () => {
   const queuedMsgs: CompilerWorkerMsg[] = [];
   const events = buildEvents();
   const executingPath = import.meta.url;
-  const workerUrl = new URL(`./stencil.js?v=${version}`, executingPath);
+  const pathname = `./stencil.js${executingPath.includes('localhost') ? '' : `?v=${version}`}`;
+  const workerUrl = new URL(pathname, executingPath);
   const worker = new Worker(workerUrl, { name: `stencil@${version}` });
 
   const build = () => post({ type: CompilerWorkerMsgType.Build });
