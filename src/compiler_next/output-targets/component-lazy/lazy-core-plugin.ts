@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { LAZY_BROWSER_ENTRY_ID, LAZY_EXTERNAL_ENTRY_ID, STENCIL_INTERNAL_ID } from '../../bundle/entry-alias-ids';
+import { LAZY_BROWSER_ENTRY_ID, LAZY_EXTERNAL_ENTRY_ID, STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
 import { Plugin } from 'rollup';
 
 
@@ -33,7 +33,7 @@ const LAZY_BUNDLES_PLACEHOLDER = `[/*!__STENCIL_LAZY_DATA__*/]`;
 
 
 const LAZY_BROWSER_ENTRY = `
-import { bootstrapLazy, globalScripts, patchBrowser } from '${STENCIL_INTERNAL_ID}';
+import { bootstrapLazy, globalScripts, patchBrowser } from '${STENCIL_INTERNAL_CLIENT_ID}';
 
 patchBrowser().then(options => {
   globalScripts();
@@ -43,7 +43,7 @@ patchBrowser().then(options => {
 
 
 const LAZY_EXTERNAL_ENTRY = `
-import { bootstrapLazy, globalScripts, patchEsm } from '${STENCIL_INTERNAL_ID}';
+import { bootstrapLazy, globalScripts, patchEsm } from '${STENCIL_INTERNAL_CLIENT_ID}';
 
 export const defineCustomElements = (win, options) => patchEsm().then(() => {
   globalScripts();

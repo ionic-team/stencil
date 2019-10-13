@@ -1,13 +1,12 @@
 import * as d from '../../../declarations';
-import { NODE_MODULES_FS_DIR, getCdnPackageJsonUrl, getCommonDirName, getCommonDirUrl, getNodeModuleFetchUrl, isCommonDirModuleFile, setPkgVersion, skipFilePathFetch, skipUrlFetch } from './resolve-utils';
+import { NODE_MODULES_FS_DIR, getCdnPackageJsonUrl, getCommonDirName, isCommonDirModuleFile } from './resolve-utils';
+import { fetchModuleAsync } from '../fetch/fetch-module-async';
+import { fetchModuleSync } from '../fetch/fetch-module-sync';
+import { getCommonDirUrl, getNodeModuleFetchUrl, packageVersions } from '../fetch/fetch-utils';
 import { IS_FETCH_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../environment';
 import { isString, normalizePath } from '@utils';
 import path from 'path';
 import resolve from 'resolve';
-
-const known404Urls = new Set<string>();
-const fetchCacheAsync = new Map<string, Promise<string>>();
-const pkgVersions = new Map<string, string>();
 
 
 export const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string) => {
@@ -15,7 +14,7 @@ export const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InM
   let pkgJson = inMemoryFs.readFileSync(filePath);
   if (!isString(pkgJson) && IS_WEB_WORKER_ENV) {
     const url = getCdnPackageJsonUrl(moduleId);
-    pkgJson = fetchModuleSync(inMemoryFs, url, filePath);
+    pkgJson = fetchModuleSync(inMemoryFs, packageVersions, url, filePath);
   }
   if (isString(pkgJson)) {
     return JSON.parse(pkgJson) as d.PackageJsonData;
@@ -50,8 +49,8 @@ export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemor
           return false;
         }
 
-        const url = getNodeModuleFetchUrl(compilerExecutingPath, pkgVersions, filePath);
-        const content = fetchModuleSync(inMemoryFs, url, filePath);
+        const url = getNodeModuleFetchUrl(compilerExecutingPath, packageVersions, filePath);
+        const content = fetchModuleSync(inMemoryFs, packageVersions, url, filePath);
         return isString(content);
       }
 
@@ -80,9 +79,9 @@ export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemor
         }
 
         const checkFileExists = (fileName: string) => {
-          const url = getCommonDirUrl(compilerExecutingPath, pkgVersions, dirPath, fileName);
+          const url = getCommonDirUrl(compilerExecutingPath, packageVersions, dirPath, fileName);
           const filePath = getCommonDirName(dirPath, fileName);
-          const content = fetchModuleSync(inMemoryFs, url, filePath);
+          const content = fetchModuleSync(inMemoryFs, packageVersions, url, filePath);
           return isString(content);
         };
 
@@ -123,8 +122,8 @@ export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemo
       if (shouldFetchModule(filePath)) {
         const endsWithExt = exts.some(ext => filePath.endsWith(ext));
         if (endsWithExt) {
-          const url = getNodeModuleFetchUrl(compilerExecutingPath, pkgVersions, filePath);
-          const content = await fetchModuleAsync(inMemoryFs, url, filePath);
+          const url = getNodeModuleFetchUrl(compilerExecutingPath, packageVersions, filePath);
+          const content = await fetchModuleAsync(inMemoryFs, packageVersions, url, filePath);
           const checkFileExists = isString(content);
           cb(null, checkFileExists);
           return;
@@ -159,9 +158,9 @@ export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemo
         }
 
         for (const fileName of COMMON_DIR_FILENAMES) {
-          const url = getCommonDirUrl(compilerExecutingPath, pkgVersions, dirPath, fileName);
+          const url = getCommonDirUrl(compilerExecutingPath, packageVersions, dirPath, fileName);
           const filePath = getCommonDirName(dirPath, fileName);
-          const content = await fetchModuleAsync(inMemoryFs, url, filePath);
+          const content = await fetchModuleAsync(inMemoryFs, packageVersions, url, filePath);
           if (isString(content)) {
             cb(null, true);
             return;
@@ -188,90 +187,6 @@ export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemo
 };
 
 const COMMON_DIR_FILENAMES = ['package.json', 'index.js', 'index.mjs'];
-
-const fetchModuleSync = (inMemoryFs: d.InMemoryFileSystem, url: string, filePath: string) => {
-  if (skipFilePathFetch(filePath)) {
-    return undefined;
-  }
-
-  const content = fetchUrlSync(url);
-  if (isString(content)) {
-    writeFetchSuccess(inMemoryFs, url, filePath, content, pkgVersions);
-  }
-
-  return content;
-};
-
-export const fetchUrlSync = (url: string) => {
-  if (known404Urls.has(url) || skipUrlFetch(url)) {
-    return undefined;
-  }
-
-  try {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url, false);
-    xhr.send(null);
-
-    if (xhr.status >= 200 && xhr.status < 300) {
-      return xhr.responseText;
-    }
-
-    known404Urls.add(url);
-
-  } catch (e) {
-    known404Urls.add(url);
-  }
-
-  return undefined;
-};
-
-const fetchModuleAsync = (inMemoryFs: d.InMemoryFileSystem, url: string, filePath: string) => {
-  if (skipFilePathFetch(filePath) || known404Urls.has(url) || skipUrlFetch(url)) {
-    return Promise.resolve(undefined);
-  }
-
-  let fetchPromise = fetchCacheAsync.get(url);
-
-  if (!fetchPromise) {
-    fetchPromise = new Promise(resolve => {
-      fetch(url)
-        .then(async rsp => {
-          if (rsp.status >= 200 && rsp.status < 300) {
-            const content = await rsp.text();
-            writeFetchSuccess(inMemoryFs, url, filePath, content, pkgVersions);
-            resolve(content);
-
-          } else {
-            known404Urls.add(url);
-            resolve(undefined);
-          }
-        })
-        .catch(() => {
-          known404Urls.add(url);
-          resolve(undefined);
-        });
-    });
-    fetchCacheAsync.set(url, fetchPromise);
-  }
-
-  return fetchPromise;
-};
-
-const writeFetchSuccess = (inMemoryFs: d.InMemoryFileSystem, url: string, filePath: string, content: string, pkgVersions: Map<string, string>) => {
-  if (url.endsWith('package.json')) {
-    setPkgVersion(content, pkgVersions);
-  }
-
-  let dir = path.dirname(filePath);
-  while (dir !== '/' && dir !== '') {
-    inMemoryFs.clearFileCache(dir);
-    inMemoryFs.sys.mkdirSync(dir);
-    dir = path.dirname(dir);
-  }
-
-  inMemoryFs.clearFileCache(filePath);
-  inMemoryFs.sys.writeFileSync(filePath, content);
-};
 
 
 const shouldFetchModule = (p: string) => (IS_FETCH_ENV && !IS_NODE_ENV && p.startsWith(NODE_MODULES_FS_DIR + '/'));

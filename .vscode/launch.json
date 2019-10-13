@@ -112,7 +112,6 @@
         "build",
         "--serve",
         "--watch",
-        "--next",
         "--debug",
         "--dev",
         "--config",

@@ -6,7 +6,7 @@ import { convertDecoratorsToStatic } from '../../../compiler/transformers/decora
 import { convertStaticToMeta } from '../../../compiler/transformers/static-to-meta/visitor';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
-import { STENCIL_INTERNAL_ID } from '../../bundle/entry-alias-ids';
+import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import path from 'path';
 import ts from 'typescript';
@@ -68,7 +68,7 @@ const getCustomTransformers = (config: d.Config, compilerCtx: d.CompilerCtx, bui
   const tsTypeChecker = tsBuilder.getProgram().getTypeChecker();
 
   const transformOpts: d.TransformOptions = {
-    coreImportPath: STENCIL_INTERNAL_ID,
+    coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: null,
     componentMetadata: null,
     proxy: null,

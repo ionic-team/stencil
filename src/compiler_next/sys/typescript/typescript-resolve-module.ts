@@ -1,25 +1,26 @@
 import * as d from '../../../declarations';
 import { compilerBuild } from '../../../version';
+import { getStencilInternalDtsUrl } from '../fetch/fetch-utils';
+import { isLocalModule, isRemoteUrlCompiler, isStencilCoreImport } from '../resolve/resolve-utils';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../environment';
 import { resolveModuleIdSync, resolveRemotePackageJsonSync } from '../resolve/resolve-module';
 import ts from 'typescript';
 
 
 export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
-  const compilerPath = config.sys_next.getCompilerExecutingPath();
+  const compilerExe = config.sys_next.getCompilerExecutingPath();
 
-  if (!IS_NODE_ENV && IS_WEB_WORKER_ENV && compilerPath.startsWith('http') && inMemoryFs) {
+  if (shouldPatchRemoteTypeScript(compilerExe)) {
     const orgResolveModuleName = ts.resolveModuleName;
 
     ts.resolveModuleName = function (moduleName, containingFile, compilerOptions, host, cache, redirectedReference) {
-      if (!moduleName.startsWith('.') && !moduleName.startsWith('/')) {
+      if (!isLocalModule(moduleName)) {
 
-        if (moduleName === '@stencil/core' || moduleName === '@stencil/core/internal') {
-          const stencilCoreRoot = new URL('../', compilerPath).href;
+        if (isStencilCoreImport(moduleName)) {
           return {
             resolvedModule: {
               extension: ts.Extension.Dts,
-              resolvedFileName: new URL('./internal/index.d.ts', stencilCoreRoot).href,
+              resolvedFileName: getStencilInternalDtsUrl(compilerExe),
               packageId: {
                 name: moduleName,
                 subModuleName: '',
@@ -51,3 +52,6 @@ export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InM
 
   return ts.resolveModuleName;
 };
+
+const shouldPatchRemoteTypeScript = (compilerExe: string) =>
+  !IS_NODE_ENV && IS_WEB_WORKER_ENV && isRemoteUrlCompiler(compilerExe);

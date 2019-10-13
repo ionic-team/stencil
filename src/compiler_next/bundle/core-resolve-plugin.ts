@@ -1,15 +1,17 @@
 import * as d from '../../declarations';
-import { getStencilModulePath, isRemoteUrlCompiler } from '../sys/resolve/resolve-utils';
+import { fetchModuleAsync } from '../sys/fetch/fetch-module-async';
+import { getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
+import { isRemoteUrlCompiler } from '../sys/resolve/resolve-utils';
 import { STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID, STENCIL_INTERNAL_PLATFORM_ID, STENCIL_INTERNAL_RUNTIME_ID } from './entry-alias-ids';
 import path from 'path';
 import { Plugin } from 'rollup';
 
 
-export const coreResolvePlugin = (sys: d.CompilerSystem, platform: 'client' | 'hydrate'): Plugin => {
-  const compilerExe = sys.getCompilerExecutingPath();
-  const internalClient = getStencilInternalModule(compilerExe, 'client');
-  const internalHydrate = getStencilInternalModule(compilerExe, 'hydrate');
-  const internalRuntime = getStencilInternalModule(compilerExe, 'runtime');
+export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, platform: 'client' | 'hydrate'): Plugin => {
+  const compilerExe = config.sys_next.getCompilerExecutingPath();
+  const internalClient = getStencilInternalModule(config.rootDir, compilerExe, 'client');
+  const internalHydrate = getStencilInternalModule(config.rootDir, compilerExe, 'hydrate');
+  const internalRuntime = getStencilInternalModule(config.rootDir, compilerExe, 'runtime');
 
   return {
     name: 'coreResolvePlugin',
@@ -33,13 +35,23 @@ export const coreResolvePlugin = (sys: d.CompilerSystem, platform: 'client' | 'h
         return internalRuntime;
       }
       return null;
+    },
+
+    load(filePath) {
+      if (filePath === internalClient || filePath === internalHydrate || filePath === internalRuntime) {
+        if (isRemoteUrlCompiler(compilerExe)) {
+          const url = getStencilModuleUrl(compilerExe, filePath);
+          return fetchModuleAsync(compilerCtx.fs, packageVersions, url, filePath);
+        }
+      }
+      return null;
     }
   };
 };
 
-export const getStencilInternalModule = (compilerExe: string, internalModule: string) => {
+export const getStencilInternalModule = (rootDir: string, compilerExe: string, internalModule: string) => {
   if (isRemoteUrlCompiler(compilerExe)) {
-    return getStencilModulePath(`internal/${internalModule}/index.mjs`);
+    return path.join(rootDir, 'node_modules', '@stencil', 'core', 'internal', internalModule, 'index.mjs');
   }
 
   const compilerExeDir = path.dirname(compilerExe);
