@@ -207,6 +207,7 @@ export interface Config extends StencilConfig {
   fsNamespace?: string;
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
   rootDir?: string;
+  sourceMap?: boolean;
   suppressLogs?: boolean;
   profile?: boolean;
   _isValidated?: boolean;

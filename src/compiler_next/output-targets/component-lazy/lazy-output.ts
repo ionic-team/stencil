@@ -32,7 +32,7 @@ export const lazyOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       },
       outputOptions: {
         format: 'es',
-        sourcemap: true
+        sourcemap: config.sourceMap,
       },
       outputTargets,
       tsBuilder,

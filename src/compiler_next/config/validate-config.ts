@@ -1,5 +1,5 @@
 import { Config, ConfigBundle, Diagnostic } from '../../declarations';
-import { buildError, sortBy } from '@utils';
+import { buildError, isBoolean, sortBy } from '@utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './outputs';
@@ -26,20 +26,24 @@ export const validateConfig = (userConfig?: Config) => {
     config.devMode = false;
   } else if (config.flags.dev) {
     config.devMode = true;
-  } else if (typeof config.devMode !== 'boolean') {
+  } else if (!isBoolean(config.devMode)) {
     config.devMode = DEFAULT_DEV_MODE;
   }
 
   // minify
-  if (typeof config.minifyCss !== 'boolean') {
+  if (!isBoolean(config.minifyCss)) {
     config.minifyCss = !config.devMode;
   }
-  if (typeof config.minifyJs !== 'boolean') {
+  if (!isBoolean(config.minifyJs)) {
     config.minifyJs = !config.devMode;
   }
 
+  if (!isBoolean(config.sourceMap)) {
+    config.sourceMap = false;
+  }
+
   // hash file names
-  if (typeof config.hashFileNames !== 'boolean') {
+  if (!isBoolean(config.hashFileNames)) {
     config.hashFileNames = !config.devMode;
   }
   if (typeof config.hashedFileNameLength !== 'number') {

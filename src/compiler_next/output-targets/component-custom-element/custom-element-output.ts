@@ -24,7 +24,7 @@ export const customElementOutput = async (config: d.Config, compilerCtx: d.Compi
       inputs: getEntries(compilerCtx),
       outputOptions: {
         format: 'es',
-        sourcemap: true
+        sourcemap: config.sourceMap,
       },
       outputTargets,
       tsBuilder,
