@@ -13,7 +13,7 @@ export const createWorkerCompiler = async () => {
   const events = buildEvents();
   const executingPath = import.meta.url;
   const workerUrl = new URL(`./stencil.js?v=${version}`, executingPath);
-  const worker = new Worker(workerUrl, { name: `@stencil/core/compiler@${version}` });
+  const worker = new Worker(workerUrl, { name: `stencil@${version}` });
 
   const build = () => post({ type: CompilerWorkerMsgType.Build });
 
@@ -77,21 +77,19 @@ export const createWorkerCompiler = async () => {
   });
 
   worker.onmessage = (ev) => {
-    let msgs: CompilerWorkerMsg[];
-    if (typeof ev.data === 'string') {
-      try {
-        msgs = JSON.parse(ev.data);
-      } catch (e) {}
-    }
+    const msgs: CompilerWorkerMsg[] = ev.data;
     if (Array.isArray(msgs)) {
       msgs.forEach(msg => {
-        if (typeof msg.onEventName === 'string') {
-          events.emit(msg.onEventName as any, msg.data);
-        } else {
-          const resolveFn = resolves.get(msg.stencilMsgId);
-          if (resolveFn) {
-            resolves.delete(msg.stencilMsgId);
-            resolveFn(msg.data);
+        if (msg != null) {
+          if (typeof msg.onEventName === 'string') {
+            events.emit(msg.onEventName as any, msg.data);
+
+          } else {
+            const resolveFn = resolves.get(msg.stencilMsgId);
+            if (resolveFn) {
+              resolves.delete(msg.stencilMsgId);
+              resolveFn(msg.data);
+            }
           }
         }
       });

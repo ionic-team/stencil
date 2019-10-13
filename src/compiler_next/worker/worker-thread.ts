@@ -211,7 +211,7 @@ export const initWebWorker = (self: Worker) => {
       isQueued = true;
       tick.then(() => {
         isQueued = false;
-        self.postMessage(JSON.stringify(queuedMsgs));
+        self.postMessage(queuedMsgs);
         queuedMsgs.length = 0;
       });
     }
