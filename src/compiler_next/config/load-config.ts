@@ -53,9 +53,8 @@ export const loadConfig = async (config: Config = {}) => {
     } else {
       // no stencil.config.ts or .js file, which is fine
       // #0CJS ¯\_(ツ)_/¯
-      results.config = {
-        rootDir: normalizePath(cwd)
-      };
+      results.config = Object.assign({}, config);
+      results.config.rootDir = normalizePath(cwd);
     }
 
     results.config.cwd = normalizePath(cwd);

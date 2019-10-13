@@ -12,14 +12,16 @@ export class ReplOutputs {
   @Prop() selectedTarget: string;
   @State() selectedOutputName: string;
   @Event() targetUpdate: EventEmitter<string>;
-  outputTargets = ['dist-collection', 'dist-custom-element', 'dist-lazy'];
+  outputTargets = ['dist-collection', 'dist-custom-element', 'dist-lazy', 'www'];
+
+  componentWillRender() {
+    if (this.outputs.length > 0 && !this.outputs.some(o => o.name === this.selectedOutputName)) {
+      this.selectedOutputName = this.outputs[0].name;
+    }
+  }
 
   render() {
-    const outputs = this.outputs.filter(o => o.name.endsWith('.js'));
-    if (outputs.length > 0 && !outputs.some(o => o.name === this.selectedOutputName)) {
-      this.selectedOutputName = outputs[0].name;
-    }
-
+    const outputs = this.outputs;
     return (
       <Host>
 

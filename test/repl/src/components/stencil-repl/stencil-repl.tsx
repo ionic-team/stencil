@@ -11,7 +11,7 @@ export class StencilRepl {
 
   @Prop() appName: string = 'Stencil Components';
   @Prop() stencilCompilerPath = `http://cdn.jsdelivr.net/npm/@stencil/core/compiler/stencil-browser.js`;
-  @Prop() selectedTarget = 'custom-element-next';
+  @Prop() selectedTarget = 'dist-custom-element';
   @Prop() inputs: InputFile[] = [];
   @State() outputs: OutputFile[] = [];
 
