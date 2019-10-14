@@ -10,6 +10,7 @@
 import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
 import { isComplexType } from '@utils';
+import { STENCIL_DEV_MODE } from '../profile';
 
 // const stack: any[] = [];
 
@@ -30,6 +31,12 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
       } else if (child != null && typeof child !== 'boolean') {
         if (simple = typeof nodeName !== 'function' && !isComplexType(child)) {
           child = String(child);
+
+        } else if (BUILD.isDev && child.$flags$ === undefined) {
+          console.error(...STENCIL_DEV_MODE, `vNode passed as children has unexpected type.
+Make sure it's using the correct h() function.
+Empty objects can also be the cause, look for JSX comments that became objects.`);
+
         }
 
         if (simple && lastSimple) {
