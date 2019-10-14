@@ -36,7 +36,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
       } else if (hostRef.$flags$ & HOST_FLAGS.devOnDidLoad) {
         console.debug(
           ...STENCIL_DEV_MODE,
-          `The state/prop "${propName}" changed during "componentDidLoad()", this triggers extra re-renders, try to setup on "componentWillRender()"`,
+          `The state/prop "${propName}" changed during "componentDidLoad()", this triggers extra re-renders, try to setup on "componentWillLoad()"`,
           '\nElement', elm,
           '\nNew value', newVal,
           '\nOld value', oldVal
