@@ -78,6 +78,7 @@
     "src/client/polyfills/css-shim/index.ts",
     "src/cli/index.ts",
     "src/cli_next/public.ts",
+    "src/cli_next/worker/index.ts",
     "src/compiler/index.ts",
     "src/compiler_next/public-browser.ts",
     "src/compiler_next/public-core.ts",

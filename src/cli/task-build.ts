@@ -1,11 +1,12 @@
 import * as d from '../declarations';
 import { Compiler } from '@compiler_legacy';
 import { startServer } from '@dev-server';
+import { runPrerender } from '../prerender/prerender-main';
 import { validateCompilerVersion } from './task-version';
 import exit from 'exit';
 
 
-export async function taskBuild(process: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
+export async function taskBuild(prcs: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
   const compiler = new Compiler(config);
   if (!compiler.isValid) {
     exit(1);
@@ -60,7 +61,7 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
   }
 
   if (config.watch || devServer) {
-    process.once('SIGINT', () => {
+    prcs.once('SIGINT', () => {
       config.sys.destroy();
 
       if (devServer != null) {
@@ -71,6 +72,10 @@ export async function taskBuild(process: NodeJS.Process, config: d.Config, flags
 
   if (latestVersionPromise != null) {
     await validateCompilerVersion(config.sys, config.logger, latestVersionPromise);
+  }
+
+  if (config.flags.prerender) {
+    await runPrerender(prcs, __dirname, config, results);
   }
 
   return results;

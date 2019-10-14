@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
-import { hasError, normalizeDiagnostics } from '@utils';
 import { generateHmr } from './build-hmr';
+import { hasError, normalizeDiagnostics } from '@utils';
 
 
 export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -10,6 +10,7 @@ export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCt
     buildId: buildCtx.buildId,
     buildConditionals: getBuildConditionals(buildCtx),
     bundleBuildCount: buildCtx.bundleBuildCount,
+    componentGraph: buildCtx.componentGraph,
     diagnostics: normalizeDiagnostics(compilerCtx, buildCtx.diagnostics),
     dirsAdded: buildCtx.dirsAdded.slice().sort(),
     dirsDeleted: buildCtx.dirsDeleted.slice().sort(),
@@ -21,6 +22,7 @@ export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCt
     filesWritten: buildCtx.filesWritten.sort(),
     hasError: hasError(buildCtx.diagnostics),
     hasSuccessfulBuild: compilerCtx.hasSuccessfulBuild,
+    hydrateAppFilePath: buildCtx.hydrateAppFilePath,
     isRebuild: buildCtx.isRebuild,
     styleBuildCount: buildCtx.styleBuildCount,
     transpileBuildCount: buildCtx.transpileBuildCount,

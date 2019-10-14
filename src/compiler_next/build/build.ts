@@ -18,7 +18,12 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
     const tsTimeSpan = buildCtx.createTimeSpan('transpile started');
     const componentDtsChanged = await runTsProgram(config, compilerCtx, buildCtx, tsBuilder);
     tsTimeSpan.finish('transpile finished');
-    if (componentDtsChanged || buildCtx.hasError) return buildAbort(buildCtx);
+    if (buildCtx.hasError) return buildAbort(buildCtx);
+
+    if (componentDtsChanged) {
+      // silent abort
+      return null;
+    }
 
     // create outputs
     await generateOutputTargets(config, compilerCtx, buildCtx, tsBuilder);

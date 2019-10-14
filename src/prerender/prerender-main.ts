@@ -1,22 +1,45 @@
-import * as d from '../../declarations';
+import * as d from '../declarations';
 import { drainPrerenderQueue, initializePrerenderEntryUrls } from './prerender-queue';
 import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
 import { generateTemplateHtml } from './prerender-template-html';
 import { getPrerenderConfig } from './prerender-config';
-import { getAbsoluteBuildDir } from '../html/utils';
-import { URL } from 'url';
+import { getAbsoluteBuildDir } from '../compiler/html/utils';
+import { isOutputTargetWww } from '../compiler/output-targets/output-utils';
+import { WorkerManager } from '../sys/node/worker';
+import path from 'path';
 import readline from 'readline';
+import { URL } from 'url';
 
 
-export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
-  // main thread!
-  if (buildCtx.hasError) {
+export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, config: d.Config, buildResults: d.BuildResults) {
+  const outputTargets = config.outputTargets
+    .filter(isOutputTargetWww)
+    .filter(o => typeof o.indexHtml === 'string');
+
+  if (outputTargets.length === 0) {
     return;
   }
 
+  const workerModulePath = path.join(cliRootDir, 'cli-worker.js');
+  const workerManager = new WorkerManager(workerModulePath, {
+    maxConcurrentWorkers: config.maxConcurrentWorkers,
+    maxConcurrentTasksPerWorker: config.maxConcurrentTasksPerWorker,
+    logger: config.logger
+  });
+
+  await Promise.all(outputTargets.map(outputTarget => {
+    return runPrerenderOutputTarget(prcs, workerManager, config, buildResults, outputTarget);
+  }));
+
+  workerManager.destroy();
+}
+
+
+async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: WorkerManager, config: d.Config, buildResults: d.BuildResults, outputTarget: d.OutputTargetWww) {
   // keep track of how long the entire build process takes
-  const timeSpan = buildCtx.createTimeSpan(`prerendering started`);
+  const diagnostics: d.Diagnostic[] = [];
+  const timeSpan = config.logger.createTimeSpan(`prerendering started`);
 
   const prerenderDiagnostics: d.Diagnostic[] = [];
 
@@ -26,13 +49,15 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
 
   // get the prerender urls to queue up
   const manager: d.PrerenderManager = {
+    prcs,
+    prerenderUrlWorker(prerenderRequest: d.PrerenderRequest) {
+      return workerManager.run('prerenderUrlWorker', [prerenderRequest]);
+    },
     componentGraphPath: null,
-    prcs: null,
-    prerenderUrlWorker: null,
     config: config,
     diagnostics: prerenderDiagnostics,
     devServerHostUrl: devServerHostUrl,
-    hydrateAppFilePath: buildCtx.hydrateAppFilePath,
+    hydrateAppFilePath: buildResults.hydrateAppFilePath,
     isDebug: (config.logLevel === 'debug'),
     logCount: 0,
     maxConcurrency: (config.maxConcurrentWorkers * 2 - 1),
@@ -57,9 +82,9 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
     return;
   }
 
-  const templateHtml = await generateTemplateHtml(config, buildCtx, outputTarget);
+  const templateHtml = await generateTemplateHtml(config, diagnostics, outputTarget);
   manager.templateId = await createPrerenderTemplate(config, templateHtml);
-  manager.componentGraphPath = await createComponentGraphPath(config, buildCtx, outputTarget);
+  manager.componentGraphPath = await createComponentGraphPath(config, buildResults, outputTarget);
 
   await new Promise(resolve => {
     manager.resolve = resolve;
@@ -90,9 +115,9 @@ export async function runPrerenderMain(config: d.Config, buildCtx: d.BuildCtx, o
     prerenderBuildErrors.forEach(diagnostic => {
       diagnostic.type = 'runtime';
     });
-    buildCtx.diagnostics.push(...prerenderBuildErrors);
+    diagnostics.push(...prerenderBuildErrors);
   }
-  buildCtx.diagnostics.push(...prerenderRuntimeErrors);
+  diagnostics.push(...prerenderRuntimeErrors);
 
   // Clear progress logger
   if (manager.progressLogger) {
@@ -121,9 +146,9 @@ async function createPrerenderTemplate(config: d.Config, templateHtml: string) {
 }
 
 
-async function createComponentGraphPath(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
-  if (buildCtx.componentGraph) {
-    const content = getComponentPathContent(config, buildCtx.componentGraph, outputTarget);
+async function createComponentGraphPath(config: d.Config, buildResults: d.BuildResults, outputTarget: d.OutputTargetWww) {
+  if (buildResults.componentGraph) {
+    const content = getComponentPathContent(config, buildResults.componentGraph, outputTarget);
     const hash = await config.sys.generateContentHash(content, 12);
     const fileName = `prerender-component-graph-${hash}.json`;
     const componentGraphPath = config.sys.path.join(config.sys.details.tmpDir, fileName);

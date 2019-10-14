@@ -116,6 +116,7 @@ export interface BuildResults {
   };
   bundleBuildCount: number;
   components: BuildComponent[];
+  componentGraph: Map<string, string[]>;
   diagnostics: Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
@@ -129,6 +130,7 @@ export interface BuildResults {
   hasError: boolean;
   hasSuccessfulBuild: boolean;
   hmr?: HotModuleReplacement;
+  hydrateAppFilePath?: string;
   isRebuild: boolean;
   styleBuildCount: number;
   transpileBuildCount: number;

@@ -26,29 +26,31 @@ export async function cli(opts: BuildOptions) {
     types: 'index.d.ts'
   });
 
+  const external = [
+    'assert',
+    'buffer',
+    'child_process',
+    'constants',
+    'crypto',
+    'events',
+    'os',
+    'path',
+    'readline',
+    'stream',
+    'string_decoder',
+    'tty',
+    'typescript',
+    'url',
+    'util',
+  ];
+
   const cliBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
     output: {
       format: 'cjs',
       file: join(opts.output.cliDir, 'index.js'),
     },
-    external: [
-      'assert',
-      'buffer',
-      'child_process',
-      'constants',
-      'crypto',
-      'events',
-      'os',
-      'path',
-      'readline',
-      'stream',
-      'string_decoder',
-      'tty',
-      'typescript',
-      'url',
-      'util',
-    ],
+    external,
     plugins: [
       {
         name: 'cliImportResolverPlugin',
@@ -83,7 +85,37 @@ export async function cli(opts: BuildOptions) {
     ]
   };
 
+  const cliWorkerBundle: RollupOptions = {
+    input: join(inputDir, 'worker/index.js'),
+    output: {
+      format: 'cjs',
+      file: join(opts.output.cliDir, 'cli-worker.js'),
+    },
+    external,
+    plugins: [
+      {
+        name: 'cliWorkerImportResolverPlugin',
+        resolveId(importee) {
+          if (importee === 'fs') {
+            return {
+              id: '../sys/node/graceful-fs.js',
+              external: true
+            }
+          }
+          return null;
+        }
+      },
+      aliasPlugin(opts),
+      replacePlugin(opts),
+      resolve({
+        preferBuiltins: true
+      }),
+      commonjs(),
+    ]
+  };
+
   return [
-    cliBundle
+    cliBundle,
+    cliWorkerBundle,
   ];
 }
