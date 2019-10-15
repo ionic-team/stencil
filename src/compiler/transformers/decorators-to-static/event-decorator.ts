@@ -87,14 +87,27 @@ const validateEventName = (config: d.Config, diagnostics: d.Diagnostic[], node: 
       `Please lowercase the first character for the event to best work with all listeners.`
     ].join('');
     augmentDiagnosticWithNode(config, diagnostic, node);
+    return;
   }
 
-  if (DOM_EVENT_NAMES.has(eventName)) {
+  if (/^on[A-Z]/.test(eventName)) {
+    const warn = buildWarn(diagnostics);
+    warn.messageText = `Events decorated with @Event() should describe the actual DOM event name, not the handler. In other words "${eventName}" would be better named as "${suggestEventName(eventName)}".`;
+    augmentDiagnosticWithNode(config, warn, node);
+    return;
+  }
+
+  if (DOM_EVENT_NAMES.has(eventName.toLowerCase())) {
     const diagnostic = buildWarn(diagnostics);
     diagnostic.messageText = `The event name conflicts with the "${eventName}" native DOM event name.`;
     augmentDiagnosticWithNode(config, diagnostic, node);
+    return;
   }
 };
+
+function suggestEventName(onEvent: string) {
+  return onEvent[2].toLowerCase() + onEvent.slice(3);
+}
 
 const DOM_EVENT_NAMES: Set<string> = new Set([
   'CheckboxStateChange',
@@ -357,4 +370,4 @@ const DOM_EVENT_NAMES: Set<string> = new Set([
   'vrdisplaypresentchange',
   'waiting',
   'wheel',
-]);
+].map(e => e.toLowerCase()));

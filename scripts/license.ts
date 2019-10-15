@@ -32,8 +32,7 @@ const bundledDeps = [
 
 export function createLicense(rootDir: string) {
   const opts = getOptions(rootDir);
-  const licenseCorePath = join(opts.scriptsDir, 'LICENSE.md');
-  const licenseRootPath = join(opts.rootDir, 'LICENSE.md');
+  const thirdPartyLicensesRootPath = join(opts.rootDir, 'NOTICE.md');
 
   const depLicenses = bundledDeps.map(moduleId => {
     return createBundledDepLicense(opts, moduleId);
@@ -50,13 +49,7 @@ export function createLicense(rootDir: string) {
     .sort();
 
   const output = `
-
-# Stencil Core License
-
-${fs.readFileSync(licenseCorePath, 'utf8').trim()}
-
-
-## Licenses of Bundled Dependencies
+# Licenses of Bundled Dependencies
 
 The published Stencil distribution contains the following licenses:
 
@@ -67,9 +60,9 @@ ${licenses.map(l => `    ` + l).join('\n')}
 
 ${depLicenses.map(l => l.content).join('\n')}
 
-`.trimLeft();
+`.trim() + '\n';
 
-  fs.writeFileSync(licenseRootPath, output);
+  fs.writeFileSync(thirdPartyLicensesRootPath, output);
 }
 
 
@@ -80,7 +73,7 @@ function createBundledDepLicense(opts: BuildOptions, moduleId: string) {
   let license: string = null;
 
   output.push(
-    `### \`${moduleId}\``,
+    `## \`${moduleId}\``,
     ``,
   );
 
