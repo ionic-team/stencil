@@ -58,7 +58,13 @@ const parsePropDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeC
     augmentDiagnosticWithNode(config, err, prop.modifiers[0]);
   }
 
-  validatePublicName(config, diagnostics, propName, '@Prop()', 'prop', prop.name);
+  if (/^on(-|[A-Z])/.test(propName)) {
+    const warn = buildWarn(diagnostics);
+    warn.messageText = `The @Prop() name "${propName}" looks like an event. Please use the "@Event()" decorator to expose events instead, not properties or methods.`;
+    augmentDiagnosticWithNode(config, warn, prop.name);
+  } else {
+    validatePublicName(config, diagnostics, propName, '@Prop()', 'prop', prop.name);
+  }
 
   const symbol = typeChecker.getSymbolAtLocation(prop.name);
   const type = typeChecker.getTypeAtLocation(prop);

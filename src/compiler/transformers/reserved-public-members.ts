@@ -4,12 +4,6 @@ import ts from 'typescript';
 
 
 export const validatePublicName = (config: d.Config, diagnostics: d.Diagnostic[], memberName: string, decorator: string, memberType: string, node: ts.Node) => {
-  if (/^on(-|[A-Z])/.test(memberName)) {
-    const warn = buildWarn(diagnostics);
-    warn.messageText = `The ${decorator} name "${memberName}" looks like an event. Please use the "@Event()" decorator to expose events instead, not properties or methods.`;
-    augmentDiagnosticWithNode(config, warn, node);
-    return;
-  }
   if (RESERVED_PUBLIC_MEMBERS.has(memberName.toLowerCase())) {
     const warn = buildWarn(diagnostics);
     warn.messageText = [
