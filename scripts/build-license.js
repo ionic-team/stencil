@@ -27,19 +27,12 @@ const bundledDeps = [
 ].sort();
 
 
-const licenseCorePath = path.join(__dirname, 'LICENSE.md');
-const licenseRootPath = path.join(__dirname, '..', 'LICENSE.md');
+const thirdPartyLicensesRootPath = path.join(__dirname, '..', 'NOTICE.md');
 const allLicenses = [];
 const depLicenses = bundledDeps.map(createBundledDepLicense);
 
 const output = `
-
-# Stencil Core License
-
-${fs.readFileSync(licenseCorePath, 'utf8').trim()}
-
-
-## Licenses of Bundled Dependencies
+# Licenses of Bundled Dependencies
 
 The published Stencil distribution contains the following licenses:
 
@@ -52,7 +45,7 @@ ${depLicenses.join('\n')}
 
 `.trimLeft();
 
-fs.writeFileSync(licenseRootPath, output);
+fs.writeFileSync(thirdPartyLicensesRootPath, output);
 
 
 function createBundledDepLicense(moduleId) {
@@ -61,7 +54,7 @@ function createBundledDepLicense(moduleId) {
   const output = [];
 
   output.push(
-    `### \`${moduleId}\``,
+    `## \`${moduleId}\``,
     ``,
   );
 
