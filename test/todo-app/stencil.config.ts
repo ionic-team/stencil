@@ -7,10 +7,10 @@ export const config: Config = {
       type: 'www',
       serviceWorker: null
     },
-    // {
-    //   type: 'experimental-module',
-    //   dir: 'public',
-    //   empty: false
-    // }
+    {
+      type: 'dist-custom-element',
+      dir: 'public',
+      empty: false
+    }
   ],
 };

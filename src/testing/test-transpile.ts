@@ -1,11 +1,11 @@
-import * as d from '../declarations';
+import { Config, Diagnostic, TransformOptions } from '@stencil/core/internal';
 import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { transpileModule } from '../compiler';
 import path from 'path';
 import ts from 'typescript';
 
 
-const TRANSPILE_CONFIG: d.Config = {
+const TRANSPILE_CONFIG: Config = {
   cwd: process.cwd(),
   rootDir: '/',
   srcDir: '/',
@@ -19,7 +19,7 @@ const TRANSPILE_CONFIG: d.Config = {
 };
 
 
-const DEFAULT_TRANSFORM_OPTS: d.TransformOptions = {
+const DEFAULT_TRANSFORM_OPTS: TransformOptions = {
   coreImportPath: '@stencil/core',
   componentExport: null,
   componentMetadata: 'compilerstatic',
@@ -28,7 +28,7 @@ const DEFAULT_TRANSFORM_OPTS: d.TransformOptions = {
 };
 
 
-export function transpile(input: string, opts?: d.TransformOptions, sourceFilePath?: string) {
+export function transpile(input: string, opts?: TransformOptions, sourceFilePath?: string) {
   opts = opts || ({} as any);
   Object.assign(opts, DEFAULT_TRANSFORM_OPTS);
   return transpileModule(TRANSPILE_CONFIG, input, opts, sourceFilePath);
@@ -122,7 +122,7 @@ function getUserCompilerOptions(rootDir: string) {
 }
 
 
-export function formatDiagnostic(diagnostic: d.Diagnostic) {
+export function formatDiagnostic(diagnostic: Diagnostic) {
   let m = '';
 
   if (diagnostic.relFilePath) {

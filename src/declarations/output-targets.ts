@@ -234,6 +234,8 @@ export interface OutputTargetBaseNext {
 
 export interface OutputTargetDistCustomElement extends OutputTargetBaseNext {
   type: 'dist-custom-element';
+  empty?: boolean;
+  copy?: CopyTask[];
 }
 
 export interface OutputTargetBase {

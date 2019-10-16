@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import { EventInitDict, HostElement, SerializedEvent } from '@stencil/core/internal';
 import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 import { EventSpy, addE2EListener, waitForEvent } from './puppeteer-events';
@@ -35,7 +35,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     return this.e2eRunActions();
   }
 
-  triggerEvent(eventName: string, eventInitDict?: d.EventInitDict) {
+  triggerEvent(eventName: string, eventInitDict?: EventInitDict) {
     this._queueAction({
       eventName: eventName,
       eventInitDict: eventInitDict
@@ -45,7 +45,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   async spyOnEvent(eventName: string) {
     const eventSpy = new EventSpy(eventName);
 
-    await addE2EListener(this._page, this._elmHandle, eventName, (ev: d.SerializedEvent) => {
+    await addE2EListener(this._page, this._elmHandle, eventName, (ev: SerializedEvent) => {
       eventSpy.push(ev);
     });
 
@@ -75,7 +75,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     try {
       const executionContext = this._elmHandle.executionContext();
 
-      isVisible = await executionContext.evaluate((elm: d.HostElement) => {
+      isVisible = await executionContext.evaluate((elm: HostElement) => {
 
         return new Promise<boolean>(resolve => {
 
@@ -514,7 +514,7 @@ interface ElementAction {
   classRemove?: string;
   classToggle?: string;
   eventName?: string;
-  eventInitDict?: d.EventInitDict;
+  eventInitDict?: EventInitDict;
   methodName?: string;
   methodArgs?: any[];
   setAttributeName?: string;

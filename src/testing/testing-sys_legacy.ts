@@ -1,7 +1,7 @@
 import { normalizePath } from '@utils';
 import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
-import { StencilSystem } from '../declarations';
+import { StencilSystem } from '@stencil/core/internal';
 import fs from 'fs';
 import path from 'path';
 

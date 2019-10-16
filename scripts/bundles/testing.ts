@@ -20,10 +20,19 @@ export async function testing(opts: BuildOptions) {
       opts.output.testingDir
     ),
 
-    // copy index.d.ts
-    fs.copyFile(
-      join(inputDir, 'index.d.ts'),
-      join(opts.output.testingDir, 'index.d.ts')
+    // copy testing d.ts files
+    fs.copy(
+      join(inputDir),
+      join(opts.output.testingDir),
+      { filter: f => {
+        if (f.endsWith('.d.ts')) {
+          return true;
+        }
+        if (fs.statSync(f).isDirectory()) {
+          return true;
+        }
+        return false
+      } }
     )
   ]);
 

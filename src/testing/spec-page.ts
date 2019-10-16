@@ -1,9 +1,9 @@
-import * as d from '../declarations';
+import { BuildConditionals, ComponentCompilerMeta, ComponentRuntimeMeta, ComponentTestingConstructor, HostRef, LazyBundlesRuntimeData, NewSpecPageOptions, SpecPage } from '@stencil/core/internal';
 import { formatLazyBundleRuntimeMeta, getBuildFeatures } from '../compiler';
 import { resetBuildConditionals } from './reset-build-conditionals';
 
 
-export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPage> {
+export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   if (opts == null) {
     throw new Error(`NewSpecPageOptions required`);
   }
@@ -16,7 +16,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
   // using require() in a closure so jest has a moment
   // to jest.mock w/ moduleNameMapper in the jest config
   // otherwise the require() happens at the top of the file before jest is setup
-  const bc = require('@stencil/core/internal/app-data') as { BUILD: d.BuildConditionals };
+  const bc = require('@stencil/core/internal/app-data') as { BUILD: BuildConditionals };
   const testingPlatform = require('@stencil/core/internal/platform');
 
   // reset the platform for this new test
@@ -48,11 +48,11 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
   (win as any)['__stencil_spec_options'] = opts;
   const doc = win.document;
 
-  const page: d.SpecPage = {
+  const page: SpecPage = {
     win: win,
     doc: doc,
     body: doc.body as any,
-    build: bc.BUILD as d.BuildConditionals,
+    build: bc.BUILD as BuildConditionals,
     styles: testingPlatform.styles as Map<string, string>,
     setContent: (html: string) => {
       doc.body.innerHTML = html;
@@ -63,7 +63,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     flushQueue: (): Promise<void> => testingPlatform.flushQueue()
   };
 
-  const lazyBundles: d.LazyBundlesRuntimeData = opts.components.map((Cstr: d.ComponentTestingConstructor) => {
+  const lazyBundles: LazyBundlesRuntimeData = opts.components.map((Cstr: ComponentTestingConstructor) => {
     if (Cstr.COMPILER_META == null) {
       throw new Error(`Invalid component class: Missing static "COMPILER_META" property.`);
     }
@@ -87,7 +87,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     return lazyBundleRuntimeMeta;
   });
 
-  const cmpCompilerMeta = opts.components.map(Cstr => Cstr.COMPILER_META as d.ComponentCompilerMeta);
+  const cmpCompilerMeta = opts.components.map(Cstr => Cstr.COMPILER_META as ComponentCompilerMeta);
 
   const cmpBuild = getBuildFeatures(cmpCompilerMeta);
   if (opts.strictBuild) {
@@ -147,13 +147,13 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
   testingPlatform.bootstrapLazy(lazyBundles);
 
   if (typeof opts.template === 'function') {
-    const ref: d.HostRef = {
+    const ref: HostRef = {
       $ancestorComponent$: undefined,
       $flags$: 0,
       $modeName$: undefined,
       $hostElement$: page.body
     };
-    const cmpMeta: d.ComponentRuntimeMeta = {
+    const cmpMeta: ComponentRuntimeMeta = {
       $flags$: 0,
       $tagName$: 'body'
     };
@@ -208,7 +208,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
 }
 
 
-function proxyComponentLifeCycles(platform: any, Cstr: d.ComponentTestingConstructor) {
+function proxyComponentLifeCycles(platform: any, Cstr: ComponentTestingConstructor) {
   if (typeof Cstr.prototype.__componentWillLoad === 'function') {
     Cstr.prototype.componentWillLoad = Cstr.prototype.__componentWillLoad;
     Cstr.prototype.__componentWillLoad = null;

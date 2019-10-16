@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import { SerializedEvent } from '@stencil/core/internal';
 import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 
@@ -54,8 +54,8 @@ export async function waitForEvent(page: pd.E2EPageInternal, eventName: string, 
 }
 
 
-export class EventSpy implements d.EventSpy {
-  events: d.SerializedEvent[] = [];
+export class EventSpy implements EventSpy {
+  events: SerializedEvent[] = [];
   private cursor = 0;
   private queuedHandler: (() => void)[] = [];
   constructor(public eventName: string) {}
@@ -92,7 +92,7 @@ export class EventSpy implements d.EventSpy {
     }
   }
 
-  push(ev: d.SerializedEvent) {
+  push(ev: SerializedEvent) {
     this.events.push(ev);
     const next = this.queuedHandler.shift();
     if (next) {
@@ -198,7 +198,7 @@ function browserContextEvents() {
 
   (window as unknown as pd.BrowserWindow).stencilSerializeEvent = (orgEv: any) => {
     // BROWSER CONTEXT
-    const serializedEvent: d.SerializedEvent = {
+    const serializedEvent: SerializedEvent = {
       bubbles: orgEv.bubbles,
       cancelBubble: orgEv.cancelBubble,
       cancelable: orgEv.cancelable,

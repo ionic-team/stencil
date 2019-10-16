@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import { EventInitDict, EventSpy, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
 import * as puppeteer from 'puppeteer';
 
 
@@ -34,7 +34,7 @@ export interface E2EPage extends PuppeteerPage {
    * results can then be used to test pixel mismatches, such as
    * `expect(results).toMatchScreenshot()`.
    */
-  compareScreenshot(): Promise<d.ScreenshotDiff>;
+  compareScreenshot(): Promise<ScreenshotDiff>;
 
   /**
    * `Experimental`
@@ -42,7 +42,7 @@ export interface E2EPage extends PuppeteerPage {
    * against the master screenshot. The provided `description` will be
    * added onto its current description, which comes from the test description.
    */
-  compareScreenshot(description: string): Promise<d.ScreenshotDiff>;
+  compareScreenshot(description: string): Promise<ScreenshotDiff>;
 
   /**
    * `Experimental`
@@ -50,7 +50,7 @@ export interface E2EPage extends PuppeteerPage {
    * against the master screenshot. The `opts` argument can be used to
    * customize screenshot options.
    */
-  compareScreenshot(opts: d.ScreenshotOptions): Promise<d.ScreenshotDiff>;
+  compareScreenshot(opts: ScreenshotOptions): Promise<ScreenshotDiff>;
 
   /**
    * `Experimental`
@@ -59,7 +59,7 @@ export interface E2EPage extends PuppeteerPage {
    * added onto its current description, which comes from the test description.
    * The `opts` argument can be used to customize screenshot options.
    */
-  compareScreenshot(description: string, opts: d.ScreenshotOptions): Promise<d.ScreenshotDiff>;
+  compareScreenshot(description: string, opts: ScreenshotOptions): Promise<ScreenshotDiff>;
 
   /**
    * Sets a debugger;
@@ -109,7 +109,7 @@ export interface E2EPage extends PuppeteerPage {
    * `expect(spy).toHaveReceivedEventTimes(x)` and
    * `expect(spy).toHaveReceivedEventDetail({...})`.
    */
-  spyOnEvent(eventName: string, selector?: 'window' | 'document'): Promise<d.EventSpy>;
+  spyOnEvent(eventName: string, selector?: 'window' | 'document'): Promise<EventSpy>;
 
   /**
    * Both Stencil and Puppeteer have an asynchronous architecture, which is a good thing
@@ -339,7 +339,7 @@ export interface E2EElement {
    * `expect(spy).toHaveReceivedEventTimes(x)` and
    * `expect(spy).toHaveReceivedEventDetail({...})`.
    */
-  spyOnEvent(eventName: string): Promise<d.EventSpy>;
+  spyOnEvent(eventName: string): Promise<EventSpy>;
 
   /**
    * Represents the tab order of the current element. Setting the
@@ -376,7 +376,7 @@ export interface E2EElement {
    * and dispatch it from the element, to include any custom event
    * `detail` data as the second argument.
    */
-  triggerEvent(eventName: string, eventInitDict?: d.EventInitDict): void;
+  triggerEvent(eventName: string, eventInitDict?: EventInitDict): void;
 
   /**
    * Sends a keydown, keypress/input, and keyup event for each character in the text.

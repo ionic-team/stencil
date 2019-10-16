@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@stencil/core/internal';
 import { BuildContext, Cache } from '../compiler';
 import { InMemoryFs } from '@utils';
 import { MockWindow } from '@mock-doc';

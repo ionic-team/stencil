@@ -1,10 +1,10 @@
-import * as d from '../declarations';
+import { FileSystem, FsStats } from '@stencil/core/internal';
 import { normalizePath } from '@utils';
 import fs from 'fs';
 import path from 'path';
 
 
-export class TestingFs implements d.FileSystem {
+export class TestingFs implements FileSystem {
   data = new Map<string, Data>();
 
   diskWrites = 0;
@@ -177,7 +177,7 @@ export class TestingFs implements d.FileSystem {
   }
 
   stat(itemPath: string) {
-    return new Promise<d.FsStats>((resolve, reject) => {
+    return new Promise<FsStats>((resolve, reject) => {
       process.nextTick(() => {
         try {
           resolve(this.statSync(itemPath));
@@ -200,7 +200,7 @@ export class TestingFs implements d.FileSystem {
         isDirectory: () => isDirectory,
         isFile: () => isFile,
         size: data.content != null ? data.content.length : 0
-      } as d.FsStats;
+      } as FsStats;
     }
     throw new Error(`stat, path doesn't exist: ${itemPath}`);
   }
