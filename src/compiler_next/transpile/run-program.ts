@@ -1,15 +1,13 @@
 import * as d from '../../declarations';
+import { convertDecoratorsToStatic } from '../../compiler/transformers/decorators-to-static/convert-decorators';
 import { generateAppTypes } from '../../compiler/types/generate-app-types';
 import { getComponentsFromModules } from '../../compiler/output-targets/output-utils';
 import { loadTypeScriptDiagnostics } from '@utils';
 import { collectionOutput } from '../output-targets/component-collection/collection-output';
 import { resolveComponentDependencies } from '../../compiler/entries/resolve-component-dependencies';
 import { updateComponentBuildConditionals } from '../build/app-data';
-import ts from 'typescript';
 import { updateModule } from './static-to-meta/parse-static';
-import { updateStencilCoreImports } from '../../compiler/transformers/update-stencil-core-import';
-import { convertDecoratorsToStatic } from '../../compiler/transformers/decorators-to-static/convert-decorators';
-import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
+import ts from 'typescript';
 
 
 export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
