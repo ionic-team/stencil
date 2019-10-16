@@ -27,6 +27,17 @@ export class StencilRepl {
     this.compiler = await stencil.createWorkerCompiler();
 
     await this.compiler.sys.mkdir('/src');
+
+    if (!this.inputs.some(({name}) => name === 'src/stencil.config.ts')) {
+      this.inputs.push({
+        name: 'src/stencil.config.ts',
+        code: `
+// TODO       
+        `
+      })
+    }
+
+
     await Promise.all(this.inputs.map(async input => {
       await this.compiler.sys.writeFile(input.name, input.code);
     }));

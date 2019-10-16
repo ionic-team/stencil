@@ -83,7 +83,7 @@
         "--next",
         "--watch",
         "--config",
-        "${workspaceFolder}/test/hello-world/stencil.config.ts"
+        "${workspaceFolder}/test/hello-vdom/stencil.config.ts"
       ],
       "protocol": "inspector"
     },

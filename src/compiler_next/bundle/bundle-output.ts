@@ -71,7 +71,7 @@ const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
       rollupReplacePlugin({
         'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
       }),
-      typescriptPlugin(bundleOpts),
+      typescriptPlugin(compilerCtx, bundleOpts),
       sysPlugin(compilerCtx.fs)
     ],
 

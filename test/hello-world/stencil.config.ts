@@ -5,7 +5,7 @@ export const config: Config = {
   outputTargets: [
     // { type: 'dist' },
     {
-      type: 'custom-element-next',
+      type: 'dist-custom-elements',
       dir: 'www'
     },
     // {

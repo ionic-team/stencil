@@ -2,15 +2,13 @@ import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
-import { convertDecoratorsToStatic } from '../../../compiler/transformers/decorators-to-static/convert-decorators';
-import { convertStaticToMeta } from '../../../compiler/transformers/static-to-meta/visitor';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
 import { generateEntryModules } from '../../..//compiler/entries/entry-modules';
 import { LAZY_BROWSER_ENTRY_ID, LAZY_EXTERNAL_ENTRY_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID } from '../../bundle/entry-alias-ids';
 import { isOutputTargetHydrate } from '../../../compiler/output-targets/output-utils';
 import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
-import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import ts from 'typescript';
+import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 
 
 export const lazyOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram, outputTargets: d.OutputTargetDistLazy[]) => {
@@ -24,7 +22,7 @@ export const lazyOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       id: 'lazy',
       platform: 'client',
       conditionals: getBuildConditionals(config, buildCtx.components),
-      customTransformers: getCustomTransformers(config, compilerCtx, buildCtx, tsBuilder),
+      customTransformers: getCustomTransformer(compilerCtx),
       inputs: {
         [config.fsNamespace]: LAZY_BROWSER_ENTRY_ID,
         'loader': LAZY_EXTERNAL_ENTRY_ID,
@@ -85,9 +83,7 @@ const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[])
 // }
 
 
-const getCustomTransformers = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
-  const tsTypeChecker = tsBuilder.getProgram().getTypeChecker();
-
+const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: 'lazy',
@@ -95,16 +91,8 @@ const getCustomTransformers = (config: d.Config, compilerCtx: d.CompilerCtx, bui
     proxy: null,
     style: 'static'
   };
-
-  const customTransformers: ts.CustomTransformers = {
-    before: [
-      convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker),
-      updateStencilCoreImports(transformOpts.coreImportPath)
-    ],
-    after: [
-      convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts),
-      lazyComponentTransform(compilerCtx, transformOpts)
-    ]
-  };
-  return customTransformers;
+  return [
+    updateStencilCoreImports(transformOpts.coreImportPath),
+    lazyComponentTransform(compilerCtx, transformOpts)
+  ];
 };

@@ -1,25 +1,25 @@
 import * as d from '../../../declarations';
-import { getModule, resetModule } from '../../../compiler/build/compiler-ctx';
 import { parseCallExpression } from '../../../compiler/transformers/static-to-meta/call-expression';
 import { parseImport } from '../../../compiler/transformers/static-to-meta/import';
 import { parseStaticComponentMeta } from '../../../compiler/transformers/static-to-meta/component';
 import { parseStringLiteral } from '../../../compiler/transformers/static-to-meta/string-literal';
-import { visitClass } from '../../../compiler/transformers/decorators-to-static/convert-decorators';
 import path from 'path';
 import ts from 'typescript';
+import { normalizePath } from '@utils';
 
 
-export const parseToModule = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsSourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta, transformOpts: d.TransformOptions) => {
+export const updateModule = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsSourceFile: ts.SourceFile, sourceFileText: string, emitFilepath: string, typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta) => {
   const dirPath = path.dirname(tsSourceFile.fileName);
-  const moduleFile = getModule(config, compilerCtx, tsSourceFile.fileName);
-  resetModule(moduleFile);
+  const moduleFile = createModule(tsSourceFile, sourceFileText, emitFilepath);
+  compilerCtx.moduleMap.set(moduleFile.sourceFilePath, moduleFile);
 
   const visitNode = (node: ts.Node) => {
     if (ts.isClassDeclaration(node)) {
-      const classNode = visitClass(config, buildCtx.diagnostics, typeChecker, node);
-      parseStaticComponentMeta(config, compilerCtx, typeChecker, classNode, moduleFile, compilerCtx.nodeMap, transformOpts);
+      parseStaticComponentMeta(config, compilerCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap);
+      return;
     } else if (ts.isImportDeclaration(node)) {
       parseImport(config, compilerCtx, buildCtx, moduleFile, dirPath, node);
+      return;
     } else if (ts.isCallExpression(node)) {
       parseCallExpression(moduleFile, node);
     } else if (ts.isStringLiteral(node)) {
@@ -32,12 +32,51 @@ export const parseToModule = (config: d.Config, compilerCtx: d.CompilerCtx, buil
     moduleFile.isCollectionDependency = true;
     moduleFile.collectionName = collection.collectionName;
     collection.moduleFiles.push(moduleFile);
-  } else {
-    moduleFile.isCollectionDependency = false;
-    moduleFile.collectionName = null;
   }
-
   visitNode(tsSourceFile);
+  return moduleFile;
+};
 
+export const getModule = (compilerCtx: d.CompilerCtx, sourceFilePath: string) => {
+  sourceFilePath = normalizePath(sourceFilePath);
+  return compilerCtx.moduleMap.get(sourceFilePath);
+};
+
+export const createModule = (
+  staticSourceFile: ts.SourceFile, // this is NOT the original
+  staticSourceFileText: string,
+  emitFilepath: string,
+) => {
+  const sourceFilePath = normalizePath(staticSourceFile.fileName);
+  const moduleFile: d.Module = {
+    sourceFilePath: sourceFilePath,
+    jsFilePath: emitFilepath,
+    staticSourceFile,
+    staticSourceFileText,
+    cmps: [],
+    coreRuntimeApis: [],
+    collectionName: null,
+    dtsFilePath: null,
+    excludeFromCollection: false,
+    externalImports: [],
+    hasVdomAttribute: false,
+    hasVdomXlink: false,
+    hasVdomClass: false,
+    hasVdomFunctional: false,
+    hasVdomKey: false,
+    hasVdomListener: false,
+    hasVdomRef: false,
+    hasVdomRender: false,
+    hasVdomStyle: false,
+    hasVdomText: false,
+    htmlAttrNames: [],
+    htmlTagNames: [],
+    isCollectionDependency: false,
+    isLegacy: false,
+    localImports: [],
+    originalCollectionComponentPath: null,
+    originalImports: [],
+    potentialCmpRefs: []
+  };
   return moduleFile;
 };

@@ -113,7 +113,9 @@ export const getModule = (config: d.Config, compilerCtx: d.CompilerCtx, sourceFi
       localImports: [],
       originalCollectionComponentPath: null,
       originalImports: [],
-      potentialCmpRefs: []
+      potentialCmpRefs: [],
+      staticSourceFile: null,
+      staticSourceFileText: ''
     };
     compilerCtx.moduleMap.set(sourceFilePath, moduleFile);
     return moduleFile;

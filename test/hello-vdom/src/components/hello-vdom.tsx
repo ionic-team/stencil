@@ -1,26 +1,16 @@
-import { Component, Method, h } from '@stencil/core';
-
-declare global {
-  interface Whatever {
-
-  }
-}
+import { Component, h } from '@stencil/core';
 
 @Component({
   tag: 'hello-vdom'
 })
 export class HelloWorld {
 
-  @Method()
-  getTab(tab: string): Promise<Whatever> {
-    console.log(tab);
-    return null;
-  }
 
   render() {
     return (
       <h1>
-        Hello VDOM!</h1>
+        Hello VDAA!
+      </h1>
     );
   }
 }

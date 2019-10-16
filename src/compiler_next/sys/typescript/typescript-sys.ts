@@ -45,8 +45,12 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
     });
   };
 
-  const visitDirectory = (matchingPaths: Set<string>, p: string, extensions: ReadonlyArray<string>) => {
+  const visitDirectory = (matchingPaths: Set<string>, p: string, extensions: ReadonlyArray<string>, depth: number) => {
+    if (depth < 0) {
+      return;
+    }
     const dirItems = stencilSys.readdirSync(p);
+    depth--;
 
     dirItems.forEach(dirItem => {
       if (Array.isArray(extensions) && extensions.length > 0) {
@@ -57,16 +61,16 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
         matchingPaths.add(dirItem);
       }
 
-      const s = stencilSys.statSync(dirItem);
-      if (s && s.isDirectory()) {
-        visitDirectory(matchingPaths, dirItem, extensions);
+      const s = inMemoryFs.statSync(dirItem);
+      if (s && s.isDirectory) {
+        visitDirectory(matchingPaths, dirItem, extensions, depth);
       }
     });
   };
 
-  tsSys.readDirectory = (p, extensions) => {
+  tsSys.readDirectory = (p, extensions, _exclude, _include, depth = 0) => {
     const matchingPaths = new Set<string>();
-    visitDirectory(matchingPaths, p, extensions);
+    visitDirectory(matchingPaths, p, extensions, depth);
     return Array.from(matchingPaths);
   };
 
@@ -77,7 +81,7 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
       if (IS_WEB_WORKER_ENV) {
         content = fetchUrlSync(p);
         if (typeof content === 'string') {
-          stencilSys.writeFileSync(p, content);
+          inMemoryFs.writeFile(p, content);
         }
       } else {
         config.logger.error(`ts.sys can only request http resources from within a web worker: ${p}`);
@@ -89,7 +93,6 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
 
   tsSys.writeFile = (p, data) => {
     inMemoryFs.writeFile(p, data);
-    stencilSys.writeFileSync(p, data);
   };
 };
 

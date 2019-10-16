@@ -27,6 +27,7 @@ export const createTsWatchProgram = async (config: d.Config, compilerCtx: d.Comp
     }
   };
 
+  // TODO: it should error?
   if (config.tsconfig == null) {
     config.tsconfig = path.join(config.rootDir, TSCONFIG_NAME_FALLBACK);
     const tsConfig = JSON.stringify(getTsConfigFallback(config), null, 2);

@@ -9,7 +9,7 @@ export const getTsOptionsToExtend = (config: d.Config) => {
     incremental: config.enableCache,
     module: ts.ModuleKind.ESNext,
     moduleResolution: ts.ModuleResolutionKind.NodeJs,
-    noEmitOnError: true,
+    noEmitOnError: false,
     outDir: config.cacheDir,
     rootDir: config.srcDir,
     sourceMap: config.sourceMap,

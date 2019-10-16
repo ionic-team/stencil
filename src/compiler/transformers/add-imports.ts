@@ -48,7 +48,6 @@ const addEsmImports = (tsSourceFile: ts.SourceFile, importFnNames: string[], imp
     ts.createLiteral(importPath)
   );
   statements.unshift(newImport);
-
   return ts.updateSourceFileNode(tsSourceFile, statements);
 };
 

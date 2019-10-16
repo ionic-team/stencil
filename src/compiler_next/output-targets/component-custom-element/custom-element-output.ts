@@ -2,14 +2,12 @@ import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
-import { convertDecoratorsToStatic } from '../../../compiler/transformers/decorators-to-static/convert-decorators';
-import { convertStaticToMeta } from '../../../compiler/transformers/static-to-meta/visitor';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
-import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import path from 'path';
 import ts from 'typescript';
+import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 
 
 export const customElementOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram, outputTargets: d.OutputTargetDistCustomElement[]) => {
@@ -20,7 +18,7 @@ export const customElementOutput = async (config: d.Config, compilerCtx: d.Compi
       id: 'customElement',
       platform: 'client',
       conditionals: getBuildConditionals(config, buildCtx.components),
-      customTransformers: getCustomTransformers(config, compilerCtx, buildCtx, tsBuilder),
+      customTransformers: getCustomTransformer(compilerCtx),
       inputs: getEntries(compilerCtx),
       outputOptions: {
         format: 'es',
@@ -64,9 +62,7 @@ const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[])
   return build;
 };
 
-const getCustomTransformers = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
-  const tsTypeChecker = tsBuilder.getProgram().getTypeChecker();
-
+const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: null,
@@ -74,16 +70,8 @@ const getCustomTransformers = (config: d.Config, compilerCtx: d.CompilerCtx, bui
     proxy: null,
     style: 'static'
   };
-
-  const customTransformers: ts.CustomTransformers = {
-    before: [
-      convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker),
-      updateStencilCoreImports(transformOpts.coreImportPath)
-    ],
-    after: [
-      convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts),
-      nativeComponentTransform(compilerCtx, transformOpts)
-    ]
-  };
-  return customTransformers;
+  return [
+    updateStencilCoreImports(transformOpts.coreImportPath),
+    nativeComponentTransform(compilerCtx, transformOpts)
+  ];
 };

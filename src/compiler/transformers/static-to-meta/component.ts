@@ -19,7 +19,15 @@ import ts from 'typescript';
 import { addComponentMetaStatic } from '../add-component-meta-static';
 
 
-export const parseStaticComponentMeta = (config: d.Config, compilerCtx: d.CompilerCtx, typeChecker: ts.TypeChecker, cmpNode: ts.ClassDeclaration, moduleFile: d.Module, nodeMap: d.NodeMap, transformOpts: d.TransformOptions) => {
+export const parseStaticComponentMeta = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  typeChecker: ts.TypeChecker,
+  cmpNode: ts.ClassDeclaration,
+  moduleFile: d.Module,
+  nodeMap: d.NodeMap,
+  transformOpts?: d.TransformOptions
+) => {
   if (cmpNode.members == null) {
     return cmpNode;
   }
