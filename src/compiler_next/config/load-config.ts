@@ -113,7 +113,7 @@ const loadConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[], co
             try {
               const testConfigFilePath = path.join(configPath, configName);
               const stat = await sys.stat(testConfigFilePath);
-              if (stat.isFile()) {
+              if (stat && stat.isFile()) {
                 configPath = testConfigFilePath;
                 hasConfigFile = true;
                 break;
