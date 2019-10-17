@@ -7,6 +7,7 @@ import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
 import { validateRollupConfig } from '../../compiler/config/validate-rollup-config';
 import { validateTesting } from '../../compiler/config/validate-testing';
+import { setBooleanConfig } from '../../compiler/config/config-utils';
 import path from 'path';
 
 
@@ -30,17 +31,9 @@ export const validateConfig = (userConfig?: Config) => {
     config.devMode = DEFAULT_DEV_MODE;
   }
 
-  // minify
-  if (!isBoolean(config.minifyCss)) {
-    config.minifyCss = !config.devMode;
-  }
-  if (!isBoolean(config.minifyJs)) {
-    config.minifyJs = !config.devMode;
-  }
-
-  if (!isBoolean(config.sourceMap)) {
-    config.sourceMap = false;
-  }
+  setBooleanConfig(config, 'minifyCss', null, !config.devMode);
+  setBooleanConfig(config, 'minifyJs', null, !config.devMode);
+  setBooleanConfig(config, 'sourceMap', null, false);
 
   // hash file names
   if (!isBoolean(config.hashFileNames)) {
@@ -86,26 +79,26 @@ export const validateConfig = (userConfig?: Config) => {
     config.bundles = [];
   }
 
-  // setBooleanConfig(config, 'writeLog', 'log', false);
-  // setBooleanConfig(config, 'buildAppCore', null, true);
+  setBooleanConfig(config, 'writeLog', 'log', false);
+  setBooleanConfig(config, 'buildAppCore', null, true);
 
   // Default copy
-  // config.copy = config.copy || [];
+  config.copy = config.copy || [];
 
   // validate how many workers we can use
   // validateWorkers(config);
 
   // default devInspector to whatever devMode is
-  // setBooleanConfig(config, 'devInspector', null, config.devMode);
+  setBooleanConfig(config, 'devInspector', null, config.devMode);
 
   // default watch false
-  // setBooleanConfig(config, 'watch', 'watch', false);
+  setBooleanConfig(config, 'watch', 'watch', false);
 
-  // setBooleanConfig(config, 'minifyCss', null, !config.devMode);
-  // setBooleanConfig(config, 'minifyJs', null, !config.devMode);
+  setBooleanConfig(config, 'minifyCss', null, !config.devMode);
+  setBooleanConfig(config, 'minifyJs', null, !config.devMode);
 
-  // setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
-  // setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
+  setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
+  setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
 
   // if (!config._isTesting) {
   //   validateDistNamespace(config, diagnostics);
@@ -119,8 +112,8 @@ export const validateConfig = (userConfig?: Config) => {
   //   config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
   // }
 
-  // setBooleanConfig(config, 'generateDocs', 'docs', false);
-  // setBooleanConfig(config, 'enableCache', 'cache', true);
+  setBooleanConfig(config, 'generateDocs', 'docs', false);
+  setBooleanConfig(config, 'enableCache', 'cache', true);
 
   // if (!Array.isArray(config.includeSrc)) {
   //   config.includeSrc = DEFAULT_INCLUDES.map(include => {
@@ -138,6 +131,11 @@ export const validateConfig = (userConfig?: Config) => {
   // config._isValidated = true;
 
   // validateOutputTargetCustom(config, diagnostics);
+
+  // TODO
+  config.autoprefixCss = false;
+  config.minifyCss = false;
+  config.minifyJs = false;
 
   return {
     config,

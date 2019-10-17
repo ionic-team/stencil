@@ -18,7 +18,7 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
       if (externalId) {
         return {
           id: externalId,
-          external: true
+          external: true,
         };
       }
       if (id === '@utils') {

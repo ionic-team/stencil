@@ -2,6 +2,7 @@ import { CompilerSystem } from '../../declarations';
 import { normalizePath } from '@utils';
 import fs from 'fs';
 import path from 'path';
+import { createHash } from 'crypto';
 
 
 export function createNodeSys(prcs: NodeJS.Process) {
@@ -115,7 +116,7 @@ export function createNodeSys(prcs: NodeJS.Process) {
     },
     stat(p) {
       return new Promise(resolve => {
-        fs.lstat(p, (err, s) => {
+        fs.stat(p, (err, s) => {
           if (err) {
             resolve(undefined);
           } else {
@@ -126,7 +127,7 @@ export function createNodeSys(prcs: NodeJS.Process) {
     },
     statSync(p) {
       try {
-        return fs.lstatSync(p);
+        return fs.statSync(p);
       } catch (e) {}
       return undefined;
     },
@@ -158,6 +159,17 @@ export function createNodeSys(prcs: NodeJS.Process) {
       } catch (e) {}
       return false;
     },
+    generateContentHash(content: string, length?: number) {
+      let hash = createHash('sha1')
+        .update(content)
+        .digest('hex')
+        .toLowerCase();
+
+      if (typeof length === 'number') {
+        hash = hash.substr(0, length);
+      }
+      return Promise.resolve(hash);
+    }
   };
 
   return sys;

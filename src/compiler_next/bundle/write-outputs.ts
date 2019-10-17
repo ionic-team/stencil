@@ -22,6 +22,7 @@ const writeBuildOutput = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outp
   const promises: Promise<any>[] = [];
 
   rollupOutput.output.forEach(output => {
+    debugger;
     const outputFilePath = normalizePath(path.join(outputTarget.dir, output.fileName));
     promises.push(
       compilerCtx.fs.writeFile(outputFilePath, (output as OutputChunk).code)

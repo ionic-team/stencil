@@ -8,10 +8,26 @@ import ts from 'typescript';
 import { normalizePath } from '@utils';
 
 
-export const updateModule = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsSourceFile: ts.SourceFile, sourceFileText: string, emitFilepath: string, typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta) => {
-  const dirPath = path.dirname(tsSourceFile.fileName);
+export const updateModule = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  tsSourceFile: ts.SourceFile,
+  sourceFileText: string,
+  emitFilepath: string,
+  typeChecker: ts.TypeChecker,
+  collection: d.CollectionCompilerMeta
+) => {
+  const sourceFilePath = normalizePath(tsSourceFile.fileName);
+  const prevModuleFile = getModule(compilerCtx, sourceFilePath);
+  if (prevModuleFile && prevModuleFile.staticSourceFileText === sourceFileText) {
+    return;
+  }
+
+  const dirPath = path.dirname(sourceFilePath);
   const moduleFile = createModule(tsSourceFile, sourceFileText, emitFilepath);
   compilerCtx.moduleMap.set(moduleFile.sourceFilePath, moduleFile);
+  compilerCtx.changedModules.add(moduleFile.sourceFilePath);
 
   const visitNode = (node: ts.Node) => {
     if (ts.isClassDeclaration(node)) {
@@ -34,12 +50,10 @@ export const updateModule = (config: d.Config, compilerCtx: d.CompilerCtx, build
     collection.moduleFiles.push(moduleFile);
   }
   visitNode(tsSourceFile);
-  return moduleFile;
 };
 
-export const getModule = (compilerCtx: d.CompilerCtx, sourceFilePath: string) => {
-  sourceFilePath = normalizePath(sourceFilePath);
-  return compilerCtx.moduleMap.get(sourceFilePath);
+export const getModule = (compilerCtx: d.CompilerCtx, fileName: string) => {
+  return compilerCtx.moduleMap.get(fileName);
 };
 
 export const createModule = (

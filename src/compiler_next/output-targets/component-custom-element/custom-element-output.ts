@@ -1,66 +1,38 @@
 import * as d from '../../../declarations';
-import { BundleOptions } from '../../bundle/bundle-interface';
-import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
-import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
 import path from 'path';
 import ts from 'typescript';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
+import { isOutputTargetDistCustomElements } from '../../../compiler/output-targets/output-utils';
 
 
-export const customElementOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram, outputTargets: d.OutputTargetDistCustomElement[]) => {
-  const timespan = buildCtx.createTimeSpan(`generate custom element started`, true);
+export const customElementOutput = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, changedModuleFiles: d.Module[]) => {
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
+  if (outputTargets.length === 0) {
+    return;
+  }
 
+  const timespan = buildCtx.createTimeSpan(`generate custom elements started`, true);
+  const printer = ts.createPrinter();
   try {
-    const bundleOpts: BundleOptions = {
-      id: 'customElement',
-      platform: 'client',
-      conditionals: getBuildConditionals(config, buildCtx.components),
-      customTransformers: getCustomTransformer(compilerCtx),
-      inputs: getEntries(compilerCtx),
-      outputOptions: {
-        format: 'es',
-        sourcemap: config.sourceMap,
-      },
-      outputTargets,
-      tsBuilder,
-    };
-
-    await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
+    changedModuleFiles.forEach(mod => {
+      const transformed = ts.transform(mod.staticSourceFile, getCustomTransformer(compilerCtx)).transformed[0];
+      const code = printer.printFile(transformed);
+      outputTargets.forEach(outputTarget => {
+        const collectionFilePath = path.join(outputTarget.dir, mod.jsFilePath);
+        compilerCtx.fs.writeFile(collectionFilePath, code);
+      });
+    });
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
 
-  timespan.finish(`generate custom element finished`);
+  timespan.finish(`generate custom elements finished`);
 };
 
-
-const getEntries = (compilerCtx: d.CompilerCtx) => {
-  const inputs: any = {};
-
-  compilerCtx.moduleMap.forEach(m => {
-    if (m.cmps.length > 0) {
-      const fileName = path.basename(m.sourceFilePath);
-      const nameParts = fileName.split('.');
-      nameParts.pop();
-      const entryName = nameParts.join('.');
-      inputs[entryName] = m.sourceFilePath;
-    }
-  });
-
-  return inputs;
-};
-
-const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
-  const build = getBuildFeatures(cmps) as d.BuildConditionals;
-
-  updateBuildConditionals(config, build);
-
-  return build;
-};
 
 const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {

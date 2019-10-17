@@ -1,12 +1,13 @@
 import * as d from '../../declarations';
 import ts from 'typescript';
+import { isOutputTargetDistTypes } from '../../compiler/output-targets/output-utils';
 
 
 export const getTsOptionsToExtend = (config: d.Config) => {
   const tsOptions: ts.CompilerOptions = {
     experimentalDecorators: true,
-    declaration: true,
-    incremental: config.enableCache,
+    declaration: config.outputTargets.some(isOutputTargetDistTypes),
+    incremental: false,
     module: ts.ModuleKind.ESNext,
     moduleResolution: ts.ModuleResolutionKind.NodeJs,
     noEmitOnError: false,

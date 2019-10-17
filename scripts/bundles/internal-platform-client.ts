@@ -39,6 +39,9 @@ export async function internalClient(opts: BuildOptions) {
   const internalClientBundle: RollupOptions = {
     input: join(inputClientDir, 'index.js'),
     output,
+    treeshake:{
+      pureExternalModules: true,
+    },
     plugins: [
       {
         name: 'internalClientRuntimeCssShim',

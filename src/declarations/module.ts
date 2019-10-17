@@ -1,5 +1,4 @@
 import { ComponentCompilerMeta } from './component-compiler-meta';
-import ts from 'typescript';
 
 
 export type ModuleMap = Map<string, Module>;
@@ -25,7 +24,7 @@ export interface Module {
   originalCollectionComponentPath: string;
   potentialCmpRefs: string[];
   sourceFilePath: string;
-  staticSourceFile: ts.SourceFile;
+  staticSourceFile: any;
   staticSourceFileText: string;
 
   // build features

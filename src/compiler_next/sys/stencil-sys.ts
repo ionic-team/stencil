@@ -244,6 +244,16 @@ export const createStencilSys = () => {
     return true;
   };
 
+  const generateContentHash = async (content: string) => {
+    const arrayBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(content));
+    const hashArray = Array.from(new Uint8Array(arrayBuffer));                     // convert buffer to byte array
+    let hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+    if (typeof length === 'number') {
+      hashHex = hashHex.substr(0, length);
+    }
+    return hashHex;
+  };
+
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
   const fileWatchTimeout = 32;
@@ -276,6 +286,7 @@ export const createStencilSys = () => {
     watchFile,
     writeFile,
     writeFileSync,
+    generateContentHash
   };
 
   return sys;

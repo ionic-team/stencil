@@ -50,6 +50,7 @@ export interface CompilerCtx {
   rootTsFiles: string[];
   styleModeNames: Set<string>;
   tsService: TsService;
+  changedModules: Set<string>;
 
   rollupCache: Map<string, any>;
 

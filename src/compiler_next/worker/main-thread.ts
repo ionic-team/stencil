@@ -44,6 +44,7 @@ export const createWorkerCompiler = async () => {
     stat: path => post({ type: CompilerWorkerMsgType.SysStat, path }),
     unlink: path => post({ type: CompilerWorkerMsgType.SysUnlink, path }),
     writeFile: (path, content) => post({ type: CompilerWorkerMsgType.SysWriteFile, path, content }),
+    generateContentHash: () => Promise.resolve('TODO')
   };
 
   const loadConfig = (config: Config) => post({

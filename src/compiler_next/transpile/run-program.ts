@@ -1,13 +1,13 @@
 import * as d from '../../declarations';
 import { convertDecoratorsToStatic } from '../../compiler/transformers/decorators-to-static/convert-decorators';
 import { generateAppTypes } from '../../compiler/types/generate-app-types';
-import { getComponentsFromModules } from '../../compiler/output-targets/output-utils';
+import { getComponentsFromModules, isOutputTargetDistTypes } from '../../compiler/output-targets/output-utils';
 import { loadTypeScriptDiagnostics } from '@utils';
-import { collectionOutput } from '../output-targets/component-collection/collection-output';
 import { resolveComponentDependencies } from '../../compiler/entries/resolve-component-dependencies';
 import { updateComponentBuildConditionals } from '../build/app-data';
 import { updateModule } from './static-to-meta/parse-static';
 import ts from 'typescript';
+import path from 'path';
 
 
 export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
@@ -24,12 +24,18 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
 
   const tsProgram = tsBuilder.getProgram();
   const tsTypeChecker = tsProgram.getTypeChecker();
-  const emittedModules: d.Module[] = [];
-  const emitCallback: ts.WriteFileCallback = (emiFilePath, data, _w, _e, tsSourceFiles) => {
-    if (emiFilePath.endsWith('.js')) {
-      emittedModules.push(
-        updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emiFilePath, tsTypeChecker, null)
-      );
+  const typesOutputTarget = config.outputTargets.filter(isOutputTargetDistTypes);
+  const emitCallback: ts.WriteFileCallback = (filepath, data, _w, _e, tsSourceFiles) => {
+    filepath = filepath.replace(config.cacheDir, '');
+    if (filepath.endsWith('.js')) {
+      updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, filepath, tsTypeChecker, null);
+    } else if (filepath.endsWith('.d.ts')) {
+      typesOutputTarget.forEach(o => {
+        compilerCtx.fs.writeFile(
+          path.join(o.typesDir, filepath),
+          data
+        );
+      });
     }
   };
 
@@ -47,9 +53,6 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
   buildCtx.components = getComponentsFromModules(buildCtx.moduleFiles);
   updateComponentBuildConditionals(compilerCtx.moduleMap, buildCtx.components);
   resolveComponentDependencies(buildCtx.components);
-
-  // Write collection output
-  collectionOutput(config, compilerCtx, buildCtx, emittedModules);
 
   if (buildCtx.hasError) {
     return false;

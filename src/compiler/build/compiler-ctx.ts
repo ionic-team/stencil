@@ -42,6 +42,7 @@ export class CompilerContext implements d.CompilerCtx {
   cachedGlobalStyle: string;
   styleModeNames = new Set<string>();
   rollupCache = new Map();
+  changedModules = new Set<string>();
 
   constructor(config: d.Config) {
     const cacheFs = (config.enableCache && config.sys.fs != null) ? new InMemoryFs(config.sys.fs, config.sys.path) : null;

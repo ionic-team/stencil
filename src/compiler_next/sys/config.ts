@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { createLogger } from './logger';
 import { createStencilSys } from './stencil-sys';
 import path from 'path';
+import { scopeCss } from '../../utils/shadow-css';
 
 
 export const getConfig = (userConfig: d.Config) => {
@@ -27,6 +28,8 @@ export const getConfig = (userConfig: d.Config) => {
   // old way
   config.sys = config.sys || {};
   config.sys.path = path;
+  config.sys.generateContentHash = config.sys_next.generateContentHash;
+  config.sys.scopeCss = (cssText, scopeId, commentOriginalSelector) => Promise.resolve(scopeCss(cssText, scopeId, commentOriginalSelector));
 
   return config;
 };

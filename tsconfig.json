@@ -10,7 +10,7 @@
     "jsxFactory": "h",
     "lib": [
       "dom",
-      "es2017",
+      "es2018",
       "esnext.array"
     ],
     "module": "esnext",

@@ -1,17 +1,18 @@
 import * as d from '../../../declarations';
 import { buildError, isBoolean, isString } from '@utils';
-import { COPY, DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetDist, isOutputTargetWww } from '../../../compiler/output-targets/output-utils';
+import { COPY, DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww } from '../../../compiler/output-targets/output-utils';
+import { getAbsolutePath } from '../utils';
 import { validateCopy } from '../../../compiler/config/validate-copy';
 import { validatePrerender } from '../../../compiler/config/validate-prerender';
 import { validateServiceWorker } from '../../../compiler/config/validate-service-worker';
 import path from 'path';
 
-
-export const validateWww = (config: d.Config, userOutputs: d.OutputTargetWww[], diagnostics: d.Diagnostic[]) => {
+export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[]) => {
   const hasOutputTargets = Array.isArray(config.outputTargets);
   const hasE2eTests = !!(config.flags && config.flags.e2e);
+  const userOutputs = config.outputTargets.filter(isOutputTargetWww);
 
-  if (!hasOutputTargets || (hasE2eTests && !config.outputTargets.some(isOutputTargetWww)) && !config.outputTargets.some(isOutputTargetDist)) {
+  if (!hasOutputTargets || (hasE2eTests && !config.outputTargets.some(isOutputTargetWww))) {
     userOutputs.push({ type: WWW });
   }
 
@@ -74,13 +75,7 @@ const validateWwwOutputTarget = (config: d.Config, outputTarget: d.OutputTargetW
     outputTarget.baseUrl += '/';
   }
 
-  if (!isString(outputTarget.dir)) {
-    outputTarget.dir = 'www';
-  }
-
-  if (!path.isAbsolute(outputTarget.dir)) {
-    outputTarget.dir = path.join(config.rootDir, outputTarget.dir);
-  }
+  outputTarget.dir = getAbsolutePath(config, outputTarget.dir || 'www');
 
   // Fix "dir" to account
   outputTarget.appDir = path.join(outputTarget.dir, getUrlPathName(outputTarget.baseUrl));

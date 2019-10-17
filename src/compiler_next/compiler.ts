@@ -6,6 +6,7 @@ import { getConfig } from './sys/config';
 import { inMemoryFs } from './sys/in-memory-fs';
 import { patchFs } from './sys/fs-patch';
 import { patchTypescript } from './sys/typescript/typescript-patch';
+import { Cache } from '../compiler/cache';
 
 
 export const createCompiler = async (config: Config) => {
@@ -17,6 +18,8 @@ export const createCompiler = async (config: Config) => {
 
   const compilerCtx = new CompilerContext(config);
   compilerCtx.fs = inMemoryFs(sys);
+  compilerCtx.cache = new Cache(config, inMemoryFs(sys));
+  compilerCtx.cache.initCacheDir();
 
   await patchTypescript(config, diagnostics, compilerCtx.fs);
 

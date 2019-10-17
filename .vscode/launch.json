@@ -78,7 +78,6 @@
         "${workspaceFolder}/bin/stencil",
         "build",
         "--dev",
-        "--debug",
         "--max-workers=1",
         "--next",
         "--watch",

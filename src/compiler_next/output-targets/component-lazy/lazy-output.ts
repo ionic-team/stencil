@@ -1,17 +1,22 @@
+import { generateEntryModules } from '../../..//compiler/entries/entry-modules';
 import * as d from '../../../declarations';
-import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
-import { generateEntryModules } from '../../..//compiler/entries/entry-modules';
+import { BundleOptions } from '../../bundle/bundle-interface';
 import { LAZY_BROWSER_ENTRY_ID, LAZY_EXTERNAL_ENTRY_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID } from '../../bundle/entry-alias-ids';
-import { isOutputTargetHydrate } from '../../../compiler/output-targets/output-utils';
+import { isOutputTargetDistLazy, isOutputTargetHydrate } from '../../../compiler/output-targets/output-utils';
 import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
 import ts from 'typescript';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 
 
-export const lazyOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram, outputTargets: d.OutputTargetDistLazy[]) => {
+export const lazyOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
+  if (outputTargets.length === 0) {
+    return;
+  }
+
   const timespan = buildCtx.createTimeSpan(`generate lazy started`, true);
 
   try {

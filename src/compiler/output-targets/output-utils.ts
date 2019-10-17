@@ -41,8 +41,11 @@ export const isOutputTargetDist = (o: d.OutputTarget): o is d.OutputTargetDist =
 export const isOutputTargetDistCollection = (o: d.OutputTarget): o is d.OutputTargetDistCollection =>
   o.type === DIST_COLLECTION;
 
-export const isOutputTargetDistCustomElement = (o: d.OutputTarget): o is d.OutputTargetDistCustomElement =>
-  o.type === DIST_CUSTOM_ELEMENT;
+export const isOutputTargetDistCustomElements = (o: d.OutputTarget): o is d.OutputTargetDistCustomElements =>
+  o.type === DIST_CUSTOM_ELEMENTS;
+
+export const isOutputTargetDistCustomElementsBundle = (o: d.OutputTarget): o is d.OutputTargetDistCustomElements =>
+  o.type === DIST_CUSTOM_ELEMENTS_BUNDLE;
 
 export const isOutputTargetCopy = (o: d.OutputTarget): o is d.OutputTargetCopy =>
   o.type === COPY;
@@ -113,7 +116,8 @@ export const COPY = 'copy';
 export const CUSTOM = `custom`;
 export const DIST = `dist`;
 export const DIST_COLLECTION = `dist-collection`;
-export const DIST_CUSTOM_ELEMENT = `dist-custom-element`;
+export const DIST_CUSTOM_ELEMENTS = `dist-custom-elements`;
+export const DIST_CUSTOM_ELEMENTS_BUNDLE = `dist-custom-elements-bundle`;
 export const DIST_TYPES = `dist-types`;
 export const DIST_HYDRATE_SCRIPT = `dist-hydrate-script`;
 export const DIST_LAZY = `dist-lazy`;
@@ -149,10 +153,28 @@ export const VALID_TYPES = [
 ];
 
 export const VALID_TYPES_NEXT = [
-  DIST_COLLECTION,
-  DIST_CUSTOM_ELEMENT,
-  DIST_LAZY,
+  // DIST
   WWW,
+  DIST,
+  DIST_COLLECTION,
+  DIST_CUSTOM_ELEMENTS,
+  DIST_CUSTOM_ELEMENTS_BUNDLE,
+  DIST_LAZY,
+  DIST_HYDRATE_SCRIPT,
+
+  // DOCS
+  DOCS,
+  DOCS_JSON,
+  DOCS_README,
+  DOCS_VSCODE,
+  DOCS_CUSTOM,
+
+  // MISC
+  ANGULAR,
+  COPY,
+  CUSTOM,
+  STATS,
+
 ];
 
 export const GENERATED_DTS = 'components.d.ts';

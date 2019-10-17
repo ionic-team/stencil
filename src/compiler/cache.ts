@@ -19,7 +19,7 @@ export class Cache implements d.Cache {
       return;
     }
 
-    if (!this.config.enableCache) {
+    if (!this.config.enableCache || !this.cacheFs) {
       this.config.logger.info(`cache optimizations disabled`);
       this.clearDiskCache();
       return;
@@ -29,6 +29,7 @@ export class Cache implements d.Cache {
 
     try {
       const readmeFilePath = this.path.join(this.config.cacheDir, '_README.log');
+      debugger;
       await this.cacheFs.writeFile(readmeFilePath, CACHE_DIR_README);
 
     } catch (e) {

@@ -78,6 +78,7 @@ export function mockCompilerCtx() {
     rootTsFiles: [],
     styleModeNames: new Set(),
     tsService: null,
+    changedModules: new Set(),
     reset: () => {/**/}
   };
 

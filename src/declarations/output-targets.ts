@@ -232,8 +232,13 @@ export interface OutputTargetBaseNext {
   dir?: string;
 }
 
-export interface OutputTargetDistCustomElement extends OutputTargetBaseNext {
-  type: 'dist-custom-element';
+export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
+  type: 'dist-custom-elements';
+  copy?: CopyTask[];
+}
+
+export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
+  type: 'dist-custom-elements-bundle';
   empty?: boolean;
   copy?: CopyTask[];
 }
@@ -253,7 +258,8 @@ export type OutputTarget =
  | OutputTargetCustom
  | OutputTargetDist
  | OutputTargetDistCollection
- | OutputTargetDistCustomElement
+ | OutputTargetDistCustomElements
+ | OutputTargetDistCustomElementsBundle
  | OutputTargetDistLazy
  | OutputTargetDistGlobalStyles
  | OutputTargetDistLazyLoader

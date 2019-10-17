@@ -6,6 +6,7 @@ import { generateOutputTargets } from '../output-targets/generate-output-targets
 import { runTsProgram } from '../transpile/run-program';
 import { writeBuild } from './write-build';
 import ts from 'typescript';
+import { generateGlobalStyles } from '../../compiler/style/global-styles';
 
 
 export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
@@ -25,12 +26,20 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
       return null;
     }
 
+    // const copyPromise = outputCopy(config, compilerCtx, buildCtx);
+
+    // preprocess and generate styles before any outputTarget starts
+    buildCtx.stylesPromise = generateGlobalStyles(config, compilerCtx, buildCtx);
+    if (buildCtx.hasError) return buildAbort(buildCtx);
+
     // create outputs
     await generateOutputTargets(config, compilerCtx, buildCtx, tsBuilder);
     if (buildCtx.hasError) return buildAbort(buildCtx);
 
     /// write outputs
+    await buildCtx.stylesPromise;
     await writeBuild(config, compilerCtx, buildCtx);
+    // await copyPromise;
 
   } catch (e) {
     // ¯\_(ツ)_/¯

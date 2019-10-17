@@ -43,6 +43,10 @@ export interface CompilerSystemAsync {
    * Always returns a boolean if the file was written or not. Does not throw.
    */
   writeFile(p: string, content: string): Promise<boolean>;
+  /**
+   * Generates a MD5 digest encoded as HEX
+   */
+  generateContentHash?(content: string, length?: number): Promise<string>;
 }
 
 export interface CompilerSystem extends CompilerSystemAsync {
