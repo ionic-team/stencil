@@ -1,6 +1,7 @@
 import * as d from '../declarations';
 import path from 'path';
 import { URL } from 'url';
+import { normalizePath } from '@utils';
 
 
 export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputHref: string) {
@@ -47,10 +48,8 @@ export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputHr
   pathParts.push(fileName);
 
   // figure out the directory where this file will be saved
-  const filePath = path.join(
+  return normalizePath(path.join(
     manager.outputTarget.appDir,
     ...pathParts
-  );
-
-  return filePath;
+  ));
 }
