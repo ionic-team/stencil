@@ -2,11 +2,9 @@ import { ComponentCompilerMeta } from './component-compiler-meta';
 
 
 export interface EntryModule {
-  entryKey?: string;
-  dependencies?: string[];
+  entryKey: string;
   cmps: ComponentCompilerMeta[];
-  modeNames?: string[];
-  entryBundles?: EntryBundle[];
+  modeNames: string[];
 }
 
 export interface EntryBundle {

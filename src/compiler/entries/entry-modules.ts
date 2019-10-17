@@ -29,8 +29,6 @@ export function createEntryModule(cmps: d.ComponentCompilerMeta[]): d.EntryModul
   return {
     cmps,
     entryKey,
-
-    // get the modes used in this bundle
     modeNames: getEntryModes(cmps),
   };
 }

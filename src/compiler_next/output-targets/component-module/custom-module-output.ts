@@ -6,12 +6,11 @@ import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data'
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
 import path from 'path';
-import ts from 'typescript';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import { isOutputTargetDistCustomElementsBundle } from '../../../compiler/output-targets/output-utils';
+import { writeBuildOutputs } from '../../bundle/write-outputs';
 
-
-export const customElementsBundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
+export const customElementsBundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElementsBundle);
   if (outputTargets.length === 0) {
     return;
@@ -26,15 +25,15 @@ export const customElementsBundleOutput = async (config: d.Config, compilerCtx: 
       conditionals: getBuildConditionals(config, buildCtx.components),
       customTransformers: getCustomTransformer(compilerCtx),
       inputs: getEntries(compilerCtx),
-      outputOptions: {
-        format: 'es',
-        sourcemap: config.sourceMap,
-      },
-      outputTargets,
-      tsBuilder,
     };
 
-    await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
+
+    const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
+    const rollupOutput = await build.generate({
+      format: 'es',
+      sourcemap: config.sourceMap,
+    });
+    await writeBuildOutputs(compilerCtx, buildCtx, outputTargets, rollupOutput);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

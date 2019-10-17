@@ -19,7 +19,7 @@ export const config: Config = {
       type: 'dist',
     },
     {
-      type: 'dist-custom-element'
+      type: 'dist-custom-elements'
     }
   ],
   enableCache: false

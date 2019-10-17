@@ -1,11 +1,11 @@
-import { CompilerOptions, nodeModuleNameResolver } from 'typescript';
+import ts from 'typescript';
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
 export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx): Plugin {
   const path = config.sys.path;
-  const compilerOptions: CompilerOptions = compilerCtx.compilerOptions;
+  const compilerOptions: ts.CompilerOptions = compilerCtx.compilerOptions;
 
   return {
     name: 'inMemoryFsRead',
@@ -88,7 +88,7 @@ export function inMemoryFsRead(config: d.Config, compilerCtx: d.CompilerCtx): Pl
 /**
  * Check whether an importee has a matching path alias.
  */
-const hasMatchingPathAlias = (importee: string, compilerOptions: CompilerOptions) =>
+const hasMatchingPathAlias = (importee: string, compilerOptions: ts.CompilerOptions) =>
   Object.keys(compilerOptions.paths).some(path => new RegExp(path.replace('*', '\\w*')).test(importee));
 
 /**
@@ -98,7 +98,7 @@ const hasMatchingPathAlias = (importee: string, compilerOptions: CompilerOptions
  * if the import can't be resolved
  */
 const resolveWithPathAlias = async (importee: string, importer: string, compilerCtx: d.CompilerCtx, path: d.Path) => {
-  const { resolvedModule } = nodeModuleNameResolver(importee, importer, compilerCtx.compilerOptions, {
+  const { resolvedModule } = ts.nodeModuleNameResolver(importee, importer, compilerCtx.compilerOptions, {
     readFile: compilerCtx.fs.readFileSync,
     fileExists: fileName => compilerCtx.fs.statSync(fileName).isFile,
   });

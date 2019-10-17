@@ -33,7 +33,7 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
     if (buildCtx.hasError) return buildAbort(buildCtx);
 
     // create outputs
-    await generateOutputTargets(config, compilerCtx, buildCtx, tsBuilder);
+    await generateOutputTargets(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildAbort(buildCtx);
 
     /// write outputs
