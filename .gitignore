@@ -34,8 +34,6 @@ dist/
 
 /screenshot/index.js
 /screenshot/package.json
-/screenshot/connector.js
-/screenshot/local-connector.js
 /screenshot/pixel-match.js
 /screenshot/*.d.ts
 

@@ -17,16 +17,22 @@ import { validateBuild } from './test/validate-build';
 
 
 export async function run(rootDir: string, args: string[]) {
-  if (args.includes('--release')) {
-    await release(rootDir, args);
-  }
+  try {
+    if (args.includes('--release')) {
+      await release(rootDir, args);
+    }
 
-  if (args.includes('--license')) {
-    createLicense(rootDir);
-  }
+    if (args.includes('--license')) {
+      createLicense(rootDir);
+    }
 
-  if (args.includes('--validate-build')) {
-    validateBuild(rootDir);
+    if (args.includes('--validate-build')) {
+      validateBuild(rootDir);
+    }
+
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
   }
 }
 
