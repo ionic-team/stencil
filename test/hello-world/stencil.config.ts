@@ -1,23 +1,13 @@
-import { Config } from '../../dist';
+import { Config } from '../../internal';
 
 export const config: Config = {
   namespace: 'HelloWorld',
   outputTargets: [
-    // { type: 'dist' },
     {
-      type: 'dist-custom-elements',
-      dir: 'www'
-    },
-    // {
-    //   type: 'www',
-    //   serviceWorker: null,
-    //   copy: [
-    //     {
-    //       src: 'index-module.html',
-    //       dest: 'index-module.html'
-    //     }
-    //   ]
-    // }
+      type: 'www',
+      serviceWorker: null,
+      baseUrl: 'https://helloworld.stencil.js.com/'
+    }
   ],
   enableCache: false
 };

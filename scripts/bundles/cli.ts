@@ -96,6 +96,12 @@ export async function cli(opts: BuildOptions) {
       {
         name: 'cliWorkerImportResolverPlugin',
         resolveId(importee) {
+          if (importee === '@mock-doc') {
+            return {
+              id: '../mock-doc/index.js',
+              external: true
+            }
+          }
           if (importee === 'fs') {
             return {
               id: '../sys/node/graceful-fs.js',

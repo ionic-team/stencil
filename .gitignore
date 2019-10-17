@@ -37,6 +37,7 @@ dist/
 /screenshot/connector.js
 /screenshot/local-connector.js
 /screenshot/pixel-match.js
+/screenshot/*.d.ts
 
 test/**/www/*
 .stencil
