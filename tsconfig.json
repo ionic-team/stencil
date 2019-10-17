@@ -92,6 +92,8 @@
     "src/internal/default.ts",
     "src/internal/index.ts",
     "src/mock-doc/index.ts",
+    "src/screenshot/index.ts",
+    "src/screenshot/pixel-match.ts",
     "src/sys/node/index.ts",
     "src/sys/node/node-sys-worker.ts",
     "src/testing/index.ts",

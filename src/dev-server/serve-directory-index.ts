@@ -115,7 +115,7 @@ async function getDirectoryItems(sys: d.CompilerSystem, urlPathName: string, dir
     const item: DirectoryItem = {
       name: fileName,
       pathname: url.resolve(urlPathName, fileName),
-      isDirectory: stats.isDirectory()
+      isDirectory: !!(stats && stats.isDirectory())
     };
 
     return item;

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@stencil/core/internal';
 import { expectExtend } from '../matchers';
 import { setupGlobal, teardownGlobal } from '@mock-doc';
 import { setupMockFetch } from '../mock-fetch';

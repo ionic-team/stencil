@@ -9,6 +9,7 @@ import { emptyDir } from 'fs-extra';
 import { internal } from './bundles/internal';
 import { mockDoc } from './bundles/mock-doc';
 import { release } from './release';
+import { screenshot } from './bundles/screenshot';
 import { sysNode } from './bundles/sys-node';
 import { sysNode_legacy } from './bundles/sys-node_legacy';
 import { testing } from './bundles/testing';
@@ -16,16 +17,22 @@ import { validateBuild } from './test/validate-build';
 
 
 export async function run(rootDir: string, args: string[]) {
-  if (args.includes('--release')) {
-    await release(rootDir, args);
-  }
+  try {
+    if (args.includes('--release')) {
+      await release(rootDir, args);
+    }
 
-  if (args.includes('--license')) {
-    createLicense(rootDir);
-  }
+    if (args.includes('--license')) {
+      createLicense(rootDir);
+    }
 
-  if (args.includes('--validate-build')) {
-    validateBuild(rootDir);
+    if (args.includes('--validate-build')) {
+      validateBuild(rootDir);
+    }
+
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
   }
 }
 
@@ -44,15 +51,21 @@ export async function createBuild(opts: BuildOptions) {
 
   await sysNode(opts);
 
-  return [
-    ...(await cli(opts)),
-    ...(await cli_legacy(opts)),
-    ...(await compiler(opts)),
-    ...(await compiler_legacy(opts)),
-    ...(await devServer(opts)),
-    ...(await internal(opts)),
-    ...(await mockDoc(opts)),
-    ...(await sysNode_legacy(opts)),
-    ...(await testing(opts)),
-  ];
+  const bundles = await Promise.all([
+    cli(opts),
+    cli_legacy(opts),
+    compiler(opts),
+    compiler_legacy(opts),
+    devServer(opts),
+    internal(opts),
+    mockDoc(opts),
+    screenshot(opts),
+    sysNode_legacy(opts),
+    testing(opts),
+  ]);
+
+  return bundles.reduce((b, bundle) => {
+    b.push(...bundle);
+    return b;
+  }, []);
 }

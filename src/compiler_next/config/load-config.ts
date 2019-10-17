@@ -103,21 +103,23 @@ const loadConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[], co
   if (typeof configPath === 'string') {
     try {
       const stat = await sys.stat(configPath);
-      if (stat.isFile()) {
-        hasConfigFile = true;
+      if (stat) {
+        if (stat.isFile()) {
+          hasConfigFile = true;
 
-      } else if (stat.isDirectory()) {
-        // this is only a directory, so let's make some assumptions
-        for (const configName of CONFIG_FILENAMES) {
-          try {
-            const testConfigFilePath = path.join(configPath, configName);
-            const stat = await sys.stat(testConfigFilePath);
-            if (stat.isFile()) {
-              configPath = testConfigFilePath;
-              hasConfigFile = true;
-              break;
-            }
-          } catch (e) {}
+        } else if (stat.isDirectory()) {
+          // this is only a directory, so let's make some assumptions
+          for (const configName of CONFIG_FILENAMES) {
+            try {
+              const testConfigFilePath = path.join(configPath, configName);
+              const stat = await sys.stat(testConfigFilePath);
+              if (stat && stat.isFile()) {
+                configPath = testConfigFilePath;
+                hasConfigFile = true;
+                break;
+              }
+            } catch (e) {}
+          }
         }
       }
     } catch (e) {}
