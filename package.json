@@ -88,6 +88,7 @@
     "core-js-builder": "^3.2.0",
     "css-what": "3.2.0",
     "cssnano": "4.1.10",
+    "csstype": "2.6.7",
     "execa": "^2.0.3",
     "exit": "^0.1.2",
     "fast-deep-equal": "^2.0.1",

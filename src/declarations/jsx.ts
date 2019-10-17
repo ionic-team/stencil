@@ -1,4 +1,4 @@
-
+import * as CSS from 'csstype';
 declare namespace LocalJSX {
   export interface Element {}
   export interface IntrinsicElements {}
@@ -651,6 +651,8 @@ export namespace JSXBase {
     width?: number | string;
   }
 
+  export interface CSSProperties extends CSS.Properties<string | number> {}
+
   export interface HTMLAttributes<T = HTMLElement> extends DOMAttributes<T> {
     // vdom specific
     innerHTML?: string;
@@ -670,7 +672,7 @@ export namespace JSXBase {
     lang?: string;
     spellCheck?: boolean;
     spellcheck?: boolean | string;
-    style?: { [key: string]: string | undefined };
+    style?: CSSProperties;
     tabIndex?: number;
     tabindex?: number | string;
     title?: string;
@@ -732,7 +734,7 @@ export namespace JSXBase {
     method?: string;
     min?: number | string;
     name?: string;
-    style?: { [key: string]: string | undefined };
+    style?: CSSProperties;
     target?: string;
     type?: string;
     width?: number | string;
