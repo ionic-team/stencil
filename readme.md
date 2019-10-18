@@ -151,7 +151,7 @@ Stencil includes a subset of the `core-js` polyfills for old browsers like IE11,
 
 ### Internet Explorer 11
 
-Browser that does not support native ESM (at the moment, only IE11 and older) will download a subset of [`core-js`](https://github.com/zloirock/core-js).
+Browsers that do not support native ESM (at the moment, only IE11 and older) will download a subset of [`core-js`](https://github.com/zloirock/core-js).
 
 This subset is generated using the [`core-js-builder` tool](https://github.com/zloirock/core-js/tree/master/packages/core-js-builder) with the following configuration:
 
@@ -186,7 +186,7 @@ In addition, the following set of polyfills are also included:
 
 ### All browsers
 
-Some modern browsers today like Edge does not include native support for web components, in that case we conditionally load the [Custom Elements v1](https://github.com/webcomponents/polyfills/tree/master/packages/custom-elements) polyfill.
+Some modern browsers like Edge do not include native support for Web Components. In that case, we conditionally load the [Custom Elements v1](https://github.com/webcomponents/polyfills/tree/master/packages/custom-elements) polyfill.
 
 
 ## Related

@@ -9,11 +9,7 @@ export async function generateTypes(config: d.Config, compilerCtx: d.CompilerCtx
     await generateTypesOutput(config, compilerCtx, buildCtx, pkgData, outputTarget);
 
     if (typeof pkgData.types === 'string') {
-      const pkgFile = config.sys.path.join(config.rootDir, pkgData.types);
-      const fileExists = await compilerCtx.fs.access(pkgFile);
-      if (fileExists) {
-        await copyStencilCoreDts(config, compilerCtx);
-      }
+      await copyStencilCoreDts(config, compilerCtx);
     }
   }
 }
