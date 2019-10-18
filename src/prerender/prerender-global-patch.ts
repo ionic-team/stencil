@@ -6,7 +6,7 @@ export function patchNodeGlobal(nodeGlobal: any, devServerHostUrl: string) {
 
     // webpack work-around/hack
     const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
-    const nodeFetch = requireFunc(path.join(__dirname, 'node-fetch.js'));
+    const nodeFetch = requireFunc(path.join(__dirname, '..', 'sys', 'node', 'node-fetch.js'));
 
     nodeGlobal.fetch = (input: any, init: any) => {
       if (typeof input === 'string') {

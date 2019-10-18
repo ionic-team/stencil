@@ -1,10 +1,11 @@
-import * as d from '../../../declarations';
+import * as d from '../../declarations';
 import { catchError, normalizePath } from '@utils';
 import { crawlAnchorsForNextUrls } from '../crawl-urls';
 import { getPrerenderConfig } from '../prerender-config';
 import { MockWindow, cloneWindow, serializeNodeToHtml } from '@mock-doc';
 import { patchNodeGlobal, patchWindowGlobal } from '../prerender-global-patch';
-import { generateModulePreloads } from '../prerender-modulepreload';
+import { generateModulePreloads } from './prerender-modulepreload';
+import { WorkerChild } from '../../sys/node/worker/worker-child';
 import fs from 'fs';
 import path from 'path';
 import { URL } from 'url';
@@ -220,8 +221,22 @@ function getComponentGraph(componentGraphPath: string) {
   return componentGraph;
 }
 
+export function createRunner() {
+  return (methodName: string, args: any[]) => {
+    if (methodName === 'prerenderWorker') {
+      return prerenderWorker(args[0]);
+    }
+    return null;
+  };
+}
 
-
+if (process.argv.indexOf('--start-worker') > -1) {
+  // --start-worker cmd line arg used to start the worker
+  // and attached a message handler to the process
+  const runner = createRunner();
+  const w = new WorkerChild(process, runner);
+  process.on('message', w.receiveMessageFromMain.bind(w));
+}
 
 
 declare const __webpack_require__: any;

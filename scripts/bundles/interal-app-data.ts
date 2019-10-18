@@ -41,10 +41,7 @@ export async function internalAppData(opts: BuildOptions) {
         dir: outputInternalAppDataDir,
         entryFileNames: '[name].js',
       }
-    ] as any,
-    plugins: [
-
-    ]
+    ] as any
   };
 
   return internalAppDataBundle;

@@ -58,6 +58,15 @@ export async function internalHydrate(opts: BuildOptions) {
       'vm'
     ],
     plugins: [
+      {
+        name: 'hydrateRunnerPlugin',
+        resolveId(id) {
+          if (id === '@mock-doc') {
+            return join(opts.transpiledDir, 'mock-doc', 'index.js');
+          }
+          return null;
+        }
+      },
       aliasPlugin(opts),
       replacePlugin(opts),
       urlPlugin(),

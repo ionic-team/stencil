@@ -46,6 +46,10 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config, flags: d
   const results = await compiler.build();
 
   if (!config.watch) {
+    if (config.flags.prerender) {
+      await runPrerender(prcs, __dirname, config, devServer, results);
+    }
+
     if (devServer != null) {
       await devServer.close();
       devServer = null;
@@ -72,10 +76,6 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config, flags: d
 
   if (latestVersionPromise != null) {
     await validateCompilerVersion(config.sys, config.logger, latestVersionPromise);
-  }
-
-  if (config.flags.prerender) {
-    await runPrerender(prcs, __dirname, config, results);
   }
 
   return results;
