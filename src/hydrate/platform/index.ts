@@ -2,8 +2,18 @@ import * as d from '../../declarations';
 
 export const cmpModules = new Map<string, {[exportName: string]: d.ComponentConstructor}>();
 
+const getModule = (tagName: string): d.ComponentConstructor => {
+  tagName = tagName.toLowerCase();
+  const cmpModule = cmpModules.get(tagName);
+  if (cmpModule != null) {
+    return cmpModule[tagName];
+  }
+  return null;
+};
+
+
 export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef, _hmrVersionId?: string): any => {
-  return cmpModules.get(cmpMeta.$tagName$);
+  return getModule(cmpMeta.$tagName$);
 };
 
 export const isMemberInElement = (elm: any, memberName: string) => {
@@ -12,9 +22,9 @@ export const isMemberInElement = (elm: any, memberName: string) => {
       return true;
     }
     const tagName = elm.nodeName.toLowerCase();
-    const cmpModule = cmpModules.get(tagName);
-    if (cmpModule) {
-      const hostRef: d.ComponentNativeConstructor = cmpModule[tagName] as any;
+    const cstr = getModule(tagName);
+    if (cstr) {
+      const hostRef: d.ComponentNativeConstructor = cstr as any;
       if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
         return memberName in hostRef.cmpMeta.$members$;
       }
