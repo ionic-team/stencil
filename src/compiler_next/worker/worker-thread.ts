@@ -34,13 +34,11 @@ export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerCont
     return cmplr.build();
   };
 
-  const createWatcher = async () => {
+  const createWatcher = async (): Promise<d.CompilerWatcher> => {
     const cmplr = await getCompiler();
     watcher = await cmplr.createWatcher();
-    watcher.on((eventName, data) => {
-      events.emit(eventName as any, data);
-    });
-    return watcher;
+    watcher.on(events.emit);
+    return null;
   };
 
   const destroy = async () => {

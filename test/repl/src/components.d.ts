@@ -54,49 +54,49 @@ declare global {
 
 
   interface HTMLReplHeaderElement extends Components.ReplHeader, HTMLStencilElement {}
-  const HTMLReplHeaderElement: {
+  var HTMLReplHeaderElement: {
     prototype: HTMLReplHeaderElement;
     new (): HTMLReplHeaderElement;
   };
 
   interface HTMLReplInputFileElement extends Components.ReplInputFile, HTMLStencilElement {}
-  const HTMLReplInputFileElement: {
+  var HTMLReplInputFileElement: {
     prototype: HTMLReplInputFileElement;
     new (): HTMLReplInputFileElement;
   };
 
   interface HTMLReplInputSelectionElement extends Components.ReplInputSelection, HTMLStencilElement {}
-  const HTMLReplInputSelectionElement: {
+  var HTMLReplInputSelectionElement: {
     prototype: HTMLReplInputSelectionElement;
     new (): HTMLReplInputSelectionElement;
   };
 
   interface HTMLReplInputsElement extends Components.ReplInputs, HTMLStencilElement {}
-  const HTMLReplInputsElement: {
+  var HTMLReplInputsElement: {
     prototype: HTMLReplInputsElement;
     new (): HTMLReplInputsElement;
   };
 
   interface HTMLReplOutputFileElement extends Components.ReplOutputFile, HTMLStencilElement {}
-  const HTMLReplOutputFileElement: {
+  var HTMLReplOutputFileElement: {
     prototype: HTMLReplOutputFileElement;
     new (): HTMLReplOutputFileElement;
   };
 
   interface HTMLReplOutputsElement extends Components.ReplOutputs, HTMLStencilElement {}
-  const HTMLReplOutputsElement: {
+  var HTMLReplOutputsElement: {
     prototype: HTMLReplOutputsElement;
     new (): HTMLReplOutputsElement;
   };
 
   interface HTMLReplViewportElement extends Components.ReplViewport, HTMLStencilElement {}
-  const HTMLReplViewportElement: {
+  var HTMLReplViewportElement: {
     prototype: HTMLReplViewportElement;
     new (): HTMLReplViewportElement;
   };
 
   interface HTMLStencilReplElement extends Components.StencilRepl, HTMLStencilElement {}
-  const HTMLStencilReplElement: {
+  var HTMLStencilReplElement: {
     prototype: HTMLStencilReplElement;
     new (): HTMLStencilReplElement;
   };
