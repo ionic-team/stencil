@@ -1,28 +1,19 @@
 import * as d from '../../declarations';
+import { buildEvents } from '../../compiler/events';
 import { compile } from '../compile-module';
-import { CompilerWorkerMsg, CompilerWorkerMsgType } from './worker-interfaces';
 import { createCompiler } from '../compiler';
 import { createStencilSys } from '../sys/stencil-sys';
-import { getMinifyScriptOptions } from '../config/compile-module-options';
+import { createWebWorkerThread } from '../sys/worker/web-worker-thread';
+import { isNumber, isString } from '@utils';
+import { IS_NODE_ENV, IS_WEB_WORKER_ENV, requireFunc } from '../sys/environment';
 import { loadConfig } from '../config/load-config';
 
 
-export const initWebWorker = (self: Worker) => {
+export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerContext => {
   let config: d.Config;
   let compiler: d.CompilerNext;
+  let sys: d.CompilerSystemAsync;
   let watcher: d.CompilerWatcher;
-  let watcherCloseMsgId: number;
-  let isQueued: boolean;
-  let sys: d.CompilerSystem;
-  let queuedMsgs: CompilerWorkerMsg[];
-  let tick: Promise<void>;
-
-  const initCompiler = async (msg: CompilerWorkerMsg) => {
-    queuedMsgs = [];
-    sys = createStencilSys();
-    tick = Promise.resolve();
-    post({ stencilMsgId: msg.stencilMsgId });
-  };
 
   const getCompiler = async () => {
     if (config) {
@@ -34,198 +25,135 @@ export const initWebWorker = (self: Worker) => {
     return null;
   };
 
-  const loadCompilerConfig = async (msg: CompilerWorkerMsg) => {
-    const validated = await loadConfig({
-      sys_next: sys,
-      ...msg.config
-    });
-    config = validated.config;
-    return post({ stencilMsgId: msg.stencilMsgId, data: validated.diagnostics });
+  const autoPrefixCss = (css: string) => {
+    return Promise.resolve(css + '/* todo autoprefixer */');
   };
 
-  const destroy = async (msg: CompilerWorkerMsg) => {
+  const build = async () => {
+    const cmplr = await getCompiler();
+    return cmplr.build();
+  };
+
+  const createWatcher = async () => {
+    const cmplr = await getCompiler();
+    watcher = await cmplr.createWatcher();
+    watcher.on((eventName, data) => {
+      events.emit(eventName as any, data);
+    });
+    return watcher;
+  };
+
+  const destroy = async () => {
     if (compiler) {
       await compiler.destroy();
-      compiler = config = watcher = watcherCloseMsgId = null;
-    }
-    post({ stencilMsgId: msg.stencilMsgId });
-  };
-
-  const build = async (msg: CompilerWorkerMsg) => {
-    const cmplr = await getCompiler();
-    if (cmplr) {
-      post({
-        stencilMsgId: msg.stencilMsgId,
-        data: await cmplr.build()
-      });
-
-    } else {
-      post({
-        stencilMsgId: msg.stencilMsgId,
-        data: [{ type: 'err', messageText: 'Compiler not loaded' } as d.Diagnostic]
-      });
+      compiler = config = watcher = null;
     }
   };
 
-  const createWatcher = async (msg: CompilerWorkerMsg) => {
-    const cmplr = await getCompiler();
-    if (cmplr) {
-      watcher = await cmplr.createWatcher();
-      watcher.on((eventName, data) => {
-        post({ onEventName: eventName, data });
-      });
-      post({ stencilMsgId: msg.stencilMsgId });
-    } else {
-      post({
-        stencilMsgId: msg.stencilMsgId,
-        data: [{ type: 'err', messageText: 'Compiler not loaded' } as d.Diagnostic]
-      });
-    }
+  const initCompiler = async () => {
+    sys = createStencilSys();
   };
 
-  const watcherStart = (msg: CompilerWorkerMsg) => {
-    if (watcher) {
-      watcherCloseMsgId = msg.stencilMsgId;
-      watcher.start();
-
-    } else {
-      post({ stencilMsgId: msg.stencilMsgId });
-    }
+  const loadCompilerConfig = async (inputConfig: d.Config) => {
+    const validated = await loadConfig({
+      sys_next: sys as any,
+      ...inputConfig
+    });
+    config = validated.config;
+    return validated.diagnostics;
   };
 
-  const watcherClose = async (msg: CompilerWorkerMsg) => {
-    if (watcher) {
-      post({
-        stencilMsgId: watcherCloseMsgId,
-        data: await watcher.close()
-      });
-      watcher = watcherCloseMsgId = null;
-    }
-
-    post({ stencilMsgId: msg.stencilMsgId });
+  const watcherClose = async () => {
+    const rtnValue = await watcher.close();
+    watcher = null;
+    return rtnValue;
   };
 
-  const onMessage = async (msg: CompilerWorkerMsg) => {
-    if (msg && typeof msg.stencilMsgId === 'number' && typeof msg.type === 'number') {
-      switch (msg.type) {
+  const watcherStart = async () => watcher.start();
 
-        case CompilerWorkerMsgType.InitCompiler:
-          initCompiler(msg);
-          break;
+  return {
+    autoPrefixCss,
+    build,
+    compileModule: compile,
+    createWatcher,
+    destroy,
+    initCompiler,
+    loadConfig: loadCompilerConfig,
+    sysAccess: (p) => sys.access(p),
+    sysMkdir: (p) => sys.mkdir(p),
+    sysReadFile: (p) => sys.readFile(p),
+    sysReaddir: (p) => sys.readdir(p),
+    sysRmdir: (p) => sys.rmdir(p),
+    sysStat: (p) => sys.stat(p),
+    sysUnlink: (p) => sys.unlink(p),
+    sysWriteFile: (p, content) => sys.writeFile(p, content),
+    watcherClose,
+    watcherStart,
+  };
+};
 
-        case CompilerWorkerMsgType.LoadConfig:
-          loadCompilerConfig(msg);
-          break;
 
-        case CompilerWorkerMsgType.DestroyCompiler:
-          destroy(msg);
-          break;
+export const createWorkerMsgHandler = (): d.WorkerMsgHandler => {
+  const events = buildEvents();
+  const workerCtx = createWorkerContext(events);
 
-        case CompilerWorkerMsgType.Build:
-          build(msg);
-          break;
+  const handleMsg = async (fromMainMsg: d.WorkerMsg) => {
+    if (!fromMainMsg || !isNumber(fromMainMsg.stencilId)) return null;
 
-        case CompilerWorkerMsgType.CreateWatcher:
-          createWatcher(msg);
-          break;
+    const responseToMainMsg: d.WorkerMsg = {
+      stencilId: fromMainMsg.stencilId,
+      rtnValue: null,
+      rtnError: null,
+    };
 
-        case CompilerWorkerMsgType.WatchStart:
-          watcherStart(msg);
-          break;
+    try {
+      const fnName: string = fromMainMsg.inputArgs[0];
+      const fnArgs = fromMainMsg.inputArgs.slice(1);
+      const fn = (workerCtx as any)[fnName] as Function;
 
-        case CompilerWorkerMsgType.WatchClose:
-          watcherClose(msg);
-          break;
+      responseToMainMsg.rtnValue = await fn.apply(null, fnArgs);
 
-        case CompilerWorkerMsgType.CompileModule:
-          post({
-            stencilMsgId: msg.stencilMsgId,
-            data: await compile(msg.code, msg.opts)
-          });
-          break;
-
-        case CompilerWorkerMsgType.MinifyScriptOptions:
-          post({
-            stencilMsgId: msg.stencilMsgId,
-            data: getMinifyScriptOptions(msg.opts)
-          });
-          break;
-
-        case CompilerWorkerMsgType.SysAccess:
-          post({
-            data: await sys.access(msg.path)
-          });
-          break;
-
-        case CompilerWorkerMsgType.SysMkDir:
-          post({
-            stencilMsgId: msg.stencilMsgId,
-            data: await sys.mkdir(msg.path)
-          });
-          break;
-
-        case CompilerWorkerMsgType.SysReadDir:
-          post({
-            stencilMsgId: msg.stencilMsgId,
-            data: await sys.readdir(msg.path)
-          });
-          break;
-
-        case CompilerWorkerMsgType.SysReadFile:
-          post({
-            stencilMsgId: msg.stencilMsgId,
-            data: await sys.readFile(msg.path)
-          });
-          break;
-
-        case CompilerWorkerMsgType.SysRmDir:
-          post({
-            stencilMsgId: msg.stencilMsgId,
-            data: await sys.rmdir(msg.path)
-          });
-          break;
-
-        case CompilerWorkerMsgType.SysStat:
-          post({
-            stencilMsgId: msg.stencilMsgId,
-            data: await sys.stat(msg.path)
-          });
-          break;
-
-        case CompilerWorkerMsgType.SysWriteFile:
-          post({
-            stencilMsgId: msg.stencilMsgId,
-            data: await sys.writeFile(msg.path, msg.content)
-          });
-          break;
-
-        default:
-          throw new Error(`invalid worker message: ${msg}`);
+    } catch (e) {
+      responseToMainMsg.rtnError = 'Error';
+      if (isString(e)) {
+        responseToMainMsg.rtnError += ': ' + e;
+      } else if (e) {
+        if (e.stack) {
+          responseToMainMsg.rtnError += ': ' + e.stack;
+        } else if (e.message) {
+          responseToMainMsg.rtnError += ': ' + e.message;
+        }
       }
     }
+
+    return responseToMainMsg;
   };
 
-  const post = (msg: CompilerWorkerMsg) => {
-    queuedMsgs.push(msg);
-    if (!isQueued) {
-      isQueued = true;
-      tick.then(() => {
-        isQueued = false;
-        self.postMessage(queuedMsgs);
-        queuedMsgs.length = 0;
-      });
-    }
-  };
+  return handleMsg;
+};
 
-  self.onmessage = (ev) => {
-    let msgs: CompilerWorkerMsg[];
-    if (typeof ev.data === 'string') {
-      try {
-        msgs = JSON.parse(ev.data);
-      } catch (e) {}
-    }
-    if (Array.isArray(msgs)) {
-      msgs.forEach(onMessage);
-    }
-  };
+
+const initWebWorkerThread = (workerSelf: Worker) => {
+  if (location.search.includes('stencil-worker')) {
+    const msgHandler = createWorkerMsgHandler();
+    createWebWorkerThread(workerSelf, msgHandler);
+  }
+};
+
+const initNodeWorkerThread = (prcs: NodeJS.Process) => {
+  const forkModuleArg = prcs.argv.find((a: string) => a.startsWith('--worker-controller='));
+  if (forkModuleArg) {
+    const msgHandler = createWorkerMsgHandler();
+    const forkModulePath = forkModuleArg.split('=')[1];
+    const forkModule = requireFunc(forkModulePath);
+    forkModule.createNodeWorkerThread(prcs, msgHandler);
+  }
+};
+
+export const initWorkerThread = (glbl: any) => {
+  if (IS_WEB_WORKER_ENV) {
+    initWebWorkerThread(glbl);
+  } else if (IS_NODE_ENV) {
+    initNodeWorkerThread(glbl.process);
+  }
 };

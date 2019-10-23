@@ -67,7 +67,7 @@ export async function compiler(opts: BuildOptions) {
       }),
       commonjs(),
       replacePlugin(opts),
-      json() as any
+      json() as any,
     ],
     treeshake: {
       moduleSideEffects: false
@@ -85,12 +85,13 @@ export async function compiler(opts: BuildOptions) {
     },
     plugins: [
       aliasPlugin(opts),
+      sysModulesPlugin(inputDir),
       nodeResolve({
         preferBuiltins: false
       }),
       commonjs(),
-      sysModulesPlugin(inputDir),
       replacePlugin(opts),
+      json() as any,
     ]
   };
 

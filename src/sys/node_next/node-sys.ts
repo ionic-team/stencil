@@ -1,8 +1,8 @@
 import { CompilerSystem } from '../../declarations';
+import { createHash } from 'crypto';
 import { normalizePath } from '@utils';
 import fs from 'fs';
 import path from 'path';
-import { createHash } from 'crypto';
 
 
 export function createNodeSys(prcs: NodeJS.Process) {
@@ -169,8 +169,7 @@ export function createNodeSys(prcs: NodeJS.Process) {
         hash = hash.substr(0, length);
       }
       return Promise.resolve(hash);
-    }
+    },
   };
-
   return sys;
 }

@@ -1,11 +1,24 @@
 import * as d from '../../declarations';
+import { createWebWorkerMainController } from '../sys/worker/web-worker-main';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from './environment';
 import { normalizePath } from '@utils';
 import path from 'path';
 
-/**
- * In-memory Stencil System, used by the browser
- */
+
+export const getCompilerExecutingPath = () => {
+  if (IS_NODE_ENV) {
+    return __filename;
+  }
+  if (IS_WEB_WORKER_ENV) {
+    return location.href;
+  }
+  try {
+    return import.meta.url;
+  } catch (e) {}
+  throw new Error('unable to find executing path');
+};
+
+
 export const createStencilSys = () => {
   const items = new Map<string, FsItem>();
 
@@ -286,7 +299,8 @@ export const createStencilSys = () => {
     watchFile,
     writeFile,
     writeFileSync,
-    generateContentHash
+    generateContentHash,
+    createWorker: createWebWorkerMainController,
   };
 
   return sys;

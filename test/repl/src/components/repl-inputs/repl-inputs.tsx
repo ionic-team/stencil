@@ -16,11 +16,13 @@ export class ReplInputs {
     this.selectedName = (ev.detail as any).name;
   }
 
-  render() {
+  componentWillRender() {
     if (this.inputs.length > 0 && !this.inputs.some(i => i.name === this.selectedName)) {
       this.selectedName = this.inputs[0].name;
     }
+  }
 
+  render() {
     return (
       <Host>
         <header>

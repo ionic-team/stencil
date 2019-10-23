@@ -5,6 +5,7 @@ import { loadConfig } from '@compiler';
 import { parseFlags } from './parse-flags';
 import { runTask } from './tasks/run-task';
 import { shouldIgnoreError } from '@utils';
+import { setupWorkerController } from '../sys/node_next/worker';
 import exit from 'exit';
 
 
@@ -33,6 +34,8 @@ export async function run(opts: RunCliOptions = {}) {
       exit(1);
     }
 
+    setupWorkerController(opts.sys, opts.logger);
+
     opts.process.title = `Stencil: ${validated.config.namespace}`;
 
     await runTask(opts.process, validated.config, validated.config.flags.task);
@@ -43,13 +46,6 @@ export async function run(opts: RunCliOptions = {}) {
       exit(1);
     }
   }
-}
-
-
-export interface RunCliOptions {
-  process?: NodeJS.Process;
-  logger?: Logger;
-  sys?: CompilerSystem;
 }
 
 
@@ -82,6 +78,12 @@ function setupNodeProcess(prcs: NodeJS.Process, logger: Logger) {
       logger.error(msg);
     }
   });
+}
+
+export interface RunCliOptions {
+  process?: NodeJS.Process;
+  logger?: Logger;
+  sys?: CompilerSystem;
 }
 
 export {

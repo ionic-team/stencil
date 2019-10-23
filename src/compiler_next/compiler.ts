@@ -1,25 +1,35 @@
+import { Cache } from '../compiler/cache';
 import { CompilerNext, CompilerWatcher, Config, Diagnostic } from '../declarations';
 import { CompilerContext } from '../compiler/build/compiler-ctx';
 import { createFullBuild } from './build/full-build';
+import { createSysWorker } from './worker/sys-worker';
 import { createWatchBuild } from './build/watch-build';
 import { getConfig } from './sys/config';
 import { inMemoryFs } from './sys/in-memory-fs';
 import { patchFs } from './sys/fs-patch';
 import { patchTypescript } from './sys/typescript/typescript-patch';
-import { Cache } from '../compiler/cache';
 
 
 export const createCompiler = async (config: Config) => {
-  const diagnostics: Diagnostic[] = [];
+  // actual compiler code
+  // could be in a web worker on the browser
+  // or the main thread in node
   config = getConfig(config);
+  const diagnostics: Diagnostic[] = [];
   const sys = config.sys_next;
 
   patchFs(sys);
 
   const compilerCtx = new CompilerContext(config);
+
+  compilerCtx.worker = createSysWorker(sys, compilerCtx.events, config.maxConcurrentWorkers);
+
+  const c = await compilerCtx.worker.autoPrefixCss('body{}');
+  console.log(c)
+
   compilerCtx.fs = inMemoryFs(sys);
   compilerCtx.cache = new Cache(config, inMemoryFs(sys));
-  compilerCtx.cache.initCacheDir();
+  await compilerCtx.cache.initCacheDir();
 
   await patchTypescript(config, diagnostics, compilerCtx.fs);
 

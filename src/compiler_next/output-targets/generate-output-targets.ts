@@ -15,7 +15,7 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
   const changedModuleFiles = Array.from(compilerCtx.changedModules)
     .map(filename => compilerCtx.moduleMap.get(filename));
   compilerCtx.changedModules.clear();
-  debugger;
+
   await Promise.all([
     appOutput(config, compilerCtx, buildCtx),
     customElementsBundleOutput(config, compilerCtx, buildCtx),

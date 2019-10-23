@@ -43,3 +43,4 @@ export * from './transpile';
 export * from './types';
 export * from './vdom';
 export * from './worker';
+export * from './worker_next';

@@ -7,6 +7,7 @@ import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
 import { validateRollupConfig } from '../../compiler/config/validate-rollup-config';
 import { validateTesting } from '../../compiler/config/validate-testing';
+import { validateWorkers } from './validate-workers';
 import { setBooleanConfig } from '../../compiler/config/config-utils';
 import path from 'path';
 
@@ -86,7 +87,7 @@ export const validateConfig = (userConfig?: Config) => {
   config.copy = config.copy || [];
 
   // validate how many workers we can use
-  // validateWorkers(config);
+  validateWorkers(config);
 
   // default devInspector to whatever devMode is
   setBooleanConfig(config, 'devInspector', null, config.devMode);

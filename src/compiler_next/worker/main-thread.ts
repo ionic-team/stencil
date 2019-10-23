@@ -1,124 +1,34 @@
-import { CompileOptions, CompileResults, CompileScriptMinifyOptions, CompilerBuildResults, CompilerSystemAsync, CompilerWatcher, Config, Diagnostic } from '../../declarations';
-import { buildEvents } from '../../compiler/events';
-import { CompilerWorkerMsg, CompilerWorkerMsgType } from './worker-interfaces';
-import { version } from '../../version';
+import { BuildEvents, CompilerWorkerContext, WorkerMainController } from '../../declarations';
 
 
-export const createWorkerCompiler = async () => {
-  let msgIds = 0;
-  let isQueued = false;
-  const tick = Promise.resolve();
-  const resolves = new Map<number, Function>();
-  const queuedMsgs: CompilerWorkerMsg[] = [];
-  const events = buildEvents();
-  const executingPath = import.meta.url;
-  const pathname = `./stencil.js${executingPath.includes('localhost') ? '' : `?v=${version}`}`;
-  const workerUrl = new URL(pathname, executingPath);
-  const worker = new Worker(workerUrl, { name: `stencil@${version}` });
+export const createWorkerMainContext = (workerCtrl: WorkerMainController, events: BuildEvents): CompilerWorkerContext => {
+  const send = workerCtrl.sendMessage;
 
-  const build = () => post({ type: CompilerWorkerMsgType.Build });
-
-  const createWatcher = () => post({ type: CompilerWorkerMsgType.CreateWatcher }).then(() => {
-    const start = () => post({ type: CompilerWorkerMsgType.WatchStart });
-
-    const close = () => post({ type: CompilerWorkerMsgType.WatchClose });
-
-    const watcher = {
-      start,
-      close,
-      on: events.on
-    };
-    return watcher;
-  });
-
-  const destroy = () => post({ type: CompilerWorkerMsgType.DestroyCompiler }).then(() => {
-    worker.terminate();
-  });
-
-  const sys: CompilerSystemAsync = {
-    access: path => post({ type: CompilerWorkerMsgType.SysAccess, path }),
-    mkdir: path => post({ type: CompilerWorkerMsgType.SysMkDir, path }),
-    readdir: path => post({ type: CompilerWorkerMsgType.SysReadDir, path }),
-    readFile: path => post({ type: CompilerWorkerMsgType.SysReadFile, path }),
-    rmdir: path => post({ type: CompilerWorkerMsgType.SysRmDir, path }),
-    stat: path => post({ type: CompilerWorkerMsgType.SysStat, path }),
-    unlink: path => post({ type: CompilerWorkerMsgType.SysUnlink, path }),
-    writeFile: (path, content) => post({ type: CompilerWorkerMsgType.SysWriteFile, path, content }),
-    generateContentHash: () => Promise.resolve('TODO')
+  return {
+    autoPrefixCss: (css) => send('autoPrefixCss', css),
+    build: () => send('build'),
+    compileModule: (code, opts) => send('compileModule', code, opts),
+    createWatcher: () => send('createWatcher').then(() => (
+      {
+        start: () => send('watcherStart'),
+        close: () => send('watcherClose'),
+        on: events.on,
+      }
+    )),
+    destroy: () => send('destroy').then(() => {
+      workerCtrl.destroy();
+    }),
+    initCompiler: () => send('initCompiler'),
+    loadConfig: (config) => send('loadConfig', config),
+    sysAccess: (p) => send('sysAccess', p),
+    sysMkdir: (p) => send('sysMkdir', p),
+    sysReadFile: (p) => send('sysReadFile', p),
+    sysReaddir: (p) => send('sysReaddir', p),
+    sysRmdir: (p) => send('sysRmdir', p),
+    sysStat: (p) => send('sysStat', p),
+    sysUnlink: (p) => send('sysUnlink', p),
+    sysWriteFile: (p, content) => send('sysWriteFile', p, content),
+    watcherClose: () => send('watcherClose'),
+    watcherStart: () => send('watcherStart'),
   };
-
-  const loadConfig = (config: Config) => post({
-    type: CompilerWorkerMsgType.LoadConfig,
-    config
-  });
-
-  const compileModule = (code: string, opts: CompileOptions = {}) => post({
-    type: CompilerWorkerMsgType.CompileModule,
-    code,
-    opts
-  });
-
-  const getMinifyScriptOptions = (opts: CompileScriptMinifyOptions = {}) => post({
-    type: CompilerWorkerMsgType.MinifyScriptOptions,
-    opts
-  });
-
-  const post = (msg: CompilerWorkerMsg) => new Promise<any>(resolve => {
-    msg.stencilMsgId = msgIds++;
-    resolves.set(msg.stencilMsgId, resolve);
-
-    queuedMsgs.push(msg);
-    if (!isQueued) {
-      isQueued = true;
-      tick.then(() => {
-        isQueued = false;
-        worker.postMessage(JSON.stringify(queuedMsgs));
-        queuedMsgs.length = 0;
-      });
-    }
-  });
-
-  worker.onmessage = (ev) => {
-    const msgs: CompilerWorkerMsg[] = ev.data;
-    if (Array.isArray(msgs)) {
-      msgs.forEach(msg => {
-        if (msg != null) {
-          if (typeof msg.onEventName === 'string') {
-            events.emit(msg.onEventName as any, msg.data);
-
-          } else {
-            const resolveFn = resolves.get(msg.stencilMsgId);
-            if (resolveFn) {
-              resolves.delete(msg.stencilMsgId);
-              resolveFn(msg.data);
-            }
-          }
-        }
-      });
-    }
-  };
-
-  return post({ type: CompilerWorkerMsgType.InitCompiler }).then(() => {
-    const compiler: WorkerCompiler = {
-      build,
-      compileModule,
-      createWatcher,
-      destroy,
-      getMinifyScriptOptions,
-      loadConfig,
-      sys
-    };
-    return compiler;
-  });
 };
-
-
-export interface WorkerCompiler {
-  build(): Promise<CompilerBuildResults>;
-  compileModule(code: string, opts: CompileOptions): Promise<CompileResults>;
-  createWatcher(): Promise<CompilerWatcher>;
-  destroy(): Promise<void>;
-  getMinifyScriptOptions(): Promise<CompileScriptMinifyOptions>;
-  loadConfig(config?: Config): Promise<Diagnostic[]>;
-  sys: CompilerSystemAsync;
-}

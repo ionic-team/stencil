@@ -43,6 +43,7 @@ export class CompilerContext implements d.CompilerCtx {
   styleModeNames = new Set<string>();
   rollupCache = new Map();
   changedModules = new Set<string>();
+  worker: d.CompilerWorkerContext = null;
 
   constructor(config: d.Config) {
     const cacheFs = (config.enableCache && config.sys.fs != null) ? new InMemoryFs(config.sys.fs, config.sys.path) : null;

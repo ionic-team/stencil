@@ -1,6 +1,7 @@
 import { BuildOnEvents, CompilerEventFileAdd, CompilerEventFileDelete, CompilerEventFileUpdate } from './build-events';
 import { Diagnostic } from './diagnostics';
 import { HotModuleReplacement } from './build';
+import { WorkerMainController } from './worker_next';
 
 
 export interface CompilerNext {
@@ -43,10 +44,6 @@ export interface CompilerSystemAsync {
    * Always returns a boolean if the file was written or not. Does not throw.
    */
   writeFile(p: string, content: string): Promise<boolean>;
-  /**
-   * Generates a MD5 digest encoded as HEX
-   */
-  generateContentHash?(content: string, length?: number): Promise<string>;
 }
 
 export interface CompilerSystem extends CompilerSystemAsync {
@@ -107,6 +104,14 @@ export interface CompilerSystem extends CompilerSystemAsync {
    * Always returns a boolean if the file was written or not. Does not throw.
    */
   writeFileSync(p: string, content: string): boolean;
+  /**
+   * Generates a MD5 digest encoded as HEX
+   */
+  generateContentHash?(content: string, length?: number): Promise<string>;
+  /**
+   * Creates the worker farm for the current system.
+   */
+  createWorker?(maxConcurrentWorkers: number): WorkerMainController;
 }
 
 export type CompilerFileWatcherEvent = CompilerEventFileAdd | CompilerEventFileDelete | CompilerEventFileUpdate;
