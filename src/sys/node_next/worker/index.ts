@@ -93,7 +93,7 @@ class NodeWorkerController extends EventEmitter {
     }
   }
 
-  sendMessage(...args: any[]) {
+  send(...args: any[]) {
     if (this.isEnding) {
       return Promise.reject(TASK_CANCELED_MSG);
     }

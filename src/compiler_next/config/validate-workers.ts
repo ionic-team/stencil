@@ -3,7 +3,7 @@ import * as d from '../../declarations';
 
 export const validateWorkers = (config: d.Config) => {
   if (typeof config.maxConcurrentWorkers !== 'number') {
-    config.maxConcurrentWorkers = 4;
+    config.maxConcurrentWorkers = 8;
   }
 
   if (config.flags) {
@@ -14,5 +14,5 @@ export const validateWorkers = (config: d.Config) => {
     }
   }
 
-  config.maxConcurrentWorkers = Math.max(Math.min(config.maxConcurrentWorkers, 16), 1);
+  config.maxConcurrentWorkers = Math.max(Math.min(config.maxConcurrentWorkers, 16), 0);
 };

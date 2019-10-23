@@ -25,7 +25,7 @@ export interface CompilerWorkerContext {
 }
 
 export interface WorkerMainController {
-  sendMessage(...args: any[]): Promise<any>;
+  send(...args: any[]): Promise<any>;
   destroy(): void;
 }
 

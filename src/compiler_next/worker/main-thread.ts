@@ -2,33 +2,31 @@ import { BuildEvents, CompilerWorkerContext, WorkerMainController } from '../../
 
 
 export const createWorkerMainContext = (workerCtrl: WorkerMainController, events: BuildEvents): CompilerWorkerContext => {
-  const send = workerCtrl.sendMessage;
-
   return {
-    autoPrefixCss: (css) => send('autoPrefixCss', css),
-    build: () => send('build'),
-    compileModule: (code, opts) => send('compileModule', code, opts),
-    createWatcher: () => send('createWatcher').then(() => (
+    autoPrefixCss: (css) => workerCtrl.send('autoPrefixCss', css),
+    build: () => workerCtrl.send('build'),
+    compileModule: (code, opts) => workerCtrl.send('compileModule', code, opts),
+    createWatcher: () => workerCtrl.send('createWatcher').then(() => (
       {
-        start: () => send('watcherStart'),
-        close: () => send('watcherClose'),
+        start: () => workerCtrl.send('watcherStart'),
+        close: () => workerCtrl.send('watcherClose'),
         on: events.on,
       }
     )),
-    destroy: () => send('destroy').then(() => {
+    destroy: () => workerCtrl.send('destroy').then(() => {
       workerCtrl.destroy();
     }),
-    initCompiler: () => send('initCompiler'),
-    loadConfig: (config) => send('loadConfig', config),
-    sysAccess: (p) => send('sysAccess', p),
-    sysMkdir: (p) => send('sysMkdir', p),
-    sysReadFile: (p) => send('sysReadFile', p),
-    sysReaddir: (p) => send('sysReaddir', p),
-    sysRmdir: (p) => send('sysRmdir', p),
-    sysStat: (p) => send('sysStat', p),
-    sysUnlink: (p) => send('sysUnlink', p),
-    sysWriteFile: (p, content) => send('sysWriteFile', p, content),
-    watcherClose: () => send('watcherClose'),
-    watcherStart: () => send('watcherStart'),
+    initCompiler: () => workerCtrl.send('initCompiler'),
+    loadConfig: (config) => workerCtrl.send('loadConfig', config),
+    sysAccess: (p) => workerCtrl.send('sysAccess', p),
+    sysMkdir: (p) => workerCtrl.send('sysMkdir', p),
+    sysReadFile: (p) => workerCtrl.send('sysReadFile', p),
+    sysReaddir: (p) => workerCtrl.send('sysReaddir', p),
+    sysRmdir: (p) => workerCtrl.send('sysRmdir', p),
+    sysStat: (p) => workerCtrl.send('sysStat', p),
+    sysUnlink: (p) => workerCtrl.send('sysUnlink', p),
+    sysWriteFile: (p, content) => workerCtrl.send('sysWriteFile', p, content),
+    watcherClose: () => workerCtrl.send('watcherClose'),
+    watcherStart: () => workerCtrl.send('watcherStart'),
   };
 };

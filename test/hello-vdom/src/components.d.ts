@@ -17,7 +17,7 @@ declare global {
 
 
   interface HTMLHelloVdomElement extends Components.HelloVdom, HTMLStencilElement {}
-  const HTMLHelloVdomElement: {
+  var HTMLHelloVdomElement: {
     prototype: HTMLHelloVdomElement;
     new (): HTMLHelloVdomElement;
   };

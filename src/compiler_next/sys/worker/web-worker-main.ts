@@ -44,7 +44,7 @@ export const createWebWorkerMainController = (maxConcurrentWorkers: number): d.W
     });
   };
 
-  const sendMessage = (...args: any[]) => new Promise<any>((resolve, reject) => {
+  const send = (...args: any[]) => new Promise<any>((resolve, reject) => {
     if (isDestroyed) {
       reject(TASK_CANCELED_MSG);
       return;
@@ -89,7 +89,7 @@ export const createWebWorkerMainController = (maxConcurrentWorkers: number): d.W
   };
 
   return {
-    sendMessage,
+    send,
     destroy,
   };
 };

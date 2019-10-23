@@ -139,10 +139,12 @@ const initWebWorkerThread = (workerSelf: Worker) => {
 };
 
 const initNodeWorkerThread = (prcs: NodeJS.Process) => {
-  const forkModuleArg = prcs.argv.find((a: string) => a.startsWith('--worker-controller='));
+  const forkModuleArg = prcs.argv.find((a: string) => a.startsWith('--stencil-worker="') && a.endsWith('"'));
   if (forkModuleArg) {
     const msgHandler = createWorkerMsgHandler();
-    const forkModulePath = forkModuleArg.split('=')[1];
+    let forkModulePath = forkModuleArg.split('="')[1];
+    forkModulePath = forkModulePath.substr(0, forkModulePath.length - 1);
+    console.log(forkModuleArg, forkModulePath)
     const forkModule = requireFunc(forkModulePath);
     forkModule.createNodeWorkerThread(prcs, msgHandler);
   }

@@ -28,14 +28,18 @@ export class NodeWorkerMain extends EventEmitter {
     const options: cp.ForkOptions = {
       execArgv: filteredArgs,
       env: process.env,
-      cwd: process.cwd()
+      cwd: process.cwd(),
+      silent: true,
     };
 
     const args = [
-      `--worker-controller=${workerModule}`
+      `--stencil-worker="${workerModule}"`
     ];
 
     this.childProcess = cp.fork(workerModule, args, options);
+
+    this.childProcess.stdout.setEncoding('utf8');
+    this.childProcess.stdout.on('data', data => console.log(data));
 
     this.childProcess.on('message', this.receiveFromWorker.bind(this));
 

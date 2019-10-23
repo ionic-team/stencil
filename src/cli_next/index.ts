@@ -7,6 +7,7 @@ import { runTask } from './tasks/run-task';
 import { shouldIgnoreError } from '@utils';
 import { setupWorkerController } from '../sys/node_next/worker';
 import exit from 'exit';
+import { join } from 'path';
 
 
 export async function run(opts: RunCliOptions = {}) {
@@ -22,6 +23,10 @@ export async function run(opts: RunCliOptions = {}) {
 
   try {
     setupNodeProcess(opts.process, opts.logger);
+
+    if (opts.sys.getCompilerExecutingPath == null) {
+      opts.sys.getCompilerExecutingPath = getCompilerExecutingPath;
+    }
 
     const validated = await loadConfig({
       sys_next: opts.sys,
@@ -46,6 +51,10 @@ export async function run(opts: RunCliOptions = {}) {
       exit(1);
     }
   }
+}
+
+function getCompilerExecutingPath() {
+  return join(__dirname, '..', 'compiler', 'stencil.js');
 }
 
 

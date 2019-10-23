@@ -33,9 +33,7 @@ export function createNodeSys(prcs: NodeJS.Process) {
     getCurrentDirectory() {
       return normalizePath(prcs.cwd());
     },
-    getCompilerExecutingPath() {
-      return __filename;
-    },
+    getCompilerExecutingPath: null,
     mkdir(p, opts) {
       return new Promise(resolve => {
         fs.mkdir(p, opts, err => {
