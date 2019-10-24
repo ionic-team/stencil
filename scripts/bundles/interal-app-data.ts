@@ -40,6 +40,7 @@ export async function internalAppData(opts: BuildOptions) {
         format: 'cjs',
         dir: outputInternalAppDataDir,
         entryFileNames: '[name].js',
+        esModule: false,
       }
     ] as any
   };

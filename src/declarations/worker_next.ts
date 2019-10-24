@@ -3,13 +3,14 @@ import { CompilerFsStats, CompilerSystemMakeDirectoryOptions, WatcherCloseResult
 
 
 export interface CompilerWorkerContext {
-  autoPrefixCss(css: string): Promise<string>;
+  autoPrefixCss(css: string): Promise<{output: string, diagnostics: Diagnostic[]}>;
   build(): Promise<CompilerBuildResults>;
   compileModule(code: string, opts: CompileOptions): Promise<CompileResults>;
   createWatcher(): Promise<CompilerWatcher>;
   destroy(): Promise<void>;
   initCompiler(): Promise<void>;
   loadConfig(config?: Config): Promise<Diagnostic[]>;
+  minifyJs(input: string, opts?: any): Promise<{output: string, sourceMap: any, diagnostics: Diagnostic[]}>;
 
   sysAccess(p: string): Promise<boolean>;
   sysMkdir(p: string, opts?: CompilerSystemMakeDirectoryOptions): Promise<boolean>;
@@ -29,14 +30,18 @@ export interface WorkerMainController {
   destroy(): void;
 }
 
-export interface WorkerMsg {
-  stencilId?: number;
-  inputArgs?: any[];
-  rtnValue?: any;
-  rtnError?: string;
+export interface MsgToWorker {
+  stencilId: number;
+  args: any[];
+  terminate?: boolean;
+}
+
+export interface MsgFromWorker {
+  stencilId: number;
+  rtnValue: any;
+  rtnError: string;
   rtnEventName?: any;
   rtnEventData?: any;
-  terminate?: boolean;
 }
 
 export interface CompilerWorkerTask {
@@ -47,4 +52,4 @@ export interface CompilerWorkerTask {
   retries?: number;
 }
 
-export type WorkerMsgHandler = (msg: WorkerMsg) => Promise<WorkerMsg>;
+export type WorkerMsgHandler = (msgToWorker: MsgToWorker) => Promise<any>;

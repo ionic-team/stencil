@@ -60,6 +60,7 @@ export async function screenshot(opts: BuildOptions) {
     output: {
       format: 'cjs',
       dir: opts.output.screenshotDir,
+      esModule: false,
     },
     external,
     plugins: [
@@ -77,6 +78,7 @@ export async function screenshot(opts: BuildOptions) {
     output: {
       format: 'cjs',
       dir: opts.output.screenshotDir,
+      esModule: false,
     },
     external,
     plugins: [

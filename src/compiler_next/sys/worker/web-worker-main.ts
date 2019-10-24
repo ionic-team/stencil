@@ -13,18 +13,18 @@ export const createWebWorkerMainController = (maxConcurrentWorkers: number): d.W
   const totalWorkers = Math.max(Math.min(maxConcurrentWorkers, cpus), 1);
 
   const onMessage = (ev: MessageEvent) => {
-    const msg: d.WorkerMsg = ev.data;
-    if (msg != null && !isDestroyed) {
-      const task = tasks.get(msg.stencilId);
+    const msgFromWorker: d.MsgFromWorker = ev.data;
+    if (msgFromWorker && !isDestroyed) {
+      const task = tasks.get(msgFromWorker.stencilId);
       if (task) {
-        tasks.delete(msg.stencilId);
-        if (msg.rtnError) {
-          task.reject(msg.rtnError);
+        tasks.delete(msgFromWorker.stencilId);
+        if (msgFromWorker.rtnError) {
+          task.reject(msgFromWorker.rtnError);
         } else {
-          task.resolve(msg.rtnValue);
+          task.resolve(msgFromWorker.rtnValue);
         }
-      } else if (msg.rtnError) {
-        console.error(msg.rtnError);
+      } else if (msgFromWorker.rtnError) {
+        console.error(msgFromWorker.rtnError);
       }
     }
   };
@@ -50,9 +50,9 @@ export const createWebWorkerMainController = (maxConcurrentWorkers: number): d.W
       return;
     }
 
-    const msg: d.WorkerMsg = {
+    const msg: d.MsgToWorker = {
       stencilId: msgIds++,
-      inputArgs: args,
+      args,
     };
 
     tasks.set(msg.stencilId, {

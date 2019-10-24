@@ -27,7 +27,8 @@ export async function internalTesting(opts: BuildOptions) {
     dir: outputTestingPlatformDir,
     entryFileNames: '[name].js',
     chunkFileNames: '[name].js',
-    banner: getBanner(opts, 'Stencil Testing Platform')
+    banner: getBanner(opts, 'Stencil Testing Platform'),
+    esModule: false,
   };
 
   const internalTestingPlatformBundle: RollupOptions = {

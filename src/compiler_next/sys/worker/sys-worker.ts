@@ -1,6 +1,6 @@
-import { BuildEvents, CompilerSystem } from '../../declarations';
-import { createWorkerMainContext } from './main-thread';
-import { createWorkerContext } from './worker-thread';
+import { BuildEvents, CompilerSystem } from '../../../declarations';
+import { createWorkerContext } from '../../worker/worker-thread';
+import { createWorkerMainContext } from '../../worker/main-thread';
 
 
 export const createSysWorker = (sys: CompilerSystem, events: BuildEvents, maxConcurrentWorkers: number) => {

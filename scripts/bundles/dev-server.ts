@@ -49,6 +49,7 @@ export async function devServer(opts: BuildOptions) {
     output: {
       format: 'cjs',
       file: join(opts.output.devServerDir, 'index.js'),
+      esModule: false,
     },
     external: [
       'child_process',
@@ -72,6 +73,7 @@ export async function devServer(opts: BuildOptions) {
     output: {
       format: 'cjs',
       file: join(opts.output.devServerDir, 'server-worker.js'),
+      esModule: false,
     },
     external: [
       'buffer',

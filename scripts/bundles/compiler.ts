@@ -56,7 +56,8 @@ export async function compiler(opts: BuildOptions) {
       intro: cjsIntro + compilerIntro,
       outro: cjsOutro,
       strict: false,
-      banner: getBanner(opts, 'Stencil Compiler')
+      banner: getBanner(opts, 'Stencil Compiler'),
+      esModule: false,
     },
     plugins: [
       inlinedCompilerPluginsPlugin(opts, inputDir),

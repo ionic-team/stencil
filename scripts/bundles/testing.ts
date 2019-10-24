@@ -76,6 +76,7 @@ export async function testing(opts: BuildOptions) {
   const output: OutputOptions = {
     format: 'cjs',
     dir: opts.output.testingDir,
+    esModule: false,
   };
 
   const testingBundle: RollupOptions = {

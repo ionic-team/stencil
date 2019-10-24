@@ -47,7 +47,7 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config, flags: d
 
   if (!config.watch) {
     if (config.flags.prerender) {
-      await runPrerender(prcs, __dirname, config, devServer, results);
+      await runPrerender(prcs, __dirname, config, devServer, results as any);
     }
 
     if (devServer != null) {

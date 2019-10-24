@@ -49,6 +49,7 @@ export async function cli(opts: BuildOptions) {
     output: {
       format: 'cjs',
       file: join(opts.output.cliDir, 'index.js'),
+      esModule: false,
     },
     external,
     plugins: [
@@ -90,6 +91,7 @@ export async function cli(opts: BuildOptions) {
     output: {
       format: 'cjs',
       file: join(opts.output.cliDir, 'cli-worker.js'),
+      esModule: false,
     },
     external,
     plugins: [

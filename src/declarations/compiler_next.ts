@@ -157,6 +157,7 @@ export interface CompilerBuildStart {
 
 export interface CompilerBuildResults {
   buildId: number;
+  componentGraph?: Map<string, string[]>;
   diagnostics: Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
@@ -168,6 +169,7 @@ export interface CompilerBuildResults {
   hasError: boolean;
   hasSuccessfulBuild: boolean;
   hmr?: HotModuleReplacement;
+  hydrateAppFilePath?: string;
   isRebuild: boolean;
   outputs: BuildOutput[];
   timestamp: string;

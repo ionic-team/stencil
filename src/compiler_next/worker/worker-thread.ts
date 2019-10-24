@@ -3,10 +3,11 @@ import { buildEvents } from '../../compiler/events';
 import { compile } from '../compile-module';
 import { createCompiler } from '../compiler';
 import { createStencilSys } from '../sys/stencil-sys';
-import { createWebWorkerThread } from '../sys/worker/web-worker-thread';
-import { isNumber, isString } from '@utils';
-import { IS_NODE_ENV, IS_WEB_WORKER_ENV, requireFunc } from '../sys/environment';
+import { initNodeWorkerThread } from '../../sys/node_next/worker/worker-child';
+import { initWebWorkerThread } from '../sys/worker/web-worker-thread';
+import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../sys/environment';
 import { loadConfig } from '../config/load-config';
+import { minifyJs } from '../optimize/optimize-module';
 
 
 export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerContext => {
@@ -26,7 +27,10 @@ export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerCont
   };
 
   const autoPrefixCss = (css: string) => {
-    return Promise.resolve(css + '/* todo autoprefixer */');
+    return Promise.resolve({
+      output: css + '/* todo autoprefixer */',
+      diagnostics: []
+    });
   };
 
   const build = async () => {
@@ -77,6 +81,7 @@ export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerCont
     destroy,
     initCompiler,
     loadConfig: loadCompilerConfig,
+    minifyJs,
     sysAccess: (p) => sys.access(p),
     sysMkdir: (p) => sys.mkdir(p),
     sysReadFile: (p) => sys.readFile(p),
@@ -95,65 +100,25 @@ export const createWorkerMsgHandler = (): d.WorkerMsgHandler => {
   const events = buildEvents();
   const workerCtx = createWorkerContext(events);
 
-  const handleMsg = async (fromMainMsg: d.WorkerMsg) => {
-    if (!fromMainMsg || !isNumber(fromMainMsg.stencilId)) return null;
-
-    const responseToMainMsg: d.WorkerMsg = {
-      stencilId: fromMainMsg.stencilId,
-      rtnValue: null,
-      rtnError: null,
-    };
-
-    try {
-      const fnName: string = fromMainMsg.inputArgs[0];
-      const fnArgs = fromMainMsg.inputArgs.slice(1);
-      const fn = (workerCtx as any)[fnName] as Function;
-
-      responseToMainMsg.rtnValue = await fn.apply(null, fnArgs);
-
-    } catch (e) {
-      responseToMainMsg.rtnError = 'Error';
-      if (isString(e)) {
-        responseToMainMsg.rtnError += ': ' + e;
-      } else if (e) {
-        if (e.stack) {
-          responseToMainMsg.rtnError += ': ' + e.stack;
-        } else if (e.message) {
-          responseToMainMsg.rtnError += ': ' + e.message;
-        }
-      }
-    }
-
-    return responseToMainMsg;
+  const handleMsg = async (msgToWorker: d.MsgToWorker) => {
+    const fnName: string = msgToWorker.args[0];
+    const fnArgs = msgToWorker.args.slice(1);
+    const fn = (workerCtx as any)[fnName] as Function;
+    return fn.apply(null, fnArgs);
   };
 
   return handleMsg;
 };
 
 
-const initWebWorkerThread = (workerSelf: Worker) => {
-  if (location.search.includes('stencil-worker')) {
-    const msgHandler = createWorkerMsgHandler();
-    createWebWorkerThread(workerSelf, msgHandler);
-  }
-};
-
-const initNodeWorkerThread = (prcs: NodeJS.Process) => {
-  const forkModuleArg = prcs.argv.find((a: string) => a.startsWith('--stencil-worker="') && a.endsWith('"'));
-  if (forkModuleArg) {
-    const msgHandler = createWorkerMsgHandler();
-    let forkModulePath = forkModuleArg.split('="')[1];
-    forkModulePath = forkModulePath.substr(0, forkModulePath.length - 1);
-    console.log(forkModuleArg, forkModulePath)
-    const forkModule = requireFunc(forkModulePath);
-    forkModule.createNodeWorkerThread(prcs, msgHandler);
-  }
-};
-
 export const initWorkerThread = (glbl: any) => {
   if (IS_WEB_WORKER_ENV) {
-    initWebWorkerThread(glbl);
+    if (location.search.includes('stencil-worker')) {
+      initWebWorkerThread(glbl, createWorkerMsgHandler());
+    }
   } else if (IS_NODE_ENV) {
-    initNodeWorkerThread(glbl.process);
+    if (glbl.process.argv.includes('stencil-worker')) {
+      initNodeWorkerThread(glbl.process, createWorkerMsgHandler());
+    }
   }
 };

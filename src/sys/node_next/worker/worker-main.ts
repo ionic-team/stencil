@@ -9,21 +9,24 @@ export class NodeWorkerMain extends EventEmitter {
   tasks = new Map<number, d.CompilerWorkerTask>();
   exitCode: number = null;
   processQueue = true;
-  sendQueue: d.WorkerMsg[] = [];
+  sendQueue: d.MsgToWorker[] = [];
   stopped = false;
   successfulMessage = false;
   totalTasksAssigned = 0;
-  workerKeys: string[] = [];
 
-  constructor(public id: number, workerModule: string) {
+  constructor(public id: number, forkModulePath: string) {
     super();
-    this.fork(workerModule);
+    this.fork(forkModulePath);
   }
 
-  fork(workerModule: string) {
+  fork(forkModulePath: string) {
     const filteredArgs = process.execArgv.filter(
       v => !/^--(debug|inspect)/.test(v)
     );
+
+    const args = [
+      `stencil-worker`
+    ];
 
     const options: cp.ForkOptions = {
       execArgv: filteredArgs,
@@ -32,24 +35,27 @@ export class NodeWorkerMain extends EventEmitter {
       silent: true,
     };
 
-    const args = [
-      `--stencil-worker="${workerModule}"`
-    ];
-
-    this.childProcess = cp.fork(workerModule, args, options);
+    this.childProcess = cp.fork(forkModulePath, args, options);
 
     this.childProcess.stdout.setEncoding('utf8');
-    this.childProcess.stdout.on('data', data => console.log(data));
+    this.childProcess.stdout.on('data', data => {
+      console.log(data);
+    });
+
+    this.childProcess.stderr.setEncoding('utf8');
+    this.childProcess.stderr.on('data', data => {
+      console.log(data);
+    });
 
     this.childProcess.on('message', this.receiveFromWorker.bind(this));
+
+    this.childProcess.on('error', err => {
+      this.emit('error', err);
+    });
 
     this.childProcess.once('exit', code => {
       this.exitCode = code;
       this.emit('exit', code);
-    });
-
-    this.childProcess.on('error', err => {
-      this.emit('error', err);
     });
   }
 
@@ -59,11 +65,11 @@ export class NodeWorkerMain extends EventEmitter {
 
     this.sendToWorker({
       stencilId: task.stencilId,
-      inputArgs: task.inputArgs
+      args: task.inputArgs
     });
   }
 
-  sendToWorker(msg: d.WorkerMsg) {
+  sendToWorker(msg: d.MsgToWorker) {
     if (!this.processQueue) {
       this.sendQueue.push(msg);
       return;
@@ -88,30 +94,30 @@ export class NodeWorkerMain extends EventEmitter {
     }
   }
 
-  receiveFromWorker(responseFromWorker: d.WorkerMsg) {
+  receiveFromWorker(msgFromWorker: d.MsgFromWorker) {
     this.successfulMessage = true;
 
     if (this.stopped) {
       return;
     }
 
-    const task = this.tasks.get(responseFromWorker.stencilId);
+    const task = this.tasks.get(msgFromWorker.stencilId);
     if (!task) {
-      if (responseFromWorker.rtnError != null) {
-        this.emit('error', responseFromWorker.rtnError);
+      if (msgFromWorker.rtnError != null) {
+        this.emit('error', msgFromWorker.rtnError);
       }
       return;
     }
 
-    if (responseFromWorker.rtnError != null) {
-      task.reject(responseFromWorker.rtnError);
+    if (msgFromWorker.rtnError != null) {
+      task.reject(msgFromWorker.rtnError);
     } else {
-      task.resolve(responseFromWorker.rtnValue);
+      task.resolve(msgFromWorker.rtnValue);
     }
 
-    this.tasks.delete(responseFromWorker.stencilId);
+    this.tasks.delete(msgFromWorker.stencilId);
 
-    this.emit('response', responseFromWorker);
+    this.emit('response', msgFromWorker);
   }
 
   stop() {

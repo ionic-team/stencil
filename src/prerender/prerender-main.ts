@@ -7,13 +7,13 @@ import { generateTemplateHtml } from './prerender-template-html';
 import { getPrerenderConfig } from './prerender-config';
 import { getAbsoluteBuildDir } from '../compiler/html/utils';
 import { isOutputTargetWww } from '../compiler/output-targets/output-utils';
-import { WorkerManager } from '../sys/node/worker';
+import { NodeWorkerController } from '../sys/node_next/worker';
 import path from 'path';
 import readline from 'readline';
 import { URL } from 'url';
 
 
-export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, config: d.Config, devServer: d.DevServer, buildResults: d.BuildResults) {
+export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, config: d.Config, devServer: d.DevServer, buildResults: d.CompilerBuildResults) {
   const outputTargets = config.outputTargets
     .filter(isOutputTargetWww)
     .filter(o => typeof o.indexHtml === 'string');
@@ -24,17 +24,17 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
 
   const diagnostics: d.Diagnostic[] = [];
   try {
-    const workerModulePath = path.join(cliRootDir, 'cli-worker.js');
-    const workerManager = new WorkerManager(workerModulePath, {
-      maxConcurrentWorkers: config.maxConcurrentWorkers,
-      maxConcurrentTasksPerWorker: config.maxConcurrentTasksPerWorker,
-      logger: config.logger
-    });
+    const cliWorkerPath = path.join(cliRootDir, 'cli-worker.js');
+    const workerCtrl = new NodeWorkerController(
+      cliWorkerPath,
+      config.maxConcurrentWorkers,
+      config.logger
+    );
 
     await Promise.all(outputTargets.map(outputTarget => {
       return runPrerenderOutputTarget(
         prcs,
-        workerManager,
+        workerCtrl,
         diagnostics,
         config,
         devServer,
@@ -43,7 +43,7 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
       );
     }));
 
-    workerManager.destroy();
+    workerCtrl.destroy();
 
   } catch (e) {
     catchError(diagnostics, e);
@@ -53,7 +53,7 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
 }
 
 
-async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: WorkerManager, diagnostics: d.Diagnostic[], config: d.Config, devServer: d.DevServer, buildResults: d.BuildResults, outputTarget: d.OutputTargetWww) {
+async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: NodeWorkerController, diagnostics: d.Diagnostic[], config: d.Config, devServer: d.DevServer, buildResults: d.CompilerBuildResults, outputTarget: d.OutputTargetWww) {
   try {
     const timeSpan = config.logger.createTimeSpan(`prerendering started`);
 
@@ -67,7 +67,7 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Wor
     const manager: d.PrerenderManager = {
       prcs,
       prerenderUrlWorker(prerenderRequest: d.PrerenderRequest) {
-        return workerManager.run('prerenderWorker', [prerenderRequest]);
+        return workerManager.send('prerenderWorker', prerenderRequest);
       },
       componentGraphPath: null,
       config: config,
@@ -167,7 +167,7 @@ async function createPrerenderTemplate(config: d.Config, templateHtml: string) {
 }
 
 
-async function createComponentGraphPath(config: d.Config, buildResults: d.BuildResults, outputTarget: d.OutputTargetWww) {
+async function createComponentGraphPath(config: d.Config, buildResults: d.CompilerBuildResults, outputTarget: d.OutputTargetWww) {
   if (buildResults.componentGraph) {
     const content = getComponentPathContent(config, buildResults.componentGraph, outputTarget);
     const hash = await config.sys.generateContentHash(content, 12);

@@ -19,19 +19,19 @@ declare global {
 
 
   interface HTMLCmpAElement extends Components.CmpA, HTMLStencilElement {}
-  const HTMLCmpAElement: {
+  var HTMLCmpAElement: {
     prototype: HTMLCmpAElement;
     new (): HTMLCmpAElement;
   };
 
   interface HTMLCmpBElement extends Components.CmpB, HTMLStencilElement {}
-  const HTMLCmpBElement: {
+  var HTMLCmpBElement: {
     prototype: HTMLCmpBElement;
     new (): HTMLCmpBElement;
   };
 
   interface HTMLCmpCElement extends Components.CmpC, HTMLStencilElement {}
-  const HTMLCmpCElement: {
+  var HTMLCmpCElement: {
     prototype: HTMLCmpCElement;
     new (): HTMLCmpCElement;
   };

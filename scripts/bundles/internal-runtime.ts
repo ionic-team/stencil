@@ -28,7 +28,7 @@ export async function internalRuntime(opts: BuildOptions) {
     dir: outputInternalRuntimeDir,
     entryFileNames: '[name].mjs',
     chunkFileNames: '[name].mjs',
-    banner: getBanner(opts, 'Stencil Runtime')
+    banner: getBanner(opts, 'Stencil Runtime'),
   };
 
   const cjsOutput: OutputOptions = {
@@ -36,7 +36,8 @@ export async function internalRuntime(opts: BuildOptions) {
     dir: outputInternalRuntimeDir,
     entryFileNames: '[name].js',
     chunkFileNames: '[name].js',
-    banner: getBanner(opts, 'Stencil Runtime')
+    banner: getBanner(opts, 'Stencil Runtime'),
+    esModule: false,
   };
 
   const internalRuntimeBundle: RollupOptions = {

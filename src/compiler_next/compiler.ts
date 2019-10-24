@@ -2,7 +2,7 @@ import { Cache } from '../compiler/cache';
 import { CompilerNext, CompilerWatcher, Config, Diagnostic } from '../declarations';
 import { CompilerContext } from '../compiler/build/compiler-ctx';
 import { createFullBuild } from './build/full-build';
-import { createSysWorker } from './worker/sys-worker';
+import { createSysWorker } from './sys/worker/sys-worker';
 import { createWatchBuild } from './build/watch-build';
 import { getConfig } from './sys/config';
 import { inMemoryFs } from './sys/in-memory-fs';
@@ -24,8 +24,8 @@ export const createCompiler = async (config: Config) => {
 
   compilerCtx.worker = createSysWorker(sys, compilerCtx.events, config.maxConcurrentWorkers);
 
-  const c = await compilerCtx.worker.autoPrefixCss('body{}');
-  console.log(c)
+  console.log(await compilerCtx.worker.autoPrefixCss('body{}'));
+  console.log(await compilerCtx.worker.minifyJs('// minifyjs'));
 
   compilerCtx.fs = inMemoryFs(sys);
   compilerCtx.cache = new Cache(config, inMemoryFs(sys));

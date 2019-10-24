@@ -50,7 +50,8 @@ export async function internalHydrate(opts: BuildOptions) {
     output: {
       format: 'cjs',
       file: join(outputInternalHydrateDir, 'runner.js'),
-      banner: getBanner(opts, 'Stencil Hydrate Runner')
+      banner: getBanner(opts, 'Stencil Hydrate Runner'),
+      esModule: false,
     },
     external: [
       'fs',

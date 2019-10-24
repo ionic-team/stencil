@@ -25,6 +25,7 @@ const bundledDeps = [
   'rollup-plugin-commonjs',
   'rollup-plugin-node-resolve',
   'semver',
+  'source-map',
   'terser',
   'ws',
 ].sort();

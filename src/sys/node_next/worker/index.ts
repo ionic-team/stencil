@@ -2,18 +2,22 @@ import * as d from '../../../declarations';
 import { EventEmitter } from 'events';
 import { TASK_CANCELED_MSG } from '@utils';
 import { NodeWorkerMain } from './worker-main';
+import { cpus } from 'os';
 
 
-class NodeWorkerController extends EventEmitter {
+export class NodeWorkerController extends EventEmitter {
   workerIds = 0;
   stencilId = 0;
   isEnding = false;
   taskQueue: d.CompilerWorkerTask[] = [];
   workers: NodeWorkerMain[] = [];
+  totalWorkers: number;
 
 
-  constructor(public compilerExecutablePath: string, public maxConcurrentWorkers: number, public logger: d.Logger) {
+  constructor(public forkModulePath: string, maxConcurrentWorkers: number, public logger: d.Logger) {
     super();
+    this.totalWorkers = Math.max(Math.min(maxConcurrentWorkers, cpus().length), 1);
+    this.startWorkers();
   }
 
   onError(err: NodeJS.ErrnoException, workerId: number) {
@@ -47,9 +51,15 @@ class NodeWorkerController extends EventEmitter {
     }, 10);
   }
 
+  startWorkers() {
+    while (this.workers.length < this.totalWorkers) {
+      this.startWorker();
+    }
+  }
+
   startWorker() {
     const workerId = this.workerIds++;
-    const worker = new NodeWorkerMain(workerId, this.compilerExecutablePath);
+    const worker = new NodeWorkerMain(workerId, this.forkModulePath);
 
     worker.on('response', this.processTaskQueue.bind(this));
 
@@ -81,10 +91,9 @@ class NodeWorkerController extends EventEmitter {
       return;
     }
 
+    this.startWorkers();
+
     while (this.taskQueue.length > 0) {
-      if (this.workers.length < this.maxConcurrentWorkers) {
-        this.startWorker();
-      }
       const worker = getNextWorker(this.workers);
       if (!worker) {
         break;
@@ -175,7 +184,7 @@ export function getNextWorker(workers: NodeWorkerMain[]) {
 
 export function setupWorkerController(sys: d.CompilerSystem, logger: d.Logger) {
   sys.createWorker = function (maxConcurrentWorkers) {
-    const compilerExecutablePath = sys.getCompilerExecutingPath();
-    return new NodeWorkerController(compilerExecutablePath, maxConcurrentWorkers, logger);
+    const forkModulePath = sys.getCompilerExecutingPath();
+    return new NodeWorkerController(forkModulePath, maxConcurrentWorkers, logger);
   };
 }

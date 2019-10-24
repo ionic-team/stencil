@@ -5,7 +5,7 @@ import { getPrerenderConfig } from '../prerender-config';
 import { MockWindow, cloneWindow, serializeNodeToHtml } from '@mock-doc';
 import { patchNodeGlobal, patchWindowGlobal } from '../prerender-global-patch';
 import { generateModulePreloads } from './prerender-modulepreload';
-import { WorkerChild } from '../../sys/node/worker/worker-child';
+import { initNodeWorkerThread } from '../../sys/node_next/worker/worker-child';
 import fs from 'fs';
 import path from 'path';
 import { URL } from 'url';
@@ -221,23 +221,27 @@ function getComponentGraph(componentGraphPath: string) {
   return componentGraph;
 }
 
-export function createRunner() {
-  return (methodName: string, args: any[]) => {
-    if (methodName === 'prerenderWorker') {
-      return prerenderWorker(args[0]);
-    }
-    return null;
-  };
+
+function initPrerenderWorker(prcs: NodeJS.Process) {
+  if (prcs.argv.includes('stencil-worker')) {
+    // stencil-worker cmd line arg used to start the worker
+    // and attached a message handler to the process
+    initNodeWorkerThread(prcs, async (msgFromMain) => {
+      const fnName: string = msgFromMain.args[0];
+      const fnArgs = msgFromMain.args.slice(1);
+
+      switch (fnName) {
+        case 'prerenderWorker':
+          return prerenderWorker.apply(null, fnArgs);
+
+        default:
+          throw new Error(`invalid prerender worker msg: ${JSON.stringify(msgFromMain)}`);
+      }
+    });
+  }
 }
 
-if (process.argv.indexOf('--start-worker') > -1) {
-  // --start-worker cmd line arg used to start the worker
-  // and attached a message handler to the process
-  const runner = createRunner();
-  const w = new WorkerChild(process, runner);
-  process.on('message', w.receiveMessageFromMain.bind(w));
-}
-
+initPrerenderWorker(process);
 
 declare const __webpack_require__: any;
 declare const __non_webpack_require__: any;

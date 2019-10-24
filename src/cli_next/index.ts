@@ -8,6 +8,7 @@ import { shouldIgnoreError } from '@utils';
 import { setupWorkerController } from '../sys/node_next/worker';
 import exit from 'exit';
 import { join } from 'path';
+import { isString } from 'util';
 
 
 export async function run(opts: RunCliOptions = {}) {
@@ -76,12 +77,12 @@ function setupNodeProcess(prcs: NodeJS.Process, logger: Logger) {
     if (!shouldIgnoreError(e)) {
       let msg = 'unhandledRejection';
       if (e != null) {
-        if (e.stack) {
+        if (isString(e)) {
+          msg += ': ' + e;
+        } else if (e.stack) {
           msg += ': ' + e.stack;
         } else if (e.message) {
           msg += ': ' + e.message;
-        } else {
-          msg += ': ' + e;
         }
       }
       logger.error(msg);

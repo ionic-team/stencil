@@ -42,6 +42,7 @@ export async function mockDoc(opts: BuildOptions) {
     intro: CJS_INTRO,
     outro: CJS_OUTRO,
     strict: false,
+    esModule: false,
   };
 
   const mockDocBundle: RollupOptions = {
