@@ -12,6 +12,7 @@ export interface CompilerWorkerContext {
   loadConfig(config?: Config): Promise<Diagnostic[]>;
   minifyJs(input: string, opts?: any): Promise<{output: string, sourceMap: any, diagnostics: Diagnostic[]}>;
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
+  scopeCss(cssText: string, scopeId: string, commentOriginalSelector: boolean): Promise<string>;
 
   sysAccess(p: string): Promise<boolean>;
   sysMkdir(p: string, opts?: CompilerSystemMakeDirectoryOptions): Promise<boolean>;

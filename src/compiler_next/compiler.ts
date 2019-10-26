@@ -38,6 +38,7 @@ export const createCompiler = async (config: Config) => {
     minify: true,
     legecyBuild: false,
   }));
+  console.log('scopeCss', await compilerCtx.worker.scopeCss(':host { color: red; }', 'test', false));
 
   compilerCtx.fs = inMemoryFs(sys);
   compilerCtx.cache = new Cache(config, inMemoryFs(sys));
