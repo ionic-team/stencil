@@ -8,6 +8,6 @@ export const createSysWorker = (sys: CompilerSystem, events: BuildEvents, maxCon
     return createWorkerContext(events);
   }
 
-  const workerCtrl = sys.createWorker(maxConcurrentWorkers);
+  const workerCtrl = sys.createWorker(maxConcurrentWorkers, events);
   return createWorkerMainContext(workerCtrl, events);
 };

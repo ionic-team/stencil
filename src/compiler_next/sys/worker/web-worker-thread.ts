@@ -1,8 +1,8 @@
+import { BuildEvents, MsgFromWorker, MsgToWorker, WorkerMsgHandler } from '../../../declarations';
 import { isNumber, isString } from '@utils';
-import { MsgFromWorker, MsgToWorker, WorkerMsgHandler } from '../../../declarations';
 
 
-export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHandler) => {
+export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHandler, events: BuildEvents) => {
 
   const error = (stencilMsgId: number, err: any) => {
     const errMsgBackToMain: MsgFromWorker = {
@@ -48,4 +48,14 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
     // uncaught error occurred on the worker thread
     error(-1, e);
   };
+
+  events.on((eventName, data) => {
+    const eventFromWorker: MsgFromWorker = {
+      rtnEventName: eventName,
+      rtnEventData: data,
+      rtnValue: null,
+      rtnError: null,
+    };
+    selfWorker.postMessage(eventFromWorker);
+  });
 };

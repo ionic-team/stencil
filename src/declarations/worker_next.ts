@@ -39,7 +39,7 @@ export interface MsgToWorker {
 }
 
 export interface MsgFromWorker {
-  stencilId: number;
+  stencilId?: number;
   rtnValue: any;
   rtnError: string;
   rtnEventName?: any;

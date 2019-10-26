@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import * as cp from 'child_process';
 import { EventEmitter } from 'events';
-import { TASK_CANCELED_MSG } from '@utils';
+import { TASK_CANCELED_MSG, isString } from '@utils';
 
 
 export class NodeWorkerMain extends EventEmitter {
@@ -14,7 +14,7 @@ export class NodeWorkerMain extends EventEmitter {
   successfulMessage = false;
   totalTasksAssigned = 0;
 
-  constructor(public id: number, forkModulePath: string) {
+  constructor(public id: number, public events: d.BuildEvents, forkModulePath: string) {
     super();
     this.fork(forkModulePath);
   }
@@ -98,6 +98,13 @@ export class NodeWorkerMain extends EventEmitter {
     this.successfulMessage = true;
 
     if (this.stopped) {
+      return;
+    }
+
+    if (isString(msgFromWorker.rtnEventName)) {
+      if (this.events) {
+        this.events.emit(msgFromWorker.rtnEventName as any, msgFromWorker.rtnEventData);
+      }
       return;
     }
 

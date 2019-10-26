@@ -1,4 +1,4 @@
-import { BuildOnEvents, CompilerEventFileAdd, CompilerEventFileDelete, CompilerEventFileUpdate } from './build-events';
+import { BuildEvents, BuildOnEvents, CompilerEventFileAdd, CompilerEventFileDelete, CompilerEventFileUpdate } from './build-events';
 import { Diagnostic } from './diagnostics';
 import { HotModuleReplacement } from './build';
 import { WorkerMainController } from './worker_next';
@@ -111,7 +111,7 @@ export interface CompilerSystem extends CompilerSystemAsync {
   /**
    * Creates the worker farm for the current system.
    */
-  createWorker?(maxConcurrentWorkers: number): WorkerMainController;
+  createWorker?(maxConcurrentWorkers: number, events: BuildEvents): WorkerMainController;
 }
 
 export type CompilerFileWatcherEvent = CompilerEventFileAdd | CompilerEventFileDelete | CompilerEventFileUpdate;

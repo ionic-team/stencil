@@ -7,8 +7,8 @@ import { createWorkerMainContext } from './main-thread';
 export const createWorkerCompiler = async (): Promise<WorkerCompiler> => {
   // main thread that creates an interface to the worker thread
   // the worker thread is running the one compiler
-  const workerCtrl = createWebWorkerMainController(1);
   const events = buildEvents();
+  const workerCtrl = createWebWorkerMainController(1, events);
   const worker = createWorkerMainContext(workerCtrl, events);
 
   await worker.initCompiler();

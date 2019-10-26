@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 
 
-export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerMsgHandler) => {
+export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerMsgHandler, events: d.BuildEvents) => {
 
   const sendMessageBackToMain = (msgFromWorker: d.MsgFromWorker) => {
     prcs.send(msgFromWorker, (err: NodeJS.ErrnoException) => {
@@ -49,6 +49,17 @@ export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerM
       }
     }
   });
+
+  if (events) {
+    events.on((eventName, data) => {
+      sendMessageBackToMain({
+        rtnEventName: eventName,
+        rtnEventData: data,
+        rtnValue: null,
+        rtnError: null,
+      });
+    });
+  }
 
   prcs.on(`unhandledRejection`, (e: any) => {
     errorHandler(-1, e);

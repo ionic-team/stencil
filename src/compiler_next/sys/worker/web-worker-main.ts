@@ -1,10 +1,10 @@
 import * as d from '../../../declarations';
 import { version } from '../../../version';
 import { getCompilerExecutingPath } from '../stencil-sys';
-import { TASK_CANCELED_MSG } from '@utils';
+import { TASK_CANCELED_MSG, isString } from '@utils';
 
 
-export const createWebWorkerMainController = (maxConcurrentWorkers: number): d.WorkerMainController => {
+export const createWebWorkerMainController = (maxConcurrentWorkers: number, events: d.BuildEvents): d.WorkerMainController => {
   let msgIds = 0;
   let isDestroyed = false;
   const tasks = new Map<number, d.CompilerWorkerTask>();
@@ -15,16 +15,20 @@ export const createWebWorkerMainController = (maxConcurrentWorkers: number): d.W
   const onMessage = (ev: MessageEvent) => {
     const msgFromWorker: d.MsgFromWorker = ev.data;
     if (msgFromWorker && !isDestroyed) {
-      const task = tasks.get(msgFromWorker.stencilId);
-      if (task) {
-        tasks.delete(msgFromWorker.stencilId);
-        if (msgFromWorker.rtnError) {
-          task.reject(msgFromWorker.rtnError);
-        } else {
-          task.resolve(msgFromWorker.rtnValue);
+      if (isString(msgFromWorker.rtnEventName)) {
+        events.emit(msgFromWorker.rtnEventName as any, msgFromWorker.rtnEventData);
+      } else {
+        const task = tasks.get(msgFromWorker.stencilId);
+        if (task) {
+          tasks.delete(msgFromWorker.stencilId);
+          if (msgFromWorker.rtnError) {
+            task.reject(msgFromWorker.rtnError);
+          } else {
+            task.resolve(msgFromWorker.rtnValue);
+          }
+        } else if (msgFromWorker.rtnError) {
+          console.error(msgFromWorker.rtnError);
         }
-      } else if (msgFromWorker.rtnError) {
-        console.error(msgFromWorker.rtnError);
       }
     }
   };

@@ -14,7 +14,7 @@ export class NodeWorkerController extends EventEmitter {
   totalWorkers: number;
 
 
-  constructor(public forkModulePath: string, maxConcurrentWorkers: number, public logger: d.Logger) {
+  constructor(public forkModulePath: string, maxConcurrentWorkers: number, public events: d.BuildEvents, public logger: d.Logger) {
     super();
     this.totalWorkers = Math.max(Math.min(maxConcurrentWorkers, cpus().length), 1);
     this.startWorkers();
@@ -59,7 +59,7 @@ export class NodeWorkerController extends EventEmitter {
 
   startWorker() {
     const workerId = this.workerIds++;
-    const worker = new NodeWorkerMain(workerId, this.forkModulePath);
+    const worker = new NodeWorkerMain(workerId, this.events, this.forkModulePath);
 
     worker.on('response', this.processTaskQueue.bind(this));
 
@@ -183,8 +183,8 @@ export function getNextWorker(workers: NodeWorkerMain[]) {
 
 
 export function setupWorkerController(sys: d.CompilerSystem, logger: d.Logger) {
-  sys.createWorker = function (maxConcurrentWorkers) {
+  sys.createWorker = function (maxConcurrentWorkers, events) {
     const forkModulePath = sys.getCompilerExecutingPath();
-    return new NodeWorkerController(forkModulePath, maxConcurrentWorkers, logger);
+    return new NodeWorkerController(forkModulePath, maxConcurrentWorkers, events, logger);
   };
 }

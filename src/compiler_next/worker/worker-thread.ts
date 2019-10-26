@@ -100,8 +100,7 @@ export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerCont
 };
 
 
-export const createWorkerMsgHandler = (): d.WorkerMsgHandler => {
-  const events = buildEvents();
+export const createWorkerMsgHandler = (events: d.BuildEvents): d.WorkerMsgHandler => {
   const workerCtx = createWorkerContext(events);
 
   const handleMsg = async (msgToWorker: d.MsgToWorker) => {
@@ -118,11 +117,15 @@ export const createWorkerMsgHandler = (): d.WorkerMsgHandler => {
 export const initWorkerThread = (glbl: any) => {
   if (IS_WEB_WORKER_ENV) {
     if (location.search.includes('stencil-worker')) {
-      initWebWorkerThread(glbl, createWorkerMsgHandler());
+      const webWorkerEvents = buildEvents();
+      const webWorkerMsgHandler = createWorkerMsgHandler(webWorkerEvents);
+      initWebWorkerThread(glbl, webWorkerMsgHandler, webWorkerEvents);
     }
   } else if (IS_NODE_ENV) {
     if (glbl.process.argv.includes('stencil-worker')) {
-      initNodeWorkerThread(glbl.process, createWorkerMsgHandler());
+      const nodeWorkerEvents = buildEvents();
+      const nodeWorkerMsgHandler = createWorkerMsgHandler(nodeWorkerEvents);
+      initNodeWorkerThread(glbl.process, nodeWorkerMsgHandler, nodeWorkerEvents);
     }
   }
 };

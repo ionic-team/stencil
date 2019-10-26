@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { customElementsBundleOutput } from './component-module/custom-module-output';
 import { lazyOutput } from './component-lazy/lazy-output';
-import { collectionOutput } from './component-collection/collection-output';
+// import { collectionOutput } from './component-collection/collection-output';
 import { customElementOutput } from './component-custom-element/custom-element-output';
 import { outputAngular } from '../../compiler/output-targets/output-angular';
 import { outputDocs } from '../../compiler/output-targets/output-docs';
@@ -19,7 +19,7 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
   await Promise.all([
     appOutput(config, compilerCtx, buildCtx),
     customElementsBundleOutput(config, compilerCtx, buildCtx),
-    collectionOutput(config, compilerCtx, buildCtx, changedModuleFiles),
+    // collectionOutput(config, compilerCtx, buildCtx, changedModuleFiles),
     customElementOutput(config, compilerCtx, buildCtx, changedModuleFiles),
     outputAngular(config, compilerCtx, buildCtx),
     outputDocs(config, compilerCtx, buildCtx),

@@ -5,10 +5,10 @@ import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
 import path from 'path';
 import ts from 'typescript';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
-import { isOutputTargetDistCustomElements } from '../../../compiler/output-targets/output-utils';
+import { isOutputTargetDistCustomElements, DIST_CUSTOM_ELEMENTS } from '../../../compiler/output-targets/output-utils';
 
 
-export const customElementOutput = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, changedModuleFiles: d.Module[]) => {
+export const customElementOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, changedModuleFiles: d.Module[]) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
   if (outputTargets.length === 0) {
     return;
@@ -17,14 +17,23 @@ export const customElementOutput = (config: d.Config, compilerCtx: d.CompilerCtx
   const timespan = buildCtx.createTimeSpan(`generate custom elements started`, true);
   const printer = ts.createPrinter();
   try {
-    changedModuleFiles.forEach(mod => {
+    const buildOutput: d.BuildOutput = {
+      type: DIST_CUSTOM_ELEMENTS,
+      files: [],
+    };
+
+    await Promise.all(changedModuleFiles.map(async mod => {
       const transformed = ts.transform(mod.staticSourceFile, getCustomTransformer(compilerCtx)).transformed[0];
       const code = printer.printFile(transformed);
-      outputTargets.forEach(outputTarget => {
-        const collectionFilePath = path.join(outputTarget.dir, mod.jsFilePath);
-        compilerCtx.fs.writeFile(collectionFilePath, code);
-      });
-    });
+
+      await Promise.all(outputTargets.map(async outputTarget => {
+        const filePath = path.join(outputTarget.dir, mod.jsFilePath);
+        await compilerCtx.fs.writeFile(filePath, code);
+        buildOutput.files.push(filePath);
+      }));
+    }));
+
+    buildCtx.outputs.push(buildOutput);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
