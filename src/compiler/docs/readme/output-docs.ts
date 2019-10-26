@@ -15,7 +15,15 @@ export async function generateReadme(config: d.Config, compilerCtx: d.CompilerCt
   await Promise.all(readmeOutputs.map(async readmeOutput => {
     if (readmeOutput.dir) {
       const readmeContent = generateMarkdown(config, userContent, docsData, cmps, readmeOutput.footer);
-      const relPath = config.sys.path.relative(config.srcDir, docsData.readmePath);
+
+      let relPath;
+      if (readmeOutput.extension) {
+        const readme = docsData.readmePath.split('.');
+        relPath = config.sys.path.relative(config.srcDir, `${readme[0]}.${readmeOutput.extension}`);
+      } else {
+        relPath = config.sys.path.relative(config.srcDir, docsData.readmePath);
+      }
+
       const absPath = config.sys.path.join(readmeOutput.dir, relPath);
       const results = await compilerCtx.fs.writeFile(absPath, readmeContent);
       if (results.changedContent) {
