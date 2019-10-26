@@ -19,6 +19,7 @@ export const createWorkerMainContext = (workerCtrl: WorkerMainController, events
     initCompiler: () => workerCtrl.send('initCompiler'),
     loadConfig: (config) => workerCtrl.send('loadConfig', config),
     minifyJs: (input, opts) => workerCtrl.send('minifyJs', input, opts),
+    optimizeCss: (opts) => workerCtrl.send('optimizeCss', opts),
     sysAccess: (p) => workerCtrl.send('sysAccess', p),
     sysMkdir: (p) => workerCtrl.send('sysMkdir', p),
     sysReadFile: (p) => workerCtrl.send('sysReadFile', p),

@@ -3,7 +3,7 @@ import { Plugin } from 'rollup';
 
 
 const modules = new Set([
-  'events', 'fs', 'module', 'path', 'typescript', 'url', 'util'
+  'events', 'fs', 'module', 'os', 'path', 'stream', 'typescript', 'url', 'util'
 ]);
 
 

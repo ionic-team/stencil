@@ -70,7 +70,7 @@ export async function internalHydrate(opts: BuildOptions) {
       },
       aliasPlugin(opts),
       replacePlugin(opts),
-      urlPlugin(),
+      urlPlugin(opts),
       rollupResolve({
         preferBuiltins: true
       }),

@@ -33,7 +33,7 @@ export async function compiler_legacy(opts: BuildOptions) {
       },
       aliasPlugin(opts),
       replacePlugin(opts),
-      urlPlugin(),
+      urlPlugin(opts),
       resolve({
         preferBuiltins: true
       }),

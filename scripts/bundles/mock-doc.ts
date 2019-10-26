@@ -65,7 +65,7 @@ export async function mockDoc(opts: BuildOptions) {
         }
       },
       aliasPlugin(opts),
-      urlPlugin(),
+      urlPlugin(opts),
       replacePlugin(opts),
       resolve(),
       commonjs()
@@ -99,7 +99,7 @@ export async function mockDoc(opts: BuildOptions) {
           }
         },
         aliasPlugin(opts),
-        urlPlugin(),
+        urlPlugin(opts),
         rollupResolve(),
         rollupCommonjs()
       ]

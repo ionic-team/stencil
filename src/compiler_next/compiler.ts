@@ -24,8 +24,20 @@ export const createCompiler = async (config: Config) => {
 
   compilerCtx.worker = createSysWorker(sys, compilerCtx.events, config.maxConcurrentWorkers);
 
-  console.log(await compilerCtx.worker.autoPrefixCss('body{}'));
-  console.log(await compilerCtx.worker.minifyJs('// minifyjs'));
+  // console.log('autoPrefixCss', await compilerCtx.worker.autoPrefixCss('body{}'));
+  console.log('minifyJs', await compilerCtx.worker.minifyJs('// minifyjs'));
+  console.log('optimizeCss', await compilerCtx.worker.optimizeCss({
+    css: `
+    body {
+      /* comment */
+      flex: 1;
+    }
+    `,
+    filePath: 'file.css',
+    autoprefixer: config.autoprefixCss,
+    minify: true,
+    legecyBuild: false,
+  }));
 
   compilerCtx.fs = inMemoryFs(sys);
   compilerCtx.cache = new Cache(config, inMemoryFs(sys));

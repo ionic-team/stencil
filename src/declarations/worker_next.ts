@@ -1,4 +1,4 @@
-import { CompileOptions, CompileResults, CompilerBuildResults, CompilerWatcher, Config, Diagnostic } from '.';
+import { CompileOptions, CompileResults, CompilerBuildResults, CompilerWatcher, Config, Diagnostic, OptimizeCssInput, OptimizeCssOutput } from '.';
 import { CompilerFsStats, CompilerSystemMakeDirectoryOptions, WatcherCloseResults } from '../internal';
 
 
@@ -11,6 +11,7 @@ export interface CompilerWorkerContext {
   initCompiler(): Promise<void>;
   loadConfig(config?: Config): Promise<Diagnostic[]>;
   minifyJs(input: string, opts?: any): Promise<{output: string, sourceMap: any, diagnostics: Diagnostic[]}>;
+  optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
 
   sysAccess(p: string): Promise<boolean>;
   sysMkdir(p: string, opts?: CompilerSystemMakeDirectoryOptions): Promise<boolean>;

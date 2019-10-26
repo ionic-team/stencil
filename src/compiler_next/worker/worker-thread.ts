@@ -8,6 +8,7 @@ import { initWebWorkerThread } from '../sys/worker/web-worker-thread';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../sys/environment';
 import { loadConfig } from '../config/load-config';
 import { minifyJs } from '../optimize/optimize-module';
+import { optimizeCss } from '../optimize/optimize-css';
 
 
 export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerContext => {
@@ -82,6 +83,7 @@ export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerCont
     initCompiler,
     loadConfig: loadCompilerConfig,
     minifyJs,
+    optimizeCss,
     sysAccess: (p) => sys.access(p),
     sysMkdir: (p) => sys.mkdir(p),
     sysReadFile: (p) => sys.readFile(p),

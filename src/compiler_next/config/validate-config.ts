@@ -133,11 +133,6 @@ export const validateConfig = (userConfig?: Config) => {
 
   // validateOutputTargetCustom(config, diagnostics);
 
-  // TODO
-  config.autoprefixCss = false;
-  config.minifyCss = false;
-  config.minifyJs = false;
-
   return {
     config,
     diagnostics
