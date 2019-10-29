@@ -1,5 +1,4 @@
 import { formatDiagnostic, getCompilerOptions, transpile } from '../test-transpile';
-// import { basename } from 'path';
 
 
 export const jestPreprocessor = {
@@ -10,7 +9,7 @@ export const jestPreprocessor = {
       return '';
     }
 
-    if (filePath.endsWith('.ts') || filePath.endsWith('.tsx') || filePath.endsWith('.jsx')) {
+    if (shouldTransformTS(filePath) || shouldTransformESM(filePath, sourceText)) {
       const opts = Object.assign({}, this.getCompilerOptions(jestConfig.rootDir));
 
       const results = transpile(sourceText, opts, filePath);
@@ -59,6 +58,27 @@ export const jestPreprocessor = {
       !!transformOptions.instrument
     ];
 
-    return key.join(':') + Math.random();
+    return key.join(':');
   }
 };
+
+function shouldTransformTS(filePath: string) {
+  return (filePath.endsWith('.ts') || filePath.endsWith('.tsx') || filePath.endsWith('.jsx'));
+}
+
+function shouldTransformESM(filePath: string, sourceText: string) {
+  // there may be false positives here
+  // but worst case scenario a commonjs file is transpiled to commonjs
+  if (filePath.endsWith('.esm.js') || filePath.endsWith('.mjs')) {
+    return true;
+  }
+  if (filePath.endsWith('.js')) {
+    if (sourceText.includes('import ') || sourceText.includes('import.') || sourceText.includes('import(')) {
+      return true;
+    }
+    if (sourceText.includes('export ')) {
+      return true;
+    }
+  }
+  return false;
+}
