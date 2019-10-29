@@ -96,7 +96,7 @@
     "graceful-fs": "^4.2.1",
     "inquirer": "^6.4.1",
     "is-glob": "4.0.1",
-    "jest": "^24.8.0",
+    "jest": "^24.9.0",
     "jest-cli": "^24.8.0",
     "jest-environment-node": "^24.0.0",
     "listr": "0.14.3",
@@ -130,7 +130,7 @@
     "ws": "7.1.2"
   },
   "lazyDependencies": {
-    "@types/jest": "~24.0.13",
+    "@types/jest": "~24.9.0",
     "@types/puppeteer": "^1.19.0",
     "jest": "~24.8.0",
     "jest-cli": "~24.8.0",
