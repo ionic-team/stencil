@@ -2,7 +2,7 @@ import { BuildConditionals } from './build-conditionals';
 
 declare global {
   namespace jest {
-    interface Matchers<R> {
+    interface Matchers<R, T> {
       /**
        * Compares HTML, but first normalizes the HTML so all
        * whitespace, attribute order and css class order are
