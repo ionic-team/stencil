@@ -60,9 +60,15 @@ export function createNodeSys(prcs: NodeJS.Process) {
     getCompilerExecutingPath: null,
     mkdir(p, opts) {
       return new Promise(resolve => {
-        fs.mkdir(p, opts, err => {
-          resolve(!err);
-        });
+        if (opts) {
+          fs.mkdir(p, opts, err => {
+            resolve(!err);
+          });
+        } else {
+          fs.mkdir(p, err => {
+            resolve(!err);
+          });
+        }
       });
     },
     mkdirSync(p, opts) {
