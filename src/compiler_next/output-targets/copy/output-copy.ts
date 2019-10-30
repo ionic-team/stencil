@@ -1,9 +1,10 @@
-import * as d from '../../declarations';
-import { isOutputTargetCopy } from './output-utils';
+import * as d from '../../../declarations';
 import { buildError, isGlob, normalizePath } from '@utils';
-import { canSkipAssetsCopy, getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
+import { canSkipAssetsCopy, getComponentAssetsCopyTasks } from './assets-copy-tasks';
 import { getDestAbsPath, getSrcAbsPath } from '../copy/local-copy-tasks';
+import { isOutputTargetCopy } from '../../../compiler/output-targets/output-utils';
 import minimatch from 'minimatch';
+
 
 export async function outputCopy(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const outputTargets = config.outputTargets.filter(isOutputTargetCopy);
@@ -35,7 +36,7 @@ export async function outputCopy(config: d.Config, compilerCtx: d.CompilerCtx, b
     let copiedFiles = 0;
     try {
 
-      const copyResults = await config.sys.copy(copyTasks, config.srcDir);
+      const copyResults = await config.sys_next.copy(copyTasks, config.srcDir);
       if (copyResults != null) {
         buildCtx.diagnostics.push(...copyResults.diagnostics);
         compilerCtx.fs.cancelDeleteDirectoriesFromDisk(copyResults.dirPaths);

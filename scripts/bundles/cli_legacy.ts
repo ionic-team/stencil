@@ -2,6 +2,7 @@ import { join } from 'path';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import { aliasPlugin } from './plugins/alias-plugin';
+import { gracefulFsPlugin } from './plugins/graceful-fs-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { BuildOptions } from '../utils/options';
 import { RollupOptions } from 'rollup';
@@ -54,6 +55,7 @@ export async function cli_legacy(opts: BuildOptions) {
           return null;
         }
       },
+      gracefulFsPlugin(),
       aliasPlugin(opts),
       replacePlugin(opts),
       resolve({

@@ -1,6 +1,6 @@
 import { Diagnostic, Logger, LoggerTimeSpan, PrintLine } from '../../declarations';
 import color from 'ansi-colors';
-import fs from 'fs';
+import fs from 'graceful-fs';
 import path from 'path';
 
 

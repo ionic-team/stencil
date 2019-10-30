@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { sendMsg } from './dev-server-utils';
 import { startDevServerWorker } from './start-server-worker';
-import fs from 'fs';
+import fs from 'graceful-fs';
 import path from 'path';
 import util from 'util';
 

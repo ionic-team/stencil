@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { catchError } from '@utils';
-import fs from 'fs';
+import fs from 'graceful-fs';
 import path from 'path';
 import { promisify } from 'util';
 import { URL } from 'url';

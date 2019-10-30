@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import * as http  from 'http';
-import fs  from 'fs';
+import fs  from 'graceful-fs';
 import path  from 'path';
 import util from 'util';
 import { responseHeaders, sendMsg } from './dev-server-utils';

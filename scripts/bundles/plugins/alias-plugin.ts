@@ -19,9 +19,12 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
     'caniuse-lite',
     'cosmicconfig',
     'cssnano-preset-default',
+    'inherits',
     'is-resolvable',
+    'path-is-absolute',
     'postcss',
     'supports-color',
+    'util',
   ]);
 
   // ensure we use the same one

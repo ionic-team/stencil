@@ -21,6 +21,26 @@ export const getCompilerExecutingPath = () => {
 
 export const createStencilSys = () => {
   const items = new Map<string, FsItem>();
+  const destroys = new Set<() => Promise<void> | void>();
+
+  const addDestory = (cb: () => void) => destroys.add(cb);
+  const removeDestory = (cb: () => void) => destroys.delete(cb);
+
+  const destroy = async () => {
+    const waits: Promise<void>[] = [];
+    destroys.forEach(cb => {
+      try {
+        const rtn = cb();
+        if (rtn && rtn.then) {
+          waits.push(rtn);
+        }
+      } catch (e) {
+        console.error(`stencil sys destroy: ${e}`);
+      }
+    });
+    await Promise.all(waits);
+    destroys.clear();
+  };
 
   const normalize = (p: string) => {
     if (p === '/' || p === '') {
@@ -181,13 +201,17 @@ export const createStencilSys = () => {
       });
     }
 
-    return {
-      close() {
-        const closeItem = items.get(p);
-        if (closeItem) {
-          closeItem.watcherCallback = null;
-        }
+    const close = () => {
+      const closeItem = items.get(p);
+      if (closeItem) {
+        closeItem.watcherCallback = null;
       }
+    };
+
+    addDestory(close);
+
+    return {
+      close,
     };
   };
 
@@ -209,13 +233,17 @@ export const createStencilSys = () => {
       });
     }
 
-    return {
-      close() {
-        const closeItem = items.get(p);
-        if (closeItem) {
-          closeItem.watcherCallback = null;
-        }
+    const close = () => {
+      const closeItem = items.get(p);
+      if (closeItem) {
+        closeItem.watcherCallback = null;
       }
+    };
+
+    addDestory(close);
+
+    return {
+      close,
     };
   };
 
@@ -259,7 +287,7 @@ export const createStencilSys = () => {
 
   const generateContentHash = async (content: string) => {
     const arrayBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(content));
-    const hashArray = Array.from(new Uint8Array(arrayBuffer));                     // convert buffer to byte array
+    const hashArray = Array.from(new Uint8Array(arrayBuffer)); // convert buffer to byte array
     let hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
     if (typeof length === 'number') {
       hashHex = hashHex.substr(0, length);
@@ -269,6 +297,17 @@ export const createStencilSys = () => {
 
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
+  const copy = async (copyTasks: Required<d.CopyTask>[], srcDir: string) => {
+    const results: d.CopyResults = {
+      diagnostics: [],
+      dirPaths: [],
+      filePaths: []
+    };
+    console.log('todo, copy task', copyTasks.length, srcDir);
+    return results;
+  };
+
+
   const fileWatchTimeout = 32;
 
   mkdirSync('/');
@@ -276,7 +315,9 @@ export const createStencilSys = () => {
   const sys: d.CompilerSystem = {
     access,
     accessSync,
+    addDestory,
     copyFile,
+    destroy,
     fileWatchTimeout,
     getCurrentDirectory,
     getCompilerExecutingPath,
@@ -288,6 +329,7 @@ export const createStencilSys = () => {
     readFileSync,
     realpath,
     realpathSync,
+    removeDestory,
     resolvePath,
     rmdir,
     rmdirSync,
@@ -301,6 +343,7 @@ export const createStencilSys = () => {
     writeFileSync,
     generateContentHash,
     createWorker: createWebWorkerMainController,
+    copy,
   };
 
   return sys;

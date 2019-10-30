@@ -21,7 +21,7 @@ export async function taskWatch(prcs: NodeJS.Process, config: d.Config) {
   }
 
   prcs.once('SIGINT', () => {
-    watcher.close();
+    compiler.destroy();
   });
 
   const closeResults = await watcher.start();

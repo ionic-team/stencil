@@ -1,4 +1,5 @@
 import { BuildEvents, BuildOnEvents, CompilerEventFileAdd, CompilerEventFileDelete, CompilerEventFileUpdate } from './build-events';
+import { CopyResults, CopyTask } from './assets';
 import { Diagnostic } from './diagnostics';
 import { HotModuleReplacement } from './build';
 import { WorkerMainController } from './worker_next';
@@ -48,6 +49,14 @@ export interface CompilerSystemAsync {
 
 export interface CompilerSystem extends CompilerSystemAsync {
   /**
+   * Add a callback which will be ran when destroy() is called.
+   */
+  addDestory(cb: () => void): void;
+  /**
+   * Remove a callback which will be ran when destroy() is called.
+   */
+  removeDestory(cb: () => void): void;
+  /**
    * Always returns a boolean, does not throw.
    */
   accessSync(p: string): boolean;
@@ -55,6 +64,13 @@ export interface CompilerSystem extends CompilerSystemAsync {
    * Always returns a boolean if the files were copied or not. Does not throw.
    */
   copyFile(src: string, dst: string): Promise<boolean>;
+  /**
+   * Used to destroy any listeners, file watchers or child processes.
+   */
+  destroy(): Promise<void>;
+  /**
+   * Get the current directory.
+   */
   getCurrentDirectory(): string;
   /**
    * The compiler's current executing path. Like the compiler's __filename on NodeJS or location.href in a web worker.
@@ -112,6 +128,8 @@ export interface CompilerSystem extends CompilerSystemAsync {
    * Creates the worker farm for the current system.
    */
   createWorker?(maxConcurrentWorkers: number, events: BuildEvents): WorkerMainController;
+
+  copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
 }
 
 export type CompilerFileWatcherEvent = CompilerEventFileAdd | CompilerEventFileDelete | CompilerEventFileUpdate;

@@ -6,6 +6,7 @@ import ts from 'typescript';
 
 export const createTsWatchProgram = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>) => {
   let isRunning = false;
+  let timeoutId: any;
 
   const optionsToExtend = getTsOptionsToExtend(config);
 
@@ -13,19 +14,22 @@ export const createTsWatchProgram = async (config: d.Config, compilerCtx: d.Comp
     ...ts.sys,
 
     setTimeout(callback, time) {
-      const id = setInterval(() => {
+      timeoutId = setInterval(() => {
         if (!isRunning) {
           callback();
-          clearInterval(id);
+          clearInterval(timeoutId);
         }
       }, config.sys_next.fileWatchTimeout || time);
-      return id;
+      return timeoutId;
     },
 
     clearTimeout(id) {
       return clearInterval(id);
     }
   };
+
+  config.sys_next.addDestory(() => tsWatchSys.clearTimeout(timeoutId));
+
 
   // TODO: it should error?
   if (config.tsconfig == null) {

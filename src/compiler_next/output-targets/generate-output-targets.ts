@@ -4,6 +4,7 @@ import { lazyOutput } from './component-lazy/lazy-output';
 // import { collectionOutput } from './component-collection/collection-output';
 import { customElementOutput } from './component-custom-element/custom-element-output';
 import { outputAngular } from '../../compiler/output-targets/output-angular';
+import { outputCopy } from './copy/output-copy';
 import { outputDocs } from '../../compiler/output-targets/output-docs';
 import { outputLazyLoader } from '../../compiler/output-targets/output-lazy-loader';
 import { outputWww } from '../../compiler/output-targets/output-www';
@@ -24,6 +25,7 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
     outputAngular(config, compilerCtx, buildCtx),
     outputDocs(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
+    outputCopy(config, compilerCtx, buildCtx),
   ]);
 
   timeSpan.finish('generate outputs finished');

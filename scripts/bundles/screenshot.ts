@@ -3,6 +3,7 @@ import { join } from 'path';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import { aliasPlugin } from './plugins/alias-plugin';
+import { gracefulFsPlugin } from './plugins/graceful-fs-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
@@ -64,6 +65,7 @@ export async function screenshot(opts: BuildOptions) {
     },
     external,
     plugins: [
+      gracefulFsPlugin(),
       aliasPlugin(opts),
       nodeResolve({
         preferBuiltins: false

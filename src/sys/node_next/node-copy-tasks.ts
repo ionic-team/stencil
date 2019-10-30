@@ -1,11 +1,11 @@
 import * as d from '../../declarations';
 import { buildError, catchError, flatOne, isGlob, normalizePath, unique } from '@utils';
-import { NodeFs } from '../../sys/node/node-fs';
+import { copyFile, mkdir, readdir, stat } from './node-fs-promisify';
 import path from 'path';
 import glob from 'glob';
 
 
-export async function copyTasksWorker(copyTasks: Required<d.CopyTask>[], srcDir: string) {
+export async function nodeCopyTasks(copyTasks: Required<d.CopyTask>[], srcDir: string) {
   const results: d.CopyResults = {
     diagnostics: [],
     dirPaths: [],
@@ -13,8 +13,6 @@ export async function copyTasksWorker(copyTasks: Required<d.CopyTask>[], srcDir:
   };
 
   try {
-    const fs = new NodeFs(process);
-
     copyTasks = flatOne(await Promise.all(
       copyTasks.map(task => processGlobs(task, srcDir))
     ));
@@ -28,9 +26,9 @@ export async function copyTasksWorker(copyTasks: Required<d.CopyTask>[], srcDir:
     while (copyTasks.length > 0) {
       const tasks = copyTasks.splice(0, 100);
 
-      await Promise.all(tasks.map(async copyTask => {
-        await processCopyTask(fs, results, allCopyTasks, copyTask);
-      }));
+      await Promise.all(tasks.map(copyTask =>
+        processCopyTask(results, allCopyTasks, copyTask)
+      ));
     }
 
     // figure out which directories we'll need to make first
@@ -38,16 +36,16 @@ export async function copyTasksWorker(copyTasks: Required<d.CopyTask>[], srcDir:
 
     try {
       await Promise.all(
-        mkDirs.map(dir => fs.mkdir(dir, { recursive: true }))
+        mkDirs.map(dir => mkdir(dir, { recursive: true }))
       );
     } catch (mkDirErr) {}
 
     while (allCopyTasks.length > 0) {
       const tasks = allCopyTasks.splice(0, 100);
 
-      await Promise.all(tasks.map(async copyTask => {
-        await fs.copyFile(copyTask.src, copyTask.dest);
-      }));
+      await Promise.all(tasks.map(copyTask =>
+        copyFile(copyTask.src, copyTask.dest)
+      ));
     }
 
   } catch (e) {
@@ -101,20 +99,20 @@ function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, glob
 }
 
 
-async function processCopyTask(fs: NodeFs, results: d.CopyResults, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask) {
+async function processCopyTask(results: d.CopyResults, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask) {
   try {
     copyTask.src = normalizePath(copyTask.src);
     copyTask.dest = normalizePath(copyTask.dest);
 
     // get the stats for this src to see if it's a directory or not
-    const stats = await fs.stat(copyTask.src);
+    const stats = await stat(copyTask.src);
     if (stats.isDirectory()) {
       // still a directory, keep diggin down
       if (!results.dirPaths.includes(copyTask.dest)) {
         results.dirPaths.push(copyTask.dest);
       }
 
-      await processCopyTaskDirectory(fs, results, allCopyTasks, copyTask);
+      await processCopyTaskDirectory(results, allCopyTasks, copyTask);
 
     } else if (!shouldIgnore(copyTask.src)) {
       // this is a file we should copy
@@ -134,9 +132,9 @@ async function processCopyTask(fs: NodeFs, results: d.CopyResults, allCopyTasks:
 }
 
 
-async function processCopyTaskDirectory(fs: NodeFs, results: d.CopyResults, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask) {
+async function processCopyTaskDirectory(results: d.CopyResults, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask) {
   try {
-    const dirItems = await fs.readdir(copyTask.src);
+    const dirItems = await readdir(copyTask.src);
 
     await Promise.all(dirItems.map(async dirItem => {
       const subCopyTask: d.CopyTask = {
@@ -145,7 +143,7 @@ async function processCopyTaskDirectory(fs: NodeFs, results: d.CopyResults, allC
         warn: copyTask.warn
       };
 
-      await processCopyTask(fs, results, allCopyTasks, subCopyTask);
+      await processCopyTask(results, allCopyTasks, subCopyTask);
     }));
 
   } catch (e) {

@@ -14,8 +14,16 @@ export function createNodeSysWithWatch(prcs: NodeJS.Process): CompilerSystem {
       fileName = normalizePath(fileName);
       callback(fileName, null);
     }, true);
+
+    const close = () => {
+      tsFileWatcher.close();
+    };
+
+    sys.addDestory(close);
+
     return {
       close() {
+        sys.removeDestory(close);
         tsFileWatcher.close();
       }
     };
@@ -32,8 +40,15 @@ export function createNodeSysWithWatch(prcs: NodeJS.Process): CompilerSystem {
         callback(fileName, 'fileDelete');
       }
     });
+
+    const close = () => {
+      tsFileWatcher.close();
+    };
+    sys.addDestory(close);
+
     return {
       close() {
+        sys.removeDestory(close);
         tsFileWatcher.close();
       }
     };

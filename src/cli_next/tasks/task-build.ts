@@ -14,9 +14,11 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config) {
   const compiler = await createCompiler(config);
   const results = await compiler.build();
 
-  if (config.flags.prerender) {
+  if (!results.hasError && config.flags.prerender) {
     const devServer = await startServer(config.devServer, config.logger);
     await runPrerender(prcs, __dirname, config, devServer, results);
     await devServer.close();
   }
+
+  await compiler.destroy();
 }

@@ -1,11 +1,14 @@
 import { CompilerSystem } from '../../declarations';
+import { nodeCopyTasks } from './node-copy-tasks';
 import { createHash } from 'crypto';
 import { normalizePath } from '@utils';
-import fs from 'fs';
+import fs from 'graceful-fs';
 import path from 'path';
 
 
 export function createNodeSys(prcs: NodeJS.Process) {
+  const destroys = new Set<() => Promise<void> | void>();
+
   const sys: CompilerSystem = {
     access(p) {
       return new Promise(resolve => {
@@ -23,12 +26,33 @@ export function createNodeSys(prcs: NodeJS.Process) {
       } catch (e) {}
       return hasAccess;
     },
+    addDestory(cb) {
+      destroys.add(cb);
+    },
+    removeDestory(cb) {
+      destroys.delete(cb);
+    },
     copyFile(src, dst) {
       return new Promise(resolve => {
         fs.copyFile(src, dst, err => {
           resolve(!err);
         });
       });
+    },
+    async destroy() {
+      const waits: Promise<void>[] = [];
+      destroys.forEach(cb => {
+        try {
+          const rtn = cb();
+          if (rtn && rtn.then) {
+            waits.push(rtn);
+          }
+        } catch (e) {
+          console.error(`node sys destroy: ${e}`);
+        }
+      });
+      await Promise.all(waits);
+      destroys.clear();
     },
     getCurrentDirectory() {
       return normalizePath(prcs.cwd());
@@ -157,7 +181,7 @@ export function createNodeSys(prcs: NodeJS.Process) {
       } catch (e) {}
       return false;
     },
-    generateContentHash(content: string, length?: number) {
+    generateContentHash(content, length) {
       let hash = createHash('sha1')
         .update(content)
         .digest('hex')
@@ -168,6 +192,7 @@ export function createNodeSys(prcs: NodeJS.Process) {
       }
       return Promise.resolve(hash);
     },
+    copy: nodeCopyTasks,
   };
   return sys;
 }

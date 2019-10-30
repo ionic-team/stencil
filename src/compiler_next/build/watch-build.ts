@@ -75,6 +75,8 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     return watcherCloseResults;
   };
 
+  config.sys_next.addDestory(close);
+
   return {
     start,
     close,

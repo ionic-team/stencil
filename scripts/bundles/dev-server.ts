@@ -3,6 +3,7 @@ import { join } from 'path';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import { aliasPlugin } from './plugins/alias-plugin';
+import { gracefulFsPlugin } from './plugins/graceful-fs-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { BuildOptions } from '../utils/options';;
@@ -59,6 +60,7 @@ export async function devServer(opts: BuildOptions) {
       'util',
     ],
     plugins: [
+      gracefulFsPlugin(),
       aliasPlugin(opts),
       resolve({
         preferBuiltins: true

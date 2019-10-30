@@ -4,7 +4,7 @@ import { compilerBuild } from '../version';
 import { serve500 } from './serve-500';
 import * as http  from 'http';
 import path from 'path';
-import fs from 'fs';
+import fs from 'graceful-fs';
 import * as querystring from 'querystring';
 import * as Url from 'url';
 import * as zlib from 'zlib';

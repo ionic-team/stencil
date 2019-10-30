@@ -13,6 +13,7 @@ const bundledDeps = [
   'glob',
   'graceful-fs',
   'is-glob',
+  'is-extglob',
   'minimatch',
   'node-fetch',
   'open',

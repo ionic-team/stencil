@@ -1,5 +1,5 @@
 import { Cache } from '../compiler/cache';
-import { CompilerNext, CompilerWatcher, Config, Diagnostic } from '../declarations';
+import { CompilerNext, Config, Diagnostic } from '../declarations';
 import { CompilerContext } from '../compiler/build/compiler-ctx';
 import { createFullBuild } from './build/full-build';
 import { createSysWorker } from './sys/worker/sys-worker';
@@ -24,45 +24,27 @@ export const createCompiler = async (config: Config) => {
 
   compilerCtx.worker = createSysWorker(sys, compilerCtx.events, config.maxConcurrentWorkers);
 
-  // console.log('autoPrefixCss', await compilerCtx.worker.autoPrefixCss('body{}'));
-  console.log('minifyJs', await compilerCtx.worker.minifyJs('// minifyjs'));
-  console.log('optimizeCss', await compilerCtx.worker.optimizeCss({
-    css: `
-    body {
-      /* comment */
-      flex: 1;
-    }
-    `,
-    filePath: 'file.css',
-    autoprefixer: config.autoprefixCss,
-    minify: true,
-    legecyBuild: false,
-  }));
-  console.log('scopeCss', await compilerCtx.worker.scopeCss(':host { color: red; }', 'test', false));
-
   compilerCtx.fs = inMemoryFs(sys);
   compilerCtx.cache = new Cache(config, inMemoryFs(sys));
   await compilerCtx.cache.initCacheDir();
 
   await patchTypescript(config, diagnostics, compilerCtx.fs);
 
-  let watcher: CompilerWatcher = null;
+  const build = () => createFullBuild(config, compilerCtx);
+
+  const createWatcher = () =>
+    createWatchBuild(config, compilerCtx);
+
+  const destroy = async () => {
+    compilerCtx.reset();
+    compilerCtx.events.unsubscribeAll();
+    await sys.destroy();
+  };
 
   const compiler: CompilerNext = {
-    build: () => createFullBuild(config, compilerCtx),
-    createWatcher: async () => {
-      watcher = await createWatchBuild(config, compilerCtx);
-      return watcher;
-    },
-    destroy: async () => {
-      compilerCtx.reset();
-      compilerCtx.events.unsubscribeAll();
-
-      if (watcher) {
-        await watcher.close();
-        watcher = null;
-      }
-    },
+    build,
+    createWatcher,
+    destroy,
     sys
   };
 

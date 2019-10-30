@@ -6,7 +6,7 @@ import { MockWindow, cloneWindow, serializeNodeToHtml } from '@mock-doc';
 import { patchNodeGlobal, patchWindowGlobal } from '../prerender-global-patch';
 import { generateModulePreloads } from './prerender-modulepreload';
 import { initNodeWorkerThread } from '../../sys/node_next/worker/worker-child';
-import fs from 'fs';
+import fs from 'graceful-fs';
 import path from 'path';
 import { URL } from 'url';
 

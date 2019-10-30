@@ -9,5 +9,8 @@ export const createSysWorker = (sys: CompilerSystem, events: BuildEvents, maxCon
   }
 
   const workerCtrl = sys.createWorker(maxConcurrentWorkers, events);
+
+  sys.addDestory(() => workerCtrl.destroy());
+
   return createWorkerMainContext(workerCtrl, events);
 };
