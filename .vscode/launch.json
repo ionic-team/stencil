@@ -63,7 +63,7 @@
         "build",
         "--dev",
         "--debug",
-        "--max-workers=1",
+        "--max-workers=0",
         "--prerender",
         "--config",
         "${workspaceFolder}/test/hello-world/stencil.config.ts"
@@ -77,19 +77,20 @@
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
-        "--dev",
-        "--max-workers=1",
         "--next",
+        "--dev",
         "--watch",
+        "--serve",
+        "--max-workers=0",
         "--config",
-        "${workspaceFolder}/test/hello-vdom/stencil.config.ts"
+        "${workspaceFolder}/test/hello-world/stencil.config.ts"
       ],
       "protocol": "inspector"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Hello VDom",
+      "name": "Hello VDom NEXT",
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
@@ -151,7 +152,7 @@
         "build",
         "--dev",
         "--prerender",
-        "--max-workers=1",
+        "--max-workers=0",
         "--config",
         "${workspaceFolder}/test/prerender-shadow/stencil.config.ts"
       ],
@@ -207,7 +208,7 @@
         "--watch",
         "--serve",
         "--debug",
-        "--max-workers=1",
+        "--max-workers=0",
         "--config",
         "${workspaceFolder}/test/todo-app/stencil.config.ts"
       ],
@@ -221,7 +222,7 @@
         "${workspaceFolder}/bin/stencil",
         "build",
         "--dev",
-        "--max-workers=1",
+        "--max-workers=0",
         "--config",
         "${workspaceFolder}/test/style-modes/stencil.config.ts"
       ],
@@ -235,7 +236,7 @@
         "${workspaceFolder}/bin/stencil",
         "build",
         "--prerender",
-        "--max-workers=1",
+        "--max-workers=0",
         "--config",
         "${workspaceFolder}/../stencil-site/stencil.config.ts"
       ],

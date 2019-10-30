@@ -101,15 +101,10 @@ export async function cli(opts: BuildOptions) {
               external: true
             }
           }
-          if (importee === 'fs') {
-            return {
-              id: '../sys/node/graceful-fs.js',
-              external: true
-            }
-          }
           return null;
         }
       },
+      gracefulFsPlugin(),
       aliasPlugin(opts),
       replacePlugin(opts),
       resolve({

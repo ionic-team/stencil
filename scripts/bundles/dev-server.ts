@@ -53,6 +53,7 @@ export async function devServer(opts: BuildOptions) {
       esModule: false,
     },
     external: [
+      'assert',
       'child_process',
       'fs',
       'os',
@@ -78,6 +79,7 @@ export async function devServer(opts: BuildOptions) {
       esModule: false,
     },
     external: [
+      'assert',
       'buffer',
       'child_process',
       'crypto',
@@ -113,6 +115,7 @@ export async function devServer(opts: BuildOptions) {
           return null;
         }
       },
+      gracefulFsPlugin(),
       aliasPlugin(opts),
       resolve({
         preferBuiltins: true
