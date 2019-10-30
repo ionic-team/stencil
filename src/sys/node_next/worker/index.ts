@@ -16,7 +16,8 @@ export class NodeWorkerController extends EventEmitter {
 
   constructor(public forkModulePath: string, maxConcurrentWorkers: number, public events: d.BuildEvents, public logger: d.Logger) {
     super();
-    this.totalWorkers = Math.max(Math.min(maxConcurrentWorkers, cpus().length), 1);
+    const totalCpus = cpus().length;
+    this.totalWorkers = Math.max(Math.min(maxConcurrentWorkers, totalCpus), 2) - 1;
     this.startWorkers();
   }
 
