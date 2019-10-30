@@ -59,7 +59,7 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   };
 
   const start = async () => {
-    tsWatchProgram = await createTsWatchProgram(config, compilerCtx, onBuild);
+    tsWatchProgram = await createTsWatchProgram(config, onBuild);
     return watchWaiter;
   };
 

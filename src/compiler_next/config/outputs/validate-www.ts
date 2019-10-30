@@ -23,6 +23,7 @@ export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[]) => {
 
   return userOutputs.reduce((outputs, o) => {
     const outputTarget = validateWwwOutputTarget(config, o, diagnostics);
+    outputs.push(outputTarget);
 
     // Add dist-lazy output target
     const buildDir = outputTarget.buildDir;

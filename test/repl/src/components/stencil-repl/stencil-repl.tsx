@@ -28,11 +28,26 @@ export class StencilRepl {
 
     await this.compiler.sys.mkdir('/src');
 
-    if (!this.inputs.some(({name}) => name === 'src/stencil.config.ts')) {
+    if (!this.inputs.some(({name}) => name === '/tsconfig.json')) {
       this.inputs.push({
-        name: 'src/stencil.config.ts',
+        name: '/tsconfig.json',
         code: `
-// TODO       
+          {
+            "compilerOptions": {
+              "experimentalDecorators": true,
+              "lib": [
+                "dom",
+                "es2015"
+              ],
+              "module": "esnext",
+              "target": "es2017",
+              "jsx": "react",
+              "jsxFactory": "h"
+            },
+            "include": [
+              "src"
+            ]
+          }
         `
       })
     }

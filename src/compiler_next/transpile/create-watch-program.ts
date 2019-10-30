@@ -1,10 +1,9 @@
 import * as d from '../../declarations';
-import { TSCONFIG_NAME_FALLBACK, getTsConfigFallback, getTsOptionsToExtend } from './ts-config';
-import path from 'path';
+import { getTsOptionsToExtend } from './ts-config';
 import ts from 'typescript';
 
 
-export const createTsWatchProgram = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>) => {
+export const createTsWatchProgram = async (config: d.Config, buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>) => {
   let isRunning = false;
   let timeoutId: any;
 
@@ -29,14 +28,6 @@ export const createTsWatchProgram = async (config: d.Config, compilerCtx: d.Comp
   };
 
   config.sys_next.addDestory(() => tsWatchSys.clearTimeout(timeoutId));
-
-
-  // TODO: it should error?
-  if (config.tsconfig == null) {
-    config.tsconfig = path.join(config.rootDir, TSCONFIG_NAME_FALLBACK);
-    const tsConfig = JSON.stringify(getTsConfigFallback(config), null, 2);
-    await compilerCtx.fs.writeFile(config.tsconfig, tsConfig, { immediateWrite: true });
-  }
 
   const tsWatchHost = ts.createWatchCompilerHost(
     config.tsconfig,

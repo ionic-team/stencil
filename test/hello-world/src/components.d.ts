@@ -17,7 +17,7 @@ declare global {
 
 
   interface HTMLHelloWorldElement extends Components.HelloWorld, HTMLStencilElement {}
-  const HTMLHelloWorldElement: {
+  var HTMLHelloWorldElement: {
     prototype: HTMLHelloWorldElement;
     new (): HTMLHelloWorldElement;
   };

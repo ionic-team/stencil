@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
-import ts from 'typescript';
 import { isOutputTargetDistTypes } from '../../compiler/output-targets/output-utils';
+import ts from 'typescript';
 
 
 export const getTsOptionsToExtend = (config: d.Config) => {
@@ -12,24 +12,9 @@ export const getTsOptionsToExtend = (config: d.Config) => {
     moduleResolution: ts.ModuleResolutionKind.NodeJs,
     noEmitOnError: false,
     outDir: config.cacheDir,
-    rootDir: config.srcDir,
+    rootDir: config.rootDir,
     sourceMap: config.sourceMap,
     target: ts.ScriptTarget.ES2017,
   };
   return tsOptions;
-};
-
-export const TSCONFIG_NAME_FALLBACK = `tsconfig.fallback.json`;
-
-
-export const getTsConfigFallback = (config: d.Config) => {
-  const tsCompilerOptions: ts.CompilerOptions = {};
-
-  const tsConfig: any = {
-    compilerOptions: tsCompilerOptions,
-    include: [
-      config.srcDir + '/**/*'
-    ]
-  };
-  return tsConfig;
 };

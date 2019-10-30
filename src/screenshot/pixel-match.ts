@@ -1,5 +1,5 @@
 import * as d from '@stencil/core/internal';
-import fs from 'graceful-fs';
+import fs from 'fs';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 
