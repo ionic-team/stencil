@@ -126,41 +126,36 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
     // loop through this directory and sub directories
     // always a disk read!!
     const dirItems = await sys.readdir(dirPath);
+    if (dirItems.length > 0) {
+      // cache some facts about this path
+      const item = getItem(dirPath);
+      item.exists = true;
+      item.isFile = false;
+      item.isDirectory = true;
 
-    // cache some facts about this path
-    const item = getItem(dirPath);
-    item.exists = true;
-    item.isFile = false;
-    item.isDirectory = true;
+      await Promise.all(dirItems.map(async dirItem => {
+        // let's loop through each of the files we've found so far
+        // create an absolute path of the item inside of this directory
+        const absPath = normalizePath(dirItem);
+        const relPath = normalizePath(path.relative(initPath, absPath));
 
-    await Promise.all(dirItems.map(async dirItem => {
-      // let's loop through each of the files we've found so far
-      // create an absolute path of the item inside of this directory
-      const absPath = normalizePath(dirItem);
-      const relPath = normalizePath(path.relative(initPath, absPath));
+        // get the fs stats for the item, could be either a file or directory
+        const stats = await stat(absPath);
 
-      // get the fs stats for the item, could be either a file or directory
-      const stats = await stat(absPath);
+        collectedPaths.push({
+          absPath: absPath,
+          relPath: relPath,
+          isDirectory: stats.isDirectory,
+          isFile: stats.isFile
+        });
 
-      // cache some stats about this path
-      const subItem = getItem(absPath);
-      subItem.exists = true;
-      subItem.isDirectory = stats.isDirectory;
-      subItem.isFile = stats.isFile;
-
-      collectedPaths.push({
-        absPath: absPath,
-        relPath: relPath,
-        isDirectory: stats.isDirectory,
-        isFile: stats.isFile
-      });
-
-      if (opts.recursive === true && stats.isDirectory === true) {
-        // looks like it's yet another directory
-        // let's keep drilling down
-        await readDirectory(initPath, absPath, opts, collectedPaths);
-      }
-    }));
+        if (opts.recursive === true && stats.isDirectory === true) {
+          // looks like it's yet another directory
+          // let's keep drilling down
+          await readDirectory(initPath, absPath, opts, collectedPaths);
+        }
+      }));
+    }
   };
 
   const readFile = async (filePath: string, opts?: d.FsReadOptions) => {
