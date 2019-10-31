@@ -10,7 +10,8 @@ import { replacePlugin } from './plugins/replace-plugin';
 import { getBanner } from '../utils/banner';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { BuildOptions } from '../utils/options';
-import { RollupOptions } from 'rollup';
+import { RollupOptions, OutputChunk } from 'rollup';
+import terser from 'terser';
 
 
 export async function compiler(opts: BuildOptions) {
@@ -60,6 +61,14 @@ export async function compiler(opts: BuildOptions) {
       esModule: false,
     },
     plugins: [
+      {
+        resolveId(id) {
+          if (id === '@mock-doc') {
+            return join(opts.transpiledDir, 'mock-doc', 'index.js');
+          }
+          return null;
+        }
+      },
       inlinedCompilerPluginsPlugin(opts, inputDir),
       aliasPlugin(opts),
       sysModulesPlugin(inputDir),
@@ -69,6 +78,16 @@ export async function compiler(opts: BuildOptions) {
       commonjs(),
       replacePlugin(opts),
       json() as any,
+      {
+        generateBundle(_, bundleFiles) {
+          Object.keys(bundleFiles).forEach(fileName => {
+            if (opts.isProd) {
+              const bundle = bundleFiles[fileName] as OutputChunk;
+              bundle.code = minifyStencilCompiler(bundle.code)
+            }
+          });
+        }
+      }
     ],
     treeshake: {
       moduleSideEffects: false
@@ -101,3 +120,14 @@ export async function compiler(opts: BuildOptions) {
     browserCompilerBundle
   ];
 };
+
+
+function minifyStencilCompiler(code: string) {
+  const minifyResults = terser.minify(code);
+
+  if (minifyResults.error) {
+    throw minifyResults.error;
+  }
+
+  return minifyResults.code;
+}

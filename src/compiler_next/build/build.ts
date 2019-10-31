@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { buildAbort, buildFinish } from './build-finish';
-import { catchError } from '@utils';
+import { catchError, isString } from '@utils';
 import { emptyOutputTargets } from '../../compiler/output-targets/empty-dir';
 import { generateOutputTargets } from '../output-targets/generate-output-targets';
 import { runTsProgram } from '../transpile/run-program';
@@ -14,6 +14,13 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
     // empty the directories on the first build
     await emptyOutputTargets(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildAbort(buildCtx);
+
+    if (config.srcIndexHtml) {
+      const indexSrcHtml = await compilerCtx.fs.readFile(config.srcIndexHtml);
+      if (isString(indexSrcHtml)) {
+        buildCtx.indexDoc = config.sys.createDocument(indexSrcHtml);
+      }
+    }
 
     // run typescript program
     const tsTimeSpan = buildCtx.createTimeSpan('transpile started');
