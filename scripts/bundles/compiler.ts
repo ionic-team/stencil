@@ -123,7 +123,16 @@ export async function compiler(opts: BuildOptions) {
 
 
 function minifyStencilCompiler(code: string) {
-  const minifyResults = terser.minify(code);
+  const minifyResults = terser.minify(code, {
+    ecma: 7,
+    compress: {
+      passes: 2,
+      ecma: 7,
+    },
+    output: {
+      ecma: 7,
+    }
+  });
 
   if (minifyResults.error) {
     throw minifyResults.error;

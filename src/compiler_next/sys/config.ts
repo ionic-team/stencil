@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { cloneDocument, createDocument } from '@mock-doc';
+import { cloneDocument, createDocument, serializeNodeToHtml } from '@mock-doc';
 import { createLogger } from './logger';
 import { createStencilSys } from './stencil-sys';
 import { scopeCss } from '../../utils/shadow-css';
@@ -33,6 +33,7 @@ export const getConfig = (userConfig: d.Config) => {
   config.sys.scopeCss = (cssText, scopeId, commentOriginalSelector) => Promise.resolve(scopeCss(cssText, scopeId, commentOriginalSelector));
   config.sys.cloneDocument = cloneDocument;
   config.sys.createDocument = createDocument;
+  config.sys.serializeNodeToHtml = serializeNodeToHtml;
 
   return config;
 };

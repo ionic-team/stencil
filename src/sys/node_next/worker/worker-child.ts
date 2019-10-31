@@ -1,14 +1,13 @@
 import * as d from '../../../declarations';
+import { isNumber, isString } from '@utils';
 
 
 export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerMsgHandler, events: d.BuildEvents) => {
 
-  const sendMessageBackToMain = (msgFromWorker: d.MsgFromWorker) => {
-    prcs.send(msgFromWorker, (err: NodeJS.ErrnoException) => {
-      if (err && err.code === 'ERR_IPC_CHANNEL_CLOSED') {
-        prcs.exit(0);
-      }
-    });
+  const sendHandle = (err: NodeJS.ErrnoException) => {
+    if (err && err.code === 'ERR_IPC_CHANNEL_CLOSED') {
+      prcs.exit(0);
+    }
   };
 
   const errorHandler = (stencilMsgId: number, err: any) => {
@@ -17,7 +16,7 @@ export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerM
       rtnValue: null,
       rtnError: 'Error',
     };
-    if (typeof err === 'string') {
+    if (isString(err)) {
       errMsgBackToMain.rtnError += ': ' + err;
     } else if (err) {
       if (err.stack) {
@@ -26,12 +25,12 @@ export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerM
         errMsgBackToMain.rtnError += ':' + err.message;
       }
     }
-    sendMessageBackToMain(errMsgBackToMain);
+    prcs.send(errMsgBackToMain, sendHandle);
   };
 
   prcs.on('message', async (msgToWorker: d.MsgToWorker) => {
     // message from the main thread
-    if (msgToWorker && typeof msgToWorker.stencilId === 'number') {
+    if (msgToWorker && isNumber(msgToWorker.stencilId)) {
       try {
         // run the handler to get the data
         const msgFromWorker: d.MsgFromWorker = {
@@ -41,7 +40,7 @@ export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerM
         };
 
         // send response data from the worker to the main thread
-        sendMessageBackToMain(msgFromWorker);
+        prcs.send(msgFromWorker, sendHandle);
 
       } catch (e) {
         // error occurred while running the task
@@ -52,12 +51,12 @@ export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerM
 
   if (events) {
     events.on((eventName, data) => {
-      sendMessageBackToMain({
+      prcs.send({
         rtnEventName: eventName,
         rtnEventData: data,
         rtnValue: null,
         rtnError: null,
-      });
+      }, sendHandle);
     });
   }
 
