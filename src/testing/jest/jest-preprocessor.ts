@@ -4,12 +4,12 @@ import { formatDiagnostic, getCompilerOptions, transpile } from '../test-transpi
 export const jestPreprocessor = {
 
   process(sourceText: string, filePath: string, jestConfig: { rootDir: string }) {
-    if (filePath.endsWith('.d.ts')) {
+    if (shouldTransformDts(filePath)) {
       // .d.ts file doesn't need to be transpiled for testing
       return '';
     }
 
-    if (shouldTransformTS(filePath) || shouldTransformESM(filePath, sourceText)) {
+    if (shouldTransformTs(filePath) || shouldTransformEsm(filePath, sourceText)) {
       const opts = Object.assign({}, this.getCompilerOptions(jestConfig.rootDir));
 
       const results = transpile(sourceText, opts, filePath);
@@ -29,6 +29,11 @@ export const jestPreprocessor = {
       const sourceMapInlined = `data:application/json;charset=utf-8;base64,${mapBase64}`;
       const sourceMapComment = results.code.lastIndexOf('//#');
       return results.code.slice(0, sourceMapComment) + '//# sourceMappingURL=' + sourceMapInlined;
+    }
+
+    if (shouldTransformCss(filePath)) {
+      const safeContent = JSON.stringify(sourceText);
+      return `module.exports = ${safeContent};`;
     }
 
     return sourceText;
@@ -62,11 +67,11 @@ export const jestPreprocessor = {
   }
 };
 
-function shouldTransformTS(filePath: string) {
+function shouldTransformTs(filePath: string) {
   return (filePath.endsWith('.ts') || filePath.endsWith('.tsx') || filePath.endsWith('.jsx'));
 }
 
-function shouldTransformESM(filePath: string, sourceText: string) {
+function shouldTransformEsm(filePath: string, sourceText: string) {
   // there may be false positives here
   // but worst case scenario a commonjs file is transpiled to commonjs
   if (filePath.endsWith('.esm.js') || filePath.endsWith('.mjs')) {
@@ -81,4 +86,12 @@ function shouldTransformESM(filePath: string, sourceText: string) {
     }
   }
   return false;
+}
+
+function shouldTransformCss(filePath: string) {
+  return filePath.endsWith('.css');
+}
+
+function shouldTransformDts(filePath: string) {
+  return filePath.endsWith('.d.ts');
 }
