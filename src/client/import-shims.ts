@@ -59,7 +59,7 @@ export const patchDynamicImport = (base: string) => {
   try {
     // There is a caching issue in V8, that breaks using import() in Function
     // By generating a random string, we can workaround it
-    // Check https://bugs.chromium.org/p/v8/issues/detail?id=9558 for more info
+    // Check https://bugs.chromium.org/p/chromium/issues/detail?id=990810 for more info
     (win as any)[importFunctionName] = new Function('w', `return import(w);//${Math.random()}`);
   } catch (e) {
     const moduleMap = new Map<string, any>();
