@@ -13,6 +13,8 @@ import { generateEsm } from './generate-esm';
 import { generateSystem } from './generate-system';
 import { generateCjs } from './generate-cjs';
 import { generateModuleGraph } from '../../../compiler/entries/component-graph';
+import { getGlobalScriptPaths } from '../../bundle/app-data-plugin';
+import MagicString from 'magic-string';
 
 
 export const lazyOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -24,8 +26,8 @@ export const lazyOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, b
   const timespan = buildCtx.createTimeSpan(`generate lazy started`, true);
 
   try {
-
     // const criticalBundles = getCriticalPath(buildCtx);
+    const globalScriptPaths = getGlobalScriptPaths(config, compilerCtx);
 
     const bundleOpts: BundleOptions = {
       id: 'lazy',
@@ -38,8 +40,8 @@ export const lazyOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, b
         'index': USER_INDEX_ENTRY_ID
       },
       loader: {
-        [LAZY_EXTERNAL_ENTRY_ID]: LAZY_EXTERNAL_ENTRY,
-        [LAZY_BROWSER_ENTRY_ID]: LAZY_BROWSER_ENTRY
+        [LAZY_EXTERNAL_ENTRY_ID]: getLazyEntry(false, globalScriptPaths),
+        [LAZY_BROWSER_ENTRY_ID]: getLazyEntry(true, globalScriptPaths),
       }
     };
 
@@ -114,24 +116,37 @@ const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
   ];
 };
 
+const getLazyEntry = (isBrowser: boolean, globalScriptPaths: string[]) => {
+  const hasGlobalScripts = (globalScriptPaths.length > 0);
 
-const LAZY_BROWSER_ENTRY = `
-import { bootstrapLazy, globalScripts, patchBrowser } from '${STENCIL_INTERNAL_CLIENT_ID}';
+  const s = new MagicString(``);
+  s.append(`import { bootstrapLazy } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
 
-patchBrowser().then(options => {
-  globalScripts();
-  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
-});
-`;
+  if (hasGlobalScripts) {
+    s.append(`import { globalScripts } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
+  }
 
-const LAZY_EXTERNAL_ENTRY = `
-import { bootstrapLazy, globalScripts, patchEsm } from '${STENCIL_INTERNAL_CLIENT_ID}';
+  if (isBrowser) {
+    s.append(`import { patchBrowser } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
+    s.append(`patchBrowser().then(options => {\n`);
+    if (hasGlobalScripts) {
+      s.append(`  globalScripts();\n`);
+    }
+    s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
+    s.append(`});\n`);
 
-export const defineCustomElements = (win, options) => patchEsm().then(() => {
-  globalScripts();
-  bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
-});
-`;
+  } else {
+    s.append(`import { patchEsm } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
+    s.append(`export const defineCustomElements = (win, options) => patchEsm().then(() => {\n`);
+    if (hasGlobalScripts) {
+      s.append(`  globalScripts();\n`);
+    }
+    s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
+    s.append(`});\n`);
+  }
+
+  return s.toString();
+} ;
 
 function generateLegacyLoader(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) {
   return Promise.all(

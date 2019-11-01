@@ -21,6 +21,7 @@ coverage/
 dist/
 
 # submodule packages
+/build-conditionals
 /cli
 /compiler
 /hydrate
@@ -28,6 +29,7 @@ dist/
 /internal
 /mock-doc
 /polyfills
+/runtime
 /server
 /sys
 /testing

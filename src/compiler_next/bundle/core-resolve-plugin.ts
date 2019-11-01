@@ -46,6 +46,13 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
         }
       }
       return null;
+    },
+
+    resolveImportMeta(prop, { format }) {
+      if (prop === 'url' && format === 'es') {
+        return '""';
+      }
+      return null;
     }
   };
 };

@@ -1,24 +1,12 @@
 import * as d from '../../declarations';
+import MagicString from 'magic-string';
 import { normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 import { STENCIL_APP_DATA_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
 
 
 export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build: d.BuildConditionals, platform: 'client' | 'hydrate'): Plugin => {
-  const globalPaths: string[] = [];
-
-  if (typeof config.globalScript === 'string') {
-    const mod = compilerCtx.moduleMap.get(config.globalScript);
-    if (mod != null && mod.jsFilePath) {
-      globalPaths.push(normalizePath(mod.jsFilePath));
-    }
-  }
-
-  compilerCtx.collections.forEach(collection => {
-    if (collection.global != null && typeof collection.global.jsFilePath === 'string') {
-      globalPaths.push(normalizePath(collection.global.jsFilePath));
-    }
-  });
+  const globalPaths = getGlobalScriptPaths(config, compilerCtx);
 
   return {
     name: 'appDataPlugin',
@@ -32,11 +20,11 @@ export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buil
 
     load(id) {
       if (id === STENCIL_APP_DATA_ID) {
-        return [
-          getGlobalScripts(globalPaths),
-          getBuildConditionals(config, build),
-          getNamespace(config),
-        ].join('\n');
+        const s = new MagicString(``);
+        appendNamespace(config, s);
+        appendBuildConditionals(config, build, s);
+        appendGlobalScripts(globalPaths, s);
+        return s.toString();
       }
       return null;
     },
@@ -58,33 +46,60 @@ export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buil
 };
 
 
-const getBuildConditionals = (config: d.Config, build: d.BuildConditionals) => {
-  const builData = Object.keys(build).map(key => {
-    return key + ': ' + ((build as any)[key] ? 'true' : 'false');
+export const getGlobalScriptPaths = (config: d.Config, compilerCtx: d.CompilerCtx) => {
+  const globalPaths: string[] = [];
+
+  if (typeof config.globalScript === 'string') {
+    const mod = compilerCtx.moduleMap.get(config.globalScript);
+    if (mod != null && mod.jsFilePath) {
+      globalPaths.push(normalizePath(mod.jsFilePath));
+    }
+  }
+
+  compilerCtx.collections.forEach(collection => {
+    if (collection.global != null && typeof collection.global.jsFilePath === 'string') {
+      globalPaths.push(normalizePath(collection.global.jsFilePath));
+    }
   });
 
-  return `export const BUILD = /* ${config.fsNamespace} custom */ { ${builData.join(', ')} };`;
+  return globalPaths;
 };
 
 
-const getNamespace = (config: d.Config) => {
-  return `export const NAMESPACE = '${config.fsNamespace}';`;
+const appendGlobalScripts = (globalPaths: string[], s: MagicString) => {
+  if (globalPaths.length === 1) {
+    s.prepend(`import appGlobalScript from '${globalPaths[0]}';\n`);
+    s.append(`export const globalScripts = appGlobalScript;\n`);
+
+  } else if (globalPaths.length > 1) {
+    globalPaths.forEach((appGlobalScriptPath, index) => {
+      s.prepend(`import appGlobalScript${index} from '${appGlobalScriptPath}';\n`);
+    });
+
+    s.append(`export const globalScripts = () => {\n`);
+    globalPaths.forEach((_, index) => {
+      s.append(`  appGlobalScript${index}();\n`);
+    });
+    s.append(`};\n`);
+
+  } else {
+    s.append(`export const globalScripts = () => {};\n`);
+  }
+};
+
+const appendBuildConditionals = (config: d.Config, build: d.BuildConditionals, s: MagicString) => {
+  const builData = Object.keys(build).sort().map(key => (
+    key + ': ' + ((build as any)[key] ? 'true' : 'false')
+  )).join(', ');
+
+  s.append(`export const BUILD = /* ${config.fsNamespace} */ { ${builData} };\n`);
 };
 
 
-const getGlobalScripts = (globalPaths: string[]) => {
-  const output = globalPaths.map((appGlobalScriptPath, index) => (
-    `import appGlobalScript${index} from '${appGlobalScriptPath}';`
-  ));
-
-  output.push(
-    `export const globalScripts = /*@__PURE__*/ () => {`,
-    ...globalPaths.map((_, index) => `  appGlobalScript${index}();`),
-    `};`
-  );
-
-  return output.join('\n');
+const appendNamespace = (config: d.Config, s: MagicString) => {
+  s.append(`export const NAMESPACE = '${config.fsNamespace}';\n`);
 };
+
 
 const getContextImport = (platform: string) => {
   return `import { Context } from '${
