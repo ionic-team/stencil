@@ -4,18 +4,10 @@ import * as d from '../../declarations';
 export const createLogger = () => {
   const logger: d.Logger = {
     level: '',
-    info(...msg: any[]) {
-      console.log.apply(console, msg);
-    },
-    warn(...msg: any[]) {
-      console.warn.apply(console, msg);
-    },
-    error(...msg: any[]) {
-      console.error.apply(console, msg);
-    },
-    debug(...msg: any[]) {
-      console.log.apply(console, msg);
-    },
+    info: console.log.bind(console),
+    warn: console.warn.bind(console),
+    error: console.error.bind(console),
+    debug: console.debug.bind(console),
     red(msg: string) { return msg; },
     green(msg: string) { return msg; },
     yellow(msg: string) { return msg; },

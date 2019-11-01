@@ -10,24 +10,20 @@ if (typeof globalThis === 'undefined') {
 
 (gbl => {
   if (!gbl.Buffer) {
-    gbl.Buffer = {
-      __mocked: true
-    };
+    gbl.Buffer = {};
   }
-  const prcs = gbl.process = (gbl.process || {
-    __mocked: true
-  });
+  const prcs = gbl.process = (gbl.process || {});
   if (!prcs.argv) {
     prcs.argv = ['/'];
   }
   if (!prcs.binding) {
-    prcs.binding = () => ({ __mocked: true });
+    prcs.binding = () => ({});
   }
   if (!prcs.cwd) {
     prcs.cwd = () => '/';
   }
   if (!prcs.env) {
-    prcs.env = { __mocked: true };
+    prcs.env = {};
   }
   if (!prcs.nextTick) {
     prcs.nextTick = (cb) => Promise.resolve().then(cb);

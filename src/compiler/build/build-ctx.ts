@@ -61,6 +61,8 @@ export class BuildContext implements d.BuildCtx {
     this.config = config;
     this.compilerCtx = compilerCtx;
     this.buildId = ++this.compilerCtx.activeBuildId;
+
+    this.debug = config.logger.debug.bind(config.logger);
   }
 
   start() {
@@ -144,11 +146,7 @@ export class BuildContext implements d.BuildCtx {
   }
 
   debug(msg: string) {
-    if (this.config.watch) {
-      this.config.logger.debug(`${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`);
-    } else {
-      this.config.logger.debug(msg);
-    }
+    this.config.logger.debug(msg);
   }
 
   get hasError() {

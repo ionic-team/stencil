@@ -101,7 +101,7 @@ export async function compiler(opts: BuildOptions) {
     output: {
       format: 'es',
       file: join(opts.output.compilerDir, browserFileName),
-      banner: getBanner(opts, 'Stencil Browser Compiler', true)
+      banner: getBanner(opts, 'Stencil Compiler (Browser)', true)
     },
     plugins: [
       aliasPlugin(opts),
