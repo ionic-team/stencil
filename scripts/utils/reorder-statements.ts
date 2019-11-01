@@ -28,31 +28,47 @@ function reorderStatements(code: string) {
   function transform() {
     return () => {
       return (tsSourceFile: ts.SourceFile) => {
-        const letStatements = tsSourceFile.statements.filter(n => {
-          return isLet(n);
-        });
-        const importStatements = tsSourceFile.statements.filter(n => {
-          return ts.isImportDeclaration(n);
-        });
-        let statements = tsSourceFile.statements.filter(n => {
-          return !isLet(n) && !ts.isImportDeclaration(n);
-        });
+        const s = tsSourceFile.statements;
+
+        const importStatements = s.filter(ts.isImportDeclaration);
+        const letNoInitializerStatements = s.filter(isLetNoInitializer);
+        const letWithInitializer = s.filter(isLetWithInitializer);
+
+        const otherStatements = s.filter(n => (
+          !isLet(n) &&
+          !ts.isImportDeclaration(n)
+        ));
+
         return ts.updateSourceFileNode(tsSourceFile, [
           ...importStatements,
-          ...letStatements,
-          ...statements
+          ...letNoInitializerStatements,
+          ...letWithInitializer,
+          ...otherStatements
         ]);
       };
     };
   };
 
-  function isLet(n: ts.Statement) {
-    if (ts.isVariableStatement(n)) {
+  function isLet(n: ts.Statement): n is ts.VariableStatement {
+    if (ts.isVariableStatement(n) && n.declarationList) {
       if (n.declarationList.kind === ts.SyntaxKind.VariableDeclarationList) {
         if (n.declarationList.flags === ts.NodeFlags.Let) {
           return true;
         }
       }
+    }
+    return false;
+  }
+
+  function isLetNoInitializer(n: ts.Statement) {
+    return isLet(n) && !isLetWithInitializer(n);
+  }
+
+  function isLetWithInitializer(n: ts.Statement) {
+    if (isLet(n) && n.declarationList.declarations) {
+      return n.declarationList.declarations.some(d => {
+        return !!d.initializer;
+      });
     }
     return false;
   }

@@ -57,7 +57,7 @@ export async function compiler(opts: BuildOptions) {
       intro: cjsIntro + compilerIntro,
       outro: cjsOutro,
       strict: false,
-      banner: getBanner(opts, 'Stencil Compiler'),
+      banner: getBanner(opts, 'Stencil Compiler', true),
       esModule: false,
     },
     plugins: [
@@ -101,7 +101,7 @@ export async function compiler(opts: BuildOptions) {
     output: {
       format: 'es',
       file: join(opts.output.compilerDir, browserFileName),
-      banner: getBanner(opts, 'Stencil Browser Compiler - ' + browserFileName)
+      banner: getBanner(opts, 'Stencil Browser Compiler', true)
     },
     plugins: [
       aliasPlugin(opts),
