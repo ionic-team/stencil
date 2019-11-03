@@ -41,7 +41,7 @@ const validateTsConfig = async (config: d.Config, diagnostics: d.Diagnostic[], i
       diagnostics.push(loadTypeScriptDiagnostic(results.error));
 
     } else if (results.config) {
-      if (!Array.isArray(results.config.include) || results.config.include.length === 0) {
+      if (hasSrcDirectoryInclude(results.config.include)) {
         const warn = buildWarn(diagnostics);
         warn.header = `tsconfig.json "include" required`;
         warn.messageText = `In order for TypeScript to improve watch performance, it's recommended the "tsconfig.json" file should have the "include" property, with at least the app's "src" directory listed. For example: "include": ["src"]`;
@@ -51,4 +51,8 @@ const validateTsConfig = async (config: d.Config, diagnostics: d.Diagnostic[], i
   } catch (e) {
     catchError(diagnostics, e);
   }
+};
+
+const hasSrcDirectoryInclude = (includeProp: string[]) => {
+  return !Array.isArray(includeProp) || includeProp.length === 0;
 };

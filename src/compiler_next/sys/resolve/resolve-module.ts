@@ -23,17 +23,17 @@ export const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InM
 };
 
 
-export const resolveModuleIdSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, containingFile: string, exts: string[]) => {
-  const opts = createCustomResolverSync(config, inMemoryFs, exts);
-  opts.basedir = path.dirname(containingFile);
+export const resolveModuleIdSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, basedir: string, exts: string[]) => {
+  const opts = createCustomResolverSync(config, inMemoryFs, basedir, exts);
   return resolve.sync(moduleId, opts);
 };
 
 
-export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, exts: string[]) => {
+export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, basedir: string, exts: string[]) => {
   const compilerExecutingPath = config.sys_next.getCompilerExecutingPath();
 
   return {
+    basedir,
 
     isFile(filePath: string) {
       filePath = normalizePath(filePath);
@@ -105,10 +105,12 @@ export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemor
 };
 
 
-export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, exts: string[]) => {
+export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, basedir: string, exts: string[]) => {
   const compilerExecutingPath = config.sys_next.getCompilerExecutingPath();
 
   return {
+
+    basedir,
 
     async isFile(filePath: string, cb: (err: any, isFile: boolean) => void) {
       filePath = normalizePath(filePath);

@@ -37,6 +37,12 @@ export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx,
 
 
 const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
+  const customResolveOptions = createCustomResolverAsync(
+    config,
+    compilerCtx.fs,
+    config.rootDir,
+    ['.tsx', '.ts', '.mjs', '.js', '.json']
+  );
 
   const rollupOptions: RollupOptions = {
 
@@ -50,7 +56,7 @@ const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
       userIndexPlugin(config, compilerCtx),
       rollupCommonjsPlugin({
         include: /node_modules/,
-        sourceMap: false,
+        sourceMap: config.sourceMap,
         ...config.commonjs
       }),
       ...config.rollupPlugins,
@@ -58,7 +64,7 @@ const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
       rollupNodeResolvePlugin({
         mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
         browser: true,
-        customResolveOptions: createCustomResolverAsync(config, compilerCtx.fs, ['.tsx', '.ts', '.mjs', '.js', '.json']),
+        customResolveOptions,
         ...config.nodeResolve as any
       }),
       rollupJsonPlugin(),

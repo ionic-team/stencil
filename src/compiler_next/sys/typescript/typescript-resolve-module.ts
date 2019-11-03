@@ -4,6 +4,7 @@ import { getStencilInternalDtsUrl } from '../fetch/fetch-utils';
 import { isLocalModule, isRemoteUrlCompiler, isStencilCoreImport } from '../resolve/resolve-utils';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../environment';
 import { resolveModuleIdSync, resolveRemotePackageJsonSync } from '../resolve/resolve-module';
+import path from 'path';
 import ts from 'typescript';
 
 
@@ -32,7 +33,8 @@ export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InM
 
         const pkgJson = resolveRemotePackageJsonSync(config, inMemoryFs, moduleName);
         if (pkgJson) {
-          const id = resolveModuleIdSync(config, inMemoryFs, moduleName, containingFile, ['.js', '.mjs']);
+          const fromDir = path.dirname(containingFile);
+          const id = resolveModuleIdSync(config, inMemoryFs, moduleName, fromDir, ['.js', '.mjs']);
           return {
             resolvedModule: {
               extension: ts.Extension.Js,
