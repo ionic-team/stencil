@@ -16,9 +16,9 @@ export function inlinedCompilerPluginsPlugin(opts: BuildOptions, inputDir: strin
       }
       return null;
     },
-    async load(id) {
+    load(id) {
       if (id === '@compiler-plugins') {
-        return await bundleCompilerPlugins(opts, inputDir);
+        return bundleCompilerPlugins(opts, inputDir);
       }
       return null;
     }

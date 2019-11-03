@@ -48,6 +48,9 @@
       "@mock-doc": [
         "src/mock-doc/index.ts"
       ],
+      "@optimize-css": [
+        "src/compiler_next/optimize/optimize-css.ts"
+      ],
       "@platform": [
         "src/client/index.ts"
       ],

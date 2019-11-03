@@ -8,7 +8,7 @@ import { initWebWorkerThread } from '../sys/worker/web-worker-thread';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../sys/environment';
 import { loadConfig } from '../config/load-config';
 import { minifyJs } from '../optimize/optimize-module';
-import { optimizeCssWorker } from '../optimize/optimize-css';
+import { optimizeCssWorker } from '@optimize-css';
 import { scopeCssAsync } from '../../utils/shadow-css';
 
 
@@ -37,7 +37,7 @@ export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerCont
     const cmplr = await getCompiler();
     watcher = await cmplr.createWatcher();
     watcher.on(events.emit);
-    return watcher;
+    return null;
   };
 
   const destroy = async () => {

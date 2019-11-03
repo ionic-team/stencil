@@ -209,6 +209,7 @@
         "--watch",
         "--serve",
         "--debug",
+        "--no-open",
         "--max-workers=0",
         "--config",
         "${workspaceFolder}/test/todo-app/stencil.config.ts"

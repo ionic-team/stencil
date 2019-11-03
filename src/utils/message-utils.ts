@@ -1,4 +1,5 @@
 import * as d from '../declarations';
+import { isString } from './helpers';
 
 
 export const buildError = (diagnostics: d.Diagnostic[]) => {
@@ -104,7 +105,7 @@ export const catchError = (diagnostics: d.Diagnostic[], err: Error, msg?: string
     lines: []
   };
 
-  if (typeof msg === 'string') {
+  if (isString(msg)) {
     diagnostic.messageText = msg;
 
   } else if (err != null) {

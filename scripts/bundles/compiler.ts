@@ -5,6 +5,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import json from 'rollup-plugin-json';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { inlinedCompilerPluginsPlugin } from './plugins/inlined-compiler-plugins-plugin';
+import { optimizeCssPlugin } from './plugins/optimizecss-plugin';
 import { sysModulesPlugin } from './plugins/sys-modules-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { getBanner } from '../utils/banner';
@@ -69,6 +70,7 @@ export async function compiler(opts: BuildOptions) {
           return null;
         }
       },
+      optimizeCssPlugin(opts),
       inlinedCompilerPluginsPlugin(opts, inputDir),
       aliasPlugin(opts),
       sysModulesPlugin(inputDir),

@@ -32,12 +32,9 @@ export const fetchUrlSync = (url: string) => {
     if (xhr.status >= 200 && xhr.status < 300) {
       return xhr.responseText;
     }
+  } catch (e) {}
 
-    known404Urls.add(url);
-
-  } catch (e) {
-    known404Urls.add(url);
-  }
+  known404Urls.add(url);
 
   return undefined;
 };
