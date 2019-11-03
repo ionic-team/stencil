@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-const bundledDeps = [
+const entryDeps = [
   'ansi-colors',
   'autoprefixer',
   'cssnano',
@@ -10,6 +10,7 @@ const bundledDeps = [
   'glob',
   'graceful-fs',
   'is-glob',
+  'is-extglob',
   'minimatch',
   'node-fetch',
   'open',
@@ -22,36 +23,70 @@ const bundledDeps = [
   'rollup-plugin-commonjs',
   'rollup-plugin-node-resolve',
   'semver',
+  'source-map',
   'terser',
   'ws',
-].sort();
+];
 
 
-const thirdPartyLicensesRootPath = path.join(__dirname, '..', 'NOTICE.md');
-const allLicenses = [];
-const depLicenses = bundledDeps.map(createBundledDepLicense);
+function createLicense(opts) {
+  const thirdPartyLicensesRootPath = path.join(opts.rootDir, 'NOTICE.md');
 
-const output = `
+  const bundledDeps = [];
+
+  createBundledDeps(opts, bundledDeps, entryDeps);
+
+  bundledDeps.sort((a, b) => {
+    if (a.moduleId < b.moduleId) return -1;
+    if (a.moduleId > b.moduleId) return 1;
+    return 0;
+  });
+
+  const licenses = bundledDeps
+    .map(l => l.license)
+    .reduce((arr, l) => {
+      if (!arr.includes(l)) {
+        arr.push(l)
+      }
+      return arr;
+    }, [])
+    .sort();
+
+  const output = `
 # Licenses of Bundled Dependencies
 
 The published Stencil distribution contains the following licenses:
 
-${allLicenses.sort().map(l => `    ` + l).join('\n')}
+${licenses.map(l => `    ` + l).join('\n')}
 
 
 -----------------------------------------
 
-${depLicenses.join('\n')}
+${bundledDeps.map(l => l.content).join('\n')}
 
-`.trimLeft();
+`.trim() + '\n';
 
-fs.writeFileSync(thirdPartyLicensesRootPath, output);
+  fs.writeFileSync(thirdPartyLicensesRootPath, output);
+}
 
+function createBundledDeps(opts, bundledDeps, deps) {
+  if (Array.isArray(deps)) {
+    deps.forEach(moduleId => {
+      if (includeDepLicense(bundledDeps, moduleId)) {
+        const bundledDep = createBundledDepLicense(opts, moduleId);
+        bundledDeps.push(bundledDep);
 
-function createBundledDepLicense(moduleId) {
-  const pkgJsonFile = path.join(__dirname, '..', 'node_modules', moduleId, 'package.json');
+        createBundledDeps(opts, bundledDeps, bundledDep.dependencies);
+      }
+    });
+  }
+}
+
+function createBundledDepLicense(opts, moduleId) {
+  const pkgJsonFile = path.join(opts.nodeModulesDir, moduleId, 'package.json');
   const pkgJson = fs.readJsonSync(pkgJsonFile);
   const output = [];
+  let license = null;
 
   output.push(
     `## \`${moduleId}\``,
@@ -59,9 +94,7 @@ function createBundledDepLicense(moduleId) {
   );
 
   if (typeof pkgJson.license === 'string') {
-    if (!allLicenses.includes(pkgJson.license)) {
-      allLicenses.push(pkgJson.license);
-    }
+    license = pkgJson.license;
     output.push(
       `License: ${pkgJson.license}`, ``
     );
@@ -71,9 +104,7 @@ function createBundledDepLicense(moduleId) {
     const bundledLicenses = [];
     pkgJson.licenses.forEach(l => {
       if (l.type) {
-        if (!allLicenses.includes(l.type)) {
-          allLicenses.push(l.type);
-        }
+        license = l.type;
         bundledLicenses.push(l.type);
       }
     });
@@ -105,13 +136,7 @@ function createBundledDepLicense(moduleId) {
     );
   }
 
-  if (pkgJson.repository && pkgJson.repository.url) {
-    output.push(
-      `Repository: ${pkgJson.repository.url}`, ``
-    );
-  }
-
-  const depLicense = getBundledDepLicenseContent(moduleId, pkgJson);
+  const depLicense = getBundledDepLicenseContent(opts, moduleId);
   if (typeof depLicense === 'string') {
     depLicense.trim().split('\n').forEach(ln => {
       output.push(`> ${ln}`);
@@ -120,7 +145,14 @@ function createBundledDepLicense(moduleId) {
 
   output.push(``, `-----------------------------------------`, ``);
 
-  return output.join('\n');
+  const dependencies = (pkgJson.dependencies ? Object.keys(pkgJson.dependencies) : []).sort();
+
+  return {
+    moduleId,
+    content: output.join('\n'),
+    license,
+    dependencies,
+  };
 }
 
 function getContributors(prop) {
@@ -154,26 +186,56 @@ function getAuthor(c) {
   }
 }
 
-function getBundledDepLicenseContent(moduleId) {
-  const nodeModulesDir = path.join(__dirname, '..', 'node_modules');
-
+function getBundledDepLicenseContent(opts, moduleId) {
   try {
-    const licensePath = path.join(nodeModulesDir, moduleId, 'LICENSE');
+    const licensePath = path.join(opts.nodeModulesDir, moduleId, 'LICENSE');
     return fs.readFileSync(licensePath, 'utf8');
-
   } catch (e) {
 
     try {
-      const licensePath = path.join(nodeModulesDir, moduleId, 'LICENSE.md');
+      const licensePath = path.join(opts.nodeModulesDir, moduleId, 'LICENSE.md');
       return fs.readFileSync(licensePath, 'utf8');
 
     } catch (e) {
       try {
-        const licensePath = path.join(nodeModulesDir, moduleId, 'LICENSE-MIT');
+        const licensePath = path.join(opts.nodeModulesDir, moduleId, 'LICENSE-MIT');
         return fs.readFileSync(licensePath, 'utf8');
       } catch (e) {}
     }
   }
 }
 
-console.log(`📝  Build License`);
+function includeDepLicense(bundledDeps, moduleId) {
+  if (manuallyNotBundled.has(moduleId)) {
+    return false;
+  }
+  if (moduleId.startsWith('@types/')) {
+    return false;
+  }
+  if (bundledDeps.some(b => b.moduleId === moduleId)) {
+    return false;
+  }
+  return true;
+}
+
+// bundle does not include these
+// scripts/bundles/helpers/cssnano-preset-default.js
+const manuallyNotBundled = new Set([
+  'chalk',
+  'commander',
+  'cosmiconfig',
+  'css-declaration-sorter',
+  'minimist',
+  'postcss-calc',
+  'postcss-discard-overridden',
+  'postcss-merge-longhand',
+  'postcss-normalize-charset',
+  'postcss-normalize-timing-functions',
+  'postcss-normalize-unicode',
+  'postcss-svgo',
+]);
+
+createLicense({
+  rootDir: path.join(__dirname, '..'),
+  nodeModulesDir: path.join(__dirname, '..', 'node_modules'),
+});
