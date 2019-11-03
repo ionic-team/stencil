@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { isOutputTargetDist, isOutputTargetDistLazyLoader, isOutputTargetDistSelfContained, isOutputTargetHydrate, isOutputTargetWww } from './output-utils';
+import { isOutputTargetDist, isOutputTargetDistLazyLoader, isOutputTargetDistSelfContained, isOutputTargetHydrate, isOutputTargetWww, isOutputTargetDistCustomElements } from './output-utils';
 
 
 type OutputTargetEmptiable =
@@ -12,6 +12,7 @@ type OutputTargetEmptiable =
 export function isEmptable(o: d.OutputTarget): o is OutputTargetEmptiable {
   return (
     isOutputTargetDist(o) ||
+    isOutputTargetDistCustomElements(o) ||
     isOutputTargetWww(o) ||
     isOutputTargetDistLazyLoader(o) ||
     isOutputTargetDistSelfContained(o) ||

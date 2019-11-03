@@ -4,7 +4,7 @@ import { CompilerContext } from './build/compiler-ctx';
 import { createFullBuild } from './build/full-build';
 import { createSysWorker } from './sys/worker/sys-worker';
 import { createWatchBuild } from './build/watch-build';
-import { getConfig } from './sys/config';
+import { getConfig, patchSysLegacy } from './sys/config';
 import { inMemoryFs } from './sys/in-memory-fs';
 import { patchFs } from './sys/fs-patch';
 import { patchTypescript } from './sys/typescript/typescript-patch';
@@ -17,15 +17,16 @@ export const createCompiler = async (config: Config) => {
   config = getConfig(config);
   const diagnostics: Diagnostic[] = [];
   const sys = config.sys_next;
+  const compilerCtx = new CompilerContext();
 
   patchFs(sys);
 
-  const compilerCtx = new CompilerContext();
   compilerCtx.fs = inMemoryFs(sys);
   compilerCtx.cache = new Cache(config, inMemoryFs(sys));
   await compilerCtx.cache.initCacheDir();
 
   compilerCtx.worker = createSysWorker(sys, compilerCtx.events, config.maxConcurrentWorkers);
+  patchSysLegacy(config, compilerCtx);
 
   await patchTypescript(config, diagnostics, compilerCtx.fs);
 

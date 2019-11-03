@@ -3,7 +3,6 @@ import { BuildEvents, CompilerWorkerContext, WorkerMainController } from '../../
 
 export const createWorkerMainContext = (workerCtrl: WorkerMainController, events: BuildEvents): CompilerWorkerContext => {
   return {
-    autoPrefixCss: (css) => workerCtrl.send('autoPrefixCss', css),
     build: () => workerCtrl.send('build'),
     compileModule: (code, opts) => workerCtrl.send('compileModule', code, opts),
     createWatcher: () => workerCtrl.send('createWatcher').then(() => (

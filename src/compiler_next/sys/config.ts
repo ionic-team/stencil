@@ -26,6 +26,11 @@ export const getConfig = (userConfig: d.Config) => {
   }
   config.logger.level = config.logLevel;
 
+
+  return config;
+};
+
+export const patchSysLegacy = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   // old way
   config.sys = config.sys || {};
   config.sys.path = path;
@@ -34,6 +39,5 @@ export const getConfig = (userConfig: d.Config) => {
   config.sys.cloneDocument = cloneDocument;
   config.sys.createDocument = createDocument;
   config.sys.serializeNodeToHtml = serializeNodeToHtml;
-
-  return config;
+  config.sys.optimizeCss = (inputOpts) => compilerCtx.worker.optimizeCss(inputOpts);
 };

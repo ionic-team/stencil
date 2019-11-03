@@ -200,10 +200,11 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Todo App",
+      "name": "Todo App NEXT",
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
+        "--next",
         "--dev",
         "--watch",
         "--serve",
@@ -249,6 +250,24 @@
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
+        "--max-workers=1",
+        "--watch",
+        "--dev",
+        "--config",
+        "${workspaceFolder}/test/karma/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Karma NEXT",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--next",
+        "--max-workers=0",
+        "--watch",
         "--dev",
         "--config",
         "${workspaceFolder}/test/karma/stencil.config.ts"

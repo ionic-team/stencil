@@ -1,5 +1,6 @@
 import * as d from '../../../declarations';
 import { getAbsolutePath } from '../utils';
+import { isBoolean } from '@utils';
 import { isOutputTargetDistCustomElements } from '../../../compiler/output-targets/output-utils';
 
 
@@ -7,11 +8,13 @@ export function validateCustomElement(config: d.Config, _diagnostics: d.Diagnost
   return config.outputTargets
     .filter(isOutputTargetDistCustomElements)
     .map(o => {
-      return {
+      const outputTarget = {
         ...o,
-        dir: getAbsolutePath(config, o.dir || 'dist/components')
+        dir: getAbsolutePath(config, o.dir || 'dist/components'),
       };
+      if (!isBoolean(outputTarget.empty)) {
+        outputTarget.empty = true;
+      }
+      return outputTarget;
     });
 }
-
-

@@ -1,13 +1,13 @@
 import * as d from '../../declarations';
+import { buildError, loadTypeScriptDiagnostics } from '@utils';
 import { convertDecoratorsToStatic } from '../../compiler/transformers/decorators-to-static/convert-decorators';
 import { generateAppTypes } from '../../compiler/types/generate-app-types';
 import { getComponentsFromModules, isOutputTargetDistTypes } from '../../compiler/output-targets/output-utils';
-import { loadTypeScriptDiagnostics } from '@utils';
 import { resolveComponentDependencies } from '../../compiler/entries/resolve-component-dependencies';
 import { updateComponentBuildConditionals } from '../build/app-data';
 import { updateModule } from './static-to-meta/parse-static';
-import ts from 'typescript';
 import path from 'path';
+import ts from 'typescript';
 
 
 export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
@@ -54,6 +54,8 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
   updateComponentBuildConditionals(compilerCtx.moduleMap, buildCtx.components);
   resolveComponentDependencies(buildCtx.components);
 
+  validateUniqueTagNames(config, buildCtx);
+
   if (buildCtx.hasError) {
     return false;
   }
@@ -76,4 +78,18 @@ const getCustomTransforms = (config: d.Config, buildCtx: d.BuildCtx, tsTypeCheck
       convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker),
     ]
   };
+};
+
+const validateUniqueTagNames = (config: d.Config, buildCtx: d.BuildCtx) => {
+  buildCtx.components.forEach(cmp => {
+    const tagName = cmp.tagName;
+    const cmpsWithTagName = buildCtx.components.filter(c => c.tagName === tagName);
+    if (cmpsWithTagName.length > 1) {
+      const err = buildError(buildCtx.diagnostics);
+      err.header = `Component Tag Name "${tagName}" Must Be Unique`;
+      err.messageText = `Please update the components so "${tagName}" is only used once: ${
+        cmpsWithTagName.map(c => path.relative(config.rootDir, c.sourceFilePath)).join(' ')
+      }`;
+    }
+  });
 };

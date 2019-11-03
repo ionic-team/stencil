@@ -3,7 +3,6 @@ import { CompilerFsStats, CompilerSystemMakeDirectoryOptions, WatcherCloseResult
 
 
 export interface CompilerWorkerContext {
-  autoPrefixCss(css: string): Promise<{output: string, diagnostics: Diagnostic[]}>;
   build(): Promise<CompilerBuildResults>;
   compileModule(code: string, opts: CompileOptions): Promise<CompileResults>;
   createWatcher(): Promise<CompilerWatcher>;

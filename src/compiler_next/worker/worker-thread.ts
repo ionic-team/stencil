@@ -8,7 +8,7 @@ import { initWebWorkerThread } from '../sys/worker/web-worker-thread';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../sys/environment';
 import { loadConfig } from '../config/load-config';
 import { minifyJs } from '../optimize/optimize-module';
-import { optimizeCss } from '../optimize/optimize-css';
+import { optimizeCssWorker } from '../optimize/optimize-css';
 import { scopeCssAsync } from '../../utils/shadow-css';
 
 
@@ -28,13 +28,6 @@ export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerCont
     return null;
   };
 
-  const autoPrefixCss = (css: string) => {
-    return Promise.resolve({
-      output: css + '/* todo autoprefixer */',
-      diagnostics: []
-    });
-  };
-
   const build = async () => {
     const cmplr = await getCompiler();
     return cmplr.build();
@@ -44,7 +37,7 @@ export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerCont
     const cmplr = await getCompiler();
     watcher = await cmplr.createWatcher();
     watcher.on(events.emit);
-    return null;
+    return watcher;
   };
 
   const destroy = async () => {
@@ -76,7 +69,6 @@ export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerCont
   const watcherStart = async () => watcher.start();
 
   return {
-    autoPrefixCss,
     build,
     compileModule: compile,
     createWatcher,
@@ -84,7 +76,7 @@ export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerCont
     initCompiler,
     loadConfig: loadCompilerConfig,
     minifyJs,
-    optimizeCss,
+    optimizeCss: optimizeCssWorker,
     scopeCss: scopeCssAsync,
     sysAccess: (p) => sys.access(p),
     sysMkdir: (p) => sys.mkdir(p),

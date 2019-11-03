@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "alwaysStrict": true,
+    // "strict": true,
+    // "alwaysStrict": true,
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
     "declaration": false,
@@ -34,9 +34,9 @@
     "test-app/**/*.spec.ts",
     "test-app/**/*.tsx",
     "test-app/util.ts",
-    "test-prerender/**/*.spec.ts",
-    "test-prerender/**/*.tsx",
-    "test-sibling/**/*.spec.ts",
-    "test-sibling/**/*.tsx"
+    // "test-prerender/**/*.spec.ts",
+    // "test-prerender/**/*.tsx",
+    // "test-sibling/**/*.spec.ts",
+    // "test-sibling/**/*.tsx"
   ]
 }

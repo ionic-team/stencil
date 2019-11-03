@@ -9,8 +9,8 @@ export const createWebWorkerMainController = (maxConcurrentWorkers: number, even
   let isDestroyed = false;
   const tasks = new Map<number, d.CompilerWorkerTask>();
   const workers: WorkerChild[] = [];
-  const totalCpus = navigator.hardwareConcurrency || 1;
-  const totalWorkers = Math.max(Math.min(maxConcurrentWorkers, totalCpus), 2) - 1;
+  const hardwareConcurrency = navigator.hardwareConcurrency || 1;
+  const totalWorkers = Math.max(Math.min(maxConcurrentWorkers, hardwareConcurrency), 2) - 1;
 
   const onMessage = (ev: MessageEvent) => {
     const msgFromWorker: d.MsgFromWorker = ev.data;

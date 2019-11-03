@@ -8,9 +8,8 @@ export const config: Config = {
       serviceWorker: null
     },
     {
-      type: 'dist-custom-element',
-      dir: 'public',
-      empty: false
+      type: 'dist-custom-elements',
+      dir: 'public'
     }
   ],
 };

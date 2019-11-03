@@ -1,32 +1,36 @@
 import * as d from '../../declarations';
 import cssnano from 'cssnano';
-// import autoprefixer from 'autoprefixer';
+import autoprefixer from 'autoprefixer';
 import postcss, { AcceptedPlugin } from 'postcss';
 import { catchError } from '@utils';
 
 
-export const optimizeCss = async (inputOpts: d.OptimizeCssInput) => {
+export const optimizeCssWorker = async (inputOpts: d.OptimizeCssInput) => {
   const output: d.OptimizeCssOutput = {
-    css: null,
+    css: inputOpts.css,
     diagnostics: []
   };
 
   try {
     const plugins: AcceptedPlugin[] = [];
 
-    // if (inputOpts.autoprefixer !== false && inputOpts.autoprefixer !== null) {
-    //   const autoprefixerOpts = (inputOpts.autoprefixer != null && typeof inputOpts.autoprefixer === 'object') ?
-    //     inputOpts.autoprefixer :
-    //     DEFAULT_AUTOPREFIX_LEGACY;
+    if (inputOpts.autoprefixer !== false && inputOpts.autoprefixer !== null) {
+      const autoprefixerOpts = (inputOpts.autoprefixer != null && typeof inputOpts.autoprefixer === 'object') ?
+        inputOpts.autoprefixer :
+        DEFAULT_AUTOPREFIX_LEGACY;
 
-    //   plugins.push(autoprefixer(autoprefixerOpts));
-    // }
+      plugins.push(autoprefixer(autoprefixerOpts));
+    }
 
     if (inputOpts.minify) {
       const cssnanoPlugin = cssnano({
         preset: 'default'
       });
       plugins.push(cssnanoPlugin);
+    }
+
+    if (plugins.length === 0) {
+      return output;
     }
 
     const processor = postcss(plugins);
@@ -106,15 +110,15 @@ export const optimizeCss = async (inputOpts: d.OptimizeCssInput) => {
 };
 
 
-// const DEFAULT_AUTOPREFIX_LEGACY = {
-//   overrideBrowserslist: [
-//     'last 2 versions',
-//     'iOS >= 9',
-//     'Android >= 4.4',
-//     'Explorer >= 11',
-//     'ExplorerMobile >= 11'
-//   ],
-//   cascade: false,
-//   remove: false,
-//   flexbox: 'no-2009'
-// };
+const DEFAULT_AUTOPREFIX_LEGACY = {
+  overrideBrowserslist: [
+    'last 2 versions',
+    'iOS >= 9',
+    'Android >= 4.4',
+    'Explorer >= 11',
+    'ExplorerMobile >= 11'
+  ],
+  cascade: false,
+  remove: false,
+  flexbox: 'no-2009'
+};

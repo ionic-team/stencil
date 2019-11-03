@@ -13,20 +13,16 @@
 
   (gbl => {
     if (!gbl.Buffer) {
-      gbl.Buffer = {
-        __mocked: true
-      };
+      gbl.Buffer = {};
     }
 
-    const process = gbl.process = (gbl.process || {
-      __mocked: true
-    });
+    const process = gbl.process = (gbl.process || {});
 
     if (!process.argv) {
       process.argv = [''];
     }
     if (!process.binding) {
-      process.binding = () => ({ __mocked: true });
+      process.binding = () => ({});
     }
     if (!process.cwd) {
       process.cwd = () => '/';

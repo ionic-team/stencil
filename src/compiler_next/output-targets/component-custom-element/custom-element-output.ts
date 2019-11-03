@@ -1,11 +1,11 @@
 import * as d from '../../../declarations';
 import { catchError } from '@utils';
+import { DIST_CUSTOM_ELEMENTS, isOutputTargetDistCustomElements } from '../../../compiler/output-targets/output-utils';
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
+import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import path from 'path';
 import ts from 'typescript';
-import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
-import { isOutputTargetDistCustomElements, DIST_CUSTOM_ELEMENTS } from '../../../compiler/output-targets/output-utils';
 
 
 export const customElementOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, changedModuleFiles: d.Module[]) => {
