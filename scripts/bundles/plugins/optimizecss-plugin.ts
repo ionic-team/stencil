@@ -32,6 +32,12 @@ async function webpackOptimizeCss(opts: BuildOptions, bundleName: string): Promi
   const inputFile = path.join(opts.transpiledDir, 'compiler_next', 'optimize', 'optimize-css.js');
   const outputFile = path.join(opts.transpiledDir, 'optimize-css-bundle.js');
 
+  if (!opts.isProd) {
+    try {
+      return fs.readFileSync(outputFile, 'utf8')
+    } catch (e) {}
+  }
+
   return new Promise(resolve => {
 
     webpack({
