@@ -33,6 +33,7 @@ export interface PackageData {
   browser?: string;
   types?: string;
   version?: string;
+  dependencies?: string[];
   private?: boolean;
   license?: string | any;
   licenses?: string | any;

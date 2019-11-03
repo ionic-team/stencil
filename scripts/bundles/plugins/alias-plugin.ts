@@ -15,15 +15,8 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
 
   // ensure we use the same one
   const helperResolvers = new Set([
-    'browserslist',
-    'caniuse-lite',
-    'cosmicconfig',
-    'cssnano-preset-default',
-    'inherits',
     'is-resolvable',
     'path-is-absolute',
-    'postcss',
-    'supports-color',
     'util',
   ]);
 

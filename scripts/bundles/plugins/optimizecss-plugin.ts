@@ -58,11 +58,11 @@ async function webpackOptimizeCss(opts: BuildOptions, bundleName: string): Promi
       resolve: {
         alias: {
           '@utils': path.join(opts.transpiledDir, 'utils', 'message-utils.js'),
-          'cosmiconfig': path.resolve(opts.bundleHelpersDir, 'empty.js'),
+          'cosmiconfig': path.join(opts.bundleHelpersDir, 'empty.js'),
           'postcss': path.resolve(opts.nodeModulesDir, 'postcss'),
           'source-map': path.resolve(opts.nodeModulesDir, 'source-map'),
-          'chalk': path.resolve(opts.bundleHelpersDir, 'empty.js'),
-          'cssnano-preset-default': path.resolve(opts.bundleHelpersDir, 'cssnano-preset-default'),
+          'chalk': path.join(opts.bundleHelpersDir, 'empty.js'),
+          'cssnano-preset-default': path.join(opts.bundleHelpersDir, 'cssnano-preset-default.js'),
         }
       },
       optimization: {

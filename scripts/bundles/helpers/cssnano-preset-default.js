@@ -1,8 +1,5 @@
 /**
- * @author Ben Briggs
- * @license MIT
- * @module cssnano:preset:default
- * @overview
+ * cssnano:preset:default
  *
  * This default preset for cssnano only includes transforms that make no
  * assumptions about your CSS other than what is passed in. In previous
