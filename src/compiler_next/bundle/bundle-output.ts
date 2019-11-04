@@ -40,8 +40,7 @@ const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
   const customResolveOptions = createCustomResolverAsync(
     config,
     compilerCtx.fs,
-    config.rootDir,
-    ['.tsx', '.ts', '.mjs', '.js', '.json']
+    ['.tsx', '.ts', '.js', '.mjs', '.json']
   );
 
   const rollupOptions: RollupOptions = {

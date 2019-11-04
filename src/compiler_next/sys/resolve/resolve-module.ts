@@ -105,12 +105,10 @@ export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemor
 };
 
 
-export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, basedir: string, exts: string[]) => {
+export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, exts: string[]) => {
   const compilerExecutingPath = config.sys_next.getCompilerExecutingPath();
 
   return {
-
-    basedir,
 
     async isFile(filePath: string, cb: (err: any, isFile: boolean) => void) {
       filePath = normalizePath(filePath);
