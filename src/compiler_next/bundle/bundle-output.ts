@@ -5,12 +5,12 @@ import { coreResolvePlugin } from './core-resolve-plugin';
 import { createCustomResolverAsync } from '../sys/resolve/resolve-module';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { extensionTransformerPlugin } from './extension-transformer-plugin';
+import { fileLoadPlugin } from './file-load-plugin';
 import { imagePlugin } from '../../compiler/rollup-plugins/image-plugin';
 import { lazyComponentPlugin } from '../output-targets/component-lazy/lazy-component-plugin';
 import { pluginHelper } from '../../compiler/rollup-plugins/plugin-helper';
 import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-plugins';
 import { RollupOptions, TreeshakingOptions, rollup } from 'rollup';
-import { sysPlugin } from './sys-plugin';
 import { typescriptPlugin } from './typescript-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { loaderPlugin } from '../../compiler/rollup-plugins/loader';
@@ -73,7 +73,7 @@ const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
         'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
       }),
       typescriptPlugin(compilerCtx, bundleOpts),
-      sysPlugin(compilerCtx.fs)
+      fileLoadPlugin(compilerCtx.fs),
     ],
 
     treeshake: getTreeshakeOption(config),

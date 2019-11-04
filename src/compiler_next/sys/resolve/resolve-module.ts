@@ -4,7 +4,7 @@ import { fetchModuleAsync } from '../fetch/fetch-module-async';
 import { fetchModuleSync } from '../fetch/fetch-module-sync';
 import { getCommonDirUrl, getNodeModuleFetchUrl, packageVersions } from '../fetch/fetch-utils';
 import { IS_FETCH_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../environment';
-import { isString, normalizePath } from '@utils';
+import { isString, normalizeFsPath } from '@utils';
 import path from 'path';
 import resolve from 'resolve';
 
@@ -36,21 +36,21 @@ export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemor
     basedir,
 
     isFile(filePath: string) {
-      filePath = normalizePath(filePath);
+      const fsFilePath = normalizeFsPath(filePath);
 
-      const stat = inMemoryFs.statSync(filePath);
+      const stat = inMemoryFs.statSync(fsFilePath);
       if (stat.isFile) {
         return true;
       }
 
-      if (shouldFetchModule(filePath)) {
-        const endsWithExt = exts.some(ext => filePath.endsWith(ext));
+      if (shouldFetchModule(fsFilePath)) {
+        const endsWithExt = exts.some(ext => fsFilePath.endsWith(ext));
         if (!endsWithExt) {
           return false;
         }
 
-        const url = getNodeModuleFetchUrl(compilerExecutingPath, packageVersions, filePath);
-        const content = fetchModuleSync(inMemoryFs, packageVersions, url, filePath);
+        const url = getNodeModuleFetchUrl(compilerExecutingPath, packageVersions, fsFilePath);
+        const content = fetchModuleSync(inMemoryFs, packageVersions, url, fsFilePath);
         return isString(content);
       }
 
@@ -58,29 +58,29 @@ export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemor
     },
 
     isDirectory(dirPath: string) {
-      dirPath = normalizePath(dirPath);
+      const fsDirPath = normalizeFsPath(dirPath);
 
-      const stat = inMemoryFs.statSync(dirPath);
+      const stat = inMemoryFs.statSync(fsDirPath);
       if (stat.isDirectory) {
         return true;
       }
 
-      if (shouldFetchModule(dirPath)) {
-        if (dirPath === NODE_MODULES_FS_DIR) {
+      if (shouldFetchModule(fsDirPath)) {
+        if (fsDirPath === NODE_MODULES_FS_DIR) {
           // just the /node_modules directory
           inMemoryFs.sys.mkdirSync(NODE_MODULES_FS_DIR);
-          inMemoryFs.clearFileCache(dirPath);
+          inMemoryFs.clearFileCache(fsDirPath);
           return true;
         }
 
-        if (isCommonDirModuleFile(dirPath)) {
+        if (isCommonDirModuleFile(fsDirPath)) {
           // don't bother seeing if it's a directory if it has a common file extension
           return false;
         }
 
         const checkFileExists = (fileName: string) => {
-          const url = getCommonDirUrl(compilerExecutingPath, packageVersions, dirPath, fileName);
-          const filePath = getCommonDirName(dirPath, fileName);
+          const url = getCommonDirUrl(compilerExecutingPath, packageVersions, fsDirPath, fileName);
+          const filePath = getCommonDirName(fsDirPath, fileName);
           const content = fetchModuleSync(inMemoryFs, packageVersions, url, filePath);
           return isString(content);
         };
@@ -111,19 +111,19 @@ export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemo
   return {
 
     async isFile(filePath: string, cb: (err: any, isFile: boolean) => void) {
-      filePath = normalizePath(filePath);
+      const fsFilePath = normalizeFsPath(filePath);
 
-      const stat = await inMemoryFs.stat(filePath);
+      const stat = await inMemoryFs.stat(fsFilePath);
       if (stat.isFile) {
         cb(null, true);
         return;
       }
 
-      if (shouldFetchModule(filePath)) {
-        const endsWithExt = exts.some(ext => filePath.endsWith(ext));
+      if (shouldFetchModule(fsFilePath)) {
+        const endsWithExt = exts.some(ext => fsFilePath.endsWith(ext));
         if (endsWithExt) {
-          const url = getNodeModuleFetchUrl(compilerExecutingPath, packageVersions, filePath);
-          const content = await fetchModuleAsync(inMemoryFs, packageVersions, url, filePath);
+          const url = getNodeModuleFetchUrl(compilerExecutingPath, packageVersions, fsFilePath);
+          const content = await fetchModuleAsync(inMemoryFs, packageVersions, url, fsFilePath);
           const checkFileExists = isString(content);
           cb(null, checkFileExists);
           return;
@@ -134,32 +134,32 @@ export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemo
     },
 
     async isDirectory(dirPath: string, cb: (err: any, isDirectory: boolean) => void) {
-      dirPath = normalizePath(dirPath);
+      const fsDirPath = normalizeFsPath(dirPath);
 
-      const stat = await inMemoryFs.stat(dirPath);
+      const stat = await inMemoryFs.stat(fsDirPath);
       if (stat.isDirectory) {
         cb(null, true);
         return;
       }
 
-      if (shouldFetchModule(dirPath)) {
-        if (dirPath === NODE_MODULES_FS_DIR) {
+      if (shouldFetchModule(fsDirPath)) {
+        if (fsDirPath === NODE_MODULES_FS_DIR) {
           // just the /node_modules directory
           inMemoryFs.sys.mkdirSync(NODE_MODULES_FS_DIR);
-          inMemoryFs.clearFileCache(dirPath);
+          inMemoryFs.clearFileCache(fsDirPath);
           cb(null, true);
           return;
         }
 
-        if (isCommonDirModuleFile(dirPath)) {
+        if (isCommonDirModuleFile(fsDirPath)) {
           // don't bother seeing if it's a directory if it has a common file extension
           cb(null, false);
           return;
         }
 
         for (const fileName of COMMON_DIR_FILENAMES) {
-          const url = getCommonDirUrl(compilerExecutingPath, packageVersions, dirPath, fileName);
-          const filePath = getCommonDirName(dirPath, fileName);
+          const url = getCommonDirUrl(compilerExecutingPath, packageVersions, fsDirPath, fileName);
+          const filePath = getCommonDirName(fsDirPath, fileName);
           const content = await fetchModuleAsync(inMemoryFs, packageVersions, url, filePath);
           if (isString(content)) {
             cb(null, true);
@@ -172,9 +172,9 @@ export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemo
     },
 
     async readFile(p: string, cb: (err: any, data: string) => void) {
-      p = normalizePath(p);
+      const fsFilePath = normalizeFsPath(p);
 
-      const data = await inMemoryFs.readFile(p);
+      const data = await inMemoryFs.readFile(fsFilePath);
       if (isString(data)) {
         return cb(null, data);
       }
@@ -185,6 +185,7 @@ export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemo
     extensions: exts,
   } as any;
 };
+
 
 const COMMON_DIR_FILENAMES = ['package.json', 'index.js', 'index.mjs'];
 
