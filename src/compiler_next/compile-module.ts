@@ -1,5 +1,5 @@
 import { CompileOptions, CompileResults } from '../declarations';
-import { catchError } from '@utils';
+import { catchError, isString } from '@utils';
 import { getCompileConfig, getCompileOptions, getTransformOptions } from './config/compile-module-options';
 import { getPublicCompilerMeta } from '../compiler/transformers/add-component-meta-static';
 import { patchTypescript } from './sys/typescript/typescript-patch';
@@ -7,12 +7,12 @@ import { transformCssToEsm } from '../compiler/style/css-to-esm';
 import { transpileModule } from '../compiler/transpile/transpile-module';
 
 
-export const compile = async (code: string, opts: CompileOptions = {}): Promise<CompileResults> => {
+export const compile = async (code: string, opts: CompileOptions = {}) => {
   const r: CompileResults = {
     diagnostics: [],
-    code: (typeof code === 'string' ? code : ''),
+    code: (isString(code) ? code : ''),
     map: null,
-    inputFilePath: (typeof opts.file === 'string' ? opts.file.trim() : 'module.tsx'),
+    inputFilePath: (isString(opts.file) ? opts.file.trim() : 'module.tsx'),
     outputFilePath: null,
     inputOptions: null,
     imports: [],
@@ -21,9 +21,13 @@ export const compile = async (code: string, opts: CompileOptions = {}): Promise<
 
   try {
     const config = getCompileConfig();
-    r.inputOptions = getCompileOptions(opts, r.inputFilePath);
+    const filePath = r.inputFilePath;
+    r.inputOptions = getCompileOptions(opts);
 
-    if (r.inputOptions.type === 'tsx' || r.inputOptions.type === 'ts' || r.inputOptions.type === 'jsx') {
+    if (filePath.endsWith('.d.ts')) {
+      r.code = '';
+
+    } else if (filePath.endsWith('.tsx') || filePath.endsWith('.ts') || filePath.endsWith('.jsx')) {
       patchTypescript(config, r.diagnostics, null);
 
       const transformOpts = getTransformOptions(r.inputOptions);
@@ -32,13 +36,13 @@ export const compile = async (code: string, opts: CompileOptions = {}): Promise<
 
       r.diagnostics.push(...transpileResults.diagnostics);
 
-      if (typeof transpileResults.code === 'string') {
+      if (isString(transpileResults.code)) {
         r.code = transpileResults.code;
       }
 
       r.map = transpileResults.map;
 
-      if (typeof transpileResults.sourceFilePath === 'string') {
+      if (isString(transpileResults.sourceFilePath)) {
         r.inputFilePath = transpileResults.sourceFilePath;
       }
 
@@ -57,11 +61,7 @@ export const compile = async (code: string, opts: CompileOptions = {}): Promise<
         });
       }
 
-    } else if (r.inputOptions.type === 'dts') {
-      r.code = '';
-      r.map = null;
-
-    } else if (r.inputOptions.type === 'css') {
+    } else if (filePath.endsWith('.css')) {
       const styleData = opts.data;
       const cssResults = transformCssToEsm(config, code, r.inputFilePath, styleData.tag, styleData.encapsulation, styleData.mode);
       r.code = cssResults.code;

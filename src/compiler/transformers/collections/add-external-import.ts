@@ -37,6 +37,9 @@ export const addExternalImport = (config: d.Config, compilerCtx: d.CompilerCtx, 
   // open up and parse the package.json
   // sync on purpose :(
   const pkgJsonStr = compilerCtx.fs.readFileSync(pkgJsonFilePath);
+  if (pkgJsonStr == null) {
+    return;
+  }
   const pkgData: d.PackageJsonData = JSON.parse(pkgJsonStr);
 
   if (typeof pkgData.collection !== 'string' || !pkgData.collection.endsWith('.json')) {

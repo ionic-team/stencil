@@ -55,7 +55,7 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
           ...config.nodeResolve
         }),
         config.sys.rollup.plugins.json(),
-        imagePlugin(config, buildCtx),
+        imagePlugin(config, compilerCtx, buildCtx),
         cssTransformer(config, compilerCtx, buildCtx),
         inMemoryFsRead(config, compilerCtx),
         config.sys.rollup.plugins.replace({

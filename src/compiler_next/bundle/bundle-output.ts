@@ -68,7 +68,7 @@ const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
         ...config.nodeResolve as any
       }),
       rollupJsonPlugin(),
-      imagePlugin(config, buildCtx),
+      imagePlugin(config, compilerCtx, buildCtx),
       extensionTransformerPlugin(config, compilerCtx, buildCtx),
       rollupReplacePlugin({
         'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'

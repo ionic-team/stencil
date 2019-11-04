@@ -130,6 +130,8 @@ export interface CompilerSystem extends CompilerSystemAsync {
   createWorker?(maxConcurrentWorkers: number, events: BuildEvents): WorkerMainController;
 
   copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
+
+  encodeToBase64(str: string): string;
 }
 
 export type CompilerFileWatcherEvent = CompilerEventFileAdd | CompilerEventFileDelete | CompilerEventFileUpdate;

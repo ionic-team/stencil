@@ -21,9 +21,13 @@ export const compile = async (code: string, opts: d.CompileOptions = {}): Promis
 
   try {
     const config = getCompilerConfig();
-    r.inputOptions = getCompileOptions(opts, r.inputFilePath);
+    const fileName = r.inputFilePath;
+    r.inputOptions = getCompileOptions(opts);
 
-    if (r.inputOptions.type === 'tsx' || r.inputOptions.type === 'ts' || r.inputOptions.type === 'jsx') {
+    if (fileName.endsWith('.d.ts')) {
+      r.code = '';
+
+    } else if (fileName.endsWith('.tsx') || fileName.endsWith('.ts') || fileName.endsWith('.jsx')) {
       initTypescript();
 
       const transformOpts = getTransformOptions(r.inputOptions);
@@ -57,11 +61,7 @@ export const compile = async (code: string, opts: d.CompileOptions = {}): Promis
         });
       }
 
-    } else if (r.inputOptions.type === 'dts') {
-      r.code = '';
-      r.map = null;
-
-    } else if (r.inputOptions.type === 'css') {
+    } else if (fileName.endsWith('.css')) {
       const styleData = opts.data;
       const cssResults = transformCssToEsm(config, code, r.inputFilePath, styleData.tag, styleData.encapsulation, styleData.mode);
       r.code = cssResults.code;

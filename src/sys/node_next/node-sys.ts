@@ -54,6 +54,9 @@ export function createNodeSys(prcs: NodeJS.Process) {
       await Promise.all(waits);
       destroys.clear();
     },
+    encodeToBase64(str) {
+      return Buffer.from(str).toString('base64');
+    },
     getCurrentDirectory() {
       return normalizePath(prcs.cwd());
     },

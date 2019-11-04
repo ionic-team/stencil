@@ -1,8 +1,6 @@
 import * as d from '../../declarations';
 import { createStencilImportPath } from './stencil-import-path';
 import ts from 'typescript';
-import path from 'path';
-import { normalizePath } from '@utils';
 
 
 export const updateStyleImports = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, moduleFile: d.Module) => {
@@ -78,7 +76,7 @@ const updateEsmStyleImportPath = (tsSourceFile: ts.SourceFile, statements: ts.St
 
 const createEsmStyleImport = (tsSourceFile: ts.SourceFile, cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
   const importName = ts.createIdentifier(style.styleIdentifier);
-  const importPath = getStyleImportPath(tsSourceFile, cmp, style, style.externalStyles[0].originalComponentPath);
+  const importPath = getStyleImportPath(tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
 
   return ts.createImportDeclaration(
     undefined,
@@ -117,7 +115,7 @@ const updateCjsStyleRequires = (tsSourceFile: ts.SourceFile, moduleFile: d.Modul
 
 const createCjsStyleRequire = (tsSourceFile: ts.SourceFile, cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
   const importName = ts.createIdentifier(style.styleIdentifier);
-  const importPath = getStyleImportPath(tsSourceFile, cmp, style, style.externalStyles[0].originalComponentPath);
+  const importPath = getStyleImportPath(tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
 
   return ts.createVariableStatement(
     undefined,
@@ -140,7 +138,5 @@ const createCjsStyleRequire = (tsSourceFile: ts.SourceFile, cmp: d.ComponentComp
 
 
 const getStyleImportPath = (tsSourceFile: ts.SourceFile, cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, importPath: string) => {
-  const importeeDir = path.dirname(tsSourceFile.fileName);
-  importPath = normalizePath(path.resolve(importeeDir, importPath));
-  return `${createStencilImportPath('css', cmp.tagName, cmp.encapsulation, style.modeName, importPath)}`;
+  return createStencilImportPath(cmp.tagName, cmp.encapsulation, style.modeName, importPath, tsSourceFile.fileName);
 };

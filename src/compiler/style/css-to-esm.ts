@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { createStencilImportPath } from '../transformers/stencil-import-path';
-import { DEFAULT_STYLE_MODE, dashToPascalCase, normalizePath } from '@utils';
+import { DEFAULT_STYLE_MODE, createVarName, normalizePath } from '@utils';
 import { getScopeId } from '../style/scope-css';
 import { scopeCss } from '../../utils/shadow-css';
 import { stripComments } from './style-utils';
@@ -13,7 +13,7 @@ export const transformCssToEsm = (config: d.Config, cssText: string, filePath: s
     cssText = scopeCss(cssText, scopeId, false);
   }
 
-  const defaultVarName = createVarName(filePath, modeName);
+  const defaultVarName = createCssVarName(filePath, modeName);
   const varNames = new Set([defaultVarName]);
 
   const esmImports: string[] = [];
@@ -23,7 +23,7 @@ export const transformCssToEsm = (config: d.Config, cssText: string, filePath: s
     // remove the original css @imports
     cssText = cssText = cssText.replace(cssImport.srcImportText, '');
 
-    const importPath = createStencilImportPath('css', tagName, encapsulation, modeName, cssImport.filePath);
+    const importPath = createStencilImportPath(tagName, encapsulation, modeName, cssImport.filePath, filePath);
     esmImports.push(`import ${cssImport.varName} from '${importPath}';`);
   });
 
@@ -87,7 +87,7 @@ const getCssImports = (config: d.Config, varNames: Set<string>, cssText: string,
       cssImportData.filePath = normalizePath(path.resolve(dir, cssImportData.url));
     }
 
-    cssImportData.varName = createVarName(filePath, modeName);
+    cssImportData.varName = createCssVarName(filePath, modeName);
 
     if (varNames.has(cssImportData.varName)) {
       cssImportData.varName += (varNames.size);
@@ -121,12 +121,10 @@ const isLocalCssImport = (srcImport: string) => {
   return true;
 };
 
-const createVarName = (filePath: string, modeName: string) => {
-  let varName = path.basename(filePath).toLowerCase();
-  varName = varName.replace(/[|&;$%@"<>()+,.{}_]/g, '-');
+const createCssVarName = (filePath: string, modeName: string) => {
+  let varName = path.basename(filePath);
   if (modeName && modeName !== DEFAULT_STYLE_MODE && !varName.includes(modeName)) {
     varName = modeName + '-' + varName;
   }
-  varName = dashToPascalCase(varName);
-  return varName.trim();
+  return createVarName(varName);
 };

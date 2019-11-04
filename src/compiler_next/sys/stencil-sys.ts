@@ -66,6 +66,8 @@ export const createStencilSys = () => {
     return true;
   };
 
+  const encodeToBase64 = (str: string) => btoa(unescape(encodeURIComponent(str)));
+
   const getCurrentDirectory = () => {
     if (IS_NODE_ENV) {
       return global['process'].cwd();
@@ -318,6 +320,7 @@ export const createStencilSys = () => {
     addDestory,
     copyFile,
     destroy,
+    encodeToBase64,
     fileWatchTimeout,
     getCurrentDirectory,
     getCompilerExecutingPath,

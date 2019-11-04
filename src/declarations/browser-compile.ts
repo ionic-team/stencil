@@ -9,7 +9,6 @@ export interface CompileOptions {
   componentExport?: 'customelement' | 'module' | string | undefined;
   script?: CompileScript;
   style?: 'static' | string | undefined;
-  type?: StencilDataType;
   data?: StencilComponentData;
 }
 
@@ -32,10 +31,7 @@ export interface CompileScriptMinifyOptions {
 
 export type CompileScript = 'latest' | 'esnext' | 'es2017' | 'es2015' | 'es5' | string | undefined;
 
-export type StencilDataType = 'css' | 'js' | 'ts' | 'tsx' | 'jsx' | 'dts';
-
 export interface ResolvedStencilData {
-  type: StencilDataType;
   resolvedId: string;
   resolvedFilePath: string;
   resolvedFileName: string;

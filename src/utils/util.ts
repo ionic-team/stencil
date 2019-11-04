@@ -1,6 +1,14 @@
 import * as d from '../declarations';
 import { BANNER } from './constants';
 import { buildError } from './message-utils';
+import { dashToPascalCase } from './helpers';
+
+
+export const createVarName = (fileName: string) => (
+  dashToPascalCase(fileName
+    .toLowerCase()
+    .replace(/[|&;$%@"<>()+,.{}_]/g, '-'))
+);
 
 
 export const getFileExt = (fileName: string) => {

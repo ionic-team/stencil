@@ -4,7 +4,7 @@ import path from 'path';
 import ts from 'typescript';
 
 
-export const getCompileOptions = (input: CompileOptions, filePath: string) => {
+export const getCompileOptions = (input: CompileOptions) => {
   const rtn: CompileOptions = {
     componentExport: getConfig(input.componentExport, VALID_EXPORT, 'customelement'),
     componentMetadata: getConfig(input.componentMetadata, VALID_METADATA, null),
@@ -13,25 +13,7 @@ export const getCompileOptions = (input: CompileOptions, filePath: string) => {
     script: getConfig(input.script, VALID_SCRIPT, 'es2017'),
     style: getConfig(input.style, VALID_STYLE, 'static'),
     data: input.data ? Object.assign({}, input.data) : null,
-    type: input.type
   };
-
-  if (rtn.type == null) {
-    const fileName = path.basename(filePath).trim().toLowerCase();
-    if (fileName.endsWith('.d.ts')) {
-      rtn.type = 'dts';
-    } else if (fileName.endsWith('.tsx')) {
-      rtn.type = 'tsx';
-    } else if (fileName.endsWith('.ts')) {
-      rtn.type = 'ts';
-    } else if (fileName.endsWith('.jsx')) {
-      rtn.type = 'jsx';
-    } else if (fileName.endsWith('.js') || fileName.endsWith('.mjs')) {
-      rtn.type = 'js';
-    } else if (fileName.endsWith('.css') && rtn.data != null) {
-      rtn.type = 'css';
-    }
-  }
 
   return rtn;
 };

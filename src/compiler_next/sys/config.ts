@@ -41,7 +41,8 @@ export const patchSysLegacy = (config: d.Config, compilerCtx: d.CompilerCtx) => 
   config.sys.createDocument = createDocument;
   config.sys.serializeNodeToHtml = serializeNodeToHtml;
   config.sys.optimizeCss = (inputOpts) => compilerCtx.worker.optimizeCss(inputOpts);
-  config.sys.resolveModule = (fromDir, moduleId) => {
-    return resolveModuleIdSync(config, compilerCtx.fs, moduleId, fromDir, ['.js', '.mjs', '.css']);
-  };
+  config.sys.resolveModule = (fromDir, moduleId) => (
+    resolveModuleIdSync(config, compilerCtx.fs, moduleId, fromDir, ['.js', '.mjs', '.css'])
+  );
+  config.sys.encodeToBase64 = config.sys_next.encodeToBase64;
 };

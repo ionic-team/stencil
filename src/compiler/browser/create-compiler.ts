@@ -45,7 +45,6 @@ export const createCompiler = () => {
       const r = getResolvedData(filePath);
       if (r != null) {
         const compileOpts = Object.assign({}, defaultOpts, opts);
-        compileOpts.type = r.type;
         compileOpts.file = r.resolvedFilePath;
         compileOpts.data = r.data;
 

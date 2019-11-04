@@ -10,9 +10,9 @@ export const cssTransformer = (config: d.Config, compilerCtx: d.CompilerCtx, bui
   return {
     name: 'cssTransformer',
 
-    resolveId(importee: string, importer: string) {
+    resolveId(importee, importer) {
       const r = compiler.resolveId(importee, importer);
-      if (r != null && r.type === 'css') {
+      if (r != null && r.importer.endsWith('.css')) {
         if (KNOWN_PREPROCESSOR_EXTS.has(r.importerExt) && r.importerExt !== r.resolvedFileExt) {
           // basically for sass paths without an extension
           r.resolvedFileExt = r.importerExt;
@@ -26,7 +26,7 @@ export const cssTransformer = (config: d.Config, compilerCtx: d.CompilerCtx, bui
       return null;
     },
 
-    async transform(code: string, id: string) {
+    async transform(code, id) {
       const r = compiler.getResolvedData(id);
       if (r != null) {
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, buildCtx, code, id);

@@ -3,13 +3,7 @@ import { DEFAULT_STYLE_MODE, getFileExt, normalizePath } from '@utils';
 import path from 'path';
 
 
-export const createStencilImportPath = (type: d.StencilDataType, tagName: string, encapsulation: string, modeName: string, importPath: string) => {
-  const pathData = serializeStencilImportPath(type, tagName, encapsulation, modeName);
-  return `${pathData}!${importPath}`;
-};
-
-
-const serializeStencilImportPath = (type: d.StencilDataType, tagName: string, encapsulation: string, modeName: string) => {
+export const createStencilImportPath = (tagName: string, encapsulation: string, modeName: string, importeePath: string, importerPath: string) => {
   const data: d.StencilComponentData = {
     tag: tagName,
   };
@@ -21,15 +15,24 @@ const serializeStencilImportPath = (type: d.StencilDataType, tagName: string, en
   }
 
   const params = new URLSearchParams(Object.entries(data));
-  params.set('type', type);
-  return STENCIL_IMPORT_PREFIX + params.toString();
+
+  let p = importeePath;
+  if (path.isAbsolute(importeePath)) {
+    const importerDir = path.dirname(importerPath);
+    p = path.relative(importerDir, importeePath);
+  }
+  if (!p.startsWith('.')) {
+    p = './' + p;
+  }
+
+  return p + '?' + params.toString();
 };
 
 
 export const parseStencilImportPath = (importee: string, importer: string) => {
   if (typeof importee === 'string' && typeof importee === 'string') {
 
-    if (importee.startsWith(STENCIL_IMPORT_PREFIX) && importee.includes('!')) {
+    if (importee.startsWith('STENCIL_IMPORT_PREFIX') && importee.includes('!')) {
       const importeeParts = importee.split('!');
       const importData = importeeParts[0];
       const importPath = importeeParts[importeeParts.length - 1];
@@ -38,7 +41,6 @@ export const parseStencilImportPath = (importee: string, importer: string) => {
       if (dataParts.length === 2) {
         const params = dataParts[1];
         const urlParams = new URLSearchParams(params);
-        const type = urlParams.get('type') as any;
         const data: d.StencilComponentData = {
           tag: urlParams.get('tag'),
           encapsulation: urlParams.get('encapsulation') || 'none',
@@ -59,7 +61,6 @@ export const parseStencilImportPath = (importee: string, importer: string) => {
         }
 
         const r: d.ResolvedStencilData = {
-          type,
           resolvedId,
           resolvedFilePath,
           resolvedFileName,
@@ -77,5 +78,3 @@ export const parseStencilImportPath = (importee: string, importer: string) => {
   }
   return null;
 };
-
-const STENCIL_IMPORT_PREFIX = `\0stencil?`;
