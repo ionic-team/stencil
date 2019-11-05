@@ -9,7 +9,7 @@ import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../sys/environment';
 import { loadConfig } from '../config/load-config';
 import { minifyJs } from '../optimize/optimize-module';
 import { optimizeCssWorker } from '@optimize-css';
-import { scopeCssAsync } from '../../utils/shadow-css';
+import { transformCssToEsm } from '../../compiler/style/css-to-esm';
 
 
 export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerContext => {
@@ -77,7 +77,7 @@ export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerCont
     loadConfig: loadCompilerConfig,
     minifyJs,
     optimizeCss: optimizeCssWorker,
-    scopeCss: scopeCssAsync,
+    transformCssToEsm,
     sysAccess: (p) => sys.access(p),
     sysMkdir: (p) => sys.mkdir(p),
     sysReadFile: (p) => sys.readFile(p),

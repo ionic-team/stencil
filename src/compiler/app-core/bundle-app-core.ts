@@ -3,7 +3,6 @@ import { appDataPlugin } from '../../compiler_next/bundle/app-data-plugin';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { coreResolvePlugin } from '../../compiler_next/bundle/core-resolve-plugin';
 import { createOnWarnFn, getDependencies, loadRollupDiagnostics } from '@utils';
-import { cssTransformer } from '../rollup-plugins/css-transformer';
 import { loaderPlugin } from '../rollup-plugins/loader';
 import { imagePlugin } from '../rollup-plugins/image-plugin';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
@@ -56,7 +55,6 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
         }),
         config.sys.rollup.plugins.json(),
         imagePlugin(config, compilerCtx, buildCtx),
-        cssTransformer(config, compilerCtx, buildCtx),
         inMemoryFsRead(config, compilerCtx),
         config.sys.rollup.plugins.replace({
           'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'

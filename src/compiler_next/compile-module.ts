@@ -62,10 +62,18 @@ export const compile = async (code: string, opts: CompileOptions = {}) => {
       }
 
     } else if (filePath.endsWith('.css')) {
-      const styleData = opts.data;
-      const cssResults = transformCssToEsm(config, code, r.inputFilePath, styleData.tag, styleData.encapsulation, styleData.mode);
+      const cssResults = await transformCssToEsm({
+        filePath,
+        code: code,
+        tagName: opts.data.tag,
+        encapsulation: opts.data.encapsulation,
+        modeName: opts.data.mode,
+        sourceMap: false,
+        commentOriginalSelector: false,
+      });
       r.code = cssResults.code;
       r.map = cssResults.map;
+      r.diagnostics.push(...cssResults.diagnostics);
     }
 
   } catch (e) {

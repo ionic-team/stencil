@@ -427,7 +427,3 @@ export const scopeCss = (cssText: string, scopeId: string, commentOriginalSelect
 
   return cssText;
 };
-
-export const scopeCssAsync = (cssText: string, scopeId: string, commentOriginalSelector: boolean) => Promise.resolve(
-  scopeCss(cssText, scopeId, commentOriginalSelector)
-);

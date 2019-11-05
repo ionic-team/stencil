@@ -4,16 +4,16 @@ import { BundleOptions } from './bundle-interface';
 import { coreResolvePlugin } from './core-resolve-plugin';
 import { createCustomResolverAsync } from '../sys/resolve/resolve-module';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
-import { extensionTransformerPlugin } from './extension-transformer-plugin';
+import { extTransformsPlugin } from './ext-transforms-plugin';
 import { fileLoadPlugin } from './file-load-plugin';
 import { imagePlugin } from '../../compiler/rollup-plugins/image-plugin';
 import { lazyComponentPlugin } from '../output-targets/component-lazy/lazy-component-plugin';
+import { loaderPlugin } from '../../compiler/rollup-plugins/loader';
 import { pluginHelper } from '../../compiler/rollup-plugins/plugin-helper';
 import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-plugins';
 import { RollupOptions, TreeshakingOptions, rollup } from 'rollup';
 import { typescriptPlugin } from './typescript-plugin';
 import { userIndexPlugin } from './user-index-plugin';
-import { loaderPlugin } from '../../compiler/rollup-plugins/loader';
 
 
 export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
@@ -61,18 +61,17 @@ const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
       ...config.rollupPlugins,
       pluginHelper(config, buildCtx),
       rollupNodeResolvePlugin({
-        mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
-        browser: true,
+        mainFields: ['browser', 'collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
         customResolveOptions,
         ...config.nodeResolve as any
       }),
       rollupJsonPlugin(),
+      typescriptPlugin(compilerCtx, bundleOpts),
       imagePlugin(config, compilerCtx, buildCtx),
-      extensionTransformerPlugin(config, compilerCtx, buildCtx),
+      extTransformsPlugin(config, compilerCtx, buildCtx),
       rollupReplacePlugin({
         'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
       }),
-      typescriptPlugin(compilerCtx, bundleOpts),
       fileLoadPlugin(compilerCtx.fs),
     ],
 

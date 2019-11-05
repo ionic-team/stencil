@@ -15,6 +15,7 @@ export interface Plugin {
 
 export interface PluginTransformResults {
   code?: string;
+  map?: string;
   id?: string;
 }
 

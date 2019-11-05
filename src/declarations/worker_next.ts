@@ -1,5 +1,5 @@
 import { CompileOptions, CompileResults, CompilerBuildResults, CompilerWatcher, Config, Diagnostic, OptimizeCssInput, OptimizeCssOutput } from '.';
-import { CompilerFsStats, CompilerSystemMakeDirectoryOptions, WatcherCloseResults } from '../internal';
+import { CompilerFsStats, CompilerSystemMakeDirectoryOptions, TransformCssToEsmInput, TransformCssToEsmOutput, WatcherCloseResults } from '../internal';
 
 
 export interface CompilerWorkerContext {
@@ -11,7 +11,7 @@ export interface CompilerWorkerContext {
   loadConfig(config?: Config): Promise<Diagnostic[]>;
   minifyJs(input: string, opts?: any): Promise<{output: string, sourceMap: any, diagnostics: Diagnostic[]}>;
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
-  scopeCss(cssText: string, scopeId: string, commentOriginalSelector: boolean): Promise<string>;
+  transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
 
   sysAccess(p: string): Promise<boolean>;
   sysMkdir(p: string, opts?: CompilerSystemMakeDirectoryOptions): Promise<boolean>;

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { catchError } from '@utils';
+import { catchError, isString, isFunction } from '@utils';
 import { PluginCtx, PluginTransformResults } from '../../declarations/plugin';
 import { parseCssImports } from '../style/css-imports';
 import { isOutputTargetDocs } from '../output-targets/output-utils';
@@ -155,7 +155,7 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
 }
 
 
-export const runPluginTransformsEsmImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceText: string, id: string) => {
+export const runPluginTransformsEsmImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, code: string, id: string) => {
   const pluginCtx: PluginCtx = {
     config: config,
     sys: config.sys,
@@ -165,19 +165,20 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
   };
 
   const transformResults: PluginTransformResults = {
-    code: sourceText,
-    id: id
+    code,
+    id,
+    map: null,
   };
 
   for (const plugin of pluginCtx.config.plugins) {
 
-    if (typeof plugin.transform === 'function') {
+    if (isFunction(plugin.transform)) {
       try {
         let pluginTransformResults: PluginTransformResults | string;
         const results = plugin.transform(transformResults.code, transformResults.id, pluginCtx);
 
         if (results != null) {
-          if (typeof (results as any).then === 'function') {
+          if (isFunction((results as any).then)) {
             pluginTransformResults = await results;
 
           } else {
@@ -185,14 +186,14 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
           }
 
           if (pluginTransformResults != null) {
-            if (typeof pluginTransformResults === 'string') {
+            if (isString(pluginTransformResults)) {
               transformResults.code = pluginTransformResults as string;
 
             } else {
-              if (typeof pluginTransformResults.code === 'string') {
+              if (isString(pluginTransformResults.code)) {
                 transformResults.code = pluginTransformResults.code;
               }
-              if (typeof pluginTransformResults.id === 'string') {
+              if (isString(pluginTransformResults.id)) {
                 transformResults.id = pluginTransformResults.id;
               }
             }
