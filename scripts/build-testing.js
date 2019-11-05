@@ -37,6 +37,7 @@ async function bundleTesting() {
       'path',
       'process',
       'puppeteer',
+      'puppeteer-core',
       'readline',
       'rollup',
       'rollup-plugin-commonjs',
@@ -61,16 +62,13 @@ async function bundleTesting() {
               }
             }
             if (importee === '@mock-doc') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'mock-doc');
+              return relativeResolve('../mock-doc');
             }
             if (importee === '@runtime') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'runtime');
-            }
-            if (importee === '@sys') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
+              return relativeResolve('../runtime');
             }
             if (importee === '@utils') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
+              return relativeResolve('../utils');
             }
           }
         }

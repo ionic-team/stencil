@@ -4,6 +4,7 @@ import { consoleError, getHostRef } from '@platform';
 import { HOST_FLAGS } from '@utils';
 import { parsePropertyValue } from './parse-property-value';
 import { scheduleUpdate } from './update-component';
+import { STENCIL_DEV_MODE } from './profile';
 
 
 export const getValue = (ref: d.RuntimeRef, propName: string) =>
@@ -12,20 +13,40 @@ export const getValue = (ref: d.RuntimeRef, propName: string) =>
 export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta) => {
   // check our new property value against our internal value
   const hostRef = getHostRef(ref);
-  const elm = (BUILD.lazyLoad || BUILD.hydrateServerSide) ? hostRef.$hostElement$ : ref as d.HostElement;
+  const elm = BUILD.lazyLoad ? hostRef.$hostElement$ : ref as d.HostElement;
   const oldVal = hostRef.$instanceValues$.get(propName);
   const flags = hostRef.$flags$;
+  const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   newVal = parsePropertyValue(newVal, cmpMeta.$members$[propName][0]);
 
-  if (newVal !== oldVal && (!(flags & HOST_FLAGS.isConstructingInstance) || oldVal === undefined)) {
+  if (newVal !== oldVal && (!BUILD.lazyLoad || !(flags & HOST_FLAGS.isConstructingInstance) || oldVal === undefined)) {
     // gadzooks! the property's value has changed!!
     // set our new value!
     hostRef.$instanceValues$.set(propName, newVal);
 
-    if (!BUILD.lazyLoad || hostRef.$lazyInstance$) {
+    if (BUILD.isDev) {
+      if (hostRef.$flags$ & HOST_FLAGS.devOnRender) {
+        console.warn(
+          ...STENCIL_DEV_MODE,
+          `The state/prop "${propName}" changed during rendering. This can potentially lead to infinite-loops and other bugs.`,
+          '\nElement', elm,
+          '\nNew value', newVal,
+          '\nOld value', oldVal
+        );
+      } else if (hostRef.$flags$ & HOST_FLAGS.devOnDidLoad) {
+        console.debug(
+          ...STENCIL_DEV_MODE,
+          `The state/prop "${propName}" changed during "componentDidLoad()", this triggers extra re-renders, try to setup on "componentWillLoad()"`,
+          '\nElement', elm,
+          '\nNew value', newVal,
+          '\nOld value', oldVal
+        );
+      }
+    }
+
+    if (!BUILD.lazyLoad || instance) {
       // get an array of method names of watch functions to call
-      if (BUILD.watchCallback && cmpMeta.$watchers$ &&
-        (flags & (HOST_FLAGS.hasConnected | HOST_FLAGS.isConstructingInstance)) === HOST_FLAGS.hasConnected) {
+      if (BUILD.watchCallback && cmpMeta.$watchers$ && flags & HOST_FLAGS.isWatchReady) {
         const watchMethods = cmpMeta.$watchers$[propName];
 
         if (watchMethods) {
@@ -33,8 +54,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           watchMethods.forEach(watchMethodName => {
             try {
               // fire off each of the watch methods that are watching this property
-              (BUILD.lazyLoad || BUILD.hydrateServerSide ? hostRef.$lazyInstance$ : elm as any)[watchMethodName].call(
-                (BUILD.lazyLoad || BUILD.hydrateServerSide ? hostRef.$lazyInstance$ : elm as any),
+              instance[watchMethodName](
                 newVal,
                 oldVal,
                 propName
@@ -47,7 +67,12 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
         }
       }
 
-      if (BUILD.updatable && (flags & (HOST_FLAGS.isActiveRender | HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
+      if (BUILD.updatable && (flags & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
+        if (BUILD.cmpShouldUpdate && instance.componentShouldUpdate) {
+          if (instance.componentShouldUpdate(newVal, oldVal, propName) === false) {
+            return;
+          }
+        }
         // looks like this value actually changed, so we've got work to do!
         // but only if we've already rendered, otherwise just chill out
         // queue that we need to do an update, but don't worry about queuing

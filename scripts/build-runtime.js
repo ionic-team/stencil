@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
+const { reorderCoreStatements } = require('./reorder-statements');
 const { run, transpile } = require('./script-utils');
 const buildPolyfills = require('./build-polyfills');
 
@@ -25,30 +26,31 @@ async function bundleRuntime() {
       'index': runtimeInputFile
     },
     plugins: [
-      (() => {
-        return {
-          resolveId(id) {
-            if (id === '@build-conditionals') {
-              return {
-                id: '@stencil/core/build-conditionals',
-                external: true
-              };
-            }
-            if (id === '@platform') {
-              return {
-                id: '@stencil/core/platform',
-                external: true
-              };
-            }
-            if (id === '@utils') {
-              return {
-                id: '@stencil/core/utils',
-                external: true
-              };
-            }
+      {
+        resolveId(id) {
+          if (id === '@build-conditionals') {
+            return {
+              id: '@stencil/core/build-conditionals',
+              external: true
+            };
           }
+          if (id === '@platform') {
+            return {
+              id: '@stencil/core/platform',
+              external: true
+            };
+          }
+          if (id === '@utils') {
+            return {
+              id: '@stencil/core/utils',
+              external: true
+            };
+          }
+        },
+        generateBundle(options, bundles) {
+          reorderCoreStatements(options, bundles);
         }
-      })()
+      }
     ],
     onwarn: (message) => {
       if (message.code === 'CIRCULAR_DEPENDENCY') return;
@@ -76,24 +78,25 @@ async function bundleClient() {
       'index': clientInputFile
     },
     plugins: [
-      (() => {
-        return {
-          resolveId(id) {
-            if (id === '@build-conditionals') {
-              return {id: '@stencil/core/build-conditionals', external: true}
-            }
-            if (id === '@platform') {
-              return clientInputFile;
-            }
-            if (id === '@runtime') {
-              return runtimeInputFile;
-            }
-            if (id === '@utils') {
-              return utilsInputFile;
-            }
+      {
+        resolveId(id) {
+          if (id === '@build-conditionals') {
+            return {id: '@stencil/core/build-conditionals', external: true}
           }
+          if (id === '@platform') {
+            return clientInputFile;
+          }
+          if (id === '@runtime') {
+            return runtimeInputFile;
+          }
+          if (id === '@utils') {
+            return utilsInputFile;
+          }
+        },
+        generateBundle(options, bundles) {
+          reorderCoreStatements(options, bundles);
         }
-      })()
+      }
     ],
     onwarn: (message) => {
       if (message.code === 'CIRCULAR_DEPENDENCY') return;

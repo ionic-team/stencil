@@ -23,7 +23,7 @@ describe('shadow-dom-mode', function() {
         const redBg = window.getComputedStyle(redElm).backgroundColor;
         expect(redBg).toBe('rgb(255, 0, 0)');
         resolve();
-      }, 1000);
+      }, 2000);
 
     });
   });

@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 
 
-export function normalizeDiagnostics(compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]) {
+export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]) => {
   const normalizedErrors: d.Diagnostic[] = [];
   const normalizedOthers: d.Diagnostic[] = [];
   const dups = new Set<string>();
@@ -27,10 +27,10 @@ export function normalizeDiagnostics(compilerCtx: d.CompilerCtx, diagnostics: d.
     ...normalizedErrors,
     ...normalizedOthers
   ];
-}
+};
 
 
-function normalizeDiagnostic(compilerCtx: d.CompilerCtx, diagnostic: d.Diagnostic) {
+const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnostic) => {
   if (diagnostic.messageText) {
     if (typeof (<any>diagnostic.messageText).message === 'string') {
       diagnostic.messageText = (<any>diagnostic.messageText).message;
@@ -97,17 +97,17 @@ function normalizeDiagnostic(compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
   }
 
   return diagnostic;
-}
+};
 
 
-export function splitLineBreaks(sourceText: string) {
+export const splitLineBreaks = (sourceText: string) => {
   if (typeof sourceText !== 'string') return [];
   sourceText = sourceText.replace(/\\r/g, '\n');
   return sourceText.split('\n');
-}
+};
 
 
-export function escapeHtml(unsafe: any) {
+export const escapeHtml = (unsafe: any) => {
   if (unsafe === undefined) return 'undefined';
   if (unsafe === null) return 'null';
 
@@ -121,7 +121,7 @@ export function escapeHtml(unsafe: any) {
          .replace(/>/g, '&gt;')
          .replace(/"/g, '&quot;')
          .replace(/'/g, '&#039;');
-}
+};
 
 
-export const MAX_ERRORS = 15;
+export const MAX_ERRORS = 25;

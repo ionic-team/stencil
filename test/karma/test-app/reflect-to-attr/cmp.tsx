@@ -5,18 +5,18 @@ import { Component, Prop, Element } from '@stencil/core';
 })
 export class ReflectToAttr {
 
-  @Element() el: any;
+  @Element() el!: any;
 
   @Prop({reflectToAttr: true}) str = 'single';
   @Prop({reflectToAttr: true}) nu = 2;
-  @Prop({reflectToAttr: true}) undef: string;
-  @Prop({reflectToAttr: true}) null: string = null;
+  @Prop({reflectToAttr: true}) undef?: string;
+  @Prop({reflectToAttr: true}) null: string | null = null;
   @Prop({reflectToAttr: true}) bool = false;
   @Prop({reflectToAttr: true}) otherBool = true;
   @Prop({reflectToAttr: true}) disabled = false;
 
-  @Prop({reflectToAttr: true, mutable: true}) dynamicStr: string;
-  @Prop({reflectToAttr: true}) dynamicNu: number;
+  @Prop({reflectToAttr: true, mutable: true}) dynamicStr?: string;
+  @Prop({reflectToAttr: true}) dynamicNu?: number;
 
   componentDidLoad() {
     this.dynamicStr = 'value';

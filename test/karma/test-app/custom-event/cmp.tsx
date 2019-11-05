@@ -5,7 +5,7 @@ import { Component, Element, State, h } from '@stencil/core';
 })
 export class CustomEventCmp {
 
-  @Element() elm: HTMLElement;
+  @Element() elm!: HTMLElement;
 
   @State() output = '';
 
@@ -14,7 +14,7 @@ export class CustomEventCmp {
     this.elm.addEventListener('eventWithDetail', this.receiveEvent.bind(this));
   }
 
-  receiveEvent(ev: CustomEvent) {
+  receiveEvent(ev: any) {
     this.output = `${ev.type} ${ev.detail || ''}`.trim();
   }
 

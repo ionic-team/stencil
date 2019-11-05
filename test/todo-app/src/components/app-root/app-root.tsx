@@ -6,10 +6,7 @@ import { Component, State, h } from '@stencil/core';
 })
 export class AppRoot {
 
-  @State() list: TodoItem[] = [
-    { text: 'my initial todo' },
-    { text: 'Learn about Web Components', checked: true }
-  ];
+  @State() list: TodoItem[] = [];
 
   render() {
     const list = this.list;
@@ -38,17 +35,15 @@ export class AppRoot {
           <ul class="todo-list">
             {list.map((item, index) => (
               <todo-item
-                onItemCheck={(e: CustomEvent) => {
-                  const item = list[e.detail];
-                  list[e.detail] = Object.assign({}, item, { checked: !item.checked });
+                onItemCheck={() => {
+                  list[index] = Object.assign({}, item, { checked: !item.checked });
                   this.list = list.slice();
                 }}
-                onItemRemove={(e: CustomEvent) => {
-                  this.list = [...list.slice(0, e.detail), ...list.slice(e.detail + 1)];
+                onItemRemove={() => {
+                  this.list = [...list.slice(0, index), ...list.slice(index + 1)];
                 }}
                 checked={item.checked}
                 text={item.text}
-                index={index}
               />
             ))}
           </ul>

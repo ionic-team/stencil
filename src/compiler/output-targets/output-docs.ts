@@ -8,7 +8,7 @@ import { generateVscodeDocs } from '../docs/vscode';
 import { outputCustom } from './output-custom';
 
 export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (config.devMode) {
+  if (!config.buildDocs) {
     return;
   }
   const docsOutputTargets = config.outputTargets.filter(o => (
@@ -26,7 +26,7 @@ export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, b
 
   await Promise.all([
     generateReadmeDocs(config, compilerCtx, docsData, docsOutputTargets),
-    generateJsonDocs(compilerCtx, docsData, docsOutputTargets),
+    generateJsonDocs(config, compilerCtx, docsData, docsOutputTargets),
     generateVscodeDocs(compilerCtx, docsData, docsOutputTargets),
     generateCustomDocs(config, docsData, docsOutputTargets),
     outputCustom(config, compilerCtx, buildCtx, docsData, docsOutputTargets)

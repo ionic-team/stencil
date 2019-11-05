@@ -1,4 +1,4 @@
-import * as d from '.';
+import { RenderNode } from './render';
 
 
 export interface HostElement extends HTMLElement {
@@ -23,13 +23,7 @@ export interface HostElement extends HTMLElement {
    * host element's original content. This comment is used to
    * always represent where host element's light dom is.
    */
-  ['s-cr']?: d.RenderNode;
-
-  /**
-   * Is Active Loading:
-   * Set of child host elements that are actively loading.
-   */
-  ['s-al']?: Set<HostElement>;
+  ['s-cr']?: RenderNode;
 
   /**
    * Lifecycle ready
@@ -50,13 +44,6 @@ export interface HostElement extends HTMLElement {
   ['s-sc']?: string;
 
   /**
-   * Component Initial Load:
-   * The component has fully loaded, instance creatd,
-   * and has rendered. Method is on the host element prototype.
-   */
-  ['s-init']?: () => void;
-
-  /**
    * Hot Module Replacement, dev mode only
    */
   ['s-hmr']?: (versionId: string) => void;
@@ -66,6 +53,8 @@ export interface HostElement extends HTMLElement {
    */
   ['s-hmr-load']?: () => void;
 
+  ['s-p']?: Promise<void>[];
+
   componentOnReady?: () => Promise<this>;
 }
 
@@ -73,6 +62,7 @@ export interface CustomElementsDefineOptions {
   exclude?: string[];
   resourcesUrl?: string;
   syncQueue?: boolean;
+  jmp?: (c: Function) => any;
   raf?: (c: FrameRequestCallback) => number;
   ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;

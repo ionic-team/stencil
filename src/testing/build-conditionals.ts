@@ -2,15 +2,12 @@ import * as d from '../declarations';
 
 
 export const BUILD: d.Build = {};
+export const NAMESPACE = 'app';
 
 
 export function resetBuildConditionals(b: d.Build) {
   Object.keys(b).forEach(key => {
-    if (typeof (b as any)[key] === 'boolean') {
-      (b as any)[key] = true;
-    } else {
-      (b as any)[key] = null;
-    }
+    (b as any)[key] = true;
   });
 
   b.isDev = true;
@@ -20,9 +17,11 @@ export function resetBuildConditionals(b: d.Build) {
   b.scoped = true;
   b.shadowDom = true;
   b.slotRelocation = true;
+  b.asyncLoading = true;
   b.svg = true;
   b.updatable = true;
   b.vdomAttribute = true;
+  b.vdomXlink = true;
   b.vdomClass = true;
   b.vdomStyle = true;
   b.vdomKey = true;
@@ -31,6 +30,7 @@ export function resetBuildConditionals(b: d.Build) {
   b.vdomFunctional = true;
   b.vdomText = true;
   b.allRenderFn = false;
+  b.devTools = false;
   b.hydrateClientSide = false;
   b.hydrateServerSide = false;
 }

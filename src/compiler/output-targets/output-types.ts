@@ -1,19 +1,14 @@
 import * as d from '../../declarations';
-import { isOutputTargetDistCollection } from './output-utils';
-import { generateTypesAndValidate } from '../types/generate-types';
+import { generateTypes } from '../types/generate-types';
+import { isOutputTargetDistTypes } from './output-utils';
 
 
 export async function outputTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistTypes);
   if (outputTargets.length === 0) {
     return;
   }
 
-  return writeTypes(config, compilerCtx, buildCtx, outputTargets as any);
-}
-
-
-async function writeTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDist[]) {
   const pkgData = buildCtx.packageJson;
   if (pkgData == null) {
     return;
@@ -22,9 +17,8 @@ async function writeTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
   const timespan = buildCtx.createTimeSpan(`generate types started`, true);
 
   await Promise.all(outputTargets.map(outputsTarget => {
-    return generateTypesAndValidate(config, compilerCtx, buildCtx, pkgData, outputsTarget);
+    return generateTypes(config, compilerCtx, buildCtx, pkgData, outputsTarget);
   }));
 
   timespan.finish(`generate types finished`);
 }
-

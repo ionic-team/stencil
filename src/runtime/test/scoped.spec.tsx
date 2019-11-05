@@ -16,7 +16,7 @@ describe('scoped', () => {
           <cmp-b>
             <span>Hola</span>
           </cmp-b>
-        )
+        );
       }
     }
 
@@ -36,6 +36,7 @@ describe('scoped', () => {
     }
     const page = await newSpecPage({
       components: [CmpA, CmpB],
+      includeAnnotations: true,
       html: `<cmp-a></cmp-a>`
     });
 

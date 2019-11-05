@@ -3,6 +3,11 @@
 const activeRendering = new Set();
 const onAppReadyCallbacks: Function[] = [];
 
+export declare namespace SomeTypes {
+  type Number = number;
+  type String = string;
+}
+
 function willRender(elm: any) {
   activeRendering.add(elm);
 }
@@ -34,7 +39,7 @@ export function setupDomTests(document: Document) {
   let testBed = document.getElementById('test-app');
   if (!testBed) {
     testBed = document.createElement('div');
-    testBed.id = 'test-bed';
+    testBed.id = 'test-app';
     document.body.appendChild(testBed);
   }
 
@@ -49,7 +54,7 @@ export function setupDomTests(document: Document) {
     app.addEventListener('stencil_componentDidRender', (ev) => didRender(ev.target))
 
     app.className = 'test-spec';
-    testBed.appendChild(app)
+    testBed!.appendChild(app)
 
     if (url) {
       app.setAttribute('data-url', url);
@@ -63,7 +68,7 @@ export function setupDomTests(document: Document) {
    * Run this after each test
    */
   function tearDownDom() {
-    testBed.innerHTML = '';
+    testBed!.innerHTML = '';
   };
 
   /**
@@ -74,7 +79,39 @@ export function setupDomTests(document: Document) {
 
     return new Promise<HTMLElement>((resolve, reject) => {
       try {
-        const indexLoaded = function() {
+        const waitFrame = () => {
+          return new Promise(resolve => {
+            requestAnimationFrame(resolve);
+          });
+        };
+
+        const allReady = () => {
+          const promises: Promise<any>[] = [];
+          const waitForDidLoad = (promises: Promise<any>[], elm: Element) => {
+            if (elm != null && elm.nodeType === 1) {
+              for (let i = 0; i < elm.children.length; i++) {
+                const childElm = elm.children[i];
+                if (childElm.tagName.includes('-') && typeof (childElm as any).componentOnReady === 'function') {
+                  promises.push((childElm as any).componentOnReady());
+                }
+                waitForDidLoad(promises, childElm);
+              }
+            }
+          };
+
+          waitForDidLoad(promises, window.document.documentElement);
+
+          return Promise.all(promises)
+            .catch((e) => console.error(e));
+        };
+
+        const stencilReady = () => {
+          return allReady()
+            .then(() => waitFrame())
+            .then(() => allReady());
+        };
+
+        const indexLoaded = function(this: XMLHttpRequest) {
           if (this.status !== 200) {
             reject(`404: ${url}`);
             return;
@@ -87,16 +124,16 @@ export function setupDomTests(document: Document) {
 
           function appLoad() {
             window.removeEventListener('stencil_appload', appLoad);
-            setTimeout(() => {
+            stencilReady().then(() => {
               resolve(app);
-            }, 200);
+            });
           }
 
           window.addEventListener('stencil_appload', appLoad);
 
-          function scriptErrored(ev: any) {
-            console.error('script error', ev);
-          }
+          // function scriptErrored(ev: any) {
+          //   console.error('script error', ev);
+          // }
 
           const tmpScripts = app.querySelectorAll('script') as NodeListOf<HTMLScriptElement>;
           for (let i = 0; i < tmpScripts.length; i++) {
@@ -108,14 +145,14 @@ export function setupDomTests(document: Document) {
               script.setAttribute('nomodule', '');
             }
             if (tmpScripts[i].hasAttribute('type')) {
-              script.setAttribute('type', tmpScripts[i].getAttribute('type'));
+              script.setAttribute('type', tmpScripts[i].getAttribute('type')!);
             }
             script.innerHTML = tmpScripts[i].innerHTML;
 
-            script.addEventListener('error', scriptErrored);
+            // script.addEventListener('error', scriptErrored);
 
-            tmpScripts[i].parentNode.insertBefore(script, tmpScripts[i]);
-            tmpScripts[i].parentNode.removeChild(tmpScripts[i]);
+            tmpScripts[i].parentNode!.insertBefore(script, tmpScripts[i]);
+            tmpScripts[i].parentNode!.removeChild(tmpScripts[i]);
           }
 
           elm.innerHTML = '';
@@ -143,7 +180,7 @@ export function setupDomTests(document: Document) {
 /**
  * Wait for the component to asynchronously update
  */
-export function waitForChanges(timeout = 150) {
+export function waitForChanges(timeout = 250) {
   const win = window as any;
 
   return new Promise(resolve => {

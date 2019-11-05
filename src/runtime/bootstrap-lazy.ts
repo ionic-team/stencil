@@ -1,38 +1,54 @@
-import { disconnectedCallback } from './disconnected-callback';
 import { proxyComponent } from './proxy-component';
+import * as d from '../declarations';
 import { CMP_FLAGS } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
-import * as d from '../declarations';
+import { disconnectedCallback } from './disconnected-callback';
 import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
-import { HYDRATE_ID, PLATFORM_FLAGS } from './runtime-constants';
-import { postUpdateComponent, scheduleUpdate } from './update-component';
+import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
+import { appDidLoad, forceUpdate } from './update-component';
+import { createTime, installDevTools } from './profile';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
+  if (BUILD.profile) {
+    performance.mark('st:app:start');
+  }
+  installDevTools();
+
+  const endBootstrap = createTime('bootstrapLazy');
   const cmpTags: string[] = [];
   const exclude = options.exclude || [];
   const head = doc.head;
   const customElements = win.customElements;
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
+  const deferredConnectedCallbacks: {connectedCallback: () => void}[] = [];
+  let appLoadFallback: any;
+  let isBootstrapping = true;
+
   Object.assign(plt, options);
-  plt.$resourcesUrl$ = new URL(options.resourcesUrl || '/', doc.baseURI).href;
+  plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
   if (options.syncQueue) {
     plt.$flags$ |= PLATFORM_FLAGS.queueSync;
   }
+  if (BUILD.hydrateClientSide) {
+    // If the app is already hydrated there is not point to disable the
+    // async queue. This will improve the first input delay
+    plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
+  }
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
     const styles = doc.querySelectorAll('style[s-id]');
-    let globalStyles = '';
-    styles.forEach(styleElm => globalStyles += styleElm.innerHTML);
-    styles.forEach(styleElm => {
+    for (let i = 0; i < styles.length; i++) {
+      const styleElm = styles[i];
       registerStyle(
         styleElm.getAttribute(HYDRATE_ID),
-        globalStyles + convertScopedToShadow(styleElm.innerHTML)
+        convertScopedToShadow(styleElm.innerHTML),
+        true,
       );
-    });
+    }
   }
 
   lazyBundles.forEach(lazyBundle =>
@@ -43,6 +59,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         $members$: compactMeta[2],
         $listeners$: compactMeta[3],
       };
+      if (BUILD.member) {
+        cmpMeta.$members$ = compactMeta[2];
+      }
+      if (BUILD.hostListener) {
+        cmpMeta.$listeners$ = compactMeta[3];
+      }
       if (BUILD.reflect) {
         cmpMeta.$attrsToReflect$ = [];
       }
@@ -55,7 +77,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       const tagName = cmpMeta.$tagName$;
       const HostElement = class extends HTMLElement {
 
-        ['s-lr']: boolean;
+        ['s-p']: Promise<void>[];
         ['s-rc']: (() => void)[];
 
         // StencilLazyHost
@@ -63,11 +85,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           // @ts-ignore
           super(self);
           self = this;
-
-          if (BUILD.lifecycle) {
-            this['s-lr'] = false;
-            this['s-rc'] = [];
-          }
 
           registerHost(self);
           if (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
@@ -83,18 +100,20 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         connectedCallback() {
-          connectedCallback(this, cmpMeta);
+          if (appLoadFallback) {
+            clearTimeout(appLoadFallback);
+            appLoadFallback = null;
+          }
+          if (isBootstrapping) {
+            // connectedCallback will be processed once all components have been registered
+            deferredConnectedCallbacks.push(this);
+          } else {
+            plt.jmp(() => connectedCallback(this, cmpMeta));
+          }
         }
 
         disconnectedCallback() {
-          disconnectedCallback(this);
-        }
-
-        's-init'() {
-          const hostRef = getHostRef(this);
-          if (hostRef.$lazyInstance$) {
-            postUpdateComponent(this, hostRef);
-          }
+          plt.jmp(() => disconnectedCallback(this));
         }
 
         's-hmr'(hmrVersionId: string) {
@@ -104,15 +123,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         forceUpdate() {
-          if (BUILD.updatable) {
-            const hostRef = getHostRef(this);
-            scheduleUpdate(
-              this,
-              hostRef,
-              cmpMeta,
-              false
-            );
-          }
+          forceUpdate(this, cmpMeta);
         }
 
         componentOnReady() {
@@ -122,21 +133,26 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       cmpMeta.$lazyBundleIds$ = lazyBundle[0];
 
       if (!exclude.includes(tagName) && !customElements.get(tagName)) {
-        if (BUILD.style) {
-          cmpTags.push(tagName);
-        }
+        cmpTags.push(tagName);
         customElements.define(
           tagName,
-          proxyComponent(HostElement as any, cmpMeta, 1, 0) as any
+          proxyComponent(HostElement as any, cmpMeta, PROXY_FLAGS.isElementConstructor) as any
         );
       }
     }));
 
+  // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
+  visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
+  visibilityStyle.setAttribute('data-styles', '');
+  head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
 
-  if (BUILD.style) {
-    // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
-    visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
-    visibilityStyle.setAttribute('data-styles', '');
-    head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
+  // Process deferred connectedCallbacks now all components have been registered
+  isBootstrapping = false;
+  if (deferredConnectedCallbacks.length > 0) {
+    deferredConnectedCallbacks.forEach(host => host.connectedCallback());
+  } else {
+    plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30, 'timeout'));
   }
+  // Fallback appLoad event
+  endBootstrap();
 };

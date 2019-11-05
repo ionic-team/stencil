@@ -5,6 +5,7 @@ import mkdirp from 'mkdirp';
 
 export class NodeFs implements d.FileSystem {
   supportsMkdirRecursive = false;
+  supportsCOPYFILE_FICLONE = false;
 
   constructor(process: NodeJS.Process) {
     try {
@@ -14,6 +15,7 @@ export class NodeFs implements d.FileSystem {
 
       // mkdir recursive support started in v10.12.0
       this.supportsMkdirRecursive = (major >= 11 || (major === 10 && minor >= 12));
+      this.supportsCOPYFILE_FICLONE = (major >= 12);
     } catch (e) {}
   }
 
@@ -28,9 +30,14 @@ export class NodeFs implements d.FileSystem {
       });
     });
   }
+
   copyFile(src: string, dest: string) {
     return new Promise<void>((resolve, reject) => {
-      return fs.copyFile(src, dest, 0, (err) => {
+      const flags = this.supportsCOPYFILE_FICLONE
+        ? fs.constants.COPYFILE_FICLONE
+        : 0;
+
+      return fs.copyFile(src, dest, flags, (err) => {
         if (err) {
           reject(err);
         } else {
@@ -119,9 +126,9 @@ export class NodeFs implements d.FileSystem {
     return fs.readdirSync(dirPath);
   }
 
-  readFile(filePath: string) {
+  readFile(filePath: string, format = 'utf8') {
     return new Promise<string>((resolve, reject) => {
-      fs.readFile(filePath, 'utf8', (err: any, content: any) => {
+      fs.readFile(filePath, format, (err: any, content: any) => {
         if (err) {
           reject(err);
         } else {
@@ -141,8 +148,8 @@ export class NodeFs implements d.FileSystem {
     return fs.existsSync(filePath);
   }
 
-  readFileSync(filePath: string) {
-    return fs.readFileSync(filePath, 'utf8');
+  readFileSync(filePath: string, format = 'utf8') {
+    return fs.readFileSync(filePath, format);
   }
 
   rmdir(dirPath: string) {

@@ -99,7 +99,7 @@ describe('serializeNodeToHtml', () => {
 
     expect(elm).toEqualHtml(`
       <cmp-a>
-        <shadow-root>
+        <mock:shadow-root>
           <article>
             shadow top
           </article>
@@ -107,12 +107,20 @@ describe('serializeNodeToHtml', () => {
           <section>
             shadow bottom
           </section>
-        </shadow-root>
+        </mock:shadow-root>
         <div>
           light dom
         </div>
       </cmp-a>
     `);
+  });
+
+  it ('style', () => {
+    const input = `<style>     \n    text   \n\n</style>`;
+    doc.body.innerHTML = input;
+
+    const output = serializeNodeToHtml(doc.body);
+    expect(output).toBe(`<style>text</style>`);
   });
 
   it('template', () => {

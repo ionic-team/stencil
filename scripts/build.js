@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const { execSync, fork } = require('child_process');
+const { fork } = require('child_process');
 const Listr = require('listr');
 const color = require('ansi-colors');
 const { getBuildId, run } = require('./script-utils');
@@ -19,7 +19,7 @@ run(async () => {
   const scripts = [
     ['CLI', 'build-cli.js'],
     ['Compiler', 'build-compiler.js'],
-    ['Dev Sever', 'build-dev-server.js'],
+    ['Dev Server', 'build-dev-server.js'],
     ['Dev Server Client', 'build-dev-server-client.js'],
     ['Hydrate', 'build-hydrate.js'],
     ['Mock Doc', 'build-mock-doc.js'],
@@ -83,5 +83,6 @@ run(async () => {
     errors.forEach(err => {
       console.error(err);
     });
+    process.exit(1);
   }
 });

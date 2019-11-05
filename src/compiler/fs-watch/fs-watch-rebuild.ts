@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { configFileReload } from '../config/config-reload';
 import { hasServiceWorkerChanges } from '../service-worker/generate-sw';
-import { isCopyTaskFile } from '../copy/local-copy-tasks';
 import { normalizePath, unique } from '@utils';
 
 
@@ -26,18 +25,6 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
   // files changed include updated, added and deleted
   buildCtx.filesChanged = filesChanged(buildCtx);
 
-  // see if any of the changed files/directories are copy tasks
-  buildCtx.hasCopyChanges = hasCopyChanges(config, buildCtx);
-
-  // see if we should rebuild or not
-  if (!shouldRebuild(buildCtx)) {
-    // nothing actually changed!!!
-    if (compilerCtx.events) {
-      compilerCtx.events.emit('buildNoChange', { noChange: true });
-    }
-    return null;
-  }
-
   // collect all the scripts that were added/deleted
   buildCtx.scriptsAdded = scriptsAdded(config, buildCtx);
   buildCtx.scriptsDeleted = scriptsDeleted(config, buildCtx);
@@ -47,7 +34,7 @@ export function generateBuildFromFsWatch(config: d.Config, compilerCtx: d.Compil
   buildCtx.hasStyleChanges = hasStyleChanges(buildCtx);
 
   // figure out if any changed files were index.html files
-  buildCtx.hasIndexHtmlChanges = hasIndexHtmlChanges(config, buildCtx);
+  buildCtx.hasHtmlChanges = hasHtmlChanges(config, buildCtx);
 
   buildCtx.hasServiceWorkerChanges = hasServiceWorkerChanges(config, buildCtx);
 
@@ -96,22 +83,6 @@ export function filesChanged(buildCtx: d.BuildCtx) {
     ...buildCtx.filesAdded,
     ...buildCtx.filesDeleted
   ]).sort();
-}
-
-
-function hasCopyChanges(config: d.Config, buildCtx: d.BuildCtx) {
-  return buildCtx.filesUpdated.some(f => isCopyTaskFile(config, f)) ||
-         buildCtx.filesAdded.some(f => isCopyTaskFile(config, f)) ||
-         buildCtx.dirsAdded.some(f => isCopyTaskFile(config, f));
-}
-
-export function shouldRebuild(buildCtx: d.BuildCtx) {
-  return buildCtx.hasCopyChanges ||
-    buildCtx.dirsAdded.length > 0 ||
-    buildCtx.dirsDeleted.length > 0 ||
-    buildCtx.filesAdded.length > 0 ||
-    buildCtx.filesDeleted.length > 0 ||
-    buildCtx.filesUpdated.length > 0;
 }
 
 
@@ -164,10 +135,11 @@ export function isStyleExt(ext: string) {
 const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
 
 
-function hasIndexHtmlChanges(config: d.Config, buildCtx: d.BuildCtx) {
-  const anyIndexHtmlChanged = buildCtx.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === 'index.html');
-  if (anyIndexHtmlChanged) {
-    // any index.html in any directory that changes counts too
+function hasHtmlChanges(config: d.Config, buildCtx: d.BuildCtx) {
+  const anyHtmlChanged = buildCtx.filesChanged.some(f => f.toLowerCase().endsWith('.html'));
+
+  if (anyHtmlChanged) {
+    // any *.html in any directory that changes counts and rebuilds
     return true;
   }
 

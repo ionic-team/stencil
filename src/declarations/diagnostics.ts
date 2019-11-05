@@ -15,7 +15,6 @@ export interface Diagnostic {
   lines?: PrintLine[];
 }
 
-
 export interface PrintLine {
   lineIndex: number;
   lineNumber: number;

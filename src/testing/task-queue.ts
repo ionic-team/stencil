@@ -24,12 +24,9 @@ export function resetTaskQueue() {
 }
 
 
-export const tick = {
-  then(cb: Function) {
-    queuedTicks.push(cb);
-  }
+export const nextTick = (cb: Function) => {
+  queuedTicks.push(cb);
 };
-
 
 export function flushTicks() {
   return new Promise((resolve, reject) => {
@@ -143,6 +140,7 @@ export async function flushAll() {
     }
     throw err;
   }
+  return new Promise(resolve => process.nextTick(resolve));
 }
 
 

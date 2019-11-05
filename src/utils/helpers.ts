@@ -9,13 +9,17 @@ export const toDashCase = (str: string) => toLowerCase(str.replace(/([A-Z0-9])/g
 
 export const dashToPascalCase = (str: string) => toLowerCase(str).split('-').map(segment => segment.charAt(0).toUpperCase() + segment.slice(1)).join('');
 
-export const toTitleCase = (str: string) => str.charAt(0).toUpperCase() + str.substr(1);
-
-export const captializeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+export const toTitleCase = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const noop = (): any => { /* noop*/ };
 
-export function sortBy<T>(array: T[], prop: ((item: T) => string | number)) {
+export const isComplexType = (o: any) => {
+  // https://jsperf.com/typeof-fn-object/5
+  o = typeof o;
+  return o === 'object' || o === 'function';
+};
+
+export const sortBy = <T>(array: T[], prop: ((item: T) => string | number)) => {
   return array.slice().sort((a, b) => {
     const nameA = prop(a);
     const nameB = prop(b);
@@ -23,9 +27,9 @@ export function sortBy<T>(array: T[], prop: ((item: T) => string | number)) {
     if (nameA > nameB) return 1;
     return 0;
   });
-}
+};
 
-export function flatOne<T>(array: T[][]): T[] {
+export const flatOne = <T>(array: T[][]): T[] => {
   if (array.flat) {
     return array.flat(1);
   }
@@ -33,9 +37,9 @@ export function flatOne<T>(array: T[][]): T[] {
     result.push(...item);
     return result;
   }, [] as T[]);
-}
+};
 
-export function unique<T>(array: T[], predicate: (item: T) => any = (i) => i): T[] {
+export const unique = <T>(array: T[], predicate: (item: T) => any = (i) => i): T[] => {
   const set = new Set();
   return array.filter(item => {
     const key = predicate(item);
@@ -48,18 +52,18 @@ export function unique<T>(array: T[], predicate: (item: T) => any = (i) => i): T
     set.add(key);
     return true;
   });
-}
+};
 
-export function fromEntries<V>(entries: IterableIterator<[string, V]>) {
+export const fromEntries = <V>(entries: IterableIterator<[string, V]>) => {
   const object: { [key: string]: V} = {};
   for (const [key, value] of entries) {
     object[key] = value;
   }
   return object;
-}
+};
 
 
-export function relativeImport(config: d.Config, pathFrom: string, pathTo: string, ext?: string, addPrefix = true) {
+export const relativeImport = (config: d.Config, pathFrom: string, pathTo: string, ext?: string, addPrefix = true) => {
   let relativePath = config.sys.path.relative(config.sys.path.dirname(pathFrom), config.sys.path.dirname(pathTo));
   if (addPrefix) {
     if (relativePath === '') {
@@ -69,7 +73,7 @@ export function relativeImport(config: d.Config, pathFrom: string, pathTo: strin
     }
   }
   return normalizePath(`${relativePath}/${config.sys.path.basename(pathTo, ext)}`);
-}
+};
 
 export const pluck = (obj: {[key: string]: any }, keys: string[]) => {
   return keys.reduce((final, key) => {

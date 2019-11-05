@@ -1,25 +1,15 @@
 import * as d from '../../declarations';
 import { isOutputTargetDistCollection } from './output-utils';
 import { COLLECTION_MANIFEST_FILE_NAME, flatOne, normalizePath, sortBy } from '@utils';
-import { getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
-import { performCopyTasks } from '../copy/copy-tasks';
-import { processCopyTasks } from '../copy/local-copy-tasks';
 
 
 export async function outputCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!config.buildDist) {
-    return;
-  }
-
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
   if (outputTargets.length === 0) {
     return;
   }
 
   const timespan = buildCtx.createTimeSpan(`generate collections started`, true);
-
-  copyAssets(config, compilerCtx, buildCtx, outputTargets);
-
   const moduleFiles = buildCtx.moduleFiles.filter(m => !m.isCollectionDependency && m.jsFilePath);
   await Promise.all([
     writeJsFiles(config, compilerCtx, moduleFiles, outputTargets),
@@ -28,15 +18,6 @@ export async function outputCollections(config: d.Config, compilerCtx: d.Compile
 
   timespan.finish(`generate collections finished`);
 }
-
-async function copyAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
-  const copyTasks = flatOne(await Promise.all(outputTargets.map(async o => ([
-    ...getComponentAssetsCopyTasks(config, buildCtx, o.collectionDir, true),
-    ...await processCopyTasks(config, o.collectionDir, o.copy)
-  ]))));
-  return performCopyTasks(config, compilerCtx, buildCtx, copyTasks);
-}
-
 
 function writeJsFiles(config: d.Config, compilerCtx: d.CompilerCtx, moduleFiles: d.Module[], outputTargets: d.OutputTargetDistCollection[]) {
   return Promise.all(

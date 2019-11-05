@@ -1,18 +1,17 @@
 import * as d from '../../declarations';
 import { setBooleanConfig, setStringConfig } from './config-utils';
 import { validatePrerender } from './validate-prerender';
-import { validateResourcesUrl } from './validate-resources-url';
 import { validateServiceWorker } from './validate-service-worker';
 import { validateCopy } from './validate-copy';
-import { DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww } from '../output-targets/output-utils';
+import { COPY, DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 import { URL } from 'url';
+import { buildError } from '@utils';
 
-
-export function validateOutputTargetWww(config: d.Config) {
+export function validateOutputTargetWww(config: d.Config, diagnostics: d.Diagnostic[]) {
   const hasOutputTargets = Array.isArray(config.outputTargets);
   const hasE2eTests = !!(config.flags && config.flags.e2e);
 
-  if (!hasOutputTargets || (hasE2eTests && !config.outputTargets.some(isOutputTargetWww))) {
+  if (!hasOutputTargets || (hasE2eTests && !config.outputTargets.some(isOutputTargetWww)) && !config.outputTargets.some(isOutputTargetDist)) {
     config.outputTargets = [
       { type: WWW }
     ];
@@ -21,15 +20,16 @@ export function validateOutputTargetWww(config: d.Config) {
   const wwwOutputTargets = config.outputTargets.filter(isOutputTargetWww);
 
   if (config.flags.prerender && wwwOutputTargets.length === 0) {
-    throw new Error(`You need at least one "www" output target configured in your stencil.config.ts, when the "--prerender" flag is used`);
+    const err = buildError(diagnostics);
+    err.messageText = `You need at least one "www" output target configured in your stencil.config.ts, when the "--prerender" flag is used`;
   }
   wwwOutputTargets.forEach(outputTarget => {
-    validateOutputTarget(config, outputTarget);
+    validateOutputTarget(config, diagnostics, outputTarget);
   });
 }
 
 
-function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww) {
+function validateOutputTarget(config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetWww) {
   const path = config.sys.path;
 
   setStringConfig(outputTarget, 'baseUrl', '/');
@@ -60,14 +60,7 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   }
 
   setBooleanConfig(outputTarget, 'empty', null, DEFAULT_EMPTY_DIR);
-  validatePrerender(config, outputTarget);
-
-  outputTarget.copy = validateCopy(outputTarget.copy, [
-    ...(config.copy || []),
-    ...DEFAULT_WWW_COPY,
-  ]);
-
-  outputTarget.resourcesUrl = validateResourcesUrl(outputTarget.resourcesUrl);
+  validatePrerender(config, diagnostics, outputTarget);
   validateServiceWorker(config, outputTarget);
 
   if (outputTarget.polyfills === undefined) {
@@ -79,12 +72,28 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   const buildDir = outputTarget.buildDir;
   config.outputTargets.push({
     type: DIST_LAZY,
-    copyDir: buildDir,
     esmDir: buildDir,
-    systemDir: buildDir,
+    systemDir: config.buildEs5 ? buildDir : undefined,
+    systemLoaderFile: config.buildEs5 ? config.sys.path.join(buildDir, `${config.fsNamespace}.js`) : undefined,
     polyfills: outputTarget.polyfills,
-    systemLoaderFile: config.sys.path.join(buildDir, `${config.fsNamespace}.js`),
     isBrowserBuild: true,
+  });
+
+  // Copy for dist
+  config.outputTargets.push({
+    type: COPY,
+    dir: buildDir,
+    copyAssets: 'dist'
+  });
+
+  // Copy for www
+  config.outputTargets.push({
+    type: COPY,
+    dir: outputTarget.appDir,
+    copy: validateCopy(outputTarget.copy, [
+      ...(config.copy || []),
+      ...DEFAULT_WWW_COPY,
+    ]),
   });
 
   // Generate global style with original name

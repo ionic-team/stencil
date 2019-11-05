@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { isOutputTargetDist } from '../output-targets/output-utils';
+import { normalizePath } from '@utils';
 
 
 export function updateStencilTypesImports(path: d.Path, typesDir: string, dtsFilePath: string, dtsContent: string) {
@@ -11,14 +12,11 @@ export function updateStencilTypesImports(path: d.Path, typesDir: string, dtsFil
     coreDtsPath = `./${coreDtsPath}`;
   }
 
-  if (dtsContent.includes('@stencil/core/internal')) {
-    dtsContent = dtsContent.replace(/\@stencil\/core\/internal/g, coreDtsPath);
-  }
-
+  coreDtsPath = normalizePath(coreDtsPath);
   if (dtsContent.includes('@stencil/core')) {
-    dtsContent = dtsContent.replace(/\@stencil\/core/g, coreDtsPath);
+    dtsContent = dtsContent.replace(/(from\s*(:?'|"))@stencil\/core\/internal('|")/g, `$1${coreDtsPath}$2`);
+    dtsContent = dtsContent.replace(/(from\s*(:?'|"))@stencil\/core('|")/g, `$1${coreDtsPath}$2`);
   }
-
   return dtsContent;
 }
 

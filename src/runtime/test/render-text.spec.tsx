@@ -45,6 +45,9 @@ describe('render-text', () => {
     expect(page.body).toEqualHtml(`
       <cmp-a>Hello World</cmp-a>
     `);
+    expect(page.root).toEqualHtml(`<cmp-a>Hello World</cmp-a>`);
+    expect(page.rootInstance).not.toBeUndefined();
+    expect(page.rootInstance).not.toBeNull();
   });
 
   it('Hello World, re-render, waitForChanges', async () => {

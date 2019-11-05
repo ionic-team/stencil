@@ -1,4 +1,7 @@
-import * as d from '.';
+import { Config } from './config';
+import { Diagnostic } from './diagnostics';
+import { OutputTargetWww } from './output-targets';
+import { SerializeDocumentOptions } from './hydrate';
 
 
 export interface ProgressLogger {
@@ -7,14 +10,14 @@ export interface ProgressLogger {
 }
 
 export interface PrerenderManager {
-  config: d.Config;
+  config: Config;
   devServerHostUrl: string;
-  diagnostics: d.Diagnostic[];
+  diagnostics: Diagnostic[];
   hydrateAppFilePath: string;
   isDebug: boolean;
   logCount: number;
-  outputTarget: d.OutputTargetWww;
-  prerenderConfig: d.PrerenderConfig;
+  outputTarget: OutputTargetWww;
+  prerenderConfig: PrerenderConfig;
   prerenderConfigPath: string;
   progressLogger?: ProgressLogger;
   resolve: Function;
@@ -41,7 +44,7 @@ export interface PrerenderRequest {
 
 export interface PrerenderResults {
   anchorUrls: string[];
-  diagnostics: d.Diagnostic[];
+  diagnostics: Diagnostic[];
   filePath: string;
 }
 
@@ -54,7 +57,7 @@ export interface PrerenderConfig {
   filterAnchor?(attrs: {[attrName: string]: string}, base?: URL): boolean;
   filterUrl?(url?: URL, base?: URL): boolean;
   filePath?(url?: URL, filePath?: string): string;
-  hydrateOptions?(url?: URL): d.HydrateDocumentOptions;
+  hydrateOptions?(url?: URL): SerializeDocumentOptions;
   normalizeUrl?(href?: string, base?: URL): URL;
   robotsTxt?(opts: RobotsTxtOpts): string | RobotsTxtResults;
   sitemapXml?(opts: SitemapXmpOpts): string | SitemapXmpResults;

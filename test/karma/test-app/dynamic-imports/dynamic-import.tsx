@@ -5,7 +5,7 @@ import { Component, Method, State, h } from '@stencil/core';
 })
 export class DynamicImport {
 
-  @State() value: string;
+  @State() value?: string;
 
   async componentWillLoad() {
     await this.update();

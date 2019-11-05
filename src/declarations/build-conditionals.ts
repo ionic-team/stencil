@@ -22,6 +22,7 @@ export interface BuildFeatures {
   vdomRender: boolean;
   noVdomRender: boolean;
   vdomAttribute: boolean;
+  vdomXlink: boolean;
   vdomClass: boolean;
   vdomStyle: boolean;
   vdomKey: boolean;
@@ -51,10 +52,14 @@ export interface BuildFeatures {
   watchCallback: boolean;
   member: boolean;
   updatable: boolean;
+  propBoolean: boolean;
+  propNumber: boolean;
+  propString: boolean;
 
   // lifecycle events
   lifecycle: boolean;
   cmpDidLoad: boolean;
+  cmpShouldUpdate: boolean;
   cmpWillLoad: boolean;
   cmpDidUpdate: boolean;
   cmpWillUpdate: boolean;
@@ -63,6 +68,7 @@ export interface BuildFeatures {
   cmpDidUnload: boolean;
   connectedCallback: boolean;
   disconnectedCallback: boolean;
+  asyncLoading: boolean;
 
   // attr
   observeAttribute: boolean;
@@ -75,16 +81,19 @@ export interface Build extends Partial<BuildFeatures> {
   hotModuleReplacement?: boolean;
   isDebug?: boolean;
   isDev?: boolean;
+  devTools?: boolean;
   hydrateServerSide?: boolean;
   hydrateClientSide?: boolean;
   lifecycleDOMEvents?: boolean;
+  cssAnnotations?: boolean;
   lazyLoad?: boolean;
   profile?: boolean;
   cssVarShim?: boolean;
   constructableCSS?: boolean;
+  initializeNextTick?: boolean;
 }
 
 export interface UserBuildConditionals {
-  isDev: boolean;
-  isBrowser: boolean;
+  readonly isDev: boolean;
+  readonly isBrowser: boolean;
 }

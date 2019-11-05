@@ -28,7 +28,7 @@ export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
 
   // finalize phase
   buildCtx.diagnostics = normalizeDiagnostics(compilerCtx, buildCtx.diagnostics);
-  config.logger.printDiagnostics(buildCtx.diagnostics, config.rootDir);
+  config.logger.printDiagnostics(buildCtx.diagnostics);
 
   // create a nice pretty message stating what happend
   let buildStatus = 'finished';

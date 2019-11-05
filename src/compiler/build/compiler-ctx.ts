@@ -40,6 +40,7 @@ export class CompilerContext implements d.CompilerCtx {
   rootTsFiles: string[] = [];
   tsService: d.TsService = null;
   cachedGlobalStyle: string;
+  styleModeNames = new Set<string>();
 
   constructor(config: d.Config) {
     const cacheFs = (config.enableCache && config.sys.fs != null) ? new InMemoryFileSystem(config.sys.fs, config.sys.path) : null;
@@ -72,7 +73,7 @@ export class CompilerContext implements d.CompilerCtx {
 }
 
 
-export function getModule(config: d.Config, compilerCtx: d.CompilerCtx, sourceFilePath: string) {
+export const getModule = (config: d.Config, compilerCtx: d.CompilerCtx, sourceFilePath: string) => {
   sourceFilePath = normalizePath(sourceFilePath);
 
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
@@ -80,28 +81,48 @@ export function getModule(config: d.Config, compilerCtx: d.CompilerCtx, sourceFi
     return moduleFile;
 
   } else {
-    const p = config.sys.path.parse(sourceFilePath);
+    const sourceFileDir = config.sys.path.dirname(sourceFilePath);
+    const sourceFileExt = config.sys.path.extname(sourceFilePath);
+    const sourceFileName = config.sys.path.basename(sourceFilePath, sourceFileExt);
+    const jsFilePath = config.sys.path.join(sourceFileDir, sourceFileName + '.js');
+
     const moduleFile: d.Module = {
       sourceFilePath: sourceFilePath,
-      jsFilePath: config.sys.path.join(p.dir, p.name + '.js'),
+      jsFilePath: jsFilePath,
       cmps: [],
+      coreRuntimeApis: [],
       collectionName: null,
       dtsFilePath: null,
       excludeFromCollection: false,
       externalImports: [],
+      hasVdomAttribute: false,
+      hasVdomXlink: false,
+      hasVdomClass: false,
+      hasVdomFunctional: false,
+      hasVdomKey: false,
+      hasVdomListener: false,
+      hasVdomRef: false,
+      hasVdomRender: false,
+      hasVdomStyle: false,
+      hasVdomText: false,
+      htmlAttrNames: [],
+      htmlTagNames: [],
       isCollectionDependency: false,
-      localImports: [],
       isLegacy: false,
-      originalCollectionComponentPath: null
+      localImports: [],
+      originalCollectionComponentPath: null,
+      originalImports: [],
+      potentialCmpRefs: []
     };
     compilerCtx.moduleMap.set(sourceFilePath, moduleFile);
     return moduleFile;
   }
-}
+};
 
 
-export function resetModule(moduleFile: d.Module) {
+export const resetModule = (moduleFile: d.Module) => {
   moduleFile.cmps.length = 0;
+  moduleFile.coreRuntimeApis.length = 0;
   moduleFile.collectionName = null;
   moduleFile.dtsFilePath = null;
   moduleFile.excludeFromCollection = false;
@@ -109,4 +130,19 @@ export function resetModule(moduleFile: d.Module) {
   moduleFile.isCollectionDependency = false;
   moduleFile.localImports.length = 0;
   moduleFile.originalCollectionComponentPath = null;
-}
+  moduleFile.originalImports.length = 0;
+
+  moduleFile.hasVdomXlink = false;
+  moduleFile.hasVdomAttribute = false;
+  moduleFile.hasVdomClass = false;
+  moduleFile.hasVdomFunctional = false;
+  moduleFile.hasVdomKey = false;
+  moduleFile.hasVdomListener = false;
+  moduleFile.hasVdomRef = false;
+  moduleFile.hasVdomRender = false;
+  moduleFile.hasVdomStyle = false;
+  moduleFile.hasVdomText = false;
+  moduleFile.htmlAttrNames.length = 0;
+  moduleFile.htmlTagNames.length = 0;
+  moduleFile.potentialCmpRefs.length = 0;
+};

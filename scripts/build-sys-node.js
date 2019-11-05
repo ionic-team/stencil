@@ -45,10 +45,6 @@ function bundleExternal(entryFileName) {
           return callback(null, '../../mock-doc');
         }
 
-        if (request === '@sys') {
-          return callback(null, '../../sys/node');
-        }
-
         if (request === '@utils') {
           return callback(null, '../../utils');
         }
@@ -129,13 +125,10 @@ async function bundleNodeSysMain() {
               return { id: './graceful-fs.js', external: true };
             }
             if (importee === '@mock-doc') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'mock-doc');
-            }
-            if (importee === '@sys') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
+              return relativeResolve('../../mock-doc');
             }
             if (importee === '@utils') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
+              return relativeResolve('../../utils');
             }
           }
         }

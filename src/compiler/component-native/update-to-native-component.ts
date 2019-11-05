@@ -4,13 +4,13 @@ import { dashToPascalCase, normalizePath } from '@utils';
 import { transformToNativeComponentText } from '../transformers/component-native/tranform-to-native-component';
 
 
-export async function updateToNativeComponent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta): Promise<d.ComponentCompilerData> {
+export const updateToNativeComponent = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta): Promise<d.ComponentCompilerData> => {
   const inputFilePath = cmp.jsFilePath;
   const inputFileDir = config.sys.path.dirname(inputFilePath);
   const inputFileName = config.sys.path.basename(inputFilePath);
   const inputJsText = await compilerCtx.fs.readFile(inputFilePath);
 
-  const cacheKey = compilerCtx.cache.createKey('native', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, inputJsText);
+  const cacheKey = await compilerCtx.cache.createKey('native', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, inputJsText);
   const outputFileName = `${cacheKey}-${inputFileName}`;
   const outputFilePath = config.sys.path.join(inputFileDir, outputFileName);
 
@@ -28,11 +28,11 @@ export async function updateToNativeComponent(config: d.Config, compilerCtx: d.C
     exportLine: createComponentExport(cmp, outputFilePath),
     cmp
   };
-}
+};
 
-function createComponentExport(cmp: d.ComponentCompilerMeta, lazyModuleFilePath: string) {
+const createComponentExport = (cmp: d.ComponentCompilerMeta, lazyModuleFilePath: string) => {
   const originalClassName = cmp.componentClassName;
   const pascalCasedClassName = dashToPascalCase(cmp.tagName);
   const filePath = normalizePath(lazyModuleFilePath);
   return `export { ${originalClassName} as ${pascalCasedClassName} } from '${filePath}';`;
-}
+};

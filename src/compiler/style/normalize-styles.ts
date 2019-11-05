@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { DEFAULT_STYLE_MODE, normalizePath } from '@utils';
 
 
-export function normalizeStyles(config: d.Config, tagName: string, componentFilePath: string, styles: d.StyleCompiler[]) {
+export const normalizeStyles = (config: d.Config, tagName: string, componentFilePath: string, styles: d.StyleCompiler[]) => {
   styles.forEach(style => {
 
     if (style.modeName === DEFAULT_STYLE_MODE) {
@@ -17,10 +17,10 @@ export function normalizeStyles(config: d.Config, tagName: string, componentFile
       });
     }
   });
-}
+};
 
 
-function normalizeExternalStyle(config: d.Config, componentFilePath: string, externalStyle: d.ExternalStyleCompiler) {
+const normalizeExternalStyle = (config: d.Config, componentFilePath: string, externalStyle: d.ExternalStyleCompiler) => {
   if (typeof externalStyle.originalComponentPath !== 'string' || externalStyle.originalComponentPath.trim().length === 0) {
     return;
   }
@@ -44,4 +44,4 @@ function normalizeExternalStyle(config: d.Config, componentFilePath: string, ext
     // create the absolute path to the style file
     externalStyle.absolutePath = normalizePath(config.sys.path.join(componentDir, externalStyle.originalComponentPath));
   }
-}
+};

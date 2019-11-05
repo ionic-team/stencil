@@ -65,9 +65,9 @@ describe('parse comments', () => {
             'text': '',
           },
         ],
-        'return': '{}',
+        'return': 'unknown',
         'references': {},
-        'signature': '(prop: string) => {}',
+        'signature': '(prop: string) => unknown',
       },
       'docs': {
         'tags': [],

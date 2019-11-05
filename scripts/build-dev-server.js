@@ -39,13 +39,13 @@ async function bundleDevServer() {
         return {
           resolveId(importee, importer) {
             if (importee === 'graceful-fs') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node/graceful-fs.js');
+              return relativeResolve('../sys/node/graceful-fs.js');
             }
             if (importee === '@sys') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
+              return relativeResolve('../sys/node');
             }
             if (importee === '@utils') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
+              return relativeResolve('../utils');
             }
           }
         }

@@ -1,11 +1,11 @@
 import * as d from '../../declarations';
-import { buildError, catchError, hasFileExtension, normalizePath } from '@utils';
-import { DEFAULT_STYLE_MODE } from '@utils';
+import { DEFAULT_STYLE_MODE, buildError, catchError, hasFileExtension, normalizePath } from '@utils';
 import { getComponentStylesCache, setComponentStylesCache } from './cached-styles';
+import { isOutputTargetHydrate } from '../output-targets/output-utils';
 import { optimizeCss } from './optimize-css';
+import { PLUGIN_HELPERS, escapeCssForJs, getStyleId, requiresScopedStyles } from './style-utils';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
-import { isOutputTargetHydrate } from '../output-targets/output-utils';
 
 
 export function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
@@ -248,49 +248,3 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   return compiledStyle;
 }
-
-
-function getStyleId(cmp: d.ComponentCompilerMeta, modeName: string, isScopedStyles: boolean) {
-  return `${cmp.tagName}${modeName}${isScopedStyles ? '.sc' : ''}`;
-}
-
-
-export function escapeCssForJs(style: string) {
-  if (typeof style === 'string') {
-    return style
-      .replace(/\\[\D0-7]/g, (v) => '\\' + v)
-      .replace(/\r\n|\r|\n/g, `\\n`)
-      .replace(/\"/g, `\\"`)
-      .replace(/\'/g, `\\'`)
-      .replace(/\@/g, `\\@`);
-  }
-  return style;
-}
-
-
-function requiresScopedStyles(encapsulation: d.Encapsulation, commentOriginalSelector: boolean) {
-  return (encapsulation === 'scoped' || (encapsulation === 'shadow' && commentOriginalSelector));
-}
-
-
-export const PLUGIN_HELPERS = [
-  {
-    pluginName: 'PostCSS',
-    pluginId: 'postcss',
-    pluginExts: ['pcss']
-  },
-  {
-    pluginName: 'Sass',
-    pluginId: 'sass',
-    pluginExts: ['scss', 'sass']
-  },
-  {
-    pluginName: 'Stylus',
-    pluginId: 'stylus',
-    pluginExts: ['styl', 'stylus']
-  }, {
-    pluginName: 'Less',
-    pluginId: 'less',
-    pluginExts: ['less']
-  }
-];

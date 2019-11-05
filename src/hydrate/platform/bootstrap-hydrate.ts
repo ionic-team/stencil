@@ -1,59 +1,57 @@
 import * as d from '../../declarations';
-import { getComponent, getHostRef } from '@platform';
-import { hydrateComponent } from './hydrate-component';
-import { insertVdomAnnotations, postUpdateComponent } from '@runtime';
+import { doc, getComponent, getHostRef, plt, registerHost } from '@platform';
+import { connectedCallback, insertVdomAnnotations } from '@runtime';
+import { proxyHostElement } from './proxy-host-element';
 
 
 export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, done: (results: BootstrapHydrateResults) => void) {
   const results: BootstrapHydrateResults = {
     hydratedCount: 0,
-    hydratedTags: []
+    hydratedComponents: []
   };
+  plt.$resourcesUrl$ = new URL(opts.resourcesUrl || './', doc.baseURI).href;
+
 
   try {
     const connectedElements = new Set<any>();
-    const waitPromises: Promise<any>[] = [];
+    const createdElements = new Set<HTMLElement>();
 
     const patchedConnectedCallback = function patchedConnectedCallback(this: d.HostElement) {
-      connectElements(win, opts, results, this, connectedElements, waitPromises);
+      return connectElement(this);
     };
 
-    const patchedComponentInit = function patchedComponentInit(this: d.HostElement) {
-      const hostRef = getHostRef(this);
-      if (hostRef != null) {
-        postUpdateComponent(this, hostRef);
-      }
-    };
-
-    const patchComponent = function(elm: d.HostElement) {
+    const patchElement = function(elm: d.HostElement) {
       const tagName = elm.nodeName.toLowerCase();
       if (elm.tagName.includes('-')) {
         const Cstr = getComponent(tagName);
 
-        if (Cstr != null) {
-          if (typeof elm.connectedCallback !== 'function') {
-            elm.connectedCallback = patchedConnectedCallback;
-          }
+        if (Cstr != null && Cstr.cmpMeta) {
+          createdElements.add(elm);
+          elm.connectedCallback = patchedConnectedCallback;
 
-          if (typeof elm['s-init'] !== 'function') {
-            elm['s-rc'] = [];
-            elm['s-init'] = patchedComponentInit;
-          }
+          registerHost(elm);
+          proxyHostElement(elm, Cstr.cmpMeta);
         }
       }
     };
 
-    let orgDocumentCreateElement = win.document.createElement;
+    const orgDocumentCreateElement = win.document.createElement;
     win.document.createElement = function patchedCreateElement(tagName: string) {
       const elm = orgDocumentCreateElement.call(win.document, tagName);
-      patchComponent(elm);
+      patchElement(elm);
+      return elm;
+    };
+
+    const orgDocumentCreateElementNS = win.document.createElementNS;
+    win.document.createElementNS = function patchedCreateElement(namespaceURI: string, tagName: string) {
+      const elm = orgDocumentCreateElementNS.call(win.document, namespaceURI, tagName);
+      patchElement(elm);
       return elm;
     };
 
     const patchChild = (elm: any) => {
       if (elm != null && elm.nodeType === 1) {
-        patchComponent(elm);
-
+        patchElement(elm);
         const children = elm.children;
         for (let i = 0, ii = children.length; i < ii; i++) {
           patchChild(children[i]);
@@ -61,32 +59,49 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
       }
     };
 
-    patchChild(win.document.body);
+    const connectElement = (elm: HTMLElement) => {
+      createdElements.delete(elm);
+      if (elm != null && elm.nodeType === 1 && results.hydratedCount < opts.maxHydrateCount && shouldHydrate(elm)) {
+        const tagName = elm.nodeName.toLowerCase();
 
-    const initConnectElement = (elm: d.HostElement) => {
-      if (elm != null && elm.nodeType === 1) {
-        if (typeof elm.connectedCallback === 'function') {
-          elm.connectedCallback();
-        }
-        const children = elm.children;
-        for (let i = 0, ii = children.length; i < ii; i++) {
-          initConnectElement(children[i] as any);
+        if (tagName.includes('-') && !connectedElements.has(elm)) {
+          connectedElements.add(elm);
+          return hydrateComponent(win, results, tagName, elm);
         }
       }
+      return Promise.resolve();
     };
 
-    initConnectElement(win.document.body);
+    const flush = () => {
+      const toConnect = Array.from(createdElements).filter(elm => elm.parentElement);
+      if (toConnect.length > 0) {
+        return Promise.all(toConnect.map(elm => connectElement(elm)));
+      }
+      return undefined;
+    };
 
-    Promise.all(waitPromises)
+    // Patch all existing nodes
+    patchChild(win.document.body);
+
+    // Wait
+    const waitLoop = (): Promise<void> => {
+      const waitForComponents = flush();
+      if (waitForComponents === undefined) {
+        return Promise.resolve();
+      }
+      return waitForComponents.then(() => waitLoop());
+    };
+
+    waitLoop()
       .then(() => {
         try {
-          waitPromises.length = 0;
+          createdElements.clear();
           connectedElements.clear();
           if (opts.clientHydrateAnnotations) {
             insertVdomAnnotations(win.document);
           }
           win.document.createElement = orgDocumentCreateElement;
-          win = opts = orgDocumentCreateElement = null;
+          win.document.createElementNS = orgDocumentCreateElementNS;
         } catch (e) {
           win.console.error(e);
         }
@@ -96,10 +111,9 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
       .catch(e => {
         try {
           win.console.error(e);
-          waitPromises.length = 0;
           connectedElements.clear();
           win.document.createElement = orgDocumentCreateElement;
-          win = opts = orgDocumentCreateElement = null;
+          win.document.createElementNS = orgDocumentCreateElementNS;
         } catch (e) {}
 
         done(results);
@@ -112,20 +126,29 @@ export function bootstrapHydrate(win: Window, opts: d.HydrateDocumentOptions, do
   }
 }
 
+export async function hydrateComponent(win: Window, results: BootstrapHydrateResults, tagName: string, elm: d.HostElement) {
+  const Cstr = getComponent(tagName);
 
-function connectElements(win: Window, opts: d.HydrateDocumentOptions, results: BootstrapHydrateResults, elm: HTMLElement, connectedElements: Set<any>, waitPromises: Promise<any>[]) {
-  if (elm != null && elm.nodeType === 1 && results.hydratedCount < opts.maxHydrateCount && shouldHydrate(elm)) {
-    const tagName = elm.nodeName.toLowerCase();
+  if (Cstr != null) {
+    const cmpMeta = Cstr.cmpMeta;
 
-    if (tagName.includes('-') && !connectedElements.has(elm)) {
-      connectedElements.add(elm);
-      hydrateComponent(win, results, tagName, elm, waitPromises);
-    }
+    if (cmpMeta != null) {
+      try {
+        connectedCallback(elm, cmpMeta);
+        await elm.componentOnReady();
 
-    const children = elm.children;
-    if (children != null) {
-      for (let i = 0, ii = children.length; i < ii; i++) {
-        connectElements(win, opts, results, children[i] as any, connectedElements, waitPromises);
+        results.hydratedCount++;
+
+        const ref = getHostRef(elm);
+        const modeName = !ref.$modeName$ ? '$' : ref.$modeName$;
+        if (!results.hydratedComponents.some(c => c.tag === tagName && c.mode === modeName)) {
+          results.hydratedComponents.push({
+            tag: tagName,
+            mode: modeName
+          });
+        }
+      } catch (e) {
+        win.console.error(e);
       }
     }
   }
@@ -133,6 +156,9 @@ function connectElements(win: Window, opts: d.HydrateDocumentOptions, results: B
 
 
 function shouldHydrate(elm: Element): boolean {
+  if (elm.nodeType === 9) {
+    return true;
+  }
   if (NO_HYDRATE_TAGS.has(elm.nodeName)) {
     return false;
   }
@@ -166,5 +192,8 @@ const NO_HYDRATE_TAGS = new Set([
 
 export interface BootstrapHydrateResults {
   hydratedCount: number;
-  hydratedTags: string[];
+  hydratedComponents: {
+    tag: string,
+    mode: string
+  }[];
 }

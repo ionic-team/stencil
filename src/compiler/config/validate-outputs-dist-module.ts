@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
+import { COPY, isOutputTargetDistModule } from '../output-targets/output-utils';
 import { normalizePath } from '@utils';
-import { isOutputTargetDistModule } from '../output-targets/output-utils';
+import { validateCopy } from './validate-copy';
 
 
 export function validateOutputTargetDistModule(config: d.Config) {
@@ -20,6 +21,19 @@ export function validateOutputTargetDistModule(config: d.Config) {
 
     if (typeof outputTarget.empty !== 'boolean') {
       outputTarget.empty = true;
+    }
+
+
+    outputTarget.copy = validateCopy(outputTarget.copy);
+
+    if (outputTarget.copy.length > 0) {
+      config.outputTargets.push({
+        type: COPY,
+        dir: outputTarget.dir,
+        copy: [
+          ...outputTarget.copy
+        ]
+      });
     }
   });
 }

@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { catchError, normalizePath } from '@utils';
 
 
-export async function initFsWatcher(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export const initFsWatcher = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   // only create the watcher if this is a watch build
   // and we haven't created a watch listener already
   if (!config.watch || compilerCtx.fsWatcher != null) {
@@ -29,12 +29,11 @@ export async function initFsWatcher(config: d.Config, compilerCtx: d.CompilerCtx
     }
 
   } catch (e) {
-    console.log(e)
     const diagnostics: d.Diagnostic[] = [];
     catchError(diagnostics, e);
-    config.logger.printDiagnostics(diagnostics, config.rootDir);
+    config.logger.printDiagnostics(diagnostics);
     return false;
   }
 
   return true;
-}
+};

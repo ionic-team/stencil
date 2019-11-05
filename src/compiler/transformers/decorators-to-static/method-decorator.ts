@@ -1,11 +1,12 @@
 import * as d from '../../../declarations';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isDecoratorNamed, isMemberPrivate, serializeSymbol, typeToString } from '../transform-utils';
 import { augmentDiagnosticWithNode, buildError, buildWarn } from '@utils';
+import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isMemberPrivate, serializeSymbol, typeToString, validateReferences } from '../transform-utils';
+import { isDecoratorNamed } from './decorator-utils';
 import { validatePublicName } from '../reserved-public-members';
 import ts from 'typescript';
 
 
-export function methodDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
+export const methodDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
   const methods = decoratedProps
     .filter(ts.isMethodDeclaration)
     .map(method => parseMethodDecorator(config, diagnostics, sourceFile, typeChecker, method))
@@ -14,10 +15,10 @@ export function methodDecoratorsToStatic(config: d.Config, diagnostics: d.Diagno
   if (methods.length > 0) {
     newMembers.push(createStaticGetter('methods', ts.createObjectLiteral(methods, true)));
   }
-}
+};
 
 
-function parseMethodDecorator(config: d.Config, diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, method: ts.MethodDeclaration) {
+const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, method: ts.MethodDeclaration) => {
   const methodDecorator = method.decorators.find(isDecoratorNamed('Method'));
   if (methodDecorator == null) {
     return null;
@@ -78,6 +79,7 @@ function parseMethodDecorator(config: d.Config, diagnostics: d.Diagnostic[], sou
       tags: signature.getJsDocTags()
     }
   };
+  validateReferences(config, diagnostics, methodMeta.complexType.references, method.type || method.name);
 
   const staticProp = ts.createPropertyAssignment(
     ts.createLiteral(methodName),
@@ -85,8 +87,8 @@ function parseMethodDecorator(config: d.Config, diagnostics: d.Diagnostic[], sou
   );
 
   return staticProp;
-}
+};
 
-function isTypePromise(typeStr: string) {
+const isTypePromise = (typeStr: string) => {
   return /^Promise<.+>$/.test(typeStr);
-}
+};

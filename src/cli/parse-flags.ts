@@ -196,6 +196,7 @@ const ARG_OPTS = {
     'esm',
     'verbose',
     'headless',
+    'devtools',
     'help',
     'log',
     'open',

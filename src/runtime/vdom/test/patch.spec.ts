@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { h } from '../h';
+import { h, newVNode } from '../h';
 import { patch } from '../vdom-render';
 import { shuffleArray } from '@stencil/core/testing';
 import { SVG_NS } from '@utils';
@@ -13,7 +13,7 @@ describe('renderer', () => {
 
   beforeEach(() => {
     hostElm = document.createElement('div');
-    vnode0 = {$flags$: 0};
+    vnode0 = newVNode(null, null);
     vnode0.$elm$ = hostElm;
   });
 
@@ -26,7 +26,7 @@ describe('renderer', () => {
 
       hostElm = document.createElement('my-tag');
 
-      const vnode0 = {} as d.VNode;
+      const vnode0 = newVNode(null, null);
       vnode0.$elm$ = hostElm;
 
       const vnode1 = h('my-tag', null,
@@ -56,7 +56,7 @@ describe('renderer', () => {
 
       hostElm = document.createElement('my-tag');
 
-      const vnode0 = {} as d.VNode;
+      const vnode0 = newVNode(null, null);
       vnode0.$elm$ = hostElm;
 
       const vnode1 = h('my-tag', null,
@@ -80,7 +80,7 @@ describe('renderer', () => {
       }
 
       hostElm = document.createElement('my-tag');
-      vnode0 = { $flags$: 0 };
+      vnode0 = newVNode(null, null);
       vnode0.$elm$ = hostElm;
       patch(vnode0,
         h('my-tag', null,
@@ -98,7 +98,7 @@ describe('renderer', () => {
       }
 
       hostElm = document.createElement('my-tag');
-      vnode0 = { $flags$: 0 };
+      vnode0 = newVNode(null, null);
       vnode0.$elm$ = hostElm;
       patch(vnode0,
         h('my-tag', null,
@@ -119,7 +119,7 @@ describe('renderer', () => {
       }
 
       hostElm = document.createElement('my-tag');
-      vnode0 = { $flags$: 0 };
+      vnode0 = newVNode(null, null);
       vnode0.$elm$ = hostElm;
       patch(vnode0,
         h('my-tag', null,
@@ -146,12 +146,6 @@ describe('renderer', () => {
       const vnode1 = h('div', null, h('i', { class: { i: true, am: true, a: true, 'class': true } }));
       patch(vnode0, vnode1);
       expect(hostElm.firstChild).toHaveClasses(['i', 'am', 'a', 'class']);
-    });
-
-    it('should not remove duplicate css classes', () => {
-      const vnode1 = h('div', { class: 'middle aligned center aligned' }, 'Hello');
-      patch(vnode0, vnode1);
-      expect(hostElm.className).toEqual('middle aligned center aligned');
     });
 
     it('can create elements with text content', () => {

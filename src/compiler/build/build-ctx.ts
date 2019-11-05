@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { buildFinish } from './build-finish';
 import { hasError, hasWarning } from '@utils';
 
 
@@ -13,10 +12,12 @@ export class BuildContext implements d.BuildCtx {
   buildResults: d.BuildResults = null;
   bundleBuildCount = 0;
   collections: d.Collection[] = [];
+  completedTasks: d.BuildTask[] = [];
+  compilerCtx: d.CompilerCtx;
   components: d.ComponentCompilerMeta[] = [];
   componentGraph = new Map<string, string[]>();
+  config: d.Config;
   data: any = {};
-  indexDoc: Document = undefined;
   diagnostics: d.Diagnostic[] = [];
   dirsAdded: string[] = [];
   dirsDeleted: string[] = [];
@@ -26,20 +27,22 @@ export class BuildContext implements d.BuildCtx {
   filesDeleted: string[] = [];
   filesUpdated: string[] = [];
   filesWritten: string[] = [];
-  skipAssetsCopy = false;
   globalStyle: string = undefined;
   hasConfigChanges = false;
-  hasCopyChanges = false;
   hasFinished = false;
-  hasIndexHtmlChanges = false;
+  hasHtmlChanges = false;
   hasPrintedResults = false;
   hasServiceWorkerChanges = false;
   hasScriptChanges = true;
   hasStyleChanges = true;
   hydrateAppFilePath: string = null;
   indexBuildCount = 0;
+  indexDoc: Document = undefined;
   isRebuild = false;
   moduleFiles: d.Module[] = [];
+  packageJson: d.PackageJsonData = {};
+  packageJsonFilePath: string = null;
+  pendingCopyTasks: Promise<d.CopyResults>[] = [];
   requiresFullBuild = true;
   scriptsAdded: string[] = [];
   scriptsDeleted: string[] = [];
@@ -50,11 +53,11 @@ export class BuildContext implements d.BuildCtx {
   timeSpan: d.LoggerTimeSpan = null;
   timestamp: string;
   transpileBuildCount = 0;
-  pendingCopyTasks: Promise<d.CopyResults>[] = [];
   validateTypesPromise: Promise<d.ValidateTypesResults>;
-  packageJson: d.PackageJsonData = {};
 
-  constructor(private config: d.Config, private compilerCtx: d.CompilerCtx) {
+  constructor(config: d.Config, compilerCtx: d.CompilerCtx) {
+    this.config = config;
+    this.compilerCtx = compilerCtx;
     this.buildId = ++this.compilerCtx.activeBuildId;
   }
 
@@ -62,6 +65,13 @@ export class BuildContext implements d.BuildCtx {
     // get the build id from the incremented activeBuildId
     // print out a good message
     const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${this.config.fsNamespace}, ${this.config.devMode ? 'dev' : 'prod'} mode, started`;
+
+    const buildLog: d.BuildLog = {
+      buildId: this.buildId,
+      messages: [],
+      progress: 0
+    };
+    this.compilerCtx.events.emit('buildLog', buildLog);
 
     // create a timespan for this build
     this.timeSpan = this.createTimeSpan(msg);
@@ -83,9 +93,12 @@ export class BuildContext implements d.BuildCtx {
       const timeSpan = this.config.logger.createTimeSpan(msg, debug, this.buildMessages);
 
       if (!debug && this.compilerCtx.events) {
-        this.compilerCtx.events.emit('buildLog', {
-          messages: this.buildMessages.slice()
-        } as d.BuildLog);
+        const buildLog: d.BuildLog = {
+          buildId: this.buildId,
+          messages: this.buildMessages,
+          progress: getProgress(this.completedTasks)
+        };
+        this.compilerCtx.events.emit('buildLog', buildLog);
       }
 
       return {
@@ -103,9 +116,12 @@ export class BuildContext implements d.BuildCtx {
             timeSpan.finish(finishedMsg, color, bold, newLineSuffix);
 
             if (!debug) {
-              this.compilerCtx.events.emit('buildLog', {
-                messages: this.buildMessages.slice()
-              } as d.BuildLog);
+              const buildLog: d.BuildLog = {
+                buildId: this.buildId,
+                messages: this.buildMessages.slice(),
+                progress: getProgress(this.completedTasks)
+              };
+              this.compilerCtx.events.emit('buildLog', buildLog);
             }
           }
           return timeSpan.duration();
@@ -135,12 +151,8 @@ export class BuildContext implements d.BuildCtx {
     return hasWarning(this.diagnostics);
   }
 
-  async abort() {
-    return buildFinish(this.config, this.compilerCtx, this as any, true);
-  }
-
-  async finish() {
-    return buildFinish(this.config, this.compilerCtx, this as any, false);
+  progress(t: d.BuildTask) {
+    this.completedTasks.push(t);
   }
 
   async validateTypesBuild() {
@@ -169,7 +181,7 @@ export class BuildContext implements d.BuildCtx {
 }
 
 
-export function getBuildTimestamp() {
+export const getBuildTimestamp = () => {
   const d = new Date();
 
   // YYYY-MM-DDThh:mm:ss
@@ -181,4 +193,26 @@ export function getBuildTimestamp() {
   timestamp += ('0' + d.getUTCSeconds()).slice(-2);
 
   return timestamp;
-}
+};
+
+const getProgress = (completedTasks: d.BuildTask[]) => {
+  let progressIndex = 0;
+  const taskKeys = Object.keys(ProgressTask);
+
+  taskKeys.forEach((taskKey, index) => {
+    if (completedTasks.includes((ProgressTask as any)[taskKey])) {
+      progressIndex = index;
+    }
+  });
+
+  return (progressIndex + 1) / taskKeys.length;
+};
+
+export const ProgressTask = {
+  emptyOutputTargets: {},
+  transpileApp: {},
+  generateStyles: {},
+  generateOutputTargets: {},
+  validateTypesBuild: {},
+  writeBuildFiles: {},
+};

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { isDocsPublic } from '@utils';
+import { getTextDocs, isDocsPublic } from '@utils';
 
 
 export function generateMethodTypes(cmpMethods: d.ComponentCompilerMethod[]): d.TypeInfo {
@@ -9,6 +9,6 @@ export function generateMethodTypes(cmpMethods: d.ComponentCompilerMethod[]): d.
     optional: false,
     required: false,
     public: isDocsPublic(cmpMethod.docs),
-    jsdoc: (cmpMethod.docs != null && typeof cmpMethod.docs.text === 'string') ? cmpMethod.docs.text : undefined
+    jsdoc: getTextDocs(cmpMethod.docs),
   }));
 }

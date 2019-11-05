@@ -6,12 +6,19 @@ import { isOutputTargetWww } from '../output-targets/output-utils';
 import { getScopeId } from '../style/scope-css';
 
 
-export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!config.devServer || !config.devServer.hotReplacement || !buildCtx.isRebuild) {
+export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+  if (!config.devServer || !buildCtx.isRebuild) {
     return null;
   }
 
-  const hmr: d.HotModuleReplacement = {};
+  if (config.devServer.reloadStrategy == null) {
+    return null;
+  }
+
+  const hmr: d.HotModuleReplacement = {
+    reloadStrategy: config.devServer.reloadStrategy,
+    versionId: Date.now().toString().substring(6) + '' + Math.round((Math.random() * 89999) + 10000)
+  };
 
   if (buildCtx.scriptsAdded.length > 0) {
     hmr.scriptsAdded = buildCtx.scriptsAdded.slice();
@@ -26,7 +33,7 @@ export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     hmr.excludeHmr = excludeHmr.slice();
   }
 
-  if (buildCtx.hasIndexHtmlChanges) {
+  if (buildCtx.hasHtmlChanges) {
     hmr.indexHtmlUpdated = true;
   }
 
@@ -63,13 +70,11 @@ export function generateHmr(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     return null;
   }
 
-  hmr.versionId = Date.now().toString().substring(6);
-
   return hmr;
-}
+};
 
 
-function getComponentsUpdated(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+const getComponentsUpdated = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   // find all of the components that would be affected from the file changes
   if (!buildCtx.filesChanged) {
     return null;
@@ -111,10 +116,10 @@ function getComponentsUpdated(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
   }
 
   return tags.sort();
-}
+};
 
 
-function addTsFileImporters(allModuleFiles: d.Module[], filesToLookForImporters: string[], checkedFiles: Set<string>, changedScriptFiles: string[], scriptFile: string) {
+const addTsFileImporters = (allModuleFiles: d.Module[], filesToLookForImporters: string[], checkedFiles: Set<string>, changedScriptFiles: string[], scriptFile: string) => {
   if (!changedScriptFiles.includes(scriptFile)) {
     // add it to our list of files to transpile
     changedScriptFiles.push(scriptFile);
@@ -162,10 +167,10 @@ function addTsFileImporters(allModuleFiles: d.Module[], filesToLookForImporters:
     // if we add to this array, then the while look will keep working until it's empty
     filesToLookForImporters.push(tsFileThatImportsThisTsFile);
   });
-}
+};
 
 
-function getExternalStylesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
+const getExternalStylesUpdated = (config: d.Config, buildCtx: d.BuildCtx) => {
   if (!buildCtx.isRebuild) {
     return null;
   }
@@ -183,10 +188,10 @@ function getExternalStylesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
   return cssFiles.map(cssFile => {
     return config.sys.path.basename(cssFile);
   }).sort();
-}
+};
 
 
-function getImagesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
+const getImagesUpdated = (config: d.Config, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
     return null;
@@ -207,10 +212,10 @@ function getImagesUpdated(config: d.Config, buildCtx: d.BuildCtx) {
   }
 
   return imageFiles.sort();
-}
+};
 
 
-function excludeHmrFiles(config: d.Config, excludeHmr: string[], filesChanged: string[]) {
+const excludeHmrFiles = (config: d.Config, excludeHmr: string[], filesChanged: string[]) => {
   const excludeFiles: string[] = [];
 
   if (!excludeHmr || excludeHmr.length === 0) {
@@ -239,7 +244,7 @@ function excludeHmrFiles(config: d.Config, excludeHmr: string[], filesChanged: s
   });
 
   return excludeFiles.sort();
-}
+};
 
 
 const IMAGE_EXT = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.svg'];

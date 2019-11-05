@@ -42,11 +42,11 @@ async function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, bui
 
   const imports = `/* tslint:disable */
 /* auto-generated angular directive proxies */
-import { Component, ElementRef, ChangeDetectorRef, EventEmitter } from '@angular/core';`;
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, NgZone } from '@angular/core';`;
 
   const sourceImports = !outputTarget.componentCorePackage ?
     `import { Components } from '${componentsTypeFile}';` :
-    `import { Components } from '${outputTarget.componentCorePackage}'`;
+    `import { Components } from '${outputTarget.componentCorePackage}';`;
 
   const final: string[] = [
     imports,
@@ -80,7 +80,7 @@ function getProxy(cmpMeta: d.ComponentCompilerMeta) {
   // Generate Angular @Directive
   const directiveOpts = [
     `selector: \'${cmpMeta.tagName}\'`,
-    `changeDetection: 0`,
+    `changeDetection: ChangeDetectionStrategy.OnPush`,
     `template: '<ng-content></ng-content>'`
   ];
   if (inputs.length > 0) {
@@ -99,7 +99,7 @@ export class ${tagNameAsPascal} {`];
   });
 
   lines.push('  protected el: HTMLElement;');
-  lines.push(`  constructor(c: ChangeDetectorRef, r: ElementRef) {
+  lines.push(`  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;`);
   if (hasOutputs) {
@@ -171,29 +171,31 @@ async function generateAngularUtils(compilerCtx: d.CompilerCtx, outputTarget: d.
 
 const PROXY_UTILS = `import { fromEvent } from 'rxjs';
 
-export function proxyInputs(Cmp: any, inputs: string[]) {
+export const proxyInputs = (Cmp: any, inputs: string[]) => {
   const Prototype = Cmp.prototype;
   inputs.forEach(item => {
     Object.defineProperty(Prototype, item, {
       get() { return this.el[item]; },
-      set(val: any) { this.el[item] = val; },
+      set(val: any) {
+        this.z.runOutsideAngular(() => this.el[item] = val);
+      },
     });
   });
-}
+};
 
-export function proxyMethods(Cmp: any, methods: string[]) {
+export const proxyMethods = (Cmp: any, methods: string[]) => {
   const Prototype = Cmp.prototype;
   methods.forEach(methodName => {
     Prototype[methodName] = function() {
       const args = arguments;
-      return this.el.componentOnReady().then((el: any) => el[methodName].apply(el, args));
+      return this.z.runOutsideAngular(() => this.el[methodName].apply(this.el, args));
     };
   });
-}
+};
 
-export function proxyOutputs(instance: any, el: any, events: string[]) {
+export const proxyOutputs = (instance: any, el: any, events: string[]) => {
   events.forEach(eventName => instance[eventName] = fromEvent(el, eventName));
-}
+};
 `;
 
 export const GENERATED_DTS = 'components.d.ts';

@@ -1,53 +1,61 @@
 import * as d from '../../../declarations';
 import { gatherVdomMeta } from '../static-to-meta/vdom';
+import { H } from '../core-runtime-apis';
 import ts from 'typescript';
-import { H } from '../exports';
 
 
-export function parseCallExpression(cmpMeta: d.ComponentCompilerMeta, node: ts.CallExpression) {
+export const parseCallExpression = (m: d.Module | d.ComponentCompilerMeta, node: ts.CallExpression) => {
   if (node.arguments != null && node.arguments.length > 0) {
 
-    if (node.expression.kind === ts.SyntaxKind.Identifier) {
+    if (ts.isIdentifier(node.expression)) {
       // h('tag')
-      visitCallExpressionArgs(cmpMeta, node.expression as ts.Identifier, node.arguments);
+      visitCallExpressionArgs(m, node.expression, node.arguments);
 
-    } else if (node.expression.kind === ts.SyntaxKind.PropertyAccessExpression) {
+    } else if (ts.isPropertyAccessExpression(node.expression)) {
       // document.createElement('tag')
-      if ((node.expression as ts.PropertyAccessExpression).name) {
-        visitCallExpressionArgs(cmpMeta, (node.expression as ts.PropertyAccessExpression).name as ts.Identifier, node.arguments);
+      if (node.expression.name) {
+        visitCallExpressionArgs(m, node.expression.name, node.arguments);
       }
     }
   }
-}
+};
 
 
-function visitCallExpressionArgs(cmpMeta: d.ComponentCompilerMeta, callExpressionName: ts.Identifier, args: ts.NodeArray<ts.Expression>) {
+const visitCallExpressionArgs = (m: d.Module | d.ComponentCompilerMeta, callExpressionName: ts.Identifier, args: ts.NodeArray<ts.Expression>) => {
   const fnName = callExpressionName.escapedText as string;
 
   if (fnName === 'h' || fnName === H || fnName === 'createElement') {
-    visitCallExpressionArg(cmpMeta, args[0]);
+    visitCallExpressionArg(m, args[0]);
 
     if (fnName === 'h' || fnName === H) {
-      gatherVdomMeta(cmpMeta, args);
+      gatherVdomMeta(m, args);
     }
 
   } else if (args.length > 1 && fnName === 'createElementNS') {
-    visitCallExpressionArg(cmpMeta, args[1]);
-  }
-}
+    visitCallExpressionArg(m, args[1]);
 
-
-function visitCallExpressionArg(cmpMeta: d.ComponentCompilerMeta, arg: ts.Expression) {
-  if (arg.kind === ts.SyntaxKind.StringLiteral) {
-    let tag = (arg as ts.StringLiteral).text;
-
-    if (typeof tag === 'string') {
-      tag = tag.toLowerCase();
-      cmpMeta.htmlTagNames.push(tag);
-
-      if (tag.includes('-')) {
-        cmpMeta.potentialCmpRefs.push(tag);
+  } else if (fnName === 'require' && args.length > 0 && (m as d.Module).originalImports) {
+    const arg = args[0];
+    if (ts.isStringLiteral(arg)) {
+      if (!(m as d.Module).originalImports.includes(arg.text)) {
+        (m as d.Module).originalImports.push(arg.text);
       }
     }
   }
-}
+};
+
+
+const visitCallExpressionArg = (m: d.Module | d.ComponentCompilerMeta, arg: ts.Expression) => {
+  if (ts.isStringLiteral(arg)) {
+    let tag = arg.text;
+
+    if (typeof tag === 'string') {
+      tag = tag.toLowerCase();
+      m.htmlTagNames.push(tag);
+
+      if (tag.includes('-')) {
+        m.potentialCmpRefs.push(tag);
+      }
+    }
+  }
+};

@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { URL } from 'url';
 
 
 export async function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResultss: d.HydrateResults[]) {
@@ -48,11 +49,11 @@ export function generateHostRule(config: d.Config, outputTarget: d.OutputTargetW
 export function generateHostRuleHeaders(config: d.Config, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) {
   const hostRuleHeaders: d.HostRuleHeader[] = [];
 
-  addStyles(config, hostRuleHeaders, hydrateResults);
+  addStyles(hostRuleHeaders, hydrateResults);
   addCoreJs(config, outputTarget, 'compilerCtx.appCoreWWWPath', hostRuleHeaders);
   addBundles(config, outputTarget, entryModules, hostRuleHeaders, hydrateResults.components);
-  addScripts(config, hostRuleHeaders, hydrateResults);
-  addImgs(config, hostRuleHeaders, hydrateResults);
+  addScripts(hostRuleHeaders, hydrateResults);
+  addImgs(hostRuleHeaders, hydrateResults);
 
   return hostRuleHeaders;
 }
@@ -140,43 +141,43 @@ export function sortComponents(components: d.HydrateComponent[]) {
 }
 
 
-function addStyles(config: d.Config, hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
+function addStyles(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
   hydrateResults.styles.forEach(style => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
-    const url = config.sys.url.parse(style.href);
+    const url = new URL(style.href);
     if (url.hostname === hydrateResults.hostname) {
-      hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
+      hostRuleHeaders.push(formatLinkRelPreloadHeader(url.pathname));
     }
   });
 }
 
 
-function addScripts(config: d.Config, hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
+function addScripts(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
   hydrateResults.scripts.forEach(script => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
-    const url = config.sys.url.parse(script.src);
+    const url = new URL(script.src);
     if (url.hostname === hydrateResults.hostname) {
-      hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
+      hostRuleHeaders.push(formatLinkRelPreloadHeader(url.pathname));
     }
   });
 }
 
 
-function addImgs(config: d.Config, hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
+function addImgs(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
   hydrateResults.imgs.forEach(img => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
-    const url = config.sys.url.parse(img.src);
+    const url = new URL(img.src);
     if (url.hostname === hydrateResults.hostname) {
-      hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
+      hostRuleHeaders.push(formatLinkRelPreloadHeader(url.pathname));
     }
   });
 }

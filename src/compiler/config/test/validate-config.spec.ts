@@ -112,18 +112,18 @@ describe('validation', () => {
 
   describe('hashed filenames', () => {
 
-    it('should throw error when hashedFileNameLength too large', () => {
-      expect(() => {
-        config.hashedFileNameLength = 33;
-        validateConfig(config, [], false);
-      }).toThrow();
+    it('should error when hashedFileNameLength too large', () => {
+      config.hashedFileNameLength = 33;
+      const diagnostics: d.Diagnostic[] = [];
+      validateConfig(config, diagnostics, false);
+      expect(diagnostics).toHaveLength(1);
     });
 
-    it('should throw error when hashedFileNameLength too small', () => {
-      expect(() => {
-        config.hashedFileNameLength = 3;
-        validateConfig(config, [], false);
-      }).toThrow();
+    it('should error when hashedFileNameLength too small', () => {
+      config.hashedFileNameLength = 3;
+      const diagnostics: d.Diagnostic[] = [];
+      validateConfig(config, diagnostics, false);
+      expect(diagnostics).toHaveLength(1);
     });
 
     it('should set from hashedfilenamelength', () => {
@@ -288,10 +288,12 @@ describe('validation', () => {
   });
 
   it('should require at least one output target', () => {
-    expect(() => {
-      config.outputTargets = [];
-      validateConfig(config, [], false);
-    }).toThrow();
+
+    config.outputTargets = [];
+    const diagnostics: d.Diagnostic[] = [];
+    validateConfig(config, diagnostics, false);
+    expect(diagnostics).toHaveLength(1);
+
   });
 
   it('should set devInspector false', () => {
@@ -330,22 +332,21 @@ describe('validation', () => {
   });
 
   it('should require at least one output target', () => {
-    expect(() => {
-      config.outputTargets = [];
-      validateConfig(config, [], false);
-    }).toThrow();
+    config.outputTargets = [];
+    const diagnostics: d.Diagnostic[] = [];
+    validateConfig(config, diagnostics, false);
+    expect(diagnostics).toHaveLength(1);
   });
 
-  it('should throw error for invalie outputTarget type', () => {
-    expect(() => {
-      config.outputTargets = [
-        {
-          type: 'whatever'
-        } as any
-      ];
-      validateConfig(config, [], false);
-      expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
-    }).toThrow();
+  it('should error for invalid outputTarget type', () => {
+    config.outputTargets = [
+      {
+        type: 'whatever'
+      } as any
+    ];
+    const diagnostics: d.Diagnostic[] = [];
+    validateConfig(config, diagnostics, false);
+    expect(diagnostics).toHaveLength(1);
   });
 
   it('should default add www type to outputTarget', () => {

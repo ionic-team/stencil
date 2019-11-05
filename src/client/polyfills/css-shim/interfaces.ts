@@ -20,10 +20,11 @@ export interface Declaration {
 export interface CSSScope {
   original: string;
 
-  cssScopeId?: string;
+  scopeId?: string;
+  isScoped?: boolean;
 
   selectors: CSSSelector[];
   template: CSSTemplate;
-  isDynamic: boolean;
+  usesCssVars: boolean;
   styleEl?: HTMLStyleElement;
 }

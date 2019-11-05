@@ -35,6 +35,7 @@ export const BUILD = {
   svg: true,
   updatable: true,
   vdomAttribute: true,
+  vdomXlink: true,
   vdomClass: true,
   vdomFunctional: true,
   vdomKey: true,

@@ -1,16 +1,14 @@
 import * as d from '../../declarations';
 import { bundleApp, generateRollupOutput } from '../app-core/bundle-app-core';
-import { isOutputTargetDistModule } from './output-utils';
-import { buildWarn, dashToPascalCase } from '@utils';
+import { dashToPascalCase } from '@utils';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 import { getBuildFeatures, updateBuildConditionals } from '../app-core/build-conditionals';
+import { hasGlobalScriptPaths } from '../rollup-plugins/global-scripts';
+import { isOutputTargetDistModule } from './output-utils';
 import { optimizeModule } from '../app-core/optimize-module';
 
-export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (config.devMode) {
-    return;
-  }
 
+export async function outputModule(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistModule);
   if (outputTargets.length === 0) {
     return;
@@ -37,10 +35,6 @@ async function bundleRawComponents(config: d.Config, compilerCtx: d.CompilerCtx,
   const cmps = buildCtx.components;
   const build = getBuildConditionals(config, cmps);
 
-  if (build.mode) {
-    const warn = buildWarn(buildCtx.diagnostics);
-    warn.messageText = 'Multiple modes is not fully supported by "dist-module" output target';
-  }
   const rollupResults = await bundleNativeModule(config, compilerCtx, buildCtx, build, externalRuntime);
 
   if (Array.isArray(rollupResults) && !buildCtx.hasError) {
@@ -49,7 +43,7 @@ async function bundleRawComponents(config: d.Config, compilerCtx: d.CompilerCtx,
         let code = result.code;
 
         if (!externalRuntime && config.minifyJs) {
-          const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', true, true, code);
+          const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', true, code);
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
 
           if (optimizeResults.diagnostics.length === 0 && typeof optimizeResults.output === 'string') {
@@ -74,7 +68,9 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   build.hydrateClientSide = false;
   build.hydrateServerSide = false;
 
+  build.taskQueue = false;
   updateBuildConditionals(config, build);
+  build.devTools = false;
 
   return build;
 }
@@ -85,9 +81,10 @@ export async function bundleNativeModule(config: d.Config, compilerCtx: d.Compil
       'index': '@core-entrypoint'
     },
     loader: {
-      '@core-entrypoint': generateEntryPoint(buildCtx.entryModules)
+      '@core-entrypoint': generateEntryPoint(config, compilerCtx, buildCtx.entryModules)
     },
-    cache: compilerCtx.rollupCacheNative,
+    // TODO: fix dist-module rollup caching
+    // cache: compilerCtx.rollupCacheNative,
     externalRuntime: externalRuntime ? '@stencil/core/runtime' : undefined,
     skipDeps: true
   };
@@ -95,6 +92,7 @@ export async function bundleNativeModule(config: d.Config, compilerCtx: d.Compil
   const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, build, bundleAppOptions);
   if (rollupBuild != null) {
     compilerCtx.rollupCacheNative = rollupBuild.cache;
+
   } else {
     compilerCtx.rollupCacheNative = null;
   }
@@ -102,26 +100,52 @@ export async function bundleNativeModule(config: d.Config, compilerCtx: d.Compil
   return generateRollupOutput(rollupBuild, { format: 'esm' }, config, buildCtx.entryModules);
 }
 
-function generateEntryPoint(entryModules: d.EntryModule[]) {
-  let count = 0;
-  const result: string[] = [
-    `import { proxyNative, globals } from '@stencil/core';`,
-    `globals()`
-  ];
+function generateEntryPoint(config: d.Config, compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[]) {
+  const imports: string[] = [];
+  const exports: string[] = [];
+  const statements: string[] = [];
+
+  const hasGlobal = hasGlobalScriptPaths(config, compilerCtx);
+  if (hasGlobal) {
+    imports.push(
+      `import { proxyNative, globals } from '@stencil/core';`
+    );
+
+    statements.push(
+      `globals();`
+    );
+
+  } else {
+    imports.push(
+      `import { proxyNative } from '@stencil/core';`
+    );
+  }
+
   entryModules.forEach(entry => entry.cmps.forEach(cmp => {
+    const exportName = dashToPascalCase(cmp.tagName);
+
     if (cmp.isPlain) {
-      result.push(
-        `export { ${dashToPascalCase(cmp.tagName)} } from '${entry.entryKey}';`,
+      exports.push(
+        `export { ${exportName} } from '${entry.entryKey}';`,
       );
+
     } else {
       const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
-      const exportName = dashToPascalCase(cmp.tagName);
-      result.push(
-        `import { ${exportName} as $Cmp${count} } from '${entry.entryKey}';`,
-        `export const ${exportName} = /*@__PURE__*/proxyNative($Cmp${count}, ${meta});`
+      const importAs = `$Cmp${exportName}`;
+
+      imports.push(
+        `import { ${exportName} as ${importAs} } from '${entry.entryKey}';`
       );
-      count++;
+
+      exports.push(
+        `export const ${exportName} = /*@__PURE__*/proxyNative(${importAs}, ${meta});`
+      );
     }
   }));
-  return result.join('\n');
+
+  return [
+    ...imports,
+    ...exports,
+    ...statements
+  ].join('\n');
 }

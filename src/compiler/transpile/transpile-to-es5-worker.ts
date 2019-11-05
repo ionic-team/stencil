@@ -30,7 +30,9 @@ export async function transpileToEs5Worker(_cwd: string, input: string, inlineHe
 
   const tsResults = ts.transpileModule(input, transpileOpts);
 
-  loadTypeScriptDiagnostics(results.diagnostics, tsResults.diagnostics);
+  results.diagnostics.push(
+    ...loadTypeScriptDiagnostics(tsResults.diagnostics)
+  );
 
   if (results.diagnostics.length === 0) {
     results.code = tsResults.outputText;

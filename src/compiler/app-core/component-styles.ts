@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
 
 
-export function replaceStylePlaceholders(cmps: d.ComponentCompilerMeta[], modeName: string, code: string) {
+export const replaceStylePlaceholders = (cmps: d.ComponentCompilerMeta[], modeName: string, code: string) => {
   cmps.forEach(cmp => {
     let styleModeName = modeName;
     let style = cmp.styles.find(s => s.modeName === styleModeName);
@@ -20,13 +20,13 @@ export function replaceStylePlaceholders(cmps: d.ComponentCompilerMeta[], modeNa
   });
 
   return code;
-}
+};
 
-export function getStyleTextPlaceholder(cmp: d.ComponentCompilerMeta) {
+export const getStyleTextPlaceholder = (cmp: d.ComponentCompilerMeta) => {
   return `STYLE_TEXT_PLACEHOLDER:${cmp.tagName}`;
-}
+};
 
-export function getAllModes(cmps: d.ComponentCompilerMeta[]) {
+export const getAllModes = (cmps: d.ComponentCompilerMeta[]) => {
   const allModes: string[] = [DEFAULT_STYLE_MODE];
 
   cmps.forEach(cmp => {
@@ -40,4 +40,4 @@ export function getAllModes(cmps: d.ComponentCompilerMeta[]) {
   });
 
   return allModes.sort();
-}
+};

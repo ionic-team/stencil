@@ -142,7 +142,6 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
       shell: true,
       cwd: fromDir,
       env: Object.assign({}, process.env),
-      stdio: 'inherit'
     };
     opts.env.NODE_ENV = 'development';
 
@@ -155,11 +154,19 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
 
     const childProcess = spawn(cmd, args, opts);
 
-    let error = '';
+    let output = '';
+
+    if (childProcess.stdout) {
+      childProcess.stdout.setEncoding('utf8');
+      childProcess.stdout.on('data', data => {
+        output += data;
+      });
+    }
 
     if (childProcess.stderr) {
+      childProcess.stderr.setEncoding('utf8');
       childProcess.stderr.on('data', data => {
-        error += data.toString();
+        output += data;
       });
     }
 
@@ -171,7 +178,7 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
       if (exitCode === 0) {
         resolve();
       } else {
-        reject(`failed to install: ${moduleIds.join(', ')}${error ? ', ' + error : ''}`);
+        reject(`failed to install: ${moduleIds.join(', ')}${output ? ', ' + output : ''}`);
       }
     });
 

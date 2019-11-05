@@ -1,10 +1,11 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, doc, plt, supportsListenerOptions, win } from '@platform';
-import { LISTENER_FLAGS } from '@utils';
+import { doc, plt, supportsListenerOptions, win } from '@platform';
+import { HOST_FLAGS, LISTENER_FLAGS } from '@utils';
 
 
 export const addEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listeners: d.ComponentRuntimeHostListener[]) => {
+  hostRef.$queuedListeners$ = hostRef.$queuedListeners$ || [];
   const removeFns = listeners.map(([flags, name, method]) => {
     const target = (BUILD.hostListenerTarget ? getHostListenerTarget(elm, flags) : elm);
     const handler = hostListenerProxy(hostRef, method);
@@ -17,16 +18,16 @@ export const addEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listen
 
 const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
   return (ev: Event) => {
-    if (BUILD.lazyLoad || BUILD.hydrateServerSide) {
-      if (hostRef.$lazyInstance$) {
+    if (BUILD.lazyLoad) {
+      if (hostRef.$flags$ & HOST_FLAGS.isListenReady) {
         // instance is ready, let's call it's member method for this event
-        return hostRef.$lazyInstance$[methodName](ev);
+        hostRef.$lazyInstance$[methodName](ev);
 
       } else {
-        return hostRef.$onReadyPromise$.then(() => hostRef.$lazyInstance$[methodName](ev)).catch(consoleError);
+        hostRef.$queuedListeners$.push([methodName, ev]);
       }
     } else {
-      return (hostRef.$hostElement$ as any)[methodName](ev);
+      (hostRef.$hostElement$ as any)[methodName](ev);
     }
   };
 };

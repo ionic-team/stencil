@@ -5,7 +5,7 @@ import { Component, Element, State, Method, h } from '@stencil/core';
 })
 export class AttributeBooleanRoot {
 
-  @Element() el: HTMLElement;
+  @Element() el!: HTMLElement;
 
   @State() state = false;
 

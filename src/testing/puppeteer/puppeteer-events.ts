@@ -4,71 +4,60 @@ import * as puppeteer from 'puppeteer';
 
 
 export async function initPageEvents(page: pd.E2EPageInternal) {
-  page._e2eEvents = [];
+  page._e2eEvents = new Map();
   page._e2eEventIds = 0;
+  page.spyOnEvent = pageSpyOnEvent.bind(page, page);
 
-  await page.exposeFunction('stencilOnEvent', (browserEvent: pd.BrowserContextEvent) => {
+  await page.exposeFunction('stencilOnEvent', (id: number, ev: any) => {
     // NODE CONTEXT
-    nodeContextEvents(page._e2eEvents, browserEvent);
+    nodeContextEvents(page._e2eEvents, id, ev);
   });
 
   await page.evaluateOnNewDocument(browserContextEvents);
-
-  page.spyOnEvent = pageSpyOnEvent.bind(page, page);
-
-  page.waitForEvent = pageWaitForEvent.bind(page, page);
 }
 
 
 async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selector: 'window' | 'document') {
   const eventSpy = new EventSpy(eventName);
 
-  if (selector !== 'document') {
-    selector = 'window';
-  }
+  const handler = (selector !== 'document')
+    ? () => window
+    : () => document;
 
-  const handle = await page.evaluateHandle(selector);
+  const handle = await page.evaluateHandle(handler);
 
-  await addE2EListener(page, handle, eventName, (ev: any) => {
-    eventSpy.events.push(ev);
+  await addE2EListener(page, handle, eventName, (ev) => {
+    eventSpy.push(ev);
   });
 
   return eventSpy;
 }
 
-
-async function pageWaitForEvent(page: pd.E2EPageInternal, eventName: string, selector: 'window' | 'document') {
-  if (selector !== 'document') {
-    selector = 'window';
-  }
-
-  const ev = await page.evaluate((selector: string, eventName: string) => {
-
-    return new Promise((resolve, reject) => {
+export async function waitForEvent(page: pd.E2EPageInternal, eventName: string, elementHandle: puppeteer.ElementHandle) {
+  const timeoutMs = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
+  const ev = await page.evaluate((element: Element, eventName: string, timeoutMs: number) => {
+    return new Promise<any>((resolve, reject) => {
       const tmr = setTimeout(() => {
-        reject(`page.waitForEvent() timeout, eventName: ${eventName}, selector: ${selector}`);
-      }, 10000);
+        reject(new Error(`waitForEvent() timeout, eventName: ${eventName}`));
+      }, timeoutMs);
 
-      function listener(ev: any) {
+      element.addEventListener(eventName, ev => {
         clearTimeout(tmr);
-        (window as any)[selector].removeEventListener(eventName, listener);
-        resolve((window as pd.BrowserWindow).stencilSerializeEvent(ev));
-      }
+        resolve((window as unknown as pd.BrowserWindow).stencilSerializeEvent(ev as any));
+      }, {once: true});
 
-      (window as any)[selector].addEventListener(eventName, listener);
     });
-
-  }, selector, eventName);
+  }, elementHandle, eventName, timeoutMs);
 
   await page.waitForChanges();
-
   return ev;
 }
 
 
 export class EventSpy implements d.EventSpy {
   events: d.SerializedEvent[] = [];
-
+  private cursor = 0;
+  private queuedHandler: (() => void)[] = [];
   constructor(public eventName: string) {}
 
   get length() {
@@ -82,18 +71,43 @@ export class EventSpy implements d.EventSpy {
   get lastEvent() {
     return this.events[this.events.length - 1] || null;
   }
+
+  next() {
+    const cursor = this.cursor;
+    this.cursor++;
+    const next = this.events[cursor];
+    if (next) {
+      return Promise.resolve({
+        done: false,
+        value: next
+      });
+    } else {
+      let resolve: () => void;
+      const promise = new Promise(r => resolve = r);
+      this.queuedHandler.push(resolve);
+      return promise.then(() => ({
+        done: false,
+        value: this.events[cursor]
+      }));
+    }
+  }
+
+  push(ev: d.SerializedEvent) {
+    this.events.push(ev);
+    const next = this.queuedHandler.shift();
+    if (next) {
+      next();
+    }
+  }
 }
 
 
-export async function addE2EListener(page: pd.E2EPageInternal, elmHandle: puppeteer.JSHandle, eventName: string, resolve: (ev: any) => void, cancelRejectId?: any) {
+export async function addE2EListener(page: pd.E2EPageInternal, elmHandle: puppeteer.JSHandle, eventName: string, callback: (ev: any) => void) {
   // NODE CONTEXT
   const id = page._e2eEventIds++;
-
-  page._e2eEvents.push({
-    id: id,
-    eventName: eventName,
-    resolve: resolve,
-    cancelRejectId: cancelRejectId
+  page._e2eEvents.set(id, {
+    eventName,
+    callback,
   });
 
   const executionContext = elmHandle.executionContext();
@@ -101,39 +115,33 @@ export async function addE2EListener(page: pd.E2EPageInternal, elmHandle: puppet
   // add element event listener
   await executionContext.evaluate((elm: any, id: number, eventName: string) => {
     elm.addEventListener(eventName, (ev: any) => {
-      (window as pd.BrowserWindow).stencilOnEvent({
-        id: id,
-        event: (window as pd.BrowserWindow).stencilSerializeEvent(ev)
-      });
+      (window as unknown as pd.BrowserWindow).stencilOnEvent(
+        id,
+        (window as unknown as pd.BrowserWindow).stencilSerializeEvent(ev)
+      );
     });
   }, elmHandle, id, eventName);
 }
 
 
-function nodeContextEvents(waitForEvents: pd.WaitForEvent[], browserEvent: pd.BrowserContextEvent) {
+function nodeContextEvents(waitForEvents: Map<number, pd.WaitForEvent>, eventId: number, ev: any) {
   // NODE CONTEXT
-  const waitForEventData = waitForEvents.find(waitData => {
-    return waitData.id === browserEvent.id;
-  });
-
+  const waitForEventData = waitForEvents.get(eventId);
   if (waitForEventData) {
-    if (waitForEventData.cancelRejectId != null) {
-      clearTimeout(waitForEventData.cancelRejectId);
-    }
-
-    waitForEventData.resolve(browserEvent.event);
+    waitForEventData.callback(ev);
   }
 }
 
 
 function browserContextEvents() {
   // BROWSER CONTEXT
-
-  const appLoaded = () => {
-    (window as pd.BrowserWindow).stencilAppLoaded = true;
+  const waitFrame = () => {
+    return new Promise(resolve => {
+      requestAnimationFrame(resolve);
+    });
   };
 
-  const domReady = () => {
+  const allReady = () => {
     const promises: Promise<any>[] = [];
     const waitForDidLoad = (promises: Promise<any>[], elm: Element) => {
       if (elm != null && elm.nodeType === 1) {
@@ -149,12 +157,20 @@ function browserContextEvents() {
 
     waitForDidLoad(promises, window.document.documentElement);
 
-    Promise.all(promises)
-      .then(appLoaded)
-      .catch(appLoaded);
+    return Promise.all(promises)
+      .catch((e) => console.error(e));
   };
 
-  (window as pd.BrowserWindow).stencilSerializeEventTarget = (target: any) => {
+  const stencilReady = () => {
+    return allReady()
+      .then(() => waitFrame())
+      .then(() => allReady())
+      .then(() => {
+        (window as unknown as pd.BrowserWindow).stencilAppLoaded = true;
+      });
+  };
+
+  (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget = (target: any) => {
     // BROWSER CONTEXT
     if (!target) {
       return null;
@@ -180,21 +196,21 @@ function browserContextEvents() {
     return null;
   };
 
-  (window as pd.BrowserWindow).stencilSerializeEvent = (orgEv: any) => {
+  (window as unknown as pd.BrowserWindow).stencilSerializeEvent = (orgEv: any) => {
     // BROWSER CONTEXT
     const serializedEvent: d.SerializedEvent = {
       bubbles: orgEv.bubbles,
       cancelBubble: orgEv.cancelBubble,
       cancelable: orgEv.cancelable,
       composed: orgEv.composed,
-      currentTarget: (window as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.currentTarget),
+      currentTarget: (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.currentTarget),
       defaultPrevented: orgEv.defaultPrevented,
       detail: orgEv.detail,
       eventPhase: orgEv.eventPhase,
       isTrusted: orgEv.isTrusted,
       returnValue: orgEv.returnValue,
-      srcElement: (window as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.srcElement),
-      target: (window as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.target),
+      srcElement: (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.srcElement),
+      target: (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.target),
       timeStamp: orgEv.timeStamp,
       type: orgEv.type,
       isSerializedEvent: true
@@ -203,9 +219,9 @@ function browserContextEvents() {
   };
 
   if (window.document.readyState === 'complete') {
-    domReady();
+    stencilReady();
 
   } else {
-    window.document.addEventListener('DOMContentLoaded', domReady);
+    window.addEventListener('load', stencilReady);
   }
 }

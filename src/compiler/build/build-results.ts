@@ -3,11 +3,12 @@ import { hasError, normalizeDiagnostics } from '@utils';
 import { generateHmr } from './build-hmr';
 
 
-export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const timeSpan = buildCtx.createTimeSpan(`generateBuildResults started`, true);
 
   const buildResults: d.BuildResults = {
     buildId: buildCtx.buildId,
+    buildConditionals: getBuildConditionals(buildCtx),
     bundleBuildCount: buildCtx.bundleBuildCount,
     diagnostics: normalizeDiagnostics(compilerCtx, buildCtx.diagnostics),
     dirsAdded: buildCtx.dirsAdded.slice().sort(),
@@ -53,7 +54,7 @@ export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCt
       }
       const buildCmp: d.BuildComponent = {
         tag: cmp.tagName,
-        dependencyOf: cmp.dependants.slice(),
+        dependencyOf: cmp.dependents.slice(),
         dependencies: cmp.dependencies.slice()
       };
       buildEntry.components.push(buildCmp);
@@ -68,4 +69,22 @@ export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCt
   timeSpan.finish(`generateBuildResults finished`);
 
   return buildResults;
-}
+};
+
+const getBuildConditionals = (buildCtx: d.BuildCtx) => {
+  const b = {
+    shadow: false,
+    slot: false,
+    svg: false,
+    vdom: false
+  };
+
+  buildCtx.components.forEach(cmp => {
+    b.shadow = b.shadow || (cmp.encapsulation === 'shadow');
+    b.slot = b.slot || cmp.htmlTagNames.includes('slot');
+    b.svg = b.svg || cmp.htmlTagNames.includes('svg');
+    b.vdom = b.vdom || cmp.hasVdomRender;
+  });
+
+  return b;
+};

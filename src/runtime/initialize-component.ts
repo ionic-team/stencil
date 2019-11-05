@@ -1,17 +1,20 @@
 import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
-import { consoleError, loadModule } from '@platform';
+import { consoleError, loadModule, styles } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { proxyComponent } from './proxy-component';
 import { scheduleUpdate } from './update-component';
 import { computeMode } from './mode';
 import { getScopeId, registerStyle } from './styles';
 import { fireConnectedCallback } from './connected-callback';
+import { PROXY_FLAGS } from './runtime-constants';
+import { createTime, uniqueTime } from './profile';
 
 
-export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: d.ComponentConstructor) => {
+export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: any) => {
+
   // initializeComponent
-  if ((BUILD.lazyLoad || BUILD.style || BUILD.hydrateServerSide) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
+  if ((BUILD.lazyLoad || BUILD.style) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
     // we haven't initialized this element yet
     hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
 
@@ -26,11 +29,20 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       elm.setAttribute('s-mode', hostRef.$modeName$);
     }
 
-    if (BUILD.lazyLoad || BUILD.hydrateServerSide) {
+    if (BUILD.lazyLoad) {
       // lazy loaded components
       // request the component's implementation to be
       // wired up with the host element
-      Cstr = await loadModule(cmpMeta, hostRef, hmrVersionId);
+      Cstr = loadModule(cmpMeta, hostRef, hmrVersionId);
+      if (Cstr.then) {
+        // Await creates a micro-task avoid if possible
+        const endLoad = uniqueTime(
+          `st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`,
+          `[Stencil] Load module for <${cmpMeta.$tagName$}>`
+        );
+        Cstr = await Cstr;
+        endLoad();
+      }
       if ((BUILD.isDev || BUILD.isDebug) && !Cstr) {
         throw new Error(`Constructor for "${cmpMeta.$tagName$}#${hostRef.$modeName$}" was not found`);
       }
@@ -41,10 +53,11 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         if (BUILD.watchCallback) {
           cmpMeta.$watchers$ = Cstr.watchers;
         }
-        proxyComponent(Cstr, cmpMeta, 0, 1);
+        proxyComponent(Cstr, cmpMeta, PROXY_FLAGS.proxyState);
         Cstr.isProxied = true;
       }
 
+      const endNewInstance = createTime('createInstance', cmpMeta.$tagName$);
       // ok, time to construct the instance
       // but let's keep track of when we start and stop
       // so that the getters/setters don't incorrectly step on data
@@ -64,38 +77,50 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       if (BUILD.member) {
         hostRef.$flags$ &= ~HOST_FLAGS.isConstructingInstance;
       }
+      if (BUILD.watchCallback) {
+        hostRef.$flags$ |= HOST_FLAGS.isWatchReady;
+      }
+      endNewInstance();
       fireConnectedCallback(hostRef.$lazyInstance$);
 
     } else {
       Cstr = elm.constructor as any;
     }
 
-    if (BUILD.style && !Cstr.isStyleRegistered && Cstr.style) {
+    const scopeId = BUILD.mode ? getScopeId(cmpMeta.$tagName$, hostRef.$modeName$) : getScopeId(cmpMeta.$tagName$);
+    if (BUILD.style && !styles.has(scopeId) && Cstr.style) {
+      const endRegisterStyles = createTime('registerStyles', cmpMeta.$tagName$);
       // this component has styles but we haven't registered them yet
       let style = Cstr.style;
-      let scopeId = getScopeId(cmpMeta.$tagName$, hostRef.$modeName$);
+
+      if (BUILD.mode && typeof style !== 'string') {
+        style = style[hostRef.$modeName$];
+      }
+
       if (!BUILD.hydrateServerSide && BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
         style = await import('../utils/shadow-css').then(m => m.scopeCss(style, scopeId, false));
       }
-      registerStyle(scopeId, style);
-      Cstr.isStyleRegistered = true;
+
+      registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation));
+      endRegisterStyles();
     }
   }
 
   // we've successfully created a lazy instance
+  const ancestorComponent = hostRef.$ancestorComponent$;
+  const schedule = () => scheduleUpdate(elm, hostRef, cmpMeta, true);
 
-  if (BUILD.lifecycle && hostRef.$ancestorComponent$ && !hostRef.$ancestorComponent$['s-lr']) {
+  if (BUILD.asyncLoading && ancestorComponent && ancestorComponent['s-rc']) {
     // this is the intial load and this component it has an ancestor component
     // but the ancestor component has NOT fired its will update lifecycle yet
     // so let's just cool our jets and wait for the ancestor to continue first
-    hostRef.$ancestorComponent$['s-rc'].push(() =>
-      // this will get fired off when the ancestor component
-      // finally gets around to rendering its lazy self
-      // fire off the initial update
-      initializeComponent(elm, hostRef, cmpMeta)
-    );
+
+    // this will get fired off when the ancestor component
+    // finally gets around to rendering its lazy self
+    // fire off the initial update
+    ancestorComponent['s-rc'].push(schedule);
 
   } else {
-    scheduleUpdate(elm, hostRef, cmpMeta, true);
+    schedule();
   }
 };

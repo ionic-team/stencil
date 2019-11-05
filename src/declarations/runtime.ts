@@ -1,4 +1,9 @@
-import * as d from '.';
+import { ComponentConstructorWatchers } from './component-constructor';
+import { ComponentInterface } from './component-interfaces';
+import { HostElement } from './host-element';
+import { RenderNode } from './render';
+import { VNode } from './vdom';
+import { CssVarSim } from './css-var-shim';
 
 
 export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
@@ -33,8 +38,8 @@ export interface ComponentRuntimeMeta {
   $members$?: ComponentRuntimeMembers;
   $listeners$?: ComponentRuntimeHostListener[];
   $attrsToReflect$?: [string, string][];
-  $watchers$?: d.ComponentConstructorWatchers;
-  $lazyBundleIds$?: d.ModeBundleIds;
+  $watchers$?: ComponentConstructorWatchers;
+  $lazyBundleIds$?: ModeBundleIds;
 }
 
 
@@ -81,28 +86,35 @@ export interface ModeBundleIds {
   [modeName: string]: string;
 }
 
-export type RuntimeRef = d.HostElement | {};
+export type RuntimeRef = HostElement | {};
 
 export interface HostRef {
-  $ancestorComponent$?: d.HostElement;
+  $ancestorComponent$?: HostElement;
   $flags$: number;
-  $hostElement$?: d.HostElement;
+  $hostElement$?: HostElement;
   $instanceValues$?: Map<string, any>;
-  $lazyInstance$?: d.ComponentInstance;
+  $lazyInstance$?: ComponentInterface;
   $onReadyPromise$?: Promise<any>;
   $onReadyResolve$?: (elm: any) => void;
-  $vnode$?: d.VNode;
+  $onInstancePromise$?: Promise<any>;
+  $onInstanceResolve$?: (elm: any) => void;
+  $onRenderResolve$?: () => void;
+  $vnode$?: VNode;
+  $queuedListeners$?: [string, any][];
   $rmListeners$?: () => void;
   $modeName$?: string;
+  $renderCount$?: number;
 }
 
 export interface PlatformRuntime {
   $flags$: number;
   $resourcesUrl$: string;
+  jmp: (c: Function) => any;
   raf: (c: FrameRequestCallback) => number;
   ael: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   rel: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
-  $orgLocNodes$?: Map<string, d.RenderNode>;
+  $orgLocNodes$?: Map<string, RenderNode>;
+  $cssShim$?: CssVarSim;
 }
 
 export type RefMap = WeakMap<any, HostRef>;

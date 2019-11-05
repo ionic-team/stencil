@@ -1,4 +1,5 @@
-import * as d from '.';
+import { Diagnostic } from './diagnostics';
+
 
 export interface AssetsMeta {
   absolutePath: string;
@@ -11,11 +12,12 @@ export interface CopyTask {
   src: string;
   dest?: string;
   warn?: boolean;
+  keepDirStructure?: boolean;
 }
 
 
 export interface CopyResults {
-  diagnostics: d.Diagnostic[];
+  diagnostics: Diagnostic[];
   filePaths: string[];
   dirPaths: string[];
 }

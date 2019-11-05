@@ -10,6 +10,9 @@ import { generateCjs } from './generate-cjs';
 import { generateModuleGraph } from '../entries/component-graph';
 
 export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[]) {
+  if (canSkipLazyBuild(buildCtx)) {
+    return;
+  }
   const timespan = buildCtx.createTimeSpan(`bundling components started`);
 
   const cmps = buildCtx.components;
@@ -22,11 +25,12 @@ export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.Com
   await buildCtx.stylesPromise;
 
   const [componentBundle] = await Promise.all([
-    generateEsmBrowser(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
+    generateEsmBrowser(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
     generateEsm(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
-    generateSystem(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
-    generateCjs(config, compilerCtx, buildCtx, build, rollupBuild, outputTargets),
+    generateSystem(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
+    generateCjs(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
   ]);
+  await generateLegacyLoader(config, compilerCtx, outputTargets);
 
   timespan.finish(`bundling components finished`);
   buildCtx.componentGraph = generateModuleGraph(buildCtx.components, componentBundle);
@@ -38,6 +42,8 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   build.lazyLoad = true;
   build.hydrateServerSide = false;
   build.cssVarShim = true;
+  build.initializeNextTick = true;
+  build.taskQueue = true;
 
   const hasHydrateOutputTargets = config.outputTargets.some(isOutputTargetHydrate);
   build.hydrateClientSide = hasHydrateOutputTargets;
@@ -68,7 +74,6 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
       'loader': '@external-entrypoint',
       'index': usersIndexJsPath
     },
-    emitCoreChunk: true,
     cache: compilerCtx.rollupCacheLazy
   };
 
@@ -87,9 +92,9 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
 
 const BROWSER_ENTRY = `
 import { bootstrapLazy, patchBrowser, globals } from '@stencil/core';
-patchBrowser().then(resourcesUrl => {
+patchBrowser().then(options => {
   globals();
-  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], { resourcesUrl });
+  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
 });
 `;
 
@@ -104,3 +109,58 @@ export const defineCustomElements = (win, options) => {
   });
 };
 `;
+
+function generateLegacyLoader(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) {
+  return Promise.all(
+    outputTargets.map(async o => {
+      if (o.legacyLoaderFile) {
+        const loaderContent = getLegacyLoader(config);
+        await compilerCtx.fs.writeFile(o.legacyLoaderFile, loaderContent);
+      }
+    })
+  );
+}
+
+
+function getLegacyLoader(config: d.Config) {
+  const namespace = config.fsNamespace;
+  return `
+(function(doc){
+  var scriptElm = doc.scripts[doc.scripts.length - 1];
+  var warn = ['[${namespace}] Deprecated script, please remove: ' + scriptElm.outerHTML];
+
+  warn.push('To improve performance it is recommended to set the differential scripts in the head as follows:')
+
+  var parts = scriptElm.src.split('/');
+  parts.pop();
+  parts.push('${namespace}');
+  var url = parts.join('/');
+
+  var scriptElm = doc.createElement('script');
+  scriptElm.setAttribute('type', 'module');
+  scriptElm.src = url + '/${namespace}.esm.js';
+  warn.push(scriptElm.outerHTML);
+  scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
+  doc.head.appendChild(scriptElm);
+
+  scriptElm = doc.createElement('script');
+  scriptElm.setAttribute('nomodule', '');
+  scriptElm.src = url + '/${namespace}.js';
+  warn.push(scriptElm.outerHTML);
+  scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
+  doc.head.appendChild(scriptElm);
+
+  console.warn(warn.join('\\n'));
+
+})(document);`;
+}
+
+export function canSkipLazyBuild(buildCtx: d.BuildCtx) {
+  if (buildCtx.requiresFullBuild) {
+    return false;
+  }
+  if (buildCtx.isRebuild && (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges)) {
+    return false;
+  }
+  return true;
+}

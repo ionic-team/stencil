@@ -1,4 +1,16 @@
-import * as d from '.';
+import { Collection } from './collection';
+import { CompilerCtx } from './compiler';
+import { ComponentCompilerMeta, Encapsulation } from './component-compiler-meta';
+import { Config } from './config';
+import { CopyResults } from './assets';
+import { Diagnostic } from './diagnostics';
+import { EntryModule } from './entry';
+import { LoggerTimeSpan } from './logger';
+import { Module } from './module';
+import { PackageJsonData } from './system';
+import { PageReloadStrategy } from './dev-server';
+import { ValidateTypesResults } from './transpile';
+
 
 export type ModuleFormat =
   | 'amd'
@@ -19,37 +31,32 @@ export interface RollupResults {
 }
 
 export interface BuildCtx {
-  abort(): Promise<BuildResults>;
   buildId: number;
-  buildResults: d.BuildResults;
+  buildResults: BuildResults;
   buildMessages: string[];
   bundleBuildCount: number;
-  collections: d.Collection[];
-  components: d.ComponentCompilerMeta[];
+  collections: Collection[];
+  compilerCtx: CompilerCtx;
+  components: ComponentCompilerMeta[];
   componentGraph: Map<string, string[]>;
-  moduleFiles: d.Module[];
-  entryModules: d.EntryModule[];
-  indexDoc: Document;
-  packageJson: d.PackageJsonData;
-  createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
+  config: Config;
+  createTimeSpan(msg: string, debug?: boolean): LoggerTimeSpan;
   data: any;
   debug: (msg: string) => void;
-  diagnostics: d.Diagnostic[];
+  diagnostics: Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
+  entryModules: EntryModule[];
   filesAdded: string[];
   filesChanged: string[];
   filesDeleted: string[];
   filesUpdated: string[];
   filesWritten: string[];
-  skipAssetsCopy: boolean;
-  finish(): Promise<BuildResults>;
   globalStyle: string | undefined;
   hasConfigChanges: boolean;
-  hasCopyChanges: boolean;
   hasError: boolean;
   hasFinished: boolean;
-  hasIndexHtmlChanges: boolean;
+  hasHtmlChanges: boolean;
   hasPrintedResults: boolean;
   hasServiceWorkerChanges: boolean;
   hasScriptChanges: boolean;
@@ -57,7 +64,13 @@ export interface BuildCtx {
   hasWarning: boolean;
   hydrateAppFilePath: string;
   indexBuildCount: number;
+  indexDoc: Document;
   isRebuild: boolean;
+  moduleFiles: Module[];
+  packageJson: PackageJsonData;
+  packageJsonFilePath: string;
+  pendingCopyTasks: Promise<CopyResults>[];
+  progress(task: BuildTask): void;
   requiresFullBuild: boolean;
   rollupResults?: RollupResults;
   scriptsAdded: string[];
@@ -66,13 +79,12 @@ export interface BuildCtx {
   styleBuildCount: number;
   stylesPromise: Promise<void>;
   stylesUpdated: BuildStyleUpdate[];
-  timeSpan: d.LoggerTimeSpan;
+  timeSpan: LoggerTimeSpan;
   timestamp: string;
   transpileBuildCount: number;
-  pendingCopyTasks: Promise<d.CopyResults>[];
-  validateTypesHandler?: (results: d.ValidateTypesResults) => Promise<void>;
-  validateTypesPromise?: Promise<d.ValidateTypesResults>;
   validateTypesBuild?(): Promise<void>;
+  validateTypesHandler?: (results: ValidateTypesResults) => Promise<void>;
+  validateTypesPromise?: Promise<ValidateTypesResults>;
 }
 
 
@@ -82,18 +94,26 @@ export interface BuildStyleUpdate {
   styleMode: string;
 }
 
-
+export type BuildTask = any;
 
 export interface BuildLog {
+  buildId: number;
   messages: string[];
+  progress: number;
 }
 
 
 export interface BuildResults {
   buildId: number;
+  buildConditionals: {
+    shadow: boolean;
+    slot: boolean;
+    svg: boolean;
+    vdom: boolean;
+  };
   bundleBuildCount: number;
   components: BuildComponent[];
-  diagnostics: d.Diagnostic[];
+  diagnostics: Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
   duration: number;
@@ -111,6 +131,7 @@ export interface BuildResults {
   transpileBuildCount: number;
 }
 
+export type BuildStatus = 'pending' | 'error' | 'disabled' | 'default';
 
 export interface HotModuleReplacement {
   componentsUpdated?: string[];
@@ -119,6 +140,7 @@ export interface HotModuleReplacement {
   imagesUpdated?: string[];
   indexHtmlUpdated?: boolean;
   inlineStylesUpdated?: HmrStyleUpdate[];
+  reloadStrategy: PageReloadStrategy;
   scriptsAdded?: string[];
   scriptsDeleted?: string[];
   serviceWorkerUpdated?: boolean;
@@ -176,7 +198,7 @@ export interface BuildEntry {
   bundles: BuildBundle[];
   inputs: string[];
   modes?: string[];
-  encapsulations: d.Encapsulation[];
+  encapsulations: Encapsulation[];
 }
 
 
@@ -200,9 +222,6 @@ export interface BuildComponent {
   dependencyOf?: string[];
   dependencies?: string[];
 }
-
-
-export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'fsChange' | 'buildFinish' | 'buildNoChange' | 'buildLog';
 
 
 export interface BundleOutputChunk {
@@ -231,7 +250,6 @@ export interface BundleAppOptions {
   inputs: BundleEntryInputs;
   loader: {[id: string]: string};
   cache?: any;
-  emitCoreChunk?: boolean;
   externalRuntime?: string;
   skipDeps?: boolean;
   isServer?: boolean;
@@ -258,7 +276,7 @@ export interface BundleModule {
   entryKey: string;
   modeNames: string[];
   rollupResult: RollupResult;
-  cmps: d.ComponentCompilerMeta[];
+  cmps: ComponentCompilerMeta[];
   outputs: BundleModuleOutput[];
 }
 

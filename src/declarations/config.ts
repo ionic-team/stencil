@@ -1,4 +1,10 @@
-import * as d from '.';
+import { CopyTask } from './assets';
+import { DevServerConfig, StencilDevServerConfig } from './dev-server';
+import { Logger } from './logger';
+import { OutputTarget } from './output-targets';
+import { StencilSystem } from './system';
+import { TestingConfig } from './testing';
+
 
 /**
  * https://stenciljs.com/docs/config/
@@ -40,7 +46,7 @@ export interface StencilConfig {
    *
    * @deprecated
    */
-  copy?: d.CopyTask[];
+  copy?: CopyTask[];
 
   /**
    * Stencil will cache build results in order to speed up rebuilds.
@@ -98,14 +104,14 @@ export interface StencilConfig {
    *
    * The outputTargets config is an array of objects, with types of www and dist.
    */
-  outputTargets?: d.OutputTarget[];
+  outputTargets?: OutputTarget[];
 
   /**
    * The plugins config can be used to add your own rollup plugins.
    * By default, Stencil does not come with Sass or PostCss support.
    * However, either can be added using the plugin array.
    */
-  plugins?: d.Plugin[];
+  plugins?: any[];
 
   /**
    * The srcDir config specifies the directory which should contain the source typescript files
@@ -113,34 +119,78 @@ export interface StencilConfig {
    */
   srcDir?: string;
 
-  entryComponentsHint?: string[];
+  /**
+   * Passes custom configuration down to the "rollup-plugin-commonjs" that Stencil uses under the hood.
+   * For further information: https://stenciljs.com/docs/module-bundling
+   */
+  commonjs?: BundlingConfig;
+
+  /**
+   * Passes custom configuration down to the "rollup-plugin-node-resolve" that Stencil uses under the hood.
+   * For further information: https://stenciljs.com/docs/module-bundling
+   */
+  nodeResolve?: NodeResolveConfig;
+
+  /**
+   * Passes custom configuration down to rollup itself, not all rollup options can be overriden.
+   */
+  rollupConfig?: RollupConfig;
+
+  /**
+   * Sets if the ES5 build must be generated or not. It defaults to `false` in dev mode, and `true` in production mode.
+   * Notice that Stencil always generates a modern build too, this setting will just disable the additional `es5` build.
+   */
   buildEs5?: boolean;
+
+  /**
+   * Sets if the JS browser files are minified or not. Stencil uses `terser` under the hood.
+   * Defaults to `false` in dev mode and `true` in production mode.
+   */
+  minifyJs?: boolean;
+
+  /**
+   * Sets if the CSS is minified or not. Stencil uses `cssnano` under the hood.
+   * Defaults to `false` in dev mode and `true` in production mode.
+   */
+  minifyCss?: boolean;
+
+  /**
+   * Forces Stencil to run in `dev` mode if the value is `true` and `production` mode
+   * if it's `false`.
+   *
+   * Defaults to `false` (ie. production) unless the `--dev` flag is used in the CLI.
+   */
+  devMode?: boolean;
+
+  /**
+   * Object to provide a custom logger. By default a `logger` is already provided for the
+   * platform the compiler is running on, such as NodeJS or a browser.
+   */
+  logger?: Logger;
+
+  globalScript?: string;
+  srcIndexHtml?: string;
+  watch?: boolean;
+  testing?: TestingConfig;
+  maxConcurrentWorkers?: number;
+  maxConcurrentTasksPerWorker?: number;
+  preamble?: string;
+  includeSrc?: string[];
+
+  entryComponentsHint?: string[];
   buildDist?: boolean;
   buildLogFilePath?: string;
   cacheDir?: string;
-  commonjs?: BundlingConfig;
-  nodeResolve?: NodeResolveConfig;
-  rollupConfig?: RollupConfig;
   devInspector?: boolean;
-  devMode?: boolean;
-  devServer?: d.DevServerConfig;
+  devServer?: StencilDevServerConfig;
   enableCacheStats?: boolean;
-  globalScript?: string;
-  includeSrc?: string[];
-  logger?: d.Logger;
-  maxConcurrentWorkers?: number;
-  maxConcurrentTasksPerWorker?: number;
-  minifyCss?: boolean;
-  minifyJs?: boolean;
-  preamble?: string;
-  srcIndexHtml?: string;
-  sys?: d.StencilSystem;
-  testing?: d.TestingConfig;
+  sys?: StencilSystem;
   tsconfig?: string;
   validateTypes?: boolean;
-  watch?: boolean;
   watchIgnoredRegex?: RegExp;
-  writeLog?: boolean;
+  excludeUnusedDependencies?: boolean;
+
+  stencilCoreResolvedId?: string;
 }
 
 export interface Config extends StencilConfig {
@@ -148,13 +198,22 @@ export interface Config extends StencilConfig {
   buildDocs?: boolean;
   configPath?: string;
   cwd?: string;
+  writeLog?: boolean;
+  rollupPlugins?: any[];
+  devServer?: DevServerConfig;
   flags?: ConfigFlags;
   fsNamespace?: string;
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
   rootDir?: string;
   suppressLogs?: boolean;
+  profile?: boolean;
   _isValidated?: boolean;
   _isTesting?: boolean;
+  _lifecycleDOMEvents?: boolean;
+}
+
+export interface BrowserConfig extends StencilConfig {
+  win?: Window;
 }
 
 export interface RollupConfig {
@@ -165,6 +224,7 @@ export interface RollupConfig {
 export interface RollupInputOptions {
   context?: string;
   moduleContext?: ((id: string) => string) | { [id: string]: string };
+  treeshake?: boolean;
 }
 
 export interface RollupOutputOptions {
@@ -208,7 +268,7 @@ export interface NodeResolveConfig {
 
 
 export interface ConfigFlags {
-  task?: 'build' | 'docs' | 'help' | 'serve' | 'test';
+  task?: 'build' | 'docs' | 'help' | 'serve' | 'test' | 'g' | 'generate';
   args?: string[];
   knownArgs?: string[];
   unknownArgs?: string[];
@@ -249,6 +309,7 @@ export interface ConfigFlags {
   updateScreenshot?: boolean;
   version?: boolean;
   watch?: boolean;
+  devtools?: boolean;
 }
 
 

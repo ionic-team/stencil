@@ -1,21 +1,19 @@
-import { Component, Element, h, Prop, Watch } from '@stencil/core';
+import { Component, Element, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'input-basic-root'
 })
 export class InputBasicRoot {
 
-  @Element() el: HTMLElement;
-  @Prop({ mutable: true }) value: string;
-  @Watch('value')
-  onValueChanges(v: any) {
-    console.log('onValueChanges', v);
-  }
+  @Element() el!: HTMLElement;
+  @Prop({ mutable: true }) value?: string;
 
   render() {
-    console.log('render');
     return (
       <div>
+        <p>
+          Value: <span class="value">{this.value}</span>
+        </p>
         <input type="text" value={this.value} onInput={(ev: any) => this.value = ev.target.value}></input>
       </div>
     );

@@ -21,8 +21,8 @@ export interface FileSystem {
   mkdirSync(dirPath: string): void;
   readdir(dirPath: string): Promise<string[]>;
   readdirSync(dirPath: string): string[];
-  readFile(filePath: string): Promise<string>;
-  readFileSync(filePath: string): string;
+  readFile(filePath: string, format?: string): Promise<string>;
+  readFileSync(filePath: string, format?: string): string;
   rmdir(dirPath: string): Promise<void>;
   stat(path: string): Promise<FsStats>;
   statSync(path: string): FsStats;

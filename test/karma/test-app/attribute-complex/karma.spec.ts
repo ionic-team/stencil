@@ -15,6 +15,7 @@ describe('attribute-complex', function() {
 
     el.setAttribute('nu-0', '3');
     el.setAttribute('nu-1', '-2.3');
+    el.nu2 = '123';
 
     el.setAttribute('bool-0', 'false');
     el.setAttribute('bool-1', 'true');
@@ -22,12 +23,14 @@ describe('attribute-complex', function() {
 
     el.setAttribute('str-0', 'false');
     el.setAttribute('str-1', '123');
+    el.str2 = 321;
 
     await waitForChanges();
 
     const instance = await el.getInstance();
     expect(instance.nu0).toBe(3);
     expect(instance.nu1).toBe(-2.3);
+    expect(instance.nu2).toBe(123);
 
     expect(instance.bool0).toBe(false);
     expect(instance.bool1).toBe(true);
@@ -35,6 +38,7 @@ describe('attribute-complex', function() {
 
     expect(instance.str0).toBe('false');
     expect(instance.str1).toBe('123');
+    expect(instance.str2).toBe('321');
   });
 
   it('should cast element props', async () => {

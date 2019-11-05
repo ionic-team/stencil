@@ -1,5 +1,5 @@
 import { cloneAttributes } from './attribute';
-import { CONTENT_REF_ID, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from '../runtime/runtime-constants';
+import { CONTENT_REF_ID, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID, XLINK_NS } from '../runtime/runtime-constants';
 import { MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
@@ -79,7 +79,7 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToH
 
 function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: SerializeOutput, isShadowRoot: boolean) {
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE || isShadowRoot) {
-    const tagName = isShadowRoot ? 'shadow-root' : node.nodeName.toLowerCase();
+    const tagName = isShadowRoot ? 'mock:shadow-root' : getTagName(node as Element);
 
     if (tagName === 'body') {
       output.isWithinBody = true;
@@ -146,7 +146,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
             output.currentLineWidth += (attrName.length + 1);
           }
 
-        } else if (attrNamespaceURI === 'http://www.w3.org/1999/xlink') {
+        } else if (attrNamespaceURI === XLINK_NS) {
           output.text.push(' xlink:' + attrName);
           output.currentLineWidth += (attrName.length + 7);
 
@@ -267,10 +267,9 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
     let textContent = node.nodeValue;
 
     if (typeof textContent === 'string') {
-
-      if (textContent.trim() === '') {
+      const trimmedTextContent = textContent.trim();
+      if (trimmedTextContent === '') {
         // this text node is whitespace only
-
         if (isWithinWhitespaceSensitive(node)) {
           // whitespace matters within this element
           // just add the exact text we were given
@@ -321,7 +320,12 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
           if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
             // this text node cannot have its content escaped since it's going
             // into an element like <style> or <script>
-            output.text.push(textContent);
+            if (isWithinWhitespaceSensitive(node)) {
+              output.text.push(textContent);
+            } else {
+              output.text.push(trimmedTextContent);
+              textContentLength = trimmedTextContent.length;
+            }
             output.currentLineWidth += textContentLength;
 
           } else {
@@ -402,6 +406,14 @@ const LT_REGEX = /</g;
 const GT_REGEX = />/g;
 const CAN_REMOVE_ATTR_QUOTES = /^[^ \t\n\f\r"'`=<>\/\\-]+$/;
 
+function getTagName(element: Element) {
+  if (element.namespaceURI === 'http://www.w3.org/1999/xhtml') {
+    return element.nodeName.toLowerCase();
+  } else {
+    return element.nodeName;
+  }
+}
+
 function escapeString(str: string, attrMode: boolean) {
   str = str.replace(AMP_REGEX, '&amp;').replace(NBSP_REGEX, '&nbsp;');
 
@@ -432,7 +444,7 @@ function isWithinWhitespaceSensitive(node: Node) {
 
 /*@__PURE__*/const BOOLEAN_ATTR = new Set(['allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'compact', 'controls', 'declare', 'default', 'defaultchecked', 'defaultmuted', 'defaultselected', 'defer', 'disabled', 'enabled', 'formnovalidate', 'hidden', 'indeterminate', 'inert', 'ismap', 'itemscope', 'loop', 'multiple', 'muted', 'nohref', 'nomodule', 'noresize', 'noshade', 'novalidate', 'nowrap', 'open', 'pauseonexit', 'readonly', 'required', 'reversed', 'scoped', 'seamless', 'selected', 'sortable', 'truespeed', 'typemustmatch', 'visible']);
 
-/*@__PURE__*/const STRUCTURE_ELEMENTS = new Set(['html', 'body', 'head', 'iframe', 'meta', 'link', 'title', 'script', 'style']);
+/*@__PURE__*/const STRUCTURE_ELEMENTS = new Set(['html', 'body', 'head', 'iframe', 'meta', 'link', 'base', 'title', 'script', 'style']);
 
 
 interface SerializeOutput {

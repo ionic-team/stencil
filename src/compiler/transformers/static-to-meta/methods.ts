@@ -3,7 +3,7 @@ import { getStaticValue, isInternal } from '../transform-utils';
 import ts from 'typescript';
 
 
-export function parseStaticMethods(staticMembers: ts.ClassElement[]): d.ComponentCompilerMethod[] {
+export const parseStaticMethods = (staticMembers: ts.ClassElement[]): d.ComponentCompilerMethod[] => {
   const parsedMethods: {[key: string]: d.ComponentCompilerStaticMethod} = getStaticValue(staticMembers, 'methods');
   if (!parsedMethods) {
     return [];
@@ -22,4 +22,4 @@ export function parseStaticMethods(staticMembers: ts.ClassElement[]): d.Componen
       internal: isInternal(parsedMethods[methodName].docs)
     };
   });
-}
+};

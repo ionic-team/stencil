@@ -31,17 +31,17 @@ export function generateComponentTypes(cmp: d.ComponentCompilerMeta): d.TypesMod
   ], true);
   return {
     isDep,
+    tagName,
     tagNameAsPascal,
+    htmlElementName,
     component: `interface ${tagNameAsPascal} {${stencilComponentAttributes}}`,
-    jsx: `interface ${tagNameAsPascal} extends JSXBase.HTMLAttributes {${stencilComponentJSXAttributes}}`,
+    jsx: `interface ${tagNameAsPascal} {${stencilComponentJSXAttributes}}`,
     element: `
 interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {}
 var ${htmlElementName}: {
   prototype: ${htmlElementName};
   new (): ${htmlElementName};
 };`,
-    HTMLElementTagNameMap: `'${tagName}': ${htmlElementName}`,
-    ElementTagNameMap: `'${tagName}': ${htmlElementName};`,
   };
 }
 
@@ -52,7 +52,9 @@ function attributesToMultiLineString(attributes: d.TypeInfo, jsxAttributes: bool
     .reduce((fullList, type) => {
       if (type.jsdoc) {
         fullList.push(`/**`);
-        fullList.push(` * ${type.jsdoc.replace(/\r?\n|\r/g, ' ')}`);
+        fullList.push(
+          ...type.jsdoc.split('\n').map(line => '  * ' + line)
+        );
         fullList.push(` */`);
       }
       const optional = (jsxAttributes)

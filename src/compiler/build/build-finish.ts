@@ -5,7 +5,26 @@ import { initFsWatcher } from '../fs-watch/fs-watch-init';
 import { writeCacheStats } from './cache-stats';
 
 
-export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, aborted: boolean) {
+export const buildFinish = async (buildCtx: d.BuildCtx) => {
+  const results = await buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, false);
+
+  const buildLog: d.BuildLog = {
+    buildId: buildCtx.buildId,
+    messages: buildCtx.buildMessages.slice(),
+    progress: 1
+  };
+  buildCtx.compilerCtx.events.emit('buildLog', buildLog);
+
+  return results;
+};
+
+
+export const buildAbort = (buildCtx: d.BuildCtx) => {
+  return buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, true);
+};
+
+
+const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, aborted: boolean) => {
   if (buildCtx.hasFinished && buildCtx.buildResults) {
     // we've already marked this build as finished and
     // already created the build results, just return these
@@ -21,7 +40,7 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
   if (!buildCtx.hasFinished) {
     // haven't set this build as finished yet
     if (!buildCtx.hasPrintedResults) {
-      config.logger.printDiagnostics(buildCtx.buildResults.diagnostics, config.rootDir);
+      config.logger.printDiagnostics(buildCtx.buildResults.diagnostics);
     }
 
     if (!compilerCtx.hasLoggedServerUrl && config.devServer && config.devServer.browserUrl && config.flags.serve) {
@@ -56,20 +75,18 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
       compilerCtx.hasSuccessfulBuild = true;
     }
 
-    if (!aborted || (aborted && !compilerCtx.hasSuccessfulBuild)) {
-      // print out the time it took to build
-      // and add the duration to the build results
-      if (!buildCtx.hasPrintedResults) {
-        buildCtx.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
-        buildCtx.hasPrintedResults = true;
+    // print out the time it took to build
+    // and add the duration to the build results
+    if (!buildCtx.hasPrintedResults) {
+      buildCtx.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
+      buildCtx.hasPrintedResults = true;
 
-        // write the build stats
-        await generateBuildStats(config, compilerCtx, buildCtx, buildCtx.buildResults);
-      }
-
-      // emit a buildFinish event for anyone who cares
-      compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
+      // write the build stats
+      await generateBuildStats(config, compilerCtx, buildCtx, buildCtx.buildResults);
     }
+
+    // emit a buildFinish event for anyone who cares
+    compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
 
     // write all of our logs to disk if config'd to do so
     // do this even if there are errors or not the active build
@@ -93,10 +110,10 @@ export async function buildFinish(config: d.Config, compilerCtx: d.CompilerCtx, 
   buildCtx.hasFinished = true;
 
   return buildCtx.buildResults;
-}
+};
 
 
-function logHmr(logger: d.Logger, buildCtx: d.BuildCtx) {
+const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {
   // this is a rebuild, and we've got hmr data
   // and this build hasn't been aborted
   const hmr = buildCtx.buildResults.hmr;
@@ -121,10 +138,10 @@ function logHmr(logger: d.Logger, buildCtx: d.BuildCtx) {
   if (hmr.imagesUpdated) {
     cleanupUpdateMsg(logger, `updated image`, hmr.imagesUpdated);
   }
-}
+};
 
 
-function cleanupUpdateMsg(logger: d.Logger, msg: string, fileNames: string[]) {
+const cleanupUpdateMsg = (logger: d.Logger, msg: string, fileNames: string[]) => {
   if (fileNames.length > 0) {
     let fileMsg = '';
 
@@ -143,4 +160,4 @@ function cleanupUpdateMsg(logger: d.Logger, msg: string, fileNames: string[]) {
 
     logger.info(`${msg}: ${logger.cyan(fileMsg)}`);
   }
-}
+};

@@ -9,16 +9,18 @@ export class TodoInput {
   @State() value: string;
 
   render() {
+    const value = this.value;
     return (
-      <form onSubmit={(e: any) => {
-        e.preventDefault();
-        if (!this.value) return;
-        this.inputSubmit.emit(this.value);
-        this.value = '';
+      <form onSubmit={(ev) => {
+        if (value) {
+          ev.preventDefault();
+          this.inputSubmit.emit(value);
+          this.value = '';
+        }
       }}>
         <input
           class="new-todo"
-          value={this.value}
+          value={value}
           type="text"
           placeholder="What needs to be done?"
           onInput={(ev: any) => this.value = ev.target.value}

@@ -278,7 +278,7 @@ export class NodeLogger implements d.Logger {
     console.log(outputLines.join('\n'));
   }
 
-  printDiagnostic(diagnostic: d.Diagnostic, cwd: string) {
+  printDiagnostic(diagnostic: d.Diagnostic, cwd?: string) {
     const outputLines = wordWrap([diagnostic.messageText], getColumns());
 
     let header = '';
@@ -287,7 +287,11 @@ export class NodeLogger implements d.Logger {
       header += diagnostic.header;
     }
 
-    if (typeof cwd === 'string' && typeof diagnostic.absFilePath === 'string' && typeof diagnostic.relFilePath !== 'string') {
+    if (typeof diagnostic.absFilePath === 'string' && typeof diagnostic.relFilePath !== 'string') {
+      if (typeof cwd !== 'string') {
+        cwd = process.cwd();
+      }
+
       diagnostic.relFilePath = path.relative(cwd, diagnostic.absFilePath);
       if (!diagnostic.relFilePath.includes('/')) {
         diagnostic.relFilePath = './' + diagnostic.relFilePath;
@@ -331,7 +335,12 @@ export class NodeLogger implements d.Logger {
           return;
         }
 
-        let msg = `L${l.lineNumber}:  `;
+        let msg = ``;
+
+        if (l.lineNumber > -1) {
+          msg = `L${l.lineNumber}:  `;
+        }
+
         while (msg.length < INDENT.length) {
           msg = ' ' + msg;
         }

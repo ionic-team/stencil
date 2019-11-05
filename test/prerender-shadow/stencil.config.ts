@@ -3,10 +3,11 @@ import { Config } from '../../dist';
 export const config: Config = {
 
   hashFileNames: false,
-
+  minifyJs: false,
   outputTargets: [
     {
       type: 'www',
+      baseUrl: 'http://testing.stenciljs.com',
       serviceWorker: null
     },
     {

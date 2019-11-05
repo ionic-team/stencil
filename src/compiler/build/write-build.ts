@@ -2,6 +2,8 @@ import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { outputPrerender } from '../output-targets/output-prerender';
 import { outputServiceWorkers } from '../output-targets/output-service-workers';
+import { validateBuildFiles } from './validate-files';
+
 
 export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
@@ -27,7 +29,7 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
 
     if (!config.watch) {
       compilerCtx.reset();
-      if (global && global.gc) {
+      if (typeof global !== 'undefined' && global.gc) {
         buildCtx.debug(`triggering forced gc`);
         global.gc();
         buildCtx.debug(`forced gc finished`);
@@ -36,6 +38,8 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
 
     await outputPrerender(config, buildCtx);
     await outputServiceWorkers(config, buildCtx);
+
+    await validateBuildFiles(config, compilerCtx, buildCtx);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

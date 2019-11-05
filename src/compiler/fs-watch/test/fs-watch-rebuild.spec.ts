@@ -51,6 +51,13 @@ describe('fs-watch, rebuild', () => {
     expect(buildCtx.hasStyleChanges).toBe(true);
   });
 
+  it('hasHtmlChanges', () => {
+    compilerCtx.activeFilesUpdated = ['file.HTML', 'file2.html'];
+    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
+    expect(buildCtx).toBeDefined();
+    expect(buildCtx.hasHtmlChanges).toBe(true);
+  });
+
   it('should rebuild for dirsAdded, and recursive add files/dirs', async () => {
     const root = path.resolve('/');
     await compilerCtx.fs.disk.mkdir(path.join(root, 'added-1'));
@@ -135,11 +142,6 @@ describe('fs-watch, rebuild', () => {
     compilerCtx.activeFilesUpdated = ['updated'];
     const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx.requiresFullBuild).toBe(true);
-  });
-
-  it('should not rebuild for no changes', () => {
-    const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
-    expect(buildCtx).toBe(null);
   });
 
 });

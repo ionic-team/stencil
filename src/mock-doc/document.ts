@@ -1,16 +1,17 @@
-import { createElement } from './element';
 import { MockComment } from './comment-node';
+import { NODE_NAMES, NODE_TYPES } from './constants';
 import { MockDocumentFragment } from './document-fragment';
 import { MockDocumentTypeNode } from './document-type-node';
-import { MockElement, MockTextNode, resetElement } from './node';
-import { NODE_NAMES, NODE_TYPES } from './constants';
+import { MockElement, MockHTMLElement, MockTextNode, resetElement } from './node';
+import { MockBaseElement, createElement, createElementNS } from './element';
 import { parseDocumentUtil } from './parse-util';
 import { parseHtmlToFragment } from './parse-html';
 import { resetEventListeners } from './event';
 import { MockWindow } from './window';
+import { MockAttr } from './attribute';
 
 
-export class MockDocument extends MockElement {
+export class MockDocument extends MockHTMLElement {
   defaultView: any;
   cookie: string;
   referrer: string;
@@ -35,24 +36,56 @@ export class MockDocument extends MockElement {
       }
 
     } else if (html !== false) {
-      const documentElement = new MockElement(this, 'html');
+      const documentElement = new MockHTMLElement(this, 'html');
       this.appendChild(documentElement);
 
-      documentElement.appendChild(new MockElement(this, 'head'));
-      documentElement.appendChild(new MockElement(this, 'body'));
+      documentElement.appendChild(new MockHTMLElement(this, 'head'));
+      documentElement.appendChild(new MockHTMLElement(this, 'body'));
+    }
+  }
+
+  get location() {
+    if (this.defaultView != null) {
+      return (this.defaultView as Window).location;
+    }
+    return null;
+  }
+  set location(val: Location) {
+    if (this.defaultView != null) {
+      (this.defaultView as Window).location = val;
     }
   }
 
   get baseURI() {
-    if (this.defaultView != null) {
-      return (this.defaultView as Window).location.href;
+    const baseNode = this.head.childNodes.find(node => node.nodeName === 'BASE') as MockBaseElement;
+    if (baseNode) {
+      return baseNode.href;
     }
-    return '';
+    return this.URL;
   }
-  set baseURI(value: string) {
-    if (this.defaultView != null) {
-      (this.defaultView as Window).location.href = value;
-    }
+
+  get URL() {
+    return this.location.href;
+  }
+
+  get styleSheets() {
+    return this.querySelectorAll('style');
+  }
+
+  get scripts() {
+    return this.querySelectorAll('script');
+  }
+
+  get forms() {
+    return this.querySelectorAll('form');
+  }
+
+  get images() {
+    return this.querySelectorAll('img');
+  }
+
+  get scrollingElement() {
+    return this.documentElement;
   }
 
   get documentElement() {
@@ -62,7 +95,7 @@ export class MockDocument extends MockElement {
       }
     }
 
-    const documentElement = new MockElement(this, 'html');
+    const documentElement = new MockHTMLElement(this, 'html');
     this.appendChild(documentElement);
     return documentElement;
   }
@@ -86,7 +119,7 @@ export class MockDocument extends MockElement {
       }
     }
 
-    const head = new MockElement(this, 'head');
+    const head = new MockHTMLElement(this, 'head');
     documentElement.insertBefore(head, documentElement.firstChild);
     return head;
   }
@@ -111,7 +144,7 @@ export class MockDocument extends MockElement {
       }
     }
 
-    const body = new MockElement(this, 'body');
+    const body = new MockHTMLElement(this, 'body');
     documentElement.appendChild(body);
     return body;
   }
@@ -139,6 +172,14 @@ export class MockDocument extends MockElement {
     return new MockComment(this, data);
   }
 
+  createAttribute(attrName: string) {
+    return new MockAttr(attrName.toLowerCase(), '');
+  }
+
+  createAttributeNS(namespaceURI: string, attrName: string) {
+    return new MockAttr(attrName, '', namespaceURI);
+  }
+
   createElement(tagName: string) {
     if (tagName === NODE_NAMES.DOCUMENT_NODE) {
       const doc = new MockDocument(false as any);
@@ -151,7 +192,7 @@ export class MockDocument extends MockElement {
   }
 
   createElementNS(namespaceURI: string, tagName: string) {
-    const elmNs = new MockElement(this, tagName);
+    const elmNs = createElementNS(this, namespaceURI, tagName);
     elmNs.namespaceURI = namespaceURI;
     return elmNs;
   }

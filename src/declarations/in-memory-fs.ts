@@ -1,8 +1,9 @@
-import * as d from '.';
+import { FileSystem, FsItem, FsReadOptions, FsReaddirItem, FsReaddirOptions, FsWriteOptions, FsWriteResults } from './file-system';
 
 
 export interface InMemoryFileSystem {
-  disk: d.FileSystem;
+  disk: FileSystem;
+
   accessData(filePath: string): Promise<{
     exists: boolean;
     isDirectory: boolean;
@@ -17,14 +18,14 @@ export interface InMemoryFileSystem {
   accessSync(filePath: string): boolean;
   copyFile(srcFile: string, dest: string): Promise<void>;
   emptyDir(dirPath: string): Promise<void>;
-  readdir(dirPath: string, opts?: d.FsReaddirOptions): Promise<d.FsReaddirItem[]>;
-  readFile(filePath: string, opts?: d.FsReadOptions): Promise<string>;
+  readdir(dirPath: string, opts?: FsReaddirOptions): Promise<FsReaddirItem[]>;
+  readFile(filePath: string, opts?: FsReadOptions): Promise<string>;
   /**
    * Synchronous!!! Do not use!!!
    * (Only typescript transpiling is allowed to use)
    * @param filePath
    */
-  readFileSync(filePath: string, opts?: d.FsReadOptions): string;
+  readFileSync(filePath: string, opts?: FsReadOptions): string;
   remove(itemPath: string): Promise<void>;
   stat(itemPath: string): Promise<{
       isFile: boolean;
@@ -39,10 +40,10 @@ export interface InMemoryFileSystem {
       isFile: boolean;
       isDirectory: boolean;
   };
-  writeFile(filePath: string, content: string, opts?: d.FsWriteOptions): Promise<d.FsWriteResults>;
+  writeFile(filePath: string, content: string, opts?: FsWriteOptions): Promise<FsWriteResults>;
   writeFiles(files: {
       [filePath: string]: string;
-  }, opts?: d.FsWriteOptions): Promise<d.FsWriteResults[]>;
+  }, opts?: FsWriteOptions): Promise<FsWriteResults[]>;
   commit(): Promise<{
       filesWritten: string[];
       filesDeleted: string[];
@@ -54,7 +55,7 @@ export interface InMemoryFileSystem {
   cancelDeleteDirectoriesFromDisk(filePaths: string[]): void;
   clearDirCache(dirPath: string): void;
   clearFileCache(filePath: string): void;
-  getItem(itemPath: string): d.FsItem;
+  getItem(itemPath: string): FsItem;
   clearCache(): void;
   readonly keys: string[];
   getMemoryStats(): string;

@@ -5,7 +5,7 @@ import { Component, Prop, h } from '@stencil/core';
 })
 export class SlotReplaceWrapper {
 
-  @Prop() href: string = null;
+  @Prop() href?: string;;
 
   render() {
     const TagType = (this.href != null ? 'a' : 'div') as any;

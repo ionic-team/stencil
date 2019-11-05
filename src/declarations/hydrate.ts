@@ -1,9 +1,12 @@
 
 
-export interface RenderToStringOptions extends HydrateDocumentOptions {
+export interface RenderToStringOptions extends SerializeDocumentOptions {
   afterHydrate?(document: any): any | Promise<any>;
-  approximateLineWidth?: number;
   beforeHydrate?(document: any): any | Promise<any>;
+}
+
+export interface SerializeDocumentOptions extends HydrateDocumentOptions {
+  approximateLineWidth?: number;
   prettyHtml?: boolean;
   removeAttributeQuotes?: boolean;
   removeBooleanAttributeQuotes?: boolean;
@@ -22,6 +25,7 @@ export interface HydrateDocumentOptions {
   referrer?: string;
   removeScripts?: boolean;
   removeUnusedStyles?: boolean;
+  resourcesUrl?: string;
   timeout?: number;
   title?: string;
   url?: string;
@@ -51,6 +55,7 @@ export interface HydrateResults {
 
 export interface HydrateComponent {
   tag: string;
+  mode: string;
   count: number;
   depth: number;
 }

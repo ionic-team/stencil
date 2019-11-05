@@ -33,7 +33,7 @@ async function bundleScreenshot() {
               return '../sys/node/graceful-fs.js';
             }
             if (importee === '@utils') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
+              return relativeResolve('../utils');
             }
           }
         }

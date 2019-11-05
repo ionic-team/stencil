@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { getCssImports } from './css-imports';
+import { getStyleId } from './style-utils';
 
 
 export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, commentOriginalSelector: boolean) {
@@ -141,19 +142,21 @@ async function hasChangedImportContent(config: d.Config, compilerCtx: d.Compiler
 function getComponentStyleInputKey(cmp: d.ComponentCompilerMeta) {
   const input: string[] = [];
 
-  cmp.styles.forEach(styleMeta => {
-    input.push(styleMeta.modeName);
+  if (Array.isArray(cmp.styles)) {
+    cmp.styles.forEach(styleMeta => {
+      input.push(styleMeta.modeName);
 
-    if (styleMeta.styleStr) {
-      input.push(styleMeta.styleStr);
-    }
+      if (typeof styleMeta.styleStr === 'string') {
+        input.push(styleMeta.styleStr);
+      }
 
-    if (styleMeta.externalStyles) {
-      styleMeta.externalStyles.forEach(s => {
-        input.push(s.absolutePath);
-      });
-    }
-  });
+      if (styleMeta.externalStyles) {
+        styleMeta.externalStyles.forEach(s => {
+          input.push(s.absolutePath);
+        });
+      }
+    });
+  }
 
   return input.join(',');
 }
@@ -171,4 +174,44 @@ export function setComponentStylesCache(compilerCtx: d.CompilerCtx, cmp: d.Compo
 
 function getComponentStylesCacheKey(cmp: d.ComponentCompilerMeta, modeName: string) {
   return `${cmp.sourceFilePath}#${cmp.tagName}#${modeName}`;
+}
+
+
+export async function updateLastStyleComponetInputs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (config.watch) {
+    const promises: Promise<any>[] = [];
+    compilerCtx.moduleMap.forEach(m => {
+      if (Array.isArray(m.cmps)) {
+        promises.push(...m.cmps.map(async cmp => {
+          const cacheKey = cmp.tagName;
+          const currentInputHash = await getComponentDecoratorStyleHash(config, cmp);
+
+          if (cmp.styles == null || cmp.styles.length === 0) {
+            compilerCtx.styleModeNames.forEach(modeName => {
+              const lastInputHash = compilerCtx.lastComponentStyleInput.get(cacheKey);
+              if (lastInputHash !== currentInputHash) {
+                buildCtx.stylesUpdated.push({
+                  styleTag: cmp.tagName,
+                  styleText: '',
+                  styleMode: modeName
+                });
+
+                const cacheKey = getComponentStylesCacheKey(cmp, modeName);
+                compilerCtx.cachedStyleMeta.delete(cacheKey);
+
+                const styleId = getStyleId(cmp, modeName, false);
+                compilerCtx.lastBuildStyles.delete(styleId);
+              }
+            });
+          }
+          compilerCtx.lastComponentStyleInput.set(cacheKey, currentInputHash);
+        }));
+      }
+    });
+    await Promise.all(promises);
+  }
+}
+
+function getComponentDecoratorStyleHash(config: d.Config, cmp: d.ComponentCompilerMeta) {
+  return config.sys.generateContentHash(getComponentStyleInputKey(cmp), 8);
 }

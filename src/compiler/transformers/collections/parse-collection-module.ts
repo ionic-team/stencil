@@ -3,7 +3,7 @@ import { normalizePath } from '@utils';
 import { parseCollectionManifest } from './parse-collection-manifest';
 
 
-export function parseCollection(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgJsonFilePath: string, pkgData: d.PackageJsonData) {
+export const parseCollection = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgJsonFilePath: string, pkgData: d.PackageJsonData) => {
   // note this MUST be synchronous because this is used during transpile
   const collectionName = pkgData.name;
 
@@ -51,4 +51,4 @@ export function parseCollection(config: d.Config, compilerCtx: d.CompilerCtx, bu
   compilerCtx.collections.push(collection);
 
   return collection;
-}
+};

@@ -8,8 +8,11 @@ export function validateCopy(copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTa
   if (!Array.isArray(copy)) {
     copy = [];
   }
-  return unique([
-    ...copy,
-    ...defaultCopy,
-  ], task => task.src);
+  copy = copy.slice();
+  for (const task of defaultCopy) {
+    if (copy.every(t => t.src !== task.src)) {
+      copy.push(task);
+    }
+  }
+  return unique(copy, task => `${task.src}:${task.dest}:${task.keepDirStructure}`);
 }

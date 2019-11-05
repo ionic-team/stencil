@@ -20,23 +20,23 @@ var browserStackLaunchers = {
     os: 'Windows',
     os_version: '10'
   },
-  bs_ie: {
-    base: 'BrowserStack',
-    browser: 'ie',
-    os: 'Windows',
-    os_version: '10'
-  },
-  bs_safari: {
-    base: 'BrowserStack',
-    browser: 'safari',
-    os: 'OS X',
-    os_version: 'High Sierra'
-  }
+  // bs_ie: {
+  //   base: 'BrowserStack',
+  //   browser: 'ie',
+  //   os: 'Windows',
+  //   os_version: '10'
+  // },
+  // bs_safari: {
+  //   base: 'BrowserStack',
+  //   browser: 'safari',
+  //   os: 'OS X',
+  //   os_version: 'Mojave'
+  // }
 };
 
 const localLaunchers = {
   ChromeHeadless: {
-    base: 'Chrome',
+    base: 'ChromeHeadless',
     flags: [
 			'--no-sandbox',
 			// See https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md
@@ -46,10 +46,25 @@ const localLaunchers = {
 			'--remote-debugging-port=9333'
 		]
   },
-  // 'Firefox': {
-  //   base: 'Firefox'
-  // }
+  'Firefox': {
+    base: 'Firefox'
+  }
 };
+
+if (process.platform === 'win32') {
+  localLaunchers.IE = {
+    base: 'IE'
+  };
+  localLaunchers.Edge = {
+    base: 'Edge'
+  };
+
+} else if (process.platform === 'darwin') {
+  // localLaunchers.Safari = {
+  //   base: 'Safari'
+  // };
+}
+
 
 module.exports = function(config) {
   config.set({
@@ -58,6 +73,8 @@ module.exports = function(config) {
       'karma-firefox-launcher',
       'karma-safari-launcher',
       'karma-browserstack-launcher',
+      'karma-ie-launcher',
+      'karma-edge-launcher',
       'karma-jasmine',
       'karma-typescript',
       'karma-polyfill'
@@ -87,7 +104,7 @@ module.exports = function(config) {
     },
 
     customLaunchers: browserStack ? browserStackLaunchers : {},
-
+    urlRoot: '/__karma__/',
     files: [
       // 'test-app/attribute-basic/karma.spec.ts',
       // 'test-app/attribute-complex/karma.spec.ts',
@@ -99,10 +116,9 @@ module.exports = function(config) {
     ],
 
     proxies: {
-      '/build/': '/base/www/build/',
+      '/': '/base/www/',
       // '/build/testsibling.js': '/base/www/noscript.js',
       // '/esm-webpack/main.js': '/base/www/noscript.js',
-      '/prerender/': '/base/www/prerender/'
     },
 
     colors: true,

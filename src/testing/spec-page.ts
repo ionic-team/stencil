@@ -25,27 +25,33 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
   platform.registerContext(opts.context);
   platform.registerComponents(opts.components);
 
+
+  if (opts.hydrateClientSide) {
+    opts.includeAnnotations = true;
+  }
   if (opts.hydrateServerSide) {
+    opts.includeAnnotations = true;
     platform.supportsShadowDom = false;
   } else {
-    if (opts.serializedShadowDom === false) {
+    opts.includeAnnotations = !!opts.includeAnnotations;
+    if (opts.supportsShadowDom === false) {
       platform.supportsShadowDom = false;
     } else {
       platform.supportsShadowDom = true;
     }
   }
+  bc.BUILD.cssAnnotations = opts.includeAnnotations;
 
   const cmpTags = new Set<string>();
 
   const win = platform.win as Window;
+  (win as any)['__stencil_spec_options'] = opts;
   const doc = win.document;
 
   const page: d.SpecPage = {
     win: win,
     doc: doc,
     body: doc.body as any,
-    root: null as any,
-    rootInstance: null as any,
     build: bc.BUILD as d.Build,
     styles: platform.styles as Map<string, string>,
     setContent: (html: string) => {
@@ -81,15 +87,19 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     return lazyBundleRuntimeMeta;
   });
 
-  const cmpBuild = getBuildFeatures(
-    opts.components.map(Cstr => Cstr.COMPILER_META)
-  ) as any;
-  Object.keys(cmpBuild).forEach(key => {
-    if ((cmpBuild as any)[key] === true) {
-      (bc.BUILD as any)[key] = true;
-    }
-  });
+  const cmpCompilerMeta = opts.components.map(Cstr => Cstr.COMPILER_META as d.ComponentCompilerMeta);
 
+  const cmpBuild = getBuildFeatures(cmpCompilerMeta);
+  if (opts.strictBuild) {
+    Object.assign(bc.BUILD, cmpBuild);
+  } else {
+    Object.keys(cmpBuild).forEach(key => {
+      if ((cmpBuild as any)[key] === true) {
+        (bc.BUILD as any)[key] = true;
+      }
+    });
+  }
+  bc.BUILD.asyncLoading = true;
   if (opts.hydrateClientSide) {
     bc.BUILD.hydrateClientSide = true;
     bc.BUILD.hydrateServerSide = false;
@@ -136,7 +146,19 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
 
   platform.bootstrapLazy(lazyBundles);
 
-  if (typeof opts.html === 'string') {
+  if (typeof opts.template === 'function') {
+    const ref: d.HostRef = {
+      $ancestorComponent$: undefined,
+      $flags$: 0,
+      $modeName$: undefined,
+      $hostElement$: page.body
+    };
+    const cmpMeta: d.ComponentRuntimeMeta = {
+      $flags$: 0,
+      $tagName$: 'body'
+    };
+    platform.renderVdom(page.body, ref, cmpMeta, opts.template());
+  } else if (typeof opts.html === 'string') {
     page.body.innerHTML = opts.html;
   }
 
@@ -144,10 +166,32 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     await page.waitForChanges();
   }
 
-  page.root = findRoot(cmpTags, page.body);
-  if (page.root != null) {
-    page.rootInstance = platform.getHostRef(page.root).$lazyInstance$;
-  }
+  let rootComponent: any = null;
+  Object.defineProperty(page, 'root', {
+    get() {
+      if (rootComponent == null) {
+        rootComponent = findRootComponent(cmpTags, page.body);
+        if (rootComponent != null) {
+          return rootComponent;
+        }
+      }
+      const firstElementChild = page.body.firstElementChild;
+      if (firstElementChild != null) {
+        return firstElementChild as any;
+      }
+      return null;
+    }
+  });
+
+  Object.defineProperty(page, 'rootInstance', {
+    get() {
+      const hostRef = platform.getHostRef(page.root);
+      if (hostRef != null) {
+        return hostRef.$lazyInstance$;
+      }
+      return null;
+    }
+  });
 
   if (opts.hydrateServerSide) {
     platform.insertVdomAnnotations(doc);
@@ -219,7 +263,7 @@ function proxyComponentLifeCycles(platform: any, Cstr: d.ComponentTestingConstru
 }
 
 
-function findRoot(cmpTags: Set<string>, node: Element): any {
+function findRootComponent(cmpTags: Set<string>, node: Element): any {
   if (node != null) {
     const children = node.children;
     const childrenLength = children.length;
@@ -232,7 +276,7 @@ function findRoot(cmpTags: Set<string>, node: Element): any {
     }
 
     for (let i = 0; i < childrenLength; i++) {
-      const r = findRoot(cmpTags, children[i]);
+      const r = findRootComponent(cmpTags, children[i]);
       if (r != null) {
         return r;
       }

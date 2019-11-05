@@ -48,7 +48,7 @@ Stencil used to generate a loader `.js` file that automatically decided which en
 
 ### Collection's package.json
 
-Stencil One has chaged the internal folder structure of the `dist` folder, and some entry-points are located in different location:
+Stencil One has changed the internal folder structure of the `dist` folder, and some entry-points are located in different location:
 
 - **"module"**: `dist/esm/index.js` => `dist/index.mjs`
 - **"jsnext:main**": `dist/esm/es2017/index.js` => `dist/esm/index.mjs`
@@ -72,6 +72,20 @@ Make sure you update the `package.json` in the root of your project, like this:
   }
 ```
 
+### Dependencies
+
+Some packages, specially the ones from the Stencil and Ionic core teams used some private APIs of Stencil, that's why if your collection depends of `@ionic/core`, `@stencil/router` or `@stencil/state-tunnel`, you might need to update your `package.json` to point these dependencies to the `"one"` tag.
+
+```
+"@ionic/core": "one",
+"@stencil/router": "^1.0.0",
+"@stencil/state-tunnel": "^1.0.0",
+
+"@stencil/sass": "^1.0.0",
+"@stencil/less": "^1.0.0",
+"@stencil/stylus": "^1.0.0",
+"@stencil/postcss": "^1.0.0",
+```
 
 ### `window.NAMESPACE` is no longer a thing
 
@@ -155,7 +169,7 @@ onEnter(ev: KeyboardEvent) {
 
 ### Removed: @Listen('event’, { enabled })
 
-It's not possible to programatically enable/disable an event listener defined using the `@Listen()` decorator. Please use the DOM API directly (`addEventListener` / `removeEventListener`).
+It's not possible to programmatically enable/disable an event listener defined using the `@Listen()` decorator. Please use the DOM API directly (`addEventListener` / `removeEventListener`).
 
 ### Removed: @Listen('event’, { eventName })
 
@@ -364,7 +378,7 @@ It will not be recommended to use `@Prop(connect)` in order to lazily load compo
 
 ### OutputTarget local copy tasks
 
-The root `copy` property in `stencil.config.ts` has been deprecated in favour of local copy tasks per output-target, ie. now the copy tasks are specific under the context of each output-target.
+The root `copy` property in `stencil.config.ts` has been deprecated in favor of local copy tasks per output-target, ie. now the copy tasks are specific under the context of each output-target.
 
 ```diff
   const copy =
@@ -414,7 +428,7 @@ In the example above, the `main.html` file is actually copied into 5 different p
 - dist-app/app/main.html
 - www/main.html
 
-If the old behaviour is still desired, the config can be refactored to:
+If the old behavior is still desired, the config can be refactored to:
 
 ```ts
 const copy = [
@@ -479,9 +493,9 @@ it('override default values from attribute', async () => {
 ```
 
 
-### Serialized `<shadow-root>`
+### Serialized `<mock:shadow-root>`
 
-Traditionally, when a component is serialized to a string its shadow-root is ignored and not include within the HTML output. However, when building web components and using Shadow DOM, the nodes generated within the components are just as important as any other nodes to be tested. For this reason, both spec and e2e tests will serialize the shadow-root content into a mocked `<shadow-root>` element. Note that this serialized shadow-root is simply for testing and comparing values, and is not used at browser runtime.
+Traditionally, when a component is serialized to a string its shadow-root is ignored and not include within the HTML output. However, when building web components and using Shadow DOM, the nodes generated within the components are just as important as any other nodes to be tested. For this reason, both spec and e2e tests will serialize the shadow-root content into a mocked `<mock:shadow-root>` element. Note that this serialized shadow-root is simply for testing and comparing values, and is not used at browser runtime.
 
 ```tsx
 import { Component } from '@stencil/core';
@@ -511,11 +525,11 @@ it('test shadow root innerHTML', async () => {
 
   expect(page.root).toEqualHtml(`
     <cmp-a>
-      <shadow-root>
+      <mock:shadow-root>
         <div>
           Shadow Content
         </div>
-      </shadow-root>
+      </mock:shadow-root>
       Light Content
     </cmp-a>
   `);

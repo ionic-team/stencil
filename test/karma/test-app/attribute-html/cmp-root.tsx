@@ -5,9 +5,9 @@ import { Component, Prop, h } from '@stencil/core';
 })
 export class AttributeHtmlRoot {
 
-  @Prop() strAttr: string;
-  @Prop() anyAttr: any | null;
-  @Prop() nuAttr: number | null;
+  @Prop() strAttr?: string;
+  @Prop() anyAttr?: any;
+  @Prop() nuAttr?: number;
 
   render() {
     return [

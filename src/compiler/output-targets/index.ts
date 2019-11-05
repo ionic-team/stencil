@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { canSkipOutputTargets } from './output-utils';
 import { outputApp } from './output-app';
 import { outputCollections } from './output-collection';
 import { outputHydrate } from './output-hydrate';
@@ -9,12 +10,9 @@ import { outputWww } from './output-www';
 import { outputDocs } from './output-docs';
 import { outputAngular } from './output-angular';
 
-import { canSkipAppCoreBuild } from './output-utils';
-
-
 
 export async function generateOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (canSkipAppCoreBuild(buildCtx)) {
+  if (canSkipOutputTargets(buildCtx)) {
     return;
   }
 
@@ -26,7 +24,6 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     outputAngular(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
 
-    // outputSelfContainedWebComponents(config, compilerCtx, buildCtx),
     buildCtx.stylesPromise
   ]);
 
@@ -34,6 +31,7 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
   // since it validates files were created
   await outputTypes(config, compilerCtx, buildCtx);
 }
+
 
 async function outputModulesApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   await outputModule(config, compilerCtx, buildCtx);

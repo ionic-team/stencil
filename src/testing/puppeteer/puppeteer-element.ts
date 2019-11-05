@@ -1,12 +1,12 @@
 import * as d from '../../declarations';
 import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
-import { EventSpy, addE2EListener } from './puppeteer-events';
+import { EventSpy, addE2EListener, waitForEvent } from './puppeteer-events';
 import { find, findAll } from './puppeteer-find';
-import { MockElement, cloneAttributes, parseHtmlToFragment } from '@mock-doc';
+import { MockHTMLElement, cloneAttributes, parseHtmlToFragment } from '@mock-doc';
 
 
-export class E2EElement extends MockElement implements pd.E2EElementInternal {
+export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal {
   private _queuedActions: ElementAction[] = [];
 
   private _queueAction(action: ElementAction) {
@@ -46,7 +46,7 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     const eventSpy = new EventSpy(eventName);
 
     await addE2EListener(this._page, this._elmHandle, eventName, (ev: d.SerializedEvent) => {
-      eventSpy.events.push(ev);
+      eventSpy.push(ev);
     });
 
     return eventSpy;
@@ -108,53 +108,47 @@ export class E2EElement extends MockElement implements pd.E2EElementInternal {
     return isVisible;
   }
 
+  waitForEvent(eventName: string) {
+    return waitForEvent(this._page, eventName, this._elmHandle);
+  }
+
   waitForVisible() {
     return new Promise<void>((resolve, reject) => {
-      let resolveTmr: any;
-
-      const timeout = 30000;
-
-      const rejectTmr = setTimeout(() => {
-        clearTimeout(resolveTmr);
-        reject(`waitForVisible timed out: ${timeout}ms`);
-      }, timeout);
-
       const checkVisible = async () => {
         const isVisible = await this.isVisible();
         if (isVisible) {
+          clearInterval(resolveTmr);
           clearTimeout(rejectTmr);
           resolve();
-        } else {
-          resolveTmr = setTimeout(checkVisible, 10);
         }
       };
-
-      checkVisible();
+      const resolveTmr = setInterval(checkVisible, 10);
+      const timeout = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
+      const timeoutError = new Error(`waitForVisible timed out: ${timeout}ms`);
+      const rejectTmr = setTimeout(() => {
+        clearTimeout(resolveTmr);
+        reject(timeoutError);
+      }, timeout);
     });
   }
 
   waitForNotVisible() {
     return new Promise<void>((resolve, reject) => {
-      let resolveTmr: any;
-
-      const timeout = 30000;
-
-      const rejectTmr = setTimeout(() => {
-        clearTimeout(resolveTmr);
-        reject(`waitForNotVisible timed out: ${timeout}ms`);
-      }, timeout);
-
       const checkVisible = async () => {
         const isVisible = await this.isVisible();
-        if (isVisible) {
-          resolveTmr = setTimeout(checkVisible, 10);
-        } else {
+        if (!isVisible) {
+          clearInterval(resolveTmr);
           clearTimeout(rejectTmr);
           resolve();
         }
       };
-
-      checkVisible();
+      const resolveTmr = setInterval(checkVisible, 10);
+      const timeout = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
+      const timeoutError = new Error(`waitForNotVisible timed out: ${timeout}ms`);
+      const rejectTmr = setTimeout(() => {
+        clearTimeout(resolveTmr);
+        reject(timeoutError);
+      }, timeout);
     });
   }
 
