@@ -62,7 +62,10 @@ export const lazyOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       ]);
 
       await generateLegacyLoader(config, compilerCtx, outputTargets);
-      buildCtx.componentGraph = generateModuleGraph(buildCtx.components, componentBundle);
+
+      if (componentBundle != null) {
+        buildCtx.componentGraph = generateModuleGraph(buildCtx.components, componentBundle);
+      }
     }
 
   } catch (e) {

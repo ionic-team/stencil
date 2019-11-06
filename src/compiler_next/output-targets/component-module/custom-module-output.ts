@@ -3,12 +3,13 @@ import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
-import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
-import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
-import path from 'path';
-import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import { isOutputTargetDistCustomElementsBundle } from '../../../compiler/output-targets/output-utils';
+import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
+import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
+import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
 import { writeBuildOutputs } from '../../bundle/write-outputs';
+import path from 'path';
+
 
 export const customElementsBundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElementsBundle);
@@ -20,7 +21,7 @@ export const customElementsBundleOutput = async (config: d.Config, compilerCtx: 
 
   try {
     const bundleOpts: BundleOptions = {
-      id: 'customElement',
+      id: 'customElements',
       platform: 'client',
       conditionals: getBuildConditionals(config, buildCtx.components),
       customTransformers: getCustomTransformer(compilerCtx),
