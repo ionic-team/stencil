@@ -26,7 +26,9 @@ export async function taskGenerate(config: d.Config, flags: d.ConfigFlags) {
     (await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string;
 
   const { dir, base: componentName } = parse(input);
-
+  const prefix = componentName.split('-')[0];
+  const afterPrefix = componentName.split('-').slice(1).join('-');
+  
   const tagError = validateComponentTag(componentName);
   if (tagError) {
     config.logger.error(tagError);
@@ -35,12 +37,12 @@ export async function taskGenerate(config: d.Config, flags: d.ConfigFlags) {
 
   const extensionsToGenerate: GeneratableExtension[] = ['tsx', ...(await chooseFilesToGenerate())];
 
-  const outDir = join(baseDir, srcDir, 'components', dir, componentName);
+  const outDir = join(baseDir, srcDir, 'components', dir, afterPrefix);
   await mkdir(outDir, { recursive: true });
 
   const writtenFiles = await Promise.all(
     extensionsToGenerate.map(extension =>
-      writeFileByExtension(outDir, componentName, extension, extensionsToGenerate.includes('css')),
+      writeFileByExtension(outDir, prefix, afterPrefix, extension, extensionsToGenerate.includes('css')),
     ),
   ).catch(error => config.logger.error(error));
 
@@ -73,9 +75,9 @@ const chooseFilesToGenerate = async () =>
 /**
  * Get a file's boilerplate by its extension and write it to disk.
  */
-const writeFileByExtension = async (path: string, name: string, extension: GeneratableExtension, withCss: boolean) => {
-  const outFile = join(path, `${name}.${extension}`);
-  const boilerplate = getBoilerplateByExtension(name, extension, withCss);
+const writeFileByExtension = async (path: string, prefix: string, afterPrefix: string, extension: GeneratableExtension, withCss: boolean) => {
+  const outFile = join(path, `${afterPrefix}.${extension}`);
+  const boilerplate = getBoilerplateByExtension(prefix, afterPrefix, extension, withCss);
 
   await writeFile(outFile, boilerplate, { flag: 'wx' });
 
@@ -85,19 +87,19 @@ const writeFileByExtension = async (path: string, name: string, extension: Gener
 /**
  * Get the boilerplate for a file by its extension.
  */
-const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtension, withCss: boolean) => {
+const getBoilerplateByExtension = (prefix: string, afterPrefix: string, extension: GeneratableExtension, withCss: boolean) => {
   switch (extension) {
     case 'tsx':
-      return getComponentBoilerplate(tagName, withCss);
+      return getComponentBoilerplate(prefix, afterPrefix, withCss);
 
     case 'css':
       return getStyleUrlBoilerplate();
 
     case 'spec.ts':
-      return getSpecTestBoilerplate(tagName);
+      return getSpecTestBoilerplate(prefix, afterPrefix);
 
     case 'e2e.ts':
-      return getE2eTestBoilerplate(tagName);
+      return getE2eTestBoilerplate(`${prefix}-${afterPrefix}`);
 
     default:
       throw new Error(`Unkown extension "${extension}".`);
@@ -107,11 +109,11 @@ const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtens
 /**
  * Get the boilerplate for a component.
  */
-const getComponentBoilerplate = (tagName: string, hasStyle: boolean) => {
+const getComponentBoilerplate = (prefix: string, afterPrefix: string, hasStyle: boolean) => {
   const decorator = [`{`];
-  decorator.push(`  tag: '${tagName}',`);
+  decorator.push(`  tag: '${prefix}-${afterPrefix}',`);
   if (hasStyle) {
-    decorator.push(`  styleUrl: '${tagName}.css',`);
+    decorator.push(`  styleUrl: '${afterPrefix}.css',`);
   }
   decorator.push(`  shadow: true`);
   decorator.push(`}`);
@@ -119,7 +121,7 @@ const getComponentBoilerplate = (tagName: string, hasStyle: boolean) => {
   return `import { Component, Host, h } from '@stencil/core';
 
 @Component(${decorator.join('\n')})
-export class ${toPascalCase(tagName)} {
+export class ${toPascalCase(afterPrefix)} {
 
   render() {
     return (
@@ -145,12 +147,12 @@ const getStyleUrlBoilerplate = () =>
 /**
  * Get the boilerplate for a spec test.
  */
-const getSpecTestBoilerplate = (tagName: string) =>
-`import { ${toPascalCase(tagName)} } from './${tagName}';
+const getSpecTestBoilerplate = (prefix: string, afterPrefix: string) =>
+`import { ${toPascalCase(afterPrefix)} } from './${afterPrefix}';
 
-describe('${tagName}', () => {
+describe('${prefix}-${afterPrefix}', () => {
   it('builds', () => {
-    expect(new ${toPascalCase(tagName)}()).toBeTruthy();
+    expect(new ${toPascalCase(afterPrefix)}()).toBeTruthy();
   });
 });
 `;
