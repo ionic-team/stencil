@@ -7,21 +7,22 @@ import { validatePrerender } from '../../../compiler/config/validate-prerender';
 import { validateServiceWorker } from '../../../compiler/config/validate-service-worker';
 import path from 'path';
 
-export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[]) => {
-  const hasOutputTargets = Array.isArray(config.outputTargets);
-  const hasE2eTests = !!(config.flags && config.flags.e2e);
-  const userOutputs = config.outputTargets.filter(isOutputTargetWww);
 
-  if (!hasOutputTargets || (hasE2eTests && !config.outputTargets.some(isOutputTargetWww))) {
-    userOutputs.push({ type: WWW });
+export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
+  const hasOutputTargets = Array.isArray(userOutputs);
+  const hasE2eTests = !!(config.flags && config.flags.e2e);
+  const userWwwOutputs = userOutputs.filter(isOutputTargetWww);
+
+  if (!hasOutputTargets || (hasE2eTests && !userWwwOutputs.some(isOutputTargetWww))) {
+    userWwwOutputs.push({ type: WWW });
   }
 
-  if (config.flags.prerender && userOutputs.length === 0) {
+  if (config.flags.prerender && userWwwOutputs.length === 0) {
     const err = buildError(diagnostics);
     err.messageText = `You need at least one "www" output target configured in your stencil.config.ts, when the "--prerender" flag is used`;
   }
 
-  return userOutputs.reduce((outputs, o) => {
+  return userWwwOutputs.reduce((outputs, o) => {
     const outputTarget = validateWwwOutputTarget(config, o, diagnostics);
     outputs.push(outputTarget);
 

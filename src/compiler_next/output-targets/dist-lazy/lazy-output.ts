@@ -1,23 +1,23 @@
-import { generateEntryModules } from '../../..//compiler/entries/entry-modules';
 import * as d from '../../../declarations';
+import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
+import { generateEntryModules } from '../../../compiler/entries/entry-modules';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
-import { BundleOptions } from '../../bundle/bundle-interface';
 import { LAZY_BROWSER_ENTRY_ID, LAZY_EXTERNAL_ENTRY_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID } from '../../bundle/entry-alias-ids';
 import { isOutputTargetDistLazy, isOutputTargetHydrate } from '../../../compiler/output-targets/output-utils';
 import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
-import { generateEsmBrowser } from '../../../compiler/component-lazy/generate-esm-browser';
+import { generateCjs } from './generate-cjs';
+import { generateEsmBrowser } from './generate-esm-browser';
 import { generateEsm } from './generate-esm';
 import { generateSystem } from './generate-system';
-import { generateCjs } from './generate-cjs';
 import { generateModuleGraph } from '../../../compiler/entries/component-graph';
 import { getGlobalScriptPaths } from '../../bundle/app-data-plugin';
 import MagicString from 'magic-string';
 
 
-export const lazyOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
   if (outputTargets.length === 0) {
     return;
@@ -157,7 +157,7 @@ function generateLegacyLoader(config: d.Config, compilerCtx: d.CompilerCtx, outp
     outputTargets.map(async o => {
       if (o.legacyLoaderFile) {
         const loaderContent = getLegacyLoader(config);
-        await compilerCtx.fs.writeFile(o.legacyLoaderFile, loaderContent);
+        await compilerCtx.fs.writeFile(o.legacyLoaderFile, loaderContent, { outputTargetType: o.type });
       }
     })
   );

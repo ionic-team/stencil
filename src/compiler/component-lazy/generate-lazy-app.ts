@@ -1,13 +1,13 @@
 import * as d from '../../declarations';
 import { bundleApp } from '../app-core/bundle-app-core';
 import { getBuildFeatures, updateBuildConditionals } from '../../compiler_next/build/app-data';
-import { isOutputTargetHydrate } from '../output-targets/output-utils';
 import { generateEsm } from './generate-esm';
 import { generateEsmBrowser } from './generate-esm-browser';
-
 import { generateSystem } from './generate-system';
 import { generateCjs } from './generate-cjs';
 import { generateModuleGraph } from '../entries/component-graph';
+import { isOutputTargetHydrate } from '../output-targets/output-utils';
+
 
 export async function generateLazyLoadedApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistLazy[]) {
   if (canSkipLazyBuild(buildCtx)) {

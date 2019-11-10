@@ -38,11 +38,19 @@ Stencil is able to generate components into various formats so they can be best 
 - Generates a `collection` into the `dist/collection/` directory to be used by other projects.
 
 
-### `selfcontained`
+### `dist-custom-elements`
 
 - Generates a directory of each component as its own stand-alone web component.
 - Does not import any functions and works as is within the browser.
 
+```
+dist/
+  components/
+    cmp-a/
+      cmp-a.mjs (component extends HTMLElement, but does not define custom element)
+      index.mjs (defines custom element on window)
+    index.mjs
+```
 
 ### `angular`
 
@@ -50,7 +58,7 @@ Stencil is able to generate components into various formats so they can be best 
 - Web componets themselves work fine within Angular, but you loose out on many of Angular's features, such as types or `@ViewChild`. In order for a Stencil project to fit right into the Angular ecosystem, this output target generates thin wrapper that can be imported by Angular.
 
 
-### `hydrate`
+### `dist-hydrate-script`
 
 - Generates a hydrate app, which is used by prerendering and Angular Universal server module.
 
@@ -72,7 +80,9 @@ Stencil is able to generate components into various formats so they can be best 
   - loader
     - index.mjs (points to the esm/es2017/ directory)
 
-  - modules/ (modules to be imported)
+  - components/ (custom elements to be imported)
+
+  - components-es5/ (custom elements to be imported)
     - es5/
       - index.mjs
 
@@ -91,7 +101,7 @@ Stencil is able to generate components into various formats so they can be best 
     - cmp-b.mjs
     - app.mjs (self-contained of all native components)
 
-  - server/
+  - hydrate/
     - hydrate.d.ts
     - hydrate.js
     - index.js

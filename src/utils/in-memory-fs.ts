@@ -580,7 +580,8 @@ export class InMemoryFs implements d.InMemoryFileSystem {
       queueCopyFileToDest: null,
       queueDeleteFromDisk: null,
       queueWriteToDisk: null,
-      useCache: null
+      useCache: null,
+      outputTargetType: null,
     });
     return item;
   }
@@ -595,6 +596,10 @@ export class InMemoryFs implements d.InMemoryFileSystem {
 
   getMemoryStats() {
     return `data length: ${this.items.size}`;
+  }
+
+  getBuildOutputs(): d.BuildOutput[] {
+    return [];
   }
 
 }

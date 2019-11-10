@@ -1,4 +1,4 @@
-import { BuildOutput, CompilerBuildResults } from './compiler_next';
+import { CompilerBuildResults } from './compiler_next';
 import { Collection } from './collection';
 import { CompilerCtx } from './compiler';
 import { ComponentCompilerMeta, Encapsulation } from './component-compiler-meta';
@@ -69,7 +69,6 @@ export interface BuildCtx {
   indexDoc: Document;
   isRebuild: boolean;
   moduleFiles: Module[];
-  outputs: BuildOutput[];
   packageJson: PackageJsonData;
   packageJsonFilePath: string;
   pendingCopyTasks: Promise<CopyResults>[];

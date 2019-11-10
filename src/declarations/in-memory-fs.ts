@@ -1,4 +1,4 @@
-import { CompilerSystem } from './compiler_next';
+import { BuildOutput, CompilerSystem } from './compiler_next';
 import { FileSystem, FsItem, FsReadOptions, FsReaddirItem, FsReaddirOptions, FsWriteOptions, FsWriteResults } from './file-system';
 
 
@@ -62,6 +62,7 @@ export interface InMemoryFileSystem {
   clearDirCache(dirPath: string): void;
   clearFileCache(filePath: string): void;
   getItem(itemPath: string): FsItem;
+  getBuildOutputs(): BuildOutput[];
   clearCache(): void;
   keys(): string[];
   getMemoryStats(): string;

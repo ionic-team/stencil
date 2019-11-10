@@ -17,15 +17,12 @@ export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnosti
       err.messageText = `Invalid outputTarget type "${outputTarget.type}". Valid outputTarget types include: ${VALID_TYPES_NEXT.map(t => `"${t}"`).join(', ')}`;
     }
   });
-  if (!config.outputTargets) {
-    config.outputTargets = [];
-  }
 
   config.outputTargets = [
-    ...validateCollection(config, diagnostics),
-    ...validateCustomElement(config, diagnostics),
-    ...validateLazy(config, diagnostics),
-    ...validateWww(config, diagnostics),
-    ...validateDist(config, diagnostics),
+    ...validateCollection(config, userOutputs),
+    ...validateCustomElement(config, userOutputs),
+    ...validateLazy(config, userOutputs),
+    ...validateWww(config, diagnostics, userOutputs),
+    ...validateDist(config, userOutputs),
   ];
 }

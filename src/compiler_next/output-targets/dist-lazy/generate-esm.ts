@@ -1,11 +1,12 @@
 import * as d from '../../../declarations';
+import { generateLazyModules } from '../dist-lazy/generate-lazy-module';
 import { generateRollupOutput } from '../../../compiler/app-core/bundle-app-core';
-import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
 import { RollupResult } from '../../../declarations';
 
-export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
+
+export const generateEsm = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) => {
   const esmEs5Outputs = config.buildEs5 ? outputTargets.filter(o => !!o.esmEs5Dir && !o.isBrowserBuild) : [];
   const esmOutputs = outputTargets.filter(o => !!o.esmDir && !o.isBrowserBuild);
   if (esmOutputs.length + esmEs5Outputs.length > 0) {
@@ -14,22 +15,22 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
       entryFileNames: '[name].mjs',
       preferConst: true
     };
-
+    const outputTargetType = esmOutputs[0].type;
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (output != null) {
       const es2017destinations = esmOutputs.map(o => o.esmDir);
-      await generateLazyModules(config, compilerCtx, buildCtx, es2017destinations, output, 'es2017', false, '');
+      await generateLazyModules(config, compilerCtx, buildCtx, outputTargetType, es2017destinations, output, 'es2017', false, '');
 
       const es5destinations = esmEs5Outputs.map(o => o.esmEs5Dir);
-      await generateLazyModules(config, compilerCtx, buildCtx, es5destinations, output, 'es5', false, '');
+      await generateLazyModules(config, compilerCtx, buildCtx, outputTargetType, es5destinations, output, 'es5', false, '');
 
       await copyPolyfills(config, compilerCtx, esmOutputs);
       await generateShortcuts(config, compilerCtx, outputTargets, output);
     }
   }
-}
+};
 
-async function copyPolyfills(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) {
+const copyPolyfills = async (config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) => {
   const destinations = outputTargets.filter(o => o.polyfills).map(o => o.esmDir);
   if (destinations.length === 0) {
     return;
@@ -45,9 +46,9 @@ async function copyPolyfills(config: d.Config, compilerCtx: d.CompilerCtx, outpu
         config.sys.path.join(dest, 'polyfills', f.relPath));
     }));
   }));
-}
+};
 
-function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[], rollupResult: RollupResult[]) {
+const generateShortcuts = (config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[], rollupResult: RollupResult[]) => {
   const indexFilename = rollupResult.find(r => r.isIndex).fileName;
 
   return Promise.all(
@@ -59,8 +60,8 @@ function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, outputT
 
         const relativePath = relativeImport(config, o.esmIndexFile, entryPointPath);
         const shortcutContent = `export * from '${relativePath}';`;
-        await compilerCtx.fs.writeFile(o.esmIndexFile, shortcutContent);
+        await compilerCtx.fs.writeFile(o.esmIndexFile, shortcutContent, { outputTargetType: o.type });
       }
     })
   );
-}
+};

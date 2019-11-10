@@ -26,6 +26,11 @@ export const config: Config = {
           dest: './@stencil/core/package.json',
           warn: true
         },
+        {
+          src: '../../../node_modules/typescript',
+          dest: './@stencil/core/typescript',
+          warn: true,
+        },
       ]
     }
   ],

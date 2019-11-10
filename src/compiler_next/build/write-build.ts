@@ -1,11 +1,9 @@
 import * as d from '../../declarations';
 import { catchError } from '@utils';
-// import { outputPrerender } from '../output-targets/output-prerender';
-// import { outputServiceWorkers } from '../output-targets/output-service-workers';
 // import { validateBuildFiles } from './validate-files';
 
 
-export const writeBuild = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const writeBuild = async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
 
   let totalFilesWrote = 0;
@@ -27,17 +25,6 @@ export const writeBuild = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
     // buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
-    if (!config.watch) {
-      compilerCtx.reset();
-      if (typeof global !== 'undefined' && global.gc) {
-        buildCtx.debug(`triggering forced gc`);
-        global.gc();
-        buildCtx.debug(`forced gc finished`);
-      }
-    }
-
-    // await outputPrerender(config, buildCtx);
-    // await outputServiceWorkers(config, buildCtx);
     // await validateBuildFiles(config, compilerCtx, buildCtx);
 
   } catch (e) {

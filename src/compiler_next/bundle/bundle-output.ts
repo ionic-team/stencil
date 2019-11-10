@@ -7,7 +7,7 @@ import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { extTransformsPlugin } from './ext-transforms-plugin';
 import { fileLoadPlugin } from './file-load-plugin';
 import { imagePlugin } from '../../compiler/rollup-plugins/image-plugin';
-import { lazyComponentPlugin } from '../output-targets/component-lazy/lazy-component-plugin';
+import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-plugin';
 import { loaderPlugin } from '../../compiler/rollup-plugins/loader';
 import { pluginHelper } from '../../compiler/rollup-plugins/plugin-helper';
 import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-plugins';

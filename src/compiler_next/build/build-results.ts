@@ -3,7 +3,7 @@ import { getBuildTimestamp } from '../../compiler/build/build-ctx';
 import { hasError, normalizeDiagnostics } from '@utils';
 
 
-export const generateBuildResults = (_config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const generateBuildResults = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const buildResults: d.CompilerBuildResults = {
     buildId: buildCtx.buildId,
     diagnostics: normalizeDiagnostics(compilerCtx, buildCtx.diagnostics),
@@ -17,8 +17,8 @@ export const generateBuildResults = (_config: d.Config, compilerCtx: d.CompilerC
     hasError: hasError(buildCtx.diagnostics),
     hasSuccessfulBuild: compilerCtx.hasSuccessfulBuild,
     isRebuild: buildCtx.isRebuild,
-    outputs: buildCtx.outputs.slice(),
-    timestamp: getBuildTimestamp()
+    outputs: compilerCtx.fs.getBuildOutputs(),
+    timestamp: getBuildTimestamp(),
   };
 
   compilerCtx.lastBuildResults = Object.assign({}, buildResults as any);

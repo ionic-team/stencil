@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { buildAbort, buildFinish } from './build-finish';
 import { catchError, isString } from '@utils';
 import { emptyOutputTargets } from '../../compiler/output-targets/empty-dir';
-import { generateOutputTargets } from '../output-targets/generate-output-targets';
+import { generateOutputTargets } from '../output-targets';
 import { runTsProgram } from '../transpile/run-program';
 import { writeBuild } from './write-build';
 import ts from 'typescript';
@@ -45,7 +45,7 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
     /// write outputs
     await buildCtx.stylesPromise;
-    await writeBuild(config, compilerCtx, buildCtx);
+    await writeBuild(compilerCtx, buildCtx);
     // await copyPromise;
 
   } catch (e) {

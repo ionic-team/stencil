@@ -1,16 +1,22 @@
 import * as d from '../../../declarations';
-import path from 'path';
-import { isOutputTargetDistLazy } from '../../../compiler/output-targets/output-utils';
+import { DIST_LAZY, isOutputTargetDistLazy } from '../../../compiler/output-targets/output-utils';
 import { getAbsolutePath } from '../utils';
+import path from 'path';
 
 
-export function validateLazy(config: d.Config, _diagnostics: d.Diagnostic[]) {
-  return config.outputTargets
+export const validateLazy = (config: d.Config, userOutputs: d.OutputTarget[]) => {
+  return userOutputs
     .filter(isOutputTargetDistLazy)
     .map(o => {
-      return {
-        ...o,
-        dir: getAbsolutePath(config, o.dir || path.join('dist', config.fsNamespace))
+      const dir = getAbsolutePath(config, o.dir || path.join('dist', config.fsNamespace));
+      const lazyOutput: d.OutputTargetDistLazy = {
+        type: DIST_LAZY,
+        esmDir: dir,
+        systemDir: config.buildEs5 ? dir : undefined,
+        systemLoaderFile: config.buildEs5 ? config.sys.path.join(dir, `${config.fsNamespace}.js`) : undefined,
+        polyfills: !!o.polyfills,
+        isBrowserBuild: true,
       };
+      return lazyOutput;
     });
-}
+};

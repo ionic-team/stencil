@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { generateBuildResults } from './build-results';
+import { IS_NODE_ENV } from '../sys/environment';
 import path from 'path';
 
 
@@ -32,7 +33,7 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
   buildCtx.debug(`${aborted ? 'aborted' : 'finished'} build, ${buildCtx.timestamp}`);
 
   // create the build results data
-  buildCtx.buildResults_next = generateBuildResults(config, compilerCtx, buildCtx);
+  buildCtx.buildResults_next = generateBuildResults(compilerCtx, buildCtx);
 
   // log any errors/warnings
   if (!buildCtx.hasFinished) {
@@ -84,6 +85,15 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
 
   // it's official, this build has finished
   buildCtx.hasFinished = true;
+
+  if (!config.watch) {
+    compilerCtx.reset();
+    if (IS_NODE_ENV && global.gc) {
+      buildCtx.debug(`triggering forced gc`);
+      global.gc();
+      buildCtx.debug(`forced gc finished`);
+    }
+  }
 
   return buildCtx.buildResults_next;
 };

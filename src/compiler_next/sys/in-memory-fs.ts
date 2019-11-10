@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { normalizePath } from '@utils';
+import { normalizePath, isString } from '@utils';
 import path from 'path';
 
 
@@ -298,11 +298,11 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   const writeFile = async (filePath: string, content: string, opts?: d.FsWriteOptions) => {
-    if (typeof filePath !== 'string') {
+    if (!isString(filePath)) {
       throw new Error(`writeFile, invalid filePath: ${filePath}`);
     }
 
-    if (typeof content !== 'string') {
+    if (!isString(content)) {
       throw new Error(`writeFile, invalid content: ${filePath}`);
     }
 
@@ -328,8 +328,18 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
 
     item.fileText = content;
 
-    if (opts != null && opts.useCache === false) {
-      item.useCache = false;
+    if (opts != null) {
+      if (isString(opts.outputTargetType)) {
+        if (isString(item.outputTargetType)) {
+          if (item.outputTargetType !== opts.outputTargetType) {
+            throw new Error(`writeFile, ${filePath} already has output target "${item.outputTargetType}" but is being set to "${opts.outputTargetType}"`);
+          }
+        }
+        item.outputTargetType = opts.outputTargetType;
+      }
+      if (opts.useCache === false) {
+        item.useCache = false;
+      }
     }
 
     if (opts != null && opts.inMemoryOnly === true) {
@@ -580,21 +590,42 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
       queueCopyFileToDest: null,
       queueDeleteFromDisk: null,
       queueWriteToDisk: null,
-      useCache: null
+      useCache: null,
+      outputTargetType: null,
     });
     return item;
   };
 
-  const clearCache = () => {
-    items.clear();
-  };
+  const clearCache = () => items.clear();
 
-  const keys = () => {
-    return Array.from(items.keys()).sort();
-  };
+  const keys = () => Array.from(items.keys()).sort();
 
-  const getMemoryStats = () => {
-    return `data length: ${items.size}`;
+  const getMemoryStats = () => `data length: ${items.size}`;
+
+  const getBuildOutputs = () => {
+    const outputs: d.BuildOutput[] = [];
+
+    items.forEach((item, filePath) => {
+      if (isString(item.outputTargetType)) {
+        let o = outputs.find(o => o.type === item.outputTargetType);
+        if (!o) {
+          o = {
+            type: item.outputTargetType,
+            files: [],
+          };
+          outputs.push(o);
+        }
+        o.files.push(filePath);
+      }
+    });
+
+    outputs.forEach(o => o.files.sort());
+
+    return outputs.sort((a, b) => {
+      if (a.type < b.type) return -1;
+      if (a.type > b.type) return 1;
+      return 0;
+    });
   };
 
   // only cache if it's less than 5MB-ish (using .length as a rough guess)
@@ -616,6 +647,7 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
     commit,
     copyFile,
     emptyDir,
+    getBuildOutputs,
     getItem,
     getMemoryStats,
     keys,

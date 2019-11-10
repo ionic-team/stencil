@@ -4,8 +4,8 @@ import { COPY, DIST_COLLECTION, DIST_GLOBAL_STYLES, DIST_LAZY, DIST_LAZY_LOADER,
 import { validateCopy } from '../../../compiler/config/validate-copy';
 import path from 'path';
 
-export const validateDist = (config: d.Config, _diagnostics: d.Diagnostic[]) => {
-  const distOutputTargets = config.outputTargets.filter(isOutputTargetDist);
+export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) => {
+  const distOutputTargets = userOutputs.filter(isOutputTargetDist);
   return distOutputTargets.reduce((outputs, o) => {
     const outputTarget = validateOutputTargetDist(config, o);
     if (outputTarget.collectionDir) {

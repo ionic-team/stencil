@@ -5,42 +5,40 @@ import { catchError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
 import { isOutputTargetDistCustomElementsBundle } from '../../../compiler/output-targets/output-utils';
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
-import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
-import { writeBuildOutputs } from '../../bundle/write-outputs';
+import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import path from 'path';
 
 
-export const customElementsBundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElementsBundle);
   if (outputTargets.length === 0) {
     return;
   }
 
-  const timespan = buildCtx.createTimeSpan(`generate custom element started`, true);
+  const timespan = buildCtx.createTimeSpan(`generate custom elements bundle started`, true);
 
   try {
     const bundleOpts: BundleOptions = {
-      id: 'customElements',
+      id: 'customElementsBundle',
       platform: 'client',
       conditionals: getBuildConditionals(config, buildCtx.components),
       customTransformers: getCustomTransformer(compilerCtx),
       inputs: getEntries(compilerCtx),
     };
 
-
     const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
     const rollupOutput = await build.generate({
       format: 'es',
       sourcemap: config.sourceMap,
     });
-    await writeBuildOutputs(compilerCtx, buildCtx, outputTargets, rollupOutput);
+    rollupOutput;
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
 
-  timespan.finish(`generate custom element finished`);
+  timespan.finish(`generate custom elements bundle finished`);
 };
 
 

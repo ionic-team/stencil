@@ -1,12 +1,12 @@
 import * as d from '../../../declarations';
+import { getAbsolutePath } from '../utils';
 import { isOutputTargetDistCollection } from '../../../compiler/output-targets/output-utils';
 import { normalizePath } from '@utils';
-import { getAbsolutePath } from '../utils';
 import path from 'path';
 
 
-export const validateCollection = (config: d.Config, _diagnostics: d.Diagnostic[]) => {
-  return config.outputTargets
+export const validateCollection = (config: d.Config, userOutputs: d.OutputTarget[]) => {
+  return userOutputs
     .filter(isOutputTargetDistCollection)
     .map(o => {
       return {

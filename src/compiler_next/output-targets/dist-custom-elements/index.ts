@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { catchError } from '@utils';
-import { DIST_CUSTOM_ELEMENTS, isOutputTargetDistCustomElements } from '../../../compiler/output-targets/output-utils';
+import { isOutputTargetDistCustomElements } from '../../../compiler/output-targets/output-utils';
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
@@ -8,7 +8,7 @@ import path from 'path';
 import ts from 'typescript';
 
 
-export const customElementOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, changedModuleFiles: d.Module[]) => {
+export const outputCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, changedModuleFiles: d.Module[]) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
   if (outputTargets.length === 0) {
     return;
@@ -17,23 +17,16 @@ export const customElementOutput = async (config: d.Config, compilerCtx: d.Compi
   const timespan = buildCtx.createTimeSpan(`generate custom elements started`, true);
   const printer = ts.createPrinter();
   try {
-    const buildOutput: d.BuildOutput = {
-      type: DIST_CUSTOM_ELEMENTS,
-      files: [],
-    };
-
     await Promise.all(changedModuleFiles.map(async mod => {
-      const transformed = ts.transform(mod.staticSourceFile, getCustomTransformer(compilerCtx)).transformed[0];
+      const transformResults = ts.transform(mod.staticSourceFile, getCustomTransformer(compilerCtx));
+      const transformed = transformResults.transformed[0];
       const code = printer.printFile(transformed);
 
-      await Promise.all(outputTargets.map(async outputTarget => {
-        const filePath = path.join(outputTarget.dir, mod.jsFilePath);
-        await compilerCtx.fs.writeFile(filePath, code);
-        buildOutput.files.push(filePath);
+      await Promise.all(outputTargets.map(async o => {
+        const filePath = path.join(o.dir, mod.jsFilePath);
+        await compilerCtx.fs.writeFile(filePath, code, { outputTargetType: o.type });
       }));
     }));
-
-    buildCtx.outputs.push(buildOutput);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

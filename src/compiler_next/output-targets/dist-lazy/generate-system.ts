@@ -1,11 +1,17 @@
 import * as d from '../../../declarations';
 import { generateRollupOutput } from '../../../compiler/app-core/bundle-app-core';
-import { generateLazyModules } from '../component-lazy/generate-lazy-module';
+import { generateLazyModules } from '../dist-lazy/generate-lazy-module';
 import { getAppBrowserCorePolyfills } from '../../../compiler/app-core/app-polyfills';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
 
-export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
+export const generateSystem = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  rollupBuild: RollupBuild,
+  outputTargets: d.OutputTargetDistLazy[]
+) => {
   const systemOutputs = outputTargets.filter(o => !!o.systemDir);
 
   if (systemOutputs.length > 0) {
@@ -18,11 +24,11 @@ export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCt
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
       const destinations = systemOutputs.map(o => o.esmDir);
-      await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es5', true, '.system');
+      await generateLazyModules(config, compilerCtx, buildCtx, outputTargets[0].type, destinations, results, 'es5', true, '.system');
       await generateSystemLoaders(config, compilerCtx, results, systemOutputs);
     }
   }
-}
+};
 
 function generateSystemLoaders(config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], systemOutputs: d.OutputTargetDistLazy[]) {
   const loaderFilename = rollupResult.find(r => r.isBrowserLoader).fileName;
@@ -37,7 +43,7 @@ async function writeSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, l
     const entryPointPath = config.sys.path.join(outputTarget.systemDir, loaderFilename);
     const relativePath = relativeImport(config, outputTarget.systemLoaderFile, entryPointPath);
     const loaderContent = await getSystemLoader(config, compilerCtx, relativePath, outputTarget.polyfills);
-    await compilerCtx.fs.writeFile(outputTarget.systemLoaderFile, loaderContent);
+    await compilerCtx.fs.writeFile(outputTarget.systemLoaderFile, loaderContent, { outputTargetType: outputTarget.type });
   }
 }
 

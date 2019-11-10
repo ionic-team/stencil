@@ -11,7 +11,7 @@ export class StencilRepl {
 
   @Prop() appName: string = 'Stencil Components';
   @Prop() stencilCompilerPath = `http://cdn.jsdelivr.net/npm/@stencil/core/compiler/stencil-browser.js`;
-  @Prop() selectedTarget = 'dist-custom-element';
+  @Prop() selectedTarget = 'dist-custom-elements';
   @Prop() inputs: InputFile[] = [];
   @State() outputs: OutputFile[] = [];
 
@@ -52,13 +52,13 @@ export class StencilRepl {
       })
     }
 
-
     await Promise.all(this.inputs.map(async input => {
       await this.compiler.sys.writeFile(input.name, input.code);
     }));
 
     const diagnostics = await this.compiler.loadConfig({
       devMode: true,
+      watch: true,
       outputTargets: [
         { type: this.selectedTarget as any }
       ]

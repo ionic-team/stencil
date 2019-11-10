@@ -88,4 +88,10 @@ const knownUrlSkips = [
   '/@stencil/core/internal.mjs',
   '/@stencil/core/internal.js',
   '/@stencil/core/internal.json',
+  '/@stencil/core.js',
+  '/@stencil/core.mjs',
+  '/@stencil/core.css',
+  '/@stencil/core/index.js',
+  '/@stencil/core/index.mjs',
+  '/@stencil/core/index.css',
 ];

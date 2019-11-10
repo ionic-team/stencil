@@ -3,7 +3,10 @@ import { DEFAULT_STYLE_MODE } from '@utils';
 
 
 export async function writeLazyModule(
-  config: d.Config, compilerCtx: d.CompilerCtx, destinations: string[],
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  outputTargetType: string,
+  destinations: string[],
   entryModule: d.EntryModule,
   shouldHash: boolean,
   code: string,
@@ -17,7 +20,7 @@ export async function writeLazyModule(
 
   await Promise.all(
     destinations.map(dst =>
-      compilerCtx.fs.writeFile(config.sys.path.join(dst, fileName), code)
+      compilerCtx.fs.writeFile(config.sys.path.join(dst, fileName), code, { outputTargetType })
     )
   );
 

@@ -4,8 +4,8 @@ import { isBoolean } from '@utils';
 import { isOutputTargetDistCustomElements } from '../../../compiler/output-targets/output-utils';
 
 
-export function validateCustomElement(config: d.Config, _diagnostics: d.Diagnostic[]) {
-  return config.outputTargets
+export const validateCustomElement = (config: d.Config, userOutputs: d.OutputTarget[]) => {
+  return userOutputs
     .filter(isOutputTargetDistCustomElements)
     .map(o => {
       const outputTarget = {
@@ -17,4 +17,4 @@ export function validateCustomElement(config: d.Config, _diagnostics: d.Diagnost
       }
       return outputTarget;
     });
-}
+};

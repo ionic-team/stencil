@@ -1,5 +1,4 @@
 import * as d from '../../../declarations';
-import { dependencies, getRemoteDependencyUrl } from '../dependencies';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { IS_WEB_WORKER_ENV } from '../environment';
 import path from 'path';
@@ -135,14 +134,6 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
 
 
 const patchTsSystemUtils = (config: d.Config, tsSys: ts.System) => {
-  if (!tsSys.getExecutingFilePath) {
-    const tsDep = dependencies.find(dep => dep.name === 'typescript');
-    const tsUrl = getRemoteDependencyUrl(tsDep);
-    tsSys.getExecutingFilePath = () => {
-      return tsUrl;
-    };
-  }
-
   if (!tsSys.getCurrentDirectory) {
     tsSys.getCurrentDirectory = () => {
       return '/';
