@@ -318,6 +318,7 @@ export namespace JSXBase {
     marginWidth?: number;
     marginwidth?: string | number;
     name?: string;
+    referrerPolicy?: ReferrerPolicy;
     sandbox?: string;
     scrolling?: string;
     seamless?: boolean;
