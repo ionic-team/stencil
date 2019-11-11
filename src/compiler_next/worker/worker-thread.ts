@@ -108,16 +108,13 @@ export const createWorkerMsgHandler = (events: d.BuildEvents): d.WorkerMsgHandle
 
 export const initWorkerThread = (glbl: any) => {
   if (IS_WEB_WORKER_ENV) {
-    if (location.search.includes('stencil-worker')) {
-      const webWorkerEvents = buildEvents();
-      const webWorkerMsgHandler = createWorkerMsgHandler(webWorkerEvents);
-      initWebWorkerThread(glbl, webWorkerMsgHandler, webWorkerEvents);
-    }
-  } else if (IS_NODE_ENV) {
-    if (glbl.process.argv.includes('stencil-worker')) {
-      const nodeWorkerEvents = buildEvents();
-      const nodeWorkerMsgHandler = createWorkerMsgHandler(nodeWorkerEvents);
-      initNodeWorkerThread(glbl.process, nodeWorkerMsgHandler, nodeWorkerEvents);
-    }
+    const webWorkerEvents = buildEvents();
+    const webWorkerMsgHandler = createWorkerMsgHandler(webWorkerEvents);
+    initWebWorkerThread(glbl, webWorkerMsgHandler, webWorkerEvents);
+
+  } else if (IS_NODE_ENV && glbl.process.argv.includes('stencil-worker')) {
+    const nodeWorkerEvents = buildEvents();
+    const nodeWorkerMsgHandler = createWorkerMsgHandler(nodeWorkerEvents);
+    initNodeWorkerThread(glbl.process, nodeWorkerMsgHandler, nodeWorkerEvents);
   }
 };

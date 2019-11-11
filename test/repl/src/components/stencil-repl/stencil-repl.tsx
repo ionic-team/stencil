@@ -49,7 +49,7 @@ export class StencilRepl {
             ]
           }
         `
-      })
+      });
     }
 
     await Promise.all(this.inputs.map(async input => {

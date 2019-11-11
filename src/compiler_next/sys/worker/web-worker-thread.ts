@@ -3,6 +3,9 @@ import { isNumber, isString } from '@utils';
 
 
 export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHandler, events: BuildEvents) => {
+  let isQueued = false;
+
+  const tick = Promise.resolve();
 
   const error = (stencilMsgId: number, err: any) => {
     const errMsgBackToMain: MsgFromWorker = {
@@ -22,9 +25,15 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
     selfWorker.postMessage(errMsgBackToMain);
   };
 
-  selfWorker.onmessage = async (ev) => {
-    // message from the main thread
-    const msgToWorker: MsgToWorker = ev.data;
+  const msgsFromWorkerQueue: MsgFromWorker[] = [];
+
+  const drainMsgQueueFromWorker = () => {
+    isQueued = false;
+    selfWorker.postMessage(msgsFromWorkerQueue);
+    msgsFromWorkerQueue.length = 0;
+  };
+
+  const onMessageToWorker = async (msgToWorker: MsgToWorker) => {
     if (msgToWorker && isNumber(msgToWorker.stencilId)) {
       try {
         // run the handler to get the data
@@ -34,13 +43,25 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
           rtnError: null,
         };
 
-        // send response data from the worker to the main thread
-        selfWorker.postMessage(msgFromWorker);
+        msgsFromWorkerQueue.push(msgFromWorker);
+
+        if (!isQueued) {
+          isQueued = true;
+          tick.then(drainMsgQueueFromWorker);
+        }
 
       } catch (e) {
         // error occurred while running the task
         error(msgToWorker.stencilId, e);
       }
+    }
+  };
+
+  selfWorker.onmessage = (ev) => {
+    // message from the main thread
+    const msgsToWorker: MsgToWorker[] = ev.data;
+    if (Array.isArray(msgsToWorker)) {
+      msgsToWorker.forEach(onMessageToWorker);
     }
   };
 
@@ -56,6 +77,12 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
       rtnValue: null,
       rtnError: null,
     };
-    selfWorker.postMessage(eventFromWorker);
+
+    msgsFromWorkerQueue.push(eventFromWorker);
+
+    if (!isQueued) {
+      isQueued = true;
+      tick.then(drainMsgQueueFromWorker);
+    }
   });
 };

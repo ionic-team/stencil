@@ -345,7 +345,9 @@ export const createStencilSys = () => {
     writeFile,
     writeFileSync,
     generateContentHash,
-    createWorker: createWebWorkerMainController,
+    createWorker: (maxConcurrentWorkers, events) => (
+      createWebWorkerMainController(location.href, 'worker', maxConcurrentWorkers, events)
+    ),
     copy,
   };
 
