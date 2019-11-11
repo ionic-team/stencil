@@ -10,7 +10,9 @@ export const NAMESPACE = '${namespace}';
   return {
     resolveId(id: string) {
       if (id === '@stencil/core/build-conditionals') {
-        return id;
+        return {
+          id,
+        };
       }
       return null;
     },

@@ -4,21 +4,17 @@ import { generateAppTypes } from './generate-app-types';
 import { isDtsFile } from '@utils';
 
 
-export async function generateTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDist) {
+export async function generateTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDistTypes) {
   if (!buildCtx.hasError) {
     await generateTypesOutput(config, compilerCtx, buildCtx, pkgData, outputTarget);
 
     if (typeof pkgData.types === 'string') {
-      const pkgFile = config.sys.path.join(config.rootDir, pkgData.types);
-      const fileExists = await compilerCtx.fs.access(pkgFile);
-      if (fileExists) {
-        await copyStencilCoreDts(config, compilerCtx);
-      }
+      await copyStencilCoreDts(config, compilerCtx);
     }
   }
 }
 
-async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDist) {
+async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDistTypes) {
   if (typeof pkgData.types !== 'string') {
     return;
   }

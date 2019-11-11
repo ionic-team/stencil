@@ -84,4 +84,45 @@ describe('prop', () => {
     expect(root.num).toBe(88);
   });
 
+  it('only update on even numbers', async () => {
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      @Prop() num = 1;
+
+      componentShouldUpdate(newValue: number, _: number, propName: string) {
+        if (propName === 'num') {
+          return newValue % 2 === 0;
+        }
+        return true;
+      }
+      render() {
+        return `${this.num}`;
+      }
+    }
+
+    const { root, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml(`
+      <cmp-a>1</cmp-a>
+    `);
+
+    root.num++;
+    await waitForChanges();
+    expect(root).toEqualHtml(`
+      <cmp-a>2</cmp-a>
+    `);
+    root.num++;
+    await waitForChanges();
+    expect(root).toEqualHtml(`
+      <cmp-a>2</cmp-a>
+    `);
+    root.num++;
+    await waitForChanges();
+    expect(root).toEqualHtml(`
+      <cmp-a>4</cmp-a>
+    `);
+  });
 });

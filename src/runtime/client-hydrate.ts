@@ -2,18 +2,17 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from './runtime-constants';
 import { doc, plt } from '@platform';
-import { toLowerCase } from '@utils';
+import { newVNode } from './vdom/h';
+import { createTime } from './profile';
 
 
 export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string, hostId: string, hostRef: d.HostRef) => {
+  const endHydrate = createTime('hydrateClient', tagName);
   const shadowRoot = hostElm.shadowRoot;
   const childRenderNodes: RenderNodeData[] = [];
   const slotNodes: RenderNodeData[] = [];
   const shadowRootNodes: d.RenderNode[] = (BUILD.shadowDom && shadowRoot ? [] : null);
-  const vnode: d.VNode = hostRef.$vnode$ = {
-    $flags$: 0,
-    $tag$: tagName
-  };
+  const vnode: d.VNode = hostRef.$vnode$ = newVNode(tagName, null);
 
   if (!plt.$orgLocNodes$) {
     initializeDocumentHydrate(doc.body, plt.$orgLocNodes$ = new Map());
@@ -29,7 +28,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
     const orgLocationNode = plt.$orgLocNodes$.get(orgLocationId);
     const node = c.$elm$ as d.RenderNode;
 
-    if (orgLocationNode && c.$hostId$ === '0') {
+    if (orgLocationNode && (orgLocationNode['s-sd'] || c.$hostId$ === '0')) {
       orgLocationNode.parentNode.insertBefore(
         node,
         orgLocationNode.nextSibling
@@ -55,6 +54,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
       }
     });
   }
+  endHydrate();
 };
 
 const clientHydrate = (
@@ -69,6 +69,7 @@ const clientHydrate = (
   let childNodeType: string;
   let childIdSplt: string[];
   let childVNode: RenderNodeData;
+  let i: number;
 
   if (node.nodeType === NODE_TYPE.ElementNode) {
 
@@ -85,8 +86,13 @@ const clientHydrate = (
           $nodeId$: childIdSplt[1],
           $depth$: childIdSplt[2],
           $index$: childIdSplt[3],
-          $tag$: toLowerCase(node.tagName),
-          $elm$: node
+          $tag$: node.tagName.toLowerCase(),
+          $elm$: node,
+          $attrs$: null,
+          $children$: null,
+          $key$: null,
+          $name$: null,
+          $text$: null
         };
 
         childRenderNodes.push(childVNode);
@@ -111,8 +117,7 @@ const clientHydrate = (
     }
 
     // recursively drill down, end to start so we can remove nodes
-    let i = node.childNodes.length - 1;
-    for (; i >= 0; i--) {
+    for (i = node.childNodes.length - 1; i >= 0; i--) {
       clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.childNodes[i] as any, hostId);
     }
 
@@ -137,7 +142,13 @@ const clientHydrate = (
         $nodeId$: childIdSplt[2],
         $depth$: childIdSplt[3],
         $index$: childIdSplt[4],
-        $elm$: node
+        $elm$: node,
+        $attrs$: null,
+        $children$: null,
+        $key$: null,
+        $name$: null,
+        $tag$: null,
+        $text$: null
       };
 
       if (childNodeType === TEXT_NODE_ID) {
@@ -215,32 +226,35 @@ const clientHydrate = (
       }
     }
   } else if (parentVNode && parentVNode.$tag$ === 'style') {
-    parentVNode.$children$ = [{
-      $index$: '0',
-      $text$: node.textContent,
-      $elm$: node
-    } as any];
+    const vnode = newVNode(null, node.textContent) as any;
+    vnode.$elm$ = node;
+    vnode.$index$ = '0';
+    parentVNode.$children$ = [vnode];
   }
 };
 
 
-export const initializeDocumentHydrate = (node: d.HostElement, rootOriginalLocations: Map<string, any>) => {
+export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: Map<string, any>) => {
   if (node.nodeType === NODE_TYPE.ElementNode) {
     let i = 0;
     for (; i < node.childNodes.length; i++) {
-      initializeDocumentHydrate(node.childNodes[i] as any, rootOriginalLocations);
+      initializeDocumentHydrate(node.childNodes[i] as any, orgLocNodes);
     }
     if (node.shadowRoot) {
       for (i = 0; i < node.shadowRoot.childNodes.length; i++) {
-        initializeDocumentHydrate(node.shadowRoot.childNodes[i] as any, rootOriginalLocations);
+        initializeDocumentHydrate(node.shadowRoot.childNodes[i] as any, orgLocNodes);
       }
     }
 
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
     const childIdSplt = node.nodeValue.split('.');
     if (childIdSplt[0] === ORG_LOCATION_ID) {
-      rootOriginalLocations.set(childIdSplt[1] + '.' + childIdSplt[2], node);
+      orgLocNodes.set(childIdSplt[1] + '.' + childIdSplt[2], node);
       node.nodeValue = '';
+
+      // useful to know if the original location is
+      // the root light-dom of a shadow dom component
+      node['s-sd'] = (childIdSplt[3] === '');
     }
   }
 };

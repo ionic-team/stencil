@@ -2,66 +2,72 @@ import * as d from '../../../declarations';
 import ts from 'typescript';
 
 
-export function gatherVdomMeta(m: d.Module | d.ComponentCompilerMeta, args: ts.NodeArray<ts.Expression>) {
+export const gatherVdomMeta = (m: d.Module | d.ComponentCompilerMeta, args: ts.NodeArray<ts.Expression>) => {
   m.hasVdomRender = true;
 
-  if (args[0].kind === ts.SyntaxKind.Identifier) {
+  // Parse vdom tag
+  const hTag = args[0];
+  if (!ts.isStringLiteral(hTag) && (!ts.isIdentifier(hTag) || hTag.text !== 'Host')) {
     m.hasVdomFunctional = true;
   }
 
+  // Parse attributes
   if (args.length > 1) {
-    if (ts.isObjectLiteralExpression(args[1])) {
-      const props: ts.ObjectLiteralElementLike[] = ((args[1] as ts.ObjectLiteralExpression).properties as any);
+    const objectLiteral = args[1];
+    if (ts.isCallExpression(objectLiteral) || ts.isIdentifier(objectLiteral)) {
+      m.hasVdomAttribute = true;
+      m.hasVdomKey = true;
+      m.hasVdomClass = true;
+      m.hasVdomListener = true;
+      m.hasVdomRef = true;
+      m.hasVdomXlink = true;
+      m.hasVdomStyle = true;
 
-      const propsWithText = props
-        .filter(p => p.name && (p.name as any).text && (p.name as any).text.length > 0)
-        .map(p => (p.name as any).text as string);
-
-      if (propsWithText.length > 0) {
-        const attrs = new Set(Array.from(propsWithText));
-
-        if (attrs.has('key')) {
+    } else if (ts.isObjectLiteralExpression(objectLiteral)) {
+      objectLiteral.properties.forEach(prop => {
+        m.hasVdomAttribute = true;
+        if (ts.isSpreadAssignment(prop) || ts.isComputedPropertyName(prop.name)) {
           m.hasVdomKey = true;
-          attrs.delete('key');
-        }
-
-        if (attrs.has('ref')) {
+          m.hasVdomClass = true;
+          m.hasVdomListener = true;
+          m.hasVdomXlink = true;
           m.hasVdomRef = true;
-          attrs.delete('ref');
-        }
+          m.hasVdomStyle = true;
 
-        attrs.forEach(attr => {
-          if (attr.startsWith('on') && attr.length > 2 && /[A-Z]/.test(attr.charAt(2))) {
-            m.hasVdomListener = true;
-            attrs.delete(attr);
+        } else if (prop.name && (prop.name as any).text && (prop.name as any).text.length > 0) {
+          const attrName = (prop.name as any).text;
+          if (attrName === 'key') {
+            m.hasVdomKey = true;
           }
-        });
-
-        if (attrs.size > 0) {
-          m.hasVdomAttribute = true;
-
-          if (attrs.has('class') || attrs.has('className')) {
+          if (attrName === 'ref') {
+            m.hasVdomRef = true;
+          }
+          if (attrName === 'class' || attrName === 'className') {
             m.hasVdomClass = true;
           }
-          if (attrs.has('style')) {
+          if (attrName === 'style') {
             m.hasVdomStyle = true;
           }
-
-          attrs.forEach(attrName => {
-            m.htmlAttrNames.push(attrName);
-          });
+          if (/^on(-|[A-Z])/.test(attrName)) {
+            m.hasVdomListener = true;
+          }
+          if (attrName.startsWith('xlink')) {
+            m.hasVdomXlink = true;
+          }
+          m.htmlAttrNames.push(attrName);
         }
-      }
+      });
     }
+  }
 
-    if (!m.hasVdomText) {
-      for (let i = 2; i < args.length; i++) {
-        if (ts.isStringLiteral(args[i])) {
-          m.hasVdomText = true;
-          break;
-        }
+  // Parse children
+  if (!m.hasVdomText) {
+    for (let i = 2; i < args.length; i++) {
+      const arg = args[i];
+      if (!ts.isCallExpression(arg) || !ts.isIdentifier(arg.expression) || (arg.expression.text !== 'h')) {
+        m.hasVdomText = true;
+        break;
       }
     }
   }
-}
-
+};

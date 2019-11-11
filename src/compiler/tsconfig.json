@@ -31,8 +31,8 @@
       "@platform": [
         "../client/index.ts"
       ],
-      "@sys": [
-        "../sys/node/index.ts"
+      "@runtime": [
+        "../runtime/index.ts"
       ],
       "@utils": [
         "../utils/index.ts"
@@ -44,9 +44,15 @@
   ],
   "files": [
     "./index.ts",
-    "../utils/index.ts",
+    "../client/index.ts",
+    "../client/polyfills/css-shim/index.ts",
+    "./browser/index.ts",
+    "./browser/build-conditionals-client.ts",
+    "../runtime/index.ts",
+    "../sys/browser/index.ts",
     "../../types/rollup-plugin-commonjs.d.ts",
     "../../types/rollup-plugin-node-globals.d.ts",
+    "../../types/rollup-plugin-json.d.ts",
     "../../types/rollup-plugin-node-resolve.d.ts"
   ]
 }

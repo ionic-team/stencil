@@ -1,40 +1,37 @@
 import * as d from '../../declarations';
 import { flatOne, unique } from '@utils';
 
-export function resolveComponentDependencies(compilerCtx: d.CompilerCtx, cmps: d.ComponentCompilerMeta[]) {
-  computeDependencies(compilerCtx, cmps);
-  computeDependants(cmps);
+export function resolveComponentDependencies(cmps: d.ComponentCompilerMeta[]) {
+  computeDependencies(cmps);
+  computeDependents(cmps);
 }
 
-function computeDependencies(compilerCtx: d.CompilerCtx, cmps: d.ComponentCompilerMeta[]) {
-  const visited = new Set();
+function computeDependencies(cmps: d.ComponentCompilerMeta[]) {
+  const visited = new Set<d.ComponentCompilerMeta>();
   cmps.forEach(cmp => {
-    resolveTransitiveDependencies(compilerCtx, cmp, cmps, visited);
+    resolveTransitiveDependencies(cmp, cmps, visited);
     cmp.dependencies = unique(cmp.dependencies).sort();
   });
 }
 
-function computeDependants(cmps: d.ComponentCompilerMeta[]) {
+function computeDependents(cmps: d.ComponentCompilerMeta[]) {
   cmps.forEach(cmp => {
-    resolveTransitiveDependants(cmp, cmps);
+    resolveTransitiveDependents(cmp, cmps);
   });
 }
 
-function resolveTransitiveDependencies(compilerCtx: d.CompilerCtx, cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[], visited: Set<d.ComponentCompilerMeta>): string[] {
+function resolveTransitiveDependencies(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[], visited: Set<d.ComponentCompilerMeta>): string[] {
   if (visited.has(cmp)) {
     return cmp.dependencies;
   }
   visited.add(cmp);
 
-  const moduleFile = compilerCtx.moduleMap.get(cmp.sourceFilePath);
-
-  const dependencies = moduleFile.potentialCmpRefs.filter(tagName => cmps.some(c => c.tagName === tagName));
+  const dependencies = cmp.potentialCmpRefs.filter(tagName => cmps.some(c => c.tagName === tagName));
   cmp.dependencies = cmp.directDependencies = dependencies;
-
   const transitiveDeps = flatOne(
     dependencies
       .map(tagName => cmps.find(c => c.tagName === tagName))
-      .map(c => resolveTransitiveDependencies(compilerCtx, c, cmps, visited))
+      .map(c => resolveTransitiveDependencies(c, cmps, visited))
   );
   return cmp.dependencies = [
     ...dependencies,
@@ -42,13 +39,13 @@ function resolveTransitiveDependencies(compilerCtx: d.CompilerCtx, cmp: d.Compon
   ];
 }
 
-function resolveTransitiveDependants(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) {
-  cmp.dependants = cmps
+function resolveTransitiveDependents(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) {
+  cmp.dependents = cmps
     .filter(c => c.dependencies.includes(cmp.tagName))
     .map(c => c.tagName)
     .sort();
 
-  cmp.directDependants = cmps
+  cmp.directDependents = cmps
     .filter(c => c.directDependencies.includes(cmp.tagName))
     .map(c => c.tagName)
     .sort();

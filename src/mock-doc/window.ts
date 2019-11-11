@@ -1,8 +1,8 @@
 import { createConsole } from './console';
 import { MockCustomElementRegistry, resetCustomElementRegistry } from './custom-element-registry';
-import { MockCustomEvent, MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
+import { MockCustomEvent, MockEvent, MockKeyboardEvent, MockMouseEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { MockDocument, resetDocument } from './document';
-import { MockElement } from './node';
+import { MockElement, MockHTMLElement, MockNode, MockNodeList } from './node';
 import { MockHistory } from './history';
 import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
@@ -12,16 +12,33 @@ import { URL } from 'url';
 
 
 const historyMap = new WeakMap<MockWindow, MockHistory>();
+const elementCstrMap = new WeakMap<MockWindow, any>();
 const htmlElementCstrMap = new WeakMap<MockWindow, any>();
+const nodeCstrMap = new WeakMap<MockWindow, any>();
+const nodeListCstrMap = new WeakMap<MockWindow, any>();
 const localStorageMap = new WeakMap<MockWindow, MockStorage>();
 const locMap = new WeakMap<MockWindow, MockLocation>();
 const navMap = new WeakMap<MockWindow, MockNavigator>();
 const sessionStorageMap = new WeakMap<MockWindow, MockStorage>();
 const eventClassMap = new WeakMap<MockWindow, any>();
 const customEventClassMap = new WeakMap<MockWindow, any>();
-
+const keyboardEventClassMap = new WeakMap<MockWindow, any>();
+const mouseEventClassMap = new WeakMap<MockWindow, any>();
+const nativeClearInterval = clearInterval;
+const nativeClearTimeout = clearTimeout;
+const nativeSetInterval = setInterval;
+const nativeSetTimeout = setTimeout;
+const nativeURL = URL;
 
 export class MockWindow {
+  __clearInterval: typeof nativeClearInterval;
+  __clearTimeout: typeof nativeClearTimeout;
+  __setInterval: typeof nativeSetInterval;
+  __setTimeout: typeof nativeSetTimeout;
+  __maxTimeout: number;
+  __allowInterval: boolean;
+  URL: typeof URL;
+
   console: Console;
   customElements: CustomElementRegistry;
   document: Document;
@@ -49,6 +66,7 @@ export class MockWindow {
     this.performance = new MockPerformance();
     this.customElements = new MockCustomElementRegistry(this as any);
     this.console = createConsole();
+    resetWindowDefaults(this);
     resetWindowDimensions(this);
   }
 
@@ -101,8 +119,34 @@ export class MockWindow {
     customEventClassMap.set(this, custEvClass);
   }
 
+  get KeyboardEvent() {
+    const kbEvClass = keyboardEventClassMap.get(this);
+    if (kbEvClass != null) {
+      return kbEvClass;
+    }
+    return MockKeyboardEvent;
+  }
+  set KeyboardEvent(kbEvClass: any) {
+    keyboardEventClassMap.set(this, kbEvClass);
+  }
+
+  get MouseEvent() {
+    const mouseEvClass = mouseEventClassMap.get(this);
+    if (mouseEvClass != null) {
+      return mouseEvClass;
+    }
+    return MockMouseEvent;
+  }
+  set MouseEvent(mouseEvClass: any) {
+    mouseEventClassMap.set(this, mouseEvClass);
+  }
+
   dispatchEvent(ev: MockEvent) {
     return dispatchEvent(this, ev);
+  }
+
+  get JSON() {
+    return JSON;
   }
 
   get Event() {
@@ -114,10 +158,6 @@ export class MockWindow {
   }
   set Event(ev: any) {
     eventClassMap.set(this, ev);
-  }
-
-  fetch() {
-    return Promise.reject(`fetch() unimplemented`);
   }
 
   getComputedStyle(_: any) {
@@ -159,11 +199,54 @@ export class MockWindow {
     historyMap.set(this, hsty);
   }
 
+  get Element() {
+    let ElementCstr = elementCstrMap.get(this);
+    if (ElementCstr == null) {
+      const ownerDocument = this.document;
+      ElementCstr = class extends MockElement {
+        constructor() {
+          super(ownerDocument, '');
+          throw (new Error('Illegal constructor: cannot construct Element'));
+        }
+      };
+      elementCstrMap.set(this, ElementCstr);
+    }
+    return ElementCstr;
+  }
+
+  get Node() {
+    let NodeCstr = nodeCstrMap.get(this);
+    if (NodeCstr == null) {
+      const ownerDocument = this.document;
+      NodeCstr = class extends MockNode {
+        constructor() {
+          super(ownerDocument, 0, 'test', '');
+          throw (new Error('Illegal constructor: cannot constructor'));
+        }
+      };
+      return NodeCstr;
+    }
+  }
+
+  get NodeList() {
+    let NodeListCstr = nodeListCstrMap.get(this);
+    if (NodeListCstr == null) {
+      const ownerDocument = this.document;
+      NodeListCstr = class extends MockNodeList {
+        constructor() {
+          super(ownerDocument, [], 0);
+          throw (new Error('Illegal constructor: cannot constructor'))
+        }
+      };
+      return NodeListCstr;
+    }
+  }
+
   get HTMLElement() {
     let HtmlElementCstr = htmlElementCstrMap.get(this);
     if (HtmlElementCstr == null) {
       const ownerDocument = this.document;
-      HtmlElementCstr = class extends MockElement {
+      HtmlElementCstr = class extends MockHTMLElement {
         constructor() {
           super(ownerDocument, '');
 
@@ -330,18 +413,103 @@ export class MockWindow {
     return this;
   }
 
-  URL = URL;
-
-  // used so the native setTimeout can actually be used
-  // but allows us to monkey patch the window.setTimeout
-  __clearInterval = clearInterval;
-  __clearTimeout = clearTimeout;
-  __setInterval = setInterval;
-  __setTimeout = setTimeout;
-  __maxTimeout = 30000;
-  __allowInterval = true;
+  onanimationstart() { /**/ }
+  onanimationend() { /**/ }
+  onanimationiteration() { /**/ }
+  onabort() {/**/}
+  onauxclick() {/**/}
+  onbeforecopy() {/**/}
+  onbeforecut() {/**/}
+  onbeforepaste() {/**/}
+  onblur() {/**/}
+  oncancel() {/**/}
+  oncanplay() {/**/}
+  oncanplaythrough() {/**/}
+  onchange() {/**/}
+  onclick() {/**/}
+  onclose() {/**/}
+  oncontextmenu() {/**/}
+  oncopy() {/**/}
+  oncuechange() {/**/}
+  oncut() {/**/}
+  ondblclick() {/**/}
+  ondrag() {/**/}
+  ondragend() {/**/}
+  ondragenter() {/**/}
+  ondragleave() {/**/}
+  ondragover() {/**/}
+  ondragstart() {/**/}
+  ondrop() {/**/}
+  ondurationchange() {/**/}
+  onemptied() {/**/}
+  onended() {/**/}
+  onerror() {/**/}
+  onfocus() {/**/}
+  onformdata() {/**/}
+  onfullscreenchange() {/**/}
+  onfullscreenerror() {/**/}
+  ongotpointercapture() {/**/}
+  oninput() {/**/}
+  oninvalid() {/**/}
+  onkeydown() {/**/}
+  onkeypress() {/**/}
+  onkeyup() {/**/}
+  onload() {/**/}
+  onloadeddata() {/**/}
+  onloadedmetadata() {/**/}
+  onloadstart() {/**/}
+  onlostpointercapture() {/**/}
+  onmousedown() {/**/}
+  onmouseenter() {/**/}
+  onmouseleave() {/**/}
+  onmousemove() {/**/}
+  onmouseout() {/**/}
+  onmouseover() {/**/}
+  onmouseup() {/**/}
+  onmousewheel() {/**/}
+  onpaste() {/**/}
+  onpause() {/**/}
+  onplay() {/**/}
+  onplaying() {/**/}
+  onpointercancel() {/**/}
+  onpointerdown() {/**/}
+  onpointerenter() {/**/}
+  onpointerleave() {/**/}
+  onpointermove() {/**/}
+  onpointerout() {/**/}
+  onpointerover() {/**/}
+  onpointerup() {/**/}
+  onprogress() {/**/}
+  onratechange() {/**/}
+  onreset() {/**/}
+  onresize() {/**/}
+  onscroll() {/**/}
+  onsearch() {/**/}
+  onseeked() {/**/}
+  onseeking() {/**/}
+  onselect() {/**/}
+  onselectstart() {/**/}
+  onstalled() {/**/}
+  onsubmit() {/**/}
+  onsuspend() {/**/}
+  ontimeupdate() {/**/}
+  ontoggle() {/**/}
+  onvolumechange() {/**/}
+  onwaiting() {/**/}
+  onwebkitfullscreenchange() {/**/}
+  onwebkitfullscreenerror() {/**/}
+  onwheel() {/**/}
 }
 
+function resetWindowDefaults(win: any) {
+  win.__clearInterval = nativeClearInterval;
+  win.__clearTimeout = nativeClearTimeout;
+  win.__setInterval = nativeSetInterval;
+  win.__setTimeout = nativeSetTimeout;
+  win.__maxTimeout = 30000;
+  win.__allowInterval = true;
+  win.URL = nativeURL;
+}
 
 export function createWindow(html: string | boolean = null): Window {
   return new MockWindow(html) as any;
@@ -395,19 +563,23 @@ export function resetWindow(win: Window) {
         delete (win as any)[key];
       }
     }
-
+    resetWindowDefaults(win);
     resetWindowDimensions(win);
 
     resetEventListeners(win);
 
     historyMap.delete(win as any);
     htmlElementCstrMap.delete(win as any);
+    elementCstrMap.delete(win as any);
+    nodeListCstrMap.delete(win as any);
     localStorageMap.delete(win as any);
     locMap.delete(win as any);
     navMap.delete(win as any);
     sessionStorageMap.delete(win as any);
     eventClassMap.delete(win as any);
     customEventClassMap.delete(win as any);
+    keyboardEventClassMap.delete(win as any);
+    mouseEventClassMap.delete(win as any);
 
     if (win.document != null) {
       try {

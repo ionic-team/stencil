@@ -10,17 +10,23 @@ log.txt
 
 .idea/
 .vscode/
+.history/
 .sass-cache/
 .versions/
 node_modules/
 coverage/
 
+/build/
+/scripts/build/
 dist/
+dist-ts/
 **/www/build/
 
 # submodule packages
+/cli
 /compiler
 /hydrate
+/dev-server
 /internal
 /mock-doc
 /polyfills
@@ -35,6 +41,7 @@ dist/
 /screenshot/connector.js
 /screenshot/local-connector.js
 /screenshot/pixel-match.js
+/screenshot/*.d.ts
 
 test/**/www/*
 .stencil

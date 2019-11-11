@@ -39,14 +39,14 @@ export interface FunctionalComponent<T = {}> {
 }
 
 export interface VNode {
-  $tag$?: string | number | Function;
-  $key$?: string | number;
-  $text$?: string;
-  $children$?: VNode[];
+  $flags$: number;
+  $tag$: string | number | Function;
+  $elm$: any;
+  $text$: string;
+  $children$: VNode[];
   $attrs$?: any;
   $name$?: string;
-  $flags$: number;
-  $elm$?: any;
+  $key$?: string | number;
 }
 
 export interface ChildNode {

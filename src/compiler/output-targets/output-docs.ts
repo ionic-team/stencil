@@ -26,7 +26,7 @@ export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, b
 
   await Promise.all([
     generateReadmeDocs(config, compilerCtx, docsData, docsOutputTargets),
-    generateJsonDocs(compilerCtx, docsData, docsOutputTargets),
+    generateJsonDocs(config, compilerCtx, docsData, docsOutputTargets),
     generateVscodeDocs(compilerCtx, docsData, docsOutputTargets),
     generateCustomDocs(config, docsData, docsOutputTargets),
     outputCustom(config, compilerCtx, buildCtx, docsData, docsOutputTargets)

@@ -1,4 +1,5 @@
-import * as d from '.';
+import { BuildLog, BuildResults } from './build';
+import { FsStats } from './file-system';
 
 
 export interface DevServer {
@@ -7,9 +8,44 @@ export interface DevServer {
 }
 
 
-export interface DevServerConfig {
+export interface StencilDevServerConfig {
+  /**
+   * IP address used by the dev server. The default is `0.0.0.0`, which points to all IPv4 addresses on the local machine, such as `localhost`.
+   */
   address?: string;
+  /**
+   * Base path to be used by the server. Defaults to the root pathname.
+   */
   basePath?: string;
+  /**
+   * When set, the dev server will run via https using the SSL certificate and key you provide (use `fs` if you want to read them from files).
+   */
+  https?: Credentials;
+  /**
+   * The URL the dev server should first open to. Defaults to `/`.
+   */
+  initialLoadUrl?: string;
+  /**
+   * When `true`, every request to the server will be logged within the terminal. Defaults to `false`.
+   */
+  logRequests?: boolean;
+  /**
+   * By default, when dev server is started the local dev URL is opened in your default browser. However, to prevent this URL to be opened change this value to `false`. Defaults to `true`.
+   */
+  openBrowser?: boolean;
+  /**
+   * Sets the server's port. Defaults to `3333`.
+   */
+  port?: number;
+  /**
+   * When files are watched and udated, by default the dev server will use `hmr` (Hot Module Replacement) to update the page without a full page refresh. To have the page do a full refresh use `pageReload`. To disable any reloading, use `null`. Defaults to `hmr`.
+   */
+  reloadStrategy?: PageReloadStrategy;
+  root?: string;
+  websocket?: boolean;
+}
+
+export interface DevServerConfig extends StencilDevServerConfig {
   browserUrl?: string;
   contentTypes?: { [ext: string]: string };
   devServerDir?: string;
@@ -17,16 +53,14 @@ export interface DevServerConfig {
   excludeHmr?: string[];
   gzip?: boolean;
   historyApiFallback?: HistoryApiFallback;
-  initialLoadUrl?: string;
-  logRequests?: boolean;
   openBrowser?: boolean;
-  port?: number;
   protocol?: 'http' | 'https';
-  reloadStrategy?: PageReloadStrategy;
-  root?: string;
-  websocket?: boolean;
 }
 
+export interface Credentials {
+  key: string;
+  cert: string;
+}
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
@@ -46,7 +80,7 @@ export interface DevClientWindow extends Window {
 
 export interface DevClientConfig {
   basePath: string;
-  editors: d.DevServerEditor[];
+  editors: DevServerEditor[];
   reloadStrategy: PageReloadStrategy;
 }
 
@@ -63,7 +97,7 @@ export interface HttpRequest {
   url: string;
   pathname?: string;
   filePath?: string;
-  stats?: d.FsStats;
+  stats?: FsStats;
   headers?: {[name: string]: string};
   host?: string;
 }
@@ -72,8 +106,8 @@ export interface HttpRequest {
 export interface DevServerMessage {
   startServer?: DevServerConfig;
   serverStated?: DevServerStartResponse;
-  buildLog?: d.BuildLog;
-  buildResults?: d.BuildResults;
+  buildLog?: BuildLog;
+  buildResults?: BuildResults;
   requestBuildResults?: boolean;
   error?: { message?: string; type?: string; stack?: any; };
   isActivelyBuilding?: boolean;

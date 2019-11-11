@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { catchError } from '@utils';
 import cssnano, { CssNanoOptions } from 'cssnano';
-import autoprefixer, { Options } from 'autoprefixer';
+import autoprefixer from 'autoprefixer';
 import postcss, { AcceptedPlugin } from 'postcss';
 
 
@@ -45,7 +45,7 @@ export async function optimizeCssWorker(inputOpts: d.OptimizeCssInput) {
     } catch (e) {
       const diagnostic: d.Diagnostic = {
         header: `Optimize CSS`,
-        messageText: `CSS Error`,
+        messageText: `CSS Error` + e,
         level: `error`,
         type: `css`,
         absFilePath: inputOpts.filePath
@@ -106,8 +106,8 @@ export function addAutoprefixer(inputOpts: d.OptimizeCssInput) {
 }
 
 
-const DEFAULT_AUTOPREFIX_LEGACY: Options = {
-  browsers: [
+const DEFAULT_AUTOPREFIX_LEGACY = {
+  overrideBrowserslist: [
     'last 2 versions',
     'iOS >= 9',
     'Android >= 4.4',

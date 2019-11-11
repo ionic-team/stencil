@@ -77,9 +77,14 @@ Make sure you update the `package.json` in the root of your project, like this:
 Some packages, specially the ones from the Stencil and Ionic core teams used some private APIs of Stencil, that's why if your collection depends of `@ionic/core`, `@stencil/router` or `@stencil/state-tunnel`, you might need to update your `package.json` to point these dependencies to the `"one"` tag.
 
 ```
-"@stencil/router": "one",
-"@stencil/state-tunnel": "one",
 "@ionic/core": "one",
+"@stencil/router": "^1.0.0",
+"@stencil/state-tunnel": "^1.0.0",
+
+"@stencil/sass": "^1.0.0",
+"@stencil/less": "^1.0.0",
+"@stencil/stylus": "^1.0.0",
+"@stencil/postcss": "^1.0.0",
 ```
 
 ### `window.NAMESPACE` is no longer a thing

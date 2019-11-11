@@ -44,7 +44,7 @@ describe('toVNode()', () => {
     const vnode = toVNode(elm);
     expect(vnode.$elm$).toBe(elm);
     expect(vnode.$tag$).toBe('h1');
-    expect(vnode.$children$).toBeUndefined();
+    expect(vnode.$children$).toBeNull();
   });
 
 });

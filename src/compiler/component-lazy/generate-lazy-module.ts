@@ -24,6 +24,7 @@ export async function generateLazyModules(config: d.Config, compilerCtx: d.Compi
   ]);
 
   const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
+  config.logger.debug(`Upfront metadata is ${lazyRuntimeData.length} bytes`);
   const entryResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && rollupResult.isEntry);
   await Promise.all(
     entryResults.map(rollupResult => {
@@ -44,9 +45,10 @@ async function generateLazyEntryModule(
 ): Promise<d.BundleModule> {
   const entryModule = buildCtx.entryModules.find(entryModule => entryModule.entryKey === rollupResult.entryKey);
   const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, rollupResult.code);
+  const shouldHash = config.hashFileNames && isBrowserBuild;
   const outputs = await Promise.all(
     entryModule.modeNames.map(modeName =>
-      writeLazyModule(config, compilerCtx, destinations, entryModule, shouldMinify, code, modeName, sufix)
+      writeLazyModule(config, compilerCtx, destinations, entryModule, shouldHash, code, modeName, sufix)
     )
   );
 
@@ -82,7 +84,7 @@ async function writeLazyEntry(
   shouldMinify: boolean,
   isBrowserBuild: boolean,
 ) {
-  if (isBrowserBuild && ['index', 'loader'].includes(rollupResult.entryKey)) {
+  if (isBrowserBuild && ['loader'].includes(rollupResult.entryKey)) {
     return;
   }
   let code = rollupResult.code.replace(
@@ -130,17 +132,17 @@ function formatLazyRuntimeBundle(bundleModule: d.BundleModule): d.LazyBundleRunt
 }
 
 export function sortBundleModules(a: d.BundleModule, b: d.BundleModule) {
-  const aDependants = a.cmps.reduce((dependants, cmp) => {
-    dependants.push(...cmp.dependants);
-    return dependants;
+  const aDependents = a.cmps.reduce((dependents, cmp) => {
+    dependents.push(...cmp.dependents);
+    return dependents;
   }, [] as string[]);
-  const bDependants = b.cmps.reduce((dependants, cmp) => {
-    dependants.push(...cmp.dependants);
-    return dependants;
+  const bDependents = b.cmps.reduce((dependents, cmp) => {
+    dependents.push(...cmp.dependents);
+    return dependents;
   }, [] as string[]);
 
-  if (a.cmps.some(cmp => bDependants.includes(cmp.tagName))) return 1;
-  if (b.cmps.some(cmp => aDependants.includes(cmp.tagName))) return -1;
+  if (a.cmps.some(cmp => bDependents.includes(cmp.tagName))) return 1;
+  if (b.cmps.some(cmp => aDependents.includes(cmp.tagName))) return -1;
 
   const aDependencies = a.cmps.reduce((dependencies, cmp) => {
     dependencies.push(...cmp.dependencies);
@@ -154,8 +156,8 @@ export function sortBundleModules(a: d.BundleModule, b: d.BundleModule) {
   if (a.cmps.some(cmp => bDependencies.includes(cmp.tagName))) return -1;
   if (b.cmps.some(cmp => aDependencies.includes(cmp.tagName))) return 1;
 
-  if (aDependants.length < bDependants.length) return -1;
-  if (aDependants.length > bDependants.length) return 1;
+  if (aDependents.length < bDependents.length) return -1;
+  if (aDependents.length > bDependents.length) return 1;
 
   if (aDependencies.length > bDependencies.length) return -1;
   if (aDependencies.length < bDependencies.length) return 1;
@@ -188,20 +190,20 @@ export function sortBundleComponents(a: d.ComponentCompilerMeta, b: d.ComponentC
   // cmp-a is a dependant of cmp-b and cmp-c
   // cmp-a is a directDependant of cmp-b
 
-  if (a.directDependants.includes(b.tagName)) return 1;
-  if (b.directDependants.includes(a.tagName)) return -1;
+  if (a.directDependents.includes(b.tagName)) return 1;
+  if (b.directDependents.includes(a.tagName)) return -1;
 
   if (a.directDependencies.includes(b.tagName)) return 1;
   if (b.directDependencies.includes(a.tagName)) return -1;
 
-  if (a.dependants.includes(b.tagName)) return 1;
-  if (b.dependants.includes(a.tagName)) return -1;
+  if (a.dependents.includes(b.tagName)) return 1;
+  if (b.dependents.includes(a.tagName)) return -1;
 
   if (a.dependencies.includes(b.tagName)) return 1;
   if (b.dependencies.includes(a.tagName)) return -1;
 
-  if (a.dependants.length < b.dependants.length) return -1;
-  if (a.dependants.length > b.dependants.length) return 1;
+  if (a.dependents.length < b.dependents.length) return -1;
+  if (a.dependents.length > b.dependents.length) return 1;
 
   if (a.dependencies.length > b.dependencies.length) return -1;
   if (a.dependencies.length < b.dependencies.length) return 1;
@@ -224,15 +226,16 @@ async function convertChunk(
   if (sourceTarget === 'es5') {
     const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
     const transpileResults = await transpileToEs5Main(config, compilerCtx, code, inlineHelpers);
-    buildCtx.diagnostics.push(...transpileResults.diagnostics);
-    if (transpileResults.diagnostics.length === 0) {
-      code = transpileResults.code;
+    if (transpileResults != null) {
+      buildCtx.diagnostics.push(...transpileResults.diagnostics);
+      if (transpileResults.diagnostics.length === 0) {
+        code = transpileResults.code;
+      }
     }
   }
   if (shouldMinify) {
-    const optimizeResults = await optimizeModule(config, compilerCtx, sourceTarget, isCore, isBrowserBuild, code);
+    const optimizeResults = await optimizeModule(config, compilerCtx, sourceTarget, isCore, code);
     buildCtx.diagnostics.push(...optimizeResults.diagnostics);
-
     if (optimizeResults.diagnostics.length === 0 && typeof optimizeResults.output === 'string') {
       code = optimizeResults.output;
     }

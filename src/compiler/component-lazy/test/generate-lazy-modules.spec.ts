@@ -6,16 +6,16 @@ describe('generate lazy modules', () => {
 
   describe('sortBundleModules', () => {
 
-    it('sort by dependants', () => {
+    it('sort by dependents', () => {
       const bundleModules = [
         bundle('z', [
-          cmp({ tagName: 'a', dependants: ['f', 'f', 'f'] })
+          cmp({ tagName: 'a', dependents: ['f', 'f', 'f'] })
         ]),
         bundle('y', [
-          cmp({ tagName: 'b', dependants: ['a', 'f', 'f'] })
+          cmp({ tagName: 'b', dependents: ['a', 'f', 'f'] })
         ]),
         bundle('x', [
-          cmp({ tagName: 'c', dependants: ['a', 'b', 'f'] })
+          cmp({ tagName: 'c', dependents: ['a', 'b', 'f'] })
         ])
       ].sort(sortBundleModules);
 
@@ -24,16 +24,16 @@ describe('generate lazy modules', () => {
       expect(bundleModules[2].entryKey).toBe('z');
     });
 
-    it('sort by dependants length', () => {
+    it('sort by dependents length', () => {
       const bundleModules = [
         bundle('z', [
-          cmp({ tagName: 'a', dependants: ['l', 'm', 'n'] })
+          cmp({ tagName: 'a', dependents: ['l', 'm', 'n'] })
         ]),
         bundle('y', [
-          cmp({ tagName: 'b', dependants: ['o', 'p'] })
+          cmp({ tagName: 'b', dependents: ['o', 'p'] })
         ]),
         bundle('x', [
-          cmp({ tagName: 'c', dependants: ['q'] })
+          cmp({ tagName: 'c', dependents: ['q'] })
         ])
       ].sort(sortBundleModules);
 
@@ -136,11 +136,11 @@ describe('generate lazy modules', () => {
       expect(cmps[2].testId).toBe(2);
     });
 
-    it('sort bundle cmps by dependants length, more dependants go to bottom', () => {
+    it('sort bundle cmps by dependents length, more dependents go to bottom', () => {
       const cmps = [
-        cmp({ testId: 2, dependants: ['x', 'y'] }),
-        cmp({ testId: 1, dependants: ['z'] }),
-        cmp({ testId: 0, dependants: [] })
+        cmp({ testId: 2, dependents: ['x', 'y'] }),
+        cmp({ testId: 1, dependents: ['z'] }),
+        cmp({ testId: 0, dependents: [] })
       ].sort(sortBundleComponents);
 
       expect(cmps[0].testId).toBe(0);
@@ -172,11 +172,11 @@ describe('generate lazy modules', () => {
       expect(cmps[2].testId).toBe(2);
     });
 
-    it('sort bundle cmps by dependants', () => {
+    it('sort bundle cmps by dependents', () => {
       const cmps = [
-        cmp({ testId: 2, tagName: 'x', dependants: ['z', 'y', 'f'] }),
-        cmp({ testId: 1, tagName: 'y', dependants: ['z', 'f', 'f'] }),
-        cmp({ testId: 0, tagName: 'z', dependants: ['f', 'f', 'f'] })
+        cmp({ testId: 2, tagName: 'x', dependents: ['z', 'y', 'f'] }),
+        cmp({ testId: 1, tagName: 'y', dependents: ['z', 'f', 'f'] }),
+        cmp({ testId: 0, tagName: 'z', dependents: ['f', 'f', 'f'] })
       ].sort(sortBundleComponents);
 
       expect(cmps[0].testId).toBe(0);
@@ -184,11 +184,11 @@ describe('generate lazy modules', () => {
       expect(cmps[2].testId).toBe(2);
     });
 
-    it('sort bundle cmps by directDependants', () => {
+    it('sort bundle cmps by directDependents', () => {
       const cmps = [
-        cmp({ testId: 2, tagName: 'x', directDependants: ['z', 'y', 'f'] }),
-        cmp({ testId: 1, tagName: 'y', directDependants: ['z', 'f', 'f'] }),
-        cmp({ testId: 0, tagName: 'z', directDependants: ['f', 'f', 'f'] })
+        cmp({ testId: 2, tagName: 'x', directDependents: ['z', 'y', 'f'] }),
+        cmp({ testId: 1, tagName: 'y', directDependents: ['z', 'f', 'f'] }),
+        cmp({ testId: 0, tagName: 'z', directDependents: ['f', 'f', 'f'] })
       ].sort(sortBundleComponents);
 
       expect(cmps[0].testId).toBe(0);
@@ -196,11 +196,11 @@ describe('generate lazy modules', () => {
       expect(cmps[2].testId).toBe(2);
     });
 
-    it('sort bundle cmps by dependants', () => {
+    it('sort bundle cmps by dependents', () => {
       const cmps = [
-        cmp({ testId: 2, tagName: 'x', dependants: ['z', 'y', 'f'] }),
-        cmp({ testId: 1, tagName: 'y', dependants: ['z', 'f', 'f'] }),
-        cmp({ testId: 0, tagName: 'z', dependants: ['f', 'f', 'f'] })
+        cmp({ testId: 2, tagName: 'x', dependents: ['z', 'y', 'f'] }),
+        cmp({ testId: 1, tagName: 'y', dependents: ['z', 'f', 'f'] }),
+        cmp({ testId: 0, tagName: 'z', dependents: ['f', 'f', 'f'] })
       ].sort(sortBundleComponents);
 
       expect(cmps[0].testId).toBe(0);
@@ -222,12 +222,12 @@ describe('generate lazy modules', () => {
 
   });
 
-  function cmp(c: { testId?: number, tagName?: string, dependants?: string[], directDependants?: string[], dependencies?: string[], directDependencies?: string[] }) {
+  function cmp(c: { testId?: number, tagName?: string, dependents?: string[], directDependents?: string[], dependencies?: string[], directDependencies?: string[] }) {
     const r: TestComponentCompilerMeta = {
       testId: c.testId || 0,
       tagName: c.tagName || 'a',
-      dependants: c.dependants || [],
-      directDependants: c.directDependants || [],
+      dependents: c.dependents || [],
+      directDependents: c.directDependents || [],
       dependencies: c.dependencies || [],
       directDependencies: c.directDependencies || []
     } as any;

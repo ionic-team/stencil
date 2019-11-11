@@ -1,7 +1,9 @@
 import { sass } from '@stencil/sass';
-import builtins from 'rollup-plugin-node-builtins';
-import globals from 'rollup-plugin-node-globals';
+import { less } from '@stencil/less';
+import { stylus } from '@stencil/stylus';
+import { postcss } from '@stencil/postcss';
 
+import nodePolyfills from 'rollup-plugin-node-polyfills';
 
 export const config = {
   namespace: 'TestApp',
@@ -9,8 +11,7 @@ export const config = {
   tsconfig: 'tsconfig-stencil.json',
   outputTargets: [
     {
-      type: 'www',
-      empty: false
+      type: 'www'
     },
     {
       type: 'dist',
@@ -19,16 +20,20 @@ export const config = {
   ],
   copy: [
     { src: '**/*.html' },
+    { src: '**/*.css' },
     { src: 'noscript.js' }
   ],
   excludeSrc: [],
   globalScript: 'test-app/global.ts',
   globalStyle: 'test-app/style-plugin/global-sass-entry.scss',
   plugins: [
-    builtins(),
-    globals(),
-    sass()
+    nodePolyfills(),
+    sass(),
+    less(),
+    postcss(),
+    stylus()
   ],
+  _lifecycleDOMEvents: true,
   devServer: {
     historyApiFallback: {
       disableDotRule: true,

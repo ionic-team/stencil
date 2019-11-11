@@ -1,4 +1,5 @@
-import * as d from '.';
+import { ComponentCompilerMeta } from './component-compiler-meta';
+import { ComponentRuntimeMeta } from './runtime';
 
 
 export interface ComponentConstructor {
@@ -11,7 +12,7 @@ export interface ComponentConstructor {
   styleId?: string;
   encapsulation?: ComponentConstructorEncapsulation;
   observedAttributes?: string[];
-  cmpMeta?: d.ComponentRuntimeMeta;
+  cmpMeta?: ComponentRuntimeMeta;
   isProxied?: boolean;
   isStyleRegistered?: boolean;
 }
@@ -21,7 +22,7 @@ export interface ComponentConstructorWatchers {
 }
 
 export interface ComponentTestingConstructor extends ComponentConstructor {
-  COMPILER_META: d.ComponentCompilerMeta;
+  COMPILER_META: ComponentCompilerMeta;
   prototype?: {
     componentWillLoad?: Function;
     componentWillUpdate?: Function;
@@ -33,7 +34,7 @@ export interface ComponentTestingConstructor extends ComponentConstructor {
 }
 
 export interface ComponentNativeConstructor extends ComponentConstructor {
-  cmpMeta: d.ComponentRuntimeMeta;
+  cmpMeta: ComponentRuntimeMeta;
 }
 
 

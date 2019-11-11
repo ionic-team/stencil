@@ -1,12 +1,12 @@
-import * as d from '.';
+import { ModeBundleIds } from './runtime';
 
 
 /** OLD WAY */
 export interface Collection {
   collectionName?: string;
   moduleDir?: string;
-  moduleFiles?: ModuleFile[];
-  global?: ModuleFile;
+  moduleFiles?: any[];
+  global?: any;
   compiler?: CollectionCompiler;
   isInitialized?: boolean;
   hasExports?: boolean;
@@ -37,14 +37,9 @@ export interface AppRegistry {
 
 export interface AppRegistryComponents {
   [tagName: string]: {
-    bundleIds: d.ModeBundleIds,
+    bundleIds: ModeBundleIds,
     encapsulation?: 'shadow' | 'scoped';
   };
-}
-
-/** OLD WAY */
-export interface ModuleFiles {
-  [filePath: string]: ModuleFile;
 }
 
 

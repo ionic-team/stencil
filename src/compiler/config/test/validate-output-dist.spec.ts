@@ -4,6 +4,7 @@ import path from 'path';
 
 
 describe('validateDistOutputTarget', () => {
+  const rootDir = path.resolve('/');
 
   let config: d.Config;
   beforeEach(() => {
@@ -11,7 +12,7 @@ describe('validateDistOutputTarget', () => {
       sys: {
         path: path
       },
-      rootDir: '/'
+      rootDir
     };
   });
 
@@ -24,11 +25,55 @@ describe('validateDistOutputTarget', () => {
     };
     config.outputTargets = [outputTarget];
     validateOutputTargetDist(config);
-    expect(config.outputTargets).toHaveLength(4);
-    expect(outputTarget).toBeDefined();
-    expect(outputTarget.dir).toBe('/my-dist');
-    expect(outputTarget.buildDir).toBe('/my-dist/my-build');
-    expect(outputTarget.empty).toBe(false);
+    expect(config.outputTargets).toEqual([
+      {
+        'buildDir': path.join(rootDir, 'my-dist', 'my-build'),
+        'collectionDir': path.join(rootDir, 'my-dist', 'collection'),
+        'copy': [],
+        'dir': path.join(rootDir, 'my-dist'),
+        'empty': false,
+        'esmLoaderPath': path.join(rootDir, 'my-dist', 'loader'),
+        'resourcesUrl': undefined,
+        'type': 'dist',
+        'typesDir': path.join(rootDir, 'my-dist', 'types')
+      },
+      {
+        'collectionDir': path.join(rootDir, 'my-dist', 'collection'),
+        'dir': path.join(rootDir, '/my-dist'),
+        'type': 'dist-collection'
+      },
+      {
+        'copy': [
+          {'src': '**/*.svg'},
+          {'src': '**/*.js'}
+        ],
+        'copyAssets': 'collection',
+        'dir': path.join(rootDir, 'my-dist', 'collection'),
+        'type': 'copy'
+      },
+      {
+        'dir': path.join(rootDir, 'my-dist'),
+        'type': 'dist-types',
+        'typesDir': path.join(rootDir, 'my-dist', 'types')
+      },
+      {
+        'esmDir': path.join(rootDir, 'my-dist', 'my-build', 'app'),
+        'isBrowserBuild': true,
+        'legacyLoaderFile': path.join(rootDir, 'my-dist', 'my-build', 'app.js'),
+        'polyfills': true,
+        'systemDir': undefined,
+        'systemLoaderFile': undefined,
+        'type': 'dist-lazy'},
+        {
+          'copyAssets': 'dist',
+          'dir': path.join(rootDir, 'my-dist', 'my-build', 'app'),
+          'type': 'copy'
+        },
+        {
+          'file': path.join(rootDir, 'my-dist', 'my-build', 'app', 'undefined.css'),
+          'type': 'dist-global-styles'
+        }
+      ]);
   });
 
   it('should set defaults when outputTargets dist is empty', () => {
@@ -38,8 +83,8 @@ describe('validateDistOutputTarget', () => {
     validateOutputTargetDist(config);
     const outputTarget = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     expect(outputTarget).toBeDefined();
-    expect(outputTarget.dir).toBe('/dist');
-    expect(outputTarget.buildDir).toBe('/dist');
+    expect(outputTarget.dir).toBe(path.join(rootDir, 'dist'));
+    expect(outputTarget.buildDir).toBe(path.join(rootDir, '/dist'));
     expect(outputTarget.empty).toBe(true);
   });
 

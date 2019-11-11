@@ -651,10 +651,9 @@ export namespace JSXBase {
     width?: number | string;
   }
 
-  export interface HTMLAttributes<T = HTMLElement> extends DOMAttributes {
+  export interface HTMLAttributes<T = HTMLElement> extends DOMAttributes<T> {
     // vdom specific
     innerHTML?: string;
-    ref?: (elm?: T) => void;
     key?: string | number;
 
     // Standard HTML Attributes
@@ -669,7 +668,6 @@ export namespace JSXBase {
     hidden?: boolean;
     id?: string;
     lang?: string;
-    slot?: string;
     spellCheck?: boolean;
     spellcheck?: boolean | string;
     style?: { [key: string]: string | undefined };
@@ -721,7 +719,7 @@ export namespace JSXBase {
     unselectable?: boolean;
   }
 
-  export interface SVGAttributes extends DOMAttributes {
+  export interface SVGAttributes<T = SVGElement> extends DOMAttributes<T> {
     // Attributes which also defined in HTMLAttributes
     // See comment in SVGDOMPropertyConfig.js
     class?: string | { [className: string]: boolean };
@@ -986,7 +984,10 @@ export namespace JSXBase {
     zoomAndPan?: string;
   }
 
-  export interface DOMAttributes {
+  export interface DOMAttributes<T = Element> {
+    ref?: (elm?: T) => void;
+    slot?: string;
+
     // Clipboard Events
     onCopy?: (event: ClipboardEvent) => void;
     onCopyCapture?: (event: ClipboardEvent) => void;

@@ -1,12 +1,9 @@
-import ts from 'typescript';
 import * as d from '../../../declarations';
-// import { formatHostListeners } from '../../app-core/format-component-runtime-meta';
-// import { convertValueToLiteral } from '../transform-utils';
+import ts from 'typescript';
 
 
-export function addNativeConnectedCallback(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
+export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   // function call to stencil's exported connectedCallback(elm, plt)
-  const methodName = 'connectedCallback';
 
   // TODO: fast path
   if (cmp.isPlain && cmp.hasRenderFn) {
@@ -25,7 +22,7 @@ export function addNativeConnectedCallback(classMembers: ts.ClassElement[], cmp:
       )
     ));
     const connectedCallback = classMembers.find(classMember => {
-      return (ts.isMethodDeclaration(classMember) && (classMember.name as any).escapedText === methodName);
+      return (ts.isMethodDeclaration(classMember) && (classMember.name as any).escapedText === 'connectedCallback');
     }) as ts.MethodDeclaration;
 
     const prependBody = [
@@ -44,37 +41,10 @@ export function addNativeConnectedCallback(classMembers: ts.ClassElement[], cmp:
         undefined,
         undefined,
         undefined,
-        methodName, undefined, undefined, undefined, undefined,
+        'connectedCallback', undefined, undefined, undefined, undefined,
         ts.createBlock(prependBody, true)
       );
       classMembers.push(callbackMethod);
     }
   }
-}
-
-// function connectedCallbackStatement() {
-//   // connectedCallback(this)
-//   return ts.createExpressionStatement(
-//     ts.createCall(
-//       ts.createIdentifier(CONNECTED_CALLBACK),
-//       undefined,
-//       [ ts.createThis() ]
-//     )
-//   );
-// }
-
-// function setListenersStatements(cmp: d.ComponentCompilerMeta) {
-//   if (cmp.listeners.length === 0) {
-//     return [];
-//   }
-//   return [ts.createExpressionStatement(
-//     ts.createCall(
-//       ts.createIdentifier('__stencil_setListeners'),
-//       undefined,
-//       [
-//         ts.createThis(),
-//         convertValueToLiteral(formatHostListeners(cmp))
-//       ]
-//     )
-//   )];
-// }
+};

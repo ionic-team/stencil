@@ -29,7 +29,7 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
 
     if (!config.watch) {
       compilerCtx.reset();
-      if (global && global.gc) {
+      if (typeof global !== 'undefined' && global.gc) {
         buildCtx.debug(`triggering forced gc`);
         global.gc();
         buildCtx.debug(`forced gc finished`);

@@ -1,4 +1,4 @@
-import * as d from '.';
+import { ModeStyles } from './style';
 
 
 declare type CustomMethodDecorator<T> = (target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
@@ -37,7 +37,7 @@ export interface ComponentOptions {
   /**
    * Similar as `styleUrl` but allows to specify different stylesheets for different modes.
    */
-  styleUrls?: string[] | d.ModeStyles;
+  styleUrls?: string[] | ModeStyles;
 
   /**
    * String that contains inlined CSS instead of using an external stylesheet.
@@ -68,7 +68,7 @@ export interface PropOptions {
    * Stencil uses different heuristics to determine the default name of the attribute,
    * but using this property, you can override the default behaviour.
    */
-  attribute?: string;
+  attribute?: string | null;
 
   /**
    * A Prop is _by default_ immutable from inside the component logic.

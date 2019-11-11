@@ -2,7 +2,7 @@ import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } 
 import { closest, matches, selectAll, selectOne } from './selector';
 import { CSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
 import { dataset } from './dataset';
-import { MockAttr, MockAttributeMap, cloneAttributes } from './attribute';
+import { MockAttr, MockAttributeMap } from './attribute';
 import { MockClassList } from './class-list';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { NODE_NAMES, NODE_TYPES } from './constants';
@@ -28,11 +28,33 @@ export class MockNode {
   }
 
   appendChild(newNode: MockNode) {
-    newNode.remove();
-    newNode.parentNode = this;
-    this.childNodes.push(newNode);
-    connectNode(this.ownerDocument, newNode);
+    if (newNode.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
+      const nodes = newNode.childNodes.slice();
+      for (const child of nodes) {
+        this.appendChild(child);
+      }
+    } else {
+      newNode.remove();
+      newNode.parentNode = this;
+      this.childNodes.push(newNode);
+      connectNode(this.ownerDocument, newNode);
+    }
     return newNode;
+  }
+
+  append(...items: (MockNode | string)[]) {
+    items.forEach(item => {
+      const isNode = typeof item === 'object' && item !== null && 'nodeType' in item;
+      this.appendChild(isNode ? item : this.ownerDocument.createTextNode(String(item)));
+    });
+  }
+
+  prepend(...items: (MockNode | string)[]) {
+    const firstChild = this.firstChild;
+    items.forEach(item => {
+      const isNode = typeof item === 'object' && item !== null && 'nodeType' in item;
+      this.insertBefore(isNode ? item : this.ownerDocument.createTextNode(String(item)), firstChild);
+    });
   }
 
   cloneNode(deep?: boolean): MockNode {
@@ -103,6 +125,10 @@ export class MockNode {
     return null;
   }
 
+  contains(otherNode: MockNode) {
+    return this.childNodes.includes(otherNode);
+  }
+
   removeChild(childNode: MockNode) {
     const index = this.childNodes.indexOf(childNode);
     if (index > -1) {
@@ -159,6 +185,18 @@ export class MockNode {
 }
 
 
+export class MockNodeList {
+  childNodes: MockNode[];
+  length: number;
+  ownerDocument: any;
+
+  constructor(ownerDocument: any, childNodes: MockNode[], length: number) {
+    this.ownerDocument = ownerDocument;
+    this.childNodes = childNodes;
+    this.length = length;
+  }
+}
+
 const attrsMap = new WeakMap<MockElement, MockAttributeMap>();
 const shadowRootMap = new WeakMap<MockElement, ShadowRoot>();
 const stylesMap = new WeakMap<MockElement, CSSStyleDeclaration>();
@@ -170,7 +208,7 @@ export class MockElement extends MockNode {
     super(
       ownerDocument,
       NODE_TYPES.ELEMENT_NODE,
-      typeof nodeName === 'string' ? nodeName.toUpperCase() : null,
+      typeof nodeName === 'string' ? nodeName : null,
       null
     );
     this.namespaceURI = null;
@@ -206,6 +244,7 @@ export class MockElement extends MockNode {
     }
     return attrs;
   }
+
   set attributes(attrs: MockAttributeMap) {
     attrsMap.set(this, attrs);
   }
@@ -229,23 +268,9 @@ export class MockElement extends MockNode {
     dispatchEvent(this, new MockEvent('click', { bubbles: true, cancelable: true, composed: true }));
   }
 
-  cloneNode(deep?: boolean) {
-    const cloned = new MockElement(null, this.nodeName);
-    cloned.attributes = cloneAttributes(this.attributes);
-
-    const styleCssText = this.getAttribute('style');
-    if (styleCssText != null && styleCssText.length > 0) {
-      cloned.setAttribute('style', styleCssText);
-    }
-
-    if (deep) {
-      for (let i = 0, ii = this.childNodes.length; i < ii; i++) {
-        const clonedChildNode = this.childNodes[i].cloneNode(true);
-        cloned.appendChild(clonedChildNode);
-      }
-    }
-
-    return cloned;
+  cloneNode(_deep?: boolean): MockElement {
+    // implemented on MockElement.prototype from within element.ts
+    return null;
   }
 
   closest(selector: string) {
@@ -268,7 +293,6 @@ export class MockElement extends MockNode {
   }
 
   getAttribute(attrName: string) {
-    attrName = attrName.toLowerCase();
     if (attrName === 'style') {
       const style = stylesMap.get(this);
       if (style != null && style.length > 0) {
@@ -276,11 +300,15 @@ export class MockElement extends MockNode {
       }
       return null;
     }
-    return this.getAttributeNS(null, attrName);
+    const attr = this.attributes.getNamedItem(attrName);
+    if (attr != null) {
+      return attr.value;
+    }
+    return null;
   }
 
-  getAttributeNS(namespaceURI: string, name: string) {
-    const attr = this.attributes.getNamedItemNS(namespaceURI, name);
+  getAttributeNS(namespaceURI: string, attrName: string) {
+    const attr = this.attributes.getNamedItemNS(namespaceURI, attrName);
     if (attr != null) {
       return attr.value;
     }
@@ -312,7 +340,7 @@ export class MockElement extends MockNode {
   }
 
   get id() { return this.getAttributeNS(null, 'id') || ''; }
-  set id(value: string) { this.setAttribute('id', value); }
+  set id(value: string) { this.setAttributeNS(null, 'id', value); }
 
   get innerHTML() {
     if (this.childNodes.length === 0) {
@@ -353,12 +381,11 @@ export class MockElement extends MockNode {
   }
 
   hasAttribute(attrName: string) {
-    attrName = attrName.toLowerCase();
     if (attrName === 'style') {
       const style = stylesMap.get(this);
       return (style != null && style.length > 0);
     }
-    return this.getAttributeNS(null, attrName) !== null;
+    return this.getAttribute(attrName) !== null;
   }
 
   hasAttributeNS(namespaceURI: string, name: string) {
@@ -423,11 +450,16 @@ export class MockElement extends MockNode {
   }
 
   removeAttribute(attrName: string) {
-    attrName = attrName.toLowerCase();
     if (attrName === 'style') {
       stylesMap.delete(this);
     } else {
-      this.removeAttributeNS(null, attrName);
+      const attr = this.attributes.getNamedItem(attrName);
+      if (attr != null) {
+        this.attributes.removeNamedItemNS(attr);
+        if (checkAttributeChanged(this) === true) {
+          attributeChanged(this, attrName, attr.value, null);
+        }
+      }
     }
   }
 
@@ -446,11 +478,36 @@ export class MockElement extends MockNode {
   }
 
   setAttribute(attrName: string, value: any) {
-    attrName = attrName.toLowerCase();
     if (attrName === 'style') {
       this.style = value;
     } else {
-      this.setAttributeNS(null, attrName, value);
+      const attributes = this.attributes;
+      let attr = attributes.getNamedItem(attrName);
+      const checkAttrChanged = checkAttributeChanged(this);
+
+      if (attr != null) {
+        if (checkAttrChanged === true) {
+          const oldValue = attr.value;
+          attr.value = value;
+
+          if (oldValue !== attr.value) {
+            attributeChanged(this, attr.name, oldValue, attr.value);
+          }
+        } else {
+          attr.value = value;
+        }
+
+      } else {
+        if (attributes.caseInsensitive) {
+          attrName = attrName.toLowerCase();
+        }
+        attr = new MockAttr(attrName, value);
+        attributes.items.push(attr);
+
+        if (checkAttrChanged === true) {
+          attributeChanged(this, attrName, null, attr.value);
+        }
+      }
     }
   }
 
@@ -462,13 +519,13 @@ export class MockElement extends MockNode {
     if (attr != null) {
       if (checkAttrChanged === true) {
         const oldValue = attr.value;
-        attr.value = String(value);
+        attr.value = value;
 
         if (oldValue !== attr.value) {
-          attributeChanged(this, attrName, oldValue, attr.value);
+          attributeChanged(this, attr.name, oldValue, attr.value);
         }
       } else {
-        attr.value = String(value);
+        attr.value = value;
       }
 
     } else {
@@ -507,7 +564,7 @@ export class MockElement extends MockNode {
   set tabIndex(value: number) { this.setAttributeNS(null, 'tabindex', value); }
 
   get tagName() { return this.nodeName; }
-  set tagName(value: string) { this.nodeName = value.toUpperCase(); }
+  set tagName(value: string) { this.nodeName = value; }
 
   get textContent() {
     const text: string[] = [];
@@ -521,6 +578,9 @@ export class MockElement extends MockNode {
   get title() { return this.getAttributeNS(null, 'title') || ''; }
   set title(value: string) { this.setAttributeNS(null, 'title', value); }
 
+  onanimationstart() { /**/ }
+  onanimationend() { /**/ }
+  onanimationiteration() { /**/ }
   onabort() {/**/}
   onauxclick() {/**/}
   onbeforecopy() {/**/}
@@ -643,6 +703,32 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
   return newNode;
 }
 
+export class MockHTMLElement extends MockElement {
+
+  namespaceURI = 'http://www.w3.org/1999/xhtml';
+
+  constructor(ownerDocument: any, nodeName: string) {
+    super(
+      ownerDocument,
+      typeof nodeName === 'string' ? nodeName.toUpperCase() : null,
+    );
+  }
+
+  get tagName() { return this.nodeName; }
+  set tagName(value: string) { this.nodeName = value; }
+
+  get attributes() {
+    let attrs = attrsMap.get(this);
+    if (attrs == null) {
+      attrs = new MockAttributeMap(true);
+      attrsMap.set(this, attrs);
+    }
+    return attrs;
+  }
+  set attributes(attrs: MockAttributeMap) {
+    attrsMap.set(this, attrs);
+  }
+}
 
 export class MockTextNode extends MockNode {
 
@@ -663,6 +749,13 @@ export class MockTextNode extends MockNode {
     return this.nodeValue;
   }
   set textContent(text) {
+    this.nodeValue = text;
+  }
+
+  get data() {
+    return this.nodeValue;
+  }
+  set data(text) {
     this.nodeValue = text;
   }
 

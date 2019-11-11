@@ -1,4 +1,10 @@
-import * as d from '.';
+import { Config, ServiceWorkerConfig } from './config';
+import { CopyTask } from './assets';
+import { Diagnostic } from './diagnostics';
+import { CompilerCtx } from './compiler';
+import { BuildCtx } from './build';
+import { JsonDocs } from './docs';
+
 
 export interface OutputTargetAngular extends OutputTargetBase {
   type: 'angular';
@@ -8,6 +14,14 @@ export interface OutputTargetAngular extends OutputTargetBase {
   directivesArrayFile?: string;
   directivesUtilsFile?: string;
   excludeComponents?: string[];
+}
+
+export interface OutputTargetCopy extends OutputTargetBase {
+  type: 'copy';
+
+  dir: string;
+  copy?: CopyTask[];
+  copyAssets?: 'collection' | 'dist';
 }
 
 export interface OutputTargetWww extends OutputTargetBase {
@@ -54,7 +68,7 @@ export interface OutputTargetWww extends OutputTargetBase {
    *
    * In the copy config below, it will copy the entire directory from src/docs-content over to www/docs-content.
    */
-  copy?: d.CopyTask[];
+  copy?: CopyTask[];
 
   /**
    * The base url of the app, it's required during prerendering to be the absolute path
@@ -83,8 +97,7 @@ export interface OutputTargetWww extends OutputTargetBase {
    */
   prerenderConfig?: string;
 
-  serviceWorker?: d.ServiceWorkerConfig | null;
-  resourcesUrl?: string;
+  serviceWorker?: ServiceWorkerConfig | null;
   appDir?: string;
 }
 
@@ -94,12 +107,11 @@ export interface OutputTargetDist extends OutputTargetBase {
 
   buildDir?: string;
   dir?: string;
-  resourcesUrl?: string;
 
-  collectionDir?: string;
+  collectionDir?: string | null;
   typesDir?: string;
   esmLoaderPath?: string;
-  copy?: d.CopyTask[];
+  copy?: CopyTask[];
 
   empty?: boolean;
 }
@@ -109,22 +121,23 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
 
   dir: string;
   collectionDir: string;
-  typesDir: string;
-  copy: d.CopyTask[];
 }
 
+export interface OutputTargetDistTypes extends OutputTargetBase {
+  type: 'dist-types';
+
+  dir: string;
+  typesDir: string;
+}
 
 export interface OutputTargetDistLazy extends OutputTargetBase {
   type: 'dist-lazy';
 
-  copyDir?: string;
   esmDir?: string;
   esmEs5Dir?: string;
   systemDir?: string;
   cjsDir?: string;
-  resourcesUrl?: string;
   polyfills?: boolean;
-  copy?: d.CopyTask[];
   isBrowserBuild?: boolean;
 
   esmIndexFile?: string;
@@ -156,6 +169,7 @@ export interface OutputTargetDistModule extends OutputTargetBase {
   dir?: string;
   externalRuntime?: boolean;
   empty?: boolean;
+  copy?: CopyTask[];
 }
 
 
@@ -164,7 +178,6 @@ export interface OutputTargetDistSelfContained extends OutputTargetBase {
 
   dir?: string;
   buildDir?: string;
-  resourcesUrl?: string;
 
   empty?: boolean;
 }
@@ -180,13 +193,14 @@ export interface OutputTargetHydrate extends OutputTargetBase {
 export interface OutputTargetCustom extends OutputTargetBase {
   type: 'custom';
   name: string;
-  validate?: (config: d.Config, diagnostics: d.Diagnostic[]) => void;
-  generator: (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, docs: d.JsonDocs) => Promise<void>;
+  validate?: (config: Config, diagnostics: Diagnostic[]) => void;
+  generator: (config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, docs: JsonDocs) => Promise<void>;
 }
 
 export interface OutputTargetDocsVscode extends OutputTargetBase {
   type: 'docs-vscode';
-  file?: string;
+  file: string;
+  sourceCodeBaseUrl?: string;
 }
 
 export interface OutputTargetDocsReadme extends OutputTargetBase {
@@ -202,6 +216,7 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
   type: 'docs-json';
 
   file: string;
+  typesFile?: string | null;
   strict?: boolean;
 }
 
@@ -209,7 +224,7 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
 export interface OutputTargetDocsCustom extends OutputTargetBase {
   type: 'docs-custom';
 
-  generator: (docs: d.JsonDocs) => void | Promise<void>;
+  generator: (docs: JsonDocs) => void | Promise<void>;
   strict?: boolean;
 }
 
@@ -224,8 +239,6 @@ export interface OutputTargetBase {
   type: string;
 }
 
-
-
 export type OutputTargetBuild =
  | OutputTargetDistCollection
  | OutputTargetDistLazy;
@@ -233,6 +246,7 @@ export type OutputTargetBuild =
 
 export type OutputTarget =
  | OutputTargetAngular
+ | OutputTargetCopy
  | OutputTargetCustom
  | OutputTargetDist
  | OutputTargetDistCollection
@@ -247,4 +261,5 @@ export type OutputTarget =
  | OutputTargetDocsVscode
  | OutputTargetWww
  | OutputTargetHydrate
- | OutputTargetStats;
+ | OutputTargetStats
+ | OutputTargetDistTypes;

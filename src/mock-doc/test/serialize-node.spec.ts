@@ -115,6 +115,14 @@ describe('serializeNodeToHtml', () => {
     `);
   });
 
+  it ('style', () => {
+    const input = `<style>     \n    text   \n\n</style>`;
+    doc.body.innerHTML = input;
+
+    const output = serializeNodeToHtml(doc.body);
+    expect(output).toBe(`<style>text</style>`);
+  });
+
   it('template', () => {
     const input = `<template>text</template>`;
     doc.body.innerHTML = input;

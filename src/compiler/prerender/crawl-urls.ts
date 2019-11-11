@@ -106,6 +106,9 @@ export function crawlAnchorsForNextUrls(prerenderConfig: d.PrerenderConfig, diag
 function standardFilterAnchor(diagnostics: d.Diagnostic[], attrs: {[attrName: string]: string}, _base: URL) {
   try {
     let href = attrs.href;
+    if (typeof attrs.download === 'string') {
+      return false;
+    }
     if (typeof href === 'string') {
       href = href.trim();
 
@@ -154,6 +157,10 @@ function standardNormalizeUrl(diagnostics: d.Diagnostic[], href: string, current
 function standardFilterUrl(diagnostics: d.Diagnostic[], url: URL, currentUrl: URL, basePathParts: string[]) {
   try {
     if (url.hostname != null && currentUrl.hostname != null && url.hostname !== currentUrl.hostname) {
+      return false;
+    }
+
+    if (shouldSkipExtension(url.pathname)) {
       return false;
     }
 
@@ -218,3 +225,27 @@ export function standardNormalizeHref(prerenderConfig: d.PrerenderConfig, diagno
 
   return null;
 }
+
+function shouldSkipExtension(filename: string) {
+  return SKIP_EXT.has(extname(filename).toLowerCase());
+}
+
+function extname(str: string) {
+  const parts = str.split('.');
+  return parts[parts.length - 1].toLowerCase();
+}
+
+const SKIP_EXT = new Set([
+  'zip',
+  'rar',
+  'tar',
+  'gz',
+  'bz2',
+  'png',
+  'jpeg',
+  'jpg',
+  'gif',
+  'pdf',
+  'tiff',
+  'psd',
+]);

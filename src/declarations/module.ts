@@ -1,4 +1,4 @@
-import * as d from '.';
+import { ComponentCompilerMeta } from './component-compiler-meta';
 
 
 export type ModuleMap = Map<string, Module>;
@@ -8,12 +8,26 @@ export type ModuleMap = Map<string, Module>;
  * cannot use Map or Set
  */
 export interface Module {
-  cmps: d.ComponentCompilerMeta[];
+  cmps: ComponentCompilerMeta[];
+  coreRuntimeApis: string[];
   collectionName: string;
   dtsFilePath: string;
   excludeFromCollection: boolean;
   externalImports: string[];
+  htmlAttrNames: string[];
+  htmlTagNames: string[];
+  isCollectionDependency: boolean;
+  isLegacy: boolean;
+  jsFilePath: string;
+  localImports: string[];
+  originalImports: string[];
+  originalCollectionComponentPath: string;
+  potentialCmpRefs: string[];
+  sourceFilePath: string;
+
+  // build features
   hasVdomAttribute: boolean;
+  hasVdomXlink: boolean;
   hasVdomClass: boolean;
   hasVdomFunctional: boolean;
   hasVdomKey: boolean;
@@ -22,13 +36,4 @@ export interface Module {
   hasVdomRender: boolean;
   hasVdomStyle: boolean;
   hasVdomText: boolean;
-  htmlAttrNames: string[];
-  htmlTagNames: string[];
-  isCollectionDependency: boolean;
-  isLegacy: boolean;
-  jsFilePath: string;
-  localImports: string[];
-  originalCollectionComponentPath: string;
-  potentialCmpRefs: string[];
-  sourceFilePath: string;
 }

@@ -18,7 +18,7 @@ async function updateToHydrateComponent(config: d.Config, compilerCtx: d.Compile
   const inputFileName = config.sys.path.basename(inputFilePath);
   const inputJsText = await compilerCtx.fs.readFile(inputFilePath);
 
-  const cacheKey = compilerCtx.cache.createKey('hydrate', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, inputJsText);
+  const cacheKey = await compilerCtx.cache.createKey('hydrate', COMPILER_BUILD.id, COMPILER_BUILD.transpiler, inputJsText);
   const outputFileName = `${cacheKey}-${inputFileName}`;
   const outputFilePath = config.sys.path.join(inputFileDir, outputFileName);
 

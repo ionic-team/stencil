@@ -1,7 +1,5 @@
 [![npm][npm-badge]][npm-badge-url]
-[![Build Status][circle-badge]][circle-badge-url]
-[![Appveyor Build status][appveyor-badge]][appveyor-badge-url]
-[![BrowserStack Status][browserstack-badge]][browserstack-badge-url]
+[![Build & Test](https://github.com/ionic-team/stencil/workflows/Build%20&%20Test/badge.svg)](https://github.com/ionic-team/stencil/actions)
 [![license][npm-license]][npm-license-url]
 
 
@@ -148,30 +146,47 @@ Web Components, specifically Custom Elements, are natively supported in Chrome a
 
 ## Polyfills
 
-For the small minority of browsers that do not support modern browser features and APIs, Stencil will automatically polyfill them on-demand. What this means is that for browsers that already support the feature natively, they will not have to download and parse any unnecessary JavaScript. The great news is that in today's web landscape, most modern APIs are already shipping for what Stencil requires. Polyfills which are loaded on-demand include:
+Stencil includes a subset of the `core-js` polyfills for old browsers like IE11, `fetch` and conditionally downloads the [Custom Elements v1](https://github.com/webcomponents/polyfills/tree/master/packages/custom-elements) only when it's needed for modern browsers (EDGE and old versions of Firefox.)
 
- - [Custom Element](https://github.com/WebReflection/document-register-element)
- - [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
- - [CSS Variables](https://github.com/webcomponents/shadycss)
+
+### Internet Explorer 11
+
+Browsers that do not support native ESM (at the moment, only IE11 and older) will download a subset of [`core-js`](https://github.com/zloirock/core-js).
+
+This subset is generated using the [`core-js-builder` tool](https://github.com/zloirock/core-js/tree/master/packages/core-js-builder) with the following configuration:
+
+```js
+require('core-js-builder')({
+  targets: 'ie 11',
+  modules: [
+    'es',
+    'web.url',
+    'web.url.to-json',
+    'web.url-search-params',
+    'web.dom-collections.for-each'
+  ],
+  blacklist: [
+    'es.math',
+    'es.date',
+    'es.symbol',
+    'es.array-buffer',
+    'es.data-view',
+    'es.typed-array',
+    'es.reflect',
+    'es.promise'
+  ]
+});
+```
+
+In addition, the following set of polyfills are also included:
+
  - [Promise](https://github.com/stefanpenner/es6-promise)
- - [async/await](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) *(transpiled to promises)*
  - [fetch()](https://github.com/github/fetch)
- - [URL](https://github.com/lifaon74/url-polyfill)
- - [Array.fill](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill)
- - [Array.find](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
- - [Array.findIndex](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex)
- - [Array.from](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from)
- - [Array.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes)
- - [Element.closest](https://github.com/jonathantneal/closest)
- - [Element.matches](https://github.com/jonathantneal/closest)
- - [Element.remove](https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove)
- - [Map/Set/WeakMap/WeakSet](https://github.com/WebReflection/es6-collections)
- - [Object.assign](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
- - [Object.entries](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries)
- - [Object.values](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/values)
- - [String.startsWith](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith)
- - [String.endsWith](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith)
- - [String.includes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes)
+ - [CSS variables](https://github.com/ionic-team/stencil/tree/master/src/client/polyfills/css-shim): We implemented our own CSS variables polyfill that integrates into the Stenciljs runtime.
+
+### All browsers
+
+Some modern browsers like Edge do not include native support for Web Components. In that case, we conditionally load the [Custom Elements v1](https://github.com/webcomponents/polyfills/tree/master/packages/custom-elements) polyfill.
 
 
 ## Related
@@ -186,7 +201,7 @@ For the small minority of browsers that do not support modern browser features a
 
 ## License
 
- - [MIT](https://raw.githubusercontent.com/ionic-team/stencil/master/LICENSE)
+ - [MIT](https://raw.githubusercontent.com/ionic-team/stencil/master/LICENSE.md)
 
 
 [npm-badge]: https://img.shields.io/npm/v/@stencil/core.svg

@@ -1,4 +1,5 @@
-import * as d from '.';
+import { StyleCompiler } from './style';
+import { ListenTargetOptions } from './decorators';
 
 /** Must be serializable to JSON!! */
 export interface ComponentCompilerFeatures {
@@ -6,6 +7,7 @@ export interface ComponentCompilerFeatures {
   hasAttributeChangedCallbackFn: boolean;
   hasComponentWillLoadFn: boolean;
   hasComponentDidLoadFn: boolean;
+  hasComponentShouldUpdateFn: boolean;
   hasComponentWillUpdateFn: boolean;
   hasComponentDidUpdateFn: boolean;
   hasComponentWillRenderFn: boolean;
@@ -35,6 +37,7 @@ export interface ComponentCompilerFeatures {
   hasState: boolean;
   hasStyle: boolean;
   hasVdomAttribute: boolean;
+  hasVdomXlink: boolean;
   hasVdomClass: boolean;
   hasVdomFunctional: boolean;
   hasVdomKey: boolean;
@@ -71,16 +74,16 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   sourceFilePath: string;
   states: ComponentCompilerState[];
   styleDocs: CompilerStyleDoc[];
-  styles: d.StyleCompiler[];
+  styles: StyleCompiler[];
   tagName: string;
   internal: boolean;
   legacyConnect: ComponentCompilerLegacyConnect[];
   legacyContext: ComponentCompilerLegacyContext[];
 
   dependencies?: string[];
-  dependants?: string[];
+  dependents?: string[];
   directDependencies?: string[];
-  directDependants?: string[];
+  directDependents?: string[];
 }
 
 export interface ComponentCompilerLegacyConnect {
@@ -161,7 +164,7 @@ export interface ComponentCompilerListener {
   method: string;
   capture: boolean;
   passive: boolean;
-  target: d.ListenTargetOptions | undefined;
+  target: ListenTargetOptions | undefined;
 }
 
 export interface ComponentCompilerStaticMethod {
@@ -215,7 +218,7 @@ export interface CompilerAssetDir {
 export interface ComponentCompilerData {
   exportLine: string;
   filePath: string;
-  cmp: d.ComponentCompilerMeta;
+  cmp: ComponentCompilerMeta;
   uniqueComponentClassName?: string;
   importLine?: string;
 }

@@ -7,7 +7,7 @@ export class AttributeBasic {
 
   @Prop() single = 'single';
   @Prop() multiWord = 'multiWord';
-  @Prop({ attr: 'my-custom-attr' }) customAttr = 'my-custom-attr';
+  @Prop({ attribute: 'my-custom-attr' }) customAttr = 'my-custom-attr';
 
   render() {
     return (

@@ -1,8 +1,8 @@
-import * as d from '.';
+import { Build } from './build-conditionals';
 
 declare global {
   namespace jest {
-    interface Matchers<R> {
+    interface Matchers<R, T> {
       /**
        * Compares HTML, but first normalizes the HTML so all
        * whitespace, attribute order and css class order are
@@ -127,6 +127,10 @@ export interface EventSpy {
   firstEvent: SerializedEvent;
   lastEvent: SerializedEvent;
   length: number;
+  next(): Promise<{
+    done: boolean;
+    value: SerializedEvent;
+  }>;
 }
 
 
@@ -159,6 +163,7 @@ export interface EventInitDict {
 
 export interface JestEnvironmentGlobal {
   __NEW_TEST_PAGE__: () => Promise<any>;
+  __CLOSE_OPEN_PAGES__: () => Promise<any>;
   Context: any;
   loadTestWindow: (testWindow: any) => Promise<void>;
   h: any;
@@ -185,11 +190,13 @@ export interface E2EProcessEnv {
   __STENCIL_BROWSER_URL__?: string;
   __STENCIL_APP_URL__?: string;
   __STENCIL_BROWSER_WS_ENDPOINT__?: string;
+  __STENCIL_BROWSER_WAIT_UNTIL?: string;
 
   __STENCIL_SCREENSHOT__?: 'true';
   __STENCIL_SCREENSHOT_BUILD__?: string;
 
   __STENCIL_E2E_TESTS__?: 'true';
+  __STENCIL_E2E_DEVTOOLS__?: 'true';
   __STENCIL_SPEC_TESTS__?: 'true';
 
   __STENCIL_PUPPETEER_MODULE__?: string;
@@ -314,6 +321,11 @@ export interface JestConfig {
    */
   setupFiles?: string[];
 
+  setupFilesAfterEnv?: string[];
+
+  /**
+   * @deprecated Use setupFilesAfterEnv instead.
+   */
   setupTestFrameworkScriptFile?: string;
   snapshotSerializers?: any[];
   testEnvironment?: string;
@@ -402,6 +414,12 @@ export interface TestingConfig extends JestConfig {
   browserSlowMo?: number;
 
   /**
+   * By default, all E2E pages wait until the "load" event, this global setting can be used
+   * to change the default `waitUntil` behaviour.
+   */
+  browserWaitUntil?: 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
+
+  /**
    * Whether to auto-open a DevTools panel for each tab.
    * If this option is true, the headless option will be set false
    */
@@ -417,8 +435,12 @@ export interface TestingConfig extends JestConfig {
    * Path to the Screenshot Connector module.
    */
   screenshotConnector?: string;
-}
 
+  /**
+   * Amount of time in milliseconds to wait before a screenshot is taken.
+   */
+  waitBeforeScreenshot?: number;
+}
 
 export interface EmulateConfig {
   /**
@@ -474,36 +496,106 @@ export interface AnyHTMLElement extends HTMLElement {
 }
 
 export interface SpecPage {
-  win: Window;
-  doc: HTMLDocument;
+  /**
+   * Mocked testing `document.body`.
+   */
   body: HTMLBodyElement;
+  /**
+   * Mocked testing `document`.
+   */
+  doc: HTMLDocument;
+  /**
+   * The first component found within the mocked `document.body`. If a component isn't found, then it'll return `document.body.firstElementChild`.
+   */
   root?: AnyHTMLElement;
+  /**
+   * Similar to `root`, except returns the component instance. If a root component was not found it'll return `null`.
+   */
   rootInstance?: any;
-  build: d.Build;
-  styles: Map<string, string>;
+  /**
+   * Convenience function to set `document.body.innerHTML` and `waitForChanges()`. Function argument should be an html string.
+   */
   setContent: (html: string) => Promise<any>;
+  /**
+   * After changes have been made to a component, such as a update to a property or attribute, the test page does not automatically apply the changes. In order to wait for, and apply the update, call `await page.waitForChanges()`.
+   */
   waitForChanges: () => Promise<any>;
+  /**
+   * Mocked testing `window`.
+   */
+  win: Window;
+
+  build: Build;
   flushLoadModule: (bundleId?: string) => Promise<any>;
   flushQueue: () => Promise<any>;
+  styles: Map<string, string>;
 }
 
 
 export interface NewSpecPageOptions {
+  /**
+   * An array of components to test. Component classes can be imported into the spec file, then their reference should be added to the `component` array in order to be used throughout the test.
+   */
   components: any[];
+  /**
+   * Sets the mocked `document.cookie`.
+   */
   cookie?: string;
+  /**
+   * Sets the mocked `dir` attribute on `<html>`.
+   */
   direction?: string;
   flushQueue?: boolean;
+  /**
+   * The initial HTML used to generate the test. This can be useful to construct a collection of components working together, and assign HTML attributes. This value sets the mocked `document.body.innerHTML`.
+   */
   html?: string;
+
+  /**
+   * The initial JSX used to generate the test.
+   * Use `template` when you want to initialize a component using their properties, instead of their HTML attributes.
+   * It will render the specified template (JSX) into `document.body`.
+   */
+  template?: () => any;
+
+  /**
+   * Sets the mocked `lang` attribute on `<html>`.
+   */
   language?: string;
+  /**
+   * Useful for debugging hydrating components client-side. Sets that the `html` option already includes annotated prerender attributes and comments.
+   */
   hydrateClientSide?: boolean;
+  /**
+   * Useful for debugging hydrating components server-side. The output HTML will also include prerender annotations.
+   */
   hydrateServerSide?: boolean;
+  /**
+   * Sets the mocked `document.referrer`.
+   */
   referrer?: string;
+  /**
+   * Manually set if the mocked document supports Shadow DOM or not. Default is `true`.
+   */
   supportsShadowDom?: boolean;
+  /**
+   * When a component is prerendered it includes HTML annotations, such as `s-id` attributes and `<!-t.0->` comments. This information is used by clientside hydrating. Default is `false`.
+   */
   includeAnnotations?: boolean;
+  /**
+   * Sets the mocked browser's `location.href`.
+   */
   url?: string;
+  /**
+   * Sets the mocked browser's `navigator.userAgent`.
+   */
   userAgent?: string;
+  /**
+   * By default, any changes to component properties and attributes must `page.waitForChanges()` in order to test the updates. As an option, `autoAppluChanges` continuously flushes the queue on the background. Default is `false`.
+   */
   autoApplyChanges?: boolean;
 
+  strictBuild?: boolean;
   /** @deprecated */
   context?: {[key: string]: any};
 }

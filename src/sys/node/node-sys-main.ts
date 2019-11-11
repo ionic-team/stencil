@@ -18,7 +18,6 @@ import { WorkerManager } from './worker/index';
 import { createHash } from 'crypto';
 import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
 import path from 'path';
-import * as url from 'url';
 
 
 export class NodeSystem implements d.StencilSystem {
@@ -127,7 +126,7 @@ export class NodeSystem implements d.StencilSystem {
   get compiler() {
     return {
       name: this.packageJsonData.name,
-      version: this.packageJsonData.version,
+      version: '0.0.0-stencil-dev',
       runtime: path.join(this.distDir, 'compiler', 'index.js'),
       packageDir: this.packageDir,
       distDir: this.distDir,
@@ -135,8 +134,8 @@ export class NodeSystem implements d.StencilSystem {
     };
   }
 
-  async copy(copyTasks: d.CopyTask[]): Promise<d.CopyResults> {
-    return this.sysWorker.run('copy', [copyTasks], { isLongRunningTask: true });
+  async copy(copyTasks: d.CopyTask[], srcDir: string): Promise<d.CopyResults> {
+    return this.sysWorker.run('copy', [copyTasks, srcDir], { isLongRunningTask: true });
   }
 
   createDocument(html: string) {
@@ -154,17 +153,19 @@ export class NodeSystem implements d.StencilSystem {
   }
 
   generateContentHash(content: any, length?: number) {
-    let hash = createHash('md5')
-               .update(content)
-               .digest('base64');
+    return new Promise<string>(resolve => {
+      let hash = createHash('md5')
+        .update(content)
+        .digest('base64');
 
-    if (typeof length === 'number') {
-      hash = hash.replace(/\W/g, '')
-                 .substr(0, length)
-                 .toLowerCase();
-    }
+      if (typeof length === 'number') {
+        hash = hash.replace(/\W/g, '')
+                .substr(0, length)
+                .toLowerCase();
+      }
 
-    return hash;
+      resolve(hash);
+    });
   }
 
   getClientPath(staticName: string) {
@@ -269,14 +270,10 @@ export class NodeSystem implements d.StencilSystem {
     return this.sysWorker.run('transpileToEs5', [cwd, input, inlineHelpers]);
   }
 
-  get url() {
-    return url;
-  }
-
-  validateTypes(compilerOptions: any, emitDtsFiles: boolean, currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+  validateTypes(compilerOptions: any, emitDtsFiles: boolean, collectionNames: string[], rootTsFiles: string[], isDevMode: boolean) {
     return this.sysWorker.run(
       'validateTypes',
-      [compilerOptions, emitDtsFiles, currentWorkingDir, collectionNames, rootTsFiles],
+      [compilerOptions, emitDtsFiles, collectionNames, rootTsFiles, isDevMode],
       { isLongRunningTask: true, workerKey: 'validateTypes' }
     );
   }

@@ -7,7 +7,7 @@ import path from 'path';
 import ts from 'typescript';
 
 
-export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: boolean, compilerOptions: ts.CompilerOptions, _currentWorkingDir: string, collectionNames: string[], rootTsFiles: string[]) {
+export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: boolean, compilerOptions: ts.CompilerOptions, collectionNames: string[], rootTsFiles: string[], isDevMode: boolean) {
   const results: d.ValidateTypesResults = {
     diagnostics: [],
     dirPaths: [],
@@ -18,7 +18,14 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
     compilerOptions.outDir = undefined;
 
     const tsHost = ts.createCompilerHost(compilerOptions);
-
+    const originalReadFile = tsHost.readFile;
+    tsHost.readFile = (filename: string) => {
+      const content = originalReadFile(filename);
+      if (filename.endsWith('components.d.ts')) {
+        return content.replace('interface ElementTagNameMap ', 'interface _LegacyElementTagNameMap ');
+      }
+      return content;
+    };
     tsHost.writeFile = (outputFileName: string, data: string, writeByteOrderMark: boolean) => {
       if (!emitDtsFiles) {
         return;
@@ -67,12 +74,35 @@ export function validateTypesWorker(workerCtx: d.WorkerContext, emitDtsFiles: bo
     ]
   });
 
-  const tsDiagnostics: ts.Diagnostic[] = [];
-  program.getSyntacticDiagnostics().forEach(d => tsDiagnostics.push(d));
-  program.getSemanticDiagnostics().forEach(d => tsDiagnostics.push(d));
-  program.getOptionsDiagnostics().forEach(d => tsDiagnostics.push(d));
+  const tsSyntacticDiagnostics = program.getSyntacticDiagnostics();
+  const tsSemanticDiagnostics = program.getSemanticDiagnostics();
+  const tsOptionsDiagnostics = program.getOptionsDiagnostics();
 
-  loadTypeScriptDiagnostics(results.diagnostics, tsDiagnostics);
+  if (tsSyntacticDiagnostics.length > 0) {
+    results.diagnostics.push(
+      ...loadTypeScriptDiagnostics(tsSyntacticDiagnostics)
+    );
+  }
+
+  if (tsSemanticDiagnostics.length > 0) {
+    const semanticDiagnostics = loadTypeScriptDiagnostics(tsSemanticDiagnostics);
+    if (isDevMode) {
+      semanticDiagnostics.forEach(semanticDiagnostic => {
+        if (semanticDiagnostic.code === '6133') {
+          semanticDiagnostic.level = 'warn';
+        }
+      });
+    }
+    results.diagnostics.push(
+      ...semanticDiagnostics
+    );
+  }
+
+  if (tsOptionsDiagnostics.length > 0) {
+    results.diagnostics.push(
+      ...loadTypeScriptDiagnostics(tsOptionsDiagnostics)
+    );
+  }
 
   return results;
 }

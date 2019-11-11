@@ -3,7 +3,7 @@ import { getStaticValue, isInternal } from '../transform-utils';
 import ts from 'typescript';
 
 
-export function parseStaticEvents(staticMembers: ts.ClassElement[]): d.ComponentCompilerEvent[] {
+export const parseStaticEvents = (staticMembers: ts.ClassElement[]): d.ComponentCompilerEvent[] => {
   const parsedEvents: d.ComponentCompilerEvent[] = getStaticValue(staticMembers, 'events');
   if (!parsedEvents || parsedEvents.length === 0) {
     return [];
@@ -21,5 +21,4 @@ export function parseStaticEvents(staticMembers: ts.ClassElement[]): d.Component
       internal: isInternal(parsedEvent.docs)
     };
   });
-}
-
+};

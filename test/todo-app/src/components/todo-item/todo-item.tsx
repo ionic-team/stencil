@@ -5,8 +5,8 @@ import { Component, Prop, Event, EventEmitter, h } from '@stencil/core';
 })
 export class TodoItem {
 
-  @Prop() checked: boolean;
-  @Prop() text: string;
+  @Prop({attribute: null}) checked: boolean;
+  @Prop({attribute: null}) text: string;
   @Event() itemCheck: EventEmitter;
   @Event() itemRemove: EventEmitter;
 

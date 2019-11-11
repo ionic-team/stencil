@@ -35,7 +35,7 @@ export class Compiler implements d.Compiler {
       if (config.suppressLogs !== true) {
         logger.info(logger.cyan(startupMsg));
 
-        if (sys.semver.prerelease(sys.compiler.version)) {
+        if (sys.semver && sys.semver.prerelease(sys.compiler.version)) {
           logger.warn(sys.color.yellow(`This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`));
         }
         if (config.devMode && config.buildEs5) {
@@ -64,14 +64,15 @@ export class Compiler implements d.Compiler {
         logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}, buildEs5: ${config.buildEs5}`);
       }
 
-      const workerOpts = sys.initWorkers(config.maxConcurrentWorkers, config.maxConcurrentTasksPerWorker, logger);
-      const workerInfo = `compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`;
-      if (isDebug) {
-        logger.debug(workerInfo);
-      } else if (config.flags && config.flags.ci) {
-        logger.info(workerInfo);
+      if (sys.initWorkers) {
+        const workerOpts = sys.initWorkers(config.maxConcurrentWorkers, config.maxConcurrentTasksPerWorker, logger);
+        const workerInfo = `compiler workers: ${workerOpts.maxConcurrentWorkers}, tasks per worker: ${workerOpts.maxConcurrentTasksPerWorker}`;
+        if (isDebug) {
+          logger.debug(workerInfo);
+        } else if (config.flags && config.flags.ci) {
+          logger.info(workerInfo);
+        }
       }
-
 
       this.ctx = new CompilerContext(config);
 
@@ -243,14 +244,25 @@ function isValid(config: d.Config): [ boolean, d.Config | null] {
   } catch (e) {
     catchError(diagnostics, e, e.message);
   }
-  if (config.logger) {
+
+  if (config.logger != null) {
     diagnostics.forEach(d => {
       d.type = 'config';
       d.header = 'configuration';
       d.absFilePath = config.configPath;
     });
     config.logger.printDiagnostics(diagnostics);
+
+  } else {
+    diagnostics.forEach(d => {
+      if (d.level === 'error') {
+        throw new Error(d.messageText);
+      } else {
+        console.info(d.messageText);
+      }
+    });
   }
+
   if (hasError(diagnostics)) {
     return [ false, null ];
   } else {

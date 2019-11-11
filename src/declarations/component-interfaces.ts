@@ -61,9 +61,12 @@ export interface ComponentDidUnload {
   componentDidUnload: () => void;
 }
 
-export interface ComponentInstance {
+export interface ComponentInterface {
   connectedCallback?: () => void;
   disconnectedCallback?: () => void;
+
+  componentWillRender?: () => Promise<void> | void;
+  componentDidRender?: () => void;
 
   /**
    * The component is about to load and it has not
@@ -107,23 +110,7 @@ export interface ComponentInstance {
    */
   componentDidUpdate?: () => void;
 
-  /**
-   * The component did unload and the element
-   * will be destroyed.
-   */
-  componentDidUnload?: () => void;
-
   render?: () => any;
-
-  /**
-   * Used to dynamically set host element attributes.
-   * Should be placed directly above render()
-   */
-  hostData?: () => {
-    class?: {[className: string]: boolean};
-    style?: any;
-    [attrName: string]: any;
-  };
 
   [memberName: string]: any;
 }

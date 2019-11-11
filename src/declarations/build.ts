@@ -1,4 +1,16 @@
-import * as d from '.';
+import { Collection } from './collection';
+import { CompilerCtx } from './compiler';
+import { ComponentCompilerMeta, Encapsulation } from './component-compiler-meta';
+import { Config } from './config';
+import { CopyResults } from './assets';
+import { Diagnostic } from './diagnostics';
+import { EntryModule } from './entry';
+import { LoggerTimeSpan } from './logger';
+import { Module } from './module';
+import { PackageJsonData } from './system';
+import { PageReloadStrategy } from './dev-server';
+import { ValidateTypesResults } from './transpile';
+
 
 export type ModuleFormat =
   | 'amd'
@@ -19,30 +31,29 @@ export interface RollupResults {
 }
 
 export interface BuildCtx {
-  abort(): Promise<BuildResults>;
   buildId: number;
-  buildResults: d.BuildResults;
+  buildResults: BuildResults;
   buildMessages: string[];
   bundleBuildCount: number;
-  collections: d.Collection[];
-  components: d.ComponentCompilerMeta[];
+  collections: Collection[];
+  compilerCtx: CompilerCtx;
+  components: ComponentCompilerMeta[];
   componentGraph: Map<string, string[]>;
-  createTimeSpan(msg: string, debug?: boolean): d.LoggerTimeSpan;
+  config: Config;
+  createTimeSpan(msg: string, debug?: boolean): LoggerTimeSpan;
   data: any;
   debug: (msg: string) => void;
-  diagnostics: d.Diagnostic[];
+  diagnostics: Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
-  entryModules: d.EntryModule[];
+  entryModules: EntryModule[];
   filesAdded: string[];
   filesChanged: string[];
   filesDeleted: string[];
   filesUpdated: string[];
   filesWritten: string[];
-  finish(): Promise<BuildResults>;
   globalStyle: string | undefined;
   hasConfigChanges: boolean;
-  hasCopyChanges: boolean;
   hasError: boolean;
   hasFinished: boolean;
   hasHtmlChanges: boolean;
@@ -55,26 +66,25 @@ export interface BuildCtx {
   indexBuildCount: number;
   indexDoc: Document;
   isRebuild: boolean;
-  moduleFiles: d.Module[];
-  packageJson: d.PackageJsonData;
+  moduleFiles: Module[];
+  packageJson: PackageJsonData;
   packageJsonFilePath: string;
-  pendingCopyTasks: Promise<d.CopyResults>[];
+  pendingCopyTasks: Promise<CopyResults>[];
   progress(task: BuildTask): void;
   requiresFullBuild: boolean;
   rollupResults?: RollupResults;
   scriptsAdded: string[];
   scriptsDeleted: string[];
-  skipAssetsCopy: boolean;
   startTime: number;
   styleBuildCount: number;
   stylesPromise: Promise<void>;
   stylesUpdated: BuildStyleUpdate[];
-  timeSpan: d.LoggerTimeSpan;
+  timeSpan: LoggerTimeSpan;
   timestamp: string;
   transpileBuildCount: number;
   validateTypesBuild?(): Promise<void>;
-  validateTypesHandler?: (results: d.ValidateTypesResults) => Promise<void>;
-  validateTypesPromise?: Promise<d.ValidateTypesResults>;
+  validateTypesHandler?: (results: ValidateTypesResults) => Promise<void>;
+  validateTypesPromise?: Promise<ValidateTypesResults>;
 }
 
 
@@ -103,7 +113,7 @@ export interface BuildResults {
   };
   bundleBuildCount: number;
   components: BuildComponent[];
-  diagnostics: d.Diagnostic[];
+  diagnostics: Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
   duration: number;
@@ -130,7 +140,7 @@ export interface HotModuleReplacement {
   imagesUpdated?: string[];
   indexHtmlUpdated?: boolean;
   inlineStylesUpdated?: HmrStyleUpdate[];
-  reloadStrategy: d.PageReloadStrategy;
+  reloadStrategy: PageReloadStrategy;
   scriptsAdded?: string[];
   scriptsDeleted?: string[];
   serviceWorkerUpdated?: boolean;
@@ -188,7 +198,7 @@ export interface BuildEntry {
   bundles: BuildBundle[];
   inputs: string[];
   modes?: string[];
-  encapsulations: d.Encapsulation[];
+  encapsulations: Encapsulation[];
 }
 
 
@@ -212,9 +222,6 @@ export interface BuildComponent {
   dependencyOf?: string[];
   dependencies?: string[];
 }
-
-
-export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'fsChange' | 'buildFinish' | 'buildNoChange' | 'buildLog';
 
 
 export interface BundleOutputChunk {
@@ -243,7 +250,6 @@ export interface BundleAppOptions {
   inputs: BundleEntryInputs;
   loader: {[id: string]: string};
   cache?: any;
-  emitCoreChunk?: boolean;
   externalRuntime?: string;
   skipDeps?: boolean;
   isServer?: boolean;
@@ -270,7 +276,7 @@ export interface BundleModule {
   entryKey: string;
   modeNames: string[];
   rollupResult: RollupResult;
-  cmps: d.ComponentCompilerMeta[];
+  cmps: ComponentCompilerMeta[];
   outputs: BundleModuleOutput[];
 }
 

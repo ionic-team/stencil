@@ -6,12 +6,17 @@ const resolveMockPromises: Promise<any>[] = [];
 
 
 export function setupMockFetch(global: any) {
-  global.window.fetch = function(input: RequestInfo) {
-    return globalMockFetch(input);
-  };
-  global.fetch = function(input: RequestInfo) {
-    return globalMockFetch(input);
-  };
+  const win = global.window;
+  if (!('fetch' in win)) {
+    win.fetch = function(input: RequestInfo) {
+      return globalMockFetch(input);
+    };
+  }
+  if (!('fetch' in global)) {
+    global.fetch = function(input: RequestInfo) {
+      return globalMockFetch(input);
+    };
+  }
 }
 
 

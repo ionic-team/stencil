@@ -10,6 +10,7 @@
 import * as d from '../../declarations';
 import { BUILD } from '@build-conditionals';
 import { isComplexType } from '@utils';
+import { STENCIL_DEV_MODE } from '../profile';
 
 // const stack: any[] = [];
 
@@ -17,19 +18,25 @@ import { isComplexType } from '@utils';
 // export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
 export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.VNode => {
   let child = null;
+  let key: string = null;
+  let slotName: string = null;
   let simple = false;
   let lastSimple = false;
-  let key: string;
-  let slotName: string;
   let vNodeChildren: d.VNode[] = [];
   const walk = (c: any[]) => {
     for (let i = 0; i < c.length; i++) {
       child = c[i];
       if (Array.isArray(child)) {
         walk(child);
-      } else if (child != null) {
+      } else if (child != null && typeof child !== 'boolean') {
         if (simple = typeof nodeName !== 'function' && !isComplexType(child)) {
           child = String(child);
+
+        } else if (BUILD.isDev && child.$flags$ === undefined) {
+          console.error(...STENCIL_DEV_MODE, `vNode passed as children has unexpected type.
+Make sure it's using the correct h() function.
+Empty objects can also be the cause, look for JSX comments that became objects.`);
+
         }
 
         if (simple && lastSimple) {
@@ -37,19 +44,19 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
           vNodeChildren[vNodeChildren.length - 1].$text$ += child;
         } else {
           // Append a new vNode, if it's text, we create a text vNode
-          vNodeChildren.push(simple ? { $flags$: 0, $text$: child } : child);
+          vNodeChildren.push(simple ? newVNode(null, child) : child);
         }
         lastSimple = simple;
       }
     }
   };
   walk(children);
-  if (BUILD.vdomAttribute && vnodeData) {
+  if (vnodeData) {
     // normalize class / classname attributes
-    if (BUILD.vdomKey) {
-      key = vnodeData.key || undefined;
+    if (BUILD.vdomKey && vnodeData.key) {
+      key = vnodeData.key;
     }
-    if (BUILD.slotRelocation) {
+    if (BUILD.slotRelocation && vnodeData.name) {
       slotName = vnodeData.name;
     }
     if (BUILD.vdomClass) {
@@ -64,18 +71,22 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
     }
   }
 
+  if (BUILD.isDev && vNodeChildren.some(isHost)) {
+    throw new Error(`The <Host> must be the single root component. Make sure:
+- You are NOT using hostData() and <Host> in the same component.
+- <Host> is used once, and it's the single root component of the render() function.`);
+  }
+
   if (BUILD.vdomFunctional && typeof nodeName === 'function') {
     // nodeName is a functional component
     return (nodeName as d.FunctionalComponent<any>)(vnodeData, vNodeChildren, vdomFnUtils) as any;
   }
 
-  const vnode: d.VNode = {
-    $flags$: 0,
-    $tag$: nodeName,
-    $children$: vNodeChildren.length > 0 ? vNodeChildren : null,
-    $elm$: undefined,
-    $attrs$: vnodeData,
-  };
+  const vnode = newVNode(nodeName, null);
+  vnode.$attrs$ = vnodeData;
+  if (vNodeChildren.length > 0) {
+    vnode.$children$ = vNodeChildren;
+  }
   if (BUILD.vdomKey) {
     vnode.$key$ = key;
   }
@@ -85,7 +96,31 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
   return vnode;
 };
 
+export const newVNode = (tag: string, text: string) => {
+  const vnode: d.VNode = {
+    $flags$: 0,
+    $tag$: tag,
+    $text$: text,
+    $elm$: null,
+    $children$: null
+  };
+  if (BUILD.vdomAttribute) {
+    vnode.$attrs$ = null;
+  }
+  if (BUILD.vdomKey)  {
+    vnode.$key$ = null;
+  }
+  if (BUILD.slotRelocation) {
+    vnode.$name$ = null;
+  }
+  return vnode;
+};
+
 export const Host = {};
+
+export const isHost = (node: any): node is d.VNode => {
+  return node && node.$tag$ === Host;
+};
 
 const vdomFnUtils: d.FunctionalUtilities = {
   'forEach': (children, cb) => children.map(convertToPublic).forEach(cb),
@@ -104,13 +139,10 @@ const convertToPublic = (node: d.VNode): d.ChildNode => {
 };
 
 const convertToPrivate = (node: d.ChildNode): d.VNode => {
-  return {
-    $flags$: 0,
-    $attrs$: node.vattrs,
-    $children$: node.vchildren,
-    $key$: node.vkey,
-    $name$: node.vname,
-    $tag$: node.vtag,
-    $text$: node.vtext
-  };
+  const vnode = newVNode(node.vtag as any, node.vtext);
+  vnode.$attrs$ = node.vattrs;
+  vnode.$children$ = node.vchildren;
+  vnode.$key$ = node.vkey;
+  vnode.$name$ = node.vname;
+  return vnode;
 };

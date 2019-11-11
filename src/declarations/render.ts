@@ -1,11 +1,11 @@
-import * as d from '.';
+import { HostElement } from './host-element';
 
 
 /**
  * Generic node that represents all of the
  * different types of nodes we'd see when rendering
  */
-export interface RenderNode extends d.HostElement {
+export interface RenderNode extends HostElement {
 
   /**
    * Shadow root's host
@@ -66,4 +66,9 @@ export interface RenderNode extends d.HostElement {
    * Node Id (hydrate only)
    */
   ['s-node-id']?: number;
+
+  /**
+   * Used to tell if the element is shadow dom or not
+   */
+  ['s-sd']?: boolean;
 }

@@ -22,6 +22,7 @@ export const Build: d.UserBuildConditionals = {
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
+  jmp: (h) => h(),
   raf: (h) => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
@@ -111,8 +112,12 @@ export const registerHost = (elm: d.HostElement) => {
     $flags$: 0,
     $hostElement$: elm,
     $instanceValues$: new Map(),
+    $renderCount$: 0
   };
+  hostRef.$onInstancePromise$ = new Promise(r => hostRef.$onInstanceResolve$ = r);
   hostRef.$onReadyPromise$ = new Promise(r => hostRef.$onReadyResolve$ = r);
+  elm['s-p'] = [];
+  elm['s-rc'] = [];
   hostRefs.set(elm, hostRef);
 };
 
@@ -131,9 +136,12 @@ export const isMemberInElement = (elm: any, memberName: string) => {
     if (memberName in elm) {
       return true;
     }
-    const cstr = cstrs.get(elm.nodeName.toLowerCase());
-    if (cstr != null && cstr.COMPILER_META != null && cstr.COMPILER_META.properties != null) {
-      return cstr.COMPILER_META.properties.some(p => p.name === memberName);
+    const nodeName = elm.nodeName;
+    if (nodeName) {
+      const cstr = cstrs.get(nodeName.toLowerCase());
+      if (cstr != null && cstr.COMPILER_META != null && cstr.COMPILER_META.properties != null) {
+        return cstr.COMPILER_META.properties.some(p => p.name === memberName);
+      }
     }
   }
   return false;

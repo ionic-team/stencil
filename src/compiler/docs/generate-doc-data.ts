@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { flatOne, isDocsPublic, normalizePath, sortBy } from '@utils';
 import { getBuildTimestamp } from '../build/build-ctx';
+import { JsonDocsValue } from '../../declarations';
 
 
 export async function generateDocData(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocs> {
@@ -28,7 +29,7 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, build
       .filter(cmp => isDocsPublic(cmp.docs) && !cmp.isCollectionDependency)
       .map(cmp => ({
         dirPath,
-        filePath,
+        filePath: config.sys.path.relative(config.rootDir, filePath),
         fileName: config.sys.path.basename(filePath),
         readmePath,
         usagesDir,
@@ -38,9 +39,10 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, build
         docs: generateDocs(readme, cmp.docs),
         docsTags: cmp.docs.tags,
         encapsulation: getEncapsulation(cmp),
-        dependants: cmp.directDependants,
+        dependents: cmp.directDependents,
         dependencies: cmp.directDependencies,
         dependencyGraph: buildDepGraph(cmp, buildCtx.components),
+        deprecation: getDeprecation(cmp.docs.tags),
 
         props: getProperties(cmp),
         methods: getMethods(cmp.methods),
@@ -67,8 +69,8 @@ function buildDepGraph(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMe
   }
   walk(cmp.tagName);
 
-  // load dependants
-  cmp.directDependants.forEach(tagName => {
+  // load dependents
+  cmp.directDependents.forEach(tagName => {
     if (dependencies[tagName] && !dependencies[tagName].includes(tagName)) {
       dependencies[tagName].push(cmp.tagName);
     } else {
@@ -107,6 +109,7 @@ function getRealProperties(properties: d.ComponentCompilerProperty[]): d.JsonDoc
       docsTags: member.docs.tags,
       default: member.defaultValue,
       deprecation: getDeprecation(member.docs.tags),
+      values: parseTypeIntoValues(member.complexType.resolved),
 
       optional: member.optional,
       required: member.required,
@@ -124,10 +127,55 @@ function getVirtualProperties(virtualProps: d.ComponentCompilerVirtualProperty[]
     docsTags: [],
     default: undefined,
     deprecation: undefined,
+    values: parseTypeIntoValues(member.type),
 
     optional: true,
     required: false,
   }));
+}
+
+function parseTypeIntoValues(type: string) {
+  if (typeof type === 'string') {
+    const unions = type.split('|').map(u => u.trim());
+    const parsedUnions: JsonDocsValue[] = [];
+    unions.forEach(u => {
+      if (u === 'true') {
+        parsedUnions.push({
+          value: 'true',
+          type: 'boolean'
+        });
+        return;
+      }
+      if (u === 'false') {
+        parsedUnions.push({
+          value: 'false',
+          type: 'boolean'
+        });
+        return;
+      }
+      if (!Number.isNaN(parseFloat(u))) {
+        // union is a number
+        parsedUnions.push({
+          value: u,
+          type: 'number'
+        });
+        return;
+      }
+      if (/^("|').+("|')$/gm.test(u)) {
+        // ionic is a string
+        parsedUnions.push({
+          value: u.slice(1, -1),
+          type: 'string'
+        });
+        return;
+      }
+      parsedUnions.push({
+        type: u
+      });
+    });
+    return parsedUnions;
+  }
+  return [];
 }
 
 function getMethods(methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] {
@@ -187,19 +235,20 @@ function getDeprecation(tags: d.JsonDocsTag[]) {
 }
 
 function getSlots(tags: d.JsonDocsTag[]): d.JsonDocsSlot[] {
+  return sortBy(getNameText('slot', tags)
+    .map(([name, docs]) => ({ name, docs }))
+  , a => a.name);
+}
+
+export function getNameText(name: string, tags: d.JsonDocsTag[]) {
   return tags
-    .filter(tag => tag.name === 'slot' && tag.text)
+    .filter(tag => tag.name === name && tag.text)
     .map(({text}) => {
       const [namePart, ...rest] = (' ' + text).split(' - ');
-      return {
-        name: namePart.trim(),
-        docs: rest.join(' - ').trim()
-      };
-    })
-    .sort((a, b) => {
-      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-      return 0;
+      return [
+        namePart.trim(),
+        rest.join(' - ').trim()
+      ];
     });
 }
 

@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { getAbsoluteBuildDir } from './utils';
 import { generateHashedCopy } from '../copy/hashed-copy';
+import { injectModulePreloads } from './inject-module-preloads';
 
 
 export async function optimizeEsmImport(config: d.Config, compilerCtx: d.CompilerCtx, doc: Document, outputTarget: d.OutputTargetWww) {
@@ -23,9 +24,12 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
   if (content.length > MAX_JS_INLINE_SIZE) {
     const hashedFile = await generateHashedCopy(config, compilerCtx, entryPath);
     if (hashedFile) {
-      script.setAttribute('src', config.sys.path.join(resourcesUrl, hashedFile));
+      const hashedPath = config.sys.path.join(resourcesUrl, hashedFile);
+      script.setAttribute('src', hashedPath);
       script.setAttribute('data-resources-url', resourcesUrl);
-      script.setAttribute('data-namespace', config.fsNamespace);
+      script.setAttribute('data-stencil-namespace', config.fsNamespace);
+
+      injectModulePreloads(doc, [hashedPath]);
       return true;
     }
     return false;
@@ -47,7 +51,7 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
   const inlinedScript = doc.createElement('script');
   inlinedScript.setAttribute('type', 'module');
   inlinedScript.setAttribute('data-resources-url', resourcesUrl);
-  inlinedScript.setAttribute('data-namespace', config.fsNamespace);
+  inlinedScript.setAttribute('data-stencil-namespace', config.fsNamespace);
   inlinedScript.innerHTML = content;
   doc.body.appendChild(inlinedScript);
 
@@ -56,4 +60,5 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
   return true;
 }
 
-const MAX_JS_INLINE_SIZE = 4 * 1024;
+// https://twitter.com/addyosmani/status/1143938175926095872
+const MAX_JS_INLINE_SIZE = 1 * 1024;

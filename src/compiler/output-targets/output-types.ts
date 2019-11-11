@@ -1,10 +1,10 @@
 import * as d from '../../declarations';
 import { generateTypes } from '../types/generate-types';
-import { isOutputTargetDistCollection } from './output-utils';
+import { isOutputTargetDistTypes } from './output-utils';
 
 
 export async function outputTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistTypes);
   if (outputTargets.length === 0) {
     return;
   }
@@ -17,7 +17,7 @@ export async function outputTypes(config: d.Config, compilerCtx: d.CompilerCtx, 
   const timespan = buildCtx.createTimeSpan(`generate types started`, true);
 
   await Promise.all(outputTargets.map(outputsTarget => {
-    return generateTypes(config, compilerCtx, buildCtx, pkgData, outputsTarget as any);
+    return generateTypes(config, compilerCtx, buildCtx, pkgData, outputsTarget);
   }));
 
   timespan.finish(`generate types finished`);

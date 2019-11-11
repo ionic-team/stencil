@@ -1,18 +1,20 @@
 import * as d from '../../../declarations';
-import { convertValueToLiteral, createStaticGetter, getDeclarationParameters, removeDecorators } from '../transform-utils';
+import { augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
+import { CLASS_DECORATORS_TO_REMOVE, getDeclarationParameters } from './decorator-utils';
+import { convertValueToLiteral, createStaticGetter, removeDecorators } from '../transform-utils';
+import { styleToStatic } from './style-to-static';
 import ts from 'typescript';
-import { DEFAULT_STYLE_MODE, augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
 
 
-export function componentDecoratorToStatic(config: d.Config, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) {
-  removeDecorators(cmpNode, ['Component']);
+export const componentDecoratorToStatic = (config: d.Config, typeChecker: ts.TypeChecker, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, newMembers: ts.ClassElement[], componentDecorator: ts.Decorator) => {
+  removeDecorators(cmpNode, CLASS_DECORATORS_TO_REMOVE);
 
   const [ componentOptions ] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
   if (!componentOptions) {
     return;
   }
 
-  if (!validateComponent(config, diagnostics, componentOptions, cmpNode, componentDecorator)) {
+  if (!validateComponent(config, diagnostics, typeChecker, componentOptions, cmpNode, componentDecorator)) {
     return;
   }
 
@@ -25,30 +27,7 @@ export function componentDecoratorToStatic(config: d.Config, diagnostics: d.Diag
     newMembers.push(createStaticGetter('encapsulation', convertValueToLiteral('scoped')));
   }
 
-  const defaultModeStyles = [];
-  if (componentOptions.styleUrls) {
-    if (Array.isArray(componentOptions.styleUrls)) {
-      defaultModeStyles.push(...normalizeStyle(componentOptions.styleUrls));
-    } else {
-      defaultModeStyles.push(...normalizeStyle(componentOptions.styleUrls[DEFAULT_STYLE_MODE]));
-    }
-  }
-  if (componentOptions.styleUrl) {
-    defaultModeStyles.push(...normalizeStyle(componentOptions.styleUrl));
-  }
-
-  let styleUrls: d.CompilerModeStyles = {};
-  if (componentOptions.styleUrls && !Array.isArray(componentOptions.styleUrls)) {
-    styleUrls = normalizeStyleUrls(componentOptions.styleUrls);
-  }
-  if (defaultModeStyles.length > 0) {
-    styleUrls[DEFAULT_STYLE_MODE] = defaultModeStyles;
-  }
-
-  if (Object.keys(styleUrls).length > 0) {
-    newMembers.push(createStaticGetter('originalStyleUrls', convertValueToLiteral(styleUrls)));
-    newMembers.push(createStaticGetter('styleUrls', convertValueToLiteral(normalizeExtension(config, styleUrls))));
-  }
+  styleToStatic(config, newMembers, componentOptions);
 
   let assetsDirs = componentOptions.assetsDirs || [];
   if (componentOptions.assetsDir) {
@@ -60,15 +39,9 @@ export function componentDecoratorToStatic(config: d.Config, diagnostics: d.Diag
   if (assetsDirs.length > 0) {
     newMembers.push(createStaticGetter('assetsDirs', convertValueToLiteral(assetsDirs)));
   }
-  if (typeof componentOptions.styles === 'string') {
-    const styles = componentOptions.styles.trim();
-    if (styles.length > 0) {
-      newMembers.push(createStaticGetter('styles', convertValueToLiteral(styles)));
-    }
-  }
-}
+};
 
-function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], componentOptions: d.ComponentOptions, cmpNode: ts.ClassDeclaration, componentDecorator: ts.Node) {
+const validateComponent = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, componentOptions: d.ComponentOptions, cmpNode: ts.ClassDeclaration, componentDecorator: ts.Node) => {
   const extendNode = cmpNode.heritageClauses && cmpNode.heritageClauses.find(c => c.token === ts.SyntaxKind.ExtendsKeyword);
   if (extendNode) {
     const err = buildError(diagnostics);
@@ -85,12 +58,21 @@ function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], compon
     return false;
   }
 
+  const constructor = cmpNode.members.find(ts.isConstructorDeclaration);
+  if (constructor && constructor.parameters.length > 0) {
+    const err = buildError(diagnostics);
+    err.messageText = `Classes decorated with @Component can not have a "constructor" that takes arguments.
+    All data required by a component must be passed by using class properties decorated with @Prop()`;
+    augmentDiagnosticWithNode(config, err, constructor.parameters[0]);
+    return false;
+  }
+
   // check if class has more than one decorator
   const otherDecorator = cmpNode.decorators && cmpNode.decorators.find(d => d !== componentDecorator);
   if (otherDecorator) {
     const err = buildError(diagnostics);
     err.messageText = `Classes decorated with @Component can not be decorated with more decorators.
-    Stencil performs extensive static analysis on top of your components in order to generate the necesary metadata, runtime decorators at the components level make this task very hard.`;
+    Stencil performs extensive static analysis on top of your components in order to generate the necessary metadata, runtime decorators at the components level make this task very hard.`;
     augmentDiagnosticWithNode(config, err, otherDecorator);
     return false;
   }
@@ -110,10 +92,31 @@ function validateComponent(config: d.Config, diagnostics: d.Diagnostic[], compon
     augmentDiagnosticWithNode(config, err, findTagNode('tag', componentDecorator));
     return false;
   }
-  return true;
-}
 
-function findTagNode(propName: string, node: ts.Node) {
+  if (!config._isTesting) {
+    const nonTypeExports = typeChecker.getExportsOfModule(typeChecker.getSymbolAtLocation(cmpNode.getSourceFile()))
+      .filter(symbol => (symbol.flags & (ts.SymbolFlags.Interface | ts.SymbolFlags.TypeAlias)) === 0)
+      .filter(symbol => symbol.name !== cmpNode.name.text);
+
+    nonTypeExports.forEach(symbol => {
+      const err = buildError(diagnostics);
+      err.messageText = `To allow efficient bundling, modules using @Component() can only have a single export which is the component class itself.
+      Any other exports should be moved to a separate file.
+      For further information check out: https://stenciljs.com/docs/module-bundling`;
+      const errorNode = symbol.valueDeclaration
+        ? symbol.valueDeclaration
+        : symbol.declarations[0];
+
+      augmentDiagnosticWithNode(config, err, errorNode);
+    });
+    if (nonTypeExports.length > 0) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const findTagNode = (propName: string, node: ts.Node) => {
   if (ts.isDecorator(node) && ts.isCallExpression(node.expression)) {
     const arg = node.expression.arguments[0];
     if (ts.isObjectLiteralExpression(arg)) {
@@ -127,35 +130,4 @@ function findTagNode(propName: string, node: ts.Node) {
     }
   }
   return node;
-}
-
-function normalizeExtension(config: d.Config, styleUrls: d.CompilerModeStyles): d.CompilerModeStyles {
-  const compilerStyleUrls: d.CompilerModeStyles = {};
-  Object.keys(styleUrls).forEach(key => {
-    compilerStyleUrls[key] = styleUrls[key].map(s => useCss(config, s));
-  });
-  return compilerStyleUrls;
-}
-
-function useCss(config: d.Config, path: string) {
-  const p = config.sys.path.parse(path);
-  return config.sys.path.join(p.dir, p.name + '.css');
-}
-
-function normalizeStyleUrls(styleUrls: d.ModeStyles): d.CompilerModeStyles {
-  const compilerStyleUrls: d.CompilerModeStyles = {};
-  Object.keys(styleUrls).forEach(key => {
-    compilerStyleUrls[key] = normalizeStyle(styleUrls[key]);
-  });
-  return compilerStyleUrls;
-}
-
-function normalizeStyle(style: string | string[] | undefined): string[] {
-  if (Array.isArray(style)) {
-    return style;
-  }
-  if (style) {
-    return [style];
-  }
-  return [];
-}
+};

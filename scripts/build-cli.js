@@ -16,20 +16,21 @@ async function buildCli() {
     external: [
       'child_process',
       'crypto',
+      'events',
       'fs',
       'https',
       'os',
       'path',
+      'readline',
+      'util',
     ],
     plugins: [
       (() => {
         return {
-          resolveId(id, importer) {
-            if (id === '@sys') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'sys/node');
-            }
+          resolveId(id) {
+
             if (id === '@utils') {
-              return relativeResolve(importer, TRANSPILED_DIR, 'utils');
+              return relativeResolve('../utils');
             }
           }
         }
@@ -37,7 +38,7 @@ async function buildCli() {
       rollupResolve({
         preferBuiltins: true
       }),
-      rollupCommonjs()
+      rollupCommonjs(),
     ],
     onwarn: (message) => {
       if (message.code === 'CIRCULAR_DEPENDENCY') return;

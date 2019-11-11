@@ -1,13 +1,23 @@
-import * as d from '.';
-import ts from 'typescript';
+import { BuildCtx, BuildResults } from './build';
+import { BuildEvents } from './build-events';
+import { Cache } from './cache';
+import { CollectionCompilerMeta } from './collection-manifest';
+import { ComponentCompilerMeta } from './component-compiler-meta';
+import { Config } from './config';
+import { DevServer } from './dev-server';
+import { FsWatcher } from './fs-watch';
+import { InMemoryFileSystem } from './in-memory-fs';
+import { ModuleMap } from './module';
+import { StyleCompiler } from './style';
+
 
 export interface Compiler {
-  build(): Promise<d.BuildResults>;
-  config: d.Config;
+  build(): Promise<BuildResults>;
+  config: Config;
   docs(): Promise<void>;
-  fs: d.InMemoryFileSystem;
+  fs: InMemoryFileSystem;
   isValid: boolean;
-  startDevServer(): Promise<d.DevServer>;
+  startDevServer(): Promise<DevServer>;
 }
 
 
@@ -18,21 +28,21 @@ export interface CompilerCtx {
   activeFilesAdded: string[];
   activeFilesDeleted: string[];
   activeFilesUpdated: string[];
-  cache: d.Cache;
-  cachedStyleMeta: Map<string, d.StyleCompiler>;
+  cache: Cache;
+  cachedStyleMeta: Map<string, StyleCompiler>;
   cachedGlobalStyle: string;
-  collections: d.CollectionCompilerMeta[];
+  collections: CollectionCompilerMeta[];
   compilerOptions: any;
-  events: d.BuildEvents;
-  fs: d.InMemoryFileSystem;
-  fsWatcher: d.FsWatcher;
+  events: BuildEvents;
+  fs: InMemoryFileSystem;
+  fsWatcher: FsWatcher;
   hasLoggedServerUrl: boolean;
   hasSuccessfulBuild: boolean;
   isActivelyBuilding: boolean;
   lastComponentStyleInput: Map<string, string>;
-  lastBuildResults: d.BuildResults;
+  lastBuildResults: BuildResults;
   lastBuildStyles: Map<string, string>;
-  moduleMap: d.ModuleMap;
+  moduleMap: ModuleMap;
   nodeMap: NodeMap;
   resolvedCollections: Set<string>;
   rollupCacheHydrate: any;
@@ -45,6 +55,6 @@ export interface CompilerCtx {
   reset(): void;
 }
 
-export type NodeMap = WeakMap<ts.ClassDeclaration, d.ComponentCompilerMeta>;
+export type NodeMap = WeakMap<any, ComponentCompilerMeta>;
 
-export type TsService = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[], checkCacheKey: boolean, useFsCache: boolean) => Promise<boolean>;
+export type TsService = (compilerCtx: CompilerCtx, buildCtx: BuildCtx, tsFilePaths: string[], checkCacheKey: boolean, useFsCache: boolean) => Promise<boolean>;

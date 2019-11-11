@@ -3,7 +3,7 @@ import { hasError, normalizeDiagnostics } from '@utils';
 import { generateHmr } from './build-hmr';
 
 
-export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const timeSpan = buildCtx.createTimeSpan(`generateBuildResults started`, true);
 
   const buildResults: d.BuildResults = {
@@ -54,7 +54,7 @@ export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCt
       }
       const buildCmp: d.BuildComponent = {
         tag: cmp.tagName,
-        dependencyOf: cmp.dependants.slice(),
+        dependencyOf: cmp.dependents.slice(),
         dependencies: cmp.dependencies.slice()
       };
       buildEntry.components.push(buildCmp);
@@ -69,9 +69,9 @@ export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCt
   timeSpan.finish(`generateBuildResults finished`);
 
   return buildResults;
-}
+};
 
-function getBuildConditionals(buildCtx: d.BuildCtx) {
+const getBuildConditionals = (buildCtx: d.BuildCtx) => {
   const b = {
     shadow: false,
     slot: false,
@@ -87,4 +87,4 @@ function getBuildConditionals(buildCtx: d.BuildCtx) {
   });
 
   return b;
-}
+};

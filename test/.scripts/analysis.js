@@ -27,7 +27,7 @@ fileSizeProfile('Hello VDOM App',
 
 fileSizeProfile('Todo App',
   [
-    path.join(rootDir, 'todo-app', 'www', 'build', '*'),
+    path.join(rootDir, 'todo-app', 'public', 'index.js'),
   ],
   output
 );

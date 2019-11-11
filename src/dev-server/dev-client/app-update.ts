@@ -4,7 +4,7 @@ import { hmrComponents } from './hmr-components';
 import { hmrExternalStyles } from './hmr-external-styles';
 import { hmrImages } from './hmr-images';
 import { hmrInlineStyles } from './hmr-inline-styles';
-import { logBuild, logReload } from './logger';
+import { logBuild, logReload, logWarn } from './logger';
 import { onBuildResults } from './build-events';
 
 
@@ -33,7 +33,7 @@ function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientCon
       // let's make sure the url is at the root
       // and we've unregistered any existing service workers
       // then let's refresh the page from the root of the server
-      appReset(win, config).then(() => {
+      appReset(win, config, () => {
         logReload(`Initial load`);
         win.location.reload(true);
       });
@@ -116,26 +116,33 @@ function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
 }
 
 
-export function appReset(win: d.DevClientWindow, config: d.DevClientConfig) {
+export function appReset(win: d.DevClientWindow, config: d.DevClientConfig, cb: () => void) {
   // we're probably at some ugly url
   // let's update the url to be the expect root url: /
+  // avoiding Promise to keep things simple for our ie11 buddy
   win.history.replaceState({}, 'App', config.basePath);
 
-  if (!win.navigator.serviceWorker) {
-    return Promise.resolve();
+  if (!win.navigator.serviceWorker || !win.navigator.serviceWorker.getRegistration) {
+    cb();
+    
+  } else {
+    // it's possible a service worker is already registered
+    // for this localhost url from some other app's development
+    // let's ensure we entirely remove the service worker for this domain
+    win.navigator.serviceWorker.getRegistration().then(swRegistration => {
+      if (swRegistration) {
+        swRegistration.unregister().then(hasUnregistered => {
+          if (hasUnregistered) {
+            logBuild(`unregistered service worker`);
+          }
+          cb();
+        });
+      } else {
+        cb();
+      }
+    }).catch(err => {
+      logWarn('Service Worker', err);
+      cb();
+    });
   }
-
-  // it's possible a service worker is already registered
-  // for this localhost url from some other app's development
-  // let's ensure we entirely remove the service worker for this domain
-  return win.navigator.serviceWorker.getRegistration().then(swRegistration => {
-    if (swRegistration) {
-      return swRegistration.unregister().then(hasUnregistered => {
-        if (hasUnregistered) {
-          logBuild(`unregistered service worker`);
-        }
-      });
-    }
-    return Promise.resolve();
-  });
 }

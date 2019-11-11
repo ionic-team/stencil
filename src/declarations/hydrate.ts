@@ -55,6 +55,7 @@ export interface HydrateResults {
 
 export interface HydrateComponent {
   tag: string;
+  mode: string;
   count: number;
   depth: number;
 }

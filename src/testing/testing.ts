@@ -38,8 +38,6 @@ export class Testing implements d.Testing {
     const env: d.E2EProcessEnv = process.env;
     const compiler = this.compiler;
     const config = this.config;
-    config.outputTargets = getOutputTargets(config);
-
     const msg: string[] = [];
 
     if (config.flags.e2e) {
@@ -147,9 +145,9 @@ export class Testing implements d.Testing {
 function setupTestingConfig(config: d.Config) {
   config.buildEs5 = false;
   config.devMode = true;
-  config.maxConcurrentWorkers = 1;
   config.validateTypes = false;
   config._isTesting = true;
+  config.buildDist = true;
 
   config.flags = config.flags || {};
   config.flags.serve = false;
@@ -159,20 +157,25 @@ function setupTestingConfig(config: d.Config) {
 }
 
 
-function getOutputTargets(config: d.Config) {
-  return config.outputTargets.filter(o => {
-    return isOutputTargetWww(o) || isOutputTargetDistLazy(o);
-  });
-}
-
 
 function getAppUrl(config: d.Config, browserUrl: string) {
-  const wwwOutput = config.outputTargets.find(isOutputTargetWww);
-  const appBuildDir = wwwOutput.buildDir;
   const appFileName = `${config.fsNamespace}.esm.js`;
-  const appFilePath = config.sys.path.join(appBuildDir, appFileName);
 
-  const appUrlPath = config.sys.path.relative(wwwOutput.dir, appFilePath);
+  const wwwOutput = config.outputTargets.find(isOutputTargetWww);
+  if (wwwOutput) {
+    const appBuildDir = wwwOutput.buildDir;
+    const appFilePath = config.sys.path.join(appBuildDir, appFileName);
+    const appUrlPath = config.sys.path.relative(wwwOutput.dir, appFilePath);
+    return browserUrl + appUrlPath;
+  }
 
-  return browserUrl + appUrlPath;
+  const distOutput = config.outputTargets.find(isOutputTargetDistLazy);
+  if (distOutput) {
+    const appBuildDir = distOutput.esmDir;
+    const appFilePath = config.sys.path.join(appBuildDir, appFileName);
+    const appUrlPath = config.sys.path.relative(config.rootDir, appFilePath);
+    return browserUrl + appUrlPath;
+  }
+
+  return browserUrl;
 }

@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { getCssImports } from './css-imports';
-import { getStyleId } from './component-styles';
+import { getStyleId } from './style-utils';
 
 
 export async function getComponentStylesCache(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, styleMeta: d.StyleCompiler, commentOriginalSelector: boolean) {
@@ -177,13 +177,14 @@ function getComponentStylesCacheKey(cmp: d.ComponentCompilerMeta, modeName: stri
 }
 
 
-export function updateLastStyleComponetInputs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function updateLastStyleComponetInputs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (config.watch) {
+    const promises: Promise<any>[] = [];
     compilerCtx.moduleMap.forEach(m => {
       if (Array.isArray(m.cmps)) {
-        m.cmps.forEach(cmp => {
+        promises.push(...m.cmps.map(async cmp => {
           const cacheKey = cmp.tagName;
-          const currentInputHash = getComponentDecoratorStyleHash(config, cmp);
+          const currentInputHash = await getComponentDecoratorStyleHash(config, cmp);
 
           if (cmp.styles == null || cmp.styles.length === 0) {
             compilerCtx.styleModeNames.forEach(modeName => {
@@ -204,9 +205,10 @@ export function updateLastStyleComponetInputs(config: d.Config, compilerCtx: d.C
             });
           }
           compilerCtx.lastComponentStyleInput.set(cacheKey, currentInputHash);
-        });
+        }));
       }
     });
+    await Promise.all(promises);
   }
 }
 

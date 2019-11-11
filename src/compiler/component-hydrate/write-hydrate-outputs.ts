@@ -10,22 +10,27 @@ export function writeHydrateOutputs(config: d.Config, compilerCtx: d.CompilerCtx
 
 
 async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetHydrate, rollupOutput: RollupOutput) {
+  const hydrateAppFileName = getHydrateAppFileName(config);
+  const hydratePackageName = await getHydratePackageName(config, compilerCtx);
+
   const hydrateAppDirPath = outputTarget.dir;
 
   const hydrateCoreIndexPath = config.sys.path.join(hydrateAppDirPath, 'index.js');
   const hydrateCoreIndexDtsFilePath = config.sys.path.join(hydrateAppDirPath, 'index.d.ts');
 
   const pkgJsonPath = config.sys.path.join(hydrateAppDirPath, 'package.json');
-  const pkgJsonCode = await getHydratePackageJson(config, compilerCtx, hydrateCoreIndexPath, hydrateCoreIndexDtsFilePath);
+  const pkgJsonCode = getHydratePackageJson(config, hydrateCoreIndexPath, hydrateCoreIndexDtsFilePath, hydratePackageName);
 
   const writePromises: Promise<any>[] = [
-    copyHydrateRunner(config, compilerCtx, hydrateAppDirPath),
+    copyHydrateRunner(config, compilerCtx, hydrateAppDirPath, hydrateAppFileName, hydratePackageName),
     compilerCtx.fs.writeFile(pkgJsonPath, pkgJsonCode)
   ];
 
   rollupOutput.output.forEach(output => {
-    const filePath = config.sys.path.join(hydrateAppDirPath, output.fileName);
-    writePromises.push(compilerCtx.fs.writeFile(filePath, output.code));
+    if (output.type === 'chunk') {
+      const filePath = config.sys.path.join(hydrateAppDirPath, output.fileName);
+      writePromises.push(compilerCtx.fs.writeFile(filePath, output.code));
+    }
   });
 
   // always remember a path to the hydrate app that the prerendering may need later on
@@ -35,20 +40,10 @@ async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, 
 }
 
 
-async function getHydratePackageJson(config: d.Config, compilerCtx: d.CompilerCtx, hydrateAppFilePath: string, hydrateDtsFilePath: string) {
-  let pkgName: string;
-  try {
-    const rootPkgFilePath = config.sys.path.join(config.rootDir, 'package.json');
-    const pkgStr = await compilerCtx.fs.readFile(rootPkgFilePath);
-    const pkgData = JSON.parse(pkgStr) as d.PackageJsonData;
-    pkgName = `${pkgData.name}/hydrate`;
-
-  } catch (e) {
-    pkgName = `${config.fsNamespace}/hydrate`;
-  }
-
+function getHydratePackageJson(config: d.Config, hydrateAppFilePath: string, hydrateDtsFilePath: string, hydratePackageName: string) {
   const pkg: d.PackageJsonData = {
-    name: pkgName,
+    name: hydratePackageName,
+    description: `${config.namespace} component hydration app built for a NodeJS environment.`,
     main: config.sys.path.basename(hydrateAppFilePath),
     types: config.sys.path.basename(hydrateDtsFilePath)
   };
@@ -56,7 +51,24 @@ async function getHydratePackageJson(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 
-async function copyHydrateRunner(config: d.Config, compilerCtx: d.CompilerCtx, hydrateAppDirPath: string) {
+async function getHydratePackageName(config: d.Config, compilerCtx: d.CompilerCtx) {
+  try {
+    const rootPkgFilePath = config.sys.path.join(config.rootDir, 'package.json');
+    const pkgStr = await compilerCtx.fs.readFile(rootPkgFilePath);
+    const pkgData = JSON.parse(pkgStr) as d.PackageJsonData;
+    return `${pkgData.name}/hydrate`;
+  } catch (e) {}
+
+  return `${config.fsNamespace}/hydrate`;
+}
+
+
+export function getHydrateAppFileName(config: d.Config) {
+  return `${config.fsNamespace}-hydrate.js`;
+}
+
+
+async function copyHydrateRunner(config: d.Config, compilerCtx: d.CompilerCtx, hydrateAppDirPath: string, hydrateAppFileName: string, hydratePackageName: string) {
   const srcHydrateDir = config.sys.path.join(config.sys.compiler.distDir, 'hydrate');
 
   const runnerIndexFileName = 'index.js';
@@ -68,8 +80,13 @@ async function copyHydrateRunner(config: d.Config, compilerCtx: d.CompilerCtx, h
   const runnerDestPath = config.sys.path.join(hydrateAppDirPath, runnerIndexFileName);
   const runnerDtsDestPath = config.sys.path.join(hydrateAppDirPath, runnerDtsFileName);
 
+  let runnerSrcCode = await compilerCtx.fs.readFile(runnerSrcPath);
+
+  runnerSrcCode = runnerSrcCode.replace('$$HYDRATE_APP_FILENAME$$', hydrateAppFileName);
+  runnerSrcCode = runnerSrcCode.replace('$$HYDRATE_APP_PACKAGE_NAME$$', hydratePackageName);
+
   await Promise.all([
-    compilerCtx.fs.copyFile(runnerSrcPath, runnerDestPath),
+    compilerCtx.fs.writeFile(runnerDestPath, runnerSrcCode),
     compilerCtx.fs.copyFile(runnerDtsSrcPath, runnerDtsDestPath)
   ]);
 }

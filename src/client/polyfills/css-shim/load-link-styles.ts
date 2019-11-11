@@ -1,16 +1,24 @@
 import { CSSScope } from './interfaces';
-import { addGlobalStyle } from './scope';
+import { addGlobalStyle, updateGlobalScopes } from './scope';
 
 export function loadDocument(doc: Document, globalScopes: CSSScope[]) {
-  return loadDocumentLinks(doc, globalScopes).then(() => {
-    loadDocumentStyles(doc, globalScopes);
+  loadDocumentStyles(doc, globalScopes);
+  return loadDocumentLinks(doc, globalScopes);
+}
+
+export function startWatcher(doc: Document, globalScopes: CSSScope[]) {
+  const mutation = new MutationObserver(() => {
+    if (loadDocumentStyles(doc, globalScopes)) {
+      updateGlobalScopes(globalScopes);
+    }
   });
+  mutation.observe(document.head, { childList: true });
 }
 
 export function loadDocumentLinks(doc: Document, globalScopes: CSSScope[]) {
   const promises: Promise<any>[] = [];
 
-  const linkElms = doc.querySelectorAll('link[rel="stylesheet"][href]');
+  const linkElms = doc.querySelectorAll('link[rel="stylesheet"][href]:not([data-no-shim])');
   for (let i = 0; i < linkElms.length; i++) {
     promises.push(addGlobalLink(doc, globalScopes, linkElms[i] as HTMLLinkElement));
   }
@@ -18,10 +26,10 @@ export function loadDocumentLinks(doc: Document, globalScopes: CSSScope[]) {
 }
 
 export function loadDocumentStyles(doc: Document, globalScopes: CSSScope[]) {
-  const styleElms = doc.querySelectorAll('style');
-  for (let i = 0; i < styleElms.length; i++) {
-    addGlobalStyle(globalScopes, styleElms[i]);
-  }
+  const styleElms = Array.from(doc.querySelectorAll('style:not([data-styles]):not([data-no-shim])')) as HTMLStyleElement[];
+  return styleElms
+    .map(style => addGlobalStyle(globalScopes, style))
+    .some(Boolean);
 }
 
 export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: HTMLLinkElement) {
@@ -32,7 +40,8 @@ export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: 
         text = fixRelativeUrls(text, url);
       }
       const styleEl = doc.createElement('style');
-      styleEl.innerHTML = text;
+      styleEl.setAttribute('data-styles', '');
+      styleEl.textContent = text;
 
       addGlobalStyle(globalScopes, styleEl);
       linkElm.parentNode.insertBefore(styleEl, linkElm);
@@ -61,7 +70,7 @@ export function hasCssVariables(css: string) {
 }
 
 // This regexp find all url() usages with relative urls
-const CSS_URL_REGEXP = /url[\s]*\([\s]*['"]?(?![http|/])([^\'\"\)]*)[\s]*['"]?\)[\s]*/gim;
+const CSS_URL_REGEXP = /url[\s]*\([\s]*['"]?(?!(?:https?|data)\:|\/)([^\'\"\)]*)[\s]*['"]?\)[\s]*/gim;
 
 export function hasRelativeUrls(css: string) {
   CSS_URL_REGEXP.lastIndex = 0;

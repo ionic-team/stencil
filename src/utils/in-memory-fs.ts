@@ -587,7 +587,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 }
 
 
-export function getCommitInstructions(path: d.Path, d: d.FsItems) {
+export const getCommitInstructions = (path: d.Path, d: d.FsItems) => {
   const instructions = {
     filesToDelete: [] as string[],
     filesToWrite: [] as string[],
@@ -722,18 +722,18 @@ export function getCommitInstructions(path: d.Path, d: d.FsItems) {
   });
 
   return instructions;
-}
+};
 
 
-export function shouldIgnore(filePath: string) {
+export const shouldIgnore = (filePath: string) => {
   filePath = filePath.trim().toLowerCase();
   return IGNORE.some(ignoreFile => filePath.endsWith(ignoreFile));
-}
+};
 
-export function isTextFile(filePath: string) {
+export const isTextFile = (filePath: string) => {
   filePath = filePath.toLowerCase().trim();
   return TXT_EXT.some(ext => filePath.endsWith(ext));
-}
+};
 
 const TXT_EXT = [
   '.ts', '.tsx', '.js', '.jsx', '.svg',

@@ -149,6 +149,16 @@ td.dev-server-diagnostic-blob-num::before {
   z-index: -1;
 }
 
+.dev-server-diagnostic-open-in-editor td.dev-server-diagnostic-blob-num:hover {
+  cursor: pointer;
+  background-color: #ffffe3 !important;
+  font-weight: bold;
+}
+
+.dev-server-diagnostic-open-in-editor.dev-server-diagnostic-error-line td.dev-server-diagnostic-blob-num:hover {
+  background-color: #ffdada !important;
+}
+
 td.dev-server-diagnostic-blob-code {
   position: relative !important;
   padding-right: 10px !important;

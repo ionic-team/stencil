@@ -1,4 +1,4 @@
-import * as d from '.';
+import { Diagnostic } from './diagnostics';
 
 
 export interface Logger {
@@ -8,7 +8,7 @@ export interface Logger {
   warn(...msg: any[]): void;
   error(...msg: any[]): void;
   createTimeSpan(startMsg: string, debug?: boolean, appendTo?: string[]): LoggerTimeSpan;
-  printDiagnostics(diagnostics: d.Diagnostic[], cwd?: string): void;
+  printDiagnostics(diagnostics: Diagnostic[], cwd?: string): void;
   red(msg: string): string;
   green(msg: string): string;
   yellow(msg: string): string;

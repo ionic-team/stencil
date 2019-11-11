@@ -32,7 +32,7 @@ describe('hydrate, shadow parent', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
-        <!--o.0.1-->
+        <!--o.0.1.-->
         <div c-id="1.0.0.0">
           <!--s.1.1.1.0.-->
           <!--t.0.1-->
@@ -90,7 +90,7 @@ describe('hydrate, shadow parent', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
-        <!--o.0.1-->
+        <!--o.0.1.-->
         <!--t.1.0.0.0-->
         top
         <!--s.1.1.0.1.-->
@@ -322,7 +322,7 @@ describe('hydrate, shadow parent', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
-        <!--o.0.1-->
+        <!--o.0.1.-->
         <section c-id="1.0.0.0">
           <!--s.1.1.1.0.start-->
           <!--s.1.2.1.1.secondary-->
@@ -414,12 +414,12 @@ describe('hydrate, shadow parent', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <ion-tab-button class="hydrated" s-id="1">
         <!--r.1-->
-        <!--o.0.2-->
+        <!--o.0.2.-->
         <a c-id="1.0.0.0">
           <!--s.1.1.1.0.-->
           <ion-badge class="hydrated" c-id="0.2" s-id="2">
             <!--r.2-->
-            <!--o.0.4-->
+            <!--o.0.4.-->
             <!--s.2.0.0.0.-->
             <!--t.0.4-->
             root-text

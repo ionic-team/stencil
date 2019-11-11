@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { PluginCtx, PluginTransformResults } from '../../declarations/plugin';
 import { parseCssImports } from '../style/css-imports';
+import { isOutputTargetDocs } from '../output-targets/output-utils';
 
 
 export async function runPluginResolveId(pluginCtx: PluginCtx, importee: string) {
@@ -82,15 +83,12 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
   };
 
   const isRawCssFile = transformResults.id.toLowerCase().endsWith('.css');
+  const shouldParseCssDocs = (cmp != null && config.outputTargets.some(isOutputTargetDocs));
 
   if (isRawCssFile) {
     // concat all css @imports into one file
     // when the entry file is a .css file (not .scss)
     // do this BEFORE transformations on css files
-    const shouldParseCssDocs = (cmp != null && config.outputTargets.some(o => {
-      return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
-    }));
-
     if (shouldParseCssDocs && cmp != null) {
       cmp.styleDocs = cmp.styleDocs || [];
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code, cmp.styleDocs);
@@ -144,10 +142,6 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
     // but only updated it to use url() instead. Let's go ahead and concat the url() css
     // files into one file like we did for raw .css files.
     // do this AFTER transformations on non-css files
-    const shouldParseCssDocs = (cmp != null && config.outputTargets.some(o => {
-      return o.type === 'docs' || o.type === 'docs-json' || o.type === 'docs-custom';
-    }));
-
     if (shouldParseCssDocs && cmp != null) {
       cmp.styleDocs = cmp.styleDocs || [];
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code, cmp.styleDocs);
@@ -159,3 +153,59 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
 
   return transformResults;
 }
+
+
+export const runPluginTransformsEsmImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, sourceText: string, id: string) => {
+  const pluginCtx: PluginCtx = {
+    config: config,
+    sys: config.sys,
+    fs: compilerCtx.fs,
+    cache: compilerCtx.cache,
+    diagnostics: []
+  };
+
+  const transformResults: PluginTransformResults = {
+    code: sourceText,
+    id: id
+  };
+
+  for (const plugin of pluginCtx.config.plugins) {
+
+    if (typeof plugin.transform === 'function') {
+      try {
+        let pluginTransformResults: PluginTransformResults | string;
+        const results = plugin.transform(transformResults.code, transformResults.id, pluginCtx);
+
+        if (results != null) {
+          if (typeof (results as any).then === 'function') {
+            pluginTransformResults = await results;
+
+          } else {
+            pluginTransformResults = results as PluginTransformResults;
+          }
+
+          if (pluginTransformResults != null) {
+            if (typeof pluginTransformResults === 'string') {
+              transformResults.code = pluginTransformResults as string;
+
+            } else {
+              if (typeof pluginTransformResults.code === 'string') {
+                transformResults.code = pluginTransformResults.code;
+              }
+              if (typeof pluginTransformResults.id === 'string') {
+                transformResults.id = pluginTransformResults.id;
+              }
+            }
+          }
+        }
+
+      } catch (e) {
+        catchError(buildCtx.diagnostics, e);
+      }
+    }
+  }
+
+  buildCtx.diagnostics.push(...pluginCtx.diagnostics);
+
+  return transformResults;
+};

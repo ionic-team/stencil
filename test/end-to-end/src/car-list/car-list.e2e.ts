@@ -69,21 +69,21 @@ describe('car-list', () => {
 
     expect(elm.shadowRoot).toEqualHtml(`
       <ul>
-        <li class="">
+        <li>
           <car-detail class="hydrated">
             <section>
               1934 Cord Model 812
             </section>
           </car-detail>
         </li>
-        <li class="">
+        <li>
           <car-detail class="hydrated">
             <section>
               1935 Duesenberg SSJ
             </section>
           </car-detail>
         </li>
-        <li class="">
+        <li>
           <car-detail class="hydrated">
             <section>
               1938 Alfa Romeo 2900 8c

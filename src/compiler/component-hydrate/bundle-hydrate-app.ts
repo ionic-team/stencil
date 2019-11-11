@@ -1,18 +1,24 @@
 import * as d from '../../declarations';
-import { bundleJson } from '../rollup-plugins/json';
 import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { loaderPlugin } from '../rollup-plugins/loader';
-import { RollupBuild, RollupOptions } from 'rollup'; // types only
+import { pluginHelper } from '../rollup-plugins/plugin-helper';
+import { RollupBuild, RollupOptions, TreeshakingOptions } from 'rollup'; // types only
 import { stencilBuildConditionalsPlugin } from '../rollup-plugins/stencil-build-conditionals';
 import { stencilHydratePlugin } from '../rollup-plugins/stencil-hydrate';
 
 
-export async function bundleHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, appEntryCode: string) {
+export const bundleHydrateApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, appEntryCode: string) => {
   try {
-    const treeshake = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false;
+    const treeshake: TreeshakingOptions | boolean = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
+      ? {
+        propertyReadSideEffects: false,
+        tryCatchDeoptimization: false,
+      }
+      : false;
+
     const rollupOptions: RollupOptions = {
       ...config.rollupConfig.inputOptions,
 
@@ -26,18 +32,18 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
         stencilBuildConditionalsPlugin(build, config.fsNamespace),
         globalScriptsPlugin(config, compilerCtx),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
-        ...config.plugins,
-        config.sys.rollup.plugins.nodeResolve({
-          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
-          ...config.nodeResolve
-        }),
-        config.sys.rollup.plugins.emptyJsResolver(),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,
           sourceMap: false,
           ...config.commonjs
         }),
-        bundleJson(config),
+        ...config.rollupPlugins,
+        pluginHelper(config, buildCtx),
+        config.sys.rollup.plugins.nodeResolve({
+          mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
+          ...config.nodeResolve
+        }),
+        config.sys.rollup.plugins.json(),
         inMemoryFsRead(config, compilerCtx),
         config.sys.rollup.plugins.replace({
           'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
@@ -59,9 +65,9 @@ export async function bundleHydrateApp(config: d.Config, compilerCtx: d.Compiler
 
   } catch (e) {
     if (!buildCtx.hasError) {
-      loadRollupDiagnostics(buildCtx, e);
+      loadRollupDiagnostics(compilerCtx, buildCtx, e);
     }
   }
 
   return undefined;
-}
+};

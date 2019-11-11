@@ -4,63 +4,67 @@ import ts from 'typescript';
 import { normalizePath } from '../normalize-path';
 
 
-export function augmentDiagnosticWithNode(config: d.Config, d: d.Diagnostic, node: ts.Node) {
+export const augmentDiagnosticWithNode = (config: d.Config, d: d.Diagnostic, node: ts.Node) => {
+  if (!node) {
+    return d;
+  }
 
   const sourceFile = node.getSourceFile();
+  if (!sourceFile) {
+    return d;
+  }
 
-  if (sourceFile) {
-    d.absFilePath = normalizePath(sourceFile.fileName);
-    d.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
+  d.absFilePath = normalizePath(sourceFile.fileName);
+  d.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
 
-    const sourceText = sourceFile.text;
-    const srcLines = splitLineBreaks(sourceText);
+  const sourceText = sourceFile.text;
+  const srcLines = splitLineBreaks(sourceText);
 
-    const start = node.getStart();
-    const end = node.getEnd();
-    const posStart = sourceFile.getLineAndCharacterOfPosition(start);
+  const start = node.getStart();
+  const end = node.getEnd();
+  const posStart = sourceFile.getLineAndCharacterOfPosition(start);
 
-    const errorLine: d.PrintLine = {
-      lineIndex: posStart.line,
-      lineNumber: posStart.line + 1,
-      text: srcLines[posStart.line],
-      errorCharStart: posStart.character,
-      errorLength: Math.max(end - start, 1)
+  const errorLine: d.PrintLine = {
+    lineIndex: posStart.line,
+    lineNumber: posStart.line + 1,
+    text: srcLines[posStart.line],
+    errorCharStart: posStart.character,
+    errorLength: Math.max(end - start, 1)
+  };
+  d.lineNumber = errorLine.lineNumber;
+  d.columnNumber = errorLine.errorCharStart + 1;
+  d.lines.push(errorLine);
+  if (errorLine.errorLength === 0 && errorLine.errorCharStart > 0) {
+    errorLine.errorLength = 1;
+    errorLine.errorCharStart--;
+  }
+
+  if (errorLine.lineIndex > 0) {
+    const previousLine: d.PrintLine = {
+      lineIndex: errorLine.lineIndex - 1,
+      lineNumber: errorLine.lineNumber - 1,
+      text: srcLines[errorLine.lineIndex - 1],
+      errorCharStart: -1,
+      errorLength: -1
     };
-    d.lineNumber = errorLine.lineNumber;
-    d.columnNumber = errorLine.errorCharStart + 1;
-    d.lines.push(errorLine);
-    if (errorLine.errorLength === 0 && errorLine.errorCharStart > 0) {
-      errorLine.errorLength = 1;
-      errorLine.errorCharStart--;
-    }
 
-    if (errorLine.lineIndex > 0) {
-      const previousLine: d.PrintLine = {
-        lineIndex: errorLine.lineIndex - 1,
-        lineNumber: errorLine.lineNumber - 1,
-        text: srcLines[errorLine.lineIndex - 1],
-        errorCharStart: -1,
-        errorLength: -1
-      };
+    d.lines.unshift(previousLine);
+  }
 
-      d.lines.unshift(previousLine);
-    }
+  if (errorLine.lineIndex + 1 < srcLines.length) {
+    const nextLine: d.PrintLine = {
+      lineIndex: errorLine.lineIndex + 1,
+      lineNumber: errorLine.lineNumber + 1,
+      text: srcLines[errorLine.lineIndex + 1],
+      errorCharStart: -1,
+      errorLength: -1
+    };
 
-    if (errorLine.lineIndex + 1 < srcLines.length) {
-      const nextLine: d.PrintLine = {
-        lineIndex: errorLine.lineIndex + 1,
-        lineNumber: errorLine.lineNumber + 1,
-        text: srcLines[errorLine.lineIndex + 1],
-        errorCharStart: -1,
-        errorLength: -1
-      };
-
-      d.lines.push(nextLine);
-    }
+    d.lines.push(nextLine);
   }
 
   return d;
-}
+};
 
 
 /**
@@ -68,16 +72,19 @@ export function augmentDiagnosticWithNode(config: d.Config, d: d.Diagnostic, nod
  * error reporting within a terminal. So, yeah, let's code it up, shall we?
  */
 
-export function loadTypeScriptDiagnostics(resultsDiagnostics: d.Diagnostic[], tsDiagnostics: readonly ts.Diagnostic[]) {
+export const loadTypeScriptDiagnostics = (tsDiagnostics: readonly ts.Diagnostic[]) => {
+  const diagnostics: d.Diagnostic[] = [];
   const maxErrors = Math.min(tsDiagnostics.length, 50);
 
   for (let i = 0; i < maxErrors; i++) {
-    resultsDiagnostics.push(loadTypeScriptDiagnostic(tsDiagnostics[i]));
+    diagnostics.push(loadTypeScriptDiagnostic(tsDiagnostics[i]));
   }
-}
+
+  return diagnostics;
+};
 
 
-export function loadTypeScriptDiagnostic(tsDiagnostic: ts.Diagnostic) {
+export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
 
   const d: d.Diagnostic = {
     level: 'warn',
@@ -85,7 +92,7 @@ export function loadTypeScriptDiagnostic(tsDiagnostic: ts.Diagnostic) {
     language: 'typescript',
     header: 'TypeScript',
     code: tsDiagnostic.code.toString(),
-    messageText: formatMessageText(tsDiagnostic),
+    messageText: flattenDiagnosticMessageText(tsDiagnostic, tsDiagnostic.messageText),
     relFilePath: null,
     absFilePath: null,
     lines: []
@@ -147,14 +154,14 @@ export function loadTypeScriptDiagnostic(tsDiagnostic: ts.Diagnostic) {
   }
 
   return d;
-}
+};
 
 
-function formatMessageText(tsDiagnostic: ts.Diagnostic) {
-  let diagnosticChain = tsDiagnostic.messageText;
-
-  if (typeof diagnosticChain === 'string') {
-    return diagnosticChain;
+const flattenDiagnosticMessageText = (tsDiagnostic: ts.Diagnostic, diag: string | ts.DiagnosticMessageChain | undefined) => {
+  if (typeof diag === 'string') {
+    return diag;
+  } else if (diag === undefined) {
+    return '';
   }
 
   const ignoreCodes: number[] = [];
@@ -164,13 +171,13 @@ function formatMessageText(tsDiagnostic: ts.Diagnostic) {
   }
 
   let result = '';
-
-  while (diagnosticChain) {
-    if (!ignoreCodes.includes(diagnosticChain.code)) {
-      result += diagnosticChain.messageText + ' ';
+  if (!ignoreCodes.includes(diag.code)) {
+    result = diag.messageText;
+    if (diag.next) {
+      for (const kid of diag.next) {
+        result += flattenDiagnosticMessageText(tsDiagnostic, kid);
+      }
     }
-
-    diagnosticChain = diagnosticChain.next;
   }
 
   if (isStencilConfig) {
@@ -180,4 +187,4 @@ function formatMessageText(tsDiagnostic: ts.Diagnostic) {
   }
 
   return result.trim();
-}
+};

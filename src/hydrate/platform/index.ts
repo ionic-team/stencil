@@ -3,9 +3,7 @@ import * as d from '../../declarations';
 const cstrs = new Map<string, d.ComponentNativeConstructor>();
 
 export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef, _hmrVersionId?: string): any => {
-  return new Promise(resolve => {
-    resolve(cstrs.get(cmpMeta.$tagName$));
-  });
+  return cstrs.get(cmpMeta.$tagName$);
 };
 
 export const getComponent = (tagName: string) => {
@@ -17,9 +15,12 @@ export const isMemberInElement = (elm: any, memberName: string) => {
     if (memberName in elm) {
       return true;
     }
-    const hostRef: d.ComponentNativeConstructor = getComponent(elm.nodeName.toLowerCase());
-    if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
-      return memberName in hostRef.cmpMeta.$members$;
+    const nodeName = elm.nodeName;
+    if (nodeName) {
+      const hostRef: d.ComponentNativeConstructor = getComponent(nodeName.toLowerCase());
+      if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
+        return memberName in hostRef.cmpMeta.$members$;
+      }
     }
   }
   return false;
@@ -55,7 +56,7 @@ export const writeTask = (cb: Function) => {
   });
 };
 
-export const tick = Promise.resolve();
+export const nextTick = /*@__PURE__*/(cb: () => void) => Promise.resolve().then(cb);
 
 export const consoleError = (e: any) => {
   if (e != null) {
@@ -69,6 +70,7 @@ export const Context: any = {};
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
+  jmp: (h) => h(),
   raf: (h) => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
@@ -93,8 +95,12 @@ export const registerHost = (elm: d.HostElement) => {
     $flags$: 0,
     $hostElement$: elm,
     $instanceValues$: new Map(),
+    $renderCount$: 0
   };
+  hostRef.$onInstancePromise$ = new Promise(r => hostRef.$onInstanceResolve$ = r);
   hostRef.$onReadyPromise$ = new Promise(r => hostRef.$onReadyResolve$ = r);
+  elm['s-p'] = [];
+  elm['s-rc'] = [];
   return hostRefs.set(elm, hostRef);
 };
 
@@ -104,7 +110,6 @@ export const Build: d.UserBuildConditionals = {
 };
 
 export const styles: d.StyleMap = new Map();
-export const cssVarShim: d.CssVarSim = false as any;
 
 export { bootstrapHydrate } from './bootstrap-hydrate';
 

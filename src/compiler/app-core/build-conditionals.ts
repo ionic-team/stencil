@@ -6,6 +6,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
   const f: d.BuildFeatures = {
     allRenderFn: cmps.every(c => c.hasRenderFn),
     cmpDidLoad: cmps.some(c => c.hasComponentDidLoadFn),
+    cmpShouldUpdate:  cmps.some(c => c.hasComponentShouldUpdateFn),
     cmpDidUnload: cmps.some(c => c.hasComponentDidUnloadFn),
     cmpDidUpdate: cmps.some(c => c.hasComponentDidUpdateFn),
     cmpDidRender: cmps.some(c => c.hasComponentDidRenderFn),
@@ -19,6 +20,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     event: cmps.some(c => c.hasEvent),
     hasRenderFn: cmps.some(c => c.hasRenderFn),
     lifecycle: cmps.some(c => c.hasLifecycle),
+    asyncLoading: false,
     hostListener: cmps.some(c => c.hasListener),
     hostListenerTargetWindow: cmps.some(c => c.hasListenerTargetWindow),
     hostListenerTargetDocument: cmps.some(c => c.hasListenerTargetDocument),
@@ -45,6 +47,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     svg: cmps.some(c => c.htmlTagNames.includes('svg')),
     updatable: cmps.some(c => c.isUpdateable),
     vdomAttribute: cmps.some(c => c.hasVdomAttribute),
+    vdomXlink: cmps.some(c => c.hasVdomXlink),
     vdomClass: cmps.some(c => c.hasVdomClass),
     vdomFunctional: cmps.some(c => c.hasVdomFunctional),
     vdomKey: cmps.some(c => c.hasVdomKey),
@@ -56,6 +59,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     watchCallback: cmps.some(c => c.hasWatchCallback),
     taskQueue: true,
   };
+  f.asyncLoading = f.cmpWillUpdate || f.cmpWillLoad || f.cmpWillRender;
 
   return f;
 }
@@ -68,6 +72,7 @@ export function updateComponentBuildConditionals(moduleMap: d.ModuleMap, cmps: d
       // if the component already has a boolean true value it'll keep it
       // otherwise we get the boolean value from the imported module
       cmp.hasVdomAttribute = cmp.hasVdomAttribute || importedModule.hasVdomAttribute;
+      cmp.hasVdomXlink = cmp.hasVdomXlink || importedModule.hasVdomXlink;
       cmp.hasVdomClass = cmp.hasVdomClass || importedModule.hasVdomClass;
       cmp.hasVdomFunctional = cmp.hasVdomFunctional || importedModule.hasVdomFunctional;
       cmp.hasVdomKey = cmp.hasVdomKey || importedModule.hasVdomKey;
@@ -110,13 +115,14 @@ function getModuleImports(moduleMap: d.ModuleMap, filePath: string, importedModu
 export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isDebug = (config.logLevel === 'debug');
   b.isDev = !!config.devMode;
-  b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting);
-  b.profile = !!(config.flags && config.flags.profile);
-  b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.reloadStrategy === 'hmr');
+  b.devTools = b.isDev;
+  b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config._lifecycleDOMEvents);
+  b.profile = !!(config.profile);
+  b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.reloadStrategy === 'hmr' && !config._isTesting);
   b.updatable = (b.updatable || b.hydrateClientSide || b.hotModuleReplacement);
   b.member = (b.member || b.updatable || b.mode || b.lifecycle);
-  b.taskQueue = (b.updatable || b.mode || b.lifecycle);
-  b.constructableCSS = !b.hotModuleReplacement || config._isTesting;
+  b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
+  b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;
 }
 

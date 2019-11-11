@@ -1,10 +1,11 @@
 import * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildWarn } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, getDeclarationParameters, isDecoratorNamed, resolveType, serializeSymbol } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, resolveType, serializeSymbol, validateReferences } from '../transform-utils';
+import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
 
-export function eventDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
+export const eventDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
   const events = decoratedProps
     .filter(ts.isPropertyDeclaration)
     .map(prop => parseEventDecorator(config, diagnostics, typeChecker, prop))
@@ -13,10 +14,10 @@ export function eventDecoratorsToStatic(config: d.Config, diagnostics: d.Diagnos
   if (events.length > 0) {
     newMembers.push(createStaticGetter('events', convertValueToLiteral(events)));
   }
-}
+};
 
 
-function parseEventDecorator(config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration): d.ComponentCompilerStaticEvent {
+const parseEventDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration): d.ComponentCompilerStaticEvent => {
   const eventDecorator = prop.decorators.find(isDecoratorNamed('Event'));
 
   if (eventDecorator == null) {
@@ -33,9 +34,9 @@ function parseEventDecorator(config: d.Config, diagnostics: d.Diagnostic[], type
   const symbol = typeChecker.getSymbolAtLocation(prop.name);
   const name = getEventName(opts, memberName);
 
-  validateEventEmitterMemberName(config, diagnostics, prop.name, memberName);
+  validateEventName(config, diagnostics, prop.name, name);
 
-  return {
+  const eventMeta = {
     method: memberName,
     name,
     bubbles: opts && typeof opts.bubbles === 'boolean' ? opts.bubbles : true,
@@ -44,17 +45,19 @@ function parseEventDecorator(config: d.Config, diagnostics: d.Diagnostic[], type
     docs: serializeSymbol(typeChecker, symbol),
     complexType: getComplexType(typeChecker, prop)
   };
-}
+  validateReferences(config, diagnostics, eventMeta.complexType.references, prop.type);
+  return eventMeta;
+};
 
-export function getEventName(eventOptions: d.EventOptions, memberName: string) {
+export const getEventName = (eventOptions: d.EventOptions, memberName: string) => {
   if (eventOptions && typeof eventOptions.eventName === 'string' && eventOptions.eventName.trim().length > 0) {
     // always use the event name if given
     return eventOptions.eventName.trim();
   }
   return memberName;
-}
+};
 
-function getComplexType(typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration): d.ComponentCompilerPropertyComplexType {
+const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration): d.ComponentCompilerPropertyComplexType => {
   const sourceFile = node.getSourceFile();
   const eventType = node.type ? getEventType(node.type) : null;
   return {
@@ -62,9 +65,9 @@ function getComplexType(typeChecker: ts.TypeChecker, node: ts.PropertyDeclaratio
     resolved: eventType ? resolveType(typeChecker, typeChecker.getTypeFromTypeNode(eventType)) : 'any',
     references: eventType ? getAttributeTypeInfo(eventType, sourceFile) : {}
   };
-}
+};
 
-function getEventType(type: ts.TypeNode): ts.TypeNode | null {
+const getEventType = (type: ts.TypeNode): ts.TypeNode | null => {
   if (ts.isTypeReferenceNode(type) &&
     ts.isIdentifier(type.typeName) &&
     type.typeName.text === 'EventEmitter' &&
@@ -73,18 +76,298 @@ function getEventType(type: ts.TypeNode): ts.TypeNode | null {
       return type.typeArguments[0];
   }
   return null;
-}
+};
 
-function validateEventEmitterMemberName(config: d.Config, diagnostics: d.Diagnostic[], node: ts.Node, memberName: string) {
-  const firstChar = memberName.charAt(0);
-
-  if (/[A-Z]/.test(firstChar)) {
+const validateEventName = (config: d.Config, diagnostics: d.Diagnostic[], node: ts.Node, eventName: string) => {
+  if (/^[A-Z]/.test(eventName)) {
     const diagnostic = buildWarn(diagnostics);
     diagnostic.messageText = [
-      `In order to be compatible with all event listeners on elements, the `,
-      `@Event() "${memberName}" cannot start with a capital letter. `,
+      `In order to be compatible with all event listeners on elements, the event name `,
+      `cannot start with a capital letter. `,
       `Please lowercase the first character for the event to best work with all listeners.`
     ].join('');
     augmentDiagnosticWithNode(config, diagnostic, node);
+    return;
   }
+
+  if (/^on[A-Z]/.test(eventName)) {
+    const warn = buildWarn(diagnostics);
+    warn.messageText = `Events decorated with @Event() should describe the actual DOM event name, not the handler. In other words "${eventName}" would be better named as "${suggestEventName(eventName)}".`;
+    augmentDiagnosticWithNode(config, warn, node);
+    return;
+  }
+
+  if (DOM_EVENT_NAMES.has(eventName.toLowerCase())) {
+    const diagnostic = buildWarn(diagnostics);
+    diagnostic.messageText = `The event name conflicts with the "${eventName}" native DOM event name.`;
+    augmentDiagnosticWithNode(config, diagnostic, node);
+    return;
+  }
+};
+
+function suggestEventName(onEvent: string) {
+  return onEvent[2].toLowerCase() + onEvent.slice(3);
 }
+
+const DOM_EVENT_NAMES: Set<string> = new Set([
+  'CheckboxStateChange',
+  'DOMContentLoaded',
+  'DOMMenuItemActive',
+  'DOMMenuItemInactive',
+  'DOMMouseScroll',
+  'MSManipulationStateChanged',
+  'MSPointerHover',
+  'MozAudioAvailable',
+  'MozGamepadButtonDown',
+  'MozGamepadButtonUp',
+  'MozMousePixelScroll',
+  'MozOrientation',
+  'MozScrolledAreaChanged',
+  'RadioStateChange',
+  'SVGAbort',
+  'SVGError',
+  'SVGLoad',
+  'SVGResize',
+  'SVGScroll',
+  'SVGUnload',
+  'SVGZoom',
+  'ValueChange',
+  'abort',
+  'afterprint',
+  'afterscriptexecute',
+  'alerting',
+  'animationcancel',
+  'animationend',
+  'animationiteration',
+  'animationstart',
+  'appinstalled',
+  'audioend',
+  'audioprocess',
+  'audiostart',
+  'auxclick',
+  'beforeinstallprompt',
+  'beforeprint',
+  'beforescriptexecute',
+  'beforeunload',
+  'beginEvent',
+  'blur',
+  'boundary',
+  'broadcast',
+  'busy',
+  'callschanged',
+  'canplay',
+  'canplaythrough',
+  'cardstatechange',
+  'cfstatechange',
+  'change',
+  'chargingchange',
+  'chargingtimechange',
+  'checking',
+  'click',
+  'command',
+  'commandupdate',
+  'compassneedscalibration',
+  'complete',
+  'compositionend',
+  'compositionstart',
+  'compositionupdate',
+  'connected',
+  'connecting',
+  'connectionInfoUpdate',
+  'contextmenu',
+  'copy',
+  'cut',
+  'datachange',
+  'dataerror',
+  'dblclick',
+  'delivered',
+  'devicechange',
+  'devicemotion',
+  'deviceorientation',
+  'dialing',
+  'disabled',
+  'dischargingtimechange',
+  'disconnected',
+  'disconnecting',
+  'downloading',
+  'drag',
+  'dragend',
+  'dragenter',
+  'dragleave',
+  'dragover',
+  'dragstart',
+  'drop',
+  'durationchange',
+  'emptied',
+  'enabled',
+  'end',
+  'endEvent',
+  'ended',
+  'error',
+  'focus',
+  'focusin',
+  'focusout',
+  'fullscreenchange',
+  'fullscreenerror',
+  'gamepadconnected',
+  'gamepaddisconnected',
+  'gotpointercapture',
+  'hashchange',
+  'held',
+  'holding',
+  'icccardlockerror',
+  'iccinfochange',
+  'incoming',
+  'input',
+  'invalid',
+  'keydown',
+  'keypress',
+  'keyup',
+  'languagechange',
+  'levelchange',
+  'load',
+  'loadeddata',
+  'loadedmetadata',
+  'loadend',
+  'loadstart',
+  'localized',
+  'lostpointercapture',
+  'mark',
+  'message',
+  'messageerror',
+  'mousedown',
+  'mouseenter',
+  'mouseleave',
+  'mousemove',
+  'mouseout',
+  'mouseover',
+  'mouseup',
+  'mousewheel',
+  'mozbrowseractivitydone',
+  'mozbrowserasyncscroll',
+  'mozbrowseraudioplaybackchange',
+  'mozbrowsercaretstatechanged',
+  'mozbrowserclose',
+  'mozbrowsercontextmenu',
+  'mozbrowserdocumentfirstpaint',
+  'mozbrowsererror',
+  'mozbrowserfindchange',
+  'mozbrowserfirstpaint',
+  'mozbrowsericonchange',
+  'mozbrowserloadend',
+  'mozbrowserloadstart',
+  'mozbrowserlocationchange',
+  'mozbrowsermanifestchange',
+  'mozbrowsermetachange',
+  'mozbrowseropensearch',
+  'mozbrowseropentab',
+  'mozbrowseropenwindow',
+  'mozbrowserresize',
+  'mozbrowserscroll',
+  'mozbrowserscrollareachanged',
+  'mozbrowserscrollviewchange',
+  'mozbrowsersecuritychange',
+  'mozbrowserselectionstatechanged',
+  'mozbrowsershowmodalprompt',
+  'mozbrowsertitlechange',
+  'mozbrowserusernameandpasswordrequired',
+  'mozbrowservisibilitychange',
+  'moztimechange',
+  'msContentZoom',
+  'nomatch',
+  'notificationclick',
+  'noupdate',
+  'obsolete',
+  'offline',
+  'online',
+  'orientationchange',
+  'overflow',
+  'pagehide',
+  'pageshow',
+  'paste',
+  'pause',
+  'play',
+  'playing',
+  'pointercancel',
+  'pointerdown',
+  'pointerenter',
+  'pointerleave',
+  'pointerlockchange',
+  'pointerlockerror',
+  'pointermove',
+  'pointerout',
+  'pointerover',
+  'pointerup',
+  'popstate',
+  'popuphidden',
+  'popuphiding',
+  'popupshowing',
+  'popupshown',
+  'progress',
+  'push',
+  'pushsubscriptionchange',
+  'ratechange',
+  'readystatechange',
+  'received',
+  'repeatEvent',
+  'reset',
+  'resize',
+  'resourcetimingbufferfull',
+  'result',
+  'resume',
+  'resuming',
+  'scroll',
+  'seeked',
+  'seeking',
+  'select',
+  'selectionchange',
+  'selectstart',
+  'sent',
+  'show',
+  'slotchange',
+  'smartcard-insert',
+  'smartcard-remove',
+  'soundend',
+  'soundstart',
+  'speechend',
+  'speechstart',
+  'stalled',
+  'start',
+  'statechange',
+  'statuschange',
+  'stkcommand',
+  'stksessionend',
+  'storage',
+  'submit',
+  'suspend',
+  'timeout',
+  'timeupdate',
+  'touchcancel',
+  'touchend',
+  'touchenter',
+  'touchleave',
+  'touchmove',
+  'touchstart',
+  'transitioncancel',
+  'transitionend',
+  'transitionrun',
+  'transitionstart',
+  'underflow',
+  'unload',
+  'updateready',
+  'userproximity',
+  'ussdreceived',
+  'visibilitychange',
+  'voicechange',
+  'voiceschanged',
+  'volumechange',
+  'vrdisplayactivate',
+  'vrdisplayblur',
+  'vrdisplayconnect',
+  'vrdisplaydeactivate',
+  'vrdisplaydisconnect',
+  'vrdisplayfocus',
+  'vrdisplaypresentchange',
+  'waiting',
+  'wheel',
+].map(e => e.toLowerCase()));

@@ -1,8 +1,8 @@
-import * as d from '.';
+import { ListenOptions } from './decorators';
 
 
 export interface AddEventListener {
-  (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: d.ListenOptions): Function;
+  (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: ListenOptions): Function;
 }
 
 
