@@ -6,10 +6,10 @@ import { Component, h } from '@stencil/core';
 export class SlotLightList {
   render() {
     return [
-      <h1>These are my items:</h1>,
-      <div class="list-wrapper" style={{ display: 'block', border: '1px solid red' }}>
+      <section>These are my items:</section>,
+      <article class="list-wrapper" style={{ display: 'block', border: '1px solid red' }}>
         <slot></slot>
-      </div>,
+      </article>,
       <div>That's it....</div>
     ];
   }

@@ -19,13 +19,13 @@ describe('slot-list', () => {
     expect(list).toBeTruthy();
 
     let items = list.shadowRoot.querySelectorAll('.list-wrapper > div');
-    expect(items.length).toEqual(4);
+    expect(items.length).toEqual(0);
 
     button.click();
     await waitForChanges();
     console.log(list.innerHTML);
 
     items = list.shadowRoot.querySelectorAll('.list-wrapper > div');
-    expect(items.length).toEqual(8);
+    expect(items.length).toEqual(4);
   });
 });
