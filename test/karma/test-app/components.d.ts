@@ -159,7 +159,10 @@ export namespace Components {
   interface SlotBasicOrder {}
   interface SlotBasicOrderRoot {}
   interface SlotBasicRoot {}
-  interface SlotDynamicList {
+  interface SlotDynamicScopedList {
+    'items': Array<string>;
+  }
+  interface SlotDynamicShadowList {
     'items': Array<string>;
   }
   interface SlotDynamicWrapper {
@@ -176,7 +179,11 @@ export namespace Components {
   interface SlotLightDomContent {}
   interface SlotLightDomRoot {}
   interface SlotLightList {}
+  interface SlotLightScopedList {}
   interface SlotListLightRoot {
+    'items': string[];
+  }
+  interface SlotListLightScopedRoot {
     'items': string[];
   }
   interface SlotMapOrder {}
@@ -655,10 +662,16 @@ declare global {
     new (): HTMLSlotBasicRootElement;
   };
 
-  interface HTMLSlotDynamicListElement extends Components.SlotDynamicList, HTMLStencilElement {}
-  var HTMLSlotDynamicListElement: {
-    prototype: HTMLSlotDynamicListElement;
-    new (): HTMLSlotDynamicListElement;
+  interface HTMLSlotDynamicScopedListElement extends Components.SlotDynamicScopedList, HTMLStencilElement {}
+  var HTMLSlotDynamicScopedListElement: {
+    prototype: HTMLSlotDynamicScopedListElement;
+    new (): HTMLSlotDynamicScopedListElement;
+  };
+
+  interface HTMLSlotDynamicShadowListElement extends Components.SlotDynamicShadowList, HTMLStencilElement {}
+  var HTMLSlotDynamicShadowListElement: {
+    prototype: HTMLSlotDynamicShadowListElement;
+    new (): HTMLSlotDynamicShadowListElement;
   };
 
   interface HTMLSlotDynamicWrapperElement extends Components.SlotDynamicWrapper, HTMLStencilElement {}
@@ -709,10 +722,22 @@ declare global {
     new (): HTMLSlotLightListElement;
   };
 
+  interface HTMLSlotLightScopedListElement extends Components.SlotLightScopedList, HTMLStencilElement {}
+  var HTMLSlotLightScopedListElement: {
+    prototype: HTMLSlotLightScopedListElement;
+    new (): HTMLSlotLightScopedListElement;
+  };
+
   interface HTMLSlotListLightRootElement extends Components.SlotListLightRoot, HTMLStencilElement {}
   var HTMLSlotListLightRootElement: {
     prototype: HTMLSlotListLightRootElement;
     new (): HTMLSlotListLightRootElement;
+  };
+
+  interface HTMLSlotListLightScopedRootElement extends Components.SlotListLightScopedRoot, HTMLStencilElement {}
+  var HTMLSlotListLightScopedRootElement: {
+    prototype: HTMLSlotListLightScopedRootElement;
+    new (): HTMLSlotListLightScopedRootElement;
   };
 
   interface HTMLSlotMapOrderElement extends Components.SlotMapOrder, HTMLStencilElement {}
@@ -857,7 +882,8 @@ declare global {
     'slot-basic-order': HTMLSlotBasicOrderElement;
     'slot-basic-order-root': HTMLSlotBasicOrderRootElement;
     'slot-basic-root': HTMLSlotBasicRootElement;
-    'slot-dynamic-list': HTMLSlotDynamicListElement;
+    'slot-dynamic-scoped-list': HTMLSlotDynamicScopedListElement;
+    'slot-dynamic-shadow-list': HTMLSlotDynamicShadowListElement;
     'slot-dynamic-wrapper': HTMLSlotDynamicWrapperElement;
     'slot-dynamic-wrapper-root': HTMLSlotDynamicWrapperRootElement;
     'slot-fallback': HTMLSlotFallbackElement;
@@ -866,7 +892,9 @@ declare global {
     'slot-light-dom-content': HTMLSlotLightDomContentElement;
     'slot-light-dom-root': HTMLSlotLightDomRootElement;
     'slot-light-list': HTMLSlotLightListElement;
+    'slot-light-scoped-list': HTMLSlotLightScopedListElement;
     'slot-list-light-root': HTMLSlotListLightRootElement;
+    'slot-list-light-scoped-root': HTMLSlotListLightScopedRootElement;
     'slot-map-order': HTMLSlotMapOrderElement;
     'slot-map-order-root': HTMLSlotMapOrderRootElement;
     'slot-reorder': HTMLSlotReorderElement;
@@ -1030,7 +1058,10 @@ declare namespace LocalJSX {
   interface SlotBasicOrder {}
   interface SlotBasicOrderRoot {}
   interface SlotBasicRoot {}
-  interface SlotDynamicList {
+  interface SlotDynamicScopedList {
+    'items'?: Array<string>;
+  }
+  interface SlotDynamicShadowList {
     'items'?: Array<string>;
   }
   interface SlotDynamicWrapper {
@@ -1047,7 +1078,11 @@ declare namespace LocalJSX {
   interface SlotLightDomContent {}
   interface SlotLightDomRoot {}
   interface SlotLightList {}
+  interface SlotLightScopedList {}
   interface SlotListLightRoot {
+    'items'?: string[];
+  }
+  interface SlotListLightScopedRoot {
     'items'?: string[];
   }
   interface SlotMapOrder {}
@@ -1143,7 +1178,8 @@ declare namespace LocalJSX {
     'slot-basic-order': SlotBasicOrder;
     'slot-basic-order-root': SlotBasicOrderRoot;
     'slot-basic-root': SlotBasicRoot;
-    'slot-dynamic-list': SlotDynamicList;
+    'slot-dynamic-scoped-list': SlotDynamicScopedList;
+    'slot-dynamic-shadow-list': SlotDynamicShadowList;
     'slot-dynamic-wrapper': SlotDynamicWrapper;
     'slot-dynamic-wrapper-root': SlotDynamicWrapperRoot;
     'slot-fallback': SlotFallback;
@@ -1152,7 +1188,9 @@ declare namespace LocalJSX {
     'slot-light-dom-content': SlotLightDomContent;
     'slot-light-dom-root': SlotLightDomRoot;
     'slot-light-list': SlotLightList;
+    'slot-light-scoped-list': SlotLightScopedList;
     'slot-list-light-root': SlotListLightRoot;
+    'slot-list-light-scoped-root': SlotListLightScopedRoot;
     'slot-map-order': SlotMapOrder;
     'slot-map-order-root': SlotMapOrderRoot;
     'slot-reorder': SlotReorder;
@@ -1249,7 +1287,8 @@ declare module "@stencil/core" {
       'slot-basic-order': LocalJSX.SlotBasicOrder & JSXBase.HTMLAttributes<HTMLSlotBasicOrderElement>;
       'slot-basic-order-root': LocalJSX.SlotBasicOrderRoot & JSXBase.HTMLAttributes<HTMLSlotBasicOrderRootElement>;
       'slot-basic-root': LocalJSX.SlotBasicRoot & JSXBase.HTMLAttributes<HTMLSlotBasicRootElement>;
-      'slot-dynamic-list': LocalJSX.SlotDynamicList & JSXBase.HTMLAttributes<HTMLSlotDynamicListElement>;
+      'slot-dynamic-scoped-list': LocalJSX.SlotDynamicScopedList & JSXBase.HTMLAttributes<HTMLSlotDynamicScopedListElement>;
+      'slot-dynamic-shadow-list': LocalJSX.SlotDynamicShadowList & JSXBase.HTMLAttributes<HTMLSlotDynamicShadowListElement>;
       'slot-dynamic-wrapper': LocalJSX.SlotDynamicWrapper & JSXBase.HTMLAttributes<HTMLSlotDynamicWrapperElement>;
       'slot-dynamic-wrapper-root': LocalJSX.SlotDynamicWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotDynamicWrapperRootElement>;
       'slot-fallback': LocalJSX.SlotFallback & JSXBase.HTMLAttributes<HTMLSlotFallbackElement>;
@@ -1258,7 +1297,9 @@ declare module "@stencil/core" {
       'slot-light-dom-content': LocalJSX.SlotLightDomContent & JSXBase.HTMLAttributes<HTMLSlotLightDomContentElement>;
       'slot-light-dom-root': LocalJSX.SlotLightDomRoot & JSXBase.HTMLAttributes<HTMLSlotLightDomRootElement>;
       'slot-light-list': LocalJSX.SlotLightList & JSXBase.HTMLAttributes<HTMLSlotLightListElement>;
+      'slot-light-scoped-list': LocalJSX.SlotLightScopedList & JSXBase.HTMLAttributes<HTMLSlotLightScopedListElement>;
       'slot-list-light-root': LocalJSX.SlotListLightRoot & JSXBase.HTMLAttributes<HTMLSlotListLightRootElement>;
+      'slot-list-light-scoped-root': LocalJSX.SlotListLightScopedRoot & JSXBase.HTMLAttributes<HTMLSlotListLightScopedRootElement>;
       'slot-map-order': LocalJSX.SlotMapOrder & JSXBase.HTMLAttributes<HTMLSlotMapOrderElement>;
       'slot-map-order-root': LocalJSX.SlotMapOrderRoot & JSXBase.HTMLAttributes<HTMLSlotMapOrderRootElement>;
       'slot-reorder': LocalJSX.SlotReorder & JSXBase.HTMLAttributes<HTMLSlotReorderElement>;

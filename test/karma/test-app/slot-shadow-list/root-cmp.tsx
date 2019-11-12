@@ -3,7 +3,7 @@ import { Component, Prop, h } from '@stencil/core';
 @Component({
   tag: 'slot-list-light-root'
 })
-export class AppHome {
+export class SlotListLightRoot {
   @Prop({ mutable: true })
   items: string[] = [];
 
@@ -22,7 +22,7 @@ export class AppHome {
     return (
       <div>
         <button onClick={() => this.needMore()}>More</button>
-        <slot-dynamic-list items={this.items} />
+        <slot-dynamic-shadow-list items={this.items} />
       </div>
     );
   }
