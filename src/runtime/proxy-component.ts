@@ -1,10 +1,10 @@
 import * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { getHostRef, plt } from '@platform';
+import { consoleDevWarn, getHostRef, plt } from '@platform';
 import { getValue, setValue } from './set-value';
 import { MEMBER_FLAGS } from '../utils/constants';
 import { PROXY_FLAGS } from './runtime-constants';
-import { STENCIL_DEV_MODE } from './profile';
+
 
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, flags: number) => {
   if (BUILD.member && cmpMeta.$members$) {
@@ -39,7 +39,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
                 // the member is a non-mutable prop
                 (memberFlags & (MEMBER_FLAGS.Prop | MEMBER_FLAGS.Mutable)) === MEMBER_FLAGS.Prop
               ) {
-                console.warn(...STENCIL_DEV_MODE, `@Prop() "${memberName}" on "${cmpMeta.$tagName$}" cannot be modified.\nFurther information: https://stenciljs.com/docs/properties#prop-mutability`);
+                consoleDevWarn(`@Prop() "${memberName}" on "${cmpMeta.$tagName$}" cannot be modified.\nFurther information: https://stenciljs.com/docs/properties#prop-mutability`);
               }
               // proxyComponent, set value
               setValue(this, memberName, newValue, cmpMeta);

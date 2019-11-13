@@ -117,7 +117,6 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
         });
         if (failOnConsoleError) {
           fail(new Error(serializeConsoleMessage(ev)));
-          return;
         }
       }
       consoleMessage(ev);
@@ -138,9 +137,9 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
       });
       if (failOnNetworkError) {
         fail(new Error(req.failure().errorText));
-        return;
+      } else {
+        console.error('requestfailed', req.url());
       }
-      console.error('requestfailed', req.url());
     });
 
     if (typeof opts.html === 'string') {

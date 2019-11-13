@@ -5,7 +5,6 @@ import { HOST_FLAGS } from '@utils';
 
 let i = 0;
 
-export const STENCIL_DEV_MODE = ['%c[STENCIL-DEV-MODE]', 'color:#4c47ff;font-weight: bold'];
 export const createTime = (fnName: string, tagName = '') => {
   if (BUILD.profile) {
     const key = `st:${fnName}:${tagName}:${i++}`;

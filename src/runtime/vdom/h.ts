@@ -9,8 +9,8 @@
 
 import * as d from '../../declarations';
 import { BUILD } from '@app-data';
+import { consoleDevError } from '@platform';
 import { isComplexType } from '@utils';
-import { STENCIL_DEV_MODE } from '../profile';
 
 // const stack: any[] = [];
 
@@ -33,7 +33,7 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
           child = String(child);
 
         } else if (BUILD.isDev && child.$flags$ === undefined) {
-          console.error(...STENCIL_DEV_MODE, `vNode passed as children has unexpected type.
+          consoleDevError(`vNode passed as children has unexpected type.
 Make sure it's using the correct h() function.
 Empty objects can also be the cause, look for JSX comments that became objects.`);
 
@@ -72,7 +72,7 @@ Empty objects can also be the cause, look for JSX comments that became objects.`
   }
 
   if (BUILD.isDev && vNodeChildren.some(isHost)) {
-    throw new Error(`The <Host> must be the single root component. Make sure:
+    consoleDevError(`The <Host> must be the single root component. Make sure:
 - You are NOT using hostData() and <Host> in the same component.
 - <Host> is used once, and it's the single root component of the render() function.`);
   }
@@ -118,9 +118,7 @@ export const newVNode = (tag: string, text: string) => {
 
 export const Host = {};
 
-export const isHost = (node: any): node is d.VNode => {
-  return node && node.$tag$ === Host;
-};
+export const isHost = (node: any): node is d.VNode => node && node.$tag$ === Host;
 
 const vdomFnUtils: d.FunctionalUtilities = {
   'forEach': (children, cb) => children.map(convertToPublic).forEach(cb),
