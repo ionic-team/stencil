@@ -23,7 +23,7 @@
     "build": "node scripts && npm run tsc && npm run rollup.prod.ci",
     "build.prod": "node scripts && npm run tsc.scripts && npm run tsc && npm run rollup.prod",
     "tsc.scripts": "tsc -p scripts/tsconfig.json",
-    "watch": "npm run tsc && concurrently \"npm run rollup.watch\" \"npm run tsc.watch\"",
+    "watch": "node scripts && npm run tsc && concurrently \"npm run rollup.watch\" \"npm run tsc.watch\"",
     "release": "node scripts --release --publish",
     "release.prepare": "node scripts --release --prepare",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",

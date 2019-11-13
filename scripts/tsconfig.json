@@ -2,7 +2,6 @@
   "compilerOptions": {
     "alwaysStrict": true,
     "allowSyntheticDefaultImports": true,
-    "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "lib": [
