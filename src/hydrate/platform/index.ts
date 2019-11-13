@@ -64,6 +64,12 @@ export const consoleError = (e: any) => {
   }
 };
 
+export const consoleDevError = (..._: any[]) => {/* noop for hydrate */};
+
+export const consoleDevWarn = (..._: any[]) => {/* noop for hydrate */};
+
+export const consoleDevInfo = (..._: any[]) => {/* noop for hydrate */};
+
 export const Context: any = {};
 
 

@@ -1,8 +1,9 @@
 import * as d from '../declarations';
 import { BUILD, NAMESPACE } from '@build-conditionals';
+import { consoleDevInfo } from './client-log';
 import { doc, plt, win } from './client-window';
 import { getDynamicImportFunction } from '@utils';
-import { STENCIL_DEV_MODE } from '../runtime/profile';
+
 
 export const patchEsm = () => {
   // @ts-ignore
@@ -20,7 +21,7 @@ export const patchEsm = () => {
 
 export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => {
   if (BUILD.isDev) {
-    console.info(...STENCIL_DEV_MODE, 'Stencil is running in the development mode.');
+    consoleDevInfo('Stencil is running in the development mode.');
   }
   if (BUILD.cssVarShim) {
     plt.$cssShim$ = (win as any).__stencil_cssshim;
