@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "1.7.5",
+  "version": "1.8.0",
   "license": "MIT",
   "main": "internal/stencil.core.js",
   "types": "internal/stencil.core.d.ts",
@@ -47,7 +47,7 @@
     "test.watch": "jest --watch"
   },
   "dependencies": {
-    "typescript": "3.6.3"
+    "typescript": "3.7.2"
   },
   "devDependencies": {
     "@types/autoprefixer": "^9.1.1",
