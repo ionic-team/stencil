@@ -599,7 +599,7 @@ render() {
     useNativeShadowDom = supportsShadowDom && (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) !== 0;
 
     // always reset
-    checkSlotRelocate = checkSlotFallbackVisibility = false;
+    checkSlotFallbackVisibility = false;
   }
 
   // synchronous patch
