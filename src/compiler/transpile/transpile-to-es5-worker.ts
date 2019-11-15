@@ -35,8 +35,14 @@ export async function transpileToEs5Worker(_cwd: string, input: string, inlineHe
   );
 
   if (results.diagnostics.length === 0) {
-    results.code = tsResults.outputText;
+    results.code = fixHelpers(tsResults.outputText);
   }
 
   return results;
+}
+
+// TODO:
+// remove once fixed: https://github.com/microsoft/TypeScript/issues/35108
+function fixHelpers(code: string) {
+  return code.replace(/\b__(extends|assign|rest|decorate|param|metadata|awaiter|generator|exportStar|values|read|spread|spreadArrays|await|asyncGenerator|asyncDelegator|asyncValues|makeTemplateObject|importStar|importDefault|)_\d\(/g, '__$1(');
 }
