@@ -88,18 +88,14 @@ export async function connectBrowser() {
 }
 
 
-export async function disconnectBrowser(browserContext: puppeteer.BrowserContext) {
-  if (browserContext) {
-    const browser = browserContext.browser();
-    try {
-      await browserContext.close();
-    } catch (e) {}
+export async function disconnectBrowser(browser: puppeteer.Browser) {
+  if (browser) {
     try {
       browser.disconnect();
     } catch (e) {}
   }
 }
 
-export function newBrowserPage(browserContext: puppeteer.BrowserContext) {
-  return browserContext.newPage();
+export function newBrowserPage(browser: puppeteer.Browser) {
+  return browser.newPage();
 }
