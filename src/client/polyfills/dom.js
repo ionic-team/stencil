@@ -44,7 +44,7 @@ if (typeof document.baseURI !== 'string') {
     configurable: true,
     get: function () {
       var base = document.querySelector('base');
-      if (base) {
+      if (base && base.href) {
         return base.href;
       }
       return document.URL;
