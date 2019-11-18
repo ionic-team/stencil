@@ -117,7 +117,6 @@ export const Build: d.UserBuildConditionals = {
 
 export const styles: d.StyleMap = new Map();
 
-export { bootstrapHydrate } from './bootstrap-hydrate';
+export { hydrateApp } from './hydrate-app';
 
 export * from '@runtime';
-

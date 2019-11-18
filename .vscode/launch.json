@@ -202,8 +202,24 @@
         "build",
         "--prerender",
         "--max-workers=1",
+        "--debug",
         "--config",
         "${workspaceFolder}/../stencil-site/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Ionic Docs Prerender",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--prerender",
+        "--max-workers=1",
+        "--debug",
+        "--config",
+        "${workspaceFolder}/../ionic-docs/stencil.config.ts"
       ],
       "protocol": "inspector"
     },

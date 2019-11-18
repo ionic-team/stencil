@@ -265,11 +265,11 @@ export function resetDocument(doc: Document) {
 
     const documentElement = doc.documentElement;
     if (documentElement != null) {
-      resetElement(documentElement);
+      resetElement(documentElement as any);
 
       for (let i = 0, ii = documentElement.childNodes.length; i < ii; i++) {
         const childNode = documentElement.childNodes[i];
-        resetElement(childNode);
+        resetElement(childNode as any);
         childNode.childNodes.length = 0;
       }
     }

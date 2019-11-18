@@ -1,9 +1,10 @@
 import { createConsole } from './console';
-import { MockCustomElementRegistry, resetCustomElementRegistry } from './custom-element-registry';
+import { MockCustomElementRegistry } from './custom-element-registry';
 import { MockCustomEvent, MockEvent, MockKeyboardEvent, MockMouseEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { MockDocument, resetDocument } from './document';
 import { MockElement, MockHTMLElement, MockNode, MockNodeList } from './node';
 import { MockHistory } from './history';
+import { MockIntersectionObserver } from './intersection-observer';
 import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
 import { MockPerformance, resetPerformance } from './performance';
@@ -11,19 +12,6 @@ import { MockStorage } from './storage';
 import { URL } from 'url';
 
 
-const historyMap = new WeakMap<MockWindow, MockHistory>();
-const elementCstrMap = new WeakMap<MockWindow, any>();
-const htmlElementCstrMap = new WeakMap<MockWindow, any>();
-const nodeCstrMap = new WeakMap<MockWindow, any>();
-const nodeListCstrMap = new WeakMap<MockWindow, any>();
-const localStorageMap = new WeakMap<MockWindow, MockStorage>();
-const locMap = new WeakMap<MockWindow, MockLocation>();
-const navMap = new WeakMap<MockWindow, MockNavigator>();
-const sessionStorageMap = new WeakMap<MockWindow, MockStorage>();
-const eventClassMap = new WeakMap<MockWindow, any>();
-const customEventClassMap = new WeakMap<MockWindow, any>();
-const keyboardEventClassMap = new WeakMap<MockWindow, any>();
-const mouseEventClassMap = new WeakMap<MockWindow, any>();
 const nativeClearInterval = clearInterval;
 const nativeClearTimeout = clearTimeout;
 const nativeSetInterval = setInterval;
@@ -31,6 +19,20 @@ const nativeSetTimeout = setTimeout;
 const nativeURL = URL;
 
 export class MockWindow {
+  __timeouts: Set<any>;
+  __history: MockHistory;
+  __elementCstr: any;
+  __htmlElementCstr: any;
+  __nodeCstr: any;
+  __nodeListCstr: any;
+  __localStorage: MockStorage;
+  __sessionStorage: MockStorage;
+  __location: MockLocation;
+  __navigator: MockNavigator;
+  __eventClass: any;
+  __customEventClass: any;
+  __keyboardEventClass: any;
+  __mouseEventClass: any;
   __clearInterval: typeof nativeClearInterval;
   __clearTimeout: typeof nativeClearTimeout;
   __setInterval: typeof nativeSetInterval;
@@ -75,8 +77,14 @@ export class MockWindow {
   }
 
   alert(msg: string) {
-    this.console.debug(msg);
+    if (this.console) {
+      this.console.debug(msg);
+    } else {
+      console.debug(msg);
+    }
   }
+
+  blur(): any {/**/}
 
   cancelAnimationFrame(id: any) {
     this.__clearTimeout(id);
@@ -109,56 +117,43 @@ export class MockWindow {
   }
 
   get CustomEvent() {
-    const custEvClass = customEventClassMap.get(this);
-    if (custEvClass != null) {
-      return custEvClass;
+    if (this.__customEventClass != null) {
+      return this.__customEventClass;
     }
     return MockCustomEvent;
   }
   set CustomEvent(custEvClass: any) {
-    customEventClassMap.set(this, custEvClass);
-  }
-
-  get KeyboardEvent() {
-    const kbEvClass = keyboardEventClassMap.get(this);
-    if (kbEvClass != null) {
-      return kbEvClass;
-    }
-    return MockKeyboardEvent;
-  }
-  set KeyboardEvent(kbEvClass: any) {
-    keyboardEventClassMap.set(this, kbEvClass);
-  }
-
-  get MouseEvent() {
-    const mouseEvClass = mouseEventClassMap.get(this);
-    if (mouseEvClass != null) {
-      return mouseEvClass;
-    }
-    return MockMouseEvent;
-  }
-  set MouseEvent(mouseEvClass: any) {
-    mouseEventClassMap.set(this, mouseEvClass);
+    this.__customEventClass = custEvClass;
   }
 
   dispatchEvent(ev: MockEvent) {
     return dispatchEvent(this, ev);
   }
 
-  get JSON() {
-    return JSON;
+  get Element() {
+    if (this.__elementCstr == null) {
+      const ownerDocument = this.document;
+      this.__elementCstr = class extends MockElement {
+        constructor() {
+          super(ownerDocument, '');
+          throw (new Error('Illegal constructor: cannot construct Element'));
+        }
+      };
+    }
+    return this.__elementCstr;
   }
 
   get Event() {
-    const evClass = eventClassMap.get(this);
-    if (evClass != null) {
-      return evClass;
+    if (this.__eventClass != null) {
+      return this.__eventClass;
     }
     return MockEvent;
   }
   set Event(ev: any) {
-    eventClassMap.set(this, ev);
+    this.__eventClass = ev;
   }
+
+  focus(): any {/**/}
 
   getComputedStyle(_: any) {
     return {
@@ -188,65 +183,33 @@ export class MockWindow {
   }
 
   get history() {
-    let hsty = historyMap.get(this);
-    if (hsty == null) {
-      hsty = new MockHistory();
-      historyMap.set(this, hsty);
+    if (this.__history == null) {
+      this.__history = new MockHistory();
     }
-    return hsty;
+    return this.__history;
   }
   set history(hsty: any) {
-    historyMap.set(this, hsty);
+    this.__history = hsty;
   }
 
-  get Element() {
-    let ElementCstr = elementCstrMap.get(this);
-    if (ElementCstr == null) {
-      const ownerDocument = this.document;
-      ElementCstr = class extends MockElement {
-        constructor() {
-          super(ownerDocument, '');
-          throw (new Error('Illegal constructor: cannot construct Element'));
-        }
-      };
-      elementCstrMap.set(this, ElementCstr);
-    }
-    return ElementCstr;
+  get JSON() {
+    return JSON;
   }
 
-  get Node() {
-    let NodeCstr = nodeCstrMap.get(this);
-    if (NodeCstr == null) {
-      const ownerDocument = this.document;
-      NodeCstr = class extends MockNode {
-        constructor() {
-          super(ownerDocument, 0, 'test', '');
-          throw (new Error('Illegal constructor: cannot constructor'));
-        }
-      };
-      return NodeCstr;
+  get KeyboardEvent() {
+    if (this.__keyboardEventClass != null) {
+      return this.__keyboardEventClass;
     }
+    return MockKeyboardEvent;
   }
-
-  get NodeList() {
-    let NodeListCstr = nodeListCstrMap.get(this);
-    if (NodeListCstr == null) {
-      const ownerDocument = this.document;
-      NodeListCstr = class extends MockNodeList {
-        constructor() {
-          super(ownerDocument, [], 0);
-          throw (new Error('Illegal constructor: cannot constructor'))
-        }
-      };
-      return NodeListCstr;
-    }
+  set KeyboardEvent(kbEvClass: any) {
+    this.__keyboardEventClass = kbEvClass;
   }
 
   get HTMLElement() {
-    let HtmlElementCstr = htmlElementCstrMap.get(this);
-    if (HtmlElementCstr == null) {
+    if (this.__htmlElementCstr == null) {
       const ownerDocument = this.document;
-      HtmlElementCstr = class extends MockHTMLElement {
+      this.__htmlElementCstr = class extends MockHTMLElement {
         constructor() {
           super(ownerDocument, '');
 
@@ -261,42 +224,39 @@ export class MockWindow {
           }
         }
       };
-      htmlElementCstrMap.set(this, HtmlElementCstr);
     }
-    return HtmlElementCstr;
+    return this.__htmlElementCstr;
+  }
+
+  get IntersectionObserver() {
+    return MockIntersectionObserver;
   }
 
   get localStorage() {
-    let locStorage = localStorageMap.get(this);
-    if (locStorage == null) {
-      locStorage = new MockStorage();
-      localStorageMap.set(this, locStorage);
+    if (this.__localStorage == null) {
+      this.__localStorage = new MockStorage();
     }
-    return locStorage;
+    return this.__localStorage;
   }
   set localStorage(locStorage: MockStorage) {
-    localStorageMap.set(this, locStorage);
+    this.__localStorage = locStorage;
   }
 
   get location(): Location {
-    let loc = locMap.get(this);
-    if (loc == null) {
-      loc = new MockLocation();
-      locMap.set(this, loc);
+    if (this.__location == null) {
+      this.__location = new MockLocation();
     }
-    return loc;
+    return this.__location;
   }
   set location(val: Location) {
     if (typeof val === 'string') {
-      let loc = locMap.get(this);
-      if (loc == null) {
-        loc = new MockLocation();
-        locMap.set(this, loc);
+      if (this.__location == null) {
+        this.__location = new MockLocation();
       }
-      loc.href = val;
+      this.__location.href = val;
 
     } else {
-      locMap.set(this, val as any);
+      this.__location = val as any;
     }
   }
 
@@ -306,16 +266,50 @@ export class MockWindow {
     };
   }
 
-  get navigator() {
-    let nav = navMap.get(this);
-    if (nav == null) {
-      nav = new MockNavigator();
-      navMap.set(this, nav);
+  get MouseEvent() {
+    if (this.__mouseEventClass != null) {
+      return this.__mouseEventClass;
     }
-    return nav;
+    return MockMouseEvent;
+  }
+  set MouseEvent(mouseEvClass: any) {
+    this.__mouseEventClass = mouseEvClass;
+  }
+
+  get Node() {
+    if (this.__nodeCstr == null) {
+      const ownerDocument = this.document;
+      this.__nodeCstr = class extends MockNode {
+        constructor() {
+          super(ownerDocument, 0, 'test', '');
+          throw (new Error('Illegal constructor: cannot construct Node'));
+        }
+      };
+      return this.__nodeCstr;
+    }
+  }
+
+  get NodeList() {
+    if (this.__nodeListCstr == null) {
+      const ownerDocument = this.document;
+      this.__nodeListCstr = class extends MockNodeList {
+        constructor() {
+          super(ownerDocument, [], 0);
+          throw (new Error('Illegal constructor: cannot construct NodeList'));
+        }
+      };
+      return this.__nodeListCstr;
+    }
+  }
+
+  get navigator() {
+    if (this.__navigator == null) {
+      this.__navigator = new MockNavigator();
+    }
+    return this.__navigator;
   }
   set navigator(nav: any) {
-    navMap.set(this, nav);
+    this.__navigator = nav;
   }
 
   get parent(): any {
@@ -324,6 +318,10 @@ export class MockWindow {
 
   prompt() {
     return '';
+  }
+
+  open(): any {
+    return null;
   }
 
   get origin() {
@@ -360,49 +358,85 @@ export class MockWindow {
   }
 
   get sessionStorage() {
-    let sessStorage = sessionStorageMap.get(this);
-    if (sessStorage == null) {
-      sessStorage = new MockStorage();
-      sessionStorageMap.set(this, sessStorage);
+    if (this.__sessionStorage == null) {
+      this.__sessionStorage = new MockStorage();
     }
-    return sessStorage;
+    return this.__sessionStorage;
   }
   set sessionStorage(locStorage: any) {
-    sessionStorageMap.set(this, locStorage);
+    this.__sessionStorage = locStorage;
   }
 
   setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): number {
+    if (this.__timeouts == null) {
+      this.__timeouts = new Set();
+    }
+
     ms = Math.min(ms, this.__maxTimeout);
 
     if (this.__allowInterval) {
-      return this.__setInterval(() => {
+      const intervalId = this.__setInterval(() => {
+        this.__timeouts.delete(intervalId);
+
         try {
           callback(...args);
         } catch (e) {
-          this.console.error(e);
+          if (this.console) {
+            this.console.error(e);
+          } else {
+            console.error(e);
+          }
         }
       }, ms) as any;
+
+      this.__timeouts.add(intervalId);
+
+      return intervalId;
     }
 
-    return this.__setTimeout(() => {
+    const timeoutId = this.__setTimeout(() => {
+      this.__timeouts.delete(timeoutId);
+
       try {
         callback(...args);
       } catch (e) {
-        this.console.error(e);
+        if (this.console) {
+          this.console.error(e);
+        } else {
+          console.error(e);
+        }
       }
     }, ms) as any;
+
+    this.__timeouts.add(timeoutId);
+
+    return timeoutId;
   }
 
   setTimeout(callback: (...args: any[]) => void, ms: number, ...args: any[]): number {
+    if (this.__timeouts == null) {
+      this.__timeouts = new Set();
+    }
+
     ms = Math.min(ms, this.__maxTimeout);
 
-    return (this.__setTimeout(() => {
+    const timeoutId = (this.__setTimeout(() => {
+      this.__timeouts.delete(timeoutId);
+
       try {
         callback(...args);
       } catch (e) {
-        this.console.error(e);
+        if (this.console) {
+          this.console.error(e);
+        } else {
+          console.error(e);
+        }
       }
     }, ms) as any) as number;
+
+    this.__timeouts.add(timeoutId);
+
+    return timeoutId;
   }
 
   get top() {
@@ -501,7 +535,7 @@ export class MockWindow {
   onwheel() {/**/}
 }
 
-function resetWindowDefaults(win: any) {
+function resetWindowDefaults(win: MockWindow) {
   win.__clearInterval = nativeClearInterval;
   win.__clearTimeout = nativeClearTimeout;
   win.__setInterval = nativeSetInterval;
@@ -552,9 +586,19 @@ export function constrainTimeouts(win: any) {
 }
 
 
-export function resetWindow(win: Window) {
+function resetWindow(win: MockWindow) {
   if (win != null) {
-    resetCustomElementRegistry(win.customElements);
+    if (win.__timeouts) {
+      win.__timeouts.forEach(timeoutId => {
+        nativeClearInterval(timeoutId);
+        nativeClearTimeout(timeoutId);
+      });
+      win.__timeouts.clear();
+    }
+    if (win.customElements && (win.customElements as MockCustomElementRegistry).clear) {
+      (win.customElements as MockCustomElementRegistry).clear();
+    }
+
     resetDocument(win.document);
     resetPerformance(win.performance);
 
@@ -565,21 +609,7 @@ export function resetWindow(win: Window) {
     }
     resetWindowDefaults(win);
     resetWindowDimensions(win);
-
     resetEventListeners(win);
-
-    historyMap.delete(win as any);
-    htmlElementCstrMap.delete(win as any);
-    elementCstrMap.delete(win as any);
-    nodeListCstrMap.delete(win as any);
-    localStorageMap.delete(win as any);
-    locMap.delete(win as any);
-    navMap.delete(win as any);
-    sessionStorageMap.delete(win as any);
-    eventClassMap.delete(win as any);
-    customEventClassMap.delete(win as any);
-    keyboardEventClassMap.delete(win as any);
-    mouseEventClassMap.delete(win as any);
 
     if (win.document != null) {
       try {
@@ -589,7 +619,7 @@ export function resetWindow(win: Window) {
   }
 }
 
-function resetWindowDimensions(win: any) {
+function resetWindowDimensions(win: MockWindow) {
   try {
     win.devicePixelRatio = 1;
 
@@ -617,9 +647,9 @@ function resetWindowDimensions(win: any) {
       orientation: {
         angle: 0,
         type: 'portrait-primary'
-      },
+      } as any,
       pixelDepth: 24,
       width: win.innerWidth
-    };
+    } as any;
   } catch (e) {}
 }

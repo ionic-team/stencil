@@ -16,21 +16,23 @@ const HYDRATE_DIST_DIR = path.join(DIST_DIR, 'hydrate');
 async function bundleHydrateRunner() {
   const rollupBuild = await rollup.rollup({
     input: RUNNER_INDEX_FILE,
-    external: [
-      'fs',
-      'path',
-      'vm'
-    ],
     plugins: [
-      (() => {
-        return {
-          resolveId(importee) {
-            if (importee === '@mock-doc') {
-              return path.join(TRANSPILED_DIR, 'mock-doc', 'index.js');
+      {
+        resolveId(importee) {
+          if (importee === '@mock-doc') {
+            return {
+              id: '@stencil/core/mock-doc',
+              external: true,
+            }
+          }
+          if (importee === '@hydrate-factory') {
+            return {
+              id: '@stencil/core/hydrate-factory',
+              external: true,
             }
           }
         }
-      })(),
+      },
       urlPlugin(),
       rollupResolve({
         preferBuiltins: true
@@ -44,7 +46,8 @@ async function bundleHydrateRunner() {
   });
 
   const { output } = await rollupBuild.generate({
-    format: 'cjs'
+    format: 'esm',
+    file: 'index.mjs'
   });
 
   const filePath = path.join(HYDRATE_DIST_DIR, output[0].fileName);
@@ -72,21 +75,20 @@ async function bundleHydratePlatform() {
   const rollupBuild = await rollup.rollup({
     input: PLATFORM_INDEX_FILE,
     plugins: [
-      (() => {
-        return {
-          resolveId(importee) {
-            if (importee === '@runtime') {
-              return {
-                id: '@stencil/core/runtime',
-                external: true
-              };
-            }
-            if (importee === '@platform') {
-              return PLATFORM_INDEX_FILE;
-            }
+      {
+        resolveId(importee) {
+          if (importee === '@runtime') {
+            return {
+              id: '@stencil/core/runtime',
+              external: true
+            };
+          }
+          if (importee === '@platform') {
+            return PLATFORM_INDEX_FILE;
           }
         }
-      })(),
+      },
+      urlPlugin(),
       rollupResolve({
         preferBuiltins: true
       }),

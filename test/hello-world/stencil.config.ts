@@ -4,6 +4,7 @@ export const config: Config = {
   namespace: 'HelloWorld',
   outputTargets: [
     { type: 'dist' },
+    { type: 'dist-hydrate-script' },
     {
       type: 'experimental-dist-module',
       dir: 'www'

@@ -1,11 +1,11 @@
 import * as d from '../../declarations';
-import { constrainTimeouts } from '@mock-doc';
 import { renderCatchError } from './render-utils';
+import { constrainTimeouts } from '@mock-doc';
 
 
-export function initializeWindow(win: Window, doc: Document, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
+export function initializeWindow(win: Window, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
   try {
-    win.location.href = results.url;
+    win.location.href = opts.url;
   } catch (e) {
     renderCatchError(results, e);
   }
@@ -17,22 +17,22 @@ export function initializeWindow(win: Window, doc: Document, opts: d.HydrateDocu
   }
   if (typeof opts.cookie === 'string') {
     try {
-      doc.cookie = opts.cookie;
+      win.document.cookie = opts.cookie;
     } catch (e) {}
   }
   if (typeof opts.referrer === 'string') {
     try {
-      (doc as any).referrer = opts.referrer;
+      (win.document as any).referrer = opts.referrer;
     } catch (e) {}
   }
   if (typeof opts.direction === 'string') {
     try {
-      doc.documentElement.setAttribute('dir', opts.direction);
+      win.document.documentElement.setAttribute('dir', opts.direction);
     } catch (e) {}
   }
   if (typeof opts.language === 'string') {
     try {
-      doc.documentElement.setAttribute('lang', opts.language);
+      win.document.documentElement.setAttribute('lang', opts.language);
     } catch (e) {}
   }
 
@@ -46,39 +46,18 @@ export function initializeWindow(win: Window, doc: Document, opts: d.HydrateDocu
 
   try {
     win.console.error = function() {
-
-      const diagnostic: d.Diagnostic = {
-        level: 'error',
-        type: 'runtime',
-        header: 'Hydrate Error',
-        messageText: [...arguments].join(', '),
-        relFilePath: null,
-        absFilePath: null,
-        lines: []
-      };
-      if (typeof results.pathname === 'string') {
-        diagnostic.header += `: ${results.pathname}`;
-      }
-      results.diagnostics.push(diagnostic);
+      renderCatchError(results, [...arguments].join(', '));
     };
 
     win.console.debug = function() {
-      const diagnostic: d.Diagnostic = {
-        level: 'debug',
-        type: 'build',
-        header: 'Hydrate Debug',
-        messageText: [...arguments].join(', '),
-        relFilePath: null,
-        absFilePath: null,
-        lines: []
-      };
-      if (typeof results.pathname === 'string') {
-        diagnostic.header += `: ${results.pathname}`;
-      }
-      results.diagnostics.push(diagnostic);
+      const diagnostic = renderCatchError(results, [...arguments].join(', '));
+      diagnostic.level = 'debug';
+      diagnostic.messageText = 'Hydrate Debug';
     };
 
   } catch (e) {
     renderCatchError(results, e);
   }
+
+  return win;
 }

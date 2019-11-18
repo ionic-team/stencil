@@ -1,14 +1,18 @@
+import * as d from '../../declarations';
 import { MockWindow, patchWindow } from '@mock-doc';
 
 
-export function patchDomImplementation(doc: any) {
+export function patchDomImplementation(doc: any, opts: d.HydrateFactoryOptions) {
   let win: any;
 
   if (doc.defaultView != null) {
+    opts.destroyWindow = true;
     patchWindow(doc.defaultView);
     win = doc.defaultView;
 
   } else {
+    opts.destroyWindow = true;
+    opts.destroyDocument = false;
     win = new MockWindow(false) as any;
   }
 

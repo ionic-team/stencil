@@ -22,7 +22,7 @@ export function isEmptable(o: d.OutputTarget): o is OutputTargetEmptiable {
 }
 
 export async function emptyOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (buildCtx.isRebuild) {
+  if (buildCtx.isRebuild || config.logLevel === 'debug') {
     return;
   }
   const cleanDirs = config.outputTargets

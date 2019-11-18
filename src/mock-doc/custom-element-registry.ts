@@ -2,11 +2,10 @@ import { MockHTMLElement, MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
 
-const registryMap = new WeakMap<MockCustomElementRegistry, Map<string, { cstr: any, options: any }>>();
-const whenDefinedResolvesMap = new WeakMap<MockCustomElementRegistry, Map<string, Function[]>>();
-
-
 export class MockCustomElementRegistry implements CustomElementRegistry {
+  private __registry: Map<string, { cstr: any, options: any }>;
+  private __whenDefined: Map<string, Function[]>;
+
   constructor(private win: Window) {}
 
   define(tagName: string, cstr: any, options?: any) {
@@ -14,22 +13,19 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
       throw new Error(`Failed to execute 'define' on 'CustomElementRegistry': "${tagName}" is not a valid custom element name`);
     }
 
-    let registry = registryMap.get(this);
-    if (registry == null) {
-      registry = new Map();
-      registryMap.set(this, registry);
+    if (this.__registry == null) {
+      this.__registry = new Map();
     }
-    registry.set(tagName, { cstr, options });
+    this.__registry.set(tagName, { cstr, options });
 
-    const whenDefinedResolves = whenDefinedResolvesMap.get(this);
-    if (whenDefinedResolves != null) {
-      const whenDefinedResolveFns = whenDefinedResolves.get(tagName);
+    if (this.__whenDefined != null) {
+      const whenDefinedResolveFns = this.__whenDefined.get(tagName);
       if (whenDefinedResolveFns != null) {
         whenDefinedResolveFns.forEach(whenDefinedResolveFn => {
           whenDefinedResolveFn();
         });
         whenDefinedResolveFns.length = 0;
-        whenDefinedResolves.delete(tagName);
+        this.__whenDefined.delete(tagName);
       }
     }
 
@@ -61,9 +57,8 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
   }
 
   get(tagName: string) {
-    const registry = registryMap.get(this);
-    if (registry != null) {
-      const def = registry.get(tagName.toLowerCase());
+    if (this.__registry != null) {
+      const def = this.__registry.get(tagName.toLowerCase());
       if (def != null) {
         return def.cstr;
       }
@@ -75,44 +70,36 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
     //
   }
 
+  clear() {
+    if (this.__registry != null) {
+      this.__registry.clear();
+    }
+
+    if (this.__whenDefined != null) {
+      this.__whenDefined.clear();
+    }
+  }
+
   whenDefined(tagName: string) {
     tagName = tagName.toLowerCase();
 
-    const registry = registryMap.get(this);
-    if (registry != null && registry.has(tagName) === true) {
+    if (this.__registry != null && this.__registry.has(tagName) === true) {
       return Promise.resolve();
     }
 
     return new Promise<void>(resolve => {
-      let whenDefinedResolves = whenDefinedResolvesMap.get(this);
-      if (whenDefinedResolves == null) {
-        whenDefinedResolves = new Map();
-        whenDefinedResolvesMap.set(this, whenDefinedResolves);
+      if (this.__whenDefined == null) {
+        this.__whenDefined = new Map();
       }
 
-      let whenDefinedResolveFns = whenDefinedResolves.get(tagName);
+      let whenDefinedResolveFns = this.__whenDefined.get(tagName);
       if (whenDefinedResolveFns == null) {
         whenDefinedResolveFns = [];
-        whenDefinedResolves.set(tagName, whenDefinedResolveFns);
+        this.__whenDefined.set(tagName, whenDefinedResolveFns);
       }
 
       whenDefinedResolveFns.push(resolve);
     });
-  }
-}
-
-
-export function resetCustomElementRegistry(customElements: CustomElementRegistry) {
-  if (customElements != null) {
-    const registry = registryMap.get(customElements as any);
-    if (registry != null) {
-      registry.clear();
-    }
-
-    const whenDefinedResolves = whenDefinedResolvesMap.get(customElements as any);
-    if (whenDefinedResolves != null) {
-      whenDefinedResolves.clear();
-    }
   }
 }
 

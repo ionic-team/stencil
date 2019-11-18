@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { resetTaskQueue } from './task-queue';
-import { resetWindow, setupGlobal } from '@mock-doc';
 import { flushAll } from './task-queue';
+import { setupGlobal } from '@mock-doc';
 
 export * from './task-queue';
 
@@ -38,7 +38,9 @@ let isAutoApplyingChanges = false;
 let autoApplyTimer: any = undefined;
 
 export function resetPlatform() {
-  resetWindow(win);
+  if (win && typeof win.close === 'function') {
+    win.close();
+  }
 
   hostRefs.clear();
   styles.clear();

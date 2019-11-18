@@ -4,7 +4,7 @@ import { StringifyCss } from '../style/stringify-css';
 import { UsedSelectors } from '../style/used-selectors';
 
 
-export function removeUnusedStyles(doc: Document, results: d.HydrateResults) {
+export function removeUnusedStyles(doc: Document, diagnostics: d.Diagnostic[]) {
   const styleElms = doc.head.querySelectorAll<HTMLStyleElement>(`style[data-styles]`);
 
   if (styleElms.length > 0) {
@@ -13,19 +13,19 @@ export function removeUnusedStyles(doc: Document, results: d.HydrateResults) {
     const usedSelectors = new UsedSelectors(doc.body);
 
     for (let i = 0; i < styleElms.length; i++) {
-      removeUnusedStyleText(usedSelectors, results, styleElms[i]);
+      removeUnusedStyleText(usedSelectors, diagnostics, styleElms[i]);
     }
   }
 }
 
 
-function removeUnusedStyleText(usedSelectors: UsedSelectors, results: d.HydrateResults, styleElm: HTMLStyleElement) {
+function removeUnusedStyleText(usedSelectors: UsedSelectors, diagnostics: d.Diagnostic[], styleElm: HTMLStyleElement) {
   try {
     // parse the css from being applied to the document
     const cssAst = parseCss(styleElm.innerHTML);
 
     if (cssAst.stylesheet.diagnostics.length > 0) {
-      results.diagnostics.push(...cssAst.stylesheet.diagnostics);
+      diagnostics.push(...cssAst.stylesheet.diagnostics);
       return;
     }
 
@@ -36,7 +36,7 @@ function removeUnusedStyleText(usedSelectors: UsedSelectors, results: d.HydrateR
       styleElm.innerHTML = stringify.compile(cssAst);
 
     } catch (e) {
-      results.diagnostics.push({
+      diagnostics.push({
         level: 'warn',
         type: 'css',
         header: 'CSS Stringify',
@@ -45,7 +45,7 @@ function removeUnusedStyleText(usedSelectors: UsedSelectors, results: d.HydrateR
     }
 
   } catch (e) {
-    results.diagnostics.push({
+    diagnostics.push({
       level: 'warn',
       type: 'css',
       header: 'CSS Parse',

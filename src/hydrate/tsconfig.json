@@ -32,6 +32,9 @@
       "@compiler": [
         "../compiler/index.ts"
       ],
+      "@hydrate-factory": [
+        "./runner/hydrate-factory.ts"
+      ],
       "@mock-doc": [
         "../mock-doc/index.ts"
       ],
