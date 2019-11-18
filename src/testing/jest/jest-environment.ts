@@ -8,7 +8,7 @@ export function createJestPuppeteerEnvironment() {
   const JestEnvironment = class extends NodeEnvironment {
 
     global: d.JestEnvironmentGlobal;
-    browserContext: any = null;
+    browser: any = null;
     pages: any[] = [];
 
     constructor(config: any) {
@@ -23,17 +23,12 @@ export function createJestPuppeteerEnvironment() {
     }
 
     async newPuppeteerPage() {
-      if (!this.browserContext) {
+      if (!this.browser) {
         // load the browser and page on demand
-        const browser = await connectBrowser();
-        this.browserContext = await browser.createIncognitoBrowserContext();
+        this.browser = await connectBrowser();
       }
 
-      if (!this.browserContext) {
-        return null;
-      }
-
-      const page = await newBrowserPage(this.browserContext);
+      const page = await newBrowserPage(this.browser);
       this.pages.push(page);
       const env: d.E2EProcessEnv = process.env;
       if (typeof env.__STENCIL_DEFAULT_TIMEOUT__ === 'string') {
@@ -52,8 +47,8 @@ export function createJestPuppeteerEnvironment() {
     async teardown() {
       await super.teardown();
       await this.closeOpenPages();
-      await disconnectBrowser(this.browserContext);
-      this.browserContext = null;
+      await disconnectBrowser(this.browser);
+      this.browser = null;
     }
   };
 
