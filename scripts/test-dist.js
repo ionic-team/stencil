@@ -47,7 +47,7 @@ const fs = require('fs');
     // hydrate
     files: [
       '../dist/hydrate/index.d.ts',
-      '../dist/hydrate/index.js',
+      '../dist/hydrate/index.mjs',
       '../dist/hydrate/platform.mjs'
     ]
   },
