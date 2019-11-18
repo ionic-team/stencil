@@ -285,8 +285,8 @@ export class MockWindow {
           throw (new Error('Illegal constructor: cannot construct Node'));
         }
       };
-      return this.__nodeCstr;
     }
+    return this.__nodeCstr;
   }
 
   get NodeList() {
@@ -298,8 +298,8 @@ export class MockWindow {
           throw (new Error('Illegal constructor: cannot construct NodeList'));
         }
       };
-      return this.__nodeListCstr;
     }
+    return this.__nodeListCstr;
   }
 
   get navigator() {

@@ -34,7 +34,7 @@ describe('globals', () => {
   });
 
   describe('globals/prototypes', () => {
-    let page;
+    let page: any;
     beforeEach(async () => {
       @Component({ tag: 'cmp-el' })
       class CmpEl {
@@ -63,6 +63,7 @@ describe('globals', () => {
       expect(page.rootInstance.protoNode).toEqual((global as any).Node.prototype);
       expect(page.rootInstance.protoNode).toBeTruthy();
     });
+
     it('allows access to the NodeList prototype', async () => {
       expect(page.rootInstance.protoNodeList).toEqual(NodeList.prototype);
       expect(page.rootInstance.protoNodeList).toEqual((page.win as any).NodeList.prototype);
@@ -78,5 +79,15 @@ describe('globals', () => {
       expect(page.rootInstance.protoEl).toEqual((global as any).Element.prototype);
       expect(page.rootInstance.protoEl).toBeTruthy();
     });
+
+    it('allows access to the KeyboardEvent', async () => {
+      expect(window.KeyboardEvent).toEqual(KeyboardEvent);
+      expect(global.KeyboardEvent).toEqual(KeyboardEvent);
+      expect(page.rootInstance.protoEl).toEqual((page.win as any).Element.prototype);
+      expect(page.rootInstance.protoEl).toEqual((window as any).Element.prototype);
+      expect(page.rootInstance.protoEl).toEqual((global as any).Element.prototype);
+      expect(page.rootInstance.protoEl).toBeTruthy();
+    });
+
   });
 });
