@@ -19,7 +19,8 @@ describe('event', () => {
 
       @Method()
       emitEvent() {
-        this.ionChange.emit();
+        const event = this.ionChange.emit();
+        expect(event.type).toEqual('ionChange');
       }
 
       render() {
