@@ -23,6 +23,14 @@ export const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InM
 };
 
 
+export const resolvePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, basedir: string) => {
+  const opts = createCustomResolverSync(config, inMemoryFs, basedir, ['.json']);
+  opts.packageFilter = (pkg: any, packagePath: string) => {
+    pkg.main = packagePath;
+  };
+  return resolve.sync(moduleId, opts);
+};
+
 export const resolveModuleIdSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, basedir: string, exts: string[]) => {
   const opts = createCustomResolverSync(config, inMemoryFs, basedir, exts);
   return resolve.sync(moduleId, opts);

@@ -23,7 +23,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     return;
   }
 
-  const timespan = buildCtx.createTimeSpan(`generate lazy started`, true);
+  const timespan = buildCtx.createTimeSpan(`generate lazy started`);
 
   try {
     // const criticalBundles = getCriticalPath(buildCtx);

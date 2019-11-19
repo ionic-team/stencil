@@ -22,7 +22,7 @@ export const addExternalImport = (config: d.Config, compilerCtx: d.CompilerCtx, 
   let pkgJsonFilePath: string;
   try {
     // get the full package.json file path
-    pkgJsonFilePath = normalizePath(config.sys.resolveModule(resolveFromDir, moduleId));
+    pkgJsonFilePath = normalizePath(config.sys.resolveModule(resolveFromDir, moduleId, {packageJson: true}));
 
   } catch (e) {
     // it's someone else's job to handle unresolvable paths

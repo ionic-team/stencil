@@ -65,6 +65,7 @@ export interface StencilSystem {
 
 export interface ResolveModuleOptions {
   manuallyResolve?: boolean;
+  packageJson?: boolean;
 }
 
 

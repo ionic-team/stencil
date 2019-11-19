@@ -51,8 +51,8 @@ export const getGlobalScriptPaths = (config: d.Config, compilerCtx: d.CompilerCt
 
   if (typeof config.globalScript === 'string') {
     const mod = compilerCtx.moduleMap.get(config.globalScript);
-    if (mod != null && mod.jsFilePath) {
-      globalPaths.push(normalizePath(mod.jsFilePath));
+    if (mod != null && mod.sourceFilePath) {
+      globalPaths.push(normalizePath(mod.sourceFilePath));
     }
   }
 

@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { cloneDocument, createDocument, serializeNodeToHtml } from '@mock-doc';
 import { createLogger } from './logger';
 import { createStencilSys } from './stencil-sys';
-import { resolveModuleIdSync } from './resolve/resolve-module';
+import { resolveModuleIdSync, resolvePackageJsonSync } from './resolve/resolve-module';
 import { scopeCss } from '../../utils/shadow-css';
 import path from 'path';
 
@@ -41,8 +41,12 @@ export const patchSysLegacy = (config: d.Config, compilerCtx: d.CompilerCtx) => 
   config.sys.createDocument = createDocument;
   config.sys.serializeNodeToHtml = serializeNodeToHtml;
   config.sys.optimizeCss = (inputOpts) => compilerCtx.worker.optimizeCss(inputOpts);
-  config.sys.resolveModule = (fromDir, moduleId) => (
-    resolveModuleIdSync(config, compilerCtx.fs, moduleId, fromDir, ['.js', '.mjs', '.css'])
-  );
+  config.sys.resolveModule = (fromDir, moduleId, opts = {}) => {
+    if (opts.packageJson === true) {
+      return resolvePackageJsonSync(config, compilerCtx.fs, moduleId, fromDir);
+    } else {
+      return resolveModuleIdSync(config, compilerCtx.fs, moduleId, fromDir, ['.js', '.mjs', '.css']);
+    }
+  };
   config.sys.encodeToBase64 = config.sys_next.encodeToBase64;
 };
