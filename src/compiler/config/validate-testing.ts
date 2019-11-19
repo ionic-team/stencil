@@ -22,6 +22,7 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
 
   testing.browserArgs = testing.browserArgs || [];
   addOption(testing.browserArgs, '--font-render-hinting=medium');
+  addOption(testing.browserArgs, '--incognito');
 
   if (config.flags.ci) {
     addOption(testing.browserArgs, '--no-sandbox');

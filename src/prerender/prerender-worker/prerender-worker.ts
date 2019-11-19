@@ -66,6 +66,9 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     }
 
     if (typeof hydrateResults.httpStatus === 'number' && hydrateResults.httpStatus >= 400) {
+      try {
+        win.close();
+      } catch (e) {}
       return results;
     }
 
@@ -95,6 +98,10 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     }
 
     await writePrerenderedHtml(results, html);
+
+    try {
+      win.close();
+    } catch (e) {}
 
   } catch (e) {
     // ahh man! what happened!

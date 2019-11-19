@@ -1,4 +1,4 @@
-import { MockWindow, resetWindow } from './window';
+import { MockWindow } from './window';
 
 
 export function setupGlobal(gbl: any) {
@@ -29,7 +29,9 @@ export function setupGlobal(gbl: any) {
 
 export function teardownGlobal(gbl: any) {
   const win = gbl.window as Window;
-  resetWindow(win);
+  if (win && typeof win.close === 'function') {
+    win.close();
+  }
 }
 
 

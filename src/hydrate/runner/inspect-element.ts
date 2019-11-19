@@ -6,7 +6,7 @@ export function inspectElement(results: d.HydrateResults, elm: Element, depth: n
 
   for (let i = 0, ii = children.length; i < ii; i++) {
     const childElm = children[i];
-    const tagName = childElm.tagName.toLowerCase();
+    const tagName = childElm.nodeName.toLowerCase();
 
     if (tagName.includes('-')) {
       // we've already collected components that were hydrated

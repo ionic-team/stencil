@@ -9,7 +9,7 @@
 
 import * as d from '../../declarations';
 import { BUILD } from '@app-data';
-import { consoleDevError } from '@platform';
+import { consoleDevError, consoleDevWarn } from '@platform';
 import { isComplexType } from '@utils';
 
 // const stack: any[] = [];
@@ -52,6 +52,9 @@ Empty objects can also be the cause, look for JSX comments that became objects.`
   };
   walk(children);
   if (vnodeData) {
+    if (BUILD.isDev && nodeName === 'input') {
+      validateInputProperties(vnodeData);
+    }
     // normalize class / classname attributes
     if (BUILD.vdomKey && vnodeData.key) {
       key = vnodeData.key;
@@ -143,4 +146,16 @@ const convertToPrivate = (node: d.ChildNode): d.VNode => {
   vnode.$key$ = node.vkey;
   vnode.$name$ = node.vname;
   return vnode;
+};
+
+const validateInputProperties = (vnodeData: any) => {
+  const props = Object.keys(vnodeData);
+  const typeIndex = props.indexOf('type');
+  const minIndex = props.indexOf('min');
+  const maxIndex = props.indexOf('max');
+  const stepIndex = props.indexOf('min');
+  const value = props.indexOf('value');
+  if (value < typeIndex || value < minIndex || value < maxIndex || value < stepIndex) {
+    consoleDevWarn(`The "value" prop of <input> should be set after "min", "max", "type" and "step"`);
+  }
 };

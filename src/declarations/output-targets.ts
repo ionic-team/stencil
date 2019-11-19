@@ -187,6 +187,7 @@ export interface OutputTargetCustom extends OutputTargetBase {
   name: string;
   validate?: (config: Config, diagnostics: Diagnostic[]) => void;
   generator: (config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, docs: JsonDocs) => Promise<void>;
+  copy?: CopyTask[];
 }
 
 export interface OutputTargetDocsVscode extends OutputTargetBase {

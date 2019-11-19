@@ -1,5 +1,4 @@
 
-
 export interface RenderToStringOptions extends SerializeDocumentOptions {
   afterHydrate?(document: any): any | Promise<any>;
   beforeHydrate?(document: any): any | Promise<any>;
@@ -30,6 +29,13 @@ export interface HydrateDocumentOptions {
   title?: string;
   url?: string;
   userAgent?: string;
+}
+
+export interface HydrateFactoryOptions extends RenderToStringOptions {
+  hasTimedOut: boolean;
+  serializeToHtml: boolean;
+  destroyWindow: boolean;
+  destroyDocument: boolean;
 }
 
 export interface HydrateResults {

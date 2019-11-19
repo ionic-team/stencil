@@ -10,19 +10,19 @@ import { RollupBuild, RollupOptions } from 'rollup'; // types only
 import { stencilHydratePlugin } from '../rollup-plugins/stencil-hydrate';
 
 
-export const bundleHydrateApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.BuildConditionals, appEntryCode: string) => {
+export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.BuildConditionals, appEntryCode: string) => {
   try {
     const treeshake = false;
 
     const rollupOptions: RollupOptions = {
       ...config.rollupConfig.inputOptions,
 
-      input: '@app-entry',
+      input: '@app-factory-entry',
       inlineDynamicImports: true,
       plugins: [
         coreResolvePlugin(config, compilerCtx, 'hydrate'),
         loaderPlugin({
-          '@app-entry': appEntryCode
+          '@app-factory-entry': appEntryCode
         }),
         stencilHydratePlugin(config),
         // stencilBuildConditionalsPlugin(build, config.fsNamespace),

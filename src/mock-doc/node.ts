@@ -197,12 +197,11 @@ export class MockNodeList {
   }
 }
 
-const attrsMap = new WeakMap<MockElement, MockAttributeMap>();
-const shadowRootMap = new WeakMap<MockElement, ShadowRoot>();
-const stylesMap = new WeakMap<MockElement, CSSStyleDeclaration>();
-
 export class MockElement extends MockNode {
   namespaceURI: string;
+  __attributeMap: MockAttributeMap;
+  __shadowRoot: ShadowRoot;
+  __style: CSSStyleDeclaration;
 
   constructor(ownerDocument: any, nodeName: string) {
     super(
@@ -225,28 +224,26 @@ export class MockElement extends MockNode {
   }
 
   get shadowRoot() {
-    return shadowRootMap.get(this) || null;
+    return this.__shadowRoot || null;
   }
   set shadowRoot(shadowRoot: any) {
     if (shadowRoot != null) {
       shadowRoot.host = this;
-      shadowRootMap.set(this, shadowRoot);
+      this.__shadowRoot = shadowRoot;
     } else {
-      shadowRootMap.delete(this);
+      delete this.__shadowRoot;
     }
   }
 
   get attributes() {
-    let attrs = attrsMap.get(this);
-    if (attrs == null) {
-      attrs = new MockAttributeMap();
-      attrsMap.set(this, attrs);
+    if (this.__attributeMap == null) {
+      this.__attributeMap = new MockAttributeMap();
     }
-    return attrs;
+    return this.__attributeMap;
   }
 
   set attributes(attrs: MockAttributeMap) {
-    attrsMap.set(this, attrs);
+    this.__attributeMap = attrs;
   }
 
   get children() {
@@ -294,8 +291,7 @@ export class MockElement extends MockNode {
 
   getAttribute(attrName: string) {
     if (attrName === 'style') {
-      const style = stylesMap.get(this);
-      if (style != null && style.length > 0) {
+      if (this.__style != null && this.__style.length > 0) {
         return this.style.cssText;
       }
       return null;
@@ -382,8 +378,7 @@ export class MockElement extends MockNode {
 
   hasAttribute(attrName: string) {
     if (attrName === 'style') {
-      const style = stylesMap.get(this);
-      return (style != null && style.length > 0);
+      return (this.__style != null && this.__style.length > 0);
     }
     return this.getAttribute(attrName) !== null;
   }
@@ -451,7 +446,7 @@ export class MockElement extends MockNode {
 
   removeAttribute(attrName: string) {
     if (attrName === 'style') {
-      stylesMap.delete(this);
+      delete this.__style;
     } else {
       const attr = this.attributes.getNamedItem(attrName);
       if (attr != null) {
@@ -539,24 +534,20 @@ export class MockElement extends MockNode {
   }
 
   get style() {
-    let style = stylesMap.get(this);
-    if (style == null) {
-      style = createCSSStyleDeclaration();
-      stylesMap.set(this, style);
+    if (this.__style == null) {
+      this.__style = createCSSStyleDeclaration();
     }
-    return style;
+    return this.__style;
   }
   set style(val: any) {
     if (typeof val === 'string') {
-      let style = stylesMap.get(this);
-      if (style == null) {
-        style = createCSSStyleDeclaration();
-        stylesMap.set(this, style);
+      if (this.__style == null) {
+        this.__style = createCSSStyleDeclaration();
       }
-      style.cssText = val;
+      this.__style.cssText = val;
 
     } else {
-      stylesMap.set(this, val);
+      this.__style = val;
     }
   }
 
@@ -671,11 +662,11 @@ export class MockElement extends MockNode {
 
 }
 
-export function resetElement(elm: any) {
+export function resetElement(elm: MockElement) {
   resetEventListeners(elm);
-  attrsMap.delete(elm);
-  shadowRootMap.delete(elm);
-  stylesMap.delete(elm);
+  delete elm.__attributeMap;
+  delete elm.__shadowRoot;
+  delete elm.__style;
 }
 
 function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: MockNode) {
@@ -718,15 +709,13 @@ export class MockHTMLElement extends MockElement {
   set tagName(value: string) { this.nodeName = value; }
 
   get attributes() {
-    let attrs = attrsMap.get(this);
-    if (attrs == null) {
-      attrs = new MockAttributeMap(true);
-      attrsMap.set(this, attrs);
+    if (this.__attributeMap == null) {
+      this.__attributeMap = new MockAttributeMap(true);
     }
-    return attrs;
+    return this.__attributeMap;
   }
   set attributes(attrs: MockAttributeMap) {
-    attrsMap.set(this, attrs);
+    this.__attributeMap = attrs;
   }
 }
 

@@ -3,7 +3,12 @@ import { URL } from 'url';
 
 
 export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
-  const outputOpts: d.HydrateDocumentOptions = Object.assign({}, inputOpts);
+  const outputOpts: d.HydrateFactoryOptions = Object.assign({
+    hasTimedOut: false,
+    serializeToHtml: false,
+    destroyWindow: false,
+    destroyDocument: false,
+  }, inputOpts || {});
 
   if (typeof outputOpts.clientHydrateAnnotations !== 'boolean') {
     outputOpts.clientHydrateAnnotations = true;
@@ -23,7 +28,6 @@ export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
 
   return outputOpts;
 }
-
 
 export function generateHydrateResults(opts: d.HydrateDocumentOptions) {
   if (typeof opts.url !== 'string') {

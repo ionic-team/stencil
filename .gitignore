@@ -40,4 +40,5 @@ dist/
 /screenshot/*.d.ts
 
 test/**/www/*
+test/**/hydrate/*
 .stencil
