@@ -13,12 +13,9 @@ export async function validateOutputTargetCustom(config: d.Config, diagnostics: 
         try {
           outputTarget.validate(config, diagnostics);
         } catch (e) {
-          catchError(diagnostics, e);
+          catchError(localDiagnostics, e);
         }
-        if (localDiagnostics.length > 0) {
-          diagnostics.push(...localDiagnostics);
-
-        } else if (outputTarget.copy && outputTarget.copy.length > 0) {
+        if (outputTarget.copy && outputTarget.copy.length > 0) {
           config.outputTargets.push({
             type: COPY,
             dir: config.rootDir,
@@ -27,6 +24,7 @@ export async function validateOutputTargetCustom(config: d.Config, diagnostics: 
             ]
           });
         }
+        diagnostics.push(...localDiagnostics);
       }
     })
   );
