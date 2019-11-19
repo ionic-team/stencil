@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { isOutputTargetCustom } from '../output-targets/output-utils';
+import { COPY, isOutputTargetCustom } from '../output-targets/output-utils';
 import { catchError } from '@utils';
 
 
@@ -13,7 +13,16 @@ export async function validateOutputTargetCustom(config: d.Config, diagnostics: 
         try {
           outputTarget.validate(config, diagnostics);
         } catch (e) {
-          catchError(diagnostics, e);
+          catchError(localDiagnostics, e);
+        }
+        if (outputTarget.copy && outputTarget.copy.length > 0) {
+          config.outputTargets.push({
+            type: COPY,
+            dir: config.rootDir,
+            copy: [
+              ...outputTarget.copy
+            ]
+          });
         }
         diagnostics.push(...localDiagnostics);
       }
