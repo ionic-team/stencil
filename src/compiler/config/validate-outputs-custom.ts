@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
-import { isOutputTargetCustom, COPY } from '../output-targets/output-utils';
+import { COPY, isOutputTargetCustom } from '../output-targets/output-utils';
 import { catchError } from '@utils';
-import { validateCopy } from './validate-copy';
 
 
 export async function validateOutputTargetCustom(config: d.Config, diagnostics: d.Diagnostic[]) {
