@@ -115,7 +115,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 function getRenderToStringOptions(prerenderConfig: d.PrerenderConfig, url: URL, results: d.PrerenderResults) {
   const prerenderUrl = url.href;
 
-  const opts: d.RenderToStringOptions = {
+  const opts: d.SerializeDocumentOptions = {
     url: prerenderUrl,
     approximateLineWidth: 100,
     removeAttributeQuotes: true,

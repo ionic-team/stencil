@@ -90,6 +90,15 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Hello World Prerender",
+      "args": [
+        "${workspaceFolder}/test/hello-world/prerender.js"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Hello VDom NEXT",
       "args": [
         "${workspaceFolder}/bin/stencil",
@@ -131,15 +140,6 @@
         "--watch",
         "--config",
         "${workspaceFolder}/test/hello-vdom/stencil.config.ts"
-      ],
-      "protocol": "inspector"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Hello World Prerender",
-      "args": [
-        "${workspaceFolder}/test/hello-world/prerender.js"
       ],
       "protocol": "inspector"
     },

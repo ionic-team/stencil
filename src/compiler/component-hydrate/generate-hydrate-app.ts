@@ -6,6 +6,8 @@ import { HYDRATE_FACTORY_INTRO, HYDRATE_FACTORY_OUTRO } from './hydrate-factory-
 import { updateToHydrateComponents } from './update-to-hydrate-components';
 import { writeHydrateOutputs } from './write-hydrate-outputs';
 import { RollupBuild, RollupOptions } from 'rollup';
+import MagicString from 'magic-string';
+import { STENCIL_HYDRATE_FACTORY_ID, STENCIL_INTERNAL_PLATFORM_ID, STENCIL_MOCK_DOC_ID } from '../../compiler_next/bundle/entry-alias-ids';
 
 
 export async function generateHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[]) {
@@ -13,22 +15,22 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
     const rollupOptions: RollupOptions = {
       ...config.rollupConfig.inputOptions,
 
-      input: config.sys.path.join(config.sys.compiler.distDir, 'hydrate', 'index.mjs'),
+      input: config.sys.path.join(config.sys.compiler.packageDir, 'internal', 'hydrate', 'runner.mjs'),
       inlineDynamicImports: true,
       plugins: [
         {
           name: 'hydrateAppPlugin',
           resolveId(id) {
-            if (id === '@stencil/core/hydrate-factory') {
+            if (id === STENCIL_HYDRATE_FACTORY_ID) {
               return id;
             }
-            if (id === '@stencil/core/mock-doc') {
-              return config.sys.path.join(config.sys.compiler.distDir, 'mock-doc', 'index.mjs');
+            if (id === STENCIL_MOCK_DOC_ID) {
+              return config.sys.path.join(config.sys.compiler.packageDir, 'mock-doc', 'index.mjs');
             }
             return null;
           },
           load(id) {
-            if (id === '@stencil/core/hydrate-factory') {
+            if (id === STENCIL_HYDRATE_FACTORY_ID) {
               return generateHydrateFactory(config, compilerCtx, buildCtx);
             }
             return null;
@@ -42,6 +44,7 @@ export async function generateHydrateApp(config: d.Config, compilerCtx: d.Compil
     const rollupAppBuild: RollupBuild = await config.sys.rollup.rollup(rollupOptions);
     const rollupOutput = await rollupAppBuild.generate({
       format: 'cjs',
+      file: 'index.js',
     });
 
     await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, rollupOutput);
@@ -60,9 +63,9 @@ async function generateHydrateFactory(config: d.Config, compilerCtx: d.CompilerC
       const cmps = buildCtx.components;
       const build = getBuildConditionals(config, cmps);
 
-      const appEntryCode = await generateHydrateAppCore(config, compilerCtx, buildCtx);
+      const appFactoryEntryCode = await generateHydrateFactoryEntry(config, compilerCtx, buildCtx);
 
-      const rollupFactoryBuild = await bundleHydrateFactory(config, compilerCtx, buildCtx, build, appEntryCode);
+      const rollupFactoryBuild = await bundleHydrateFactory(config, compilerCtx, buildCtx, build, appFactoryEntryCode);
       if (rollupFactoryBuild != null) {
         const rollupOutput = await rollupFactoryBuild.generate({
           format: 'cjs',
@@ -86,22 +89,20 @@ async function generateHydrateFactory(config: d.Config, compilerCtx: d.CompilerC
 }
 
 
-async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+async function generateHydrateFactoryEntry(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const cmps = buildCtx.components;
-  const coreText: string[] = [];
   const hydrateCmps = await updateToHydrateComponents(config, compilerCtx, buildCtx, cmps);
+  const s = new MagicString('');
 
-  coreText.push(`import { hydrateApp, registerComponents, styles } from '@stencil/core/platform';`);
-  coreText.push(`import globals from '@stencil/core/global-scripts';`);
+  s.append(`import { hydrateApp, registerComponents, styles } from '${STENCIL_INTERNAL_PLATFORM_ID}';\n`);
 
-  hydrateCmps.forEach(cmpData => coreText.push(cmpData.importLine));
+  hydrateCmps.forEach(cmpData => s.append(cmpData.importLine + '\n'));
 
-  coreText.push(`const cmps = [`);
+  s.append(`registerComponents([\n`);
   hydrateCmps.forEach(cmpData => {
-    coreText.push(`  ${cmpData.uniqueComponentClassName},`);
+    s.append(`  ${cmpData.uniqueComponentClassName},\n`);
   });
-  coreText.push(`];`);
-  coreText.push(`registerComponents(cmps);`);
+  s.append(`]);\n`);
 
   await buildCtx.stylesPromise;
 
@@ -113,16 +114,16 @@ async function generateHydrateAppCore(config: d.Config, compilerCtx: d.CompilerC
       }
 
       if (typeof style.compiledStyleTextScopedCommented === 'string') {
-        coreText.push(`styles.set('${scopeId}','${style.compiledStyleTextScopedCommented}');`);
+        s.append(`styles.set('${scopeId}','${style.compiledStyleTextScopedCommented}');\n`);
       } else {
-        coreText.push(`styles.set('${scopeId}','${style.compiledStyleTextScoped}');`);
+        s.append(`styles.set('${scopeId}','${style.compiledStyleTextScoped}');\n`);
       }
     });
   });
 
-  coreText.push(`export { hydrateApp }`);
+  s.append(`export { hydrateApp }\n`);
 
-  return coreText.join('\n');
+  return s.toString();
 }
 
 

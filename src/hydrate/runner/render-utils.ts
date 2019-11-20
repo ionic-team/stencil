@@ -4,7 +4,6 @@ import { URL } from 'url';
 
 export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
   const outputOpts: d.HydrateFactoryOptions = Object.assign({
-    hasTimedOut: false,
     serializeToHtml: false,
     destroyWindow: false,
     destroyDocument: false,
@@ -40,18 +39,19 @@ export function generateHydrateResults(opts: d.HydrateDocumentOptions) {
     host: null,
     hostname: null,
     href: null,
-    port: null,
     pathname: null,
+    port: null,
     search: null,
     hash: null,
     html: null,
+    httpStatus: null,
     hydratedCount: 0,
     anchors: [],
     components: [],
     imgs: [],
     scripts: [],
     styles: [],
-    title: null
+    title: null,
   };
 
   try {

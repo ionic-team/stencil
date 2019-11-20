@@ -7,6 +7,7 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
 
   const alias = new Map([
     ['@app-data', '@stencil/core/internal/app-data'],
+    ['@hydrate-factory', '@stencil/core/hydrate-factory'],
     ['@mock-doc', '@stencil/core/mock-doc'],
     ['@platform', '@stencil/core/internal/platform'],
     ['@runtime', '@stencil/core/internal/runtime'],

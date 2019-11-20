@@ -1,17 +1,4 @@
-
-export interface RenderToStringOptions extends SerializeDocumentOptions {
-  afterHydrate?(document: any): any | Promise<any>;
-  beforeHydrate?(document: any): any | Promise<any>;
-}
-
-export interface SerializeDocumentOptions extends HydrateDocumentOptions {
-  approximateLineWidth?: number;
-  prettyHtml?: boolean;
-  removeAttributeQuotes?: boolean;
-  removeBooleanAttributeQuotes?: boolean;
-  removeEmptyAttributes?: boolean;
-  removeHtmlComments?: boolean;
-}
+import { Diagnostic } from './diagnostics';
 
 export interface HydrateDocumentOptions {
   canonicalUrl?: string;
@@ -31,15 +18,25 @@ export interface HydrateDocumentOptions {
   userAgent?: string;
 }
 
-export interface HydrateFactoryOptions extends RenderToStringOptions {
-  hasTimedOut: boolean;
+export interface SerializeDocumentOptions extends HydrateDocumentOptions {
+  afterHydrate?(document: any): any | Promise<any>;
+  approximateLineWidth?: number;
+  beforeHydrate?(document: any): any | Promise<any>;
+  prettyHtml?: boolean;
+  removeAttributeQuotes?: boolean;
+  removeBooleanAttributeQuotes?: boolean;
+  removeEmptyAttributes?: boolean;
+  removeHtmlComments?: boolean;
+}
+
+export interface HydrateFactoryOptions extends SerializeDocumentOptions {
   serializeToHtml: boolean;
   destroyWindow: boolean;
   destroyDocument: boolean;
 }
 
 export interface HydrateResults {
-  diagnostics: HydrateDiagnostic[];
+  diagnostics: Diagnostic[];
   url: string;
   host: string;
   hostname: string;
@@ -56,7 +53,7 @@ export interface HydrateResults {
   imgs: HydrateImgElement[];
   title: string;
   hydratedCount: number;
-  httpStatus?: number;
+  httpStatus: number;
 }
 
 export interface HydrateComponent {
@@ -86,25 +83,4 @@ export interface HydrateScriptElement extends HydrateElement {
 
 export interface HydrateImgElement extends HydrateElement {
   src?: string;
-}
-
-export interface HydrateDiagnostic {
-  level: string | any;
-  type: string | any;
-  header?: string;
-  language?: string;
-  messageText: string;
-  debugText?: string;
-  code?: string;
-  absFilePath?: string;
-  relFilePath?: string;
-  lineNumber?: number;
-  columnNumber?: number;
-  lines?: {
-    lineIndex: number;
-    lineNumber: number;
-    text?: string;
-    errorCharStart: number;
-    errorLength?: number;
-  }[];
 }

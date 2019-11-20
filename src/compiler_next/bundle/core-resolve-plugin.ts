@@ -3,7 +3,7 @@ import { fetchModuleAsync } from '../sys/fetch/fetch-module-async';
 import { getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
 import { isRemoteUrlCompiler } from '../sys/resolve/resolve-utils';
 import { normalizePath } from '@utils';
-import { STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID, STENCIL_INTERNAL_PLATFORM_ID, STENCIL_INTERNAL_RUNTIME_ID, STENCIL_CORE_ID } from './entry-alias-ids';
+import { STENCIL_CORE_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID, STENCIL_INTERNAL_PLATFORM_ID, STENCIL_INTERNAL_RUNTIME_ID } from './entry-alias-ids';
 import path from 'path';
 import { Plugin } from 'rollup';
 
@@ -18,7 +18,7 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
     name: 'coreResolvePlugin',
 
     resolveId(id) {
-      if (id === STENCIL_INTERNAL_PLATFORM_ID) {
+      if (id === STENCIL_INTERNAL_PLATFORM_ID || id === STENCIL_CORE_ID) {
         if (platform === 'client') {
           return internalClient;
         }
@@ -26,7 +26,7 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
           return internalHydrate;
         }
       }
-      if (id === STENCIL_INTERNAL_CLIENT_ID || id === STENCIL_CORE_ID) {
+      if (id === STENCIL_INTERNAL_CLIENT_ID) {
         return internalClient;
       }
       if (id === STENCIL_INTERNAL_HYDRATE_ID) {

@@ -7,10 +7,9 @@ import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { loaderPlugin } from '../rollup-plugins/loader';
 import { pluginHelper } from '../rollup-plugins/plugin-helper';
 import { RollupBuild, RollupOptions } from 'rollup'; // types only
-import { stencilHydratePlugin } from '../rollup-plugins/stencil-hydrate';
 
 
-export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.BuildConditionals, appEntryCode: string) => {
+export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.BuildConditionals, appFactoryEntryCode: string) => {
   try {
     const treeshake = false;
 
@@ -22,11 +21,8 @@ export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.Comp
       plugins: [
         coreResolvePlugin(config, compilerCtx, 'hydrate'),
         loaderPlugin({
-          '@app-factory-entry': appEntryCode
+          '@app-factory-entry': appFactoryEntryCode
         }),
-        stencilHydratePlugin(config),
-        // stencilBuildConditionalsPlugin(build, config.fsNamespace),
-        // globalScriptsPlugin(config, compilerCtx),
         appDataPlugin(config, compilerCtx, build, 'hydrate'),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.commonjs({

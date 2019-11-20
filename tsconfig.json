@@ -45,6 +45,9 @@
       "@dts-internal": [
         "src/compiler_next/sys/modules/dts-internal.ts"
       ],
+      "@hydrate-factory": [
+        "src/hydrate/runner/hydrate-factory.ts"
+      ],
       "@mock-doc": [
         "src/mock-doc/index.ts"
       ],

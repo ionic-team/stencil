@@ -101,6 +101,10 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Nod
     }
 
     const templateHtml = await generateTemplateHtml(config, diagnostics, outputTarget);
+    if (diagnostics.length > 0) {
+      return;
+    }
+
     manager.templateId = await createPrerenderTemplate(config, templateHtml);
     manager.componentGraphPath = await createComponentGraphPath(config, buildResults, outputTarget);
 
