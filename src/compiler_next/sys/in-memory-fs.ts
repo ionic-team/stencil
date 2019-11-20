@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { normalizePath, isString } from '@utils';
+import { isString, normalizePath } from '@utils';
 import path from 'path';
 
 

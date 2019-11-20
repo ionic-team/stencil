@@ -33,8 +33,6 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
       return null;
     }
 
-    // const copyPromise = outputCopy(config, compilerCtx, buildCtx);
-
     // preprocess and generate styles before any outputTarget starts
     buildCtx.stylesPromise = generateGlobalStyles(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildAbort(buildCtx);

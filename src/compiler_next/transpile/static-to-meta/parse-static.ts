@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { parseCallExpression } from '../../../compiler/transformers/static-to-meta/call-expression';
-import { parseImport } from '../../../compiler/transformers/static-to-meta/import';
+import { parseImport } from './import';
 import { parseStaticComponentMeta } from '../../../compiler/transformers/static-to-meta/component';
 import { parseStringLiteral } from '../../../compiler/transformers/static-to-meta/string-literal';
 import path from 'path';
@@ -21,7 +21,7 @@ export const updateModule = (
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const prevModuleFile = getModule(compilerCtx, sourceFilePath);
   if (prevModuleFile && prevModuleFile.staticSourceFileText === sourceFileText) {
-    return;
+    return prevModuleFile;
   }
 
   const dirPath = path.dirname(sourceFilePath);
@@ -50,6 +50,7 @@ export const updateModule = (
     collection.moduleFiles.push(moduleFile);
   }
   visitNode(tsSourceFile);
+  return moduleFile;
 };
 
 export const getModule = (compilerCtx: d.CompilerCtx, fileName: string) => {

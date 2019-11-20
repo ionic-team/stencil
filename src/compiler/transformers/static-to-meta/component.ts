@@ -37,7 +37,7 @@ export const parseStaticComponentMeta = (
     return cmpNode;
   }
 
-  const symbol = typeChecker.getSymbolAtLocation(cmpNode.name);
+  const symbol = typeChecker ? typeChecker.getSymbolAtLocation(cmpNode.name) : undefined;
   const docs = serializeSymbol(typeChecker, symbol);
   const isCollectionDependency = moduleFile.isCollectionDependency;
 

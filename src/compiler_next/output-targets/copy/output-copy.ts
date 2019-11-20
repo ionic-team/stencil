@@ -43,7 +43,6 @@ export async function outputCopy(config: d.Config, compilerCtx: d.CompilerCtx, b
         compilerCtx.fs.cancelDeleteFilesFromDisk(copyResults.filePaths);
         copiedFiles = copyResults.filePaths.length;
       }
-
     } catch (e) {
       const err = buildError(buildCtx.diagnostics);
       err.messageText = e.message;

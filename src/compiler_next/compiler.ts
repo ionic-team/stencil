@@ -28,6 +28,10 @@ export const createCompiler = async (config: Config) => {
   compilerCtx.worker = createSysWorker(sys, compilerCtx.events, config.maxConcurrentWorkers);
   patchSysLegacy(config, compilerCtx);
 
+  if (sys.events) {
+    // Pipe events from sys.events to compilerCtx
+    sys.events.on(compilerCtx.events.emit);
+  }
   await patchTypescript(config, diagnostics, compilerCtx.fs);
 
   const build = () => createFullBuild(config, compilerCtx);

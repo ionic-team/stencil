@@ -26,7 +26,13 @@ export const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InM
 export const resolvePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, basedir: string) => {
   const opts = createCustomResolverSync(config, inMemoryFs, basedir, ['.json']);
   opts.packageFilter = (pkg: any, packagePath: string) => {
+    // Workaround: https://github.com/browserify/resolve/pull/202
+    packagePath = packagePath.endsWith('package.json')
+      ? packagePath
+      : path.join(packagePath, 'package.json');
+
     pkg.main = packagePath;
+    return pkg;
   };
   return resolve.sync(moduleId, opts);
 };

@@ -74,7 +74,7 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
   };
 
   tsSys.readFile = (p) => {
-    let content = inMemoryFs.readFileSync(p);
+    let content = inMemoryFs.readFileSync(p, { useCache: false });
 
     if (typeof content !== 'string' && (p.startsWith('https:') || p.startsWith('http:'))) {
       if (IS_WEB_WORKER_ENV) {
@@ -98,37 +98,33 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
 
 const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
 
-  if (!tsSys.watchDirectory) {
-    tsSys.watchDirectory = (p, cb) => {
-      const watcher = stencilSys.watchDirectory(p, (filePath) => {
-        cb(filePath);
-      });
-      return {
-        close() {
-          watcher.close();
-        }
-      };
+  tsSys.watchDirectory = (p, cb) => {
+    const watcher = stencilSys.watchDirectory(p, (filePath) => {
+      cb(filePath);
+    });
+    return {
+      close() {
+        watcher.close();
+      }
     };
-  }
+  };
 
-  if (!tsSys.watchFile) {
-    tsSys.watchFile = (p, cb) => {
-      const watcher = stencilSys.watchFile(p, (filePath, eventKind) => {
-        if (eventKind === 'fileAdd') {
-          cb(filePath, ts.FileWatcherEventKind.Created);
-        } else if (eventKind === 'fileUpdate') {
-          cb(filePath, ts.FileWatcherEventKind.Changed);
-        } else if (eventKind === 'fileDelete') {
-          cb(filePath, ts.FileWatcherEventKind.Deleted);
-        }
-      });
-      return {
-        close() {
-          watcher.close();
-        }
-      };
+  tsSys.watchFile = (p, cb) => {
+    const watcher = stencilSys.watchFile(p, (filePath, eventKind) => {
+      if (eventKind === 'fileAdd') {
+        cb(filePath, ts.FileWatcherEventKind.Created);
+      } else if (eventKind === 'fileUpdate') {
+        cb(filePath, ts.FileWatcherEventKind.Changed);
+      } else if (eventKind === 'fileDelete') {
+        cb(filePath, ts.FileWatcherEventKind.Deleted);
+      }
+    });
+    return {
+      close() {
+        watcher.close();
+      }
     };
-  }
+  };
 
 };
 

@@ -13,6 +13,8 @@ export interface CompilerNext {
 }
 
 export interface CompilerSystemAsync {
+  events?: BuildEvents;
+
   /**
    * Always returns a boolean, does not throw.
    */

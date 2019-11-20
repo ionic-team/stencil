@@ -489,6 +489,12 @@ export const isStaticGetter = (member: ts.ClassElement) => {
 
 
 export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.CompilerJsDoc => {
+  if (!checker || !symbol) {
+    return {
+      tags: [],
+      text: '',
+    };
+  }
   return {
     tags: symbol.getJsDocTags().map(tag => ({text: tag.text, name: tag.name})),
     text: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
