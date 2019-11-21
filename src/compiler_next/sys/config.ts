@@ -5,6 +5,7 @@ import { createStencilSys } from './stencil-sys';
 import { resolveModuleIdSync, resolvePackageJsonSync } from './resolve/resolve-module';
 import { scopeCss } from '../../utils/shadow-css';
 import path from 'path';
+import { compilerBuild } from '../../version';
 
 
 export const getConfig = (userConfig: d.Config) => {
@@ -35,6 +36,12 @@ export const patchSysLegacy = (config: d.Config, compilerCtx: d.CompilerCtx) => 
   // old way
   config.sys = config.sys || {};
   config.sys.path = path;
+  config.sys.compiler = {
+    name: '',
+    version: compilerBuild.stencilVersion,
+    typescriptVersion: compilerBuild.typescriptVersion,
+    packageDir: path.resolve(__dirname, '..')
+  },
   config.sys.generateContentHash = config.sys_next.generateContentHash;
   config.sys.scopeCss = (cssText, scopeId, commentOriginalSelector) => Promise.resolve(scopeCss(cssText, scopeId, commentOriginalSelector));
   config.sys.cloneDocument = cloneDocument;
@@ -49,4 +56,5 @@ export const patchSysLegacy = (config: d.Config, compilerCtx: d.CompilerCtx) => 
     }
   };
   config.sys.encodeToBase64 = config.sys_next.encodeToBase64;
+  console.log(config.sys.compiler);
 };

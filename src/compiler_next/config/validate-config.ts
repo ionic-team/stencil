@@ -35,6 +35,13 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
   setBooleanConfig(config, 'sourceMap', null, false);
+  setBooleanConfig(config, 'watch', 'watch', false);
+  setBooleanConfig(config, 'minifyCss', null, !config.devMode);
+  setBooleanConfig(config, 'minifyJs', null, !config.devMode);
+  setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
+  setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
+  setBooleanConfig(config, 'writeLog', 'log', false);
+  setBooleanConfig(config, 'buildAppCore', null, true);
 
   // hash file names
   if (!isBoolean(config.hashFileNames)) {
@@ -80,9 +87,6 @@ export const validateConfig = (userConfig?: Config) => {
     config.bundles = [];
   }
 
-  setBooleanConfig(config, 'writeLog', 'log', false);
-  setBooleanConfig(config, 'buildAppCore', null, true);
-
   // Default copy
   config.copy = config.copy || [];
 
@@ -91,15 +95,6 @@ export const validateConfig = (userConfig?: Config) => {
 
   // default devInspector to whatever devMode is
   setBooleanConfig(config, 'devInspector', null, config.devMode);
-
-  // default watch false
-  setBooleanConfig(config, 'watch', 'watch', false);
-
-  setBooleanConfig(config, 'minifyCss', null, !config.devMode);
-  setBooleanConfig(config, 'minifyJs', null, !config.devMode);
-
-  setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
-  setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
 
   // if (!config._isTesting) {
   //   validateDistNamespace(config, diagnostics);

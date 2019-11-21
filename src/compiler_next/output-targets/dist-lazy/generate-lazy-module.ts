@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { writeLazyModule } from './write-lazy-entry-module';
 import { DEFAULT_STYLE_MODE, hasDependency, sortBy } from '@utils';
-import { optimizeModule } from '../../../compiler/app-core/optimize-module';
+import { optimizeModule } from '../../optimize/optimize-module';
 import { transpileToEs5Main } from '../../../compiler/transpile/transpile-to-es5-main';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../../../compiler/app-core/format-component-runtime-meta';
 

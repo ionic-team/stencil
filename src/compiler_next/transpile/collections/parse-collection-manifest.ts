@@ -1,7 +1,6 @@
 import * as d from '../../../declarations';
-import { getModule } from '../../../compiler/build/compiler-ctx';
 import { normalizePath } from '@utils';
-import { parseCollectionComponents } from './parse-collection-components';
+import { parseCollectionComponents, transpileCollectionModule } from './parse-collection-components';
 
 
 export const parseCollectionManifest = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionName: string, collectionDir: string, collectionJsonStr: string) => {
@@ -11,6 +10,7 @@ export const parseCollectionManifest = (config: d.Config, compilerCtx: d.Compile
 
   const collection: d.CollectionCompilerMeta = {
     collectionName: collectionName,
+    moduleFiles: [],
     dependencies: parseCollectionDependencies(collectionManifest),
     compiler: {
       name: compilerVersion.name || '',
@@ -18,9 +18,9 @@ export const parseCollectionManifest = (config: d.Config, compilerCtx: d.Compile
       typescriptVersion: compilerVersion.typescriptVersion || ''
     },
     bundles: parseBundles(collectionManifest),
-    global: parseGlobal(config, compilerCtx, collectionDir, collectionManifest)
   };
 
+  parseGlobal(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
   parseCollectionComponents(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
 
   return collection;
@@ -32,16 +32,14 @@ export const parseCollectionDependencies = (collectionManifest: d.CollectionMani
 };
 
 
-export const parseGlobal = (config: d.Config, compilerCtx: d.CompilerCtx, collectionDir: string, collectionManifest: d.CollectionManifest) => {
+export const parseGlobal = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionDir: string, collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) => {
   if (typeof collectionManifest.global !== 'string') {
-    return undefined;
+    return;
   }
 
   const sourceFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
-
-  const globalModule = getModule(config, compilerCtx, sourceFilePath);
-  globalModule.jsFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
-  return globalModule;
+  const globalModule = transpileCollectionModule(config, compilerCtx, buildCtx, collection, sourceFilePath);
+  collection.global = globalModule;
 };
 
 
