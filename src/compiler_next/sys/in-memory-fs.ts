@@ -167,7 +167,6 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
     }
 
     const fileText = await sys.readFile(filePath);
-
     const item = getItem(filePath);
     if (typeof fileText === 'string') {
       if (fileText.length < MAX_TEXT_CACHE) {
@@ -197,7 +196,6 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
     }
 
     const fileText = sys.readFileSync(filePath);
-
     const item = getItem(filePath);
     if (typeof fileText === 'string') {
       if (fileText.length < MAX_TEXT_CACHE) {

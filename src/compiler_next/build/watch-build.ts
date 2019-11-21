@@ -20,16 +20,19 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   compilerCtx.events.on('fileAdd', p => {
     config.logger.debug(`fileAdd: ${p}`);
     filesAdded.add(p);
+    compilerCtx.fs.clearFileCache(p);
   });
 
   compilerCtx.events.on('fileUpdate', p => {
     config.logger.debug(`fileUpdate: ${p}`);
     filesUpdated.add(p);
+    compilerCtx.fs.clearFileCache(p);
   });
 
   compilerCtx.events.on('fileDelete', p => {
     config.logger.debug(`fileDelete: ${p}`);
     filesDeleted.add(p);
+    compilerCtx.fs.clearFileCache(p);
   });
 
   const onBuild = async (tsBuilder: ts.BuilderProgram) => {

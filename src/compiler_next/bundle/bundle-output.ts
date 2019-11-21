@@ -21,6 +21,7 @@ export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx,
     const rollupOptions = getRollupOptions(config, compilerCtx, buildCtx, bundleOpts);
     const rollupBuild = await rollup(rollupOptions);
 
+    // console.log(rollupBuild.getTimings());
     compilerCtx.rollupCache.set(
       bundleOpts.id,
       rollupBuild.cache
@@ -53,22 +54,22 @@ const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
       lazyComponentPlugin(buildCtx),
       loaderPlugin(bundleOpts.loader),
       userIndexPlugin(config, compilerCtx),
-      rollupCommonjsPlugin({
-        include: /node_modules/,
-        sourceMap: config.sourceMap,
-        ...config.commonjs
-      }),
+      typescriptPlugin(compilerCtx, bundleOpts),
+      imagePlugin(config, compilerCtx, buildCtx),
+      extTransformsPlugin(config, compilerCtx, buildCtx),
       ...config.rollupPlugins,
-      pluginHelper(config, buildCtx),
       rollupNodeResolvePlugin({
         mainFields: ['browser', 'collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
         customResolveOptions,
         ...config.nodeResolve as any
       }),
+      rollupCommonjsPlugin({
+        include: /node_modules/,
+        sourceMap: config.sourceMap,
+        ...config.commonjs
+      }),
+      pluginHelper(config, buildCtx),
       rollupJsonPlugin(),
-      typescriptPlugin(compilerCtx, bundleOpts),
-      imagePlugin(config, compilerCtx, buildCtx),
-      extTransformsPlugin(config, compilerCtx, buildCtx),
       rollupReplacePlugin({
         'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
       }),
@@ -79,7 +80,7 @@ const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
 
     onwarn: createOnWarnFn(buildCtx.diagnostics),
 
-    cache: compilerCtx.rollupCache.get(bundleOpts.id)
+    cache: compilerCtx.rollupCache.get(bundleOpts.id),
   };
 
   return rollupOptions;

@@ -22,8 +22,7 @@ export const lazyComponentPlugin = (buildCtx: d.BuildCtx) => {
     load(id) {
       const entryModule = entrys.get(id);
       if (entryModule) {
-        const content = entryModule.cmps.map(createComponentExport).join('\n');
-        return content;
+        return entryModule.cmps.map(createComponentExport).join('\n');
       }
       return null;
     }

@@ -14,6 +14,7 @@ export const getTsOptionsToExtend = (config: d.Config) => {
     outDir: config.cacheDir,
     rootDir: config.rootDir,
     sourceMap: config.sourceMap,
+    types: [],
     target: ts.ScriptTarget.ES2017,
   };
   return tsOptions;
