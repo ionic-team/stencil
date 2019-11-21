@@ -61,7 +61,6 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
         generateCjs(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
       ]);
 
-      console.log(outputTargets);
       await generateLegacyLoader(config, compilerCtx, outputTargets);
 
       if (componentBundle != null) {

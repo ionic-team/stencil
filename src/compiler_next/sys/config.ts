@@ -56,5 +56,4 @@ export const patchSysLegacy = (config: d.Config, compilerCtx: d.CompilerCtx) => 
     }
   };
   config.sys.encodeToBase64 = config.sys_next.encodeToBase64;
-  console.log(config.sys.compiler);
 };

@@ -19,12 +19,20 @@ export const getTypeScriptSys = (config: d.Config, inMemoryFs: d.InMemoryFileSys
 
 const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, tsSys: ts.System) => {
 
-  tsSys.createDirectory = (p) => stencilSys.mkdirSync(p);
+  // const skipDirectories = (p: string) => {
+  //   return (
+  //     !p.startsWith(config.rootDir)
+  //   );
+  // };
 
-  tsSys.directoryExists = (p) => {
-    const s = inMemoryFs.statSync(p);
-    return s.isDirectory;
-  };
+  // const filterTypes = (paths: string[]) => paths.filter(p => (
+  //   !p.includes('/@types/puppeteer') &&
+  //   !p.includes('/@types/jest') &&
+  //   !p.includes('/@types/node') &&
+  //   !p.includes('/@types/estree')
+  // ));
+
+  tsSys.createDirectory = (p) => stencilSys.mkdirSync(p);
 
   tsSys.directoryExists = (p) => {
     const s = inMemoryFs.statSync(p);
@@ -37,6 +45,9 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
   };
 
   tsSys.getDirectories = (p) => {
+    // if (skipDirectories(p)) {
+    //   return [];
+    // }
     const items = stencilSys.readdirSync(p);
     return items.filter(itemPath => {
       const s = stencilSys.statSync(itemPath);
@@ -68,6 +79,9 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
   };
 
   tsSys.readDirectory = (p, extensions, _exclude, _include, depth = 0) => {
+    // if (skipDirectories(p)) {
+    //   return [];
+    // }
     const matchingPaths = new Set<string>();
     visitDirectory(matchingPaths, p, extensions, depth);
     return Array.from(matchingPaths);
