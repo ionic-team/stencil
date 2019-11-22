@@ -82,6 +82,7 @@ export interface Build extends Partial<BuildFeatures> {
   isDebug?: boolean;
   isDev?: boolean;
   devTools?: boolean;
+  forceShadowDom?: boolean;
   hydrateServerSide?: boolean;
   hydrateClientSide?: boolean;
   lifecycleDOMEvents?: boolean;

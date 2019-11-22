@@ -163,6 +163,12 @@ export interface StencilConfig {
   devMode?: boolean;
 
   /**
+   * Forces Stencil to use shadowDOM and not fallback to scoped on browsers that don't support shadowDOM natively.
+   * This is intended to be used together with a shadowDOM polyfill like @webcomponents/webcomponentsjs
+   */
+  forceShadowDom?: boolean;
+
+  /**
    * Object to provide a custom logger. By default a `logger` is already provided for the
    * platform the compiler is running on, such as NodeJS or a browser.
    */

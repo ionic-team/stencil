@@ -56,6 +56,7 @@ export const BUILD: Required<d.Build> = {
   taskQueue: true,
 
   devTools: false,
+  forceShadowDom: false,
   hotModuleReplacement: false,
   isDebug: false,
   isDev: false,
