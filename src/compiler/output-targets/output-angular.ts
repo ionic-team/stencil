@@ -12,7 +12,7 @@ export async function outputAngular(config: d.Config, compilerCtx: d.CompilerCtx
   await Promise.all(
     angularOutputTargets.map(outputTarget => (
       angularDirectiveProxyOutput(config, compilerCtx, buildCtx, outputTarget))
-  ));
+    ));
 
   timespan.finish(`generate angular proxies finished`);
 }
@@ -65,6 +65,21 @@ function getProxies(components: d.ComponentCompilerMeta[]) {
     .map(getProxy)
     .join('\n');
 }
+function getProxyCmp(inputs: string[], outputs: string[], methods: string[]): string {
+
+  const hasInputs = inputs.length > 0;
+  const hasOutputs = outputs.length > 0;
+  const hasMethods = methods.length > 0;
+  const proxMeta: string[] = [];
+
+  if (!hasInputs && !hasMethods && !hasOutputs) { return''; }
+
+  if (hasInputs) proxMeta.push(`inputs: ['${inputs.join(`', '`)}']`);
+  if (hasOutputs) proxMeta.push(`outputs: ['${outputs.join(`', '`)}']`);
+  if (hasMethods) proxMeta.push(`'methods': ['${methods.join(`', '`)}']`);
+
+  return `@ProxyCmp({${proxMeta.join(', ')}})`;
+}
 
 function getProxy(cmpMeta: d.ComponentCompilerMeta) {
   // Collect component meta
@@ -72,10 +87,6 @@ function getProxy(cmpMeta: d.ComponentCompilerMeta) {
   const outputs = getOutputs(cmpMeta);
   const methods = getMethods(cmpMeta);
 
-  // Process meta
-  const hasInputs = inputs.length > 0;
-  const hasOutputs = outputs.length > 0;
-  const hasMethods = methods.length > 0;
 
   // Generate Angular @Directive
   const directiveOpts = [
@@ -90,6 +101,7 @@ function getProxy(cmpMeta: d.ComponentCompilerMeta) {
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagName);
   const lines = [`
 export declare interface ${tagNameAsPascal} extends Components.${tagNameAsPascal} {}
+${getProxyCmp(inputs, outputs, methods)}
 @Component({ ${directiveOpts.join(', ')} })
 export class ${tagNameAsPascal} {`];
 
@@ -102,18 +114,8 @@ export class ${tagNameAsPascal} {`];
   lines.push(`  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;`);
-  if (hasOutputs) {
-    lines.push(`    proxyOutputs(this, this.el, ['${outputs.join(`', '`)}']);`);
-  }
   lines.push(`  }`);
   lines.push(`}`);
-
-  if (hasMethods) {
-    lines.push(`proxyMethods(${tagNameAsPascal}, ['${methods.join(`', '`)}']);`);
-  }
-  if (hasInputs) {
-    lines.push(`proxyInputs(${tagNameAsPascal}, ['${inputs.join(`', '`)}']);`);
-  }
 
   return lines.join('\n');
 }
@@ -138,7 +140,7 @@ function getProxyUtils(config: d.Config, outputTarget: d.OutputTargetAngular) {
     return PROXY_UTILS.replace(/export function/g, 'function');
   } else {
     const utilsPath = relativeImport(config, outputTarget.directivesProxyFile, outputTarget.directivesUtilsFile, '.ts');
-    return `import { proxyInputs, proxyMethods, proxyOutputs } from '${utilsPath}';\n`;
+    return `import { ProxyCmp } from '${utilsPath}';\n`;
   }
 }
 
@@ -175,10 +177,12 @@ export const proxyInputs = (Cmp: any, inputs: string[]) => {
   const Prototype = Cmp.prototype;
   inputs.forEach(item => {
     Object.defineProperty(Prototype, item, {
-      get() { return this.el[item]; },
-      set(val: any) {
-        this.z.runOutsideAngular(() => this.el[item] = val);
+      get() {
+        return this.el[item];
       },
+      set(val: any) {
+        this.z.runOutsideAngular(() => (this.el[item] = val));
+      }
     });
   });
 };
@@ -186,16 +190,34 @@ export const proxyInputs = (Cmp: any, inputs: string[]) => {
 export const proxyMethods = (Cmp: any, methods: string[]) => {
   const Prototype = Cmp.prototype;
   methods.forEach(methodName => {
-    Prototype[methodName] = function() {
+    Prototype[methodName] = function () {
       const args = arguments;
-      return this.z.runOutsideAngular(() => this.el[methodName].apply(this.el, args));
+      return this.z.runOutsideAngular(() =>
+        this.el[methodName].apply(this.el, args)
+      );
     };
   });
 };
 
 export const proxyOutputs = (instance: any, el: any, events: string[]) => {
-  events.forEach(eventName => instance[eventName] = fromEvent(el, eventName));
+  events.forEach(eventName => (instance[eventName] = fromEvent(el, eventName)));
 };
+
+// tslint:disable-next-line: only-arrow-functions
+export function ProxyCmp(opts: { inputs?: any; outputs?: any; methods?: any }) {
+  return (cls: any) => {
+    if (opts.inputs) {
+      proxyInputs(cls, opts.inputs);
+    }
+    if (opts.methods) {
+      proxyMethods(cls, opts.methods);
+    }
+    if (opts.outputs) {
+      proxyOutputs(cls, cls.el, opts.outputs);
+    }
+    return cls;
+  };
+}
 `;
 
 export const GENERATED_DTS = 'components.d.ts';
