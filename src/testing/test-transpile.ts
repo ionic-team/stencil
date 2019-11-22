@@ -3,6 +3,7 @@ import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { transpileModule } from '../compiler';
 import path from 'path';
 import ts from 'typescript';
+import { TestingLogger } from './testing-logger';
 
 
 const TRANSPILE_CONFIG: Config = {
@@ -13,6 +14,7 @@ const TRANSPILE_CONFIG: Config = {
   _isTesting: true,
   validateTypes: false,
   enableCache: false,
+  logger: new TestingLogger(),
   sys: {
     path: path
   }
