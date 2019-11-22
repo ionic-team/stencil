@@ -436,6 +436,15 @@ export class MockElement extends MockNode {
     return null;
   }
 
+  getElementsByClassName(classNames: string) {
+    const classes = classNames.trim().split(' ').filter(c => c.length > 0);
+    return getElementsByClassName(this, classes);
+  }
+
+  getElementsByTagName(tagName: string) {
+    return getElementsByTagName(this, tagName.toLowerCase());
+  }
+
   querySelector(selector: string) {
     return selectOne(selector, this);
   }
@@ -660,6 +669,34 @@ export class MockElement extends MockNode {
     return serializeNodeToHtml(this as any, opts);
   }
 
+}
+
+
+function getElementsByClassName(elm: MockElement, classNames: string[], foundElms: MockElement[] = []) {
+  const children = elm.children;
+  for (let i = 0, ii = children.length; i < ii; i++) {
+    const childElm = children[i];
+    for (let j = 0, jj = classNames.length; j < jj; j++) {
+      if (childElm.classList.contains(classNames[j])) {
+        foundElms.push(childElm);
+      }
+    }
+    getElementsByClassName(childElm, classNames, foundElms);
+  }
+  return foundElms;
+}
+
+
+function getElementsByTagName(elm: MockElement, tagName: string, foundElms: MockElement[] = []) {
+  const children = elm.children;
+  for (let i = 0, ii = children.length; i < ii; i++) {
+    const childElm = children[i];
+    if (childElm.nodeName.toLowerCase() === tagName) {
+      foundElms.push(childElm);
+    }
+    getElementsByTagName(childElm, tagName, foundElms);
+  }
+  return foundElms;
 }
 
 export function resetElement(elm: MockElement) {
