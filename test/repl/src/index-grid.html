@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Stencil REPL</title>
+  <meta name="Description" content="Welcome to the Stencil App Starter. You can use this starter to build entire apps all with web components using Stencil!">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#16161d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="x-ua-compatible" content="IE=Edge">
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: red;
+    }
+    stencil-repl {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 40px auto 40px;
+      grid-template-areas:
+        "header header"
+        "input-panel output-panel"
+        "footer footer";
+      grid-gap: 10px;
+      width: 100%;
+      height: 100%;
+      background: purple;
+    }
+    repl-header {
+      grid-area: header;
+      background: lightyellow;
+    }
+
+    repl-input-panel {
+      grid-area: input-panel;
+      background: lightblue;
+
+      display: grid;
+      grid-template-rows: 40px auto;
+      grid-template-areas:
+        "input-files"
+        "input-main";
+        grid-gap: 10px;
+    }
+    repl-input-files {
+      grid-area: input-files;
+      display: flex;
+      background: orange;
+    }
+    repl-input-files button {
+      -webkit-appearance: none;
+      border: 1px solid black;
+    }
+    repl-input-main {
+      grid-area: input-main;
+      display: block;
+      background: lightcoral;
+    }
+
+    repl-output-panel {
+      grid-area: output-panel;
+      background: lightpink;
+
+      display: grid;
+      grid-template-rows: 40px auto 80px;
+      grid-template-areas:
+        "output-tabs"
+        "output-main"
+        "output-console";
+        grid-gap: 10px;
+    }
+
+    repl-output-tabs {
+      grid-area: output-tabs;
+      display: flex;
+      background: paleturquoise;
+    }
+    repl-output-tabs button {
+      -webkit-appearance: none;
+      border: 1px solid black;
+    }
+
+    repl-output-main {
+      display: block;
+      background: lightgoldenrodyellow;
+    }
+    iframe.results {
+      grid-area: output-text;
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      margin: 0;
+      padding: 0;
+      background: lightskyblue;
+    }
+
+    repl-output-console {
+      display: block;
+      background: lightgoldenrodyellow;
+    }
+
+    repl-footer {
+      grid-area: footer;
+      background: lightgreen;
+    }
+
+  </style>
+</head>
+<body>
+
+  <stencil-repl>
+
+    <repl-header>
+      repl-header
+    </repl-header>
+
+    <repl-input-panel>
+
+      <repl-input-files>
+        <button>cmp-a.tsx</button>
+        <button>cmp-a.css</button>
+        <button>utils.ts</button>
+      </repl-input-files>
+
+      <repl-input-main>
+        repl-input-main
+      </repl-input-main>
+
+    </repl-input-panel>
+
+    <repl-output-panel>
+
+      <repl-output-tabs>
+        <button>Results</button>
+        <button>Files</button>
+        <button>Options</button>
+      </repl-output-tabs>
+
+      <repl-output-content>
+        <iframe class="results"></iframe>
+      </repl-output-content>
+
+      <repl-output-console>
+        console
+      </repl-output-console>
+
+    </repl-output-panel>
+
+    <repl-footer>
+      repl-footer
+    </repl-footer>
+
+  </stencil-repl>
+
+</body>
+</html>
