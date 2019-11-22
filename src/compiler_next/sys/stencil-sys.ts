@@ -3,6 +3,7 @@ import { createWebWorkerMainController } from '../sys/worker/web-worker-main';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from './environment';
 import { normalizePath } from '@utils';
 import path from 'path';
+import { buildEvents } from '../../compiler/events';
 
 
 export const getCompilerExecutingPath = () => {
@@ -25,6 +26,7 @@ export const createStencilSys = () => {
 
   const addDestory = (cb: () => void) => destroys.add(cb);
   const removeDestory = (cb: () => void) => destroys.delete(cb);
+  const events = buildEvents();
 
   const destroy = async () => {
     const waits: Promise<void>[] = [];
@@ -176,6 +178,7 @@ export const createStencilSys = () => {
     if (item) {
       if (item.watcherCallback) {
         item.watcherCallback(p, 'fileDelete');
+        events.emit('fileDelete', p);
       }
       items.delete(p);
       emitDirectoryWatch(p, new Set());
@@ -270,6 +273,7 @@ export const createStencilSys = () => {
       item.data = data;
       if (shouldEmitUpdate) {
         item.watcherCallback(p, 'fileUpdate');
+        events.emit('fileUpdate', p);
       }
 
     } else {
@@ -315,6 +319,7 @@ export const createStencilSys = () => {
   mkdirSync('/');
 
   const sys: d.CompilerSystem = {
+    events,
     access,
     accessSync,
     addDestory,

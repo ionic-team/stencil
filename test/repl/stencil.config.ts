@@ -4,7 +4,6 @@ import { Config } from '../../internal';
 
 export const config: Config = {
   globalStyle: 'src/global/app.css',
-  globalScript: 'src/global/app.ts',
   outputTargets: [
     {
       type: 'www',
@@ -33,6 +32,5 @@ export const config: Config = {
         },
       ]
     }
-  ],
-  enableCache: false
+  ]
 };
