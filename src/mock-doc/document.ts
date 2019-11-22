@@ -213,23 +213,8 @@ export class MockDocument extends MockHTMLElement {
     return getElementById(this, id);
   }
 
-  getElementsByClassName(classNames: string) {
-    const foundElms: MockElement[] = [];
-    const classes = classNames.trim().split(' ').filter(c => c.length > 0);
-    getElementsByClassName(this, classes, foundElms);
-    return foundElms;
-  }
-
-  getElementsByTagName(tagName: string) {
-    const foundElms: MockElement[] = [];
-    getElementsByTagName(this, tagName.toLowerCase(), foundElms);
-    return foundElms;
-  }
-
   getElementsByName(elmName: string) {
-    const foundElms: MockElement[] = [];
-    getElementsByName(this, elmName.toLowerCase(), foundElms);
-    return foundElms;
+    return getElementsByName(this, elmName.toLowerCase());
   }
 
   get title() {
@@ -305,7 +290,7 @@ const DOC_KEY_KEEPERS = new Set([
   '_shadowRoot'
 ]);
 
-function getElementById(elm: MockElement, id: string): MockElement {
+export function getElementById(elm: MockElement, id: string): MockElement {
   const children = elm.children;
   for (let i = 0, ii = children.length; i < ii; i++) {
     const childElm = children[i];
@@ -320,34 +305,7 @@ function getElementById(elm: MockElement, id: string): MockElement {
   return null;
 }
 
-
-function getElementsByClassName(elm: MockElement, classNames: string[], foundElms: MockElement[]) {
-  const children = elm.children;
-  for (let i = 0, ii = children.length; i < ii; i++) {
-    const childElm = children[i];
-    for (let j = 0, jj = classNames.length; j < jj; j++) {
-      if (childElm.classList.contains(classNames[j])) {
-        foundElms.push(childElm);
-      }
-    }
-    getElementsByClassName(childElm, classNames, foundElms);
-  }
-}
-
-
-function getElementsByTagName(elm: MockElement, tagName: string, foundElms: MockElement[]) {
-  const children = elm.children;
-  for (let i = 0, ii = children.length; i < ii; i++) {
-    const childElm = children[i];
-    if (childElm.nodeName.toLowerCase() === tagName) {
-      foundElms.push(childElm);
-    }
-    getElementsByTagName(childElm, tagName, foundElms);
-  }
-}
-
-
-function getElementsByName(elm: MockElement, elmName: string, foundElms: MockElement[]) {
+function getElementsByName(elm: MockElement, elmName: string, foundElms: MockElement[] = []) {
   const children = elm.children;
   for (let i = 0, ii = children.length; i < ii; i++) {
     const childElm = children[i];
@@ -356,6 +314,7 @@ function getElementsByName(elm: MockElement, elmName: string, foundElms: MockEle
     }
     getElementsByName(childElm, elmName, foundElms);
   }
+  return foundElms;
 }
 
 

@@ -1,6 +1,6 @@
 import { MockHTMLElement } from './node';
 import { NODE_NAMES, NODE_TYPES } from './constants';
-
+import { getElementById } from './document';
 
 export class MockDocumentFragment extends MockHTMLElement {
 
@@ -8,6 +8,10 @@ export class MockDocumentFragment extends MockHTMLElement {
     super(ownerDocument, null);
     this.nodeName = NODE_NAMES.DOCUMENT_FRAGMENT_NODE;
     this.nodeType = NODE_TYPES.DOCUMENT_FRAGMENT_NODE;
+  }
+
+  getElementById(id: string) {
+    return getElementById(this, id);
   }
 
   cloneNode(deep?: boolean) {
