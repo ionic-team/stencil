@@ -1,8 +1,0 @@
-
-:host {
-  grid-area: header;
-  padding: 6px;
-  color: white;
-  background: var(--stencil-purple);
-  font-family: var(--stencil-font);
-}
