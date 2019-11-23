@@ -88,7 +88,7 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
   };
 
   tsSys.readFile = (p) => {
-    let content = inMemoryFs.readFileSync(p);
+    let content = inMemoryFs.readFileSync(p, {useCache: false});
 
     if (typeof content !== 'string' && (p.startsWith('https:') || p.startsWith('http:'))) {
       if (IS_WEB_WORKER_ENV) {
