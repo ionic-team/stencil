@@ -1,5 +1,5 @@
 import { Component, Host, h, Prop, Listen } from '@stencil/core';
-import { InputFile } from '../stencil-repl/stencil-repl';
+import { InputFile } from '../../compiler/declarations';
 
 @Component({
   tag: 'repl-inputs',

@@ -1,5 +1,5 @@
 import { Component, Event, EventEmitter, Host, h, Prop, State } from '@stencil/core';
-import { OutputFile } from '../stencil-repl/stencil-repl';
+import { OutputFile } from '../../compiler/declarations';
 
 @Component({
   tag: 'repl-outputs',

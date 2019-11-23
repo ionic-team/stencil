@@ -1,4 +1,6 @@
 import { Component, Host, h, Prop, State, Listen } from '@stencil/core';
+import { createCompiler, initCompilerFs, loadConfig } from '../../compiler/load-compiler';
+import { InputFile, OutputFile } from '../../compiler/declarations';
 import * as d from '@stencil/core/internal';
 
 
@@ -22,48 +24,11 @@ export class StencilRepl {
       await this.compiler.destroy();
     }
 
-    const stencil = await import(this.stencilCompilerPath);
+    this.compiler = await createCompiler(this.stencilCompilerPath);
 
-    this.compiler = await stencil.createWorkerCompiler();
+    await initCompilerFs(this.compiler, this.inputs);
 
-    await this.compiler.sys.mkdir('/src');
-
-    if (!this.inputs.some(({name}) => name === '/tsconfig.json')) {
-      this.inputs.push({
-        name: '/tsconfig.json',
-        code: `
-          {
-            "compilerOptions": {
-              "experimentalDecorators": true,
-              "lib": [
-                "dom",
-                "es2015"
-              ],
-              "module": "esnext",
-              "target": "es2017",
-              "jsx": "react",
-              "jsxFactory": "h"
-            },
-            "include": [
-              "src"
-            ]
-          }
-        `
-      });
-    }
-
-    await Promise.all(this.inputs.map(async input => {
-      await this.compiler.sys.writeFile(input.name, input.code);
-    }));
-
-    const diagnostics = await this.compiler.loadConfig({
-      devMode: true,
-      watch: true,
-      outputTargets: [
-        { type: this.selectedTarget as any }
-      ]
-    });
-    logDiagnostics(diagnostics);
+    await loadConfig(this.compiler, this.selectedTarget);
 
     const watcher = await this.compiler.createWatcher();
 
@@ -80,7 +45,7 @@ export class StencilRepl {
       this.outputs = outputs;
     });
 
-    await watcher.start();
+    watcher.start();
   }
 
   @Listen('fileAdd')
@@ -136,63 +101,4 @@ export class StencilRepl {
       </Host>
     );
   }
-}
-
-// const localDevPlugin = (repl: StencilRepl) => {
-//   if (!repl.stencilUrl) {
-//     return null;
-//   }
-//   const fetchText = new Map<string, string>();
-//   return {
-//     resolveId: async (importee: string, importer: string) => {
-//       if (importee.includes('@stencil') || (importer && importer.includes('@stencil'))) {
-//         if (importee.startsWith('@stencil')) {
-//           importee = repl.stencilUrl + importee;
-//         }
-//         // if (importer && !path.isAbsolute(importee)) {
-//         //   const importerDir = path.dirname(importer);
-//         //   importee = path.resolve(importerDir, importee);
-//         // }
-//         if (importee === '/@stencil/core/internal/client') {
-//           importee = '/@stencil/core/internal/client/index';
-//         }
-//         if (!importee.endsWith('.mjs')) {
-//           importee += '.mjs';
-//         }
-//         if (!fetchText.has(importee)) {
-//           const rsp = await fetch(importee);
-//           const text = await rsp.text();
-//           fetchText.set(importee, text);
-//         }
-//         return importee;
-//       }
-//     },
-//     load: (id: string) => {
-//       if (fetchText.has(id)) {
-//         return fetchText.get(id);
-//       }
-//     }
-//   }
-// };
-
-const logDiagnostics = (diagnostics: d.Diagnostic[]) => {
-  diagnostics.forEach(d => {
-    if (d.level === 'error') {
-      console.error(d.messageText);
-    } else if (d.level === 'warn') {
-      console.warn(d.messageText);
-    } else {
-      console.info(d.messageText);
-    }
-  });
-};
-
-export interface InputFile {
-  name: string;
-  code?: string;
-}
-
-export interface OutputFile {
-  name: string;
-  code: string;
 }

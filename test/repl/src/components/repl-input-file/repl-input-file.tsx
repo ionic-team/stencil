@@ -1,5 +1,5 @@
 import { Component, Event, EventEmitter, Host, h, Prop } from '@stencil/core';
-import { InputFile } from '../stencil-repl/stencil-repl';
+import { InputFile } from '../../compiler/declarations';
 
 
 @Component({

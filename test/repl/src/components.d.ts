@@ -10,10 +10,7 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
   InputFile,
   OutputFile,
-} from './components/stencil-repl/stencil-repl';
-import {
-  InputFile as InputFile1,
-} from './components/stencil-repl/stencil-repl';
+} from './compiler/declarations';
 
 export namespace Components {
   interface ReplHeader {
