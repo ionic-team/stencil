@@ -21,6 +21,7 @@ export interface Compiler {
 
 
 export interface CompilerCtx {
+  version: number;
   activeBuildId: number;
   activeDirsAdded: string[];
   activeDirsDeleted: string[];

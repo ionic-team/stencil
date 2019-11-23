@@ -50,7 +50,14 @@ export const getGlobalScriptPaths = (config: d.Config, compilerCtx: d.CompilerCt
   const globalPaths: string[] = [];
 
   if (typeof config.globalScript === 'string') {
-    globalPaths.push(normalizePath(config.globalScript));
+    const mod = compilerCtx.moduleMap.get(config.globalScript);
+    const globalScript = compilerCtx.version === 2
+      ? config.globalScript
+      : mod && mod.jsFilePath;
+
+    if (globalScript) {
+      globalPaths.push(normalizePath(globalScript));
+    }
   }
 
   compilerCtx.collections.forEach(collection => {

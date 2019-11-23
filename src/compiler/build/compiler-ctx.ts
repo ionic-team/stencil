@@ -11,6 +11,7 @@ import { InMemoryFs, normalizePath } from '@utils';
  * is always the same.
  */
 export class CompilerContext implements d.CompilerCtx {
+  version = 1;
   activeBuildId = -1;
   activeFilesAdded: string[] = [];
   activeFilesDeleted: string[] = [];

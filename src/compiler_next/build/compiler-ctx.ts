@@ -9,6 +9,7 @@ import { buildEvents } from '../../compiler/events';
  * is always the same.
  */
 export class CompilerContext implements d.CompilerCtx {
+  version = 2;
   activeBuildId = -1;
   activeFilesAdded: string[] = [];
   activeFilesDeleted: string[] = [];
