@@ -49,6 +49,7 @@ export function mockConfig() {
 
 export function mockCompilerCtx() {
   const compilerCtx: d.CompilerCtx = {
+    version: 1,
     activeBuildId: 0,
     activeDirsAdded: [],
     activeDirsDeleted: [],
