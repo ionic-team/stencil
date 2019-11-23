@@ -2,11 +2,11 @@ import { Component, Host, h, Prop, Listen } from '@stencil/core';
 import { InputFile } from '../../compiler/declarations';
 
 @Component({
-  tag: 'repl-inputs',
-  styleUrl: 'repl-inputs.css',
+  tag: 'repl-input-panel',
+  styleUrl: 'repl-input-panel.css',
   shadow: true
 })
-export class ReplInputs {
+export class ReplInputPanel {
 
   @Prop() inputs: InputFile[] = [];
   @Prop() selectedName: string;
@@ -25,17 +25,7 @@ export class ReplInputs {
   render() {
     return (
       <Host>
-        <header>
-          {(this.inputs.map(input => (
-            <repl-input-selection
-              name={input.name}
-              isSelected={input.name === this.selectedName}
-            />
-          )))}
-          <button
-            class="add-input"
-          >+</button>
-        </header>
+        <repl-input-selector inputs={this.inputs}/>
         <section>
           {(this.inputs.map(input => (
             <repl-input-file

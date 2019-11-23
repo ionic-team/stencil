@@ -93,11 +93,16 @@ export class StencilRepl {
   render() {
     return (
       <Host>
-        <repl-header appName={this.appName}></repl-header>
-        <repl-viewport>
-          <repl-inputs slot="left" inputs={this.inputs}/>
-          <repl-outputs slot="right" outputs={this.outputs} selectedTarget={this.selectedTarget}/>
-        </repl-viewport>
+        <repl-header
+          appName={this.appName}
+        />
+        <repl-input-panel
+          inputs={this.inputs}
+        />
+        <repl-output-panel
+          outputs={this.outputs}
+          selectedTarget={this.selectedTarget}
+        />
       </Host>
     );
   }

@@ -13,7 +13,7 @@
 
 textarea {
   box-sizing: border-box;
-  font-family: var(--font-code);
+  font-family: var(--stencil-font-code);
   font-size: 12px;
   margin: 0 0 20px 0;
   padding: 10px;

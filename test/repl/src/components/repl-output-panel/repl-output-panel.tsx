@@ -2,11 +2,11 @@ import { Component, Event, EventEmitter, Host, h, Prop, State } from '@stencil/c
 import { OutputFile } from '../../compiler/declarations';
 
 @Component({
-  tag: 'repl-outputs',
-  styleUrl: 'repl-outputs.css',
+  tag: 'repl-output-panel',
+  styleUrl: 'repl-output-panel.css',
   shadow: true
 })
-export class ReplOutputs {
+export class ReplOutputPanel {
 
   @Prop() outputs: OutputFile[] = [];
   @Prop() selectedTarget: string;
@@ -26,14 +26,18 @@ export class ReplOutputs {
     }
   }
 
+  targetChange = (ev: UIEvent) => {
+    this.targetUpdate.emit((ev.target as any).value);
+  };
+
   render() {
     const outputs = this.outputs;
     return (
       <Host>
 
-        <div>
+        <section>
           <select
-            onInput={ev => this.targetUpdate.emit((ev.target as any).value)}>
+            onInput={this.targetChange}>
             {(this.outputTargets.map(outputTarget => (
               <option
                 value={outputTarget}
@@ -43,9 +47,7 @@ export class ReplOutputs {
               </option>
             )))}
           </select>
-        </div>
 
-        <div>
           <select
             onInput={ev => this.selectedOutputName = (ev.target as any).value}
             hidden={outputs.length === 0}
@@ -59,7 +61,7 @@ export class ReplOutputs {
               </option>
             )))}
           </select>
-        </div>
+        </section>
 
         <section>
           {(outputs.map(output => (
