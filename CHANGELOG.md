@@ -1,3 +1,18 @@
+## ⛄️ [1.8.2-1](https://github.com/ionic-team/stencil/compare/v1.8.2-0...v1.8.2-1) (2019-11-24)
+
+
+### Bug Fixes
+
+* **mock-doc:** implement  getElementById() in document fragment ([#2032](https://github.com/ionic-team/stencil/issues/2032)) ([35021d8](https://github.com/ionic-team/stencil/commit/35021d818f0dd9eca9935f4737c25d5461525fe5)), closes [#2030](https://github.com/ionic-team/stencil/issues/2030)
+
+
+### Features
+
+* **custom:** add copy tasks to custom outputTargets ([#2023](https://github.com/ionic-team/stencil/issues/2023)) ([65aeb8c](https://github.com/ionic-team/stencil/commit/65aeb8c4a818b200695946073b71f63bf4aa3634))
+* **runtime:** experimental active render context ([#2040](https://github.com/ionic-team/stencil/issues/2040)) ([75ed488](https://github.com/ionic-team/stencil/commit/75ed488667020065eec908365a4595b8d2a32531))
+
+
+
 ## 🎳 [1.8.2-0](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.8.2-0) (2019-11-18)
 
 
