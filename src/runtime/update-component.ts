@@ -81,21 +81,17 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
 
   if (BUILD.hasRenderFn || BUILD.reflect) {
     if (BUILD.vdomRender || BUILD.reflect) {
-      try {
-        // looks like we've got child nodes to render into this host element
-        // or we need to update the css class/attrs on the host element
-        // DOM WRITE!
-        renderVdom(
-          elm,
-          hostRef,
-          cmpMeta,
-          (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()),
-        );
-      } catch (e) {
-        consoleError(e);
-      }
+      // looks like we've got child nodes to render into this host element
+      // or we need to update the css class/attrs on the host element
+      // DOM WRITE!
+      renderVdom(
+        elm,
+        hostRef,
+        cmpMeta,
+        callRender(instance, elm),
+      );
     } else {
-      elm.textContent = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
+      elm.textContent = callRender(instance, elm);
     }
   }
   if (BUILD.cssVarShim && plt.$cssShim$) {
@@ -153,6 +149,20 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
   }
 };
 
+let renderingElement: HTMLElement = null;
+
+const callRender = (instance: any, elm: HTMLElement) => {
+  try {
+    renderingElement = elm;
+    instance = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
+  } catch (e) {
+    consoleError(e);
+  }
+  renderingElement = null;
+  return instance;
+};
+
+export const getRenderingElement = () => renderingElement;
 
 export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta) => {
   const endPostUpdate = createTime('postUpdate', cmpMeta.$tagName$);
@@ -244,7 +254,8 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
 export const forceUpdate = (elm: d.RenderNode, cmpMeta: d.ComponentRuntimeMeta) => {
   if (BUILD.updatable) {
     const hostRef = getHostRef(elm);
-    if ((hostRef.$flags$ & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
+    const isConnected = hostRef.$hostElement$.isConnected;
+    if (isConnected && (hostRef.$flags$ & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
       scheduleUpdate(
         elm,
         hostRef,
@@ -252,7 +263,10 @@ export const forceUpdate = (elm: d.RenderNode, cmpMeta: d.ComponentRuntimeMeta) 
         false
       );
     }
+    // Returns "true" when the forced update was successfully scheduled
+    return isConnected;
   }
+  return false;
 };
 
 export const appDidLoad = (who: string) => {

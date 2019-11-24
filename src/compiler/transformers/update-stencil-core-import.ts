@@ -61,5 +61,7 @@ const KEEP_IMPORTS = new Set([
   'getAssetPath',
   'writeTask',
   'readTask',
-  'getElement'
+  'getElement',
+  'forceUpdate',
+  'getRenderingElement'
 ]);

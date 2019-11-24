@@ -90,6 +90,11 @@ export declare function writeTask(task: d.RafCallback): void;
 export declare function readTask(task: d.RafCallback): void;
 
 /**
+ * forceUpdate
+ */
+export declare function forceUpdate(ref: any): void;
+
+/**
  * Host
  */
 interface HostAttributes {
