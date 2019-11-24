@@ -7,6 +7,16 @@ describe('documentFragment', () => {
     doc = new MockDocument();
   });
 
+  it('getElementById()', () => {
+    const frag = doc.createDocumentFragment();
+    const div = doc.createElement('div');
+    div.id = 'my-div';
+    frag.append(div);
+
+    expect(frag.getElementById('unknown')).toBeNull();
+    expect(frag.getElementById('my-div')).toBe(div);
+  });
+
   it('move children when appended', () => {
     const frag = new MockDocumentFragment(doc);
     const div = doc.createElement('div');

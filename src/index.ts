@@ -107,6 +107,11 @@ export declare function writeTask(task: RafCallback): void;
 export declare function readTask(task: RafCallback): void;
 
 /**
+ * forceUpdate
+ */
+export declare function forceUpdate(ref: any): void;
+
+/**
  * Host
  */
 interface HostAttributes {

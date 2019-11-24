@@ -4,6 +4,7 @@ import { MockElement, MockNode, MockTextNode } from './node';
 import { MockTemplateElement } from './element';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { Attribute, ParserOptions, TreeAdapter, parse, parseFragment } from 'parse5';
+import { MockDocumentFragment } from './document-fragment';
 
 
 const docParser = new WeakMap<any, any>();
@@ -83,7 +84,7 @@ function getParser(ownerDocument: MockDocument) {
       parentNode.insertBefore(newNode, referenceNode);
     },
 
-    setTemplateContent(templateElement: MockTemplateElement, contentElement: MockElement) {
+    setTemplateContent(templateElement: MockTemplateElement, contentElement: MockDocumentFragment) {
       templateElement.content = contentElement;
     },
 
