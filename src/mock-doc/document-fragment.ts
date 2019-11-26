@@ -1,4 +1,4 @@
-import { MockHTMLElement } from './node';
+import { MockElement, MockHTMLElement } from './node';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { getElementById } from './document';
 
@@ -10,7 +10,7 @@ export class MockDocumentFragment extends MockHTMLElement {
     this.nodeType = NODE_TYPES.DOCUMENT_FRAGMENT_NODE;
   }
 
-  getElementById(id: string) {
+  getElementById(id: string): MockElement {
     return getElementById(this, id);
   }
 
