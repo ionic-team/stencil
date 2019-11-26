@@ -768,6 +768,7 @@ export namespace JSXBase {
   }
 
   export interface IframeHTMLAttributes<T> extends HTMLAttributes<T> {
+    allow?: string;
     allowFullScreen?: boolean;
     allowfullScreen?: string | boolean;
     allowTransparency?: boolean;
