@@ -123,4 +123,25 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
   } else {
     schedule();
   }
+
+  // For CLONED components that are re-added to the DOM (like ngIf in AngularJS)
+  // AND do not use shadow-dom, remove all children that are not slot content
+  if (elm.classList.contains('hydrated') && BUILD.slotRelocation && !BUILD.hydrateServerSide && !BUILD.hydrateClientSide) {
+    removeNonSlotNodes(elm);
+  }
+};
+
+const removeNonSlotNodes = (elm: Element) => {
+  Array.from(elm.children)
+  .forEach((node) => {
+    const numChildren = node.children && node.children.length;
+    // ['s-isc'] stands for is-slot-content and is only added to elements that belong to a slot
+    // It is added as an attribute, because arbitrary props get removed when cloning nodes
+    if (node.getAttribute('s-isc') === null && !numChildren) {
+      node.remove();
+    }
+    if (numChildren) {
+      removeNonSlotNodes(node);
+    }
+  });
 };

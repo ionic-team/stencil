@@ -880,4 +880,74 @@ describe('render-vdom', () => {
     });
 
   });
+
+  describe('is slot content attribute', () => {
+    it('should add a `s-isc` attribute', async () => {
+      @Component({ tag: 'comp-a' })
+      class CmpA {
+        render() {
+          return (
+            <Host>
+              <span>Component mark-up</span>
+              <slot></slot>
+            </Host>
+          );
+        }
+      }
+
+      const { waitForChanges, body } = await newSpecPage({
+        components: [CmpA],
+        html: `
+        <comp-a>
+            <div id="slot-content">I am slot content</div>
+        </comp-a>
+      `,
+      });
+
+      const component = body.querySelector('comp-a');
+      body.removeChild(component);
+      body.appendChild(component.cloneNode(true));
+
+      await waitForChanges();
+
+      const span = body.querySelector('span');
+      const slotContent = body.querySelector('#slot-content');
+      expect(span.getAttribute('s-isc')).toBe(null);
+      expect(slotContent.getAttribute('s-isc')).toBe('');
+    });
+
+    it('should not add a `s-isc` attribute with shadow DOM enabled', async () => {
+      @Component({ tag: 'comp-a', shadow: true })
+      class CmpA {
+        render() {
+          return (
+            <Host>
+              <span>Component mark-up</span>
+              <slot></slot>
+            </Host>
+          );
+        }
+      }
+
+      const { waitForChanges, body } = await newSpecPage({
+        components: [CmpA],
+        html: `
+        <comp-a>
+            <div id="slot-content">I am slot content</div>
+        </comp-a>
+      `,
+      });
+
+      const component = body.querySelector('comp-a');
+      body.removeChild(component);
+      body.appendChild(component.cloneNode(true));
+
+      await waitForChanges();
+
+      const span = component.shadowRoot.querySelector('span');
+      const slotContent = body.querySelector('#slot-content');
+      expect(span.getAttribute('s-isc')).toBe(null);
+      expect(slotContent.getAttribute('s-isc')).toBe(null);
+    });
+  });
 });

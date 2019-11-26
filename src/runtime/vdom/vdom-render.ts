@@ -529,6 +529,13 @@ const relocateSlotContent = (
               checkSlotFallbackVisibility = true;
               node['s-sn'] = slotNameAttr;
 
+              // Used in initialize-component.ts
+              // Attributes persist data for cloned elements (like ngIf in AngularJS)
+              // non-native properties such as `node['s-sn']` are lost when cloning
+              if (node.setAttribute) {
+                node.setAttribute('s-isc', '');
+              }
+
               // add to our list of nodes to relocate
               relocateNodes.push({
                 $slotRefNode$: childNode,
