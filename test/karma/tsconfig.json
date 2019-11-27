@@ -35,6 +35,7 @@
     "test-app/**/*.tsx",
     "test-app/**/*.ts",
     "test-app/util.ts",
+    "test-app/global.ts",
     "test-sibling/**/*.spec.ts",
     "test-sibling/**/*.tsx"
   ]

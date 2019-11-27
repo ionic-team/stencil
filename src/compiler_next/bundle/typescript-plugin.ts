@@ -13,18 +13,22 @@ export const typescriptPlugin = (compilerCtx: CompilerCtx, bundleOpts: BundleOpt
     name: `${bundleOpts.id}TypescriptPlugin`,
 
     load(id) {
-      const fsFilePath = normalizeFsPath(id);
-      const mod = getModule(compilerCtx, fsFilePath);
-      if (mod) {
-        return mod.staticSourceFileText;
+      if (id[0] === '/') {
+        const fsFilePath = normalizeFsPath(id);
+        const mod = getModule(compilerCtx, fsFilePath);
+        if (mod) {
+          return mod.staticSourceFileText;
+        }
       }
       return null;
     },
     transform(_, id) {
-      const mod = getModule(compilerCtx, id);
-      if (mod && mod.cmps.length > 0) {
-        const transformed = ts.transform(mod.staticSourceFile, bundleOpts.customTransformers).transformed[0];
-        return tsPrinter.printFile(transformed);
+      if (id[0] === '/') {
+        const mod = getModule(compilerCtx, id);
+        if (mod && mod.cmps.length > 0) {
+          const transformed = ts.transform(mod.staticSourceFile, bundleOpts.customTransformers).transformed[0];
+          return tsPrinter.printFile(transformed);
+        }
       }
       return null;
     }
