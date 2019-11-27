@@ -51,7 +51,7 @@ const pkgs: TestPackage[] = [
     packageJson: 'internal/hydrate/package.json',
     files: [
       'internal/hydrate/runner.d.ts',
-      'internal/hydrate/runner.js',
+      'internal/hydrate/runner.mjs',
     ]
   },
   {
