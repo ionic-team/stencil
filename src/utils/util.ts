@@ -1,6 +1,14 @@
 import * as d from '../declarations';
 import { BANNER } from './constants';
 import { buildError } from './message-utils';
+import { dashToPascalCase } from './helpers';
+
+
+export const createVarName = (fileName: string) => (
+  dashToPascalCase(fileName
+    .toLowerCase()
+    .replace(/[|&;$%@"<>()+,.{}_]/g, '-'))
+);
 
 
 export const getFileExt = (fileName: string) => {
@@ -69,17 +77,6 @@ export const isCssFile = (filePath: string) => {
 export const isHtmlFile = (filePath: string) => {
   return hasFileExtension(filePath, ['html', 'htm']);
 };
-
-/**
- * Only web development text files, like ts, tsx,
- * js, html, css, scss, etc.
- * @param filePath
- */
-export const isWebDevFile = (filePath: string) => {
-  return (hasFileExtension(filePath, WEB_DEV_EXT) || isTsFile(filePath));
-};
-const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass', 'less', 'styl', 'pcss'];
-
 
 export const generatePreamble = (config: d.Config, opts: { prefix?: string; suffix?: string, defaultBanner?: boolean } = {}) => {
   let preamble: string[] = [];

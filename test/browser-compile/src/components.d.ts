@@ -17,7 +17,7 @@ declare global {
 
 
   interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
-  var HTMLAppRootElement: {
+  const HTMLAppRootElement: {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
   };

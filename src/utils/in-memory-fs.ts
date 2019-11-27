@@ -2,10 +2,20 @@ import * as d from '../declarations';
 import { normalizePath } from './normalize-path';
 
 
-export class InMemoryFileSystem implements d.InMemoryFileSystem {
+export class InMemoryFs implements d.InMemoryFileSystem {
+  private revisions = new Map<string, number>();
   private items: d.FsItems = new Map();
 
   constructor(public disk: d.FileSystem, private path: d.Path) {}
+
+  private markItem(filePath: string) {
+    const rev = this.revision(filePath) + 1;
+    this.revisions.set(filePath, rev);
+  }
+
+  revision(filePath: string) {
+    return this.revisions.get(filePath) ?? 0;
+  }
 
   async accessData(filePath: string) {
     const item = this.getItem(filePath);
@@ -60,11 +70,10 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     let hasAccess = false;
     try {
       const s = this.statSync(filePath);
-      item.exists = true;
-      item.isDirectory = s.isDirectory;
-      item.isFile = s.isFile;
-
-      hasAccess = true;
+      item.isDirectory = !!s.isDirectory;
+      item.isFile = !!s.isFile;
+      item.exists = item.isDirectory || item.isFile;
+      hasAccess = item.exists;
 
     } catch (e) {
       item.exists = false;
@@ -193,6 +202,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       item.isDirectory = false;
       item.fileText = fileContent;
     }
+    this.markItem(filePath);
 
     return fileContent;
   }
@@ -211,7 +221,6 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     }
 
     const fileContent = this.disk.readFileSync(filePath);
-
     const item = this.getItem(filePath);
     if (fileContent.length < MAX_TEXT_CACHE) {
       item.exists = true;
@@ -219,6 +228,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       item.isDirectory = false;
       item.fileText = fileContent;
     }
+    this.markItem(filePath);
 
     return fileContent;
   }
@@ -257,6 +267,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     if (!item.queueWriteToDisk) {
       item.queueDeleteFromDisk = true;
     }
+    this.markItem(filePath);
   }
 
   async stat(itemPath: string) {
@@ -285,17 +296,20 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
    */
   statSync(itemPath: string) {
     const item = this.getItem(itemPath);
-
     if (typeof item.isDirectory !== 'boolean' || typeof item.isFile !== 'boolean') {
-      const s = this.disk.statSync(itemPath);
-      item.exists = true;
-      item.isDirectory = s.isDirectory();
-      item.isFile = s.isFile();
+      try {
+        const s = this.disk.statSync(itemPath);
+        item.exists = true;
+        item.isDirectory = s.isDirectory();
+        item.isFile = s.isFile();
+      } catch (e) {
+        item.exists = false;
+      }
     }
-
     return {
-      isFile: item.isFile,
-      isDirectory: item.isDirectory
+      exists: !!item.exists,
+      isFile: !!item.isFile,
+      isDirectory: !!item.isDirectory
     };
   }
 
@@ -329,6 +343,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     results.queuedWrite = false;
 
     item.fileText = content;
+    this.markItem(filePath);
 
     if (opts != null && opts.useCache === false) {
       item.useCache = false;
@@ -348,12 +363,12 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
         item.queueWriteToDisk = false;
       }
     } else if (opts != null && opts.immediateWrite === true) {
-
-      // If this is an immediate write then write the file
-      // and do not add it to the queue
-      await this.ensureDir(filePath);
-      await this.disk.writeFile(filePath, item.fileText);
-
+      if (opts.useCache !== true || results.changedContent) {
+        // If this is an immediate write then write the file
+        // and do not add it to the queue
+        await this.ensureDir(filePath);
+        await this.disk.writeFile(filePath, item.fileText);
+      }
     } else {
       // we want to write this to disk (eventually)
       // but only if the content is different
@@ -369,10 +384,21 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     return results;
   }
 
-  writeFiles(files: { [filePath: string]: string }, opts?: d.FsWriteOptions) {
-    return Promise.all(Object.keys(files).map(filePath => {
-      return this.writeFile(filePath, files[filePath], opts);
-    }));
+  writeFiles(files: { [filePath: string]: string } | Map<string, string>, opts?: d.FsWriteOptions) {
+    const promises: Promise<any>[] = [];
+
+    if (files instanceof Map) {
+      files.forEach((content, filePath) => {
+        promises.push(this.writeFile(filePath, content, opts));
+      });
+
+    } else {
+      Object.keys(files).forEach(filePath => {
+        promises.push(this.writeFile(filePath, files[filePath], opts));
+      });
+    }
+
+    return Promise.all(promises);
   }
 
   async commit() {
@@ -530,6 +556,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     if (item != null && !item.queueWriteToDisk) {
       this.items.delete(filePath);
     }
+    this.markItem(filePath);
   }
 
   cancelDeleteFilesFromDisk(filePaths: string[]) {
@@ -538,6 +565,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       if (item.isFile === true && item.queueDeleteFromDisk === true) {
         item.queueDeleteFromDisk = false;
       }
+      this.markItem(filePath);
     });
   }
 
@@ -567,7 +595,8 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
       queueCopyFileToDest: null,
       queueDeleteFromDisk: null,
       queueWriteToDisk: null,
-      useCache: null
+      useCache: null,
+      outputTargetType: null,
     });
     return item;
   }
@@ -576,12 +605,16 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
     this.items.clear();
   }
 
-  get keys() {
+  keys() {
     return Array.from(this.items.keys()).sort();
   }
 
   getMemoryStats() {
     return `data length: ${this.items.size}`;
+  }
+
+  getBuildOutputs(): d.BuildOutput[] {
+    return [];
   }
 
 }
@@ -729,17 +762,6 @@ export const shouldIgnore = (filePath: string) => {
   filePath = filePath.trim().toLowerCase();
   return IGNORE.some(ignoreFile => filePath.endsWith(ignoreFile));
 };
-
-export const isTextFile = (filePath: string) => {
-  filePath = filePath.toLowerCase().trim();
-  return TXT_EXT.some(ext => filePath.endsWith(ext));
-};
-
-const TXT_EXT = [
-  '.ts', '.tsx', '.js', '.jsx', '.svg',
-  '.html', '.txt', '.md', '.markdown', '.json',
-  '.css', '.scss', '.sass', '.less', '.styl'
-];
 
 const IGNORE = [
   '.ds_store',

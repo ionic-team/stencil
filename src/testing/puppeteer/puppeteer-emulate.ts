@@ -1,9 +1,9 @@
-import * as d from '../../declarations';
+import { E2EProcessEnv, EmulateConfig } from '@stencil/core/internal';
 import * as puppeteer from 'puppeteer';
 
 
-export function setScreenshotEmulateData(userEmulateConfig: d.EmulateConfig, env: d.E2EProcessEnv) {
-  const screenshotEmulate: d.EmulateConfig = {
+export function setScreenshotEmulateData(userEmulateConfig: EmulateConfig, env: E2EProcessEnv) {
+  const screenshotEmulate: EmulateConfig = {
     userAgent: 'default',
     viewport: {
       width: 800,

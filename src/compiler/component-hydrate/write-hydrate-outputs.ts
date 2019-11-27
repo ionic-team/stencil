@@ -31,14 +31,6 @@ async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, 
   await Promise.all(rollupOutput.output.map(async output => {
     if (output.type === 'chunk') {
       const filePath = config.sys.path.join(hydrateAppDirPath, output.fileName);
-      try {
-        const existingCode = await compilerCtx.fs.disk.readFile(filePath);
-        if (existingCode === output.code) {
-          // if it's identical then don't overwrite it so debugging context works
-          return;
-        }
-      } catch (e) {}
-
       await compilerCtx.fs.writeFile(filePath, output.code);
     }
   }));
@@ -48,7 +40,7 @@ async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, 
 function getHydratePackageJson(config: d.Config, hydrateAppFilePath: string, hydrateDtsFilePath: string, hydratePackageName: string) {
   const pkg: d.PackageJsonData = {
     name: hydratePackageName,
-    description: `${config.namespace} component hydration app built for a NodeJS environment.`,
+    description: `${config.namespace} component hydration app.`,
     main: config.sys.path.basename(hydrateAppFilePath),
     types: config.sys.path.basename(hydrateDtsFilePath)
   };
@@ -69,13 +61,9 @@ async function getHydratePackageName(config: d.Config, compilerCtx: d.CompilerCt
 
 
 async function copyHydrateRunnerDts(config: d.Config, compilerCtx: d.CompilerCtx, hydrateAppDirPath: string) {
-  const srcHydrateDir = config.sys.path.join(config.sys.compiler.distDir, 'hydrate');
+  const srcHydrateDir = config.sys.path.join(config.sys.compiler.packageDir, 'internal', 'hydrate', 'runner.d.ts');
 
-  const runnerDtsFileName = 'index.d.ts';
+  const runnerDtsDestPath = config.sys.path.join(hydrateAppDirPath, 'index.d.ts');
 
-  const runnerDtsSrcPath = config.sys.path.join(srcHydrateDir, runnerDtsFileName);
-
-  const runnerDtsDestPath = config.sys.path.join(hydrateAppDirPath, runnerDtsFileName);
-
-  await compilerCtx.fs.copyFile(runnerDtsSrcPath, runnerDtsDestPath);
+  await compilerCtx.fs.copyFile(srcHydrateDir, runnerDtsDestPath);
 }

@@ -19,10 +19,9 @@ coverage/
 /build/
 /scripts/build/
 dist/
-dist-ts/
-**/www/build/
 
 # submodule packages
+/build-conditionals
 /cli
 /compiler
 /hydrate
@@ -30,16 +29,13 @@ dist-ts/
 /internal
 /mock-doc
 /polyfills
+/runtime
 /server
 /sys
 /testing
-/build-conditionals
-/runtime
 
 /screenshot/index.js
 /screenshot/package.json
-/screenshot/connector.js
-/screenshot/local-connector.js
 /screenshot/pixel-match.js
 /screenshot/*.d.ts
 

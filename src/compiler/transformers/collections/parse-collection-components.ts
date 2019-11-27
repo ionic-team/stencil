@@ -17,6 +17,7 @@ export function parseCollectionComponents(config: d.Config, compilerCtx: d.Compi
       transpileCollectionEntry(config, compilerCtx, buildCtx, collection, componentPath, sourceText);
     });
   }
+  debugger;
 }
 
 
@@ -64,13 +65,7 @@ function transpileCollectionEntry(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   program.emit(undefined, undefined, undefined, undefined, {
     after: [
-      convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, collection, {
-        coreImportPath: '@stencil/core',
-        componentExport: null,
-        componentMetadata: null,
-        proxy: null,
-        style: 'static'
-      })
+      convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, collection, null)
     ]
   });
 }

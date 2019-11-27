@@ -77,7 +77,7 @@ export interface BuildFeatures {
   taskQueue: boolean;
 }
 
-export interface Build extends Partial<BuildFeatures> {
+export interface BuildConditionals extends Partial<BuildFeatures> {
   hotModuleReplacement?: boolean;
   isDebug?: boolean;
   isDev?: boolean;
@@ -91,9 +91,4 @@ export interface Build extends Partial<BuildFeatures> {
   cssVarShim?: boolean;
   constructableCSS?: boolean;
   initializeNextTick?: boolean;
-}
-
-export interface UserBuildConditionals {
-  readonly isDev: boolean;
-  readonly isBrowser: boolean;
 }

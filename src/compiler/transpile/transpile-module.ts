@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
-import { CompilerContext } from '../build/compiler-ctx';
+import { CompilerContext } from '../../compiler_next/build/compiler-ctx';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
@@ -14,7 +14,7 @@ import ts from 'typescript';
  * Mainly used as the typescript preprocessor for unit tests
  */
 export const transpileModule = (config: d.Config, input: string, transformOpts: d.TransformOptions, sourceFilePath?: string) => {
-  const compilerCtx = new CompilerContext(config);
+  const compilerCtx = new CompilerContext();
   const buildCtx = new BuildContext(config, compilerCtx);
 
   if (typeof sourceFilePath === 'string') {

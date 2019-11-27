@@ -1,7 +1,7 @@
 import * as d from '@stencil/core/declarations';
 import { generateBuildFromFsWatch } from '../fs-watch-rebuild';
 import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
-import { normalizePath } from '@stencil/core/utils';
+import { normalizePath } from '@utils';
 import path from 'path';
 
 

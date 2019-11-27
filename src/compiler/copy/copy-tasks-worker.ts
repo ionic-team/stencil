@@ -1,9 +1,8 @@
 import * as d from '../../declarations';
-import { buildError, catchError, flatOne, normalizePath, unique } from '@utils';
+import { buildError, catchError, flatOne, isGlob, normalizePath, unique } from '@utils';
 import { NodeFs } from '../../sys/node/node-fs';
 import path from 'path';
 import glob from 'glob';
-import isGlob from 'is-glob';
 
 
 export async function copyTasksWorker(copyTasks: Required<d.CopyTask>[], srcDir: string) {

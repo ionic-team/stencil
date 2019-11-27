@@ -1,18 +1,10 @@
-import { Config } from '../../dist';
+import { Config } from '../../internal';
 
 export const config: Config = {
 
-  hashFileNames: false,
-
-  outputTargets: [
-    {
-      type: 'www',
-      serviceWorker: null
-    }
-  ],
-
-  enableCache: false,
-
+  outputTargets: [{
+    type: 'dist'
+  }],
   devServer: {
     logRequests: true
   }

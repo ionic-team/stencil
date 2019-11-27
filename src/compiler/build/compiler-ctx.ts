@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import { BuildEvents } from '../events';
+import { buildEvents } from '../events';
 import { Cache } from '../cache';
-import { InMemoryFileSystem, normalizePath } from '@utils';
+import { InMemoryFs, normalizePath } from '@utils';
 
 
 /**
@@ -11,6 +11,7 @@ import { InMemoryFileSystem, normalizePath } from '@utils';
  * is always the same.
  */
 export class CompilerContext implements d.CompilerCtx {
+  version = 1;
   activeBuildId = -1;
   activeFilesAdded: string[] = [];
   activeFilesDeleted: string[] = [];
@@ -21,7 +22,7 @@ export class CompilerContext implements d.CompilerCtx {
   cachedStyleMeta = new Map<string, d.StyleCompiler>();
   collections: d.CollectionCompilerMeta[] = [];
   compilerOptions: any = null;
-  events = new BuildEvents();
+  events = buildEvents();
   fs: d.InMemoryFileSystem;
   fsWatcher: d.FsWatcher = null;
   hasFsWatcherEvents = false;
@@ -41,14 +42,17 @@ export class CompilerContext implements d.CompilerCtx {
   tsService: d.TsService = null;
   cachedGlobalStyle: string;
   styleModeNames = new Set<string>();
+  rollupCache = new Map();
+  changedModules = new Set<string>();
+  worker: d.CompilerWorkerContext = null;
 
   constructor(config: d.Config) {
-    const cacheFs = (config.enableCache && config.sys.fs != null) ? new InMemoryFileSystem(config.sys.fs, config.sys.path) : null;
+    const cacheFs = (config.enableCache && config.sys.fs != null) ? new InMemoryFs(config.sys.fs, config.sys.path) : null;
     this.cache = new Cache(config, cacheFs);
 
     this.cache.initCacheDir();
 
-    this.fs = (config.sys.fs != null ? new InMemoryFileSystem(config.sys.fs, config.sys.path) : null);
+    this.fs = (config.sys.fs != null ? new InMemoryFs(config.sys.fs, config.sys.path) : null);
   }
 
   reset() {
@@ -112,7 +116,9 @@ export const getModule = (config: d.Config, compilerCtx: d.CompilerCtx, sourceFi
       localImports: [],
       originalCollectionComponentPath: null,
       originalImports: [],
-      potentialCmpRefs: []
+      potentialCmpRefs: [],
+      staticSourceFile: null,
+      staticSourceFileText: ''
     };
     compilerCtx.moduleMap.set(sourceFilePath, moduleFile);
     return moduleFile;

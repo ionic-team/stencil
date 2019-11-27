@@ -32,4 +32,4 @@ const fakeBundleIds = (cmp: d.ComponentCompilerMeta) => {
     return modes;
   }
   return '-';
-}
+};

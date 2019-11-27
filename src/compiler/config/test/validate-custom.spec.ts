@@ -1,8 +1,7 @@
 import * as d from '@stencil/core/declarations';
 import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
-import { validateOutputStats } from '../validate-output-stats';
 import { validateOutputTargetCustom } from '../validate-outputs-custom';
-import { buildWarn } from '@stencil/core/utils';
+import { buildWarn } from '@utils';
 
 
 describe('validateCustom', () => {

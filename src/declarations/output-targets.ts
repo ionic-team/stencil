@@ -133,6 +133,7 @@ export interface OutputTargetDistTypes extends OutputTargetBase {
 export interface OutputTargetDistLazy extends OutputTargetBase {
   type: 'dist-lazy';
 
+  dir?: string;
   esmDir?: string;
   esmEs5Dir?: string;
   systemDir?: string;
@@ -161,15 +162,6 @@ export interface OutputTargetDistLazyLoader extends OutputTargetBase {
   componentDts: string;
 
   empty: boolean;
-}
-
-export interface OutputTargetDistModule extends OutputTargetBase {
-  type: 'experimental-dist-module';
-
-  dir?: string;
-  externalRuntime?: boolean;
-  empty?: boolean;
-  copy?: CopyTask[];
 }
 
 
@@ -236,6 +228,23 @@ export interface OutputTargetStats extends OutputTargetBase {
   file?: string;
 }
 
+export interface OutputTargetBaseNext {
+  type: string;
+  dir?: string;
+}
+
+export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
+  type: 'dist-custom-elements';
+  empty?: boolean;
+  copy?: CopyTask[];
+}
+
+export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
+  type: 'dist-custom-elements-bundle';
+  empty?: boolean;
+  copy?: CopyTask[];
+}
+
 export interface OutputTargetBase {
   type: string;
 }
@@ -251,10 +260,11 @@ export type OutputTarget =
  | OutputTargetCustom
  | OutputTargetDist
  | OutputTargetDistCollection
+ | OutputTargetDistCustomElements
+ | OutputTargetDistCustomElementsBundle
  | OutputTargetDistLazy
  | OutputTargetDistGlobalStyles
  | OutputTargetDistLazyLoader
- | OutputTargetDistModule
  | OutputTargetDistSelfContained
  | OutputTargetDocsJson
  | OutputTargetDocsCustom

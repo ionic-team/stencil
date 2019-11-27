@@ -19,7 +19,7 @@ export class Cache implements d.Cache {
       return;
     }
 
-    if (!this.config.enableCache) {
+    if (!this.config.enableCache || !this.cacheFs) {
       this.config.logger.info(`cache optimizations disabled`);
       this.clearDiskCache();
       return;

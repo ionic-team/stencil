@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { DEV_SERVER_URL, OPEN_IN_EDITOR_URL } from '../dev-server-utils';
+import * as c from '../dev-server-constants';
 import { emitBuildStatus } from './build-events';
 import { logDiagnostic } from './logger';
 
@@ -142,7 +142,7 @@ function addOpenInEditor(win: Window, config: d.DevClientConfig, elm: HTMLElemen
       editor: config.editors[0].id
     };
 
-    const url = `${OPEN_IN_EDITOR_URL}?${Object.keys(qs).map(k => `${k}=${(qs as any)[k]}`).join('&')}`;
+    const url = `${c.OPEN_IN_EDITOR_URL}?${Object.keys(qs).map(k => `${k}=${(qs as any)[k]}`).join('&')}`;
     win.fetch(url);
   });
 }
@@ -168,7 +168,7 @@ function getDevServerModal(doc: Document) {
 
   outer.innerHTML = `
     <style>#${DEV_SERVER_MODAL} { display: none; }</style>
-    <link href="${DEV_SERVER_URL}/app-error.css" rel="stylesheet">
+    <link href="${c.DEV_SERVER_URL}/app-error.css" rel="stylesheet">
     <div id="${DEV_SERVER_MODAL}-inner"></div>
   `;
 

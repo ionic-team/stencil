@@ -1,8 +1,9 @@
+import { BuildEmitEvents } from './build-events';
 import { BuildLog, BuildResults } from './build';
-import { FsStats } from './file-system';
+import { CompilerFsStats } from './compiler_next';
 
 
-export interface DevServer {
+export interface DevServer extends BuildEmitEvents {
   browserUrl: string;
   close(): Promise<void>;
 }
@@ -17,6 +18,10 @@ export interface StencilDevServerConfig {
    * Base path to be used by the server. Defaults to the root pathname.
    */
   basePath?: string;
+  /**
+   * If the dev server should respond with gzip compressed content. Defaults to `true`.
+   */
+  gzip?: boolean;
   /**
    * When set, the dev server will run via https using the SSL certificate and key you provide (use `fs` if you want to read them from files).
    */
@@ -51,7 +56,6 @@ export interface DevServerConfig extends StencilDevServerConfig {
   devServerDir?: string;
   editors?: DevServerEditor[];
   excludeHmr?: string[];
-  gzip?: boolean;
   historyApiFallback?: HistoryApiFallback;
   openBrowser?: boolean;
   protocol?: 'http' | 'https';
@@ -66,8 +70,9 @@ export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
 
 export interface DevServerStartResponse {
-  browserUrl?: string;
-  initialLoadUrl?: string;
+  browserUrl: string;
+  initialLoadUrl: string;
+  error: string;
 }
 
 
@@ -97,7 +102,7 @@ export interface HttpRequest {
   url: string;
   pathname?: string;
   filePath?: string;
-  stats?: FsStats;
+  stats?: CompilerFsStats;
   headers?: {[name: string]: string};
   host?: string;
 }
@@ -105,7 +110,7 @@ export interface HttpRequest {
 
 export interface DevServerMessage {
   startServer?: DevServerConfig;
-  serverStated?: DevServerStartResponse;
+  serverStarted?: DevServerStartResponse;
   buildLog?: BuildLog;
   buildResults?: BuildResults;
   requestBuildResults?: boolean;

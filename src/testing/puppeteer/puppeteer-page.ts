@@ -1,22 +1,22 @@
-import * as d from '../../declarations';
-import * as pd from './puppeteer-declarations';
+import { E2EProcessEnv, EmulateConfig, HostElement, JestEnvironmentGlobal } from '@stencil/core/internal';
+import { E2EPage, E2EPageInternal, FindSelector, NewE2EPageOptions, PageDiagnostic } from './puppeteer-declarations';
 import { find, findAll } from './puppeteer-find';
 import { initPageEvents, waitForEvent } from './puppeteer-events';
 import { initPageScreenshot } from './puppeteer-screenshot';
 import * as puppeteer from 'puppeteer';
 
 
-declare const global: d.JestEnvironmentGlobal;
+declare const global: JestEnvironmentGlobal;
 
 
-const env: d.E2EProcessEnv = process.env;
-export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2EPage> {
+const env: E2EProcessEnv = process.env;
+export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage> {
   if (!global.__NEW_TEST_PAGE__) {
     throw new Error(`newE2EPage() is only available from E2E tests, and ran with the --e2e cmd line flag.`);
   }
 
-  const page: pd.E2EPageInternal = await global.__NEW_TEST_PAGE__();
-  const diagnostics: pd.PageDiagnostic[] = [];
+  const page: E2EPageInternal = await global.__NEW_TEST_PAGE__();
+  const diagnostics: PageDiagnostic[] = [];
   try {
     page._e2eElements = [];
 
@@ -71,12 +71,12 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
       return documentJsHandle.asElement();
     };
 
-    page.find = async (selector: pd.FindSelector) => {
+    page.find = async (selector: FindSelector) => {
       const docHandle = await getDocHandle();
       return find(page, docHandle, selector) as any;
     };
 
-    page.findAll = async (selector: pd.FindSelector) => {
+    page.findAll = async (selector: FindSelector) => {
       const docHandle = await getDocHandle();
       return findAll(page, docHandle, selector) as any;
     };
@@ -162,7 +162,7 @@ export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2
   return page;
 }
 
-async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer.NavigationOptions = {}) {
+async function e2eGoTo(page: E2EPageInternal, url: string, options: puppeteer.NavigationOptions = {}) {
 
   if (page.isClosed()) {
     throw new Error('e2eGoTo unavailable: page already closed');
@@ -198,7 +198,7 @@ async function e2eGoTo(page: pd.E2EPageInternal, url: string, options: puppeteer
 }
 
 
-async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: puppeteer.NavigationOptions = {}) {
+async function e2eSetContent(page: E2EPageInternal, html: string, options: puppeteer.NavigationOptions = {}) {
   if (page.isClosed()) {
     throw new Error('e2eSetContent unavailable: page already closed');
   }
@@ -249,7 +249,7 @@ async function e2eSetContent(page: pd.E2EPageInternal, html: string, options: pu
 }
 
 
-async function waitForStencil(page: pd.E2EPage) {
+async function waitForStencil(page: E2EPage) {
   try {
     await page.waitForFunction('window.stencilAppLoaded', {timeout: 4500});
 
@@ -269,7 +269,7 @@ async function setPageEmulate(page: puppeteer.Page) {
     return;
   }
 
-  const screenshotEmulate = JSON.parse(emulateJsonContent) as d.EmulateConfig;
+  const screenshotEmulate = JSON.parse(emulateJsonContent) as EmulateConfig;
 
   const emulateOptions: puppeteer.EmulateOptions = {
     viewport: screenshotEmulate.viewport,
@@ -280,7 +280,7 @@ async function setPageEmulate(page: puppeteer.Page) {
 }
 
 
-async function waitForChanges(page: pd.E2EPageInternal) {
+async function waitForChanges(page: E2EPageInternal) {
   try {
     if (page.isClosed()) {
       return;
@@ -304,8 +304,8 @@ async function waitForChanges(page: pd.E2EPageInternal) {
               for (let i = 0; i < len; i++) {
                 const childElm = children[i];
                 if (childElm != null) {
-                  if (childElm.tagName.includes('-') && typeof (childElm as d.HostElement).componentOnReady === 'function') {
-                    promises.push((childElm as d.HostElement).componentOnReady());
+                  if (childElm.tagName.includes('-') && typeof (childElm as HostElement).componentOnReady === 'function') {
+                    promises.push((childElm as HostElement).componentOnReady());
                   }
                   waitComponentOnReady(childElm, promises);
                 }

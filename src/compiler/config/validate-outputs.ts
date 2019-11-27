@@ -3,7 +3,6 @@ import { validateOutputStats } from './validate-output-stats';
 import { validateOutputTargetDist } from './validate-outputs-dist';
 import { validateOutputTargetDistHydrateScript } from './validate-outputs-hydrate-script';
 import { validateOutputTargetWww } from './validate-outputs-www';
-import { validateOutputTargetDistModule } from './validate-outputs-dist-module';
 import { validateOutputTargetAngular } from './validate-outputs-angular';
 import { validateDocs } from './validate-docs';
 import { VALID_TYPES, WWW } from '../output-targets/output-utils';
@@ -33,10 +32,8 @@ export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnosti
   validateOutputTargetDist(config);
   validateOutputTargetAngular(config);
   validateOutputTargetDistHydrateScript(config);
-  validateOutputTargetDistModule(config);
   validateDocs(config, diagnostics);
   validateOutputStats(config);
-
 
   if (!config.outputTargets || config.outputTargets.length === 0) {
     const err = buildError(diagnostics);

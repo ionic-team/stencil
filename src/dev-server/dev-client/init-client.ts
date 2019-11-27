@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
+import * as c from '../dev-server-constants';
 import { appReset, initAppUpdate } from './app-update';
-import { DEV_SERVER_INIT_URL } from '../dev-server-utils';
 import { initBuildProgress } from './build-progress';
 import { initBuildStatus } from './build-status';
 import { initClientWebSocket } from './client-web-socket';
@@ -45,5 +45,5 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
 function isInitialDevServerLoad(win: d.DevClientWindow, config: d.DevClientConfig) {
   let pathname = win.location.pathname;
   pathname = '/' + pathname.substring(config.basePath.length);
-  return pathname === DEV_SERVER_INIT_URL;
+  return pathname === c.DEV_SERVER_INIT_URL;
 }

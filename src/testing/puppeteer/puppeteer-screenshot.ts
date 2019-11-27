@@ -1,15 +1,15 @@
-import * as d from '../../declarations';
+import { E2EProcessEnv, EmulateConfig, JestEnvironmentGlobal, ScreenshotBuildData, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
 import { compareScreenshot } from '../../screenshot/screenshot-compare';
 import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 
 
 export function initPageScreenshot(page: pd.E2EPageInternal) {
-  const env = (process.env) as d.E2EProcessEnv;
+  const env = (process.env) as E2EProcessEnv;
 
   if (env.__STENCIL_SCREENSHOT__ === 'true') {
     page.compareScreenshot = (a?: any, b?: any) => {
-      const jestEnv: d.JestEnvironmentGlobal = (global as any);
+      const jestEnv: JestEnvironmentGlobal = (global as any);
 
       let desc = '';
       let testPath = '';
@@ -22,7 +22,7 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
           testPath = jestEnv.currentSpec.testPath;
         }
       }
-      let opts: d.ScreenshotOptions;
+      let opts: ScreenshotOptions;
 
       if (typeof a === 'string') {
         if (desc.length > 0) {
@@ -57,7 +57,7 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
   } else {
     // screen shot not enabled, so just skip over all the logic
     page.compareScreenshot = async () => {
-      const diff: d.ScreenshotDiff = {
+      const diff: ScreenshotDiff = {
         mismatchedPixels: 0,
         allowableMismatchedPixels: 1,
         allowableMismatchedRatio: 1,
@@ -72,7 +72,7 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
 }
 
 
-export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: d.E2EProcessEnv, desc: string, testPath: string, opts: d.ScreenshotOptions) {
+export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: E2EProcessEnv, desc: string, testPath: string, opts: ScreenshotOptions) {
   if (typeof env.__STENCIL_EMULATE__ !== 'string') {
     throw new Error(`compareScreenshot, missing screenshot emulate env var`);
   }
@@ -81,8 +81,8 @@ export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: d.E2E
     throw new Error(`compareScreenshot, missing screen build env var`);
   }
 
-  const emulateConfig = JSON.parse(env.__STENCIL_EMULATE__) as d.EmulateConfig;
-  const screenshotBuildData = JSON.parse(env.__STENCIL_SCREENSHOT_BUILD__) as d.ScreenshotBuildData;
+  const emulateConfig = JSON.parse(env.__STENCIL_EMULATE__) as EmulateConfig;
+  const screenshotBuildData = JSON.parse(env.__STENCIL_SCREENSHOT_BUILD__) as ScreenshotBuildData;
 
   await wait(screenshotBuildData.timeoutBeforeScreenshot);
   await page.evaluate(() => {
@@ -102,7 +102,7 @@ export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: d.E2E
 }
 
 
-function createPuppeteerScreenshopOptions(opts: d.ScreenshotOptions) {
+function createPuppeteerScreenshopOptions(opts: ScreenshotOptions) {
   const puppeteerOpts: puppeteer.ScreenshotOptions = {
     type: 'png',
     fullPage: opts.fullPage,

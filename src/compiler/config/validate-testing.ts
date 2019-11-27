@@ -4,7 +4,7 @@ import { buildError, buildWarn } from '@utils';
 
 
 export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
-  const testing = config.testing = config.testing || {};
+  const testing = config.testing = Object.assign({}, config.testing || {});
 
   if (!config.flags || (!config.flags.e2e && !config.flags.spec)) {
     return;

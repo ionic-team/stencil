@@ -10,7 +10,7 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
   const esmOutputs = outputTargets.filter(o => !!o.esmDir && !o.isBrowserBuild);
   if (esmOutputs.length + esmEs5Outputs.length > 0) {
     const esmOpts: OutputOptions = {
-      format: 'esm',
+      format: 'es',
       entryFileNames: '[name].mjs',
       preferConst: true
     };
@@ -35,7 +35,7 @@ async function copyPolyfills(config: d.Config, compilerCtx: d.CompilerCtx, outpu
     return;
   }
 
-  const src = config.sys.getClientPath('polyfills');
+  const src = config.sys.path.join(config.sys.compiler.packageDir, 'internal', 'client', 'polyfills');
   const files = await compilerCtx.fs.readdir(src);
 
   await Promise.all(destinations.map(dest => {

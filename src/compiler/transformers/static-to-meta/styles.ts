@@ -31,8 +31,15 @@ export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, 
       }
 
     } else if ((parsedStyle as ConvertIdentifier).__identifier) {
-      styles.push(parseStyleIdentifier(parsedStyle));
+      styles.push(parseStyleIdentifier(parsedStyle, DEFAULT_STYLE_MODE));
       compilerCtx.styleModeNames.add(DEFAULT_STYLE_MODE);
+
+    } else if (typeof parsedStyle === 'object') {
+      Object.keys(parsedStyle).forEach(modeName => {
+        const parsedStyleMode = parsedStyle[modeName];
+        styles.push(parseStyleIdentifier(parsedStyleMode, modeName));
+        compilerCtx.styleModeNames.add(modeName);
+      });
     }
   }
 
@@ -73,9 +80,9 @@ export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, 
   return sortBy(styles, s => s.modeName);
 };
 
-const parseStyleIdentifier = (parsedStyle: ConvertIdentifier) => {
+const parseStyleIdentifier = (parsedStyle: ConvertIdentifier, modeName: string) => {
   const style: d.StyleCompiler = {
-    modeName: DEFAULT_STYLE_MODE,
+    modeName: modeName,
     styleId: null,
     styleStr: null,
     styleIdentifier: parsedStyle.__escapedText,

@@ -40,13 +40,41 @@ export const styleToStatic = (config: d.Config, newMembers: ts.ClassElement[], c
   if (typeof componentOptions.styles === 'string') {
     const styles = componentOptions.styles.trim();
     if (styles.length > 0) {
+      // @Component({
+      //   styles: ":host {...}"
+      // })
       newMembers.push(createStaticGetter('styles', ts.createLiteral(styles)));
     }
 
   } else if (componentOptions.styles) {
     const convertIdentifier = (componentOptions.styles as any) as ConvertIdentifier;
     if (convertIdentifier.__identifier) {
-      newMembers.push(createStaticGetter('styles', ts.createIdentifier(convertIdentifier.__escapedText)));
+      // import styles from './styles.css';
+      // @Component({
+      //   styles
+      // })
+      const stylesIdentifier = convertIdentifier.__escapedText;
+      newMembers.push(createStaticGetter('styles', ts.createIdentifier(stylesIdentifier)));
+
+    } else if (typeof convertIdentifier === 'object') {
+      // import ios from './ios.css';
+      // import md from './md.css';
+      // @Component({
+      //   styles: {
+      //     ios
+      //     md
+      //   }
+      // })
+      const styleModeIdentifiers: any = {};
+      Object.keys(convertIdentifier).forEach(modeName => {
+        const styleModeIdentifier = (convertIdentifier as any)[modeName] as ConvertIdentifier;
+        if (styleModeIdentifier.__identifier) {
+          styleModeIdentifiers[modeName] = styleModeIdentifier.__escapedText;
+        }
+      });
+      if (Object.keys(styleModeIdentifiers).length > 0) {
+        newMembers.push(createStaticGetter('styles', ts.createIdentifier(styleModeIdentifiers)));
+      }
     }
   }
 };

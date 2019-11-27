@@ -4,7 +4,7 @@ import { generateAppTypes } from '../types/generate-app-types';
 import { getComponentsFromModules } from '../output-targets/output-utils';
 import { resolveComponentDependencies} from '../entries/resolve-component-dependencies';
 import { transpileService } from './transpile-service';
-import { updateComponentBuildConditionals } from '../app-core/build-conditionals';
+import { updateComponentBuildConditionals } from '../../compiler_next/build/app-data';
 import { validateTypesMain } from './validate-types-main';
 
 

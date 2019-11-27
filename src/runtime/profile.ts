@@ -1,6 +1,6 @@
-import { BUILD } from '@build-conditionals';
-import { getHostRef, win } from '@platform';
 import * as d from '../declarations';
+import { BUILD } from '@app-data';
+import { getHostRef, win } from '@platform';
 import { HOST_FLAGS } from '@utils';
 
 let i = 0;

@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
-import { normalizePath, sortBy } from '@utils';
-import isGlob from 'is-glob';
+import { isGlob, normalizePath, sortBy } from '@utils';
 import minimatch from 'minimatch';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 import { getScopeId } from '../style/scope-css';

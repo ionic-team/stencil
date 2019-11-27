@@ -24,6 +24,8 @@ export interface Module {
   originalCollectionComponentPath: string;
   potentialCmpRefs: string[];
   sourceFilePath: string;
+  staticSourceFile: any;
+  staticSourceFileText: string;
 
   // build features
   hasVdomAttribute: boolean;

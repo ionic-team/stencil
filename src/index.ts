@@ -1,4 +1,21 @@
-import * as d from './declarations';
+import {
+  ComponentDecorator,
+  ElementDecorator,
+  EventDecorator,
+  FunctionalComponent,
+  HTMLStencilElement,
+  JSX as LocalJSX,
+  JSXBase,
+  ListenDecorator,
+  MethodDecorator,
+  PropDecorator,
+  RafCallback,
+  StateDecorator,
+  UserBuildConditionals,
+  VNode,
+  VNodeData,
+  WatchDecorator
+} from './declarations';
 
 export {
   ComponentDidLoad,
@@ -17,47 +34,47 @@ export {
 /**
  * Build
  */
-export declare const Build: d.UserBuildConditionals;
+export declare const Build: UserBuildConditionals;
 
 /**
  * Component
  */
-export declare const Component: d.ComponentDecorator;
+export declare const Component: ComponentDecorator;
 
 /**
  * Element
  */
-export declare const Element: d.ElementDecorator;
+export declare const Element: ElementDecorator;
 
 /**
  * Event
  */
-export declare const Event: d.EventDecorator;
+export declare const Event: EventDecorator;
 
 /**
  * Listen
  */
-export declare const Listen: d.ListenDecorator;
+export declare const Listen: ListenDecorator;
 
 /**
  * Method
  */
-export declare const Method: d.MethodDecorator;
+export declare const Method: MethodDecorator;
 
 /**
  * Prop
  */
-export declare const Prop: d.PropDecorator;
+export declare const Prop: PropDecorator;
 
 /**
  * State
  */
-export declare const State: d.StateDecorator;
+export declare const State: StateDecorator;
 
 /**
  * Watch
  */
-export declare const Watch: d.WatchDecorator;
+export declare const Watch: WatchDecorator;
 
 /**
  * setMode
@@ -77,17 +94,17 @@ export declare function getAssetPath(path: string): string;
 /**
  * getElement
  */
-export declare function getElement(ref: any): d.HTMLStencilElement;
+export declare function getElement(ref: any): HTMLStencilElement;
 
 /**
  * writeTask
  */
-export declare function writeTask(task: d.RafCallback): void;
+export declare function writeTask(task: RafCallback): void;
 
 /**
  * readTask
  */
-export declare function readTask(task: d.RafCallback): void;
+export declare function readTask(task: RafCallback): void;
 
 /**
  * forceUpdate
@@ -105,24 +122,24 @@ interface HostAttributes {
   [prop: string]: any;
 }
 
-export declare const Host: d.FunctionalComponent<HostAttributes>;
+export declare const Host: FunctionalComponent<HostAttributes>;
 
 /**
  * The "h" namespace is used to import JSX types for elements and attributes.
  * It is imported in order to avoid conflicting global JSX issues.
  */
 export declare namespace h {
-  export function h(sel: any): d.VNode;
-  export function h(sel: Node, data: d.VNodeData): d.VNode;
-  export function h(sel: any, data: d.VNodeData): d.VNode;
-  export function h(sel: any, text: string): d.VNode;
-  export function h(sel: any, children: Array<d.VNode | undefined | null>): d.VNode;
-  export function h(sel: any, data: d.VNodeData, text: string): d.VNode;
-  export function h(sel: any, data: d.VNodeData, children: Array<d.VNode | undefined | null>): d.VNode;
-  export function h(sel: any, data: d.VNodeData, children: d.VNode): d.VNode;
+  export function h(sel: any): VNode;
+  export function h(sel: Node, data: VNodeData): VNode;
+  export function h(sel: any, data: VNodeData): VNode;
+  export function h(sel: any, text: string): VNode;
+  export function h(sel: any, children: Array<VNode | undefined | null>): VNode;
+  export function h(sel: any, data: VNodeData, text: string): VNode;
+  export function h(sel: any, data: VNodeData, children: Array<VNode | undefined | null>): VNode;
+  export function h(sel: any, data: VNodeData, children: VNode): VNode;
 
   export namespace JSX {
-    interface IntrinsicElements extends d.JSX.IntrinsicElements, d.JSXBase.IntrinsicElements {
+    interface IntrinsicElements extends LocalJSX.IntrinsicElements, JSXBase.IntrinsicElements {
       [tagName: string]: any;
     }
   }

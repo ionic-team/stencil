@@ -1,7 +1,7 @@
 import * as d from '@stencil/core/declarations';
-import { InMemoryFileSystem, getCommitInstructions, isTextFile, shouldIgnore } from '../in-memory-fs';
-import { mockFs } from '@stencil/core/testing';
-import { normalizePath } from '@stencil/core/utils';
+import { InMemoryFs, getCommitInstructions, isTextFile, shouldIgnore } from '../in-memory-fs';
+import { TestingFs, mockFs } from '@stencil/core/testing';
+import { normalizePath } from '@utils';
 import path from 'path';
 
 
@@ -13,15 +13,31 @@ describe(`in-memory-fs, getCommitInstructions`, () => {
     d = new Map();
   });
 
+  function createFsItem(fsItem: any): d.FsItem {
+    const defaultItem: d.FsItem = {
+      exists: null,
+      fileText: null,
+      size: null,
+      mtimeMs: null,
+      isDirectory: null,
+      isFile: null,
+      queueCopyFileToDest: null,
+      queueDeleteFromDisk: null,
+      queueWriteToDisk: null,
+      useCache: null
+    };
+    return Object.assign(defaultItem, fsItem);
+  }
+
   it(`dirsToDelete, sort longest to shortest, windows`, () => {
     const root = normalizePath(`C:\\`);
     const dir1 = normalizePath(`C:\\dir1\\`);
     const dir2 = normalizePath(`C:\\dir1\\dir2\\`);
     const dir3 = normalizePath(`C:\\dir1\\dir2\\dir3\\`);
-    d.set(root, { queueDeleteFromDisk: true, isDirectory: true });
-    d.set(dir2, { queueDeleteFromDisk: true, isDirectory: true });
-    d.set(dir3, { queueDeleteFromDisk: true, isDirectory: true });
-    d.set(dir1, { queueDeleteFromDisk: true, isDirectory: true });
+    d.set(root, createFsItem({ queueDeleteFromDisk: true, isDirectory: true }));
+    d.set(dir2, createFsItem({ queueDeleteFromDisk: true, isDirectory: true }));
+    d.set(dir3, createFsItem({ queueDeleteFromDisk: true, isDirectory: true }));
+    d.set(dir1, createFsItem({ queueDeleteFromDisk: true, isDirectory: true }));
     const i = getCommitInstructions(path, d);
     expect(i.filesToDelete).toEqual([]);
     expect(i.filesToWrite).toEqual([]);
@@ -162,7 +178,7 @@ describe(`in-memory-fs`, () => {
 
   beforeEach(() => {
     mockedFs = mockFs();
-    fs = new InMemoryFileSystem(mockedFs, path);
+    fs = new InMemoryFs(mockedFs, path);
   });
 
 
@@ -648,28 +664,6 @@ describe(`in-memory-fs`, () => {
 
 
   describe('fs utils', () => {
-
-    it('isTextFile', () => {
-      const filePaths = [
-        '/file.ts', '/file.tsx', '/file.js', '/file.jsx', '/file.svg',
-        '/file.html', '/file.txt', '/file.md', '/file.markdown',
-        '/file.css', '/file.scss', '/file.sass', '/file.less', '/file.styl'
-      ];
-      filePaths.forEach(filePath => {
-        expect(isTextFile(filePath)).toBe(true);
-      });
-    });
-
-    it('not isTextFile', () => {
-      const filePaths = [
-        '/file.png', '/file.gif', '/file.jpg', '/file.jpeg',
-        '/file.psd', '/file.pdf', '/file.bmp',
-        '/file.woff2', '/file.woff', '/file.ttf', '/file.eot'
-      ];
-      filePaths.forEach(filePath => {
-        expect(isTextFile(filePath)).toBe(false);
-      });
-    });
 
     it('not shouldIgnore', () => {
       const filePaths = [

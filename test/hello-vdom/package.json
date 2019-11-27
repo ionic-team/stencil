@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "node ../../bin/stencil build",
-    "start": "node ../../bin/stencil build --dev --watch --serve",
+    "start": "node ../../bin/stencil build --dev --watch --serve --next",
     "start.prod": "node ../../bin/stencil build --watch --serve"
   }
 }

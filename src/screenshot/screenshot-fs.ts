@@ -1,5 +1,5 @@
-import * as d from '../declarations';
-import fs from 'graceful-fs';
+import * as d from '@stencil/core/internal';
+import fs from 'fs';
 import path from 'path';
 
 

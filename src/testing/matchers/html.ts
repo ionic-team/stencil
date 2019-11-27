@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '@stencil/core/internal';
 
 import { NODE_TYPES, parseHtmlToFragment, serializeNodeToHtml } from '@mock-doc';
 

@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { BUILD } from '@build-conditionals';
+import { BUILD } from '@app-data';
 import { consoleError, loadModule, styles } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { proxyComponent } from './proxy-component';
@@ -14,7 +14,7 @@ import { createTime, uniqueTime } from './profile';
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: any) => {
 
   // initializeComponent
-  if ((BUILD.lazyLoad || BUILD.style) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
+  if ((BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.style) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
     // we haven't initialized this element yet
     hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
 
@@ -29,7 +29,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       elm.setAttribute('s-mode', hostRef.$modeName$);
     }
 
-    if (BUILD.lazyLoad) {
+    if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
       // lazy loaded components
       // request the component's implementation to be
       // wired up with the host element

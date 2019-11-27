@@ -10,6 +10,7 @@ export class BuildContext implements d.BuildCtx {
   buildId = -1;
   buildMessages: string[] = [];
   buildResults: d.BuildResults = null;
+  buildResults_next: d.CompilerBuildResults = null;
   bundleBuildCount = 0;
   collections: d.Collection[] = [];
   completedTasks: d.BuildTask[] = [];
@@ -40,6 +41,7 @@ export class BuildContext implements d.BuildCtx {
   indexDoc: Document = undefined;
   isRebuild = false;
   moduleFiles: d.Module[] = [];
+  outputs: d.BuildOutput[] = [];
   packageJson: d.PackageJsonData = {};
   packageJsonFilePath: string = null;
   pendingCopyTasks: Promise<d.CopyResults>[] = [];
@@ -59,6 +61,8 @@ export class BuildContext implements d.BuildCtx {
     this.config = config;
     this.compilerCtx = compilerCtx;
     this.buildId = ++this.compilerCtx.activeBuildId;
+
+    this.debug = config.logger.debug.bind(config.logger);
   }
 
   start() {
@@ -81,6 +85,12 @@ export class BuildContext implements d.BuildCtx {
 
     // debug log our new build
     this.debug(`start build, ${this.timestamp}`);
+
+    const buildStart: d.CompilerBuildStart = {
+      buildId: this.buildId,
+      timestamp: this.timestamp
+    };
+    this.compilerCtx.events.emit('buildStart', buildStart);
   }
 
   createTimeSpan(msg: string, debug?: boolean) {
@@ -136,11 +146,7 @@ export class BuildContext implements d.BuildCtx {
   }
 
   debug(msg: string) {
-    if (this.config.watch) {
-      this.config.logger.debug(`${this.config.logger.cyan('[' + this.buildId + ']')} ${msg}`);
-    } else {
-      this.config.logger.debug(msg);
-    }
+    this.config.logger.debug(msg);
   }
 
   get hasError() {

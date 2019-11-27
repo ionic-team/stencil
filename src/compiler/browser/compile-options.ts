@@ -1,11 +1,11 @@
-import * as d from '../../declarations';
+import { CompileOptions, CompileScriptMinifyOptions, Config, SourceTarget, TransformOptions } from '../../declarations';
 import { getTerserOptions } from '../app-core/optimize-module';
 import path from 'path';
 import ts from 'typescript';
 
 
-export const getCompileOptions = (input: d.CompileOptions, filePath: string) => {
-  const rtn: d.CompileOptions = {
+export const getCompileOptions = (input: CompileOptions) => {
+  const rtn: CompileOptions = {
     componentExport: getConfig(input.componentExport, VALID_EXPORT, 'customelement'),
     componentMetadata: getConfig(input.componentMetadata, VALID_METADATA, null),
     proxy: getConfig(input.proxy, VALID_PROXY, 'defineproperty'),
@@ -13,25 +13,7 @@ export const getCompileOptions = (input: d.CompileOptions, filePath: string) => 
     script: getConfig(input.script, VALID_SCRIPT, 'es2017'),
     style: getConfig(input.style, VALID_STYLE, 'static'),
     data: input.data ? Object.assign({}, input.data) : null,
-    type: input.type
   };
-
-  if (rtn.type == null) {
-    const fileName = path.basename(filePath).trim().toLowerCase();
-    if (fileName.endsWith('.d.ts')) {
-      rtn.type = 'dts';
-    } else if (fileName.endsWith('.tsx')) {
-      rtn.type = 'tsx';
-    } else if (fileName.endsWith('.ts')) {
-      rtn.type = 'ts';
-    } else if (fileName.endsWith('.jsx')) {
-      rtn.type = 'jsx';
-    } else if (fileName.endsWith('.js') || fileName.endsWith('.mjs')) {
-      rtn.type = 'js';
-    } else if (fileName.endsWith('.css') && rtn.data != null) {
-      rtn.type = 'css';
-    }
-  }
 
   return rtn;
 };
@@ -55,8 +37,8 @@ const VALID_SCRIPT = new Set(['latest', 'esnext', 'es2017', 'es2015', 'es5']);
 const VALID_STYLE = new Set(['static']);
 
 
-export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
-  const transformOpts: d.TransformOptions = {
+export const getTransformOptions = (compilerOpts: CompileOptions) => {
+  const transformOpts: TransformOptions = {
 
     // best we always set this to true
     allowSyntheticDefaultImports: true,
@@ -130,7 +112,7 @@ export const getTransformOptions = (compilerOpts: d.CompileOptions) => {
 
 
 export const getCompilerConfig = () => {
-  const config: d.Config = {
+  const config: Config = {
     cwd: '/',
     rootDir: '/',
     srcDir: '/',
@@ -147,8 +129,8 @@ export const getCompilerConfig = () => {
 };
 
 
-export const getMinifyScriptOptions = (opts: d.CompileScriptMinifyOptions = {}) => {
-  const sourceTarget: d.SourceTarget = (opts.script === 'es5') ? 'es5' : 'es2017';
+export const getMinifyScriptOptions = (opts: CompileScriptMinifyOptions = {}) => {
+  const sourceTarget: SourceTarget = (opts.script === 'es5') ? 'es5' : 'es2017';
   const isPretty = !!opts.pretty;
   return {
     options: getTerserOptions(sourceTarget, isPretty),

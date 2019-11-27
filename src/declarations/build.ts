@@ -1,3 +1,4 @@
+import { CompilerBuildResults } from './compiler_next';
 import { Collection } from './collection';
 import { CompilerCtx } from './compiler';
 import { ComponentCompilerMeta, Encapsulation } from './component-compiler-meta';
@@ -33,6 +34,7 @@ export interface RollupResults {
 export interface BuildCtx {
   buildId: number;
   buildResults: BuildResults;
+  buildResults_next: CompilerBuildResults;
   buildMessages: string[];
   bundleBuildCount: number;
   collections: Collection[];
@@ -113,6 +115,7 @@ export interface BuildResults {
   };
   bundleBuildCount: number;
   components: BuildComponent[];
+  componentGraph: Map<string, string[]>;
   diagnostics: Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
@@ -126,6 +129,7 @@ export interface BuildResults {
   hasError: boolean;
   hasSuccessfulBuild: boolean;
   hmr?: HotModuleReplacement;
+  hydrateAppFilePath?: string;
   isRebuild: boolean;
   styleBuildCount: number;
   transpileBuildCount: number;

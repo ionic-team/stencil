@@ -1,5 +1,5 @@
 import { CustomStyle } from '../custom-style';
-import { mockWindow } from '../../../../testing/mocks';
+import { mockWindow } from '@stencil/core/testing';
 
 
 describe('css-shim', () => {
@@ -12,14 +12,14 @@ describe('css-shim', () => {
       --custom-a: red;
     }
     `);
-    await customStyle.addGlobalStyle(rootElm);
+    customStyle.addGlobalStyle(rootElm);
 
     const styleElm = style(`
     p {
       color: var(--custom-a);
     }
     `);
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`
@@ -45,7 +45,7 @@ describe('css-shim', () => {
       color: var(--custom-a);
     }
     `);
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`
@@ -68,7 +68,7 @@ describe('css-shim', () => {
       color: var(--custom-a);
     }
     `);
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`
@@ -92,7 +92,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`
@@ -113,7 +113,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`
@@ -136,7 +136,7 @@ describe('css-shim', () => {
       background-image: var(--stencil-logo);
     }
     `);
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`
@@ -160,7 +160,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`
@@ -180,7 +180,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
 
@@ -202,7 +202,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
 
@@ -227,7 +227,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`
@@ -250,7 +250,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`
@@ -273,7 +273,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`
@@ -299,7 +299,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`
@@ -326,7 +326,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`
@@ -358,7 +358,7 @@ describe('css-shim', () => {
       }
     `);
 
-    await customStyle.addGlobalStyle(styleElm);
+    customStyle.addGlobalStyle(styleElm);
 
     expect(css(styleElm.textContent)).toBe(
       css(`

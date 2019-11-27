@@ -1,7 +1,8 @@
 import * as d from '../declarations';
-import { BUILD } from '@build-conditionals';
-import { consoleDevWarn, getElement, win } from '@platform';
+import { BUILD } from '@app-data';
+import { consoleDevWarn, win } from '@platform';
 import { EVENT_FLAGS } from '@utils';
+import { getElement } from './element';
 
 
 export const createEvent = (ref: d.RuntimeRef, name: string, flags: number) => {

@@ -38,11 +38,11 @@
       "@stencil/core/testing": [
         "../testing/index.ts"
       ],
-      "@stencil/core/utils": [
-        "../utils/index.ts"
-      ],
       "@stencil/core": [
         "../index.ts"
+      ],
+      "@utils": [
+        "../utils/index.ts"
       ]
     }
   }

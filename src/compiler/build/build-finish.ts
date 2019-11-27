@@ -43,13 +43,6 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
       config.logger.printDiagnostics(buildCtx.buildResults.diagnostics);
     }
 
-    if (!compilerCtx.hasLoggedServerUrl && config.devServer && config.devServer.browserUrl && config.flags.serve) {
-      // we've opened up the dev server
-      // let's print out the dev server url
-      config.logger.info(`dev server: ${config.logger.cyan(config.devServer.browserUrl)}`);
-      compilerCtx.hasLoggedServerUrl = true;
-    }
-
     const hasChanges = buildCtx.hasScriptChanges || buildCtx.hasStyleChanges;
     if (buildCtx.isRebuild && hasChanges && buildCtx.buildResults.hmr && !aborted) {
       // this is a rebuild, and we've got hmr data
@@ -86,7 +79,7 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
     }
 
     // emit a buildFinish event for anyone who cares
-    compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
+    compilerCtx.events.emit('buildFinish', buildCtx.buildResults as any);
 
     // write all of our logs to disk if config'd to do so
     // do this even if there are errors or not the active build

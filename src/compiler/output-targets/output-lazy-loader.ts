@@ -25,7 +25,7 @@ async function generateLoader(config: d.Config, compilerCtx: d.CompilerCtx, outp
     return;
   }
 
-  const es5HtmlElement = await getClientPolyfill(config, 'es5-html-element.js');
+  const es5HtmlElement = await getClientPolyfill(config, compilerCtx, 'es5-html-element.js');
 
   const packageJsonContent = JSON.stringify({
     'name': config.fsNamespace + '-loader',

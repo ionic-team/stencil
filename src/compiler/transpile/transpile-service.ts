@@ -143,8 +143,10 @@ const buildTsService = async (config: d.Config, compilerCtx: d.CompilerCtx, buil
     transpileCtx.compilerCtx = compilerCtx;
     transpileCtx.buildCtx = buildCtx;
 
-    // ensure components.d.ts isn't in the transpile (for now)
     const cmpDts = getComponentsDtsSrcFilePath(config);
+    if (!tsFilePaths.includes(cmpDts)) {
+      tsFilePaths.push(cmpDts);
+    }
     tsFilePaths = tsFilePaths.filter(tsFilePath => tsFilePath !== cmpDts);
 
     // loop through each ts file that has changed
@@ -365,7 +367,7 @@ const primeTsServiceCache = (transpileCtx: TranspileContext) => {
   // let's go through and run the ts service on these files again again so
   // that the ts service cache is all updated and ready to go. But this can
   // happen after the first build since so far we're good to go w/ the fs cache
-  const unsubscribe = transpileCtx.compilerCtx.events.subscribe('buildFinish' as any, () => {
+  const unsubscribe = transpileCtx.compilerCtx.events.on('buildFinish', () => {
     unsubscribe();
 
     if (transpileCtx.buildCtx.hasError) {

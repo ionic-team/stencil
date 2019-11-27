@@ -1,20 +1,21 @@
-import * as d from '../declarations';
+import { BuildResults, Compiler, Config, DevServer, E2EProcessEnv, ITesting, OutputTargetWww } from '@stencil/core/internal';
 import { hasError } from '@utils';
 import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { runJest } from './jest/jest-runner';
 import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
+import { startServer } from '@dev-server';
 import * as puppeteer from 'puppeteer';
 
 
-export class Testing implements d.Testing {
+export class Testing implements ITesting {
   isValid = false;
-  compiler: d.Compiler;
-  config: d.Config;
-  devServer: d.DevServer;
+  compiler: Compiler;
+  config: Config;
+  devServer: DevServer;
   puppeteerBrowser: puppeteer.Browser;
 
-  constructor(config: d.Config) {
+  constructor(config: Config) {
     const { Compiler } = require('../compiler/index.js');
 
     this.compiler = new Compiler(setupTestingConfig(config));
@@ -35,7 +36,7 @@ export class Testing implements d.Testing {
       return false;
     }
 
-    const env: d.E2EProcessEnv = process.env;
+    const env: E2EProcessEnv = process.env;
     const compiler = this.compiler;
     const config = this.config;
     const msg: string[] = [];
@@ -68,9 +69,9 @@ export class Testing implements d.Testing {
       // do a build, start a dev server
       // and spin up a puppeteer browser
 
-      let buildTask: Promise<d.BuildResults> = null;
+      let buildTask: Promise<BuildResults> = null;
 
-      (config.outputTargets as d.OutputTargetWww[]).forEach(outputTarget => {
+      (config.outputTargets as OutputTargetWww[]).forEach(outputTarget => {
         outputTarget.empty = false;
       });
 
@@ -80,7 +81,7 @@ export class Testing implements d.Testing {
       }
 
       const startupResults = await Promise.all([
-        compiler.startDevServer(),
+        startServer(config.devServer, config.logger),
         startPuppeteerBrowser(config),
       ]);
 
@@ -142,7 +143,7 @@ export class Testing implements d.Testing {
 }
 
 
-function setupTestingConfig(config: d.Config) {
+function setupTestingConfig(config: Config) {
   config.buildEs5 = false;
   config.devMode = true;
   config.validateTypes = false;
@@ -158,7 +159,7 @@ function setupTestingConfig(config: d.Config) {
 
 
 
-function getAppUrl(config: d.Config, browserUrl: string) {
+function getAppUrl(config: Config, browserUrl: string) {
   const appFileName = `${config.fsNamespace}.esm.js`;
 
   const wwwOutput = config.outputTargets.find(isOutputTargetWww);

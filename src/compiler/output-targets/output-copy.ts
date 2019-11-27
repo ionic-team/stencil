@@ -1,9 +1,8 @@
 import * as d from '../../declarations';
 import { isOutputTargetCopy } from './output-utils';
-import { buildError, normalizePath } from '@utils';
+import { buildError, isGlob, normalizePath } from '@utils';
 import { canSkipAssetsCopy, getComponentAssetsCopyTasks } from '../copy/assets-copy-tasks';
 import { getDestAbsPath, getSrcAbsPath } from '../copy/local-copy-tasks';
-import isGlob from 'is-glob';
 import minimatch from 'minimatch';
 
 export async function outputCopy(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

@@ -29,6 +29,7 @@ export interface StencilSystem {
   destroy?(): void;
   addDestroy?(fn: Function): void;
   details?: SystemDetails;
+  encodeToBase64?(str: string): string;
   fs?: FileSystem;
   generateContentHash?(content: string, length: number): Promise<string>;
   getLatestCompilerVersion?(logger: Logger, forceCheck: boolean): Promise<string>;
@@ -64,6 +65,7 @@ export interface StencilSystem {
 
 export interface ResolveModuleOptions {
   manuallyResolve?: boolean;
+  packageJson?: boolean;
 }
 
 
@@ -159,6 +161,7 @@ export interface PackageJsonData {
     type?: string;
     url?: string;
   };
+  private?: boolean;
 }
 
 

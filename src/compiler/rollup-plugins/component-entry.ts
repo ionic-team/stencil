@@ -4,7 +4,7 @@ import { updateToNativeComponent } from '../component-native/update-to-native-co
 import { Plugin } from 'rollup';
 
 
-export const componentEntryPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.Build, entryModules: d.EntryModule[]): Plugin => {
+export const componentEntryPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.BuildConditionals, entryModules: d.EntryModule[]): Plugin => {
   const entrys = new Map<string, d.EntryModule>();
 
   return {

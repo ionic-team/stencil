@@ -1,7 +1,7 @@
-import * as d from '../declarations';
+import { Diagnostic, Logger, LoggerTimeSpan } from '@stencil/core/internal';
 
 
-export class TestingLogger implements d.Logger {
+export class TestingLogger implements Logger {
 
   enable = false;
 
@@ -38,13 +38,13 @@ export class TestingLogger implements d.Logger {
   gray(msg: string) { return msg; }
   bold(msg: string) { return msg; }
   dim(msg: string) { return msg; }
-  createTimeSpan(_startMsg: string, _debug = false): d.LoggerTimeSpan {
+  createTimeSpan(_startMsg: string, _debug = false): LoggerTimeSpan {
     return {
       duration() { return 0; },
       finish() { return 0; }
     };
   }
-  printDiagnostics(_diagnostics: d.Diagnostic[]) {
+  printDiagnostics(_diagnostics: Diagnostic[]) {
     /* */
   }
   buildLogFilePath: string = null;

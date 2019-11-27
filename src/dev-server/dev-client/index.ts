@@ -7,6 +7,7 @@ declare const appWindow: d.DevClientWindow;
 declare const appDoc: Document;
 declare const config: d.DevClientConfig;
 
-applyPolyfills(iframeWindow);
-
-initClient(appWindow, appDoc, config || {} as any);
+if (config) {
+  applyPolyfills(iframeWindow);
+  initClient(appWindow, appDoc, config);
+}

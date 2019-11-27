@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { connectedCallback, insertVdomAnnotations } from '@runtime';
-import { doc, getComponent, getHostRef, plt, registerHost } from '@platform';
+import { doc, getHostRef, loadModule, plt, registerHost } from '@platform';
+import { globalScripts } from '@app-data';
 import { proxyHostElement } from './proxy-host-element';
 
 
@@ -56,7 +57,10 @@ export function hydrateApp(
     function patchElement(elm: d.HostElement) {
       const tagName = elm.nodeName.toLowerCase();
       if (tagName.includes('-')) {
-        const Cstr = getComponent(tagName);
+        const Cstr = loadModule({
+          $tagName$: tagName,
+          $flags$: null,
+        }, null) as d.ComponentConstructor;
 
         if (Cstr != null && Cstr.cmpMeta != null) {
           createdElements.add(elm);
@@ -112,10 +116,12 @@ export function hydrateApp(
       return elm;
     };
 
-    // ensure we use nodejs's native setTimeout, not the mocked one
+    // ensure we use nodejs's native setTimeout, not the mocked hydrate app scoped one
     tmrId = global.setTimeout(timeoutExceeded, opts.timeout);
 
     plt.$resourcesUrl$ = new URL(opts.resourcesUrl || './', doc.baseURI).href;
+
+    globalScripts();
 
     patchChild(win.document.body);
 
@@ -130,7 +136,10 @@ export function hydrateApp(
 
 
 async function hydrateComponent(win: Window, results: d.HydrateResults, tagName: string, elm: d.HostElement) {
-  const Cstr = getComponent(tagName);
+  const Cstr = loadModule({
+    $tagName$: tagName,
+    $flags$: null,
+  }, null) as d.ComponentConstructor;
 
   if (Cstr != null) {
     const cmpMeta = Cstr.cmpMeta;

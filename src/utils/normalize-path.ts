@@ -1,6 +1,11 @@
 
+/**
+ * Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar
+ * Forward-slash paths can be used in Windows as long as they're not
+ * extended-length paths and don't contain any non-ascii characters.
+ * This was created since the path methods in Node.js outputs \\ paths on Windows.
+ */
 export const normalizePath = (str: string) => {
-  // Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar
   // https://github.com/sindresorhus/slash MIT
   // By Sindre Sorhus
   if (typeof str !== 'string') {
@@ -30,6 +35,12 @@ export const normalizePath = (str: string) => {
 
   return str;
 };
+
+/**
+ * Same as normalizePath(), expect it'll also strip any querystrings
+ * from the path name. So /dir/file.css?tag=cmp-a becomes /dir/file.css
+ */
+export const normalizeFsPath = (p: string) => normalizePath(p.split('?')[0]);
 
 const EXTENDED_PATH_REGEX = /^\\\\\?\\/;
 const NON_ASCII_REGEX = /[^\x00-\x80]+/;

@@ -1,77 +1,83 @@
 
 
 export const HYDRATE_FACTORY_INTRO = `
-export function hydrateFactory(win, opts, results, afterHydrate, resolve) {
-  var globalThis = win;
-  var self = win;
-  var top = win;
-  var parent = win;
+export function hydrateFactory($stencilWindow, $stencilHydrateOpts, $stencilHydrateResults, $stencilAfterHydrate, $stencilHydrateResolve) {
+  var globalThis = $stencilWindow;
+  var self = $stencilWindow;
+  var top = $stencilWindow;
+  var parent = $stencilWindow;
 
-  var addEventListener = win.addEventListener.bind(win);
-  var alert = win.alert.bind(win);
-  var blur = win.blur.bind(win);
-  var cancelAnimationFrame = win.cancelAnimationFrame.bind(win);
-  var cancelIdleCallback = win.cancelIdleCallback.bind(win);
-  var clearInterval = win.clearInterval.bind(win);
-  var clearTimeout = win.clearTimeout.bind(win);
+  var addEventListener = $stencilWindow.addEventListener.bind($stencilWindow);
+  var alert = $stencilWindow.alert.bind($stencilWindow);
+  var blur = $stencilWindow.blur.bind($stencilWindow);
+  var cancelAnimationFrame = $stencilWindow.cancelAnimationFrame.bind($stencilWindow);
+  var cancelIdleCallback = $stencilWindow.cancelIdleCallback.bind($stencilWindow);
+  var clearInterval = $stencilWindow.clearInterval.bind($stencilWindow);
+  var clearTimeout = $stencilWindow.clearTimeout.bind($stencilWindow);
   var close = () => {};
-  var confirm = win.confirm.bind(win);
-  var dispatchEvent = win.dispatchEvent.bind(win);
-  var focus = win.focus.bind(win);
-  var getComputedStyle = win.getComputedStyle.bind(win);
-  var matchMedia = win.matchMedia.bind(win);
-  var open = win.open.bind(win);
-  var prompt = win.prompt.bind(win);
-  var removeEventListener = win.removeEventListener.bind(win);
-  var requestAnimationFrame = win.requestAnimationFrame.bind(win);
-  var requestIdleCallback = win.requestIdleCallback.bind(win);
-  var setInterval = win.setInterval.bind(win);
-  var setTimeout = win.setTimeout.bind(win);
+  var confirm = $stencilWindow.confirm.bind($stencilWindow);
+  var dispatchEvent = $stencilWindow.dispatchEvent.bind($stencilWindow);
+  var focus = $stencilWindow.focus.bind($stencilWindow);
+  var getComputedStyle = $stencilWindow.getComputedStyle.bind($stencilWindow);
+  var matchMedia = $stencilWindow.matchMedia.bind($stencilWindow);
+  var open = $stencilWindow.open.bind($stencilWindow);
+  var prompt = $stencilWindow.prompt.bind($stencilWindow);
+  var removeEventListener = $stencilWindow.removeEventListener.bind($stencilWindow);
+  var requestAnimationFrame = $stencilWindow.requestAnimationFrame.bind($stencilWindow);
+  var requestIdleCallback = $stencilWindow.requestIdleCallback.bind($stencilWindow);
+  var setInterval = $stencilWindow.setInterval.bind($stencilWindow);
+  var setTimeout = $stencilWindow.setTimeout.bind($stencilWindow);
 
-  var CSS = win.CSS;
-  var CustomEvent = win.CustomEvent;
-  var Element = win.Element;
-  var Event = win.Event;
-  var HTMLElement = win.HTMLElement;
-  var IntersectionObserver = win.IntersectionObserver;
-  var KeyboardEvent = win.KeyboardEvent;
-  var MouseEvent = win.MouseEvent;
-  var Node = win.Node;
-  var NodeList = win.NodeList;
-  var URL = win.URL;
+  var CharacterData = $stencilWindow.CharacterData;
+  var CSS = $stencilWindow.CSS;
+  var CustomEvent = $stencilWindow.CustomEvent;
+  var Document = $stencilWindow.Document;
+  var DocumentFragment = $stencilWindow.DocumentFragment;
+  var DocumentType = $stencilWindow.DocumentType;
+  var DOMTokenList = $stencilWindow.DOMTokenList;
+  var Element = $stencilWindow.Element;
+  var Event = $stencilWindow.Event;
+  var HTMLElement = $stencilWindow.HTMLElement;
+  var IntersectionObserver = $stencilWindow.IntersectionObserver;
+  var KeyboardEvent = $stencilWindow.KeyboardEvent;
+  var MouseEvent = $stencilWindow.MouseEvent;
+  var Node = $stencilWindow.Node;
+  var NodeList = $stencilWindow.NodeList;
+  var URL = $stencilWindow.URL;
 
-  var console = win.console;
-  var customElements = win.customElements;
-  var history = win.history;
-  var localStorage = win.localStorage;
-  var location = win.location;
-  var navigator = win.navigator;
-  var performance = win.performance;
-  var sessionStorage = win.sessionStorage;
+  var console = $stencilWindow.console;
+  var customElements = $stencilWindow.customElements;
+  var history = $stencilWindow.history;
+  var localStorage = $stencilWindow.localStorage;
+  var location = $stencilWindow.location;
+  var navigator = $stencilWindow.navigator;
+  var performance = $stencilWindow.performance;
+  var sessionStorage = $stencilWindow.sessionStorage;
 
-  var devicePixelRatio = win.devicePixelRatio;
-  var innerHeight = win.innerHeight;
-  var innerWidth = win.innerWidth;
-  var origin = win.origin;
-  var pageXOffset = win.pageXOffset;
-  var pageYOffset = win.pageYOffset;
-  var screen = win.screen;
-  var screenLeft = win.screenLeft;
-  var screenTop = win.screenTop;
-  var screenX = win.screenX;
-  var screenY = win.screenY;
-  var scrollX = win.scrollX;
-  var scrollY = win.scrollY;
+  var devicePixelRatio = $stencilWindow.devicePixelRatio;
+  var innerHeight = $stencilWindow.innerHeight;
+  var innerWidth = $stencilWindow.innerWidth;
+  var origin = $stencilWindow.origin;
+  var pageXOffset = $stencilWindow.pageXOffset;
+  var pageYOffset = $stencilWindow.pageYOffset;
+  var screen = $stencilWindow.screen;
+  var screenLeft = $stencilWindow.screenLeft;
+  var screenTop = $stencilWindow.screenTop;
+  var screenX = $stencilWindow.screenX;
+  var screenY = $stencilWindow.screenY;
+  var scrollX = $stencilWindow.scrollX;
+  var scrollY = $stencilWindow.scrollY;
   var exports = {};
 
-  function hydrateAppClosure(window) {
-    var document = window.document;
+  function hydrateAppClosure($stencilWindow) {
+    const window = $stencilWindow;
+    const document = $stencilWindow.document;
 `;
 
 export const HYDRATE_FACTORY_OUTRO = `
-    hydrateApp(window, opts, results, afterHydrate, resolve);
+    hydrateApp(window, $stencilHydrateOpts, $stencilHydrateResults, $stencilAfterHydrate, $stencilHydrateResolve);
   }
 
-  hydrateAppClosure(win);
+  hydrateAppClosure($stencilWindow);
 }
 `;

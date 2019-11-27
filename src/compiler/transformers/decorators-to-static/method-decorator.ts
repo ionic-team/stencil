@@ -6,10 +6,11 @@ import { validatePublicName } from '../reserved-public-members';
 import ts from 'typescript';
 
 
-export const methodDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
+export const methodDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
+  const tsSourceFile = cmpNode.getSourceFile();
   const methods = decoratedProps
     .filter(ts.isMethodDeclaration)
-    .map(method => parseMethodDecorator(config, diagnostics, sourceFile, typeChecker, method))
+    .map(method => parseMethodDecorator(config, diagnostics, tsSourceFile, typeChecker, method))
     .filter(method => !!method);
 
   if (methods.length > 0) {
@@ -18,7 +19,7 @@ export const methodDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagno
 };
 
 
-const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, method: ts.MethodDeclaration) => {
+const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], tsSourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, method: ts.MethodDeclaration) => {
   const methodDecorator = method.decorators.find(isDecoratorNamed('Method'));
   if (methodDecorator == null) {
     return null;
@@ -69,8 +70,8 @@ const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], sou
       signature: signatureString,
       parameters: signature.parameters.map(symbol => serializeSymbol(typeChecker, symbol)),
       references: {
-        ...getAttributeTypeInfo(returnTypeNode, sourceFile),
-        ...getAttributeTypeInfo(method, sourceFile)
+        ...getAttributeTypeInfo(returnTypeNode, tsSourceFile),
+        ...getAttributeTypeInfo(method, tsSourceFile)
       },
       return: returnString
     },

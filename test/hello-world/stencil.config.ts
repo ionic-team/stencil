@@ -1,4 +1,4 @@
-import { Config } from '../../dist';
+import { Config } from '../../internal';
 
 export const config: Config = {
   namespace: 'HelloWorld',
@@ -6,18 +6,9 @@ export const config: Config = {
     { type: 'dist' },
     { type: 'dist-hydrate-script' },
     {
-      type: 'experimental-dist-module',
-      dir: 'www'
-    },
-    {
       type: 'www',
       serviceWorker: null,
-      copy: [
-        {
-          src: 'index-module.html',
-          dest: 'index-module.html'
-        }
-      ]
+      baseUrl: 'https://helloworld.stencil.js.com/'
     }
   ],
   enableCache: false

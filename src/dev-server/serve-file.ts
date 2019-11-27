@@ -1,19 +1,21 @@
 import * as d from '../declarations';
 import * as util from './dev-server-utils';
+import { compilerBuild } from '../version';
 import { serve500 } from './serve-500';
 import * as http  from 'http';
 import path from 'path';
+import fs from 'graceful-fs';
 import * as querystring from 'querystring';
 import * as Url from 'url';
 import * as zlib from 'zlib';
 import { Buffer } from 'buffer';
 
 
-export async function serveFile(devServerConfig: d.DevServerConfig, fs: d.FileSystem, req: d.HttpRequest, res: http.ServerResponse) {
+export async function serveFile(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem, req: d.HttpRequest, res: http.ServerResponse) {
   try {
     if (util.isSimpleText(req.filePath)) {
       // easy text file, use the internal cache
-      let content = await fs.readFile(req.filePath);
+      let content = await sys.readFile(req.filePath, 'utf8');
 
       if (devServerConfig.websocket && util.isHtmlFile(req.filePath) && !util.isDevServerClient(req.pathname)) {
         // auto inject our dev server script
@@ -117,5 +119,5 @@ const urlVersionIds = new Map<string, string>();
 
 function getDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
   const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.host);
-  return `\n<iframe title="Stencil Dev Server Connector &#9889;" src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0"></iframe>`;
+  return `\n<iframe title="Stencil Dev Server Connector ${compilerBuild.stencilVersion} &#9889;" src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0" aria-hidden="true"></iframe>`;
 }

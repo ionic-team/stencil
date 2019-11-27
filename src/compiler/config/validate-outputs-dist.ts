@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { DIST_COLLECTION, DIST_GLOBAL_STYLES, DIST_LAZY, DIST_LAZY_LOADER, getComponentsDtsTypesFilePath, isOutputTargetDist, DIST_TYPES, COPY } from '../output-targets/output-utils';
+import { COPY, DIST_COLLECTION, DIST_GLOBAL_STYLES, DIST_LAZY, DIST_LAZY_LOADER, DIST_TYPES, getComponentsDtsTypesFilePath, isOutputTargetDist } from '../output-targets/output-utils';
 import { validateCopy } from './validate-copy';
 
 

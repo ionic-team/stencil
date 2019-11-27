@@ -1,4 +1,4 @@
-import { Config } from '../../dist';
+import { Config } from '../../internal';
 import builtins from 'rollup-plugin-node-builtins';
 
 export const config: Config = {
@@ -19,8 +19,7 @@ export const config: Config = {
       type: 'dist',
     },
     {
-      type: 'experimental-dist-module',
-      externalRuntime: true
+      type: 'dist-custom-elements'
     }
   ],
   enableCache: false

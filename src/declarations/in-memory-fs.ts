@@ -1,8 +1,15 @@
+import { BuildOutput, CompilerSystem } from './compiler_next';
 import { FileSystem, FsItem, FsReadOptions, FsReaddirItem, FsReaddirOptions, FsWriteOptions, FsWriteResults } from './file-system';
 
 
 export interface InMemoryFileSystem {
-  disk: FileSystem;
+  /* new compiler */
+  sys?: CompilerSystem;
+
+  /** legacy */
+  disk?: FileSystem;
+
+  revision(filePath: string): number;
 
   accessData(filePath: string): Promise<{
     exists: boolean;
@@ -37,13 +44,14 @@ export interface InMemoryFileSystem {
    * @param itemPath
    */
   statSync(itemPath: string): {
+      exists: boolean;
       isFile: boolean;
       isDirectory: boolean;
   };
   writeFile(filePath: string, content: string, opts?: FsWriteOptions): Promise<FsWriteResults>;
   writeFiles(files: {
       [filePath: string]: string;
-  }, opts?: FsWriteOptions): Promise<FsWriteResults[]>;
+  } | Map<string, String>, opts?: FsWriteOptions): Promise<FsWriteResults[]>;
   commit(): Promise<{
       filesWritten: string[];
       filesDeleted: string[];
@@ -56,7 +64,8 @@ export interface InMemoryFileSystem {
   clearDirCache(dirPath: string): void;
   clearFileCache(filePath: string): void;
   getItem(itemPath: string): FsItem;
+  getBuildOutputs(): BuildOutput[];
   clearCache(): void;
-  readonly keys: string[];
+  keys(): string[];
   getMemoryStats(): string;
 }

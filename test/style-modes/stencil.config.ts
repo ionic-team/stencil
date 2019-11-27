@@ -1,4 +1,4 @@
-import { Config } from '../../dist';
+import { Config } from '../../internal';
 import { sass } from '@stencil/sass';
 
 export const config: Config = {
@@ -11,7 +11,7 @@ export const config: Config = {
       serviceWorker: null
     },
     {
-      type: 'experimental-dist-module',
+      type: 'dist-custom-element',
       dir: 'www/dist-module',
       copy: [
         {

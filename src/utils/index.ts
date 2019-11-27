@@ -2,6 +2,7 @@
 export * from './constants';
 export * from './helpers';
 export * from './in-memory-fs';
+export * from './is-glob';
 export * from './logger/logger-minify-js';
 export * from './logger/logger-rollup';
 export * from './logger/logger-typescript';

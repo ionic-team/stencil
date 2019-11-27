@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from '@stencil/core/internal';
 import { resetTaskQueue } from './task-queue';
 import { flushAll } from './task-queue';
 import { setupGlobal } from '@mock-doc';

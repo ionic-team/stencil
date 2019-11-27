@@ -1,1 +1,0 @@
-exports.WebSocket = require('ws');

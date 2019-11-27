@@ -41,7 +41,8 @@ export function configReload(config: d.Config, updatedConfig: d.Config) {
   config._isValidated = false;
 
   // validate our new config data
-  validateConfig(config, [], false);
+  const validated = validateConfig(config);
+  config = validated.config;
 
   // ensure we're using the correct original config data
   for (const key in keepers) {

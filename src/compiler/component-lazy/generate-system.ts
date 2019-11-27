@@ -36,13 +36,13 @@ async function writeSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, l
   if (outputTarget.systemLoaderFile) {
     const entryPointPath = config.sys.path.join(outputTarget.systemDir, loaderFilename);
     const relativePath = relativeImport(config, outputTarget.systemLoaderFile, entryPointPath);
-    const loaderContent = await getSystemLoader(config, relativePath, outputTarget.polyfills);
+    const loaderContent = await getSystemLoader(config, compilerCtx, relativePath, outputTarget.polyfills);
     await compilerCtx.fs.writeFile(outputTarget.systemLoaderFile, loaderContent);
   }
 }
 
-async function getSystemLoader(config: d.Config, corePath: string, includePolyfills: boolean) {
-  const polyfills = includePolyfills ? await getAppBrowserCorePolyfills(config) : '';
+async function getSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, corePath: string, includePolyfills: boolean) {
+  const polyfills = includePolyfills ? await getAppBrowserCorePolyfills(config, compilerCtx) : '';
   return `
 'use strict';
 (function () {

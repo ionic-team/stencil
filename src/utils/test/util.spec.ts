@@ -209,33 +209,4 @@ describe('util', () => {
     });
   });
 
-  describe('isWebDevFile', () => {
-    it('should return true for all web dev file types', () => {
-      expect(util.isWebDevFile('foo.ts')).toEqual(true);
-      expect(util.isWebDevFile('foo.tsx')).toEqual(true);
-      expect(util.isWebDevFile('foo.js')).toEqual(true);
-      expect(util.isWebDevFile('foo.jsx')).toEqual(true);
-      expect(util.isWebDevFile('foo.html')).toEqual(true);
-      expect(util.isWebDevFile('foo.htm')).toEqual(true);
-      expect(util.isWebDevFile('foo.css')).toEqual(true);
-      expect(util.isWebDevFile('foo.scss')).toEqual(true);
-      expect(util.isWebDevFile('foo.sass')).toEqual(true);
-      expect(util.isWebDevFile('foo.less')).toEqual(true);
-      expect(util.isWebDevFile('foo.styl')).toEqual(true);
-    });
-
-    it('should return false for d.ts file', () => {
-      expect(util.isWebDevFile('components.d.ts')).toEqual(false);
-    });
-
-    it('should return false for other types of files', () => {
-      expect(util.isWebDevFile('foo.txt')).toEqual(false);
-    });
-
-    it('should be case insensitive', () => {
-      expect(util.isWebDevFile('foo.TS')).toEqual(true);
-      expect(util.isWebDevFile('foo.tSx')).toEqual(true);
-      expect(util.isWebDevFile('foo.JS')).toEqual(true);
-    });
-  });
 });

@@ -3,15 +3,13 @@ import * as ws from 'ws';
 import * as http from 'http';
 import { noop } from '@utils';
 
-const WebSocket: any = require('../sys/node/websocket').WebSocket;
 
-
-export function createWebSocket(process: NodeJS.Process, httpServer: http.Server, destroys: d.DevServerDestroy[]) {
+export function createWebSocket(prcs: NodeJS.Process, httpServer: http.Server, destroys: d.DevServerDestroy[]) {
   const wsConfig: ws.ServerOptions = {
     server: httpServer
   };
 
-  const wsServer: ws.Server = new WebSocket.Server(wsConfig);
+  const wsServer: ws.Server = new ws.Server(wsConfig);
 
   function heartbeat(this: DevWS) {
     this.isAlive = true;
@@ -22,7 +20,7 @@ export function createWebSocket(process: NodeJS.Process, httpServer: http.Server
     ws.on('message', (data) => {
       // the server process has received a message from the browser
       // pass the message received from the browser to the main cli process
-      process.send(JSON.parse(data.toString()));
+      prcs.send(JSON.parse(data.toString()));
     });
 
     ws.isAlive = true;
@@ -55,7 +53,7 @@ export function createWebSocket(process: NodeJS.Process, httpServer: http.Server
     }
   }
 
-  process.addListener('message', onMessageFromCli);
+  prcs.addListener('message', onMessageFromCli);
 
   destroys.push(() => {
     clearInterval(pingInternval);

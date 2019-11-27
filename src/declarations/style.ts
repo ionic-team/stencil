@@ -1,3 +1,5 @@
+import { Diagnostic } from '.';
+
 
 export interface StyleCompiler {
   modeName: string;
@@ -22,10 +24,6 @@ export interface CompilerModeStyles {
   [modeName: string]: string[];
 }
 
-export interface ModeStyles {
-  [modeName: string]: string | string[];
-}
-
 
 export interface CssImportData {
   srcImport: string;
@@ -42,4 +40,20 @@ export interface CssToEsmImportData {
   varName: string;
   url: string;
   filePath: string;
+}
+
+export interface TransformCssToEsmInput {
+  filePath: string;
+  code: string;
+  tagName: string;
+  encapsulation: string;
+  modeName: string;
+  commentOriginalSelector: boolean;
+  sourceMap: boolean;
+}
+
+export interface TransformCssToEsmOutput {
+  code: string;
+  map: any;
+  diagnostics: Diagnostic[];
 }

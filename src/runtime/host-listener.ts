@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { BUILD } from '@build-conditionals';
+import { BUILD } from '@app-data';
 import { doc, plt, supportsListenerOptions, win } from '@platform';
 import { HOST_FLAGS, LISTENER_FLAGS } from '@utils';
 
@@ -44,8 +44,8 @@ const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
 
 const hostListenerOpts = (flags: number) =>
   supportsListenerOptions ?
-    {
+    ({
       'passive': (flags & LISTENER_FLAGS.Passive) !== 0,
       'capture': (flags & LISTENER_FLAGS.Capture) !== 0,
-    }
+    })
   : (flags & LISTENER_FLAGS.Capture) !== 0;

@@ -1,5 +1,5 @@
 import * as d from '@stencil/core/declarations';
-import { BuildEvents } from '../../events';
+import { buildEvents } from '../../events';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import { initFsWatcher } from '../fs-watch-init';
 import { validateConfig } from '@stencil/core/compiler';
@@ -23,7 +23,7 @@ describe('fs-watch, init', () => {
     compilerCtx = mockCompilerCtx();
 
     buildCtx = mockBuildCtx(config, compilerCtx);
-    compilerCtx.events = new BuildEvents();
+    compilerCtx.events = buildEvents();
   });
 
 

@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { BUILD, NAMESPACE } from '@build-conditionals';
+import { BUILD, NAMESPACE } from '@app-data';
 import { consoleDevInfo } from './client-log';
 import { doc, plt, win } from './client-window';
 import { getDynamicImportFunction } from '@utils';
@@ -21,7 +21,7 @@ export const patchEsm = () => {
 
 export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => {
   if (BUILD.isDev) {
-    consoleDevInfo('Stencil is running in the development mode.');
+    consoleDevInfo('Running in development mode.');
   }
   if (BUILD.cssVarShim) {
     plt.$cssShim$ = (win as any).__stencil_cssshim;
@@ -60,7 +60,7 @@ export const patchDynamicImport = (base: string) => {
   try {
     // There is a caching issue in V8, that breaks using import() in Function
     // By generating a random string, we can workaround it
-    // Check https://bugs.chromium.org/p/v8/issues/detail?id=9558 for more info
+    // Check https://bugs.chromium.org/p/chromium/issues/detail?id=990810 for more info
     (win as any)[importFunctionName] = new Function('w', `return import(w);//${Math.random()}`);
   } catch (e) {
     const moduleMap = new Map<string, any>();

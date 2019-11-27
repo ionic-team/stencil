@@ -8,7 +8,7 @@ export async function generateEsmBrowser(config: d.Config, compilerCtx: d.Compil
   const esmOutputs = outputTargets.filter(o => !!o.esmDir && !!o.isBrowserBuild);
   if (esmOutputs.length) {
     const esmOpts: OutputOptions = {
-      format: 'esm',
+      format: 'es',
       entryFileNames: '[name].esm.js',
       chunkFileNames: config.hashFileNames ? 'p-[hash].js' : '[name]-[hash].js',
       preferConst: true,

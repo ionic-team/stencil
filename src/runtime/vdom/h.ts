@@ -8,7 +8,7 @@
  */
 
 import * as d from '../../declarations';
-import { BUILD } from '@build-conditionals';
+import { BUILD } from '@app-data';
 import { consoleDevError, consoleDevWarn } from '@platform';
 import { isComplexType } from '@utils';
 
@@ -128,16 +128,16 @@ const vdomFnUtils: d.FunctionalUtilities = {
   'map': (children, cb) => children.map(convertToPublic).map(cb).map(convertToPrivate)
 };
 
-const convertToPublic = (node: d.VNode): d.ChildNode => {
-  return {
+const convertToPublic = (node: d.VNode): d.ChildNode => (
+  {
     vattrs: node.$attrs$,
     vchildren: node.$children$,
     vkey: node.$key$,
     vname: node.$name$,
     vtag: node.$tag$,
     vtext: node.$text$
-  };
-};
+  }
+);
 
 const convertToPrivate = (node: d.ChildNode): d.VNode => {
   const vnode = newVNode(node.vtag as any, node.vtext);

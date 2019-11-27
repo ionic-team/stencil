@@ -70,14 +70,9 @@ export function validateDevServer(config: d.Config, diagnostics: d.Diagnostic[])
     const baseUrl = new URL(wwwOutputTarget.baseUrl, 'http://config.stenciljs.com');
     basePath = baseUrl.pathname;
     serveDir = wwwOutputTarget.appDir;
-    config.logger.debug(`dev server www root: ${serveDir}, base path: ${basePath}`);
 
   } else {
     serveDir = config.rootDir;
-
-    if (config.flags && config.flags.serve) {
-      config.logger.debug(`dev server missing www output target, serving root directory: ${serveDir}`);
-    }
   }
 
   if (typeof basePath !== 'string' || basePath.trim() === '') {
