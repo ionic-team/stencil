@@ -112,10 +112,10 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
 
 const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
 
-  tsSys.watchDirectory = (p, cb) => {
+  tsSys.watchDirectory = (p, cb, recursive) => {
     const watcher = stencilSys.watchDirectory(p, (filePath) => {
       cb(filePath);
-    });
+    }, recursive);
     return {
       close() {
         watcher.close();

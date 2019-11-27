@@ -112,7 +112,7 @@ export interface CompilerSystem extends CompilerSystemAsync {
    */
   unlinkSync(p: string): boolean;
 
-  watchDirectory?(p: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
+  watchDirectory?(p: string, callback: CompilerFileWatcherCallback, recursive?: boolean): CompilerFileWatcher;
   watchFile?(p: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
   /**
    * How many milliseconds to wait after a change before calling watch callbacks.

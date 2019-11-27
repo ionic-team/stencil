@@ -13,11 +13,11 @@ export function createNodeSysWithWatch(prcs: NodeJS.Process): CompilerSystem {
   sys.fileWatchTimeout = 80;
   sys.events = buildEvents();
 
-  sys.watchDirectory = (p, callback) => {
+  sys.watchDirectory = (p, callback, recursive) => {
     const tsFileWatcher = tsWatchDirectory(p, (fileName) => {
       fileName = normalizePath(fileName);
       callback(fileName, null);
-    }, true);
+    }, recursive);
 
     const close = () => {
       tsFileWatcher.close();

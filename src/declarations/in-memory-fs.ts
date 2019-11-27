@@ -9,6 +9,8 @@ export interface InMemoryFileSystem {
   /** legacy */
   disk?: FileSystem;
 
+  revision(filePath: string): number;
+
   accessData(filePath: string): Promise<{
     exists: boolean;
     isDirectory: boolean;

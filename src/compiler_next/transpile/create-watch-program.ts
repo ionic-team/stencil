@@ -5,7 +5,9 @@ import ts from 'typescript';
 
 export const createTsWatchProgram = async (config: d.Config, buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>) => {
   let isRunning = false;
+  let lastTsBuilder: any;
   let timeoutId: any;
+  let rebuildTimer: any;
 
   const optionsToExtend = getTsOptionsToExtend(config);
 
@@ -13,13 +15,15 @@ export const createTsWatchProgram = async (config: d.Config, buildCallback: (tsB
     ...ts.sys,
 
     setTimeout(callback, time) {
-      timeoutId = setInterval(() => {
+      clearInterval(rebuildTimer);
+      const t = timeoutId = setInterval(() => {
         if (!isRunning) {
           callback();
-          clearInterval(timeoutId);
+          clearInterval(t);
+          timeoutId = rebuildTimer = null;
         }
       }, config.sys_next.fileWatchTimeout || time);
-      return timeoutId;
+      return t;
     },
 
     clearTimeout(id) {
@@ -43,10 +47,18 @@ export const createTsWatchProgram = async (config: d.Config, buildCallback: (tsB
   );
 
   tsWatchHost.afterProgramCreate = async (tsBuilder) => {
+    lastTsBuilder = tsBuilder;
     isRunning = true;
     await buildCallback(tsBuilder);
     isRunning = false;
   };
 
-  return ts.createWatchProgram(tsWatchHost);
+  return {
+    program: ts.createWatchProgram(tsWatchHost),
+    rebuild: () => {
+      if (lastTsBuilder && !timeoutId) {
+        rebuildTimer = tsWatchSys.setTimeout(() => tsWatchHost.afterProgramCreate(lastTsBuilder), 300);
+      }
+    }
+  };
 };

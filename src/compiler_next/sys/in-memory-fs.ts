@@ -5,6 +5,18 @@ import path from 'path';
 
 export const inMemoryFs = (sys: d.CompilerSystem) => {
   const items: d.FsItems = new Map();
+  const revisions = new Map<string, number>();
+  const markItem = (filePath: string) => {
+    let rev = revisions.get(filePath);
+    if (rev === undefined) {
+      rev = revisions.size * 100000;
+    }
+    revisions.set(filePath, rev + 1);
+  };
+
+  const revision = (filePath: string) => {
+    return revisions.get(filePath) ?? 0;
+  };
 
   const accessData = async (filePath: string) => {
     const item = getItem(filePath);
@@ -178,7 +190,7 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
     } else {
       item.exists = false;
     }
-
+    markItem(filePath);
     return fileText;
   };
 
@@ -207,6 +219,7 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
     } else {
       item.exists = false;
     }
+    markItem(filePath);
 
     return fileText;
   };
@@ -245,6 +258,7 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
     if (!item.queueWriteToDisk) {
       item.queueDeleteFromDisk = true;
     }
+    markItem(filePath);
   };
 
   const stat = async (itemPath: string) => {
@@ -325,6 +339,9 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
     results.queuedWrite = false;
 
     item.fileText = content;
+    if (results.changedContent) {
+      markItem(filePath);
+    }
 
     if (opts != null) {
       if (isString(opts.outputTargetType)) {
@@ -550,6 +567,7 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
     const item = items.get(filePath);
     if (item != null && !item.queueWriteToDisk) {
       items.delete(filePath);
+      markItem(filePath);
     }
   };
 
@@ -559,6 +577,7 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
       if (item.isFile === true && item.queueDeleteFromDisk === true) {
         item.queueDeleteFromDisk = false;
       }
+      markItem(filePath);
     });
   };
 
@@ -634,6 +653,7 @@ export const inMemoryFs = (sys: d.CompilerSystem) => {
   const MAX_TEXT_CACHE = 5242880;
 
   const fs: d.InMemoryFileSystem = {
+    revision,
     access,
     accessSync,
     accessData,

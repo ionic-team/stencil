@@ -17,6 +17,8 @@ export interface PluginTransformResults {
   code?: string;
   map?: string;
   id?: string;
+  diagnostics?: Diagnostic[];
+  dependencies?: string[];
 }
 
 export interface PluginCtx {

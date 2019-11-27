@@ -9,7 +9,9 @@ import ts from 'typescript';
 
 export const createWatchBuild = async (config: d.Config, compilerCtx: d.CompilerCtx): Promise<d.CompilerWatcher> => {
   let isRebuild = false;
-  let tsWatchProgram: ts.WatchOfConfigFile<ts.BuilderProgram> = null;
+  let tsWatchProgram: any;
+  let fileWatcher: any;
+
   let closeResolver: Function;
   const watchWaiter = new Promise<d.WatcherCloseResults>(resolve => closeResolver = resolve);
 
@@ -17,23 +19,16 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   const filesUpdated = new Set<string>();
   const filesDeleted = new Set<string>();
 
-  compilerCtx.events.on('fileAdd', p => {
-    config.logger.debug(`fileAdd: ${p}`);
-    filesAdded.add(p);
-    compilerCtx.fs.clearFileCache(p);
-  });
-
-  compilerCtx.events.on('fileUpdate', p => {
-    config.logger.debug(`fileUpdate: ${p}`);
-    filesUpdated.add(p);
-    compilerCtx.fs.clearFileCache(p);
-  });
-
-  compilerCtx.events.on('fileDelete', p => {
-    config.logger.debug(`fileDelete: ${p}`);
-    filesDeleted.add(p);
-    compilerCtx.fs.clearFileCache(p);
-  });
+  const onFileChange: d.CompilerFileWatcherCallback = (file, kind) => {
+    compilerCtx.fs.clearFileCache(file);
+    switch (kind) {
+      case 'fileAdd': filesAdded.add(file); break;
+      case 'fileUpdate': filesUpdated.add(file); break;
+      case 'fileDelete': filesDeleted.add(file); break;
+    }
+    config.logger.debug(`${kind}: ${file}`);
+    tsWatchProgram.rebuild();
+  };
 
   const onBuild = async (tsBuilder: ts.BuilderProgram) => {
     const buildCtx = new BuildContext(config, compilerCtx);
@@ -62,13 +57,15 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   };
 
   const start = async () => {
+    fileWatcher = await watchSrcDirectory(config, compilerCtx, onFileChange);
     tsWatchProgram = await createTsWatchProgram(config, onBuild);
     return watchWaiter;
   };
 
   const close = async () => {
     if (tsWatchProgram) {
-      tsWatchProgram.close();
+      fileWatcher.close();
+      tsWatchProgram.program.close();
       tsWatchProgram = null;
     }
     const watcherCloseResults: d.WatcherCloseResults = {
@@ -84,5 +81,35 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     start,
     close,
     on: compilerCtx.events.on
+  };
+};
+
+export const watchSrcDirectory = async (config: d.Config, compilerCtx: d.CompilerCtx, callback: d.CompilerFileWatcherCallback) => {
+  const watching = new Map();
+  const watchFile = (path: string) => {
+    if (!watching.has(path)) {
+      watching.set(path, config.sys_next.watchFile(path, callback));
+    }
+  };
+  const files = await compilerCtx.fs.readdir(config.srcDir, {
+    recursive: true
+  });
+
+  files
+    .filter(({isFile}) => isFile)
+    .forEach(({absPath}) => watchFile(absPath));
+
+  watching.set(
+    config.srcDir,
+    config.sys_next.watchDirectory(config.srcDir, (filename, kind) => {
+      watchFile(filename);
+      callback(filename, kind);
+    })
+  );
+
+  return {
+    close() {
+      watching.forEach(w => w.close());
+    }
   };
 };

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { catchError, isString, isFunction } from '@utils';
+import { catchError, isFunction, isString } from '@utils';
 import { PluginCtx, PluginTransformResults } from '../../declarations/plugin';
 import { parseCssImports } from '../style/css-imports';
 import { isOutputTargetDocs } from '../output-targets/output-utils';
@@ -155,7 +155,7 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
 }
 
 
-export const runPluginTransformsEsmImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, code: string, id: string) => {
+export const runPluginTransformsEsmImports = async (config: d.Config, compilerCtx: d.CompilerCtx, code: string, id: string) => {
   const pluginCtx: PluginCtx = {
     config: config,
     sys: config.sys,
@@ -168,6 +168,8 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
     code,
     id,
     map: null,
+    diagnostics: [],
+    dependencies: []
   };
 
   for (const plugin of pluginCtx.config.plugins) {
@@ -176,7 +178,6 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
       try {
         let pluginTransformResults: PluginTransformResults | string;
         const results = plugin.transform(transformResults.code, transformResults.id, pluginCtx);
-
         if (results != null) {
           if (isFunction((results as any).then)) {
             pluginTransformResults = await results;
@@ -196,17 +197,20 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
               if (isString(pluginTransformResults.id)) {
                 transformResults.id = pluginTransformResults.id;
               }
+              if (Array.isArray(pluginTransformResults.dependencies)) {
+                transformResults.dependencies.push(...pluginTransformResults.dependencies);
+              }
             }
           }
         }
 
       } catch (e) {
-        catchError(buildCtx.diagnostics, e);
+        catchError(transformResults.diagnostics, e);
       }
     }
   }
 
-  buildCtx.diagnostics.push(...pluginCtx.diagnostics);
+  transformResults.diagnostics.push(...pluginCtx.diagnostics);
 
   return transformResults;
 };
