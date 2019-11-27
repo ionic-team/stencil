@@ -83,6 +83,18 @@ declare global {
       toHaveReceivedEventDetail(eventDetail: any): void;
 
       /**
+       * When given an EventSpy, checks the first event has
+       * received the correct custom event `detail` data.
+       */
+      toHaveFirstReceivedEventDetail(eventDetail: any): void;
+
+      /**
+       * When given an EventSpy, checks the event at an index
+       * has received the correct custom event `detail` data.
+       */
+      toHaveNthReceivedEventDetail(index: number, eventDetail: any): void;
+
+      /**
        * Used to evaluate the results of `compareScreenshot()`, such as
        * `expect(compare).toMatchScreenshot()`. The `allowableMismatchedRatio`
        * value from the testing config is used by default if
