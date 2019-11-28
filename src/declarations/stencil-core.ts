@@ -243,6 +243,16 @@ export declare function getAssetPath(path: string): string;
  */
 export declare function getElement(ref: any): HTMLStencilElement;
 
+/**
+ * forceUpdate
+ */
+export declare function forceUpdate(ref: any): void;
+
+/**
+ * getRenderingRef
+ */
+export declare function getRenderingRef(): any;
+
 export interface HTMLStencilElement extends HTMLElement {
   componentOnReady(): Promise<this>;
   forceUpdate(): void;

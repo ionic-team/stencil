@@ -13,7 +13,7 @@ export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostEl
   }
 };
 
-export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, isInitialLoad: boolean) => {
+export const scheduleUpdate = (hostRef: d.HostRef, isInitialLoad: boolean) => {
   if (BUILD.taskQueue && BUILD.updatable) {
     hostRef.$flags$ |= HOST_FLAGS.isQueuedForUpdate;
   }
@@ -21,10 +21,11 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
     hostRef.$flags$ |= HOST_FLAGS.needsRerender;
     return;
   }
-  const endSchedule = createTime('scheduleUpdate', cmpMeta.$tagName$);
+  const elm = hostRef.$hostElement$;
+  const endSchedule = createTime('scheduleUpdate', hostRef.$cmpMeta$.$tagName$);
   const ancestorComponent = hostRef.$ancestorComponent$;
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
-  const update = () => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
+  const update = () => updateComponent(hostRef, instance, isInitialLoad);
   attachToAncestor(hostRef, ancestorComponent);
 
   let promise: Promise<void>;
@@ -65,16 +66,17 @@ export const scheduleUpdate = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: 
   );
 };
 
-const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, instance: any, isInitialLoad: boolean) => {
+const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boolean) => {
   // updateComponent
-  const endUpdate = createTime('update', cmpMeta.$tagName$);
+  const elm = hostRef.$hostElement$ as d.RenderNode;
+  const endUpdate = createTime('update', hostRef.$cmpMeta$.$tagName$);
   const rc = elm['s-rc'];
   if (BUILD.style && isInitialLoad) {
     // DOM WRITE!
-    attachStyles(elm, cmpMeta, hostRef.$modeName$);
+    attachStyles(hostRef);
   }
 
-  const endRender = createTime('render', cmpMeta.$tagName$);
+  const endRender = createTime('render', hostRef.$cmpMeta$.$tagName$);
   if (BUILD.isDev)  {
     hostRef.$flags$ |= HOST_FLAGS.devOnRender;
   }
@@ -85,13 +87,11 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
       // or we need to update the css class/attrs on the host element
       // DOM WRITE!
       renderVdom(
-        elm,
         hostRef,
-        cmpMeta,
-        callRender(instance, elm),
+        callRender(instance),
       );
     } else {
-      elm.textContent = callRender(instance, elm);
+      elm.textContent = callRender(instance);
     }
   }
   if (BUILD.cssVarShim && plt.$cssShim$) {
@@ -110,7 +110,7 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
       // manually connected child components during server-side hydrate
       serverSideConnected(elm);
 
-      if (isInitialLoad && (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation)) {
+      if (isInitialLoad && (hostRef.$cmpMeta$.$flags$ & CMP_FLAGS.shadowDomEncapsulation)) {
         // using only during server-side hydrate
         elm['s-sd'] = true;
       }
@@ -136,7 +136,7 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
 
   if (BUILD.asyncLoading) {
     const childrenPromises = elm['s-p'];
-    const postUpdate = () => postUpdateComponent(elm, hostRef, cmpMeta);
+    const postUpdate = () => postUpdateComponent(hostRef);
     if (childrenPromises.length === 0) {
       postUpdate();
     } else {
@@ -145,27 +145,29 @@ const updateComponent = (elm: d.RenderNode, hostRef: d.HostRef, cmpMeta: d.Compo
       childrenPromises.length = 0;
     }
   } else {
-    postUpdateComponent(elm, hostRef, cmpMeta);
+    postUpdateComponent(hostRef);
   }
 };
 
-let renderingElement: HTMLElement = null;
+let renderingRef: any = null;
 
-const callRender = (instance: any, elm: HTMLElement) => {
+const callRender = (instance: any) => {
   try {
-    renderingElement = elm;
+    renderingRef = instance;
     instance = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
   } catch (e) {
     consoleError(e);
   }
-  renderingElement = null;
+  renderingRef = null;
   return instance;
 };
 
-export const getRenderingElement = () => renderingElement;
+export const getRenderingRef = () => renderingRef;
 
-export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta) => {
-  const endPostUpdate = createTime('postUpdate', cmpMeta.$tagName$);
+export const postUpdateComponent = (hostRef: d.HostRef) => {
+  const tagName = hostRef.$cmpMeta$.$tagName$;
+  const elm = hostRef.$hostElement$;
+  const endPostUpdate = createTime('postUpdate', tagName);
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   const ancestorComponent = hostRef.$ancestorComponent$;
 
@@ -205,7 +207,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
     if (BUILD.asyncLoading) {
       hostRef.$onReadyResolve$(elm);
       if (!ancestorComponent)  {
-        appDidLoad(cmpMeta.$tagName$);
+        appDidLoad(tagName);
       }
     }
 
@@ -242,7 +244,7 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
       hostRef.$onRenderResolve$ = undefined;
     }
     if (hostRef.$flags$ & HOST_FLAGS.needsRerender) {
-      nextTick(() => scheduleUpdate(elm, hostRef, cmpMeta, false));
+      nextTick(() => scheduleUpdate(hostRef, false));
     }
     hostRef.$flags$ &= ~(HOST_FLAGS.isWaitingForChildren | HOST_FLAGS.needsRerender);
   }
@@ -251,15 +253,13 @@ export const postUpdateComponent = (elm: d.HostElement, hostRef: d.HostRef, cmpM
   // (⌐■_■)
 };
 
-export const forceUpdate = (elm: d.RenderNode, cmpMeta: d.ComponentRuntimeMeta) => {
+export const forceUpdate = (ref: any) => {
   if (BUILD.updatable) {
-    const hostRef = getHostRef(elm);
+    const hostRef = getHostRef(ref);
     const isConnected = hostRef.$hostElement$.isConnected;
     if (isConnected && (hostRef.$flags$ & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
       scheduleUpdate(
-        elm,
         hostRef,
-        cmpMeta,
         false
       );
     }

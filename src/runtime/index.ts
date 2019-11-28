@@ -13,7 +13,7 @@ export { getValue, setValue } from './set-value';
 export { h, Host } from './vdom/h';
 export { insertVdomAnnotations } from './vdom/vdom-annotations';
 export { parsePropertyValue } from './parse-property-value';
-export { forceUpdate, postUpdateComponent, getRenderingElement } from './update-component';
+export { forceUpdate, postUpdateComponent, getRenderingRef } from './update-component';
 export { proxyComponent } from './proxy-component';
 export { renderVdom } from './vdom/vdom-render';
 export { setMode, getMode } from './mode';

@@ -16,11 +16,11 @@ export const fireConnectedCallback = (instance: any) => {
   }
 };
 
-export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
+export const connectedCallback = (elm: d.HostElement) => {
   if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {
-    const endConnected = createTime('connectedCallback', cmpMeta.$tagName$);
-    // connectedCallback
     const hostRef = getHostRef(elm);
+    const cmpMeta = hostRef.$cmpMeta$;
+    const endConnected = createTime('connectedCallback', cmpMeta.$tagName$);
 
     if (BUILD.hostListener && cmpMeta.$listeners$) {
       // initialize our event listeners on the host element
@@ -52,8 +52,8 @@ export const connectedCallback = (elm: d.HostElement, cmpMeta: d.ComponentRuntim
         // host element has been connected to the DOM
         if (
           (BUILD.hydrateServerSide) ||
-          (BUILD.slot && cmpMeta.$flags$ & CMP_FLAGS.hasSlotRelocation) ||
-          (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim)) {
+          ((BUILD.slot || BUILD.shadowDom) && cmpMeta.$flags$ & (CMP_FLAGS.hasSlotRelocation | CMP_FLAGS.needsShadowDomShim))
+        ) {
           setContentReference(elm);
         }
       }

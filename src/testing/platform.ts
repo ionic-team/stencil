@@ -97,10 +97,11 @@ export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) => {
   }
 
   if (hostRef == null) {
+    console.warn('Use newSpecPage() to instanciate component instances.')
     const Cstr = lazyInstance.constructor as d.ComponentTestingConstructor;
     const tagName = (Cstr.COMPILER_META && Cstr.COMPILER_META.tagName) ? Cstr.COMPILER_META.tagName : 'div';
     const elm = document.createElement(tagName);
-    registerHost(elm);
+    registerHost(elm, {$flags$: 0, $tagName$: tagName});
     hostRef = getHostRef(elm);
   }
 
@@ -108,11 +109,11 @@ export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) => {
   return hostRefs.set(lazyInstance, hostRef);
 };
 
-
-export const registerHost = (elm: d.HostElement) => {
+export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
   const hostRef: d.HostRef = {
     $flags$: 0,
     $hostElement$: elm,
+    $cmpMeta$: cmpMeta,
     $instanceValues$: new Map(),
     $renderCount$: 0
   };

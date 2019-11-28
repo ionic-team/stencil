@@ -108,7 +108,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
 
   // we've successfully created a lazy instance
   const ancestorComponent = hostRef.$ancestorComponent$;
-  const schedule = () => scheduleUpdate(elm, hostRef, cmpMeta, true);
+  const schedule = () => scheduleUpdate(hostRef, true);
 
   if (BUILD.asyncLoading && ancestorComponent && ancestorComponent['s-rc']) {
     // this is the intial load and this component it has an ancestor component

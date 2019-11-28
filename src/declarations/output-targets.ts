@@ -240,7 +240,8 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
 }
 
 export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
-  type: 'dist-custom-elements-bundle';
+  //  dist-custom-elements-bundle
+  type: 'experimental-dist-module';
   empty?: boolean;
   copy?: CopyTask[];
 }

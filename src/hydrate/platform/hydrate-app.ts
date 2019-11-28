@@ -66,7 +66,7 @@ export function hydrateApp(
           createdElements.add(elm);
           elm.connectedCallback = patchedConnectedCallback;
 
-          registerHost(elm);
+          registerHost(elm, Cstr.cmpMeta);
           proxyHostElement(elm, Cstr.cmpMeta);
         }
       }
@@ -146,7 +146,7 @@ async function hydrateComponent(win: Window, results: d.HydrateResults, tagName:
 
     if (cmpMeta != null) {
       try {
-        connectedCallback(elm, cmpMeta);
+        connectedCallback(elm);
         await elm.componentOnReady();
 
         results.hydratedCount++;

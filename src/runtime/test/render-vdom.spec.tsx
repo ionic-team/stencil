@@ -1,4 +1,4 @@
-import { Component, Element, Host, Prop, h } from '@stencil/core';
+import { Component, Element, Host, Prop, State, forceUpdate, getRenderingRef, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
@@ -567,6 +567,113 @@ describe('render-vdom', () => {
       </cmp-a>
     `);
   });
+
+  describe('getRenderingRef', () => {
+    it('returns instance', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        render() {
+          const ref = getRenderingRef();
+          expect(ref).toBe(this);
+          return <MyFunctionalCmp cmp={this}/>;
+        }
+      }
+      const MyFunctionalCmp = (props: any) => {
+        expect(getRenderingRef()).toBe(props.cmp);
+        return <p>MyFunctionalCmp</p>;
+      };
+      const { root } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      });
+      expect(root).toEqualHtml(`
+        <cmp-a>
+          <p>MyFunctionalCmp</p>
+        </cmp-a>
+      `);
+    });
+
+    it('useState hook', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        @State() count = 0;
+        render() {
+          return <MyFunctionalCmp/>;
+        }
+      }
+
+      const useState = (state: string) => {
+        const ref = getRenderingRef();
+        return [
+          ref[state],
+          (value: any) => ref[state] = value
+        ];
+      };
+
+      const MyFunctionalCmp = () => {
+        const [count, setCount] = useState('count');
+        return (
+          <p onClick={() => setCount(count + 1)}>
+            {count}
+          </p>
+        );
+      };
+      const { root, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      });
+      expect(root).toEqualHtml(`
+        <cmp-a>
+          <p>0</p>
+        </cmp-a>
+      `);
+      root.querySelector('p').click();
+      await waitForChanges();
+      expect(root).toEqualHtml(`
+        <cmp-a>
+          <p>1</p>
+        </cmp-a>
+      `);
+    });
+  });
+
+  describe('forceUpdate', () => {
+    it('should trigger re-render', async () => {
+      @Component({ tag: 'cmp-a'})
+      class CmpA {
+        private count = 0;
+        render() {
+          return this.count++;
+        }
+      }
+
+      const { root, rootInstance, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      });
+      await waitForChanges();
+      expect(root.textContent).toEqual('0');
+
+      expect(forceUpdate(root)).toBe(true);
+      await waitForChanges();
+      expect(root.textContent).toEqual('1');
+
+      expect(forceUpdate(rootInstance)).toBe(true);
+      await waitForChanges();
+      expect(root.textContent).toEqual('2');
+
+      expect(forceUpdate(rootInstance)).toBe(true);
+      expect(forceUpdate(root)).toBe(true);
+      await waitForChanges();
+      await waitForChanges();
+      expect(root.textContent).toEqual('3');
+
+      root.remove();
+      expect(forceUpdate(root)).toBe(false);
+      expect(forceUpdate(rootInstance)).toBe(false);
+    });
+  });
+
 
   describe('input', () => {
     it('should render attributes', async () => {
