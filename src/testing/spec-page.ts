@@ -147,17 +147,18 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   testingPlatform.bootstrapLazy(lazyBundles);
 
   if (typeof opts.template === 'function') {
-    const ref: HostRef = {
-      $ancestorComponent$: undefined,
-      $flags$: 0,
-      $modeName$: undefined,
-      $hostElement$: page.body
-    };
     const cmpMeta: ComponentRuntimeMeta = {
       $flags$: 0,
       $tagName$: 'body'
     };
-    testingPlatform.renderVdom(page.body, ref, cmpMeta, opts.template());
+    const ref: HostRef = {
+      $ancestorComponent$: undefined,
+      $flags$: 0,
+      $modeName$: undefined,
+      $cmpMeta$: cmpMeta,
+      $hostElement$: page.body
+    };
+    testingPlatform.renderVdom(ref, opts.template());
   } else if (typeof opts.html === 'string') {
     page.body.innerHTML = opts.html;
   }

@@ -40,10 +40,10 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
 
   Object.assign(Cstr.prototype, {
     forceUpdate() {
-      forceUpdate(this, cmpMeta);
+      forceUpdate(this);
     },
     connectedCallback() {
-      connectedCallback(this, cmpMeta);
+      connectedCallback(this);
     },
     disconnectedCallback() {
       disconnectedCallback(this);

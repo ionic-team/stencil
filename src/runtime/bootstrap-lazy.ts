@@ -86,7 +86,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           super(self);
           self = this;
 
-          registerHost(self);
+          registerHost(self, cmpMeta);
           if (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
             // this component is using shadow dom
             // and this browser supports shadow dom
@@ -108,7 +108,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
             // connectedCallback will be processed once all components have been registered
             deferredConnectedCallbacks.push(this);
           } else {
-            plt.jmp(() => connectedCallback(this, cmpMeta));
+            plt.jmp(() => connectedCallback(this));
           }
         }
 
@@ -123,7 +123,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         forceUpdate() {
-          forceUpdate(this, cmpMeta);
+          forceUpdate(this);
         }
 
         componentOnReady() {

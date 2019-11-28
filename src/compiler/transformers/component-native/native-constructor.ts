@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';
-import { ATTACH_SHADOW, REGISTER_HOST, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
+import { ATTACH_SHADOW, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
 import ts from 'typescript';
 
 
@@ -80,9 +80,12 @@ const nativeRegisterHostStatement = (moduleFile: d.Module) => {
   addCoreRuntimeApi(moduleFile, RUNTIME_APIS.registerHost);
 
   return ts.createStatement(ts.createCall(
-    ts.createIdentifier(REGISTER_HOST),
+    ts.createPropertyAccess(
+      ts.createThis(),
+      ts.createIdentifier('__registerHost')
+    ),
     undefined,
-    [ ts.createThis() ]
+    undefined
   ));
 };
 

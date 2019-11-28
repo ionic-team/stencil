@@ -91,6 +91,7 @@ export type RuntimeRef = HostElement | {};
 export interface HostRef {
   $ancestorComponent$?: HostElement;
   $flags$: number;
+  $cmpMeta$: ComponentRuntimeMeta;
   $hostElement$?: HostElement;
   $instanceValues$?: Map<string, any>;
   $lazyInstance$?: ComponentInterface;

@@ -558,8 +558,16 @@ interface RelocateNode {
   $nodeToRelocate$: d.RenderNode;
 }
 
-export const renderVdom = (hostElm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, renderFnResults: d.VNode | d.VNode[]) => {
+export const renderVdom = (hostRef: d.HostRef, renderFnResults: d.VNode | d.VNode[]) => {
+  const hostElm = hostRef.$hostElement$;
+  const cmpMeta = hostRef.$cmpMeta$;
+  const oldVNode: d.VNode = hostRef.$vnode$ || newVNode(null, null);
+  const rootVnode = isHost(renderFnResults)
+    ? renderFnResults
+    : h(null, null, renderFnResults as any);
+
   hostTagName = hostElm.tagName;
+
   // <Host> runtime check
   if (BUILD.isDev && Array.isArray(renderFnResults) && renderFnResults.some(isHost)) {
     throw new Error(`The <Host> must be the single root component.
@@ -573,13 +581,8 @@ render() {
     <Host>{content}</Host>
   );
 }
-`);
+  `);
   }
-  const oldVNode: d.VNode = hostRef.$vnode$ || newVNode(null, null);
-  const rootVnode = isHost(renderFnResults)
-    ? renderFnResults
-    : h(null, null, renderFnResults as any);
-
   if (BUILD.reflect && cmpMeta.$attrsToReflect$) {
     rootVnode.$attrs$ = rootVnode.$attrs$ || {};
     cmpMeta.$attrsToReflect$.forEach(([propName, attribute]) =>

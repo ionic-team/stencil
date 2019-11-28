@@ -10,10 +10,11 @@ export const getHostRef = (ref: d.RuntimeRef) =>
 export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) =>
   hostRefs.set(hostRef.$lazyInstance$ = lazyInstance, hostRef);
 
-export const registerHost = (elm: d.HostElement) => {
+export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
   const hostRef: d.HostRef = {
     $flags$: 0,
     $hostElement$: elm,
+    $cmpMeta$: cmpMeta,
     $instanceValues$: new Map()
   };
   if (BUILD.isDev) {
