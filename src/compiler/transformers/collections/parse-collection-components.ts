@@ -17,7 +17,6 @@ export function parseCollectionComponents(config: d.Config, compilerCtx: d.Compi
       transpileCollectionEntry(config, compilerCtx, buildCtx, collection, componentPath, sourceText);
     });
   }
-  debugger;
 }
 
 

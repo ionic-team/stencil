@@ -60,7 +60,8 @@ export function startupLog(prcs: NodeJS.Process, config: d.Config) {
     }
 
     logger.debug(`node ${prcs.version}`);
-    logger.debug(`compiler build: ${compilerBuild.buildId}`);
+    logger.debug(`compiler: ${config.sys_next.getCompilerExecutingPath()}`);
+    logger.debug(`build: ${compilerBuild.buildId}`);
 
   } catch (e) {
     logger.warn(e);
