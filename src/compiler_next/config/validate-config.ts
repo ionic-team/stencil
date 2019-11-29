@@ -10,6 +10,7 @@ import { validateTesting } from '../../compiler/config/validate-testing';
 import { validateWorkers } from './validate-workers';
 import { setBooleanConfig } from '../../compiler/config/config-utils';
 import path from 'path';
+import fs from 'fs';
 
 
 export const validateConfig = (userConfig?: Config) => {
@@ -19,6 +20,9 @@ export const validateConfig = (userConfig?: Config) => {
   // old way
   config.sys = config.sys || {};
   config.sys.path = path;
+  config.sys.fs = fs as any;
+  config.sys.details = config.sys_next.details;
+  config.sys.nextTick = process.nextTick.bind(process);
 
   // copy flags (we know it'll be json safe)
   config.flags = JSON.parse(JSON.stringify(config.flags || {}));

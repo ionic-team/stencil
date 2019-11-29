@@ -1,9 +1,10 @@
-import { CompilerSystem } from '../../declarations';
+import { CompilerSystem, SystemDetails } from '../../declarations';
 import { nodeCopyTasks } from './node-copy-tasks';
 import { createHash } from 'crypto';
 import { normalizePath } from '@utils';
 import fs from 'graceful-fs';
 import path from 'path';
+import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
 
 
 export function createNodeSys(prcs: NodeJS.Process) {
@@ -202,6 +203,33 @@ export function createNodeSys(prcs: NodeJS.Process) {
       return Promise.resolve(hash);
     },
     copy: nodeCopyTasks,
+    details: getDetails()
   };
   return sys;
 }
+
+const getDetails = () => {
+  const details: SystemDetails = {
+    cpuModel: '',
+    cpus: -1,
+    freemem() {
+      return freemem();
+    },
+    platform: '',
+    release: '',
+    runtime: 'node',
+    runtimeVersion: '',
+    tmpDir: tmpdir(),
+    totalmem: -1
+  };
+  try {
+    const sysCpus = cpus();
+    details.cpuModel = sysCpus[0].model;
+    details.cpus = sysCpus.length;
+    details.platform = platform();
+    details.release = release();
+    details.runtimeVersion = process.version;
+    details.totalmem = totalmem();
+  } catch (e) {}
+  return details;
+};

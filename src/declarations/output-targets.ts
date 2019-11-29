@@ -243,6 +243,7 @@ export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNe
   //  dist-custom-elements-bundle
   type: 'experimental-dist-module';
   empty?: boolean;
+  externalRuntime?: boolean;
   copy?: CopyTask[];
 }
 

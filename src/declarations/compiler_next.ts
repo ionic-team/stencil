@@ -3,6 +3,7 @@ import { CopyResults, CopyTask } from './assets';
 import { Diagnostic } from './diagnostics';
 import { HotModuleReplacement } from './build';
 import { WorkerMainController } from './worker_next';
+import { SystemDetails } from './system';
 
 
 export interface CompilerNext {
@@ -14,6 +15,7 @@ export interface CompilerNext {
 
 export interface CompilerSystemAsync {
   events?: BuildEvents;
+  details?: SystemDetails;
 
   /**
    * Always returns a boolean, does not throw.

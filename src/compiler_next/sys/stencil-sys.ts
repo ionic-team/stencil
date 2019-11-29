@@ -339,6 +339,7 @@ export const createStencilSys = () => {
     createWorker: (maxConcurrentWorkers, events) => (
       createWebWorkerMainController(location.href, 'worker', maxConcurrentWorkers, events)
     ),
+    details: getDetails(),
     copy,
   };
 
@@ -353,3 +354,21 @@ interface FsItem {
   isDirectory: boolean;
   watcherCallback: d.CompilerFileWatcherCallback;
 }
+
+
+const getDetails = () => {
+  const details: d.SystemDetails = {
+    cpuModel: '',
+    cpus: -1,
+    freemem() {
+      return 0;
+    },
+    platform: '',
+    release: '',
+    runtime: 'node',
+    runtimeVersion: '',
+    tmpDir: '/.tmp',
+    totalmem: -1
+  };
+  return details;
+};
