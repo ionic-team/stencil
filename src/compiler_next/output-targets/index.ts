@@ -7,19 +7,22 @@ import { outputDocs } from '../../compiler/output-targets/output-docs';
 import { outputLazy } from './dist-lazy/lazy-output';
 import { outputLazyLoader } from '../../compiler/output-targets/output-lazy-loader';
 import { outputWww } from '../../compiler/output-targets/output-www';
+import { outputCollection } from './dist-collection';
 
 
 export const generateOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const timeSpan = buildCtx.createTimeSpan('generate outputs started', true);
 
   const changedModuleFiles = Array.from(compilerCtx.changedModules)
-    .map(filename => compilerCtx.moduleMap.get(filename));
+    .map(filename => compilerCtx.moduleMap.get(filename))
+    .filter(mod => mod && !mod.isCollectionDependency);
 
   compilerCtx.changedModules.clear();
 
   await Promise.all([
     outputAngular(config, compilerCtx, buildCtx),
     outputCopy(config, compilerCtx, buildCtx),
+    outputCollection(config, compilerCtx, buildCtx, changedModuleFiles),
     outputCustomElements(config, compilerCtx, buildCtx, changedModuleFiles),
     outputCustomElementsBundle(config, compilerCtx, buildCtx),
     outputDocs(config, compilerCtx, buildCtx),

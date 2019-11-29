@@ -12,7 +12,7 @@ export const getTsOptionsToExtend = (config: d.Config) => {
     moduleResolution: ts.ModuleResolutionKind.NodeJs,
     noEmitOnError: false,
     outDir: config.cacheDir,
-    rootDir: config.rootDir,
+    rootDir: config.srcDir,
     sourceMap: config.sourceMap,
     target: ts.ScriptTarget.ES2017,
   };
