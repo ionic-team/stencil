@@ -52,6 +52,12 @@ export async function cli_legacy(opts: BuildOptions) {
               external: true
             }
           }
+          if (importee === '@mock-doc') {
+            return {
+              id: '../mock-doc/index.js',
+              external: true
+            }
+          }
           return null;
         }
       },

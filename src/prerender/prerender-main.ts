@@ -8,6 +8,9 @@ import { getPrerenderConfig } from './prerender-config';
 import { getAbsoluteBuildDir } from '../compiler/html/utils';
 import { isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { NodeWorkerController } from '../sys/node_next/worker';
+import crypto from 'crypto';
+import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import readline from 'readline';
 import { URL } from 'url';
@@ -23,31 +26,52 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
   }
 
   const diagnostics: d.Diagnostic[] = [];
-  try {
-    const cliWorkerPath = path.join(cliRootDir, 'cli-worker.js');
-    const workerCtrl = new NodeWorkerController(
-      cliWorkerPath,
-      config.maxConcurrentWorkers,
-      null,
-      config.logger
-    );
 
-    await Promise.all(outputTargets.map(outputTarget => {
-      return runPrerenderOutputTarget(
-        prcs,
-        workerCtrl,
-        diagnostics,
-        config,
-        devServer,
-        buildResults,
-        outputTarget
+  if (typeof buildResults.hydrateAppFilePath !== 'string') {
+    const diagnostic = buildError(diagnostics);
+    diagnostic.header = `Prerender Error`;
+    diagnostic.messageText = `Build results missing "hydrateAppFilePath"`;
+
+  } else {
+    const hydrateAppExists = fs.existsSync(buildResults.hydrateAppFilePath);
+    if (!hydrateAppExists) {
+      const diagnostic = buildError(diagnostics);
+      diagnostic.header = `Prerender Error`;
+      diagnostic.messageText = `Unable to open "hydrateAppFilePath": ${buildResults.hydrateAppFilePath}`;
+    }
+  }
+
+  if (diagnostics.length === 0) {
+    let workerCtrl: NodeWorkerController = null;
+
+    try {
+      const cliWorkerPath = path.join(cliRootDir, 'cli-worker.js');
+      workerCtrl = new NodeWorkerController(
+        cliWorkerPath,
+        config.maxConcurrentWorkers,
+        null,
+        config.logger
       );
-    }));
 
-    workerCtrl.destroy();
+      await Promise.all(outputTargets.map(outputTarget => {
+        return runPrerenderOutputTarget(
+          prcs,
+          workerCtrl,
+          diagnostics,
+          config,
+          devServer,
+          buildResults,
+          outputTarget
+        );
+      }));
 
-  } catch (e) {
-    catchError(diagnostics, e);
+    } catch (e) {
+      catchError(diagnostics, e);
+    }
+
+    if (workerCtrl) {
+      workerCtrl.destroy();
+    }
   }
 
   config.logger.printDiagnostics(diagnostics);
@@ -62,6 +86,7 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Nod
 
     const devServerBaseUrl = new URL(devServer.browserUrl);
     const devServerHostUrl = devServerBaseUrl.origin;
+    config.logger.debug(`prerender hydrate app: ${buildResults.hydrateAppFilePath}`);
     config.logger.debug(`prerender dev server: ${devServerHostUrl}`);
 
     // get the prerender urls to queue up
@@ -101,17 +126,17 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Nod
     }
 
     const templateHtml = await generateTemplateHtml(config, diagnostics, outputTarget);
-    if (diagnostics.length > 0) {
+    if (diagnostics.length > 0 || typeof templateHtml !== 'string') {
       return;
     }
 
-    manager.templateId = await createPrerenderTemplate(config, templateHtml);
-    manager.componentGraphPath = await createComponentGraphPath(config, buildResults, outputTarget);
+    manager.templateId = createPrerenderTemplate(config, templateHtml);
+    manager.componentGraphPath = createComponentGraphPath(config, buildResults, outputTarget);
 
     await new Promise(resolve => {
       manager.resolve = resolve;
 
-      config.sys.nextTick(() => {
+      process.nextTick(() => {
         drainPrerenderQueue(manager);
       });
     });
@@ -163,22 +188,23 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Nod
 }
 
 
-async function createPrerenderTemplate(config: d.Config, templateHtml: string) {
-  const hash = await config.sys.generateContentHash(templateHtml, 12);
+function createPrerenderTemplate(config: d.Config, templateHtml: string) {
+  const hash = generateContentHash(templateHtml);
   const templateFileName = `prerender-template-${hash}.html`;
-  const templateId = config.sys.path.join(config.sys.details.tmpDir, templateFileName);
-  await config.sys.fs.writeFile(templateId, templateHtml);
+  const templateId = path.join(os.tmpdir(), templateFileName);
+  config.logger.debug(`prerender template: ${templateId}`);
+  fs.writeFileSync(templateId, templateHtml);
   return templateId;
 }
 
 
-async function createComponentGraphPath(config: d.Config, buildResults: d.CompilerBuildResults, outputTarget: d.OutputTargetWww) {
+function createComponentGraphPath(config: d.Config, buildResults: d.CompilerBuildResults, outputTarget: d.OutputTargetWww) {
   if (buildResults.componentGraph) {
     const content = getComponentPathContent(config, buildResults.componentGraph, outputTarget);
-    const hash = await config.sys.generateContentHash(content, 12);
+    const hash = generateContentHash(content);
     const fileName = `prerender-component-graph-${hash}.json`;
-    const componentGraphPath = config.sys.path.join(config.sys.details.tmpDir, fileName);
-    await config.sys.fs.writeFile(componentGraphPath, content);
+    const componentGraphPath = path.join(os.tmpdir(), fileName);
+    fs.writeFileSync(componentGraphPath, content);
     return componentGraphPath;
   }
   return null;
@@ -189,7 +215,7 @@ function getComponentPathContent(config: d.Config, componentGraph: Map<string, s
   const buildDir = getAbsoluteBuildDir(config, outputTarget);
   const object: {[key: string]: string[]} = {};
   for (const [key, chunks] of componentGraph.entries()) {
-    object[key] = chunks.map(filename => config.sys.path.join(buildDir, filename));
+    object[key] = chunks.map(filename => path.join(buildDir, filename));
   }
   return JSON.stringify(object);
 }
@@ -217,3 +243,12 @@ const startProgressLogger = (): d.ProgressLogger => {
     stop
   };
 };
+
+
+function generateContentHash(content: string) {
+  return crypto.createHash('md5')
+    .update(content)
+    .digest('hex')
+    .toLowerCase()
+    .substr(0, 12);
+}

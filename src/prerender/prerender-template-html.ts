@@ -1,19 +1,27 @@
 import * as d from '../declarations';
 import { catchError } from '@utils';
+import { createDocument, serializeNodeToHtml } from '@mock-doc';
+import fs from 'fs';
+import path from 'path';
+import { promisify } from 'util';
+
+const readFile = promisify(fs.readFile);
 
 
 export async function generateTemplateHtml(config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetWww) {
   try {
-    const templateHtml = await config.sys.fs.readFile(outputTarget.indexHtml);
-    const templateDoc = config.sys.createDocument(templateHtml);
+    const templateHtml = await readFile(outputTarget.indexHtml, 'utf8');
+    const templateDoc = createDocument(templateHtml);
 
-    await inlineStyleSheets(config, templateDoc, outputTarget);
+    await inlineStyleSheets(templateDoc, outputTarget);
 
     if (config.minifyJs && config.logLevel !== 'debug') {
-      await minifyScriptElements(config, templateDoc);
+      // TODO
+      // await minifyScriptElements(config, templateDoc);
     }
 
-    return config.sys.serializeNodeToHtml(templateDoc);
+    return serializeNodeToHtml(templateDoc);
+
   } catch (e) {
     catchError(diagnostics, e);
   }
@@ -21,7 +29,7 @@ export async function generateTemplateHtml(config: d.Config, diagnostics: d.Diag
 }
 
 
-function inlineStyleSheets(config: d.Config, doc: Document, outputTarget: d.OutputTargetWww) {
+function inlineStyleSheets(doc: Document, outputTarget: d.OutputTargetWww) {
   const globalLinks = Array.from(doc.querySelectorAll('link[rel=stylesheet]')) as HTMLLinkElement[];
   return Promise.all(
     globalLinks.map(async link => {
@@ -29,34 +37,38 @@ function inlineStyleSheets(config: d.Config, doc: Document, outputTarget: d.Outp
       if (!href.startsWith('/') || link.getAttribute('media') !== null) {
         return;
       }
-      const fsPath = config.sys.path.join(outputTarget.appDir, href);
-      if (!config.sys.fs.existsSync(fsPath)) {
-        return;
+
+      const fsPath = path.join(outputTarget.appDir, href);
+
+      try {
+        const styles = await readFile(fsPath, 'utf8');
+
+        // insert inline <style>
+        const inlinedStyles = doc.createElement('style');
+        inlinedStyles.innerHTML = styles;
+        link.parentNode.insertBefore(inlinedStyles, link);
+        link.remove();
+
+        // mark inlinedStyle as treeshakable
+        inlinedStyles.setAttribute('data-styles', '');
+
+        // since it's not longer a critical resource
+        link.setAttribute('media', '(max-width: 0px)');
+        link.setAttribute('importance', 'low');
+        link.setAttribute('onload', `this.media=''`);
+
+        // move <link rel="stylesheet"> to the end of <body>
+        doc.body.appendChild(link);
+
+      } catch (e) {
+
       }
-      const styles = await config.sys.fs.readFile(fsPath);
-
-      // insert inline <style>
-      const inlinedStyles = doc.createElement('style');
-      inlinedStyles.innerHTML = styles;
-      link.parentNode.insertBefore(inlinedStyles, link);
-      link.remove();
-
-      // mark inlinedStyle as treeshakable
-      inlinedStyles.setAttribute('data-styles', '');
-
-      // since it's not longer a critical resource
-      link.setAttribute('media', '(max-width: 0px)');
-      link.setAttribute('importance', 'low');
-      link.setAttribute('onload', `this.media=''`);
-
-      // move <link rel="stylesheet"> to the end of <body>
-      doc.body.appendChild(link);
     })
   );
 }
 
 
-function minifyScriptElements(config: d.Config, doc: Document) {
+export function minifyScriptElements(config: d.Config, doc: Document) {
   const scriptElms = (Array.from(doc.querySelectorAll('script')) as HTMLScriptElement[])
     .filter(scriptElm => {
       if (scriptElm.hasAttribute('src')) {
