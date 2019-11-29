@@ -1,4 +1,6 @@
 import * as d from '../../../declarations';
+import { basename } from 'path';
+
 
 export interface FsObj {
   __sys: d.CompilerSystem;
@@ -25,7 +27,13 @@ export const existsSync = fs.existsSync = (p: string) => {
 
 export const mkdirSync = fs.mkdirSync = (p: string) => fs.__sys.mkdirSync(p);
 
-export const readdirSync = fs.readdirSync = (p: string) => fs.__sys.readdirSync(p);
+export const readdirSync = fs.readdirSync = (p: string) => {
+  // sys.readdirSync includes full paths
+  // but if fs.readdirSync was called, the expected
+  // nodejs results are of just the basename for each dir item
+  const dirItems = fs.__sys.readdirSync(p);
+  return dirItems.map(dirItem => basename(dirItem));
+};
 
 export const readFile = fs.readFile = async (p: string, opts: any, cb: (err: any, data: string) => void) => {
   const encoding = typeof opts === 'object' ? opts.encoding : typeof opts === 'string' ? opts : 'utf-8';
