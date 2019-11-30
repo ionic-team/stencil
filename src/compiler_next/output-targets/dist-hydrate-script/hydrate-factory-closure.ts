@@ -1,5 +1,4 @@
 
-
 export const HYDRATE_FACTORY_INTRO = `
 export function hydrateFactory($stencilWindow, $stencilHydrateOpts, $stencilHydrateResults, $stencilAfterHydrate, $stencilHydrateResolve) {
   var globalThis = $stencilWindow;

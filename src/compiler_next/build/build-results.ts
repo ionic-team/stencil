@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { getBuildTimestamp } from '../../compiler/build/build-ctx';
-import { hasError, normalizeDiagnostics } from '@utils';
+import { hasError, isString, normalizeDiagnostics } from '@utils';
 
 
 export const generateBuildResults = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -20,6 +20,10 @@ export const generateBuildResults = (compilerCtx: d.CompilerCtx, buildCtx: d.Bui
     outputs: compilerCtx.fs.getBuildOutputs(),
     timestamp: getBuildTimestamp(),
   };
+
+  if (isString(buildCtx.hydrateAppFilePath)) {
+    buildResults.hydrateAppFilePath = buildCtx.hydrateAppFilePath;
+  }
 
   compilerCtx.lastBuildResults = Object.assign({}, buildResults as any);
 

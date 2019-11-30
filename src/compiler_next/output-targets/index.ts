@@ -4,6 +4,7 @@ import { outputCopy } from './copy/output-copy';
 import { outputCustomElements } from './dist-custom-elements';
 import { outputCustomElementsBundle } from './dist-custom-elements-bundle';
 import { outputDocs } from '../../compiler/output-targets/output-docs';
+import { outputHydrateScript } from './dist-hydrate-script';
 import { outputLazy } from './dist-lazy/lazy-output';
 import { outputLazyLoader } from '../../compiler/output-targets/output-lazy-loader';
 import { outputWww } from '../../compiler/output-targets/output-www';
@@ -26,6 +27,7 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
     outputCustomElements(config, compilerCtx, buildCtx, changedModuleFiles),
     outputCustomElementsBundle(config, compilerCtx, buildCtx),
     outputDocs(config, compilerCtx, buildCtx),
+    outputHydrateScript(config, compilerCtx, buildCtx),
     outputLazy(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
     outputWww(config, compilerCtx, buildCtx),

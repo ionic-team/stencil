@@ -52,7 +52,7 @@ export const transformToHydrateComponentText = (compilerCtx: d.CompilerCtx, buil
 };
 
 
-const hydrateComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
+export const hydrateComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
 
   return transformCtx => {
 

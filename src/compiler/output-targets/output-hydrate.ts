@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { isOutputTargetHydrate } from './output-utils';
-import { generateHydrateApp } from '../component-hydrate/generate-hydrate-app';
+import { generateHydrateApp } from '../component-hydrate_legacy/generate-hydrate-app_legacy';
 
 
 export async function outputHydrate(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {

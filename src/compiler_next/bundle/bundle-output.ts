@@ -37,7 +37,7 @@ export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx,
 };
 
 
-const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
+export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
   const customResolveOptions = createCustomResolverAsync(
     config,
     compilerCtx.fs,

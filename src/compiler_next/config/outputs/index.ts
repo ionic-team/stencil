@@ -3,9 +3,10 @@ import { buildError } from '@utils';
 import { VALID_TYPES_NEXT } from '../../../compiler/output-targets/output-utils';
 import { validateCollection } from './validate-collection';
 import { validateCustomElement } from './validate-custom-element';
+import { validateDist } from './validate-dist';
+import { validateHydrateScript } from './validate-hydrate-script';
 import { validateLazy } from './validate-lazy';
 import { validateWww } from './validate-www';
-import { validateDist } from './validate-dist';
 
 
 export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnostic[]) {
@@ -24,5 +25,6 @@ export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnosti
     ...validateLazy(config, userOutputs),
     ...validateWww(config, diagnostics, userOutputs),
     ...validateDist(config, userOutputs),
+    ...validateHydrateScript(config, userOutputs),
   ];
 }

@@ -90,6 +90,21 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Hello World Prerender NEXT",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--next",
+        "--prerender",
+        "--max-workers=0",
+        "--config",
+        "${workspaceFolder}/test/hello-world/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Hello World Prerender",
       "args": [
         "${workspaceFolder}/test/hello-world/prerender.js"
@@ -256,7 +271,22 @@
         "${workspaceFolder}/bin/stencil",
         "build",
         "--prerender",
+        "--max-workers=1",
+        "--debug",
+        "--config",
+        "${workspaceFolder}/../stencil-site/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Stencil Site Prerender NEXT",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
         "--max-workers=0",
+        "--next",
         "--debug",
         "--config",
         "${workspaceFolder}/../stencil-site/stencil.config.ts"

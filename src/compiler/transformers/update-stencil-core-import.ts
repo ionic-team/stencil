@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { STENCIL_CORE_ID } from '../../compiler_next/bundle/entry-alias-ids';
 
 
 export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.TransformerFactory<ts.SourceFile> => {
@@ -10,7 +11,7 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
       tsSourceFile.statements.forEach(s => {
         if (ts.isImportDeclaration(s)) {
           if (s.moduleSpecifier != null && ts.isStringLiteral(s.moduleSpecifier)) {
-            if (s.moduleSpecifier.text === '@stencil/core') {
+            if (s.moduleSpecifier.text === STENCIL_CORE_ID) {
               if (s.importClause && s.importClause.namedBindings && s.importClause.namedBindings.kind === ts.SyntaxKind.NamedImports) {
 
                 const origImports = s.importClause.namedBindings.elements;
