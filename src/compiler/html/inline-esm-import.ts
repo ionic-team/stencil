@@ -48,15 +48,11 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
   content = content.replace(corePath, newPath);
 
   // insert inline script
-  const inlinedScript = doc.createElement('script');
-  inlinedScript.setAttribute('type', 'module');
-  inlinedScript.setAttribute('data-resources-url', resourcesUrl);
-  inlinedScript.setAttribute('data-stencil-namespace', config.fsNamespace);
-  inlinedScript.innerHTML = content;
-  doc.body.appendChild(inlinedScript);
+  script.removeAttribute('src');
+  script.setAttribute('data-resources-url', resourcesUrl);
+  script.setAttribute('data-stencil-namespace', config.fsNamespace);
+  script.innerHTML = content;
 
-  // remove original script
-  script.remove();
   return true;
 }
 
