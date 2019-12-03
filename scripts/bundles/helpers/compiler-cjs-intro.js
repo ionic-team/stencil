@@ -1,4 +1,4 @@
-(function(exports) {
+var stencil = (function(exports) {
   'use strict';
 
   if (typeof globalThis === 'undefined') {
