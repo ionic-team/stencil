@@ -4,6 +4,7 @@ export {
   CompilerBuildResults,
   Config,
   createCompiler,
+  CompilerNext as Compiler,
   dependencies,
   Diagnostic,
   getMinifyScriptOptions,

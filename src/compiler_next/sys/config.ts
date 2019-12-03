@@ -19,6 +19,7 @@ export const getConfig = (userConfig: d.Config) => {
     config.sys_next = createStencilSys();
   }
 
+  config.flags = config.flags || {};
   if (config.flags.debug || config.flags.verbose) {
     config.logLevel = 'debug';
   } else if (config.flags.logLevel) {
