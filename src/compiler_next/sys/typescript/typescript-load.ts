@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { catchError } from '@utils';
 import { dependencies, getRemoteDependencyUrl } from '../dependencies';
-import { IS_NODE_ENV, IS_WEB_WORKER_ENV, requireFunc } from '../environment';
+import { IS_NODE_ENV, IS_WEB_WORKER_ENV, requireFunc, IS_SERVICE_WORKER_ENV } from '../environment';
 import tsTypes from 'typescript';
 
 
@@ -12,42 +12,65 @@ export const loadTypescript = (diagnostics: d.Diagnostic[]) => {
       return requireFunc('typescript');
     }
 
-    if (globalThis.ts) {
-      // "ts" already on global scope
-      return globalThis.ts;
-    }
-
     if (IS_WEB_WORKER_ENV) {
       // browser web worker
       const tsDep = dependencies.find(dep => dep.name === 'typescript');
       const tsExternalUrl = getRemoteDependencyUrl(tsDep);
-      try {
-        (self as any).importScripts(tsExternalUrl);
-        globalThis.ts.sys = globalThis.ts.sys || {};
-        (globalThis.ts.sys as tsTypes.System).getExecutingFilePath = () => tsExternalUrl;
-        return globalThis.ts;
-
-      } catch (e) {
-        // make a huge assumption and check for typescript dir as a sibling to this file
-        // /lib/typescript.js
-        const tsLocalUrl = new URL(`../typescript/${tsDep.main}`, location.href).href;
-        try {
-          (self as any).importScripts(tsLocalUrl);
-          globalThis.ts.sys = globalThis.ts.sys || {};
-          (globalThis.ts.sys as tsTypes.System).getExecutingFilePath = () => tsLocalUrl;
-          return globalThis.ts;
-
-        } catch (e) {
-          throw new Error(`unable to load typescript from url "${tsExternalUrl}" or "${tsLocalUrl}"`);
-        }
+      const tsExternal = fetchTypescriptScript(tsExternalUrl);
+      if (tsExternal) {
+        return tsExternal;
       }
+
+      const tsLocalUrl = new URL(`../typescript/${tsDep.main}`, location.href).href;
+      const tsLocal = fetchTypescriptScript(tsLocalUrl);
+      if (tsLocal) {
+        return tsLocal;
+      }
+
+      throw new Error(`unable to load typescript from url "${tsExternalUrl}" or "${tsLocalUrl}"`);
     }
 
-    throw new Error(`typescript: missing global "ts" variable`);
+    throw new Error(`typescript: compiler can only run from within a web worker or nodejs`);
 
   } catch (e) {
     catchError(diagnostics, e);
   }
 };
 
-declare var globalThis: any;
+const fetchTypescriptScript = (tsUrl: string) => {
+  let ts: any = null;
+
+  if (IS_SERVICE_WORKER_ENV) {
+    // NOTE! async importScripts() do not work in service workers!
+    // https://developers.google.com/web/tools/workbox/modules/workbox-sw#avoid_async_imports
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', tsUrl, false);
+      xhr.send(null);
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const tsContent = xhr.responseText;
+
+        const getTs = new Function(tsContent + ';return ts;');
+        ts = getTs();
+
+        ts.sys = ts.sys || {};
+        (ts.sys as tsTypes.System).getExecutingFilePath = () => tsUrl;
+      }
+
+    } catch (e) {}
+
+  } else if (IS_WEB_WORKER_ENV) {
+    try {
+      (self as any).importScripts(tsUrl);
+      if ((self as any).ts) {
+        ts = (self as any).ts;
+        ts.sys = ts.sys || {};
+        ts.sys.getExecutingFilePath = () => tsUrl;
+      }
+
+    } catch (e) {}
+  }
+
+  return ts;
+};
