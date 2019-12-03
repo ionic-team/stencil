@@ -2,8 +2,9 @@ import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
 import { getBuildFeatures } from '../../build/app-data';
 import { getRollupOptions } from '../../bundle/bundle-output';
+import { hydrateComponentTransform } from '../../transformers/component-hydrate/tranform-to-hydrate-component';
+
 import { loadRollupDiagnostics } from '@utils';
-import { hydrateComponentTransform } from '../../../compiler/transformers/component-hydrate/tranform-to-hydrate-component';
 import { rollup } from 'rollup';
 import { STENCIL_INTERNAL_HYDRATE_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';

@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { bundleHydrateFactory } from './bundle-hydrate-factory';
-import { DEFAULT_STYLE_MODE, catchError, createOnWarnFn, loadRollupDiagnostics } from '@utils';
+import { catchError, createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
 import { HYDRATE_FACTORY_INTRO, HYDRATE_FACTORY_OUTRO } from './hydrate-factory-closure';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
@@ -69,7 +69,7 @@ const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerC
       const cmps = buildCtx.components;
       const build = getBuildConditionals(config, cmps);
 
-      const appFactoryEntryCode = await generateHydrateFactoryEntry(compilerCtx, buildCtx);
+      const appFactoryEntryCode = await generateHydrateFactoryEntry(buildCtx);
 
       const rollupFactoryBuild = await bundleHydrateFactory(config, compilerCtx, buildCtx, build, appFactoryEntryCode);
       if (rollupFactoryBuild != null) {
@@ -95,9 +95,9 @@ const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerC
 };
 
 
-const generateHydrateFactoryEntry = async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+const generateHydrateFactoryEntry = async (buildCtx: d.BuildCtx) => {
   const cmps = buildCtx.components;
-  const hydrateCmps = await updateToHydrateComponents(compilerCtx, buildCtx, cmps);
+  const hydrateCmps = await updateToHydrateComponents(cmps);
   const s = new MagicString('');
 
   s.append(`import { hydrateApp, registerComponents, styles } from '${STENCIL_INTERNAL_PLATFORM_ID}';\n`);
@@ -109,24 +109,6 @@ const generateHydrateFactoryEntry = async (compilerCtx: d.CompilerCtx, buildCtx:
     s.append(`  ${cmpData.uniqueComponentClassName},\n`);
   });
   s.append(`]);\n`);
-
-  await buildCtx.stylesPromise;
-
-  hydrateCmps.forEach(cmpData => {
-    cmpData.cmp.styles.forEach(style => {
-      let scopeId = 'sc-' + cmpData.cmp.tagName;
-      if (style.modeName !== DEFAULT_STYLE_MODE) {
-        scopeId += `-${style.modeName}`;
-      }
-
-      if (typeof style.compiledStyleTextScopedCommented === 'string') {
-        s.append(`styles.set('${scopeId}','${style.compiledStyleTextScopedCommented}');\n`);
-      } else {
-        s.append(`styles.set('${scopeId}','${style.compiledStyleTextScoped}');\n`);
-      }
-    });
-  });
-
   s.append(`export { hydrateApp }\n`);
 
   return s.toString();
