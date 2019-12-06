@@ -31,7 +31,7 @@ export const createTsBuildProgram = async (config: d.Config, buildCallback: (tsB
           callback();
           clearInterval(timeoutId);
         }
-      }, config.sys_next.fileWatchTimeout || time);
+      }, config.sys_next.watchTimeout || time);
       return timeoutId;
     },
 

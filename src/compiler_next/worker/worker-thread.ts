@@ -15,7 +15,7 @@ import { transformCssToEsm } from '../../compiler/style/css-to-esm';
 export const createWorkerContext = (events: d.BuildEvents): d.CompilerWorkerContext => {
   let config: d.Config;
   let compiler: d.CompilerNext;
-  let sys: d.CompilerSystemAsync;
+  let sys: d.CompilerSystem;
   let watcher: d.CompilerWatcher;
 
   const getCompiler = async () => {

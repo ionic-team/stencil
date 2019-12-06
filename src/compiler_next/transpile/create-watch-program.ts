@@ -22,7 +22,7 @@ export const createTsWatchProgram = async (config: d.Config, buildCallback: (tsB
           clearInterval(t);
           timeoutId = rebuildTimer = null;
         }
-      }, config.sys_next.fileWatchTimeout || time);
+      }, config.sys_next.watchTimeout || time);
       return t;
     },
 

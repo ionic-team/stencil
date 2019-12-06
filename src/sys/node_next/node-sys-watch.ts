@@ -10,7 +10,7 @@ export function createNodeSysWithWatch(prcs: NodeJS.Process): CompilerSystem {
   const tsWatchFile = ts.sys.watchFile;
   const tsWatchDirectory = ts.sys.watchDirectory;
 
-  sys.fileWatchTimeout = 80;
+  sys.watchTimeout = 80;
   sys.events = buildEvents();
 
   sys.watchDirectory = (p, callback, recursive) => {
