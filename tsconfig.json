@@ -28,7 +28,7 @@
         "src/app-data/index.ts"
       ],
       "@compiler": [
-        "src/compiler_next/index-core.ts"
+        "src/compiler_next/index.ts"
       ],
       "@compiler_legacy": [
         "src/compiler/index.ts"
@@ -86,8 +86,7 @@
     "src/cli_next/public.ts",
     "src/cli_next/worker/index.ts",
     "src/compiler/index.ts",
-    "src/compiler_next/public-browser.ts",
-    "src/compiler_next/public-core.ts",
+    "src/compiler_next/public.ts",
     "src/compiler_next/sys/modules/index.ts",
     "src/dev-server/index.ts",
     "src/dev-server/public.ts",

@@ -19,20 +19,12 @@ export async function compiler(opts: BuildOptions) {
   const inputDir = join(opts.transpiledDir, 'compiler_next');
 
   const compilerFileName = 'stencil.js';
-  const browserFileName = 'stencil-browser.js';
   const compilerDtsName = compilerFileName.replace('.js', '.d.ts');
-  const browserDtsName = browserFileName.replace('.js', '.d.ts');
 
-  // copy @stencil/core/compiler(core) public d.ts
+  // copy @stencil/core/compiler public d.ts
   await fs.copyFile(
-    join(inputDir, 'public-core.d.ts'),
+    join(inputDir, 'public.d.ts'),
     join(opts.output.compilerDir, compilerDtsName)
-  );
-
-  // copy @stencil/core/compiler(browser) public d.ts
-  await fs.copyFile(
-    join(inputDir, 'public-browser.d.ts'),
-    join(opts.output.compilerDir, browserDtsName)
   );
 
   // write @stencil/core/compiler/package.json
@@ -40,7 +32,6 @@ export async function compiler(opts: BuildOptions) {
     name: '@stencil/core/compiler',
     description: 'Stencil Compiler.',
     main: compilerFileName,
-    browser: browserFileName,
     types: compilerDtsName
   });
 
@@ -50,8 +41,8 @@ export async function compiler(opts: BuildOptions) {
   const cjsOutro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-outro.js'), 'utf8');
 
 
-  const coreCompilerBundle: RollupOptions = {
-    input: join(inputDir, 'index-core.js'),
+  const compilerBundle: RollupOptions = {
+    input: join(inputDir, 'index.js'),
     output: {
       format: 'cjs',
       file: join(opts.output.compilerDir, compilerFileName),
@@ -96,30 +87,8 @@ export async function compiler(opts: BuildOptions) {
     }
   };
 
-
-  // browser compiler build
-  const browserCompilerBundle: RollupOptions = {
-    input: join(inputDir, 'index-browser.js'),
-    output: {
-      format: 'es',
-      file: join(opts.output.compilerDir, browserFileName),
-      banner: getBanner(opts, 'Stencil Compiler (Browser)', true)
-    },
-    plugins: [
-      aliasPlugin(opts),
-      sysModulesPlugin(inputDir),
-      nodeResolve({
-        preferBuiltins: false
-      }),
-      commonjs(),
-      replacePlugin(opts),
-      json() as any,
-    ]
-  };
-
   return [
-    coreCompilerBundle,
-    browserCompilerBundle
+    compilerBundle,
   ];
 };
 
