@@ -2,13 +2,14 @@
 export {
   compile,
   CompilerBuildResults,
+  CompilerNext as Compiler,
+  CompilerSystem,
   Config,
   createCompiler,
   createSystem,
-  CompilerNext as Compiler,
   dependencies,
   Diagnostic,
   getMinifyScriptOptions,
   loadConfig,
-  version
+  version,
 } from '@stencil/core/internal';
