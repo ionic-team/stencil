@@ -13,7 +13,6 @@ import { generateEsmBrowser } from './generate-esm-browser';
 import { generateEsm } from './generate-esm';
 import { generateSystem } from './generate-system';
 import { generateModuleGraph } from '../../../compiler/entries/component-graph';
-import { getGlobalScriptPaths } from '../../bundle/app-data-plugin';
 import MagicString from 'magic-string';
 
 
@@ -27,8 +26,6 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
 
   try {
     // const criticalBundles = getCriticalPath(buildCtx);
-    const globalScriptPaths = getGlobalScriptPaths(config, compilerCtx);
-
     const bundleOpts: BundleOptions = {
       id: 'lazy',
       platform: 'client',
@@ -40,8 +37,8 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
         'index': USER_INDEX_ENTRY_ID
       },
       loader: {
-        [LAZY_EXTERNAL_ENTRY_ID]: getLazyEntry(false, globalScriptPaths),
-        [LAZY_BROWSER_ENTRY_ID]: getLazyEntry(true, globalScriptPaths),
+        [LAZY_EXTERNAL_ENTRY_ID]: getLazyEntry(false),
+        [LAZY_BROWSER_ENTRY_ID]: getLazyEntry(true),
       }
     };
 
@@ -120,31 +117,22 @@ const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
   ];
 };
 
-const getLazyEntry = (isBrowser: boolean, globalScriptPaths: string[]) => {
-  const hasGlobalScripts = (globalScriptPaths.length > 0);
-
+const getLazyEntry = (isBrowser: boolean) => {
   const s = new MagicString(``);
-  s.append(`import { bootstrapLazy } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
+  s.append(`import { bootstrapLazy, globalScripts } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
 
-  if (hasGlobalScripts) {
-    s.append(`import { globalScripts } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
-  }
 
   if (isBrowser) {
     s.append(`import { patchBrowser } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
     s.append(`patchBrowser().then(options => {\n`);
-    if (hasGlobalScripts) {
-      s.append(`  globalScripts();\n`);
-    }
+    s.append(`  globalScripts();\n`);
     s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
     s.append(`});\n`);
 
   } else {
     s.append(`import { patchEsm } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
     s.append(`export const defineCustomElements = (win, options) => patchEsm().then(() => {\n`);
-    if (hasGlobalScripts) {
-      s.append(`  globalScripts();\n`);
-    }
+    s.append(`  globalScripts();\n`);
     s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
     s.append(`});\n`);
   }

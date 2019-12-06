@@ -18,7 +18,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
   newVal = parsePropertyValue(newVal, cmpMeta.$members$[propName][0]);
 
-  if (newVal !== oldVal && (!BUILD.lazyLoad || !(flags & HOST_FLAGS.isConstructingInstance) || oldVal === undefined)) {
+  if ((!BUILD.lazyLoad || !(flags & HOST_FLAGS.isConstructingInstance) || oldVal === undefined) && newVal !== oldVal) {
     // gadzooks! the property's value has changed!!
     // set our new value!
     hostRef.$instanceValues$.set(propName, newVal);

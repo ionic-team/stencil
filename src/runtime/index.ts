@@ -1,7 +1,7 @@
 
 export { bootstrapLazy } from './bootstrap-lazy';
 export { defineCustomElement, proxyCustomElement } from './define-native';
-export { proxyNative, attachShadow } from './bootstrap-native';
+export { proxyNative, attachShadow, forceModeUpdate } from './bootstrap-native';
 export { connectedCallback } from './connected-callback';
 export { createEvent } from './event-emitter';
 export { disconnectedCallback } from './disconnected-callback';

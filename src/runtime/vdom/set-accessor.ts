@@ -57,7 +57,13 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       newValue(elm);
     }
 
-  } else if (BUILD.vdomListener && !isProp && memberName[0] === 'o' && memberName[1] === 'n') {
+  } else if (
+    BUILD.vdomListener &&
+    (BUILD.lazyLoad
+      ? !isProp
+      : !(elm as any).__lookupSetter__(memberName)) &&
+    memberName[0] === 'o' && memberName[1] === 'n'
+  ) {
     // Event Handlers
     // so if the member name starts with "on" and the 3rd characters is
     // a capital letter, and it's not already a member on the element,

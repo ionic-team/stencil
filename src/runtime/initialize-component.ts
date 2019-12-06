@@ -3,10 +3,9 @@ import { BUILD } from '@app-data';
 import { consoleError, loadModule, styles } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { proxyComponent } from './proxy-component';
-import { scheduleUpdate } from './update-component';
+import { safeCall, scheduleUpdate } from './update-component';
 import { computeMode } from './mode';
 import { getScopeId, registerStyle } from './styles';
-import { fireConnectedCallback } from './connected-callback';
 import { PROXY_FLAGS } from './runtime-constants';
 import { createTime, uniqueTime } from './profile';
 
@@ -122,5 +121,11 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
 
   } else {
     schedule();
+  }
+};
+
+export const fireConnectedCallback = (instance: any) => {
+  if (BUILD.lazyLoad && BUILD.connectedCallback) {
+    safeCall(instance, 'connectedCallback');
   }
 };

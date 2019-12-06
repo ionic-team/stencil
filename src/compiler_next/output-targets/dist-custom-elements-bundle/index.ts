@@ -1,13 +1,14 @@
 import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
-import { catchError } from '@utils';
+import { catchError, dashToPascalCase } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
 import { isOutputTargetDistCustomElementsBundle } from '../../../compiler/output-targets/output-utils';
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
-import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
+import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import path from 'path';
+import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../../../compiler/app-core/format-component-runtime-meta';
 
 
 export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -16,7 +17,7 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
     return;
   }
 
-  const timespan = buildCtx.createTimeSpan(`generate custom elements bundle started`, true);
+  const timespan = buildCtx.createTimeSpan(`generate custom elements bundle started`);
 
   try {
     const bundleOpts: BundleOptions = {
@@ -24,7 +25,13 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
       platform: 'client',
       conditionals: getBuildConditionals(config, buildCtx.components),
       customTransformers: getCustomTransformer(compilerCtx),
-      inputs: getEntries(compilerCtx),
+      inputs: {
+        'index': '@core-entrypoint'
+      },
+      loader: {
+        '@core-entrypoint': generateEntryPoint(config, compilerCtx, buildCtx)
+      },
+      inlineDynamicImports: true,
     };
 
     const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
@@ -32,7 +39,23 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
       format: 'es',
       sourcemap: config.sourceMap,
     });
-    rollupOutput;
+
+    const promises: Promise<any>[] = [];
+    outputTargets.forEach(o => {
+      rollupOutput.output.forEach(file => {
+        if (file.type === 'chunk') {
+          promises.push(
+            compilerCtx.fs.writeFile(
+              path.join(o.dir, file.fileName),
+              file.code,
+              { outputTargetType: o.type }
+            )
+          );
+        }
+      });
+    });
+
+    await Promise.all(promises);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
@@ -41,30 +64,58 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
   timespan.finish(`generate custom elements bundle finished`);
 };
 
+function generateEntryPoint(_config: d.Config, _compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  const imports: string[] = [];
+  const exports: string[] = [];
+  imports.push(
+    `import { proxyNative, globalScripts } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
+    `export * from '${USER_INDEX_ENTRY_ID}';`,
+    'globalScripts();',
+  );
 
-const getEntries = (compilerCtx: d.CompilerCtx) => {
-  const inputs: any = {};
+  buildCtx.components.forEach(cmp => {
+    const exportName = dashToPascalCase(cmp.tagName);
+    const importName = cmp.componentClassName;
+    const importAs = `$Cmp${exportName}`;
 
-  compilerCtx.moduleMap.forEach(m => {
-    if (m.cmps.length > 0) {
-      const fileName = path.basename(m.sourceFilePath);
-      const nameParts = fileName.split('.');
-      nameParts.pop();
-      const entryName = nameParts.join('.');
-      inputs[entryName] = m.sourceFilePath;
+    if (cmp.isPlain) {
+      exports.push(
+        `export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`,
+      );
+
+    } else {
+      const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
+
+      imports.push(
+        `import { ${importName} as ${importAs} } from '${cmp.sourceFilePath}';`
+      );
+
+      exports.push(
+        `export const ${exportName} = /*@__PURE__*/proxyNative(${importAs}, ${meta});`
+      );
     }
   });
 
-  return inputs;
-};
+  return [
+    ...imports,
+    ...exports,
+    ''
+  ].join('\n');
+}
 
-const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
+function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
 
+  build.lazyLoad = false;
+  build.hydrateClientSide = false;
+  build.hydrateServerSide = false;
+
+  build.taskQueue = false;
   updateBuildConditionals(config, build);
+  build.devTools = false;
 
   return build;
-};
+}
 
 const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {

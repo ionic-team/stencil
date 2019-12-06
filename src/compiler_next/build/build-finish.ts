@@ -33,7 +33,7 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
   buildCtx.debug(`${aborted ? 'aborted' : 'finished'} build, ${buildCtx.timestamp}`);
 
   // create the build results data
-  buildCtx.buildResults_next = generateBuildResults(compilerCtx, buildCtx);
+  buildCtx.buildResults_next = generateBuildResults(config, compilerCtx, buildCtx);
 
   // log any errors/warnings
   if (!buildCtx.hasFinished) {

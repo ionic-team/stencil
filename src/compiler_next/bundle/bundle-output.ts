@@ -21,7 +21,6 @@ export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx,
     const rollupOptions = getRollupOptions(config, compilerCtx, buildCtx, bundleOpts);
     const rollupBuild = await rollup(rollupOptions);
 
-    // console.log(rollupBuild.getTimings());
     compilerCtx.rollupCache.set(
       bundleOpts.id,
       rollupBuild.cache
@@ -77,6 +76,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
     ],
 
     treeshake: getTreeshakeOption(config),
+    inlineDynamicImports: bundleOpts.inlineDynamicImports,
 
     onwarn: createOnWarnFn(buildCtx.diagnostics),
 

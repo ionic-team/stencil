@@ -6,15 +6,10 @@ import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS } from '@utils';
 import { doc, getHostRef, nextTick, plt, supportsShadowDom } from '@platform';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
-import { initializeComponent } from './initialize-component';
-import { attachToAncestor, safeCall } from './update-component';
+import { initializeComponent, fireConnectedCallback } from './initialize-component';
+import { attachToAncestor } from './update-component';
 import { createTime } from './profile';
 
-export const fireConnectedCallback = (instance: any) => {
-  if (BUILD.lazyLoad && BUILD.connectedCallback) {
-    safeCall(instance, 'connectedCallback');
-  }
-};
 
 export const connectedCallback = (elm: d.HostElement) => {
   if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {

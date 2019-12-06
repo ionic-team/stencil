@@ -5,7 +5,6 @@ import { doc, plt, styles, supportsConstructibleStylesheets, supportsShadowDom }
 import { HYDRATE_ID, NODE_TYPE } from './runtime-constants';
 import { createTime } from './profile';
 
-
 const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/new WeakMap();
 
 export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean) => {
@@ -79,10 +78,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
       }
 
     } else if (BUILD.constructableCSS && !styleContainerNode.adoptedStyleSheets.includes(style)) {
-      styleContainerNode.adoptedStyleSheets = [
-        ...styleContainerNode.adoptedStyleSheets,
-        style
-      ];
+      styleContainerNode.adoptedStyleSheets = [style];
     }
   }
   return scopeId;

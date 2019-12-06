@@ -7,7 +7,7 @@ import { validateDist } from './validate-dist';
 import { validateHydrateScript } from './validate-hydrate-script';
 import { validateLazy } from './validate-lazy';
 import { validateWww } from './validate-www';
-
+import { validateCustomElementBundle } from './validate-custom-element-bundle';
 
 export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnostic[]) {
   const userOutputs = (config.outputTargets || []).slice();
@@ -22,6 +22,7 @@ export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnosti
   config.outputTargets = [
     ...validateCollection(config, userOutputs),
     ...validateCustomElement(config, userOutputs),
+    ...validateCustomElementBundle(config, userOutputs),
     ...validateLazy(config, userOutputs),
     ...validateWww(config, diagnostics, userOutputs),
     ...validateDist(config, userOutputs),

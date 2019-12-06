@@ -1,9 +1,10 @@
 import * as d from '../../declarations';
 import { getBuildTimestamp } from '../../compiler/build/build-ctx';
 import { hasError, isString, normalizeDiagnostics } from '@utils';
+import { generateHmr } from './build-hmr';
 
 
-export const generateBuildResults = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const buildResults: d.CompilerBuildResults = {
     buildId: buildCtx.buildId,
     diagnostics: normalizeDiagnostics(compilerCtx, buildCtx.diagnostics),
@@ -20,6 +21,11 @@ export const generateBuildResults = (compilerCtx: d.CompilerCtx, buildCtx: d.Bui
     outputs: compilerCtx.fs.getBuildOutputs(),
     timestamp: getBuildTimestamp(),
   };
+
+  const hmr = generateHmr(config, compilerCtx, buildCtx);
+  if (hmr != null) {
+    buildResults.hmr = hmr;
+  }
 
   if (isString(buildCtx.hydrateAppFilePath)) {
     buildResults.hydrateAppFilePath = buildCtx.hydrateAppFilePath;

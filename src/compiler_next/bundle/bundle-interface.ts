@@ -9,4 +9,5 @@ export interface BundleOptions {
   customTransformers: TransformerFactory<SourceFile>[];
   inputs: {[entryKey: string]: string};
   loader?: {[id: string]: string};
+  inlineDynamicImports?: boolean;
 }
