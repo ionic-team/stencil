@@ -97,8 +97,8 @@ export interface RunCliOptions {
 }
 
 export {
-  createNodeLogger as createLogger,
-  createNodeSysWithWatch as createSys,
+  createNodeLogger,
+  createNodeSysWithWatch as createNodeSystem,
   parseFlags,
   runTask
 };

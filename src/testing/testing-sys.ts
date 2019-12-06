@@ -1,4 +1,4 @@
-import { createStencilSys } from '../compiler_next/sys/stencil-sys';
+import { createSystem } from '../compiler_next/sys/stencil-sys';
 import { CompilerSystem } from '@stencil/core/internal';
 
 export interface TestingSystem extends CompilerSystem {
@@ -6,10 +6,10 @@ export interface TestingSystem extends CompilerSystem {
   diskWrites: number;
 }
 
-export const createTestingSys = (): TestingSystem => {
+export const createTestingSystem = (): TestingSystem => {
   let diskReads = 0;
   let diskWrites = 0;
-  const sys = createStencilSys();
+  const sys = createSystem();
 
   const wrapRead = (fn: any) => {
     const orgFn = fn;

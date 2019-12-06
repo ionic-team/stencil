@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { createTestingSys } from '../../../testing/testing-sys';
+import { createTestingSystem } from '../../../testing/testing-sys';
 import { getCommitInstructions, inMemoryFs, shouldIgnore } from '../in-memory-fs';
 import { normalizePath } from '../../../utils';
 
@@ -172,11 +172,11 @@ describe(`in-memory-fs, getCommitInstructions`, () => {
 
 describe(`in-memory-fs`, () => {
 
-  let sys = createTestingSys();
+  let sys = createTestingSystem();
   let fs: d.InMemoryFileSystem;
 
   beforeEach(() => {
-    sys = createTestingSys();
+    sys = createTestingSystem();
     fs = inMemoryFs(sys);
   });
 

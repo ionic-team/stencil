@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { cloneDocument, createDocument, serializeNodeToHtml } from '@mock-doc';
 import { createLogger } from './logger';
-import { createStencilSys } from './stencil-sys';
+import { createSystem } from './stencil-sys';
 import { resolveModuleIdSync, resolvePackageJsonSync } from './resolve/resolve-module';
 import { scopeCss } from '../../utils/shadow-css';
 import path from 'path';
@@ -16,7 +16,7 @@ export const getConfig = (userConfig: d.Config) => {
   }
 
   if (!config.sys_next) {
-    config.sys_next = createStencilSys();
+    config.sys_next = createSystem();
   }
 
   config.flags = config.flags || {};

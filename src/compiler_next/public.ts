@@ -4,6 +4,7 @@ export {
   CompilerBuildResults,
   Config,
   createCompiler,
+  createSystem,
   CompilerNext as Compiler,
   dependencies,
   Diagnostic,

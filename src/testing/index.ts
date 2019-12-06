@@ -9,7 +9,7 @@ export { shuffleArray } from './testing-utils';
 export { Testing } from './testing';
 export { transpile } from './test-transpile';
 export { TestingFs } from './testing-fs';
-export { createTestingSys } from './testing-sys';
+export { createTestingSystem } from './testing-sys';
 
 export {
   EventSpy,

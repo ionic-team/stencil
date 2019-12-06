@@ -1,7 +1,7 @@
 import { buildError, catchError, normalizePath } from '@utils';
 import { CompilerSystem, Config, Diagnostic } from '../../declarations';
 import { createLogger } from '../sys/logger';
-import { createStencilSys } from '../sys/stencil-sys';
+import { createSystem } from '../sys/stencil-sys';
 import { loadTypescript } from '../sys/typescript/typescript-load';
 import { IS_NODE_ENV } from '../sys/environment';
 import { validateConfig } from './validate-config';
@@ -19,7 +19,7 @@ export const loadConfig = async (config: Config = {}) => {
   };
 
   try {
-    const sys = config.sys_next || createStencilSys();
+    const sys = config.sys_next || createSystem();
     const logger = config.logger || createLogger();
     const cwd = sys.getCurrentDirectory();
 

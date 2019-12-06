@@ -1,7 +1,7 @@
 import * as d from '@stencil/core/declarations';
 import { createRequestHandler } from '../request-handler';
+import { createSystem } from '../../compiler_next/sys/stencil-sys';
 import { mockConfig } from '@stencil/core/testing';
-import { createStencilSys } from '../../compiler_next/sys/stencil-sys';
 import { normalizePath } from '@utils';
 import { validateConfig } from '@stencil/core/compiler';
 import { validateDevServer } from '../../compiler/config/validate-dev-server';
@@ -27,7 +27,7 @@ describe('request-handler', () => {
   };
 
   beforeEach(async () => {
-    sys = createStencilSys();
+    sys = createSystem();
 
     const validated = validateConfig(mockConfig());
     const stencilConfig = validated.config;

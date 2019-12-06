@@ -6,7 +6,7 @@ import { normalizePath } from '@utils';
 import path from 'path';
 
 
-export const createStencilSys = () => {
+export const createSystem = () => {
   const items = new Map<string, FsItem>();
   const destroys = new Set<() => Promise<void> | void>();
 
