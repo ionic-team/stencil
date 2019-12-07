@@ -44,6 +44,7 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   build.cssVarShim = true;
   build.initializeNextTick = true;
   build.taskQueue = true;
+  build.forceShadowDom = config.forceShadowDom || false;
 
   const hasHydrateOutputTargets = config.outputTargets.some(isOutputTargetHydrate);
   build.hydrateClientSide = hasHydrateOutputTargets;
