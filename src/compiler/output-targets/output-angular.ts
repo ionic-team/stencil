@@ -207,7 +207,7 @@ export const proxyOutputs = (instance: any, el: any, events: string[]) => {
 
 // tslint:disable-next-line: only-arrow-functions
 export function ProxyCmp(opts: { inputs?: any; methods?: any }) {
-  return (cls: any) => {
+  const decorator =  function(cls: any){
     if (opts.inputs) {
       proxyInputs(cls, opts.inputs);
     }
@@ -216,6 +216,7 @@ export function ProxyCmp(opts: { inputs?: any; methods?: any }) {
     }
     return cls;
   };
+  return decorator;
 }
 `;
 
