@@ -113,7 +113,7 @@ export class ${tagNameAsPascal} {`];
   lines.push(`  constructor(c: ChangeDetectorRef, r: ElementRef, protected z: NgZone) {
     c.detach();
     this.el = r.nativeElement;`);
-  if(hasOutputs){
+  if (hasOutputs) {
     lines.push(`    proxyOutputs(this, this.el, ['${outputs.join(`', '`)}']);`);
   }
   lines.push(`  }`);
@@ -202,8 +202,8 @@ export const proxyMethods = (Cmp: any, methods: string[]) => {
 };
 
 export const proxyOutputs = (instance: any, el: any, events: string[]) => {
-   events.forEach(eventName => instance[eventName] = fromEvent(el, eventName));
- }
+  events.forEach(eventName => instance[eventName] = fromEvent(el, eventName));
+}
 
 // tslint:disable-next-line: only-arrow-functions
 export function ProxyCmp(opts: { inputs?: any; methods?: any }) {
