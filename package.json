@@ -66,7 +66,7 @@
     "@types/node-fetch": "^2.3.5",
     "@types/open": "^6.1.0",
     "@types/parse5": "^5.0.0",
-    "@types/pixelmatch": "^4.0.0",
+    "@types/pixelmatch": "^5.0.0",
     "@types/pngjs": "^3.3.2",
     "@types/prompts": "2.0.1",
     "@types/puppeteer": "~1.20.2",
