@@ -173,9 +173,6 @@ async function publishRelease(opts: BuildOptions, args: string[]) {
     .prompt(prompts)
     .then(answers => {
       if (answers.confirm){
-        if (opts.version !== answers.version) {
-          throw new Error(`Release data version and selected version do not match`);
-        }
         runReleaseTasks(opts, args);
       }
     })
