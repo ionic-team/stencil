@@ -1,27 +1,29 @@
-## ⛄️ [1.8.2-1](https://github.com/ionic-team/stencil/compare/v1.8.2-0...v1.8.2-1) (2019-11-24)
+# 🎷 [1.9.0-0](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.9.0-0) (2019-12-10)
 
 
 ### Bug Fixes
 
+* **compiler:** fix prerendering in next compiler ([4669ad9](https://github.com/ionic-team/stencil/commit/4669ad934d1e41f532af30a51a2a293dd32ab7b9))
+* **fs:** fix sys fs.readdirSync ([ec75495](https://github.com/ionic-team/stencil/commit/ec7549506a787e7599b22c7fbca82e47ded4242e))
+* **mock-doc:** fix MockElement type ([d5a4243](https://github.com/ionic-team/stencil/commit/d5a4243a2973407cbb6deb3b90bd3071ce28fe7e))
+* **next:** collection output target ([5fffda1](https://github.com/ionic-team/stencil/commit/5fffda1c990bc3464aae59cb4aa5e0ef0f677377))
+* **next:** do not override target ([d1bd0e2](https://github.com/ionic-team/stencil/commit/d1bd0e2c95cc1ae9904fe63ed2016e254990abb6))
+* **next:** typescript plugin runs first ([67e6565](https://github.com/ionic-team/stencil/commit/67e6565f7e19a5209c13e1f5e6a62a79e51ad688))
+* **runtime:** cmpMeta is part of hostRef ([04f7dcd](https://github.com/ionic-team/stencil/commit/04f7dcd9937b1175b3f19983032debba249c1b3c))
+* **www:** inline esm in place ([b99344f](https://github.com/ionic-team/stencil/commit/b99344fbcb975a9fef8d5995e7d1b5251da022cd))
 * **mock-doc:** implement  getElementById() in document fragment ([#2032](https://github.com/ionic-team/stencil/issues/2032)) ([35021d8](https://github.com/ionic-team/stencil/commit/35021d818f0dd9eca9935f4737c25d5461525fe5)), closes [#2030](https://github.com/ionic-team/stencil/issues/2030)
-
-
-### Features
-
-* **custom:** add copy tasks to custom outputTargets ([#2023](https://github.com/ionic-team/stencil/issues/2023)) ([65aeb8c](https://github.com/ionic-team/stencil/commit/65aeb8c4a818b200695946073b71f63bf4aa3634))
-* **runtime:** experimental active render context ([#2040](https://github.com/ionic-team/stencil/issues/2040)) ([75ed488](https://github.com/ionic-team/stencil/commit/75ed488667020065eec908365a4595b8d2a32531))
-
-
-
-## 🎳 [1.8.2-0](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.8.2-0) (2019-11-18)
-
-
-### Bug Fixes
-
 * **event:** emit() returns the CustomElement ([#2017](https://github.com/ionic-team/stencil/issues/2017)) ([e675366](https://github.com/ionic-team/stencil/commit/e675366f59526b28bd4be0712f01a096ca8148e4)), closes [#1996](https://github.com/ionic-team/stencil/issues/1996)
 * **polyfills:** update baseURI for base w/out href ([#1995](https://github.com/ionic-team/stencil/issues/1995)) ([8582c93](https://github.com/ionic-team/stencil/commit/8582c934b5aaccf3d7e8c14131f1af4eedcc07b8))
 * **prerender:** prevent window timeout leaks ([b80feda](https://github.com/ionic-team/stencil/commit/b80feda7e8b57815f750cb9b2d608525b6f3b6a6))
 * **testing:** fix single-process mode ([#2016](https://github.com/ionic-team/stencil/issues/2016)) ([72f0a05](https://github.com/ionic-team/stencil/commit/72f0a05f0a4403174afbbc52ae46820e6d53faa6))
+
+
+
+### Features
+
+* **compiler:** custom-elements-bundle ([228e382](https://github.com/ionic-team/stencil/commit/228e38201390327dbb4198cfb0e53d6218415068))
+* **custom:** add copy tasks to custom outputTargets ([#2023](https://github.com/ionic-team/stencil/issues/2023)) ([65aeb8c](https://github.com/ionic-team/stencil/commit/65aeb8c4a818b200695946073b71f63bf4aa3634))
+* **runtime:** experimental active render context ([#2040](https://github.com/ionic-team/stencil/issues/2040)) ([75ed488](https://github.com/ionic-team/stencil/commit/75ed488667020065eec908365a4595b8d2a32531))
 
 
 
