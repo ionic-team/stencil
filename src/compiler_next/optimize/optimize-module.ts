@@ -55,11 +55,9 @@ export async function optimizeModule(
     if (opts.modeName && opts.modeName !== DEFAULT_STYLE_MODE) {
       const regex = new RegExp(`\\/\\*STENCIL:MODE:((?!${opts.modeName}).)*\\*\\/.*$`, 'gm');
       opts.input = opts.input.replace(regex, '');
-      console.log(opts.input);
     }
   }
 
-  console.log('cache mis');
   const shouldTranspile = opts.sourceTarget === 'es5';
   const results = await compilerCtx.worker.prepareModule(opts.input, minifyOpts, shouldTranspile, opts.inlineHelpers);
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
