@@ -1,52 +1,74 @@
-import * as d from '../../declarations';
-import { splitLineBreaks } from '@utils';
 import { CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declarations';
 import { compilerBuild } from '../../version';
-import terser from 'terser';
+import { transpileToEs5 } from '../transpile/transpile-to-es5';
+import { minifyJs } from './minify-js';
+import { DEFAULT_STYLE_MODE } from '@utils';
 
+interface OptimizeModuleOptions {
+  input: string;
+  sourceTarget?: SourceTarget;
+  isCore?: boolean;
+  minify?: boolean;
+  inlineHelpers?: boolean;
+  modeName?: string;
+}
 
-export async function optimizeModule(config: Config, compilerCtx: CompilerCtx, sourceTarget: SourceTarget, isCore: boolean, input: string) {
+export async function optimizeModule(
+  config: Config,
+  compilerCtx: CompilerCtx,
+  opts: OptimizeModuleOptions
+) {
+  if (!opts.minify && opts.sourceTarget !== 'es5') {
+    return {
+      output: opts.input,
+      diagnostics: [] as Diagnostic[]
+    };
+  }
   const isDebug = (config.logLevel === 'debug');
-
-  const opts = getTerserOptions(sourceTarget, isDebug);
-
-  if (sourceTarget !== 'es5' && isCore) {
-    if (!isDebug) {
-      opts.compress.passes = 3;
-      opts.compress.global_defs = {
-        supportsListenerOptions: true,
-        'plt.$cssShim$': false
-      };
-      opts.compress.pure_funcs = ['getHostRef', ...opts.compress.pure_funcs];
-    }
-
-    opts.mangle.properties = {
-      regex: '^\\$.+\\$$',
-      debug: isDebug
+  const cacheKey = await compilerCtx.cache.createKey('optimizeModule', compilerBuild.minfyJsId, opts, isDebug);
+  const cachedContent = await compilerCtx.cache.get(cacheKey);
+  if (cachedContent != null) {
+    return {
+      output: cachedContent,
+      diagnostics: [] as Diagnostic[]
     };
   }
 
-  let cacheKey: string;
-  if (compilerCtx) {
-    cacheKey = await compilerCtx.cache.createKey('minifyModule', compilerBuild.minfyJsId, opts, input);
-    const cachedContent = await compilerCtx.cache.get(cacheKey);
-    if (cachedContent != null) {
-      return {
-        output: cachedContent,
-        diagnostics: [] as Diagnostic[]
+  let minifyOpts: any;
+  if (opts.minify) {
+    minifyOpts = getTerserOptions(opts.sourceTarget, isDebug);
+    if (opts.sourceTarget !== 'es5' && opts.isCore) {
+      if (!isDebug) {
+        minifyOpts.compress.passes = 3;
+        minifyOpts.compress.global_defs = {
+          supportsListenerOptions: true,
+          'plt.$cssShim$': false
+        };
+        minifyOpts.compress.pure_funcs = ['getHostRef', ...minifyOpts.compress.pure_funcs];
+      }
+
+      minifyOpts.mangle.properties = {
+        regex: '^\\$.+\\$$',
+        debug: isDebug
       };
+    }
+    if (opts.modeName && opts.modeName !== DEFAULT_STYLE_MODE) {
+      const regex = new RegExp(`\\/\\*STENCIL:MODE:((?!${opts.modeName}).)*\\*\\/.*$`, 'gm');
+      opts.input = opts.input.replace(regex, '');
+      console.log(opts.input);
     }
   }
 
-  const results = await compilerCtx.worker.minifyJs(input, opts);
+  console.log('cache mis');
+  const shouldTranspile = opts.sourceTarget === 'es5';
+  const results = await compilerCtx.worker.prepareModule(opts.input, minifyOpts, shouldTranspile, opts.inlineHelpers);
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
-    if (isCore) {
+    if (opts.isCore) {
       results.output = results.output
         .replace(/disconnectedCallback\(\)\{\}/g, '');
     }
     await compilerCtx.cache.put(cacheKey, results.output);
   }
-
   return results;
 }
 
@@ -77,7 +99,7 @@ export const getTerserOptions = (sourceTarget: SourceTarget, isDebug: boolean) =
       ]
     };
 
-    opts.ecma = opts.output.ecma = opts.compress.ecma = 7;
+    opts.ecma = opts.output.ecma = opts.compress.ecma = 8;
     opts.toplevel = true;
     opts.module = true;
     opts.compress.toplevel = true;
@@ -101,107 +123,29 @@ export const getTerserOptions = (sourceTarget: SourceTarget, isDebug: boolean) =
 };
 
 
-export const minifyJs = async (input: string, opts?: any)  => {
-  if (opts && opts.mangle && opts.mangle.properties && opts.mangle.properties.regex) {
-    opts.mangle.properties.regex = new RegExp(opts.mangle.properties.regex);
+export const prepareModule = async (
+  input: string,
+  minifyOpts: any,
+  transpile: boolean,
+  inlineHelpers: boolean
+) => {
+  if (transpile) {
+    const transpile = await transpileToEs5(input, inlineHelpers);
+    if (transpile.diagnostics.length > 0) {
+      return {
+        sourceMap: null,
+        output: null,
+        diagnostics: transpile.diagnostics
+      };
+    }
+    input = transpile.code;
   }
-  const result = terser.minify(input, opts);
-  const diagnostics = loadMinifyJsDiagnostics(input, result);
-
+  if (minifyOpts) {
+    return minifyJs(input, minifyOpts);
+  }
   return {
-    output: result.code,
-    sourceMap: result.map as any,
-    diagnostics: diagnostics
+    output: input,
+    diagnostics: [] as Diagnostic[],
+    sourceMap: null,
   };
 };
-
-
-const loadMinifyJsDiagnostics = (sourceText: string, result: terser.MinifyOutput) => {
-  const diagnostics: d.Diagnostic[] = [];
-  if (!result || !result.error) {
-    return diagnostics;
-  }
-
-  const d: d.Diagnostic = {
-    level: 'error',
-    type: 'build',
-    language: 'javascript',
-    header: 'Minify JS',
-    code: '',
-    messageText: result.error.message,
-    absFilePath: null,
-    relFilePath: null,
-    lines: []
-  };
-
-  const err: {
-    col: number;
-    filename: string;
-    line: number;
-    message: string;
-    name: string;
-    pos: number;
-    stack: string;
-  } = result.error as any;
-
-  if (typeof err.line === 'number' && err.line > -1) {
-    const srcLines = splitLineBreaks(sourceText);
-
-    const errorLine: d.PrintLine = {
-      lineIndex: err.line - 1,
-      lineNumber: err.line,
-      text: srcLines[err.line - 1],
-      errorCharStart: err.col,
-      errorLength: 0
-    };
-
-    d.lineNumber = errorLine.lineNumber;
-    d.columnNumber = errorLine.errorCharStart;
-
-    const highlightLine = errorLine.text.substr(d.columnNumber);
-    for (let i = 0; i < highlightLine.length; i++) {
-      if (CHAR_BREAK.has(highlightLine.charAt(i))) {
-        break;
-      }
-      errorLine.errorLength++;
-    }
-
-    d.lines.push(errorLine);
-
-    if (errorLine.errorLength === 0 && errorLine.errorCharStart > 0) {
-      errorLine.errorLength = 1;
-      errorLine.errorCharStart--;
-    }
-
-    if (errorLine.lineIndex > 0) {
-      const previousLine: d.PrintLine = {
-        lineIndex: errorLine.lineIndex - 1,
-        lineNumber: errorLine.lineNumber - 1,
-        text: srcLines[errorLine.lineIndex - 1],
-        errorCharStart: -1,
-        errorLength: -1
-      };
-
-      d.lines.unshift(previousLine);
-    }
-
-    if (errorLine.lineIndex + 1 < srcLines.length) {
-      const nextLine: d.PrintLine = {
-        lineIndex: errorLine.lineIndex + 1,
-        lineNumber: errorLine.lineNumber + 1,
-        text: srcLines[errorLine.lineIndex + 1],
-        errorCharStart: -1,
-        errorLength: -1
-      };
-
-      d.lines.push(nextLine);
-    }
-  }
-
-  diagnostics.push(d);
-
-  return diagnostics;
-};
-
-const CHAR_BREAK = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);
-

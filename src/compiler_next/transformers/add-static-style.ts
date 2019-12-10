@@ -28,7 +28,7 @@ const addMultipleModeStyleGetter = (classMembers: ts.ClassElement[], cmp: d.Comp
       // inline the style string
       // static get style() { return { ios: "string" }; }
       const styleLiteral = createStyleLiteral(cmp, style);
-      const propStr = ts.createPropertyAssignment(style.modeName, styleLiteral);
+      const propStr = createPropertyAssignment(style.modeName, styleLiteral);
       styleModes.push(propStr);
 
     } else if (typeof style.styleIdentifier === 'string') {
@@ -36,7 +36,7 @@ const addMultipleModeStyleGetter = (classMembers: ts.ClassElement[], cmp: d.Comp
       // import myTagIosStyle from './import-path.css';
       // static get style() { return { ios: myTagIosStyle }; }
       const styleIdentifier = ts.createIdentifier(style.styleIdentifier);
-      const propIdentifier = ts.createPropertyAssignment(style.modeName, styleIdentifier);
+      const propIdentifier = createPropertyAssignment(style.modeName, styleIdentifier);
       styleModes.push(propIdentifier);
 
     } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
@@ -44,7 +44,7 @@ const addMultipleModeStyleGetter = (classMembers: ts.ClassElement[], cmp: d.Comp
       // import myTagIosStyle from './import-path.css';
       // static get style() { return { ios: myTagIosStyle }; }
       const styleUrlIdentifier = createStyleIdentifierFromUrl(cmp, style);
-      const propUrlIdentifier = ts.createPropertyAssignment(style.modeName, styleUrlIdentifier);
+      const propUrlIdentifier = createPropertyAssignment(style.modeName, styleUrlIdentifier);
       styleModes.push(propUrlIdentifier);
     }
   });
@@ -54,6 +54,12 @@ const addMultipleModeStyleGetter = (classMembers: ts.ClassElement[], cmp: d.Comp
   classMembers.push(createStaticGetter('style', styleObj));
 };
 
+
+const createPropertyAssignment = (mode: string, initializer: ts.Expression) => {
+  const node = ts.createPropertyAssignment(mode, initializer);
+  ts.addSyntheticLeadingComment(node, ts.SyntaxKind.MultiLineCommentTrivia, `STENCIL:MODE:${mode}`);
+  return node;
+};
 
 const addSingleStyleGetter = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
   if (typeof style.styleStr === 'string') {

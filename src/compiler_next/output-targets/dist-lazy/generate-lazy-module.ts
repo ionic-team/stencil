@@ -2,7 +2,6 @@ import * as d from '../../../declarations';
 import { writeLazyModule } from './write-lazy-entry-module';
 import { DEFAULT_STYLE_MODE, hasDependency, sortBy } from '@utils';
 import { optimizeModule } from '../../optimize/optimize-module';
-import { transpileToEs5Main } from '../../../compiler/transpile/transpile-to-es5-main';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../../../compiler/app-core/format-component-runtime-meta';
 
 
@@ -48,12 +47,12 @@ const generateLazyEntryModule = async (
   sufix: string
 ): Promise<d.BundleModule> => {
   const entryModule = buildCtx.entryModules.find(entryModule => entryModule.entryKey === rollupResult.entryKey);
-  const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, rollupResult.code);
   const shouldHash = config.hashFileNames && isBrowserBuild;
   const outputs = await Promise.all(
-    entryModule.modeNames.map(modeName =>
-      writeLazyModule(config, compilerCtx, outputTargetType, destinations, entryModule, shouldHash, code, modeName, sufix)
-    )
+    entryModule.modeNames.map(async modeName => {
+      const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, rollupResult.code, modeName);
+      return writeLazyModule(config, compilerCtx, outputTargetType, destinations, entryModule, shouldHash, code, modeName, sufix);
+    })
   );
 
   return {
@@ -232,24 +231,21 @@ const convertChunk = async (
   shouldMinify: boolean,
   isCore: boolean,
   isBrowserBuild: boolean,
-  code: string
+  code: string,
+  modeName?: string
 ) => {
-  if (sourceTarget === 'es5') {
-    const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
-    const transpileResults = await transpileToEs5Main(config, compilerCtx, code, inlineHelpers);
-    if (transpileResults != null) {
-      buildCtx.diagnostics.push(...transpileResults.diagnostics);
-      if (transpileResults.diagnostics.length === 0) {
-        code = transpileResults.code;
-      }
-    }
-  }
-  if (shouldMinify) {
-    const optimizeResults = await optimizeModule(config, compilerCtx, sourceTarget, isCore, code);
-    buildCtx.diagnostics.push(...optimizeResults.diagnostics);
-    if (optimizeResults.diagnostics.length === 0 && typeof optimizeResults.output === 'string') {
-      code = optimizeResults.output;
-    }
+  const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
+  const optimizeResults = await optimizeModule(config, compilerCtx, {
+    input: code,
+    isCore,
+    sourceTarget,
+    inlineHelpers,
+    minify: shouldMinify,
+    modeName
+  });
+  buildCtx.diagnostics.push(...optimizeResults.diagnostics);
+  if (optimizeResults.diagnostics.length === 0 && typeof optimizeResults.output === 'string') {
+    code = optimizeResults.output;
   }
   return code;
 };

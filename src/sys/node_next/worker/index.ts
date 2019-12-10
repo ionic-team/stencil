@@ -5,7 +5,7 @@ import { NodeWorkerMain } from './worker-main';
 import { cpus } from 'os';
 
 
-export class NodeWorkerController extends EventEmitter {
+export class NodeWorkerController extends EventEmitter implements d.WorkerMainController {
   workerIds = 0;
   stencilId = 0;
   isEnding = false;
@@ -120,6 +120,12 @@ export class NodeWorkerController extends EventEmitter {
 
       this.processTaskQueue();
     });
+  }
+
+  handler(name: string) {
+    return (...args: any[]) => {
+      return this.send(name, ...args);
+    };
   }
 
   cancelTasks() {

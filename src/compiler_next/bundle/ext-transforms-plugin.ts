@@ -27,6 +27,7 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
     async transform(_, id) {
       const pathData = parseStencilImportPathData(id);
       if (pathData != null) {
+        // TODO, offline caching
         const filePath = normalizeFsPath(id);
         const code = await compilerCtx.fs.readFile(filePath);
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, code, filePath);

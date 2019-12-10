@@ -43,12 +43,14 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
     });
     const chunk = rollupOutput.output.find(o => o.type === 'chunk') as OutputChunk;
     let code = chunk.code;
-    if (config.minifyJs) {
-      const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', true, code);
-      buildCtx.diagnostics.push(...optimizeResults.diagnostics);
-      if (hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
-        code = optimizeResults.output;
-      }
+    const optimizeResults = await optimizeModule(config, compilerCtx, {
+      input: code,
+      isCore: true,
+      minify: config.minifyJs
+    });
+    buildCtx.diagnostics.push(...optimizeResults.diagnostics);
+    if (hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
+      code = optimizeResults.output;
     }
 
     await Promise.all(

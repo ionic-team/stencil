@@ -1,5 +1,5 @@
 import { CompileOptions, CompileResults, Diagnostic, OptimizeCssInput, OptimizeCssOutput } from '.';
-import { TransformCssToEsmInput, TransformCssToEsmOutput } from '../internal';
+import { TransformCssToEsmInput, TransformCssToEsmOutput, TranspileResults } from '../internal';
 
 
 export interface CompilerWorkerContext {
@@ -7,10 +7,13 @@ export interface CompilerWorkerContext {
   minifyJs(input: string, opts?: any): Promise<{output: string, sourceMap: any, diagnostics: Diagnostic[]}>;
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
+  transpileToEs5(input: string, inlineHelpers: boolean): Promise<TranspileResults>;
+  prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{output: string, sourceMap: any, diagnostics: Diagnostic[]}>;
 }
 
 export interface WorkerMainController {
   send(...args: any[]): Promise<any>;
+  handler(name: string): ((...args: any[]) => Promise<any>);
   destroy(): void;
 }
 

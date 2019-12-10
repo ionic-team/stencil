@@ -3,10 +3,11 @@ import { compile } from '../compile-module';
 import { initNodeWorkerThread } from '../../sys/node_next/worker/worker-child';
 import { initWebWorkerThread } from '../sys/worker/web-worker-thread';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../sys/environment';
-import { minifyJs } from '../optimize/optimize-module';
+import { prepareModule } from '../optimize/optimize-module';
+import { minifyJs } from '../optimize/minify-js';
 import { optimizeCssWorker } from '@optimize-css';
 import { transformCssToEsm } from '../../compiler/style/css-to-esm';
-
+import { transpileToEs5 } from '../transpile/transpile-to-es5';
 
 export const createWorkerContext = (): d.CompilerWorkerContext => {
   return {
@@ -14,6 +15,8 @@ export const createWorkerContext = (): d.CompilerWorkerContext => {
     minifyJs,
     optimizeCss: optimizeCssWorker,
     transformCssToEsm,
+    prepareModule,
+    transpileToEs5
   };
 };
 

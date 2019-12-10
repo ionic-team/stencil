@@ -133,9 +133,16 @@ export const createWebWorkerMainController = (workerUrl: URL | string, workerNam
     workers.length = 0;
   };
 
+  const handler = (name: string) => {
+    return function(...args: any[]) {
+      return send(name, ...args);
+    };
+  };
+
   return {
     send,
     destroy,
+    handler
   };
 };
 
