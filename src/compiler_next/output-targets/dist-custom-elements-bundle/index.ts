@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
-import { catchError, dashToPascalCase } from '@utils';
+import { catchError, dashToPascalCase, hasError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
 import { isOutputTargetDistCustomElementsBundle } from '../../../compiler/output-targets/output-utils';
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
@@ -9,6 +9,8 @@ import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID } from '../../bundle/en
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import path from 'path';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../../../compiler/app-core/format-component-runtime-meta';
+import { OutputChunk } from 'rollup';
+import { optimizeModule } from '../../optimize/optimize-module';
 
 
 export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -39,23 +41,25 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
       format: 'es',
       sourcemap: config.sourceMap,
     });
+    const chunk = rollupOutput.output.find(o => o.type === 'chunk') as OutputChunk;
+    let code = chunk.code;
+    if (config.minifyJs) {
+      const optimizeResults = await optimizeModule(config, compilerCtx, 'es2017', true, code);
+      buildCtx.diagnostics.push(...optimizeResults.diagnostics);
+      if (hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
+        code = optimizeResults.output;
+      }
+    }
 
-    const promises: Promise<any>[] = [];
-    outputTargets.forEach(o => {
-      rollupOutput.output.forEach(file => {
-        if (file.type === 'chunk') {
-          promises.push(
-            compilerCtx.fs.writeFile(
-              path.join(o.dir, file.fileName),
-              file.code,
-              { outputTargetType: o.type }
-            )
-          );
-        }
-      });
-    });
-
-    await Promise.all(promises);
+    await Promise.all(
+      outputTargets.map(o => {
+        return compilerCtx.fs.writeFile(
+          path.join(o.dir, chunk.fileName),
+          code,
+          { outputTargetType: o.type }
+        );
+      })
+    );
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
