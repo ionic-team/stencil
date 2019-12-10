@@ -1,8 +1,8 @@
-import { BuildEvents, MsgFromWorker, MsgToWorker, WorkerMsgHandler } from '../../../declarations';
+import { MsgFromWorker, MsgToWorker, WorkerMsgHandler } from '../../../declarations';
 import { isNumber, isString } from '@utils';
 
 
-export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHandler, events: BuildEvents) => {
+export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHandler) => {
   let isQueued = false;
 
   const tick = Promise.resolve();
@@ -69,20 +69,4 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
     // uncaught error occurred on the worker thread
     error(-1, e);
   };
-
-  events.on((eventName, data) => {
-    const eventFromWorker: MsgFromWorker = {
-      rtnEventName: eventName,
-      rtnEventData: data,
-      rtnValue: null,
-      rtnError: null,
-    };
-
-    msgsFromWorkerQueue.push(eventFromWorker);
-
-    if (!isQueued) {
-      isQueued = true;
-      tick.then(drainMsgQueueFromWorker);
-    }
-  });
 };

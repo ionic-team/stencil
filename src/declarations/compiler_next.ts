@@ -40,7 +40,7 @@ export interface CompilerSystem {
   /**
    * Creates the worker farm for the current system.
    */
-  createWorker?(maxConcurrentWorkers: number, events: BuildEvents): WorkerMainController;
+  createWorker?(maxConcurrentWorkers: number): WorkerMainController;
   encodeToBase64(str: string): string;
   /**
    * Generates a MD5 digest encoded as HEX

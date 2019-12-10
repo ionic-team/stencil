@@ -25,7 +25,7 @@ export const createCompiler = async (config: Config) => {
   compilerCtx.cache = new Cache(config, inMemoryFs(sys));
   await compilerCtx.cache.initCacheDir();
 
-  compilerCtx.worker = createSysWorker(sys, compilerCtx.events, config.maxConcurrentWorkers);
+  compilerCtx.worker = createSysWorker(sys, config.maxConcurrentWorkers);
   patchSysLegacy(config, compilerCtx);
 
   if (sys.events) {

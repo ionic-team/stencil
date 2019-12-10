@@ -11,44 +11,55 @@ import { join } from 'path';
 import { isString } from 'util';
 
 
-export async function run(opts: RunCliOptions = {}) {
-  if (!opts.process) {
-    opts.process = process;
+export async function run(init: CliInitOptions) {
+  if (!init) {
+    throw new Error('cli missing run init');
   }
-  if (!opts.logger) {
-    opts.logger = createNodeLogger(opts.process);
+  const prcs = init.process;
+  if (!prcs) {
+    throw new Error('cli run missing "process"');
   }
-  if (!opts.sys) {
-    opts.sys = createNodeSysWithWatch(opts.process);
+  const logger = init.logger;
+  if (!logger) {
+    throw new Error('cli run missing "logger"');
+  }
+  const sys = init.sys;
+  if (!sys) {
+    throw new Error('cli run missing "sys"');
   }
 
   try {
-    setupNodeProcess(opts.process, opts.logger);
+    setupNodeProcess(prcs, logger);
 
-    if (opts.sys.getCompilerExecutingPath == null) {
-      opts.sys.getCompilerExecutingPath = getCompilerExecutingPath;
+    if (sys.getCompilerExecutingPath == null) {
+      sys.getCompilerExecutingPath = getCompilerExecutingPath;
     }
 
+    const flags = parseFlags(prcs.argv.slice(2));
+
     const validated = await loadConfig({
-      sys_next: opts.sys,
-      logger: opts.logger,
-      flags: parseFlags(opts.process.argv.slice(2)),
+      config: {
+        flags
+      },
+      configPath: flags.config,
+      logger,
+      sys,
     });
 
     if (validated.diagnostics.length > 0) {
-      opts.logger.printDiagnostics(validated.diagnostics);
+      logger.printDiagnostics(validated.diagnostics);
       exit(1);
     }
 
-    setupWorkerController(opts.sys, opts.logger);
+    setupWorkerController(sys, logger);
 
-    opts.process.title = `Stencil: ${validated.config.namespace}`;
+    prcs.title = `Stencil: ${validated.config.namespace}`;
 
-    await runTask(opts.process, validated.config, validated.config.flags.task);
+    await runTask(prcs, validated.config, validated.config.flags.task);
 
   } catch (e) {
     if (!shouldIgnoreError(e)) {
-      opts.logger.error(`uncaught cli error: ${e}${opts.logger.level === 'debug' ? e.stack : ''}`);
+      logger.error(`uncaught cli error: ${e}${logger.level === 'debug' ? e.stack : ''}`);
       exit(1);
     }
   }
@@ -90,7 +101,7 @@ function setupNodeProcess(prcs: NodeJS.Process, logger: Logger) {
   });
 }
 
-export interface RunCliOptions {
+export interface CliInitOptions {
   process?: NodeJS.Process;
   logger?: Logger;
   sys?: CompilerSystem;

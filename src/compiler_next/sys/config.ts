@@ -1,11 +1,11 @@
 import * as d from '../../declarations';
 import { cloneDocument, createDocument, serializeNodeToHtml } from '@mock-doc';
+import { compilerBuild } from '../../version';
 import { createLogger } from './logger';
 import { createSystem } from './stencil-sys';
 import { resolveModuleIdSync, resolvePackageJsonSync } from './resolve/resolve-module';
 import { scopeCss } from '../../utils/shadow-css';
 import path from 'path';
-import { compilerBuild } from '../../version';
 
 
 export const getConfig = (userConfig: d.Config) => {
@@ -29,14 +29,15 @@ export const getConfig = (userConfig: d.Config) => {
   }
   config.logger.level = config.logLevel;
 
+  // old sys
+  config.sys = config.sys || {};
+  config.sys.path = path;
 
   return config;
 };
 
 export const patchSysLegacy = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   // old way
-  config.sys = config.sys || {};
-  config.sys.path = path;
   config.sys.compiler = {
     name: '',
     version: compilerBuild.stencilVersion,

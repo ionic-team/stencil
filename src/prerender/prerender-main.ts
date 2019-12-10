@@ -49,7 +49,6 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
       workerCtrl = new NodeWorkerController(
         cliWorkerPath,
         config.maxConcurrentWorkers,
-        null,
         config.logger
       );
 

@@ -336,8 +336,8 @@ export const createSystem = () => {
     writeFile,
     writeFileSync,
     generateContentHash,
-    createWorker: (maxConcurrentWorkers, events) => (
-      createWebWorkerMainController(location.href, 'worker', maxConcurrentWorkers, events)
+    createWorker: (maxConcurrentWorkers) => (
+      createWebWorkerMainController(location.href, 'worker', maxConcurrentWorkers)
     ),
     details: getDetails(),
     copy,

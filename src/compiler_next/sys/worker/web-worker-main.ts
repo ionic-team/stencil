@@ -1,9 +1,8 @@
 import * as d from '../../../declarations';
-import { TASK_CANCELED_MSG, isString } from '@utils';
-import { version } from '../../../version';
+import { TASK_CANCELED_MSG } from '@utils';
 
 
-export const createWebWorkerMainController = (workerUrl: URL | string, workerName: string, maxConcurrentWorkers: number, events: d.BuildEvents): d.WorkerMainController => {
+export const createWebWorkerMainController = (workerUrl: URL | string, workerName: string, maxConcurrentWorkers: number): d.WorkerMainController => {
   let msgIds = 0;
   let isDestroyed = false;
   let isQueued = false;
@@ -21,27 +20,22 @@ export const createWebWorkerMainController = (workerUrl: URL | string, workerNam
       if (Array.isArray(msgsFromWorker)) {
         msgsFromWorker.forEach(msgFromWorker => {
           if (msgFromWorker) {
-            if (isString(msgFromWorker.rtnEventName)) {
-              events.emit(msgFromWorker.rtnEventName as any, msgFromWorker.rtnEventData);
-
-            } else {
-              const task = tasks.get(msgFromWorker.stencilId);
-              if (task) {
-                tasks.delete(msgFromWorker.stencilId);
-                if (msgFromWorker.rtnError) {
-                  task.reject(msgFromWorker.rtnError);
-                } else {
-                  task.resolve(msgFromWorker.rtnValue);
-                }
-
-                worker.activeTasks--;
-                if (worker.activeTasks < 0 || worker.activeTasks > 50) {
-                  worker.activeTasks = 0;
-                }
-
-              } else if (msgFromWorker.rtnError) {
-                console.error(msgFromWorker.rtnError);
+            const task = tasks.get(msgFromWorker.stencilId);
+            if (task) {
+              tasks.delete(msgFromWorker.stencilId);
+              if (msgFromWorker.rtnError) {
+                task.reject(msgFromWorker.rtnError);
+              } else {
+                task.resolve(msgFromWorker.rtnValue);
               }
+
+              worker.activeTasks--;
+              if (worker.activeTasks < 0 || worker.activeTasks > 50) {
+                worker.activeTasks = 0;
+              }
+
+            } else if (msgFromWorker.rtnError) {
+              console.error(msgFromWorker.rtnError);
             }
           }
         });
@@ -53,7 +47,7 @@ export const createWebWorkerMainController = (workerUrl: URL | string, workerNam
 
   const createWebWorkerMain = () => {
     const worker = new Worker(workerUrl, {
-      name: `stencil-${workerName}-${workerName === 'compiler' ? version : workerIds++}`
+      name: `stencil-${workerName}-${workerIds++}`
     });
     const workerChild: WorkerChild = {
       worker,

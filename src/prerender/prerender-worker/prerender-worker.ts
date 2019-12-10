@@ -244,7 +244,7 @@ function initPrerenderWorker(prcs: NodeJS.Process) {
         default:
           throw new Error(`invalid prerender worker msg: ${JSON.stringify(msgFromMain)}`);
       }
-    }, null);
+    });
   }
 }
 

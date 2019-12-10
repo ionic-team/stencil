@@ -1,6 +1,7 @@
 import { CompilerSystem } from './compiler_next';
 import { CopyTask } from './assets';
 import { DevServerConfig, StencilDevServerConfig } from './dev-server';
+import { Diagnostic } from './diagnostics';
 import { Logger } from './logger';
 import { OutputTarget } from './output-targets';
 import { StencilSystem } from './system';
@@ -216,6 +217,18 @@ export interface Config extends StencilConfig {
   _isValidated?: boolean;
   _isTesting?: boolean;
   _lifecycleDOMEvents?: boolean;
+}
+
+export interface LoadConfigInit {
+  config?: Config;
+  configPath?: string;
+  logger?: Logger;
+  sys?: CompilerSystem;
+}
+
+export interface LoadConfigResults {
+  config: Config;
+  diagnostics: Diagnostic[];
 }
 
 export interface BrowserConfig extends StencilConfig {

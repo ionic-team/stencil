@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import { isNumber, isString } from '@utils';
 
 
-export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerMsgHandler, events: d.BuildEvents) => {
+export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerMsgHandler) => {
 
   const sendHandle = (err: NodeJS.ErrnoException) => {
     if (err && err.code === 'ERR_IPC_CHANNEL_CLOSED') {
@@ -48,17 +48,6 @@ export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerM
       }
     }
   });
-
-  if (events) {
-    events.on((eventName, data) => {
-      prcs.send({
-        rtnEventName: eventName,
-        rtnEventData: data,
-        rtnValue: null,
-        rtnError: null,
-      }, sendHandle);
-    });
-  }
 
   prcs.on(`unhandledRejection`, (e: any) => {
     errorHandler(-1, e);

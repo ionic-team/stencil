@@ -17,6 +17,14 @@ export async function runTask(prcs: NodeJS.Process, config: Config, task: TaskCo
       // await taskDocs(config);
       break;
 
+    case 'generate':
+      await taskGenerate(config);
+      break;
+
+    case 'help':
+      taskHelp(prcs, config);
+      break;
+
     case 'serve':
       await taskServe(prcs, config);
       break;
@@ -25,16 +33,8 @@ export async function runTask(prcs: NodeJS.Process, config: Config, task: TaskCo
       // await taskTest(config);
       break;
 
-    case 'generate':
-      await taskGenerate(config);
-      break;
-
     case 'version':
       taskVersion(config);
-      break;
-
-    case 'help':
-      taskHelp(prcs, config);
       break;
 
     default:

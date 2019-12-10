@@ -11,5 +11,6 @@ export {
   Diagnostic,
   getMinifyScriptOptions,
   loadConfig,
+  LoadConfigInit,
   version,
 } from '@stencil/core/internal';

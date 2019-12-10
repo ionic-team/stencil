@@ -1,8 +1,7 @@
 import * as d from '../../../declarations';
 import { catchError } from '@utils';
 import { dependencies, getRemoteDependencyUrl } from '../dependencies';
-import { IS_NODE_ENV, IS_WEB_WORKER_ENV, requireFunc, IS_SERVICE_WORKER_ENV } from '../environment';
-import tsTypes from 'typescript';
+import { IS_NODE_ENV, IS_WEB_WORKER_ENV, requireFunc } from '../environment';
 
 
 export const loadTypescript = (diagnostics: d.Diagnostic[]) => {
@@ -16,13 +15,13 @@ export const loadTypescript = (diagnostics: d.Diagnostic[]) => {
       // browser web worker
       const tsDep = dependencies.find(dep => dep.name === 'typescript');
       const tsExternalUrl = getRemoteDependencyUrl(tsDep);
-      const tsExternal = fetchTypescriptScript(tsExternalUrl);
+      const tsExternal = importTypescriptScript(tsExternalUrl);
       if (tsExternal) {
         return tsExternal;
       }
 
       const tsLocalUrl = new URL(`../typescript/${tsDep.main}`, location.href).href;
-      const tsLocal = fetchTypescriptScript(tsLocalUrl);
+      const tsLocal = importTypescriptScript(tsLocalUrl);
       if (tsLocal) {
         return tsLocal;
       }
@@ -37,40 +36,18 @@ export const loadTypescript = (diagnostics: d.Diagnostic[]) => {
   }
 };
 
-const fetchTypescriptScript = (tsUrl: string) => {
+const importTypescriptScript = (tsUrl: string) => {
   let ts: any = null;
 
-  if (IS_SERVICE_WORKER_ENV) {
-    // NOTE! async importScripts() do not work in service workers!
-    // https://developers.google.com/web/tools/workbox/modules/workbox-sw#avoid_async_imports
-    try {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', tsUrl, false);
-      xhr.send(null);
+  try {
+    (self as any).importScripts(tsUrl);
+    if ((self as any).ts) {
+      ts = (self as any).ts;
+      ts.sys = ts.sys || {};
+      ts.sys.getExecutingFilePath = () => tsUrl;
+    }
 
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const tsContent = xhr.responseText;
-
-        const getTs = new Function(tsContent + ';return ts;');
-        ts = getTs();
-
-        ts.sys = ts.sys || {};
-        (ts.sys as tsTypes.System).getExecutingFilePath = () => tsUrl;
-      }
-
-    } catch (e) {}
-
-  } else if (IS_WEB_WORKER_ENV) {
-    try {
-      (self as any).importScripts(tsUrl);
-      if ((self as any).ts) {
-        ts = (self as any).ts;
-        ts.sys = ts.sys || {};
-        ts.sys.getExecutingFilePath = () => tsUrl;
-      }
-
-    } catch (e) {}
-  }
+  } catch (e) {}
 
   return ts;
 };

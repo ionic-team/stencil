@@ -16,11 +16,6 @@ export const IS_WEB_WORKER_ENV = (
   typeof navigator !== 'undefined'
 );
 
-export const IS_SERVICE_WORKER_ENV = (
-  IS_WEB_WORKER_ENV &&
-  'onfetch' in self
-);
-
 export const IS_FETCH_ENV = (
   typeof fetch === 'function'
 );
