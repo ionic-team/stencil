@@ -113,12 +113,7 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
       },
       {
         title: `Build @stencil/core ${color.dim('(' + opts.buildId + ')')}`,
-        task: async () => {
-          const rollupBuildOptions = await createBuild(opts);
-          await Promise.all(rollupBuildOptions.map(async rollupBuildOption => {
-            await rollup(rollupBuildOption);
-          }));
-        }
+        task: () => execa('npm', ['run', 'build.prod'], { cwd: rootDir })
       },
       {
         title: 'Run jest tests',
@@ -239,6 +234,7 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
     })
     .catch(err => {
       console.log(`\n🤒  ${color.red(err)}\n`);
+      console.log(err);
       process.exit(1);
     });
 }
