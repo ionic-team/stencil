@@ -28,10 +28,14 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
     outputCustomElementsBundle(config, compilerCtx, buildCtx),
     outputDocs(config, compilerCtx, buildCtx),
     outputHydrateScript(config, compilerCtx, buildCtx),
-    outputLazy(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
-    outputWww(config, compilerCtx, buildCtx),
+    outputApp(config, compilerCtx, buildCtx),
   ]);
 
   timeSpan.finish('generate outputs finished');
+};
+
+const outputApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+  await outputLazy(config, compilerCtx, buildCtx);
+  await outputWww(config, compilerCtx, buildCtx);
 };
