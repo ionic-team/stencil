@@ -1,5 +1,5 @@
 import { Config, ConfigBundle, Diagnostic } from '../../declarations';
-import { buildError, isBoolean, sortBy } from '@utils';
+import { buildError, isBoolean, sortBy, buildWarn } from '@utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './outputs';
@@ -115,17 +115,15 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'generateDocs', 'docs', false);
   setBooleanConfig(config, 'enableCache', 'cache', true);
 
-  // if (!Array.isArray(config.includeSrc)) {
-  //   config.includeSrc = DEFAULT_INCLUDES.map(include => {
-  //     return config.sys.path.join(config.srcDir, include);
-  //   });
-  // }
+  if (config.excludeSrc) {
+    const warn = buildWarn(diagnostics);
+    warn.messageText = `"excludeSrc" is deprecated, use the "exclude" option in tsconfig.json`;
+  }
 
-  // if (!Array.isArray(config.excludeSrc)) {
-  //   config.excludeSrc = DEFAULT_EXCLUDES.map(include => {
-  //     return config.sys.path.join(config.srcDir, include);
-  //   });
-  // }
+  if (config.includeSrc) {
+    const warn = buildWarn(diagnostics);
+    warn.messageText = `"includeSrc" is deprecated, use the "include" option in tsconfig.json`;
+  }
 
   // set to true so it doesn't bother going through all this again on rebuilds
   // config._isValidated = true;

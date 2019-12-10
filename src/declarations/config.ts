@@ -61,6 +61,8 @@ export interface StencilConfig {
    * from the build process.
    *
    * The defaults are meant to exclude possible test files that you would not want to include in your final build.
+   *
+   * @deprecated Use the "exclude" option in tsconfig.json`;
    */
   excludeSrc?: string[];
 
@@ -180,6 +182,10 @@ export interface StencilConfig {
    */
   maxConcurrentTasksPerWorker?: number;
   preamble?: string;
+
+  /**
+   * @deprecated Use the "include" option in tsconfig.json`;
+   */
   includeSrc?: string[];
 
   entryComponentsHint?: string[];

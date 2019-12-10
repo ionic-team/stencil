@@ -32,14 +32,34 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
   //   !p.includes('/@types/estree')
   // ));
 
+  const skipFile = (readPath: string) => {
+    // filter e2e tests
+    if (readPath.includes('.e2e.') || readPath.includes('/e2e.')) {
+      // keep this test if it's an e2e file and we should be testing e2e
+      return true;
+    }
+
+    // filter spec tests
+    if (readPath.includes('.spec.') || readPath.includes('/spec.')) {
+      return true;
+    }
+    return false;
+  };
+
   tsSys.createDirectory = (p) => stencilSys.mkdirSync(p);
 
   tsSys.directoryExists = (p) => {
+    if (skipFile(p)) {
+      return false;
+    }
     const s = inMemoryFs.statSync(p);
     return s.isDirectory;
   };
 
   tsSys.fileExists = (p) => {
+    if (skipFile(p)) {
+      return false;
+    }
     const s = inMemoryFs.statSync(p);
     return s.isFile;
   };
@@ -63,17 +83,19 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
     depth--;
 
     dirItems.forEach(dirItem => {
-      if (Array.isArray(extensions) && extensions.length > 0) {
-        if (extensions.some(ext => dirItem.endsWith(ext))) {
+      if (!skipFile(dirItem)) {
+        if (Array.isArray(extensions) && extensions.length > 0) {
+          if (extensions.some(ext => dirItem.endsWith(ext))) {
+            matchingPaths.add(dirItem);
+          }
+        } else {
           matchingPaths.add(dirItem);
         }
-      } else {
-        matchingPaths.add(dirItem);
-      }
 
-      const s = inMemoryFs.statSync(dirItem);
-      if (s && s.isDirectory) {
-        visitDirectory(matchingPaths, dirItem, extensions, depth);
+        const s = inMemoryFs.statSync(dirItem);
+        if (s && s.isDirectory) {
+          visitDirectory(matchingPaths, dirItem, extensions, depth);
+        }
       }
     });
   };
@@ -88,6 +110,9 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
   };
 
   tsSys.readFile = (p) => {
+    if (skipFile(p)) {
+      return undefined;
+    }
     let content = inMemoryFs.readFileSync(p, {useCache: false});
 
     if (typeof content !== 'string' && (p.startsWith('https:') || p.startsWith('http:'))) {
