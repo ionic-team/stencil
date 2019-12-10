@@ -49,79 +49,79 @@ declare global {
 
 
   interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
-  const HTMLAppRootElement: {
+  var HTMLAppRootElement: {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
   };
 
   interface HTMLCarDetailElement extends Components.CarDetail, HTMLStencilElement {}
-  const HTMLCarDetailElement: {
+  var HTMLCarDetailElement: {
     prototype: HTMLCarDetailElement;
     new (): HTMLCarDetailElement;
   };
 
   interface HTMLCarListElement extends Components.CarList, HTMLStencilElement {}
-  const HTMLCarListElement: {
+  var HTMLCarListElement: {
     prototype: HTMLCarListElement;
     new (): HTMLCarListElement;
   };
 
   interface HTMLDomApiElement extends Components.DomApi, HTMLStencilElement {}
-  const HTMLDomApiElement: {
+  var HTMLDomApiElement: {
     prototype: HTMLDomApiElement;
     new (): HTMLDomApiElement;
   };
 
   interface HTMLDomInteractionElement extends Components.DomInteraction, HTMLStencilElement {}
-  const HTMLDomInteractionElement: {
+  var HTMLDomInteractionElement: {
     prototype: HTMLDomInteractionElement;
     new (): HTMLDomInteractionElement;
   };
 
   interface HTMLDomVisibleElement extends Components.DomVisible, HTMLStencilElement {}
-  const HTMLDomVisibleElement: {
+  var HTMLDomVisibleElement: {
     prototype: HTMLDomVisibleElement;
     new (): HTMLDomVisibleElement;
   };
 
   interface HTMLElementCmpElement extends Components.ElementCmp, HTMLStencilElement {}
-  const HTMLElementCmpElement: {
+  var HTMLElementCmpElement: {
     prototype: HTMLElementCmpElement;
     new (): HTMLElementCmpElement;
   };
 
   interface HTMLEventCmpElement extends Components.EventCmp, HTMLStencilElement {}
-  const HTMLEventCmpElement: {
+  var HTMLEventCmpElement: {
     prototype: HTMLEventCmpElement;
     new (): HTMLEventCmpElement;
   };
 
   interface HTMLListenCmpElement extends Components.ListenCmp, HTMLStencilElement {}
-  const HTMLListenCmpElement: {
+  var HTMLListenCmpElement: {
     prototype: HTMLListenCmpElement;
     new (): HTMLListenCmpElement;
   };
 
   interface HTMLMethodCmpElement extends Components.MethodCmp, HTMLStencilElement {}
-  const HTMLMethodCmpElement: {
+  var HTMLMethodCmpElement: {
     prototype: HTMLMethodCmpElement;
     new (): HTMLMethodCmpElement;
   };
 
   interface HTMLPathAliasCmpElement extends Components.PathAliasCmp, HTMLStencilElement {}
-  const HTMLPathAliasCmpElement: {
+  var HTMLPathAliasCmpElement: {
     prototype: HTMLPathAliasCmpElement;
     new (): HTMLPathAliasCmpElement;
   };
 
   interface HTMLPropCmpElement extends Components.PropCmp, HTMLStencilElement {}
-  const HTMLPropCmpElement: {
+  var HTMLPropCmpElement: {
     prototype: HTMLPropCmpElement;
     new (): HTMLPropCmpElement;
   };
 
   interface HTMLStateCmpElement extends Components.StateCmp, HTMLStencilElement {}
-  const HTMLStateCmpElement: {
+  var HTMLStateCmpElement: {
     prototype: HTMLStateCmpElement;
     new (): HTMLStateCmpElement;
   };

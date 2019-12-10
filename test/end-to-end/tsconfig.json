@@ -23,10 +23,17 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core/testing": ["../../src/testing/index.ts"],
       "@stencil/core": ["../../internal"],
       "@stencil/core/internal": ["../../internal"],
-      "@path-alias": ["./src/path-alias-cmp/path-alias-lib"],
+      "@stencil/core/testing": ["../../testing"],
+      "@path-alias": ["./src/path-alias-cmp/path-alias-lib"]
     }
-  }
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/*.spec.*",
+    "**/*.e2e.*",
+  ]
 }
