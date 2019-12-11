@@ -13,25 +13,31 @@ const pkgs: TestPackage[] = [
     // cli
     packageJson: 'cli/package.json',
     files: [
+      'cli/cli-worker.js',
       'cli/index_legacy.js',
-    ]
+    ],
   },
   {
     // compiler
     packageJson: 'compiler/package.json',
+    files: [
+      'compiler/index.js',
+    ],
   },
   {
     // dev-server
     packageJson: 'dev-server/package.json',
     files: [
-      'dev-server/static/',
+      'dev-server/static/app-error.css',
       'dev-server/static/favicon.ico',
-      'dev-server/templates/',
+      'dev-server/templates/directory-index.html',
+      'dev-server/templates/initial-load.html',
       'dev-server/connector.html',
       'dev-server/content-type-db.json',
-      'dev-server/index.js',
+      'dev-server/open-in-editor-api.js',
       'dev-server/server-worker.js',
       'dev-server/visualstudio.vbs',
+      'dev-server/ws.js',
       'dev-server/xdg-open',
     ],
   },
@@ -66,7 +72,12 @@ const pkgs: TestPackage[] = [
     // internal
     packageJson: 'internal/package.json',
     files: [
-      'internal/ext-modules.d.ts',
+      'internal/stencil-core.d.ts',
+      'internal/stencil-core.js',
+      'internal/stencil-ext-modules.d.ts',
+      'internal/stencil-private.d.ts',
+      'internal/stencil-public-compiler.d.ts',
+      'internal/stencil-public-runtime.d.ts',
     ]
   },
   {
@@ -84,7 +95,7 @@ const pkgs: TestPackage[] = [
     ],
   },
   {
-    // sys.node
+    // sys/node
     files: [
       'sys/node/graceful-fs.js',
       'sys/node/index.js',
