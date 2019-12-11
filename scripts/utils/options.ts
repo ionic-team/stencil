@@ -7,6 +7,7 @@ import { readJSONSync } from 'fs-extra';
 export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
   const srcDir = join(rootDir, 'src');
   const packageJsonPath = join(rootDir, 'package.json');
+  const packageLockJsonPath = join(rootDir, 'package-lock.json');
   const changelogPath = join(rootDir, 'CHANGELOG.md');
   const nodeModulesDir = join(rootDir, 'node_modules');
   const transpiledDir = join(rootDir, 'build');
@@ -18,6 +19,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
     rootDir,
     srcDir,
     packageJsonPath,
+    packageLockJsonPath,
     changelogPath,
     nodeModulesDir,
     transpiledDir,
@@ -35,7 +37,6 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
       testingDir: join(rootDir, 'testing'),
     },
     packageJson: readJSONSync(packageJsonPath),
-    replaceData: null,
     version: null,
     buildId: null,
     isProd: false,
@@ -69,17 +70,11 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
     }
   }
 
-  opts.replaceData = createReplaceData(opts);
-
-  if (inputOpts.replaceData) {
-    Object.assign(opts.replaceData, inputOpts.replaceData);
-  }
-
   return opts;
 }
 
 
-function createReplaceData(opts: BuildOptions) {
+export function createReplaceData(opts: BuildOptions) {
   const CACHE_BUSTER = 4;
 
   const typescriptPkg = require(join(opts.nodeModulesDir, 'typescript', 'package.json'));
@@ -125,7 +120,6 @@ export interface BuildOptions {
   scriptsDir?: string;
   scriptsBundlesDir?: string;
   bundleHelpersDir?: string;
-  replaceData?: any;
 
   output?: {
     cliDir: string;
@@ -145,6 +139,7 @@ export interface BuildOptions {
   isCI?: boolean,
   vermoji?: string;
   packageJsonPath?: string;
+  packageLockJsonPath?: string;
   packageJson?: PackageData;
   changelogPath?: string;
   tag?: string;

@@ -3,11 +3,10 @@ import color from 'ansi-colors';
 import execa from 'execa';
 import Listr, { ListrTask } from 'listr';
 import { BuildOptions } from './utils/options';
-import { createBuild } from './build';
-import { rollup } from 'rollup';
 import { isValidVersionInput, SEMVER_INCREMENTS, isVersionGreater, isPrereleaseVersion } from './utils/release-utils';
 import { validateBuild } from './test/validate-build';
 import { createLicense } from './license';
+import { bundleBuild } from './build';
 
 
 export function runReleaseTasks(opts: BuildOptions, args: string[]) {
@@ -15,9 +14,13 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
   const pkg = opts.packageJson;
   const tasks: ListrTask[] = [];
   const newVersion = opts.version;
-  const isDryRun = args.includes('--dry-run');
+  const isDryRun = args.includes('--dry-run') || opts.version.includes('dryrun');
   const isAnyBranch = args.includes('--any-branch');
   let tagPrefix: string;
+
+  if (isDryRun) {
+    console.log(color.bold.yellow(`\n  🏃‍ Dry Run!\n`));
+  }
 
   if (!opts.isPublishRelease) {
     tasks.push(
@@ -31,7 +34,8 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
           if (!isVersionGreater(pkg.version, newVersion)) {
             throw new Error(`New version \`${newVersion}\` should be higher than current version \`${pkg.version}\``);
           }
-        }
+        },
+        skip: () => isDryRun,
       }
     );
   }
@@ -71,49 +75,59 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
             throw err;
           }
         }
-      )
+      ),
+      skip: () => isDryRun,
     },
     {
       title: 'Check current branch',
       task: () => execa('git', ['symbolic-ref', '--short', 'HEAD']).then(({stdout}) => {
-        if (stdout !== 'master' && !isAnyBranch && !isDryRun) {
+        if (stdout !== 'master' && !isAnyBranch) {
           throw new Error('Not on `master` branch. Use --any-branch to publish anyway.');
         }
-      })
+      }),
+      skip: () => isDryRun,
     },
     {
       title: 'Check local working tree',
       task: () => execa('git', ['status', '--porcelain']).then(({stdout}) => {
-        if (stdout !== '' && !isDryRun) {
+        if (stdout !== '') {
           throw new Error('Unclean working tree. Commit or stash changes first.');
         }
-      })
+      }),
+      skip: () => isDryRun,
     },
     {
       title: 'Check remote history',
       task: () => execa('git', ['rev-list', '--count', '--left-only', '@{u}...HEAD']).then(({stdout}) => {
-        if (stdout !== '0' && !isAnyBranch && !isDryRun) {
+        if (stdout !== '0' && !isAnyBranch) {
           throw new Error('Remote history differs. Please pull changes.');
         }
-      })
+      }),
+      skip: () => isDryRun,
     }
   );
 
   if (!opts.isPublishRelease) {
     tasks.push(
       {
-        title: 'Cleanup',
-        task: () => fs.remove('node_modules'),
-        skip: () => isDryRun,
+        title: `Set package.json version to ${color.bold.yellow(opts.version)}`,
+        task: () => {
+          const packageJson = JSON.parse(fs.readFileSync(opts.packageJsonPath, 'utf8'));
+          packageJson.version = opts.version;
+          fs.writeFileSync(opts.packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
+
+          const packageLockJson = JSON.parse(fs.readFileSync(opts.packageLockJsonPath, 'utf8'));
+          packageLockJson.version = opts.version;
+          fs.writeFileSync(opts.packageLockJsonPath, JSON.stringify(packageLockJson, null, 2) + '\n');
+        },
       },
       {
-        title: 'Install npm dependencies',
-        task: () => execa('npm', ['install'], { cwd: rootDir }),
-        skip: () => isDryRun,
+        title: `Install npm dependencies ${color.dim('(npm ci)')}`,
+        task: () => execa('npm', ['ci'], { cwd: rootDir }),
       },
       {
         title: `Build @stencil/core ${color.dim('(' + opts.buildId + ')')}`,
-        task: () => execa('npm', ['run', 'build.prod'], { cwd: rootDir })
+        task: () => bundleBuild(opts)
       },
       {
         title: 'Run jest tests',
@@ -132,15 +146,7 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
         task: () => validateBuild(rootDir)
       },
       {
-        title: `Set package.json version to ${color.bold.magenta(opts.version)}`,
-        task: () => {
-          const packageJson = JSON.parse(fs.readFileSync(opts.packageJsonPath, 'utf8'));
-          packageJson.version = opts.version;
-          fs.writeFileSync(opts.packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
-        },
-      },
-      {
-        title: `Generate Changelog ${opts.vermoji}`,
+        title: `Generate ${opts.version} Changelog ${opts.vermoji}`,
         task: async () => {
           await execa('npm', ['run', 'changelog'], { cwd: rootDir });
 
@@ -227,9 +233,9 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
   listr.run()
     .then(() => {
       if (opts.isPublishRelease) {
-        console.log(`\n ${opts.vermoji}  ${pkg.name} ${newVersion} published!! 🎉🎉🎉\n`);
+        console.log(`\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} published!! ${opts.vermoji}\n`);
       } else {
-        console.log(`\n ${opts.vermoji}  ${pkg.name} ${newVersion} prepared, check the diffs and commit 🧐\n`);
+        console.log(`\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} prepared, check the diffs and commit ${opts.vermoji}\n`);
       }
     })
     .catch(err => {

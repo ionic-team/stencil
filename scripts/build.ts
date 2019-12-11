@@ -14,6 +14,7 @@ import { sysNode } from './bundles/sys-node';
 import { sysNode_legacy } from './bundles/sys-node_legacy';
 import { testing } from './bundles/testing';
 import { validateBuild } from './test/validate-build';
+import { RollupOptions, rollup } from 'rollup';
 
 
 export async function run(rootDir: string, args: string[]) {
@@ -67,5 +68,25 @@ export async function createBuild(opts: BuildOptions) {
   return bundles.reduce((b, bundle) => {
     b.push(...bundle);
     return b;
-  }, []);
+  }, [] as RollupOptions[]);
+}
+
+
+export async function bundleBuild(opts: BuildOptions) {
+  const bundles = await createBuild(opts);
+
+  await Promise.all(bundles.map(async rollupOption => {
+
+    rollupOption.onwarn = () => {};
+
+    const bundle = await rollup(rollupOption);
+
+    if (Array.isArray(rollupOption.output)) {
+      await Promise.all(rollupOption.output.map(async output => {
+        await bundle.write(output);
+      }));
+    } else {
+      await bundle.write(rollupOption.output);
+    }
+  }));
 }

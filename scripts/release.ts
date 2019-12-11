@@ -53,8 +53,8 @@ async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPat
         .concat([
           new inquirer.Separator() as any,
           {
-            name: 'Other (specify)',
-            value: null
+            name: 'Dry Run',
+            value: getNewVersion(oldVersion, 'patch') + '-dryrun'
           }
         ]),
       filter: (input: any) => isValidVersionInput(input) ? getNewVersion(oldVersion, input) : input
@@ -79,7 +79,7 @@ async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPat
       type: 'confirm',
       name: 'confirm',
       message: (answers: any) => {
-        return `Prepare release ${opts.vermoji}  ${color.magenta(answers.version)} from ${oldVersion}. Continue?`;
+        return `Prepare release ${opts.vermoji}  ${color.yellow(answers.version)} from ${oldVersion}. Continue?`;
       }
     }
   ];
@@ -162,9 +162,8 @@ async function publishRelease(opts: BuildOptions, args: string[]) {
       name: 'confirm',
       message: (answers: any) => {
         opts.tag = answers.tag;
-        const tagPart = opts.tag ? ` and tag this release in npm as ${opts.tag}` : '';
-
-        return `Will publish ${opts.vermoji}  ${color.cyan(opts.version + tagPart)}. Continue?`;
+        const tagPart = opts.tag ? ` and tag this release in npm as ${color.yellow(opts.tag)}` : '';
+        return `Will publish ${opts.vermoji}  ${color.yellow(opts.version)}${tagPart}. Continue?`;
       }
     }
   ];
