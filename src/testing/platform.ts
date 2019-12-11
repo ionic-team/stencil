@@ -97,7 +97,7 @@ export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) => {
   }
 
   if (hostRef == null) {
-    console.warn('Use newSpecPage() to instanciate component instances.')
+    console.warn('Use newSpecPage() to instanciate component instances.');
     const Cstr = lazyInstance.constructor as d.ComponentTestingConstructor;
     const tagName = (Cstr.COMPILER_META && Cstr.COMPILER_META.tagName) ? Cstr.COMPILER_META.tagName : 'div';
     const elm = document.createElement(tagName);

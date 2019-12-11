@@ -1,8 +1,8 @@
-import { Config, Diagnostic, TransformOptions } from '@stencil/core/internal';
+import { Config, Diagnostic, TransformOptions, TranspileResults } from '@stencil/core/internal';
 import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { transpileModule } from '../compiler';
 import path from 'path';
-import ts from 'typescript';
+import * as ts from 'typescript';
 import { TestingLogger } from './testing-logger';
 
 
@@ -30,7 +30,7 @@ const DEFAULT_TRANSFORM_OPTS: TransformOptions = {
 };
 
 
-export function transpile(input: string, opts?: TransformOptions, sourceFilePath?: string) {
+export function transpile(input: string, opts?: TransformOptions, sourceFilePath?: string): TranspileResults {
   opts = opts || ({} as any);
   Object.assign(opts, DEFAULT_TRANSFORM_OPTS);
   return transpileModule(TRANSPILE_CONFIG, input, opts, sourceFilePath);

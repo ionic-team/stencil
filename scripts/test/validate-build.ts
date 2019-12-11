@@ -2,6 +2,7 @@ import { dirname, join } from 'path';
 import fs from 'fs-extra';
 import { BuildOptions, getOptions } from '../utils/options';
 import { PackageData } from '../utils/write-pkg-json';
+import ts from 'typescript';
 
 /**
  * Used to triple check that the final build files
@@ -133,20 +134,25 @@ const pkgs: TestPackage[] = [
       'LICENSE.md',
       'readme.md'
     ],
-    hasBin: true
+    hasBin: true,
   }
 ];
 
+
 export function validateBuild(rootDir: string) {
+  const dtsEntries: string[] = [];
   const opts = getOptions(rootDir);
   pkgs.forEach(testPkg => {
-    validatePackage(opts, testPkg);
+    validatePackage(opts, testPkg, dtsEntries);
   });
+
+  validateDts(opts, dtsEntries);
+
   console.log(`👾  Validated build files and distribution`);
 }
 
 
-function validatePackage(opts: BuildOptions, testPkg: TestPackage) {
+function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: string[]) {
   const rootDir = opts.rootDir;
 
   if (testPkg.packageJson) {
@@ -206,7 +212,8 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage) {
 
     if (pkgJson.types) {
       const pkgTypes = join(pkgDir, pkgJson.types);
-      fs.accessSync(pkgTypes)
+      fs.accessSync(pkgTypes);
+      dtsEntries.push(pkgTypes);
     }
   }
 
@@ -215,6 +222,30 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage) {
       const filePath = join(rootDir, file);
       fs.statSync(filePath);
     });
+  }
+}
+
+function validateDts(opts: BuildOptions, dtsEntries: string[]) {
+  const program = ts.createProgram(dtsEntries, {
+    baseUrl: '.',
+    paths: {
+      '@stencil/core/internal': [
+        join(opts.rootDir, 'internal', 'index.d.ts')
+      ],
+    },
+  });
+
+  const tsDiagnostics = program
+		.getSemanticDiagnostics()
+    .concat(program.getSyntacticDiagnostics());
+
+  if (tsDiagnostics.length > 0) {
+    const host = {
+      getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
+      getNewLine: () => ts.sys.newLine,
+      getCanonicalFileName: (f: string) => f,
+    };
+    throw new Error('🧨  ' + ts.formatDiagnostics(tsDiagnostics, host));
   }
 }
 
