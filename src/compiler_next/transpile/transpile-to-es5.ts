@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { loadTypeScriptDiagnostics } from '@utils';
+import { loadTypeScriptDiagnostics, hasError } from '@utils';
 import { loadTypescript } from '../sys/typescript/typescript-load';
 
 
@@ -14,7 +14,7 @@ export async function transpileToEs5(input: string, inlineHelpers: boolean) {
     moduleFile: null,
     build: {}
   };
-  if (diagnostics.length > 0) {
+  if (hasError(diagnostics)) {
     return results;
   }
 
@@ -34,12 +34,10 @@ export async function transpileToEs5(input: string, inlineHelpers: boolean) {
   };
 
   const tsResults = ts.transpileModule(input, transpileOpts);
-
   results.diagnostics.push(
     ...loadTypeScriptDiagnostics(tsResults.diagnostics)
   );
-
-  if (results.diagnostics.length === 0) {
+  if (!hasError(results.diagnostics)) {
     results.code = fixHelpers(tsResults.outputText);
   }
 

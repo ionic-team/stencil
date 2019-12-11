@@ -8,6 +8,7 @@ import { patchDomImplementation } from './patch-dom-implementation';
 import { relocateMetaCharset } from '../../compiler/html/relocate-meta-charset';
 import { removeUnusedStyles } from '../../compiler/html/remove-unused-styles';
 import { updateCanonicalLink } from '../../compiler/html/canonical-link';
+import { hasError } from '@utils';
 
 
 export function renderToString(html: string | any, options?: SerializeDocumentOptions) {
@@ -16,7 +17,7 @@ export function renderToString(html: string | any, options?: SerializeDocumentOp
 
   return new Promise<HydrateResults>(resolve => {
     const results = generateHydrateResults(opts);
-    if (results.diagnostics.length > 0) {
+    if (hasError(results.diagnostics)) {
       resolve(results);
 
     } else if (typeof html === 'string') {
@@ -57,7 +58,7 @@ export function hydrateDocument(doc: any | string, options?: HydrateDocumentOpti
 
   return new Promise<HydrateResults>(resolve => {
     const results = generateHydrateResults(opts);
-    if (results.diagnostics.length > 0) {
+    if (hasError(results.diagnostics)) {
       resolve(results);
 
     } else if (typeof doc === 'string') {
@@ -181,7 +182,7 @@ function finalizeHydrate(win: Window, doc: Document, opts: HydrateFactoryOptions
       relocateMetaCharset(doc);
     } catch (e) {}
 
-    if (results.diagnostics.length === 0) {
+    if (!hasError(results.diagnostics)) {
       results.httpStatus = 200;
     }
 

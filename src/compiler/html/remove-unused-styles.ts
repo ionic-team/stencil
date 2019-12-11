@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { parseCss } from '../style/parse-css';
 import { StringifyCss } from '../style/stringify-css';
 import { UsedSelectors } from '../style/used-selectors';
+import { hasError } from '@utils';
 
 
 export function removeUnusedStyles(doc: Document, diagnostics: d.Diagnostic[]) {
@@ -24,8 +25,8 @@ function removeUnusedStyleText(usedSelectors: UsedSelectors, diagnostics: d.Diag
     // parse the css from being applied to the document
     const cssAst = parseCss(styleElm.innerHTML);
 
-    if (cssAst.stylesheet.diagnostics.length > 0) {
-      diagnostics.push(...cssAst.stylesheet.diagnostics);
+    diagnostics.push(...cssAst.stylesheet.diagnostics);
+    if (hasError(diagnostics)) {
       return;
     }
 

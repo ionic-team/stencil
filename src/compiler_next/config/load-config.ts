@@ -1,4 +1,4 @@
-import { buildError, catchError, isString, normalizePath } from '@utils';
+import { buildError, catchError, isString, normalizePath, hasError } from '@utils';
 import { CompilerSystem, Config, Diagnostic, LoadConfigInit, LoadConfigResults } from '../../declarations';
 import { createLogger } from '../sys/logger';
 import { createSystem } from '../sys/stencil-sys';
@@ -41,7 +41,7 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
     }
 
     const loadedConfigFile = await loadConfigFile(sys, results.diagnostics, configPath, isDefaultConfigPath);
-    if (results.diagnostics.length > 0) {
+    if (hasError(results.diagnostics)) {
       return results;
     }
 
@@ -65,7 +65,7 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
 
     const validated = validateConfig(results.config);
     results.diagnostics.push(...validated.diagnostics);
-    if (results.diagnostics.length > 0) {
+    if (hasError(results.diagnostics)) {
       return results;
     }
 
@@ -132,7 +132,7 @@ const loadConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[], co
     // the passed in config was a string, so it's probably a path to the config we need to load
     // first clear the require cache so we don't get the same file
     const configFileData = evaluateConfigFile(sys, diagnostics, configPath);
-    if (diagnostics.length > 0) {
+    if (hasError(diagnostics)) {
       return config;
     }
 
@@ -190,7 +190,7 @@ const evaluateConfigFile = (sys: CompilerSystem, diagnostics: Diagnostic[], conf
       // browser environment, can't use node's require() to evaluate
       let sourceText = sys.readFileSync(configFilePath, 'utf8');
       sourceText = transpileTypedConfig(diagnostics, sourceText, configFilePath);
-      if (diagnostics.length > 0) {
+      if (hasError(diagnostics)) {
         return configFileData;
       }
 
@@ -210,7 +210,7 @@ const transpileTypedConfig = (diagnostics: Diagnostic[], sourceText: string, fil
   // let's transpile an awesome stencil.config.ts file into
   // a boring stencil.config.js file
   const ts = loadTypescript(diagnostics);
-  if (diagnostics.length > 0) {
+  if (hasError(diagnostics)) {
     return sourceText;
   }
 

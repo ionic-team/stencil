@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { buildError, catchError } from '@utils';
+import { buildError, catchError, hasError } from '@utils';
 import { drainPrerenderQueue, initializePrerenderEntryUrls } from './prerender-queue';
 import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
@@ -41,7 +41,7 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
     }
   }
 
-  if (diagnostics.length === 0) {
+  if (!hasError(diagnostics)) {
     let workerCtrl: NodeWorkerController = null;
 
     try {

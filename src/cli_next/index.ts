@@ -4,7 +4,7 @@ import { createNodeSysWithWatch } from '../sys/node_next/node-sys-watch';
 import { loadConfig } from '@compiler';
 import { parseFlags } from './parse-flags';
 import { runTask } from './tasks/run-task';
-import { shouldIgnoreError } from '@utils';
+import { shouldIgnoreError, hasError } from '@utils';
 import { setupWorkerController } from '../sys/node_next/worker';
 import exit from 'exit';
 import { join } from 'path';
@@ -48,7 +48,9 @@ export async function run(init: CliInitOptions) {
 
     if (validated.diagnostics.length > 0) {
       logger.printDiagnostics(validated.diagnostics);
-      exit(1);
+      if (hasError(validated.diagnostics)) {
+        exit(1);
+      }
     }
 
     setupWorkerController(sys, logger);

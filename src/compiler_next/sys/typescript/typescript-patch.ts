@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { buildError, buildWarn, catchError, isString, loadTypeScriptDiagnostic, normalizePath } from '@utils';
+import { buildError, buildWarn, catchError, isString, loadTypeScriptDiagnostic, normalizePath, hasError } from '@utils';
 import { getTypeScriptSys } from './typescript-sys';
 import { loadTypescript } from './typescript-load';
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
@@ -9,7 +9,7 @@ import ts from 'typescript';
 
 export const patchTypescript = async (config: d.Config, diagnostics: d.Diagnostic[], inMemoryFs: d.InMemoryFileSystem) => {
   const loadedTs = loadTypescript(diagnostics);
-  if (diagnostics.length > 0) {
+  if (hasError(diagnostics)) {
     return;
   }
 
