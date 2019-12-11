@@ -12,6 +12,7 @@
     "cli/",
     "compiler/",
     "dev-server/",
+    "dist/",
     "internal/",
     "mock-doc/",
     "screenshot/",
