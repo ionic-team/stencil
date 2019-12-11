@@ -1,6 +1,6 @@
-import { CompilerSystem } from '../../../declarations';
 import { createSystem } from '../../../compiler_next/sys/stencil-sys';
 import { loadConfig } from '../load-config';
+import { normalizePath } from '../../../utils';
 
 
 describe('load config', () => {
@@ -26,7 +26,7 @@ describe('load config', () => {
       sys,
     });
     expect(c.diagnostics).toHaveLength(0);
-    expect(c.config.configPath).toBe(configPath);
+    expect(c.config.configPath).toBe(normalizePath(configPath));
     expect(c.config).toBeDefined();
     expect(c.config.hashedFileNameLength).toBe(13);
   });
