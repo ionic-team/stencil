@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import * as c from '../dev-server-constants';
 import { emitBuildStatus } from './build-events';
 import { logDiagnostic } from './logger';
-import { hasError } from '@utils';
 
 
 export function appError(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.BuildResults) {
@@ -12,7 +11,7 @@ export function appError(win: d.DevClientWindow, doc: Document, config: d.DevCli
 
   const diagnostics = buildResults.diagnostics.filter(diagnostic => diagnostic.level === 'error');
 
-  if (hasError(diagnostics)) {
+  if (diagnostics.length === 0) {
     return;
   }
 
