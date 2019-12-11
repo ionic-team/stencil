@@ -12,7 +12,6 @@ export const getTsOptionsToExtend = (config: d.Config) => {
     moduleResolution: ts.ModuleResolutionKind.NodeJs,
     noEmitOnError: false,
     outDir: config.cacheDir,
-    rootDir: config.srcDir,
     sourceMap: config.sourceMap,
   };
   return tsOptions;
