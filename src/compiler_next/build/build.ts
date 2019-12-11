@@ -1,12 +1,12 @@
 import * as d from '../../declarations';
 import { buildAbort, buildFinish } from './build-finish';
-import { catchError, isString } from '@utils';
+import { catchError, isString, readPackageJson } from '@utils';
 import { emptyOutputTargets } from '../../compiler/output-targets/empty-dir';
+import { generateGlobalStyles } from '../../compiler/style/global-styles';
 import { generateOutputTargets } from '../output-targets';
 import { runTsProgram } from '../transpile/run-program';
 import { writeBuild } from './write-build';
 import ts from 'typescript';
-import { generateGlobalStyles } from '../../compiler/style/global-styles';
 
 
 export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
@@ -21,6 +21,9 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
         buildCtx.indexDoc = config.sys.createDocument(indexSrcHtml);
       }
     }
+
+    buildCtx.packageJson = await readPackageJson(config, compilerCtx, buildCtx);
+    if (buildCtx.hasError) return buildAbort(buildCtx);
 
     // run typescript program
     const tsTimeSpan = buildCtx.createTimeSpan('transpile started');

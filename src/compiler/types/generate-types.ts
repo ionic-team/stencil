@@ -1,24 +1,17 @@
 import * as d from '../../declarations';
 import { copyStencilCoreDts, updateStencilTypesImports } from './stencil-types';
 import { generateAppTypes } from './generate-app-types';
-import { isDtsFile } from '@utils';
+import { isDtsFile, isString } from '@utils';
 
 
-export async function generateTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDistTypes) {
-  if (!buildCtx.hasError) {
+export const generateTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDistTypes) => {
+  if (!buildCtx.hasError && isString(pkgData.types)) {
     await generateTypesOutput(config, compilerCtx, buildCtx, pkgData, outputTarget);
-
-    if (typeof pkgData.types === 'string') {
-      await copyStencilCoreDts(config, compilerCtx);
-    }
+    await copyStencilCoreDts(config, compilerCtx);
   }
-}
+};
 
-async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDistTypes) {
-  if (typeof pkgData.types !== 'string') {
-    return;
-  }
-
+const generateTypesOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgData: d.PackageJsonData, outputTarget: d.OutputTargetDistTypes) => {
   const srcDirItems = await compilerCtx.fs.readdir(config.srcDir, { recursive: false });
   const srcDtsFiles = srcDirItems.filter(srcItem => srcItem.isFile && isDtsFile(srcItem.absPath));
   const distTypesDir = config.sys.path.dirname(pkgData.types);
@@ -37,4 +30,4 @@ async function generateTypesOutput(config: d.Config, compilerCtx: d.CompilerCtx,
 
   const distPath = config.sys.path.join(config.rootDir, distTypesDir);
   await generateAppTypes(config, compilerCtx, buildCtx, distPath);
-}
+};

@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { catchError, isFunction, isString } from '@utils';
-import { PluginCtx, PluginTransformResults } from '../../declarations/plugin';
+import { PluginCtx, PluginTransformResults } from '../../declarations';
 import { parseCssImports } from '../style/css-imports';
 import { isOutputTargetDocs } from '../output-targets/output-utils';
 

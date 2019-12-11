@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { getTextDocs, isDocsPublic } from '@utils';
 
-export function generatePropTypes(cmpMeta: d.ComponentCompilerMeta): d.TypeInfo {
+export const generatePropTypes = (cmpMeta: d.ComponentCompilerMeta): d.TypeInfo => {
   return [
     ...cmpMeta.properties.map(cmpProp => ({
       name: cmpProp.name,
@@ -20,4 +20,4 @@ export function generatePropTypes(cmpMeta: d.ComponentCompilerMeta): d.TypeInfo 
       public: true
     }))
   ];
-}
+};

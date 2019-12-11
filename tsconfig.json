@@ -83,9 +83,11 @@
     "src/client/index.ts",
     "src/client/polyfills/css-shim/index.ts",
     "src/cli/index.ts",
+    "src/cli_next/index.ts",
     "src/cli_next/public.ts",
     "src/cli_next/worker/index.ts",
     "src/compiler/index.ts",
+    "src/compiler_next/index.ts",
     "src/compiler_next/public.ts",
     "src/compiler_next/sys/modules/index.ts",
     "src/dev-server/index.ts",
@@ -106,6 +108,7 @@
   ],
 
   "include": [
-    "types/*.d.ts"
+    "types/*.d.ts",
+    "src/declarations/*.ts"
   ]
 }

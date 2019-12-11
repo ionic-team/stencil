@@ -7,7 +7,7 @@ import { normalizePath } from '@utils';
 import { updateStencilTypesImports } from './stencil-types';
 
 
-export async function generateAppTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination: string) {
+export const generateAppTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination: string) => {
   // only gather components that are still root ts files we've found and have component metadata
   // the compilerCtx cache may still have files that may have been deleted/renamed
   const timespan = buildCtx.createTimeSpan(`generated app types started`, true);
@@ -27,7 +27,7 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
 
   timespan.finish(`generated app types finished: ${config.sys.path.relative(config.rootDir, componentsDtsFilePath)}`);
   return changedContent;
-}
+};
 
 
 /**
@@ -35,7 +35,7 @@ export async function generateAppTypes(config: d.Config, compilerCtx: d.Compiler
  * @param config the project build configuration
  * @param options compiler options from tsconfig
  */
-async function generateComponentTypesFile(config: d.Config, buildCtx: d.BuildCtx, _destination: string) {
+const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx, _destination: string) => {
   let typeImportData: d.TypesImportData = {};
   const allTypes = new Map<string, number>();
   const needsJSXElementHack = buildCtx.components.some(cmp => cmp.isLegacy);
@@ -122,4 +122,4 @@ ${componentsFileString}
   return `${COMPONENTS_DTS_HEADER}
 
 ${indentTypes(code)}`;
-}
+};

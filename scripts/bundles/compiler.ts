@@ -21,11 +21,10 @@ export async function compiler(opts: BuildOptions) {
   const compilerFileName = 'stencil.js';
   const compilerDtsName = compilerFileName.replace('.js', '.d.ts');
 
-  // copy @stencil/core/compiler public d.ts
-  await fs.copyFile(
-    join(inputDir, 'public.d.ts'),
-    join(opts.output.compilerDir, compilerDtsName)
-  );
+  // create public d.ts
+  let dts = await fs.readFile(join(inputDir, 'public.d.ts'), 'utf8');
+  dts = dts.replace('@stencil/core/internal', '../internal/index');
+  await fs.writeFile(join(opts.output.compilerDir, compilerDtsName), dts);
 
   // write @stencil/core/compiler/package.json
   writePkgJson(opts, opts.output.compilerDir, {

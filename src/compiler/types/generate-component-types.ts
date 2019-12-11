@@ -11,7 +11,7 @@ import { generatePropTypes } from './generate-prop-types';
  * @param cmp the metadata for the component that a type definition string is generated for
  * @param importPath the path of the component file
  */
-export function generateComponentTypes(cmp: d.ComponentCompilerMeta): d.TypesModule {
+export const generateComponentTypes = (cmp: d.ComponentCompilerMeta): d.TypesModule => {
   const tagName = cmp.tagName.toLowerCase();
   const tagNameAsPascal = dashToPascalCase(tagName);
   const htmlElementName = `HTML${tagNameAsPascal}Element`;
@@ -43,10 +43,10 @@ var ${htmlElementName}: {
   new (): ${htmlElementName};
 };`,
   };
-}
+};
 
 
-function attributesToMultiLineString(attributes: d.TypeInfo, jsxAttributes: boolean, paddingString = '') {
+const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: boolean, paddingString = '') => {
   const attributesStr = sortBy(attributes, a => a.name)
     .filter(type => type.public || !jsxAttributes)
     .reduce((fullList, type) => {
@@ -67,4 +67,4 @@ function attributesToMultiLineString(attributes: d.TypeInfo, jsxAttributes: bool
     .join(`\n`);
 
   return attributesStr !== '' ? `\n${attributesStr}\n` : '';
-}
+};

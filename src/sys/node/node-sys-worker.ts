@@ -42,7 +42,7 @@ export class NodeSystemWorker {
     return scopeCss(cssText, scopeId, commentOriginalSelector);
   }
 
-  transpileToEs5(cwd: string, input: string, inlineHelpers: boolean): Promise<d.TranspileResults> {
+  transpileToEs5(cwd: string, input: string, inlineHelpers: boolean): Promise<any> {
     return transpileToEs5Worker(cwd, input, inlineHelpers);
   }
 

@@ -13,11 +13,10 @@ import { RollupOptions } from 'rollup';
 export async function cli(opts: BuildOptions) {
   const inputDir = join(opts.transpiledDir, 'cli_next');
 
-  // copy public d.ts
-  await fs.copyFile(
-    join(inputDir, 'public.d.ts'),
-    join(opts.output.cliDir, 'index.d.ts')
-  );
+  // create public d.ts
+  let dts = await fs.readFile(join(inputDir, 'public.d.ts'), 'utf8');
+  dts = dts.replace('@stencil/core/internal', '../internal/index');
+  await fs.writeFile(join(opts.output.cliDir, 'index.d.ts'), dts);
 
   // write package.json
   writePkgJson(opts, opts.output.cliDir, {

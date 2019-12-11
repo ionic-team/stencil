@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { isOutputTargetDist } from '../output-targets/output-utils';
+import { isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { normalizePath } from '@utils';
 
 
@@ -23,10 +23,10 @@ export const updateStencilTypesImports = (path: d.Path, typesDir: string, dtsFil
 
 export const copyStencilCoreDts = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const typesOutputTargets = config.outputTargets
-    .filter(isOutputTargetDist)
+    .filter(isOutputTargetDistTypes)
     .filter(o => o.typesDir);
 
-  const srcStencilDtsPath = config.sys.path.join(config.sys.compiler.packageDir, 'internal', 'stencil.core.d.ts');
+  const srcStencilDtsPath = config.sys.path.join(config.sys.compiler.packageDir, 'internal', CORE_DTS);
   const srcStencilCoreDts = await compilerCtx.fs.readFile(srcStencilDtsPath);
 
   return Promise.all(typesOutputTargets.map(o => {
@@ -36,5 +36,5 @@ export const copyStencilCoreDts = async (config: d.Config, compilerCtx: d.Compil
 };
 
 
-const CORE_FILENAME = `stencil.core`;
+const CORE_FILENAME = `stencil-public-runtime`;
 const CORE_DTS = `${CORE_FILENAME}.d.ts`;

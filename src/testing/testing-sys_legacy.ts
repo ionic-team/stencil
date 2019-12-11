@@ -16,6 +16,7 @@ export interface NodeSystemSystemConstructor {
 }
 
 export class TestingSystem extends NodeSystem {
+  path: any;
 
   constructor() {
     const fs = new TestingFs();
@@ -23,7 +24,7 @@ export class TestingSystem extends NodeSystem {
     this.path = Object.assign({}, path);
 
     const orgPathJoin = path.join;
-    this.path.join = function(...paths) {
+    this.path.join = function(...paths: string[]) {
       return normalizePath(orgPathJoin.apply(path, paths));
     };
 

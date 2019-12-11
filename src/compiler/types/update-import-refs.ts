@@ -10,7 +10,7 @@ import * as d from '../../declarations';
  * @param filePath the path of the component file
  * @param config general config that all of stencil uses
  */
-export function updateReferenceTypeImports(config: d.Config, importDataObj: d.TypesImportData, allTypes: Map<string, number>, cmp: d.ComponentCompilerMeta, filePath: string) {
+export const updateReferenceTypeImports = (config: d.Config, importDataObj: d.TypesImportData, allTypes: Map<string, number>, cmp: d.ComponentCompilerMeta, filePath: string) => {
   const updateImportReferences = updateImportReferenceFactory(config, allTypes, filePath);
 
   return [
@@ -22,9 +22,9 @@ export function updateReferenceTypeImports(config: d.Config, importDataObj: d.Ty
   .reduce((obj, cmpProp) => {
     return updateImportReferences(obj, cmpProp.complexType.references);
   }, importDataObj);
-}
+};
 
-function updateImportReferenceFactory(config: d.Config, allTypes: Map<string, number>, filePath: string) {
+const updateImportReferenceFactory = (config: d.Config, allTypes: Map<string, number>, filePath: string) => {
   function getIncrementTypeName(name: string): string {
     const counter = allTypes.get(name);
     if (counter === undefined) {
@@ -78,4 +78,4 @@ function updateImportReferenceFactory(config: d.Config, allTypes: Map<string, nu
 
     return obj;
   };
-}
+};

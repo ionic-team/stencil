@@ -9,7 +9,7 @@ export const COMPONENTS_DTS_HEADER = `/* eslint-disable */
  */`;
 
 
-export function indentTypes(code: string) {
+export const indentTypes = (code: string) => {
   const INDENT_STRING = '  ';
   let indentSize = 0;
 
@@ -30,10 +30,10 @@ export function indentTypes(code: string) {
       return newCode;
     })
     .join('\n');
-}
+};
 
 
-export function sortImportNames(a: d.TypesMemberNameData, b: d.TypesMemberNameData) {
+export const sortImportNames = (a: d.TypesMemberNameData, b: d.TypesMemberNameData) => {
   const aName = a.localName.toLowerCase();
   const bName = b.localName.toLowerCase();
   if (aName < bName) return -1;
@@ -41,4 +41,4 @@ export function sortImportNames(a: d.TypesMemberNameData, b: d.TypesMemberNameDa
   if (a.localName < b.localName) return -1;
   if (a.localName > b.localName) return 1;
   return 0;
-}
+};

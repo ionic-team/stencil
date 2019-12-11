@@ -18,15 +18,19 @@ export async function bundleDts(opts: BuildOptions, inputFile: string) {
 
   let outputCode = generateDtsBundle(entries).join('\n');
 
-  outputCode = outputCode.replace(/\/\/\/ <reference types="node" \/>/g, '');
-
-  outputCode = outputCode.replace(/NodeJS.Process/g, 'any');
-
-  outputCode = outputCode.replace(/import \{ URL \} from \'url\';/g, '');
-
-  outputCode = outputCode.trim();
+  outputCode = cleanDts(outputCode);
 
   await fs.writeFile(cachedDtsOutput, outputCode);
 
   return outputCode;
+}
+
+export function cleanDts(dtsContent: string) {
+  dtsContent = dtsContent.replace(/\/\/\/ <reference types="node" \/>/g, '');
+
+  dtsContent = dtsContent.replace(/NodeJS.Process/g, 'any');
+
+  dtsContent = dtsContent.replace(/import \{ URL \} from \'url\';/g, '');
+
+  return dtsContent.trim();
 }

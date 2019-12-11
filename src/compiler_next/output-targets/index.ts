@@ -9,6 +9,7 @@ import { outputLazy } from './dist-lazy/lazy-output';
 import { outputLazyLoader } from '../../compiler/output-targets/output-lazy-loader';
 import { outputWww } from '../../compiler/output-targets/output-www';
 import { outputCollection } from './dist-collection';
+import { outputTypes } from '../../compiler/output-targets/output-types';
 
 
 export const generateOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -31,6 +32,10 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
     outputLazyLoader(config, compilerCtx),
     outputApp(config, compilerCtx, buildCtx),
   ]);
+
+  // must run after all the other outputs
+  // since it validates files were created
+  await outputTypes(config, compilerCtx, buildCtx);
 
   timeSpan.finish('generate outputs finished');
 };
