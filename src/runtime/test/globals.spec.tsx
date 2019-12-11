@@ -1,4 +1,4 @@
-import { Component } from '@stencil/core';
+import { Component, Build } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 
@@ -33,15 +33,21 @@ describe('globals', () => {
     expect((window as any).JSON.stringify([0])).toEqual('[0]');
   });
 
+  it('build values', () => {
+    expect(Build.isBrowser).toBe(false);
+    expect(Build.isDev).toBe(true);
+    expect(Build.isTesting).toBe(true);
+  });
+
   describe('globals/prototypes', () => {
     let page: any;
     beforeEach(async () => {
       @Component({ tag: 'cmp-el' })
       class CmpEl {
         // @ts-ignore
-        private protoEl: any;
-        private protoNode: any;
-        private protoNodeList: any;
+        protoEl: any;
+        protoNode: any;
+        protoNodeList: any;
 
         constructor() {
           this.protoEl = Element.prototype;

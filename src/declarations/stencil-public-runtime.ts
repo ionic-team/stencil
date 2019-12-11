@@ -174,6 +174,7 @@ export interface WatchDecorator {
 export interface UserBuildConditionals {
   isDev: boolean;
   isBrowser: boolean;
+  isTesting: boolean;
 }
 
 /**

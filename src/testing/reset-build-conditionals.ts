@@ -7,6 +7,7 @@ export function resetBuildConditionals(b: d.BuildConditionals) {
   });
 
   b.isDev = true;
+  b.isTesting = true;
   b.isDebug = false;
   b.lazyLoad = true;
   b.member = true;

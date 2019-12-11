@@ -46,6 +46,7 @@ const getBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => {
   build.hydrateClientSide = true;
   build.isDebug = false;
   build.isDev = false;
+  build.isTesting = false;
   build.devTools = false;
   build.lifecycleDOMEvents = false;
   build.profile = false;

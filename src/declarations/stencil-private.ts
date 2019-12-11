@@ -181,6 +181,7 @@ export interface BuildFeatures {
 export interface BuildConditionals extends Partial<BuildFeatures> {
   hotModuleReplacement?: boolean;
   isDebug?: boolean;
+  isTesting?: boolean;
   isDev?: boolean;
   devTools?: boolean;
   hydrateServerSide?: boolean;

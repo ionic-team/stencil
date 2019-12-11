@@ -13,6 +13,7 @@ import {
 
 export namespace Components {
   interface AppRoot {}
+  interface BuildData {}
   interface CarDetail {
     'car': CarData;
   }
@@ -52,6 +53,12 @@ declare global {
   var HTMLAppRootElement: {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
+  };
+
+  interface HTMLBuildDataElement extends Components.BuildData, HTMLStencilElement {}
+  var HTMLBuildDataElement: {
+    prototype: HTMLBuildDataElement;
+    new (): HTMLBuildDataElement;
   };
 
   interface HTMLCarDetailElement extends Components.CarDetail, HTMLStencilElement {}
@@ -127,6 +134,7 @@ declare global {
   };
   interface HTMLElementTagNameMap {
     'app-root': HTMLAppRootElement;
+    'build-data': HTMLBuildDataElement;
     'car-detail': HTMLCarDetailElement;
     'car-list': HTMLCarListElement;
     'dom-api': HTMLDomApiElement;
@@ -144,6 +152,7 @@ declare global {
 
 declare namespace LocalJSX {
   interface AppRoot {}
+  interface BuildData {}
   interface CarDetail {
     'car'?: CarData;
   }
@@ -176,6 +185,7 @@ declare namespace LocalJSX {
 
   interface IntrinsicElements {
     'app-root': AppRoot;
+    'build-data': BuildData;
     'car-detail': CarDetail;
     'car-list': CarList;
     'dom-api': DomApi;
@@ -198,6 +208,7 @@ declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
       'app-root': LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
+      'build-data': LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
       'car-detail': LocalJSX.CarDetail & JSXBase.HTMLAttributes<HTMLCarDetailElement>;
       'car-list': LocalJSX.CarList & JSXBase.HTMLAttributes<HTMLCarListElement>;
       'dom-api': LocalJSX.DomApi & JSXBase.HTMLAttributes<HTMLDomApiElement>;

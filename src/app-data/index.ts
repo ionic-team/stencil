@@ -52,6 +52,7 @@ export const BUILD: BuildConditionals = /* default */ {
   hotModuleReplacement: true,
   isDebug: false,
   isDev: false,
+  isTesting: false,
   hydrateServerSide: false,
   hydrateClientSide: false,
   lifecycleDOMEvents: false,

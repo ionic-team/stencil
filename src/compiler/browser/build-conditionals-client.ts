@@ -59,6 +59,7 @@ export const BUILD: Required<d.Build> = {
   hotModuleReplacement: false,
   isDebug: false,
   isDev: false,
+  isTesting: false,
   cssVarShim: false,
   constructableCSS: true,
   initializeNextTick: false,

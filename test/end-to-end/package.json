@@ -16,11 +16,12 @@
   },
   "devDependencies": {
     "@types/jest": "24.0.20",
-    "@types/puppeteer": "1.19.1",
+    "@types/puppeteer": "2.0.0",
     "jest": "24.9.0",
     "jest-cli": "24.9.0",
-    "puppeteer": "1.20.0",
-    "workbox-build": "4.3.1"
+    "puppeteer": "2.0.0",
+    "workbox-build": "4.3.1",
+    "rollup-plugin-node-builtins": "^2.1.2"
   },
   "jest": {
     "preset": "../../testing/jest-preset.js"

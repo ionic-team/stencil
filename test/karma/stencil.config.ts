@@ -23,7 +23,6 @@ export const config = {
     { src: '**/*.css' },
     { src: 'noscript.js' }
   ],
-  excludeSrc: [],
   globalScript: 'test-app/global.ts',
   globalStyle: 'test-app/style-plugin/global-sass-entry.scss',
   plugins: [

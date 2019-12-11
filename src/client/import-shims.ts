@@ -20,7 +20,7 @@ export const patchEsm = () => {
 };
 
 export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => {
-  if (BUILD.isDev) {
+  if (BUILD.devTools) {
     consoleDevInfo('Running in development mode.');
   }
   if (BUILD.cssVarShim) {

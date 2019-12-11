@@ -45,6 +45,7 @@ export namespace Components {
     'strAttr'?: string;
   }
   interface BadSharedJsx {}
+  interface BuildData {}
   interface CmpA {}
   interface CmpB {}
   interface CmpC {}
@@ -252,6 +253,12 @@ declare global {
   var HTMLBadSharedJsxElement: {
     prototype: HTMLBadSharedJsxElement;
     new (): HTMLBadSharedJsxElement;
+  };
+
+  interface HTMLBuildDataElement extends Components.BuildData, HTMLStencilElement {}
+  var HTMLBuildDataElement: {
+    prototype: HTMLBuildDataElement;
+    new (): HTMLBuildDataElement;
   };
 
   interface HTMLCmpAElement extends Components.CmpA, HTMLStencilElement {}
@@ -814,6 +821,7 @@ declare global {
     'attribute-host': HTMLAttributeHostElement;
     'attribute-html-root': HTMLAttributeHtmlRootElement;
     'bad-shared-jsx': HTMLBadSharedJsxElement;
+    'build-data': HTMLBuildDataElement;
     'cmp-a': HTMLCmpAElement;
     'cmp-b': HTMLCmpBElement;
     'cmp-c': HTMLCmpCElement;
@@ -940,6 +948,7 @@ declare namespace LocalJSX {
     'strAttr'?: string;
   }
   interface BadSharedJsx {}
+  interface BuildData {}
   interface CmpA {}
   interface CmpB {}
   interface CmpC {}
@@ -1110,6 +1119,7 @@ declare namespace LocalJSX {
     'attribute-host': AttributeHost;
     'attribute-html-root': AttributeHtmlRoot;
     'bad-shared-jsx': BadSharedJsx;
+    'build-data': BuildData;
     'cmp-a': CmpA;
     'cmp-b': CmpB;
     'cmp-c': CmpC;
@@ -1219,6 +1229,7 @@ declare module "@stencil/core" {
       'attribute-host': LocalJSX.AttributeHost & JSXBase.HTMLAttributes<HTMLAttributeHostElement>;
       'attribute-html-root': LocalJSX.AttributeHtmlRoot & JSXBase.HTMLAttributes<HTMLAttributeHtmlRootElement>;
       'bad-shared-jsx': LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
+      'build-data': LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
       'cmp-a': LocalJSX.CmpA & JSXBase.HTMLAttributes<HTMLCmpAElement>;
       'cmp-b': LocalJSX.CmpB & JSXBase.HTMLAttributes<HTMLCmpBElement>;
       'cmp-c': LocalJSX.CmpC & JSXBase.HTMLAttributes<HTMLCmpCElement>;
