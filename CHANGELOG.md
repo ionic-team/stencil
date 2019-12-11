@@ -1,4 +1,5 @@
-# 🎷 [1.9.0-0](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.9.0-0) (2019-12-10)
+# 😄 [1.9.0-1](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.9.0-1) (2019-12-11)
+
 
 
 ### Bug Fixes
@@ -16,6 +17,10 @@
 * **polyfills:** update baseURI for base w/out href ([#1995](https://github.com/ionic-team/stencil/issues/1995)) ([8582c93](https://github.com/ionic-team/stencil/commit/8582c934b5aaccf3d7e8c14131f1af4eedcc07b8))
 * **prerender:** prevent window timeout leaks ([b80feda](https://github.com/ionic-team/stencil/commit/b80feda7e8b57815f750cb9b2d608525b6f3b6a6))
 * **testing:** fix single-process mode ([#2016](https://github.com/ionic-team/stencil/issues/2016)) ([72f0a05](https://github.com/ionic-team/stencil/commit/72f0a05f0a4403174afbbc52ae46820e6d53faa6))
+* **next:** optimize dist-custom-elements bundle ([50b5a27](https://github.com/ionic-team/stencil/commit/50b5a27f84de84393f655a86e8f68015eec226cf))
+* **next:** optimizes mode entries ([634e394](https://github.com/ionic-team/stencil/commit/634e39439a3ddcd93db8c15afd793ac95d338a7e))
+* **next:** skip test files ([150d984](https://github.com/ionic-team/stencil/commit/150d98448dd1a50cd316048d775803f9889fa5be))
+* **next:** www runs after lazy build ([96ae066](https://github.com/ionic-team/stencil/commit/96ae066de4c5eb6515c962aceeafc20063044b84))
 
 
 
