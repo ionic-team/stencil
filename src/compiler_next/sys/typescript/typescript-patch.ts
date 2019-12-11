@@ -55,10 +55,17 @@ const validateTsConfig = async (config: d.Config, diagnostics: d.Diagnostic[], i
 
       } else if (results.config) {
         const compilerOptions = results.config.compilerOptions;
-        if (hasSrcDirectoryInclude(results.config.include)) {
+
+        if (!hasSrcDirectoryInclude(results.config.include)) {
           const warn = buildWarn(diagnostics);
           warn.header = `tsconfig.json "include" required`;
           warn.messageText = `In order for TypeScript to improve watch performance, it's recommended the "tsconfig.json" file should have the "include" property, with at least the app's "src" directory listed. For example: "include": ["src"]`;
+        }
+
+        if (hasStencilConfigInclude(results.config.include)) {
+          const warn = buildWarn(diagnostics);
+          warn.header = `tsconfig.json should not reference stencil.config.ts`;
+          warn.messageText = `stencil.config.ts is not part of the output build, it should not be included.`;
         }
 
         const target = (compilerOptions.target ?? 'es5').toLowerCase();
@@ -84,5 +91,9 @@ const validateTsConfig = async (config: d.Config, diagnostics: d.Diagnostic[], i
 };
 
 const hasSrcDirectoryInclude = (includeProp: string[]) => {
-  return !Array.isArray(includeProp) || includeProp.length === 0;
+  return includeProp && includeProp.includes('src');
+};
+
+const hasStencilConfigInclude = (includeProp: string[]) => {
+  return includeProp && includeProp.includes('stencil.config.ts');
 };
