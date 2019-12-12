@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { createTestingSystem } from '../../../testing/testing-sys';
-import { getCommitInstructions, inMemoryFs, shouldIgnore } from '../in-memory-fs';
+import { getCommitInstructions, createInMemoryFs, shouldIgnore } from '../in-memory-fs';
 import { normalizePath } from '../../../utils';
 
 
@@ -177,7 +177,7 @@ describe(`in-memory-fs`, () => {
 
   beforeEach(() => {
     sys = createTestingSystem();
-    fs = inMemoryFs(sys);
+    fs = createInMemoryFs(sys);
   });
 
 

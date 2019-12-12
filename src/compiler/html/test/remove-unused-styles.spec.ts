@@ -31,7 +31,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -58,7 +58,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -87,7 +87,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -121,7 +121,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -156,7 +156,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -185,7 +185,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -211,7 +211,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -236,7 +236,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -262,7 +262,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
