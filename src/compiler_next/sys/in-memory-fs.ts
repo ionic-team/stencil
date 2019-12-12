@@ -3,7 +3,7 @@ import { isString, normalizePath } from '@utils';
 import path from 'path';
 
 
-export const inMemoryFs = (sys: d.CompilerSystem) => {
+export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const items: d.FsItems = new Map();
   const revisions = new Map<string, number>();
   const markItem = (filePath: string) => {

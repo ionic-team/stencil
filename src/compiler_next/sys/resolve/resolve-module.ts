@@ -9,6 +9,22 @@ import path from 'path';
 import resolve from 'resolve';
 
 
+export const resolveRemoteModuleId = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, containingFile: string) => {
+  const packageJson = resolveRemotePackageJsonSync(config, inMemoryFs, moduleId);
+  if (packageJson) {
+    const fromDir = path.dirname(containingFile);
+    const resolvedUrl = resolveModuleIdSync(config, inMemoryFs, moduleId, fromDir, ['.js', '.mjs']);
+    if (isString(resolvedUrl)) {
+      return {
+        resolvedUrl,
+        packageJson,
+      }
+    }
+  }
+  return null;
+}
+
+
 export const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string) => {
   const filePath = path.join(config.rootDir, 'node_modules', moduleId, 'package.json');
   let pkgJson = inMemoryFs.readFileSync(filePath);
@@ -17,7 +33,9 @@ export const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InM
     pkgJson = fetchModuleSync(inMemoryFs, packageVersions, url, filePath);
   }
   if (isString(pkgJson)) {
-    return JSON.parse(pkgJson) as d.PackageJsonData;
+    try {
+      return JSON.parse(pkgJson) as d.PackageJsonData;
+    } catch (e) {}
   }
   return null;
 };

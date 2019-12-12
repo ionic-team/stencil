@@ -2,10 +2,10 @@ import { Cache } from '../compiler/cache';
 import { CompilerNext, Config, Diagnostic } from '../declarations';
 import { CompilerContext } from './build/compiler-ctx';
 import { createFullBuild } from './build/full-build';
+import { createInMemoryFs } from './sys/in-memory-fs';
 import { createSysWorker } from './sys/worker/sys-worker';
 import { createWatchBuild } from './build/watch-build';
 import { getConfig, patchSysLegacy } from './sys/config';
-import { inMemoryFs } from './sys/in-memory-fs';
 import { patchFs } from './sys/fs-patch';
 import { patchTypescript } from './sys/typescript/typescript-patch';
 
@@ -21,8 +21,8 @@ export const createCompiler = async (config: Config) => {
 
   patchFs(sys);
 
-  compilerCtx.fs = inMemoryFs(sys);
-  compilerCtx.cache = new Cache(config, inMemoryFs(sys));
+  compilerCtx.fs = createInMemoryFs(sys);
+  compilerCtx.cache = new Cache(config, createInMemoryFs(sys));
   await compilerCtx.cache.initCacheDir();
 
   compilerCtx.worker = createSysWorker(sys, config.maxConcurrentWorkers);
