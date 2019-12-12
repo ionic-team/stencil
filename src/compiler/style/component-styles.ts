@@ -195,7 +195,7 @@ async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildC
   }
 
   // auto add css prefixes and minifies when configured
-  compiledStyle.styleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, compiledStyle.styleText, filePath, true);
+  compiledStyle.styleText = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, compiledStyle.styleText, filePath);
   if (requiresScopedStyles(cmp.encapsulation, commentOriginalSelector)) {
     // only create scoped styles if we need to
     compiledStyle.styleTextScoped = await scopeComponentCss(config, buildCtx, cmp, modeName, compiledStyle.styleText, false);

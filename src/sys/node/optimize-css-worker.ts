@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
 import { catchError } from '@utils';
-import cssnano, { CssNanoOptions } from 'cssnano';
 import autoprefixer from 'autoprefixer';
 import postcss, { AcceptedPlugin } from 'postcss';
+import { minifyCss } from '../../compiler_next/optimize/minify-css';
 
 
 export async function optimizeCssWorker(inputOpts: d.OptimizeCssInput) {
@@ -16,10 +16,6 @@ export async function optimizeCssWorker(inputOpts: d.OptimizeCssInput) {
 
     if (inputOpts.autoprefixer !== false && inputOpts.autoprefixer !== null) {
       plugins.push(addAutoprefixer(inputOpts));
-    }
-
-    if (inputOpts.minify) {
-      plugins.push(addMinify());
     }
 
     const processor = postcss(plugins);
@@ -42,6 +38,9 @@ export async function optimizeCssWorker(inputOpts: d.OptimizeCssInput) {
 
       output.css = result.css;
 
+      if (inputOpts.minify) {
+        output.css = minifyCss(output.css);
+      }
     } catch (e) {
       const diagnostic: d.Diagnostic = {
         header: `Optimize CSS`,
@@ -118,12 +117,3 @@ const DEFAULT_AUTOPREFIX_LEGACY = {
   remove: false,
   flexbox: 'no-2009'
 };
-
-
-export function addMinify() {
-  const cssnanoOpts: CssNanoOptions = {
-    preset: 'default'
-  };
-
-  return cssnano(cssnanoOpts);
-}

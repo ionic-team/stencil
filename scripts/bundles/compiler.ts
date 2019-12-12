@@ -5,7 +5,6 @@ import commonjs from 'rollup-plugin-commonjs';
 import json from 'rollup-plugin-json';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { inlinedCompilerPluginsPlugin } from './plugins/inlined-compiler-plugins-plugin';
-import { optimizeCssPlugin } from './plugins/optimizecss-plugin';
 import { sysModulesPlugin } from './plugins/sys-modules-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { getBanner } from '../utils/banner';
@@ -13,6 +12,7 @@ import { writePkgJson } from '../utils/write-pkg-json';
 import { BuildOptions } from '../utils/options';
 import { RollupOptions, OutputChunk } from 'rollup';
 import terser from 'terser';
+import { moduleDebugPlugin } from './plugins/moduleDebugPlugin';
 
 
 export async function compiler(opts: BuildOptions) {
@@ -60,7 +60,6 @@ export async function compiler(opts: BuildOptions) {
           return null;
         }
       },
-      optimizeCssPlugin(opts),
       inlinedCompilerPluginsPlugin(opts, inputDir),
       aliasPlugin(opts),
       sysModulesPlugin(inputDir),
@@ -70,6 +69,7 @@ export async function compiler(opts: BuildOptions) {
       commonjs(),
       replacePlugin(opts),
       json() as any,
+      moduleDebugPlugin(),
       {
         generateBundle(_, bundleFiles) {
           Object.keys(bundleFiles).forEach(fileName => {

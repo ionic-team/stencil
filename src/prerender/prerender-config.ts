@@ -1,5 +1,6 @@
 import * as d from '../declarations';
 import { catchError } from '@utils';
+import { requireFunc } from '../compiler_next/sys/environment';
 
 
 export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigPath: string) {
@@ -7,8 +8,6 @@ export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigP
 
   if (typeof prerenderConfigPath === 'string') {
     try {
-      // webpack work-around/hack
-      const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
       const userConfig = requireFunc(prerenderConfigPath);
       if (userConfig != null) {
         Object.assign(prerenderConfig, userConfig);
@@ -25,8 +24,3 @@ export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigP
 
   return prerenderConfig;
 }
-
-
-
-declare const __webpack_require__: any;
-declare const __non_webpack_require__: any;

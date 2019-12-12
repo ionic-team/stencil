@@ -1,11 +1,12 @@
 import * as d from '../../declarations';
-import { DEFAULT_STYLE_MODE, catchError, createVarName, normalizePath } from '@utils';
+import { DEFAULT_STYLE_MODE, catchError, createVarName, normalizePath, hasError } from '@utils';
 import { createStencilImportPath } from '../transformers/stencil-import-path';
 import { getScopeId } from '../style/scope-css';
 import { scopeCss } from '../../utils/shadow-css';
 import { stripComments } from './style-utils';
 import MagicString from 'magic-string';
 import path from 'path';
+import { optimizeCss } from '../../compiler_next/optimize/optimize-css';
 
 
 export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
@@ -39,6 +40,19 @@ export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
     cssImports.forEach(cssImport => {
       s.append(`${cssImport.varName} + `);
     });
+
+    const optimizeResults = await optimizeCss({
+      autoprefixer: input.autoprefixer,
+      css: results.code,
+      filePath: input.filePath,
+      minify: input.minify
+    });
+
+    results.diagnostics.push(...optimizeResults.diagnostics);
+    if (hasError(optimizeResults.diagnostics)) {
+      return results;
+    }
+    results.code = optimizeResults.css;
 
     s.append(`${JSON.stringify(results.code)};\n`);
 

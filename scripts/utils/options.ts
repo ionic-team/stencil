@@ -90,10 +90,9 @@ export function createReplaceData(opts: BuildOptions) {
   const bundlerId = rollupPkg.name + rollupPkg.version + '_' + CACHE_BUSTER;
 
   const autoprefixerPkg = require(join(opts.nodeModulesDir, 'autoprefixer', 'package.json'));
-  const cssnanoPkg = require(join(opts.nodeModulesDir, 'cssnano', 'package.json'));
   const postcssPkg = require(join(opts.nodeModulesDir, 'postcss', 'package.json'));
 
-  const optimizeCssId = autoprefixerPkg.name + autoprefixerPkg.version + '_' + cssnanoPkg.name + cssnanoPkg.version + '_' + postcssPkg.name + postcssPkg.version + '_' + CACHE_BUSTER;
+  const optimizeCssId = autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version + '_' + CACHE_BUSTER;
 
   return {
     '__BUILDID__': opts.buildId,

@@ -70,6 +70,8 @@ export const compile = async (code: string, opts: CompileOptions = {}) => {
         modeName: opts.data.mode,
         sourceMap: false,
         commentOriginalSelector: false,
+        minify: false,
+        autoprefixer: false,
       });
       r.code = cssResults.code;
       r.map = cssResults.map;

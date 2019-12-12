@@ -38,7 +38,7 @@ export async function buildGlobalStyles(config: d.Config, compilerCtx: d.Compile
 
     const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, globalStylePath);
 
-    return compilerCtx.cachedGlobalStyle = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, transformResults.code, globalStylePath, true);
+    return compilerCtx.cachedGlobalStyle = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, transformResults.code, globalStylePath);
 
   } catch (e) {
     const d = buildError(buildCtx.diagnostics);

@@ -2126,6 +2126,8 @@ export interface TransformCssToEsmInput {
   modeName: string;
   commentOriginalSelector: boolean;
   sourceMap: boolean;
+  minify: boolean;
+  autoprefixer: any;
 }
 
 export interface TransformCssToEsmOutput {

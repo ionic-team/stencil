@@ -39,6 +39,8 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
           modeName: pathData.mode,
           commentOriginalSelector: false,
           sourceMap: config.sourceMap,
+          minify: config.minifyCss,
+          autoprefixer: config.autoprefixCss
         });
         dependendencies.set(filePath, pluginTransforms.dependencies);
         buildCtx.diagnostics.push(...pluginTransforms.diagnostics);

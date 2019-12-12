@@ -5,17 +5,17 @@ import { initWebWorkerThread } from '../sys/worker/web-worker-thread';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../sys/environment';
 import { prepareModule } from '../optimize/optimize-module';
 import { minifyJs } from '../optimize/minify-js';
-import { optimizeCssWorker } from '@optimize-css';
 import { transformCssToEsm } from '../../compiler/style/css-to-esm';
 import { transpileToEs5 } from '../transpile/transpile-to-es5';
+import { optimizeCss } from '../optimize/optimize-css';
 
 export const createWorkerContext = (): d.CompilerWorkerContext => {
   return {
     compileModule: compile,
     minifyJs,
-    optimizeCss: optimizeCssWorker,
     transformCssToEsm,
     prepareModule,
+    optimizeCss,
     transpileToEs5
   };
 };

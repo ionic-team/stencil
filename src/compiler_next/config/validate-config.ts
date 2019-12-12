@@ -26,7 +26,6 @@ export const validateConfig = (userConfig?: Config) => {
 
   // copy flags (we know it'll be json safe)
   config.flags = JSON.parse(JSON.stringify(config.flags || {}));
-
   // default devMode false
   if (config.flags.prod) {
     config.devMode = false;
@@ -46,6 +45,7 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
   setBooleanConfig(config, 'writeLog', 'log', false);
   setBooleanConfig(config, 'buildAppCore', null, true);
+  setBooleanConfig(config, 'autoprefixCss', null, config.buildEs5);
 
   // hash file names
   if (!isBoolean(config.hashFileNames)) {

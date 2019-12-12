@@ -50,7 +50,6 @@
   },
   "devDependencies": {
     "@types/autoprefixer": "^9.1.1",
-    "@types/cssnano": "^4.0.0",
     "@types/exit": "^0.1.30",
     "@types/fs-extra": "^8.0.1",
     "@types/glob": "^7.1.1",
@@ -79,7 +78,6 @@
     "conventional-changelog-cli": "^2.0.28",
     "core-js-builder": "~3.4.8",
     "css-what": "3.2.1",
-    "cssnano": "4.1.10",
     "dts-bundle-generator": "~3.3.1",
     "execa": "3.4.0",
     "exit": "^0.1.2",

@@ -146,7 +146,7 @@ export interface StencilConfig {
   minifyJs?: boolean;
 
   /**
-   * Sets if the CSS is minified or not. Stencil uses `cssnano` under the hood.
+   * Sets if the CSS is minified or not.
    * Defaults to `false` in dev mode and `true` in production mode.
    */
   minifyCss?: boolean;
@@ -1448,7 +1448,6 @@ export interface OptimizeCssInput {
   filePath: string;
   autoprefixer: any;
   minify: boolean;
-  legecyBuild: boolean;
 }
 
 export interface OptimizeCssOutput {

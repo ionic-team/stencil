@@ -12,6 +12,7 @@ export async function sysNode(opts: BuildOptions) {
   fs.ensureDirSync(cachedDir);
 
   await Promise.all([
+    bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'autoprefixer.js'),
     bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'graceful-fs.js'),
     bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'node-fetch.js'),
     bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'sys-worker.js'),
@@ -44,14 +45,14 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
     const outputFile = join(outputDir, entryFileName);
     const cachedFile = join(cachedDir, entryFileName);
 
-    if (!opts.isProd) {
-      const cachedExists = fs.existsSync(cachedFile);
-      if (cachedExists) {
-        await fs.copyFile(cachedFile, outputFile);
-        resolveBundle();
-        return;
-      }
-    }
+    // if (!opts.isProd) {
+    //   const cachedExists = fs.existsSync(cachedFile);
+    //   if (cachedExists) {
+    //     await fs.copyFile(cachedFile, outputFile);
+    //     resolveBundle();
+    //     return;
+    //   }
+    // }
 
     const whitelist = new Set([
       'child_process',
@@ -98,7 +99,6 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
           'postcss': join(opts.nodeModulesDir, 'postcss'),
           'source-map': join(opts.nodeModulesDir, 'source-map'),
           'chalk': join(opts.bundleHelpersDir, 'empty.js'),
-          'cssnano-preset-default': join(opts.bundleHelpersDir, 'cssnano-preset-default'),
         }
       },
       optimization: {
@@ -117,11 +117,13 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
           rejectBundle(webpackError);
 
         } else {
+
           if (opts.isProd) {
             let code = await fs.readFile(outputFile, 'utf8');
             const minifyResults = terser.minify(code);
             if (minifyResults.error) {
               rejectBundle(minifyResults.error);
+              return;
             }
             code = minifyResults.code;
             await fs.writeFile(outputFile, code);

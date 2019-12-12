@@ -3,7 +3,7 @@ import { COMPILER_BUILD } from '../build/compiler-build-id';
 import { hasError, normalizePath } from '@utils';
 
 
-export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], styleText: string, filePath: string, legacyBuild: boolean) {
+export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], styleText: string, filePath: string) {
   if (typeof styleText !== 'string' || !styleText.length) {
     //  don't bother with invalid data
     return styleText;
@@ -22,8 +22,7 @@ export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, 
     css: styleText,
     filePath: filePath,
     autoprefixer: config.autoprefixCss,
-    minify: config.minifyCss,
-    legecyBuild: legacyBuild
+    minify: config.minifyCss
   };
 
   const cacheKey = await compilerCtx.cache.createKey('optimizeCss', COMPILER_BUILD.optimizeCss, opts);

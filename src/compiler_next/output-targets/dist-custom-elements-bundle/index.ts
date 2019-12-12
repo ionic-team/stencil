@@ -14,6 +14,10 @@ import { optimizeModule } from '../../optimize/optimize-module';
 
 
 export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+  if (config.devMode) {
+    return;
+  }
+
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElementsBundle);
   if (outputTargets.length === 0) {
     return;
