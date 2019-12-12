@@ -70,16 +70,16 @@ export async function compiler(opts: BuildOptions) {
       replacePlugin(opts),
       json() as any,
       moduleDebugPlugin(),
-      {
-        generateBundle(_, bundleFiles) {
-          Object.keys(bundleFiles).forEach(fileName => {
-            if (opts.isProd) {
-              const bundle = bundleFiles[fileName] as OutputChunk;
-              bundle.code = minifyStencilCompiler(bundle.code)
-            }
-          });
-        }
-      }
+      // {
+      //   generateBundle(_, bundleFiles) {
+      //     Object.keys(bundleFiles).forEach(fileName => {
+      //       if (opts.isProd) {
+      //         const bundle = bundleFiles[fileName] as OutputChunk;
+      //         bundle.code = minifyStencilCompiler(bundle.code)
+      //       }
+      //     });
+      //   }
+      // }
     ],
     treeshake: {
       moduleSideEffects: false
@@ -93,7 +93,7 @@ export async function compiler(opts: BuildOptions) {
 
 
 function minifyStencilCompiler(code: string) {
-  const minifyResults = terser.minify(code, {
+  const opts: terser.MinifyOptions = {
     ecma: 7,
     compress: {
       passes: 2,
@@ -102,7 +102,9 @@ function minifyStencilCompiler(code: string) {
     output: {
       ecma: 7,
     }
-  });
+  };
+
+  const minifyResults = terser.minify(code, opts);
 
   if (minifyResults.error) {
     throw minifyResults.error;
