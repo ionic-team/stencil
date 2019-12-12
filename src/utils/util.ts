@@ -155,9 +155,22 @@ export const getDynamicImportFunction = (namespace: string) => {
 export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const pkgJsonPath = config.sys.path.join(config.rootDir, 'package.json');
 
-  let pkgJson: string;
   try {
-    pkgJson = await compilerCtx.fs.readFile(pkgJsonPath);
+    const pkgJson = await compilerCtx.fs.readFile(pkgJsonPath);
+
+    if (pkgJson) {
+      try {
+        const pkgData: d.PackageJsonData = JSON.parse(pkgJson);
+        buildCtx.packageJsonFilePath = pkgJsonPath;
+        return pkgData;
+
+      } catch (e) {
+        const diagnostic = buildError(buildCtx.diagnostics);
+        diagnostic.header = `Error parsing "package.json"`;
+        diagnostic.messageText = `${pkgJsonPath}, ${e}`;
+        diagnostic.absFilePath = pkgJsonPath;
+      }
+    }
 
   } catch (e) {
     if (!config.outputTargets.some(o => o.type.includes('dist'))) {
@@ -165,23 +178,8 @@ export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerC
       diagnostic.header = `Missing "package.json"`;
       diagnostic.messageText = `Valid "package.json" file is required for distribution: ${pkgJsonPath}`;
     }
-    return null;
   }
-
-  let pkgData: d.PackageJsonData;
-  try {
-    pkgData = JSON.parse(pkgJson);
-
-  } catch (e) {
-    const diagnostic = buildError(buildCtx.diagnostics);
-    diagnostic.header = `Error parsing "package.json"`;
-    diagnostic.messageText = `${pkgJsonPath}, ${e}`;
-    diagnostic.absFilePath = pkgJsonPath;
-    return null;
-  }
-
-  buildCtx.packageJsonFilePath = pkgJsonPath;
-  return pkgData;
+  return null;
 };
 
 const SKIP_DEPS = ['@stencil/core'];
