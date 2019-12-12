@@ -72,6 +72,12 @@ async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: str
   const compilerDts = cleanDts(await fs.readFile(compilerDtsSrcPath, 'utf8'));
   await fs.writeFile(compilerDtsDestPath, compilerDts);
 
+  // @stencil/core/internal/stencil-public-docs.d.ts
+  const docsDtsSrcPath = join(declarationsInputDir, 'stencil-public-docs.d.ts');
+  const docsDtsDestPath = join(outputInternalDir, 'stencil-public-docs.d.ts');
+  const docsDts = cleanDts(await fs.readFile(docsDtsSrcPath, 'utf8'));
+  await fs.writeFile(docsDtsDestPath, docsDts);
+
   // @stencil/core/internal/stencil-public-runtime.d.ts
   const runtimeDtsSrcPath = join(declarationsInputDir, 'stencil-public-runtime.d.ts');
   const runtimeDtsDestPath = join(outputInternalDir, 'stencil-public-runtime.d.ts');

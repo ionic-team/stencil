@@ -78,6 +78,7 @@ const pkgs: TestPackage[] = [
       'internal/stencil-ext-modules.d.ts',
       'internal/stencil-private.d.ts',
       'internal/stencil-public-compiler.d.ts',
+      'internal/stencil-public-docs.d.ts',
       'internal/stencil-public-runtime.d.ts',
     ]
   },

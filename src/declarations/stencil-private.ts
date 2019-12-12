@@ -1204,12 +1204,6 @@ export interface OpenInEditorData {
   error?: string;
 }
 
-export interface StyleDoc {
-  name: string;
-  docs: string;
-  annotation: 'prop';
-}
-
 export interface EntryModule {
   entryKey: string;
   cmps: ComponentCompilerMeta[];

@@ -6,7 +6,7 @@ export async function generateJsonDocs(config: d.Config, compilerCtx: d.Compiler
   if (jsonOutputTargets.length === 0) {
     return;
   }
-  const docsDtsPath = config.sys.path.join(config.sys.compiler.distDir, 'declarations', 'docs.d.ts');
+  const docsDtsPath = config.sys.path.join(config.sys.compiler.packageDir, 'internal', 'stencil-public-docs.d.ts');
   const docsDts = await compilerCtx.fs.readFile(docsDtsPath);
   const typesContent = `
 /**
