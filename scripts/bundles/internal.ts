@@ -56,7 +56,8 @@ async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: str
   // @stencil/core/internal/index.d.ts
   const indexDtsSrcPath = join(declarationsInputDir, 'index.d.ts');
   const indexDtsDestPath = join(outputInternalDir, 'index.d.ts');
-  const indexDts = cleanDts(await fs.readFile(indexDtsSrcPath, 'utf8'));
+  let indexDts = cleanDts(await fs.readFile(indexDtsSrcPath, 'utf8'));
+  indexDts = prependExtModules(indexDts);
   await fs.writeFile(indexDtsDestPath, indexDts);
 
   // @stencil/core/internal/stencil-private.d.ts
@@ -68,8 +69,7 @@ async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: str
   // @stencil/core/internal/stencil-public.compiler.d.ts
   const compilerDtsSrcPath = join(declarationsInputDir, 'stencil-public-compiler.d.ts');
   const compilerDtsDestPath = join(outputInternalDir, 'stencil-public-compiler.d.ts');
-  let compilerDts = cleanDts(await fs.readFile(compilerDtsSrcPath, 'utf8'));
-  compilerDts = `/// <reference path="./stencil-ext-modules.d.ts" />\n` + compilerDts;
+  const compilerDts = cleanDts(await fs.readFile(compilerDtsSrcPath, 'utf8'));
   await fs.writeFile(compilerDtsDestPath, compilerDts);
 
   // @stencil/core/internal/stencil-public-runtime.d.ts
@@ -90,6 +90,9 @@ async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: str
   await fs.copyFile(srcExtModuleOutput, dstExtModuleOutput);
 }
 
+function prependExtModules(content: string) {
+  return `/// <reference path="./stencil-ext-modules.d.ts" />\n` + content;
+}
 
 async function createStencilCoreEntry(outputInternalDir: string) {
   // write @stencil/core entry (really only used for node resolving, not its actual code as you can see)
