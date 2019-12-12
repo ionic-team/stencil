@@ -20,8 +20,6 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
     return false;
   }
 
-  u
-
   const entryPath = config.sys.path.join(outputTarget.buildDir, entryFilename);
   let content = await compilerCtx.fs.readFile(entryPath);
 
