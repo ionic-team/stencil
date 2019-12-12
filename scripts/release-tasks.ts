@@ -110,18 +110,6 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
   if (!opts.isPublishRelease) {
     tasks.push(
       {
-        title: `Set package.json version to ${color.bold.yellow(opts.version)}`,
-        task: () => {
-          const packageJson = JSON.parse(fs.readFileSync(opts.packageJsonPath, 'utf8'));
-          packageJson.version = opts.version;
-          fs.writeFileSync(opts.packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
-
-          const packageLockJson = JSON.parse(fs.readFileSync(opts.packageLockJsonPath, 'utf8'));
-          packageLockJson.version = opts.version;
-          fs.writeFileSync(opts.packageLockJsonPath, JSON.stringify(packageLockJson, null, 2) + '\n');
-        },
-      },
-      {
         title: `Install npm dependencies ${color.dim('(npm ci)')}`,
         task: () => execa('npm', ['ci'], { cwd: rootDir }),
       },
@@ -144,6 +132,18 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
       {
         title: 'Validate build',
         task: () => validateBuild(rootDir)
+      },
+      {
+        title: `Set package.json version to ${color.bold.yellow(opts.version)}`,
+        task: () => {
+          const packageJson = JSON.parse(fs.readFileSync(opts.packageJsonPath, 'utf8'));
+          packageJson.version = opts.version;
+          fs.writeFileSync(opts.packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
+
+          const packageLockJson = JSON.parse(fs.readFileSync(opts.packageLockJsonPath, 'utf8'));
+          packageLockJson.version = opts.version;
+          fs.writeFileSync(opts.packageLockJsonPath, JSON.stringify(packageLockJson, null, 2) + '\n');
+        },
       },
       {
         title: `Generate ${opts.version} Changelog ${opts.vermoji}`,
