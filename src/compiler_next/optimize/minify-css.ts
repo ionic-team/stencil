@@ -6,7 +6,9 @@ export const minifyCss = (cssString: string) => {
 }
 
 const stripWhitespaces = (cssString: string) => {
-  return cssString.replace(/(^\s*)|\n/gm, '');
+	return cssString
+		.replace(/(^\s*)|\n/gm, '')
+		.replace(/\s*([\{:,+\}])\s*/gm, '$1');
 }
 
 const stripComments = (cssString: string) => {
