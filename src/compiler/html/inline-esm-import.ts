@@ -10,11 +10,17 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
   const expectedSrc = config.sys.path.join(resourcesUrl, entryFilename);
 
   const script = Array.from(doc.querySelectorAll('script'))
-    .find(s => s.getAttribute('type') === 'module' && s.getAttribute('src') === expectedSrc);
+    .find(s => (
+      s.getAttribute('type') === 'module' &&
+      !s.hasAttribute('crossorigin') &&
+      s.getAttribute('src') === expectedSrc
+    ));
 
   if (!script) {
     return false;
   }
+
+  u
 
   const entryPath = config.sys.path.join(outputTarget.buildDir, entryFilename);
   let content = await compilerCtx.fs.readFile(entryPath);
