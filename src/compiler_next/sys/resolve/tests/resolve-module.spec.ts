@@ -1,4 +1,4 @@
-import { isLocalModule, isRemoteUrlCompiler, isStencilCoreImport, setPackageVersionByContent } from '../resolve-utils';
+import { isExternalUrl, isLocalModule, isStencilCoreImport, setPackageVersionByContent } from '../resolve-utils';
 
 
 describe('resolve modules', () => {
@@ -26,10 +26,10 @@ describe('resolve modules', () => {
     expect(isLocalModule('@ionic/core')).toBe(false);
   });
 
-  it('isRemoteUrlCompiler', () => {
-    expect(isRemoteUrlCompiler('http://localhost/comiler/stencil.js')).toBe(true);
-    expect(isRemoteUrlCompiler('https://localhost/comiler/stencil.js')).toBe(true);
-    expect(isRemoteUrlCompiler('/User/app/node_modules/stencil.js')).toBe(false);
+  it('isExternalUrl', () => {
+    expect(isExternalUrl('http://localhost/comiler/stencil.js')).toBe(true);
+    expect(isExternalUrl('https://localhost/comiler/stencil.js')).toBe(true);
+    expect(isExternalUrl('/User/app/node_modules/stencil.js')).toBe(false);
   });
 
   describe('setPackageVersionByContent', () => {

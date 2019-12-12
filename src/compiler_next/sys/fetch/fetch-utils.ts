@@ -1,5 +1,5 @@
 import { normalizePath } from '@utils';
-import { NODE_MODULES_CDN_URL, NODE_MODULES_FS_DIR, STENCIL_CORE_MODULE, isCommonDirModuleFile } from '../resolve/resolve-utils';
+import { NODE_MODULES_CDN_URL, NODE_MODULES_FS_DIR, STENCIL_CORE_MODULE, isCommonDirModuleFile, isTsFile, isTsxFile } from '../resolve/resolve-utils';
 
 
 export const packageVersions = new Map<string, string>();
@@ -59,7 +59,7 @@ export const getNodeModuleFetchUrl = (compilerExe: string, pkgVersions: Map<stri
 
 
 export const skipFilePathFetch = (filePath: string) => {
-  if (filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
+  if (isTsFile(filePath) || isTsxFile(filePath)) {
     // don't bother trying to resolve  node_module packages w/ typescript files
     // they should already be .js files
     return true;

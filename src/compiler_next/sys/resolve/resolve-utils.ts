@@ -1,4 +1,5 @@
 import * as d from '../../../declarations';
+import { isString } from '@utils';
 
 export const NODE_MODULES_FS_DIR = '/node_modules';
 export const STENCIL_CORE_MODULE = NODE_MODULES_FS_DIR + '/@stencil/core/';
@@ -6,6 +7,19 @@ export const NODE_MODULES_CDN_URL = 'https://cdn.jsdelivr.net/npm';
 
 const COMMON_DIR_MODULE_EXTS = ['.tsx', '.ts', '.mjs', '.js', '.jsx', '.json', '.md'];
 
+export const isDtsFile = (p: string) => p.endsWith('.d.ts');
+
+export const isTsFile = (p: string) => !isDtsFile(p) && p.endsWith('.ts');
+
+export const isTsxFile = (p: string) => p.endsWith('.tsx');
+
+export const isJsxFile = (p: string) => p.endsWith('.jsx');
+
+export const isJsFile = (p: string) => p.endsWith('.js');
+
+export const isMjsFile = (p: string) => p.endsWith('.mjs');
+
+export const isJsonFile = (p: string) => p.endsWith('.json');
 
 export const getCommonDirName = (dirPath: string, fileName: string) => dirPath + '/' + fileName;
 
@@ -24,8 +38,13 @@ export const setPackageVersionByContent = (pkgVersions: Map<string, string>, pkg
   } catch (e) {}
 };
 
-export const isRemoteUrlCompiler = (compilerExe: string) =>
-  compilerExe.startsWith('https://') || compilerExe.startsWith('http://');
+export const isExternalUrl = (p: string) => {
+  if (isString(p)) {
+    p = p.toLowerCase();
+    return p.startsWith('https://') || p.startsWith('http://')
+  }
+  return false;
+};
 
 export const getCdnPackageJsonUrl = (moduleId: string) => new URL(`./${moduleId}/package.json`, NODE_MODULES_CDN_URL).href;
 

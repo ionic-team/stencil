@@ -1,10 +1,12 @@
 import * as d from '../../../declarations';
 import { compilerBuild } from '../../../version';
 import { getStencilInternalDtsUrl } from '../fetch/fetch-utils';
-import { isLocalModule, isRemoteUrlCompiler, isStencilCoreImport } from '../resolve/resolve-utils';
+import { isDtsFile, isExternalUrl, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile } from '../resolve/resolve-utils';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../environment';
+import { isString } from '@utils';
 import { resolveRemoteModuleId } from '../resolve/resolve-module';
 import ts from 'typescript';
+import path from 'path';
 
 
 export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
@@ -29,16 +31,14 @@ export const tsRemoteResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFi
   if (isLocalModule(moduleName)) {
     // local file
 
-    const stencilInternalDtsUrl = getStencilInternalDtsUrl(compilerExe);
-    if (stencilInternalDtsUrl === containingFile) {
-      let dtsUrl = new URL(moduleName, containingFile).href;
-      if (!dtsUrl.endsWith('.d.ts')) {
-        dtsUrl += '.d.ts';
-      }
+    if (isExternalUrl(containingFile)) {
+      let resolvedUrl = new URL(moduleName, containingFile).href;
+      resolvedUrl = ensureUrlExtension(resolvedUrl, containingFile);
+
       return {
         resolvedModule: {
-          extension: ts.Extension.Dts,
-          resolvedFileName: dtsUrl,
+          extension: getTsResolveExtension(resolvedUrl),
+          resolvedFileName: resolvedUrl,
           packageId: {
             name: moduleName,
             subModuleName: '',
@@ -84,5 +84,42 @@ export const tsRemoteResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFi
   return null;
 };
 
+export const ensureUrlExtension = (url: string, containingUrl: string) => {
+  const fileName = path.basename(url);
+
+  if (!fileName.includes('.') && isString(containingUrl)) {
+    containingUrl = containingUrl.toLowerCase();
+    if (isJsFile(containingUrl)) {
+      url += '.js';
+    } else if (isDtsFile(containingUrl)) {
+      url += '.d.ts';
+    } else if (isTsxFile(containingUrl)) {
+      url += '.tsx';
+    } else if (isTsFile(containingUrl)) {
+      url += '.ts';
+    } else if (isJsxFile(containingUrl)) {
+      url += '.jsx';
+    }
+  }
+
+  return url;
+};
+
+const getTsResolveExtension = (p: string) => {
+  if (isDtsFile(p)) {
+    return ts.Extension.Dts;
+  }
+  if (isTsxFile(p)) {
+    return ts.Extension.Tsx;
+  }
+  if (isJsFile(p)) {
+    return ts.Extension.Js;
+  }
+  if (isJsxFile(p)) {
+    return ts.Extension.Jsx;
+  }
+  return ts.Extension.Ts;
+};
+
 const shouldPatchRemoteTypeScript = (compilerExe: string) =>
-  !IS_NODE_ENV && IS_WEB_WORKER_ENV && isRemoteUrlCompiler(compilerExe);
+  !IS_NODE_ENV && IS_WEB_WORKER_ENV && isExternalUrl(compilerExe);
