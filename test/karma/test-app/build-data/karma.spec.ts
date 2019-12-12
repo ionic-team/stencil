@@ -11,9 +11,9 @@ describe('build-data', function() {
   afterEach(tearDownDom);
 
   it('should have proper values', async () => {
-    expect(app.querySelector('.is-dev').textContent).toBe('false');
-    expect(app.querySelector('.is-browser').textContent).toBe('true');
-    expect(app.querySelector('.is-testing').textContent).toBe('false');
+    expect(app.querySelector('.is-dev').textContent).toBe('isDev: false');
+    expect(app.querySelector('.is-browser').textContent).toBe('isBrowser: true');
+    expect(app.querySelector('.is-testing').textContent).toBe('isTesting: false');
   });
 
 });

@@ -126,7 +126,7 @@ describe('component-styles', () => {
     expect(r.styleBuildCount).toBe(1);
 
     let content = await compiler.fs.readFile(path.join(root, 'www', 'build', 'cmp-a.entry.js'));
-    expect(content).toContain(`body{color:red}`);
+    expect(content).toContain(`body{color:red;}`);
 
     const rebuildListener = compiler.once('buildFinish');
 
