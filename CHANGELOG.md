@@ -1,9 +1,17 @@
-# 😄 [1.9.0-1](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.9.0-1) (2019-12-11)
-
+# 🐞 [1.9.0-2](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.9.0-2) (2019-12-12)
 
 
 ### Bug Fixes
 
+* **compiler:** don't inline scripts with crossorigin ([9cdcb28](https://github.com/ionic-team/stencil/commit/9cdcb28451a31a17074a7281798a84fdc384c103))
+* **config:** add warning for stencil.config.ts in tsconfig ([b93b32b](https://github.com/ionic-team/stencil/commit/b93b32ba02d1ea6a5e04a5e07da063fea592c833))
+* **next:** do not overide rootDir ([f1be974](https://github.com/ionic-team/stencil/commit/f1be974f5e4a8d8c075877a2f0443a420e06df02))
+* **next:** fix JsonDocs dts ([93ff155](https://github.com/ionic-team/stencil/commit/93ff155f6c177875d78b35b228bc3262e9eb1d57))
+* **next:** fix readPackageJson ([ae10174](https://github.com/ionic-team/stencil/commit/ae10174b552752e54466dc840e86127e7f38121e))
+* **next:** prepend ext-modules.d.ts ref to internal index ([b2506fe](https://github.com/ionic-team/stencil/commit/b2506fe26b664201a5383f3e9898fb79d532e527))
+* **next:** resolve remote internal dts urls ([2999885](https://github.com/ionic-team/stencil/commit/2999885a7888256b9512e5669535cfd00a563122))
+* **next:** resolve remote url ts extensions ([5ae307d](https://github.com/ionic-team/stencil/commit/5ae307d4ba64bca15c1d966b8ab6ecb6e365f22b))
+* **next:** warnings does not kill the process ([29ff45e](https://github.com/ionic-team/stencil/commit/29ff45e55c097219e56593849c04299a7fcb344e))
 * **compiler:** fix prerendering in next compiler ([4669ad9](https://github.com/ionic-team/stencil/commit/4669ad934d1e41f532af30a51a2a293dd32ab7b9))
 * **fs:** fix sys fs.readdirSync ([ec75495](https://github.com/ionic-team/stencil/commit/ec7549506a787e7599b22c7fbca82e47ded4242e))
 * **mock-doc:** fix MockElement type ([d5a4243](https://github.com/ionic-team/stencil/commit/d5a4243a2973407cbb6deb3b90bd3071ce28fe7e))
@@ -26,6 +34,7 @@
 
 ### Features
 
+* **compiler:** add Build.isTesting ([eac90bd](https://github.com/ionic-team/stencil/commit/eac90bd151a993b2387aa0bf7583d3e696a0e98f))
 * **compiler:** custom-elements-bundle ([228e382](https://github.com/ionic-team/stencil/commit/228e38201390327dbb4198cfb0e53d6218415068))
 * **custom:** add copy tasks to custom outputTargets ([#2023](https://github.com/ionic-team/stencil/issues/2023)) ([65aeb8c](https://github.com/ionic-team/stencil/commit/65aeb8c4a818b200695946073b71f63bf4aa3634))
 * **runtime:** experimental active render context ([#2040](https://github.com/ionic-team/stencil/issues/2040)) ([75ed488](https://github.com/ionic-team/stencil/commit/75ed488667020065eec908365a4595b8d2a32531))

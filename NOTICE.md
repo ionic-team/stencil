@@ -43,9 +43,9 @@ Homepage: https://github.com/acornjs/acorn
 
 License: MIT
 
-Author: [Brian Woodward](https://github.com/doowb)
+Author: Brian Woodward (https://github.com/doowb)
 
-Contributors: [Brian Woodward](https://twitter.com/doowb), [Jason Schilling](https://sourecode.de), [Jon Schlinkert](http://twitter.com/jonschlinkert), [Jordan](https://github.com/Silic0nS0ldier)
+Contributors: Brian Woodward (https://twitter.com/doowb), Jason Schilling (https://sourecode.de), Jon Schlinkert (http://twitter.com/jonschlinkert), Jordan (https://github.com/Silic0nS0ldier)
 
 Homepage: https://github.com/doowb/ansi-colors
 
@@ -77,9 +77,7 @@ Homepage: https://github.com/doowb/ansi-colors
 
 License: MIT
 
-Author: Samuel Reed
-
-Homepage: https://github.com/strml/async-limiter#readme
+Author: Samuel Reed <samuel.trace.reed@gmail.com
 
 > The MIT License (MIT)
 > Copyright (c) 2017 Samuel Reed <samuel.trace.reed@gmail.com>
@@ -96,9 +94,7 @@ Homepage: https://github.com/strml/async-limiter#readme
 
 License: MIT
 
-Author: Andrey Sitnik
-
-Homepage: https://github.com/postcss/autoprefixer#readme
+Author: Andrey Sitnik <andrey@sitnik.ru>
 
 > The MIT License (MIT)
 > 
@@ -191,9 +187,7 @@ Homepage: https://github.com/juliangruber/brace-expansion
 
 License: MIT
 
-Author: Andrey Sitnik
-
-Homepage: https://github.com/browserslist/browserslist#readme
+Author: Andrey Sitnik <andrey@sitnik.ru>
 
 > The MIT License (MIT)
 > 
@@ -221,8 +215,6 @@ Homepage: https://github.com/browserslist/browserslist#readme
 ## `buffer-from`
 
 License: MIT
-
-Homepage: https://github.com/LinusU/buffer-from#readme
 
 > MIT License
 > 
@@ -254,8 +246,6 @@ License: MIT
 
 Author: [Sindre Sorhus](sindresorhus.com)
 
-Homepage: https://github.com/sindresorhus/builtin-modules#readme
-
 > MIT License
 > 
 > Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
@@ -273,8 +263,6 @@ Homepage: https://github.com/sindresorhus/builtin-modules#readme
 License: CC-BY-4.0
 
 Author: [Ben Briggs](http://beneb.info)
-
-Homepage: https://github.com/ben-eb/caniuse-lite#readme
 
 > Attribution 4.0 International
 > 
@@ -680,8 +668,6 @@ License: MIT
 
 Author: [James Halliday](http://substack.net)
 
-Homepage: https://github.com/substack/node-concat-map#readme
-
 > This software is released under the MIT license:
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -707,9 +693,7 @@ Homepage: https://github.com/substack/node-concat-map#readme
 
 License: BSD-2-Clause
 
-Author: [Felix Böhm](http://feedic.com)
-
-Homepage: https://github.com/fb55/css-what#readme
+Author: Felix Böhm <me@feedic.com> (http://feedic.com)
 
 > Copyright (c) Felix Böhm
 > All rights reserved.
@@ -731,8 +715,6 @@ License: ISC
 
 Author: Kilian Valkhof
 
-Homepage: https://github.com/kilian/electron-to-chromium#readme
-
 > Copyright 2018 Kilian Valkhof
 > 
 > Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
@@ -746,8 +728,6 @@ Homepage: https://github.com/kilian/electron-to-chromium#readme
 License: MIT
 
 Author: Rich Harris
-
-Homepage: https://github.com/Rich-Harris/estree-walker#readme
 
 
 -----------------------------------------
@@ -789,9 +769,7 @@ Homepage: https://github.com/cowboy/node-exit
 
 License: ISC
 
-Author: [Isaac Z. Schlueter](http://blog.izs.me/)
-
-Homepage: https://github.com/isaacs/fs.realpath#readme
+Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)
 
 > The ISC License
 > 
@@ -843,9 +821,7 @@ Homepage: https://github.com/isaacs/fs.realpath#readme
 
 License: ISC
 
-Author: [Isaac Z. Schlueter](http://blog.izs.me/)
-
-Homepage: https://github.com/isaacs/node-glob#readme
+Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)
 
 > The ISC License
 > 
@@ -875,8 +851,6 @@ Homepage: https://github.com/isaacs/node-glob#readme
 
 License: ISC
 
-Homepage: https://github.com/isaacs/node-graceful-fs#readme
-
 > The ISC License
 > 
 > Copyright (c) Isaac Z. Schlueter, Ben Noordhuis, and Contributors
@@ -901,8 +875,6 @@ License: MIT
 
 Author: [Sindre Sorhus](sindresorhus.com)
 
-Homepage: https://github.com/sindresorhus/has-flag#readme
-
 > MIT License
 > 
 > Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
@@ -919,7 +891,7 @@ Homepage: https://github.com/sindresorhus/has-flag#readme
 
 License: ISC
 
-Author: [Isaac Z. Schlueter](http://blog.izs.me/)
+Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)
 
 Homepage: https://github.com/isaacs/inflight
 
@@ -945,8 +917,6 @@ Homepage: https://github.com/isaacs/inflight
 
 License: ISC
 
-Homepage: https://github.com/isaacs/inherits#readme
-
 > The ISC License
 > 
 > Copyright (c) Isaac Z. Schlueter
@@ -969,7 +939,7 @@ Homepage: https://github.com/isaacs/inherits#readme
 
 License: MIT
 
-Author: [Jon Schlinkert](https://github.com/jonschlinkert)
+Author: Jon Schlinkert (https://github.com/jonschlinkert)
 
 Homepage: https://github.com/jonschlinkert/is-extglob
 
@@ -1001,9 +971,9 @@ Homepage: https://github.com/jonschlinkert/is-extglob
 
 License: MIT
 
-Author: [Jon Schlinkert](https://github.com/jonschlinkert)
+Author: Jon Schlinkert (https://github.com/jonschlinkert)
 
-Contributors: [Brian Woodward](https://twitter.com/doowb), [Daniel Perez](https://tuvistavie.com), [Jon Schlinkert](http://twitter.com/jonschlinkert)
+Contributors: Brian Woodward (https://twitter.com/doowb), Daniel Perez (https://tuvistavie.com), Jon Schlinkert (http://twitter.com/jonschlinkert)
 
 Homepage: https://github.com/micromatch/is-glob
 
@@ -1037,8 +1007,6 @@ License: MIT
 
 Author: [Jonathan Ong](http://jongleberry.com)
 
-Homepage: https://github.com/component/is-module#readme
-
 
 -----------------------------------------
 
@@ -1059,8 +1027,6 @@ License: MIT
 
 Author: [Sindre Sorhus](sindresorhus.com)
 
-Homepage: https://github.com/sindresorhus/is-wsl#readme
-
 > MIT License
 > 
 > Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
@@ -1078,8 +1044,6 @@ Homepage: https://github.com/sindresorhus/is-wsl#readme
 License: MIT
 
 Author: [Luke Edwards](lukeed.com)
-
-Homepage: https://github.com/lukeed/kleur#readme
 
 > The MIT License (MIT)
 > 
@@ -1111,8 +1075,6 @@ License: MIT
 
 Author: Rich Harris
 
-Homepage: https://github.com/rich-harris/magic-string#readme
-
 > Copyright 2018 Rich Harris
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -1127,9 +1089,7 @@ Homepage: https://github.com/rich-harris/magic-string#readme
 
 License: ISC
 
-Author: [Isaac Z. Schlueter](http://blog.izs.me)
-
-Homepage: https://github.com/isaacs/minimatch#readme
+Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me)
 
 > The ISC License
 > 
@@ -1185,9 +1145,7 @@ Homepage: https://github.com/bitinn/node-fetch
 
 License: MIT
 
-Author: Sergey Rubanov
-
-Homepage: https://github.com/chicoxyzzy/node-releases#readme
+Author: Sergey Rubanov <chi187@gmail.com>
 
 > The MIT License
 > 
@@ -1219,8 +1177,6 @@ License: MIT
 
 Author: [James Talmage](github.com/jamestalmage)
 
-Homepage: https://github.com/jamestalmage/normalize-range#readme
-
 > The MIT License (MIT)
 > 
 > Copyright (c) James Talmage <james@talmage.io> (github.com/jamestalmage)
@@ -1251,8 +1207,6 @@ License: MIT
 
 Author: [yisi](http://iyunlu.com/view)
 
-Homepage: https://github.com/yisibl/num2fraction#readme
-
 > The MIT License (MIT)
 > 
 > Copyright (c) 2014 PostCSS
@@ -1281,9 +1235,7 @@ Homepage: https://github.com/yisibl/num2fraction#readme
 
 License: ISC
 
-Author: [Isaac Z. Schlueter](http://blog.izs.me/)
-
-Homepage: https://github.com/isaacs/once#readme
+Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)
 
 > The ISC License
 > 
@@ -1309,8 +1261,6 @@ License: MIT
 
 Author: [Sindre Sorhus](sindresorhus.com)
 
-Homepage: https://github.com/sindresorhus/open#readme
-
 > MIT License
 > 
 > Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
@@ -1327,7 +1277,7 @@ Homepage: https://github.com/sindresorhus/open#readme
 
 License: MIT
 
-Author: [Ivan Nikulin](https://github.com/inikulin)
+Author: Ivan Nikulin <ifaaan@gmail.com> (https://github.com/inikulin)
 
 Contributors: https://github.com/inikulin/parse5/graphs/contributors
 
@@ -1361,8 +1311,6 @@ License: MIT
 
 Author: [Sindre Sorhus](sindresorhus.com)
 
-Homepage: https://github.com/sindresorhus/path-is-absolute#readme
-
 > The MIT License (MIT)
 > 
 > Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
@@ -1391,7 +1339,7 @@ Homepage: https://github.com/sindresorhus/path-is-absolute#readme
 
 License: MIT
 
-Author: Javier Blanco
+Author: Javier Blanco <http://jbgutierrez.info>
 
 Homepage: https://github.com/jbgutierrez/path-parse#readme
 
@@ -1480,7 +1428,7 @@ Homepage: https://github.com/lukeapage/pngjs
 
 License: MIT
 
-Author: Andrey Sitnik
+Author: Andrey Sitnik <andrey@sitnik.ru>
 
 Homepage: https://postcss.org/
 
@@ -1511,7 +1459,7 @@ Homepage: https://postcss.org/
 
 License: MIT
 
-Author: Bogdan Chadkin
+Author: Bogdan Chadkin <trysound@yandex.ru>
 
 Homepage: https://github.com/TrySound/postcss-value-parser
 
@@ -1546,8 +1494,6 @@ License: MIT
 
 Author: [Terkel Gjervig](https://terkel.com)
 
-Homepage: https://github.com/terkelg/prompts#readme
-
 > MIT License
 > 
 > Copyright (c) 2018 Terkel Gjervig Nielsen
@@ -1577,8 +1523,6 @@ Homepage: https://github.com/terkelg/prompts#readme
 License: MIT
 
 Author: [James Halliday](http://substack.net)
-
-Homepage: https://github.com/browserify/resolve#readme
 
 > MIT License
 > 
@@ -1610,7 +1554,7 @@ License: MIT
 
 Author: Rich Harris
 
-Contributors: Oskar Segersvärd, Bogdan Chadkin
+Contributors: Oskar Segersvärd <victorystick@gmail.com>, Bogdan Chadkin <trysound@yandex.ru>
 
 Homepage: https://github.com/rollup/rollup
 
@@ -2231,7 +2175,7 @@ Homepage: https://github.com/rollup/rollup-plugin-commonjs
 
 License: MIT
 
-Author: Rich Harris
+Author: Rich Harris <richard.a.harris@gmail.com>
 
 Homepage: https://github.com/rollup/rollup-plugin-node-resolve#readme
 
@@ -2242,7 +2186,7 @@ Homepage: https://github.com/rollup/rollup-plugin-node-resolve#readme
 
 License: MIT
 
-Author: Rich Harris
+Author: Rich Harris <richard.a.harris@gmail.com>
 
 Homepage: https://github.com/rollup/rollup-pluginutils#readme
 
@@ -2252,8 +2196,6 @@ Homepage: https://github.com/rollup/rollup-pluginutils#readme
 ## `semver`
 
 License: ISC
-
-Homepage: https://github.com/npm/node-semver#readme
 
 > The ISC License
 > 
@@ -2278,8 +2220,6 @@ Homepage: https://github.com/npm/node-semver#readme
 License: MIT
 
 Author: [Terkel Gjervig](https://terkel.com)
-
-Homepage: https://github.com/terkelg/sisteransi#readme
 
 > MIT License
 > 
@@ -2309,9 +2249,9 @@ Homepage: https://github.com/terkelg/sisteransi#readme
 
 License: BSD-3-Clause
 
-Author: Nick Fitzgerald
+Author: Nick Fitzgerald <nfitzgerald@mozilla.com>
 
-Contributors: Tobias Koppers, Duncan Beevers, Stephen Crane, Ryan Seddon, Miles Elam, Mihai Bazon, Michael Ficarra, Todd Wolfson, Alexander Solovyov, Felix Gnass, Conrad Irwin, usrbincc, David Glasser, Chase Douglas, Evan Wallace, Heather Arthur, Hugh Kennedy, David Glasser, Simon Lydell, Jmeas Smith, Michael Z Goddard, azu, John Gozde, Adam Kirkton, Chris Montgomery, J. Ryan Stinnett, Jack Herrington, Chris Truter, Daniel Espeset, Jamie Wong, Eddy Bruël, Hawken Rives, Gilad Peleg, djchie, Gary Ye, Nicolas Lalevée
+Contributors: Tobias Koppers <tobias.koppers@googlemail.com>, Duncan Beevers <duncan@dweebd.com>, Stephen Crane <scrane@mozilla.com>, Ryan Seddon <seddon.ryan@gmail.com>, Miles Elam <miles.elam@deem.com>, Mihai Bazon <mihai.bazon@gmail.com>, Michael Ficarra <github.public.email@michael.ficarra.me>, Todd Wolfson <todd@twolfson.com>, Alexander Solovyov <alexander@solovyov.net>, Felix Gnass <fgnass@gmail.com>, Conrad Irwin <conrad.irwin@gmail.com>, usrbincc <usrbincc@yahoo.com>, David Glasser <glasser@davidglasser.net>, Chase Douglas <chase@newrelic.com>, Evan Wallace <evan.exe@gmail.com>, Heather Arthur <fayearthur@gmail.com>, Hugh Kennedy <hughskennedy@gmail.com>, David Glasser <glasser@davidglasser.net>, Simon Lydell <simon.lydell@gmail.com>, Jmeas Smith <jellyes2@gmail.com>, Michael Z Goddard <mzgoddard@gmail.com>, azu <azu@users.noreply.github.com>, John Gozde <john@gozde.ca>, Adam Kirkton <akirkton@truefitinnovation.com>, Chris Montgomery <christopher.montgomery@dowjones.com>, J. Ryan Stinnett <jryans@gmail.com>, Jack Herrington <jherrington@walmartlabs.com>, Chris Truter <jeffpalentine@gmail.com>, Daniel Espeset <daniel@danielespeset.com>, Jamie Wong <jamie.lf.wong@gmail.com>, Eddy Bruël <ejpbruel@mozilla.com>, Hawken Rives <hawkrives@gmail.com>, Gilad Peleg <giladp007@gmail.com>, djchie <djchie.dev@gmail.com>, Gary Ye <garysye@gmail.com>, Nicolas Lalevée <nicolas.lalevee@hibnet.org>
 
 Homepage: https://github.com/mozilla/source-map
 
@@ -2348,8 +2288,6 @@ Homepage: https://github.com/mozilla/source-map
 ## `source-map-support`
 
 License: MIT
-
-Homepage: https://github.com/evanw/node-source-map-support#readme
 
 > The MIT License (MIT)
 > 
@@ -2413,8 +2351,6 @@ License: MIT
 
 Author: [Sindre Sorhus](sindresorhus.com)
 
-Homepage: https://github.com/chalk/supports-color#readme
-
 > MIT License
 > 
 > Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
@@ -2431,7 +2367,7 @@ Homepage: https://github.com/chalk/supports-color#readme
 
 License: BSD-2-Clause
 
-Author: [Mihai Bazon](http://lisperator.net/)
+Author: Mihai Bazon <mihai.bazon@gmail.com> (http://lisperator.net/)
 
 Homepage: https://terser.org
 
@@ -2471,7 +2407,7 @@ Homepage: https://terser.org
 
 License: ISC
 
-Author: [Isaac Z. Schlueter](http://blog.izs.me/)
+Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)
 
 Homepage: https://github.com/npm/wrappy
 
@@ -2497,7 +2433,7 @@ Homepage: https://github.com/npm/wrappy
 
 License: MIT
 
-Author: [Einar Otto Stangvik](http://2x.io)
+Author: Einar Otto Stangvik <einaros@gmail.com> (http://2x.io)
 
 Homepage: https://github.com/websockets/ws
 
