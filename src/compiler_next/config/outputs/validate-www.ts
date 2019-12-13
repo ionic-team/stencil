@@ -9,11 +9,11 @@ import path from 'path';
 
 
 export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
-  const hasOutputTargets = Array.isArray(userOutputs);
+  const hasOutputTargets = userOutputs.length > 0;
   const hasE2eTests = !!(config.flags && config.flags.e2e);
   const userWwwOutputs = userOutputs.filter(isOutputTargetWww);
 
-  if (!hasOutputTargets || (hasE2eTests && !userWwwOutputs.some(isOutputTargetWww))) {
+  if (!hasOutputTargets || (hasE2eTests && !userOutputs.some(isOutputTargetWww))) {
     userWwwOutputs.push({ type: WWW });
   }
 
