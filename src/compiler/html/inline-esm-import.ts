@@ -25,7 +25,7 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
 
   // If the script is too big, instead of inlining, we hash the file and change
   // the <script> to the new location
-  if (content.length > MAX_JS_INLINE_SIZE) {
+  if (config.allowInlineScripts !== false && content.length > MAX_JS_INLINE_SIZE) {
     const hashedFile = await generateHashedCopy(config, compilerCtx, entryPath);
     if (hashedFile) {
       const hashedPath = config.sys.path.join(resourcesUrl, hashedFile);

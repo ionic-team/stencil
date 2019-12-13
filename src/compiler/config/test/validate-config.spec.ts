@@ -19,6 +19,27 @@ describe('validation', () => {
     };
   });
 
+  describe('allowInlineScripts', () => {
+
+    it('set allowInlineScripts true', () => {
+      config.allowInlineScripts = true;
+      validateConfig(config);
+      expect(config.allowInlineScripts).toBe(true);
+    });
+
+    it('set allowInlineScripts false', () => {
+      config.allowInlineScripts = false;
+      validateConfig(config);
+      expect(config.allowInlineScripts).toBe(false);
+    });
+
+    it('default allowInlineScripts true', () => {
+      validateConfig(config);
+      expect(config.allowInlineScripts).toBe(true);
+    });
+
+  });
+
 
   describe('enableCache', () => {
 
