@@ -1,5 +1,4 @@
-## 🌪 [1.8.2-2](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.8.2-2) (2019-12-13)
-
+## ❤️ [1.8.2-3](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.8.2-3) (2019-12-13)
 
 ### Bug Fixes
 
