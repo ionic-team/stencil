@@ -125,6 +125,7 @@ export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
 export const Build: d.UserBuildConditionals = {
   isDev: false,
   isBrowser: false,
+  isServer: true,
   isTesting: false
 };
 

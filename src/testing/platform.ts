@@ -17,6 +17,7 @@ export const cssVarShim: d.CssVarSim = false as any;
 export const Build: d.UserBuildConditionals = {
   isDev: true,
   isBrowser: false,
+  isServer: true,
   isTesting: true
 };
 
