@@ -32,5 +32,5 @@ export function cleanDts(dtsContent: string) {
 
   dtsContent = dtsContent.replace(/import \{ URL \} from \'url\';/g, '');
 
-  return dtsContent.trim();
+  return dtsContent.trim() + '\n';
 }
