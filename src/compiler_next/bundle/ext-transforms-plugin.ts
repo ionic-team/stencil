@@ -59,5 +59,3 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
     }
   };
 };
-
-// const KNOWN_PREPROCESSOR_EXTS = new Set(['sass', 'scss', 'styl', 'less', 'pcss']);

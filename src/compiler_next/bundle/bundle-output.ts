@@ -6,6 +6,7 @@ import { createCustomResolverAsync } from '../sys/resolve/resolve-module';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { extTransformsPlugin } from './ext-transforms-plugin';
 import { fileLoadPlugin } from './file-load-plugin';
+import { textPlugin } from './text-plugin';
 import { imagePlugin } from '../../compiler/rollup-plugins/image-plugin';
 import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-plugin';
 import { loaderPlugin } from '../../compiler/rollup-plugins/loader';
@@ -55,6 +56,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       userIndexPlugin(config, compilerCtx),
       typescriptPlugin(compilerCtx, bundleOpts),
       imagePlugin(config, compilerCtx, buildCtx),
+      textPlugin(),
       extTransformsPlugin(config, compilerCtx, buildCtx),
       ...config.rollupPlugins,
       rollupNodeResolvePlugin({
