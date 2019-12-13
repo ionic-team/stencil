@@ -1,5 +1,5 @@
-import { MsgFromWorker, MsgToWorker, WorkerMsgHandler } from '../../../declarations';
 import { isNumber, isString } from '@utils';
+import { MsgFromWorker, MsgToWorker, WorkerMsgHandler } from '../../../declarations';
 
 
 export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHandler) => {
@@ -7,48 +7,50 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
 
   const tick = Promise.resolve();
 
-  const error = (stencilMsgId: number, err: any) => {
-    const errMsgBackToMain: MsgFromWorker = {
-      stencilId: stencilMsgId,
-      rtnValue: null,
-      rtnError: 'Error',
-    };
-    if (isString(err)) {
-      errMsgBackToMain.rtnError += ': ' + err;
-    } else if (err) {
-      if (err.stack) {
-        errMsgBackToMain.rtnError += ': ' + err.stack;
-      } else if (err.message) {
-        errMsgBackToMain.rtnError += ': ' + err.message;
-      }
-    }
-    selfWorker.postMessage(errMsgBackToMain);
-  };
-
   const msgsFromWorkerQueue: MsgFromWorker[] = [];
 
-  const drainMsgQueueFromWorker = () => {
+  const drainMsgQueueFromWorkerToMain = () => {
     isQueued = false;
     selfWorker.postMessage(msgsFromWorkerQueue);
     msgsFromWorkerQueue.length = 0;
   };
 
-  const onMessageToWorker = async (msgToWorker: MsgToWorker) => {
+  const queueMsgFromWorkerToMain = (msgFromWorkerToMain: MsgFromWorker) => {
+    msgsFromWorkerQueue.push(msgFromWorkerToMain);
+    if (!isQueued) {
+      isQueued = true;
+      tick.then(drainMsgQueueFromWorkerToMain);
+    }
+  };
+
+  const error = (stencilMsgId: number, err: any) => {
+    const errMsgFromWorkerToMain: MsgFromWorker = {
+      stencilId: stencilMsgId,
+      stencilRtnValue: null,
+      stencilRtnError: 'Error',
+    };
+    if (isString(err)) {
+      errMsgFromWorkerToMain.stencilRtnError += ': ' + err;
+    } else if (err) {
+      if (err.stack) {
+        errMsgFromWorkerToMain.stencilRtnError += ': ' + err.stack;
+      } else if (err.message) {
+        errMsgFromWorkerToMain.stencilRtnError += ': ' + err.message;
+      }
+    }
+    queueMsgFromWorkerToMain(errMsgFromWorkerToMain);
+  };
+
+  const receiveMsgFromMainToWorker = async (msgToWorker: MsgToWorker) => {
     if (msgToWorker && isNumber(msgToWorker.stencilId)) {
       try {
         // run the handler to get the data
-        const msgFromWorker: MsgFromWorker = {
+        const msgFromWorkerToMain: MsgFromWorker = {
           stencilId: msgToWorker.stencilId,
-          rtnValue: await msgHandler(msgToWorker),
-          rtnError: null,
+          stencilRtnValue: await msgHandler(msgToWorker),
+          stencilRtnError: null,
         };
-
-        msgsFromWorkerQueue.push(msgFromWorker);
-
-        if (!isQueued) {
-          isQueued = true;
-          tick.then(drainMsgQueueFromWorker);
-        }
+        queueMsgFromWorkerToMain(msgFromWorkerToMain);
 
       } catch (e) {
         // error occurred while running the task
@@ -59,9 +61,9 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
 
   selfWorker.onmessage = (ev) => {
     // message from the main thread
-    const msgsToWorker: MsgToWorker[] = ev.data;
-    if (Array.isArray(msgsToWorker)) {
-      msgsToWorker.forEach(onMessageToWorker);
+    const msgsFromMainToWorker: MsgToWorker[] = ev.data;
+    if (Array.isArray(msgsFromMainToWorker)) {
+      msgsFromMainToWorker.forEach(receiveMsgFromMainToWorker);
     }
   };
 

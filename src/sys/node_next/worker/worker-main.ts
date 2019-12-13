@@ -103,16 +103,16 @@ export class NodeWorkerMain extends EventEmitter {
 
     const task = this.tasks.get(msgFromWorker.stencilId);
     if (!task) {
-      if (msgFromWorker.rtnError != null) {
-        this.emit('error', msgFromWorker.rtnError);
+      if (msgFromWorker.stencilRtnError != null) {
+        this.emit('error', msgFromWorker.stencilRtnError);
       }
       return;
     }
 
-    if (msgFromWorker.rtnError != null) {
-      task.reject(msgFromWorker.rtnError);
+    if (msgFromWorker.stencilRtnError != null) {
+      task.reject(msgFromWorker.stencilRtnError);
     } else {
-      task.resolve(msgFromWorker.rtnValue);
+      task.resolve(msgFromWorker.stencilRtnValue);
     }
 
     this.tasks.delete(msgFromWorker.stencilId);

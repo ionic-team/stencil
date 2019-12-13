@@ -23,10 +23,10 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
             const task = tasks.get(msgFromWorker.stencilId);
             if (task) {
               tasks.delete(msgFromWorker.stencilId);
-              if (msgFromWorker.rtnError) {
-                task.reject(msgFromWorker.rtnError);
+              if (msgFromWorker.stencilRtnError) {
+                task.reject(msgFromWorker.stencilRtnError);
               } else {
-                task.resolve(msgFromWorker.rtnValue);
+                task.resolve(msgFromWorker.stencilRtnValue);
               }
 
               worker.activeTasks--;
@@ -34,8 +34,8 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
                 worker.activeTasks = 0;
               }
 
-            } else if (msgFromWorker.rtnError) {
-              console.error(msgFromWorker.rtnError);
+            } else if (msgFromWorker.stencilRtnError) {
+              console.error(msgFromWorker.stencilRtnError);
             }
           }
         });

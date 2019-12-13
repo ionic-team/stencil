@@ -2580,8 +2580,8 @@ export interface MsgToWorker {
 
 export interface MsgFromWorker {
   stencilId?: number;
-  rtnValue: any;
-  rtnError: string;
+  stencilRtnValue: any;
+  stencilRtnError: string;
 }
 
 export interface CompilerWorkerTask {

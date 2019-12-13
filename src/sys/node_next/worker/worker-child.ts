@@ -13,16 +13,16 @@ export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerM
   const errorHandler = (stencilMsgId: number, err: any) => {
     const errMsgBackToMain: d.MsgFromWorker = {
       stencilId: stencilMsgId,
-      rtnValue: null,
-      rtnError: 'Error',
+      stencilRtnValue: null,
+      stencilRtnError: 'Error',
     };
     if (isString(err)) {
-      errMsgBackToMain.rtnError += ': ' + err;
+      errMsgBackToMain.stencilRtnError += ': ' + err;
     } else if (err) {
       if (err.stack) {
-        errMsgBackToMain.rtnError += ': ' + err.stack;
+        errMsgBackToMain.stencilRtnError += ': ' + err.stack;
       } else if (err.message) {
-        errMsgBackToMain.rtnError += ':' + err.message;
+        errMsgBackToMain.stencilRtnError += ':' + err.message;
       }
     }
     prcs.send(errMsgBackToMain, sendHandle);
@@ -35,8 +35,8 @@ export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerM
         // run the handler to get the data
         const msgFromWorker: d.MsgFromWorker = {
           stencilId: msgToWorker.stencilId,
-          rtnValue: await msgHandler(msgToWorker),
-          rtnError: null,
+          stencilRtnValue: await msgHandler(msgToWorker),
+          stencilRtnError: null,
         };
 
         // send response data from the worker to the main thread
