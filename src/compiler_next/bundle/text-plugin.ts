@@ -5,7 +5,7 @@ export const textPlugin = (): Plugin => {
   return {
     name: 'textPlugin',
 
-    async transform(code, id) {
+    transform(code, id) {
       if (KNOWN_TXT_EXTS.has(path.extname(id))) {
         return `export default ${JSON.stringify(code)};`;
       }
