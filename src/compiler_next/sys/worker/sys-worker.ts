@@ -4,11 +4,11 @@ import { createWorkerMainContext } from '../../worker/main-thread';
 
 
 export const createSysWorker = (sys: CompilerSystem, maxConcurrentWorkers: number) => {
-  if (sys.createWorker == null || maxConcurrentWorkers < 1) {
+  if (sys.createWorkerController == null || maxConcurrentWorkers < 1) {
     return createWorkerContext();
   }
 
-  const workerCtrl = sys.createWorker(maxConcurrentWorkers);
+  const workerCtrl = sys.createWorkerController(sys.getCompilerExecutingPath(), maxConcurrentWorkers);
 
   sys.addDestory(() => workerCtrl.destroy());
 

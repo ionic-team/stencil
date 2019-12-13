@@ -190,8 +190,7 @@ export function getNextWorker(workers: NodeWorkerMain[]) {
 
 
 export function setupWorkerController(sys: d.CompilerSystem, logger: d.Logger) {
-  sys.createWorker = function (maxConcurrentWorkers) {
-    const forkModulePath = sys.getCompilerExecutingPath();
-    return new NodeWorkerController(forkModulePath, maxConcurrentWorkers, logger);
+  sys.createWorkerController = function (compilerPath, maxConcurrentWorkers) {
+    return new NodeWorkerController(compilerPath, maxConcurrentWorkers, logger);
   };
 }

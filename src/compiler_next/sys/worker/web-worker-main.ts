@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import { TASK_CANCELED_MSG } from '@utils';
 
 
-export const createWebWorkerMainController = (workerUrl: URL | string, workerName: string, maxConcurrentWorkers: number): d.WorkerMainController => {
+export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWorkers: number): d.WorkerMainController => {
   let msgIds = 0;
   let isDestroyed = false;
   let isQueued = false;
@@ -47,7 +47,7 @@ export const createWebWorkerMainController = (workerUrl: URL | string, workerNam
 
   const createWebWorkerMain = () => {
     const worker = new Worker(workerUrl, {
-      name: `stencil-${workerName}-${workerIds++}`
+      name: `stencil-worker-${workerIds++}`
     });
     const workerChild: WorkerChild = {
       worker,

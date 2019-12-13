@@ -355,9 +355,9 @@ export interface CompilerSystem {
    */
   destroy(): Promise<void>;
   /**
-   * Creates the worker farm for the current system.
+   * Creates the worker controller for the current system.
    */
-  createWorker?(maxConcurrentWorkers: number): WorkerMainController;
+  createWorkerController?(compilerPath: string, maxConcurrentWorkers: number): WorkerMainController;
   encodeToBase64(str: string): string;
   /**
    * Generates a MD5 digest encoded as HEX
