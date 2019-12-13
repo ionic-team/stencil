@@ -2,11 +2,11 @@ import * as d from '../declarations';
 import { BUILD } from '@build-conditionals';
 
 
-export const win = window;
+export const win = typeof window !== 'undefined' ? window : {} as Window;
 
-export const doc = document;
+export const doc = win.document || { head: {} } as Document;
 
-export const H = HTMLElement;
+export const H = ((win as any).HTMLElement || class {} as any) as HTMLElement;
 
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
@@ -17,7 +17,7 @@ export const plt: d.PlatformRuntime = {
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
 };
 
-export const supportsShadowDom = (BUILD.shadowDom) ? /*@__PURE__*/(() => !!doc.documentElement.attachShadow)() : false;
+export const supportsShadowDom = (BUILD.shadowDom) ? /*@__PURE__*/(() => !!doc.head.attachShadow)() : false;
 
 export const supportsListenerOptions = /*@__PURE__*/(() => {
   let supportsListenerOptions = false;
