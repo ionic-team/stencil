@@ -46,13 +46,14 @@ export const visitClass = (config: d.Config, diagnostics: d.Diagnostic[], typeCh
   componentDecoratorToStatic(config, typeChecker, diagnostics, classNode, newMembers, componentDecorator);
 
   // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)
+  const watchable = new Set<string>();
   if (decoratedMembers.length > 0) {
-    propDecoratorsToStatic(config, diagnostics, decoratedMembers, typeChecker, newMembers);
-    stateDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, newMembers);
+    propDecoratorsToStatic(config, diagnostics, decoratedMembers, typeChecker, watchable, newMembers);
+    stateDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, watchable, newMembers);
     eventDecoratorsToStatic(config, diagnostics, decoratedMembers, typeChecker, newMembers);
     methodDecoratorsToStatic(config, diagnostics, classNode, decoratedMembers, typeChecker, newMembers);
     elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, newMembers);
-    watchDecoratorsToStatic(diagnostics, decoratedMembers, newMembers);
+    watchDecoratorsToStatic(config, diagnostics, decoratedMembers, watchable, newMembers);
     listenDecoratorsToStatic(config, diagnostics, decoratedMembers, newMembers);
   }
 

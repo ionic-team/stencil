@@ -6,12 +6,12 @@ import { validatePublicName } from '../reserved-public-members';
 import ts from 'typescript';
 
 
-export const propDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
+export const propDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, watchable: Set<string>, newMembers: ts.ClassElement[]) => {
   const connect: any[] = [];
   const context: any[] = [];
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map(prop => parsePropDecorator(config, diagnostics, typeChecker, prop, context, connect, newMembers))
+    .map(prop => parsePropDecorator(config, diagnostics, typeChecker, prop, context, connect, watchable, newMembers))
     .filter(prop => prop != null);
 
   if (properties.length > 0) {
@@ -26,7 +26,7 @@ export const propDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnost
 };
 
 
-const parsePropDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, context: any[], connect: any[], newMembers: ts.ClassElement[]) => {
+const parsePropDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, context: any[], connect: any[], watchable: Set<string>, newMembers: ts.ClassElement[]) => {
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
@@ -96,7 +96,7 @@ const parsePropDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeC
     ts.createLiteral(propName),
     convertValueToLiteral(propMeta)
   );
-
+  watchable.add(propName);
   return staticProp;
 };
 
