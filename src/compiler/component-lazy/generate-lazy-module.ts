@@ -6,7 +6,7 @@ import { transpileToEs5Main } from '../transpile/transpile-to-es5-main';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../app-core/format-component-runtime-meta';
 
 
-export async function generateLazyModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], rollupResults: d.RollupResult[], sourceTarget: d.SourceTarget, isBrowserBuild: boolean, sufix: string) {
+export async function generateLazyModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destinations: string[], rollupResults: d.RollupChunkResult[], sourceTarget: d.SourceTarget, isBrowserBuild: boolean, sufix: string) {
   if (destinations.length === 0) {
     return [];
   }
@@ -37,7 +37,7 @@ export async function generateLazyModules(config: d.Config, compilerCtx: d.Compi
 
 async function generateLazyEntryModule(
   config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx,
-  rollupResult: d.RollupResult, destinations: string[],
+  rollupResult: d.RollupChunkResult, destinations: string[],
   sourceTarget: d.SourceTarget,
   shouldMinify: boolean,
   isBrowserBuild: boolean,
@@ -63,7 +63,7 @@ async function generateLazyEntryModule(
 
 async function writeLazyChunk(
   config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx,
-  rollupResult: d.RollupResult, destinations: string[],
+  rollupResult: d.RollupChunkResult, destinations: string[],
   sourceTarget: d.SourceTarget,
   shouldMinify: boolean,
   isBrowserBuild: boolean
@@ -78,7 +78,7 @@ async function writeLazyChunk(
 
 async function writeLazyEntry(
   config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx,
-  rollupResult: d.RollupResult, destinations: string[],
+  rollupResult: d.RollupChunkResult, destinations: string[],
   lazyRuntimeData: string,
   sourceTarget: d.SourceTarget,
   shouldMinify: boolean,

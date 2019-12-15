@@ -23,3 +23,9 @@ declare module '*.vert' {
   const src: string;
   export default src;
 }
+
+declare module '*?worker' {
+  const methods: {[method: string]: (...args: any[]) => Promise<any>}
+  export const worker: Worker;
+  export default methods;
+}

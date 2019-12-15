@@ -3,7 +3,6 @@ import { generateRollupOutput } from '../app-core/bundle-app-core';
 import { generateLazyModules } from '../component-lazy/generate-lazy-module';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
-import { RollupResult } from '../../declarations';
 
 export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
   const esmEs5Outputs = config.buildEs5 ? outputTargets.filter(o => !!o.esmEs5Dir && !o.isBrowserBuild) : [];
@@ -15,7 +14,7 @@ export async function generateEsm(config: d.Config, compilerCtx: d.CompilerCtx, 
       preferConst: true
     };
 
-    const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
+    const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules) as d.RollupChunkResult[];
     if (output != null) {
       const es2017destinations = esmOutputs.map(o => o.esmDir);
       await generateLazyModules(config, compilerCtx, buildCtx, es2017destinations, output, 'es2017', false, '');
@@ -47,7 +46,7 @@ async function copyPolyfills(config: d.Config, compilerCtx: d.CompilerCtx, outpu
   }));
 }
 
-function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[], rollupResult: RollupResult[]) {
+function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[], rollupResult: d.RollupChunkResult[]) {
   const indexFilename = rollupResult.find(r => r.isIndex).fileName;
 
   return Promise.all(

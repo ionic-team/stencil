@@ -8,7 +8,24 @@ import path from 'path';
 import { Plugin } from 'rollup';
 
 
-export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, platform: 'client' | 'hydrate'): Plugin => {
+export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, platform: 'client' | 'hydrate' | 'worker'): Plugin => {
+  if (platform === 'worker') {
+    return {
+      name: 'coreResolvePlugin',
+      resolveId(id) {
+        if (
+          id === STENCIL_INTERNAL_PLATFORM_ID ||
+          id === STENCIL_CORE_ID ||
+          id === STENCIL_INTERNAL_CLIENT_ID ||
+          id === STENCIL_INTERNAL_HYDRATE_ID ||
+          id === STENCIL_INTERNAL_RUNTIME_ID
+        ) {
+          this.error(`${id} cannot be imported from a worker`);
+        }
+        return null;
+      },
+    };
+  }
   const compilerExe = config.sys_next.getCompilerExecutingPath();
   const internalClient = getStencilInternalModule(config.rootDir, compilerExe, 'client');
   const internalHydrate = getStencilInternalModule(config.rootDir, compilerExe, 'hydrate');

@@ -404,7 +404,16 @@ export interface BundleEntryInputs {
   [entryKey: string]: string;
 }
 
-export interface RollupResult {
+export type RollupResult = RollupChunkResult | RollupAssetResult;
+
+export interface RollupAssetResult {
+  type: 'asset';
+  fileName: string;
+  content: string;
+}
+
+export interface RollupChunkResult {
+  type: 'chunk';
   entryKey: string;
   fileName: string;
   code: string;
@@ -420,7 +429,7 @@ export interface RollupResult {
 export interface BundleModule {
   entryKey: string;
   modeNames: string[];
-  rollupResult: RollupResult;
+  rollupResult: RollupChunkResult;
   cmps: ComponentCompilerMeta[];
   outputs: BundleModuleOutput[];
 }

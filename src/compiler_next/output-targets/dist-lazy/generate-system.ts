@@ -31,7 +31,7 @@ export const generateSystem = async (
 };
 
 function generateSystemLoaders(config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], systemOutputs: d.OutputTargetDistLazy[]) {
-  const loaderFilename = rollupResult.find(r => r.isBrowserLoader).fileName;
+  const loaderFilename = rollupResult.find(r => r.type === 'chunk' && r.isBrowserLoader).fileName;
 
   return Promise.all(
     systemOutputs.map((o) => writeSystemLoader(config, compilerCtx, loaderFilename, o))

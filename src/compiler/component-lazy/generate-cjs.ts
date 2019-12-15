@@ -13,7 +13,7 @@ export async function generateCjs(config: d.Config, compilerCtx: d.CompilerCtx, 
       entryFileNames: '[name].cjs.js',
       preferConst: true
     };
-    const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
+    const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules) as d.RollupChunkResult[];
     if (results != null) {
       const destinations = cjsOutputs.map(o => o.cjsDir);
       await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es2017', false, '.cjs');
@@ -22,7 +22,7 @@ export async function generateCjs(config: d.Config, compilerCtx: d.CompilerCtx, 
   }
 }
 
-function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], outputTargets: d.OutputTargetDistLazy[]) {
+function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupChunkResult[], outputTargets: d.OutputTargetDistLazy[]) {
   const indexFilename = rollupResult.find(r => r.isIndex).fileName;
   return Promise.all(outputTargets.map(async o => {
     if (o.cjsIndexFile) {

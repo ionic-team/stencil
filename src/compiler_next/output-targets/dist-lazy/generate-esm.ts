@@ -49,7 +49,7 @@ const copyPolyfills = async (config: d.Config, compilerCtx: d.CompilerCtx, outpu
 };
 
 const generateShortcuts = (config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[], rollupResult: RollupResult[]) => {
-  const indexFilename = rollupResult.find(r => r.isIndex).fileName;
+  const indexFilename = rollupResult.find(r => r.type === 'chunk' && r.isIndex).fileName;
 
   return Promise.all(
     outputTargets.map(async o => {

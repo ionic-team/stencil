@@ -6,7 +6,7 @@ import { createOnWarnFn, getDependencies, loadRollupDiagnostics } from '@utils';
 import { loaderPlugin } from '../rollup-plugins/loader';
 import { imagePlugin } from '../rollup-plugins/image-plugin';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
-import { OutputChunk, OutputOptions, RollupBuild, RollupOptions, TreeshakingOptions } from 'rollup'; // types only
+import { OutputOptions, RollupBuild, RollupOptions, TreeshakingOptions } from 'rollup'; // types only
 import { pluginHelper } from '../rollup-plugins/plugin-helper';
 import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
 import { stencilExternalRuntimePlugin } from '../rollup-plugins/stencil-external-runtime';
@@ -85,21 +85,29 @@ export const generateRollupOutput = async (build: RollupBuild, options: OutputOp
 
   const { output } = await build.generate(options);
   return output
-    .filter(chunk => !('isAsset' in chunk))
-    .map((chunk: OutputChunk) => {
-      const isCore = Object.keys(chunk.modules).includes('@stencil/core');
+    .map((chunk) => {
+      if (chunk.type === 'chunk') {
+        const isCore = Object.keys(chunk.modules).includes('@stencil/core');
+        return {
+          type: 'chunk',
+          fileName: chunk.fileName,
+          code: chunk.code,
+          moduleFormat: options.format,
+          entryKey: chunk.name,
+          imports: chunk.imports,
+          isEntry: !!chunk.isEntry,
+          isComponent: !!chunk.isEntry && entryModules.some(m => m.entryKey === chunk.name),
+          isBrowserLoader: chunk.isEntry && chunk.name === config.fsNamespace,
+          isIndex: chunk.isEntry && chunk.name === 'index',
+          isCore,
+      };
+    } else {
       return {
+        type: 'asset',
         fileName: chunk.fileName,
-        code: chunk.code,
-        moduleFormat: options.format,
-        entryKey: chunk.name,
-        imports: chunk.imports,
-        isEntry: !!chunk.isEntry,
-        isComponent: !!chunk.isEntry && entryModules.some(m => m.entryKey === chunk.name),
-        isBrowserLoader: chunk.isEntry && chunk.name === config.fsNamespace,
-        isIndex: chunk.isEntry && chunk.name === 'index',
-        isCore,
-    };
+        content: chunk.source as any
+      };
+    }
   });
 };
 

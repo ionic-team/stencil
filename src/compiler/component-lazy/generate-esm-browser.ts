@@ -15,7 +15,7 @@ export async function generateEsmBrowser(config: d.Config, compilerCtx: d.Compil
       // This is needed until Firefox 67, which ships native dynamic imports
       dynamicImportFunction: getDynamicImportFunction(config.fsNamespace)
     };
-    const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
+    const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules) as d.RollupChunkResult[];
 
     if (output != null) {
       const es2017destinations = esmOutputs.map(o => o.esmDir);
