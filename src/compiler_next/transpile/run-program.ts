@@ -67,6 +67,14 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
   }
 
   const tsSemantic = loadTypeScriptDiagnostics(tsBuilder.getSemanticDiagnostics());
+  if (config.devMode) {
+    tsSemantic.forEach(semanticDiagnostic => {
+      // Unused variable errors become warnings in dev mode
+      if (semanticDiagnostic.code === '6133') {
+        semanticDiagnostic.level = 'warn';
+      }
+    });
+  }
   buildCtx.diagnostics.push(...tsSemantic);
 
   return false;
