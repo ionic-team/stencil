@@ -15,7 +15,7 @@ export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCt
       chunkFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name]-[hash].system.js',
       preferConst: true
     };
-    const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
+    const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules) as d.RollupChunkResult[];
     if (results != null) {
       const destinations = systemOutputs.map(o => o.esmDir);
       await generateLazyModules(config, compilerCtx, buildCtx, destinations, results, 'es5', true, '.system');
@@ -25,7 +25,7 @@ export async function generateSystem(config: d.Config, compilerCtx: d.CompilerCt
 }
 
 function generateSystemLoaders(config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], systemOutputs: d.OutputTargetDistLazy[]) {
-  const loaderFilename = rollupResult.find(r => r.isBrowserLoader).fileName;
+  const loaderFilename = rollupResult.find(r => r.type === 'chunk' && r.isBrowserLoader).fileName;
 
   return Promise.all(
     systemOutputs.map((o) => writeSystemLoader(config, compilerCtx, loaderFilename, o))

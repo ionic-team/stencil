@@ -6,6 +6,9 @@ export const textPlugin = (): Plugin => {
     name: 'textPlugin',
 
     transform(code, id) {
+      if (/\0/.test(id)) {
+        return null;
+      }
       if (KNOWN_TXT_EXTS.has(path.extname(id))) {
         return `export default ${JSON.stringify(code)};`;
       }

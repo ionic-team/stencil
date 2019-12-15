@@ -25,7 +25,7 @@ export const generateCjs = async (config: d.Config, compilerCtx: d.CompilerCtx, 
 };
 
 const generateShortcuts = (config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], outputTargets: d.OutputTargetDistLazy[]) => {
-  const indexFilename = rollupResult.find(r => r.isIndex).fileName;
+  const indexFilename = rollupResult.find(r => r.type === 'chunk' && r.isIndex).fileName;
   return Promise.all(outputTargets.map(async o => {
     if (o.cjsIndexFile) {
       const entryPointPath = config.sys.path.join(o.cjsDir, indexFilename);

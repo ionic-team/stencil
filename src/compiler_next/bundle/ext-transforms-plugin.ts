@@ -11,6 +11,9 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
     name: 'extTransformsPlugin',
 
     load(id) {
+      if (/\0/.test(id)) {
+        return null;
+      }
       const fsFilePath = normalizeFsPath(id);
       const deps = dependendencies.get(fsFilePath);
       if (deps && deps.length > 0) {
@@ -25,8 +28,11 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
       return null;
     },
     async transform(_, id) {
+      if (/\0/.test(id)) {
+        return null;
+      }
       const pathData = parseStencilImportPathData(id);
-      if (pathData != null) {
+      if (pathData !== null) {
         // TODO, offline caching
         const filePath = normalizeFsPath(id);
         const code = await compilerCtx.fs.readFile(filePath);

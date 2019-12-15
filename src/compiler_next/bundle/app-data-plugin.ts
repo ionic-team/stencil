@@ -5,7 +5,12 @@ import { Plugin } from 'rollup';
 import { STENCIL_APP_DATA_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
 
 
-export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build: d.BuildConditionals, platform: 'client' | 'hydrate'): Plugin => {
+export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build: d.BuildConditionals, platform: 'client' | 'hydrate' | 'worker'): Plugin => {
+  if (!platform) {
+    return {
+      name: 'appDataPlugin',
+    };
+  }
   const globalPaths = getGlobalScriptPaths(config, compilerCtx);
 
   return {
@@ -13,6 +18,9 @@ export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buil
 
     resolveId(id) {
       if (id === STENCIL_APP_DATA_ID) {
+        if (platform === 'worker') {
+          this.error('@stencil/core packages cannot be imported from a worker.');
+        }
         return id;
       }
       return null;

@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
-import { bundleOutput } from '../../bundle/bundle-output';
+import { bundleApp } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
 import { generateEntryModules } from '../../../compiler/entries/entry-modules';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
@@ -49,7 +49,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       bundleOpts.inputs[entryModule.entryKey] = entryModule.entryKey;
     });
 
-    const rollupBuild = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
+    const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, bundleOpts);
     if (rollupBuild != null) {
       const [componentBundle] = await Promise.all([
         generateEsmBrowser(config, compilerCtx, buildCtx, rollupBuild, outputTargets),

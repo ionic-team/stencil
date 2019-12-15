@@ -35,8 +35,12 @@ export const parseStencilImportPathData = (importee: string) => {
     if (dataParts.length === 2) {
       const params = dataParts[1];
       const urlParams = new URLSearchParams(params);
+      const tag = urlParams.get('tag');
+      if (tag === null) {
+        return null;
+      }
       const data: d.StencilComponentData = {
-        tag: urlParams.get('tag'),
+        tag,
         encapsulation: urlParams.get('encapsulation') || 'none',
         mode: urlParams.get('mode') || DEFAULT_STYLE_MODE,
       };
