@@ -61,22 +61,27 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
 
 const WORKER_INTRO = `
 const exports = {};
-onmessage = async ({data}) => {
+addEventListener('message', async ({data}) => {
   let id = data[0];
-  let method = exports[data[1]];
-  let args = data[2];
-  let value;
-  let err;
-  try {
-    value = await method(...args);
-  } catch (e) {
-    err = {
-      message: typeof e === 'string' ? e : e.message,
-      stack: e.stack
-    };
+  let method = data[1];
+  if (id.startsWith('stncl-') && method) {
+    let args = data[2];
+    let value;
+    let err;
+    try {
+      value = await exports[method](...args);
+    } catch (e) {
+      err = {
+        message: typeof e === 'string' ? e : e.message,
+        stack: e.stack
+      };
+    }
+    postMessage(
+      [id, value, err],
+      value instanceof ArrayBuffer ? [value] : []
+    );
   }
-  postMessage([id, value, err]);
-};
+});
 `
 
 const getWorkerMain = (referenceId: string, workerName: string, exportedMethod: string[]) => {
@@ -86,21 +91,27 @@ const methods = /*@__PURE__*/(() => {
   let id = 0;
   const pending = new Map();
   const proxy = {};
-  worker.onmessage = (ev) => {
-    const [id, value, err] = ev.data;
-    const [resolve, reject] = pending.get(id);
-    pending.delete(id);
-    if (err) {
-      reject(err);
-    } else {
-      resolve(value);
+  worker.addEventListener('message', ({data}) => {
+    const id = data[0];
+    if (id.startsWith('stncl-')) {
+      const [resolve, reject] = pending.get(id);
+      pending.delete(id);
+      if (data[2]) {
+        reject(data[2]);
+      } else {
+        resolve(data[1]);
+      }
     }
-  };
+  });
   ${JSON.stringify(exportedMethod)}.forEach(method => {
     proxy[method] = (...args) => {
       return new Promise((resolve, reject) => {
-        pending.set(id, [resolve, reject]);
-        return worker.postMessage([id++, method, args]);
+        const key = 'stncl-' + id++;
+        pending.set(key, [resolve, reject]);
+        return worker.postMessage(
+          [key, method, args],
+          args.filter(a => a instanceof ArrayBuffer)
+        );
       });
     };
   });
