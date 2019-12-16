@@ -215,7 +215,7 @@ export const createProxy = (worker, exportedMethod) => (
       ['stencil', pendingId, method, args],
       args.filter(a => a instanceof ArrayBuffer)
     );
-  });
+  })
 );
 `;
 
