@@ -10,6 +10,7 @@ import { outputLazyLoader } from '../../compiler/output-targets/output-lazy-load
 import { outputWww } from '../../compiler/output-targets/output-www';
 import { outputCollection } from './dist-collection';
 import { outputTypes } from '../../compiler/output-targets/output-types';
+import { RollupCache } from 'rollup';
 
 
 export const generateOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -20,6 +21,8 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
     .filter(mod => mod && !mod.isCollectionDependency);
 
   compilerCtx.changedModules.clear();
+
+  invalidateRollupCaches(compilerCtx);
 
   await Promise.all([
     outputAngular(config, compilerCtx, buildCtx),
@@ -44,3 +47,14 @@ const outputApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
   await outputLazy(config, compilerCtx, buildCtx);
   await outputWww(config, compilerCtx, buildCtx);
 };
+
+const invalidateRollupCaches = (compilerCtx: d.CompilerCtx) => {
+  const invalidatedIds = compilerCtx.changedFiles;
+  compilerCtx.rollupCache.forEach((cache: RollupCache) => {
+    cache.modules.forEach(mod => {
+      if (mod.transformDependencies.some(id => invalidatedIds.has(id))) {
+        mod.originalCode = null;
+      }
+    });
+  });
+}

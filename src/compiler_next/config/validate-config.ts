@@ -46,6 +46,7 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'writeLog', 'log', false);
   setBooleanConfig(config, 'buildAppCore', null, true);
   setBooleanConfig(config, 'autoprefixCss', null, config.buildEs5);
+  setBooleanConfig(config, 'validateTypes', null, !config._isTesting);
 
   // hash file names
   if (!isBoolean(config.hashFileNames)) {

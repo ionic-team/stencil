@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { Plugin } from 'rollup';
+import { Plugin, TransformResult } from 'rollup';
 import path from 'path';
 import { bundleOutput } from './bundle-output';
 import { normalizeFsPath, hasError } from '@utils';
@@ -11,7 +11,10 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
 
     resolveId(id) {
       if (id === WORKER_HELPER_ID) {
-        return id;
+        return {
+          id,
+          moduleSideEffects: false
+        };
       }
       return null;
     },
@@ -23,7 +26,7 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
       return null;
     },
 
-    async transform(_, id) {
+    async transform(_, id): Promise<TransformResult> {
       if (/\0/.test(id)) {
         return null;
       }
@@ -32,14 +35,18 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
       if (workerEntryPath != null) {
         const exportWorker = id.includes('?worker');
         const workerName = path.basename(workerEntryPath, '.ts');
+
+        // Rollup worker
         const build = await bundleOutput(config, compilerCtx, buildCtx, {
           platform: 'worker',
-          id: `worker-${id}`,
+          id: `worker-${workerName}`,
           inputs: {
             'index': workerEntryPath + '?worker-entry'
           },
           inlineDynamicImports: true,
         });
+
+        // Generate commonjs output so we can intercept exports at runtme
         const output = await build.generate({
           format: 'commonjs',
           intro: WORKER_INTRO,
@@ -51,6 +58,8 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
         if (entryPoint.imports.length > 0) {
           this.error('Workers should not have any external imports: ' + JSON.stringify(entryPoint.imports));
         }
+
+        // Optimize code
         let code = entryPoint.code;
         const results = await optimizeModule(config, compilerCtx, {
           input: code,
@@ -63,13 +72,21 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
         if (!hasError(results.diagnostics)) {
           code = results.output;
         }
+
+        // Put worker in an asset so new Worker() can reference it later
         const referenceId = this.emitFile({
           type: 'asset',
           source: code,
-          name: workerName + '.worker.js'
+          name: workerName + '.js',
         });
-        const mainCode = getWorkerMain(referenceId, workerName, entryPoint.exports, exportWorker);
-        return mainCode;
+
+        Object.keys(entryPoint.modules)
+          .filter(id => !/\0/.test(id) && id !== workerEntryPath)
+          .forEach(id => this.addWatchFile(id));
+        return {
+          code: getWorkerMain(referenceId, workerName, entryPoint.exports, exportWorker),
+          moduleSideEffects: false,
+        };
       }
       return null;
     }

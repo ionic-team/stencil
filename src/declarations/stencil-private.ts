@@ -806,6 +806,7 @@ export interface CompilerCtx {
   styleModeNames: Set<string>;
   tsService: TsService;
   changedModules: Set<string>;
+  changedFiles: Set<string>;
   worker?: CompilerWorkerContext;
 
   rollupCache: Map<string, any>;
@@ -1370,8 +1371,6 @@ export interface InMemoryFileSystem {
 
   /** legacy */
   disk?: FileSystem;
-
-  revision(filePath: string): number;
 
   accessData(filePath: string): Promise<{
     exists: boolean;

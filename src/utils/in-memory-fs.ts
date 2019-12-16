@@ -3,19 +3,10 @@ import { normalizePath } from './normalize-path';
 
 
 export class InMemoryFs implements d.InMemoryFileSystem {
-  private revisions = new Map<string, number>();
   private items: d.FsItems = new Map();
 
   constructor(public disk: d.FileSystem, private path: d.Path) {}
 
-  private markItem(filePath: string) {
-    const rev = this.revision(filePath) + 1;
-    this.revisions.set(filePath, rev);
-  }
-
-  revision(filePath: string) {
-    return this.revisions.get(filePath) ?? 0;
-  }
 
   async accessData(filePath: string) {
     const item = this.getItem(filePath);
@@ -202,7 +193,6 @@ export class InMemoryFs implements d.InMemoryFileSystem {
       item.isDirectory = false;
       item.fileText = fileContent;
     }
-    this.markItem(filePath);
 
     return fileContent;
   }
@@ -228,7 +218,6 @@ export class InMemoryFs implements d.InMemoryFileSystem {
       item.isDirectory = false;
       item.fileText = fileContent;
     }
-    this.markItem(filePath);
 
     return fileContent;
   }
@@ -267,7 +256,6 @@ export class InMemoryFs implements d.InMemoryFileSystem {
     if (!item.queueWriteToDisk) {
       item.queueDeleteFromDisk = true;
     }
-    this.markItem(filePath);
   }
 
   async stat(itemPath: string) {
@@ -343,7 +331,6 @@ export class InMemoryFs implements d.InMemoryFileSystem {
     results.queuedWrite = false;
 
     item.fileText = content;
-    this.markItem(filePath);
 
     if (opts != null && opts.useCache === false) {
       item.useCache = false;
@@ -556,7 +543,6 @@ export class InMemoryFs implements d.InMemoryFileSystem {
     if (item != null && !item.queueWriteToDisk) {
       this.items.delete(filePath);
     }
-    this.markItem(filePath);
   }
 
   cancelDeleteFilesFromDisk(filePaths: string[]) {
@@ -565,7 +551,6 @@ export class InMemoryFs implements d.InMemoryFileSystem {
       if (item.isFile === true && item.queueDeleteFromDisk === true) {
         item.queueDeleteFromDisk = false;
       }
-      this.markItem(filePath);
     });
   }
 
