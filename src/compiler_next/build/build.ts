@@ -54,6 +54,10 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
     catchError(buildCtx.diagnostics, e);
   }
 
+  // TODO
+  // clear changed files
+  compilerCtx.changedFiles.clear();
+
   // return what we've learned today
   return buildFinish(buildCtx);
 };

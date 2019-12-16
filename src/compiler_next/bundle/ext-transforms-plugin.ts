@@ -4,29 +4,10 @@ import { parseStencilImportPathData } from '../../compiler/transformers/stencil-
 import { Plugin } from 'rollup';
 import { runPluginTransformsEsmImports } from '../../compiler/plugin/plugin';
 
-
-const dependendencies = new Map<string, string[]>();
 export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Plugin => {
   return {
     name: 'extTransformsPlugin',
 
-    load(id) {
-      if (/\0/.test(id)) {
-        return null;
-      }
-      const fsFilePath = normalizeFsPath(id);
-      const deps = dependendencies.get(fsFilePath);
-      if (deps && deps.length > 0) {
-        const prefix = '//' + deps
-          .map(dep => `${compilerCtx.fs.revision(dep)}`)
-          .join(',');
-
-        return compilerCtx.fs.readFile(fsFilePath).then(content => {
-          return prefix + '\n' + content;
-        });
-      }
-      return null;
-    },
     async transform(_, id) {
       if (/\0/.test(id)) {
         return null;
@@ -48,7 +29,12 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
           minify: config.minifyCss,
           autoprefixer: config.autoprefixCss
         });
-        dependendencies.set(filePath, pluginTransforms.dependencies);
+
+        // Track dependencies
+        pluginTransforms.dependencies.forEach(dep => {
+          this.addWatchFile(dep);
+        });
+
         buildCtx.diagnostics.push(...pluginTransforms.diagnostics);
         buildCtx.diagnostics.push(...cssTransformResults.diagnostics);
         const didError = hasError(cssTransformResults.diagnostics) || hasError(pluginTransforms.diagnostics);

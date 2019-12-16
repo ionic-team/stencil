@@ -21,6 +21,7 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
 
   const onFileChange: d.CompilerFileWatcherCallback = (file, kind) => {
     compilerCtx.fs.clearFileCache(file);
+    compilerCtx.changedFiles.add(file);
     switch (kind) {
       case 'fileAdd': filesAdded.add(file); break;
       case 'fileUpdate': filesUpdated.add(file); break;

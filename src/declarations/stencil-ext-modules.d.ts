@@ -25,7 +25,8 @@ declare module '*.vert' {
 }
 
 declare module '*?worker' {
-  const methods: {[method: string]: (...args: any[]) => Promise<any>}
+  const workerProxy: {[method: string]: (...args: any[]) => Promise<any>}
   export const worker: Worker;
-  export default methods;
+  export const fileName: string;
+  export default workerProxy;
 }

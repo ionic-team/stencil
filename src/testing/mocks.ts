@@ -80,6 +80,7 @@ export function mockCompilerCtx() {
     styleModeNames: new Set(),
     tsService: null,
     changedModules: new Set(),
+    changedFiles: new Set(),
     reset: () => {/**/}
   };
 

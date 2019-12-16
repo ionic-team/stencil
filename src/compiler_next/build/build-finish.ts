@@ -65,6 +65,7 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
     } else {
       // successful build!
       // ┏(°.°)┛ ┗(°.°)┓ ┗(°.°)┛ ┏(°.°)┓
+      compilerCtx.changedFiles.clear();
       compilerCtx.hasSuccessfulBuild = true;
     }
 

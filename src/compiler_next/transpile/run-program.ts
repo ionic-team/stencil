@@ -66,16 +66,18 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
     return true;
   }
 
-  const tsSemantic = loadTypeScriptDiagnostics(tsBuilder.getSemanticDiagnostics());
-  if (config.devMode) {
-    tsSemantic.forEach(semanticDiagnostic => {
-      // Unused variable errors become warnings in dev mode
-      if (semanticDiagnostic.code === '6133') {
-        semanticDiagnostic.level = 'warn';
-      }
-    });
+  if (config.validateTypes) {
+    const tsSemantic = loadTypeScriptDiagnostics(tsBuilder.getSemanticDiagnostics());
+    if (config.devMode) {
+      tsSemantic.forEach(semanticDiagnostic => {
+        // Unused variable errors become warnings in dev mode
+        if (semanticDiagnostic.code === '6133') {
+          semanticDiagnostic.level = 'warn';
+        }
+      });
+    }
+    buildCtx.diagnostics.push(...tsSemantic);
   }
-  buildCtx.diagnostics.push(...tsSemantic);
 
   return false;
 };
