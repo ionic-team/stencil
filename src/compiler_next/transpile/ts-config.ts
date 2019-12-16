@@ -7,7 +7,6 @@ export const getTsOptionsToExtend = (config: d.Config) => {
   const tsOptions: ts.CompilerOptions = {
     experimentalDecorators: true,
     declaration: config.outputTargets.some(isOutputTargetDistTypes),
-    incremental: false,
     module: ts.ModuleKind.ESNext,
     moduleResolution: ts.ModuleResolutionKind.NodeJs,
     noEmitOnError: false,
