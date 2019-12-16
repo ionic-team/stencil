@@ -69,8 +69,8 @@ export const getGlobalScriptPaths = (config: d.Config, compilerCtx: d.CompilerCt
   }
 
   compilerCtx.collections.forEach(collection => {
-    if (collection.global != null && typeof collection.global.staticSourceFile === 'string') {
-      globalPaths.push(normalizePath(collection.global.staticSourceFile));
+    if (collection.global != null) {
+      globalPaths.push(normalizePath(collection.global.sourceFilePath));
     }
   });
 
