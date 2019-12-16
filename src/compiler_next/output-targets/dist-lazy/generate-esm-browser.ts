@@ -12,6 +12,7 @@ export async function generateEsmBrowser(config: d.Config, compilerCtx: d.Compil
       format: 'es',
       entryFileNames: '[name].esm.js',
       chunkFileNames: config.hashFileNames ? 'p-[hash].js' : '[name]-[hash].js',
+      assetFileNames: '[name]-[hash][extname]',
       preferConst: true,
       // This is needed until Firefox 67, which ships native dynamic imports
       dynamicImportFunction: getDynamicImportFunction(config.fsNamespace)

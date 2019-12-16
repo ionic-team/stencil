@@ -19,6 +19,7 @@ export const generateSystem = async (
       format: 'system',
       entryFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name].system.js',
       chunkFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name]-[hash].system.js',
+      assetFileNames: '[name]-[hash][extname]',
       preferConst: true
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);

@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
 import { getBuildFeatures } from '../../build/app-data';
-import { bundleApp } from '../../bundle/bundle-output';
+import { bundleOutput } from '../../bundle/bundle-output';
 import { hydrateComponentTransform } from '../../transformers/component-hydrate/tranform-to-hydrate-component';
 
 import { loadRollupDiagnostics } from '@utils';
@@ -25,7 +25,7 @@ export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.Comp
       }
     };
 
-    const rollupBuild = await bundleApp(config, compilerCtx, buildCtx, bundleOpts);
+    const rollupBuild = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
     return rollupBuild;
 
   } catch (e) {

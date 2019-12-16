@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
-import { catchError, dashToPascalCase } from '@utils';
+import { catchError, dashToPascalCase, hasError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
 import { isOutputTargetDistCustomElementsBundle } from '../../../compiler/output-targets/output-utils';
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
@@ -9,6 +9,8 @@ import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID } from '../../bundle/en
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import path from 'path';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../../../compiler/app-core/format-component-runtime-meta';
+import { optimizeModule } from '../../optimize/optimize-module';
+import { OutputChunk } from 'rollup';
 
 
 export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -38,7 +40,23 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
       inlineDynamicImports: true,
     };
 
-    const code = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
+    const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
+    const rollupOutput = await build.generate({
+      format: 'esm',
+      sourcemap: config.sourceMap,
+    });
+    const chunk = rollupOutput.output.find(o => o.type === 'chunk') as OutputChunk;
+    let code = chunk.code;
+    const optimizeResults = await optimizeModule(config, compilerCtx, {
+      input: code,
+      isCore: true,
+      minify: config.minifyJs
+    });
+    buildCtx.diagnostics.push(...optimizeResults.diagnostics);
+    if (hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
+      code = optimizeResults.output;
+    }
+
     await Promise.all(
       outputTargets.map(o => {
         return compilerCtx.fs.writeFile(

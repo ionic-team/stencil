@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { Plugin } from 'rollup';
 import path from 'path';
-import { bundleApp } from './bundle-output';
+import { bundleOutput } from './bundle-output';
 import { normalizeFsPath, hasError } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';
 
@@ -16,7 +16,7 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
       if (id.endsWith('?worker')) {
         const filePath = normalizeFsPath(id)
         const workerName = path.basename(filePath, '.ts');
-        const build = await bundleApp(config, compilerCtx, buildCtx, {
+        const build = await bundleOutput(config, compilerCtx, buildCtx, {
           platform: 'worker',
           id: `worker-${id}`,
           inputs: {
@@ -36,17 +36,16 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
           this.error('Workers should not have any external imports: ' + JSON.stringify(entryPoint.imports));
         }
         let code = entryPoint.code;
-        if (config.minifyJs) {
-          const results = await optimizeModule(config, compilerCtx, {
-            input: code,
-            sourceTarget: 'es2017',
-            isCore: false,
-            minify: true,
-          });
-          buildCtx.diagnostics.push(...results.diagnostics);
-          if (!hasError(results.diagnostics)) {
-            code = results.output;
-          }
+        const results = await optimizeModule(config, compilerCtx, {
+          input: code,
+          sourceTarget: config.buildEs5 ? 'es5' : 'es2017',
+          isCore: false,
+          minify: config.minifyJs,
+          inlineHelpers: true
+        });
+        buildCtx.diagnostics.push(...results.diagnostics);
+        if (!hasError(results.diagnostics)) {
+          code = results.output;
         }
         const referenceId = this.emitFile({
           type: 'asset',
@@ -63,9 +62,9 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
 const WORKER_INTRO = `
 const exports = {};
 onmessage = async ({data}) => {
-  const id = data[0];
-  const method = exports[data[1]];
-  const args = data[2];
+  let id = data[0];
+  let method = exports[data[1]];
+  let args = data[2];
   let value;
   let err;
   try {

@@ -13,6 +13,7 @@ export const generateCjs = async (config: d.Config, compilerCtx: d.CompilerCtx, 
     const esmOpts: OutputOptions = {
       format: 'cjs',
       entryFileNames: '[name].cjs.js',
+      assetFileNames: '[name]-[hash][extname]',
       preferConst: true
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);

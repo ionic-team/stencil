@@ -3,7 +3,7 @@ import { appDataPlugin } from './app-data-plugin';
 import { BundleOptions } from './bundle-interface';
 import { coreResolvePlugin } from './core-resolve-plugin';
 import { createCustomResolverAsync } from '../sys/resolve/resolve-module';
-import { createOnWarnFn, loadRollupDiagnostics, hasError } from '@utils';
+import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { extTransformsPlugin } from './ext-transforms-plugin';
 import { fileLoadPlugin } from './file-load-plugin';
 import { textPlugin } from './text-plugin';
@@ -12,14 +12,13 @@ import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-
 import { loaderPlugin } from '../../compiler/rollup-plugins/loader';
 import { pluginHelper } from '../../compiler/rollup-plugins/plugin-helper';
 import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-plugins';
-import { RollupOptions, TreeshakingOptions, rollup, OutputChunk } from 'rollup';
+import { RollupOptions, TreeshakingOptions, rollup } from 'rollup';
 import { typescriptPlugin } from './typescript-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
-import { optimizeModule } from '../optimize/optimize-module';
 
 
-export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
+export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
   try {
     const rollupOptions = getRollupOptions(config, compilerCtx, buildCtx, bundleOpts);
     const rollupBuild = await rollup(rollupOptions);
@@ -99,24 +98,4 @@ const getTreeshakeOption = (config: d.Config) => {
     }
     : false;
   return treeshake;
-};
-
-export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions, format: d.ModuleFormat = 'es') => {
-  const build = await bundleApp(config, compilerCtx, buildCtx, bundleOpts);
-  const rollupOutput = await build.generate({
-    format,
-    sourcemap: config.sourceMap,
-  });
-  const chunk = rollupOutput.output.find(o => o.type === 'chunk') as OutputChunk;
-  let code = chunk.code;
-  const optimizeResults = await optimizeModule(config, compilerCtx, {
-    input: code,
-    isCore: true,
-    minify: config.minifyJs
-  });
-  buildCtx.diagnostics.push(...optimizeResults.diagnostics);
-  if (hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
-    code = optimizeResults.output;
-  }
-  return code;
 };
