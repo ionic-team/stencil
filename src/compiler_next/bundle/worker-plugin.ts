@@ -172,11 +172,12 @@ export const createWorker = (workerPath, workerOpts) => {
       const msgType = data[0];
       const id = data[1];
       const value = data[2];
+      const err = data[3];
       if (msgType === 'stencil') {
         const [resolve, reject] = pending.get(id);
         pending.delete(id);
         if (err) {
-          reject(data[3]);
+          reject(err);
         } else {
           if (Array.isArray(value) && value[0] === 'stencil-destroy') {
             for (let i = 0, l = value[1].length; i < l; i++) {
@@ -212,7 +213,7 @@ export const createProxy = (worker, exportedMethod) => (
     }
 
     worker.postMessage(
-      ['stencil', pendingId, method, args],
+      ['stencil', pendingId, exportedMethod, args],
       args.filter(a => a instanceof ArrayBuffer)
     );
   })
