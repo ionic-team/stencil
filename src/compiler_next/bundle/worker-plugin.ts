@@ -27,14 +27,16 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
       if (/\0/.test(id)) {
         return null;
       }
-      if (id.endsWith('?worker')) {
-        const filePath = normalizeFsPath(id)
-        const workerName = path.basename(filePath, '.ts');
+
+      const workerEntryPath = getWorkerEntryPath(id);
+      if (workerEntryPath != null) {
+        const exportWorker = id.includes('?worker');
+        const workerName = path.basename(workerEntryPath, '.ts');
         const build = await bundleOutput(config, compilerCtx, buildCtx, {
           platform: 'worker',
           id: `worker-${id}`,
           inputs: {
-            'index': filePath
+            'index': workerEntryPath + '?worker-entry'
           },
           inlineDynamicImports: true,
         });
@@ -66,32 +68,72 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
           source: code,
           name: workerName + '.worker.js'
         });
-        return getWorkerMain(referenceId, workerName, entryPoint.exports);
+        const mainCode = getWorkerMain(referenceId, workerName, entryPoint.exports, exportWorker);
+        return mainCode;
       }
       return null;
     }
   };
 };
 
+const getWorkerEntryPath = (id: string) => {
+  if (!id.includes('?worker-entry') && WORKER_SUFFIX.some(p => id.endsWith(p))) {
+    return normalizeFsPath(id);
+  }
+  return null;
+};
+
+const WORKER_SUFFIX = [
+  '?worker',
+  '.worker',
+  '.worker/index.ts',
+  '.worker/index.tsx',
+  '.worker/index.js',
+  '.worker/index.mjs',
+];
+
 const WORKER_HELPER_ID = '@worker-helper';
 
 const WORKER_INTRO = `
 const exports = {};
 addEventListener('message', async ({data}) => {
-  if (data[0] === 'stencil') {
+  if (data && data[0] === 'stencil') {
     let id = data[1];
     let method = data[2];
     let args = data[3];
+    let i = 0;
+    let argsLen = args.length;
     let value;
     let err;
+    let destroyIds;
+
     try {
+      for (; i < argsLen; i++) {
+        if (Array.isArray(args[i]) && args[i][0] === 'stencil-callback') {
+          const callbackId = args[i][1];
+          const cb = (...cbArgs) => {
+            postMessage(
+              ['stencil-callback', callbackId, cbArgs]
+            );
+          };
+          args[i] = cb;
+          (destroyIds = destroyIds || []).push(callbackId);
+        }
+      }
+
       value = await exports[method](...args);
+
+      if (destroyIds) {
+        value = ['stencil-destroy', destroyIds];
+      }
+
     } catch (e) {
       err = {
         message: typeof e === 'string' ? e : e.message,
         stack: e.stack
       };
     }
+
     postMessage(
       ['stencil', id, value, err],
       value instanceof ArrayBuffer ? [value] : []
@@ -101,44 +143,72 @@ addEventListener('message', async ({data}) => {
 `
 
 export const WORKER_HELPERS = `
-export const createProxy = (worker, exportedMethod) => {
-  let id = 0;
-  const pending = new Map();
-  const proxy = {};
+let pendingIds = 0;
+let callbackIds = 0;
+const pending = new Map();
+const callbacks = new Map();
+
+export const createWorker = (workerPath, workerOpts) => {
+  const worker = new Worker(workerPath, workerOpts);
   worker.addEventListener('message', ({data}) => {
-    if (data[0] === 'stencil') {
+    if (data) {
+      const msgType = data[0];
       const id = data[1];
-      const [resolve, reject] = pending.get(id);
-      pending.delete(id);
-      if (data[3]) {
-        reject(data[3]);
-      } else {
-        resolve(data[2]);
+      const value = data[2];
+      if (msgType === 'stencil') {
+        const [resolve, reject] = pending.get(id);
+        pending.delete(id);
+        if (err) {
+          reject(data[3]);
+        } else {
+          if (Array.isArray(value) && value[0] === 'stencil-destroy') {
+            for (let i = 0, l = value[1].length; i < l; i++) {
+              callbacks.delete(value[1][i]);
+            }
+            value = undefined;
+          }
+          resolve(value);
+        }
+      } else if (msgType === 'stencil-callback') {
+        try {
+          callbacks.get(id)(...value);
+        } catch (e) {
+          console.error(e);
+        }
       }
     }
   });
-  exportedMethod.forEach(method => {
-    proxy[method] = (...args) => {
-      return new Promise((resolve, reject) => {
-        const key = id++;
-        pending.set(key, [resolve, reject]);
-        return worker.postMessage(
-          ['stencil', key, method, args],
-          args.filter(a => a instanceof ArrayBuffer)
-        );
-      });
-    };
-  });
-  return proxy;
+  return worker;
 };
+
+export const createProxy = (worker, exportedMethod) => (
+  (...args) => new Promise((resolve, reject) => {
+    const pendingId = pendingIds++;
+    pending.set(pendingId, [resolve, reject]);
+
+    for (let i = 0, l = args.length; i < l; i++) {
+      if (typeof args[i] === 'function') {
+        const callbackId = callbackIds++;
+        callbacks.set(callbackId, args[i]);
+        args[i] = ['stencil-callback', callbackId];
+      }
+    }
+
+    worker.postMessage(
+      ['stencil', pendingId, method, args],
+      args.filter(a => a instanceof ArrayBuffer)
+    );
+  });
+);
 `;
 
 
-const getWorkerMain = (referenceId: string, workerName: string, exportedMethod: string[]) => {
+const getWorkerMain = (referenceId: string, workerName: string, exportedMethods: string[], exportWorker: boolean) => {
   return `
-import {createProxy} from '${WORKER_HELPER_ID}';
-export const worker = new Worker(import.meta.ROLLUP_FILE_URL_${referenceId}, {name: "${workerName}"});
-const methods = /*@__PURE__*/createProxy(worker, ${JSON.stringify(exportedMethod)});
-export default methods;`;
+import { createProxy, createWorker } from '${WORKER_HELPER_ID}';
+${exportWorker ? 'export ' : ''}const worker = createWorker(import.meta.ROLLUP_FILE_URL_${referenceId}, {name: "${workerName}"});
+${exportedMethods.map(exportedMethod => {
+  return `export const ${exportedMethod} = /*@__PURE__*/createProxy(worker, '${exportedMethod}');`;
+}).join('\n')}
+`;
 };
-

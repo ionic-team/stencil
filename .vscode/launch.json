@@ -152,12 +152,11 @@
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
-        "--serve",
-        "--watch",
         "--debug",
         "--dev",
+        "--next",
         "--config",
-        "${workspaceFolder}/test/repl/stencil.config.ts"
+        "${workspaceFolder}/../stencil-repl/stencil.config.ts"
       ],
       "protocol": "inspector"
     },
