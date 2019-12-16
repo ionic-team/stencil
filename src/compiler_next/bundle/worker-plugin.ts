@@ -1,13 +1,24 @@
 import * as d from '../../declarations';
-import { Plugin, TransformResult } from 'rollup';
+import { Plugin, TransformResult, PluginContext } from 'rollup';
 import path from 'path';
 import { bundleOutput } from './bundle-output';
 import { normalizeFsPath, hasError } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';
 
-export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Plugin => {
+export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, platform: string): Plugin => {
+  if (platform === 'worker') {
+    return {
+      name: 'workerPlugin',
+    };
+  }
+  const workersMap = new Map<string, WorkerMeta>();
+
   return {
     name: 'workerPlugin',
+
+    buildStart() {
+      workersMap.clear();
+    },
 
     resolveId(id) {
       if (id === WORKER_HELPER_ID) {
@@ -31,60 +42,23 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
         return null;
       }
 
+      // Canonical worker path
+      if (id.endsWith('?worker')) {
+        const workerEntryPath = normalizeFsPath(id);
+        const { referenceId, dependencies } = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
+        dependencies.forEach(id => this.addWatchFile(id));
+        return {
+          code: getWorkerMain(referenceId),
+          moduleSideEffects: false,
+        };
+      }
+
+      // Proxy worker path
       const workerEntryPath = getWorkerEntryPath(id);
       if (workerEntryPath != null) {
-        const exportWorker = id.includes('?worker');
-        const workerName = path.basename(workerEntryPath, '.ts');
-
-        // Rollup worker
-        const build = await bundleOutput(config, compilerCtx, buildCtx, {
-          platform: 'worker',
-          id: `worker-${workerName}`,
-          inputs: {
-            'index': workerEntryPath + '?worker-entry'
-          },
-          inlineDynamicImports: true,
-        });
-
-        // Generate commonjs output so we can intercept exports at runtme
-        const output = await build.generate({
-          format: 'commonjs',
-          intro: WORKER_INTRO,
-          esModule: false,
-          preferConst: true,
-          externalLiveBindings: false
-        });
-        const entryPoint = output.output[0];
-        if (entryPoint.imports.length > 0) {
-          this.error('Workers should not have any external imports: ' + JSON.stringify(entryPoint.imports));
-        }
-
-        // Optimize code
-        let code = entryPoint.code;
-        const results = await optimizeModule(config, compilerCtx, {
-          input: code,
-          sourceTarget: config.buildEs5 ? 'es5' : 'es2017',
-          isCore: false,
-          minify: config.minifyJs,
-          inlineHelpers: true
-        });
-        buildCtx.diagnostics.push(...results.diagnostics);
-        if (!hasError(results.diagnostics)) {
-          code = results.output;
-        }
-
-        // Put worker in an asset so new Worker() can reference it later
-        const referenceId = this.emitFile({
-          type: 'asset',
-          source: code,
-          name: workerName + '.js',
-        });
-
-        Object.keys(entryPoint.modules)
-          .filter(id => !/\0/.test(id) && id !== workerEntryPath)
-          .forEach(id => this.addWatchFile(id));
+        const worker = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
         return {
-          code: getWorkerMain(referenceId, workerName, entryPoint.exports, exportWorker),
+          code: getWorkerProxy(workerEntryPath, worker.exports),
           moduleSideEffects: false,
         };
       }
@@ -94,19 +68,85 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
 };
 
 const getWorkerEntryPath = (id: string) => {
-  if (!id.includes('?worker-entry') && WORKER_SUFFIX.some(p => id.endsWith(p))) {
+  if (WORKER_SUFFIX.some(p => id.endsWith(p))) {
     return normalizeFsPath(id);
   }
   return null;
 };
 
+interface WorkerMeta {
+  referenceId: string;
+  exports: string[];
+  dependencies: string[];
+}
+
+const getWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, ctx: PluginContext, workersMap: Map<string, WorkerMeta>, workerEntryPath: string): Promise<WorkerMeta> => {
+  let worker = workersMap.get(workerEntryPath);
+  if (!worker) {
+    worker = await buildWorker(config, compilerCtx, buildCtx, ctx, workerEntryPath);
+    workersMap.set(workerEntryPath, worker);
+  }
+  return worker;
+}
+
+const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, ctx: PluginContext, workerEntryPath: string) => {
+  const workerName = path.basename(workerEntryPath, '.ts');
+  const build = await bundleOutput(config, compilerCtx, buildCtx, {
+    platform: 'worker',
+    id: `worker-${workerName}`,
+    inputs: {
+      'index': workerEntryPath
+    },
+    inlineDynamicImports: true,
+  });
+
+  // Generate commonjs output so we can intercept exports at runtme
+  const output = await build.generate({
+    format: 'commonjs',
+    intro: WORKER_INTRO,
+    esModule: false,
+    preferConst: true,
+    externalLiveBindings: false
+  });
+  const entryPoint = output.output[0];
+  if (entryPoint.imports.length > 0) {
+    ctx.error('Workers should not have any external imports: ' + JSON.stringify(entryPoint.imports));
+  }
+
+  // Optimize code
+  let code = entryPoint.code;
+  const results = await optimizeModule(config, compilerCtx, {
+    input: code,
+    sourceTarget: config.buildEs5 ? 'es5' : 'es2017',
+    isCore: false,
+    minify: config.minifyJs,
+    inlineHelpers: true
+  });
+  buildCtx.diagnostics.push(...results.diagnostics);
+  if (!hasError(results.diagnostics)) {
+    code = results.output;
+  }
+
+  // Put worker in an asset so new Worker() can reference it later
+  const referenceId = ctx.emitFile({
+    type: 'asset',
+    source: code,
+    name: workerName + '.js',
+  });
+
+  return {
+    referenceId,
+    exports: entryPoint.exports,
+    dependencies: Object.keys(entryPoint.modules)
+      .filter(id => !/\0/.test(id) && id !== workerEntryPath)
+  };
+}
+
 const WORKER_SUFFIX = [
-  '?worker',
-  '.worker',
+  '.worker.ts',
+  '.worker.tsx',
   '.worker/index.ts',
   '.worker/index.tsx',
-  '.worker/index.js',
-  '.worker/index.mjs',
 ];
 
 const WORKER_HELPER_ID = '@worker-helper';
@@ -220,11 +260,20 @@ export const createProxy = (worker, exportedMethod) => (
 );
 `;
 
-
-const getWorkerMain = (referenceId: string, workerName: string, exportedMethods: string[], exportWorker: boolean) => {
+const getWorkerMain = (referenceId: string) => {
   return `
-import { createProxy, createWorker } from '${WORKER_HELPER_ID}';
-${exportWorker ? 'export ' : ''}const worker = createWorker(import.meta.ROLLUP_FILE_URL_${referenceId}, {name: "${workerName}"});
+import { createWorker } from '${WORKER_HELPER_ID}';
+export const workerPath = import.meta.ROLLUP_FILE_URL_${referenceId};
+export const worker = /*@__PURE__*/createWorker(workerPath);
+`;
+};
+
+
+
+const getWorkerProxy = (workerEntryPath: string, exportedMethods: string[]) => {
+  return `
+import { createProxy } from '${WORKER_HELPER_ID}';
+import { worker } from '${workerEntryPath}?worker';
 ${exportedMethods.map(exportedMethod => {
   return `export const ${exportedMethod} = /*@__PURE__*/createProxy(worker, '${exportedMethod}');`;
 }).join('\n')}

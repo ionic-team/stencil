@@ -59,7 +59,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       imagePlugin(config, compilerCtx, buildCtx),
       textPlugin(),
       extTransformsPlugin(config, compilerCtx, buildCtx),
-      workerPlugin(config, compilerCtx, buildCtx),
+      workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform),
       ...config.rollupPlugins,
       rollupNodeResolvePlugin({
         mainFields: ['browser', 'collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],

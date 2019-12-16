@@ -68,7 +68,7 @@ export const compile = async (code: string, opts: CompileOptions = {}) => {
         tagName: opts.data.tag,
         encapsulation: opts.data.encapsulation,
         modeName: opts.data.mode,
-        sourceMap: false,
+        sourceMap: config.sourceMap,
         commentOriginalSelector: false,
         minify: false,
         autoprefixer: false,
