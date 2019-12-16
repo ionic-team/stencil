@@ -9,6 +9,20 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
   return {
     name: 'workerPlugin',
 
+    resolveId(id) {
+      if (id === WORKER_HELPER_ID) {
+        return id;
+      }
+      return null;
+    },
+
+    load(id) {
+      if (id === WORKER_HELPER_ID) {
+        return WORKER_HELPERS;
+      }
+      return null;
+    },
+
     async transform(_, id) {
       if (/\0/.test(id)) {
         return null;
@@ -59,13 +73,15 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
   };
 };
 
+const WORKER_HELPER_ID = '@worker-helper';
+
 const WORKER_INTRO = `
 const exports = {};
 addEventListener('message', async ({data}) => {
-  let id = data[0];
-  let method = data[1];
-  if (id.startsWith('stncl-') && method) {
-    let args = data[2];
+  if (data[0] === 'stencil') {
+    let id = data[1];
+    let method = data[2];
+    let args = data[3];
     let value;
     let err;
     try {
@@ -77,48 +93,52 @@ addEventListener('message', async ({data}) => {
       };
     }
     postMessage(
-      [id, value, err],
+      ['stencil', id, value, err],
       value instanceof ArrayBuffer ? [value] : []
     );
   }
 });
 `
 
-const getWorkerMain = (referenceId: string, workerName: string, exportedMethod: string[]) => {
-  return `
-export const worker = new Worker(import.meta.ROLLUP_FILE_URL_${referenceId}, {name: "${workerName}"});
-const methods = /*@__PURE__*/(() => {
+export const WORKER_HELPERS = `
+export const createProxy = (worker, exportedMethod) => {
   let id = 0;
   const pending = new Map();
   const proxy = {};
   worker.addEventListener('message', ({data}) => {
-    const id = data[0];
-    if (id.startsWith('stncl-')) {
+    if (data[0] === 'stencil') {
+      const id = data[1];
       const [resolve, reject] = pending.get(id);
       pending.delete(id);
-      if (data[2]) {
-        reject(data[2]);
+      if (data[3]) {
+        reject(data[3]);
       } else {
-        resolve(data[1]);
+        resolve(data[2]);
       }
     }
   });
-  ${JSON.stringify(exportedMethod)}.forEach(method => {
+  exportedMethod.forEach(method => {
     proxy[method] = (...args) => {
       return new Promise((resolve, reject) => {
-        const key = 'stncl-' + id++;
+        const key = id++;
         pending.set(key, [resolve, reject]);
         return worker.postMessage(
-          [key, method, args],
+          ['stencil', key, method, args],
           args.filter(a => a instanceof ArrayBuffer)
         );
       });
     };
   });
   return proxy;
-})();
+};
+`;
 
-export default methods;
 
-`
-}
+const getWorkerMain = (referenceId: string, workerName: string, exportedMethod: string[]) => {
+  return `
+import {createProxy} from '${WORKER_HELPER_ID}';
+export const worker = new Worker(import.meta.ROLLUP_FILE_URL_${referenceId}, {name: "${workerName}"});
+const methods = /*@__PURE__*/createProxy(worker, ${JSON.stringify(exportedMethod)});
+export default methods;`;
+};
+
