@@ -2,7 +2,8 @@ import * as d from '../../declarations';
 import { Plugin } from 'rollup';
 import path from 'path';
 import { bundleApp } from './bundle-output';
-import { normalizeFsPath } from '@utils';
+import { normalizeFsPath, hasError } from '@utils';
+import { optimizeModule } from '../optimize/optimize-module';
 
 export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Plugin => {
   return {
@@ -26,14 +27,30 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
         const output = await build.generate({
           format: 'commonjs',
           intro: WORKER_INTRO,
+          esModule: false,
+          preferConst: true,
+          externalLiveBindings: false
         });
         const entryPoint = output.output[0];
         if (entryPoint.imports.length > 0) {
           this.error('Workers should not have any external imports: ' + JSON.stringify(entryPoint.imports));
         }
+        let code = entryPoint.code;
+        if (config.minifyJs) {
+          const results = await optimizeModule(config, compilerCtx, {
+            input: code,
+            sourceTarget: 'es2017',
+            isCore: false,
+            minify: true,
+          });
+          buildCtx.diagnostics.push(...results.diagnostics);
+          if (!hasError(results.diagnostics)) {
+            code = results.output;
+          }
+        }
         const referenceId = this.emitFile({
           type: 'asset',
-          source: entryPoint.code,
+          source: code,
           name: workerName + '.worker.js'
         });
         return getWorkerMain(referenceId, workerName, entryPoint.exports);
