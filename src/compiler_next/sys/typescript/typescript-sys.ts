@@ -76,13 +76,11 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
   };
 
   const visitDirectory = (matchingPaths: Set<string>, p: string, extensions: ReadonlyArray<string>, depth: number) => {
-    if (depth !== undefined) {
-      depth--;
-      if (depth === 0) {
-        return;
-      }
+    if (depth < 0) {
+      return;
     }
     const dirItems = stencilSys.readdirSync(p);
+    depth--;
 
     dirItems.forEach(dirItem => {
       if (!skipFile(dirItem)) {
@@ -102,7 +100,7 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
     });
   };
 
-  tsSys.readDirectory = (p, extensions, _exclude, _include, depth) => {
+  tsSys.readDirectory = (p, extensions, _exclude, _include, depth = 0) => {
     // if (skipDirectories(p)) {
     //   return [];
     // }
