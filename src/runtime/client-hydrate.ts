@@ -235,6 +235,11 @@ const clientHydrate = (
 
 
 export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: Map<string, any>) => {
+  // Make sure the below code isn’t executed in IE11 or Edge
+  // as it’d break prerendered content’s client-side hydration
+  if (!document.documentElement.attachShadow) {
+    return
+  }
   if (node.nodeType === NODE_TYPE.ElementNode) {
     let i = 0;
     for (; i < node.childNodes.length; i++) {
