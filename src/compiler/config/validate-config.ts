@@ -108,6 +108,7 @@ export function validateConfig(config: d.Config): { config: d.Config, diagnostic
 
   setBooleanConfig(config, 'generateDocs', 'docs', false);
   setBooleanConfig(config, 'enableCache', 'cache', true);
+  setBooleanConfig(config, 'allowInlineScripts', null, true);
 
   if (!Array.isArray(config.includeSrc)) {
     config.includeSrc = DEFAULT_INCLUDES.map(include => {

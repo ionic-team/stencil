@@ -6,6 +6,11 @@ export * from './stencil-public-docs';
  */
 export interface StencilConfig {
   /**
+   * By default, Stencil will attempt to optimize small scripts by inlining them in HTML. Setting 
+   * this flag to `false` will prevent this optimization and keep all scripts separate from HTML.
+   */
+  allowInlineScripts?: boolean;
+  /**
    * By default, Stencil will use the appropriate config to automatically prefix css. For example,
    * developers can write modern and standard css properties, such as "transform", and Stencil
    * will automatically add in the prefixed version, such as "-webkit-transform". To disable
