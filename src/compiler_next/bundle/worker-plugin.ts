@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
 import { Plugin, TransformResult, PluginContext } from 'rollup';
-import path from 'path';
 import { bundleOutput } from './bundle-output';
 import { normalizeFsPath, hasError } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';
+
 
 export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, platform: string): Plugin => {
   if (platform === 'worker') {
@@ -45,10 +45,11 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
       // Canonical worker path
       if (id.endsWith('?worker')) {
         const workerEntryPath = normalizeFsPath(id);
+        const workerName = getWorkerName(workerEntryPath);
         const { referenceId, dependencies } = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
         dependencies.forEach(id => this.addWatchFile(id));
         return {
-          code: getWorkerMain(referenceId),
+          code: getWorkerMain(referenceId, workerName),
           moduleSideEffects: false,
         };
       }
@@ -89,13 +90,19 @@ const getWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
   return worker;
 }
 
+const getWorkerName = (id: string) => {
+  const parts = id.split('/').filter(i => !i.includes('index'));
+  id = parts[parts.length - 1];
+  return id.replace('.tsx', '').replace('.ts', '');
+};
+
 const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, ctx: PluginContext, workerEntryPath: string) => {
-  const workerName = path.basename(workerEntryPath, '.ts');
+  const workerName = getWorkerName(workerEntryPath);
   const build = await bundleOutput(config, compilerCtx, buildCtx, {
     platform: 'worker',
-    id: `worker-${workerName}`,
+    id: workerName,
     inputs: {
-      'index': workerEntryPath
+      [workerName]: workerEntryPath
     },
     inlineDynamicImports: true,
   });
@@ -260,11 +267,11 @@ export const createProxy = (worker, exportedMethod) => (
 );
 `;
 
-const getWorkerMain = (referenceId: string) => {
+const getWorkerMain = (referenceId: string, workerName: string) => {
   return `
 import { createWorker } from '${WORKER_HELPER_ID}';
 export const workerPath = import.meta.ROLLUP_FILE_URL_${referenceId};
-export const worker = /*@__PURE__*/createWorker(workerPath);
+export const worker = /*@__PURE__*/createWorker(workerPath,{name:'${workerName}'});
 `;
 };
 
