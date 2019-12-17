@@ -43,7 +43,7 @@ h2 {
     <li>Please see the example below or our <a href="https://stenciljs.com/docs/stencil-config" target="_blank" rel="noopener noreferrer">config docs</a> if you would like to develop on a browser that does not fully support ES2017 and custom elements.</li>
     <li>Note that by default, ES5 builds and polyfills are enabled during production builds.</li>
     <li>When testing browsers it is recommended to always test in production mode, and ES5 builds should always be enabled during production builds.</li>
-    <li><em>This is only an experiement and if it slows down app development then we will revert this and enable ES5 builds during dev.</em></li>
+    <li><em>This is only an experiment and if it slows down app development then we will revert this and enable ES5 builds during dev.</em></li>
   </ul>
 
 
