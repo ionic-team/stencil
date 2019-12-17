@@ -1,8 +1,19 @@
-# ⚽️ [1.9.0-3](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.9.0-3) (2019-12-13)
+# 📺 [1.9.0-4](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.9.0-4) (2019-12-17)
 
 
 ### Bug Fixes
 
+* **compiler:** add unused watch error ([f9c8078](https://github.com/ionic-team/stencil/commit/f9c80785f348f1d77fadad77cb0ad12200cc88d3))
+* **compiler:** do not force disable incremental build ([f5a5daf](https://github.com/ionic-team/stencil/commit/f5a5dafc4fa984a9a6367b2ae33372fcb78ae77b))
+* **compiler:** include dependency globals ([8de1667](https://github.com/ionic-team/stencil/commit/8de1667ece0fb3ac86ab9119ef24f1a7a4889c89))
+* **compiler:** move worker file to the root ([71adb25](https://github.com/ionic-team/stencil/commit/71adb255f3800202b4282f4cb6d6c4aee481f9fb))
+* **compiler:** unused variables becomes a warning in dev mode ([d55ade5](https://github.com/ionic-team/stencil/commit/d55ade5f6c42f291859695b59b34dc1b6b1cff74))
+* **next:** validate tsconfig w/ ts parse config api ([10a6471](https://github.com/ionic-team/stencil/commit/10a6471367853b4b5872ef63ab4bc9ef34da5fcc))
+* **runtime:** safari 10.0 does not implement the performance api [#2081](https://github.com/ionic-team/stencil/issues/2081) ([117e9a9](https://github.com/ionic-team/stencil/commit/117e9a9c0d560691eb9731c065fe5135e0eca7e3))
+* **worker:** make them strongly typed and allow to pass callbacks ([89d5f40](https://github.com/ionic-team/stencil/commit/89d5f409ee106088d0bb3e8a1fe607210a8c534c))
+* **worker:** minify worker in production ([3716040](https://github.com/ionic-team/stencil/commit/37160404c9a1d59fbcaeccef51a51478466463c6))
+* **worker:** move main thread into a virtual module ([606fdbf](https://github.com/ionic-team/stencil/commit/606fdbf9931a6a2dd278c58b73d55ca95c441c92))
+* **worker:** use event listeners and stencil prefix ([8b37fc5](https://github.com/ionic-team/stencil/commit/8b37fc51c8881438968e3d5711d10495d485b25b))
 * **compiler:** don't inline scripts with crossorigin ([9cdcb28](https://github.com/ionic-team/stencil/commit/9cdcb28451a31a17074a7281798a84fdc384c103))
 * **config:** add warning for stencil.config.ts in tsconfig ([b93b32b](https://github.com/ionic-team/stencil/commit/b93b32ba02d1ea6a5e04a5e07da063fea592c833))
 * **next:** do not overide rootDir ([f1be974](https://github.com/ionic-team/stencil/commit/f1be974f5e4a8d8c075877a2f0443a420e06df02))
@@ -36,6 +47,8 @@
 
 ### Features
 
+* **build:** web workers esm ([67a7fc2](https://github.com/ionic-team/stencil/commit/67a7fc2ea969f6b33dd4662c912f5218f6729a48))
+* **compiler:** add config flag for preventing script inlining ([#2077](https://github.com/ionic-team/stencil/issues/2077)) ([f85cf42](https://github.com/ionic-team/stencil/commit/f85cf423fd4f3d3521da6c89839f450f3c4756cc))
 * **compiler:** add Build.isTesting ([eac90bd](https://github.com/ionic-team/stencil/commit/eac90bd151a993b2387aa0bf7583d3e696a0e98f))
 * **compiler:** custom-elements-bundle ([228e382](https://github.com/ionic-team/stencil/commit/228e38201390327dbb4198cfb0e53d6218415068))
 * **custom:** add copy tasks to custom outputTargets ([#2023](https://github.com/ionic-team/stencil/issues/2023)) ([65aeb8c](https://github.com/ionic-team/stencil/commit/65aeb8c4a818b200695946073b71f63bf4aa3634))
