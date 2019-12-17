@@ -6,7 +6,7 @@ import { HOST_FLAGS } from '@utils';
 let i = 0;
 
 export const createTime = (fnName: string, tagName = '') => {
-  if (BUILD.profile) {
+  if (BUILD.profile && performance.mark) {
     const key = `st:${fnName}:${tagName}:${i++}`;
     // Start
     performance.mark(key);
@@ -19,7 +19,7 @@ export const createTime = (fnName: string, tagName = '') => {
 };
 
 export const uniqueTime = (key: string, measureText: string) => {
-  if (BUILD.profile) {
+  if (BUILD.profile && performance.mark) {
     if (performance.getEntriesByName(key).length === 0) {
       performance.mark(key);
     }
