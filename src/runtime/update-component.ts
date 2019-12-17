@@ -279,7 +279,7 @@ export const appDidLoad = (who: string) => {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
   emitLifecycleEvent(doc, 'appload');
-  if (BUILD.profile) {
+  if (BUILD.profile && performance.measure) {
     performance.measure(`[Stencil] ${NAMESPACE} initial load (by ${who})`, 'st:app:start');
   }
 };

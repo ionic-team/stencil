@@ -13,7 +13,7 @@ import { createTime, installDevTools } from './profile';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
-  if (BUILD.profile) {
+  if (BUILD.profile && performance.mark) {
     performance.mark('st:app:start');
   }
   installDevTools();
