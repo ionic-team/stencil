@@ -47,7 +47,7 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
 
   const createWebWorkerMain = () => {
     const worker = new Worker(workerUrl, {
-      name: `stencil-worker-${workerIds++}`
+      name: `stencil.worker.${workerIds++}`
     });
     const workerChild: WorkerChild = {
       worker,
