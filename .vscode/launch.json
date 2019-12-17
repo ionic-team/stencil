@@ -130,40 +130,6 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "REPL start",
-      "args": [
-        "${workspaceFolder}/bin/stencil",
-        "build",
-        "--watch",
-        "--next",
-        "--dev",
-        "--serve",
-        "--watch",
-        "--config",
-        "${workspaceFolder}/test/repl/stencil.config.ts"
-      ],
-      "protocol": "inspector"
-    },
-
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Repl",
-      "args": [
-        "${workspaceFolder}/bin/stencil",
-        "build",
-        "--serve",
-        "--watch",
-        "--debug",
-        "--dev",
-        "--config",
-        "${workspaceFolder}/test/repl/stencil.config.ts"
-      ],
-      "protocol": "inspector"
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "Hello VDom Watch",
       "args": [
         "${workspaceFolder}/bin/stencil",
