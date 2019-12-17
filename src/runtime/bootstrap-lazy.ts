@@ -129,15 +129,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         componentOnReady() {
           return getHostRef(this).$onReadyPromise$;
         }
-
-        cloneNode(deep?: boolean): any {
-          const isShadowDom = BUILD.shadowDom ? this.shadowRoot && supportsShadowDom : false;
-          const clonedHost = super.cloneNode(isShadowDom ? deep : false) as Element;
-          if (BUILD.slot && !isShadowDom && deep) {
-            cloneChildren(this, clonedHost);
-          }
-          return clonedHost;
-        }
       };
       cmpMeta.$lazyBundleIds$ = lazyBundle[0];
 
@@ -164,17 +155,4 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   }
   // Fallback appLoad event
   endBootstrap();
-};
-
-const cloneChildren = (originalElm: Element, clonedElm: Element) => {
-  let nodes = originalElm.childNodes;
-  let i = 0;
-  let slotted;
-  for (; i < nodes.length; i++) {
-    slotted = (nodes[i] as any)['s-nr'];
-    if (slotted) {
-      clonedElm.append(slotted.cloneNode(true));
-    }
-  }
-  return clonedElm;
 };
