@@ -99,10 +99,8 @@ const validateTsConfig = async (config: d.Config, diagnostics: d.Diagnostic[]) =
   }
 };
 
-const hasSrcDirectoryInclude = (includeProp: string[]) => {
-  return includeProp && includeProp.includes('src');
-};
+const hasSrcDirectoryInclude = (includeProp: string[]) =>
+  Array.isArray(includeProp) && includeProp.length > 0;
 
-const hasStencilConfigInclude = (includeProp: string[]) => {
-  return includeProp && includeProp.includes('stencil.config.ts');
-};
+const hasStencilConfigInclude = (includeProp: string[]) =>
+  Array.isArray(includeProp) && includeProp.includes('stencil.config.ts');

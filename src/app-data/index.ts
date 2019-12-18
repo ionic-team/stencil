@@ -58,7 +58,8 @@ export const BUILD: BuildConditionals = /* default */ {
   lifecycleDOMEvents: false,
   lazyLoad: false,
   profile: false,
-  slotRelocation: true
+  slotRelocation: true,
+  cloneNodeFix: false,
 };
 
 export const globalScripts = /* default */ () => {/**/};

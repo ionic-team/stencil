@@ -56,6 +56,7 @@ const getBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => {
   build.constructableCSS = false;
   build.asyncLoading = true;
   build.cssAnnotations = true;
+  build.cloneNodeFix = false;
 
   return build;
 };

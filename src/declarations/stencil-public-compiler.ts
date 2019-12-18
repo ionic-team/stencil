@@ -6,7 +6,7 @@ export * from './stencil-public-docs';
  */
 export interface StencilConfig {
   /**
-   * By default, Stencil will attempt to optimize small scripts by inlining them in HTML. Setting 
+   * By default, Stencil will attempt to optimize small scripts by inlining them in HTML. Setting
    * this flag to `false` will prevent this optimization and keep all scripts separate from HTML.
    */
   allowInlineScripts?: boolean;
@@ -200,6 +200,12 @@ export interface StencilConfig {
   excludeUnusedDependencies?: boolean;
 
   stencilCoreResolvedId?: string;
+  extras?: ConfigExtras;
+}
+
+export interface ConfigExtras {
+  cloneNodeFix?: boolean;
+  lifecycleDOMEvents?: boolean;
 }
 
 export interface Config extends StencilConfig {
@@ -219,7 +225,6 @@ export interface Config extends StencilConfig {
   profile?: boolean;
   _isValidated?: boolean;
   _isTesting?: boolean;
-  _lifecycleDOMEvents?: boolean;
 }
 
 export interface StencilDevServerConfig {

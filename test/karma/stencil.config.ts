@@ -2,10 +2,11 @@ import { sass } from '@stencil/sass';
 import { less } from '@stencil/less';
 import { stylus } from '@stencil/stylus';
 import { postcss } from '@stencil/postcss';
+import { Config } from '../../dist/declarations';
 
 import nodePolyfills from 'rollup-plugin-node-polyfills';
 
-export const config = {
+export const config: Config = {
   namespace: 'TestApp',
   srcDir: 'test-app',
   tsconfig: 'tsconfig-stencil.json',
@@ -32,7 +33,10 @@ export const config = {
     postcss(),
     stylus()
   ],
-  _lifecycleDOMEvents: true,
+  extras: {
+    cloneNodeFix: true,
+    lifecycleDOMEvents: true,
+  },
   devServer: {
     historyApiFallback: {
       disableDotRule: true,

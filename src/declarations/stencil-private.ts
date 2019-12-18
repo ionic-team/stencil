@@ -193,6 +193,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   cssVarShim?: boolean;
   constructableCSS?: boolean;
   initializeNextTick?: boolean;
+  cloneNodeFix?: boolean;
 }
 
 export type ModuleFormat =

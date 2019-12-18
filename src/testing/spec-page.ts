@@ -108,6 +108,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
     bc.BUILD.hydrateServerSide = true;
     bc.BUILD.hydrateClientSide = false;
   }
+  bc.BUILD.cloneNodeFix = false;
 
   (page as any).flush = () => {
     console.warn(`DEPRECATED: page.flush(), please use page.waitForChanges() instead`);

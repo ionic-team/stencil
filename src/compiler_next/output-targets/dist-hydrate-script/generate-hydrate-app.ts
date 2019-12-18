@@ -126,6 +126,7 @@ const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[])
   build.lifecycleDOMEvents = false;
   build.devTools = false;
   build.hotModuleReplacement = false;
+  build.cloneNodeFix = false;
 
   return build;
 };
