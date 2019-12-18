@@ -35,6 +35,7 @@ export function validateConfig(config: d.Config): { config: d.Config, diagnostic
   }
 
   config.flags = config.flags || {};
+  config.extras = config.extras || {};
 
   setBooleanConfig(config, 'writeLog', 'log', false);
   setBooleanConfig(config, 'buildAppCore', null, true);
