@@ -1,8 +1,7 @@
 export function applyPolyfills() {
+  var promises = [];
   if (typeof window !== 'undefined') {
     var win = window;
-
-    var promises = [];
 
     if (!win.customElements || (win.Element && (!win.Element.prototype.closest || !win.Element.prototype.matches || !win.Element.prototype.remove))) {
       promises.push(import('./dom.js'));
@@ -29,7 +28,6 @@ export function applyPolyfills() {
     ) {
       promises.push(import('./core-js.js'));
     }
-    return Promise.all(promises);
   }
-  return Promise.resolve();
+  return Promise.all(promises);
 }
