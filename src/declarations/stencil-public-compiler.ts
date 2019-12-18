@@ -1380,7 +1380,6 @@ export interface StencilSystem {
   resolveModule?(fromDir: string, moduleId: string, opts?: ResolveModuleOptions): string;
   rollup?: RollupInterface;
   scopeCss?: (cssText: string, scopeId: string, commentOriginalSelector: boolean) => Promise<string>;
-  semver?: Semver;
   serializeNodeToHtml?(elm: Element | Document): string;
   storage?: Storage;
   transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<any>;
@@ -1396,15 +1395,6 @@ export interface WorkerOptions {
   maxConcurrentWorkers?: number;
   maxConcurrentTasksPerWorker?: number;
   logger?: Logger;
-}
-
-export interface Semver {
-  lt(v1: string, v2: string): boolean;
-  lte(v1: string, v2: string): boolean;
-  gt(v1: string, v2: string): boolean;
-  gte(v1: string, v2: string): boolean;
-  prerelease(v: string): readonly string[] | null;
-  satisfies(version: string, range: string): boolean;
 }
 
 export interface RollupInterface {
