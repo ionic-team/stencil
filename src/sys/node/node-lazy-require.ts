@@ -8,8 +8,10 @@ import { SpawnOptions, spawn } from 'child_process';
 export class NodeLazyRequire implements d.LazyRequire {
   private moduleData = new Map<string, { fromDir: string, modulePath: string }>();
 
-  constructor(private semver: d.Semver, private nodeResolveModule: NodeResolveModule, private stencilPackageJson: d.PackageJsonData) {
-  }
+  constructor(
+    private semver: d.Semver,
+    private nodeResolveModule: NodeResolveModule, private stencilPackageJson: d.PackageJsonData
+  ) {}
 
   async ensure(logger: d.Logger, fromDir: string, ensureModuleIds: string[]) {
     if (!this.stencilPackageJson || !this.stencilPackageJson.lazyDependencies) {

@@ -12,8 +12,20 @@ import { NodeRollup } from './node-rollup';
 import { NodeStorage } from './node-storage';
 import { normalizePath } from '@utils';
 import open from 'open';
-import semver from 'semver';
 import { WorkerManager } from './worker/index';
+
+// @ts-ignore
+import semver_lt from 'semver/functions/lt';
+// @ts-ignore
+import semver_lte from 'semver/functions/lte';
+// @ts-ignore
+import semver_gt from 'semver/functions/gt';
+// @ts-ignore
+import semver_gte from 'semver/functions/gte';
+// @ts-ignore
+import semver_prerelease from 'semver/functions/prerelease';
+// @ts-ignore
+import semver_satisfies from 'semver/functions/satisfies';
 
 import { createHash } from 'crypto';
 import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
@@ -36,12 +48,12 @@ export class NodeSystem implements d.StencilSystem {
   path: d.Path;
 
   semver: d.Semver = {
-    lt: semver.lt,
-    lte: semver.lte,
-    gt: semver.gt,
-    gte: semver.gte,
-    prerelease: semver.prerelease,
-    satisfies: semver.satisfies
+    lt: semver_lt,
+    lte: semver_lte,
+    gt: semver_gt,
+    gte: semver_gte,
+    prerelease: semver_prerelease,
+    satisfies: semver_satisfies
   };
 
   constructor(fs?: d.FileSystem) {
