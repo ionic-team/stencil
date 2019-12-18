@@ -1,10 +1,13 @@
 import * as d from '../../declarations';
 import { getBuildTimestamp } from '../../compiler/build/build-ctx';
-import { hasError, isString, normalizeDiagnostics } from '@utils';
+import { hasError, isString, normalizeDiagnostics, fromEntries } from '@utils';
 import { generateHmr } from './build-hmr';
 
 
 export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+  const componentGraph = buildCtx.componentGraph
+    ? fromEntries(buildCtx.componentGraph.entries())
+    : undefined;
   const buildResults: d.CompilerBuildResults = {
     buildId: buildCtx.buildId,
     diagnostics: normalizeDiagnostics(compilerCtx, buildCtx.diagnostics),
@@ -20,6 +23,7 @@ export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCt
     isRebuild: buildCtx.isRebuild,
     outputs: compilerCtx.fs.getBuildOutputs(),
     timestamp: getBuildTimestamp(),
+    componentGraph
   };
 
   const hmr = generateHmr(config, compilerCtx, buildCtx);

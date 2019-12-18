@@ -535,7 +535,7 @@ export interface BuildNoChangeResults {
 
 export interface CompilerBuildResults {
   buildId: number;
-  componentGraph?: Map<string, string[]>;
+  componentGraph?: {[scopeid: string]: string[]};
   diagnostics: Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];

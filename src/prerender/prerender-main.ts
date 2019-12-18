@@ -210,10 +210,11 @@ function createComponentGraphPath(config: d.Config, buildResults: d.CompilerBuil
 }
 
 
-function getComponentPathContent(config: d.Config, componentGraph: Map<string, string[]>, outputTarget: d.OutputTargetWww) {
+function getComponentPathContent(config: d.Config, componentGraph: {[scopeId: string]: string[]}, outputTarget: d.OutputTargetWww) {
   const buildDir = getAbsoluteBuildDir(config, outputTarget);
   const object: {[key: string]: string[]} = {};
-  for (const [key, chunks] of componentGraph.entries()) {
+  const entries = Object.entries(componentGraph);
+  for (const [key, chunks] of entries) {
     object[key] = chunks.map(filename => path.join(buildDir, filename));
   }
   return JSON.stringify(object);
