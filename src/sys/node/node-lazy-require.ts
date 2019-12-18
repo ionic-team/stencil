@@ -39,7 +39,7 @@ export class NodeLazyRequire implements d.LazyRequire {
 
         isUpdate = true;
 
-        if (semiver(installedPkgJson.version, requiredVersionRange) === -1) {
+        if (semiver(installedPkgJson.version, requiredVersionRange) >= 0) {
           this.moduleData.set(ensureModuleId, {
             fromDir: fromDir,
             modulePath: dirname(resolvedPkgJsonPath)
