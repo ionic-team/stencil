@@ -33,6 +33,7 @@ export function mockConfig() {
     sys,
     testing: null,
     validateTypes: false,
+    extras: {},
     nodeResolve: {
       customResolveOptions: {},
     },
