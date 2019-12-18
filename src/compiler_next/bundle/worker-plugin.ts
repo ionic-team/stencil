@@ -6,7 +6,7 @@ import { optimizeModule } from '../optimize/optimize-module';
 
 
 export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, platform: string): Plugin => {
-  if (platform === 'worker') {
+  if (platform === 'worker' || platform === 'hydrate') {
     return {
       name: 'workerPlugin',
     };
@@ -110,7 +110,7 @@ const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCt
   // Generate commonjs output so we can intercept exports at runtme
   const output = await build.generate({
     format: 'commonjs',
-    intro: getWorkerIntro(workerName),
+    intro: getWorkerIntro(workerName, config.devMode),
     esModule: false,
     preferConst: true,
     externalLiveBindings: false
@@ -158,7 +158,7 @@ const WORKER_SUFFIX = [
 
 const WORKER_HELPER_ID = '@worker-helper';
 
-const getWorkerIntro = (workerName: string) => `
+const getWorkerIntro = (workerName: string, isDev: boolean) => `
 const exports = {};
 const workerMsgId = 'stencil.${workerName}';
 const workerMsgCallbackId = workerMsgId + '.cb';
@@ -184,8 +184,14 @@ addEventListener('message', async ({data}) => {
           };
         }
       }
-
-      value = await exports[method](...args);
+      ${isDev ? `
+      value = exports[method](...args);
+      if (!value.then) {
+        throw new Error('The exported method "' + method + '" does not return a Promise, make sure it's an "async" function');
+      }
+      value = await value;
+      ` : `
+      value = await exports[method](...args);` }
 
     } catch (e) {
       err = {
@@ -226,9 +232,7 @@ export const createWorker = (workerPath, workerName, workerMsgId) => {
           reject(err);
         } else {
           if (callbackIds) {
-            for (let i = 0, l = callbackIds.length; i < l; i++) {
-              callbacks.delete(callbackIds[i]);
-            }
+            callbackIds.forEach(id => callbacks.delete(id));
           }
           resolve(value);
         }
