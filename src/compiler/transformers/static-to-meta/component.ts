@@ -6,7 +6,7 @@ import { parseStaticListeners } from './listeners';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
 import { parseClassMethods } from './class-methods';
 import { parseStaticElementRef } from './element-ref';
-import { parseStaticEncapsulation } from './encapsulation';
+import { parseStaticEncapsulation, parseStaticShadowDelegatesFocus } from './encapsulation';
 import { parseStaticEvents } from './events';
 import { getComponentTagName, getStaticValue, isInternal, isStaticGetter, serializeSymbol } from '../transform-utils';
 import { parseStaticProps } from './props';
@@ -40,6 +40,7 @@ export const parseStaticComponentMeta = (
   const symbol = typeChecker ? typeChecker.getSymbolAtLocation(cmpNode.name) : undefined;
   const docs = serializeSymbol(typeChecker, symbol);
   const isCollectionDependency = moduleFile.isCollectionDependency;
+  const encapsulation = parseStaticEncapsulation(staticMembers);
 
   const cmp: d.ComponentCompilerMeta = {
     isLegacy: false,
@@ -48,7 +49,8 @@ export const parseStaticComponentMeta = (
     isCollectionDependency,
     componentClassName: (cmpNode.name ? cmpNode.name.text : ''),
     elementRef: parseStaticElementRef(staticMembers),
-    encapsulation: parseStaticEncapsulation(staticMembers),
+    encapsulation,
+    shadowDelegatesFocus: parseStaticShadowDelegatesFocus(encapsulation, staticMembers),
     properties: parseStaticProps(staticMembers),
     virtualProperties: parseVirtualProps(docs),
     states: parseStaticStates(staticMembers),

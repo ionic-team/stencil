@@ -21,6 +21,12 @@ export const componentDecoratorToStatic = (config: d.Config, typeChecker: ts.Typ
   if (componentOptions.shadow) {
     newMembers.push(createStaticGetter('encapsulation', convertValueToLiteral('shadow')));
 
+    if (typeof componentOptions.shadow !== 'boolean') {
+      if (componentOptions.shadow.delegatesFocus === true) {
+        newMembers.push(createStaticGetter('delegatesFocus', convertValueToLiteral(true)));
+      }
+    }
+
   } else if (componentOptions.scoped) {
     newMembers.push(createStaticGetter('encapsulation', convertValueToLiteral('scoped')));
   }

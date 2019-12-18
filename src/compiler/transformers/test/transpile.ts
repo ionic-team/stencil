@@ -83,7 +83,7 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
     outputText = outputText.replace(/  /g, ' ');
   }
 
-  const moduleFile = compilerCtx.moduleMap.values().next().value;
+  const moduleFile: d.Module = compilerCtx.moduleMap.values().next().value;
   const cmps = moduleFile ? moduleFile.cmps : null;
   const cmp = Array.isArray(cmps) && cmps.length > 0 ? cmps[0] : null;
   const tagName = cmp ? cmp.tagName : null;

@@ -6,6 +6,8 @@ export * from '../../app-data';
 
 export function getBuildFeatures(cmps: ComponentCompilerMeta[]) {
   const slot = cmps.some(c => c.htmlTagNames.includes('slot'));
+  const shadowDom = cmps.some(c => c.encapsulation === 'shadow');
+
   const f: BuildFeatures = {
     allRenderFn: cmps.every(c => c.hasRenderFn),
     cmpDidLoad: cmps.some(c => c.hasComponentDidLoadFn),
@@ -42,7 +44,8 @@ export function getBuildFeatures(cmps: ComponentCompilerMeta[]) {
     propMutable: cmps.some(c => c.hasPropMutable),
     reflect: cmps.some(c => c.hasReflect),
     scoped: cmps.some(c => c.encapsulation === 'scoped'),
-    shadowDom: cmps.some(c => c.encapsulation === 'shadow'),
+    shadowDom,
+    shadowDelegatesFocus: shadowDom && cmps.some(c => c.shadowDelegatesFocus),
     slot,
     slotRelocation: slot, // TODO: cmps.some(c => c.htmlTagNames.includes('slot') && c.encapsulation !== 'shadow'),
     state: cmps.some(c => c.hasState),

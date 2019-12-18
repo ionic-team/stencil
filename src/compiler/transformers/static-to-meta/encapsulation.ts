@@ -14,3 +14,12 @@ export const parseStaticEncapsulation = (staticMembers: ts.ClassElement[]) => {
 
   return 'none';
 };
+
+
+export const parseStaticShadowDelegatesFocus = (encapsulation: string, staticMembers: ts.ClassElement[]) => {
+  if (encapsulation === 'shadow') {
+    const delegatesFocus: boolean = getStaticValue(staticMembers, 'delegatesFocus');
+    return !!delegatesFocus;
+  }
+  return null;
+};

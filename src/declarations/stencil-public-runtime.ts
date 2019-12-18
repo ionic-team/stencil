@@ -20,10 +20,11 @@ export interface ComponentOptions {
   scoped?: boolean;
 
   /**
-   * If `true`, the component will use native shadow-dom encapsulation, it will fallback to `scoped` if the browser
-   * does not support shadow-dom nativelly. Defaults to `false`.
+   * If `true`, the component will use native shadow-dom encapsulation, it will fallback to
+   * `scoped` if the browser does not support shadow-dom natively. Defaults to `false`.
+   * Additionally, `shadow` can also be given options when attaching the shadow root.
    */
-  shadow?: boolean;
+  shadow?: boolean | ShadowRootOptions;
 
   /**
    * Relative URL to some external stylesheet file. It should be a `.css` file unless some
@@ -53,6 +54,15 @@ export interface ComponentOptions {
    * @deprecated Use `assetsDirs` instead
    */
   assetsDir?: string;
+}
+
+export interface ShadowRootOptions {
+  /**
+   * When set to `true`, specifies behavior that mitigates custom element issues
+   * around focusability. When a non-focusable part of the shadow DOM is clicked, the first
+   * focusable part is given focus, and the shadow host is given any available `:focus` styling.
+   */
+  delegatesFocus?: boolean;
 }
 
 export interface ModeStyles {

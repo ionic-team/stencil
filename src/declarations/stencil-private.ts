@@ -107,6 +107,7 @@ export interface BuildFeatures {
 
   // dom
   shadowDom: boolean;
+  shadowDelegatesFocus: boolean;
   scoped: boolean;
 
   // render
@@ -878,6 +879,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   componentClassName: string;
   elementRef: string;
   encapsulation: Encapsulation;
+  shadowDelegatesFocus: boolean;
   excludeFromCollection: boolean;
   isCollectionDependency: boolean;
   isLegacy: boolean;

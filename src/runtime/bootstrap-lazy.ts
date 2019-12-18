@@ -91,8 +91,19 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
             // this component is using shadow dom
             // and this browser supports shadow dom
             // add the read-only property "shadowRoot" to the host element
+            // adding the shadow root build conditionals to minimize runtime
             if (supportsShadowDom) {
-              self.attachShadow({ 'mode': 'open' });
+
+              if (BUILD.shadowDelegatesFocus) {
+                self.attachShadow({
+                  mode: 'open',
+                  delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
+                });
+
+              } else {
+                self.attachShadow({ mode: 'open' });
+              }
+
             } else if (!BUILD.hydrateServerSide && !('shadowRoot' in self)) {
               (self as any).shadowRoot = self;
             }
