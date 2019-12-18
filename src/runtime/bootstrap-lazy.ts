@@ -116,12 +116,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           plt.jmp(() => disconnectedCallback(this));
         }
 
-        's-hmr'(hmrVersionId: string) {
-          if (BUILD.hotModuleReplacement) {
-            hmrStart(this, cmpMeta, hmrVersionId);
-          }
-        }
-
         forceUpdate() {
           forceUpdate(this, cmpMeta);
         }
@@ -130,6 +124,33 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           return getHostRef(this).$onReadyPromise$;
         }
       };
+
+      if (BUILD.cloneNodeFix) {
+        const orgCloneNode = HostElement.prototype.cloneNode;
+        HostElement.prototype.cloneNode = function(deep?: boolean) {
+          const srcNode = this;
+          const isShadowDom = BUILD.shadowDom ? srcNode.shadowRoot && supportsShadowDom : false;
+          const clonedNode = orgCloneNode.call(this, isShadowDom ? deep : false) as Node;
+          if (BUILD.slot && !isShadowDom && deep) {
+            let i = 0;
+            let slotted;
+            for (; i < srcNode.childNodes.length; i++) {
+              slotted = (srcNode.childNodes[i] as any)['s-nr'];
+              if (slotted) {
+                clonedNode.appendChild(slotted.cloneNode(true));
+              }
+            }
+          }
+          return clonedNode;
+        };
+      }
+
+      if (BUILD.hotModuleReplacement) {
+        (HostElement as any).prototype['s-hmr'] = function(hmrVersionId: string) {
+          hmrStart(this, cmpMeta, hmrVersionId);
+        };
+      }
+
       cmpMeta.$lazyBundleIds$ = lazyBundle[0];
 
       if (!exclude.includes(tagName) && !customElements.get(tagName)) {

@@ -67,7 +67,8 @@ export const BUILD: Required<d.Build> = {
   lifecycleDOMEvents: false,
   lazyLoad: false,
   profile: false,
-  slotRelocation: true
+  slotRelocation: true,
+  cloneNodeFix: false,
 };
 
 export const NAMESPACE = 'app';

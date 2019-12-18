@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { BUILD, NAMESPACE } from '@build-conditionals';
 import { consoleDevInfo } from './client-log';
-import { doc, plt, win } from './client-window';
+import { H, doc, plt, win } from './client-window';
 import { getDynamicImportFunction } from '@utils';
 
 
@@ -25,6 +25,9 @@ export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => 
   }
   if (BUILD.cssVarShim) {
     plt.$cssShim$ = (win as any).__stencil_cssshim;
+  }
+  if (BUILD.cloneNodeFix) {
+    patchCloneNodeFix((H as any).prototype);
   }
 
   // @ts-ignore
@@ -85,3 +88,26 @@ export const patchDynamicImport = (base: string) => {
   }
 };
 
+
+export const patchCloneNodeFix = (HTMLElementPrototype: any) => {
+  const nativeCloneNodeFn = HTMLElementPrototype.cloneNode;
+
+  HTMLElementPrototype.cloneNode = function(this: Node, deep: boolean) {
+    if (this.nodeName === 'TEMPLATE') {
+      return nativeCloneNodeFn.call(this, deep);
+    }
+    const clonedNode = nativeCloneNodeFn.call(this, false);
+    const srcChildNodes = this.childNodes;
+    if (deep) {
+      for (let i = 0; i < srcChildNodes.length; i++) {
+        // Node.ATTRIBUTE_NODE === 2, and checking because IE11
+        if (srcChildNodes[i].nodeType !== 2) {
+          clonedNode.appendChild(
+            srcChildNodes[i].cloneNode(true)
+          );
+        }
+      }
+    }
+    return clonedNode;
+  };
+};

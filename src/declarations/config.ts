@@ -191,6 +191,11 @@ export interface StencilConfig {
   excludeUnusedDependencies?: boolean;
 
   stencilCoreResolvedId?: string;
+  extras?: ConfigExtras;
+}
+
+export interface ConfigExtras {
+  cloneNodeFix?: boolean;
 }
 
 export interface Config extends StencilConfig {

@@ -411,7 +411,7 @@ MockElement.prototype.cloneNode = function(this: MockElement, deep?: boolean) {
   // because we're creating elements, which extending specific HTML base classes there
   // is a MockElement circular reference that bundling has trouble dealing with so
   // the fix is to add cloneNode() to MockElement's prototype after the HTML classes
-  const cloned = createElement(null, this.nodeName);
+  const cloned = createElement(this.ownerDocument, this.nodeName);
   cloned.attributes = cloneAttributes(this.attributes);
 
   const styleCssText = this.getAttribute('style');

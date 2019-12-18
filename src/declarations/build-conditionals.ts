@@ -75,6 +75,9 @@ export interface BuildFeatures {
   reflect: boolean;
 
   taskQueue: boolean;
+
+  // extras
+  cloneNodeFix: boolean;
 }
 
 export interface Build extends Partial<BuildFeatures> {

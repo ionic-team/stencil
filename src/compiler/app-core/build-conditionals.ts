@@ -58,6 +58,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     vdomText: cmps.some(c => c.hasVdomText),
     watchCallback: cmps.some(c => c.hasWatchCallback),
     taskQueue: true,
+    cloneNodeFix: false,
   };
   f.asyncLoading = f.cmpWillUpdate || f.cmpWillLoad || f.cmpWillRender;
 
@@ -124,6 +125,10 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
   b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;
+
+  if (config.extras) {
+    b.cloneNodeFix = !!config.extras.cloneNodeFix;
+  }
 }
 
 
