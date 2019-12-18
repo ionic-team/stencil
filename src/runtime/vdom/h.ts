@@ -32,7 +32,7 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
         if (simple = typeof nodeName !== 'function' && !isComplexType(child)) {
           child = String(child);
 
-        } else if (BUILD.isDev && child.$flags$ === undefined) {
+        } else if (BUILD.isDev && typeof nodeName !== 'function' && child.$flags$ === undefined) {
           consoleDevError(`vNode passed as children has unexpected type.
 Make sure it's using the correct h() function.
 Empty objects can also be the cause, look for JSX comments that became objects.`);
