@@ -55,6 +55,7 @@ export namespace Components {
   interface CssVariablesNoEncapsulation {}
   interface CssVariablesShadowDom {}
   interface CustomEventRoot {}
+  interface DelegatesFocus {}
   interface DomReattach {
     'didLoad': number;
     'didUnload': number;
@@ -118,6 +119,7 @@ export namespace Components {
   interface ListenJsx {}
   interface ListenJsxRoot {}
   interface ListenWindow {}
+  interface NoDelegatesFocus {}
   interface NodeGlobals {}
   interface NodeResolution {}
   interface ReflectToAttr {
@@ -315,6 +317,12 @@ declare global {
   var HTMLCustomEventRootElement: {
     prototype: HTMLCustomEventRootElement;
     new (): HTMLCustomEventRootElement;
+  };
+
+  interface HTMLDelegatesFocusElement extends Components.DelegatesFocus, HTMLStencilElement {}
+  var HTMLDelegatesFocusElement: {
+    prototype: HTMLDelegatesFocusElement;
+    new (): HTMLDelegatesFocusElement;
   };
 
   interface HTMLDomReattachElement extends Components.DomReattach, HTMLStencilElement {}
@@ -531,6 +539,12 @@ declare global {
   var HTMLListenWindowElement: {
     prototype: HTMLListenWindowElement;
     new (): HTMLListenWindowElement;
+  };
+
+  interface HTMLNoDelegatesFocusElement extends Components.NoDelegatesFocus, HTMLStencilElement {}
+  var HTMLNoDelegatesFocusElement: {
+    prototype: HTMLNoDelegatesFocusElement;
+    new (): HTMLNoDelegatesFocusElement;
   };
 
   interface HTMLNodeGlobalsElement extends Components.NodeGlobals, HTMLStencilElement {}
@@ -845,6 +859,7 @@ declare global {
     'css-variables-no-encapsulation': HTMLCssVariablesNoEncapsulationElement;
     'css-variables-shadow-dom': HTMLCssVariablesShadowDomElement;
     'custom-event-root': HTMLCustomEventRootElement;
+    'delegates-focus': HTMLDelegatesFocusElement;
     'dom-reattach': HTMLDomReattachElement;
     'dom-reattach-clone': HTMLDomReattachCloneElement;
     'dom-reattach-clone-deep-slot': HTMLDomReattachCloneDeepSlotElement;
@@ -881,6 +896,7 @@ declare global {
     'listen-jsx': HTMLListenJsxElement;
     'listen-jsx-root': HTMLListenJsxRootElement;
     'listen-window': HTMLListenWindowElement;
+    'no-delegates-focus': HTMLNoDelegatesFocusElement;
     'node-globals': HTMLNodeGlobalsElement;
     'node-resolution': HTMLNodeResolutionElement;
     'reflect-to-attr': HTMLReflectToAttrElement;
@@ -974,6 +990,7 @@ declare namespace LocalJSX {
   interface CssVariablesNoEncapsulation {}
   interface CssVariablesShadowDom {}
   interface CustomEventRoot {}
+  interface DelegatesFocus {}
   interface DomReattach {
     'didLoad'?: number;
     'didUnload'?: number;
@@ -1041,6 +1058,7 @@ declare namespace LocalJSX {
   interface ListenJsx {}
   interface ListenJsxRoot {}
   interface ListenWindow {}
+  interface NoDelegatesFocus {}
   interface NodeGlobals {}
   interface NodeResolution {}
   interface ReflectToAttr {
@@ -1147,6 +1165,7 @@ declare namespace LocalJSX {
     'css-variables-no-encapsulation': CssVariablesNoEncapsulation;
     'css-variables-shadow-dom': CssVariablesShadowDom;
     'custom-event-root': CustomEventRoot;
+    'delegates-focus': DelegatesFocus;
     'dom-reattach': DomReattach;
     'dom-reattach-clone': DomReattachClone;
     'dom-reattach-clone-deep-slot': DomReattachCloneDeepSlot;
@@ -1183,6 +1202,7 @@ declare namespace LocalJSX {
     'listen-jsx': ListenJsx;
     'listen-jsx-root': ListenJsxRoot;
     'listen-window': ListenWindow;
+    'no-delegates-focus': NoDelegatesFocus;
     'node-globals': NodeGlobals;
     'node-resolution': NodeResolution;
     'reflect-to-attr': ReflectToAttr;
@@ -1259,6 +1279,7 @@ declare module "@stencil/core" {
       'css-variables-no-encapsulation': LocalJSX.CssVariablesNoEncapsulation & JSXBase.HTMLAttributes<HTMLCssVariablesNoEncapsulationElement>;
       'css-variables-shadow-dom': LocalJSX.CssVariablesShadowDom & JSXBase.HTMLAttributes<HTMLCssVariablesShadowDomElement>;
       'custom-event-root': LocalJSX.CustomEventRoot & JSXBase.HTMLAttributes<HTMLCustomEventRootElement>;
+      'delegates-focus': LocalJSX.DelegatesFocus & JSXBase.HTMLAttributes<HTMLDelegatesFocusElement>;
       'dom-reattach': LocalJSX.DomReattach & JSXBase.HTMLAttributes<HTMLDomReattachElement>;
       'dom-reattach-clone': LocalJSX.DomReattachClone & JSXBase.HTMLAttributes<HTMLDomReattachCloneElement>;
       'dom-reattach-clone-deep-slot': LocalJSX.DomReattachCloneDeepSlot & JSXBase.HTMLAttributes<HTMLDomReattachCloneDeepSlotElement>;
@@ -1295,6 +1316,7 @@ declare module "@stencil/core" {
       'listen-jsx': LocalJSX.ListenJsx & JSXBase.HTMLAttributes<HTMLListenJsxElement>;
       'listen-jsx-root': LocalJSX.ListenJsxRoot & JSXBase.HTMLAttributes<HTMLListenJsxRootElement>;
       'listen-window': LocalJSX.ListenWindow & JSXBase.HTMLAttributes<HTMLListenWindowElement>;
+      'no-delegates-focus': LocalJSX.NoDelegatesFocus & JSXBase.HTMLAttributes<HTMLNoDelegatesFocusElement>;
       'node-globals': LocalJSX.NodeGlobals & JSXBase.HTMLAttributes<HTMLNodeGlobalsElement>;
       'node-resolution': LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
       'reflect-to-attr': LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;

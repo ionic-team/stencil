@@ -6,6 +6,7 @@ export interface BuildFeatures {
 
   // dom
   shadowDom: boolean;
+  shadowDelegatesFocus: boolean;
   scoped: boolean;
 
   // render
