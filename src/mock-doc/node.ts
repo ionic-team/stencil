@@ -1,9 +1,9 @@
 import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } from './custom-element-registry';
 import { closest, matches, selectAll, selectOne } from './selector';
-import { CSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
 import { dataset } from './dataset';
 import { MockAttr, MockAttributeMap } from './attribute';
 import { MockClassList } from './class-list';
+import { MockCSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { NON_ESCAPABLE_CONTENT, SerializeNodeToHtmlOptions, serializeNodeToHtml } from './serialize-node';
@@ -201,7 +201,7 @@ export class MockElement extends MockNode {
   namespaceURI: string;
   __attributeMap: MockAttributeMap;
   __shadowRoot: ShadowRoot;
-  __style: CSSStyleDeclaration;
+  __style: MockCSSStyleDeclaration;
 
   constructor(ownerDocument: any, nodeName: string) {
     super(

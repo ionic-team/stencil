@@ -1,6 +1,5 @@
 
-
-export class CSSStyleDeclaration {
+export class MockCSSStyleDeclaration {
   private _styles = new Map<string, string>();
 
   setProperty(prop: string, value: string) {
@@ -62,13 +61,13 @@ export class CSSStyleDeclaration {
 
 export function createCSSStyleDeclaration() {
   return new Proxy(
-    new CSSStyleDeclaration(),
+    new MockCSSStyleDeclaration(),
     cssProxyHandler
   );
 }
 
 
-const cssProxyHandler: ProxyHandler<CSSStyleDeclaration> = {
+const cssProxyHandler: ProxyHandler<MockCSSStyleDeclaration> = {
   get(cssStyle, prop: string) {
     if (prop in cssStyle) {
       return (cssStyle as any)[prop];

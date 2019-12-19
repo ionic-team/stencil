@@ -10,7 +10,6 @@ import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
 import { MockPerformance, resetPerformance } from './performance';
 import { MockStorage } from './storage';
-import { URL } from 'url';
 
 
 const nativeClearInterval = clearInterval;

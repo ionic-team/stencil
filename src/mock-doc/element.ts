@@ -2,7 +2,6 @@ import { cloneAttributes } from './attribute';
 import { createCustomElement } from './custom-element-registry';
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockHTMLElement } from './node';
-import { URL } from 'url';
 
 
 export function createElement(ownerDocument: any, tagName: string) {

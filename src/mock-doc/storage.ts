@@ -1,5 +1,4 @@
 
-
 export class MockStorage {
   private items = new Map<string, string>();
 

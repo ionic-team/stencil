@@ -1,5 +1,4 @@
 
-
 export class MockHistory {
   private items: any[] = [];
 
