@@ -1,3 +1,17 @@
+## 👀 [1.8.3-0](https://github.com/ionic-team/stencil/compare/v1.8.2...v1.8.3-0) (2019-12-19)
+
+
+### Bug Fixes
+
+* **mock-doc:** add CSSStyleSheet insertRule() to fix emotion-css SSR ([3aa702c](https://github.com/ionic-team/stencil/commit/3aa702c523831cf5a4653ec41b8115c23cb88af2))
+
+
+### Features
+
+* **e2e:** add togglesAttribute() and removeAttribute() to e2e elements ([ca27197](https://github.com/ionic-team/stencil/commit/ca27197c5e817878ab3ddad7ab19451c5c7d51c7)), closes [#1745](https://github.com/ionic-team/stencil/issues/1745)
+
+
+
 ## 🐍 [1.8.2](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.8.2) (2019-12-18)
 
 
