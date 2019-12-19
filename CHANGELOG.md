@@ -1,8 +1,10 @@
-# 🏀 [1.9.0-5](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.9.0-5) (2019-12-18)
+# 🌙 [1.9.0-6](https://github.com/ionic-team/stencil/compare/v1.8.1...v1.9.0-6) (2019-12-19)
 
 
 ### Bug Fixes
 
+* **mock-doc:** add CSSStyleSheet insertRule() to fix emotion-css SSR ([a13bd0a](https://github.com/ionic-team/stencil/commit/a13bd0a03b22b318b9a34615e922f17bb5ef3571))
+* **worker:** dev error ([eeb8b3d](https://github.com/ionic-team/stencil/commit/eeb8b3d35347fb27863bc02142c6e0f156a12184))
 * **compiler:** config.extras is always defined ([d5591d3](https://github.com/ionic-team/stencil/commit/d5591d370caaad5a788817b8bc26b06a74434c6d))
 * **next:** don't minify css around + ([d38707d](https://github.com/ionic-team/stencil/commit/d38707d3d5e80de75090397278c245acbd3827cb))
 * **next:** emit componentGraph data ([3d4eb4a](https://github.com/ionic-team/stencil/commit/3d4eb4af2dea4580da4f4b055eb557f8dd9940c3))
