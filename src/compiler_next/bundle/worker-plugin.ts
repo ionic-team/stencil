@@ -58,10 +58,12 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
       const workerEntryPath = getWorkerEntryPath(id);
       if (workerEntryPath != null) {
         const worker = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
-        return {
-          code: getWorkerProxy(workerEntryPath, worker.exports),
-          moduleSideEffects: false,
-        };
+        if (worker) {
+          return {
+            code: getWorkerProxy(workerEntryPath, worker.exports),
+            moduleSideEffects: false,
+          };
+        }
       }
       return null;
     }
@@ -107,46 +109,49 @@ const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCt
     inlineDynamicImports: true,
   });
 
-  // Generate commonjs output so we can intercept exports at runtme
-  const output = await build.generate({
-    format: 'commonjs',
-    intro: getWorkerIntro(workerName, config.devMode),
-    esModule: false,
-    preferConst: true,
-    externalLiveBindings: false
-  });
-  const entryPoint = output.output[0];
-  if (entryPoint.imports.length > 0) {
-    ctx.error('Workers should not have any external imports: ' + JSON.stringify(entryPoint.imports));
+  if (build) {
+    // Generate commonjs output so we can intercept exports at runtme
+    const output = await build.generate({
+      format: 'commonjs',
+      intro: getWorkerIntro(workerName, config.devMode),
+      esModule: false,
+      preferConst: true,
+      externalLiveBindings: false
+    });
+    const entryPoint = output.output[0];
+    if (entryPoint.imports.length > 0) {
+      ctx.error('Workers should not have any external imports: ' + JSON.stringify(entryPoint.imports));
+    }
+
+    // Optimize code
+    let code = entryPoint.code;
+    const results = await optimizeModule(config, compilerCtx, {
+      input: code,
+      sourceTarget: config.buildEs5 ? 'es5' : 'es2017',
+      isCore: false,
+      minify: config.minifyJs,
+      inlineHelpers: true
+    });
+    buildCtx.diagnostics.push(...results.diagnostics);
+    if (!hasError(results.diagnostics)) {
+      code = results.output;
+    }
+
+    // Put worker in an asset so new Worker() can reference it later
+    const referenceId = ctx.emitFile({
+      type: 'asset',
+      source: code,
+      name: workerName + '.js',
+    });
+
+    return {
+      referenceId,
+      exports: entryPoint.exports,
+      dependencies: Object.keys(entryPoint.modules)
+        .filter(id => !/\0/.test(id) && id !== workerEntryPath)
+    };
   }
-
-  // Optimize code
-  let code = entryPoint.code;
-  const results = await optimizeModule(config, compilerCtx, {
-    input: code,
-    sourceTarget: config.buildEs5 ? 'es5' : 'es2017',
-    isCore: false,
-    minify: config.minifyJs,
-    inlineHelpers: true
-  });
-  buildCtx.diagnostics.push(...results.diagnostics);
-  if (!hasError(results.diagnostics)) {
-    code = results.output;
-  }
-
-  // Put worker in an asset so new Worker() can reference it later
-  const referenceId = ctx.emitFile({
-    type: 'asset',
-    source: code,
-    name: workerName + '.js',
-  });
-
-  return {
-    referenceId,
-    exports: entryPoint.exports,
-    dependencies: Object.keys(entryPoint.modules)
-      .filter(id => !/\0/.test(id) && id !== workerEntryPath)
-  };
+  return null;
 }
 
 const WORKER_SUFFIX = [

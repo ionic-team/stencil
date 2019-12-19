@@ -41,31 +41,33 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
     };
 
     const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
-    const rollupOutput = await build.generate({
-      format: 'esm',
-      sourcemap: config.sourceMap,
-    });
-    const chunk = rollupOutput.output.find(o => o.type === 'chunk') as OutputChunk;
-    let code = chunk.code;
-    const optimizeResults = await optimizeModule(config, compilerCtx, {
-      input: code,
-      isCore: true,
-      minify: config.minifyJs
-    });
-    buildCtx.diagnostics.push(...optimizeResults.diagnostics);
-    if (hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
-      code = optimizeResults.output;
-    }
+    if (build) {
+      const rollupOutput = await build.generate({
+        format: 'esm',
+        sourcemap: config.sourceMap,
+      });
+      const chunk = rollupOutput.output.find(o => o.type === 'chunk') as OutputChunk;
+      let code = chunk.code;
+      const optimizeResults = await optimizeModule(config, compilerCtx, {
+        input: code,
+        isCore: true,
+        minify: config.minifyJs
+      });
+      buildCtx.diagnostics.push(...optimizeResults.diagnostics);
+      if (hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
+        code = optimizeResults.output;
+      }
 
-    await Promise.all(
-      outputTargets.map(o => {
-        return compilerCtx.fs.writeFile(
-          path.join(o.dir, 'index.mjs'),
-          code,
-          { outputTargetType: o.type }
-        );
-      })
-    );
+      await Promise.all(
+        outputTargets.map(o => {
+          return compilerCtx.fs.writeFile(
+            path.join(o.dir, 'index.mjs'),
+            code,
+            { outputTargetType: o.type }
+          );
+        })
+      );
+    }
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
