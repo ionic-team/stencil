@@ -202,6 +202,19 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     });
   }
 
+  removeAttribute(name: string) {
+    this._queueAction({
+      removeAttribute: name
+    });
+  }
+
+  toggleAttribute(name: string, force?: boolean) {
+    this._queueAction({
+      toggleAttributeName: name,
+      toggleAttributeForce: force
+    });
+  }
+
   get classList() {
     const api: any = {
       add: (...classNames: string[]) => {
@@ -407,6 +420,16 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
           } else if (queuedAction.setAttributeName) {
             elm.setAttribute(queuedAction.setAttributeName, queuedAction.setAttributeValue);
 
+          } else if (queuedAction.removeAttribute) {
+            elm.removeAttribute(queuedAction.removeAttribute);
+
+          } else if (queuedAction.toggleAttributeName) {
+            if (typeof queuedAction.toggleAttributeForce === 'boolean') {
+              elm.toggleAttribute(queuedAction.toggleAttributeName, queuedAction.toggleAttributeForce);
+            } else {
+              elm.toggleAttribute(queuedAction.toggleAttributeName);
+            }
+
           } else if (queuedAction.classAdd) {
             elm.classList.add(queuedAction.classAdd);
 
@@ -517,8 +540,11 @@ interface ElementAction {
   eventInitDict?: EventInitDict;
   methodName?: string;
   methodArgs?: any[];
+  removeAttribute?: string;
   setAttributeName?: string;
   setAttributeValue?: any;
   setPropertyName?: string;
   setPropertyValue?: any;
+  toggleAttributeName?: string;
+  toggleAttributeForce?: boolean;
 }

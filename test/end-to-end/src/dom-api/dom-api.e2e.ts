@@ -123,8 +123,11 @@ describe('dom api e2e tests', () => {
 
     expect(elm.getAttribute('id')).toBe('my-cmp');
     expect(elm.getAttribute('mph')).toBe('88');
+    expect(elm).not.toHaveAttribute('enabled');
 
     elm.setAttribute('id', 'my-changed-id');
+    elm.setAttribute('town', 'hill valley');
+    elm.toggleAttribute('enabled');
 
     await page.waitForChanges();
 
@@ -134,6 +137,14 @@ describe('dom api e2e tests', () => {
       id: 'my-changed-id',
       mph: '88'
     });
+    expect(elm).toHaveAttribute('town');
+    expect(elm).toHaveAttribute('enabled');
+
+    elm.removeAttribute('town');
+    elm.toggleAttribute('enabled');
+    await page.waitForChanges();
+    expect(elm).not.toHaveAttribute('town');
+    expect(elm).not.toHaveAttribute('enabled');
   });
 
   it('should test html', async () => {
