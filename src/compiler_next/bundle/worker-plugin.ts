@@ -191,8 +191,8 @@ addEventListener('message', async ({data}) => {
       }
       ${isDev ? `
       value = exports[method](...args);
-      if (!value.then) {
-        throw new Error('The exported method "' + method + '" does not return a Promise, make sure it's an "async" function');
+      if (!value || !value.then) {
+        throw new Error('The exported method "' + method + '" does not return a Promise, make sure it is an "async" function');
       }
       value = await value;
       ` : `
