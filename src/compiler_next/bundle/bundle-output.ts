@@ -16,6 +16,7 @@ import { RollupOptions, TreeshakingOptions, rollup } from 'rollup';
 import { typescriptPlugin } from './typescript-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
+import { wasmPlugin } from './wasm-plugin';
 
 
 export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
@@ -60,6 +61,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       textPlugin(),
       extTransformsPlugin(config, compilerCtx, buildCtx),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform),
+      wasmPlugin(config, compilerCtx, buildCtx, bundleOpts.platform),
       ...config.rollupPlugins,
       rollupNodeResolvePlugin({
         mainFields: ['browser', 'collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],

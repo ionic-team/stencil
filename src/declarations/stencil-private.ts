@@ -411,7 +411,7 @@ export type RollupResult = RollupChunkResult | RollupAssetResult;
 export interface RollupAssetResult {
   type: 'asset';
   fileName: string;
-  content: string;
+  content: string | Buffer;
 }
 
 export interface RollupChunkResult {

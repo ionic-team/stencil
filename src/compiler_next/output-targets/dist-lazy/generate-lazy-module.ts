@@ -4,6 +4,7 @@ import { DEFAULT_STYLE_MODE, hasDependency, sortBy } from '@utils';
 import { optimizeModule } from '../../optimize/optimize-module';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../../../compiler/app-core/format-component-runtime-meta';
 import path from 'path';
+import fs from 'fs';
 
 export const generateLazyModules = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargetType: string, destinations: string[], results: d.RollupResult[], sourceTarget: d.SourceTarget, isBrowserBuild: boolean, sufix: string) => {
   if (!Array.isArray(destinations) || destinations.length === 0) {
@@ -37,15 +38,18 @@ export const generateLazyModules = async (config: d.Config, compilerCtx: d.Compi
   return bundleModules;
 };
 
-const writeAssets = (compilerCtx: d.CompilerCtx, destinations: string[], results: d.RollupResult[]) => {
+const writeAssets = (_compilerCtx: d.CompilerCtx, destinations: string[], results: d.RollupResult[]) => {
   return results
     .filter(r => r.type === 'asset')
     .map((r: d.RollupAssetResult) => {
       return Promise.all(destinations.map(dest => {
-        return compilerCtx.fs.writeFile(
-          path.join(dest, r.fileName),
-          r.content
-        );
+        return new Promise(resolve =>  {
+          fs.writeFile(
+            path.join(dest, r.fileName),
+            r.content,
+            resolve
+          );
+        });
       }));
     });
 }
