@@ -11,7 +11,7 @@ export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, hostRef: d.HostRef, 
     ? cmpMeta.$lazyBundleIds$[hostRef.$modeName$]
     : cmpMeta.$lazyBundleIds$) as string;
   if (BUILD.isDev && typeof bundleId !== 'string') {
-    consoleDevError(`Trying to lazyly load component <${cmpMeta.$tagName$}> with style mode "${hostRef.$modeName$}", but it does not exist.`);
+    consoleDevError(`Trying to lazily load component <${cmpMeta.$tagName$}> with style mode "${hostRef.$modeName$}", but it does not exist.`);
     return undefined;
   }
   const module = !BUILD.hotModuleReplacement ? cmpModules.get(bundleId) : false;
