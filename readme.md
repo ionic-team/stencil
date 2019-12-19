@@ -51,7 +51,7 @@ Stencil components are plain ES6/TypeScript classes with some decorator metadata
 Create new components by creating files with a `.tsx` extension, such as `my-component.tsx`, and place them in `src/components`.
 
 ```typescript
-import { Component, Prop } from '@stencil/core';
+import { Component, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
