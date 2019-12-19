@@ -1,5 +1,6 @@
 import { cloneAttributes } from './attribute';
 import { createCustomElement } from './custom-element-registry';
+import { MockCSSStyleSheet, getStyleElementText, setStyleElementText } from './css-style-sheet';
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockHTMLElement } from './node';
 
@@ -37,6 +38,9 @@ export function createElement(ownerDocument: any, tagName: string) {
 
     case 'script':
       return new MockScriptElement(ownerDocument);
+
+    case 'style':
+      return new MockStyleElement(ownerDocument);
 
     case 'template':
       return new MockTemplateElement(ownerDocument);
@@ -218,6 +222,36 @@ class MockScriptElement extends MockHTMLElement {
 patchPropAttributes(MockScriptElement.prototype, {
   type: String
 });
+
+export class MockStyleElement extends MockHTMLElement {
+  sheet: MockCSSStyleSheet;
+
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'style');
+    this.sheet = new MockCSSStyleSheet(this);
+  }
+
+  get innerHTML() {
+    return getStyleElementText(this);
+  }
+  set innerHTML(value: string) {
+    setStyleElementText(this, value);
+  }
+
+  get innerText() {
+    return getStyleElementText(this);
+  }
+  set innerText(value: string) {
+    setStyleElementText(this, value);
+  }
+
+  get textContent() {
+    return getStyleElementText(this);
+  }
+  set textContent(value: string) {
+    setStyleElementText(this, value);
+  }
+}
 
 export class MockSVGElement extends MockElement {
   // SVGElement properties and methods
