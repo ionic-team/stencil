@@ -308,6 +308,13 @@ export interface E2EElement {
   press(key: string, options?: { text?: string, delay?: number }): Promise<void>;
 
   /**
+   * Removes the attribute on the specified element. Note that
+   * `await page.waitForChanges()` must be called before reading
+   * the value if content has changed.
+   */
+  removeAttribute(name: string): void;
+
+  /**
    * Sets the value of an attribute on the specified element. If the
    * attribute already exists, the value is updated; otherwise a new
    * attribute is added with the specified name and value. The value
@@ -370,6 +377,16 @@ export interface E2EElement {
    * 'tool tip' popup when the mouse is over the displayed node.
    */
   title: string;
+
+  /**
+   * Toggles a `boolean` attribute (removing it if it is present and adding
+   * it if it is not present) on the given element. Note that
+   * `await page.waitForChanges()` must be called before reading
+   * the value if content has changed. The optional `force` argument is a
+   * `boolean` value to determine whether the attribute should be added or
+   * removed, no matter whether the attribute is present or not at the moment.
+   */
+  toggleAttribute(name: string, force?: boolean): void;
 
   /**
    * This is a convenience method to easily create a `CustomEvent`,
