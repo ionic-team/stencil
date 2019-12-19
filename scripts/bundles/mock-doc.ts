@@ -189,6 +189,9 @@ async function getDtsContent(inputDir: string, inputDtsFile: string) {
     if (ln.trim().startsWith('private')) {
       return false;
     }
+    if (ln.replace(/ /g, '').startsWith('export{}')) {
+      return false;
+    }
     return true;
   });
 
