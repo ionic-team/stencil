@@ -13,7 +13,7 @@ export async function taskCheckVersion(config: d.Config) {
     const currentVersion = config.sys.compiler.version;
     const latestVersion = await config.sys.getLatestCompilerVersion(config.logger, true);
 
-    if (semiver(currentVersion, latestVersion) === -1) {
+    if (semiver(currentVersion, latestVersion) < 0) {
       printUpdateMessage(config.logger, currentVersion, latestVersion);
 
     } else {
@@ -35,7 +35,7 @@ export async function validateCompilerVersion(sys: d.StencilSystem, logger: d.Lo
 
   const currentVersion = sys.compiler.version;
 
-  if (semiver(currentVersion, latestVersion) === -1) {
+  if (semiver(currentVersion, latestVersion) < 0) {
     printUpdateMessage(logger, currentVersion, latestVersion);
   }
 }
