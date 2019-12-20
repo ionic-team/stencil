@@ -77,7 +77,7 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
 }
 
 
-async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: NodeWorkerController, diagnostics: d.Diagnostic[], config: d.Config, devServer: d.DevServer, buildResults: d.CompilerBuildResults, outputTarget: d.OutputTargetWww) {
+async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWorkerController, diagnostics: d.Diagnostic[], config: d.Config, devServer: d.DevServer, buildResults: d.CompilerBuildResults, outputTarget: d.OutputTargetWww) {
   try {
     const timeSpan = config.logger.createTimeSpan(`prerendering started`);
 
@@ -92,7 +92,7 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Nod
     const manager: d.PrerenderManager = {
       prcs,
       prerenderUrlWorker(prerenderRequest: d.PrerenderRequest) {
-        return workerManager.send('prerenderWorker', prerenderRequest);
+        return workerCtrl.send('prerenderWorker', prerenderRequest);
       },
       componentGraphPath: null,
       config: config,
