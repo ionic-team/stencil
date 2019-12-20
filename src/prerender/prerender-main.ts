@@ -101,7 +101,7 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Nod
       hydrateAppFilePath: buildResults.hydrateAppFilePath,
       isDebug: (config.logLevel === 'debug'),
       logCount: 0,
-      maxConcurrency: (config.maxConcurrentWorkers * 2 - 1),
+      maxConcurrency: Math.max(20, (config.maxConcurrentWorkers * 10)),
       outputTarget: outputTarget,
       prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
       prerenderConfigPath: outputTarget.prerenderConfig,
@@ -112,8 +112,8 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Nod
       resolve: null
     };
 
-    if (!config.flags.ci && config.logLevel !== 'debug') {
-      manager.progressLogger = startProgressLogger();
+    if (!config.flags.ci && !manager.isDebug) {
+      manager.progressLogger = startProgressLogger(prcs);
     }
 
     initializePrerenderEntryUrls(manager);
@@ -135,7 +135,7 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Nod
     await new Promise(resolve => {
       manager.resolve = resolve;
 
-      process.nextTick(() => {
+      prcs.nextTick(() => {
         drainPrerenderQueue(manager);
       });
     });
@@ -221,28 +221,30 @@ function getComponentPathContent(config: d.Config, componentGraph: {[scopeId: st
 }
 
 
-const startProgressLogger = (): d.ProgressLogger => {
+function startProgressLogger(prcs: NodeJS.Process): d.ProgressLogger {
   let promise = Promise.resolve();
   const update = (text: string) => {
-    text = text.substr(0, process.stdout.columns - 5) + '\x1b[0m';
+    text = text.substr(0, prcs.stdout.columns - 5) + '\x1b[0m';
     return promise = promise.then(() => {
       return new Promise<any>(resolve => {
-        readline.clearLine(process.stdout, 0);
-        readline.cursorTo(process.stdout, 0, null);
-        process.stdout.write(text, resolve);
+        readline.clearLine(prcs.stdout, 0);
+        readline.cursorTo(prcs.stdout, 0, null);
+        prcs.stdout.write(text, resolve);
       });
     });
   };
+
   const stop = () => {
     return update('\x1B[?25h');
   };
+
   // hide cursor
-  process.stdout.write('\x1B[?25l');
+  prcs.stdout.write('\x1B[?25l');
   return {
     update,
     stop
   };
-};
+}
 
 
 function generateContentHash(content: string) {

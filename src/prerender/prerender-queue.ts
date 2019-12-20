@@ -3,7 +3,6 @@ import { buildError, catchError } from '@utils';
 import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 import path from 'path';
-import { URL } from 'url';
 
 
 export function initializePrerenderEntryUrls(manager: d.PrerenderManager) {
@@ -70,28 +69,37 @@ function addUrlToPendingQueue(manager: d.PrerenderManager, queueUrl: string, fro
 }
 
 
-export async function drainPrerenderQueue(manager: d.PrerenderManager) {
-  const url = getNextUrl(manager);
+export function drainPrerenderQueue(manager: d.PrerenderManager) {
+  const nextUrl = manager.urlsPending.values().next();
+  if (!nextUrl.done) {
+    if (manager.urlsProcessing.size > manager.maxConcurrency) {
+      // slow it down there buddy, too many at one time
+      setTimeout(() => {
+        drainPrerenderQueue(manager);
+      });
 
-  if (url != null) {
-    // looks like we're ready to prerender more
-    // remove from pending
-    manager.urlsPending.delete(url);
+    } else {
+      const url = nextUrl.value;
 
-    // move to processing
-    manager.urlsProcessing.add(url);
+      // looks like we're ready to prerender more
+      // remove from pending
+      manager.urlsPending.delete(url);
 
-    // kick off async prerendering
-    prerenderUrl(manager, url);
+      // move to processing
+      manager.urlsProcessing.add(url);
 
-    // could be more ready for prerendering
-    // let's check again after a tick
-    manager.prcs.nextTick(() => {
-      drainPrerenderQueue(manager);
-    });
+      // kick off async prerendering
+      prerenderUrl(manager, url);
+
+      // could be more ready for prerendering
+      // let's check again after a tick
+      manager.prcs.nextTick(() => {
+        drainPrerenderQueue(manager);
+      });
+    }
   }
 
-  if (manager.urlsProcessing.size === 0) {
+  if (manager.urlsProcessing.size === 0 && manager.urlsPending.size === 0) {
     if (typeof manager.resolve === 'function') {
       // we're not actively processing anything
       // and there aren't anymore urls in the queue to be prerendered
@@ -100,22 +108,6 @@ export async function drainPrerenderQueue(manager: d.PrerenderManager) {
       manager.resolve = null;
     }
   }
-}
-
-
-function getNextUrl(manager: d.PrerenderManager) {
-  const next = manager.urlsPending.values().next();
-  if (next.done) {
-    // all emptied out, no more pending
-    return null;
-  }
-
-  if (manager.urlsProcessing.size >= manager.maxConcurrency) {
-    // slow it down there buddy, too many at one time
-    return null;
-  }
-
-  return next.value;
 }
 
 
