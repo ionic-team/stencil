@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
 import { connectedCallback, insertVdomAnnotations } from '@runtime';
 import { doc, getHostRef, loadModule, plt, registerHost } from '@platform';
-import { globalScripts } from '@app-data';
 import { proxyHostElement } from './proxy-host-element';
+import { globalScripts } from '@app-globals';
 
 
 export function hydrateApp(

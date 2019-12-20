@@ -4,7 +4,7 @@ import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
 import { generateEntryModules } from '../../../compiler/entries/entry-modules';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
-import { LAZY_BROWSER_ENTRY_ID, LAZY_EXTERNAL_ENTRY_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID } from '../../bundle/entry-alias-ids';
+import { LAZY_BROWSER_ENTRY_ID, LAZY_EXTERNAL_ENTRY_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
 import { isOutputTargetDistLazy, isOutputTargetHydrate } from '../../../compiler/output-targets/output-utils';
 import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
@@ -119,11 +119,11 @@ const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
 
 const getLazyEntry = (isBrowser: boolean) => {
   const s = new MagicString(``);
-  s.append(`import { bootstrapLazy, globalScripts } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
-
+  s.append(`import { bootstrapLazy } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
 
   if (isBrowser) {
     s.append(`import { patchBrowser } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
+    s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
     s.append(`patchBrowser().then(options => {\n`);
     s.append(`  globalScripts();\n`);
     s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
@@ -131,6 +131,7 @@ const getLazyEntry = (isBrowser: boolean) => {
 
   } else {
     s.append(`import { patchEsm } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
+    s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
     s.append(`export const defineCustomElements = (win, options) => patchEsm().then(() => {\n`);
     s.append(`  globalScripts();\n`);
     s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);

@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import MagicString from 'magic-string';
 import { normalizePath } from '@utils';
 import { Plugin } from 'rollup';
-import { STENCIL_APP_DATA_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
+import { STENCIL_APP_DATA_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID, STENCIL_APP_GLOBALS_ID } from './entry-alias-ids';
 
 
 export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build: d.BuildConditionals, platform: 'client' | 'hydrate' | 'worker'): Plugin => {
@@ -17,7 +17,7 @@ export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buil
     name: 'appDataPlugin',
 
     resolveId(id) {
-      if (id === STENCIL_APP_DATA_ID) {
+      if (id === STENCIL_APP_DATA_ID || id === STENCIL_APP_GLOBALS_ID) {
         if (platform === 'worker') {
           this.error('@stencil/core packages cannot be imported from a worker.');
         }
@@ -27,11 +27,15 @@ export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buil
     },
 
     load(id) {
+      if (id === STENCIL_APP_GLOBALS_ID)  {
+        const s = new MagicString(``);
+        appendGlobalScripts(globalPaths, s);
+        return s.toString();
+      }
       if (id === STENCIL_APP_DATA_ID) {
         const s = new MagicString(``);
         appendNamespace(config, s);
         appendBuildConditionals(config, build, s);
-        appendGlobalScripts(globalPaths, s);
         return s.toString();
       }
       return null;

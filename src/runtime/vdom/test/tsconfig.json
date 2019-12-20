@@ -32,6 +32,9 @@
       "@app-data": [
         "../../../app-data/index.ts"
       ],
+      "@app-globals": [
+        "../../../app-globals/index.ts"
+      ],
       "@utils": [
         "../../../utils/index.ts"
       ]

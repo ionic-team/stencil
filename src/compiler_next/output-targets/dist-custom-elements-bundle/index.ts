@@ -5,7 +5,7 @@ import { catchError, dashToPascalCase, hasError } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
 import { isOutputTargetDistCustomElementsBundle } from '../../../compiler/output-targets/output-utils';
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
-import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID } from '../../bundle/entry-alias-ids';
+import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import path from 'path';
 import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../../../compiler/app-core/format-component-runtime-meta';
@@ -80,8 +80,9 @@ function generateEntryPoint(_config: d.Config, _compilerCtx: d.CompilerCtx, buil
   const imports: string[] = [];
   const exports: string[] = [];
   imports.push(
-    `import { proxyNative, globalScripts } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
+    `import { proxyNative } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
     `export * from '${USER_INDEX_ENTRY_ID}';`,
+    `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';`,
     'globalScripts();',
   );
 

@@ -62,6 +62,4 @@ export const BUILD: BuildConditionals = /* default */ {
   cloneNodeFix: false,
 };
 
-export const globalScripts = /* default */ () => {/**/};
-
 export const NAMESPACE = /* default */ 'app' as string;

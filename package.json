@@ -152,6 +152,7 @@
     "preset": "./testing/jest-preset.js",
     "moduleNameMapper": {
       "@app-data": "<rootDir>/internal/app-data/index.js",
+      "@app-globals": "<rootDir>/internal/app-globals/index.js",
       "@compiler": "<rootDir>/compiler/index.js",
       "@mock-doc": "<rootDir>/mock-doc/index.js",
       "@platform": "<rootDir>/internal/testing/index.js",
