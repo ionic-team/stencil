@@ -120,11 +120,16 @@ const urlVersionIds = new Map<string, string>();
 function appendDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest, content: string) {
   const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.host);
   const iframe = `<iframe title="Stencil Dev Server Connector ${compilerBuild.stencilVersion} &#9889;" src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0" aria-hidden="true"></iframe>`;
+  return appendDevServerClientIframe(content, iframe);
+}
+
+
+export function appendDevServerClientIframe(content: string, iframe: string) {
   if (content.includes('</body>')) {
-    return content.replace('</body>', `${iframe}\n</body>`);
+    return content.replace('</body>', `${iframe}</body>`);
   }
   if (content.includes('</html>')) {
-    return content.replace('</html>', `${iframe}\n</html>`);
+    return content.replace('</html>', `${iframe}</html>`);
   }
-  return `\n${content}`;
+  return `${content}${iframe}`;
 }
