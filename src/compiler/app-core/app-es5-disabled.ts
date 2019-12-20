@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { escapeHtml } from '@utils';
 
 
-export async function generateEs5DisabledMessage(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
+export const generateEs5DisabledMessage = async (config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) => {
   // not doing an es5 right now
   // but it's possible during development the user
   // tests on a browser that doesn't support es2017
@@ -10,10 +10,9 @@ export async function generateEs5DisabledMessage(config: d.Config, compilerCtx: 
   const filePath = config.sys.path.join(outputTarget.buildDir, fileName);
   await compilerCtx.fs.writeFile(filePath, getDisabledMessageScript(config));
   return fileName;
-}
+};
 
-
-function getDisabledMessageScript(config: d.Config) {
+const getDisabledMessageScript = (config: d.Config) => {
   const style = `
 <style>
 body {
@@ -105,7 +104,13 @@ h2 {
   ${escapeHtml(`<script`)} <span style="background:yellow">nomodule</span> ${escapeHtml(`src="/build/${config.fsNamespace}.js"></script>`)}</code>
     </pre>
   `;
-  const script = `
+  return `
+(function() {
+  function checkSupport() {
+    if (!document.body) {
+      setTimeout(checkSupport);
+      return;
+    }
     function supportsDynamicImports() {
       try {
         new Function('import("")');
@@ -128,12 +133,12 @@ h2 {
     } else {
       document.body.innerHTML = '${inlineHTML(htmlUpdate)}';
     }
-  `;
+  }
 
-  // timeout just to ensure <body> is ready
-  return `setTimeout(function(){ ${script} }, 10)`;
-}
+  setTimeout(checkSupport);
+})();`;
+};
 
-function inlineHTML(html: string) {
+const inlineHTML = (html: string) => {
   return html.replace(/\n/g, '\\n').replace(/\'/g, `\\'`).trim();
-}
+};
