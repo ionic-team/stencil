@@ -71,7 +71,7 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
 };
 
 const getWorkerEntryPath = (id: string) => {
-  if (WORKER_SUFFIX.some(p => id.endsWith(p))) {
+  if (/\.worker(\.|\/)/.test(id)) {
     return normalizeFsPath(id);
   }
   return null;
@@ -153,13 +153,6 @@ const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCt
   }
   return null;
 }
-
-const WORKER_SUFFIX = [
-  '.worker.ts',
-  '.worker.tsx',
-  '.worker/index.ts',
-  '.worker/index.tsx',
-];
 
 const WORKER_HELPER_ID = '@worker-helper';
 
@@ -296,7 +289,11 @@ const getWorkerProxy = (workerEntryPath: string, exportedMethods: string[]) => {
 import { createWorkerProxy } from '${WORKER_HELPER_ID}';
 import { worker, workerName, workerMsgId } from '${workerEntryPath}?worker';
 ${exportedMethods.map(exportedMethod => {
-  return `export const ${exportedMethod} = /*@__PURE__*/createWorkerProxy(worker, workerMsgId, '${exportedMethod}');`;
+  if (exportedMethod === 'default') {
+    return `export default /*@__PURE__*/createWorkerProxy(worker, workerMsgId, '${exportedMethod}');`;
+  } else {
+    return `export const ${exportedMethod} = /*@__PURE__*/createWorkerProxy(worker, workerMsgId, '${exportedMethod}');`;
+  }
 }).join('\n')}
 `;
 };

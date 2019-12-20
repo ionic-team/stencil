@@ -29,10 +29,16 @@ declare module '*?worker' {
   export const fileName: string;
 }
 
-
 declare module '*.wasm' {
   const wasmProxy: {
-    [method: string]: (...args: any[]) => Promise<WebAssembly.ExportValue>
+    [method: string]: (...args: any[]) => Promise<any>
+  };
+  export default wasmProxy;
+}
+
+declare module '*.rs' {
+  const wasmProxy: {
+    [method: string]: (...args: any[]) => Promise<any>
   };
   export default wasmProxy;
 }

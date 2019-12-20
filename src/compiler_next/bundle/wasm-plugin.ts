@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { Plugin } from 'rollup';
 import fs from 'fs';
 import path from 'path';
+import { normalizeFsPath } from '@utils';
 
 const readFile = (id: string) => {
   return new Promise<Buffer>((res, reject) => {
@@ -37,18 +38,21 @@ export const wasmPlugin = (_config: d.Config, _compilerCtx: d.CompilerCtx, _buil
       if (id === WASM_HELPER_ID) {
         return WASM_HELPER;
       }
-      if (id.endsWith('.wasm')) {
+      if (id.endsWith('.wasm') || id.endsWith('?wasm')) {
+        id = normalizeFsPath(id);
         return readFile(id).then(buf => buf.toString('base64'));
       }
       return null;
     },
 
-    async transform(_, id) {
-      if (id.endsWith('.wasm')) {
+    transform(base64, id) {
+      if (id.endsWith('.wasm') || id.endsWith('?wasm')) {
+        id = normalizeFsPath(id);
+        const assetName = path.basename(id, '.wasm') + '.wasm';
         const referenceId = this.emitFile({
           type: 'asset',
-          source: await readFile(id),
-          name: path.basename(id),
+          source: Buffer.from(base64, 'base64'),
+          name: assetName,
         });
         return `
 import { createAsyncWasm } from '${WASM_HELPER_ID}';
