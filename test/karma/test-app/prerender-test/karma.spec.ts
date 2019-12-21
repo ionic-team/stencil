@@ -3,13 +3,10 @@ import { setupDomTests } from '../util';
 describe('prerender', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
+  afterEach(tearDownDom);
 
-  beforeAll(async () => {
-    app = await setupDom('/prerender/index.html');
-  });
-  afterAll(tearDownDom);
-
-  it('server componentWillLoad Order', () => {
+  it('server componentWillLoad Order', async () => {
+    app = await setupDom('/prerender/index.html', 500);
     const elm = app.querySelector('#server-componentWillLoad');
     expect(elm.children[0].textContent.trim()).toBe('CmpA server componentWillLoad');
     expect(elm.children[1].textContent.trim()).toBe('CmpD - a1-child server componentWillLoad');
@@ -21,7 +18,8 @@ describe('prerender', () => {
     expect(elm.children[7].textContent.trim()).toBe('CmpD - c-child server componentWillLoad');
   });
 
-  it('server componentDidLoad Order', () => {
+  it('server componentDidLoad Order', async () => {
+    app = await setupDom('/prerender/index.html', 500);
     const elm = app.querySelector('#server-componentDidLoad');
     expect(elm.children[0].textContent.trim()).toBe('CmpD - a1-child server componentDidLoad');
     expect(elm.children[1].textContent.trim()).toBe('CmpD - a2-child server componentDidLoad');
@@ -33,22 +31,26 @@ describe('prerender', () => {
     expect(elm.children[7].textContent.trim()).toBe('CmpA server componentDidLoad');
   });
 
-  it('set ssrv', () => {
-    const appRoot = app.querySelector('app-root');
-    expect(appRoot.getAttribute('ssrv')).toBe('0');
-    expect(appRoot.getAttribute('class')).toBe('hydrated');
-
-    const main = app.querySelector('app-root main');
-    expect(main.getAttribute('ssrc')).toBe('0.0');
-  });
-
-  it('correct scoped styles applied after scripts kick in', () => {
+  it('correct scoped styles applied after scripts kick in', async () => {
+    app = await setupDom('/prerender/index.html', 500);
     testScopedStyles(app);
   });
 
-  it('correct scoped styles applied before scripts kick in', async () => {
-    app = await setupDom('/prerender/index-no-script.html');
+  it('no-script, correct scoped styles applied before scripts kick in', async () => {
+    app = await setupDom('/prerender/index-no-script.html', 500);
     testScopedStyles(app);
+  });
+
+  it('root slots', async () => {
+    app = await setupDom('/prerender/index.html', 500);
+
+    const scoped = app.querySelector('cmp-client-scoped');
+    const scopedStyle = getComputedStyle(scoped.querySelector('section'));
+    expect(scopedStyle.color).toBe('rgb(255, 0, 0)');
+
+    const shadow = app.querySelector('cmp-client-shadow');
+    const shadowStyle = getComputedStyle(shadow.shadowRoot.querySelector('article'));
+    expect(shadowStyle.color).toBe('rgb(255, 0, 0)');
   });
 
 });
@@ -86,9 +88,4 @@ function testScopedStyles(app: HTMLElement) {
   const cmpScopedBScopedClass = cmpScopedB.querySelector('.scoped-class');
   const scopedBScopedClassStyles = window.getComputedStyle(cmpScopedBScopedClass);
   expect(scopedBScopedClassStyles.color).toBe('rgb(255, 255, 0)');
-
-  const styles = app.querySelectorAll('style') as NodeListOf<HTMLStyleElement>;
-  for (let i = 0; i < styles.length; i++) {
-    expect(styles[i].innerHTML).not.toContain('i-am-an-unused-selecor');
-  }
 }

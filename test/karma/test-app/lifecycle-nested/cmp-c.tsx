@@ -1,17 +1,17 @@
-import { Host, Component, h } from "@stencil/core";
-import output from "./output";
+import { Host, Component, h } from '@stencil/core';
+import output from './output';
 
 @Component({
-  tag: "cmp-c",
+  tag: 'lifecycle-nested-c',
   shadow: true
 })
 export class Cmpc {
   async componentWillLoad() {
-    output("componentWillLoad-c");
+    output('componentWillLoad-c');
   }
 
   componentDidLoad() {
-    output("componentDidLoad-c");
+    output('componentDidLoad-c');
   }
 
   render() {

@@ -1746,9 +1746,10 @@ export interface RenderNode extends HostElement {
   ['s-node-id']?: number;
 
   /**
-   * Used to tell if the element is shadow dom or not
+   * Used to know the components encapsulation.
+   * empty "" for shadow, "c" from scoped
    */
-  ['s-sd']?: boolean;
+  ['s-en']?: '' /*shadow*/ | 'c' /*scoped*/;
 }
 
 export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];

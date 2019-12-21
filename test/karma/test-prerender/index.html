@@ -3,22 +3,13 @@
 <head>
   <meta charset="utf-8">
   <title>Test Prerender App</title>
-  <meta name="Description" content="Welcome to the Test Prerender App!">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
-  <meta name="theme-color" content="#16161d">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta http-equiv="x-ua-compatible" content="IE=Edge"/>
-
   <link href="/prerender/build/testprerender.css" rel="stylesheet">
-  <script src="/prerender/build/testprerender.js"></script>
-
-  <link rel="apple-touch-icon" href="/prerender/assets/icon/icon.png">
-  <link rel="icon" type="image/x-icon" href="/prerender/assets/icon/favicon.ico">
-  <link rel="manifest" href="/prerender/manifest.json">
+  <script src="/prerender/build/testprerender.esm.js" type="module"></script>
+  <script src="/prerender/build/testprerender.js" nomodule></script>
 </head>
 <body>
-
   <app-root></app-root>
-
+  <cmp-client-scoped>scoped light-dom: red if in the correct slot</cmp-client-scoped>
+  <cmp-client-shadow>shadow light-dom: red if in the correct slot</cmp-client-shadow>
 </body>
 </html>

@@ -4,7 +4,7 @@ import { drainPrerenderQueue, initializePrerenderEntryUrls } from './prerender-q
 import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
 import { generateTemplateHtml } from './prerender-template-html';
-import { getPrerenderConfig } from './prerender-config';
+import { getPrerenderConfig, validatePrerenderConfigPath } from './prerender-config';
 import { getAbsoluteBuildDir } from '../compiler/html/utils';
 import { isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { NodeWorkerController } from '../sys/node_next/worker';
@@ -87,6 +87,11 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWo
     const devServerHostUrl = devServerBaseUrl.origin;
     config.logger.debug(`prerender hydrate app: ${buildResults.hydrateAppFilePath}`);
     config.logger.debug(`prerender dev server: ${devServerHostUrl}`);
+
+    validatePrerenderConfigPath(diagnostics, outputTarget.prerenderConfig);
+    if (hasError(diagnostics)) {
+      return;
+    }
 
     // get the prerender urls to queue up
     const manager: d.PrerenderManager = {

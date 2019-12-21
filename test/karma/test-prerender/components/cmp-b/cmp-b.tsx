@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, h } from '@stencil/core';
 import { printLifecycle } from '../../global/util';
 
 
@@ -8,14 +8,12 @@ import { printLifecycle } from '../../global/util';
 })
 export class CmpB {
 
-  @Prop({ context: 'isClient' }) isClient: boolean;
-
   componentWillLoad() {
-    printLifecycle(this.isClient, 'CmpB', 'componentWillLoad');
+    printLifecycle('CmpB', 'componentWillLoad');
   }
 
   componentDidLoad() {
-    printLifecycle(this.isClient, 'CmpB', 'componentDidLoad');
+    printLifecycle('CmpB', 'componentDidLoad');
   }
 
   render() {

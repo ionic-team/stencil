@@ -5,12 +5,6 @@ app-root {
   background: blue;
 }
 
-app-root header {
-  padding: 10px;
-  color: white;
-  font-weight: bold;
-}
-
 .server {
   padding: 10px;
   background: darkorange;

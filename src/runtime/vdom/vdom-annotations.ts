@@ -48,11 +48,19 @@ export const insertVdomAnnotations = (doc: Document) => {
         let orgLocationNodeId = `${ORG_LOCATION_ID}.${childId}`;
 
         const orgLocationParentNode = orgLocationNode.parentElement as d.RenderNode;
-        if (orgLocationParentNode && orgLocationParentNode['s-sd']) {
-          // ending with a . means that the parent element
-          // of this node's original location is a shadow dom element
-          // and this node is apart of the root level light dom
-          orgLocationNodeId += `.`;
+        if (orgLocationParentNode) {
+          if (orgLocationParentNode['s-en'] === '') {
+            // ending with a "." means that the parent element
+            // of this node's original location is a SHADOW dom element
+            // and this node is apart of the root level light dom
+            orgLocationNodeId += `.`;
+
+          } else if (orgLocationParentNode['s-en'] === 'c') {
+            // ending with a ".c" means that the parent element
+            // of this node's original location is a SCOPED element
+            // and this node is apart of the root level light dom
+            orgLocationNodeId += `.c`;
+          }
         }
 
         orgLocationNode.nodeValue = orgLocationNodeId;

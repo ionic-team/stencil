@@ -1,9 +1,10 @@
+import { Build } from '@stencil/core';
 
 
-export function printLifecycle(isClient: boolean, cmp: string, lifecycle: string) {
+export function printLifecycle(cmp: string, lifecycle: string) {
   const elm = document.createElement('div');
 
-  if (isClient) {
+  if (Build.isBrowser) {
     const output = document.getElementById(`client-${lifecycle}`);
     elm.textContent = `${cmp} client ${lifecycle}`;
     output.appendChild(elm);

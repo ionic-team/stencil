@@ -1,4 +1,4 @@
-import { Component, h } from '@stencil/core';
+import { Component, Host, h } from '@stencil/core';
 
 
 @Component({
@@ -9,13 +9,12 @@ export class AppRoot {
 
   render() {
     return (
-      <main>
-        <header>App Root</header>
+      <Host>
         <cmp-a>
-          <cmp-d unique-id="a1-child"/>
-          <cmp-d unique-id="a2-child"/>
-          <cmp-d unique-id="a3-child"/>
-          <cmp-d unique-id="a4-child"/>
+          <cmp-d uniqueId="a1-child"/>
+          <cmp-d uniqueId="a2-child"/>
+          <cmp-d uniqueId="a3-child"/>
+          <cmp-d uniqueId="a4-child"/>
         </cmp-a>
         <div class="server">
           <div id="server-componentWillLoad"/>
@@ -31,7 +30,7 @@ export class AppRoot {
         <div>
           <cmp-scoped-b></cmp-scoped-b>
         </div>
-      </main>
+      </Host>
     );
   }
 }
