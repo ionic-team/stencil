@@ -1,3 +1,13 @@
+## 🦄 [1.8.3-1](https://github.com/ionic-team/stencil/compare/v1.8.3-0...v1.8.3-1) (2019-12-21)
+
+
+### Bug Fixes
+
+* **hydrate:** fix scoped/ie11/edge clientside slot hydrate ([d4314f4](https://github.com/ionic-team/stencil/commit/d4314f4d432830408a963b8996a4f6eee6285699))
+* **ie11:** ensure document.body ready for es5 msg ([763343e](https://github.com/ionic-team/stencil/commit/763343e6dbf9afa90e7a91e8e80c6feef4244e30))
+
+
+
 ## 👀 [1.8.3-0](https://github.com/ionic-team/stencil/compare/v1.8.2...v1.8.3-0) (2019-12-19)
 
 
