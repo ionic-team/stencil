@@ -70,3 +70,63 @@ export function toHaveReceivedEventDetail(eventSpy: d.EventSpy, eventDetail: any
     pass: pass,
   };
 }
+
+export function toHaveFirstReceivedEventDetail(eventSpy: d.EventSpy, eventDetail: any) {
+  if (!eventSpy) {
+    throw new Error(`toHaveFirstReceivedEventDetail event spy is null`);
+  }
+
+  if (typeof (eventSpy as any).then === 'function') {
+    throw new Error(`event spy must be a resolved value, not a promise, before it can be tested`);
+  }
+
+  if (!eventSpy.eventName) {
+    throw new Error(`toHaveFirstReceivedEventDetail did not receive an event spy`);
+  }
+
+  if (!eventSpy.firstEvent) {
+    throw new Error(`event "${eventSpy.eventName}" was not received`);
+  }
+
+  const pass = deepEqual(eventSpy.firstEvent.detail, eventDetail);
+
+  expect(eventSpy.lastEvent.detail).toEqual(eventDetail);
+
+  return {
+    message: () => `expected event "${eventSpy.eventName}" detail to ${pass ? 'not ' : ''}equal`,
+    pass: pass,
+  };
+}
+
+export function toHaveNthReceivedEventDetail(eventSpy: d.EventSpy, index: number, eventDetail: any) {
+  if (!eventSpy) {
+    throw new Error(`toHaveNthReceivedEventDetail event spy is null`);
+  }
+
+  if (typeof (eventSpy as any).then === 'function') {
+    throw new Error(`event spy must be a resolved value, not a promise, before it can be tested`);
+  }
+
+  if (!eventSpy.eventName) {
+    throw new Error(`toHaveNthReceivedEventDetail did not receive an event spy`);
+  }
+
+  if (!eventSpy.firstEvent) {
+    throw new Error(`event "${eventSpy.eventName}" was not received`);
+  }
+
+  const event = eventSpy.events[index];
+
+  if (!event) {
+    throw new Error(`event at index ${index} was not received`);
+  }
+
+  const pass = deepEqual(event.detail, eventDetail);
+
+  expect(event.detail).toEqual(eventDetail);
+
+  return {
+    message: () => `expected event "${eventSpy.eventName}" detail to ${pass ? 'not ' : ''}equal`,
+    pass: pass,
+  };
+}
