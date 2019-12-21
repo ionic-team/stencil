@@ -1,5 +1,5 @@
 const browserStack = !!process.env.CI;
-process.env.CHROME_BIN = require('puppeteer').executablePath()
+process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 var browserStackLaunchers = {
   bs_chrome: {
@@ -38,13 +38,13 @@ const localLaunchers = {
   ChromeHeadless: {
     base: 'ChromeHeadless',
     flags: [
-			'--no-sandbox',
-			// See https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md
-			'--headless',
-			'--disable-gpu',
-			// Without a remote debugging port, Google Chrome exits immediately.
-			'--remote-debugging-port=9333'
-		]
+      '--no-sandbox',
+      // See https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md
+      '--headless',
+      '--disable-gpu',
+      // Without a remote debugging port, Google Chrome exits immediately.
+      '--remote-debugging-port=9333'
+    ]
   },
   'Firefox': {
     base: 'Firefox'
@@ -66,7 +66,7 @@ if (process.platform === 'win32') {
 }
 
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
     plugins: [
       'karma-chrome-launcher',
@@ -106,10 +106,7 @@ module.exports = function(config) {
     customLaunchers: browserStack ? browserStackLaunchers : {},
     urlRoot: '/__karma__/',
     files: [
-      // 'test-app/attribute-basic/karma.spec.ts',
-      // 'test-app/attribute-complex/karma.spec.ts',
-      // 'test-app/reflect-to-attr/karma.spec.ts',
-
+      // 'test-app/prerender-test/karma.spec.ts',
       'test-app/**/*.spec.ts',
       'test-app/util.ts',
       { pattern: 'www/**/*', watched: false, included: false, served: true, nocache: true, type: 'module' }
@@ -126,7 +123,7 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
 
     reporters: ['progress'].concat(browserStack
-      ? [ 'BrowserStack' ]
+      ? ['BrowserStack']
       : []),
 
     karmaTypescriptConfig: {

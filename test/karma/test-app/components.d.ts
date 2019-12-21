@@ -12,6 +12,7 @@ import {
 } from './util';
 
 export namespace Components {
+  interface AppRoot {}
   interface AttributeBasic {
     'customAttr': string;
     'multiWord': string;
@@ -48,6 +49,13 @@ export namespace Components {
   interface CmpA {}
   interface CmpB {}
   interface CmpC {}
+  interface CmpClientScoped {}
+  interface CmpClientShadow {}
+  interface CmpD {
+    'uniqueId': string;
+  }
+  interface CmpScopedA {}
+  interface CmpScopedB {}
   interface ConditionalBasic {}
   interface ConditionalRerender {}
   interface ConditionalRerenderRoot {}
@@ -106,6 +114,9 @@ export namespace Components {
   interface LifecycleBasicC {
     'value': string;
   }
+  interface LifecycleNestedA {}
+  interface LifecycleNestedB {}
+  interface LifecycleNestedC {}
   interface LifecycleUnloadA {}
   interface LifecycleUnloadB {}
   interface LifecycleUnloadRoot {}
@@ -156,6 +167,7 @@ export namespace Components {
     'i'?: number;
   }
   interface ShadowDomSlotNestedRoot {}
+  interface SiblingRoot {}
   interface SlotArrayBasic {}
   interface SlotArrayComplex {}
   interface SlotArrayComplexRoot {}
@@ -210,6 +222,12 @@ export namespace Components {
 
 declare global {
 
+
+  interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
+  var HTMLAppRootElement: {
+    prototype: HTMLAppRootElement;
+    new (): HTMLAppRootElement;
+  };
 
   interface HTMLAttributeBasicElement extends Components.AttributeBasic, HTMLStencilElement {}
   var HTMLAttributeBasicElement: {
@@ -275,6 +293,36 @@ declare global {
   var HTMLCmpCElement: {
     prototype: HTMLCmpCElement;
     new (): HTMLCmpCElement;
+  };
+
+  interface HTMLCmpClientScopedElement extends Components.CmpClientScoped, HTMLStencilElement {}
+  var HTMLCmpClientScopedElement: {
+    prototype: HTMLCmpClientScopedElement;
+    new (): HTMLCmpClientScopedElement;
+  };
+
+  interface HTMLCmpClientShadowElement extends Components.CmpClientShadow, HTMLStencilElement {}
+  var HTMLCmpClientShadowElement: {
+    prototype: HTMLCmpClientShadowElement;
+    new (): HTMLCmpClientShadowElement;
+  };
+
+  interface HTMLCmpDElement extends Components.CmpD, HTMLStencilElement {}
+  var HTMLCmpDElement: {
+    prototype: HTMLCmpDElement;
+    new (): HTMLCmpDElement;
+  };
+
+  interface HTMLCmpScopedAElement extends Components.CmpScopedA, HTMLStencilElement {}
+  var HTMLCmpScopedAElement: {
+    prototype: HTMLCmpScopedAElement;
+    new (): HTMLCmpScopedAElement;
+  };
+
+  interface HTMLCmpScopedBElement extends Components.CmpScopedB, HTMLStencilElement {}
+  var HTMLCmpScopedBElement: {
+    prototype: HTMLCmpScopedBElement;
+    new (): HTMLCmpScopedBElement;
   };
 
   interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {}
@@ -487,6 +535,24 @@ declare global {
     new (): HTMLLifecycleBasicCElement;
   };
 
+  interface HTMLLifecycleNestedAElement extends Components.LifecycleNestedA, HTMLStencilElement {}
+  var HTMLLifecycleNestedAElement: {
+    prototype: HTMLLifecycleNestedAElement;
+    new (): HTMLLifecycleNestedAElement;
+  };
+
+  interface HTMLLifecycleNestedBElement extends Components.LifecycleNestedB, HTMLStencilElement {}
+  var HTMLLifecycleNestedBElement: {
+    prototype: HTMLLifecycleNestedBElement;
+    new (): HTMLLifecycleNestedBElement;
+  };
+
+  interface HTMLLifecycleNestedCElement extends Components.LifecycleNestedC, HTMLStencilElement {}
+  var HTMLLifecycleNestedCElement: {
+    prototype: HTMLLifecycleNestedCElement;
+    new (): HTMLLifecycleNestedCElement;
+  };
+
   interface HTMLLifecycleUnloadAElement extends Components.LifecycleUnloadA, HTMLStencilElement {}
   var HTMLLifecycleUnloadAElement: {
     prototype: HTMLLifecycleUnloadAElement;
@@ -647,6 +713,12 @@ declare global {
   var HTMLShadowDomSlotNestedRootElement: {
     prototype: HTMLShadowDomSlotNestedRootElement;
     new (): HTMLShadowDomSlotNestedRootElement;
+  };
+
+  interface HTMLSiblingRootElement extends Components.SiblingRoot, HTMLStencilElement {}
+  var HTMLSiblingRootElement: {
+    prototype: HTMLSiblingRootElement;
+    new (): HTMLSiblingRootElement;
   };
 
   interface HTMLSlotArrayBasicElement extends Components.SlotArrayBasic, HTMLStencilElement {}
@@ -841,6 +913,7 @@ declare global {
     new (): HTMLTag88Element;
   };
   interface HTMLElementTagNameMap {
+    'app-root': HTMLAppRootElement;
     'attribute-basic': HTMLAttributeBasicElement;
     'attribute-basic-root': HTMLAttributeBasicRootElement;
     'attribute-boolean': HTMLAttributeBooleanElement;
@@ -852,6 +925,11 @@ declare global {
     'cmp-a': HTMLCmpAElement;
     'cmp-b': HTMLCmpBElement;
     'cmp-c': HTMLCmpCElement;
+    'cmp-client-scoped': HTMLCmpClientScopedElement;
+    'cmp-client-shadow': HTMLCmpClientShadowElement;
+    'cmp-d': HTMLCmpDElement;
+    'cmp-scoped-a': HTMLCmpScopedAElement;
+    'cmp-scoped-b': HTMLCmpScopedBElement;
     'conditional-basic': HTMLConditionalBasicElement;
     'conditional-rerender': HTMLConditionalRerenderElement;
     'conditional-rerender-root': HTMLConditionalRerenderRootElement;
@@ -887,6 +965,9 @@ declare global {
     'lifecycle-basic-a': HTMLLifecycleBasicAElement;
     'lifecycle-basic-b': HTMLLifecycleBasicBElement;
     'lifecycle-basic-c': HTMLLifecycleBasicCElement;
+    'lifecycle-nested-a': HTMLLifecycleNestedAElement;
+    'lifecycle-nested-b': HTMLLifecycleNestedBElement;
+    'lifecycle-nested-c': HTMLLifecycleNestedCElement;
     'lifecycle-unload-a': HTMLLifecycleUnloadAElement;
     'lifecycle-unload-b': HTMLLifecycleUnloadBElement;
     'lifecycle-unload-root': HTMLLifecycleUnloadRootElement;
@@ -914,6 +995,7 @@ declare global {
     'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement;
     'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement;
     'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement;
+    'sibling-root': HTMLSiblingRootElement;
     'slot-array-basic': HTMLSlotArrayBasicElement;
     'slot-array-complex': HTMLSlotArrayComplexElement;
     'slot-array-complex-root': HTMLSlotArrayComplexRootElement;
@@ -950,6 +1032,7 @@ declare global {
 }
 
 declare namespace LocalJSX {
+  interface AppRoot {}
   interface AttributeBasic {
     'customAttr'?: string;
     'multiWord'?: string;
@@ -983,6 +1066,13 @@ declare namespace LocalJSX {
   interface CmpA {}
   interface CmpB {}
   interface CmpC {}
+  interface CmpClientScoped {}
+  interface CmpClientShadow {}
+  interface CmpD {
+    'uniqueId'?: string;
+  }
+  interface CmpScopedA {}
+  interface CmpScopedB {}
   interface ConditionalBasic {}
   interface ConditionalRerender {}
   interface ConditionalRerenderRoot {}
@@ -1045,6 +1135,9 @@ declare namespace LocalJSX {
     'onLifecycleUpdate'?: (event: CustomEvent<any>) => void;
     'value'?: string;
   }
+  interface LifecycleNestedA {}
+  interface LifecycleNestedB {}
+  interface LifecycleNestedC {}
   interface LifecycleUnloadA {}
   interface LifecycleUnloadB {}
   interface LifecycleUnloadRoot {}
@@ -1095,6 +1188,7 @@ declare namespace LocalJSX {
     'i'?: number;
   }
   interface ShadowDomSlotNestedRoot {}
+  interface SiblingRoot {}
   interface SlotArrayBasic {}
   interface SlotArrayComplex {}
   interface SlotArrayComplexRoot {}
@@ -1147,6 +1241,7 @@ declare namespace LocalJSX {
   interface Tag88 {}
 
   interface IntrinsicElements {
+    'app-root': AppRoot;
     'attribute-basic': AttributeBasic;
     'attribute-basic-root': AttributeBasicRoot;
     'attribute-boolean': AttributeBoolean;
@@ -1158,6 +1253,11 @@ declare namespace LocalJSX {
     'cmp-a': CmpA;
     'cmp-b': CmpB;
     'cmp-c': CmpC;
+    'cmp-client-scoped': CmpClientScoped;
+    'cmp-client-shadow': CmpClientShadow;
+    'cmp-d': CmpD;
+    'cmp-scoped-a': CmpScopedA;
+    'cmp-scoped-b': CmpScopedB;
     'conditional-basic': ConditionalBasic;
     'conditional-rerender': ConditionalRerender;
     'conditional-rerender-root': ConditionalRerenderRoot;
@@ -1193,6 +1293,9 @@ declare namespace LocalJSX {
     'lifecycle-basic-a': LifecycleBasicA;
     'lifecycle-basic-b': LifecycleBasicB;
     'lifecycle-basic-c': LifecycleBasicC;
+    'lifecycle-nested-a': LifecycleNestedA;
+    'lifecycle-nested-b': LifecycleNestedB;
+    'lifecycle-nested-c': LifecycleNestedC;
     'lifecycle-unload-a': LifecycleUnloadA;
     'lifecycle-unload-b': LifecycleUnloadB;
     'lifecycle-unload-root': LifecycleUnloadRoot;
@@ -1220,6 +1323,7 @@ declare namespace LocalJSX {
     'shadow-dom-slot-basic': ShadowDomSlotBasic;
     'shadow-dom-slot-nested': ShadowDomSlotNested;
     'shadow-dom-slot-nested-root': ShadowDomSlotNestedRoot;
+    'sibling-root': SiblingRoot;
     'slot-array-basic': SlotArrayBasic;
     'slot-array-complex': SlotArrayComplex;
     'slot-array-complex-root': SlotArrayComplexRoot;
@@ -1261,6 +1365,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
+      'app-root': LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
       'attribute-basic': LocalJSX.AttributeBasic & JSXBase.HTMLAttributes<HTMLAttributeBasicElement>;
       'attribute-basic-root': LocalJSX.AttributeBasicRoot & JSXBase.HTMLAttributes<HTMLAttributeBasicRootElement>;
       'attribute-boolean': LocalJSX.AttributeBoolean & JSXBase.HTMLAttributes<HTMLAttributeBooleanElement>;
@@ -1272,6 +1377,11 @@ declare module "@stencil/core" {
       'cmp-a': LocalJSX.CmpA & JSXBase.HTMLAttributes<HTMLCmpAElement>;
       'cmp-b': LocalJSX.CmpB & JSXBase.HTMLAttributes<HTMLCmpBElement>;
       'cmp-c': LocalJSX.CmpC & JSXBase.HTMLAttributes<HTMLCmpCElement>;
+      'cmp-client-scoped': LocalJSX.CmpClientScoped & JSXBase.HTMLAttributes<HTMLCmpClientScopedElement>;
+      'cmp-client-shadow': LocalJSX.CmpClientShadow & JSXBase.HTMLAttributes<HTMLCmpClientShadowElement>;
+      'cmp-d': LocalJSX.CmpD & JSXBase.HTMLAttributes<HTMLCmpDElement>;
+      'cmp-scoped-a': LocalJSX.CmpScopedA & JSXBase.HTMLAttributes<HTMLCmpScopedAElement>;
+      'cmp-scoped-b': LocalJSX.CmpScopedB & JSXBase.HTMLAttributes<HTMLCmpScopedBElement>;
       'conditional-basic': LocalJSX.ConditionalBasic & JSXBase.HTMLAttributes<HTMLConditionalBasicElement>;
       'conditional-rerender': LocalJSX.ConditionalRerender & JSXBase.HTMLAttributes<HTMLConditionalRerenderElement>;
       'conditional-rerender-root': LocalJSX.ConditionalRerenderRoot & JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement>;
@@ -1307,6 +1417,9 @@ declare module "@stencil/core" {
       'lifecycle-basic-a': LocalJSX.LifecycleBasicA & JSXBase.HTMLAttributes<HTMLLifecycleBasicAElement>;
       'lifecycle-basic-b': LocalJSX.LifecycleBasicB & JSXBase.HTMLAttributes<HTMLLifecycleBasicBElement>;
       'lifecycle-basic-c': LocalJSX.LifecycleBasicC & JSXBase.HTMLAttributes<HTMLLifecycleBasicCElement>;
+      'lifecycle-nested-a': LocalJSX.LifecycleNestedA & JSXBase.HTMLAttributes<HTMLLifecycleNestedAElement>;
+      'lifecycle-nested-b': LocalJSX.LifecycleNestedB & JSXBase.HTMLAttributes<HTMLLifecycleNestedBElement>;
+      'lifecycle-nested-c': LocalJSX.LifecycleNestedC & JSXBase.HTMLAttributes<HTMLLifecycleNestedCElement>;
       'lifecycle-unload-a': LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
       'lifecycle-unload-b': LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
       'lifecycle-unload-root': LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
@@ -1334,6 +1447,7 @@ declare module "@stencil/core" {
       'shadow-dom-slot-basic': LocalJSX.ShadowDomSlotBasic & JSXBase.HTMLAttributes<HTMLShadowDomSlotBasicElement>;
       'shadow-dom-slot-nested': LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;
       'shadow-dom-slot-nested-root': LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
+      'sibling-root': LocalJSX.SiblingRoot & JSXBase.HTMLAttributes<HTMLSiblingRootElement>;
       'slot-array-basic': LocalJSX.SlotArrayBasic & JSXBase.HTMLAttributes<HTMLSlotArrayBasicElement>;
       'slot-array-complex': LocalJSX.SlotArrayComplex & JSXBase.HTMLAttributes<HTMLSlotArrayComplexElement>;
       'slot-array-complex-root': LocalJSX.SlotArrayComplexRoot & JSXBase.HTMLAttributes<HTMLSlotArrayComplexRootElement>;

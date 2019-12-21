@@ -32,6 +32,12 @@ function onReady(callback: Function) {
   }
 }
 
+function waitFrame() {
+  return new Promise(resolve => {
+    requestAnimationFrame(resolve);
+  });
+}
+
 /**
  * Create setup methods for dom based tests.
  */
@@ -46,7 +52,7 @@ export function setupDomTests(document: Document) {
   /**
    * Run this before each test
    */
-  function setupDom(url?: string) {
+  function setupDom(url?: string, waitForStencilReady?: number) {
     const app = document.createElement('div');
     activeRendering.clear();
     onAppReadyCallbacks.length = 0;
@@ -58,7 +64,7 @@ export function setupDomTests(document: Document) {
 
     if (url) {
       app.setAttribute('data-url', url);
-      return renderTest(url, app);
+      return renderTest(url, app, waitForStencilReady);
     }
 
     return Promise.resolve(app);
@@ -74,17 +80,11 @@ export function setupDomTests(document: Document) {
   /**
    * Create web component for executing tests against
    */
-  function renderTest(url: string, app: HTMLElement) {
+  function renderTest(url: string, app: HTMLElement, waitForStencilReady: number) {
     url = '/base/www' + url;
 
     return new Promise<HTMLElement>((resolve, reject) => {
       try {
-        const waitFrame = () => {
-          return new Promise(resolve => {
-            requestAnimationFrame(resolve);
-          });
-        };
-
         const allReady = () => {
           const promises: Promise<any>[] = [];
           const waitForDidLoad = (promises: Promise<any>[], elm: Element) => {
@@ -105,7 +105,7 @@ export function setupDomTests(document: Document) {
             .catch((e) => console.error(e));
         };
 
-        const stencilReady = () => {
+        const stencilReady = (): Promise<any> => {
           return allReady()
             .then(() => waitFrame())
             .then(() => allReady());
@@ -122,19 +122,6 @@ export function setupDomTests(document: Document) {
           frag.appendChild(elm);
           app.innerHTML = elm.innerHTML;
 
-          function appLoad() {
-            window.removeEventListener('stencil_appload', appLoad);
-            stencilReady().then(() => {
-              resolve(app);
-            });
-          }
-
-          window.addEventListener('stencil_appload', appLoad);
-
-          // function scriptErrored(ev: any) {
-          //   console.error('script error', ev);
-          // }
-
           const tmpScripts = app.querySelectorAll('script') as NodeListOf<HTMLScriptElement>;
           for (let i = 0; i < tmpScripts.length; i++) {
             const script = document.createElement('script') as HTMLScriptElement;
@@ -149,13 +136,26 @@ export function setupDomTests(document: Document) {
             }
             script.innerHTML = tmpScripts[i].innerHTML;
 
-            // script.addEventListener('error', scriptErrored);
-
             tmpScripts[i].parentNode!.insertBefore(script, tmpScripts[i]);
             tmpScripts[i].parentNode!.removeChild(tmpScripts[i]);
           }
 
           elm.innerHTML = '';
+
+          if (typeof waitForStencilReady === 'number') {
+            setTimeout(() => {
+              resolve(app);
+            }, waitForStencilReady);
+
+          } else {
+            const appLoad = () => {
+              window.removeEventListener('stencil_appload', appLoad);
+              stencilReady().then(() => {
+                resolve(app);
+              });
+            };
+            window.addEventListener('stencil_appload', appLoad);
+          }
         }
 
         var oReq = new XMLHttpRequest();

@@ -1,17 +1,17 @@
-import { Component, h } from "@stencil/core";
-import output from "./output";
+import { Component, h } from '@stencil/core';
+import output from './output';
 
 @Component({
-  tag: "cmp-a",
+  tag: 'lifecycle-nested-a',
   shadow: true
 })
 export class Cmpa {
   async componentWillLoad() {
-    output("componentWillLoad-a");
+    output('componentWillLoad-a');
   }
 
   async componentDidLoad() {
-    output("componentDidLoad-a");
+    output('componentDidLoad-a');
   }
 
   render() {
