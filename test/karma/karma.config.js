@@ -46,9 +46,9 @@ const localLaunchers = {
       '--remote-debugging-port=9333'
     ]
   },
-  'Firefox': {
-    base: 'Firefox'
-  }
+  // 'Firefox': {
+  //   base: 'Firefox'
+  // }
 };
 
 if (process.platform === 'win32') {
