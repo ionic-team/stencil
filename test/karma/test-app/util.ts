@@ -52,7 +52,7 @@ export function setupDomTests(document: Document) {
   /**
    * Run this before each test
    */
-  function setupDom(url?: string, waitForStencilReady?: number) {
+  function setupDom(url?: string, waitForStencilReady?: number | undefined) {
     const app = document.createElement('div');
     activeRendering.clear();
     onAppReadyCallbacks.length = 0;
@@ -80,7 +80,7 @@ export function setupDomTests(document: Document) {
   /**
    * Create web component for executing tests against
    */
-  function renderTest(url: string, app: HTMLElement, waitForStencilReady: number) {
+  function renderTest(url: string, app: HTMLElement, waitForStencilReady: number | undefined) {
     url = '/base/www' + url;
 
     return new Promise<HTMLElement>((resolve, reject) => {
