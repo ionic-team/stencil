@@ -1,37 +1,24 @@
 import * as d from '../../../declarations';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
-import { IS_WEB_WORKER_ENV } from '../environment';
-import path from 'path';
+import { IS_WEB_WORKER_ENV, IS_CASE_SENSITIVE_FILE_NAMES } from '../environment';
+import { basename, resolve } from 'path';
+import { noop } from '@utils';
 import ts from 'typescript';
 
 
-export const getTypeScriptSys = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+export const getTypeScriptSys = async (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
   const stencilSys = config.sys_next;
   const tsSys = Object.assign({}, ts.sys || {} as ts.System);
 
   patchTsSystemFileSystem(config, stencilSys, inMemoryFs, tsSys);
   patchTsSystemWatch(stencilSys, tsSys);
-  patchTsSystemUtils(config, tsSys);
+  patchTsSystemUtils(tsSys);
 
   return tsSys;
 };
 
 
 const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, tsSys: ts.System) => {
-
-  // const skipDirectories = (p: string) => {
-  //   return (
-  //     !p.startsWith(config.rootDir)
-  //   );
-  // };
-
-  // const filterTypes = (paths: string[]) => paths.filter(p => (
-  //   !p.includes('/@types/puppeteer') &&
-  //   !p.includes('/@types/jest') &&
-  //   !p.includes('/@types/node') &&
-  //   !p.includes('/@types/estree')
-  // ));
-
   const skipFile = (readPath: string) => {
     // filter e2e tests
     if (readPath.includes('.e2e.') || readPath.includes('/e2e.')) {
@@ -44,6 +31,42 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
       return true;
     }
     return false;
+  };
+
+  const realpath = (path: string) => {
+    const rp = stencilSys.realpathSync(path);
+    if (rp) {
+      return rp;
+    }
+    return path;
+  };
+
+  const getAccessibleFileSystemEntries = (path: string) => {
+    try {
+      const entries = stencilSys.readdirSync(path || '.').sort();
+      const files: string[] = [];
+      const directories: string[] = [];
+
+      for (const absPath of entries) {
+        // This is necessary because on some file system node fails to exclude
+        // "." and "..". See https://github.com/nodejs/node/issues/4002
+        const stat = stencilSys.statSync(absPath);
+        if (!stat) {
+          continue;
+        }
+
+        const entry = basename(absPath);
+        if (stat.isFile()) {
+          files.push(entry);
+        } else if (stat.isDirectory()) {
+          directories.push(entry);
+        }
+      }
+      return { files, directories };
+
+    } catch (e) {
+      return { files: [], directories: [] };
+    }
   };
 
   tsSys.createDirectory = (p) => stencilSys.mkdirSync(p);
@@ -65,9 +88,6 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
   };
 
   tsSys.getDirectories = (p) => {
-    // if (skipDirectories(p)) {
-    //   return [];
-    // }
     const items = stencilSys.readdirSync(p);
     return items.filter(itemPath => {
       const s = stencilSys.statSync(itemPath);
@@ -75,47 +95,19 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
     });
   };
 
-  const visitDirectory = (matchingPaths: Set<string>, p: string, extensions: ReadonlyArray<string>, depth: number) => {
-    if (depth < 0) {
-      return;
-    }
-    const dirItems = stencilSys.readdirSync(p);
-    depth--;
-
-    dirItems.forEach(dirItem => {
-      if (!skipFile(dirItem)) {
-        if (Array.isArray(extensions) && extensions.length > 0) {
-          if (extensions.some(ext => dirItem.endsWith(ext))) {
-            matchingPaths.add(dirItem);
-          }
-        } else {
-          matchingPaths.add(dirItem);
-        }
-
-        const s = inMemoryFs.statSync(dirItem);
-        if (s && s.isDirectory) {
-          visitDirectory(matchingPaths, dirItem, extensions, depth);
-        }
-      }
-    });
-  };
-
-  tsSys.readDirectory = (p, extensions, _exclude, _include, depth = 0) => {
-    // if (skipDirectories(p)) {
-    //   return [];
-    // }
-    const matchingPaths = new Set<string>();
-    visitDirectory(matchingPaths, p, extensions, depth);
-    return Array.from(matchingPaths);
+  tsSys.readDirectory = (path, extensions, exclude, include, depth) => {
+    const cwd = stencilSys.getCurrentDirectory();
+    return (ts as any).matchFiles(path, extensions, exclude, include, IS_CASE_SENSITIVE_FILE_NAMES, cwd, depth, getAccessibleFileSystemEntries, realpath);
   };
 
   tsSys.readFile = (p) => {
     if (skipFile(p)) {
       return undefined;
     }
-    let content = inMemoryFs.readFileSync(p, {useCache: false});
+    const isUrl = p.startsWith('https:') || p.startsWith('http:');
+    let content = inMemoryFs.readFileSync(p, { useCache: isUrl });
 
-    if (typeof content !== 'string' && (p.startsWith('https:') || p.startsWith('http:'))) {
+    if (typeof content !== 'string' && isUrl) {
       if (IS_WEB_WORKER_ENV) {
         content = fetchUrlSync(p);
         if (typeof content === 'string') {
@@ -129,9 +121,8 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
     return content;
   };
 
-  tsSys.writeFile = (p, data) => {
+  tsSys.writeFile = (p, data) =>
     inMemoryFs.writeFile(p, data);
-  };
 };
 
 
@@ -168,11 +159,9 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
 };
 
 
-const patchTsSystemUtils = (config: d.Config, tsSys: ts.System) => {
+export const patchTsSystemUtils = (tsSys: ts.System) => {
   if (!tsSys.getCurrentDirectory) {
-    tsSys.getCurrentDirectory = () => {
-      return '/';
-    };
+    tsSys.getCurrentDirectory = () => '/';
   }
 
   if (!tsSys.args) {
@@ -184,24 +173,18 @@ const patchTsSystemUtils = (config: d.Config, tsSys: ts.System) => {
   }
 
   if (typeof tsSys.useCaseSensitiveFileNames !== 'boolean') {
-    tsSys.useCaseSensitiveFileNames = false;
+    tsSys.useCaseSensitiveFileNames = IS_CASE_SENSITIVE_FILE_NAMES;
   }
 
   if (!tsSys.exit) {
-    tsSys.exit = (exitCode) => {
-      config.logger.error(`typescript exit: ${exitCode}`);
-    };
+    tsSys.exit = noop;
   }
 
   if (!tsSys.resolvePath) {
-    tsSys.resolvePath = (p) => {
-      return path.resolve(p);
-    };
+    tsSys.resolvePath = (p) => resolve(p);
   }
 
   if (!tsSys.write) {
-    tsSys.write = (s) => {
-      config.logger.info('ts.sys.write', s);
-    };
+    tsSys.write = noop;
   }
 };

@@ -1,10 +1,10 @@
 import * as d from '../../declarations';
 import { cloneDocument, createDocument, serializeNodeToHtml } from '@mock-doc';
-import { compilerBuild } from '../../version';
 import { createLogger } from './logger';
 import { createSystem } from './stencil-sys';
 import { resolveModuleIdSync, resolvePackageJsonSync } from './resolve/resolve-module';
 import { scopeCss } from '../../utils/shadow-css';
+import { typescriptVersion, version } from '../../version';
 import path from 'path';
 
 
@@ -40,8 +40,8 @@ export const patchSysLegacy = (config: d.Config, compilerCtx: d.CompilerCtx) => 
   // old way
   config.sys.compiler = {
     name: '',
-    version: compilerBuild.stencilVersion,
-    typescriptVersion: compilerBuild.typescriptVersion,
+    version,
+    typescriptVersion,
     packageDir: path.resolve(__dirname, '..')
   },
   config.sys.generateContentHash = config.sys_next.generateContentHash;

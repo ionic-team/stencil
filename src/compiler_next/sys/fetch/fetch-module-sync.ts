@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import { known404Urls } from './fetch-utils';
 import { isString } from '@utils';
 import { skipFilePathFetch, skipUrlFetch } from '../fetch/fetch-utils';
-import { writeFetchSuccess } from './write-fetch-success';
+import { writeFetchSuccessSync } from './write-fetch-success';
 
 
 export const fetchModuleSync = (inMemoryFs: d.InMemoryFileSystem, pkgVersions: Map<string, string>, url: string, filePath: string) => {
@@ -12,7 +12,7 @@ export const fetchModuleSync = (inMemoryFs: d.InMemoryFileSystem, pkgVersions: M
 
   const content = fetchUrlSync(url);
   if (isString(content)) {
-    writeFetchSuccess(inMemoryFs, url, filePath, content, pkgVersions);
+    writeFetchSuccessSync(inMemoryFs, url, filePath, content, pkgVersions);
   }
 
   return content;
@@ -29,7 +29,7 @@ export const fetchUrlSync = (url: string) => {
     xhr.open('GET', url, false);
     xhr.send(null);
 
-    if (xhr.status >= 200 && xhr.status < 300) {
+    if (xhr.status >= 200 && xhr.status <= 299) {
       return xhr.responseText;
     }
   } catch (e) {}

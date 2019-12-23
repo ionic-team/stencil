@@ -1,21 +1,21 @@
 import * as d from '../../../declarations';
-import { buildError, buildWarn, catchError, isString, loadTypeScriptDiagnostic, normalizePath, hasError } from '@utils';
+import { buildError, buildWarn, catchError, hasError, isString, loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { getTypeScriptSys } from './typescript-sys';
+import { isAbsolute, join } from 'path';
 import { loadTypescript } from './typescript-load';
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
-import path from 'path';
 import ts from 'typescript';
 
 
 export const patchTypescript = async (config: d.Config, diagnostics: d.Diagnostic[], inMemoryFs: d.InMemoryFileSystem) => {
-  const loadedTs = loadTypescript(diagnostics);
+  const loadedTs = await loadTypescript(diagnostics);
   if (hasError(diagnostics)) {
     return;
   }
 
   Object.assign(ts, loadedTs);
 
-  loadedTs.sys = ts.sys = getTypeScriptSys(config, inMemoryFs);
+  loadedTs.sys = ts.sys = await getTypeScriptSys(config, inMemoryFs);
 
   loadedTs.resolveModuleName = ts.resolveModuleName = patchTypeScriptResolveModule(config, inMemoryFs);
 
@@ -27,13 +27,13 @@ export const patchTypescript = async (config: d.Config, diagnostics: d.Diagnosti
 export const getTsConfigPath = async (config: d.Config) => {
   if (config) {
     if (isString(config.tsconfig)) {
-      if (!path.isAbsolute(config.tsconfig)) {
-        return normalizePath(path.join(config.rootDir, config.tsconfig));
+      if (!isAbsolute(config.tsconfig)) {
+        return normalizePath(join(config.rootDir, config.tsconfig));
       }
       return normalizePath(config.tsconfig);
     }
     if (config.sys_next) {
-      const tsConfigPath = path.join(config.rootDir, 'tsconfig.json');
+      const tsConfigPath = join(config.rootDir, 'tsconfig.json');
       const tsconfigStat = await config.sys_next.stat(tsConfigPath);
       if (tsconfigStat && tsconfigStat.isFile()) {
         return normalizePath(tsConfigPath);

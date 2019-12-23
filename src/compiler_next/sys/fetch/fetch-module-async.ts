@@ -1,40 +1,31 @@
 import * as d from '../../../declarations';
+import { cachedFetch } from './fetch-cache';
 import { known404Urls } from './fetch-utils';
 import { skipFilePathFetch, skipUrlFetch } from '../fetch/fetch-utils';
-import { writeFetchSuccess } from './write-fetch-success';
+import { writeFetchSuccessAsync } from './write-fetch-success';
 
 
-const fetchCacheAsync = new Map<string, Promise<string>>();
-
-
-export const fetchModuleAsync = (inMemoryFs: d.InMemoryFileSystem, pkgVersions: Map<string, string>, url: string, filePath: string) => {
+export const fetchModuleAsync = async (inMemoryFs: d.InMemoryFileSystem, pkgVersions: Map<string, string>, url: string, filePath: string) => {
   if (skipFilePathFetch(filePath) || known404Urls.has(url) || skipUrlFetch(url)) {
-    return Promise.resolve(undefined);
+    return undefined;
   }
 
-  let fetchPromise = fetchCacheAsync.get(url);
+  try {
+    const rsp = await cachedFetch(url);
+    if (rsp) {
+      if (rsp.ok) {
+        const content = await rsp.clone().text();
+        writeFetchSuccessAsync(inMemoryFs, url, filePath, content, pkgVersions);
+        return content;
+      }
 
-  if (!fetchPromise) {
-    fetchPromise = new Promise(resolve => {
-      fetch(url)
-        .then(async rsp => {
-          if (rsp.status >= 200 && rsp.status < 300) {
-            const content = await rsp.text();
-            writeFetchSuccess(inMemoryFs, url, filePath, content, pkgVersions);
-            resolve(content);
-
-          } else {
-            known404Urls.add(url);
-            resolve(undefined);
-          }
-        })
-        .catch(() => {
-          known404Urls.add(url);
-          resolve(undefined);
-        });
-    });
-    fetchCacheAsync.set(url, fetchPromise);
+      if (rsp.status === 404) {
+        known404Urls.add(url);
+      }
+    }
+  } catch (e) {
+    console.error(e);
   }
 
-  return fetchPromise;
+  return undefined;
 };

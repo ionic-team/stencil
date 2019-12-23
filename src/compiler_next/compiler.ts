@@ -1,4 +1,5 @@
 import { Cache } from '../compiler/cache';
+import { cleanFetchCache } from './sys/fetch/fetch-cache';
 import { CompilerNext, Config, Diagnostic } from '../declarations';
 import { CompilerContext } from './build/compiler-ctx';
 import { createFullBuild } from './build/full-build';
@@ -8,6 +9,7 @@ import { createWatchBuild } from './build/watch-build';
 import { getConfig, patchSysLegacy } from './sys/config';
 import { patchFs } from './sys/fs-patch';
 import { patchTypescript } from './sys/typescript/typescript-patch';
+import { preloadInMemoryFsFromCache } from './sys/fetch/fetch-preload';
 
 
 export const createCompiler = async (config: Config) => {
@@ -27,6 +29,8 @@ export const createCompiler = async (config: Config) => {
 
   compilerCtx.worker = createSysWorker(sys, config.maxConcurrentWorkers);
   patchSysLegacy(config, compilerCtx);
+
+  await preloadInMemoryFsFromCache(config, compilerCtx.fs);
 
   if (sys.events) {
     // Pipe events from sys.events to compilerCtx
@@ -53,6 +57,8 @@ export const createCompiler = async (config: Config) => {
   };
 
   config.logger.printDiagnostics(diagnostics);
+
+  cleanFetchCache();
 
   return compiler;
 };
