@@ -74,7 +74,7 @@ function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, output
     }
   }, null, '  ');
 
-  return compilerCtx.fs.writeFile(hostConfigPath, hostConfigContent);
+  return compilerCtx.fs.writeFile(hostConfigPath, hostConfigContent, { outputTargetType: outputTarget.type });
 }
 
 
@@ -102,9 +102,10 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
 
     if (config.sys.serializeNodeToHtml != null) {
       const indexContent = config.sys.serializeNodeToHtml(doc);
-      await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexContent);
+      await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexContent, { outputTargetType: outputTarget.type });
+
       if (outputTarget.serviceWorker && config.flags.prerender) {
-        await compilerCtx.fs.writeFile(config.sys.path.join(outputTarget.appDir, INDEX_ORG), indexContent);
+        await compilerCtx.fs.writeFile(config.sys.path.join(outputTarget.appDir, INDEX_ORG), indexContent, { outputTargetType: outputTarget.type });
       }
 
       buildCtx.debug(`generateIndexHtml, write: ${config.sys.path.relative(config.rootDir, outputTarget.indexHtml)}`);
