@@ -26,6 +26,11 @@ export const HAS_FETCH_CACHE = (
   typeof caches.match === 'function'
 );
 
+export const HAS_WEB_WORKER = (
+  typeof Worker === 'function' &&
+  typeof location !== 'undefined'
+);
+
 export const IS_WINDOWS_ENV = (
   IS_NODE_ENV &&
   global.process.platform === 'win32'
