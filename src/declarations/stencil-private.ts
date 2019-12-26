@@ -1298,7 +1298,6 @@ export interface FsItem {
   queueWriteToDisk: boolean;
   queueDeleteFromDisk?: boolean;
   useCache: boolean;
-  outputTargetType: string;
 }
 
 export interface HostElement extends HTMLElement {
