@@ -203,6 +203,7 @@ addEventListener('message', async ({data}) => {
         message: typeof e === 'string' ? e : e.message,
         stack: e.stack
       };
+      value = undefined;
     }
 
     postMessage(
