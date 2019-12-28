@@ -199,6 +199,8 @@ addEventListener('message', async ({data}) => {
       value = await exports[method](...args);` }
 
     } catch (e) {
+      value = null;
+      ${isDev ? 'console.error(e);' : ''}
       err = {
         message: typeof e === 'string' ? e : e.message,
         stack: e.stack
