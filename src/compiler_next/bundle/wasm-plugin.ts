@@ -54,11 +54,17 @@ export const wasmPlugin = (_config: d.Config, _compilerCtx: d.CompilerCtx, _buil
           source: Buffer.from(base64, 'base64'),
           name: assetName,
         });
-        return `
-import { createAsyncWasm } from '${WASM_HELPER_ID}';
+        return {
+          syntheticNamedExports: true,
+          inlineDynamicImport: true,
+          code: `
+import { createAsyncWasm, createWasmProxy } from '${WASM_HELPER_ID}';
 const wasmPath = /*@__PURE__*/import.meta.ROLLUP_FILE_URL_${referenceId};
-const wasmProxy = /*@__PURE__*/createAsyncWasm(wasmPath);
-export default wasmProxy;`;
+const wasmExports = /*@__PURE__*/createAsyncWasm(wasmPath);
+
+export default /*@__PURE__*/createWasmProxy(wasmExports);
+export const then = wasmExports.then.bind(wasmExports);`
+        };
       }
       return null;
     }
@@ -68,14 +74,23 @@ export default wasmProxy;`;
 const WASM_HELPER_ID = '@wasm-helper';
 
 const WASM_HELPER = `
+export const createSyncWasm = (buffer) => {
+  const module = new WebAssembly.Module(buffer);
+  const instance = new WebAssembly.Instance(module);
+  return instance.exports;
+}
+
 export const createAsyncWasm = (src) => {
-  const promise = WebAssembly.instantiateStreaming(fetch(src)).then(obj => obj.instance.exports);
+  return WebAssembly.instantiateStreaming(fetch(src)).then(obj => obj.instance.exports);
+};
+
+export const createWasmProxy = (wasmExports) => {
   return new Proxy({}, {
     get(_, exportedName) {
       return (...args) => (
-        promise.then(exports => exports[exportedName](...args))
+        wasmExports.then(exports => exports[exportedName](...args))
       );
     }
-  })
-}
+  });
+};
 `;

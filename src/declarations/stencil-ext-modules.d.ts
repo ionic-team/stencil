@@ -29,16 +29,14 @@ declare module '*?worker' {
   export const fileName: string;
 }
 
+type WasmExports = Record<string, (...args: any[]) => any>;
+
 declare module '*.wasm' {
-  const wasmProxy: {
-    [method: string]: (...args: any[]) => Promise<any>
-  };
-  export default wasmProxy;
+  const wasmExports: WasmExports;
+  export = wasmExports;
 }
 
 declare module '*.rs' {
-  const wasmProxy: {
-    [method: string]: (...args: any[]) => Promise<any>
-  };
-  export default wasmProxy;
+  const wasmExports: WasmExports;
+  export = wasmExports;
 }
