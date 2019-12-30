@@ -3,7 +3,9 @@ import { addGlobalStyle, updateGlobalScopes } from './scope';
 
 export function loadDocument(doc: Document, globalScopes: CSSScope[]) {
   loadDocumentStyles(doc, globalScopes);
-  return loadDocumentLinks(doc, globalScopes);
+  return loadDocumentLinks(doc, globalScopes).then(() => {
+    updateGlobalScopes(globalScopes);
+  });
 }
 
 export function startWatcher(doc: Document, globalScopes: CSSScope[]) {
