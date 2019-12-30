@@ -1,10 +1,10 @@
 
 div#relativeToRoot {
-  background-image: url("/path/to/image.png");
+  background-image: url("/assets/favicon.ico?relativeToRoot");
 }
 div#relative {
-  background-image: url("../path/to/image.png");
+  background-image: url("../assets/favicon.ico?relative");
 }
 div#absolute {
-  background-image: url("http://domain/path/to/image.png");
+  background-image: url("https://www.google.com/favicon.ico");
 }
