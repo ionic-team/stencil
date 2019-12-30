@@ -261,7 +261,7 @@ export interface StencilDevServerConfig {
    */
   port?: number;
   /**
-   * When files are watched and udated, by default the dev server will use `hmr` (Hot Module Replacement) to update the page without a full page refresh. To have the page do a full refresh use `pageReload`. To disable any reloading, use `null`. Defaults to `hmr`.
+   * When files are watched and updated, by default the dev server will use `hmr` (Hot Module Replacement) to update the page without a full page refresh. To have the page do a full refresh use `pageReload`. To disable any reloading, use `null`. Defaults to `hmr`.
    */
   reloadStrategy?: PageReloadStrategy;
   root?: string;
@@ -542,14 +542,17 @@ export interface CompilerBuildResults {
   duration: number;
   filesAdded: string[];
   filesChanged: string[];
-  filesUpdated: string[];
   filesDeleted: string[];
+  filesUpdated: string[];
   hasError: boolean;
   hasSuccessfulBuild: boolean;
   hmr?: HotModuleReplacement;
   hydrateAppFilePath?: string;
   isRebuild: boolean;
+  namespace: string;
   outputs: BuildOutput[];
+  rootDir: string;
+  srcDir: string;
   timestamp: string;
 }
 
