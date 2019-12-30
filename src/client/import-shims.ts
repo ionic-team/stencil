@@ -45,7 +45,7 @@ export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => 
     };
   } else {
     const resourcesUrl = new URL('.', new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href));
-    patchDynamicImport(resourcesUrl.href);
+    patchDynamicImport(resourcesUrl.href, scriptElm);
 
     if (!window.customElements) {
       // @ts-ignore
@@ -58,14 +58,18 @@ export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => 
   }
 };
 
-export const patchDynamicImport = (base: string) => {
+export const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
   const importFunctionName = getDynamicImportFunction(NAMESPACE);
   try {
+    // test if this browser supports dynamic imports
     // There is a caching issue in V8, that breaks using import() in Function
     // By generating a random string, we can workaround it
     // Check https://bugs.chromium.org/p/v8/issues/detail?id=9558 for more info
     (win as any)[importFunctionName] = new Function('w', `return import(w);//${Math.random()}`);
   } catch (e) {
+    // this shim is specifically for browsers that do support "esm" imports
+    // however, they do NOT support "dynamic" imports
+    // basically this code is for old Edge, v18 and below
     const moduleMap = new Map<string, any>();
     (win as any)[importFunctionName] = (src: string) => {
       const url = new URL(src, base).href;
@@ -73,6 +77,7 @@ export const patchDynamicImport = (base: string) => {
       if (!mod) {
         const script = doc.createElement('script');
         script.type = 'module';
+        script.crossOrigin = orgScriptElm.crossOrigin;
         script.src = URL.createObjectURL(new Blob([`import * as m from '${url}'; window.${importFunctionName}.m = m;`], { type: 'application/javascript' }));
         mod = new Promise(resolve => {
           script.onload = () => {
