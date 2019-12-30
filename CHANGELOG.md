@@ -1,18 +1,11 @@
-## 🦄 [1.8.3-1](https://github.com/ionic-team/stencil/compare/v1.8.3-0...v1.8.3-1) (2019-12-21)
+## 🚍 [1.8.3](https://github.com/ionic-team/stencil/compare/v1.8.2...v1.8.3) (2019-12-30)
 
 
 ### Bug Fixes
 
+* **crossOrigin:** fix crossOrigin error on edge ([965b4af](https://github.com/ionic-team/stencil/commit/965b4af2c24ce9387ce585b27ff46ccf423dfbe5))
 * **hydrate:** fix scoped/ie11/edge clientside slot hydrate ([d4314f4](https://github.com/ionic-team/stencil/commit/d4314f4d432830408a963b8996a4f6eee6285699))
 * **ie11:** ensure document.body ready for es5 msg ([763343e](https://github.com/ionic-team/stencil/commit/763343e6dbf9afa90e7a91e8e80c6feef4244e30))
-
-
-
-## 👀 [1.8.3-0](https://github.com/ionic-team/stencil/compare/v1.8.2...v1.8.3-0) (2019-12-19)
-
-
-### Bug Fixes
-
 * **mock-doc:** add CSSStyleSheet insertRule() to fix emotion-css SSR ([3aa702c](https://github.com/ionic-team/stencil/commit/3aa702c523831cf5a4653ec41b8115c23cb88af2))
 
 
