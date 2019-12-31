@@ -146,6 +146,7 @@ export function validateDevServer(config: d.Config, flags: d.ConfigFlags, diagno
   if (!path.isAbsolute(devServer.root)) {
     devServer.root = path.join(config.rootDir, devServer.root);
   }
+  devServer.root = normalizePath(devServer.root);
 
   if (devServer.excludeHmr) {
     if (!Array.isArray(devServer.excludeHmr)) {
