@@ -19,20 +19,6 @@ export const getTypeScriptSys = async (config: d.Config, inMemoryFs: d.InMemoryF
 
 
 const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, tsSys: ts.System) => {
-  const skipFile = (readPath: string) => {
-    // filter e2e tests
-    if (readPath.includes('.e2e.') || readPath.includes('/e2e.')) {
-      // keep this test if it's an e2e file and we should be testing e2e
-      return true;
-    }
-
-    // filter spec tests
-    if (readPath.includes('.spec.') || readPath.includes('/spec.')) {
-      return true;
-    }
-    return false;
-  };
-
   const realpath = (path: string) => {
     const rp = stencilSys.realpathSync(path);
     if (rp) {
@@ -72,17 +58,11 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
   tsSys.createDirectory = (p) => stencilSys.mkdirSync(p);
 
   tsSys.directoryExists = (p) => {
-    if (skipFile(p)) {
-      return false;
-    }
     const s = inMemoryFs.statSync(p);
     return s.isDirectory;
   };
 
   tsSys.fileExists = (p) => {
-    if (skipFile(p)) {
-      return false;
-    }
     const s = inMemoryFs.statSync(p);
     return s.isFile;
   };
@@ -101,9 +81,6 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
   };
 
   tsSys.readFile = (p) => {
-    if (skipFile(p)) {
-      return undefined;
-    }
     const isUrl = p.startsWith('https:') || p.startsWith('http:');
     let content = inMemoryFs.readFileSync(p, { useCache: isUrl });
 

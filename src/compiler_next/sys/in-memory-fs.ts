@@ -272,6 +272,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
   /**
    * Synchronous!!! Do not use!!!
+   * Always returns an object, does not throw errors.
    * (Only typescript transpiling is allowed to use)
    * @param itemPath
    */
