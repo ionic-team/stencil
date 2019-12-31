@@ -70,6 +70,7 @@ export const BUILD: Required<d.Build> = {
   profile: false,
   slotRelocation: true,
   cloneNodeFix: false,
+  appendChildSlotFix: false,
 };
 
 export const NAMESPACE = 'app';

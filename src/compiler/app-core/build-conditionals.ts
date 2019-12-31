@@ -44,7 +44,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     shadowDom,
     shadowDelegatesFocus: shadowDom && cmps.some(c => c.shadowDelegatesFocus),
     slot,
-    slotRelocation: slot, // TODO: cmps.some(c => c.htmlTagNames.includes('slot') && c.encapsulation !== 'shadow'),
+    slotRelocation: slot,
     state: cmps.some(c => c.hasState),
     style: cmps.some(c => c.hasStyle),
     svg: cmps.some(c => c.htmlTagNames.includes('svg')),
@@ -62,6 +62,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     watchCallback: cmps.some(c => c.hasWatchCallback),
     taskQueue: true,
     cloneNodeFix: false,
+    appendChildSlotFix: false,
   };
   f.asyncLoading = f.cmpWillUpdate || f.cmpWillLoad || f.cmpWillRender;
 
@@ -131,6 +132,7 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
 
   if (config.extras) {
     b.cloneNodeFix = !!config.extras.cloneNodeFix;
+    b.appendChildSlotFix = b.slotRelocation && !!config.extras.appendChildSlotFix;
   }
 }
 

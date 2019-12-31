@@ -168,6 +168,13 @@ export interface StencilConfig {
    */
   logger?: Logger;
 
+  /**
+   * Config to add extra runtime for DOM features that require more polyfills. Note
+   * that not all DOM APIs are fully polyfilled when using the slot polyfill. These
+   * are opt-in since not all users will require the additional runtime.
+   */
+  extras?: ConfigExtras;
+
   globalScript?: string;
   srcIndexHtml?: string;
   watch?: boolean;
@@ -191,11 +198,21 @@ export interface StencilConfig {
   excludeUnusedDependencies?: boolean;
 
   stencilCoreResolvedId?: string;
-  extras?: ConfigExtras;
 }
 
 export interface ConfigExtras {
+  /**
+   * By default, the runtime does not polyfill `cloneNode()` when cloning a component
+   * that uses the slot polyfill. This is an opt-in polyfill for those who need it.
+   */
   cloneNodeFix?: boolean;
+
+  /**
+   * By default, the slot polyfill does not update `appendChild()` so that it appends
+   * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
+   * polyfill for those who need it.
+   */
+  appendChildSlotFix?: boolean;
 }
 
 export interface Config extends StencilConfig {

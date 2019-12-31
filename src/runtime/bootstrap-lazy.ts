@@ -10,6 +10,7 @@ import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
 import { appDidLoad, forceUpdate } from './update-component';
 import { createTime, installDevTools } from './profile';
+import { appendChildSlotFix, cloneNodeFix } from './dom-extras';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
@@ -137,23 +138,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       };
 
       if (BUILD.cloneNodeFix) {
-        const orgCloneNode = HostElement.prototype.cloneNode;
-        HostElement.prototype.cloneNode = function(deep?: boolean) {
-          const srcNode = this;
-          const isShadowDom = BUILD.shadowDom ? srcNode.shadowRoot && supportsShadowDom : false;
-          const clonedNode = orgCloneNode.call(this, isShadowDom ? deep : false) as Node;
-          if (BUILD.slot && !isShadowDom && deep) {
-            let i = 0;
-            let slotted;
-            for (; i < srcNode.childNodes.length; i++) {
-              slotted = (srcNode.childNodes[i] as any)['s-nr'];
-              if (slotted) {
-                clonedNode.appendChild(slotted.cloneNode(true));
-              }
-            }
-          }
-          return clonedNode;
-        };
+        cloneNodeFix(HostElement.prototype);
+      }
+
+      if (BUILD.appendChildSlotFix) {
+        appendChildSlotFix(HostElement.prototype);
       }
 
       if (BUILD.hotModuleReplacement) {

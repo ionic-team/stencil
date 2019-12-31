@@ -31,14 +31,6 @@ async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, 
   await Promise.all(rollupOutput.output.map(async output => {
     if (output.type === 'chunk') {
       const filePath = config.sys.path.join(hydrateAppDirPath, output.fileName);
-      try {
-        const existingCode = await compilerCtx.fs.disk.readFile(filePath);
-        if (existingCode === output.code) {
-          // if it's identical then don't overwrite it so debugging context works
-          return;
-        }
-      } catch (e) {}
-
       await compilerCtx.fs.writeFile(filePath, output.code);
     }
   }));

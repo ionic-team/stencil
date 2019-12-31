@@ -72,6 +72,7 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   updateBuildConditionals(config, build);
   build.devTools = false;
   build.cloneNodeFix = false;
+  build.appendChildSlotFix = false;
 
   return build;
 }

@@ -79,6 +79,7 @@ export interface BuildFeatures {
 
   // extras
   cloneNodeFix: boolean;
+  appendChildSlotFix: boolean;
 }
 
 export interface Build extends Partial<BuildFeatures> {

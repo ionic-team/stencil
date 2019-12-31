@@ -36,6 +36,7 @@ export const config: Config = {
   ],
   extras: {
     cloneNodeFix: true,
+    appendChildSlotFix: true,
   },
   _lifecycleDOMEvents: true,
   devServer: {
