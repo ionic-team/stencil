@@ -13,6 +13,7 @@ import {
 
 export namespace Components {
   interface AppRoot {}
+  interface AppendChild {}
   interface AttributeBasic {
     'customAttr': string;
     'multiWord': string;
@@ -228,6 +229,12 @@ declare global {
   var HTMLAppRootElement: {
     prototype: HTMLAppRootElement;
     new (): HTMLAppRootElement;
+  };
+
+  interface HTMLAppendChildElement extends Components.AppendChild, HTMLStencilElement {}
+  var HTMLAppendChildElement: {
+    prototype: HTMLAppendChildElement;
+    new (): HTMLAppendChildElement;
   };
 
   interface HTMLAttributeBasicElement extends Components.AttributeBasic, HTMLStencilElement {}
@@ -921,6 +928,7 @@ declare global {
   };
   interface HTMLElementTagNameMap {
     'app-root': HTMLAppRootElement;
+    'append-child': HTMLAppendChildElement;
     'attribute-basic': HTMLAttributeBasicElement;
     'attribute-basic-root': HTMLAttributeBasicRootElement;
     'attribute-boolean': HTMLAttributeBooleanElement;
@@ -1041,6 +1049,7 @@ declare global {
 
 declare namespace LocalJSX {
   interface AppRoot {}
+  interface AppendChild {}
   interface AttributeBasic {
     'customAttr'?: string;
     'multiWord'?: string;
@@ -1251,6 +1260,7 @@ declare namespace LocalJSX {
 
   interface IntrinsicElements {
     'app-root': AppRoot;
+    'append-child': AppendChild;
     'attribute-basic': AttributeBasic;
     'attribute-basic-root': AttributeBasicRoot;
     'attribute-boolean': AttributeBoolean;
@@ -1376,6 +1386,7 @@ declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
       'app-root': LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
+      'append-child': LocalJSX.AppendChild & JSXBase.HTMLAttributes<HTMLAppendChildElement>;
       'attribute-basic': LocalJSX.AttributeBasic & JSXBase.HTMLAttributes<HTMLAttributeBasicElement>;
       'attribute-basic-root': LocalJSX.AttributeBasicRoot & JSXBase.HTMLAttributes<HTMLAttributeBasicRootElement>;
       'attribute-boolean': LocalJSX.AttributeBoolean & JSXBase.HTMLAttributes<HTMLAttributeBooleanElement>;
