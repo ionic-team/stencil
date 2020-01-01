@@ -339,16 +339,16 @@ async function waitForChanges(page: E2EPageInternal) {
 
 
 function consoleMessage(c: puppeteer.ConsoleMessage) {
-  const message = serializeConsoleMessage(c);
-  if (message.includes('STENCIL-DEV-MODE')) {
+  const msg = serializeConsoleMessage(c);
+  if (msg.includes('STENCIL-DEV-MODE') || msg.includes('development mode')) {
     return;
   }
   const type = c.type();
   const normalizedType = type === 'warning' ? 'warn' : type;
   if (typeof (console as any)[normalizedType] === 'function') {
-    (console as any)[normalizedType](message);
+    (console as any)[normalizedType](msg);
   } else {
-    console.log(type, message);
+    console.log(type, msg);
   }
 }
 
