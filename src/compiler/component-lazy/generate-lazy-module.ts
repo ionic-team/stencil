@@ -232,6 +232,12 @@ async function convertChunk(
         code = transpileResults.code;
       }
     }
+    if (isCore) {
+      // IS_ESM_BUILD is replaced at build time so systemjs and esm builds have diff values
+      // not using the BUILD conditional since rollup would input the same value
+      code = code.replace(/\/\* IS_ESM_BUILD \*\//g, '&& false /* IS_SYSTEM_JS_BUILD */');
+    }
+
   }
   if (shouldMinify) {
     const optimizeResults = await optimizeModule(config, compilerCtx, sourceTarget, isCore, code);
