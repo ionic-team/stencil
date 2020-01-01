@@ -114,7 +114,6 @@ export const validateConfig = (userConfig?: Config) => {
   //   config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
   // }
 
-  setBooleanConfig(config, 'generateDocs', 'docs', false);
   setBooleanConfig(config, 'enableCache', 'cache', true);
 
   if (config.excludeSrc) {

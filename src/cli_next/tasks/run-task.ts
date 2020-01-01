@@ -1,5 +1,6 @@
 import { Config, TaskCommand } from '../../declarations';
 import { taskBuild } from './task-build';
+import { taskDocs } from './task-docs';
 import { taskGenerate } from './task-generate';
 import { taskHelp } from './task-help';
 import { taskServe } from './task-serve';
@@ -14,7 +15,7 @@ export async function runTask(prcs: NodeJS.Process, config: Config, task: TaskCo
       break;
 
     case 'docs':
-      // await taskDocs(config);
+      await taskDocs(prcs, config);
       break;
 
     case 'generate':

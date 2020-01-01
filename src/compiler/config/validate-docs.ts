@@ -6,11 +6,8 @@ import { buildError } from '@utils';
 export function validateDocs(config: d.Config, diagnostics: d.Diagnostic[]) {
   config.outputTargets = config.outputTargets || [];
 
-  let buildDocs = !config.devMode;
-
   // json docs flag
   if (typeof config.flags.docsJson === 'string') {
-    buildDocs = true;
     config.outputTargets.push({
       type: 'docs-json',
       file: config.flags.docsJson
@@ -22,8 +19,7 @@ export function validateDocs(config: d.Config, diagnostics: d.Diagnostic[]) {
   });
 
   // readme docs flag
-  if (config.flags.docs) {
-    buildDocs = true;
+  if (config.flags.docs || config.flags.task === 'docs') {
     if (!config.outputTargets.some(isOutputTargetDocsReadme)) {
       // didn't provide a docs config, so let's add one
       config.outputTargets.push({ type: 'docs-readme' });
@@ -39,8 +35,6 @@ export function validateDocs(config: d.Config, diagnostics: d.Diagnostic[]) {
   customDocsOutputs.forEach(jsonDocsOutput => {
     validateCustomDocsOutputTarget(diagnostics, jsonDocsOutput);
   });
-
-  config.buildDocs = buildDocs;
 }
 
 

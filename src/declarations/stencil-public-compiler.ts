@@ -231,7 +231,6 @@ export interface ConfigExtras {
 
 export interface Config extends StencilConfig {
   buildAppCore?: boolean;
-  buildDocs?: boolean;
   configPath?: string;
   cwd?: string;
   writeLog?: boolean;

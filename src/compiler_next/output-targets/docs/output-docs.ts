@@ -1,11 +1,12 @@
-import * as d from '../../declarations';
-import { generateDocData } from '../docs/generate-doc-data';
-import { isOutputTargetCustom, isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme, isOutputTargetDocsVscode } from './output-utils';
-import { generateCustomDocs } from '../docs/custom';
-import { generateReadmeDocs } from '../docs/readme';
-import { generateJsonDocs } from '../docs/json';
-import { generateVscodeDocs } from '../docs/vscode';
-import { outputCustom } from './output-custom';
+import * as d from '../../../declarations';
+import { generateDocData } from '../../../compiler/docs/generate-doc-data';
+import { isOutputTargetCustom, isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme, isOutputTargetDocsVscode } from '../../../compiler/output-targets/output-utils';
+import { generateCustomDocs } from '../../../compiler/docs/custom';
+import { generateReadmeDocs } from '../../../compiler/docs/readme';
+import { generateJsonDocs } from '../../../compiler/docs/json';
+import { generateVscodeDocs } from '../../../compiler/docs/vscode';
+import { outputCustom } from '../../../compiler/output-targets/output-custom';
+
 
 export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const docsOutputTargets = config.outputTargets.filter(o => (

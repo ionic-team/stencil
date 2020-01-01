@@ -1,14 +1,17 @@
 import * as d from '../../declarations';
-import exit from 'exit';
+import { createCompiler } from '@compiler';
+import { isOutputTargetDocs } from '../../compiler/output-targets/output-utils';
+import { startupLog } from './startup-log';
 
 
-export function taskDocs(config: d.Config) {
-  const { Compiler } = require('../compiler/index.js');
+export async function taskDocs(prcs: NodeJS.Process, config: d.Config) {  config.devServer = null;
+  config.outputTargets = config.outputTargets.filter(isOutputTargetDocs);
+  config.devMode = true;
 
-  const compiler: d.Compiler = new Compiler(config);
-  if (!compiler.isValid) {
-    exit(1);
-  }
+  startupLog(prcs, config);
 
-  return compiler.docs();
+  const compiler = await createCompiler(config);
+  await compiler.build();
+
+  await compiler.destroy();
 }
