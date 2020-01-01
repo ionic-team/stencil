@@ -2,9 +2,10 @@ import * as d from '../../declarations';
 import { getAbsoluteBuildDir } from './utils';
 import { generateHashedCopy } from '../copy/hashed-copy';
 import { injectModulePreloads } from './inject-module-preloads';
+import ts from 'typescript';
 
 
-export async function optimizeEsmImport(config: d.Config, compilerCtx: d.CompilerCtx, doc: Document, outputTarget: d.OutputTargetWww) {
+export const optimizeEsmImport = async (config: d.Config, compilerCtx: d.CompilerCtx, doc: Document, outputTarget: d.OutputTargetWww) => {
   const resourcesUrl = getAbsoluteBuildDir(config, outputTarget);
   const entryFilename = `${config.fsNamespace}.esm.js`;
   const expectedSrc = config.sys.path.join(resourcesUrl, entryFilename);
@@ -40,25 +41,67 @@ export async function optimizeEsmImport(config: d.Config, compilerCtx: d.Compile
   }
 
   // Let's try to inline, we have to fix all the relative paths of the imports
-  const result = content.match(/import.*from\s*(?:'|")(.*)(?:'|");/);
-  if (!result) {
+  const results = updateImportPaths(content, resourcesUrl);
+  if (results.orgImportPaths.length === 0) {
     return false;
   }
-  const corePath = result[1];
-  const newPath = config.sys.path.join(
-    config.sys.path.dirname(expectedSrc),
-    corePath
-  );
-  content = content.replace(corePath, newPath);
 
   // insert inline script
   script.removeAttribute('src');
   script.setAttribute('data-resources-url', resourcesUrl);
   script.setAttribute('data-stencil-namespace', config.fsNamespace);
-  script.innerHTML = content;
+  script.innerHTML = results.code;
 
   return true;
-}
+};
+
+export const updateImportPaths = (code: string, newDir: string) => {
+  const orgImportPaths: string[] = [];
+  const tsSourceFile = ts.createSourceFile('module.ts', code, ts.ScriptTarget.Latest);
+  ts.transform(tsSourceFile, [
+    readImportPaths(orgImportPaths)
+  ]);
+
+  orgImportPaths.forEach(orgImportPath => {
+    const newPath = replacePathDir(orgImportPath, newDir);
+    if (newPath) {
+      code = code.replace(`"${orgImportPath}"`, `"${newPath}"`);
+      code = code.replace(`'${orgImportPath}'`, `'${newPath}'`);
+    }
+  });
+
+  return {
+    code,
+    orgImportPaths,
+  }
+};
+
+const replacePathDir = (orgImportPath: string, newDir: string) => {
+  if (orgImportPath.startsWith('./') && (orgImportPath.endsWith('.js') || orgImportPath.endsWith('.mjs'))) {
+    return newDir + orgImportPath.substring(2);
+  }
+  return null;
+};
+
+const readImportPaths = (orgImportPaths: string[]): ts.TransformerFactory<ts.SourceFile> => {
+  return () => {
+    return tsSourceFile => {
+
+      const importStatements = tsSourceFile.statements
+        .filter(ts.isImportDeclaration)
+        .filter(s => s.moduleSpecifier != null)
+        .filter(s => ts.isStringLiteral(s.moduleSpecifier) && s.moduleSpecifier.text)
+
+      importStatements.forEach(s => {
+        if (ts.isStringLiteral(s.moduleSpecifier)) {
+          orgImportPaths.push(s.moduleSpecifier.text);
+        }
+      });
+
+      return tsSourceFile;
+    };
+  };
+};
 
 // https://twitter.com/addyosmani/status/1143938175926095872
 const MAX_JS_INLINE_SIZE = 1 * 1024;

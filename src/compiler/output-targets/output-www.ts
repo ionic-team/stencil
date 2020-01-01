@@ -14,7 +14,7 @@ import { INDEX_ORG } from '../service-worker/generate-sw';
 import { getAbsoluteBuildDir } from '../html/utils';
 
 
-export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export const outputWww = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
     return;
@@ -30,7 +30,7 @@ export async function outputWww(config: d.Config, compilerCtx: d.CompilerCtx, bu
   timespan.finish(`generate www finished`);
 }
 
-function getCriticalPath(buildCtx: d.BuildCtx) {
+const getCriticalPath = (buildCtx: d.BuildCtx) => {
   const componentGraph = buildCtx.componentGraph;
   if (!buildCtx.indexDoc || !componentGraph) {
     return [];
@@ -42,9 +42,9 @@ function getCriticalPath(buildCtx: d.BuildCtx) {
         .map(scopeId => buildCtx.componentGraph.get(scopeId) || [])
     )
   ).sort();
-}
+};
 
-async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) {
+const generateWww = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) => {
   if (!config.buildEs5) {
     await generateEs5DisabledMessage(config, compilerCtx, outputTarget);
   }
@@ -55,9 +55,9 @@ async function generateWww(config: d.Config, compilerCtx: d.CompilerCtx, buildCt
     await generateIndexHtml(config, compilerCtx, buildCtx, criticalPath, outputTarget);
   }
   await generateHostConfig(config, compilerCtx, outputTarget);
-}
+};
 
-function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) {
+const generateHostConfig = (config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) => {
   const buildDir = getAbsoluteBuildDir(config, outputTarget);
   const hostConfigPath = config.sys.path.join(outputTarget.appDir, 'host.config.json');
   const hostConfigContent = JSON.stringify({
@@ -75,10 +75,9 @@ function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, output
   }, null, '  ');
 
   return compilerCtx.fs.writeFile(hostConfigPath, hostConfigContent, { outputTargetType: outputTarget.type });
-}
+};
 
-
-async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) {
+const generateIndexHtml = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) => {
   if (compilerCtx.hasSuccessfulBuild && !buildCtx.hasHtmlChanges) {
     // no need to rebuild index.html if there were no app file changes
     return;
@@ -114,6 +113,6 @@ async function generateIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, b
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
-}
+};
 
 const MAX_CSS_INLINE_SIZE = 3 * 1024;
