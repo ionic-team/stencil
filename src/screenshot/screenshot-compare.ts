@@ -6,7 +6,7 @@ import { join, relative } from 'path';
 import { fork } from 'child_process';
 
 
-export async function compareScreenshot(emulateConfig: d.EmulateConfig, screenshotBuildData: d.ScreenshotBuildData, currentScreenshotBuf: Buffer, desc: string, testPath: string, pixelmatchThreshold: number) {
+export async function compareScreenshot(emulateConfig: d.EmulateConfig, screenshotBuildData: d.ScreenshotBuildData, currentScreenshotBuf: Buffer, desc: string, width: number, height: number, testPath: string, pixelmatchThreshold: number) {
   const currentImageHash = createHash('md5').update(currentScreenshotBuf).digest('hex');
   const currentImageName = `${currentImageHash}.png`;
   const currentImagePath = join(screenshotBuildData.imagesDir, currentImageName);
@@ -31,8 +31,8 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
     userAgent: emulateConfig.userAgent,
     desc: desc,
     testPath: testPath,
-    width: emulateConfig.viewport.width,
-    height: emulateConfig.viewport.height,
+    width: width,
+    height: height,
     deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
     hasTouch: emulateConfig.viewport.hasTouch,
     isLandscape: emulateConfig.viewport.isLandscape,
@@ -45,8 +45,8 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
       mismatchedPixels: 0,
       device: emulateConfig.device,
       userAgent: emulateConfig.userAgent,
-      width: emulateConfig.viewport.width,
-      height: emulateConfig.viewport.height,
+      width: width,
+      height: height,
       deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
       hasTouch: emulateConfig.viewport.hasTouch,
       isLandscape: emulateConfig.viewport.isLandscape,
