@@ -1,7 +1,7 @@
 import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } from './custom-element-registry';
 import { closest, matches, selectAll, selectOne } from './selector';
 import { dataset } from './dataset';
-import { MockAttr, MockAttributeMap } from './attribute';
+import { MockAttr, MockAttributeMap, createAttributeProxy } from './attribute';
 import { MockClassList } from './class-list';
 import { MockCSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
@@ -237,7 +237,7 @@ export class MockElement extends MockNode {
 
   get attributes() {
     if (this.__attributeMap == null) {
-      this.__attributeMap = new MockAttributeMap();
+      this.__attributeMap = createAttributeProxy(false);
     }
     return this.__attributeMap;
   }
@@ -506,7 +506,7 @@ export class MockElement extends MockNode {
           attrName = attrName.toLowerCase();
         }
         attr = new MockAttr(attrName, value);
-        attributes.items.push(attr);
+        attributes.__items.push(attr);
 
         if (checkAttrChanged === true) {
           attributeChanged(this, attrName, null, attr.value);
@@ -534,7 +534,7 @@ export class MockElement extends MockNode {
 
     } else {
       attr = new MockAttr(attrName, value, namespaceURI);
-      attributes.items.push(attr);
+      attributes.__items.push(attr);
 
       if (checkAttrChanged === true) {
         attributeChanged(this, attrName, null, attr.value);
@@ -747,7 +747,7 @@ export class MockHTMLElement extends MockElement {
 
   get attributes() {
     if (this.__attributeMap == null) {
-      this.__attributeMap = new MockAttributeMap(true);
+      this.__attributeMap = createAttributeProxy(true);
     }
     return this.__attributeMap;
   }

@@ -162,7 +162,7 @@ function getParser(ownerDocument: MockDocument) {
     },
 
     getAttrList(element: MockElement) {
-      const attrs: Attribute[] = element.attributes.items.map(attr => {
+      const attrs: Attribute[] = element.attributes.__items.map(attr => {
         return {
           name: attr.name,
           value: attr.value,
