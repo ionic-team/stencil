@@ -22,37 +22,20 @@ export const optimizeEsmImport = async (config: d.Config, compilerCtx: d.Compile
   }
 
   const entryPath = config.sys.path.join(outputTarget.buildDir, entryFilename);
-  let content = await compilerCtx.fs.readFile(entryPath);
 
   // If the script is too big, instead of inlining, we hash the file and change
   // the <script> to the new location
-  if (config.allowInlineScripts && content.length > MAX_JS_INLINE_SIZE) {
-    const hashedFile = await generateHashedCopy(config, compilerCtx, entryPath);
-    if (hashedFile) {
-      const hashedPath = config.sys.path.join(resourcesUrl, hashedFile);
-      script.setAttribute('src', hashedPath);
-      script.setAttribute('data-resources-url', resourcesUrl);
-      script.setAttribute('data-stencil-namespace', config.fsNamespace);
+  const hashedFile = await generateHashedCopy(config, compilerCtx, entryPath);
+  if (hashedFile) {
+    const hashedPath = config.sys.path.join(resourcesUrl, hashedFile);
+    script.setAttribute('src', hashedPath);
+    script.setAttribute('data-resources-url', resourcesUrl);
+    script.setAttribute('data-stencil-namespace', config.fsNamespace);
 
-      injectModulePreloads(doc, [hashedPath]);
-      return true;
-    }
-    return false;
+    injectModulePreloads(doc, [hashedPath]);
+    return true;
   }
-
-  // Let's try to inline, we have to fix all the relative paths of the imports
-  const results = updateImportPaths(content, resourcesUrl);
-  if (results.orgImportPaths.length === 0) {
-    return false;
-  }
-
-  // insert inline script
-  script.removeAttribute('src');
-  script.setAttribute('data-resources-url', resourcesUrl);
-  script.setAttribute('data-stencil-namespace', config.fsNamespace);
-  script.innerHTML = results.code;
-
-  return true;
+  return false;
 };
 
 export const updateImportPaths = (code: string, newDir: string) => {
@@ -104,4 +87,4 @@ const readImportPaths = (orgImportPaths: string[]): ts.TransformerFactory<ts.Sou
 };
 
 // https://twitter.com/addyosmani/status/1143938175926095872
-const MAX_JS_INLINE_SIZE = 1 * 1024;
+// const MAX_JS_INLINE_SIZE = 1 * 1024;
