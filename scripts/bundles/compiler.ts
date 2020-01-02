@@ -69,7 +69,7 @@ export async function compiler(opts: BuildOptions) {
       commonjs(),
       replacePlugin(opts),
       json() as any,
-      moduleDebugPlugin(),
+      moduleDebugPlugin(opts),
       // {
       //   generateBundle(_, bundleFiles) {
       //     Object.keys(bundleFiles).forEach(fileName => {

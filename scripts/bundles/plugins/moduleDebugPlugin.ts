@@ -1,11 +1,15 @@
 import { Plugin } from 'rollup';
+import { BuildOptions } from '../../utils/options';
+import path from 'path';
 
-export function moduleDebugPlugin(): Plugin {
+
+export function moduleDebugPlugin(opts: BuildOptions): Plugin {
 
   return {
-    name: 'aliasPlugin',
+    name: 'moduleDebugPlugin',
     transform(code, id) {
-      const comment = `// MODULE: ${id}\n`;
+      const debugPath = path.posix.relative(opts.transpiledDir, id);
+      const comment = `// MODULE: ${debugPath}\n`;
       return comment + code;
     }
   }
