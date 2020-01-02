@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
 import { catchError } from '@utils';
-// import { validateBuildFiles } from './validate-files';
+import { validateBuildFiles } from './validate-files';
 
 
-export const writeBuild = async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const writeBuild = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
 
   let totalFilesWrote = 0;
@@ -25,7 +25,7 @@ export const writeBuild = async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCt
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
     // buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
-    // await validateBuildFiles(config, compilerCtx, buildCtx);
+    await validateBuildFiles(config, compilerCtx, buildCtx);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
