@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { validateBuildFiles } from './validate-files';
+import { outputServiceWorkers } from '../../compiler/output-targets/output-service-workers';
 
 
 export const writeBuild = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -25,6 +26,7 @@ export const writeBuild = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
     // buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
+    await outputServiceWorkers(config, buildCtx),
     await validateBuildFiles(config, compilerCtx, buildCtx);
 
   } catch (e) {

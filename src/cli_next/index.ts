@@ -9,6 +9,8 @@ import { setupWorkerController } from '../sys/node_next/worker';
 import exit from 'exit';
 import { join } from 'path';
 import { isString } from 'util';
+import { NodeLazyRequire } from '../sys/node/node-lazy-require';
+import { NodeResolveModule } from '../sys/node/node-resolve-module';
 
 
 export async function run(init: CliInitOptions) {
@@ -44,6 +46,20 @@ export async function run(init: CliInitOptions) {
       configPath: flags.config,
       logger,
       sys,
+    });
+
+    // TODO
+    validated.config.sys.lazyRequire = new NodeLazyRequire(new NodeResolveModule(), {
+      "lazyDependencies": {
+        "@types/jest": "24.0.20",
+        "@types/puppeteer": "1.19.0",
+        "jest": "24.9.0",
+        "jest-cli": "24.9.0",
+        "pixelmatch": "4.0.2",
+        "puppeteer": "1.19.0",
+        "puppeteer-core": "1.19.0",
+        "workbox-build": "4.3.1"
+      }
     });
 
     if (validated.diagnostics.length > 0) {
