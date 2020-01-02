@@ -32,8 +32,8 @@ describe('markdown props', () => {
 
 | Property | Attribute | Description    | Type                | Default |
 | -------- | --------- | -------------- | ------------------- | ------- |
-| \`hello\`  | \`hello\`   | This is a prop | \`boolean \\| string\` | \`false\` |
-| \`hello\`  | --        | This is a prop | \`boolean \\| string\` | \`false\` |
+| \`hello\`  | \`hello\`   | This is a prop | \`boolean or string\` | \`false\` |
+| \`hello\`  | --        | This is a prop | \`boolean or string\` | \`false\` |
 
 `);
   });
