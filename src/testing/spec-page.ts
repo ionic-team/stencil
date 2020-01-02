@@ -173,9 +173,9 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
     get() {
       if (rootComponent == null) {
         rootComponent = findRootComponent(cmpTags, page.body);
-        if (rootComponent != null) {
-          return rootComponent;
-        }
+      }
+      if (rootComponent != null) {
+        return rootComponent;
       }
       const firstElementChild = page.body.firstElementChild;
       if (firstElementChild != null) {
