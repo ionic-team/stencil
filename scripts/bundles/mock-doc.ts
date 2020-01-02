@@ -156,7 +156,7 @@ async function bundleMockDocDts(inputDir: string, outputDir: string) {
   // only reason we can do this is because we already know the shape
   // of mock-doc's dts files and how we want them to come together
   const srcDtsFiles = (await fs.readdir(inputDir)).filter(f => {
-    return f.endsWith('.d.ts') && !f.endsWith('index.d.ts');
+    return f.endsWith('.d.ts') && !f.endsWith('index.d.ts') && !f.endsWith('index.d.ts-bundled.d.ts');
   });
 
   const output = await Promise.all(srcDtsFiles.map(inputDtsFile => {
