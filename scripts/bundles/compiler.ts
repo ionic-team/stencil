@@ -50,6 +50,7 @@ export async function compiler(opts: BuildOptions) {
       strict: false,
       banner: getBanner(opts, 'Stencil Compiler', true),
       esModule: false,
+      preferConst: true,
     },
     plugins: [
       {
