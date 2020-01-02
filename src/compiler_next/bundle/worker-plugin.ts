@@ -167,7 +167,20 @@ const getWorkerIntro = (workerName: string, isDev: boolean) => `
 const exports = {};
 const workerMsgId = 'stencil.${workerName}';
 const workerMsgCallbackId = workerMsgId + '.cb';
-
+const getTransferables = (value) => {
+  if (!!value) {
+    if (value instanceof ArrayBuffer) {
+      return [value];
+    }
+    if (value.constructor === Object) {
+      return [].concat(...Object.keys(value).map(k => getTransferables(value[k])))
+    }
+    if (typeof value === 'object') {
+      return getTransferables(value.buffer);
+    }
+  }
+  return [];
+};
 addEventListener('message', async ({data}) => {
   if (data && data[0] === workerMsgId) {
     let id = data[1];
@@ -208,9 +221,12 @@ addEventListener('message', async ({data}) => {
       value = undefined;
     }
 
+    const transferables = getTransferables(value);
+    ${isDev ? `if (transferables.length > 0) console.debug('Transfering', transferables);` : ''}
+
     postMessage(
       [workerMsgId, id, value, err],
-      value instanceof ArrayBuffer ? [value] : []
+      transferables
     );
   }
 });
