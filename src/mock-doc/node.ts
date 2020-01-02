@@ -376,6 +376,53 @@ export class MockElement extends MockNode {
     setTextContent(this, value);
   }
 
+  insertAdjacentElement(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', elm: MockHTMLElement) {
+    if (position === 'beforebegin') {
+      insertBefore(this.parentNode, elm, this);
+    } else if (position === 'afterbegin') {
+      this.prepend(elm);
+    } else if (position === 'beforeend') {
+      this.appendChild(elm);
+    } else if (position === 'afterend') {
+      insertBefore(this.parentNode, elm, this.nextSibling);
+    }
+    return elm;
+  }
+
+  insertAdjacentHTML(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', html: string) {
+    const frag = parseFragmentUtil(this.ownerDocument, html);
+    if (position === 'beforebegin') {
+      while (frag.childNodes.length > 0) {
+        insertBefore(this.parentNode, frag.childNodes[0], this);
+      }
+    } else if (position === 'afterbegin') {
+      while (frag.childNodes.length > 0) {
+        this.prepend(frag.childNodes[frag.childNodes.length - 1]);
+      }
+    } else if (position === 'beforeend') {
+      while (frag.childNodes.length > 0) {
+        this.appendChild(frag.childNodes[0]);
+      }
+    } else if (position === 'afterend') {
+      while (frag.childNodes.length > 0) {
+        insertBefore(this.parentNode, frag.childNodes[frag.childNodes.length - 1], this.nextSibling);
+      }
+    }
+  }
+
+  insertAdjacentText(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', text: string) {
+    const elm = this.ownerDocument.createTextNode(text);
+    if (position === 'beforebegin') {
+      insertBefore(this.parentNode, elm, this);
+    } else if (position === 'afterbegin') {
+      this.prepend(elm);
+    } else if (position === 'beforeend') {
+      this.appendChild(elm);
+    } else if (position === 'afterend') {
+      insertBefore(this.parentNode, elm, this.nextSibling);
+    }
+  }
+
   hasAttribute(attrName: string) {
     if (attrName === 'style') {
       return (this.__style != null && this.__style.length > 0);

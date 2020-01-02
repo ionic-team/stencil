@@ -10,6 +10,110 @@ describe('element', () => {
     doc = new MockDocument();
   });
 
+  it('insertAdjacentElement beforebegin', () => {
+    const elm = doc.createElement('div') as MockHTMLElement;
+    elm.innerHTML = '<b>0</b>';
+    doc.body.appendChild(elm);
+    const insertElm = doc.createElement('i');
+    insertElm.textContent = 'c';
+    elm.insertAdjacentElement('beforebegin', insertElm);
+    expect(doc.body).toEqualHtml(`<body><i>c</i><div><b>0</b></div></body>`);
+  });
+
+  it('insertAdjacentElement afterbegin', () => {
+    const elm = doc.createElement('div') as MockHTMLElement;
+    elm.innerHTML = '<b>0</b>';
+    doc.body.appendChild(elm);
+    const insertElm = doc.createElement('i');
+    insertElm.textContent = 'c';
+    elm.insertAdjacentElement('afterbegin', insertElm);
+    expect(doc.body).toEqualHtml(`<body><div><i>c</i><b>0</b></div></body>`);
+  });
+
+  it('insertAdjacentElement beforeend', () => {
+    const elm = doc.createElement('div') as MockHTMLElement;
+    elm.innerHTML = '<b>0</b>';
+    doc.body.appendChild(elm);
+    const insertElm = doc.createElement('i');
+    insertElm.textContent = 'c';
+    elm.insertAdjacentElement('beforeend', insertElm);
+    expect(doc.body).toEqualHtml(`<body><div><b>0</b><i>c</i></div></body>`);
+  });
+
+  it('insertAdjacentElement afterend', () => {
+    const elm = doc.createElement('div') as MockHTMLElement;
+    elm.innerHTML = '<b>0</b>';
+    doc.body.appendChild(elm);
+    const insertElm = doc.createElement('i');
+    insertElm.textContent = 'c';
+    elm.insertAdjacentElement('afterend', insertElm);
+    expect(doc.body).toEqualHtml(`<body><div><b>0</b></div><i>c</i></body>`);
+  });
+
+  it('insertAdjacentText beforebegin', () => {
+    const elm = doc.createElement('div') as MockHTMLElement;
+    elm.innerHTML = '<b>0</b>';
+    doc.body.appendChild(elm);
+    elm.insertAdjacentText('beforebegin', 'a');
+    expect(doc.body).toEqualHtml(`<body>a<div><b>0</b></div></body>`);
+  });
+
+  it('insertAdjacentText afterbegin', () => {
+    const elm = doc.createElement('div') as MockHTMLElement;
+    elm.innerHTML = '<b>0</b>';
+    doc.body.appendChild(elm);
+    elm.insertAdjacentText('afterbegin', 'a');
+    expect(doc.body).toEqualHtml(`<body><div>a<b>0</b></div></body>`);
+  });
+
+  it('insertAdjacentText beforeend', () => {
+    const elm = doc.createElement('div') as MockHTMLElement;
+    elm.innerHTML = '<b>0</b>';
+    doc.body.appendChild(elm);
+    elm.insertAdjacentText('beforeend', 'a');
+    expect(doc.body).toEqualHtml(`<body><div><b>0</b>a</div></body>`);
+  });
+
+  it('insertAdjacentText afterend', () => {
+    const elm = doc.createElement('div') as MockHTMLElement;
+    elm.innerHTML = '<b>0</b>';
+    doc.body.appendChild(elm);
+    elm.insertAdjacentText('afterend', 'a');
+    expect(doc.body).toEqualHtml(`<body><div><b>0</b></div>a</body>`);
+  });
+
+  it('insertAdjacentHTML beforebegin', () => {
+    const elm = doc.createElement('div') as MockHTMLElement;
+    elm.textContent = '0';
+    doc.body.appendChild(elm);
+    elm.insertAdjacentHTML('beforebegin', '<b>88</b>mph');
+    expect(doc.body).toEqualHtml(`<body><b>88</b>mph<div>0</div></body>`);
+  });
+
+  it('insertAdjacentHTML afterbegin', () => {
+    const elm = doc.createElement('div') as MockHTMLElement;
+    elm.textContent = '0';
+    doc.body.appendChild(elm);
+    elm.insertAdjacentHTML('afterbegin', '<b>88</b>mph<i>!</i>');
+    expect(doc.body).toEqualHtml(`<body><div><b>88</b>mph<i>!</i>0</div></body>`);
+  });
+
+  it('insertAdjacentHTML beforeend', () => {
+    const elm = doc.createElement('div') as MockHTMLElement;
+    elm.textContent = '0';
+    doc.body.appendChild(elm);
+    elm.insertAdjacentHTML('beforeend', '<b>88</b>mph<i>!</i>');
+    expect(doc.body).toEqualHtml(`<body><div>0<b>88</b>mph<i>!</i></div></body>`);
+  });
+
+  it('insertAdjacentHTML afterend', () => {
+    const elm = doc.createElement('div') as MockHTMLElement;
+    elm.innerHTML = '<b>0</b>';
+    doc.body.appendChild(elm);
+    elm.insertAdjacentHTML('afterend', 'a');
+    expect(doc.body).toEqualHtml(`<body><div><b>0</b></div>a</body>`);
+  });
+
   it('clone elements', () => {
     const win = new MockWindow(`
       <html>
