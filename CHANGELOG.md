@@ -1,4 +1,4 @@
-# 🐆 [1.9.0-8](https://github.com/ionic-team/stencil/compare/v1.8.3...v1.9.0-8) (2020-01-02)
+# 🏌 [1.9.0-9](https://github.com/ionic-team/stencil/compare/v1.8.3...v1.9.0-9) (2020-01-03)
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
 
@@ -14,6 +14,7 @@ Some of main features with the `--next` compiler include:
 
 ### Bug Fixes
 
+* **compiler:** add sw to next compiler ([afd2215](https://github.com/ionic-team/stencil/commit/afd22152022fc4a29a526ad57fc9acde083a56f1))
 * **build:** skip d.ts cache file ([98b067b](https://github.com/ionic-team/stencil/commit/98b067b15ee2827fe9a933a79ac71c3c30442c77))
 * **www:** respect allowInlineScripts ([1042a50](https://github.com/ionic-team/stencil/commit/1042a50ea7499020f2c273acb96fa4b49fa4238b))
 * don't inline main script ([8c04fd1](https://github.com/ionic-team/stencil/commit/8c04fd1527c45c4027bb4198a5ae5c747dbfa19e))
