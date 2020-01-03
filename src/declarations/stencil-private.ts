@@ -2143,6 +2143,7 @@ export interface TransformCssToEsmInput {
 }
 
 export interface TransformCssToEsmOutput {
+  styleText: string;
   code: string;
   map: any;
   diagnostics: Diagnostic[];
