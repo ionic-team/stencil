@@ -46,7 +46,7 @@
     "test.watch": "jest --watch"
   },
   "dependencies": {
-    "typescript": "3.7.3"
+    "typescript": "3.7.4"
   },
   "devDependencies": {
     "@types/autoprefixer": "^9.1.1",
