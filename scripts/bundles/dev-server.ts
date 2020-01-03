@@ -31,7 +31,7 @@ export async function devServer(opts: BuildOptions) {
   // copy static files
   await fs.copy(
     join(opts.srcDir, 'dev-server', 'static'),
-    join(opts.output.devServerDir, 'static')
+    join(opts.output.devServerDir, 'static'),
   );
 
   // copy template files
@@ -173,13 +173,43 @@ export async function devServer(opts: BuildOptions) {
         }
       },
       replacePlugin(opts),
+      resolve(),
+    ]
+  };
+
+  await fs.ensureDir(join(opts.output.devServerDir, 'hmr-client'));
+
+  // copy hmr-client dts files
+  await fs.copy(
+    join(opts.transpiledDir, 'dev-server', 'hmr-client', 'index.d.ts'),
+    join(opts.output.devServerDir, 'hmr-client', 'index.d.ts')
+  );
+
+  // write package.json
+  writePkgJson(opts, join(opts.output.devServerDir, 'hmr-client'), {
+    name: "@stencil/core/dev-server/hmr-client",
+    description: 'Stencil HMR Client.',
+    main: 'index.mjs',
+    types: 'index.d.ts'
+  });
+
+  const hmrClientBundle: RollupOptions = {
+    input: join(opts.transpiledDir, 'dev-server', 'hmr-client', 'index.js'),
+    output: {
+      format: 'esm',
+      file: join(opts.output.devServerDir, 'hmr-client', 'index.mjs'),
+    },
+    plugins: [
+      replacePlugin(opts),
+      resolve(),
     ]
   };
 
   return [
     devServerBundle,
     devServerWorkerBundle,
-    devServerClientBundle
+    devServerClientBundle,
+    hmrClientBundle,
   ];
 };
 

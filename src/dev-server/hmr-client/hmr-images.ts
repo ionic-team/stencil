@@ -1,16 +1,17 @@
-import { parseQuerystring, stringifyQuerystring, updateCssUrlValue, updateHmrHref } from './hmr-util';
+import { setQueryString, updateCssUrlValue, getHmrHref, isLinkStylesheet, setHmrAttr, isTemplate, hasShadowRoot, isElement, setHmrQueryString } from './hmr-util';
 
 
-export function hmrImages(win: Window, doc: Document, versionId: string, imageFileNames: string[]) {
+export const hmrImages = (win: Window, doc: Document, versionId: string, imageFileNames: string[]) => {
   if (win.location.protocol !== 'file:' && doc.styleSheets) {
     hmrStyleSheetsImages(doc, versionId, imageFileNames);
   }
 
   hmrImagesElements(win, doc.documentElement, versionId, imageFileNames);
-}
 
+  return imageFileNames.sort();
+};
 
-function hmrStyleSheetsImages(doc: Document, versionId: string, imageFileNames: string[]) {
+const hmrStyleSheetsImages = (doc: Document, versionId: string, imageFileNames: string[]) => {
   const cssImageProps = Object.keys(doc.documentElement.style).filter(cssProp => {
     return cssProp.endsWith('Image');
   });
@@ -18,10 +19,9 @@ function hmrStyleSheetsImages(doc: Document, versionId: string, imageFileNames: 
   for (let i = 0; i < doc.styleSheets.length; i++) {
     hmrStyleSheetImages(cssImageProps, doc.styleSheets[i] as CSSStyleSheet, versionId, imageFileNames);
   }
-}
+};
 
-
-function hmrStyleSheetImages(cssImageProps: string[], styleSheet: CSSStyleSheet, versionId: string, imageFileNames: string[]) {
+const hmrStyleSheetImages = (cssImageProps: string[], styleSheet: CSSStyleSheet, versionId: string, imageFileNames: string[]) => {
   try {
     const cssRules = styleSheet.cssRules;
     for (let i = 0; i < cssRules.length; i++) {
@@ -45,10 +45,9 @@ function hmrStyleSheetImages(cssImageProps: string[], styleSheet: CSSStyleSheet,
   } catch (e) {
     console.error('hmrStyleSheetImages: ' + e);
   }
-}
+};
 
-
-function hmrStyleSheetRuleImages(cssImageProps: string[], cssRule: CSSStyleRule, versionId: string, imageFileNames: string[]) {
+const hmrStyleSheetRuleImages = (cssImageProps: string[], cssRule: CSSStyleRule, versionId: string, imageFileNames: string[]) => {
   cssImageProps.forEach(cssImageProp => {
     imageFileNames.forEach(imageFileName => {
       const oldCssText = (cssRule as any).style[cssImageProp];
@@ -59,36 +58,34 @@ function hmrStyleSheetRuleImages(cssImageProps: string[], cssRule: CSSStyleRule,
       }
     });
   });
-}
+};
 
-
-export function hmrImagesElements(win: Window, elm: Element, versionId: string, imageFileNames: string[]) {
-  if (elm.nodeName.toLowerCase() === 'img') {
+const hmrImagesElements = (win: Window, elm: Element, versionId: string, imageFileNames: string[]) => {
+  const tagName = elm.nodeName.toLowerCase();
+  if (tagName === 'img') {
     hmrImgElement(elm as HTMLImageElement, versionId, imageFileNames);
   }
 
-  if (elm.getAttribute) {
+  if (isElement(elm)) {
     const styleAttr = elm.getAttribute('style');
     if (styleAttr) {
       hmrUpdateStyleAttr(elm, versionId, imageFileNames, styleAttr);
     }
   }
 
-  if (elm.nodeName.toLowerCase() === 'style') {
+  if (tagName === 'style') {
     hmrUpdateStyleElementUrl(elm as HTMLStyleElement, versionId, imageFileNames);
   }
 
-  if (win.location.protocol === 'file:') {
-    if (elm.nodeName.toLowerCase() === 'link') {
-      hmrUpdateLinkElementUrl(elm as HTMLLinkElement, versionId, imageFileNames);
-    }
+  if (win.location.protocol !== 'file:' && isLinkStylesheet(elm)) {
+    hmrUpdateLinkElementUrl(elm as HTMLLinkElement, versionId, imageFileNames);
   }
 
-  if (elm.nodeName.toLowerCase() === 'template' && (elm as HTMLTemplateElement).content) {
+  if (isTemplate(elm)) {
     hmrImagesElements(win, (elm as HTMLTemplateElement).content as any, versionId, imageFileNames);
   }
 
-  if (elm.shadowRoot) {
+  if (hasShadowRoot(elm)) {
     hmrImagesElements(win, elm.shadowRoot as any, versionId, imageFileNames);
   }
 
@@ -97,50 +94,39 @@ export function hmrImagesElements(win: Window, elm: Element, versionId: string, 
       hmrImagesElements(win, elm.children[i], versionId, imageFileNames);
     }
   }
-}
+};
 
-
-function hmrImgElement(imgElm: HTMLImageElement, versionId: string, imageFileNames: string[]) {
+const hmrImgElement = (imgElm: HTMLImageElement, versionId: string, imageFileNames: string[]) => {
   imageFileNames.forEach(imageFileName => {
-    imgElm.src = updateHmrHref(versionId, imageFileName, imgElm.src);
-    imgElm.setAttribute('data-hmr', versionId);
-  });
-}
-
-
-function hmrUpdateStyleAttr(elm: Element, versionId: string, imageFileNames: string[], oldStyleAttr: string) {
-  imageFileNames.forEach(imageFileName => {
-    const newSstyleAttr = updateCssUrlValue(versionId, imageFileName, oldStyleAttr);
-
-    if (newSstyleAttr !== oldStyleAttr) {
-      elm.setAttribute('style', newSstyleAttr);
-      elm.setAttribute('data-hmr', versionId);
+    const orgSrc = imgElm.getAttribute('src');
+    const newSrc = getHmrHref(versionId, imageFileName, orgSrc);
+    if (newSrc !== orgSrc) {
+      imgElm.setAttribute('src', newSrc)
+      setHmrAttr(imgElm, versionId);
     }
   });
-}
+};
 
+const hmrUpdateStyleAttr = (elm: Element, versionId: string, imageFileNames: string[], oldStyleAttr: string) => {
+  imageFileNames.forEach(imageFileName => {
+    const newStyleAttr = updateCssUrlValue(versionId, imageFileName, oldStyleAttr);
 
-function hmrUpdateStyleElementUrl(styleElm: HTMLStyleElement, versionId: string, imageFileNames: string[]) {
+    if (newStyleAttr !== oldStyleAttr) {
+      elm.setAttribute('style', newStyleAttr);
+      setHmrAttr(elm, versionId);
+    }
+  });
+};
+
+const hmrUpdateStyleElementUrl = (styleElm: HTMLStyleElement, versionId: string, imageFileNames: string[]) => {
   imageFileNames.forEach(imageFileName => {
     styleElm.innerHTML = updateCssUrlValue(versionId, imageFileName, styleElm.innerHTML);
-    styleElm.setAttribute('data-hmr', versionId);
+    setHmrAttr(styleElm, versionId);
   });
-}
+};
 
-
-function hmrUpdateLinkElementUrl(linkElm: HTMLLinkElement, versionId: string, imageFileNames: string[]) {
-  if (!linkElm.href || !linkElm.rel || linkElm.rel.toLowerCase() !== 'stylesheet') {
-    return;
-  }
-
-  const hrefSplt = linkElm.href.split('?');
-  const hrefFileName = hrefSplt[0];
-
-  const newQs = parseQuerystring(hrefSplt[1]);
-
-  newQs['s-hmr'] = versionId;
-  newQs['s-hmr-urls'] = imageFileNames.join(',');
-
-  linkElm.href = hrefFileName + '?' + stringifyQuerystring(newQs);
+const hmrUpdateLinkElementUrl = (linkElm: HTMLLinkElement, versionId: string, imageFileNames: string[]) => {
+  linkElm.href = setQueryString(linkElm.href, 's-hmr-urls', imageFileNames.sort().join(','));
+  linkElm.href = setHmrQueryString(linkElm.href, versionId);
   linkElm.setAttribute('data-hmr', versionId);
-}
+};
