@@ -6,7 +6,7 @@ import { validateOutputTargets } from './outputs';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
 import { validateRollupConfig } from '../../compiler/config/validate-rollup-config';
-import { validateTesting } from '../../compiler/config/validate-testing';
+import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
 import { setBooleanConfig } from '../../compiler/config/config-utils';
 import path from 'path';

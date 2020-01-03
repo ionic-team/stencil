@@ -1,15 +1,16 @@
 import * as d from '../../declarations';
+import { Testing as TestingTypes } from '@testing';
 import exit from 'exit';
 
 
 export async function taskTest(config: d.Config) {
   try {
-    const { Testing } = require('../testing/index.js');
-
-    const testing: d.Testing = new Testing(config);
-    if (!testing.isValid) {
-      exit(1);
-    }
+    const testingRunOpts: d.TestingRunOptions = {
+      e2e: !!config.flags.e2e,
+      screenshot: !!config.flags.screenshot,
+      spec: !!config.flags.spec,
+      updateScreenshot: !!config.flags.updateScreenshot,
+    };
 
     // always ensure we have jest modules installed
     const ensureModuleIds = [
@@ -18,7 +19,7 @@ export async function taskTest(config: d.Config) {
       'jest-cli'
     ];
 
-    if (config.flags.e2e) {
+    if (testingRunOpts.e2e) {
       // if it's an e2e test, also make sure we're got
       // puppeteer modules installed and if browserExecutablePath is provided don't download Chromium use only puppeteer-core instead
       const puppeteer = config.testing.browserExecutablePath ? 'puppeteer-core' : 'puppeteer';
@@ -28,7 +29,7 @@ export async function taskTest(config: d.Config) {
         puppeteer
       );
 
-      if (config.flags.screenshot) {
+      if (testingRunOpts.screenshot) {
         // ensure we've got pixelmatch for screenshots
         config.logger.warn(config.logger.yellow(`EXPERIMENTAL: screenshot visual diff testing is currently under heavy development and has not reached a stable status. However, any assistance testing would be appreciated.`));
       }
@@ -44,7 +45,10 @@ export async function taskTest(config: d.Config) {
       ensureModuleIds
     );
 
-    const passed = await testing.runTests();
+    // let's test!
+    const { createTesting } = require('../testing/index.js');
+    const testing: TestingTypes = await createTesting(config);
+    const passed = await testing.run(testingRunOpts);
     await testing.destroy();
 
     if (!passed) {

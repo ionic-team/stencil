@@ -4,6 +4,7 @@ import { taskDocs } from './task-docs';
 import { taskGenerate } from './task-generate';
 import { taskHelp } from './task-help';
 import { taskServe } from './task-serve';
+import { taskTest } from './task-test';
 import { taskVersion } from './task-version';
 import exit from 'exit';
 
@@ -31,7 +32,7 @@ export async function runTask(prcs: NodeJS.Process, config: Config, task: TaskCo
       break;
 
     case 'test':
-      // await taskTest(config);
+      await taskTest(config);
       break;
 
     case 'version':
@@ -40,7 +41,7 @@ export async function runTask(prcs: NodeJS.Process, config: Config, task: TaskCo
 
     default:
       config.logger.error(`${(prcs.platform !== 'win32') ? '❌ ' : ''} Invalid stencil command, please see the options below:`);
-      taskHelp(prcs, config.logger);
+      taskHelp(prcs, config);
       exit(1);
   }
 }

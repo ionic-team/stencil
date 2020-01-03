@@ -729,6 +729,18 @@ export interface RollupOutputOptions {
   globals?: { [name: string]: string } | ((name: string) => string);
 }
 
+export interface Testing {
+  run(opts: TestingRunOptions): Promise<boolean>;
+  destroy(): Promise<void>;
+}
+
+export interface TestingRunOptions {
+  e2e?: boolean;
+  screenshot?: boolean;
+  spec?: boolean;
+  updateScreenshot?: boolean;
+}
+
 export interface JestConfig {
   /**
    * This option tells Jest that all imported modules in your tests should be mocked automatically.
