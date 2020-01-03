@@ -21,13 +21,6 @@ export const loadTypescript = async (diagnostics: d.Diagnostic[]) => {
         return tsExternal;
       }
 
-      // const tsDep = dependencies.find(dep => dep.name === 'typescript');
-      // const tsLocalUrl = new URL(`../typescript/${tsDep.main}`, location.href).href;
-      // const tsLocal = await importTypescriptScript(tsLocalUrl);
-      // if (tsLocal) {
-      //   return tsLocal;
-      // }
-
       throw new Error(`unable to load typescript from url "${tsExternalUrl}"`);
     }
 
@@ -39,7 +32,7 @@ export const loadTypescript = async (diagnostics: d.Diagnostic[]) => {
 };
 
 const importTypescriptScript = async (tsUrl: string) => {
-  let ts: any = null;
+  let importedTs: any = null;
   try {
 
     // if (compilerBuild.stencilVersion.includes('-dev.')) {
@@ -50,22 +43,22 @@ const importTypescriptScript = async (tsUrl: string) => {
     //   }
     // }
 
-    if (!ts) {
+    if (!importedTs) {
       const content = await cachedTypescriptFetch(tsUrl);
       if (content) {
         const getTs = new Function(content + ';return ts;');
-        ts = getTs();
+        importedTs = getTs();
       }
     }
 
-    if (ts) {
-      ts.sys = ts.sys || {};
-      ts.sys.getExecutingFilePath = () => tsUrl;
-      patchTsSystemUtils(ts.sys);
+    if (importedTs) {
+      importedTs.sys = importedTs.sys || {};
+      importedTs.sys.getExecutingFilePath = () => tsUrl;
+      patchTsSystemUtils(importedTs.sys);
     }
 
   } catch (e) {}
-  return ts;
+  return importedTs;
 };
 
 const cachedTypescriptFetch = async (tsUrl: string) => {

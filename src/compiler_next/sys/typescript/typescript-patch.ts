@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { buildError, buildWarn, catchError, hasError, isString, loadTypeScriptDiagnostic, normalizePath } from '@utils';
-import { getTypeScriptSys } from './typescript-sys';
+import { patchTypeScriptSys, patchTypeScriptGetParsedCommandLineOfConfigFile } from './typescript-sys';
 import { isAbsolute, join } from 'path';
 import { loadTypescript } from './typescript-load';
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
@@ -8,16 +8,20 @@ import ts from 'typescript';
 
 
 export const patchTypescript = async (config: d.Config, diagnostics: d.Diagnostic[], inMemoryFs: d.InMemoryFileSystem) => {
-  const loadedTs = await loadTypescript(diagnostics);
+  // dynamically load the typescript dependency
+  const loadedTs: typeof ts = await loadTypescript(diagnostics);
   if (hasError(diagnostics)) {
     return;
   }
 
+  // override some properties on the original imported ts object
+  patchTypeScriptSys(loadedTs, config, inMemoryFs);
+  patchTypeScriptResolveModule(loadedTs, config, inMemoryFs);
+  patchTypeScriptGetParsedCommandLineOfConfigFile(loadedTs, config);
+
+  // assign the loaded ts object to our project's "ts" object
+  // our "ts" object is the one the rest of the compiler imports and uses
   Object.assign(ts, loadedTs);
-
-  loadedTs.sys = ts.sys = await getTypeScriptSys(config, inMemoryFs);
-
-  loadedTs.resolveModuleName = ts.resolveModuleName = patchTypeScriptResolveModule(config, inMemoryFs);
 
   config.tsconfig = await getTsConfigPath(config);
 

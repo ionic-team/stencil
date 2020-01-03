@@ -9,13 +9,13 @@ import ts from 'typescript';
 import path from 'path';
 
 
-export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+export const patchTypeScriptResolveModule = (loadedTs: typeof ts, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
   const compilerExe = config.sys_next.getCompilerExecutingPath();
 
   if (shouldPatchRemoteTypeScript(compilerExe)) {
-    const orgResolveModuleName = ts.resolveModuleName;
+    const orgResolveModuleName = loadedTs.resolveModuleName;
 
-    ts.resolveModuleName = function (moduleName, containingFile, compilerOptions, host, cache, redirectedReference) {
+    loadedTs.resolveModuleName = (moduleName, containingFile, compilerOptions, host, cache, redirectedReference) => {
       const resolvedModule = tsRemoteResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
       if (resolvedModule) {
         return resolvedModule;
@@ -23,8 +23,6 @@ export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InM
       return orgResolveModuleName(moduleName, containingFile, compilerOptions, host, cache, redirectedReference);
     };
   }
-
-  return ts.resolveModuleName;
 };
 
 export const tsRemoteResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, compilerExe: string, moduleName: string, containingFile: string): ts.ResolvedModuleWithFailedLookupLocations => {

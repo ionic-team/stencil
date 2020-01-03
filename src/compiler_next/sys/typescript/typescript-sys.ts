@@ -2,13 +2,13 @@ import * as d from '../../../declarations';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { IS_WEB_WORKER_ENV, IS_CASE_SENSITIVE_FILE_NAMES } from '../environment';
 import { basename, resolve } from 'path';
-import { noop } from '@utils';
+import { isBoolean, noop } from '@utils';
 import ts from 'typescript';
 
 
-export const getTypeScriptSys = async (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+export const patchTypeScriptSys = (loadedTs: typeof ts, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
   const stencilSys = config.sys_next;
-  const tsSys = Object.assign({}, ts.sys || {} as ts.System);
+  const tsSys = Object.assign({}, loadedTs.sys || {} as ts.System);
 
   patchTsSystemFileSystem(config, stencilSys, inMemoryFs, tsSys);
   patchTsSystemWatch(stencilSys, tsSys);
@@ -149,7 +149,7 @@ export const patchTsSystemUtils = (tsSys: ts.System) => {
     tsSys.newLine = '\n';
   }
 
-  if (typeof tsSys.useCaseSensitiveFileNames !== 'boolean') {
+  if (!isBoolean(tsSys.useCaseSensitiveFileNames)) {
     tsSys.useCaseSensitiveFileNames = IS_CASE_SENSITIVE_FILE_NAMES;
   }
 
@@ -164,4 +164,28 @@ export const patchTsSystemUtils = (tsSys: ts.System) => {
   if (!tsSys.write) {
     tsSys.write = noop;
   }
+};
+
+export const patchTypeScriptGetParsedCommandLineOfConfigFile = (loadedTs: typeof ts, _config: d.Config) => {
+  const orgGetParsedCommandLineOfConfigFile = loadedTs.getParsedCommandLineOfConfigFile;
+
+  loadedTs.getParsedCommandLineOfConfigFile = (configFileName, optionsToExtend, host, extendedConfigCache) => {
+    const results = orgGetParsedCommandLineOfConfigFile(configFileName, optionsToExtend, host, extendedConfigCache);
+
+    // manually filter out any .spec or .e2e files
+    results.fileNames = results.fileNames.filter(f => {
+      // filter e2e tests
+      if (f.includes('.e2e.') || f.includes('/e2e.')) {
+        return false;
+      }
+      // filter spec tests
+      if (f.includes('.spec.') || f.includes('/spec.')) {
+        return false;
+      }
+      return true;
+    });
+
+    return results;
+  };
+
 };
