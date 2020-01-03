@@ -8,13 +8,11 @@ import ts from 'typescript';
 
 export const patchTypeScriptSys = (loadedTs: typeof ts, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
   const stencilSys = config.sys_next;
-  const tsSys = Object.assign({}, loadedTs.sys || {} as ts.System);
+  loadedTs.sys = loadedTs.sys || {} as ts.System;
 
-  patchTsSystemFileSystem(config, stencilSys, inMemoryFs, tsSys);
-  patchTsSystemWatch(stencilSys, tsSys);
-  patchTsSystemUtils(tsSys);
-
-  return tsSys;
+  patchTsSystemFileSystem(config, stencilSys, inMemoryFs, loadedTs.sys);
+  patchTsSystemWatch(stencilSys, loadedTs.sys);
+  patchTsSystemUtils(loadedTs.sys);
 };
 
 
