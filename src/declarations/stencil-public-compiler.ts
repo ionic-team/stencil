@@ -471,11 +471,11 @@ export interface CompilerSystem {
   /**
    * Always returns a boolean if the file was written or not. Does not throw.
    */
-  writeFile(p: string, content: string): Promise<boolean>;
+  writeFile(p: string, content: string | Buffer): Promise<boolean>;
   /**
    * SYNC! Always returns a boolean if the file was written or not. Does not throw.
    */
-  writeFileSync(p: string, content: string): boolean;
+  writeFileSync(p: string, content: string | Buffer): boolean;
 }
 
 export interface WorkerMainController {

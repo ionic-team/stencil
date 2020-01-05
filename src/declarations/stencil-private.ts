@@ -1289,7 +1289,7 @@ export interface FsWriteResults {
 export type FsItems = Map<string, FsItem>;
 
 export interface FsItem {
-  fileText: string;
+  content: string | Buffer;
   isFile: boolean;
   isDirectory: boolean;
   size: number;
@@ -1412,7 +1412,7 @@ export interface InMemoryFileSystem {
       isFile: boolean;
       isDirectory: boolean;
   };
-  writeFile(filePath: string, content: string, opts?: FsWriteOptions): Promise<FsWriteResults>;
+  writeFile(filePath: string, content: string | Buffer, opts?: FsWriteOptions): Promise<FsWriteResults>;
   writeFiles(files: {
       [filePath: string]: string;
   } | Map<string, String>, opts?: FsWriteOptions): Promise<FsWriteResults[]>;

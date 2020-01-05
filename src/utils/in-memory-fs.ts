@@ -179,8 +179,8 @@ export class InMemoryFs implements d.InMemoryFileSystem {
   async readFile(filePath: string, opts?: d.FsReadOptions) {
     if (opts == null || (opts.useCache === true || opts.useCache === undefined)) {
       const item = this.getItem(filePath);
-      if (item.exists && typeof item.fileText === 'string') {
-        return item.fileText;
+      if (item.exists && typeof item.content === 'string') {
+        return item.content;
       }
     }
 
@@ -191,7 +191,7 @@ export class InMemoryFs implements d.InMemoryFileSystem {
       item.exists = true;
       item.isFile = true;
       item.isDirectory = false;
-      item.fileText = fileContent;
+      item.content = fileContent;
     }
 
     return fileContent;
@@ -205,8 +205,8 @@ export class InMemoryFs implements d.InMemoryFileSystem {
   readFileSync(filePath: string, opts?: d.FsReadOptions) {
     if (opts == null || (opts.useCache === true || opts.useCache === undefined)) {
       const item = this.getItem(filePath);
-      if (item.exists && typeof item.fileText === 'string') {
-        return item.fileText;
+      if (item.exists && typeof item.content === 'string') {
+        return item.content;
       }
     }
 
@@ -216,7 +216,7 @@ export class InMemoryFs implements d.InMemoryFileSystem {
       item.exists = true;
       item.isFile = true;
       item.isDirectory = false;
-      item.fileText = fileContent;
+      item.content = fileContent;
     }
 
     return fileContent;
@@ -327,10 +327,10 @@ export class InMemoryFs implements d.InMemoryFileSystem {
     item.isDirectory = false;
     item.queueDeleteFromDisk = false;
 
-    results.changedContent = (item.fileText !== content);
+    results.changedContent = (item.content !== content);
     results.queuedWrite = false;
 
-    item.fileText = content;
+    item.content = content;
 
     if (opts != null && opts.useCache === false) {
       item.useCache = false;
@@ -354,7 +354,7 @@ export class InMemoryFs implements d.InMemoryFileSystem {
         // If this is an immediate write then write the file
         // and do not add it to the queue
         await this.ensureDir(filePath);
-        await this.disk.writeFile(filePath, item.fileText);
+        await this.disk.writeFile(filePath, item.content);
       }
     } else {
       // we want to write this to disk (eventually)
@@ -490,10 +490,10 @@ export class InMemoryFs implements d.InMemoryFileSystem {
   private async commitWriteFile(filePath: string) {
     const item = this.getItem(filePath);
 
-    if (item.fileText == null) {
+    if (item.content == null) {
       throw new Error(`unable to find item fileText to write: ${filePath}`);
     }
-    await this.disk.writeFile(filePath, item.fileText);
+    await this.disk.writeFile(filePath, item.content as string);
 
     if (item.useCache === false) {
       this.clearFileCache(filePath);
@@ -572,7 +572,7 @@ export class InMemoryFs implements d.InMemoryFileSystem {
 
     this.items.set(itemPath, item = {
       exists: null,
-      fileText: null,
+      content: null,
       size: null,
       mtimeMs: null,
       isDirectory: null,
