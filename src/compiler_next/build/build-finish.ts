@@ -67,6 +67,7 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
       // ┏(°.°)┛ ┗(°.°)┓ ┗(°.°)┛ ┏(°.°)┓
       compilerCtx.changedFiles.clear();
       compilerCtx.hasSuccessfulBuild = true;
+      buildCtx.buildResults_next.hasSuccessfulBuild = true;
     }
 
     // print out the time it took to build

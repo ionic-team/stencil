@@ -41,6 +41,13 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         if (didError) {
           this.error('Plugin CSS transform error');
         }
+
+        buildCtx.stylesUpdated.push({
+          styleTag: pathData.tag,
+          styleMode: pathData.mode,
+          styleText: cssTransformResults.styleText,
+        });
+
         return {
           code: cssTransformResults.code,
           map: cssTransformResults.map,

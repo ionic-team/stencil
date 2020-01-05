@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import exit from 'exit';
-// @ts-ignore
-import semver_lt from 'semver/functions/lt';
+import semiver from 'semiver';
 
 
 export function taskVersion(config: d.Config) {
@@ -14,7 +13,7 @@ export async function taskCheckVersion(config: d.Config) {
     const currentVersion = config.sys.compiler.version;
     const latestVersion = await config.sys.getLatestCompilerVersion(config.logger, true);
 
-    if (semver_lt(currentVersion, latestVersion)) {
+    if (semiver(currentVersion, latestVersion) < 0) {
       printUpdateMessage(config.logger, currentVersion, latestVersion);
 
     } else {
@@ -36,7 +35,7 @@ export async function validateCompilerVersion(sys: d.StencilSystem, logger: d.Lo
 
   const currentVersion = sys.compiler.version;
 
-  if (semver_lt(currentVersion, latestVersion)) {
+  if (semiver(currentVersion, latestVersion) < 0) {
     printUpdateMessage(logger, currentVersion, latestVersion);
   }
 }

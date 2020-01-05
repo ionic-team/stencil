@@ -1,15 +1,16 @@
-import { proxyComponent } from './proxy-component';
 import * as d from '../declarations';
+import { appDidLoad, forceUpdate } from './update-component';
+import { appendChildSlotFix, cloneNodeFix } from './dom-extras';
+import { BUILD } from '@app-data';
 import { CMP_FLAGS } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
+import { createTime, installDevTools } from './profile';
 import { disconnectedCallback } from './disconnected-callback';
-import { BUILD } from '@app-data';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
-import { appDidLoad, forceUpdate } from './update-component';
-import { createTime, installDevTools } from './profile';
+import { proxyComponent } from './proxy-component';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
@@ -137,23 +138,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       };
 
       if (BUILD.cloneNodeFix) {
-        const orgCloneNode = HostElement.prototype.cloneNode;
-        HostElement.prototype.cloneNode = function(deep?: boolean) {
-          const srcNode = this;
-          const isShadowDom = BUILD.shadowDom ? srcNode.shadowRoot && supportsShadowDom : false;
-          const clonedNode = orgCloneNode.call(this, isShadowDom ? deep : false) as Node;
-          if (BUILD.slot && !isShadowDom && deep) {
-            let i = 0;
-            let slotted;
-            for (; i < srcNode.childNodes.length; i++) {
-              slotted = (srcNode.childNodes[i] as any)['s-nr'];
-              if (slotted) {
-                clonedNode.appendChild(slotted.cloneNode(true));
-              }
-            }
-          }
-          return clonedNode;
-        };
+        cloneNodeFix(HostElement.prototype);
+      }
+
+      if (BUILD.appendChildSlotFix) {
+        appendChildSlotFix(HostElement.prototype);
       }
 
       if (BUILD.hotModuleReplacement) {

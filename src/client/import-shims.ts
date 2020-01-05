@@ -19,53 +19,75 @@ export const patchEsm = () => {
   return Promise.resolve();
 };
 
-export const patchBrowser = async (): Promise<d.CustomElementsDefineOptions> => {
-  if (BUILD.devTools) {
+export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
+  // NOTE!! This fn cannot use async/await!
+  if (BUILD.isDev) {
     consoleDevInfo('Running in development mode.');
   }
+
   if (BUILD.cssVarShim) {
+    // shim css vars
     plt.$cssShim$ = (win as any).__stencil_cssshim;
   }
+
   if (BUILD.cloneNodeFix) {
+    // opted-in to polyfill cloneNode() for slot polyfilled components
     patchCloneNodeFix((H as any).prototype);
   }
 
+  if (BUILD.profile && !performance.mark) {
+    // not all browsers support performance.mark/measure (Safari 10)
+    performance.mark = performance.measure = () => {/*noop*/};
+    performance.getEntriesByName = () => [];
+  }
+
   // @ts-ignore
-  const importMeta = import.meta.url;
-  const regex = new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`);
   const scriptElm = Array.from(doc.querySelectorAll('script')).find(s => (
-    regex.test(s.src) ||
+    new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) ||
     s.getAttribute('data-stencil-namespace') === NAMESPACE
   ));
-  const opts = (scriptElm as any)['data-opts'];
+  const opts = (scriptElm as any)['data-opts'] || {};
+  const importMeta = import.meta.url;
+
+  if ('onbeforeload' in scriptElm && !history.scrollRestoration /* IS_ESM_BUILD */) {
+    // Safari < v11 support: This IF is true if it's Safari below v11.
+    // This fn cannot use async/await since Safari didn't support it until v11,
+    // however, Safari 10 did support modules. Safari 10 also didn't support "nomodule",
+    // so both the ESM file and nomodule file would get downloaded. Only Safari
+    // has 'onbeforeload' in the script, and "history.scrollRestoration" was added
+    // to Safari in v11. Return a noop then() so the async/await ESM code doesn't continue.
+    // IS_ESM_BUILD is replaced at build time so this check doesn't happen in systemjs builds.
+    return { then() {/* promise noop */} } as any;
+  }
+
   if (importMeta !== '') {
-    return {
-      ...opts,
-      resourcesUrl: new URL('.', importMeta).href
-    };
+    opts.resourcesUrl = new URL('.', importMeta).href;
+
   } else {
-    const resourcesUrl = new URL('.', new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href));
-    patchDynamicImport(resourcesUrl.href);
+    opts.resourcesUrl = new URL('.', new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href)).href;
+    patchDynamicImport(opts.resourcesUrl, scriptElm);
 
     if (!window.customElements) {
+      // module support, but no custom elements support (Old Edge)
       // @ts-ignore
-      await import('./polyfills/dom.js');
+     return import('./polyfills/dom.js').then(() => opts);
     }
-    return {
-      ...opts,
-      resourcesUrl: resourcesUrl.href,
-    };
   }
+  return Promise.resolve(opts);
 };
 
-export const patchDynamicImport = (base: string) => {
+export const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
   const importFunctionName = getDynamicImportFunction(NAMESPACE);
   try {
+    // test if this browser supports dynamic imports
     // There is a caching issue in V8, that breaks using import() in Function
     // By generating a random string, we can workaround it
     // Check https://bugs.chromium.org/p/chromium/issues/detail?id=990810 for more info
     (win as any)[importFunctionName] = new Function('w', `return import(w);//${Math.random()}`);
   } catch (e) {
+    // this shim is specifically for browsers that do support "esm" imports
+    // however, they do NOT support "dynamic" imports
+    // basically this code is for old Edge, v18 and below
     const moduleMap = new Map<string, any>();
     (win as any)[importFunctionName] = (src: string) => {
       const url = new URL(src, base).href;
@@ -73,6 +95,7 @@ export const patchDynamicImport = (base: string) => {
       if (!mod) {
         const script = doc.createElement('script');
         script.type = 'module';
+        script.crossOrigin = orgScriptElm.crossOrigin;
         script.src = URL.createObjectURL(new Blob([`import * as m from '${url}'; window.${importFunctionName}.m = m;`], { type: 'application/javascript' }));
         mod = new Promise(resolve => {
           script.onload = () => {

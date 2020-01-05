@@ -85,13 +85,19 @@ export const skipUrlFetch = (url: string) =>
 
 
 const knownUrlSkips = [
-  '/@stencil/core/internal.mjs',
   '/@stencil/core/internal.js',
   '/@stencil/core/internal.json',
+  '/@stencil/core/internal.mjs',
+  '/@stencil/core/internal/stencil-core.js/index.json',
+  '/@stencil/core/internal/stencil-core.js.json',
+  '/@stencil/core/internal/stencil-core.js/package.json',
   '/@stencil/core.js',
+  '/@stencil/core.json',
   '/@stencil/core.mjs',
   '/@stencil/core.css',
   '/@stencil/core/index.js',
+  '/@stencil/core/index.json',
   '/@stencil/core/index.mjs',
   '/@stencil/core/index.css',
+  '/@stencil/package.json',
 ];

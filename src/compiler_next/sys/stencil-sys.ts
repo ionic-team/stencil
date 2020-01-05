@@ -1,9 +1,9 @@
 import { CompilerFileWatcherCallback, CompilerFsStats, CompilerSystem, CompilerSystemMakeDirectoryOptions, CopyResults, CopyTask, SystemDetails } from '../../declarations';
 import { buildEvents } from '../../compiler/events';
 import { createWebWorkerMainController } from '../sys/worker/web-worker-main';
-import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from './environment';
+import { HAS_WEB_WORKER, IS_NODE_ENV, IS_WEB_WORKER_ENV } from './environment';
 import { normalizePath } from '@utils';
-import path from 'path';
+import { basename, dirname } from 'path';
 
 
 export const createSystem = () => {
@@ -34,8 +34,8 @@ export const createSystem = () => {
     if (p === '/' || p === '') {
       return '/';
     }
-    const dir = path.dirname(p);
-    const base = path.basename(p);
+    const dir = dirname(p);
+    const base = basename(p);
     if (dir.endsWith('/')) {
       return normalizePath(`${dir}${base}`);
     }
@@ -78,18 +78,18 @@ export const createSystem = () => {
     const item = items.get(p);
     if (!item) {
       items.set(p, {
-        basename: path.basename(p),
-        dirname: path.dirname(p),
+        basename: basename(p),
+        dirname: dirname(p),
         isDirectory: true,
         isFile: false,
-        watcherCallback: null,
+        watcherCallbacks: null,
         data: undefined
       });
+      emitDirectoryWatch(p, new Set());
     } else {
       item.isDirectory = true;
       item.isFile = false;
     }
-    emitDirectoryWatch(p, new Set());
     return true;
   };
 
@@ -162,9 +162,10 @@ export const createSystem = () => {
     p = normalize(p);
     const item = items.get(p);
     if (item) {
-      if (item.watcherCallback) {
-        item.watcherCallback(p, 'fileDelete');
-        events.emit('fileDelete', p);
+      if (item.watcherCallbacks) {
+        item.watcherCallbacks.forEach(watcherCallback => {
+          watcherCallback(p, 'fileDelete');
+        });
       }
       items.delete(p);
       emitDirectoryWatch(p, new Set());
@@ -177,73 +178,93 @@ export const createSystem = () => {
   const watchDirectory = (p: string, dirWatcherCallback: CompilerFileWatcherCallback) => {
     p = normalize(p);
     const item = items.get(p);
-    if (item) {
-      item.isDirectory = true;
-      item.isFile = false;
-      item.watcherCallback = dirWatcherCallback;
-    } else {
-      items.set(p, {
-        basename: path.basename(p),
-        dirname: path.dirname(p),
-        isDirectory: true,
-        isFile: false,
-        watcherCallback: dirWatcherCallback,
-        data: undefined
-      });
-    }
 
     const close = () => {
       const closeItem = items.get(p);
-      if (closeItem) {
-        closeItem.watcherCallback = null;
+      if (closeItem && closeItem.watcherCallbacks) {
+        const index = closeItem.watcherCallbacks.indexOf(dirWatcherCallback);
+        if (index > -1) {
+          closeItem.watcherCallbacks.splice(index, 1);
+        }
       }
     };
 
     addDestory(close);
 
+    if (item) {
+      item.isDirectory = true;
+      item.isFile = false;
+      item.watcherCallbacks = item.watcherCallbacks || [];
+      item.watcherCallbacks.push(dirWatcherCallback);
+
+    } else {
+      items.set(p, {
+        basename: basename(p),
+        dirname: dirname(p),
+        isDirectory: true,
+        isFile: false,
+        watcherCallbacks: [dirWatcherCallback],
+        data: undefined
+      });
+    }
+
     return {
-      close,
+      close() {
+        removeDestory(close);
+        close();
+      }
     };
   };
 
   const watchFile = (p: string, fileWatcherCallback: CompilerFileWatcherCallback) => {
     p = normalize(p);
     const item = items.get(p);
-    if (item) {
-      item.isDirectory = false;
-      item.isFile = true;
-      item.watcherCallback = fileWatcherCallback;
-    } else {
-      items.set(p, {
-        basename: path.basename(p),
-        dirname: path.dirname(p),
-        isDirectory: true,
-        isFile: false,
-        watcherCallback: fileWatcherCallback,
-        data: undefined
-      });
-    }
 
     const close = () => {
       const closeItem = items.get(p);
-      if (closeItem) {
-        closeItem.watcherCallback = null;
+      if (closeItem && closeItem.watcherCallbacks) {
+        const index = closeItem.watcherCallbacks.indexOf(fileWatcherCallback);
+        if (index > -1) {
+          closeItem.watcherCallbacks.splice(index, 1);
+        }
       }
     };
 
     addDestory(close);
 
+    if (item) {
+      item.isDirectory = false;
+      item.isFile = true;
+      item.watcherCallbacks = item.watcherCallbacks || [];
+      item.watcherCallbacks.push(fileWatcherCallback);
+
+    } else {
+      items.set(p, {
+        basename: basename(p),
+        dirname: dirname(p),
+        isDirectory: true,
+        isFile: false,
+        watcherCallbacks: [fileWatcherCallback],
+        data: undefined
+      });
+    }
+
     return {
-      close,
+      close() {
+        removeDestory(close);
+        close();
+      }
     };
   };
 
   const emitDirectoryWatch = (p: string, emitted: Set<string>) => {
-    const parentDir = normalize(path.dirname(p));
+    const parentDir = normalize(dirname(p));
     const dirItem = items.get(parentDir);
 
-    if (dirItem && dirItem.isDirectory && dirItem.watcherCallback) {
-      dirItem.watcherCallback(p, null);
+    if (dirItem && dirItem.isDirectory && dirItem.watcherCallbacks) {
+      dirItem.watcherCallbacks.forEach(watcherCallback => {
+        watcherCallback(p, null);
+      });
     }
     if (!emitted.has(parentDir)) {
       emitted.add(parentDir);
@@ -255,20 +276,21 @@ export const createSystem = () => {
     p = normalize(p);
     const item = items.get(p);
     if (item) {
-      const shouldEmitUpdate = (item.watcherCallback && item.data !== data);
+      const hasChanged = (item.data !== data);
       item.data = data;
-      if (shouldEmitUpdate) {
-        item.watcherCallback(p, 'fileUpdate');
-        events.emit('fileUpdate', p);
+      if (hasChanged && item.watcherCallbacks) {
+        item.watcherCallbacks.forEach(watcherCallback => {
+          watcherCallback(p, 'fileUpdate');
+        });
       }
 
     } else {
       items.set(p, {
-        basename: path.basename(p),
-        dirname: path.dirname(p),
+        basename: basename(p),
+        dirname: dirname(p),
         isDirectory: false,
         isFile: true,
-        watcherCallback: null,
+        watcherCallbacks: null,
         data
       });
 
@@ -336,7 +358,7 @@ export const createSystem = () => {
     writeFile,
     writeFileSync,
     generateContentHash,
-    createWorkerController: createWebWorkerMainController,
+    createWorkerController: HAS_WEB_WORKER ? createWebWorkerMainController : null,
     details: getDetails(),
     copy,
   };
@@ -350,7 +372,7 @@ interface FsItem {
   dirname: string;
   isFile: boolean;
   isDirectory: boolean;
-  watcherCallback: CompilerFileWatcherCallback;
+  watcherCallbacks: CompilerFileWatcherCallback[];
 }
 
 

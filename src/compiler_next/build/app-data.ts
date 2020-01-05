@@ -123,7 +123,6 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.isDev = !!config.devMode;
   b.isTesting = !!config._isTesting;
   b.devTools = b.isDev && !config._isTesting;
-  b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || (config.extras.lifecycleDOMEvents));
   b.profile = !!(config.profile);
   b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.reloadStrategy === 'hmr' && !config._isTesting);
   b.updatable = (b.updatable || b.hydrateClientSide || b.hotModuleReplacement);
@@ -131,5 +130,7 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
   b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;
+  b.appendChildSlotFix = !!config.extras.appendChildSlotFix;
   b.cloneNodeFix = !!config.extras.cloneNodeFix;
+  b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
 };

@@ -292,6 +292,15 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Karma Prerender",
+      "args": [
+        "${workspaceFolder}/test/karma/test-prerender/prerender.js"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Karma NEXT",
       "args": [
         "${workspaceFolder}/bin/stencil",

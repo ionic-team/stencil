@@ -1,5 +1,5 @@
 import { CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declarations';
-import { compilerBuild } from '../../version';
+import { minfyJsId } from '../../version';
 import { transpileToEs5 } from '../transpile/transpile-to-es5';
 import { minifyJs } from './minify-js';
 import { DEFAULT_STYLE_MODE } from '@utils';
@@ -25,7 +25,7 @@ export async function optimizeModule(
     };
   }
   const isDebug = (config.logLevel === 'debug');
-  const cacheKey = await compilerCtx.cache.createKey('optimizeModule', compilerBuild.minfyJsId, opts, isDebug);
+  const cacheKey = await compilerCtx.cache.createKey('optimizeModule', minfyJsId, opts, isDebug);
   const cachedContent = await compilerCtx.cache.get(cacheKey);
   if (cachedContent != null) {
     return {

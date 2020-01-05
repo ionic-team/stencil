@@ -91,7 +91,9 @@ async function bundleLazyApp(config: d.Config, compilerCtx: d.CompilerCtx, build
 }
 
 const BROWSER_ENTRY = `
-import { bootstrapLazy, globalScripts, patchBrowser } from '@stencil/core/internal/client';
+import { bootstrapLazy, patchBrowser } from '@stencil/core/internal/client';
+import { globalScripts } from '@stencil/core/internal/app-globals';
+
 patchBrowser().then(options => {
   globalScripts();
   return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
@@ -100,7 +102,8 @@ patchBrowser().then(options => {
 
 // This is for webpack
 const EXTERNAL_ENTRY = `
-import { bootstrapLazy, globalScripts, patchEsm } from '@stencil/core/internal/client';
+import { bootstrapLazy, patchEsm } from '@stencil/core/internal/client';
+import { globalScripts } from '@stencil/core/internal/app-globals';
 
 export const defineCustomElements = (win, options) => {
   return patchEsm().then(() => {

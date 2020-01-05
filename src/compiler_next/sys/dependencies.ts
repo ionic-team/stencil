@@ -1,27 +1,32 @@
-import { compilerBuild } from '../../version';
+import { rollupVersion, terserVersion, typescriptVersion } from '../../version';
 
 const remoteDepUrl = 'https://cdn.jsdelivr.net/npm/';
 
 
-export const getRemoteDependencyUrl = (dep: CompilerDependency) => {
-  return `${remoteDepUrl}${dep.name}${dep.version ? '@' + dep.version : ''}${dep.main}`;
+export const getRemoteDependencyUrl = (dep: CompilerDependency) =>
+  `${remoteDepUrl}${dep.name}${dep.version ? '@' + dep.version : ''}${dep.main}`;
+
+
+export const getRemoteTypeScriptUrl = () => {
+  const tsDep = dependencies.find(dep => dep.name === 'typescript');
+  return getRemoteDependencyUrl(tsDep);
 };
 
 
 export const dependencies: CompilerDependency[] = [
   {
     name: 'typescript',
-    version: compilerBuild.typescriptVersion,
+    version: typescriptVersion,
     main: '/lib/typescript.js',
   },
   {
     name: 'rollup',
-    version: compilerBuild.rollupVersion,
+    version: rollupVersion,
     main: '/dist/rollup.browser.es.js'
   },
   {
     name: 'terser',
-    version: compilerBuild.terserVersion,
+    version: terserVersion,
     main: '/dist/bundle.min.js'
   }
 ];

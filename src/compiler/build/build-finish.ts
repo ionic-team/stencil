@@ -71,7 +71,9 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
     // print out the time it took to build
     // and add the duration to the build results
     if (!buildCtx.hasPrintedResults) {
-      buildCtx.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
+      if (buildCtx.timeSpan) {
+        buildCtx.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
+      }
       buildCtx.hasPrintedResults = true;
 
       // write the build stats

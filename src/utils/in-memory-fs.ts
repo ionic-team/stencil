@@ -581,7 +581,6 @@ export class InMemoryFs implements d.InMemoryFileSystem {
       queueDeleteFromDisk: null,
       queueWriteToDisk: null,
       useCache: null,
-      outputTargetType: null,
     });
     return item;
   }

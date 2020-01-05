@@ -1,6 +1,9 @@
 {
   "name": "@stencil/hello-world",
   "private": true,
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "build": "node ../../bin/stencil build --prerender",
     "build.next": "node ../../bin/stencil build --next",

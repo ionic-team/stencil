@@ -4,7 +4,7 @@ import { drainPrerenderQueue, initializePrerenderEntryUrls } from './prerender-q
 import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
 import { generateTemplateHtml } from './prerender-template-html';
-import { getPrerenderConfig } from './prerender-config';
+import { getPrerenderConfig, validatePrerenderConfigPath } from './prerender-config';
 import { getAbsoluteBuildDir } from '../compiler/html/utils';
 import { isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { NodeWorkerController } from '../sys/node_next/worker';
@@ -77,7 +77,7 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
 }
 
 
-async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: NodeWorkerController, diagnostics: d.Diagnostic[], config: d.Config, devServer: d.DevServer, buildResults: d.CompilerBuildResults, outputTarget: d.OutputTargetWww) {
+async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWorkerController, diagnostics: d.Diagnostic[], config: d.Config, devServer: d.DevServer, buildResults: d.CompilerBuildResults, outputTarget: d.OutputTargetWww) {
   try {
     const timeSpan = config.logger.createTimeSpan(`prerendering started`);
 
@@ -88,11 +88,16 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Nod
     config.logger.debug(`prerender hydrate app: ${buildResults.hydrateAppFilePath}`);
     config.logger.debug(`prerender dev server: ${devServerHostUrl}`);
 
+    validatePrerenderConfigPath(diagnostics, outputTarget.prerenderConfig);
+    if (hasError(diagnostics)) {
+      return;
+    }
+
     // get the prerender urls to queue up
     const manager: d.PrerenderManager = {
       prcs,
       prerenderUrlWorker(prerenderRequest: d.PrerenderRequest) {
-        return workerManager.send('prerenderWorker', prerenderRequest);
+        return workerCtrl.send('prerenderWorker', prerenderRequest);
       },
       componentGraphPath: null,
       config: config,
@@ -101,7 +106,7 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Nod
       hydrateAppFilePath: buildResults.hydrateAppFilePath,
       isDebug: (config.logLevel === 'debug'),
       logCount: 0,
-      maxConcurrency: (config.maxConcurrentWorkers * 2 - 1),
+      maxConcurrency: Math.max(20, (config.maxConcurrentWorkers * 10)),
       outputTarget: outputTarget,
       prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
       prerenderConfigPath: outputTarget.prerenderConfig,
@@ -112,8 +117,8 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Nod
       resolve: null
     };
 
-    if (!config.flags.ci && config.logLevel !== 'debug') {
-      manager.progressLogger = startProgressLogger();
+    if (!config.flags.ci && !manager.isDebug) {
+      manager.progressLogger = startProgressLogger(prcs);
     }
 
     initializePrerenderEntryUrls(manager);
@@ -135,7 +140,7 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerManager: Nod
     await new Promise(resolve => {
       manager.resolve = resolve;
 
-      process.nextTick(() => {
+      prcs.nextTick(() => {
         drainPrerenderQueue(manager);
       });
     });
@@ -221,28 +226,30 @@ function getComponentPathContent(config: d.Config, componentGraph: {[scopeId: st
 }
 
 
-const startProgressLogger = (): d.ProgressLogger => {
+function startProgressLogger(prcs: NodeJS.Process): d.ProgressLogger {
   let promise = Promise.resolve();
   const update = (text: string) => {
-    text = text.substr(0, process.stdout.columns - 5) + '\x1b[0m';
+    text = text.substr(0, prcs.stdout.columns - 5) + '\x1b[0m';
     return promise = promise.then(() => {
       return new Promise<any>(resolve => {
-        readline.clearLine(process.stdout, 0);
-        readline.cursorTo(process.stdout, 0, null);
-        process.stdout.write(text, resolve);
+        readline.clearLine(prcs.stdout, 0);
+        readline.cursorTo(prcs.stdout, 0, null);
+        prcs.stdout.write(text, resolve);
       });
     });
   };
+
   const stop = () => {
     return update('\x1B[?25h');
   };
+
   // hide cursor
-  process.stdout.write('\x1B[?25l');
+  prcs.stdout.write('\x1B[?25l');
   return {
     update,
     stop
   };
-};
+}
 
 
 function generateContentHash(content: string) {

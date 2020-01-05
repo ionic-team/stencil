@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildError, normalizePath } from '@utils';
+import { buildError, isBoolean, isNumber, isString, normalizePath } from '@utils';
 import { isOutputTargetWww } from '../../compiler/output-targets/output-utils';
 import { URL } from 'url';
 import path from 'path';
@@ -12,16 +12,42 @@ export function validateDevServer(config: d.Config, flags: d.ConfigFlags, diagno
 
   const devServer = Object.assign({}, config.devServer);
 
-  if (typeof flags.address === 'string') {
+  if (isString(flags.address)) {
     devServer.address = flags.address;
-  } else if (typeof devServer.address !== 'string') {
+  } else if (!isString(devServer.address)) {
     devServer.address = '0.0.0.0';
   }
 
-  if (typeof flags.port === 'number') {
+  let addressProtocol: 'http' | 'https';
+  if (devServer.address.toLowerCase().startsWith('http://')) {
+    devServer.address = devServer.address.substring(7);
+    addressProtocol = 'http';
+  } else if (devServer.address.toLowerCase().startsWith('https://')) {
+    devServer.address = devServer.address.substring(8);
+    addressProtocol = 'https';
+  }
+
+  devServer.address = devServer.address.split('/')[0];
+
+  let addressPort: number;
+  const addressSplit = devServer.address.split(':');
+  if (addressSplit.length > 1) {
+    if (!isNaN(addressSplit[1] as any)) {
+      devServer.address = addressSplit[0];
+      addressPort = parseInt(addressSplit[1], 10);
+    }
+  }
+
+  if (isNumber(flags.port)) {
     devServer.port = flags.port;
-  } else if (typeof devServer !== 'number') {
-    devServer.port = 3333;
+  } else if (devServer.port !== null && !isNumber(devServer.port)) {
+    if (isNumber(addressPort)) {
+      devServer.port = addressPort;
+    } else if (devServer.address === 'localhost' || !isNaN(devServer.address.split('.')[0] as any)) {
+      devServer.port = 3333;
+    } else {
+      devServer.port = null;
+    }
   }
 
   if ((devServer as any).hotReplacement === true) {
@@ -38,30 +64,30 @@ export function validateDevServer(config: d.Config, flags: d.ConfigFlags, diagno
     }
   }
 
-  if (typeof devServer.gzip !== 'boolean') {
+  if (!isBoolean(devServer.gzip)) {
     devServer.gzip = true;
   }
 
-  if (typeof devServer.openBrowser !== 'boolean') {
+  if (!isBoolean(devServer.openBrowser)) {
     devServer.openBrowser = true;
   }
 
-  if (typeof devServer.websocket !== 'boolean') {
+  if (!isBoolean(devServer.websocket)) {
     devServer.websocket = true;
   }
 
   if (devServer.protocol !== 'http' && devServer.protocol !== 'https') {
-    devServer.protocol = devServer.https ? 'https' : 'http';
+    devServer.protocol = devServer.https ? 'https' : (addressProtocol ? addressProtocol : 'http');
   }
 
   if (devServer.historyApiFallback !== null && devServer.historyApiFallback !== false) {
     devServer.historyApiFallback = devServer.historyApiFallback || {};
 
-    if (typeof devServer.historyApiFallback.index !== 'string') {
+    if (!isString(devServer.historyApiFallback.index)) {
       devServer.historyApiFallback.index = 'index.html';
     }
 
-    if (typeof devServer.historyApiFallback.disableDotRule !== 'boolean') {
+    if (!isBoolean(devServer.historyApiFallback.disableDotRule)) {
       devServer.historyApiFallback.disableDotRule = false;
     }
   }
@@ -86,7 +112,7 @@ export function validateDevServer(config: d.Config, flags: d.ConfigFlags, diagno
     serveDir = config.rootDir;
   }
 
-  if (typeof basePath !== 'string' || basePath.trim() === '') {
+  if (!isString(basePath) || basePath.trim() === '') {
     basePath = `/`;
   }
 
@@ -100,19 +126,19 @@ export function validateDevServer(config: d.Config, flags: d.ConfigFlags, diagno
     basePath += '/';
   }
 
-  if (typeof devServer.logRequests !== 'boolean') {
+  if (!isBoolean(devServer.logRequests)) {
     devServer.logRequests = (config.logLevel === 'debug');
   }
 
-  if (typeof devServer.root !== 'string') {
+  if (!isString(devServer.root)) {
     devServer.root = serveDir;
   }
 
-  if (typeof devServer.basePath !== 'string') {
+  if (!isString(devServer.basePath)) {
     devServer.basePath = basePath;
   }
 
-  if (typeof (devServer as any).baseUrl === 'string') {
+  if (isString((devServer as any).baseUrl)) {
     const err = buildError(diagnostics);
     err.messageText = `devServer config "baseUrl" has been renamed to "basePath", and should not include a domain or protocol.`;
   }
@@ -120,6 +146,7 @@ export function validateDevServer(config: d.Config, flags: d.ConfigFlags, diagno
   if (!path.isAbsolute(devServer.root)) {
     devServer.root = path.join(config.rootDir, devServer.root);
   }
+  devServer.root = normalizePath(devServer.root);
 
   if (devServer.excludeHmr) {
     if (!Array.isArray(devServer.excludeHmr)) {

@@ -131,4 +131,72 @@ describe('selector', () => {
     expect(nav.outerHTML).toBe('<nav>2</nav>');
   });
 
+  it('finds child', () => {
+    const doc = new MockDocument(`
+      <div>
+        <span></span>
+      </div>
+    `);
+
+    const span = doc.querySelector('div > span');
+    expect(span.outerHTML).toBe('<span></span>');
+  });
+
+  it('finds child if multiple children', () => {
+    const doc = new MockDocument(`
+      <div>
+        <a></a>
+        <span></span>
+      </div>
+    `);
+
+    const span = doc.querySelector('div > span');
+    expect(span.outerHTML).toBe('<span></span>');
+  });
+
+  it('finds child if multiple selectors', () => {
+    const doc = new MockDocument(`
+      <div>
+        <a></a>
+        <span>
+          <div></div>
+          <div class="inner"></div>
+        </span>
+      </div>
+    `);
+
+    const span = doc.querySelector('div > span > .inner');
+    expect(span.outerHTML).toBe('<div class="inner"></div>');
+  });
+
+  it('not find child if does not exist', () => {
+    const doc = new MockDocument(`
+      <div>
+        <a></a>
+        <span>
+          <div></div>
+          <div class="inner"></div>
+        </span>
+      </div>
+    `);
+
+    const span = doc.querySelector('div > span > .none');
+    expect(span).toBeFalsy();
+  });
+
+  it('not find child if no tag specified after combinator', () => {
+    const doc = new MockDocument(`
+      <div>
+        <a></a>
+        <span>
+          <div></div>
+          <div class="inner"></div>
+        </span>
+      </div>
+    `);
+
+    const span = doc.querySelector('div > span > ');
+    expect(span).toBeFalsy();
+  });
+
 });

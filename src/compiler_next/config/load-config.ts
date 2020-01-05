@@ -131,7 +131,7 @@ const loadConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[], co
   if (hasConfigFile) {
     // the passed in config was a string, so it's probably a path to the config we need to load
     // first clear the require cache so we don't get the same file
-    const configFileData = evaluateConfigFile(sys, diagnostics, configPath);
+    const configFileData = await evaluateConfigFile(sys, diagnostics, configPath);
     if (hasError(diagnostics)) {
       return config;
     }
@@ -152,11 +152,13 @@ const loadConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[], co
 const CONFIG_FILENAMES = ['stencil.config.ts', 'stencil.config.js'];
 
 
-const evaluateConfigFile = (sys: CompilerSystem, diagnostics: Diagnostic[], configFilePath: string) => {
+const evaluateConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[], configFilePath: string) => {
   let configFileData: { config?: Config } = null;
 
   try {
     // TODO: this should use sys for resolving
+    const ts = await loadTypescript(diagnostics);
+
     if (IS_NODE_ENV) {
       // ensure we cleared out node's internal require() cache for this file
       delete require.cache[path.resolve(configFilePath)];
@@ -169,7 +171,7 @@ const evaluateConfigFile = (sys: CompilerSystem, diagnostics: Diagnostic[], conf
         if (configFilePath.endsWith('.ts')) {
           // looks like we've got a typed config file
           // let's transpile it to .js quick
-          sourceText = transpileTypedConfig(diagnostics, sourceText, configFilePath);
+          sourceText = transpileTypedConfig(ts, diagnostics, sourceText, configFilePath);
 
         } else {
           // quick hack to turn a modern es module
@@ -189,7 +191,7 @@ const evaluateConfigFile = (sys: CompilerSystem, diagnostics: Diagnostic[], conf
     } else {
       // browser environment, can't use node's require() to evaluate
       let sourceText = sys.readFileSync(configFilePath, 'utf8');
-      sourceText = transpileTypedConfig(diagnostics, sourceText, configFilePath);
+      sourceText = transpileTypedConfig(ts, diagnostics, sourceText, configFilePath);
       if (hasError(diagnostics)) {
         return configFileData;
       }
@@ -206,10 +208,9 @@ const evaluateConfigFile = (sys: CompilerSystem, diagnostics: Diagnostic[], conf
 };
 
 
-const transpileTypedConfig = (diagnostics: Diagnostic[], sourceText: string, filePath: string) => {
+const transpileTypedConfig = (ts: any, diagnostics: Diagnostic[], sourceText: string, filePath: string) => {
   // let's transpile an awesome stencil.config.ts file into
   // a boring stencil.config.js file
-  const ts = loadTypescript(diagnostics);
   if (hasError(diagnostics)) {
     return sourceText;
   }

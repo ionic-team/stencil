@@ -11,7 +11,8 @@ import { optimizeCss } from '../../compiler_next/optimize/optimize-css';
 
 export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
   const results: d.TransformCssToEsmOutput = {
-    code: input.code,
+    styleText: input.code,
+    code: '',
     map: null,
     diagnostics: []
   };
@@ -23,13 +24,13 @@ export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
 
     if (input.encapsulation === 'scoped') {
       const scopeId = getScopeId(input.tagName, input.modeName);
-      results.code = scopeCss(results.code, scopeId, input.commentOriginalSelector);
+      results.styleText = scopeCss(results.styleText, scopeId, input.commentOriginalSelector);
     }
 
-    const cssImports = getCssImports(varNames, results.code, input.filePath, input.modeName);
+    const cssImports = getCssImports(varNames, results.styleText, input.filePath, input.modeName);
     cssImports.forEach(cssImport => {
       // remove the original css @imports
-      results.code = results.code.replace(cssImport.srcImportText, '');
+      results.styleText = results.styleText.replace(cssImport.srcImportText, '');
 
       const importPath = createStencilImportPath(input.tagName, input.encapsulation, input.modeName, cssImport.filePath, input.filePath);
       s.append(`import ${cssImport.varName} from '${importPath}';\n`);
@@ -43,7 +44,7 @@ export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
 
     const optimizeResults = await optimizeCss({
       autoprefixer: input.autoprefixer,
-      css: results.code,
+      css: results.styleText,
       filePath: input.filePath,
       minify: input.minify
     });
@@ -54,7 +55,7 @@ export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
     }
     results.code = optimizeResults.css;
 
-    s.append(`${JSON.stringify(results.code)};\n`);
+    s.append(`${JSON.stringify(results.styleText)};\n`);
 
     s.append(`export default ${defaultVarName};`);
 

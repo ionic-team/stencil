@@ -15,6 +15,7 @@ module.exports = {
     "^@stencil/core/cli$": path.join(rootDir, 'cli', 'index_legacy.js'),
     "^@stencil/core/compiler$": path.join(rootDir, 'compiler', 'index.js'),
     "^@stencil/core/internal/app-data$": path.join(internalDir, 'app-data', 'index.js'),
+    "^@stencil/core/internal/app-globals$": path.join(internalDir, 'app-globals', 'index.js'),
     "^@stencil/core/internal/platform$": path.join(internalDir, 'testing', 'index.js'),
     "^@stencil/core/internal/runtime$": path.join(internalDir, 'runtime', 'index.js'),
     "^@stencil/core/mock-doc$": path.join(rootDir, 'mock-doc', 'index.js'),

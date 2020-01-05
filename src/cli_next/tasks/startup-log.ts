@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { compilerBuild } from '../../version';
+import { buildId, vermoji, version } from '../../version';
 import os from 'os';
 
 
@@ -10,7 +10,6 @@ export function startupLog(prcs: NodeJS.Process, config: d.Config) {
 
   const logger = config.logger;
   const isDebug = logger.level === 'debug';
-  const version = compilerBuild.stencilVersion;
   const isPrerelease = version.includes('-');
   const isDevBuild = version.includes('-dev.');
 
@@ -25,7 +24,7 @@ export function startupLog(prcs: NodeJS.Process, config: d.Config) {
   startupMsg += ' ' + logger.magenta('[NEXT]');
 
   if (prcs.platform !== 'win32') {
-    startupMsg += ' ' + compilerBuild.vermoji;
+    startupMsg += ' ' + vermoji;
   }
 
   logger.info(startupMsg);
@@ -61,7 +60,7 @@ export function startupLog(prcs: NodeJS.Process, config: d.Config) {
 
     logger.debug(`node ${prcs.version}`);
     logger.debug(`compiler: ${config.sys_next.getCompilerExecutingPath()}`);
-    logger.debug(`build: ${compilerBuild.buildId}`);
+    logger.debug(`build: ${buildId}`);
 
   } catch (e) {
     logger.warn(e);

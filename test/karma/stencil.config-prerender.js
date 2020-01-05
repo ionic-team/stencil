@@ -7,9 +7,10 @@ exports.config = {
   outputTargets: [
     {
       type: 'www',
-      dir: 'www/prerender',
-      baseUrl: '/prerender',
-      serviceWorker: false
+      baseUrl: 'https://karma.stenciljs.com/prerender',
+      serviceWorker: null,
+      empty: false,
+      prerenderConfig: './test-prerender/prerender.config.js'
     }
   ],
   excludeSrc: []

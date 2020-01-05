@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
-import { flatOne, buildError, augmentDiagnosticWithNode } from '@utils';
+import { flatOne, buildError, augmentDiagnosticWithNode, buildWarn } from '@utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
@@ -32,10 +32,10 @@ const parseWatchDecorator = (config: d.Config, diagnostics: d.Diagnostic[], watc
     .map(decorator => {
       const [ propName ] = getDeclarationParameters<string>(decorator);
       if (!watchable.has(propName)) {
-        const err = buildError(diagnostics);
-        err.messageText = `@Watch('${propName}') is trying to watch for changes in a property that does not exist.
+        const dianostic = config.devMode ? buildWarn(diagnostics) : buildError(diagnostics);
+        dianostic.messageText = `@Watch('${propName}') is trying to watch for changes in a property that does not exist.
         Make sure only properties decorated with @State() or @Prop() are watched.`;
-        augmentDiagnosticWithNode(config, err, decorator);
+        augmentDiagnosticWithNode(config, dianostic, decorator);
       }
       return {
         propName,

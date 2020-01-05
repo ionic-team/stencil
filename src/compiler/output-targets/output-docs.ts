@@ -8,9 +8,6 @@ import { generateVscodeDocs } from '../docs/vscode';
 import { outputCustom } from './output-custom';
 
 export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (!config.buildDocs) {
-    return;
-  }
   const docsOutputTargets = config.outputTargets.filter(o => (
     isOutputTargetCustom(o) ||
     isOutputTargetDocsReadme(o) ||
@@ -18,6 +15,10 @@ export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, b
     isOutputTargetDocsCustom(o) ||
     isOutputTargetDocsVscode(o)
   ));
+
+  if (docsOutputTargets.length === 0) {
+    return;
+  }
 
   // ensure all the styles are built first, which parses all the css docs
   await buildCtx.stylesPromise;

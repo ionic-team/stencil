@@ -131,7 +131,7 @@ export const Build: d.UserBuildConditionals = {
 
 export const styles: d.StyleMap = new Map();
 
-export { BUILD, NAMESPACE, globalScripts } from '@app-data';
+export { BUILD, NAMESPACE } from '@app-data';
 export { hydrateApp } from './hydrate-app';
 
 export * from '@runtime';

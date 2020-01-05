@@ -13,7 +13,9 @@ describe('goto root url', () => {
     const elm = await page.find('prop-cmp >>> div');
     expect(elm).toEqualText('Hello, my name is Stencil JS');
 
-    await page.compareScreenshot('navigate to homepage');
+    await page.compareScreenshot('navigate to homepage', {
+      fullPage: false, clip: { x: 0, y: 0, width: 400, height: 250 }, omitBackground: true,
+    });
   });
 
   it('should navigate to the index.html page with custom url searchParams', async () => {

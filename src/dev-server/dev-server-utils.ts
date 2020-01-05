@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import * as c from './dev-server-constants';
-import { compilerBuild } from '../version';
+import { version } from '../version';
 import util from 'util';
 
 
@@ -37,7 +37,7 @@ export function responseHeaders(headers: d.DevResponseHeaders): any {
 const DEFAULT_HEADERS: d.DevResponseHeaders = {
   'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
   'Expires': '0',
-  'X-Powered-By': 'Stencil Dev Server ' + compilerBuild.stencilVersion,
+  'X-Powered-By': 'Stencil Dev Server ' + version,
   'Access-Control-Allow-Origin': '*'
 };
 

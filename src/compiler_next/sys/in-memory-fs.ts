@@ -5,6 +5,7 @@ import path from 'path';
 
 export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const items: d.FsItems = new Map();
+  const outputTargetTypes = new Map<string, string>();
 
   const accessData = async (filePath: string) => {
     const item = getItem(filePath);
@@ -271,6 +272,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
   /**
    * Synchronous!!! Do not use!!!
+   * Always returns an object, does not throw errors.
    * (Only typescript transpiling is allowed to use)
    * @param itemPath
    */
@@ -327,12 +329,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
     if (opts != null) {
       if (isString(opts.outputTargetType)) {
-        if (isString(item.outputTargetType)) {
-          if (item.outputTargetType !== opts.outputTargetType) {
-            throw new Error(`writeFile, ${filePath} already has output target "${item.outputTargetType}" but is being set to "${opts.outputTargetType}"`);
-          }
-        }
-        item.outputTargetType = opts.outputTargetType;
+        outputTargetTypes.set(filePath, opts.outputTargetType);
       }
       if (opts.useCache === false) {
         item.useCache = false;
@@ -588,7 +585,6 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       queueDeleteFromDisk: null,
       queueWriteToDisk: null,
       useCache: null,
-      outputTargetType: null,
     });
     return item;
   };
@@ -602,17 +598,15 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const getBuildOutputs = () => {
     const outputs: d.BuildOutput[] = [];
 
-    items.forEach((item, filePath) => {
-      if (isString(item.outputTargetType)) {
-        let o = outputs.find(o => o.type === item.outputTargetType);
-        if (!o) {
-          o = {
-            type: item.outputTargetType,
-            files: [],
-          };
-          outputs.push(o);
-        }
-        o.files.push(filePath);
+    outputTargetTypes.forEach((outputTargetType, filePath) => {
+      const output = outputs.find(o => o.type === outputTargetType);
+      if (output) {
+        output.files.push(filePath);
+      } else {
+        outputs.push({
+          type: outputTargetType,
+          files: [filePath],
+        });
       }
     });
 

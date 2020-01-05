@@ -4,9 +4,9 @@ import exit from 'exit';
 
 export async function taskTest(config: d.Config) {
   try {
-    const { Testing } = require('../testing/index.js');
+    const { TestingLegacy } = require('../testing/index.js');
 
-    const testing: d.ITesting = new Testing(config);
+    const testing: d.ITestingLegacy = new TestingLegacy(config);
     if (!testing.isValid) {
       exit(1);
     }

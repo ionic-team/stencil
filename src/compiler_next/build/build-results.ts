@@ -8,6 +8,7 @@ export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCt
   const componentGraph = buildCtx.componentGraph
     ? fromEntries(buildCtx.componentGraph.entries())
     : undefined;
+
   const buildResults: d.CompilerBuildResults = {
     buildId: buildCtx.buildId,
     diagnostics: normalizeDiagnostics(compilerCtx, buildCtx.diagnostics),
@@ -21,7 +22,10 @@ export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCt
     hasError: hasError(buildCtx.diagnostics),
     hasSuccessfulBuild: compilerCtx.hasSuccessfulBuild,
     isRebuild: buildCtx.isRebuild,
+    namespace: config.namespace,
     outputs: compilerCtx.fs.getBuildOutputs(),
+    rootDir: config.rootDir,
+    srcDir: config.srcDir,
     timestamp: getBuildTimestamp(),
     componentGraph
   };

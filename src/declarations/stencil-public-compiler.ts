@@ -170,6 +170,13 @@ export interface StencilConfig {
    */
   logger?: Logger;
 
+  /**
+   * Config to add extra runtime for DOM features that require more polyfills. Note
+   * that not all DOM APIs are fully polyfilled when using the slot polyfill. These
+   * are opt-in since not all users will require the additional runtime.
+   */
+  extras?: ConfigExtras;
+
   globalScript?: string;
   srcIndexHtml?: string;
   watch?: boolean;
@@ -200,17 +207,30 @@ export interface StencilConfig {
   excludeUnusedDependencies?: boolean;
 
   stencilCoreResolvedId?: string;
-  extras?: ConfigExtras;
 }
 
 export interface ConfigExtras {
+  /**
+   * By default, the slot polyfill does not update `appendChild()` so that it appends
+   * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
+   * polyfill for those who need it.
+   */
+  appendChildSlotFix?: boolean;
+
+  /**
+   * By default, the runtime does not polyfill `cloneNode()` when cloning a component
+   * that uses the slot polyfill. This is an opt-in polyfill for those who need it.
+   */
   cloneNodeFix?: boolean;
+
+  /**
+   * Dispatches component lifecycle events. Mainly used for testing.
+   */
   lifecycleDOMEvents?: boolean;
 }
 
 export interface Config extends StencilConfig {
   buildAppCore?: boolean;
-  buildDocs?: boolean;
   configPath?: string;
   cwd?: string;
   writeLog?: boolean;
@@ -261,7 +281,7 @@ export interface StencilDevServerConfig {
    */
   port?: number;
   /**
-   * When files are watched and udated, by default the dev server will use `hmr` (Hot Module Replacement) to update the page without a full page refresh. To have the page do a full refresh use `pageReload`. To disable any reloading, use `null`. Defaults to `hmr`.
+   * When files are watched and updated, by default the dev server will use `hmr` (Hot Module Replacement) to update the page without a full page refresh. To have the page do a full refresh use `pageReload`. To disable any reloading, use `null`. Defaults to `hmr`.
    */
   reloadStrategy?: PageReloadStrategy;
   root?: string;
@@ -542,14 +562,17 @@ export interface CompilerBuildResults {
   duration: number;
   filesAdded: string[];
   filesChanged: string[];
-  filesUpdated: string[];
   filesDeleted: string[];
+  filesUpdated: string[];
   hasError: boolean;
   hasSuccessfulBuild: boolean;
   hmr?: HotModuleReplacement;
   hydrateAppFilePath?: string;
   isRebuild: boolean;
+  namespace: string;
   outputs: BuildOutput[];
+  rootDir: string;
+  srcDir: string;
   timestamp: string;
 }
 
@@ -704,6 +727,18 @@ export interface RollupInputOptions {
 
 export interface RollupOutputOptions {
   globals?: { [name: string]: string } | ((name: string) => string);
+}
+
+export interface Testing {
+  run(opts: TestingRunOptions): Promise<boolean>;
+  destroy(): Promise<void>;
+}
+
+export interface TestingRunOptions {
+  e2e?: boolean;
+  screenshot?: boolean;
+  spec?: boolean;
+  updateScreenshot?: boolean;
 }
 
 export interface JestConfig {
@@ -1380,7 +1415,6 @@ export interface StencilSystem {
   resolveModule?(fromDir: string, moduleId: string, opts?: ResolveModuleOptions): string;
   rollup?: RollupInterface;
   scopeCss?: (cssText: string, scopeId: string, commentOriginalSelector: boolean) => Promise<string>;
-  semver?: Semver;
   serializeNodeToHtml?(elm: Element | Document): string;
   storage?: Storage;
   transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<any>;
@@ -1396,15 +1430,6 @@ export interface WorkerOptions {
   maxConcurrentWorkers?: number;
   maxConcurrentTasksPerWorker?: number;
   logger?: Logger;
-}
-
-export interface Semver {
-  lt(v1: string, v2: string): boolean;
-  lte(v1: string, v2: string): boolean;
-  gt(v1: string, v2: string): boolean;
-  gte(v1: string, v2: string): boolean;
-  prerelease(v: string): readonly string[] | null;
-  satisfies(version: string, range: string): boolean;
 }
 
 export interface RollupInterface {

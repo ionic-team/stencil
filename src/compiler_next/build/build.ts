@@ -46,7 +46,7 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
     /// write outputs
     await buildCtx.stylesPromise;
-    await writeBuild(compilerCtx, buildCtx);
+    await writeBuild(config, compilerCtx, buildCtx);
     // await copyPromise;
 
   } catch (e) {

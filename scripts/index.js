@@ -7,8 +7,9 @@ function main() {
   const rootDir = path.join(scriptsDir, '..');
   const scriptsBuildDir = path.join(scriptsDir, 'build');
   const scriptsBuildJs = path.join(scriptsBuildDir, 'build.js');
+  const args = process.argv.slice(2);
 
-  if (!fs.existsSync(scriptsBuildJs)) {
+  if (args.includes('--prepare') || !fs.existsSync(scriptsBuildJs)) {
     // ensure we've transpiled the build scripts first
     console.log('🧩  transpiling build scripts');
     fs.emptyDirSync(scriptsBuildDir);
@@ -22,7 +23,7 @@ function main() {
   }
 
   const build = require(scriptsBuildJs);
-  build.run(rootDir, process.argv.slice(2));
+  build.run(rootDir, args);
 }
 
 main();

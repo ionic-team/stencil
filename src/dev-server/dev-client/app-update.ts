@@ -1,9 +1,6 @@
 import  * as d from '../../declarations';
 import { appError, clearDevServerModal } from './app-error';
-import { hmrComponents } from './hmr-components';
-import { hmrExternalStyles } from './hmr-external-styles';
-import { hmrImages } from './hmr-images';
-import { hmrInlineStyles } from './hmr-inline-styles';
+import { hmrWindow } from '../hmr-client';
 import { logBuild, logReload, logWarn } from './logger';
 import { onBuildResults } from './build-events';
 
@@ -41,7 +38,7 @@ function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientCon
     }
 
     if (buildResults.hmr) {
-      appHmr(win, doc, buildResults.hmr);
+      appHmr(win, buildResults.hmr);
     }
 
   } catch (e) {
@@ -50,7 +47,7 @@ function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientCon
 }
 
 
-function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
+function appHmr(win: Window, hmr: d.HotModuleReplacement) {
   let shouldWindowReload = false;
 
   if (hmr.reloadStrategy === 'pageReload') {
@@ -87,31 +84,22 @@ function appHmr(win: Window, doc: Document, hmr: d.HotModuleReplacement) {
     return;
   }
 
-  // let's do some hot module replacement shall we
-  doc.documentElement.setAttribute('data-hmr', hmr.versionId);
+  const results = hmrWindow(win, hmr);
 
-  if (hmr.componentsUpdated) {
-    hmrComponents(doc.documentElement, hmr.versionId, hmr.componentsUpdated);
+  if (results.updatedComponents.length > 0) {
+    logBuild(`Updated component${results.updatedComponents.length > 1 ? 's' : ''}: ${results.updatedComponents.join(', ')}`);
   }
 
-  if (hmr.inlineStylesUpdated) {
-    logBuild(`Updated styles: ${hmr.inlineStylesUpdated.map(s => s.styleTag).reduce((arr, v) => {
-      if (!arr.includes(v)) {
-        arr.push(v);
-      }
-      return arr;
-    }, []).sort().join(', ')}`);
-    hmrInlineStyles(doc.documentElement, hmr.versionId, hmr.inlineStylesUpdated);
+  if (results.updatedInlineStyles.length > 0) {
+    logBuild(`Updated styles: ${results.updatedInlineStyles.join(', ')}`);
   }
 
-  if (hmr.externalStylesUpdated) {
-    logBuild(`Updated stylesheets: ${hmr.externalStylesUpdated.sort().join(', ')}`);
-    hmrExternalStyles(doc.documentElement, hmr.versionId, hmr.externalStylesUpdated);
+  if (results.updatedExternalStyles.length > 0) {
+    logBuild(`Updated stylesheets: ${results.updatedExternalStyles.join(', ')}`);
   }
 
-  if (hmr.imagesUpdated) {
-    logBuild(`Updated images: ${hmr.imagesUpdated.sort().join(', ')}`);
-    hmrImages(win, doc, hmr.versionId, hmr.imagesUpdated);
+  if (results.updatedImages.length > 0) {
+    logBuild(`Updated images: ${results.updatedImages.join(', ')}`);
   }
 }
 

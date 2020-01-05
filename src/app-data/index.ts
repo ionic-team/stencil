@@ -55,13 +55,12 @@ export const BUILD: BuildConditionals = /* default */ {
   isTesting: false,
   hydrateServerSide: false,
   hydrateClientSide: false,
-  lifecycleDOMEvents: false,
   lazyLoad: false,
   profile: false,
   slotRelocation: true,
+  appendChildSlotFix: false,
   cloneNodeFix: false,
+  lifecycleDOMEvents: false,
 };
-
-export const globalScripts = /* default */ () => {/**/};
 
 export const NAMESPACE = /* default */ 'app' as string;

@@ -1,19 +1,34 @@
 import { XLINK_NS } from '../runtime/runtime-constants';
 
 
+const attrHandler = {
+  get(obj: any, prop: string) {
+    if (prop in obj) {
+      return obj[prop];
+    }
+    if (!isNaN(prop as any)) {
+      return (obj as MockAttributeMap).__items[prop as any];
+    }
+    return undefined;
+  }
+};
+
+export const createAttributeProxy = (caseInsensitive: boolean) =>
+  new Proxy(new MockAttributeMap(caseInsensitive), attrHandler);
+
 export class MockAttributeMap {
-  items: MockAttr[] = [];
+  __items: MockAttr[] = [];
 
   constructor(
     public caseInsensitive = false
   ) {}
 
   get length() {
-    return this.items.length;
+    return this.__items.length;
   }
 
   item(index: number) {
-    return this.items[index] || null;
+    return this.__items[index] || null;
   }
 
   setNamedItem(attr: MockAttr) {
@@ -26,11 +41,11 @@ export class MockAttributeMap {
       attr.value = String(attr.value);
     }
 
-    const existingAttr = this.items.find(a => a.name === attr.name && a.namespaceURI === attr.namespaceURI);
+    const existingAttr = this.__items.find(a => a.name === attr.name && a.namespaceURI === attr.namespaceURI);
     if (existingAttr != null) {
       existingAttr.value = attr.value;
     } else {
-      this.items.push(attr);
+      this.__items.push(attr);
     }
   }
 
@@ -43,7 +58,7 @@ export class MockAttributeMap {
 
   getNamedItemNS(namespaceURI: string, attrName: string) {
     namespaceURI = getNamespaceURI(namespaceURI);
-    return this.items.find(attr => attr.name === attrName && getNamespaceURI(attr.namespaceURI) === namespaceURI) || null;
+    return this.__items.find(attr => attr.name === attrName && getNamespaceURI(attr.namespaceURI) === namespaceURI) || null;
   }
 
   removeNamedItem(attr: MockAttr) {
@@ -51,14 +66,15 @@ export class MockAttributeMap {
   }
 
   removeNamedItemNS(attr: MockAttr) {
-    for (let i = 0, ii = this.items.length; i < ii; i++) {
-      if (this.items[i].name === attr.name && this.items[i].namespaceURI === attr.namespaceURI) {
-        this.items.splice(i, 1);
+    for (let i = 0, ii = this.__items.length; i < ii; i++) {
+      if (this.__items[i].name === attr.name && this.__items[i].namespaceURI === attr.namespaceURI) {
+        this.__items.splice(i, 1);
         break;
       }
     }
   }
 }
+
 
 function getNamespaceURI(namespaceURI: string) {
   return namespaceURI === XLINK_NS ? null : namespaceURI;

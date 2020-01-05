@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import * as util from './dev-server-utils';
-import { compilerBuild } from '../version';
+import { version } from '../version';
 import { serve500 } from './serve-500';
 import * as http  from 'http';
 import path from 'path';
@@ -19,7 +19,7 @@ export async function serveFile(devServerConfig: d.DevServerConfig, sys: d.Compi
 
       if (devServerConfig.websocket && util.isHtmlFile(req.filePath) && !util.isDevServerClient(req.pathname)) {
         // auto inject our dev server script
-        content += getDevServerClientScript(devServerConfig, req);
+        content = appendDevServerClientScript(devServerConfig, req, content);
 
       } else if (util.isCssFile(req.filePath)) {
         content = updateStyleUrls(req.url, content);
@@ -117,7 +117,19 @@ function updateStyleUrls(cssUrl: string, oldCss: string) {
 const urlVersionIds = new Map<string, string>();
 
 
-function getDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
+function appendDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest, content: string) {
   const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.host);
-  return `\n<iframe title="Stencil Dev Server Connector ${compilerBuild.stencilVersion} &#9889;" src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0" aria-hidden="true"></iframe>`;
+  const iframe = `<iframe title="Stencil Dev Server Connector ${version} &#9889;" src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0" aria-hidden="true"></iframe>`;
+  return appendDevServerClientIframe(content, iframe);
+}
+
+
+export function appendDevServerClientIframe(content: string, iframe: string) {
+  if (content.includes('</body>')) {
+    return content.replace('</body>', `${iframe}</body>`);
+  }
+  if (content.includes('</html>')) {
+    return content.replace('</html>', `${iframe}</html>`);
+  }
+  return `${content}${iframe}`;
 }

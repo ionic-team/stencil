@@ -34,6 +34,7 @@ export const config: Config = {
     stylus()
   ],
   extras: {
+    appendChildSlotFix: true,
     cloneNodeFix: true,
     lifecycleDOMEvents: true,
   },

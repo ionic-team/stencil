@@ -3,9 +3,10 @@ import { loadTypeScriptDiagnostics, hasError } from '@utils';
 import { loadTypescript } from '../sys/typescript/typescript-load';
 
 
-export async function transpileToEs5(input: string, inlineHelpers: boolean) {
+export const transpileToEs5 = async (input: string, inlineHelpers: boolean) => {
   const diagnostics: d.Diagnostic[] = [];
-  const ts = loadTypescript(diagnostics);
+  const ts = await loadTypescript(diagnostics);
+
   const results: d.TranspileResults = {
     sourceFilePath: null,
     code: input,
@@ -42,10 +43,10 @@ export async function transpileToEs5(input: string, inlineHelpers: boolean) {
   }
 
   return results;
-}
+};
 
 // TODO:
 // remove once fixed: https://github.com/microsoft/TypeScript/issues/35108
-function fixHelpers(code: string) {
+const fixHelpers = (code: string) => {
   return code.replace(/\b__(extends|assign|rest|decorate|param|metadata|awaiter|generator|exportStar|values|read|spread|spreadArrays|await|asyncGenerator|asyncDelegator|asyncValues|makeTemplateObject|importStar|importDefault|)_\d\(/g, '__$1(');
-}
+};

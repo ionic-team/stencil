@@ -33,6 +33,8 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
 
   const onBuild = async (tsBuilder: ts.BuilderProgram) => {
     const buildCtx = new BuildContext(config, compilerCtx);
+    buildCtx.isRebuild = isRebuild;
+    buildCtx.requiresFullBuild = !isRebuild;
     buildCtx.filesAdded = Array.from(filesAdded.keys()).sort();
     buildCtx.filesUpdated = Array.from(filesUpdated.keys()).sort();
     buildCtx.filesDeleted = Array.from(filesDeleted.keys()).sort();
@@ -48,8 +50,6 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     filesUpdated.clear();
     filesDeleted.clear();
 
-    buildCtx.isRebuild = isRebuild;
-    buildCtx.requiresFullBuild = !isRebuild;
     buildCtx.start();
 
     await build(config, compilerCtx, buildCtx, tsBuilder);

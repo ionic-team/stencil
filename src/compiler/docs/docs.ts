@@ -7,8 +7,6 @@ import { transpileApp } from '../transpile/transpile-app';
 export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
   const buildCtx = new BuildContext(config, compilerCtx);
 
-  config.logger.info(config.logger.cyan(`${config.sys.compiler.name} v${config.sys.compiler.version}`));
-
   // keep track of how long the entire build process takes
   const timeSpan = config.logger.createTimeSpan(`generate docs, ${config.fsNamespace}, started`);
 

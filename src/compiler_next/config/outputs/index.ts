@@ -4,6 +4,7 @@ import { VALID_TYPES_NEXT } from '../../../compiler/output-targets/output-utils'
 import { validateCollection } from './validate-collection';
 import { validateCustomElement } from './validate-custom-element';
 import { validateDist } from './validate-dist';
+import { validateDocs } from './validate-docs';
 import { validateHydrateScript } from './validate-hydrate-script';
 import { validateLazy } from './validate-lazy';
 import { validateWww } from './validate-www';
@@ -27,5 +28,6 @@ export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnosti
     ...validateWww(config, diagnostics, userOutputs),
     ...validateDist(config, userOutputs),
     ...validateHydrateScript(config, userOutputs),
+    ...validateDocs(config, diagnostics, userOutputs),
   ];
 }

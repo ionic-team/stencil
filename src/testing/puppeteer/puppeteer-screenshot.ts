@@ -96,7 +96,20 @@ export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: E2EPr
   const screenshotOpts = createPuppeteerScreenshopOptions(opts);
   const screenshotBuf = await page.screenshot(screenshotOpts);
   const pixelmatchThreshold = (typeof opts.pixelmatchThreshold === 'number' ? opts.pixelmatchThreshold : screenshotBuildData.pixelmatchThreshold);
-  const results = await compareScreenshot(emulateConfig, screenshotBuildData, screenshotBuf, desc, testPath, pixelmatchThreshold);
+
+  let width = emulateConfig.viewport.width;
+  let height = emulateConfig.viewport.height;
+
+  if (opts && opts.clip) {
+    if (typeof opts.clip.width === 'number') {
+      width = opts.clip.width;
+    }
+    if (typeof opts.clip.height === 'number') {
+      height = opts.clip.height;
+    }
+  }
+
+  const results = await compareScreenshot(emulateConfig, screenshotBuildData, screenshotBuf, desc, width, height, testPath, pixelmatchThreshold);
 
   return results;
 }

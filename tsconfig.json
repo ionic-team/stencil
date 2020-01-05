@@ -27,6 +27,9 @@
       "@app-data": [
         "src/app-data/index.ts"
       ],
+      "@app-globals": [
+        "src/app-globals/index.ts"
+      ],
       "@compiler": [
         "src/compiler_next/index.ts"
       ],
@@ -80,6 +83,7 @@
 
   "files": [
     "src/app-data/index.ts",
+    "src/app-globals/index.ts",
     "src/client/index.ts",
     "src/client/polyfills/css-shim/index.ts",
     "src/cli/index.ts",

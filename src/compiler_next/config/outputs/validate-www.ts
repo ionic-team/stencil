@@ -81,6 +81,9 @@ const validateWwwOutputTarget = (config: d.Config, outputTarget: d.OutputTargetW
 
   // Fix "dir" to account
   outputTarget.appDir = path.join(outputTarget.dir, getUrlPathName(outputTarget.baseUrl));
+  if (outputTarget.appDir.endsWith('/')) {
+    outputTarget.appDir = outputTarget.appDir.substring(0, outputTarget.appDir.length - 1);
+  }
 
   if (!isString(outputTarget.buildDir)) {
     outputTarget.buildDir = 'build';

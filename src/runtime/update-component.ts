@@ -110,9 +110,13 @@ const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boole
       // manually connected child components during server-side hydrate
       serverSideConnected(elm);
 
-      if (isInitialLoad && (hostRef.$cmpMeta$.$flags$ & CMP_FLAGS.shadowDomEncapsulation)) {
+      if (isInitialLoad) {
         // using only during server-side hydrate
-        elm['s-sd'] = true;
+        if (hostRef.$cmpMeta$.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
+          elm['s-en'] = '';
+        } else if (hostRef.$cmpMeta$.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+          elm['s-en'] = 'c';
+        }
       }
 
     } catch (e) {

@@ -6,7 +6,7 @@ import { validateOutputTargets } from './outputs';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
 import { validateRollupConfig } from '../../compiler/config/validate-rollup-config';
-import { validateTesting } from '../../compiler/config/validate-testing';
+import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
 import { setBooleanConfig } from '../../compiler/config/config-utils';
 import path from 'path';
@@ -48,6 +48,7 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'buildAppCore', null, true);
   setBooleanConfig(config, 'autoprefixCss', null, config.buildEs5);
   setBooleanConfig(config, 'validateTypes', null, !config._isTesting);
+  setBooleanConfig(config, 'allowInlineScripts', null, true);
 
   // hash file names
   if (!isBoolean(config.hashFileNames)) {
@@ -114,7 +115,6 @@ export const validateConfig = (userConfig?: Config) => {
   //   config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
   // }
 
-  setBooleanConfig(config, 'generateDocs', 'docs', false);
   setBooleanConfig(config, 'enableCache', 'cache', true);
 
   if (config.excludeSrc) {

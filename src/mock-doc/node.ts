@@ -1,7 +1,7 @@
 import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } from './custom-element-registry';
 import { closest, matches, selectAll, selectOne } from './selector';
 import { dataset } from './dataset';
-import { MockAttr, MockAttributeMap } from './attribute';
+import { MockAttr, MockAttributeMap, createAttributeProxy } from './attribute';
 import { MockClassList } from './class-list';
 import { MockCSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
@@ -237,7 +237,7 @@ export class MockElement extends MockNode {
 
   get attributes() {
     if (this.__attributeMap == null) {
-      this.__attributeMap = new MockAttributeMap();
+      this.__attributeMap = createAttributeProxy(false);
     }
     return this.__attributeMap;
   }
@@ -376,6 +376,53 @@ export class MockElement extends MockNode {
     setTextContent(this, value);
   }
 
+  insertAdjacentElement(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', elm: MockHTMLElement) {
+    if (position === 'beforebegin') {
+      insertBefore(this.parentNode, elm, this);
+    } else if (position === 'afterbegin') {
+      this.prepend(elm);
+    } else if (position === 'beforeend') {
+      this.appendChild(elm);
+    } else if (position === 'afterend') {
+      insertBefore(this.parentNode, elm, this.nextSibling);
+    }
+    return elm;
+  }
+
+  insertAdjacentHTML(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', html: string) {
+    const frag = parseFragmentUtil(this.ownerDocument, html);
+    if (position === 'beforebegin') {
+      while (frag.childNodes.length > 0) {
+        insertBefore(this.parentNode, frag.childNodes[0], this);
+      }
+    } else if (position === 'afterbegin') {
+      while (frag.childNodes.length > 0) {
+        this.prepend(frag.childNodes[frag.childNodes.length - 1]);
+      }
+    } else if (position === 'beforeend') {
+      while (frag.childNodes.length > 0) {
+        this.appendChild(frag.childNodes[0]);
+      }
+    } else if (position === 'afterend') {
+      while (frag.childNodes.length > 0) {
+        insertBefore(this.parentNode, frag.childNodes[frag.childNodes.length - 1], this.nextSibling);
+      }
+    }
+  }
+
+  insertAdjacentText(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', text: string) {
+    const elm = this.ownerDocument.createTextNode(text);
+    if (position === 'beforebegin') {
+      insertBefore(this.parentNode, elm, this);
+    } else if (position === 'afterbegin') {
+      this.prepend(elm);
+    } else if (position === 'beforeend') {
+      this.appendChild(elm);
+    } else if (position === 'afterend') {
+      insertBefore(this.parentNode, elm, this.nextSibling);
+    }
+  }
+
   hasAttribute(attrName: string) {
     if (attrName === 'style') {
       return (this.__style != null && this.__style.length > 0);
@@ -506,7 +553,7 @@ export class MockElement extends MockNode {
           attrName = attrName.toLowerCase();
         }
         attr = new MockAttr(attrName, value);
-        attributes.items.push(attr);
+        attributes.__items.push(attr);
 
         if (checkAttrChanged === true) {
           attributeChanged(this, attrName, null, attr.value);
@@ -534,7 +581,7 @@ export class MockElement extends MockNode {
 
     } else {
       attr = new MockAttr(attrName, value, namespaceURI);
-      attributes.items.push(attr);
+      attributes.__items.push(attr);
 
       if (checkAttrChanged === true) {
         attributeChanged(this, attrName, null, attr.value);
@@ -747,7 +794,7 @@ export class MockHTMLElement extends MockElement {
 
   get attributes() {
     if (this.__attributeMap == null) {
-      this.__attributeMap = new MockAttributeMap(true);
+      this.__attributeMap = createAttributeProxy(true);
     }
     return this.__attributeMap;
   }

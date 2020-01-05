@@ -12,13 +12,23 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
   taskQueue: d.CompilerWorkerTask[] = [];
   workers: NodeWorkerMain[] = [];
   totalWorkers: number;
-
+  useForkedWorkers: boolean;
+  mainThreadRunner: { [fnName: string]: (...args: any[]) => Promise<any> };
 
   constructor(public forkModulePath: string, maxConcurrentWorkers: number, public logger: d.Logger) {
     super();
     const osCpus = cpus().length;
+
+    this.useForkedWorkers = (maxConcurrentWorkers > 0);
     this.totalWorkers = Math.max(Math.min(maxConcurrentWorkers, osCpus), 2) - 1;
-    this.startWorkers();
+
+    if (this.useForkedWorkers) {
+      // start up the forked child processes
+      this.startWorkers();
+    } else {
+      // run on the main thread by just requiring the module
+      this.mainThreadRunner = require(forkModulePath);
+    }
   }
 
   onError(err: NodeJS.ErrnoException, workerId: number) {
@@ -92,7 +102,9 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
       return;
     }
 
-    this.startWorkers();
+    if (this.useForkedWorkers) {
+      this.startWorkers();
+    }
 
     while (this.taskQueue.length > 0) {
       const worker = getNextWorker(this.workers);
@@ -108,18 +120,24 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
       return Promise.reject(TASK_CANCELED_MSG);
     }
 
-    return new Promise<any>((resolve, reject) => {
-      const task: d.CompilerWorkerTask = {
-        stencilId: this.stencilId++,
-        inputArgs: args,
-        retries: 0,
-        resolve: resolve,
-        reject: reject,
-      };
-      this.taskQueue.push(task);
+    if (this.useForkedWorkers) {
+      // queue to be sent to a forked child process
+      return new Promise<any>((resolve, reject) => {
+        const task: d.CompilerWorkerTask = {
+          stencilId: this.stencilId++,
+          inputArgs: args,
+          retries: 0,
+          resolve: resolve,
+          reject: reject,
+        };
+        this.taskQueue.push(task);
 
-      this.processTaskQueue();
-    });
+        this.processTaskQueue();
+      });
+    }
+
+    // run on the main thread, no forked child processes
+    return this.mainThreadRunner[args[0]].apply(null, args.slice(1));
   }
 
   handler(name: string) {

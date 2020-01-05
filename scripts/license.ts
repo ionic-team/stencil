@@ -24,7 +24,7 @@ const entryDeps = [
   'rollup',
   'rollup-plugin-commonjs',
   'rollup-plugin-node-resolve',
-  'semver',
+  'semiver',
   'source-map',
   'terser',
   'ws',

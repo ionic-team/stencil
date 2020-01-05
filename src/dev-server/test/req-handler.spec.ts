@@ -1,4 +1,5 @@
 import * as d from '@stencil/core/declarations';
+import { appendDevServerClientIframe } from '../serve-file';
 import { createRequestHandler } from '../request-handler';
 import { createSystem } from '../../compiler_next/sys/stencil-sys';
 import { mockConfig } from '@stencil/core/testing';
@@ -354,27 +355,46 @@ describe('request-handler', () => {
   describe('serve static text files', () => {
 
     it('should load file w/ querystring', async () => {
-      await sys.writeFile(path.join(root, 'www', 'scripts', 'file1.html'), `<html></html>`);
+      await sys.writeFile(path.join(root, 'www', 'scripts', 'file1.html'), `html`);
       const handler = createRequestHandler(config, sys);
 
       req.url = '/scripts/file1.html?qs=1234';
 
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
-      expect(res.$content).toContain('<html></html>');
+      expect(res.$content.split('\n')[0]).toContain('html');
       expect(res.$contentType).toBe('text/html');
     });
 
     it('should load html file', async () => {
-      await sys.writeFile(path.join(root, 'www', 'scripts', 'file1.html'), `<html></html>`);
+      await sys.writeFile(path.join(root, 'www', 'scripts', 'file1.html'), `html`);
       const handler = createRequestHandler(config, sys);
 
       req.url = '/scripts/file1.html';
 
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
-      expect(res.$content).toContain('<html></html>');
+      expect(res.$content.split('\n')[0]).toContain('html');
       expect(res.$contentType).toBe('text/html');
+    });
+
+  });
+
+  describe('iframe connector', () => {
+
+    it('appends to <body>', () => {
+      const h = appendDevServerClientIframe(`<html><body>88mph</body></html>`, `<iframe></iframe>`);
+      expect(h).toBe(`<html><body>88mph<iframe></iframe></body></html>`);
+    });
+
+    it('appends to <html>', () => {
+      const h = appendDevServerClientIframe(`<html>88mph</html>`, `<iframe></iframe>`);
+      expect(h).toBe(`<html>88mph<iframe></iframe></html>`);
+    });
+
+    it('appends to end', () => {
+      const h = appendDevServerClientIframe(`88mph`, `<iframe></iframe>`);
+      expect(h).toBe(`88mph<iframe></iframe>`);
     });
 
   });

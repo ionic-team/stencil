@@ -34,9 +34,6 @@ export class Compiler implements d.Compiler {
       if (config.suppressLogs !== true) {
         logger.info(logger.cyan(startupMsg));
 
-        if (sys.semver && sys.semver.prerelease(sys.compiler.version)) {
-          logger.warn(sys.color.yellow(`This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`));
-        }
         if (config.devMode && config.buildEs5) {
           logger.warn(`Generating ES5 during development is a very task expensive, initial and incremental builds will be much slower. Drop the '--es5' flag and use a modern browser for development.
           If you need ESM output, use the '--esm' flag instead.`);

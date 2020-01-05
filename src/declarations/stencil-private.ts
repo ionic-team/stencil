@@ -193,8 +193,9 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   profile?: boolean;
   cssVarShim?: boolean;
   constructableCSS?: boolean;
-  initializeNextTick?: boolean;
+  appendChildSlotFix?: boolean;
   cloneNodeFix?: boolean;
+  initializeNextTick?: boolean;
 }
 
 export type ModuleFormat =
@@ -1298,7 +1299,6 @@ export interface FsItem {
   queueWriteToDisk: boolean;
   queueDeleteFromDisk?: boolean;
   useCache: boolean;
-  outputTargetType: string;
 }
 
 export interface HostElement extends HTMLElement {
@@ -1746,9 +1746,10 @@ export interface RenderNode extends HostElement {
   ['s-node-id']?: number;
 
   /**
-   * Used to tell if the element is shadow dom or not
+   * Used to know the components encapsulation.
+   * empty "" for shadow, "c" from scoped
    */
-  ['s-sd']?: boolean;
+  ['s-en']?: '' /*shadow*/ | 'c' /*scoped*/;
 }
 
 export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
@@ -2142,6 +2143,7 @@ export interface TransformCssToEsmInput {
 }
 
 export interface TransformCssToEsmOutput {
+  styleText: string;
   code: string;
   map: any;
   diagnostics: Diagnostic[];
@@ -2286,6 +2288,18 @@ declare global {
       toHaveReceivedEventDetail(eventDetail: any): void;
 
       /**
+       * When given an EventSpy, checks the first event has
+       * received the correct custom event `detail` data.
+       */
+      toHaveFirstReceivedEventDetail(eventDetail: any): void;
+
+      /**
+       * When given an EventSpy, checks the event at an index
+       * has received the correct custom event `detail` data.
+       */
+      toHaveNthReceivedEventDetail(index: number, eventDetail: any): void;
+
+      /**
        * Used to evaluate the results of `compareScreenshot()`, such as
        * `expect(compare).toMatchScreenshot()`. The `allowableMismatchedRatio`
        * value from the testing config is used by default if
@@ -2407,7 +2421,7 @@ export interface E2EProcessEnv {
 }
 
 
-export interface ITesting {
+export interface ITestingLegacy {
   isValid: boolean;
   runTests(): Promise<boolean>;
   destroy(): Promise<void>;

@@ -1,21 +1,21 @@
 import * as d from '../../../declarations';
-import { compilerBuild } from '../../../version';
 import { getStencilInternalDtsUrl } from '../fetch/fetch-utils';
 import { isDtsFile, isExternalUrl, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile } from '../resolve/resolve-utils';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../environment';
 import { isString } from '@utils';
 import { resolveRemoteModuleId } from '../resolve/resolve-module';
+import { version } from '../../../version';
 import ts from 'typescript';
 import path from 'path';
 
 
-export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+export const patchTypeScriptResolveModule = (loadedTs: typeof ts, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
   const compilerExe = config.sys_next.getCompilerExecutingPath();
 
   if (shouldPatchRemoteTypeScript(compilerExe)) {
-    const orgResolveModuleName = ts.resolveModuleName;
+    const orgResolveModuleName = loadedTs.resolveModuleName;
 
-    ts.resolveModuleName = function (moduleName, containingFile, compilerOptions, host, cache, redirectedReference) {
+    loadedTs.resolveModuleName = (moduleName, containingFile, compilerOptions, host, cache, redirectedReference) => {
       const resolvedModule = tsRemoteResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
       if (resolvedModule) {
         return resolvedModule;
@@ -23,8 +23,6 @@ export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InM
       return orgResolveModuleName(moduleName, containingFile, compilerOptions, host, cache, redirectedReference);
     };
   }
-
-  return ts.resolveModuleName;
 };
 
 export const tsRemoteResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, compilerExe: string, moduleName: string, containingFile: string): ts.ResolvedModuleWithFailedLookupLocations => {
@@ -42,7 +40,7 @@ export const tsRemoteResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFi
           packageId: {
             name: moduleName,
             subModuleName: '',
-            version: compilerBuild.stencilVersion,
+            version,
           }
         }
       };
@@ -59,7 +57,7 @@ export const tsRemoteResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFi
           packageId: {
             name: moduleName,
             subModuleName: '',
-            version: compilerBuild.stencilVersion,
+            version,
           }
         }
       };

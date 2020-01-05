@@ -3,13 +3,12 @@ import { dirname } from 'path';
 import { NodeResolveModule } from './node-resolve-module';
 import { readFile } from 'graceful-fs';
 import { SpawnOptions, spawn } from 'child_process';
-
+import semiver from 'semiver';
 
 export class NodeLazyRequire implements d.LazyRequire {
   private moduleData = new Map<string, { fromDir: string, modulePath: string }>();
 
   constructor(
-    private semver: d.Semver,
     private nodeResolveModule: NodeResolveModule, private stencilPackageJson: d.PackageJsonData
   ) {}
 
@@ -40,7 +39,7 @@ export class NodeLazyRequire implements d.LazyRequire {
 
         isUpdate = true;
 
-        if (this.semver.satisfies(installedPkgJson.version, requiredVersionRange)) {
+        if (semiver(installedPkgJson.version, requiredVersionRange) >= 0) {
           this.moduleData.set(ensureModuleId, {
             fromDir: fromDir,
             modulePath: dirname(resolvedPkgJsonPath)

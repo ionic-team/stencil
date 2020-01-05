@@ -21,7 +21,10 @@ export function updateCanonicalLink(doc: Document, href: string) {
     // don't have a href
     if (canonicalLinkElm != null) {
       // but there is a canonical link in the head so let's remove it
-      canonicalLinkElm.parentNode.removeChild(canonicalLinkElm);
+      const existingHref = canonicalLinkElm.getAttribute('href');
+      if (!existingHref) {
+        canonicalLinkElm.parentNode.removeChild(canonicalLinkElm);
+      }
     }
   }
 }

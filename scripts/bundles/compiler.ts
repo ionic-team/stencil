@@ -50,6 +50,7 @@ export async function compiler(opts: BuildOptions) {
       strict: false,
       banner: getBanner(opts, 'Stencil Compiler', true),
       esModule: false,
+      preferConst: true,
     },
     plugins: [
       {
@@ -69,7 +70,7 @@ export async function compiler(opts: BuildOptions) {
       commonjs(),
       replacePlugin(opts),
       json() as any,
-      moduleDebugPlugin(),
+      moduleDebugPlugin(opts),
       // {
       //   generateBundle(_, bundleFiles) {
       //     Object.keys(bundleFiles).forEach(fileName => {
