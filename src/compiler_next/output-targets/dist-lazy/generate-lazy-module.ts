@@ -42,7 +42,7 @@ const writeAssets = (compilerCtx: d.CompilerCtx, destinations: string[], results
     .filter(r => r.type === 'asset')
     .map((r: d.RollupAssetResult) => {
       return Promise.all(destinations.map(dest => {
-        compilerCtx.fs.writeFile(
+        return compilerCtx.fs.writeFile(
           path.join(dest, r.fileName),
           r.content
         );
