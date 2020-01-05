@@ -56,7 +56,6 @@ export const wasmPlugin = (_config: d.Config, _compilerCtx: d.CompilerCtx, _buil
         });
         return {
           syntheticNamedExports: true,
-          inlineDynamicImport: true,
           code: `
 import { createAsyncWasm, createWasmProxy } from '${WASM_HELPER_ID}';
 const wasmPath = /*@__PURE__*/import.meta.ROLLUP_FILE_URL_${referenceId};
