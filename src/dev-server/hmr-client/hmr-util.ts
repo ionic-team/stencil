@@ -33,7 +33,7 @@ export const setQueryString = (url: string, qsKey: string, qsValue: string) => {
   // not using URL because IE11 doesn't support it
   const urlSplt = url.split('?');
   const urlPath = urlSplt[0];
-  const qs = parseQuerystring(urlPath[1]);
+  const qs = parseQuerystring(urlSplt[1]);
   qs[qsKey] = qsValue;
   return urlPath + '?' + stringifyQuerystring(qs);
 };

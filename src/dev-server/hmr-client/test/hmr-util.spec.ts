@@ -1,4 +1,4 @@
-import { updateCssUrlValue, updateHmrHref } from '../hmr-util';
+import { updateCssUrlValue, getHmrHref } from '../hmr-util';
 
 
 describe('updateCssUrlValue', () => {
@@ -62,7 +62,7 @@ describe('updateHmrUrl', () => {
     const fileName = 'file-a.css';
     const oldHref = './file-a.css?s-hmr=4321&what=ever';
 
-    const newHref = updateHmrHref(versionId, fileName, oldHref);
+    const newHref = getHmrHref(versionId, fileName, oldHref);
 
     expect(newHref).toBe('./file-a.css?s-hmr=1234&what=ever');
   });
@@ -71,7 +71,7 @@ describe('updateHmrUrl', () => {
     const fileName = 'file-a.css';
     const oldHref = './file-a.css?what=ever';
 
-    const newHref = updateHmrHref(versionId, fileName, oldHref);
+    const newHref = getHmrHref(versionId, fileName, oldHref);
 
     expect(newHref).toBe('./file-a.css?what=ever&s-hmr=1234');
   });
@@ -80,7 +80,7 @@ describe('updateHmrUrl', () => {
     const fileName = 'file-a.css';
     const oldHref = 'file-a.css';
 
-    const newHref = updateHmrHref(versionId, fileName, oldHref);
+    const newHref = getHmrHref(versionId, fileName, oldHref);
 
     expect(newHref).toBe('file-a.css?s-hmr=1234');
   });
@@ -89,7 +89,7 @@ describe('updateHmrUrl', () => {
     const fileName = 'file-a.css';
     const oldHref = '/build/file-a.css';
 
-    const newHref = updateHmrHref(versionId, fileName, oldHref);
+    const newHref = getHmrHref(versionId, fileName, oldHref);
 
     expect(newHref).toBe('/build/file-a.css?s-hmr=1234');
   });
@@ -98,7 +98,7 @@ describe('updateHmrUrl', () => {
     const fileName = 'file-a.css';
     const oldHref = '/build/file-b.css';
 
-    const newHref = updateHmrHref(versionId, fileName, oldHref);
+    const newHref = getHmrHref(versionId, fileName, oldHref);
 
     expect(newHref).toBe('/build/file-b.css');
   });
