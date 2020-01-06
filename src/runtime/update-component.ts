@@ -3,7 +3,7 @@ import { attachStyles } from './styles';
 import { BUILD, NAMESPACE } from '@app-data';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { consoleError, doc, getHostRef, nextTick, plt, writeTask } from '@platform';
-import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
+import { PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 import { createTime } from './profile';
 
@@ -192,7 +192,7 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
     if (BUILD.asyncLoading && BUILD.cssAnnotations) {
       // DOM WRITE!
       // add the css class that this element has officially hydrated
-      elm.classList.add(HYDRATED_CLASS);
+      elm.dataset.hydrated = '';
     }
 
     if (BUILD.cmpDidLoad) {
@@ -277,7 +277,7 @@ export const appDidLoad = (who: string) => {
   // on appload
   // we have finish the first big initial render
   if (BUILD.cssAnnotations) {
-    doc.documentElement.classList.add(HYDRATED_CLASS);
+    doc.documentElement.dataset.hydrated = '';
   }
   if (!BUILD.hydrateServerSide) {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;

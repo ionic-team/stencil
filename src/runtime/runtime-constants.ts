@@ -32,7 +32,6 @@ export const ORG_LOCATION_ID = 'o';
 export const SLOT_NODE_ID = 's';
 export const TEXT_NODE_ID = 't';
 
-export const HYDRATED_CLASS = 'hydrated';
 export const HYDRATE_ID = 's-id';
 export const HYDRATE_CHILD_ID = 'c-id';
 

@@ -16,10 +16,10 @@ describe('globals', () => {
       includeAnnotations: true
     });
     const html = page.doc.documentElement;
-    expect(html.classList.contains('hydrated')).toBe(false);
+    expect(html.dataset.hydrated).toBeUndefined();
     await new Promise(resolve => {
       setTimeout(() => {
-        expect(html.classList.contains('hydrated')).toBe(true);
+        expect(html.dataset.hydrated).toEqual('');
         resolve();
       }, 100);
     });
@@ -32,7 +32,7 @@ describe('globals', () => {
       includeAnnotations: true
     });
     const html = page.doc.documentElement;
-    expect(html.classList.contains('hydrated')).toBe(true);
+    expect(html.dataset.hydrated).toEqual('');
   });
 
   it('should hide non hydrated components', async () => {
@@ -47,7 +47,7 @@ describe('globals', () => {
     });
     expect(doc.head.children[0]).toEqualHtml(`
       <style data-styles>
-        cmp-a,cmp-b{visibility:hidden}.hydrated{visibility:inherit}
+        cmp-a,cmp-b{visibility:hidden}[data-hydrated]{visibility:inherit}
       </style>
     `);
   });

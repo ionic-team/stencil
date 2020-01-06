@@ -22,7 +22,7 @@ describe('hydrate no encapsulation', () => {
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a data-hydrated s-id="1">
         <!--r.1-->
         <p c-id="1.0.0.0" class="hi">
           <!--t.1.1.1.0-->
@@ -42,7 +42,7 @@ describe('hydrate no encapsulation', () => {
     expect(clientHydrated.root['s-cr']['s-cn']).toBe(true);
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a data-hydrated>
         <!--r.1-->
         <p class="hi">
           Hello
@@ -69,7 +69,7 @@ describe('hydrate no encapsulation', () => {
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a data-hydrated s-id="1">
         <!--r.1-->
         <!--t.1.0.0.0-->
         Hello
@@ -87,7 +87,7 @@ describe('hydrate no encapsulation', () => {
     expect(clientHydrated.root['s-cr']['s-cn']).toBe(true);
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a data-hydrated>
         <!--r.1-->
         Hello
       </cmp-a>
@@ -114,7 +114,7 @@ describe('hydrate no encapsulation', () => {
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a data-hydrated s-id="1">
         <!--r.1-->
         <!--t.1.0.0.0-->
         top
@@ -136,7 +136,7 @@ describe('hydrate no encapsulation', () => {
     expect(clientHydrated.root['s-id']).toBe('1');
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a data-hydrated>
         <!--r.1-->
         top
         <p>
@@ -176,9 +176,9 @@ describe('hydrate no encapsulation', () => {
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a data-hydrated s-id="1">
         <!--r.1-->
-        <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
+        <cmp-b data-hydrated c-id="1.0.0.0" s-id="2">
           <!--r.2-->
           <!--o.1.1-->
           <!--s.2.0.0.0.-->
@@ -197,9 +197,9 @@ describe('hydrate no encapsulation', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a data-hydrated>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b data-hydrated>
           <!--r.2-->
           <!---->
           <!--s.2.0.0.0.-->
@@ -240,9 +240,9 @@ describe('hydrate no encapsulation', () => {
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a data-hydrated s-id="1">
         <!--r.1-->
-        <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
+        <cmp-b data-hydrated c-id="1.0.0.0" s-id="2">
           <!--r.2-->
           <!--o.1.1-->
           <header c-id="2.0.0.0"></header>
@@ -261,9 +261,9 @@ describe('hydrate no encapsulation', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a data-hydrated>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b data-hydrated>
           <!--r.2-->
           <!---->
           <header></header>
@@ -304,9 +304,9 @@ describe('hydrate no encapsulation', () => {
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a data-hydrated s-id="1">
         <!--r.1-->
-        <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
+        <cmp-b data-hydrated c-id="1.0.0.0" s-id="2">
           <!--r.2-->
           <!--o.1.1-->
           <header c-id="2.0.0.0"></header>
@@ -326,9 +326,9 @@ describe('hydrate no encapsulation', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a data-hydrated>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b data-hydrated>
           <!--r.2-->
           <!---->
           <header></header>
@@ -376,9 +376,9 @@ describe('hydrate no encapsulation', () => {
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a data-hydrated s-id="1">
         <!--r.1-->
-        <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
+        <cmp-b data-hydrated c-id="1.0.0.0" s-id="2">
           <!--r.2-->
           <!--o.1.1-->
           <!--o.1.3-->
@@ -410,9 +410,9 @@ describe('hydrate no encapsulation', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a data-hydrated>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b data-hydrated>
           <!--r.2-->
           <!---->
           <!---->

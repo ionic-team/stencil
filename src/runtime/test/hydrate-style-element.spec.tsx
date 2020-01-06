@@ -20,7 +20,7 @@ describe('hydrate style element', () => {
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a data-hydrated s-id="1">
         <!--r.1-->
         <style c-id="1.0.0.0">div { color: red; }</style>
       </cmp-a>
@@ -33,7 +33,7 @@ describe('hydrate style element', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a data-hydrated>
         <!--r.1-->
         <style>div { color: red; }</style>
       </cmp-a>

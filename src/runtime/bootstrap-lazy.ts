@@ -163,7 +163,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     }));
 
   // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
-  visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
+  visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}[data-hydrated]{visibility:inherit}';
   visibilityStyle.setAttribute('data-styles', '');
   head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
 

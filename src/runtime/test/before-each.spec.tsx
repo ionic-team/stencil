@@ -34,7 +34,7 @@ describe('newSpecPage, spec testing', () => {
 
   it('renders changes to the name data', async () => {
     expect(root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a data-hydrated>
         <mock:shadow-root>
           <div>
             Hello, World! I'm
@@ -42,7 +42,7 @@ describe('newSpecPage, spec testing', () => {
         </mock:shadow-root>
       </cmp-a>
     `);
-    expect(root).toHaveClass('hydrated');
+    expect(root).toHaveAttribute('data-hydrated');
     const div = root.shadowRoot.querySelector('div');
     expect(div.textContent).toEqual(`Hello, World! I'm `);
 
