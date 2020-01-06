@@ -120,8 +120,12 @@ const hmrUpdateStyleAttr = (elm: Element, versionId: string, imageFileNames: str
 
 const hmrUpdateStyleElementUrl = (styleElm: HTMLStyleElement, versionId: string, imageFileNames: string[]) => {
   imageFileNames.forEach(imageFileName => {
-    styleElm.innerHTML = updateCssUrlValue(versionId, imageFileName, styleElm.innerHTML);
-    setHmrAttr(styleElm, versionId);
+    const oldCssText = styleElm.innerHTML;
+    const newCssText = updateCssUrlValue(versionId, imageFileName, oldCssText);
+    if (newCssText !== oldCssText) {
+      styleElm.innerHTML = newCssText;
+      setHmrAttr(styleElm, versionId);
+    }
   });
 };
 

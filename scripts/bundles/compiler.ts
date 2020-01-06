@@ -7,10 +7,12 @@ import { aliasPlugin } from './plugins/alias-plugin';
 import { inlinedCompilerPluginsPlugin } from './plugins/inlined-compiler-plugins-plugin';
 import { sysModulesPlugin } from './plugins/sys-modules-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
+import { parse5Plugin } from './plugins/parse5-plugin';
+import { sizzlePlugin } from './plugins/sizzle-plugin';
 import { getBanner } from '../utils/banner';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { BuildOptions } from '../utils/options';
-import { RollupOptions, OutputChunk } from 'rollup';
+import { RollupOptions } from 'rollup';
 import terser from 'terser';
 import { moduleDebugPlugin } from './plugins/moduleDebugPlugin';
 
@@ -62,6 +64,8 @@ export async function compiler(opts: BuildOptions) {
         }
       },
       inlinedCompilerPluginsPlugin(opts, inputDir),
+      parse5Plugin(opts),
+      sizzlePlugin(opts),
       aliasPlugin(opts),
       sysModulesPlugin(inputDir),
       nodeResolve({

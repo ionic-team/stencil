@@ -184,19 +184,48 @@ describe('selector', () => {
     expect(span).toBeFalsy();
   });
 
-  it('not find child if no tag specified after combinator', () => {
+  it(':not()', () => {
     const doc = new MockDocument(`
-      <div>
-        <a></a>
-        <span>
-          <div></div>
-          <div class="inner"></div>
-        </span>
-      </div>
+      <a nope>
+        <b><b>
+      </a>
     `);
+    const q1 = doc.querySelector('a:not([nope]) b');
+    expect(q1).toBe(null);
+  });
 
-    const span = doc.querySelector('div > span > ');
-    expect(span).toBeFalsy();
+  it('descendent, two deep', () => {
+    const doc = new MockDocument();
+    const div = doc.createElement('div');
+    const span = doc.createElement('span');
+    span.classList.add('c');
+    const a = doc.createElement('a');
+    const b = doc.createElement('b');
+    div.appendChild(span);
+    span.appendChild(a);
+    a.appendChild(b);
+
+    const q1 = div.querySelector('span b');
+    expect(q1.tagName).toBe('B');
+
+    const q2 = div.querySelector('span.c b');
+    expect(q2.tagName).toBe('B');
+  });
+
+  it('descendent, one deep', () => {
+    const doc = new MockDocument();
+    const div = doc.createElement('div');
+    const span = doc.createElement('span');
+    span.classList.add('c');
+    const a = doc.createElement('a');
+    div.appendChild(span);
+    span.appendChild(a);
+
+    const q1 = div.querySelector('span a');
+    expect(q1.tagName).toBe('A');
+
+    const q2 = div.querySelector('span.c a');
+    expect(q2.tagName).toBe('A');
   });
 
 });

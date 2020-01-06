@@ -7,7 +7,6 @@ import { PackageData } from './utils/write-pkg-json';
 const entryDeps = [
   'ansi-colors',
   'autoprefixer',
-  'css-what',
   'exit',
   'glob',
   'graceful-fs',
@@ -25,6 +24,7 @@ const entryDeps = [
   'rollup-plugin-commonjs',
   'rollup-plugin-node-resolve',
   'semiver',
+  'sizzle',
   'source-map',
   'terser',
   'ws',

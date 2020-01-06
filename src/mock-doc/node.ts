@@ -1,6 +1,6 @@
 import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } from './custom-element-registry';
-import { closest, matches, selectAll, selectOne } from './selector';
 import { dataset } from './dataset';
+import { matches, selectAll, selectOne } from './selector';
 import { MockAttr, MockAttributeMap, createAttributeProxy } from './attribute';
 import { MockClassList } from './class-list';
 import { MockCSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
@@ -271,7 +271,14 @@ export class MockElement extends MockNode {
   }
 
   closest(selector: string) {
-    return closest(selector, this);
+    let elm = this;
+    while (elm != null) {
+      if (elm.matches(selector)) {
+        return elm;
+      }
+      elm = elm.parentNode as any;
+    }
+    return null;
   }
 
   get dataset() {
@@ -485,11 +492,15 @@ export class MockElement extends MockNode {
 
   getElementsByClassName(classNames: string) {
     const classes = classNames.trim().split(' ').filter(c => c.length > 0);
-    return getElementsByClassName(this, classes);
+    const results: MockElement[] = [];
+    getElementsByClassName(this, classes, results);
+    return results;
   }
 
   getElementsByTagName(tagName: string) {
-    return getElementsByTagName(this, tagName.toLowerCase());
+    const results: MockElement[] = [];
+    getElementsByTagName(this, tagName.toLowerCase(), results);
+    return results;
   }
 
   querySelector(selector: string) {
@@ -719,7 +730,7 @@ export class MockElement extends MockNode {
 }
 
 
-function getElementsByClassName(elm: MockElement, classNames: string[], foundElms: MockElement[] = []) {
+function getElementsByClassName(elm: MockElement, classNames: string[], foundElms: MockElement[]) {
   const children = elm.children;
   for (let i = 0, ii = children.length; i < ii; i++) {
     const childElm = children[i];
@@ -730,20 +741,18 @@ function getElementsByClassName(elm: MockElement, classNames: string[], foundElm
     }
     getElementsByClassName(childElm, classNames, foundElms);
   }
-  return foundElms;
 }
 
 
-function getElementsByTagName(elm: MockElement, tagName: string, foundElms: MockElement[] = []) {
+function getElementsByTagName(elm: MockElement, tagName: string, foundElms: MockElement[]) {
   const children = elm.children;
   for (let i = 0, ii = children.length; i < ii; i++) {
     const childElm = children[i];
-    if (childElm.nodeName.toLowerCase() === tagName) {
+    if (tagName === '*' || childElm.nodeName.toLowerCase() === tagName) {
       foundElms.push(childElm);
     }
     getElementsByTagName(childElm, tagName, foundElms);
   }
-  return foundElms;
 }
 
 export function resetElement(elm: MockElement) {
