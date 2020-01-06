@@ -1,3 +1,14 @@
+## ⭐️ [1.8.4](https://github.com/ionic-team/stencil/compare/v1.8.3...v1.8.4) (2020-01-06)
+
+
+### Bug Fixes
+
+* **css-shim:** apply css vars to global styles ([4070312](https://github.com/ionic-team/stencil/commit/4070312d1cfa39309fa6afb541332a456397ab21)), closes [#2076](https://github.com/ionic-team/stencil/issues/2076)
+* **safari:** update safari 10 to use es5/system builds ([cc4c013](https://github.com/ionic-team/stencil/commit/cc4c013f8cdc9324280464eb4fb0f469fec0b5c8)), closes [#1900](https://github.com/ionic-team/stencil/issues/1900)
+* **slot:** fix appendChild when using slot polyfill ([e8b4c59](https://github.com/ionic-team/stencil/commit/e8b4c59261b48295bd787ce10490a928c67ec02f)), closes [#1686](https://github.com/ionic-team/stencil/issues/1686)
+
+
+
 ## 🚍 [1.8.3](https://github.com/ionic-team/stencil/compare/v1.8.2...v1.8.3) (2019-12-30)
 
 
