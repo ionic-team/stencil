@@ -1141,7 +1141,6 @@ export namespace JSXBase {
   export interface HTMLAttributes<T = HTMLElement> extends DOMAttributes<T> {
     // vdom specific
     innerHTML?: string;
-    key?: string | number;
 
     // Standard HTML Attributes
     accessKey?: string;
@@ -1472,6 +1471,9 @@ export namespace JSXBase {
   }
 
   export interface DOMAttributes<T = Element> {
+    // vdom specific
+    key?: string | number;
+                              
     ref?: (elm?: T) => void;
     slot?: string;
 
