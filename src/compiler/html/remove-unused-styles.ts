@@ -33,7 +33,9 @@ function removeUnusedStyleText(usedSelectors: UsedSelectors, diagnostics: d.Diag
     try {
       // convert the parsed css back into a string
       // but only keeping what was found in our active selectors
-      const stringify = new StringifyCss(usedSelectors);
+      const stringify = new StringifyCss({
+        usedSelectors
+      });
       styleElm.innerHTML = stringify.compile(cssAst);
 
     } catch (e) {
