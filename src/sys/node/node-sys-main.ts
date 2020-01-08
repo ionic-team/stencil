@@ -16,6 +16,7 @@ import { WorkerManager } from './worker/index';
 import { createHash } from 'crypto';
 import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
 import path from 'path';
+import { version } from '../../version';
 
 
 export class NodeSystem implements d.StencilSystem {
@@ -115,7 +116,7 @@ export class NodeSystem implements d.StencilSystem {
   get compiler() {
     return {
       name: this.packageJsonData.name,
-      version: '0.0.0-stencil-dev',
+      version: version,
       runtime: path.join(this.distDir, 'compiler', 'index.js'),
       packageDir: this.packageDir,
       distDir: this.distDir,
