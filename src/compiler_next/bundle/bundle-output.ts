@@ -16,6 +16,7 @@ import { RollupOptions, TreeshakingOptions, rollup } from 'rollup';
 import { typescriptPlugin } from './typescript-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
+import { wasmPlugin } from './wasm-plugin';
 
 
 export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
@@ -60,7 +61,8 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       textPlugin(),
       extTransformsPlugin(config, compilerCtx, buildCtx),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform),
-      ...config.rollupPlugins,
+      ...prepareRollupConfig(config, compilerCtx, buildCtx),
+      wasmPlugin(config, compilerCtx, buildCtx, bundleOpts.platform),
       rollupNodeResolvePlugin({
         mainFields: ['browser', 'collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
         customResolveOptions,
@@ -89,6 +91,15 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
 
   return rollupOptions;
 };
+
+const prepareRollupConfig = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+  config.rollupPlugins.forEach(plugin => {
+    if ('stencilContext' in plugin) {
+      plugin.stencilContext(config, compilerCtx, buildCtx);
+    }
+  });
+  return config.rollupPlugins;
+}
 
 const getTreeshakeOption = (config: d.Config) => {
   const treeshake: TreeshakingOptions | boolean = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false

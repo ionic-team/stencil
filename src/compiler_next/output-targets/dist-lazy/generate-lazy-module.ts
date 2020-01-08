@@ -38,7 +38,7 @@ export const generateLazyModules = async (config: d.Config, compilerCtx: d.Compi
 };
 
 const writeAssets = (compilerCtx: d.CompilerCtx, destinations: string[], results: d.RollupResult[]) => {
-  return results
+  return Promise.all(results
     .filter(r => r.type === 'asset')
     .map((r: d.RollupAssetResult) => {
       return Promise.all(destinations.map(dest => {
@@ -47,7 +47,7 @@ const writeAssets = (compilerCtx: d.CompilerCtx, destinations: string[], results
           r.content
         );
       }));
-    });
+    }));
 }
 
 

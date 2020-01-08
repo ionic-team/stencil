@@ -189,24 +189,24 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const readFile = async (filePath: string, opts?: d.FsReadOptions) => {
     if (opts == null || (opts.useCache === true || opts.useCache === undefined)) {
       const item = getItem(filePath);
-      if (item.exists && typeof item.fileText === 'string') {
-        return item.fileText;
+      if (item.exists && typeof item.content === 'string') {
+        return item.content;
       }
     }
 
-    const fileText = await sys.readFile(filePath);
+    const content = await sys.readFile(filePath);
     const item = getItem(filePath);
-    if (typeof fileText === 'string') {
-      if (fileText.length < MAX_TEXT_CACHE) {
+    if (typeof content === 'string') {
+      if (content.length < MAX_TEXT_CACHE) {
         item.exists = true;
         item.isFile = true;
         item.isDirectory = false;
-        item.fileText = fileText;
+        item.content = content;
       }
     } else {
       item.exists = false;
     }
-    return fileText;
+    return content;
   };
 
   /**
@@ -217,25 +217,25 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const readFileSync = (filePath: string, opts?: d.FsReadOptions) => {
     if (opts == null || (opts.useCache === true || opts.useCache === undefined)) {
       const item = getItem(filePath);
-      if (item.exists && typeof item.fileText === 'string') {
-        return item.fileText;
+      if (item.exists && typeof item.content === 'string') {
+        return item.content;
       }
     }
 
-    const fileText = sys.readFileSync(filePath);
+    const content = sys.readFileSync(filePath);
     const item = getItem(filePath);
-    if (typeof fileText === 'string') {
-      if (fileText.length < MAX_TEXT_CACHE) {
+    if (typeof content === 'string') {
+      if (content.length < MAX_TEXT_CACHE) {
         item.exists = true;
         item.isFile = true;
         item.isDirectory = false;
-        item.fileText = fileText;
+        item.content = content;
       }
     } else {
       item.exists = false;
     }
 
-    return fileText;
+    return content;
   };
 
   const remove = async (itemPath: string) => {
@@ -323,13 +323,9 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     };
   };
 
-  const writeFile = async (filePath: string, content: string, opts?: d.FsWriteOptions) => {
+  const writeFile = async (filePath: string, content: string | Buffer, opts?: d.FsWriteOptions) => {
     if (!isString(filePath)) {
       throw new Error(`writeFile, invalid filePath: ${filePath}`);
-    }
-
-    if (!isString(content)) {
-      throw new Error(`writeFile, invalid content: ${filePath}`);
     }
 
     const results: d.FsWriteResults = {
@@ -349,10 +345,10 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     item.isDirectory = false;
     item.queueDeleteFromDisk = false;
 
-    results.changedContent = (item.fileText !== content);
+    results.changedContent = (item.content !== content);
     results.queuedWrite = false;
 
-    item.fileText = content;
+    item.content = content;
 
     if (opts != null) {
       if (isString(opts.outputTargetType)) {
@@ -387,10 +383,10 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         // writing the file to disk is a big deal and kicks off fs watchers
         // so let's just double check that the file is actually different first
         const existingFile = await sys.readFile(filePath);
-        results.changedContent = (existingFile !== item.fileText);
+        results.changedContent = (existingFile !== item.content);
         if (results.changedContent) {
           await ensureDir(filePath, false);
-          await sys.writeFile(filePath, item.fileText);
+          await sys.writeFile(filePath, item.content);
         }
       }
 
@@ -521,10 +517,10 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const commitWriteFile = async (filePath: string) => {
     const item = getItem(filePath);
 
-    if (item.fileText == null) {
+    if (item.content == null) {
       throw new Error(`unable to find item fileText to write: ${filePath}`);
     }
-    await sys.writeFile(filePath, item.fileText);
+    await sys.writeFile(filePath, item.content);
 
     if (item.useCache === false) {
       clearFileCache(filePath);
@@ -603,7 +599,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
     items.set(itemPath, item = {
       exists: null,
-      fileText: null,
+      content: null,
       size: null,
       mtimeMs: null,
       isDirectory: null,

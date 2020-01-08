@@ -28,3 +28,15 @@ declare module '*?worker' {
   export const worker: Worker;
   export const fileName: string;
 }
+
+type WasmExports = Record<string, (...args: any[]) => any>;
+
+declare module '*.wasm' {
+  const wasmExports: WasmExports;
+  export = wasmExports;
+}
+
+declare module '*.rs' {
+  const wasmExports: WasmExports;
+  export = wasmExports;
+}

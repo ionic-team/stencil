@@ -119,7 +119,7 @@ export const createSystem = () => {
     p = normalize(p);
     const item = items.get(p);
     if (item && item.isFile) {
-      return item.data;
+      return item.data as string;
     }
     return undefined;
   };
@@ -272,7 +272,7 @@ export const createSystem = () => {
     }
   };
 
-  const writeFileSync = (p: string, data: string) => {
+  const writeFileSync = (p: string, data: string | Buffer) => {
     p = normalize(p);
     const item = items.get(p);
     if (item) {
@@ -309,7 +309,7 @@ export const createSystem = () => {
     return hashHex;
   };
 
-  const writeFile = async (p: string, data: string) => writeFileSync(p, data);
+  const writeFile = async (p: string, data: string | Buffer) => writeFileSync(p, data);
 
   const copy = async (copyTasks: Required<CopyTask>[], srcDir: string) => {
     const results: CopyResults = {
@@ -367,7 +367,7 @@ export const createSystem = () => {
 };
 
 interface FsItem {
-  data: string;
+  data: string | Buffer;
   basename: string;
   dirname: string;
   isFile: boolean;
