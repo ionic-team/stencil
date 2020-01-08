@@ -1,6 +1,7 @@
 import { Config, ConfigBundle, Diagnostic } from '../../declarations';
 import { buildError, isBoolean, sortBy, buildWarn } from '@utils';
 import { validateDevServer } from './validate-dev-server';
+import { validateDistNamespace } from 'src/compiler/config/validate-namespace';
 import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './outputs';
 import { validatePaths } from './validate-paths';
@@ -103,17 +104,9 @@ export const validateConfig = (userConfig?: Config) => {
   // default devInspector to whatever devMode is
   setBooleanConfig(config, 'devInspector', null, config.devMode);
 
-  // if (!config._isTesting) {
-  //   validateDistNamespace(config, diagnostics);
-  // }
-
-  // if (typeof config.validateTypes !== 'boolean') {
-  //   config.validateTypes = true;
-  // }
-
-  // if (!config.watchIgnoredRegex) {
-  //   config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
-  // }
+  if (!config._isTesting) {
+    validateDistNamespace(config, diagnostics);
+  }
 
   setBooleanConfig(config, 'enableCache', 'cache', true);
 
@@ -129,8 +122,6 @@ export const validateConfig = (userConfig?: Config) => {
 
   // set to true so it doesn't bother going through all this again on rebuilds
   // config._isValidated = true;
-
-  // validateOutputTargetCustom(config, diagnostics);
 
   return {
     config,
