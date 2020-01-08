@@ -1,14 +1,13 @@
 import * as d from '../../../declarations';
 
-export function getSrcAbsPath(config: d.Config, src: string) {
+export const getSrcAbsPath = (config: d.Config, src: string) => {
   if (config.sys.path.isAbsolute(src)) {
     return src;
   }
   return config.sys.path.join(config.srcDir, src);
-}
+};
 
-
-export function getDestAbsPath(config: d.Config, src: string, destAbsPath: string, destRelPath: string) {
+export const getDestAbsPath = (config: d.Config, src: string, destAbsPath: string, destRelPath: string) => {
   if (destRelPath) {
     if (config.sys.path.isAbsolute(destRelPath)) {
       return destRelPath;
@@ -23,4 +22,4 @@ export function getDestAbsPath(config: d.Config, src: string, destAbsPath: strin
   }
 
   return destAbsPath;
-}
+};

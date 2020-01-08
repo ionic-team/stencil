@@ -6,7 +6,7 @@ import { isOutputTargetCopy } from '../../../compiler/output-targets/output-util
 import minimatch from 'minimatch';
 
 
-export async function outputCopy(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export const outputCopy = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetCopy);
   if (outputTargets.length === 0) {
     return;
@@ -49,9 +49,9 @@ export async function outputCopy(config: d.Config, compilerCtx: d.CompilerCtx, b
     }
     timespan.finish(`copy finished (${copiedFiles} file${copiedFiles === 1 ? '' : 's'})`);
   }
-}
+};
 
-function getCopyTasks(config: d.Config, buildCtx: d.BuildCtx, o: d.OutputTargetCopy, changedFiles: string[]) {
+const getCopyTasks = (config: d.Config, buildCtx: d.BuildCtx, o: d.OutputTargetCopy, changedFiles: string[]) => {
   if (!Array.isArray(o.copy)) {
     return [];
   }
@@ -60,10 +60,9 @@ function getCopyTasks(config: d.Config, buildCtx: d.BuildCtx, o: d.OutputTargetC
     : filterCopyTasks(config, o.copy, changedFiles);
 
   return copyTasks.map(t => transformToAbs(config, t, o.dir));
-}
+};
 
-
-function filterCopyTasks(config: d.Config, tasks: d.CopyTask[], changedFiles: string[]) {
+const filterCopyTasks = (config: d.Config, tasks: d.CopyTask[], changedFiles: string[]) => {
   if (Array.isArray(tasks)) {
     return tasks.filter(copy => {
       let copySrc = copy.src;
@@ -83,13 +82,13 @@ function filterCopyTasks(config: d.Config, tasks: d.CopyTask[], changedFiles: st
     });
   }
   return [];
-}
+};
 
-function transformToAbs(config: d.Config, copyTask: d.CopyTask, dest: string): Required<d.CopyTask> {
+const transformToAbs = (config: d.Config, copyTask: d.CopyTask, dest: string): Required<d.CopyTask> => {
   return {
     src: copyTask.src,
     dest: getDestAbsPath(config, copyTask.src, dest, copyTask.dest),
     keepDirStructure: typeof copyTask.keepDirStructure === 'boolean' ? copyTask.keepDirStructure : copyTask.dest == null,
     warn: copyTask.warn !== false
   };
-}
+};

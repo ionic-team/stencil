@@ -6,7 +6,7 @@ import { getComponentsFromModules, isOutputTargetDistTypes } from '../../compile
 import { resolveComponentDependencies } from '../../compiler/entries/resolve-component-dependencies';
 import { updateComponentBuildConditionals } from '../build/app-data';
 import { updateModule } from './static-to-meta/parse-static';
-import path from 'path';
+import { join, relative } from 'path';
 import ts from 'typescript';
 
 
@@ -25,14 +25,17 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
   const tsProgram = tsBuilder.getProgram();
   const tsTypeChecker = tsProgram.getTypeChecker();
   const typesOutputTarget = config.outputTargets.filter(isOutputTargetDistTypes);
-  const emitCallback: ts.WriteFileCallback = (filepath, data, _w, _e, tsSourceFiles) => {
-    filepath = filepath.replace(config.cacheDir, '');
-    if (filepath.endsWith('.js')) {
-      updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, filepath, tsTypeChecker, null);
-    } else if (filepath.endsWith('.d.ts')) {
+
+  const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
+    if (emitFilePath.endsWith('.js')) {
+      updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
+
+    } else if (emitFilePath.endsWith('.d.ts')) {
+      const relativeEmitFilepath = emitFilePath.replace(config.cacheDir, '');
+
       typesOutputTarget.forEach(o => {
         compilerCtx.fs.writeFile(
-          path.join(o.typesDir, filepath),
+          join(o.typesDir, relativeEmitFilepath),
           data
         );
       });
@@ -98,7 +101,7 @@ const validateUniqueTagNames = (config: d.Config, buildCtx: d.BuildCtx) => {
       const err = buildError(buildCtx.diagnostics);
       err.header = `Component Tag Name "${tagName}" Must Be Unique`;
       err.messageText = `Please update the components so "${tagName}" is only used once: ${
-        cmpsWithTagName.map(c => path.relative(config.rootDir, c.sourceFilePath)).join(' ')
+        cmpsWithTagName.map(c => relative(config.rootDir, c.sourceFilePath)).join(' ')
       }`;
     }
   });

@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import { normalizePath } from '@utils';
 
 
-export function getComponentAssetsCopyTasks(config: d.Config, buildCtx: d.BuildCtx, dest: string, collectionsPath: boolean) {
+export const getComponentAssetsCopyTasks = (config: d.Config, buildCtx: d.BuildCtx, dest: string, collectionsPath: boolean) => {
   if (!dest) {
     return [];
   }
@@ -43,10 +43,9 @@ export function getComponentAssetsCopyTasks(config: d.Config, buildCtx: d.BuildC
   buildCtx.debug(`getComponentAssetsCopyTasks: ${copyTasks.length}`);
 
   return copyTasks;
-}
+};
 
-
-export function canSkipAssetsCopy(config: d.Config, compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[], filesChanged: string[]) {
+export const canSkipAssetsCopy = (config: d.Config, compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[], filesChanged: string[]) => {
   if (!compilerCtx.hasSuccessfulBuild) {
     // always copy assets if we haven't had a successful build yet
     // cannot skip build
@@ -85,4 +84,4 @@ export function canSkipAssetsCopy(config: d.Config, compilerCtx: d.CompilerCtx, 
   });
 
   return shouldSkipAssetsCopy;
-}
+};

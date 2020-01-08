@@ -1,11 +1,11 @@
 import * as d from '../../../declarations';
+import { normalizePath } from '@utils';
 import { parseCallExpression } from '../../../compiler/transformers/static-to-meta/call-expression';
 import { parseImport } from './import';
 import { parseStaticComponentMeta } from '../../../compiler/transformers/static-to-meta/component';
 import { parseStringLiteral } from '../../../compiler/transformers/static-to-meta/string-literal';
-import path from 'path';
+import { dirname, basename, join } from 'path';
 import ts from 'typescript';
-import { normalizePath } from '@utils';
 
 
 export const updateModule = (
@@ -14,18 +14,22 @@ export const updateModule = (
   buildCtx: d.BuildCtx,
   tsSourceFile: ts.SourceFile,
   sourceFileText: string,
-  emitFilepath: string,
+  emitFilePath: string,
   typeChecker: ts.TypeChecker,
   collection: d.CollectionCompilerMeta
 ) => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const prevModuleFile = getModule(compilerCtx, sourceFilePath);
+
   if (prevModuleFile && prevModuleFile.staticSourceFileText === sourceFileText) {
     return prevModuleFile;
   }
 
-  const dirPath = path.dirname(sourceFilePath);
-  const moduleFile = createModule(tsSourceFile, sourceFileText, emitFilepath);
+  const srcDirPath = dirname(sourceFilePath);
+  const emitFileName = basename(emitFilePath);
+  emitFilePath = normalizePath(join(srcDirPath, emitFileName));
+
+  const moduleFile = createModule(tsSourceFile, sourceFileText, emitFilePath);
   compilerCtx.moduleMap.set(moduleFile.sourceFilePath, moduleFile);
   compilerCtx.changedModules.add(moduleFile.sourceFilePath);
 
@@ -34,7 +38,7 @@ export const updateModule = (
       parseStaticComponentMeta(config, compilerCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap);
       return;
     } else if (ts.isImportDeclaration(node)) {
-      parseImport(config, compilerCtx, buildCtx, moduleFile, dirPath, node);
+      parseImport(config, compilerCtx, buildCtx, moduleFile, srcDirPath, node);
       return;
     } else if (ts.isCallExpression(node)) {
       parseCallExpression(moduleFile, node);
