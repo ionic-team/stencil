@@ -1271,6 +1271,19 @@ export interface FsReadOptions {
 export interface FsReaddirOptions {
   inMemoryOnly?: boolean;
   recursive?: boolean;
+  /**
+   * Directory names to exclude. Just the basename,
+   * not the entire path. Basically for "node_moduels".
+   */
+  excludeDirNames?: string[];
+  /**
+   * Extensions we know we can avoid. Each extension
+   * should include the `.` so that we can test for both
+   * `.d.ts.` and `.ts`. If `excludeExtensions` isn't provided it
+   * doesn't try to exclude anything. This only checks against
+   * the filename, not directory names when recursive.
+   */
+  excludeExtensions?: string[];
 }
 
 export interface FsReaddirItem {

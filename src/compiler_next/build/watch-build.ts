@@ -93,7 +93,20 @@ export const watchSrcDirectory = async (config: d.Config, compilerCtx: d.Compile
     }
   };
   const files = await compilerCtx.fs.readdir(config.srcDir, {
-    recursive: true
+    recursive: true,
+    excludeDirNames: [
+      '.cache',
+      '.github',
+      '.stencil',
+      '.vscode',
+      'node_modules',
+    ],
+    excludeExtensions: [
+      '.md', '.markdown', '.txt',
+      '.spec.ts', '.spec.tsx',
+      '.e2e.ts', '.e2e.tsx',
+      '.gitignore', '.editorconfig',
+    ]
   });
 
   files

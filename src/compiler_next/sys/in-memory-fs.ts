@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
+import { basename, dirname, relative } from 'path';
 import { isString, normalizePath } from '@utils';
-import path from 'path';
 
 
 export const createInMemoryFs = (sys: d.CompilerSystem) => {
@@ -105,7 +105,9 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
               isDirectory: d.isDirectory,
               isFile: d.isFile
             };
-            collectedPaths.push(item);
+            if (!shouldExcludeFromReaddir(opts, item)) {
+              collectedPaths.push(item);
+            }
           }
         }
       });
@@ -138,17 +140,23 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         // let's loop through each of the files we've found so far
         // create an absolute path of the item inside of this directory
         const absPath = normalizePath(dirItem);
-        const relPath = normalizePath(path.relative(initPath, absPath));
+        const relPath = normalizePath(relative(initPath, absPath));
 
         // get the fs stats for the item, could be either a file or directory
         const stats = await stat(absPath);
 
-        collectedPaths.push({
+        const childItem: d.FsReaddirItem = {
           absPath: absPath,
           relPath: relPath,
           isDirectory: stats.isDirectory,
           isFile: stats.isFile
-        });
+        };
+
+        if (shouldExcludeFromReaddir(opts, childItem)) {
+          return;
+        }
+
+        collectedPaths.push(childItem);
 
         if (opts.recursive === true && stats.isDirectory === true) {
           // looks like it's yet another directory
@@ -157,6 +165,25 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         }
       }));
     }
+  };
+
+  const shouldExcludeFromReaddir = (opts: d.FsReaddirOptions, item: d.FsReaddirItem) => {
+    if (item.isDirectory) {
+      if (Array.isArray(opts.excludeDirNames)) {
+        const base = basename(item.absPath);
+        if (opts.excludeDirNames.some(dir => base === dir)) {
+          return true;
+        }
+      }
+    } else {
+      if (Array.isArray(opts.excludeExtensions)) {
+        const p = item.relPath.toLowerCase();
+        if (opts.excludeExtensions.some(ext => p.endsWith(ext))) {
+          return true;
+        }
+      }
+    }
+    return false;
   };
 
   const readFile = async (filePath: string, opts?: d.FsReadOptions) => {
@@ -429,7 +456,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     const allDirs: string[] = [];
 
     while (true) {
-      p = path.dirname(p);
+      p = dirname(p);
       if (typeof p === 'string' && p.length > 0 && p !== '/' && p.endsWith(':/') === false && p.endsWith(':\\') === false) {
         allDirs.push(p);
       } else {
@@ -534,7 +561,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     dirPath = normalizePath(dirPath);
 
     items.forEach((_, f) => {
-      const filePath = path.relative(dirPath, f).split('/')[0];
+      const filePath = relative(dirPath, f).split('/')[0];
       if (!filePath.startsWith('.') && !filePath.startsWith('/')) {
         clearFileCache(f);
       }
@@ -672,7 +699,7 @@ export const getCommitInstructions = (items: d.FsItems) => {
       if (item.isFile === true) {
         instructions.filesToWrite.push(itemPath);
 
-        const dir = normalizePath(path.dirname(itemPath));
+        const dir = normalizePath(dirname(itemPath));
         if (!instructions.dirsToEnsure.includes(dir)) {
           instructions.dirsToEnsure.push(dir);
         }
@@ -711,7 +738,7 @@ export const getCommitInstructions = (items: d.FsItems) => {
       const dest = item.queueCopyFileToDest;
       instructions.filesToCopy.push([src, dest]);
 
-      const dir = normalizePath(path.dirname(dest));
+      const dir = normalizePath(dirname(dest));
       if (!instructions.dirsToEnsure.includes(dir)) {
         instructions.dirsToEnsure.push(dir);
       }
