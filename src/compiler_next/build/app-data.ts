@@ -1,4 +1,5 @@
 import { BuildConditionals, BuildFeatures, ComponentCompilerMeta, Config, Module, ModuleMap } from '@stencil/core/internal';
+import { unique } from '@utils';
 
 
 export * from '../../app-data';
@@ -87,10 +88,15 @@ export const updateComponentBuildConditionals = (moduleMap: ModuleMap, cmps: Com
       cmp.hasVdomRender = cmp.hasVdomRender || importedModule.hasVdomRender;
       cmp.hasVdomStyle = cmp.hasVdomStyle || importedModule.hasVdomStyle;
       cmp.hasVdomText = cmp.hasVdomText || importedModule.hasVdomText;
+
       cmp.htmlAttrNames.push(...importedModule.htmlAttrNames);
       cmp.htmlTagNames.push(...importedModule.htmlTagNames);
       cmp.potentialCmpRefs.push(...importedModule.potentialCmpRefs);
     });
+
+    cmp.htmlAttrNames = unique(cmp.htmlAttrNames);
+    cmp.htmlTagNames = unique(cmp.htmlTagNames);
+    cmp.potentialCmpRefs = unique(cmp.potentialCmpRefs);
   });
 };
 

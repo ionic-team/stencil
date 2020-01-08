@@ -26,7 +26,8 @@ function resolveTransitiveDependencies(cmp: d.ComponentCompilerMeta, cmps: d.Com
   }
   visited.add(cmp);
 
-  const dependencies = cmp.potentialCmpRefs.filter(tagName => cmps.some(c => c.tagName === tagName));
+  const dependencies = unique(cmp.potentialCmpRefs.filter(tagName => cmps.some(c => c.tagName === tagName)));
+
   cmp.dependencies = cmp.directDependencies = dependencies;
   const transitiveDeps = flatOne(
     dependencies
