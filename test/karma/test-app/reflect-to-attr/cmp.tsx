@@ -7,16 +7,16 @@ export class ReflectToAttr {
 
   @Element() el!: any;
 
-  @Prop({reflectToAttr: true}) str = 'single';
-  @Prop({reflectToAttr: true}) nu = 2;
-  @Prop({reflectToAttr: true}) undef?: string;
-  @Prop({reflectToAttr: true}) null: string | null = null;
-  @Prop({reflectToAttr: true}) bool = false;
-  @Prop({reflectToAttr: true}) otherBool = true;
-  @Prop({reflectToAttr: true}) disabled = false;
+  @Prop({ reflect: true}) str = 'single';
+  @Prop({ reflect: true}) nu = 2;
+  @Prop({ reflect: true}) undef?: string;
+  @Prop({ reflect: true}) null: string | null = null;
+  @Prop({ reflect: true}) bool = false;
+  @Prop({ reflect: true}) otherBool = true;
+  @Prop({ reflect: true}) disabled = false;
 
-  @Prop({reflectToAttr: true, mutable: true}) dynamicStr?: string;
-  @Prop({reflectToAttr: true}) dynamicNu?: number;
+  @Prop({ reflect: true, mutable: true}) dynamicStr?: string;
+  @Prop({ reflect: true}) dynamicNu?: number;
 
   componentDidLoad() {
     this.dynamicStr = 'value';

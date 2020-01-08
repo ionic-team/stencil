@@ -382,7 +382,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
   if (!BUILD.vdomText || newVNode.$text$ === null) {
     // element node
 
-    if (BUILD.vdomAttribute) {
+    if (BUILD.vdomAttribute || BUILD.reflect) {
       if (BUILD.slot && newVNode.$tag$ === 'slot') {
         // minifier will clean this up
 
