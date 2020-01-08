@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { isOutputTargetDocsJson } from '../../output-targets/output-utils';
 
-export async function generateJsonDocs(config: d.Config, compilerCtx: d.CompilerCtx, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) {
+export const generateJsonDocs = async (config: d.Config, compilerCtx: d.CompilerCtx, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) => {
   const jsonOutputTargets = outputTargets.filter(isOutputTargetDocsJson);
   if (jsonOutputTargets.length === 0) {
     return;
@@ -46,9 +46,9 @@ export default _default;
       return writeDocsOutput(compilerCtx,  jsonOutput, jsonContent, typesContent);
     })
   );
-}
+};
 
-export async function writeDocsOutput(compilerCtx: d.CompilerCtx, jsonOutput: d.OutputTargetDocsJson, jsonContent: string, typesContent: string) {
+export const writeDocsOutput = async (compilerCtx: d.CompilerCtx, jsonOutput: d.OutputTargetDocsJson, jsonContent: string, typesContent: string) => {
   return Promise.all([
     compilerCtx.fs.writeFile(jsonOutput.file, jsonContent),
     (jsonOutput.typesFile
@@ -56,4 +56,4 @@ export async function writeDocsOutput(compilerCtx: d.CompilerCtx, jsonOutput: d.
       : Promise.resolve() as any
     )
   ]);
-}
+};

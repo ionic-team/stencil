@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { isOutputTargetDocsCustom } from '../../output-targets/output-utils';
 
-export async function generateCustomDocs(config: d.Config, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) {
+export const generateCustomDocs = async (config: d.Config, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) => {
   const customOutputTargets = outputTargets.filter(isOutputTargetDocsCustom);
   if (customOutputTargets.length === 0) {
     return;
@@ -13,4 +13,4 @@ export async function generateCustomDocs(config: d.Config, docsData: d.JsonDocs,
       config.logger.error(`uncaught custom docs error: ${e}`);
     }
   }));
-}
+};

@@ -2,7 +2,8 @@ import * as d from '../../../declarations';
 import { getNameText } from '../generate-doc-data';
 import { isOutputTargetDocsVscode } from '../../output-targets/output-utils';
 
-export async function generateVscodeDocs(compilerCtx: d.CompilerCtx, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) {
+
+export const generateVscodeDocs = async (compilerCtx: d.CompilerCtx, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) => {
   const vsCodeOutputTargets = outputTargets.filter(isOutputTargetDocsVscode);
   if (vsCodeOutputTargets.length === 0) {
     return;
@@ -24,9 +25,9 @@ export async function generateVscodeDocs(compilerCtx: d.CompilerCtx, docsData: d
     const jsonContent = JSON.stringify(json, null, 2);
     await compilerCtx.fs.writeFile(outputTarget.file, jsonContent);
   }));
-}
+};
 
-function getReferences(cmp: d.JsonDocsComponent, repoBaseUrl: string) {
+const getReferences = (cmp: d.JsonDocsComponent, repoBaseUrl: string) => {
   const references = getNameText('reference', cmp.docsTags)
     .map(([name, url]) => ({ name, url }));
   if (repoBaseUrl) {
@@ -39,9 +40,9 @@ function getReferences(cmp: d.JsonDocsComponent, repoBaseUrl: string) {
     return references;
   }
   return undefined;
-}
+};
 
-function serializeAttribute(prop: d.JsonDocsProp) {
+const serializeAttribute = (prop: d.JsonDocsProp) => {
   const attribute: any = {
     'name': prop.attr,
     'description': prop.docs,
@@ -54,4 +55,4 @@ function serializeAttribute(prop: d.JsonDocsProp) {
     attribute.values = values;
   }
   return attribute;
-}
+};

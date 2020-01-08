@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import { MarkdownTable } from './docs-util';
 
 
-export function stylesToMarkdown(styles: d.JsonDocsStyle[]) {
+export const stylesToMarkdown = (styles: d.JsonDocsStyle[]) => {
   const content: string[] = [];
   if (styles.length === 0) {
     return content;
@@ -26,4 +26,4 @@ export function stylesToMarkdown(styles: d.JsonDocsStyle[]) {
   content.push(``);
 
   return content;
-}
+};

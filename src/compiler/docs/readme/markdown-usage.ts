@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { toTitleCase } from '@utils';
 
-export function usageToMarkdown(usages: d.JsonDocsUsage) {
+export const usageToMarkdown = (usages: d.JsonDocsUsage) => {
   const content: string[] = [];
   const merged = mergeUsages(usages);
   if (merged.length === 0) {
@@ -22,9 +22,9 @@ export function usageToMarkdown(usages: d.JsonDocsUsage) {
   content.push('');
 
   return content;
-}
+};
 
-export function mergeUsages(usages: d.JsonDocsUsage) {
+export const mergeUsages = (usages: d.JsonDocsUsage) => {
   const keys = Object.keys(usages);
   const map = new Map<string, string[]>();
   keys.forEach(key => {
@@ -41,5 +41,4 @@ export function mergeUsages(usages: d.JsonDocsUsage) {
     });
   });
   return merged;
-}
-
+};

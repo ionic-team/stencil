@@ -5,7 +5,7 @@ import { getBuildTimestamp } from '../build/build-ctx';
 import { JsonDocsValue } from '../../declarations';
 
 
-export async function generateDocData(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocs> {
+export const generateDocData = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocs> => {
   return {
     timestamp: getBuildTimestamp(),
     compiler: {
@@ -15,9 +15,9 @@ export async function generateDocData(config: d.Config, compilerCtx: d.CompilerC
     },
     components: await getComponents(config, compilerCtx, buildCtx)
   };
-}
+};
 
-async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> {
+const getComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> => {
   const results = await Promise.all(buildCtx.moduleFiles.map(async moduleFile => {
     const filePath = moduleFile.sourceFilePath;
     const dirPath = normalizePath(config.sys.path.dirname(filePath));
@@ -53,9 +53,9 @@ async function getComponents(config: d.Config, compilerCtx: d.CompilerCtx, build
     }));
 
   return sortBy(flatOne(results), cmp => cmp.tag);
-}
+};
 
-function buildDepGraph(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) {
+const buildDepGraph = (cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) => {
   const dependencies: d.JsonDocsDependencyGraph = {};
   function walk(tagName: string) {
     if (!dependencies[tagName]) {
@@ -71,16 +71,16 @@ function buildDepGraph(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMe
 
   // load dependents
   cmp.directDependents.forEach(tagName => {
-    if (dependencies[tagName] && !dependencies[tagName].includes(tagName)) {
+    if (dependencies[tagName] && !dependencies[tagName].includes(cmp.tagName)) {
       dependencies[tagName].push(cmp.tagName);
     } else {
       dependencies[tagName] = [cmp.tagName];
     }
   });
   return dependencies;
-}
+};
 
-function getEncapsulation(cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped' | 'none' {
+const getEncapsulation = (cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped' | 'none' => {
   if (cmp.encapsulation === 'shadow') {
     return 'shadow';
   } else if (cmp.encapsulation === 'scoped') {
@@ -88,16 +88,16 @@ function getEncapsulation(cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped' | '
   } else {
     return 'none';
   }
-}
+};
 
-function getProperties(cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] {
+const getProperties = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] => {
   return sortBy([
     ...getRealProperties(cmpMeta.properties),
     ...getVirtualProperties(cmpMeta.virtualProperties)
   ], p => p.name);
-}
+};
 
-function getRealProperties(properties: d.ComponentCompilerProperty[]): d.JsonDocsProp[] {
+const getRealProperties = (properties: d.ComponentCompilerProperty[]): d.JsonDocsProp[] => {
   return properties.filter(member => isDocsPublic(member.docs))
     .map(member => ({
       name: member.name,
@@ -114,9 +114,9 @@ function getRealProperties(properties: d.ComponentCompilerProperty[]): d.JsonDoc
       optional: member.optional,
       required: member.required,
     }));
-}
+};
 
-function getVirtualProperties(virtualProps: d.ComponentCompilerVirtualProperty[]): d.JsonDocsProp[] {
+const getVirtualProperties = (virtualProps: d.ComponentCompilerVirtualProperty[]): d.JsonDocsProp[] => {
   return virtualProps.map(member => ({
     name: member.name,
     type: member.type,
@@ -132,9 +132,9 @@ function getVirtualProperties(virtualProps: d.ComponentCompilerVirtualProperty[]
     optional: true,
     required: false,
   }));
-}
+};
 
-function parseTypeIntoValues(type: string) {
+const parseTypeIntoValues = (type: string) => {
   if (typeof type === 'string') {
     const unions = type.split('|').map(u => u.trim());
     const parsedUnions: JsonDocsValue[] = [];
@@ -176,9 +176,9 @@ function parseTypeIntoValues(type: string) {
     return parsedUnions;
   }
   return [];
-}
+};
 
-function getMethods(methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] {
+const getMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] => {
   return sortBy(methods, member => member.name)
     .filter(member => isDocsPublic(member.docs))
     .map(member => ({
@@ -193,10 +193,10 @@ function getMethods(methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] {
       docsTags: member.docs.tags,
       deprecation: getDeprecation(member.docs.tags)
     }));
-}
+};
 
 
-function getEvents(events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] {
+const getEvents = (events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] => {
   return sortBy(events, eventMeta => eventMeta.name.toLowerCase())
     .filter(eventMeta => isDocsPublic(eventMeta.docs))
     .map(eventMeta => ({
@@ -209,10 +209,10 @@ function getEvents(events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] {
       docsTags: eventMeta.docs.tags,
       deprecation: getDeprecation(eventMeta.docs.tags)
     }));
-}
+};
 
 
-function getStyles(cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] {
+const getStyles = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] => {
   if (!cmpMeta.styleDocs) {
     return [];
   }
@@ -226,21 +226,21 @@ function getStyles(cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] {
   });
 }
 
-function getDeprecation(tags: d.JsonDocsTag[]) {
+const getDeprecation = (tags: d.JsonDocsTag[]) => {
   const deprecation = tags.find(t => t.name === 'deprecated');
   if (deprecation) {
     return deprecation.text || '';
   }
   return undefined;
-}
+};
 
-function getSlots(tags: d.JsonDocsTag[]): d.JsonDocsSlot[] {
+const getSlots = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
   return sortBy(getNameText('slot', tags)
     .map(([name, docs]) => ({ name, docs }))
   , a => a.name);
-}
+};
 
-export function getNameText(name: string, tags: d.JsonDocsTag[]) {
+export const getNameText = (name: string, tags: d.JsonDocsTag[]) => {
   return tags
     .filter(tag => tag.name === name && tag.text)
     .map(({text}) => {
@@ -250,9 +250,9 @@ export function getNameText(name: string, tags: d.JsonDocsTag[]) {
         rest.join(' - ').trim()
       ];
     });
-}
+};
 
-async function getUserReadmeContent(compilerCtx: d.CompilerCtx, readmePath: string) {
+const getUserReadmeContent = async (compilerCtx: d.CompilerCtx, readmePath: string) => {
   try {
     const existingContent = await compilerCtx.fs.readFile(readmePath);
     const userContentIndex = existingContent.indexOf(AUTO_GENERATE_COMMENT) - 1;
@@ -261,10 +261,9 @@ async function getUserReadmeContent(compilerCtx: d.CompilerCtx, readmePath: stri
     }
   } catch (e) {}
   return undefined;
-}
+};
 
-
-function generateDocs(readme: string, jsdoc: d.CompilerJsDoc) {
+const generateDocs = (readme: string, jsdoc: d.CompilerJsDoc) => {
   const docs = jsdoc.text;
   if (docs !== '' || !readme) {
     return docs;
@@ -286,9 +285,9 @@ function generateDocs(readme: string, jsdoc: d.CompilerJsDoc) {
     }
   }
   return contentLines.join('\n').trim();
-}
+};
 
-async function generateUsages(config: d.Config, compilerCtx: d.CompilerCtx, usagesDir: string) {
+const generateUsages = async (config: d.Config, compilerCtx: d.CompilerCtx, usagesDir: string) => {
   const rtn: d.JsonDocsUsage = {};
 
   try {
@@ -320,4 +319,4 @@ async function generateUsages(config: d.Config, compilerCtx: d.CompilerCtx, usag
   } catch (e) {}
 
   return rtn;
-}
+};

@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import { MarkdownTable } from './docs-util';
 
 
-export function slotsToMarkdown(slots: d.JsonDocsSlot[]) {
+export const slotsToMarkdown = (slots: d.JsonDocsSlot[]) => {
   const content: string[] = [];
   if (slots.length === 0) {
     return content;
@@ -26,4 +26,4 @@ export function slotsToMarkdown(slots: d.JsonDocsSlot[]) {
   content.push(``);
 
   return content;
-}
+};

@@ -2,8 +2,7 @@ import * as d from '../../../declarations';
 import { MarkdownTable } from './docs-util';
 
 
-export function eventsToMarkdown(events: d.JsonDocsEvent[]) {
-
+export const eventsToMarkdown = (events: d.JsonDocsEvent[]) => {
   const content: string[] = [];
   if (events.length === 0) {
     return content;
@@ -33,11 +32,11 @@ export function eventsToMarkdown(events: d.JsonDocsEvent[]) {
   content.push(``);
 
   return content;
-}
+};
 
-function getDocsField(prop: d.JsonDocsEvent) {
+const getDocsField = (prop: d.JsonDocsEvent) => {
   return `${prop.deprecation !== undefined
     ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
     : ''
   }${prop.docs}`;
-}
+};

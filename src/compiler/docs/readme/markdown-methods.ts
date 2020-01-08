@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import { MarkdownTable } from './docs-util';
 
 
-export function methodsToMarkdown(methods: d.JsonDocsMethod[]) {
+export const methodsToMarkdown = (methods: d.JsonDocsMethod[]) => {
   const content: string[] = [];
   if (methods.length === 0) {
     return content;
@@ -47,9 +47,9 @@ export function methodsToMarkdown(methods: d.JsonDocsMethod[]) {
   return content;
 }
 
-function getDocsField(prop: d.JsonDocsMethod) {
+const getDocsField = (prop: d.JsonDocsMethod) => {
   return `${prop.deprecation !== undefined
     ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
     : ''
   }${prop.docs}`;
-}
+};

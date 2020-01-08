@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import { generateReadme } from './output-docs';
 import { isOutputTargetDocsReadme } from '../../output-targets/output-utils';
 
-export async function generateReadmeDocs(config: d.Config, compilerCtx: d.CompilerCtx, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) {
+export const generateReadmeDocs = async (config: d.Config, compilerCtx: d.CompilerCtx, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) => {
   const readmeOutputTargets = outputTargets.filter(isOutputTargetDocsReadme);
   if (readmeOutputTargets.length === 0) {
     return;
@@ -15,9 +15,9 @@ export async function generateReadmeDocs(config: d.Config, compilerCtx: d.Compil
   await Promise.all(docsData.components.map(cmpData => {
     return generateReadme(config, compilerCtx, readmeOutputTargets, cmpData, docsData.components);
   }));
-}
+};
 
-export function strickCheckDocs(config: d.Config, docsData: d.JsonDocs) {
+export const strickCheckDocs = (config: d.Config, docsData: d.JsonDocs) => {
   docsData.components.forEach(component => {
     component.props.forEach(prop => {
       if (!prop.docs && prop.deprecation === undefined) {
@@ -35,4 +35,4 @@ export function strickCheckDocs(config: d.Config, docsData: d.JsonDocs) {
       }
     });
   });
-}
+};

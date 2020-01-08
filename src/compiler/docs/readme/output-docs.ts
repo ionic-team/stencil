@@ -8,7 +8,8 @@ import { slotsToMarkdown } from './markdown-slots';
 import { depsToMarkdown } from './markdown-dependencies';
 import { AUTO_GENERATE_COMMENT } from '../../docs/constants';
 
-export async function generateReadme(config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docsData: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) {
+
+export const generateReadme = async (config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docsData: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) => {
   const isUpdate = !!docsData.readme;
   const userContent = isUpdate ? docsData.readme : getDefaultReadme(docsData);
 
@@ -27,9 +28,9 @@ export async function generateReadme(config: d.Config, compilerCtx: d.CompilerCt
       }
     }
   }));
-}
+};
 
-export function generateMarkdown(config: d.Config, userContent: string, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[], footer: string) {
+export const generateMarkdown = (config: d.Config, userContent: string, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[], footer: string) => {
   return [
     userContent,
     AUTO_GENERATE_COMMENT,
@@ -48,9 +49,9 @@ export function generateMarkdown(config: d.Config, userContent: string, cmp: d.J
     footer,
     ''
   ].join('\n');
-}
+};
 
-function getDeprecation(cmp: d.JsonDocsComponent) {
+const getDeprecation = (cmp: d.JsonDocsComponent) => {
   if (cmp.deprecation !== undefined) {
     return [
       `> **[DEPRECATED]** ${cmp.deprecation}`,
@@ -58,13 +59,13 @@ function getDeprecation(cmp: d.JsonDocsComponent) {
     ];
   }
   return [];
-}
+};
 
-function getDefaultReadme(docsData: d.JsonDocsComponent) {
+const getDefaultReadme = (docsData: d.JsonDocsComponent) => {
   return [
     `# ${docsData.tag}`,
     '',
     '',
     ''
   ].join('\n');
-}
+};
