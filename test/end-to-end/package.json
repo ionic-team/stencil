@@ -6,7 +6,7 @@
   "types": "dist/types/components.d.ts",
   "collection": " dist/collection/collection-manifest.json",
   "scripts": {
-    "build": "node ../../bin/stencil build --next",
+    "build": "node ../../bin/stencil build --next --docs",
     "start": "node ../../bin/stencil build --debug --watch --dev --serve",
     "test": "node ../../bin/stencil test --ci --e2e --spec --screenshot",
     "test.e2e": "node ../../bin/stencil test --e2e",

@@ -5,6 +5,7 @@ import { methodsToMarkdown } from './markdown-methods';
 import { usageToMarkdown } from './markdown-usage';
 import { stylesToMarkdown } from './markdown-css-props';
 import { slotsToMarkdown } from './markdown-slots';
+import { partsToMarkdown } from './markdown-parts';
 import { depsToMarkdown } from './markdown-dependencies';
 import { AUTO_GENERATE_COMMENT } from '../../docs/constants';
 
@@ -42,6 +43,7 @@ export const generateMarkdown = (config: d.Config, userContent: string, cmp: d.J
     ...eventsToMarkdown(cmp.events),
     ...methodsToMarkdown(cmp.methods),
     ...slotsToMarkdown(cmp.slots),
+    ...partsToMarkdown(cmp.parts),
     ...stylesToMarkdown(cmp.styles),
     ...depsToMarkdown(config, cmp, cmps),
     `----------------------------------------------`,

@@ -1,7 +1,11 @@
 import { Component, Event, EventEmitter, Prop, h } from '@stencil/core';
 import { CarData } from './car-data';
 
-
+/**
+ * Component that helps display a list of cars
+ * @slot header - The slot for the header content.
+ * @part car - The shadow part to target to style the car.
+ */
 @Component({
   tag: 'car-list',
   styleUrl: 'car-list.css',
