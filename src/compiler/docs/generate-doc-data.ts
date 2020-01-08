@@ -48,9 +48,10 @@ const getComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, build
         methods: getMethods(cmp.methods),
         events: getEvents(cmp.events),
         styles: getStyles(cmp),
-        slots: getSlots(cmp.docs.tags)
+        slots: getSlots(cmp.docs.tags),
+        parts: getParts(cmp.docs.tags)
       }));
-    }));
+  }));
 
   return sortBy(flatOne(results), cmp => cmp.tag);
 };
@@ -237,13 +238,19 @@ const getDeprecation = (tags: d.JsonDocsTag[]) => {
 const getSlots = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
   return sortBy(getNameText('slot', tags)
     .map(([name, docs]) => ({ name, docs }))
-  , a => a.name);
+    , a => a.name);
+};
+
+const getParts = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
+  return sortBy(getNameText('part', tags)
+    .map(([name, docs]) => ({ name, docs }))
+    , a => a.name);
 };
 
 export const getNameText = (name: string, tags: d.JsonDocsTag[]) => {
   return tags
     .filter(tag => tag.name === name && tag.text)
-    .map(({text}) => {
+    .map(({ text }) => {
       const [namePart, ...rest] = (' ' + text).split(' - ');
       return [
         namePart.trim(),
@@ -259,7 +266,7 @@ const getUserReadmeContent = async (compilerCtx: d.CompilerCtx, readmePath: stri
     if (userContentIndex >= 0) {
       return existingContent.substring(0, userContentIndex);
     }
-  } catch (e) {}
+  } catch (e) { }
   return undefined;
 };
 
@@ -316,7 +323,7 @@ const generateUsages = async (config: d.Config, compilerCtx: d.CompilerCtx, usag
       rtn[key] = usages[key];
     });
 
-  } catch (e) {}
+  } catch (e) { }
 
   return rtn;
 };
