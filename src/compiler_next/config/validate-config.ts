@@ -1,7 +1,7 @@
 import { Config, ConfigBundle, Diagnostic } from '../../declarations';
 import { buildError, isBoolean, sortBy, buildWarn } from '@utils';
 import { validateDevServer } from './validate-dev-server';
-import { validateDistNamespace } from 'src/compiler/config/validate-namespace';
+import { validateDistNamespace } from '../../compiler/config/validate-namespace';
 import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './outputs';
 import { validatePaths } from './validate-paths';
