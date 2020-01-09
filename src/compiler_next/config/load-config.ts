@@ -2,10 +2,10 @@ import { buildError, catchError, isString, normalizePath, hasError } from '@util
 import { CompilerSystem, Config, Diagnostic, LoadConfigInit, LoadConfigResults } from '../../declarations';
 import { createLogger } from '../sys/logger';
 import { createSystem } from '../sys/stencil-sys';
-import { getTsConfigPath } from '../sys/typescript/typescript-patch';
 import { loadTypescript } from '../sys/typescript/typescript-load';
 import { IS_NODE_ENV } from '../sys/environment';
 import { validateConfig } from './validate-config';
+import { validateTsConfig } from '../sys/typescript/typescript-config';
 import path from 'path';
 import tsTypes from 'typescript';
 
@@ -14,12 +14,16 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
   const results: LoadConfigResults = {
     config: null,
     diagnostics: [],
+    tsconfig: {
+      compilerOptions: null,
+    },
   };
 
   try {
     const sys = init.sys || createSystem();
     const config = init.config || {};
     const cwd = sys.getCurrentDirectory();
+    const tsPromise = loadTypescript(results.diagnostics);
     let configPath = init.configPath || config.configPath;
     let isDefaultConfigPath = true;
 
@@ -84,7 +88,14 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
     results.config.logger = init.logger || results.config.logger || createLogger();
     results.config.logger.level = results.config.logLevel;
 
-    results.config.tsconfig = await getTsConfigPath(results.config);
+    const loadedTs = await tsPromise;
+    if (!hasError(results.diagnostics)) {
+      const tsConfigResults = await validateTsConfig(loadedTs, results.config, sys, init);
+      results.diagnostics.push(...tsConfigResults.diagnostics);
+
+      results.config.tsconfig = tsConfigResults.path
+      results.tsconfig.compilerOptions = tsConfigResults.compilerOptions;
+    }
 
   } catch (e) {
     catchError(results.diagnostics, e);
@@ -208,7 +219,7 @@ const evaluateConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[]
 };
 
 
-const transpileTypedConfig = (ts: any, diagnostics: Diagnostic[], sourceText: string, filePath: string) => {
+const transpileTypedConfig = (ts: typeof tsTypes, diagnostics: Diagnostic[], sourceText: string, filePath: string) => {
   // let's transpile an awesome stencil.config.ts file into
   // a boring stencil.config.js file
   if (hasError(diagnostics)) {

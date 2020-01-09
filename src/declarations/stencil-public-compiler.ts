@@ -1344,11 +1344,20 @@ export interface LoadConfigInit {
   configPath?: string;
   logger?: Logger;
   sys?: CompilerSystem;
+  /**
+   * When set to true, if the "tsconfig.json" file is not found
+   * it'll automatically generate and save a default tsconfig
+   * within the root directory.
+   */
+  initTsConfig?: boolean;
 }
 
 export interface LoadConfigResults {
   config: Config;
   diagnostics: Diagnostic[];
+  tsconfig: {
+    compilerOptions: any;
+  }
 }
 
 export interface Diagnostic {

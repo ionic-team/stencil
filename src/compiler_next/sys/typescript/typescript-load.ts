@@ -4,13 +4,22 @@ import { catchError } from '@utils';
 import { getRemoteTypeScriptUrl } from '../dependencies';
 import { HAS_FETCH_CACHE, IS_NODE_ENV, IS_WEB_WORKER_ENV, requireFunc } from '../environment';
 import { patchTsSystemUtils } from './typescript-sys';
+import { version } from '../../../version';
+import ts from 'typescript';
 
 
-export const loadTypescript = async (diagnostics: d.Diagnostic[]) => {
+export const loadTypescript = async (diagnostics: d.Diagnostic[]): Promise<typeof ts> => {
   try {
+    if ((ts as any).__loaded) {
+      // already loaded
+      return ts;
+    }
+
     if (IS_NODE_ENV) {
       // NodeJS
-      return requireFunc('typescript');
+      const nodeTs = requireFunc('typescript');
+      nodeTs.__loaded = true;
+      return nodeTs;
     }
 
     if (IS_WEB_WORKER_ENV) {
@@ -18,6 +27,7 @@ export const loadTypescript = async (diagnostics: d.Diagnostic[]) => {
       const tsExternalUrl = getRemoteTypeScriptUrl();
       const tsExternal = await importTypescriptScript(tsExternalUrl);
       if (tsExternal) {
+        tsExternal.__loaded = true;
         return tsExternal;
       }
 
@@ -29,19 +39,22 @@ export const loadTypescript = async (diagnostics: d.Diagnostic[]) => {
   } catch (e) {
     catchError(diagnostics, e);
   }
+  return null;
 };
 
 const importTypescriptScript = async (tsUrl: string) => {
   let importedTs: any = null;
   try {
 
-    // if (compilerBuild.stencilVersion.includes('-dev.')) {
-    //   // be able to easily step through and debug typescript.js
-    //   (self as any).importScripts(tsUrl);
-    //   if ((self as any).ts) {
-    //     ts = (self as any).ts;
-    //   }
-    // }
+    if (version.includes('-dev.')) {
+      // be able to easily step through and debug typescript.js
+      // but a prod build of stencil.js should use the fetch()
+      // way so we can cache it better
+      (self as any).importScripts(tsUrl);
+      if ((self as any).ts) {
+        importedTs = (self as any).ts;
+      }
+    }
 
     if (!importedTs) {
       const content = await cachedTypescriptFetch(tsUrl);
