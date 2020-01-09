@@ -36,7 +36,14 @@ export const validateTsConfig = async (ts: typeof tsTypes, config: d.Config, sys
 
       if (results.errors && results.errors.length > 0) {
         results.errors.forEach(configErr => {
-          tsconfig.diagnostics.push(loadTypeScriptDiagnostic(configErr));
+          const tsDiagnostic = loadTypeScriptDiagnostic(configErr);
+          if (tsDiagnostic.code === '18003') {
+            // "No inputs were found in config file"
+            // fine to just "warn" rather than "error" even before starting
+            tsDiagnostic.level = 'warn';
+          }
+          tsDiagnostic.absFilePath = tsconfig.path;
+          tsconfig.diagnostics.push(tsDiagnostic);
         });
 
       } else {
