@@ -1,4 +1,7 @@
-# 🍨 [1.9.0-10](https://github.com/ionic-team/stencil/compare/1.8.4...v1.9.0-10) (2020-01-08)
+# 🏇 [1.9.0-11](https://github.com/ionic-team/stencil/compare/1.8.5...v1.9.0-11) (2020-01-09)
+
+
+### Bug Fixes
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
 
@@ -21,6 +24,7 @@ Some of main features with the `--next` compiler include:
 * **mock-doc:** add insertAdjacentHTML ([42921d2](https://github.com/ionic-team/stencil/commit/42921d2ede7ee9b2840ca851e8887682194f1ee8)), closes [#1980](https://github.com/ionic-team/stencil/issues/1980)
 * **mock-doc:** get attributes by index ([d91b197](https://github.com/ionic-team/stencil/commit/d91b197f1ba57e15f336a1213fc29e4051e61906)), closes [#1211](https://github.com/ionic-team/stencil/issues/1211)
 * **worker:** transfer any typedArray ([302ddb1](https://github.com/ionic-team/stencil/commit/302ddb1f3cb9ee2efd5430856eabe4672fb1a903))
+* **docs:** Add documentation output for Shadow Parts ([#2122](https://github.com/ionic-team/stencil/issues/2122)) ([f7cd61a](https://github.com/ionic-team/stencil/commit/f7cd61a52f6d46bdabbc359fc9c86a6fa7e4c632))
 * **e2e:** add togglesAttribute() and removeAttribute() to e2e elements ([5b28be8](https://github.com/ionic-team/stencil/commit/5b28be88c8418a84ef168f126c269931c1151a63)), closes [#1745](https://github.com/ionic-team/stencil/issues/1745)
 * **mock-doc:** selector to handle child combinators ([#2037](https://github.com/ionic-team/stencil/issues/2037)) ([6fd43e7](https://github.com/ionic-team/stencil/commit/6fd43e75eb2828c188ef22c59504e3c211639cd5))
 * **test:** Add two event detail jest matchers ([ebc518d](https://github.com/ionic-team/stencil/commit/ebc518dd258be44b9c5e74c440c5134086ab55f9)), closes [#2046](https://github.com/ionic-team/stencil/issues/2046)
@@ -30,6 +34,8 @@ Some of main features with the `--next` compiler include:
 * **runtime:** experimental active render context ([#2040](https://github.com/ionic-team/stencil/issues/2040)) ([75ed488](https://github.com/ionic-team/stencil/commit/75ed488667020065eec908365a4595b8d2a32531))
 * **bundler:** txt plugin ([b0efb11](https://github.com/ionic-team/stencil/commit/b0efb11e6d10fb501e0ef35cdff8951983ffcdc4))
 * **compiler:** add Build.isServer ([56d94f3](https://github.com/ionic-team/stencil/commit/56d94f33db5917e402692cf1740e0b62047e4e63))
+* **config:** also load and validate tsconfig within loadConfig() ([cbff6e1](https://github.com/ionic-team/stencil/commit/cbff6e1535942e2f83681e63240556779a38cb35))
+* **hydrate:** always build hydrate if it's an output ([92a6015](https://github.com/ionic-team/stencil/commit/92a6015a77aff622ec4c43578e6f4623136b9045))
 
 
 ### Bug Fixes
@@ -121,6 +127,14 @@ Some of main features with the `--next` compiler include:
 * **compiler:** resolve dependencies package.json correctly ([0f029ae](https://github.com/ionic-team/stencil/commit/0f029ae5dd398af76eee795f505695fc73fb607c))
 * **next:** ensure at least one output target ([751ada9](https://github.com/ionic-team/stencil/commit/751ada95a1dceaafe3e9596cff54e0733aad6c0f))
 * **worker:** fix passing back worker error ([9304db7](https://github.com/ionic-team/stencil/commit/9304db74535e9eeb8fb62655c3537ac18f11bf40))
+* **es5:** optionally do not include polyfills for dist builds ([4964f1e](https://github.com/ionic-team/stencil/commit/4964f1ebdf06ae77a6a39edb7c666f34a5afb23c)), closes [#2005](https://github.com/ionic-team/stencil/issues/2005)
+* **namespace:** fix namespaces w/ dashes ([84ef0b2](https://github.com/ionic-team/stencil/commit/84ef0b2562f0d8776b28ae1da728e87e3884a29e)), closes [#2116](https://github.com/ionic-team/stencil/issues/2116)
+* **next:** copy cmp assets to correct directory ([8887579](https://github.com/ionic-team/stencil/commit/88875797be0aa323578a193acb9e9d19fa6d46fb)), closes [#2120](https://github.com/ionic-team/stencil/issues/2120)
+* **next:** normalize paths ([#2124](https://github.com/ionic-team/stencil/issues/2124)) ([f980954](https://github.com/ionic-team/stencil/commit/f980954c33f38ca156558e9a54223512cd0bea6f))
+* **polyfills:** apply SystemJS polyfill conditionally ([#2118](https://github.com/ionic-team/stencil/issues/2118)) ([8b68d0c](https://github.com/ionic-team/stencil/commit/8b68d0cedcaaa7f2e5e6c13adbd015a7bc861a32)), closes [#2005](https://github.com/ionic-team/stencil/issues/2005)
+* **prerender:** add reflect to attributes while prerendering ([7974c41](https://github.com/ionic-team/stencil/commit/7974c41325889fc09491feea2ca21172ad86187c)), closes [#2119](https://github.com/ionic-team/stencil/issues/2119)
+* **reflect:** reflect attrs when no vnode attr ([2b948b2](https://github.com/ionic-team/stencil/commit/2b948b241b12acf3b988ecb84d1d633238a227ff))
+* **shadowDom:** improve supports shadow dom check ([8b5aa06](https://github.com/ionic-team/stencil/commit/8b5aa06e31919b16a9e11268441d250e254da36f)), closes [#2117](https://github.com/ionic-team/stencil/issues/2117)
 
 
 
