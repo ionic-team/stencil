@@ -188,19 +188,6 @@ function runTasks(opts) {
         task: () => execa('git', ['push', '--tags'], { cwd: rootDir })
       }
     );
-
-    if (opts.tag !== 'next' && opts.tag !== 'test') {
-      tasks.push(
-        {
-          title: 'Also set "next" tag on @stencil/core',
-          task: () => execa(
-            'npm',
-            ['dist-tag', 'add', '@stencil/core@' + opts.version, 'next']
-              .concat(opts.otp ? ['--otp', opts.otp] : []),
-            { cwd: rootDir })
-        }
-      );
-    }
   }
 
   const listr = new Listr(tasks, { showSubtasks: false });
