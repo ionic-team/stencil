@@ -42,7 +42,7 @@ async function writeSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, l
 }
 
 async function getSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, corePath: string, includePolyfills: boolean) {
-  const polyfills = includePolyfills ? await getAppBrowserCorePolyfills(config, compilerCtx) : '';
+  const polyfills = includePolyfills ? await getAppBrowserCorePolyfills(config, compilerCtx) : '/* polyfills excluded */';
   return `
 'use strict';
 (function () {

@@ -31,25 +31,25 @@ export const generateSystem = async (
   }
 };
 
-function generateSystemLoaders(config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], systemOutputs: d.OutputTargetDistLazy[]) {
+const generateSystemLoaders = (config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], systemOutputs: d.OutputTargetDistLazy[]) => {
   const loaderFilename = rollupResult.find(r => r.type === 'chunk' && r.isBrowserLoader).fileName;
 
   return Promise.all(
     systemOutputs.map((o) => writeSystemLoader(config, compilerCtx, loaderFilename, o))
   );
-}
+};
 
-async function writeSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, loaderFilename: string, outputTarget: d.OutputTargetDistLazy) {
+const writeSystemLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, loaderFilename: string, outputTarget: d.OutputTargetDistLazy) => {
   if (outputTarget.systemLoaderFile) {
     const entryPointPath = config.sys.path.join(outputTarget.systemDir, loaderFilename);
     const relativePath = relativeImport(config, outputTarget.systemLoaderFile, entryPointPath);
     const loaderContent = await getSystemLoader(config, compilerCtx, relativePath, outputTarget.polyfills);
     await compilerCtx.fs.writeFile(outputTarget.systemLoaderFile, loaderContent, { outputTargetType: outputTarget.type });
   }
-}
+};
 
-async function getSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, corePath: string, includePolyfills: boolean) {
-  const polyfills = includePolyfills ? await getAppBrowserCorePolyfills(config, compilerCtx) : '';
+const getSystemLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, corePath: string, includePolyfills: boolean) => {
+  const polyfills = includePolyfills ? await getAppBrowserCorePolyfills(config, compilerCtx) : '/* polyfills excluded */';
   return `
 'use strict';
 (function () {
@@ -84,4 +84,4 @@ async function getSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, cor
   }
 }).call(window);
 `;
-}
+};

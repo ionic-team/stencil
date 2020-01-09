@@ -1056,6 +1056,7 @@ export interface OutputTargetDist extends OutputTargetBase {
   typesDir?: string;
   esmLoaderPath?: string;
   copy?: CopyTask[];
+  polyfills?: boolean;
 
   empty?: boolean;
 }
