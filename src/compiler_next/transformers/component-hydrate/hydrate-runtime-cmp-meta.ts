@@ -14,7 +14,7 @@ export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d
     $members$: compactMeta[2],
     $listeners$: compactMeta[3],
     $lazyBundleIds$: fakeBundleIds(cmp),
-    $attrsToReflect$: []
+    $attrsToReflect$: getHydrateAttrsToReflect(cmp),
   };
   // We always need shadow-dom shim in hydrate runtime
   if (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
@@ -35,4 +35,13 @@ const fakeBundleIds = (cmp: d.ComponentCompilerMeta) => {
     return modes;
   }
   return '-';
+};
+
+const getHydrateAttrsToReflect = (cmp: d.ComponentCompilerMeta) => {
+  return cmp.properties.reduce((attrs, prop) => {
+    if (prop.reflect) {
+      attrs.push([prop.name, prop.attribute]);
+    }
+    return attrs;
+  }, [] as [string, string][]);
 };
