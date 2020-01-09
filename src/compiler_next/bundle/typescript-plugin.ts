@@ -3,6 +3,7 @@ import { CompilerCtx } from '../../declarations';
 import { getModule } from '../transpile/static-to-meta/parse-static';
 import { normalizeFsPath } from '@utils';
 import { Plugin } from 'rollup';
+import path from 'path';
 import ts from 'typescript';
 
 
@@ -13,7 +14,7 @@ export const typescriptPlugin = (compilerCtx: CompilerCtx, bundleOpts: BundleOpt
     name: `${bundleOpts.id}TypescriptPlugin`,
 
     load(id) {
-      if (id[0] === '/') {
+      if (path.isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
         const mod = getModule(compilerCtx, fsFilePath);
         if (mod) {
@@ -23,8 +24,9 @@ export const typescriptPlugin = (compilerCtx: CompilerCtx, bundleOpts: BundleOpt
       return null;
     },
     transform(_, id) {
-      if (id[0] === '/') {
-        const mod = getModule(compilerCtx, id);
+      if (path.isAbsolute(id)) {
+        const fsFilePath = normalizeFsPath(id);
+        const mod = getModule(compilerCtx, fsFilePath);
         if (mod && mod.cmps.length > 0) {
           const transformed = ts.transform(mod.staticSourceFile, bundleOpts.customTransformers).transformed[0];
           return tsPrinter.printFile(transformed);
