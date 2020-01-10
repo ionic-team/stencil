@@ -4,7 +4,7 @@ export { createTestRunner } from './jest/jest-runner';
 export { jestPreprocessor } from './jest/jest-preprocessor';
 export { jestSetupTestFramework } from './jest/jest-setup-test-framework';
 export { mockBuildCtx, mockConfig, mockCompilerCtx, mockDocument, mockFs, mockLogger, mockStencilSystem, mockWindow } from './mocks';
-export { mockFetch } from './mock-fetch';
+export { MockHeaders, MockRequest, MockRequestInit, MockRequestInfo, MockResponse, MockResponseInit, mockFetch } from './mock-fetch';
 export { newSpecPage } from './spec-page';
 export { shuffleArray } from './testing-utils';
 export { transpile } from './test-transpile';
