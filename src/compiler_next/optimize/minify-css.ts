@@ -1,19 +1,16 @@
 import { hasError } from '@utils';
-import { parseCss } from '../../compiler/style/parse-css';
-import { StringifyCss } from '../../compiler/style/stringify-css';
+import { parseCss } from '../../compiler/style/css-parser/parse-css';
+import { serializeCss } from '../../compiler/style/css-parser/serialize-css';
 
 
 export const minifyCss = (cssString: string) => {
-	const cssAst = parseCss(cssString);
+	const parseResults = parseCss(cssString);
 
-	if (hasError(cssAst.stylesheet.diagnostics)) {
+	if (hasError(parseResults.diagnostics)) {
 		return cssString;
 	}
 
-	const output = new StringifyCss({
-		removeTrailingSemicolon: true,
-		removeWhitespace: true,
-	});
+	const output = serializeCss(parseResults.stylesheet, {});
 
-	return output.compile(cssAst);
+	return output;
 };

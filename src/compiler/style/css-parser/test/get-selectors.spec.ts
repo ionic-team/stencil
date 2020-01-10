@@ -1,10 +1,10 @@
-import { getSelectors } from '../get-selectors';
+import { getCssSelectors } from '../get-css-selectors';
 
 
-describe('getSelectors', () => {
+describe('getCssSelectors', () => {
 
   it('attribute containing selector', () => {
-    const s = getSelectors('pre[class*="language-"]');
+    const s = getCssSelectors('pre[class*="language-"]');
 
     expect(s.tags).toHaveLength(1);
     expect(s.tags[0]).toBe('pre');
@@ -17,7 +17,7 @@ describe('getSelectors', () => {
   });
 
   it('should get complex selectors', () => {
-    const s = getSelectors('button.my-button#id[attr="value"]::before > + ~ @ button:not(.label)');
+    const s = getCssSelectors('button.my-button#id[attr="value"]::before > + ~ @ button:not(.label)');
 
     expect(s.tags).toHaveLength(2);
     expect(s.tags[0]).toBe('button');
@@ -34,7 +34,7 @@ describe('getSelectors', () => {
   });
 
   it('should not get selectors in :not()', () => {
-    const s = getSelectors('div:not(.my-class)');
+    const s = getCssSelectors('div:not(.my-class)');
 
     expect(s.tags).toHaveLength(1);
     expect(s.tags[0]).toBe('div');
@@ -43,7 +43,7 @@ describe('getSelectors', () => {
   });
 
   it('should get attrs selectors', () => {
-    const s = getSelectors('[attr-a][attr-b="value"] div[AtTr-c]');
+    const s = getCssSelectors('[attr-a][attr-b="value"] div[AtTr-c]');
 
     expect(s.attrs).toHaveLength(3);
     expect(s.attrs[0]).toBe('attr-a');
@@ -52,7 +52,7 @@ describe('getSelectors', () => {
   });
 
   it('should get id selectors', () => {
-    const s = getSelectors('#id-a div#ID-b');
+    const s = getCssSelectors('#id-a div#ID-b');
 
     expect(s.ids).toHaveLength(2);
     expect(s.ids[0]).toBe('id-a');
@@ -60,7 +60,7 @@ describe('getSelectors', () => {
   });
 
   it('should get class selectors', () => {
-    const s = getSelectors('.class-a.class-b div.ClAsS-c');
+    const s = getCssSelectors('.class-a.class-b div.ClAsS-c');
 
     expect(s.classNames).toHaveLength(3);
     expect(s.classNames[0]).toBe('class-a');

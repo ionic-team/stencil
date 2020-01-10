@@ -1,93 +1,32 @@
-
-/**
- * CSS parser adopted from rework/css by
- * TJ Holowaychuk (@tj)
- * Licensed under the MIT License
- * https://github.com/reworkcss/css/blob/master/LICENSE
- */
-import * as d from '../../declarations';
-
-// http://www.w3.org/TR/CSS21/grammar.html
-// https://github.com/visionmedia/css-parse/pull/49#issuecomment-30088027
-const commentre = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
+import * as d from '../../../declarations';
+import { ParseCssResults, CssNode, CssParsePosition } from './css-parse-declarations'
 
 
-export function parseCss(css: string, filePath?: string): {
-  type: string;
-  stylesheet: {
-    source: string;
-    rules: any[];
-    diagnostics: d.Diagnostic[]
-  }
-} {
+export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
+  let lineno = 1;
+  let column = 1;
 
-  /**
-   * Positional.
-   */
+  const diagnostics: d.Diagnostic[] = [];
 
-  var lineno = 1;
-  var column = 1;
-  var srcLines: string[];
-
-  /**
-   * Update lineno and column based on `str`.
-   */
-
-  function updatePosition(str: string) {
+  const updatePosition = (str: string) => {
     const lines = str.match(/\n/g);
     if (lines) lineno += lines.length;
     const i = str.lastIndexOf('\n');
     column = ~i ? str.length - i : column + str.length;
-  }
+  };
 
-  /**
-   * Mark position and patch `node.position`.
-   */
-
-  function position(): any {
+  const position = () => {
     const start = { line: lineno, column: column };
 
-    return function(node: any) {
+    return (node: CssNode) => {
       node.position = new ParsePosition(start);
       whitespace();
       return node;
     };
-  }
+  };
 
-  /**
-   * Store position information for a node
-   */
-
-  class ParsePosition {
-    start: any;
-    end: any;
-    source: any;
-    content: string;
-
-    constructor(start: any) {
-      this.start = start;
-      this.end = { line: lineno, column: column };
-      this.source = filePath;
-    }
-
-  }
-
-  /**
-   * Non-enumerable source string
-   */
-
-  ParsePosition.prototype.content = css;
-
-  /**
-   * Error `msg`.
-   */
-
-  const diagnostics: d.Diagnostic[] = [];
-
-  function error(msg: string) {
-    if (!srcLines) {
-      srcLines = css.split('\n');
-    }
+  const error = (msg: string): null => {
+    const srcLines = css.split('\n');
 
     const d: d.Diagnostic = {
       level: 'error',
@@ -128,13 +67,11 @@ export function parseCss(css: string, filePath?: string): {
     }
 
     diagnostics.push(d);
-  }
 
-  /**
-   * Parse stylesheet.
-   */
+    return null;
+  };
 
-  function stylesheet() {
+  const stylesheet = (): CssNode => {
     const rulesList = rules();
 
     return {
@@ -142,34 +79,25 @@ export function parseCss(css: string, filePath?: string): {
       stylesheet: {
         source: filePath,
         rules: rulesList,
-        diagnostics: diagnostics
       }
     };
   }
 
-  /**
-   * Opening brace.
-   */
+  const open = () => match(/^{\s*/);
+  const close = () => match(/^}/);
 
-  function open() {
-    return match(/^{\s*/);
-  }
+  const match = (re: any) => {
+    const m = re.exec(css);
+    if (!m) return;
+    const str = m[0];
+    updatePosition(str);
+    css = css.slice(str.length);
+    return m;
+  };
 
-  /**
-   * Closing brace.
-   */
-
-  function close() {
-    return match(/^}/);
-  }
-
-  /**
-   * Parse ruleset.
-   */
-
-  function rules() {
-    var node;
-    const rules: any[] = [];
+  const rules = () => {
+    let node: CssNode | void;
+    const rules: CssNode[] = [];
 
     whitespace();
     comments(rules);
@@ -184,32 +112,13 @@ export function parseCss(css: string, filePath?: string): {
   }
 
   /**
-   * Match `re` and return captures.
-   */
-
-  function match(re: any) {
-    const m = re.exec(css);
-    if (!m) return;
-    const str = m[0];
-    updatePosition(str);
-    css = css.slice(str.length);
-    return m;
-  }
-
-  /**
    * Parse whitespace.
    */
 
-  function whitespace() {
-    match(/^\s*/);
-  }
+  const whitespace = () => match(/^\s*/);
 
-  /**
-   * Parse comments;
-   */
-
-  function comments(rules?: any) {
-    var c;
+  const comments = (rules?: CssNode[]) => {
+    let c;
     rules = rules || [];
     while (c = comment()) {
       if (c !== false) {
@@ -217,17 +126,13 @@ export function parseCss(css: string, filePath?: string): {
       }
     }
     return rules;
-  }
+  };
 
-  /**
-   * Parse comment.
-   */
-
-  function comment() {
+  const comment = () => {
     const pos = position();
-    if ('/' !== css.charAt(0) || '*' !== css.charAt(1)) return;
+    if ('/' !== css.charAt(0) || '*' !== css.charAt(1)) return null;
 
-    var i = 2;
+    let i = 2;
     while ('' !== css.charAt(i) && ('*' !== css.charAt(i) || '/' !== css.charAt(i + 1))) ++i;
     i += 2;
 
@@ -235,27 +140,22 @@ export function parseCss(css: string, filePath?: string): {
       return error('End of comment missing');
     }
 
-    const str = css.slice(2, i - 2);
+    const comment = css.slice(2, i - 2);
     column += 2;
-    updatePosition(str);
+    updatePosition(comment);
     css = css.slice(i);
     column += 2;
 
     return pos({
       type: 'comment',
-      comment: str
+      comment
     });
   }
 
-  /**
-   * Parse selector.
-   */
-
-  function selector(): any {
+  const selector = () =>{
     const m: any = match(/^([^{]+)/);
-    if (!m) return;
-    /* @fix Remove all comments from selectors
-     * http://ostermiller.org/findcomment.html */
+    if (!m) return null;
+
     return trim(m[0])
       .replace(/\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/+/g, '')
       .replace(/"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, function(m) {
@@ -265,18 +165,14 @@ export function parseCss(css: string, filePath?: string): {
       .map(function(s) {
         return s.replace(/\u200C/g, ',');
       });
-  }
+  };
 
-  /**
-   * Parse declaration.
-   */
-
-  function declaration() {
+  const declaration = () => {
     const pos = position();
 
     // prop
-    var prop = match(/^(\*?[-#\/\*\\\w]+(\[[0-9a-z_-]+\])?)\s*/);
-    if (!prop) return;
+    let prop = match(/^(\*?[-#\/\*\\\w]+(\[[0-9a-z_-]+\])?)\s*/);
+    if (!prop) return null;
     prop = trim(prop[0]);
 
     // :
@@ -291,24 +187,19 @@ export function parseCss(css: string, filePath?: string): {
       value: val ? trim(val[0]).replace(commentre, '') : ''
     });
 
-    // ;
     match(/^[;\s]*/);
 
     return ret;
-  }
+  };
 
-  /**
-   * Parse declarations.
-   */
-
-  function declarations() {
-    const decls: any[] = [];
+  const declarations = () => {
+    const decls: CssNode[] = [];
 
     if (!open()) return error(`missing '{'`);
     comments(decls);
 
     // declarations
-    var decl;
+    let decl;
     while (decl = declaration()) {
       if (decl !== false) {
         decls.push(decl);
@@ -320,38 +211,30 @@ export function parseCss(css: string, filePath?: string): {
     return decls;
   }
 
-  /**
-   * Parse keyframe.
-   */
-
-  function keyframe() {
-    var m;
-    const vals = [];
+  const keyframe = () => {
+    let m;
+    const values: string[] = [];
     const pos = position();
 
     while (m = match(/^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/)) {
-      vals.push(m[1]);
+      values.push(m[1]);
       match(/^,\s*/);
     }
 
-    if (!vals.length) return;
+    if (!values.length) return null;
 
     return pos({
       type: 'keyframe',
-      values: vals,
+      values,
       declarations: declarations()
     });
   }
 
-  /**
-   * Parse keyframes.
-   */
-
-  function atkeyframes() {
+  const atkeyframes = () => {
     const pos = position();
-    var m = match(/^@([-\w]+)?keyframes\s*/);
+    let m = match(/^@([-\w]+)?keyframes\s*/);
+    if (!m) return null;
 
-    if (!m) return;
     const vendor = m[1];
 
     // identifier
@@ -361,8 +244,8 @@ export function parseCss(css: string, filePath?: string): {
 
     if (!open()) return error(`@keyframes missing '{'`);
 
-    var frame;
-    var frames = comments();
+    let frame: CssNode;
+    let frames = comments();
     while (frame = keyframe()) {
       frames.push(frame);
       frames = frames.concat(comments());
@@ -378,15 +261,11 @@ export function parseCss(css: string, filePath?: string): {
     });
   }
 
-  /**
-   * Parse supports.
-   */
-
-  function atsupports() {
+  const atsupports = () => {
     const pos = position();
     const m = match(/^@supports *([^{]+)/);
 
-    if (!m) return;
+    if (!m) return null;
     const supports = trim(m[1]);
 
     if (!open()) return error(`@supports missing '{'`);
@@ -400,17 +279,13 @@ export function parseCss(css: string, filePath?: string): {
       supports: supports,
       rules: style
     });
-  }
+  };
 
-  /**
-   * Parse host.
-   */
-
-  function athost() {
+  const athost = () => {
     const pos = position();
     const m = match(/^@host\s*/);
 
-    if (!m) return;
+    if (!m) return null;
 
     if (!open()) return error(`@host missing '{'`);
 
@@ -422,17 +297,13 @@ export function parseCss(css: string, filePath?: string): {
       type: 'host',
       rules: style
     });
-  }
+  };
 
-  /**
-   * Parse media.
-   */
-
-  function atmedia() {
+  const atmedia = () => {
     const pos = position();
     const m = match(/^@media *([^{]+)/);
 
-    if (!m) return;
+    if (!m) return null;
     const media = trim(m[1]);
 
     if (!open()) return error(`@media missing '{'`);
@@ -446,41 +317,31 @@ export function parseCss(css: string, filePath?: string): {
       media: media,
       rules: style
     });
-  }
+  };
 
-
-  /**
-   * Parse custom-media.
-   */
-
-  function atcustommedia() {
+  const atcustommedia = () => {
     const pos = position();
     const m = match(/^@custom-media\s+(--[^\s]+)\s*([^{;]+);/);
-    if (!m) return;
+    if (!m) return null;
 
     return pos({
       type: 'custom-media',
       name: trim(m[1]),
       media: trim(m[2])
     });
-  }
+  };
 
-  /**
-   * Parse paged media.
-   */
-
-  function atpage() {
+  const atpage = () => {
     const pos = position();
     const m = match(/^@page */);
-    if (!m) return;
+    if (!m) return null;
 
     const sel = selector() || [];
 
     if (!open()) return error(`@page missing '{'`);
-    var decls = comments();
+    let decls = comments();
 
-    // declarations
-    var decl;
+    let decl: CssNode | void;
     while (decl = declaration()) {
       decls.push(decl);
       decls = decls.concat(comments());
@@ -495,14 +356,10 @@ export function parseCss(css: string, filePath?: string): {
     });
   }
 
-  /**
-   * Parse document.
-   */
-
-  function atdocument() {
+  const atdocument = () => {
     const pos = position();
     const m = match(/^@([-\w]+)?document *([^{]+)/);
-    if (!m) return;
+    if (!m) return null;
 
     const vendor = trim(m[1]);
     const doc = trim(m[2]);
@@ -519,22 +376,17 @@ export function parseCss(css: string, filePath?: string): {
       vendor: vendor,
       rules: style
     });
-  }
+  };
 
-  /**
-   * Parse font-face.
-   */
-
-  function atfontface() {
+  const atfontface = () => {
     const pos = position();
     const m = match(/^@font-face\s*/);
-    if (!m) return;
+    if (!m) return null;
 
     if (!open()) return error(`@font-face missing '{'`);
-    var decls = comments();
+    let decls = comments();
 
-    // declarations
-    var decl;
+    let decl: CssNode | void;
     while (decl = declaration()) {
       decls.push(decl);
       decls = decls.concat(comments());
@@ -548,48 +400,26 @@ export function parseCss(css: string, filePath?: string): {
     });
   }
 
-  /**
-   * Parse import
-   */
-
-  const atimport = _compileAtrule('import');
-
-  /**
-   * Parse charset
-   */
-
-  const atcharset = _compileAtrule('charset');
-
-  /**
-   * Parse namespace
-   */
-
-  const atnamespace = _compileAtrule('namespace');
-
-  /**
-   * Parse non-block at-rules
-   */
-
-
-  function _compileAtrule(name: any) {
+  const _compileAtrule = (name: string) => {
     const re = new RegExp('^@' + name + '\\s*([^;]+);');
-    return function() {
+    return () => {
       const pos = position();
       const m = match(re);
-      if (!m) return;
+      if (!m) return null;
       const ret: any = { type: name };
       ret[name] = m[1].trim();
       return pos(ret);
     };
   }
 
-  /**
-   * Parse at rule.
-   */
+  const atimport = _compileAtrule('import');
 
-  function atrule() {
-    if (css[0] !== '@') return;
+  const atcharset = _compileAtrule('charset');
 
+  const atnamespace = _compileAtrule('namespace');
+
+  const atrule = () => {
+    if (css[0] !== '@') return null;
     return atkeyframes()
       || atmedia()
       || atcustommedia()
@@ -601,13 +431,9 @@ export function parseCss(css: string, filePath?: string): {
       || atpage()
       || athost()
       || atfontface();
-  }
+  };
 
-  /**
-   * Parse rule.
-   */
-
-  function rule() {
+  const rule = () => {
     const pos = position();
     const sel = selector();
 
@@ -621,22 +447,33 @@ export function parseCss(css: string, filePath?: string): {
     });
   }
 
-  return addParent(stylesheet());
+  class ParsePosition implements CssParsePosition {
+    start: any;
+    end: any;
+    source: any;
+    content: string;
+
+    constructor(start: any) {
+      this.start = start;
+      this.end = { line: lineno, column: column };
+      this.source = filePath;
+    }
+  }
+  ParsePosition.prototype.content = css;
+
+  return {
+    diagnostics,
+    ...addParent(stylesheet())
+  };
 }
 
-/**
- * Trim `str`.
- */
-
-function trim(str: string) {
-  return str ? str.trim() : '';
-}
+const trim = (str: string) => str ? str.trim() : '';
 
 /**
  * Adds non-enumerable parent node reference to each node.
  */
 
-function addParent(obj?: any, parent?: any) {
+const addParent = (obj?: any, parent?: any) => {
   const isNode = obj && typeof obj.type === 'string';
   const childParent = isNode ? obj : parent;
 
@@ -659,4 +496,8 @@ function addParent(obj?: any, parent?: any) {
   }
 
   return obj;
-}
+};
+
+// http://www.w3.org/TR/CSS21/grammar.html
+// https://github.com/visionmedia/css-parse/pull/49#issuecomment-30088027
+const commentre = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;

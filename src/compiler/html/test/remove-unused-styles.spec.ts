@@ -127,12 +127,12 @@ describe('removeUnusedStyles', () => {
 
     const css = doc.querySelector('style').innerHTML;
 
-    expectSelector(css, 'div { font: used; }');
-    expectSelector(css, 'label { font: used; }');
-    expectSelector(css, 'div label { font: used; }');
-    expectSelector(css, 'div label#usedId { font: used; }');
-    expectSelector(css, 'div label#usedId.my-used { font: used; }');
-    expectSelector(css, 'div label#usedId.my-used[mph] { font: used; }');
+    expectSelector(css, 'div{font:used}');
+    expectSelector(css, 'label{font:used}');
+    expectSelector(css, 'div label{font:used}');
+    expectSelector(css, 'div label#usedId{font:used}');
+    expectSelector(css, 'div label#usedId.my-used{font:used}');
+    expectSelector(css, 'div label#usedId.my-used[mph]{font:used}');
   });
 
   it('should remove unused id selector', () => {
@@ -162,7 +162,7 @@ describe('removeUnusedStyles', () => {
 
     const css = doc.querySelector('style').innerHTML;
 
-    expectSelector(css, 'label { font: used; }');
+    expectSelector(css, 'label{font:used}');
     expectSelector(css, 'label#usedId');
     expectSelector(css, '#another-UsedId');
     expectNoSelector(css, 'label#unusedId');
@@ -191,7 +191,7 @@ describe('removeUnusedStyles', () => {
 
     const css = doc.querySelector('style').innerHTML;
 
-    expectSelector(css, 'label { font: used; }');
+    expectSelector(css, 'label{font:used}');
     expectSelector(css, 'label[mph="88"]');
     expectNoSelector(css, 'label[unused="val"]');
   });

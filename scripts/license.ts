@@ -7,6 +7,7 @@ import { PackageData } from './utils/write-pkg-json';
 const entryDeps = [
   'ansi-colors',
   'autoprefixer',
+  'css',
   'exit',
   'glob',
   'graceful-fs',

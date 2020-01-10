@@ -1,6 +1,6 @@
 
 
-export function getSelectors(sel: string) {
+export const getCssSelectors = (sel: string) => {
   // reusing global SELECTORS since this is a synchronous operation
   SELECTORS.all.length = SELECTORS.tags.length = SELECTORS.classNames.length = SELECTORS.ids.length = SELECTORS.attrs.length = 0;
 
@@ -15,7 +15,7 @@ export function getSelectors(sel: string) {
 
   const items = sel.split(' ');
 
-  for (var i = 0; i < items.length; i++) {
+  for (let i = 0, l = items.length; i < l; i++) {
     items[i] = items[i].split(':')[0];
 
     if (items[i].length === 0) continue;
@@ -42,8 +42,7 @@ export function getSelectors(sel: string) {
   });
 
   return SELECTORS;
-}
-
+};
 
 const SELECTORS: { all: string[], tags: string[], classNames: string[], ids: string[], attrs: string[] } = {
   all: [],

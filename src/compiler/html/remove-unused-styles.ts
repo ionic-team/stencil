@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import { parseCss } from '../style/parse-css';
-import { StringifyCss } from '../style/stringify-css';
-import { UsedSelectors } from '../style/used-selectors';
+import { parseCss } from '../style/css-parser/parse-css';
+import { serializeCss } from '../style/css-parser/serialize-css';
+import { UsedSelectors } from '../style/css-parser/used-selectors';
 import { hasError } from '@utils';
 
 
@@ -23,9 +23,9 @@ export function removeUnusedStyles(doc: Document, diagnostics: d.Diagnostic[]) {
 function removeUnusedStyleText(usedSelectors: UsedSelectors, diagnostics: d.Diagnostic[], styleElm: HTMLStyleElement) {
   try {
     // parse the css from being applied to the document
-    const cssAst = parseCss(styleElm.innerHTML);
+    const parseResults = parseCss(styleElm.innerHTML);
 
-    diagnostics.push(...cssAst.stylesheet.diagnostics);
+    diagnostics.push(...parseResults.diagnostics);
     if (hasError(diagnostics)) {
       return;
     }
@@ -33,10 +33,9 @@ function removeUnusedStyleText(usedSelectors: UsedSelectors, diagnostics: d.Diag
     try {
       // convert the parsed css back into a string
       // but only keeping what was found in our active selectors
-      const stringify = new StringifyCss({
+      styleElm.innerHTML = serializeCss(parseResults.stylesheet, {
         usedSelectors
       });
-      styleElm.innerHTML = stringify.compile(cssAst);
 
     } catch (e) {
       diagnostics.push({

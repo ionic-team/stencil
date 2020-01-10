@@ -53,7 +53,7 @@ export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
     if (hasError(optimizeResults.diagnostics)) {
       return results;
     }
-    results.code = optimizeResults.css;
+    results.styleText = optimizeResults.css;
 
     s.append(`${JSON.stringify(results.styleText)};\n`);
 
