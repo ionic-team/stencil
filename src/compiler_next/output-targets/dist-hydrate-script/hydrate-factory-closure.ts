@@ -1,4 +1,6 @@
 
+export const HYDRATE_APP_CLOSURE_START = `/*hydrateAppClosure start*/`;
+
 export const HYDRATE_FACTORY_INTRO = `
 export function hydrateFactory($stencilWindow, $stencilHydrateOpts, $stencilHydrateResults, $stencilAfterHydrate, $stencilHydrateResolve) {
   var globalThis = $stencilWindow;
@@ -71,9 +73,11 @@ export function hydrateFactory($stencilWindow, $stencilHydrateOpts, $stencilHydr
   function hydrateAppClosure($stencilWindow) {
     const window = $stencilWindow;
     const document = $stencilWindow.document;
+    ${HYDRATE_APP_CLOSURE_START}
 `;
 
 export const HYDRATE_FACTORY_OUTRO = `
+    /*hydrateAppClosure end*/
     hydrateApp(window, $stencilHydrateOpts, $stencilHydrateResults, $stencilAfterHydrate, $stencilHydrateResolve);
   }
 

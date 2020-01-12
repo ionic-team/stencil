@@ -262,7 +262,7 @@ class MockResponse404 extends MockResponse {
 }
 
 
-export interface MockedResponseData {
+interface MockedResponseData {
   response: MockResponse;
   reject: boolean;
 }

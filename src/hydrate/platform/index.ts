@@ -67,7 +67,8 @@ export const writeTask = (cb: Function) => {
   });
 };
 
-export const nextTick = /*@__PURE__*/(cb: () => void) => Promise.resolve().then(cb);
+const resolved = /*@__PURE__*/Promise.resolve();
+export const nextTick = /*@__PURE__*/(cb: () => void) => resolved.then(cb);
 
 export const consoleError = (e: any) => {
   if (e != null) {
@@ -81,7 +82,7 @@ export const consoleDevWarn = (..._: any[]) => {/* noop for hydrate */};
 
 export const consoleDevInfo = (..._: any[]) => {/* noop for hydrate */};
 
-export const Context: any = {};
+/*hydrate context start*/export const Context = {};/*hydrate context end*/
 
 
 export const plt: d.PlatformRuntime = {
