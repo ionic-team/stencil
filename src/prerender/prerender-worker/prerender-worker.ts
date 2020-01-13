@@ -2,13 +2,16 @@ import * as d from '../../declarations';
 import { catchError, normalizePath } from '@utils';
 import { crawlAnchorsForNextUrls } from '../crawl-urls';
 import { getPrerenderConfig } from '../prerender-config';
-import { MockWindow, cloneWindow, serializeNodeToHtml } from '@mock-doc';
 import { patchNodeGlobal, patchWindowGlobal } from '../prerender-global-patch';
 import { generateModulePreloads } from './prerender-modulepreload';
 import { initNodeWorkerThread } from '../../sys/node_next/worker/worker-child';
 import fs from 'graceful-fs';
 import path from 'path';
 import { URL } from 'url';
+
+
+let componentGraph: Map<string, string[]>;
+let templateHtml: string = null;
 
 
 export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
@@ -22,12 +25,23 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   try {
     const url = new URL(prerenderRequest.url, prerenderRequest.devServerHostUrl);
     const componentGraph = getComponentGraph(prerenderRequest.componentGraphPath);
-    const win = getWindow(prerenderRequest);
-    const doc = win.document;
 
     // webpack work-around/hack
     const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
     const hydrateApp = requireFunc(prerenderRequest.hydrateAppFilePath);
+
+    if (templateHtml == null) {
+      // cache template html in this process
+      templateHtml = fs.readFileSync(prerenderRequest.templateId, 'utf8');
+    }
+
+    // create a new window by cloning the cached parsed window
+    const win = hydrateApp.createWindowFromHtml(templateHtml, prerenderRequest.templateId);
+    const doc = win.document;
+
+    // patch this new window
+    patchNodeGlobal(global, prerenderRequest.devServerHostUrl);
+    patchWindowGlobal(global, win);
 
     const prerenderConfig = getPrerenderConfig(
       results.diagnostics,
@@ -72,16 +86,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       return results;
     }
 
-    const html = serializeNodeToHtml(doc, {
-      approximateLineWidth: opts.approximateLineWidth,
-      outerHtml: false,
-      prettyHtml: opts.prettyHtml,
-      removeAttributeQuotes: opts.removeAttributeQuotes,
-      removeBooleanAttributeQuotes: opts.removeBooleanAttributeQuotes,
-      removeEmptyAttributes: opts.removeEmptyAttributes,
-      removeHtmlComments: opts.removeHtmlComments,
-      serializeShadowRoot: false
-    });
+    const html = hydrateApp.serializeDocumentToString(doc, opts);
 
     const baseUrl = new URL(prerenderRequest.baseUrl);
     results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, baseUrl, url, hydrateResults.anchors);
@@ -194,26 +199,6 @@ function ensureDir(p: string) {
     }
   }
 }
-
-const templateWindows = new Map<string, Window>();
-
-function getWindow(prerenderRequest: d.PrerenderRequest) {
-  let templateWindow = templateWindows.get(prerenderRequest.templateId);
-  if (templateWindow == null) {
-    const templateHtml = fs.readFileSync(prerenderRequest.templateId, 'utf8');
-    templateWindow = new MockWindow(templateHtml) as any;
-    templateWindows.set(prerenderRequest.templateId, templateWindow);
-  }
-
-  const win = cloneWindow(templateWindow);
-
-  patchNodeGlobal(global, prerenderRequest.devServerHostUrl);
-  patchWindowGlobal(global, win);
-
-  return win;
-}
-
-let componentGraph: Map<string, string[]>;
 
 function getComponentGraph(componentGraphPath: string) {
   if (componentGraphPath == null) {

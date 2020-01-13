@@ -356,7 +356,7 @@ export interface ConfigFlags {
   devtools?: boolean;
 }
 
-export type TaskCommand = 'build' | 'docs' | 'serve' | 'test' | 'generate' | 'version' | 'help';
+export type TaskCommand = 'build' | 'docs' | 'generate' | 'help' | 'prerender' | 'serve' | 'test' | 'version';
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
@@ -555,7 +555,7 @@ export interface BuildNoChangeResults {
 
 export interface CompilerBuildResults {
   buildId: number;
-  componentGraph?: {[scopeid: string]: string[]};
+  componentGraph?: BuildResultsComponentGraph;
   diagnostics: Diagnostic[];
   dirsAdded: string[];
   dirsDeleted: string[];
@@ -574,6 +574,10 @@ export interface CompilerBuildResults {
   rootDir: string;
   srcDir: string;
   timestamp: string;
+}
+
+export interface BuildResultsComponentGraph {
+  [scopeId: string]: string[];
 }
 
 export interface BuildOutput {

@@ -161,10 +161,8 @@ export function connectNode(ownerDocument: any, node: MockNode) {
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
     if (ownerDocument != null && node.nodeName.includes('-')) {
       const win = ownerDocument.defaultView as Window;
-      if (win != null && win.customElements != null) {
-        if (typeof (node as any).connectedCallback === 'function' && node.isConnected) {
-          fireConnectedCallback(node);
-        }
+      if (win != null && typeof (node as any).connectedCallback === 'function' && node.isConnected) {
+        fireConnectedCallback(node);
       }
 
       const shadowRoot = ((node as any) as Element).shadowRoot;

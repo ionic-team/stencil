@@ -4,6 +4,7 @@ import { startServer } from '@dev-server';
 import { runPrerender } from '../prerender/prerender-main';
 import { validateCompilerVersion } from './task-version';
 import exit from 'exit';
+import { fromEntries } from '@utils';
 
 
 export async function taskBuild(prcs: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
@@ -46,8 +47,14 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config, flags: d
   const results = await compiler.build();
 
   if (!config.watch) {
+    let exitCode = 0;
     if (config.flags.prerender) {
-      await runPrerender(prcs, __dirname, config, devServer, results as any);
+      const componentGraph = results.componentGraph ? fromEntries(results.componentGraph.entries()) : null;
+      const prerenderDiagnostics = await runPrerender(prcs, __dirname, config, devServer, results.hydrateAppFilePath, componentGraph, null);
+      if (prerenderDiagnostics.some(d => d.type === 'error')) {
+        config.logger.printDiagnostics(prerenderDiagnostics);
+        exitCode = 1;
+      }
     }
 
     if (devServer != null) {
@@ -59,8 +66,11 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config, flags: d
       const hasError = results.diagnostics.some(d => d.level === 'error' || d.type === 'runtime');
       if (hasError) {
         config.sys.destroy();
-        exit(1);
+        exitCode = 1;
       }
+    }
+    if (exitCode > 0) {
+      exit(exitCode);
     }
   }
 

@@ -16,28 +16,27 @@ import readline from 'readline';
 import { URL } from 'url';
 
 
-export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, config: d.Config, devServer: d.DevServer, buildResults: d.CompilerBuildResults) {
+export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, config: d.Config, devServer: d.DevServer, hydrateAppFilePath: string, componentGraph: d.BuildResultsComponentGraph, srcIndexHtmlPath: string) {
+  const diagnostics: d.Diagnostic[] = [];
   const outputTargets = config.outputTargets
     .filter(isOutputTargetWww)
     .filter(o => typeof o.indexHtml === 'string');
 
   if (outputTargets.length === 0) {
-    return;
+    return diagnostics;
   }
 
-  const diagnostics: d.Diagnostic[] = [];
-
-  if (typeof buildResults.hydrateAppFilePath !== 'string') {
+  if (typeof hydrateAppFilePath !== 'string') {
     const diagnostic = buildError(diagnostics);
     diagnostic.header = `Prerender Error`;
     diagnostic.messageText = `Build results missing "hydrateAppFilePath"`;
 
   } else {
-    const hydrateAppExists = fs.existsSync(buildResults.hydrateAppFilePath);
+    const hydrateAppExists = fs.existsSync(hydrateAppFilePath);
     if (!hydrateAppExists) {
       const diagnostic = buildError(diagnostics);
       diagnostic.header = `Prerender Error`;
-      diagnostic.messageText = `Unable to open "hydrateAppFilePath": ${buildResults.hydrateAppFilePath}`;
+      diagnostic.messageText = `Unable to open "hydrateAppFilePath": ${hydrateAppFilePath}`;
     }
   }
 
@@ -59,7 +58,9 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
           diagnostics,
           config,
           devServer,
-          buildResults,
+          hydrateAppFilePath,
+          componentGraph,
+          srcIndexHtmlPath,
           outputTarget
         );
       }));
@@ -73,11 +74,11 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
     }
   }
 
-  config.logger.printDiagnostics(diagnostics);
+  return diagnostics;
 }
 
 
-async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWorkerController, diagnostics: d.Diagnostic[], config: d.Config, devServer: d.DevServer, buildResults: d.CompilerBuildResults, outputTarget: d.OutputTargetWww) {
+async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWorkerController, diagnostics: d.Diagnostic[], config: d.Config, devServer: d.DevServer, hydrateAppFilePath: string, componentGraph: d.BuildResultsComponentGraph, srcIndexHtmlPath: string, outputTarget: d.OutputTargetWww) {
   try {
     const timeSpan = config.logger.createTimeSpan(`prerendering started`);
 
@@ -85,7 +86,7 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWo
 
     const devServerBaseUrl = new URL(devServer.browserUrl);
     const devServerHostUrl = devServerBaseUrl.origin;
-    config.logger.debug(`prerender hydrate app: ${buildResults.hydrateAppFilePath}`);
+    config.logger.debug(`prerender hydrate app: ${hydrateAppFilePath}`);
     config.logger.debug(`prerender dev server: ${devServerHostUrl}`);
 
     validatePrerenderConfigPath(diagnostics, outputTarget.prerenderConfig);
@@ -103,7 +104,7 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWo
       config: config,
       diagnostics: prerenderDiagnostics,
       devServerHostUrl: devServerHostUrl,
-      hydrateAppFilePath: buildResults.hydrateAppFilePath,
+      hydrateAppFilePath: hydrateAppFilePath,
       isDebug: (config.logLevel === 'debug'),
       logCount: 0,
       maxConcurrency: Math.max(20, (config.maxConcurrentWorkers * 10)),
@@ -129,13 +130,13 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWo
       return;
     }
 
-    const templateHtml = await generateTemplateHtml(config, diagnostics, outputTarget);
+    const templateHtml = await generateTemplateHtml(config, diagnostics, srcIndexHtmlPath, outputTarget);
     if (diagnostics.length > 0 || typeof templateHtml !== 'string') {
       return;
     }
 
     manager.templateId = createPrerenderTemplate(config, templateHtml);
-    manager.componentGraphPath = createComponentGraphPath(config, buildResults, outputTarget);
+    manager.componentGraphPath = createComponentGraphPath(config, componentGraph, outputTarget);
 
     await new Promise(resolve => {
       manager.resolve = resolve;
@@ -202,9 +203,9 @@ function createPrerenderTemplate(config: d.Config, templateHtml: string) {
 }
 
 
-function createComponentGraphPath(config: d.Config, buildResults: d.CompilerBuildResults, outputTarget: d.OutputTargetWww) {
-  if (buildResults.componentGraph) {
-    const content = getComponentPathContent(config, buildResults.componentGraph, outputTarget);
+function createComponentGraphPath(config: d.Config, componentGraph: d.BuildResultsComponentGraph, outputTarget: d.OutputTargetWww) {
+  if (componentGraph) {
+    const content = getComponentPathContent(config, componentGraph, outputTarget);
     const hash = generateContentHash(content);
     const fileName = `prerender-component-graph-${hash}.json`;
     const componentGraphPath = path.join(os.tmpdir(), fileName);

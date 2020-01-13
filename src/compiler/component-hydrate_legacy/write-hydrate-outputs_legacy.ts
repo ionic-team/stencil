@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { relocateHydrateContextConst } from '../../compiler_next/output-targets/dist-hydrate-script/relocate-hydrate-context';
 import { RollupOutput } from 'rollup';
 
 
@@ -31,6 +32,7 @@ async function writeHydrateOutput(config: d.Config, compilerCtx: d.CompilerCtx, 
   await Promise.all(rollupOutput.output.map(async output => {
     if (output.type === 'chunk') {
       const filePath = config.sys.path.join(hydrateAppDirPath, output.fileName);
+      output.code = relocateHydrateContextConst(config, compilerCtx, output.code);
       await compilerCtx.fs.writeFile(filePath, output.code);
     }
   }));

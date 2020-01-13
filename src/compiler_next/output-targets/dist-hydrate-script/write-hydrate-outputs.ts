@@ -1,8 +1,7 @@
 import * as d from '../../../declarations';
-import { RollupOutput, OutputChunk } from 'rollup';
 import { basename, join } from 'path';
-import { getGlobalScriptPaths } from '../../bundle/app-data-plugin';
-import { HYDRATE_APP_CLOSURE_START } from './hydrate-factory-closure';
+import { relocateHydrateContextConst } from './relocate-hydrate-context';
+import { RollupOutput } from 'rollup';
 
 
 export const writeHydrateOutputs = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[], rollupOutput: RollupOutput) => {
@@ -33,7 +32,7 @@ const writeHydrateOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, 
 
   await Promise.all(rollupOutput.output.map(async output => {
     if (output.type === 'chunk') {
-      relocateHydrateContextConst(config, compilerCtx, output);
+      output.code = relocateHydrateContextConst(config, compilerCtx, output.code);
       const filePath = join(hydrateAppDirPath, output.fileName);
       await compilerCtx.fs.writeFile(filePath, output.code);
     }
@@ -71,23 +70,4 @@ const copyHydrateRunnerDts = async (config: d.Config, compilerCtx: d.CompilerCtx
   const runnerDtsDestPath = join(hydrateAppDirPath, 'index.d.ts');
 
   await compilerCtx.fs.copyFile(srcHydrateDir, runnerDtsDestPath);
-};
-
-const relocateHydrateContextConst = (config: d.Config, compilerCtx: d.CompilerCtx, output: OutputChunk) => {
-  // for whatever reason, const Context = {};
-  // is not hoisted to the correct location when bundled,
-  // so manually doing it here
-
-  // /*hydrate context start*/export const Context = {};/*hydrate context end*/
-
-  const globalPaths = getGlobalScriptPaths(config, compilerCtx);
-  if (globalPaths.length > 0) {
-    const startCode = output.code.indexOf('/*hydrate context start*/');
-    const endCode = output.code.indexOf('/*hydrate context end*/') + '/*hydrate context end*/'.length;
-
-    const hydrateContextCode = output.code.substring(startCode, endCode);
-    output.code = output.code.replace(hydrateContextCode, '');
-
-    output.code = output.code.replace(HYDRATE_APP_CLOSURE_START, HYDRATE_APP_CLOSURE_START + '\n  ' + hydrateContextCode);
-  }
 };

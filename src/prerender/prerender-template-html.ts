@@ -8,9 +8,12 @@ import { promisify } from 'util';
 const readFile = promisify(fs.readFile);
 
 
-export async function generateTemplateHtml(config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetWww) {
+export async function generateTemplateHtml(config: d.Config, diagnostics: d.Diagnostic[], srcIndexHtmlPath: string, outputTarget: d.OutputTargetWww) {
   try {
-    const templateHtml = await readFile(outputTarget.indexHtml, 'utf8');
+    if (typeof srcIndexHtmlPath !== 'string') {
+      srcIndexHtmlPath = outputTarget.indexHtml;
+    }
+    const templateHtml = await readFile(srcIndexHtmlPath, 'utf8');
     const templateDoc = createDocument(templateHtml);
 
     await inlineStyleSheets(templateDoc, outputTarget);

@@ -201,16 +201,7 @@ function finalizeHydrate(win: Window, doc: Document, opts: HydrateFactoryOptions
     }
 
     if (opts.serializeToHtml) {
-      results.html = serializeNodeToHtml(doc, {
-        approximateLineWidth: opts.approximateLineWidth,
-        outerHtml: false,
-        prettyHtml: opts.prettyHtml,
-        removeAttributeQuotes: opts.removeAttributeQuotes,
-        removeBooleanAttributeQuotes: opts.removeBooleanAttributeQuotes,
-        removeEmptyAttributes: opts.removeEmptyAttributes,
-        removeHtmlComments: opts.removeHtmlComments,
-        serializeShadowRoot: false,
-      });
+      results.html = serializeDocumentToString(doc, opts);
     }
 
   } catch (e) {
@@ -232,6 +223,19 @@ function finalizeHydrate(win: Window, doc: Document, opts: HydrateFactoryOptions
   }
 
   resolve(results);
+}
+
+export function serializeDocumentToString(doc: any, opts: HydrateFactoryOptions) {
+  return serializeNodeToHtml(doc, {
+    approximateLineWidth: opts.approximateLineWidth,
+    outerHtml: false,
+    prettyHtml: opts.prettyHtml,
+    removeAttributeQuotes: opts.removeAttributeQuotes,
+    removeBooleanAttributeQuotes: opts.removeBooleanAttributeQuotes,
+    removeEmptyAttributes: opts.removeEmptyAttributes,
+    removeHtmlComments: opts.removeHtmlComments,
+    serializeShadowRoot: false,
+  });
 }
 
 function isValidDocument(doc: Document) {

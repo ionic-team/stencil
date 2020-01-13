@@ -3,6 +3,7 @@ import { taskBuild } from './task-build';
 import { taskDocs } from './task-docs';
 import { taskGenerate } from './task-generate';
 import { taskHelp } from './task-help';
+import { taskPrerender } from './task-prerender';
 import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
 import { taskVersion } from './task-version';
@@ -25,6 +26,10 @@ export async function runTask(prcs: NodeJS.Process, config: Config, task: TaskCo
 
     case 'help':
       taskHelp(prcs, config);
+      break;
+
+    case 'prerender':
+      await taskPrerender(prcs, config);
       break;
 
     case 'serve':

@@ -631,12 +631,16 @@ export function createWindow(html: string | boolean = null): Window {
   return new MockWindow(html) as any;
 }
 
-export function cloneWindow(srcWin: Window) {
+export function cloneWindow(srcWin: Window, opts: { customElementProxy?: boolean; } = {}) {
   if (srcWin == null) {
     return null;
   }
 
   const clonedWin = new MockWindow(false);
+  if (!opts.customElementProxy) {
+    srcWin.customElements = null;
+  }
+
   if (srcWin.document != null) {
     const clonedDoc = new MockDocument(false, clonedWin);
     clonedWin.document = clonedDoc as any;

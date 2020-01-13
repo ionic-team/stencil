@@ -48,6 +48,13 @@ export async function run(init: CliInitOptions) {
       sys,
     });
 
+    if (validated.diagnostics.length > 0) {
+      logger.printDiagnostics(validated.diagnostics);
+      if (hasError(validated.diagnostics)) {
+        exit(1);
+      }
+    }
+
     // TODO
     validated.config.sys.lazyRequire = new NodeLazyRequire(new NodeResolveModule(), {
       "lazyDependencies": {
@@ -61,13 +68,6 @@ export async function run(init: CliInitOptions) {
         "workbox-build": "4.3.1"
       }
     });
-
-    if (validated.diagnostics.length > 0) {
-      logger.printDiagnostics(validated.diagnostics);
-      if (hasError(validated.diagnostics)) {
-        exit(1);
-      }
-    }
 
     setupWorkerController(sys, logger);
 
