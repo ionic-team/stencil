@@ -146,11 +146,22 @@ const getStyleUrlBoilerplate = () =>
  * Get the boilerplate for a spec test.
  */
 const getSpecTestBoilerplate = (tagName: string) =>
-`import { ${toPascalCase(tagName)} } from './${tagName}';
+`import { newSpecPage } from '@stencil/core/testing';
+import { ${toPascalCase(tagName)} } from './${tagName}';
 
 describe('${tagName}', () => {
-  it('builds', () => {
-    expect(new ${toPascalCase(tagName)}()).toBeTruthy();
+  it('renders', async () => {
+    const page = await newSpecPage({
+      components: [${toPascalCase(tagName)}],
+      html: \`<${tagName}></${tagName}>\`,
+    });
+    expect(page.root).toEqualHtml(\`
+      <${tagName}>
+        <mock:shadow-root>
+          <slot></slot>
+        </mock:shadow-root>
+      </${tagName}>
+    \`);
   });
 });
 `;
