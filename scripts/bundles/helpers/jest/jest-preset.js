@@ -35,8 +35,8 @@ module.exports = {
     '/www'
   ],
   maxConcurrency: 1,
-  testRegex: '(/__tests__/.*|\\.?(test|spec))\\.(tsx?|ts?|jsx?|js?)$',
+  testRegex: '(/__tests__/.*|\\.?(test|spec))\\.(tsx?|ts?|jsx?|js?|mjs?)$',
   transform: {
-    '^.+\\.(ts|tsx|jsx)$': path.join(testingDir, 'jest-preprocessor.js')
+    '^.+\\.(ts|tsx|jsx|js|mjs)$': path.join(testingDir, 'jest-preprocessor.js')
   }
 };
