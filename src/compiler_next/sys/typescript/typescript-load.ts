@@ -22,19 +22,15 @@ export const loadTypescript = async (diagnostics: d.Diagnostic[]): Promise<typeo
       return nodeTs;
     }
 
-    if (IS_WEB_WORKER_ENV) {
-      // browser web worker
-      const tsExternalUrl = getRemoteTypeScriptUrl();
-      const tsExternal = await importTypescriptScript(tsExternalUrl);
-      if (tsExternal) {
-        tsExternal.__loaded = true;
-        return tsExternal;
-      }
-
-      throw new Error(`unable to load typescript from url "${tsExternalUrl}"`);
+    // browser
+    const tsExternalUrl = getRemoteTypeScriptUrl();
+    const tsExternal = await importTypescriptScript(tsExternalUrl);
+    if (tsExternal) {
+      tsExternal.__loaded = true;
+      return tsExternal;
     }
 
-    throw new Error(`typescript: compiler can only run from within a web worker or nodejs`);
+    throw new Error(`unable to load typescript from url "${tsExternalUrl}"`);
 
   } catch (e) {
     catchError(diagnostics, e);
@@ -46,7 +42,7 @@ const importTypescriptScript = async (tsUrl: string) => {
   let importedTs: any = null;
   try {
 
-    if (version.includes('-dev.')) {
+    if (IS_WEB_WORKER_ENV && version.includes('-dev.')) {
       // be able to easily step through and debug typescript.js
       // but a prod build of stencil.js should use the fetch()
       // way so we can cache it better

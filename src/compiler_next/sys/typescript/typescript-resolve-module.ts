@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { getStencilInternalDtsUrl } from '../fetch/fetch-utils';
 import { isDtsFile, isExternalUrl, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile } from '../resolve/resolve-utils';
-import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../environment';
+import { IS_LOCATION_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../environment';
 import { isString } from '@utils';
 import { resolveRemoteModuleId } from '../resolve/resolve-module';
 import { version } from '../../../version';
@@ -10,7 +10,12 @@ import path from 'path';
 
 
 export const patchTypeScriptResolveModule = (loadedTs: typeof ts, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
-  const compilerExe = config.sys_next.getCompilerExecutingPath();
+  let compilerExe: string;
+  if (config.sys_next) {
+    compilerExe = config.sys_next.getCompilerExecutingPath();
+  } else if (IS_LOCATION_ENV) {
+    compilerExe = location.href;
+  }
 
   if (shouldPatchRemoteTypeScript(compilerExe)) {
     const orgResolveModuleName = loadedTs.resolveModuleName;

@@ -101,7 +101,7 @@ export class AppRoot {
       input: entryId,
       treeshake: true,
       plugins: [
-        stencil.rollupPlugin(),
+        // stencil.rollupPlugin(),
         {
           resolveId: (importee: string, importer: string) => {
             console.log('bundle resolveId, importee:', importee, 'importer:', importer);

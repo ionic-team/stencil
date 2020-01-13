@@ -28,7 +28,7 @@ export const compile = async (code: string, opts: CompileOptions = {}) => {
       r.code = '';
 
     } else if (filePath.endsWith('.tsx') || filePath.endsWith('.ts') || filePath.endsWith('.jsx')) {
-      patchTypescript(config, r.diagnostics, null);
+      await patchTypescript(config, r.diagnostics, null);
 
       const transformOpts = getTransformOptions(r.inputOptions);
 

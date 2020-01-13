@@ -6,7 +6,7 @@ export const loadDeps = async (resolveLookup: Map<string, string>, fs: Map<strin
   await loadDep('/@stencil/core/compiler/stencil.js');
 
   const deps = stencil.dependencies.map((dep: any) => {
-    return loadDep(dep.url);
+    return loadDep(`https://cdn.jsdelivr.net/npm/${dep.name}@${dep.version}${dep.main}`);
   });
 
   deps.push(
@@ -18,11 +18,11 @@ export const loadDeps = async (resolveLookup: Map<string, string>, fs: Map<strin
 
 
   const fetchResults = await Promise.all([
-    await fetch('/@stencil/core/internal/client/index.mjs'),
-    await fetch('/@stencil/core/internal/client/build-conditionals.mjs'),
-    await fetch('/@stencil/core/internal/client/css-shim.stencil-client.mjs'),
-    await fetch('/@stencil/core/internal/client/dom.stencil-client.mjs'),
-    await fetch('/@stencil/core/internal/client/shadow-css.stencil-client.mjs'),
+    // await fetch('/@stencil/core/internal/client/index.mjs'),
+    // await fetch('/@stencil/core/internal/client/build-conditionals.mjs'),
+    // await fetch('/@stencil/core/internal/client/css-shim.stencil-client.mjs'),
+    // await fetch('/@stencil/core/internal/client/dom.stencil-client.mjs'),
+    // await fetch('/@stencil/core/internal/client/shadow-css.stencil-client.mjs'),
   ]);
 
   await Promise.all(fetchResults.map(async r => {
@@ -42,7 +42,10 @@ const loadDep = (url: string) => {
       console.log('loaded dep:', url);
       setTimeout(resolve);
     };
-    script.onerror = reject;
+    script.onerror = (e) => {
+      console.log('error loading dep:', url);
+      reject(e);
+    };
     script.src = url;
     document.head.appendChild(script);
   });

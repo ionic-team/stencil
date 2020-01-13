@@ -13,11 +13,15 @@ export const IS_NODE_WINDOWS_ENV = (
   global.process.platform === 'win32'
 );
 
+export const IS_LOCATION_ENV = (
+  typeof location !== 'undefined'
+);
+
 export const IS_WEB_WORKER_ENV = (
   typeof self !== 'undefined' &&
   typeof (self as any).importScripts === 'function' &&
   typeof XMLHttpRequest !== 'undefined' &&
-  typeof location !== 'undefined' &&
+  IS_LOCATION_ENV &&
   typeof navigator !== 'undefined'
 );
 
@@ -33,7 +37,7 @@ export const HAS_FETCH_CACHE = (
 
 export const HAS_WEB_WORKER = (
   typeof Worker === 'function' &&
-  typeof location !== 'undefined'
+  IS_LOCATION_ENV
 );
 
 export const IS_CASE_SENSITIVE_FILE_NAMES = (

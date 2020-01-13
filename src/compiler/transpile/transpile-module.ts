@@ -6,6 +6,7 @@ import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import { TestingLogger } from '../../testing/testing-logger';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
 import ts from 'typescript';
 
@@ -14,6 +15,12 @@ import ts from 'typescript';
  * Mainly used as the typescript preprocessor for unit tests
  */
 export const transpileModule = (config: d.Config, input: string, transformOpts: d.TransformOptions, sourceFilePath?: string) => {
+  if (!config.logger) {
+    config = {
+      logger: new TestingLogger(),
+      ...config
+    }
+  }
   const compilerCtx = new CompilerContext();
   const buildCtx = new BuildContext(config, compilerCtx);
 
