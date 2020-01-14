@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildError, sortBy } from '@utils';
+import { buildError, isBoolean, sortBy } from '@utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace, validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
@@ -35,9 +35,12 @@ export function validateConfig(config: d.Config): { config: d.Config, diagnostic
   }
 
   config.flags = config.flags || {};
-  config.extras = config.extras || {
-    cssVarsShim: true
-  };
+  config.extras = config.extras || {};
+
+  config.extras.appendChildSlotFix = !!config.extras.appendChildSlotFix;
+  config.extras.cloneNodeFix = !!config.extras.cloneNodeFix;
+  config.extras.cssVarsShim = isBoolean(config.extras.cssVarsShim) ? config.extras.cssVarsShim : true;
+  config.extras.lifecycleDOMEvents = !!config.extras.lifecycleDOMEvents;
 
   setBooleanConfig(config, 'writeLog', 'log', false);
   setBooleanConfig(config, 'buildAppCore', null, true);
