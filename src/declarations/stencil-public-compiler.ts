@@ -331,7 +331,6 @@ export interface ConfigFlags {
   e2e?: boolean;
   emulate?: string;
   es5?: boolean;
-  esm?: boolean;
   headless?: boolean;
   help?: boolean;
   log?: boolean;
