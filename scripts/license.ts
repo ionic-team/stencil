@@ -31,6 +31,25 @@ const entryDeps = [
   'ws',
 ];
 
+// bundle does not include these
+// scripts/bundles/helpers/cssnano-preset-default.js
+const manuallyNotBundled = new Set([
+  'chalk',
+  'commander',
+  'cosmiconfig',
+  'css-declaration-sorter',
+  'minimist',
+  'postcss-calc',
+  'postcss-discard-overridden',
+  'postcss-merge-longhand',
+  'postcss-normalize-charset',
+  'postcss-normalize-timing-functions',
+  'postcss-normalize-unicode',
+  'postcss-svgo',
+  'source-map-resolve',
+  'urix',
+]);
+
 
 export function createLicense(rootDir: string) {
   const opts = getOptions(rootDir);
@@ -239,20 +258,3 @@ function includeDepLicense(bundledDeps: BundledDep[], moduleId: string) {
   }
   return true;
 }
-
-// bundle does not include these
-// scripts/bundles/helpers/cssnano-preset-default.js
-const manuallyNotBundled = new Set([
-  'chalk',
-  'commander',
-  'cosmiconfig',
-  'css-declaration-sorter',
-  'minimist',
-  'postcss-calc',
-  'postcss-discard-overridden',
-  'postcss-merge-longhand',
-  'postcss-normalize-charset',
-  'postcss-normalize-timing-functions',
-  'postcss-normalize-unicode',
-  'postcss-svgo',
-]);
