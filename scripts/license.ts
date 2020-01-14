@@ -11,6 +11,7 @@ const entryDeps = [
   'exit',
   'glob',
   'graceful-fs',
+  'fast-deep-equal',
   'is-glob',
   'is-extglob',
   'minimatch',
