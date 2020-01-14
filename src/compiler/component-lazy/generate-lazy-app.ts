@@ -106,10 +106,13 @@ import { bootstrapLazy, patchEsm } from '@stencil/core/internal/client';
 import { globalScripts } from '@stencil/core/internal/app-globals';
 
 export const defineCustomElements = (win, options) => {
-  return patchEsm().then(() => {
-    globalScripts();
-    bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
-  });
+  if (typeof window !== 'undefined') {
+    return patchEsm().then(() => {
+      globalScripts();
+      bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);
+    });
+  }
+  return Promise.resolve();
 };
 `;
 

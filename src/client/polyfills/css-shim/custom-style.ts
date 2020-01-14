@@ -20,17 +20,17 @@ export class CustomStyle {
   ) {}
 
   initShim() {
-    if (this.didInit) {
+    if (this.didInit || !this.win.requestAnimationFrame) {
       return Promise.resolve();
-    } else {
-      this.didInit = true;
-      return new Promise(resolve => {
-        this.win.requestAnimationFrame(() => {
-          startWatcher(this.doc, this.globalScopes);
-          loadDocument(this.doc, this.globalScopes).then(() => resolve());
-        });
-      });
     }
+
+    this.didInit = true;
+    return new Promise(resolve => {
+      this.win.requestAnimationFrame(() => {
+        startWatcher(this.doc, this.globalScopes);
+        loadDocument(this.doc, this.globalScopes).then(() => resolve());
+      });
+    });
   }
 
   addLink(linkEl: HTMLLinkElement) {

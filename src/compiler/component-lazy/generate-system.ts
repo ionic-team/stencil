@@ -46,8 +46,7 @@ async function getSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, cor
   return `
 'use strict';
 (function () {
-  var doc = document;
-  var currentScript = doc.currentScript;
+  var currentScript = document.currentScript;
 
   // !currentScript
   // IE11 since it doesnt support document.currentScript
@@ -70,7 +69,7 @@ async function getSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, cor
 
     // Figure out currentScript (for IE11, since it does not support currentScript)
     var regex = /\\/${config.fsNamespace}(\\.esm)?\\.js($|\\?|#)/;
-    var scriptElm = currentScript || Array.from(doc.querySelectorAll('script')).find(function(s) {
+    var scriptElm = currentScript || Array.from(document.querySelectorAll('script')).find(function(s) {
       return regex.test(s.src) || s.getAttribute('data-stencil-namespace') === "${config.fsNamespace}";
     });
 
@@ -80,8 +79,8 @@ async function getSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, cor
       System.import(url.href);
     };
 
-    if (win.__stencil_cssshim) {
-      win.__stencil_cssshim.initShim().then(start);
+    if (window.__stencil_cssshim) {
+      window.__stencil_cssshim.initShim().then(start);
     } else {
       start();
     }
