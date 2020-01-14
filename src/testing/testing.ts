@@ -64,6 +64,10 @@ export const createTesting = async (config: Config): Promise<Testing> => {
         buildTask = compiler.build();
       }
 
+      config.devServer.openBrowser = false;
+      config.devServer.gzip = false;
+      config.devServer.reloadStrategy = null;
+
       const startupResults = await Promise.all([
         startServer(config.devServer, config.logger),
         startPuppeteerBrowser(config),
