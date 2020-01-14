@@ -10,7 +10,7 @@ export const validateCustomElementBundle = (config: d.Config, userOutputs: d.Out
     .map(o => {
       const outputTarget = {
         ...o,
-        dir: getAbsolutePath(config, o.dir || 'dist/customElementsBundle'),
+        dir: getAbsolutePath(config, o.dir || 'dist/custom-elements-bundle'),
       };
       if (!isBoolean(outputTarget.empty)) {
         outputTarget.empty = true;
