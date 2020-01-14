@@ -224,6 +224,12 @@ export interface ConfigExtras {
   cloneNodeFix?: boolean;
 
   /**
+   * Include the CSS Custom Property polyfill/shim for legacy browsers. Defaults to `true`
+   * for legacy builds only. ESM builds will not include the css vars shim.
+   */
+  cssVarsShim?: boolean;
+
+  /**
    * Dispatches component lifecycle events. Mainly used for testing.
    */
   lifecycleDOMEvents?: boolean;

@@ -78,7 +78,7 @@ const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[])
 
   build.lazyLoad = true;
   build.hydrateServerSide = false;
-  build.cssVarShim = true;
+  build.cssVarShim = config.extras.cssVarsShim;
 
   const hasHydrateOutputTargets = config.outputTargets.some(isOutputTargetHydrate);
   build.hydrateClientSide = hasHydrateOutputTargets;

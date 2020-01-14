@@ -10,8 +10,14 @@ export async function getClientPolyfill(config: d.Config, compilerCtx: d.Compile
 
 export async function getAppBrowserCorePolyfills(config: d.Config, compilerCtx: d.CompilerCtx) {
   // read all the polyfill content, in this particular order
+  const polyfills = INLINE_POLYFILLS.slice();
+
+  if (config.extras.cssVarsShim) {
+    polyfills.push(INLINE_CSS_SHIM)
+  }
+
   const results = await Promise.all(
-    INLINE_POLYFILLS
+    polyfills
       .map(polyfillFile => getClientPolyfill(config, compilerCtx, polyfillFile))
   );
 
@@ -28,5 +34,6 @@ const INLINE_POLYFILLS = [
   'dom.js',
   'es5-html-element.js',
   'system.js',
-  'css-shim.js'
 ];
+
+const INLINE_CSS_SHIM = 'css-shim.js';

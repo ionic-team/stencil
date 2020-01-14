@@ -35,7 +35,12 @@ export const validateConfig = (userConfig?: Config) => {
   } else if (!isBoolean(config.devMode)) {
     config.devMode = DEFAULT_DEV_MODE;
   }
+
   config.extras = config.extras || {};
+  config.extras.appendChildSlotFix = !!config.extras.appendChildSlotFix;
+  config.extras.cloneNodeFix = !!config.extras.cloneNodeFix;
+  config.extras.cssVarsShim = isBoolean(config.extras.cssVarsShim) ? config.extras.cssVarsShim : true;
+  config.extras.lifecycleDOMEvents = !!config.extras.lifecycleDOMEvents;
 
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);

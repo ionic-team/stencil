@@ -136,7 +136,7 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
   b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;
-  b.appendChildSlotFix = !!config.extras.appendChildSlotFix;
-  b.cloneNodeFix = !!config.extras.cloneNodeFix;
+  b.appendChildSlotFix = config.extras.appendChildSlotFix;
+  b.cloneNodeFix = config.extras.cloneNodeFix;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
 };
