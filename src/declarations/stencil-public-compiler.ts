@@ -227,6 +227,11 @@ export interface ConfigExtras {
    * Dispatches component lifecycle events. Mainly used for testing.
    */
   lifecycleDOMEvents?: boolean;
+
+  /**
+   * Include the CSS Custom Property polyfill/shim for legacy browsers. Defaults to true
+   */
+  cssVarsShim?: boolean;
 }
 
 export interface Config extends StencilConfig {
