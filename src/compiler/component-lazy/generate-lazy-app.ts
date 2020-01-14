@@ -41,7 +41,7 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
 
   build.lazyLoad = true;
   build.hydrateServerSide = false;
-  build.cssVarShim = true;
+  build.cssVarShim = config.extras.cssVarsShim;
   build.initializeNextTick = true;
   build.taskQueue = true;
 

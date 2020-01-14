@@ -35,7 +35,9 @@ export const validateConfig = (userConfig?: Config) => {
   } else if (!isBoolean(config.devMode)) {
     config.devMode = DEFAULT_DEV_MODE;
   }
-  config.extras = config.extras || {};
+  config.extras = config.extras || {
+    cssVarsShim: true
+  };
 
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
