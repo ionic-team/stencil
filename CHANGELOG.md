@@ -1,4 +1,4 @@
-# 🏇 [1.9.0-11](https://github.com/ionic-team/stencil/compare/1.8.5...v1.9.0-11) (2020-01-09)
+# 🚌 [1.9.0-12](https://github.com/ionic-team/stencil/compare/1.8.5...v1.9.0-12) (2020-01-14)
 
 
 ### Bug Fixes
@@ -9,7 +9,7 @@ Some of main features with the `--next` compiler include:
 
 - Faster incremental builds
 - Easily bundle and interact with [Web Workers](https://stenciljs.com/docs/web-workers)
-- Custom Element Output Target (components without lazy loading)
+- `dist-custom-elements-bundle` Output Target (components without lazy loading)
 - Internal compiler refactor in order to improve 3rd party tooling
 - Import CSS files using traditional ESM imports
 - Online REPL
@@ -36,6 +36,9 @@ Some of main features with the `--next` compiler include:
 * **compiler:** add Build.isServer ([56d94f3](https://github.com/ionic-team/stencil/commit/56d94f33db5917e402692cf1740e0b62047e4e63))
 * **config:** also load and validate tsconfig within loadConfig() ([cbff6e1](https://github.com/ionic-team/stencil/commit/cbff6e1535942e2f83681e63240556779a38cb35))
 * **hydrate:** always build hydrate if it's an output ([92a6015](https://github.com/ionic-team/stencil/commit/92a6015a77aff622ec4c43578e6f4623136b9045))
+* **cli:** update tests in task generator ([#2128](https://github.com/ionic-team/stencil/issues/2128)) ([e6af190](https://github.com/ionic-team/stencil/commit/e6af1902de066740082bc15df687d4aced211f26))
+* **fetch:** export mock fetch testing apis ([c63a64f](https://github.com/ionic-team/stencil/commit/c63a64fa5bf545cd3965310399993e648f8261d9))
+* **prerender:** add prerender task cmd for existing hydrate app scripts ([f4f3213](https://github.com/ionic-team/stencil/commit/f4f32139712f71f6c7d29248d9e0c030b3cdff29))
 
 
 ### Bug Fixes
@@ -135,6 +138,12 @@ Some of main features with the `--next` compiler include:
 * **prerender:** add reflect to attributes while prerendering ([7974c41](https://github.com/ionic-team/stencil/commit/7974c41325889fc09491feea2ca21172ad86187c)), closes [#2119](https://github.com/ionic-team/stencil/issues/2119)
 * **reflect:** reflect attrs when no vnode attr ([2b948b2](https://github.com/ionic-team/stencil/commit/2b948b241b12acf3b988ecb84d1d633238a227ff))
 * **shadowDom:** improve supports shadow dom check ([8b5aa06](https://github.com/ionic-team/stencil/commit/8b5aa06e31919b16a9e11268441d250e254da36f)), closes [#2117](https://github.com/ionic-team/stencil/issues/2117)
+* **css:** add types to css parser/serializer and add more tests ([b9e4595](https://github.com/ionic-team/stencil/commit/b9e4595ca318bc88dc0938780567131ed4ea3692))
+* **gatsby:** ensure window references are avoided ([b00bed6](https://github.com/ionic-team/stencil/commit/b00bed6ea133dcc6e56be18d8f0f7f716e241ae9))
+* **hydrate:** fix const Context declaration ([d20f6ed](https://github.com/ionic-team/stencil/commit/d20f6edae3af4dfa13f88cc3b04bdc18f9ec617f))
+* **jsx:** every JSX element should have a "key" ([#2113](https://github.com/ionic-team/stencil/issues/2113)) ([1243e8d](https://github.com/ionic-team/stencil/commit/1243e8d1862e456476225e205b5d26ec074e43db))
+* **logger:** checking iterability of diag.next ([#2107](https://github.com/ionic-team/stencil/issues/2107)) ([fb5b11b](https://github.com/ionic-team/stencil/commit/fb5b11be03581efd943470c8e080f4f476cddae1))
+* **next:** allow browser main thread compiler, fix ts imports ([64e3810](https://github.com/ionic-team/stencil/commit/64e38101dba8f138999947eb54f2991ccc9d85bf)), closes [#2130](https://github.com/ionic-team/stencil/issues/2130)
 
 
 
