@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import { splitLineBreaks } from './logger-utils';
 import ts from 'typescript';
 import { normalizePath } from '../normalize-path';
+import { isIterable } from '../helpers';
 
 
 export const augmentDiagnosticWithNode = (config: d.Config, d: d.Diagnostic, node: ts.Node) => {
@@ -173,7 +174,7 @@ const flattenDiagnosticMessageText = (tsDiagnostic: ts.Diagnostic, diag: string 
   let result = '';
   if (!ignoreCodes.includes(diag.code)) {
     result = diag.messageText;
-    if (diag.next) {
+    if (isIterable(diag.next)) {
       for (const kid of diag.next) {
         result += flattenDiagnosticMessageText(tsDiagnostic, kid);
       }
