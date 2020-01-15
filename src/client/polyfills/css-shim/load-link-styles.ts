@@ -9,12 +9,14 @@ export function loadDocument(doc: Document, globalScopes: CSSScope[]) {
 }
 
 export function startWatcher(doc: Document, globalScopes: CSSScope[]) {
-  const mutation = new MutationObserver(() => {
-    if (loadDocumentStyles(doc, globalScopes)) {
-      updateGlobalScopes(globalScopes);
-    }
-  });
-  mutation.observe(document.head, { childList: true });
+  if (typeof MutationObserver !== 'undefined') {
+    const mutation = new MutationObserver(() => {
+      if (loadDocumentStyles(doc, globalScopes)) {
+        updateGlobalScopes(globalScopes);
+      }
+    });
+    mutation.observe(document.head, { childList: true });
+  }
 }
 
 export function loadDocumentLinks(doc: Document, globalScopes: CSSScope[]) {
