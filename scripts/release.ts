@@ -55,6 +55,10 @@ async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPat
           {
             name: 'Dry Run',
             value: getNewVersion(oldVersion, 'patch') + '-dryrun'
+          },
+          {
+            name: 'Other (specify)',
+            value: null
           }
         ]),
       filter: (input: any) => isValidVersionInput(input) ? getNewVersion(oldVersion, input) : input
@@ -68,10 +72,7 @@ async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPat
       validate: (input: string) => {
         if (!isValidVersionInput(input)) {
           return 'Please specify a valid semver, for example, `1.2.3`. See http://semver.org';
-        } else if (!isVersionGreater(oldVersion, input)) {
-          return `Version must be greater than ${oldVersion}`;
         }
-
         return true;
       }
     },
