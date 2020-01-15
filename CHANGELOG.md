@@ -1,4 +1,4 @@
-# 🚌 [1.9.0-12](https://github.com/ionic-team/stencil/compare/1.8.5...v1.9.0-12) (2020-01-14)
+# 💪 [1.9.0-12](https://github.com/ionic-team/stencil/compare/v1.8.5...v1.9.0-12) (2020-01-15)
 
 
 ### Bug Fixes
@@ -7,7 +7,7 @@ With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, 
 
 Some of main features with the `--next` compiler include:
 
-- Faster incremental builds
+- Faster incremental builds and TypeScript error feedback
 - Easily bundle and interact with [Web Workers](https://stenciljs.com/docs/web-workers)
 - `dist-custom-elements-bundle` Output Target (components without lazy loading)
 - Internal compiler refactor in order to improve 3rd party tooling
@@ -39,6 +39,7 @@ Some of main features with the `--next` compiler include:
 * **cli:** update tests in task generator ([#2128](https://github.com/ionic-team/stencil/issues/2128)) ([e6af190](https://github.com/ionic-team/stencil/commit/e6af1902de066740082bc15df687d4aced211f26))
 * **fetch:** export mock fetch testing apis ([c63a64f](https://github.com/ionic-team/stencil/commit/c63a64fa5bf545cd3965310399993e648f8261d9))
 * **prerender:** add prerender task cmd for existing hydrate app scripts ([f4f3213](https://github.com/ionic-team/stencil/commit/f4f32139712f71f6c7d29248d9e0c030b3cdff29))
+* **polyfills:** optionally exclude css vars shim ([b3b6993](https://github.com/ionic-team/stencil/commit/b3b69933528b7106ff69720797ecaabec74e4546))
 
 
 ### Bug Fixes
@@ -144,6 +145,8 @@ Some of main features with the `--next` compiler include:
 * **jsx:** every JSX element should have a "key" ([#2113](https://github.com/ionic-team/stencil/issues/2113)) ([1243e8d](https://github.com/ionic-team/stencil/commit/1243e8d1862e456476225e205b5d26ec074e43db))
 * **logger:** checking iterability of diag.next ([#2107](https://github.com/ionic-team/stencil/issues/2107)) ([fb5b11b](https://github.com/ionic-team/stencil/commit/fb5b11be03581efd943470c8e080f4f476cddae1))
 * **next:** allow browser main thread compiler, fix ts imports ([64e3810](https://github.com/ionic-team/stencil/commit/64e38101dba8f138999947eb54f2991ccc9d85bf)), closes [#2130](https://github.com/ionic-team/stencil/issues/2130)
+* **dev-server:** visibility hidden connector iframe ([b86e537](https://github.com/ionic-team/stencil/commit/b86e537a2df2f66c13831cf6ad1df9ad8a3133e0)), closes [#1683](https://github.com/ionic-team/stencil/issues/1683)
+* **test:** lock in working version of fast-deep-equal ([8ad1540](https://github.com/ionic-team/stencil/commit/8ad15408e931f5263c1c2dbe221b20c712334572)), closes [#2133](https://github.com/ionic-team/stencil/issues/2133)
 
 
 
