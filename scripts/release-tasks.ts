@@ -30,10 +30,6 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
           if (!isValidVersionInput(opts.version)) {
             throw new Error(`Version should be either ${SEMVER_INCREMENTS.join(', ')}, or a valid semver version.`);
           }
-
-          if (!isVersionGreater(pkg.version, newVersion)) {
-            throw new Error(`New version \`${newVersion}\` should be higher than current version \`${pkg.version}\``);
-          }
         },
         skip: () => isDryRun,
       }
