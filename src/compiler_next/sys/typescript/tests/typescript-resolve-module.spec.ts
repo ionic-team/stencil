@@ -3,7 +3,7 @@ import { createInMemoryFs } from '../../../sys/in-memory-fs';
 import { createSystem } from '../../../sys/stencil-sys';
 import { ensureUrlExtension } from '../typescript-resolve-module';
 import { getStencilInternalDtsUrl } from '../../fetch/fetch-utils';
-import { tsRemoteResolveModule } from '../typescript-resolve-module';
+import { tsResolveModule } from '../typescript-resolve-module';
 import ts from 'typescript';
 
 
@@ -46,7 +46,7 @@ describe('typescript resolve module', () => {
   it('resolve ./stencil-private.d.ts to full dts url when imported by internal dts url', () => {
     const moduleName = './stencil-private';
     const containingFile = getStencilInternalDtsUrl(compilerExe);
-    const r = tsRemoteResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
+    const r = tsResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
     expect(r).toEqual({
       resolvedModule: {
         extension: ts.Extension.Dts,
@@ -63,7 +63,7 @@ describe('typescript resolve module', () => {
   it('resolve @stencil/core/internal to internal dts url', () => {
     const moduleName = '@stencil/core';
     const containingFile = './cmp.tsx';
-    const r = tsRemoteResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
+    const r = tsResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
     expect(r).toEqual({
       resolvedModule: {
         extension: ts.Extension.Dts,
@@ -80,7 +80,7 @@ describe('typescript resolve module', () => {
   it('resolve @stencil/core to internal dts url', () => {
     const moduleName = '@stencil/core';
     const containingFile = './cmp.tsx';
-    const r = tsRemoteResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
+    const r = tsResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
     expect(r).toEqual({
       resolvedModule: {
         extension: ts.Extension.Dts,
@@ -97,7 +97,7 @@ describe('typescript resolve module', () => {
   it('do nothing for local path', () => {
     const moduleName = './style.css';
     const containingFile = './cmp.tsx';
-    const r = tsRemoteResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
+    const r = tsResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
     expect(r).toEqual(null);
   });
 
