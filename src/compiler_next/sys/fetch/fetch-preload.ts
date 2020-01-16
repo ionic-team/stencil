@@ -1,71 +1,91 @@
 import * as d from '../../../declarations';
 import { CACHES } from '../fetch/fetch-cache';
 import { getRemoteTypeScriptUrl } from '../dependencies';
-import { HAS_FETCH_CACHE, IS_WEB_WORKER_ENV } from '../environment';
+import { HAS_FETCH_CACHE, IS_FETCH_ENV, IS_WEB_WORKER_ENV } from '../environment';
+import { join } from 'path';
 
 
-export const preloadInMemoryFsFromCache = async (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
-  if (IS_WEB_WORKER_ENV && HAS_FETCH_CACHE) {
-    const preloadUrls = getCoreFetchPreloadUrls(config.sys_next.getCompilerExecutingPath());
+export const fetchPreloadFs = async (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+  if (IS_WEB_WORKER_ENV && IS_FETCH_ENV) {
+    const preloadUrls = getCoreFetchPreloadUrls(config, config.sys_next.getCompilerExecutingPath());
 
-    const coreCache = await caches.open(CACHES.core);
+    const coreCache = HAS_FETCH_CACHE ? await caches.open(CACHES.core) : null;
 
-    await Promise.all(preloadUrls.map(async url => {
+    await Promise.all(preloadUrls.map(async preload => {
       try {
-        const content = await getCoreContent(coreCache, url);
-        await inMemoryFs.writeFile(url, content, { inMemoryOnly: true });
+        const fileExists = await inMemoryFs.access(preload.filePath);
+        if (!fileExists) {
+          const content = await getCoreContent(coreCache, preload.url);
+          await inMemoryFs.writeFile(preload.filePath, content);
+        }
 
       } catch (e) {
-        console.error(e);
+        config.logger.error(e);
       }
     }));
+
+    await inMemoryFs.commit();
   }
 };
 
 const getCoreContent = async (coreCache: Cache, url: string) => {
-  const cachedRsp = await coreCache.match(url);
-  if (cachedRsp) {
-    return cachedRsp.text();
+  if (coreCache) {
+    const cachedRsp = await coreCache.match(url);
+    if (cachedRsp) {
+      return cachedRsp.text();
+    }
   }
+
   const rsp = await fetch(url);
-  if (rsp.ok) {
+  if (rsp.ok && coreCache) {
     coreCache.put(url, rsp.clone());
   }
   return rsp.text();
 };
 
-const getCoreFetchPreloadUrls = (compilerUrl: string) => {
+const getCoreFetchPreloadUrls = (config: d.Config, compilerUrl: string) => {
   const stencilUrl = new URL('..', compilerUrl);
-  const tsUrl = getRemoteTypeScriptUrl();
+  const tsUrl = new URL('..', getRemoteTypeScriptUrl());
   return [
-    ...stencilPreloadPaths.map(p => new URL(p, stencilUrl).href),
-    ...tsPreloadPaths.map(p => new URL(p, tsUrl).href),
+    ...stencilPreloadPaths.map(p => {
+      return {
+        url: new URL(p, stencilUrl).href,
+        filePath: join(config.rootDir, 'node_modules', '@stencil', 'core', p),
+      }
+    }),
+    ...tsPreloadPaths.map(p => {
+      return {
+        url: new URL(p, tsUrl).href,
+        filePath: join(config.rootDir, 'node_modules', 'typescript', p),
+      }
+    }),
   ];
 };
 
 const stencilPreloadPaths = [
   'internal/index.d.ts',
+  'internal/stencil-core.js',
+  'internal/stencil-core.d.ts',
   'internal/stencil-ext-modules.d.ts',
   'internal/stencil-private.d.ts',
   'internal/stencil-public-compiler.d.ts',
   'internal/stencil-public-docs.d.ts',
   'internal/stencil-public-runtime.d.ts',
-  'internal/stencil-ext-modules.d.ts',
-  'internal/stencil-public-docs.d.ts',
   'package.json',
 ];
 
 const tsPreloadPaths = [
-  'lib.dom.d.ts',
-  'lib.es2015.d.ts',
-  'lib.es5.d.ts',
-  'lib.es2015.core.d.ts',
-  'lib.es2015.collection.d.ts',
-  'lib.es2015.generator.d.ts',
-  'lib.es2015.iterable.d.ts',
-  'lib.es2015.symbol.d.ts',
-  'lib.es2015.promise.d.ts',
-  'lib.es2015.proxy.d.ts',
-  'lib.es2015.reflect.d.ts',
-  'lib.es2015.symbol.wellknown.d.ts',
+  'lib/lib.dom.d.ts',
+  'lib/lib.es2015.d.ts',
+  'lib/lib.es5.d.ts',
+  'lib/lib.es2015.core.d.ts',
+  'lib/lib.es2015.collection.d.ts',
+  'lib/lib.es2015.generator.d.ts',
+  'lib/lib.es2015.iterable.d.ts',
+  'lib/lib.es2015.symbol.d.ts',
+  'lib/lib.es2015.promise.d.ts',
+  'lib/lib.es2015.proxy.d.ts',
+  'lib/lib.es2015.reflect.d.ts',
+  'lib/lib.es2015.symbol.wellknown.d.ts',
+  'package.json',
 ];

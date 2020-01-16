@@ -6,10 +6,10 @@ import { createFullBuild } from './build/full-build';
 import { createInMemoryFs } from './sys/in-memory-fs';
 import { createSysWorker } from './sys/worker/sys-worker';
 import { createWatchBuild } from './build/watch-build';
+import { fetchPreloadFs } from './sys/fetch/fetch-preload';
 import { getConfig, patchSysLegacy } from './sys/config';
 import { patchFs } from './sys/fs-patch';
 import { patchTypescript } from './sys/typescript/typescript-patch';
-import { preloadInMemoryFsFromCache } from './sys/fetch/fetch-preload';
 
 
 export const createCompiler = async (config: Config) => {
@@ -30,7 +30,7 @@ export const createCompiler = async (config: Config) => {
   compilerCtx.worker = createSysWorker(sys, config.maxConcurrentWorkers);
   patchSysLegacy(config, compilerCtx);
 
-  await preloadInMemoryFsFromCache(config, compilerCtx.fs);
+  await fetchPreloadFs(config, compilerCtx.fs);
 
   if (sys.events) {
     // Pipe events from sys.events to compilerCtx

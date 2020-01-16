@@ -18,23 +18,24 @@ export const patchTypeScriptResolveModule = (loadedTs: typeof ts, config: d.Conf
   }
 
   if (shouldPatchRemoteTypeScript(compilerExe)) {
-    const orgResolveModuleName = loadedTs.resolveModuleName;
+    const orgResolveModule = loadedTs.resolveModuleName;
 
     loadedTs.resolveModuleName = (moduleName, containingFile, compilerOptions, host, cache, redirectedReference) => {
-      const resolvedModule = tsRemoteResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
+      const resolvedModule = tsResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
       if (resolvedModule) {
         return resolvedModule;
       }
-      return orgResolveModuleName(moduleName, containingFile, compilerOptions, host, cache, redirectedReference);
+      return orgResolveModule(moduleName, containingFile, compilerOptions, host, cache, redirectedReference);
     };
   }
 };
 
-export const tsRemoteResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, compilerExe: string, moduleName: string, containingFile: string): ts.ResolvedModuleWithFailedLookupLocations => {
+export const tsResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, compilerExe: string, moduleName: string, containingFile: string): ts.ResolvedModuleWithFailedLookupLocations => {
   if (isLocalModule(moduleName)) {
     // local file
 
     if (isExternalUrl(containingFile)) {
+      // containing file is a
       let resolvedUrl = new URL(moduleName, containingFile).href;
       resolvedUrl = ensureUrlExtension(resolvedUrl, containingFile);
 
@@ -53,39 +54,44 @@ export const tsRemoteResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFi
 
   } else {
     // node module id
-
-    if (isStencilCoreImport(moduleName)) {
-      return {
-        resolvedModule: {
-          extension: ts.Extension.Dts,
-          resolvedFileName: getStencilInternalDtsUrl(compilerExe),
-          packageId: {
-            name: moduleName,
-            subModuleName: '',
-            version,
-          }
-        }
-      };
-    }
-
-    const resolved = resolveRemoteModuleId(config, inMemoryFs, moduleName, containingFile);
-    if (resolved) {
-      return {
-        resolvedModule: {
-          extension: ts.Extension.Js,
-          resolvedFileName: resolved.resolvedUrl,
-          packageId: {
-            name: moduleName,
-            subModuleName: '',
-            version: resolved.packageJson.version,
-          }
-        }
-      };
-    }
+    return tsResolveNodeModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
   }
 
   return null;
 };
+
+const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, compilerExe: string, moduleName: string, containingFile: string): ts.ResolvedModuleWithFailedLookupLocations => {
+  if (isStencilCoreImport(moduleName)) {
+    return {
+      resolvedModule: {
+        extension: ts.Extension.Dts,
+        resolvedFileName: getStencilInternalDtsUrl(compilerExe),
+        packageId: {
+          name: moduleName,
+          subModuleName: '',
+          version,
+        }
+      }
+    };
+  }
+
+  const resolved = resolveRemoteModuleId(config, inMemoryFs, moduleName, containingFile);
+  if (resolved) {
+    return {
+      resolvedModule: {
+        extension: ts.Extension.Js,
+        resolvedFileName: resolved.resolvedUrl,
+        packageId: {
+          name: moduleName,
+          subModuleName: '',
+          version: resolved.packageJson.version,
+        }
+      }
+    };
+  }
+
+  return null;
+}
 
 export const ensureUrlExtension = (url: string, containingUrl: string) => {
   const fileName = path.basename(url);
