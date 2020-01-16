@@ -166,7 +166,7 @@ const serializeCssMedia = (opts: SerializeOpts, node: CssNode) => {
   if (mediaCss === '') {
     return '';
   }
-  return '@media ' + removeSelectorWhitespace(node.media) + '{' + mediaCss + '}';
+  return '@media ' + removeMediaWhitespace(node.media) + '{' + mediaCss + '}';
 };
 
 const serializeCssKeyframes = (opts: SerializeOpts, node: CssNode) => {
@@ -246,6 +246,26 @@ const removeSelectorWhitespace = (selector: string) => {
       }
       rtn += ' ';
 
+    } else {
+      rtn += char;
+    }
+  }
+
+  return rtn;
+};
+
+const removeMediaWhitespace = (media: string) => {
+  let rtn = '';
+  let char = '';
+  media = media.trim();
+
+  for (let i = 0, l = media.length; i < l; i++) {
+    char = media[i];
+    if (CSS_WS_REG.test(char)) {
+      if (CSS_WS_REG.test(rtn[rtn.length - 1])) {
+        continue
+      }
+      rtn += ' ';
     } else {
       rtn += char;
     }

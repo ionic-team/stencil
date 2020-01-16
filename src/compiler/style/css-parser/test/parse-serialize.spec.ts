@@ -166,17 +166,27 @@ describe('css parse/serialize', () => {
     [
       "media",
       "@media screen, projection {\n  /* html above */\n  html {\n    /* html inside */\n    background: #fffef0;\n    color: #300;\n  }\n\n  /* body above */\n  body {\n    /* body inside */\n    max-width: 35em;\n    margin: 0 auto;\n  }\n}\n\n@media print {\n  html {\n    background: #fff;\n    color: #000;\n  }\n  body {\n    padding: 1in;\n    border: 0.5pt solid #666;\n  }\n}\n",
-      "@media screen,projection{html{background:#fffef0;color:#300}body{max-width:35em;margin:0 auto}}@media print{html{background:#fff;color:#000}body{padding:1in;border:0.5pt solid #666}}",
+      "@media screen, projection{html{background:#fffef0;color:#300}body{max-width:35em;margin:0 auto}}@media print{html{background:#fff;color:#000}body{padding:1in;border:0.5pt solid #666}}",
     ],
     [
       "media-linebreak",
       "@media\n\n(\n    min-width: 300px\n)\n{\n    .test { width: 100px; }\n}\n",
-      "@media (min-width: 300px){.test{width:100px}}",
+      "@media ( min-width: 300px ){.test{width:100px}}",
     ],
     [
       "media-messed",
       "@media screen, projection{ html\n  \n  {\nbackground: #fffef0;\n    color:#300;\n  }\n  body\n\n{\n    max-width: 35em;\n    margin: 0 auto;\n\n\n}\n  }\n\n@media print\n{\n              html {\n              background: #fff;\n              color: #000;\n              }\n              body {\n              padding: 1in;\n              border: 0.5pt solid #666;\n              }\n}\n",
-      "@media screen,projection{html{background:#fffef0;color:#300}body{max-width:35em;margin:0 auto}}@media print{html{background:#fff;color:#000}body{padding:1in;border:0.5pt solid #666}}",
+      "@media screen, projection{html{background:#fffef0;color:#300}body{max-width:35em;margin:0 auto}}@media print{html{background:#fff;color:#000}body{padding:1in;border:0.5pt solid #666}}",
+    ],
+    [
+      "media-screen-and-max",
+      "@media only \n\n screen and\n\n (max-width:    22.5em  ) {.lead{font-size:21px;}}",
+      "@media only screen and (max-width: 22.5em ){.lead{font-size:21px}}",
+    ],
+    [
+      "media-screen-and-min-and-max",
+      "@media only    screen and   \n (min-width: 64.0625em)   \t and (max-width: 40em) {.lead{font-size:21px;}}",
+      "@media only screen and (min-width: 64.0625em) and (max-width: 40em){.lead{font-size:21px}}",
     ],
     [
       "messed-up",
