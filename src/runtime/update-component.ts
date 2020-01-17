@@ -305,7 +305,13 @@ const then = (promise: Promise<any>, thenFn: () => any) => {
 
 const emitLifecycleEvent = (elm: EventTarget, lifecycleName: string) => {
   if (BUILD.lifecycleDOMEvents) {
-    elm.dispatchEvent(new CustomEvent('stencil_' + lifecycleName, { 'bubbles': true, 'composed': true }));
+    elm.dispatchEvent(new CustomEvent('stencil_' + lifecycleName, {
+      'bubbles': true,
+      'composed': true,
+      detail: {
+        namespace: NAMESPACE
+      }
+    }));
   }
 };
 
