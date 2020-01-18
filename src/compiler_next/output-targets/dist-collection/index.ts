@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { catchError } from '@utils';
 import { isOutputTargetDistCollection } from '../../../compiler/output-targets/output-utils';
-import path from 'path';
+import { join, relative } from 'path';
 
 
 export const outputCollection = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, changedModuleFiles: d.Module[]) => {
@@ -16,7 +16,8 @@ export const outputCollection = async (config: d.Config, compilerCtx: d.Compiler
       const code = mod.staticSourceFileText;
 
       await Promise.all(outputTargets.map(async o => {
-        const filePath = path.join(o.collectionDir, mod.jsFilePath);
+        const relPath = relative(config.srcDir, mod.jsFilePath);
+        const filePath = join(o.collectionDir, relPath);
         await compilerCtx.fs.writeFile(filePath, code, { outputTargetType: o.type });
       }));
     }));

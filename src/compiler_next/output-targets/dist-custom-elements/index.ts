@@ -4,7 +4,7 @@ import { isOutputTargetDistCustomElements } from '../../../compiler/output-targe
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
-import path from 'path';
+import { join, relative } from 'path';
 import ts from 'typescript';
 
 
@@ -23,7 +23,8 @@ export const outputCustomElements = async (config: d.Config, compilerCtx: d.Comp
       const code = printer.printFile(transformed);
 
       await Promise.all(outputTargets.map(async o => {
-        const filePath = path.join(o.dir, mod.jsFilePath);
+        const relPath = relative(config.srcDir, mod.jsFilePath);
+        const filePath = join(o.dir, relPath);
         await compilerCtx.fs.writeFile(filePath, code, { outputTargetType: o.type });
       }));
     }));
