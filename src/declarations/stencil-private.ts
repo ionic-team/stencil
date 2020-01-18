@@ -756,6 +756,21 @@ export interface CompilerNext {
 export interface CompilerWatcher extends BuildOnEvents {
   start(): Promise<WatcherCloseResults>;
   close(): Promise<WatcherCloseResults>;
+  request(data: CompilerRequest): Promise<CompilerRequestResponse>;
+}
+
+export interface CompilerRequest {
+  path?: string;
+}
+
+export interface CompilerRequestResponse {
+  nodeModuleId: string;
+  nodeModuleVersion: string;
+  nodeResolvedPath: string;
+  cachePath: string;
+  cacheHit: boolean;
+  content: string;
+  status: number;
 }
 
 export interface BuildOutputFile {
@@ -1180,6 +1195,7 @@ export interface HttpRequest {
 }
 
 export interface DevServerMessage {
+  resolveId?: number;
   startServer?: DevServerConfig;
   serverStarted?: DevServerStartResponse;
   buildLog?: BuildLog;
@@ -1187,6 +1203,8 @@ export interface DevServerMessage {
   requestBuildResults?: boolean;
   error?: { message?: string; type?: string; stack?: any; };
   isActivelyBuilding?: boolean;
+  compilerRequestPath?: string;
+  compilerRequestResults?: CompilerRequestResponse;
   requestLog?: {
     method: string;
     url: string;

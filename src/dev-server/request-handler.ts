@@ -1,10 +1,11 @@
 import * as d from '../declarations';
-import { isDevClient, sendMsg } from './dev-server-utils';
+import { isDevClient, isDevModule, sendMsg } from './dev-server-utils';
 import { normalizePath } from '@utils';
 import { serveDevClient } from './serve-dev-client';
 import { serveFile } from './serve-file';
 import { serve404, serve404Content } from './serve-404';
 import { serve500 } from './serve-500';
+import { serveCompilerRequest } from './serve-compiler-request';
 import { serveDirectoryIndex } from './serve-directory-index';
 import * as http from 'http';
 import path from 'path';
@@ -35,6 +36,10 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, sys: d.
 
       if (isDevClient(req.pathname) && devServerConfig.websocket) {
         return serveDevClient(devServerConfig, sys, req, res);
+      }
+
+      if (isDevModule(req.pathname)) {
+        return serveCompilerRequest(devServerConfig, req, res);
       }
 
       if (!req.url.startsWith(devServerConfig.basePath)) {

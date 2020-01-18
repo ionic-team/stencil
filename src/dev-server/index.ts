@@ -1,10 +1,10 @@
-import { CompilerBuildResults, CompilerEventName, DevServer, DevServerConfig, DevServerMessage, Logger, StencilDevServerConfig } from '../declarations';
+import { BuildOnEventRemove, CompilerBuildResults, CompilerEventName, CompilerWatcher, DevServer, DevServerConfig, DevServerMessage, Logger, StencilDevServerConfig } from '../declarations';
 import { ChildProcess, fork } from 'child_process';
 import path from 'path';
 import open from 'open';
 
 
-export async function startServer(stencilDevServerConfig: StencilDevServerConfig, logger: Logger) {
+export async function startServer(stencilDevServerConfig: StencilDevServerConfig, logger: Logger, watcher?: CompilerWatcher) {
   let devServer: DevServer = null;
   const devServerConfig = Object.assign({}, stencilDevServerConfig) as DevServerConfig;
   const timespan = logger.createTimeSpan(`starting dev server`, true);
@@ -37,7 +37,14 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
       lastBuildResults: null
     };
 
-    const starupDevServerConfig = await startWorkerServer(devServerConfig, logger, serverProcess, devServerContext);
+    const starupDevServerConfig = await startWorkerServer(devServerConfig, logger, watcher, serverProcess, devServerContext);
+
+    let removeWatcher: BuildOnEventRemove = null;
+    if (watcher) {
+      removeWatcher = watcher.on((eventName, data) => {
+        emitMessageToClient(serverProcess, devServerContext, eventName, data);
+      });
+    }
 
     devServer = {
       browserUrl: starupDevServerConfig.browserUrl,
@@ -45,6 +52,10 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
         try {
           if (serverProcess) {
             serverProcess.kill('SIGINT');
+          }
+          if (removeWatcher) {
+            removeWatcher();
+            removeWatcher = null;
           }
         } catch (e) {}
         logger.debug(`dev server closed`);
@@ -65,7 +76,7 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
 }
 
 
-function startWorkerServer(devServerConfig: DevServerConfig, logger: Logger, serverProcess: ChildProcess, devServerContext: DevServerMainContext) {
+function startWorkerServer(devServerConfig: DevServerConfig, logger: Logger, watcher: CompilerWatcher, serverProcess: ChildProcess, devServerContext: DevServerMainContext) {
   let hasStarted = false;
 
   return new Promise<DevServerConfig>((resolve, reject) => {
@@ -82,7 +93,7 @@ function startWorkerServer(devServerConfig: DevServerConfig, logger: Logger, ser
       }
     });
 
-    serverProcess.on('message', (msg: DevServerMessage) => {
+    serverProcess.on('message', async (msg: DevServerMessage) => {
       // main process has received a message from the child server process
 
       if (msg.serverStarted) {
@@ -125,6 +136,17 @@ function startWorkerServer(devServerConfig: DevServerConfig, logger: Logger, ser
           };
           serverProcess.send(msg);
         }
+        return;
+      }
+
+      if (msg.compilerRequestPath && watcher && watcher.request) {
+        const rspMsg: DevServerMessage = {
+          resolveId: msg.resolveId,
+          compilerRequestResults: await watcher.request({
+            path: msg.compilerRequestPath
+          }),
+        }
+        serverProcess.send(rspMsg);
         return;
       }
 

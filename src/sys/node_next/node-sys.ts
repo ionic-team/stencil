@@ -61,6 +61,19 @@ export function createNodeSys(prcs: NodeJS.Process) {
     getCurrentDirectory() {
       return normalizePath(prcs.cwd());
     },
+    isSymbolicLink: (p: string) => new Promise<boolean>(resolve => {
+      try {
+        fs.lstat(p, (err, stats) => {
+          if (err) {
+            resolve(false);
+          } else {
+            resolve(stats.isSymbolicLink());
+          }
+        });
+      } catch (e) {
+        resolve(false);
+      }
+    }),
     getCompilerExecutingPath: null,
     mkdir(p, opts) {
       return new Promise(resolve => {

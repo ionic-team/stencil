@@ -8,21 +8,15 @@ import exit from 'exit';
 export async function taskWatch(prcs: NodeJS.Process, config: d.Config) {
   startupLog(prcs, config);
 
-  let devServerPromise: Promise<d.DevServer> = null;
   let devServer: d.DevServer = null;
   let exitCode = 0;
-
-  if (config.flags.serve) {
-    devServerPromise = startServer(config.devServer, config.logger);
-  }
 
   try {
     const compiler = await createCompiler(config);
     const watcher = await compiler.createWatcher();
 
-    if (devServerPromise) {
-      devServer = await devServerPromise;
-      watcher.on(devServer.emit);
+    if (config.flags.serve) {
+      devServer = await startServer(config.devServer, config.logger, watcher);
     }
 
     prcs.once('SIGINT', () => {

@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { buildError, isBoolean, isNumber, isString, normalizePath } from '@utils';
 import { isOutputTargetWww } from '../../compiler/output-targets/output-utils';
 import { URL } from 'url';
-import path from 'path';
+import { isAbsolute, join } from 'path';
 
 
 export function validateDevServer(config: d.Config, flags: d.ConfigFlags, diagnostics: d.Diagnostic[]) {
@@ -10,7 +10,7 @@ export function validateDevServer(config: d.Config, flags: d.ConfigFlags, diagno
     return null;
   }
 
-  const devServer = Object.assign({}, config.devServer);
+  const devServer = { ...config.devServer };
 
   if (isString(flags.address)) {
     devServer.address = flags.address;
@@ -143,8 +143,8 @@ export function validateDevServer(config: d.Config, flags: d.ConfigFlags, diagno
     err.messageText = `devServer config "baseUrl" has been renamed to "basePath", and should not include a domain or protocol.`;
   }
 
-  if (!path.isAbsolute(devServer.root)) {
-    devServer.root = path.join(config.rootDir, devServer.root);
+  if (!isAbsolute(devServer.root)) {
+    devServer.root = join(config.rootDir, devServer.root);
   }
   devServer.root = normalizePath(devServer.root);
 
@@ -156,6 +156,12 @@ export function validateDevServer(config: d.Config, flags: d.ConfigFlags, diagno
 
   } else {
     devServer.excludeHmr = [];
+  }
+
+  if (!config.devMode || config.buildEs5) {
+    devServer.experimentalDevModules = false;
+  } else {
+    devServer.experimentalDevModules = !!devServer.experimentalDevModules;
   }
 
   return devServer;

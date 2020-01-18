@@ -263,6 +263,14 @@ export interface StencilDevServerConfig {
    */
   basePath?: string;
   /**
+   * EXPERIMENTAL!
+   * During development, node modules can be independently requested and bundled, making for
+   * faster build times. This is only available using the Stencil Dev Server throughout
+   * development. Production builds and builds with the `es5` flag will override
+   * this setting to `false`. Default is `false`.
+   */
+  experimentalDevModules?: boolean;
+  /**
    * If the dev server should respond with gzip compressed content. Defaults to `true`.
    */
   gzip?: boolean;
@@ -406,6 +414,10 @@ export interface CompilerSystem {
    * The compiler's current executing path. Like the compiler's __filename on NodeJS or location.href in a web worker.
    */
   getCompilerExecutingPath(): string;
+  /**
+   * Tests if the path is a symbolic link or not. Always resolves a boolean. Does not throw.
+   */
+  isSymbolicLink(p: string): Promise<boolean>;
   /**
    * Always returns a boolean if the directory was created or not. Does not throw.
    */

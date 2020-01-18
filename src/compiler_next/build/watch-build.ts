@@ -1,7 +1,8 @@
 import * as d from '../../declarations';
-import { createTsWatchProgram } from '../transpile/create-watch-program';
-import { BuildContext } from '../../compiler/build/build-ctx';
 import { build } from './build';
+import { BuildContext } from '../../compiler/build/build-ctx';
+import { compilerRequest } from '../bundle/dev-module';
+import { createTsWatchProgram } from '../transpile/create-watch-program';
 import { filesChanged, hasHtmlChanges, hasScriptChanges, hasStyleChanges, scriptsAdded, scriptsDeleted } from '../../compiler/fs-watch/fs-watch-rebuild';
 import { hasServiceWorkerChanges } from '../../compiler/service-worker/generate-sw';
 import ts from 'typescript';
@@ -76,12 +77,15 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     return watcherCloseResults;
   };
 
+  const request = async (data: d.CompilerRequest) => compilerRequest(config, compilerCtx, data);
+
   config.sys_next.addDestory(close);
 
   return {
     start,
     close,
-    on: compilerCtx.events.on
+    on: compilerCtx.events.on,
+    request
   };
 };
 

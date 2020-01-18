@@ -3,11 +3,33 @@ import * as c from './dev-server-constants';
 import { version } from '../version';
 import util from 'util';
 
+const msgResolves = new Map<number, (v: any) => void>();
+let resolveIds = 1;
 
 export function sendMsg(prcs: NodeJS.Process, msg: d.DevServerMessage) {
   prcs.send(msg);
 }
 
+export function sendMsgWithResponse(prcs: NodeJS.Process, msg: d.DevServerMessage) {
+  return new Promise<d.DevServerMessage>(resolve => {
+    msg.resolveId = resolveIds++;
+    msgResolves.set(msg.resolveId, resolve);
+    sendMsg(prcs, msg);
+  });
+}
+
+export function createMessageReceiver(prcs: NodeJS.Process, cb: (msg: d.DevServerMessage) => void) {
+  prcs.on('message', (msg: d.DevServerMessage) => {
+    if (typeof msg.resolveId === 'number') {
+      const resolve = msgResolves.get(msg.resolveId);
+      if (resolve) {
+        msgResolves.delete(msg.resolveId);
+        resolve(msg);
+      }
+    }
+    cb(msg);
+  });
+}
 
 export function sendError(prcs: NodeJS.Process, e: any) {
   const msg: d.DevServerMessage = {
@@ -110,6 +132,11 @@ export function isSimpleText(filePath: string) {
 
 export function isDevClient(pathname: string) {
   return pathname.startsWith(c.DEV_SERVER_URL);
+}
+
+
+export function isDevModule(pathname: string) {
+  return pathname.includes(c.DEV_MODULE_URL);
 }
 
 

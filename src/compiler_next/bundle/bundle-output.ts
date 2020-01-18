@@ -4,6 +4,7 @@ import { BundleOptions } from './bundle-interface';
 import { coreResolvePlugin } from './core-resolve-plugin';
 import { createCustomResolverAsync } from '../sys/resolve/resolve-module';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
+import { devNodeModuleResolveId } from './dev-module';
 import { extTransformsPlugin } from './ext-transforms-plugin';
 import { fileLoadPlugin } from './file-load-plugin';
 import { textPlugin } from './text-plugin';
@@ -45,6 +46,21 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
     ['.tsx', '.ts', '.js', '.mjs', '.json']
   );
 
+  const nodeResolvePlugin = rollupNodeResolvePlugin({
+    mainFields: ['browser', 'collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
+    customResolveOptions,
+    ...config.nodeResolve as any
+  });
+
+  if (config.devServer && config.devServer.experimentalDevModules) {
+    const orgNodeResolveId = nodeResolvePlugin.resolveId;
+
+    nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
+      const resolvedId = await orgNodeResolveId.call(nodeResolvePlugin, importee, importer);
+      return devNodeModuleResolveId(config, compilerCtx.fs, resolvedId, importee);
+    };
+  }
+
   const rollupOptions: RollupOptions = {
 
     input: bundleOpts.inputs,
@@ -61,11 +77,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       extTransformsPlugin(config, compilerCtx, buildCtx),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform),
       ...config.rollupPlugins,
-      rollupNodeResolvePlugin({
-        mainFields: ['browser', 'collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
-        customResolveOptions,
-        ...config.nodeResolve as any
-      }),
+      nodeResolvePlugin,
       rollupCommonjsPlugin({
         include: /node_modules/,
         sourceMap: config.sourceMap,

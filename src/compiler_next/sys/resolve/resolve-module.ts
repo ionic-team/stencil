@@ -216,7 +216,7 @@ export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemo
     },
 
     extensions: exts,
-  } as any;
+  };
 };
 
 

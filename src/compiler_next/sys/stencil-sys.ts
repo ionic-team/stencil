@@ -73,6 +73,10 @@ export const createSystem = () => {
     throw new Error('unable to find executing path');
   };
 
+  const isSymbolicLink = (_p: string) => new Promise<boolean>(resolve => {
+    resolve(false);
+  });
+
   const mkdirSync = (p: string, _opts?: CompilerSystemMakeDirectoryOptions) => {
     p = normalize(p);
     const item = items.get(p);
@@ -337,6 +341,7 @@ export const createSystem = () => {
     watchTimeout: fileWatchTimeout,
     getCurrentDirectory,
     getCompilerExecutingPath,
+    isSymbolicLink,
     mkdir,
     mkdirSync,
     readdir,

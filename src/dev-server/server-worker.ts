@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { sendMsg } from './dev-server-utils';
+import { createMessageReceiver, sendMsg } from './dev-server-utils';
 import { startDevServerWorker } from './start-server-worker';
 import fs from 'graceful-fs';
 import path from 'path';
@@ -32,7 +32,7 @@ async function loadContentTypes(devServerConfig: d.DevServerConfig) {
 }
 
 
-process.on('message', (msg: d.DevServerMessage) => {
+createMessageReceiver(process, (msg: d.DevServerMessage) => {
   if (msg.startServer) {
     startServer(msg.startServer);
   }
