@@ -1,12 +1,12 @@
 import * as d from '../../declarations';
-import { buildError, loadTypeScriptDiagnostics } from '@utils';
+import { buildError, loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { convertDecoratorsToStatic } from '../../compiler/transformers/decorators-to-static/convert-decorators';
 import { generateAppTypes } from '../../compiler/types/generate-app-types';
 import { getComponentsFromModules, isOutputTargetDistTypes } from '../../compiler/output-targets/output-utils';
 import { resolveComponentDependencies } from '../../compiler/entries/resolve-component-dependencies';
 import { updateComponentBuildConditionals } from '../build/app-data';
 import { updateModule } from './static-to-meta/parse-static';
-import { join, relative } from 'path';
+import { basename, join, relative } from 'path';
 import ts from 'typescript';
 
 
@@ -31,7 +31,7 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
       updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
 
     } else if (emitFilePath.endsWith('.d.ts')) {
-      const relativeEmitFilepath = emitFilePath.replace(config.cacheDir, '');
+      const relativeEmitFilepath = getRelativeDts(config, tsSourceFiles[0].fileName, emitFilePath);
 
       typesOutputTarget.forEach(o => {
         compilerCtx.fs.writeFile(
@@ -105,4 +105,20 @@ const validateUniqueTagNames = (config: d.Config, buildCtx: d.BuildCtx) => {
       }`;
     }
   });
+};
+
+const getRelativeDts = (config: d.Config, srcPath: string, emitDtsPath: string) => {
+  const parts: string[] = [];
+  srcPath = normalizePath(srcPath);
+  for (let i = 0; i < 30; i++) {
+    if (config.srcDir === srcPath) {
+      break;
+    }
+    const b = basename(emitDtsPath);
+    parts.push(b);
+
+    emitDtsPath = join(emitDtsPath, '..');
+    srcPath = normalizePath(join(srcPath, '..'));
+  }
+  return join.apply(null, parts.reverse());
 };
