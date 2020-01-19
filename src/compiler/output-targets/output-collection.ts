@@ -13,7 +13,7 @@ export async function outputCollections(config: d.Config, compilerCtx: d.Compile
   const moduleFiles = buildCtx.moduleFiles.filter(m => !m.isCollectionDependency && m.jsFilePath);
   await Promise.all([
     writeJsFiles(config, compilerCtx, moduleFiles, outputTargets),
-    writeManifests(config, compilerCtx, buildCtx, outputTargets)
+    writeCollectionManifests(config, compilerCtx, buildCtx, outputTargets)
   ]);
 
   timespan.finish(`generate collections finished`);
@@ -37,19 +37,19 @@ async function writeModuleFile(config: d.Config, compilerCtx: d.CompilerCtx, mod
   );
 }
 
-async function writeManifests(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) {
+export const writeCollectionManifests = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) => {
   const collectionData = JSON.stringify(serializeCollectionManifest(config, compilerCtx, buildCtx), null, 2);
   return Promise.all(
-    outputTargets.map(o => writeManifest(config, compilerCtx, collectionData, o))
+    outputTargets.map(o => writeCollectionManifest(config, compilerCtx, collectionData, o))
   );
-}
+};
 
 // this maps the json data to our internal data structure
 // apping is so that the internal data structure "could"
 // change, but the external user data will always use the same api
 // over the top lame mapping functions is basically so we can loosly
 // couple core component meta data between specific versions of the compiler
-async function writeManifest(config: d.Config, compilerCtx: d.CompilerCtx, collectionData: string, outputTarget: d.OutputTargetDistCollection) {
+const writeCollectionManifest = async (config: d.Config, compilerCtx: d.CompilerCtx, collectionData: string, outputTarget: d.OutputTargetDistCollection) => {
   // get the absolute path to the directory where the collection will be saved
   const collectionDir = normalizePath(outputTarget.collectionDir);
 
@@ -58,10 +58,9 @@ async function writeManifest(config: d.Config, compilerCtx: d.CompilerCtx, colle
 
   // don't bother serializing/writing the collection if we're not creating a distribution
   await compilerCtx.fs.writeFile(collectionFilePath, collectionData);
-}
+};
 
-
-export function serializeCollectionManifest(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): d.CollectionManifest {
+export const serializeCollectionManifest = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   // create the single collection we're going to fill up with data
   const collectionManifest: d.CollectionManifest = {
     entries: buildCtx.moduleFiles
@@ -86,11 +85,11 @@ export function serializeCollectionManifest(config: d.Config, compilerCtx: d.Com
   return collectionManifest;
 }
 
-function serializeCollectionDependencies(compilerCtx: d.CompilerCtx): d.CollectionDependencyData[] {
+const serializeCollectionDependencies = (compilerCtx: d.CompilerCtx): d.CollectionDependencyData[] => {
   const collectionDeps = compilerCtx.collections.map(c => ({
     name: c.collectionName,
     tags: flatOne(c.moduleFiles.map(m => m.cmps)).map(cmp => cmp.tagName).sort()
   }));
 
   return sortBy(collectionDeps, item => item.name);
-}
+};

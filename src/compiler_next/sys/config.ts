@@ -39,10 +39,10 @@ export const getConfig = (userConfig: d.Config) => {
 export const patchSysLegacy = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   // old way
   config.sys.compiler = {
-    name: '',
+    name: '@stencil/core',
     version,
     typescriptVersion,
-    packageDir: path.resolve(__dirname, '..')
+    packageDir: path.join(config.sys_next.getCompilerExecutingPath(), '..', '..'),
   },
   config.sys.generateContentHash = config.sys_next.generateContentHash;
   config.sys.scopeCss = (cssText, scopeId, commentOriginalSelector) => Promise.resolve(scopeCss(cssText, scopeId, commentOriginalSelector));

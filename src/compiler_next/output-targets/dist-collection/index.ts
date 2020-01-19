@@ -2,6 +2,7 @@ import * as d from '../../../declarations';
 import { catchError } from '@utils';
 import { isOutputTargetDistCollection } from '../../../compiler/output-targets/output-utils';
 import { join, relative } from 'path';
+import { writeCollectionManifests } from '../../../compiler/output-targets/output-collection';
 
 
 export const outputCollection = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, changedModuleFiles: d.Module[]) => {
@@ -21,6 +22,8 @@ export const outputCollection = async (config: d.Config, compilerCtx: d.Compiler
         await compilerCtx.fs.writeFile(filePath, code, { outputTargetType: o.type });
       }));
     }));
+
+    await writeCollectionManifests(config, compilerCtx, buildCtx, outputTargets);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

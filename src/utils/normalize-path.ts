@@ -5,7 +5,7 @@
  * extended-length paths and don't contain any non-ascii characters.
  * This was created since the path methods in Node.js outputs \\ paths on Windows.
  */
-export const normalizePath = (str: string) => {
+export const normalizePath = (str: string): string => {
   // https://github.com/sindresorhus/slash MIT
   // By Sindre Sorhus
   if (typeof str !== 'string') {
