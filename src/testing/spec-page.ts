@@ -8,10 +8,6 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
     throw new Error(`NewSpecPageOptions required`);
   }
 
-  if (!Array.isArray(opts.components) || opts.components.length === 0) {
-    throw new Error(`opts.components required`);
-  }
-
   // * WHY THE REQUIRES?!
   // using require() in a closure so jest has a moment
   // to jest.mock w/ moduleNameMapper in the jest config
@@ -24,7 +20,10 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   resetBuildConditionals(bc.BUILD);
 
   testingPlatform.registerContext(opts.context);
-  testingPlatform.registerComponents(opts.components);
+
+  if (Array.isArray(opts.components)) {
+    testingPlatform.registerComponents(opts.components);
+  }
 
   if (opts.hydrateClientSide) {
     opts.includeAnnotations = true;
