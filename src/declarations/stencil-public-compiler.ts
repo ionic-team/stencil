@@ -1111,6 +1111,7 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   cjsIndexFile?: string;
   systemLoaderFile?: string;
   legacyLoaderFile?: string;
+  empty?: boolean;
 }
 
 export interface OutputTargetDistGlobalStyles extends OutputTargetBase {

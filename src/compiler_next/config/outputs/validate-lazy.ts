@@ -1,5 +1,6 @@
 import * as d from '../../../declarations';
 import { DIST_LAZY, isOutputTargetDistLazy } from '../../../compiler/output-targets/output-utils';
+import { isBoolean } from '@utils';
 import { getAbsolutePath } from '../utils';
 import path from 'path';
 
@@ -16,6 +17,7 @@ export const validateLazy = (config: d.Config, userOutputs: d.OutputTarget[]) =>
         systemLoaderFile: config.buildEs5 ? config.sys.path.join(dir, `${config.fsNamespace}.js`) : undefined,
         polyfills: !!o.polyfills,
         isBrowserBuild: true,
+        empty: isBoolean(o.empty) ? o.empty : true,
       };
       return lazyOutput;
     });

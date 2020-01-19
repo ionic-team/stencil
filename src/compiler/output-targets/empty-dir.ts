@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
-import { isOutputTargetDist, isOutputTargetDistLazyLoader, isOutputTargetDistSelfContained, isOutputTargetHydrate, isOutputTargetWww, isOutputTargetDistCustomElements } from './output-utils';
-
+import { isOutputTargetDist, isOutputTargetDistLazyLoader, isOutputTargetDistSelfContained, isOutputTargetHydrate, isOutputTargetWww, isOutputTargetDistCustomElements, isOutputTargetDistLazy } from './output-utils';
+import { isString } from '@utils';
 
 type OutputTargetEmptiable =
   d.OutputTargetDist |
@@ -9,25 +9,31 @@ type OutputTargetEmptiable =
   d.OutputTargetDistSelfContained |
   d.OutputTargetHydrate;
 
-export function isEmptable(o: d.OutputTarget): o is OutputTargetEmptiable {
-  return (
-    isOutputTargetDist(o) ||
-    isOutputTargetDistCustomElements(o) ||
-    isOutputTargetWww(o) ||
-    isOutputTargetDistLazyLoader(o) ||
-    isOutputTargetDistSelfContained(o) ||
-    isOutputTargetHydrate(o)
-  );
-}
+const isEmptable = (o: d.OutputTarget): o is OutputTargetEmptiable => (
+  isOutputTargetDist(o) ||
+  isOutputTargetDistCustomElements(o) ||
+  isOutputTargetWww(o) ||
+  isOutputTargetDistLazy(o) ||
+  isOutputTargetDistLazyLoader(o) ||
+  isOutputTargetDistSelfContained(o) ||
+  isOutputTargetHydrate(o)
+);
 
-export async function emptyOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export const emptyOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (buildCtx.isRebuild || config.logLevel === 'debug') {
     return;
   }
-  const cleanDirs = config.outputTargets
+  const cleanDirs = (config.outputTargets)
     .filter(isEmptable)
-    .filter(o => o.empty)
-    .map(({dir}) => dir);
+    .filter(o => o.empty === true)
+    .map(o => o.dir || (o as any).esmDir)
+    .filter(isString)
+    .reduce((dirs, dir) => {
+      if (!dirs.includes(dir)) {
+        dirs.push(dir);
+      }
+      return dirs;
+    }, [] as string[]);
 
   if (cleanDirs.length === 0) {
     return;
@@ -38,9 +44,9 @@ export async function emptyOutputTargets(config: d.Config, compilerCtx: d.Compil
     cleanDirs.map(dir => emptyDir(config, compilerCtx, buildCtx, dir))
   );
   timeSpan.finish('cleaning dirs finished');
-}
+};
 
-export async function emptyDir(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dir: string) {
+const emptyDir = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dir: string) => {
   buildCtx.debug(`empty dir: ${dir}`);
 
   // Check if there is a .gitkeep file
@@ -55,4 +61,4 @@ export async function emptyDir(config: d.Config, compilerCtx: d.CompilerCtx, bui
   if (existsGitkeep) {
     await compilerCtx.fs.writeFile(gitkeepPath, '', { immediateWrite: true });
   }
-}
+};
