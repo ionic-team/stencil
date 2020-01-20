@@ -1,7 +1,4 @@
-# 💪 [1.9.0-12](https://github.com/ionic-team/stencil/compare/v1.8.5...v1.9.0-12) (2020-01-15)
-
-
-### Bug Fixes
+# 🌃 [1.9.0-13](https://github.com/ionic-team/stencil/compare/v1.8.5...v1.9.0-13) (2020-01-20)
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
 
@@ -40,6 +37,9 @@ Some of main features with the `--next` compiler include:
 * **fetch:** export mock fetch testing apis ([c63a64f](https://github.com/ionic-team/stencil/commit/c63a64fa5bf545cd3965310399993e648f8261d9))
 * **prerender:** add prerender task cmd for existing hydrate app scripts ([f4f3213](https://github.com/ionic-team/stencil/commit/f4f32139712f71f6c7d29248d9e0c030b3cdff29))
 * **polyfills:** optionally exclude css vars shim ([b3b6993](https://github.com/ionic-team/stencil/commit/b3b69933528b7106ff69720797ecaabec74e4546))
+* **bundling:** add webpack chunk name ([3ca7d82](https://github.com/ionic-team/stencil/commit/3ca7d82d8ef03f92b147892a6932c645b50d3aa7)), closes [#1345](https://github.com/ionic-team/stencil/issues/1345) [#1346](https://github.com/ionic-team/stencil/issues/1346)
+* **dev-server:** experimental dev node modules ([104a819](https://github.com/ionic-team/stencil/commit/104a81920bbcf575346f0969459f3eb329edfe3c))
+* **runtime:** dispatch namespace in lifecycleDOMEvents ([67cb2f3](https://github.com/ionic-team/stencil/commit/67cb2f3d1e03509e726fe284a0fcdc3601038634))
 
 
 ### Bug Fixes
@@ -147,6 +147,13 @@ Some of main features with the `--next` compiler include:
 * **next:** allow browser main thread compiler, fix ts imports ([64e3810](https://github.com/ionic-team/stencil/commit/64e38101dba8f138999947eb54f2991ccc9d85bf)), closes [#2130](https://github.com/ionic-team/stencil/issues/2130)
 * **dev-server:** visibility hidden connector iframe ([b86e537](https://github.com/ionic-team/stencil/commit/b86e537a2df2f66c13831cf6ad1df9ad8a3133e0)), closes [#1683](https://github.com/ionic-team/stencil/issues/1683)
 * **test:** lock in working version of fast-deep-equal ([8ad1540](https://github.com/ionic-team/stencil/commit/8ad15408e931f5263c1c2dbe221b20c712334572)), closes [#2133](https://github.com/ionic-team/stencil/issues/2133)
+* **css:** fix media whitespace removal ([918ae5a](https://github.com/ionic-team/stencil/commit/918ae5a96ee9ef57986485a767bea3b83977f06e))
+* **css-shim:** check for MutationObserver ([#2140](https://github.com/ionic-team/stencil/issues/2140)) ([f5140c4](https://github.com/ionic-team/stencil/commit/f5140c4df0762d2e2443338f9e90cdb916acbc94))
+* **next:** create collection-manifest.json ([d9b236a](https://github.com/ionic-team/stencil/commit/d9b236a6b79e3995ca10b99942e0379075a6fff5)), closes [#2150](https://github.com/ionic-team/stencil/issues/2150)
+* **next:** empty dist directories ([c4590ff](https://github.com/ionic-team/stencil/commit/c4590ff84149c1aaf5085b60827b7c5d815259c5))
+* **next:** fix collection output paths ([7097a9d](https://github.com/ionic-team/stencil/commit/7097a9d6da84c789fff975431a690695e662c7b4)), closes [#2149](https://github.com/ionic-team/stencil/issues/2149)
+* **next:** fix dist output ([aa57ebc](https://github.com/ionic-team/stencil/commit/aa57ebc66b295ea606dc2e967cb4e6d3505da186))
+* **next:** fix output dts relative path ([9e2679e](https://github.com/ionic-team/stencil/commit/9e2679efa1a24ad8f684678bf0334f685b8563d9))
 
 
 
