@@ -116,10 +116,10 @@ const getComponentBoilerplate = (tagName: string, hasStyle: boolean) => {
   decorator.push(`  shadow: true`);
   decorator.push(`}`);
 
-  return `import { Component, Host, h } from '@stencil/core';
+  return `import { Component, ComponentInterface, Host, h } from '@stencil/core';
 
 @Component(${decorator.join('\n')})
-export class ${toPascalCase(tagName)} {
+export class ${toPascalCase(tagName)} implements ComponentInterface {
 
   render() {
     return (
