@@ -28,7 +28,7 @@ function generateShortcuts(config: d.Config, compilerCtx: d.CompilerCtx, rollupR
     if (o.cjsIndexFile) {
       const entryPointPath = config.sys.path.join(o.cjsDir, indexFilename);
       const relativePath = relativeImport(config, o.cjsIndexFile, entryPointPath);
-      const shortcutContent = `module.exports = require('${relativePath}');`;
+      const shortcutContent = `module.exports = require('${relativePath}');\n`;
       await compilerCtx.fs.writeFile(o.cjsIndexFile, shortcutContent);
     }
   }));

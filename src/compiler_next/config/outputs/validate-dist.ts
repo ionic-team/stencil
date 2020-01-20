@@ -10,6 +10,8 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) =>
   const distOutputTargets = userOutputs.filter(isOutputTargetDist);
   return distOutputTargets.reduce((outputs, o) => {
     const distOutputTarget = validateOutputTargetDist(config, o);
+    outputs.push(distOutputTarget);
+
     if (distOutputTarget.collectionDir) {
       outputs.push({
         type: DIST_COLLECTION,
