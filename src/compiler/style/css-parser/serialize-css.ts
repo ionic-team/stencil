@@ -13,6 +13,7 @@ export const serializeCss = (stylesheet: CssNode, serializeOpts: SerializeCssOpt
   };
 
   const rules = stylesheet.rules;
+
   if (!rules) {
     return '';
   }
@@ -151,10 +152,22 @@ const serializeCssRule = (opts: SerializeOpts, node: CssNode) => {
     return '';
   }
 
-  return `${node.selectors.map(removeSelectorWhitespace)}{${serializeCssMapVisit(opts, decls)}}`;
+  const cleanedSelectors: string[] = [];
+  let cleanedSelector = '';
+  for (const selector of node.selectors) {
+    cleanedSelector = removeSelectorWhitespace(selector);
+    if (!cleanedSelectors.includes(cleanedSelector)) {
+      cleanedSelectors.push(cleanedSelector);
+    }
+  }
+
+  return `${cleanedSelectors}{${serializeCssMapVisit(opts, decls)}}`;
 };
 
 const serializeCssDeclaration = (node: CssNode, index: number, len: number) => {
+  if (node.value === '') {
+    return '';
+  }
   if (len - 1 === index) {
     return node.property + ':' + node.value;
   }

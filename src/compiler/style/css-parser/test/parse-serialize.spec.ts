@@ -29,6 +29,11 @@ describe('css parse/serialize', () => {
       "a{margin:auto;padding:0}",
     ],
     [
+      "duplicate",
+      "h1, h1, h2, h2, h3 {color:red}",
+      "h1,h2,h3{color:red}",
+    ],
+    [
       "comma-attribute 1",
       ".foo[bar=\"baz,quz\"] {\n  foobar: 123;\n}\n\n",
       ".foo[bar=\"baz,quz\"]{foobar:123}",
@@ -51,7 +56,7 @@ describe('css parse/serialize', () => {
     [
       "comma-selector-function",
       ".foo:matches(.bar,.baz),\n.foo:matches(.bar, .baz),\n.foo:matches(.bar , .baz),\n.foo:matches(.bar ,.baz) {\n  prop: value;\n}\n\n.foo:matches(.bar,.baz,.foobar),\n.foo:matches(.bar, .baz,),\n.foo:matches(,.bar , .baz) {\n  anotherprop: anothervalue;\n}\n",
-      ".foo:matches(.bar,.baz),.foo:matches(.bar,.baz),.foo:matches(.bar,.baz),.foo:matches(.bar,.baz){prop:value}.foo:matches(.bar,.baz,.foobar),.foo:matches(.bar,.baz,),.foo:matches(,.bar,.baz){anotherprop:anothervalue}",
+      ".foo:matches(.bar,.baz){prop:value}.foo:matches(.bar,.baz,.foobar),.foo:matches(.bar,.baz,),.foo:matches(,.bar,.baz){anotherprop:anothervalue}",
     ],
     [
       "comment",
@@ -94,6 +99,21 @@ describe('css parse/serialize', () => {
       "",
     ],
     [
+      "empty h1",
+      "h1 {}",
+      "",
+    ],
+    [
+      "no selector",
+      "{color:blue}",
+      "",
+    ],
+    [
+      "no prop value",
+      "h2 {}",
+      "",
+    ],
+    [
       "escapes 1",
       "/* tests compressed for easy testing */\n/* http://mathiasbynens.be/notes/css-escapes */\n/* will match elements with class=\":`(\" */\n.\\3A \\`\\({}\n/* will match elements with class=\"1a2b3c\" */\n.\\31 a2b3c{}\n/* will match the element with id=\"#fake-id\" */\n#\\#fake-id{}\n/* will match the element with id=\"---\" */\n#\\---{}\n/* will match the element with id=\"-a-b-c-\" */\n#-a-b-c-{}\n/* will match the element with id=\"©\" */\n#©{}\n/* More tests from http://mathiasbynens.be/demo/html5-id */\nhtml{font:1.2em/1.6 Arial;}\ncode{font-family:Consolas;}\nli code{background:rgba(255, 255, 255, .5);padding:.3em;}\nli{background:orange;}\n#♥{background:lime}\n#©{background:lime}\n#“‘’”{background:lime}\n#☺☃{background:lime}\n#⌘⌥{background:lime}\n#𝄞♪♩♫♬{background:lime}\n#\\?{background:lime}\n#\\@{background:lime}\n#\\.{background:lime}\n#\\3A \\){background:lime}\n#\\3A \\`\\({background:lime}\n#\\31 23{background:lime}\n#\\31 a2b3c{background:lime}\n#\\<p\\>{background:lime}\n#\\<\\>\\<\\<\\<\\>\\>\\<\\>{background:lime}\n#\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\[\\>\\+\\+\\+\\+\\+\\+\\+\\>\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\>\\+\\+\\+\\>\\+\\<\\<\\<\\<\\-\\]\\>\\+\\+\\.\\>\\+\\.\\+\\+\\+\\+\\+\\+\\+\\.\\.\\+\\+\\+\\.\\>\\+\\+\\.\\<\\<\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\.\\>\\.\\+\\+\\+\\.\\-\\-\\-\\-\\-\\-\\.\\-\\-\\-\\-\\-\\-\\-\\-\\.\\>\\+\\.\\>\\.{background:lime}\n#\\#{background:lime}\n#\\#\\#{background:lime}\n#\\#\\.\\#\\.\\#{background:lime}\n#\\_{background:lime}\n#\\.fake\\-class{background:lime}\n#foo\\.bar{background:lime}\n#\\3A hover{background:lime}\n#\\3A hover\\3A focus\\3A active{background:lime}\n#\\[attr\\=value\\]{background:lime}\n#f\\/o\\/o{background:lime}\n#f\\\\o\\\\o{background:lime}\n#f\\*o\\*o{background:lime}\n#f\\!o\\!o{background:lime}\n#f\\'o\\'o{background:lime}\n#f\\~o\\~o{background:lime}\n#f\\+o\\+o{background:lime}\n\n/* css-parse does not yet pass this test */\n/*#\\{\\}{background:lime}*/\n",
       "html{font:1.2em/1.6 Arial}code{font-family:Consolas}li code{background:rgba(255, 255, 255, .5);padding:.3em}li{background:orange}#♥{background:lime}#©{background:lime}#“‘’”{background:lime}#☺☃{background:lime}#⌘⌥{background:lime}#𝄞♪♩♫♬{background:lime}#\\?{background:lime}#\\@{background:lime}#\\.{background:lime}#\\3A \\){background:lime}#\\3A \\`\\({background:lime}#\\31 23{background:lime}#\\31 a2b3c{background:lime}#\\<p\\>{background:lime}#\\<\\>\\<\\<\\<\\>\\>\\<\\>{background:lime}#\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\[\\>\\+\\+\\+\\+\\+\\+\\+\\>\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\>\\+\\+\\+\\>\\+\\<\\<\\<\\<\\-\\]\\>\\+\\+\\.\\>\\+\\.\\+\\+\\+\\+\\+\\+\\+\\.\\.\\+\\+\\+\\.\\>\\+\\+\\.\\<\\<\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\+\\.\\>\\.\\+\\+\\+\\.\\-\\-\\-\\-\\-\\-\\.\\-\\-\\-\\-\\-\\-\\-\\-\\.\\>\\+\\.\\>\\.{background:lime}#\\#{background:lime}#\\#\\#{background:lime}#\\#\\.\\#\\.\\#{background:lime}#\\_{background:lime}#\\.fake\\-class{background:lime}#foo\\.bar{background:lime}#\\3A hover{background:lime}#\\3A hover\\3A focus\\3A active{background:lime}#\\[attr\\=value\\]{background:lime}#f\\/o\\/o{background:lime}#f\\\\o\\\\o{background:lime}#f\\*o\\*o{background:lime}#f\\!o\\!o{background:lime}#f\\'o\\'o{background:lime}#f\\~o\\~o{background:lime}#f\\+o\\+o{background:lime}",
@@ -107,6 +127,11 @@ describe('css parse/serialize', () => {
       "font-face-linebreak",
       "@font-face\n  \n       {\n  font-family: \"Bitstream Vera Serif Bold\";\n  src: url(\"http://developer.mozilla.org/@api/deki/files/2934/=VeraSeBd.ttf\");\n}\n\nbody {\n  font-family: \"Bitstream Vera Serif Bold\", serif;\n}\n",
       "@font-face{font-family:\"Bitstream Vera Serif Bold\";src:url(\"http://developer.mozilla.org/@api/deki/files/2934/=VeraSeBd.ttf\")}body{font-family:\"Bitstream Vera Serif Bold\", serif}",
+    ],
+    [
+      "empty font-face",
+      "@font-face;",
+      "",
     ],
     [
       "hose-linebreak",
