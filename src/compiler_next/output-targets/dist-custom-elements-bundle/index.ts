@@ -30,12 +30,12 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
       id: 'customElementsBundle',
       platform: 'client',
       conditionals: getBuildConditionals(config, buildCtx.components),
-      customTransformers: getCustomTransformer(compilerCtx),
+      customTransformers: getCustomElementBundleCustomTransformer(compilerCtx),
       inputs: {
         'index': '@core-entrypoint'
       },
       loader: {
-        '@core-entrypoint': generateEntryPoint(config, compilerCtx, buildCtx)
+        '@core-entrypoint': generateEntryPoint(buildCtx)
       },
       inlineDynamicImports: true,
     };
@@ -76,11 +76,11 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
   timespan.finish(`generate custom elements bundle finished`);
 };
 
-function generateEntryPoint(_config: d.Config, _compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+const generateEntryPoint = (buildCtx: d.BuildCtx) => {
   const imports: string[] = [];
   const exports: string[] = [];
   imports.push(
-    `import { proxyNative } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
+    `import { proxyCustomElement } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
     `export * from '${USER_INDEX_ENTRY_ID}';`,
     `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';`,
     'globalScripts();',
@@ -104,7 +104,7 @@ function generateEntryPoint(_config: d.Config, _compilerCtx: d.CompilerCtx, buil
       );
 
       exports.push(
-        `export const ${exportName} = /*@__PURE__*/proxyNative(${importAs}, ${meta});`
+        `export const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});`
       );
     }
   });
@@ -114,9 +114,9 @@ function generateEntryPoint(_config: d.Config, _compilerCtx: d.CompilerCtx, buil
     ...exports,
     ''
   ].join('\n');
-}
+};
 
-function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[]) {
+const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
 
   build.lazyLoad = false;
@@ -128,9 +128,9 @@ function getBuildConditionals(config: d.Config, cmps: d.ComponentCompilerMeta[])
   build.devTools = false;
 
   return build;
-}
+};
 
-const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
+const getCustomElementBundleCustomTransformer = (compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: null,

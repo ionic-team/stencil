@@ -101,20 +101,9 @@ export class AppRoot {
       input: entryId,
       treeshake: true,
       plugins: [
-        // stencil.rollupPlugin(),
         {
           resolveId: (importee: string, importer: string) => {
             console.log('bundle resolveId, importee:', importee, 'importer:', importer);
-
-            if (importee.includes('.stencil-client.')) {
-              const parts = importee.split('/');
-              const filename = parts[parts.length - 1];
-              const url = `/@stencil/core/internal/client/${filename}`;
-              return {
-                id: url,
-                external: true
-              };
-            }
 
             if (importee.startsWith('.')) {
               var u = new URL(importee, 'http://url.resolve' + (importer || ''));

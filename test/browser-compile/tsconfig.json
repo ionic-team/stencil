@@ -26,5 +26,8 @@
       "@stencil/core": ["../../internal"],
       "@stencil/core/internal": ["../../internal"]
     }
-  }
+  },
+  "include": [
+    "src"
+  ]
 }

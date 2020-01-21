@@ -22,7 +22,7 @@ export const parseImport = (config: d.Config, compilerCtx: d.CompilerCtx, buildC
       importPath = normalizePath(config.sys.path.resolve(dirPath, importPath));
       moduleFile.localImports.push(importPath);
 
-    } else {
+    } else if (config.sys.resolveModule) {
       // node resolve side effect import
       addExternalImport(config, compilerCtx, buildCtx, moduleFile, config.rootDir, importPath);
 

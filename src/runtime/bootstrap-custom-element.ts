@@ -9,22 +9,28 @@ import { PROXY_FLAGS } from './runtime-constants';
 import { attachStyles, getScopeId, registerStyle } from './styles';
 import { computeMode } from './mode';
 
-export const attachShadow = (el: HTMLElement) => {
-  if (supportsShadowDom) {
-    el.attachShadow({ mode: 'open' });
-  } else {
-    (el as any).shadowRoot = el;
-  }
+
+export const defineCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
+  customElements.define(
+    compactMeta[1],
+    proxyCustomElement(Cstr, compactMeta) as Function
+  );
 };
 
-export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
+export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
   const cmpMeta: d.ComponentRuntimeMeta = {
     $flags$: compactMeta[0],
     $tagName$: compactMeta[1],
-    $members$: compactMeta[2],
-    $listeners$: compactMeta[3],
-    $watchers$: Cstr.$watchers$
   };
+  if (BUILD.member) {
+    cmpMeta.$members$ = compactMeta[2];
+  }
+  if (BUILD.hostListener) {
+    cmpMeta.$listeners$ = compactMeta[3];
+  }
+  if (BUILD.watchCallback) {
+    cmpMeta.$watchers$ = Cstr.$watchers$;
+  }
   if (BUILD.reflect) {
     cmpMeta.$attrsToReflect$ = [];
   }
@@ -40,11 +46,15 @@ export const proxyNative = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompac
     },
     connectedCallback() {
       connectedCallback(this);
-      originalConnectedCallback && originalConnectedCallback.call(this);
+      if (BUILD.connectedCallback && originalConnectedCallback) {
+        originalConnectedCallback.call(this);
+      }
     },
     disconnectedCallback() {
       disconnectedCallback(this);
-      originalDisconnectedCallback && originalDisconnectedCallback.call(this);
+      if (BUILD.disconnectedCallback && originalDisconnectedCallback) {
+        originalDisconnectedCallback.call(this);
+      }
     },
     forceUpdate() {
       forceUpdate(this);
@@ -74,5 +84,13 @@ export const forceModeUpdate = (elm: d.RenderNode) => {
         forceUpdate(elm);
       }
     }
+  }
+};
+
+export const attachShadow = (el: HTMLElement) => {
+  if (supportsShadowDom) {
+    el.attachShadow({ mode: 'open' });
+  } else {
+    (el as any).shadowRoot = el;
   }
 };

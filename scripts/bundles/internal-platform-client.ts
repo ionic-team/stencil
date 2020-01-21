@@ -32,7 +32,7 @@ export async function internalClient(opts: BuildOptions) {
     format: 'es',
     dir: outputInternalClientDir,
     entryFileNames: '[name].mjs',
-    chunkFileNames: '[name].[hash].mjs',
+    chunkFileNames: '[name].mjs',
     banner: getBanner(opts, 'Stencil Client Platform')
   }
 

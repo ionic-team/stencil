@@ -68,7 +68,7 @@ export const updateNativeConstructor = (classMembers: ts.ClassElement[], moduleF
 
 const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   const initStatements =  [
-    nativeRegisterHostStatement(moduleFile),
+    nativeRegisterHostStatement(),
   ];
   if (cmp.encapsulation === 'shadow') {
     initStatements.push(nativeAttachShadowStatement(moduleFile));
@@ -76,9 +76,7 @@ const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   return initStatements;
 };
 
-const nativeRegisterHostStatement = (moduleFile: d.Module) => {
-  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.registerHost);
-
+const nativeRegisterHostStatement = () => {
   return ts.createStatement(ts.createCall(
     ts.createPropertyAccess(
       ts.createThis(),
