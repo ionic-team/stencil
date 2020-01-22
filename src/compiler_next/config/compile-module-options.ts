@@ -37,7 +37,7 @@ const VALID_SCRIPT = new Set(['latest', 'esnext', 'es2017', 'es2015', 'es5']);
 const VALID_STYLE = new Set(['static']);
 
 
-export const getTransformOptions = (compilerOpts: CompileOptions) => {
+export const getCompileModuleTransformOptions = (compilerOpts: CompileOptions) => {
   const transformOpts: TransformOptions = {
 
     // best we always set this to true

@@ -3,7 +3,7 @@ import { DEFAULT_STYLE_MODE, catchError, createVarName, normalizePath, hasError 
 import { createStencilImportPath } from '../transformers/stencil-import-path';
 import { getScopeId } from '../style/scope-css';
 import { scopeCss } from '../../utils/shadow-css';
-import { stripComments } from './style-utils';
+import { stripCssComments } from './style-utils';
 import MagicString from 'magic-string';
 import path from 'path';
 import { optimizeCss } from '../../compiler_next/optimize/optimize-css';
@@ -77,7 +77,7 @@ const getCssImports = (varNames: Set<string>, cssText: string, filePath: string,
     return cssImports;
   }
 
-  cssText = stripComments(cssText);
+  cssText = stripCssComments(cssText);
 
   const dir = path.dirname(filePath);
 

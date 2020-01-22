@@ -1,6 +1,6 @@
 import { CompileOptions, CompileResults } from '../declarations';
 import { catchError, isString } from '@utils';
-import { getCompileConfig, getCompileOptions, getTransformOptions } from './config/compile-module-options';
+import { getCompileConfig, getCompileOptions, getCompileModuleTransformOptions } from './config/compile-module-options';
 import { getPublicCompilerMeta } from '../compiler/transformers/add-component-meta-static';
 import { patchTypescript } from './sys/typescript/typescript-patch';
 import { transformCssToEsm } from '../compiler/style/css-to-esm';
@@ -30,7 +30,7 @@ export const compile = async (code: string, opts: CompileOptions = {}) => {
     } else if (filePath.endsWith('.tsx') || filePath.endsWith('.ts') || filePath.endsWith('.jsx')) {
       await patchTypescript(config, r.diagnostics, null);
 
-      const transformOpts = getTransformOptions(r.inputOptions);
+      const transformOpts = getCompileModuleTransformOptions(r.inputOptions);
 
       const transpileResults = transpileModule(config, code, transformOpts, r.inputFilePath);
 

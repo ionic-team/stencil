@@ -37,7 +37,7 @@ export const generateMarkdown = (config: d.Config, userContent: string, cmp: d.J
     AUTO_GENERATE_COMMENT,
     '',
     '',
-    ...getDeprecation(cmp),
+    ...getDocsDeprecation(cmp),
     ...usageToMarkdown(cmp.usage),
     ...propsToMarkdown(cmp.props),
     ...eventsToMarkdown(cmp.events),
@@ -53,7 +53,7 @@ export const generateMarkdown = (config: d.Config, userContent: string, cmp: d.J
   ].join('\n');
 };
 
-const getDeprecation = (cmp: d.JsonDocsComponent) => {
+const getDocsDeprecation = (cmp: d.JsonDocsComponent) => {
   if (cmp.deprecation !== undefined) {
     return [
       `> **[DEPRECATED]** ${cmp.deprecation}`,

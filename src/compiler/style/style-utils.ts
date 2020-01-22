@@ -42,7 +42,7 @@ export const PLUGIN_HELPERS = [
   }
 ];
 
-export const stripComments = (input: string) => {
+export const stripCssComments = (input: string) => {
   let isInsideString = null;
   let currentCharacter = '';
   let returnValue = '';

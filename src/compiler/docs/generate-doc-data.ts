@@ -13,11 +13,11 @@ export const generateDocData = async (config: d.Config, compilerCtx: d.CompilerC
       version: config.sys.compiler.version,
       typescriptVersion: config.sys.compiler.typescriptVersion
     },
-    components: await getComponents(config, compilerCtx, buildCtx)
+    components: await getDocsComponents(config, compilerCtx, buildCtx)
   };
 };
 
-const getComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> => {
+const getDocsComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> => {
   const results = await Promise.all(buildCtx.moduleFiles.map(async moduleFile => {
     const filePath = moduleFile.sourceFilePath;
     const dirPath = normalizePath(config.sys.path.dirname(filePath));
@@ -38,25 +38,25 @@ const getComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, build
         usage,
         docs: generateDocs(readme, cmp.docs),
         docsTags: cmp.docs.tags,
-        encapsulation: getEncapsulation(cmp),
+        encapsulation: getDocsEncapsulation(cmp),
         dependents: cmp.directDependents,
         dependencies: cmp.directDependencies,
-        dependencyGraph: buildDepGraph(cmp, buildCtx.components),
-        deprecation: getDeprecation(cmp.docs.tags),
+        dependencyGraph: buildDocsDepGraph(cmp, buildCtx.components),
+        deprecation: getDocsDeprecationText(cmp.docs.tags),
 
-        props: getProperties(cmp),
-        methods: getMethods(cmp.methods),
-        events: getEvents(cmp.events),
-        styles: getStyles(cmp),
-        slots: getSlots(cmp.docs.tags),
-        parts: getParts(cmp.docs.tags)
+        props: getDocsProperties(cmp),
+        methods: getDocsMethods(cmp.methods),
+        events: getDocsEvents(cmp.events),
+        styles: getDocsStyles(cmp),
+        slots: getDocsSlots(cmp.docs.tags),
+        parts: getDocsParts(cmp.docs.tags)
       }));
   }));
 
   return sortBy(flatOne(results), cmp => cmp.tag);
 };
 
-const buildDepGraph = (cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) => {
+const buildDocsDepGraph = (cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) => {
   const dependencies: d.JsonDocsDependencyGraph = {};
   function walk(tagName: string) {
     if (!dependencies[tagName]) {
@@ -81,7 +81,7 @@ const buildDepGraph = (cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMe
   return dependencies;
 };
 
-const getEncapsulation = (cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped' | 'none' => {
+const getDocsEncapsulation = (cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped' | 'none' => {
   if (cmp.encapsulation === 'shadow') {
     return 'shadow';
   } else if (cmp.encapsulation === 'scoped') {
@@ -91,7 +91,7 @@ const getEncapsulation = (cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped' | '
   }
 };
 
-const getProperties = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] => {
+const getDocsProperties = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] => {
   return sortBy([
     ...getRealProperties(cmpMeta.properties),
     ...getVirtualProperties(cmpMeta.virtualProperties)
@@ -109,7 +109,7 @@ const getRealProperties = (properties: d.ComponentCompilerProperty[]): d.JsonDoc
       docs: member.docs.text,
       docsTags: member.docs.tags,
       default: member.defaultValue,
-      deprecation: getDeprecation(member.docs.tags),
+      deprecation: getDocsDeprecationText(member.docs.tags),
       values: parseTypeIntoValues(member.complexType.resolved),
 
       optional: member.optional,
@@ -179,7 +179,7 @@ const parseTypeIntoValues = (type: string) => {
   return [];
 };
 
-const getMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] => {
+const getDocsMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] => {
   return sortBy(methods, member => member.name)
     .filter(member => isDocsPublic(member.docs))
     .map(member => ({
@@ -192,12 +192,12 @@ const getMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] =>
       parameters: [], // TODO
       docs: member.docs.text,
       docsTags: member.docs.tags,
-      deprecation: getDeprecation(member.docs.tags)
+      deprecation: getDocsDeprecationText(member.docs.tags)
     }));
 };
 
 
-const getEvents = (events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] => {
+const getDocsEvents = (events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] => {
   return sortBy(events, eventMeta => eventMeta.name.toLowerCase())
     .filter(eventMeta => isDocsPublic(eventMeta.docs))
     .map(eventMeta => ({
@@ -208,12 +208,11 @@ const getEvents = (events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] => {
       composed: eventMeta.composed,
       docs: eventMeta.docs.text,
       docsTags: eventMeta.docs.tags,
-      deprecation: getDeprecation(eventMeta.docs.tags)
+      deprecation: getDocsDeprecationText(eventMeta.docs.tags)
     }));
 };
 
-
-const getStyles = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] => {
+const getDocsStyles = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] => {
   if (!cmpMeta.styleDocs) {
     return [];
   }
@@ -227,7 +226,7 @@ const getStyles = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] => {
   });
 }
 
-const getDeprecation = (tags: d.JsonDocsTag[]) => {
+const getDocsDeprecationText = (tags: d.JsonDocsTag[]) => {
   const deprecation = tags.find(t => t.name === 'deprecated');
   if (deprecation) {
     return deprecation.text || '';
@@ -235,13 +234,13 @@ const getDeprecation = (tags: d.JsonDocsTag[]) => {
   return undefined;
 };
 
-const getSlots = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
+const getDocsSlots = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
   return sortBy(getNameText('slot', tags)
     .map(([name, docs]) => ({ name, docs }))
     , a => a.name);
 };
 
-const getParts = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
+const getDocsParts = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
   return sortBy(getNameText('part', tags)
     .map(([name, docs]) => ({ name, docs }))
     , a => a.name);

@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { buildError, normalizePath } from '@utils';
 import { parseStyleDocs } from '../docs/style-docs';
-import { stripComments } from './style-utils';
+import { stripCssComments } from './style-utils';
 
 
 export async function parseCssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, srcFilePath: string, resolvedFilePath: string, styleText: string, styleDocs?: d.StyleDoc[]) {
@@ -74,7 +74,7 @@ export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: 
     return imports;
   }
 
-  styleText = stripComments(styleText);
+  styleText = stripCssComments(styleText);
 
   const dir = config.sys.path.dirname(filePath);
   const importeeExt = filePath.split('.').pop().toLowerCase();

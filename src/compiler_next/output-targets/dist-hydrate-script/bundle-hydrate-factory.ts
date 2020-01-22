@@ -14,8 +14,8 @@ export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.Comp
     const bundleOpts: BundleOptions = {
       id: 'hydrate',
       platform: 'hydrate',
-      conditionals: getBuildConditionals(buildCtx.components),
-      customTransformers: getCustomTransformer(compilerCtx),
+      conditionals: getHydrateBuildConditionals(buildCtx.components),
+      customTransformers: getHydrateCustomTransformer(compilerCtx),
       inlineDynamicImports: true,
       inputs: {
         '@app-factory-entry': '@app-factory-entry'
@@ -37,7 +37,7 @@ export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.Comp
 };
 
 
-const getBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => {
+const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
 
   build.lazyLoad = true;
@@ -63,7 +63,7 @@ const getBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => {
 };
 
 
-const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
+const getHydrateCustomTransformer = (compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_HYDRATE_ID,
     componentExport: null,
