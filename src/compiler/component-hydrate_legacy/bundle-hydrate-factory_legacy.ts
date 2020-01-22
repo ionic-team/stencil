@@ -58,7 +58,7 @@ export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.Comp
 
   } catch (e) {
     if (!buildCtx.hasError) {
-      loadRollupDiagnostics(compilerCtx, buildCtx, e);
+      loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
     }
   }
 

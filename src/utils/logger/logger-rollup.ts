@@ -1,10 +1,11 @@
 import * as d from '../../declarations';
 import { buildWarn } from '../message-utils';
+import { isString, toTitleCase } from '../helpers';
 import { splitLineBreaks } from './logger-utils';
-import { toTitleCase } from '../helpers';
+import { RollupError } from 'rollup'
 
 
-export const loadRollupDiagnostics = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: any) => {
+export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: RollupError) => {
   const formattedCode = formatErrorCode(rollupError.code);
 
   const diagnostic: d.Diagnostic = {
@@ -19,7 +20,7 @@ export const loadRollupDiagnostics = (compilerCtx: d.CompilerCtx, buildCtx: d.Bu
     lines: []
   };
 
-  if (rollupError.stack) {
+  if (config.logLevel === 'debug' && rollupError.stack) {
     diagnostic.messageText = rollupError.stack;
   } else if (rollupError.message) {
     diagnostic.messageText = rollupError.message;
@@ -29,12 +30,13 @@ export const loadRollupDiagnostics = (compilerCtx: d.CompilerCtx, buildCtx: d.Bu
     diagnostic.messageText += ` (plugin: ${rollupError.plugin}${rollupError.hook ? `, ${rollupError.hook}` : ''})`;
   }
 
-  if (rollupError.loc != null && typeof rollupError.loc.file === 'string') {
+  const srcFile = rollupError.loc.file || rollupError.id;
+  if (rollupError.loc != null && isString(srcFile)) {
 
     try {
-      const sourceText = compilerCtx.fs.readFileSync(rollupError.loc.file);
+      const sourceText = compilerCtx.fs.readFileSync(srcFile);
       if (sourceText) {
-        diagnostic.absFilePath = rollupError.loc.file;
+        diagnostic.absFilePath = srcFile;
 
         try {
           const srcLines = splitLineBreaks(sourceText);
@@ -90,7 +92,7 @@ export const loadRollupDiagnostics = (compilerCtx: d.CompilerCtx, buildCtx: d.Bu
           }
 
         } catch (e) {
-          diagnostic.messageText = `Error parsing: ${diagnostic.absFilePath}, line: ${rollupError.loc.line}, column: ${rollupError.loc.column}`;
+          diagnostic.messageText += `\nError parsing: ${diagnostic.absFilePath}, line: ${rollupError.loc.line}, column: ${rollupError.loc.column}`;
           diagnostic.debugText = sourceText;
         }
 

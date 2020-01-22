@@ -57,7 +57,7 @@ export const generateHydrateApp = async (config: d.Config, compilerCtx: d.Compil
 
   } catch (e) {
     if (!buildCtx.hasError) {
-      loadRollupDiagnostics(compilerCtx, buildCtx, e);
+      loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
     }
   }
 };

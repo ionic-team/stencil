@@ -32,7 +32,7 @@ export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx,
 
   } catch (e) {
     if (!buildCtx.hasError) {
-      loadRollupDiagnostics(compilerCtx, buildCtx, e);
+      loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
     }
   }
   return undefined;
