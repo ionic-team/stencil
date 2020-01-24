@@ -43,7 +43,7 @@ describe('@Element', () => {
     await page.waitForChanges();
 
     expect(elm).toEqualHtml(`
-      <element-cmp id="my-elm" class="hydrated">
+      <element-cmp id="my-elm" class="hydrated" data-hydrated>
         <div>
           inner content
         </div>

@@ -39,7 +39,7 @@ describe('shadow', () => {
 
 
     expect(page.root).toEqualHtml(`
-    <cmp-a class="hydrated">
+    <cmp-a class="hydrated" data-hydrated>
       <mock:shadow-root>
         <div>
           <slot name=\"start\"></slot>
@@ -62,7 +62,7 @@ describe('shadow', () => {
     </cmp-a>`);
 
     expect(page.root).toEqualLightHtml(`
-    <cmp-a class="hydrated">
+    <cmp-a class="hydrated" data-hydrated>
       <span slot=\"end\">
         End
       </span>
@@ -87,7 +87,7 @@ describe('shadow', () => {
     });
 
     const expected = `
-    <cmp-a class="hydrated sc-cmp-a-h">
+    <cmp-a class="sc-cmp-a-h hydrated" data-hydrated>
       <!---->
       <div class="sc-cmp-a sc-cmp-a-s">
         <span slot=\"start\">

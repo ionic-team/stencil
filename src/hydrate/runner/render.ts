@@ -198,6 +198,7 @@ function finalizeHydrate(win: Window, doc: Document, opts: HydrateFactoryOptions
 
     if (opts.clientHydrateAnnotations) {
       doc.documentElement.classList.add('hydrated');
+      doc.documentElement.dataset.hydrated = "";
     }
 
     if (opts.serializeToHtml) {

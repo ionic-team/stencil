@@ -15,7 +15,7 @@ describe('car-list', () => {
 
   it('should work without parameters', async () => {
     expect(elm).toEqualHtml(`
-      <car-list class="hydrated">
+      <car-list class="hydrated" data-hydrated>
         <mock:shadow-root></mock:shadow-root>
       </car-list>
     `);
@@ -36,25 +36,25 @@ describe('car-list', () => {
     await page.waitForChanges();
 
     expect(elm).toEqualHtml(`
-      <car-list class="hydrated">
+      <car-list class="hydrated" data-hydrated>
         <mock:shadow-root>
           <ul>
             <li class="">
-              <car-detail class="hydrated">
+              <car-detail class="hydrated" data-hydrated>
                 <section>
                   1934 Cord Model 812
                 </section>
               </car-detail>
             </li>
             <li class="">
-              <car-detail class="hydrated">
+              <car-detail class="hydrated" data-hydrated>
                 <section>
                   1935 Duesenberg SSJ
                 </section>
               </car-detail>
             </li>
             <li class="">
-              <car-detail class="hydrated">
+              <car-detail class="hydrated" data-hydrated>
                 <section>
                   1938 Alfa Romeo 2900 8c
                 </section>
@@ -70,21 +70,21 @@ describe('car-list', () => {
     expect(elm.shadowRoot).toEqualHtml(`
       <ul>
         <li>
-          <car-detail class="hydrated">
+          <car-detail class="hydrated" data-hydrated>
             <section>
               1934 Cord Model 812
             </section>
           </car-detail>
         </li>
         <li>
-          <car-detail class="hydrated">
+          <car-detail class="hydrated" data-hydrated>
             <section>
               1935 Duesenberg SSJ
             </section>
           </car-detail>
         </li>
         <li>
-          <car-detail class="hydrated">
+          <car-detail class="hydrated" data-hydrated>
             <section>
               1938 Alfa Romeo 2900 8c
             </section>

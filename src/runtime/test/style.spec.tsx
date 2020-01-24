@@ -21,7 +21,7 @@ describe('style', () => {
       html: `<cmp-a></cmp-a>`,
     });
 
-    expect(root).toHaveClass('hydrated');
+    expect(root).toHaveAttribute('data-hydrated');
     expect(styles.get('CMP-A')).toBe(`div { color: red; }`);
   });
 

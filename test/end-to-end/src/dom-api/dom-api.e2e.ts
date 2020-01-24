@@ -12,7 +12,7 @@ describe('dom api e2e tests', () => {
 
     expect(elm).toHaveClass('class-a');
     expect(elm).not.toHaveClass('class-b');
-    expect(elm.className).toBe('class-a hydrated');
+    expect(elm).toHaveAttribute('data-hydrated');
 
     elm.classList.add('class-b', 'class-c');
 
@@ -40,7 +40,8 @@ describe('dom api e2e tests', () => {
     expect(elm.classList.contains('class-c')).toBe(true);
     expect(elm.classList.contains('class-d')).toBe(false);
 
-    expect(elm.className).toBe('class-a hydrated class-b class-c');
+    expect(elm.className).toBe('class-a class-b class-c');
+    expect(elm).toHaveAttribute('data-hydrated');
   });
 
   it('should remove css classes', async () => {
@@ -155,7 +156,7 @@ describe('dom api e2e tests', () => {
     const elm = await page.find('dom-api');
 
     expect(elm).toEqualHtml(`
-      <dom-api class="hydrated">
+      <dom-api class="hydrated" data-hydrated>
         <span data-z="z" class="red green blue" data-a="a">
           dom api
         </span>
@@ -185,13 +186,13 @@ describe('dom api e2e tests', () => {
     await page.waitForChanges();
 
     expect(elm).toEqualHtml(`
-      <dom-api class="hydrated">
+      <dom-api class="hydrated" data-hydrated>
         <div>changed content</div>
       </dom-api>
     `);
 
     expect(elm.outerHTML).toEqualHtml(`
-      <dom-api class="hydrated">
+      <dom-api class="hydrated" data-hydrated>
         <div>changed content</div>
       </dom-api>
     `);
@@ -233,7 +234,7 @@ describe('dom api e2e tests', () => {
     `);
 
     expect(elm).toEqualHtml(`
-      <dom-api class="hydrated">
+      <dom-api class="hydrated" data-hydrated>
         updated text content
       </dom-api>
     `);

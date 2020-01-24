@@ -179,6 +179,7 @@ describe('${name}', () => {
 
     const element = await page.find('${name}');
     expect(element).toHaveClass('hydrated');
+    expect(element).toHaveAttribute('data-hydrated');
   });
 });
 `;

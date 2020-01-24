@@ -24,7 +24,7 @@ describe('hydrate scoped', () => {
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a class="hydrated" data-hydrated s-id="1">
         <!--r.1-->
         <!--o.0.1.-->
         <article c-id="1.0.0.0">
@@ -44,7 +44,7 @@ describe('hydrate scoped', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a class="hydrated" data-hydrated>
         <!--r.1-->
         <!---->
         <article>
@@ -75,7 +75,7 @@ describe('hydrate scoped', () => {
       hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a class="hydrated" data-hydrated s-id="1">
         <!--r.1-->
         <!--o.0.1.c-->
         <article c-id="1.0.0.0">
@@ -97,7 +97,7 @@ describe('hydrate scoped', () => {
     expect(clientHydrated.root['s-cr']['s-cn']).toBe(true);
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a class="hydrated" data-hydrated>
         <!--r.1-->
         <!---->
         <article>
@@ -126,7 +126,7 @@ describe('hydrate scoped', () => {
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a class="hydrated" data-hydrated s-id="1">
         <!--r.1-->
         <p c-id="1.0.0.0" class="hi">
           <!--t.1.1.1.0-->
@@ -146,7 +146,7 @@ describe('hydrate scoped', () => {
     expect(clientHydrated.root['s-cr']['s-cn']).toBe(true);
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a class="hydrated" data-hydrated>
         <!--r.1-->
         <p class="hi">
           Hello

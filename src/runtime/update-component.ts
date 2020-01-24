@@ -193,6 +193,7 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
       // DOM WRITE!
       // add the css class that this element has officially hydrated
       elm.classList.add(HYDRATED_CLASS);
+      elm.dataset.hydrated = '';
     }
 
     if (BUILD.cmpDidLoad) {
@@ -278,6 +279,7 @@ export const appDidLoad = (who: string) => {
   // we have finish the first big initial render
   if (BUILD.cssAnnotations) {
     doc.documentElement.classList.add(HYDRATED_CLASS);
+    doc.documentElement.dataset.hydrated = '';
   }
   if (!BUILD.hydrateServerSide) {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;

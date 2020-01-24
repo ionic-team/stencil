@@ -38,9 +38,9 @@ describe('hydrate, shadow', () => {
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a class="hydrated" data-hydrated s-id="1">
         <!--r.1-->
-        <cmp-b c-id="1.0.0.0" class="hydrated" s-id="2">
+        <cmp-b c-id="1.0.0.0" class="hydrated" data-hydrated s-id="2">
           <!--r.2-->
           <!--o.1.1.-->
           <article c-id="2.0.0.0">
@@ -59,9 +59,9 @@ describe('hydrate, shadow', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a class="hydrated" data-hydrated>
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b class="hydrated" data-hydrated>
           <mock:shadow-root>
             <article>
               <slot></slot>
@@ -113,7 +113,7 @@ describe('hydrate, shadow', () => {
       hydrateServerSide: true
     });
     expect(serverHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated" s-id="1">
+      <cmp-a class="hydrated" data-hydrated s-id="1">
         <!--r.1-->
         <!--o.0.2.-->
         <article c-id="1.0.0.0">
@@ -149,7 +149,7 @@ describe('hydrate, shadow', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a class="hydrated" data-hydrated>
         <mock:shadow-root>
           <article>
             <section>

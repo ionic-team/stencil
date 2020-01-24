@@ -11,7 +11,7 @@ describe('build-data e2e', () => {
     });
     const element = await page.find('build-data')
     expect(element).toEqualHtml(`
-      <build-data class="hydrated">
+      <build-data class="hydrated" data-hydrated>
         <p>isDev: true</p>
         <p>isBrowser: true</p>
         <p>isTesting: true</p>
