@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { getGlobalScriptPaths } from '../../bundle/app-data-plugin';
+import { getGlobalScriptData } from '../../bundle/app-data-plugin';
 import { HYDRATE_APP_CLOSURE_START } from './hydrate-factory-closure';
 
 
@@ -10,8 +10,8 @@ export const relocateHydrateContextConst = (config: d.Config, compilerCtx: d.Com
 
   // /*hydrate context start*/export const Context = {};/*hydrate context end*/
 
-  const globalPaths = getGlobalScriptPaths(config, compilerCtx);
-  if (globalPaths.length > 0) {
+  const globalScripts = getGlobalScriptData(config, compilerCtx);
+  if (globalScripts.length > 0) {
     const startCode = code.indexOf('/*hydrate context start*/');
     const endCode = code.indexOf('/*hydrate context end*/') + '/*hydrate context end*/'.length;
 

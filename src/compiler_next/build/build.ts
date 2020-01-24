@@ -22,7 +22,7 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
       }
     }
 
-    buildCtx.packageJson = await readPackageJson(config, compilerCtx, buildCtx);
+    await readPackageJson(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildAbort(buildCtx);
 
     // run typescript program
@@ -31,8 +31,8 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
     tsTimeSpan.finish('transpile finished');
     if (buildCtx.hasError) return buildAbort(buildCtx);
 
-    if (componentDtsChanged) {
-      // silent abort
+    if (config.watch && componentDtsChanged) {
+      // silent abort for watch mode only
       return null;
     }
 

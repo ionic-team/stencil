@@ -30,77 +30,79 @@ export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerC
     diagnostic.messageText += ` (plugin: ${rollupError.plugin}${rollupError.hook ? `, ${rollupError.hook}` : ''})`;
   }
 
-  const srcFile = rollupError.loc.file || rollupError.id;
-  if (rollupError.loc != null && isString(srcFile)) {
+  const loc = rollupError.loc;
+  if (loc != null) {
+    const srcFile = loc.file || rollupError.id;
+    if (isString(srcFile)) {
+      try {
+        const sourceText = compilerCtx.fs.readFileSync(srcFile);
+        if (sourceText) {
+          diagnostic.absFilePath = srcFile;
 
-    try {
-      const sourceText = compilerCtx.fs.readFileSync(srcFile);
-      if (sourceText) {
-        diagnostic.absFilePath = srcFile;
+          try {
+            const srcLines = splitLineBreaks(sourceText);
 
-        try {
-          const srcLines = splitLineBreaks(sourceText);
+            const errorLine: d.PrintLine = {
+              lineIndex: loc.line - 1,
+              lineNumber: loc.line,
+              text: srcLines[loc.line - 1],
+              errorCharStart: loc.column,
+              errorLength: 0
+            };
 
-          const errorLine: d.PrintLine = {
-            lineIndex: rollupError.loc.line - 1,
-            lineNumber: rollupError.loc.line,
-            text: srcLines[rollupError.loc.line - 1],
-            errorCharStart: rollupError.loc.column,
-            errorLength: 0
-          };
+            diagnostic.lineNumber = errorLine.lineNumber;
+            diagnostic.columnNumber = errorLine.errorCharStart;
 
-          diagnostic.lineNumber = errorLine.lineNumber;
-          diagnostic.columnNumber = errorLine.errorCharStart;
-
-          const highlightLine = errorLine.text.substr(rollupError.loc.column);
-          for (let i = 0; i < highlightLine.length; i++) {
-            if (charBreak.has(highlightLine.charAt(i))) {
-              break;
+            const highlightLine = errorLine.text.substr(loc.column);
+            for (let i = 0; i < highlightLine.length; i++) {
+              if (charBreak.has(highlightLine.charAt(i))) {
+                break;
+              }
+              errorLine.errorLength++;
             }
-            errorLine.errorLength++;
+
+            diagnostic.lines.push(errorLine);
+
+            if (errorLine.errorLength === 0 && errorLine.errorCharStart > 0) {
+              errorLine.errorLength = 1;
+              errorLine.errorCharStart--;
+            }
+
+            if (errorLine.lineIndex > 0) {
+              const previousLine: d.PrintLine = {
+                lineIndex: errorLine.lineIndex - 1,
+                lineNumber: errorLine.lineNumber - 1,
+                text: srcLines[errorLine.lineIndex - 1],
+                errorCharStart: -1,
+                errorLength: -1
+              };
+
+              diagnostic.lines.unshift(previousLine);
+            }
+
+            if (errorLine.lineIndex + 1 < srcLines.length) {
+              const nextLine: d.PrintLine = {
+                lineIndex: errorLine.lineIndex + 1,
+                lineNumber: errorLine.lineNumber + 1,
+                text: srcLines[errorLine.lineIndex + 1],
+                errorCharStart: -1,
+                errorLength: -1
+              };
+
+              diagnostic.lines.push(nextLine);
+            }
+
+          } catch (e) {
+            diagnostic.messageText += `\nError parsing: ${diagnostic.absFilePath}, line: ${loc.line}, column: ${loc.column}`;
+            diagnostic.debugText = sourceText;
           }
 
-          diagnostic.lines.push(errorLine);
-
-          if (errorLine.errorLength === 0 && errorLine.errorCharStart > 0) {
-            errorLine.errorLength = 1;
-            errorLine.errorCharStart--;
-          }
-
-          if (errorLine.lineIndex > 0) {
-            const previousLine: d.PrintLine = {
-              lineIndex: errorLine.lineIndex - 1,
-              lineNumber: errorLine.lineNumber - 1,
-              text: srcLines[errorLine.lineIndex - 1],
-              errorCharStart: -1,
-              errorLength: -1
-            };
-
-            diagnostic.lines.unshift(previousLine);
-          }
-
-          if (errorLine.lineIndex + 1 < srcLines.length) {
-            const nextLine: d.PrintLine = {
-              lineIndex: errorLine.lineIndex + 1,
-              lineNumber: errorLine.lineNumber + 1,
-              text: srcLines[errorLine.lineIndex + 1],
-              errorCharStart: -1,
-              errorLength: -1
-            };
-
-            diagnostic.lines.push(nextLine);
-          }
-
-        } catch (e) {
-          diagnostic.messageText += `\nError parsing: ${diagnostic.absFilePath}, line: ${rollupError.loc.line}, column: ${rollupError.loc.column}`;
-          diagnostic.debugText = sourceText;
+        } else if (typeof rollupError.frame === 'string') {
+          diagnostic.messageText += '\n' + rollupError.frame;
         }
 
-      } else if (typeof rollupError.frame === 'string') {
-        diagnostic.messageText += '\n' + rollupError.frame;
-      }
-
-    } catch (e) {}
+      } catch (e) {}
+    }
   }
 
   buildCtx.diagnostics.push(diagnostic);

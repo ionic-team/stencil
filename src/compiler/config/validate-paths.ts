@@ -61,6 +61,8 @@ export function validatePaths(config: Config) {
     config.buildLogFilePath = normalizePath(config.buildLogFilePath);
     config.logger.buildLogFilePath = config.buildLogFilePath;
   }
+
+  config.packageJsonFilePath = path.join(config.rootDir, 'package.json');
 }
 
 

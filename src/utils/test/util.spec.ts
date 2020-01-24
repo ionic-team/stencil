@@ -209,4 +209,14 @@ describe('util', () => {
     });
   });
 
+  it('createJsVarName', () => {
+    expect(util.createJsVarName('Doc.brown&')).toBe('docBrown');
+    expect(util.createJsVarName('  Doc!  Brown?  ')).toBe('docBrown');
+    expect(util.createJsVarName('doc--Brown')).toBe('docBrown');
+    expect(util.createJsVarName('doc-brown')).toBe('docBrown');
+    expect(util.createJsVarName('DocBrown')).toBe('docBrown');
+    expect(util.createJsVarName('Doc')).toBe('doc');
+    expect(util.createJsVarName('doc')).toBe('doc');
+  });
+
 });

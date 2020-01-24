@@ -1,14 +1,16 @@
 import * as d from '../declarations';
 import { BANNER } from './constants';
 import { buildError } from './message-utils';
-import { dashToPascalCase } from './helpers';
+import { dashToPascalCase, isString, toDashCase } from './helpers';
 
 
-export const createVarName = (fileName: string) => (
-  dashToPascalCase(fileName
-    .toLowerCase()
-    .replace(/[|&;$%@"<>()+,.{}_]/g, '-'))
-);
+export const createJsVarName = (fileName: string) => {
+  fileName = toDashCase(fileName);
+  fileName = fileName.replace(/[|&;$%@"<>()+,.{}_\!\?]/g, '-');
+  fileName = dashToPascalCase(fileName);
+  fileName = fileName[0].toLowerCase() + fileName.substr(1);
+  return fileName;
+};
 
 
 export const getFileExt = (fileName: string) => {
@@ -153,22 +155,15 @@ export const getDynamicImportFunction = (namespace: string) => {
 };
 
 export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  const pkgJsonPath = config.sys.path.join(config.rootDir, 'package.json');
-
   try {
-    const pkgJson = await compilerCtx.fs.readFile(pkgJsonPath);
+    const pkgJson = await compilerCtx.fs.readFile(config.packageJsonFilePath);
 
     if (pkgJson) {
-      try {
-        const pkgData: d.PackageJsonData = JSON.parse(pkgJson);
-        buildCtx.packageJsonFilePath = pkgJsonPath;
-        return pkgData;
-
-      } catch (e) {
-        const diagnostic = buildError(buildCtx.diagnostics);
-        diagnostic.header = `Error parsing "package.json"`;
-        diagnostic.messageText = `${pkgJsonPath}, ${e}`;
-        diagnostic.absFilePath = pkgJsonPath;
+      const parseResults = parsePackageJson(pkgJson, config.packageJsonFilePath);
+      if (parseResults.diagnostic) {
+        buildCtx.diagnostics.push(parseResults.diagnostic);
+      } else {
+        buildCtx.packageJson = parseResults.data;
       }
     }
 
@@ -176,10 +171,43 @@ export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerC
     if (!config.outputTargets.some(o => o.type.includes('dist'))) {
       const diagnostic = buildError(buildCtx.diagnostics);
       diagnostic.header = `Missing "package.json"`;
-      diagnostic.messageText = `Valid "package.json" file is required for distribution: ${pkgJsonPath}`;
+      diagnostic.messageText = `Valid "package.json" file is required for distribution: ${config.packageJsonFilePath}`;
     }
   }
+};
+
+export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): { diagnostic: d.Diagnostic; data: d.PackageJsonData; filePath: string; } => {
+  if (isString(pkgJsonFilePath)) {
+    return parseJson(pkgJsonStr, pkgJsonFilePath);
+  }
   return null;
+};
+
+export const parseJson = (jsonStr: string, filePath?: string) => {
+  const rtn = {
+    diagnostic: null as d.Diagnostic,
+    data: null as any,
+    filePath
+  };
+
+  if (isString(jsonStr)) {
+    try {
+      rtn.data = JSON.parse(jsonStr);
+    } catch (e) {
+      const msg = e.message;
+      rtn.diagnostic = buildError();
+      rtn.diagnostic.absFilePath = filePath;
+      rtn.diagnostic.header = `Error Parsing JSON`;
+      rtn.diagnostic.messageText = msg;
+    }
+  } else {
+    rtn.diagnostic = buildError();
+    rtn.diagnostic.absFilePath = filePath;
+    rtn.diagnostic.header = `Error Parsing JSON`;
+    rtn.diagnostic.messageText = `Invalid JSON input to parse`
+  }
+
+  return rtn;
 };
 
 const SKIP_DEPS = ['@stencil/core'];

@@ -33,7 +33,7 @@ export class SiblingRoot {
     return (
       <div>
         <section>
-          sibling inner dom
+          sibling-shadow-dom
         </section>
         <article>
           <slot/>

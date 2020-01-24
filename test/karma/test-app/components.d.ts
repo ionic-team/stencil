@@ -169,7 +169,6 @@ export namespace Components {
     'i'?: number;
   }
   interface ShadowDomSlotNestedRoot {}
-  interface SiblingRoot {}
   interface SlotArrayBasic {}
   interface SlotArrayComplex {}
   interface SlotArrayComplexRoot {}
@@ -215,6 +214,7 @@ export namespace Components {
     'href'?: string;
   }
   interface SlotReplaceWrapperRoot {}
+  interface StencilSibling {}
   interface StylusCmp {}
   interface SvgAttr {}
   interface SvgClass {}
@@ -729,12 +729,6 @@ declare global {
     new (): HTMLShadowDomSlotNestedRootElement;
   };
 
-  interface HTMLSiblingRootElement extends Components.SiblingRoot, HTMLStencilElement {}
-  var HTMLSiblingRootElement: {
-    prototype: HTMLSiblingRootElement;
-    new (): HTMLSiblingRootElement;
-  };
-
   interface HTMLSlotArrayBasicElement extends Components.SlotArrayBasic, HTMLStencilElement {}
   var HTMLSlotArrayBasicElement: {
     prototype: HTMLSlotArrayBasicElement;
@@ -897,6 +891,12 @@ declare global {
     new (): HTMLSlotReplaceWrapperRootElement;
   };
 
+  interface HTMLStencilSiblingElement extends Components.StencilSibling, HTMLStencilElement {}
+  var HTMLStencilSiblingElement: {
+    prototype: HTMLStencilSiblingElement;
+    new (): HTMLStencilSiblingElement;
+  };
+
   interface HTMLStylusCmpElement extends Components.StylusCmp, HTMLStencilElement {}
   var HTMLStylusCmpElement: {
     prototype: HTMLStylusCmpElement;
@@ -1011,7 +1011,6 @@ declare global {
     'shadow-dom-slot-basic': HTMLShadowDomSlotBasicElement;
     'shadow-dom-slot-nested': HTMLShadowDomSlotNestedElement;
     'shadow-dom-slot-nested-root': HTMLShadowDomSlotNestedRootElement;
-    'sibling-root': HTMLSiblingRootElement;
     'slot-array-basic': HTMLSlotArrayBasicElement;
     'slot-array-complex': HTMLSlotArrayComplexElement;
     'slot-array-complex-root': HTMLSlotArrayComplexRootElement;
@@ -1039,6 +1038,7 @@ declare global {
     'slot-reorder-root': HTMLSlotReorderRootElement;
     'slot-replace-wrapper': HTMLSlotReplaceWrapperElement;
     'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement;
+    'stencil-sibling': HTMLStencilSiblingElement;
     'stylus-cmp': HTMLStylusCmpElement;
     'svg-attr': HTMLSvgAttrElement;
     'svg-class': HTMLSvgClassElement;
@@ -1206,7 +1206,6 @@ declare namespace LocalJSX {
     'i'?: number;
   }
   interface ShadowDomSlotNestedRoot {}
-  interface SiblingRoot {}
   interface SlotArrayBasic {}
   interface SlotArrayComplex {}
   interface SlotArrayComplexRoot {}
@@ -1252,6 +1251,7 @@ declare namespace LocalJSX {
     'href'?: string;
   }
   interface SlotReplaceWrapperRoot {}
+  interface StencilSibling {}
   interface StylusCmp {}
   interface SvgAttr {}
   interface SvgClass {}
@@ -1343,7 +1343,6 @@ declare namespace LocalJSX {
     'shadow-dom-slot-basic': ShadowDomSlotBasic;
     'shadow-dom-slot-nested': ShadowDomSlotNested;
     'shadow-dom-slot-nested-root': ShadowDomSlotNestedRoot;
-    'sibling-root': SiblingRoot;
     'slot-array-basic': SlotArrayBasic;
     'slot-array-complex': SlotArrayComplex;
     'slot-array-complex-root': SlotArrayComplexRoot;
@@ -1371,6 +1370,7 @@ declare namespace LocalJSX {
     'slot-reorder-root': SlotReorderRoot;
     'slot-replace-wrapper': SlotReplaceWrapper;
     'slot-replace-wrapper-root': SlotReplaceWrapperRoot;
+    'stencil-sibling': StencilSibling;
     'stylus-cmp': StylusCmp;
     'svg-attr': SvgAttr;
     'svg-class': SvgClass;
@@ -1469,7 +1469,6 @@ declare module "@stencil/core" {
       'shadow-dom-slot-basic': LocalJSX.ShadowDomSlotBasic & JSXBase.HTMLAttributes<HTMLShadowDomSlotBasicElement>;
       'shadow-dom-slot-nested': LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;
       'shadow-dom-slot-nested-root': LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
-      'sibling-root': LocalJSX.SiblingRoot & JSXBase.HTMLAttributes<HTMLSiblingRootElement>;
       'slot-array-basic': LocalJSX.SlotArrayBasic & JSXBase.HTMLAttributes<HTMLSlotArrayBasicElement>;
       'slot-array-complex': LocalJSX.SlotArrayComplex & JSXBase.HTMLAttributes<HTMLSlotArrayComplexElement>;
       'slot-array-complex-root': LocalJSX.SlotArrayComplexRoot & JSXBase.HTMLAttributes<HTMLSlotArrayComplexRootElement>;
@@ -1497,6 +1496,7 @@ declare module "@stencil/core" {
       'slot-reorder-root': LocalJSX.SlotReorderRoot & JSXBase.HTMLAttributes<HTMLSlotReorderRootElement>;
       'slot-replace-wrapper': LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
       'slot-replace-wrapper-root': LocalJSX.SlotReplaceWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement>;
+      'stencil-sibling': LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
       'stylus-cmp': LocalJSX.StylusCmp & JSXBase.HTMLAttributes<HTMLStylusCmpElement>;
       'svg-attr': LocalJSX.SvgAttr & JSXBase.HTMLAttributes<HTMLSvgAttrElement>;
       'svg-class': LocalJSX.SvgClass & JSXBase.HTMLAttributes<HTMLSvgClassElement>;

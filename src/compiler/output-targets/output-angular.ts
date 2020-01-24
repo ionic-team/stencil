@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { isOutputTargetAngular } from './output-utils';
-import { dashToPascalCase, readPackageJson, relativeImport, sortBy } from '@utils';
+import { dashToPascalCase, relativeImport, sortBy } from '@utils';
 
 export async function outputAngular(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   const angularOutputTargets = config.outputTargets.filter(isOutputTargetAngular);
@@ -35,8 +35,7 @@ function getFilteredComponents(excludeComponents: string[] = [], cmps: d.Compone
 
 async function generateProxies(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular) {
   const proxies = getProxies(components);
-  const pkgData = await readPackageJson(config, compilerCtx, buildCtx);
-  const distTypesDir = config.sys.path.dirname(pkgData.types);
+  const distTypesDir = config.sys.path.dirname(buildCtx.packageJson.types);
   const dtsFilePath = config.sys.path.join(config.rootDir, distTypesDir, GENERATED_DTS);
   const componentsTypeFile = relativeImport(config, outputTarget.directivesProxyFile, dtsFilePath, '.d.ts');
 

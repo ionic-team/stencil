@@ -1,11 +1,11 @@
 import * as d from '../../declarations';
-import { catchError, isFunction, isString } from '@utils';
-import { PluginCtx, PluginTransformResults } from '../../declarations';
-import { parseCssImports } from '../style/css-imports';
+import { buildError, catchError, isFunction, isString } from '@utils';
 import { isOutputTargetDocs } from '../output-targets/output-utils';
+import { parseCssImports } from '../style/css-imports';
+import { PluginCtx, PluginTransformResults } from '../../declarations';
 
 
-export async function runPluginResolveId(pluginCtx: PluginCtx, importee: string) {
+export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string) => {
   for (const plugin of pluginCtx.config.plugins) {
 
     if (typeof plugin.resolveId === 'function') {
@@ -32,10 +32,9 @@ export async function runPluginResolveId(pluginCtx: PluginCtx, importee: string)
 
   // default resolvedId
   return importee;
-}
+};
 
-
-export async function runPluginLoad(pluginCtx: PluginCtx, id: string) {
+export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
   for (const plugin of pluginCtx.config.plugins) {
 
     if (typeof plugin.load === 'function') {
@@ -62,10 +61,9 @@ export async function runPluginLoad(pluginCtx: PluginCtx, id: string) {
 
   // default load()
   return pluginCtx.fs.readFile(id);
-}
+};
 
-
-export async function runPluginTransforms(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, id: string, cmp?: d.ComponentCompilerMeta) {
+export const runPluginTransforms = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, id: string, cmp?: d.ComponentCompilerMeta) => {
   const pluginCtx: PluginCtx = {
     config: config,
     sys: config.sys,
@@ -76,6 +74,12 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
 
   const resolvedId = await runPluginResolveId(pluginCtx, id);
   const sourceText = await runPluginLoad(pluginCtx, resolvedId);
+  if (!isString(sourceText)) {
+    const diagnostic = buildError(buildCtx.diagnostics);
+    diagnostic.header = `Unable to find "${config.sys.path.basename(id)}"`;
+    diagnostic.messageText = `The file "${config.sys.path.relative(config.rootDir, id)}" was unable to load.`;
+    return null;
+  }
 
   const transformResults: PluginTransformResults = {
     code: sourceText,
@@ -152,8 +156,7 @@ export async function runPluginTransforms(config: d.Config, compilerCtx: d.Compi
   }
 
   return transformResults;
-}
-
+};
 
 export const runPluginTransformsEsmImports = async (config: d.Config, compilerCtx: d.CompilerCtx, code: string, id: string) => {
   const pluginCtx: PluginCtx = {

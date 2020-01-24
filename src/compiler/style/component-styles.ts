@@ -99,20 +99,22 @@ async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx
   try {
     const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath, cmp);
 
-    if (!cmp.isCollectionDependency) {
-      const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
+    if (transformResults) {
+      if (!cmp.isCollectionDependency) {
+        const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
 
-      const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
+        const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
 
-      await Promise.all(collectionDirs.map(async outputTarget => {
-        const collectionPath = config.sys.path.join(outputTarget.collectionDir, relPath);
-        await compilerCtx.fs.writeFile(collectionPath, transformResults.code);
-      }));
+        await Promise.all(collectionDirs.map(async outputTarget => {
+          const collectionPath = config.sys.path.join(outputTarget.collectionDir, relPath);
+          await compilerCtx.fs.writeFile(collectionPath, transformResults.code);
+        }));
+      }
+
+      styleText = transformResults.code;
+
+      buildCtx.styleBuildCount++;
     }
-
-    styleText = transformResults.code;
-
-    buildCtx.styleBuildCount++;
 
   } catch (e) {
     if (e.code === 'ENOENT') {

@@ -1,4 +1,5 @@
 import { setMode } from '@stencil/core';
+import '@test-sibling';
 
 declare const Context: any;
 

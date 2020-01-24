@@ -67,7 +67,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
 
     plugins: [
       coreResolvePlugin(config, compilerCtx, bundleOpts.platform),
-      appDataPlugin(config, compilerCtx, bundleOpts.conditionals, bundleOpts.platform),
+      appDataPlugin(config, compilerCtx, buildCtx, bundleOpts.conditionals, bundleOpts.platform),
       lazyComponentPlugin(buildCtx),
       loaderPlugin(bundleOpts.loader),
       userIndexPlugin(config, compilerCtx),

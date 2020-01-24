@@ -17,7 +17,7 @@ export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagn
 
     const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
-        return visitClass(config, diagnostics, typeChecker, node);
+        return visitClassDeclaration(config, diagnostics, typeChecker, node);
       }
       return ts.visitEachChild(node, visit, transformCtx);
     };
@@ -29,7 +29,7 @@ export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagn
 };
 
 
-export const visitClass = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, classNode: ts.ClassDeclaration) => {
+export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, classNode: ts.ClassDeclaration) => {
   if (!classNode.decorators) {
     return classNode;
   }

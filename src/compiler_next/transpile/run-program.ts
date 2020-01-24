@@ -23,6 +23,7 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
   }
 
   const tsProgram = tsBuilder.getProgram();
+
   const tsTypeChecker = tsProgram.getTypeChecker();
   const typesOutputTarget = config.outputTargets.filter(isOutputTargetDistTypes);
 
@@ -48,7 +49,11 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
     emitCallback,
     undefined,
     false,
-    getCustomTransforms(config, buildCtx, tsTypeChecker)
+    {
+      before: [
+        convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker),
+      ]
+    },
   );
 
   // Finalize components metadata
@@ -83,14 +88,6 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
   }
 
   return false;
-};
-
-const getCustomTransforms = (config: d.Config, buildCtx: d.BuildCtx, tsTypeChecker: ts.TypeChecker) => {
-  return {
-    before: [
-      convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker),
-    ]
-  };
 };
 
 const validateUniqueTagNames = (config: d.Config, buildCtx: d.BuildCtx) => {

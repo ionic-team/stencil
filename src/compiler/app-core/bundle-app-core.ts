@@ -39,7 +39,7 @@ export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
           ...bundleAppOptions.loader
         }),
         stencilClientPlugin(config),
-        appDataPlugin(config, compilerCtx, build, 'client'),
+        appDataPlugin(config, compilerCtx, buildCtx, build, 'client'),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,

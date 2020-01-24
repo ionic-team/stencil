@@ -1,20 +1,20 @@
+import * as d from '../../declarations';
 import { BundleOptions } from './bundle-interface';
-import { CompilerCtx } from '../../declarations';
-import { getModule } from '../transpile/static-to-meta/parse-static';
+import { getModule } from '../transpile/transpiled-module';
 import { normalizeFsPath } from '@utils';
 import { Plugin } from 'rollup';
-import path from 'path';
+import { isAbsolute } from 'path';
 import ts from 'typescript';
 
 
-export const typescriptPlugin = (compilerCtx: CompilerCtx, bundleOpts: BundleOptions): Plugin => {
+export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions): Plugin => {
   const tsPrinter = ts.createPrinter();
 
   return {
     name: `${bundleOpts.id}TypescriptPlugin`,
 
     load(id) {
-      if (path.isAbsolute(id)) {
+      if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
         const mod = getModule(compilerCtx, fsFilePath);
         if (mod) {
@@ -24,7 +24,7 @@ export const typescriptPlugin = (compilerCtx: CompilerCtx, bundleOpts: BundleOpt
       return null;
     },
     transform(_, id) {
-      if (path.isAbsolute(id)) {
+      if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
         const mod = getModule(compilerCtx, fsFilePath);
         if (mod && mod.cmps.length > 0) {

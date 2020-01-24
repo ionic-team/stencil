@@ -2,15 +2,16 @@ import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError, dashToPascalCase, hasError } from '@utils';
+import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../../../compiler/app-core/format-component-runtime-meta';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
 import { isOutputTargetDistCustomElementsBundle } from '../../../compiler/output-targets/output-utils';
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
+import { optimizeModule } from '../../optimize/optimize-module';
+import { removeCollectionImports } from '../../transformers/remove-collection-imports';
 import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
-import path from 'path';
-import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../../../compiler/app-core/format-component-runtime-meta';
-import { optimizeModule } from '../../optimize/optimize-module';
 import { OutputChunk } from 'rollup';
+import { join } from 'path';
 
 
 export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -61,7 +62,7 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
       await Promise.all(
         outputTargets.map(o => {
           return compilerCtx.fs.writeFile(
-            path.join(o.dir, 'index.mjs'),
+            join(o.dir, 'index.mjs'),
             code,
             { outputTargetType: o.type }
           );
@@ -140,6 +141,7 @@ const getCustomElementBundleCustomTransformer = (compilerCtx: d.CompilerCtx) => 
   };
   return [
     updateStencilCoreImports(transformOpts.coreImportPath),
-    nativeComponentTransform(compilerCtx, transformOpts)
+    nativeComponentTransform(compilerCtx, transformOpts),
+    removeCollectionImports(compilerCtx),
   ];
 };

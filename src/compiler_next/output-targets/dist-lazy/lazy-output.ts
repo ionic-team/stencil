@@ -4,15 +4,16 @@ import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
 import { generateEntryModules } from '../../../compiler/entries/entry-modules';
 import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
-import { LAZY_BROWSER_ENTRY_ID, LAZY_EXTERNAL_ENTRY_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
 import { isOutputTargetDistLazy, isOutputTargetHydrate } from '../../../compiler/output-targets/output-utils';
+import { LAZY_BROWSER_ENTRY_ID, LAZY_EXTERNAL_ENTRY_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
 import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
-import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import { generateCjs } from './generate-cjs';
 import { generateEsmBrowser } from './generate-esm-browser';
 import { generateEsm } from './generate-esm';
 import { generateSystem } from './generate-system';
 import { generateModuleGraph } from '../../../compiler/entries/component-graph';
+import { removeCollectionImports } from '../../transformers/remove-collection-imports';
+import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import MagicString from 'magic-string';
 
 
@@ -30,7 +31,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       id: 'lazy',
       platform: 'client',
       conditionals: getBuildConditionals(config, buildCtx.components),
-      customTransformers: getCustomTransformer(compilerCtx),
+      customTransformers: getLazyCustomTransformer(compilerCtx),
       inputs: {
         [config.fsNamespace]: LAZY_BROWSER_ENTRY_ID,
         'loader': LAZY_EXTERNAL_ENTRY_ID,
@@ -103,7 +104,7 @@ const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[])
 // }
 
 
-const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
+const getLazyCustomTransformer = (compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: 'lazy',
@@ -113,7 +114,8 @@ const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
   };
   return [
     updateStencilCoreImports(transformOpts.coreImportPath),
-    lazyComponentTransform(compilerCtx, transformOpts)
+    lazyComponentTransform(compilerCtx, transformOpts),
+    removeCollectionImports(compilerCtx)
   ];
 };
 
@@ -141,7 +143,7 @@ const getLazyEntry = (isBrowser: boolean) => {
   return s.toString();
 } ;
 
-function generateLegacyLoader(config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) {
+const generateLegacyLoader = (config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) => {
   return Promise.all(
     outputTargets.map(async o => {
       if (o.legacyLoaderFile) {
@@ -150,10 +152,10 @@ function generateLegacyLoader(config: d.Config, compilerCtx: d.CompilerCtx, outp
       }
     })
   );
-}
+};
 
 
-function getLegacyLoader(config: d.Config) {
+const getLegacyLoader = (config: d.Config) => {
   const namespace = config.fsNamespace;
   return `
 (function(doc){
@@ -184,4 +186,4 @@ function getLegacyLoader(config: d.Config) {
   console.warn(warn.join('\\n'));
 
 })(document);`;
-}
+};

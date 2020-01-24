@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { addExternalImport } from '../transformers/collections/add-external-import';
+import { addExternalImportLegacy } from '../transformers/collections/add-external-import';
 import { COMPILER_BUILD } from '../build/compiler-build-id';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
@@ -220,7 +220,7 @@ const transpileTsFile = async (config: d.Config, services: ts.LanguageService, c
 
       // add any collections to the context which this cached file may know about
       cachedModuleFile.moduleFile.externalImports.forEach(moduleId => {
-        addExternalImport(config, ctx.compilerCtx, ctx.buildCtx, cachedModuleFile.moduleFile, config.rootDir, moduleId);
+        addExternalImportLegacy(config, ctx.compilerCtx, ctx.buildCtx, cachedModuleFile.moduleFile, config.rootDir, moduleId);
       });
 
       // write the cached js output too
@@ -269,7 +269,7 @@ const transpileTsFile = async (config: d.Config, services: ts.LanguageService, c
       const moduleFile = getModule(config, ctx.compilerCtx, sourceFilePath);
       if (Array.isArray(ensureExternalImports)) {
         ensureExternalImports.forEach(moduleId => {
-          addExternalImport(config, ctx.compilerCtx, ctx.buildCtx, moduleFile, config.rootDir, moduleId);
+          addExternalImportLegacy(config, ctx.compilerCtx, ctx.buildCtx, moduleFile, config.rootDir, moduleId);
         });
       }
 

@@ -1,4 +1,5 @@
 import * as d from '../../../declarations';
+import { createModule, getModule } from '../transpiled-module';
 import { normalizePath } from '@utils';
 import { parseCallExpression } from '../../../compiler/transformers/static-to-meta/call-expression';
 import { parseImport } from './import';
@@ -30,7 +31,8 @@ export const updateModule = (
   emitFilePath = normalizePath(join(srcDirPath, emitFileName));
 
   const moduleFile = createModule(tsSourceFile, sourceFileText, emitFilePath);
-  compilerCtx.moduleMap.set(moduleFile.sourceFilePath, moduleFile);
+  const moduleFileKey = normalizePath(moduleFile.sourceFilePath);
+  compilerCtx.moduleMap.set(moduleFileKey, moduleFile);
   compilerCtx.changedModules.add(moduleFile.sourceFilePath);
 
   const visitNode = (node: ts.Node) => {
@@ -60,48 +62,5 @@ export const updateModule = (
   if (moduleFile.cmps.length > 0) {
     moduleFile.staticSourceFile = ts.createSourceFile(sourceFilePath, sourceFileText, tsSourceFile.languageVersion, true, ts.ScriptKind.JS);
   }
-  return moduleFile;
-};
-
-export const getModule = (compilerCtx: d.CompilerCtx, fileName: string) => {
-  return compilerCtx.moduleMap.get(fileName);
-};
-
-export const createModule = (
-  staticSourceFile: ts.SourceFile, // this is NOT the original
-  staticSourceFileText: string,
-  emitFilepath: string,
-) => {
-  const sourceFilePath = normalizePath(staticSourceFile.fileName);
-  const moduleFile: d.Module = {
-    sourceFilePath: sourceFilePath,
-    jsFilePath: emitFilepath,
-    staticSourceFile,
-    staticSourceFileText,
-    cmps: [],
-    coreRuntimeApis: [],
-    collectionName: null,
-    dtsFilePath: null,
-    excludeFromCollection: false,
-    externalImports: [],
-    hasVdomAttribute: false,
-    hasVdomXlink: false,
-    hasVdomClass: false,
-    hasVdomFunctional: false,
-    hasVdomKey: false,
-    hasVdomListener: false,
-    hasVdomRef: false,
-    hasVdomRender: false,
-    hasVdomStyle: false,
-    hasVdomText: false,
-    htmlAttrNames: [],
-    htmlTagNames: [],
-    isCollectionDependency: false,
-    isLegacy: false,
-    localImports: [],
-    originalCollectionComponentPath: null,
-    originalImports: [],
-    potentialCmpRefs: []
-  };
   return moduleFile;
 };

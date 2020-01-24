@@ -1,17 +1,19 @@
 import * as d from '../../declarations';
 import MagicString from 'magic-string';
-import { normalizePath } from '@utils';
+import { createJsVarName, normalizePath, isString, loadTypeScriptDiagnostics } from '@utils';
 import { Plugin } from 'rollup';
+import { removeCollectionImports } from '../transformers/remove-collection-imports';
 import { STENCIL_APP_DATA_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID, STENCIL_APP_GLOBALS_ID } from './entry-alias-ids';
+import ts from 'typescript';
 
 
-export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build: d.BuildConditionals, platform: 'client' | 'hydrate' | 'worker'): Plugin => {
+export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.BuildConditionals, platform: 'client' | 'hydrate' | 'worker'): Plugin => {
   if (!platform) {
     return {
       name: 'appDataPlugin',
     };
   }
-  const globalPaths = getGlobalScriptPaths(config, compilerCtx);
+  const globalScripts = getGlobalScriptData(config, compilerCtx);
 
   return {
     name: 'appDataPlugin',
@@ -29,7 +31,7 @@ export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buil
     load(id) {
       if (id === STENCIL_APP_GLOBALS_ID)  {
         const s = new MagicString(``);
-        appendGlobalScripts(globalPaths, s);
+        appendGlobalScripts(globalScripts, s);
         return s.toString();
       }
       if (id === STENCIL_APP_DATA_ID) {
@@ -43,58 +45,83 @@ export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buil
 
     transform(code, id) {
       id = normalizePath(id);
-      if (globalPaths.includes(id)) {
+      if (globalScripts.some(s => s.path === id)) {
         const program = this.parse(code, {});
         const needsDefault = !program.body.some(s => s.type === 'ExportDefaultDeclaration');
         const defaultExport = needsDefault
           ? '\nexport const globalFn = () => {};\nexport default globalFn;'
           : '';
+        code = getContextImport(platform) + code + defaultExport;
 
-        return getContextImport(platform) + code + defaultExport;
+        const compilerOptions: ts.CompilerOptions = { ...config.tsCompilerOptions };
+        compilerOptions.module = ts.ModuleKind.ESNext;
+
+        const results = ts.transpileModule(code, {
+          compilerOptions,
+          fileName: id,
+          transformers: {
+            after: [
+              removeCollectionImports(compilerCtx),
+            ]
+          }
+        });
+
+        buildCtx.diagnostics.push(...loadTypeScriptDiagnostics(results.diagnostics));
+
+        return results.outputText;
       }
       return null;
     }
   };
 };
 
+export const getGlobalScriptData = (config: d.Config, compilerCtx: d.CompilerCtx) => {
+  const globalScripts: GlobalScript[] = [];
 
-export const getGlobalScriptPaths = (config: d.Config, compilerCtx: d.CompilerCtx) => {
-  const globalPaths: string[] = [];
-
-  if (typeof config.globalScript === 'string') {
+  if (isString(config.globalScript)) {
     const mod = compilerCtx.moduleMap.get(config.globalScript);
     const globalScript = compilerCtx.version === 2
       ? config.globalScript
       : mod && mod.jsFilePath;
 
     if (globalScript) {
-      globalPaths.push(normalizePath(globalScript));
+      globalScripts.push({
+        defaultName: createJsVarName(config.namespace + 'GlobalScript'),
+        path: normalizePath(globalScript)
+      });
     }
   }
 
   compilerCtx.collections.forEach(collection => {
-    if (collection.global != null) {
-      globalPaths.push(normalizePath(collection.global.sourceFilePath));
+    if (collection.global != null && isString(collection.global.sourceFilePath)) {
+      let defaultName = createJsVarName(collection.collectionName + 'GlobalScript');
+      if (globalScripts.some(s => s.defaultName === defaultName)) {
+        defaultName += globalScripts.length;
+      }
+      globalScripts.push({
+        defaultName,
+        path: normalizePath(collection.global.sourceFilePath)
+      });
     }
   });
 
-  return globalPaths;
+  return globalScripts;
 };
 
 
-const appendGlobalScripts = (globalPaths: string[], s: MagicString) => {
-  if (globalPaths.length === 1) {
-    s.prepend(`import appGlobalScript from '${globalPaths[0]}';\n`);
+const appendGlobalScripts = (globalScripts: GlobalScript[], s: MagicString) => {
+  if (globalScripts.length === 1) {
+    s.prepend(`import appGlobalScript from '${globalScripts[0].path}';\n`);
     s.append(`export const globalScripts = appGlobalScript;\n`);
 
-  } else if (globalPaths.length > 1) {
-    globalPaths.forEach((appGlobalScriptPath, index) => {
-      s.prepend(`import appGlobalScript${index} from '${appGlobalScriptPath}';\n`);
+  } else if (globalScripts.length > 1) {
+    globalScripts.forEach((globalScript) => {
+      s.prepend(`import ${globalScript.defaultName} from '${globalScript.path}';\n`);
     });
 
     s.append(`export const globalScripts = () => {\n`);
-    globalPaths.forEach((_, index) => {
-      s.append(`  appGlobalScript${index}();\n`);
+    globalScripts.forEach(globalScript => {
+      s.append(`  ${globalScript.defaultName}();\n`);
     });
     s.append(`};\n`);
 
@@ -111,11 +138,9 @@ const appendBuildConditionals = (config: d.Config, build: d.BuildConditionals, s
   s.append(`export const BUILD = /* ${config.fsNamespace} */ { ${builData} };\n`);
 };
 
-
 const appendNamespace = (config: d.Config, s: MagicString) => {
   s.append(`export const NAMESPACE = '${config.fsNamespace}';\n`);
 };
-
 
 const getContextImport = (platform: string) => {
   return `import { Context } from '${
@@ -124,3 +149,8 @@ const getContextImport = (platform: string) => {
       STENCIL_INTERNAL_CLIENT_ID
   }';\n`;
 };
+
+interface GlobalScript {
+  defaultName: string;
+  path: string;
+}

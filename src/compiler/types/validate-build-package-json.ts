@@ -4,7 +4,7 @@ import { getComponentsDtsTypesFilePath, isOutputTargetDistCollection, isOutputTa
 import { isGlob } from '@utils';
 
 
-export const validatePackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const validateBuildPackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (config.watch) {
     return;
   }
@@ -31,7 +31,7 @@ const validatePackageJsonOutput = async (config: d.Config, compilerCtx: d.Compil
     validateMain(config, compilerCtx, buildCtx, outputTarget),
     validateModule(config, compilerCtx, buildCtx, outputTarget),
     validateCollection(config, compilerCtx, buildCtx, outputTarget),
-    validateBrowser(compilerCtx, buildCtx)
+    validateBrowser(config, compilerCtx, buildCtx)
   ]);
 };
 
@@ -52,19 +52,19 @@ export const validatePackageFiles = async (config: d.Config, compilerCtx: d.Comp
 
     if (!containsDistDir) {
       const msg = `package.json "files" array must contain the distribution directory "${actualDistDir}/" when generating a distribution.`;
-      packageJsonWarn(compilerCtx, buildCtx, msg, `"files"`);
+      packageJsonWarn(config, compilerCtx, buildCtx, msg, `"files"`);
       return;
     }
 
     await Promise.all(buildCtx.packageJson.files.map(async pkgFile => {
       if (!isGlob(pkgFile)) {
-        const packageJsonDir = config.sys.path.dirname(buildCtx.packageJsonFilePath);
+        const packageJsonDir = config.sys.path.dirname(config.packageJsonFilePath);
         const absPath = config.sys.path.join(packageJsonDir, pkgFile);
 
         const hasAccess = await compilerCtx.fs.access(absPath);
         if (!hasAccess) {
           const msg = `Unable to find "${pkgFile}" within the package.json "files" array.`;
-          packageJsonError(compilerCtx, buildCtx, msg, `"${pkgFile}"`);
+          packageJsonError(config, compilerCtx, buildCtx, msg, `"${pkgFile}"`);
         }
       }
     }));
@@ -78,11 +78,11 @@ export const validateMain = (config: d.Config, compilerCtx: d.CompilerCtx, build
 
   if (typeof buildCtx.packageJson.main !== 'string' || buildCtx.packageJson.main === '') {
     const msg = `package.json "main" property is required when generating a distribution. It's recommended to set the "main" property to: ${mainRel}`;
-    packageJsonWarn(compilerCtx, buildCtx, msg, `"main"`);
+    packageJsonWarn(config, compilerCtx, buildCtx, msg, `"main"`);
 
   } else if (buildCtx.packageJson.main !== mainRel) {
     const msg = `package.json "main" property is set to "${buildCtx.packageJson.main}". It's recommended to set the "main" property to: ${mainRel}`;
-    packageJsonWarn(compilerCtx, buildCtx, msg, `"main"`);
+    packageJsonWarn(config, compilerCtx, buildCtx, msg, `"main"`);
   }
 };
 
@@ -93,11 +93,11 @@ export const validateModule = (config: d.Config, compilerCtx: d.CompilerCtx, bui
 
   if (typeof buildCtx.packageJson.module !== 'string') {
     const msg = `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ${moduleRel}`;
-    packageJsonWarn(compilerCtx, buildCtx, msg, `"module"`);
+    packageJsonWarn(config, compilerCtx, buildCtx, msg, `"module"`);
 
   } else if (buildCtx.packageJson.module !== moduleRel) {
     const msg = `package.json "module" property is set to "${buildCtx.packageJson.module}". It's recommended to set the "module" property to: ${moduleRel}`;
-    packageJsonWarn(compilerCtx, buildCtx, msg, `"module"`);
+    packageJsonWarn(config, compilerCtx, buildCtx, msg, `"module"`);
   }
 };
 
@@ -106,11 +106,11 @@ export const validateTypes = async (config: d.Config, compilerCtx: d.CompilerCtx
   if (typeof buildCtx.packageJson.types !== 'string' || buildCtx.packageJson.types === '') {
     const recommendedPath = getRecommendedTypesPath(config, outputTarget);
     const msg = `package.json "types" property is required when generating a distribution. It's recommended to set the "types" property to: ${recommendedPath}`;
-    packageJsonWarn(compilerCtx, buildCtx, msg, `"types"`);
+    packageJsonWarn(config, compilerCtx, buildCtx, msg, `"types"`);
 
   } else if (!buildCtx.packageJson.types.endsWith('.d.ts')) {
     const msg  = `package.json "types" file must have a ".d.ts" extension: ${buildCtx.packageJson.types}`;
-    packageJsonWarn(compilerCtx, buildCtx, msg, `"types"`);
+    packageJsonWarn(config, compilerCtx, buildCtx, msg, `"types"`);
 
   } else {
     const typesFile = config.sys.path.join(config.rootDir, buildCtx.packageJson.types);
@@ -121,7 +121,7 @@ export const validateTypes = async (config: d.Config, compilerCtx: d.CompilerCtx
       if (buildCtx.packageJson.types !== recommendedPath) {
         msg += ` It's recommended to set the "types" property to: ${recommendedPath}`;
       }
-      packageJsonError(compilerCtx, buildCtx, msg, `"types"`);
+      packageJsonError(config, compilerCtx, buildCtx, msg, `"types"`);
     }
   }
 };
@@ -132,16 +132,16 @@ export const validateCollection = (config: d.Config, compilerCtx: d.CompilerCtx,
     const collectionRel = config.sys.path.join(config.sys.path.relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
     if (!buildCtx.packageJson.collection || normalizePath(buildCtx.packageJson.collection) !== collectionRel) {
       const msg = `package.json "collection" property is required when generating a distribution and must be set to: ${collectionRel}`;
-      packageJsonWarn(compilerCtx, buildCtx, msg, `"collection"`);
+      packageJsonWarn(config, compilerCtx, buildCtx, msg, `"collection"`);
     }
   }
 };
 
 
-export const validateBrowser = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const validateBrowser = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (typeof buildCtx.packageJson.browser === 'string') {
     const msg = `package.json "browser" property is set to "${buildCtx.packageJson.browser}". However, for maximum compatibility with all bundlers it's recommended to not set the "browser" property and instead ensure both "module" and "main" properties are set.`;
-    packageJsonWarn(compilerCtx, buildCtx, msg, `"browser"`);
+    packageJsonWarn(config, compilerCtx, buildCtx, msg, `"browser"`);
   }
 };
 
@@ -152,14 +152,14 @@ export const getRecommendedTypesPath = (config: d.Config, outputTarget: d.Output
 };
 
 
-const packageJsonError = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, msg: string, warnKey: string) => {
-  const err = buildJsonFileError(compilerCtx, buildCtx.diagnostics, buildCtx.packageJsonFilePath, msg, warnKey);
+const packageJsonError = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, msg: string, warnKey: string) => {
+  const err = buildJsonFileError(compilerCtx, buildCtx.diagnostics, config.packageJsonFilePath, msg, warnKey);
   err.header = `Package Json`;
   return err;
 };
 
-const packageJsonWarn = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, msg: string, warnKey: string) => {
-  const warn = buildJsonFileError(compilerCtx, buildCtx.diagnostics, buildCtx.packageJsonFilePath, msg, warnKey);
+const packageJsonWarn = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, msg: string, warnKey: string) => {
+  const warn = buildJsonFileError(compilerCtx, buildCtx.diagnostics, config.packageJsonFilePath, msg, warnKey);
   warn.header = `Package Json`;
   warn.level = 'warn';
   return warn;

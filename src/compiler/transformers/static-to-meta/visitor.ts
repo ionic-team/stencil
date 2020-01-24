@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { getModule, resetModule } from '../../build/compiler-ctx';
 import { parseCallExpression } from './call-expression';
-import { parseImport } from './import';
+import { parseImportLegacy } from './import';
 import { parseStaticComponentMeta } from './component';
 import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
@@ -18,7 +18,7 @@ export const convertStaticToMeta = (config: d.Config, compilerCtx: d.CompilerCtx
       if (ts.isClassDeclaration(node)) {
         return parseStaticComponentMeta(config, compilerCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap, transformOpts);
       } else if (ts.isImportDeclaration(node)) {
-        return parseImport(config, compilerCtx, buildCtx, moduleFile, dirPath, node);
+        return parseImportLegacy(config, compilerCtx, buildCtx, moduleFile, dirPath, node);
       } else if (ts.isCallExpression(node)) {
         parseCallExpression(moduleFile, node);
       } else if (ts.isStringLiteral(node)) {

@@ -16,7 +16,7 @@ export const patchTypeScriptSys = (loadedTs: typeof ts, config: d.Config, inMemo
 };
 
 
-const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, tsSys: ts.System) => {
+export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, tsSys: ts.System) => {
   const realpath = (path: string) => {
     const rp = stencilSys.realpathSync(path);
     if (rp) {
@@ -98,6 +98,8 @@ const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem,
 
   tsSys.writeFile = (p, data) =>
     inMemoryFs.writeFile(p, data);
+
+  return tsSys;
 };
 
 

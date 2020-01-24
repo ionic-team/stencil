@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { isString } from './helpers';
 
 
-export const buildError = (diagnostics: d.Diagnostic[]) => {
+export const buildError = (diagnostics?: d.Diagnostic[]) => {
   const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'build',
@@ -13,7 +13,9 @@ export const buildError = (diagnostics: d.Diagnostic[]) => {
     lines: []
   };
 
-  diagnostics.push(diagnostic);
+  if (diagnostics) {
+    diagnostics.push(diagnostic);
+  }
 
   return diagnostic;
 };

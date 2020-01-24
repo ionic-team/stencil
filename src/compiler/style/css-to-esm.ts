@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { DEFAULT_STYLE_MODE, catchError, createVarName, normalizePath, hasError } from '@utils';
+import { DEFAULT_STYLE_MODE, catchError, createJsVarName, normalizePath, hasError } from '@utils';
 import { createStencilImportPath } from '../transformers/stencil-import-path';
 import { getScopeId } from '../style/scope-css';
 import { scopeCss } from '../../utils/shadow-css';
@@ -146,5 +146,5 @@ const createCssVarName = (filePath: string, modeName: string) => {
   if (modeName && modeName !== DEFAULT_STYLE_MODE && !varName.includes(modeName)) {
     varName = modeName + '-' + varName;
   }
-  return createVarName(varName);
+  return createJsVarName(varName);
 };

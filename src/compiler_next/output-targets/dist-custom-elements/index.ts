@@ -2,6 +2,7 @@ import * as d from '../../../declarations';
 import { catchError } from '@utils';
 import { isOutputTargetDistCustomElements } from '../../../compiler/output-targets/output-utils';
 import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
+import { removeCollectionImports } from '../../transformers/remove-collection-imports';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 import { join, relative } from 'path';
@@ -47,6 +48,7 @@ const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
   };
   return [
     updateStencilCoreImports(transformOpts.coreImportPath),
-    nativeComponentTransform(compilerCtx, transformOpts)
+    nativeComponentTransform(compilerCtx, transformOpts),
+    removeCollectionImports(compilerCtx),
   ];
 };

@@ -25,7 +25,12 @@ export const generateAppTypes = async (config: d.Config, compilerCtx: d.Compiler
 
   const { changedContent } = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
 
-  timespan.finish(`generated app types finished: ${config.sys.path.relative(config.rootDir, componentsDtsFilePath)}`);
+  const componentsDtsRelFileName = config.sys.path.relative(config.rootDir, componentsDtsFilePath);
+  if (changedContent) {
+    config.logger.debug(`${componentsDtsRelFileName} changed`);
+  }
+
+  timespan.finish(`generated app types finished: ${componentsDtsRelFileName}`);
   return changedContent;
 };
 

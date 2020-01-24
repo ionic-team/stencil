@@ -3,8 +3,8 @@ import { BundleOptions } from '../../bundle/bundle-interface';
 import { getBuildFeatures } from '../../build/app-data';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { hydrateComponentTransform } from '../../transformers/component-hydrate/tranform-to-hydrate-component';
-
 import { loadRollupDiagnostics } from '@utils';
+import { removeCollectionImports } from '../../transformers/remove-collection-imports';
 import { STENCIL_INTERNAL_HYDRATE_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
 
@@ -75,6 +75,7 @@ const getHydrateCustomTransformer = (compilerCtx: d.CompilerCtx) => {
   return [
     updateStencilCoreImports(transformOpts.coreImportPath),
     hydrateComponentTransform(compilerCtx, transformOpts),
+    removeCollectionImports(compilerCtx),
   ];
 };
 

@@ -37,7 +37,6 @@ export const validateNamespace = (c: d.Config, diagnostics: d.Diagnostic[]) => {
 
   if (c.namespace.includes('-')) {
     // convert to PascalCase
-    // this is the same namespace that gets put on "window"
     c.namespace = dashToPascalCase(c.namespace);
   }
 };

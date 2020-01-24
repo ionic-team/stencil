@@ -23,7 +23,7 @@ export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.Comp
         loaderPlugin({
           '@app-factory-entry': appFactoryEntryCode
         }),
-        appDataPlugin(config, compilerCtx, build, 'hydrate'),
+        appDataPlugin(config, compilerCtx, buildCtx, build, 'hydrate'),
         componentEntryPlugin(config, compilerCtx, buildCtx, build, buildCtx.entryModules),
         config.sys.rollup.plugins.commonjs({
           include: /node_modules/,

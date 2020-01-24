@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import ts from 'typescript';
 
 
-export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> => {
+export const removeCollectionImportsLegacy = (compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> => {
   /*
 
     // remove side effect collection imports like:

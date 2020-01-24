@@ -18,7 +18,7 @@ export async function build(config: d.Config, compilerCtx: d.CompilerCtx, buildC
     // and we've got a clean slate
     config.sys.cancelWorkerTasks();
 
-    buildCtx.packageJson = await readPackageJson(config, compilerCtx, buildCtx);
+    await readPackageJson(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildAbort(buildCtx);
 
     if (!config.devServer || !config.flags.serve) {

@@ -10,6 +10,7 @@ export const parseCollectionManifest = (config: d.Config, compilerCtx: d.Compile
 
   const collection: d.CollectionCompilerMeta = {
     collectionName: collectionName,
+    moduleId: collectionName,
     moduleFiles: [],
     dependencies: parseCollectionDependencies(collectionManifest),
     compiler: {

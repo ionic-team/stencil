@@ -255,7 +255,6 @@ export interface BuildCtx {
   isRebuild: boolean;
   moduleFiles: Module[];
   packageJson: PackageJsonData;
-  packageJsonFilePath: string;
   pendingCopyTasks: Promise<CopyResults>[];
   progress(task: BuildTask): void;
   requiresFullBuild: boolean;
@@ -458,6 +457,7 @@ export interface Cache {
 
 export interface CollectionCompilerMeta {
   collectionName?: string;
+  moduleId?: string;
   moduleDir?: string;
   moduleFiles?: Module[];
   global?: Module;

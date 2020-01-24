@@ -3,7 +3,7 @@ import { normalizePath } from '@utils';
 import { parseCollection } from './parse-collection-module';
 
 
-export const addExternalImport = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, resolveFromDir: string, moduleId: string) => {
+export const addExternalImportLegacy = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, resolveFromDir: string, moduleId: string) => {
   moduleFile.externalImports = moduleFile.externalImports || [];
   if (!moduleFile.externalImports.includes(moduleId)) {
     moduleFile.externalImports.push(moduleId);
@@ -75,7 +75,7 @@ export const addExternalImport = (config: d.Config, compilerCtx: d.CompilerCtx, 
     // let's keep digging down and discover all of them
     collection.dependencies.forEach(dependencyModuleId => {
       const resolveFromDir = config.sys.path.dirname(pkgJsonFilePath);
-      addExternalImport(config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId);
+      addExternalImportLegacy(config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId);
     });
   }
 };

@@ -2,7 +2,7 @@ import { sass } from '@stencil/sass';
 import { less } from '@stencil/less';
 import { stylus } from '@stencil/stylus';
 import { postcss } from '@stencil/postcss';
-import { Config } from '../../dist/declarations';
+import { Config } from '../../internal';
 
 import nodePolyfills from 'rollup-plugin-node-polyfills';
 

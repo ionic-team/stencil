@@ -1,10 +1,10 @@
 import * as d from '../../../declarations';
-import { addExternalImport } from '../collections/add-external-import';
+import { addExternalImportLegacy } from '../collections/add-external-import';
 import { normalizePath } from '@utils';
 import ts from 'typescript';
 
 
-export const parseImport = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, dirPath: string, importNode: ts.ImportDeclaration) => {
+export const parseImportLegacy = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, dirPath: string, importNode: ts.ImportDeclaration) => {
   if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
     let importPath = importNode.moduleSpecifier.text;
 
@@ -24,7 +24,7 @@ export const parseImport = (config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
     } else if (config.sys.resolveModule) {
       // node resolve side effect import
-      addExternalImport(config, compilerCtx, buildCtx, moduleFile, config.rootDir, importPath);
+      addExternalImportLegacy(config, compilerCtx, buildCtx, moduleFile, config.rootDir, importPath);
 
       // test if this side effect import is a collection
       const isCollectionImport = compilerCtx.collections.some(c => {

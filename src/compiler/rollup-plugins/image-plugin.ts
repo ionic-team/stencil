@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildWarn, catchError, createVarName, normalizePath } from '@utils';
+import { buildWarn, catchError, createJsVarName, normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
 
@@ -23,7 +23,7 @@ export const imagePlugin = (config: d.Config, _compilerCtx: d.CompilerCtx, build
       }
 
       try {
-        const varName = createVarName(config.sys.path.basename(id));
+        const varName = createJsVarName(config.sys.path.basename(id));
         const base64 = config.sys.encodeToBase64(code);
 
         if (config.devMode && base64.length > MAX_IMAGE_SIZE) {
