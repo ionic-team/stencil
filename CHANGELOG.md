@@ -1,3 +1,17 @@
+## 🚚 [1.8.6](https://github.com/ionic-team/stencil/compare/v1.8.5...v1.8.6) (2020-01-24)
+
+Updated:
+
+- TypeScript 3.7.5
+- Rollup 1.29.1
+- Terser 4.6.3
+
+### Bug Fixes
+
+* **dist:** optionally provide defineCustomElements window ([dfca3ed](https://github.com/ionic-team/stencil/commit/dfca3edae2831652e84633eff4218535e41099d1))
+* **ie11:** indexOf instead of includes ([2f16d2a](https://github.com/ionic-team/stencil/commit/2f16d2aa6372e8043cc36f61aa13c7bde40519bb)), closes [#2151](https://github.com/ionic-team/stencil/issues/2151)
+
+
 ## 🏕 [1.8.5](https://github.com/ionic-team/stencil/compare/v1.8.4...v1.8.5) (2020-01-09)
 
 
