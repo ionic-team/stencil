@@ -1,4 +1,4 @@
-# 🌃 [1.9.0-13](https://github.com/ionic-team/stencil/compare/v1.8.5...v1.9.0-13) (2020-01-20)
+# 🌃 [1.9.0-13](https://github.com/ionic-team/stencil/compare/v1.8.6...v1.9.0-13) (2020-01-20)
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
 
@@ -154,6 +154,21 @@ Some of main features with the `--next` compiler include:
 * **next:** fix collection output paths ([7097a9d](https://github.com/ionic-team/stencil/commit/7097a9d6da84c789fff975431a690695e662c7b4)), closes [#2149](https://github.com/ionic-team/stencil/issues/2149)
 * **next:** fix dist output ([aa57ebc](https://github.com/ionic-team/stencil/commit/aa57ebc66b295ea606dc2e967cb4e6d3505da186))
 * **next:** fix output dts relative path ([9e2679e](https://github.com/ionic-team/stencil/commit/9e2679efa1a24ad8f684678bf0334f685b8563d9))
+
+
+
+## 🚚 [1.8.6](https://github.com/ionic-team/stencil/compare/v1.8.5...v1.8.6) (2020-01-24)
+
+Updated:
+
+- TypeScript 3.7.5
+- Rollup 1.29.1
+- Terser 4.6.3
+
+### Bug Fixes
+
+* **dist:** optionally provide defineCustomElements window ([dfca3ed](https://github.com/ionic-team/stencil/commit/dfca3edae2831652e84633eff4218535e41099d1))
+* **ie11:** indexOf instead of includes ([2f16d2a](https://github.com/ionic-team/stencil/commit/2f16d2aa6372e8043cc36f61aa13c7bde40519bb)), closes [#2151](https://github.com/ionic-team/stencil/issues/2151)
 
 
 
