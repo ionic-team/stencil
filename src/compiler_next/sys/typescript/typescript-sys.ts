@@ -1,8 +1,7 @@
 import * as d from '../../../declarations';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
-import { IS_WEB_WORKER_ENV, IS_CASE_SENSITIVE_FILE_NAMES } from '../environment';
 import { basename, resolve } from 'path';
-import { isBoolean, noop } from '@utils';
+import { isBoolean, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, noop } from '@utils';
 import ts from 'typescript';
 
 

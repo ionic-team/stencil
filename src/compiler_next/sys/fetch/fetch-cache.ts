@@ -1,5 +1,4 @@
-import { HAS_FETCH_CACHE } from '../environment';
-import { isString } from '@utils';
+import { HAS_FETCH_CACHE, isString } from '@utils';
 import { version } from '../../../version';
 
 

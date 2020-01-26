@@ -1,13 +1,12 @@
 import * as d from '../../../declarations';
 import { getStencilInternalDtsUrl } from '../fetch/fetch-utils';
 import { isDtsFile, isExternalUrl, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile } from '../resolve/resolve-utils';
-import { IS_LOCATION_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../environment';
-import { isString, normalizePath } from '@utils';
+import { isString, IS_LOCATION_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV , normalizePath } from '@utils';
+import { patchTsSystemFileSystem } from './typescript-sys';
 import { resolveRemoteModuleId } from '../resolve/resolve-module';
 import { version } from '../../../version';
 import ts from 'typescript';
 import { basename, dirname, join, resolve } from 'path';
-import { patchTsSystemFileSystem } from './typescript-sys';
 
 
 export const patchTypeScriptResolveModule = (loadedTs: typeof ts, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {

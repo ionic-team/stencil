@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { CACHES } from '../fetch/fetch-cache';
 import { getRemoteTypeScriptUrl } from '../dependencies';
-import { HAS_FETCH_CACHE, IS_FETCH_ENV, IS_WEB_WORKER_ENV } from '../environment';
+import { HAS_FETCH_CACHE, IS_FETCH_ENV, IS_WEB_WORKER_ENV } from '@utils';
 import { join } from 'path';
 
 

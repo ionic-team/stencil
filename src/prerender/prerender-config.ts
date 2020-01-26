@@ -1,7 +1,6 @@
 import * as d from '../declarations';
-import { catchError, buildError } from '@utils';
+import { buildError, catchError, requireFunc } from '@utils';
 import fs from 'fs';
-import { requireFunc } from '../compiler_next/sys/environment';
 
 
 export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigPath: string) {

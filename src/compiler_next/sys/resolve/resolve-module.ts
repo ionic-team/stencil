@@ -3,8 +3,7 @@ import { NODE_MODULES_FS_DIR, getCdnPackageJsonUrl, getCommonDirName, isCommonDi
 import { fetchModuleAsync } from '../fetch/fetch-module-async';
 import { fetchModuleSync } from '../fetch/fetch-module-sync';
 import { getCommonDirUrl, getNodeModuleFetchUrl, packageVersions } from '../fetch/fetch-utils';
-import { IS_FETCH_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../environment';
-import { isString, normalizeFsPath } from '@utils';
+import { isString, IS_FETCH_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV, normalizeFsPath } from '@utils';
 import path from 'path';
 import resolve from 'resolve';
 

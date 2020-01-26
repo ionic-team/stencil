@@ -1,5 +1,6 @@
 
 export * from './constants';
+export * from './environment';
 export * from './helpers';
 export * from './in-memory-fs';
 export * from './is-glob';

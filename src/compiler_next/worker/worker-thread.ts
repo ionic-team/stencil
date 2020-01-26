@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { compile } from '../compile-module';
 import { initNodeWorkerThread } from '../../sys/node_next/worker/worker-child';
 import { initWebWorkerThread } from '../sys/worker/web-worker-thread';
-import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '../sys/environment';
+import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '@utils';
 import { prepareModule } from '../optimize/optimize-module';
 import { minifyJs } from '../optimize/minify-js';
 import { transformCssToEsm } from '../../compiler/style/css-to-esm';

@@ -1,6 +1,5 @@
 import pathBrowserify from 'path-browserify';
-import { IS_NODE_ENV, requireFunc } from '../environment';
-import { normalizePath } from '@utils';
+import { IS_NODE_ENV, normalizePath, requireFunc } from '@utils';
 
 const path: any = {};
 

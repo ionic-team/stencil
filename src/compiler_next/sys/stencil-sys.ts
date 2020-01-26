@@ -1,8 +1,7 @@
 import { CompilerFileWatcherCallback, CompilerFsStats, CompilerSystem, CompilerSystemMakeDirectoryOptions, CopyResults, CopyTask, SystemDetails } from '../../declarations';
 import { buildEvents } from '../../compiler/events';
 import { createWebWorkerMainController } from '../sys/worker/web-worker-main';
-import { HAS_WEB_WORKER, IS_NODE_ENV, IS_WEB_WORKER_ENV } from './environment';
-import { normalizePath } from '@utils';
+import { HAS_WEB_WORKER, IS_NODE_ENV, IS_WEB_WORKER_ENV, normalizePath } from '@utils';
 import { basename, dirname } from 'path';
 
 

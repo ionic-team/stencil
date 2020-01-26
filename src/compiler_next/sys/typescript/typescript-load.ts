@@ -1,8 +1,7 @@
 import * as d from '../../../declarations';
 import { CACHES } from '../fetch/fetch-cache';
-import { catchError } from '@utils';
+import { catchError, HAS_FETCH_CACHE, IS_NODE_ENV, IS_WEB_WORKER_ENV, requireFunc } from '@utils';
 import { getRemoteTypeScriptUrl } from '../dependencies';
-import { HAS_FETCH_CACHE, IS_NODE_ENV, IS_WEB_WORKER_ENV, requireFunc } from '../environment';
 import { patchTsSystemUtils } from './typescript-sys';
 import { version } from '../../../version';
 import ts from 'typescript';

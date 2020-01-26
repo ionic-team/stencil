@@ -1,9 +1,8 @@
-import { buildError, catchError, isString, normalizePath, hasError } from '@utils';
+import { buildError, catchError, isString, normalizePath, hasError, IS_NODE_ENV } from '@utils';
 import { CompilerSystem, Config, Diagnostic, LoadConfigInit, LoadConfigResults } from '../../declarations';
 import { createLogger } from '../sys/logger';
 import { createSystem } from '../sys/stencil-sys';
 import { loadTypescript } from '../sys/typescript/typescript-load';
-import { IS_NODE_ENV } from '../sys/environment';
 import { validateConfig } from './validate-config';
 import { validateTsConfig } from '../sys/typescript/typescript-config';
 import path from 'path';

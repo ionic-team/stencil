@@ -1,4 +1,4 @@
-import { IS_NODE_ENV, requireFunc } from '../environment';
+import { IS_NODE_ENV, requireFunc } from '@utils';
 
 
 export const URL = (gbl => {
