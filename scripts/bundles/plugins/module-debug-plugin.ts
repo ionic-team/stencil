@@ -4,11 +4,11 @@ import path from 'path';
 
 
 export function moduleDebugPlugin(opts: BuildOptions): Plugin {
-
   return {
     name: 'moduleDebugPlugin',
     transform(code, id) {
-      const debugPath = path.posix.relative(opts.transpiledDir, id);
+      let debugPath = path.relative(opts.transpiledDir, id);
+      debugPath = debugPath.replace(/\\/g, '/');
       const comment = `// MODULE: ${debugPath}\n`;
       return comment + code;
     }

@@ -4,17 +4,17 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import json from 'rollup-plugin-json';
 import { aliasPlugin } from './plugins/alias-plugin';
-import { inlinedCompilerPluginsPlugin } from './plugins/inlined-compiler-plugins-plugin';
-import { sysModulesPlugin } from './plugins/sys-modules-plugin';
-import { replacePlugin } from './plugins/replace-plugin';
-import { parse5Plugin } from './plugins/parse5-plugin';
-import { sizzlePlugin } from './plugins/sizzle-plugin';
 import { getBanner } from '../utils/banner';
+import { inlinedCompilerPluginsPlugin } from './plugins/inlined-compiler-plugins-plugin';
+import { moduleDebugPlugin } from './plugins/module-debug-plugin';
+import { parse5Plugin } from './plugins/parse5-plugin';
+import { replacePlugin } from './plugins/replace-plugin';
+import { sizzlePlugin } from './plugins/sizzle-plugin';
+import { sysModulesPlugin } from './plugins/sys-modules-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { BuildOptions } from '../utils/options';
 import { RollupOptions } from 'rollup';
 import terser from 'terser';
-import { moduleDebugPlugin } from './plugins/moduleDebugPlugin';
 
 
 export async function compiler(opts: BuildOptions) {
@@ -37,7 +37,6 @@ export async function compiler(opts: BuildOptions) {
   });
 
 
-  const compilerIntro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-intro.js'), 'utf8');
   const cjsIntro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-intro.js'), 'utf8');
   const cjsOutro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-outro.js'), 'utf8');
 
@@ -47,7 +46,7 @@ export async function compiler(opts: BuildOptions) {
     output: {
       format: 'cjs',
       file: join(opts.output.compilerDir, compilerFileName),
-      intro: cjsIntro + compilerIntro,
+      intro: cjsIntro,
       outro: cjsOutro,
       strict: false,
       banner: getBanner(opts, 'Stencil Compiler', true),
