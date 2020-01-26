@@ -7,7 +7,7 @@ import util from 'util';
 export function serve500(devServerConfig: d.DevServerConfig, req: d.HttpRequest, res: http.ServerResponse, error: any) {
   try {
     res.writeHead(500, responseHeaders({
-      'Content-Type': 'text/plain'
+      'Content-Type': 'text/plain;charset=UTF-8'
     }));
 
     res.write(util.inspect(error));

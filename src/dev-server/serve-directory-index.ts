@@ -54,7 +54,7 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
         .replace('{{files}}', files);
 
       res.writeHead(200, responseHeaders({
-        'Content-Type': 'text/html',
+        'Content-Type': 'text/html;charset=UTF-8',
         'X-Directory-Index': req.pathname
       }));
 

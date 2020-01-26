@@ -28,7 +28,7 @@ export async function serveFile(devServerConfig: d.DevServerConfig, sys: d.Compi
       if (util.shouldCompress(devServerConfig, req)) {
         // let's gzip this well known web dev text file
         res.writeHead(200, util.responseHeaders({
-          'Content-Type': util.getContentType(devServerConfig, req.filePath),
+          'Content-Type': util.getContentType(devServerConfig, req.filePath) + ';charset=UTF-8',
           'Content-Encoding': 'gzip',
           'Vary': 'Accept-Encoding'
         }));
@@ -40,7 +40,7 @@ export async function serveFile(devServerConfig: d.DevServerConfig, sys: d.Compi
       } else {
         // let's not gzip this file
         res.writeHead(200, util.responseHeaders({
-          'Content-Type': util.getContentType(devServerConfig, req.filePath),
+          'Content-Type': util.getContentType(devServerConfig, req.filePath) + ';charset=UTF-8',
           'Content-Length': Buffer.byteLength(content, 'utf8')
         }));
         res.write(content);

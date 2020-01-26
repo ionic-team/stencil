@@ -59,7 +59,7 @@ async function serveDevClientScript(devServerConfig: d.DevServerConfig, sys: d.C
       content = content.replace('window.__DEV_CLIENT_CONFIG__', JSON.stringify(devClientConfig));
 
       res.writeHead(200, util.responseHeaders({
-        'Content-Type': 'text/html'
+        'Content-Type': 'text/html;charset=UTF-8'
       }));
       res.write(content);
       res.end();

@@ -18,7 +18,7 @@ export async function serve404(devServerConfig: d.DevServerConfig, req: d.HttpRe
         const rs = fs.createReadStream(defaultFavicon);
         rs.on('error', err => {
           res.writeHead(404, responseHeaders({
-            'Content-Type': 'text/plain'
+            'Content-Type': 'text/plain;charset=UTF-8'
           }));
           res.write(util.inspect(err));
           res.end();
@@ -58,7 +58,7 @@ export async function serve404(devServerConfig: d.DevServerConfig, req: d.HttpRe
 export function serve404Content(devServerConfig: d.DevServerConfig, req: d.HttpRequest, res: http.ServerResponse, content: string) {
   try {
     const headers = responseHeaders({
-      'Content-Type': 'text/plain'
+      'Content-Type': 'text/plain;charset=UTF-8'
     });
 
     res.writeHead(404, headers);
