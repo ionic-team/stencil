@@ -3,12 +3,49 @@ import { normalizePath } from '../normalize-path';
 
 describe('normalizePath', () => {
 
-  it('normalize posix', () => {
-    expect(normalizePath('/dir/basename.ext')).toBe('/dir/basename.ext');
-    expect(normalizePath('/dir')).toBe('/dir');
+  it('node module', () => {
+    expect(normalizePath('lodash')).toBe('lodash');
+    expect(normalizePath('   lodash    ')).toBe('lodash');
+    expect(normalizePath('@angular/core')).toBe('@angular/core');
   });
 
-  it('normalize win32', () => {
+  it('empty', () => {
+    expect(normalizePath('')).toBe('.');
+    expect(normalizePath('.')).toBe('.');
+    expect(normalizePath('..')).toBe('..');
+    expect(normalizePath('./')).toBe('.');
+    expect(normalizePath('./././')).toBe('.');
+  });
+
+  it('relative ./ posix', () => {
+    expect(normalizePath('./dir/basename.ext')).toBe('./dir/basename.ext');
+    expect(normalizePath('./dir')).toBe('./dir');
+  });
+
+  it('relative ./ win32', () => {
+    expect(normalizePath('.\\dir\\basename.ext')).toBe('./dir/basename.ext');
+    expect(normalizePath('.\\dir')).toBe('./dir');
+  });
+
+  it('relative ../ posix', () => {
+    expect(normalizePath('../dir/basename.ext')).toBe('../dir/basename.ext');
+    expect(normalizePath('../../dir/basename.ext')).toBe('../../dir/basename.ext');
+    expect(normalizePath('../dir1/dir2')).toBe('../dir1/dir2');
+  });
+
+  it('relative ../ win32', () => {
+    expect(normalizePath('..\\dir\\basename.ext')).toBe('../dir/basename.ext');
+    expect(normalizePath('..\\..\\dir\\basename.ext')).toBe('../../dir/basename.ext');
+    expect(normalizePath('..\\dir1\\dir2')).toBe('../dir1/dir2');
+  });
+
+  it('absolute posix', () => {
+    expect(normalizePath('/dir/basename.ext')).toBe('/dir/basename.ext');
+    expect(normalizePath('/dir')).toBe('/dir');
+    expect(normalizePath('/./dir')).toBe('/dir');
+  });
+
+  it('absolute win32', () => {
     expect(normalizePath('C:\\dir\\basename.ext')).toBe('C:/dir/basename.ext');
     expect(normalizePath('C:\\dir')).toBe('C:/dir');
   });

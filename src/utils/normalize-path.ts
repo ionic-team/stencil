@@ -9,23 +9,18 @@ export const normalizePath = (path: string) => {
   if (typeof path !== 'string') {
     throw new Error(`invalid path to normalize`);
   }
-  path = normalizeSlashes(path);
-  let normalized = getPathFromPathComponents(reducePathComponents(getPathComponents(path)));
-  if (normalized) {
-    normalized = normalized.trim();
+  path = normalizeSlashes(path.trim());
 
-    // always remove the trailing /
-    // this makes our file cache look ups consistent
-    if (normalized.charAt(normalized.length - 1) === '/') {
-      const colonIndex = normalized.indexOf(':');
-      if (colonIndex > -1) {
-        if (colonIndex < normalized.length - 2) {
-          normalized = normalized.substring(0, normalized.length - 1);
-        }
-      } else if (normalized.length > 1) {
-        normalized = normalized.substring(0, normalized.length - 1);
-      }
-    }
+  const pathComponents = reducePathComponents(getPathComponents(path));
+  const rootPart = pathComponents[0];
+  const secondPart = pathComponents[1];
+  const normalized = rootPart + pathComponents.slice(1).join('/');
+
+  if (normalized === '') {
+    return '.'
+  }
+  if (rootPart === '' && secondPart && path.includes('/') && !secondPart.startsWith('.') && !secondPart.startsWith('@')) {
+    return './' + normalized;
   }
   return normalized;
 };
@@ -156,31 +151,10 @@ const combinePaths = (path: string, ...paths: (string | undefined)[]) => {
     relativePath = normalizeSlashes(relativePath);
     if (!path || getRootLength(relativePath) !== 0) {
       path = relativePath;
-    } else {
-      path = ensureTrailingDirectorySeparator(path) + relativePath;
     }
   }
   return path;
 }
-
-const getPathFromPathComponents = (pathComponents: readonly string[]) => {
-  if (pathComponents.length === 0) return '';
-  const root = pathComponents[0] && ensureTrailingDirectorySeparator(pathComponents[0]);
-  return root + pathComponents.slice(1).join('/');
-};
-
-const ensureTrailingDirectorySeparator = (path: string) => {
-  if (!hasTrailingDirectorySeparator(path)) {
-    return path + '/';
-  }
-  return path;
-};
-
-const hasTrailingDirectorySeparator = (path: string) =>
-  path.length > 0 && isAnyDirectorySeparator(path.charCodeAt(path.length - 1));
-
-const isAnyDirectorySeparator = (charCode: number) =>
-  charCode === CharacterCodes.slash || charCode === CharacterCodes.backslash;
 
 /**
  * Same as normalizePath(), expect it'll also strip any querystrings
