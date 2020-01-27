@@ -281,9 +281,19 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       const s = await sys.stat(itemPath);
       if (s) {
         item.exists = true;
-        item.isDirectory = s.isDirectory();
-        item.isFile = s.isFile();
-        item.size = s.size;
+        if (s.isFile()) {
+          item.isFile = true;
+          item.isDirectory = false;
+          item.size = s.size;
+        } else if (s.isDirectory()) {
+          item.isFile = false;
+          item.isDirectory = true;
+          item.size = s.size;
+        } else {
+          item.isFile = false;
+          item.isDirectory = false;
+          item.size = null;
+        }
       } else {
         item.exists = false;
       }
@@ -309,8 +319,19 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       const s = sys.statSync(itemPath);
       if (s) {
         item.exists = true;
-        item.isDirectory = s.isDirectory();
-        item.isFile = s.isFile();
+        if (s.isFile()) {
+          item.isFile = true;
+          item.isDirectory = false;
+          item.size = s.size;
+        } else if (s.isDirectory()) {
+          item.isFile = false;
+          item.isDirectory = true;
+          item.size = s.size;
+        } else {
+          item.isFile = false;
+          item.isDirectory = false;
+          item.size = null;
+        }
       } else {
         item.exists = false;
       }

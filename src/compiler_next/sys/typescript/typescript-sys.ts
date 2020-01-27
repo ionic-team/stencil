@@ -33,15 +33,15 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
       for (const absPath of entries) {
         // This is necessary because on some file system node fails to exclude
         // "." and "..". See https://github.com/nodejs/node/issues/4002
-        const stat = stencilSys.statSync(absPath);
+        const stat = inMemoryFs.statSync(absPath);
         if (!stat) {
           continue;
         }
 
         const entry = basename(absPath);
-        if (stat.isFile()) {
+        if (stat.isFile) {
           files.push(entry);
-        } else if (stat.isDirectory()) {
+        } else if (stat.isDirectory) {
           directories.push(entry);
         }
       }
@@ -67,8 +67,8 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
   tsSys.getDirectories = (p) => {
     const items = stencilSys.readdirSync(p);
     return items.filter(itemPath => {
-      const s = stencilSys.statSync(itemPath);
-      return !!(s && s.isDirectory());
+      const s = inMemoryFs.statSync(itemPath);
+      return !!(s && s.exists && s.isDirectory);
     });
   };
 
