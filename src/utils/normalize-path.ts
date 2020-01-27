@@ -11,10 +11,11 @@ export const normalizePath = (path: string) => {
   }
   path = normalizeSlashes(path.trim());
 
-  const pathComponents = reducePathComponents(getPathComponents(path));
-  const rootPart = pathComponents[0];
-  const secondPart = pathComponents[1];
-  const normalized = rootPart + pathComponents.slice(1).join('/');
+  const components = pathComponents(path, getRootLength(path));
+  const reducedComponents = reducePathComponents(components);
+  const rootPart = reducedComponents[0];
+  const secondPart = reducedComponents[1];
+  const normalized = rootPart + reducedComponents.slice(1).join('/');
 
   if (normalized === '') {
     return '.'
@@ -52,11 +53,6 @@ const reducePathComponents = (components: readonly string[]) => {
     reduced.push(component);
   }
   return reduced;
-};
-
-const getPathComponents = (path: string, currentDirectory = '') => {
-  path = combinePaths(currentDirectory, path);
-  return pathComponents(path, getRootLength(path));
 };
 
 const getRootLength = (path: string) => {
@@ -124,7 +120,7 @@ const isVolumeCharacter = (charCode: number) =>
   (charCode >= CharacterCodes.a && charCode <= CharacterCodes.z) ||
   (charCode >= CharacterCodes.A && charCode <= CharacterCodes.Z);
 
-  const getFileUrlVolumeSeparatorEnd = (url: string, start: number) => {
+const getFileUrlVolumeSeparatorEnd = (url: string, start: number) => {
   const ch0 = url.charCodeAt(start);
   if (ch0 === CharacterCodes.colon) return start + 1;
   if (ch0 === CharacterCodes.percent && url.charCodeAt(start + 1) === CharacterCodes._3) {
@@ -137,24 +133,12 @@ const isVolumeCharacter = (charCode: number) =>
 const pathComponents = (path: string, rootLength: number) => {
   const root = path.substring(0, rootLength);
   const rest = path.substring(rootLength).split('/');
-  if (rest.length && !lastOrUndefined(rest)) rest.pop();
+  const restLen = rest.length;
+  if (restLen > 0 && !rest[restLen - 1]) {
+    rest.pop()
+  };
   return [root, ...rest];
 };
-
-const lastOrUndefined = <T>(array: readonly T[]): T | undefined =>
-  array.length === 0 ? undefined : array[array.length - 1];
-
-const combinePaths = (path: string, ...paths: (string | undefined)[]) => {
-  if (path) path = normalizeSlashes(path);
-  for (let relativePath of paths) {
-    if (!relativePath) continue;
-    relativePath = normalizeSlashes(relativePath);
-    if (!path || getRootLength(relativePath) !== 0) {
-      path = relativePath;
-    }
-  }
-  return path;
-}
 
 /**
  * Same as normalizePath(), expect it'll also strip any querystrings

@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { cloneDocument, createDocument, serializeNodeToHtml } from '@mock-doc';
 import { createLogger } from './logger';
 import { createSystem } from './stencil-sys';
-import { resolveModuleIdSync, resolvePackageJsonSync } from './resolve/resolve-module';
+import { resolveModuleIdSync, resolvePackageJsonSync } from './resolve/resolve-module-sync';
 import { scopeCss } from '../../utils/shadow-css';
 import { typescriptVersion, version } from '../../version';
 import path from 'path';

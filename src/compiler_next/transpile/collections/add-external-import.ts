@@ -50,6 +50,9 @@ export const addExternalImport = (config: d.Config, compilerCtx: d.CompilerCtx, 
   // let's parse it and gather all the module data about it
   // internally it'll cached collection data if we've already done this
   const collection = parseCollection(config, compilerCtx, buildCtx, moduleId, parsedPkgJson.filePath, parsedPkgJson.data);
+  if (!collection) {
+    return;
+  }
 
   // check if we already added this collection to the build context
   const alreadyHasCollection = buildCtx.collections.some(c => {

@@ -3,10 +3,10 @@ import { getStencilInternalDtsUrl } from '../fetch/fetch-utils';
 import { isDtsFile, isExternalUrl, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile } from '../resolve/resolve-utils';
 import { isString, IS_LOCATION_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV , normalizePath } from '@utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
-import { resolveRemoteModuleId } from '../resolve/resolve-module';
+import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
 import { version } from '../../../version';
-import ts from 'typescript';
 import { basename, dirname, join, resolve } from 'path';
+import ts from 'typescript';
 
 
 export const patchTypeScriptResolveModule = (loadedTs: typeof ts, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
@@ -114,7 +114,7 @@ export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFile
     };
   }
 
-  const resolved = resolveRemoteModuleId(config, inMemoryFs, moduleName, containingFile);
+  const resolved = resolveRemoteModuleIdSync(config, inMemoryFs, moduleName, containingFile);
   if (resolved) {
     return {
       resolvedModule: {
@@ -130,7 +130,7 @@ export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFile
   }
 
   return null;
-}
+};
 
 export const ensureUrlExtension = (url: string, containingUrl: string) => {
   const fileName = basename(url);

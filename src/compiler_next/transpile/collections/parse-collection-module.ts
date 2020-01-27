@@ -26,6 +26,9 @@ export const parseCollection = (config: d.Config, compilerCtx: d.CompilerCtx, bu
   // we haven't cached the collection yet, let's read this file
   // sync on purpose :(
   const collectionJsonStr = compilerCtx.fs.readFileSync(collectionFilePath);
+  if (!collectionJsonStr) {
+    return null;
+  }
 
   // get the directory where the collection collection file is sitting
   const collectionDir = normalizePath(config.sys.path.dirname(collectionFilePath));

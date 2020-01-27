@@ -1,11 +1,13 @@
 import * as d from '../../../declarations';
-import { isString } from '@utils';
+import { IS_FETCH_ENV, IS_NODE_ENV, isString } from '@utils';
 
 export const NODE_MODULES_FS_DIR = '/node_modules';
 export const STENCIL_CORE_MODULE = NODE_MODULES_FS_DIR + '/@stencil/core/';
 export const NODE_MODULES_CDN_URL = 'https://cdn.jsdelivr.net/npm';
 
 const COMMON_DIR_MODULE_EXTS = ['.tsx', '.ts', '.mjs', '.js', '.jsx', '.json', '.md'];
+
+export const COMMON_DIR_FILENAMES = ['package.json', 'index.js', 'index.mjs'];
 
 export const isDtsFile = (p: string) => p.endsWith('.d.ts');
 
@@ -51,3 +53,5 @@ export const getCdnPackageJsonUrl = (moduleId: string) => new URL(`./${moduleId}
 export const isLocalModule = (p: string) => p.startsWith('.') || p.startsWith('/');
 
 export const isStencilCoreImport = (p: string) => p.startsWith('@stencil/core');
+
+export const shouldFetchModule = (p: string) => (IS_FETCH_ENV && !IS_NODE_ENV && p.startsWith(NODE_MODULES_FS_DIR + '/'));

@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { appDataPlugin } from './app-data-plugin';
 import { BundleOptions } from './bundle-interface';
 import { coreResolvePlugin } from './core-resolve-plugin';
-import { createCustomResolverAsync } from '../sys/resolve/resolve-module';
+import { createCustomResolverAsync } from '../sys/resolve/resolve-module-async';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { devNodeModuleResolveId } from './dev-module';
 import { extTransformsPlugin } from './ext-transforms-plugin';
@@ -12,9 +12,9 @@ import { imagePlugin } from '../../compiler/rollup-plugins/image-plugin';
 import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-plugin';
 import { loaderPlugin } from '../../compiler/rollup-plugins/loader';
 import { pluginHelper } from '../../compiler/rollup-plugins/plugin-helper';
+import { resolveIdWithTypeScript, typescriptPlugin } from './typescript-plugin';
 import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-plugins';
 import { RollupOptions, TreeshakingOptions, rollup } from 'rollup';
-import { typescriptPlugin } from './typescript-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
 
@@ -78,6 +78,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform),
       ...config.rollupPlugins,
       nodeResolvePlugin,
+      resolveIdWithTypeScript(config, compilerCtx),
       rollupCommonjsPlugin({
         include: /node_modules/,
         sourceMap: config.sourceMap,
