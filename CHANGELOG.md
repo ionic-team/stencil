@@ -1,4 +1,5 @@
-# 🌃 [1.9.0-13](https://github.com/ionic-team/stencil/compare/v1.8.6...v1.9.0-13) (2020-01-20)
+# 🎬 [1.9.0-14](https://github.com/ionic-team/stencil/compare/v1.8.6...v1.9.0-14) (2020-01-27)
+
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
 
@@ -154,6 +155,13 @@ Some of main features with the `--next` compiler include:
 * **next:** fix collection output paths ([7097a9d](https://github.com/ionic-team/stencil/commit/7097a9d6da84c789fff975431a690695e662c7b4)), closes [#2149](https://github.com/ionic-team/stencil/issues/2149)
 * **next:** fix dist output ([aa57ebc](https://github.com/ionic-team/stencil/commit/aa57ebc66b295ea606dc2e967cb4e6d3505da186))
 * **next:** fix output dts relative path ([9e2679e](https://github.com/ionic-team/stencil/commit/9e2679efa1a24ad8f684678bf0334f685b8563d9))
+* **build:** fix global script and collection builds for distribution ([df83832](https://github.com/ionic-team/stencil/commit/df83832356b48e158d6535fd9ee8cc15d2b02593))
+* **dev-server:** ensure utf-8 ([ca42fca](https://github.com/ionic-team/stencil/commit/ca42fca8b6a9151f1e15637e5bc3b730d98974a4)), closes [#2161](https://github.com/ionic-team/stencil/issues/2161)
+* **ie11:** indexOf instead of includes ([f80865b](https://github.com/ionic-team/stencil/commit/f80865bcc9992816f6a8eba056d2551a70914e46)), closes [#2151](https://github.com/ionic-team/stencil/issues/2151)
+* **next:** fix standalone compiler ([674019b](https://github.com/ionic-team/stencil/commit/674019b0d42ed95512fddc68764440fe7df56bbe)), closes [#2142](https://github.com/ionic-team/stencil/issues/2142)
+* **normalizePath:** ensure non-ascii paths can be normalized ([a97c2f5](https://github.com/ionic-team/stencil/commit/a97c2f542fe7d5ea5498b0f30046cab89b866ef8)), closes [#2161](https://github.com/ionic-team/stencil/issues/2161)
+* **normalizePath:** improve normalizePath ([addfdbc](https://github.com/ionic-team/stencil/commit/addfdbca71262cd8175c01e8b88c14bf6ca3e1f9))
+* **resolve:** resolve also w/ typescript compiler option paths ([69efa87](https://github.com/ionic-team/stencil/commit/69efa872470a204a09e485c822bfa3aff4e2e287))
 
 
 
