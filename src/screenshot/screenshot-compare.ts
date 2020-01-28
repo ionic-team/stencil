@@ -141,7 +141,7 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
 
       const pixelMatchProcess = fork(pixelmatchModulePath, [], options);
 
-      pixelMatchProcess.on('message', data => {
+      pixelMatchProcess.on('message', (data: any) => {
         pixelMatchProcess.kill();
         clearTimeout(tmr);
         resolve(data);
