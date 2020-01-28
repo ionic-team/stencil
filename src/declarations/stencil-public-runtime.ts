@@ -104,17 +104,14 @@ export interface PropOptions {
   reflectToAttr?: boolean;
 }
 
-
 export interface MethodDecorator {
   (opts?: MethodOptions): CustomMethodDecorator<any>;
 }
 export interface MethodOptions {}
 
-
 export interface ElementDecorator {
   (): PropertyDecorator;
 }
-
 
 export interface EventDecorator {
   (opts?: EventOptions): PropertyDecorator;
@@ -140,7 +137,6 @@ export interface EventOptions {
   composed?: boolean;
 }
 
-
 export interface ListenDecorator {
   (eventName: string, opts?: ListenOptions): CustomMethodDecorator<any>;
 }
@@ -155,7 +151,8 @@ export interface ListenOptions {
   /**
    * Event listener attached with `@Listen` does not "capture" by default,
    * When a event listener is set to "capture", means the event will be dispatched
-   * during the "capture phase", check out https://www.quirksmode.org/js/events_order.html for further information.
+   * during the "capture phase". Please see
+   * https://www.quirksmode.org/js/events_order.html for further information.
    */
   capture?: boolean;
 
@@ -164,18 +161,16 @@ export interface ListenOptions {
    * it must attach a `passive` event listener or not.
    *
    * Using the `passive` option can be used to change the default behaviour.
-   * Please check out https://developers.google.com/web/updates/2016/06/passive-event-listeners for further information.
+   * Please see https://developers.google.com/web/updates/2016/06/passive-event-listeners for further information.
    */
   passive?: boolean;
 }
 
 export type ListenTargetOptions = 'parent' | 'body' | 'document' | 'window';
 
-
 export interface StateDecorator {
   (): PropertyDecorator;
 }
-
 
 export interface WatchDecorator {
   (propName: string): CustomMethodDecorator<any>;
@@ -189,52 +184,78 @@ export interface UserBuildConditionals {
 }
 
 /**
- * Build
+ * The `Build` object provides many build conditionals that can be used to
+ * include or exclude code depending on the build.
  */
 export declare const Build: UserBuildConditionals;
 
 /**
- * Component
+ * The `@Component()` decorator is used to provide metadata about the component class.
+ * https://stenciljs.com/docs/component
  */
 export declare const Component: ComponentDecorator;
 
 /**
- * Element
+ * The `@Element()` decorator is a reference to the actual host element
+ * once it has rendered.
  */
 export declare const Element: ElementDecorator;
 
 /**
- * Event
+ * Components can emit data and events using the Event Emitter decorator.
+ * To dispatch Custom DOM events for other components to handle, use the
+ * `@Event()` decorator. The Event decorator also makes it easier for Stencil
+ * to automatically build types and documentation for the event data.
+ * https://stenciljs.com/docs/events
  */
 export declare const Event: EventDecorator;
 
 /**
- * Listen
+ * The `Listen()` decorator is for listening DOM events, including the ones
+ * dispatched from `@Events()`.
+ * https://stenciljs.com/docs/events#listen-decorator
  */
 export declare const Listen: ListenDecorator;
 
 /**
- * Method
+ * The `@Method()` decorator is used to expose methods on the public API.
+ * Class methods decorated with the @Method() decorator can be called directly
+ * from the element, meaning they are intended to be callable from the outside.
+ * https://stenciljs.com/docs/methods
  */
 export declare const Method: MethodDecorator;
 
 /**
- * Prop
+ * Props are custom attribute/properties exposed publicly on the element
+ * that developers can provide values for. Children components do not need to
+ * know about or reference parent components, so Props can be used to pass
+ * data down from the parent to the child. Components need to explicitly
+ * declare the Props they expect to receive using the `@Prop()` decorator.
+ * Any value changes to a Prop will cause a re-render.
+ * https://stenciljs.com/docs/properties
  */
 export declare const Prop: PropDecorator;
 
 /**
- * State
+ * The `@State()` decorator can be used to manage internal data for a component.
+ * This means that a user cannot modify this data from outside the component,
+ * but the component can modify it however it sees fit. Any value changes to a
+ * `@State()` property will cause the components render function to be called again.
+ * https://stenciljs.com/docs/state
  */
 export declare const State: StateDecorator;
 
 /**
- * Watch
+ * When a property's value has changed, a method decorated with `@Watch()` will be
+ * called and passed the new value of the prop along with the old value. Watch is
+ * useful for validating props or handling side effects. Watch decorator does not
+ * fire when a component initially loads.
+ * https://stenciljs.com/docs/reactive-data#watch-decorator
  */
 export declare const Watch: WatchDecorator;
 
 /**
- * setMode
+ * `setMode()` is used for libraries which provide multiple "modes" for styles.
  */
 export declare const setMode: (handler: ((elm: HTMLElement) => string | undefined | null)) => void;
 
@@ -1473,7 +1494,7 @@ export namespace JSXBase {
   export interface DOMAttributes<T = Element> {
     // vdom specific
     key?: string | number;
-                              
+
     ref?: (elm?: T) => void;
     slot?: string;
 
