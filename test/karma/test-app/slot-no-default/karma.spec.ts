@@ -12,13 +12,22 @@ describe('slot-no-default', function() {
 
 
   it('only renders slots that havea location', async () => {
-    const elm = app.querySelector('slot-no-default');
+    const root = app.querySelector('slot-no-default');
 
-    expect(elm.textContent).toContain('Header-No-Show');
-    expect(elm.textContent).toContain('Default-Slot-No-Show');
-    expect(elm.textContent).toContain('A-Show');
-    expect(elm.textContent).toContain('Footer-Show');
-    expect(elm.textContent).toContain('Nav-Show');
+    const a = root.querySelector('a');
+    expect(a.hasAttribute('hidden')).toBe(false);
+
+    const header = root.querySelector('header');
+    expect(header.hasAttribute('hidden')).toBe(true);
+
+    const main = root.querySelector('main');
+    expect(main.hasAttribute('hidden')).toBe(true);
+
+    const nav = root.querySelector('nav');
+    expect(nav.hasAttribute('hidden')).toBe(false);
+
+    const footer = root.querySelector('footer');
+    expect(footer.hasAttribute('hidden')).toBe(false);
   });
 
 });
