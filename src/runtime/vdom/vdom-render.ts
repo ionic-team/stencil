@@ -482,21 +482,22 @@ const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
   }
 };
 
-const relocateNodes: RelocateNode[] = [];
+const relocateNodes: RelocateNodeData[] = [];
 
 const relocateSlotContent = (
-  elm: d.RenderNode,
+  elm: d.RenderNode
 ) => {
 // tslint:disable-next-line: prefer-const
+  let childNode: d.RenderNode;
+  let node: d.RenderNode;
+  let hostContentNodes: NodeList;
+  let slotNameAttr: string;
+  let relocateNodeData: RelocateNodeData;
   let childNodes: d.RenderNode[] = elm.childNodes as any;
   let ilen = childNodes.length;
   let i = 0;
   let j = 0;
   let nodeType = 0;
-  let childNode: d.RenderNode;
-  let node: d.RenderNode;
-  let hostContentNodes: NodeList;
-  let slotNameAttr: string;
 
   for (ilen = childNodes.length; i < ilen; i++) {
     childNode = childNodes[i];
@@ -522,19 +523,33 @@ const relocateSlotContent = (
             (nodeType === NODE_TYPE.ElementNode && node.getAttribute('slot') === slotNameAttr)
           ) {
             // it's possible we've already decided to relocate this node
-            if (!relocateNodes.some(r => r.$nodeToRelocate$ === node)) {
-              // made some changes to slots
-              // let's make sure we also double check
-              // fallbacks are correctly hidden or shown
-              checkSlotFallbackVisibility = true;
-              node['s-sn'] = slotNameAttr;
+            relocateNodeData = relocateNodes.find(r => r.$nodeToRelocate$ === node);
 
+            // made some changes to slots
+            // let's make sure we also double check
+            // fallbacks are correctly hidden or shown
+            checkSlotFallbackVisibility = true;
+            node['s-sn'] = slotNameAttr;
+
+            if (relocateNodeData) {
+              // previously we never found a slot home for this node
+              // but turns out we did, so let's remember it now
+              relocateNodeData.$slotRefNode$ = childNode;
+
+            } else {
               // add to our list of nodes to relocate
               relocateNodes.push({
                 $slotRefNode$: childNode,
-                $nodeToRelocate$: node
+                $nodeToRelocate$: node,
               });
             }
+
+          } else if (!relocateNodes.some(r => r.$nodeToRelocate$ === node)) {
+            // so far this element does not have a slot home, not setting slotRefNode on purpose
+            // if we never find a home for this element then we'll need to hide it
+            relocateNodes.push({
+              $nodeToRelocate$: node,
+            });
           }
         }
       }
@@ -553,8 +568,8 @@ export const callNodeRefs = (vNode: d.VNode) => {
   }
 };
 
-interface RelocateNode {
-  $slotRefNode$: d.RenderNode;
+interface RelocateNodeData {
+  $slotRefNode$?: d.RenderNode;
   $nodeToRelocate$: d.RenderNode;
 }
 
@@ -609,20 +624,29 @@ render() {
     if (checkSlotRelocate) {
       relocateSlotContent(rootVnode.$elm$);
 
-      for (let i = 0; i < relocateNodes.length; i++) {
-        const relocateNode = relocateNodes[i];
+      let relocateData: RelocateNodeData;
+      let nodeToRelocate: d.RenderNode;
+      let orgLocationNode: d.RenderNode;
+      let parentNodeRef: Node;
+      let insertBeforeNode: Node;
+      let refNode: d.RenderNode;
+      let i = 0;
 
-        if (!relocateNode.$nodeToRelocate$['s-ol']) {
+      for (; i < relocateNodes.length; i++) {
+        relocateData = relocateNodes[i];
+        nodeToRelocate = relocateData.$nodeToRelocate$;
+
+        if (!nodeToRelocate['s-ol']) {
           // add a reference node marking this node's original location
           // keep a reference to this node for later lookups
-          const orgLocationNode = (BUILD.isDebug || BUILD.hydrateServerSide)
+          orgLocationNode = (BUILD.isDebug || BUILD.hydrateServerSide)
             ? doc.createComment(`org-loc`) as any
             : doc.createTextNode('') as any;
-          orgLocationNode['s-nr'] = relocateNode.$nodeToRelocate$;
+          orgLocationNode['s-nr'] = nodeToRelocate;
 
-          relocateNode.$nodeToRelocate$.parentNode.insertBefore(
-            (relocateNode.$nodeToRelocate$['s-ol'] = orgLocationNode),
-            relocateNode.$nodeToRelocate$
+          nodeToRelocate.parentNode.insertBefore(
+            (nodeToRelocate['s-ol'] = orgLocationNode),
+            nodeToRelocate
           );
         }
       }
@@ -631,41 +655,50 @@ render() {
       // the disconnectCallback from working
       plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
 
-      for (let i = 0; i < relocateNodes.length; i++) {
-        const relocateNode = relocateNodes[i];
+      for (i = 0; i < relocateNodes.length; i++) {
+        relocateData = relocateNodes[i];
+        nodeToRelocate = relocateData.$nodeToRelocate$;
 
-        // by default we're just going to insert it directly
-        // after the slot reference node
-        const parentNodeRef = relocateNode.$slotRefNode$.parentNode;
-        let insertBeforeNode = relocateNode.$slotRefNode$.nextSibling;
-        let orgLocationNode = relocateNode.$nodeToRelocate$['s-ol'] as any;
+        if (relocateData.$slotRefNode$) {
+          // by default we're just going to insert it directly
+          // after the slot reference node
+          parentNodeRef = relocateData.$slotRefNode$.parentNode;
+          insertBeforeNode = relocateData.$slotRefNode$.nextSibling;
+          orgLocationNode = nodeToRelocate['s-ol'] as any;
 
-        while (orgLocationNode = orgLocationNode.previousSibling as any) {
-          let refNode = orgLocationNode['s-nr'];
-          if (
-            refNode &&
-            refNode['s-sn'] === relocateNode.$nodeToRelocate$['s-sn'] &&
-            parentNodeRef === refNode.parentNode
-          ) {
-            refNode = refNode.nextSibling;
-            if (!refNode || !refNode['s-nr']) {
-              insertBeforeNode = refNode;
-              break;
+          while (orgLocationNode = orgLocationNode.previousSibling as any) {
+            refNode = orgLocationNode['s-nr'];
+            if (
+              refNode &&
+              refNode['s-sn'] === nodeToRelocate['s-sn'] &&
+              parentNodeRef === refNode.parentNode
+            ) {
+              refNode = refNode.nextSibling as any;
+              if (!refNode || !refNode['s-nr']) {
+                insertBeforeNode = refNode;
+                break;
+              }
             }
           }
-        }
 
-        if (
-          (!insertBeforeNode && parentNodeRef !== relocateNode.$nodeToRelocate$.parentNode) ||
-          (relocateNode.$nodeToRelocate$.nextSibling !== insertBeforeNode)
-        ) {
-          // we've checked that it's worth while to relocate
-          // since that the node to relocate
-          // has a different next sibling or parent relocated
+          if (
+            (!insertBeforeNode && parentNodeRef !== nodeToRelocate.parentNode) ||
+            (nodeToRelocate.nextSibling !== insertBeforeNode)
+          ) {
+            // we've checked that it's worth while to relocate
+            // since that the node to relocate
+            // has a different next sibling or parent relocated
 
-          if (relocateNode.$nodeToRelocate$ !== insertBeforeNode) {
-            // add it back to the dom but in its new home
-            parentNodeRef.insertBefore(relocateNode.$nodeToRelocate$, insertBeforeNode);
+            if (nodeToRelocate !== insertBeforeNode) {
+              // add it back to the dom but in its new home
+              parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
+            }
+          }
+
+        } else {
+          // this node doesn't have a slot home to go to, so let's hide it
+          if (nodeToRelocate.nodeType === NODE_TYPE.ElementNode) {
+            nodeToRelocate.hidden = true;
           }
         }
       }
