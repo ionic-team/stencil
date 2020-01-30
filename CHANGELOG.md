@@ -1,3 +1,12 @@
+## 🏙 [1.8.7-0](https://github.com/ionic-team/stencil/compare/v1.8.6...v1.8.7-0) (2020-01-30)
+
+
+### Bug Fixes
+
+* **slot:** do not render light dom without unnamed slot ([8298659](https://github.com/ionic-team/stencil/commit/829865936a0448c6988f77d259734c93245e58f1)), closes [#2162](https://github.com/ionic-team/stencil/issues/2162)
+
+
+
 ## 🚚 [1.8.6](https://github.com/ionic-team/stencil/compare/v1.8.5...v1.8.6) (2020-01-24)
 
 Updated:
