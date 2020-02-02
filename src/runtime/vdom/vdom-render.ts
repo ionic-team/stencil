@@ -368,19 +368,26 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
   const elm = newVNode.$elm$ = oldVNode.$elm$;
   const oldChildren = oldVNode.$children$;
   const newChildren = newVNode.$children$;
+  const tag = newVNode.$tag$;
+  const text = newVNode.$text$;
   let defaultHolder: Comment;
 
-  if (BUILD.svg) {
-    // test if we're rendering an svg element, or still rendering nodes inside of one
-    // only add this to the when the compiler sees we're using an svg somewhere
-    isSvgMode = newVNode.$tag$ === 'svg' ? true : (newVNode.$tag$ === 'foreignObject' ? false : isSvgMode);
-  }
+  if (!BUILD.vdomText || text === null) {
 
-  if (!BUILD.vdomText || newVNode.$text$ === null) {
+    if (BUILD.svg) {
+      // test if we're rendering an svg element, or still rendering nodes inside of one
+      // only add this to the when the compiler sees we're using an svg somewhere
+      isSvgMode = (tag === 'svg')
+        ? true
+        : (tag === 'foreignObject')
+          ? false
+          : isSvgMode;
+    }
+
     // element node
 
     if (BUILD.vdomAttribute || BUILD.reflect) {
-      if (BUILD.slot && newVNode.$tag$ === 'slot') {
+      if (BUILD.slot && tag === 'slot') {
         // minifier will clean this up
 
       } else {
@@ -409,18 +416,18 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
       removeVnodes(oldChildren, 0, oldChildren.length - 1);
     }
 
+    if (BUILD.svg && isSvgMode && tag === 'svg') {
+      isSvgMode = false;
+    }
+
   } else if (BUILD.vdomText && BUILD.slotRelocation && (defaultHolder = (elm['s-cr'] as any))) {
     // this element has slotted content
-    defaultHolder.parentNode.textContent = newVNode.$text$;
+    defaultHolder.parentNode.textContent = text;
 
-  } else if (BUILD.vdomText && oldVNode.$text$ !== newVNode.$text$) {
+  } else if (BUILD.vdomText && oldVNode.$text$ !== text) {
     // update the text content for the text only vnode
     // and also only if the text is different than before
-    elm.data = newVNode.$text$;
-  }
-
-  if (BUILD.svg && isSvgMode && newVNode.$tag$ === 'svg') {
-    isSvgMode = false;
+    elm.data = text;
   }
 };
 
