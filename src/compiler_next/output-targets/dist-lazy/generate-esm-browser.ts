@@ -14,9 +14,11 @@ export async function generateEsmBrowser(config: d.Config, compilerCtx: d.Compil
       chunkFileNames: config.hashFileNames ? 'p-[hash].js' : '[name]-[hash].js',
       assetFileNames: '[name]-[hash][extname]',
       preferConst: true,
-      // This is needed until Firefox 67, which ships native dynamic imports
-      dynamicImportFunction: getDynamicImportFunction(config.fsNamespace)
     };
+    if (config.extras.dynamicImportShim !== false) {
+      // This is needed until Firefox 67, which ships native dynamic imports
+      esmOpts.dynamicImportFunction = getDynamicImportFunction(config.fsNamespace)
+    }
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
 
     if (output != null) {

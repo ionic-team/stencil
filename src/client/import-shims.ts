@@ -65,7 +65,9 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
 
   } else {
     opts.resourcesUrl = new URL('.', new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href)).href;
-    patchDynamicImport(opts.resourcesUrl, scriptElm);
+    if (BUILD.dynamicImportShim) {
+      patchDynamicImport(opts.resourcesUrl, scriptElm);
+    }
 
     if (!window.customElements) {
       // module support, but no custom elements support (Old Edge)
@@ -76,7 +78,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   return Promise.resolve(opts);
 };
 
-export const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
+const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
   const importFunctionName = getDynamicImportFunction(NAMESPACE);
   try {
     // test if this browser supports dynamic imports
@@ -112,7 +114,7 @@ export const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement
 };
 
 
-export const patchCloneNodeFix = (HTMLElementPrototype: any) => {
+const patchCloneNodeFix = (HTMLElementPrototype: any) => {
   const nativeCloneNodeFn = HTMLElementPrototype.cloneNode;
 
   HTMLElementPrototype.cloneNode = function(this: Node, deep: boolean) {
