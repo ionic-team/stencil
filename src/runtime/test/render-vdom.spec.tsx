@@ -818,7 +818,9 @@ describe('render-vdom', () => {
                 </svg>
                 <feGaussianBlur class='is-html'>bye</feGaussianBlur>
               </foreignObject>
-              <feGaussianBlur class='is-svg'></feGaussianBlur>
+              <text class='is-svg'>Hello</text>
+              <text class='is-svg'>Bye</text>
+
             </svg>
           );
         }
@@ -856,7 +858,8 @@ describe('render-vdom', () => {
               bye
             </fegaussianblur>
           </foreignObject>
-          <feGaussianBlur class=\"is-svg\"></feGaussianBlur>
+          <text class=\"is-svg\">Hello</text>
+          <text class=\"is-svg\">Bye</text>
         </svg>
       </cmp-a>`);
     });
