@@ -373,9 +373,6 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
   if (BUILD.svg) {
     // test if we're rendering an svg element, or still rendering nodes inside of one
     // only add this to the when the compiler sees we're using an svg somewhere
-    isSvgMode = elm && elm.parentNode &&
-                ((elm as any) as SVGElement).ownerSVGElement !== undefined;
-
     isSvgMode = newVNode.$tag$ === 'svg' ? true : (newVNode.$tag$ === 'foreignObject' ? false : isSvgMode);
   }
 
