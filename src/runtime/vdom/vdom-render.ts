@@ -64,7 +64,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
   } else if (BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotReference) {
     // create a slot reference node
-    elm = newVNode.$elm$ = (BUILD.isDebug || BUILD.hydrateServerSide) ? doc.createComment(`slot-reference:${hostTagName.toLowerCase()}`) : doc.createTextNode('') as any;
+    elm = newVNode.$elm$ = (BUILD.isDebug || BUILD.hydrateServerSide) ? slotReferenceDebugNode(newVNode) : doc.createTextNode('') as any;
 
   } else {
     if (BUILD.svg && !isSvgMode) {
@@ -484,22 +484,19 @@ const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
 
 const relocateNodes: RelocateNodeData[] = [];
 
-const relocateSlotContent = (
-  elm: d.RenderNode
-) => {
-// tslint:disable-next-line: prefer-const
+const relocateSlotContent = (elm: d.RenderNode) => {
+  // tslint:disable-next-line: prefer-const
   let childNode: d.RenderNode;
   let node: d.RenderNode;
   let hostContentNodes: NodeList;
   let slotNameAttr: string;
   let relocateNodeData: RelocateNodeData;
+  let j;
+  let i = 0;
   let childNodes: d.RenderNode[] = elm.childNodes as any;
   let ilen = childNodes.length;
-  let i = 0;
-  let j = 0;
-  let nodeType = 0;
 
-  for (ilen = childNodes.length; i < ilen; i++) {
+  for (; i < ilen; i++) {
     childNode = childNodes[i];
 
     if (childNode['s-sr'] && (node = childNode['s-cr'])) {
@@ -515,13 +512,8 @@ const relocateSlotContent = (
           // let's do some relocating to its new home
           // but never relocate a content reference node
           // that is suppose to always represent the original content location
-          nodeType = node.nodeType;
 
-          if (
-            ((nodeType === NODE_TYPE.TextNode || nodeType === NODE_TYPE.CommentNode) && slotNameAttr === '') ||
-            (nodeType === NODE_TYPE.ElementNode && node.getAttribute('slot') === null && slotNameAttr === '') ||
-            (nodeType === NODE_TYPE.ElementNode && node.getAttribute('slot') === slotNameAttr)
-          ) {
+          if (isNodeLocatedInSlot(node, slotNameAttr)) {
             // it's possible we've already decided to relocate this node
             relocateNodeData = relocateNodes.find(r => r.$nodeToRelocate$ === node);
 
@@ -529,7 +521,7 @@ const relocateSlotContent = (
             // let's make sure we also double check
             // fallbacks are correctly hidden or shown
             checkSlotFallbackVisibility = true;
-            node['s-sn'] = slotNameAttr;
+            node['s-sn'] = node['s-sn'] || slotNameAttr;
 
             if (relocateNodeData) {
               // previously we never found a slot home for this node
@@ -541,6 +533,17 @@ const relocateSlotContent = (
               relocateNodes.push({
                 $slotRefNode$: childNode,
                 $nodeToRelocate$: node,
+              });
+            }
+
+            if (node['s-sr']) {
+              relocateNodes.forEach(relocateNode => {
+                if (isNodeLocatedInSlot(relocateNode.$nodeToRelocate$, node['s-sn'])) {
+                  relocateNodeData = relocateNodes.find(r => r.$nodeToRelocate$ === node);
+                  if (relocateNodeData) {
+                    relocateNode.$slotRefNode$ = relocateNodeData.$slotRefNode$;
+                  }
+                }
               });
             }
 
@@ -559,6 +562,22 @@ const relocateSlotContent = (
       relocateSlotContent(childNode);
     }
   }
+};
+
+const isNodeLocatedInSlot = (nodeToRelocate: d.RenderNode, slotNameAttr: string) => {
+  if (nodeToRelocate.nodeType === NODE_TYPE.ElementNode) {
+    if (nodeToRelocate.getAttribute('slot') === null && slotNameAttr === '') {
+      return true;
+    }
+    if (nodeToRelocate.getAttribute('slot') === slotNameAttr) {
+      return true;
+    }
+    return false;
+  }
+  if (nodeToRelocate['s-sn'] === slotNameAttr) {
+    return true;
+  }
+  return slotNameAttr === '';
 };
 
 export const callNodeRefs = (vNode: d.VNode) => {
@@ -640,7 +659,7 @@ render() {
           // add a reference node marking this node's original location
           // keep a reference to this node for later lookups
           orgLocationNode = (BUILD.isDebug || BUILD.hydrateServerSide)
-            ? doc.createComment(`org-loc`) as any
+            ? originalLocationDebugNode(nodeToRelocate)
             : doc.createTextNode('') as any;
           orgLocationNode['s-nr'] = nodeToRelocate;
 
@@ -690,6 +709,10 @@ render() {
             // has a different next sibling or parent relocated
 
             if (nodeToRelocate !== insertBeforeNode) {
+              if (!nodeToRelocate['s-hn'] && nodeToRelocate['s-ol']) {
+                // probably a component in the index.html that doesn't have it's hostname set
+                nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
+              }
               // add it back to the dom but in its new home
               parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
             }
@@ -716,3 +739,19 @@ render() {
     relocateNodes.length = 0;
   }
 };
+
+// slot comment debug nodes only created with the `--debug` flag
+// otherwise these nodes are text nodes w/out content
+const slotReferenceDebugNode = (slotVNode: d.VNode) =>
+  doc.createComment(
+    `<slot${slotVNode.$name$ ?
+      (' name="' + slotVNode.$name$) + '"' :
+      ''}> (host=${hostTagName.toLowerCase()})`)
+
+const originalLocationDebugNode = (nodeToRelocate: d.RenderNode): any =>
+  doc.createComment(
+    `org-location for ` +
+    (nodeToRelocate.localName ?
+      `<${nodeToRelocate.localName}> (host=${nodeToRelocate['s-hn']})` :
+      `[${nodeToRelocate.textContent}]`)
+  );

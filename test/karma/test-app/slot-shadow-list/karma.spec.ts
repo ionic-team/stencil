@@ -26,5 +26,8 @@ describe('slot-shadow-list', () => {
 
     items = list.shadowRoot.querySelectorAll('.list-wrapper > div');
     expect(items.length).toEqual(4);
+
+    const hiddenCmp = app.querySelector('[hidden]');
+    expect(hiddenCmp).toBe(null);
   });
 });

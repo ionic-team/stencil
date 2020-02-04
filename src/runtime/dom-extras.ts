@@ -44,7 +44,8 @@ export const appendChildSlotFix = (HostElementPrototype: any) => {
 
 };
 
-const getSlotName = (node: Node) =>
+const getSlotName = (node: d.RenderNode) =>
+  (node['s-sn']) ||
   (node.nodeType === 1 && (node as Element).getAttribute('slot')) || '';
 
 const getHostSlotNode = (elm: d.RenderNode, slotName: string) => {

@@ -114,11 +114,11 @@ const setContentReference = (elm: d.HostElement) => {
   // let's pick out the inner content for slot projection
   // create a node to represent where the original
   // content was first placed, which is useful later on
-  const crName = (BUILD.isDebug)
-    ? `content-ref:${elm.tagName}`
-    : '';
-
-  const contentRefElm = elm['s-cr'] = (doc.createComment(crName) as any);
+  const contentRefElm = elm['s-cr'] = (doc.createComment(
+    BUILD.isDebug
+      ? `content-ref (host=${elm.localName})`
+      : ''
+  ) as any);
   contentRefElm['s-cn'] = true;
   elm.insertBefore(contentRefElm, elm.firstChild);
 };
