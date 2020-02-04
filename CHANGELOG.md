@@ -1,8 +1,10 @@
-## 🏙 [1.8.7-0](https://github.com/ionic-team/stencil/compare/v1.8.6...v1.8.7-0) (2020-01-30)
+## 🏎 [1.8.7](https://github.com/ionic-team/stencil/compare/v1.8.6...v1.8.7) (2020-02-04)
 
 
 ### Bug Fixes
 
+* **runtime:** render svg #text nodes ([#2176](https://github.com/ionic-team/stencil/issues/2176)) ([f623bf7](https://github.com/ionic-team/stencil/commit/f623bf77ec6c3899a6795cf5e5139ece569f0d96))
+* **slot:** correct order of nested slots ([800292f](https://github.com/ionic-team/stencil/commit/800292fdfeec2420cd0a85c041a3682f9dc5cf4d)), closes [#2159](https://github.com/ionic-team/stencil/issues/2159)
 * **slot:** do not render light dom without unnamed slot ([8298659](https://github.com/ionic-team/stencil/commit/829865936a0448c6988f77d259734c93245e58f1)), closes [#2162](https://github.com/ionic-team/stencil/issues/2162)
 
 
