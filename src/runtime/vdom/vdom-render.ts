@@ -386,13 +386,8 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
 
     // element node
 
-<<<<<<< HEAD
-    if (BUILD.vdomAttribute) {
-      if (BUILD.slot && newVNode.$tag$ === 'slot') {
-=======
     if (BUILD.vdomAttribute || BUILD.reflect) {
       if (BUILD.slot && tag === 'slot') {
->>>>>>> 458218316... fix(runtime): render svg #text nodes (#2176)
         // minifier will clean this up
 
       } else {
