@@ -235,7 +235,7 @@ export interface ConfigExtras {
   lifecycleDOMEvents?: boolean;
 
   /**
-   * Dynamic import polufill
+   * Dynamic import polyfill
    */
   dynamicImportShim?: boolean;
 }
