@@ -27,6 +27,15 @@ export function validatePaths(config: Config) {
   }
   config.srcDir = normalizePath(config.srcDir);
 
+  if (config.extraSrcDirs) {
+    for (let i = 0; i < config.extraSrcDirs.length; i++) {
+      if (!path.isAbsolute(config.extraSrcDirs[i])) {
+          config.extraSrcDirs[i] = path.join(config.rootDir, config.extraSrcDirs[i]);
+      }
+      config.extraSrcDirs[i] = normalizePath(config.extraSrcDirs[i]);
+    }
+  }
+
   setStringConfig(config, 'cacheDir', DEFAULT_CACHE_DIR);
   if (!path.isAbsolute(config.cacheDir)) {
     config.cacheDir = path.join(config.rootDir, config.cacheDir);

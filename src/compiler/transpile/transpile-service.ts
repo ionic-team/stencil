@@ -329,14 +329,22 @@ const shouldScanForTsChanges = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx
 const scanDirForTsFiles = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const scanDirTimeSpan = buildCtx.createTimeSpan(`scan ${config.srcDir} started`, true);
 
-  // loop through this directory and sub directories looking for
-  // files that need to be transpiled
-  const dirItems = await compilerCtx.fs.readdir(config.srcDir, { recursive: true });
+  const getFilesToWatch = async (dir: string) => {
+    // loop through this directory and sub directories looking for
+    // files that need to be transpiled
+    const dirItems = await compilerCtx.fs.readdir(dir, { recursive: true });
+    return dirItems ? dirItems.filter(item => item.isFile && isFileIncludePath(config, item.absPath)) : [];
+  };
+  let tsFileItems: Array<d.FsReaddirItem> = await getFilesToWatch(config.srcDir);
 
-  // filter down to only the ts files we should include
-  const tsFileItems = dirItems.filter(item => {
-    return item.isFile && isFileIncludePath(config, item.absPath);
-  });
+  if (config.extraSrcDirs) {
+    for (let i = 0; i < config.extraSrcDirs.length; i++) {
+      const extraFiles = await getFilesToWatch(config.extraSrcDirs[i]);
+      if (extraFiles) {
+        tsFileItems = [...tsFileItems.slice(0), ...extraFiles.slice(0)];
+      }
+    }
+  }
 
   const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
 

@@ -115,6 +115,16 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
     });
   }
 
+  if (config.extraSrcDirs) {
+    const extraIncludeSrcs = new Array<string>();
+    DEFAULT_INCLUDES.forEach(include => {
+        config.extraSrcDirs.forEach(srcDir => {
+            extraIncludeSrcs.push(config.sys.path.join(srcDir, include));
+        });
+    });
+    config.includeSrc = [...config.includeSrc.slice(0), ...extraIncludeSrcs.slice(0)];
+  }
+
   if (!Array.isArray(config.excludeSrc)) {
     config.excludeSrc = DEFAULT_EXCLUDES.map(include => {
       return config.sys.path.join(config.srcDir, include);

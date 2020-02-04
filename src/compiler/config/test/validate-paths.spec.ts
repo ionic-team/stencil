@@ -152,6 +152,25 @@ describe('validatePaths', () => {
     expect(path.isAbsolute(config.srcDir)).toBe(true);
   });
 
+  it('should skip extraSrcDirs when not present', () => {
+    validateConfig(config, [], false);
+    expect(config.extraSrcDirs).toBe(undefined);
+  });
+
+  it('should set extraSrcDirs and convert to absolute path', () => {
+    config.extraSrcDirs = ['one', 'a/two', '../b/three'];
+    validateConfig(config, [], false);
+    expect(path.basename(config.extraSrcDirs[0])).toBe('one');
+    expect(path.isAbsolute(config.extraSrcDirs[0])).toBe(true);
+
+    expect(path.basename(config.extraSrcDirs[1])).toBe('two');
+    expect(path.isAbsolute(config.extraSrcDirs[1])).toBe(true);
+
+    expect(path.basename(config.extraSrcDirs[2])).toBe('three');
+    expect(path.isAbsolute(config.extraSrcDirs[2])).toBe(true);
+  });
+
+
   it('should convert globalScript to absolute path, if a globalScript property was provided', () => {
     config.globalScript = path.join('src', 'global', 'index.ts');
     validateConfig(config, [], false);

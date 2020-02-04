@@ -102,6 +102,23 @@ describe('validation', () => {
       ]);
     });
 
+    it('should add extraSrcDirs globs', () => {
+        config.extraSrcDirs = ['one', 'a/two', '../b/three'];
+        validateConfig(config, [], false);
+        const normalizedIncludeSrc = config.includeSrc.map(x => normalizePath(x));
+        expect(normalizedIncludeSrc).toEqual([
+          '/User/some/path/src/**/*.ts',
+          '/User/some/path/src/**/*.tsx',
+          '/User/some/path/one/**/*.ts',
+          '/User/some/path/a/two/**/*.ts',
+          '/User/some/b/three/**/*.ts',
+          '/User/some/path/one/**/*.tsx',
+          '/User/some/path/a/two/**/*.tsx',
+          '/User/some/b/three/**/*.tsx'
+        ]);
+      });
+
+
     it('should default exclude glob', () => {
       validateConfig(config, [], false);
       expect(config.excludeSrc).toEqual(['/User/some/path/src/**/test/**']);

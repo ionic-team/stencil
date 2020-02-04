@@ -63,6 +63,11 @@ export interface StencilConfig {
   excludeSrc?: string[];
 
   /**
+   * Use to specify directories that exist outside of the src dir.  These are optional
+   */
+  extraSrcDirs?: Array<string>;
+
+  /**
    * Stencil is traditionally used to compile many components into an app,
    * and each component comes with its own compartmentalized styles.
    * However, it's still common to have styles which should be "global" across all components and the website.
