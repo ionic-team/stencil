@@ -83,6 +83,9 @@ describe('slot-light-dom', () => {
     expect(navs[0].textContent).toBe('K');
     expect(navs[1].textContent).toBe('L');
     expect(navs[2].textContent).toBe('M');
+
+    const hiddenCmp = app.querySelector('[hidden]');
+    expect(hiddenCmp).toBe(null);
   });
 
 });

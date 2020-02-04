@@ -90,6 +90,9 @@ describe('slot-html', () => {
     expect(result.childNodes[9].textContent.trim()).toBe('default slot 2');
     expect(result.childNodes[12].childNodes[1].textContent.trim()).toBe('end slot 1');
     expect(result.childNodes[12].childNodes[2].textContent.trim()).toBe('end slot 2');
+
+    const hiddenCmp = app.querySelector('[hidden]');
+    expect(hiddenCmp).toBe(null);
   });
 
 });

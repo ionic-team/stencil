@@ -26,5 +26,8 @@ describe('slot-scoped-list', () => {
 
     items = list.querySelectorAll('.list-wrapper > div');
     expect(items.length).toEqual(4);
+
+    const hiddenCmp = app.querySelector('[hidden]');
+    expect(hiddenCmp).toBe(null);
   });
 });

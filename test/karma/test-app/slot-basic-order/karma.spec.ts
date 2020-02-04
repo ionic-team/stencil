@@ -14,6 +14,9 @@ describe('slot-basic-order', function() {
   it('render', async () => {
     let result = app.querySelector('slot-basic-order-root');
     expect(result.textContent).toEqual('abc');
+
+    const hiddenCmp = app.querySelector('[hidden]');
+    expect(hiddenCmp).toBe(null);
   });
 
 });

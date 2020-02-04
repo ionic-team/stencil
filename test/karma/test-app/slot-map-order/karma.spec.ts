@@ -17,6 +17,9 @@ describe('slot-map-order', function() {
     expect((result.children[0].children[0] as HTMLInputElement).value).toBe('a');
     expect((result.children[1].children[0] as HTMLInputElement).value).toBe('b');
     expect((result.children[2].children[0] as HTMLInputElement).value).toBe('c');
+
+    const hiddenCmp = app.querySelector('[hidden]');
+    expect(hiddenCmp).toBe(null);
   });
 
 });

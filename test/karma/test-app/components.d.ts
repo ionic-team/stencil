@@ -206,6 +206,8 @@ export namespace Components {
   }
   interface SlotMapOrder {}
   interface SlotMapOrderRoot {}
+  interface SlotNestedOrderChild {}
+  interface SlotNestedOrderParent {}
   interface SlotNoDefault {}
   interface SlotReorder {
     'reordered': boolean;
@@ -868,6 +870,18 @@ declare global {
     new (): HTMLSlotMapOrderRootElement;
   };
 
+  interface HTMLSlotNestedOrderChildElement extends Components.SlotNestedOrderChild, HTMLStencilElement {}
+  var HTMLSlotNestedOrderChildElement: {
+    prototype: HTMLSlotNestedOrderChildElement;
+    new (): HTMLSlotNestedOrderChildElement;
+  };
+
+  interface HTMLSlotNestedOrderParentElement extends Components.SlotNestedOrderParent, HTMLStencilElement {}
+  var HTMLSlotNestedOrderParentElement: {
+    prototype: HTMLSlotNestedOrderParentElement;
+    new (): HTMLSlotNestedOrderParentElement;
+  };
+
   interface HTMLSlotNoDefaultElement extends Components.SlotNoDefault, HTMLStencilElement {}
   var HTMLSlotNoDefaultElement: {
     prototype: HTMLSlotNoDefaultElement;
@@ -1041,6 +1055,8 @@ declare global {
     'slot-list-light-scoped-root': HTMLSlotListLightScopedRootElement;
     'slot-map-order': HTMLSlotMapOrderElement;
     'slot-map-order-root': HTMLSlotMapOrderRootElement;
+    'slot-nested-order-child': HTMLSlotNestedOrderChildElement;
+    'slot-nested-order-parent': HTMLSlotNestedOrderParentElement;
     'slot-no-default': HTMLSlotNoDefaultElement;
     'slot-reorder': HTMLSlotReorderElement;
     'slot-reorder-root': HTMLSlotReorderRootElement;
@@ -1251,6 +1267,8 @@ declare namespace LocalJSX {
   }
   interface SlotMapOrder {}
   interface SlotMapOrderRoot {}
+  interface SlotNestedOrderChild {}
+  interface SlotNestedOrderParent {}
   interface SlotNoDefault {}
   interface SlotReorder {
     'reordered'?: boolean;
@@ -1375,6 +1393,8 @@ declare namespace LocalJSX {
     'slot-list-light-scoped-root': SlotListLightScopedRoot;
     'slot-map-order': SlotMapOrder;
     'slot-map-order-root': SlotMapOrderRoot;
+    'slot-nested-order-child': SlotNestedOrderChild;
+    'slot-nested-order-parent': SlotNestedOrderParent;
     'slot-no-default': SlotNoDefault;
     'slot-reorder': SlotReorder;
     'slot-reorder-root': SlotReorderRoot;
@@ -1502,6 +1522,8 @@ declare module "@stencil/core" {
       'slot-list-light-scoped-root': LocalJSX.SlotListLightScopedRoot & JSXBase.HTMLAttributes<HTMLSlotListLightScopedRootElement>;
       'slot-map-order': LocalJSX.SlotMapOrder & JSXBase.HTMLAttributes<HTMLSlotMapOrderElement>;
       'slot-map-order-root': LocalJSX.SlotMapOrderRoot & JSXBase.HTMLAttributes<HTMLSlotMapOrderRootElement>;
+      'slot-nested-order-child': LocalJSX.SlotNestedOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedOrderChildElement>;
+      'slot-nested-order-parent': LocalJSX.SlotNestedOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedOrderParentElement>;
       'slot-no-default': LocalJSX.SlotNoDefault & JSXBase.HTMLAttributes<HTMLSlotNoDefaultElement>;
       'slot-reorder': LocalJSX.SlotReorder & JSXBase.HTMLAttributes<HTMLSlotReorderElement>;
       'slot-reorder-root': LocalJSX.SlotReorderRoot & JSXBase.HTMLAttributes<HTMLSlotReorderRootElement>;
