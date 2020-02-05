@@ -200,22 +200,46 @@ const colonHostContextPartReplacer = (host: string, part: string, suffix: string
   }
 };
 
-const convertColonSlotted = (cssText: string, slotAttr: string) => {
-  const regExp = _cssColonSlottedRe;
+const convertColonSlotted = (cssText: string, slotScopeId: string) => {
+  const slotClass = '.' + slotScopeId + ' > ';
+  const selectors: {orgSelector: string; updatedSelector: string}[] = [];
 
-  return cssText.replace(regExp, (...m: string[]) => {
+  cssText = cssText.replace(_cssColonSlottedRe, (...m: string[]) => {
     if (m[2]) {
       const compound = m[2].trim();
       const suffix = m[3];
+      const slottedSelector = slotClass + compound + suffix;
 
-      const sel = '.' + slotAttr + ' > ' + compound + suffix;
+      let prefixSelector = '';
+      for (let i: number = m[4] as any - 1; i >= 0; i--) {
+        const char = m[5][i];
+        if (char === '}' || char === ',') {
+          break;
+        }
+        prefixSelector = char + prefixSelector;
+      }
 
-      return sel;
+      const orgSelector = prefixSelector + slottedSelector;
+      const addedSelector = `${prefixSelector.trimRight()}${slottedSelector.trim()}`;
+      if (orgSelector.trim() !== addedSelector.trim()) {
+        const updatedSelector = `${addedSelector}, ${orgSelector}`;
+        selectors.push({
+          orgSelector,
+          updatedSelector,
+        });
+      }
+
+      return slottedSelector;
 
     } else {
       return _polyfillHostNoCombinator + m[3];
     }
   });
+
+  return {
+    selectors,
+    cssText
+  };
 };
 
 const convertColonHostContext = (cssText: string) => {
@@ -368,7 +392,9 @@ const scopeCssText = (cssText: string, scopeId: string, hostScopeId: string, slo
   cssText = insertPolyfillHostInCssText(cssText);
   cssText = convertColonHost(cssText);
   cssText = convertColonHostContext(cssText);
-  cssText = convertColonSlotted(cssText, slotScopeId);
+
+  const slotted = convertColonSlotted(cssText, slotScopeId);
+  cssText = slotted.cssText;
   cssText = convertShadowDOMSelectors(cssText);
 
   if (scopeId) {
@@ -377,7 +403,11 @@ const scopeCssText = (cssText: string, scopeId: string, hostScopeId: string, slo
 
   cssText = cssText.replace(/-shadowcsshost-no-combinator/g, `.${hostScopeId}`);
   cssText = cssText.replace(/>\s*\*\s+([^{, ]+)/gm, ' $1 ');
-  return cssText.trim();
+
+  return {
+    cssText: cssText.trim(),
+    slottedSelectors: slotted.selectors,
+  };
 };
 
 
@@ -416,14 +446,18 @@ export const scopeCss = (cssText: string, scopeId: string, commentOriginalSelect
     });
   }
 
-  const scopedCssText = scopeCssText(cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector);
-  cssText = [scopedCssText, ...commentsWithHash].join('\n');
+  const scoped = scopeCssText(cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector);
+  cssText = [scoped.cssText, ...commentsWithHash].join('\n');
 
   if (commentOriginalSelector) {
     orgSelectors.forEach(({placeholder, comment}) => {
       cssText = cssText.replace(placeholder, comment);
     });
   }
+
+  scoped.slottedSelectors.forEach(slottedSelector => {
+    cssText = cssText.replace(slottedSelector.orgSelector, slottedSelector.updatedSelector);
+  });
 
   return cssText;
 };

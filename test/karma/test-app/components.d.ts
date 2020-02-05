@@ -217,6 +217,7 @@ export namespace Components {
     'href'?: string;
   }
   interface SlotReplaceWrapperRoot {}
+  interface SlottedCss {}
   interface StencilSibling {}
   interface StylusCmp {}
   interface SvgAttr {}
@@ -912,6 +913,12 @@ declare global {
     new (): HTMLSlotReplaceWrapperRootElement;
   };
 
+  interface HTMLSlottedCssElement extends Components.SlottedCss, HTMLStencilElement {}
+  var HTMLSlottedCssElement: {
+    prototype: HTMLSlottedCssElement;
+    new (): HTMLSlottedCssElement;
+  };
+
   interface HTMLStencilSiblingElement extends Components.StencilSibling, HTMLStencilElement {}
   var HTMLStencilSiblingElement: {
     prototype: HTMLStencilSiblingElement;
@@ -1062,6 +1069,7 @@ declare global {
     'slot-reorder-root': HTMLSlotReorderRootElement;
     'slot-replace-wrapper': HTMLSlotReplaceWrapperElement;
     'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement;
+    'slotted-css': HTMLSlottedCssElement;
     'stencil-sibling': HTMLStencilSiblingElement;
     'stylus-cmp': HTMLStylusCmpElement;
     'svg-attr': HTMLSvgAttrElement;
@@ -1278,6 +1286,7 @@ declare namespace LocalJSX {
     'href'?: string;
   }
   interface SlotReplaceWrapperRoot {}
+  interface SlottedCss {}
   interface StencilSibling {}
   interface StylusCmp {}
   interface SvgAttr {}
@@ -1400,6 +1409,7 @@ declare namespace LocalJSX {
     'slot-reorder-root': SlotReorderRoot;
     'slot-replace-wrapper': SlotReplaceWrapper;
     'slot-replace-wrapper-root': SlotReplaceWrapperRoot;
+    'slotted-css': SlottedCss;
     'stencil-sibling': StencilSibling;
     'stylus-cmp': StylusCmp;
     'svg-attr': SvgAttr;
@@ -1529,6 +1539,7 @@ declare module "@stencil/core" {
       'slot-reorder-root': LocalJSX.SlotReorderRoot & JSXBase.HTMLAttributes<HTMLSlotReorderRootElement>;
       'slot-replace-wrapper': LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
       'slot-replace-wrapper-root': LocalJSX.SlotReplaceWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement>;
+      'slotted-css': LocalJSX.SlottedCss & JSXBase.HTMLAttributes<HTMLSlottedCssElement>;
       'stencil-sibling': LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
       'stylus-cmp': LocalJSX.StylusCmp & JSXBase.HTMLAttributes<HTMLStylusCmpElement>;
       'svg-attr': LocalJSX.SvgAttr & JSXBase.HTMLAttributes<HTMLSvgAttrElement>;
