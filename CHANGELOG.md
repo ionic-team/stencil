@@ -1,3 +1,12 @@
+## 🐈 [1.8.8-0](https://github.com/ionic-team/stencil/compare/v1.8.7...v1.8.8-0) (2020-02-05)
+
+
+### Bug Fixes
+
+* **slotted:** fix applying polyfilled slotted css to nested slot ([e4229db](https://github.com/ionic-team/stencil/commit/e4229db51d7be1bc1a7e94f84ee8e0f2cea001fe)), closes [#2183](https://github.com/ionic-team/stencil/issues/2183)
+
+
+
 ## 🏎 [1.8.7](https://github.com/ionic-team/stencil/compare/v1.8.6...v1.8.7) (2020-02-04)
 
 
