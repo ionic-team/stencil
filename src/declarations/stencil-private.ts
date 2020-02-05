@@ -195,6 +195,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   constructableCSS?: boolean;
   appendChildSlotFix?: boolean;
   cloneNodeFix?: boolean;
+  dynamicImportShim?: boolean;
   initializeNextTick?: boolean;
 }
 

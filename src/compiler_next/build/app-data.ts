@@ -138,5 +138,6 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.cssAnnotations = true;
   b.appendChildSlotFix = config.extras.appendChildSlotFix;
   b.cloneNodeFix = config.extras.cloneNodeFix;
+  b.dynamicImportShim = config.extras.dynamicImportShim !== false;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
 };

@@ -152,6 +152,4 @@ export const isMemberInElement = (elm: any, memberName: string) => {
   return false;
 };
 
-export const patchDynamicImport = (_: string) => { return; };
-
 export * from '@runtime';

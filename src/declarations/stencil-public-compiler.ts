@@ -233,6 +233,11 @@ export interface ConfigExtras {
    * Dispatches component lifecycle events. Mainly used for testing.
    */
   lifecycleDOMEvents?: boolean;
+
+  /**
+   * Dynamic import polyfill
+   */
+  dynamicImportShim?: boolean;
 }
 
 export interface Config extends StencilConfig {
