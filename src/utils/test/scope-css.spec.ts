@@ -288,6 +288,26 @@ describe('ShadowCss', function() {
       expect(r).toEqual('.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}');
     });
 
+    it('should combine parent selector', () => {
+      const r = s('div{} .a .b .c ::slotted(*) {}', 'sc-ion-tag');
+      expect(r).toEqual('div.sc-ion-tag{} .a .b .c.sc-ion-tag-s > *, .a .b .c .sc-ion-tag-s > * {}');
+    });
+
+    it('same selectors', () => {
+      const r = s('::slotted(*) {}, ::slotted(*) {}, ::slotted(*) {}', 'sc-ion-tag');
+      expect(r).toEqual('.sc-ion-tag-s > * {}, .sc-ion-tag-s > * {}, .sc-ion-tag-s > * {}');
+    });
+
+    it('same selectors, commentOriginalSelector', () => {
+      const r = s('::slotted(*) {}, ::slotted(*) {}, ::slotted(*) {}', 'sc-ion-tag', true);
+      expect(r).toEqual('/*!@::slotted(*)*/.sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}');
+    });
+
+    it('should combine parent selector when comma', () => {
+      const r = s('.a .b, .c ::slotted(*) {}', 'sc-ion-tag');
+      expect(r).toEqual('.a.sc-ion-tag .b.sc-ion-tag, .c.sc-ion-tag-s > *, .c .sc-ion-tag-s > * {}');
+    });
+
     it('should handle multiple selector, commentOriginalSelector', () => {
       const r = s('::slotted(ul), ::slotted(li) {}', 'sc-ion-tag', true);
       expect(r).toEqual('/*!@::slotted(ul), ::slotted(li)*/.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}');
