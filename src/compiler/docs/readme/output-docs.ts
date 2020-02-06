@@ -33,7 +33,7 @@ export const generateReadme = async (config: d.Config, compilerCtx: d.CompilerCt
 
 export const generateMarkdown = (config: d.Config, userContent: string, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[], readmeOutput: d.OutputTargetDocsReadme) => {
   //If the readmeOutput.dependencies is true or undefined the dependencies will be generated.
-  const dependencies = readmeOutput.dependencies === true || readmeOutput.dependencies === undefined ? depsToMarkdown(config, cmp, cmps) : [];
+  const dependencies = readmeOutput.dependencies !== false ? depsToMarkdown(config, cmp, cmps) : [];
   return [
     userContent,
     AUTO_GENERATE_COMMENT,
