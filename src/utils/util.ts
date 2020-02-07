@@ -5,10 +5,21 @@ import { dashToPascalCase, isString, toDashCase } from './helpers';
 
 
 export const createJsVarName = (fileName: string) => {
-  fileName = toDashCase(fileName);
-  fileName = fileName.replace(/[|&;$%@"<>()+,.{}_\!\?]/g, '-');
-  fileName = dashToPascalCase(fileName);
-  fileName = fileName[0].toLowerCase() + fileName.substr(1);
+  if (isString(fileName)) {
+    fileName = toDashCase(fileName);
+    fileName = fileName.replace(/[|&;$%@"<>()+,.{}_\!\?\/\\]/g, '-');
+    fileName = dashToPascalCase(fileName);
+
+    if (fileName.length > 1) {
+      fileName = fileName[0].toLowerCase() + fileName.substr(1);
+    } else {
+      fileName = fileName.toLowerCase();
+    }
+
+    if (fileName.length > 0 && !isNaN(fileName[0] as any)) {
+      fileName = '_' + fileName;
+    }
+  }
   return fileName;
 };
 

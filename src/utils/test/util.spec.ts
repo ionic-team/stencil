@@ -163,13 +163,23 @@ describe('util', () => {
   });
 
   it('createJsVarName', () => {
+    expect(util.createJsVarName('@ionic/core')).toBe('ionicCore');
+    expect(util.createJsVarName('@ionic\\core')).toBe('ionicCore');
+    expect(util.createJsVarName('88mph')).toBe('_88mph');
     expect(util.createJsVarName('Doc.brown&')).toBe('docBrown');
     expect(util.createJsVarName('  Doc!  Brown?  ')).toBe('docBrown');
-    expect(util.createJsVarName('doc--Brown')).toBe('docBrown');
+    expect(util.createJsVarName('doc---Brown')).toBe('docBrown');
     expect(util.createJsVarName('doc-brown')).toBe('docBrown');
     expect(util.createJsVarName('DocBrown')).toBe('docBrown');
     expect(util.createJsVarName('Doc')).toBe('doc');
     expect(util.createJsVarName('doc')).toBe('doc');
+    expect(util.createJsVarName('AB')).toBe('aB');
+    expect(util.createJsVarName('Ab')).toBe('ab');
+    expect(util.createJsVarName('a')).toBe('a');
+    expect(util.createJsVarName('A')).toBe('a');
+    expect(util.createJsVarName('    ')).toBe('');
+    expect(util.createJsVarName('')).toBe('');
+    expect(util.createJsVarName(null)).toBe(null);
   });
 
 });
