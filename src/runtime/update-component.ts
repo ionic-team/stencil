@@ -282,7 +282,9 @@ export const appDidLoad = (who: string) => {
   if (!BUILD.hydrateServerSide) {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
-  emitLifecycleEvent(doc, 'appload');
+  if (BUILD.lifecycleDOMEvents) {
+    nextTick(() => emitLifecycleEvent(doc, 'appload'));
+  }
   if (BUILD.profile && performance.measure) {
     performance.measure(`[Stencil] ${NAMESPACE} initial load (by ${who})`, 'st:app:start');
   }
