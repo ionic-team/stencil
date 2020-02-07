@@ -35,8 +35,7 @@ export function startupLog(prcs: NodeJS.Process, config: d.Config) {
 
   if (config.devMode && !isDebug) {
     if (config.buildEs5) {
-      logger.warn(`Generating ES5 during development is a very task expensive, initial and incremental builds will be much slower. Drop the '--es5' flag and use a modern browser for development.
-      If you need ESM output, use the '--esm' flag instead.`);
+      logger.warn(`Generating ES5 during development is a very task expensive, initial and incremental builds will be much slower. Drop the '--es5' flag and use a modern browser for development.`);
     }
 
     if (!config.enableCache) {

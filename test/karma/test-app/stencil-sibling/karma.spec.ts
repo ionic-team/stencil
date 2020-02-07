@@ -11,9 +11,23 @@ describe('stencil-sibling', function() {
   afterEach(tearDownDom);
 
   it('loads sibling root', async () => {
-    const elm = app.querySelector('stencil-sibling');
+    const stencilSibling = app.querySelector('stencil-sibling');
+    expect(stencilSibling).toBeDefined();
 
-    expect(elm.textContent.trim()).toBe('sibling-shadow-domsibling-light-dom');
+    const siblingRoot = stencilSibling.querySelector('sibling-root');
+    expect(siblingRoot).toBeDefined();
+
+    const section = siblingRoot.querySelector('div section');
+    expect(section.textContent.trim()).toBe('sibling-shadow-dom');
+
+    const article = section.nextElementSibling;
+    expect(article.textContent.trim()).toBe('sibling-light-dom');
+
+    const ionButton = stencilSibling.querySelector('ion-button');
+    expect(ionButton.classList.contains('hydrated')).toBe(true);
+
+    const ionToggle = stencilSibling.querySelector('ion-toggle');
+    expect(ionToggle.classList.contains('hydrated')).toBe(true);
   });
 
 });
