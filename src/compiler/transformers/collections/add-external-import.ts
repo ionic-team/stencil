@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { normalizePath } from '@utils';
-import { parseCollection } from './parse-collection-module';
+import { parseCollectionLegacy } from './parse-collection-module';
 
 
 export const addExternalImportLegacy = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, resolveFromDir: string, moduleId: string) => {
@@ -55,7 +55,7 @@ export const addExternalImportLegacy = (config: d.Config, compilerCtx: d.Compile
   // this import is a stencil collection
   // let's parse it and gather all the module data about it
   // internally it'll cached collection data if we've already done this
-  const collection = parseCollection(config, compilerCtx, buildCtx, pkgJsonFilePath, pkgData);
+  const collection = parseCollectionLegacy(config, compilerCtx, buildCtx, pkgJsonFilePath, pkgData);
 
   // check if we already added this collection to the build context
   const alreadyHasCollection = buildCtx.collections.some(c => {

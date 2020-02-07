@@ -1,10 +1,10 @@
 import * as d from '../../../declarations';
 import { getModule } from '../../build/compiler-ctx';
 import { normalizePath } from '@utils';
-import { parseCollectionComponents } from './parse-collection-components';
+import { parseCollectionComponentsLegacy } from './parse-collection-components';
 
 
-export const parseCollectionManifest = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionName: string, collectionDir: string, collectionJsonStr: string) => {
+export const parseCollectionManifestLegacy = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionName: string, collectionDir: string, collectionJsonStr: string) => {
   const collectionManifest: d.CollectionManifest = JSON.parse(collectionJsonStr);
 
   const compilerVersion: d.CollectionCompilerVersion = collectionManifest.compiler || {} as any;
@@ -21,7 +21,7 @@ export const parseCollectionManifest = (config: d.Config, compilerCtx: d.Compile
     global: parseGlobal(config, compilerCtx, collectionDir, collectionManifest)
   };
 
-  parseCollectionComponents(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
+  parseCollectionComponentsLegacy(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
 
   return collection;
 };

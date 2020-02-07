@@ -1,9 +1,9 @@
 import * as d from '../../../declarations';
 import { normalizePath } from '@utils';
-import { parseCollectionManifest } from './parse-collection-manifest';
+import { parseCollectionManifestLegacy } from './parse-collection-manifest';
 
 
-export const parseCollection = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgJsonFilePath: string, pkgData: d.PackageJsonData) => {
+export const parseCollectionLegacy = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgJsonFilePath: string, pkgData: d.PackageJsonData) => {
   // note this MUST be synchronous because this is used during transpile
   const collectionName = pkgData.name;
 
@@ -31,7 +31,7 @@ export const parseCollection = (config: d.Config, compilerCtx: d.CompilerCtx, bu
   const collectionDir = normalizePath(config.sys.path.dirname(collectionFilePath));
 
   // parse the json string into our collection data
-  collection = parseCollectionManifest(
+  collection = parseCollectionManifestLegacy(
     config,
     compilerCtx,
     buildCtx,

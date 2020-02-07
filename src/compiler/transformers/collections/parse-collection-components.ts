@@ -5,7 +5,7 @@ import { parseComponentsDeprecated } from './parse-collection-deprecated';
 import ts from 'typescript';
 
 
-export function parseCollectionComponents(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionDir: string, collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) {
+export function parseCollectionComponentsLegacy(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionDir: string, collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) {
   collection.moduleFiles = collection.moduleFiles || [];
 
   parseComponentsDeprecated(config, compilerCtx, collection, collectionDir, collectionManifest);
