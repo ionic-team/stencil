@@ -22,12 +22,6 @@ describe('stencil-sibling', function() {
 
     const article = section.nextElementSibling;
     expect(article.textContent.trim()).toBe('sibling-light-dom');
-
-    const ionButton = stencilSibling.querySelector('ion-button');
-    expect(ionButton.classList.contains('hydrated')).toBe(true);
-
-    const ionToggle = stencilSibling.querySelector('ion-toggle');
-    expect(ionToggle.classList.contains('hydrated')).toBe(true);
   });
 
 });

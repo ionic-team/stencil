@@ -3,8 +3,5 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "collection": "dist/collection/collection-manifest.json",
-  "types": "dist/types/components.d.ts",
-  "dependencies": {
-    "@ionic/core": "^4.11.10"
-  }
+  "types": "dist/types/components.d.ts"
 }

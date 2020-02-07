@@ -38,12 +38,6 @@ export class SiblingRoot {
         <article>
           <slot/>
         </article>
-        <div>
-          <ion-button>ion-button</ion-button>
-        </div>
-        <div>
-          <ion-toggle>ion-toggle</ion-toggle>
-        </div>
       </div>
     );
   }

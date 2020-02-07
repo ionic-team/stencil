@@ -1,4 +1,3 @@
-import '@ionic/core';
 
 declare const Context: any;
 
