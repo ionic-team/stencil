@@ -21,6 +21,8 @@ export namespace Components {
   }
   interface CmpScopedA {}
   interface CmpScopedB {}
+  interface CmpTextBlue {}
+  interface CmpTextGreen {}
 }
 
 declare global {
@@ -79,6 +81,18 @@ declare global {
     prototype: HTMLCmpScopedBElement;
     new (): HTMLCmpScopedBElement;
   };
+
+  interface HTMLCmpTextBlueElement extends Components.CmpTextBlue, HTMLStencilElement {}
+  var HTMLCmpTextBlueElement: {
+    prototype: HTMLCmpTextBlueElement;
+    new (): HTMLCmpTextBlueElement;
+  };
+
+  interface HTMLCmpTextGreenElement extends Components.CmpTextGreen, HTMLStencilElement {}
+  var HTMLCmpTextGreenElement: {
+    prototype: HTMLCmpTextGreenElement;
+    new (): HTMLCmpTextGreenElement;
+  };
   interface HTMLElementTagNameMap {
     'app-root': HTMLAppRootElement;
     'cmp-a': HTMLCmpAElement;
@@ -89,6 +103,8 @@ declare global {
     'cmp-d': HTMLCmpDElement;
     'cmp-scoped-a': HTMLCmpScopedAElement;
     'cmp-scoped-b': HTMLCmpScopedBElement;
+    'cmp-text-blue': HTMLCmpTextBlueElement;
+    'cmp-text-green': HTMLCmpTextGreenElement;
   }
 }
 
@@ -104,6 +120,8 @@ declare namespace LocalJSX {
   }
   interface CmpScopedA {}
   interface CmpScopedB {}
+  interface CmpTextBlue {}
+  interface CmpTextGreen {}
 
   interface IntrinsicElements {
     'app-root': AppRoot;
@@ -115,6 +133,8 @@ declare namespace LocalJSX {
     'cmp-d': CmpD;
     'cmp-scoped-a': CmpScopedA;
     'cmp-scoped-b': CmpScopedB;
+    'cmp-text-blue': CmpTextBlue;
+    'cmp-text-green': CmpTextGreen;
   }
 }
 
@@ -133,6 +153,8 @@ declare module "@stencil/core" {
       'cmp-d': LocalJSX.CmpD & JSXBase.HTMLAttributes<HTMLCmpDElement>;
       'cmp-scoped-a': LocalJSX.CmpScopedA & JSXBase.HTMLAttributes<HTMLCmpScopedAElement>;
       'cmp-scoped-b': LocalJSX.CmpScopedB & JSXBase.HTMLAttributes<HTMLCmpScopedBElement>;
+      'cmp-text-blue': LocalJSX.CmpTextBlue & JSXBase.HTMLAttributes<HTMLCmpTextBlueElement>;
+      'cmp-text-green': LocalJSX.CmpTextGreen & JSXBase.HTMLAttributes<HTMLCmpTextGreenElement>;
     }
   }
 }

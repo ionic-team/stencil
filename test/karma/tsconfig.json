@@ -33,10 +33,11 @@
     "test-app/**/*.spec.ts",
     "test-app/**/*.tsx",
     "test-app/**/*.ts",
-    "test-prerender/**/*.tsx",
-    "test-prerender/**/*.ts",
     "test-app/util.ts",
-    "test-sibling/**/*.spec.ts",
-    "test-sibling/**/*.tsx"
+    "test-app/global.ts"
+  ],
+  "exclude": [
+    "test-prerender",
+    "test-sibling"
   ]
 }

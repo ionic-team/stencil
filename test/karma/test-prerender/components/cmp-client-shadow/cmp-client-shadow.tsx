@@ -12,6 +12,8 @@ export class CmpClientShadow {
     return (
       <article class="client-shadow">
         <slot></slot>
+        <cmp-text-blue></cmp-text-blue>
+        <cmp-text-green></cmp-text-green>
       </article>
     );
   }

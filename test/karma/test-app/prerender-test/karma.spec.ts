@@ -50,7 +50,15 @@ describe('prerender', () => {
 
     const shadow = app.querySelector('cmp-client-shadow');
     const shadowStyle = getComputedStyle(shadow.shadowRoot.querySelector('article'));
-    expect(shadowStyle.color).toBe('rgb(255, 0, 0)');
+    expect(shadowStyle.color).toBe('rgb(0, 155, 0)');
+
+    const blueText = shadow.shadowRoot.querySelector('cmp-text-blue');
+    const blueTextStyle = getComputedStyle(blueText.querySelector('text-blue'));
+    expect(blueTextStyle.color).toBe('rgb(0, 0, 255)');
+
+    const greenText = shadow.shadowRoot.querySelector('cmp-text-green');
+    const greenTextStyle = getComputedStyle(greenText.querySelector('text-green'));
+    expect(greenTextStyle.color).toBe('rgb(0, 255, 0)');
   });
 
 });

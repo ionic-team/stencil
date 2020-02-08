@@ -7,7 +7,7 @@ import { disconnectedCallback } from './disconnected-callback';
 import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
-import { HYDRATE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
+import { HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
 import { appDidLoad, forceUpdate } from './update-component';
 import { createTime, installDevTools } from './profile';
 import { appendChildSlotFix, cloneNodeFix } from './dom-extras';
@@ -27,8 +27,10 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const y = /*@__PURE__*/head.querySelector('meta[charset]');
   const visibilityStyle = /*@__PURE__*/doc.createElement('style');
   const deferredConnectedCallbacks: {connectedCallback: () => void}[] = [];
+  const styles = doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
   let appLoadFallback: any;
   let isBootstrapping = true;
+  let i = 0;
 
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
@@ -41,12 +43,10 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
-    const styles = doc.querySelectorAll('style[s-id]');
-    for (let i = 0; i < styles.length; i++) {
-      const styleElm = styles[i];
+    for (; i < styles.length; i++) {
       registerStyle(
-        styleElm.getAttribute(HYDRATE_ID),
-        convertScopedToShadow(styleElm.innerHTML),
+        styles[i].getAttribute(HYDRATED_STYLE_ID),
+        convertScopedToShadow(styles[i].innerHTML),
         true,
       );
     }
