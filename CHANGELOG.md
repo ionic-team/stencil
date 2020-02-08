@@ -1,4 +1,4 @@
-# 🎬 [1.9.0-14](https://github.com/ionic-team/stencil/compare/v1.8.6...v1.9.0-14) (2020-01-27)
+# ❄️ [1.9.0-15](https://github.com/ionic-team/stencil/compare/v1.8.7...v1.9.0-15) (2020-02-08)
 
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
@@ -41,6 +41,7 @@ Some of main features with the `--next` compiler include:
 * **bundling:** add webpack chunk name ([3ca7d82](https://github.com/ionic-team/stencil/commit/3ca7d82d8ef03f92b147892a6932c645b50d3aa7)), closes [#1345](https://github.com/ionic-team/stencil/issues/1345) [#1346](https://github.com/ionic-team/stencil/issues/1346)
 * **dev-server:** experimental dev node modules ([104a819](https://github.com/ionic-team/stencil/commit/104a81920bbcf575346f0969459f3eb329edfe3c))
 * **runtime:** dispatch namespace in lifecycleDOMEvents ([67cb2f3](https://github.com/ionic-team/stencil/commit/67cb2f3d1e03509e726fe284a0fcdc3601038634))
+* add dynamicImportShim as extra ([#2177](https://github.com/ionic-team/stencil/issues/2177)) ([fd81489](https://github.com/ionic-team/stencil/commit/fd8148958a5fd300ff5d634d32106c20afdfb4d8))
 
 
 ### Bug Fixes
@@ -162,6 +163,16 @@ Some of main features with the `--next` compiler include:
 * **normalizePath:** ensure non-ascii paths can be normalized ([a97c2f5](https://github.com/ionic-team/stencil/commit/a97c2f542fe7d5ea5498b0f30046cab89b866ef8)), closes [#2161](https://github.com/ionic-team/stencil/issues/2161)
 * **normalizePath:** improve normalizePath ([addfdbc](https://github.com/ionic-team/stencil/commit/addfdbca71262cd8175c01e8b88c14bf6ca3e1f9))
 * **resolve:** resolve also w/ typescript compiler option paths ([69efa87](https://github.com/ionic-team/stencil/commit/69efa872470a204a09e485c822bfa3aff4e2e287))
+* **build:** always build esm for dist, both prod and dev mode ([06e90bf](https://github.com/ionic-team/stencil/commit/06e90bf530e4f95f6f4ba7f8d0139451aac49160))
+* **hydrate:** do not overwrite parent shadow style when multiple scoped ([016d66f](https://github.com/ionic-team/stencil/commit/016d66fed878d441fbe5786a66dffc8edcb38b54))
+* **next:** add tick before stencil_appload dom event ([a71b3af](https://github.com/ionic-team/stencil/commit/a71b3af9d0b4c6af2a81a6b873389ad7e7fd38f4))
+* **next:** do not read collection of the same project ([76f46f2](https://github.com/ionic-team/stencil/commit/76f46f26486639708cf3bc1eafce5ae45110e7b4))
+* **next:** fix hydrate build w/ global script, w/out Context ([d65b0cc](https://github.com/ionic-team/stencil/commit/d65b0cc93a20763cd5154715a4a5f4fbab9fa66f))
+* **next:** improve createJsVarName ([d219327](https://github.com/ionic-team/stencil/commit/d2193271f4cbda03c51152e3e2767bf84a82eb20))
+* **runtime:** render svg #text nodes ([#2176](https://github.com/ionic-team/stencil/issues/2176)) ([4582183](https://github.com/ionic-team/stencil/commit/45821831683d0a468b1e38a3179b4c03c2acba7a))
+* **slot:** correct order of nested slots ([e7b9b38](https://github.com/ionic-team/stencil/commit/e7b9b3807ad0250f097f6aff11c897b6192b4096)), closes [#2159](https://github.com/ionic-team/stencil/issues/2159)
+* **slot:** do not render light dom without unnamed slot ([9ac767b](https://github.com/ionic-team/stencil/commit/9ac767b2ccf0915e025a250758831b75f2fc8506)), closes [#2162](https://github.com/ionic-team/stencil/issues/2162)
+* **slotted:** fix applying polyfilled slotted css to nested slot ([af2c481](https://github.com/ionic-team/stencil/commit/af2c481151863a9fe691b57d310f9c9f38519093)), closes [#2183](https://github.com/ionic-team/stencil/issues/2183)
 
 
 
