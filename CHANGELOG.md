@@ -1,8 +1,9 @@
-## 🐈 [1.8.8-0](https://github.com/ionic-team/stencil/compare/v1.8.7...v1.8.8-0) (2020-02-05)
+## 🐥 [1.8.8-1](https://github.com/ionic-team/stencil/compare/v1.8.7...v1.8.8-1) (2020-02-08)
 
 
 ### Bug Fixes
 
+* **hydrate:** do not overwrite parent shadow style when multiple scoped ([a10a37f](https://github.com/ionic-team/stencil/commit/a10a37f327ad56b7dc4c0f52c9804000c38c20aa))
 * **slotted:** fix applying polyfilled slotted css to nested slot ([e4229db](https://github.com/ionic-team/stencil/commit/e4229db51d7be1bc1a7e94f84ee8e0f2cea001fe)), closes [#2183](https://github.com/ionic-team/stencil/issues/2183)
 
 
