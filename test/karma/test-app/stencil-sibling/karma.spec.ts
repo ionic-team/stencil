@@ -1,4 +1,4 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { setupDomTests } from '../util';
 
 
 describe('stencil-sibling', function() {

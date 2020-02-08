@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS } from '@utils';
 import { doc, plt, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
-import { HYDRATE_ID, NODE_TYPE } from './runtime-constants';
+import { HYDRATED_STYLE_ID, NODE_TYPE } from './runtime-constants';
 import { createTime } from './profile';
 
 const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/new WeakMap();
@@ -40,7 +40,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
         rootAppliedStyles.set(styleContainerNode, appliedStyles = new Set());
       }
       if (!appliedStyles.has(scopeId)) {
-        if (BUILD.hydrateClientSide && styleContainerNode.host && (styleElm = styleContainerNode.firstElementChild as any) && styleElm.tagName === 'STYLE') {
+        if (BUILD.hydrateClientSide && styleContainerNode.host && (styleElm = styleContainerNode.querySelector(`[${HYDRATED_STYLE_ID}="${scopeId}"]`))) {
           // This is only happening on native shadow-dom, do not needs CSS var shim
           styleElm.innerHTML = style;
 
@@ -63,7 +63,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
           }
 
           if (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) {
-            styleElm.setAttribute(HYDRATE_ID, scopeId);
+            styleElm.setAttribute(HYDRATED_STYLE_ID, scopeId);
           }
 
           styleContainerNode.insertBefore(
@@ -78,7 +78,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
       }
 
     } else if (BUILD.constructableCSS && !styleContainerNode.adoptedStyleSheets.includes(style)) {
-      styleContainerNode.adoptedStyleSheets = [style];
+      styleContainerNode.adoptedStyleSheets = [...styleContainerNode.adoptedStyleSheets, style];
     }
   }
   return scopeId;

@@ -12,7 +12,6 @@ import {
 } from './util';
 
 export namespace Components {
-  interface AppRoot {}
   interface AppendChild {}
   interface AttributeBasic {
     'customAttr': string;
@@ -48,16 +47,6 @@ export namespace Components {
   }
   interface BadSharedJsx {}
   interface BuildData {}
-  interface CmpA {}
-  interface CmpB {}
-  interface CmpC {}
-  interface CmpClientScoped {}
-  interface CmpClientShadow {}
-  interface CmpD {
-    'uniqueId': string;
-  }
-  interface CmpScopedA {}
-  interface CmpScopedB {}
   interface ConditionalBasic {}
   interface ConditionalRerender {}
   interface ConditionalRerenderRoot {}
@@ -229,12 +218,6 @@ export namespace Components {
 declare global {
 
 
-  interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {}
-  var HTMLAppRootElement: {
-    prototype: HTMLAppRootElement;
-    new (): HTMLAppRootElement;
-  };
-
   interface HTMLAppendChildElement extends Components.AppendChild, HTMLStencilElement {}
   var HTMLAppendChildElement: {
     prototype: HTMLAppendChildElement;
@@ -293,54 +276,6 @@ declare global {
   var HTMLBuildDataElement: {
     prototype: HTMLBuildDataElement;
     new (): HTMLBuildDataElement;
-  };
-
-  interface HTMLCmpAElement extends Components.CmpA, HTMLStencilElement {}
-  var HTMLCmpAElement: {
-    prototype: HTMLCmpAElement;
-    new (): HTMLCmpAElement;
-  };
-
-  interface HTMLCmpBElement extends Components.CmpB, HTMLStencilElement {}
-  var HTMLCmpBElement: {
-    prototype: HTMLCmpBElement;
-    new (): HTMLCmpBElement;
-  };
-
-  interface HTMLCmpCElement extends Components.CmpC, HTMLStencilElement {}
-  var HTMLCmpCElement: {
-    prototype: HTMLCmpCElement;
-    new (): HTMLCmpCElement;
-  };
-
-  interface HTMLCmpClientScopedElement extends Components.CmpClientScoped, HTMLStencilElement {}
-  var HTMLCmpClientScopedElement: {
-    prototype: HTMLCmpClientScopedElement;
-    new (): HTMLCmpClientScopedElement;
-  };
-
-  interface HTMLCmpClientShadowElement extends Components.CmpClientShadow, HTMLStencilElement {}
-  var HTMLCmpClientShadowElement: {
-    prototype: HTMLCmpClientShadowElement;
-    new (): HTMLCmpClientShadowElement;
-  };
-
-  interface HTMLCmpDElement extends Components.CmpD, HTMLStencilElement {}
-  var HTMLCmpDElement: {
-    prototype: HTMLCmpDElement;
-    new (): HTMLCmpDElement;
-  };
-
-  interface HTMLCmpScopedAElement extends Components.CmpScopedA, HTMLStencilElement {}
-  var HTMLCmpScopedAElement: {
-    prototype: HTMLCmpScopedAElement;
-    new (): HTMLCmpScopedAElement;
-  };
-
-  interface HTMLCmpScopedBElement extends Components.CmpScopedB, HTMLStencilElement {}
-  var HTMLCmpScopedBElement: {
-    prototype: HTMLCmpScopedBElement;
-    new (): HTMLCmpScopedBElement;
   };
 
   interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {}
@@ -955,7 +890,6 @@ declare global {
     new (): HTMLTag88Element;
   };
   interface HTMLElementTagNameMap {
-    'app-root': HTMLAppRootElement;
     'append-child': HTMLAppendChildElement;
     'attribute-basic': HTMLAttributeBasicElement;
     'attribute-basic-root': HTMLAttributeBasicRootElement;
@@ -966,14 +900,6 @@ declare global {
     'attribute-html-root': HTMLAttributeHtmlRootElement;
     'bad-shared-jsx': HTMLBadSharedJsxElement;
     'build-data': HTMLBuildDataElement;
-    'cmp-a': HTMLCmpAElement;
-    'cmp-b': HTMLCmpBElement;
-    'cmp-c': HTMLCmpCElement;
-    'cmp-client-scoped': HTMLCmpClientScopedElement;
-    'cmp-client-shadow': HTMLCmpClientShadowElement;
-    'cmp-d': HTMLCmpDElement;
-    'cmp-scoped-a': HTMLCmpScopedAElement;
-    'cmp-scoped-b': HTMLCmpScopedBElement;
     'conditional-basic': HTMLConditionalBasicElement;
     'conditional-rerender': HTMLConditionalRerenderElement;
     'conditional-rerender-root': HTMLConditionalRerenderRootElement;
@@ -1080,7 +1006,6 @@ declare global {
 }
 
 declare namespace LocalJSX {
-  interface AppRoot {}
   interface AppendChild {}
   interface AttributeBasic {
     'customAttr'?: string;
@@ -1113,16 +1038,6 @@ declare namespace LocalJSX {
   }
   interface BadSharedJsx {}
   interface BuildData {}
-  interface CmpA {}
-  interface CmpB {}
-  interface CmpC {}
-  interface CmpClientScoped {}
-  interface CmpClientShadow {}
-  interface CmpD {
-    'uniqueId'?: string;
-  }
-  interface CmpScopedA {}
-  interface CmpScopedB {}
   interface ConditionalBasic {}
   interface ConditionalRerender {}
   interface ConditionalRerenderRoot {}
@@ -1295,7 +1210,6 @@ declare namespace LocalJSX {
   interface Tag88 {}
 
   interface IntrinsicElements {
-    'app-root': AppRoot;
     'append-child': AppendChild;
     'attribute-basic': AttributeBasic;
     'attribute-basic-root': AttributeBasicRoot;
@@ -1306,14 +1220,6 @@ declare namespace LocalJSX {
     'attribute-html-root': AttributeHtmlRoot;
     'bad-shared-jsx': BadSharedJsx;
     'build-data': BuildData;
-    'cmp-a': CmpA;
-    'cmp-b': CmpB;
-    'cmp-c': CmpC;
-    'cmp-client-scoped': CmpClientScoped;
-    'cmp-client-shadow': CmpClientShadow;
-    'cmp-d': CmpD;
-    'cmp-scoped-a': CmpScopedA;
-    'cmp-scoped-b': CmpScopedB;
     'conditional-basic': ConditionalBasic;
     'conditional-rerender': ConditionalRerender;
     'conditional-rerender-root': ConditionalRerenderRoot;
@@ -1425,7 +1331,6 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
-      'app-root': LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
       'append-child': LocalJSX.AppendChild & JSXBase.HTMLAttributes<HTMLAppendChildElement>;
       'attribute-basic': LocalJSX.AttributeBasic & JSXBase.HTMLAttributes<HTMLAttributeBasicElement>;
       'attribute-basic-root': LocalJSX.AttributeBasicRoot & JSXBase.HTMLAttributes<HTMLAttributeBasicRootElement>;
@@ -1436,14 +1341,6 @@ declare module "@stencil/core" {
       'attribute-html-root': LocalJSX.AttributeHtmlRoot & JSXBase.HTMLAttributes<HTMLAttributeHtmlRootElement>;
       'bad-shared-jsx': LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
       'build-data': LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
-      'cmp-a': LocalJSX.CmpA & JSXBase.HTMLAttributes<HTMLCmpAElement>;
-      'cmp-b': LocalJSX.CmpB & JSXBase.HTMLAttributes<HTMLCmpBElement>;
-      'cmp-c': LocalJSX.CmpC & JSXBase.HTMLAttributes<HTMLCmpCElement>;
-      'cmp-client-scoped': LocalJSX.CmpClientScoped & JSXBase.HTMLAttributes<HTMLCmpClientScopedElement>;
-      'cmp-client-shadow': LocalJSX.CmpClientShadow & JSXBase.HTMLAttributes<HTMLCmpClientShadowElement>;
-      'cmp-d': LocalJSX.CmpD & JSXBase.HTMLAttributes<HTMLCmpDElement>;
-      'cmp-scoped-a': LocalJSX.CmpScopedA & JSXBase.HTMLAttributes<HTMLCmpScopedAElement>;
-      'cmp-scoped-b': LocalJSX.CmpScopedB & JSXBase.HTMLAttributes<HTMLCmpScopedBElement>;
       'conditional-basic': LocalJSX.ConditionalBasic & JSXBase.HTMLAttributes<HTMLConditionalBasicElement>;
       'conditional-rerender': LocalJSX.ConditionalRerender & JSXBase.HTMLAttributes<HTMLConditionalRerenderElement>;
       'conditional-rerender-root': LocalJSX.ConditionalRerenderRoot & JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement>;

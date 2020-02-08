@@ -34,6 +34,7 @@ export const TEXT_NODE_ID = 't';
 
 export const HYDRATED_CLASS = 'hydrated';
 export const HYDRATE_ID = 's-id';
+export const HYDRATED_STYLE_ID = 'sty-id';
 export const HYDRATE_CHILD_ID = 'c-id';
 
 export const XLINK_NS = 'http://www.w3.org/1999/xlink';
