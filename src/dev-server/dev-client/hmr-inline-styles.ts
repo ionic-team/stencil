@@ -29,7 +29,7 @@ function hmrStyleElement(elm: Element, versionId: string, stylesUpdated: d.HmrSt
     return;
   }
 
-  const styleId = elm.getAttribute('s-id');
+  const styleId = elm.getAttribute('sty-id');
   if (styleId !== stylesUpdated.styleId || !stylesUpdated.styleText) {
     return;
   }
