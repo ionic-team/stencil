@@ -6,24 +6,18 @@
   "types": "dist/types/components.d.ts",
   "collection": " dist/collection/collection-manifest.json",
   "scripts": {
-    "build": "node ../../bin/stencil build --next --docs",
-    "start": "node ../../bin/stencil build --debug --watch --dev --serve",
-    "test": "node ../../bin/stencil test --ci --e2e --spec --screenshot",
-    "test.e2e": "node ../../bin/stencil test --e2e",
-    "test.screenshot": "node ../../bin/stencil test --e2e --debug --screenshot",
-    "test.spec": "node ../../bin/stencil test --spec --debug",
+    "build": "node ../../bin/stencil build --docs --next",
+    "start": "node ../../bin/stencil build --debug --watch --dev --serve --next",
+    "test": "node ../../bin/stencil test --ci --e2e --spec --screenshot --next",
+    "test.e2e": "node ../../bin/stencil test --e2e --next",
+    "test.screenshot": "node ../../bin/stencil test --e2e --debug --screenshot --next",
+    "test.spec": "node ../../bin/stencil test --spec --debug --next",
     "jest": "jest --coverage"
-  },
-  "devDependencies": {
-    "@types/jest": "24.0.20",
-    "@types/puppeteer": "2.0.0",
-    "jest": "24.9.0",
-    "jest-cli": "24.9.0",
-    "puppeteer": "2.0.0",
-    "workbox-build": "4.3.1",
-    "rollup-plugin-node-builtins": "^2.1.2"
   },
   "jest": {
     "preset": "../../testing/jest-preset.js"
+  },
+  "devDependencies": {
+    "rollup-plugin-node-builtins": "^2.1.2"
   }
 }
