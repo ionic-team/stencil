@@ -15,13 +15,18 @@ export const addExternalImport = (config: d.Config, compilerCtx: d.CompilerCtx, 
     return;
   }
 
-  const pkgJsonFilePath = tsResolveModuleNamePackageJsonPath(config, compilerCtx, moduleId, containingFile);
+  let pkgJsonFilePath = tsResolveModuleNamePackageJsonPath(config, compilerCtx, moduleId, containingFile);
 
   // cache that we've already parsed this
   compilerCtx.resolvedCollections.add(moduleId);
 
   if (pkgJsonFilePath == null) {
     return;
+  }
+
+  const realPkgJsonFilePath = config.sys_next.realpathSync(pkgJsonFilePath);
+  if (realPkgJsonFilePath) {
+    pkgJsonFilePath = realPkgJsonFilePath;
   }
 
   if (pkgJsonFilePath === config.packageJsonFilePath) {
