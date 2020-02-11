@@ -4,6 +4,7 @@ import { parseStencilImportPathData } from '../../compiler/transformers/stencil-
 import { Plugin } from 'rollup';
 import { runPluginTransformsEsmImports } from '../../compiler/plugin/plugin';
 
+
 export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Plugin => {
   return {
     name: 'extTransformsPlugin',
@@ -18,6 +19,21 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         const filePath = normalizeFsPath(id);
         const code = await compilerCtx.fs.readFile(filePath);
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, code, filePath);
+
+        const modules = Array.from(compilerCtx.moduleMap.values());
+        const moduleFile = modules.find(m => m.cmps.some(c => c.tagName === pathData.tag));
+
+        if (moduleFile) {
+          const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
+
+          const relPath = config.sys.path.relative(config.srcDir, pluginTransforms.id);
+
+          await Promise.all(collectionDirs.map(async outputTarget => {
+            const collectionPath = config.sys.path.join(outputTarget.collectionDir, relPath);
+            await compilerCtx.fs.writeFile(collectionPath, pluginTransforms.code);
+          }));
+        }
+
         const cssTransformResults = await compilerCtx.worker.transformCssToEsm({
           filePath: pluginTransforms.id,
           code: pluginTransforms.code,
