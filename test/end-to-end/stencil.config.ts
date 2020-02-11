@@ -3,7 +3,7 @@ import builtins from 'rollup-plugin-node-builtins';
 
 export const config: Config = {
   namespace: 'EndToEnd',
-
+  globalScript: './src/global.ts',
   plugins: [
     builtins()
   ],

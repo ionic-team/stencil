@@ -2,7 +2,10 @@ import { Component, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'prop-cmp',
-  styleUrl: 'prop-cmp.css',
+  styleUrls: {
+    ios: 'prop-cmp.ios.css',
+    md: 'prop-cmp.md.css',
+  },
   shadow: true
 })
 export class PropCmp {

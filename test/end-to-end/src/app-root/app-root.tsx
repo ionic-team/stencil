@@ -16,7 +16,7 @@ export class AppRoot {
   }
 
   render() {
-    return <prop-cmp first={this.first} lastName={this.last}></prop-cmp>
+    return <prop-cmp first={this.first} lastName={this.last} mode="ios"></prop-cmp>
   }
 
 }
