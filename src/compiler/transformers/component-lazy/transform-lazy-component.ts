@@ -22,7 +22,7 @@ export const transformToLazyComponentText = (compilerCtx: d.CompilerCtx, buildCt
       fileName: cmp.jsFilePath,
       transformers: {
         after: [
-          lazyComponentTransform(compilerCtx, transformOpts)
+          lazyComponentTransformLegacy(compilerCtx, transformOpts)
         ]
       }
     };
@@ -45,7 +45,7 @@ export const transformToLazyComponentText = (compilerCtx: d.CompilerCtx, buildCt
 };
 
 
-export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
+export const lazyComponentTransformLegacy = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
 
   return transformCtx => {
 

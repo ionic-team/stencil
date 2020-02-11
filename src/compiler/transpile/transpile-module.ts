@@ -4,7 +4,7 @@ import { CompilerContext } from '../../compiler_next/build/compiler-ctx';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
-import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
+import { lazyComponentTransformLegacy } from '../transformers/component-lazy/transform-lazy-component';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { TestingLogger } from '../../testing/testing-logger';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
@@ -84,7 +84,7 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     after.push(nativeComponentTransform(compilerCtx, transformOpts));
 
   } else {
-    after.push(lazyComponentTransform(compilerCtx, transformOpts));
+    after.push(lazyComponentTransformLegacy(compilerCtx, transformOpts));
   }
 
   program.emit(undefined, undefined, undefined, false, {

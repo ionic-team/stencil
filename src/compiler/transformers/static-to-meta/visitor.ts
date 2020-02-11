@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { getModule, resetModule } from '../../build/compiler-ctx';
+import { getModuleLegacy, resetModule } from '../../build/compiler-ctx';
 import { parseCallExpression } from './call-expression';
 import { parseImportLegacy } from './import';
 import { parseStaticComponentMeta } from './component';
@@ -29,7 +29,7 @@ export const convertStaticToMeta = (config: d.Config, compilerCtx: d.CompilerCtx
 
     return tsSourceFile => {
       dirPath = config.sys.path.dirname(tsSourceFile.fileName);
-      moduleFile = getModule(config, compilerCtx, tsSourceFile.fileName);
+      moduleFile = getModuleLegacy(config, compilerCtx, tsSourceFile.fileName);
       resetModule(moduleFile);
 
       if (collection != null) {

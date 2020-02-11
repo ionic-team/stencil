@@ -30,7 +30,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     const bundleOpts: BundleOptions = {
       id: 'lazy',
       platform: 'client',
-      conditionals: getBuildConditionals(config, buildCtx.components),
+      conditionals: getLazyBuildConditionals(config, buildCtx.components),
       customTransformers: getLazyCustomTransformer(compilerCtx),
       inputs: {
         [config.fsNamespace]: LAZY_BROWSER_ENTRY_ID,
@@ -74,7 +74,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
 };
 
 
-const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
+const getLazyBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
 
   build.lazyLoad = true;

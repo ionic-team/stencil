@@ -4,7 +4,7 @@ import { COMPILER_BUILD } from '../build/compiler-build-id';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import { getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
-import { getModule } from '../build/compiler-ctx';
+import { getModuleLegacy } from '../build/compiler-ctx';
 import { getUserCompilerOptions } from './compiler-options';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
@@ -266,7 +266,7 @@ const transpileTsFile = async (config: d.Config, services: ts.LanguageService, c
 
     if (outputFilePath.endsWith('.js')) {
       // this is the JS output of the typescript file transpiling
-      const moduleFile = getModule(config, ctx.compilerCtx, sourceFilePath);
+      const moduleFile = getModuleLegacy(config, ctx.compilerCtx, sourceFilePath);
       if (Array.isArray(ensureExternalImports)) {
         ensureExternalImports.forEach(moduleId => {
           addExternalImportLegacy(config, ctx.compilerCtx, ctx.buildCtx, moduleFile, config.rootDir, moduleId);

@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { getModule } from '../../../compiler/build/compiler-ctx';
+import { getModuleLegacy } from '../../../compiler/build/compiler-ctx';
 import { normalizePath } from '@utils';
 import { setComponentBuildConditionals } from '../../../compiler/transformers/component-build-conditionals';
 
@@ -15,7 +15,7 @@ export function parseComponentsDeprecated(config: d.Config, compilerCtx: d.Compi
 
 function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, collection: d.CollectionCompilerMeta, collectionDir: string, cmpData: d.ComponentDataDeprecated) {
   const sourceFilePath = normalizePath(config.sys.path.join(collectionDir, cmpData.componentPath));
-  const moduleFile = getModule(config, compilerCtx, sourceFilePath);
+  const moduleFile = getModuleLegacy(config, compilerCtx, sourceFilePath);
 
   moduleFile.isCollectionDependency = true;
   moduleFile.isLegacy = true;

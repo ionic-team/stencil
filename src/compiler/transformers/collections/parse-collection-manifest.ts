@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { getModule } from '../../build/compiler-ctx';
+import { getModuleLegacy } from '../../build/compiler-ctx';
 import { normalizePath } from '@utils';
 import { parseCollectionComponentsLegacy } from './parse-collection-components';
 
@@ -39,7 +39,7 @@ export const parseGlobal = (config: d.Config, compilerCtx: d.CompilerCtx, collec
 
   const sourceFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
 
-  const globalModule = getModule(config, compilerCtx, sourceFilePath);
+  const globalModule = getModuleLegacy(config, compilerCtx, sourceFilePath);
   globalModule.jsFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
   return globalModule;
 };
