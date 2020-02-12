@@ -15,7 +15,7 @@ describe('@Prop', () => {
     // create a new puppeteer page
     // load the page with html content
     await page.setContent(`
-      <prop-cmp></prop-cmp>
+      <prop-cmp mode="ios"></prop-cmp>
     `);
 
     // select the "prop-cmp" element
@@ -38,7 +38,7 @@ describe('@Prop', () => {
 
   it('should set props from attributes', async () => {
     await page.setContent(`
-      <prop-cmp first="Marty" last-name="McFly"></prop-cmp>
+      <prop-cmp first="Marty" last-name="McFly" mode="ios"></prop-cmp>
     `);
 
     const elm = await page.find('prop-cmp >>> div');
