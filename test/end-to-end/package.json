@@ -9,7 +9,7 @@
     "build": "node ../../bin/stencil build --docs --next",
     "start": "node ../../bin/stencil build --debug --watch --dev --serve --next",
     "test": "node ../../bin/stencil test --ci --e2e --spec --screenshot --next && npm run test.dist",
-    "test.dist": "node test-dist.js",
+    "test.dist": "node ../../bin/stencil build --next && node test-dist.js",
     "test.e2e": "node ../../bin/stencil test --e2e --next",
     "test.screenshot": "node ../../bin/stencil test --e2e --debug --screenshot --next",
     "test.spec": "node ../../bin/stencil test --spec --debug --next",
