@@ -146,6 +146,9 @@ export const createTesting = async (config: Config): Promise<Testing> => {
 function setupTestingConfig(config: Config) {
   config.buildEs5 = false;
   config.devMode = true;
+  config.minifyCss = false;
+  config.minifyJs = false;
+  config.hashFileNames = false;
   config.validateTypes = false;
   config._isTesting = true;
   config.buildDist = true;
@@ -153,6 +156,12 @@ function setupTestingConfig(config: Config) {
   config.flags = config.flags || {};
   config.flags.serve = false;
   config.flags.open = false;
+
+  config.outputTargets.forEach(o => {
+    if (o.type === 'www') {
+      o.serviceWorker = null;
+    }
+  });
 
   return config;
 }

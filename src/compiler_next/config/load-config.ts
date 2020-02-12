@@ -2,10 +2,10 @@ import { buildError, catchError, isString, normalizePath, hasError, IS_NODE_ENV 
 import { CompilerSystem, Config, Diagnostic, LoadConfigInit, LoadConfigResults } from '../../declarations';
 import { createLogger } from '../sys/logger';
 import { createSystem } from '../sys/stencil-sys';
+import { dirname, isAbsolute, join, resolve } from 'path';
 import { loadTypescript } from '../sys/typescript/typescript-load';
 import { validateConfig } from './validate-config';
 import { validateTsConfig } from '../sys/typescript/typescript-config';
-import path from 'path';
 import tsTypes from 'typescript';
 
 
@@ -27,10 +27,10 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
     let isDefaultConfigPath = true;
 
     if (isString(configPath)) {
-      if (!path.isAbsolute(configPath)) {
+      if (!isAbsolute(configPath)) {
         // passed in a custom stencil config location
         // but it's relative, so prefix the cwd
-        configPath = normalizePath(path.join(cwd, configPath));
+        configPath = normalizePath(join(cwd, configPath));
 
       } else {
         // config path already an absolute path, we're good here
@@ -53,7 +53,7 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
       configPath = loadedConfigFile.configPath;
       results.config = Object.assign(loadedConfigFile, config);
       results.config.configPath = configPath;
-      results.config.rootDir = normalizePath(path.dirname(configPath));
+      results.config.rootDir = normalizePath(dirname(configPath));
 
     } else {
       // no stencil.config.ts or .js file, which is fine
@@ -127,7 +127,7 @@ const loadConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[], co
       } else if (stat.isDirectory()) {
         // this is only a directory, so let's make some assumptions
         for (const configName of CONFIG_FILENAMES) {
-          const testConfigFilePath = path.join(configPath, configName);
+          const testConfigFilePath = join(configPath, configName);
           const stat = await sys.stat(testConfigFilePath);
           if (stat && stat.isFile()) {
             configPath = testConfigFilePath;
@@ -172,7 +172,7 @@ const evaluateConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[]
 
     if (IS_NODE_ENV) {
       // ensure we cleared out node's internal require() cache for this file
-      delete require.cache[path.resolve(configFilePath)];
+      delete require.cache[resolve(configFilePath)];
 
       // let's override node's require for a second
       // don't worry, we'll revert this when we're done

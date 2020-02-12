@@ -2,7 +2,8 @@ import * as d from '../../declarations';
 import { buildWarn, catchError } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export async function generateServiceWorker(config: d.Config, buildCtx: d.BuildCtx, workbox: d.Workbox, outputTarget: d.OutputTargetWww) {
+
+export const generateServiceWorker = async (config: d.Config, buildCtx: d.BuildCtx, workbox: d.Workbox, outputTarget: d.OutputTargetWww) => {
   const serviceWorker = await getServiceWorker(outputTarget);
   if (serviceWorker.unregister) {
     await config.sys.fs.writeFile(serviceWorker.swDest, SELF_UNREGISTER_SW);
@@ -16,10 +17,9 @@ export async function generateServiceWorker(config: d.Config, buildCtx: d.BuildC
   } else {
     return generateSW(buildCtx, serviceWorker, workbox);
   }
-}
+};
 
-
-async function copyLib(buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, workbox: d.Workbox) {
+const copyLib = async (buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, workbox: d.Workbox) => {
   const timeSpan = buildCtx.createTimeSpan(`copy service worker library started`, true);
 
   try {
@@ -31,10 +31,9 @@ async function copyLib(buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, wo
   }
 
   timeSpan.finish(`copy service worker library finished`);
-}
+};
 
-
-async function generateSW(buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerConfig, workbox: d.Workbox) {
+const generateSW = async (buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerConfig, workbox: d.Workbox) => {
   const timeSpan = buildCtx.createTimeSpan(`generate service worker started`);
 
   try {
@@ -44,10 +43,9 @@ async function generateSW(buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerCo
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
-}
+};
 
-
-async function injectManifest(buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerConfig, workbox: d.Workbox) {
+const injectManifest = async (buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerConfig, workbox: d.Workbox) => {
   const timeSpan = buildCtx.createTimeSpan(`inject manifest into service worker started`);
 
   try {
@@ -57,10 +55,9 @@ async function injectManifest(buildCtx: d.BuildCtx, serviceWorker: d.ServiceWork
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
-}
+};
 
-
-export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) {
+export const hasServiceWorkerChanges = (config: d.Config, buildCtx: d.BuildCtx) => {
   if (config.devMode && !config.flags.serviceWorker) {
     return false;
   }
@@ -72,25 +69,27 @@ export function hasServiceWorkerChanges(config: d.Config, buildCtx: d.BuildCtx) 
   return wwwServiceOutputs.some(outputTarget => {
     return buildCtx.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === config.sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase());
   });
-}
+};
 
-async function getServiceWorker(outputTarget: d.OutputTargetWww) {
+const getServiceWorker = async (outputTarget: d.OutputTargetWww) => {
   if (!outputTarget.serviceWorker) {
     return undefined;
   }
+
   const serviceWorker: d.ServiceWorkerConfig = {
     ...outputTarget.serviceWorker
   };
+
   if (serviceWorker.unregister !== true) {
     delete serviceWorker.unregister;
   }
 
   return serviceWorker;
-}
+};
 
 export const INDEX_ORG = 'index-org.html';
 
-export function getRegisterSW(swUrl: string) {
+export const getRegisterSW = (swUrl: string) => {
   return `
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', function() {
@@ -108,7 +107,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       .catch(function(err) { console.error('service worker error', err) });
   });
 }`;
-}
+};
 
 export const UNREGISTER_SW = `
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
@@ -136,4 +135,3 @@ self.addEventListener('activate', function(e) {
     });
 });
 `;
-

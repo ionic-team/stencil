@@ -249,7 +249,7 @@ export interface Config extends StencilConfig {
   devServer?: DevServerConfig;
   flags?: ConfigFlags;
   fsNamespace?: string;
-  logLevel?: 'error'|'warn'|'info'|'debug'|string;
+  logLevel?: 'error' | 'warn' | 'info' | 'debug' | string;
   rootDir?: string;
   packageJsonFilePath?: string;
   sourceMap?: boolean;
@@ -896,7 +896,7 @@ export interface JestConfig {
   testRunner?: string;
   testURL?: string;
   timers?: string;
-  transform?: {[key: string]: string };
+  transform?: { [key: string]: string };
   transformIgnorePatterns?: any[];
   unmockedModulePathPatterns?: any[];
   verbose?: boolean;
@@ -1223,10 +1223,10 @@ export interface OutputTargetBase {
 }
 
 export type OutputTargetBuild =
- | OutputTargetDistCollection
- | OutputTargetDistLazy;
+  | OutputTargetDistCollection
+  | OutputTargetDistLazy;
 
- export interface OutputTargetAngular extends OutputTargetBase {
+export interface OutputTargetAngular extends OutputTargetBase {
   type: 'angular';
 
   componentCorePackage: string;
@@ -1322,25 +1322,25 @@ export interface OutputTargetWww extends OutputTargetBase {
 }
 
 export type OutputTarget =
- | OutputTargetAngular
- | OutputTargetCopy
- | OutputTargetCustom
- | OutputTargetDist
- | OutputTargetDistCollection
- | OutputTargetDistCustomElements
- | OutputTargetDistCustomElementsBundle
- | OutputTargetDistLazy
- | OutputTargetDistGlobalStyles
- | OutputTargetDistLazyLoader
- | OutputTargetDistSelfContained
- | OutputTargetDocsJson
- | OutputTargetDocsCustom
- | OutputTargetDocsReadme
- | OutputTargetDocsVscode
- | OutputTargetWww
- | OutputTargetHydrate
- | OutputTargetStats
- | OutputTargetDistTypes;
+  | OutputTargetAngular
+  | OutputTargetCopy
+  | OutputTargetCustom
+  | OutputTargetDist
+  | OutputTargetDistCollection
+  | OutputTargetDistCustomElements
+  | OutputTargetDistCustomElementsBundle
+  | OutputTargetDistLazy
+  | OutputTargetDistGlobalStyles
+  | OutputTargetDistLazyLoader
+  | OutputTargetDistSelfContained
+  | OutputTargetDocsJson
+  | OutputTargetDocsCustom
+  | OutputTargetDocsReadme
+  | OutputTargetDocsVscode
+  | OutputTargetWww
+  | OutputTargetHydrate
+  | OutputTargetStats
+  | OutputTargetDistTypes;
 
 export interface ServiceWorkerConfig {
   // https://developers.google.com/web/tools/workbox/modules/workbox-build#full_generatesw_config
@@ -1349,8 +1349,8 @@ export interface ServiceWorkerConfig {
   swDest?: string;
   swSrc?: string;
   globPatterns?: string[];
-  globDirectory?: string|string[];
-  globIgnores?: string|string[];
+  globDirectory?: string | string[];
+  globIgnores?: string | string[];
   templatedUrls?: any;
   maximumFileSizeToCacheInBytes?: number;
   manifestTransforms?: any;
@@ -1433,7 +1433,7 @@ export interface StencilSystem {
   generateContentHash?(content: string, length: number): Promise<string>;
   getLatestCompilerVersion?(logger: Logger, forceCheck: boolean): Promise<string>;
   getClientPath?(staticName: string): string;
-  getClientCoreFile?(opts: {staticName: string}): Promise<string>;
+  getClientCoreFile?(opts: { staticName: string }): Promise<string>;
   glob?(pattern: string, options: {
     cwd?: string;
     nodir?: boolean;

@@ -124,9 +124,6 @@ export const validateConfig = (userConfig?: Config) => {
     warn.messageText = `"includeSrc" is deprecated, use the "include" option in tsconfig.json`;
   }
 
-  // set to true so it doesn't bother going through all this again on rebuilds
-  // config._isValidated = true;
-
   return {
     config,
     diagnostics

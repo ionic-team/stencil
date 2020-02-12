@@ -1,8 +1,9 @@
 import * as d from '../../declarations';
 import { HOST_CONFIG_FILENAME } from '../../prerender/host-config';
+import { isString } from '@utils';
 
 
-export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww) {
+export const validateServiceWorker = (config: d.Config, outputTarget: d.OutputTargetWww) => {
   if (config.devMode && !config.flags.serviceWorker) {
     outputTarget.serviceWorker = null;
     return;
@@ -50,17 +51,21 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
 
   outputTarget.serviceWorker.dontCacheBustURLsMatching = /p-\w{8}/;
 
-  if (!outputTarget.serviceWorker.swDest) {
+  if (isString(outputTarget.serviceWorker.swSrc) && !config.sys.path.isAbsolute(outputTarget.serviceWorker.swSrc)) {
+    outputTarget.serviceWorker.swSrc = config.sys.path.join(config.rootDir, outputTarget.serviceWorker.swSrc);
+  }
+
+  if (!isString(outputTarget.serviceWorker.swDest)) {
     outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.appDir, DEFAULT_FILENAME);
   }
 
   if (!config.sys.path.isAbsolute(outputTarget.serviceWorker.swDest)) {
     outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.appDir, outputTarget.serviceWorker.swDest);
   }
-}
+};
 
 
-function addGlobIgnores(config: d.Config, globIgnores: string[]) {
+const addGlobIgnores = (config: d.Config, globIgnores: string[]) => {
   globIgnores.push(
     `**/${HOST_CONFIG_FILENAME}`,
     `**/*.system.entry.js`,
@@ -69,7 +74,7 @@ function addGlobIgnores(config: d.Config, globIgnores: string[]) {
     `**/${config.fsNamespace}.esm.js`,
     `**/${config.fsNamespace}.css`,
   );
-}
+};
 
 
 const DEFAULT_GLOB_PATTERNS = [

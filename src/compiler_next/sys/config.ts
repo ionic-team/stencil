@@ -9,7 +9,7 @@ import path from 'path';
 
 
 export const getConfig = (userConfig: d.Config) => {
-  const config = Object.assign(userConfig, {});
+  const config = { ...userConfig };
 
   if (!config.logger) {
     config.logger = createLogger();
@@ -44,7 +44,7 @@ export const patchSysLegacy = (config: d.Config, compilerCtx: d.CompilerCtx) => 
     typescriptVersion,
     packageDir: path.join(config.sys_next.getCompilerExecutingPath(), '..', '..'),
   },
-  config.sys.generateContentHash = config.sys_next.generateContentHash;
+    config.sys.generateContentHash = config.sys_next.generateContentHash;
   config.sys.scopeCss = (cssText, scopeId, commentOriginalSelector) => Promise.resolve(scopeCss(cssText, scopeId, commentOriginalSelector));
   config.sys.cloneDocument = cloneDocument;
   config.sys.createDocument = createDocument;
