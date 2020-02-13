@@ -22,8 +22,10 @@ export const createFullBuild = async (config: d.Config, compilerCtx: d.CompilerC
 
       const result = await build(config, compilerCtx, buildCtx, tsBuilder);
       if (result !== null) {
-        tsWatchProgram.close();
-        tsWatchProgram = null;
+        if (tsWatchProgram) {
+          tsWatchProgram.close();
+          tsWatchProgram = null;
+        }
         resolve(result);
       }
     };
