@@ -41,7 +41,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
           });
           await Promise.all(disposes);
         }
-      } catch (e) {}
+      } catch (e) { }
 
       const noop: any = () => { throw new Error('The page was already closed'); };
       page._e2eElements = noop;
@@ -60,7 +60,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
         if (!page.isClosed()) {
           await page._e2eClose(options);
         }
-      } catch (e) {}
+      } catch (e) { }
     };
 
     const getDocHandle = async () => {
@@ -207,24 +207,30 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
     throw new Error('invalid e2eSetContent() html');
   }
 
-  const appUrl = env.__STENCIL_APP_URL__;
-  if (typeof appUrl !== 'string') {
+  const body: string[] = [];
+
+  const appScriptUrl = env.__STENCIL_APP_SCRIPT_URL__;
+  if (typeof appScriptUrl !== 'string') {
     throw new Error('invalid e2eSetContent() app script url');
   }
+  body.push(`<script type="module" src="${appScriptUrl}"></script>`);
 
-  const url = env.__STENCIL_BROWSER_URL__;
-  const body = [
-    `<script type="module" src="${appUrl}"></script>`,
-    html
-  ].join('\n');
+  const appStyleUrl = env.__STENCIL_APP_STYLE_URL__;
+  if (typeof appStyleUrl === 'string') {
+    body.push(`<link rel="stylesheet" href="${appStyleUrl}">`);
+  }
+
+  body.push(html);
+
+  const pageUrl = env.__STENCIL_BROWSER_URL__;
 
   await page.setRequestInterception(true);
   page.on('request', interceptedRequest => {
-    if (url === interceptedRequest.url()) {
+    if (pageUrl === interceptedRequest.url()) {
       interceptedRequest.respond({
         status: 200,
         contentType: 'text/html',
-        body: body
+        body: body.join('\n'),
       });
       (page as any).removeAllListeners('request');
       page.setRequestInterception(false);
@@ -237,7 +243,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   if (!options.waitUntil) {
     options.waitUntil = env.__STENCIL_BROWSER_WAIT_UNTIL as any;
   }
-  const rsp = await page._e2eGoto(url, options);
+  const rsp = await page._e2eGoto(pageUrl, options);
 
   if (!rsp.ok()) {
     throw new Error(`Testing unable to load content`);
@@ -251,7 +257,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
 
 async function waitForStencil(page: E2EPage) {
   try {
-    await page.waitForFunction('window.stencilAppLoaded', {timeout: 4500});
+    await page.waitForFunction('window.stencilAppLoaded', { timeout: 4500 });
 
   } catch (e) {
     throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
@@ -334,7 +340,7 @@ async function waitForChanges(page: E2EPageInternal) {
 
     await Promise.all(page._e2eElements.map(elm => elm.e2eSync()));
 
-  } catch (e) {}
+  } catch (e) { }
 }
 
 

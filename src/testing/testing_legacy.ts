@@ -1,6 +1,6 @@
 import { BuildResults, Compiler, Config, DevServer, E2EProcessEnv, ITestingLegacy, OutputTargetWww } from '@stencil/core/internal';
+import { getAppScriptUrl, getAppStyleUrl } from './testing-utils';
 import { hasError } from '@utils';
-import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { runJest } from './jest/jest-runner';
 import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
@@ -100,8 +100,11 @@ export class TestingLegacy implements ITestingLegacy {
         env.__STENCIL_BROWSER_URL__ = this.devServer.browserUrl;
         this.config.logger.debug(`e2e dev server url: ${env.__STENCIL_BROWSER_URL__}`);
 
-        env.__STENCIL_APP_URL__ = getAppUrl(config, this.devServer.browserUrl);
-        this.config.logger.debug(`e2e app url: ${env.__STENCIL_APP_URL__}`);
+        env.__STENCIL_APP_SCRIPT_URL__ = getAppScriptUrl(config, this.devServer.browserUrl);
+        config.logger.debug(`e2e app script url: ${env.__STENCIL_APP_SCRIPT_URL__}`);
+
+        env.__STENCIL_APP_STYLE_URL__ = getAppStyleUrl(config, this.devServer.browserUrl);
+        config.logger.debug(`e2e app style url: ${env.__STENCIL_APP_STYLE_URL__}`);
       }
     }
 
@@ -155,28 +158,4 @@ function setupTestingConfig(config: Config) {
   config.flags.open = false;
 
   return config;
-}
-
-
-
-function getAppUrl(config: Config, browserUrl: string) {
-  const appFileName = `${config.fsNamespace}.esm.js`;
-
-  const wwwOutput = config.outputTargets.find(isOutputTargetWww);
-  if (wwwOutput) {
-    const appBuildDir = wwwOutput.buildDir;
-    const appFilePath = config.sys.path.join(appBuildDir, appFileName);
-    const appUrlPath = config.sys.path.relative(wwwOutput.dir, appFilePath);
-    return browserUrl + appUrlPath;
-  }
-
-  const distOutput = config.outputTargets.find(isOutputTargetDistLazy);
-  if (distOutput) {
-    const appBuildDir = distOutput.esmDir;
-    const appFilePath = config.sys.path.join(appBuildDir, appFileName);
-    const appUrlPath = config.sys.path.relative(config.rootDir, appFilePath);
-    return browserUrl + appUrlPath;
-  }
-
-  return browserUrl;
 }

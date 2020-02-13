@@ -1,5 +1,6 @@
 import * as d from '@stencil/core/internal';
 import { normalizePath } from '@utils';
+import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 
 
 export function shuffleArray(array: any[]) {
@@ -49,4 +50,36 @@ export function wroteFile(r: d.BuildResults, p: string) {
   return r.filesWritten.some(f => {
     return normalizePath(f) === normalizePath(p);
   });
+}
+
+export function getAppScriptUrl(config: d.Config, browserUrl: string) {
+  const appFileName = `${config.fsNamespace}.esm.js`;
+  return getAppUrl(config, browserUrl, appFileName);
+}
+
+export function getAppStyleUrl(config: d.Config, browserUrl: string) {
+  const appFileName = `${config.fsNamespace}.css`;
+  return getAppUrl(config, browserUrl, appFileName);
+}
+
+function getAppUrl(config: d.Config, browserUrl: string, appFileName: string) {
+  const wwwOutput = config.outputTargets.find(isOutputTargetWww);
+  if (wwwOutput) {
+    const appBuildDir = wwwOutput.buildDir;
+    const appFilePath = config.sys.path.join(appBuildDir, appFileName);
+    const appUrlPath = config.sys.path.relative(wwwOutput.dir, appFilePath);
+    const url = new URL(appUrlPath, browserUrl);
+    return url.href;
+  }
+
+  const distOutput = config.outputTargets.find(isOutputTargetDistLazy);
+  if (distOutput) {
+    const appBuildDir = distOutput.esmDir;
+    const appFilePath = config.sys.path.join(appBuildDir, appFileName);
+    const appUrlPath = config.sys.path.relative(config.rootDir, appFilePath);
+    const url = new URL(appUrlPath, browserUrl);
+    return url.href;
+  }
+
+  return browserUrl;
 }
