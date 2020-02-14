@@ -19,6 +19,7 @@ export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
     if (config.flags.devtools) {
       env.__STENCIL_DEFAULT_TIMEOUT__ = '300000000';
     }
+    config.logger.debug(`default timeout: ${env.__STENCIL_DEFAULT_TIMEOUT__}`);
 
     // build up our args from our already know list of args in the config
     const jestArgv = buildJestArgv(config);
@@ -50,7 +51,7 @@ export function createTestRunner(): any {
     async runTests(tests: { path: string }[], watcher: any, onStart: any, onResult: any, onFailure: any, options: any) {
       const env = (process.env as d.E2EProcessEnv);
 
-        // filter out only the tests the flags said we should run
+      // filter out only the tests the flags said we should run
       tests = tests.filter(t => includeTestFile(t.path, env));
 
       if (env.__STENCIL_SCREENSHOT__ === 'true') {

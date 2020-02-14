@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { basename, dirname, relative } from 'path';
-import { isString, normalizePath } from '@utils';
+import { normalizePath } from '@utils';
 
 
 export const createInMemoryFs = (sys: d.CompilerSystem) => {
@@ -345,11 +345,11 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   const writeFile = async (filePath: string, content: string, opts?: d.FsWriteOptions) => {
-    if (!isString(filePath)) {
+    if (typeof filePath !== 'string') {
       throw new Error(`writeFile, invalid filePath: ${filePath}`);
     }
 
-    if (!isString(content)) {
+    if (typeof content !== 'string') {
       throw new Error(`writeFile, invalid content: ${filePath}`);
     }
 
@@ -370,13 +370,19 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     item.isDirectory = false;
     item.queueDeleteFromDisk = false;
 
-    results.changedContent = (item.fileText !== content);
-    results.queuedWrite = false;
-
+    if (typeof item.fileText === 'string') {
+      // compare strings but replace Windows CR to rule out any
+      // insignificant new line differences
+      results.changedContent = (item.fileText.replace(/\r/g, '') !== content.replace(/\r/g, ''));
+    } else {
+      results.changedContent = true;
+    }
     item.fileText = content;
 
+    results.queuedWrite = false;
+
     if (opts != null) {
-      if (isString(opts.outputTargetType)) {
+      if (typeof opts.outputTargetType === 'string') {
         outputTargetTypes.set(filePath, opts.outputTargetType);
       }
       if (opts.useCache === false) {
@@ -408,7 +414,10 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         // writing the file to disk is a big deal and kicks off fs watchers
         // so let's just double check that the file is actually different first
         const existingFile = await sys.readFile(filePath);
-        results.changedContent = (existingFile !== item.fileText);
+        if (typeof existingFile === 'string') {
+          results.changedContent = (item.fileText.replace(/\r/g, '') !== existingFile.replace(/\r/g, ''));
+        }
+
         if (results.changedContent) {
           await ensureDir(filePath, false);
           await sys.writeFile(filePath, item.fileText);
@@ -513,7 +522,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
         dirsAdded.push(dirPath);
 
-      } catch (e) {}
+      } catch (e) { }
     }
 
     return dirsAdded;
@@ -571,7 +580,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     for (const dirPath of dirsToDelete) {
       try {
         await sys.rmdir(dirPath);
-      } catch (e) {}
+      } catch (e) { }
       dirsDeleted.push(dirPath);
     }
 

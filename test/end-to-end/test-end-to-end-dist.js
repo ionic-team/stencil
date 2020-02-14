@@ -33,3 +33,5 @@ const wwwDir = path.join(__dirname, 'www');
 fs.accessSync(path.join(wwwDir, 'build', 'endtoend.js'));
 fs.accessSync(path.join(wwwDir, 'build', 'endtoend.esm.js'));
 fs.accessSync(path.join(wwwDir, 'index.html'));
+
+console.log('🍄  validated test/end-to-end/dist files\n');

@@ -11,6 +11,7 @@ export const createFullBuild = async (config: d.Config, compilerCtx: d.CompilerC
     let tsWatchProgram: ts.WatchOfConfigFile<ts.BuilderProgram> = null;
 
     compilerCtx.events.on('fileUpdate', p => {
+      config.logger.debug(`fileUpdate: ${p}`);
       compilerCtx.fs.clearFileCache(p);
     });
 

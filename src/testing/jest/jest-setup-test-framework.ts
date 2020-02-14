@@ -54,7 +54,7 @@ export function jestSetupTestFramework() {
 
   if (typeof env.__STENCIL_DEFAULT_TIMEOUT__ === 'string') {
     const time = parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10);
-    jest.setTimeout(time);
+    jest.setTimeout(time * 1.5);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = time;
   }
 }

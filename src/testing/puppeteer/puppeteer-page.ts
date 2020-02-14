@@ -155,7 +155,9 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
 
   } catch (e) {
     if (page) {
-      page.close();
+      if (!page.isClosed()) {
+        await page.close();
+      }
     }
     throw e;
   }
@@ -202,25 +204,32 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   if (page.isClosed()) {
     throw new Error('e2eSetContent unavailable: page already closed');
   }
-
   if (typeof html !== 'string') {
     throw new Error('invalid e2eSetContent() html');
   }
 
-  const body: string[] = [];
+  const output: string[] = [];
 
   const appScriptUrl = env.__STENCIL_APP_SCRIPT_URL__;
   if (typeof appScriptUrl !== 'string') {
     throw new Error('invalid e2eSetContent() app script url');
   }
-  body.push(`<script type="module" src="${appScriptUrl}"></script>`);
+
+  output.push(`<!doctype html>`);
+  output.push(`<html>`);
+  output.push(`<head>`);
 
   const appStyleUrl = env.__STENCIL_APP_STYLE_URL__;
   if (typeof appStyleUrl === 'string') {
-    body.push(`<link rel="stylesheet" href="${appStyleUrl}">`);
+    output.push(`<link rel="stylesheet" href="${appStyleUrl}">`);
   }
+  output.push(`<script type="module" src="${appScriptUrl}"></script>`);
 
-  body.push(html);
+  output.push(`</head>`);
+  output.push(`<body>`);
+  output.push(html);
+  output.push(`</body>`);
+  output.push(`</html>`);
 
   const pageUrl = env.__STENCIL_BROWSER_URL__;
 
@@ -230,10 +239,8 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
       interceptedRequest.respond({
         status: 200,
         contentType: 'text/html',
-        body: body.join('\n'),
+        body: output.join('\n'),
       });
-      (page as any).removeAllListeners('request');
-      page.setRequestInterception(false);
 
     } else {
       interceptedRequest.continue();
@@ -257,7 +264,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
 
 async function waitForStencil(page: E2EPage) {
   try {
-    await page.waitForFunction('window.stencilAppLoaded', { timeout: 4500 });
+    await page.waitForFunction('window.stencilAppLoaded', { timeout: 4750 });
 
   } catch (e) {
     throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
