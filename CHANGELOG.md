@@ -1,4 +1,4 @@
-# ❄️ [1.9.0-15](https://github.com/ionic-team/stencil/compare/v1.8.7...v1.9.0-15) (2020-02-08)
+# ✈️ [1.9.0-16](https://github.com/ionic-team/stencil/compare/v1.9.0-15...v1.9.0-16) (2020-02-14)
 
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
@@ -42,6 +42,8 @@ Some of main features with the `--next` compiler include:
 * **dev-server:** experimental dev node modules ([104a819](https://github.com/ionic-team/stencil/commit/104a81920bbcf575346f0969459f3eb329edfe3c))
 * **runtime:** dispatch namespace in lifecycleDOMEvents ([67cb2f3](https://github.com/ionic-team/stencil/commit/67cb2f3d1e03509e726fe284a0fcdc3601038634))
 * add dynamicImportShim as extra ([#2177](https://github.com/ionic-team/stencil/issues/2177)) ([fd81489](https://github.com/ionic-team/stencil/commit/fd8148958a5fd300ff5d634d32106c20afdfb4d8))
+* **e2e:** include global style in e2e html content ([b8e7a8f](https://github.com/ionic-team/stencil/commit/b8e7a8feca1da48ad6662a18a77c6e3a1eec25c7)), closes [#2192](https://github.com/ionic-team/stencil/issues/2192)
+* **hydratedFlag:** ability to configure applied hydrated css class ([62e2168](https://github.com/ionic-team/stencil/commit/62e2168e1f49d3778b269fae10c8b77e30dc1c49))
 
 
 ### Bug Fixes
@@ -173,6 +175,10 @@ Some of main features with the `--next` compiler include:
 * **slot:** correct order of nested slots ([e7b9b38](https://github.com/ionic-team/stencil/commit/e7b9b3807ad0250f097f6aff11c897b6192b4096)), closes [#2159](https://github.com/ionic-team/stencil/issues/2159)
 * **slot:** do not render light dom without unnamed slot ([9ac767b](https://github.com/ionic-team/stencil/commit/9ac767b2ccf0915e025a250758831b75f2fc8506)), closes [#2162](https://github.com/ionic-team/stencil/issues/2162)
 * **slotted:** fix applying polyfilled slotted css to nested slot ([af2c481](https://github.com/ionic-team/stencil/commit/af2c481151863a9fe691b57d310f9c9f38519093)), closes [#2183](https://github.com/ionic-team/stencil/issues/2183)
+* **next:** copy styles to collection build ([baf5bcf](https://github.com/ionic-team/stencil/commit/baf5bcf5fc6ab57e9002bb77b17447d18de1cd5e))
+* **next:** fix lerna collection ([24f59d3](https://github.com/ionic-team/stencil/commit/24f59d3a3ef519e63d9c67a3f9c27823433be0d0))
+* **next:** unregister service worker during e2e tests ([a34b88b](https://github.com/ionic-team/stencil/commit/a34b88b1c6d082460165fb70e8db1fc5878ff673))
+* **windows:** update puppeteer and jest, format components.d.ts ([558aa72](https://github.com/ionic-team/stencil/commit/558aa722428d39f0464721c1f6c2820a6c8d2319))
 
 
 
