@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildError, isBoolean, sortBy } from '@utils';
+import { buildError, sortBy } from '@utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace, validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';

@@ -77,7 +77,7 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
             }
           }
         } else {
-          code = code.replace(HYDRATED_CSS, '');
+          code = code.replace(HYDRATED_CSS, '{}');
         }
         return code;
       }
