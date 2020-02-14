@@ -9,7 +9,7 @@ import { createTime, installDevTools } from './profile';
 import { disconnectedCallback } from './disconnected-callback';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
-import { HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
+import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
 import { proxyComponent } from './proxy-component';
 
 
@@ -22,11 +22,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const endBootstrap = createTime('bootstrapLazy');
   const cmpTags: string[] = [];
   const exclude = options.exclude || [];
-  const head = doc.head;
   const customElements = win.customElements;
-  const y = /*@__PURE__*/head.querySelector('meta[charset]');
-  const visibilityStyle = /*@__PURE__*/doc.createElement('style');
-  const deferredConnectedCallbacks: {connectedCallback: () => void}[] = [];
+  const head = doc.head;
+  const metaCharset = head.querySelector('meta[charset]');
+  const visibilityStyle = doc.createElement('style');
+  const deferredConnectedCallbacks: { connectedCallback: () => void }[] = [];
   const styles = doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
   let appLoadFallback: any;
   let isBootstrapping = true;
@@ -146,7 +146,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       }
 
       if (BUILD.hotModuleReplacement) {
-        (HostElement as any).prototype['s-hmr'] = function(hmrVersionId: string) {
+        (HostElement as any).prototype['s-hmr'] = function (hmrVersionId: string) {
           hmrStart(this, cmpMeta, hmrVersionId);
         };
       }
@@ -162,10 +162,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       }
     }));
 
-  // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
-  visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
-  visibilityStyle.setAttribute('data-styles', '');
-  head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
+  if (BUILD.hydratedClass || BUILD.hydratedAttribute) {
+    visibilityStyle.innerHTML = cmpTags + HYDRATED_CSS;
+    visibilityStyle.setAttribute('data-styles', '');
+    head.insertBefore(visibilityStyle, metaCharset ? metaCharset.nextSibling : head.firstChild);
+  }
 
   // Process deferred connectedCallbacks now all components have been registered
   isBootstrapping = false;

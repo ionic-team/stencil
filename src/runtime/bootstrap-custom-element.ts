@@ -74,7 +74,7 @@ export const forceModeUpdate = (elm: d.RenderNode) => {
       const scopeId = getScopeId(cmpMeta.$tagName$, mode);
       const style = (elm.constructor as any).style[mode];
       const flags = cmpMeta.$flags$;
-      if (style)  {
+      if (style) {
         if (!styles.has(scopeId)) {
           registerStyle(scopeId, style, !!(flags & CMP_FLAGS.shadowDomEncapsulation));
         }

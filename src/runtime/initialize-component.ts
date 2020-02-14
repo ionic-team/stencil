@@ -96,7 +96,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         style = style[hostRef.$modeName$];
       }
 
-      if (!BUILD.hydrateServerSide && BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
+      if (!BUILD.hydrateServerSide && BUILD.shadowDom && BUILD.shadowDomShim && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
         style = await import('../utils/shadow-css').then(m => m.scopeCss(style, scopeId, false));
       }
 

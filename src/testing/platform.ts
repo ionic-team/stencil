@@ -12,7 +12,7 @@ export const doc = win.document;
 const hostRefs = new Map<d.RuntimeRef, d.HostRef>();
 
 export const styles: d.StyleMap = new Map();
-export const cssVarShim: d.CssVarSim = false as any;
+export const cssVarShim: d.CssVarShim = false as any;
 
 export const Build: d.UserBuildConditionals = {
   isDev: true,
@@ -103,7 +103,7 @@ export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) => {
     const Cstr = lazyInstance.constructor as d.ComponentTestingConstructor;
     const tagName = (Cstr.COMPILER_META && Cstr.COMPILER_META.tagName) ? Cstr.COMPILER_META.tagName : 'div';
     const elm = document.createElement(tagName);
-    registerHost(elm, {$flags$: 0, $tagName$: tagName});
+    registerHost(elm, { $flags$: 0, $tagName$: tagName });
     hostRef = getHostRef(elm);
   }
 

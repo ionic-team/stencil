@@ -3,11 +3,11 @@ import { attachStyles } from './styles';
 import { BUILD, NAMESPACE } from '@app-data';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { consoleError, doc, getHostRef, nextTick, plt, writeTask } from '@platform';
-import { HYDRATED_CLASS, PLATFORM_FLAGS } from './runtime-constants';
+import { PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 import { createTime } from './profile';
 
-export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) =>  {
+export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) => {
   if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$) {
     ancestorComponent['s-p'].push(new Promise(r => hostRef.$onRenderResolve$ = r));
   }
@@ -77,7 +77,7 @@ const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boole
   }
 
   const endRender = createTime('render', hostRef.$cmpMeta$.$tagName$);
-  if (BUILD.isDev)  {
+  if (BUILD.isDev) {
     hostRef.$flags$ |= HOST_FLAGS.devOnRender;
   }
 
@@ -191,16 +191,15 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
 
     if (BUILD.asyncLoading && BUILD.cssAnnotations) {
       // DOM WRITE!
-      // add the css class that this element has officially hydrated
-      elm.classList.add(HYDRATED_CLASS);
+      addHydratedFlag(elm);
     }
 
     if (BUILD.cmpDidLoad) {
-      if (BUILD.isDev)  {
+      if (BUILD.isDev) {
         hostRef.$flags$ |= HOST_FLAGS.devOnDidLoad;
       }
       safeCall(instance, 'componentDidLoad');
-      if (BUILD.isDev)  {
+      if (BUILD.isDev) {
         hostRef.$flags$ &= ~HOST_FLAGS.devOnDidLoad;
       }
     }
@@ -210,7 +209,7 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
 
     if (BUILD.asyncLoading) {
       hostRef.$onReadyResolve$(elm);
-      if (!ancestorComponent)  {
+      if (!ancestorComponent) {
         appDidLoad(tagName);
       }
     }
@@ -221,7 +220,7 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
       // fire off the user's componentDidUpdate method (if one was provided)
       // componentDidUpdate runs AFTER render() has been called
       // and all child components have finished updating
-      if (BUILD.isDev)  {
+      if (BUILD.isDev) {
         hostRef.$flags$ |= HOST_FLAGS.devOnRender;
       }
       safeCall(instance, 'componentDidUpdate');
@@ -277,7 +276,7 @@ export const appDidLoad = (who: string) => {
   // on appload
   // we have finish the first big initial render
   if (BUILD.cssAnnotations) {
-    doc.documentElement.classList.add(HYDRATED_CLASS);
+    addHydratedFlag(doc.documentElement);
   }
   if (!BUILD.hydrateServerSide) {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
@@ -317,6 +316,12 @@ const emitLifecycleEvent = (elm: EventTarget, lifecycleName: string) => {
   }
 };
 
+const addHydratedFlag = (elm: Element) =>
+  BUILD.hydratedClass ?
+    elm.classList.add('hydrated') :
+    BUILD.hydratedAttribute ?
+      elm.setAttribute('hydrated', '') :
+      undefined;
 
 const serverSideConnected = (elm: any) => {
   const children = elm.children;

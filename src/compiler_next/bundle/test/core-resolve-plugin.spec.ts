@@ -1,4 +1,4 @@
-import { getStencilInternalModule } from '../core-resolve-plugin';
+import { getHydratedFlagHead, getStencilInternalModule } from '../core-resolve-plugin';
 
 
 describe('core resolve plugin', () => {
@@ -23,6 +23,50 @@ describe('core resolve plugin', () => {
     const internalModule = 'client';
     const m = getStencilInternalModule(rootDir, compilerExe, internalModule);
     expect(m).toBe('/Users/me/node_modules/stencil/internal/client/index.mjs');
+  });
+
+  it('should not set initialValue', () => {
+    const o = getHydratedFlagHead({
+      name: 'yup',
+      selector: 'class',
+      property: 'display',
+      initialValue: null,
+      hydratedValue: 'block',
+    });
+    expect(o).toBe(`.yup{display:block}`);
+  });
+
+  it('should not set hydratedValue', () => {
+    const o = getHydratedFlagHead({
+      name: 'yup',
+      selector: 'class',
+      property: 'display',
+      initialValue: 'none',
+      hydratedValue: null,
+    });
+    expect(o).toBe(`{display:none}`);
+  });
+
+  it('should set class selector', () => {
+    const o = getHydratedFlagHead({
+      name: 'yup',
+      selector: 'class',
+      property: 'display',
+      initialValue: 'none',
+      hydratedValue: 'block',
+    });
+    expect(o).toBe(`{display:none}.yup{display:block}`);
+  });
+
+  it('should set attribute selector', () => {
+    const o = getHydratedFlagHead({
+      name: 'yup',
+      selector: 'attribute',
+      property: 'display',
+      initialValue: 'none',
+      hydratedValue: 'block',
+    });
+    expect(o).toBe(`{display:none}[yup]{display:block}`);
   });
 
 });

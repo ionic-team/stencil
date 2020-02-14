@@ -33,4 +33,6 @@ export function resetBuildConditionals(b: d.BuildConditionals) {
   b.hydrateServerSide = false;
   b.cssAnnotations = false;
   b.style = false;
+  b.hydratedAttribute = false;
+  b.hydratedClass = true;
 }

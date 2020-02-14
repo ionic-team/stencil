@@ -12,7 +12,7 @@ export function getBuildFeatures(cmps: ComponentCompilerMeta[]) {
   const f: BuildFeatures = {
     allRenderFn: cmps.every(c => c.hasRenderFn),
     cmpDidLoad: cmps.some(c => c.hasComponentDidLoadFn),
-    cmpShouldUpdate:  cmps.some(c => c.hasComponentShouldUpdateFn),
+    cmpShouldUpdate: cmps.some(c => c.hasComponentShouldUpdateFn),
     cmpDidUnload: cmps.some(c => c.hasComponentDidUnloadFn),
     cmpDidUpdate: cmps.some(c => c.hasComponentDidUpdateFn),
     cmpDidRender: cmps.some(c => c.hasComponentDidRenderFn),
@@ -138,6 +138,16 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.cssAnnotations = true;
   b.appendChildSlotFix = config.extras.appendChildSlotFix;
   b.cloneNodeFix = config.extras.cloneNodeFix;
-  b.dynamicImportShim = config.extras.dynamicImportShim !== false;
+  b.dynamicImportShim = config.extras.dynamicImportShim;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
+  b.shadowDomShim = config.extras.shadowDomShim;
+  b.safari10 = config.extras.safari10;
+
+  if (config.hydratedFlag) {
+    b.hydratedAttribute = config.hydratedFlag.selector === 'attribute';
+    b.hydratedClass = config.hydratedFlag.selector === 'class';
+  } else {
+    b.hydratedAttribute = false;
+    b.hydratedClass = false;
+  }
 };

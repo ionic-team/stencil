@@ -2,6 +2,7 @@ import { Config, ConfigBundle, Diagnostic } from '../../declarations';
 import { buildError, isBoolean, sortBy, buildWarn } from '@utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace } from '../../compiler/config/validate-namespace';
+import { validateHydrated } from './validate-hydrated';
 import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './outputs';
 import { validatePaths } from './validate-paths';
@@ -39,8 +40,11 @@ export const validateConfig = (userConfig?: Config) => {
   config.extras = config.extras || {};
   config.extras.appendChildSlotFix = !!config.extras.appendChildSlotFix;
   config.extras.cloneNodeFix = !!config.extras.cloneNodeFix;
-  config.extras.cssVarsShim = isBoolean(config.extras.cssVarsShim) ? config.extras.cssVarsShim : true;
+  config.extras.cssVarsShim = config.extras.cssVarsShim !== false;
+  config.extras.dynamicImportShim = config.extras.dynamicImportShim !== false;
   config.extras.lifecycleDOMEvents = !!config.extras.lifecycleDOMEvents;
+  config.extras.safari10 = config.extras.safari10 !== false;
+  config.extras.shadowDomShim = config.extras.shadowDomShim !== false;
 
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
@@ -91,6 +95,9 @@ export const validateConfig = (userConfig?: Config) => {
 
   // testing
   validateTesting(config, diagnostics);
+
+  // hydrate flag
+  config.hydratedFlag = validateHydrated(config);
 
   // bundles
   if (Array.isArray(config.bundles)) {

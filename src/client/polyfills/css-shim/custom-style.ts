@@ -3,8 +3,9 @@ import { executeTemplate } from './template';
 import { CSSScope } from './interfaces';
 import { addGlobalStyle, parseCSS, reScope, updateGlobalScopes } from './scope';
 import { getActiveSelectors, resolveValues } from './selectors';
+import { CssVarShim } from '../../../declarations';
 
-export class CustomStyle {
+export class CustomStyle implements CssVarShim {
 
   private count = 0;
   private hostStyleMap = new WeakMap<HTMLElement, HTMLStyleElement>();
@@ -17,9 +18,9 @@ export class CustomStyle {
   constructor(
     private win: Window,
     private doc: Document,
-  ) {}
+  ) { }
 
-  initShim() {
+  i() {
     if (this.didInit || !this.win.requestAnimationFrame) {
       return Promise.resolve();
     }

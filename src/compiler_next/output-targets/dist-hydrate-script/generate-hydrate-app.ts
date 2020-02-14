@@ -67,7 +67,7 @@ const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerC
   if (!buildCtx.hasError) {
     try {
       const cmps = buildCtx.components;
-      const build = getBuildConditionals(config, cmps);
+      const build = getHydrateBuildConditionals(config, cmps);
 
       const appFactoryEntryCode = await generateHydrateFactoryEntry(buildCtx);
 
@@ -115,7 +115,7 @@ const generateHydrateFactoryEntry = async (buildCtx: d.BuildCtx) => {
 };
 
 
-const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
+const getHydrateBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
 
   build.lazyLoad = true;
@@ -128,6 +128,8 @@ const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[])
   build.hotModuleReplacement = false;
   build.cloneNodeFix = false;
   build.appendChildSlotFix = false;
+  build.safari10 = false;
+  build.shadowDomShim = false;
 
   return build;
 };

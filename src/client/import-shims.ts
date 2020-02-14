@@ -1,18 +1,20 @@
 import * as d from '../declarations';
 import { BUILD, NAMESPACE } from '@app-data';
 import { consoleDevInfo } from './client-log';
-import { H, doc, plt, win } from './client-window';
+import { CSS, H, doc, plt, win } from './client-window';
 import { getDynamicImportFunction } from '@utils';
 
 
 export const patchEsm = () => {
   // @ts-ignore
-  if (BUILD.cssVarShim && !(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'))) {
+  if (BUILD.cssVarShim && !(CSS && CSS.supports && CSS.supports('color', 'var(--c)'))) {
     // @ts-ignore
     return import(/* webpackChunkName: "stencil-polyfills-css-shim" */ './polyfills/css-shim.js').then(() => {
-      plt.$cssShim$ = (win as any).__stencil_cssshim;
-      if (plt.$cssShim$) {
-        return plt.$cssShim$.initShim();
+      if (plt.$cssShim$ = (win as any).__cssshim) {
+        return plt.$cssShim$.i();
+      } else {
+        // for better minification
+        return 0;
       }
     });
   }
@@ -27,7 +29,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
 
   if (BUILD.cssVarShim) {
     // shim css vars
-    plt.$cssShim$ = (win as any).__stencil_cssshim;
+    plt.$cssShim$ = (win as any).__cssshim;
   }
 
   if (BUILD.cloneNodeFix) {
@@ -37,7 +39,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
 
   if (BUILD.profile && !performance.mark) {
     // not all browsers support performance.mark/measure (Safari 10)
-    performance.mark = performance.measure = () => {/*noop*/};
+    performance.mark = performance.measure = () => {/*noop*/ };
     performance.getEntriesByName = () => [];
   }
 
@@ -49,7 +51,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   const opts = (scriptElm as any)['data-opts'] || {};
   const importMeta = import.meta.url;
 
-  if ('onbeforeload' in scriptElm && !history.scrollRestoration /* IS_ESM_BUILD */) {
+  if (BUILD.safari10 && 'onbeforeload' in scriptElm && !history.scrollRestoration /* IS_ESM_BUILD */) {
     // Safari < v11 support: This IF is true if it's Safari below v11.
     // This fn cannot use async/await since Safari didn't support it until v11,
     // however, Safari 10 did support modules. Safari 10 also didn't support "nomodule",
@@ -57,22 +59,22 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
     // has 'onbeforeload' in the script, and "history.scrollRestoration" was added
     // to Safari in v11. Return a noop then() so the async/await ESM code doesn't continue.
     // IS_ESM_BUILD is replaced at build time so this check doesn't happen in systemjs builds.
-    return { then() {/* promise noop */} } as any;
+    return { then() {/* promise noop */ } } as any;
   }
 
-  if (importMeta !== '') {
+  if (!BUILD.safari10 && importMeta !== '') {
     opts.resourcesUrl = new URL('.', importMeta).href;
 
-  } else {
+  } else if (BUILD.dynamicImportShim || BUILD.safari10) {
     opts.resourcesUrl = new URL('.', new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href)).href;
     if (BUILD.dynamicImportShim) {
       patchDynamicImport(opts.resourcesUrl, scriptElm);
     }
 
-    if (!window.customElements) {
+    if (BUILD.dynamicImportShim && !win.customElements) {
       // module support, but no custom elements support (Old Edge)
       // @ts-ignore
-     return import(/* webpackChunkName: "stencil-polyfills-dom" */ './polyfills/dom.js').then(() => opts);
+      return import(/* webpackChunkName: "stencil-polyfills-dom" */ './polyfills/dom.js').then(() => opts);
     }
   }
   return Promise.resolve(opts);
@@ -117,7 +119,7 @@ const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
 const patchCloneNodeFix = (HTMLElementPrototype: any) => {
   const nativeCloneNodeFn = HTMLElementPrototype.cloneNode;
 
-  HTMLElementPrototype.cloneNode = function(this: Node, deep: boolean) {
+  HTMLElementPrototype.cloneNode = function (this: Node, deep: boolean) {
     if (this.nodeName === 'TEMPLATE') {
       return nativeCloneNodeFn.call(this, deep);
     }

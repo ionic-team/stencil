@@ -79,8 +79,8 @@ async function getSystemLoader(config: d.Config, compilerCtx: d.CompilerCtx, cor
       System.import(url.href);
     };
 
-    if (window.__stencil_cssshim) {
-      window.__stencil_cssshim.initShim().then(start);
+    if (window.__cssshim) {
+      window.__cssshim.i().then(start);
     } else {
       start();
     }

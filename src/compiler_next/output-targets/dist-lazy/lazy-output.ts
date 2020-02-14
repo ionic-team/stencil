@@ -141,7 +141,7 @@ const getLazyEntry = (isBrowser: boolean) => {
   }
 
   return s.toString();
-} ;
+};
 
 const generateLegacyLoader = (config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) => {
   return Promise.all(

@@ -12,9 +12,11 @@ export async function generateEsmBrowser(config: d.Config, compilerCtx: d.Compil
       entryFileNames: '[name].esm.js',
       chunkFileNames: config.hashFileNames ? 'p-[hash].js' : '[name]-[hash].js',
       preferConst: true,
-      // This is needed until Firefox 67, which ships native dynamic imports
-      dynamicImportFunction: getDynamicImportFunction(config.fsNamespace)
     };
+    if (config.extras.dynamicImportShim) {
+      // for Edge 18 and below
+      esmOpts.dynamicImportFunction = getDynamicImportFunction(config.fsNamespace);
+    }
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules) as d.RollupChunkResult[];
 
     if (output != null) {

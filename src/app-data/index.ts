@@ -61,6 +61,8 @@ export const BUILD: BuildConditionals = /* default */ {
   appendChildSlotFix: false,
   cloneNodeFix: false,
   lifecycleDOMEvents: false,
+  hydratedAttribute: false,
+  hydratedClass: true,
 };
 
 export const NAMESPACE = /* default */ 'app' as string;

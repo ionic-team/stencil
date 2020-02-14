@@ -196,7 +196,11 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   appendChildSlotFix?: boolean;
   cloneNodeFix?: boolean;
   dynamicImportShim?: boolean;
+  hydratedAttribute?: boolean;
+  hydratedClass?: boolean;
   initializeNextTick?: boolean;
+  safari10?: boolean;
+  shadowDomShim?: boolean;
 }
 
 export type ModuleFormat =
@@ -1144,9 +1148,9 @@ export interface HostRuleHeader {
   value?: string;
 }
 
-export interface CssVarSim {
-  initShim(): Promise<void>;
-  addLink(linkEl: HTMLLinkElement): HTMLLinkElement;
+export interface CssVarShim {
+  i(): Promise<any>;
+  addLink(linkEl: HTMLLinkElement): Promise<any>;
   addGlobalStyle(styleEl: HTMLStyleElement): void;
 
   createHostStyle(
@@ -1884,7 +1888,7 @@ export interface PlatformRuntime {
   ael: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   rel: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   $orgLocNodes$?: Map<string, RenderNode>;
-  $cssShim$?: CssVarSim;
+  $cssShim$?: CssVarShim;
 }
 
 export type RefMap = WeakMap<any, HostRef>;
