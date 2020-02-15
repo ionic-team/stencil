@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import { CMP_FLAGS } from '@utils';
 import { convertValueToLiteral, createStaticGetter } from '../../../compiler/transformers/transform-utils';
 import ts from 'typescript';
-import { addStaticStyle } from '../../../compiler_next/transformers/add-static-style';
+import { addStaticStyleGetterWithinClass } from '../../../compiler_next/transformers/add-static-style';
 import { formatComponentRuntimeMeta } from '../../../compiler/app-core/format-component-runtime-meta';
 
 
@@ -21,7 +21,7 @@ export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d
     cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
   }
   const staticMember = createStaticGetter('cmpMeta', convertValueToLiteral(cmpMeta));
-  addStaticStyle(classMembers, cmp);
+  addStaticStyleGetterWithinClass(classMembers, cmp);
 
   classMembers.push(staticMember);
 };

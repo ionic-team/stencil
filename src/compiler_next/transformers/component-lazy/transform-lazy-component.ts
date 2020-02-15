@@ -12,13 +12,14 @@ export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts
   return transformCtx => {
 
     return tsSourceFile => {
+      const styleStatements: ts.Statement[] = [];
       const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
 
       const visitNode = (node: ts.Node): any => {
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateLazyComponentClass(transformOpts, node, moduleFile, cmp);
+            return updateLazyComponentClass(transformOpts, styleStatements, node, moduleFile, cmp);
           }
         }
         return ts.visitEachChild(node, visitNode, transformCtx);
@@ -34,6 +35,13 @@ export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts
         addLegacyApis(moduleFile);
       }
       tsSourceFile = addImports(transformOpts, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
+
+      if (styleStatements.length > 0) {
+        tsSourceFile = ts.updateSourceFileNode(tsSourceFile, [
+          ...tsSourceFile.statements,
+          ...styleStatements,
+        ]);
+      }
 
       return tsSourceFile;
     };

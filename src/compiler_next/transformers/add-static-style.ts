@@ -5,22 +5,54 @@ import { getScopeId } from '../../compiler/style/scope-css';
 import { scopeCss } from '../../utils/shadow-css';
 import ts from 'typescript';
 
-
-export const addStaticStyle = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
-  if (Array.isArray(cmp.styles) && cmp.styles.length > 0) {
-    if (cmp.styles.length > 1 || (cmp.styles.length === 1 && cmp.styles[0].modeName !== DEFAULT_STYLE_MODE)) {
-      // multiple style modes
-      addMultipleModeStyleGetter(classMembers, cmp, cmp.styles);
-
-    } else {
-      // single style
-      addSingleStyleGetter(classMembers, cmp, cmp.styles[0]);
-    }
+/**
+ * Adds static "style" getter within the class
+ * const MyComponent = class {
+ *   static get style() { return "styles"; }
+ * }
+ */
+export const addStaticStyleGetterWithinClass = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
+  const styleLiteral = getStyleLiteral(cmp);
+  if (styleLiteral) {
+    classMembers.push(createStaticGetter('style', styleLiteral));
   }
 };
 
+/**
+ * Adds static "style" property to the class variable.
+ * const MyComponent = class {}
+ * MyComponent.style = "styles";
+ */
+export const addStaticStylePropertyToClass = (styleStatements: ts.Statement[], cmp: d.ComponentCompilerMeta) => {
+  const styleLiteral = getStyleLiteral(cmp);
+  if (styleLiteral) {
+    const statement = ts.createStatement(ts.createAssignment(
+      ts.createPropertyAccess(
+        ts.createIdentifier(cmp.componentClassName),
+        'style'
+      ),
+      styleLiteral
+    ));
+    styleStatements.push(statement);
+  }
+};
 
-const addMultipleModeStyleGetter = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, styles: d.StyleCompiler[]) => {
+const getStyleLiteral = (cmp: d.ComponentCompilerMeta) => {
+  if (Array.isArray(cmp.styles) && cmp.styles.length > 0) {
+    if (cmp.styles.length > 1 || (cmp.styles.length === 1 && cmp.styles[0].modeName !== DEFAULT_STYLE_MODE)) {
+      // multiple style modes
+      return getMultipleModeStyle(cmp, cmp.styles);
+
+    } else {
+      // single style
+      return getSingleStyle(cmp, cmp.styles[0]);
+    }
+  }
+  return null;
+};
+
+
+const getMultipleModeStyle = (cmp: d.ComponentCompilerMeta, styles: d.StyleCompiler[]) => {
   const styleModes: ts.ObjectLiteralElementLike[] = [];
 
   styles.forEach(style => {
@@ -49,11 +81,8 @@ const addMultipleModeStyleGetter = (classMembers: ts.ClassElement[], cmp: d.Comp
     }
   });
 
-  const styleObj = ts.createObjectLiteral(styleModes, true);
-
-  classMembers.push(createStaticGetter('style', styleObj));
+  return ts.createObjectLiteral(styleModes, true);
 };
-
 
 const createPropertyAssignment = (mode: string, initializer: ts.Expression) => {
   const node = ts.createPropertyAssignment(mode, initializer);
@@ -61,27 +90,29 @@ const createPropertyAssignment = (mode: string, initializer: ts.Expression) => {
   return node;
 };
 
-const addSingleStyleGetter = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
   if (typeof style.styleStr === 'string') {
     // inline the style string
     // static get style() { return "string"; }
-    const styleLiteral = createStyleLiteral(cmp, style);
-    classMembers.push(createStaticGetter('style', styleLiteral));
+    return createStyleLiteral(cmp, style);
+  }
 
-  } else if (typeof style.styleIdentifier === 'string') {
+  if (typeof style.styleIdentifier === 'string') {
     // direct import already written in the source code
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
-    const styleIdentifier = ts.createIdentifier(style.styleIdentifier);
-    classMembers.push(createStaticGetter('style', styleIdentifier));
+    return ts.createIdentifier(style.styleIdentifier);
 
-  } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
+  }
+
+  if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
     // import generated from @Component() styleUrls option
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
-    const styleUrlIdentifier = createStyleIdentifierFromUrl(cmp, style);
-    classMembers.push(createStaticGetter('style', styleUrlIdentifier));
+    return createStyleIdentifierFromUrl(cmp, style);
   }
+
+  return null;
 };
 
 
