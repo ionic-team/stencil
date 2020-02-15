@@ -24,10 +24,10 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const exclude = options.exclude || [];
   const customElements = win.customElements;
   const head = doc.head;
-  const metaCharset = head.querySelector('meta[charset]');
-  const visibilityStyle = doc.createElement('style');
+  const metaCharset = /*@__PURE__*/ head.querySelector('meta[charset]');
+  const visibilityStyle = /*@__PURE__*/ doc.createElement('style');
   const deferredConnectedCallbacks: { connectedCallback: () => void }[] = [];
-  const styles = doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
+  const styles = /*@__PURE__*/ doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
   let appLoadFallback: any;
   let isBootstrapping = true;
   let i = 0;
@@ -173,7 +173,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   if (deferredConnectedCallbacks.length > 0) {
     deferredConnectedCallbacks.forEach(host => host.connectedCallback());
   } else {
-    plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30, 'timeout'));
+    if (BUILD.profile) {
+      plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30, 'timeout'));
+    } else {
+      plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30));
+    }
   }
   // Fallback appLoad event
   endBootstrap();

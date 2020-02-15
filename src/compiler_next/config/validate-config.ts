@@ -44,6 +44,7 @@ export const validateConfig = (userConfig?: Config) => {
   config.extras.dynamicImportShim = config.extras.dynamicImportShim !== false;
   config.extras.lifecycleDOMEvents = !!config.extras.lifecycleDOMEvents;
   config.extras.safari10 = config.extras.safari10 !== false;
+  config.extras.scriptDataOpts = config.extras.scriptDataOpts !== false;
   config.extras.shadowDomShim = config.extras.shadowDomShim !== false;
 
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);

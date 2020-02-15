@@ -44,12 +44,13 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   }
 
   // @ts-ignore
-  const scriptElm = Array.from(doc.querySelectorAll('script')).find(s => (
-    new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) ||
-    s.getAttribute('data-stencil-namespace') === NAMESPACE
-  ));
-  const opts = (scriptElm as any)['data-opts'] || {};
+  const scriptElm = (BUILD.scriptDataOpts || BUILD.safari10 || BUILD.dynamicImportShim) ?
+    Array.from(doc.querySelectorAll('script')).find(s => (
+      new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) ||
+      s.getAttribute('data-stencil-namespace') === NAMESPACE
+    )) : null;
   const importMeta = import.meta.url;
+  const opts = BUILD.scriptDataOpts ? (scriptElm as any)['data-opts'] || {} : {};
 
   if (BUILD.safari10 && 'onbeforeload' in scriptElm && !history.scrollRestoration /* IS_ESM_BUILD */) {
     // Safari < v11 support: This IF is true if it's Safari below v11.

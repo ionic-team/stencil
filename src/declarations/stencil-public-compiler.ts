@@ -242,14 +242,15 @@ export interface ConfigExtras {
   cssVarsShim?: boolean;
 
   /**
+   * Dynamic `import()` shim. This is only needed for Edge 18 and below, and Firefox 67 and below.
+   * Defaults to `true`.
+   */
+  dynamicImportShim?: boolean;
+
+  /**
    * Dispatches component lifecycle events. Mainly used for testing. Defaults to `false`.
    */
   lifecycleDOMEvents?: boolean;
-
-  /**
-   * Dynamic import() shim. This is only needed for Edge 18 and below. Defaults to `true`.
-   */
-  dynamicImportShim?: boolean;
 
   /**
    * Safari 10 supports ES modules with `<script type="module">`, however, it did not implement
@@ -257,6 +258,14 @@ export interface ConfigExtras {
    * Defaults to `true`.
    */
   safari10?: boolean;
+
+  /**
+   * It is possible to assign data to the actual `<script>` element's `data-opts` property,
+   * which then gets passed to Stencil's initial bootstrap. This feature is only required
+   * for very special cases and rarely needed. When set to `false` it will not read
+   * this data. Defaults to `true`.
+   */
+  scriptDataOpts?: boolean;
 
   /**
    * If enabled `true`, the runtime will check if the shadow dom shim is required. However,

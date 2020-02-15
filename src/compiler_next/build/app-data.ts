@@ -140,8 +140,9 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.cloneNodeFix = config.extras.cloneNodeFix;
   b.dynamicImportShim = config.extras.dynamicImportShim;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
-  b.shadowDomShim = config.extras.shadowDomShim;
   b.safari10 = config.extras.safari10;
+  b.scriptDataOpts = config.extras.scriptDataOpts;
+  b.shadowDomShim = config.extras.shadowDomShim;
 
   if (config.hydratedFlag) {
     b.hydratedAttribute = config.hydratedFlag.selector === 'attribute';

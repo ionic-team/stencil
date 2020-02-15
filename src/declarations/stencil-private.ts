@@ -200,6 +200,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   hydratedClass?: boolean;
   initializeNextTick?: boolean;
   safari10?: boolean;
+  scriptDataOpts?: boolean;
   shadowDomShim?: boolean;
 }
 
