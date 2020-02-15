@@ -16,43 +16,43 @@ export const gatherVdomMeta = (m: d.Module | d.ComponentCompilerMeta, args: ts.N
     const objectLiteral = args[1];
     if (ts.isCallExpression(objectLiteral) || ts.isIdentifier(objectLiteral)) {
       m.hasVdomAttribute = true;
-      m.hasVdomKey = true;
       m.hasVdomClass = true;
+      m.hasVdomKey = true;
       m.hasVdomListener = true;
+      m.hasVdomPropOrAttr = true;
       m.hasVdomRef = true;
-      m.hasVdomXlink = true;
       m.hasVdomStyle = true;
+      m.hasVdomXlink = true;
 
     } else if (ts.isObjectLiteralExpression(objectLiteral)) {
       objectLiteral.properties.forEach(prop => {
         m.hasVdomAttribute = true;
         if (ts.isSpreadAssignment(prop) || ts.isComputedPropertyName(prop.name)) {
-          m.hasVdomKey = true;
           m.hasVdomClass = true;
+          m.hasVdomKey = true;
           m.hasVdomListener = true;
-          m.hasVdomXlink = true;
+          m.hasVdomPropOrAttr = true;
           m.hasVdomRef = true;
           m.hasVdomStyle = true;
+          m.hasVdomXlink = true;
 
         } else if (prop.name && (prop.name as any).text && (prop.name as any).text.length > 0) {
           const attrName = (prop.name as any).text;
           if (attrName === 'key') {
             m.hasVdomKey = true;
-          }
-          if (attrName === 'ref') {
+          } else if (attrName === 'ref') {
             m.hasVdomRef = true;
-          }
-          if (attrName === 'class' || attrName === 'className') {
+          } else if (attrName === 'class' || attrName === 'className') {
             m.hasVdomClass = true;
-          }
-          if (attrName === 'style') {
+          } else if (attrName === 'style') {
             m.hasVdomStyle = true;
-          }
-          if (/^on(-|[A-Z])/.test(attrName)) {
+          } else if (/^on(-|[A-Z])/.test(attrName)) {
             m.hasVdomListener = true;
-          }
-          if (attrName.startsWith('xlink')) {
+          } else if (attrName.startsWith('xlink')) {
             m.hasVdomXlink = true;
+            m.hasVdomPropOrAttr = true;
+          } else {
+            m.hasVdomPropOrAttr = true;
           }
           m.htmlAttrNames.push(attrName);
         }

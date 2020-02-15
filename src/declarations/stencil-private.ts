@@ -124,14 +124,15 @@ export interface BuildFeatures {
   vdomRender: boolean;
   noVdomRender: boolean;
   vdomAttribute: boolean;
-  vdomXlink: boolean;
   vdomClass: boolean;
-  vdomStyle: boolean;
-  vdomKey: boolean;
-  vdomRef: boolean;
-  vdomListener: boolean;
   vdomFunctional: boolean;
+  vdomKey: boolean;
+  vdomListener: boolean;
+  vdomPropOrAttr: boolean;
+  vdomRef: boolean;
+  vdomStyle: boolean;
   vdomText: boolean;
+  vdomXlink: boolean;
   slotRelocation: boolean;
 
   // elements
@@ -878,15 +879,16 @@ export interface ComponentCompilerFeatures {
   hasState: boolean;
   hasStyle: boolean;
   hasVdomAttribute: boolean;
-  hasVdomXlink: boolean;
   hasVdomClass: boolean;
   hasVdomFunctional: boolean;
   hasVdomKey: boolean;
   hasVdomListener: boolean;
+  hasVdomPropOrAttr: boolean;
   hasVdomRef: boolean;
   hasVdomRender: boolean;
   hasVdomStyle: boolean;
   hasVdomText: boolean;
+  hasVdomXlink: boolean;
   hasWatchCallback: boolean;
   htmlAttrNames: string[];
   htmlTagNames: string[];
@@ -1614,15 +1616,16 @@ export interface Module {
 
   // build features
   hasVdomAttribute: boolean;
-  hasVdomXlink: boolean;
   hasVdomClass: boolean;
   hasVdomFunctional: boolean;
   hasVdomKey: boolean;
   hasVdomListener: boolean;
+  hasVdomPropOrAttr: boolean;
   hasVdomRef: boolean;
   hasVdomRender: boolean;
   hasVdomStyle: boolean;
   hasVdomText: boolean;
+  hasVdomXlink: boolean;
 }
 
 export interface Plugin {

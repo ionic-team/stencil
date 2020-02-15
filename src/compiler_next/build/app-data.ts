@@ -59,6 +59,7 @@ export function getBuildFeatures(cmps: ComponentCompilerMeta[]) {
     vdomFunctional: cmps.some(c => c.hasVdomFunctional),
     vdomKey: cmps.some(c => c.hasVdomKey),
     vdomListener: cmps.some(c => c.hasVdomListener),
+    vdomPropOrAttr: cmps.some(c => c.hasVdomPropOrAttr),
     vdomRef: cmps.some(c => c.hasVdomRef),
     vdomRender: cmps.some(c => c.hasVdomRender),
     vdomStyle: cmps.some(c => c.hasVdomStyle),

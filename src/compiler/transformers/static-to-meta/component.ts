@@ -107,6 +107,7 @@ export const parseStaticComponentMeta = (
     hasVdomFunctional: false,
     hasVdomKey: false,
     hasVdomListener: false,
+    hasVdomPropOrAttr: false,
     hasVdomRef: false,
     hasVdomRender: false,
     hasVdomStyle: false,
@@ -130,7 +131,7 @@ export const parseStaticComponentMeta = (
   visitComponentChildNode(cmpNode);
   parseClassMethods(cmpNode, cmp);
 
-  cmp.legacyConnect.forEach(({connect}) => {
+  cmp.legacyConnect.forEach(({ connect }) => {
     cmp.htmlTagNames.push(connect);
     if (connect.includes('-')) {
       cmp.potentialCmpRefs.push(connect);
@@ -157,7 +158,7 @@ export const parseStaticComponentMeta = (
 
 const parseVirtualProps = (docs: d.CompilerJsDoc) => {
   return docs.tags
-    .filter(({name}) => name === 'virtualProp')
+    .filter(({ name }) => name === 'virtualProp')
     .map(parseVirtualProp)
     .filter(prop => !!prop);
 };
