@@ -1,4 +1,4 @@
-# ✈️ [1.9.0-16](https://github.com/ionic-team/stencil/compare/v1.9.0-15...v1.9.0-16) (2020-02-14)
+# 🐈 [1.9.0-17](https://github.com/ionic-team/stencil/compare/v1.9.0-16...v1.9.0-17) (2020-02-16)
 
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
@@ -44,6 +44,11 @@ Some of main features with the `--next` compiler include:
 * add dynamicImportShim as extra ([#2177](https://github.com/ionic-team/stencil/issues/2177)) ([fd81489](https://github.com/ionic-team/stencil/commit/fd8148958a5fd300ff5d634d32106c20afdfb4d8))
 * **e2e:** include global style in e2e html content ([b8e7a8f](https://github.com/ionic-team/stencil/commit/b8e7a8feca1da48ad6662a18a77c6e3a1eec25c7)), closes [#2192](https://github.com/ionic-team/stencil/issues/2192)
 * **hydratedFlag:** ability to configure applied hydrated css class ([62e2168](https://github.com/ionic-team/stencil/commit/62e2168e1f49d3778b269fae10c8b77e30dc1c49))
+* minify dist-custom-elements-bundle in prod mode ([7f90430](https://github.com/ionic-team/stencil/commit/7f904304263a6a9ce9e410f7902b37bd91d4534c))
+* **build:** exclude setting vdom prop/attrs when not used ([381b66d](https://github.com/ionic-team/stencil/commit/381b66d15b4559fc1c9a603c681d22902d38f52d))
+* **extras:** add ability to opt out of scriptDataOpts ([d622712](https://github.com/ionic-team/stencil/commit/d622712d5c84bf6554048d3ad6f508e555e6132b))
+* **minify:** improve minifying core ([747fb7d](https://github.com/ionic-team/stencil/commit/747fb7d61b553d6f4c469dba63c12e6cd8f9cad4))
+* **style:** set static style as property on cmp clss ([ba14fe6](https://github.com/ionic-team/stencil/commit/ba14fe61dd7cb398bd24a8bc7442bf28dfb4f5a6))
 
 
 ### Bug Fixes
