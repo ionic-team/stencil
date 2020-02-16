@@ -1,14 +1,27 @@
 import * as d from '../../declarations';
 import { splitLineBreaks } from '@utils';
-import terser from 'terser';
+import terser, { CompressOptions, MangleOptions, ManglePropertiesOptions, MinifyOptions } from 'terser';
 
 
-export const minifyJs = async (input: string, opts?: any)  => {
-  if (opts && opts.mangle && opts.mangle.properties && opts.mangle.properties.regex) {
-    opts.mangle.properties.regex = new RegExp(opts.mangle.properties.regex);
+export const minifyJs = async (input: string, opts?: MinifyOptions) => {
+  if (opts) {
+    const mangle = opts.mangle as MangleOptions;
+    if (mangle) {
+      const mangleProperties = mangle.properties as ManglePropertiesOptions;
+      if (mangleProperties && mangleProperties.regex) {
+        mangleProperties.regex = new RegExp(mangleProperties.regex);
+      }
+    }
   }
   const result = terser.minify(input, opts);
   const diagnostics = loadMinifyJsDiagnostics(input, result);
+
+  if (diagnostics.length === 0) {
+    const compress = opts.compress as CompressOptions;
+    if (compress && compress.module && result.code.endsWith('};')) {
+      result.code = result.code.substring(0, result.code.length - 1);
+    }
+  }
 
   return {
     output: result.code,

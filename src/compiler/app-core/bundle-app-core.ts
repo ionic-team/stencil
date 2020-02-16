@@ -4,7 +4,7 @@ import { componentEntryPlugin } from '../rollup-plugins/component-entry';
 import { coreResolvePlugin } from '../../compiler_next/bundle/core-resolve-plugin';
 import { createOnWarnFn, getDependencies, loadRollupDiagnostics } from '@utils';
 import { loaderPlugin } from '../rollup-plugins/loader';
-import { imagePlugin } from '../rollup-plugins/image-plugin';
+import { imagePlugin } from '../rollup-plugins/image-plugin';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { OutputOptions, RollupBuild, RollupOptions, TreeshakingOptions } from 'rollup'; // types only
 import { pluginHelper } from '../rollup-plugins/plugin-helper';
@@ -87,7 +87,7 @@ export const generateRollupOutput = async (build: RollupBuild, options: OutputOp
   return output
     .map((chunk) => {
       if (chunk.type === 'chunk') {
-        const isCore = Object.keys(chunk.modules).includes('@stencil/core');
+        const isCore = Object.keys(chunk.modules).some(m => m.includes('@stencil/core'));
         return {
           type: 'chunk',
           fileName: chunk.fileName,
@@ -100,15 +100,15 @@ export const generateRollupOutput = async (build: RollupBuild, options: OutputOp
           isBrowserLoader: chunk.isEntry && chunk.name === config.fsNamespace,
           isIndex: chunk.isEntry && chunk.name === 'index',
           isCore,
-      };
-    } else {
-      return {
-        type: 'asset',
-        fileName: chunk.fileName,
-        content: chunk.source as any
-      };
-    }
-  });
+        };
+      } else {
+        return {
+          type: 'asset',
+          fileName: chunk.fileName,
+          content: chunk.source as any
+        };
+      }
+    });
 };
 
 export const DEFAULT_CORE = `

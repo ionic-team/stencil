@@ -104,7 +104,7 @@ export const generatePreamble = (config: d.Config, opts: { prefix?: string; suff
     });
   }
 
-  if (opts.defaultBanner === true)  {
+  if (opts.defaultBanner === true) {
     preamble.push(BANNER);
   }
 
@@ -124,7 +124,7 @@ export const generatePreamble = (config: d.Config, opts: { prefix?: string; suff
   }
 
 
-  if (opts.defaultBanner === true)  {
+  if (opts.defaultBanner === true) {
     return `/*! ${BANNER} */`;
   }
   return '';
@@ -142,9 +142,9 @@ export function getTextDocs(docs: d.CompilerJsDoc | undefined | null) {
   }
   return `${docs.text.replace(lineBreakRegex, ' ')}
 ${docs.tags
-  .filter(tag => tag.name !== 'internal')
-  .map(tag => `@${tag.name} ${(tag.text || '').replace(lineBreakRegex, ' ')}`)
-  .join('\n')}`.trim();
+      .filter(tag => tag.name !== 'internal')
+      .map(tag => `@${tag.name} ${(tag.text || '').replace(lineBreakRegex, ' ')}`)
+      .join('\n')}`.trim();
 }
 
 export const getDependencies = (buildCtx: d.BuildCtx) => {
@@ -159,11 +159,10 @@ export const hasDependency = (buildCtx: d.BuildCtx, depName: string) => {
   return getDependencies(buildCtx).includes(depName);
 };
 
-export const getDynamicImportFunction = (namespace: string) => {
-  return `__sc_import_${
-    namespace.replace(/\s|-/g, '_')
+export const getDynamicImportFunction = (namespace: string) =>
+  `__sc_import_${
+  namespace.replace(/\s|-/g, '_')
   }`;
-};
 
 export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   try {

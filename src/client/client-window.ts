@@ -33,6 +33,7 @@ export const supportsListenerOptions = /*@__PURE__*/(() => {
   return supportsListenerOptions;
 })();
 
+export const promiseResolve = (v?: any) => Promise.resolve(v);
 
 export const supportsConstructibleStylesheets = BUILD.constructableCSS ? /*@__PURE__*/(() => {
   try {

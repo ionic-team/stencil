@@ -71,6 +71,7 @@
     "@types/rollup-plugin-json": "^3.0.2",
     "@types/semver": "^7.1.0",
     "@types/sizzle": "^2.3.2",
+    "@types/terser": "^3.12.0",
     "@types/webpack": "^4.41.3",
     "@types/ws": "^7.2.0",
     "ansi-colors": "4.1.1",

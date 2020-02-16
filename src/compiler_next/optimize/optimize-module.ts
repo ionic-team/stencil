@@ -3,6 +3,7 @@ import { minfyJsId } from '../../version';
 import { transpileToEs5 } from '../transpile/transpile-to-es5';
 import { minifyJs } from './minify-js';
 import { DEFAULT_STYLE_MODE } from '@utils';
+import { CompressOptions, MangleOptions, MinifyOptions } from 'terser';
 
 interface OptimizeModuleOptions {
   input: string;
@@ -34,24 +35,32 @@ export async function optimizeModule(
     };
   }
 
-  let minifyOpts: any;
+  let minifyOpts: MinifyOptions;
   if (opts.minify) {
-    minifyOpts = getTerserOptions(opts.sourceTarget, isDebug);
+    minifyOpts = getTerserOptions(config, opts.sourceTarget, isDebug);
+    const compressOpts = minifyOpts.compress as CompressOptions;
+    const mangleOptions = minifyOpts.mangle as MangleOptions;
+
     if (opts.sourceTarget !== 'es5' && opts.isCore) {
       if (!isDebug) {
-        minifyOpts.compress.passes = 3;
-        minifyOpts.compress.global_defs = {
+        compressOpts.passes = 3;
+        compressOpts.global_defs = {
           supportsListenerOptions: true,
           'plt.$cssShim$': false
         };
-        minifyOpts.compress.pure_funcs = ['getHostRef', ...minifyOpts.compress.pure_funcs];
+        compressOpts.pure_funcs = ['getHostRef', ...compressOpts.pure_funcs];
       }
 
-      minifyOpts.mangle.properties = {
+      mangleOptions.properties = {
         regex: '^\\$.+\\$$',
         debug: isDebug
       };
+
+      compressOpts.inline = 1;
+      compressOpts.unsafe = true;
+      compressOpts.unsafe_undefined = true;
     }
+
     if (opts.modeName && opts.modeName !== DEFAULT_STYLE_MODE) {
       const regex = new RegExp(`\\/\\*STENCIL:MODE:((?!${opts.modeName}).)*\\*\\/.*$`, 'gm');
       opts.input = opts.input.replace(regex, '');
@@ -71,9 +80,9 @@ export async function optimizeModule(
 }
 
 
-export const getTerserOptions = (sourceTarget: SourceTarget, isDebug: boolean) => {
-  const opts: any = {
-    safari10: true,
+export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, isDebug: boolean) => {
+  const opts: MinifyOptions = {
+    safari10: config.extras.safari10,
     output: {},
   };
 
@@ -94,20 +103,21 @@ export const getTerserOptions = (sourceTarget: SourceTarget, isDebug: boolean) =
       passes: 2,
       pure_funcs: [
         'console.debug'
-      ]
+      ],
     };
 
     opts.ecma = opts.output.ecma = opts.compress.ecma = 8;
     opts.toplevel = true;
     opts.module = true;
     opts.compress.toplevel = true;
-    opts.mangle.toplevel = true;
+    opts.compress.booleans_as_integers =
+      opts.mangle.toplevel = true;
     opts.compress.arrows = true;
     opts.compress.module = true;
   }
 
   if (isDebug) {
-    opts.mangle = {keep_fnames: true};
+    opts.mangle = { keep_fnames: true };
     opts.compress = {};
     opts.compress.drop_console = false;
     opts.compress.drop_debugger = false;
@@ -123,7 +133,7 @@ export const getTerserOptions = (sourceTarget: SourceTarget, isDebug: boolean) =
 
 export const prepareModule = async (
   input: string,
-  minifyOpts: any,
+  minifyOpts: MinifyOptions,
   transpile: boolean,
   inlineHelpers: boolean
 ) => {
