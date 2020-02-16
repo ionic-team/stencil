@@ -72,7 +72,7 @@ export async function optimizeModule(
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
     if (opts.isCore) {
       results.output = results.output
-        .replace(/disconnectedCallback\(\)\{\}/g, '');
+        .replace(/disconnectedCallback\(\)\{\},/g, '');
     }
     await compilerCtx.cache.put(cacheKey, results.output);
   }
