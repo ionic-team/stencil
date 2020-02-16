@@ -55,7 +55,7 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
         minify: config.minifyJs
       });
       buildCtx.diagnostics.push(...optimizeResults.diagnostics);
-      if (hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
+      if (!hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
         code = optimizeResults.output;
       }
 
