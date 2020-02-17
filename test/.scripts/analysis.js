@@ -12,30 +12,22 @@ const rootDir = path.join(__dirname, '..');
 
 
 fileSizeProfile('Hello World App',
-  [
-    path.join(rootDir, 'hello-world', 'www', '*.js'),
-  ],
+  path.join(rootDir, 'hello-world', 'www', 'build'),
   output
 );
 
 fileSizeProfile('Hello VDOM App',
-  [
-    path.join(rootDir, 'hello-vdom', 'www', 'build', '*'),
-  ],
+  path.join(rootDir, 'hello-vdom', 'www', 'build'),
   output
 );
 
 fileSizeProfile('Todo App',
-  [
-    path.join(rootDir, 'todo-app', 'public', 'index.js'),
-  ],
+  path.join(rootDir, 'todo-app', 'www', 'build'),
   output
 );
 
 fileSizeProfile('End-to-end App',
-  [
-    path.join(rootDir, 'end-to-end', 'www', 'build', 'app.js'),
-  ],
+  path.join(rootDir, 'end-to-end', 'www', 'build'),
   output
 );
 

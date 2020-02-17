@@ -12,5 +12,14 @@ export const config: Config = {
       baseUrl: 'https://helloworld.stencil.js.com/'
     }
   ],
-  enableCache: false
+  enableCache: false,
+  hydratedFlag: null,
+  hashFileNames: false,
+  extras: {
+    cssVarsShim: false,
+    dynamicImportShim: false,
+    safari10: false,
+    scriptDataOpts: false,
+    shadowDomShim: false,
+  }
 };

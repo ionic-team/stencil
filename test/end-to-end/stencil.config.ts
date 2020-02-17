@@ -23,6 +23,6 @@ export const config: Config = {
       type: 'experimental-dist-module'
     }
   ],
-  enableCache: false
-
+  enableCache: false,
+  hashFileNames: false,
 };

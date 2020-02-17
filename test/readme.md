@@ -5,46 +5,63 @@
 
 ## Hello World App
 
-| File                       | Brotli   | Gzipped  | Minified |
-|----------------------------|----------|----------|----------|
-| index.js                   | 85B      | 134B     | 140B     |
-| TOTAL                      | 85B      | 134B     | 140B     |
+`hello-world/www/build`
+
+| File                            | Brotli   | Gzipped  | Minified |
+|---------------------------------|----------|----------|----------|
+| hello-world.entry.js            | 105B     | 133B     | 129B     |
+| helloworld.esm.js               | 88B      | 108B     | 103B     |
+| index-hash.js                   | 1.98KB   | 2.18KB   | 4.48KB   |
+| TOTAL                           | 2.17KB   | 2.42KB   | 4.70KB   |
 
 
 
 ## Hello VDOM App
 
-| File                       | Brotli   | Gzipped  | Minified |
-|----------------------------|----------|----------|----------|
-| app.esm.js                 | 87B      | 102B     | 97B      |
-| app.js                     | 36.72KB  | 41.28KB  | 132.10KB |
-| hello-vdom.entry.js        | 116B     | 146B     | 145B     |
-| hello-vdom.system.entry.js | 175B     | 213B     | 276B     |
-| index.esm.js               | ERROR    | ERROR    | ERROR    |
-| p-04a3b409.js              | 2.12KB   | 2.37KB   | 4.61KB   |
-| p-0e8365cd.system.js       | 3.35KB   | 3.73KB   | 9.20KB   |
-| p-1635c1a0.js              | 2.95KB   | 3.24KB   | 8.06KB   |
-| p-2ddc72bd.system.js       | 148B     | 175B     | 222B     |
-| p-50ea2036.system.js       | 59B      | 86B      | 76B      |
-| p-5b416380.system.js       | 4.91KB   | 5.56KB   | 18.63KB  |
-| p-9b741424.system.js       | 3.10KB   | 3.43KB   | 8.96KB   |
-| p-d0882b30.js              | 4.85KB   | 5.51KB   | 18.13KB  |
-| TOTAL                      | 58.57KB  | 65.83KB  | 200.48KB |
+`hello-vdom/www/build`
+
+| File                            | Brotli   | Gzipped  | Minified |
+|---------------------------------|----------|----------|----------|
+| app.esm.js                      | 141B     | 171B     | 211B     |
+| app.js                          | 1.24KB   | 1.68KB   | 4.88KB   |
+| core-hash.js                    | 20.86KB  | 24.64KB  | 106.42KB |
+| index.esm.js                    | -        | 44B      | 24B      |
+| TOTAL                           | 22.24KB  | 26.54KB  | 111.53KB |
 
 
 
 ## Todo App
 
-| File                       | Brotli   | Gzipped  | Minified |
-|----------------------------|----------|----------|----------|
-| index.js                   | 2.18KB   | 2.44KB   | 5.16KB   |
-| TOTAL                      | 2.18KB   | 2.44KB   | 5.16KB   |
+`todo-app/www/build`
+
+| File                            | Brotli   | Gzipped  | Minified |
+|---------------------------------|----------|----------|----------|
+| app-root_3.entry.js             | 574B     | 683B     | 1.46KB   |
+| app.esm.js                      | 127B     | 159B     | 180B     |
+| index-hash.js                   | 2.69KB   | 2.95KB   | 5.81KB   |
+| TOTAL                           | 3.37KB   | 3.77KB   | 7.45KB   |
 
 
 
 ## End-to-end App
 
-| File                       | Brotli   | Gzipped  | Minified |
-|----------------------------|----------|----------|----------|
-| TOTAL                      | ERROR    | ERROR    | ERROR    |
+`end-to-end/www/build`
+
+| File                            | Brotli   | Gzipped  | Minified |
+|---------------------------------|----------|----------|----------|
+| app-globals-hash.js             | 103B     | 111B     | 103B     |
+| app-root_2-ios.entry.js         | 449B     | 572B     | 912B     |
+| app-root_2-md.entry.js          | 449B     | 572B     | 911B     |
+| build-data.entry.js             | 155B     | 193B     | 272B     |
+| car-detail.entry.js             | 163B     | 211B     | 270B     |
+| car-list.entry.js               | 326B     | 408B     | 662B     |
+| element-cmp.entry.js            | 183B     | 228B     | 332B     |
+| endtoend.esm.js                 | 414B     | 484B     | 1007B    |
+| event-cmp.entry.js              | 237B     | 243B     | 473B     |
+| index-hash.js                   | 4.27KB   | 4.69KB   | 9.74KB   |
+| listen-cmp.entry.js             | 107B     | 140B     | 157B     |
+| method-cmp.entry.js             | 136B     | 170B     | 208B     |
+| path-alias-cmp.entry.js         | 112B     | 140B     | 144B     |
+| state-cmp.entry.js              | 274B     | 336B     | 511B     |
+| TOTAL                           | 7.31KB   | 8.41KB   | 15.57KB  |
 
