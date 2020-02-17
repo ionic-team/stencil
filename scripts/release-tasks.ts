@@ -55,28 +55,28 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
       task: () => execa('git', ['fetch'])
         .then(() => execa('npm', ['config', 'get', 'tag-version-prefix']))
         .then(
-          ({stdout}) => tagPrefix = stdout,
-          () => {}
+          ({ stdout }) => tagPrefix = stdout,
+          () => { }
         )
         .then(() => execa('git', ['rev-parse', '--quiet', '--verify', `refs/tags/${tagPrefix}${newVersion}`]))
-        .then(({stdout}) => {
+        .then(({ stdout }) => {
           if (stdout) {
             throw new Error(`Git tag \`${tagPrefix}${newVersion}\` already exists.`);
           }
         },
-        err => {
-          // Command fails with code 1 and no output if the tag does not exist, even though `--quiet` is provided
-          // https://github.com/sindresorhus/np/pull/73#discussion_r72385685
-          if (err.stdout !== '' || err.stderr !== '') {
-            throw err;
+          err => {
+            // Command fails with code 1 and no output if the tag does not exist, even though `--quiet` is provided
+            // https://github.com/sindresorhus/np/pull/73#discussion_r72385685
+            if (err.stdout !== '' || err.stderr !== '') {
+              throw err;
+            }
           }
-        }
-      ),
+        ),
       skip: () => isDryRun,
     },
     {
       title: 'Check current branch',
-      task: () => execa('git', ['symbolic-ref', '--short', 'HEAD']).then(({stdout}) => {
+      task: () => execa('git', ['symbolic-ref', '--short', 'HEAD']).then(({ stdout }) => {
         if (stdout !== 'master' && !isAnyBranch) {
           throw new Error('Not on `master` branch. Use --any-branch to publish anyway.');
         }
@@ -85,7 +85,7 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
     },
     {
       title: 'Check local working tree',
-      task: () => execa('git', ['status', '--porcelain']).then(({stdout}) => {
+      task: () => execa('git', ['status', '--porcelain']).then(({ stdout }) => {
         if (stdout !== '') {
           throw new Error('Unclean working tree. Commit or stash changes first.');
         }
@@ -94,7 +94,7 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
     },
     {
       title: 'Check remote history',
-      task: () => execa('git', ['rev-list', '--count', '--left-only', '@{u}...HEAD']).then(({stdout}) => {
+      task: () => execa('git', ['rev-list', '--count', '--left-only', '@{u}...HEAD']).then(({ stdout }) => {
         if (stdout !== '0' && !isAnyBranch) {
           throw new Error('Remote history differs. Please pull changes.');
         }
@@ -120,6 +120,10 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
       {
         title: 'Run karma tests',
         task: () => execa('npm', ['run', 'test.karma.prod'], { cwd: rootDir })
+      },
+      {
+        title: 'Run Test Size Analysis',
+        task: () => execa('npm', ['run', 'test.analysis'], { cwd: rootDir })
       },
       {
         title: 'Build license',
