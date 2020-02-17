@@ -1,15 +1,16 @@
 import * as d from '../../declarations';
 import { buildError, sortBy } from '@utils';
+import { setArrayConfig, setBooleanConfig, setNumberConfig } from './config-utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace, validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './validate-outputs';
 import { validatePaths } from './validate-paths';
-import { setArrayConfig, setBooleanConfig, setNumberConfig } from './config-utils';
-import { validateTesting } from './validate-testing';
-import { validateWorkers } from './validate-workers';
+import { validateHydrated } from '../../compiler_next/config/validate-hydrated';
 import { validateOutputTargetCustom } from './validate-outputs-custom';
 import { validatePlugins } from './validate-plugins';
 import { validateRollupConfig } from './validate-rollup-config';
+import { validateTesting } from './validate-testing';
+import { validateWorkers } from './validate-workers';
 
 export function validateConfig(config: d.Config): { config: d.Config, diagnostics: d.Diagnostic[] } {
   const diagnostics: d.Diagnostic[] = [];
@@ -141,6 +142,8 @@ export function validateConfig(config: d.Config): { config: d.Config, diagnostic
   validateRollupConfig(config);
   validateTesting(config, diagnostics);
   validateOutputTargetCustom(config, diagnostics);
+
+  config.hydratedFlag = validateHydrated(config);
 
   return {
     config,
