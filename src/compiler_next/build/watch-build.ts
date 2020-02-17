@@ -16,6 +16,8 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   let closeResolver: Function;
   const watchWaiter = new Promise<d.WatcherCloseResults>(resolve => closeResolver = resolve);
 
+  const dirsAdded = new Set<string>();
+  const dirsDeleted = new Set<string>();
   const filesAdded = new Set<string>();
   const filesUpdated = new Set<string>();
   const filesDeleted = new Set<string>();
@@ -24,6 +26,8 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     compilerCtx.fs.clearFileCache(file);
     compilerCtx.changedFiles.add(file);
     switch (kind) {
+      case 'dirAdd': dirsAdded.add(file); break;
+      case 'dirDelete': dirsDeleted.add(file); break;
       case 'fileAdd': filesAdded.add(file); break;
       case 'fileUpdate': filesUpdated.add(file); break;
       case 'fileDelete': filesDeleted.add(file); break;
@@ -36,6 +40,8 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     const buildCtx = new BuildContext(config, compilerCtx);
     buildCtx.isRebuild = isRebuild;
     buildCtx.requiresFullBuild = !isRebuild;
+    buildCtx.dirsAdded = Array.from(dirsAdded.keys()).sort();
+    buildCtx.dirsDeleted = Array.from(dirsDeleted.keys()).sort();
     buildCtx.filesAdded = Array.from(filesAdded.keys()).sort();
     buildCtx.filesUpdated = Array.from(filesUpdated.keys()).sort();
     buildCtx.filesDeleted = Array.from(filesDeleted.keys()).sort();
@@ -47,9 +53,13 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     buildCtx.hasHtmlChanges = hasHtmlChanges(config, buildCtx);
     buildCtx.hasServiceWorkerChanges = hasServiceWorkerChanges(config, buildCtx);
 
+    dirsAdded.clear();
+    dirsDeleted.clear();
     filesAdded.clear();
     filesUpdated.clear();
     filesDeleted.clear();
+
+    emitFsChange(compilerCtx, buildCtx);
 
     buildCtx.start();
 
@@ -114,8 +124,8 @@ export const watchSrcDirectory = async (config: d.Config, compilerCtx: d.Compile
   });
 
   files
-    .filter(({isFile}) => isFile)
-    .forEach(({absPath}) => watchFile(absPath));
+    .filter(({ isFile }) => isFile)
+    .forEach(({ absPath }) => watchFile(absPath));
 
   watching.set(
     config.srcDir,
@@ -131,3 +141,21 @@ export const watchSrcDirectory = async (config: d.Config, compilerCtx: d.Compile
     }
   };
 };
+
+const emitFsChange = (compilerCtx: d.CompilerCtx, buildCtx: BuildContext) => {
+  if (buildCtx.dirsAdded.length > 0 ||
+    buildCtx.dirsDeleted.length > 0 ||
+    buildCtx.filesUpdated.length > 0 ||
+    buildCtx.filesAdded.length > 0 ||
+    buildCtx.filesDeleted.length > 0) {
+
+    compilerCtx.events.emit('fsChange', {
+      dirsAdded: buildCtx.dirsAdded.slice(),
+      dirsDeleted: buildCtx.dirsDeleted.slice(),
+      filesUpdated: buildCtx.filesUpdated.slice(),
+      filesAdded: buildCtx.filesAdded.slice(),
+      filesDeleted: buildCtx.filesDeleted.slice(),
+    });
+
+  }
+}

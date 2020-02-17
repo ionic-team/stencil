@@ -703,18 +703,12 @@ export interface CompilerBuildStart {
 
 export type CompilerFileWatcherCallback = (fileName: string, eventKind: CompilerFileWatcherEvent) => void;
 
-export type CompilerFileWatcherEvent = CompilerEventFileAdd | CompilerEventFileDelete | CompilerEventFileUpdate;
-
-export type CompilerEventFsChange = 'fsChange';
-export type CompilerEventFileUpdate = 'fileUpdate';
-export type CompilerEventFileAdd = 'fileAdd';
-export type CompilerEventFileDelete = 'fileDelete';
-export type CompilerEventDirAdd = 'dirAdd';
-export type CompilerEventDirDelete = 'dirDelete';
-export type CompilerEventBuildStart = 'buildStart';
-export type CompilerEventBuildFinish = 'buildFinish';
-export type CompilerEventBuildLog = 'buildLog';
-export type CompilerEventBuildNoChange = 'buildNoChange';
+export type CompilerFileWatcherEvent =
+  CompilerEventFileAdd |
+  CompilerEventFileDelete |
+  CompilerEventFileUpdate |
+  CompilerEventDirAdd |
+  CompilerEventDirDelete;
 
 export type CompilerEventName =
   CompilerEventFsChange |
@@ -727,6 +721,17 @@ export type CompilerEventName =
   CompilerEventBuildFinish |
   CompilerEventBuildNoChange |
   CompilerEventBuildLog;
+
+export type CompilerEventFsChange = 'fsChange';
+export type CompilerEventFileUpdate = 'fileUpdate';
+export type CompilerEventFileAdd = 'fileAdd';
+export type CompilerEventFileDelete = 'fileDelete';
+export type CompilerEventDirAdd = 'dirAdd';
+export type CompilerEventDirDelete = 'dirDelete';
+export type CompilerEventBuildStart = 'buildStart';
+export type CompilerEventBuildFinish = 'buildFinish';
+export type CompilerEventBuildLog = 'buildLog';
+export type CompilerEventBuildNoChange = 'buildNoChange';
 
 export interface CompilerFileWatcher {
   close(): void;
