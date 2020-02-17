@@ -4,13 +4,12 @@ import { parseStyleDocs } from '../docs/style-docs';
 import { stripCssComments } from './style-utils';
 
 
-export async function parseCssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, srcFilePath: string, resolvedFilePath: string, styleText: string, styleDocs?: d.StyleDoc[]) {
+export const parseCssImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, srcFilePath: string, resolvedFilePath: string, styleText: string, styleDocs?: d.StyleDoc[]) => {
   const isCssEntry = resolvedFilePath.toLowerCase().endsWith('.css');
   return cssImports(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, resolvedFilePath, styleText, [], styleDocs);
-}
+};
 
-
-async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, resolvedFilePath: string, styleText: string, noLoop: string[], styleDocs?: d.StyleDoc[]) {
+const cssImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, resolvedFilePath: string, styleText: string, noLoop: string[], styleDocs?: d.StyleDoc[]) => {
   if (noLoop.includes(resolvedFilePath)) {
     return styleText;
   }
@@ -30,10 +29,9 @@ async function cssImports(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
   }));
 
   return replaceImportDeclarations(styleText, cssImports, isCssEntry);
-}
+};
 
-
-async function concatCssImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, cssImportData: d.CssImportData, noLoop: string[], styleDocs?: d.StyleDoc[]) {
+const concatCssImport = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, cssImportData: d.CssImportData, noLoop: string[], styleDocs?: d.StyleDoc[]) => {
   cssImportData.styleText = await loadStyleText(compilerCtx, cssImportData);
 
   if (typeof cssImportData.styleText === 'string') {
@@ -44,10 +42,9 @@ async function concatCssImport(config: d.Config, compilerCtx: d.CompilerCtx, bui
     err.messageText = `Unable to read css import: ${cssImportData.srcImport}`;
     err.absFilePath = srcFilePath;
   }
-}
+};
 
-
-async function loadStyleText(compilerCtx: d.CompilerCtx, cssImportData: d.CssImportData) {
+const loadStyleText = async (compilerCtx: d.CompilerCtx, cssImportData: d.CssImportData) => {
   let styleText: string = null;
 
   try {
@@ -58,15 +55,14 @@ async function loadStyleText(compilerCtx: d.CompilerCtx, cssImportData: d.CssImp
       try {
         styleText = await compilerCtx.fs.readFile(cssImportData.filePath);
 
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 
   return styleText;
-}
+};
 
-
-export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: string, styleText: string) {
+export const getCssImports = (config: d.Config, buildCtx: d.BuildCtx, filePath: string, styleText: string) => {
   const imports: d.CssImportData[] = [];
 
   if (!styleText.includes('@import')) {
@@ -126,17 +122,15 @@ export function getCssImports(config: d.Config, buildCtx: d.BuildCtx, filePath: 
 
 const IMPORT_RE = /(@import)\s+(url\()?\s?(.*?)\s?\)?([^;]*);?/gi;
 
-
-export function isCssNodeModule(url: string) {
+export const isCssNodeModule = (url: string) => {
   return url.startsWith('~');
-}
+};
 
-
-export function resolveCssNodeModule(config: d.Config, diagnostics: d.Diagnostic[], filePath: string, cssImportData: d.CssImportData) {
+export const resolveCssNodeModule = (config: d.Config, diagnostics: d.Diagnostic[], filePath: string, cssImportData: d.CssImportData) => {
   try {
     const dir = config.sys.path.dirname(filePath);
     const moduleId = getModuleId(cssImportData.url);
-    cssImportData.filePath = config.sys.resolveModule(dir, moduleId, { packageJson: true });
+    cssImportData.filePath = config.sys.resolveModule(dir, moduleId);
     cssImportData.filePath = config.sys.path.dirname(cssImportData.filePath);
     cssImportData.filePath += normalizePath(cssImportData.url.substring(moduleId.length + 1));
     cssImportData.updatedImport = `@import "${cssImportData.filePath}";`;
@@ -146,10 +140,9 @@ export function resolveCssNodeModule(config: d.Config, diagnostics: d.Diagnostic
     d.messageText = `Unable to resolve node module for CSS @import: ${cssImportData.url}`;
     d.absFilePath = filePath;
   }
-}
+};
 
-
-export function isLocalCssImport(srcImport: string) {
+export const isLocalCssImport = (srcImport: string) => {
   srcImport = srcImport.toLowerCase();
 
   if (srcImport.includes('url(')) {
@@ -162,10 +155,9 @@ export function isLocalCssImport(srcImport: string) {
   }
 
   return true;
-}
+};
 
-
-export function replaceNodeModuleUrl(config: d.Config, baseCssFilePath: string, moduleId: string, nodeModulePath: string, url: string) {
+export const replaceNodeModuleUrl = (config: d.Config, baseCssFilePath: string, moduleId: string, nodeModulePath: string, url: string) => {
   nodeModulePath = normalizePath(config.sys.path.dirname(nodeModulePath));
   url = normalizePath(url);
 
@@ -175,10 +167,9 @@ export function replaceNodeModuleUrl(config: d.Config, baseCssFilePath: string, 
 
   const relToRoot = normalizePath(config.sys.path.relative(baseCssDir, absPathToNodeModuleCss));
   return relToRoot;
-}
+};
 
-
-export function getModuleId(orgImport: string) {
+export const getModuleId = (orgImport: string) => {
   if (orgImport.startsWith('~')) {
     orgImport = orgImport.substring(1);
   }
@@ -191,10 +182,9 @@ export function getModuleId(orgImport: string) {
   }
 
   return splt[0];
-}
+};
 
-
-export function replaceImportDeclarations(styleText: string, cssImports: d.CssImportData[], isCssEntry: boolean) {
+export const replaceImportDeclarations = (styleText: string, cssImports: d.CssImportData[], isCssEntry: boolean) => {
   cssImports.forEach(cssImportData => {
     if (isCssEntry) {
       if (typeof cssImportData.styleText === 'string') {
@@ -206,4 +196,4 @@ export function replaceImportDeclarations(styleText: string, cssImports: d.CssIm
   });
 
   return styleText;
-}
+};
