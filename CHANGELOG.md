@@ -1,4 +1,4 @@
-# 🐈 [1.9.0-17](https://github.com/ionic-team/stencil/compare/v1.9.0-16...v1.9.0-17) (2020-02-16)
+# 🎯 [1.9.0-18](https://github.com/ionic-team/stencil/compare/v1.9.0-17...v1.9.0-18) (2020-02-17)
 
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
@@ -184,6 +184,9 @@ Some of main features with the `--next` compiler include:
 * **next:** fix lerna collection ([24f59d3](https://github.com/ionic-team/stencil/commit/24f59d3a3ef519e63d9c67a3f9c27823433be0d0))
 * **next:** unregister service worker during e2e tests ([a34b88b](https://github.com/ionic-team/stencil/commit/a34b88b1c6d082460165fb70e8db1fc5878ff673))
 * **windows:** update puppeteer and jest, format components.d.ts ([558aa72](https://github.com/ionic-team/stencil/commit/558aa722428d39f0464721c1f6c2820a6c8d2319))
+* **css:** fix node_module css imports ([cc79e39](https://github.com/ionic-team/stencil/commit/cc79e39d3f874bcb1db733a4f9b15b0f0c5ccb42))
+* **hydrated:** fix hydrated config for legacy compiler ([1d1e900](https://github.com/ionic-team/stencil/commit/1d1e9006a3d287f2e782073d5172a9532d70c4ef))
+* **next:** emit fsChange event ([09986b0](https://github.com/ionic-team/stencil/commit/09986b0ed5a7b08703f9e96cc7a1441e487d29d7))
 
 
 
