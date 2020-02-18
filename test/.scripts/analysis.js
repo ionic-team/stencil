@@ -31,5 +31,9 @@ fileSizeProfile('End-to-end App',
   output
 );
 
+fileSizeProfile('Ionic App',
+  path.join(rootDir, 'ionic-app', 'www', 'build'),
+  output
+);
 
 fs.writeFileSync(path.join(rootDir, 'readme.md'), output.join('\n'));
