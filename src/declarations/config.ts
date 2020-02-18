@@ -175,6 +175,17 @@ export interface StencilConfig {
    */
   extras?: ConfigExtras;
 
+  /**
+   * The hydrated flag identifies if a component and all of its child components
+   * have finished hydrating. This helps prevent any flash of unstyled content (FOUC)
+   * as various components are asynchronously downloaded and rendered. By default it
+   * will add the `hydrated` CSS class to the element. The `hydratedFlag` confg can be used
+   * to change the name of the CSS class, change it to an attribute, or change which
+   * type of CSS properties and values are assigned before and after hydrating. This config
+   * can also be used to not include the hydrated flag at all by setting it to `null`.
+   */
+  hydratedFlag?: HydratedFlag;
+
   globalScript?: string;
   srcIndexHtml?: string;
   watch?: boolean;
@@ -202,17 +213,58 @@ export interface StencilConfig {
 
 export interface ConfigExtras {
   /**
+   * By default, the slot polyfill does not update `appendChild()` so that it appends
+   * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
+   * polyfill for those who need it. Defaults to `false`.
+   */
+  appendChildSlotFix?: boolean;
+
+  /**
    * By default, the runtime does not polyfill `cloneNode()` when cloning a component
    * that uses the slot polyfill. This is an opt-in polyfill for those who need it.
+   * Defaults to `false`.
    */
   cloneNodeFix?: boolean;
 
   /**
-   * By default, the slot polyfill does not update `appendChild()` so that it appends
-   * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
-   * polyfill for those who need it.
+   * Include the CSS Custom Property polyfill/shim for legacy browsers. Defaults to `true`
+   * for legacy builds only. ESM builds will not include the css vars shim.
    */
-  appendChildSlotFix?: boolean;
+  cssVarsShim?: boolean;
+
+  /**
+   * Dynamic `import()` shim. This is only needed for Edge 18 and below, and Firefox 67 and below.
+   * Defaults to `true`.
+   */
+  dynamicImportShim?: boolean;
+
+  /**
+   * Dispatches component lifecycle events. Mainly used for testing. Defaults to `false`.
+   */
+  lifecycleDOMEvents?: boolean;
+
+  /**
+   * Safari 10 supports ES modules with `<script type="module">`, however, it did not implement
+   * `<script nomodule>`. When set to `false`, the runtime will not patch support for Safari 10.
+   * Defaults to `true`.
+   */
+  safari10?: boolean;
+
+  /**
+   * It is possible to assign data to the actual `<script>` element's `data-opts` property,
+   * which then gets passed to Stencil's initial bootstrap. This feature is only required
+   * for very special cases and rarely needed. When set to `false` it will not read
+   * this data. Defaults to `true`.
+   */
+  scriptDataOpts?: boolean;
+
+  /**
+   * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
+   * if it's determined that shadow dom is already natively supported by the browser then
+   * it does not request the shim. Setting to `false` will avoid all shadow dom tests.
+   * Defaults to `true`.
+   */
+  shadowDomShim?: boolean;
 }
 
 export interface Config extends StencilConfig {
@@ -225,13 +277,37 @@ export interface Config extends StencilConfig {
   devServer?: DevServerConfig;
   flags?: ConfigFlags;
   fsNamespace?: string;
-  logLevel?: 'error'|'warn'|'info'|'debug'|string;
+  logLevel?: 'error' | 'warn' | 'info' | 'debug' | string;
   rootDir?: string;
   suppressLogs?: boolean;
   profile?: boolean;
   _isValidated?: boolean;
   _isTesting?: boolean;
-  _lifecycleDOMEvents?: boolean;
+}
+
+export interface HydratedFlag {
+  /**
+   * Defaults to `hydrated`.
+   */
+  name?: string;
+  /**
+   * Can be either `class` or `attribute`. Defaults to `class`.
+   */
+  selector?: 'class' | 'attribute';
+  /**
+   * Defaults to use CSS `visibility` property.
+   */
+  property?: string;
+  /**
+   * This is the CSS value to give all components before it has been hydrated.
+   * Defaults to `hidden`.
+   */
+  initialValue?: string;
+  /**
+   * This is the CSS value to assign once a component has finished hydrating.
+   * Defaults to `inherit`.
+   */
+  hydratedValue?: string;
 }
 
 export interface BrowserConfig extends StencilConfig {
@@ -347,8 +423,8 @@ export interface ServiceWorkerConfig {
   swDest?: string;
   swSrc?: string;
   globPatterns?: string[];
-  globDirectory?: string|string[];
-  globIgnores?: string|string[];
+  globDirectory?: string | string[];
+  globIgnores?: string | string[];
   templatedUrls?: any;
   maximumFileSizeToCacheInBytes?: number;
   manifestTransforms?: any;

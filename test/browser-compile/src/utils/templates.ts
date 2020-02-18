@@ -8,9 +8,52 @@ export const templates = new Map<string, QuickTemplate>();
 
 
 
+templates.set(`my-counter.tsx`, {
+
+  source: `
+import { h, Component, State } from "@stencil/core";
+
+@Component({
+  tag: "my-counter",
+  styleUrl: "my-counter.css",
+  shadow: true
+})
+export class MyCounter {
+  @State() count: number = 0;
+
+  inc() {
+    this.count++;
+  }
+
+  dec() {
+    this.count--;
+  }
+
+  render() {
+    return (
+      <div>
+        <button class="large btn" onClick={this.dec.bind(this)}>
+          -
+        </button>
+        <span class="large span">{this.count}</span>
+        <button class="large btn" onClick={this.inc.bind(this)}>
+          +
+        </button>
+      </div>
+    );
+  }
+}
+`,
+  html: `
+<my-counter></my-counter>
+`
+});
+
+
+
 templates.set(`hello-world.tsx`, {
 
-source:  `
+  source: `
 import { Component } from '@stencil/core';
 
 @Component({
@@ -24,7 +67,7 @@ export class HelloWorld {
 
 }
 `,
-html: `
+  html: `
 <hello-world></hello-world>
 `
 });
@@ -32,7 +75,7 @@ html: `
 
 
 templates.set(`properties.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h } from '@stencil/core';
 
@@ -53,14 +96,14 @@ export class MyName {
 }
 
 `,
-html: `
+  html: `
 <my-name first="Stencil" last="JS"></my-name>
 `});
 
 
 
 templates.set(`shadow-inline-styles.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h } from '@stencil/core';
 
@@ -82,7 +125,7 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button>Shadow / Inline Styles</my-button>
 `
 });
@@ -90,7 +133,7 @@ html: `
 
 
 templates.set(`scoped-inline-styles.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h } from '@stencil/core';
 
@@ -112,7 +155,7 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button>Scoped / Inline Styles</my-button>
 `
 });
@@ -120,7 +163,7 @@ html: `
 
 
 templates.set(`style-esm-import.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h } from '@stencil/core';
 import styleEsmImport from './style-import.css';
@@ -142,14 +185,14 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button>Style ESM Import</my-button>
 `
 });
 
 
 templates.set(`style-local-const.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h } from '@stencil/core';
 const styleLocal = ':host { display: block; padding: 20px; background: #ddd; } :host::before { content: "styleLocal"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: maroon; color: white; font-weight: bold; }';
@@ -172,7 +215,7 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button>Style Local Const</my-button>
 `
 });
@@ -180,7 +223,7 @@ html: `
 
 
 templates.set(`style-url.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h } from '@stencil/core';
 
@@ -201,7 +244,7 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button>Style Url</my-button>
 `
 });
@@ -233,12 +276,12 @@ templates.set(`scoped-style-url.tsx`, {
   html: `
   <my-button>Scoped Style Url</my-button>
   `
-  });
+});
 
 
 
 templates.set(`shadow-modes.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h, setMode } from '@stencil/core';
 
@@ -267,7 +310,7 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button mode="ios">ios Shadow Url</my-button>
 <my-button mode="md">md Shadow Url</my-button>
 `
@@ -275,7 +318,7 @@ html: `
 
 
 templates.set(`scoped-modes.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h, setMode } from '@stencil/core';
 
@@ -304,7 +347,7 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button mode="ios">ios Scoped Url</my-button>
 <my-button mode="md">md Scoped Url</my-button>
 `

@@ -108,6 +108,9 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     bc.BUILD.hydrateServerSide = true;
     bc.BUILD.hydrateClientSide = false;
   }
+  bc.BUILD.cloneNodeFix = false;
+  bc.BUILD.shadowDomShim = false;
+  bc.BUILD.safari10 = false;
 
   (page as any).flush = () => {
     console.warn(`DEPRECATED: page.flush(), please use page.waitForChanges() instead`);
@@ -129,19 +132,19 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
   if (typeof opts.cookie === 'string') {
     try {
       page.doc.cookie = opts.cookie;
-    } catch (e) {}
+    } catch (e) { }
   }
 
   if (typeof opts.referrer === 'string') {
     try {
       (page.doc as any).referrer = opts.referrer;
-    } catch (e) {}
+    } catch (e) { }
   }
 
   if (typeof opts.userAgent === 'string') {
     try {
       (page.win.navigator as any).userAgent = opts.userAgent;
-    } catch (e) {}
+    } catch (e) { }
   }
 
   platform.bootstrapLazy(lazyBundles);
@@ -224,7 +227,7 @@ function proxyComponentLifeCycles(platform: any, Cstr: d.ComponentTestingConstru
 
   if (typeof Cstr.prototype.componentWillLoad === 'function') {
     Cstr.prototype.__componentWillLoad = Cstr.prototype.componentWillLoad;
-    Cstr.prototype.componentWillLoad = function() {
+    Cstr.prototype.componentWillLoad = function () {
       const result = this.__componentWillLoad();
       if (result != null && typeof result.then === 'function') {
         platform.writeTask(() => result);
@@ -237,7 +240,7 @@ function proxyComponentLifeCycles(platform: any, Cstr: d.ComponentTestingConstru
 
   if (typeof Cstr.prototype.componentWillUpdate === 'function') {
     Cstr.prototype.__componentWillUpdate = Cstr.prototype.componentWillUpdate;
-    Cstr.prototype.componentWillUpdate = function() {
+    Cstr.prototype.componentWillUpdate = function () {
       const result = this.__componentWillUpdate();
       if (result != null && typeof result.then === 'function') {
         platform.writeTask(() => result);
@@ -250,7 +253,7 @@ function proxyComponentLifeCycles(platform: any, Cstr: d.ComponentTestingConstru
 
   if (typeof Cstr.prototype.componentWillRender === 'function') {
     Cstr.prototype.__componentWillRender = Cstr.prototype.componentWillRender;
-    Cstr.prototype.componentWillRender = function() {
+    Cstr.prototype.componentWillRender = function () {
       const result = this.__componentWillRender();
       if (result != null && typeof result.then === 'function') {
         platform.writeTask(() => result);

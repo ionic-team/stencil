@@ -49,6 +49,27 @@ styleImports.set(`/md.css`, `
 button { background: green; }
 `);
 
+styleImports.set(`/my-counter.css`, `
+.large {
+  font-size: 200%;
+}
+
+.value {
+  width: 4rem;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn {
+  width: 64px;
+  height: 64px;
+  border: none;
+  border-radius: 10px;
+  background-color: seagreen;
+  color: white;
+}
+`);
+
 export const cssTemplatePlugin = {
   name: 'cssTemplatePlugin',
 

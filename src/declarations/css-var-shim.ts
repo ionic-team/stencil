@@ -1,7 +1,7 @@
 
-export interface CssVarSim {
-  initShim(): Promise<void>;
-  addLink(linkEl: HTMLLinkElement): HTMLLinkElement;
+export interface CssVarShim {
+  i(): Promise<any>;
+  addLink(linkEl: HTMLLinkElement): Promise<any>;
   addGlobalStyle(styleEl: HTMLStyleElement): void;
 
   createHostStyle(

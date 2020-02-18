@@ -1,16 +1,16 @@
-import { proxyComponent } from './proxy-component';
 import * as d from '../declarations';
+import { appDidLoad, forceUpdate } from './update-component';
+import { appendChildSlotFix, cloneNodeFix } from './dom-extras';
+import { BUILD } from '@build-conditionals';
 import { CMP_FLAGS } from '@utils';
 import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
+import { createTime, installDevTools } from './profile';
 import { disconnectedCallback } from './disconnected-callback';
-import { BUILD } from '@build-conditionals';
 import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
 import { hmrStart } from './hmr-component';
-import { HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
-import { appDidLoad, forceUpdate } from './update-component';
-import { createTime, installDevTools } from './profile';
-import { appendChildSlotFix, cloneNodeFix } from './dom-extras';
+import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
+import { proxyComponent } from './proxy-component';
 
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
@@ -22,12 +22,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const endBootstrap = createTime('bootstrapLazy');
   const cmpTags: string[] = [];
   const exclude = options.exclude || [];
-  const head = doc.head;
   const customElements = win.customElements;
-  const y = /*@__PURE__*/head.querySelector('meta[charset]');
-  const visibilityStyle = /*@__PURE__*/doc.createElement('style');
-  const deferredConnectedCallbacks: {connectedCallback: () => void}[] = [];
-  const styles = doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
+  const head = doc.head;
+  const metaCharset = /*@__PURE__*/ head.querySelector('meta[charset]');
+  const visibilityStyle = /*@__PURE__*/ doc.createElement('style');
+  const deferredConnectedCallbacks: { connectedCallback: () => void }[] = [];
+  const styles = /*@__PURE__*/ doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
   let appLoadFallback: any;
   let isBootstrapping = true;
   let i = 0;
@@ -146,7 +146,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       }
 
       if (BUILD.hotModuleReplacement) {
-        (HostElement as any).prototype['s-hmr'] = function(hmrVersionId: string) {
+        (HostElement as any).prototype['s-hmr'] = function (hmrVersionId: string) {
           hmrStart(this, cmpMeta, hmrVersionId);
         };
       }
@@ -162,17 +162,22 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       }
     }));
 
-  // visibilityStyle.innerHTML = cmpTags.map(t => `${t}:not(.hydrated)`) + '{display:none}';
-  visibilityStyle.innerHTML = cmpTags + '{visibility:hidden}.hydrated{visibility:inherit}';
-  visibilityStyle.setAttribute('data-styles', '');
-  head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
+  if (BUILD.hydratedClass || BUILD.hydratedAttribute) {
+    visibilityStyle.innerHTML = cmpTags + HYDRATED_CSS;
+    visibilityStyle.setAttribute('data-styles', '');
+    head.insertBefore(visibilityStyle, metaCharset ? metaCharset.nextSibling : head.firstChild);
+  }
 
   // Process deferred connectedCallbacks now all components have been registered
   isBootstrapping = false;
   if (deferredConnectedCallbacks.length > 0) {
     deferredConnectedCallbacks.forEach(host => host.connectedCallback());
   } else {
-    plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30, 'timeout'));
+    if (BUILD.profile) {
+      plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30, 'timeout'));
+    } else {
+      plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30));
+    }
   }
   // Fallback appLoad event
   endBootstrap();

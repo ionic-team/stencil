@@ -44,15 +44,16 @@ export const BUILD: Required<d.Build> = {
   svg: true,
   updatable: true,
   vdomAttribute: true,
-  vdomXlink: true,
   vdomClass: true,
   vdomFunctional: true,
   vdomKey: true,
   vdomListener: true,
+  vdomPropOrAttr: true,
   vdomRef: true,
   vdomRender: true,
   vdomStyle: true,
   vdomText: true,
+  vdomXlink: true,
   watchCallback: true,
   taskQueue: true,
 
@@ -60,6 +61,7 @@ export const BUILD: Required<d.Build> = {
   hotModuleReplacement: false,
   isDebug: false,
   isDev: false,
+  isTesting: false,
   cssVarShim: false,
   constructableCSS: true,
   initializeNextTick: false,
@@ -71,6 +73,12 @@ export const BUILD: Required<d.Build> = {
   slotRelocation: true,
   cloneNodeFix: false,
   appendChildSlotFix: false,
+  dynamicImportShim: false,
+  hydratedAttribute: false,
+  hydratedClass: false,
+  safari10: false,
+  scriptDataOpts: false,
+  shadowDomShim: false,
 };
 
 export const NAMESPACE = 'app';

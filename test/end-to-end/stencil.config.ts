@@ -1,9 +1,9 @@
-import { Config } from '../../dist';
+import { Config } from '../../internal';
 import builtins from 'rollup-plugin-node-builtins';
 
 export const config: Config = {
   namespace: 'EndToEnd',
-
+  globalScript: './src/global.ts',
   plugins: [
     builtins()
   ],
@@ -19,10 +19,9 @@ export const config: Config = {
       type: 'dist',
     },
     {
-      type: 'experimental-dist-module',
-      externalRuntime: true
+      type: 'experimental-dist-module'
     }
   ],
-  enableCache: false
-
+  enableCache: false,
+  hashFileNames: false,
 };

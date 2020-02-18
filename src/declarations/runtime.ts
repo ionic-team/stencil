@@ -3,7 +3,7 @@ import { ComponentInterface } from './component-interfaces';
 import { HostElement } from './host-element';
 import { RenderNode } from './render';
 import { VNode } from './vdom';
-import { CssVarSim } from './css-var-shim';
+import { CssVarShim } from './css-var-shim';
 
 
 export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
@@ -24,7 +24,7 @@ export type ComponentRuntimeMetaCompact = [
   string,
 
   /** members */
-  {[memberName: string]: ComponentRuntimeMember}?,
+  { [memberName: string]: ComponentRuntimeMember }?,
 
   /** listeners */
   ComponentRuntimeHostListener[]?
@@ -114,7 +114,7 @@ export interface PlatformRuntime {
   ael: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   rel: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   $orgLocNodes$?: Map<string, RenderNode>;
-  $cssShim$?: CssVarSim;
+  $cssShim$?: CssVarShim;
 }
 
 export type RefMap = WeakMap<any, HostRef>;

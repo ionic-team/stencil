@@ -36,6 +36,15 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
   }
   config.logger.level = config.logLevel;
 
+  config.extras = config.extras || {};
+  config.extras.appendChildSlotFix = !!config.extras.appendChildSlotFix;
+  config.extras.cloneNodeFix = !!config.extras.cloneNodeFix;
+  config.extras.cssVarsShim = config.extras.cssVarsShim !== false;
+  config.extras.dynamicImportShim = config.extras.dynamicImportShim !== false;
+  config.extras.lifecycleDOMEvents = !!config.extras.lifecycleDOMEvents;
+  config.extras.safari10 = config.extras.safari10 !== false;
+  config.extras.shadowDomShim = config.extras.shadowDomShim !== false;
+
   setBooleanConfig(config, 'writeLog', 'log', false);
   setBooleanConfig(config, 'buildAppCore', null, true);
 
@@ -136,6 +145,8 @@ export function validateConfig(config: d.Config, diagnostics: d.Diagnostic[], se
   validateTesting(config, diagnostics);
   validateOutputTargetCustom(config, diagnostics);
 
+  config.hydratedFlag = validateHydrated(config);
+
   return config;
 }
 
@@ -154,3 +165,36 @@ const MAX_HASHED_FILENAME_LENTH = 32;
 const DEFAULT_INCLUDES = ['**/*.ts', '**/*.tsx'];
 const DEFAULT_EXCLUDES = ['**/test/**'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$/i;
+
+
+export const validateHydrated = (config: d.Config) => {
+  if (config.hydratedFlag === null || config.hydratedFlag === false) {
+    return null;
+  }
+
+  const hydratedFlag: d.HydratedFlag = { ...config.hydratedFlag };
+
+  if (hydratedFlag.name !== 'string') {
+    hydratedFlag.name = `hydrated`;
+  }
+
+  if (hydratedFlag.selector === 'attribute') {
+    hydratedFlag.selector = `attribute`;
+  } else {
+    hydratedFlag.selector = `class`;
+  }
+
+  if (hydratedFlag.property !== 'string') {
+    hydratedFlag.property = `visibility`;
+  }
+
+  if (hydratedFlag.initialValue !== 'string' && hydratedFlag.initialValue !== null) {
+    hydratedFlag.initialValue = `hidden`;
+  }
+
+  if (hydratedFlag.hydratedValue !== 'string' && hydratedFlag.initialValue !== null) {
+    hydratedFlag.hydratedValue = `inherit`;
+  }
+
+  return hydratedFlag;
+};

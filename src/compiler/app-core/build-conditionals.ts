@@ -8,7 +8,7 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
   const f: d.BuildFeatures = {
     allRenderFn: cmps.every(c => c.hasRenderFn),
     cmpDidLoad: cmps.some(c => c.hasComponentDidLoadFn),
-    cmpShouldUpdate:  cmps.some(c => c.hasComponentShouldUpdateFn),
+    cmpShouldUpdate: cmps.some(c => c.hasComponentShouldUpdateFn),
     cmpDidUnload: cmps.some(c => c.hasComponentDidUnloadFn),
     cmpDidUpdate: cmps.some(c => c.hasComponentDidUpdateFn),
     cmpDidRender: cmps.some(c => c.hasComponentDidRenderFn),
@@ -55,14 +55,13 @@ export function getBuildFeatures(cmps: d.ComponentCompilerMeta[]) {
     vdomFunctional: cmps.some(c => c.hasVdomFunctional),
     vdomKey: cmps.some(c => c.hasVdomKey),
     vdomListener: cmps.some(c => c.hasVdomListener),
+    vdomPropOrAttr: cmps.some(c => c.hasVdomPropOrAttr),
     vdomRef: cmps.some(c => c.hasVdomRef),
     vdomRender: cmps.some(c => c.hasVdomRender),
     vdomStyle: cmps.some(c => c.hasVdomStyle),
     vdomText: cmps.some(c => c.hasVdomText),
     watchCallback: cmps.some(c => c.hasWatchCallback),
     taskQueue: true,
-    cloneNodeFix: false,
-    appendChildSlotFix: false,
   };
   f.asyncLoading = f.cmpWillUpdate || f.cmpWillLoad || f.cmpWillRender;
 
@@ -121,7 +120,6 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.isDebug = (config.logLevel === 'debug');
   b.isDev = !!config.devMode;
   b.devTools = b.isDev;
-  b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config._lifecycleDOMEvents);
   b.profile = !!(config.profile);
   b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.reloadStrategy === 'hmr' && !config._isTesting);
   b.updatable = (b.updatable || b.hydrateClientSide || b.hotModuleReplacement);
@@ -129,10 +127,20 @@ export function updateBuildConditionals(config: d.Config, b: d.Build) {
   b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
   b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;
+  b.appendChildSlotFix = config.extras.appendChildSlotFix;
+  b.cloneNodeFix = config.extras.cloneNodeFix;
+  b.dynamicImportShim = config.extras.dynamicImportShim;
+  b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
+  b.safari10 = config.extras.safari10;
+  b.scriptDataOpts = config.extras.scriptDataOpts;
+  b.shadowDomShim = config.extras.shadowDomShim;
 
-  if (config.extras) {
-    b.cloneNodeFix = !!config.extras.cloneNodeFix;
-    b.appendChildSlotFix = b.slotRelocation && !!config.extras.appendChildSlotFix;
+  if (config.hydratedFlag) {
+    b.hydratedAttribute = config.hydratedFlag.selector === 'attribute';
+    b.hydratedClass = config.hydratedFlag.selector === 'class';
+  } else {
+    b.hydratedAttribute = false;
+    b.hydratedClass = false;
   }
 }
 

@@ -1,14 +1,14 @@
-import { Config } from '../../internal';
+import { Config } from '../../dist';
 
 export const config: Config = {
-  globalStyle: 'src/global/app.css',
+  namespace: 'my-counter',
+  hashFileNames: false,
   outputTargets: [
     {
       type: 'www',
-      serviceWorker: null
+      serviceWorker: null // disable service workers
     }
   ],
-  hashFileNames: false,
   hydratedFlag: null,
   extras: {
     cssVarsShim: false,

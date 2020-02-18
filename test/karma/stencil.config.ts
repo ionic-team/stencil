@@ -35,10 +35,10 @@ export const config: Config = {
     stylus()
   ],
   extras: {
-    cloneNodeFix: true,
     appendChildSlotFix: true,
+    cloneNodeFix: true,
+    lifecycleDOMEvents: true,
   },
-  _lifecycleDOMEvents: true,
   devServer: {
     historyApiFallback: {
       disableDotRule: true,

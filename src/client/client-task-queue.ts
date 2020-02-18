@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { consoleError } from './client-log';
-import { plt } from './client-window';
+import { plt, promiseResolve } from './client-window';
 import { PLATFORM_FLAGS } from '../runtime/runtime-constants';
 
 
@@ -88,7 +88,7 @@ const flush = () => {
   }
 };
 
-export const nextTick = /*@__PURE__*/(cb: () => void) => Promise.resolve().then(cb);
+export const nextTick = /*@__PURE__*/(cb: () => void) => promiseResolve().then(cb);
 
 export const readTask = /*@__PURE__*/queueTask(queueDomReads, false);
 

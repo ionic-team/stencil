@@ -20,5 +20,14 @@ export const config: Config = {
       ]
     }
   ],
-  enableCache: false
+  enableCache: false,
+  hydratedFlag: null,
+  hashFileNames: false,
+  extras: {
+    cssVarsShim: false,
+    dynamicImportShim: false,
+    safari10: false,
+    scriptDataOpts: false,
+    shadowDomShim: false,
+  }
 };

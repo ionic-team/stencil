@@ -101,6 +101,7 @@ export const getModule = (config: d.Config, compilerCtx: d.CompilerCtx, sourceFi
       hasVdomFunctional: false,
       hasVdomKey: false,
       hasVdomListener: false,
+      hasVdomPropOrAttr: false,
       hasVdomRef: false,
       hasVdomRender: false,
       hasVdomStyle: false,

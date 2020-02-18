@@ -4,7 +4,7 @@ import { createOnWarnFn, getDependencies, loadRollupDiagnostics } from '@utils';
 import { cssTransformer } from '../rollup-plugins/css-transformer';
 import { globalScriptsPlugin } from '../rollup-plugins/global-scripts';
 import { loaderPlugin } from '../rollup-plugins/loader';
-import { imagePlugin } from '../rollup-plugins/image-plugin';
+import { imagePlugin } from '../rollup-plugins/image-plugin';
 import { inMemoryFsRead } from '../rollup-plugins/in-memory-fs-read';
 import { OutputChunk, OutputOptions, RollupBuild, RollupOptions, TreeshakingOptions } from 'rollup'; // types only
 import { pluginHelper } from '../rollup-plugins/plugin-helper';
@@ -100,8 +100,8 @@ export const generateRollupOutput = async (build: RollupBuild, options: OutputOp
         isBrowserLoader: chunk.isEntry && chunk.name === config.fsNamespace,
         isIndex: chunk.isEntry && chunk.name === 'index',
         isCore,
-    };
-  });
+      };
+    });
 };
 
 export const DEFAULT_CORE = `

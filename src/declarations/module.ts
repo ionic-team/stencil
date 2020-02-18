@@ -27,13 +27,14 @@ export interface Module {
 
   // build features
   hasVdomAttribute: boolean;
-  hasVdomXlink: boolean;
   hasVdomClass: boolean;
   hasVdomFunctional: boolean;
   hasVdomKey: boolean;
   hasVdomListener: boolean;
+  hasVdomPropOrAttr: boolean;
   hasVdomRef: boolean;
   hasVdomRender: boolean;
   hasVdomStyle: boolean;
   hasVdomText: boolean;
+  hasVdomXlink: boolean;
 }

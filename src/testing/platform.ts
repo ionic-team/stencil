@@ -12,7 +12,7 @@ export const doc = win.document;
 const hostRefs = new Map<d.RuntimeRef, d.HostRef>();
 
 export const styles: d.StyleMap = new Map();
-export const cssVarShim: d.CssVarSim = false as any;
+export const cssVarShim: d.CssVarShim = false as any;
 
 export const Build: d.UserBuildConditionals = {
   isDev: true,

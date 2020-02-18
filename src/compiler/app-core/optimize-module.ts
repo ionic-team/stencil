@@ -39,7 +39,7 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
     if (isCore) {
       results.output = results.output
-        .replace(/disconnectedCallback\(\)\{\}/g, '');
+        .replace(/disconnectedCallback\(\)\{\},/g, '');
     }
     await compilerCtx.cache.put(cacheKey, results.output);
   }
@@ -84,7 +84,7 @@ export const getTerserOptions = (sourceTarget: d.SourceTarget, isDebug: boolean)
   }
 
   if (isDebug) {
-    opts.mangle = {keep_fnames: true};
+    opts.mangle = { keep_fnames: true };
     opts.compress = {};
     opts.compress.drop_console = false;
     opts.compress.drop_debugger = false;

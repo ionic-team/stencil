@@ -23,14 +23,15 @@ export interface BuildFeatures {
   vdomRender: boolean;
   noVdomRender: boolean;
   vdomAttribute: boolean;
-  vdomXlink: boolean;
   vdomClass: boolean;
-  vdomStyle: boolean;
-  vdomKey: boolean;
-  vdomRef: boolean;
-  vdomListener: boolean;
   vdomFunctional: boolean;
+  vdomKey: boolean;
+  vdomListener: boolean;
+  vdomRef: boolean;
+  vdomPropOrAttr: boolean;
+  vdomStyle: boolean;
   vdomText: boolean;
+  vdomXlink: boolean;
   slotRelocation: boolean;
 
   // elements
@@ -76,15 +77,12 @@ export interface BuildFeatures {
   reflect: boolean;
 
   taskQueue: boolean;
-
-  // extras
-  cloneNodeFix: boolean;
-  appendChildSlotFix: boolean;
 }
 
 export interface Build extends Partial<BuildFeatures> {
   hotModuleReplacement?: boolean;
   isDebug?: boolean;
+  isTesting?: boolean;
   isDev?: boolean;
   devTools?: boolean;
   hydrateServerSide?: boolean;
@@ -95,7 +93,15 @@ export interface Build extends Partial<BuildFeatures> {
   profile?: boolean;
   cssVarShim?: boolean;
   constructableCSS?: boolean;
+  appendChildSlotFix?: boolean;
+  cloneNodeFix?: boolean;
+  dynamicImportShim?: boolean;
+  hydratedAttribute?: boolean;
+  hydratedClass?: boolean;
   initializeNextTick?: boolean;
+  safari10?: boolean;
+  scriptDataOpts?: boolean;
+  shadowDomShim?: boolean;
 }
 
 export interface UserBuildConditionals {

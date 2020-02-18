@@ -80,8 +80,8 @@ async function getSystemLoader(config: d.Config, corePath: string, includePolyfi
       System.import(url.href);
     };
 
-    if (win.__stencil_cssshim) {
-      win.__stencil_cssshim.initShim().then(start);
+    if (window.__cssshim) {
+      window.__cssshim.i().then(start);
     } else {
       start();
     }
