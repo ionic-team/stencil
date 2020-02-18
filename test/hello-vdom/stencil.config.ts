@@ -2,9 +2,10 @@ import { Config } from '../../internal';
 
 export const config: Config = {
   namespace: 'HelloVDom',
-  outputTargets: [{
-    type: 'dist'
-  }],
+  outputTargets: [
+    { type: 'dist' },
+    { type: 'www', serviceWorker: null },
+  ],
   devServer: {
     logRequests: true
   },
