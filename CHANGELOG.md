@@ -1,3 +1,8 @@
+## ⛄️ [1.8.9](https://github.com/ionic-team/stencil/compare/v1.8.8...v1.8.9) (2020-02-18)
+
+- Backported runtime improvements from 1.9.x builds
+
+
 ## 🏙 [1.8.8](https://github.com/ionic-team/stencil/compare/v1.8.7...v1.8.8) (2020-02-12)
 
 
