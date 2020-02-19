@@ -110,8 +110,7 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, isD
     opts.toplevel = true;
     opts.module = true;
     opts.compress.toplevel = true;
-    opts.compress.booleans_as_integers =
-      opts.mangle.toplevel = true;
+    opts.mangle.toplevel = true;
     opts.compress.arrows = true;
     opts.compress.module = true;
   }
