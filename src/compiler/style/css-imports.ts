@@ -130,7 +130,18 @@ export const resolveCssNodeModule = (config: d.Config, diagnostics: d.Diagnostic
   try {
     const dir = config.sys.path.dirname(filePath);
     const moduleId = getModuleId(cssImportData.url);
-    cssImportData.filePath = config.sys.resolveModule(dir, moduleId);
+
+    try {
+      cssImportData.filePath = config.sys.resolveModule(dir, moduleId, { packageJson: true });
+    } catch (error) {
+      if (error.code === 'MODULE_NOT_FOUND') {
+        // the module might not have a main field in package.json
+        cssImportData.filePath = config.sys.resolveModule(dir, moduleId);
+      } else {
+        throw error;
+      }
+    }
+
     cssImportData.filePath = config.sys.path.dirname(cssImportData.filePath);
     cssImportData.filePath += normalizePath(cssImportData.url.substring(moduleId.length + 1));
     cssImportData.updatedImport = `@import "${cssImportData.filePath}";`;
