@@ -145,6 +145,21 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Ionic App NEXT",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--next",
+        "--dev",
+        "--max-workers=0",
+        "--config",
+        "${workspaceFolder}/test/ionic-app/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Prerender Shadow",
       "args": [
         "${workspaceFolder}/bin/stencil",

@@ -8,7 +8,8 @@
     "dist/"
   ],
   "scripts": {
-    "build": "node ../../bin/stencil build --next",
+    "build": "node ../../bin/stencil build --debug --next",
+    "build.dev": "node ../../bin/stencil build --dev --next",
     "start": "node ../../bin/stencil build --next --dev --watch --serve",
     "test": "node ../../bin/stencil test --next --spec --e2e",
     "test.watch": "node ../../bin/stencil test --next --spec --e2e --watch",

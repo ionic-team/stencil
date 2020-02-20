@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { addEventListeners } from './host-listener';
 import { addStyle } from './styles';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS } from '@utils';
@@ -16,13 +15,6 @@ export const connectedCallback = (elm: d.HostElement) => {
     const hostRef = getHostRef(elm);
     const cmpMeta = hostRef.$cmpMeta$;
     const endConnected = createTime('connectedCallback', cmpMeta.$tagName$);
-
-    if (BUILD.hostListener && cmpMeta.$listeners$) {
-      // initialize our event listeners on the host element
-      // we do this now so that we can listening to events that may
-      // have fired even before the instance is ready
-      hostRef.$rmListeners$ = addEventListeners(elm, hostRef, cmpMeta.$listeners$);
-    }
 
     if (!(hostRef.$flags$ & HOST_FLAGS.hasConnected)) {
       // first time this component has connected
