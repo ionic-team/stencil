@@ -12,7 +12,7 @@ export const disconnectedCallback = (elm: d.HostElement) => {
 
     if (BUILD.hostListener) {
       if (hostRef.$rmListeners$) {
-        hostRef.$rmListeners$();
+        hostRef.$rmListeners$.map(rmListener => rmListener());
         hostRef.$rmListeners$ = undefined;
       }
     }

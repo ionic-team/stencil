@@ -1,13 +1,13 @@
 import * as d from '../declarations';
+import { addHostEventListeners, doc, getHostRef, nextTick, plt, supportsShadowDom } from '@platform';
 import { addStyle } from './styles';
+import { attachToAncestor } from './update-component';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS } from '@utils';
-import { doc, getHostRef, nextTick, plt, supportsShadowDom } from '@platform';
+import { createTime } from './profile';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
 import { initializeClientHydrate } from './client-hydrate';
 import { initializeComponent, fireConnectedCallback } from './initialize-component';
-import { attachToAncestor } from './update-component';
-import { createTime } from './profile';
 
 
 export const connectedCallback = (elm: d.HostElement) => {
@@ -15,6 +15,11 @@ export const connectedCallback = (elm: d.HostElement) => {
     const hostRef = getHostRef(elm);
     const cmpMeta = hostRef.$cmpMeta$;
     const endConnected = createTime('connectedCallback', cmpMeta.$tagName$);
+
+    if (BUILD.hostListenerTargetParent) {
+      // only run if we have listeners being attached to a parent
+      addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, true);
+    }
 
     if (!(hostRef.$flags$ & HOST_FLAGS.hasConnected)) {
       // first time this component has connected
@@ -68,7 +73,7 @@ export const connectedCallback = (elm: d.HostElement) => {
       // Lazy properties
       // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
       if (BUILD.prop && BUILD.lazyLoad && !BUILD.hydrateServerSide && cmpMeta.$members$) {
-        Object.entries(cmpMeta.$members$).forEach(([memberName, [memberFlags]]) => {
+        Object.entries(cmpMeta.$members$).map(([memberName, [memberFlags]]) => {
           if (memberFlags & MEMBER_FLAGS.Prop && elm.hasOwnProperty(memberName)) {
             const value = (elm as any)[memberName];
             delete (elm as any)[memberName];
@@ -87,8 +92,11 @@ export const connectedCallback = (elm: d.HostElement) => {
       } else {
         initializeComponent(elm, hostRef, cmpMeta);
       }
+
+    } else {
+      fireConnectedCallback(hostRef.$lazyInstance$);
     }
-    fireConnectedCallback(hostRef.$lazyInstance$);
+
     endConnected();
   }
 };

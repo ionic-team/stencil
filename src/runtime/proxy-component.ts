@@ -15,7 +15,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
     const members = Object.entries(cmpMeta.$members$);
     const prototype = (Cstr as any).prototype;
 
-    members.forEach(([memberName, [memberFlags]]) => {
+    members.map(([memberName, [memberFlags]]) => {
       if ((BUILD.prop || BUILD.state) && (
         (memberFlags & MEMBER_FLAGS.Prop) ||
         (

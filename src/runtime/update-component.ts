@@ -33,7 +33,7 @@ export const scheduleUpdate = (hostRef: d.HostRef, isInitialLoad: boolean) => {
     if (BUILD.lazyLoad && BUILD.hostListener) {
       hostRef.$flags$ |= HOST_FLAGS.isListenReady;
       if (hostRef.$queuedListeners$) {
-        hostRef.$queuedListeners$.forEach(([methodName, event]) => safeCall(instance, methodName, event));
+        hostRef.$queuedListeners$.map(([methodName, event]) => safeCall(instance, methodName, event));
         hostRef.$queuedListeners$ = null;
       }
     }
