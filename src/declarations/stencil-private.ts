@@ -1879,7 +1879,7 @@ export interface HostRef {
   $onRenderResolve$?: () => void;
   $vnode$?: VNode;
   $queuedListeners$?: [string, any][];
-  $rmListeners$?: () => void;
+  $rmListeners$?: (() => void)[];
   $modeName$?: string;
   $renderCount$?: number;
 }

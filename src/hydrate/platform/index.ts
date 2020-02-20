@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { addHostEventListeners } from '@runtime';
 
 export const cmpModules = new Map<string, {[exportName: string]: d.ComponentConstructor}>();
 
@@ -120,6 +121,7 @@ export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
   hostRef.$onReadyPromise$ = new Promise(r => hostRef.$onReadyResolve$ = r);
   elm['s-p'] = [];
   elm['s-rc'] = [];
+  addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);
   return hostRefs.set(elm, hostRef);
 };
 

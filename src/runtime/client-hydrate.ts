@@ -23,7 +23,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
 
   clientHydrate(vnode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, hostElm, hostId);
 
-  childRenderNodes.forEach(c => {
+  childRenderNodes.map(c => {
     const orgLocationId = c.$hostId$ + '.' + c.$nodeId$;
     const orgLocationNode = plt.$orgLocNodes$.get(orgLocationId);
     const node = c.$elm$ as d.RenderNode;
@@ -48,7 +48,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
   });
 
   if (BUILD.shadowDom && shadowRoot) {
-    shadowRootNodes.forEach(shadowRootNode => {
+    shadowRootNodes.map(shadowRootNode => {
       if (shadowRootNode) {
         shadowRoot.appendChild(shadowRootNode as any);
       }

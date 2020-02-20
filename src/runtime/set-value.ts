@@ -48,7 +48,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
 
         if (watchMethods) {
           // this instance is watching for when this property changed
-          watchMethods.forEach(watchMethodName => {
+          watchMethods.map(watchMethodName => {
             try {
               // fire off each of the watch methods that are watching this property
               instance[watchMethodName](

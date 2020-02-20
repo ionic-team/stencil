@@ -52,8 +52,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     }
   }
 
-  lazyBundles.forEach(lazyBundle =>
-    lazyBundle[1].forEach(compactMeta => {
+  lazyBundles.map(lazyBundle =>
+    lazyBundle[1].map(compactMeta => {
       const cmpMeta: d.ComponentRuntimeMeta = {
         $flags$: compactMeta[0],
         $tagName$: compactMeta[1],
@@ -170,8 +170,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
   // Process deferred connectedCallbacks now all components have been registered
   isBootstrapping = false;
-  if (deferredConnectedCallbacks.length > 0) {
-    deferredConnectedCallbacks.forEach(host => host.connectedCallback());
+  if (deferredConnectedCallbacks.length) {
+    deferredConnectedCallbacks.map(host => host.connectedCallback());
   } else {
     if (BUILD.profile) {
       plt.jmp(() => appLoadFallback = setTimeout(appDidLoad, 30, 'timeout'));
