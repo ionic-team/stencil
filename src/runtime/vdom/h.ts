@@ -155,6 +155,9 @@ const validateInputProperties = (vnodeData: any) => {
   const maxIndex = props.indexOf('max');
   const stepIndex = props.indexOf('min');
   const value = props.indexOf('value');
+  if (value === -1) {
+    return;
+  }
   if (value < typeIndex || value < minIndex || value < maxIndex || value < stepIndex) {
     consoleDevWarn(`The "value" prop of <input> should be set after "min", "max", "type" and "step"`);
   }
