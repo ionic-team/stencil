@@ -721,7 +721,13 @@ render() {
                 nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
               }
               // add it back to the dom but in its new home
-              parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
+              try {
+                parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
+              } catch (e) {
+                if (BUILD.isDebug) {
+                  console.debug(e);
+                }
+              }
             }
           }
 

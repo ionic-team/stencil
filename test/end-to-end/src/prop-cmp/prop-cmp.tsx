@@ -19,7 +19,7 @@ export class PropCmp {
           Hello, my name is {this.first} {this.lastName}
         </div>
 
-        <slot-cmp ref={(el?: HTMLSlotCmpElement) => el && requestAnimationFrame(() => el.forceUpdate())}>
+        <slot-cmp ref={(el?: HTMLSlotCmpElement) => el && requestAnimationFrame(() => requestAnimationFrame(() => el.forceUpdate()))}>
           <slot-parent-cmp />
         </slot-cmp>
       </Host>
