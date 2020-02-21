@@ -5,11 +5,18 @@
 <!-- Auto Generated Below -->
 
 
+## Properties
+
+| Property | Attribute | Description | Type     | Default     |
+| -------- | --------- | ----------- | -------- | ----------- |
+| `label`  | `label`   |             | `string` | `undefined` |
+
+
 ## Dependencies
 
 ### Used by
 
- - [prop-cmp](../prop-cmp)
+ - [slot-cmp-container](../slot-cmp-container)
 
 ### Depends on
 
@@ -19,7 +26,7 @@
 ```mermaid
 graph TD;
   slot-parent-cmp --> slot-cmp
-  prop-cmp --> slot-parent-cmp
+  slot-cmp-container --> slot-parent-cmp
   style slot-parent-cmp fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

@@ -15,9 +15,6 @@
 ```mermaid
 graph TD;
   app-root --> prop-cmp
-  prop-cmp --> slot-cmp
-  prop-cmp --> slot-parent-cmp
-  slot-parent-cmp --> slot-cmp
   style app-root fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

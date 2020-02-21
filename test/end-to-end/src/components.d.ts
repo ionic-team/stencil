@@ -47,7 +47,10 @@ export namespace Components {
     }
     interface SlotCmp {
     }
+    interface SlotCmpContainer {
+    }
     interface SlotParentCmp {
+        "label": string;
     }
     interface StateCmp {
     }
@@ -137,6 +140,12 @@ declare global {
         prototype: HTMLSlotCmpElement;
         new (): HTMLSlotCmpElement;
     };
+    interface HTMLSlotCmpContainerElement extends Components.SlotCmpContainer, HTMLStencilElement {
+    }
+    var HTMLSlotCmpContainerElement: {
+        prototype: HTMLSlotCmpContainerElement;
+        new (): HTMLSlotCmpContainerElement;
+    };
     interface HTMLSlotParentCmpElement extends Components.SlotParentCmp, HTMLStencilElement {
     }
     var HTMLSlotParentCmpElement: {
@@ -164,6 +173,7 @@ declare global {
         "path-alias-cmp": HTMLPathAliasCmpElement;
         "prop-cmp": HTMLPropCmpElement;
         "slot-cmp": HTMLSlotCmpElement;
+        "slot-cmp-container": HTMLSlotCmpContainerElement;
         "slot-parent-cmp": HTMLSlotParentCmpElement;
         "state-cmp": HTMLStateCmpElement;
     }
@@ -210,7 +220,10 @@ declare namespace LocalJSX {
     }
     interface SlotCmp {
     }
+    interface SlotCmpContainer {
+    }
     interface SlotParentCmp {
+        "label"?: string;
     }
     interface StateCmp {
     }
@@ -229,6 +242,7 @@ declare namespace LocalJSX {
         "path-alias-cmp": PathAliasCmp;
         "prop-cmp": PropCmp;
         "slot-cmp": SlotCmp;
+        "slot-cmp-container": SlotCmpContainer;
         "slot-parent-cmp": SlotParentCmp;
         "state-cmp": StateCmp;
     }
@@ -251,6 +265,7 @@ declare module "@stencil/core" {
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
             "prop-cmp": LocalJSX.PropCmp & JSXBase.HTMLAttributes<HTMLPropCmpElement>;
             "slot-cmp": LocalJSX.SlotCmp & JSXBase.HTMLAttributes<HTMLSlotCmpElement>;
+            "slot-cmp-container": LocalJSX.SlotCmpContainer & JSXBase.HTMLAttributes<HTMLSlotCmpContainerElement>;
             "slot-parent-cmp": LocalJSX.SlotParentCmp & JSXBase.HTMLAttributes<HTMLSlotParentCmpElement>;
             "state-cmp": LocalJSX.StateCmp & JSXBase.HTMLAttributes<HTMLStateCmpElement>;
         }
