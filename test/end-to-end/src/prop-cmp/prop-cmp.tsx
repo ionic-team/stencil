@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Host, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'prop-cmp',
@@ -14,9 +14,15 @@ export class PropCmp {
 
   render() {
     return (
-      <div>
-        Hello, my name is {this.first} {this.lastName}
-      </div>
+      <Host>
+        <div>
+          Hello, my name is {this.first} {this.lastName}
+        </div>
+
+        <slot-cmp ref={(el?: HTMLSlotCmpElement) => el && requestAnimationFrame(() => el.forceUpdate())}>
+          <slot-parent-cmp />
+        </slot-cmp>
+      </Host>
     )
   }
 }

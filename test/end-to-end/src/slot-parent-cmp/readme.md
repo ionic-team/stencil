@@ -1,4 +1,4 @@
-# app-root
+# slot-parent-cmp
 
 
 
@@ -7,18 +7,20 @@
 
 ## Dependencies
 
+### Used by
+
+ - [prop-cmp](../prop-cmp)
+
 ### Depends on
 
-- [prop-cmp](../prop-cmp)
+- [slot-cmp](../slot-cmp)
 
 ### Graph
 ```mermaid
 graph TD;
-  app-root --> prop-cmp
-  prop-cmp --> slot-cmp
-  prop-cmp --> slot-parent-cmp
   slot-parent-cmp --> slot-cmp
-  style app-root fill:#f9f,stroke:#333,stroke-width:4px
+  prop-cmp --> slot-parent-cmp
+  style slot-parent-cmp fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
 ----------------------------------------------

@@ -19,9 +19,17 @@
 
  - [app-root](../app-root)
 
+### Depends on
+
+- [slot-cmp](../slot-cmp)
+- [slot-parent-cmp](../slot-parent-cmp)
+
 ### Graph
 ```mermaid
 graph TD;
+  prop-cmp --> slot-cmp
+  prop-cmp --> slot-parent-cmp
+  slot-parent-cmp --> slot-cmp
   app-root --> prop-cmp
   style prop-cmp fill:#f9f,stroke:#333,stroke-width:4px
 ```

@@ -8,7 +8,7 @@ describe('@Prop', () => {
     // example showing how new test pages can be
     // created within beforeEach(), then using
     // page.setTestContent() or page.gotoTest()
-    page = await newE2EPage();
+    page = await newE2EPage({ failOnConsoleError: true });
   });
 
   it('should set props from property', async () => {
