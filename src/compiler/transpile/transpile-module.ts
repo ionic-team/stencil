@@ -56,9 +56,9 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
       return normalizePath(fileName) === normalizePath(sourceFilePath) ? sourceFile : undefined;
     },
     writeFile: (name, text) => {
-      if (name.endsWith('.map')) {
+      if (name.endsWith('.js.map')) {
         results.map = text;
-      } else {
+      } else if (name.endsWith('.js')) {
         results.code = text;
       }
     },
