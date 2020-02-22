@@ -13,7 +13,7 @@ import { computeMode } from './mode';
 export const defineCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
   customElements.define(
     compactMeta[1],
-    proxyCustomElement(Cstr, compactMeta) as Function
+    proxyCustomElement(Cstr, compactMeta) as CustomElementConstructor
   );
 };
 

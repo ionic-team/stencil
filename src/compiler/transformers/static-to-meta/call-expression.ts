@@ -13,8 +13,9 @@ export const parseCallExpression = (m: d.Module | d.ComponentCompilerMeta, node:
 
     } else if (ts.isPropertyAccessExpression(node.expression)) {
       // document.createElement('tag')
-      if (node.expression.name) {
-        visitCallExpressionArgs(m, node.expression.name, node.arguments);
+      const n = node.expression.name;
+      if (ts.isIdentifier(n) && n) {
+        visitCallExpressionArgs(m, n, node.arguments);
       }
     }
   }
