@@ -118,10 +118,10 @@ const getComponentBoilerplate = (prefix: string, afterPrefix: string, hasStyle: 
   decorator.push(`  shadow: true`);
   decorator.push(`}`);
 
-  return `import { Component, Host, h } from '@stencil/core';
+  return `import { Component, ComponentInterface, Host, h } from '@stencil/core';
 
 @Component(${decorator.join('\n')})
-export class ${toPascalCase(afterPrefix)} {
+export class ${toPascalCase(afterPrefix)} implements ComponentInterface {
 
   render() {
     return (
