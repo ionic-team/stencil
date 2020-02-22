@@ -45,6 +45,13 @@ export namespace Components {
         "first": string;
         "lastName": string;
     }
+    interface SlotCmp {
+    }
+    interface SlotCmpContainer {
+    }
+    interface SlotParentCmp {
+        "label": string;
+    }
     interface StateCmp {
     }
 }
@@ -127,6 +134,24 @@ declare global {
         prototype: HTMLPropCmpElement;
         new (): HTMLPropCmpElement;
     };
+    interface HTMLSlotCmpElement extends Components.SlotCmp, HTMLStencilElement {
+    }
+    var HTMLSlotCmpElement: {
+        prototype: HTMLSlotCmpElement;
+        new (): HTMLSlotCmpElement;
+    };
+    interface HTMLSlotCmpContainerElement extends Components.SlotCmpContainer, HTMLStencilElement {
+    }
+    var HTMLSlotCmpContainerElement: {
+        prototype: HTMLSlotCmpContainerElement;
+        new (): HTMLSlotCmpContainerElement;
+    };
+    interface HTMLSlotParentCmpElement extends Components.SlotParentCmp, HTMLStencilElement {
+    }
+    var HTMLSlotParentCmpElement: {
+        prototype: HTMLSlotParentCmpElement;
+        new (): HTMLSlotParentCmpElement;
+    };
     interface HTMLStateCmpElement extends Components.StateCmp, HTMLStencilElement {
     }
     var HTMLStateCmpElement: {
@@ -147,6 +172,9 @@ declare global {
         "method-cmp": HTMLMethodCmpElement;
         "path-alias-cmp": HTMLPathAliasCmpElement;
         "prop-cmp": HTMLPropCmpElement;
+        "slot-cmp": HTMLSlotCmpElement;
+        "slot-cmp-container": HTMLSlotCmpContainerElement;
+        "slot-parent-cmp": HTMLSlotParentCmpElement;
         "state-cmp": HTMLStateCmpElement;
     }
 }
@@ -190,6 +218,13 @@ declare namespace LocalJSX {
         "first"?: string;
         "lastName"?: string;
     }
+    interface SlotCmp {
+    }
+    interface SlotCmpContainer {
+    }
+    interface SlotParentCmp {
+        "label"?: string;
+    }
     interface StateCmp {
     }
     interface IntrinsicElements {
@@ -206,6 +241,9 @@ declare namespace LocalJSX {
         "method-cmp": MethodCmp;
         "path-alias-cmp": PathAliasCmp;
         "prop-cmp": PropCmp;
+        "slot-cmp": SlotCmp;
+        "slot-cmp-container": SlotCmpContainer;
+        "slot-parent-cmp": SlotParentCmp;
         "state-cmp": StateCmp;
     }
 }
@@ -226,6 +264,9 @@ declare module "@stencil/core" {
             "method-cmp": LocalJSX.MethodCmp & JSXBase.HTMLAttributes<HTMLMethodCmpElement>;
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
             "prop-cmp": LocalJSX.PropCmp & JSXBase.HTMLAttributes<HTMLPropCmpElement>;
+            "slot-cmp": LocalJSX.SlotCmp & JSXBase.HTMLAttributes<HTMLSlotCmpElement>;
+            "slot-cmp-container": LocalJSX.SlotCmpContainer & JSXBase.HTMLAttributes<HTMLSlotCmpContainerElement>;
+            "slot-parent-cmp": LocalJSX.SlotParentCmp & JSXBase.HTMLAttributes<HTMLSlotParentCmpElement>;
             "state-cmp": LocalJSX.StateCmp & JSXBase.HTMLAttributes<HTMLStateCmpElement>;
         }
     }

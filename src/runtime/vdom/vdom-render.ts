@@ -544,7 +544,7 @@ const relocateSlotContent = (elm: d.RenderNode) => {
               relocateNodes.forEach(relocateNode => {
                 if (isNodeLocatedInSlot(relocateNode.$nodeToRelocate$, node['s-sn'])) {
                   relocateNodeData = relocateNodes.find(r => r.$nodeToRelocate$ === node);
-                  if (relocateNodeData) {
+                  if (relocateNodeData && !relocateNode.$slotRefNode$) {
                     relocateNode.$slotRefNode$ = relocateNodeData.$slotRefNode$;
                   }
                 }
