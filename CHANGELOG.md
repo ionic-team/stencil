@@ -1,3 +1,23 @@
+# 🐳 [1.9.0-19](https://github.com/ionic-team/stencil/compare/v1.9.0-18...v1.9.0-19) (2020-02-22)
+
+
+### Bug Fixes
+
+* **compiler:** ignore irrelevant emitted files of ts transpiler ([#2212](https://github.com/ionic-team/stencil/issues/2212)) ([65d5f6e](https://github.com/ionic-team/stencil/commit/65d5f6e22fc66a17a16e783db14f71d8bf4f2461))
+* **core:** disable booleans_as_integers minification option ([e62f212](https://github.com/ionic-team/stencil/commit/e62f2126a3a9f30d9475f707db1b466084d0c863))
+* **css:** node_modules css imports ([cc7e154](https://github.com/ionic-team/stencil/commit/cc7e15494e267cdef96f5a066f18a6f75fc9bdb2))
+* **dev:** don't show warning for inputs without `value` ([#2209](https://github.com/ionic-team/stencil/issues/2209)) ([4744070](https://github.com/ionic-team/stencil/commit/47440706eef65e1fc1bd0915dad60b4d2dc474ef))
+* **listeners:** add host event listeners within constructor ([dc1ba91](https://github.com/ionic-team/stencil/commit/dc1ba915b829b3f9b3b945a0d9fc42b20c3d0cb1))
+* **vdom:** do not reset $slotRefNode$ when relocating nodes ([#2208](https://github.com/ionic-team/stencil/issues/2208)) ([ff7807d](https://github.com/ionic-team/stencil/commit/ff7807dbe1c11b61530c111fb2547bda9537ef3f))
+
+
+### Features
+
+* **cli:** add ComponentInterface in component generator template ([#2147](https://github.com/ionic-team/stencil/issues/2147)) ([1688ff4](https://github.com/ionic-team/stencil/commit/1688ff499e75a727c3b636b8396f4b05fd280cbd))
+* **docs:** disable the dependencies part of the markdown docs. ([#2145](https://github.com/ionic-team/stencil/issues/2145)) ([4e74f26](https://github.com/ionic-team/stencil/commit/4e74f26934741aa0ac1b143e79b48da7d9d6deed))
+
+
+
 # 🎯 [1.9.0-18](https://github.com/ionic-team/stencil/compare/v1.9.0-17...v1.9.0-18) (2020-02-17)
 
 
