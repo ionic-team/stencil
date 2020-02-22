@@ -544,7 +544,7 @@ const relocateSlotContent = (elm: d.RenderNode) => {
               relocateNodes.forEach(relocateNode => {
                 if (isNodeLocatedInSlot(relocateNode.$nodeToRelocate$, node['s-sn'])) {
                   relocateNodeData = relocateNodes.find(r => r.$nodeToRelocate$ === node);
-                  if (relocateNodeData) {
+                  if (relocateNodeData && !relocateNode.$slotRefNode$) {
                     relocateNode.$slotRefNode$ = relocateNodeData.$slotRefNode$;
                   }
                 }
@@ -721,13 +721,7 @@ render() {
                 nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
               }
               // add it back to the dom but in its new home
-              try {
-                parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
-              } catch (e) {
-                if (BUILD.isDebug) {
-                  console.debug(e);
-                }
-              }
+              parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
             }
           }
 
