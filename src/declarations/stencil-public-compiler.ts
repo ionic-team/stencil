@@ -1238,8 +1238,8 @@ export interface OutputTargetDocsVscode extends OutputTargetBase {
 
 export interface OutputTargetDocsReadme extends OutputTargetBase {
   type: 'docs-readme' | 'docs';
-
   dir?: string;
+  dependencies?: boolean;
   footer?: string;
   strict?: boolean;
 }

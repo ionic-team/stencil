@@ -16,7 +16,7 @@ export const generateReadme = async (config: d.Config, compilerCtx: d.CompilerCt
 
   await Promise.all(readmeOutputs.map(async readmeOutput => {
     if (readmeOutput.dir) {
-      const readmeContent = generateMarkdown(config, userContent, docsData, cmps, readmeOutput.footer);
+      const readmeContent = generateMarkdown(config, userContent, docsData, cmps, readmeOutput);
       const relPath = config.sys.path.relative(config.srcDir, docsData.readmePath);
       const absPath = config.sys.path.join(readmeOutput.dir, relPath);
       const results = await compilerCtx.fs.writeFile(absPath, readmeContent);
@@ -31,7 +31,9 @@ export const generateReadme = async (config: d.Config, compilerCtx: d.CompilerCt
   }));
 };
 
-export const generateMarkdown = (config: d.Config, userContent: string, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[], footer: string) => {
+export const generateMarkdown = (config: d.Config, userContent: string, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[], readmeOutput: d.OutputTargetDocsReadme) => {
+  //If the readmeOutput.dependencies is true or undefined the dependencies will be generated.
+  const dependencies = readmeOutput.dependencies !== false ? depsToMarkdown(config, cmp, cmps) : [];
   return [
     userContent,
     AUTO_GENERATE_COMMENT,
@@ -45,10 +47,10 @@ export const generateMarkdown = (config: d.Config, userContent: string, cmp: d.J
     ...slotsToMarkdown(cmp.slots),
     ...partsToMarkdown(cmp.parts),
     ...stylesToMarkdown(cmp.styles),
-    ...depsToMarkdown(config, cmp, cmps),
+    ...dependencies,
     `----------------------------------------------`,
     '',
-    footer,
+    readmeOutput.footer,
     ''
   ].join('\n');
 };
