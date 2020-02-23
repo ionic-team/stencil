@@ -44,7 +44,7 @@ export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
 
     const optimizeResults = await optimizeCss({
       autoprefixer: input.autoprefixer,
-      css: results.styleText,
+      input: results.styleText,
       filePath: input.filePath,
       minify: input.minify
     });
@@ -53,7 +53,7 @@ export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
     if (hasError(optimizeResults.diagnostics)) {
       return results;
     }
-    results.styleText = optimizeResults.css;
+    results.styleText = optimizeResults.output;
 
     s.append(`${JSON.stringify(results.styleText)};\n`);
 

@@ -1,26 +1,30 @@
 import * as d from '../../declarations';
+import { getUsedSelectors, UsedSelectors } from '../style/css-parser/used-selectors';
+import { hasError, catchError } from '@utils';
 import { parseCss } from '../style/css-parser/parse-css';
 import { serializeCss } from '../style/css-parser/serialize-css';
-import { UsedSelectors } from '../style/css-parser/used-selectors';
-import { hasError } from '@utils';
 
 
-export function removeUnusedStyles(doc: Document, diagnostics: d.Diagnostic[]) {
-  const styleElms = doc.head.querySelectorAll<HTMLStyleElement>(`style[data-styles]`);
+export const removeUnusedStyles = (doc: Document, diagnostics: d.Diagnostic[]) => {
+  try {
+    const styleElms = doc.head.querySelectorAll<HTMLStyleElement>(`style[data-styles]`);
+    const styleLen = styleElms.length;
 
-  if (styleElms.length > 0) {
-    // pick out all of the selectors that are actually
-    // being used in the html document
-    const usedSelectors = new UsedSelectors(doc.body);
+    if (styleLen > 0) {
+      // pick out all of the selectors that are actually
+      // being used in the html document
+      const usedSelectors = getUsedSelectors(doc.documentElement);
 
-    for (let i = 0; i < styleElms.length; i++) {
-      removeUnusedStyleText(usedSelectors, diagnostics, styleElms[i]);
+      for (let i = 0; i < styleLen; i++) {
+        removeUnusedStyleText(usedSelectors, diagnostics, styleElms[i]);
+      }
     }
+  } catch (e) {
+    catchError(diagnostics, e);
   }
-}
+};
 
-
-function removeUnusedStyleText(usedSelectors: UsedSelectors, diagnostics: d.Diagnostic[], styleElm: HTMLStyleElement) {
+const removeUnusedStyleText = (usedSelectors: UsedSelectors, diagnostics: d.Diagnostic[], styleElm: HTMLStyleElement) => {
   try {
     // parse the css from being applied to the document
     const parseResults = parseCss(styleElm.innerHTML);
@@ -54,4 +58,4 @@ function removeUnusedStyleText(usedSelectors: UsedSelectors, diagnostics: d.Diag
       messageText: e
     });
   }
-}
+};

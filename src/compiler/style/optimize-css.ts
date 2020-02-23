@@ -19,7 +19,7 @@ export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, 
   }
 
   const opts: d.OptimizeCssInput = {
-    css: styleText,
+    input: styleText,
     filePath: filePath,
     autoprefixer: config.autoprefixCss,
     minify: config.minifyCss
@@ -38,13 +38,13 @@ export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, 
     diagnostics.push(d);
   });
 
-  if (typeof minifyResults.css === 'string' && !hasError(diagnostics)) {
+  if (typeof minifyResults.output === 'string' && !hasError(diagnostics)) {
     // cool, we got valid minified output
 
     // only cache if we got a cache key, if not it probably has an @import
-    await compilerCtx.cache.put(cacheKey, minifyResults.css);
+    await compilerCtx.cache.put(cacheKey, minifyResults.output);
 
-    return minifyResults.css;
+    return minifyResults.output;
   }
 
   return styleText;

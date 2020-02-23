@@ -11,6 +11,10 @@ import {
   Diagnostic,
   LoadConfigInit,
   LoadConfigResults,
+  OptimizeCssInput,
+  OptimizeCssOutput,
+  OptimizeJsInput,
+  OptimizeJsOutput,
 } from '@stencil/core/internal';
 
 export declare const compile: (code: string, opts?: CompileOptions) => Promise<CompileResults>;
@@ -22,14 +26,8 @@ export interface CompilerDependency {
   version: string;
   main: string;
 }
-export declare const getMinifyScriptOptions: (opts?: CompileScriptMinifyOptions) => {
-  options: any;
-  minifier: {
-    name: string;
-    version: string;
-    url: string;
-  };
-};
+export declare const optimizeCss: (cssInput?: OptimizeCssInput) => Promise<OptimizeCssOutput>;
+export declare const optimizeJs: (jsInput?: OptimizeJsInput) => Promise<OptimizeJsOutput>;
 export declare const loadConfig: (init?: LoadConfigInit) => Promise<LoadConfigResults>;
 export declare const version: string;
 
@@ -45,4 +43,8 @@ export {
   Diagnostic,
   LoadConfigInit,
   LoadConfigResults,
+  OptimizeCssInput,
+  OptimizeCssOutput,
+  OptimizeJsInput,
+  OptimizeJsOutput,
 };

@@ -7,8 +7,8 @@ import { minifyCss } from '../../compiler_next/optimize/minify-css';
 
 export async function optimizeCssWorker(inputOpts: d.OptimizeCssInput) {
   const output: d.OptimizeCssOutput = {
-    css: null,
-    diagnostics: []
+    output: null,
+    diagnostics: [],
   };
 
   try {
@@ -21,7 +21,7 @@ export async function optimizeCssWorker(inputOpts: d.OptimizeCssInput) {
     const processor = postcss(plugins);
 
     try {
-      const result = await processor.process(inputOpts.css, {
+      const result = await processor.process(inputOpts.input, {
         map: null,
         from: inputOpts.filePath
       });
@@ -36,10 +36,10 @@ export async function optimizeCssWorker(inputOpts: d.OptimizeCssInput) {
         });
       });
 
-      output.css = result.css;
+      output.output = result.css;
 
       if (inputOpts.minify) {
-        output.css = minifyCss(output.css);
+        output.output = minifyCss(output.output);
       }
     } catch (e) {
       const diagnostic: d.Diagnostic = {

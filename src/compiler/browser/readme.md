@@ -53,11 +53,6 @@ The returned results of `compile()` is a Promise, and the resolved value contain
 | `componentMeta`   | An array of component metadata for each component in the module. |
 
 
-### `getMinifyScriptOptions(opts)`
-
-This helper function provides recommended options to best optimize component minification. The returned object contains `options` and `minifier`. The `minifier` data states the exact minifier and version to use for the recommended options.
-
-
 ### `dependencies`
 
 An array of dependencies required for the Stencil compiler. This data is used to set which dependencies versions work with this particular version of the compiler. The `url` value is only a recommendation of a CDN.

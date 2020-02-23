@@ -1,5 +1,4 @@
-import { CompileOptions, CompileScriptMinifyOptions, Config, SourceTarget, TransformOptions } from '../../declarations';
-import { getTerserOptions } from '../../compiler/app-core/optimize-module';
+import { CompileOptions, Config, TransformOptions } from '../../declarations';
 import path from 'path';
 import ts from 'typescript';
 
@@ -126,18 +125,4 @@ export const getCompileConfig = () => {
   };
 
   return config;
-};
-
-
-export const getMinifyScriptOptions = (opts: CompileScriptMinifyOptions = {}) => {
-  const sourceTarget: SourceTarget = (opts.script === 'es5') ? 'es5' : 'es2017';
-  const isPretty = !!opts.pretty;
-  return {
-    options: getTerserOptions(sourceTarget, isPretty),
-    minifier: {
-      name: 'terser',
-      version: '__VERSION:TERSER__',
-      url: 'https://cdn.jsdelivr.net/npm/terser@__VERSION:TERSER__/dist/bundle.js'
-    }
-  };
 };

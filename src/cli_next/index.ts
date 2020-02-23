@@ -69,7 +69,7 @@ export async function run(init: CliInitOptions) {
       }
     });
 
-    setupWorkerController(sys, logger);
+    setupWorkerController(sys, logger, 'stencil-compiler-worker');
 
     prcs.title = `Stencil: ${validated.config.namespace}`;
 

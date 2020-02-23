@@ -52,6 +52,12 @@ export async function cli_legacy(opts: BuildOptions) {
               external: true
             }
           }
+          if (importee === '@compiler') {
+            return {
+              id: '../compiler/stencil.js',
+              external: true
+            }
+          }
           if (importee === '@mock-doc') {
             return {
               id: '../mock-doc/index.js',

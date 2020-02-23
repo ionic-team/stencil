@@ -14,11 +14,11 @@ interface OptimizeModuleOptions {
   modeName?: string;
 }
 
-export async function optimizeModule(
+export const optimizeModule = async (
   config: Config,
   compilerCtx: CompilerCtx,
   opts: OptimizeModuleOptions
-) {
+) => {
   if (!opts.minify && opts.sourceTarget !== 'es5') {
     return {
       output: opts.input,
@@ -77,12 +77,13 @@ export async function optimizeModule(
     await compilerCtx.cache.put(cacheKey, results.output);
   }
   return results;
-}
+};
 
 
 export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, isDebug: boolean) => {
   const opts: MinifyOptions = {
-    safari10: config.extras.safari10,
+    ie8: false,
+    safari10: !!config.extras.safari10,
     output: {},
   };
 
@@ -109,10 +110,10 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, isD
     opts.ecma = opts.output.ecma = opts.compress.ecma = 8;
     opts.toplevel = true;
     opts.module = true;
-    opts.compress.toplevel = true;
     opts.mangle.toplevel = true;
     opts.compress.arrows = true;
     opts.compress.module = true;
+    opts.compress.toplevel = true;
   }
 
   if (isDebug) {

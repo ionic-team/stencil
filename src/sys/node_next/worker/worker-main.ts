@@ -14,7 +14,7 @@ export class NodeWorkerMain extends EventEmitter {
   successfulMessage = false;
   totalTasksAssigned = 0;
 
-  constructor(public id: number, forkModulePath: string) {
+  constructor(public workerDomain: string, public id: number, forkModulePath: string) {
     super();
     this.fork(forkModulePath);
   }
@@ -25,7 +25,7 @@ export class NodeWorkerMain extends EventEmitter {
     );
 
     const args = [
-      `stencil-worker`
+      this.workerDomain
     ];
 
     const options: cp.ForkOptions = {

@@ -1565,6 +1565,7 @@ export interface PrerenderRequest {
   componentGraphPath: string;
   devServerHostUrl: string;
   hydrateAppFilePath: string;
+  isDebug: boolean;
   prerenderConfigPath: string;
   templateId: string;
   url: string;
@@ -1584,15 +1585,29 @@ export interface Path {
 }
 
 export interface OptimizeCssInput {
-  css: string;
-  filePath: string;
-  autoprefixer: any;
-  minify: boolean;
+  input: string;
+  filePath?: string;
+  autoprefixer?: any;
+  minify?: boolean;
 }
 
 export interface OptimizeCssOutput {
-  css: string;
-  diagnostics?: Diagnostic[];
+  output: string;
+  diagnostics: Diagnostic[];
+}
+
+export interface OptimizeJsInput {
+  input: string;
+  filePath?: string;
+  target?: 'es5' | 'latest';
+  debug?: boolean;
+  sourceMap?: boolean;
+}
+
+export interface OptimizeJsOutput {
+  output: string;
+  sourceMap: any;
+  diagnostics: Diagnostic[];
 }
 
 export interface LazyRequire {

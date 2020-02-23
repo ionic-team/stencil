@@ -398,7 +398,7 @@ export interface BundleOutputChunk {
   name: string;
 }
 
-export type SourceTarget = 'es5' | 'es2017';
+export type SourceTarget = 'es5' | 'es2017' | 'latest';
 
 export interface BundleAppOptions {
   inputs: BundleEntryInputs;
@@ -1679,6 +1679,13 @@ export interface PrerenderManager {
   maxConcurrency: number;
 }
 
+export interface PrerenderHydrateOptions extends SerializeDocumentOptions {
+  addModulePreloads?: boolean;
+  inlineExternalStyleSheets?: boolean;
+  minifyStyleElements?: boolean;
+  minifyScriptElements?: boolean;
+}
+
 export interface PrerenderConfig {
   afterHydrate?(document?: Document, url?: URL): any | Promise<any>;
   beforeHydrate?(document?: Document, url?: URL): any | Promise<any>;
@@ -1687,7 +1694,7 @@ export interface PrerenderConfig {
   filterAnchor?(attrs: { [attrName: string]: string }, base?: URL): boolean;
   filterUrl?(url?: URL, base?: URL): boolean;
   filePath?(url?: URL, filePath?: string): string;
-  hydrateOptions?(url?: URL): SerializeDocumentOptions;
+  hydrateOptions?(url?: URL): PrerenderHydrateOptions;
   normalizeUrl?(href?: string, base?: URL): URL;
   robotsTxt?(opts: RobotsTxtOpts): string | RobotsTxtResults;
   sitemapXml?(opts: SitemapXmpOpts): string | SitemapXmpResults;
@@ -2631,11 +2638,10 @@ export interface VNodeProdData {
 
 export interface CompilerWorkerContext {
   compileModule(code: string, opts: CompileOptions): Promise<CompileResults>;
-  minifyJs(input: string, opts?: any): Promise<{ output: string, sourceMap: any, diagnostics: Diagnostic[] }>;
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
+  prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string, sourceMap: any, diagnostics: Diagnostic[] }>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
   transpileToEs5(input: string, inlineHelpers: boolean): Promise<TranspileResults>;
-  prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string, sourceMap: any, diagnostics: Diagnostic[] }>;
 }
 
 export interface MsgToWorker {

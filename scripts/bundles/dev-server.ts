@@ -50,6 +50,7 @@ export async function devServer(opts: BuildOptions) {
       format: 'cjs',
       file: join(opts.output.devServerDir, 'index.js'),
       esModule: false,
+      preferConst: true,
     },
     external: [
       'assert',
@@ -76,6 +77,7 @@ export async function devServer(opts: BuildOptions) {
       format: 'cjs',
       file: join(opts.output.devServerDir, 'server-worker.js'),
       esModule: false,
+      preferConst: true,
     },
     external: [
       'assert',
@@ -133,7 +135,8 @@ export async function devServer(opts: BuildOptions) {
     output: {
       format: 'cjs',
       file: join(opts.output.devServerDir, connectorName),
-      strict: false
+      strict: false,
+      preferConst: true,
     },
     plugins: [
       {

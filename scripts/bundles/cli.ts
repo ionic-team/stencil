@@ -51,6 +51,7 @@ export async function cli(opts: BuildOptions) {
       format: 'cjs',
       file: join(opts.output.cliDir, 'index.js'),
       esModule: false,
+      preferConst: true,
     },
     external,
     plugins: [
@@ -89,17 +90,24 @@ export async function cli(opts: BuildOptions) {
   };
 
   const cliWorkerBundle: RollupOptions = {
-    input: join(inputDir, 'worker/index.js'),
+    input: join(inputDir, 'worker', 'index.js'),
     output: {
       format: 'cjs',
       file: join(opts.output.cliDir, 'cli-worker.js'),
       esModule: false,
+      preferConst: true,
     },
     external,
     plugins: [
       {
         name: 'cliWorkerImportResolverPlugin',
         resolveId(importee) {
+          if (importee === '@compiler') {
+            return {
+              id: '../compiler/stencil.js',
+              external: true
+            }
+          }
           if (importee === '@mock-doc') {
             return {
               id: '../mock-doc/index.js',

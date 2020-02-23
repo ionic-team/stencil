@@ -5,7 +5,7 @@ let cssProcessor: any;
 
 export const autoprefixCss = async (cssText: string, opts: any) => {
   const output: d.OptimizeCssOutput = {
-    css: cssText,
+    output: cssText,
     diagnostics: []
   };
   if (!IS_NODE_ENV) {
@@ -29,7 +29,7 @@ export const autoprefixCss = async (cssText: string, opts: any) => {
       });
     });
 
-    output.css = result.css;
+    output.output = result.css;
 
   } catch (e) {
     const diagnostic: d.Diagnostic = {
