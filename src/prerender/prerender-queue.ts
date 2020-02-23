@@ -125,6 +125,7 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
       componentGraphPath: manager.componentGraphPath,
       devServerHostUrl: manager.devServerHostUrl,
       hydrateAppFilePath: manager.hydrateAppFilePath,
+      isDebug: manager.isDebug,
       prerenderConfigPath: manager.prerenderConfigPath,
       templateId: manager.templateId,
       url: url,

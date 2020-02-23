@@ -4,10 +4,11 @@ import { drainPrerenderQueue, initializePrerenderEntryUrls } from './prerender-q
 import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
 import { generateTemplateHtml } from './prerender-template-html';
-import { getPrerenderConfig, validatePrerenderConfigPath } from './prerender-config';
+import { getPrerenderConfig, validatePrerenderConfigPath, getHydrateOptions } from './prerender-config';
 import { getAbsoluteBuildDir } from '../compiler/html/utils';
 import { isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { NodeWorkerController } from '../sys/node_next/worker';
+
 import crypto from 'crypto';
 import fs from 'fs';
 import os from 'os';
@@ -46,6 +47,7 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
     try {
       const cliWorkerPath = path.join(cliRootDir, 'cli-worker.js');
       workerCtrl = new NodeWorkerController(
+        'stencil-cli-worker',
         cliWorkerPath,
         config.maxConcurrentWorkers,
         config.logger
@@ -86,6 +88,10 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWo
 
     const devServerBaseUrl = new URL(devServer.browserUrl);
     const devServerHostUrl = devServerBaseUrl.origin;
+    const prerenderConfig = getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig);
+
+    const hydrateOpts = getHydrateOptions(prerenderConfig, devServerBaseUrl, diagnostics);
+
     config.logger.debug(`prerender hydrate app: ${hydrateAppFilePath}`);
     config.logger.debug(`prerender dev server: ${devServerHostUrl}`);
 
@@ -109,13 +115,13 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWo
       logCount: 0,
       maxConcurrency: Math.max(20, (config.maxConcurrentWorkers * 10)),
       outputTarget: outputTarget,
-      prerenderConfig: getPrerenderConfig(prerenderDiagnostics, outputTarget.prerenderConfig),
+      prerenderConfig: prerenderConfig,
       prerenderConfigPath: outputTarget.prerenderConfig,
       templateId: null,
       urlsCompleted: new Set(),
       urlsPending: new Set(),
       urlsProcessing: new Set(),
-      resolve: null
+      resolve: null,
     };
 
     if (!config.flags.ci && !manager.isDebug) {
@@ -130,7 +136,7 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWo
       return;
     }
 
-    const templateHtml = await generateTemplateHtml(config, diagnostics, srcIndexHtmlPath, outputTarget);
+    const templateHtml = await generateTemplateHtml(diagnostics, manager.isDebug, srcIndexHtmlPath, outputTarget, hydrateOpts);
     if (diagnostics.length > 0 || typeof templateHtml !== 'string') {
       return;
     }
@@ -192,7 +198,6 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWo
   }
 }
 
-
 function createPrerenderTemplate(config: d.Config, templateHtml: string) {
   const hash = generateContentHash(templateHtml);
   const templateFileName = `prerender-template-${hash}.html`;
@@ -201,7 +206,6 @@ function createPrerenderTemplate(config: d.Config, templateHtml: string) {
   fs.writeFileSync(templateId, templateHtml);
   return templateId;
 }
-
 
 function createComponentGraphPath(config: d.Config, componentGraph: d.BuildResultsComponentGraph, outputTarget: d.OutputTargetWww) {
   if (componentGraph) {
@@ -215,7 +219,6 @@ function createComponentGraphPath(config: d.Config, componentGraph: d.BuildResul
   return null;
 }
 
-
 function getComponentPathContent(config: d.Config, componentGraph: {[scopeId: string]: string[]}, outputTarget: d.OutputTargetWww) {
   const buildDir = getAbsoluteBuildDir(config, outputTarget);
   const object: {[key: string]: string[]} = {};
@@ -225,7 +228,6 @@ function getComponentPathContent(config: d.Config, componentGraph: {[scopeId: st
   }
   return JSON.stringify(object);
 }
-
 
 function startProgressLogger(prcs: NodeJS.Process): d.ProgressLogger {
   let promise = Promise.resolve();
@@ -251,7 +253,6 @@ function startProgressLogger(prcs: NodeJS.Process): d.ProgressLogger {
     stop
   };
 }
-
 
 function generateContentHash(content: string) {
   return crypto.createHash('md5')

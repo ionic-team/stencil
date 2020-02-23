@@ -1,10 +1,10 @@
 import * as d from '../../declarations';
+import { addModulePreloads, minifyScriptElements, minifyStyleElements } from '../prerender-optimize';
 import { catchError, normalizePath } from '@utils';
 import { crawlAnchorsForNextUrls } from '../crawl-urls';
-import { getPrerenderConfig } from '../prerender-config';
-import { patchNodeGlobal, patchWindowGlobal } from '../prerender-global-patch';
-import { generateModulePreloads } from './prerender-modulepreload';
+import { getHydrateOptions, getPrerenderConfig } from '../prerender-config';
 import { initNodeWorkerThread } from '../../sys/node_next/worker/worker-child';
+import { patchNodeGlobal, patchWindowGlobal } from '../prerender-global-patch';
 import fs from 'graceful-fs';
 import path from 'path';
 import { URL } from 'url';
@@ -48,7 +48,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       prerenderRequest.prerenderConfigPath
     );
 
-    const opts = getRenderToStringOptions(prerenderConfig, url, results);
+    const hydrateOpts = getHydrateOptions(prerenderConfig, url, results.diagnostics);
 
     if (typeof prerenderConfig.beforeHydrate === 'function') {
       try {
@@ -63,10 +63,20 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html
-    const hydrateResults = await hydrateApp.hydrateDocument(doc, opts) as d.HydrateResults;
+    const hydrateResults = await hydrateApp.hydrateDocument(doc, hydrateOpts) as d.HydrateResults;
     results.diagnostics.push(...hydrateResults.diagnostics);
 
-    generateModulePreloads(doc, hydrateResults, componentGraph);
+    if (hydrateOpts.addModulePreloads && !prerenderRequest.isDebug) {
+      addModulePreloads(doc, hydrateResults, componentGraph);
+    }
+
+    if (hydrateOpts.minifyStyleElements && !prerenderRequest.isDebug) {
+      await minifyStyleElements(doc);
+    }
+
+    if (hydrateOpts.minifyScriptElements && !prerenderRequest.isDebug) {
+      await minifyScriptElements(doc);
+    }
 
     if (typeof prerenderConfig.afterHydrate === 'function') {
       try {
@@ -86,7 +96,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       return results;
     }
 
-    const html = hydrateApp.serializeDocumentToString(doc, opts);
+    const html = hydrateApp.serializeDocumentToString(doc, hydrateOpts);
 
     const baseUrl = new URL(prerenderRequest.baseUrl);
     results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, baseUrl, url, hydrateResults.anchors);
@@ -116,47 +126,6 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   return results;
 }
 
-
-function getRenderToStringOptions(prerenderConfig: d.PrerenderConfig, url: URL, results: d.PrerenderResults) {
-  const prerenderUrl = url.href;
-
-  const opts: d.SerializeDocumentOptions = {
-    url: prerenderUrl,
-    approximateLineWidth: 100,
-    removeAttributeQuotes: true,
-    removeBooleanAttributeQuotes: true,
-    removeEmptyAttributes: true,
-    removeHtmlComments: true,
-  };
-
-  if (typeof prerenderConfig.canonicalUrl === 'function') {
-    try {
-      opts.canonicalUrl = prerenderConfig.canonicalUrl(url);
-    } catch (e) {
-      catchError(results.diagnostics, e);
-    }
-  } else {
-    opts.canonicalUrl = prerenderUrl;
-  }
-
-  if (typeof prerenderConfig.hydrateOptions === 'function') {
-    try {
-      const userOpts = prerenderConfig.hydrateOptions(url);
-      if (userOpts != null) {
-        if (userOpts.prettyHtml && typeof userOpts.removeAttributeQuotes !== 'boolean') {
-          opts.removeAttributeQuotes = false;
-        }
-        Object.assign(opts, userOpts);
-      }
-    } catch (e) {
-      catchError(results.diagnostics, e);
-    }
-  }
-
-  return opts;
-}
-
-
 function writePrerenderedHtml(results: d.PrerenderResults, html: string) {
   ensureDir(results.filePath);
 
@@ -170,7 +139,6 @@ function writePrerenderedHtml(results: d.PrerenderResults, html: string) {
     });
   });
 }
-
 
 const ensuredDirs = new Set<string>();
 
@@ -215,10 +183,10 @@ function getComponentGraph(componentGraphPath: string) {
 
 
 function initPrerenderWorker(prcs: NodeJS.Process) {
-  if (prcs.argv.includes('stencil-worker')) {
-    // stencil-worker cmd line arg used to start the worker
+  if (prcs.argv.includes('stencil-cli-worker')) {
+    // cmd line arg used to start the worker
     // and attached a message handler to the process
-    initNodeWorkerThread(prcs, async (msgFromMain) => {
+    initNodeWorkerThread(prcs, (msgFromMain) => {
       const fnName: string = msgFromMain.args[0];
       const fnArgs = msgFromMain.args.slice(1);
 
