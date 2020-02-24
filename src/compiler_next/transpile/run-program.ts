@@ -79,7 +79,7 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
     if (config.devMode) {
       tsSemantic.forEach(semanticDiagnostic => {
         // Unused variable errors become warnings in dev mode
-        if (semanticDiagnostic.code === '6133') {
+        if (semanticDiagnostic.code === '6133' || semanticDiagnostic.code === '6192') {
           semanticDiagnostic.level = 'warn';
         }
       });
