@@ -182,7 +182,7 @@ describe('optimizeCss',  () => {
     config.minifyCss = true;
     const styleText = `
       h1 {
-        background: url("http://site.com:80/image.jpg");
+        background: url("http://site.com/image.jpg");
       }
     `;
     const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
