@@ -200,6 +200,29 @@ Some of main features with the `--next` compiler include:
 
 
 
+## 🎿 [1.8.10](https://github.com/ionic-team/stencil/compare/v1.8.9...v1.8.10) (2020-02-25)
+
+
+### Bug Fixes
+
+* **minify:** do not remove console.debug() ([acd7209](https://github.com/ionic-team/stencil/commit/acd72094ced9d6bcf14b2801ab5f307c8ff8dfe2)), closes [#2216](https://github.com/ionic-team/stencil/issues/2216)
+
+
+### Features
+
+* **input:** update JSX InputHTMLAttributes ([38ffc86](https://github.com/ionic-team/stencil/commit/38ffc865831f364a5b6bb54a2d7b99cc6a35df56)), closes [#2218](https://github.com/ionic-team/stencil/issues/2218)
+* **mock-doc:** add global HTML constructors to node test global ([5036a59](https://github.com/ionic-team/stencil/commit/5036a5987ca3478ae9002aef2d67215af88fa616))
+* **rollup:** update to rollup 1.31.1 ([a883b93](https://github.com/ionic-team/stencil/commit/a883b936e48fbcc9f36fa2218fa0048db3f9ca8c))
+* **typescript:** update to typescript 3.8.2 ([aa4d189](https://github.com/ionic-team/stencil/commit/aa4d1898279ee01fb382a5bf94c336a939bc8025))
+
+
+
+## ⛄️ [1.8.9](https://github.com/ionic-team/stencil/compare/v1.8.8...v1.8.9) (2020-02-18)
+
+- Backported runtime improvements from 1.9.x builds
+
+
+
 ## 🏙 [1.8.8](https://github.com/ionic-team/stencil/compare/v1.8.7...v1.8.8) (2020-02-12)
 
 
