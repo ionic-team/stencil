@@ -1,11 +1,10 @@
 import { NodeWorkerMain } from '../worker-main';
-import { buildEvents } from '../../../../compiler/events';
 
 
 export class TestWorkerMain extends NodeWorkerMain {
 
   constructor(workerId: number) {
-    super(workerId, buildEvents(), null);
+    super('TestWorker', workerId, null);
     this.fork();
   }
 
