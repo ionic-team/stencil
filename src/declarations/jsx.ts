@@ -351,7 +351,10 @@ export namespace JSXBase {
 
   export interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
     accept?: string;
+    allowdirs?: boolean;
     alt?: string;
+    autoCapitalize?: string;
+    autocapitalize?: string;
     autoComplete?: string;
     autocomplete?: string;
     autoFocus?: boolean;
@@ -360,7 +363,11 @@ export namespace JSXBase {
     checked?: boolean;
     crossOrigin?: string;
     crossorigin?: string;
+    defaultChecked?: boolean;
+    defaultValue?: string;
+    dirName?: string;
     disabled?: boolean;
+    files?: any;
     form?: string;
     formAction?: string;
     formaction?: string;
@@ -373,6 +380,8 @@ export namespace JSXBase {
     formTarget?: string;
     formtarget?: string;
     height?: number | string;
+    indeterminate?: boolean;
+    inputmode?: string;
     list?: string;
     max?: number | string;
     maxLength?: number;
@@ -387,11 +396,18 @@ export namespace JSXBase {
     readOnly?: boolean;
     readonly?: boolean | string;
     required?: boolean;
+    selectionStart?: number | string;
+    selectionEnd?: number | string;
+    selectionDirection?: string;
     size?: number;
     src?: string;
     step?: number | string;
     type?: string;
     value?: string | string[] | number;
+    valueAsDate?: any;
+    valueAsNumber?: any;
+    webkitdirectory?: boolean;
+    webkitEntries?: any;
     width?: number | string;
   }
 
