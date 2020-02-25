@@ -48,6 +48,7 @@ export const optimizeModule = async (
           supportsListenerOptions: true,
           'plt.$cssShim$': false
         };
+        compressOpts.pure_funcs = compressOpts.pure_funcs || [];
         compressOpts.pure_funcs = ['getHostRef', ...compressOpts.pure_funcs];
       }
 
@@ -102,9 +103,6 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, isD
       pure_getters: true,
       keep_fargs: false,
       passes: 2,
-      pure_funcs: [
-        'console.debug'
-      ],
     };
 
     opts.ecma = opts.output.ecma = opts.compress.ecma = 8;
