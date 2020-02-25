@@ -69,9 +69,6 @@ export const getTerserOptions = (sourceTarget: d.SourceTarget, isDebug: boolean)
       pure_getters: true,
       keep_fargs: false,
       passes: 2,
-      pure_funcs: [
-        'console.debug'
-      ]
     };
 
     opts.ecma = opts.output.ecma = opts.compress.ecma = 7;
