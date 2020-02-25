@@ -61,6 +61,12 @@ export class MockNode {
     throw new Error(`invalid node type to clone: ${this.nodeType}, deep: ${deep}`);
   }
 
+  compareDocumentPosition(_other: MockNode) {
+    // unimplemented
+    // https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
+    return -1;
+  }
+
   get firstChild() {
     return this.childNodes[0] || null;
   }
