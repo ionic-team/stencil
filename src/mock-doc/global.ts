@@ -1,3 +1,5 @@
+import { MockAnchorElement, MockBaseElement, MockButtonElement, MockCanvasElement, MockFormElement, MockImageElement, MockInputElement, MockLinkElement, MockMetaElement, MockScriptElement, MockStyleElement, MockTemplateElement, MockTitleElement } from './element';
+import { MockCustomEvent, MockEvent, MockKeyboardEvent, MockMouseEvent } from './event';
 import { MockWindow } from './window';
 
 
@@ -20,6 +22,10 @@ export function setupGlobal(gbl: any) {
           enumerable: true
         });
       }
+    });
+
+    GLOBAL_CONSTRUCTORS.forEach(([cstrName]) => {
+      gbl[cstrName] = win[cstrName];
     });
   }
 
@@ -53,6 +59,21 @@ export function patchWindow(winToBePatched: any) {
         enumerable: true
       });
     }
+  });
+}
+
+export function addGlobalsToWindowPrototype(mockWinPrototype: any) {
+  GLOBAL_CONSTRUCTORS.forEach(([cstrName, Cstr]) => {
+    Object.defineProperty(mockWinPrototype, cstrName, {
+      get() {
+        return (this['__' + cstrName]) || Cstr;
+      },
+      set(cstr: any) {
+        this['__' + cstrName] = cstr;
+      },
+      configurable: true,
+      enumerable: true,
+    });
   });
 }
 
@@ -109,4 +130,25 @@ const WINDOW_PROPS = [
   'NodeList',
   'KeyboardEvent',
   'MouseEvent'
+];
+
+const GLOBAL_CONSTRUCTORS: [string, any][] = [
+  ['CustomEvent', MockCustomEvent],
+  ['Event', MockEvent],
+  ['KeyboardEvent', MockKeyboardEvent],
+  ['MouseEvent', MockMouseEvent],
+
+  ['HTMLAnchorElement', MockAnchorElement],
+  ['HTMLBaseElement', MockBaseElement],
+  ['HTMLButtonElement', MockButtonElement],
+  ['HTMLCanvasElement', MockCanvasElement],
+  ['HTMLFormElement', MockFormElement],
+  ['HTMLImageElement', MockImageElement],
+  ['HTMLInputElement', MockInputElement],
+  ['HTMLLinkElement', MockLinkElement],
+  ['HTMLMetaElement', MockMetaElement],
+  ['HTMLScriptElement', MockScriptElement],
+  ['HTMLStyleElement', MockStyleElement],
+  ['HTMLTemplateElement', MockTemplateElement],
+  ['HTMLTitleElement', MockTitleElement],
 ];

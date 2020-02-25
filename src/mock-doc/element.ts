@@ -22,11 +22,14 @@ export function createElement(ownerDocument: any, tagName: string) {
     case 'button':
       return new MockButtonElement(ownerDocument);
 
+    case 'canvas':
+      return new MockCanvasElement(ownerDocument);
+
     case 'form':
       return new MockFormElement(ownerDocument);
 
     case 'img':
-      return new MockImgElement(ownerDocument);
+      return new MockImageElement(ownerDocument);
 
     case 'input':
       return new MockInputElement(ownerDocument);
@@ -48,9 +51,6 @@ export function createElement(ownerDocument: any, tagName: string) {
 
     case 'title':
       return new MockTitleElement(ownerDocument);
-
-    case 'canvas':
-      return new MockCanvasElement(ownerDocument);
   }
 
   if (ownerDocument != null && tagName.includes('-')) {
@@ -73,7 +73,7 @@ export function createElementNS(ownerDocument: any, namespaceURI: string, tagNam
   }
 }
 
-class MockAnchorElement extends MockHTMLElement {
+export class MockAnchorElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'a');
   }
@@ -87,7 +87,7 @@ class MockAnchorElement extends MockHTMLElement {
 }
 
 
-class MockButtonElement extends MockHTMLElement {
+export class MockButtonElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'button');
   }
@@ -99,7 +99,7 @@ patchPropAttributes(MockButtonElement.prototype, {
 });
 
 
-class MockImgElement extends MockHTMLElement {
+export class MockImageElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'img');
   }
@@ -111,12 +111,12 @@ class MockImgElement extends MockHTMLElement {
     this.setAttribute('src', value);
   }
 }
-patchPropAttributes(MockImgElement.prototype, {
+patchPropAttributes(MockImageElement.prototype, {
   height: Number,
   width: Number
 });
 
-class MockInputElement extends MockHTMLElement {
+export class MockInputElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'input');
   }
@@ -166,7 +166,7 @@ patchPropAttributes(MockInputElement.prototype, {
   type: 'text'
 });
 
-class MockFormElement extends MockHTMLElement {
+export class MockFormElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'form');
   }
@@ -176,7 +176,7 @@ patchPropAttributes(MockFormElement.prototype, {
 });
 
 
-class MockLinkElement extends MockHTMLElement {
+export class MockLinkElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'link');
   }
@@ -196,7 +196,7 @@ patchPropAttributes(MockLinkElement.prototype, {
 });
 
 
-class MockMetaElement extends MockHTMLElement {
+export class MockMetaElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'meta');
   }
@@ -208,7 +208,7 @@ patchPropAttributes(MockMetaElement.prototype, {
 });
 
 
-class MockScriptElement extends MockHTMLElement {
+export class MockScriptElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'script');
   }
@@ -322,7 +322,7 @@ export class MockTemplateElement extends MockHTMLElement {
 }
 
 
-class MockTitleElement extends MockHTMLElement {
+export class MockTitleElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'title');
   }
@@ -336,7 +336,7 @@ class MockTitleElement extends MockHTMLElement {
 }
 
 
-class MockCanvasElement extends MockHTMLElement {
+export class MockCanvasElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'canvas');
   }

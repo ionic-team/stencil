@@ -1,6 +1,7 @@
+import { addGlobalsToWindowPrototype } from './global';
 import { createConsole } from './console';
 import { MockCustomElementRegistry } from './custom-element-registry';
-import { MockCustomEvent, MockEvent, MockKeyboardEvent, MockMouseEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
+import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { MockDocument, resetDocument } from './document';
 import { MockElement, MockHTMLElement, MockNode, MockNodeList } from './node';
 import { MockHistory } from './history';
@@ -29,10 +30,6 @@ export class MockWindow {
   __sessionStorage: MockStorage;
   __location: MockLocation;
   __navigator: MockNavigator;
-  __eventClass: any;
-  __customEventClass: any;
-  __keyboardEventClass: any;
-  __mouseEventClass: any;
   __clearInterval: typeof nativeClearInterval;
   __clearTimeout: typeof nativeClearTimeout;
   __setInterval: typeof nativeSetInterval;
@@ -116,16 +113,6 @@ export class MockWindow {
     };
   }
 
-  get CustomEvent() {
-    if (this.__customEventClass != null) {
-      return this.__customEventClass;
-    }
-    return MockCustomEvent;
-  }
-  set CustomEvent(custEvClass: any) {
-    this.__customEventClass = custEvClass;
-  }
-
   dispatchEvent(ev: MockEvent) {
     return dispatchEvent(this, ev);
   }
@@ -141,16 +128,6 @@ export class MockWindow {
       };
     }
     return this.__elementCstr;
-  }
-
-  get Event() {
-    if (this.__eventClass != null) {
-      return this.__eventClass;
-    }
-    return MockEvent;
-  }
-  set Event(ev: any) {
-    this.__eventClass = ev;
   }
 
   focus(): any {/**/}
@@ -194,16 +171,6 @@ export class MockWindow {
 
   get JSON() {
     return JSON;
-  }
-
-  get KeyboardEvent() {
-    if (this.__keyboardEventClass != null) {
-      return this.__keyboardEventClass;
-    }
-    return MockKeyboardEvent;
-  }
-  set KeyboardEvent(kbEvClass: any) {
-    this.__keyboardEventClass = kbEvClass;
   }
 
   get HTMLElement() {
@@ -264,16 +231,6 @@ export class MockWindow {
     return {
       matches: false
     };
-  }
-
-  get MouseEvent() {
-    if (this.__mouseEventClass != null) {
-      return this.__mouseEventClass;
-    }
-    return MockMouseEvent;
-  }
-  set MouseEvent(mouseEvClass: any) {
-    this.__mouseEventClass = mouseEvClass;
   }
 
   get Node() {
@@ -534,6 +491,8 @@ export class MockWindow {
   onwebkitfullscreenerror() {/**/}
   onwheel() {/**/}
 }
+
+addGlobalsToWindowPrototype(MockWindow.prototype);
 
 function resetWindowDefaults(win: MockWindow) {
   win.__clearInterval = nativeClearInterval;
