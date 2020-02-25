@@ -14,6 +14,7 @@ export async function optimizeModule(config: d.Config, compilerCtx: d.CompilerCt
         supportsListenerOptions: true,
         'plt.$cssShim$': false
       };
+      opts.compress.pure_funcs = opts.compress.pure_funcs || [];
       opts.compress.pure_funcs = ['getHostRef', ...opts.compress.pure_funcs];
     }
 
