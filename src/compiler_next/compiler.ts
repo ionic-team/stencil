@@ -1,5 +1,4 @@
 import { Cache } from '../compiler/cache';
-import { cleanFetchCache } from './sys/fetch/fetch-cache';
 import { CompilerNext, Config, Diagnostic } from '../declarations';
 import { CompilerContext } from './build/compiler-ctx';
 import { createFullBuild } from './build/full-build';
@@ -57,8 +56,6 @@ export const createCompiler = async (config: Config) => {
   };
 
   config.logger.printDiagnostics(diagnostics);
-
-  cleanFetchCache();
 
   return compiler;
 };

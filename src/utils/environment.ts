@@ -29,12 +29,6 @@ export const IS_FETCH_ENV = (
   typeof fetch === 'function'
 );
 
-export const HAS_FETCH_CACHE = (
-  IS_FETCH_ENV &&
-  typeof caches !== 'undefined' &&
-  typeof caches.match === 'function'
-);
-
 export const HAS_WEB_WORKER = (
   typeof Worker === 'function' &&
   IS_LOCATION_ENV

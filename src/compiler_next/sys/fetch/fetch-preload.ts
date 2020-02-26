@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
-import { CACHES } from '../fetch/fetch-cache';
+import { cachedFetch } from './fetch-cache';
 import { getRemoteTypeScriptUrl } from '../dependencies';
-import { HAS_FETCH_CACHE, IS_FETCH_ENV, IS_WEB_WORKER_ENV } from '@utils';
+import { IS_FETCH_ENV, IS_WEB_WORKER_ENV } from '@utils';
 import { join } from 'path';
 
 
@@ -9,13 +9,12 @@ export const fetchPreloadFs = async (config: d.Config, inMemoryFs: d.InMemoryFil
   if (IS_WEB_WORKER_ENV && IS_FETCH_ENV) {
     const preloadUrls = getCoreFetchPreloadUrls(config, config.sys_next.getCompilerExecutingPath());
 
-    const coreCache = HAS_FETCH_CACHE ? await caches.open(CACHES.core) : null;
-
     await Promise.all(preloadUrls.map(async preload => {
       try {
         const fileExists = await inMemoryFs.access(preload.filePath);
         if (!fileExists) {
-          const content = await getCoreContent(coreCache, preload.url);
+          const rsp = await cachedFetch(preload.url);
+          const content = await rsp.text();
           await inMemoryFs.writeFile(preload.filePath, content);
         }
 
@@ -26,21 +25,6 @@ export const fetchPreloadFs = async (config: d.Config, inMemoryFs: d.InMemoryFil
 
     await inMemoryFs.commit();
   }
-};
-
-const getCoreContent = async (coreCache: Cache, url: string) => {
-  if (coreCache) {
-    const cachedRsp = await coreCache.match(url);
-    if (cachedRsp) {
-      return cachedRsp.text();
-    }
-  }
-
-  const rsp = await fetch(url);
-  if (rsp.ok && coreCache) {
-    coreCache.put(url, rsp.clone());
-  }
-  return rsp.text();
 };
 
 const getCoreFetchPreloadUrls = (config: d.Config, compilerUrl: string) => {

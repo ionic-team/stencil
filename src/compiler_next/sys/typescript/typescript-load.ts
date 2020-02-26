@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
-import { CACHES } from '../fetch/fetch-cache';
-import { catchError, HAS_FETCH_CACHE, IS_NODE_ENV, IS_WEB_WORKER_ENV, requireFunc } from '@utils';
+import { cachedFetch } from '../fetch/fetch-cache';
+import { catchError, IS_NODE_ENV, IS_WEB_WORKER_ENV, requireFunc } from '@utils';
 import { getRemoteTypeScriptUrl } from '../dependencies';
 import { patchTsSystemUtils } from './typescript-sys';
 import { version } from '../../../version';
@@ -52,8 +52,9 @@ const importTypescriptScript = async (tsUrl: string) => {
     }
 
     if (!importedTs) {
-      const content = await cachedTypescriptFetch(tsUrl);
-      if (content) {
+      const rsp = await cachedFetch(tsUrl);
+      if (rsp) {
+        const content = await rsp.text();
         const getTs = new Function(content + ';return ts;');
         importedTs = getTs();
       }
@@ -67,30 +68,4 @@ const importTypescriptScript = async (tsUrl: string) => {
 
   } catch (e) {}
   return importedTs;
-};
-
-const cachedTypescriptFetch = async (tsUrl: string) => {
-  try {
-    const cache = HAS_FETCH_CACHE ? await caches.open(CACHES.core) : null;
-    if (cache) {
-      const cache = await caches.open(CACHES.core);
-      const cachedRsp = await cache.match(tsUrl);
-      if (cachedRsp) {
-        return cachedRsp.text();
-      }
-    }
-
-    const rsp = await fetch(tsUrl);
-    if (rsp && rsp.ok) {
-      if (cache) {
-        cache.put(tsUrl, rsp.clone());
-      }
-      return rsp.text();
-    }
-
-  } catch (e) {
-    console.error(e);
-  }
-
-  return null;
 };
