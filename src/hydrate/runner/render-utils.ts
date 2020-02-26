@@ -26,6 +26,13 @@ export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
     outputOpts.timeout = 15000;
   }
 
+  if (!Array.isArray(outputOpts.excludeComponents)) {
+    outputOpts.excludeComponents = [];
+  }
+  outputOpts.excludeComponents = outputOpts.excludeComponents
+    .filter(c => typeof c === 'string' && c.includes('-'))
+    .map(c => c.toLowerCase());
+
   return outputOpts;
 }
 

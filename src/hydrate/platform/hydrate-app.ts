@@ -80,14 +80,36 @@ export function hydrateApp(
 
     function connectElement(elm: HTMLElement) {
       createdElements.delete(elm);
-      if (elm != null && elm.nodeType === 1 && results.hydratedCount < opts.maxHydrateCount && shouldHydrate(elm)) {
-        const tagName = elm.nodeName.toLowerCase();
 
-        if (tagName.includes('-') && !connectedElements.has(elm)) {
-          connectedElements.add(elm);
-          return hydrateComponent(win, results, tagName, elm);
+      if (elm != null && elm.nodeType === 1 && results.hydratedCount < opts.maxHydrateCount) {
+        // this is a valid element to hydrate
+        // and we haven't hit our max hydrated count yet
+
+        if (shouldHydrate(elm)) {
+          // this is a valid element to hydrate
+          // and all of its ancestor elements are valid too
+          const tagName = elm.nodeName.toLowerCase();
+
+          if (tagName.includes('-')) {
+            // this is a component, not just an element
+
+            if (opts.excludeComponents.includes(tagName)) {
+              // we want to skip hydrating this component
+              // but it does not skip hydrating its child components
+              // or check to see if any of its ancestor components were excluded
+              return resolved;
+            }
+
+            if (!connectedElements.has(elm)) {
+              // we haven't connected this element yet
+              // add it to our Set so we know it's already being connected
+              connectedElements.add(elm);
+              return hydrateComponent(win, results, tagName, elm);
+            }
+          }
         }
       }
+
       return resolved;
     }
 
@@ -158,7 +180,6 @@ async function hydrateComponent(win: Window, results: d.HydrateResults, tagName:
     }
   }
 }
-
 
 function shouldHydrate(elm: Element): boolean {
   if (elm.nodeType === 9) {
