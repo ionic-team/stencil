@@ -32,7 +32,7 @@ export const hmrInlineStyles = (elm: Element, versionId: string, stylesUpdated: 
 };
 
 const hmrStyleElement = (elm: Element, versionId: string, stylesUpdated: d.HmrStyleUpdate) => {
-  const styleId = elm.getAttribute('s-id');
+  const styleId = elm.getAttribute('sty-id');
   if (styleId === stylesUpdated.styleId && stylesUpdated.styleText) {
     // if we made it this far then it's a match!
     // update the new style text
