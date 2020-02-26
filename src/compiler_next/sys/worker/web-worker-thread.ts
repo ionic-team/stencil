@@ -63,7 +63,9 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
     // message from the main thread
     const msgsFromMainToWorker: MsgToWorker[] = ev.data;
     if (Array.isArray(msgsFromMainToWorker)) {
-      msgsFromMainToWorker.forEach(receiveMsgFromMainToWorker);
+      for (const msgFromMainToWorker of msgsFromMainToWorker) {
+        receiveMsgFromMainToWorker(msgFromMainToWorker);
+      }
     }
   };
 

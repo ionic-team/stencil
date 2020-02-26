@@ -7,6 +7,7 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
   let isDestroyed = false;
   let isQueued = false;
   let workerIds = 0;
+  let workerBlob: Blob;
   const tasks = new Map<number, d.CompilerWorkerTask>();
   const queuedSendMsgs: d.MsgToWorker[] = [];
   const workers: WorkerChild[] = [];
@@ -18,7 +19,7 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
     if (!isDestroyed) {
       const msgsFromWorker: d.MsgFromWorker[] = ev.data;
       if (Array.isArray(msgsFromWorker)) {
-        msgsFromWorker.forEach(msgFromWorker => {
+        for (const msgFromWorker of msgsFromWorker) {
           if (msgFromWorker) {
             const task = tasks.get(msgFromWorker.stencilId);
             if (task) {
@@ -38,7 +39,7 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
               console.error(msgFromWorker.stencilRtnError);
             }
           }
-        });
+        }
       }
     }
   };
@@ -46,9 +47,25 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
   const onError = (e: ErrorEvent) => console.error(e);
 
   const createWebWorkerMain = () => {
-    const worker = new Worker(workerUrl, {
+    let worker: Worker = null;
+    const workerOpts: WorkerOptions = {
       name: `stencil.worker.${workerIds++}`
-    });
+    };
+
+    try {
+      // first try directly starting the worker with the URL
+      worker = new Worker(workerUrl, workerOpts);
+    } catch (e) {
+      // probably a cross-origin issue, try using a Blob instead
+      if (workerBlob == null) {
+        workerBlob = new Blob(
+          [`importScripts('${workerUrl}');`],
+          { type: 'application/javascript' }
+        );
+      }
+      worker = new Worker(URL.createObjectURL(workerBlob), workerOpts);
+    }
+
     const workerChild: WorkerChild = {
       worker,
       activeTasks: 0,
