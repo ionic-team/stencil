@@ -4,10 +4,12 @@ import { addHostEventListeners } from '@runtime';
 export const cmpModules = new Map<string, {[exportName: string]: d.ComponentConstructor}>();
 
 const getModule = (tagName: string): d.ComponentConstructor => {
-  tagName = tagName.toLowerCase();
-  const cmpModule = cmpModules.get(tagName);
-  if (cmpModule != null) {
-    return cmpModule[tagName];
+  if (typeof tagName === 'string') {
+    tagName = tagName.toLowerCase();
+    const cmpModule = cmpModules.get(tagName);
+    if (cmpModule != null) {
+      return cmpModule[tagName];
+    }
   }
   return null;
 };
@@ -22,13 +24,11 @@ export const isMemberInElement = (elm: any, memberName: string) => {
     if (memberName in elm) {
       return true;
     }
-    if (typeof elm.nodeName === 'string') {
-      const cstr = getModule(elm.nodeName.toLowerCase());
-      if (cstr != null) {
-        const hostRef: d.ComponentNativeConstructor = cstr as any;
-        if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
-          return memberName in hostRef.cmpMeta.$members$;
-        }
+    const cstr = getModule(elm.nodeName);
+    if (cstr != null) {
+      const hostRef: d.ComponentNativeConstructor = cstr as any;
+      if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
+        return memberName in hostRef.cmpMeta.$members$;
       }
     }
   }

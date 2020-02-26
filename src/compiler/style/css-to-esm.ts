@@ -22,7 +22,7 @@ export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
     const defaultVarName = createCssVarName(input.filePath, input.modeName);
     const varNames = new Set([defaultVarName]);
 
-    if (input.encapsulation === 'scoped') {
+    if (input.encapsulation === 'scoped' || (input.encapsulation === 'shadow' && input.commentOriginalSelector)) {
       const scopeId = getScopeId(input.tagName, input.modeName);
       results.styleText = scopeCss(results.styleText, scopeId, input.commentOriginalSelector);
     }

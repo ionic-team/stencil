@@ -74,7 +74,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       typescriptPlugin(compilerCtx, bundleOpts),
       imagePlugin(config, compilerCtx, buildCtx),
       textPlugin(),
-      extTransformsPlugin(config, compilerCtx, buildCtx),
+      extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform),
       ...config.rollupPlugins,
       nodeResolvePlugin,

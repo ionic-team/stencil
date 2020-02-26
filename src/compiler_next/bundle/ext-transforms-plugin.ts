@@ -1,11 +1,12 @@
 import * as d from '../../declarations';
+import { BundleOptions } from './bundle-interface';
 import { hasError, normalizeFsPath } from '@utils';
 import { parseStencilImportPathData } from '../../compiler/transformers/stencil-import-path';
 import { Plugin } from 'rollup';
 import { runPluginTransformsEsmImports } from '../../compiler/plugin/plugin';
 
 
-export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Plugin => {
+export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions): Plugin => {
   return {
     name: 'extTransformsPlugin',
 
@@ -34,16 +35,18 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
           }));
         }
 
+        const commentOriginalSelector = (bundleOpts.platform === 'hydrate');
+
         const cssTransformResults = await compilerCtx.worker.transformCssToEsm({
           filePath: pluginTransforms.id,
           code: pluginTransforms.code,
           tagName: pathData.tag,
           encapsulation: pathData.encapsulation,
           modeName: pathData.mode,
-          commentOriginalSelector: false,
+          commentOriginalSelector,
           sourceMap: config.sourceMap,
           minify: config.minifyCss,
-          autoprefixer: config.autoprefixCss
+          autoprefixer: config.autoprefixCss,
         });
 
         // Track dependencies
