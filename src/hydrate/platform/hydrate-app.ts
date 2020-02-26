@@ -55,19 +55,30 @@ export function hydrateApp(
     }
 
     function patchElement(elm: d.HostElement) {
-      const tagName = elm.nodeName.toLowerCase();
-      if (tagName.includes('-')) {
-        const Cstr = loadModule({
-          $tagName$: tagName,
-          $flags$: null,
-        }, null) as d.ComponentConstructor;
+      if (isValidComponent(elm, opts)) {
+        // this element is a valid component
 
-        if (Cstr != null && Cstr.cmpMeta != null) {
-          createdElements.add(elm);
-          elm.connectedCallback = patchedConnectedCallback;
+        const hostRef = getHostRef(elm);
+        if (!hostRef) {
+          // we haven't registered this component's host element yet
 
-          registerHost(elm, Cstr.cmpMeta);
-          proxyHostElement(elm, Cstr.cmpMeta);
+          // get the component's constructor
+          const Cstr = loadModule({
+            $tagName$: elm.nodeName.toLowerCase(),
+            $flags$: null,
+          }, null) as d.ComponentConstructor;
+
+          if (Cstr != null && Cstr.cmpMeta != null) {
+            // we found valid component metadata
+            createdElements.add(elm);
+            elm.connectedCallback = patchedConnectedCallback;
+
+            // register the host element
+            registerHost(elm, Cstr.cmpMeta);
+
+            // proxy the host element with the component's metadata
+            proxyHostElement(elm, Cstr.cmpMeta);
+          }
         }
       }
     }
@@ -85,32 +96,17 @@ export function hydrateApp(
     function connectElement(elm: HTMLElement) {
       createdElements.delete(elm);
 
-      if (elm != null && elm.nodeType === 1 && results.hydratedCount < opts.maxHydrateCount) {
-        // this is a valid element to hydrate
+      if (isValidComponent(elm, opts) && results.hydratedCount < opts.maxHydrateCount) {
+        // this is a valid component to hydrate
         // and we haven't hit our max hydrated count yet
 
-        if (shouldHydrate(elm)) {
-          // this is a valid element to hydrate
+        if (!connectedElements.has(elm) && shouldHydrate(elm)) {
+          // we haven't connected this component yet
           // and all of its ancestor elements are valid too
-          const tagName = elm.nodeName.toLowerCase();
 
-          if (tagName.includes('-')) {
-            // this is a component, not just an element
-
-            if (opts.excludeComponents.includes(tagName)) {
-              // we want to skip hydrating this component
-              // but it does not skip hydrating its child components
-              // or check to see if any of its ancestor components were excluded
-              return resolved;
-            }
-
-            if (!connectedElements.has(elm)) {
-              // we haven't connected this element yet
-              // add it to our Set so we know it's already being connected
-              connectedElements.add(elm);
-              return hydrateComponent(win, results, tagName, elm);
-            }
-          }
+          // add it to our Set so we know it's already being connected
+          connectedElements.add(elm);
+          return hydrateComponent(win, results, elm.nodeName, elm);
         }
       }
 
@@ -158,6 +154,7 @@ export function hydrateApp(
 
 
 async function hydrateComponent(win: Window, results: d.HydrateResults, tagName: string, elm: d.HostElement) {
+  tagName = tagName.toLowerCase();
   const Cstr = loadModule({
     $tagName$: tagName,
     $flags$: null,
@@ -188,6 +185,22 @@ async function hydrateComponent(win: Window, results: d.HydrateResults, tagName:
       }
     }
   }
+}
+
+function isValidComponent(elm: Element, opts: d.HydrateFactoryOptions) {
+  if (elm != null && elm.nodeType === 1) {
+    // playing it safe and not using elm.tagName or elm.localName on purpose
+    const tagName = elm.nodeName;
+    if (typeof tagName === 'string' && tagName.includes('-')) {
+      if (opts.excludeComponents.includes(tagName.toLowerCase())) {
+        // this tagName we DO NOT want to hydrate
+        return false;
+      }
+      // all good, this is a valid component
+      return true;
+    }
+  }
+  return false;
 }
 
 function shouldHydrate(elm: Element): boolean {
