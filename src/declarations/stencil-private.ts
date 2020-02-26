@@ -1479,6 +1479,7 @@ export interface HydrateDocumentOptions {
   clientHydrateAnnotations?: boolean;
   cookie?: string;
   direction?: string;
+  excludeComponents?: string[];
   language?: string;
   maxHydrateCount?: number;
   referrer?: string;
