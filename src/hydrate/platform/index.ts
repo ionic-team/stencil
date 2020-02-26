@@ -22,12 +22,13 @@ export const isMemberInElement = (elm: any, memberName: string) => {
     if (memberName in elm) {
       return true;
     }
-    const tagName = elm.nodeName.toLowerCase();
-    const cstr = getModule(tagName);
-    if (cstr) {
-      const hostRef: d.ComponentNativeConstructor = cstr as any;
-      if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
-        return memberName in hostRef.cmpMeta.$members$;
+    if (typeof elm.nodeName === 'string') {
+      const cstr = getModule(elm.nodeName.toLowerCase());
+      if (cstr != null) {
+        const hostRef: d.ComponentNativeConstructor = cstr as any;
+        if (hostRef != null && hostRef.cmpMeta != null && hostRef.cmpMeta.$members$ != null) {
+          return memberName in hostRef.cmpMeta.$members$;
+        }
       }
     }
   }
