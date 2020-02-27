@@ -103,8 +103,11 @@ export class TestingLegacy implements ITestingLegacy {
         env.__STENCIL_APP_SCRIPT_URL__ = getAppScriptUrl(config, this.devServer.browserUrl);
         config.logger.debug(`e2e app script url: ${env.__STENCIL_APP_SCRIPT_URL__}`);
 
-        env.__STENCIL_APP_STYLE_URL__ = getAppStyleUrl(config, this.devServer.browserUrl);
-        config.logger.debug(`e2e app style url: ${env.__STENCIL_APP_STYLE_URL__}`);
+        const styleUrl = getAppStyleUrl(config, this.devServer.browserUrl);
+        if (styleUrl) {
+          env.__STENCIL_APP_STYLE_URL__ = getAppStyleUrl(config, this.devServer.browserUrl);
+          config.logger.debug(`e2e app style url: ${env.__STENCIL_APP_STYLE_URL__}`);
+        }
       }
     }
 

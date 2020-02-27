@@ -58,8 +58,11 @@ export function getAppScriptUrl(config: d.Config, browserUrl: string) {
 }
 
 export function getAppStyleUrl(config: d.Config, browserUrl: string) {
-  const appFileName = `${config.fsNamespace}.css`;
-  return getAppUrl(config, browserUrl, appFileName);
+  if (config.globalStyle) {
+    const appFileName = `${config.fsNamespace}.css`;
+    return getAppUrl(config, browserUrl, appFileName);
+  }
+  return null;
 }
 
 function getAppUrl(config: d.Config, browserUrl: string, appFileName: string) {
