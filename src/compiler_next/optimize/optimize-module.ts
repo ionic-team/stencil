@@ -81,7 +81,7 @@ export const optimizeModule = async (
 };
 
 
-export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, isDebug: boolean) => {
+export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, prettyOutput: boolean) => {
   const opts: MinifyOptions = {
     ie8: false,
     safari10: !!config.extras.safari10,
@@ -114,7 +114,7 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, isD
     opts.compress.toplevel = true;
   }
 
-  if (isDebug) {
+  if (prettyOutput) {
     opts.mangle = { keep_fnames: true };
     opts.compress = {};
     opts.compress.drop_console = false;

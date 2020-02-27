@@ -12,14 +12,14 @@ export const optimizeJs = async (inputOpts: OptimizeJsInput) => {
   };
 
   try {
-    const isDebug = !!inputOpts.debug;
+    const prettyOutput = !!inputOpts.pretty;
     const config: Config = {
       extras: {
         safari10: true,
       }
     };
     const sourceTarget = inputOpts.target === 'es5' ? 'es5' : 'latest';
-    const minifyOpts = getTerserOptions(config, sourceTarget, isDebug);
+    const minifyOpts = getTerserOptions(config, sourceTarget, prettyOutput);
 
     const minifyResults = await minifyJs(inputOpts.input, minifyOpts);
     if (minifyResults.diagnostics.length > 0) {

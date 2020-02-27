@@ -151,21 +151,21 @@ export class AppRoot {
       this.wrap = 'off';
 
       if (this.minified === 'minified') {
-        const m = stencil.getMinifyScriptOptions({
-          script: this.script.value,
-          pretty: false
+        const results = await stencil.optimizeJs({
+          input: this.bundledInput.value,
+          target: this.script.value,
+          pretty: false,
         });
-        const results = Terser.minify(this.bundledInput.value, m.options);
-        this.bundledInput.value = results.code;
+        this.bundledInput.value = results.output;
         this.wrap = 'on';
 
       } else if (this.minified === 'pretty') {
-        const m = stencil.getMinifyScriptOptions({
-          script: this.script.value,
-          pretty: true
+        const results = await stencil.optimizeJs({
+          input: this.bundledInput.value,
+          target: this.script.value,
+          pretty: true,
         });
-        const results = Terser.minify(this.bundledInput.value, m.options);
-        this.bundledInput.value = results.code;
+        this.bundledInput.value = results.output;
       }
 
       this.preview();
@@ -355,4 +355,3 @@ export class AppRoot {
 declare const stencil: any;
 declare const ts: any;
 declare const rollup: any;
-declare const Terser: any;

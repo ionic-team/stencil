@@ -1600,7 +1600,7 @@ export interface OptimizeJsInput {
   input: string;
   filePath?: string;
   target?: 'es5' | 'latest';
-  debug?: boolean;
+  pretty?: boolean;
   sourceMap?: boolean;
 }
 
