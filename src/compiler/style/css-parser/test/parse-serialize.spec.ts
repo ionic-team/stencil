@@ -64,6 +64,11 @@ describe('css parse/serialize', () => {
       "head,body{foo:'bar';}",
     ],
     [
+      "comment-/*!",
+      "/*! 1 */ div { /* 2 */ } /*! 3 */",
+      "/*! 1 */div{}/*! 3 */",
+    ],
+    [
       "comment-in",
       "a {\n    color/**/: 12px;\n    padding/*4815162342*/: 1px /**/ 2px /*13*/ 3px;\n    border/*\\**/: solid; border-top/*\\**/: none\\9;\n}\n",
       "a{color:12px;padding:1px  2px  3px;border:solid;border-top:none\\9}",

@@ -18,10 +18,13 @@ export const serializeCss = (stylesheet: CssNode, serializeOpts: SerializeCssOpt
     return '';
   }
   const rulesLen = rules.length;
+  const out: string[] = [];
 
-  return rules
-    .map((rule, i) => serializeCssVisitNode(opts, rule, i, rulesLen))
-    .join('');
+  for (let i = 0; i < rulesLen; i++) {
+    out.push(serializeCssVisitNode(opts, rules[i], i, rulesLen));
+  }
+
+  return out.join('');
 };
 
 const serializeCssVisitNode = (opts: SerializeOpts, node: CssNode, index: number, len: number) => {
@@ -33,7 +36,11 @@ const serializeCssVisitNode = (opts: SerializeOpts, node: CssNode, index: number
     return serializeCssRule(opts, node);
   }
   if (nodeType === 'comment') {
-    return '';
+    if (node.comment[0] === '!') {
+      return `/*${node.comment}*/`;
+    } else {
+      return '';
+    }
   }
   if (nodeType === 'media') {
     return serializeCssMedia(opts, node);
