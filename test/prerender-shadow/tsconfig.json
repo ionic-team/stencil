@@ -21,8 +21,15 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core": ["../../internal"],
-      "@stencil/core/internal": ["../../internal"]
+      "@stencil/core": [
+        "../../internal"
+      ],
+      "@stencil/core/internal": [
+        "../../internal"
+      ]
     }
-  }
+  },
+  "include": [
+    "src"
+  ]
 }

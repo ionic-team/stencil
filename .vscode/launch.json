@@ -164,6 +164,7 @@
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
+        "--next",
         "--dev",
         "--prerender",
         "--max-workers=0",
