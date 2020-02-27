@@ -1,3 +1,12 @@
+## 🏰 [1.8.11](https://github.com/ionic-team/stencil/compare/v1.8.10...v1.8.11) (2020-02-27)
+
+
+### Features
+
+* **hydrate:** excludeComponents option ([a75f76a](https://github.com/ionic-team/stencil/commit/a75f76a0ef915d3a75eb688a3cdda65bbfb0f676))
+
+
+
 ## 🎿 [1.8.10](https://github.com/ionic-team/stencil/compare/v1.8.9...v1.8.10) (2020-02-25)
 
 
