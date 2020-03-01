@@ -120,7 +120,7 @@
     "terser": "4.6.4",
     "tslib": "^1.10.0",
     "util": "^0.12.1",
-    "webpack": "^4.41.5",
+    "webpack": "^4.41.6",
     "ws": "7.2.1"
   },
   "lazyDependencies": {
