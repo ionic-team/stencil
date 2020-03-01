@@ -11,7 +11,7 @@ Some of main features with the `--next` compiler include:
 - Internal compiler refactor in order to improve 3rd party tooling
 - Import CSS files using traditional ESM imports
 - Online REPL
-- TypeScript 3.8.2
+- TypeScript 3.8.3
 - Rollup 1.31.1
 
 
