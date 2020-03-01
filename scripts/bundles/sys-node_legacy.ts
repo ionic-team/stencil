@@ -45,7 +45,7 @@ export async function sysNode_legacy(opts: BuildOptions) {
               external: true
             };
           }
-          if (importee === '@mock-doc') {
+          if (importee === '@stencil/core/mock-doc') {
             return {
               id: '../../mock-doc',
               external: true

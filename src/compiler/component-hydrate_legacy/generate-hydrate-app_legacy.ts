@@ -7,7 +7,7 @@ import { updateToHydrateComponents } from './update-to-hydrate-components_legacy
 import { writeHydrateOutputs } from './write-hydrate-outputs_legacy';
 import { RollupBuild, RollupOptions } from 'rollup';
 import MagicString from 'magic-string';
-import { STENCIL_HYDRATE_FACTORY_ID, STENCIL_INTERNAL_PLATFORM_ID, STENCIL_MOCK_DOC_ID } from '../../compiler_next/bundle/entry-alias-ids';
+import { STENCIL_HYDRATE_FACTORY_ID, STENCIL_INTERNAL_HYDRATE_ID, STENCIL_MOCK_DOC_ID } from '../../compiler_next/bundle/entry-alias-ids';
 
 
 export async function generateHydrateApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[]) {
@@ -94,7 +94,7 @@ async function generateHydrateFactoryEntry(config: d.Config, compilerCtx: d.Comp
   const hydrateCmps = await updateToHydrateComponents(config, compilerCtx, buildCtx, cmps);
   const s = new MagicString('');
 
-  s.append(`import { hydrateApp, registerComponents, styles } from '${STENCIL_INTERNAL_PLATFORM_ID}';\n`);
+  s.append(`import { hydrateApp, registerComponents, styles } from '${STENCIL_INTERNAL_HYDRATE_ID}';\n`);
 
   hydrateCmps.forEach(cmpData => s.append(cmpData.importLine + '\n'));
 

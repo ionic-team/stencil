@@ -31,7 +31,7 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
       id: 'customElementsBundle',
       platform: 'client',
       conditionals: getBuildConditionals(config, buildCtx.components),
-      customTransformers: getCustomElementBundleCustomTransformer(compilerCtx),
+      customTransformers: getCustomElementBundleCustomTransformer(config, compilerCtx),
       inputs: {
         'index': '@core-entrypoint'
       },
@@ -131,13 +131,14 @@ const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[])
   return build;
 };
 
-const getCustomElementBundleCustomTransformer = (compilerCtx: d.CompilerCtx) => {
+const getCustomElementBundleCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: null,
     componentMetadata: null,
+    currentDirectory: config.cwd,
     proxy: null,
-    style: 'static'
+    style: 'static',
   };
   return [
     updateStencilCoreImports(transformOpts.coreImportPath),

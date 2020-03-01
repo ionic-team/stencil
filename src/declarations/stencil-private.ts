@@ -52,34 +52,99 @@ export interface AssetsMeta {
 }
 
 export interface CompileOptions {
-  file?: string;
-  componentMetadata?: 'runtimestatic' | 'compilerstatic' | string | undefined;
-  proxy?: 'defineproperty' | string | undefined;
-  module?: 'cjs' | 'esm' | string;
+  /**
+   * A component can be defined as a custom element by using `customelement`, or the
+   * component class can be exported by using `module`. Default is `customelement`.
+   */
   componentExport?: 'customelement' | 'module' | string | undefined;
-  script?: CompileScript;
+  /**
+   * Sets how and if component metadata should be assigned on the compiled
+   * component output. The `compilerstatic` value will set the metadata to
+   * a static `COMPILER_META` getter on the component class. This option
+   * is useful for unit testing preprocessors. Default is `null`.
+   */
+  componentMetadata?: 'runtimestatic' | 'compilerstatic' | string | undefined;
+  /**
+   * The actual internal import path for any `@stencil/core` imports.
+   * Default is `@stencil/core/internal/client`.
+   */
+  coreImportPath?: string;
+  /**
+   * The current working directory. Default is `/`.
+   */
+  currentDirectory?: string;
+  /**
+   * The filename of the code being compiled. Default is `module.tsx`.
+   */
+  file?: string;
+  /**
+   * Module format to use for the compiled code output, which can be either `esm` or `cjs`.
+   * Default is `esm`.
+   */
+  module?: 'cjs' | 'esm' | string;
+  /**
+   * Sets how and if any properties, methods and events are proxied on the
+   * component class. The `defineproperty` value sets the getters and setters
+   * using Object.defineProperty. Default is `defineproperty`.
+   */
+  proxy?: 'defineproperty' | string | undefined;
+  /**
+   * How component styles should be associated to the component. The `static`
+   * setting will assign the styles as a static getter on the component class.
+   */
   style?: 'static' | string | undefined;
+  /**
+   * The JavaScript source target TypeScript should to transpile to. Values can be
+   * `latest`, `esnext`, `es2017`, `es2015`, or `es5`. Defaults to `latest`.
+   */
+  target?: CompileTarget;
+  /**
+   * The path used to load TypeScript, which is dependent on which environment
+   * the compiler is being used on. Default for NodeJS is `typescript`. Default
+   * url to downloaded TypeScript in a brower's web worker or main thread is
+   * from `https://cdn.jsdelivr.net/npm/`.
+   */
+  typescriptPath?: string;
+  /**
+   * Create a source map. Using `inline` will inline the source map into the
+   * code, otherwise the source map will be in the returned `map` property.
+   * Default is `true`.
+   */
+  sourceMap?: boolean | 'inline';
+  /**
+   * Base directory to resolve non-relative module names. Same as the `baseUrl`
+   * TypeScript compiler option: https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping
+   */
+  baseUrl?: string;
+  /**
+   * List of path mapping entries for module names to locations relative to the `baseUrl`.
+   * Same as the `baseUrl` TypeScript compiler option:
+   * https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping
+   */
+  paths?: {[key: string]: string[]};
+
   data?: StencilComponentData;
 }
 
 export interface CompileResults {
-  diagnostics: Diagnostic[];
   code: string;
-  map: any;
-  inputFilePath: string;
-  outputFilePath: string;
-  inputOptions: CompileOptions;
-  imports: { path: string; }[];
   componentMeta: any[];
+  diagnostics: Diagnostic[];
+  imports: { path: string; }[];
+  inputFileExtension: string;
+  inputFilePath: string;
+  inputOptions: CompileOptions;
+  map: any;
+  outputFilePath: string;
 }
 
 export interface CompileScriptMinifyOptions {
-  script?: CompileScript;
+  target?: CompileTarget;
   pretty?: boolean;
 }
 
 
-export type CompileScript = 'latest' | 'esnext' | 'es2017' | 'es2015' | 'es5' | string | undefined;
+export type CompileTarget = 'latest' | 'esnext' | 'es2020' | 'es2019' | 'es2018' | 'es2017' | 'es2015' | 'es5' | string | undefined;
 
 export interface ResolvedStencilData {
   resolvedId: string;
@@ -1893,14 +1958,15 @@ export interface HostRef {
 }
 
 export interface PlatformRuntime {
+  $cssShim$?: CssVarShim;
   $flags$: number;
+  $orgLocNodes$?: Map<string, RenderNode>;
   $resourcesUrl$: string;
+  $supportsShadow$?: boolean;
   jmp: (c: Function) => any;
   raf: (c: FrameRequestCallback) => number;
   ael: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   rel: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
-  $orgLocNodes$?: Map<string, RenderNode>;
-  $cssShim$?: CssVarShim;
 }
 
 export type RefMap = WeakMap<any, HostRef>;
@@ -2714,12 +2780,14 @@ export interface ValidateTypesResults {
   filePaths: string[];
 }
 
-
 export interface TransformOptions {
   coreImportPath: string;
-  componentExport: 'lazy' | 'native' | 'customelement' | null;
+  componentExport: 'lazy' | 'module' | 'customelement' | null;
   componentMetadata: 'runtimestatic' | 'compilerstatic' | null;
+  currentDirectory: string;
+  file?: string;
+  module?: 'cjs' | 'esm';
   proxy: 'defineproperty' | null;
   style: 'static' | null;
-  [key: string]: any;
+  target?: string;
 }

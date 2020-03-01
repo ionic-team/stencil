@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { cloneDocument, createDocument, serializeNodeToHtml } from '@mock-doc';
+import { cloneDocument, createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import { createLogger } from './logger';
 import { createSystem } from './stencil-sys';
 import { resolveModuleIdSync, resolvePackageJsonSync } from './resolve/resolve-module-sync';

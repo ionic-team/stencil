@@ -1,7 +1,7 @@
 import { CompilerSystem, Logger } from '../declarations';
 import { createNodeLogger } from '../sys/node_next/node-logger';
 import { createNodeSysWithWatch } from '../sys/node_next/node-sys-watch';
-import { loadConfig } from '@compiler';
+import { loadConfig } from '@stencil/core/compiler';
 import { parseFlags } from './parse-flags';
 import { runTask } from './tasks/run-task';
 import { shouldIgnoreError, hasError } from '@utils';

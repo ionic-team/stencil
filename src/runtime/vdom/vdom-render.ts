@@ -9,7 +9,7 @@
 import * as d from '../../declarations';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS, HTML_NS, SVG_NS, isDef } from '@utils';
-import { consoleError, doc, plt, supportsShadowDom } from '@platform';
+import { consoleError, doc, plt } from '@platform';
 import { h, isHost, newVNode } from './h';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
 import { updateElement } from './update-element';
@@ -541,7 +541,7 @@ const relocateSlotContent = (elm: d.RenderNode) => {
             }
 
             if (node['s-sr']) {
-              relocateNodes.forEach(relocateNode => {
+              relocateNodes.map(relocateNode => {
                 if (isNodeLocatedInSlot(relocateNode.$nodeToRelocate$, node['s-sn'])) {
                   relocateNodeData = relocateNodes.find(r => r.$nodeToRelocate$ === node);
                   if (relocateNodeData && !relocateNode.$slotRefNode$) {
@@ -587,7 +587,7 @@ const isNodeLocatedInSlot = (nodeToRelocate: d.RenderNode, slotNameAttr: string)
 export const callNodeRefs = (vNode: d.VNode) => {
   if (BUILD.vdomRef) {
     vNode.$attrs$ && vNode.$attrs$.ref && vNode.$attrs$.ref(null);
-    vNode.$children$ && vNode.$children$.forEach(callNodeRefs);
+    vNode.$children$ && vNode.$children$.map(callNodeRefs);
   }
 };
 
@@ -623,7 +623,7 @@ render() {
   }
   if (BUILD.reflect && cmpMeta.$attrsToReflect$) {
     rootVnode.$attrs$ = rootVnode.$attrs$ || {};
-    cmpMeta.$attrsToReflect$.forEach(([propName, attribute]) =>
+    cmpMeta.$attrsToReflect$.map(([propName, attribute]) =>
       rootVnode.$attrs$[attribute] = (hostElm as any)[propName]);
   }
 
@@ -637,7 +637,7 @@ render() {
   }
   if (BUILD.slotRelocation) {
     contentRef = hostElm['s-cr'];
-    useNativeShadowDom = supportsShadowDom && (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) !== 0;
+    useNativeShadowDom = plt.$supportsShadow$ && (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) !== 0;
 
     // always reset
     checkSlotFallbackVisibility = false;

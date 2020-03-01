@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { flatOne, unique } from '@utils';
 import { getScopeId } from '../compiler/style/scope-css';
 import { injectModulePreloads } from '../compiler/html/inject-module-preloads';
-import { optimizeCss, optimizeJs } from '@compiler';
+import { optimizeCss, optimizeJs } from '@stencil/core/compiler';
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';

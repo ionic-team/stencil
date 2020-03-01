@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
-import { startServer } from '@dev-server';
+import { startServer } from '@stencil/core/dev-server';
 
 
 export async function taskServe(process: NodeJS.Process, config: d.Config) {

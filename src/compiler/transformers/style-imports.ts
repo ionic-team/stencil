@@ -5,7 +5,7 @@ import ts from 'typescript';
 
 export const updateStyleImports = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, moduleFile: d.Module) => {
   // add style imports built from @Component() styleUrl option
-  if (transformOpts.module === ts.ModuleKind.CommonJS) {
+  if (transformOpts.module === 'cjs') {
     return updateCjsStyleRequires(tsSourceFile, moduleFile);
   }
 

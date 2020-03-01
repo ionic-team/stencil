@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { Compiler } from '@compiler_legacy';
 import { normalizePath } from '@utils';
-import { startServer } from '@dev-server';
+import { startServer } from '@stencil/core/dev-server';
 import exit from 'exit';
 
 

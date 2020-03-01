@@ -31,7 +31,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       id: 'lazy',
       platform: 'client',
       conditionals: getLazyBuildConditionals(config, buildCtx.components),
-      customTransformers: getLazyCustomTransformer(compilerCtx),
+      customTransformers: getLazyCustomTransformer(config, compilerCtx),
       inputs: {
         [config.fsNamespace]: LAZY_BROWSER_ENTRY_ID,
         'loader': LAZY_EXTERNAL_ENTRY_ID,
@@ -89,28 +89,15 @@ const getLazyBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMet
   return build;
 };
 
-// function getCriticalPath(buildCtx: d.BuildCtx) {
-//   const componentGraph = buildCtx.componentGraph;
-//   if (!buildCtx.indexDoc || !componentGraph) {
-//     return [];
-//   }
-//   return unique(
-//     flatOne(
-//       getUsedComponents(buildCtx.indexDoc, buildCtx.components)
-//         .map(tagName => getScopeId(tagName))
-//         .map(scopeId => buildCtx.componentGraph.get(scopeId) || [])
-//     )
-//   ).sort();
-// }
 
-
-const getLazyCustomTransformer = (compilerCtx: d.CompilerCtx) => {
+const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: 'lazy',
     componentMetadata: null,
+    currentDirectory: config.cwd,
     proxy: null,
-    style: 'static'
+    style: 'static',
   };
   return [
     updateStencilCoreImports(transformOpts.coreImportPath),

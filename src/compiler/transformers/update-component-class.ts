@@ -3,7 +3,7 @@ import ts from 'typescript';
 
 
 export const updateComponentClass = (transformOpts: d.TransformOptions, classNode: ts.ClassDeclaration, heritageClauses: ts.HeritageClause[] | ts.NodeArray<ts.HeritageClause>, members: ts.ClassElement[]) => {
-  if (transformOpts.module === ts.ModuleKind.CommonJS) {
+  if (transformOpts.module === 'cjs') {
     // CommonJS, leave component class as is
     let classModifiers = (Array.isArray(classNode.modifiers) ? classNode.modifiers.slice() : []);
 

@@ -17,6 +17,10 @@ export const IS_LOCATION_ENV = (
   typeof location !== 'undefined'
 );
 
+export const IS_GLOBAL_THIS_ENV = (
+  typeof globalThis !== 'undefined'
+);
+
 export const IS_WEB_WORKER_ENV = (
   typeof self !== 'undefined' &&
   typeof (self as any).importScripts === 'function' &&

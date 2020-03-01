@@ -10,7 +10,7 @@ import { OutputOptions, RollupBuild, RollupOptions, TreeshakingOptions } from 'r
 import { pluginHelper } from '../rollup-plugins/plugin-helper';
 import { stencilClientPlugin } from '../rollup-plugins/stencil-client';
 import { stencilExternalRuntimePlugin } from '../rollup-plugins/stencil-external-runtime';
-import { STENCIL_INTERNAL_PLATFORM_ID } from '../../compiler_next/bundle/entry-alias-ids';
+import { STENCIL_INTERNAL_CLIENT_ID } from '../../compiler_next/bundle/entry-alias-ids';
 
 
 export const bundleApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.BuildConditionals, bundleAppOptions: d.BundleAppOptions) => {
@@ -112,7 +112,7 @@ export const generateRollupOutput = async (build: RollupBuild, options: OutputOp
 };
 
 export const DEFAULT_CORE = `
-export * from '${STENCIL_INTERNAL_PLATFORM_ID}';
+export * from '${STENCIL_INTERNAL_CLIENT_ID}';
 `;
 
 export const DEFAULT_ENTRY = `

@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { runPrerender } from '../../prerender/prerender-main';
 import { startupLog } from './startup-log';
-import { startServer } from '@dev-server';
+import { startServer } from '@stencil/core/dev-server';
 import exit from 'exit';
 
 

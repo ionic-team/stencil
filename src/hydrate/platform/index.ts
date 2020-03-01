@@ -90,13 +90,12 @@ export const consoleDevInfo = (..._: any[]) => {/* noop for hydrate */};
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
+  $supportsShadow$: false,
   jmp: (h) => h(),
   raf: (h) => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
 };
-
-export const supportsShadowDom = false;
 
 export const supportsListenerOptions = false;
 

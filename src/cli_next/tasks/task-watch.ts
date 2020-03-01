@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import { createCompiler } from '@compiler';
+import { createCompiler } from '@stencil/core/compiler';
 import { startupLog } from './startup-log';
-import { startServer } from '@dev-server';
+import { startServer } from '@stencil/core/dev-server';
 import exit from 'exit';
 
 

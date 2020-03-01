@@ -56,7 +56,7 @@ export async function compiler(opts: BuildOptions) {
     plugins: [
       {
         resolveId(id) {
-          if (id === '@mock-doc') {
+          if (id === '@stencil/core/mock-doc') {
             return join(opts.transpiledDir, 'mock-doc', 'index.js');
           }
           return null;

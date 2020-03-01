@@ -5,7 +5,6 @@ import { internalAppData } from './interal-app-data';
 import { internalClient } from './internal-platform-client';
 import { internalHydrate } from './internal-platform-hydrate';
 import { internalTesting } from './internal-platform-testing';
-import { internalRuntime } from './internal-runtime';
 import { join } from 'path';
 import { writePkgJson } from '../utils/write-pkg-json';
 
@@ -43,7 +42,6 @@ export async function internal(opts: BuildOptions) {
     ...hydratePlatformBundles,
     ...testingPlatform,
     await internalAppData(opts),
-    await internalRuntime(opts),
   ];
 };
 

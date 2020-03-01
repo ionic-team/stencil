@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { Testing as TestingTypes } from '@testing';
+import { Testing as TestingTypes } from '@stencil/core/testing';
 import exit from 'exit';
 
 

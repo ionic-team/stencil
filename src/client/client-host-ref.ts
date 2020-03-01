@@ -32,6 +32,5 @@ export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
   addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);
   return hostRefs.set(elm, hostRef);
 };
-export const isMemberInElement = (elm: any, memberName: string) => {
-  return memberName in elm;
-};
+
+export const isMemberInElement = (elm: any, memberName: string) => memberName in elm;

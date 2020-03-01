@@ -5,7 +5,7 @@ import { loadTypescript } from '../sys/typescript/typescript-load';
 
 export const transpileToEs5 = async (input: string, inlineHelpers: boolean) => {
   const diagnostics: d.Diagnostic[] = [];
-  const ts = await loadTypescript(diagnostics);
+  const ts = await loadTypescript(diagnostics, null);
 
   const results: d.TranspileResults = {
     sourceFilePath: null,

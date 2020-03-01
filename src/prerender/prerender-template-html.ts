@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { catchError } from '@utils';
-import { createDocument, serializeNodeToHtml } from '@mock-doc';
+import { createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import { inlineExternalStyleSheets, minifyScriptElements, minifyStyleElements } from './prerender-optimize';
 import fs from 'fs';
 import { promisify } from 'util';

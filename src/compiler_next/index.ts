@@ -1,6 +1,6 @@
 import { initWorkerThread } from './worker/worker-thread';
 
-export { compile } from './compile-module';
+export { compile, compileSync } from './compile-module';
 export { createCompiler } from './compiler';
 export { createSystem } from './sys/stencil-sys';
 export { dependencies } from './sys/dependencies';

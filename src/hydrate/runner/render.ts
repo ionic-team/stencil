@@ -3,7 +3,7 @@ import { generateHydrateResults, normalizeHydrateOptions, renderBuildError, rend
 import { hydrateFactory } from '@hydrate-factory';
 import { initializeWindow } from './window-initialize';
 import { inspectElement } from './inspect-element';
-import { MockWindow, serializeNodeToHtml } from '@mock-doc';
+import { MockWindow, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import { patchDomImplementation } from './patch-dom-implementation';
 import { relocateMetaCharset } from '../../compiler/html/relocate-meta-charset';
 import { removeUnusedStyles } from '../../compiler/html/remove-unused-styles';

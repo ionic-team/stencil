@@ -3,7 +3,7 @@ import { basename, join } from 'path';
 import { BuildOptions } from '../utils/options';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
-import { reorderCoreStatementsPlugin } from '../utils/reorder-statements';
+import { reorderCoreStatementsPlugin } from './plugins/reorder-statements';
 import { getBanner } from '../utils/banner';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { rollup, RollupOptions, OutputOptions } from 'rollup';
@@ -33,7 +33,8 @@ export async function internalClient(opts: BuildOptions) {
     dir: outputInternalClientDir,
     entryFileNames: '[name].mjs',
     chunkFileNames: '[name].mjs',
-    banner: getBanner(opts, 'Stencil Client Platform')
+    banner: getBanner(opts, 'Stencil Client Platform'),
+    preferConst: true,
   }
 
   const internalClientBundle: RollupOptions = {
@@ -43,6 +44,14 @@ export async function internalClient(opts: BuildOptions) {
       pureExternalModules: true,
     },
     plugins: [
+      {
+        name: 'internalClientPlugin',
+        resolveId(importee) {
+          if (importee === '@platform') {
+            return join(inputClientDir, 'index.js');
+          }
+        }
+      },
       {
         name: 'internalClientRuntimeCssShim',
         resolveId(importee) {

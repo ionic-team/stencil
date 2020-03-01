@@ -3,18 +3,18 @@ import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../../compiler_next/build/compiler-ctx';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
+import { isString, loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
 import { lazyComponentTransformLegacy } from '../transformers/component-lazy/transform-lazy-component';
-import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { TestingLogger } from '../../testing/testing-logger';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
 import ts from 'typescript';
 
 
 /**
- * Mainly used as the typescript preprocessor for unit tests
+ * Stand-alone compiling of a single string
  */
-export const transpileModule = (config: d.Config, input: string, transformOpts: d.TransformOptions, sourceFilePath?: string) => {
+export const transpileModule = (config: d.Config, input: string, transformOpts: d.TransformOptions) => {
   if (!config.logger) {
     config = {
       logger: new TestingLogger(),
@@ -23,11 +23,15 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
   }
   const compilerCtx = new CompilerContext();
   const buildCtx = new BuildContext(config, compilerCtx);
+  const tsCompilerOptions: ts.CompilerOptions = {
+    ...config.tsCompilerOptions,
+  };
 
-  if (typeof sourceFilePath === 'string') {
+  let sourceFilePath = transformOpts.file;
+  if (isString(sourceFilePath)) {
     sourceFilePath = normalizePath(sourceFilePath);
   } else {
-    sourceFilePath = (transformOpts.jsx ? `module.tsx` : `module.ts`);
+    sourceFilePath = (tsCompilerOptions.jsx ? `module.tsx` : `module.ts`);
   }
 
   const results: d.TranspileResults = {
@@ -36,19 +40,31 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     map: null,
     diagnostics: [],
     moduleFile: null,
-    build: {}
+    build: {},
   };
 
-  if ((sourceFilePath.endsWith('.tsx') || sourceFilePath.endsWith('.jsx')) && transformOpts.jsx == null) {
+  if (transformOpts.module === 'cjs') {
+    tsCompilerOptions.module = ts.ModuleKind.CommonJS;
+  } else {
+    tsCompilerOptions.module = ts.ModuleKind.ESNext;
+  }
+
+  tsCompilerOptions.target = getScriptTargetKind(transformOpts);
+
+  if ((sourceFilePath.endsWith('.tsx') || sourceFilePath.endsWith('.jsx')) && tsCompilerOptions.jsx == null) {
     // ensure we're setup for JSX in typescript
-    transformOpts.jsx = ts.JsxEmit.React;
+    tsCompilerOptions.jsx = ts.JsxEmit.React;
   }
 
-  if (transformOpts.jsx != null && typeof transformOpts.jsxFactory !== 'string') {
-    transformOpts.jsxFactory = 'h';
+  if (tsCompilerOptions.jsx != null && !isString(tsCompilerOptions.jsxFactory)) {
+    tsCompilerOptions.jsxFactory = 'h';
   }
 
-  const sourceFile = ts.createSourceFile(sourceFilePath, input, transformOpts.target);
+  if (tsCompilerOptions.paths && !isString(tsCompilerOptions.baseUrl)) {
+    tsCompilerOptions.baseUrl = '.';
+  }
+
+  const sourceFile = ts.createSourceFile(sourceFilePath, input, tsCompilerOptions.target);
 
   // Create a compilerHost object to allow the compiler to read and write files
   const compilerHost: ts.CompilerHost = {
@@ -65,7 +81,7 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     getDefaultLibFileName: () => `lib.d.ts`,
     useCaseSensitiveFileNames: () => false,
     getCanonicalFileName: fileName => fileName,
-    getCurrentDirectory: () => '',
+    getCurrentDirectory: () => transformOpts.currentDirectory || '',
     getNewLine: () => ts.sys.newLine,
     fileExists: fileName => normalizePath(fileName) === normalizePath(sourceFilePath),
     readFile: () => '',
@@ -73,14 +89,14 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     getDirectories: () => []
   };
 
-  const program = ts.createProgram([sourceFilePath], transformOpts, compilerHost);
+  const program = ts.createProgram([sourceFilePath], tsCompilerOptions, compilerHost);
   const typeChecker = program.getTypeChecker();
 
   const after: ts.TransformerFactory<ts.SourceFile>[] = [
     convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)
   ];
 
-  if (transformOpts.componentExport === 'customelement' || transformOpts.componentExport === 'native') {
+  if (transformOpts.componentExport === 'customelement' || transformOpts.componentExport === 'module') {
     after.push(nativeComponentTransform(compilerCtx, transformOpts));
 
   } else {
@@ -112,3 +128,35 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
   return results;
 };
 
+
+const getScriptTargetKind = (transformOpts: d.TransformOptions) => {
+  switch (transformOpts.target) {
+    case 'esnext': {
+      return ts.ScriptTarget.ESNext;
+    }
+    case 'es2020': {
+      return ts.ScriptTarget.ES2020;
+    }
+    case 'es2019': {
+      return ts.ScriptTarget.ES2019;
+    }
+    case 'es2018': {
+      return ts.ScriptTarget.ES2018;
+    }
+    case 'es2017': {
+      return ts.ScriptTarget.ES2017;
+    }
+    case 'es2016': {
+      return ts.ScriptTarget.ES2016;
+    }
+    case 'es2015': {
+      return ts.ScriptTarget.ES2015;
+    }
+    case 'es5': {
+      return ts.ScriptTarget.ES5;
+    }
+    default: {
+      return ts.ScriptTarget.Latest;
+    }
+  }
+}

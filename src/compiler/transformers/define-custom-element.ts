@@ -14,7 +14,7 @@ export const defineCustomElement = (tsSourceFile: ts.SourceFile, moduleFile: d.M
     })
   );
 
-  if (transformOpts.module === ts.ModuleKind.CommonJS) {
+  if (transformOpts.module === 'cjs') {
     // remove commonjs exports keyword from component classes
     statements = removeComponentCjsExport(statements, moduleFile);
   }

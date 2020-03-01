@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS } from '@utils';
-import { doc, plt, styles, supportsConstructibleStylesheets, supportsShadowDom } from '@platform';
+import { doc, plt, styles, supportsConstructibleStylesheets } from '@platform';
 import { HYDRATED_STYLE_ID, NODE_TYPE } from './runtime-constants';
 import { createTime } from './profile';
 
@@ -90,7 +90,7 @@ export const attachStyles = (hostRef: d.HostRef) => {
   const flags = cmpMeta.$flags$;
   const endAttachStyles = createTime('attachStyles', cmpMeta.$tagName$);
   const scopeId = addStyle(
-    (BUILD.shadowDom && supportsShadowDom && elm.shadowRoot)
+    (BUILD.shadowDom && plt.$supportsShadow$ && elm.shadowRoot)
       ? elm.shadowRoot
       : elm.getRootNode(), cmpMeta, hostRef.$modeName$, elm);
 

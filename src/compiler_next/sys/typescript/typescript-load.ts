@@ -1,35 +1,75 @@
 import * as d from '../../../declarations';
 import { cachedFetch } from '../fetch/fetch-cache';
-import { catchError, IS_NODE_ENV, IS_WEB_WORKER_ENV, requireFunc } from '@utils';
+import { catchError, IS_GLOBAL_THIS_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV, isFunction, requireFunc, IS_FETCH_ENV } from '@utils';
 import { getRemoteTypeScriptUrl } from '../dependencies';
 import { patchTsSystemUtils } from './typescript-sys';
-import { version } from '../../../version';
 import ts from 'typescript';
 
 
-export const loadTypescript = async (diagnostics: d.Diagnostic[]): Promise<typeof ts> => {
+export const loadTypescript = async (diagnostics: d.Diagnostic[], typescriptPath: string) => {
+  const tsSync = loadTypescriptSync(diagnostics, typescriptPath);
+  if (tsSync != null) {
+    return tsSync;
+  }
+
+  if (IS_FETCH_ENV) {
+    try {
+      const tsUrl = typescriptPath || getRemoteTypeScriptUrl();
+      const rsp = await cachedFetch(tsUrl);
+      const content = await rsp.text();
+      const getTsFunction = new Function(content + ';return ts;');
+      const fetchTs = getLoadedTs(getTsFunction(), 'fetch', tsUrl);
+      if (fetchTs) {
+        patchImportedTs(fetchTs, tsUrl);
+        return fetchTs;
+      }
+
+    } catch (e) {
+      catchError(diagnostics, e);
+    }
+  }
+
+  return null;
+};
+
+export const loadTypescriptSync = (diagnostics: d.Diagnostic[], typescriptPath: string): TypeScriptModule => {
   try {
-    if ((ts as any).__loaded) {
+    if ((ts as TypeScriptModule).__loaded) {
       // already loaded
-      return ts;
+      return ts as TypeScriptModule;
     }
 
     if (IS_NODE_ENV) {
       // NodeJS
-      const nodeTs = requireFunc('typescript');
-      nodeTs.__loaded = true;
-      return nodeTs;
+      const nodeModuleId = typescriptPath || 'typescript';
+      const nodeTs = getLoadedTs(requireFunc(nodeModuleId), 'nodejs', nodeModuleId);
+      if (nodeTs) {
+        return nodeTs;
+      }
     }
 
-    // browser
-    const tsExternalUrl = getRemoteTypeScriptUrl();
-    const tsExternal = await importTypescriptScript(tsExternalUrl);
-    if (tsExternal) {
-      tsExternal.__loaded = true;
-      return tsExternal;
+    if (IS_WEB_WORKER_ENV) {
+      // web worker
+      // doing this before the globalThis check cuz we'd
+      // rather ensure we're using a valid typescript version
+      const tsUrl = typescriptPath || getRemoteTypeScriptUrl();
+      // importScripts() will be synchronous within a web worker
+      (self as any).importScripts(tsUrl);
+      const webWorkerTs = getLoadedTs((self as any).ts, 'importScripts', tsUrl);
+      if (webWorkerTs) {
+        patchImportedTs(webWorkerTs, tsUrl);
+        return webWorkerTs;
+      }
     }
 
-    throw new Error(`unable to load typescript from url "${tsExternalUrl}"`);
+    if (IS_GLOBAL_THIS_ENV) {
+      // check if the global object has "ts" on it
+      // could be main browser thread, browser web worker, or nodejs global
+      const globalThisTs = getLoadedTs((globalThis as any).ts, 'globalThis', typescriptPath);
+      if (globalThisTs) {
+        return globalThisTs
+      }
+    }
 
   } catch (e) {
     catchError(diagnostics, e);
@@ -37,35 +77,26 @@ export const loadTypescript = async (diagnostics: d.Diagnostic[]): Promise<typeo
   return null;
 };
 
-const importTypescriptScript = async (tsUrl: string) => {
-  let importedTs: any = null;
-  try {
-
-    if (IS_WEB_WORKER_ENV && version.includes('-dev.')) {
-      // be able to easily step through and debug typescript.js
-      // but a prod build of stencil.js should use the fetch()
-      // way so we can cache it better
-      (self as any).importScripts(tsUrl);
-      if ((self as any).ts) {
-        importedTs = (self as any).ts;
-      }
-    }
-
-    if (!importedTs) {
-      const rsp = await cachedFetch(tsUrl);
-      if (rsp) {
-        const content = await rsp.text();
-        const getTs = new Function(content + ';return ts;');
-        importedTs = getTs();
-      }
-    }
-
-    if (importedTs) {
-      importedTs.sys = importedTs.sys || {};
-      importedTs.sys.getExecutingFilePath = () => tsUrl;
-      patchTsSystemUtils(importedTs.sys);
-    }
-
-  } catch (e) {}
-  return importedTs;
+const patchImportedTs = (importedTs: TypeScriptModule, tsUrl: string) => {
+  importedTs.sys = importedTs.sys || ({} as any);
+  importedTs.sys.getExecutingFilePath = () => tsUrl;
+  patchTsSystemUtils(importedTs.sys);
 };
+
+const getLoadedTs = (loadedTs: TypeScriptModule, source: string, typescriptPath: string)  => {
+  if (loadedTs != null && isFunction(loadedTs.transpileModule)) {
+    loadedTs.__loaded = true;
+    loadedTs.__source = source;
+    loadedTs.__path = typescriptPath;
+    return loadedTs;
+  }
+  return null;
+};
+
+type TS = typeof ts;
+
+export interface TypeScriptModule extends TS {
+  __loaded: boolean;
+  __source: string;
+  __path: string;
+}

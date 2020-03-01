@@ -19,7 +19,9 @@ export const plt: d.PlatformRuntime = {
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
 };
 
-export const supportsShadowDom = BUILD.shadowDomShim ? (BUILD.shadowDom) ? /*@__PURE__*/(() => (doc.head.attachShadow + '').indexOf('[native') > -1)() : false : true;
+if (BUILD.shadowDomShim && BUILD.shadowDom) {
+  plt.$supportsShadow$ = /*@__PURE__*/(() => (doc.head.attachShadow + '').indexOf('[native') > -1)();
+}
 
 export const supportsListenerOptions = /*@__PURE__*/(() => {
   let supportsListenerOptions = false;

@@ -16,8 +16,7 @@ module.exports = {
     "^@stencil/core/compiler$": path.join(rootDir, 'compiler', 'index.js'),
     "^@stencil/core/internal/app-data$": path.join(internalDir, 'app-data', 'index.js'),
     "^@stencil/core/internal/app-globals$": path.join(internalDir, 'app-globals', 'index.js'),
-    "^@stencil/core/internal/platform$": path.join(internalDir, 'testing', 'index.js'),
-    "^@stencil/core/internal/runtime$": path.join(internalDir, 'runtime', 'index.js'),
+    "^@stencil/core/internal/testing$": path.join(internalDir, 'testing', 'index.js'),
     "^@stencil/core/mock-doc$": path.join(rootDir, 'mock-doc', 'index.js'),
     "^@stencil/core/sys$": path.join(rootDir, 'sys', 'node', 'index.js'),
     "^@stencil/core/testing$": path.join(testingDir, 'index.js'),
@@ -28,6 +27,7 @@ module.exports = {
   ],
   testEnvironment: path.join(testingDir, 'jest-environment.js'),
   testPathIgnorePatterns: [
+    '/.cache',
     '/.stencil',
     '/.vscode',
     '/dist',

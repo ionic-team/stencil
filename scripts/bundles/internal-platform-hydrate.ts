@@ -32,14 +32,17 @@ export async function internalHydrate(opts: BuildOptions) {
     input: hydratePlatformInput,
     output: {
       format: 'es',
-      file: join(outputInternalHydrateDir, 'index.mjs'),
+      dir: outputInternalHydrateDir,
+      entryFileNames: '[name].mjs',
+      chunkFileNames: '[name].mjs',
       banner: getBanner(opts, 'Stencil Hydrate Platform'),
+      preferConst: true,
     },
     plugins: [
       {
-        name: 'hydratePlugin',
-        resolveId(id) {
-          if (id === '@platform') {
+        name: 'internalHydratePlugin',
+        resolveId(importee) {
+          if (importee === '@platform') {
             return hydratePlatformInput;
           }
         }
@@ -60,6 +63,7 @@ export async function internalHydrate(opts: BuildOptions) {
       format: 'es',
       file: join(outputInternalHydrateDir, 'runner.mjs'),
       banner: getBanner(opts, 'Stencil Hydrate Runner'),
+      preferConst: true,
     },
     plugins: [
       aliasPlugin(opts),

@@ -8,11 +8,11 @@ Some of main features with the `--next` compiler include:
 - Faster incremental builds and TypeScript error feedback
 - Easily bundle and interact with [Web Workers](https://stenciljs.com/docs/web-workers)
 - `dist-custom-elements-bundle` Output Target (components without lazy loading)
-- Internal compiler refactor in order to improve 3rd party tooling
+- Internal compiler and runtime refactor in order to improve 3rd party tooling
 - Import CSS files using traditional ESM imports
 - Online REPL
 - TypeScript 3.8.3
-- Rollup 1.31.1
+- Rollup 1.32.0
 
 
 ### Features

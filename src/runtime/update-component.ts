@@ -131,7 +131,7 @@ const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boole
     // ok, so turns out there are some child host elements
     // waiting on this parent element to load
     // let's fire off all update callbacks waiting
-    rc.forEach(cb => cb());
+    rc.map(cb => cb());
     elm['s-rc'] = undefined;
   }
 

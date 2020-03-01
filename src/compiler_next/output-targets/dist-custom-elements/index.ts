@@ -19,7 +19,7 @@ export const outputCustomElements = async (config: d.Config, compilerCtx: d.Comp
   const printer = ts.createPrinter();
   try {
     await Promise.all(changedModuleFiles.map(async mod => {
-      const transformResults = ts.transform(mod.staticSourceFile, getCustomTransformer(compilerCtx));
+      const transformResults = ts.transform(mod.staticSourceFile, getCustomTransformer(config, compilerCtx));
       const transformed = transformResults.transformed[0];
       const code = printer.printFile(transformed);
 
@@ -38,13 +38,15 @@ export const outputCustomElements = async (config: d.Config, compilerCtx: d.Comp
 };
 
 
-const getCustomTransformer = (compilerCtx: d.CompilerCtx) => {
+const getCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: null,
     componentMetadata: null,
+    currentDirectory: config.cwd,
+    module: 'esm',
     proxy: null,
-    style: 'static'
+    style: 'static',
   };
   return [
     updateStencilCoreImports(transformOpts.coreImportPath),

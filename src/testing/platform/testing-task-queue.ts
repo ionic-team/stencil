@@ -1,26 +1,5 @@
 import * as d from '@stencil/core/internal';
-
-
-const queuedTicks: Function[] = [];
-const queuedWriteTasks: d.RafCallback[] = [];
-const queuedReadTasks: d.RafCallback[] = [];
-const moduleLoaded = new Map();
-const queuedLoadModules: QueuedLoadModule[] = [];
-const caughtErrors: Error[] = [];
-
-
-export const consoleError = (e: any) => {
-  caughtErrors.push(e);
-};
-
-export const consoleDevError = (...e: any[]) => {
-  caughtErrors.push(new Error(e.join(', ')));
-};
-
-export const consoleDevWarn = (..._: any[]) => {/* noop for testing */};
-
-export const consoleDevInfo = (..._: any[]) => {/* noop for testing */};
-
+import { caughtErrors, moduleLoaded, queuedLoadModules, queuedReadTasks, queuedTicks, queuedWriteTasks } from './testing-constants';
 
 export function resetTaskQueue() {
   queuedTicks.length = 0;
@@ -30,7 +9,6 @@ export function resetTaskQueue() {
   queuedLoadModules.length = 0;
   caughtErrors.length = 0;
 }
-
 
 export const nextTick = (cb: Function) => {
   queuedTicks.push(cb);
@@ -78,7 +56,7 @@ export function readTask(cb: d.RafCallback) {
 }
 
 export function flushQueue() {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
 
     async function drain() {
       try {
@@ -126,7 +104,6 @@ export function flushQueue() {
   });
 }
 
-
 export async function flushAll() {
   while ((
     queuedTicks.length +
@@ -148,9 +125,8 @@ export async function flushAll() {
     }
     throw err;
   }
-  return new Promise(resolve => process.nextTick(resolve));
+  return new Promise<void>(resolve => process.nextTick(resolve));
 }
-
 
 export function loadModule(cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef, _hmrVersionId?: string) {
   return new Promise<any>(resolve => {
@@ -161,9 +137,8 @@ export function loadModule(cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef,
   });
 }
 
-
 export function flushLoadModule(bundleId?: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     try {
       process.nextTick(() => {
         if (bundleId != null) {
@@ -191,13 +166,7 @@ export function flushLoadModule(bundleId?: string) {
   });
 }
 
-
-export function registerModule(bundleId: string, Cstr: any) {
-  moduleLoaded.set(bundleId, Cstr);
-}
-
-
-interface QueuedLoadModule {
+export interface QueuedLoadModule {
   bundleId: any;
   resolve: Function;
 }

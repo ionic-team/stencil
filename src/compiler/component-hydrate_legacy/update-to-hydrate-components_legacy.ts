@@ -42,7 +42,7 @@ async function updateToHydrateComponent(config: d.Config, compilerCtx: d.Compile
 
   let outputJsText = await compilerCtx.cache.get(cacheKey);
   if (outputJsText == null) {
-    outputJsText = transformToHydrateComponentText(compilerCtx, buildCtx, cmp, inputJsText);
+    outputJsText = transformToHydrateComponentText(config, compilerCtx, buildCtx, cmp, inputJsText);
 
     await compilerCtx.cache.put(cacheKey, outputJsText);
   }

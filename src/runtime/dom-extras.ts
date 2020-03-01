@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { supportsShadowDom } from '@platform';
+import { plt } from '@platform';
 
 
 export const cloneNodeFix = (HostElementPrototype: any) => {
@@ -8,7 +8,7 @@ export const cloneNodeFix = (HostElementPrototype: any) => {
 
   HostElementPrototype.cloneNode = function(deep?: boolean) {
     const srcNode = this;
-    const isShadowDom = BUILD.shadowDom ? srcNode.shadowRoot && supportsShadowDom : false;
+    const isShadowDom = BUILD.shadowDom ? srcNode.shadowRoot && plt.$supportsShadow$ : false;
     const clonedNode = orgCloneNode.call(srcNode, isShadowDom ? deep : false) as Node;
     if (BUILD.slot && !isShadowDom && deep) {
       let i = 0;

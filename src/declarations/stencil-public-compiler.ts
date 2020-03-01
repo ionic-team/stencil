@@ -216,7 +216,7 @@ export interface StencilConfig {
   validateTypes?: boolean;
   watchIgnoredRegex?: RegExp;
   excludeUnusedDependencies?: boolean;
-
+  typescriptPath?: string;
   stencilCoreResolvedId?: string;
 }
 
@@ -1445,6 +1445,7 @@ export interface LoadConfigInit {
    * within the root directory.
    */
   initTsConfig?: boolean;
+  typescriptPath?: string;
 }
 
 export interface LoadConfigResults {
@@ -1589,6 +1590,7 @@ export interface OptimizeCssInput {
   filePath?: string;
   autoprefixer?: any;
   minify?: boolean;
+  sourceMap?: boolean;
 }
 
 export interface OptimizeCssOutput {

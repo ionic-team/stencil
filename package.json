@@ -153,38 +153,5 @@
     "custom elements",
     "pwa",
     "progressive web app"
-  ],
-  "jest": {
-    "preset": "./testing/jest-preset.js",
-    "moduleNameMapper": {
-      "@app-data": "<rootDir>/internal/app-data/index.js",
-      "@app-globals": "<rootDir>/internal/app-globals/index.js",
-      "@compiler": "<rootDir>/compiler/index.js",
-      "@mock-doc": "<rootDir>/mock-doc/index.js",
-      "@platform": "<rootDir>/internal/testing/index.js",
-      "@runtime": "<rootDir>/internal/runtime/index.js",
-      "@testing": "<rootDir>/testing/index.js",
-      "@utils": "<rootDir>/src/utils"
-    },
-    "modulePathIgnorePatterns": [
-      "/bin",
-      "/scripts",
-      "/www"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/.stencil/",
-      "<rootDir>/bin/",
-      "<rootDir>/dist/",
-      "<rootDir>/mock-doc/",
-      "<rootDir>/node_modules/",
-      "<rootDir>/screenshot/",
-      "<rootDir>/scripts/",
-      "<rootDir>/server/",
-      "<rootDir>/sys/",
-      "<rootDir>/test/",
-      "<rootDir>/testing/",
-      "<rootDir>/www/"
-    ],
-    "testRegex": "/src/.*\\.spec\\.(ts|tsx|js)$"
-  }
+  ]
 }

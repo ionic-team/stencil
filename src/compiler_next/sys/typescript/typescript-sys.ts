@@ -2,10 +2,11 @@ import * as d from '../../../declarations';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { basename, resolve } from 'path';
 import { isBoolean, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, noop } from '@utils';
+import { TypeScriptModule } from './typescript-load';
 import ts from 'typescript';
 
 
-export const patchTypeScriptSys = (loadedTs: typeof ts, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+export const patchTypeScriptSys = (loadedTs: TypeScriptModule, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
   const stencilSys = config.sys_next;
   loadedTs.sys = loadedTs.sys || {} as ts.System;
 
@@ -165,7 +166,7 @@ export const patchTsSystemUtils = (tsSys: ts.System) => {
   }
 };
 
-export const patchTypeScriptGetParsedCommandLineOfConfigFile = (loadedTs: typeof ts, _config: d.Config) => {
+export const patchTypeScriptGetParsedCommandLineOfConfigFile = (loadedTs: TypeScriptModule, _config: d.Config) => {
   const orgGetParsedCommandLineOfConfigFile = loadedTs.getParsedCommandLineOfConfigFile;
 
   loadedTs.getParsedCommandLineOfConfigFile = (configFileName, optionsToExtend, host, extendedConfigCache) => {

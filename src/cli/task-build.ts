@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { Compiler } from '@compiler_legacy';
-import { startServer } from '@dev-server';
+import { startServer } from '@stencil/core/dev-server';
 import { runPrerender } from '../prerender/prerender-main';
 import { validateCompilerVersion } from './task-version';
 import exit from 'exit';

@@ -31,19 +31,22 @@ function reorderStatements(code: string) {
         const s = tsSourceFile.statements;
 
         const importStatements = s.filter(ts.isImportDeclaration);
+        const exportStatements = s.filter(ts.isExportDeclaration);
         const letNoInitializerStatements = s.filter(isLetNoInitializer);
         const letWithInitializer = s.filter(isLetWithInitializer);
 
         const otherStatements = s.filter(n => (
           !isLet(n) &&
-          !ts.isImportDeclaration(n)
+          !ts.isImportDeclaration(n) &&
+          !ts.isExportDeclaration(n)
         ));
 
         return ts.updateSourceFileNode(tsSourceFile, [
-          ...importStatements,
           ...letNoInitializerStatements,
           ...letWithInitializer,
-          ...otherStatements
+          ...importStatements,
+          ...otherStatements,
+          ...exportStatements,
         ]);
       };
     };

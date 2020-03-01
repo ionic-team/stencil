@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from './runtime-constants';
-import { doc, plt, supportsShadowDom } from '@platform';
+import { doc, plt } from '@platform';
 import { newVNode } from './vdom/h';
 import { createTime } from './profile';
 
@@ -28,7 +28,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
     const orgLocationNode = plt.$orgLocNodes$.get(orgLocationId);
     const node = c.$elm$ as d.RenderNode;
 
-    if (orgLocationNode && (supportsShadowDom && orgLocationNode['s-en'] === '')) {
+    if (orgLocationNode && (plt.$supportsShadow$ && orgLocationNode['s-en'] === '')) {
       orgLocationNode.parentNode.insertBefore(
         node,
         orgLocationNode.nextSibling

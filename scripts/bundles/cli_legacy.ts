@@ -40,7 +40,7 @@ export async function cli_legacy(opts: BuildOptions) {
       {
         name: 'cliImportResolverPlugin',
         resolveId(importee) {
-          if (importee === '@dev-server') {
+          if (importee === '@stencil/core/dev-server') {
             return {
               id: '../dev-server/index.js',
               external: true
@@ -52,13 +52,13 @@ export async function cli_legacy(opts: BuildOptions) {
               external: true
             }
           }
-          if (importee === '@compiler') {
+          if (importee === '@stencil/core/compiler') {
             return {
               id: '../compiler/stencil.js',
               external: true
             }
           }
-          if (importee === '@mock-doc') {
+          if (importee === '@stencil/core/mock-doc') {
             return {
               id: '../mock-doc/index.js',
               external: true

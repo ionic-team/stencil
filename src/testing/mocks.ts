@@ -1,7 +1,7 @@
 import * as d from '@stencil/core/internal';
 import { BuildContext, Cache } from '../compiler';
 import { InMemoryFs } from '@utils';
-import { MockWindow } from '@mock-doc';
+import { MockWindow } from '@stencil/core/mock-doc';
 import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys_legacy';

@@ -4,13 +4,6 @@ import { getHydratedFlagHead, getStencilInternalModule } from '../core-resolve-p
 describe('core resolve plugin', () => {
   const rootDir = '/';
 
-  it('https cdn url path', () => {
-    const compilerExe = 'https://cdn.jsdelivr.net/npm/@stencil/core@1.2.0-0/compiler/stencil.js';
-    const internalModule = 'runtime';
-    const m = getStencilInternalModule(rootDir, compilerExe, internalModule);
-    expect(m).toBe('/node_modules/@stencil/core/internal/runtime/index.mjs');
-  });
-
   it('http localhost with port url path', () => {
     const compilerExe = 'http://localhost:3333/@stencil/core/compiler/stencil.js?v=1.2.3';
     const internalModule = 'hydrate';

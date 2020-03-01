@@ -7,7 +7,7 @@ import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
 import { createTime, installDevTools } from './profile';
 import { disconnectedCallback } from './disconnected-callback';
-import { doc, getHostRef, plt, registerHost, supportsShadowDom, win } from '@platform';
+import { doc, getHostRef, plt, registerHost, win } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
 import { proxyComponent } from './proxy-component';
@@ -72,7 +72,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       if (BUILD.watchCallback) {
         cmpMeta.$watchers$ = {};
       }
-      if (BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
+      if (BUILD.shadowDom && !plt.$supportsShadow$ && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
         cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
       }
       const tagName = cmpMeta.$tagName$;
@@ -93,7 +93,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
             // and this browser supports shadow dom
             // add the read-only property "shadowRoot" to the host element
             // adding the shadow root build conditionals to minimize runtime
-            if (supportsShadowDom) {
+            if (plt.$supportsShadow$) {
 
               if (BUILD.shadowDelegatesFocus) {
                 self.attachShadow({

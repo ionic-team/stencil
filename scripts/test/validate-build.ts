@@ -62,10 +62,6 @@ const pkgs: TestPackage[] = [
     ]
   },
   {
-    // internal/runtime
-    packageJson: 'internal/runtime/package.json',
-  },
-  {
     // internal/testing
     packageJson: 'internal/testing/package.json',
   },
@@ -232,6 +228,9 @@ function validateDts(opts: BuildOptions, dtsEntries: string[]) {
     paths: {
       '@stencil/core/internal': [
         join(opts.rootDir, 'internal', 'index.d.ts')
+      ],
+      '@stencil/core/internal/testing': [
+        join(opts.rootDir, 'internal', 'testing', 'index.d.ts')
       ],
     },
   });

@@ -4,7 +4,7 @@ import { hasError } from '@utils';
 import { runJest } from './jest/jest-runner';
 import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
-import { startServer } from '@dev-server';
+import { startServer } from '@stencil/core/dev-server';
 import * as puppeteer from 'puppeteer';
 
 

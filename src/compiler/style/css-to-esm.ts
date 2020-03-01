@@ -46,7 +46,8 @@ export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
       autoprefixer: input.autoprefixer,
       input: results.styleText,
       filePath: input.filePath,
-      minify: input.minify
+      minify: input.minify,
+      sourceMap: input.sourceMap,
     });
 
     results.diagnostics.push(...optimizeResults.diagnostics);

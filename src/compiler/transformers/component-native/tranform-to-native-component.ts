@@ -10,23 +10,26 @@ import { updateStyleImports } from '../style-imports';
 import ts from 'typescript';
 
 
-export const transformToNativeComponentText = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) => {
+export const transformToNativeComponentText = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) => {
   let outputText: string = null;
 
-  const transformOpts: d.TransformOptions = {
-    coreImportPath: '@stencil/core',
-    componentExport: null,
-    componentMetadata: null,
-    proxy: null,
-    style: 'static'
-  };
-
   try {
+    const tsCompilerOptions: ts.CompilerOptions = {
+      module: ts.ModuleKind.ESNext,
+      target: getScriptTarget(),
+    };
+
+    const transformOpts: d.TransformOptions = {
+      coreImportPath: '@stencil/core',
+      componentExport: null,
+      componentMetadata: null,
+      currentDirectory: config.cwd,
+      proxy: null,
+      style: 'static',
+    };
+
     const transpileOpts: ts.TranspileOptions = {
-      compilerOptions: {
-        module: ts.ModuleKind.ESNext,
-        target: getScriptTarget(),
-      },
+      compilerOptions: tsCompilerOptions,
       fileName: cmp.jsFilePath,
       transformers: {
         after: [

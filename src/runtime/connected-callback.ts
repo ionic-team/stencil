@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { addHostEventListeners, doc, getHostRef, nextTick, plt, supportsShadowDom } from '@platform';
+import { addHostEventListeners, doc, getHostRef, nextTick, plt } from '@platform';
 import { addStyle } from './styles';
 import { attachToAncestor } from './update-component';
 import { BUILD } from '@app-data';
@@ -29,7 +29,7 @@ export const connectedCallback = (elm: d.HostElement) => {
       if (BUILD.hydrateClientSide) {
         hostId = elm.getAttribute(HYDRATE_ID);
         if (hostId) {
-          if (BUILD.shadowDom && supportsShadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
+          if (BUILD.shadowDom && plt.$supportsShadow$ && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
             const scopeId = BUILD.mode ? addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode')) : addStyle(elm.shadowRoot, cmpMeta);
             elm.classList.remove(scopeId + '-h', scopeId + '-s');
           }

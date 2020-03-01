@@ -4,7 +4,7 @@ import { getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
 import { HYDRATED_CSS } from '../../runtime/runtime-constants';
 import { isExternalUrl } from '../sys/resolve/resolve-utils';
 import { normalizePath, normalizeFsPath } from '@utils';
-import { STENCIL_CORE_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID, STENCIL_INTERNAL_PLATFORM_ID, STENCIL_INTERNAL_RUNTIME_ID } from './entry-alias-ids';
+import { STENCIL_CORE_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
 import path from 'path';
 import { Plugin } from 'rollup';
 
@@ -15,11 +15,9 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
       name: 'coreResolvePlugin',
       resolveId(id) {
         if (
-          id === STENCIL_INTERNAL_PLATFORM_ID ||
           id === STENCIL_CORE_ID ||
           id === STENCIL_INTERNAL_CLIENT_ID ||
-          id === STENCIL_INTERNAL_HYDRATE_ID ||
-          id === STENCIL_INTERNAL_RUNTIME_ID
+          id === STENCIL_INTERNAL_HYDRATE_ID
         ) {
           this.error(`${id} cannot be imported from a worker`);
         }
@@ -30,13 +28,12 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
   const compilerExe = config.sys_next.getCompilerExecutingPath();
   const internalClient = getStencilInternalModule(config.rootDir, compilerExe, 'client');
   const internalHydrate = getStencilInternalModule(config.rootDir, compilerExe, 'hydrate');
-  const internalRuntime = getStencilInternalModule(config.rootDir, compilerExe, 'runtime');
 
   return {
     name: 'coreResolvePlugin',
 
     resolveId(id) {
-      if (id === STENCIL_INTERNAL_PLATFORM_ID || id === STENCIL_CORE_ID) {
+      if (id === STENCIL_CORE_ID) {
         if (platform === 'client') {
           return internalClient;
         }
@@ -50,14 +47,11 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
       if (id === STENCIL_INTERNAL_HYDRATE_ID) {
         return internalHydrate;
       }
-      if (id === STENCIL_INTERNAL_RUNTIME_ID) {
-        return internalRuntime;
-      }
       return null;
     },
 
     async load(filePath) {
-      if (filePath === internalClient || filePath === internalHydrate || filePath === internalRuntime) {
+      if (filePath === internalClient || filePath === internalHydrate) {
         if (isExternalUrl(compilerExe)) {
           const url = getStencilModuleUrl(compilerExe, filePath);
           return fetchModuleAsync(compilerCtx.fs, packageVersions, url, filePath);

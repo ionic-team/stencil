@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { createCompiler } from '@compiler';
+import { createCompiler } from '@stencil/core/compiler';
 import { runPrerenderTask } from './task-prerender';
 import { startupLog } from './startup-log';
 import { taskWatch } from './task-watch';

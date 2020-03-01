@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { createCompiler } from '@compiler';
+import { createCompiler } from '@stencil/core/compiler';
 import { isOutputTargetDocs } from '../../compiler/output-targets/output-utils';
 import { startupLog } from './startup-log';
 

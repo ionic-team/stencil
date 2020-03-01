@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { MockWindow, patchWindow } from '@mock-doc';
+import { MockWindow, patchWindow } from '@stencil/core/mock-doc';
 
 
 export function patchDomImplementation(doc: any, opts: d.HydrateFactoryOptions) {

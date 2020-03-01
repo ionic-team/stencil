@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { cloneDocument, createDocument, serializeNodeToHtml } from '@mock-doc';
+import { cloneDocument, createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import color from 'ansi-colors';
 import { FsWatcher } from './node-fs-watcher';
 import { getLatestCompilerVersion } from './check-version';

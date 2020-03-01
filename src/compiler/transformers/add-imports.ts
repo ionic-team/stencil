@@ -7,7 +7,7 @@ export const addImports = (transformOpts: d.TransformOptions, tsSourceFile: ts.S
     return tsSourceFile;
   }
 
-  if (transformOpts.module === ts.ModuleKind.CommonJS) {
+  if (transformOpts.module === 'cjs') {
     // CommonJS require()
     return addCjsRequires(tsSourceFile, importFnNames, importPath);
   }

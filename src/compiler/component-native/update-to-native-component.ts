@@ -16,7 +16,7 @@ export const updateToNativeComponent = async (config: d.Config, compilerCtx: d.C
 
   let outputJsText = await compilerCtx.cache.get(cacheKey);
   if (outputJsText == null) {
-    outputJsText = transformToNativeComponentText(compilerCtx, buildCtx, cmp, inputJsText);
+    outputJsText = transformToNativeComponentText(config, compilerCtx, buildCtx, cmp, inputJsText);
 
     await compilerCtx.cache.put(cacheKey, outputJsText);
   }

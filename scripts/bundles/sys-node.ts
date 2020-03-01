@@ -80,7 +80,7 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
           return callback(null, undefined);
         }
 
-        if (request === '@mock-doc') {
+        if (request === '@stencil/core/mock-doc') {
           return callback(null, '../../mock-doc');
         }
 

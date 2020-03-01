@@ -32,7 +32,7 @@ Since TypeScript is used, the compiler is able to transpile from TypeScript to J
 |---------------------|---------------------------------|---------|
 | `file`              | The filename of the code being compiled. | `module.tsx` |
 | `module`            | Module format of compiled code, which can be either `esm` or `cjs`. | `esm` |
-| `script`            | The JavaScript source target to transpile to. Values can be `latest`, `esnext`, `es2017`, `es2015`, or `es5`. | `es2017` |
+| `target`            | The JavaScript source target to transpile to. Values can be `latest`, `esnext`, `es2017`, `es2015`, or `es5`. | `es2017` |
 | `componentExport`   | A component can be defined as a custom element by using `customelement`, or the component class can be exported by using `module`. | `customelement` |
 | `componentMetadata` | Sets how and if component metadata should be assigned on the compiled component output. The `compilerstatic` value will set the metadata to a static `COMPILER_META` getter on the component class. | `null` |
 | `proxy`             | Sets how and if any properties, methods and events are proxied on the component class. The `defineproperty` value sets the getters and setters using Object.defineProperty. | `defineproperty` |
@@ -51,24 +51,6 @@ The returned results of `compile()` is a Promise, and the resolved value contain
 | `inputOptions`    | The compile options used after the user's compile options have been normalized and defaults applied. |
 | `imports`         | An array of all the imports found in the source code. This includes paths for both ESM `import` and CJS `require()`. Each import in the array is an object with a `path` property, which is the original path and has not been normalized or resolved. |
 | `componentMeta`   | An array of component metadata for each component in the module. |
-
-
-### `dependencies`
-
-An array of dependencies required for the Stencil compiler. This data is used to set which dependencies versions work with this particular version of the compiler. The `url` value is only a recommendation of a CDN.
-
-Example `dependencies`:
-
-```
-// stencil.dependencies
-[
-  {
-    "name": "typescript",
-    "version": "3.5.3",
-    "url": "https://cdn.jsdelivr.net/npm/typescript@3.5.3/lib/typescript.js"
-  }
-]
-```
 
 
 ### `version`
