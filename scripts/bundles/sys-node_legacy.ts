@@ -1,7 +1,7 @@
 import { join } from 'path';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import json from 'rollup-plugin-json';
+import rollupCommonjs from '@rollup/plugin-commonjs';
+import rollupJson from '@rollup/plugin-json';
+import rollupResolve from '@rollup/plugin-node-resolve';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { RollupOptions } from 'rollup';
@@ -35,6 +35,7 @@ export async function sysNode_legacy(opts: BuildOptions) {
     ],
     plugins: [
       {
+        name: 'sysNode_legacyResolvePlugin',
         resolveId(importee) {
           if (importee === 'resolve') {
             return join(opts.bundleHelpersDir, 'resolve.js');
@@ -56,15 +57,15 @@ export async function sysNode_legacy(opts: BuildOptions) {
       },
       aliasPlugin(opts),
       replacePlugin(opts),
-      resolve({
+      rollupResolve({
         preferBuiltins: true,
       }),
-      commonjs({
+      rollupCommonjs({
         namedExports: {
           'micromatch': [ 'matcher' ]
         }
       }),
-      json() as any
+      rollupJson(),
     ]
   };
 

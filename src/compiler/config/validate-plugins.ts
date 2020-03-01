@@ -11,12 +11,12 @@ export function validatePlugins(config: d.Config, diagnostics: d.Diagnostic[]) {
   const hasCommonjs = config.plugins.some(p => p.name === 'commonjs');
   if (hasCommonjs) {
     const warn = buildWarn(diagnostics);
-    warn.messageText = `Stencil already uses "rollup-plugin-commonjs", please remove it from your "stencil.config.ts" plugins.
+    warn.messageText = `Stencil already uses "@rollup/plugin-commonjs", please remove it from your "stencil.config.ts" plugins.
     You can configure the commonjs settings using the "commonjs" property in "stencil.config.ts`;
   }
   if (hasResolveNode) {
     const warn = buildWarn(diagnostics);
-    warn.messageText = `Stencil already uses "rollup-plugin-commonjs", please remove it from your "stencil.config.ts" plugins.
+    warn.messageText = `Stencil already uses "@rollup/plugin-commonjs", please remove it from your "stencil.config.ts" plugins.
     You can configure the commonjs settings using the "commonjs" property in "stencil.config.ts`;
   }
   config.rollupPlugins = rollupPlugins.filter(({name}) => name !== 'node-resolve' && name !== 'commonjs');

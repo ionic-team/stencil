@@ -1,8 +1,8 @@
 import fs from 'fs-extra';
 import { join } from 'path';
-import nodeResolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import json from 'rollup-plugin-json';
+import rollupCommonjs from '@rollup/plugin-commonjs';
+import rollupJson from '@rollup/plugin-json';
+import rollupNodeResolve from '@rollup/plugin-node-resolve';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { getBanner } from '../utils/banner';
 import { inlinedCompilerPluginsPlugin } from './plugins/inlined-compiler-plugins-plugin';
@@ -55,6 +55,7 @@ export async function compiler(opts: BuildOptions) {
     },
     plugins: [
       {
+        name: 'compilerMockDocResolvePlugin',
         resolveId(id) {
           if (id === '@stencil/core/mock-doc') {
             return join(opts.transpiledDir, 'mock-doc', 'index.js');
@@ -67,12 +68,12 @@ export async function compiler(opts: BuildOptions) {
       sizzlePlugin(opts),
       aliasPlugin(opts),
       sysModulesPlugin(inputDir),
-      nodeResolve({
+      rollupNodeResolve({
         preferBuiltins: false
       }),
-      commonjs(),
+      rollupCommonjs(),
       replacePlugin(opts),
-      json() as any,
+      rollupJson(),
       moduleDebugPlugin(opts),
       // {
       //   generateBundle(_, bundleFiles) {

@@ -1,9 +1,9 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { rollup, Plugin } from 'rollup';
-import nodeResolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import json from 'rollup-plugin-json';
+import rollupCommonjs from '@rollup/plugin-commonjs';
+import rollupJson from '@rollup/plugin-json';
+import rollupNodeResolve from '@rollup/plugin-node-resolve';
 import { BuildOptions } from '../../utils/options';
 
 
@@ -61,11 +61,11 @@ async function bundleCompilerPlugins(opts: BuildOptions, inputDir: string) {
           return null;
         }
       },
-      nodeResolve({
+      rollupNodeResolve({
         preferBuiltins: false
       }),
-      commonjs(),
-      json({
+      rollupCommonjs(),
+      rollupJson({
         preferConst: true
       }) as any
     ],

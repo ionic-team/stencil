@@ -1,8 +1,8 @@
 import fs from 'fs-extra';
 import { join } from 'path';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import json from 'rollup-plugin-json';
+import rollupCommonjs from '@rollup/plugin-commonjs';
+import rollupJson from '@rollup/plugin-json';
+import rollupResolve from '@rollup/plugin-node-resolve';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { BuildOptions } from '../utils/options';
 import { lazyRequirePlugin } from './plugins/lazy-require';
@@ -52,8 +52,8 @@ export async function testing(opts: BuildOptions) {
     'puppeteer-core',
     'readline',
     'rollup',
-    'rollup-plugin-commonjs',
-    'rollup-plugin-node-resolve',
+    '@rollup/plugin-commonjs',
+    '@rollup/plugin-node-resolve',
     'stream',
     'tty',
     'typescript',
@@ -97,11 +97,11 @@ export async function testing(opts: BuildOptions) {
       },
       aliasPlugin(opts),
       replacePlugin(opts),
-      resolve({
+      rollupResolve({
         preferBuiltins: true
       }),
-      commonjs(),
-      json() as any,
+      rollupCommonjs(),
+      rollupJson(),
     ]
   };
 

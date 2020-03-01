@@ -1,6 +1,6 @@
 import { join } from 'path';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
+import rollupCommonjs from '@rollup/plugin-commonjs';
+import rollupResolve from '@rollup/plugin-node-resolve';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { urlPlugin } from './plugins/url-plugin';
@@ -34,10 +34,10 @@ export async function compiler_legacy(opts: BuildOptions) {
       aliasPlugin(opts),
       replacePlugin(opts),
       urlPlugin(opts),
-      resolve({
+      rollupResolve({
         preferBuiltins: true
       }),
-      commonjs({
+      rollupCommonjs({
         ignore: ['path'],
         ignoreGlobal: true
       }),

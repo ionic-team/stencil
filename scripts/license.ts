@@ -5,6 +5,9 @@ import { PackageData } from './utils/write-pkg-json';
 
 
 const entryDeps = [
+  '@rollup/plugin-commonjs',
+  '@rollup/plugin-json',
+  '@rollup/plugin-node-resolve',
   'ansi-colors',
   'autoprefixer',
   'css',
@@ -23,8 +26,6 @@ const entryDeps = [
   'postcss',
   'prompts',
   'rollup',
-  'rollup-plugin-commonjs',
-  'rollup-plugin-node-resolve',
   'semiver',
   'sizzle',
   'source-map',

@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import { join } from 'path';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
+import rollupCommonjs from '@rollup/plugin-commonjs';
+import rollupResolve from '@rollup/plugin-node-resolve';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { gracefulFsPlugin } from './plugins/graceful-fs-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
@@ -63,10 +63,10 @@ export async function devServer(opts: BuildOptions) {
     plugins: [
       gracefulFsPlugin(),
       aliasPlugin(opts),
-      resolve({
+      rollupResolve({
         preferBuiltins: true
       }),
-      commonjs(),
+      rollupCommonjs(),
     ]
   };
 
@@ -118,10 +118,10 @@ export async function devServer(opts: BuildOptions) {
       },
       gracefulFsPlugin(),
       aliasPlugin(opts),
-      resolve({
+      rollupResolve({
         preferBuiltins: true
       }),
-      commonjs(),
+      rollupCommonjs(),
       replacePlugin(opts),
     ]
   };
@@ -176,7 +176,7 @@ export async function devServer(opts: BuildOptions) {
         }
       },
       replacePlugin(opts),
-      resolve(),
+      rollupResolve(),
     ]
   };
 
@@ -204,7 +204,7 @@ export async function devServer(opts: BuildOptions) {
     },
     plugins: [
       replacePlugin(opts),
-      resolve(),
+      rollupResolve(),
     ]
   };
 

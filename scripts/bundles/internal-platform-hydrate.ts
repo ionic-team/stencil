@@ -6,8 +6,8 @@ import { replacePlugin } from './plugins/replace-plugin';
 import { urlPlugin } from './plugins/url-plugin';
 import { getBanner } from '../utils/banner';
 import { BuildOptions } from '../utils/options';
-import rollupResolve from 'rollup-plugin-node-resolve';
-import rollupCommonjs from 'rollup-plugin-commonjs';
+import rollupCommonjs from '@rollup/plugin-commonjs';
+import rollupResolve from '@rollup/plugin-node-resolve';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { RollupOptions } from 'rollup';
 

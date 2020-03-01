@@ -75,7 +75,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
 
 
 export function createReplaceData(opts: BuildOptions) {
-  const CACHE_BUSTER = 5;
+  const CACHE_BUSTER = 6;
 
   const typescriptPkg = require(join(opts.nodeModulesDir, 'typescript', 'package.json'));
   opts.typescriptVersion = typescriptPkg.version;

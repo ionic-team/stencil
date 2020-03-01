@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import { join } from 'path';
-import nodeResolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
+import rollupCommonjs from '@rollup/plugin-commonjs';
+import rollupNodeResolve from '@rollup/plugin-node-resolve';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { gracefulFsPlugin } from './plugins/graceful-fs-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
@@ -67,10 +67,10 @@ export async function screenshot(opts: BuildOptions) {
     plugins: [
       gracefulFsPlugin(),
       aliasPlugin(opts),
-      nodeResolve({
+      rollupNodeResolve({
         preferBuiltins: false
       }),
-      commonjs(),
+      rollupCommonjs(),
       replacePlugin(opts),
     ]
   };
@@ -85,10 +85,10 @@ export async function screenshot(opts: BuildOptions) {
     external,
     plugins: [
       aliasPlugin(opts),
-      nodeResolve({
+      rollupNodeResolve({
         preferBuiltins: false
       }),
-      commonjs(),
+      rollupCommonjs(),
       replacePlugin(opts),
     ]
   };

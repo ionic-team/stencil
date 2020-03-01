@@ -1,7 +1,7 @@
-import rollupCommonjsPlugin from  'rollup-plugin-commonjs';
-import rollupJsonPlugin from  'rollup-plugin-json';
-import rollupNodeResolvePlugin from  'rollup-plugin-node-resolve';
-import rollupReplacePlugin from  'rollup-plugin-replace';
+import rollupCommonjsPlugin from  '@rollup/plugin-commonjs';
+import rollupJsonPlugin from  '@rollup/plugin-json';
+import rollupNodeResolvePlugin from  '@rollup/plugin-node-resolve';
+import rollupReplacePlugin from  '@rollup/plugin-replace';
 
 export { rollupCommonjsPlugin };
 export { rollupJsonPlugin };
