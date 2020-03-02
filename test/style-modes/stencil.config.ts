@@ -11,7 +11,7 @@ export const config: Config = {
       serviceWorker: null
     },
     {
-      type: 'dist-custom-element',
+      type: 'dist-custom-elements-bundle',
       dir: 'www/dist-module',
       copy: [
         {

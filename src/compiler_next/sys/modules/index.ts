@@ -11,3 +11,4 @@ export * from './path';
 export * from './stream';
 export * from './typescript';
 export * from './url';
+export * from './util';

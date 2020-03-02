@@ -27,4 +27,5 @@ export const normalize = path.normalize;
 export const relative = path.relative;
 export const resolve = path.resolve;
 export const sep = path.sep;
+export const posix = path.posix;
 export default path;

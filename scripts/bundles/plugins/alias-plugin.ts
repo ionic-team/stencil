@@ -17,7 +17,6 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
   const helperResolvers = new Set([
     'is-resolvable',
     'path-is-absolute',
-    'util',
   ]);
 
   // ensure we use the same one

@@ -1,5 +1,6 @@
 import * as d from '../../../declarations';
 import { basename } from 'path';
+import { promisify } from './util';
 
 
 export interface FsObj {
@@ -16,6 +17,9 @@ export const exists = fs.exists = (p: string, cb: any) => {
     cb(hasAccess);
   });
 };
+
+// https://nodejs.org/api/util.html#util_custom_promisified_functions
+(exists as any)[promisify.custom] = (p: string) => fs.__sys.access(p);
 
 export const existsSync = fs.existsSync = (p: string) => {
   const exists = fs.__sys.accessSync(p);

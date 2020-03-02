@@ -4,11 +4,10 @@ import { createNodeSysWithWatch } from '../sys/node_next/node-sys-watch';
 import { loadConfig } from '@stencil/core/compiler';
 import { parseFlags } from './parse-flags';
 import { runTask } from './tasks/run-task';
-import { shouldIgnoreError, hasError } from '@utils';
+import { shouldIgnoreError, hasError, isString } from '@utils';
 import { setupWorkerController } from '../sys/node_next/worker';
 import exit from 'exit';
 import { join } from 'path';
-import { isString } from 'util';
 import { NodeLazyRequire } from '../sys/node/node-lazy-require';
 import { NodeResolveModule } from '../sys/node/node-resolve-module';
 

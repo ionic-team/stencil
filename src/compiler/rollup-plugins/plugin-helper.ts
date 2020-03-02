@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { buildError } from '@utils';
 
 
-export function pluginHelper(config: d.Config, builtCtx: d.BuildCtx) {
+export const pluginHelper = (config: d.Config, builtCtx: d.BuildCtx) => {
   return {
     name: 'pluginHelper',
     resolveId(importee: string, importer: string): null {
@@ -28,8 +28,7 @@ export function pluginHelper(config: d.Config, builtCtx: d.BuildCtx) {
       return null;
     }
   };
-
-}
+};
 
 const builtIns = new Set([
   'child_process',

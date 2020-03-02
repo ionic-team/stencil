@@ -49,6 +49,8 @@
         "${workspaceFolder}/bin/stencil",
         "build",
         "--dev",
+        "--next",
+        "--max-workers=0",
         "--config",
         "${workspaceFolder}/test/style-modes/stencil.config.ts"
       ],
@@ -297,9 +299,9 @@
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
-        "--max-workers=1",
-        "--watch",
+        "--max-workers=0",
         "--dev",
+        "--next",
         "--config",
         "${workspaceFolder}/test/karma/stencil.config.ts"
       ],

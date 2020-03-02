@@ -40,23 +40,15 @@ async function bundleCompilerPlugins(opts: BuildOptions, inputDir: string) {
     external: [
       'fs',
       'module',
-      'path'
+      'path',
+      'util',
     ],
     plugins: [
       {
         name: 'bundleCompilerPlugins',
         resolveId(id) {
-          if (id === 'util') {
-            return '@node-util';
-          }
           if (id === 'resolve') {
             return path.join(opts.bundleHelpersDir, 'resolve.js');
-          }
-          return null;
-        },
-        load(id) {
-          if (id === '@node-util') {
-            return util;
           }
           return null;
         }
@@ -67,7 +59,7 @@ async function bundleCompilerPlugins(opts: BuildOptions, inputDir: string) {
       rollupCommonjs(),
       rollupJson({
         preferConst: true
-      }) as any
+      }),
     ],
     treeshake: {
       moduleSideEffects: false
@@ -81,8 +73,3 @@ async function bundleCompilerPlugins(opts: BuildOptions, inputDir: string) {
 
   return await fs.readFile(cacheFile, 'utf8');
 }
-
-const util = `
-export const inspect = s => console.log(s);
-export default { inspect };
-`;

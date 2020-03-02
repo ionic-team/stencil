@@ -31,21 +31,19 @@ var stencil = (function(exports) {
       process.env = () => ({ __mocked: true });
     }
     if (!process.nextTick) {
-      process.nextTick = (cb) => Promise.resolve().then(cb);
+      const resolved = Promise.resolve();
+      process.nextTick = (cb) => resolved.then(cb);
     }
     if (!process.platform) {
       process.platform = () => 'mocked';
     }
     if (!process.version) {
-      process.version = () => '0.0.0';
+      process.version = 'v12.0.0';
     }
-
     if (!gbl.__dirname) {
       gbl.__dirname = '/';
     }
-
     if (!gbl.__filename) {
       gbl.__filename = '/index.js';
     }
-
   })(globalThis);
