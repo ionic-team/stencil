@@ -101,7 +101,9 @@ export async function testing(opts: BuildOptions) {
         preferBuiltins: true
       }),
       rollupCommonjs(),
-      rollupJson(),
+      rollupJson({
+        preferConst: true
+      }),
     ]
   };
 

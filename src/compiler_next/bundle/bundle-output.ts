@@ -85,7 +85,9 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
         ...config.commonjs
       }),
       pluginHelper(config, buildCtx),
-      rollupJsonPlugin(),
+      rollupJsonPlugin({
+        preferConst: true
+      }),
       rollupReplacePlugin({
         'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
       }),

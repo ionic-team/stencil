@@ -73,7 +73,9 @@ export async function compiler(opts: BuildOptions) {
       }),
       rollupCommonjs(),
       replacePlugin(opts),
-      rollupJson(),
+      rollupJson({
+        preferConst: true
+      }),
       moduleDebugPlugin(opts),
       // {
       //   generateBundle(_, bundleFiles) {

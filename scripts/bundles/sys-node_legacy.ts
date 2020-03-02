@@ -65,7 +65,9 @@ export async function sysNode_legacy(opts: BuildOptions) {
           'micromatch': [ 'matcher' ]
         }
       }),
-      rollupJson(),
+      rollupJson({
+        preferConst: true
+      }),
     ]
   };
 
