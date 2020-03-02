@@ -38,19 +38,12 @@ Stencil is able to generate components into various formats so they can be best 
 - Generates a `collection` into the `dist/collection/` directory to be used by other projects.
 
 
-### `dist-custom-elements`
+### `dist-custom-elements-bundle`
 
-- Generates a directory of each component as its own stand-alone web component.
-- Does not import any functions and works as is within the browser.
+- Generates a single, tree-shakable, bundle of all the components.
+- Does not define the custom elements.
+- Consumers importing individual components from the bundle must define each custom element.
 
-```
-dist/
-  components/
-    cmp-a/
-      cmp-a.mjs (component extends HTMLElement, but does not define custom element)
-      index.mjs (defines custom element on window)
-    index.mjs
-```
 
 ### `angular`
 
