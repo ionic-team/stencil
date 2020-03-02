@@ -1,4 +1,4 @@
-# 🐳 [1.9.0-19](https://github.com/ionic-team/stencil/compare/v1.9.0-18...v1.9.0-19) (2020-02-22)
+# 🎊 [1.9.0-20](https://github.com/ionic-team/stencil/compare/v1.9.0-19...v1.9.0-20) (2020-03-02)
 
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
@@ -53,6 +53,12 @@ Some of main features with the `--next` compiler include:
 * **style:** set static style as property on cmp clss ([ba14fe6](https://github.com/ionic-team/stencil/commit/ba14fe61dd7cb398bd24a8bc7442bf28dfb4f5a6))
 * **cli:** add ComponentInterface in component generator template ([#2147](https://github.com/ionic-team/stencil/issues/2147)) ([1688ff4](https://github.com/ionic-team/stencil/commit/1688ff499e75a727c3b636b8396f4b05fd280cbd))
 * **docs:** disable the dependencies part of the markdown docs. ([#2145](https://github.com/ionic-team/stencil/issues/2145)) ([4e74f26](https://github.com/ionic-team/stencil/commit/4e74f26934741aa0ac1b143e79b48da7d9d6deed))
+* **compiler:** export optimizeCss and optimizeJs ([d80a111](https://github.com/ionic-team/stencil/commit/d80a111de9a12f0a212b21bfb3a72ee65c50a7a8))
+* **hydrate:** excludeComponents option ([a0a32ff](https://github.com/ionic-team/stencil/commit/a0a32ff74690f7ab6360f97926859d76cde744c8))
+* **input:** update JSX InputHTMLAttributes ([b54ed8e](https://github.com/ionic-team/stencil/commit/b54ed8e8941bcc7e32ab1aabb114488b6a269e7c)), closes [#2218](https://github.com/ionic-team/stencil/issues/2218)
+* **mock-doc:** add global HTML constructors to node test global ([67a4080](https://github.com/ionic-team/stencil/commit/67a4080e3e5e14ccd2b024bcc66f8975f9055b13))
+* **next:** transform css content to esm format w/ compile() ([a72c01d](https://github.com/ionic-team/stencil/commit/a72c01dca1d50fb65ba57348156cf650d1b23b11))
+* **prerender:** optimizeCss and optimzeJs ([425ce38](https://github.com/ionic-team/stencil/commit/425ce380e4d75aeed2592565448160aec862887d))
 
 
 ### Bug Fixes
@@ -197,6 +203,16 @@ Some of main features with the `--next` compiler include:
 * **dev:** don't show warning for inputs without `value` ([#2209](https://github.com/ionic-team/stencil/issues/2209)) ([4744070](https://github.com/ionic-team/stencil/commit/47440706eef65e1fc1bd0915dad60b4d2dc474ef))
 * **listeners:** add host event listeners within constructor ([dc1ba91](https://github.com/ionic-team/stencil/commit/dc1ba915b829b3f9b3b945a0d9fc42b20c3d0cb1))
 * **vdom:** do not reset $slotRefNode$ when relocating nodes ([#2208](https://github.com/ionic-team/stencil/issues/2208)) ([ff7807d](https://github.com/ionic-team/stencil/commit/ff7807dbe1c11b61530c111fb2547bda9537ef3f))
+* **css:** do not remove /*! comments ([581be70](https://github.com/ionic-team/stencil/commit/581be704a3195f6ca0f1bff336aa7021fad67a5d))
+* **hydrate:** check for valid element nodeName ([9994c5b](https://github.com/ionic-team/stencil/commit/9994c5b2824e8c7749e753411459bb9243210da4)), closes [#2157](https://github.com/ionic-team/stencil/issues/2157)
+* **hydrate:** do not register cmps that should be excluded ([1ff1d79](https://github.com/ionic-team/stencil/commit/1ff1d798ee912516cc86b05b1e90c1649fdb93cf))
+* **minify:** do not remove console.debug() ([755b564](https://github.com/ionic-team/stencil/commit/755b5641f70a16aba30455e461220f1dc4b1eb0d)), closes [#2216](https://github.com/ionic-team/stencil/issues/2216)
+* **next:** comment shadow css for client hydrate ([2b69230](https://github.com/ionic-team/stencil/commit/2b69230d52466c34c68cefe832d4a5e5fe25d8fe))
+* **next:** do not inject global style into e2e setContent unless set ([eb4c5d4](https://github.com/ionic-team/stencil/commit/eb4c5d4dac6c0f0331822130c62735140367607c)), closes [#2210](https://github.com/ionic-team/stencil/issues/2210)
+* **next:** fix promisify.custom and node util bundling ([51a9a5e](https://github.com/ionic-team/stencil/commit/51a9a5e9f17a29d0d0a6cede9a05a80442c14b0e))
+* **next:** fix styles hmr ([9a015e9](https://github.com/ionic-team/stencil/commit/9a015e90268be842bf640096ac87368d65c9ab31))
+* **ts:** all unused imports is a warning ([a515d17](https://github.com/ionic-team/stencil/commit/a515d17b24dd9fe010fdfa5881c8d9d68b9bedc5))
+* **worker:** use Blob for cross-origin web worker ([cbeec64](https://github.com/ionic-team/stencil/commit/cbeec6486b015ea7e9ef57c7892db12a3cb9eb07))
 
 
 
