@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { BundleOptions } from './bundle-interface';
 import { hasError, normalizeFsPath } from '@utils';
-import { parseStencilImportPathData } from '../../compiler/transformers/stencil-import-path';
+import { parseImportPath } from '../../compiler/transformers/stencil-import-path';
 import { Plugin } from 'rollup';
 import { runPluginTransformsEsmImports } from '../../compiler/plugin/plugin';
 
@@ -14,15 +14,16 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
       if (/\0/.test(id)) {
         return null;
       }
-      const pathData = parseStencilImportPathData(id);
-      if (pathData !== null) {
-        // TODO, offline caching
+
+      const { data } = parseImportPath(id);
+      if (data != null) {
         const filePath = normalizeFsPath(id);
         const code = await compilerCtx.fs.readFile(filePath);
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, code, filePath);
 
         const modules = Array.from(compilerCtx.moduleMap.values());
-        const moduleFile = modules.find(m => m.cmps.some(c => c.tagName === pathData.tag));
+        const moduleFile = modules.find(m => m.cmps.some(c => c.tagName === data.tag));
+        const commentOriginalSelector = (bundleOpts.platform === 'hydrate');
 
         if (moduleFile) {
           const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
@@ -35,14 +36,12 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
           }));
         }
 
-        const commentOriginalSelector = (bundleOpts.platform === 'hydrate');
-
         const cssTransformResults = await compilerCtx.worker.transformCssToEsm({
-          filePath: pluginTransforms.id,
-          code: pluginTransforms.code,
-          tagName: pathData.tag,
-          encapsulation: pathData.encapsulation,
-          modeName: pathData.mode,
+          file: pluginTransforms.id,
+          input: pluginTransforms.code,
+          tag: data.tag,
+          encapsulation: data.encapsulation,
+          mode: data.mode,
           commentOriginalSelector,
           sourceMap: config.sourceMap,
           minify: config.minifyCss,
@@ -62,23 +61,28 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         }
 
         const hasUpdatedStyle = buildCtx.stylesUpdated.some(s => {
-          return s.styleTag === pathData.tag && s.styleMode === pathData.mode && s.styleText === cssTransformResults.styleText
+          return (
+            s.styleTag === data.tag &&
+            s.styleMode === data.mode &&
+            s.styleText === cssTransformResults.styleText
+          );
         });
 
         if (!hasUpdatedStyle) {
           buildCtx.stylesUpdated.push({
-            styleTag: pathData.tag,
-            styleMode: pathData.mode,
+            styleTag: data.tag,
+            styleMode: data.mode,
             styleText: cssTransformResults.styleText,
           });
         }
 
         return {
-          code: cssTransformResults.code,
+          code: cssTransformResults.output,
           map: cssTransformResults.map,
           moduleSideEffects: false
         };
       }
+
       return null;
     }
   };

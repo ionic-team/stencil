@@ -1,51 +1,71 @@
-import * as d from '../../declarations';
-import { DEFAULT_STYLE_MODE, isString } from '@utils';
+import { ImportData, ParsedImport, SerializeImportData }from '../../declarations';
+import { DEFAULT_STYLE_MODE, isString, normalizePath } from '@utils';
 import path from 'path';
 
 
-export const createStencilImportPath = (tagName: string, encapsulation: string, modeName: string, importeePath: string, importerPath: string) => {
-  const data: d.StencilComponentData = {
-    tag: tagName,
-  };
-  if (modeName && modeName !== DEFAULT_STYLE_MODE) {
-    data.mode = modeName;
-  }
-  if (encapsulation !== 'none') {
-    data.encapsulation = encapsulation;
-  }
+export const serializeImportPath = (data: SerializeImportData) => {
+  let p = data.importeePath;
 
-  const params = new URLSearchParams(Object.entries(data));
+  if (isString(p)) {
+    if (isString(data.importerPath) && path.isAbsolute(data.importeePath)) {
+      p = path.relative(path.dirname(data.importerPath), data.importeePath);
+    }
+    p = normalizePath(p);
+    if (!p.startsWith('.')) {
+      p = './' + p;
+    }
 
-  let p = importeePath;
-  if (path.isAbsolute(importeePath)) {
-    const importerDir = path.dirname(importerPath);
-    p = path.relative(importerDir, importeePath);
-  }
-  if (!p.startsWith('.')) {
-    p = './' + p;
-  }
+    const paramData: ImportData = {};
+    if (isString(data.tag)) {
+      paramData.tag = data.tag;
+    }
+    if (isString(data.mode) && data.mode !== DEFAULT_STYLE_MODE) {
+      paramData.mode = data.mode;
+    }
+    if (isString(data.encapsulation) && data.encapsulation !== 'none') {
+      paramData.encapsulation = data.encapsulation;
+    }
 
-  return p + '?' + params.toString();
-};
-
-
-export const parseStencilImportPathData = (importee: string) => {
-  if (isString(importee)) {
-    const dataParts = importee.split('?');
-    if (dataParts.length === 2) {
-      const params = dataParts[1];
-      const urlParams = new URLSearchParams(params);
-      const tag = urlParams.get('tag');
-      if (tag === null) {
-        return null;
-      }
-      const data: d.StencilComponentData = {
-        tag,
-        encapsulation: urlParams.get('encapsulation') || 'none',
-        mode: urlParams.get('mode') || DEFAULT_STYLE_MODE,
-      };
-      return data;
+    const paramEntries = Object.entries(paramData);
+    if (paramEntries.length > 0) {
+      const params = new URLSearchParams(paramEntries);
+      p += '?' + params.toString();
     }
   }
-  return null;
+
+  return p;
+};
+
+export const parseImportPath = (importPath: string) => {
+  const parsedPath: ParsedImport = {
+    importPath,
+    basename: null,
+    ext: null,
+    data: null,
+  };
+
+  if (isString(importPath)) {
+    const pathParts = importPath.split('?');
+
+    parsedPath.basename = path.basename(pathParts[0].trim());
+    const extParts = parsedPath.basename.split('.');
+    if (extParts.length > 1) {
+      parsedPath.ext = extParts[extParts.length - 1].toLowerCase();
+    }
+
+    if (pathParts.length > 1) {
+      const params = pathParts[1];
+      const urlParams = new URLSearchParams(params);
+      const tag = urlParams.get('tag');
+      if (tag != null) {
+        parsedPath.data = {
+          tag,
+          encapsulation: urlParams.get('encapsulation') || 'none',
+          mode: urlParams.get('mode') || DEFAULT_STYLE_MODE,
+        };
+      }
+    }
+  }
+
+  return parsedPath;
 };

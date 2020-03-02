@@ -1,3 +1,4 @@
+import StencilTypes from '@stencil/core/compiler';
 
 
 export const styleImports = new Map<string, string>();
@@ -52,7 +53,16 @@ button { background: green; }
 export const cssTemplatePlugin = {
   name: 'cssTemplatePlugin',
 
-  load(id: string) {
-    return styleImports.get(id.split('?')[0]);
+  async load(id: string) {
+    let code = styleImports.get(id.split('?')[0]);
+    if (code) {
+      const results = await stencil.compile(code, {
+        file: id
+      });
+      return results.code;
+    }
+    return code;
   }
 };
+
+declare const stencil: typeof StencilTypes;

@@ -33,6 +33,7 @@ export const BUILD: BuildConditionals = /* default */ {
   scoped: true,
   shadowDom: true,
   slot: true,
+  cssAnnotations: true,
   state: true,
   style: true,
   svg: true,
@@ -55,14 +56,17 @@ export const BUILD: BuildConditionals = /* default */ {
   isTesting: false,
   hydrateServerSide: false,
   hydrateClientSide: false,
+  lifecycleDOMEvents: false,
   lazyLoad: false,
   profile: false,
   slotRelocation: true,
   appendChildSlotFix: false,
   cloneNodeFix: false,
-  lifecycleDOMEvents: false,
   hydratedAttribute: false,
   hydratedClass: true,
+  safari10: true,
+  scriptDataOpts: true,
+  shadowDomShim: true,
 };
 
 export const NAMESPACE = /* default */ 'app' as string;

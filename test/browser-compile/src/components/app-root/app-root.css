@@ -39,6 +39,11 @@ section header {
   border-top-left-radius: 5px;
 }
 
+section header a {
+  float: right;
+  margin-right: 8px;
+}
+
 textarea {
   width: 100%;
   font-family: 'Courier New', Courier, monospace;
@@ -52,7 +57,7 @@ textarea {
 }
 
 .source textarea {
-  height: calc(100% - 215px);
+  height: calc(100% - 255px);
 }
 
 .build textarea {

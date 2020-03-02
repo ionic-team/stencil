@@ -6,8 +6,12 @@ import { dashToPascalCase, isString, toDashCase } from './helpers';
 
 export const createJsVarName = (fileName: string) => {
   if (isString(fileName)) {
+    fileName = fileName.split('?')[0];
+    fileName = fileName.split('#')[0];
+    fileName = fileName.split('&')[0];
+    fileName = fileName.split('=')[0];
     fileName = toDashCase(fileName);
-    fileName = fileName.replace(/[|&;$%@"<>()+,.{}_\!\?\/\\]/g, '-');
+    fileName = fileName.replace(/[|;$%@"<>()+,.{}_\!\/\\]/g, '-');
     fileName = dashToPascalCase(fileName);
 
     if (fileName.length > 1) {

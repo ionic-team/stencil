@@ -1,71 +1,122 @@
 import * as d from '../../declarations';
-import { DEFAULT_STYLE_MODE, catchError, createJsVarName, normalizePath, hasError } from '@utils';
-import { createStencilImportPath } from '../transformers/stencil-import-path';
+import { DEFAULT_STYLE_MODE, catchError, createJsVarName, normalizePath, hasError, isString } from '@utils';
 import { getScopeId } from '../style/scope-css';
+import { optimizeCss } from '../../compiler_next/optimize/optimize-css';
 import { scopeCss } from '../../utils/shadow-css';
+import { serializeImportPath } from '../transformers/stencil-import-path';
 import { stripCssComments } from './style-utils';
 import MagicString from 'magic-string';
 import path from 'path';
-import { optimizeCss } from '../../compiler_next/optimize/optimize-css';
 
 
 export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
+  const results = transformCssToEsmModule(input);
+
+  const optimizeResults = await optimizeCss({
+    autoprefixer: input.autoprefixer,
+    input: results.styleText,
+    filePath: input.file,
+    minify: true,
+    sourceMap: input.sourceMap,
+  });
+
+  results.diagnostics.push(...optimizeResults.diagnostics);
+  if (hasError(optimizeResults.diagnostics)) {
+    return results;
+  }
+  results.styleText = optimizeResults.output;
+
+  return generateTransformCssToEsm(input, results);
+};
+
+export const transformCssToEsmSync = (input: d.TransformCssToEsmInput) => {
+  const results = transformCssToEsmModule(input);
+  return generateTransformCssToEsm(input, results);
+};
+
+const transformCssToEsmModule = (input: d.TransformCssToEsmInput) => {
   const results: d.TransformCssToEsmOutput = {
-    styleText: input.code,
-    code: '',
+    styleText: input.input,
+    output: '',
     map: null,
-    diagnostics: []
+    diagnostics: [],
+    imports: [],
+    defaultVarName: createCssVarName(input.file, input.mode),
   };
 
   try {
-    const s = new MagicString('');
-    const defaultVarName = createCssVarName(input.filePath, input.modeName);
-    const varNames = new Set([defaultVarName]);
+    const varNames = new Set([results.defaultVarName]);
 
-    if (input.encapsulation === 'scoped' || (input.encapsulation === 'shadow' && input.commentOriginalSelector)) {
-      const scopeId = getScopeId(input.tagName, input.modeName);
-      results.styleText = scopeCss(results.styleText, scopeId, input.commentOriginalSelector);
+    if (isString(input.tag)) {
+      if (input.encapsulation === 'scoped' || (input.encapsulation === 'shadow' && input.commentOriginalSelector)) {
+        const scopeId = getScopeId(input.tag, input.mode);
+        results.styleText = scopeCss(results.styleText, scopeId, input.commentOriginalSelector);
+      }
     }
 
-    const cssImports = getCssImports(varNames, results.styleText, input.filePath, input.modeName);
+    const cssImports = getCssImports(varNames, results.styleText, input.file, input.mode);
     cssImports.forEach(cssImport => {
       // remove the original css @imports
       results.styleText = results.styleText.replace(cssImport.srcImportText, '');
 
-      const importPath = createStencilImportPath(input.tagName, input.encapsulation, input.modeName, cssImport.filePath, input.filePath);
-      s.append(`import ${cssImport.varName} from '${importPath}';\n`);
+      const importPath = serializeImportPath({
+        importeePath: cssImport.filePath,
+        importerPath: input.file,
+        tag: input.tag,
+        encapsulation: input.encapsulation,
+        mode: input.mode,
+      });
+
+      // str.append(`import ${cssImport.varName} from '${importPath}';\n`);
+      results.imports.push({
+        varName: cssImport.varName,
+        importPath
+      });
     });
-
-    s.append(`const ${defaultVarName} = `);
-
-    cssImports.forEach(cssImport => {
-      s.append(`${cssImport.varName} + `);
-    });
-
-    const optimizeResults = await optimizeCss({
-      autoprefixer: input.autoprefixer,
-      input: results.styleText,
-      filePath: input.filePath,
-      minify: input.minify,
-      sourceMap: input.sourceMap,
-    });
-
-    results.diagnostics.push(...optimizeResults.diagnostics);
-    if (hasError(optimizeResults.diagnostics)) {
-      return results;
-    }
-    results.styleText = optimizeResults.output;
-
-    s.append(`${JSON.stringify(results.styleText)};\n`);
-
-    s.append(`export default ${defaultVarName};`);
-
-    results.code = s.toString();
 
   } catch (e) {
     catchError(results.diagnostics, e);
   }
 
+  return results;
+};
+
+
+const generateTransformCssToEsm = (input: d.TransformCssToEsmInput, results: d.TransformCssToEsmOutput) => {
+  const s = new MagicString('');
+
+  if (input.module === 'cjs') {
+    // CommonJS
+    results.imports.forEach(cssImport => {
+      s.append(`const ${cssImport.varName} = require('${cssImport.importPath}');\n`);
+    });
+
+    s.append(`const ${results.defaultVarName} = `);
+
+    results.imports.forEach(cssImport => {
+      s.append(`${cssImport.varName} + `);
+    });
+
+    s.append(`${JSON.stringify(results.styleText)};\n`);
+    s.append(`module.exports = ${results.defaultVarName};`);
+
+  } else {
+    // ESM
+    results.imports.forEach(cssImport => {
+      s.append(`import ${cssImport.varName} from '${cssImport.importPath}';\n`);
+    });
+
+    s.append(`const ${results.defaultVarName} = `);
+
+    results.imports.forEach(cssImport => {
+      s.append(`${cssImport.varName} + `);
+    });
+
+    s.append(`${JSON.stringify(results.styleText)};\n`);
+    s.append(`export default ${results.defaultVarName};`);
+  }
+
+  results.output = s.toString();
   return results;
 };
 
@@ -108,7 +159,7 @@ const getCssImports = (varNames: Set<string>, cssText: string, filePath: string,
       cssImportData.filePath = normalizePath(path.resolve(dir, cssImportData.url));
     }
 
-    cssImportData.varName = createCssVarName(filePath, modeName);
+    cssImportData.varName = createCssVarName(cssImportData.filePath, modeName);
 
     if (varNames.has(cssImportData.varName)) {
       cssImportData.varName += (varNames.size);

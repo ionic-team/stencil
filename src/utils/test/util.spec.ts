@@ -163,6 +163,10 @@ describe('util', () => {
   });
 
   it('createJsVarName', () => {
+    expect(util.createJsVarName('./scoped-style-import.css?tag=my-button&encapsulation=scoped')).toBe('scopedStyleImportCss');
+    expect(util.createJsVarName('./scoped-style-import.css#hash')).toBe('scopedStyleImportCss');
+    expect(util.createJsVarName('./scoped-style-import.css&data')).toBe('scopedStyleImportCss');
+    expect(util.createJsVarName('./scoped-style-import.css=data')).toBe('scopedStyleImportCss');
     expect(util.createJsVarName('@ionic/core')).toBe('ionicCore');
     expect(util.createJsVarName('@ionic\\core')).toBe('ionicCore');
     expect(util.createJsVarName('88mph')).toBe('_88mph');

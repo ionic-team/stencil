@@ -122,18 +122,15 @@ export interface CompileOptions {
    * https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping
    */
   paths?: {[key: string]: string[]};
-
-  data?: StencilComponentData;
 }
 
 export interface CompileResults {
   code: string;
-  componentMeta: any[];
+  data?: any[];
   diagnostics: Diagnostic[];
-  imports: { path: string; }[];
+  imports?: { path: string; }[];
   inputFileExtension: string;
   inputFilePath: string;
-  inputOptions: CompileOptions;
   map: any;
   outputFilePath: string;
 }
@@ -146,24 +143,23 @@ export interface CompileScriptMinifyOptions {
 
 export type CompileTarget = 'latest' | 'esnext' | 'es2020' | 'es2019' | 'es2018' | 'es2017' | 'es2015' | 'es5' | string | undefined;
 
-export interface ResolvedStencilData {
-  resolvedId: string;
-  resolvedFilePath: string;
-  resolvedFileName: string;
-  resolvedFileExt: string;
-  params: string;
-  data: StencilComponentData;
-  importee: string;
-  importer: string;
-  importerExt: string;
+export interface ParsedImport {
+  importPath: string;
+  basename: string;
+  ext: string;
+  data: ImportData;
 }
 
-export interface StencilComponentData {
-  tag: string;
+export interface ImportData {
+  tag?: string;
   encapsulation?: string;
   mode?: string;
 }
 
+export interface SerializeImportData extends ImportData {
+  importeePath: string;
+  importerPath?: string;
+}
 
 export interface BuildFeatures {
   // encapsulation
@@ -2245,22 +2241,25 @@ export interface CssToEsmImportData {
 }
 
 export interface TransformCssToEsmInput {
-  filePath: string;
-  code: string;
-  tagName: string;
-  encapsulation: string;
-  modeName: string;
-  commentOriginalSelector: boolean;
-  sourceMap: boolean;
-  minify: boolean;
-  autoprefixer: any;
+  input: string;
+  module?: 'cjs' | 'esm' | string;
+  file?: string;
+  tag?: string;
+  encapsulation?: string;
+  mode?: string;
+  commentOriginalSelector?: boolean;
+  sourceMap?: boolean;
+  minify?: boolean;
+  autoprefixer?: any;
 }
 
 export interface TransformCssToEsmOutput {
   styleText: string;
-  code: string;
+  output: string;
   map: any;
   diagnostics: Diagnostic[];
+  defaultVarName: string;
+  imports: { varName: string; importPath: string;}[];
 }
 
 export interface PackageJsonData {

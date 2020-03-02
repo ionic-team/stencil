@@ -268,8 +268,8 @@ export class MyButton {
 
 `,
 html: `
-<my-button mode="ios">ios Shadow Url</my-button>
-<my-button mode="md">md Shadow Url</my-button>
+<my-button mode="ios">ios Shadow Url - Blue</my-button>
+<my-button mode="md">md Shadow Url - Green</my-button>
 `
 });
 
@@ -305,9 +305,23 @@ export class MyButton {
 
 `,
 html: `
-<my-button mode="ios">ios Scoped Url</my-button>
-<my-button mode="md">md Scoped Url</my-button>
+<my-button mode="ios">ios Scoped Url - Blue</my-button>
+<my-button mode="md">md Scoped Url - Green</my-button>
 `
+});
+
+templates.set(`my-css.css`, {
+
+source:  `
+@import "some-import.css";
+body {
+  background: gray;
+}
+header div > span.panic {
+  color: red;
+}
+`,
+html: ``
 });
 
 

@@ -13,15 +13,13 @@ export const H = ((win as any).HTMLElement || class { } as any) as HTMLElement;
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
+  $supportsShadow$: (BUILD.shadowDomShim && BUILD.shadowDom) ?
+    /*@__PURE__*/(() => (doc.head.attachShadow + '').indexOf('[native') > -1)() : false,
   jmp: (h) => h(),
   raf: (h) => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
 };
-
-if (BUILD.shadowDomShim && BUILD.shadowDom) {
-  plt.$supportsShadow$ = /*@__PURE__*/(() => (doc.head.attachShadow + '').indexOf('[native') > -1)();
-}
 
 export const supportsListenerOptions = /*@__PURE__*/(() => {
   let supportsListenerOptions = false;

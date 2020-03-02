@@ -1,18 +1,41 @@
-import { CompileOptions, CompileResults, Config, TransformOptions } from '../../declarations';
+import { CompileOptions, CompileResults, Config, TransformOptions, TransformCssToEsmInput, ImportData } from '../../declarations';
 import { isString } from '@utils';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
+import { parseImportPath } from '../../compiler/transformers/stencil-import-path';
 import path from 'path';
 import ts from 'typescript';
 
 
-export const getCompileConfig = (code: string, input: CompileOptions) => {
+export const getCompileResults = (code: string, input: CompileOptions) => {
+  if (!isString(input.file)) {
+    input.file = 'module.tsx';
+  }
+  const parsedImport = parseImportPath(input.file);
+
+  const results: CompileResults = {
+    code: (typeof code === 'string' ? code : ''),
+    data: [],
+    diagnostics: [],
+    inputFileExtension: parsedImport.ext,
+    inputFilePath: input.file,
+    imports: [],
+    map: null,
+    outputFilePath: null,
+  };
+
+  return {
+    importData: parsedImport.data,
+    results,
+  }
+};
+
+export const getCompileModuleConfig = (input: CompileOptions) => {
   const compileOpts: CompileOptions = {
     componentExport: getCompileConfigOpt(input.componentExport, VALID_EXPORT, 'customelement'),
     componentMetadata: getCompileConfigOpt(input.componentMetadata, VALID_METADATA, null),
     coreImportPath: isString(input.coreImportPath) ? input.coreImportPath : STENCIL_INTERNAL_CLIENT_ID,
     currentDirectory: isString(input.currentDirectory) ? input.currentDirectory : '/',
-    data: input.data ? Object.assign({}, input.data) : null,
-    file: (isString(input.file) ? input.file.trim() : 'module.tsx'),
+    file: input.file,
     proxy: getCompileConfigOpt(input.proxy, VALID_PROXY, 'defineproperty'),
     module: getCompileConfigOpt(input.module, VALID_MODULE, 'esm'),
     sourceMap: input.sourceMap === 'inline' ? 'inline' : (input.sourceMap !== false),
@@ -77,6 +100,8 @@ export const getCompileConfig = (code: string, input: CompileOptions) => {
     rootDir: compileOpts.currentDirectory,
     srcDir: compileOpts.currentDirectory,
     devMode: true,
+    minifyCss: true,
+    minifyJs: false,
     _isTesting: true,
     validateTypes: false,
     enableCache: false,
@@ -86,32 +111,28 @@ export const getCompileConfig = (code: string, input: CompileOptions) => {
     tsCompilerOptions,
   };
 
-  const results: CompileResults = {
-    code: (typeof code === 'string' ? code : ''),
-    componentMeta: [],
-    diagnostics: [],
-    inputFileExtension: null,
-    inputFilePath: compileOpts.file,
-    inputOptions: compileOpts,
-    imports: [],
-    map: null,
-    outputFilePath: null,
-  };
-
-  const parts = compileOpts.file.toLowerCase().split('.');
-  results.inputFileExtension = parts[parts.length - 1];
-  if (results.inputFileExtension === 'ts' && parts[parts.length - 2] === 'd') {
-    results.inputFileExtension = 'd.ts';
-  }
-
   return {
     compileOpts,
     config,
-    results,
     transformOpts,
   };
 };
 
+export const getCompileCssConfig = (compileOpts: CompileOptions, importData: ImportData, results: CompileResults) => {
+  const transformInput: TransformCssToEsmInput = {
+    file: results.inputFilePath,
+    input: results.code,
+    tag: importData && importData.tag,
+    encapsulation: importData && importData.encapsulation,
+    mode: importData && importData.mode,
+    sourceMap: (compileOpts.sourceMap !== false),
+    commentOriginalSelector: false,
+    minify: false,
+    autoprefixer: false,
+    module: compileOpts.module,
+  };
+  return transformInput;
+};
 
 const getCompileConfigOpt = (value: any, validValues: Set<string>, defaultValue: string) => {
   if (value === null || value === 'null') {

@@ -18,6 +18,10 @@ export const config: Config = {
           dest: './@stencil/core/internal/',
           warn: true
         },
+        {
+          src: 'preview.html',
+          warn: true
+        },
       ]
     }
   ],

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { createStencilImportPath } from './stencil-import-path';
+import { serializeImportPath } from './stencil-import-path';
 import ts from 'typescript';
 
 
@@ -138,5 +138,12 @@ const createCjsStyleRequire = (tsSourceFile: ts.SourceFile, cmp: d.ComponentComp
 
 
 const getStyleImportPath = (tsSourceFile: ts.SourceFile, cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, importPath: string) => {
-  return createStencilImportPath(cmp.tagName, cmp.encapsulation, style.modeName, importPath, tsSourceFile.fileName);
+  const importData: d.SerializeImportData = {
+    importeePath: importPath,
+    importerPath: tsSourceFile.fileName,
+    tag: cmp.tagName,
+    encapsulation: cmp.encapsulation,
+    mode: style.modeName,
+  };
+  return serializeImportPath(importData);
 };
