@@ -8,12 +8,15 @@ module.exports = {
     'ts',
     'tsx',
     'js',
+    'mjs',
     'jsx',
-    'json'
+    'json',
+    'd.ts'
   ],
   moduleNameMapper: {
     "^@stencil/core/cli$": path.join(rootDir, 'cli', 'index_legacy.js'),
-    "^@stencil/core/compiler$": path.join(rootDir, 'compiler', 'index.js'),
+    "^@stencil/core/compiler$": path.join(rootDir, 'compiler', 'stencil.js'),
+    "^@stencil/core/internal$": path.join(internalDir, 'testing', 'index.js'),
     "^@stencil/core/internal/app-data$": path.join(internalDir, 'app-data', 'index.js'),
     "^@stencil/core/internal/app-globals$": path.join(internalDir, 'app-globals', 'index.js'),
     "^@stencil/core/internal/testing$": path.join(internalDir, 'testing', 'index.js'),
@@ -37,6 +40,6 @@ module.exports = {
   maxConcurrency: 1,
   testRegex: '(/__tests__/.*|\\.?(test|spec))\\.(tsx?|ts?|jsx?|js?)$',
   transform: {
-    '^.+\\.(ts|tsx|jsx)$': path.join(testingDir, 'jest-preprocessor.js')
+    '^.+\\.(ts|tsx|jsx|css)$': path.join(testingDir, 'jest-preprocessor.js')
   }
 };

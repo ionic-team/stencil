@@ -48,9 +48,12 @@ export const parseImportPath = (importPath: string) => {
     const pathParts = importPath.split('?');
 
     parsedPath.basename = path.basename(pathParts[0].trim());
-    const extParts = parsedPath.basename.split('.');
+    const extParts = parsedPath.basename.toLowerCase().split('.');
     if (extParts.length > 1) {
-      parsedPath.ext = extParts[extParts.length - 1].toLowerCase();
+      parsedPath.ext = extParts[extParts.length - 1];
+      if (parsedPath.ext === 'ts' && extParts[extParts.length - 2] === 'd') {
+        parsedPath.ext = 'd.ts';
+      }
     }
 
     if (pathParts.length > 1) {

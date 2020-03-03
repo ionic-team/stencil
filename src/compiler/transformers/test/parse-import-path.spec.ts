@@ -62,4 +62,16 @@ describe('stencil-import-path', () => {
     expect(p.data.mode).toBe('ios');
   });
 
+  it('serialize/parse dts ext', () => {
+    const s = serializeImportPath({
+      importeePath: './some-file.d.ts',
+    });
+    expect(s).toBe('./some-file.d.ts');
+    const p = parseImportPath(s);
+    expect(p.importPath).toBe('./some-file.d.ts');
+    expect(p.basename).toBe('some-file.d.ts');
+    expect(p.ext).toBe('d.ts');
+    expect(p.data).toBe(null);
+  });
+
 });

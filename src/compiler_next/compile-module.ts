@@ -3,6 +3,7 @@ import { catchError, isString } from '@utils';
 import { getCompileCssConfig, getCompileModuleConfig, getCompileResults } from './config/compile-module-options';
 import { getPublicCompilerMeta } from '../compiler/transformers/add-component-meta-static';
 import { patchTypescript, patchTypescriptSync } from './sys/typescript/typescript-patch';
+import { rollupPluginUtils } from '@compiler-plugins';
 import { transformCssToEsm, transformCssToEsmSync } from '../compiler/style/css-to-esm';
 import { transpileModule } from '../compiler/transpile/transpile-module';
 
@@ -16,9 +17,15 @@ export const compile = async (code: string, opts: CompileOptions = {}) => {
       await patchTypescript(config, results.diagnostics, null);
       compileModule(config, compileOpts, transformOpts, results);
 
+    } else if (results.inputFileExtension === 'd.ts') {
+      results.code = '';
+
     } else if (results.inputFileExtension === 'css') {
       const transformInput = getCompileCssConfig(opts, importData, results);
       await compileCss(transformInput, results);
+
+    } else if (results.inputFileExtension === 'json') {
+      compileJson(results);
     }
 
   } catch (e) {
@@ -37,9 +44,15 @@ export const compileSync = (code: string, opts: CompileOptions = {}) => {
       patchTypescriptSync(config, results.diagnostics, null);
       compileModule(config, compileOpts, transformOpts, results);
 
+    } else if (results.inputFileExtension === 'd.ts') {
+      results.code = '';
+
     } else if (results.inputFileExtension === 'css') {
       const transformInput = getCompileCssConfig(opts, importData, results);
       compileCssSync(transformInput, results);
+
+    } else if (results.inputFileExtension === 'json') {
+      compileJson(results);
     }
 
   } catch (e) {
@@ -111,9 +124,18 @@ const compileCssSync = (transformInput: TransformCssToEsmInput, results: Compile
   results.diagnostics.push(...cssResults.diagnostics);
 };
 
+const compileJson = (results: CompileResults) => {
+  results.code = rollupPluginUtils.dataToEsm(JSON.parse(results.code), {
+    preferConst: true,
+    compact: false,
+    indent: '  ',
+  });
+  results.map = { mappings: '' };
+}
+
 const shouldTranspileCode = (ext: string) => (
   ext === 'tsx' ||
   ext === 'ts' ||
-  ext === 'js' ||
-  ext === 'jsx'
+  ext === 'jsx' ||
+  ext === 'mjs'
 );

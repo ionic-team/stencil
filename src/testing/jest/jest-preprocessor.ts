@@ -7,12 +7,7 @@ import ts from 'typescript';
 export const jestPreprocessor = {
 
   process(sourceText: string, filePath: string, jestConfig: { rootDir: string }) {
-    if (shouldTransformDts(filePath)) {
-      // .d.ts file doesn't need to be transpiled for testing
-      return '';
-    }
-
-    if (shouldTransformTs(filePath) || shouldTransformEsm(filePath, sourceText)) {
+    if (shouldTransform(filePath, sourceText)) {
       const opts: CompileOptions = {
         file: filePath,
         currentDirectory: jestConfig.rootDir,
@@ -40,11 +35,6 @@ export const jestPreprocessor = {
       return results.code;
     }
 
-    if (shouldTransformCss(filePath)) {
-      const safeContent = JSON.stringify(sourceText);
-      return `module.exports = ${safeContent};`;
-    }
-
     return sourceText;
   },
 
@@ -70,7 +60,7 @@ export const jestPreprocessor = {
       filePath,
       jestConfigStr,
       !!transformOptions.instrument,
-      2 // cache buster
+      3 // cache buster
     ];
 
     return key.join(':');
@@ -119,17 +109,20 @@ function getCompilerOptions(rootDir: string) {
   return parseResult.options;
 }
 
-function shouldTransformTs(filePath: string) {
-  return (filePath.endsWith('.ts') || filePath.endsWith('.tsx') || filePath.endsWith('.jsx'));
-}
+export function shouldTransform(filePath: string, sourceText: string) {
+  const ext = filePath.split('.').pop().toLowerCase().split('?')[0];
 
-function shouldTransformEsm(filePath: string, sourceText: string) {
-  // there may be false positives here
-  // but worst case scenario a commonjs file is transpiled to commonjs
-  if (filePath.endsWith('.esm.js') || filePath.endsWith('.mjs')) {
+  if (ext === 'ts' || ext === 'tsx' || ext === 'jsx') {
+    // typescript extensions (to include .d.ts)
     return true;
   }
-  if (filePath.endsWith('.js')) {
+  if (ext === 'mjs') {
+    // es module extensions
+    return true;
+  }
+  if (ext === 'js') {
+    // there may be false positives here
+    // but worst case scenario a commonjs file is transpiled to commonjs
     if (sourceText.includes('import ') || sourceText.includes('import.') || sourceText.includes('import(')) {
       return true;
     }
@@ -137,13 +130,9 @@ function shouldTransformEsm(filePath: string, sourceText: string) {
       return true;
     }
   }
+  if (ext === 'css') {
+    // convert a standard css file into an nodejs ready file
+    return true;
+  }
   return false;
-}
-
-function shouldTransformCss(filePath: string) {
-  return filePath.endsWith('.css');
-}
-
-function shouldTransformDts(filePath: string) {
-  return filePath.endsWith('.d.ts');
 }
