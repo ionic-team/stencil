@@ -12,7 +12,7 @@ export async function generateEsmBrowser(config: d.Config, compilerCtx: d.Compil
       format: 'es',
       entryFileNames: '[name].esm.js',
       chunkFileNames: config.hashFileNames ? 'p-[hash].js' : '[name]-[hash].js',
-      assetFileNames: '[name]-[hash][extname]',
+      assetFileNames: config.hashFileNames ? 'p-[hash][extname]' : '[name]-[hash][extname]',
       preferConst: true,
     };
     if (config.extras.dynamicImportShim) {
