@@ -285,6 +285,8 @@ export namespace Components {
     }
     interface SlottedCss {
     }
+    interface StaticStyles {
+    }
     interface StencilSibling {
     }
     interface StylusCmp {
@@ -935,6 +937,12 @@ declare global {
         prototype: HTMLSlottedCssElement;
         new (): HTMLSlottedCssElement;
     };
+    interface HTMLStaticStylesElement extends Components.StaticStyles, HTMLStencilElement {
+    }
+    var HTMLStaticStylesElement: {
+        prototype: HTMLStaticStylesElement;
+        new (): HTMLStaticStylesElement;
+    };
     interface HTMLStencilSiblingElement extends Components.StencilSibling, HTMLStencilElement {
     }
     var HTMLStencilSiblingElement: {
@@ -1078,6 +1086,7 @@ declare global {
         "slot-replace-wrapper": HTMLSlotReplaceWrapperElement;
         "slot-replace-wrapper-root": HTMLSlotReplaceWrapperRootElement;
         "slotted-css": HTMLSlottedCssElement;
+        "static-styles": HTMLStaticStylesElement;
         "stencil-sibling": HTMLStencilSiblingElement;
         "stylus-cmp": HTMLStylusCmpElement;
         "svg-attr": HTMLSvgAttrElement;
@@ -1362,6 +1371,8 @@ declare namespace LocalJSX {
     }
     interface SlottedCss {
     }
+    interface StaticStyles {
+    }
     interface StencilSibling {
     }
     interface StylusCmp {
@@ -1481,6 +1492,7 @@ declare namespace LocalJSX {
         "slot-replace-wrapper": SlotReplaceWrapper;
         "slot-replace-wrapper-root": SlotReplaceWrapperRoot;
         "slotted-css": SlottedCss;
+        "static-styles": StaticStyles;
         "stencil-sibling": StencilSibling;
         "stylus-cmp": StylusCmp;
         "svg-attr": SvgAttr;
@@ -1599,6 +1611,7 @@ declare module "@stencil/core" {
             "slot-replace-wrapper": LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
             "slot-replace-wrapper-root": LocalJSX.SlotReplaceWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement>;
             "slotted-css": LocalJSX.SlottedCss & JSXBase.HTMLAttributes<HTMLSlottedCssElement>;
+            "static-styles": LocalJSX.StaticStyles & JSXBase.HTMLAttributes<HTMLStaticStylesElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
             "stylus-cmp": LocalJSX.StylusCmp & JSXBase.HTMLAttributes<HTMLStylusCmpElement>;
             "svg-attr": LocalJSX.SvgAttr & JSXBase.HTMLAttributes<HTMLSvgAttrElement>;

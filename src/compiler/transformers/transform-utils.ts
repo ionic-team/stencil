@@ -124,6 +124,10 @@ export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: str
     return (rtnStatement.expression as ts.StringLiteral).text;
   }
 
+  if (expKind === ts.SyntaxKind.NoSubstitutionTemplateLiteral) {
+    return (rtnStatement.expression as ts.NoSubstitutionTemplateLiteral).text;
+  }
+
   if (expKind === ts.SyntaxKind.TrueKeyword) {
     return true;
   }
