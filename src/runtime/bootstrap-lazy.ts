@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import { appDidLoad, forceUpdate } from './update-component';
-import { appendChildSlotFix, cloneNodeFix } from './dom-extras';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS } from '@utils';
 import { connectedCallback } from './connected-callback';
@@ -10,6 +9,7 @@ import { disconnectedCallback } from './disconnected-callback';
 import { doc, getHostRef, plt, registerHost, win } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
+import { patchCloneNode, patchSlotAppendChild, patchChildSlotNodes } from './dom-extras';
 import { proxyComponent } from './proxy-component';
 
 
@@ -109,6 +109,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
               (self as any).shadowRoot = self;
             }
           }
+          if (BUILD.slotChildNodesFix) {
+            patchChildSlotNodes(self, cmpMeta);
+          }
         }
 
         connectedCallback() {
@@ -138,11 +141,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       };
 
       if (BUILD.cloneNodeFix) {
-        cloneNodeFix(HostElement.prototype);
+        patchCloneNode(HostElement.prototype);
       }
 
       if (BUILD.appendChildSlotFix) {
-        appendChildSlotFix(HostElement.prototype);
+        patchSlotAppendChild(HostElement.prototype);
       }
 
       if (BUILD.hotModuleReplacement) {

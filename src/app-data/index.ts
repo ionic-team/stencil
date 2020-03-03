@@ -67,6 +67,7 @@ export const BUILD: BuildConditionals = /* default */ {
   safari10: true,
   scriptDataOpts: true,
   shadowDomShim: true,
+  slotChildNodesFix: false,
 };
 
 export const NAMESPACE = /* default */ 'app' as string;

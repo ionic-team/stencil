@@ -37,6 +37,7 @@ export const config: Config = {
     appendChildSlotFix: true,
     cloneNodeFix: true,
     lifecycleDOMEvents: true,
+    slotChildNodesFix: true,
   },
   devServer: {
     historyApiFallback: {

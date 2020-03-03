@@ -648,6 +648,10 @@ render() {
 
   if (BUILD.slotRelocation) {
     if (checkSlotRelocate) {
+      // while we're moving nodes around existing nodes, temporarily disable
+      // the disconnectCallback from working
+      plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
+
       relocateSlotContent(rootVnode.$elm$);
 
       let relocateData: RelocateNodeData;
@@ -676,10 +680,6 @@ render() {
           );
         }
       }
-
-      // while we're moving nodes around existing nodes, temporarily disable
-      // the disconnectCallback from working
-      plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
 
       for (i = 0; i < relocateNodes.length; i++) {
         relocateData = relocateNodes[i];

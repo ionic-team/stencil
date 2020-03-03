@@ -1,9 +1,11 @@
 import * as d from '../declarations';
 import { BUILD } from '@app-data';
+import { CMP_FLAGS } from '@utils';
+import { PLATFORM_FLAGS } from './runtime-constants';
 import { plt } from '@platform';
 
 
-export const cloneNodeFix = (HostElementPrototype: any) => {
+export const patchCloneNode = (HostElementPrototype: any) => {
   const orgCloneNode = HostElementPrototype.cloneNode;
 
   HostElementPrototype.cloneNode = function(deep?: boolean) {
@@ -28,12 +30,12 @@ export const cloneNodeFix = (HostElementPrototype: any) => {
   };
 };
 
-export const appendChildSlotFix = (HostElementPrototype: any) => {
+export const patchSlotAppendChild = (HostElementPrototype: any) => {
 
   HostElementPrototype.__appendChild = HostElementPrototype.appendChild;
   HostElementPrototype.appendChild = function(this: d.RenderNode, newChild: d.RenderNode) {
     const slotName = newChild['s-sn'] = getSlotName(newChild);
-    const slotNode = getHostSlotNode(this, slotName);
+    const slotNode = getHostSlotNode(this.childNodes, slotName);
     if (slotNode) {
       const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
       const appendAfter = slotChildNodes[slotChildNodes.length - 1];
@@ -44,21 +46,59 @@ export const appendChildSlotFix = (HostElementPrototype: any) => {
 
 };
 
+export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) => {
+  if (cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
+    const childrenFn = elm.__lookupGetter__('children');
+    const childNodesFn = elm.__lookupGetter__('childNodes');
+
+    Object.defineProperty(elm, 'children', {
+      get() {
+        const children = childrenFn.call(this);
+        if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {
+          const slotNode = getHostSlotNode(children, '');
+          if (slotNode && slotNode.parentNode) {
+            return slotNode.parentNode.children;
+          }
+        }
+        return children;
+      }
+    });
+
+    Object.defineProperty(elm, 'childElementCount', {
+      get() {
+        return elm.children.length;
+      }
+    });
+
+    Object.defineProperty(elm, 'childNodes', {
+      get() {
+        const childNodes = childNodesFn.call(this);
+        if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {
+          const slotNode = getHostSlotNode(childNodes, '');
+          if (slotNode && slotNode.parentNode) {
+            return slotNode.parentNode.childNodes;
+          }
+        }
+        return childNodes;
+      }
+    });
+  }
+};
+
 const getSlotName = (node: d.RenderNode) =>
   (node['s-sn']) ||
   (node.nodeType === 1 && (node as Element).getAttribute('slot')) || '';
 
-const getHostSlotNode = (elm: d.RenderNode, slotName: string) => {
-  let childNodes = elm.childNodes as any as d.RenderNode[];
+const getHostSlotNode = (childNodes: NodeListOf<ChildNode>, slotName: string) => {
   let i = 0;
   let childNode: d.RenderNode;
 
   for (; i < childNodes.length; i++) {
-    childNode = childNodes[i];
+    childNode = childNodes[i] as any;
     if (childNode['s-sr'] && childNode['s-sn'] === slotName) {
       return childNode;
     }
-    childNode = getHostSlotNode(childNode, slotName);
+    childNode = getHostSlotNode(childNode.childNodes, slotName);
     if (childNode) {
       return childNode;
     }

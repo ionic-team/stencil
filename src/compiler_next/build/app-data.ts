@@ -138,6 +138,7 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;
   b.appendChildSlotFix = config.extras.appendChildSlotFix;
+  b.slotChildNodesFix = config.extras.slotChildNodesFix;
   b.cloneNodeFix = config.extras.cloneNodeFix;
   b.dynamicImportShim = config.extras.dynamicImportShim;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);

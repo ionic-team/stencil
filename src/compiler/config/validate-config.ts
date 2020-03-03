@@ -45,6 +45,7 @@ export function validateConfig(config: d.Config): { config: d.Config, diagnostic
   config.extras.lifecycleDOMEvents = !!config.extras.lifecycleDOMEvents;
   config.extras.safari10 = config.extras.safari10 !== false;
   config.extras.shadowDomShim = config.extras.shadowDomShim !== false;
+  config.extras.slotChildNodesFix = !!config.extras.slotChildNodesFix;
 
   setBooleanConfig(config, 'writeLog', 'log', false);
   setBooleanConfig(config, 'buildAppCore', null, true);

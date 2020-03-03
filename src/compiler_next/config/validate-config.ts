@@ -46,6 +46,7 @@ export const validateConfig = (userConfig?: Config) => {
   config.extras.safari10 = config.extras.safari10 !== false;
   config.extras.scriptDataOpts = config.extras.scriptDataOpts !== false;
   config.extras.shadowDomShim = config.extras.shadowDomShim !== false;
+  config.extras.slotChildNodesFix = !!config.extras.slotChildNodesFix;
 
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
