@@ -206,6 +206,7 @@ export namespace Components {
   }
   interface SlotReplaceWrapperRoot {}
   interface SlottedCss {}
+  interface StaticStyles {}
   interface StylusCmp {}
   interface SvgAttr {}
   interface SvgClass {}
@@ -846,6 +847,12 @@ declare global {
     new (): HTMLSlottedCssElement;
   };
 
+  interface HTMLStaticStylesElement extends Components.StaticStyles, HTMLStencilElement {}
+  var HTMLStaticStylesElement: {
+    prototype: HTMLStaticStylesElement;
+    new (): HTMLStaticStylesElement;
+  };
+
   interface HTMLStylusCmpElement extends Components.StylusCmp, HTMLStencilElement {}
   var HTMLStylusCmpElement: {
     prototype: HTMLStylusCmpElement;
@@ -981,6 +988,7 @@ declare global {
     'slot-replace-wrapper': HTMLSlotReplaceWrapperElement;
     'slot-replace-wrapper-root': HTMLSlotReplaceWrapperRootElement;
     'slotted-css': HTMLSlottedCssElement;
+    'static-styles': HTMLStaticStylesElement;
     'stylus-cmp': HTMLStylusCmpElement;
     'svg-attr': HTMLSvgAttrElement;
     'svg-class': HTMLSvgClassElement;
@@ -1185,6 +1193,7 @@ declare namespace LocalJSX {
   }
   interface SlotReplaceWrapperRoot {}
   interface SlottedCss {}
+  interface StaticStyles {}
   interface StylusCmp {}
   interface SvgAttr {}
   interface SvgClass {}
@@ -1297,6 +1306,7 @@ declare namespace LocalJSX {
     'slot-replace-wrapper': SlotReplaceWrapper;
     'slot-replace-wrapper-root': SlotReplaceWrapperRoot;
     'slotted-css': SlottedCss;
+    'static-styles': StaticStyles;
     'stylus-cmp': StylusCmp;
     'svg-attr': SvgAttr;
     'svg-class': SvgClass;
@@ -1416,6 +1426,7 @@ declare module "@stencil/core" {
       'slot-replace-wrapper': LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
       'slot-replace-wrapper-root': LocalJSX.SlotReplaceWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement>;
       'slotted-css': LocalJSX.SlottedCss & JSXBase.HTMLAttributes<HTMLSlottedCssElement>;
+      'static-styles': LocalJSX.StaticStyles & JSXBase.HTMLAttributes<HTMLStaticStylesElement>;
       'stylus-cmp': LocalJSX.StylusCmp & JSXBase.HTMLAttributes<HTMLStylusCmpElement>;
       'svg-attr': LocalJSX.SvgAttr & JSXBase.HTMLAttributes<HTMLSvgAttrElement>;
       'svg-class': LocalJSX.SvgClass & JSXBase.HTMLAttributes<HTMLSvgClassElement>;
