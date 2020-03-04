@@ -1,7 +1,6 @@
 import { CompilerSystem, Logger } from '../declarations';
 import { createNodeLogger } from '../sys/node_next/node-logger';
 import { createNodeSysWithWatch } from '../sys/node_next/node-sys-watch';
-import { loadConfig } from '@stencil/core/compiler';
 import { parseFlags } from './parse-flags';
 import { runTask } from './tasks/run-task';
 import { shouldIgnoreError, hasError, isString } from '@utils';
@@ -37,6 +36,8 @@ export async function run(init: CliInitOptions) {
     }
 
     const flags = parseFlags(prcs.argv.slice(2));
+
+    const { loadConfig } = await import('@stencil/core/compiler');
 
     const validated = await loadConfig({
       config: {

@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
-import { startServer } from '@stencil/core/dev-server';
 
 
 export async function taskServe(process: NodeJS.Process, config: d.Config) {
@@ -22,6 +21,7 @@ export async function taskServe(process: NodeJS.Process, config: d.Config) {
   }
   config.devServer.root = normalizePath(config.devServer.root);
 
+  const { startServer } = await import('@stencil/core/dev-server');
   const devServer = await startServer(config.devServer, config.logger);
 
   process.once('SIGINT', () => {

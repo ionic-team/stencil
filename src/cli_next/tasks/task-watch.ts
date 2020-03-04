@@ -1,7 +1,5 @@
 import * as d from '../../declarations';
-import { createCompiler } from '@stencil/core/compiler';
 import { startupLog } from './startup-log';
-import { startServer } from '@stencil/core/dev-server';
 import exit from 'exit';
 
 
@@ -12,10 +10,12 @@ export async function taskWatch(prcs: NodeJS.Process, config: d.Config) {
   let exitCode = 0;
 
   try {
+    const { createCompiler } = await import('@stencil/core/compiler');
     const compiler = await createCompiler(config);
     const watcher = await compiler.createWatcher();
 
     if (config.flags.serve) {
+      const { startServer } = await import('@stencil/core/dev-server');
       devServer = await startServer(config.devServer, config.logger, watcher);
     }
 

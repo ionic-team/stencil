@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { createCompiler } from '@stencil/core/compiler';
 import { isOutputTargetDocs } from '../../compiler/output-targets/output-utils';
 import { startupLog } from './startup-log';
 
@@ -10,6 +9,7 @@ export async function taskDocs(prcs: NodeJS.Process, config: d.Config) {  config
 
   startupLog(prcs, config);
 
+  const { createCompiler } = await import('@stencil/core/compiler');
   const compiler = await createCompiler(config);
   await compiler.build();
 

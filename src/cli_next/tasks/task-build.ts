@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { createCompiler } from '@stencil/core/compiler';
 import { runPrerenderTask } from './task-prerender';
 import { startupLog } from './startup-log';
 import { taskWatch } from './task-watch';
@@ -18,6 +17,7 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config) {
   let exitCode = 0;
 
   try {
+    const { createCompiler } = await import('@stencil/core/compiler');
     const compiler = await createCompiler(config);
     const results = await compiler.build();
 

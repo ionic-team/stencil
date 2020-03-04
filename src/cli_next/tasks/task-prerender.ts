@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { runPrerender } from '../../prerender/prerender-main';
 import { startupLog } from './startup-log';
-import { startServer } from '@stencil/core/dev-server';
 import exit from 'exit';
 
 
@@ -32,6 +31,8 @@ export async function runPrerenderTask(prcs: NodeJS.Process, config: d.Config, h
   devServerConfig.gzip = false;
   devServerConfig.logRequests = false;
   devServerConfig.reloadStrategy = null;
+
+  const { startServer } = await import('@stencil/core/dev-server');
 
   const devServer = await startServer(devServerConfig, config.logger);
   const diagnostics: d.Diagnostic[] = [];

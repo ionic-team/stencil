@@ -1,11 +1,12 @@
 import { CompilerSystem } from '../../declarations';
+import { buildEvents } from '../../compiler/events';
 import { createNodeSys } from './node-sys';
 import { normalizePath } from '@utils';
-import ts from 'typescript';
-import { buildEvents } from '../../compiler/events';
+import tsTypes from 'typescript';
 
 
 export function createNodeSysWithWatch(prcs: NodeJS.Process): CompilerSystem {
+  const ts = require('typescript') as typeof tsTypes;
   const sys = createNodeSys(prcs);
   const tsWatchFile = ts.sys.watchFile;
   const tsWatchDirectory = ts.sys.watchDirectory;

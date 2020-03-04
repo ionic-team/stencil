@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import { catchError } from '@utils';
-import { createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import { inlineExternalStyleSheets, minifyScriptElements, minifyStyleElements } from './prerender-optimize';
 import fs from 'fs';
 import { promisify } from 'util';
@@ -10,6 +9,8 @@ const readFile = promisify(fs.readFile);
 
 export async function generateTemplateHtml(diagnostics: d.Diagnostic[], isDebug: boolean, srcIndexHtmlPath: string, outputTarget: d.OutputTargetWww, hydrateOpts: d.PrerenderHydrateOptions) {
   try {
+    const { createDocument, serializeNodeToHtml } = await import('@stencil/core/mock-doc');
+
     if (typeof srcIndexHtmlPath !== 'string') {
       srcIndexHtmlPath = outputTarget.indexHtml;
     }

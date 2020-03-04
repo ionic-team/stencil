@@ -2,7 +2,6 @@ import * as d from '../declarations';
 import { flatOne, unique } from '@utils';
 import { getScopeId } from '../compiler/style/scope-css';
 import { injectModulePreloads } from '../compiler/html/inject-module-preloads';
-import { optimizeCss, optimizeJs } from '@stencil/core/compiler';
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
@@ -10,8 +9,11 @@ import { promisify } from 'util';
 const readFile = promisify(fs.readFile);
 
 
-export function inlineExternalStyleSheets(appDir: string, doc: Document) {
+export async function inlineExternalStyleSheets(appDir: string, doc: Document) {
+  const { optimizeCss } = await import('@stencil/core/compiler');
+
   const globalLinks = Array.from(doc.querySelectorAll('link[rel=stylesheet]')) as HTMLLinkElement[];
+
   return Promise.all(
     globalLinks.map(async link => {
       const href = link.getAttribute('href');
@@ -53,7 +55,9 @@ export function inlineExternalStyleSheets(appDir: string, doc: Document) {
   );
 }
 
-export function minifyScriptElements(doc: Document) {
+export async function minifyScriptElements(doc: Document) {
+  const { optimizeJs } = await import('@stencil/core/compiler');
+
   const scriptElms = (Array.from(doc.querySelectorAll('script')))
     .filter(scriptElm => {
       if (scriptElm.hasAttribute('src')) {
@@ -86,6 +90,8 @@ export function minifyScriptElements(doc: Document) {
 }
 
 export async function minifyStyleElements(doc: Document) {
+  const { optimizeCss } = await import('@stencil/core/compiler');
+
   const styleElms = Array.from(doc.querySelectorAll('style'));
 
   await Promise.all(styleElms.map(async styleElm => {
@@ -103,10 +109,7 @@ export function addModulePreloads(doc: Document, hydrateResults: d.HydrateResult
   if (!componentGraph) {
     return false;
   }
-  // const hasImportScript = !!doc.querySelector('script[type=module][data-resources-url]');
-  // if (!hasImportScript) {
-  //   return false;
-  // }
+
   const modulePreloads = unique(
     flatOne(
       hydrateResults.components
