@@ -23,7 +23,7 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
 
         const modules = Array.from(compilerCtx.moduleMap.values());
         const moduleFile = modules.find(m => m.cmps.some(c => c.tagName === data.tag));
-        const commentOriginalSelector = (bundleOpts.platform === 'hydrate');
+        const commentOriginalSelector = (bundleOpts.platform === 'hydrate') && (data.encapsulation === 'shadow');
 
         if (moduleFile) {
           const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
