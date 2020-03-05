@@ -8,6 +8,12 @@ export interface FsObj {
   [key: string]: any;
 }
 
+class FsError extends Error {
+  constructor(public syscall: string, public path: string, public code: string = 'ENOENT', public errno: number = -2) {
+    super(`ENOENT: no such file or directory, ${syscall} '${path}'`);
+  }
+}
+
 const fs: FsObj = {
   __sys: {} as any
 };
@@ -22,14 +28,16 @@ export const exists = fs.exists = (p: string, cb: any) => {
 (exists as any)[promisify.custom] = (p: string) => fs.__sys.access(p);
 
 export const existsSync = fs.existsSync = (p: string) => {
-  const exists = fs.__sys.accessSync(p);
-  if (!exists) {
-    throw new Error(`fs.existsSync not found: ${p}`);
-  }
-  return exists;
+  // https://nodejs.org/api/fs.html#fs_fs_existssync_path
+  return fs.__sys.accessSync(p);
 };
 
-export const mkdirSync = fs.mkdirSync = (p: string) => fs.__sys.mkdirSync(p);
+export const mkdirSync = fs.mkdirSync = (p: string) => {
+  const success = fs.__sys.mkdirSync(p);
+  if (!success) {
+    throw new FsError('mkdir', p);
+  }
+}
 
 export const readdirSync = fs.readdirSync = (p: string) => {
   // sys.readdirSync includes full paths
@@ -47,10 +55,19 @@ export const readFile = fs.readFile = async (p: string, opts: any, cb: (err: any
       if (typeof data === 'string') {
         cb(null, data);
       } else {
-        cb(`fs.readFile error: ${p}`, data);
+        cb(new FsError('open', p), data);
       }
     }
   });
+};
+
+export const readFileSync = fs.readFileSync = (p: string, opts: any) => {
+  const encoding = typeof opts === 'object' ? opts.encoding : typeof opts === 'string' ? opts : 'utf-8';
+  const data = fs.__sys.readFileSync(p, encoding)
+  if (typeof data !== 'string') {
+    throw new FsError('open', p);
+  }
+  return data;
 };
 
 export const realpath = fs.realpath = (p: string, opts: any, cb: (err: any, data: string) => void) => {
@@ -60,7 +77,7 @@ export const realpath = fs.realpath = (p: string, opts: any, cb: (err: any, data
       if (typeof data === 'string') {
         cb(null, data);
       } else {
-        cb(`fs.realpath error: ${p}`, data);
+        cb(new FsError('realpath', p), data);
       }
     }
   });
@@ -69,7 +86,7 @@ export const realpath = fs.realpath = (p: string, opts: any, cb: (err: any, data
 export const realpathSync = fs.realpathSync = (p: string) => {
   const data = fs.__sys.realpathSync(p);
   if (!data) {
-    throw new Error(`fs.realpathSync not found: ${p}`);
+    throw new FsError('realpathSync', p);
   }
   return data;
 };
@@ -77,7 +94,7 @@ export const realpathSync = fs.realpathSync = (p: string) => {
 export const statSync = fs.statSync = (p: string) => {
   const s = fs.__sys.statSync(p);
   if (!s) {
-    throw new Error(`fs.statSync not found: ${p}`);
+    throw new FsError('statSync', p);
   }
   return s;
 };
@@ -91,7 +108,7 @@ export const stat = fs.stat = (p: string, opts: any, cb: any) => {
       if (success) {
         cb(null);
       } else {
-        cb(`fs.stat error: ${p}`);
+        cb(new FsError('stat', p));
       }
     }
   });
@@ -108,11 +125,10 @@ export const writeFile = fs.writeFile = (p: string, data: string, opts: any, cb:
       if (success) {
         cb(null);
       } else {
-        cb(`fs.writeFile error: ${p}`);
+        cb(new FsError('writeFile', p));
       }
     }
   });
 };
-
 
 export default fs;
