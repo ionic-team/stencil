@@ -36,7 +36,6 @@ export function getBuildFeatures(cmps: ComponentCompilerMeta[]) {
     member: cmps.some(c => c.hasMember),
     method: cmps.some(c => c.hasMethod),
     mode: cmps.some(c => c.hasMode),
-    noVdomRender: cmps.every(c => !c.hasVdomRender),
     observeAttribute: cmps.some(c => c.hasAttribute),
     prop: cmps.some(c => c.hasProp),
     propBoolean: cmps.some(c => c.hasPropBoolean),

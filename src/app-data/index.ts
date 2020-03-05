@@ -25,7 +25,6 @@ export const BUILD: BuildConditionals = /* default */ {
   member: true,
   method: true,
   mode: true,
-  noVdomRender: true,
   observeAttribute: true,
   prop: true,
   propMutable: true,
@@ -45,6 +44,7 @@ export const BUILD: BuildConditionals = /* default */ {
   vdomKey: true,
   vdomListener: true,
   vdomRef: true,
+  vdomPropOrAttr: true,
   vdomRender: true,
   vdomStyle: true,
   vdomText: true,
@@ -68,6 +68,17 @@ export const BUILD: BuildConditionals = /* default */ {
   scriptDataOpts: true,
   shadowDomShim: true,
   slotChildNodesFix: false,
+  propBoolean: true,
+  propNumber: true,
+  propString: true,
+  cssVarShim: false,
+  constructableCSS: true,
+  cmpShouldUpdate: true,
+  devTools: false,
+  dynamicImportShim: false,
+  shadowDelegatesFocus: true,
+  initializeNextTick: false,
+  asyncLoading: false,
 };
 
 export const NAMESPACE = /* default */ 'app' as string;

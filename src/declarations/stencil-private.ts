@@ -183,7 +183,6 @@ export interface BuildFeatures {
 
   // vdom
   vdomRender: boolean;
-  noVdomRender: boolean;
   vdomAttribute: boolean;
   vdomClass: boolean;
   vdomFunctional: boolean;
