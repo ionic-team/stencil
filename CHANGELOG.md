@@ -1,4 +1,4 @@
-# 🍞 [1.9.0-21](https://github.com/ionic-team/stencil/compare/v1.9.0-20...v1.9.0-21) (2020-03-03)
+# 🐺 [1.9.0-22](https://github.com/ionic-team/stencil/compare/v1.9.0-21...v1.9.0-22) (2020-03-05)
 
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
@@ -52,6 +52,7 @@ Some of main features with the `--next` compiler include:
 * **compiler:** export optimizeCss and optimizeJs ([d80a111](https://github.com/ionic-team/stencil/commit/d80a111de9a12f0a212b21bfb3a72ee65c50a7a8))
 * **next:** transform css content to esm format w/ compile() ([a72c01d](https://github.com/ionic-team/stencil/commit/a72c01dca1d50fb65ba57348156cf650d1b23b11))
 * **prerender:** optimizeCss and optimzeJs ([425ce38](https://github.com/ionic-team/stencil/commit/425ce380e4d75aeed2592565448160aec862887d))
+* **styles:** use static get styles() with template literals ([ff79406](https://github.com/ionic-team/stencil/commit/ff79406843655a4a4117a31686e4eb98cc45e535)), closes [#2234](https://github.com/ionic-team/stencil/issues/2234)
 
 
 ### Bug Fixes
@@ -183,6 +184,12 @@ Some of main features with the `--next` compiler include:
 * **ts:** all unused imports is a warning ([a515d17](https://github.com/ionic-team/stencil/commit/a515d17b24dd9fe010fdfa5881c8d9d68b9bedc5))
 * **worker:** use Blob for cross-origin web worker ([cbeec64](https://github.com/ionic-team/stencil/commit/cbeec6486b015ea7e9ef57c7892db12a3cb9eb07))
 * **next:** update jest presets ([7c83111](https://github.com/ionic-team/stencil/commit/7c831118b65ff6f13511796d1d1b75701b4d1c40))
+* **compile:** check for global ts before nodejs/webworker ts ([59cc59e](https://github.com/ionic-team/stencil/commit/59cc59eb98845914923e40fb6de414895d188ad9)), closes [#2239](https://github.com/ionic-team/stencil/issues/2239)
+* **compile:** enable vdomPropOrAttr by default ([9881011](https://github.com/ionic-team/stencil/commit/9881011d13ea3c90e178b17aa0ade4762b210a05)), closes [#2238](https://github.com/ionic-team/stencil/issues/2238)
+* **compiler:** prefix assets in prod mode ([#2236](https://github.com/ionic-team/stencil/issues/2236)) ([2c1a906](https://github.com/ionic-team/stencil/commit/2c1a9069f88c1f85f0ecaeecddc1d9fa1a478abe))
+* **next:** run custom output targets ([a9c0715](https://github.com/ionic-team/stencil/commit/a9c0715e6a05592515190b428478a3f7ff103048))
+* **prerender:** only comment original selectors for shadow css ([b5757df](https://github.com/ionic-team/stencil/commit/b5757df7c0737a3006668160da4d346047defd06))
+* **slot:** patch childNodes/children getters for browsers w/out shadow support ([efca632](https://github.com/ionic-team/stencil/commit/efca6326333d4e7da0faf19c4e37aeeec984e805)), closes [#1280](https://github.com/ionic-team/stencil/issues/1280)
 
 
 
