@@ -14,13 +14,14 @@ export const loadTypescript = async (diagnostics: d.Diagnostic[], typescriptPath
 
   if (IS_FETCH_ENV) {
     try {
+      // browser main thread
       const tsUrl = typescriptPath || getRemoteTypeScriptUrl();
       const rsp = await cachedFetch(tsUrl);
       const content = await rsp.text();
       const getTsFunction = new Function(content + ';return ts;');
       const fetchTs = getLoadedTs(getTsFunction(), 'fetch', tsUrl);
       if (fetchTs) {
-        patchImportedTs(fetchTs, tsUrl);
+        patchImportedTsSys(fetchTs, tsUrl);
         return fetchTs;
       }
 
@@ -39,6 +40,15 @@ export const loadTypescriptSync = (diagnostics: d.Diagnostic[], typescriptPath: 
       return ts as TypeScriptModule;
     }
 
+    if (IS_GLOBAL_THIS_ENV) {
+      // check if the global object has "ts" on it
+      // could be browser main thread, browser web worker, or nodejs global
+      const globalThisTs = getLoadedTs((globalThis as any).ts, 'globalThis', typescriptPath);
+      if (globalThisTs) {
+        return globalThisTs
+      }
+    }
+
     if (IS_NODE_ENV) {
       // NodeJS
       const nodeModuleId = typescriptPath || 'typescript';
@@ -49,7 +59,7 @@ export const loadTypescriptSync = (diagnostics: d.Diagnostic[], typescriptPath: 
     }
 
     if (IS_WEB_WORKER_ENV) {
-      // web worker
+      // browser web worker
       // doing this before the globalThis check cuz we'd
       // rather ensure we're using a valid typescript version
       const tsUrl = typescriptPath || getRemoteTypeScriptUrl();
@@ -57,17 +67,8 @@ export const loadTypescriptSync = (diagnostics: d.Diagnostic[], typescriptPath: 
       (self as any).importScripts(tsUrl);
       const webWorkerTs = getLoadedTs((self as any).ts, 'importScripts', tsUrl);
       if (webWorkerTs) {
-        patchImportedTs(webWorkerTs, tsUrl);
+        patchImportedTsSys(webWorkerTs, tsUrl);
         return webWorkerTs;
-      }
-    }
-
-    if (IS_GLOBAL_THIS_ENV) {
-      // check if the global object has "ts" on it
-      // could be main browser thread, browser web worker, or nodejs global
-      const globalThisTs = getLoadedTs((globalThis as any).ts, 'globalThis', typescriptPath);
-      if (globalThisTs) {
-        return globalThisTs
       }
     }
 
@@ -77,7 +78,7 @@ export const loadTypescriptSync = (diagnostics: d.Diagnostic[], typescriptPath: 
   return null;
 };
 
-const patchImportedTs = (importedTs: TypeScriptModule, tsUrl: string) => {
+const patchImportedTsSys = (importedTs: TypeScriptModule, tsUrl: string) => {
   importedTs.sys = importedTs.sys || ({} as any);
   importedTs.sys.getExecutingFilePath = () => tsUrl;
   patchTsSystemUtils(importedTs.sys);
