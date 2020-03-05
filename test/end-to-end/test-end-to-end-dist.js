@@ -34,4 +34,6 @@ fs.accessSync(path.join(wwwDir, 'build', 'endtoend.js'));
 fs.accessSync(path.join(wwwDir, 'build', 'endtoend.esm.js'));
 fs.accessSync(path.join(wwwDir, 'index.html'));
 
+fs.accessSync(path.join(__dirname, 'dist-react', 'components.ts'));
+
 console.log('🍄  validated test/end-to-end/dist files\n');

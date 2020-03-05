@@ -183,6 +183,8 @@
         "${workspaceFolder}/bin/stencil",
         "build",
         "--dev",
+        "--next",
+        "--max-workers=0",
         "--config",
         "${workspaceFolder}/test/end-to-end/stencil.config.ts"
       ],

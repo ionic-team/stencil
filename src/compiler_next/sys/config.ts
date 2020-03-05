@@ -32,6 +32,8 @@ export const getConfig = (userConfig: d.Config) => {
   // old sys
   config.sys = config.sys || {};
   config.sys.path = path;
+  config.sys.copy = config.sys_next.copy;
+  config.sys.glob = config.sys_next.glob;
 
   return config;
 };

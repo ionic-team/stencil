@@ -19,6 +19,7 @@
     "preset": "../../testing/jest-preset.js"
   },
   "devDependencies": {
+    "@stencil/react-output-target": "^0.0.4",
     "rollup-plugin-node-builtins": "^2.1.2"
   }
 }

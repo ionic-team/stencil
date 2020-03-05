@@ -1,5 +1,5 @@
 import { CompilerSystem, SystemDetails } from '../../declarations';
-import { nodeCopyTasks } from './node-copy-tasks';
+import { nodeCopyTasks, asyncGlob } from './node-copy-tasks';
 import { createHash } from 'crypto';
 import { normalizePath } from '@utils';
 import fs from 'graceful-fs';
@@ -61,6 +61,7 @@ export function createNodeSys(prcs: NodeJS.Process) {
     getCurrentDirectory() {
       return normalizePath(prcs.cwd());
     },
+    glob: asyncGlob,
     isSymbolicLink: (p: string) => new Promise<boolean>(resolve => {
       try {
         fs.lstat(p, (err, stats) => {

@@ -203,7 +203,7 @@ const IGNORE = [
 ];
 
 
-function asyncGlob(pattern: string, opts: any) {
+export function asyncGlob(pattern: string, opts: any) {
   return new Promise<string[]>((resolve, reject) => {
     glob(pattern, opts, (err: any, files: string[]) => {
       if (err) {

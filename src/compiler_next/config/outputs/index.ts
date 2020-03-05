@@ -3,6 +3,7 @@ import { buildError } from '@utils';
 import { VALID_TYPES_NEXT } from '../../../compiler/output-targets/output-utils';
 import { validateCollection } from './validate-collection';
 import { validateCustomElement } from './validate-custom-element';
+import { validateCustomOutput } from './validate-custom-output';
 import { validateDist } from './validate-dist';
 import { validateDocs } from './validate-docs';
 import { validateHydrateScript } from './validate-hydrate-script';
@@ -24,6 +25,7 @@ export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnosti
     ...validateCollection(config, userOutputs),
     ...validateCustomElement(config, userOutputs),
     ...validateCustomElementBundle(config, userOutputs),
+    ...validateCustomOutput(config, diagnostics, userOutputs),
     ...validateLazy(config, userOutputs),
     ...validateWww(config, diagnostics, userOutputs),
     ...validateDist(config, userOutputs),
