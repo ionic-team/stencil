@@ -20,6 +20,8 @@
   },
   "devDependencies": {
     "@stencil/react-output-target": "^0.0.4",
+    "@types/file-saver": "^2.0.1",
+    "file-saver": "^2.0.2",
     "rollup-plugin-node-builtins": "^2.1.2"
   }
 }

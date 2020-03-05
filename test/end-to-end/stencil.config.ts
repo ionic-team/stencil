@@ -28,6 +28,11 @@ export const config: Config = {
       proxiesFile: './dist-react/components.ts',
     })
   ],
+  commonjs: {
+    namedExports: {
+      'file-saver': ['saveAs']
+    }
+  },
   enableCache: false,
   hashFileNames: false,
 };
