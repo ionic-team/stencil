@@ -14,7 +14,7 @@ export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
   $supportsShadow$: (BUILD.shadowDomShim && BUILD.shadowDom) ?
-    /*@__PURE__*/(() => (doc.head.attachShadow + '').indexOf('[native') > -1)() : false,
+    /*@__PURE__*/(() => (doc.head.attachShadow + '').indexOf('[native') > -1)() : true,
   jmp: (h) => h(),
   raf: (h) => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
