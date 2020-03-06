@@ -6,6 +6,7 @@ import { createTsWatchProgram } from '../transpile/create-watch-program';
 import { filesChanged, hasHtmlChanges, hasScriptChanges, hasStyleChanges, scriptsAdded, scriptsDeleted } from '../../compiler/fs-watch/fs-watch-rebuild';
 import { hasServiceWorkerChanges } from '../../compiler/service-worker/generate-sw';
 import ts from 'typescript';
+import { dirname, resolve } from 'path';
 
 
 export const createWatchBuild = async (config: d.Config, compilerCtx: d.CompilerCtx): Promise<d.CompilerWatcher> => {
@@ -23,8 +24,8 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   const filesDeleted = new Set<string>();
 
   const onFileChange: d.CompilerFileWatcherCallback = (file, kind) => {
-    compilerCtx.fs.clearFileCache(file);
-    compilerCtx.changedFiles.add(file);
+    updateCompilerCtxCache(config, compilerCtx, file, kind);
+
     switch (kind) {
       case 'dirAdd': dirsAdded.add(file); break;
       case 'dirDelete': dirsDeleted.add(file); break;
@@ -32,6 +33,7 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
       case 'fileUpdate': filesUpdated.add(file); break;
       case 'fileDelete': filesDeleted.add(file); break;
     }
+
     config.logger.debug(`${kind}: ${file}`);
     tsWatchProgram.rebuild();
   };
@@ -156,6 +158,33 @@ const emitFsChange = (compilerCtx: d.CompilerCtx, buildCtx: BuildContext) => {
       filesAdded: buildCtx.filesAdded.slice(),
       filesDeleted: buildCtx.filesDeleted.slice(),
     });
-
   }
-}
+};
+
+const updateCompilerCtxCache = (config: d.Config, compilerCtx: d.CompilerCtx, path: string, kind: d.CompilerFileWatcherEvent) => {
+  compilerCtx.fs.clearFileCache(path);
+  compilerCtx.moduleMap.delete(path);
+  compilerCtx.changedFiles.add(path);
+
+  if (kind === 'dirDelete') {
+    const fsRootDir = resolve('/');
+    compilerCtx.moduleMap.forEach((_, moduleFilePath) => {
+      let moduleAncestorDir = dirname(moduleFilePath);
+
+      for (let i = 0; i < 50; i++) {
+        if (moduleAncestorDir === config.rootDir || moduleAncestorDir === fsRootDir) {
+          break;
+        }
+
+        if (moduleAncestorDir === path) {
+          compilerCtx.fs.clearFileCache(moduleFilePath);
+          compilerCtx.moduleMap.delete(moduleFilePath);
+          compilerCtx.changedFiles.add(moduleFilePath);
+          break;
+        }
+
+        moduleAncestorDir = dirname(moduleAncestorDir);
+      }
+    });
+  }
+};
