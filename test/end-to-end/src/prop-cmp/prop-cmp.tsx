@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop, h, Host } from '@stencil/core';
 import { saveAs } from 'file-saver';
 
 @Component({
@@ -19,10 +19,12 @@ export class PropCmp {
 
   render() {
     return (
-      <div>
-        Hello, my name is {this.first} {this.lastName}
+      <Host>
+        <div>
+          Hello, my name is {this.first} {this.lastName}
+        </div>
         <button onClick={() => this.saveAs()}>File Save</button>
-      </div>
+      </Host>
     )
   }
 }
