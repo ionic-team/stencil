@@ -65,9 +65,11 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
 
     buildCtx.start();
 
-    await build(config, compilerCtx, buildCtx, tsBuilder);
+    const result = await build(config, compilerCtx, buildCtx, tsBuilder);
 
-    isRebuild = true;
+    if (result && !result.hasError) {
+      isRebuild = true;
+    }
   };
 
   const start = async () => {
