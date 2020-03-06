@@ -79,7 +79,7 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
     },
 
     resolveImportMeta(prop, { format }) {
-      if (prop === 'url' && format === 'es') {
+      if (config.extras.dynamicImportShim && prop === 'url' && format === 'es') {
         return '""';
       }
       return null;
