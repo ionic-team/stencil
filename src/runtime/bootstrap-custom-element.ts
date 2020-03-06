@@ -5,7 +5,7 @@ import { CMP_FLAGS } from '@utils';
 import { computeMode } from './mode';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
-import { forceUpdate, getHostRef, plt, registerHost, styles } from '@platform';
+import { forceUpdate, getHostRef, registerHost, styles, supportsShadow } from '@platform';
 import { proxyComponent } from './proxy-component';
 import { PROXY_FLAGS } from './runtime-constants';
 
@@ -34,7 +34,7 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
   if (BUILD.reflect) {
     cmpMeta.$attrsToReflect$ = [];
   }
-  if (BUILD.shadowDom && !plt.$supportsShadow$ && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
+  if (BUILD.shadowDom && !supportsShadow && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
     cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
   }
 
@@ -88,7 +88,7 @@ export const forceModeUpdate = (elm: d.RenderNode) => {
 };
 
 export const attachShadow = (el: HTMLElement) => {
-  if (plt.$supportsShadow$) {
+  if (supportsShadow) {
     el.attachShadow({ mode: 'open' });
   } else {
     (el as any).shadowRoot = el;

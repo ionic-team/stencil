@@ -4,10 +4,11 @@ import { flushAll, resetTaskQueue } from './testing-task-queue';
 import { win } from './testing-window';
 
 
+export let supportsShadow = true;
+
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
-  $supportsShadow$: true,
   jmp: (h) => h(),
   raf: (h) => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
@@ -18,6 +19,10 @@ export const cssVarShim: d.CssVarShim = false as any;
 export const supportsListenerOptions = true;
 export const supportsConstructibleStylesheets = false;
 export const Context: any = {};
+
+export const setSupportsShadowDom = (supports: boolean) => {
+  supportsShadow = supports;
+};
 
 export function resetPlatform() {
   if (win && typeof win.close === 'function') {

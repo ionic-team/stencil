@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS } from '@utils';
 import { PLATFORM_FLAGS } from './runtime-constants';
-import { plt } from '@platform';
+import { plt, supportsShadow } from '@platform';
 
 
 export const patchCloneNode = (HostElementPrototype: any) => {
@@ -10,7 +10,7 @@ export const patchCloneNode = (HostElementPrototype: any) => {
 
   HostElementPrototype.cloneNode = function(deep?: boolean) {
     const srcNode = this;
-    const isShadowDom = BUILD.shadowDom ? srcNode.shadowRoot && plt.$supportsShadow$ : false;
+    const isShadowDom = BUILD.shadowDom ? srcNode.shadowRoot && supportsShadow : false;
     const clonedNode = orgCloneNode.call(srcNode, isShadowDom ? deep : false) as Node;
     if (BUILD.slot && !isShadowDom && deep) {
       let i = 0;
