@@ -1,4 +1,4 @@
-# 🐺 [1.9.0-22](https://github.com/ionic-team/stencil/compare/v1.9.0-21...v1.9.0-22) (2020-03-05)
+# 💫 [1.9.0-23](https://github.com/ionic-team/stencil/compare/v1.9.0-22...v1.9.0-23) (2020-03-06)
 
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
@@ -53,6 +53,8 @@ Some of main features with the `--next` compiler include:
 * **next:** transform css content to esm format w/ compile() ([a72c01d](https://github.com/ionic-team/stencil/commit/a72c01dca1d50fb65ba57348156cf650d1b23b11))
 * **prerender:** optimizeCss and optimzeJs ([425ce38](https://github.com/ionic-team/stencil/commit/425ce380e4d75aeed2592565448160aec862887d))
 * **styles:** use static get styles() with template literals ([ff79406](https://github.com/ionic-team/stencil/commit/ff79406843655a4a4117a31686e4eb98cc45e535)), closes [#2234](https://github.com/ionic-team/stencil/issues/2234)
+* **compiler:** treeshake supportsShadow ([#2249](https://github.com/ionic-team/stencil/issues/2249)) ([da634da](https://github.com/ionic-team/stencil/commit/da634da1aa08a1afbb3dc0a25d5102079bea0eca))
+* **runtime:** remove slot polyfill more aggressively ([#2244](https://github.com/ionic-team/stencil/issues/2244)) ([56da2e7](https://github.com/ionic-team/stencil/commit/56da2e71b45e1b60bcc4637b4a9e7e84524a6ce5))
 
 
 ### Bug Fixes
@@ -190,6 +192,12 @@ Some of main features with the `--next` compiler include:
 * **next:** run custom output targets ([a9c0715](https://github.com/ionic-team/stencil/commit/a9c0715e6a05592515190b428478a3f7ff103048))
 * **prerender:** only comment original selectors for shadow css ([b5757df](https://github.com/ionic-team/stencil/commit/b5757df7c0737a3006668160da4d346047defd06))
 * **slot:** patch childNodes/children getters for browsers w/out shadow support ([efca632](https://github.com/ionic-team/stencil/commit/efca6326333d4e7da0faf19c4e37aeeec984e805)), closes [#1280](https://github.com/ionic-team/stencil/issues/1280)
+* **client:** default supportsShadow to when shadowDomShim false ([185f933](https://github.com/ionic-team/stencil/commit/185f933bab356b661d3c059b55c168439ed46842))
+* **compiler:** do not polyfill import.meta when using native import() ([#2250](https://github.com/ionic-team/stencil/issues/2250)) ([a644004](https://github.com/ionic-team/stencil/commit/a6440040edfebefd68a4189e9761039afe16b8db))
+* **compiler:** only rebuild after success ([#2248](https://github.com/ionic-team/stencil/issues/2248)) ([3a63c4f](https://github.com/ionic-team/stencil/commit/3a63c4fa038bbf593de05b9f5e851e54d1565221))
+* **next:** always reset process cwd before each build ([91617f8](https://github.com/ionic-team/stencil/commit/91617f89df6356f0bdd8a7a3c40ad182a115bebf))
+* **next:** clear module cache after updating/deleting module ([62971ea](https://github.com/ionic-team/stencil/commit/62971eab01483c38aa72a7f1b3633fa3d640406f))
+* **next:** simulate nodejs fs errors ([d735787](https://github.com/ionic-team/stencil/commit/d73578746ffa012e47b6c4492f01236f071fc6b9))
 
 
 
