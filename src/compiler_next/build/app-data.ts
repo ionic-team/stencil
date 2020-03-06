@@ -8,7 +8,7 @@ export * from '../../app-data';
 export function getBuildFeatures(cmps: ComponentCompilerMeta[]) {
   const slot = cmps.some(c => c.htmlTagNames.includes('slot'));
   const shadowDom = cmps.some(c => c.encapsulation === 'shadow');
-
+  const slotRelocation = cmps.some(c => c.encapsulation !== 'shadow' && c.htmlTagNames.includes('slot'));
   const f: BuildFeatures = {
     allRenderFn: cmps.every(c => c.hasRenderFn),
     cmpDidLoad: cmps.some(c => c.hasComponentDidLoadFn),
@@ -47,7 +47,7 @@ export function getBuildFeatures(cmps: ComponentCompilerMeta[]) {
     shadowDom,
     shadowDelegatesFocus: shadowDom && cmps.some(c => c.shadowDelegatesFocus),
     slot,
-    slotRelocation: slot, // TODO: cmps.some(c => c.htmlTagNames.includes('slot') && c.encapsulation !== 'shadow'),
+    slotRelocation,
     state: cmps.some(c => c.hasState),
     style: cmps.some(c => c.hasStyle),
     svg: cmps.some(c => c.htmlTagNames.includes('svg')),
@@ -144,7 +144,9 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.safari10 = config.extras.safari10;
   b.scriptDataOpts = config.extras.scriptDataOpts;
   b.shadowDomShim = config.extras.shadowDomShim;
-
+  if (b.shadowDomShim) {
+    b.slotRelocation = b.slot;
+  }
   if (config.hydratedFlag) {
     b.hydratedAttribute = config.hydratedFlag.selector === 'attribute';
     b.hydratedClass = config.hydratedFlag.selector === 'class';
