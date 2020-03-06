@@ -9,7 +9,7 @@
 import * as d from '../../declarations';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS, HTML_NS, SVG_NS, isDef } from '@utils';
-import { consoleError, doc, plt } from '@platform';
+import { consoleError, doc, plt, supportsShadow } from '@platform';
 import { h, isHost, newVNode } from './h';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
 import { updateElement } from './update-element';
@@ -637,7 +637,7 @@ render() {
   }
   if (BUILD.slotRelocation) {
     contentRef = hostElm['s-cr'];
-    useNativeShadowDom = plt.$supportsShadow$ && (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) !== 0;
+    useNativeShadowDom = supportsShadow && (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) !== 0;
 
     // always reset
     checkSlotFallbackVisibility = false;

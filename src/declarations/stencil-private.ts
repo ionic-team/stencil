@@ -1958,7 +1958,6 @@ export interface PlatformRuntime {
   $flags$: number;
   $orgLocNodes$?: Map<string, RenderNode>;
   $resourcesUrl$: string;
-  $supportsShadow$?: boolean;
   jmp: (c: Function) => any;
   raf: (c: FrameRequestCallback) => number;
   ael: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;

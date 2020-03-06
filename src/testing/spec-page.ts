@@ -1,4 +1,4 @@
-import { bootstrapLazy, flushAll, flushLoadModule, flushQueue, getHostRef, insertVdomAnnotations, plt, registerComponents, registerContext, registerModule, renderVdom, resetPlatform, startAutoApplyChanges, styles, win, writeTask } from '@stencil/core/internal/testing';
+import { bootstrapLazy, flushAll, flushLoadModule, flushQueue, getHostRef, insertVdomAnnotations, registerComponents, registerContext, registerModule, renderVdom, resetPlatform, startAutoApplyChanges, styles, win, writeTask, setSupportsShadowDom } from '@stencil/core/internal/testing';
 import { BUILD } from '@app-data';
 import { ComponentCompilerMeta, ComponentRuntimeMeta, ComponentTestingConstructor, HostRef, LazyBundlesRuntimeData, NewSpecPageOptions, SpecPage } from '@stencil/core/internal';
 import { formatLazyBundleRuntimeMeta, getBuildFeatures } from '../compiler';
@@ -25,13 +25,13 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   }
   if (opts.hydrateServerSide) {
     opts.includeAnnotations = true;
-    plt.$supportsShadow$ = false;
+    setSupportsShadowDom(false);
   } else {
     opts.includeAnnotations = !!opts.includeAnnotations;
     if (opts.supportsShadowDom === false) {
-      plt.$supportsShadow$ = false;
+      setSupportsShadowDom(false);
     } else {
-      plt.$supportsShadow$ = true;
+      setSupportsShadowDom(true);
     }
   }
   BUILD.cssAnnotations = opts.includeAnnotations;
