@@ -8,11 +8,15 @@ import exit from 'exit';
 export async function taskPrerender(prcs: NodeJS.Process, config: d.Config) {
   startupLog(prcs, config);
 
-  const hydrateAppFilePath = config.flags.unknownArgs[0];
+  let hydrateAppFilePath = config.flags.unknownArgs[0];
 
   if (typeof hydrateAppFilePath !== 'string') {
     config.logger.error(`Missing hydrate app script path`);
     exit(1);
+  }
+
+  if (!config.sys.path.isAbsolute(hydrateAppFilePath)) {
+    hydrateAppFilePath = config.sys.path.join(config.cwd, hydrateAppFilePath);
   }
 
   const srcIndexHtmlPath = config.srcIndexHtml;

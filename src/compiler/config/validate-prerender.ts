@@ -4,7 +4,7 @@ import { URL } from 'url';
 
 
 export function validatePrerender(config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetWww) {
-  if (!config.flags || !config.flags.prerender) {
+  if (!config.flags || (!config.flags.prerender && config.flags.task !== 'prerender')) {
     return;
   }
 
