@@ -31,6 +31,8 @@ export namespace Components {
         "methodThatFiresMyDocumentEvent": () => Promise<void>;
         "methodThatFiresMyWindowEvent": (value: number) => Promise<void>;
     }
+    interface FunctionalCmpWrapper {
+    }
     interface ListenCmp {
         "opened": boolean;
     }
@@ -110,6 +112,12 @@ declare global {
         prototype: HTMLEventCmpElement;
         new (): HTMLEventCmpElement;
     };
+    interface HTMLFunctionalCmpWrapperElement extends Components.FunctionalCmpWrapper, HTMLStencilElement {
+    }
+    var HTMLFunctionalCmpWrapperElement: {
+        prototype: HTMLFunctionalCmpWrapperElement;
+        new (): HTMLFunctionalCmpWrapperElement;
+    };
     interface HTMLListenCmpElement extends Components.ListenCmp, HTMLStencilElement {
     }
     var HTMLListenCmpElement: {
@@ -168,6 +176,7 @@ declare global {
         "dom-visible": HTMLDomVisibleElement;
         "element-cmp": HTMLElementCmpElement;
         "event-cmp": HTMLEventCmpElement;
+        "functional-cmp-wrapper": HTMLFunctionalCmpWrapperElement;
         "listen-cmp": HTMLListenCmpElement;
         "method-cmp": HTMLMethodCmpElement;
         "path-alias-cmp": HTMLPathAliasCmpElement;
@@ -206,6 +215,8 @@ declare namespace LocalJSX {
         "onMyDocumentEvent"?: (event: CustomEvent<any>) => void;
         "onMyWindowEvent"?: (event: CustomEvent<number>) => void;
     }
+    interface FunctionalCmpWrapper {
+    }
     interface ListenCmp {
         "opened"?: boolean;
     }
@@ -237,6 +248,7 @@ declare namespace LocalJSX {
         "dom-visible": DomVisible;
         "element-cmp": ElementCmp;
         "event-cmp": EventCmp;
+        "functional-cmp-wrapper": FunctionalCmpWrapper;
         "listen-cmp": ListenCmp;
         "method-cmp": MethodCmp;
         "path-alias-cmp": PathAliasCmp;
@@ -260,6 +272,7 @@ declare module "@stencil/core" {
             "dom-visible": LocalJSX.DomVisible & JSXBase.HTMLAttributes<HTMLDomVisibleElement>;
             "element-cmp": LocalJSX.ElementCmp & JSXBase.HTMLAttributes<HTMLElementCmpElement>;
             "event-cmp": LocalJSX.EventCmp & JSXBase.HTMLAttributes<HTMLEventCmpElement>;
+            "functional-cmp-wrapper": LocalJSX.FunctionalCmpWrapper & JSXBase.HTMLAttributes<HTMLFunctionalCmpWrapperElement>;
             "listen-cmp": LocalJSX.ListenCmp & JSXBase.HTMLAttributes<HTMLListenCmpElement>;
             "method-cmp": LocalJSX.MethodCmp & JSXBase.HTMLAttributes<HTMLMethodCmpElement>;
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
