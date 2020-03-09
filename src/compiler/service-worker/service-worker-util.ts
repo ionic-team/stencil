@@ -3,10 +3,10 @@ import { normalizePath } from '@utils';
 import { URL } from 'url';
 
 
-export function generateServiceWorkerUrl(config: d.Config, outputTarget: d.OutputTargetWww) {
+export function generateServiceWorkerUrl(config: d.Config, outputTarget: d.OutputTargetWww, serviceWorker: d.ServiceWorkerConfig) {
   let swUrl = normalizePath(config.sys.path.relative(
     outputTarget.appDir,
-    outputTarget.serviceWorker.swDest
+    serviceWorker.swDest
   ));
 
   if (swUrl.charAt(0) !== '/') {

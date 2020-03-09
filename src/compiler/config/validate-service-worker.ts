@@ -4,12 +4,15 @@ import { isString } from '@utils';
 
 
 export const validateServiceWorker = (config: d.Config, outputTarget: d.OutputTargetWww) => {
+  if (outputTarget.serviceWorker === false ) {
+    return;
+  }
   if (config.devMode && !config.flags.serviceWorker) {
     outputTarget.serviceWorker = null;
     return;
   }
 
-  if (outputTarget.serviceWorker === false || outputTarget.serviceWorker === null) {
+  if (outputTarget.serviceWorker === null) {
     outputTarget.serviceWorker = null;
     return;
   }

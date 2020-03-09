@@ -18,18 +18,18 @@ describe('generateServiceWorkerUrl', () => {
         baseUrl: '/docs'
       } as d.OutputTargetWww
     ];
-    validateConfig(config, [], false);
+    validateConfig(config);
     outputTarget = config.outputTargets[0] as d.OutputTargetWww;
-    const swUrl = generateServiceWorkerUrl(config, outputTarget);
+    const swUrl = generateServiceWorkerUrl(config, outputTarget, outputTarget.serviceWorker as d.ServiceWorkerConfig);
     expect(swUrl).toBe('/docs/sw.js');
   });
 
   it('default sw url', () => {
     config = mockConfig();
     config.devMode = false;
-    validateConfig(config, [], false);
+    validateConfig(config);
     outputTarget = config.outputTargets[0] as d.OutputTargetWww;
-    const swUrl = generateServiceWorkerUrl(config, outputTarget);
+    const swUrl = generateServiceWorkerUrl(config, outputTarget, outputTarget.serviceWorker as d.ServiceWorkerConfig);
     expect(swUrl).toBe('/sw.js');
   });
 

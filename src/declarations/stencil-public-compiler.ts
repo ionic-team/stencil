@@ -1395,7 +1395,13 @@ export interface OutputTargetWww extends OutputTargetBase {
    */
   prerenderConfig?: string;
 
-  serviceWorker?: ServiceWorkerConfig | null;
+  /**
+   * Service worker config for production builds. During development builds
+   * service worker script will be injected to automatically unregister existing
+   * service workers. When set to `false` neither a service worker registration
+   * or unregistration will be added to the index.html.
+   */
+  serviceWorker?: ServiceWorkerConfig | null | false;
   appDir?: string;
 }
 

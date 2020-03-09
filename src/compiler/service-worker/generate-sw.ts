@@ -67,7 +67,12 @@ export const hasServiceWorkerChanges = (config: d.Config, buildCtx: d.BuildCtx) 
     .filter(o => o.serviceWorker && o.serviceWorker.swSrc);
 
   return wwwServiceOutputs.some(outputTarget => {
-    return buildCtx.filesChanged.some(fileChanged => config.sys.path.basename(fileChanged).toLowerCase() === config.sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase());
+    return buildCtx.filesChanged.some(fileChanged => {
+      if (outputTarget.serviceWorker) {
+        return config.sys.path.basename(fileChanged).toLowerCase() === config.sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase();
+      }
+      return false;
+    });
   });
 };
 

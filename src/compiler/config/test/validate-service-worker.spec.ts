@@ -155,20 +155,22 @@ describe('validateServiceWorker', () => {
     expect(outputTarget.serviceWorker).not.toBe(null);
   });
 
-  it('should do nothing when falsy', () => {
+  it('should stay null', () => {
     outputTarget = {
       type: 'www',
       serviceWorker: null
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker).toBe(null);
+  });
 
+  it('should stay false', () => {
     outputTarget = {
       type: 'www',
-      serviceWorker: false as any
+      serviceWorker: false
     };
     validateServiceWorker(config, outputTarget);
-    expect(outputTarget.serviceWorker).toBe(null);
+    expect(outputTarget.serviceWorker).toBe(false);
   });
 
 });
