@@ -23,7 +23,9 @@ describe('listen-reattach', () => {
     await waitForChanges();
     expect(clicked.textContent.trim()).toBe('Clicked: 2');
 
-    const moveIt = app.querySelector('#moveIt');
+    const moveIt = app.querySelector('#moveIt') as any;
+    moveIt.click();
+    await waitForChanges();
 
     elm.click();
     await waitForChanges();
