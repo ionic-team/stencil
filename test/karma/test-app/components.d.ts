@@ -161,6 +161,8 @@ export namespace Components {
     }
     interface ListenJsxRoot {
     }
+    interface ListenReattach {
+    }
     interface ListenWindow {
     }
     interface NoDelegatesFocus {
@@ -639,6 +641,12 @@ declare global {
         prototype: HTMLListenJsxRootElement;
         new (): HTMLListenJsxRootElement;
     };
+    interface HTMLListenReattachElement extends Components.ListenReattach, HTMLStencilElement {
+    }
+    var HTMLListenReattachElement: {
+        prototype: HTMLListenReattachElement;
+        new (): HTMLListenReattachElement;
+    };
     interface HTMLListenWindowElement extends Components.ListenWindow, HTMLStencilElement {
     }
     var HTMLListenWindowElement: {
@@ -1044,6 +1052,7 @@ declare global {
         "lifecycle-update-c": HTMLLifecycleUpdateCElement;
         "listen-jsx": HTMLListenJsxElement;
         "listen-jsx-root": HTMLListenJsxRootElement;
+        "listen-reattach": HTMLListenReattachElement;
         "listen-window": HTMLListenWindowElement;
         "no-delegates-focus": HTMLNoDelegatesFocusElement;
         "node-globals": HTMLNodeGlobalsElement;
@@ -1256,6 +1265,8 @@ declare namespace LocalJSX {
     }
     interface ListenJsxRoot {
     }
+    interface ListenReattach {
+    }
     interface ListenWindow {
     }
     interface NoDelegatesFocus {
@@ -1453,6 +1464,7 @@ declare namespace LocalJSX {
         "lifecycle-update-c": LifecycleUpdateC;
         "listen-jsx": ListenJsx;
         "listen-jsx-root": ListenJsxRoot;
+        "listen-reattach": ListenReattach;
         "listen-window": ListenWindow;
         "no-delegates-focus": NoDelegatesFocus;
         "node-globals": NodeGlobals;
@@ -1573,6 +1585,7 @@ declare module "@stencil/core" {
             "lifecycle-update-c": LocalJSX.LifecycleUpdateC & JSXBase.HTMLAttributes<HTMLLifecycleUpdateCElement>;
             "listen-jsx": LocalJSX.ListenJsx & JSXBase.HTMLAttributes<HTMLListenJsxElement>;
             "listen-jsx-root": LocalJSX.ListenJsxRoot & JSXBase.HTMLAttributes<HTMLListenJsxRootElement>;
+            "listen-reattach": LocalJSX.ListenReattach & JSXBase.HTMLAttributes<HTMLListenReattachElement>;
             "listen-window": LocalJSX.ListenWindow & JSXBase.HTMLAttributes<HTMLListenWindowElement>;
             "no-delegates-focus": LocalJSX.NoDelegatesFocus & JSXBase.HTMLAttributes<HTMLNoDelegatesFocusElement>;
             "node-globals": LocalJSX.NodeGlobals & JSXBase.HTMLAttributes<HTMLNodeGlobalsElement>;

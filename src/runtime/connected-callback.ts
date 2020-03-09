@@ -94,6 +94,13 @@ export const connectedCallback = (elm: d.HostElement) => {
       }
 
     } else {
+      // not the first time this has connected
+
+      // reattach any event listeners to the host
+      // since they would have been removed when disconnected
+      addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);
+
+      // fire off connectedCallback() on component instance
       fireConnectedCallback(hostRef.$lazyInstance$);
     }
 
