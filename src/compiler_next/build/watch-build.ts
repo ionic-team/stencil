@@ -165,10 +165,12 @@ const emitFsChange = (compilerCtx: d.CompilerCtx, buildCtx: BuildContext) => {
 
 const updateCompilerCtxCache = (config: d.Config, compilerCtx: d.CompilerCtx, path: string, kind: d.CompilerFileWatcherEvent) => {
   compilerCtx.fs.clearFileCache(path);
-  compilerCtx.moduleMap.delete(path);
   compilerCtx.changedFiles.add(path);
 
-  if (kind === 'dirDelete') {
+  if (kind === 'fileDelete') {
+    compilerCtx.moduleMap.delete(path);
+
+  } else if (kind === 'dirDelete') {
     const fsRootDir = resolve('/');
     compilerCtx.moduleMap.forEach((_, moduleFilePath) => {
       let moduleAncestorDir = dirname(moduleFilePath);
