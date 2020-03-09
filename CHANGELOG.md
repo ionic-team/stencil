@@ -1,5 +1,4 @@
-# 💫 [1.9.0-23](https://github.com/ionic-team/stencil/compare/v1.9.0-22...v1.9.0-23) (2020-03-06)
-
+# 🏔 [1.9.0](https://github.com/ionic-team/stencil/compare/v1.8.11...v1.9.0) (2020-03-09)
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
 
@@ -55,6 +54,7 @@ Some of main features with the `--next` compiler include:
 * **styles:** use static get styles() with template literals ([ff79406](https://github.com/ionic-team/stencil/commit/ff79406843655a4a4117a31686e4eb98cc45e535)), closes [#2234](https://github.com/ionic-team/stencil/issues/2234)
 * **compiler:** treeshake supportsShadow ([#2249](https://github.com/ionic-team/stencil/issues/2249)) ([da634da](https://github.com/ionic-team/stencil/commit/da634da1aa08a1afbb3dc0a25d5102079bea0eca))
 * **runtime:** remove slot polyfill more aggressively ([#2244](https://github.com/ionic-team/stencil/issues/2244)) ([56da2e7](https://github.com/ionic-team/stencil/commit/56da2e71b45e1b60bcc4637b4a9e7e84524a6ce5))
+* **sw:** do not register or unregister sw when config set to false ([565d353](https://github.com/ionic-team/stencil/commit/565d35307dd73009cd3f1e217278b8661dc25a95))
 
 
 ### Bug Fixes
@@ -198,6 +198,8 @@ Some of main features with the `--next` compiler include:
 * **next:** always reset process cwd before each build ([91617f8](https://github.com/ionic-team/stencil/commit/91617f89df6356f0bdd8a7a3c40ad182a115bebf))
 * **next:** clear module cache after updating/deleting module ([62971ea](https://github.com/ionic-team/stencil/commit/62971eab01483c38aa72a7f1b3633fa3d640406f))
 * **next:** simulate nodejs fs errors ([d735787](https://github.com/ionic-team/stencil/commit/d73578746ffa012e47b6c4492f01236f071fc6b9))
+* **listeners:** reattach host listeners ([8ea183e](https://github.com/ionic-team/stencil/commit/8ea183e0ed36fda81ca762a9fa96d13f48b27aba)), closes [#2253](https://github.com/ionic-team/stencil/issues/2253)
+* **prerender:** validate prerender config w/ prerender task ([26cc015](https://github.com/ionic-team/stencil/commit/26cc01575c3fdbf739268b044902a45e201b60d9))
 
 
 
