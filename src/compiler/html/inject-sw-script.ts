@@ -5,8 +5,9 @@ import { UNREGISTER_SW, getRegisterSW } from '../service-worker/generate-sw';
 
 export const updateIndexHtmlServiceWorker = async (config: d.Config, buildCtx: d.BuildCtx, doc: Document, outputTarget: d.OutputTargetWww) => {
   const serviceWorker = outputTarget.serviceWorker;
-  if ((serviceWorker && serviceWorker.unregister) || (!serviceWorker && config.devMode)) {
+  if ((serviceWorker && serviceWorker.unregister) || (serviceWorker !== null && config.devMode)) {
     injectUnregisterServiceWorker(doc);
+
   } else if (serviceWorker) {
     await injectRegisterServiceWorker(config, buildCtx, outputTarget, doc);
   }
@@ -19,18 +20,14 @@ const injectRegisterServiceWorker = async (config: d.Config, buildCtx: d.BuildCt
 };
 
 const injectUnregisterServiceWorker = (doc: Document) => {
-  doc.body.appendChild(getUnregisterSwScript(doc));
+  const script = doc.createElement('script');
+  script.innerHTML = UNREGISTER_SW;
+  doc.body.appendChild(script);
 };
 
 const getRegisterSwScript = (doc: Document, buildCtx: d.BuildCtx, swUrl: string) => {
   const script = doc.createElement('script');
   script.setAttribute('data-build', `${buildCtx.timestamp}`);
   script.innerHTML = getRegisterSW(swUrl);
-  return script;
-};
-
-const getUnregisterSwScript = (doc: Document) => {
-  const script = doc.createElement('script');
-  script.innerHTML = UNREGISTER_SW;
   return script;
 };
