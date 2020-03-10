@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "license": "MIT",
   "main": "internal/stencil-core.js",
   "types": "internal/stencil-core.d.ts",

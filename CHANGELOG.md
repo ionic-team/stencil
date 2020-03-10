@@ -1,3 +1,12 @@
+## 🐧 [1.9.1](https://github.com/ionic-team/stencil/compare/v1.9.0...v1.9.1) (2020-03-10)
+
+
+### Bug Fixes
+
+* **watch:** only remove from module cache on delete ([1f4ff24](https://github.com/ionic-team/stencil/commit/1f4ff24e9b5e1417396c6c3482dd3a7a50637875))
+
+
+
 # 🏔 [1.9.0](https://github.com/ionic-team/stencil/compare/v1.8.11...v1.9.0) (2020-03-09)
 
 With the `1.9.0` release, the default compiler is the same as `1.8.x`. However, to opt-in to test the improved compiler use the `--next` flag. Once the "next" compiler is stable we'll then make it the default in the `1.10.0` release. Currently the next compiler is passing all tests, but we'd like to get more real-world testing before making it the default.
