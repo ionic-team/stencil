@@ -275,7 +275,9 @@ export declare function getAssetPath(path: string): string;
 export declare function getElement(ref: any): HTMLStencilElement;
 
 /**
- * forceUpdate
+ * Schedules a new render of the given instance or element even if no state changed.
+ *
+ * Notice `forceUpdate()` is not syncronous and might perform the DOM render in the next frame.
  */
 export declare function forceUpdate(ref: any): void;
 
@@ -286,6 +288,8 @@ export declare function getRenderingRef(): any;
 
 export interface HTMLStencilElement extends HTMLElement {
   componentOnReady(): Promise<this>;
+
+  /** @deprecated */
   forceUpdate(): void;
 }
 

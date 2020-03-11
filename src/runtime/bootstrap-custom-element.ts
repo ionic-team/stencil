@@ -55,9 +55,6 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
       if (BUILD.disconnectedCallback && originalDisconnectedCallback) {
         originalDisconnectedCallback.call(this);
       }
-    },
-    forceUpdate() {
-      forceUpdate(this);
     }
   });
   return proxyComponent(Cstr, cmpMeta, PROXY_FLAGS.isElementConstructor | PROXY_FLAGS.proxyState);
