@@ -21,7 +21,11 @@
   "devDependencies": {
     "@stencil/react-output-target": "^0.0.4",
     "@types/file-saver": "^2.0.1",
+    "@types/lodash": "^4.14.149",
+    "@types/lodash-es": "^4.17.3",
     "file-saver": "^2.0.2",
+    "lodash": "^4.17.15",
+    "lodash-es": "^4.17.15",
     "rollup-plugin-node-builtins": "^2.1.2"
   }
 }
