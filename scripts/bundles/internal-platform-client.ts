@@ -9,6 +9,7 @@ import { writePkgJson } from '../utils/write-pkg-json';
 import { rollup, RollupOptions, OutputOptions } from 'rollup';
 import glob from 'glob';
 import ts from 'typescript';
+import { minify } from 'terser'
 
 
 export async function internalClient(opts: BuildOptions) {
@@ -80,7 +81,12 @@ export async function internalClient(opts: BuildOptions) {
               }
             });
 
-            const code = transpileToEs5.outputText;
+            let code = transpileToEs5.outputText;
+
+            if (opts.isProd) {
+              const minifyResults = minify(code);
+              code = minifyResults.code;
+            }
 
             const dest = join(outputInternalClientPolyfillsDir, 'css-shim.js');
             await fs.writeFile(dest, code);
