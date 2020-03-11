@@ -320,7 +320,9 @@ const getAllTypeReferences = (node: ts.Node) => {
           .filter(ta => ts.isTypeReferenceNode(ta))
           .forEach((tr: ts.TypeReferenceNode) => {
             const typeName = tr.typeName as ts.Identifier;
-            referencedTypes.push(typeName.escapedText.toString());
+            if (typeof typeName.escapedText !== 'undefined') {
+              referencedTypes.push(typeName.escapedText.toString());
+            }
           });
       }
     }
