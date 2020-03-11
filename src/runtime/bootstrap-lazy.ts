@@ -6,7 +6,7 @@ import { connectedCallback } from './connected-callback';
 import { convertScopedToShadow, registerStyle } from './styles';
 import { createTime, installDevTools } from './profile';
 import { disconnectedCallback } from './disconnected-callback';
-import { doc, getHostRef, plt, registerHost, win, supportsShadow } from '@platform';
+import { doc, getHostRef, plt, registerHost, win, supportsShadow, consoleDevWarn } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
 import { patchCloneNode, patchSlotAppendChild, patchChildSlotNodes } from './dom-extras';
@@ -132,6 +132,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         forceUpdate() {
+          if (BUILD.isDev) {
+            consoleDevWarn(`element.forceUpdate() is deprecated, use the "forceUpdate" function from "@stencil/core" instead:
+
+  forceUpdate(this);
+  forceUpdate(element);`)
+          }
           forceUpdate(this);
         }
 
