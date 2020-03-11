@@ -135,6 +135,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           if (BUILD.isDev) {
             consoleDevWarn(`element.forceUpdate() is deprecated, use the "forceUpdate" function from "@stencil/core" instead:
 
+  import { forceUpdate } from ‘@stencil/core’;
+
   forceUpdate(this);
   forceUpdate(element);`)
           }
