@@ -38,15 +38,6 @@ export const transpileToEs5 = async (input: string, inlineHelpers: boolean) => {
   results.diagnostics.push(
     ...loadTypeScriptDiagnostics(tsResults.diagnostics)
   );
-  if (!hasError(results.diagnostics)) {
-    results.code = fixHelpers(tsResults.outputText);
-  }
 
   return results;
-};
-
-// TODO:
-// remove once fixed: https://github.com/microsoft/TypeScript/issues/35108
-const fixHelpers = (code: string) => {
-  return code.replace(/\b__(extends|assign|rest|decorate|param|metadata|awaiter|generator|exportStar|values|read|spread|spreadArrays|await|asyncGenerator|asyncDelegator|asyncValues|makeTemplateObject|importStar|importDefault|)_\d\(/g, '__$1(');
 };
