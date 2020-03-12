@@ -1,3 +1,14 @@
+## 🚦 [1.9.2](https://github.com/ionic-team/stencil/compare/v1.9.1...v1.9.2) (2020-03-12)
+
+Deprecate element.forceUpdate() and print console warnings during development to import `forceUpdate` from `@stencil/core` instead. The `forceUpdate()` method be removed from the host element in v2.
+
+
+### Bug Fixes
+
+* **build:** minify css-shim build ([7eaad18](https://github.com/ionic-team/stencil/commit/7eaad185e7248158d88369c5ff36cd46c7e6bbba))
+
+
+
 ## 🐧 [1.9.1](https://github.com/ionic-team/stencil/compare/v1.9.0...v1.9.1) (2020-03-10)
 
 
