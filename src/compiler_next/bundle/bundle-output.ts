@@ -94,7 +94,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       fileLoadPlugin(compilerCtx.fs),
     ],
 
-    treeshake: getTreeshakeOption(config),
+    treeshake: getTreeshakeOption(config, bundleOpts),
     inlineDynamicImports: bundleOpts.inlineDynamicImports,
 
     onwarn: createOnWarnFn(buildCtx.diagnostics),
@@ -105,7 +105,13 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
   return rollupOptions;
 };
 
-const getTreeshakeOption = (config: d.Config) => {
+const getTreeshakeOption = (config: d.Config, bundleOpts: BundleOptions) => {
+  if (bundleOpts.platform === 'hydrate') {
+    return {
+      propertyReadSideEffects: false,
+      tryCatchDeoptimization: false,
+    };
+  }
   const treeshake: TreeshakingOptions | boolean = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
     ? {
       propertyReadSideEffects: false,

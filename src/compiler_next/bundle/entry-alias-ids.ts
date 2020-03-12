@@ -1,5 +1,6 @@
 
 export const STENCIL_CORE_ID = '@stencil/core';
+export const STENCIL_INTERNAL_ID = '@stencil/core/internal';
 export const STENCIL_APP_DATA_ID = '@stencil/core/internal/app-data';
 export const STENCIL_APP_GLOBALS_ID = '@stencil/core/internal/app-globals';
 export const STENCIL_HYDRATE_FACTORY_ID = '@stencil/core/hydrate-factory';

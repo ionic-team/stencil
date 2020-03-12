@@ -4,7 +4,7 @@ import { getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
 import { HYDRATED_CSS } from '../../runtime/runtime-constants';
 import { isExternalUrl } from '../sys/resolve/resolve-utils';
 import { normalizePath, normalizeFsPath } from '@utils';
-import { STENCIL_CORE_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
+import { STENCIL_CORE_ID, STENCIL_INTERNAL_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
 import path from 'path';
 import { Plugin } from 'rollup';
 
@@ -33,7 +33,7 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
     name: 'coreResolvePlugin',
 
     resolveId(id) {
-      if (id === STENCIL_CORE_ID) {
+      if (id === STENCIL_CORE_ID || id === STENCIL_INTERNAL_ID) {
         if (platform === 'client') {
           return internalClient;
         }
