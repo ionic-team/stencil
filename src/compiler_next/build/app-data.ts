@@ -5,7 +5,7 @@ import { unique } from '@utils';
 export * from '../../app-data';
 
 
-export function getBuildFeatures(cmps: ComponentCompilerMeta[]) {
+export const getBuildFeatures = (cmps: ComponentCompilerMeta[]) => {
   const slot = cmps.some(c => c.htmlTagNames.includes('slot'));
   const shadowDom = cmps.some(c => c.encapsulation === 'shadow');
   const slotRelocation = cmps.some(c => c.encapsulation !== 'shadow' && c.htmlTagNames.includes('slot'));
@@ -69,7 +69,7 @@ export function getBuildFeatures(cmps: ComponentCompilerMeta[]) {
   f.asyncLoading = f.cmpWillUpdate || f.cmpWillLoad || f.cmpWillRender;
 
   return f;
-}
+};
 
 
 export const updateComponentBuildConditionals = (moduleMap: ModuleMap, cmps: ComponentCompilerMeta[]) => {

@@ -60,9 +60,11 @@ const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => {
   build.cloneNodeFix = false;
   build.cssAnnotations = true;
   build.shadowDomShim = true;
-  build.safari10 = true;
+  build.safari10 = false;
   build.hydratedAttribute = false;
   build.hydratedClass = true;
+  build.scriptDataOpts = false;
+  build.dynamicImportShim = false;
 
   return build;
 };
