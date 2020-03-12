@@ -3,6 +3,7 @@ import * as d from '../../declarations';
 
 export const createLogger = () => {
   const logger: d.Logger = {
+    colors: true,
     level: '',
     info: console.log.bind(console),
     warn: console.warn.bind(console),
@@ -17,6 +18,7 @@ export const createLogger = () => {
     gray(msg: string) { return msg; },
     bold(msg: string) { return msg; },
     dim(msg: string) { return msg; },
+    bgRed(msg: string) { return msg; },
     createTimeSpan(_startMsg: string, _debug = false): d.LoggerTimeSpan {
       return {
         duration() { return 0; },
@@ -24,7 +26,9 @@ export const createLogger = () => {
       };
     },
     printDiagnostics(diagnostics: d.Diagnostic[]) {
-      diagnostics.forEach(logDiagnostic);
+      diagnostics.forEach(diagnostic => {
+        logDiagnostic(diagnostic, logger.colors);
+      });
     },
     buildLogFilePath: null,
     writeLogs(_: boolean) { /**/ }
@@ -33,7 +37,7 @@ export const createLogger = () => {
 };
 
 
-const logDiagnostic = (diagnostic: d.Diagnostic) => {
+const logDiagnostic = (diagnostic: d.Diagnostic, colors: boolean) => {
   let color = BLUE;
   let prefix = 'Build';
 
@@ -75,12 +79,20 @@ const logDiagnostic = (diagnostic: d.Diagnostic) => {
     msg += '\n';
   }
 
-  const styledPrefix = [
-    '%c' + prefix,
-    `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`
-  ];
+  if (colors) {
+    const styledPrefix = [
+      '%c' + prefix,
+      `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`
+    ];
 
-  console.log(...styledPrefix, msg);
+    console.log(...styledPrefix, msg);
+  } else if (diagnostic.level === 'error') {
+    console.error(msg);
+  } else if (diagnostic.level === 'warn') {
+    console.warn(msg);
+  } else {
+    console.log(msg);
+  }
 };
 
 

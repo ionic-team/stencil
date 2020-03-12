@@ -29,13 +29,17 @@ export async function run(init: CliInitOptions) {
   }
 
   try {
+    const flags = parseFlags(prcs.argv.slice(2));
+
+    if (flags.ci) {
+      logger.colors = false;
+    }
+
     setupNodeProcess(prcs, logger);
 
     if (sys.getCompilerExecutingPath == null) {
       sys.getCompilerExecutingPath = getCompilerExecutingPath;
     }
-
-    const flags = parseFlags(prcs.argv.slice(2));
 
     const { loadConfig } = await import('@stencil/core/compiler');
 

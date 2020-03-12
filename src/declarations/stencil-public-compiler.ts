@@ -1127,6 +1127,7 @@ export interface EmulateViewport {
 }
 
 export interface Logger {
+  colors: boolean;
   level: string;
   debug(...msg: any[]): void;
   info(...msg: any[]): void;
@@ -1143,6 +1144,7 @@ export interface Logger {
   gray(msg: string): string;
   bold(msg: string): string;
   dim(msg: string): string;
+  bgRed(msg: string): string;
   buildLogFilePath: string;
   writeLogs(append: boolean): void;
 }

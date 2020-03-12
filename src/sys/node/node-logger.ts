@@ -4,10 +4,12 @@ import fs from 'graceful-fs';
 import path from 'path';
 
 
-export class NodeLogger implements d.Logger {
+export class NodeLoggerLegacy implements d.Logger {
   private _level = 'info';
   private writeLogQueue: string[] = [];
   buildLogFilePath: string = null;
+
+  colors = true;
 
   get level() {
     return this._level;
@@ -258,6 +260,10 @@ export class NodeLogger implements d.Logger {
     return color.dim(msg);
   }
 
+  bgRed(msg: string) {
+    return color.bgRed(msg);
+  }
+
   private shouldLog(level: string): boolean {
     return LOG_LEVELS.indexOf(level) >= LOG_LEVELS.indexOf(this.level);
   }
@@ -462,11 +468,11 @@ export class NodeLogger implements d.Logger {
 
 
 class CmdTimeSpan {
-  private logger: NodeLogger;
+  private logger: NodeLoggerLegacy;
   private start: number;
 
   constructor(
-    logger: NodeLogger,
+    logger: NodeLoggerLegacy,
     startMsg: string,
     private debug: boolean,
     private appendTo: string[]
