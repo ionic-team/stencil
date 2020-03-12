@@ -294,12 +294,18 @@ export interface HTMLStencilElement extends HTMLElement {
 }
 
 /**
- * writeTask
+ * Schedules a DOM-write task. The provided callback will be executed
+ * in the best moment to perform DOM mutation without causing layout thrashing.
+ *
+ * For further information: https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing
  */
 export declare function writeTask(task: RafCallback): void;
 
 /**
- * readTask
+ * Schedules a DOM-read task. The provided callback will be executed
+ * in the best moment to perform DOM reads without causing layout thrashing.
+ *
+ * For further information: https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing
  */
 export declare function readTask(task: RafCallback): void;
 /**
@@ -467,6 +473,12 @@ export interface ChildNode {
   vname?: string;
 }
 
+/**
+ * Host is a functional component can be used at the root of the render function
+ * to set attributes and event listeners to the host element itself.
+ *
+ * For further information: https://stenciljs.com/docs/host-element
+ */
 export declare const Host: FunctionalComponent<HostAttributes>;
 
 /**
