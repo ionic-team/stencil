@@ -196,9 +196,7 @@ function finalizeHydrate(win: Window, doc: Document, opts: HydrateFactoryOptions
       }
     } catch (e) {}
 
-    if (opts.clientHydrateAnnotations) {
-      doc.documentElement.classList.add('hydrated');
-    }
+    doc.documentElement.classList.add('hydrated');
 
     if (opts.serializeToHtml) {
       results.html = serializeDocumentToString(doc, opts);

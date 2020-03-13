@@ -17,7 +17,7 @@ import readline from 'readline';
 import { URL } from 'url';
 
 
-export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, config: d.Config, devServer: d.DevServer, hydrateAppFilePath: string, componentGraph: d.BuildResultsComponentGraph, srcIndexHtmlPath: string) {
+export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, config: d.Config, devServer: d.DevServer, hydrateAppFilePath: string, componentGraph: d.BuildResultsComponentGraph, staticOnly: boolean, srcIndexHtmlPath: string) {
   const diagnostics: d.Diagnostic[] = [];
   const outputTargets = config.outputTargets
     .filter(isOutputTargetWww)
@@ -62,6 +62,7 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
           devServer,
           hydrateAppFilePath,
           componentGraph,
+          staticOnly,
           srcIndexHtmlPath,
           outputTarget
         );
@@ -80,7 +81,7 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
 }
 
 
-async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWorkerController, diagnostics: d.Diagnostic[], config: d.Config, devServer: d.DevServer, hydrateAppFilePath: string, componentGraph: d.BuildResultsComponentGraph, srcIndexHtmlPath: string, outputTarget: d.OutputTargetWww) {
+async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWorkerController, diagnostics: d.Diagnostic[], config: d.Config, devServer: d.DevServer, hydrateAppFilePath: string, componentGraph: d.BuildResultsComponentGraph, staticOnly: boolean, srcIndexHtmlPath: string, outputTarget: d.OutputTargetWww) {
   try {
     const timeSpan = config.logger.createTimeSpan(`prerendering started`);
 
@@ -122,6 +123,7 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWo
       urlsPending: new Set(),
       urlsProcessing: new Set(),
       resolve: null,
+      staticOnly: staticOnly,
     };
 
     if (!config.flags.ci && !manager.isDebug) {

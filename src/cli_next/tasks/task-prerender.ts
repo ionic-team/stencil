@@ -21,7 +21,7 @@ export async function taskPrerender(prcs: NodeJS.Process, config: d.Config) {
 
   const srcIndexHtmlPath = config.srcIndexHtml;
 
-  const diagnostics = await runPrerenderTask(prcs, config, hydrateAppFilePath, null, srcIndexHtmlPath);
+  const diagnostics = await runPrerenderTask(prcs, config, hydrateAppFilePath, null, false, srcIndexHtmlPath);
   config.logger.printDiagnostics(diagnostics);
 
   if (diagnostics.some(d => d.level === 'error')) {
@@ -29,7 +29,7 @@ export async function taskPrerender(prcs: NodeJS.Process, config: d.Config) {
   }
 }
 
-export async function runPrerenderTask(prcs: NodeJS.Process, config: d.Config, hydrateAppFilePath: string, componentGraph: d.BuildResultsComponentGraph, srcIndexHtmlPath: string) {
+export async function runPrerenderTask(prcs: NodeJS.Process, config: d.Config, hydrateAppFilePath: string, componentGraph: d.BuildResultsComponentGraph, staticOnly: boolean, srcIndexHtmlPath: string) {
   const devServerConfig = { ...config.devServer };
   devServerConfig.openBrowser = false;
   devServerConfig.gzip = false;
@@ -42,7 +42,7 @@ export async function runPrerenderTask(prcs: NodeJS.Process, config: d.Config, h
   const diagnostics: d.Diagnostic[] = [];
 
   try {
-    const prerenderDiagnostics = await runPrerender(prcs, __dirname, config, devServer, hydrateAppFilePath, componentGraph, srcIndexHtmlPath);
+    const prerenderDiagnostics = await runPrerender(prcs, __dirname, config, devServer, hydrateAppFilePath, componentGraph, staticOnly, srcIndexHtmlPath);
     diagnostics.push(...prerenderDiagnostics);
   } catch (e) {
     catchError(diagnostics, e);

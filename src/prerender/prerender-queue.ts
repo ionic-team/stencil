@@ -129,7 +129,8 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
       prerenderConfigPath: manager.prerenderConfigPath,
       templateId: manager.templateId,
       url: url,
-      writeToFilePath: getWriteFilePathFromUrlPath(manager, url)
+      writeToFilePath: getWriteFilePathFromUrlPath(manager, url),
+      staticOnly: manager.staticOnly,
     };
 
     // prender this path and wait on the results

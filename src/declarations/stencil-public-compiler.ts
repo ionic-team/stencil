@@ -666,6 +666,7 @@ export interface CompilerBuildResults {
   hmr?: HotModuleReplacement;
   hydrateAppFilePath?: string;
   isRebuild: boolean;
+  scriptFound: boolean;
   namespace: string;
   outputs: BuildOutput[];
   rootDir: string;
@@ -1591,6 +1592,7 @@ export interface PrerenderRequest {
   templateId: string;
   url: string;
   writeToFilePath: string;
+  staticOnly: boolean;
 }
 
 export interface Path {

@@ -893,6 +893,7 @@ export interface CompilerCtx {
   tsService: TsService;
   changedModules: Set<string>;
   changedFiles: Set<string>;
+  scriptFound: boolean;
   worker?: CompilerWorkerContext;
 
   rollupCache: Map<string, any>;
@@ -1739,6 +1740,7 @@ export interface PrerenderManager {
   urlsPending: Set<string>;
   urlsCompleted: Set<string>;
   maxConcurrency: number;
+  staticOnly: boolean;
 }
 
 export interface PrerenderHydrateOptions extends SerializeDocumentOptions {

@@ -58,6 +58,7 @@ export function mockCompilerCtx() {
     activeFilesDeleted: [],
     activeFilesUpdated: [],
     fs: null,
+    scriptFound: true,
     cachedGlobalStyle: null,
     collections: [],
     compilerOptions: null,

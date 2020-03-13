@@ -45,7 +45,7 @@ export class CompilerContext implements d.CompilerCtx {
   rollupCache = new Map();
   changedModules = new Set<string>();
   changedFiles = new Set<string>();
-
+  scriptFound = true;
   worker: d.CompilerWorkerContext = null;
 
   constructor(config: d.Config) {

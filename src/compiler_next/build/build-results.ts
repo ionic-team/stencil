@@ -27,7 +27,8 @@ export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCt
     rootDir: config.rootDir,
     srcDir: config.srcDir,
     timestamp: getBuildTimestamp(),
-    componentGraph
+    scriptFound: compilerCtx.scriptFound,
+    componentGraph,
   };
 
   const hmr = generateHmr(config, compilerCtx, buildCtx);

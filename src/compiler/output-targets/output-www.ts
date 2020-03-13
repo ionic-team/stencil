@@ -97,6 +97,7 @@ const generateIndexHtml = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       if (scriptFound) {
         optimizeCriticalPath(config, doc, criticalPath, outputTarget);
       }
+      compilerCtx.scriptFound = scriptFound;
     }
 
     if (config.sys.serializeNodeToHtml != null) {

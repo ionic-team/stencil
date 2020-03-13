@@ -49,7 +49,10 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     );
 
     const hydrateOpts = getHydrateOptions(prerenderConfig, url, results.diagnostics);
-
+    if (prerenderRequest.staticOnly) {
+      hydrateOpts.addModulePreloads = false;
+      hydrateOpts.clientHydrateAnnotations = false;
+    }
     if (typeof prerenderConfig.beforeHydrate === 'function') {
       try {
         const rtn = prerenderConfig.beforeHydrate(doc, url);

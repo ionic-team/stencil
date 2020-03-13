@@ -44,6 +44,7 @@ export class CompilerContext implements d.CompilerCtx {
   changedModules = new Set<string>();
   changedFiles = new Set<string>();
   worker: d.CompilerWorkerContext = null;
+  scriptFound = true;
 
   reset() {
     this.cache.clear();

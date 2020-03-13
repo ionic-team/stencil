@@ -50,7 +50,7 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config, flags: d
     let exitCode = 0;
     if (config.flags.prerender) {
       const componentGraph = results.componentGraph ? fromEntries(results.componentGraph.entries()) : null;
-      const prerenderDiagnostics = await runPrerender(prcs, __dirname, config, devServer, results.hydrateAppFilePath, componentGraph, null);
+      const prerenderDiagnostics = await runPrerender(prcs, __dirname, config, devServer, results.hydrateAppFilePath, componentGraph, false, null);
       if (prerenderDiagnostics.some(d => d.type === 'error')) {
         config.logger.printDiagnostics(prerenderDiagnostics);
         exitCode = 1;
