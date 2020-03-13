@@ -14,8 +14,10 @@ export const fetchPreloadFs = async (config: d.Config, inMemoryFs: d.InMemoryFil
         const fileExists = await inMemoryFs.access(preload.filePath);
         if (!fileExists) {
           const rsp = await cachedFetch(preload.url);
-          const content = await rsp.text();
-          await inMemoryFs.writeFile(preload.filePath, content);
+          if (rsp && rsp.ok) {
+            const content = await rsp.clone().text();
+            await inMemoryFs.writeFile(preload.filePath, content);
+          }
         }
 
       } catch (e) {
