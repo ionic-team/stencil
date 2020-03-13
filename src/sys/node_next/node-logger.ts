@@ -9,16 +9,12 @@ export function createNodeLogger(prcs: NodeJS.Process) {
 }
 
 export class NodeLogger implements Logger {
+  colors = true;
   private _level = 'info';
-  private _colors = true;
   private writeLogQueue: string[] = [];
   buildLogFilePath: string = null;
 
   constructor(private prcs: NodeJS.Process) {}
-
-  enableColors(enable: boolean) {
-    this._colors = enable;
-  }
 
   get level() {
     return this._level;
@@ -230,47 +226,47 @@ export class NodeLogger implements Logger {
   }
 
   color(msg: string, colorName: 'red'|'green'|'yellow'|'blue'|'magenta'|'cyan'|'gray') {
-    return this._colors ? (color as any)[colorName](msg) : msg;
+    return this.colors ? (color as any)[colorName](msg) : msg;
   }
 
   red(msg: string) {
-    return this._colors ? color.red(msg) : msg;
+    return this.colors ? color.red(msg) : msg;
   }
 
   green(msg: string) {
-    return this._colors ? color.green(msg) : msg;
+    return this.colors ? color.green(msg) : msg;
   }
 
   yellow(msg: string) {
-    return this._colors ? color.yellow(msg) : msg;
+    return this.colors ? color.yellow(msg) : msg;
   }
 
   blue(msg: string) {
-    return this._colors ? color.blue(msg) : msg;
+    return this.colors ? color.blue(msg) : msg;
   }
 
   magenta(msg: string) {
-    return this._colors ? color.magenta(msg) : msg;
+    return this.colors ? color.magenta(msg) : msg;
   }
 
   cyan(msg: string) {
-    return this._colors ? color.cyan(msg) : msg;
+    return this.colors ? color.cyan(msg) : msg;
   }
 
   gray(msg: string) {
-    return this._colors ? color.gray(msg) : msg;
+    return this.colors ? color.gray(msg) : msg;
   }
 
   bold(msg: string) {
-    return this._colors ? color.bold(msg) : msg;
+    return this.colors ? color.bold(msg) : msg;
   }
 
   dim(msg: string) {
-    return this._colors ? color.dim(msg) : msg;
+    return this.colors ? color.dim(msg) : msg;
   }
 
   bgRed(msg: string) {
-    return this._colors ? color.bgRed(msg) : msg;
+    return this.colors ? color.bgRed(msg) : msg;
   }
 
   private shouldLog(level: string): boolean {
