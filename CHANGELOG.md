@@ -1,3 +1,18 @@
+## 🍁 [1.9.3-0](https://github.com/ionic-team/stencil/compare/v1.9.2...v1.9.3-0) (2020-03-13)
+
+
+### Bug Fixes
+
+* **build:** alias @stencil/core/internal imports to correct platform ([#2267](https://github.com/ionic-team/stencil/issues/2267)) ([d04a1ca](https://github.com/ionic-team/stencil/commit/d04a1ca82040f6e5e12d01243122b54ce3307af5))
+* **fs:** clone cached fetch response text ([f19a3df](https://github.com/ionic-team/stencil/commit/f19a3dfdc0fe4b032567209ab9012eb1ed75d00f))
+
+
+### Features
+
+* **logger:** disable log colors for ci builds ([88c76e6](https://github.com/ionic-team/stencil/commit/88c76e64ccde91906aaab72dea0b508ed451448f))
+
+
+
 ## 🚦 [1.9.2](https://github.com/ionic-team/stencil/compare/v1.9.1...v1.9.2) (2020-03-12)
 
 Deprecate element.forceUpdate() and print console warnings during development to import `forceUpdate` from `@stencil/core` instead. The `forceUpdate()` method be removed from the host element in v2.
