@@ -65,7 +65,7 @@ describe('fetch', () => {
       <cmp-a data="hillvalley.json">
         <ul>
           <li>
-            Content-Type: application/json
+            content-type: application/json
           </li>
         </ul>
         <ul>
@@ -89,7 +89,7 @@ describe('fetch', () => {
       <cmp-a data="hazzard.json">
         <ul>
           <li>
-            Content-Type: application/json
+            content-type: application/json
           </li>
         </ul>
         <ul>
@@ -113,7 +113,7 @@ describe('fetch', () => {
       <cmp-a data="hazzard.json">
       <ul>
         <li>
-          Content-Type: application/json
+          content-type: application/json
         </li>
       </ul>
         <ul>
@@ -143,10 +143,10 @@ describe('fetch', () => {
       <cmp-a data="hillvalley.txt">
         <ul>
           <li>
-            Content-Type: text/plain
+            content-type: text/plain
           </li>
           <li>
-            Access-Control-Allow-Origin: *
+            access-control-allow-origin: *
           </li>
         </ul>
         <p>
@@ -168,7 +168,7 @@ describe('fetch', () => {
       <cmp-a data="no-findy.txt">
         <ul>
           <li>
-            Content-Type: text/plain
+            content-type: text/plain
           </li>
         </ul>
         <p>
@@ -176,6 +176,16 @@ describe('fetch', () => {
         </p>
       </cmp-a>
     `);
+  });
+
+  it('global Request/Response/Headers should work', () => {
+    const headers = new Headers();
+    headers.set('x-header', 'value');
+    const request = new Request('http://testing.stenciljs.com/some-url', {
+      headers
+    });
+    expect(request.url).toBe('http://testing.stenciljs.com/some-url');
+    expect(request.headers.get('x-header')).toBe('value');
   });
 
 });

@@ -1,5 +1,7 @@
 import { MockAnchorElement, MockBaseElement, MockButtonElement, MockCanvasElement, MockFormElement, MockImageElement, MockInputElement, MockLinkElement, MockMetaElement, MockScriptElement, MockStyleElement, MockTemplateElement, MockTitleElement } from './element';
 import { MockCustomEvent, MockEvent, MockKeyboardEvent, MockMouseEvent } from './event';
+import { MockHeaders } from './headers';
+import { MockRequest, MockResponse } from './request-response';
 import { MockWindow } from './window';
 
 
@@ -135,8 +137,11 @@ const WINDOW_PROPS = [
 const GLOBAL_CONSTRUCTORS: [string, any][] = [
   ['CustomEvent', MockCustomEvent],
   ['Event', MockEvent],
+  ['Headers', MockHeaders],
   ['KeyboardEvent', MockKeyboardEvent],
   ['MouseEvent', MockMouseEvent],
+  ['Request', MockRequest],
+  ['Response', MockResponse],
 
   ['HTMLAnchorElement', MockAnchorElement],
   ['HTMLBaseElement', MockBaseElement],
