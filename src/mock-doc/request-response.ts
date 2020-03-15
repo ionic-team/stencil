@@ -3,9 +3,17 @@ import { MockHeaders } from './headers';
 export type MockRequestInfo = MockRequest | string;
 
 export interface MockRequestInit {
+  body?: any;
+  cache?: string;
+  credentials?: string;
   headers?: any;
-  status?: number;
-  statusText?: string;
+  integrity?: string;
+  keepalive?: boolean;
+  method?: string;
+  mode?: string;
+  redirect?: string;
+  referrer?: string;
+  referrerPolicy?: string;
 }
 
 export class MockRequest {
@@ -31,8 +39,14 @@ export class MockRequest {
       this.headers = new MockHeaders(input.headers);
     }
 
-    if (!this.headers) {
+    Object.assign(this, init);
+
+    if (init.headers) {
       this.headers = new MockHeaders(init.headers);
+    }
+
+    if (!this.headers) {
+      this.headers = new MockHeaders();
     }
   }
 

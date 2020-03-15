@@ -70,8 +70,12 @@ describe('MockRequest', () => {
     const headers = new MockHeaders();
     headers.set('x-header', 'value');
     const request = new MockRequest('/url', {
-      headers
+      headers,
+      method: 'POST',
+      cache: 'no-cache',
     });
+    expect(request.cache).toBe('no-cache');
+    expect(request.method).toBe('POST');
     expect(request.headers).not.toBe(headers);
     expect(request.headers.get('x-header')).toBe('value');
   });
