@@ -5,13 +5,15 @@ import inquirer from 'inquirer';
 import { getOptions, BuildOptions } from './utils/options';
 import { runReleaseTasks } from './release-tasks';
 import { join } from 'path';
-import { SEMVER_INCREMENTS, prettyVersionDiff, isValidVersionInput, getNewVersion, isVersionGreater, isPrereleaseVersion } from './utils/release-utils';
+import { SEMVER_INCREMENTS, prettyVersionDiff, isValidVersionInput, getNewVersion, isPrereleaseVersion } from './utils/release-utils';
 
 
 export async function release(rootDir: string, args: string[]) {
-  const releaseDataPath = join(rootDir, 'build', 'release-data.json');
+  const buildDir = join(rootDir, 'build');
+  const releaseDataPath = join(buildDir, 'release-data.json');
 
   if (args.includes('--prepare')) {
+    await fs.emptyDir(buildDir);
     const opts = getOptions(rootDir, {
       isPublishRelease: false,
       isProd: true,
