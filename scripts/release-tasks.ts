@@ -110,7 +110,11 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
         task: () => execa('npm', ['ci'], { cwd: rootDir }),
       },
       {
-        title: `Build @stencil/core ${color.dim('(' + opts.buildId + ')')}`,
+        title: `Transpile ${color.dim('(tsc.prod)')}`,
+        task: () => execa('npm', ['run', 'tsc.prod'], { cwd: rootDir })
+      },
+      {
+        title: `Bundle @stencil/core ${color.dim('(' + opts.buildId + ')')}`,
         task: () => bundleBuild(opts)
       },
       {
@@ -120,10 +124,6 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
       {
         title: 'Run karma tests',
         task: () => execa('npm', ['run', 'test.karma.prod'], { cwd: rootDir })
-      },
-      {
-        title: 'Run Test Size Analysis',
-        task: () => execa('npm', ['run', 'test.analysis'], { cwd: rootDir })
       },
       {
         title: 'Build license',
