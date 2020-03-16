@@ -32,6 +32,7 @@ export default _default;
       props: cmp.props,
       methods: cmp.methods,
       events: cmp.events,
+      listeners: cmp.listeners,
       styles: cmp.styles,
       slots: cmp.slots,
       dependents: cmp.dependents,
