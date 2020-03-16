@@ -214,6 +214,7 @@ const getDocsEvents = (events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] =>
 };
 
 const getDocsStyles = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] => {
+  console.log(cmpMeta.styleDocs);
   if (!cmpMeta.styleDocs) {
     return [];
   }
