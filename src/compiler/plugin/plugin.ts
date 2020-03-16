@@ -206,6 +206,7 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
             }
           }
         }
+
       } catch (e) {
         catchError(transformResults.diagnostics, e);
       }

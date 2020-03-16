@@ -26,6 +26,7 @@ import {
   PrerenderRequest,
   PrerenderResults,
   StencilSystem,
+  StyleDoc,
 } from './stencil-public-compiler';
 
 import {
@@ -35,7 +36,6 @@ import {
   VNode,
   VNodeData,
 } from './stencil-public-runtime';
-import { StyleDoc } from '../internal';
 
 
 export interface PrintLine {
