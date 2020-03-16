@@ -49,7 +49,8 @@ const getDocsComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, b
         events: getDocsEvents(cmp.events),
         styles: getDocsStyles(cmp),
         slots: getDocsSlots(cmp.docs.tags),
-        parts: getDocsParts(cmp.docs.tags)
+        parts: getDocsParts(cmp.docs.tags),
+        listeners: getDocsListeners(cmp.listeners),
       }));
   }));
 
@@ -224,6 +225,15 @@ const getDocsStyles = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] => {
       docs: styleDoc.docs || ''
     };
   });
+}
+
+const getDocsListeners = (listeners: d.ComponentCompilerListener[]): d.JsonDocsListener[] => {
+  return listeners.map(listener => ({
+    event: listener.name,
+    target: listener.target,
+    capture: listener.capture,
+    passive: listener.passive
+  }));
 }
 
 const getDocsDeprecationText = (tags: d.JsonDocsTag[]) => {

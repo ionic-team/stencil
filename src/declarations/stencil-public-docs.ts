@@ -23,6 +23,7 @@ export interface JsonDocsComponent {
   props: JsonDocsProp[];
   methods: JsonDocsMethod[];
   events: JsonDocsEvent[];
+  listeners: JsonDocsListener[];
   styles: JsonDocsStyle[];
   slots: JsonDocsSlot[];
   parts: JsonDocsPart[];
@@ -101,6 +102,13 @@ export interface JsonDocsStyle {
   name: string;
   docs: string;
   annotation: string;
+}
+
+export interface JsonDocsListener {
+  event: string;
+  target?: string;
+  capture: boolean;
+  passive: boolean;
 }
 
 export interface JsonDocsSlot {
