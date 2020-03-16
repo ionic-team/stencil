@@ -3,7 +3,7 @@ import { outputAngular } from '../../compiler/output-targets/output-angular';
 import { outputCopy } from './copy/output-copy';
 import { outputCustomElements } from './dist-custom-elements';
 import { outputCustomElementsBundle } from './dist-custom-elements-bundle';
-import { outputDocs } from '../../compiler/output-targets/output-docs';
+import { outputDocs } from './docs/output-docs';
 import { outputHydrateScript } from './dist-hydrate-script';
 import { outputLazy } from './dist-lazy/lazy-output';
 import { outputLazyLoader } from '../../compiler/output-targets/output-lazy-loader';
