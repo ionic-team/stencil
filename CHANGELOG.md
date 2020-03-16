@@ -1,16 +1,18 @@
-## 🚣 [1.9.3-1](https://github.com/ionic-team/stencil/compare/v1.9.2...v1.9.3-1) (2020-03-16)
-
-
-### Features
-
-* **mock-doc:** add Request, Response, Headers to mock-doc and testing ([31502ff](https://github.com/ionic-team/stencil/commit/31502ff98b45e34379a3293d6bdb098ee301131f))
-* **logger:** disable log colors for ci builds ([88c76e6](https://github.com/ionic-team/stencil/commit/88c76e64ccde91906aaab72dea0b508ed451448f))
+# 🎭 [1.10.0](https://github.com/ionic-team/stencil/compare/v1.9.2...v1.10.0) (2020-03-16)
 
 
 ### Bug Fixes
 
+* **docs:** use pipe for union types ([d196971](https://github.com/ionic-team/stencil/commit/d19697164f25e01813430410581f517c149817d4))
 * **build:** alias @stencil/core/internal imports to correct platform ([#2267](https://github.com/ionic-team/stencil/issues/2267)) ([d04a1ca](https://github.com/ionic-team/stencil/commit/d04a1ca82040f6e5e12d01243122b54ce3307af5))
 * **fs:** clone cached fetch response text ([f19a3df](https://github.com/ionic-team/stencil/commit/f19a3dfdc0fe4b032567209ab9012eb1ed75d00f))
+
+
+### Features
+
+* **docs:** include listeners in docs-json ([#2272](https://github.com/ionic-team/stencil/issues/2272)) ([040111e](https://github.com/ionic-team/stencil/commit/040111eb5f69a667f3056d5611059beb869d4cfe))
+* **mock-doc:** add Request, Response, Headers to mock-doc and testing ([31502ff](https://github.com/ionic-team/stencil/commit/31502ff98b45e34379a3293d6bdb098ee301131f))
+* **logger:** disable log colors for ci builds ([88c76e6](https://github.com/ionic-team/stencil/commit/88c76e64ccde91906aaab72dea0b508ed451448f))
 
 
 
