@@ -226,6 +226,9 @@ function validateDts(opts: BuildOptions, dtsEntries: string[]) {
   const program = ts.createProgram(dtsEntries, {
     baseUrl: '.',
     paths: {
+      '@stencil/core/mock-doc': [
+        join(opts.rootDir, 'mock-doc', 'index.d.ts')
+      ],
       '@stencil/core/internal': [
         join(opts.rootDir, 'internal', 'index.d.ts')
       ],
