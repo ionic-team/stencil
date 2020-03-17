@@ -83,6 +83,7 @@ export function validateConfig(config: d.Config): { config: d.Config, diagnostic
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
 
   setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
+  setBooleanConfig(config, 'buildDocs', 'docs', !config.devMode);
   setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
   setBooleanConfig(config, 'profile', 'profile', config.devMode);
 

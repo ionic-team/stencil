@@ -21,7 +21,7 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         const filePath = normalizeFsPath(id);
         const code = await compilerCtx.fs.readFile(filePath);
         const cmp = buildCtx.components.find(c => c.tagName === data.tag);
-        const moduleFile = compilerCtx.moduleMap.get(cmp.sourceFilePath);
+        const moduleFile = cmp && compilerCtx.moduleMap.get(cmp.sourceFilePath);
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, code, filePath);
         const commentOriginalSelector = (bundleOpts.platform === 'hydrate') && (data.encapsulation === 'shadow');
 
@@ -50,7 +50,9 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         });
 
         // Set style docs
-        cmp.styleDocs = cssTransformResults.styleDocs;
+        if (cmp) {
+          cmp.styleDocs = cssTransformResults.styleDocs;
+        }
 
         // Track dependencies
         pluginTransforms.dependencies.forEach(dep => {
