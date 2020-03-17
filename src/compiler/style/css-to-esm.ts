@@ -7,6 +7,7 @@ import { serializeImportPath } from '../transformers/stencil-import-path';
 import { stripCssComments } from './style-utils';
 import MagicString from 'magic-string';
 import path from 'path';
+import { parseStyleDocs } from '../docs/style-docs';
 
 
 export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
@@ -42,7 +43,12 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput) => {
     diagnostics: [],
     imports: [],
     defaultVarName: createCssVarName(input.file, input.mode),
+    styleDocs: []
   };
+
+  if (input.docs) {
+    parseStyleDocs(results.styleDocs, input.input);
+  }
 
   try {
     const varNames = new Set([results.defaultVarName]);
