@@ -6,13 +6,13 @@
   "types": "dist/types/components.d.ts",
   "collection": " dist/collection/collection-manifest.json",
   "scripts": {
-    "build": "node ../../bin/stencil build --docs --next",
-    "start": "node ../../bin/stencil build --debug --watch --dev --serve --next",
-    "test": "node ../../bin/stencil test --ci --e2e --spec --screenshot --debug --next",
+    "build": "node ../../bin/stencil build --docs",
+    "start": "node ../../bin/stencil build --debug --watch --dev --serve",
+    "test": "node ../../bin/stencil test --ci --e2e --spec --screenshot --debug",
     "test.dist": "npm run build && node test-end-to-end-dist.js",
-    "test.e2e": "node ../../bin/stencil test --e2e --next",
-    "test.screenshot": "node ../../bin/stencil test --e2e --debug --screenshot --next",
-    "test.spec": "node ../../bin/stencil test --spec --debug --next",
+    "test.e2e": "node ../../bin/stencil test --e2e",
+    "test.screenshot": "node ../../bin/stencil test --e2e --debug --screenshot",
+    "test.spec": "node ../../bin/stencil test --spec --debug",
     "jest": "jest --coverage"
   },
   "jest": {
