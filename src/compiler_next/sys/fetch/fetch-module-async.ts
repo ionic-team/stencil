@@ -4,7 +4,6 @@ import { known404Urls } from './fetch-utils';
 import { skipFilePathFetch, skipUrlFetch } from '../fetch/fetch-utils';
 import { writeFetchSuccessAsync } from './write-fetch-success';
 
-
 export const fetchModuleAsync = async (inMemoryFs: d.InMemoryFileSystem, pkgVersions: Map<string, string>, url: string, filePath: string) => {
   if (skipFilePathFetch(filePath) || known404Urls.has(url) || skipUrlFetch(url)) {
     return undefined;

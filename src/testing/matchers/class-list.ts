@@ -1,5 +1,3 @@
-
-
 export function toHaveClass(elm: HTMLElement, expectClassName: string) {
   if (!elm) {
     throw new Error(`expect toHaveClass value is null`);
@@ -20,7 +18,6 @@ export function toHaveClass(elm: HTMLElement, expectClassName: string) {
     pass: pass,
   };
 }
-
 
 export function toHaveClasses(elm: HTMLElement, expectClassNames: string[]) {
   if (!elm) {
@@ -44,7 +41,6 @@ export function toHaveClasses(elm: HTMLElement, expectClassNames: string[]) {
     pass: pass,
   };
 }
-
 
 export function toMatchClasses(elm: HTMLElement, expectClassNames: string[]) {
   let { pass } = toHaveClasses(elm, expectClassNames);

@@ -1,1 +1,3 @@
-export const globalScripts = /* default */ () => {/**/};
+export const globalScripts = /* default */ () => {
+  /**/
+};

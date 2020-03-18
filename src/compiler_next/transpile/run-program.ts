@@ -9,7 +9,6 @@ import { updateComponentBuildConditionals } from '../app-core/app-data';
 import { updateModule } from '../transformers/static-to-meta/parse-static';
 import ts from 'typescript';
 
-
 export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
   const tsSyntactic = loadTypeScriptDiagnostics(tsBuilder.getSyntacticDiagnostics());
   const tsGlobal = loadTypeScriptDiagnostics(tsBuilder.getGlobalDiagnostics());
@@ -30,31 +29,19 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
     if (emitFilePath.endsWith('.js')) {
       updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
-
     } else if (emitFilePath.endsWith('.d.ts')) {
       const relativeEmitFilepath = getRelativeDts(config, tsSourceFiles[0].fileName, emitFilePath);
 
       typesOutputTarget.forEach(o => {
-        compilerCtx.fs.writeFile(
-          join(o.typesDir, relativeEmitFilepath),
-          data
-        );
+        compilerCtx.fs.writeFile(join(o.typesDir, relativeEmitFilepath), data);
       });
     }
   };
 
   // Emit files that changed
-  tsBuilder.emit(
-    undefined,
-    emitCallback,
-    undefined,
-    false,
-    {
-      before: [
-        convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker),
-      ]
-    },
-  );
+  tsBuilder.emit(undefined, emitCallback, undefined, false, {
+    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker)],
+  });
 
   // Finalize components metadata
   buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());
@@ -97,9 +84,7 @@ const validateUniqueTagNames = (config: d.Config, buildCtx: d.BuildCtx) => {
     if (cmpsWithTagName.length > 1) {
       const err = buildError(buildCtx.diagnostics);
       err.header = `Component Tag Name "${tagName}" Must Be Unique`;
-      err.messageText = `Please update the components so "${tagName}" is only used once: ${
-        cmpsWithTagName.map(c => relative(config.rootDir, c.sourceFilePath)).join(' ')
-      }`;
+      err.messageText = `Please update the components so "${tagName}" is only used once: ${cmpsWithTagName.map(c => relative(config.rootDir, c.sourceFilePath)).join(' ')}`;
     }
   });
 };

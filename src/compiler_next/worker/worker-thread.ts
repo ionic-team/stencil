@@ -8,14 +8,13 @@ import { prepareModule } from '../optimize/optimize-module';
 import { transformCssToEsm } from '../style/css-to-esm';
 import { transpileToEs5 } from '../transpile/transpile-to-es5';
 
-
 export const createWorkerContext = (): d.CompilerWorkerContext => {
   return {
     compileModule: compile,
     transformCssToEsm,
     prepareModule,
     optimizeCss,
-    transpileToEs5
+    transpileToEs5,
   };
 };
 
@@ -37,7 +36,6 @@ export const createWorkerMsgHandler = (): d.WorkerMsgHandler => {
 export const initWorkerThread = (glbl: any) => {
   if (IS_WEB_WORKER_ENV) {
     initWebWorkerThread(glbl, createWorkerMsgHandler());
-
   } else if (IS_NODE_ENV && glbl.process.argv.includes('stencil-compiler-worker')) {
     initNodeWorkerThread(glbl.process, createWorkerMsgHandler());
   }

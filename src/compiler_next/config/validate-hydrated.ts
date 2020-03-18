@@ -1,7 +1,6 @@
 import { Config, HydratedFlag } from '../../declarations';
 import { isString } from '@utils';
 
-
 export const validateHydrated = (config: Config) => {
   if (config.hydratedFlag === null || config.hydratedFlag === false) {
     return null;

@@ -2,9 +2,7 @@ import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
-
 describe('component-styles', () => {
-
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;
@@ -16,7 +14,6 @@ describe('component-styles', () => {
     await compiler.fs.writeFile(path.join(root, 'src', 'index.html'), `<cmp-a></cmp-a>`);
     await compiler.fs.commit();
   });
-
 
   it('should build one component w/ out inline style, and re-compile when adding inline styles', async () => {
     compiler.config.watch = true;
@@ -31,9 +28,12 @@ describe('component-styles', () => {
 
     const rebuildListener = compiler.once('buildFinish');
 
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styles: 'body { color: green; }' }) export class CmpA {}`,
-    }, { clearFileCache: true });
+    await compiler.fs.writeFiles(
+      {
+        [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styles: 'body { color: green; }' }) export class CmpA {}`,
+      },
+      { clearFileCache: true },
+    );
     await compiler.fs.commit();
 
     compiler.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.tsx'));
@@ -61,9 +61,12 @@ describe('component-styles', () => {
 
     const rebuildListener = compiler.once('buildFinish');
 
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
-    }, { clearFileCache: true });
+    await compiler.fs.writeFiles(
+      {
+        [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+      },
+      { clearFileCache: true },
+    );
     await compiler.fs.commit();
 
     compiler.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.tsx'));
@@ -94,9 +97,12 @@ describe('component-styles', () => {
 
     const rebuildListener = compiler.once('buildFinish');
 
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styles: 'body { color: green; }' }) export class CmpA {}`,
-    }, { clearFileCache: true });
+    await compiler.fs.writeFiles(
+      {
+        [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styles: 'body { color: green; }' }) export class CmpA {}`,
+      },
+      { clearFileCache: true },
+    );
     await compiler.fs.commit();
 
     compiler.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.tsx'));
@@ -117,7 +123,7 @@ describe('component-styles', () => {
     compiler.config.minifyCss = true;
     await compiler.fs.writeFiles({
       [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`,
-      [path.join(root, 'src', 'cmp-a.css')]: `body {    color:        red;    /** plz  minify me **/ }`
+      [path.join(root, 'src', 'cmp-a.css')]: `body {    color:        red;    /** plz  minify me **/ }`,
     });
     await compiler.fs.commit();
 
@@ -130,9 +136,12 @@ describe('component-styles', () => {
 
     const rebuildListener = compiler.once('buildFinish');
 
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'cmp-a.css')]: `body {    color:        green;    /** plz  minify me **/ }`
-    }, { clearFileCache: true });
+    await compiler.fs.writeFiles(
+      {
+        [path.join(root, 'src', 'cmp-a.css')]: `body {    color:        green;    /** plz  minify me **/ }`,
+      },
+      { clearFileCache: true },
+    );
     await compiler.fs.commit();
 
     compiler.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.css'));
@@ -151,7 +160,7 @@ describe('component-styles', () => {
       [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'file-a.css', shadow: true }) export class CmpA {}`,
       [path.join(root, 'src', 'file-a.css')]: `@import "file-b.css"; div { color: red; }`,
       [path.join(root, 'src', 'file-b.css')]: `@import "file-c.css"; span { color: green; }`,
-      [path.join(root, 'src', 'file-c.css')]: `p { color: blue; }`
+      [path.join(root, 'src', 'file-c.css')]: `p { color: blue; }`,
     });
     await compiler.fs.commit();
 
@@ -168,9 +177,12 @@ describe('component-styles', () => {
 
     const rebuildListener = compiler.once('buildFinish');
 
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'file-c.css')]: `p { color: yellow; }`,
-    }, { clearFileCache: true });
+    await compiler.fs.writeFiles(
+      {
+        [path.join(root, 'src', 'file-c.css')]: `p { color: yellow; }`,
+      },
+      { clearFileCache: true },
+    );
     await compiler.fs.commit();
 
     compiler.trigger('fileUpdate', path.join(root, 'src', 'file-c.css'));
@@ -190,7 +202,7 @@ describe('component-styles', () => {
     compiler.config.watch = true;
     await compiler.fs.writeFiles({
       [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css', shadow: true }) export class CmpA {}`,
-      [path.join(root, 'src', 'cmp-a.css')]: `body { color: red; }`
+      [path.join(root, 'src', 'cmp-a.css')]: `body { color: red; }`,
     });
     await compiler.fs.commit();
 
@@ -205,9 +217,12 @@ describe('component-styles', () => {
 
     const rebuildListener = compiler.once('buildFinish');
 
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA { constructor() { console.log('88'); } }`,
-    }, { clearFileCache: true });
+    await compiler.fs.writeFiles(
+      {
+        [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA { constructor() { console.log('88'); } }`,
+      },
+      { clearFileCache: true },
+    );
     await compiler.fs.commit();
 
     compiler.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.tsx'));
@@ -226,7 +241,7 @@ describe('component-styles', () => {
     await compiler.fs.writeFiles({
       [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a-red.css', shadow: true }) export class CmpA {}`,
       [path.join(root, 'src', 'cmp-a-red.css')]: `body { color: red; }`,
-      [path.join(root, 'src', 'cmp-a-blue.css')]: `body { color: blue; }`
+      [path.join(root, 'src', 'cmp-a-blue.css')]: `body { color: blue; }`,
     });
     await compiler.fs.commit();
 
@@ -241,9 +256,12 @@ describe('component-styles', () => {
 
     const rebuildListener = compiler.once('buildFinish');
 
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a-blue.css' }) export class CmpA { constructor() { console.log('88'); } }`,
-    }, { clearFileCache: true });
+    await compiler.fs.writeFiles(
+      {
+        [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a-blue.css' }) export class CmpA { constructor() { console.log('88'); } }`,
+      },
+      { clearFileCache: true },
+    );
     await compiler.fs.commit();
 
     compiler.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.tsx'));
@@ -256,5 +274,4 @@ describe('component-styles', () => {
     expect(content).toContain(`color: blue`);
     expect(content).toContain(`console.log('88')`);
   });
-
 });

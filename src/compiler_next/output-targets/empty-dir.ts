@@ -1,31 +1,32 @@
 import * as d from '../../declarations';
-import { isOutputTargetDist, isOutputTargetDistLazyLoader, isOutputTargetDistSelfContained, isOutputTargetHydrate, isOutputTargetWww, isOutputTargetDistCustomElements, isOutputTargetDistLazy } from './output-utils';
+import {
+  isOutputTargetDist,
+  isOutputTargetDistLazyLoader,
+  isOutputTargetDistSelfContained,
+  isOutputTargetHydrate,
+  isOutputTargetWww,
+  isOutputTargetDistCustomElements,
+  isOutputTargetDistLazy,
+} from './output-utils';
 import { isString } from '@utils';
 import { join } from 'path';
 
+type OutputTargetEmptiable = d.OutputTargetDist | d.OutputTargetWww | d.OutputTargetDistLazyLoader | d.OutputTargetDistSelfContained | d.OutputTargetHydrate;
 
-type OutputTargetEmptiable =
-  d.OutputTargetDist |
-  d.OutputTargetWww |
-  d.OutputTargetDistLazyLoader |
-  d.OutputTargetDistSelfContained |
-  d.OutputTargetHydrate;
-
-const isEmptable = (o: d.OutputTarget): o is OutputTargetEmptiable => (
+const isEmptable = (o: d.OutputTarget): o is OutputTargetEmptiable =>
   isOutputTargetDist(o) ||
   isOutputTargetDistCustomElements(o) ||
   isOutputTargetWww(o) ||
   isOutputTargetDistLazy(o) ||
   isOutputTargetDistLazyLoader(o) ||
   isOutputTargetDistSelfContained(o) ||
-  isOutputTargetHydrate(o)
-);
+  isOutputTargetHydrate(o);
 
 export const emptyOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (buildCtx.isRebuild || config.logLevel === 'debug') {
     return;
   }
-  const cleanDirs = (config.outputTargets)
+  const cleanDirs = config.outputTargets
     .filter(isEmptable)
     .filter(o => o.empty === true)
     .map(o => o.dir || (o as any).esmDir)
@@ -42,9 +43,7 @@ export const emptyOutputTargets = async (config: d.Config, compilerCtx: d.Compil
   }
 
   const timeSpan = buildCtx.createTimeSpan(`cleaning ${cleanDirs.length} dirs`, true);
-  await Promise.all(
-    cleanDirs.map(dir => emptyDir(compilerCtx, buildCtx, dir))
-  );
+  await Promise.all(cleanDirs.map(dir => emptyDir(compilerCtx, buildCtx, dir)));
   timeSpan.finish('cleaning dirs finished');
 };
 

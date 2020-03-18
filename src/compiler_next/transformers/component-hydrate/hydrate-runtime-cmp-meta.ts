@@ -4,7 +4,6 @@ import { CMP_FLAGS, formatComponentRuntimeMeta } from '@utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import ts from 'typescript';
 
-
 export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   const compactMeta: d.ComponentRuntimeMetaCompact = formatComponentRuntimeMeta(cmp, true);
   const cmpMeta: d.ComponentRuntimeMeta = {

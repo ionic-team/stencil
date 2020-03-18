@@ -1,4 +1,3 @@
-
 export {
   Build,
   ChildNode,
@@ -43,7 +42,4 @@ export {
   writeTask,
 } from './stencil-public-runtime';
 
-
-export {
-  StencilConfig as Config,
-} from './stencil-public-compiler';
+export { StencilConfig as Config } from './stencil-public-compiler';

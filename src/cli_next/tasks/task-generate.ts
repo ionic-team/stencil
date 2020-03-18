@@ -26,8 +26,7 @@ export async function taskGenerate(config: d.Config) {
   }
 
   const input =
-    config.flags.unknownArgs.find(arg => !arg.startsWith('-')) ||
-    (await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string;
+    config.flags.unknownArgs.find(arg => !arg.startsWith('-')) || ((await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string);
 
   const { dir, base: componentName } = parse(input);
 
@@ -43,9 +42,7 @@ export async function taskGenerate(config: d.Config) {
   await mkdir(outDir, { recursive: true });
 
   const writtenFiles = await Promise.all(
-    extensionsToGenerate.map(extension =>
-      writeFileByExtension(outDir, componentName, extension, extensionsToGenerate.includes('css')),
-    ),
+    extensionsToGenerate.map(extension => writeFileByExtension(outDir, componentName, extension, extensionsToGenerate.includes('css'))),
   ).catch(error => config.logger.error(error));
 
   if (!writtenFiles) {
@@ -65,16 +62,18 @@ export async function taskGenerate(config: d.Config) {
  * Show a checkbox prompt to select the files to be generated.
  */
 const chooseFilesToGenerate = async () =>
-  (await prompt({
-    name: 'filesToGenerate',
-    type: 'multiselect',
-    message: 'Which additional files do you want to generate?',
-    choices: [
-      { value: 'css', title: 'Stylesheet (.css)', selected: true },
-      { value: 'spec.tsx', title: 'Spec Test  (.spec.tsx)', selected: true },
-      { value: 'e2e.ts', title: 'E2E Test (.e2e.ts)', selected: true },
-    ] as any[],
-  })).filesToGenerate as GeneratableExtension[];
+  (
+    await prompt({
+      name: 'filesToGenerate',
+      type: 'multiselect',
+      message: 'Which additional files do you want to generate?',
+      choices: [
+        { value: 'css', title: 'Stylesheet (.css)', selected: true },
+        { value: 'spec.tsx', title: 'Spec Test  (.spec.tsx)', selected: true },
+        { value: 'e2e.ts', title: 'E2E Test (.e2e.ts)', selected: true },
+      ] as any[],
+    })
+  ).filesToGenerate as GeneratableExtension[];
 
 /**
  * Get a file's boilerplate by its extension and write it to disk.
@@ -143,7 +142,7 @@ export class ${toPascalCase(tagName)} implements ComponentInterface {
  * Get the boilerplate for style.
  */
 const getStyleUrlBoilerplate = () =>
-`:host {
+  `:host {
   display: block;
 }
 `;
@@ -152,7 +151,7 @@ const getStyleUrlBoilerplate = () =>
  * Get the boilerplate for a spec test.
  */
 const getSpecTestBoilerplate = (tagName: string) =>
-`import { newSpecPage } from '@stencil/core/testing';
+  `import { newSpecPage } from '@stencil/core/testing';
 import { ${toPascalCase(tagName)} } from './${tagName}';
 
 describe('${tagName}', () => {
@@ -176,7 +175,7 @@ describe('${tagName}', () => {
  * Get the boilerplate for an E2E test.
  */
 const getE2eTestBoilerplate = (name: string) =>
-`import { newE2EPage } from '@stencil/core/testing';
+  `import { newE2EPage } from '@stencil/core/testing';
 
 describe('${name}', () => {
   it('renders', async () => {
@@ -192,8 +191,7 @@ describe('${name}', () => {
 /**
  * Convert a dash case string to pascal case.
  */
-const toPascalCase = (str: string) =>
-  str.split('-').reduce((res, part) => res + part[0].toUpperCase() + part.substr(1), '');
+const toPascalCase = (str: string) => str.split('-').reduce((res, part) => res + part[0].toUpperCase() + part.substr(1), '');
 
 /**
  * Extensions available to generate.

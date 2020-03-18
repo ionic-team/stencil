@@ -5,9 +5,7 @@ import { normalizePath } from '@utils';
 import { ScreenshotConnector } from './connector-base';
 import { URL } from 'url';
 
-
 export class ScreenshotLocalConnector extends ScreenshotConnector {
-
   async publishBuild(results: d.ScreenshotBuildResults) {
     if (this.updateMaster || !results.masterBuild) {
       results.masterBuild = {
@@ -15,7 +13,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
         message: 'Master',
         appNamespace: this.appNamespace,
         timestamp: Date.now(),
-        screenshots: []
+        screenshots: [],
       };
     }
 
@@ -49,11 +47,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
     const gitIgnorePath = join(this.screenshotDir, '.gitignore');
     const gitIgnoreExists = await fileExists(gitIgnorePath);
     if (!gitIgnoreExists) {
-      const content = [
-        this.imagesDirName,
-        this.buildsDirName,
-        compareAppFileName
-      ];
+      const content = [this.imagesDirName, this.buildsDirName, compareAppFileName];
       await writeFile(gitIgnorePath, content.join('\n'));
     }
 
@@ -63,7 +57,6 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
 
     return results;
   }
-
 
   async getScreenshotCache() {
     let screenshotCache: d.ScreenshotCache = null;
@@ -82,9 +75,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
 
     return cache;
   }
-
 }
-
 
 function createLocalCompareApp(namespace: string, appSrcUrl: string, imagesUrl: string, jsonpUrl: string, a: d.ScreenshotBuild, b: d.ScreenshotBuild) {
   return `<!doctype html>

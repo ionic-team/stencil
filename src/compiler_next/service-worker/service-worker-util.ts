@@ -2,12 +2,8 @@ import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 import { relative } from 'path';
 
-
 export const generateServiceWorkerUrl = (outputTarget: d.OutputTargetWww, serviceWorker: d.ServiceWorkerConfig) => {
-  let swUrl = normalizePath(relative(
-    outputTarget.appDir,
-    serviceWorker.swDest
-  ));
+  let swUrl = normalizePath(relative(outputTarget.appDir, serviceWorker.swDest));
 
   if (swUrl.charAt(0) !== '/') {
     swUrl = '/' + swUrl;

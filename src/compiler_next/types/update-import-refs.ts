@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { dirname, resolve } from 'path';
 
-
 /**
  * Find all referenced types by a component and add them to the importDataObj and return the newly
  * updated importDataObj
@@ -14,15 +13,11 @@ import { dirname, resolve } from 'path';
 export const updateReferenceTypeImports = (importDataObj: d.TypesImportData, allTypes: Map<string, number>, cmp: d.ComponentCompilerMeta, filePath: string) => {
   const updateImportReferences = updateImportReferenceFactory(allTypes, filePath);
 
-  return [
-    ...cmp.properties,
-    ...cmp.events,
-    ...cmp.methods,
-  ]
-  .filter(cmpProp => cmpProp.complexType && cmpProp.complexType.references)
-  .reduce((obj, cmpProp) => {
-    return updateImportReferences(obj, cmpProp.complexType.references);
-  }, importDataObj);
+  return [...cmp.properties, ...cmp.events, ...cmp.methods]
+    .filter(cmpProp => cmpProp.complexType && cmpProp.complexType.references)
+    .reduce((obj, cmpProp) => {
+      return updateImportReferences(obj, cmpProp.complexType.references);
+    }, importDataObj);
 };
 
 const updateImportReferenceFactory = (allTypes: Map<string, number>, filePath: string) => {
@@ -37,45 +32,42 @@ const updateImportReferenceFactory = (allTypes: Map<string, number>, filePath: s
   }
 
   return (obj: d.TypesImportData, typeReferences: { [key: string]: d.ComponentCompilerTypeReference }) => {
-    Object.keys(typeReferences).map(typeName => {
-      return [typeName, typeReferences[typeName]] as [string, d.ComponentCompilerTypeReference];
-    }).forEach(([typeName, type]) => {
-      let importFileLocation: string;
+    Object.keys(typeReferences)
+      .map(typeName => {
+        return [typeName, typeReferences[typeName]] as [string, d.ComponentCompilerTypeReference];
+      })
+      .forEach(([typeName, type]) => {
+        let importFileLocation: string;
 
-      // If global then there is no import statement needed
-      if (type.location === 'global') {
-        return;
+        // If global then there is no import statement needed
+        if (type.location === 'global') {
+          return;
 
-      // If local then import location is the current file
-      } else if (type.location === 'local') {
-        importFileLocation = filePath;
+          // If local then import location is the current file
+        } else if (type.location === 'local') {
+          importFileLocation = filePath;
+        } else if (type.location === 'import') {
+          importFileLocation = type.path;
+        }
 
-      } else if (type.location === 'import') {
-        importFileLocation = type.path;
-      }
+        // If this is a relative path make it absolute
+        if (importFileLocation.startsWith('.')) {
+          importFileLocation = resolve(dirname(filePath), importFileLocation);
+        }
 
-      // If this is a relative path make it absolute
-      if (importFileLocation.startsWith('.')) {
-        importFileLocation =
-          resolve(
-            dirname(filePath),
-            importFileLocation
-          );
-      }
+        obj[importFileLocation] = obj[importFileLocation] || [];
 
-      obj[importFileLocation] = obj[importFileLocation] || [];
+        // If this file already has a reference to this type move on
+        if (obj[importFileLocation].find(df => df.localName === typeName)) {
+          return;
+        }
 
-      // If this file already has a reference to this type move on
-      if (obj[importFileLocation].find(df => df.localName === typeName)) {
-        return;
-      }
-
-      const newTypeName = getIncrementTypeName(typeName);
-      obj[importFileLocation].push({
-        localName: typeName,
-        importName: newTypeName
+        const newTypeName = getIncrementTypeName(typeName);
+        obj[importFileLocation].push({
+          localName: typeName,
+          importName: newTypeName,
+        });
       });
-    });
 
     return obj;
   };

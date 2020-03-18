@@ -6,7 +6,6 @@ import { getStencilInternalDtsUrl } from '../../fetch/fetch-utils';
 import { patchedTsResolveModule } from '../typescript-resolve-module';
 import ts from 'typescript';
 
-
 describe('typescript resolve module', () => {
   const config: d.Config = { rootDir: '/' };
   let inMemoryFs: d.InMemoryFileSystem;
@@ -19,7 +18,6 @@ describe('typescript resolve module', () => {
   });
 
   describe('ensureUrlExtension', () => {
-
     it('add d.ts ext as the containing url', () => {
       const url = 'http://stencil.com/filename';
       const containingUrl = 'http://stencil.com/index.d.ts';
@@ -40,7 +38,6 @@ describe('typescript resolve module', () => {
       const r = ensureUrlExtension(url, containingUrl);
       expect(r).toBe(url);
     });
-
   });
 
   it('resolve ./stencil-private.d.ts to full dts url when imported by internal dts url', () => {
@@ -54,9 +51,9 @@ describe('typescript resolve module', () => {
         packageId: {
           name: moduleName,
           subModuleName: '',
-          version: '__VERSION:STENCIL__'
-        }
-      }
+          version: '__VERSION:STENCIL__',
+        },
+      },
     });
   });
 
@@ -71,9 +68,9 @@ describe('typescript resolve module', () => {
         packageId: {
           name: moduleName,
           subModuleName: '',
-          version: '__VERSION:STENCIL__'
-        }
-      }
+          version: '__VERSION:STENCIL__',
+        },
+      },
     });
   });
 
@@ -88,9 +85,9 @@ describe('typescript resolve module', () => {
         packageId: {
           name: moduleName,
           subModuleName: '',
-          version: '__VERSION:STENCIL__'
-        }
-      }
+          version: '__VERSION:STENCIL__',
+        },
+      },
     });
   });
 
@@ -100,5 +97,4 @@ describe('typescript resolve module', () => {
     const r = patchedTsResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
     expect(r).toEqual(null);
   });
-
 });

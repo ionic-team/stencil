@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 
-
 export const ATTACH_SHADOW = '__stencil_attachShadow';
 export const CREATE_EVENT = '__stencil_createEvent';
 export const DEFINE_CUSTOM_ELEMENT = '__stencil_defineCustomElement';

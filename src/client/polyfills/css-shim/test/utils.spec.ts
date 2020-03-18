@@ -3,10 +3,8 @@ import { parseCSS } from '../scope';
 import { getDeclarations, normalizeValue, resolveValues } from '../selectors';
 import { CSSSelector, Declaration } from '../interfaces';
 
-
 describe('utils', () => {
   describe('resolveValues', () => {
-
     it('should resolve values', () => {
       const css = parseCSS(`
       .class{
@@ -76,24 +74,23 @@ describe('utils', () => {
 
   describe('normalizeValue', () => {
     it('should normalize CSS value', () => {
-
       expect(normalizeValue(' 12px ')).toEqual({
         value: '12px',
-        important: false
+        important: false,
       });
       expect(normalizeValue('12 px')).toEqual({
         value: '12 px',
-        important: false
+        important: false,
       });
 
       expect(normalizeValue('0 .1   2 \n 3px  ')).toEqual({
         value: '0 .1 2 3px',
-        important: false
+        important: false,
       });
 
       expect(normalizeValue('233, 244 244\t!important\n')).toEqual({
         value: '233, 244 244',
-        important: true
+        important: true,
       });
     });
   });
@@ -118,11 +115,15 @@ describe('utils', () => {
         important: false,
       });
 
-      testDeclaration(declarations[1], {
-        prop: '--var',
-        value: 'value',
-        important: false,
-      }, {'--variable': 'value'});
+      testDeclaration(
+        declarations[1],
+        {
+          prop: '--var',
+          value: 'value',
+          important: false,
+        },
+        { '--variable': 'value' },
+      );
 
       testDeclaration(declarations[2], {
         prop: '--color',
@@ -144,7 +145,6 @@ describe('utils', () => {
     });
   });
 
-
   function testDeclaration(dec: Declaration, exp: any, props: any = {}) {
     expect(dec.prop).toBe(exp.prop);
     expect(executeTemplate(dec.value, props)).toBe(exp.value);
@@ -156,10 +156,7 @@ describe('utils', () => {
     expect(selector.nu).toBe(expected.nu);
     expect(selector.specificity).toBe(expected.specificity);
     for (let i = 0; i < expected.declarations.length; i++) {
-      testDeclaration(
-        selector.declarations[i],
-        expected.declarations[i]
-      );
+      testDeclaration(selector.declarations[i], expected.declarations[i]);
     }
   }
 
@@ -186,50 +183,48 @@ describe('utils', () => {
 
       testSelector(selectors[0], {
         selector: 'ion-button',
-        declarations: [
-          { prop: '--value', value: 'transparent', important: false}
-        ],
+        declarations: [{ prop: '--value', value: 'transparent', important: false }],
         specificity: 1,
-        nu: 0
+        nu: 0,
       });
       testSelector(selectors[1], {
         selector: 'ion-button.color',
         declarations: [
-          { prop: '--value', value: 'black', important: false},
-          { prop: '--background', value: 'transparent', important: false
-        }],
+          { prop: '--value', value: 'black', important: false },
+          { prop: '--background', value: 'transparent', important: false },
+        ],
         specificity: 1,
-        nu: 1
+        nu: 1,
       });
 
       testSelector(selectors[2], {
         selector: '.color-background',
         declarations: [
-          { prop: '--stuff', value: '0 0 10x ', important: false},
-          { prop: '--background', value: '#00000', important: false}
+          { prop: '--stuff', value: '0 0 10x ', important: false },
+          { prop: '--background', value: '#00000', important: false },
         ],
         specificity: 1,
-        nu: 2
+        nu: 2,
       });
 
       testSelector(selectors[3], {
         selector: '.color-active',
         declarations: [
-          { prop: '--stuff', value: '0 0 10x ', important: false},
-          { prop: '--background', value: '#00000', important: false}
+          { prop: '--stuff', value: '0 0 10x ', important: false },
+          { prop: '--background', value: '#00000', important: false },
         ],
         specificity: 1,
-        nu: 2
+        nu: 2,
       });
 
       testSelector(selectors[4], {
         selector: ':host(.toolbar) .color-focused',
         declarations: [
-          { prop: '--stuff', value: '0 0 10x ', important: false},
-          { prop: '--background', value: '#00000', important: false}
+          { prop: '--stuff', value: '0 0 10x ', important: false },
+          { prop: '--background', value: '#00000', important: false },
         ],
         specificity: 1,
-        nu: 2
+        nu: 2,
       });
     });
   });

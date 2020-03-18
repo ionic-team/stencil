@@ -10,7 +10,6 @@ import { updateComponentClass } from '../update-component-class';
 import { updateNativeConstructor } from './native-constructor';
 import ts from 'typescript';
 
-
 export const updateNativeComponentClass = (transformOpts: d.TransformOptions, classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   const heritageClauses = updateNativeHostComponentHeritageClauses(classNode, moduleFile);
   const members = updateNativeHostComponentMembers(transformOpts, classNode, moduleFile, cmp);
@@ -26,13 +25,7 @@ const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration
     addCoreRuntimeApi(moduleFile, RUNTIME_APIS.HTMLElement);
   }
 
-  const heritageClause = ts.createHeritageClause(
-    ts.SyntaxKind.ExtendsKeyword, [
-      ts.createExpressionWithTypeArguments([],
-        ts.createIdentifier(HTML_ELEMENT)
-      )
-    ]
-  );
+  const heritageClause = ts.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [ts.createExpressionWithTypeArguments([], ts.createIdentifier(HTML_ELEMENT))]);
 
   return [heritageClause];
 };

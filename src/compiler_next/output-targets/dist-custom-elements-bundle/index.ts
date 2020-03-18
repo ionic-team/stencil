@@ -12,7 +12,6 @@ import { removeCollectionImports } from '../../transformers/remove-collection-im
 import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 
-
 export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (config.devMode) {
     return;
@@ -32,10 +31,10 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
       conditionals: getBuildConditionals(config, buildCtx.components),
       customTransformers: getCustomElementBundleCustomTransformer(config, compilerCtx),
       inputs: {
-        'index': '@core-entrypoint'
+        index: '@core-entrypoint',
       },
       loader: {
-        '@core-entrypoint': generateEntryPoint(buildCtx)
+        '@core-entrypoint': generateEntryPoint(buildCtx),
       },
       inlineDynamicImports: true,
     };
@@ -51,7 +50,7 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
       const optimizeResults = await optimizeModule(config, compilerCtx, {
         input: code,
         isCore: true,
-        minify: config.minifyJs
+        minify: config.minifyJs,
       });
       buildCtx.diagnostics.push(...optimizeResults.diagnostics);
       if (!hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
@@ -60,15 +59,10 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
 
       await Promise.all(
         outputTargets.map(o => {
-          return compilerCtx.fs.writeFile(
-            join(o.dir, 'index.mjs'),
-            code,
-            { outputTargetType: o.type }
-          );
-        })
+          return compilerCtx.fs.writeFile(join(o.dir, 'index.mjs'), code, { outputTargetType: o.type });
+        }),
       );
     }
-
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
@@ -92,28 +86,17 @@ const generateEntryPoint = (buildCtx: d.BuildCtx) => {
     const importAs = `$Cmp${exportName}`;
 
     if (cmp.isPlain) {
-      exports.push(
-        `export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`,
-      );
-
+      exports.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
     } else {
       const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
 
-      imports.push(
-        `import { ${importName} as ${importAs} } from '${cmp.sourceFilePath}';`
-      );
+      imports.push(`import { ${importName} as ${importAs} } from '${cmp.sourceFilePath}';`);
 
-      exports.push(
-        `export const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});`
-      );
+      exports.push(`export const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});`);
     }
   });
 
-  return [
-    ...imports,
-    ...exports,
-    ''
-  ].join('\n');
+  return [...imports, ...exports, ''].join('\n');
 };
 
 const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
@@ -139,9 +122,5 @@ const getCustomElementBundleCustomTransformer = (config: d.Config, compilerCtx: 
     proxy: null,
     style: 'static',
   };
-  return [
-    updateStencilCoreImports(transformOpts.coreImportPath),
-    nativeComponentTransform(compilerCtx, transformOpts),
-    removeCollectionImports(compilerCtx),
-  ];
+  return [updateStencilCoreImports(transformOpts.coreImportPath), nativeComponentTransform(compilerCtx, transformOpts), removeCollectionImports(compilerCtx)];
 };

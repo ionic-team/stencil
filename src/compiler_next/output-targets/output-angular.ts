@@ -3,7 +3,6 @@ import { dashToPascalCase, relativeImport, sortBy } from '@utils';
 import { dirname, join } from 'path';
 import { isOutputTargetAngular } from './output-utils';
 
-
 export const outputAngular = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const angularOutputTargets = config.outputTargets.filter(isOutputTargetAngular);
   if (angularOutputTargets.length === 0) {
@@ -11,10 +10,7 @@ export const outputAngular = async (config: d.Config, compilerCtx: d.CompilerCtx
   }
 
   const timespan = buildCtx.createTimeSpan(`generate angular proxies started`, true);
-  await Promise.all(
-    angularOutputTargets.map(outputTarget => (
-      angularDirectiveProxyOutput(config, compilerCtx, buildCtx, outputTarget))
-    ));
+  await Promise.all(angularOutputTargets.map(outputTarget => angularDirectiveProxyOutput(config, compilerCtx, buildCtx, outputTarget)));
 
   timespan.finish(`generate angular proxies finished`);
 };
@@ -25,13 +21,12 @@ export const angularDirectiveProxyOutput = (config: d.Config, compilerCtx: d.Com
   return Promise.all([
     generateProxies(config, compilerCtx, buildCtx, filteredComponents, outputTarget),
     generateAngularArray(compilerCtx, filteredComponents, outputTarget),
-    generateAngularUtils(compilerCtx, outputTarget)
+    generateAngularUtils(compilerCtx, outputTarget),
   ]);
 };
 
 const getFilteredComponents = (excludeComponents: string[] = [], cmps: d.ComponentCompilerMeta[]) => {
-  return sortBy(cmps, cmp => cmp.tagName)
-    .filter(c => !excludeComponents.includes(c.tagName) && !c.internal);
+  return sortBy(cmps, cmp => cmp.tagName).filter(c => !excludeComponents.includes(c.tagName) && !c.internal);
 };
 
 const generateProxies = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular) => {
@@ -44,16 +39,11 @@ const generateProxies = async (config: d.Config, compilerCtx: d.CompilerCtx, bui
 /* auto-generated angular directive proxies */
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, NgZone } from '@angular/core';`;
 
-  const sourceImports = !outputTarget.componentCorePackage ?
-    `import { Components } from '${componentsTypeFile}';` :
-    `import { Components } from '${outputTarget.componentCorePackage}';`;
+  const sourceImports = !outputTarget.componentCorePackage
+    ? `import { Components } from '${componentsTypeFile}';`
+    : `import { Components } from '${outputTarget.componentCorePackage}';`;
 
-  const final: string[] = [
-    imports,
-    getProxyUtils(outputTarget),
-    sourceImports,
-    proxies,
-  ];
+  const final: string[] = [imports, getProxyUtils(outputTarget), sourceImports, proxies];
 
   const finalText = final.join('\n') + '\n';
 
@@ -61,17 +51,17 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Even
 };
 
 const getProxies = (components: d.ComponentCompilerMeta[]) => {
-  return components
-    .map(getProxy)
-    .join('\n');
+  return components.map(getProxy).join('\n');
 };
 
-const getProxyCmp = (inputs: string[],methods: string[]): string => {
+const getProxyCmp = (inputs: string[], methods: string[]): string => {
   const hasInputs = inputs.length > 0;
   const hasMethods = methods.length > 0;
   const proxMeta: string[] = [];
 
-  if (!hasInputs && !hasMethods) { return''; }
+  if (!hasInputs && !hasMethods) {
+    return '';
+  }
 
   if (hasInputs) proxMeta.push(`inputs: ['${inputs.join(`', '`)}']`);
   if (hasMethods) proxMeta.push(`'methods': ['${methods.join(`', '`)}']`);
@@ -88,21 +78,19 @@ const getProxy = (cmpMeta: d.ComponentCompilerMeta) => {
   const hasOutputs = outputs.length > 0;
 
   // Generate Angular @Directive
-  const directiveOpts = [
-    `selector: \'${cmpMeta.tagName}\'`,
-    `changeDetection: ChangeDetectionStrategy.OnPush`,
-    `template: '<ng-content></ng-content>'`
-  ];
+  const directiveOpts = [`selector: \'${cmpMeta.tagName}\'`, `changeDetection: ChangeDetectionStrategy.OnPush`, `template: '<ng-content></ng-content>'`];
   if (inputs.length > 0) {
     directiveOpts.push(`inputs: ['${inputs.join(`', '`)}']`);
   }
 
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagName);
-  const lines = [`
+  const lines = [
+    `
 export declare interface ${tagNameAsPascal} extends Components.${tagNameAsPascal} {}
 ${getProxyCmp(inputs, methods)}
 @Component({ ${directiveOpts.join(', ')} })
-export class ${tagNameAsPascal} {`];
+export class ${tagNameAsPascal} {`,
+  ];
 
   // Generate outputs
   outputs.forEach(output => {
@@ -123,10 +111,7 @@ export class ${tagNameAsPascal} {`];
 };
 
 const getInputs = (cmpMeta: d.ComponentCompilerMeta): string[] => {
-  return [
-    ...cmpMeta.properties.filter(prop => !prop.internal).map(prop => prop.name),
-    ...cmpMeta.virtualProperties.map(prop => prop.name)
-  ].sort();
+  return [...cmpMeta.properties.filter(prop => !prop.internal).map(prop => prop.name), ...cmpMeta.virtualProperties.map(prop => prop.name)].sort();
 };
 
 const getOutputs = (cmpMeta: d.ComponentCompilerMeta): string[] => {

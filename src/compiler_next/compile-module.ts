@@ -7,7 +7,6 @@ import { rollupPluginUtils } from '@compiler-plugins';
 import { transformCssToEsm, transformCssToEsmSync } from './style/css-to-esm';
 import { transpileModule } from './transpile/transpile-module';
 
-
 export const compile = async (code: string, opts: CompileOptions = {}) => {
   const { importData, results } = getCompileResults(code, opts);
 
@@ -16,18 +15,14 @@ export const compile = async (code: string, opts: CompileOptions = {}) => {
       const { config, compileOpts, transformOpts } = getCompileModuleConfig(opts);
       await patchTypescript(config, results.diagnostics, null);
       compileModule(config, compileOpts, transformOpts, results);
-
     } else if (results.inputFileExtension === 'd.ts') {
       results.code = '';
-
     } else if (results.inputFileExtension === 'css') {
       const transformInput = getCompileCssConfig(opts, importData, results);
       await compileCss(transformInput, results);
-
     } else if (results.inputFileExtension === 'json') {
       compileJson(results);
     }
-
   } catch (e) {
     catchError(results.diagnostics, e);
   }
@@ -43,18 +38,14 @@ export const compileSync = (code: string, opts: CompileOptions = {}) => {
       const { config, compileOpts, transformOpts } = getCompileModuleConfig(opts);
       patchTypescriptSync(config, results.diagnostics, null);
       compileModule(config, compileOpts, transformOpts, results);
-
     } else if (results.inputFileExtension === 'd.ts') {
       results.code = '';
-
     } else if (results.inputFileExtension === 'css') {
       const transformInput = getCompileCssConfig(opts, importData, results);
       compileCssSync(transformInput, results);
-
     } else if (results.inputFileExtension === 'json') {
       compileJson(results);
     }
-
   } catch (e) {
     catchError(results.diagnostics, e);
   }
@@ -102,7 +93,7 @@ const compileModule = (config: Config, compileOpts: CompileOptions, transformOpt
 
     moduleFile.originalImports.forEach(originalImport => {
       results.imports.push({
-        path: originalImport
+        path: originalImport,
       });
     });
   }
@@ -131,11 +122,6 @@ const compileJson = (results: CompileResults) => {
     indent: '  ',
   });
   results.map = { mappings: '' };
-}
+};
 
-const shouldTranspileCode = (ext: string) => (
-  ext === 'tsx' ||
-  ext === 'ts' ||
-  ext === 'jsx' ||
-  ext === 'mjs'
-);
+const shouldTranspileCode = (ext: string) => ext === 'tsx' || ext === 'ts' || ext === 'jsx' || ext === 'mjs';

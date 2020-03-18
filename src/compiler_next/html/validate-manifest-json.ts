@@ -3,7 +3,6 @@ import { buildError, buildJsonFileError } from '@utils';
 import { dirname, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
-
 export const validateManifestJson = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (config.devMode) {
     return null;
@@ -11,31 +10,34 @@ export const validateManifestJson = (config: d.Config, compilerCtx: d.CompilerCt
 
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
 
-  return Promise.all(outputTargets.map(async outputsTarget => {
-    const manifestFilePath = join(outputsTarget.dir, 'manifest.json');
+  return Promise.all(
+    outputTargets.map(async outputsTarget => {
+      const manifestFilePath = join(outputsTarget.dir, 'manifest.json');
 
-    try {
-      const manifestContent = await compilerCtx.fs.readFile(manifestFilePath);
-      if (manifestContent) {
-        try {
-          const manifestData = JSON.parse(manifestContent);
-          await validateManifestJsonData(compilerCtx, buildCtx, manifestFilePath, manifestData);
-
-        } catch (e) {
-          const err = buildError(buildCtx.diagnostics);
-          err.header = `Invalid manifest.json: ${e}`;
-          err.absFilePath = manifestFilePath;
+      try {
+        const manifestContent = await compilerCtx.fs.readFile(manifestFilePath);
+        if (manifestContent) {
+          try {
+            const manifestData = JSON.parse(manifestContent);
+            await validateManifestJsonData(compilerCtx, buildCtx, manifestFilePath, manifestData);
+          } catch (e) {
+            const err = buildError(buildCtx.diagnostics);
+            err.header = `Invalid manifest.json: ${e}`;
+            err.absFilePath = manifestFilePath;
+          }
         }
-      }
-    } catch (e) {}
-  }));
+      } catch (e) {}
+    }),
+  );
 };
 
 const validateManifestJsonData = async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, manifestFilePath: string, manifestData: any) => {
   if (Array.isArray(manifestData.icons)) {
-    await Promise.all(manifestData.icons.map((manifestIcon: any) => {
-      return validateManifestJsonIcon(compilerCtx, buildCtx, manifestFilePath, manifestIcon);
-    }));
+    await Promise.all(
+      manifestData.icons.map((manifestIcon: any) => {
+        return validateManifestJsonIcon(compilerCtx, buildCtx, manifestFilePath, manifestIcon);
+      }),
+    );
   }
 };
 

@@ -3,7 +3,6 @@ import { h, newVNode } from '../h';
 import { patch } from '../vdom-render';
 import { SVG_NS, XLINK_NS } from '@utils';
 
-
 describe('attributes', () => {
   let hostElm: d.HostElement;
   let vnode0: d.VNode;
@@ -24,7 +23,7 @@ describe('attributes', () => {
   });
 
   it('are not omitted when falsy values are provided', () => {
-    const vnode1 = h('div', {href: null, minlength: 0, value: false });
+    const vnode1 = h('div', { href: null, minlength: 0, value: false });
     patch(vnode0, vnode1);
     expect(hostElm.getAttribute('href')).toEqual(null);
     expect(hostElm.getAttribute('minlength')).toEqual('0');
@@ -38,7 +37,7 @@ describe('attributes', () => {
   });
 
   it('are set correctly when namespaced (2)', () => {
-    const vnode1 = h('svg', { 'xlinkHref': '#foo' });
+    const vnode1 = h('svg', { xlinkHref: '#foo' });
     patch(vnode0, vnode1);
     expect(hostElm.getAttributeNS(XLINK_NS, 'href')).toEqual('#foo');
   });
@@ -57,7 +56,6 @@ describe('attributes', () => {
   });
 
   describe('boolean attribute', () => {
-
     it('is present if the value is truthy', () => {
       const vnode1 = h('div', { required: true, readonly: 1, noresize: 'truthy' });
       patch(vnode0, vnode1);
@@ -78,14 +76,15 @@ describe('attributes', () => {
     });
   });
 
-  describe('svg', function () {
-
+  describe('svg', function() {
     it('adds correctly xlink namespaced attribute', () => {
       const testUrl = '/test';
-      const vnode1 = h('svg', {},
+      const vnode1 = h(
+        'svg',
+        {},
         h('div', {
-          'xlink:href': testUrl
-        })
+          'xlink:href': testUrl,
+        }),
       );
 
       hostElm = document.createElementNS(SVG_NS, 'svg') as any;
@@ -96,5 +95,4 @@ describe('attributes', () => {
       expect(hostElm.children[0].getAttributeNS(XLINK_NS, 'href')).toEqual(testUrl);
     });
   });
-
 });

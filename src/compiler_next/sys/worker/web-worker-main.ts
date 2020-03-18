@@ -1,7 +1,6 @@
 import * as d from '../../../declarations';
 import { TASK_CANCELED_MSG } from '@utils';
 
-
 export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWorkers: number): d.WorkerMainController => {
   let msgIds = 0;
   let isDestroyed = false;
@@ -34,7 +33,6 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
               if (worker.activeTasks < 0 || worker.activeTasks > 50) {
                 worker.activeTasks = 0;
               }
-
             } else if (msgFromWorker.stencilRtnError) {
               console.error(msgFromWorker.stencilRtnError);
             }
@@ -49,7 +47,7 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
   const createWebWorkerMain = () => {
     let worker: Worker = null;
     const workerOpts: WorkerOptions = {
-      name: `stencil.worker.${workerIds++}`
+      name: `stencil.worker.${workerIds++}`,
     };
 
     try {
@@ -58,10 +56,7 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
     } catch (e) {
       // probably a cross-origin issue, try using a Blob instead
       if (workerBlob == null) {
-        workerBlob = new Blob(
-          [`importScripts('${workerUrl}');`],
-          { type: 'application/javascript' }
-        );
+        workerBlob = new Blob([`importScripts('${workerUrl}');`], { type: 'application/javascript' });
       }
       worker = new Worker(URL.createObjectURL(workerBlob), workerOpts);
     }
@@ -72,7 +67,7 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
       sendQueue: [],
     };
     worker.onerror = onError;
-    worker.onmessage = (ev) => onMsgsFromWorker(workerChild, ev);
+    worker.onmessage = ev => onMsgsFromWorker(workerChild, ev);
 
     return workerChild;
   };
@@ -102,7 +97,6 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
           workers.push(theChoseOne);
         }
       }
-
     } else {
       theChoseOne = createWebWorkerMain();
       workers.push(theChoseOne);
@@ -119,28 +113,28 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
     workers.forEach(sendMsgsToWorkers);
   };
 
-  const send = (...args: any[]) => new Promise<any>((resolve, reject) => {
-    if (isDestroyed) {
-      reject(TASK_CANCELED_MSG);
+  const send = (...args: any[]) =>
+    new Promise<any>((resolve, reject) => {
+      if (isDestroyed) {
+        reject(TASK_CANCELED_MSG);
+      } else {
+        const msg: d.MsgToWorker = {
+          stencilId: msgIds++,
+          args,
+        };
+        queuedSendMsgs.push(msg);
 
-    } else {
-      const msg: d.MsgToWorker = {
-        stencilId: msgIds++,
-        args,
-      };
-      queuedSendMsgs.push(msg);
+        tasks.set(msg.stencilId, {
+          resolve,
+          reject,
+        });
 
-      tasks.set(msg.stencilId, {
-        resolve,
-        reject,
-      });
-
-      if (!isQueued) {
-        isQueued = true;
-        tick.then(flushSendQueue);
+        if (!isQueued) {
+          isQueued = true;
+          tick.then(flushSendQueue);
+        }
       }
-    }
-  });
+    });
 
   const destroy = () => {
     isDestroyed = true;
@@ -159,10 +153,9 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
   return {
     send,
     destroy,
-    handler
+    handler,
   };
 };
-
 
 interface WorkerChild {
   worker: Worker;

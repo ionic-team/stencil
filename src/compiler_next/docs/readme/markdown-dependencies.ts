@@ -2,7 +2,6 @@ import * as d from '../../../declarations';
 import { normalizePath } from '@utils';
 import { relative } from 'path';
 
-
 export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) => {
   const content: string[] = [];
   const deps = Object.entries(cmp.dependencyGraph);
@@ -14,8 +13,7 @@ export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsCompone
   content.push(``);
 
   if (cmp.dependents.length > 0) {
-    const usedBy = cmp.dependents
-      .map(tag => ' - ' + getCmpLink(cmp, tag, cmps));
+    const usedBy = cmp.dependents.map(tag => ' - ' + getCmpLink(cmp, tag, cmps));
 
     content.push(`### Used by`);
     content.push(``);
@@ -23,8 +21,7 @@ export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsCompone
     content.push(``);
   }
   if (cmp.dependencies.length > 0) {
-    const dependsOn = cmp.dependencies
-      .map(tag => '- ' + getCmpLink(cmp, tag, cmps));
+    const dependsOn = cmp.dependencies.map(tag => '- ' + getCmpLink(cmp, tag, cmps));
 
     content.push(`### Depends on`);
     content.push(``);

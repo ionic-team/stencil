@@ -3,9 +3,8 @@ import { HOST_CONFIG_FILENAME } from '../../prerender/host-config';
 import { isAbsolute, join } from 'path';
 import { isString } from '@utils';
 
-
 export const validateServiceWorker = (config: d.Config, outputTarget: d.OutputTargetWww) => {
-  if (outputTarget.serviceWorker === false ) {
+  if (outputTarget.serviceWorker === false) {
     return;
   }
   if (config.devMode && !config.flags.serviceWorker) {
@@ -20,7 +19,6 @@ export const validateServiceWorker = (config: d.Config, outputTarget: d.OutputTa
 
   if (outputTarget.serviceWorker === true) {
     outputTarget.serviceWorker = {};
-
   } else if (!outputTarget.serviceWorker && config.devMode) {
     outputTarget.serviceWorker = null;
     return;
@@ -35,7 +33,6 @@ export const validateServiceWorker = (config: d.Config, outputTarget: d.OutputTa
   if (!Array.isArray(outputTarget.serviceWorker.globPatterns)) {
     if (typeof outputTarget.serviceWorker.globPatterns === 'string') {
       outputTarget.serviceWorker.globPatterns = [outputTarget.serviceWorker.globPatterns];
-
     } else if (typeof outputTarget.serviceWorker.globPatterns !== 'string') {
       outputTarget.serviceWorker.globPatterns = DEFAULT_GLOB_PATTERNS.slice();
     }
@@ -79,9 +76,6 @@ const addGlobIgnores = (config: d.Config, globIgnores: string[]) => {
   );
 };
 
-const DEFAULT_GLOB_PATTERNS = [
-  '*.html',
-  '**/*.{js,css,json}',
-];
+const DEFAULT_GLOB_PATTERNS = ['*.html', '**/*.{js,css,json}'];
 
 const DEFAULT_FILENAME = 'sw.js';

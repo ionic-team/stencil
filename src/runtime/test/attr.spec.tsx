@@ -1,11 +1,9 @@
 import { Component, Element, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('attribute', () => {
-
   it('multi-word attribute', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop() multiWord: string;
       render() {
@@ -27,7 +25,7 @@ describe('attribute', () => {
   });
 
   it('custom attribute name', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop({ attribute: 'some-customName' }) customAttr: string;
       render() {
@@ -49,9 +47,8 @@ describe('attribute', () => {
   });
 
   describe('already set', () => {
-
     it('set boolean, "false"', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() bool: boolean;
         render() {
@@ -73,7 +70,7 @@ describe('attribute', () => {
     });
 
     it('set boolean, undefined when missing attribute', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() bool: boolean;
         render() {
@@ -95,7 +92,7 @@ describe('attribute', () => {
     });
 
     it('set boolean, "true"', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() bool: boolean;
         render() {
@@ -117,7 +114,7 @@ describe('attribute', () => {
     });
 
     it('set boolean true from no attribute value', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() bool: boolean;
         render() {
@@ -139,7 +136,7 @@ describe('attribute', () => {
     });
 
     it('set boolean true from empty string', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() bool: boolean;
         render() {
@@ -161,7 +158,7 @@ describe('attribute', () => {
     });
 
     it('set zero', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() num: number;
         render() {
@@ -183,7 +180,7 @@ describe('attribute', () => {
     });
 
     it('set number', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() num: number;
         render() {
@@ -205,7 +202,7 @@ describe('attribute', () => {
     });
 
     it('set string', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() str: string;
         render() {
@@ -227,7 +224,7 @@ describe('attribute', () => {
     });
 
     it('set empty string', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() str: string;
         render() {
@@ -247,25 +244,24 @@ describe('attribute', () => {
       expect(root.textContent).toBe('');
       expect(root.str).toBe('');
     });
-
   });
 
   describe('reflect', () => {
     it('should reflect properties as attributes', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Element() el: any;
 
-        @Prop({reflect: true}) str = 'single';
-        @Prop({reflect: true}) nu = 2;
-        @Prop({reflect: true}) undef: string;
-        @Prop({reflect: true}) null: string = null;
-        @Prop({reflect: true}) bool = false;
-        @Prop({reflect: true}) otherBool = true;
-        @Prop({reflect: true}) disabled = false;
+        @Prop({ reflect: true }) str = 'single';
+        @Prop({ reflect: true }) nu = 2;
+        @Prop({ reflect: true }) undef: string;
+        @Prop({ reflect: true }) null: string = null;
+        @Prop({ reflect: true }) bool = false;
+        @Prop({ reflect: true }) otherBool = true;
+        @Prop({ reflect: true }) disabled = false;
 
-        @Prop({reflect: true, mutable: true}) dynamicStr: string;
-        @Prop({reflect: true}) dynamicNu: number;
+        @Prop({ reflect: true, mutable: true }) dynamicStr: string;
+        @Prop({ reflect: true }) dynamicNu: number;
 
         componentWillLoad() {
           this.dynamicStr = 'value';
@@ -296,5 +292,4 @@ describe('attribute', () => {
       `);
     });
   });
-
 });

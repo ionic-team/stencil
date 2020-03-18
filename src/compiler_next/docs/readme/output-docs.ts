@@ -10,26 +10,33 @@ import { partsToMarkdown } from './markdown-parts';
 import { depsToMarkdown } from './markdown-dependencies';
 import { AUTO_GENERATE_COMMENT } from '../../docs/constants';
 
-
-export const generateReadme = async (config: d.Config, compilerCtx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocsReadme[], docsData: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) => {
+export const generateReadme = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  readmeOutputs: d.OutputTargetDocsReadme[],
+  docsData: d.JsonDocsComponent,
+  cmps: d.JsonDocsComponent[],
+) => {
   const isUpdate = !!docsData.readme;
   const userContent = isUpdate ? docsData.readme : getDefaultReadme(docsData);
 
-  await Promise.all(readmeOutputs.map(async readmeOutput => {
-    if (readmeOutput.dir) {
-      const readmeContent = generateMarkdown(userContent, docsData, cmps, readmeOutput);
-      const relPath = relative(config.srcDir, docsData.readmePath);
-      const absPath = join(readmeOutput.dir, relPath);
-      const results = await compilerCtx.fs.writeFile(absPath, readmeContent);
-      if (results.changedContent) {
-        if (isUpdate) {
-          config.logger.info(`updated readme docs: ${docsData.tag}`);
-        } else {
-          config.logger.info(`created readme docs: ${docsData.tag}`);
+  await Promise.all(
+    readmeOutputs.map(async readmeOutput => {
+      if (readmeOutput.dir) {
+        const readmeContent = generateMarkdown(userContent, docsData, cmps, readmeOutput);
+        const relPath = relative(config.srcDir, docsData.readmePath);
+        const absPath = join(readmeOutput.dir, relPath);
+        const results = await compilerCtx.fs.writeFile(absPath, readmeContent);
+        if (results.changedContent) {
+          if (isUpdate) {
+            config.logger.info(`updated readme docs: ${docsData.tag}`);
+          } else {
+            config.logger.info(`created readme docs: ${docsData.tag}`);
+          }
         }
       }
-    }
-  }));
+    }),
+  );
 };
 
 export const generateMarkdown = (userContent: string, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[], readmeOutput: d.OutputTargetDocsReadme) => {
@@ -52,25 +59,17 @@ export const generateMarkdown = (userContent: string, cmp: d.JsonDocsComponent, 
     `----------------------------------------------`,
     '',
     readmeOutput.footer,
-    ''
+    '',
   ].join('\n');
 };
 
 const getDocsDeprecation = (cmp: d.JsonDocsComponent) => {
   if (cmp.deprecation !== undefined) {
-    return [
-      `> **[DEPRECATED]** ${cmp.deprecation}`,
-      ''
-    ];
+    return [`> **[DEPRECATED]** ${cmp.deprecation}`, ''];
   }
   return [];
 };
 
 const getDefaultReadme = (docsData: d.JsonDocsComponent) => {
-  return [
-    `# ${docsData.tag}`,
-    '',
-    '',
-    ''
-  ].join('\n');
+  return [`# ${docsData.tag}`, '', '', ''].join('\n');
 };

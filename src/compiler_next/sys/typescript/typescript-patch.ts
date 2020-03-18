@@ -5,7 +5,6 @@ import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 import { patchTypeScriptSys, patchTypeScriptGetParsedCommandLineOfConfigFile } from './typescript-sys';
 import ts from 'typescript';
 
-
 export const patchTypescript = async (config: d.Config, diagnostics: d.Diagnostic[], inMemoryFs: d.InMemoryFileSystem) => {
   // dynamically load the typescript dependency
   const loadedTs = await loadTypescript(diagnostics, config.typescriptPath);

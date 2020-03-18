@@ -3,9 +3,7 @@ import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import { validateConfig } from '../validate-config';
 import path from 'path';
 
-
 describe('validateTesting', () => {
-
   let config: d.Config;
   const ROOT = path.resolve('/');
   const sys = mockStencilSystem();
@@ -18,14 +16,15 @@ describe('validateTesting', () => {
       rootDir: path.join(ROOT, 'User', 'some', 'path'),
       srcDir: path.join(ROOT, 'User', 'some', 'path', 'src'),
       flags: {},
-      namespace: 'Testing'
+      namespace: 'Testing',
     };
-    config.outputTargets = [{
-      type: 'www',
-      dir: sys.path.join(ROOT, 'www')
-    } as any as d.OutputTargetStats];
+    config.outputTargets = [
+      ({
+        type: 'www',
+        dir: sys.path.join(ROOT, 'www'),
+      } as any) as d.OutputTargetStats,
+    ];
   });
-
 
   it('set headless false w/ flag', () => {
     config.flags.e2e = true;
@@ -59,22 +58,13 @@ describe('validateTesting', () => {
     config.flags.e2e = true;
     config.flags.ci = true;
     validateConfig(config, [], false);
-    expect(config.testing.browserArgs).toEqual([
-      '--font-render-hinting=medium',
-      '--incognito',
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-    ]);
+    expect(config.testing.browserArgs).toEqual(['--font-render-hinting=medium', '--incognito', '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']);
   });
 
   it('default browser args', () => {
     config.flags.e2e = true;
     validateConfig(config, [], false);
-    expect(config.testing.browserArgs).toEqual([
-      '--font-render-hinting=medium',
-      '--incognito'
-    ]);
+    expect(config.testing.browserArgs).toEqual(['--font-render-hinting=medium', '--incognito']);
   });
 
   it('set default testPathIgnorePatterns', () => {
@@ -84,7 +74,7 @@ describe('validateTesting', () => {
       sys.path.join(ROOT, 'User', 'some', 'path', '.vscode'),
       sys.path.join(ROOT, 'User', 'some', 'path', '.stencil'),
       sys.path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
-      sys.path.join(ROOT, 'www')
+      sys.path.join(ROOT, 'www'),
     ]);
   });
 

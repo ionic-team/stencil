@@ -1,13 +1,11 @@
 import { Component, Host, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('hydrate, shadow parent', () => {
-
   it('slot depth 1, text w/out vdom', async () => {
     @Component({
       tag: 'cmp-a',
-      shadow: true
+      shadow: true,
     })
     class CmpA {
       render() {
@@ -27,7 +25,7 @@ describe('hydrate, shadow parent', () => {
       html: `
         <cmp-a>middle</cmp-a>
       `,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -45,7 +43,7 @@ describe('hydrate, shadow parent', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
     expect(clientHydrated.root['s-id']).toBe('1');
 
@@ -65,7 +63,7 @@ describe('hydrate, shadow parent', () => {
   it('slot, text w/out vdom', async () => {
     @Component({
       tag: 'cmp-a',
-      shadow: true
+      shadow: true,
     })
     class CmpA {
       render() {
@@ -85,7 +83,7 @@ describe('hydrate, shadow parent', () => {
       html: `
         <cmp-a>middle</cmp-a>
       `,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -105,7 +103,7 @@ describe('hydrate, shadow parent', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
     expect(clientHydrated.root['s-id']).toBe('1');
 
@@ -125,15 +123,11 @@ describe('hydrate, shadow parent', () => {
   it('no slot, child shadow text', async () => {
     @Component({
       tag: 'cmp-a',
-      shadow: true
+      shadow: true,
     })
     class CmpA {
       render() {
-        return (
-          <Host>
-            shadow-text
-          </Host>
-        );
+        return <Host>shadow-text</Host>;
       }
     }
 
@@ -143,7 +137,7 @@ describe('hydrate, shadow parent', () => {
       html: `
         <cmp-a></cmp-a>
       `,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -157,7 +151,7 @@ describe('hydrate, shadow parent', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
     expect(clientHydrated.root['s-id']).toBe('1');
 
@@ -173,7 +167,7 @@ describe('hydrate, shadow parent', () => {
   it('named slot and slot depth 1', async () => {
     @Component({
       tag: 'cmp-a',
-      shadow: true
+      shadow: true,
     })
     class CmpA {
       render() {
@@ -182,7 +176,7 @@ describe('hydrate, shadow parent', () => {
             <div>
               <slot></slot>
             </div>
-            <slot name='fixed'></slot>
+            <slot name="fixed"></slot>
           </Host>
         );
       }
@@ -194,7 +188,7 @@ describe('hydrate, shadow parent', () => {
       html: `
         <cmp-a></cmp-a>
       `,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -210,7 +204,7 @@ describe('hydrate, shadow parent', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
     expect(clientHydrated.root['s-id']).toBe('1');
 
@@ -251,7 +245,7 @@ describe('hydrate, shadow parent', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -297,13 +291,13 @@ describe('hydrate, shadow parent', () => {
         return (
           <Host>
             <section>
-              <slot name='start'></slot>
-              <slot name='secondary'></slot>
+              <slot name="start"></slot>
+              <slot name="secondary"></slot>
               <div>
                 <slot></slot>
               </div>
-              <slot name='primary'></slot>
-              <slot name='end'></slot>
+              <slot name="primary"></slot>
+              <slot name="end"></slot>
             </section>
           </Host>
         );
@@ -317,7 +311,7 @@ describe('hydrate, shadow parent', () => {
           Title
         </cmp-a>
       `,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -396,9 +390,7 @@ describe('hydrate, shadow parent', () => {
     @Component({ tag: 'ion-ripple-effect', shadow: true })
     class RippleEffect {
       render() {
-        return (
-          <Host></Host>
-        );
+        return <Host></Host>;
       }
     }
     // @ts-ignore
@@ -409,7 +401,7 @@ describe('hydrate, shadow parent', () => {
           <ion-badge>root-text</ion-badge>
         </ion-tab-button>
       `,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <ion-tab-button class="hydrated" s-id="1">
@@ -460,5 +452,4 @@ describe('hydrate, shadow parent', () => {
       </ion-tab-button>
     `);
   });
-
 });

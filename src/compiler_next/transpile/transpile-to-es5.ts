@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { loadTypeScriptDiagnostics, hasError } from '@utils';
 import { loadTypescript } from '../sys/typescript/typescript-load';
 
-
 export const transpileToEs5 = async (input: string, inlineHelpers: boolean) => {
   const diagnostics: d.Diagnostic[] = [];
   const ts = await loadTypescript(diagnostics, null);
@@ -13,7 +12,7 @@ export const transpileToEs5 = async (input: string, inlineHelpers: boolean) => {
     map: null,
     diagnostics: diagnostics,
     moduleFile: null,
-    build: {}
+    build: {},
   };
   if (hasError(diagnostics)) {
     return results;
@@ -30,14 +29,12 @@ export const transpileToEs5 = async (input: string, inlineHelpers: boolean) => {
       isolatedModules: true,
       skipLibCheck: true,
       noEmitHelpers: !inlineHelpers,
-      importHelpers: !inlineHelpers
-    }
+      importHelpers: !inlineHelpers,
+    },
   };
 
   const tsResults = ts.transpileModule(input, transpileOpts);
-  results.diagnostics.push(
-    ...loadTypeScriptDiagnostics(tsResults.diagnostics)
-  );
+  results.diagnostics.push(...loadTypeScriptDiagnostics(tsResults.diagnostics));
 
   return results;
 };

@@ -33,7 +33,7 @@ describe('prerender-utils', () => {
         urlsProcessing: null,
         resolve: null,
         templateId: null,
-        componentGraphPath: null
+        componentGraphPath: null,
       };
     });
 
@@ -109,7 +109,5 @@ describe('prerender-utils', () => {
       const filePath = getWriteFilePathFromUrlPath(manager, inputUrl);
       expect(filePath).toBe(join(rootDir, '/www/index.html'));
     });
-
   });
-
 });

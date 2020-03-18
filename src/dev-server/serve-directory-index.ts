@@ -18,7 +18,6 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
       req.filePath = indexFilePath;
       return serveFile(devServerConfig, sys, req, res);
     }
-
   } catch (e) {}
 
   if (!req.pathname.endsWith('/')) {
@@ -27,13 +26,13 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
         requestLog: {
           method: req.method,
           url: req.url,
-          status: 302
-        }
+          status: 302,
+        },
       });
     }
 
     res.writeHead(302, {
-      'location': req.pathname + '/'
+      location: req.pathname + '/',
     });
     return res.end();
   }
@@ -53,10 +52,13 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
         .replace('{{nav}}', getName(req.pathname))
         .replace('{{files}}', files);
 
-      res.writeHead(200, responseHeaders({
-        'Content-Type': 'text/html;charset=UTF-8',
-        'X-Directory-Index': req.pathname
-      }));
+      res.writeHead(
+        200,
+        responseHeaders({
+          'Content-Type': 'text/html;charset=UTF-8',
+          'X-Directory-Index': req.pathname,
+        }),
+      );
 
       res.write(templateHtml);
       res.end();
@@ -66,20 +68,17 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
           requestLog: {
             method: req.method,
             url: req.url,
-            status: 200
-          }
+            status: 200,
+          },
         });
       }
-
     } catch (e) {
       serve500(devServerConfig, req, res, e);
     }
-
   } catch (e) {
     serve404(devServerConfig, req, res);
   }
 }
-
 
 async function getFiles(sys: d.CompilerSystem, urlPathName: string, dirItemNames: string[]) {
   const items = await getDirectoryItems(sys, urlPathName, dirItemNames);
@@ -88,46 +87,44 @@ async function getFiles(sys: d.CompilerSystem, urlPathName: string, dirItemNames
     items.unshift({
       isDirectory: true,
       pathname: '../',
-      name: '..'
+      name: '..',
     });
   }
 
   return items
     .map(item => {
-      return (`
+      return `
         <li class="${item.isDirectory ? 'directory' : 'file'}">
           <a href="${item.pathname}">
             <span class="icon"></span>
             <span>${item.name}</span>
           </a>
-        </li>`
-      );
+        </li>`;
     })
     .join('');
 }
 
-
 async function getDirectoryItems(sys: d.CompilerSystem, urlPathName: string, dirFilePaths: string[]) {
-  const items = await Promise.all(dirFilePaths.map(async dirFilePath => {
-    const fileName = path.basename(dirFilePath);
-    const stats = await sys.stat(dirFilePath);
+  const items = await Promise.all(
+    dirFilePaths.map(async dirFilePath => {
+      const fileName = path.basename(dirFilePath);
+      const stats = await sys.stat(dirFilePath);
 
-    const item: DirectoryItem = {
-      name: fileName,
-      pathname: url.resolve(urlPathName, fileName),
-      isDirectory: !!(stats && stats.isDirectory())
-    };
+      const item: DirectoryItem = {
+        name: fileName,
+        pathname: url.resolve(urlPathName, fileName),
+        isDirectory: !!(stats && stats.isDirectory()),
+      };
 
-    return item;
-  }));
+      return item;
+    }),
+  );
   return items;
 }
-
 
 function getTitle(pathName: string) {
   return pathName;
 }
-
 
 function getName(pathName: string) {
   const dirs = pathName.split('/');
@@ -135,15 +132,17 @@ function getName(pathName: string) {
 
   let url = '';
 
-  return dirs.map((dir, index) => {
-    url += dir + '/';
-    const text = (index === 0 ? `~` : dir);
+  return (
+    dirs
+      .map((dir, index) => {
+        url += dir + '/';
+        const text = index === 0 ? `~` : dir;
 
-    return `<a href="${url}">${text}</a>`;
-
-  }).join('<span>/</span>') + '<span>/</span>';
+        return `<a href="${url}">${text}</a>`;
+      })
+      .join('<span>/</span>') + '<span>/</span>'
+  );
 }
-
 
 interface DirectoryItem {
   name: string;

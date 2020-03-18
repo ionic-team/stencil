@@ -3,14 +3,11 @@ import { gatherVdomMeta } from '../static-to-meta/vdom';
 import { H } from '../core-runtime-apis';
 import ts from 'typescript';
 
-
 export const parseCallExpression = (m: d.Module | d.ComponentCompilerMeta, node: ts.CallExpression) => {
   if (node.arguments != null && node.arguments.length > 0) {
-
     if (ts.isIdentifier(node.expression)) {
       // h('tag')
       visitCallExpressionArgs(m, node.expression, node.arguments);
-
     } else if (ts.isPropertyAccessExpression(node.expression)) {
       // document.createElement('tag')
       const n = node.expression.name;
@@ -30,10 +27,8 @@ const visitCallExpressionArgs = (m: d.Module | d.ComponentCompilerMeta, callExpr
     if (fnName === 'h' || fnName === H) {
       gatherVdomMeta(m, args);
     }
-
   } else if (args.length > 1 && fnName === 'createElementNS') {
     visitCallExpressionArg(m, args[1]);
-
   } else if (fnName === 'require' && args.length > 0 && (m as d.Module).originalImports) {
     const arg = args[0];
     if (ts.isStringLiteral(arg)) {

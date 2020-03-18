@@ -4,8 +4,14 @@ import { parseComponentsDeprecated } from './parse-collection-deprecated';
 import { updateModule } from '../static-to-meta/parse-static';
 import ts from 'typescript';
 
-
-export const parseCollectionComponents = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionDir: string, collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) => {
+export const parseCollectionComponents = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  collectionDir: string,
+  collectionManifest: d.CollectionManifest,
+  collection: d.CollectionCompilerMeta,
+) => {
   parseComponentsDeprecated(config, compilerCtx, collection, collectionDir, collectionManifest);
 
   if (collectionManifest.entries) {

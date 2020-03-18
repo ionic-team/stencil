@@ -5,7 +5,6 @@ import { hmrImages } from './hmr-images';
 import { hmrInlineStyles } from './hmr-inline-styles';
 import { setHmrAttr } from './hmr-util';
 
-
 export const hmrWindow = (win: Window, buildResultsHmr: any) => {
   const results = {
     updatedComponents: [] as string[],
@@ -43,7 +42,6 @@ export const hmrWindow = (win: Window, buildResultsHmr: any) => {
     }
 
     setHmrAttr(documentElement, versionId);
-
   } catch (e) {
     console.error(e);
   }

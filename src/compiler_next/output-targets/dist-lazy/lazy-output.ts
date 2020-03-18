@@ -16,7 +16,6 @@ import { removeCollectionImports } from '../../transformers/remove-collection-im
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 import MagicString from 'magic-string';
 
-
 export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
   if (outputTargets.length === 0) {
@@ -34,13 +33,13 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       customTransformers: getLazyCustomTransformer(config, compilerCtx),
       inputs: {
         [config.fsNamespace]: LAZY_BROWSER_ENTRY_ID,
-        'loader': LAZY_EXTERNAL_ENTRY_ID,
-        'index': USER_INDEX_ENTRY_ID
+        loader: LAZY_EXTERNAL_ENTRY_ID,
+        index: USER_INDEX_ENTRY_ID,
       },
       loader: {
         [LAZY_EXTERNAL_ENTRY_ID]: getLazyEntry(false),
         [LAZY_BROWSER_ENTRY_ID]: getLazyEntry(true),
-      }
+      },
     };
 
     // we've got the compiler context filled with app modules and collection dependency modules
@@ -65,7 +64,6 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
         buildCtx.componentGraph = generateModuleGraph(buildCtx.components, componentBundle);
       }
     }
-
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
@@ -97,11 +95,7 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
     proxy: null,
     style: 'static',
   };
-  return [
-    updateStencilCoreImports(transformOpts.coreImportPath),
-    lazyComponentTransform(compilerCtx, transformOpts),
-    removeCollectionImports(compilerCtx)
-  ];
+  return [updateStencilCoreImports(transformOpts.coreImportPath), lazyComponentTransform(compilerCtx, transformOpts), removeCollectionImports(compilerCtx)];
 };
 
 const getLazyEntry = (isBrowser: boolean) => {
@@ -115,7 +109,6 @@ const getLazyEntry = (isBrowser: boolean) => {
     s.append(`  globalScripts();\n`);
     s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
     s.append(`});\n`);
-
   } else {
     s.append(`import { patchEsm } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
     s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
@@ -135,7 +128,7 @@ const generateLegacyLoader = (config: d.Config, compilerCtx: d.CompilerCtx, outp
         const loaderContent = getLegacyLoader(config);
         await compilerCtx.fs.writeFile(o.legacyLoaderFile, loaderContent, { outputTargetType: o.type });
       }
-    })
+    }),
   );
 };
 

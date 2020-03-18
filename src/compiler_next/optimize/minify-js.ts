@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { splitLineBreaks } from '@utils';
 import terser, { CompressOptions, MangleOptions, ManglePropertiesOptions, MinifyOptions } from 'terser';
 
-
 export const minifyJs = async (input: string, opts?: MinifyOptions) => {
   if (opts) {
     const mangle = opts.mangle as MangleOptions;
@@ -26,10 +25,9 @@ export const minifyJs = async (input: string, opts?: MinifyOptions) => {
   return {
     output: result.code,
     sourceMap: result.map as any,
-    diagnostics: diagnostics
+    diagnostics: diagnostics,
   };
 };
-
 
 const loadMinifyJsDiagnostics = (sourceText: string, result: terser.MinifyOutput) => {
   const diagnostics: d.Diagnostic[] = [];
@@ -46,7 +44,7 @@ const loadMinifyJsDiagnostics = (sourceText: string, result: terser.MinifyOutput
     messageText: result.error.message,
     absFilePath: null,
     relFilePath: null,
-    lines: []
+    lines: [],
   };
 
   const err: {
@@ -67,7 +65,7 @@ const loadMinifyJsDiagnostics = (sourceText: string, result: terser.MinifyOutput
       lineNumber: err.line,
       text: srcLines[err.line - 1],
       errorCharStart: err.col,
-      errorLength: 0
+      errorLength: 0,
     };
 
     d.lineNumber = errorLine.lineNumber;
@@ -94,7 +92,7 @@ const loadMinifyJsDiagnostics = (sourceText: string, result: terser.MinifyOutput
         lineNumber: errorLine.lineNumber - 1,
         text: srcLines[errorLine.lineIndex - 1],
         errorCharStart: -1,
-        errorLength: -1
+        errorLength: -1,
       };
 
       d.lines.unshift(previousLine);
@@ -106,7 +104,7 @@ const loadMinifyJsDiagnostics = (sourceText: string, result: terser.MinifyOutput
         lineNumber: errorLine.lineNumber + 1,
         text: srcLines[errorLine.lineIndex + 1],
         errorCharStart: -1,
-        errorLength: -1
+        errorLength: -1,
       };
 
       d.lines.push(nextLine);
@@ -119,4 +117,3 @@ const loadMinifyJsDiagnostics = (sourceText: string, result: terser.MinifyOutput
 };
 
 const CHAR_BREAK = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);
-

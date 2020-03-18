@@ -1,4 +1,3 @@
-
 /**
  * Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar
  * Forward-slash paths can be used in Windows as long as they're not
@@ -18,7 +17,7 @@ export const normalizePath = (path: string) => {
   const normalized = rootPart + reducedComponents.slice(1).join('/');
 
   if (normalized === '') {
-    return '.'
+    return '.';
   }
   if (rootPart === '' && secondPart && path.includes('/') && !secondPart.startsWith('.') && !secondPart.startsWith('@')) {
     return './' + normalized;
@@ -28,8 +27,8 @@ export const normalizePath = (path: string) => {
 
 const normalizeSlashes = (path: string) => path.replace(backslashRegExp, '/');
 
-const altDirectorySeparator = "\\";
-const urlSchemeSeparator = "://";
+const altDirectorySeparator = '\\';
+const urlSchemeSeparator = '://';
 const backslashRegExp = /\\/g;
 
 const reducePathComponents = (components: readonly string[]) => {
@@ -47,8 +46,7 @@ const reducePathComponents = (components: readonly string[]) => {
           reduced.pop();
           continue;
         }
-      }
-      else if (reduced[0]) continue;
+      } else if (reduced[0]) continue;
     }
     reduced.push(component);
   }
@@ -86,14 +84,14 @@ const getEncodedRootLength = (path: string): number => {
   if (schemeEnd !== -1) {
     const authorityStart = schemeEnd + urlSchemeSeparator.length;
     const authorityEnd = path.indexOf('/', authorityStart);
-    if (authorityEnd !== -1) { // URL: "file:///", "file://server/", "file://server/path"
+    if (authorityEnd !== -1) {
+      // URL: "file:///", "file://server/", "file://server/path"
       // For local "file" URLs, include the leading DOS volume (if present).
       // Per https://www.ietf.org/rfc/rfc1738.txt, a host of "" or "localhost" is a
       // special case interpreted as "the machine from which the URL is being interpreted".
       const scheme = path.slice(0, schemeEnd);
       const authority = path.slice(authorityStart, authorityEnd);
-      if (scheme === "file" && (authority === "" || authority === "localhost") &&
-        isVolumeCharacter(path.charCodeAt(authorityEnd + 1))) {
+      if (scheme === 'file' && (authority === '' || authority === 'localhost') && isVolumeCharacter(path.charCodeAt(authorityEnd + 1))) {
         const volumeSeparatorEnd = getFileUrlVolumeSeparatorEnd(path, authorityEnd + 2);
         if (volumeSeparatorEnd !== -1) {
           if (path.charCodeAt(volumeSeparatorEnd) === CharacterCodes.slash) {
@@ -114,11 +112,9 @@ const getEncodedRootLength = (path: string): number => {
 
   // relative
   return 0;
-}
+};
 
-const isVolumeCharacter = (charCode: number) =>
-  (charCode >= CharacterCodes.a && charCode <= CharacterCodes.z) ||
-  (charCode >= CharacterCodes.A && charCode <= CharacterCodes.Z);
+const isVolumeCharacter = (charCode: number) => (charCode >= CharacterCodes.a && charCode <= CharacterCodes.z) || (charCode >= CharacterCodes.A && charCode <= CharacterCodes.Z);
 
 const getFileUrlVolumeSeparatorEnd = (url: string, start: number) => {
   const ch0 = url.charCodeAt(start);
@@ -135,8 +131,8 @@ const pathComponents = (path: string, rootLength: number) => {
   const rest = path.substring(rootLength).split('/');
   const restLen = rest.length;
   if (restLen > 0 && !rest[restLen - 1]) {
-    rest.pop()
-  };
+    rest.pop();
+  }
   return [root, ...rest];
 };
 
@@ -149,13 +145,13 @@ export const normalizeFsPath = (p: string) => normalizePath(p.split('?')[0]);
 const enum CharacterCodes {
   a = 0x61,
   A = 0x41,
-  z = 0x7A,
+  z = 0x7a,
   Z = 0x5a,
   _3 = 0x33,
 
-  backslash = 0x5C,             // \
-  colon = 0x3A,                 // :
-  dot = 0x2E,                   // .
-  percent = 0x25,               // %
-  slash = 0x2F,                 // /
+  backslash = 0x5c, // \
+  colon = 0x3a, // :
+  dot = 0x2e, // .
+  percent = 0x25, // %
+  slash = 0x2f, // /
 }

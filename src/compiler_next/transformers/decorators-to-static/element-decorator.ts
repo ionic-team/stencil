@@ -4,7 +4,6 @@ import { createStaticGetter } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
-
 export const elementDecoratorsToStatic = (diagnostics: d.Diagnostic[], decoratedMembers: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
   const elementRefs = decoratedMembers
     .filter(ts.isPropertyDeclaration)

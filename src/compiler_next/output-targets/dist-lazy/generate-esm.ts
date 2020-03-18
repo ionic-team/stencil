@@ -6,13 +6,7 @@ import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
 import { RollupResult } from '../../../declarations';
 
-export const generateEsm = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  rollupBuild: RollupBuild,
-  outputTargets: d.OutputTargetDistLazy[],
-) => {
+export const generateEsm = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) => {
   const esmEs5Outputs = config.buildEs5 ? outputTargets.filter(o => !!o.esmEs5Dir && !o.isBrowserBuild) : [];
   const esmOutputs = outputTargets.filter(o => !!o.esmDir && !o.isBrowserBuild);
   if (esmOutputs.length + esmEs5Outputs.length > 0) {

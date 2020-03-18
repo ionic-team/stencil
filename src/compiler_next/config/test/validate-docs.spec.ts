@@ -2,9 +2,7 @@ import * as d from '@stencil/core/declarations';
 import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import { validateConfig } from '../validate-config';
 
-
 describe('validateDocs', () => {
-
   let config: d.Config;
   const logger = mockLogger();
   const sys = mockStencilSystem();
@@ -15,21 +13,17 @@ describe('validateDocs', () => {
       logger: logger,
       rootDir: '/User/some/path/',
       flags: {},
-      outputTargets: [
-        { type: 'www' }
-      ],
-      namespace: 'Testing'
+      outputTargets: [{ type: 'www' }],
+      namespace: 'Testing',
     };
   });
 
   it('readme docs dir', () => {
     config.flags.docs = true;
-    config.outputTargets.push(
-      {
-        type: 'docs',
-        dir: 'my-dir'
-      } as d.OutputTargetDocsReadme
-    );
+    config.outputTargets.push({
+      type: 'docs',
+      dir: 'my-dir',
+    } as d.OutputTargetDocsReadme);
     validateConfig(config, [], false);
     const o = config.outputTargets.find(o => o.type === 'docs-readme') as d.OutputTargetDocsReadme;
     expect(o.dir).toContain('my-dir');
@@ -45,5 +39,4 @@ describe('validateDocs', () => {
     validateConfig(config, [], false);
     expect(config.outputTargets.some(o => o.type === 'docs-readme')).toBe(false);
   });
-
 });

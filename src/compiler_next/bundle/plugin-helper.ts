@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { buildError } from '@utils';
 import { relative } from 'path';
 
-
 export const pluginHelper = (config: d.Config, builtCtx: d.BuildCtx) => {
   return {
     name: 'pluginHelper',
@@ -27,7 +26,7 @@ export const pluginHelper = (config: d.Config, builtCtx: d.BuildCtx) => {
         Further information: https://stenciljs.com/docs/module-bundling`;
       }
       return null;
-    }
+    },
   };
 };
 
@@ -74,5 +73,5 @@ const builtIns = new Set([
   'url',
   'util',
   'vm',
-  'zlib'
+  'zlib',
 ]);

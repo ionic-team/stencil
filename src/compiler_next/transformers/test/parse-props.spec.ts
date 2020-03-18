@@ -1,8 +1,6 @@
 import { getStaticGetter, transpileModule } from './transpile';
 
-
 describe('parse props', () => {
-
   it('prop optional', () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})
@@ -11,23 +9,23 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {},
-          'resolved': 'string',
-          'original': 'string'
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'string',
+          original: 'string',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'mutable': false,
-        'optional': true,
-        'reflect': false,
-        'required': false,
-        'type': 'string'
-      }
+        mutable: false,
+        optional: true,
+        reflect: false,
+        required: false,
+        type: 'string',
+      },
     });
 
     expect(t.property.attribute).toBe('val');
@@ -44,23 +42,23 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {},
-          'resolved': 'string',
-          'original': 'string'
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'string',
+          original: 'string',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'mutable': false,
-        'optional': false,
-        'reflect': false,
-        'required': true,
-        'type': 'string'
-      }
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: true,
+        type: 'string',
+      },
     });
     expect(t.property.required).toBe(true);
   });
@@ -73,24 +71,24 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {},
-          'resolved': 'string',
-          'original': 'string'
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'string',
+          original: 'string',
         },
-        'defaultValue': undefined,
-        'docs': {
-          'text': '',
-          'tags': []
+        defaultValue: undefined,
+        docs: {
+          text: '',
+          tags: [],
         },
-        'mutable': true,
-        'optional': false,
-        'reflect': false,
-        'required': false,
-        'type': 'string'
-      }
+        mutable: true,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'string',
+      },
     });
     expect(t.property.mutable).toBe(true);
   });
@@ -103,23 +101,23 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {},
-          'resolved': 'string',
-          'original': 'string'
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'string',
+          original: 'string',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'mutable': false,
-        'optional': false,
-        'reflect': true,
-        'required': false,
-        'type': 'string'
-      }
+        mutable: false,
+        optional: false,
+        reflect: true,
+        required: false,
+        type: 'string',
+      },
     });
     expect(t.property.reflect).toBe(true);
     expect(t.cmp.hasReflect).toBe(true);
@@ -133,21 +131,21 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'complexType': {
-          'references': {},
-          'resolved': '{}', // TODO, needs to be string[]
-          'original': 'string[]'
+      val: {
+        complexType: {
+          references: {},
+          resolved: '{}', // TODO, needs to be string[]
+          original: 'string[]',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'mutable': false,
-        'optional': false,
-        'required': false,
-        'type': 'unknown'
-      }
+        mutable: false,
+        optional: false,
+        required: false,
+        type: 'unknown',
+      },
     });
     expect(t.property.type).toBe('unknown');
     expect(t.property.attribute).toBe(undefined);
@@ -162,27 +160,27 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {
-            'Object': {
-              'location': 'global'
-            }
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {
+            Object: {
+              location: 'global',
+            },
           },
-          'resolved': 'any',
-          'original': 'Object'
+          resolved: 'any',
+          original: 'Object',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'mutable': false,
-        'optional': false,
-        'reflect': false,
-        'required': false,
-        'type': 'any'
-      }
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'any',
+      },
     });
     expect(t.property.type).toBe('any');
     expect(t.property.attribute).toBe('val');
@@ -197,24 +195,24 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'multiWord': {
-        'attribute': 'multi-word',
-        'complexType': {
-          'references': {},
-          'resolved': 'string',
-          'original': 'string'
+      multiWord: {
+        attribute: 'multi-word',
+        complexType: {
+          references: {},
+          resolved: 'string',
+          original: 'string',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'defaultValue': undefined,
-        'mutable': false,
-        'optional': false,
-        'reflect': false,
-        'required': false,
-        'type': 'string'
-      }
+        defaultValue: undefined,
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'string',
+      },
     });
     expect(t.property.name).toBe('multiWord');
     expect(t.property.attribute).toBe('multi-word');
@@ -228,23 +226,23 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {},
-          'resolved': 'string',
-          'original': 'string'
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'string',
+          original: 'string',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'mutable': false,
-        'optional': false,
-        'reflect': false,
-        'required': false,
-        'type': 'string'
-      }
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'string',
+      },
     });
     expect(t.property.type).toBe('string');
     expect(t.property.attribute).toBe('val');
@@ -258,23 +256,23 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {},
-          'resolved': 'number',
-          'original': 'number'
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'number',
+          original: 'number',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'mutable': false,
-        'optional': false,
-        'reflect': false,
-        'required': false,
-        'type': 'number'
-      }
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'number',
+      },
     });
     expect(t.property.type).toBe('number');
     expect(t.property.attribute).toBe('val');
@@ -288,23 +286,23 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {},
-          'resolved': 'boolean',
-          'original': 'boolean'
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'boolean',
+          original: 'boolean',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'mutable': false,
-        'optional': false,
-        'reflect': false,
-        'required': false,
-        'type': 'boolean'
-      }
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'boolean',
+      },
     });
     expect(t.property.type).toBe('boolean');
     expect(t.property.attribute).toBe('val');
@@ -318,23 +316,23 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {},
-          'resolved': 'any',
-          'original': 'any'
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'any',
+          original: 'any',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'mutable': false,
-        'optional': false,
-        'reflect': false,
-        'required': false,
-        'type': 'any'
-      }
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'any',
+      },
     });
     expect(t.property.type).toBe('any');
     expect(t.property.attribute).toBe('val');
@@ -348,24 +346,24 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {},
-          'resolved': 'string',
-          'original': 'string'
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'string',
+          original: 'string',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'defaultValue': `'mph'`,
-        'mutable': false,
-        'optional': false,
-        'reflect': false,
-        'required': false,
-        'type': 'string'
-      }
+        defaultValue: `'mph'`,
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'string',
+      },
     });
     expect(t.property.type).toBe('string');
     expect(t.property.attribute).toBe('val');
@@ -379,24 +377,24 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {},
-          'resolved': 'number',
-          'original': 'number'
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'number',
+          original: 'number',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'defaultValue': '88',
-        'mutable': false,
-        'optional': false,
-        'reflect': false,
-        'required': false,
-        'type': 'number'
-      }
+        defaultValue: '88',
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'number',
+      },
     });
     expect(t.property.type).toBe('number');
     expect(t.property.attribute).toBe('val');
@@ -410,24 +408,24 @@ describe('parse props', () => {
       }
     `);
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {},
-          'resolved': 'boolean',
-          'original': 'boolean'
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'boolean',
+          original: 'boolean',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'defaultValue': 'false',
-        'mutable': false,
-        'optional': false,
-        'reflect': false,
-        'required': false,
-        'type': 'boolean'
-      }
+        defaultValue: 'false',
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'boolean',
+      },
     });
     expect(t.property.type).toBe('boolean');
     expect(t.property.attribute).toBe('val');
@@ -442,27 +440,26 @@ describe('parse props', () => {
     `);
 
     expect(getStaticGetter(t.outputText, 'properties')).toEqual({
-      'val': {
-        'attribute': 'val',
-        'complexType': {
-          'references': {},
-          'resolved': 'any',
-          'original': 'any'
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'any',
+          original: 'any',
         },
-        'docs': {
-          'text': '',
-          'tags': []
+        docs: {
+          text: '',
+          tags: [],
         },
-        'defaultValue': 'null',
-        'mutable': false,
-        'optional': false,
-        'reflect': false,
-        'required': false,
-        'type': 'any'
-      }
+        defaultValue: 'null',
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'any',
+      },
     });
     expect(t.property.type).toBe('any');
     expect(t.property.attribute).toBe('val');
   });
-
 });

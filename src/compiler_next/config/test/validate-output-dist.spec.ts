@@ -2,7 +2,6 @@ import * as d from '@stencil/core/declarations';
 import { validateOutputTargetDist } from '../validate-outputs-dist';
 import path from 'path';
 
-
 describe('validateDistOutputTarget', () => {
   const rootDir = path.resolve('/');
 
@@ -10,9 +9,9 @@ describe('validateDistOutputTarget', () => {
   beforeEach(() => {
     config = {
       sys: {
-        path: path
+        path: path,
       },
-      rootDir
+      rootDir,
     };
   });
 
@@ -21,65 +20,61 @@ describe('validateDistOutputTarget', () => {
       type: 'dist',
       dir: 'my-dist',
       buildDir: 'my-build',
-      empty: false
+      empty: false,
     };
     config.outputTargets = [outputTarget];
     validateOutputTargetDist(config);
     expect(config.outputTargets).toEqual([
       {
-        'buildDir': path.join(rootDir, 'my-dist', 'my-build'),
-        'collectionDir': path.join(rootDir, 'my-dist', 'collection'),
-        'copy': [],
-        'dir': path.join(rootDir, 'my-dist'),
-        'empty': false,
-        'esmLoaderPath': path.join(rootDir, 'my-dist', 'loader'),
-        'resourcesUrl': undefined,
-        'type': 'dist',
-        'typesDir': path.join(rootDir, 'my-dist', 'types')
+        buildDir: path.join(rootDir, 'my-dist', 'my-build'),
+        collectionDir: path.join(rootDir, 'my-dist', 'collection'),
+        copy: [],
+        dir: path.join(rootDir, 'my-dist'),
+        empty: false,
+        esmLoaderPath: path.join(rootDir, 'my-dist', 'loader'),
+        resourcesUrl: undefined,
+        type: 'dist',
+        typesDir: path.join(rootDir, 'my-dist', 'types'),
       },
       {
-        'collectionDir': path.join(rootDir, 'my-dist', 'collection'),
-        'dir': path.join(rootDir, '/my-dist'),
-        'type': 'dist-collection'
+        collectionDir: path.join(rootDir, 'my-dist', 'collection'),
+        dir: path.join(rootDir, '/my-dist'),
+        type: 'dist-collection',
       },
       {
-        'copy': [
-          {'src': '**/*.svg'},
-          {'src': '**/*.js'}
-        ],
-        'copyAssets': 'collection',
-        'dir': path.join(rootDir, 'my-dist', 'collection'),
-        'type': 'copy'
+        copy: [{ src: '**/*.svg' }, { src: '**/*.js' }],
+        copyAssets: 'collection',
+        dir: path.join(rootDir, 'my-dist', 'collection'),
+        type: 'copy',
       },
       {
-        'dir': path.join(rootDir, 'my-dist'),
-        'type': 'dist-types',
-        'typesDir': path.join(rootDir, 'my-dist', 'types')
+        dir: path.join(rootDir, 'my-dist'),
+        type: 'dist-types',
+        typesDir: path.join(rootDir, 'my-dist', 'types'),
       },
       {
-        'esmDir': path.join(rootDir, 'my-dist', 'my-build', 'app'),
-        'isBrowserBuild': true,
-        'legacyLoaderFile': path.join(rootDir, 'my-dist', 'my-build', 'app.js'),
-        'polyfills': true,
-        'systemDir': undefined,
-        'systemLoaderFile': undefined,
-        'type': 'dist-lazy'},
-        {
-          'copyAssets': 'dist',
-          'dir': path.join(rootDir, 'my-dist', 'my-build', 'app'),
-          'type': 'copy'
-        },
-        {
-          'file': path.join(rootDir, 'my-dist', 'my-build', 'app', 'undefined.css'),
-          'type': 'dist-global-styles'
-        }
-      ]);
+        esmDir: path.join(rootDir, 'my-dist', 'my-build', 'app'),
+        isBrowserBuild: true,
+        legacyLoaderFile: path.join(rootDir, 'my-dist', 'my-build', 'app.js'),
+        polyfills: true,
+        systemDir: undefined,
+        systemLoaderFile: undefined,
+        type: 'dist-lazy',
+      },
+      {
+        copyAssets: 'dist',
+        dir: path.join(rootDir, 'my-dist', 'my-build', 'app'),
+        type: 'copy',
+      },
+      {
+        file: path.join(rootDir, 'my-dist', 'my-build', 'app', 'undefined.css'),
+        type: 'dist-global-styles',
+      },
+    ]);
   });
 
   it('should set defaults when outputTargets dist is empty', () => {
-    config.outputTargets = [
-      { type: 'dist' }
-    ];
+    config.outputTargets = [{ type: 'dist' }];
     validateOutputTargetDist(config);
     const outputTarget = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     expect(outputTarget).toBeDefined();
@@ -93,5 +88,4 @@ describe('validateDistOutputTarget', () => {
     validateOutputTargetDist(config);
     expect(config.outputTargets.some(o => o.type === 'dist')).toBe(false);
   });
-
 });

@@ -6,16 +6,14 @@ let cssProcessor: any;
 export const autoprefixCss = async (cssText: string, opts: any) => {
   const output: d.OptimizeCssOutput = {
     output: cssText,
-    diagnostics: []
+    diagnostics: [],
   };
   if (!IS_NODE_ENV) {
     return output;
   }
 
   try {
-    const autoprefixerOpts = (opts != null && typeof opts === 'object')
-      ? opts
-      : DEFAULT_AUTOPREFIX_LEGACY;
+    const autoprefixerOpts = opts != null && typeof opts === 'object' ? opts : DEFAULT_AUTOPREFIX_LEGACY;
 
     const processor = getProcessor(autoprefixerOpts);
     const result = await processor.process(cssText, { map: null });
@@ -30,7 +28,6 @@ export const autoprefixCss = async (cssText: string, opts: any) => {
     });
 
     output.output = result.css;
-
   } catch (e) {
     const diagnostic: d.Diagnostic = {
       header: `Autoprefix CSS`,
@@ -59,7 +56,7 @@ export const autoprefixCss = async (cssText: string, opts: any) => {
               lineNumber: -1,
               text: line,
               errorCharStart: -1,
-              errorLength: -1
+              errorLength: -1,
             };
             diagnostic.lines = diagnostic.lines || [];
             diagnostic.lines.push(printLine);
@@ -83,24 +80,16 @@ export const autoprefixCss = async (cssText: string, opts: any) => {
 };
 
 const getProcessor = (autoprefixerOpts: any) => {
-  const {postcss, autoprefixer} = requireFunc('../sys/node/autoprefixer.js');
+  const { postcss, autoprefixer } = requireFunc('../sys/node/autoprefixer.js');
   if (!cssProcessor) {
-    cssProcessor = postcss([
-      autoprefixer(autoprefixerOpts)
-    ]);
+    cssProcessor = postcss([autoprefixer(autoprefixerOpts)]);
   }
   return cssProcessor;
-}
+};
 
 const DEFAULT_AUTOPREFIX_LEGACY = {
-  overrideBrowserslist: [
-    'last 2 versions',
-    'iOS >= 9',
-    'Android >= 4.4',
-    'Explorer >= 11',
-    'ExplorerMobile >= 11'
-  ],
+  overrideBrowserslist: ['last 2 versions', 'iOS >= 9', 'Android >= 4.4', 'Explorer >= 11', 'ExplorerMobile >= 11'],
   cascade: false,
   remove: false,
-  flexbox: 'no-2009'
+  flexbox: 'no-2009',
 };

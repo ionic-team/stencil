@@ -4,7 +4,6 @@ import { bundleOutput } from './bundle-output';
 import { normalizeFsPath, hasError } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';
 
-
 export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, platform: string): Plugin => {
   if (platform === 'worker' || platform === 'hydrate') {
     return {
@@ -24,7 +23,7 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
       if (id === WORKER_HELPER_ID) {
         return {
           id,
-          moduleSideEffects: false
+          moduleSideEffects: false,
         };
       }
       return null;
@@ -66,7 +65,7 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
         }
       }
       return null;
-    }
+    },
   };
 };
 
@@ -83,14 +82,21 @@ interface WorkerMeta {
   dependencies: string[];
 }
 
-const getWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, ctx: PluginContext, workersMap: Map<string, WorkerMeta>, workerEntryPath: string): Promise<WorkerMeta> => {
+const getWorker = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  ctx: PluginContext,
+  workersMap: Map<string, WorkerMeta>,
+  workerEntryPath: string,
+): Promise<WorkerMeta> => {
   let worker = workersMap.get(workerEntryPath);
   if (!worker) {
     worker = await buildWorker(config, compilerCtx, buildCtx, ctx, workerEntryPath);
     workersMap.set(workerEntryPath, worker);
   }
   return worker;
-}
+};
 
 const getWorkerName = (id: string) => {
   const parts = id.split('/').filter(i => !i.includes('index'));
@@ -104,7 +110,7 @@ const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCt
     platform: 'worker',
     id: workerName,
     inputs: {
-      [workerName]: workerEntryPath
+      [workerName]: workerEntryPath,
     },
     inlineDynamicImports: true,
   });
@@ -116,7 +122,7 @@ const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCt
       intro: getWorkerIntro(workerName, config.devMode),
       esModule: false,
       preferConst: true,
-      externalLiveBindings: false
+      externalLiveBindings: false,
     });
     const entryPoint = output.output[0];
     if (entryPoint.imports.length > 0) {
@@ -130,7 +136,7 @@ const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCt
       sourceTarget: config.buildEs5 ? 'es5' : 'es2017',
       isCore: false,
       minify: config.minifyJs,
-      inlineHelpers: true
+      inlineHelpers: true,
     });
     buildCtx.diagnostics.push(...results.diagnostics);
     if (!hasError(results.diagnostics)) {
@@ -147,19 +153,13 @@ const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCt
     return {
       referenceId,
       exports: entryPoint.exports,
-      dependencies: Object.keys(entryPoint.modules)
-        .filter(id => !/\0/.test(id) && id !== workerEntryPath)
+      dependencies: Object.keys(entryPoint.modules).filter(id => !/\0/.test(id) && id !== workerEntryPath),
     };
   }
   return null;
-}
+};
 
-const WORKER_SUFFIX = [
-  '.worker.ts',
-  '.worker.tsx',
-  '.worker/index.ts',
-  '.worker/index.tsx',
-];
+const WORKER_SUFFIX = ['.worker.ts', '.worker.tsx', '.worker/index.ts', '.worker/index.tsx'];
 
 const WORKER_HELPER_ID = '@worker-helper';
 
@@ -202,14 +202,18 @@ addEventListener('message', async ({data}) => {
           };
         }
       }
-      ${isDev ? `
+      ${
+        isDev
+          ? `
       value = exports[method](...args);
       if (!value || !value.then) {
         throw new Error('The exported method "' + method + '" does not return a Promise, make sure it is an "async" function');
       }
       value = await value;
-      ` : `
-      value = await exports[method](...args);` }
+      `
+          : `
+      value = await exports[method](...args);`
+      }
 
     } catch (e) {
       value = null;
@@ -308,14 +312,14 @@ export const worker = /*@__PURE__*/createWorker(workerPath, workerName, workerMs
 `;
 };
 
-
-
 const getWorkerProxy = (workerEntryPath: string, exportedMethods: string[]) => {
   return `
 import { createWorkerProxy } from '${WORKER_HELPER_ID}';
 import { worker, workerName, workerMsgId } from '${workerEntryPath}?worker';
-${exportedMethods.map(exportedMethod => {
-  return `export const ${exportedMethod} = /*@__PURE__*/createWorkerProxy(worker, workerMsgId, '${exportedMethod}');`;
-}).join('\n')}
+${exportedMethods
+  .map(exportedMethod => {
+    return `export const ${exportedMethod} = /*@__PURE__*/createWorkerProxy(worker, workerMsgId, '${exportedMethod}');`;
+  })
+  .join('\n')}
 `;
 };

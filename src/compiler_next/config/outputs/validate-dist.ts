@@ -1,10 +1,18 @@
 import * as d from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';
-import { COPY, DIST_COLLECTION, DIST_GLOBAL_STYLES, DIST_LAZY, DIST_LAZY_LOADER, DIST_TYPES, getComponentsDtsTypesFilePath, isOutputTargetDist } from '../../output-targets/output-utils';
+import {
+  COPY,
+  DIST_COLLECTION,
+  DIST_GLOBAL_STYLES,
+  DIST_LAZY,
+  DIST_LAZY_LOADER,
+  DIST_TYPES,
+  getComponentsDtsTypesFilePath,
+  isOutputTargetDist,
+} from '../../output-targets/output-utils';
 import { isAbsolute, join, resolve } from 'path';
 import { isBoolean, isString } from '@utils';
 import { validateCopy } from '../validate-copy';
-
 
 export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) => {
   const distOutputTargets = userOutputs.filter(isOutputTargetDist);
@@ -23,11 +31,7 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) =>
         type: COPY,
         dir: distOutputTarget.collectionDir,
         copyAssets: 'collection',
-        copy: [
-          ...distOutputTarget.copy,
-          { src: '**/*.svg' },
-          { src: '**/*.js' }
-        ]
+        copy: [...distOutputTarget.copy, { src: '**/*.svg' }, { src: '**/*.js' }],
       });
     }
 
@@ -55,7 +59,7 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) =>
     outputs.push({
       type: COPY,
       dir: lazyDir,
-      copyAssets: 'dist'
+      copyAssets: 'dist',
     });
 
     // Emit global styles
@@ -100,7 +104,7 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) =>
 const validateOutputTargetDist = (config: d.Config, o: d.OutputTargetDist) => {
   const outputTarget = {
     ...o,
-    dir: getAbsolutePath(config, o.dir || DEFAULT_DIR)
+    dir: getAbsolutePath(config, o.dir || DEFAULT_DIR),
   };
 
   if (!isString(outputTarget.buildDir)) {

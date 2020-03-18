@@ -4,9 +4,8 @@ import { MockCSSStyleSheet, getStyleElementText, setStyleElementText } from './c
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockHTMLElement } from './node';
 
-
 export function createElement(ownerDocument: any, tagName: string) {
-  if (typeof tagName !== 'string' || tagName === '' || !(/^[a-z0-9-_:]+$/i.test(tagName))) {
+  if (typeof tagName !== 'string' || tagName === '' || !/^[a-z0-9-_:]+$/i.test(tagName)) {
     throw new Error(`The tag name provided (${tagName}) is not a valid name.`);
   }
   tagName = tagName.toLowerCase();
@@ -85,18 +84,20 @@ export class MockAnchorElement extends MockHTMLElement {
   }
 }
 
-
 export class MockButtonElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'button');
   }
 }
-patchPropAttributes(MockButtonElement.prototype, {
-  type: String
-}, {
-  type: 'submit'
-});
-
+patchPropAttributes(
+  MockButtonElement.prototype,
+  {
+    type: String,
+  },
+  {
+    type: 'submit',
+  },
+);
 
 export class MockImageElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -112,7 +113,7 @@ export class MockImageElement extends MockHTMLElement {
 }
 patchPropAttributes(MockImageElement.prototype, {
   height: Number,
-  width: Number
+  width: Number,
 });
 
 export class MockInputElement extends MockHTMLElement {
@@ -129,41 +130,45 @@ export class MockInputElement extends MockHTMLElement {
   }
 }
 
-patchPropAttributes(MockInputElement.prototype, {
-  accept: String,
-  autocomplete: String,
-  autofocus: Boolean,
-  capture: String,
-  checked: Boolean,
-  disabled: Boolean,
-  form: String,
-  formaction: String,
-  formenctype: String,
-  formmethod: String,
-  formnovalidate: String,
-  formtarget: String,
-  height: Number,
-  inputmode: String,
-  max: String,
-  maxLength: Number,
-  min: String,
-  minLength: Number,
-  multiple: Boolean,
-  name: String,
-  pattern: String,
-  placeholder: String,
-  required: Boolean,
-  readOnly: Boolean,
-  size: Number,
-  spellCheck: Boolean,
-  src: String,
-  step: String,
-  type: String,
-  value: String,
-  width: Number
-}, {
-  type: 'text'
-});
+patchPropAttributes(
+  MockInputElement.prototype,
+  {
+    accept: String,
+    autocomplete: String,
+    autofocus: Boolean,
+    capture: String,
+    checked: Boolean,
+    disabled: Boolean,
+    form: String,
+    formaction: String,
+    formenctype: String,
+    formmethod: String,
+    formnovalidate: String,
+    formtarget: String,
+    height: Number,
+    inputmode: String,
+    max: String,
+    maxLength: Number,
+    min: String,
+    minLength: Number,
+    multiple: Boolean,
+    name: String,
+    pattern: String,
+    placeholder: String,
+    required: Boolean,
+    readOnly: Boolean,
+    size: Number,
+    spellCheck: Boolean,
+    src: String,
+    step: String,
+    type: String,
+    value: String,
+    width: Number,
+  },
+  {
+    type: 'text',
+  },
+);
 
 export class MockFormElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -171,9 +176,8 @@ export class MockFormElement extends MockHTMLElement {
   }
 }
 patchPropAttributes(MockFormElement.prototype, {
-  name: String
+  name: String,
 });
-
 
 export class MockLinkElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -191,9 +195,8 @@ patchPropAttributes(MockLinkElement.prototype, {
   crossorigin: String,
   media: String,
   rel: String,
-  type: String
+  type: String,
 });
-
 
 export class MockMetaElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -203,9 +206,8 @@ export class MockMetaElement extends MockHTMLElement {
 patchPropAttributes(MockMetaElement.prototype, {
   charset: String,
   content: String,
-  name: String
+  name: String,
 });
-
 
 export class MockScriptElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -220,7 +222,7 @@ export class MockScriptElement extends MockHTMLElement {
   }
 }
 patchPropAttributes(MockScriptElement.prototype, {
-  type: String
+  type: String,
 });
 
 export class MockStyleElement extends MockHTMLElement {
@@ -255,20 +257,35 @@ export class MockStyleElement extends MockHTMLElement {
 
 export class MockSVGElement extends MockElement {
   // SVGElement properties and methods
-  get ownerSVGElement(): SVGSVGElement { return null; }
-  get viewportElement(): SVGElement { return null; }
+  get ownerSVGElement(): SVGSVGElement {
+    return null;
+  }
+  get viewportElement(): SVGElement {
+    return null;
+  }
 
-  focus() {/**/}
-  onunload() {/**/}
+  focus() {
+    /**/
+  }
+  onunload() {
+    /**/
+  }
 
   // SVGGeometryElement properties and methods
-  get pathLength(): number { return 0; }
+  get pathLength(): number {
+    return 0;
+  }
 
-  isPointInFill(_pt: DOMPoint): boolean { return false; }
-  isPointInStroke(_pt: DOMPoint): boolean { return false; }
-  getTotalLength(): number { return 0; }
+  isPointInFill(_pt: DOMPoint): boolean {
+    return false;
+  }
+  isPointInStroke(_pt: DOMPoint): boolean {
+    return false;
+  }
+  getTotalLength(): number {
+    return 0;
+  }
 }
-
 
 export class MockBaseElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -320,7 +337,6 @@ export class MockTemplateElement extends MockHTMLElement {
   }
 }
 
-
 export class MockTitleElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'title');
@@ -334,43 +350,86 @@ export class MockTitleElement extends MockHTMLElement {
   }
 }
 
-
 export class MockCanvasElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'canvas');
   }
   getContext() {
     return {
-      fillRect: function () { return; },
-      clearRect: function () { return; },
-      getImageData: function (_: number, __: number, w: number, h: number) {
+      fillRect: function() {
+        return;
+      },
+      clearRect: function() {
+        return;
+      },
+      getImageData: function(_: number, __: number, w: number, h: number) {
         return {
-          data: new Array(w * h * 4)
+          data: new Array(w * h * 4),
         };
       },
-      putImageData: function () { return; },
-      createImageData: function (): any[] { return []; },
-      setTransform: function () { return; },
-      drawImage: function () { return; },
-      save: function () { return; },
-      fillText: function () { return; },
-      restore: function () { return; },
-      beginPath: function () { return; },
-      moveTo: function () { return; },
-      lineTo: function () { return; },
-      closePath: function () { return; },
-      stroke: function () { return; },
-      translate: function () { return; },
-      scale: function () { return; },
-      rotate: function () { return; },
-      arc: function () { return; },
-      fill: function () { return; },
-      measureText: function () {
+      putImageData: function() {
+        return;
+      },
+      createImageData: function(): any[] {
+        return [];
+      },
+      setTransform: function() {
+        return;
+      },
+      drawImage: function() {
+        return;
+      },
+      save: function() {
+        return;
+      },
+      fillText: function() {
+        return;
+      },
+      restore: function() {
+        return;
+      },
+      beginPath: function() {
+        return;
+      },
+      moveTo: function() {
+        return;
+      },
+      lineTo: function() {
+        return;
+      },
+      closePath: function() {
+        return;
+      },
+      stroke: function() {
+        return;
+      },
+      translate: function() {
+        return;
+      },
+      scale: function() {
+        return;
+      },
+      rotate: function() {
+        return;
+      },
+      arc: function() {
+        return;
+      },
+      fill: function() {
+        return;
+      },
+      measureText: function() {
         return { width: 0 };
       },
-      transform: function () { return; },
-      rect: function () { return; },
-      clip: function () { return; },
+      transform: function() {
+        return;
+      },
+      rect: function() {
+        return;
+      },
+      clip: function() {
+        return;
+      },
     };
   }
 }
@@ -390,7 +449,6 @@ function fullUrl(elm: MockElement, attrName: string) {
   return val.replace(/\'|\"/g, '').trim();
 }
 
-
 function patchPropAttributes(prototype: any, attrs: any, defaults: any = {}) {
   Object.keys(attrs).forEach(propName => {
     const attr = attrs[propName];
@@ -407,38 +465,30 @@ function patchPropAttributes(prototype: any, attrs: any, defaults: any = {}) {
           } else {
             this.removeAttribute(propName);
           }
-        }
+        },
       });
-
     } else if (attr === Number) {
       Object.defineProperty(prototype, propName, {
         get(this: MockElement) {
           const value = this.getAttribute(propName);
-          return (value
-            ? parseInt(value, 10)
-            : defaultValue === undefined ? 0 : defaultValue
-          );
+          return value ? parseInt(value, 10) : defaultValue === undefined ? 0 : defaultValue;
         },
         set(this: MockElement, value: boolean) {
           this.setAttribute(propName, value);
-        }
+        },
       });
-
     } else {
       Object.defineProperty(prototype, propName, {
         get(this: MockElement) {
-          return this.hasAttribute(propName)
-            ? this.getAttribute(propName)
-            : defaultValue || '';
+          return this.hasAttribute(propName) ? this.getAttribute(propName) : defaultValue || '';
         },
         set(this: MockElement, value: boolean) {
           this.setAttribute(propName, value);
-        }
+        },
       });
     }
   });
 }
-
 
 MockElement.prototype.cloneNode = function(this: MockElement, deep?: boolean) {
   // because we're creating elements, which extending specific HTML base classes there

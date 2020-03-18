@@ -1,6 +1,5 @@
 import { parseFlags } from '../parse-flags';
 
-
 describe('parseFlags', () => {
   const args: string[] = [];
 
@@ -56,8 +55,8 @@ describe('parseFlags', () => {
 
     process.env = {
       npm_config_argv: JSON.stringify({
-        original: ['run', 'serve', '--port', '4444']
-      })
+        original: ['run', 'serve', '--port', '4444'],
+      }),
     };
 
     const flags = parseFlags(args);
@@ -83,8 +82,8 @@ describe('parseFlags', () => {
 
     process.env = {
       npm_config_argv: JSON.stringify({
-        original: ['run', 'dev']
-      })
+        original: ['run', 'dev'],
+      }),
     };
 
     const flags = parseFlags(args);
@@ -499,5 +498,4 @@ describe('parseFlags', () => {
     expect(flags.help).toBe(true);
     expect(flags.config).toBe('./myconfig.json');
   });
-
 });

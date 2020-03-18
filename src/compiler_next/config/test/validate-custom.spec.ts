@@ -3,9 +3,7 @@ import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import { validateOutputTargetCustom } from '../validate-outputs-custom';
 import { buildWarn } from '@utils';
 
-
 describe('validateCustom', () => {
-
   let config: d.Config;
 
   beforeEach(() => {
@@ -15,13 +13,11 @@ describe('validateCustom', () => {
       rootDir: '/User/some/path/',
       srcDir: '/User/some/path/src/',
       flags: {},
-      outputTargets: []
+      outputTargets: [],
     };
   });
 
-
   it('should log warning', () => {
-
     config.outputTargets = [
       {
         type: 'custom',
@@ -32,12 +28,11 @@ describe('validateCustom', () => {
         },
         generator: async () => {
           return;
-        }
-      }
+        },
+      },
     ];
     const diagnostics: d.Diagnostic[] = [];
     validateOutputTargetCustom(config, diagnostics);
     expect(diagnostics.length).toBe(1);
   });
-
 });

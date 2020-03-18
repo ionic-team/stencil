@@ -2,7 +2,6 @@ import * as d from '../../../declarations';
 import { setPackageVersionByContent } from '../resolve/resolve-utils';
 import path from 'path';
 
-
 export const writeFetchSuccessSync = (inMemoryFs: d.InMemoryFileSystem, url: string, filePath: string, content: string, pkgVersions: Map<string, string>) => {
   if (url.endsWith('package.json')) {
     setPackageVersionByContent(pkgVersions, content);

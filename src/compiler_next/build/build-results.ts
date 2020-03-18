@@ -3,11 +3,8 @@ import { generateHmr } from './build-hmr';
 import { getBuildTimestamp } from './build-ctx';
 import { hasError, isString, normalizeDiagnostics, fromEntries } from '@utils';
 
-
 export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  const componentGraph = buildCtx.componentGraph
-    ? fromEntries(buildCtx.componentGraph.entries())
-    : undefined;
+  const componentGraph = buildCtx.componentGraph ? fromEntries(buildCtx.componentGraph.entries()) : undefined;
 
   const buildResults: d.CompilerBuildResults = {
     buildId: buildCtx.buildId,
@@ -27,7 +24,7 @@ export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCt
     rootDir: config.rootDir,
     srcDir: config.srcDir,
     timestamp: getBuildTimestamp(),
-    componentGraph
+    componentGraph,
   };
 
   const hmr = generateHmr(config, compilerCtx, buildCtx);

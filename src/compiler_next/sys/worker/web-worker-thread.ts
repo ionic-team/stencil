@@ -1,7 +1,6 @@
 import { isNumber, isString } from '@utils';
 import { MsgFromWorker, MsgToWorker, WorkerMsgHandler } from '../../../declarations';
 
-
 export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHandler) => {
   let isQueued = false;
 
@@ -51,7 +50,6 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
           stencilRtnError: null,
         };
         queueMsgFromWorkerToMain(msgFromWorkerToMain);
-
       } catch (e) {
         // error occurred while running the task
         error(msgToWorker.stencilId, e);
@@ -59,7 +57,7 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
     }
   };
 
-  selfWorker.onmessage = (ev) => {
+  selfWorker.onmessage = ev => {
     // message from the main thread
     const msgsFromMainToWorker: MsgToWorker[] = ev.data;
     if (Array.isArray(msgsFromMainToWorker)) {
@@ -69,7 +67,7 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
     }
   };
 
-  selfWorker.onerror = (e) => {
+  selfWorker.onerror = e => {
     // uncaught error occurred on the worker thread
     error(-1, e);
   };

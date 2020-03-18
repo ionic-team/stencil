@@ -1,7 +1,6 @@
 import * as d from '../../../declarations';
 import { isAbsolute, join } from 'path';
 
-
 export const getSrcAbsPath = (config: d.Config, src: string) => {
   if (isAbsolute(src)) {
     return src;
@@ -13,7 +12,6 @@ export const getDestAbsPath = (src: string, destAbsPath: string, destRelPath: st
   if (destRelPath) {
     if (isAbsolute(destRelPath)) {
       return destRelPath;
-
     } else {
       return join(destAbsPath, destRelPath);
     }

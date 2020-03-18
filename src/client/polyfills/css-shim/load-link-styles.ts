@@ -31,31 +31,31 @@ export function loadDocumentLinks(doc: Document, globalScopes: CSSScope[]) {
 
 export function loadDocumentStyles(doc: Document, globalScopes: CSSScope[]) {
   const styleElms = Array.from(doc.querySelectorAll('style:not([data-styles]):not([data-no-shim])')) as HTMLStyleElement[];
-  return styleElms
-    .map(style => addGlobalStyle(globalScopes, style))
-    .some(Boolean);
+  return styleElms.map(style => addGlobalStyle(globalScopes, style)).some(Boolean);
 }
 
 export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: HTMLLinkElement) {
   const url = linkElm.href;
-  return fetch(url).then(rsp => rsp.text()).then(text => {
-    if (hasCssVariables(text) && linkElm.parentNode) {
-      if (hasRelativeUrls(text)) {
-        text = fixRelativeUrls(text, url);
+  return fetch(url)
+    .then(rsp => rsp.text())
+    .then(text => {
+      if (hasCssVariables(text) && linkElm.parentNode) {
+        if (hasRelativeUrls(text)) {
+          text = fixRelativeUrls(text, url);
+        }
+        const styleEl = doc.createElement('style');
+        styleEl.setAttribute('data-styles', '');
+        styleEl.textContent = text;
+
+        addGlobalStyle(globalScopes, styleEl);
+        linkElm.parentNode.insertBefore(styleEl, linkElm);
+        linkElm.remove();
       }
-      const styleEl = doc.createElement('style');
-      styleEl.setAttribute('data-styles', '');
-      styleEl.textContent = text;
-
-      addGlobalStyle(globalScopes, styleEl);
-      linkElm.parentNode.insertBefore(styleEl, linkElm);
-      linkElm.remove();
-    }
-  }).catch(err => {
-    console.error(err);
-  });
+    })
+    .catch(err => {
+      console.error(err);
+    });
 }
-
 
 // This regexp tries to determine when a variable is declared, for example:
 //
@@ -80,7 +80,6 @@ export function hasRelativeUrls(css: string) {
   CSS_URL_REGEXP.lastIndex = 0;
   return CSS_URL_REGEXP.test(css);
 }
-
 
 export function fixRelativeUrls(css: string, originalUrl: string) {
   // get the basepath from the original import url

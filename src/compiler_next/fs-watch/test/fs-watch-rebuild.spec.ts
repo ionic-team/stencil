@@ -4,7 +4,6 @@ import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
 import path from 'path';
 
-
 describe('fs-watch, rebuild', () => {
   const config = mockConfig();
   let compilerCtx: d.CompilerCtx;
@@ -24,17 +23,13 @@ describe('fs-watch, rebuild', () => {
   it('should get all the scripts added', () => {
     compilerCtx.activeFilesAdded = ['file1.jpg', 'file2.tsx', 'file3.ts', 'file4.js', 'file5.jsx', 'file6.css'];
     const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
-    expect(buildCtx.scriptsAdded).toEqual([
-      'file2.tsx', 'file3.ts', 'file4.js', 'file5.jsx'
-    ]);
+    expect(buildCtx.scriptsAdded).toEqual(['file2.tsx', 'file3.ts', 'file4.js', 'file5.jsx']);
   });
 
   it('should get all the scripts deleted', () => {
     compilerCtx.activeFilesDeleted = ['file1.jpg', 'file2.tsx', 'file3.ts', 'file4.js', 'file5.jsx', 'file6.css'];
     const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
-    expect(buildCtx.scriptsDeleted).toEqual([
-      'file2.tsx', 'file3.ts', 'file4.js', 'file5.jsx'
-    ]);
+    expect(buildCtx.scriptsDeleted).toEqual(['file2.tsx', 'file3.ts', 'file4.js', 'file5.jsx']);
   });
 
   it('hasScriptChanges', () => {
@@ -74,7 +69,7 @@ describe('fs-watch, rebuild', () => {
     expect(buildCtx.dirsAdded).toEqual([
       normalizePath(path.join(root, 'added-1')),
       normalizePath(path.join(root, 'added-1', 'added-2')),
-      normalizePath(path.join(root, 'added-1', 'added-2', 'added-3'))
+      normalizePath(path.join(root, 'added-1', 'added-2', 'added-3')),
     ]);
 
     expect(buildCtx.filesAdded).toEqual([
@@ -143,5 +138,4 @@ describe('fs-watch, rebuild', () => {
     const buildCtx = generateBuildFromFsWatch(config, compilerCtx);
     expect(buildCtx.requiresFullBuild).toBe(true);
   });
-
 });

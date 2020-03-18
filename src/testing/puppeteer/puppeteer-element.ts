@@ -5,7 +5,6 @@ import { EventSpy, addE2EListener, waitForEvent } from './puppeteer-events';
 import { find, findAll } from './puppeteer-find';
 import { MockHTMLElement, cloneAttributes, parseHtmlToFragment } from '@stencil/core/mock-doc';
 
-
 export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal {
   private _queuedActions: ElementAction[] = [];
 
@@ -29,7 +28,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   callMethod(methodName: string, ...methodArgs: any[]) {
     this._queueAction({
       methodName: methodName,
-      methodArgs: methodArgs
+      methodArgs: methodArgs,
     });
 
     return this.e2eRunActions();
@@ -38,7 +37,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   triggerEvent(eventName: string, eventInitDict?: EventInitDict) {
     this._queueAction({
       eventName: eventName,
-      eventInitDict: eventInitDict
+      eventInitDict: eventInitDict,
     });
   }
 
@@ -76,9 +75,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
       const executionContext = this._elmHandle.executionContext();
 
       isVisible = await executionContext.evaluate((elm: HostElement) => {
-
         return new Promise<boolean>(resolve => {
-
           window.requestAnimationFrame(() => {
             if (elm.isConnected) {
               const style = window.getComputedStyle(elm);
@@ -89,20 +86,15 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
                   elm.clientWidth;
                   resolve(true);
                 });
-
               } else {
                 resolve(false);
               }
-
             } else {
               resolve(false);
             }
           });
-
         });
-
       }, this._elmHandle);
-
     } catch (e) {}
 
     return isVisible;
@@ -156,7 +148,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     return this._elmHandle.isIntersectingViewport();
   }
 
-  async press(key: string, options?: { text?: string, delay?: number }) {
+  async press(key: string, options?: { text?: string; delay?: number }) {
     await this._elmHandle.press(key, options);
     await this._page.waitForChanges();
   }
@@ -176,9 +168,13 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
     const executionContext = this._elmHandle.executionContext();
 
-    const propValue = await executionContext.evaluate((elm: any, propertyName: string) => {
-      return elm[propertyName];
-    }, this._elmHandle, propertyName);
+    const propValue = await executionContext.evaluate(
+      (elm: any, propertyName: string) => {
+        return elm[propertyName];
+      },
+      this._elmHandle,
+      propertyName,
+    );
 
     return propValue;
   }
@@ -186,7 +182,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   setProperty(propertyName: string, value: any) {
     this._queueAction({
       setPropertyName: propertyName,
-      setPropertyValue: value
+      setPropertyValue: value,
     });
   }
 
@@ -198,20 +194,20 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   setAttribute(name: string, value: any) {
     this._queueAction({
       setAttributeName: name,
-      setAttributeValue: value
+      setAttributeValue: value,
     });
   }
 
   removeAttribute(name: string) {
     this._queueAction({
-      removeAttribute: name
+      removeAttribute: name,
     });
   }
 
   toggleAttribute(name: string, force?: boolean) {
     this._queueAction({
       toggleAttributeName: name,
-      toggleAttributeForce: force
+      toggleAttributeForce: force,
     });
   }
 
@@ -220,26 +216,26 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
       add: (...classNames: string[]) => {
         classNames.forEach(className => {
           this._queueAction({
-            classAdd: className
+            classAdd: className,
           });
         });
       },
       remove: (...classNames: string[]) => {
         classNames.forEach(className => {
           this._queueAction({
-            classRemove: className
+            classRemove: className,
           });
         });
       },
       toggle: (className: string) => {
         this._queueAction({
-          classToggle: className
+          classToggle: className,
         });
       },
       contains: (className: string) => {
         this._validate();
         return super.className.split(' ').includes(className);
-      }
+      },
     };
     return api;
   }
@@ -252,7 +248,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   set className(value: string) {
     this._queueAction({
       setPropertyName: 'className',
-      setPropertyValue: value
+      setPropertyValue: value,
     });
   }
 
@@ -264,7 +260,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   set id(value: string) {
     this._queueAction({
       setPropertyName: 'id',
-      setPropertyValue: value
+      setPropertyValue: value,
     });
   }
 
@@ -276,7 +272,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   set innerHTML(value: string) {
     this._queueAction({
       setPropertyName: 'innerHTML',
-      setPropertyValue: value
+      setPropertyValue: value,
     });
   }
 
@@ -288,7 +284,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   set innerText(value: string) {
     this._queueAction({
       setPropertyName: 'innerText',
-      setPropertyValue: value
+      setPropertyValue: value,
     });
   }
 
@@ -301,7 +297,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     if (typeof value === 'string') {
       this._queueAction({
         setPropertyName: 'nodeValue',
-        setPropertyValue: value
+        setPropertyValue: value,
       });
     }
   }
@@ -332,7 +328,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   set tabIndex(value: number) {
     this._queueAction({
       setPropertyName: 'tabIndex',
-      setPropertyValue: value
+      setPropertyValue: value,
     });
   }
 
@@ -344,7 +340,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   set textContent(value: string) {
     this._queueAction({
       setPropertyName: 'textContent',
-      setPropertyValue: value
+      setPropertyValue: value,
     });
   }
 
@@ -356,39 +352,41 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   set title(value: string) {
     this._queueAction({
       setPropertyName: 'title',
-      setPropertyValue: value
+      setPropertyValue: value,
     });
   }
 
   async getComputedStyle(pseudoElt?: string | null) {
-    const style = await this._page.evaluate((elm: HTMLElement, pseudoElt: string) => {
-      const rtn: any = {};
+    const style = await this._page.evaluate(
+      (elm: HTMLElement, pseudoElt: string) => {
+        const rtn: any = {};
 
-      const computedStyle = window.getComputedStyle(elm, pseudoElt);
+        const computedStyle = window.getComputedStyle(elm, pseudoElt);
 
-      const keys = Object.keys(computedStyle);
+        const keys = Object.keys(computedStyle);
 
-      keys.forEach(key => {
-        if (isNaN(key as any)) {
-          const value = computedStyle[key as any];
-          if (value != null) {
-            rtn[key] = value;
-          }
-
-        } else {
-          const dashProp = computedStyle[key as any];
-          if (dashProp.includes('-')) {
-            const value = computedStyle.getPropertyValue(dashProp);
+        keys.forEach(key => {
+          if (isNaN(key as any)) {
+            const value = computedStyle[key as any];
             if (value != null) {
-              rtn[dashProp] = value;
+              rtn[key] = value;
+            }
+          } else {
+            const dashProp = computedStyle[key as any];
+            if (dashProp.includes('-')) {
+              const value = computedStyle.getPropertyValue(dashProp);
+              if (value != null) {
+                rtn[dashProp] = value;
+              }
             }
           }
-        }
-      });
+        });
 
-      return rtn;
-
-    }, this._elmHandle, pseudoElt);
+        return rtn;
+      },
+      this._elmHandle,
+      pseudoElt,
+    );
 
     style.getPropertyValue = (propName: string) => {
       return style[propName];
@@ -404,71 +402,66 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
     const executionContext = this._elmHandle.executionContext();
 
-    const rtn = await executionContext.evaluate((elm: HTMLElement, queuedActions: ElementAction[]) => {
-      // BROWSER CONTEXT
-      // cannot use async/await in here cuz typescript transpiles it in the node context
-      return (elm as any).componentOnReady().then(() => {
-        let rtn: any = null;
+    const rtn = await executionContext.evaluate(
+      (elm: HTMLElement, queuedActions: ElementAction[]) => {
+        // BROWSER CONTEXT
+        // cannot use async/await in here cuz typescript transpiles it in the node context
+        return (elm as any).componentOnReady().then(() => {
+          let rtn: any = null;
 
-        queuedActions.forEach(queuedAction => {
-          if (queuedAction.methodName) {
-            rtn = (elm as any)[queuedAction.methodName].apply(elm, queuedAction.methodArgs);
+          queuedActions.forEach(queuedAction => {
+            if (queuedAction.methodName) {
+              rtn = (elm as any)[queuedAction.methodName].apply(elm, queuedAction.methodArgs);
+            } else if (queuedAction.setPropertyName) {
+              (elm as any)[queuedAction.setPropertyName] = queuedAction.setPropertyValue;
+            } else if (queuedAction.setAttributeName) {
+              elm.setAttribute(queuedAction.setAttributeName, queuedAction.setAttributeValue);
+            } else if (queuedAction.removeAttribute) {
+              elm.removeAttribute(queuedAction.removeAttribute);
+            } else if (queuedAction.toggleAttributeName) {
+              if (typeof queuedAction.toggleAttributeForce === 'boolean') {
+                elm.toggleAttribute(queuedAction.toggleAttributeName, queuedAction.toggleAttributeForce);
+              } else {
+                elm.toggleAttribute(queuedAction.toggleAttributeName);
+              }
+            } else if (queuedAction.classAdd) {
+              elm.classList.add(queuedAction.classAdd);
+            } else if (queuedAction.classRemove) {
+              elm.classList.remove(queuedAction.classRemove);
+            } else if (queuedAction.classToggle) {
+              elm.classList.toggle(queuedAction.classToggle);
+            } else if (queuedAction.eventName) {
+              const eventInitDict = queuedAction.eventInitDict || {};
 
-          } else if (queuedAction.setPropertyName) {
-            (elm as any)[queuedAction.setPropertyName] = queuedAction.setPropertyValue;
+              if (typeof eventInitDict.bubbles !== 'boolean') {
+                eventInitDict.bubbles = true;
+              }
 
-          } else if (queuedAction.setAttributeName) {
-            elm.setAttribute(queuedAction.setAttributeName, queuedAction.setAttributeValue);
+              if (typeof eventInitDict.cancelable !== 'boolean') {
+                eventInitDict.cancelable = true;
+              }
 
-          } else if (queuedAction.removeAttribute) {
-            elm.removeAttribute(queuedAction.removeAttribute);
+              if (typeof eventInitDict.composed !== 'boolean') {
+                eventInitDict.composed = true;
+              }
 
-          } else if (queuedAction.toggleAttributeName) {
-            if (typeof queuedAction.toggleAttributeForce === 'boolean') {
-              elm.toggleAttribute(queuedAction.toggleAttributeName, queuedAction.toggleAttributeForce);
-            } else {
-              elm.toggleAttribute(queuedAction.toggleAttributeName);
+              const ev = new CustomEvent(queuedAction.eventName, eventInitDict);
+              elm.dispatchEvent(ev);
             }
-
-          } else if (queuedAction.classAdd) {
-            elm.classList.add(queuedAction.classAdd);
-
-          } else if (queuedAction.classRemove) {
-            elm.classList.remove(queuedAction.classRemove);
-
-          } else if (queuedAction.classToggle) {
-            elm.classList.toggle(queuedAction.classToggle);
-
-          } else if (queuedAction.eventName) {
-            const eventInitDict = queuedAction.eventInitDict || {};
-
-            if (typeof eventInitDict.bubbles !== 'boolean') {
-              eventInitDict.bubbles = true;
-            }
-
-            if (typeof eventInitDict.cancelable !== 'boolean') {
-              eventInitDict.cancelable = true;
-            }
-
-            if (typeof eventInitDict.composed !== 'boolean') {
-              eventInitDict.composed = true;
-            }
-
-            const ev = new CustomEvent(queuedAction.eventName, eventInitDict);
-            elm.dispatchEvent(ev);
-          }
-        });
-
-        if (rtn && typeof rtn.then === 'function') {
-          return rtn.then((value: any) => {
-            return value;
           });
-        }
 
-        return rtn;
-      });
+          if (rtn && typeof rtn.then === 'function') {
+            return rtn.then((value: any) => {
+              return value;
+            });
+          }
 
-    }, this._elmHandle, this._queuedActions as any);
+          return rtn;
+        });
+      },
+      this._elmHandle,
+      this._queuedActions as any,
+    );
 
     this._queuedActions.length = 0;
 
@@ -481,14 +474,13 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     const { outerHTML, shadowRootHTML } = await executionContext.evaluate((elm: HTMLElement) => {
       return {
         outerHTML: elm.outerHTML,
-        shadowRootHTML: elm.shadowRoot ? elm.shadowRoot.innerHTML : null
+        shadowRootHTML: elm.shadowRoot ? elm.shadowRoot.innerHTML : null,
       };
     }, this._elmHandle);
 
     if (typeof shadowRootHTML === 'string') {
       (this as any).shadowRoot = parseHtmlToFragment(shadowRootHTML) as any;
       (this as any).shadowRoot.host = this;
-
     } else {
       (this as any).shadowRoot = null;
     }
@@ -528,9 +520,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
     this._page = null;
   }
-
 }
-
 
 interface ElementAction {
   classAdd?: string;

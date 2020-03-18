@@ -7,16 +7,21 @@ import { parseStaticComponentMeta } from './component';
 import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
 
-
-export const convertStaticToMeta = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, typeChecker: ts.TypeChecker, collection: d.CollectionCompilerMeta, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
+export const convertStaticToMeta = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  typeChecker: ts.TypeChecker,
+  collection: d.CollectionCompilerMeta,
+  transformOpts: d.TransformOptions,
+): ts.TransformerFactory<ts.SourceFile> => {
   return transformCtx => {
-
     let dirPath: string;
     let moduleFile: d.Module;
 
     const visitNode = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
-        return parseStaticComponentMeta( compilerCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap, transformOpts);
+        return parseStaticComponentMeta(compilerCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap, transformOpts);
       } else if (ts.isImportDeclaration(node)) {
         parseImport(config, compilerCtx, buildCtx, moduleFile, dirPath, node);
       } else if (ts.isCallExpression(node)) {

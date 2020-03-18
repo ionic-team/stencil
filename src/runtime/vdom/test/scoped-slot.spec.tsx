@@ -1,9 +1,7 @@
 import { Component, Prop, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('scoped slot', () => {
-
   it('should relocate nested default slot nodes', async () => {
     @Component({ tag: 'ion-test', scoped: true })
     class CmpA {
@@ -80,7 +78,7 @@ describe('scoped slot', () => {
       render() {
         return (
           <monkey>
-            <slot name='start'></slot>
+            <slot name="start"></slot>
           </monkey>
         );
       }
@@ -112,9 +110,7 @@ describe('scoped slot', () => {
     @Component({ tag: 'ion-child', scoped: true })
     class Child {
       render() {
-        return (
-          <slot></slot>
-        );
+        return <slot></slot>;
       }
     }
 
@@ -183,9 +179,7 @@ describe('scoped slot', () => {
     @Component({ tag: 'ion-child', scoped: true })
     class Child {
       render() {
-        return (
-          <slot></slot>
-        );
+        return <slot></slot>;
       }
     }
 
@@ -203,14 +197,10 @@ describe('scoped slot', () => {
   it('should relocate parent content after child content dynamically changes slot wrapper tag', async () => {
     @Component({ tag: 'ion-parent', scoped: true })
     class Parent {
-      @Prop() innerH = <h1>parent text</h1>;
+      @Prop() innerH = (<h1>parent text</h1>);
 
       render() {
-        return (
-          <ion-child>
-            {this.innerH}
-          </ion-child>
-        );
+        return <ion-child>{this.innerH}</ion-child>;
       }
     }
 
@@ -329,10 +319,7 @@ describe('scoped slot', () => {
         }
 
         if (this.test === 2) {
-          return [
-            <div>content 1</div>,
-            <div>content 2</div>
-          ];
+          return [<div>content 1</div>, <div>content 2</div>];
         }
 
         if (this.test === 3) {
@@ -482,8 +469,8 @@ describe('scoped slot', () => {
       render() {
         return (
           <ion-child>
-            <falcon slot='start'>{++values}</falcon>
-            <eagle slot='start'>{++values}</eagle>
+            <falcon slot="start">{++values}</falcon>
+            <eagle slot="start">{++values}</eagle>
           </ion-child>
         );
       }
@@ -495,8 +482,8 @@ describe('scoped slot', () => {
         return (
           <mouse>
             <slot></slot>
-            <slot name='start'></slot>
-            <slot name='end'></slot>
+            <slot name="start"></slot>
+            <slot name="end"></slot>
           </mouse>
         );
       }
@@ -544,8 +531,8 @@ describe('scoped slot', () => {
         return (
           <ion-child>
             <butterfly>{(++values).toString()}</butterfly>
-            <fox slot='end'>{++values}</fox>
-            <ferret slot='start'>{++values}</ferret>
+            <fox slot="end">{++values}</fox>
+            <ferret slot="start">{++values}</ferret>
           </ion-child>
         );
       }
@@ -556,11 +543,11 @@ describe('scoped slot', () => {
       render() {
         return (
           <flamingo>
-            <slot name='start'></slot>
+            <slot name="start"></slot>
             <horse>
               <slot></slot>
               <bullfrog>
-                <slot name='end'></slot>
+                <slot name="end"></slot>
               </bullfrog>
             </horse>
           </flamingo>
@@ -768,5 +755,4 @@ describe('scoped slot', () => {
     // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].nodeName).toBe('GOAT');
     // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].textContent).toBe('hey goat!');
   });
-
 });

@@ -1,13 +1,12 @@
 import { ConfigFlags } from '../declarations';
 import { dashToPascalCase } from '@utils';
 
-
 export function parseFlags(args: string[]): ConfigFlags {
   const flags: any = {
     task: null,
     args: [],
     knownArgs: [],
-    unknownArgs: null
+    unknownArgs: null,
   };
 
   // cmd line has more priority over npm scripts cmd
@@ -40,10 +39,8 @@ export function parseFlags(args: string[]): ConfigFlags {
   return flags;
 }
 
-
 function parseArgs(flags: any, args: string[], knownArgs: string[]) {
   ARG_OPTS.boolean.forEach(booleanName => {
-
     const alias = (ARG_OPTS.alias as any)[booleanName];
     const flagKey = configCase(booleanName);
 
@@ -55,19 +52,15 @@ function parseArgs(flags: any, args: string[], knownArgs: string[]) {
       if (cmdArg === `--${booleanName}`) {
         flags[flagKey] = true;
         knownArgs.push(cmdArg);
-
       } else if (cmdArg === `--${flagKey}`) {
         flags[flagKey] = true;
         knownArgs.push(cmdArg);
-
       } else if (cmdArg === `--no-${booleanName}`) {
         flags[flagKey] = false;
         knownArgs.push(cmdArg);
-
       } else if (cmdArg === `--no${dashToPascalCase(booleanName)}`) {
         flags[flagKey] = false;
         knownArgs.push(cmdArg);
-
       } else if (alias && cmdArg === `-${alias}`) {
         flags[flagKey] = true;
         knownArgs.push(cmdArg);
@@ -76,7 +69,6 @@ function parseArgs(flags: any, args: string[], knownArgs: string[]) {
   });
 
   ARG_OPTS.string.forEach(stringName => {
-
     const alias = (ARG_OPTS.alias as any)[stringName];
     const flagKey = configCase(stringName);
 
@@ -92,30 +84,25 @@ function parseArgs(flags: any, args: string[], knownArgs: string[]) {
         values.shift();
         flags[flagKey] = values.join('=');
         knownArgs.push(cmdArg);
-
       } else if (cmdArg === `--${stringName}`) {
         flags[flagKey] = args[i + 1];
         knownArgs.push(cmdArg);
         knownArgs.push(args[i + 1]);
-
       } else if (cmdArg === `--${flagKey}`) {
         flags[flagKey] = args[i + 1];
         knownArgs.push(cmdArg);
         knownArgs.push(args[i + 1]);
-
       } else if (cmdArg.startsWith(`--${flagKey}=`)) {
         const values = cmdArg.split('=');
         values.shift();
         flags[flagKey] = values.join('=');
         knownArgs.push(cmdArg);
-
       } else if (alias) {
         if (cmdArg.startsWith(`-${alias}=`)) {
           const values = cmdArg.split('=');
           values.shift();
           flags[flagKey] = values.join('=');
           knownArgs.push(cmdArg);
-
         } else if (cmdArg === `-${alias}`) {
           flags[flagKey] = args[i + 1];
           knownArgs.push(args[i + 1]);
@@ -125,7 +112,6 @@ function parseArgs(flags: any, args: string[], knownArgs: string[]) {
   });
 
   ARG_OPTS.number.forEach(numberName => {
-
     const alias = (ARG_OPTS.alias as any)[numberName];
     const flagKey = configCase(numberName);
 
@@ -141,28 +127,23 @@ function parseArgs(flags: any, args: string[], knownArgs: string[]) {
         values.shift();
         flags[flagKey] = parseInt(values.join(''), 10);
         knownArgs.push(cmdArg);
-
       } else if (cmdArg === `--${numberName}`) {
         flags[flagKey] = parseInt(args[i + 1], 10);
         knownArgs.push(args[i + 1]);
-
       } else if (cmdArg.startsWith(`--${flagKey}=`)) {
         const values = cmdArg.split('=');
         values.shift();
         flags[flagKey] = parseInt(values.join(''), 10);
         knownArgs.push(cmdArg);
-
       } else if (cmdArg === `--${flagKey}`) {
         flags[flagKey] = parseInt(args[i + 1], 10);
         knownArgs.push(args[i + 1]);
-
       } else if (alias) {
         if (cmdArg.startsWith(`-${alias}=`)) {
           const values = cmdArg.split('=');
           values.shift();
           flags[flagKey] = parseInt(values.join(''), 10);
           knownArgs.push(cmdArg);
-
         } else if (cmdArg === `-${alias}`) {
           flags[flagKey] = parseInt(args[i + 1], 10);
           knownArgs.push(args[i + 1]);
@@ -172,12 +153,10 @@ function parseArgs(flags: any, args: string[], knownArgs: string[]) {
   });
 }
 
-
 const configCase = (prop: string) => {
   prop = dashToPascalCase(prop);
   return prop.charAt(0).toLowerCase() + prop.substr(1);
 };
-
 
 const ARG_OPTS = {
   boolean: [
@@ -211,39 +190,27 @@ const ARG_OPTS = {
     'update-screenshot',
     'verbose',
     'version',
-    'watch'
+    'watch',
   ],
-  number: [
-    'max-workers',
-    'port'
-  ],
-  string: [
-    'address',
-    'config',
-    'docs-json',
-    'emulate',
-    'log-level',
-    'root',
-    'screenshot-connector'
-  ],
+  number: ['max-workers', 'port'],
+  string: ['address', 'config', 'docs-json', 'emulate', 'log-level', 'root', 'screenshot-connector'],
   alias: {
-    'config': 'c',
-    'help': 'h',
-    'port': 'p',
-    'version': 'v'
-  }
+    config: 'c',
+    help: 'h',
+    port: 'p',
+    version: 'v',
+  },
 };
-
 
 function getNpmScriptArgs() {
   // process.env.npm_config_argv
   // {"remain":["4444"],"cooked":["run","serve","--port","4444"],"original":["run","serve","--port","4444"]}
   let args: string[] = [];
   try {
-    if (typeof process !== 'undefined' &&  process.env) {
+    if (typeof process !== 'undefined' && process.env) {
       const npmConfigArgs = process.env.npm_config_argv;
       if (npmConfigArgs) {
-        args = (JSON.parse(npmConfigArgs).original as string[]);
+        args = JSON.parse(npmConfigArgs).original as string[];
         if (args[0] === 'run') {
           args = args.slice(2);
         }

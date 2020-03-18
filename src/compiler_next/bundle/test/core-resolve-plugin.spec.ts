@@ -1,6 +1,5 @@
 import { getHydratedFlagHead, getStencilInternalModule } from '../core-resolve-plugin';
 
-
 describe('core resolve plugin', () => {
   const rootDir = '/';
 
@@ -61,5 +60,4 @@ describe('core resolve plugin', () => {
     });
     expect(o).toBe(`{display:none}[yup]{display:block}`);
   });
-
 });

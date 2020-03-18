@@ -1,14 +1,10 @@
 import * as d from '../../../declarations';
 import { dashToPascalCase, sortBy, toTitleCase } from '@utils';
 
-
 export const updateToHydrateComponents = async (cmps: d.ComponentCompilerMeta[]) => {
-  const hydrateCmps = await Promise.all(
-    cmps.map(updateToHydrateComponent)
-  );
+  const hydrateCmps = await Promise.all(cmps.map(updateToHydrateComponent));
   return sortBy(hydrateCmps, c => c.cmp.componentClassName);
 };
-
 
 const updateToHydrateComponent = async (cmp: d.ComponentCompilerMeta) => {
   const cmpData: d.ComponentCompilerData = {
@@ -16,7 +12,7 @@ const updateToHydrateComponent = async (cmp: d.ComponentCompilerMeta) => {
     exportLine: ``,
     cmp: cmp,
     uniqueComponentClassName: ``,
-    importLine: ``
+    importLine: ``,
   };
 
   const pascalCasedClassName = dashToPascalCase(toTitleCase(cmp.tagName));

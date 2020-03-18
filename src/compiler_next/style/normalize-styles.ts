@@ -2,10 +2,8 @@ import * as d from '../../declarations';
 import { DEFAULT_STYLE_MODE, normalizePath } from '@utils';
 import { dirname, isAbsolute, join, relative } from 'path';
 
-
 export const normalizeStyles = (tagName: string, componentFilePath: string, styles: d.StyleCompiler[]) => {
   styles.forEach(style => {
-
     if (style.modeName === DEFAULT_STYLE_MODE) {
       style.styleId = tagName.toUpperCase();
     } else {
@@ -35,7 +33,6 @@ const normalizeExternalStyle = (componentFilePath: string, externalStyle: d.Exte
 
     // if this is an absolute path already, let's convert it to be relative
     externalStyle.relativePath = normalizePath(relative(componentDir, externalStyle.originalComponentPath));
-
   } else {
     // this path is relative to the component
     // add to our list of style relative paths

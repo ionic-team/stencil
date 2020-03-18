@@ -1,9 +1,7 @@
 import { MockDocument } from '../document';
 import { MockElement } from '../node';
 
-
 describe('selector', () => {
-
   it('closest', () => {
     const doc = new MockDocument(`
       <div>
@@ -227,5 +225,4 @@ describe('selector', () => {
     const q2 = div.querySelector('span.c a');
     expect(q2.tagName).toBe('A');
   });
-
 });

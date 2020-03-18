@@ -43,7 +43,7 @@ export const setPackageVersionByContent = (pkgVersions: Map<string, string>, pkg
 export const isExternalUrl = (p: string) => {
   if (isString(p)) {
     p = p.toLowerCase();
-    return p.startsWith('https://') || p.startsWith('http://')
+    return p.startsWith('https://') || p.startsWith('http://');
   }
   return false;
 };
@@ -54,4 +54,4 @@ export const isLocalModule = (p: string) => p.startsWith('.') || p.startsWith('/
 
 export const isStencilCoreImport = (p: string) => p.startsWith('@stencil/core');
 
-export const shouldFetchModule = (p: string) => (IS_FETCH_ENV && !IS_NODE_ENV && p.startsWith(NODE_MODULES_FS_DIR + '/'));
+export const shouldFetchModule = (p: string) => IS_FETCH_ENV && !IS_NODE_ENV && p.startsWith(NODE_MODULES_FS_DIR + '/');

@@ -1,9 +1,7 @@
 import { BuildConditionals, BuildFeatures, ComponentCompilerMeta, Config, Module, ModuleMap } from '@stencil/core/internal';
 import { unique } from '@utils';
 
-
 export * from '../../app-data';
-
 
 export const getBuildFeatures = (cmps: ComponentCompilerMeta[]) => {
   const slot = cmps.some(c => c.htmlTagNames.includes('slot'));
@@ -71,7 +69,6 @@ export const getBuildFeatures = (cmps: ComponentCompilerMeta[]) => {
   return f;
 };
 
-
 export const updateComponentBuildConditionals = (moduleMap: ModuleMap, cmps: ComponentCompilerMeta[]) => {
   cmps.forEach(cmp => {
     const importedModules = getModuleImports(moduleMap, cmp.sourceFilePath, []);
@@ -100,7 +97,6 @@ export const updateComponentBuildConditionals = (moduleMap: ModuleMap, cmps: Com
   });
 };
 
-
 const getModuleImports = (moduleMap: ModuleMap, filePath: string, importedModules: Module[]) => {
   let moduleFile = moduleMap.get(filePath);
   if (moduleFile == null) {
@@ -123,16 +119,15 @@ const getModuleImports = (moduleMap: ModuleMap, filePath: string, importedModule
   return importedModules;
 };
 
-
 export const updateBuildConditionals = (config: Config, b: BuildConditionals) => {
-  b.isDebug = (config.logLevel === 'debug');
+  b.isDebug = config.logLevel === 'debug';
   b.isDev = !!config.devMode;
   b.isTesting = !!config._isTesting;
   b.devTools = b.isDev && !config._isTesting;
-  b.profile = !!(config.profile);
+  b.profile = !!config.profile;
   b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.reloadStrategy === 'hmr' && !config._isTesting);
-  b.updatable = (b.updatable || b.hydrateClientSide || b.hotModuleReplacement);
-  b.member = (b.member || b.updatable || b.mode || b.lifecycle);
+  b.updatable = b.updatable || b.hydrateClientSide || b.hotModuleReplacement;
+  b.member = b.member || b.updatable || b.mode || b.lifecycle;
   b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
   b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;

@@ -1,9 +1,7 @@
 import * as d from '../../../declarations';
 import { h, newVNode } from '../h';
 
-
 describe('h()', () => {
-
   it('should render nested functional components', () => {
     const FunctionalCmp1 = () => h('fn-cmp', null);
     const FunctionalCmp2 = () => h(FunctionalCmp1, null);
@@ -97,10 +95,7 @@ describe('h()', () => {
   });
 
   it('should get vnode with tag, data, array of children h()', () => {
-    const vnode = h('div', { id: 'my-id' },
-      h('child-a', null),
-      h('child-b', null)
-    );
+    const vnode = h('div', { id: 'my-id' }, h('child-a', null), h('child-b', null));
     expect(vnode.$tag$).toEqual('div');
     expect(vnode.$attrs$).toBeDefined();
     expect(vnode.$children$).toBeDefined();
@@ -122,7 +117,7 @@ describe('h()', () => {
   });
 
   it('should have class based on classes as keys of an object', () => {
-    const vnode = h('div', { class: { 'dragons': true, 'love': true, 'tacos': true } });
+    const vnode = h('div', { class: { dragons: true, love: true, tacos: true } });
     expect(vnode.$attrs$.class).toBeDefined();
     expect(vnode.$attrs$.class).toEqual('dragons love tacos');
   });
@@ -153,7 +148,9 @@ describe('h()', () => {
   });
 
   it('should set vattrs ref', () => {
-    const ref = () => {/**/};
+    const ref = () => {
+      /**/
+    };
     const vnode = h('div', { ref: ref });
     expect(vnode.$attrs$.ref).toBe(ref);
   });
@@ -204,7 +201,9 @@ describe('h()', () => {
   });
 
   it('should add on', () => {
-    function onClick() {/**/}
+    function onClick() {
+      /**/
+    }
     const vnode = h('div', { onclick: onClick });
     expect(vnode.$attrs$).toBeDefined();
     expect(vnode.$attrs$.onclick).toBe(onClick);
@@ -239,7 +238,7 @@ describe('h()', () => {
   });
 
   it('can create vnode with one child vnode', () => {
-    const vnode = h('div', null,  h('span', null));
+    const vnode = h('div', null, h('span', null));
     expect(vnode.$tag$).toEqual('div');
     expect(vnode.$children$[0].$tag$).toEqual('span');
   });
@@ -285,42 +284,32 @@ describe('h()', () => {
   });
 
   it('should walk nested arrays', () => {
-    const vnode = h('a', null, [
-      'Str0',
-      [h('b', null, 'Str1'),
-        ['Str2']
-      ]
-    ]as any);
+    const vnode = h('a', null, ['Str0', [h('b', null, 'Str1'), ['Str2']]] as any);
 
     expect(vnode.$children$).toEqual([
       newVNode(null, 'Str0'),
       {
-        '$attrs$': null,
-        '$children$': [
-          newVNode(null, 'Str1')
-        ],
-        '$elm$': null,
-        '$flags$': 0,
-        '$key$': null,
-        '$name$': null,
-        '$tag$': 'b',
-        '$text$': null
+        $attrs$: null,
+        $children$: [newVNode(null, 'Str1')],
+        $elm$: null,
+        $flags$: 0,
+        $key$: null,
+        $name$: null,
+        $tag$: 'b',
+        $text$: null,
       },
-      newVNode(null, 'Str2')
+      newVNode(null, 'Str2'),
     ]);
-
-
   });
 
   describe('functional components', () => {
-
     it('should receive props, array, and utils as props', async () => {
       let args: any;
       const MyFunction: d.FunctionalComponent = (...argArray) => {
         args = argArray;
         return null;
       };
-      h(MyFunction, { 'id': 'blank' }, h('span', {}));
+      h(MyFunction, { id: 'blank' }, h('span', {}));
       expect(args.length).toBe(3);
       expect(args[0]).toEqual({ id: 'blank' });
       expect(args[1].length).toEqual(1);
@@ -349,9 +338,10 @@ describe('h()', () => {
       expect(args[1]).toEqual([]);
     });
 
-
     it('should handle functional cmp which returns null', async () => {
-      const MyFunction: d.FunctionalComponent = () => { return null; };
+      const MyFunction: d.FunctionalComponent = () => {
+        return null;
+      };
       const vnode = h(MyFunction, {});
 
       expect(vnode).toEqual(null);
@@ -363,16 +353,14 @@ describe('h()', () => {
       };
       const vnode = h(MyFunction, {});
       expect(vnode).toEqual({
-        '$elm$': null,
-        '$flags$': 0,
-        '$attrs$': {'id': 'fn-cmp'},
-        '$children$': [
-          newVNode(null, 'fn-cmp')
-        ],
-        '$key$': null,
-        '$name$': null,
-        '$tag$': 'div',
-        '$text$': null
+        $elm$: null,
+        $flags$: 0,
+        $attrs$: { id: 'fn-cmp' },
+        $children$: [newVNode(null, 'fn-cmp')],
+        $key$: null,
+        $name$: null,
+        $tag$: 'div',
+        $text$: null,
       });
     });
   });
@@ -430,8 +418,8 @@ describe('h()', () => {
             ...child,
             vattrs: {
               ...child.vattrs,
-              class: 'my-class'
-            }
+              class: 'my-class',
+            },
           };
         });
       };
@@ -442,28 +430,26 @@ describe('h()', () => {
           $flags$: 0,
           $attrs$: {
             class: 'my-class',
-            id: 'blue'
+            id: 'blue',
           },
-          $children$: [
-            newVNode(null, 'innerText')
-          ],
+          $children$: [newVNode(null, 'innerText')],
           $key$: null,
           $name$: null,
           $tag$: 'div',
-          $text$: null
+          $text$: null,
         },
         {
           $elm$: null,
           $flags$: 0,
           $attrs$: {
-            class: 'my-class'
+            class: 'my-class',
           },
           $children$: null,
           $key$: null,
           $name$: null,
           $tag$: 'span',
-          $text$: null
-        }
+          $text$: null,
+        },
       ]);
     });
   });

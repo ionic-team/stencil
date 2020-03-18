@@ -1,11 +1,9 @@
 import { Component, Event, EventEmitter, Listen, State, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('listen', () => {
-
   it('listen to click on host, from elm.click()', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @State() clicks = 0;
 
@@ -44,9 +42,8 @@ describe('listen', () => {
   });
 
   it('should listen from parent', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
-
       @State() selfClicks = 0;
       @State() parentClicks = 0;
       @State() bodyClicks = 0;
@@ -58,22 +55,22 @@ describe('listen', () => {
         this.selfClicks++;
       }
 
-      @Listen('click', {target: 'parent'})
+      @Listen('click', { target: 'parent' })
       onParentClick() {
         this.parentClicks++;
       }
 
-      @Listen('click', {target: 'body'})
+      @Listen('click', { target: 'body' })
       onBodyClick() {
         this.bodyClicks++;
       }
 
-      @Listen('click', {target: 'document'})
+      @Listen('click', { target: 'document' })
       onDocumentClick() {
         this.documentClicks++;
       }
 
-      @Listen('click', {target: 'window'})
+      @Listen('click', { target: 'window' })
       onWindowClick() {
         this.windowClicks++;
       }
@@ -95,20 +92,17 @@ describe('listen', () => {
       <cmp-a>0,0,0,0,0</cmp-a>
     `);
 
-
     root.click();
     await waitForChanges();
     expect(root).toEqualHtml(`
       <cmp-a>1,1,1,1,1</cmp-a>
     `);
 
-
     parent.click();
     await waitForChanges();
     expect(root).toEqualHtml(`
       <cmp-a>1,2,2,2,2</cmp-a>
     `);
-
 
     other.click();
     await waitForChanges();
@@ -122,13 +116,13 @@ describe('listen', () => {
       <cmp-a>1,2,4,4,4</cmp-a>
     `);
 
-    doc.dispatchEvent(new CustomEvent('click', {bubbles: true}));
+    doc.dispatchEvent(new CustomEvent('click', { bubbles: true }));
     await waitForChanges();
     expect(root).toEqualHtml(`
       <cmp-a>1,2,4,5,5</cmp-a>
     `);
 
-    win.dispatchEvent(new CustomEvent('click', {bubbles: true}));
+    win.dispatchEvent(new CustomEvent('click', { bubbles: true }));
     await waitForChanges();
     expect(root).toEqualHtml(`
       <cmp-a>1,2,4,5,6</cmp-a>
@@ -141,7 +135,7 @@ describe('listen', () => {
     function getEventDetail() {
       return `event${eventId++} `;
     }
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       renderCount = 0;
 
@@ -185,15 +179,21 @@ describe('listen', () => {
     const a = doc.createElement('cmp-a');
     doc.body.appendChild(a);
 
-    a.dispatchEvent(new CustomEvent('event', {
-      detail: getEventDetail()
-    }));
-    a.dispatchEvent(new CustomEvent('event', {
-      detail: getEventDetail()
-    }));
-    a.dispatchEvent(new CustomEvent('event', {
-      detail: getEventDetail()
-    }));
+    a.dispatchEvent(
+      new CustomEvent('event', {
+        detail: getEventDetail(),
+      }),
+    );
+    a.dispatchEvent(
+      new CustomEvent('event', {
+        detail: getEventDetail(),
+      }),
+    );
+    a.dispatchEvent(
+      new CustomEvent('event', {
+        detail: getEventDetail(),
+      }),
+    );
 
     await Promise.resolve();
     expect(log).toEqual('');
@@ -205,5 +205,4 @@ describe('listen', () => {
     await waitForChanges();
     expect(a).toEqualHtml(`<cmp-a>1 7</cmp-a>`);
   });
-
 });

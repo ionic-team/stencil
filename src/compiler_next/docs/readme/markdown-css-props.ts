@@ -1,7 +1,6 @@
 import * as d from '../../../declarations';
 import { MarkdownTable } from './docs-util';
 
-
 export const stylesToMarkdown = (styles: d.JsonDocsStyle[]) => {
   const content: string[] = [];
   if (styles.length === 0) {
@@ -15,10 +14,7 @@ export const stylesToMarkdown = (styles: d.JsonDocsStyle[]) => {
   table.addHeader(['Name', 'Description']);
 
   styles.forEach(style => {
-    table.addRow([
-      `\`${style.name}\``,
-      style.docs
-    ]);
+    table.addRow([`\`${style.name}\``, style.docs]);
   });
 
   content.push(...table.toMarkdown());

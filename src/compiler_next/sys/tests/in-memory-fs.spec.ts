@@ -3,9 +3,7 @@ import { createTestingSystem } from '../../../testing/testing-sys';
 import { getCommitInstructions, createInMemoryFs, shouldIgnore } from '../in-memory-fs';
 import { normalizePath } from '../../../utils';
 
-
 describe(`in-memory-fs, getCommitInstructions`, () => {
-
   let items: d.FsItems;
 
   beforeEach(() => {
@@ -23,7 +21,7 @@ describe(`in-memory-fs, getCommitInstructions`, () => {
       queueCopyFileToDest: null,
       queueDeleteFromDisk: null,
       queueWriteToDisk: null,
-      useCache: null
+      useCache: null,
     };
     return Object.assign(defaultItem, item);
   }
@@ -166,12 +164,9 @@ describe(`in-memory-fs, getCommitInstructions`, () => {
     expect(i.dirsToDelete).toEqual([]);
     expect(i.dirsToEnsure).toEqual([]);
   });
-
 });
 
-
 describe(`in-memory-fs`, () => {
-
   let sys = createTestingSystem();
   let fs: d.InMemoryFileSystem;
 
@@ -179,7 +174,6 @@ describe(`in-memory-fs`, () => {
     sys = createTestingSystem();
     fs = createInMemoryFs(sys);
   });
-
 
   it(`access true`, async () => {
     await fs.writeFile(`/file`, `content`);
@@ -661,14 +655,24 @@ describe(`in-memory-fs`, () => {
     expect(fs.getItem(`C:\\dir3\\file4.js`).fileText).toBe('4');
   });
 
-
   describe('fs utils', () => {
-
     it('not shouldIgnore', () => {
       const filePaths = [
-        '/file.ts', '/file.tsx', '/file.js', '/file.jsx', '/file.svg',
-        '/file.html', '/file.txt', '/file.md', '/file.markdown', '/file.json',
-        '/file.css', '/file.scss', '/file.sass', '/file.less', '/file.styl'
+        '/file.ts',
+        '/file.tsx',
+        '/file.js',
+        '/file.jsx',
+        '/file.svg',
+        '/file.html',
+        '/file.txt',
+        '/file.md',
+        '/file.markdown',
+        '/file.json',
+        '/file.css',
+        '/file.scss',
+        '/file.sass',
+        '/file.less',
+        '/file.styl',
       ];
       filePaths.forEach(filePath => {
         expect(shouldIgnore(filePath)).toBe(false);
@@ -676,17 +680,10 @@ describe(`in-memory-fs`, () => {
     });
 
     it('shouldIgnore', () => {
-      const filePaths = [
-        '/User/.DS_Store',
-        '/User/.gitignore',
-        '/User/desktop.ini',
-        '/User/thumbs.db'
-      ];
+      const filePaths = ['/User/.DS_Store', '/User/.gitignore', '/User/desktop.ini', '/User/thumbs.db'];
       filePaths.forEach(filePath => {
         expect(shouldIgnore(filePath)).toBe(true);
       });
     });
-
   });
-
 });

@@ -1,13 +1,10 @@
 import { Component, Event, EventEmitter, Listen, Method, State } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('event', () => {
-
   it('event normal ionChange event', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
-
       @Event() ionChange: EventEmitter;
 
       @State() counter = 0;
@@ -62,10 +59,9 @@ describe('event', () => {
   });
 
   it('should have custom name', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
-
-      @Event({eventName: 'ionStyle'}) style: EventEmitter;
+      @Event({ eventName: 'ionStyle' }) style: EventEmitter;
       @State() counter = 0;
 
       @Listen('ionStyle')
@@ -109,15 +105,15 @@ describe('event', () => {
   });
 
   it('should have different default settings', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
-
       @Event({
         eventName: 'ionStyle',
         bubbles: false,
         composed: false,
         cancelable: false,
-      }) style: EventEmitter;
+      })
+      style: EventEmitter;
 
       @State() counter = 0;
 
@@ -164,7 +160,7 @@ describe('event', () => {
 
   describe('KeyboardEvent', () => {
     it('can be dispatched', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @State() counter = 0;
 
@@ -197,7 +193,7 @@ describe('event', () => {
     });
 
     it('can be dispatched with custom data', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @State() key: string;
         @State() shift: string;
@@ -222,7 +218,7 @@ describe('event', () => {
         <cmp-a> - </cmp-a>
       `);
 
-      const ev = new KeyboardEvent('keydown', {key: 'A', shiftKey: true});
+      const ev = new KeyboardEvent('keydown', { key: 'A', shiftKey: true });
       root.dispatchEvent(ev);
       await waitForChanges();
 
@@ -234,7 +230,7 @@ describe('event', () => {
 
   describe('MouseEvent', () => {
     it('can be dispatched', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @State() counter = 0;
 
@@ -267,7 +263,7 @@ describe('event', () => {
     });
 
     it('can be dispatched with custom data', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @State() screenX: string;
         @State() shift: string;
@@ -292,7 +288,7 @@ describe('event', () => {
         <cmp-a> - </cmp-a>
       `);
 
-      const ev = new MouseEvent('onclick', {screenX: 99, shiftKey: true});
+      const ev = new MouseEvent('onclick', { screenX: 99, shiftKey: true });
       root.dispatchEvent(ev);
       await waitForChanges();
 

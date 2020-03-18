@@ -1,12 +1,26 @@
 import * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, buildWarn, catchError, toDashCase } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isMemberPrivate, resolveType, serializeSymbol, typeToString, validateReferences } from '../transform-utils';
+import {
+  convertValueToLiteral,
+  createStaticGetter,
+  getAttributeTypeInfo,
+  isMemberPrivate,
+  resolveType,
+  serializeSymbol,
+  typeToString,
+  validateReferences,
+} from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 import { validatePublicName } from '../reserved-public-members';
 import ts from 'typescript';
 
-
-export const propDecoratorsToStatic = (diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, watchable: Set<string>, newMembers: ts.ClassElement[]) => {
+export const propDecoratorsToStatic = (
+  diagnostics: d.Diagnostic[],
+  decoratedProps: ts.ClassElement[],
+  typeChecker: ts.TypeChecker,
+  watchable: Set<string>,
+  newMembers: ts.ClassElement[],
+) => {
   const connect: any[] = [];
   const context: any[] = [];
   const properties = decoratedProps
@@ -25,8 +39,15 @@ export const propDecoratorsToStatic = (diagnostics: d.Diagnostic[], decoratedPro
   }
 };
 
-
-const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, context: any[], connect: any[], watchable: Set<string>, newMembers: ts.ClassElement[]) => {
+const parsePropDecorator = (
+  diagnostics: d.Diagnostic[],
+  typeChecker: ts.TypeChecker,
+  prop: ts.PropertyDeclaration,
+  context: any[],
+  connect: any[],
+  watchable: Set<string>,
+  newMembers: ts.ClassElement[],
+) => {
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
@@ -76,7 +97,7 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
     complexType: getComplexType(typeChecker, prop, type),
     required: prop.exclamationToken !== undefined && propName !== 'mode',
     optional: prop.questionToken !== undefined,
-    docs: serializeSymbol(typeChecker, symbol)
+    docs: serializeSymbol(typeChecker, symbol),
   };
   validateReferences(diagnostics, propMeta.complexType.references, prop.type);
 
@@ -92,17 +113,14 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
     propMeta.defaultValue = initializer.getText();
   }
 
-  const staticProp = ts.createPropertyAssignment(
-    ts.createLiteral(propName),
-    convertValueToLiteral(propMeta)
-  );
+  const staticProp = ts.createPropertyAssignment(ts.createLiteral(propName), convertValueToLiteral(propMeta));
   watchable.add(propName);
   return staticProp;
 };
 
 const getAttributeName = (diagnostics: d.Diagnostic[], propName: string, propOptions: d.PropOptions, node: ts.Node) => {
   if (propOptions.attribute === null) {
-    return  undefined;
+    return undefined;
   }
 
   if (typeof propOptions.attribute === 'string' && propOptions.attribute.trim().length > 0) {
@@ -138,12 +156,10 @@ const getPropOptions = (propDecorator: ts.Decorator, diagnostics: d.Diagnostic[]
     return {};
   }
 
-  const suppliedOptions = (propDecorator.expression as ts.CallExpression).arguments
-  .map(arg => {
+  const suppliedOptions = (propDecorator.expression as ts.CallExpression).arguments.map(arg => {
     try {
       const fnStr = `return ${arg.getText()};`;
       return new Function(fnStr)();
-
     } catch (e) {
       catchError(diagnostics, e, `parse prop options: ${e}`);
     }
@@ -153,13 +169,12 @@ const getPropOptions = (propDecorator: ts.Decorator, diagnostics: d.Diagnostic[]
   return propOptions || {};
 };
 
-
 const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration, type: ts.Type): d.ComponentCompilerPropertyComplexType => {
   const nodeType = node.type;
   return {
     original: nodeType ? nodeType.getText() : typeToString(typeChecker, type),
     resolved: resolveType(typeChecker, type),
-    references: getAttributeTypeInfo(node, node.getSourceFile())
+    references: getAttributeTypeInfo(node, node.getSourceFile()),
   };
 };
 
@@ -192,7 +207,7 @@ export const propTypeFromTSType = (type: ts.Type) => {
   return 'unknown';
 };
 
-const checkType = (type: ts.Type, check: (type: ts.Type) => boolean ) => {
+const checkType = (type: ts.Type, check: (type: ts.Type) => boolean) => {
   if (type.flags & ts.TypeFlags.Union) {
     const union = type as ts.UnionType;
     if (union.types.some(type => checkType(type, check))) {

@@ -10,7 +10,6 @@ import { TestingLogger } from '../../testing/testing-logger';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
 import ts from 'typescript';
 
-
 /**
  * Stand-alone compiling of a single string
  */
@@ -18,8 +17,8 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
   if (!config.logger) {
     config = {
       logger: new TestingLogger(),
-      ...config
-    }
+      ...config,
+    };
   }
   const compilerCtx = new CompilerContext();
   const buildCtx = new BuildContext(config, compilerCtx);
@@ -31,7 +30,7 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
   if (isString(sourceFilePath)) {
     sourceFilePath = normalizePath(sourceFilePath);
   } else {
-    sourceFilePath = (tsCompilerOptions.jsx ? `module.tsx` : `module.ts`);
+    sourceFilePath = tsCompilerOptions.jsx ? `module.tsx` : `module.ts`;
   }
 
   const results: d.TranspileResults = {
@@ -86,29 +85,23 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     fileExists: fileName => normalizePath(fileName) === normalizePath(sourceFilePath),
     readFile: () => '',
     directoryExists: () => true,
-    getDirectories: () => []
+    getDirectories: () => [],
   };
 
   const program = ts.createProgram([sourceFilePath], tsCompilerOptions, compilerHost);
   const typeChecker = program.getTypeChecker();
 
-  const after: ts.TransformerFactory<ts.SourceFile>[] = [
-    convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)
-  ];
+  const after: ts.TransformerFactory<ts.SourceFile>[] = [convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)];
 
   if (transformOpts.componentExport === 'customelement' || transformOpts.componentExport === 'module') {
     after.push(nativeComponentTransform(compilerCtx, transformOpts));
-
   } else {
     after.push(lazyComponentTransform(compilerCtx, transformOpts));
   }
 
   program.emit(undefined, undefined, undefined, false, {
-    before: [
-      convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker),
-      updateStencilCoreImports(transformOpts.coreImportPath)
-    ],
-    after
+    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker), updateStencilCoreImports(transformOpts.coreImportPath)],
+    after,
   });
 
   const tsDiagnostics = [...program.getSyntacticDiagnostics()];
@@ -117,9 +110,7 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     tsDiagnostics.push(...program.getOptionsDiagnostics());
   }
 
-  buildCtx.diagnostics.push(
-    ...loadTypeScriptDiagnostics(tsDiagnostics)
-  );
+  buildCtx.diagnostics.push(...loadTypeScriptDiagnostics(tsDiagnostics));
 
   results.diagnostics.push(...buildCtx.diagnostics);
 
@@ -127,7 +118,6 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
 
   return results;
 };
-
 
 const getScriptTargetKind = (transformOpts: d.TransformOptions) => {
   switch (transformOpts.target) {
@@ -159,4 +149,4 @@ const getScriptTargetKind = (transformOpts: d.TransformOptions) => {
       return ts.ScriptTarget.Latest;
     }
   }
-}
+};

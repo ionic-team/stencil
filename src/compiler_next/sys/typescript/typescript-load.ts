@@ -5,7 +5,6 @@ import { getRemoteTypeScriptUrl } from '../dependencies';
 import { patchTsSystemUtils } from './typescript-sys';
 import ts from 'typescript';
 
-
 export const loadTypescript = async (diagnostics: d.Diagnostic[], typescriptPath: string) => {
   const tsSync = loadTypescriptSync(diagnostics, typescriptPath);
   if (tsSync != null) {
@@ -24,7 +23,6 @@ export const loadTypescript = async (diagnostics: d.Diagnostic[], typescriptPath
         patchImportedTsSys(fetchTs, tsUrl);
         return fetchTs;
       }
-
     } catch (e) {
       catchError(diagnostics, e);
     }
@@ -45,7 +43,7 @@ export const loadTypescriptSync = (diagnostics: d.Diagnostic[], typescriptPath: 
       // could be browser main thread, browser web worker, or nodejs global
       const globalThisTs = getLoadedTs((globalThis as any).ts, 'globalThis', typescriptPath);
       if (globalThisTs) {
-        return globalThisTs
+        return globalThisTs;
       }
     }
 
@@ -71,7 +69,6 @@ export const loadTypescriptSync = (diagnostics: d.Diagnostic[], typescriptPath: 
         return webWorkerTs;
       }
     }
-
   } catch (e) {
     catchError(diagnostics, e);
   }
@@ -84,7 +81,7 @@ const patchImportedTsSys = (importedTs: TypeScriptModule, tsUrl: string) => {
   patchTsSystemUtils(importedTs.sys);
 };
 
-const getLoadedTs = (loadedTs: TypeScriptModule, source: string, typescriptPath: string)  => {
+const getLoadedTs = (loadedTs: TypeScriptModule, source: string, typescriptPath: string) => {
   if (loadedTs != null && isFunction(loadedTs.transpileModule)) {
     loadedTs.__loaded = true;
     loadedTs.__source = source;

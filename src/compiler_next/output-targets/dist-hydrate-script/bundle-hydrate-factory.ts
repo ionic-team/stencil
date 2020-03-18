@@ -8,7 +8,6 @@ import { removeCollectionImports } from '../../transformers/remove-collection-im
 import { STENCIL_INTERNAL_HYDRATE_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 
-
 export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _build: d.BuildConditionals, appFactoryEntryCode: string) => {
   try {
     const bundleOpts: BundleOptions = {
@@ -18,16 +17,15 @@ export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.Comp
       customTransformers: getHydrateCustomTransformer(config, compilerCtx),
       inlineDynamicImports: true,
       inputs: {
-        '@app-factory-entry': '@app-factory-entry'
+        '@app-factory-entry': '@app-factory-entry',
       },
       loader: {
-        '@app-factory-entry': appFactoryEntryCode
-      }
+        '@app-factory-entry': appFactoryEntryCode,
+      },
     };
 
     const rollupBuild = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
     return rollupBuild;
-
   } catch (e) {
     if (!buildCtx.hasError) {
       loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
@@ -35,7 +33,6 @@ export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.Comp
   }
   return undefined;
 };
-
 
 const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
@@ -69,7 +66,6 @@ const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => {
   return build;
 };
 
-
 const getHydrateCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_HYDRATE_ID,
@@ -80,10 +76,5 @@ const getHydrateCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCt
     style: 'static',
   };
 
-  return [
-    updateStencilCoreImports(transformOpts.coreImportPath),
-    hydrateComponentTransform(compilerCtx, transformOpts),
-    removeCollectionImports(compilerCtx),
-  ];
+  return [updateStencilCoreImports(transformOpts.coreImportPath), hydrateComponentTransform(compilerCtx, transformOpts), removeCollectionImports(compilerCtx)];
 };
-

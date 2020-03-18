@@ -14,7 +14,9 @@ export const createTime = (fnName: string, tagName = '') => {
     // End
     return () => performance.measure(`[Stencil] ${fnName}() <${tagName}>`, key);
   } else {
-    return () => { return; };
+    return () => {
+      return;
+    };
   }
 };
 
@@ -29,7 +31,9 @@ export const uniqueTime = (key: string, measureText: string) => {
       }
     };
   } else {
-    return () => { return; };
+    return () => {
+      return;
+    };
   }
 };
 
@@ -78,7 +82,7 @@ const inspect = (ref: any) => {
 
 export const installDevTools = () => {
   if (BUILD.devTools) {
-    const stencil = (win as any).stencil = (win as any).stencil || {};
+    const stencil = ((win as any).stencil = (win as any).stencil || {});
     const originalInspect = stencil.inspect;
 
     stencil.inspect = (ref: any) => {

@@ -4,21 +4,19 @@ import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 import path from 'path';
 
-
 export function initializePrerenderEntryUrls(manager: d.PrerenderManager) {
   const entryAnchors: d.HydrateAnchorElement[] = [];
 
   if (Array.isArray(manager.prerenderConfig.entryUrls)) {
     manager.prerenderConfig.entryUrls.forEach(entryUrl => {
       const entryAnchor: d.HydrateAnchorElement = {
-        href: entryUrl
+        href: entryUrl,
       };
       entryAnchors.push(entryAnchor);
     });
-
   } else {
     const entryAnchor: d.HydrateAnchorElement = {
-      href: manager.outputTarget.baseUrl
+      href: manager.outputTarget.baseUrl,
     };
     entryAnchors.push(entryAnchor);
   }
@@ -44,7 +42,6 @@ export function initializePrerenderEntryUrls(manager: d.PrerenderManager) {
   });
 }
 
-
 function addUrlToPendingQueue(manager: d.PrerenderManager, queueUrl: string, fromUrl: string) {
   if (typeof queueUrl !== 'string' || queueUrl === '') {
     return;
@@ -68,7 +65,6 @@ function addUrlToPendingQueue(manager: d.PrerenderManager, queueUrl: string, fro
   }
 }
 
-
 export function drainPrerenderQueue(manager: d.PrerenderManager) {
   const nextUrl = manager.urlsPending.values().next();
   if (!nextUrl.done) {
@@ -77,7 +73,6 @@ export function drainPrerenderQueue(manager: d.PrerenderManager) {
       setTimeout(() => {
         drainPrerenderQueue(manager);
       });
-
     } else {
       const url = nextUrl.value;
 
@@ -110,7 +105,6 @@ export function drainPrerenderQueue(manager: d.PrerenderManager) {
   }
 }
 
-
 async function prerenderUrl(manager: d.PrerenderManager, url: string) {
   let previewUrl = url;
   try {
@@ -129,7 +123,7 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
       prerenderConfigPath: manager.prerenderConfigPath,
       templateId: manager.templateId,
       url: url,
-      writeToFilePath: getWriteFilePathFromUrlPath(manager, url)
+      writeToFilePath: getWriteFilePathFromUrlPath(manager, url),
     };
 
     // prender this path and wait on the results
@@ -152,7 +146,6 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
         addUrlToPendingQueue(manager, anchorUrl, url);
       });
     }
-
   } catch (e) {
     // darn, idk, bad news
     catchError(manager.diagnostics, e);
@@ -171,5 +164,3 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
     drainPrerenderQueue(manager);
   });
 }
-
-

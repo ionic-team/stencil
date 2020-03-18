@@ -1,19 +1,17 @@
 import { Component, Element, Host, Prop, State, forceUpdate, getRenderingRef, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('render-vdom', () => {
-
   describe('build conditionals', () => {
     it('vdomText', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
           return <div>Hello VDOM</div>;
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: false,
         vdomXlink: false,
@@ -28,7 +26,7 @@ describe('render-vdom', () => {
     });
 
     it('vdomText from identifier', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
           const text = 'Hello VDOM';
@@ -36,7 +34,7 @@ describe('render-vdom', () => {
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: false,
         vdomXlink: false,
@@ -51,7 +49,7 @@ describe('render-vdom', () => {
     });
 
     it('vdomText from call expression', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
           const text = () => 'Hello VDOM';
@@ -59,7 +57,7 @@ describe('render-vdom', () => {
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: false,
         vdomXlink: false,
@@ -74,15 +72,15 @@ describe('render-vdom', () => {
     });
 
     it('vdomText from object access', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
-          const text = {text: 'Hello VDOM'};
+          const text = { text: 'Hello VDOM' };
           return <div>{text.text}</div>;
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: false,
         vdomXlink: false,
@@ -97,14 +95,14 @@ describe('render-vdom', () => {
     });
 
     it('vdomClass', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
-          return <div class='hola'></div>;
+          return <div class="hola"></div>;
         }
       }
 
-      const { build } = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: true,
         vdomXlink: false,
@@ -118,14 +116,14 @@ describe('render-vdom', () => {
       });
     });
     it('vdomStyle', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
-          return <div style={{position: 'relative'}}></div>;
+          return <div style={{ position: 'relative' }}></div>;
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: true,
         vdomXlink: false,
@@ -140,14 +138,14 @@ describe('render-vdom', () => {
     });
 
     it('vdomKey', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
           return <div key={1}></div>;
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: true,
         vdomXlink: false,
@@ -162,14 +160,20 @@ describe('render-vdom', () => {
     });
 
     it('vdomRef', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
-          return <div ref={() => { return; }}></div>;
+          return (
+            <div
+              ref={() => {
+                return;
+              }}
+            ></div>
+          );
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: true,
         vdomXlink: false,
@@ -184,14 +188,20 @@ describe('render-vdom', () => {
     });
 
     it('vdomListener onClick', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
-          return <div onClick={() => { return; }}></div>;
+          return (
+            <div
+              onClick={() => {
+                return;
+              }}
+            ></div>
+          );
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: true,
         vdomXlink: false,
@@ -206,14 +216,20 @@ describe('render-vdom', () => {
     });
 
     it('vdomListener on-click', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
-          return <div on-click={() => { return; }}></div>;
+          return (
+            <div
+              on-click={() => {
+                return;
+              }}
+            ></div>
+          );
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: true,
         vdomXlink: false,
@@ -228,15 +244,17 @@ describe('render-vdom', () => {
     });
 
     it('vdomFunctional', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
-          const H = () => { return; };
+          const H = () => {
+            return;
+          };
           return <H />;
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: false,
         vdomXlink: false,
@@ -251,17 +269,19 @@ describe('render-vdom', () => {
     });
 
     it('vdomFunctional (2)', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
           const Tunnel = {
-            Provider: () => { return; }
+            Provider: () => {
+              return;
+            },
           };
           return <Tunnel.Provider />;
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: false,
         vdomXlink: false,
@@ -276,15 +296,15 @@ describe('render-vdom', () => {
     });
 
     it('fallback spread', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         props: any;
         render() {
-          return <div {...this.props} role='dialog'></div>;
+          return <div {...this.props} role="dialog"></div>;
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: true,
         vdomXlink: true,
@@ -299,16 +319,16 @@ describe('render-vdom', () => {
     });
 
     it('normal properties', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         prop: any;
 
         render() {
-          return <Host role='hola' onevent='adios'></Host>;
+          return <Host role="hola" onevent="adios"></Host>;
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: true,
         vdomXlink: false,
@@ -323,23 +343,32 @@ describe('render-vdom', () => {
     });
 
     it('all but style', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
           const Span = 'span';
           return (
-            <Host class={{hola: true}}>
-              <div aria-hidden='true' onClick={() => { return; }}>
+            <Host class={{ hola: true }}>
+              <div
+                aria-hidden="true"
+                onClick={() => {
+                  return;
+                }}
+              >
                 Hello VDOM
-                <Span ref={() => { return; }} key='adios'>
-                </Span>
+                <Span
+                  ref={() => {
+                    return;
+                  }}
+                  key="adios"
+                ></Span>
               </div>
             </Host>
           );
         }
       }
 
-      const {build} = await newSpecPage({components: [CmpA], strictBuild: true});
+      const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
         vdomAttribute: true,
         vdomXlink: false,
@@ -355,7 +384,7 @@ describe('render-vdom', () => {
   });
 
   it('Hello VDOM, re-render, flush', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop() excitement = '';
       render() {
@@ -388,7 +417,7 @@ describe('render-vdom', () => {
   });
 
   it('Hello VDOM, html option', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       render() {
         return <div>Hello VDOM</div>;
@@ -406,10 +435,14 @@ describe('render-vdom', () => {
   });
 
   it('<slot> test', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       render() {
-        return <a href='#'><slot></slot></a>;
+        return (
+          <a href="#">
+            <slot></slot>
+          </a>
+        );
       }
     }
 
@@ -428,7 +461,7 @@ describe('render-vdom', () => {
   });
 
   it('Hello VDOM, body.innerHTML, await flush', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       render() {
         return <div>Hello VDOM</div>;
@@ -436,7 +469,7 @@ describe('render-vdom', () => {
     }
 
     const { body, waitForChanges } = await newSpecPage({
-      components: [CmpA]
+      components: [CmpA],
     });
 
     body.innerHTML = `<cmp-a></cmp-a>`;
@@ -448,20 +481,24 @@ describe('render-vdom', () => {
   });
 
   it('should add classes', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       render() {
-        return <div class={
-          ` class1
+        return (
+          <div
+            class={` class1
               class2
               class3 `}
-        >Hello VDOM</div>;
+          >
+            Hello VDOM
+          </div>
+        );
       }
     }
 
     const { body } = await newSpecPage({
       components: [CmpA],
-      html: `<cmp-a></cmp-a>`
+      html: `<cmp-a></cmp-a>`,
     });
 
     expect(body).toEqualHtml(`
@@ -470,10 +507,8 @@ describe('render-vdom', () => {
   });
 
   it('should error when reusing vnodes', async () => {
-
     @Component({ tag: 'cmp-a' })
     class CmpA {
-
       @Prop() first = '';
       @Prop() middle = '';
       @Prop() last = '';
@@ -508,22 +543,17 @@ describe('render-vdom', () => {
   });
 
   it('should render nested arrays', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop() excitement = '';
       render() {
-        const jsx = [
-          <h1>H1</h1>,
-          <h2>h2</h2>,
-          [
-            'Outside',
-            <h3>h3</h3>,
-          ]
-        ];
-        return <div>
-          Text0
-          {jsx}
-        </div>;
+        const jsx = [<h1>H1</h1>, <h2>h2</h2>, ['Outside', <h3>h3</h3>]];
+        return (
+          <div>
+            Text0
+            {jsx}
+          </div>
+        );
       }
     }
     const { root } = await newSpecPage({
@@ -544,15 +574,17 @@ describe('render-vdom', () => {
   });
 
   it('should not render booleans ', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop() excitement = '';
       render() {
-        return <div>
-          {false}
-          hola
-          {true}
-        </div>;
+        return (
+          <div>
+            {false}
+            hola
+            {true}
+          </div>
+        );
       }
     }
     const { root } = await newSpecPage({
@@ -570,12 +602,12 @@ describe('render-vdom', () => {
 
   describe('getRenderingRef', () => {
     it('returns instance', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
           const ref = getRenderingRef();
           expect(ref).toBe(this);
-          return <MyFunctionalCmp cmp={this}/>;
+          return <MyFunctionalCmp cmp={this} />;
         }
       }
       const MyFunctionalCmp = (props: any) => {
@@ -594,29 +626,22 @@ describe('render-vdom', () => {
     });
 
     it('useState hook', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @State() count = 0;
         render() {
-          return <MyFunctionalCmp/>;
+          return <MyFunctionalCmp />;
         }
       }
 
       const useState = (state: string) => {
         const ref = getRenderingRef();
-        return [
-          ref[state],
-          (value: any) => ref[state] = value
-        ];
+        return [ref[state], (value: any) => (ref[state] = value)];
       };
 
       const MyFunctionalCmp = () => {
         const [count, setCount] = useState('count');
-        return (
-          <p onClick={() => setCount(count + 1)}>
-            {count}
-          </p>
-        );
+        return <p onClick={() => setCount(count + 1)}>{count}</p>;
       };
       const { root, waitForChanges } = await newSpecPage({
         components: [CmpA],
@@ -639,7 +664,7 @@ describe('render-vdom', () => {
 
   describe('forceUpdate', () => {
     it('should trigger re-render', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         private count = 0;
         render() {
@@ -674,7 +699,6 @@ describe('render-vdom', () => {
     });
   });
 
-
   describe('input', () => {
     it('should render attributes', async () => {
       @Component({
@@ -684,14 +708,14 @@ describe('render-vdom', () => {
         render() {
           return (
             <Host>
-              <button type='button'></button>
-              <button type='submit'></button>
-              <input type='text' value=''/>
-              <input type='number' />
-              <input type='password' />
-              <input type='email' />
-              <input type='date' />
-              <input list='my-list' />
+              <button type="button"></button>
+              <button type="submit"></button>
+              <input type="text" value="" />
+              <input type="number" />
+              <input type="password" />
+              <input type="email" />
+              <input type="date" />
+              <input list="my-list" />
             </Host>
           );
         }
@@ -721,21 +745,19 @@ describe('render-vdom', () => {
       @Component({
         tag: 'cmp-a',
         styles: ':host{}',
-        scoped: true
+        scoped: true,
       })
       class CmpA {
         @Prop() addClass = false;
         render() {
-          return (
-            <svg class={{'hello': this.addClass}}></svg>
-          );
+          return <svg class={{ hello: this.addClass }}></svg>;
         }
       }
 
       const { root, waitForChanges } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a></cmp-a>`,
-        includeAnnotations: true
+        includeAnnotations: true,
       });
       expect(root).toEqualHtml(`
     <cmp-a class="hydrated sc-cmp-a-h sc-cmp-a-s">
@@ -756,23 +778,22 @@ describe('render-vdom', () => {
 
     it('should update attributes', async () => {
       @Component({
-        tag: 'svg-attr'
+        tag: 'svg-attr',
       })
       class SvgAttr {
-
         @Prop() isOpen = false;
 
         render() {
           return (
             <div>
               <div>
-              { this.isOpen ? (
-                  <svg viewBox='0 0 54 54'>
-                    <rect transform='rotate(45 27 27)' y='22' width='54' height='10' rx='2'/>
+                {this.isOpen ? (
+                  <svg viewBox="0 0 54 54">
+                    <rect transform="rotate(45 27 27)" y="22" width="54" height="10" rx="2" />
                   </svg>
                 ) : (
-                  <svg viewBox='0 0 54 54'>
-                    <rect y='0' width='54' height='10' rx='2'/>
+                  <svg viewBox="0 0 54 54">
+                    <rect y="0" width="54" height="10" rx="2" />
                   </svg>
                 )}
               </div>
@@ -800,27 +821,25 @@ describe('render-vdom', () => {
 
     it('should render foreignObject properly', async () => {
       @Component({
-        tag: 'cmp-a'
+        tag: 'cmp-a',
       })
       class CmpA {
-
         render() {
           return (
-            <svg class='is-svg'>
-              <foreignObject class='is-svg'>
-                <div class='is-html'>hello</div>
-                <svg class='is-svg'>
-                  <feGaussianBlur class='is-svg'></feGaussianBlur>
-                  <foreignObject class='is-svg'>
-                    <foreignObject class='is-html'></foreignObject>
-                    <div class='is-html'>Still outside svg</div>
+            <svg class="is-svg">
+              <foreignObject class="is-svg">
+                <div class="is-html">hello</div>
+                <svg class="is-svg">
+                  <feGaussianBlur class="is-svg"></feGaussianBlur>
+                  <foreignObject class="is-svg">
+                    <foreignObject class="is-html"></foreignObject>
+                    <div class="is-html">Still outside svg</div>
                   </foreignObject>
                 </svg>
-                <feGaussianBlur class='is-html'>bye</feGaussianBlur>
+                <feGaussianBlur class="is-html">bye</feGaussianBlur>
               </foreignObject>
-              <text class='is-svg'>Hello</text>
-              <text class='is-svg'>Bye</text>
-
+              <text class="is-svg">Hello</text>
+              <text class="is-svg">Bye</text>
             </svg>
           );
         }
@@ -867,10 +886,10 @@ describe('render-vdom', () => {
 
   describe('native elements', () => {
     it('should render <input> correctly', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         render() {
-          return <input min={0} max={10} value={5}/>;
+          return <input min={0} max={10} value={5} />;
         }
       }
 
@@ -888,14 +907,13 @@ describe('render-vdom', () => {
 
   describe('ref property', () => {
     it('should set on Host', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
-
         selfRef: HTMLElement;
         @Element() el: HTMLElement;
 
         render() {
-          return <Host ref={el => this.selfRef = el}></Host>;
+          return <Host ref={el => (this.selfRef = el)}></Host>;
         }
       }
 
@@ -909,12 +927,12 @@ describe('render-vdom', () => {
     });
 
     it('should set and reset', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         divRef: HTMLElement;
         @Prop() visible = true;
         render() {
-          return this.visible && <div ref={el => this.divRef = el}>Hello VDOM</div>;
+          return this.visible && <div ref={el => (this.divRef = el)}>Hello VDOM</div>;
         }
       }
 
@@ -931,13 +949,13 @@ describe('render-vdom', () => {
     });
 
     it('should set once', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         divRef: HTMLElement;
         counter = 0;
         setRef = () => {
           this.counter++;
-        }
+        };
 
         render() {
           return <div ref={this.setRef}>Hello VDOM</div>;
@@ -957,19 +975,16 @@ describe('render-vdom', () => {
     });
 
     it('should set once (2)', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         counter = 0;
         setRef = () => {
           this.counter++;
-        }
+        };
         @Prop() state = true;
 
         render() {
-          return (this.state
-            ? <div ref={this.setRef}>Hello VDOM</div>
-            : <div>Hello VDOM</div>
-          );
+          return this.state ? <div ref={this.setRef}>Hello VDOM</div> : <div>Hello VDOM</div>;
         }
       }
 
@@ -988,6 +1003,5 @@ describe('render-vdom', () => {
       await waitForChanges();
       expect(rootInstance.counter).toEqual(2);
     });
-
   });
 });

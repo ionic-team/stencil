@@ -2,7 +2,6 @@ import * as d from '../../../declarations';
 import { normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
-
 export const lazyComponentPlugin = (buildCtx: d.BuildCtx) => {
   const entrys = new Map<string, d.EntryModule>();
 
@@ -25,12 +24,11 @@ export const lazyComponentPlugin = (buildCtx: d.BuildCtx) => {
         return entryModule.cmps.map(createComponentExport).join('\n');
       }
       return null;
-    }
+    },
   };
 
   return plugin;
 };
-
 
 const createComponentExport = (cmp: d.ComponentCompilerMeta) => {
   const originalClassName = cmp.componentClassName;

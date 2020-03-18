@@ -6,7 +6,6 @@ import { getActiveSelectors, resolveValues } from './selectors';
 import { CssVarShim } from '../../../declarations';
 
 export class CustomStyle implements CssVarShim {
-
   private count = 0;
   private hostStyleMap = new WeakMap<HTMLElement, HTMLStyleElement>();
   private hostScopeMap = new WeakMap<HTMLElement, CSSScope>();
@@ -15,10 +14,7 @@ export class CustomStyle implements CssVarShim {
   private scopesMap = new Map<string, CSSScope>();
   private didInit = false;
 
-  constructor(
-    private win: Window,
-    private doc: Document,
-  ) { }
+  constructor(private win: Window, private doc: Document) {}
 
   i() {
     if (this.didInit || !this.win.requestAnimationFrame) {
@@ -46,12 +42,7 @@ export class CustomStyle implements CssVarShim {
     }
   }
 
-  createHostStyle(
-    hostEl: HTMLElement,
-    cssScopeId: string,
-    cssText: string,
-    isScoped: boolean
-  ) {
+  createHostStyle(hostEl: HTMLElement, cssScopeId: string, cssText: string, isScoped: boolean) {
     if (this.hostScopeMap.has(hostEl)) {
       throw new Error('host style already created');
     }
@@ -62,7 +53,6 @@ export class CustomStyle implements CssVarShim {
     if (!baseScope.usesCssVars) {
       // This component does not use (read) css variables
       styleEl.textContent = cssText;
-
     } else if (isScoped) {
       // This component is dynamic: uses css var and is scoped
       (styleEl as any)['s-sc'] = cssScopeId = `${baseScope.scopeId}-${this.count}`;
@@ -70,7 +60,6 @@ export class CustomStyle implements CssVarShim {
       this.hostStyleMap.set(hostEl, styleEl);
       this.hostScopeMap.set(hostEl, reScope(baseScope, cssScopeId));
       this.count++;
-
     } else {
       // This component uses css vars, but it's no-encapsulation (global static)
       baseScope.styleEl = styleEl;

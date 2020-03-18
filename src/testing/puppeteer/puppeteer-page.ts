@@ -5,9 +5,7 @@ import { initPageEvents, waitForEvent } from './puppeteer-events';
 import { initPageScreenshot } from './puppeteer-screenshot';
 import * as puppeteer from 'puppeteer';
 
-
 declare const global: JestEnvironmentGlobal;
-
 
 const env: E2EProcessEnv = process.env;
 export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage> {
@@ -41,9 +39,11 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
           });
           await Promise.all(disposes);
         }
-      } catch (e) { }
+      } catch (e) {}
 
-      const noop: any = () => { throw new Error('The page was already closed'); };
+      const noop: any = () => {
+        throw new Error('The page was already closed');
+      };
       page._e2eElements = noop;
       page._e2eEvents = noop;
       page._e2eGoto = noop;
@@ -60,7 +60,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
         if (!page.isClosed()) {
           await page._e2eClose(options);
         }
-      } catch (e) { }
+      } catch (e) {}
     };
 
     const getDocHandle = async () => {
@@ -81,7 +81,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
       return findAll(page, docHandle, selector) as any;
     };
 
-    page.waitForEvent = async (eventName) => {
+    page.waitForEvent = async eventName => {
       const docHandle = await getDocHandle();
       return waitForEvent(page, eventName, docHandle);
     };
@@ -97,7 +97,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
         throw new Error('Set the --devtools flag in order to use E2EPage.debugger()');
       }
       return page.evaluate(() => {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           // tslint:disable-next-line: no-debugger
           debugger;
           resolve();
@@ -108,12 +108,12 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
     const failOnConsoleError = opts.failOnConsoleError === true;
     const failOnNetworkError = opts.failOnNetworkError === true;
 
-    page.on('console', (ev) => {
+    page.on('console', ev => {
       if (ev.type() === 'error') {
         diagnostics.push({
           type: 'error',
           message: ev.text(),
-          location: ev.location().url
+          location: ev.location().url,
         });
         if (failOnConsoleError) {
           fail(new Error(serializeConsoleMessage(ev)));
@@ -125,15 +125,15 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
       diagnostics.push({
         type: 'pageerror',
         message: err.message,
-        location: err.stack
+        location: err.stack,
       });
       fail(err);
     });
-    page.on('requestfailed', (req) => {
+    page.on('requestfailed', req => {
       diagnostics.push({
         type: 'requestfailed',
         message: req.failure().errorText,
-        location: req.url()
+        location: req.url(),
       });
       if (failOnNetworkError) {
         fail(new Error(req.failure().errorText));
@@ -144,15 +144,12 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
 
     if (typeof opts.html === 'string') {
       await e2eSetContent(page, opts.html, { waitUntil: opts.waitUntil });
-
     } else if (typeof opts.url === 'string') {
       await e2eGoTo(page, opts.url, { waitUntil: opts.waitUntil });
-
     } else {
       page.goto = e2eGoTo.bind(null, page);
       page.setContent = e2eSetContent.bind(null, page);
     }
-
   } catch (e) {
     if (page) {
       if (!page.isClosed()) {
@@ -165,7 +162,6 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
 }
 
 async function e2eGoTo(page: E2EPageInternal, url: string, options: puppeteer.NavigationOptions = {}) {
-
   if (page.isClosed()) {
     throw new Error('e2eGoTo unavailable: page already closed');
   }
@@ -198,7 +194,6 @@ async function e2eGoTo(page: E2EPageInternal, url: string, options: puppeteer.Na
 
   return rsp;
 }
-
 
 async function e2eSetContent(page: E2EPageInternal, html: string, options: puppeteer.NavigationOptions = {}) {
   if (page.isClosed()) {
@@ -241,7 +236,6 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
         contentType: 'text/html',
         body: output.join('\n'),
       });
-
     } else {
       interceptedRequest.continue();
     }
@@ -261,16 +255,13 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   return rsp;
 }
 
-
 async function waitForStencil(page: E2EPage) {
   try {
     await page.waitForFunction('window.stencilAppLoaded', { timeout: 4750 });
-
   } catch (e) {
     throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
   }
 }
-
 
 async function setPageEmulate(page: puppeteer.Page) {
   if (page.isClosed()) {
@@ -286,12 +277,11 @@ async function setPageEmulate(page: puppeteer.Page) {
 
   const emulateOptions: puppeteer.EmulateOptions = {
     viewport: screenshotEmulate.viewport,
-    userAgent: screenshotEmulate.userAgent
+    userAgent: screenshotEmulate.userAgent,
   };
 
   await (page as puppeteer.Page).emulate(emulateOptions);
 }
-
 
 async function waitForChanges(page: E2EPageInternal) {
   try {
@@ -346,10 +336,8 @@ async function waitForChanges(page: E2EPageInternal) {
     await page.waitFor(100);
 
     await Promise.all(page._e2eElements.map(elm => elm.e2eSync()));
-
-  } catch (e) { }
+  } catch (e) {}
 }
-
 
 function consoleMessage(c: puppeteer.ConsoleMessage) {
   const msg = serializeConsoleMessage(c);
@@ -382,5 +370,3 @@ function serializeLocation(loc: puppeteer.ConsoleMessageLocation) {
   }
   return locStr;
 }
-
-

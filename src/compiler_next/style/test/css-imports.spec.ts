@@ -4,7 +4,6 @@ import { mockBuildCtx, mockConfig } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
 import path from 'path';
 
-
 describe('css-imports', () => {
   const root = path.resolve('/');
   const config = mockConfig();
@@ -18,9 +17,7 @@ describe('css-imports', () => {
     buildCtx = mockBuildCtx(config);
   });
 
-
-  describe('isCssNodeModule',  () => {
-
+  describe('isCssNodeModule', () => {
     it('starts with ~ is node module', () => {
       const url = `~@ionic/core/css/normalize.css`;
       expect(isCssNodeModule(url)).toBe(true);
@@ -40,12 +37,9 @@ describe('css-imports', () => {
       const url = `styles.css`;
       expect(isCssNodeModule(url)).toBe(false);
     });
-
   });
 
-
-  describe('replaceImportDeclarations',  () => {
-
+  describe('replaceImportDeclarations', () => {
     it('replace node_module imports w/ styleText', () => {
       const styleText = `@import '~@ionic/core/dist/ionic/ionic.css'; body { color: red; }`;
       const cssImports: d.CssImportData[] = [
@@ -53,7 +47,7 @@ describe('css-imports', () => {
           filePath: `/node_modules/@ionic/core/dist/ionic/ionic.css`,
           srcImport: `@import '~@ionic/core/dist/ionic/ionic.css';`,
           url: `~@ionic/core/dist/ionic/ionic.css`,
-          styleText: `div { color: blue; }`
+          styleText: `div { color: blue; }`,
         },
       ];
       const output = replaceImportDeclarations(styleText, cssImports, true);
@@ -67,14 +61,14 @@ describe('css-imports', () => {
           filePath: `/src/cmp/file-a.css`,
           srcImport: `@import "file-a.css";`,
           url: `file-a.css`,
-          styleText: `div { color: blue; }`
+          styleText: `div { color: blue; }`,
         },
         {
           filePath: `/src/cmp/file-b.css`,
           srcImport: `@import "./file-b.css";`,
           url: `./file-c.css`,
-          styleText: `span { color: green; }`
-        }
+          styleText: `span { color: green; }`,
+        },
       ];
       const output = replaceImportDeclarations(styleText, cssImports, true);
       expect(output).toBe(`div { color: blue; } span { color: green; } body { color: red; }`);
@@ -93,12 +87,9 @@ describe('css-imports', () => {
       const output = replaceImportDeclarations(styleText, cssImports, true);
       expect(output).toBe(``);
     });
-
   });
 
-
   describe('isLocalCssImport', () => {
-
     it('not local, http w/ spaces url', () => {
       const i = `@import url(   "  https//stenciljs.com/some.css);`;
       expect(isLocalCssImport(i)).toBe(false);
@@ -148,12 +139,9 @@ describe('css-imports', () => {
       const i = `@import 'some.css';`;
       expect(isLocalCssImport(i)).toBe(true);
     });
-
   });
 
-
   describe('getCssImports', () => {
-
     it('scss extension', () => {
       const filePath = normalizePath(path.join(root, 'src', 'cmp', 'file-a.scss'));
       const content = `
@@ -165,8 +153,8 @@ describe('css-imports', () => {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.scss')),
           altFilePath: normalizePath(path.join(root, 'src', 'cmp', '_file-b.scss')),
           srcImport: `@import "file-b";`,
-          url: `file-b`
-        }
+          url: `file-b`,
+        },
       ]);
     });
 
@@ -180,8 +168,8 @@ describe('css-imports', () => {
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.less')),
           srcImport: `@import "file-b";`,
-          url: `file-b`
-        }
+          url: `file-b`,
+        },
       ]);
     });
 
@@ -195,8 +183,8 @@ describe('css-imports', () => {
         {
           filePath: normalizePath(path.join(root, 'node_modules', '@ionic', 'core', 'css', 'normalize.css')),
           srcImport: `@import url(../../node_modules/@ionic/core/css/normalize.css);`,
-          url: `../../node_modules/@ionic/core/css/normalize.css`
-        }
+          url: `../../node_modules/@ionic/core/css/normalize.css`,
+        },
       ]);
     });
 
@@ -210,8 +198,8 @@ describe('css-imports', () => {
         {
           filePath: normalizePath(path.join(root, 'build', 'app', 'app.css')),
           srcImport: `@import url('${normalizePath(path.join(root, 'build', 'app', 'app.css'))}');`,
-          url: `${normalizePath(path.join(root, 'build', 'app', 'app.css'))}`
-        }
+          url: `${normalizePath(path.join(root, 'build', 'app', 'app.css'))}`,
+        },
       ]);
     });
 
@@ -226,18 +214,18 @@ describe('css-imports', () => {
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-a.css')),
           srcImport: `@import url('file-a.css');`,
-          url: `file-a.css`
+          url: `file-a.css`,
         },
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.css')),
           srcImport: `@import  url('./file-b.css');`,
-          url: `./file-b.css`
+          url: `./file-b.css`,
         },
         {
           filePath: normalizePath(path.join(root, 'src', 'file-c.css')),
           srcImport: `@import url('../file-c.css');`,
-          url: `../file-c.css`
-        }
+          url: `../file-c.css`,
+        },
       ]);
     });
 
@@ -255,8 +243,8 @@ describe('css-imports', () => {
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file.css')),
           srcImport: `@import url('file.css');`,
-          url: `file.css`
-        }
+          url: `file.css`,
+        },
       ]);
     });
 
@@ -283,17 +271,17 @@ describe('css-imports', () => {
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.css')),
           srcImport: `@import "file-b.css";`,
-          url: `file-b.css`
+          url: `file-b.css`,
         },
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-c.css')),
           srcImport: `@import "./file-c.css";`,
-          url: `./file-c.css`
+          url: `./file-c.css`,
         },
         {
           filePath: normalizePath(path.join(root, 'src', 'global', 'file-d.css')),
           srcImport: `@import "../global/file-d.css";`,
-          url: `../global/file-d.css`
+          url: `../global/file-d.css`,
         },
       ]);
     });
@@ -310,17 +298,17 @@ describe('css-imports', () => {
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.css')),
           srcImport: `@import 'file-b.css';`,
-          url: `file-b.css`
+          url: `file-b.css`,
         },
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-c.css')),
           srcImport: `@import './file-c.css';`,
-          url: `./file-c.css`
+          url: `./file-c.css`,
         },
         {
           filePath: normalizePath(path.join(root, 'src', 'global', 'file-d.css')),
           srcImport: `@import '../global/file-d.css';`,
-          url: `../global/file-d.css`
+          url: `../global/file-d.css`,
         },
       ]);
     });
@@ -336,7 +324,7 @@ describe('css-imports', () => {
           filePath: normalizePath(path.join(root, 'mocked', 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css')),
           srcImport: `@import '~@ionic/core/dist/ionic/ionic.css';`,
           updatedImport: `@import "${normalizePath(path.join(root, 'mocked', 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css'))}";`,
-          url: `~@ionic/core/dist/ionic/ionic.css`
+          url: `~@ionic/core/dist/ionic/ionic.css`,
         },
       ]);
     });
@@ -351,7 +339,7 @@ describe('css-imports', () => {
         {
           filePath: normalizePath(path.join(root, 'src', 'file-b.css')),
           srcImport: `@import '${normalizePath(path.join(root, 'src', 'file-b.css'))}';`,
-          url: `${normalizePath(path.join(root, 'src', 'file-b.css'))}`
+          url: `${normalizePath(path.join(root, 'src', 'file-b.css'))}`,
         },
       ]);
     });
@@ -362,11 +350,9 @@ describe('css-imports', () => {
       const results = getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([]);
     });
-
   });
 
   describe('getModuleId', () => {
-
     it('getModuleId non-scoped package', () => {
       expect(getModuleId('~ionicons/dist/css/ionicons.css')).toBe('ionicons');
       expect(getModuleId('ionicons/dist/css/ionicons.css')).toBe('ionicons');
@@ -376,7 +362,5 @@ describe('css-imports', () => {
       expect(getModuleId('~@ionic/core/dist/ionic/css/ionic.css')).toBe('@ionic/core');
       expect(getModuleId('@ionic/core/dist/ionic/css/ionic.css')).toBe('@ionic/core');
     });
-
   });
-
 });

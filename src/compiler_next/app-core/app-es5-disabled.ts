@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { escapeHtml } from '@utils';
 import { join } from 'path';
 
-
 export const generateEs5DisabledMessage = async (config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) => {
   // not doing an es5 right now
   // but it's possible during development the user
@@ -101,7 +100,9 @@ h2 {
   For more info, please see <a href="https://developers.google.com/web/fundamentals/primers/modules#browser" target="_blank" rel="noopener noreferrer">Using JavaScript modules on the web</a>.
   </p>
   <pre>
-  <code>${escapeHtml(`<script`)} <span style="background:yellow">type="module"</span> src="/build/${config.fsNamespace}<span style="background:yellow">.esm</span>.js"${escapeHtml(`></script>`)}
+  <code>${escapeHtml(`<script`)} <span style="background:yellow">type="module"</span> src="/build/${config.fsNamespace}<span style="background:yellow">.esm</span>.js"${escapeHtml(
+    `></script>`,
+  )}
   ${escapeHtml(`<script`)} <span style="background:yellow">nomodule</span> ${escapeHtml(`src="/build/${config.fsNamespace}.js"></script>`)}</code>
     </pre>
   `;
@@ -141,5 +142,8 @@ h2 {
 };
 
 const inlineHTML = (html: string) => {
-  return html.replace(/\n/g, '\\n').replace(/\'/g, `\\'`).trim();
+  return html
+    .replace(/\n/g, '\\n')
+    .replace(/\'/g, `\\'`)
+    .trim();
 };

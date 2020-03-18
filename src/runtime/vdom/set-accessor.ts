@@ -23,7 +23,6 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       const newClasses = parseClassList(newValue);
       classList.remove(...oldClasses.filter(c => c && !newClasses.includes(c)));
       classList.add(...newClasses.filter(c => c && !oldClasses.includes(c)));
-
     } else if (BUILD.vdomStyle && memberName === 'style') {
       // update style attribute, css properties and values
       if (BUILD.updatable) {
@@ -49,20 +48,12 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       }
     } else if (BUILD.vdomKey && memberName === 'key') {
       // minifier will clean this up
-
     } else if (BUILD.vdomRef && memberName === 'ref') {
       // minifier will clean this up
       if (newValue) {
         newValue(elm);
       }
-
-    } else if (
-      BUILD.vdomListener &&
-      (BUILD.lazyLoad
-        ? !isProp
-        : !(elm as any).__lookupSetter__(memberName)) &&
-      memberName[0] === 'o' && memberName[1] === 'n'
-    ) {
+    } else if (BUILD.vdomListener && (BUILD.lazyLoad ? !isProp : !(elm as any).__lookupSetter__(memberName)) && memberName[0] === 'o' && memberName[1] === 'n') {
       // Event Handlers
       // so if the member name starts with "on" and the 3rd characters is
       // a capital letter, and it's not already a member on the element,
@@ -82,7 +73,6 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
         // member name "onmouseover" is on the window's prototype
         // so let's add the listener "mouseover", which is all lowercased
         memberName = ln.slice(2);
-
       } else {
         // custom event
         // the JSX attribute could have been "onMyCustomEvent"
@@ -97,7 +87,6 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       if (newValue) {
         plt.ael(elm, memberName, newValue, false);
       }
-
     } else if (BUILD.vdomPropOrAttr) {
       // Set property if it exists and it's not a SVG
       const isComplex = isComplexType(newValue);
@@ -116,7 +105,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
           } else {
             (elm as any)[memberName] = newValue;
           }
-        } catch (e) { }
+        } catch (e) {}
       }
 
       /**
@@ -139,7 +128,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
         } else {
           elm.removeAttribute(memberName);
         }
-      } else if ((!isProp || (flags & VNODE_FLAGS.isHost) || isSvg) && !isComplex) {
+      } else if ((!isProp || flags & VNODE_FLAGS.isHost || isSvg) && !isComplex) {
         newValue = newValue === true ? '' : newValue;
         if (BUILD.vdomXlink && xlink) {
           elm.setAttributeNS(XLINK_NS, memberName, newValue);
@@ -151,5 +140,4 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
   }
 };
 const parseClassListRegex = /\s/;
-const parseClassList = (value: string | undefined | null): string[] =>
-  (!value) ? [] : value.split(parseClassListRegex);
+const parseClassList = (value: string | undefined | null): string[] => (!value ? [] : value.split(parseClassListRegex));

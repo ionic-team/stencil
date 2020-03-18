@@ -1,8 +1,6 @@
 import { getStaticGetter, transpileModule } from './transpile';
 
-
 describe('parse encapsulation', () => {
-
   it('shadow', () => {
     const t = transpileModule(`
       @Component({
@@ -84,5 +82,4 @@ describe('parse encapsulation', () => {
     expect(t.cmp.encapsulation).toBe('none');
     expect(t.cmp.shadowDelegatesFocus).toBe(null);
   });
-
 });

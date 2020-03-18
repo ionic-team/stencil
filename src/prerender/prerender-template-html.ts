@@ -6,8 +6,13 @@ import { promisify } from 'util';
 
 const readFile = promisify(fs.readFile);
 
-
-export async function generateTemplateHtml(diagnostics: d.Diagnostic[], isDebug: boolean, srcIndexHtmlPath: string, outputTarget: d.OutputTargetWww, hydrateOpts: d.PrerenderHydrateOptions) {
+export async function generateTemplateHtml(
+  diagnostics: d.Diagnostic[],
+  isDebug: boolean,
+  srcIndexHtmlPath: string,
+  outputTarget: d.OutputTargetWww,
+  hydrateOpts: d.PrerenderHydrateOptions,
+) {
   try {
     const { createDocument, serializeNodeToHtml } = await import('@stencil/core/mock-doc');
 
@@ -42,7 +47,6 @@ export async function generateTemplateHtml(diagnostics: d.Diagnostic[], isDebug:
     }
 
     return serializeNodeToHtml(doc);
-
   } catch (e) {
     catchError(diagnostics, e);
   }

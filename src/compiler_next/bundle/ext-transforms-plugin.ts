@@ -7,7 +7,6 @@ import { parseImportPath } from '../transformers/stencil-import-path';
 import { Plugin } from 'rollup';
 import { runPluginTransformsEsmImports } from '../plugin/plugin';
 
-
 export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions): Plugin => {
   return {
     name: 'extTransformsPlugin',
@@ -24,17 +23,19 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         const cmp = buildCtx.components.find(c => c.tagName === data.tag);
         const moduleFile = cmp && compilerCtx.moduleMap.get(cmp.sourceFilePath);
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, code, filePath);
-        const commentOriginalSelector = (bundleOpts.platform === 'hydrate') && (data.encapsulation === 'shadow');
+        const commentOriginalSelector = bundleOpts.platform === 'hydrate' && data.encapsulation === 'shadow';
 
         if (moduleFile) {
           const collectionDirs = config.outputTargets.filter(isOutputTargetDistCollection);
 
           const relPath = relative(config.srcDir, pluginTransforms.id);
 
-          await Promise.all(collectionDirs.map(async outputTarget => {
-            const collectionPath = join(outputTarget.collectionDir, relPath);
-            await compilerCtx.fs.writeFile(collectionPath, pluginTransforms.code);
-          }));
+          await Promise.all(
+            collectionDirs.map(async outputTarget => {
+              const collectionPath = join(outputTarget.collectionDir, relPath);
+              await compilerCtx.fs.writeFile(collectionPath, pluginTransforms.code);
+            }),
+          );
         }
 
         const cssTransformResults = await compilerCtx.worker.transformCssToEsm({
@@ -47,7 +48,7 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
           sourceMap: config.sourceMap,
           minify: config.minifyCss,
           autoprefixer: config.autoprefixCss,
-          docs: config.buildDocs
+          docs: config.buildDocs,
         });
 
         // Set style docs
@@ -68,11 +69,7 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         }
 
         const hasUpdatedStyle = buildCtx.stylesUpdated.some(s => {
-          return (
-            s.styleTag === data.tag &&
-            s.styleMode === data.mode &&
-            s.styleText === cssTransformResults.styleText
-          );
+          return s.styleTag === data.tag && s.styleMode === data.mode && s.styleText === cssTransformResults.styleText;
         });
 
         if (!hasUpdatedStyle) {
@@ -86,11 +83,11 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         return {
           code: cssTransformResults.output,
           map: cssTransformResults.map,
-          moduleSideEffects: false
+          moduleSideEffects: false,
         };
       }
 
       return null;
-    }
+    },
   };
 };

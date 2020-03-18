@@ -4,7 +4,6 @@ import { buildEvents } from '../events';
 import { createWebWorkerMainController } from '../sys/worker/web-worker-main';
 import { HAS_WEB_WORKER, IS_NODE_ENV, IS_WEB_WORKER_ENV, normalizePath } from '@utils';
 
-
 export const createSystem = () => {
   const items = new Map<string, FsItem>();
   const destroys = new Set<() => Promise<void> | void>();
@@ -72,9 +71,10 @@ export const createSystem = () => {
     throw new Error('unable to find executing path');
   };
 
-  const isSymbolicLink = (_p: string) => new Promise<boolean>(resolve => {
-    resolve(false);
-  });
+  const isSymbolicLink = (_p: string) =>
+    new Promise<boolean>(resolve => {
+      resolve(false);
+    });
 
   const mkdirSync = (p: string, _opts?: CompilerSystemMakeDirectoryOptions) => {
     p = normalize(p);
@@ -86,7 +86,7 @@ export const createSystem = () => {
         isDirectory: true,
         isFile: false,
         watcherCallbacks: null,
-        data: undefined
+        data: undefined,
       });
       emitDirectoryWatch(p, new Set());
     } else {
@@ -152,7 +152,7 @@ export const createSystem = () => {
         isDirectory: () => item.isDirectory,
         isFile: () => item.isFile,
         isSymbolicLink: () => false,
-        size: item.isFile ? item.data.length : 0
+        size: item.isFile ? item.data.length : 0,
       };
       return s;
     }
@@ -199,7 +199,6 @@ export const createSystem = () => {
       item.isFile = false;
       item.watcherCallbacks = item.watcherCallbacks || [];
       item.watcherCallbacks.push(dirWatcherCallback);
-
     } else {
       items.set(p, {
         basename: basename(p),
@@ -207,7 +206,7 @@ export const createSystem = () => {
         isDirectory: true,
         isFile: false,
         watcherCallbacks: [dirWatcherCallback],
-        data: undefined
+        data: undefined,
       });
     }
 
@@ -215,7 +214,7 @@ export const createSystem = () => {
       close() {
         removeDestory(close);
         close();
-      }
+      },
     };
   };
 
@@ -240,7 +239,6 @@ export const createSystem = () => {
       item.isFile = true;
       item.watcherCallbacks = item.watcherCallbacks || [];
       item.watcherCallbacks.push(fileWatcherCallback);
-
     } else {
       items.set(p, {
         basename: basename(p),
@@ -248,7 +246,7 @@ export const createSystem = () => {
         isDirectory: true,
         isFile: false,
         watcherCallbacks: [fileWatcherCallback],
-        data: undefined
+        data: undefined,
       });
     }
 
@@ -256,7 +254,7 @@ export const createSystem = () => {
       close() {
         removeDestory(close);
         close();
-      }
+      },
     };
   };
 
@@ -279,14 +277,13 @@ export const createSystem = () => {
     p = normalize(p);
     const item = items.get(p);
     if (item) {
-      const hasChanged = (item.data !== data);
+      const hasChanged = item.data !== data;
       item.data = data;
       if (hasChanged && item.watcherCallbacks) {
         item.watcherCallbacks.forEach(watcherCallback => {
           watcherCallback(p, 'fileUpdate');
         });
       }
-
     } else {
       items.set(p, {
         basename: basename(p),
@@ -294,7 +291,7 @@ export const createSystem = () => {
         isDirectory: false,
         isFile: true,
         watcherCallbacks: null,
-        data
+        data,
       });
 
       emitDirectoryWatch(p, new Set());
@@ -318,12 +315,11 @@ export const createSystem = () => {
     const results: CopyResults = {
       diagnostics: [],
       dirPaths: [],
-      filePaths: []
+      filePaths: [],
     };
     console.log('todo, copy task', copyTasks.length, srcDir);
     return results;
   };
-
 
   const fileWatchTimeout = 32;
 
@@ -379,7 +375,6 @@ interface FsItem {
   watcherCallbacks: CompilerFileWatcherCallback[];
 }
 
-
 const getDetails = () => {
   const details: SystemDetails = {
     cpuModel: '',
@@ -392,7 +387,7 @@ const getDetails = () => {
     runtime: 'node',
     runtimeVersion: '',
     tmpDir: '/.tmp',
-    totalmem: -1
+    totalmem: -1,
   };
   return details;
 };

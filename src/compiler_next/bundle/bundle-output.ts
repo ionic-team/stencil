@@ -18,18 +18,13 @@ import { textPlugin } from './text-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
 
-
 export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
   try {
     const rollupOptions = getRollupOptions(config, compilerCtx, buildCtx, bundleOpts);
     const rollupBuild = await rollup(rollupOptions);
 
-    compilerCtx.rollupCache.set(
-      bundleOpts.id,
-      rollupBuild.cache
-    );
+    compilerCtx.rollupCache.set(bundleOpts.id, rollupBuild.cache);
     return rollupBuild;
-
   } catch (e) {
     if (!buildCtx.hasError) {
       loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
@@ -38,31 +33,25 @@ export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx,
   return undefined;
 };
 
-
 export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
-  const customResolveOptions = createCustomResolverAsync(
-    config,
-    compilerCtx.fs,
-    ['.tsx', '.ts', '.js', '.mjs', '.json']
-  );
+  const customResolveOptions = createCustomResolverAsync(config, compilerCtx.fs, ['.tsx', '.ts', '.js', '.mjs', '.json']);
 
   const nodeResolvePlugin = rollupNodeResolvePlugin({
     mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
     customResolveOptions,
-    ...config.nodeResolve as any
+    ...(config.nodeResolve as any),
   });
 
   if (config.devServer && config.devServer.experimentalDevModules) {
     const orgNodeResolveId = nodeResolvePlugin.resolveId;
 
-    nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
+    nodeResolvePlugin.resolveId = async function(importee: string, importer: string) {
       const resolvedId = await orgNodeResolveId.call(nodeResolvePlugin, importee, importer);
       return devNodeModuleResolveId(config, compilerCtx.fs, resolvedId, importee);
     };
   }
 
   const rollupOptions: RollupOptions = {
-
     input: bundleOpts.inputs,
 
     plugins: [
@@ -82,14 +71,14 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       rollupCommonjsPlugin({
         include: /node_modules/,
         sourceMap: config.sourceMap,
-        ...config.commonjs
+        ...config.commonjs,
       }),
       pluginHelper(config, buildCtx),
       rollupJsonPlugin({
-        preferConst: true
+        preferConst: true,
       }),
       rollupReplacePlugin({
-        'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"'
+        'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"',
       }),
       fileLoadPlugin(compilerCtx.fs),
     ],
@@ -112,11 +101,12 @@ const getTreeshakeOption = (config: d.Config, bundleOpts: BundleOptions) => {
       tryCatchDeoptimization: false,
     };
   }
-  const treeshake: TreeshakingOptions | boolean = !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
-    ? {
-      propertyReadSideEffects: false,
-      tryCatchDeoptimization: false,
-    }
-    : false;
+  const treeshake: TreeshakingOptions | boolean =
+    !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
+      ? {
+          propertyReadSideEffects: false,
+          tryCatchDeoptimization: false,
+        }
+      : false;
   return treeshake;
 };

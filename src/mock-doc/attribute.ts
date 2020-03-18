@@ -1,6 +1,5 @@
 import { XLINK_NS } from '../runtime/runtime-constants';
 
-
 const attrHandler = {
   get(obj: any, prop: string) {
     if (prop in obj) {
@@ -10,18 +9,15 @@ const attrHandler = {
       return (obj as MockAttributeMap).__items[prop as any];
     }
     return undefined;
-  }
+  },
 };
 
-export const createAttributeProxy = (caseInsensitive: boolean) =>
-  new Proxy(new MockAttributeMap(caseInsensitive), attrHandler);
+export const createAttributeProxy = (caseInsensitive: boolean) => new Proxy(new MockAttributeMap(caseInsensitive), attrHandler);
 
 export class MockAttributeMap {
   __items: MockAttr[] = [];
 
-  constructor(
-    public caseInsensitive = false
-  ) {}
+  constructor(public caseInsensitive = false) {}
 
   get length() {
     return this.__items.length;
@@ -75,7 +71,6 @@ export class MockAttributeMap {
   }
 }
 
-
 function getNamespaceURI(namespaceURI: string) {
   return namespaceURI === XLINK_NS ? null : namespaceURI;
 }
@@ -96,7 +91,6 @@ export function cloneAttributes(srcAttrs: MockAttributeMap, sortByName = false) 
       sortedAttrs.sort(sortAttributes).forEach(attr => {
         dstAttrs.setNamedItemNS(attr);
       });
-
     } else {
       for (let i = 0; i < attrLen; i++) {
         const srcAttr = srcAttrs.item(i);
@@ -104,7 +98,6 @@ export function cloneAttributes(srcAttrs: MockAttributeMap, sortByName = false) 
         dstAttrs.setNamedItemNS(dstAttr);
       }
     }
-
   }
   return dstAttrs;
 }
@@ -114,7 +107,6 @@ function sortAttributes(a: MockAttr, b: MockAttr) {
   if (a.name > b.name) return 1;
   return 0;
 }
-
 
 export class MockAttr {
   private _name: string;

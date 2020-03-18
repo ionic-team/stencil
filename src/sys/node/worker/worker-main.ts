@@ -3,7 +3,6 @@ import * as cp from 'child_process';
 import { EventEmitter } from 'events';
 import { TASK_CANCELED_MSG } from '@utils';
 
-
 export class NodeWorkerMain extends EventEmitter {
   childProcess: cp.ChildProcess;
   tasks = new Map<number, d.CompilerWorkerTask>();
@@ -20,13 +19,9 @@ export class NodeWorkerMain extends EventEmitter {
   }
 
   fork(forkModulePath: string) {
-    const filteredArgs = process.execArgv.filter(
-      v => !/^--(debug|inspect)/.test(v)
-    );
+    const filteredArgs = process.execArgv.filter(v => !/^--(debug|inspect)/.test(v));
 
-    const args = [
-      this.workerDomain
-    ];
+    const args = [this.workerDomain];
 
     const options: cp.ForkOptions = {
       execArgv: filteredArgs,
@@ -65,7 +60,7 @@ export class NodeWorkerMain extends EventEmitter {
 
     this.sendToWorker({
       stencilId: task.stencilId,
-      args: task.inputArgs
+      args: task.inputArgs,
     });
   }
 
@@ -130,7 +125,7 @@ export class NodeWorkerMain extends EventEmitter {
       // we know we've had a successful startup
       // so let's close it down all nice like
       this.childProcess.send({
-        exit: true
+        exit: true,
       });
 
       setTimeout(() => {
@@ -139,7 +134,6 @@ export class NodeWorkerMain extends EventEmitter {
           this.childProcess.kill('SIGKILL');
         }
       }, 100);
-
     } else {
       // never had a successful message
       // so something may be hosed up

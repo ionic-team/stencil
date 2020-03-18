@@ -16,12 +16,17 @@ import path from 'path';
 import readline from 'readline';
 import { URL } from 'url';
 
-
-export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, config: d.Config, devServer: d.DevServer, hydrateAppFilePath: string, componentGraph: d.BuildResultsComponentGraph, srcIndexHtmlPath: string) {
+export async function runPrerender(
+  prcs: NodeJS.Process,
+  cliRootDir: string,
+  config: d.Config,
+  devServer: d.DevServer,
+  hydrateAppFilePath: string,
+  componentGraph: d.BuildResultsComponentGraph,
+  srcIndexHtmlPath: string,
+) {
   const diagnostics: d.Diagnostic[] = [];
-  const outputTargets = config.outputTargets
-    .filter(isOutputTargetWww)
-    .filter(o => typeof o.indexHtml === 'string');
+  const outputTargets = config.outputTargets.filter(isOutputTargetWww).filter(o => typeof o.indexHtml === 'string');
 
   if (outputTargets.length === 0) {
     return diagnostics;
@@ -31,7 +36,6 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
     const diagnostic = buildError(diagnostics);
     diagnostic.header = `Prerender Error`;
     diagnostic.messageText = `Build results missing "hydrateAppFilePath"`;
-
   } else {
     const hydrateAppExists = fs.existsSync(hydrateAppFilePath);
     if (!hydrateAppExists) {
@@ -46,27 +50,13 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
 
     try {
       const cliWorkerPath = path.join(cliRootDir, 'cli-worker.js');
-      workerCtrl = new NodeWorkerController(
-        'stencil-cli-worker',
-        cliWorkerPath,
-        config.maxConcurrentWorkers,
-        config.logger
+      workerCtrl = new NodeWorkerController('stencil-cli-worker', cliWorkerPath, config.maxConcurrentWorkers, config.logger);
+
+      await Promise.all(
+        outputTargets.map(outputTarget => {
+          return runPrerenderOutputTarget(prcs, workerCtrl, diagnostics, config, devServer, hydrateAppFilePath, componentGraph, srcIndexHtmlPath, outputTarget);
+        }),
       );
-
-      await Promise.all(outputTargets.map(outputTarget => {
-        return runPrerenderOutputTarget(
-          prcs,
-          workerCtrl,
-          diagnostics,
-          config,
-          devServer,
-          hydrateAppFilePath,
-          componentGraph,
-          srcIndexHtmlPath,
-          outputTarget
-        );
-      }));
-
     } catch (e) {
       catchError(diagnostics, e);
     }
@@ -79,8 +69,17 @@ export async function runPrerender(prcs: NodeJS.Process, cliRootDir: string, con
   return diagnostics;
 }
 
-
-async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWorkerController, diagnostics: d.Diagnostic[], config: d.Config, devServer: d.DevServer, hydrateAppFilePath: string, componentGraph: d.BuildResultsComponentGraph, srcIndexHtmlPath: string, outputTarget: d.OutputTargetWww) {
+async function runPrerenderOutputTarget(
+  prcs: NodeJS.Process,
+  workerCtrl: NodeWorkerController,
+  diagnostics: d.Diagnostic[],
+  config: d.Config,
+  devServer: d.DevServer,
+  hydrateAppFilePath: string,
+  componentGraph: d.BuildResultsComponentGraph,
+  srcIndexHtmlPath: string,
+  outputTarget: d.OutputTargetWww,
+) {
   try {
     const timeSpan = config.logger.createTimeSpan(`prerendering started`);
 
@@ -111,9 +110,9 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWo
       diagnostics: prerenderDiagnostics,
       devServerHostUrl: devServerHostUrl,
       hydrateAppFilePath: hydrateAppFilePath,
-      isDebug: (config.logLevel === 'debug'),
+      isDebug: config.logLevel === 'debug',
       logCount: 0,
-      maxConcurrency: Math.max(20, (config.maxConcurrentWorkers * 10)),
+      maxConcurrency: Math.max(20, config.maxConcurrentWorkers * 10),
       outputTarget: outputTarget,
       prerenderConfig: prerenderConfig,
       prerenderConfigPath: outputTarget.prerenderConfig,
@@ -192,7 +191,6 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWo
     const statusColor = prerenderBuildErrors.length > 0 ? 'red' : 'green';
 
     timeSpan.finish(`prerendering ${statusMessage}`, statusColor, true);
-
   } catch (e) {
     catchError(diagnostics, e);
   }
@@ -219,9 +217,9 @@ function createComponentGraphPath(componentGraph: d.BuildResultsComponentGraph, 
   return null;
 }
 
-function getComponentPathContent(componentGraph: {[scopeId: string]: string[]}, outputTarget: d.OutputTargetWww) {
+function getComponentPathContent(componentGraph: { [scopeId: string]: string[] }, outputTarget: d.OutputTargetWww) {
   const buildDir = getAbsoluteBuildDir(outputTarget);
-  const object: {[key: string]: string[]} = {};
+  const object: { [key: string]: string[] } = {};
   const entries = Object.entries(componentGraph);
   for (const [key, chunks] of entries) {
     object[key] = chunks.map(filename => path.join(buildDir, filename));
@@ -233,13 +231,13 @@ function startProgressLogger(prcs: NodeJS.Process): d.ProgressLogger {
   let promise = Promise.resolve();
   const update = (text: string) => {
     text = text.substr(0, prcs.stdout.columns - 5) + '\x1b[0m';
-    return promise = promise.then(() => {
+    return (promise = promise.then(() => {
       return new Promise<any>(resolve => {
         readline.clearLine(prcs.stdout, 0);
         readline.cursorTo(prcs.stdout, 0, null);
         prcs.stdout.write(text, resolve);
       });
-    });
+    }));
   };
 
   const stop = () => {
@@ -250,12 +248,13 @@ function startProgressLogger(prcs: NodeJS.Process): d.ProgressLogger {
   prcs.stdout.write('\x1B[?25l');
   return {
     update,
-    stop
+    stop,
   };
 }
 
 function generateContentHash(content: string) {
-  return crypto.createHash('md5')
+  return crypto
+    .createHash('md5')
     .update(content)
     .digest('hex')
     .toLowerCase()

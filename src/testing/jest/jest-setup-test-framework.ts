@@ -7,7 +7,6 @@ import { HtmlSerializer } from './jest-serializer';
 import { resetBuildConditionals } from '../reset-build-conditionals';
 import { resetPlatform, stopAutoApplyChanges } from '@stencil/core/internal/testing';
 
-
 declare const global: d.JestEnvironmentGlobal;
 
 export function jestSetupTestFramework() {
@@ -42,7 +41,7 @@ export function jestSetupTestFramework() {
     jasmineEnv.addReporter({
       specStarted: (spec: any) => {
         global.currentSpec = spec;
-      }
+      },
     });
   }
 

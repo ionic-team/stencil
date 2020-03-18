@@ -14,24 +14,20 @@ interface OptimizeModuleOptions {
   modeName?: string;
 }
 
-export const optimizeModule = async (
-  config: Config,
-  compilerCtx: CompilerCtx,
-  opts: OptimizeModuleOptions
-) => {
+export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, opts: OptimizeModuleOptions) => {
   if (!opts.minify && opts.sourceTarget !== 'es5') {
     return {
       output: opts.input,
-      diagnostics: [] as Diagnostic[]
+      diagnostics: [] as Diagnostic[],
     };
   }
-  const isDebug = (config.logLevel === 'debug');
+  const isDebug = config.logLevel === 'debug';
   const cacheKey = await compilerCtx.cache.createKey('optimizeModule', minfyJsId, opts, isDebug);
   const cachedContent = await compilerCtx.cache.get(cacheKey);
   if (cachedContent != null) {
     return {
       output: cachedContent,
-      diagnostics: [] as Diagnostic[]
+      diagnostics: [] as Diagnostic[],
     };
   }
 
@@ -45,8 +41,8 @@ export const optimizeModule = async (
       if (!isDebug) {
         compressOpts.passes = 3;
         compressOpts.global_defs = {
-          supportsListenerOptions: true,
-          'plt.$cssShim$': false
+          'supportsListenerOptions': true,
+          'plt.$cssShim$': false,
         };
         compressOpts.pure_funcs = compressOpts.pure_funcs || [];
         compressOpts.pure_funcs = ['getHostRef', ...compressOpts.pure_funcs];
@@ -54,7 +50,7 @@ export const optimizeModule = async (
 
       mangleOptions.properties = {
         regex: '^\\$.+\\$$',
-        debug: isDebug
+        debug: isDebug,
       };
 
       compressOpts.inline = 1;
@@ -72,14 +68,12 @@ export const optimizeModule = async (
   const results = await compilerCtx.worker.prepareModule(opts.input, minifyOpts, shouldTranspile, opts.inlineHelpers);
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
     if (opts.isCore) {
-      results.output = results.output
-        .replace(/disconnectedCallback\(\)\{\},/g, '');
+      results.output = results.output.replace(/disconnectedCallback\(\)\{\},/g, '');
     }
     await compilerCtx.cache.put(cacheKey, results.output);
   }
   return results;
 };
-
 
 export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, prettyOutput: boolean) => {
   const opts: MinifyOptions = {
@@ -92,12 +86,11 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
     opts.ecma = opts.output.ecma = 5;
     opts.compress = false;
     opts.mangle = true;
-
   } else {
     opts.mangle = {
       properties: {
-        regex: '^\\$.+\\$$'
-      }
+        regex: '^\\$.+\\$$',
+      },
     };
     opts.compress = {
       pure_getters: true,
@@ -128,20 +121,14 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
   return opts;
 };
 
-
-export const prepareModule = async (
-  input: string,
-  minifyOpts: MinifyOptions,
-  transpile: boolean,
-  inlineHelpers: boolean
-) => {
+export const prepareModule = async (input: string, minifyOpts: MinifyOptions, transpile: boolean, inlineHelpers: boolean) => {
   if (transpile) {
     const transpile = await transpileToEs5(input, inlineHelpers);
     if (transpile.diagnostics.length > 0) {
       return {
         sourceMap: null,
         output: null,
-        diagnostics: transpile.diagnostics
+        diagnostics: transpile.diagnostics,
       };
     }
     input = transpile.code;

@@ -1,18 +1,29 @@
 import { basename, dirname, relative } from 'path';
 import { normalizePath } from './normalize-path';
 
-
 export const isDef = (v: any) => v != null;
 
 export const toLowerCase = (str: string) => str.toLowerCase();
 
-export const toDashCase = (str: string) => toLowerCase(str.replace(/([A-Z0-9])/g, g => ' ' + g[0]).trim().replace(/ /g, '-'));
+export const toDashCase = (str: string) =>
+  toLowerCase(
+    str
+      .replace(/([A-Z0-9])/g, g => ' ' + g[0])
+      .trim()
+      .replace(/ /g, '-'),
+  );
 
-export const dashToPascalCase = (str: string) => toLowerCase(str).split('-').map(segment => segment.charAt(0).toUpperCase() + segment.slice(1)).join('');
+export const dashToPascalCase = (str: string) =>
+  toLowerCase(str)
+    .split('-')
+    .map(segment => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join('');
 
 export const toTitleCase = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-export const noop = (): any => { /* noop*/ };
+export const noop = (): any => {
+  /* noop*/
+};
 
 export const isComplexType = (o: any) => {
   // https://jsperf.com/typeof-fn-object/5
@@ -20,7 +31,7 @@ export const isComplexType = (o: any) => {
   return o === 'object' || o === 'function';
 };
 
-export const sortBy = <T>(array: T[], prop: ((item: T) => string | number)) => {
+export const sortBy = <T>(array: T[], prop: (item: T) => string | number) => {
   return array.slice().sort((a, b) => {
     const nameA = prop(a);
     const nameB = prop(b);
@@ -40,7 +51,7 @@ export const flatOne = <T>(array: T[][]): T[] => {
   }, [] as T[]);
 };
 
-export const unique = <T>(array: T[], predicate: (item: T) => any = (i) => i): T[] => {
+export const unique = <T>(array: T[], predicate: (item: T) => any = i => i): T[] => {
   const set = new Set();
   return array.filter(item => {
     const key = predicate(item);
@@ -56,13 +67,12 @@ export const unique = <T>(array: T[], predicate: (item: T) => any = (i) => i): T
 };
 
 export const fromEntries = <V>(entries: IterableIterator<[string, V]>) => {
-  const object: { [key: string]: V} = {};
+  const object: { [key: string]: V } = {};
   for (const [key, value] of entries) {
     object[key] = value;
   }
   return object;
 };
-
 
 export const relativeImport = (pathFrom: string, pathTo: string, ext?: string, addPrefix = true) => {
   let relativePath = relative(dirname(pathFrom), dirname(pathTo));
@@ -76,15 +86,14 @@ export const relativeImport = (pathFrom: string, pathTo: string, ext?: string, a
   return normalizePath(`${relativePath}/${basename(pathTo, ext)}`);
 };
 
-export const pluck = (obj: {[key: string]: any }, keys: string[]) => {
+export const pluck = (obj: { [key: string]: any }, keys: string[]) => {
   return keys.reduce((final, key) => {
     if (obj[key]) {
       final[key] = obj[key];
     }
     return final;
-  }, {} as {[key: string]: any});
+  }, {} as { [key: string]: any });
 };
-
 
 export const isBoolean = (v: any): v is boolean => typeof v === 'boolean';
 export const isDefined = (v: any) => v !== null && v !== undefined;

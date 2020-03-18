@@ -2,28 +2,27 @@ import * as d from '../../declarations';
 import { basename } from 'path';
 import { unique } from '@utils';
 
-
 export const filesChanged = (buildCtx: d.BuildCtx) => {
   // files changed include updated, added and deleted
-  return unique([
-    ...buildCtx.filesUpdated,
-    ...buildCtx.filesAdded,
-    ...buildCtx.filesDeleted
-  ]).sort();
+  return unique([...buildCtx.filesUpdated, ...buildCtx.filesAdded, ...buildCtx.filesDeleted]).sort();
 };
 
 export const scriptsAdded = (buildCtx: d.BuildCtx) => {
   // collect all the scripts that were added
-  return buildCtx.filesAdded.filter(f => {
-    return SCRIPT_EXT.some(ext => f.endsWith(ext.toLowerCase()));
-  }).map(f => basename(f));
+  return buildCtx.filesAdded
+    .filter(f => {
+      return SCRIPT_EXT.some(ext => f.endsWith(ext.toLowerCase()));
+    })
+    .map(f => basename(f));
 };
 
 export const scriptsDeleted = (buildCtx: d.BuildCtx) => {
   // collect all the scripts that were deleted
-  return buildCtx.filesDeleted.filter(f => {
-    return SCRIPT_EXT.some(ext => f.endsWith(ext.toLowerCase()));
-  }).map(f => basename(f));
+  return buildCtx.filesDeleted
+    .filter(f => {
+      return SCRIPT_EXT.some(ext => f.endsWith(ext.toLowerCase()));
+    })
+    .map(f => basename(f));
 };
 
 export const hasScriptChanges = (buildCtx: d.BuildCtx) => {
@@ -40,7 +39,11 @@ export const hasStyleChanges = (buildCtx: d.BuildCtx) => {
   });
 };
 
-const getExt = (filePath: string) => filePath.split('.').pop().toLowerCase();
+const getExt = (filePath: string) =>
+  filePath
+    .split('.')
+    .pop()
+    .toLowerCase();
 
 const SCRIPT_EXT = ['ts', 'tsx', 'js', 'jsx'];
 export const isScriptExt = (ext: string) => SCRIPT_EXT.includes(ext);

@@ -3,9 +3,7 @@ import { normalizePath } from '../../../utils';
 import { validateConfig } from '../validate-config';
 import path from 'path';
 
-
 describe('validateDevServer', () => {
-
   let inputConfig: d.Config;
   const root = path.resolve('/');
 
@@ -14,15 +12,14 @@ describe('validateDevServer', () => {
       sys_next: {} as any,
       rootDir: normalizePath(path.join(root, 'some', 'path')),
       devServer: {
-        contentTypes: {}
+        contentTypes: {},
       },
       flags: {
-        serve: true
+        serve: true,
       },
-      namespace: 'Testing'
+      namespace: 'Testing',
     };
   });
-
 
   it('should default address', () => {
     const { config } = validateConfig(inputConfig);
@@ -30,19 +27,19 @@ describe('validateDevServer', () => {
   });
 
   it('should remove http from address', () => {
-    inputConfig.devServer.address = 'http://localhost'
+    inputConfig.devServer.address = 'http://localhost';
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.address).toBe('localhost');
   });
 
   it('should remove https from address', () => {
-    inputConfig.devServer.address = 'https://localhost'
+    inputConfig.devServer.address = 'https://localhost';
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.address).toBe('localhost');
   });
 
   it('should remove trailing / from address', () => {
-    inputConfig.devServer.address = 'localhost/'
+    inputConfig.devServer.address = 'localhost/';
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.address).toBe('localhost');
   });
@@ -63,8 +60,8 @@ describe('validateDevServer', () => {
     inputConfig.outputTargets = [
       {
         type: 'www',
-        baseUrl: '/my-base-url'
-      } as d.OutputTargetWww
+        baseUrl: '/my-base-url',
+      } as d.OutputTargetWww,
     ];
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.basePath).toBe('/my-base-url/');
@@ -74,8 +71,8 @@ describe('validateDevServer', () => {
     inputConfig.outputTargets = [
       {
         type: 'www',
-        baseUrl: 'http://stenciljs.com/my-base-url'
-      } as d.OutputTargetWww
+        baseUrl: 'http://stenciljs.com/my-base-url',
+      } as d.OutputTargetWww,
     ];
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.basePath).toBe('/my-base-url/');
@@ -120,13 +117,13 @@ describe('validateDevServer', () => {
   });
 
   it('should default port with ip address', () => {
-    inputConfig.devServer.address = '192.12.12.10'
+    inputConfig.devServer.address = '192.12.12.10';
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.port).toBe(3333);
   });
 
   it('should default port with localhost', () => {
-    inputConfig.devServer.address = 'localhost'
+    inputConfig.devServer.address = 'localhost';
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.port).toBe(3333);
   });
@@ -138,14 +135,14 @@ describe('validateDevServer', () => {
   });
 
   it('should set port if in address', () => {
-    inputConfig.devServer.address = 'localhost:88'
+    inputConfig.devServer.address = 'localhost:88';
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.port).toBe(88);
     expect(config.devServer.address).toBe('localhost');
   });
 
   it('should set port if in address and has trailing slash', () => {
-    inputConfig.devServer.address = 'https://localhost:88/'
+    inputConfig.devServer.address = 'https://localhost:88/';
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.port).toBe(88);
     expect(config.devServer.address).toBe('localhost');
@@ -153,7 +150,7 @@ describe('validateDevServer', () => {
   });
 
   it('should set address, port null, protocol', () => {
-    inputConfig.devServer.address = 'https://subdomain.stenciljs.com/'
+    inputConfig.devServer.address = 'https://subdomain.stenciljs.com/';
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.port).toBe(null);
     expect(config.devServer.address).toBe('subdomain.stenciljs.com');

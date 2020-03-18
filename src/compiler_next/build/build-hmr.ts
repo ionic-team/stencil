@@ -5,7 +5,6 @@ import { isOutputTargetWww } from '../output-targets/output-utils';
 import minimatch from 'minimatch';
 import { basename } from 'path';
 
-
 export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (config.devServer == null || config.devServer.reloadStrategy == null) {
     return null;
@@ -13,7 +12,12 @@ export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   const hmr: d.HotModuleReplacement = {
     reloadStrategy: config.devServer.reloadStrategy,
-    versionId: Date.now().toString().substring(6) + '' + Math.round((Math.random() * 89999) + 10000)
+    versionId:
+      Date.now()
+        .toString()
+        .substring(6) +
+      '' +
+      Math.round(Math.random() * 89999 + 10000),
   };
 
   if (buildCtx.scriptsAdded.length > 0) {
@@ -45,13 +49,16 @@ export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildC
   }
 
   if (Object.keys(buildCtx.stylesUpdated).length > 0) {
-    hmr.inlineStylesUpdated = sortBy(buildCtx.stylesUpdated.map(s => {
-      return {
-        styleId: getScopeId(s.styleTag, s.styleMode),
-        styleTag: s.styleTag,
-        styleText: s.styleText,
-      } as d.HmrStyleUpdate;
-    }), s => s.styleId);
+    hmr.inlineStylesUpdated = sortBy(
+      buildCtx.stylesUpdated.map(s => {
+        return {
+          styleId: getScopeId(s.styleTag, s.styleMode),
+          styleTag: s.styleTag,
+          styleText: s.styleText,
+        } as d.HmrStyleUpdate;
+      }),
+      s => s.styleId,
+    );
   }
 
   const externalStylesUpdated = getExternalStylesUpdated(buildCtx, outputTargetsWww);
@@ -111,7 +118,6 @@ const getComponentsUpdated = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
   return tags.sort();
 };
 
-
 const addTsFileImporters = (allModuleFiles: d.Module[], filesToLookForImporters: string[], checkedFiles: Set<string>, changedScriptFiles: string[], scriptFile: string) => {
   if (!changedScriptFiles.includes(scriptFile)) {
     // add it to our list of files to transpile
@@ -162,7 +168,6 @@ const addTsFileImporters = (allModuleFiles: d.Module[], filesToLookForImporters:
   });
 };
 
-
 const getExternalStylesUpdated = (buildCtx: d.BuildCtx, outputTargetsWww: d.OutputTargetWww[]) => {
   if (!buildCtx.isRebuild || outputTargetsWww.length === 0) {
     return null;
@@ -175,7 +180,6 @@ const getExternalStylesUpdated = (buildCtx: d.BuildCtx, outputTargetsWww: d.Outp
 
   return cssFiles.map(cssFile => basename(cssFile)).sort();
 };
-
 
 const getImagesUpdated = (buildCtx: d.BuildCtx, outputTargetsWww: d.OutputTargetWww[]) => {
   if (outputTargetsWww.length === 0) {
@@ -199,7 +203,6 @@ const getImagesUpdated = (buildCtx: d.BuildCtx, outputTargetsWww: d.OutputTarget
   return imageFiles.sort();
 };
 
-
 const excludeHmrFiles = (config: d.Config, excludeHmr: string[], filesChanged: string[]) => {
   const excludeFiles: string[] = [];
 
@@ -208,28 +211,27 @@ const excludeHmrFiles = (config: d.Config, excludeHmr: string[], filesChanged: s
   }
 
   excludeHmr.forEach(excludeHmr => {
+    return filesChanged
+      .map(fileChanged => {
+        let shouldExclude = false;
 
-    return filesChanged.map(fileChanged => {
-      let shouldExclude = false;
+        if (isGlob(excludeHmr)) {
+          shouldExclude = minimatch(fileChanged, excludeHmr);
+        } else {
+          shouldExclude = normalizePath(excludeHmr) === normalizePath(fileChanged);
+        }
 
-      if (isGlob(excludeHmr)) {
-        shouldExclude = minimatch(fileChanged, excludeHmr);
-      } else {
-        shouldExclude = (normalizePath(excludeHmr) === normalizePath(fileChanged));
-      }
+        if (shouldExclude) {
+          config.logger.debug(`excludeHmr: ${fileChanged}`);
+          excludeFiles.push(basename(fileChanged));
+        }
 
-      if (shouldExclude) {
-        config.logger.debug(`excludeHmr: ${fileChanged}`);
-        excludeFiles.push(basename(fileChanged));
-      }
-
-      return shouldExclude;
-
-    }).some(r => r);
+        return shouldExclude;
+      })
+      .some(r => r);
   });
 
   return excludeFiles.sort();
 };
-
 
 const IMAGE_EXT = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.svg'];

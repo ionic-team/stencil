@@ -2,8 +2,7 @@ import * as d from '../../declarations';
 import { buildWarn } from '../message-utils';
 import { isString, toTitleCase } from '../helpers';
 import { splitLineBreaks } from './logger-utils';
-import { RollupError } from 'rollup'
-
+import { RollupError } from 'rollup';
 
 export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: RollupError) => {
   const formattedCode = formatErrorCode(rollupError.code);
@@ -17,7 +16,7 @@ export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerC
     messageText: formattedCode,
     relFilePath: null,
     absFilePath: null,
-    lines: []
+    lines: [],
   };
 
   if (config.logLevel === 'debug' && rollupError.stack) {
@@ -47,7 +46,7 @@ export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerC
               lineNumber: loc.line,
               text: srcLines[loc.line - 1],
               errorCharStart: loc.column,
-              errorLength: 0
+              errorLength: 0,
             };
 
             diagnostic.lineNumber = errorLine.lineNumber;
@@ -74,7 +73,7 @@ export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerC
                 lineNumber: errorLine.lineNumber - 1,
                 text: srcLines[errorLine.lineIndex - 1],
                 errorCharStart: -1,
-                errorLength: -1
+                errorLength: -1,
               };
 
               diagnostic.lines.unshift(previousLine);
@@ -86,21 +85,18 @@ export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerC
                 lineNumber: errorLine.lineNumber + 1,
                 text: srcLines[errorLine.lineIndex + 1],
                 errorCharStart: -1,
-                errorLength: -1
+                errorLength: -1,
               };
 
               diagnostic.lines.push(nextLine);
             }
-
           } catch (e) {
             diagnostic.messageText += `\nError parsing: ${diagnostic.absFilePath}, line: ${loc.line}, column: ${loc.column}`;
             diagnostic.debugText = sourceText;
           }
-
         } else if (typeof rollupError.frame === 'string') {
           diagnostic.messageText += '\n' + rollupError.frame;
         }
-
       } catch (e) {}
     }
   }
@@ -108,11 +104,10 @@ export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerC
   buildCtx.diagnostics.push(diagnostic);
 };
 
-
 export const createOnWarnFn = (diagnostics: d.Diagnostic[], bundleModulesFiles?: d.Module[]) => {
   const previousWarns = new Set<string>();
 
-  return function onWarningMessage(warning: { code: string, importer: string, message: string }) {
+  return function onWarningMessage(warning: { code: string; importer: string; message: string }) {
     if (warning == null || ignoreWarnCodes.has(warning.code) || previousWarns.has(warning.message)) {
       return;
     }
@@ -121,10 +116,13 @@ export const createOnWarnFn = (diagnostics: d.Diagnostic[], bundleModulesFiles?:
 
     let label = '';
     if (bundleModulesFiles) {
-      label = bundleModulesFiles.reduce((cmps, m) => {
-        cmps.push(...m.cmps);
-        return cmps;
-      }, [] as d.ComponentCompilerMeta[]).join(', ').trim();
+      label = bundleModulesFiles
+        .reduce((cmps, m) => {
+          cmps.push(...m.cmps);
+          return cmps;
+        }, [] as d.ComponentCompilerMeta[])
+        .join(', ')
+        .trim();
 
       if (label.length) {
         label += ': ';
@@ -137,23 +135,18 @@ export const createOnWarnFn = (diagnostics: d.Diagnostic[], bundleModulesFiles?:
   };
 };
 
-const ignoreWarnCodes = new Set([
-  'THIS_IS_UNDEFINED',
-  'NON_EXISTENT_EXPORT',
-  'CIRCULAR_DEPENDENCY',
-  'EMPTY_BUNDLE',
-  'UNUSED_EXTERNAL_IMPORT'
-]);
-
+const ignoreWarnCodes = new Set(['THIS_IS_UNDEFINED', 'NON_EXISTENT_EXPORT', 'CIRCULAR_DEPENDENCY', 'EMPTY_BUNDLE', 'UNUSED_EXTERNAL_IMPORT']);
 
 const charBreak = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);
 
-
 const formatErrorCode = (errorCode: any) => {
   if (typeof errorCode === 'string') {
-    return errorCode.split('_').map(c => {
-      return toTitleCase(c.toLowerCase());
-    }).join(' ');
+    return errorCode
+      .split('_')
+      .map(c => {
+        return toTitleCase(c.toLowerCase());
+      })
+      .join(' ');
   }
   return (errorCode || '').trim();
 };

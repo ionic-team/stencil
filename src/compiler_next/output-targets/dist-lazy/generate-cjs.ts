@@ -5,7 +5,6 @@ import { join } from 'path';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
 
-
 export const generateCjs = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) => {
   const cjsOutputs = outputTargets.filter(o => !!o.cjsDir);
 
@@ -15,7 +14,7 @@ export const generateCjs = async (config: d.Config, compilerCtx: d.CompilerCtx, 
       format: 'cjs',
       entryFileNames: '[name].cjs.js',
       assetFileNames: '[name]-[hash][extname]',
-      preferConst: true
+      preferConst: true,
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
@@ -28,12 +27,14 @@ export const generateCjs = async (config: d.Config, compilerCtx: d.CompilerCtx, 
 
 const generateShortcuts = (compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], outputTargets: d.OutputTargetDistLazy[]) => {
   const indexFilename = rollupResult.find(r => r.type === 'chunk' && r.isIndex).fileName;
-  return Promise.all(outputTargets.map(async o => {
-    if (o.cjsIndexFile) {
-      const entryPointPath = join(o.cjsDir, indexFilename);
-      const relativePath = relativeImport(o.cjsIndexFile, entryPointPath);
-      const shortcutContent = `module.exports = require('${relativePath}');\n`;
-      await compilerCtx.fs.writeFile(o.cjsIndexFile, shortcutContent, { outputTargetType: o.type });
-    }
-  }));
+  return Promise.all(
+    outputTargets.map(async o => {
+      if (o.cjsIndexFile) {
+        const entryPointPath = join(o.cjsDir, indexFilename);
+        const relativePath = relativeImport(o.cjsIndexFile, entryPointPath);
+        const shortcutContent = `module.exports = require('${relativePath}');\n`;
+        await compilerCtx.fs.writeFile(o.cjsIndexFile, shortcutContent, { outputTargetType: o.type });
+      }
+    }),
+  );
 };

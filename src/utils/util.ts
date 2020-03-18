@@ -3,7 +3,6 @@ import { BANNER } from './constants';
 import { buildError } from './message-utils';
 import { dashToPascalCase, isString, toDashCase } from './helpers';
 
-
 export const createJsVarName = (fileName: string) => {
   if (isString(fileName)) {
     fileName = fileName.split('?')[0];
@@ -26,7 +25,6 @@ export const createJsVarName = (fileName: string) => {
   }
   return fileName;
 };
-
 
 export const getFileExt = (fileName: string) => {
   if (typeof fileName === 'string') {
@@ -56,15 +54,13 @@ export const isTsFile = (filePath: string) => {
   return false;
 };
 
-
 export const isDtsFile = (filePath: string) => {
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 2) {
-    return (parts[parts.length - 2] === 'd' && parts[parts.length - 1] === 'ts');
+    return parts[parts.length - 2] === 'd' && parts[parts.length - 1] === 'ts';
   }
   return false;
 };
-
 
 export const isJsFile = (filePath: string) => {
   const parts = filePath.toLowerCase().split('.');
@@ -79,23 +75,20 @@ export const isJsFile = (filePath: string) => {
   return false;
 };
 
-
 export const hasFileExtension = (filePath: string, extensions: string[]) => {
   filePath = filePath.toLowerCase();
   return extensions.some(ext => filePath.endsWith('.' + ext));
 };
 
-
 export const isCssFile = (filePath: string) => {
   return hasFileExtension(filePath, ['css']);
 };
-
 
 export const isHtmlFile = (filePath: string) => {
   return hasFileExtension(filePath, ['html', 'htm']);
 };
 
-export const generatePreamble = (config: d.Config, opts: { prefix?: string; suffix?: string, defaultBanner?: boolean } = {}) => {
+export const generatePreamble = (config: d.Config, opts: { prefix?: string; suffix?: string; defaultBanner?: boolean } = {}) => {
   let preamble: string[] = [];
 
   if (config.preamble) {
@@ -127,16 +120,14 @@ export const generatePreamble = (config: d.Config, opts: { prefix?: string; suff
     return preamble.join('\n');
   }
 
-
   if (opts.defaultBanner === true) {
     return `/*! ${BANNER} */`;
   }
   return '';
 };
 
-
 export const isDocsPublic = (jsDocs: d.JsDoc | d.CompilerJsDoc | undefined) => {
-  return !(jsDocs && jsDocs.tags.some((s) => s.name === 'internal'));
+  return !(jsDocs && jsDocs.tags.some(s => s.name === 'internal'));
 };
 
 const lineBreakRegex = /\r?\n|\r/g;
@@ -146,15 +137,14 @@ export function getTextDocs(docs: d.CompilerJsDoc | undefined | null) {
   }
   return `${docs.text.replace(lineBreakRegex, ' ')}
 ${docs.tags
-      .filter(tag => tag.name !== 'internal')
-      .map(tag => `@${tag.name} ${(tag.text || '').replace(lineBreakRegex, ' ')}`)
-      .join('\n')}`.trim();
+  .filter(tag => tag.name !== 'internal')
+  .map(tag => `@${tag.name} ${(tag.text || '').replace(lineBreakRegex, ' ')}`)
+  .join('\n')}`.trim();
 }
 
 export const getDependencies = (buildCtx: d.BuildCtx) => {
   if (buildCtx.packageJson != null && buildCtx.packageJson.dependencies != null) {
-    return Object.keys(buildCtx.packageJson.dependencies)
-      .filter(pkgName => !SKIP_DEPS.includes(pkgName));
+    return Object.keys(buildCtx.packageJson.dependencies).filter(pkgName => !SKIP_DEPS.includes(pkgName));
   }
   return [];
 };
@@ -163,10 +153,7 @@ export const hasDependency = (buildCtx: d.BuildCtx, depName: string) => {
   return getDependencies(buildCtx).includes(depName);
 };
 
-export const getDynamicImportFunction = (namespace: string) =>
-  `__sc_import_${
-  namespace.replace(/\s|-/g, '_')
-  }`;
+export const getDynamicImportFunction = (namespace: string) => `__sc_import_${namespace.replace(/\s|-/g, '_')}`;
 
 export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   try {
@@ -180,7 +167,6 @@ export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerC
         buildCtx.packageJson = parseResults.data;
       }
     }
-
   } catch (e) {
     if (!config.outputTargets.some(o => o.type.includes('dist'))) {
       const diagnostic = buildError(buildCtx.diagnostics);
@@ -190,7 +176,7 @@ export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerC
   }
 };
 
-export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): { diagnostic: d.Diagnostic; data: d.PackageJsonData; filePath: string; } => {
+export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): { diagnostic: d.Diagnostic; data: d.PackageJsonData; filePath: string } => {
   if (isString(pkgJsonFilePath)) {
     return parseJson(pkgJsonStr, pkgJsonFilePath);
   }
@@ -201,7 +187,7 @@ export const parseJson = (jsonStr: string, filePath?: string) => {
   const rtn = {
     diagnostic: null as d.Diagnostic,
     data: null as any,
-    filePath
+    filePath,
   };
 
   if (isString(jsonStr)) {
@@ -218,7 +204,7 @@ export const parseJson = (jsonStr: string, filePath?: string) => {
     rtn.diagnostic = buildError();
     rtn.diagnostic.absFilePath = filePath;
     rtn.diagnostic.header = `Error Parsing JSON`;
-    rtn.diagnostic.messageText = `Invalid JSON input to parse`
+    rtn.diagnostic.messageText = `Invalid JSON input to parse`;
   }
 
   return rtn;

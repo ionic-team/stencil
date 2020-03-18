@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { setHmrAttr, hasShadowRoot } from './hmr-util';
 
-
 export const hmrComponents = (elm: Element, versionId: string, hmrTagNames: string[]) => {
   const updatedTags: string[] = [];
 

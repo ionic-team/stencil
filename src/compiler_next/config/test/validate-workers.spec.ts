@@ -3,20 +3,18 @@ import { validateConfig } from '../validate-config';
 import { mockLogger } from '@stencil/core/testing';
 import path from 'path';
 
-
 describe('validate-workers', () => {
-
   let config: d.Config;
   const logger = mockLogger();
 
   beforeEach(() => {
     config = {
       sys: {
-        path: path
+        path: path,
       } as any,
       logger: logger,
       rootDir: '/',
-      namespace: 'Testing'
+      namespace: 'Testing',
     };
     config.sys.details = {
       cpuModel: 'cpuModel',
@@ -25,7 +23,7 @@ describe('validate-workers', () => {
       release: '17.6.0',
       runtime: 'node',
       runtimeVersion: 'v10.0.0',
-      tmpDir: '/tmpdir'
+      tmpDir: '/tmpdir',
     };
   });
 
@@ -43,7 +41,7 @@ describe('validate-workers', () => {
 
   it('set maxConcurrentWorkers from ci flags', () => {
     config.flags = {
-      ci: true
+      ci: true,
     };
     config.maxConcurrentWorkers = 2;
     validateConfig(config, [], false);
@@ -52,7 +50,7 @@ describe('validate-workers', () => {
 
   it('set maxConcurrentWorkers from flags', () => {
     config.flags = {
-      maxWorkers: 1
+      maxWorkers: 1,
     };
     config.maxConcurrentWorkers = 4;
     validateConfig(config, [], false);
@@ -92,5 +90,4 @@ describe('validate-workers', () => {
     validateConfig(config, [], false);
     expect(config.maxConcurrentTasksPerWorker).toBe(2);
   });
-
 });

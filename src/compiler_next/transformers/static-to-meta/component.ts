@@ -18,14 +18,13 @@ import { parseStringLiteral } from './string-literal';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
 import ts from 'typescript';
 
-
 export const parseStaticComponentMeta = (
   compilerCtx: d.CompilerCtx,
   typeChecker: ts.TypeChecker,
   cmpNode: ts.ClassDeclaration,
   moduleFile: d.Module,
   nodeMap: d.NodeMap,
-  transformOpts?: d.TransformOptions
+  transformOpts?: d.TransformOptions,
 ) => {
   if (cmpNode.members == null) {
     return cmpNode;
@@ -46,7 +45,7 @@ export const parseStaticComponentMeta = (
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
     isCollectionDependency,
-    componentClassName: (cmpNode.name ? cmpNode.name.text : ''),
+    componentClassName: cmpNode.name ? cmpNode.name.text : '',
     elementRef: parseStaticElementRef(staticMembers),
     encapsulation,
     shadowDelegatesFocus: parseStaticShadowDelegatesFocus(encapsulation, staticMembers),
@@ -116,7 +115,7 @@ export const parseStaticComponentMeta = (
     htmlAttrNames: [],
     htmlTagNames: [],
     isUpdateable: false,
-    potentialCmpRefs: []
+    potentialCmpRefs: [],
   };
 
   const visitComponentChildNode = (node: ts.Node) => {
@@ -171,7 +170,7 @@ const parseVirtualProp = (tag: d.CompilerJsDocTagInfo): d.ComponentCompilerVirtu
   return {
     type: type == null ? 'any' : type.trim(),
     name: name.trim(),
-    docs: docs.trim()
+    docs: docs.trim(),
   };
 };
 

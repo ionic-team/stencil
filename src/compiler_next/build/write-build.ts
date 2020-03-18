@@ -3,7 +3,6 @@ import { catchError } from '@utils';
 import { outputServiceWorkers } from '../output-targets/output-service-workers';
 import { validateBuildFiles } from './validate-files';
 
-
 export const writeBuild = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
 
@@ -26,9 +25,7 @@ export const writeBuild = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
     // buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
-    await outputServiceWorkers(config, buildCtx),
-    await validateBuildFiles(config, compilerCtx, buildCtx);
-
+    await outputServiceWorkers(config, buildCtx), await validateBuildFiles(config, compilerCtx, buildCtx);
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }

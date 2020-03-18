@@ -3,7 +3,6 @@ import { getHostRef } from '@platform';
 import { HOST_FLAGS } from '@utils';
 import { initializeComponent } from './initialize-component';
 
-
 export const hmrStart = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId: string) => {
   // ¯\_(ツ)_/¯
   const hostRef = getHostRef(elm);
@@ -26,7 +25,6 @@ export const hmrStart = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, hm
   // re-initialize the component
   initializeComponent(elm, hostRef, cmpMeta, hmrVersionId);
 };
-
 
 export const hmrFinish = (_elm: d.HostElement, _cmpMeta: d.ComponentRuntimeMeta) => {
   // TODO

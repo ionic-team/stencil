@@ -58,9 +58,7 @@ export class NodeLazyRequire implements d.LazyRequire {
       return Promise.resolve();
     }
 
-    const msg = `Please wait while required dependencies are ${
-      isUpdate ? `updated` : `installed`
-    }. This may take a few moments and will only be required for the initial run.`;
+    const msg = `Please wait while required dependencies are ${isUpdate ? `updated` : `installed`}. This may take a few moments and will only be required for the initial run.`;
 
     logger.info(logger.magenta(msg));
 

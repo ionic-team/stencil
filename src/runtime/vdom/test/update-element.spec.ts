@@ -4,20 +4,18 @@ import { updateElement } from '../update-element';
 import * as setAccessor from '../set-accessor';
 import { newVNode } from '../h';
 
-
 describe('updateElement', () => {
-
   it('should add/remove classes', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
     elm.className = 'mr plutonium';
     const oldVNode: d.VNode = {
       $flags$: 0,
-      $attrs$: { class: 'mr plutonium' }
+      $attrs$: { class: 'mr plutonium' },
     };
     const newVnode: d.VNode = {
       $flags$: 0,
       $elm$: elm,
-      $attrs$: { class: 'mr fusion' }
+      $attrs$: { class: 'mr fusion' },
     };
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
@@ -28,11 +26,11 @@ describe('updateElement', () => {
     elm.className = 'mr fusion';
     const oldVNode: d.VNode = {
       $flags$: 0,
-      $attrs$: { class: 'mr fusion' }
+      $attrs$: { class: 'mr fusion' },
     };
     const newVnode: d.VNode = {
       $flags$: 0,
-      $elm$: elm
+      $elm$: elm,
     };
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('');
@@ -43,12 +41,12 @@ describe('updateElement', () => {
     elm.className = 'mr fusion';
     const oldVNode: d.VNode = {
       $flags$: 0,
-      $attrs$: { class: 'mr fusion' }
+      $attrs$: { class: 'mr fusion' },
     };
     const newVnode: d.VNode = {
       $flags$: 0,
       $elm$: elm,
-      $attrs$: { class: 'mr fusion' }
+      $attrs$: { class: 'mr fusion' },
     };
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
@@ -70,7 +68,7 @@ describe('updateElement', () => {
     const newVnode: d.VNode = {
       $flags$: 0,
       $elm$: elm,
-      $attrs$: { class: 'mr fusion' }
+      $attrs$: { class: 'mr fusion' },
     };
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
@@ -82,7 +80,7 @@ describe('updateElement', () => {
       const oldVNode: d.VNode = null;
       const newVnode: d.VNode = {
         $flags$: 0,
-        $elm$: elm
+        $elm$: elm,
       };
       updateElement(oldVNode, newVnode, false);
     }).not.toThrow();
@@ -91,7 +89,7 @@ describe('updateElement', () => {
   it('should use host element on shadow root element when using shadow dom', () => {
     const elm: any = {
       host: document.createElement('div') as HTMLElement,
-      nodeType: NODE_TYPE.DocumentFragment
+      nodeType: NODE_TYPE.DocumentFragment,
     };
     const oldVNode: d.VNode = null;
     const newVnode: d.VNode = {
@@ -99,8 +97,8 @@ describe('updateElement', () => {
       $elm$: elm,
       $attrs$: {
         class: 'mr fusion',
-        style: { color: 'gray' }
-      }
+        style: { color: 'gray' },
+      },
     };
     updateElement(oldVNode, newVnode, false);
     expect(elm.host.className).toBe('mr fusion');
@@ -116,8 +114,8 @@ describe('updateElement', () => {
       $elm$: elm,
       $attrs$: {
         class: 'mr fusion',
-        style: { color: 'gray' }
-      }
+        style: { color: 'gray' },
+      },
     };
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
@@ -132,8 +130,8 @@ describe('updateElement', () => {
       $elm$: elm,
       $attrs$: {
         class: 'mr fusion',
-        style: { color: 'gray' }
-      }
+        style: { color: 'gray' },
+      },
     };
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
@@ -148,23 +146,23 @@ describe('updateElement', () => {
       $flags$: 0,
       $elm$: elm,
       $attrs$: {
-        content: 'attributes removed',
-        padding: false,
-        bold: 'false',
-        'no-attr': null
-      }
+        'content': 'attributes removed',
+        'padding': false,
+        'bold': 'false',
+        'no-attr': null,
+      },
     };
     const secondVNode: d.VNode = {
       $flags$: 0,
       $elm$: elm,
       $attrs$: {
-        content: 'attributes added',
-        padding: true,
-        bold: 'true',
-        margin: '',
-        color: 'lime',
-        'no-attr': null
-      }
+        'content': 'attributes added',
+        'padding': true,
+        'bold': 'true',
+        'margin': '',
+        'color': 'lime',
+        'no-attr': null,
+      },
     };
     updateElement(initialVNode, firstVNode, false);
     expect(spy).toHaveBeenCalledTimes(4);
@@ -193,5 +191,4 @@ describe('updateElement', () => {
     spy.mockReset();
     spy.mockRestore();
   });
-
 });

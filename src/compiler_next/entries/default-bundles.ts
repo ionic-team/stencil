@@ -15,13 +15,7 @@ export function getDefaultBundles(config: d.Config, buildCtx: d.BuildCtx, cmps: 
     return [];
   }
 
-  const mainBundle = unique([
-    ...entryPointsHints,
-    ...flatOne(entryPointsHints
-      .map(resolveTag)
-      .map(cmp => cmp.dependencies)
-    )
-  ]).map(resolveTag);
+  const mainBundle = unique([...entryPointsHints, ...flatOne(entryPointsHints.map(resolveTag).map(cmp => cmp.dependencies))]).map(resolveTag);
 
   function resolveTag(tag: string) {
     return cmps.find(cmp => cmp.tagName === tag);
@@ -33,30 +27,32 @@ export function getDefaultBundles(config: d.Config, buildCtx: d.BuildCtx, cmps: 
 export function getUserConfigBundles(config: d.Config, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
   const definedTags = new Set<string>();
   const entryTags = config.bundles.map(b => {
-    return b.components.map(tag => {
-      const tagError = validateComponentTag(tag);
-      if (tagError) {
-        const err = buildError(buildCtx.diagnostics);
-        err.header = `Stencil Config`;
-        err.messageText = tagError;
-      }
+    return b.components
+      .map(tag => {
+        const tagError = validateComponentTag(tag);
+        if (tagError) {
+          const err = buildError(buildCtx.diagnostics);
+          err.header = `Stencil Config`;
+          err.messageText = tagError;
+        }
 
-      const component = cmps.find(cmp => cmp.tagName === tag);
-      if (!component) {
-        const warn = buildWarn(buildCtx.diagnostics);
-        warn.header = `Stencil Config`;
-        warn.messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or its collections.`;
-      }
+        const component = cmps.find(cmp => cmp.tagName === tag);
+        if (!component) {
+          const warn = buildWarn(buildCtx.diagnostics);
+          warn.header = `Stencil Config`;
+          warn.messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or its collections.`;
+        }
 
-      if (definedTags.has(tag)) {
-        const warn = buildWarn(buildCtx.diagnostics);
-        warn.header = `Stencil Config`;
-        warn.messageText = `Component tag "${tag}" has been defined multiple times in the "bundles" config.`;
-      }
+        if (definedTags.has(tag)) {
+          const warn = buildWarn(buildCtx.diagnostics);
+          warn.header = `Stencil Config`;
+          warn.messageText = `Component tag "${tag}" has been defined multiple times in the "bundles" config.`;
+        }
 
-      definedTags.add(tag);
-      return component;
-    }).sort();
+        definedTags.add(tag);
+        return component;
+      })
+      .sort();
   });
   return entryTags;
 }

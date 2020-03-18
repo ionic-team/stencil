@@ -11,7 +11,6 @@ if (IS_NODE_ENV) {
   path.normalize = (...args: string[]) => normalizePath(nodePath.normalize.apply(nodePath, args));
   path.relative = (...args: string[]) => normalizePath(nodePath.relative.apply(nodePath, args));
   path.resolve = (...args: string[]) => normalizePath(nodePath.resolve.apply(nodePath, args));
-
 } else {
   Object.assign(path, pathBrowserify);
 }

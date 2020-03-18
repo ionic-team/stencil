@@ -1,29 +1,28 @@
 import * as d from '../../../declarations';
 import { UsedSelectors } from './used-selectors';
 
-
 export interface ParseCssResults {
   diagnostics: d.Diagnostic[];
   stylesheet: CssNode;
 }
 
 export type CssNodeType =
-  'charset' |
-  'comment' |
-  'custom-media' |
-  'document' |
-  'declaration' |
-  'font-face' |
-  'host' |
-  'import' |
-  'keyframes' |
-  'keyframe' |
-  'media' |
-  'namespace' |
-  'page' |
-  'rule' |
-  'stylesheet' |
-  'supports';
+  | 'charset'
+  | 'comment'
+  | 'custom-media'
+  | 'document'
+  | 'declaration'
+  | 'font-face'
+  | 'host'
+  | 'import'
+  | 'keyframes'
+  | 'keyframe'
+  | 'media'
+  | 'namespace'
+  | 'page'
+  | 'rule'
+  | 'stylesheet'
+  | 'supports';
 
 export interface CssNode {
   type?: CssNodeType;

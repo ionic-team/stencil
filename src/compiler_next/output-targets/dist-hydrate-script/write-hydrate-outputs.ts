@@ -3,13 +3,7 @@ import { basename, join } from 'path';
 import { relocateHydrateContextConst } from './relocate-hydrate-context';
 import { RollupOutput } from 'rollup';
 
-export const writeHydrateOutputs = (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  outputTargets: d.OutputTargetHydrate[],
-  rollupOutput: RollupOutput,
-) => {
+export const writeHydrateOutputs = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[], rollupOutput: RollupOutput) => {
   return Promise.all(
     outputTargets.map(outputTarget => {
       return writeHydrateOutput(config, compilerCtx, buildCtx, outputTarget, rollupOutput);
@@ -17,13 +11,7 @@ export const writeHydrateOutputs = (
   );
 };
 
-const writeHydrateOutput = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetHydrate,
-  rollupOutput: RollupOutput,
-) => {
+const writeHydrateOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetHydrate, rollupOutput: RollupOutput) => {
   const hydratePackageName = await getHydratePackageName(config, compilerCtx);
 
   const hydrateAppDirPath = outputTarget.dir;

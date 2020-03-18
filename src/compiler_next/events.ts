@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 
-
 export const buildEvents = (): d.BuildEvents => {
   const evCallbacks: EventCallback[] = [];
 
@@ -19,17 +18,16 @@ export const buildEvents = (): d.BuildEvents => {
       const callback = arg0;
       evCallbacks.push({
         eventName,
-        callback
+        callback,
       });
       return () => off(callback);
-
     } else if (typeof arg0 === 'string' && typeof arg1 === 'function') {
       const eventName = arg0.toLowerCase().trim();
       const callback = arg1;
 
       evCallbacks.push({
         eventName,
-        callback
+        callback,
       });
 
       return () => off(callback);
@@ -64,7 +62,7 @@ export const buildEvents = (): d.BuildEvents => {
   return {
     emit,
     on,
-    unsubscribeAll
+    unsubscribeAll,
   };
 };
 

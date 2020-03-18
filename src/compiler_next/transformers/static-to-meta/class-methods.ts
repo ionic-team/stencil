@@ -2,7 +2,6 @@ import * as d from '../../../declarations';
 import ts from 'typescript';
 import { isMethod } from '../transform-utils';
 
-
 export const parseClassMethods = (cmpNode: ts.ClassDeclaration, cmpMeta: d.ComponentCompilerMeta) => {
   const classMembers = cmpNode.members;
   if (!classMembers || classMembers.length === 0) {
@@ -26,7 +25,7 @@ export const parseClassMethods = (cmpNode: ts.ClassDeclaration, cmpMeta: d.Compo
   cmpMeta.hasComponentShouldUpdateFn = classMethods.some(m => isMethod(m, 'componentShouldUpdate'));
   cmpMeta.hasComponentDidUpdateFn = classMethods.some(m => isMethod(m, 'componentDidUpdate'));
   cmpMeta.hasComponentDidUnloadFn = classMethods.some(m => isMethod(m, 'componentDidUnload'));
-  cmpMeta.hasLifecycle = (cmpMeta.hasComponentWillLoadFn || cmpMeta.hasComponentDidLoadFn || cmpMeta.hasComponentWillUpdateFn || cmpMeta.hasComponentDidUpdateFn);
+  cmpMeta.hasLifecycle = cmpMeta.hasComponentWillLoadFn || cmpMeta.hasComponentDidLoadFn || cmpMeta.hasComponentWillUpdateFn || cmpMeta.hasComponentDidUpdateFn;
   cmpMeta.hasRenderFn = classMethods.some(m => isMethod(m, 'render')) || hasHostData;
   cmpMeta.hasVdomRender = cmpMeta.hasVdomRender || hasHostData;
 };

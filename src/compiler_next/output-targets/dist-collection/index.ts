@@ -4,7 +4,6 @@ import { isOutputTargetDistCollection } from '../../output-targets/output-utils'
 import { join, relative } from 'path';
 import { writeCollectionManifests } from '../../output-targets/output-collection';
 
-
 export const outputCollection = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, changedModuleFiles: d.Module[]) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
   if (outputTargets.length === 0) {
@@ -13,18 +12,21 @@ export const outputCollection = async (config: d.Config, compilerCtx: d.Compiler
 
   const timespan = buildCtx.createTimeSpan(`generate collections started`, true);
   try {
-    await Promise.all(changedModuleFiles.map(async mod => {
-      const code = mod.staticSourceFileText;
+    await Promise.all(
+      changedModuleFiles.map(async mod => {
+        const code = mod.staticSourceFileText;
 
-      await Promise.all(outputTargets.map(async o => {
-        const relPath = relative(config.srcDir, mod.jsFilePath);
-        const filePath = join(o.collectionDir, relPath);
-        await compilerCtx.fs.writeFile(filePath, code, { outputTargetType: o.type });
-      }));
-    }));
+        await Promise.all(
+          outputTargets.map(async o => {
+            const relPath = relative(config.srcDir, mod.jsFilePath);
+            const filePath = join(o.collectionDir, relPath);
+            await compilerCtx.fs.writeFile(filePath, code, { outputTargetType: o.type });
+          }),
+        );
+      }),
+    );
 
     await writeCollectionManifests(config, compilerCtx, buildCtx, outputTargets);
-
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }

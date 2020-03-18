@@ -13,7 +13,7 @@ export const textPlugin = (): Plugin => {
         return `export default ${JSON.stringify(code)};`;
       }
       return null;
-    }
+    },
   };
 };
 

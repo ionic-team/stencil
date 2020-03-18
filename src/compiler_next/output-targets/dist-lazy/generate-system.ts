@@ -6,14 +6,7 @@ import { join } from 'path';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
 
-
-export const generateSystem = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  rollupBuild: RollupBuild,
-  outputTargets: d.OutputTargetDistLazy[]
-) => {
+export const generateSystem = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) => {
   const systemOutputs = outputTargets.filter(o => !!o.systemDir);
 
   if (systemOutputs.length > 0) {
@@ -22,7 +15,7 @@ export const generateSystem = async (
       entryFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name].system.js',
       chunkFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name]-[hash].system.js',
       assetFileNames: config.hashFileNames ? 'p-[hash][extname]' : '[name]-[hash][extname]',
-      preferConst: true
+      preferConst: true,
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
@@ -36,9 +29,7 @@ export const generateSystem = async (
 const generateSystemLoaders = (config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], systemOutputs: d.OutputTargetDistLazy[]) => {
   const loaderFilename = rollupResult.find(r => r.type === 'chunk' && r.isBrowserLoader).fileName;
 
-  return Promise.all(
-    systemOutputs.map((o) => writeSystemLoader(config, compilerCtx, loaderFilename, o))
-  );
+  return Promise.all(systemOutputs.map(o => writeSystemLoader(config, compilerCtx, loaderFilename, o)));
 };
 
 const writeSystemLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, loaderFilename: string, outputTarget: d.OutputTargetDistLazy) => {

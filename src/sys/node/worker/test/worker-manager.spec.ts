@@ -1,7 +1,6 @@
 import { getNextWorker } from '..';
 import { TestWorkerMain } from './test-worker-main';
 
-
 describe('getNextWorker', () => {
   let workers: TestWorkerMain[];
   const maxConcurrentWorkers = 4;
@@ -66,5 +65,4 @@ describe('getNextWorker', () => {
 
     expect(w.id).toBe(3);
   });
-
 });

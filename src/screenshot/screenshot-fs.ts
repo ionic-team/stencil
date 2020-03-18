@@ -2,7 +2,6 @@ import * as d from '@stencil/core/internal';
 import fs from 'fs';
 import path from 'path';
 
-
 export async function writeScreenshotImage(imagePath: string, screenshotBuf: Buffer) {
   const imageExists = await fileExists(imagePath);
   if (!imageExists) {
@@ -16,7 +15,6 @@ export async function writeScreenshotData(dataDir: string, screenshotData: d.Scr
   await writeFile(filePath, content);
 }
 
-
 export async function readScreenshotData(dataDir: string, screenshotId: string) {
   let rtn: d.Screenshot = null;
 
@@ -29,12 +27,10 @@ export async function readScreenshotData(dataDir: string, screenshotId: string) 
   return rtn;
 }
 
-
 function getDataFilePath(dataDir: string, screenshotId: string) {
   const fileName = `${screenshotId}.json`;
   return path.join(dataDir, fileName);
 }
-
 
 export function fileExists(filePath: string) {
   return new Promise<boolean>(resolve => {

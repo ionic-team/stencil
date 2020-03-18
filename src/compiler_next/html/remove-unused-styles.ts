@@ -4,7 +4,6 @@ import { hasError, catchError } from '@utils';
 import { parseCss } from '../style/css-parser/parse-css';
 import { serializeCss } from '../style/css-parser/serialize-css';
 
-
 export const removeUnusedStyles = (doc: Document, diagnostics: d.Diagnostic[]) => {
   try {
     const styleElms = doc.head.querySelectorAll<HTMLStyleElement>(`style[data-styles]`);
@@ -38,24 +37,22 @@ const removeUnusedStyleText = (usedSelectors: UsedSelectors, diagnostics: d.Diag
       // convert the parsed css back into a string
       // but only keeping what was found in our active selectors
       styleElm.innerHTML = serializeCss(parseResults.stylesheet, {
-        usedSelectors
+        usedSelectors,
       });
-
     } catch (e) {
       diagnostics.push({
         level: 'warn',
         type: 'css',
         header: 'CSS Stringify',
-        messageText: e
+        messageText: e,
       });
     }
-
   } catch (e) {
     diagnostics.push({
       level: 'warn',
       type: 'css',
       header: 'CSS Parse',
-      messageText: e
+      messageText: e,
     });
   }
 };

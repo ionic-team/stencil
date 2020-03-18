@@ -10,7 +10,6 @@ import { resetEventListeners } from './event';
 import { MockWindow } from './window';
 import { MockAttr } from './attribute';
 
-
 export class MockDocument extends MockHTMLElement {
   defaultView: any;
   cookie: string;
@@ -34,7 +33,6 @@ export class MockDocument extends MockHTMLElement {
         this.appendChild(documentElement);
         setOwnerDocument(documentElement, this);
       }
-
     } else if (html !== false) {
       const documentElement = new MockHTMLElement(this, 'html');
       this.appendChild(documentElement);
@@ -233,7 +231,6 @@ export class MockDocument extends MockHTMLElement {
     }
     title.textContent = value;
   }
-
 }
 
 export function createDocument(html: string | boolean = null): Document {
@@ -280,15 +277,7 @@ export function resetDocument(doc: Document) {
   }
 }
 
-const DOC_KEY_KEEPERS = new Set([
-  'nodeName',
-  'nodeType',
-  'nodeValue',
-  'ownerDocument',
-  'parentNode',
-  'childNodes',
-  '_shadowRoot'
-]);
+const DOC_KEY_KEEPERS = new Set(['nodeName', 'nodeType', 'nodeValue', 'ownerDocument', 'parentNode', 'childNodes', '_shadowRoot']);
 
 export function getElementById(elm: MockElement, id: string): MockElement {
   const children = elm.children;
@@ -316,7 +305,6 @@ function getElementsByName(elm: MockElement, elmName: string, foundElms: MockEle
   }
   return foundElms;
 }
-
 
 export function setOwnerDocument(elm: MockElement, ownerDocument: any) {
   for (let i = 0, ii = elm.childNodes.length; i < ii; i++) {

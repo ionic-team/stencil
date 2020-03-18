@@ -4,9 +4,7 @@ import { MockElement, MockHTMLElement } from '../node';
 import { XLINK_NS } from '../../runtime/runtime-constants';
 import { MockSVGElement } from '../element';
 
-
 describe('global', () => {
-
   it('HTMLElement', () => {
     expect(HTMLElement).toBeDefined();
     expect(HTMLAnchorElement).toBeDefined();
@@ -30,5 +28,4 @@ describe('global', () => {
     expect(KeyboardEvent).toBeDefined();
     expect(MouseEvent).toBeDefined();
   });
-
 });

@@ -1,11 +1,9 @@
 import { Component, Build } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('globals', () => {
-
   @Component({
-    tag: 'cmp-a'
+    tag: 'cmp-a',
   })
   class CmpA {}
 
@@ -13,9 +11,9 @@ describe('globals', () => {
     const page = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
-      autoApplyChanges: true
+      autoApplyChanges: true,
     });
-    await new Promise((resolve) => {
+    await new Promise(resolve => {
       requestAnimationFrame(() => {
         page.win.requestAnimationFrame(() => {
           setTimeout(() => {
@@ -58,7 +56,7 @@ describe('globals', () => {
 
       page = await newSpecPage({
         components: [CmpEl],
-        html: `<cmp-el></cmp-el>`
+        html: `<cmp-el></cmp-el>`,
       });
     });
 
@@ -94,6 +92,5 @@ describe('globals', () => {
       expect(page.rootInstance.protoEl).toEqual((global as any).Element.prototype);
       expect(page.rootInstance.protoEl).toBeTruthy();
     });
-
   });
 });

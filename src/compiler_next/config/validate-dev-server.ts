@@ -3,7 +3,6 @@ import { buildError, isBoolean, isNumber, isString, normalizePath } from '@utils
 import { isAbsolute, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
-
 export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[]) => {
   if (config.devServer === false || config.devServer === null) {
     return null;
@@ -77,7 +76,7 @@ export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[])
   }
 
   if (devServer.protocol !== 'http' && devServer.protocol !== 'https') {
-    devServer.protocol = devServer.https ? 'https' : (addressProtocol ? addressProtocol : 'http');
+    devServer.protocol = devServer.https ? 'https' : addressProtocol ? addressProtocol : 'http';
   }
 
   if (devServer.historyApiFallback !== null && devServer.historyApiFallback !== false) {
@@ -94,7 +93,6 @@ export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[])
 
   if (flags.open === false) {
     devServer.openBrowser = false;
-
   } else if (flags.prerender && !config.watch) {
     devServer.openBrowser = false;
   }
@@ -107,7 +105,6 @@ export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[])
     const baseUrl = new URL(wwwOutputTarget.baseUrl, 'http://config.stenciljs.com');
     basePath = baseUrl.pathname;
     serveDir = wwwOutputTarget.appDir;
-
   } else {
     serveDir = config.rootDir;
   }
@@ -127,7 +124,7 @@ export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[])
   }
 
   if (!isBoolean(devServer.logRequests)) {
-    devServer.logRequests = (config.logLevel === 'debug');
+    devServer.logRequests = config.logLevel === 'debug';
   }
 
   if (!isString(devServer.root)) {
@@ -153,7 +150,6 @@ export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[])
       const err = buildError(diagnostics);
       err.messageText = `dev server excludeHmr must be an array of glob strings`;
     }
-
   } else {
     devServer.excludeHmr = [];
   }

@@ -2,9 +2,7 @@ import { MockDocument } from '../document';
 import { MockElement, MockHTMLElement } from '../node';
 import { XLINK_NS } from '../../runtime/runtime-constants';
 
-
 describe('attributes', () => {
-
   let doc: MockDocument;
   beforeEach(() => {
     doc = new MockDocument();
@@ -151,5 +149,4 @@ describe('attributes', () => {
     element.setAttribute('value', '123');
     expect(element.getAttributeNS(null, 'Value')).toBe(null);
   }
-
 });

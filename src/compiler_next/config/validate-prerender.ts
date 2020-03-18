@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { buildError, normalizePath } from '@utils';
 import { isAbsolute, join } from 'path';
 
-
 export const validatePrerender = (config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetWww) => {
   if (!config.flags || (!config.flags.prerender && config.flags.task !== 'prerender')) {
     return;

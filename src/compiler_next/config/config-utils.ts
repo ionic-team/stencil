@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { isAbsolute, join } from 'path';
 import { normalizePath } from '@utils';
 
-
 export const getAbsolutePath = (config: d.Config, dir: string) => {
   if (!isAbsolute(dir)) {
     dir = join(config.rootDir, dir);
@@ -25,7 +24,6 @@ export const setBooleanConfig = (config: any, configName: string, flagName: stri
 
   if (typeof config[userConfigName] === 'boolean') {
     config[configName] = config[userConfigName];
-
   } else {
     config[configName] = defaultValue;
   }
@@ -40,7 +38,6 @@ export const setNumberConfig = (config: any, configName: string, _flagName: stri
 
   if (typeof config[userConfigName] === 'number') {
     config[configName] = config[userConfigName];
-
   } else {
     config[configName] = defaultValue;
   }
@@ -55,7 +52,6 @@ export const setStringConfig = (config: any, configName: string, defaultValue: s
 
   if (typeof config[userConfigName] === 'string') {
     config[configName] = config[userConfigName];
-
   } else {
     config[configName] = defaultValue;
   }

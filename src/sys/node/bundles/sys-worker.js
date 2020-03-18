@@ -1,4 +1,3 @@
-
 const sysWorker = require('../../../../build/sys/node/node-sys-worker');
 
 exports.createRunner = sysWorker.createRunner;

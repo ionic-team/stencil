@@ -1,12 +1,8 @@
 import * as d from '../declarations';
 import { CMP_FLAGS, LISTENER_FLAGS, MEMBER_FLAGS } from './constants';
 
-
 export const formatLazyBundleRuntimeMeta = (bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData => {
-  return [
-    bundleId,
-    cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))
-  ];
+  return [bundleId, cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))];
 };
 
 export const formatComponentRuntimeMeta = (compilerMeta: d.ComponentCompilerMeta, includeMethods: boolean): d.ComponentRuntimeMetaCompact => {
@@ -25,12 +21,7 @@ export const formatComponentRuntimeMeta = (compilerMeta: d.ComponentCompilerMeta
 
   const members = formatComponentRuntimeMembers(compilerMeta, includeMethods);
   const hostListeners = formatHostListeners(compilerMeta);
-  return trimFalsy([
-    flags,
-    compilerMeta.tagName,
-    Object.keys(members).length > 0 ? members : undefined,
-    hostListeners.length > 0 ? hostListeners : undefined
-  ]);
+  return trimFalsy([flags, compilerMeta.tagName, Object.keys(members).length > 0 ? members : undefined, hostListeners.length > 0 ? hostListeners : undefined]);
 };
 
 export const stringifyRuntimeData = (data: any) => {
@@ -47,7 +38,7 @@ const formatComponentRuntimeMembers = (compilerMeta: d.ComponentCompilerMeta, in
   return {
     ...formatPropertiesRuntimeMember(compilerMeta.properties),
     ...formatStatesRuntimeMember(compilerMeta.states),
-    ...includeMethods ? formatMethodsRuntimeMember(compilerMeta.methods) : {},
+    ...(includeMethods ? formatMethodsRuntimeMember(compilerMeta.methods) : {}),
   };
 };
 
@@ -60,7 +51,7 @@ const formatPropertiesRuntimeMember = (properties: d.ComponentCompilerProperty[]
        * [0] member type
        */
       formatFlags(member),
-      formatAttrName(member)
+      formatAttrName(member),
     ]);
   });
   return runtimeMembers;
@@ -120,7 +111,7 @@ const formatStatesRuntimeMember = (states: d.ComponentCompilerState[]) => {
       /**
        * [0] member flags
        */
-      MEMBER_FLAGS.State
+      MEMBER_FLAGS.State,
     ];
   });
   return runtimeMembers;
@@ -134,7 +125,7 @@ const formatMethodsRuntimeMember = (methods: d.ComponentCompilerMethod[]) => {
       /**
        * [0] member flags
        */
-      MEMBER_FLAGS.Method
+      MEMBER_FLAGS.Method,
     ];
   });
   return runtimeMembers;
@@ -142,11 +133,7 @@ const formatMethodsRuntimeMember = (methods: d.ComponentCompilerMethod[]) => {
 
 const formatHostListeners = (compilerMeta: d.ComponentCompilerMeta) => {
   return compilerMeta.listeners.map(compilerListener => {
-    const hostListener: d.ComponentRuntimeHostListener = [
-      computeListenerFlags(compilerListener),
-      compilerListener.name,
-      compilerListener.method,
-    ];
+    const hostListener: d.ComponentRuntimeHostListener = [computeListenerFlags(compilerListener), compilerListener.name, compilerListener.method];
     return hostListener;
   });
 };
@@ -160,16 +147,24 @@ const computeListenerFlags = (listener: d.ComponentCompilerListener) => {
     flags |= LISTENER_FLAGS.Passive;
   }
   switch (listener.target) {
-    case 'document': flags |= LISTENER_FLAGS.TargetDocument; break;
-    case 'window': flags |= LISTENER_FLAGS.TargetWindow; break;
-    case 'parent': flags |= LISTENER_FLAGS.TargetParent; break;
-    case 'body': flags |= LISTENER_FLAGS.TargetBody; break;
+    case 'document':
+      flags |= LISTENER_FLAGS.TargetDocument;
+      break;
+    case 'window':
+      flags |= LISTENER_FLAGS.TargetWindow;
+      break;
+    case 'parent':
+      flags |= LISTENER_FLAGS.TargetParent;
+      break;
+    case 'body':
+      flags |= LISTENER_FLAGS.TargetBody;
+      break;
   }
   return flags;
 };
 
 const trimFalsy = (data: any): any => {
-  const arr = (data as any[]);
+  const arr = data as any[];
   for (var i = arr.length - 1; i >= 0; i--) {
     if (arr[i]) {
       break;

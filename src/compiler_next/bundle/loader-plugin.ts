@@ -1,7 +1,6 @@
 import { Plugin } from 'rollup';
 
-
-export const loaderPlugin = (entries: {[id: string]: string} = {}): Plugin => {
+export const loaderPlugin = (entries: { [id: string]: string } = {}): Plugin => {
   return {
     name: 'stencilLoaderPlugin',
     resolveId(id: string) {
@@ -18,6 +17,6 @@ export const loaderPlugin = (entries: {[id: string]: string} = {}): Plugin => {
         return entries[id];
       }
       return null;
-    }
+    },
   };
 };

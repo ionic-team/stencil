@@ -7,7 +7,6 @@ import { URL } from 'url';
 
 const writeFile = promisify(fs.writeFile);
 
-
 export async function generateSitemapXml(manager: d.PrerenderManager) {
   if (manager.prerenderConfig.sitemapXml === null) {
     // if it's set to null then let's not create a sitemap.xml file
@@ -34,7 +33,7 @@ export async function generateSitemapXml(manager: d.PrerenderManager) {
     const opts: d.SitemapXmpOpts = {
       urls: getSitemapUrls(manager),
       baseUrl: manager.outputTarget.baseUrl,
-      dir: manager.outputTarget.appDir
+      dir: manager.outputTarget.appDir,
     };
 
     const userResults = manager.prerenderConfig.sitemapXml(opts);
@@ -45,12 +44,11 @@ export async function generateSitemapXml(manager: d.PrerenderManager) {
     const results: d.SitemapXmpResults = {
       content: null,
       filePath: null,
-      url: null
+      url: null,
     };
 
     if (typeof userResults === 'string') {
       results.content = userResults;
-
     } else {
       results.content = userResults.content;
       results.filePath = userResults.filePath;
@@ -72,7 +70,6 @@ export async function generateSitemapXml(manager: d.PrerenderManager) {
     await writeFile(results.filePath, results.content);
 
     return results;
-
   } catch (e) {
     catchError(manager.diagnostics, e);
     return null;
@@ -92,7 +89,6 @@ export function getSitemapUrls(manager: d.PrerenderManager) {
         urls.push(canonicalUrl);
       }
     });
-
   } else {
     manager.urlsCompleted.forEach(url => {
       if (typeof url === 'string') {

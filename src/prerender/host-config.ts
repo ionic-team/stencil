@@ -1,12 +1,17 @@
 import * as d from '../declarations';
 import { join, relative } from 'path';
 
-
-export async function generateHostConfig(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResultss: d.HydrateResults[]) {
+export async function generateHostConfig(
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  outputTarget: d.OutputTargetWww,
+  entryModules: d.EntryModule[],
+  hydrateResultss: d.HydrateResults[],
+) {
   const hostConfig: d.HostConfig = {
     hosting: {
-      rules: []
-    }
+      rules: [],
+    },
   };
 
   hydrateResultss = hydrateResultss.sort((a, b) => {
@@ -31,11 +36,10 @@ export async function generateHostConfig(config: d.Config, compilerCtx: d.Compil
   await compilerCtx.fs.writeFile(hostConfigFilePath, JSON.stringify(hostConfig, null, 2));
 }
 
-
 export function generateHostRule(outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) {
   const hostRule: d.HostRule = {
     include: hydrateResults.pathname,
-    headers: generateHostRuleHeaders(outputTarget, entryModules, hydrateResults)
+    headers: generateHostRuleHeaders(outputTarget, entryModules, hydrateResults),
   };
 
   if (hostRule.headers.length === 0) {
@@ -44,7 +48,6 @@ export function generateHostRule(outputTarget: d.OutputTargetWww, entryModules: 
 
   return hostRule;
 }
-
 
 export function generateHostRuleHeaders(outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) {
   const hostRuleHeaders: d.HostRuleHeader[] = [];
@@ -58,13 +61,11 @@ export function generateHostRuleHeaders(outputTarget: d.OutputTargetWww, entryMo
   return hostRuleHeaders;
 }
 
-
 function addCoreJs(outputTarget: d.OutputTargetWww, appCoreWWWPath: string, hostRuleHeaders: d.HostRuleHeader[]) {
   const url = getUrlFromFilePath(outputTarget, appCoreWWWPath);
 
   hostRuleHeaders.push(formatLinkRelPreloadHeader(url));
 }
-
 
 export function addBundles(outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hostRuleHeaders: d.HostRuleHeader[], components: d.HydrateComponent[]) {
   components = sortComponents(components);
@@ -79,7 +80,6 @@ export function addBundles(outputTarget: d.OutputTargetWww, entryModules: d.Entr
     }
   });
 }
-
 
 export function getBundleIds(_entryModules: d.EntryModule[], _components: d.HydrateComponent[]) {
   const bundleIds: string[] = [];
@@ -111,13 +111,11 @@ export function getBundleIds(_entryModules: d.EntryModule[], _components: d.Hydr
   return bundleIds;
 }
 
-
 function getBundleUrl(outputTarget: d.OutputTargetWww, _bundleId: string) {
   // const unscopedFileName = 'getBrowserFilename(bundleId, false)';
   const unscopedWwwBuildPath = 'sys.path.join(getAppBuildDir(config, outputTarget), unscopedFileName)';
   return getUrlFromFilePath(outputTarget, unscopedWwwBuildPath);
 }
-
 
 export function getUrlFromFilePath(outputTarget: d.OutputTargetWww, filePath: string) {
   let url = join('/', relative(outputTarget.appDir, filePath));
@@ -126,7 +124,6 @@ export function getUrlFromFilePath(outputTarget: d.OutputTargetWww, filePath: st
 
   return url;
 }
-
 
 export function sortComponents(components: d.HydrateComponent[]) {
   return components.sort((a, b) => {
@@ -139,7 +136,6 @@ export function sortComponents(components: d.HydrateComponent[]) {
     return 0;
   });
 }
-
 
 function addStyles(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
   hydrateResults.styles.forEach(style => {
@@ -154,7 +150,6 @@ function addStyles(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.Hydrat
   });
 }
 
-
 function addScripts(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
   hydrateResults.scripts.forEach(script => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
@@ -167,7 +162,6 @@ function addScripts(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.Hydra
     }
   });
 }
-
 
 function addImgs(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
   hydrateResults.imgs.forEach(img => {
@@ -182,29 +176,25 @@ function addImgs(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateR
   });
 }
 
-
 export function formatLinkRelPreloadHeader(url: string) {
   const header: d.HostRuleHeader = {
     name: 'Link',
-    value: formatLinkRelPreloadValue(url)
+    value: formatLinkRelPreloadValue(url),
   };
   return header;
 }
 
-
 function formatLinkRelPreloadValue(url: string) {
-  const parts = [
-    `<${url}>`,
-    `rel=preload`
-  ];
+  const parts = [`<${url}>`, `rel=preload`];
 
-  const ext = url.split('.').pop().toLowerCase();
+  const ext = url
+    .split('.')
+    .pop()
+    .toLowerCase();
   if (ext === SCRIPT_EXT) {
     parts.push(`as=script`);
-
   } else if (ext === STYLE_EXT) {
     parts.push(`as=style`);
-
   } else if (IMG_EXTS.indexOf(ext) > -1) {
     parts.push(`as=image`);
   }
@@ -212,12 +202,10 @@ function formatLinkRelPreloadValue(url: string) {
   return parts.join(';');
 }
 
-
 function addDefaults(outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
   addBuildDirCacheControl(outputTarget, hostConfig);
   addServiceWorkerNoCacheControl(outputTarget, hostConfig);
 }
-
 
 function addBuildDirCacheControl(outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
   const url = getUrlFromFilePath(outputTarget, 'getAppBuildDir(config, outputTarget)');
@@ -227,12 +215,11 @@ function addBuildDirCacheControl(outputTarget: d.OutputTargetWww, hostConfig: d.
     headers: [
       {
         name: `Cache-Control`,
-        value: `public, max-age=31536000`
-      }
-    ]
+        value: `public, max-age=31536000`,
+      },
+    ],
   });
 }
-
 
 function addServiceWorkerNoCacheControl(outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
   if (!outputTarget.serviceWorker) {
@@ -246,12 +233,11 @@ function addServiceWorkerNoCacheControl(outputTarget: d.OutputTargetWww, hostCon
     headers: [
       {
         name: `Cache-Control`,
-        value: `no-cache, no-store, must-revalidate`
-      }
-    ]
+        value: `no-cache, no-store, must-revalidate`,
+      },
+    ],
   });
 }
-
 
 async function mergeUserHostConfigFile(config: d.Config, compilerCtx: d.CompilerCtx, hostConfig: d.HostConfig) {
   const hostConfigFilePath = join(config.srcDir, HOST_CONFIG_FILENAME);
@@ -261,10 +247,8 @@ async function mergeUserHostConfigFile(config: d.Config, compilerCtx: d.Compiler
     const userHostConfig = JSON.parse(userHostConfigStr) as d.HostConfig;
 
     mergeUserHostConfig(userHostConfig, hostConfig);
-
   } catch (e) {}
 }
-
 
 export function mergeUserHostConfig(userHostConfig: d.HostConfig, hostConfig: d.HostConfig) {
   if (!userHostConfig || !userHostConfig.hosting) {
@@ -279,7 +263,6 @@ export function mergeUserHostConfig(userHostConfig: d.HostConfig, hostConfig: d.
 
   hostConfig.hosting.rules = rules;
 }
-
 
 export const DEFAULT_MODE = 'md';
 const MAX_LINK_REL_PRELOAD_COUNT = 6;

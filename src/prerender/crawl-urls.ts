@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { catchError } from '@utils';
 
-
 export function crawlAnchorsForNextUrls(prerenderConfig: d.PrerenderConfig, diagnostics: d.Diagnostic[], baseUrl: URL, currentUrl: URL, parsedAnchors: d.HydrateAnchorElement[]) {
   if (!Array.isArray(parsedAnchors) || parsedAnchors.length === 0) {
     return [];
@@ -44,7 +43,6 @@ export function crawlAnchorsForNextUrls(prerenderConfig: d.PrerenderConfig, diag
 
           // standard normalizeUrl(), after user normalized
           return standardNormalizeUrl(diagnostics, userNormalizedUrl.href, currentUrl);
-
         } catch (e) {
           // user normalizeUrl() error
           catchError(diagnostics, e);
@@ -102,8 +100,7 @@ export function crawlAnchorsForNextUrls(prerenderConfig: d.PrerenderConfig, diag
     });
 }
 
-
-function standardFilterAnchor(diagnostics: d.Diagnostic[], attrs: {[attrName: string]: string}, _base: URL) {
+function standardFilterAnchor(diagnostics: d.Diagnostic[], attrs: { [attrName: string]: string }, _base: URL) {
   try {
     let href = attrs.href;
     if (typeof attrs.download === 'string') {
@@ -120,14 +117,12 @@ function standardFilterAnchor(diagnostics: d.Diagnostic[], attrs: {[attrName: st
         return true;
       }
     }
-
   } catch (e) {
     catchError(diagnostics, e);
   }
 
   return false;
 }
-
 
 function standardNormalizeUrl(diagnostics: d.Diagnostic[], href: string, currentUrl: URL) {
   if (typeof href === 'string') {
@@ -145,14 +140,12 @@ function standardNormalizeUrl(diagnostics: d.Diagnostic[], href: string, current
       }
 
       return outputUrl;
-
     } catch (e) {
       catchError(diagnostics, e);
     }
   }
   return null;
 }
-
 
 function standardFilterUrl(diagnostics: d.Diagnostic[], url: URL, currentUrl: URL, basePathParts: string[]) {
   try {
@@ -184,13 +177,11 @@ function standardFilterUrl(diagnostics: d.Diagnostic[], url: URL, currentUrl: UR
     }
 
     return true;
-
   } catch (e) {
     catchError(diagnostics, e);
   }
   return false;
 }
-
 
 export function standardNormalizeHref(prerenderConfig: d.PrerenderConfig, diagnostics: d.Diagnostic[], url: URL) {
   try {
@@ -207,7 +198,6 @@ export function standardNormalizeHref(prerenderConfig: d.PrerenderConfig, diagno
             href += '/';
           }
         }
-
       } else {
         // url should NOT have a trailing slash
         if (href.endsWith('/') && url.pathname !== '/') {
@@ -218,7 +208,6 @@ export function standardNormalizeHref(prerenderConfig: d.PrerenderConfig, diagno
 
       return href;
     }
-
   } catch (e) {
     catchError(diagnostics, e);
   }
@@ -235,17 +224,4 @@ function extname(str: string) {
   return parts[parts.length - 1].toLowerCase();
 }
 
-const SKIP_EXT = new Set([
-  'zip',
-  'rar',
-  'tar',
-  'gz',
-  'bz2',
-  'png',
-  'jpeg',
-  'jpg',
-  'gif',
-  'pdf',
-  'tiff',
-  'psd',
-]);
+const SKIP_EXT = new Set(['zip', 'rar', 'tar', 'gz', 'bz2', 'png', 'jpeg', 'jpg', 'gif', 'pdf', 'tiff', 'psd']);

@@ -4,9 +4,7 @@ import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing
 import { initFsWatcher } from '../fs-watch-init';
 import { validateConfig } from '@stencil/core/compiler';
 
-
 describe('fs-watch, init', () => {
-
   let config: d.Config;
   let compilerCtx: d.CompilerCtx;
   let buildCtx: d.BuildCtx;
@@ -17,7 +15,9 @@ describe('fs-watch, init', () => {
     config.srcDir = 'src';
     config.sys.createFsWatcher = (() => {
       return {
-        addDirectory() {/**/}
+        addDirectory() {
+          /**/
+        },
       };
     }) as any;
     compilerCtx = mockCompilerCtx();
@@ -25,7 +25,6 @@ describe('fs-watch, init', () => {
     buildCtx = mockBuildCtx(config, compilerCtx);
     compilerCtx.events = buildEvents();
   });
-
 
   it('should only create the watch listener once', async () => {
     let didCreateWatcher = await initFsWatcher(config, compilerCtx, buildCtx);
@@ -67,5 +66,4 @@ describe('fs-watch, init', () => {
     expect(reg.test('/asdf/image.html')).toBe(false);
     expect(reg.test('/asdf/image.htm')).toBe(false);
   });
-
 });

@@ -3,9 +3,7 @@ import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
 import { validateConfig } from '../validate-config';
 
-
 describe('validation', () => {
-
   let userConfig: d.Config;
   const logger = mockLogger();
   const sys = mockStencilSystem();
@@ -15,12 +13,11 @@ describe('validation', () => {
       sys: sys,
       logger: logger,
       rootDir: '/User/some/path/',
-      namespace: 'Testing'
+      namespace: 'Testing',
     };
   });
 
   describe('allowInlineScripts', () => {
-
     it('set allowInlineScripts true', () => {
       userConfig.allowInlineScripts = true;
       const { config } = validateConfig(userConfig);
@@ -37,12 +34,9 @@ describe('validation', () => {
       const { config } = validateConfig(userConfig);
       expect(config.allowInlineScripts).toBe(true);
     });
-
   });
 
-
   describe('enableCache', () => {
-
     it('set enableCache true', () => {
       userConfig.enableCache = true;
       const { config } = validateConfig(userConfig);
@@ -59,11 +53,9 @@ describe('validation', () => {
       const { config } = validateConfig(userConfig);
       expect(config.enableCache).toBe(true);
     });
-
   });
 
   describe('buildAppCore', () => {
-
     it('set buildAppCore true', () => {
       userConfig.buildAppCore = true;
       const { config } = validateConfig(userConfig);
@@ -80,11 +72,9 @@ describe('validation', () => {
       const { config } = validateConfig(userConfig);
       expect(config.buildAppCore).toBe(true);
     });
-
   });
 
   describe('es5 build', () => {
-
     it('set buildEs5 false', () => {
       userConfig.buildEs5 = false;
       const { config } = validateConfig(userConfig);
@@ -108,31 +98,22 @@ describe('validation', () => {
       const { config } = validateConfig(userConfig);
       expect(config.buildEs5).toBe(false);
     });
-
   });
 
-
   describe('include/exclude globs', () => {
-
     it('should default include glob', () => {
       validateConfig(userConfig);
       const normalizedIncludeSrc = userConfig.includeSrc.map(x => normalizePath(x));
-      expect(normalizedIncludeSrc).toEqual([
-        '/User/some/path/src/**/*.ts',
-        '/User/some/path/src/**/*.tsx'
-      ]);
+      expect(normalizedIncludeSrc).toEqual(['/User/some/path/src/**/*.ts', '/User/some/path/src/**/*.tsx']);
     });
 
     it('should default exclude glob', () => {
       const { config } = validateConfig(userConfig);
       expect(config.excludeSrc).toEqual(['/User/some/path/src/**/test/**']);
     });
-
   });
 
-
   describe('hashed filenames', () => {
-
     it('should error when hashedFileNameLength too large', () => {
       userConfig.hashedFileNameLength = 33;
       const validated = validateConfig(userConfig);
@@ -206,12 +187,9 @@ describe('validation', () => {
       const { config } = validateConfig(userConfig);
       expect(config.hashFileNames).toBe(true);
     });
-
   });
 
-
   describe('minifyJs', () => {
-
     it('should set minifyJs to true', () => {
       userConfig.devMode = true;
       userConfig.minifyJs = true;
@@ -230,12 +208,9 @@ describe('validation', () => {
       const { config } = validateConfig(userConfig);
       expect(config.minifyJs).toBe(false);
     });
-
   });
 
-
   describe('minifyCss', () => {
-
     it('should set minifyCss to true', () => {
       userConfig.devMode = true;
       userConfig.minifyCss = true;
@@ -254,7 +229,6 @@ describe('validation', () => {
       const { config } = validateConfig(userConfig);
       expect(config.minifyCss).toBe(false);
     });
-
   });
 
   it('should default watch to false', () => {
@@ -340,8 +314,8 @@ describe('validation', () => {
   it('should error for invalid outputTarget type', () => {
     userConfig.outputTargets = [
       {
-        type: 'whatever'
-      } as any
+        type: 'whatever',
+      } as any,
     ];
     const validated = validateConfig(userConfig);
     expect(validated.diagnostics).toHaveLength(1);
@@ -350,8 +324,8 @@ describe('validation', () => {
   it('should default add www type to outputTarget', () => {
     userConfig.outputTargets = [
       {
-        dir: 'somedir'
-      } as d.OutputTargetWww
+        dir: 'somedir',
+      } as d.OutputTargetWww,
     ];
     const { config } = validateConfig(userConfig);
     expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
@@ -361,5 +335,4 @@ describe('validation', () => {
     const { config } = validateConfig(userConfig);
     expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
   });
-
 });

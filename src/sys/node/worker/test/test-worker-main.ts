@@ -1,8 +1,6 @@
 import { NodeWorkerMain } from '../worker-main';
 
-
 export class TestWorkerMain extends NodeWorkerMain {
-
   constructor(workerId: number) {
     super('TestWorker', workerId, null);
     this.fork();
@@ -11,5 +9,4 @@ export class TestWorkerMain extends NodeWorkerMain {
   fork() {
     this.childProcess = {} as any;
   }
-
 }

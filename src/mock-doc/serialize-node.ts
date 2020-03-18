@@ -3,7 +3,6 @@ import { CONTENT_REF_ID, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID, XLINK_NS }
 import { MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
-
 export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToHtmlOptions = {}) {
   const output: SerializeOutput = {
     currentLineWidth: 0,
@@ -21,7 +20,6 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToH
       opts.newLines = true;
     }
     opts.approximateLineWidth = -1;
-
   } else {
     opts.prettyHtml = false;
     if (typeof opts.newLines !== 'boolean') {
@@ -58,7 +56,6 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToH
 
   if (opts.outerHtml) {
     serializeToHtml(elm as Node, opts, output, false);
-
   } else {
     for (let i = 0, ii = elm.childNodes.length; i < ii; i++) {
       serializeToHtml(elm.childNodes[i] as Node, opts, output, false);
@@ -76,7 +73,6 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToH
   return output.text.join('');
 }
 
-
 function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: SerializeOutput, isShadowRoot: boolean) {
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE || isShadowRoot) {
     const tagName = isShadowRoot ? 'mock:shadow-root' : getTagName(node as Element);
@@ -85,7 +81,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       output.isWithinBody = true;
     }
 
-    const ignoreTag = (opts.excludeTags != null && opts.excludeTags.includes(tagName));
+    const ignoreTag = opts.excludeTags != null && opts.excludeTags.includes(tagName);
 
     if (ignoreTag === false) {
       if (opts.newLines) {
@@ -101,12 +97,10 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       }
 
       output.text.push('<' + tagName);
-      output.currentLineWidth += (tagName.length + 1);
+      output.currentLineWidth += tagName.length + 1;
 
       const attrsLength = (node as HTMLElement).attributes.length;
-      const attributes = (opts.prettyHtml && attrsLength > 1) ?
-        cloneAttributes((node as HTMLElement).attributes as any, true) :
-        (node as Element).attributes;
+      const attributes = opts.prettyHtml && attrsLength > 1 ? cloneAttributes((node as HTMLElement).attributes as any, true) : (node as Element).attributes;
 
       for (let i = 0; i < attrsLength; i++) {
         const attr = attributes.item(i);
@@ -123,40 +117,39 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
 
         const attrNamespaceURI = attr.namespaceURI;
         if (attrNamespaceURI == null) {
-          output.currentLineWidth += (attrName.length + 1);
+          output.currentLineWidth += attrName.length + 1;
           if (opts.approximateLineWidth > 0 && output.currentLineWidth > opts.approximateLineWidth) {
             output.text.push('\n' + attrName);
             output.currentLineWidth = 0;
-
           } else {
             output.text.push(' ' + attrName);
           }
-
         } else if (attrNamespaceURI === 'http://www.w3.org/XML/1998/namespace') {
           output.text.push(' xml:' + attrName);
-          output.currentLineWidth += (attrName.length + 5);
-
+          output.currentLineWidth += attrName.length + 5;
         } else if (attrNamespaceURI === 'http://www.w3.org/2000/xmlns/') {
           if (attrName !== 'xmlns') {
             output.text.push(' xmlns:' + attrName);
-            output.currentLineWidth += (attrName.length + 7);
-
+            output.currentLineWidth += attrName.length + 7;
           } else {
             output.text.push(' ' + attrName);
-            output.currentLineWidth += (attrName.length + 1);
+            output.currentLineWidth += attrName.length + 1;
           }
-
         } else if (attrNamespaceURI === XLINK_NS) {
           output.text.push(' xlink:' + attrName);
-          output.currentLineWidth += (attrName.length + 7);
-
+          output.currentLineWidth += attrName.length + 7;
         } else {
           output.text.push(' ' + attrNamespaceURI + ':' + attrName);
-          output.currentLineWidth += (attrNamespaceURI.length + attrName.length + 2);
+          output.currentLineWidth += attrNamespaceURI.length + attrName.length + 2;
         }
 
         if (opts.prettyHtml && attrName === 'class') {
-          attrValue = attr.value = attrValue.split(' ').filter(t => t !== '').sort().join(' ').trim();
+          attrValue = attr.value = attrValue
+            .split(' ')
+            .filter(t => t !== '')
+            .sort()
+            .join(' ')
+            .trim();
         }
 
         if (attrValue === '') {
@@ -170,26 +163,23 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
 
         if (opts.removeAttributeQuotes && CAN_REMOVE_ATTR_QUOTES.test(attrValue)) {
           output.text.push('=' + escapeString(attrValue, true));
-          output.currentLineWidth += (attrValue.length + 1);
-
+          output.currentLineWidth += attrValue.length + 1;
         } else {
           output.text.push('="' + escapeString(attrValue, true) + '"');
-          output.currentLineWidth += (attrValue.length + 3);
+          output.currentLineWidth += attrValue.length + 3;
         }
       }
 
       if ((node as Element).hasAttribute('style')) {
         const cssText = (node as HTMLElement).style.cssText;
 
-        if (opts.approximateLineWidth > 0 && (output.currentLineWidth + cssText.length + 10) > opts.approximateLineWidth) {
+        if (opts.approximateLineWidth > 0 && output.currentLineWidth + cssText.length + 10 > opts.approximateLineWidth) {
           output.text.push(`\nstyle="${cssText}">`);
           output.currentLineWidth = 0;
-
         } else {
           output.text.push(` style="${cssText}">`);
-          output.currentLineWidth += (cssText.length + 10);
+          output.currentLineWidth += cssText.length + 10;
         }
-
       } else {
         output.text.push('>');
         output.currentLineWidth += 1;
@@ -202,7 +192,10 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
         serializeToHtml((node as HTMLElement).shadowRoot, opts, output, true);
         output.indent = output.indent - opts.indentSpaces;
 
-        if (opts.newLines && (node.childNodes.length === 0 || (node.childNodes.length === 1 && node.childNodes[0].nodeType === NODE_TYPES.TEXT_NODE && node.childNodes[0].nodeValue.trim() === ''))) {
+        if (
+          opts.newLines &&
+          (node.childNodes.length === 0 || (node.childNodes.length === 1 && node.childNodes[0].nodeType === NODE_TYPES.TEXT_NODE && node.childNodes[0].nodeValue.trim() === ''))
+        ) {
           output.text.push('\n');
           output.currentLineWidth = 0;
 
@@ -214,13 +207,12 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       }
 
       if (opts.excludeTagContent == null || opts.excludeTagContent.includes(tagName) === false) {
-        const childNodes = tagName === 'template' ? (((node as any) as HTMLTemplateElement).content.childNodes as any) : (node.childNodes);
+        const childNodes = tagName === 'template' ? (((node as any) as HTMLTemplateElement).content.childNodes as any) : node.childNodes;
         const childNodeLength = childNodes.length;
 
         if (childNodeLength > 0) {
           if (childNodeLength === 1 && childNodes[0].nodeType === NODE_TYPES.TEXT_NODE && (typeof childNodes[0].nodeValue !== 'string' || childNodes[0].nodeValue.trim() === '')) {
             // skip over empty text nodes
-
           } else {
             if (opts.indentSpaces > 0 && ignoreTag === false) {
               output.indent = output.indent + opts.indentSpaces;
@@ -249,7 +241,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
 
         if (ignoreTag === false) {
           output.text.push('</' + tagName + '>');
-          output.currentLineWidth += (tagName.length + 3);
+          output.currentLineWidth += tagName.length + 3;
         }
       }
     }
@@ -262,7 +254,6 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
     if (tagName === 'body') {
       output.isWithinBody = false;
     }
-
   } else if (node.nodeType === NODE_TYPES.TEXT_NODE) {
     let textContent = node.nodeValue;
 
@@ -275,10 +266,8 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
           // just add the exact text we were given
           output.text.push(textContent);
           output.currentLineWidth += textContent.length;
-
         } else if (opts.approximateLineWidth > 0 && !output.isWithinBody) {
           // do nothing if we're not in the <body> and we're tracking line width
-
         } else if (!opts.prettyHtml) {
           // this text node is only whitespace, and it's not
           // within a whitespace sensitive element like <pre> or <code>
@@ -291,13 +280,11 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
             // we don't care to ensure exact line lengths
             output.text.push('\n');
             output.currentLineWidth = 0;
-
           } else {
             // let's keep it all on the same line yet
             output.text.push(' ');
           }
         }
-
       } else {
         // this text node has text content
         if (opts.newLines) {
@@ -316,7 +303,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
         if (textContentLength > 0) {
           // this text node has text content
 
-          const parentTagName = (node.parentNode != null && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName : null);
+          const parentTagName = node.parentNode != null && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName : null;
           if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
             // this text node cannot have its content escaped since it's going
             // into an element like <style> or <script>
@@ -327,19 +314,16 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
               textContentLength = trimmedTextContent.length;
             }
             output.currentLineWidth += textContentLength;
-
           } else {
             // this text node is going into a normal element and html can be escaped
             if (opts.prettyHtml) {
               // pretty print the text node
               output.text.push(escapeString(textContent.replace(/\s\s+/g, ' ').trim(), false));
               output.currentLineWidth += textContentLength;
-
             } else {
               // not pretty printing the text node
               if (isWithinWhitespaceSensitive(node)) {
                 output.currentLineWidth += textContentLength;
-
               } else {
                 // this element is not a whitespace sensitive one, like <pre> or <code> so
                 // any whitespace at the start and end can be cleaned up to just be one space
@@ -350,12 +334,11 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
                 textContentLength = textContent.length;
                 if (textContentLength > 1) {
                   if (/\s/.test(textContent.charAt(textContentLength - 1))) {
-                    if (opts.approximateLineWidth > 0 && (output.currentLineWidth + textContentLength) > opts.approximateLineWidth) {
-                      textContent =  textContent.trimRight() + '\n';
+                    if (opts.approximateLineWidth > 0 && output.currentLineWidth + textContentLength > opts.approximateLineWidth) {
+                      textContent = textContent.trimRight() + '\n';
                       output.currentLineWidth = 0;
-
                     } else {
-                      textContent =  textContent.trimRight() + ' ';
+                      textContent = textContent.trimRight() + ' ';
                     }
                   }
                 }
@@ -368,12 +351,15 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
         }
       }
     }
-
   } else if (node.nodeType === NODE_TYPES.COMMENT_NODE) {
     const nodeValue = node.nodeValue;
 
     if (opts.removeHtmlComments) {
-      const isHydrateAnnotation = nodeValue.startsWith(CONTENT_REF_ID + '.') || nodeValue.startsWith(ORG_LOCATION_ID + '.') || nodeValue.startsWith(SLOT_NODE_ID + '.') || nodeValue.startsWith(TEXT_NODE_ID + '.');
+      const isHydrateAnnotation =
+        nodeValue.startsWith(CONTENT_REF_ID + '.') ||
+        nodeValue.startsWith(ORG_LOCATION_ID + '.') ||
+        nodeValue.startsWith(SLOT_NODE_ID + '.') ||
+        nodeValue.startsWith(TEXT_NODE_ID + '.');
       if (!isHydrateAnnotation) {
         return;
       }
@@ -392,8 +378,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
     }
 
     output.text.push('<!--' + nodeValue + '-->');
-    output.currentLineWidth += (nodeValue.length + 7);
-
+    output.currentLineWidth += nodeValue.length + 7;
   } else if (node.nodeType === NODE_TYPES.DOCUMENT_TYPE_NODE) {
     output.text.push('<!doctype html>');
   }
@@ -434,18 +419,79 @@ function isWithinWhitespaceSensitive(node: Node) {
   return false;
 }
 
-/*@__PURE__*/export const NON_ESCAPABLE_CONTENT = new Set(['STYLE', 'SCRIPT', 'IFRAME', 'NOSCRIPT', 'XMP', 'NOEMBED', 'NOFRAMES', 'PLAINTEXT']);
+/*@__PURE__*/ export const NON_ESCAPABLE_CONTENT = new Set(['STYLE', 'SCRIPT', 'IFRAME', 'NOSCRIPT', 'XMP', 'NOEMBED', 'NOFRAMES', 'PLAINTEXT']);
 
-/*@__PURE__*/export const WHITESPACE_SENSITIVE = new Set(['CODE', 'OUTPUT', 'PLAINTEXT', 'PRE', 'TEMPLATE', 'TEXTAREA']);
+/*@__PURE__*/ export const WHITESPACE_SENSITIVE = new Set(['CODE', 'OUTPUT', 'PLAINTEXT', 'PRE', 'TEMPLATE', 'TEXTAREA']);
 
-/*@__PURE__*/const EMPTY_ELEMENTS = new Set(['area', 'base', 'basefont', 'bgsound', 'br', 'col', 'embed', 'frame', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'trace', 'wbr']);
+/*@__PURE__*/ const EMPTY_ELEMENTS = new Set([
+  'area',
+  'base',
+  'basefont',
+  'bgsound',
+  'br',
+  'col',
+  'embed',
+  'frame',
+  'hr',
+  'img',
+  'input',
+  'keygen',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'trace',
+  'wbr',
+]);
 
-/*@__PURE__*/const REMOVE_EMPTY_ATTR = new Set(['class', 'dir', 'id', 'lang', 'name', 'title']);
+/*@__PURE__*/ const REMOVE_EMPTY_ATTR = new Set(['class', 'dir', 'id', 'lang', 'name', 'title']);
 
-/*@__PURE__*/const BOOLEAN_ATTR = new Set(['allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'compact', 'controls', 'declare', 'default', 'defaultchecked', 'defaultmuted', 'defaultselected', 'defer', 'disabled', 'enabled', 'formnovalidate', 'hidden', 'indeterminate', 'inert', 'ismap', 'itemscope', 'loop', 'multiple', 'muted', 'nohref', 'nomodule', 'noresize', 'noshade', 'novalidate', 'nowrap', 'open', 'pauseonexit', 'readonly', 'required', 'reversed', 'scoped', 'seamless', 'selected', 'sortable', 'truespeed', 'typemustmatch', 'visible']);
+/*@__PURE__*/ const BOOLEAN_ATTR = new Set([
+  'allowfullscreen',
+  'async',
+  'autofocus',
+  'autoplay',
+  'checked',
+  'compact',
+  'controls',
+  'declare',
+  'default',
+  'defaultchecked',
+  'defaultmuted',
+  'defaultselected',
+  'defer',
+  'disabled',
+  'enabled',
+  'formnovalidate',
+  'hidden',
+  'indeterminate',
+  'inert',
+  'ismap',
+  'itemscope',
+  'loop',
+  'multiple',
+  'muted',
+  'nohref',
+  'nomodule',
+  'noresize',
+  'noshade',
+  'novalidate',
+  'nowrap',
+  'open',
+  'pauseonexit',
+  'readonly',
+  'required',
+  'reversed',
+  'scoped',
+  'seamless',
+  'selected',
+  'sortable',
+  'truespeed',
+  'typemustmatch',
+  'visible',
+]);
 
-/*@__PURE__*/const STRUCTURE_ELEMENTS = new Set(['html', 'body', 'head', 'iframe', 'meta', 'link', 'base', 'title', 'script', 'style']);
-
+/*@__PURE__*/ const STRUCTURE_ELEMENTS = new Set(['html', 'body', 'head', 'iframe', 'meta', 'link', 'base', 'title', 'script', 'style']);
 
 interface SerializeOutput {
   currentLineWidth: number;

@@ -16,7 +16,6 @@ export const nextTick = (cb: Function) => {
 
 export function flushTicks() {
   return new Promise((resolve, reject) => {
-
     function drain() {
       try {
         if (queuedTicks.length > 0) {
@@ -32,11 +31,9 @@ export function flushTicks() {
 
         if (queuedTicks.length > 0) {
           process.nextTick(drain);
-
         } else {
           resolve();
         }
-
       } catch (e) {
         reject(`flushTicks: ${e}`);
       }
@@ -45,7 +42,6 @@ export function flushTicks() {
     process.nextTick(drain);
   });
 }
-
 
 export function writeTask(cb: d.RafCallback) {
   queuedWriteTasks.push(cb);
@@ -57,7 +53,6 @@ export function readTask(cb: d.RafCallback) {
 
 export function flushQueue() {
   return new Promise<void>((resolve, reject) => {
-
     async function drain() {
       try {
         if (queuedReadTasks.length > 0) {
@@ -88,13 +83,11 @@ export function flushQueue() {
           }
         }
 
-        if ((queuedReadTasks.length + queuedWriteTasks.length) > 0) {
+        if (queuedReadTasks.length + queuedWriteTasks.length > 0) {
           process.nextTick(drain);
-
         } else {
           resolve();
         }
-
       } catch (e) {
         reject(`flushQueue: ${e}`);
       }
@@ -105,12 +98,7 @@ export function flushQueue() {
 }
 
 export async function flushAll() {
-  while ((
-    queuedTicks.length +
-    queuedLoadModules.length +
-    queuedWriteTasks.length +
-    queuedReadTasks.length
-    ) > 0) {
+  while (queuedTicks.length + queuedLoadModules.length + queuedWriteTasks.length + queuedReadTasks.length > 0) {
     await flushTicks();
     await flushLoadModule();
     await flushQueue();
@@ -132,7 +120,7 @@ export function loadModule(cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef,
   return new Promise<any>(resolve => {
     queuedLoadModules.push({
       bundleId: cmpMeta.$lazyBundleIds$,
-      resolve: () => resolve(moduleLoaded.get(cmpMeta.$lazyBundleIds$))
+      resolve: () => resolve(moduleLoaded.get(cmpMeta.$lazyBundleIds$)),
     });
   });
 }
@@ -149,7 +137,6 @@ export function flushLoadModule(bundleId?: string) {
               i--;
             }
           }
-
         } else {
           let queuedLoadModule: QueuedLoadModule;
           while ((queuedLoadModule = queuedLoadModules.shift())) {
@@ -159,7 +146,6 @@ export function flushLoadModule(bundleId?: string) {
 
         resolve();
       });
-
     } catch (e) {
       reject(`flushLoadModule: ${e}`);
     }

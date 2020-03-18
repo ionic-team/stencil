@@ -143,13 +143,7 @@ export const watchSrcDirectory = async (config: d.Config, compilerCtx: d.Compile
 };
 
 const emitFsChange = (compilerCtx: d.CompilerCtx, buildCtx: BuildContext) => {
-  if (
-    buildCtx.dirsAdded.length > 0 ||
-    buildCtx.dirsDeleted.length > 0 ||
-    buildCtx.filesUpdated.length > 0 ||
-    buildCtx.filesAdded.length > 0 ||
-    buildCtx.filesDeleted.length > 0
-  ) {
+  if (buildCtx.dirsAdded.length > 0 || buildCtx.dirsDeleted.length > 0 || buildCtx.filesUpdated.length > 0 || buildCtx.filesAdded.length > 0 || buildCtx.filesDeleted.length > 0) {
     compilerCtx.events.emit('fsChange', {
       dirsAdded: buildCtx.dirsAdded.slice(),
       dirsDeleted: buildCtx.dirsDeleted.slice(),

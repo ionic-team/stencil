@@ -3,7 +3,6 @@ import { basename, dirname, extname, join } from 'path';
 import { buildEvents } from '../events';
 import { normalizePath } from '@utils';
 
-
 /**
  * The CompilerCtx is a persistent object that's reused throughout
  * all builds and rebuilds. The data within this object is used
@@ -74,7 +73,6 @@ export const getModuleLegacy = (_config: d.Config, compilerCtx: d.CompilerCtx, s
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
   if (moduleFile != null) {
     return moduleFile;
-
   } else {
     const sourceFileDir = dirname(sourceFilePath);
     const sourceFileExt = extname(sourceFilePath);
@@ -110,13 +108,12 @@ export const getModuleLegacy = (_config: d.Config, compilerCtx: d.CompilerCtx, s
       originalImports: [],
       potentialCmpRefs: [],
       staticSourceFile: null,
-      staticSourceFileText: ''
+      staticSourceFileText: '',
     };
     compilerCtx.moduleMap.set(sourceFilePath, moduleFile);
     return moduleFile;
   }
 };
-
 
 export const resetModuleLegacy = (moduleFile: d.Module) => {
   moduleFile.cmps.length = 0;

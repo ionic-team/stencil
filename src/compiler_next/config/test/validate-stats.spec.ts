@@ -2,9 +2,7 @@ import * as d from '@stencil/core/declarations';
 import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import { validateOutputStats } from '../validate-output-stats';
 
-
 describe('validateStats', () => {
-
   let config: d.Config;
 
   beforeEach(() => {
@@ -14,13 +12,14 @@ describe('validateStats', () => {
       rootDir: '/User/some/path/',
       srcDir: '/User/some/path/src/',
       flags: {},
-      outputTargets: [{
-        type: 'www',
-        dir: '/www'
-      } as any as d.OutputTargetStats]
+      outputTargets: [
+        ({
+          type: 'www',
+          dir: '/www',
+        } as any) as d.OutputTargetStats,
+      ],
     };
   });
-
 
   it('adds stats from flags, w/ no outputTargets', () => {
     config.flags.stats = true;
@@ -34,7 +33,7 @@ describe('validateStats', () => {
   it('uses stats config, custom path', () => {
     config.outputTargets.push({
       type: 'stats',
-      file: 'custom-path.json'
+      file: 'custom-path.json',
     } as d.OutputTargetStats);
     validateOutputStats(config);
     const o = config.outputTargets.find(o => o.type === 'stats') as d.OutputTargetStats;
@@ -44,7 +43,7 @@ describe('validateStats', () => {
 
   it('uses stats config, defaults file', () => {
     config.outputTargets.push({
-      type: 'stats'
+      type: 'stats',
     });
     validateOutputStats(config);
     const o = config.outputTargets.find(o => o.type === 'stats') as d.OutputTargetStats;
@@ -56,5 +55,4 @@ describe('validateStats', () => {
     validateOutputStats(config);
     expect(config.outputTargets.some(o => o.type === 'stats')).toBe(false);
   });
-
 });

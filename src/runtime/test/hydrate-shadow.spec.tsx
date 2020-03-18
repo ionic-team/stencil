@@ -1,26 +1,20 @@
 import { Component, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('hydrate, shadow', () => {
-
   it('light dom parent, nested shadow slot', async () => {
     @Component({
-      tag: 'cmp-a'
+      tag: 'cmp-a',
     })
     class CmpA {
       render() {
-        return (
-          <cmp-b>
-            CmpALightDom
-          </cmp-b>
-        );
+        return <cmp-b>CmpALightDom</cmp-b>;
       }
     }
 
     @Component({
       tag: 'cmp-b',
-      shadow: true
+      shadow: true,
     })
     class CmpB {
       render() {
@@ -35,7 +29,7 @@ describe('hydrate, shadow', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -55,7 +49,7 @@ describe('hydrate, shadow', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
 
     expect(clientHydrated.root).toEqualHtml(`
@@ -77,7 +71,7 @@ describe('hydrate, shadow', () => {
   it('light dom content, shadow slot', async () => {
     @Component({
       tag: 'cmp-a',
-      shadow: true
+      shadow: true,
     })
     class CmpA {
       render() {
@@ -110,7 +104,7 @@ describe('hydrate, shadow', () => {
           </div>
         </cmp-a>
       `,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -145,7 +139,7 @@ describe('hydrate, shadow', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
 
     expect(clientHydrated.root).toEqualHtml(`
@@ -178,5 +172,4 @@ describe('hydrate, shadow', () => {
       </cmp-a>
     `);
   });
-
 });

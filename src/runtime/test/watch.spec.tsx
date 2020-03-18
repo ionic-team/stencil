@@ -1,11 +1,9 @@
 import { Component, Method, Prop, State, Watch } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('watch', () => {
-
   it('watch is called each time a prop changes', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       method1Called = 0;
       method2Called = 0;
@@ -58,7 +56,7 @@ describe('watch', () => {
   });
 
   it('should Watch correctly', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       watchCalled = 0;
 
@@ -112,7 +110,7 @@ describe('watch', () => {
   });
 
   it('should Watch from lifecycles', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       renderCount = 0;
       watchCalled = 0;

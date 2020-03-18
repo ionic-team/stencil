@@ -1,9 +1,7 @@
 import * as d from '@stencil/core/declarations';
 import { validateNamespace } from '../validate-namespace';
 
-
 describe('validateNamespace', () => {
-
   let config: d.Config;
   let diagnostics: d.Diagnostic[] = [];
   beforeEach(() => {
@@ -90,5 +88,4 @@ describe('validateNamespace', () => {
     expect(config.namespace).toBe('App');
     expect(config.fsNamespace).toBe('app');
   });
-
 });

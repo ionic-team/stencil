@@ -1,16 +1,14 @@
-import  * as d from '../../declarations';
+import * as d from '../../declarations';
 import { appError, clearDevServerModal } from './app-error';
 import { hmrWindow } from '../hmr-client';
 import { logBuild, logReload, logWarn } from './logger';
 import { onBuildResults } from './build-events';
-
 
 export function initAppUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig) {
   onBuildResults(win, buildResults => {
     appUpdate(win, doc, config, buildResults);
   });
 }
-
 
 function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.BuildResults) {
   try {
@@ -40,12 +38,10 @@ function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientCon
     if (buildResults.hmr) {
       appHmr(win, buildResults.hmr);
     }
-
   } catch (e) {
     console.error(e);
   }
 }
-
 
 function appHmr(win: Window, hmr: d.HotModuleReplacement) {
   let shouldWindowReload = false;
@@ -103,7 +99,6 @@ function appHmr(win: Window, hmr: d.HotModuleReplacement) {
   }
 }
 
-
 export function appReset(win: d.DevClientWindow, config: d.DevClientConfig, cb: () => void) {
   // we're probably at some ugly url
   // let's update the url to be the expect root url: /
@@ -112,25 +107,27 @@ export function appReset(win: d.DevClientWindow, config: d.DevClientConfig, cb: 
 
   if (!win.navigator.serviceWorker || !win.navigator.serviceWorker.getRegistration) {
     cb();
-
   } else {
     // it's possible a service worker is already registered
     // for this localhost url from some other app's development
     // let's ensure we entirely remove the service worker for this domain
-    win.navigator.serviceWorker.getRegistration().then(swRegistration => {
-      if (swRegistration) {
-        swRegistration.unregister().then(hasUnregistered => {
-          if (hasUnregistered) {
-            logBuild(`unregistered service worker`);
-          }
+    win.navigator.serviceWorker
+      .getRegistration()
+      .then(swRegistration => {
+        if (swRegistration) {
+          swRegistration.unregister().then(hasUnregistered => {
+            if (hasUnregistered) {
+              logBuild(`unregistered service worker`);
+            }
+            cb();
+          });
+        } else {
           cb();
-        });
-      } else {
+        }
+      })
+      .catch(err => {
+        logWarn('Service Worker', err);
         cb();
-      }
-    }).catch(err => {
-      logWarn('Service Worker', err);
-      cb();
-    });
+      });
   }
 }

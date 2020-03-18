@@ -3,25 +3,22 @@ import { generateBuildResults } from './build-results';
 import { IS_NODE_ENV } from '@utils';
 import path from 'path';
 
-
 export const buildFinish = async (buildCtx: d.BuildCtx) => {
   const results = await buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, false);
 
   const buildLog: d.BuildLog = {
     buildId: buildCtx.buildId,
     messages: buildCtx.buildMessages.slice(),
-    progress: 1
+    progress: 1,
   };
   buildCtx.compilerCtx.events.emit('buildLog', buildLog);
 
   return results;
 };
 
-
 export const buildAbort = (buildCtx: d.BuildCtx) => {
   return buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, true);
 };
-
 
 const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, aborted: boolean) => {
   if (buildCtx.hasFinished && buildCtx.buildResults_next) {
@@ -61,7 +58,6 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
       // ಥ_ಥ
       buildStatus = 'failed';
       statusColor = 'red';
-
     } else {
       // successful build!
       // ┏(°.°)┛ ┗(°.°)┓ ┗(°.°)┛ ┏(°.°)┓
@@ -100,7 +96,6 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
   return buildCtx.buildResults_next;
 };
 
-
 const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {
   // this is a rebuild, and we've got hmr data
   // and this build hasn't been aborted
@@ -110,12 +105,14 @@ const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {
   }
 
   if (hmr.inlineStylesUpdated) {
-    const inlineStyles = hmr.inlineStylesUpdated.map(s => s.styleTag).reduce((arr, v) => {
-      if (!arr.includes(v)) {
-        arr.push(v);
-      }
-      return arr;
-    }, [] as string[]);
+    const inlineStyles = hmr.inlineStylesUpdated
+      .map(s => s.styleTag)
+      .reduce((arr, v) => {
+        if (!arr.includes(v)) {
+          arr.push(v);
+        }
+        return arr;
+      }, [] as string[]);
     cleanupUpdateMsg(logger, `updated style`, inlineStyles);
   }
 
@@ -128,7 +125,6 @@ const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {
   }
 };
 
-
 const cleanupUpdateMsg = (logger: d.Logger, msg: string, fileNames: string[]) => {
   if (fileNames.length > 0) {
     let fileMsg = '';
@@ -137,7 +133,6 @@ const cleanupUpdateMsg = (logger: d.Logger, msg: string, fileNames: string[]) =>
       const remaining = fileNames.length - 6;
       fileNames = fileNames.slice(0, 6);
       fileMsg = fileNames.join(', ') + `, +${remaining} others`;
-
     } else {
       fileMsg = fileNames.join(', ');
     }

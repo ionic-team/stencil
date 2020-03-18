@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { getScopeId } from '../style/scope-css';
 
-
 export const generateModuleGraph = (cmps: d.ComponentCompilerMeta[], bundleModules: d.BundleModule[]) => {
   const cmpMap = new Map<string, string[]>();
   cmps.forEach(cmp => {
@@ -12,10 +11,7 @@ export const generateModuleGraph = (cmps: d.ComponentCompilerMeta[], bundleModul
 
       // add modes cases
       bundle.outputs.map(o => {
-        cmpMap.set(getScopeId(cmp.tagName, o.modeName), [
-          ...bundle.rollupResult.imports,
-          o.fileName
-        ]);
+        cmpMap.set(getScopeId(cmp.tagName, o.modeName), [...bundle.rollupResult.imports, o.fileName]);
       });
     }
   });

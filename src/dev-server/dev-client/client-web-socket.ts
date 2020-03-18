@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { emitBuildLog, emitBuildResults, emitBuildStatus } from './build-events';
 import { logDisabled, logReload, logWarn } from './logger';
 
-
 export function initClientWebSocket(win: d.DevClientWindow) {
   const wsUrl = getSocketUrl(win.location);
   let clientWs: WebSocket;
@@ -12,7 +11,6 @@ export function initClientWebSocket(win: d.DevClientWindow) {
   let hasGottenBuildResults = false;
 
   function onOpen(this: WebSocket) {
-
     if (reconnectAttempts > 0) {
       // we just reconnected
       // we'll request the build results and wait on its response
@@ -23,7 +21,7 @@ export function initClientWebSocket(win: d.DevClientWindow) {
       requestBuildResultsTmrId = setInterval(() => {
         if (!hasGottenBuildResults && this.readyState === WebSocket.OPEN) {
           const msg: d.DevServerMessage = {
-            requestBuildResults: true
+            requestBuildResults: true,
           };
           this.send(JSON.stringify(msg));
         } else {
@@ -139,7 +137,6 @@ export function initClientWebSocket(win: d.DevClientWindow) {
 
     if (reconnectAttempts >= RECONNECT_ATTEMPTS) {
       logWarn(`Dev Server`, `Canceling reconnect attempts`);
-
     } else {
       // keep track how many times we tried to reconnect
       reconnectAttempts++;
@@ -156,11 +153,9 @@ export function initClientWebSocket(win: d.DevClientWindow) {
   connect();
 }
 
-
 function getSocketUrl(location: Location) {
   return `${location.protocol === 'https:' ? `wss:` : `ws:`}//${location.hostname}:${location.port}/`;
 }
-
 
 const RECONNECT_ATTEMPTS = 1000;
 const RECONNECT_RETRY_MS = 2500;

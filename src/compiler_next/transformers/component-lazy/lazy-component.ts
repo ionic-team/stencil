@@ -8,13 +8,24 @@ import { updateComponentClass } from '../update-component-class';
 import { updateLazyComponentConstructor } from './lazy-constructor';
 import ts from 'typescript';
 
-
-export const updateLazyComponentClass = (transformOpts: d.TransformOptions, styleStatements: ts.Statement[], classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
+export const updateLazyComponentClass = (
+  transformOpts: d.TransformOptions,
+  styleStatements: ts.Statement[],
+  classNode: ts.ClassDeclaration,
+  moduleFile: d.Module,
+  cmp: d.ComponentCompilerMeta,
+) => {
   const members = updateLazyComponentMembers(transformOpts, styleStatements, classNode, moduleFile, cmp);
   return updateComponentClass(transformOpts, classNode, classNode.heritageClauses, members);
 };
 
-const updateLazyComponentMembers = (transformOpts: d.TransformOptions, styleStatements: ts.Statement[], classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
+const updateLazyComponentMembers = (
+  transformOpts: d.TransformOptions,
+  styleStatements: ts.Statement[],
+  classNode: ts.ClassDeclaration,
+  moduleFile: d.Module,
+  cmp: d.ComponentCompilerMeta,
+) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateLazyComponentConstructor(classMembers, moduleFile, cmp);

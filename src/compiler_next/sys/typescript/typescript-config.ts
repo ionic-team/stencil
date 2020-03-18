@@ -3,7 +3,6 @@ import { buildError, buildWarn, catchError, isString, loadTypeScriptDiagnostic, 
 import { isAbsolute, join, relative } from 'path';
 import tsTypes from 'typescript';
 
-
 export const validateTsConfig = async (ts: typeof tsTypes, config: d.Config, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
   const tsconfig = {
     path: null as string,
@@ -17,7 +16,6 @@ export const validateTsConfig = async (ts: typeof tsTypes, config: d.Config, sys
       const diagnostic = buildError(tsconfig.diagnostics);
       diagnostic.header = `Missing tsconfig.json`;
       diagnostic.messageText = `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "${config.rootDir}" directory.`;
-
     } else {
       tsconfig.path = readTsConfig.path;
       const host: any = {
@@ -45,10 +43,8 @@ export const validateTsConfig = async (ts: typeof tsTypes, config: d.Config, sys
           tsDiagnostic.absFilePath = tsconfig.path;
           tsconfig.diagnostics.push(tsDiagnostic);
         });
-
       } else {
         if (results.raw) {
-
           if (!hasSrcDirectoryInclude(results.raw.include)) {
             const warn = buildWarn(tsconfig.diagnostics);
             warn.header = `tsconfig.json "include" required`;
@@ -65,7 +61,7 @@ export const validateTsConfig = async (ts: typeof tsTypes, config: d.Config, sys
         if (results.options) {
           tsconfig.compilerOptions = results.options;
 
-          const target = (tsconfig.compilerOptions.target ?? ts.ScriptTarget.ES5);
+          const target = tsconfig.compilerOptions.target ?? ts.ScriptTarget.ES5;
           if ([ts.ScriptTarget.ES3, ts.ScriptTarget.ES5, ts.ScriptTarget.ES2015, ts.ScriptTarget.ES2016].includes(target)) {
             const warn = buildWarn(tsconfig.diagnostics);
             warn.messageText = `To improve bundling, it is always recommended to set the tsconfig.json “target” setting to "es2017". Note that the compiler will automatically handle transpilation for ES5-only browsers.`;
@@ -78,7 +74,6 @@ export const validateTsConfig = async (ts: typeof tsTypes, config: d.Config, sys
         }
       }
     }
-
   } catch (e) {
     catchError(tsconfig.diagnostics, e);
   }
@@ -120,27 +115,25 @@ const getTsConfigPath = async (config: d.Config, sys: d.CompilerSystem, init: d.
   return tsconfig;
 };
 
-const createDefaultTsConfig = (config: d.Config) => JSON.stringify({
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "lib": [
-      "dom",
-      "es2015"
-    ],
-    "moduleResolution": "node",
-    "module": "esnext",
-    "target": "es2017",
-    "jsx": "react",
-    "jsxFactory": "h"
-  },
-  "include": [
-    relative(config.rootDir, config.srcDir)
-  ]
-}, null, 2);
+const createDefaultTsConfig = (config: d.Config) =>
+  JSON.stringify(
+    {
+      compilerOptions: {
+        allowSyntheticDefaultImports: true,
+        experimentalDecorators: true,
+        lib: ['dom', 'es2015'],
+        moduleResolution: 'node',
+        module: 'esnext',
+        target: 'es2017',
+        jsx: 'react',
+        jsxFactory: 'h',
+      },
+      include: [relative(config.rootDir, config.srcDir)],
+    },
+    null,
+    2,
+  );
 
-const hasSrcDirectoryInclude = (includeProp: string[]) =>
-  Array.isArray(includeProp) && includeProp.length > 0;
+const hasSrcDirectoryInclude = (includeProp: string[]) => Array.isArray(includeProp) && includeProp.length > 0;
 
-const hasStencilConfigInclude = (includeProp: string[]) =>
-  Array.isArray(includeProp) && includeProp.includes('stencil.config.ts');
+const hasStencilConfigInclude = (includeProp: string[]) => Array.isArray(includeProp) && includeProp.includes('stencil.config.ts');

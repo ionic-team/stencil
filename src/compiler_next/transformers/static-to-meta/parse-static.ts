@@ -8,7 +8,6 @@ import { parseStaticComponentMeta } from './component';
 import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
 
-
 export const updateModule = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
@@ -17,7 +16,7 @@ export const updateModule = (
   sourceFileText: string,
   emitFilePath: string,
   typeChecker: ts.TypeChecker,
-  collection: d.CollectionCompilerMeta
+  collection: d.CollectionCompilerMeta,
 ) => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const prevModuleFile = getModule(compilerCtx, sourceFilePath);

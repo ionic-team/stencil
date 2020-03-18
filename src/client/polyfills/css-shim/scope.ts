@@ -3,7 +3,6 @@ import { CSSScope } from './interfaces';
 import { getSelectors, getSelectorsForScopes, resolveValues } from './selectors';
 import { compileTemplate, executeTemplate } from './template';
 
-
 export function parseCSS(original: string): CSSScope {
   const ast = parse(original);
   const template = compileTemplate(original);
@@ -12,7 +11,7 @@ export function parseCSS(original: string): CSSScope {
     original,
     template,
     selectors,
-    usesCssVars: template.length > 1
+    usesCssVars: template.length > 1,
   };
 }
 
@@ -37,17 +36,14 @@ export function updateGlobalScopes(scopes: CSSScope[]) {
 }
 
 export function reScope(scope: CSSScope, scopeId: string): CSSScope {
-
   const template = scope.template.map(segment => {
-    return (typeof segment === 'string')
-      ? replaceScope(segment, scope.scopeId, scopeId)
-      : segment;
+    return typeof segment === 'string' ? replaceScope(segment, scope.scopeId, scopeId) : segment;
   });
 
   const selectors = scope.selectors.map(sel => {
     return {
       ...sel,
-      selector: replaceScope(sel.selector, scope.scopeId, scopeId)
+      selector: replaceScope(sel.selector, scope.scopeId, scopeId),
     };
   });
 

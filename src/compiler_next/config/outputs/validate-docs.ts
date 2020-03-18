@@ -4,16 +4,17 @@ import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsRea
 import { isAbsolute, join } from 'path';
 import { NOTE } from '../../docs/constants';
 
-
 export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
   const docsOutputs: d.OutputTarget[] = [];
 
   // json docs flag
   if (typeof config.flags.docsJson === 'string') {
-    docsOutputs.push(validateJsonDocsOutputTarget(config, diagnostics, {
-      type: 'docs-json',
-      file: config.flags.docsJson
-    }));
+    docsOutputs.push(
+      validateJsonDocsOutputTarget(config, diagnostics, {
+        type: 'docs-json',
+        file: config.flags.docsJson,
+      }),
+    );
   }
 
   // json docs
@@ -57,7 +58,7 @@ const validateReadmeOutputTarget = (config: d.Config, diagnostics: d.Diagnostic[
       level: 'warn',
       header: 'Deprecated "docs"',
       messageText: `The output target { type: "docs" } has been deprecated, please use "docs-readme" instead.`,
-      absFilePath: config.configPath
+      absFilePath: config.configPath,
     });
     outputTarget.type = 'docs-readme';
   }
@@ -102,7 +103,6 @@ const validateCustomDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarge
   return outputTarget;
 };
 
-
 const validateVScodeDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsVscode) => {
   if (typeof outputTarget.file !== 'string') {
     const err = buildError(diagnostics);
@@ -110,4 +110,3 @@ const validateVScodeDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarge
   }
   return outputTarget;
 };
-

@@ -10,11 +10,8 @@ import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
 import ts from 'typescript';
 
-
 export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker): ts.TransformerFactory<ts.SourceFile> => {
-
   return transformCtx => {
-
     const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
         return visitClassDeclaration(config, diagnostics, typeChecker, node);
@@ -27,7 +24,6 @@ export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagn
     };
   };
 };
-
 
 export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, classNode: ts.ClassDeclaration) => {
   if (!classNode.decorators) {
@@ -64,7 +60,7 @@ export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnosti
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    newMembers
+    newMembers,
   );
 };
 
@@ -74,28 +70,9 @@ const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {
     const newDecorators = removeDecorators(m, MEMBER_DECORATORS_TO_REMOVE);
     if (currentDecorators !== newDecorators) {
       if (ts.isMethodDeclaration(m)) {
-        return ts.updateMethod(
-          m,
-          newDecorators,
-          m.modifiers,
-          m.asteriskToken,
-          m.name,
-          m.questionToken,
-          m.typeParameters,
-          m.parameters,
-          m.type,
-          m.body
-        );
+        return ts.updateMethod(m, newDecorators, m.modifiers, m.asteriskToken, m.name, m.questionToken, m.typeParameters, m.parameters, m.type, m.body);
       } else if (ts.isPropertyDeclaration(m)) {
-        return ts.updateProperty(
-          m,
-          newDecorators,
-          m.modifiers,
-          m.name,
-          m.questionToken,
-          m.type,
-          m.initializer
-        );
+        return ts.updateProperty(m, newDecorators, m.modifiers, m.name, m.questionToken, m.type, m.initializer);
       } else {
         console.log('unknown class node');
       }
@@ -104,15 +81,10 @@ const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {
   });
 };
 
-
 const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
   if (node.decorators) {
     const updatedDecoratorList = node.decorators.filter(dec => {
-      const name = (
-        ts.isCallExpression(dec.expression) &&
-        ts.isIdentifier(dec.expression.expression) &&
-        dec.expression.expression.text
-      );
+      const name = ts.isCallExpression(dec.expression) && ts.isIdentifier(dec.expression.expression) && dec.expression.expression.text;
       return !decoratorNames.has(name);
     });
     if (updatedDecoratorList.length === 0) {

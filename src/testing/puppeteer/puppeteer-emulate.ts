@@ -1,7 +1,6 @@
 import { E2EProcessEnv, EmulateConfig } from '@stencil/core/internal';
 import * as puppeteer from 'puppeteer';
 
-
 export function setScreenshotEmulateData(userEmulateConfig: EmulateConfig, env: E2EProcessEnv) {
   const screenshotEmulate: EmulateConfig = {
     userAgent: 'default',
@@ -11,8 +10,8 @@ export function setScreenshotEmulateData(userEmulateConfig: EmulateConfig, env: 
       deviceScaleFactor: 1,
       isMobile: false,
       hasTouch: false,
-      isLandscape: false
-    }
+      isLandscape: false,
+    },
   };
 
   if (typeof userEmulateConfig.device === 'string') {
@@ -28,7 +27,6 @@ export function setScreenshotEmulateData(userEmulateConfig: EmulateConfig, env: 
       screenshotEmulate.device = userEmulateConfig.device;
       screenshotEmulate.userAgent = puppeteerEmulateOpts.userAgent;
       screenshotEmulate.viewport = puppeteerEmulateOpts.viewport;
-
     } catch (e) {
       console.error('error loading puppeteer DeviceDescriptors', e);
       return;

@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 
-
 export const createLogger = () => {
   const logger: d.Logger = {
     colors: true,
@@ -9,20 +8,44 @@ export const createLogger = () => {
     warn: console.warn.bind(console),
     error: console.error.bind(console),
     debug: console.debug.bind(console),
-    red(msg: string) { return msg; },
-    green(msg: string) { return msg; },
-    yellow(msg: string) { return msg; },
-    blue(msg: string) { return msg; },
-    magenta(msg: string) { return msg; },
-    cyan(msg: string) { return msg; },
-    gray(msg: string) { return msg; },
-    bold(msg: string) { return msg; },
-    dim(msg: string) { return msg; },
-    bgRed(msg: string) { return msg; },
+    red(msg: string) {
+      return msg;
+    },
+    green(msg: string) {
+      return msg;
+    },
+    yellow(msg: string) {
+      return msg;
+    },
+    blue(msg: string) {
+      return msg;
+    },
+    magenta(msg: string) {
+      return msg;
+    },
+    cyan(msg: string) {
+      return msg;
+    },
+    gray(msg: string) {
+      return msg;
+    },
+    bold(msg: string) {
+      return msg;
+    },
+    dim(msg: string) {
+      return msg;
+    },
+    bgRed(msg: string) {
+      return msg;
+    },
     createTimeSpan(_startMsg: string, _debug = false): d.LoggerTimeSpan {
       return {
-        duration() { return 0; },
-        finish() { return 0; }
+        duration() {
+          return 0;
+        },
+        finish() {
+          return 0;
+        },
       };
     },
     printDiagnostics(diagnostics: d.Diagnostic[]) {
@@ -31,11 +54,12 @@ export const createLogger = () => {
       });
     },
     buildLogFilePath: null,
-    writeLogs(_: boolean) { /**/ }
+    writeLogs(_: boolean) {
+      /**/
+    },
   };
   return logger;
 };
-
 
 const logDiagnostic = (diagnostic: d.Diagnostic, colors: boolean) => {
   let color = BLUE;
@@ -44,7 +68,6 @@ const logDiagnostic = (diagnostic: d.Diagnostic, colors: boolean) => {
   if (diagnostic.level === 'error') {
     color = RED;
     prefix = 'Error';
-
   } else if (diagnostic.level === 'warn') {
     color = YELLOW;
     prefix = 'Warning';
@@ -80,10 +103,7 @@ const logDiagnostic = (diagnostic: d.Diagnostic, colors: boolean) => {
   }
 
   if (colors) {
-    const styledPrefix = [
-      '%c' + prefix,
-      `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`
-    ];
+    const styledPrefix = ['%c' + prefix, `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`];
 
     console.log(...styledPrefix, msg);
   } else if (diagnostic.level === 'error') {
@@ -94,7 +114,6 @@ const logDiagnostic = (diagnostic: d.Diagnostic, colors: boolean) => {
     console.log(msg);
   }
 };
-
 
 const YELLOW = `#f39c12`;
 const RED = `#c0392b`;

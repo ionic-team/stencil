@@ -5,17 +5,16 @@ import { doc, plt, supportsShadow } from '@platform';
 import { newVNode } from './vdom/h';
 import { createTime } from './profile';
 
-
 export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string, hostId: string, hostRef: d.HostRef) => {
   const endHydrate = createTime('hydrateClient', tagName);
   const shadowRoot = hostElm.shadowRoot;
   const childRenderNodes: RenderNodeData[] = [];
   const slotNodes: RenderNodeData[] = [];
-  const shadowRootNodes: d.RenderNode[] = (BUILD.shadowDom && shadowRoot ? [] : null);
-  const vnode: d.VNode = hostRef.$vnode$ = newVNode(tagName, null);
+  const shadowRootNodes: d.RenderNode[] = BUILD.shadowDom && shadowRoot ? [] : null;
+  const vnode: d.VNode = (hostRef.$vnode$ = newVNode(tagName, null));
 
   if (!plt.$orgLocNodes$) {
-    initializeDocumentHydrate(doc.body, plt.$orgLocNodes$ = new Map());
+    initializeDocumentHydrate(doc.body, (plt.$orgLocNodes$ = new Map()));
   }
 
   hostElm[HYDRATE_ID] = hostId;
@@ -28,11 +27,8 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
     const orgLocationNode = plt.$orgLocNodes$.get(orgLocationId);
     const node = c.$elm$ as d.RenderNode;
 
-    if (orgLocationNode && (supportsShadow && orgLocationNode['s-en'] === '')) {
-      orgLocationNode.parentNode.insertBefore(
-        node,
-        orgLocationNode.nextSibling
-      );
+    if (orgLocationNode && supportsShadow && orgLocationNode['s-en'] === '') {
+      orgLocationNode.parentNode.insertBefore(node, orgLocationNode.nextSibling);
     }
 
     if (!shadowRoot) {
@@ -64,7 +60,7 @@ const clientHydrate = (
   shadowRootNodes: d.RenderNode[],
   hostElm: d.HostElement,
   node: d.RenderNode,
-  hostId: string
+  hostId: string,
 ) => {
   let childNodeType: string;
   let childIdSplt: string[];
@@ -72,7 +68,6 @@ const clientHydrate = (
   let i: number;
 
   if (node.nodeType === NODE_TYPE.ElementNode) {
-
     childNodeType = (node as HTMLElement).getAttribute(HYDRATE_CHILD_ID);
     if (childNodeType) {
       // got the node data from the element's attribute
@@ -92,7 +87,7 @@ const clientHydrate = (
           $children$: null,
           $key$: null,
           $name$: null,
-          $text$: null
+          $text$: null,
         };
 
         childRenderNodes.push(childVNode);
@@ -127,7 +122,6 @@ const clientHydrate = (
         clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.shadowRoot.childNodes[i] as any, hostId);
       }
     }
-
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
     // `${COMMENT_TYPE}.${hostId}.${nodeId}.${depth}.${index}`
     childIdSplt = node.nodeValue.split('.');
@@ -148,7 +142,7 @@ const clientHydrate = (
         $key$: null,
         $name$: null,
         $tag$: null,
-        $text$: null
+        $text$: null,
       };
 
       if (childNodeType === TEXT_NODE_ID) {
@@ -169,7 +163,6 @@ const clientHydrate = (
             shadowRootNodes[childVNode.$index$ as any] = childVNode.$elm$;
           }
         }
-
       } else if (childVNode.$hostId$ === hostId) {
         // this comment node is specifcally for this host id
 
@@ -211,13 +204,11 @@ const clientHydrate = (
             parentVNode.$children$ = [];
           }
           parentVNode.$children$[childVNode.$index$ as any] = childVNode;
-
         } else if (childNodeType === CONTENT_REF_ID) {
           // `${CONTENT_REF_ID}.${hostId}`;
           if (BUILD.shadowDom && shadowRootNodes) {
             // remove the content ref comment since it's not needed for shadow
             node.remove();
-
           } else if (BUILD.slotRelocation) {
             hostElm['s-cr'] = node;
             node['s-cn'] = true;
@@ -233,7 +224,6 @@ const clientHydrate = (
   }
 };
 
-
 export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: Map<string, any>) => {
   if (node.nodeType === NODE_TYPE.ElementNode) {
     let i = 0;
@@ -245,7 +235,6 @@ export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: Map<s
         initializeDocumentHydrate(node.shadowRoot.childNodes[i] as any, orgLocNodes);
       }
     }
-
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
     const childIdSplt = node.nodeValue.split('.');
     if (childIdSplt[0] === ORG_LOCATION_ID) {
@@ -258,7 +247,6 @@ export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: Map<s
     }
   }
 };
-
 
 interface RenderNodeData extends d.VNode {
   $hostId$: string;

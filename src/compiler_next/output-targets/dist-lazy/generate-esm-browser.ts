@@ -4,7 +4,6 @@ import { generateLazyModules } from './generate-lazy-module';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { getDynamicImportFunction } from '@utils';
 
-
 export const generateEsmBrowser = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) => {
   const esmOutputs = outputTargets.filter(o => !!o.esmDir && !!o.isBrowserBuild);
   if (esmOutputs.length) {

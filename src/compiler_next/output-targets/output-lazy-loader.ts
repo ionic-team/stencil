@@ -4,16 +4,13 @@ import { isOutputTargetDistLazyLoader } from './output-utils';
 import { join, relative } from 'path';
 import { normalizePath, relativeImport } from '@utils';
 
-
 export const outputLazyLoader = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazyLoader);
   if (outputTargets.length === 0) {
     return;
   }
 
-  await Promise.all(
-    outputTargets.map(o => generateLoader(config, compilerCtx, o))
-  );
+  await Promise.all(outputTargets.map(o => generateLoader(config, compilerCtx, o)));
 };
 
 const generateLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistLazyLoader) => {
@@ -28,17 +25,21 @@ const generateLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, outp
 
   const es5HtmlElement = await getClientPolyfill(config, compilerCtx, 'es5-html-element.js');
 
-  const packageJsonContent = JSON.stringify({
-    'name': config.fsNamespace + '-loader',
-    'typings': './index.d.ts',
-    'module': './index.mjs',
-    'main': './index.cjs.js',
-    'node:main': './node-main.js',
-    'jsnext:main': './index.es2017.mjs',
-    'es2015': './index.es2017.mjs',
-    'es2017': './index.es2017.mjs',
-    'unpkg': './cdn.js',
-  }, null, 2);
+  const packageJsonContent = JSON.stringify(
+    {
+      'name': config.fsNamespace + '-loader',
+      'typings': './index.d.ts',
+      'module': './index.mjs',
+      'main': './index.cjs.js',
+      'node:main': './node-main.js',
+      'jsnext:main': './index.es2017.mjs',
+      'es2015': './index.es2017.mjs',
+      'es2017': './index.es2017.mjs',
+      'unpkg': './cdn.js',
+    },
+    null,
+    2,
+  );
 
   const es5EntryPoint = join(es5Dir, 'loader.mjs');
   const es2017EntryPoint = join(es2017Dir, 'loader.mjs');
@@ -71,10 +72,9 @@ module.exports.defineCustomElements = function() { return Promise.resolve() };
     compilerCtx.fs.writeFile(join(loaderPath, 'index.cjs.js'), indexCjsContent),
     compilerCtx.fs.writeFile(join(loaderPath, 'cdn.js'), indexCjsContent),
     compilerCtx.fs.writeFile(join(loaderPath, 'index.es2017.mjs'), indexES2017Content),
-    compilerCtx.fs.writeFile(join(loaderPath, 'node-main.js'), nodeMainContent)
+    compilerCtx.fs.writeFile(join(loaderPath, 'node-main.js'), nodeMainContent),
   ]);
 };
-
 
 const generateIndexDts = (indexDtsPath: string, componentsDtsPath: string) => {
   return `

@@ -2,9 +2,7 @@ import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
-
 describe('build-conditionals', () => {
-
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;
@@ -16,7 +14,6 @@ describe('build-conditionals', () => {
     await compiler.fs.writeFile(path.join(root, 'src', 'index.html'), `<cmp-a></cmp-a>`);
     await compiler.fs.commit();
   });
-
 
   it('should import function svg/slot build conditionals, remove on rebuild, and add back on rebuild', async () => {
     compiler.config.watch = true;
@@ -47,12 +44,15 @@ describe('build-conditionals', () => {
       shadow: true,
       slot: true,
       svg: true,
-      vdom: true
+      vdom: true,
     });
 
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
-    }, { clearFileCache: true });
+    await compiler.fs.writeFiles(
+      {
+        [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+      },
+      { clearFileCache: true },
+    );
     await compiler.fs.commit();
 
     compiler.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.tsx'));
@@ -64,18 +64,21 @@ describe('build-conditionals', () => {
       shadow: false,
       slot: false,
       svg: false,
-      vdom: false
+      vdom: false,
     });
 
-    await compiler.fs.writeFiles({
-    [path.join(root, 'src', 'cmp-a.tsx')]: `
+    await compiler.fs.writeFiles(
+      {
+        [path.join(root, 'src', 'cmp-a.tsx')]: `
       import {icon, slot} from './icon';
       @Component({ tag: 'cmp-a', shadow: true }) export class CmpA {
         render() {
           return <div>{icon()}{slot()}</div>
         }
       }`,
-    }, { clearFileCache: true });
+      },
+      { clearFileCache: true },
+    );
     await compiler.fs.commit();
 
     rebuildListener = compiler.once('buildFinish');
@@ -89,7 +92,7 @@ describe('build-conditionals', () => {
       shadow: true,
       slot: true,
       svg: true,
-      vdom: true
+      vdom: true,
     });
   });
 
@@ -114,7 +117,7 @@ describe('build-conditionals', () => {
       shadow: true,
       slot: true,
       svg: false,
-      vdom: true
+      vdom: true,
     });
   });
 
@@ -134,7 +137,7 @@ describe('build-conditionals', () => {
       shadow: false,
       slot: true,
       svg: false,
-      vdom: true
+      vdom: true,
     });
   });
 
@@ -154,7 +157,7 @@ describe('build-conditionals', () => {
       shadow: false,
       slot: false,
       svg: false,
-      vdom: true
+      vdom: true,
     });
   });
 
@@ -174,8 +177,7 @@ describe('build-conditionals', () => {
       shadow: false,
       slot: false,
       svg: false,
-      vdom: false
+      vdom: false,
     });
   });
-
 });

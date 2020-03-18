@@ -1,6 +1,5 @@
 import { updateImportPaths } from '../inline-esm-import';
 
-
 describe('updateImportPaths', () => {
   const newAbsDir = '/build/';
 
@@ -45,5 +44,4 @@ describe('updateImportPaths', () => {
     const o = updateImportPaths(input, newAbsDir);
     expect(o.code).toBe(`import 'leave-me-be';`);
   });
-
 });

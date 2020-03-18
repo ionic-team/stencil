@@ -12,7 +12,6 @@ import { validateRollupConfig } from './validate-rollup-config';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
 
-
 export const validateConfig = (userConfig?: Config) => {
   const config = Object.assign({}, userConfig || {}); // not positive it's json safe
   const diagnostics: Diagnostic[] = [];
@@ -129,10 +128,9 @@ export const validateConfig = (userConfig?: Config) => {
 
   return {
     config,
-    diagnostics
+    diagnostics,
   };
 };
-
 
 const DEFAULT_DEV_MODE = false;
 const DEFAULT_HASHED_FILENAME_LENTH = 8;

@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { Testing as TestingTypes } from '@stencil/core/testing';
 import exit from 'exit';
 
-
 export async function taskTest(config: d.Config) {
   try {
     const testingRunOpts: d.TestingRunOptions = {
@@ -13,25 +12,22 @@ export async function taskTest(config: d.Config) {
     };
 
     // always ensure we have jest modules installed
-    const ensureModuleIds = [
-      '@types/jest',
-      'jest',
-      'jest-cli'
-    ];
+    const ensureModuleIds = ['@types/jest', 'jest', 'jest-cli'];
 
     if (testingRunOpts.e2e) {
       // if it's an e2e test, also make sure we're got
       // puppeteer modules installed and if browserExecutablePath is provided don't download Chromium use only puppeteer-core instead
       const puppeteer = config.testing.browserExecutablePath ? 'puppeteer-core' : 'puppeteer';
 
-      ensureModuleIds.push(
-        '@types/puppeteer',
-        puppeteer
-      );
+      ensureModuleIds.push('@types/puppeteer', puppeteer);
 
       if (testingRunOpts.screenshot) {
         // ensure we've got pixelmatch for screenshots
-        config.logger.warn(config.logger.yellow(`EXPERIMENTAL: screenshot visual diff testing is currently under heavy development and has not reached a stable status. However, any assistance testing would be appreciated.`));
+        config.logger.warn(
+          config.logger.yellow(
+            `EXPERIMENTAL: screenshot visual diff testing is currently under heavy development and has not reached a stable status. However, any assistance testing would be appreciated.`,
+          ),
+        );
       }
     }
 
@@ -39,11 +35,7 @@ export async function taskTest(config: d.Config) {
     // jest and puppeteer are quite large, so this
     // is an experiment to lazy install these
     // modules only when you need them
-    await config.sys.lazyRequire.ensure(
-      config.logger,
-      config.rootDir,
-      ensureModuleIds
-    );
+    await config.sys.lazyRequire.ensure(config.logger, config.rootDir, ensureModuleIds);
 
     // let's test!
     const { createTesting } = require('../testing/index.js');
@@ -54,7 +46,6 @@ export async function taskTest(config: d.Config) {
     if (!passed) {
       exit(1);
     }
-
   } catch (e) {
     config.logger.error(e);
     exit(1);

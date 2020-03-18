@@ -1,6 +1,5 @@
 import { isExternalUrl, isLocalModule, isStencilCoreImport, setPackageVersionByContent } from '../resolve-utils';
 
-
 describe('resolve modules', () => {
   let compilerExe: string;
   const pkgVersions = new Map<string, string>();
@@ -33,11 +32,10 @@ describe('resolve modules', () => {
   });
 
   describe('setPackageVersionByContent', () => {
-
     it('set scoped package', () => {
       const pkgContent = JSON.stringify({
         name: '@ionic/core',
-        version: '1.2.3'
+        version: '1.2.3',
       });
       setPackageVersionByContent(pkgVersions, pkgContent);
       expect(pkgVersions.get('/@ionic/core/')).toBe('1.2.3');
@@ -46,12 +44,10 @@ describe('resolve modules', () => {
     it('set package', () => {
       const pkgContent = JSON.stringify({
         name: 'lodash',
-        version: '1.2.3'
+        version: '1.2.3',
       });
       setPackageVersionByContent(pkgVersions, pkgContent);
       expect(pkgVersions.get('/lodash/')).toBe('1.2.3');
     });
-
   });
-
 });

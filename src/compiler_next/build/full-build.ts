@@ -4,10 +4,8 @@ import { BuildContext } from './build-ctx';
 import { createTsBuildProgram } from '../transpile/create-build-program';
 import ts from 'typescript';
 
-
 export const createFullBuild = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
   return new Promise<d.CompilerBuildResults>(resolve => {
-
     let tsWatchProgram: ts.WatchOfConfigFile<ts.BuilderProgram> = null;
 
     compilerCtx.events.on('fileUpdate', p => {

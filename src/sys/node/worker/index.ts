@@ -4,7 +4,6 @@ import { TASK_CANCELED_MSG } from '@utils';
 import { NodeWorkerMain } from './worker-main';
 import { cpus } from 'os';
 
-
 export class NodeWorkerController extends EventEmitter implements d.WorkerMainController {
   workerIds = 0;
   stencilId = 0;
@@ -19,7 +18,7 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
     super();
     const osCpus = cpus().length;
 
-    this.useForkedWorkers = (maxConcurrentWorkers > 0);
+    this.useForkedWorkers = maxConcurrentWorkers > 0;
     this.totalWorkers = Math.max(Math.min(maxConcurrentWorkers, osCpus), 2) - 1;
 
     if (this.useForkedWorkers) {
@@ -172,7 +171,6 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
   }
 }
 
-
 export function getNextWorker(workers: NodeWorkerMain[]) {
   const availableWorkers = workers.filter(w => {
     if (w.stopped) {
@@ -206,9 +204,8 @@ export function getNextWorker(workers: NodeWorkerMain[]) {
   return sorted[0];
 }
 
-
 export function setupWorkerController(sys: d.CompilerSystem, logger: d.Logger, workerDomain: string) {
-  sys.createWorkerController = function (compilerPath, maxConcurrentWorkers) {
+  sys.createWorkerController = function(compilerPath, maxConcurrentWorkers) {
     return new NodeWorkerController(workerDomain, compilerPath, maxConcurrentWorkers, logger);
   };
 }

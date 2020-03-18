@@ -10,7 +10,6 @@ import { relocateMetaCharset } from '../../compiler_next/html/relocate-meta-char
 import { removeUnusedStyles } from '../../compiler_next/html/remove-unused-styles';
 import { updateCanonicalLink } from '../../compiler_next/html/canonical-link';
 
-
 export function renderToString(html: string | any, options?: SerializeDocumentOptions) {
   const opts = normalizeHydrateOptions(options);
   opts.serializeToHtml = true;
@@ -19,38 +18,32 @@ export function renderToString(html: string | any, options?: SerializeDocumentOp
     const results = generateHydrateResults(opts);
     if (hasError(results.diagnostics)) {
       resolve(results);
-
     } else if (typeof html === 'string') {
       try {
         opts.destroyWindow = true;
         opts.destroyDocument = true;
 
-        const win = new MockWindow(html) as any as Window;
+        const win = (new MockWindow(html) as any) as Window;
         render(win, opts, results, resolve);
-
       } catch (e) {
         renderCatchError(results, e);
         resolve(results);
       }
-
     } else if (isValidDocument(html)) {
       try {
         opts.destroyDocument = false;
         const win = patchDomImplementation(html, opts);
         render(win, opts, results, resolve);
-
       } catch (e) {
         renderCatchError(results, e);
         resolve(results);
       }
-
     } else {
       renderBuildError(results, `Invalid html or document. Must be either a valid "html" string, or DOM "document".`);
       resolve(results);
     }
   });
 }
-
 
 export function hydrateDocument(doc: any | string, options?: HydrateDocumentOptions) {
   const opts = normalizeHydrateOptions(options);
@@ -60,31 +53,26 @@ export function hydrateDocument(doc: any | string, options?: HydrateDocumentOpti
     const results = generateHydrateResults(opts);
     if (hasError(results.diagnostics)) {
       resolve(results);
-
     } else if (typeof doc === 'string') {
       try {
         opts.destroyWindow = true;
         opts.destroyDocument = true;
 
-        const win = new MockWindow(doc) as any as Window;
+        const win = (new MockWindow(doc) as any) as Window;
         render(win, opts, results, resolve);
-
       } catch (e) {
         renderCatchError(results, e);
         resolve(results);
       }
-
     } else if (isValidDocument(doc)) {
       try {
         opts.destroyDocument = false;
         const win = patchDomImplementation(doc, opts);
         render(win, opts, results, resolve);
-
       } catch (e) {
         renderCatchError(results, e);
         resolve(results);
       }
-
     } else {
       renderBuildError(results, `Invalid html or document. Must be either a valid "html" string, or DOM "document".`);
       resolve(results);
@@ -113,12 +101,10 @@ function render(win: Window, opts: HydrateFactoryOptions, results: HydrateResult
       } else {
         hydrateFactory(win, opts, results, afterHydrate, resolve);
       }
-
     } catch (e) {
       renderCatchError(results, e);
       finalizeHydrate(win, win.document, opts, results, resolve);
     }
-
   } else {
     hydrateFactory(win, opts, results, afterHydrate, resolve);
   }
@@ -135,12 +121,10 @@ function afterHydrate(win: Window, opts: HydrateFactoryOptions, results: Hydrate
       } else {
         finalizeHydrate(win, win.document, opts, results, resolve);
       }
-
     } catch (e) {
       renderCatchError(results, e);
       finalizeHydrate(win, win.document, opts, results, resolve);
     }
-
   } else {
     finalizeHydrate(win, win.document, opts, results, resolve);
   }
@@ -203,7 +187,6 @@ function finalizeHydrate(win: Window, doc: Document, opts: HydrateFactoryOptions
     if (opts.serializeToHtml) {
       results.html = serializeDocumentToString(doc, opts);
     }
-
   } catch (e) {
     renderCatchError(results, e);
   }
@@ -216,7 +199,6 @@ function finalizeHydrate(win: Window, doc: Document, opts: HydrateFactoryOptions
       }
 
       win.close();
-
     } catch (e) {
       renderCatchError(results, e);
     }
@@ -239,12 +221,7 @@ export function serializeDocumentToString(doc: any, opts: HydrateFactoryOptions)
 }
 
 function isValidDocument(doc: Document) {
-  return doc != null &&
-    doc.nodeType === 9 &&
-    doc.documentElement != null &&
-    doc.documentElement.nodeType === 1 &&
-    doc.body != null &&
-    doc.body.nodeType === 1;
+  return doc != null && doc.nodeType === 9 && doc.documentElement != null && doc.documentElement.nodeType === 1 && doc.body != null && doc.body.nodeType === 1;
 }
 
 function removeScripts(elm: HTMLElement) {

@@ -1,6 +1,5 @@
 import ts from 'typescript';
 
-
 export const removeStaticMetaProperties = (classNode: ts.ClassDeclaration) => {
   if (classNode.members == null) {
     return [];
@@ -35,5 +34,5 @@ const REMOVE_STATIC_GETTERS = new Set([
   'watchers',
   'styleUrls',
   'contextProps',
-  'connectProps'
+  'connectProps',
 ]);

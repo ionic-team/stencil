@@ -3,11 +3,17 @@ import { join } from 'path';
 import { normalizePath } from '@utils';
 import { parseCollectionComponents, transpileCollectionModule } from './parse-collection-components';
 
-
-export const parseCollectionManifest = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionName: string, collectionDir: string, collectionJsonStr: string) => {
+export const parseCollectionManifest = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  collectionName: string,
+  collectionDir: string,
+  collectionJsonStr: string,
+) => {
   const collectionManifest: d.CollectionManifest = JSON.parse(collectionJsonStr);
 
-  const compilerVersion: d.CollectionCompilerVersion = collectionManifest.compiler || {} as any;
+  const compilerVersion: d.CollectionCompilerVersion = collectionManifest.compiler || ({} as any);
 
   const collection: d.CollectionCompilerMeta = {
     collectionName: collectionName,
@@ -17,7 +23,7 @@ export const parseCollectionManifest = (config: d.Config, compilerCtx: d.Compile
     compiler: {
       name: compilerVersion.name || '',
       version: compilerVersion.version || '',
-      typescriptVersion: compilerVersion.typescriptVersion || ''
+      typescriptVersion: compilerVersion.typescriptVersion || '',
     },
     bundles: parseBundles(collectionManifest),
   };
@@ -32,7 +38,14 @@ export const parseCollectionDependencies = (collectionManifest: d.CollectionMani
   return (collectionManifest.collections || []).map(c => c.name);
 };
 
-export const parseGlobal = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionDir: string, collectionManifest: d.CollectionManifest, collection: d.CollectionCompilerMeta) => {
+export const parseGlobal = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  collectionDir: string,
+  collectionManifest: d.CollectionManifest,
+  collection: d.CollectionCompilerMeta,
+) => {
   if (typeof collectionManifest.global !== 'string') {
     return;
   }
@@ -49,11 +62,11 @@ export const parseBundles = (collectionManifest: d.CollectionManifest) => {
 
   return collectionManifest.bundles.map(b => {
     return {
-      components: b.components.slice().sort()
+      components: b.components.slice().sort(),
     };
   });
 };
 
 const invalidArrayData = (arr: any[]) => {
-  return (!arr || !Array.isArray(arr) || arr.length === 0);
+  return !arr || !Array.isArray(arr) || arr.length === 0;
 };

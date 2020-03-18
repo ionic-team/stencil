@@ -1,6 +1,5 @@
 import { MockDocument } from '../document';
 
-
 describe('style', () => {
   let doc: MockDocument;
   beforeEach(() => {
@@ -70,5 +69,4 @@ describe('style', () => {
     expect(elm.style.getPropertyValue('color')).toEqual(``);
     expect(elm.style.getPropertyValue('font-size')).toEqual(``);
   });
-
 });

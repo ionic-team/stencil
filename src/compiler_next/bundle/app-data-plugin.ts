@@ -6,8 +6,13 @@ import { removeCollectionImports } from '../transformers/remove-collection-impor
 import { STENCIL_APP_DATA_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID, STENCIL_APP_GLOBALS_ID } from './entry-alias-ids';
 import ts from 'typescript';
 
-
-export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, build: d.BuildConditionals, platform: 'client' | 'hydrate' | 'worker'): Plugin => {
+export const appDataPlugin = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  build: d.BuildConditionals,
+  platform: 'client' | 'hydrate' | 'worker',
+): Plugin => {
   if (!platform) {
     return {
       name: 'appDataPlugin',
@@ -29,7 +34,7 @@ export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buil
     },
 
     load(id) {
-      if (id === STENCIL_APP_GLOBALS_ID)  {
+      if (id === STENCIL_APP_GLOBALS_ID) {
         const s = new MagicString(``);
         appendGlobalScripts(globalScripts, s);
         return s.toString();
@@ -48,9 +53,7 @@ export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buil
       if (globalScripts.some(s => s.path === id)) {
         const program = this.parse(code, {});
         const needsDefault = !program.body.some(s => s.type === 'ExportDefaultDeclaration');
-        const defaultExport = needsDefault
-          ? '\nexport const globalFn = () => {};\nexport default globalFn;'
-          : '';
+        const defaultExport = needsDefault ? '\nexport const globalFn = () => {};\nexport default globalFn;' : '';
         code = getContextImport(platform) + code + defaultExport;
 
         const compilerOptions: ts.CompilerOptions = { ...config.tsCompilerOptions };
@@ -60,10 +63,8 @@ export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buil
           compilerOptions,
           fileName: id,
           transformers: {
-            after: [
-              removeCollectionImports(compilerCtx),
-            ]
-          }
+            after: [removeCollectionImports(compilerCtx)],
+          },
         });
 
         buildCtx.diagnostics.push(...loadTypeScriptDiagnostics(results.diagnostics));
@@ -71,7 +72,7 @@ export const appDataPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buil
         return results.outputText;
       }
       return null;
-    }
+    },
   };
 };
 
@@ -80,14 +81,12 @@ export const getGlobalScriptData = (config: d.Config, compilerCtx: d.CompilerCtx
 
   if (isString(config.globalScript)) {
     const mod = compilerCtx.moduleMap.get(config.globalScript);
-    const globalScript = compilerCtx.version === 2
-      ? config.globalScript
-      : mod && mod.jsFilePath;
+    const globalScript = compilerCtx.version === 2 ? config.globalScript : mod && mod.jsFilePath;
 
     if (globalScript) {
       globalScripts.push({
         defaultName: createJsVarName(config.namespace + 'GlobalScript'),
-        path: normalizePath(globalScript)
+        path: normalizePath(globalScript),
       });
     }
   }
@@ -100,7 +99,7 @@ export const getGlobalScriptData = (config: d.Config, compilerCtx: d.CompilerCtx
       }
       globalScripts.push({
         defaultName,
-        path: normalizePath(collection.global.sourceFilePath)
+        path: normalizePath(collection.global.sourceFilePath),
       });
     }
   });
@@ -108,14 +107,12 @@ export const getGlobalScriptData = (config: d.Config, compilerCtx: d.CompilerCtx
   return globalScripts;
 };
 
-
 const appendGlobalScripts = (globalScripts: GlobalScript[], s: MagicString) => {
   if (globalScripts.length === 1) {
     s.prepend(`import appGlobalScript from '${globalScripts[0].path}';\n`);
     s.append(`export const globalScripts = appGlobalScript;\n`);
-
   } else if (globalScripts.length > 1) {
-    globalScripts.forEach((globalScript) => {
+    globalScripts.forEach(globalScript => {
       s.prepend(`import ${globalScript.defaultName} from '${globalScript.path}';\n`);
     });
 
@@ -124,16 +121,16 @@ const appendGlobalScripts = (globalScripts: GlobalScript[], s: MagicString) => {
       s.append(`  ${globalScript.defaultName}();\n`);
     });
     s.append(`};\n`);
-
   } else {
     s.append(`export const globalScripts = () => {};\n`);
   }
 };
 
 const appendBuildConditionals = (config: d.Config, build: d.BuildConditionals, s: MagicString) => {
-  const builData = Object.keys(build).sort().map(key => (
-    key + ': ' + ((build as any)[key] ? 'true' : 'false')
-  )).join(', ');
+  const builData = Object.keys(build)
+    .sort()
+    .map(key => key + ': ' + ((build as any)[key] ? 'true' : 'false'))
+    .join(', ');
 
   s.append(`export const BUILD = /* ${config.fsNamespace} */ { ${builData} };\n`);
 };
@@ -143,11 +140,7 @@ const appendNamespace = (config: d.Config, s: MagicString) => {
 };
 
 const getContextImport = (platform: string) => {
-  return `import { Context } from '${
-    platform === 'hydrate' ?
-      STENCIL_INTERNAL_HYDRATE_ID :
-      STENCIL_INTERNAL_CLIENT_ID
-  }';\n`;
+  return `import { Context } from '${platform === 'hydrate' ? STENCIL_INTERNAL_HYDRATE_ID : STENCIL_INTERNAL_CLIENT_ID}';\n`;
 };
 
 interface GlobalScript {

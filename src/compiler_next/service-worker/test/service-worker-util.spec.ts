@@ -3,9 +3,7 @@ import { generateServiceWorkerUrl } from '../service-worker-util';
 import { Config, validateConfig } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 
-
 describe('generateServiceWorkerUrl', () => {
-
   let config: Config;
   let outputTarget: d.OutputTargetWww;
 
@@ -15,8 +13,8 @@ describe('generateServiceWorkerUrl', () => {
     config.outputTargets = [
       {
         type: 'www',
-        baseUrl: '/docs'
-      } as d.OutputTargetWww
+        baseUrl: '/docs',
+      } as d.OutputTargetWww,
     ];
     validateConfig(config);
     outputTarget = config.outputTargets[0] as d.OutputTargetWww;
@@ -32,7 +30,4 @@ describe('generateServiceWorkerUrl', () => {
     const swUrl = generateServiceWorkerUrl(config, outputTarget, outputTarget.serviceWorker as d.ServiceWorkerConfig);
     expect(swUrl).toBe('/sw.js');
   });
-
 });
-
-

@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { hasError, hasWarning } from '@utils';
 
-
 /**
  * A new BuildCtx object is created for every build
  * and rebuild.
@@ -73,7 +72,7 @@ export class BuildContext implements d.BuildCtx {
     const buildLog: d.BuildLog = {
       buildId: this.buildId,
       messages: [],
-      progress: 0
+      progress: 0,
     };
     this.compilerCtx.events.emit('buildLog', buildLog);
 
@@ -88,7 +87,7 @@ export class BuildContext implements d.BuildCtx {
 
     const buildStart: d.CompilerBuildStart = {
       buildId: this.buildId,
-      timestamp: this.timestamp
+      timestamp: this.timestamp,
     };
     this.compilerCtx.events.emit('buildStart', buildStart);
   }
@@ -106,7 +105,7 @@ export class BuildContext implements d.BuildCtx {
         const buildLog: d.BuildLog = {
           buildId: this.buildId,
           messages: this.buildMessages,
-          progress: getProgress(this.completedTasks)
+          progress: getProgress(this.completedTasks),
         };
         this.compilerCtx.events.emit('buildLog', buildLog);
       }
@@ -129,19 +128,23 @@ export class BuildContext implements d.BuildCtx {
               const buildLog: d.BuildLog = {
                 buildId: this.buildId,
                 messages: this.buildMessages.slice(),
-                progress: getProgress(this.completedTasks)
+                progress: getProgress(this.completedTasks),
               };
               this.compilerCtx.events.emit('buildLog', buildLog);
             }
           }
           return timeSpan.duration();
-        }
+        },
       };
     }
 
     return {
-      duration() { return 0; },
-      finish() { return 0; }
+      duration() {
+        return 0;
+      },
+      finish() {
+        return 0;
+      },
     };
   }
 
@@ -183,9 +186,7 @@ export class BuildContext implements d.BuildCtx {
       this.debug(`build, non-watch, finished waiting on validateTypes`);
     }
   }
-
 }
-
 
 export const getBuildTimestamp = () => {
   const d = new Date();

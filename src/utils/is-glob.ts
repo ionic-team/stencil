@@ -7,9 +7,8 @@
  */
 import { isString } from './helpers';
 
-const isGlobChars: any = { '{': '}', '(': ')', '[': ']'};
+const isGlobChars: any = { '{': '}', '(': ')', '[': ']' };
 const isGlobStrictRegex = /\\(.)|(^!|\*|[\].+)]\?|\[[^\\\]]+\]|\{[^\\}]+\}|\(\?[:!=][^\\)]+\)|\([^|]+\|[^\\)]+\))/;
-
 
 const isExtglobRegex = /(\\).|([@?!+*]\(.*\))/;
 const isExtglob = (str: string) => {
@@ -22,7 +21,6 @@ const isExtglob = (str: string) => {
   }
   return false;
 };
-
 
 export const isGlob = (str: string) => {
   if (!isString(str) || str === '') {

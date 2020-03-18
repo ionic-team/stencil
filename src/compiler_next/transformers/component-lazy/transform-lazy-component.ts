@@ -6,11 +6,8 @@ import { updateLazyComponentClass } from './lazy-component';
 import { updateStyleImports } from '../style-imports';
 import ts from 'typescript';
 
-
 export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
-
   return transformCtx => {
-
     return tsSourceFile => {
       const styleStatements: ts.Statement[] = [];
       const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
@@ -37,10 +34,7 @@ export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts
       tsSourceFile = addImports(transformOpts, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
 
       if (styleStatements.length > 0) {
-        tsSourceFile = ts.updateSourceFileNode(tsSourceFile, [
-          ...tsSourceFile.statements,
-          ...styleStatements,
-        ]);
+        tsSourceFile = ts.updateSourceFileNode(tsSourceFile, [...tsSourceFile.statements, ...styleStatements]);
       }
 
       return tsSourceFile;

@@ -5,7 +5,6 @@ import { startupLog } from './startup-log';
 import exit from 'exit';
 import path from 'path';
 
-
 export async function taskPrerender(prcs: NodeJS.Process, config: d.Config) {
   startupLog(prcs, config);
 

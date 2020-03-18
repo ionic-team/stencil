@@ -4,7 +4,6 @@ import { ConvertIdentifier, convertValueToLiteral, createStaticGetter } from '..
 import { DEFAULT_STYLE_MODE } from '@utils';
 import ts from 'typescript';
 
-
 export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d.ComponentOptions) => {
   const defaultModeStyles = [];
 
@@ -46,7 +45,6 @@ export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d
       // })
       newMembers.push(createStaticGetter('styles', ts.createLiteral(styles)));
     }
-
   } else if (componentOptions.styles) {
     const convertIdentifier = (componentOptions.styles as any) as ConvertIdentifier;
     if (convertIdentifier.__identifier) {
@@ -56,7 +54,6 @@ export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d
       // })
       const stylesIdentifier = convertIdentifier.__escapedText;
       newMembers.push(createStaticGetter('styles', ts.createIdentifier(stylesIdentifier)));
-
     } else if (typeof convertIdentifier === 'object') {
       // import ios from './ios.css';
       // import md from './md.css';
@@ -79,7 +76,6 @@ export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d
     }
   }
 };
-
 
 const normalizeExtension = (styleUrls: d.CompilerModeStyles) => {
   const compilerStyleUrls: d.CompilerModeStyles = {};

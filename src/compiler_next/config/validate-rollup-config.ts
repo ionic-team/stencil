@@ -4,7 +4,7 @@ import { isObject, pluck } from '@utils';
 export const validateRollupConfig = (config: d.Config) => {
   const cleanRollupConfig = getCleanRollupConfig(config.rollupConfig);
   config.rollupConfig = cleanRollupConfig;
-}
+};
 
 const getCleanRollupConfig = (rollupConfig: d.RollupConfig): d.RollupConfig => {
   let cleanRollupConfig = DEFAULT_ROLLUP_CONFIG;
@@ -32,5 +32,5 @@ const getCleanRollupConfig = (rollupConfig: d.RollupConfig): d.RollupConfig => {
 
 const DEFAULT_ROLLUP_CONFIG: d.RollupConfig = {
   inputOptions: {},
-  outputOptions: {}
+  outputOptions: {},
 };

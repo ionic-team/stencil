@@ -4,8 +4,13 @@ import { dirname, join, relative } from 'path';
 import { normalizePath } from '@utils';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
 
-
-export const parseComponentsDeprecated = (config: d.Config, compilerCtx: d.CompilerCtx, collection: d.CollectionCompilerMeta, collectionDir: string, collectionManifest: d.CollectionManifest) => {
+export const parseComponentsDeprecated = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  collection: d.CollectionCompilerMeta,
+  collectionDir: string,
+  collectionManifest: d.CollectionManifest,
+) => {
   if (collectionManifest.components) {
     collectionManifest.components.forEach(cmpData => {
       parseComponentDeprecated(config, compilerCtx, collection, collectionDir, cmpData);
@@ -34,7 +39,7 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
     virtualProperties: [],
     docs: {
       text: '',
-      tags: []
+      tags: [],
     },
     internal: false,
     jsFilePath: moduleFile.jsFilePath,
@@ -103,7 +108,7 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
     htmlAttrNames: [],
     htmlTagNames: [],
     isUpdateable: false,
-    potentialCmpRefs: []
+    potentialCmpRefs: [],
   };
   setComponentBuildConditionals(cmpMeta);
 
@@ -115,7 +120,6 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
   collection.moduleFiles.push(moduleFile);
 }
 
-
 function excludeFromCollection(config: d.Config, cmpData: d.ComponentDataDeprecated) {
   // this is a component from a collection dependency
   // however, this project may also become a collection
@@ -126,20 +130,20 @@ function excludeFromCollection(config: d.Config, cmpData: d.ComponentDataDepreca
   // cmpData is a component from a collection dependency
   // if this component is listed in this config's bundles
   // then we'll need to ensure it also becomes apart of this collection
-  const isInBundle = config.bundles && config.bundles.some(bundle => {
-    return bundle.components && bundle.components.some(tag => tag === cmpData.tag);
-  });
+  const isInBundle =
+    config.bundles &&
+    config.bundles.some(bundle => {
+      return bundle.components && bundle.components.some(tag => tag === cmpData.tag);
+    });
 
   // if it's not in the config bundle then it's safe to exclude
   // this component from going into this build's collection
   return !isInBundle;
 }
 
-
 function parseTag(cmpData: d.ComponentDataDeprecated) {
   return cmpData.tag;
 }
-
 
 function parseJsFilePath(collectionDir: string, cmpData: d.ComponentDataDeprecated) {
   // convert the path that's relative to the collection file
@@ -150,7 +154,6 @@ function parseJsFilePath(collectionDir: string, cmpData: d.ComponentDataDeprecat
   return normalizePath(join(collectionDir, cmpData.componentPath));
 }
 
-
 // function parseComponentDependencies(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
 //   if (invalidArrayData(cmpData.dependencies)) {
 //     cmpMeta.dependencies = [];
@@ -159,11 +162,9 @@ function parseJsFilePath(collectionDir: string, cmpData: d.ComponentDataDeprecat
 //   }
 // }
 
-
 function parseComponentClass(cmpData: d.ComponentDataDeprecated) {
   return cmpData.componentClass;
 }
-
 
 function parseStyles(collectionDir: string, cmpData: d.ComponentDataDeprecated) {
   const stylesData = cmpData.styles;
@@ -174,39 +175,31 @@ function parseStyles(collectionDir: string, cmpData: d.ComponentDataDeprecated) 
     return modeNames.map(modeName => {
       return parseStyle(collectionDir, cmpData, stylesData[modeName], modeName.toLowerCase());
     });
-
   } else {
     return [];
   }
 }
-
 
 function parseAssetsDir(collectionDir: string, cmpData: d.ComponentDataDeprecated) {
   if (invalidArrayData(cmpData.assetPaths)) {
     return [];
   }
 
-  return cmpData.assetPaths.map(assetsPath => {
-    const assetsMeta: d.AssetsMeta = {
-      absolutePath: normalizePath(join(
-        collectionDir,
-        assetsPath
-      )),
-      cmpRelativePath: normalizePath(relative(
-        dirname(cmpData.componentPath),
-        assetsPath
-      )),
-      originalComponentPath: normalizePath(assetsPath)
-    };
-    return assetsMeta;
-
-  }).sort((a, b) => {
-    if (a.cmpRelativePath < b.cmpRelativePath) return -1;
-    if (a.cmpRelativePath > b.cmpRelativePath) return 1;
-    return 0;
-  });
+  return cmpData.assetPaths
+    .map(assetsPath => {
+      const assetsMeta: d.AssetsMeta = {
+        absolutePath: normalizePath(join(collectionDir, assetsPath)),
+        cmpRelativePath: normalizePath(relative(dirname(cmpData.componentPath), assetsPath)),
+        originalComponentPath: normalizePath(assetsPath),
+      };
+      return assetsMeta;
+    })
+    .sort((a, b) => {
+      if (a.cmpRelativePath < b.cmpRelativePath) return -1;
+      if (a.cmpRelativePath > b.cmpRelativePath) return 1;
+      return 0;
+    });
 }
-
 
 function parseStyle(collectionDir: string, cmpData: d.ComponentDataDeprecated, modeStyleData: d.StyleDataDeprecated, modeName: string) {
   const modeStyle: d.StyleCompiler = {
@@ -217,21 +210,15 @@ function parseStyle(collectionDir: string, cmpData: d.ComponentDataDeprecated, m
     externalStyles: [],
     compiledStyleText: null,
     compiledStyleTextScoped: null,
-    compiledStyleTextScopedCommented: null
+    compiledStyleTextScopedCommented: null,
   };
 
   if (Array.isArray(modeStyleData.stylePaths)) {
     modeStyleData.stylePaths.forEach(stylePath => {
       const externalStyle: d.ExternalStyleCompiler = {
-        absolutePath: normalizePath(join(
-          collectionDir,
-          stylePath
-        )),
-        relativePath: normalizePath(relative(
-          dirname(cmpData.componentPath),
-          stylePath
-        )),
-        originalComponentPath: stylePath
+        absolutePath: normalizePath(join(collectionDir, stylePath)),
+        relativePath: normalizePath(relative(dirname(cmpData.componentPath), stylePath)),
+        originalComponentPath: stylePath,
       };
 
       modeStyle.externalStyles.push(externalStyle);
@@ -240,7 +227,6 @@ function parseStyle(collectionDir: string, cmpData: d.ComponentDataDeprecated, m
 
   return modeStyle;
 }
-
 
 function parseProps(cmpData: d.ComponentDataDeprecated) {
   const propsData = cmpData.props;
@@ -253,7 +239,7 @@ function parseProps(cmpData: d.ComponentDataDeprecated) {
     const type = convertType(propData.type);
     const prop: d.ComponentCompilerProperty = {
       name: propData.name,
-      attribute: (typeof propData.attr === 'string' ? propData.attr : null),
+      attribute: typeof propData.attr === 'string' ? propData.attr : null,
       mutable: !!propData.mutable,
       optional: true,
       required: false,
@@ -267,13 +253,12 @@ function parseProps(cmpData: d.ComponentDataDeprecated) {
       },
       docs: {
         text: '',
-        tags: []
-      }
+        tags: [],
+      },
     };
     return prop;
   });
 }
-
 
 function parseConnectProps(cmpData: d.ComponentDataDeprecated) {
   const connectData = cmpData.connect;
@@ -285,7 +270,7 @@ function parseConnectProps(cmpData: d.ComponentDataDeprecated) {
   return connectData.map(propData => {
     const prop: d.ComponentCompilerLegacyConnect = {
       name: propData.name,
-      connect: propData.tag
+      connect: propData.tag,
     };
     return prop;
   });
@@ -301,11 +286,10 @@ function parseContextProps(cmpData: d.ComponentDataDeprecated): d.ComponentCompi
   return contextData.map(propData => {
     return {
       name: propData.name,
-      context: propData.id
+      context: propData.id,
     };
   });
 }
-
 
 function parseStates(cmpData: d.ComponentDataDeprecated) {
   if (invalidArrayData(cmpData.states)) {
@@ -314,7 +298,7 @@ function parseStates(cmpData: d.ComponentDataDeprecated) {
 
   return cmpData.states.map(state => {
     return {
-      name: state.name
+      name: state.name,
     };
   });
 }
@@ -331,7 +315,7 @@ function parseWatchers(cmpData: d.ComponentDataDeprecated) {
       prop.watch.forEach(watch => {
         watchers.push({
           propName: prop.name,
-          methodName: watch
+          methodName: watch,
         });
       });
     });
@@ -350,13 +334,12 @@ function parseListeners(cmpData: d.ComponentDataDeprecated) {
       name: listenerData.event,
       method: listenerData.method,
       target: undefined, // TODO
-      passive: (listenerData.passive !== false),
-      capture: (listenerData.capture !== false)
+      passive: listenerData.passive !== false,
+      capture: listenerData.capture !== false,
     };
     return listener;
   });
 }
-
 
 function parseMethods(cmpData: d.ComponentDataDeprecated) {
   if (invalidArrayData(cmpData.methods)) {
@@ -371,12 +354,12 @@ function parseMethods(cmpData: d.ComponentDataDeprecated) {
         signature: '(...args: any[]) => Promise<any>',
         parameters: [],
         return: 'Promise<any>',
-        references: {}
+        references: {},
       },
       docs: {
         text: '',
-        tags: []
-      }
+        tags: [],
+      },
     };
     return method;
   });
@@ -384,11 +367,16 @@ function parseMethods(cmpData: d.ComponentDataDeprecated) {
 
 function convertType(type: string): d.ComponentCompilerPropertyType {
   switch (type) {
-    case 'String': return 'string';
-    case 'Any': return 'any';
-    case 'Number': return 'number';
-    case 'Boolean': return 'boolean';
-    default: return 'unknown';
+    case 'String':
+      return 'string';
+    case 'Any':
+      return 'any';
+    case 'Number':
+      return 'number';
+    case 'Boolean':
+      return 'boolean';
+    default:
+      return 'unknown';
   }
 }
 
@@ -409,7 +397,6 @@ function convertType(type: string): d.ComponentCompilerPropertyType {
 //   });
 // }
 
-
 // function parseConnectMember(cmpData: d.ComponentDataDeprecated, cmpMeta: d.ComponentCompilerMeta) {
 //   if (invalidArrayData(cmpData.connect)) {
 //     return;
@@ -427,7 +414,6 @@ function convertType(type: string): d.ComponentCompilerPropertyType {
 //   });
 // }
 
-
 function parseHostElementMember(cmpData: d.ComponentDataDeprecated) {
   if (!cmpData.hostElement) {
     return undefined;
@@ -435,7 +421,6 @@ function parseHostElementMember(cmpData: d.ComponentDataDeprecated) {
 
   return cmpData.hostElement.name;
 }
-
 
 function parseEvents(cmpData: d.ComponentDataDeprecated) {
   const eventsData = cmpData.events;
@@ -447,40 +432,35 @@ function parseEvents(cmpData: d.ComponentDataDeprecated) {
   return eventsData.map(eventData => {
     const event: d.ComponentCompilerEvent = {
       name: eventData.event,
-      method: (eventData.method) ? eventData.method : eventData.event,
-      bubbles: (eventData.bubbles !== false),
-      cancelable: (eventData.cancelable !== false),
-      composed: (eventData.composed !== false),
+      method: eventData.method ? eventData.method : eventData.event,
+      bubbles: eventData.bubbles !== false,
+      cancelable: eventData.cancelable !== false,
+      composed: eventData.composed !== false,
       internal: false,
       docs: {
         text: '',
-        tags: []
+        tags: [],
       },
       complexType: {
         original: 'any',
         resolved: 'any',
-        references: {}
-      }
+        references: {},
+      },
     };
     return event;
   });
 }
 
-
-
 function parseEncapsulation(cmpData: d.ComponentDataDeprecated) {
   if (cmpData.shadow === true) {
     return 'shadow';
-
   } else if (cmpData.scoped === true) {
     return 'scoped';
-
   } else {
     return 'none';
   }
 }
 
-
 function invalidArrayData(arr: any[]) {
-  return (!arr || !Array.isArray(arr) || arr.length === 0);
+  return !arr || !Array.isArray(arr) || arr.length === 0;
 }

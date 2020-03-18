@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { isString } from './helpers';
 
-
 export const buildError = (diagnostics?: d.Diagnostic[]) => {
   const diagnostic: d.Diagnostic = {
     level: 'error',
@@ -10,7 +9,7 @@ export const buildError = (diagnostics?: d.Diagnostic[]) => {
     messageText: 'build error',
     relFilePath: null,
     absFilePath: null,
-    lines: []
+    lines: [],
   };
 
   if (diagnostics) {
@@ -20,7 +19,6 @@ export const buildError = (diagnostics?: d.Diagnostic[]) => {
   return diagnostic;
 };
 
-
 export const buildWarn = (diagnostics: d.Diagnostic[]) => {
   const diagnostic: d.Diagnostic = {
     level: 'warn',
@@ -29,14 +27,13 @@ export const buildWarn = (diagnostics: d.Diagnostic[]) => {
     messageText: 'build warn',
     relFilePath: null,
     absFilePath: null,
-    lines: []
+    lines: [],
   };
 
   diagnostics.push(diagnostic);
 
   return diagnostic;
 };
-
 
 export const buildJsonFileError = (compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], jsonFilePath: string, msg: string, pkgKey: string) => {
   const err = buildError(diagnostics);
@@ -58,7 +55,7 @@ export const buildJsonFileError = (compilerCtx: d.CompilerCtx, diagnostics: d.Di
             lineNumber: i + 1,
             text: txtLine,
             errorCharStart: txtIndex,
-            errorLength: pkgKey.length
+            errorLength: pkgKey.length,
           };
           err.lineNumber = warnLine.lineNumber;
           err.columnNumber = txtIndex + 1;
@@ -70,7 +67,7 @@ export const buildJsonFileError = (compilerCtx: d.CompilerCtx, diagnostics: d.Di
               lineNumber: warnLine.lineNumber - 1,
               text: lines[i - 1],
               errorCharStart: -1,
-              errorLength: -1
+              errorLength: -1,
             };
             err.lines.unshift(beforeWarnLine);
           }
@@ -81,7 +78,7 @@ export const buildJsonFileError = (compilerCtx: d.CompilerCtx, diagnostics: d.Di
               lineNumber: warnLine.lineNumber + 1,
               text: lines[i + 1],
               errorCharStart: -1,
-              errorLength: -1
+              errorLength: -1,
             };
             err.lines.push(afterWarnLine);
           }
@@ -95,7 +92,6 @@ export const buildJsonFileError = (compilerCtx: d.CompilerCtx, diagnostics: d.Di
   return err;
 };
 
-
 export const catchError = (diagnostics: d.Diagnostic[], err: Error, msg?: string) => {
   const diagnostic: d.Diagnostic = {
     level: 'error',
@@ -104,20 +100,17 @@ export const catchError = (diagnostics: d.Diagnostic[], err: Error, msg?: string
     messageText: 'build error',
     relFilePath: null,
     absFilePath: null,
-    lines: []
+    lines: [],
   };
 
   if (isString(msg)) {
     diagnostic.messageText = msg;
-
   } else if (err != null) {
     if (err.stack != null) {
       diagnostic.messageText = err.stack.toString();
-
     } else {
       if (err.message != null) {
         diagnostic.messageText = err.message.toString();
-
       } else {
         diagnostic.messageText = err.toString();
       }
@@ -138,7 +131,6 @@ export const hasError = (diagnostics: d.Diagnostic[]): boolean => {
   return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
 };
 
-
 export const hasWarning = (diagnostics: d.Diagnostic[]): boolean => {
   if (diagnostics == null || diagnostics.length === 0) {
     return false;
@@ -146,9 +138,8 @@ export const hasWarning = (diagnostics: d.Diagnostic[]): boolean => {
   return diagnostics.some(d => d.level === 'warn');
 };
 
-
 export const shouldIgnoreError = (msg: any) => {
-  return (msg === TASK_CANCELED_MSG);
+  return msg === TASK_CANCELED_MSG;
 };
 
 export const TASK_CANCELED_MSG = `task canceled`;

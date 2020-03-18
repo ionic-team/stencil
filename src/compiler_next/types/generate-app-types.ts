@@ -8,7 +8,6 @@ import { updateReferenceTypeImports } from './update-import-refs';
 import { updateStencilTypesImports } from './stencil-types';
 import ts from 'typescript';
 
-
 export const generateAppTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination: string) => {
   // only gather components that are still root ts files we've found and have component metadata
   // the compilerCtx cache may still have files that may have been deleted/renamed
@@ -63,7 +62,9 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
     }
     `;
 
-  const jsxElementGlobal = !needsJSXElementHack ? '' : `
+  const jsxElementGlobal = !needsJSXElementHack
+    ? ''
+    : `
     // Adding a global JSX for backcompatibility with legacy dependencies
     export namespace JSX {
       export interface Element {}
@@ -72,7 +73,10 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
 
   const componentsFileString = `
     export namespace Components {
-      ${modules.map(m => `${m.component}`).join('\n').trim()}
+      ${modules
+        .map(m => `${m.component}`)
+        .join('\n')
+        .trim()}
     }
 
     declare global {
@@ -84,7 +88,10 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
     }
 
     declare namespace LocalJSX {
-      ${modules.map(m => `${m.jsx}`).join('\n').trim()}
+      ${modules
+        .map(m => `${m.jsx}`)
+        .join('\n')
+        .trim()}
 
       interface IntrinsicElements {
         ${modules.map(m => `'${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
@@ -96,30 +103,30 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
     ${jsxAugmentation}
     `;
 
-  const typeImportString = Object.keys(typeImportData).map(filePath => {
-    const typeData = typeImportData[filePath];
-    let importFilePath: string;
-    if (isAbsolute(filePath)) {
-      importFilePath = normalizePath('./' +
-        relative(config.srcDir, filePath)
-      ).replace(/\.(tsx|ts)$/, '');
-    } else {
-      importFilePath = filePath;
-    }
-
-    return `import {
-      ${typeData.sort(sortImportNames).map(td => {
-      if (td.localName === td.importName) {
-        return `${td.importName},`;
+  const typeImportString = Object.keys(typeImportData)
+    .map(filePath => {
+      const typeData = typeImportData[filePath];
+      let importFilePath: string;
+      if (isAbsolute(filePath)) {
+        importFilePath = normalizePath('./' + relative(config.srcDir, filePath)).replace(/\.(tsx|ts)$/, '');
       } else {
-        return `${td.localName} as ${td.importName},`;
+        importFilePath = filePath;
       }
-    })
-        .join('\n')
-      }
-      } from '${importFilePath}';`;
 
-  }).join('\n');
+      return `import {
+      ${typeData
+        .sort(sortImportNames)
+        .map(td => {
+          if (td.localName === td.importName) {
+            return `${td.importName},`;
+          } else {
+            return `${td.localName} as ${td.importName},`;
+          }
+        })
+        .join('\n')}
+      } from '${importFilePath}';`;
+    })
+    .join('\n');
 
   const code = `
     ${COMPONENTS_DTS_HEADER}
@@ -130,7 +137,7 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
 
   const tsSourceFile = ts.createSourceFile(GENERATED_DTS, code, ts.ScriptTarget.Latest, false);
   const tsPrinter = ts.createPrinter({
-    newLine: ts.NewLineKind.LineFeed
+    newLine: ts.NewLineKind.LineFeed,
   });
 
   return tsPrinter.printFile(tsSourceFile);

@@ -3,7 +3,6 @@ import { MockDocument } from '../document';
 import { NODE_TYPES } from '../constants';
 import { parseHtmlToDocument, parseHtmlToFragment } from '../parse-html';
 
-
 describe('parseHtml', () => {
   let doc: MockDocument;
   beforeEach(() => {

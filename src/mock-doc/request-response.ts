@@ -77,7 +77,6 @@ export class MockRequest {
   }
 }
 
-
 // ReSPONSE
 
 export interface MockResponseInit {

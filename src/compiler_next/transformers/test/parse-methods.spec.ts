@@ -1,8 +1,6 @@
 import { getStaticGetter, transpileModule } from './transpile';
 
-
 describe('parse methods', () => {
-
   it('methods', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
@@ -14,33 +12,34 @@ describe('parse methods', () => {
       }
     `);
 
-    expect(getStaticGetter(t.outputText, 'methods')).toEqual({ 'someMethod': {
-      'complexType': {
-        'parameters': [],
-        'return': 'void',
-        'references': {},
-        'signature': '() => void',
+    expect(getStaticGetter(t.outputText, 'methods')).toEqual({
+      someMethod: {
+        complexType: {
+          parameters: [],
+          return: 'void',
+          references: {},
+          signature: '() => void',
+        },
+        docs: {
+          text: '',
+          tags: [],
+        },
       },
-      'docs': {
-        'text': '',
-        'tags': []
-      }
-    } });
+    });
 
     expect(t.method).toEqual({
-      'complexType': {
-        'parameters': [],
-        'return': 'void',
-        'references': {},
-        'signature': '() => void'
+      complexType: {
+        parameters: [],
+        return: 'void',
+        references: {},
+        signature: '() => void',
       },
-      'docs': {
-        'tags': [],
-        'text': ''
+      docs: {
+        tags: [],
+        text: '',
       },
-      'internal': false,
-      'name': 'someMethod'
+      internal: false,
+      name: 'someMethod',
     });
   });
-
 });

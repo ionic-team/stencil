@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { basename, dirname, relative } from 'path';
 import { normalizePath } from '@utils';
 
-
 export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const items: d.FsItems = new Map();
   const outputTargetTypes = new Map<string, string>();
@@ -13,14 +12,14 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       return {
         exists: item.exists,
         isDirectory: item.isDirectory,
-        isFile: item.isFile
+        isFile: item.isFile,
       };
     }
 
     const data = {
       exists: false,
       isDirectory: false,
-      isFile: false
+      isFile: false,
     };
 
     const s = await stat(filePath);
@@ -32,7 +31,6 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       data.exists = item.exists;
       data.isDirectory = item.isDirectory;
       data.isFile = item.isFile;
-
     } else {
       item.exists = false;
     }
@@ -103,7 +101,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
               absPath: filePath,
               relPath: parts[inMemoryDirs.length],
               isDirectory: d.isDirectory,
-              isFile: d.isFile
+              isFile: d.isFile,
             };
             if (!shouldExcludeFromReaddir(opts, item)) {
               collectedPaths.push(item);
@@ -111,7 +109,6 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
           }
         }
       });
-
     } else {
       // always a disk read
       await readDirectory(dirPath, dirPath, opts, collectedPaths);
@@ -136,34 +133,36 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       item.isFile = false;
       item.isDirectory = true;
 
-      await Promise.all(dirItems.map(async dirItem => {
-        // let's loop through each of the files we've found so far
-        // create an absolute path of the item inside of this directory
-        const absPath = normalizePath(dirItem);
-        const relPath = normalizePath(relative(initPath, absPath));
+      await Promise.all(
+        dirItems.map(async dirItem => {
+          // let's loop through each of the files we've found so far
+          // create an absolute path of the item inside of this directory
+          const absPath = normalizePath(dirItem);
+          const relPath = normalizePath(relative(initPath, absPath));
 
-        // get the fs stats for the item, could be either a file or directory
-        const stats = await stat(absPath);
+          // get the fs stats for the item, could be either a file or directory
+          const stats = await stat(absPath);
 
-        const childItem: d.FsReaddirItem = {
-          absPath: absPath,
-          relPath: relPath,
-          isDirectory: stats.isDirectory,
-          isFile: stats.isFile
-        };
+          const childItem: d.FsReaddirItem = {
+            absPath: absPath,
+            relPath: relPath,
+            isDirectory: stats.isDirectory,
+            isFile: stats.isFile,
+          };
 
-        if (shouldExcludeFromReaddir(opts, childItem)) {
-          return;
-        }
+          if (shouldExcludeFromReaddir(opts, childItem)) {
+            return;
+          }
 
-        collectedPaths.push(childItem);
+          collectedPaths.push(childItem);
 
-        if (opts.recursive === true && stats.isDirectory === true) {
-          // looks like it's yet another directory
-          // let's keep drilling down
-          await readDirectory(initPath, absPath, opts, collectedPaths);
-        }
-      }));
+          if (opts.recursive === true && stats.isDirectory === true) {
+            // looks like it's yet another directory
+            // let's keep drilling down
+            await readDirectory(initPath, absPath, opts, collectedPaths);
+          }
+        }),
+      );
     }
   };
 
@@ -187,7 +186,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   const readFile = async (filePath: string, opts?: d.FsReadOptions) => {
-    if (opts == null || (opts.useCache === true || opts.useCache === undefined)) {
+    if (opts == null || opts.useCache === true || opts.useCache === undefined) {
       const item = getItem(filePath);
       if (item.exists && typeof item.fileText === 'string') {
         return item.fileText;
@@ -215,7 +214,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
    * @param filePath
    */
   const readFileSync = (filePath: string, opts?: d.FsReadOptions) => {
-    if (opts == null || (opts.useCache === true || opts.useCache === undefined)) {
+    if (opts == null || opts.useCache === true || opts.useCache === undefined) {
       const item = getItem(filePath);
       if (item.exists && typeof item.fileText === 'string') {
         return item.fileText;
@@ -243,7 +242,6 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
     if (stats.isDirectory === true) {
       await removeDir(itemPath);
-
     } else if (stats.isFile === true) {
       await removeItem(itemPath);
     }
@@ -261,7 +259,6 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       const dirItems = await readdir(dirPath, { recursive: true });
 
       await Promise.all(dirItems.map(item => removeItem(item.absPath)));
-
     } catch (e) {
       // do not throw error if the directory never existed
     }
@@ -303,7 +300,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       exists: !!item.exists,
       isFile: !!item.isFile,
       isDirectory: !!item.isDirectory,
-      size: typeof item.size === 'number' ? item.size : 0
+      size: typeof item.size === 'number' ? item.size : 0,
     };
   };
 
@@ -340,7 +337,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     return {
       exists: !!item.exists,
       isFile: !!item.isFile,
-      isDirectory: !!item.isDirectory
+      isDirectory: !!item.isDirectory,
     };
   };
 
@@ -356,7 +353,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     const results: d.FsWriteResults = {
       ignored: false,
       changedContent: false,
-      queuedWrite: false
+      queuedWrite: false,
     };
 
     if (shouldIgnore(filePath) === true) {
@@ -373,7 +370,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     if (typeof item.fileText === 'string') {
       // compare strings but replace Windows CR to rule out any
       // insignificant new line differences
-      results.changedContent = (item.fileText.replace(/\r/g, '') !== content.replace(/\r/g, ''));
+      results.changedContent = item.fileText.replace(/\r/g, '') !== content.replace(/\r/g, '');
     } else {
       results.changedContent = true;
     }
@@ -397,7 +394,6 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         // we already queued this file to write to disk
         // in that case we still need to do it
         results.queuedWrite = true;
-
       } else {
         // we only want this in memory and
         // it wasn't already queued to be written
@@ -406,7 +402,6 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
       // ensure in-memory directories are created
       await ensureDir(filePath, true);
-
     } else if (opts != null && opts.immediateWrite === true) {
       // if this is an immediate write then write the file
       // now and do not add it to the queue
@@ -415,7 +410,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         // so let's just double check that the file is actually different first
         const existingFile = await sys.readFile(filePath);
         if (typeof existingFile === 'string') {
-          results.changedContent = (item.fileText.replace(/\r/g, '') !== existingFile.replace(/\r/g, ''));
+          results.changedContent = item.fileText.replace(/\r/g, '') !== existingFile.replace(/\r/g, '');
         }
 
         if (results.changedContent) {
@@ -423,7 +418,6 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
           await sys.writeFile(filePath, item.fileText);
         }
       }
-
     } else {
       // we want to write this to disk (eventually)
       // but only if the content is different
@@ -440,11 +434,12 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   const writeFiles = (files: { [filePath: string]: string }, opts?: d.FsWriteOptions) => {
-    return Promise.all(Object.keys(files).map(filePath => {
-      return writeFile(filePath, files[filePath], opts);
-    }));
+    return Promise.all(
+      Object.keys(files).map(filePath => {
+        return writeFile(filePath, files[filePath], opts);
+      }),
+    );
   };
-
 
   const commit = async () => {
     const instructions = getCommitInstructions(items);
@@ -478,7 +473,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       filesWritten,
       filesDeleted,
       dirsDeleted,
-      dirsAdded
+      dirsAdded,
     };
   };
 
@@ -521,30 +516,33 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         }
 
         dirsAdded.push(dirPath);
-
-      } catch (e) { }
+      } catch (e) {}
     }
 
     return dirsAdded;
   };
 
   const commitCopyFiles = (filesToCopy: string[][]) => {
-    const copiedFiles = Promise.all(filesToCopy.map(async data => {
-      const src = data[0];
-      const dest = data[1];
-      await sys.copyFile(src, dest);
-      return [src, dest];
-    }));
+    const copiedFiles = Promise.all(
+      filesToCopy.map(async data => {
+        const src = data[0];
+        const dest = data[1];
+        await sys.copyFile(src, dest);
+        return [src, dest];
+      }),
+    );
     return copiedFiles;
   };
 
   const commitWriteFiles = (filesToWrite: string[]) => {
-    const writtenFiles = Promise.all(filesToWrite.map(async filePath => {
-      if (typeof filePath !== 'string') {
-        throw new Error(`unable to writeFile without filePath`);
-      }
-      return commitWriteFile(filePath);
-    }));
+    const writtenFiles = Promise.all(
+      filesToWrite.map(async filePath => {
+        if (typeof filePath !== 'string') {
+          throw new Error(`unable to writeFile without filePath`);
+        }
+        return commitWriteFile(filePath);
+      }),
+    );
     return writtenFiles;
   };
 
@@ -564,13 +562,15 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   const commitDeleteFiles = async (filesToDelete: string[]) => {
-    const deletedFiles = await Promise.all(filesToDelete.map(async filePath => {
-      if (typeof filePath !== 'string') {
-        throw new Error(`unable to unlink without filePath`);
-      }
-      await sys.unlink(filePath);
-      return filePath;
-    }));
+    const deletedFiles = await Promise.all(
+      filesToDelete.map(async filePath => {
+        if (typeof filePath !== 'string') {
+          throw new Error(`unable to unlink without filePath`);
+        }
+        await sys.unlink(filePath);
+        return filePath;
+      }),
+    );
     return deletedFiles;
   };
 
@@ -580,7 +580,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     for (const dirPath of dirsToDelete) {
       try {
         await sys.rmdir(dirPath);
-      } catch (e) { }
+      } catch (e) {}
       dirsDeleted.push(dirPath);
     }
 
@@ -631,18 +631,21 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       return item;
     }
 
-    items.set(itemPath, item = {
-      exists: null,
-      fileText: null,
-      size: null,
-      mtimeMs: null,
-      isDirectory: null,
-      isFile: null,
-      queueCopyFileToDest: null,
-      queueDeleteFromDisk: null,
-      queueWriteToDisk: null,
-      useCache: null,
-    });
+    items.set(
+      itemPath,
+      (item = {
+        exists: null,
+        fileText: null,
+        size: null,
+        mtimeMs: null,
+        isDirectory: null,
+        isFile: null,
+        queueCopyFileToDest: null,
+        queueDeleteFromDisk: null,
+        queueWriteToDisk: null,
+        useCache: null,
+      }),
+    );
     return item;
   };
 
@@ -707,11 +710,10 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     statSync,
     sys,
     writeFile,
-    writeFiles
+    writeFiles,
   };
   return fs;
 };
-
 
 export const getCommitInstructions = (items: d.FsItems) => {
   const instructions = {
@@ -719,13 +721,11 @@ export const getCommitInstructions = (items: d.FsItems) => {
     filesToWrite: [] as string[],
     filesToCopy: [] as string[][],
     dirsToDelete: [] as string[],
-    dirsToEnsure: [] as string[]
+    dirsToEnsure: [] as string[],
   };
 
   items.forEach((item, itemPath) => {
-
     if (item.queueWriteToDisk === true) {
-
       if (item.isFile === true) {
         instructions.filesToWrite.push(itemPath);
 
@@ -743,7 +743,6 @@ export const getCommitInstructions = (items: d.FsItems) => {
         if (fileDeleteIndex > -1) {
           instructions.filesToDelete.splice(fileDeleteIndex, 1);
         }
-
       } else if (item.isDirectory === true) {
         if (!instructions.dirsToEnsure.includes(itemPath)) {
           instructions.dirsToEnsure.push(itemPath);
@@ -754,15 +753,12 @@ export const getCommitInstructions = (items: d.FsItems) => {
           instructions.dirsToDelete.splice(dirDeleteIndex, 1);
         }
       }
-
     } else if (item.queueDeleteFromDisk === true) {
       if (item.isDirectory && !instructions.dirsToEnsure.includes(itemPath)) {
         instructions.dirsToDelete.push(itemPath);
-
       } else if (item.isFile && !instructions.filesToWrite.includes(itemPath)) {
         instructions.filesToDelete.push(itemPath);
       }
-
     } else if (typeof item.queueCopyFileToDest === 'string') {
       const src = itemPath;
       const dest = item.queueCopyFileToDest;
@@ -850,15 +846,9 @@ export const getCommitInstructions = (items: d.FsItems) => {
   return instructions;
 };
 
-
 export const shouldIgnore = (filePath: string) => {
   filePath = filePath.trim().toLowerCase();
   return IGNORE.some(ignoreFile => filePath.endsWith(ignoreFile));
 };
 
-const IGNORE = [
-  '.ds_store',
-  '.gitignore',
-  'desktop.ini',
-  'thumbs.db'
-];
+const IGNORE = ['.ds_store', '.gitignore', 'desktop.ini', 'thumbs.db'];

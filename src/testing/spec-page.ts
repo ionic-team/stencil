@@ -1,10 +1,26 @@
-import { bootstrapLazy, flushAll, flushLoadModule, flushQueue, getHostRef, insertVdomAnnotations, registerComponents, registerContext, registerModule, renderVdom, resetPlatform, startAutoApplyChanges, styles, win, writeTask, setSupportsShadowDom } from '@stencil/core/internal/testing';
+import {
+  bootstrapLazy,
+  flushAll,
+  flushLoadModule,
+  flushQueue,
+  getHostRef,
+  insertVdomAnnotations,
+  registerComponents,
+  registerContext,
+  registerModule,
+  renderVdom,
+  resetPlatform,
+  startAutoApplyChanges,
+  styles,
+  win,
+  writeTask,
+  setSupportsShadowDom,
+} from '@stencil/core/internal/testing';
 import { BUILD } from '@app-data';
 import { ComponentCompilerMeta, ComponentRuntimeMeta, ComponentTestingConstructor, HostRef, LazyBundlesRuntimeData, NewSpecPageOptions, SpecPage } from '@stencil/core/internal';
 import { formatLazyBundleRuntimeMeta } from '@utils';
 import { getBuildFeatures } from '../compiler_next/app-core/app-data';
 import { resetBuildConditionals } from './reset-build-conditionals';
-
 
 export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   if (opts == null) {
@@ -48,13 +64,13 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
     body: doc.body as any,
     build: BUILD,
     styles: styles as Map<string, string>,
-    setContent: (html) => {
+    setContent: html => {
       doc.body.innerHTML = html;
       return flushAll();
     },
     waitForChanges: flushAll,
     flushLoadModule: flushLoadModule,
-    flushQueue: flushQueue
+    flushQueue: flushQueue,
   };
 
   const lazyBundles: LazyBundlesRuntimeData = opts.components.map((Cstr: ComponentTestingConstructor) => {
@@ -67,7 +83,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
 
     proxyComponentLifeCycles(Cstr);
 
-    const bundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 899999) + 100000)}`;
+    const bundleId = `${Cstr.COMPILER_META.tagName}.${Math.round(Math.random() * 899999) + 100000}`;
     const lazyBundleRuntimeMeta = formatLazyBundleRuntimeMeta(bundleId, [Cstr.COMPILER_META]);
 
     registerModule(bundleId, Cstr);
@@ -97,7 +113,6 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   if (opts.hydrateClientSide) {
     BUILD.hydrateClientSide = true;
     BUILD.hydrateServerSide = false;
-
   } else if (opts.hydrateServerSide) {
     BUILD.hydrateServerSide = true;
     BUILD.hydrateClientSide = false;
@@ -126,19 +141,19 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   if (typeof opts.cookie === 'string') {
     try {
       page.doc.cookie = opts.cookie;
-    } catch (e) { }
+    } catch (e) {}
   }
 
   if (typeof opts.referrer === 'string') {
     try {
       (page.doc as any).referrer = opts.referrer;
-    } catch (e) { }
+    } catch (e) {}
   }
 
   if (typeof opts.userAgent === 'string') {
     try {
       (page.win.navigator as any).userAgent = opts.userAgent;
-    } catch (e) { }
+    } catch (e) {}
   }
 
   bootstrapLazy(lazyBundles);
@@ -146,14 +161,14 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   if (typeof opts.template === 'function') {
     const cmpMeta: ComponentRuntimeMeta = {
       $flags$: 0,
-      $tagName$: 'body'
+      $tagName$: 'body',
     };
     const ref: HostRef = {
       $ancestorComponent$: undefined,
       $flags$: 0,
       $modeName$: undefined,
       $cmpMeta$: cmpMeta,
-      $hostElement$: page.body
+      $hostElement$: page.body,
     };
     renderVdom(ref, opts.template());
   } else if (typeof opts.html === 'string') {
@@ -178,7 +193,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
         return firstElementChild as any;
       }
       return null;
-    }
+    },
   });
 
   Object.defineProperty(page, 'rootInstance', {
@@ -188,7 +203,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
         return hostRef.$lazyInstance$;
       }
       return null;
-    }
+    },
   });
 
   if (opts.hydrateServerSide) {
@@ -221,7 +236,7 @@ function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
 
   if (typeof Cstr.prototype.componentWillLoad === 'function') {
     Cstr.prototype.__componentWillLoad = Cstr.prototype.componentWillLoad;
-    Cstr.prototype.componentWillLoad = function () {
+    Cstr.prototype.componentWillLoad = function() {
       const result = this.__componentWillLoad();
       if (result != null && typeof result.then === 'function') {
         writeTask(() => result);
@@ -234,7 +249,7 @@ function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
 
   if (typeof Cstr.prototype.componentWillUpdate === 'function') {
     Cstr.prototype.__componentWillUpdate = Cstr.prototype.componentWillUpdate;
-    Cstr.prototype.componentWillUpdate = function () {
+    Cstr.prototype.componentWillUpdate = function() {
       const result = this.__componentWillUpdate();
       if (result != null && typeof result.then === 'function') {
         writeTask(() => result);
@@ -247,7 +262,7 @@ function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
 
   if (typeof Cstr.prototype.componentWillRender === 'function') {
     Cstr.prototype.__componentWillRender = Cstr.prototype.componentWillRender;
-    Cstr.prototype.componentWillRender = function () {
+    Cstr.prototype.componentWillRender = function() {
       const result = this.__componentWillRender();
       if (result != null && typeof result.then === 'function') {
         writeTask(() => result);

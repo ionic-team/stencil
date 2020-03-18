@@ -1,23 +1,20 @@
 import { normalizePath } from '@utils';
 import { NODE_MODULES_CDN_URL, NODE_MODULES_FS_DIR, STENCIL_CORE_MODULE, isCommonDirModuleFile, isTsFile, isTsxFile } from '../resolve/resolve-utils';
 
-
 export const packageVersions = new Map<string, string>();
 export const known404Urls = new Set<string>();
 
-export const getStencilRootUrl = (compilerExe: string) =>
-  new URL('../', compilerExe).href;
+export const getStencilRootUrl = (compilerExe: string) => new URL('../', compilerExe).href;
 
 export const getStencilModuleUrl = (compilerExe: string, p: string) => {
   p = p.replace(STENCIL_CORE_MODULE, '');
   return new URL('./' + p, getStencilRootUrl(compilerExe)).href;
 };
 
-export const getStencilInternalDtsUrl = (compilerExe: string) =>
-  getStencilModuleUrl(compilerExe, 'internal/index.d.ts');
+export const getStencilInternalDtsUrl = (compilerExe: string) => getStencilModuleUrl(compilerExe, 'internal/index.d.ts');
 
 export const getCommonDirUrl = (compilerExe: string, pkgVersions: Map<string, string>, dirPath: string, fileName: string) =>
-   getNodeModuleFetchUrl(compilerExe, pkgVersions, dirPath) + '/' + fileName;
+  getNodeModuleFetchUrl(compilerExe, pkgVersions, dirPath) + '/' + fileName;
 
 export const getNodeModuleFetchUrl = (compilerExe: string, pkgVersions: Map<string, string>, filePath: string) => {
   if (filePath.startsWith(STENCIL_CORE_MODULE)) {
@@ -26,7 +23,9 @@ export const getNodeModuleFetchUrl = (compilerExe: string, pkgVersions: Map<stri
   }
 
   // /node_modules/lodash/package.json
-  const pathParts = normalizePath(filePath).split('/').filter(p => p.length);
+  const pathParts = normalizePath(filePath)
+    .split('/')
+    .filter(p => p.length);
   // ["node_modules", "lodash", "package.json"]
 
   if (pathParts[0] === 'node_modules') {
@@ -38,18 +37,12 @@ export const getNodeModuleFetchUrl = (compilerExe: string, pkgVersions: Map<stri
   const checkScopedModule = `/${pathParts[0]}/${pathParts[1]}/`;
   const scopedPkgVersion = pkgVersions.get(checkScopedModule);
   if (scopedPkgVersion) {
-    urlPath = urlPath.replace(
-      checkScopedModule,
-      checkScopedModule.substring(0, checkScopedModule.length - 1) + '@' + scopedPkgVersion + '/'
-    );
+    urlPath = urlPath.replace(checkScopedModule, checkScopedModule.substring(0, checkScopedModule.length - 1) + '@' + scopedPkgVersion + '/');
   } else {
     const checkModule = `/${pathParts[0]}/`;
     const pkgVersion = pkgVersions.get(checkModule);
     if (pkgVersion) {
-      urlPath = urlPath.replace(
-        checkModule,
-        checkModule.substring(0, checkModule.length - 1) + '@' + pkgVersion + '/'
-      );
+      urlPath = urlPath.replace(checkModule, checkModule.substring(0, checkModule.length - 1) + '@' + pkgVersion + '/');
     }
   }
 
@@ -78,7 +71,7 @@ export const skipFilePathFetch = (filePath: string) => {
 
 export const skipUrlFetch = (url: string) =>
   // files we just already know not to try to resolve request
-  (knownUrlSkips.some(knownSkip => url.endsWith(knownSkip)));
+  knownUrlSkips.some(knownSkip => url.endsWith(knownSkip));
 
 const knownUrlSkips = [
   '/@stencil/core/internal.js',

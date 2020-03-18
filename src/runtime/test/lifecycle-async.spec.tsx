@@ -1,12 +1,9 @@
 import { Component, Prop, Watch } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('lifecycle async', () => {
-
   it('wait for componentWillLoad', async () => {
-
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       componentWillLoad() {
         return new Promise(resolve => {
@@ -24,17 +21,13 @@ describe('lifecycle async', () => {
       html: `<cmp-a></cmp-a>`,
     });
 
-    expect(root.textContent).toBe(
-      'Loaded'
-    );
+    expect(root.textContent).toBe('Loaded');
   });
 
   it('fire lifecycle methods', async () => {
-
     let log = '';
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
-
       @Prop() prop = 0;
       @Watch('prop')
       propDidChange() {
@@ -99,20 +92,13 @@ describe('lifecycle async', () => {
       html: `<cmp-a></cmp-a>`,
     });
 
-    expect(root.textContent).toBe(
-      'connectedCallback componentWillLoad componentWillRender render'
-    );
-    expect(log.trim()).toEqual(
-      'connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad'
-    );
+    expect(root.textContent).toBe('connectedCallback componentWillLoad componentWillRender render');
+    expect(log.trim()).toEqual('connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad');
 
     log = '';
     root.prop = 1;
     await waitForChanges();
 
-    expect(log.trim()).toBe(
-      'propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate'
-    );
+    expect(log.trim()).toBe('propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate');
   });
-
 });

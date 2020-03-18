@@ -1,13 +1,9 @@
 import * as d from '@stencil/core/internal';
 
-
 export function buildJestArgv(config: d.Config) {
   const yargs = require('yargs');
 
-  const args = [
-    ...config.flags.unknownArgs.slice(),
-    ...config.flags.knownArgs.slice()
-  ];
+  const args = [...config.flags.unknownArgs.slice(), ...config.flags.knownArgs.slice()];
 
   if (!args.some(a => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
     args.push(`--max-workers=${config.maxConcurrentWorkers}`);
@@ -30,12 +26,11 @@ export function buildJestArgv(config: d.Config) {
   }
 
   if (typeof jestArgv.ci === 'string') {
-    jestArgv.ci = (jestArgv.ci === 'true' || jestArgv.ci === '');
+    jestArgv.ci = jestArgv.ci === 'true' || jestArgv.ci === '';
   }
 
   return jestArgv;
 }
-
 
 export function buildJestConfig(config: d.Config) {
   const jestDefaults = require('jest-config').defaults;
@@ -58,7 +53,6 @@ export function buildJestConfig(config: d.Config) {
 
   return JSON.stringify(jestConfig);
 }
-
 
 export function getProjectListFromCLIArgs(config: d.Config, argv: d.JestArgv) {
   const projects = argv.projects ? argv.projects : [];

@@ -1,9 +1,7 @@
 import { Component, Host, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('hydrate, shadow in shadow', () => {
-
   it('nested cmp-b w/ shadow/slot, root level text', async () => {
     @Component({ tag: 'cmp-a', shadow: true })
     class CmpA {
@@ -31,7 +29,7 @@ describe('hydrate, shadow in shadow', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a>light-dom</cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -103,7 +101,7 @@ describe('hydrate, shadow in shadow', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -166,7 +164,7 @@ describe('hydrate, shadow in shadow', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -225,7 +223,7 @@ describe('hydrate, shadow in shadow', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -285,7 +283,7 @@ describe('hydrate, shadow in shadow', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -305,7 +303,7 @@ describe('hydrate, shadow in shadow', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
 
     expect(clientHydrated.root).toEqualHtml(`
@@ -349,7 +347,7 @@ describe('hydrate, shadow in shadow', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -415,7 +413,7 @@ describe('hydrate, shadow in shadow', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -436,7 +434,7 @@ describe('hydrate, shadow in shadow', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
 
     expect(clientHydrated.root).toEqualHtml(`
@@ -454,5 +452,4 @@ describe('hydrate, shadow in shadow', () => {
       </cmp-a>
     `);
   });
-
 });

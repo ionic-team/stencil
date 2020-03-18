@@ -2,7 +2,6 @@ import { MockDocument } from '../document';
 import { MockClassList } from '../class-list';
 import { MockElement } from '../node';
 
-
 describe('class-list', () => {
   let classList: MockClassList;
   beforeEach(() => {

@@ -9,7 +9,6 @@ import { runTsProgram } from '../transpile/run-program';
 import { writeBuild } from './write-build';
 import ts from 'typescript';
 
-
 export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
   try {
     // reset process.cwd() for 3rd-party plugins
@@ -52,7 +51,6 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
     await buildCtx.stylesPromise;
     await writeBuild(config, compilerCtx, buildCtx);
     // await copyPromise;
-
   } catch (e) {
     // ¯\_(ツ)_/¯
     catchError(buildCtx.diagnostics, e);

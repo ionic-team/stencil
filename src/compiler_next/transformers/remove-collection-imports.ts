@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import ts from 'typescript';
 
-
 export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> => {
   /*
     // remove side effect collection imports like:
@@ -12,7 +11,7 @@ export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.Transfor
     import { asdf } '@ionic/core';
   */
   return () => {
-    return (tsSourceFile) => {
+    return tsSourceFile => {
       let madeUpdates = false;
       const statements = tsSourceFile.statements.slice();
 

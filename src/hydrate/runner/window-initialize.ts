@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { renderCatchError } from './render-utils';
 import { constrainTimeouts } from '@stencil/core/mock-doc';
 
-
 export function initializeWindow(win: Window, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
   try {
     win.location.href = opts.url;
@@ -54,7 +53,6 @@ export function initializeWindow(win: Window, opts: d.HydrateDocumentOptions, re
       diagnostic.level = 'debug';
       diagnostic.messageText = 'Hydrate Debug';
     };
-
   } catch (e) {
     renderCatchError(results, e);
   }

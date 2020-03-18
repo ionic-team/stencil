@@ -1,5 +1,3 @@
-
-
 export const relocateMetaCharset = (doc: Document) => {
   const head = doc.head;
 
@@ -8,7 +6,6 @@ export const relocateMetaCharset = (doc: Document) => {
     // doesn't have <meta charset>, so create it
     charsetElm = doc.createElement('meta');
     charsetElm.setAttribute('charset', 'utf-8');
-
   } else {
     // take the current one out of its existing location
     charsetElm.remove();

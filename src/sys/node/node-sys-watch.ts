@@ -4,7 +4,6 @@ import { createNodeSys } from './node-sys';
 import { normalizePath } from '@utils';
 import tsTypes from 'typescript';
 
-
 export function createNodeSysWithWatch(prcs: NodeJS.Process): CompilerSystem {
   const ts = require('typescript') as typeof tsTypes;
   const sys = createNodeSys(prcs);
@@ -15,10 +14,14 @@ export function createNodeSysWithWatch(prcs: NodeJS.Process): CompilerSystem {
   sys.events = buildEvents();
 
   sys.watchDirectory = (p, callback, recursive) => {
-    const tsFileWatcher = tsWatchDirectory(p, (fileName) => {
-      fileName = normalizePath(fileName);
-      callback(fileName, null);
-    }, recursive);
+    const tsFileWatcher = tsWatchDirectory(
+      p,
+      fileName => {
+        fileName = normalizePath(fileName);
+        callback(fileName, null);
+      },
+      recursive,
+    );
 
     const close = () => {
       tsFileWatcher.close();
@@ -30,7 +33,7 @@ export function createNodeSysWithWatch(prcs: NodeJS.Process): CompilerSystem {
       close() {
         sys.removeDestory(close);
         tsFileWatcher.close();
-      }
+      },
     };
   };
 
@@ -58,7 +61,7 @@ export function createNodeSysWithWatch(prcs: NodeJS.Process): CompilerSystem {
       close() {
         sys.removeDestory(close);
         tsFileWatcher.close();
-      }
+      },
     };
   };
 

@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 
-
 export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]) => {
   const normalizedErrors: d.Diagnostic[] = [];
   const normalizedOthers: d.Diagnostic[] = [];
@@ -23,18 +22,13 @@ export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: d.
     }
   }
 
-  return [
-    ...normalizedErrors,
-    ...normalizedOthers
-  ];
+  return [...normalizedErrors, ...normalizedOthers];
 };
-
 
 const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnostic) => {
   if (diagnostic.messageText) {
     if (typeof (<any>diagnostic.messageText).message === 'string') {
       diagnostic.messageText = (<any>diagnostic.messageText).message;
-
     } else if (typeof diagnostic.messageText === 'string' && diagnostic.messageText.indexOf('Error: ') === 0) {
       diagnostic.messageText = diagnostic.messageText.substr(7);
     }
@@ -60,7 +54,7 @@ const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
                 lineNumber: beforeLineIndex + 1,
                 text: srcLines[beforeLineIndex],
                 errorCharStart: -1,
-                errorLength: -1
+                errorLength: -1,
               };
               msgLines.push(beforeLine);
             }
@@ -70,7 +64,7 @@ const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
               lineNumber: i + 1,
               text: srcLine,
               errorCharStart: 0,
-              errorLength: -1
+              errorLength: -1,
             };
             msgLines.push(errorLine);
             diagnostic.lineNumber = errorLine.lineNumber;
@@ -83,7 +77,7 @@ const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
                 lineNumber: afterLineIndex + 1,
                 text: srcLines[afterLineIndex],
                 errorCharStart: -1,
-                errorLength: -1
+                errorLength: -1,
               };
               msgLines.push(afterLine);
             }
@@ -99,13 +93,11 @@ const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
   return diagnostic;
 };
 
-
 export const splitLineBreaks = (sourceText: string) => {
   if (typeof sourceText !== 'string') return [];
   sourceText = sourceText.replace(/\\r/g, '\n');
   return sourceText.split('\n');
 };
-
 
 export const escapeHtml = (unsafe: any) => {
   if (unsafe === undefined) return 'undefined';
@@ -116,12 +108,11 @@ export const escapeHtml = (unsafe: any) => {
   }
 
   return unsafe
-         .replace(/&/g, '&amp;')
-         .replace(/</g, '&lt;')
-         .replace(/>/g, '&gt;')
-         .replace(/"/g, '&quot;')
-         .replace(/'/g, '&#039;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 };
-
 
 export const MAX_ERRORS = 25;

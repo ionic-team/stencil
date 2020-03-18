@@ -46,7 +46,6 @@ describe('compiler', () => {
     });
 
     it('should work with fallback + nested var + calc (2)', () => {
-
       const css = `var(--font, calc(var(--ion-font, 0px) + 12px))`;
       const var1 = parseVar(css, 0);
       expect(var1.fallback).toBe('calc(var(--ion-font, 0px) + 12px)');
@@ -93,7 +92,7 @@ describe('compiler', () => {
         --color: 12px}
     `);
 
-    expect(executeTemplate(template, {})).toEqual(`
+      expect(executeTemplate(template, {})).toEqual(`
       .class {
         font-size: calc(0px + 12px);
       }
@@ -107,10 +106,12 @@ describe('compiler', () => {
         }
     `);
 
-    expect(executeTemplate(template, {
-      '--ion-font2': '100px',
-      '--font2': '200px',
-    })).toEqual(`
+      expect(
+        executeTemplate(template, {
+          '--ion-font2': '100px',
+          '--font2': '200px',
+        }),
+      ).toEqual(`
       .class {
         font-size: calc(0px + 12px);
       }
@@ -136,9 +137,9 @@ describe('compiler', () => {
       compileVar(css, segments, 0);
 
       expect(segments[1]({})).toEqual(`calc(0px, 1px + 12px)`);
-      expect(segments[1]({'--ion-font': '10px'})).toEqual(`calc(10px + 12px)`);
-      expect(segments[1]({'--font': '11px'})).toEqual(`11px`);
-      expect(segments[1]({'--font': '0', '--ion-font': '11px'})).toEqual(`0`);
+      expect(segments[1]({ '--ion-font': '10px' })).toEqual(`calc(10px + 12px)`);
+      expect(segments[1]({ '--font': '11px' })).toEqual(`11px`);
+      expect(segments[1]({ '--font': '0', '--ion-font': '11px' })).toEqual(`0`);
     });
     it('should work compile vars step by step', () => {
       const css = `
@@ -154,8 +155,7 @@ describe('compiler', () => {
       expect(segments[0]).toBe(`
 .class {
   color: `);
-      expect(segments[1]({'--color': 'hola'})).toBe(`hola`);
-
+      expect(segments[1]({ '--color': 'hola' })).toBe(`hola`);
 
       // STEP 2
       index = compileVar(css, segments, index);
@@ -166,7 +166,7 @@ describe('compiler', () => {
       // STEP 3
       index = compileVar(css, segments, index);
       expect(segments[4]).toBe(' ');
-      expect(segments[5]({'--font': 'sans'})).toBe('sans');
+      expect(segments[5]({ '--font': 'sans' })).toBe('sans');
 
       // STEP 4
       index = compileVar(css, segments, index);
@@ -176,4 +176,3 @@ describe('compiler', () => {
     });
   });
 });
-

@@ -1,40 +1,36 @@
 import * as d from '@stencil/core/declarations';
 import { validateRollupConfig } from '../validate-rollup-config';
 
-
 describe('validateStats', () => {
-
   let config: d.Config;
 
   beforeEach(() => {
     config = {};
   });
 
-
   it('should use default if no config provided', () => {
-
     validateRollupConfig(config);
     expect(config).toEqual({
       rollupConfig: {
         inputOptions: {},
-        outputOptions: {}
-      }
+        outputOptions: {},
+      },
     });
   });
   it('should use default if inputOptions is not provided but outputOptions is', () => {
     config.rollupConfig = {
       inputOptions: {
-        context: 'window'
-      }
+        context: 'window',
+      },
     };
     validateRollupConfig(config);
     expect(config).toEqual({
       rollupConfig: {
         inputOptions: {
-          context: 'window'
+          context: 'window',
         },
-        outputOptions: {}
-      }
+        outputOptions: {},
+      },
     });
   });
 
@@ -42,9 +38,9 @@ describe('validateStats', () => {
     config.rollupConfig = {
       outputOptions: {
         globals: {
-          jquery: '$'
-        }
-      }
+          jquery: '$',
+        },
+      },
     };
 
     validateRollupConfig(config);
@@ -53,10 +49,10 @@ describe('validateStats', () => {
         inputOptions: {},
         outputOptions: {
           globals: {
-            jquery: '$'
-          }
-        }
-      }
+            jquery: '$',
+          },
+        },
+      },
     });
   });
 
@@ -64,27 +60,27 @@ describe('validateStats', () => {
     config.rollupConfig = {
       inputOptions: {
         context: 'window',
-        notAnOption: {}
+        notAnOption: {},
       },
       outputOptions: {
         globals: {
-          jquery: '$'
-        }
-      }
+          jquery: '$',
+        },
+      },
     } as d.RollupConfig;
 
     validateRollupConfig(config);
     expect(config).toEqual({
       rollupConfig: {
         inputOptions: {
-          context: 'window'
+          context: 'window',
         },
         outputOptions: {
           globals: {
-            jquery: '$'
-          }
-        }
-      }
+            jquery: '$',
+          },
+        },
+      },
     });
   });
 });

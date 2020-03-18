@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { join } from 'path';
 
-
 export const inlineStyleSheets = (compilerCtx: d.CompilerCtx, doc: Document, maxSize: number, outputTarget: d.OutputTargetWww) => {
   const globalLinks = Array.from(doc.querySelectorAll('link[rel=stylesheet]')) as HTMLLinkElement[];
   return Promise.all(
@@ -24,6 +23,6 @@ export const inlineStyleSheets = (compilerCtx: d.CompilerCtx, doc: Document, max
         link.parentNode.insertBefore(inlinedStyles, link);
         link.remove();
       } catch (e) {}
-    })
+    }),
   );
 };

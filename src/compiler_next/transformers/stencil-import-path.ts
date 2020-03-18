@@ -2,7 +2,6 @@ import { ImportData, ParsedImport, SerializeImportData } from '../../declaration
 import { basename, dirname, isAbsolute, relative } from 'path';
 import { DEFAULT_STYLE_MODE, isString, normalizePath } from '@utils';
 
-
 export const serializeImportPath = (data: SerializeImportData) => {
   let p = data.importeePath;
 

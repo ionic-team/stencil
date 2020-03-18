@@ -1,6 +1,5 @@
 import { CompilerWorkerContext, WorkerMainController } from '../../declarations';
 
-
 export const createWorkerMainContext = (workerCtrl: WorkerMainController): CompilerWorkerContext => {
   return {
     compileModule: workerCtrl.handler('compileModule'),

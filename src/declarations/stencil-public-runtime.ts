@@ -1,4 +1,3 @@
-
 declare type CustomMethodDecorator<T> = (target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
 
 export interface ComponentDecorator {
@@ -257,12 +256,12 @@ export declare const Watch: WatchDecorator;
 /**
  * `setMode()` is used for libraries which provide multiple "modes" for styles.
  */
-export declare const setMode: (handler: ((elm: HTMLElement) => string | undefined | null)) => void;
+export declare const setMode: (handler: (elm: HTMLElement) => string | undefined | null) => void;
 
 /**
  * getMode
  */
-export declare function getMode<T = (string | undefined)>(ref: any): T;
+export declare function getMode<T = string | undefined>(ref: any): T;
 
 /**
  * getAssetPath
@@ -426,7 +425,7 @@ export interface ComponentInterface {
 }
 
 // General types important to applications using stencil built components
-export interface EventEmitter<T= any> {
+export interface EventEmitter<T = any> {
   emit: (data?: T) => CustomEvent<T>;
 }
 
@@ -512,11 +511,10 @@ export interface VNode {
 }
 
 export interface VNodeData {
-  class?: {[className: string]: boolean};
+  class?: { [className: string]: boolean };
   style?: any;
   [attrName: string]: any;
 }
-
 
 declare namespace LocalJSX {
   export interface Element {}
@@ -641,10 +639,9 @@ export namespace JSXBase {
     track: JSXBase.TrackHTMLAttributes<HTMLTrackElement>;
     u: JSXBase.HTMLAttributes;
     ul: JSXBase.HTMLAttributes<HTMLUListElement>;
-    'var': JSXBase.HTMLAttributes;
+    var: JSXBase.HTMLAttributes;
     video: JSXBase.VideoHTMLAttributes<HTMLVideoElement>;
     wbr: JSXBase.HTMLAttributes;
-
 
     // SVG
     animate: JSXBase.SVGAttributes;
@@ -1259,31 +1256,43 @@ export namespace JSXBase {
   export interface SVGAttributes<T = SVGElement> extends DOMAttributes<T> {
     // Attributes which also defined in HTMLAttributes
     // See comment in SVGDOMPropertyConfig.js
-    class?: string | { [className: string]: boolean };
-    color?: string;
-    height?: number | string;
-    id?: string;
-    lang?: string;
-    max?: number | string;
-    media?: string;
-    method?: string;
-    min?: number | string;
-    name?: string;
-    style?: { [key: string]: string | undefined };
-    target?: string;
-    type?: string;
-    width?: number | string;
+    'class'?: string | { [className: string]: boolean };
+    'color'?: string;
+    'height'?: number | string;
+    'id'?: string;
+    'lang'?: string;
+    'max'?: number | string;
+    'media'?: string;
+    'method'?: string;
+    'min'?: number | string;
+    'name'?: string;
+    'style'?: { [key: string]: string | undefined };
+    'target'?: string;
+    'type'?: string;
+    'width'?: number | string;
 
     // Other HTML properties supported by SVG elements in browsers
-    role?: string;
-    tabindex?: number;
+    'role'?: string;
+    'tabindex'?: number;
 
     // SVG Specific attributes
     'accent-height'?: number | string;
     'accumulate'?: 'none' | 'sum';
     'additive'?: 'replace' | 'sum';
-    'alignment-baseline'?: 'auto' | 'baseline' | 'before-edge' | 'text-before-edge' | 'middle' | 'central' | 'after-edge' |
-    'text-after-edge' | 'ideographic' | 'alphabetic' | 'hanging' | 'mathematical' | 'inherit';
+    'alignment-baseline'?:
+      | 'auto'
+      | 'baseline'
+      | 'before-edge'
+      | 'text-before-edge'
+      | 'middle'
+      | 'central'
+      | 'after-edge'
+      | 'text-after-edge'
+      | 'ideographic'
+      | 'alphabetic'
+      | 'hanging'
+      | 'mathematical'
+      | 'inherit';
     'allow-reorder'?: 'no' | 'yes';
     'alphabetic'?: number | string;
     'amplitude'?: number | string;

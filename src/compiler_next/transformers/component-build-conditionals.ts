@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
 
-
 export const setComponentBuildConditionals = (cmpMeta: d.ComponentCompilerMeta) => {
   if (cmpMeta.properties.length > 0) {
     cmpMeta.hasProp = true;
@@ -38,13 +37,20 @@ export const setComponentBuildConditionals = (cmpMeta: d.ComponentCompilerMeta) 
     cmpMeta.hasListenerTarget = cmpMeta.listeners.some(l => !!l.target);
   }
 
-  cmpMeta.hasMember = (cmpMeta.hasProp || cmpMeta.hasState || cmpMeta.hasElement || cmpMeta.hasMethod);
+  cmpMeta.hasMember = cmpMeta.hasProp || cmpMeta.hasState || cmpMeta.hasElement || cmpMeta.hasMethod;
 
-  cmpMeta.isUpdateable = (cmpMeta.hasProp || cmpMeta.hasState);
+  cmpMeta.isUpdateable = cmpMeta.hasProp || cmpMeta.hasState;
   if (cmpMeta.styles.length > 0) {
     cmpMeta.hasStyle = true;
     cmpMeta.hasMode = cmpMeta.styles.some(s => s.modeName !== DEFAULT_STYLE_MODE);
   }
-  cmpMeta.hasLifecycle = (cmpMeta.hasComponentWillLoadFn || cmpMeta.hasComponentDidLoadFn || cmpMeta.hasComponentShouldUpdateFn || cmpMeta.hasComponentWillUpdateFn || cmpMeta.hasComponentDidUpdateFn || cmpMeta.hasComponentWillRenderFn || cmpMeta.hasComponentDidRenderFn);
+  cmpMeta.hasLifecycle =
+    cmpMeta.hasComponentWillLoadFn ||
+    cmpMeta.hasComponentDidLoadFn ||
+    cmpMeta.hasComponentShouldUpdateFn ||
+    cmpMeta.hasComponentWillUpdateFn ||
+    cmpMeta.hasComponentDidUpdateFn ||
+    cmpMeta.hasComponentWillRenderFn ||
+    cmpMeta.hasComponentDidRenderFn;
   cmpMeta.isPlain = !cmpMeta.hasMember && !cmpMeta.hasStyle && !cmpMeta.hasLifecycle && !cmpMeta.hasListener && !cmpMeta.hasVdomRender;
 };

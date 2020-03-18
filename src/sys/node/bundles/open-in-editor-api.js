@@ -1,4 +1,3 @@
-
 var openInEditor = require('open-in-editor');
 
 exports.configure = openInEditor.configure;

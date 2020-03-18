@@ -5,10 +5,8 @@ import { isOutputTargetDocs } from '../output-targets/output-utils';
 import { parseCssImports } from '../style/css-imports';
 import { PluginCtx, PluginTransformResults } from '../../declarations';
 
-
 export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string) => {
   for (const plugin of pluginCtx.config.plugins) {
-
     if (isFunction(plugin.resolveId)) {
       try {
         const results = plugin.resolveId(importee, null, pluginCtx);
@@ -19,12 +17,10 @@ export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string)
             if (promiseResults != null) {
               return promiseResults as string;
             }
-
           } else if (isString(results)) {
             return results;
           }
         }
-
       } catch (e) {
         catchError(pluginCtx.diagnostics, e);
       }
@@ -37,7 +33,6 @@ export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string)
 
 export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
   for (const plugin of pluginCtx.config.plugins) {
-
     if (isFunction(plugin.load)) {
       try {
         const results = plugin.load(id, pluginCtx);
@@ -48,12 +43,10 @@ export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
             if (promiseResults != null) {
               return promiseResults as string;
             }
-
           } else if (isString(results)) {
             return results;
           }
         }
-
       } catch (e) {
         catchError(pluginCtx.diagnostics, e);
       }
@@ -70,7 +63,7 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
     sys: config.sys,
     fs: compilerCtx.fs,
     cache: compilerCtx.cache,
-    diagnostics: []
+    diagnostics: [],
   };
 
   const resolvedId = await runPluginResolveId(pluginCtx, id);
@@ -84,11 +77,11 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
 
   const transformResults: PluginTransformResults = {
     code: sourceText,
-    id: id
+    id: id,
   };
 
   const isRawCssFile = transformResults.id.toLowerCase().endsWith('.css');
-  const shouldParseCssDocs = (cmp != null && config.outputTargets.some(isOutputTargetDocs));
+  const shouldParseCssDocs = cmp != null && config.outputTargets.some(isOutputTargetDocs);
 
   if (isRawCssFile) {
     // concat all css @imports into one file
@@ -97,14 +90,12 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
     if (shouldParseCssDocs && cmp != null) {
       cmp.styleDocs = cmp.styleDocs || [];
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code, cmp.styleDocs);
-
     } else {
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code);
     }
   }
 
   for (const plugin of pluginCtx.config.plugins) {
-
     if (isFunction(plugin.transform)) {
       try {
         let pluginTransformResults: PluginTransformResults | string;
@@ -113,7 +104,6 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
         if (results != null) {
           if (isFunction((results as any).then)) {
             pluginTransformResults = await results;
-
           } else {
             pluginTransformResults = results as PluginTransformResults;
           }
@@ -121,7 +111,6 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
           if (pluginTransformResults != null) {
             if (isString(pluginTransformResults)) {
               transformResults.code = pluginTransformResults;
-
             } else {
               if (isString(pluginTransformResults.code)) {
                 transformResults.code = pluginTransformResults.code;
@@ -132,7 +121,6 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
             }
           }
         }
-
       } catch (e) {
         catchError(buildCtx.diagnostics, e);
       }
@@ -150,7 +138,6 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
     if (shouldParseCssDocs && cmp != null) {
       cmp.styleDocs = cmp.styleDocs || [];
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code, cmp.styleDocs);
-
     } else {
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code);
     }
@@ -165,7 +152,7 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
     sys: config.sys,
     fs: compilerCtx.fs,
     cache: compilerCtx.cache,
-    diagnostics: []
+    diagnostics: [],
   };
 
   const transformResults: PluginTransformResults = {
@@ -173,11 +160,10 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
     id,
     map: null,
     diagnostics: [],
-    dependencies: []
+    dependencies: [],
   };
 
   for (const plugin of pluginCtx.config.plugins) {
-
     if (isFunction(plugin.transform)) {
       try {
         let pluginTransformResults: PluginTransformResults | string;
@@ -185,7 +171,6 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
         if (results != null) {
           if (isFunction((results as any).then)) {
             pluginTransformResults = await results;
-
           } else {
             pluginTransformResults = results as PluginTransformResults;
           }
@@ -193,7 +178,6 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
           if (pluginTransformResults != null) {
             if (isString(pluginTransformResults)) {
               transformResults.code = pluginTransformResults as string;
-
             } else {
               if (isString(pluginTransformResults.code)) {
                 transformResults.code = pluginTransformResults.code;
@@ -207,7 +191,6 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
             }
           }
         }
-
       } catch (e) {
         catchError(transformResults.diagnostics, e);
       }

@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { getTextDocs, isDocsPublic } from '@utils';
 
-
 export const generateMethodTypes = (cmpMethods: d.ComponentCompilerMethod[]): d.TypeInfo => {
   return cmpMethods.map(cmpMethod => ({
     name: cmpMethod.name,

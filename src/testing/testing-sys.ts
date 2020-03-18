@@ -51,7 +51,7 @@ export const createTestingSystem = (): TestingSystem => {
       },
       set(val: number) {
         diskReads = val;
-      }
+      },
     },
     diskWrites: {
       get() {
@@ -59,7 +59,7 @@ export const createTestingSystem = (): TestingSystem => {
       },
       set(val: number) {
         diskWrites = val;
-      }
-    }
+      },
+    },
   });
 };

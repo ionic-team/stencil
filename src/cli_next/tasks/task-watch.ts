@@ -3,7 +3,6 @@ import { checkVersion } from './task-version';
 import { startupLog } from './startup-log';
 import exit from 'exit';
 
-
 export async function taskWatch(prcs: NodeJS.Process, config: d.Config) {
   startupLog(prcs, config);
 
@@ -33,7 +32,6 @@ export async function taskWatch(prcs: NodeJS.Process, config: d.Config) {
     if (closeResults.exitCode > 0) {
       exitCode = closeResults.exitCode;
     }
-
   } catch (e) {
     exitCode = 1;
     config.logger.error(e);

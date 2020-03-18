@@ -1,4 +1,3 @@
-
 export const getUsedSelectors = (elm: Element) => {
   const usedSelectors: UsedSelectors = {
     attrs: new Set(),
@@ -12,7 +11,6 @@ export const getUsedSelectors = (elm: Element) => {
 
 const collectUsedSelectors = (usedSelectors: UsedSelectors, elm: Element) => {
   if (elm != null && elm.nodeType === 1) {
-
     // tags
     const children = elm.children;
     const tagName = elm.nodeName.toLowerCase();
@@ -32,7 +30,6 @@ const collectUsedSelectors = (usedSelectors: UsedSelectors, elm: Element) => {
         for (let i = 0, l = classList.length; i < l; i++) {
           usedSelectors.classNames.add(classList.item(i));
         }
-
       } else if (attrName === 'id') {
         // ids
         usedSelectors.ids.add(attr.value);

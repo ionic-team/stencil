@@ -1,7 +1,6 @@
 import * as d from '../../../declarations';
 import { MarkdownTable } from './docs-util';
 
-
 export const methodsToMarkdown = (methods: d.JsonDocsMethod[]) => {
   const content: string[] = [];
   if (methods.length === 0) {
@@ -45,11 +44,8 @@ export const methodsToMarkdown = (methods: d.JsonDocsMethod[]) => {
   content.push(``);
 
   return content;
-}
+};
 
 const getDocsField = (prop: d.JsonDocsMethod) => {
-  return `${prop.deprecation !== undefined
-    ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
-    : ''
-  }${prop.docs}`;
+  return `${prop.deprecation !== undefined ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>` : ''}${prop.docs}`;
 };

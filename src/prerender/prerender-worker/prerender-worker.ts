@@ -9,17 +9,15 @@ import fs from 'graceful-fs';
 import path from 'path';
 import { URL } from 'url';
 
-
 let componentGraph: Map<string, string[]>;
 let templateHtml: string = null;
-
 
 export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   // worker thread!
   const results: d.PrerenderResults = {
     diagnostics: [],
     anchorUrls: [],
-    filePath: prerenderRequest.writeToFilePath
+    filePath: prerenderRequest.writeToFilePath,
   };
 
   try {
@@ -43,10 +41,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     patchNodeGlobal(global, prerenderRequest.devServerHostUrl);
     patchWindowGlobal(global, win);
 
-    const prerenderConfig = getPrerenderConfig(
-      results.diagnostics,
-      prerenderRequest.prerenderConfigPath
-    );
+    const prerenderConfig = getPrerenderConfig(results.diagnostics, prerenderRequest.prerenderConfigPath);
 
     const hydrateOpts = getHydrateOptions(prerenderConfig, url, results.diagnostics);
 
@@ -63,7 +58,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html
-    const hydrateResults = await hydrateApp.hydrateDocument(doc, hydrateOpts) as d.HydrateResults;
+    const hydrateResults = (await hydrateApp.hydrateDocument(doc, hydrateOpts)) as d.HydrateResults;
     results.diagnostics.push(...hydrateResults.diagnostics);
 
     if (hydrateOpts.addModulePreloads && !prerenderRequest.isDebug) {
@@ -117,7 +112,6 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     try {
       win.close();
     } catch (e) {}
-
   } catch (e) {
     // ahh man! what happened!
     catchError(results.diagnostics, e);
@@ -174,19 +168,16 @@ function getComponentGraph(componentGraphPath: string) {
   }
   if (componentGraph == null) {
     const componentGraphJson = JSON.parse(fs.readFileSync(componentGraphPath, 'utf8'));
-    componentGraph = new Map<string, string[]>(
-      Object.entries(componentGraphJson)
-    );
+    componentGraph = new Map<string, string[]>(Object.entries(componentGraphJson));
   }
   return componentGraph;
 }
-
 
 function initPrerenderWorker(prcs: NodeJS.Process) {
   if (prcs.argv.includes('stencil-cli-worker')) {
     // cmd line arg used to start the worker
     // and attached a message handler to the process
-    initNodeWorkerThread(prcs, (msgFromMain) => {
+    initNodeWorkerThread(prcs, msgFromMain => {
       const fnName: string = msgFromMain.args[0];
       const fnArgs = msgFromMain.args.slice(1);
 

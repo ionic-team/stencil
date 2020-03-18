@@ -2,14 +2,12 @@ import * as d from '../../declarations';
 import { generateServiceWorkerUrl } from '../service-worker/service-worker-util';
 import { UNREGISTER_SW, getRegisterSW } from '../service-worker/generate-sw';
 
-
 export const updateIndexHtmlServiceWorker = async (config: d.Config, buildCtx: d.BuildCtx, doc: Document, outputTarget: d.OutputTargetWww) => {
   const serviceWorker = outputTarget.serviceWorker;
 
   if (serviceWorker !== false) {
     if ((serviceWorker && serviceWorker.unregister) || (!serviceWorker && config.devMode)) {
       injectUnregisterServiceWorker(doc);
-
     } else if (serviceWorker) {
       await injectRegisterServiceWorker(buildCtx, outputTarget, doc);
     }

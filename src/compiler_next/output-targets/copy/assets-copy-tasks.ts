@@ -2,7 +2,6 @@ import * as d from '../../../declarations';
 import { dirname, join, relative } from 'path';
 import { normalizePath } from '@utils';
 
-
 export const getComponentAssetsCopyTasks = (config: d.Config, buildCtx: d.BuildCtx, dest: string, collectionsPath: boolean) => {
   if (!dest) {
     return [];
@@ -27,10 +26,7 @@ export const getComponentAssetsCopyTasks = (config: d.Config, buildCtx: d.BuildC
         });
       } else if (!cmp.excludeFromCollection && !cmp.isCollectionDependency) {
         cmp.assetsDirs.forEach(assetsMeta => {
-          const collectionDirDestination = join(
-            dest,
-            relative(config.srcDir, assetsMeta.absolutePath)
-          );
+          const collectionDirDestination = join(dest, relative(config.srcDir, assetsMeta.absolutePath));
           copyTasks.push({
             src: assetsMeta.absolutePath,
             dest: collectionDirDestination,
@@ -65,7 +61,6 @@ export const canSkipAssetsCopy = (compilerCtx: d.CompilerCtx, entryModules: d.En
     entryModules.forEach(entryModule => {
       entryModule.cmps.forEach(cmp => {
         if (cmp.assetsDirs != null) {
-
           // loop through each of the asset directories of each component
           cmp.assetsDirs.forEach(assetsDir => {
             // get the absolute of the asset directory
@@ -81,7 +76,6 @@ export const canSkipAssetsCopy = (compilerCtx: d.CompilerCtx, entryModules: d.En
         }
       });
     });
-
   });
 
   return shouldSkipAssetsCopy;

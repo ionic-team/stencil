@@ -9,9 +9,7 @@ import { getScopeId, registerStyle } from './styles';
 import { PROXY_FLAGS } from './runtime-constants';
 import { createTime, uniqueTime } from './profile';
 
-
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: any) => {
-
   // initializeComponent
   if ((BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.style) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
     // we haven't initialized this element yet
@@ -35,10 +33,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       Cstr = loadModule(cmpMeta, hostRef, hmrVersionId);
       if (Cstr.then) {
         // Await creates a micro-task avoid if possible
-        const endLoad = uniqueTime(
-          `st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`,
-          `[Stencil] Load module for <${cmpMeta.$tagName$}>`
-        );
+        const endLoad = uniqueTime(`st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`, `[Stencil] Load module for <${cmpMeta.$tagName$}>`);
         Cstr = await Cstr;
         endLoad();
       }
@@ -81,7 +76,6 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       }
       endNewInstance();
       fireConnectedCallback(hostRef.$lazyInstance$);
-
     } else {
       Cstr = elm.constructor as any;
     }
@@ -118,7 +112,6 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     // finally gets around to rendering its lazy self
     // fire off the initial update
     ancestorComponent['s-rc'].push(schedule);
-
   } else {
     schedule();
   }

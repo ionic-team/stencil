@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { isAbsolute, join } from 'path';
 import { normalizePath } from '@utils';
 
-
 export const validatePaths = (config: d.Config) => {
   if (typeof config.rootDir !== 'string') {
     config.rootDir = '/';
@@ -25,7 +24,7 @@ export const validatePaths = (config: d.Config) => {
   config.cacheDir = normalizePath(config.cacheDir);
 
   if (typeof config.srcIndexHtml !== 'string') {
-    config.srcIndexHtml =  normalizePath(join(config.srcDir, DEFAULT_INDEX_HTML));
+    config.srcIndexHtml = normalizePath(join(config.srcDir, DEFAULT_INDEX_HTML));
   }
   if (!isAbsolute(config.srcIndexHtml)) {
     config.srcIndexHtml = join(config.rootDir, config.srcIndexHtml);

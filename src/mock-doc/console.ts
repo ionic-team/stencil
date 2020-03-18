@@ -1,4 +1,6 @@
-const consoleNoop = () => {/**/};
+const consoleNoop = () => {
+  /**/
+};
 
 export function createConsole(): any {
   return {
@@ -25,6 +27,6 @@ export function createConsole(): any {
     timeEnd: consoleNoop,
     timeStamp: consoleNoop,
     context: consoleNoop,
-    memory: consoleNoop
+    memory: consoleNoop,
   };
 }

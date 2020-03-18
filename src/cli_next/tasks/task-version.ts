@@ -6,10 +6,8 @@ import os from 'os';
 import path from 'path';
 import semiver from 'semiver';
 
-
 const REGISTRY_URL = `https://registry.npmjs.org/@stencil/core`;
-const CHECK_INTERVAL = (1000 * 60 * 60 * 24 * 7);
-
+const CHECK_INTERVAL = 1000 * 60 * 60 * 24 * 7;
 
 export async function taskVersion() {
   const { version } = await import('@stencil/core/compiler');
@@ -24,13 +22,11 @@ export async function checkVersion(config: d.Config, currentVersion: string): Pr
         return () => {
           if (semiver(currentVersion, latestVersion) < 0) {
             printUpdateMessage(config.logger, currentVersion, latestVersion);
-
           } else {
             console.debug(`${config.logger.cyan('@stencil/core')} version ${config.logger.green(currentVersion)} is the latest version`);
           }
         };
       }
-
     } catch (e) {
       config.logger.debug(`unable to load latest compiler version: ${e}`);
     }
@@ -62,7 +58,6 @@ async function getLatestCompilerVersion(config: d.Config) {
     await setPromise;
 
     return data['dist-tags'].latest;
-
   } catch (e) {
     // quietly catch, could have no network connection which is fine
     config.logger.debug(`getLatestCompilerVersion error: ${e}`);
@@ -96,7 +91,7 @@ async function requestUrl(url: string) {
 }
 
 function requiresCheck(now: number, lastCheck: number, checkInterval: number) {
-  return ((lastCheck + checkInterval) < now);
+  return lastCheck + checkInterval < now;
 }
 
 function getLastCheck() {
@@ -106,7 +101,7 @@ function getLastCheck() {
         resolve(null);
       } else {
         try {
-           resolve(JSON.parse(data));
+          resolve(JSON.parse(data));
         } catch (e) {
           resolve(null);
         }
@@ -129,18 +124,14 @@ function getLastCheckStoragePath() {
 }
 
 function printUpdateMessage(logger: d.Logger, currentVersion: string, latestVersion: string) {
-  const msg = [
-    `Update available: ${currentVersion} ${ARROW} ${latestVersion}`,
-    `To get the latest, please run:`,
-    NPM_INSTALL
-  ];
+  const msg = [`Update available: ${currentVersion} ${ARROW} ${latestVersion}`, `To get the latest, please run:`, NPM_INSTALL];
 
   const lineLength = msg[0].length;
 
   const o: string[] = [];
 
   let top = BOX_TOP_LEFT;
-  while (top.length <= lineLength + (PADDING * 2)) {
+  while (top.length <= lineLength + PADDING * 2) {
     top += BOX_HORIZONTAL;
   }
   top += BOX_TOP_RIGHT;
@@ -152,7 +143,7 @@ function printUpdateMessage(logger: d.Logger, currentVersion: string, latestVers
       line += ` `;
     }
     line += m;
-    while (line.length <= lineLength + (PADDING * 2)) {
+    while (line.length <= lineLength + PADDING * 2) {
       line += ` `;
     }
     line += BOX_VERTICAL;
@@ -160,7 +151,7 @@ function printUpdateMessage(logger: d.Logger, currentVersion: string, latestVers
   });
 
   let bottom = BOX_BOTTOM_LEFT;
-  while (bottom.length <= lineLength + (PADDING * 2)) {
+  while (bottom.length <= lineLength + PADDING * 2) {
     bottom += BOX_HORIZONTAL;
   }
   bottom += BOX_BOTTOM_RIGHT;

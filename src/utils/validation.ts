@@ -1,4 +1,3 @@
-
 export const validateComponentTag = (tag: string) => {
   if (tag !== tag.trim()) {
     return `Tag can not contain white spaces`;

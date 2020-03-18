@@ -3,7 +3,6 @@ import { COLLECTION_MANIFEST_FILE_NAME, buildJsonFileError, isGlob, normalizePat
 import { dirname, join, relative } from 'path';
 import { getComponentsDtsTypesFilePath, isOutputTargetDistCollection, isOutputTargetDistTypes } from '../output-targets/output-utils';
 
-
 export const validateBuildPackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (config.watch) {
     return;
@@ -20,7 +19,7 @@ export const validateBuildPackageJson = async (config: d.Config, compilerCtx: d.
     }),
     ...typesOutputTargets.map(outputTarget => {
       return validateTypes(config, compilerCtx, buildCtx, outputTarget);
-    })
+    }),
   ]);
 };
 
@@ -30,7 +29,7 @@ const validatePackageJsonOutput = async (config: d.Config, compilerCtx: d.Compil
     validateMain(config, compilerCtx, buildCtx, outputTarget),
     validateModule(config, compilerCtx, buildCtx, outputTarget),
     validateCollection(config, compilerCtx, buildCtx, outputTarget),
-    validateBrowser(config, compilerCtx, buildCtx)
+    validateBrowser(config, compilerCtx, buildCtx),
   ]);
 };
 
@@ -38,15 +37,9 @@ export const validatePackageFiles = async (config: d.Config, compilerCtx: d.Comp
   if (!config.devMode && Array.isArray(buildCtx.packageJson.files)) {
     const actualDistDir = normalizePath(relative(config.rootDir, outputTarget.dir));
 
-    const validPaths = [
-      `${actualDistDir}`,
-      `${actualDistDir}/`,
-      `./${actualDistDir}`,
-      `./${actualDistDir}/`
-    ];
+    const validPaths = [`${actualDistDir}`, `${actualDistDir}/`, `./${actualDistDir}`, `./${actualDistDir}/`];
 
-    const containsDistDir = buildCtx.packageJson.files
-            .some(userPath => validPaths.some(validPath => normalizePath(userPath) === validPath));
+    const containsDistDir = buildCtx.packageJson.files.some(userPath => validPaths.some(validPath => normalizePath(userPath) === validPath));
 
     if (!containsDistDir) {
       const msg = `package.json "files" array must contain the distribution directory "${actualDistDir}/" when generating a distribution.`;
@@ -54,18 +47,20 @@ export const validatePackageFiles = async (config: d.Config, compilerCtx: d.Comp
       return;
     }
 
-    await Promise.all(buildCtx.packageJson.files.map(async pkgFile => {
-      if (!isGlob(pkgFile)) {
-        const packageJsonDir = dirname(config.packageJsonFilePath);
-        const absPath = join(packageJsonDir, pkgFile);
+    await Promise.all(
+      buildCtx.packageJson.files.map(async pkgFile => {
+        if (!isGlob(pkgFile)) {
+          const packageJsonDir = dirname(config.packageJsonFilePath);
+          const absPath = join(packageJsonDir, pkgFile);
 
-        const hasAccess = await compilerCtx.fs.access(absPath);
-        if (!hasAccess) {
-          const msg = `Unable to find "${pkgFile}" within the package.json "files" array.`;
-          packageJsonError(config, compilerCtx, buildCtx, msg, `"${pkgFile}"`);
+          const hasAccess = await compilerCtx.fs.access(absPath);
+          if (!hasAccess) {
+            const msg = `Unable to find "${pkgFile}" within the package.json "files" array.`;
+            packageJsonError(config, compilerCtx, buildCtx, msg, `"${pkgFile}"`);
+          }
         }
-      }
-    }));
+      }),
+    );
   }
 };
 
@@ -76,7 +71,6 @@ export const validateMain = (config: d.Config, compilerCtx: d.CompilerCtx, build
   if (typeof buildCtx.packageJson.main !== 'string' || buildCtx.packageJson.main === '') {
     const msg = `package.json "main" property is required when generating a distribution. It's recommended to set the "main" property to: ${mainRel}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"main"`);
-
   } else if (normalizePath(buildCtx.packageJson.main) !== normalizePath(mainRel)) {
     const msg = `package.json "main" property is set to "${buildCtx.packageJson.main}". It's recommended to set the "main" property to: ${mainRel}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"main"`);
@@ -90,24 +84,22 @@ export const validateModule = (config: d.Config, compilerCtx: d.CompilerCtx, bui
   if (typeof buildCtx.packageJson.module !== 'string') {
     const msg = `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ${moduleRel}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"module"`);
-
   } else if (normalizePath(buildCtx.packageJson.module) !== normalizePath(moduleRel)) {
     const msg = `package.json "module" property is set to "${buildCtx.packageJson.module}". It's recommended to set the "module" property to: ${moduleRel}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"module"`);
   }
 };
 
-export const validateTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistTypes) => {  const typesAbs = getComponentsDtsTypesFilePath(outputTarget);
+export const validateTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistTypes) => {
+  const typesAbs = getComponentsDtsTypesFilePath(outputTarget);
   const recommendedPath = relative(config.rootDir, typesAbs);
 
   if (typeof buildCtx.packageJson.types !== 'string' || buildCtx.packageJson.types === '') {
     const msg = `package.json "types" property is required when generating a distribution. It's recommended to set the "types" property to: ${recommendedPath}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"types"`);
-
   } else if (!buildCtx.packageJson.types.endsWith('.d.ts')) {
-    const msg  = `package.json "types" file must have a ".d.ts" extension: ${buildCtx.packageJson.types}`;
+    const msg = `package.json "types" file must have a ".d.ts" extension: ${buildCtx.packageJson.types}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"types"`);
-
   } else {
     const typesFile = join(config.rootDir, buildCtx.packageJson.types);
     const typesFileExists = await compilerCtx.fs.access(typesFile);

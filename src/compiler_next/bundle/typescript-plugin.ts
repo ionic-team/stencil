@@ -7,7 +7,6 @@ import { tsResolveModuleName } from '../sys/typescript/typescript-resolve-module
 import { isAbsolute } from 'path';
 import ts from 'typescript';
 
-
 export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions): Plugin => {
   const tsPrinter = ts.createPrinter();
 
@@ -34,10 +33,9 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
         }
       }
       return null;
-    }
+    },
   };
 };
-
 
 export const resolveIdWithTypeScript = (config: d.Config, compilerCtx: d.CompilerCtx): Plugin => {
   return {
@@ -48,7 +46,7 @@ export const resolveIdWithTypeScript = (config: d.Config, compilerCtx: d.Compile
         return null;
       }
 
-      const tsResolved = tsResolveModuleName(config, compilerCtx, importee, importer)
+      const tsResolved = tsResolveModuleName(config, compilerCtx, importee, importer);
       if (tsResolved && tsResolved.resolvedModule) {
         // this is probably a .d.ts file for whatever reason in how TS resolves this
         // use this resolved file as the "importer"
@@ -59,6 +57,6 @@ export const resolveIdWithTypeScript = (config: d.Config, compilerCtx: d.Compile
       }
 
       return null;
-    }
+    },
   };
 };

@@ -1,6 +1,5 @@
 import { getNodeModuleFetchUrl, getStencilInternalDtsUrl, getStencilModuleUrl, getStencilRootUrl, skipFilePathFetch } from '../fetch-utils';
 
-
 describe('fetch module', () => {
   let compilerExe: string;
 
@@ -23,7 +22,6 @@ describe('fetch module', () => {
   });
 
   describe('getStencilModulePath', () => {
-
     it('cdn w/ version w/out node_module prefix', () => {
       compilerExe = 'https://cdn.jsdelivr.net/npm/@stencil/core@1.2.3/compiler/stencil.js';
       const p = 'internal/client/index.mjs';
@@ -56,11 +54,8 @@ describe('fetch module', () => {
       const m = getStencilModuleUrl(compilerExe, p);
       expect(m).toBe('http://localhost:3333/@stencil/core/package.json');
     });
-
   });
-
 });
-
 
 describe('getNodeModuleFetchUrl', () => {
   let compilerExe: string;
@@ -109,12 +104,9 @@ describe('getNodeModuleFetchUrl', () => {
     const url = getNodeModuleFetchUrl(compilerExe, pkgVersions, filePath);
     expect(url).toBe('https://cdn.jsdelivr.net/npm/@ionic/core@1.2.3/package.json');
   });
-
 });
 
-
 describe('skipFilePathFetch', () => {
-
   it('skip for known bogus node_module paths', () => {
     expect(skipFilePathFetch('/node_modules/index.mjs')).toBe(true);
     expect(skipFilePathFetch('/node_modules/lodash.js')).toBe(true);
@@ -128,5 +120,4 @@ describe('skipFilePathFetch', () => {
     expect(skipFilePathFetch('whatever.ts')).toBe(true);
     expect(skipFilePathFetch('whatever.tsx')).toBe(true);
   });
-
 });

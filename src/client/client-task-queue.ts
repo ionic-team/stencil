@@ -3,7 +3,6 @@ import { consoleError } from './client-log';
 import { plt, promiseResolve } from './client-window';
 import { PLATFORM_FLAGS } from '../runtime/runtime-constants';
 
-
 let queueCongestion = 0;
 let queuePending = false;
 
@@ -24,7 +23,6 @@ const queueTask = (queue: d.RafCallback[], write: boolean) => (cb: d.RafCallback
   }
 };
 
-
 const consume = (queue: d.RafCallback[]) => {
   for (let i = 0; i < queue.length; i++) {
     try {
@@ -35,7 +33,6 @@ const consume = (queue: d.RafCallback[]) => {
   }
   queue.length = 0;
 };
-
 
 const consumeTimeout = (queue: d.RafCallback[], timeout: number) => {
   let i = 0;
@@ -54,7 +51,6 @@ const consumeTimeout = (queue: d.RafCallback[], timeout: number) => {
   }
 };
 
-
 const flush = () => {
   queueCongestion++;
 
@@ -64,9 +60,7 @@ const flush = () => {
   // DOM READS!!!
   consume(queueDomReads);
 
-  const timeout = (plt.$flags$ & PLATFORM_FLAGS.queueMask) === PLATFORM_FLAGS.appLoaded
-    ? performance.now() + (10 * Math.ceil(queueCongestion * (1.0 / 22.0)))
-    : Infinity;
+  const timeout = (plt.$flags$ & PLATFORM_FLAGS.queueMask) === PLATFORM_FLAGS.appLoaded ? performance.now() + 10 * Math.ceil(queueCongestion * (1.0 / 22.0)) : Infinity;
 
   // DOM WRITES!!!
   consumeTimeout(queueDomWrites, timeout);
@@ -77,19 +71,17 @@ const flush = () => {
     queueDomWrites.length = 0;
   }
 
-  if (queuePending = ((queueDomReads.length + queueDomWrites.length + queueDomWritesLow.length) > 0)) {
+  if ((queuePending = queueDomReads.length + queueDomWrites.length + queueDomWritesLow.length > 0)) {
     // still more to do yet, but we've run out of time
     // let's let this thing cool off and try again in the next tick
     plt.raf(flush);
-
-
   } else {
     queueCongestion = 0;
   }
 };
 
-export const nextTick = /*@__PURE__*/(cb: () => void) => promiseResolve().then(cb);
+export const nextTick = /*@__PURE__*/ (cb: () => void) => promiseResolve().then(cb);
 
-export const readTask = /*@__PURE__*/queueTask(queueDomReads, false);
+export const readTask = /*@__PURE__*/ queueTask(queueDomReads, false);
 
-export const writeTask = /*@__PURE__*/queueTask(queueDomWrites, true);
+export const writeTask = /*@__PURE__*/ queueTask(queueDomWrites, true);

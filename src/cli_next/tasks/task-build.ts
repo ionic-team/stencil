@@ -5,7 +5,6 @@ import { startupLog } from './startup-log';
 import { taskWatch } from './task-watch';
 import exit from 'exit';
 
-
 export async function taskBuild(prcs: NodeJS.Process, config: d.Config) {
   if (config.flags.watch) {
     // watch build
@@ -27,7 +26,6 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config) {
 
     if (results.hasError) {
       exitCode = 1;
-
     } else if (config.flags.prerender) {
       const prerenderDiagnostics = await runPrerenderTask(prcs, config, results.hydrateAppFilePath, results.componentGraph, null);
       config.logger.printDiagnostics(prerenderDiagnostics);
@@ -39,7 +37,6 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config) {
 
     const checkVersionResults = await checkVersionPromise;
     checkVersionResults();
-
   } catch (e) {
     exitCode = 1;
     config.logger.error(e);

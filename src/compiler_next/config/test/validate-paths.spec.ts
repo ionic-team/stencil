@@ -4,9 +4,7 @@ import { normalizePath } from '@utils';
 import { validateConfig } from '../validate-config';
 import path from 'path';
 
-
 describe('validatePaths', () => {
-
   let config: d.Config;
   const logger = mockLogger();
   const sys = mockStencilSystem();
@@ -18,10 +16,9 @@ describe('validatePaths', () => {
       sys: sys,
       logger: logger,
       rootDir: path.join(ROOT, 'User', 'my-app'),
-      namespace: 'Testing'
+      namespace: 'Testing',
     };
   });
-
 
   it('should set absolute cacheDir', () => {
     config.cacheDir = path.join(ROOT, 'some', 'custom', 'cache');
@@ -47,10 +44,12 @@ describe('validatePaths', () => {
   });
 
   it('should convert a custom wwwIndexHtml to absolute path', () => {
-    config.outputTargets = [{
-      type: 'www',
-      indexHtml: path.join('assets', 'custom-index.html')
-    }] as d.OutputTargetWww[];
+    config.outputTargets = [
+      {
+        type: 'www',
+        indexHtml: path.join('assets', 'custom-index.html'),
+      },
+    ] as d.OutputTargetWww[];
     validateConfig(config, [], false);
     expect(path.basename((config.outputTargets as d.OutputTargetWww[])[0].indexHtml)).toBe('custom-index.html');
     expect(path.isAbsolute((config.outputTargets as d.OutputTargetWww[])[0].indexHtml)).toBe(true);
@@ -63,10 +62,12 @@ describe('validatePaths', () => {
   });
 
   it('should set emptyDist to false', () => {
-    config.outputTargets = [{
-      type: 'www',
-      empty: false
-    }] as d.OutputTargetWww[];
+    config.outputTargets = [
+      {
+        type: 'www',
+        empty: false,
+      },
+    ] as d.OutputTargetWww[];
     validateConfig(config, [], false);
     expect((config.outputTargets as d.OutputTargetWww[])[0].empty).toBe(false);
   });
@@ -77,27 +78,33 @@ describe('validatePaths', () => {
   });
 
   it('should set emptyWWW to false', () => {
-    config.outputTargets = [{
-      type: 'www',
-      empty: false
-    }] as d.OutputTargetWww[];
+    config.outputTargets = [
+      {
+        type: 'www',
+        empty: false,
+      },
+    ] as d.OutputTargetWww[];
     validateConfig(config, [], false);
     expect((config.outputTargets as d.OutputTargetWww[])[0].empty).toBe(false);
   });
 
   it('should set default collection dir and convert to absolute path', () => {
-    config.outputTargets = [{
-      type: 'dist'
-    }];
+    config.outputTargets = [
+      {
+        type: 'dist',
+      },
+    ];
     validateConfig(config, [], false);
     expect(path.basename((config.outputTargets as d.OutputTargetDist[])[0].collectionDir)).toBe('collection');
     expect(path.isAbsolute((config.outputTargets as d.OutputTargetDist[])[0].collectionDir)).toBe(true);
   });
 
   it('should set default types dir and convert to absolute path', () => {
-    config.outputTargets = [{
-      type: 'dist'
-    }];
+    config.outputTargets = [
+      {
+        type: 'dist',
+      },
+    ];
     validateConfig(config, [], false);
     expect(path.basename((config.outputTargets as d.OutputTargetDist[])[0].typesDir)).toBe('types');
     expect(path.isAbsolute((config.outputTargets as d.OutputTargetDist[])[0].typesDir)).toBe(true);
@@ -113,10 +120,12 @@ describe('validatePaths', () => {
   });
 
   it('should set build dir w/ custom www', () => {
-    config.outputTargets = [{
-      type: 'www',
-      dir: 'custom-www'
-    }] as d.OutputTargetWww[];
+    config.outputTargets = [
+      {
+        type: 'www',
+        dir: 'custom-www',
+      },
+    ] as d.OutputTargetWww[];
     validateConfig(config, [], false);
     const normalizedPathSep = '/';
     const parts = (config.outputTargets as d.OutputTargetDist[])[0].buildDir.split(normalizedPathSep);
@@ -179,5 +188,4 @@ describe('validatePaths', () => {
     expect(path.basename(config.globalStyle)).toBe('styles.css');
     expect(path.isAbsolute(config.globalStyle)).toBe(true);
   });
-
 });

@@ -4,13 +4,12 @@ import { doc, getHostRef, loadModule, plt, registerHost } from '@platform';
 import { proxyHostElement } from './proxy-host-element';
 import { globalScripts } from '@app-globals';
 
-
 export function hydrateApp(
   win: Window,
   opts: d.HydrateFactoryOptions,
   results: d.HydrateResults,
   afterHydrate: (win: Window, opts: d.HydrateFactoryOptions, results: d.HydrateResults, resolve: (results: d.HydrateResults) => void) => void,
-  resolve: (results: d.HydrateResults) => void
+  resolve: (results: d.HydrateResults) => void,
 ) {
   const connectedElements = new Set<any>();
   const createdElements = new Set<HTMLElement>();
@@ -31,7 +30,6 @@ export function hydrateApp(
       }
       win.document.createElement = orgDocumentCreateElement;
       win.document.createElementNS = orgDocumentCreateElementNS;
-
     } catch (e) {
       renderCatchError(opts, results, e);
     }
@@ -49,7 +47,6 @@ export function hydrateApp(
   }
 
   try {
-
     function patchedConnectedCallback(this: d.HostElement) {
       return connectElement(this);
     }
@@ -63,10 +60,13 @@ export function hydrateApp(
           // we haven't registered this component's host element yet
 
           // get the component's constructor
-          const Cstr = loadModule({
-            $tagName$: elm.nodeName.toLowerCase(),
-            $flags$: null,
-          }, null) as d.ComponentConstructor;
+          const Cstr = loadModule(
+            {
+              $tagName$: elm.nodeName.toLowerCase(),
+              $flags$: null,
+            },
+            null,
+          ) as d.ComponentConstructor;
 
           if (Cstr != null && Cstr.cmpMeta != null) {
             // we found valid component metadata
@@ -116,8 +116,7 @@ export function hydrateApp(
     function waitLoop(): Promise<void> {
       const toConnect = Array.from(createdElements).filter(elm => elm.parentElement);
       if (toConnect.length > 0) {
-        return Promise.all(toConnect.map(connectElement))
-          .then(waitLoop);
+        return Promise.all(toConnect.map(connectElement)).then(waitLoop);
       }
       return resolved;
     }
@@ -146,19 +145,20 @@ export function hydrateApp(
     waitLoop()
       .then(hydratedComplete)
       .catch(hydratedError);
-
   } catch (e) {
     hydratedError(e);
   }
 }
 
-
 async function hydrateComponent(win: Window, results: d.HydrateResults, tagName: string, elm: d.HostElement) {
   tagName = tagName.toLowerCase();
-  const Cstr = loadModule({
-    $tagName$: tagName,
-    $flags$: null,
-  }, null) as d.ComponentConstructor;
+  const Cstr = loadModule(
+    {
+      $tagName$: tagName,
+      $flags$: null,
+    },
+    null,
+  ) as d.ComponentConstructor;
 
   if (Cstr != null) {
     const cmpMeta = Cstr.cmpMeta;
@@ -221,22 +221,7 @@ function shouldHydrate(elm: Element): boolean {
   return shouldHydrate(parentNode as Element);
 }
 
-const NO_HYDRATE_TAGS = new Set([
-  'CODE',
-  'HEAD',
-  'IFRAME',
-  'INPUT',
-  'OBJECT',
-  'OUTPUT',
-  'NOSCRIPT',
-  'PRE',
-  'SCRIPT',
-  'SELECT',
-  'STYLE',
-  'TEMPLATE',
-  'TEXTAREA'
-]);
-
+const NO_HYDRATE_TAGS = new Set(['CODE', 'HEAD', 'IFRAME', 'INPUT', 'OBJECT', 'OUTPUT', 'NOSCRIPT', 'PRE', 'SCRIPT', 'SELECT', 'STYLE', 'TEMPLATE', 'TEXTAREA']);
 
 function renderCatchError(opts: d.HydrateFactoryOptions, results: d.HydrateResults, err: any) {
   const diagnostic: d.Diagnostic = {
@@ -246,7 +231,7 @@ function renderCatchError(opts: d.HydrateFactoryOptions, results: d.HydrateResul
     messageText: '',
     relFilePath: null,
     absFilePath: null,
-    lines: []
+    lines: [],
   };
 
   if (opts.url) {

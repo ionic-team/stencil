@@ -18,9 +18,7 @@ export const createTesting = async (config: Config): Promise<Testing> => {
 
   const run = async (opts: TestingRunOptions = {}) => {
     if (!opts.spec && !opts.e2e) {
-      config.logger.error(
-        `Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`,
-      );
+      config.logger.error(`Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`);
       return false;
     }
 

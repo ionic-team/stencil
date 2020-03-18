@@ -9,7 +9,6 @@ import { taskTest } from './task-test';
 import { taskVersion } from './task-version';
 import exit from 'exit';
 
-
 export async function runTask(prcs: NodeJS.Process, config: Config, task: TaskCommand) {
   switch (task) {
     case 'build':
@@ -45,7 +44,7 @@ export async function runTask(prcs: NodeJS.Process, config: Config, task: TaskCo
       break;
 
     default:
-      config.logger.error(`${(prcs.platform !== 'win32') ? '❌ ' : ''} Invalid stencil command, please see the options below:`);
+      config.logger.error(`${prcs.platform !== 'win32' ? '❌ ' : ''} Invalid stencil command, please see the options below:`);
       taskHelp(prcs, config);
       exit(1);
   }

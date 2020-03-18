@@ -4,11 +4,8 @@ import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
-
 export const listenDecoratorsToStatic = (diagnostics: d.Diagnostic[], decoratedMembers: ts.ClassElement[], newMembers: ts.ClassElement[]) => {
-  const listeners = decoratedMembers
-    .filter(ts.isMethodDeclaration)
-    .map(method => parseListenDecorators(diagnostics, method));
+  const listeners = decoratedMembers.filter(ts.isMethodDeclaration).map(method => parseListenDecorators(diagnostics, method));
 
   const flatListeners = flatOne(listeners);
   if (flatListeners.length > 0) {
@@ -24,7 +21,7 @@ const parseListenDecorators = (diagnostics: d.Diagnostic[], method: ts.MethodDec
 
   return listenDecorators.map(listenDecorator => {
     const methodName = method.name.getText();
-    const [ listenText, listenOptions ] = getDeclarationParameters<string, d.ListenOptions>(listenDecorator);
+    const [listenText, listenOptions] = getDeclarationParameters<string, d.ListenOptions>(listenDecorator);
 
     const eventNames = listenText.split(',');
     if (eventNames.length > 1) {
@@ -36,7 +33,6 @@ const parseListenDecorators = (diagnostics: d.Diagnostic[], method: ts.MethodDec
     return parseListener(diagnostics, eventNames[0], listenOptions, methodName, listenDecorator);
   });
 };
-
 
 export const parseListener = (diagnostics: d.Diagnostic[], eventName: string, opts: d.ListenOptions = {}, methodName: string, decoratorNode: ts.Decorator) => {
   let rawEventName = eventName.trim();
@@ -68,36 +64,59 @@ export const parseListener = (diagnostics: d.Diagnostic[], eventName: string, op
     name: rawEventName,
     method: methodName,
     target,
-    capture: (typeof opts.capture === 'boolean') ? opts.capture : false,
-    passive: (typeof opts.passive === 'boolean') ? opts.passive :
-      // if the event name is kown to be a passive event then set it to true
-      (PASSIVE_TRUE_DEFAULTS.has(rawEventName.toLowerCase())),
+    capture: typeof opts.capture === 'boolean' ? opts.capture : false,
+    passive:
+      typeof opts.passive === 'boolean'
+        ? opts.passive
+        : // if the event name is kown to be a passive event then set it to true
+          PASSIVE_TRUE_DEFAULTS.has(rawEventName.toLowerCase()),
   };
   return listener;
 };
 
 export const isValidTargetValue = (prefix: string): prefix is d.ListenTargetOptions => {
-  return (VALID_ELEMENT_REF_PREFIXES.has(prefix));
+  return VALID_ELEMENT_REF_PREFIXES.has(prefix);
 };
 
 export const isValidKeycodeSuffix = (prefix: string) => {
-  return (VALID_KEYCODE_SUFFIX.has(prefix));
+  return VALID_KEYCODE_SUFFIX.has(prefix);
 };
 
 const PASSIVE_TRUE_DEFAULTS = new Set([
-  'dragstart', 'drag', 'dragend', 'dragenter', 'dragover', 'dragleave', 'drop',
-  'mouseenter', 'mouseover', 'mousemove', 'mousedown', 'mouseup', 'mouseleave', 'mouseout', 'mousewheel',
-  'pointerover', 'pointerenter', 'pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'pointerout', 'pointerleave',
+  'dragstart',
+  'drag',
+  'dragend',
+  'dragenter',
+  'dragover',
+  'dragleave',
+  'drop',
+  'mouseenter',
+  'mouseover',
+  'mousemove',
+  'mousedown',
+  'mouseup',
+  'mouseleave',
+  'mouseout',
+  'mousewheel',
+  'pointerover',
+  'pointerenter',
+  'pointerdown',
+  'pointermove',
+  'pointerup',
+  'pointercancel',
+  'pointerout',
+  'pointerleave',
   'resize',
   'scroll',
-  'touchstart', 'touchmove', 'touchend', 'touchenter', 'touchleave', 'touchcancel',
+  'touchstart',
+  'touchmove',
+  'touchend',
+  'touchenter',
+  'touchleave',
+  'touchcancel',
   'wheel',
 ]);
 
-const VALID_ELEMENT_REF_PREFIXES = new Set([
-  'parent', 'body', 'document', 'window'
-]);
+const VALID_ELEMENT_REF_PREFIXES = new Set(['parent', 'body', 'document', 'window']);
 
-const VALID_KEYCODE_SUFFIX = new Set([
-  'enter', 'escape', 'space', 'tab', 'up', 'right', 'down', 'left'
-]);
+const VALID_KEYCODE_SUFFIX = new Set(['enter', 'escape', 'space', 'tab', 'up', 'right', 'down', 'left']);

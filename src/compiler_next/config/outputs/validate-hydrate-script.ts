@@ -3,7 +3,6 @@ import { DIST_HYDRATE_SCRIPT, isOutputTargetDist, isOutputTargetHydrate, isOutpu
 import { isBoolean, isString } from '@utils';
 import { isAbsolute, join } from 'path';
 
-
 export const validateHydrateScript = (config: d.Config, userOutputs: d.OutputTarget[]) => {
   const output: d.OutputTargetHydrate[] = [];
 
@@ -13,9 +12,7 @@ export const validateHydrateScript = (config: d.Config, userOutputs: d.OutputTar
     // we don't already have a hydrate output target
     // let's still see if we require one because of other output targets
 
-    const hasWwwOutput = userOutputs
-      .filter(isOutputTargetWww)
-      .some(o => isString(o.indexHtml));
+    const hasWwwOutput = userOutputs.filter(isOutputTargetWww).some(o => isString(o.indexHtml));
 
     if (hasWwwOutput && config.flags && config.flags.prerender) {
       // we're prerendering a www output target, so we'll need a hydrate app
@@ -29,14 +26,13 @@ export const validateHydrateScript = (config: d.Config, userOutputs: d.OutputTar
 
       const hydrateForWwwOutputTarget: d.OutputTargetHydrate = {
         type: DIST_HYDRATE_SCRIPT,
-        dir: hydrateDir
+        dir: hydrateDir,
       };
       userOutputs.push(hydrateForWwwOutputTarget);
     }
   }
 
-  const hydrateOutputTargets = userOutputs
-    .filter(isOutputTargetHydrate);
+  const hydrateOutputTargets = userOutputs.filter(isOutputTargetHydrate);
 
   hydrateOutputTargets.forEach(outputTarget => {
     if (!isString(outputTarget.dir)) {

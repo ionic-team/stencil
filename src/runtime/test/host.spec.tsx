@@ -1,13 +1,10 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('hostData', () => {
-
   it('render hostData() attributes', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
-
       @Prop() hidden = false;
 
       hostData() {
@@ -15,7 +12,7 @@ describe('hostData', () => {
           'value': 'somevalue',
           'role': 'alert',
           'aria-hidden': this.hidden ? 'true' : null,
-          'hidden': this.hidden
+          'hidden': this.hidden,
         };
       }
     }
@@ -37,20 +34,12 @@ describe('hostData', () => {
   });
 
   it('render <host> attributes', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
-
       @Prop() hidden = false;
 
       render() {
-        return (
-          <Host
-            value='hello'
-            role='alert'
-            aria-hidden={this.hidden ? 'true' : null}
-            hidden={this.hidden}
-          />
-        );
+        return <Host value="hello" role="alert" aria-hidden={this.hidden ? 'true' : null} hidden={this.hidden} />;
       }
     }
 
@@ -71,35 +60,26 @@ describe('hostData', () => {
   });
 
   it('register <Host> listeners', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
-
       @State() count = 0;
 
       render() {
         return (
           <Host>
             <span>{this.count}</span>
-            <cmp-b onClick={() => this.count++}>
-            </cmp-b>
+            <cmp-b onClick={() => this.count++}></cmp-b>
           </Host>
         );
       }
     }
 
-    @Component({ tag: 'cmp-b'})
+    @Component({ tag: 'cmp-b' })
     class CmpB {
-
       @State() count = 0;
 
       render() {
-        return (
-          <Host
-            onClick={() => this.count++}
-          >
-          {this.count}
-          </Host>
-        );
+        return <Host onClick={() => this.count++}>{this.count}</Host>;
       }
     }
 
@@ -118,5 +98,4 @@ describe('hostData', () => {
     <cmp-a><span>1</span><cmp-b>1</cmp-b></cmp-a>
     `);
   });
-
 });

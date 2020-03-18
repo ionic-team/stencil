@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { normalizePath } from '@utils';
 import path from 'path';
 
-
 export async function taskServe(process: NodeJS.Process, config: d.Config) {
   config.suppressLogs = true;
 

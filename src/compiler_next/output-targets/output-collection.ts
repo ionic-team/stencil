@@ -4,7 +4,6 @@ import { isOutputTargetDistCollection } from './output-utils';
 import { join, relative } from 'path';
 import { typescriptVersion, version } from '../../version';
 
-
 export const outputCollections = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
   if (outputTargets.length === 0) {
@@ -13,19 +12,13 @@ export const outputCollections = async (config: d.Config, compilerCtx: d.Compile
 
   const timespan = buildCtx.createTimeSpan(`generate collections started`, true);
   const moduleFiles = buildCtx.moduleFiles.filter(m => !m.isCollectionDependency && m.jsFilePath);
-  await Promise.all([
-    writeJsFiles(config, compilerCtx, moduleFiles, outputTargets),
-    writeCollectionManifests(config, compilerCtx, buildCtx, outputTargets)
-  ]);
+  await Promise.all([writeJsFiles(config, compilerCtx, moduleFiles, outputTargets), writeCollectionManifests(config, compilerCtx, buildCtx, outputTargets)]);
 
   timespan.finish(`generate collections finished`);
 };
 
 const writeJsFiles = (config: d.Config, compilerCtx: d.CompilerCtx, moduleFiles: d.Module[], outputTargets: d.OutputTargetDistCollection[]) => {
-  return Promise.all(
-    moduleFiles
-      .map(moduleFile => writeModuleFile(config, compilerCtx, moduleFile, outputTargets))
-  );
+  return Promise.all(moduleFiles.map(moduleFile => writeModuleFile(config, compilerCtx, moduleFile, outputTargets)));
 };
 
 const writeModuleFile = async (config: d.Config, compilerCtx: d.CompilerCtx, moduleFile: d.Module, outputTargets: d.OutputTargetDistCollection[]) => {
@@ -35,15 +28,13 @@ const writeModuleFile = async (config: d.Config, compilerCtx: d.CompilerCtx, mod
     outputTargets.map(o => {
       const outputFilePath = join(o.collectionDir, relPath);
       return compilerCtx.fs.writeFile(outputFilePath, jsContent);
-    })
+    }),
   );
 };
 
 export const writeCollectionManifests = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) => {
   const collectionData = JSON.stringify(serializeCollectionManifest(config, compilerCtx, buildCtx), null, 2);
-  return Promise.all(
-    outputTargets.map(o => writeCollectionManifest(compilerCtx, collectionData, o))
-  );
+  return Promise.all(outputTargets.map(o => writeCollectionManifest(compilerCtx, collectionData, o)));
 };
 
 // this maps the json data to our internal data structure
@@ -65,9 +56,7 @@ const writeCollectionManifest = async (compilerCtx: d.CompilerCtx, collectionDat
 export const serializeCollectionManifest = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   // create the single collection we're going to fill up with data
   const collectionManifest: d.CollectionManifest = {
-    entries: buildCtx.moduleFiles
-      .filter(mod => !mod.isCollectionDependency && mod.cmps.length > 0)
-      .map(mod => relative(config.srcDir, mod.jsFilePath)),
+    entries: buildCtx.moduleFiles.filter(mod => !mod.isCollectionDependency && mod.cmps.length > 0).map(mod => relative(config.srcDir, mod.jsFilePath)),
     compiler: {
       name: '@stencil/core',
       version,
@@ -75,8 +64,8 @@ export const serializeCollectionManifest = (config: d.Config, compilerCtx: d.Com
     },
     collections: serializeCollectionDependencies(compilerCtx),
     bundles: config.bundles.map(b => ({
-      components: b.components.slice().sort()
-    }))
+      components: b.components.slice().sort(),
+    })),
   };
   if (config.globalScript) {
     const mod = compilerCtx.moduleMap.get(normalizePath(config.globalScript));
@@ -85,12 +74,14 @@ export const serializeCollectionManifest = (config: d.Config, compilerCtx: d.Com
     }
   }
   return collectionManifest;
-}
+};
 
 const serializeCollectionDependencies = (compilerCtx: d.CompilerCtx): d.CollectionDependencyData[] => {
   const collectionDeps = compilerCtx.collections.map(c => ({
     name: c.collectionName,
-    tags: flatOne(c.moduleFiles.map(m => m.cmps)).map(cmp => cmp.tagName).sort()
+    tags: flatOne(c.moduleFiles.map(m => m.cmps))
+      .map(cmp => cmp.tagName)
+      .sort(),
   }));
 
   return sortBy(collectionDeps, item => item.name);

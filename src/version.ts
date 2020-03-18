@@ -1,4 +1,3 @@
-
 export const buildId = '__BUILDID__';
 export const minfyJsId = '__BUILDID:MINIFYJS__';
 export const optimizeCssId = '__BUILDID:OPTIMIZECSS__';

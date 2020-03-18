@@ -1,9 +1,7 @@
 import * as d from '../../../declarations';
 import { isNumber, isString } from '@utils';
 
-
 export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerMsgHandler) => {
-
   const sendHandle = (err: NodeJS.ErrnoException) => {
     if (err && err.code === 'ERR_IPC_CHANNEL_CLOSED') {
       prcs.exit(0);
@@ -41,7 +39,6 @@ export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerM
 
         // send response data from the worker to the main thread
         prcs.send(msgFromWorker, sendHandle);
-
       } catch (e) {
         // error occurred while running the task
         errorHandler(msgToWorker.stencilId, e);

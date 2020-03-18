@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { buildError, dashToPascalCase, isString } from '@utils';
 import { isOutputTargetDist } from '../output-targets/output-utils';
 
-
 export const validateNamespace = (c: d.Config, diagnostics: d.Diagnostic[]) => {
   c.namespace = isString(c.namespace) ? c.namespace : DEFAULT_NAMESPACE;
   c.namespace = c.namespace.trim();

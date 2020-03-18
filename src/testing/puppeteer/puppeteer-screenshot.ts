@@ -3,13 +3,12 @@ import { compareScreenshot } from '../../screenshot/screenshot-compare';
 import * as pd from './puppeteer-declarations';
 import * as puppeteer from 'puppeteer';
 
-
 export function initPageScreenshot(page: pd.E2EPageInternal) {
-  const env = (process.env) as E2EProcessEnv;
+  const env = process.env as E2EProcessEnv;
 
   if (env.__STENCIL_SCREENSHOT__ === 'true') {
     page.compareScreenshot = (a?: any, b?: any) => {
-      const jestEnv: JestEnvironmentGlobal = (global as any);
+      const jestEnv: JestEnvironmentGlobal = global as any;
 
       let desc = '';
       let testPath = '';
@@ -34,7 +33,6 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
         if (typeof b === 'object') {
           opts = b;
         }
-
       } else if (typeof a === 'object') {
         opts = a;
       }
@@ -47,13 +45,14 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
       }
 
       if (jestEnv.screenshotDescriptions.has(desc)) {
-        throw new Error(`Screenshot description "${desc}" found in "${testPath}" cannot be used for multiple screenshots and must be unique. To make screenshot descriptions unique within the same test, use the first argument to "compareScreenshot", such as "compareScreenshot('more to the description')".`);
+        throw new Error(
+          `Screenshot description "${desc}" found in "${testPath}" cannot be used for multiple screenshots and must be unique. To make screenshot descriptions unique within the same test, use the first argument to "compareScreenshot", such as "compareScreenshot('more to the description')".`,
+        );
       }
       jestEnv.screenshotDescriptions.add(desc);
 
       return pageCompareScreenshot(page, env, desc, testPath, opts);
     };
-
   } else {
     // screen shot not enabled, so just skip over all the logic
     page.compareScreenshot = async () => {
@@ -64,13 +63,12 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
         desc: '',
         width: 1,
         height: 1,
-        deviceScaleFactor: 1
+        deviceScaleFactor: 1,
       };
       return diff;
     };
   }
 }
-
 
 export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: E2EProcessEnv, desc: string, testPath: string, opts: ScreenshotOptions) {
   if (typeof env.__STENCIL_EMULATE__ !== 'string') {
@@ -95,7 +93,7 @@ export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: E2EPr
 
   const screenshotOpts = createPuppeteerScreenshopOptions(opts);
   const screenshotBuf = await page.screenshot(screenshotOpts);
-  const pixelmatchThreshold = (typeof opts.pixelmatchThreshold === 'number' ? opts.pixelmatchThreshold : screenshotBuildData.pixelmatchThreshold);
+  const pixelmatchThreshold = typeof opts.pixelmatchThreshold === 'number' ? opts.pixelmatchThreshold : screenshotBuildData.pixelmatchThreshold;
 
   let width = emulateConfig.viewport.width;
   let height = emulateConfig.viewport.height;
@@ -114,7 +112,6 @@ export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: E2EPr
   return results;
 }
 
-
 function createPuppeteerScreenshopOptions(opts: ScreenshotOptions) {
   const puppeteerOpts: puppeteer.ScreenshotOptions = {
     type: 'png',
@@ -128,7 +125,7 @@ function createPuppeteerScreenshopOptions(opts: ScreenshotOptions) {
       x: opts.clip.x,
       y: opts.clip.y,
       width: opts.clip.width,
-      height: opts.clip.height
+      height: opts.clip.height,
     };
   }
 

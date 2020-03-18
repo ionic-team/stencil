@@ -4,7 +4,6 @@ import { normalizePath } from '../normalize-path';
 import { splitLineBreaks } from './logger-utils';
 import ts from 'typescript';
 
-
 export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: ts.Node) => {
   if (!node) {
     return d;
@@ -29,7 +28,7 @@ export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: ts.Node) => {
     lineNumber: posStart.line + 1,
     text: srcLines[posStart.line],
     errorCharStart: posStart.character,
-    errorLength: Math.max(end - start, 1)
+    errorLength: Math.max(end - start, 1),
   };
   d.lineNumber = errorLine.lineNumber;
   d.columnNumber = errorLine.errorCharStart + 1;
@@ -45,7 +44,7 @@ export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: ts.Node) => {
       lineNumber: errorLine.lineNumber - 1,
       text: srcLines[errorLine.lineIndex - 1],
       errorCharStart: -1,
-      errorLength: -1
+      errorLength: -1,
     };
 
     d.lines.unshift(previousLine);
@@ -57,7 +56,7 @@ export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: ts.Node) => {
       lineNumber: errorLine.lineNumber + 1,
       text: srcLines[errorLine.lineIndex + 1],
       errorCharStart: -1,
-      errorLength: -1
+      errorLength: -1,
     };
 
     d.lines.push(nextLine);
@@ -65,7 +64,6 @@ export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: ts.Node) => {
 
   return d;
 };
-
 
 /**
  * Ok, so formatting overkill, we know. But whatever, it makes for great
@@ -83,9 +81,7 @@ export const loadTypeScriptDiagnostics = (tsDiagnostics: readonly ts.Diagnostic[
   return diagnostics;
 };
 
-
 export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
-
   const d: d.Diagnostic = {
     level: 'warn',
     type: 'typescript',
@@ -95,7 +91,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
     messageText: flattenDiagnosticMessageText(tsDiagnostic, tsDiagnostic.messageText),
     relFilePath: null,
     absFilePath: null,
-    lines: []
+    lines: [],
   };
 
   if (tsDiagnostic.category === 1) {
@@ -115,7 +111,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
       lineNumber: posData.line + 1,
       text: srcLines[posData.line],
       errorCharStart: posData.character,
-      errorLength: Math.max(tsDiagnostic.length, 1)
+      errorLength: Math.max(tsDiagnostic.length, 1),
     };
 
     d.lineNumber = errorLine.lineNumber;
@@ -134,7 +130,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
         lineNumber: errorLine.lineNumber - 1,
         text: srcLines[errorLine.lineIndex - 1],
         errorCharStart: -1,
-        errorLength: -1
+        errorLength: -1,
       };
 
       d.lines.unshift(previousLine);
@@ -146,7 +142,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
         lineNumber: errorLine.lineNumber + 1,
         text: srcLines[errorLine.lineIndex + 1],
         errorCharStart: -1,
-        errorLength: -1
+        errorLength: -1,
       };
 
       d.lines.push(nextLine);
@@ -155,7 +151,6 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
 
   return d;
 };
-
 
 const flattenDiagnosticMessageText = (tsDiagnostic: ts.Diagnostic, diag: string | ts.DiagnosticMessageChain | undefined) => {
   if (typeof diag === 'string') {
