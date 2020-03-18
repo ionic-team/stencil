@@ -5,8 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "node ../../bin/stencil build --next",
-    "start": "node ../../bin/stencil build --debug --watch --dev --serve --next"
+    "build": "node ../../bin/stencil build",
+    "start": "node ../../bin/stencil build --debug --watch --dev --serve"
   },
   "author": "Ionic Team",
   "license": "MIT"

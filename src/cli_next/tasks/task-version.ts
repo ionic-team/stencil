@@ -64,19 +64,6 @@ async function getLatestCompilerVersion(config: d.Config, forceCheck: boolean) {
   return null;
 }
 
-async function validateCompilerVersion(logger: d.Logger, latestVersionPromise: Promise<string>) {
-  const latestVersion = await latestVersionPromise;
-  if (latestVersion == null) {
-    return;
-  }
-
-  const { version } = await import('@stencil/core/compiler');
-
-  if (semiver(version, latestVersion) < 0) {
-    printUpdateMessage(logger, version, latestVersion);
-  }
-}
-
 async function requestUrl(url: string) {
   return new Promise<string>((resolve, reject) => {
     const req = request(url, res => {

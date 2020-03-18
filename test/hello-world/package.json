@@ -5,9 +5,9 @@
     "dist/"
   ],
   "scripts": {
-    "build": "node ../../bin/stencil build --prerender --next",
-    "start": "node ../../bin/stencil build --dev --watch --serve --next",
-    "start.prod": "node ../../bin/stencil build --watch --serve --next"
+    "build": "node ../../bin/stencil build --prerender",
+    "start": "node ../../bin/stencil build --dev --watch --serve",
+    "start.prod": "node ../../bin/stencil build --watch --serve"
   },
   "collection": "dist/collection/collection-manifest.json",
   "types": "dist/types/components.d.ts",

@@ -26,6 +26,7 @@ import {
   PrerenderRequest,
   PrerenderResults,
   StencilSystem,
+  StyleDoc,
 } from './stencil-public-compiler';
 
 import {
@@ -2249,6 +2250,7 @@ export interface TransformCssToEsmInput {
   commentOriginalSelector?: boolean;
   sourceMap?: boolean;
   minify?: boolean;
+  docs?: boolean;
   autoprefixer?: any;
 }
 
@@ -2258,6 +2260,7 @@ export interface TransformCssToEsmOutput {
   map: any;
   diagnostics: Diagnostic[];
   defaultVarName: string;
+  styleDocs: StyleDoc[];
   imports: { varName: string; importPath: string;}[];
 }
 

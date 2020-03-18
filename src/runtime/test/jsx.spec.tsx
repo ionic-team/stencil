@@ -1,5 +1,6 @@
 import { Component, Host, Prop, State, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+import { FunctionalComponent } from '../../declarations';
 
 
 describe('jsx', () => {
@@ -29,6 +30,37 @@ describe('jsx', () => {
       <cmp-a>
         <div>
           The answer is: 42
+        </div>
+      </cmp-a>
+    `);
+  });
+
+  it('functional cmp with default props', async () => {
+
+    interface FunctionalCmpProps {
+      first?: string;
+      last?: string;
+    }
+    const FunctionalCmp: FunctionalComponent<FunctionalCmpProps> = ({ first = 'Kim', last = 'Doe' } = {}) => (
+      <div>Hi, my name is {first} {last}.</div>
+    );
+
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      render() {
+        return <FunctionalCmp/>
+      }
+    }
+
+    const { root } = await newSpecPage({
+      components: [CmpA],
+      html: '<cmp-a></cmp-a>'
+    });
+
+    expect(root).toEqualHtml(`
+      <cmp-a>
+        <div>
+          Hi, my name is Kim Doe.
         </div>
       </cmp-a>
     `);

@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { buildError } from '@utils';
-import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme } from '../../output-targets/output-utils';
+import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme, isOutputTargetDocsVscode } from '../../output-targets/output-utils';
 import { isAbsolute, join } from 'path';
 import { NOTE } from '../../docs/constants';
 
@@ -15,6 +15,8 @@ export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], user
       file: config.flags.docsJson
     }));
   }
+
+  // json docs
   const jsonDocsOutputs = userOutputs.filter(isOutputTargetDocsJson);
   jsonDocsOutputs.forEach(jsonDocsOutput => {
     docsOutputs.push(validateJsonDocsOutputTarget(config, diagnostics, jsonDocsOutput));
@@ -27,6 +29,8 @@ export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], user
       docsOutputs.push(validateReadmeOutputTarget(config, diagnostics, { type: 'docs-readme' }));
     }
   }
+
+  // readme docs
   const readmeDocsOutputs = userOutputs.filter(isOutputTargetDocsReadme);
   readmeDocsOutputs.forEach(readmeDocsOutput => {
     docsOutputs.push(validateReadmeOutputTarget(config, diagnostics, readmeDocsOutput));
@@ -38,6 +42,11 @@ export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], user
     docsOutputs.push(validateCustomDocsOutputTarget(diagnostics, jsonDocsOutput));
   });
 
+  // vscode docs
+  const vscodeDocsOutputs = userOutputs.filter(isOutputTargetDocsVscode);
+  vscodeDocsOutputs.forEach(vscodeDocsOutput => {
+    docsOutputs.push(validateVScodeDocsOutputTarget(diagnostics, vscodeDocsOutput));
+  });
   return docsOutputs;
 };
 
@@ -92,3 +101,13 @@ const validateCustomDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarge
   outputTarget.strict = !!outputTarget.strict;
   return outputTarget;
 };
+
+
+const validateVScodeDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsVscode) => {
+  if (typeof outputTarget.file !== 'string') {
+    const err = buildError(diagnostics);
+    err.messageText = `docs-vscode outputTarget missing the "file" paht`;
+  }
+  return outputTarget;
+};
+

@@ -9,6 +9,9 @@ import { outputCustom } from '../../../compiler/output-targets/output-custom';
 
 
 export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  if (!config.buildDocs) {
+    return;
+  }
   const docsOutputTargets = config.outputTargets.filter(o => (
     isOutputTargetCustom(o) ||
     isOutputTargetDocsReadme(o) ||

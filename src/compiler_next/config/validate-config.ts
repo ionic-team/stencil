@@ -50,6 +50,8 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
   setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
+  setBooleanConfig(config, 'buildDocs', 'docs', !config.devMode);
+  setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
   setBooleanConfig(config, 'writeLog', 'log', false);
   setBooleanConfig(config, 'buildAppCore', null, true);
   setBooleanConfig(config, 'autoprefixCss', null, config.buildEs5);

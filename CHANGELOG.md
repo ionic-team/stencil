@@ -1,3 +1,15 @@
+## 🍋 [1.10.1](https://github.com/ionic-team/stencil/compare/v1.10.0...v1.10.1) (2020-03-17)
+
+
+### Bug Fixes
+
+* **bundler:** not resolve browser modules ([#2279](https://github.com/ionic-team/stencil/issues/2279)) ([93182e7](https://github.com/ionic-team/stencil/commit/93182e75cd25bcc4f25947c3b4265fd35d22a411))
+* **docs:** validate vscode output docs ([2f48a8d](https://github.com/ionic-team/stencil/commit/2f48a8d6e9964c6bf3698e756b5e317f5e7abc4a))
+* disable console colors in E2E testing ([27e1eda](https://github.com/ionic-team/stencil/commit/27e1edae8555c8c5cd44d54fb392e41176173088))
+* **docs:** parse css variables docs ([#2273](https://github.com/ionic-team/stencil/issues/2273)) ([1370152](https://github.com/ionic-team/stencil/commit/137015252decda15cf75cea6b006faa3eedc13a2))
+
+
+
 # 🎭 [1.10.0](https://github.com/ionic-team/stencil/compare/v1.9.2...v1.10.0) (2020-03-16)
 
 

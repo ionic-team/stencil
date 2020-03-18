@@ -6,8 +6,8 @@
   "collection": "./dist/collection/collection-manifest.json",
   "types": "./dist/types/index.d.ts",
   "scripts": {
-    "build": "node ../../bin/stencil build --next",
-    "start": "node ../../bin/stencil build --dev --watch --serve --next",
-    "start.prod": "node ../../bin/stencil build --watch --serve --next"
+    "build": "node ../../bin/stencil build",
+    "start": "node ../../bin/stencil build --dev --watch --serve",
+    "start.prod": "node ../../bin/stencil build --watch --serve"
   }
 }
