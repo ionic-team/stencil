@@ -1295,7 +1295,7 @@ export namespace JSXBase {
     'azimuth'?: number | string;
     'base-frequency'?: number | string;
     'baseline-shift'?: number | string;
-    'base-profile'?: number | string;
+    'baseProfile'?: number | string;
     'bbox'?: number | string;
     'begin'?: number | string;
     'bias'?: number | string;
@@ -1310,8 +1310,8 @@ export namespace JSXBase {
     'color-interpolation-filters'?: 'auto' | 's-rGB' | 'linear-rGB' | 'inherit';
     'color-profile'?: number | string;
     'color-rendering'?: number | string;
-    'content-script-type'?: number | string;
-    'content-style-type'?: number | string;
+    'contentScriptType'?: number | string;
+    'contentStyleType'?: number | string;
     'cursor'?: number | string;
     'cx'?: number | string;
     'cy'?: number | string;
@@ -1418,7 +1418,7 @@ export namespace JSXBase {
     'points-at-y'?: number | string;
     'points-at-z'?: number | string;
     'preserve-alpha'?: number | string;
-    'preserve-aspect-ratio'?: string;
+    'preserveAspectRatio'?: string;
     'primitive-units'?: number | string;
     'r'?: number | string;
     'radius'?: number | string;
@@ -1489,7 +1489,7 @@ export namespace JSXBase {
     'vert-origin-y'?: number | string;
     'v-hanging'?: number | string;
     'v-ideographic'?: number | string;
-    'view-box'?: string;
+    'viewBox'?: string;
     'view-target'?: number | string;
     'visibility'?: number | string;
     'v-mathematical'?: number | string;
@@ -1518,7 +1518,7 @@ export namespace JSXBase {
     'y'?: number | string;
     'y-channel-selector'?: string;
     'z'?: number | string;
-    'zoom-and-pan'?: string;
+    'zoomAndPan'?: string;
   }
 
   export interface DOMAttributes<T = Element> {
