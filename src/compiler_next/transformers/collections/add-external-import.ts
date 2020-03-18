@@ -4,8 +4,14 @@ import { isString, parsePackageJson } from '@utils';
 import { parseCollection } from './parse-collection-module';
 import { tsResolveModuleNamePackageJsonPath } from '../../sys/typescript/typescript-resolve-module';
 
-
-export const addExternalImport = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, containingFile: string, moduleId: string) => {
+export const addExternalImport = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  moduleFile: d.Module,
+  containingFile: string,
+  moduleId: string,
+) => {
   if (!moduleFile.externalImports.includes(moduleId)) {
     moduleFile.externalImports.push(moduleId);
     moduleFile.externalImports.sort();
@@ -25,7 +31,7 @@ export const addExternalImport = (config: d.Config, compilerCtx: d.CompilerCtx, 
     return;
   }
 
-  const realPkgJsonFilePath = config.sys_next.realpathSync(pkgJsonFilePath);
+  const realPkgJsonFilePath = config.sys.realpathSync(pkgJsonFilePath);
   if (realPkgJsonFilePath) {
     pkgJsonFilePath = realPkgJsonFilePath;
   }

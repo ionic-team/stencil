@@ -4,11 +4,12 @@ import { isAbsolute, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
-export const validateDevServer = (config: d.Config, flags: d.ConfigFlags, diagnostics: d.Diagnostic[]) => {
+export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[]) => {
   if (config.devServer === false || config.devServer === null) {
     return null;
   }
 
+  const flags = config.flags;
   const devServer = { ...config.devServer };
 
   if (isString(flags.address)) {

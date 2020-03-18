@@ -6,7 +6,6 @@ import { isString, IS_WEB_WORKER_ENV, normalizeFsPath } from '@utils';
 import { dirname, join } from 'path';
 import resolve, { SyncOpts } from 'resolve';
 
-
 export const resolveRemoteModuleIdSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, containingFile: string) => {
   const packageJson = resolveRemotePackageJsonSync(config, inMemoryFs, moduleId);
   if (packageJson) {
@@ -16,7 +15,7 @@ export const resolveRemoteModuleIdSync = (config: d.Config, inMemoryFs: d.InMemo
       return {
         resolvedUrl,
         packageJson,
-      }
+      };
     }
   }
   return null;
@@ -42,9 +41,7 @@ export const resolvePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryF
   let pkgPath = '';
   opts.packageFilter = (pkg: any, packagePath: string) => {
     // Workaround: https://github.com/browserify/resolve/pull/202
-    pkgPath = packagePath.endsWith('package.json')
-      ? packagePath
-      : join(packagePath, 'package.json');
+    pkgPath = packagePath.endsWith('package.json') ? packagePath : join(packagePath, 'package.json');
 
     return pkg;
   };
@@ -58,7 +55,7 @@ export const resolveModuleIdSync = (config: d.Config, inMemoryFs: d.InMemoryFile
 };
 
 export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, basedir: string, exts: string[]): SyncOpts => {
-  const compilerExecutingPath = config.sys_next.getCompilerExecutingPath();
+  const compilerExecutingPath = config.sys.getCompilerExecutingPath();
 
   return {
     basedir,
@@ -128,6 +125,6 @@ export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemor
       throw new Error(`file not found: ${p}`);
     },
 
-    extensions: exts
+    extensions: exts,
   } as any;
 };

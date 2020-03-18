@@ -13,7 +13,6 @@ import {
   DevServerConfig,
   DevServerEditor,
   Diagnostic,
-  FileSystem,
   FsWatcher,
   FsWriteOptions,
   HotModuleReplacement,
@@ -25,18 +24,10 @@ import {
   PageReloadStrategy,
   PrerenderRequest,
   PrerenderResults,
-  StencilSystem,
   StyleDoc,
 } from './stencil-public-compiler';
 
-import {
-  ComponentInterface,
-  ListenOptions,
-  ListenTargetOptions,
-  VNode,
-  VNodeData,
-} from './stencil-public-runtime';
-
+import { ComponentInterface, ListenOptions, ListenTargetOptions, VNode, VNodeData } from './stencil-public-runtime';
 
 export interface PrintLine {
   lineIndex: number;
@@ -122,14 +113,14 @@ export interface CompileOptions {
    * Same as the `baseUrl` TypeScript compiler option:
    * https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping
    */
-  paths?: {[key: string]: string[]};
+  paths?: { [key: string]: string[] };
 }
 
 export interface CompileResults {
   code: string;
   data?: any[];
   diagnostics: Diagnostic[];
-  imports?: { path: string; }[];
+  imports?: { path: string }[];
   inputFileExtension: string;
   inputFilePath: string;
   map: any;
@@ -140,7 +131,6 @@ export interface CompileScriptMinifyOptions {
   target?: CompileTarget;
   pretty?: boolean;
 }
-
 
 export type CompileTarget = 'latest' | 'esnext' | 'es2020' | 'es2019' | 'es2018' | 'es2017' | 'es2015' | 'es5' | string | undefined;
 
@@ -267,16 +257,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   shadowDomShim?: boolean;
 }
 
-export type ModuleFormat =
-  | 'amd'
-  | 'cjs'
-  | 'commonjs'
-  | 'es'
-  | 'esm'
-  | 'iife'
-  | 'module'
-  | 'system'
-  | 'umd';
+export type ModuleFormat = 'amd' | 'cjs' | 'commonjs' | 'es' | 'esm' | 'iife' | 'module' | 'system' | 'umd';
 
 export interface RollupResultModule {
   id: string;
@@ -455,7 +436,7 @@ export interface BundleOutputChunk {
       removedExports: string[];
       renderedLength: number;
       originalLength: number;
-    }
+    };
   };
   name: string;
 }
@@ -681,7 +662,7 @@ export interface AppRegistry {
 
 export interface AppRegistryComponents {
   [tagName: string]: {
-    bundleIds: ModeBundleIds,
+    bundleIds: ModeBundleIds;
     encapsulation?: 'shadow' | 'scoped';
   };
 }
@@ -815,7 +796,7 @@ export interface HostElementData {
   name: string;
 }
 
-export interface CompilerNext {
+export interface Compiler {
   build(): Promise<CompilerBuildResults>;
   createWatcher(): Promise<CompilerWatcher>;
   destroy(): Promise<void>;
@@ -852,14 +833,6 @@ export type RemoveCallback = () => boolean;
 
 export interface WatcherCloseResults {
   exitCode: number;
-}
-
-export interface Compiler {
-  build(): Promise<BuildResults>;
-  config: Config;
-  docs(): Promise<void>;
-  fs: InMemoryFileSystem;
-  isValid: boolean;
 }
 
 export interface CompilerCtx {
@@ -1218,12 +1191,7 @@ export interface CssVarShim {
   addLink(linkEl: HTMLLinkElement): Promise<any>;
   addGlobalStyle(styleEl: HTMLStyleElement): void;
 
-  createHostStyle(
-    hostEl: HTMLElement,
-    templateName: string,
-    cssText: string,
-    isScoped: boolean
-  ): HTMLStyleElement;
+  createHostStyle(hostEl: HTMLElement, templateName: string, cssText: string, isScoped: boolean): HTMLStyleElement;
 
   removeHost(hostEl: HTMLElement): void;
   updateHost(hostEl: HTMLElement): void;
@@ -1271,7 +1239,7 @@ export interface DevServerMessage {
   buildLog?: BuildLog;
   buildResults?: BuildResults;
   requestBuildResults?: boolean;
-  error?: { message?: string; type?: string; stack?: any; };
+  error?: { message?: string; type?: string; stack?: any };
   isActivelyBuilding?: boolean;
   compilerRequestPath?: string;
   compilerRequestResults?: CompilerRequestResponse;
@@ -1473,10 +1441,9 @@ export interface InMemoryFileSystem {
   /* new compiler */
   sys?: CompilerSystem;
 
-  /** legacy */
-  disk?: FileSystem;
-
-  accessData(filePath: string): Promise<{
+  accessData(
+    filePath: string,
+  ): Promise<{
     exists: boolean;
     isDirectory: boolean;
     isFile: boolean;
@@ -1499,7 +1466,9 @@ export interface InMemoryFileSystem {
    */
   readFileSync(filePath: string, opts?: FsReadOptions): string;
   remove(itemPath: string): Promise<void>;
-  stat(itemPath: string): Promise<{
+  stat(
+    itemPath: string,
+  ): Promise<{
     isFile: boolean;
     isDirectory: boolean;
   }>;
@@ -1508,15 +1477,22 @@ export interface InMemoryFileSystem {
    * (Only typescript transpiling is allowed to use)
    * @param itemPath
    */
-  statSync(itemPath: string): {
+  statSync(
+    itemPath: string,
+  ): {
     exists: boolean;
     isFile: boolean;
     isDirectory: boolean;
   };
   writeFile(filePath: string, content: string, opts?: FsWriteOptions): Promise<FsWriteResults>;
-  writeFiles(files: {
-    [filePath: string]: string;
-  } | Map<string, String>, opts?: FsWriteOptions): Promise<FsWriteResults[]>;
+  writeFiles(
+    files:
+      | {
+          [filePath: string]: string;
+        }
+      | Map<string, String>,
+    opts?: FsWriteOptions,
+  ): Promise<FsWriteResults[]>;
   commit(): Promise<{
     filesWritten: string[];
     filesDeleted: string[];
@@ -1709,7 +1685,7 @@ export interface PluginTransformResults {
 
 export interface PluginCtx {
   config: Config;
-  sys: StencilSystem;
+  sys: CompilerSystem;
   fs: InMemoryFileSystem;
   cache: Cache;
   diagnostics: Diagnostic[];
@@ -1794,7 +1770,6 @@ export interface SitemapXmpResults {
  * different types of nodes we'd see when rendering
  */
 export interface RenderNode extends HostElement {
-
   /**
    * Shadow root's host
    */
@@ -1867,7 +1842,7 @@ export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
 export type LazyBundleRuntimeData = [
   /** bundleIds */
   any,
-  ComponentRuntimeMetaCompact[]
+  ComponentRuntimeMetaCompact[],
 ];
 
 export type ComponentRuntimeMetaCompact = [
@@ -1881,7 +1856,7 @@ export type ComponentRuntimeMetaCompact = [
   { [memberName: string]: ComponentRuntimeMember }?,
 
   /** listeners */
-  ComponentRuntimeHostListener[]?
+  ComponentRuntimeHostListener[]?,
 ];
 
 export interface ComponentRuntimeMeta {
@@ -1907,7 +1882,7 @@ export type ComponentRuntimeMember = [
   /**
    * attribute name to observe
    */
-  string?
+  string?,
 ];
 
 export type ComponentRuntimeHostListener = [
@@ -1924,7 +1899,7 @@ export type ComponentRuntimeHostListener = [
   /**
    * event method,
    */
-  string
+  string,
 ];
 
 export type ModeBundleId = ModeBundleIds | string;
@@ -2261,40 +2236,40 @@ export interface TransformCssToEsmOutput {
   diagnostics: Diagnostic[];
   defaultVarName: string;
   styleDocs: StyleDoc[];
-  imports: { varName: string; importPath: string;}[];
+  imports: { varName: string; importPath: string }[];
 }
 
 export interface PackageJsonData {
-  name?: string;
-  version?: string;
-  main?: string;
-  description?: string;
-  bin?: { [key: string]: string };
-  browser?: string;
-  module?: string;
+  'name'?: string;
+  'version'?: string;
+  'main'?: string;
+  'description'?: string;
+  'bin'?: { [key: string]: string };
+  'browser'?: string;
+  'module'?: string;
   'jsnext:main'?: string;
   'collection:main'?: string;
-  unpkg?: string;
-  collection?: string;
-  types?: string;
-  files?: string[];
+  'unpkg'?: string;
+  'collection'?: string;
+  'types'?: string;
+  'files'?: string[];
   ['dist-tags']?: {
     latest: string;
   };
-  dependencies?: {
+  'dependencies'?: {
     [moduleId: string]: string;
   };
-  devDependencies?: {
+  'devDependencies'?: {
     [moduleId: string]: string;
   };
-  lazyDependencies?: {
+  'lazyDependencies'?: {
     [moduleId: string]: string;
   };
-  repository?: {
+  'repository'?: {
     type?: string;
     url?: string;
   };
-  private?: boolean;
+  'private'?: boolean;
 }
 
 export interface Workbox {
@@ -2318,7 +2293,6 @@ export interface Url {
   query?: string | any;
   hash?: string;
 }
-
 
 declare global {
   namespace jest {
@@ -2425,7 +2399,6 @@ declare global {
   }
 }
 
-
 export interface MatchScreenshotOptions {
   /**
    * The `allowableMismatchedPixels` value is the total number of pixels
@@ -2452,7 +2425,6 @@ export interface MatchScreenshotOptions {
   allowableMismatchedRatio?: number;
 }
 
-
 export interface EventSpy {
   events: SerializedEvent[];
   eventName: string;
@@ -2464,7 +2436,6 @@ export interface EventSpy {
     value: SerializedEvent;
   }>;
 }
-
 
 export interface SerializedEvent {
   bubbles: boolean;
@@ -2484,14 +2455,12 @@ export interface SerializedEvent {
   isSerializedEvent: boolean;
 }
 
-
 export interface EventInitDict {
   bubbles?: boolean;
   cancelable?: boolean;
   composed?: boolean;
   detail?: any;
 }
-
 
 export interface JestEnvironmentGlobal {
   __NEW_TEST_PAGE__: () => Promise<any>;
@@ -2508,7 +2477,6 @@ export interface JestEnvironmentGlobal {
   };
   screenshotDescriptions: Set<string>;
 }
-
 
 export interface E2EProcessEnv {
   STENCIL_COMMIT_ID?: string;
@@ -2535,7 +2503,6 @@ export interface E2EProcessEnv {
   __STENCIL_PUPPETEER_MODULE__?: string;
   __STENCIL_DEFAULT_TIMEOUT__?: string;
 }
-
 
 export interface AnyHTMLElement extends HTMLElement {
   [key: string]: any;
@@ -2665,7 +2632,7 @@ export interface TypesModule {
 }
 
 export type TypeInfo = {
-  name: string,
+  name: string;
   type: string;
   optional: boolean;
   required: boolean;
@@ -2699,7 +2666,7 @@ export interface VNodeProdData {
 export interface CompilerWorkerContext {
   compileModule(code: string, opts: CompileOptions): Promise<CompileResults>;
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
-  prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string, sourceMap: any, diagnostics: Diagnostic[] }>;
+  prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string; sourceMap: any; diagnostics: Diagnostic[] }>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
   transpileToEs5(input: string, inlineHelpers: boolean): Promise<TranspileResults>;
 }

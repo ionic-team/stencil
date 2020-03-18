@@ -5,13 +5,11 @@ import { getScopeId } from '../../style/scope-css';
 import { scopeCss } from '../../../utils/shadow-css';
 import ts from 'typescript';
 
-
 export const addNativeStaticStyle = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   if (Array.isArray(cmp.styles) && cmp.styles.length > 0) {
     if (cmp.styles.length > 1 || (cmp.styles.length === 1 && cmp.styles[0].modeName !== DEFAULT_STYLE_MODE)) {
       // multiple style modes
       addMultipleModeStyleGetter(classMembers, cmp, cmp.styles);
-
     } else {
       // single style
       addSingleStyleGetter(classMembers, cmp, cmp.styles[0]);
@@ -29,7 +27,6 @@ const addMultipleModeStyleGetter = (classMembers: ts.ClassElement[], cmp: d.Comp
       const styleLiteral = createStyleLiteral(cmp, style);
       const propStr = ts.createPropertyAssignment(style.modeName, styleLiteral);
       styleModes.push(propStr);
-
     } else if (typeof style.styleIdentifier === 'string') {
       // direct import already written in the source code
       // import myTagIosStyle from './import-path.css';
@@ -37,7 +34,6 @@ const addMultipleModeStyleGetter = (classMembers: ts.ClassElement[], cmp: d.Comp
       const styleIdentifier = ts.createIdentifier(style.styleIdentifier);
       const propIdentifier = ts.createPropertyAssignment(style.modeName, styleIdentifier);
       styleModes.push(propIdentifier);
-
     } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
       // import generated from @Component() styleUrls option
       // import myTagIosStyle from './import-path.css';
@@ -59,14 +55,12 @@ const addSingleStyleGetter = (classMembers: ts.ClassElement[], cmp: d.ComponentC
     // static get style() { return "string"; }
     const styleLiteral = createStyleLiteral(cmp, style);
     classMembers.push(createStaticGetter('style', styleLiteral));
-
   } else if (typeof style.styleIdentifier === 'string') {
     // direct import already written in the source code
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
     const styleIdentifier = ts.createIdentifier(style.styleIdentifier);
     classMembers.push(createStaticGetter('style', styleIdentifier));
-
   } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
     // import generated from @Component() styleUrls option
     // import myTagStyle from './import-path.css';
@@ -80,9 +74,7 @@ const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler
   if (cmp.encapsulation === 'scoped') {
     // scope the css first
     const scopeId = getScopeId(cmp.tagName, style.modeName);
-    return ts.createStringLiteral(
-      scopeCss(style.styleStr, scopeId, false)
-    );
+    return ts.createStringLiteral(scopeCss(style.styleStr, scopeId, false));
   }
 
   return ts.createStringLiteral(style.styleStr);

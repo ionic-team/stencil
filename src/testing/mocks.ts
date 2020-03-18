@@ -4,10 +4,8 @@ import { Cache } from '../compiler_next/cache';
 import { createTestingSystem } from './testing-sys';
 import { createInMemoryFs } from '../compiler_next/sys/in-memory-fs';
 import { MockWindow } from '@stencil/core/mock-doc';
-import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
 import path from 'path';
-
 
 export function mockConfig() {
   const sys = createTestingSystem();
@@ -38,16 +36,10 @@ export function mockConfig() {
     nodeResolve: {
       customResolveOptions: {},
     },
-    sys_next: {
-      getCompilerExecutingPath() {
-        return sys.getCompilerExecutingPath();
-      }
-    } as any
   };
 
   return config;
 }
-
 
 export function mockCompilerCtx() {
   const compilerCtx: d.CompilerCtx = {
@@ -83,7 +75,9 @@ export function mockCompilerCtx() {
     tsService: null,
     changedModules: new Set(),
     changedFiles: new Set(),
-    reset: () => {/**/}
+    reset: () => {
+      /**/
+    },
   };
 
   Object.defineProperty(compilerCtx, 'fs', {
@@ -92,7 +86,7 @@ export function mockCompilerCtx() {
         // this._fs = new InMemoryFs(mockFs(), path);
       }
       return this._fs;
-    }
+    },
   });
 
   Object.defineProperty(compilerCtx, 'cache', {
@@ -101,12 +95,11 @@ export function mockCompilerCtx() {
         this._cache = mockCache();
       }
       return this._cache;
-    }
+    },
   });
 
   return compilerCtx;
 }
-
 
 export function mockBuildCtx(config?: d.Config, compilerCtx?: d.CompilerCtx) {
   if (!config) {
@@ -120,12 +113,6 @@ export function mockBuildCtx(config?: d.Config, compilerCtx?: d.CompilerCtx) {
   return buildCtx as d.BuildCtx;
 }
 
-
-export function mockFs() {
-  return new TestingFs();
-}
-
-
 export function mockCache() {
   const sys = createTestingSystem();
   const inMemoryFs = createInMemoryFs(sys);
@@ -137,22 +124,18 @@ export function mockCache() {
   return cache as d.Cache;
 }
 
-
 export function mockLogger() {
   return new TestingLogger();
 }
 
-
-export function mockStencilSystem(): d.StencilSystem {
+export function mockStencilSystem() {
   return createTestingSystem();
 }
-
 
 export function mockDocument(html: string = null) {
   const win = new MockWindow(html);
   return win.document as Document;
 }
-
 
 export function mockWindow(html: string = null) {
   const win = new MockWindow(html);

@@ -3,13 +3,11 @@ import { basename, extname } from 'path';
 import { buildWarn, catchError, createJsVarName, normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
-
 const svgMimeTypes: any = {
   '.svg': 'image/svg+xml',
 };
 
 export const imagePlugin = (config: d.Config, buildCtx: d.BuildCtx): Plugin => {
-
   return {
     name: 'image',
 
@@ -25,7 +23,7 @@ export const imagePlugin = (config: d.Config, buildCtx: d.BuildCtx): Plugin => {
 
       try {
         const varName = createJsVarName(basename(id));
-        const base64 = config.sys_next.encodeToBase64(code);
+        const base64 = config.sys.encodeToBase64(code);
 
         if (config.devMode && base64.length > SVG_MAX_IMAGE_SIZE) {
           const warn = buildWarn(buildCtx.diagnostics);
@@ -33,13 +31,12 @@ export const imagePlugin = (config: d.Config, buildCtx: d.BuildCtx): Plugin => {
           warn.absFilePath = normalizePath(id);
         }
         return `const ${varName} = 'data:${mime};base64,${base64}';export default ${varName};`;
-
       } catch (e) {
         catchError(buildCtx.diagnostics, e);
       }
 
       return null;
-    }
+    },
   };
 };
 

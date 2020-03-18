@@ -2,15 +2,12 @@ import * as d from '../../../declarations';
 import { isOutputTargetDocsJson } from '../../output-targets/output-utils';
 import { join } from 'path';
 
-
 export const generateJsonDocs = async (config: d.Config, compilerCtx: d.CompilerCtx, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) => {
   const jsonOutputTargets = outputTargets.filter(isOutputTargetDocsJson);
   if (jsonOutputTargets.length === 0) {
     return;
   }
-  const docsDtsPath = join(
-    config.sys_next.getCompilerExecutingPath(), '..', '..', 'internal', 'stencil-public-docs.d.ts'
-  );
+  const docsDtsPath = join(config.sys.getCompilerExecutingPath(), '..', '..', 'internal', 'stencil-public-docs.d.ts');
   const docsDts = await compilerCtx.fs.readFile(docsDtsPath);
   const typesContent = `
 /**
@@ -43,22 +40,19 @@ export default _default;
       dependencies: cmp.dependencies,
       dependencyGraph: cmp.dependencyGraph,
       deprecation: cmp.deprecation,
-    }))
+    })),
   };
   const jsonContent = JSON.stringify(json, null, 2);
   await Promise.all(
     jsonOutputTargets.map(jsonOutput => {
-      return writeDocsOutput(compilerCtx,  jsonOutput, jsonContent, typesContent);
-    })
+      return writeDocsOutput(compilerCtx, jsonOutput, jsonContent, typesContent);
+    }),
   );
 };
 
 export const writeDocsOutput = async (compilerCtx: d.CompilerCtx, jsonOutput: d.OutputTargetDocsJson, jsonContent: string, typesContent: string) => {
   return Promise.all([
     compilerCtx.fs.writeFile(jsonOutput.file, jsonContent),
-    (jsonOutput.typesFile
-      ? compilerCtx.fs.writeFile(jsonOutput.typesFile, typesContent)
-      : Promise.resolve() as any
-    )
+    jsonOutput.typesFile ? compilerCtx.fs.writeFile(jsonOutput.typesFile, typesContent) : (Promise.resolve() as any),
   ]);
 };

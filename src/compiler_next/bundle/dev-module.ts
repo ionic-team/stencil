@@ -5,7 +5,6 @@ import { getRollupOptions } from './bundle-output';
 import { OutputOptions, rollup } from 'rollup';
 import { PartialResolvedId } from 'rollup';
 
-
 export const devNodeModuleResolveId = async (config: d.Config, inMemoryFs: d.InMemoryFileSystem, resolvedId: PartialResolvedId, importee: string) => {
   if (!shouldCheckDevModule(resolvedId, importee)) {
     return resolvedId;
@@ -31,7 +30,7 @@ export const devNodeModuleResolveId = async (config: d.Config, inMemoryFs: d.InM
     return resolvedId;
   }
 
-  resolvedId.id = serializeDevNodeModuleUrl(config, pkgJsonData.name, pkgJsonData.version, resolvedPath)
+  resolvedId.id = serializeDevNodeModuleUrl(config, pkgJsonData.name, pkgJsonData.version, resolvedPath);
   resolvedId.external = true;
 
   return resolvedId;
@@ -50,7 +49,7 @@ const getPackageJsonPath = (resolvedPath: string, importee: string): string => {
     }
   }
   return null;
-}
+};
 
 export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerCtx, data: d.CompilerRequest) => {
   const results: d.CompilerRequestResponse = {
@@ -85,7 +84,7 @@ export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerC
       if (useCache) {
         cachePath = getDevModuleCachePath(config, parsedUrl);
 
-        const cachedContent = await config.sys_next.readFile(cachePath);
+        const cachedContent = await config.sys.readFile(cachePath);
         if (typeof cachedContent === 'string') {
           results.content = cachedContent;
           results.cachePath = cachePath;
@@ -101,13 +100,11 @@ export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerC
         results.cachePath = cachePath;
         writeCachedFile(config, results);
       }
-
     } else {
       results.content = `/* invalid dev module */`;
       results.status = 400;
       return results;
     }
-
   } catch (e) {
     if (e) {
       if (e.stack) {
@@ -130,8 +127,8 @@ const bundleDevModule = async (config: d.Config, compilerCtx: d.CompilerCtx, par
       id: parsedUrl.nodeModuleId,
       platform: 'client',
       inputs: {
-        index: parsedUrl.nodeResolvedPath
-      }
+        index: parsedUrl.nodeResolvedPath,
+      },
     });
     const rollupBuild = await rollup(inputOpts);
 
@@ -150,12 +147,10 @@ const bundleDevModule = async (config: d.Config, compilerCtx: d.CompilerCtx, par
     if (buildCtx.hasError) {
       results.status = 500;
       results.content = `console.error(${JSON.stringify(buildCtx.diagnostics)})`;
-
     } else if (r && r.output && r.output.length > 0) {
       results.content = r.output[0].code;
       results.status = 200;
     }
-
   } catch (e) {
     results.status = 500;
     results.content = `console.error(${JSON.stringify((e.stack || e) + '')})`;
@@ -169,7 +164,7 @@ const useDevModuleCache = async (config: d.Config, p: string) => {
       if (n === 'node_modules') {
         return true;
       }
-      const isSymbolicLink = await config.sys_next.isSymbolicLink(p);
+      const isSymbolicLink = await config.sys.isSymbolicLink(p);
       if (isSymbolicLink) {
         return false;
       }
@@ -181,8 +176,8 @@ const useDevModuleCache = async (config: d.Config, p: string) => {
 
 const writeCachedFile = async (config: d.Config, results: d.CompilerRequestResponse) => {
   try {
-    await config.sys_next.mkdir(config.cacheDir);
-    config.sys_next.writeFile(results.cachePath, results.content);
+    await config.sys.mkdir(config.cacheDir);
+    config.sys.writeFile(results.cachePath, results.content);
   } catch (e) {
     console.error(e);
   }
@@ -234,7 +229,7 @@ const DEV_MODULE_CACHE_BUSTER = 0;
 
 const DEV_MODULE_DIR = `~dev-module`;
 
-const shouldCheckDevModule = (resolvedId: PartialResolvedId, importee: string) => (
+const shouldCheckDevModule = (resolvedId: PartialResolvedId, importee: string) =>
   resolvedId &&
   importee &&
   resolvedId.id &&
@@ -242,8 +237,7 @@ const shouldCheckDevModule = (resolvedId: PartialResolvedId, importee: string) =
   (resolvedId.id.endsWith('.js') || resolvedId.id.endsWith('.mjs')) &&
   !resolvedId.external &&
   !importee.startsWith('.') &&
-  !importee.startsWith('/')
-);
+  !importee.startsWith('/');
 
 interface ParsedDevModuleUrl {
   nodeModuleId: string;

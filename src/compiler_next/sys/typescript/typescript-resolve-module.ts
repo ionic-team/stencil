@@ -2,23 +2,22 @@ import * as d from '../../../declarations';
 import { basename, dirname, join, resolve } from 'path';
 import { getStencilInternalDtsUrl } from '../fetch/fetch-utils';
 import { isDtsFile, isExternalUrl, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile } from '../resolve/resolve-utils';
-import { isString, IS_LOCATION_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV , normalizePath } from '@utils';
+import { isString, IS_LOCATION_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV, normalizePath } from '@utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
 import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
 import { version } from '../../../version';
 import ts from 'typescript';
 
-
 export const patchTypeScriptResolveModule = (loadedTs: typeof ts, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
   let compilerExe: string;
-  if (config.sys_next) {
-    compilerExe = config.sys_next.getCompilerExecutingPath();
+  if (config.sys) {
+    compilerExe = config.sys.getCompilerExecutingPath();
   } else if (IS_LOCATION_ENV) {
     compilerExe = location.href;
   }
 
   if (shouldPatchRemoteTypeScript(compilerExe)) {
-    const resolveModuleName = (loadedTs as any).__resolveModuleName = loadedTs.resolveModuleName;
+    const resolveModuleName = ((loadedTs as any).__resolveModuleName = loadedTs.resolveModuleName);
 
     loadedTs.resolveModuleName = (moduleName, containingFile, compilerOptions, host, cache, redirectedReference) => {
       const resolvedModule = patchedTsResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
@@ -34,7 +33,7 @@ export const tsResolveModuleName = (config: d.Config, compilerCtx: d.CompilerCtx
   const resolveModuleName: typeof ts.resolveModuleName = (ts as any).__resolveModuleName || ts.resolveModuleName;
 
   if (moduleName && resolveModuleName && config.tsCompilerOptions) {
-    const host: ts.ModuleResolutionHost = patchTsSystemFileSystem(config, config.sys_next, compilerCtx.fs, {} as any);
+    const host: ts.ModuleResolutionHost = patchTsSystemFileSystem(config, config.sys, compilerCtx.fs, {} as any);
 
     const compilerOptions: ts.CompilerOptions = { ...config.tsCompilerOptions };
     compilerOptions.resolveJsonModule = true;
@@ -57,7 +56,7 @@ export const tsResolveModuleNamePackageJsonPath = (config: d.Config, compilerCtx
         }
         resolvedFileName = dirname(resolvedFileName);
         const pkgJsonPath = join(resolvedFileName, 'package.json');
-        const exists = config.sys_next.accessSync(pkgJsonPath);
+        const exists = config.sys.accessSync(pkgJsonPath);
         if (exists) {
           return normalizePath(pkgJsonPath);
         }
@@ -69,7 +68,13 @@ export const tsResolveModuleNamePackageJsonPath = (config: d.Config, compilerCtx
   return null;
 };
 
-export const patchedTsResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, compilerExe: string, moduleName: string, containingFile: string): ts.ResolvedModuleWithFailedLookupLocations => {
+export const patchedTsResolveModule = (
+  config: d.Config,
+  inMemoryFs: d.InMemoryFileSystem,
+  compilerExe: string,
+  moduleName: string,
+  containingFile: string,
+): ts.ResolvedModuleWithFailedLookupLocations => {
   if (isLocalModule(moduleName)) {
     // local file
 
@@ -86,11 +91,10 @@ export const patchedTsResolveModule = (config: d.Config, inMemoryFs: d.InMemoryF
             name: moduleName,
             subModuleName: '',
             version,
-          }
-        }
+          },
+        },
       };
     }
-
   } else {
     // node module id
     return tsResolveNodeModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
@@ -99,7 +103,13 @@ export const patchedTsResolveModule = (config: d.Config, inMemoryFs: d.InMemoryF
   return null;
 };
 
-export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, compilerExe: string, moduleName: string, containingFile: string): ts.ResolvedModuleWithFailedLookupLocations => {
+export const tsResolveNodeModule = (
+  config: d.Config,
+  inMemoryFs: d.InMemoryFileSystem,
+  compilerExe: string,
+  moduleName: string,
+  containingFile: string,
+): ts.ResolvedModuleWithFailedLookupLocations => {
   if (isStencilCoreImport(moduleName)) {
     return {
       resolvedModule: {
@@ -109,8 +119,8 @@ export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFile
           name: moduleName,
           subModuleName: '',
           version,
-        }
-      }
+        },
+      },
     };
   }
 
@@ -124,8 +134,8 @@ export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFile
           name: moduleName,
           subModuleName: '',
           version: resolved.packageJson.version,
-        }
-      }
+        },
+      },
     };
   }
 
@@ -169,5 +179,4 @@ const getTsResolveExtension = (p: string) => {
   return ts.Extension.Ts;
 };
 
-const shouldPatchRemoteTypeScript = (compilerExe: string) =>
-  !IS_NODE_ENV && IS_WEB_WORKER_ENV && isExternalUrl(compilerExe);
+const shouldPatchRemoteTypeScript = (compilerExe: string) => !IS_NODE_ENV && IS_WEB_WORKER_ENV && isExternalUrl(compilerExe);

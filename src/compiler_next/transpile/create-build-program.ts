@@ -3,7 +3,6 @@ import { getTsOptionsToExtend } from './ts-config';
 import { GENERATED_DTS } from '../output-targets/output-utils';
 import ts from 'typescript';
 
-
 export const createTsBuildProgram = async (config: d.Config, buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>) => {
   let isRunning = false;
   let timeoutId: any;
@@ -18,12 +17,12 @@ export const createTsBuildProgram = async (config: d.Config, buildCallback: (tsB
         return ts.sys.watchFile(path, callback);
       }
       return {
-        close() { }
+        close() {},
       };
     },
     watchDirectory() {
       return {
-        close() { }
+        close() {},
       };
     },
     setTimeout(callback, time) {
@@ -32,31 +31,31 @@ export const createTsBuildProgram = async (config: d.Config, buildCallback: (tsB
           callback();
           clearInterval(timeoutId);
         }
-      }, config.sys_next.watchTimeout || time);
+      }, config.sys.watchTimeout || time);
       return timeoutId;
     },
 
     clearTimeout(id) {
       return clearInterval(id);
-    }
+    },
   };
 
-  config.sys_next.addDestory(() => tsWatchSys.clearTimeout(timeoutId));
+  config.sys.addDestory(() => tsWatchSys.clearTimeout(timeoutId));
 
   const tsWatchHost = ts.createWatchCompilerHost(
     config.tsconfig,
     optionsToExtend,
     tsWatchSys,
     ts.createEmitAndSemanticDiagnosticsBuilderProgram,
-    (reportDiagnostic) => {
+    reportDiagnostic => {
       config.logger.debug('watch reportDiagnostic:' + reportDiagnostic.messageText);
     },
-    (reportWatchStatus) => {
+    reportWatchStatus => {
       config.logger.debug(reportWatchStatus.messageText);
-    }
+    },
   );
 
-  tsWatchHost.afterProgramCreate = async (tsBuilder) => {
+  tsWatchHost.afterProgramCreate = async tsBuilder => {
     isRunning = true;
     await buildCallback(tsBuilder);
     isRunning = false;

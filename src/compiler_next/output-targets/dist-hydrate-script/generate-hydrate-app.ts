@@ -11,10 +11,9 @@ import MagicString from 'magic-string';
 import { rollup } from 'rollup';
 import { join } from 'path';
 
-
 export const generateHydrateApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[]) => {
   try {
-    const packageDir = join(config.sys_next.getCompilerExecutingPath(), '..', '..');
+    const packageDir = join(config.sys.getCompilerExecutingPath(), '..', '..');
     const input = join(packageDir, 'internal', 'hydrate', 'runner.mjs');
     const mockDoc = join(packageDir, 'mock-doc', 'index.mjs');
 
@@ -40,8 +39,8 @@ export const generateHydrateApp = async (config: d.Config, compilerCtx: d.Compil
               return generateHydrateFactory(config, compilerCtx, buildCtx);
             }
             return null;
-          }
-        }
+          },
+        },
       ],
       treeshake: false,
       onwarn: createOnWarnFn(buildCtx.diagnostics),
@@ -54,14 +53,12 @@ export const generateHydrateApp = async (config: d.Config, compilerCtx: d.Compil
     });
 
     await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, rollupOutput);
-
   } catch (e) {
     if (!buildCtx.hasError) {
       loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
     }
   }
 };
-
 
 const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (!buildCtx.hasError) {
@@ -86,14 +83,12 @@ const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerC
           return rollupOutput.output[0].code;
         }
       }
-
     } catch (e) {
       catchError(buildCtx.diagnostics, e);
     }
   }
   return '';
 };
-
 
 const generateHydrateFactoryEntry = async (buildCtx: d.BuildCtx) => {
   const cmps = buildCtx.components;
@@ -113,7 +108,6 @@ const generateHydrateFactoryEntry = async (buildCtx: d.BuildCtx) => {
 
   return s.toString();
 };
-
 
 const getHydrateBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;

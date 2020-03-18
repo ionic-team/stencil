@@ -5,10 +5,9 @@ import { isBoolean, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, noop } from
 import { TypeScriptModule } from './typescript-load';
 import ts from 'typescript';
 
-
 export const patchTypeScriptSys = (loadedTs: TypeScriptModule, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
-  const stencilSys = config.sys_next;
-  loadedTs.sys = loadedTs.sys || {} as ts.System;
+  const stencilSys = config.sys;
+  loadedTs.sys = loadedTs.sys || ({} as ts.System);
 
   patchTsSystemFileSystem(config, stencilSys, inMemoryFs, loadedTs.sys);
   patchTsSystemWatch(stencilSys, loadedTs.sys);
@@ -46,25 +45,24 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
         }
       }
       return { files, directories };
-
     } catch (e) {
       return { files: [], directories: [] };
     }
   };
 
-  tsSys.createDirectory = (p) => stencilSys.mkdirSync(p);
+  tsSys.createDirectory = p => stencilSys.mkdirSync(p);
 
-  tsSys.directoryExists = (p) => {
+  tsSys.directoryExists = p => {
     const s = inMemoryFs.statSync(p);
     return s.isDirectory;
   };
 
-  tsSys.fileExists = (p) => {
+  tsSys.fileExists = p => {
     const s = inMemoryFs.statSync(p);
     return s.isFile;
   };
 
-  tsSys.getDirectories = (p) => {
+  tsSys.getDirectories = p => {
     const items = stencilSys.readdirSync(p);
     return items.filter(itemPath => {
       const s = inMemoryFs.statSync(itemPath);
@@ -77,7 +75,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
     return (ts as any).matchFiles(path, extensions, exclude, include, IS_CASE_SENSITIVE_FILE_NAMES, cwd, depth, getAccessibleFileSystemEntries, realpath);
   };
 
-  tsSys.readFile = (p) => {
+  tsSys.readFile = p => {
     const isUrl = p.startsWith('https:') || p.startsWith('http:');
     let content = inMemoryFs.readFileSync(p, { useCache: isUrl });
 
@@ -95,22 +93,24 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
     return content;
   };
 
-  tsSys.writeFile = (p, data) =>
-    inMemoryFs.writeFile(p, data);
+  tsSys.writeFile = (p, data) => inMemoryFs.writeFile(p, data);
 
   return tsSys;
 };
 
 const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
-
   tsSys.watchDirectory = (p, cb, recursive) => {
-    const watcher = stencilSys.watchDirectory(p, (filePath) => {
-      cb(filePath);
-    }, recursive);
+    const watcher = stencilSys.watchDirectory(
+      p,
+      filePath => {
+        cb(filePath);
+      },
+      recursive,
+    );
     return {
       close() {
         watcher.close();
-      }
+      },
     };
   };
 
@@ -127,10 +127,9 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
     return {
       close() {
         watcher.close();
-      }
+      },
     };
   };
-
 };
 
 export const patchTsSystemUtils = (tsSys: ts.System) => {
@@ -155,7 +154,7 @@ export const patchTsSystemUtils = (tsSys: ts.System) => {
   }
 
   if (!tsSys.resolvePath) {
-    tsSys.resolvePath = (p) => resolve(p);
+    tsSys.resolvePath = p => resolve(p);
   }
 
   if (!tsSys.write) {
@@ -184,5 +183,4 @@ export const patchTypeScriptGetParsedCommandLineOfConfigFile = (loadedTs: TypeSc
 
     return results;
   };
-
 };

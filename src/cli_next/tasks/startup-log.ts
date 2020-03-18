@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { buildId, vermoji, version } from '../../version';
 import os from 'os';
 
-
 export function startupLog(prcs: NodeJS.Process, config: d.Config) {
   if (config.suppressLogs === true) {
     return;
@@ -30,12 +29,18 @@ export function startupLog(prcs: NodeJS.Process, config: d.Config) {
   logger.info(startupMsg);
 
   if (isPrerelease && !isDevBuild) {
-    logger.warn(logger.yellow(`This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`));
+    logger.warn(
+      logger.yellow(
+        `This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`,
+      ),
+    );
   }
 
   if (config.devMode && !isDebug) {
     if (config.buildEs5) {
-      logger.warn(`Generating ES5 during development is a very task expensive, initial and incremental builds will be much slower. Drop the '--es5' flag and use a modern browser for development.`);
+      logger.warn(
+        `Generating ES5 during development is a very task expensive, initial and incremental builds will be much slower. Drop the '--es5' flag and use a modern browser for development.`,
+      );
     }
 
     if (!config.enableCache) {
@@ -51,16 +56,14 @@ export function startupLog(prcs: NodeJS.Process, config: d.Config) {
     if (isDebug) {
       logger.debug(platformInfo);
       logger.debug(statsInfo);
-
     } else if (config.flags && config.flags.ci) {
       logger.info(platformInfo);
       logger.info(statsInfo);
     }
 
     logger.debug(`node ${prcs.version}`);
-    logger.debug(`compiler: ${config.sys_next.getCompilerExecutingPath()}`);
+    logger.debug(`compiler: ${config.sys.getCompilerExecutingPath()}`);
     logger.debug(`build: ${buildId}`);
-
   } catch (e) {
     logger.warn(e);
   }

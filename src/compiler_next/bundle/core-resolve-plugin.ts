@@ -8,24 +8,19 @@ import { STENCIL_CORE_ID, STENCIL_INTERNAL_ID, STENCIL_INTERNAL_CLIENT_ID, STENC
 import path from 'path';
 import { Plugin } from 'rollup';
 
-
 export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, platform: 'client' | 'hydrate' | 'worker'): Plugin => {
   if (platform === 'worker') {
     return {
       name: 'coreResolvePlugin',
       resolveId(id) {
-        if (
-          id === STENCIL_CORE_ID ||
-          id === STENCIL_INTERNAL_CLIENT_ID ||
-          id === STENCIL_INTERNAL_HYDRATE_ID
-        ) {
+        if (id === STENCIL_CORE_ID || id === STENCIL_INTERNAL_CLIENT_ID || id === STENCIL_INTERNAL_HYDRATE_ID) {
           this.error(`${id} cannot be imported from a worker`);
         }
         return null;
       },
     };
   }
-  const compilerExe = config.sys_next.getCompilerExecutingPath();
+  const compilerExe = config.sys.getCompilerExecutingPath();
   const internalClient = getStencilInternalModule(config.rootDir, compilerExe, 'client');
   const internalHydrate = getStencilInternalModule(config.rootDir, compilerExe, 'hydrate');
 
@@ -83,7 +78,7 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
         return '""';
       }
       return null;
-    }
+    },
   };
 };
 
@@ -108,9 +103,7 @@ export const getHydratedFlagHead = (h: d.HydratedFlag) => {
     initial = `{${h.property}:${h.initialValue}}`;
   }
 
-  const selector = h.selector === 'attribute' ?
-    `[${h.name}]` :
-    `.${h.name}`
+  const selector = h.selector === 'attribute' ? `[${h.name}]` : `.${h.name}`;
 
   if (!String(h.hydratedValue) || h.hydratedValue === '' || h.hydratedValue == null) {
     hydrated = '';

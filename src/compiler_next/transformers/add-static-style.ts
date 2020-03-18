@@ -26,13 +26,7 @@ export const addStaticStyleGetterWithinClass = (classMembers: ts.ClassElement[],
 export const addStaticStylePropertyToClass = (styleStatements: ts.Statement[], cmp: d.ComponentCompilerMeta) => {
   const styleLiteral = getStyleLiteral(cmp);
   if (styleLiteral) {
-    const statement = ts.createStatement(ts.createAssignment(
-      ts.createPropertyAccess(
-        ts.createIdentifier(cmp.componentClassName),
-        'style'
-      ),
-      styleLiteral
-    ));
+    const statement = ts.createStatement(ts.createAssignment(ts.createPropertyAccess(ts.createIdentifier(cmp.componentClassName), 'style'), styleLiteral));
     styleStatements.push(statement);
   }
 };
@@ -42,7 +36,6 @@ const getStyleLiteral = (cmp: d.ComponentCompilerMeta) => {
     if (cmp.styles.length > 1 || (cmp.styles.length === 1 && cmp.styles[0].modeName !== DEFAULT_STYLE_MODE)) {
       // multiple style modes
       return getMultipleModeStyle(cmp, cmp.styles);
-
     } else {
       // single style
       return getSingleStyle(cmp, cmp.styles[0]);
@@ -61,7 +54,6 @@ const getMultipleModeStyle = (cmp: d.ComponentCompilerMeta, styles: d.StyleCompi
       const styleLiteral = createStyleLiteral(cmp, style);
       const propStr = createPropertyAssignment(style.modeName, styleLiteral);
       styleModes.push(propStr);
-
     } else if (typeof style.styleIdentifier === 'string') {
       // direct import already written in the source code
       // import myTagIosStyle from './import-path.css';
@@ -69,7 +61,6 @@ const getMultipleModeStyle = (cmp: d.ComponentCompilerMeta, styles: d.StyleCompi
       const styleIdentifier = ts.createIdentifier(style.styleIdentifier);
       const propIdentifier = createPropertyAssignment(style.modeName, styleIdentifier);
       styleModes.push(propIdentifier);
-
     } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
       // import generated from @Component() styleUrls option
       // import myTagIosStyle from './import-path.css';
@@ -101,7 +92,6 @@ const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) =>
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
     return ts.createIdentifier(style.styleIdentifier);
-
   }
 
   if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
@@ -118,9 +108,7 @@ const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler
   if (cmp.encapsulation === 'scoped') {
     // scope the css first
     const scopeId = getScopeId(cmp.tagName, style.modeName);
-    return ts.createStringLiteral(
-      scopeCss(style.styleStr, scopeId, false)
-    );
+    return ts.createStringLiteral(scopeCss(style.styleStr, scopeId, false));
   }
 
   return ts.createStringLiteral(style.styleStr);

@@ -1,11 +1,12 @@
 import { CompilerSystem, SystemDetails } from '../../declarations';
-import { nodeCopyTasks, asyncGlob } from './node-copy-tasks';
-import { createHash } from 'crypto';
-import { normalizePath } from '@utils';
-import fs from 'graceful-fs';
-import path from 'path';
+import { asyncGlob, nodeCopyTasks } from './node-copy-tasks';
 import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
-
+import { createHash } from 'crypto';
+import fs from 'graceful-fs';
+import { normalizePath } from '@utils';
+import path from 'path';
+import { NodeLazyRequire } from './node-lazy-require';
+import { NodeResolveModule } from './node-resolve-module';
 
 export function createNodeSys(prcs: NodeJS.Process) {
   const destroys = new Set<() => Promise<void> | void>();
@@ -62,19 +63,20 @@ export function createNodeSys(prcs: NodeJS.Process) {
       return normalizePath(prcs.cwd());
     },
     glob: asyncGlob,
-    isSymbolicLink: (p: string) => new Promise<boolean>(resolve => {
-      try {
-        fs.lstat(p, (err, stats) => {
-          if (err) {
-            resolve(false);
-          } else {
-            resolve(stats.isSymbolicLink());
-          }
-        });
-      } catch (e) {
-        resolve(false);
-      }
-    }),
+    isSymbolicLink: (p: string) =>
+      new Promise<boolean>(resolve => {
+        try {
+          fs.lstat(p, (err, stats) => {
+            if (err) {
+              resolve(false);
+            } else {
+              resolve(stats.isSymbolicLink());
+            }
+          });
+        } catch (e) {
+          resolve(false);
+        }
+      }),
     getCompilerExecutingPath: null,
     mkdir(p, opts) {
       return new Promise(resolve => {
@@ -102,9 +104,11 @@ export function createNodeSys(prcs: NodeJS.Process) {
           if (err) {
             resolve([]);
           } else {
-            resolve(files.map(f => {
-              return normalizePath(path.join(p, f));
-            }));
+            resolve(
+              files.map(f => {
+                return normalizePath(path.join(p, f));
+              }),
+            );
           }
         });
       });
@@ -217,8 +221,25 @@ export function createNodeSys(prcs: NodeJS.Process) {
       return Promise.resolve(hash);
     },
     copy: nodeCopyTasks,
-    details: getDetails()
+    details: getDetails(),
   };
+
+  const nodeResolve = new NodeResolveModule();
+
+  // TODO
+  sys.lazyRequire = new NodeLazyRequire(nodeResolve, {
+    lazyDependencies: {
+      '@types/jest': '24.0.20',
+      '@types/puppeteer': '1.19.0',
+      'jest': '24.9.0',
+      'jest-cli': '24.9.0',
+      'pixelmatch': '4.0.2',
+      'puppeteer': '1.19.0',
+      'puppeteer-core': '1.19.0',
+      'workbox-build': '4.3.1',
+    },
+  });
+
   return sys;
 }
 
@@ -234,7 +255,7 @@ const getDetails = () => {
     runtime: 'node',
     runtimeVersion: '',
     tmpDir: tmpdir(),
-    totalmem: -1
+    totalmem: -1,
   };
   try {
     const sysCpus = cpus();

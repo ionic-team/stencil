@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { optimizeCssId } from '../../version';
 import { hasError, normalizePath } from '@utils';
 
-
 export const optimizeCss = async (config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], styleText: string, filePath: string) => {
   if (typeof styleText !== 'string' || !styleText.length) {
     //  don't bother with invalid data
@@ -22,7 +21,7 @@ export const optimizeCss = async (config: d.Config, compilerCtx: d.CompilerCtx, 
     input: styleText,
     filePath: filePath,
     autoprefixer: config.autoprefixCss,
-    minify: config.minifyCss
+    minify: config.minifyCss,
   };
 
   const cacheKey = await compilerCtx.cache.createKey('optimizeCss', optimizeCssId, opts);
@@ -32,7 +31,7 @@ export const optimizeCss = async (config: d.Config, compilerCtx: d.CompilerCtx, 
     return cachedContent;
   }
 
-  const minifyResults = await config.sys.optimizeCss(opts);
+  const minifyResults = await compilerCtx.worker.optimizeCss(opts);
   minifyResults.diagnostics.forEach(d => {
     // collect up any diagnostics from minifying
     diagnostics.push(d);

@@ -1,10 +1,9 @@
-
 import {
   CompileOptions,
   CompileResults,
   CompileScriptMinifyOptions,
   CompilerBuildResults,
-  CompilerNext as Compiler,
+  Compiler,
   CompilerSystem,
   CompilerWatcher,
   Config,

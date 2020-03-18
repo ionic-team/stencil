@@ -4,26 +4,26 @@ import { getRemoteTypeScriptUrl } from '../dependencies';
 import { IS_FETCH_ENV, IS_WEB_WORKER_ENV } from '@utils';
 import { join } from 'path';
 
-
 export const fetchPreloadFs = async (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
   if (IS_WEB_WORKER_ENV && IS_FETCH_ENV) {
-    const preloadUrls = getCoreFetchPreloadUrls(config, config.sys_next.getCompilerExecutingPath());
+    const preloadUrls = getCoreFetchPreloadUrls(config, config.sys.getCompilerExecutingPath());
 
-    await Promise.all(preloadUrls.map(async preload => {
-      try {
-        const fileExists = await inMemoryFs.access(preload.filePath);
-        if (!fileExists) {
-          const rsp = await cachedFetch(preload.url);
-          if (rsp && rsp.ok) {
-            const content = await rsp.clone().text();
-            await inMemoryFs.writeFile(preload.filePath, content);
+    await Promise.all(
+      preloadUrls.map(async preload => {
+        try {
+          const fileExists = await inMemoryFs.access(preload.filePath);
+          if (!fileExists) {
+            const rsp = await cachedFetch(preload.url);
+            if (rsp && rsp.ok) {
+              const content = await rsp.clone().text();
+              await inMemoryFs.writeFile(preload.filePath, content);
+            }
           }
+        } catch (e) {
+          config.logger.error(e);
         }
-
-      } catch (e) {
-        config.logger.error(e);
-      }
-    }));
+      }),
+    );
 
     await inMemoryFs.commit();
   }
@@ -37,13 +37,13 @@ const getCoreFetchPreloadUrls = (config: d.Config, compilerUrl: string) => {
       return {
         url: new URL(p, stencilUrl).href,
         filePath: join(config.rootDir, 'node_modules', '@stencil', 'core', p),
-      }
+      };
     }),
     ...tsPreloadPaths.map(p => {
       return {
         url: new URL(p, tsUrl).href,
         filePath: join(config.rootDir, 'node_modules', 'typescript', p),
-      }
+      };
     }),
   ];
 };

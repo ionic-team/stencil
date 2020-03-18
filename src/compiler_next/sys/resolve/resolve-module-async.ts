@@ -5,12 +5,11 @@ import { getCommonDirUrl, getNodeModuleFetchUrl, packageVersions } from '../fetc
 import { isString, normalizeFsPath } from '@utils';
 import resolve from 'resolve';
 
-
 export const resolveModuleIdAsync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, basedir: string, exts: string[]) => {
   const opts = createCustomResolverAsync(config, inMemoryFs, exts);
   opts.basedir = basedir;
 
-  return new Promise<{ resolveId: string, pkgData: d.PackageJsonData }>((resolvePromise, rejectPromise) => {
+  return new Promise<{ resolveId: string; pkgData: d.PackageJsonData }>((resolvePromise, rejectPromise) => {
     resolve(moduleId, opts, (err, resolveId, pkgData: any) => {
       if (err) {
         rejectPromise(err);
@@ -25,10 +24,9 @@ export const resolveModuleIdAsync = (config: d.Config, inMemoryFs: d.InMemoryFil
 };
 
 export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, exts: string[]): any => {
-  const compilerExecutingPath = config.sys_next.getCompilerExecutingPath();
+  const compilerExecutingPath = config.sys.getCompilerExecutingPath();
 
   return {
-
     async isFile(filePath: string, cb: (err: any, isFile: boolean) => void) {
       const fsFilePath = normalizeFsPath(filePath);
 

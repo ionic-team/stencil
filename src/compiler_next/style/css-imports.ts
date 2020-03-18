@@ -2,15 +2,33 @@ import * as d from '../../declarations';
 import { basename, dirname, isAbsolute, join, relative } from 'path';
 import { buildError, normalizePath } from '@utils';
 import { parseStyleDocs } from '../docs/style-docs';
+import { resolveModuleIdAsync } from '../sys/resolve/resolve-module-async';
 import { stripCssComments } from './style-utils';
 
-
-export const parseCssImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, srcFilePath: string, resolvedFilePath: string, styleText: string, styleDocs?: d.StyleDoc[]) => {
+export const parseCssImports = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  srcFilePath: string,
+  resolvedFilePath: string,
+  styleText: string,
+  styleDocs?: d.StyleDoc[],
+) => {
   const isCssEntry = resolvedFilePath.toLowerCase().endsWith('.css');
   return cssImports(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, resolvedFilePath, styleText, [], styleDocs);
 };
 
-const cssImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, resolvedFilePath: string, styleText: string, noLoop: string[], styleDocs?: d.StyleDoc[]) => {
+const cssImports = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  isCssEntry: boolean,
+  srcFilePath: string,
+  resolvedFilePath: string,
+  styleText: string,
+  noLoop: string[],
+  styleDocs?: d.StyleDoc[],
+) => {
   if (noLoop.includes(resolvedFilePath)) {
     return styleText;
   }
@@ -20,24 +38,44 @@ const cssImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx
     parseStyleDocs(styleDocs, styleText);
   }
 
-  const cssImports = getCssImports(config, buildCtx, resolvedFilePath, styleText);
+  const cssImports = await getCssImports(config, compilerCtx, buildCtx, resolvedFilePath, styleText);
   if (cssImports.length === 0) {
     return styleText;
   }
 
-  await Promise.all(cssImports.map(async cssImportData => {
-    await concatCssImport(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, cssImportData, noLoop, styleDocs);
-  }));
+  await Promise.all(
+    cssImports.map(async cssImportData => {
+      await concatCssImport(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, cssImportData, noLoop, styleDocs);
+    }),
+  );
 
   return replaceImportDeclarations(styleText, cssImports, isCssEntry);
 };
 
-const concatCssImport = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, isCssEntry: boolean, srcFilePath: string, cssImportData: d.CssImportData, noLoop: string[], styleDocs?: d.StyleDoc[]) => {
+const concatCssImport = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  isCssEntry: boolean,
+  srcFilePath: string,
+  cssImportData: d.CssImportData,
+  noLoop: string[],
+  styleDocs?: d.StyleDoc[],
+) => {
   cssImportData.styleText = await loadStyleText(compilerCtx, cssImportData);
 
   if (typeof cssImportData.styleText === 'string') {
-    cssImportData.styleText = await cssImports(config, compilerCtx, buildCtx, isCssEntry, cssImportData.filePath, cssImportData.filePath, cssImportData.styleText, noLoop, styleDocs);
-
+    cssImportData.styleText = await cssImports(
+      config,
+      compilerCtx,
+      buildCtx,
+      isCssEntry,
+      cssImportData.filePath,
+      cssImportData.filePath,
+      cssImportData.styleText,
+      noLoop,
+      styleDocs,
+    );
   } else {
     const err = buildError(buildCtx.diagnostics);
     err.messageText = `Unable to read css import: ${cssImportData.srcImport}`;
@@ -50,20 +88,18 @@ const loadStyleText = async (compilerCtx: d.CompilerCtx, cssImportData: d.CssImp
 
   try {
     styleText = await compilerCtx.fs.readFile(cssImportData.filePath);
-
   } catch (e) {
     if (cssImportData.altFilePath) {
       try {
         styleText = await compilerCtx.fs.readFile(cssImportData.filePath);
-
-      } catch (e) { }
+      } catch (e) {}
     }
   }
 
   return styleText;
 };
 
-export const getCssImports = (config: d.Config, buildCtx: d.BuildCtx, filePath: string, styleText: string) => {
+export const getCssImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filePath: string, styleText: string) => {
   const imports: d.CssImportData[] = [];
 
   if (!styleText.includes('@import')) {
@@ -74,13 +110,16 @@ export const getCssImports = (config: d.Config, buildCtx: d.BuildCtx, filePath: 
   styleText = stripCssComments(styleText);
 
   const dir = dirname(filePath);
-  const importeeExt = filePath.split('.').pop().toLowerCase();
+  const importeeExt = filePath
+    .split('.')
+    .pop()
+    .toLowerCase();
 
   let r: RegExpExecArray;
-  while (r = IMPORT_RE.exec(styleText)) {
+  while ((r = IMPORT_RE.exec(styleText))) {
     const cssImportData: d.CssImportData = {
       srcImport: r[0],
-      url: r[4].replace(/[\"\'\)]/g, '')
+      url: r[4].replace(/[\"\'\)]/g, ''),
     };
 
     if (!isLocalCssImport(cssImportData.srcImport)) {
@@ -91,12 +130,10 @@ export const getCssImports = (config: d.Config, buildCtx: d.BuildCtx, filePath: 
 
     if (isCssNodeModule(cssImportData.url)) {
       // node resolve this path cuz it starts with ~
-      resolveCssNodeModule(config, buildCtx.diagnostics, filePath, cssImportData);
-
+      await resolveCssNodeModule(config, compilerCtx, buildCtx.diagnostics, filePath, cssImportData);
     } else if (isAbsolute(cssImportData.url)) {
       // absolute path already
       cssImportData.filePath = normalizePath(cssImportData.url);
-
     } else {
       // relative path
       cssImportData.filePath = normalizePath(join(dir, cssImportData.url));
@@ -119,7 +156,7 @@ export const getCssImports = (config: d.Config, buildCtx: d.BuildCtx, filePath: 
   }
 
   return imports;
-}
+};
 
 const IMPORT_RE = /(@import)\s+(url\()?\s?(.*?)\s?\)?([^;]*);?/gi;
 
@@ -127,26 +164,16 @@ export const isCssNodeModule = (url: string) => {
   return url.startsWith('~');
 };
 
-export const resolveCssNodeModule = (config: d.Config, diagnostics: d.Diagnostic[], filePath: string, cssImportData: d.CssImportData) => {
+export const resolveCssNodeModule = async (config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], filePath: string, cssImportData: d.CssImportData) => {
   try {
     const dir = dirname(filePath);
     const moduleId = getModuleId(cssImportData.url);
-
-    try {
-      cssImportData.filePath = config.sys.resolveModule(dir, moduleId, { packageJson: true });
-    } catch (error) {
-      if (error.code === 'MODULE_NOT_FOUND') {
-        // the module might not have a main field in package.json
-        cssImportData.filePath = config.sys.resolveModule(dir, moduleId);
-      } else {
-        throw error;
-      }
-    }
+    const resolved = await resolveModuleIdAsync(config, compilerCtx.fs, moduleId, dir, []);
+    cssImportData.filePath = resolved.resolveId;
 
     cssImportData.filePath = dirname(cssImportData.filePath);
     cssImportData.filePath += normalizePath(cssImportData.url.substring(moduleId.length + 1));
     cssImportData.updatedImport = `@import "${cssImportData.filePath}";`;
-
   } catch (e) {
     const d = buildError(diagnostics);
     d.messageText = `Unable to resolve node module for CSS @import: ${cssImportData.url}`;

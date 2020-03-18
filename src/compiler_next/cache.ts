@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { join } from 'path';
 
-
 export class Cache implements d.Cache {
   private failed = 0;
   private skip = false;
@@ -9,7 +8,7 @@ export class Cache implements d.Cache {
   private logger: d.Logger;
 
   constructor(private config: d.Config, private cacheFs: d.InMemoryFileSystem) {
-    this.sys = config.sys_next;
+    this.sys = config.sys;
     this.logger = config.logger;
   }
 
@@ -29,7 +28,6 @@ export class Cache implements d.Cache {
     try {
       const readmeFilePath = join(this.config.cacheDir, '_README.log');
       await this.cacheFs.writeFile(readmeFilePath, CACHE_DIR_README);
-
     } catch (e) {
       this.logger.error(`Cache, initCacheDir: ${e}`);
       this.config.enableCache = false;
@@ -54,7 +52,6 @@ export class Cache implements d.Cache {
       result = await this.cacheFs.readFile(this.getCacheFilePath(key));
       this.failed = 0;
       this.skip = false;
-
     } catch (e) {
       this.failed++;
       result = null;
@@ -83,12 +80,12 @@ export class Cache implements d.Cache {
 
   async has(key: string) {
     const val = await this.get(key);
-    return (typeof val === 'string');
+    return typeof val === 'string';
   }
 
   async createKey(domain: string, ...args: any[]) {
     if (!this.config.enableCache) {
-      return domain + (Math.random() * 9999999);
+      return domain + Math.random() * 9999999;
     }
     const hash = await this.sys.generateContentHash(JSON.stringify(args), 32);
     return domain + '_' + hash;
@@ -116,14 +113,14 @@ export class Cache implements d.Cache {
 
     const now = Date.now();
 
-    const lastClear = await this.sys.cacheStorage.get(EXP_STORAGE_KEY) as number;
+    const lastClear = (await this.sys.cacheStorage.get(EXP_STORAGE_KEY)) as number;
     if (lastClear != null) {
       const diff = now - lastClear;
       if (diff < ONE_DAY) {
         return;
       }
 
-      const fs = this.cacheFs.disk;
+      const fs = this.cacheFs.sys;
       const cachedFileNames = await fs.readdir(this.config.cacheDir);
       const cachedFilePaths = cachedFileNames.map(f => join(this.config.cacheDir, f));
 
@@ -169,9 +166,7 @@ export class Cache implements d.Cache {
     }
     return null;
   }
-
 }
-
 
 const MAX_FAILED = 100;
 const ONE_DAY = 1000 * 60 * 60 * 24;

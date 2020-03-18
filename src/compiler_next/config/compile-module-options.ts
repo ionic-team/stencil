@@ -4,7 +4,6 @@ import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
 import { parseImportPath } from '../transformers/stencil-import-path';
 import ts from 'typescript';
 
-
 export const getCompileResults = (code: string, input: CompileOptions) => {
   if (!isString(input.file)) {
     input.file = 'module.tsx';
@@ -12,7 +11,7 @@ export const getCompileResults = (code: string, input: CompileOptions) => {
   const parsedImport = parseImportPath(input.file);
 
   const results: CompileResults = {
-    code: (typeof code === 'string' ? code : ''),
+    code: typeof code === 'string' ? code : '',
     data: [],
     diagnostics: [],
     inputFileExtension: parsedImport.ext,
@@ -25,7 +24,7 @@ export const getCompileResults = (code: string, input: CompileOptions) => {
   return {
     importData: parsedImport.data,
     results,
-  }
+  };
 };
 
 export const getCompileModuleConfig = (input: CompileOptions) => {
@@ -37,7 +36,7 @@ export const getCompileModuleConfig = (input: CompileOptions) => {
     file: input.file,
     proxy: getCompileConfigOpt(input.proxy, VALID_PROXY, 'defineproperty'),
     module: getCompileConfigOpt(input.module, VALID_MODULE, 'esm'),
-    sourceMap: input.sourceMap === 'inline' ? 'inline' : (input.sourceMap !== false),
+    sourceMap: input.sourceMap === 'inline' ? 'inline' : input.sourceMap !== false,
     style: getCompileConfigOpt(input.style, VALID_STYLE, 'static'),
     target: getCompileConfigOpt(input.target || (input as any).script /* deprecated */, VALID_TARGET, 'latest'),
     typescriptPath: input.typescriptPath,
@@ -51,7 +50,7 @@ export const getCompileModuleConfig = (input: CompileOptions) => {
     esModuleInterop: true,
 
     // always get source maps
-    sourceMap: (compileOpts.sourceMap !== false),
+    sourceMap: compileOpts.sourceMap !== false,
 
     // isolated per file transpiling
     isolatedModules: true,
@@ -104,7 +103,7 @@ export const getCompileModuleConfig = (input: CompileOptions) => {
     _isTesting: true,
     validateTypes: false,
     enableCache: false,
-    sys: {},
+    sys: {} as any,
     tsCompilerOptions,
   };
 
@@ -122,7 +121,7 @@ export const getCompileCssConfig = (compileOpts: CompileOptions, importData: Imp
     tag: importData && importData.tag,
     encapsulation: importData && importData.encapsulation,
     mode: importData && importData.mode,
-    sourceMap: (compileOpts.sourceMap !== false),
+    sourceMap: compileOpts.sourceMap !== false,
     commentOriginalSelector: false,
     minify: false,
     autoprefixer: false,
@@ -135,7 +134,7 @@ const getCompileConfigOpt = (value: any, validValues: Set<string>, defaultValue:
   if (value === null || value === 'null') {
     return null;
   }
-  value = (isString(value) ? value.toLowerCase().trim() : null);
+  value = isString(value) ? value.toLowerCase().trim() : null;
   if (validValues.has(value)) {
     return value;
   }

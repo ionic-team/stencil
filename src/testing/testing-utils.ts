@@ -3,7 +3,6 @@ import { normalizePath } from '@utils';
 import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler_next/output-targets/output-utils';
 import { join, relative } from 'path';
 
-
 export function shuffleArray(array: any[]) {
   // http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
   let currentIndex = array.length;
@@ -12,7 +11,6 @@ export function shuffleArray(array: any[]) {
 
   // While there remain elements to shuffle...
   while (0 !== currentIndex) {
-
     // Pick a remaining element...
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex -= 1;
@@ -26,17 +24,16 @@ export function shuffleArray(array: any[]) {
   return array;
 }
 
-
 export function expectFiles(fs: d.InMemoryFileSystem, filePaths: string[]) {
   filePaths.forEach(filePath => {
-    fs.disk.statSync(filePath);
+    fs.sys.statSync(filePath);
   });
 }
 
 export function doNotExpectFiles(fs: d.InMemoryFileSystem, filePaths: string[]) {
   filePaths.forEach(filePath => {
     try {
-      fs.disk.statSync(filePath);
+      fs.sys.statSync(filePath);
     } catch (e) {
       return;
     }

@@ -3,9 +3,8 @@ import { buildError, buildWarn } from '@utils';
 import { isAbsolute, join } from 'path';
 import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 
-
 export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) => {
-  const testing = config.testing = Object.assign({}, config.testing || {});
+  const testing = (config.testing = Object.assign({}, config.testing || {}));
 
   if (!config.flags || (!config.flags.e2e && !config.flags.spec)) {
     return;
@@ -36,7 +35,6 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
     if (!isAbsolute(testing.rootDir)) {
       testing.rootDir = join(config.rootDir, testing.rootDir);
     }
-
   } else {
     testing.rootDir = config.rootDir;
   }
@@ -49,11 +47,8 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
     if (!isAbsolute(testing.screenshotConnector)) {
       testing.screenshotConnector = join(config.rootDir, testing.screenshotConnector);
     }
-
   } else {
-    testing.screenshotConnector = join(
-      config.sys_next.getCompilerExecutingPath(), '..', '..', 'screenshot', 'local-connector.js'
-    );
+    testing.screenshotConnector = join(config.sys.getCompilerExecutingPath(), '..', '..', 'screenshot', 'local-connector.js');
   }
 
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
@@ -61,31 +56,24 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
       return join(testing.rootDir, ignorePattern);
     });
 
-    config.outputTargets.filter(o => (isOutputTargetDist(o) || isOutputTargetWww(o)) && o.dir).forEach((outputTarget: d.OutputTargetWww) => {
-      testing.testPathIgnorePatterns.push(outputTarget.dir);
-    });
+    config.outputTargets
+      .filter(o => (isOutputTargetDist(o) || isOutputTargetWww(o)) && o.dir)
+      .forEach((outputTarget: d.OutputTargetWww) => {
+        testing.testPathIgnorePatterns.push(outputTarget.dir);
+      });
   }
 
   if (typeof testing.preset !== 'string') {
-    testing.preset = join(
-      config.sys_next.getCompilerExecutingPath(), '..', '..', 'testing'
-    );
-
+    testing.preset = join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing');
   } else if (!isAbsolute(testing.preset)) {
-    testing.preset = join(
-      config.configPath,
-      testing.preset
-    );
+    testing.preset = join(config.configPath, testing.preset);
   }
 
   if (!Array.isArray(testing.setupFilesAfterEnv)) {
     testing.setupFilesAfterEnv = [];
-
   }
 
-  testing.setupFilesAfterEnv.unshift(
-    join(config.sys_next.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js')
-  );
+  testing.setupFilesAfterEnv.unshift(join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js'));
   if (testing.setupTestFrameworkScriptFile) {
     const err = buildWarn(diagnostics);
     err.messageText = `setupTestFrameworkScriptFile has been deprecated.`;
@@ -93,10 +81,7 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
 
   if (typeof testing.testEnvironment === 'string') {
     if (!isAbsolute(testing.testEnvironment)) {
-      testing.testEnvironment = join(
-        config.configPath,
-        testing.testEnvironment
-      );
+      testing.testEnvironment = join(config.configPath, testing.testEnvironment);
     }
   }
 
@@ -105,7 +90,6 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
       const err = buildError(diagnostics);
       err.messageText = `allowableMismatchedPixels must be a value that is 0 or greater`;
     }
-
   } else {
     testing.allowableMismatchedPixels = DEFAULT_ALLOWABLE_MISMATCHED_PIXELS;
   }
@@ -122,7 +106,6 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
       const err = buildError(diagnostics);
       err.messageText = `pixelmatchThreshold must be a value ranging from 0 to 1`;
     }
-
   } else {
     testing.pixelmatchThreshold = DEFAULT_PIXEL_MATCH_THRESHOLD;
   }
@@ -133,16 +116,12 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
 
   if (Array.isArray(testing.testMatch)) {
     delete testing.testRegex;
-
   } else if (typeof testing.testRegex === 'string') {
     delete testing.testMatch;
-
   }
 
   if (typeof testing.runner !== 'string') {
-    testing.runner = join(
-      config.sys_next.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-runner.js'
-    );
+    testing.runner = join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-runner.js');
   }
 
   if (typeof testing.waitBeforeScreenshot === 'number') {
@@ -165,8 +144,8 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
           isMobile: false,
           hasTouch: false,
           isLandscape: false,
-        }
-      }
+        },
+      },
     ];
   }
 };
@@ -179,8 +158,4 @@ const addTestingConfigOption = (setArray: string[], option: string) => {
 
 const DEFAULT_ALLOWABLE_MISMATCHED_PIXELS = 100;
 const DEFAULT_PIXEL_MATCH_THRESHOLD = 0.1;
-const DEFAULT_IGNORE_PATTERNS = [
-  '.vscode',
-  '.stencil',
-  'node_modules',
-];
+const DEFAULT_IGNORE_PATTERNS = ['.vscode', '.stencil', 'node_modules'];

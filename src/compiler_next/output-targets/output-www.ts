@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { catchError, flatOne, unique } from '@utils';
-import { cloneDocument } from '@stencil/core/mock-doc';
+import { cloneDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
 import { generateHashedCopy } from '../copy/hashed-copy';
 import { getAbsoluteBuildDir } from '../html/html-utils';
@@ -15,7 +15,6 @@ import { optimizeEsmImport } from '../html/inline-esm-import';
 import { updateGlobalStylesLink } from '../html/update-global-styles-link';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 
-
 export const outputWww = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
@@ -25,12 +24,10 @@ export const outputWww = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
   const timespan = buildCtx.createTimeSpan(`generate www started`, true);
   const criticalBundles = getCriticalPath(buildCtx);
 
-  await Promise.all(
-    outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, criticalBundles, outputTarget))
-  );
+  await Promise.all(outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, criticalBundles, outputTarget)));
 
   timespan.finish(`generate www finished`);
-}
+};
 
 const getCriticalPath = (buildCtx: d.BuildCtx) => {
   const componentGraph = buildCtx.componentGraph;
@@ -41,8 +38,8 @@ const getCriticalPath = (buildCtx: d.BuildCtx) => {
     flatOne(
       getUsedComponents(buildCtx.indexDoc, buildCtx.components)
         .map(tagName => getScopeId(tagName))
-        .map(scopeId => buildCtx.componentGraph.get(scopeId) || [])
-    )
+        .map(scopeId => buildCtx.componentGraph.get(scopeId) || []),
+    ),
   ).sort();
 };
 
@@ -62,19 +59,25 @@ const generateWww = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCt
 const generateHostConfig = (compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) => {
   const buildDir = getAbsoluteBuildDir(outputTarget);
   const hostConfigPath = join(outputTarget.appDir, 'host.config.json');
-  const hostConfigContent = JSON.stringify({
-    'hosting': {
-      'headers': [
-        {
-          'source': join(buildDir, '/p-*'),
-          'headers': [ {
-            'key': 'Cache-Control',
-            'value': 'max-age=31556952, s-maxage=31556952, immutable'
-          } ]
-        }
-      ]
-    }
-  }, null, '  ');
+  const hostConfigContent = JSON.stringify(
+    {
+      hosting: {
+        headers: [
+          {
+            source: join(buildDir, '/p-*'),
+            headers: [
+              {
+                key: 'Cache-Control',
+                value: 'max-age=31556952, s-maxage=31556952, immutable',
+              },
+            ],
+          },
+        ],
+      },
+    },
+    null,
+    '  ',
+  );
 
   return compilerCtx.fs.writeFile(hostConfigPath, hostConfigContent, { outputTargetType: outputTarget.type });
 };
@@ -101,17 +104,14 @@ const generateIndexHtml = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       }
     }
 
-    if (config.sys.serializeNodeToHtml != null) {
-      const indexContent = config.sys.serializeNodeToHtml(doc);
-      await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexContent, { outputTargetType: outputTarget.type });
+    const indexContent = serializeNodeToHtml(doc);
+    await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexContent, { outputTargetType: outputTarget.type });
 
-      if (outputTarget.serviceWorker && config.flags.prerender) {
-        await compilerCtx.fs.writeFile(join(outputTarget.appDir, INDEX_ORG), indexContent, { outputTargetType: outputTarget.type });
-      }
-
-      buildCtx.debug(`generateIndexHtml, write: ${relative(config.rootDir, outputTarget.indexHtml)}`);
+    if (outputTarget.serviceWorker && config.flags.prerender) {
+      await compilerCtx.fs.writeFile(join(outputTarget.appDir, INDEX_ORG), indexContent, { outputTargetType: outputTarget.type });
     }
 
+    buildCtx.debug(`generateIndexHtml, write: ${relative(config.rootDir, outputTarget.indexHtml)}`);
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }

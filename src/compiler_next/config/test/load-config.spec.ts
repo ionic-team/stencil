@@ -4,7 +4,6 @@ import { loadConfig } from '../load-config';
 import { normalizePath } from '../../../utils';
 import path from 'path';
 
-
 describe('load config', () => {
   const configPath = require.resolve('./fixtures/stencil.config.ts');
   const configPath2 = require.resolve('./fixtures/stencil.config2.ts');
@@ -63,7 +62,7 @@ describe('load config', () => {
     expect(c.diagnostics.filter(d => d.level === 'error')).toHaveLength(0);
     expect(c.diagnostics.filter(d => d.level === 'warn')).toHaveLength(1);
     expect(c.config).toBeDefined();
-    expect(c.config.sys_next).toBeDefined();
+    expect(c.config.sys).toBeDefined();
     expect(c.config.logger).toBeDefined();
     expect(c.config.configPath).toBe(null);
   });
@@ -77,5 +76,4 @@ describe('load config', () => {
     const c = await loadConfig();
     expect(c.diagnostics).toHaveLength(1);
   });
-
 });

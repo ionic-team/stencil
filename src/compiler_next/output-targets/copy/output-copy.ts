@@ -6,38 +6,27 @@ import { isOutputTargetCopy } from '../../output-targets/output-utils';
 import { join } from 'path';
 import minimatch from 'minimatch';
 
-
 export const outputCopy = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetCopy);
   if (outputTargets.length === 0) {
     return;
   }
 
-  const changedFiles = [
-    ...buildCtx.filesUpdated,
-    ...buildCtx.filesAdded,
-    ...buildCtx.dirsAdded
-  ];
+  const changedFiles = [...buildCtx.filesUpdated, ...buildCtx.filesAdded, ...buildCtx.dirsAdded];
   const copyTasks: Required<d.CopyTask>[] = [];
   const needsCopyAssets = !canSkipAssetsCopy(compilerCtx, buildCtx.entryModules, buildCtx.filesChanged);
   outputTargets.forEach(o => {
     if (needsCopyAssets && o.copyAssets) {
-      copyTasks.push(
-        ...getComponentAssetsCopyTasks(config, buildCtx, o.dir, o.copyAssets === 'collection')
-      );
+      copyTasks.push(...getComponentAssetsCopyTasks(config, buildCtx, o.dir, o.copyAssets === 'collection'));
     }
-    copyTasks.push(
-      ...getCopyTasks(config, buildCtx, o, changedFiles)
-    );
+    copyTasks.push(...getCopyTasks(config, buildCtx, o, changedFiles));
   });
-
 
   if (copyTasks.length > 0) {
     const timespan = buildCtx.createTimeSpan(`copy started`);
     let copiedFiles = 0;
     try {
-
-      const copyResults = await config.sys_next.copy(copyTasks, config.srcDir);
+      const copyResults = await config.sys.copy(copyTasks, config.srcDir);
       if (copyResults != null) {
         buildCtx.diagnostics.push(...copyResults.diagnostics);
         compilerCtx.fs.cancelDeleteDirectoriesFromDisk(copyResults.dirPaths);
@@ -56,9 +45,7 @@ const getCopyTasks = (config: d.Config, buildCtx: d.BuildCtx, o: d.OutputTargetC
   if (!Array.isArray(o.copy)) {
     return [];
   }
-  const copyTasks = (!buildCtx.isRebuild || buildCtx.requiresFullBuild)
-    ? o.copy
-    : filterCopyTasks(config, o.copy, changedFiles);
+  const copyTasks = !buildCtx.isRebuild || buildCtx.requiresFullBuild ? o.copy : filterCopyTasks(config, o.copy, changedFiles);
 
   return copyTasks.map(t => transformToAbs(t, o.dir));
 };
@@ -90,6 +77,6 @@ const transformToAbs = (copyTask: d.CopyTask, dest: string): Required<d.CopyTask
     src: copyTask.src,
     dest: getDestAbsPath(copyTask.src, dest, copyTask.dest),
     keepDirStructure: typeof copyTask.keepDirStructure === 'boolean' ? copyTask.keepDirStructure : copyTask.dest == null,
-    warn: copyTask.warn !== false
+    warn: copyTask.warn !== false,
   };
 };

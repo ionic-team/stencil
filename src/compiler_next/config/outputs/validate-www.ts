@@ -7,7 +7,6 @@ import { validateCopy } from '../validate-copy';
 import { validatePrerender } from '../validate-prerender';
 import { validateServiceWorker } from '../validate-service-worker';
 
-
 export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
   const hasOutputTargets = userOutputs.length > 0;
   const hasE2eTests = !!(config.flags && config.flags.e2e);
@@ -42,7 +41,7 @@ export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userO
     outputs.push({
       type: COPY,
       dir: buildDir,
-      copyAssets: 'dist'
+      copyAssets: 'dist',
     });
 
     // Copy for www
@@ -65,7 +64,6 @@ export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userO
     return outputs;
   }, []);
 };
-
 
 const validateWwwOutputTarget = (config: d.Config, outputTarget: d.OutputTargetWww, diagnostics: d.Diagnostic[]) => {
   if (!isString(outputTarget.baseUrl)) {

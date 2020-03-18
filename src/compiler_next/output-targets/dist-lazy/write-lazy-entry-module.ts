@@ -2,7 +2,6 @@ import * as d from '../../../declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { join } from 'path';
 
-
 export const writeLazyModule = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
@@ -12,18 +11,14 @@ export const writeLazyModule = async (
   shouldHash: boolean,
   code: string,
   modeName: string,
-  sufix: string
+  sufix: string,
 ): Promise<d.BundleModuleOutput> => {
   // code = replaceStylePlaceholders(entryModule.cmps, modeName, code);
 
   const bundleId = await getBundleId(config, entryModule.entryKey, shouldHash, code, modeName, sufix);
   const fileName = `${bundleId}.entry.js`;
 
-  await Promise.all(
-    destinations.map(dst =>
-      compilerCtx.fs.writeFile(join(dst, fileName), code, { outputTargetType })
-    )
-  );
+  await Promise.all(destinations.map(dst => compilerCtx.fs.writeFile(join(dst, fileName), code, { outputTargetType })));
 
   return {
     bundleId,
@@ -35,7 +30,7 @@ export const writeLazyModule = async (
 
 const getBundleId = async (config: d.Config, entryKey: string, shouldHash: boolean, code: string, modeName: string, sufix: string) => {
   if (shouldHash) {
-    const hash = await config.sys_next.generateContentHash(code, config.hashedFileNameLength);
+    const hash = await config.sys.generateContentHash(code, config.hashedFileNameLength);
     return `p-${hash}${sufix}`;
   }
 

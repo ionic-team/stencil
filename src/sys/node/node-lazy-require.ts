@@ -6,11 +6,9 @@ import { SpawnOptions, spawn } from 'child_process';
 import semiver from 'semiver';
 
 export class NodeLazyRequire implements d.LazyRequire {
-  private moduleData = new Map<string, { fromDir: string, modulePath: string }>();
+  private moduleData = new Map<string, { fromDir: string; modulePath: string }>();
 
-  constructor(
-    private nodeResolveModule: NodeResolveModule, private stencilPackageJson: d.PackageJsonData
-  ) {}
+  constructor(private nodeResolveModule: NodeResolveModule, private stencilPackageJson: d.PackageJsonData) {}
 
   async ensure(logger: d.Logger, fromDir: string, ensureModuleIds: string[]) {
     if (!this.stencilPackageJson || !this.stencilPackageJson.lazyDependencies) {
@@ -42,7 +40,7 @@ export class NodeLazyRequire implements d.LazyRequire {
         if (semiver(installedPkgJson.version, requiredVersionRange) >= 0) {
           this.moduleData.set(ensureModuleId, {
             fromDir: fromDir,
-            modulePath: dirname(resolvedPkgJsonPath)
+            modulePath: dirname(resolvedPkgJsonPath),
           });
           return;
         }
@@ -50,7 +48,7 @@ export class NodeLazyRequire implements d.LazyRequire {
 
       depsToInstall.push({
         moduleId: ensureModuleId,
-        requiredVersionRange: requiredVersionRange
+        requiredVersionRange: requiredVersionRange,
       });
     });
 
@@ -60,7 +58,9 @@ export class NodeLazyRequire implements d.LazyRequire {
       return Promise.resolve();
     }
 
-    const msg = `Please wait while required dependencies are ${isUpdate ? `updated` : `installed`}. This may take a few moments and will only be required for the initial run.`;
+    const msg = `Please wait while required dependencies are ${
+      isUpdate ? `updated` : `installed`
+    }. This may take a few moments and will only be required for the initial run.`;
 
     logger.info(logger.magenta(msg));
 
@@ -81,12 +81,11 @@ export class NodeLazyRequire implements d.LazyRequire {
       depsToInstall.forEach(installedDep => {
         this.moduleData.set(installedDep.moduleId, {
           fromDir: fromDir,
-          modulePath: null
+          modulePath: null,
         });
       });
 
       timeSpan.finish(`installing dependencies finished`);
-
     } catch (e) {
       logger.error(`lazy require failed: ${e}`);
     }
@@ -123,21 +122,13 @@ export class NodeLazyRequire implements d.LazyRequire {
 
     return moduleData.modulePath;
   }
-
 }
-
 
 function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
   return new Promise<void>((resolve, reject) => {
     const cmd = 'npm';
 
-    const args = [
-      'install',
-      ...moduleIds,
-      '--no-audit',
-      '--save-exact',
-      '--save-dev'
-    ];
+    const args = ['install', ...moduleIds, '--no-audit', '--save-exact', '--save-dev'];
 
     const opts: SpawnOptions = {
       shell: true,
@@ -182,17 +173,14 @@ function npmInstall(logger: d.Logger, fromDir: string, moduleIds: string[]) {
         reject(`failed to install: ${moduleIds.join(', ')}${output ? ', ' + output : ''}`);
       }
     });
-
   });
 }
-
 
 function readPackageJson(pkgJsonPath: string) {
   return new Promise<d.PackageJsonData>((resolve, reject) => {
     readFile(pkgJsonPath, 'utf8', (err, data) => {
       if (err) {
         reject(err);
-
       } else {
         try {
           resolve(JSON.parse(data));

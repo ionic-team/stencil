@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { getTsOptionsToExtend } from './ts-config';
 import ts from 'typescript';
 
-
 export const createTsWatchProgram = async (config: d.Config, buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>) => {
   let isRunning = false;
   let lastTsBuilder: any;
@@ -16,37 +15,37 @@ export const createTsWatchProgram = async (config: d.Config, buildCallback: (tsB
 
     setTimeout(callback, time) {
       clearInterval(rebuildTimer);
-      const t = timeoutId = setInterval(() => {
+      const t = (timeoutId = setInterval(() => {
         if (!isRunning) {
           callback();
           clearInterval(t);
           timeoutId = rebuildTimer = null;
         }
-      }, config.sys_next.watchTimeout || time);
+      }, config.sys.watchTimeout || time));
       return t;
     },
 
     clearTimeout(id) {
       return clearInterval(id);
-    }
+    },
   };
 
-  config.sys_next.addDestory(() => tsWatchSys.clearTimeout(timeoutId));
+  config.sys.addDestory(() => tsWatchSys.clearTimeout(timeoutId));
 
   const tsWatchHost = ts.createWatchCompilerHost(
     config.tsconfig,
     optionsToExtend,
     tsWatchSys,
     ts.createEmitAndSemanticDiagnosticsBuilderProgram,
-    (reportDiagnostic) => {
+    reportDiagnostic => {
       config.logger.debug('watch reportDiagnostic:' + reportDiagnostic.messageText);
     },
-    (reportWatchStatus) => {
+    reportWatchStatus => {
       config.logger.debug(reportWatchStatus.messageText);
-    }
+    },
   );
 
-  tsWatchHost.afterProgramCreate = async (tsBuilder) => {
+  tsWatchHost.afterProgramCreate = async tsBuilder => {
     lastTsBuilder = tsBuilder;
     isRunning = true;
     await buildCallback(tsBuilder);
@@ -59,6 +58,6 @@ export const createTsWatchProgram = async (config: d.Config, buildCallback: (tsB
       if (lastTsBuilder && !timeoutId) {
         rebuildTimer = tsWatchSys.setTimeout(() => tsWatchHost.afterProgramCreate(lastTsBuilder), 300);
       }
-    }
+    },
   };
 };
