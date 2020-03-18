@@ -1,9 +1,10 @@
 import * as d from '../../declarations';
-import { isOutputTargetDist, isOutputTargetWww } from '../../compiler/output-targets/output-utils';
 import { buildError, buildWarn } from '@utils';
+import { isAbsolute, join } from 'path';
+import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 
 
-export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
+export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) => {
   const testing = config.testing = Object.assign({}, config.testing || {});
 
   if (!config.flags || (!config.flags.e2e && !config.flags.spec)) {
@@ -21,21 +22,19 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
   }
 
   testing.browserArgs = testing.browserArgs || [];
-  addOption(testing.browserArgs, '--font-render-hinting=medium');
-  addOption(testing.browserArgs, '--incognito');
+  addTestingConfigOption(testing.browserArgs, '--font-render-hinting=medium');
+  addTestingConfigOption(testing.browserArgs, '--incognito');
 
   if (config.flags.ci) {
-    addOption(testing.browserArgs, '--no-sandbox');
-    addOption(testing.browserArgs, '--disable-setuid-sandbox');
-    addOption(testing.browserArgs, '--disable-dev-shm-usage');
+    addTestingConfigOption(testing.browserArgs, '--no-sandbox');
+    addTestingConfigOption(testing.browserArgs, '--disable-setuid-sandbox');
+    addTestingConfigOption(testing.browserArgs, '--disable-dev-shm-usage');
     testing.browserHeadless = true;
   }
 
-  const path = config.sys.path;
-
   if (typeof testing.rootDir === 'string') {
-    if (!path.isAbsolute(testing.rootDir)) {
-      testing.rootDir = path.join(config.rootDir, testing.rootDir);
+    if (!isAbsolute(testing.rootDir)) {
+      testing.rootDir = join(config.rootDir, testing.rootDir);
     }
 
   } else {
@@ -47,19 +46,19 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
   }
 
   if (typeof testing.screenshotConnector === 'string') {
-    if (!path.isAbsolute(testing.screenshotConnector)) {
-      testing.screenshotConnector = path.join(config.rootDir, testing.screenshotConnector);
+    if (!isAbsolute(testing.screenshotConnector)) {
+      testing.screenshotConnector = join(config.rootDir, testing.screenshotConnector);
     }
 
   } else {
-    testing.screenshotConnector = path.join(
+    testing.screenshotConnector = join(
       config.sys_next.getCompilerExecutingPath(), '..', '..', 'screenshot', 'local-connector.js'
     );
   }
 
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
     testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map(ignorePattern => {
-      return path.join(testing.rootDir, ignorePattern);
+      return join(testing.rootDir, ignorePattern);
     });
 
     config.outputTargets.filter(o => (isOutputTargetDist(o) || isOutputTargetWww(o)) && o.dir).forEach((outputTarget: d.OutputTargetWww) => {
@@ -68,12 +67,12 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
   }
 
   if (typeof testing.preset !== 'string') {
-    testing.preset = path.join(
+    testing.preset = join(
       config.sys_next.getCompilerExecutingPath(), '..', '..', 'testing'
     );
 
-  } else if (!path.isAbsolute(testing.preset)) {
-    testing.preset = path.join(
+  } else if (!isAbsolute(testing.preset)) {
+    testing.preset = join(
       config.configPath,
       testing.preset
     );
@@ -85,7 +84,7 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
   }
 
   testing.setupFilesAfterEnv.unshift(
-    path.join(config.sys_next.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js')
+    join(config.sys_next.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js')
   );
   if (testing.setupTestFrameworkScriptFile) {
     const err = buildWarn(diagnostics);
@@ -93,8 +92,8 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
   }
 
   if (typeof testing.testEnvironment === 'string') {
-    if (!path.isAbsolute(testing.testEnvironment)) {
-      testing.testEnvironment = path.join(
+    if (!isAbsolute(testing.testEnvironment)) {
+      testing.testEnvironment = join(
         config.configPath,
         testing.testEnvironment
       );
@@ -141,7 +140,7 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
   }
 
   if (typeof testing.runner !== 'string') {
-    testing.runner = path.join(
+    testing.runner = join(
       config.sys_next.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-runner.js'
     );
   }
@@ -170,15 +169,13 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
       }
     ];
   }
-}
+};
 
-
-function addOption(setArray: string[], option: string) {
+const addTestingConfigOption = (setArray: string[], option: string) => {
   if (!setArray.includes(option)) {
     setArray.push(option);
   }
-}
-
+};
 
 const DEFAULT_ALLOWABLE_MISMATCHED_PIXELS = 100;
 const DEFAULT_PIXEL_MATCH_THRESHOLD = 0.1;

@@ -1,8 +1,7 @@
 import { CompileOptions, CompileResults, Config, TransformOptions, TransformCssToEsmInput, ImportData } from '../../declarations';
 import { isString } from '@utils';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
-import { parseImportPath } from '../../compiler/transformers/stencil-import-path';
-import path from 'path';
+import { parseImportPath } from '../transformers/stencil-import-path';
 import ts from 'typescript';
 
 
@@ -105,9 +104,7 @@ export const getCompileModuleConfig = (input: CompileOptions) => {
     _isTesting: true,
     validateTypes: false,
     enableCache: false,
-    sys: {
-      path: path
-    },
+    sys: {},
     tsCompilerOptions,
   };
 

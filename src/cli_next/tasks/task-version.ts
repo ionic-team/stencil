@@ -1,23 +1,28 @@
 import * as d from '../../declarations';
+import { request } from 'https';
 import exit from 'exit';
 import semiver from 'semiver';
 
 
-export function taskVersion(config: d.Config) {
-  console.log(config.sys.compiler.version);
-}
+const REGISTRY_URL = `https://registry.npmjs.org/@stencil/core`;
+const CHECK_INTERVAL = (1000 * 60 * 60 * 24 * 7);
 
+
+export async function taskVersion() {
+  const { version } = await import('@stencil/core/compiler');
+  console.log(version);
+}
 
 export async function taskCheckVersion(config: d.Config) {
   try {
-    const currentVersion = config.sys.compiler.version;
-    const latestVersion = await config.sys.getLatestCompilerVersion(config.logger, true);
+    const { version } = await import('@stencil/core/compiler');
+    const latestVersion = await getLatestCompilerVersion(config, true);
 
-    if (semiver(currentVersion, latestVersion) < 0) {
-      printUpdateMessage(config.logger, currentVersion, latestVersion);
+    if (semiver(version, latestVersion) < 0) {
+      printUpdateMessage(config.logger, version, latestVersion);
 
     } else {
-      console.log(`${config.logger.cyan(config.sys.compiler.name)} version ${config.logger.green(config.sys.compiler.version)} is the latest version`);
+      console.log(`${config.logger.cyan('@stencil/core')} version ${config.logger.green(version)} is the latest version`);
     }
 
   } catch (e) {
@@ -26,19 +31,91 @@ export async function taskCheckVersion(config: d.Config) {
   }
 }
 
+async function getLatestCompilerVersion(config: d.Config, forceCheck: boolean) {
+  try {
+    if (!forceCheck) {
+      const lastCheck = await getLastCheck(config);
+      if (lastCheck == null) {
+        // we've never check before, so probably first install, so don't bother
+        // save that we did just do a check though
+        await setLastCheck(config);
+        return null;
+      }
 
-export async function validateCompilerVersion(sys: d.StencilSystem, logger: d.Logger, latestVersionPromise: Promise<string>) {
+      if (!requiresCheck(Date.now(), lastCheck, CHECK_INTERVAL)) {
+        // within the range that we did a check recently, so don't bother
+        return null;
+      }
+    }
+
+    // remember we just did a check
+    await setLastCheck(config);
+
+    const body = await requestUrl(REGISTRY_URL);
+    const data = JSON.parse(body) as d.PackageJsonData;
+    const latestVersion = data['dist-tags'].latest;
+    return latestVersion;
+
+  } catch (e) {
+    // quietly catch, could have no network connection which is fine
+    config.logger.debug(`checkVersion error: ${e}`);
+  }
+
+  return null;
+}
+
+async function validateCompilerVersion(logger: d.Logger, latestVersionPromise: Promise<string>) {
   const latestVersion = await latestVersionPromise;
   if (latestVersion == null) {
     return;
   }
 
-  const currentVersion = sys.compiler.version;
+  const { version } = await import('@stencil/core/compiler');
 
-  if (semiver(currentVersion, latestVersion) < 0) {
-    printUpdateMessage(logger, currentVersion, latestVersion);
+  if (semiver(version, latestVersion) < 0) {
+    printUpdateMessage(logger, version, latestVersion);
   }
 }
+
+async function requestUrl(url: string) {
+  return new Promise<string>((resolve, reject) => {
+    const req = request(url, res => {
+      if (res.statusCode > 299) {
+        reject(`url: ${url}, staus: ${res.statusCode}`);
+        return;
+      }
+
+      res.once('error', reject);
+
+      const ret: any = [];
+      res.once('end', () => {
+        resolve(ret.join(''));
+      });
+
+      res.on('data', data => {
+        ret.push(data);
+      });
+    });
+    req.once('error', reject);
+    req.end();
+  });
+}
+
+
+function requiresCheck(now: number, lastCheck: number, checkInterval: number) {
+  return ((lastCheck + checkInterval) < now);
+}
+
+
+function getLastCheck(config: d.Config): Promise<number> {
+  return config.sys_next.cacheStorage.get(STORAGE_KEY);
+}
+
+function setLastCheck(config: d.Config) {
+  return config.sys_next.cacheStorage.set(STORAGE_KEY, Date.now());
+}
+
+const STORAGE_KEY = 'last_version_check';
 
 
 function printUpdateMessage(logger: d.Logger, currentVersion: string, latestVersion: string) {

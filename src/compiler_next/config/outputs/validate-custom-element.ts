@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
-import { getAbsolutePath } from '../utils';
+import { getAbsolutePath } from '../config-utils';
 import { isBoolean } from '@utils';
-import { isOutputTargetDistCustomElements } from '../../../compiler/output-targets/output-utils';
+import { isOutputTargetDistCustomElements } from '../../output-targets/output-utils';
 
 
 export const validateCustomElement = (config: d.Config, userOutputs: d.OutputTarget[]) => {

@@ -3,6 +3,7 @@ import { catchError } from '@utils';
 import { runPrerender } from '../../prerender/prerender-main';
 import { startupLog } from './startup-log';
 import exit from 'exit';
+import path from 'path';
 
 
 export async function taskPrerender(prcs: NodeJS.Process, config: d.Config) {
@@ -15,8 +16,8 @@ export async function taskPrerender(prcs: NodeJS.Process, config: d.Config) {
     exit(1);
   }
 
-  if (!config.sys.path.isAbsolute(hydrateAppFilePath)) {
-    hydrateAppFilePath = config.sys.path.join(config.cwd, hydrateAppFilePath);
+  if (!path.isAbsolute(hydrateAppFilePath)) {
+    hydrateAppFilePath = path.join(config.cwd, hydrateAppFilePath);
   }
 
   const srcIndexHtmlPath = config.srcIndexHtml;

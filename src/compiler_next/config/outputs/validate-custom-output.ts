@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { catchError } from '@utils';
-import { COPY, isOutputTargetCustom } from '../../../compiler/output-targets/output-utils';
+import { COPY, isOutputTargetCustom } from '../../output-targets/output-utils';
 
 
 export const validateCustomOutput = (config: d.Config, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {

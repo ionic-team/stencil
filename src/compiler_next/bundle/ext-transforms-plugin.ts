@@ -1,9 +1,10 @@
 import * as d from '../../declarations';
 import { BundleOptions } from './bundle-interface';
 import { hasError, normalizeFsPath } from '@utils';
-import { parseImportPath } from '../../compiler/transformers/stencil-import-path';
+import { join, relative } from 'path';
+import { parseImportPath } from '../transformers/stencil-import-path';
 import { Plugin } from 'rollup';
-import { runPluginTransformsEsmImports } from '../../compiler/plugin/plugin';
+import { runPluginTransformsEsmImports } from '../plugin/plugin';
 
 
 export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions): Plugin => {
@@ -28,10 +29,10 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         if (moduleFile) {
           const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
 
-          const relPath = config.sys.path.relative(config.srcDir, pluginTransforms.id);
+          const relPath = relative(config.srcDir, pluginTransforms.id);
 
           await Promise.all(collectionDirs.map(async outputTarget => {
-            const collectionPath = config.sys.path.join(outputTarget.collectionDir, relPath);
+            const collectionPath = join(outputTarget.collectionDir, relPath);
             await compilerCtx.fs.writeFile(collectionPath, pluginTransforms.code);
           }));
         }

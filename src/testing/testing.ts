@@ -119,7 +119,6 @@ export const createTesting = async (config: Config): Promise<Testing> => {
   const destroy = async () => {
     const closingTime: Promise<any>[] = []; // you don't have to go home but you can't stay here
     if (config) {
-      config.sys && config.sys.destroy && config.sys.destroy();
       if (config.sys_next && config.sys_next.destroy) {
         closingTime.push(config.sys_next.destroy());
       }

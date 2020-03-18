@@ -1,14 +1,14 @@
 import { HydrateDocumentOptions, HydrateFactoryOptions, HydrateResults, SerializeDocumentOptions } from '../../declarations';
 import { generateHydrateResults, normalizeHydrateOptions, renderBuildError, renderCatchError } from './render-utils';
+import { hasError } from '@utils';
 import { hydrateFactory } from '@hydrate-factory';
 import { initializeWindow } from './window-initialize';
 import { inspectElement } from './inspect-element';
 import { MockWindow, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import { patchDomImplementation } from './patch-dom-implementation';
-import { relocateMetaCharset } from '../../compiler/html/relocate-meta-charset';
-import { removeUnusedStyles } from '../../compiler/html/remove-unused-styles';
-import { updateCanonicalLink } from '../../compiler/html/canonical-link';
-import { hasError } from '@utils';
+import { relocateMetaCharset } from '../../compiler_next/html/relocate-meta-charset';
+import { removeUnusedStyles } from '../../compiler_next/html/remove-unused-styles';
+import { updateCanonicalLink } from '../../compiler_next/html/canonical-link';
 
 
 export function renderToString(html: string | any, options?: SerializeDocumentOptions) {

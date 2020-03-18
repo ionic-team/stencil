@@ -1,11 +1,11 @@
 import * as d from '../../../declarations';
 import { buildError, isBoolean, isString } from '@utils';
-import { COPY, DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww } from '../../../compiler/output-targets/output-utils';
-import { getAbsolutePath } from '../utils';
-import { validateCopy } from '../../../compiler/config/validate-copy';
-import { validatePrerender } from '../../../compiler/config/validate-prerender';
-import { validateServiceWorker } from '../../../compiler/config/validate-service-worker';
-import path from 'path';
+import { COPY, DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww } from '../../output-targets/output-utils';
+import { getAbsolutePath } from '../config-utils';
+import { isAbsolute, join } from 'path';
+import { validateCopy } from '../validate-copy';
+import { validatePrerender } from '../validate-prerender';
+import { validateServiceWorker } from '../validate-service-worker';
 
 
 export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
@@ -33,7 +33,7 @@ export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userO
       dir: buildDir,
       esmDir: buildDir,
       systemDir: config.buildEs5 ? buildDir : undefined,
-      systemLoaderFile: config.buildEs5 ? config.sys.path.join(buildDir, `${config.fsNamespace}.js`) : undefined,
+      systemLoaderFile: config.buildEs5 ? join(buildDir, `${config.fsNamespace}.js`) : undefined,
       polyfills: outputTarget.polyfills,
       isBrowserBuild: true,
     });
@@ -59,7 +59,7 @@ export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userO
     // Generate global style with original name
     outputs.push({
       type: DIST_GLOBAL_STYLES,
-      file: path.join(buildDir, `${config.fsNamespace}.css`),
+      file: join(buildDir, `${config.fsNamespace}.css`),
     });
 
     return outputs;
@@ -80,7 +80,8 @@ const validateWwwOutputTarget = (config: d.Config, outputTarget: d.OutputTargetW
   outputTarget.dir = getAbsolutePath(config, outputTarget.dir || 'www');
 
   // Fix "dir" to account
-  outputTarget.appDir = path.join(outputTarget.dir, getUrlPathName(outputTarget.baseUrl));
+  const pathname = new URL(outputTarget.baseUrl, 'http://localhost/').pathname;
+  outputTarget.appDir = join(outputTarget.dir, pathname);
   if (outputTarget.appDir.endsWith('/')) {
     outputTarget.appDir = outputTarget.appDir.substring(0, outputTarget.appDir.length - 1);
   }
@@ -89,16 +90,16 @@ const validateWwwOutputTarget = (config: d.Config, outputTarget: d.OutputTargetW
     outputTarget.buildDir = 'build';
   }
 
-  if (!path.isAbsolute(outputTarget.buildDir)) {
-    outputTarget.buildDir = path.join(outputTarget.appDir, outputTarget.buildDir);
+  if (!isAbsolute(outputTarget.buildDir)) {
+    outputTarget.buildDir = join(outputTarget.appDir, outputTarget.buildDir);
   }
 
   if (!isString(outputTarget.indexHtml)) {
     outputTarget.indexHtml = 'index.html';
   }
 
-  if (!path.isAbsolute(outputTarget.indexHtml)) {
-    outputTarget.indexHtml = path.join(outputTarget.appDir, outputTarget.indexHtml);
+  if (!isAbsolute(outputTarget.indexHtml)) {
+    outputTarget.indexHtml = join(outputTarget.appDir, outputTarget.indexHtml);
   }
 
   if (!isBoolean(outputTarget.empty)) {
@@ -115,5 +116,3 @@ const validateWwwOutputTarget = (config: d.Config, outputTarget: d.OutputTargetW
 
   return outputTarget;
 };
-
-const getUrlPathName = (url: string) => new URL(url, 'http://localhost/').pathname;

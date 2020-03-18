@@ -5,9 +5,9 @@ import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
 import { generateTemplateHtml } from './prerender-template-html';
 import { getPrerenderConfig, validatePrerenderConfigPath, getHydrateOptions } from './prerender-config';
-import { getAbsoluteBuildDir } from '../compiler/html/utils';
-import { isOutputTargetWww } from '../compiler/output-targets/output-utils';
-import { NodeWorkerController } from '../sys/node_next/worker';
+import { getAbsoluteBuildDir } from '../compiler_next/html/html-utils';
+import { isOutputTargetWww } from '../compiler_next/output-targets/output-utils';
+import { NodeWorkerController } from '../sys/node/worker';
 
 import crypto from 'crypto';
 import fs from 'fs';
@@ -142,7 +142,7 @@ async function runPrerenderOutputTarget(prcs: NodeJS.Process, workerCtrl: NodeWo
     }
 
     manager.templateId = createPrerenderTemplate(config, templateHtml);
-    manager.componentGraphPath = createComponentGraphPath(config, componentGraph, outputTarget);
+    manager.componentGraphPath = createComponentGraphPath(componentGraph, outputTarget);
 
     await new Promise(resolve => {
       manager.resolve = resolve;
@@ -207,9 +207,9 @@ function createPrerenderTemplate(config: d.Config, templateHtml: string) {
   return templateId;
 }
 
-function createComponentGraphPath(config: d.Config, componentGraph: d.BuildResultsComponentGraph, outputTarget: d.OutputTargetWww) {
+function createComponentGraphPath(componentGraph: d.BuildResultsComponentGraph, outputTarget: d.OutputTargetWww) {
   if (componentGraph) {
-    const content = getComponentPathContent(config, componentGraph, outputTarget);
+    const content = getComponentPathContent(componentGraph, outputTarget);
     const hash = generateContentHash(content);
     const fileName = `prerender-component-graph-${hash}.json`;
     const componentGraphPath = path.join(os.tmpdir(), fileName);
@@ -219,8 +219,8 @@ function createComponentGraphPath(config: d.Config, componentGraph: d.BuildResul
   return null;
 }
 
-function getComponentPathContent(config: d.Config, componentGraph: {[scopeId: string]: string[]}, outputTarget: d.OutputTargetWww) {
-  const buildDir = getAbsoluteBuildDir(config, outputTarget);
+function getComponentPathContent(componentGraph: {[scopeId: string]: string[]}, outputTarget: d.OutputTargetWww) {
+  const buildDir = getAbsoluteBuildDir(outputTarget);
   const object: {[key: string]: string[]} = {};
   const entries = Object.entries(componentGraph);
   for (const [key, chunks] of entries) {

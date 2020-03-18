@@ -24,7 +24,6 @@ export const resolveModuleIdAsync = (config: d.Config, inMemoryFs: d.InMemoryFil
   });
 };
 
-
 export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, exts: string[]): any => {
   const compilerExecutingPath = config.sys_next.getCompilerExecutingPath();
 

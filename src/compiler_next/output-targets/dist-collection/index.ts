@@ -1,8 +1,8 @@
 import * as d from '../../../declarations';
 import { catchError } from '@utils';
-import { isOutputTargetDistCollection } from '../../../compiler/output-targets/output-utils';
+import { isOutputTargetDistCollection } from '../../output-targets/output-utils';
 import { join, relative } from 'path';
-import { writeCollectionManifests } from '../../../compiler/output-targets/output-collection';
+import { writeCollectionManifests } from '../../output-targets/output-collection';
 
 
 export const outputCollection = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, changedModuleFiles: d.Module[]) => {

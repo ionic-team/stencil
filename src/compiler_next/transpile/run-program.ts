@@ -1,12 +1,12 @@
 import * as d from '../../declarations';
-import { buildError, loadTypeScriptDiagnostics, normalizePath } from '@utils';
-import { convertDecoratorsToStatic } from '../../compiler/transformers/decorators-to-static/convert-decorators';
-import { generateAppTypes } from '../../compiler/types/generate-app-types';
-import { getComponentsFromModules, isOutputTargetDistTypes } from '../../compiler/output-targets/output-utils';
-import { resolveComponentDependencies } from '../../compiler/entries/resolve-component-dependencies';
-import { updateComponentBuildConditionals } from '../build/app-data';
-import { updateModule } from './static-to-meta/parse-static';
 import { basename, join, relative } from 'path';
+import { buildError, loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
+import { generateAppTypes } from '../types/generate-app-types';
+import { getComponentsFromModules, isOutputTargetDistTypes } from '../output-targets/output-utils';
+import { resolveComponentDependencies } from '../entries/resolve-component-dependencies';
+import { updateComponentBuildConditionals } from '../app-core/app-data';
+import { updateModule } from '../transformers/static-to-meta/parse-static';
 import ts from 'typescript';
 
 

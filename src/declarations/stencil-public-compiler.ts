@@ -464,6 +464,7 @@ export interface CompilerSystem {
    * SYNC! Always returns a boolean, does not throw.
    */
   accessSync(p: string): boolean;
+  cacheStorage?: CacheStorage;
   copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
   /**
    * Always returns a boolean if the files were copied or not. Does not throw.
@@ -1498,27 +1499,19 @@ export interface Diagnostic {
 }
 
 export interface StencilSystem {
-  cancelWorkerTasks?(): void;
-  compiler?: {
-    name: string;
-    version: string;
-    typescriptVersion?: string;
-    runtime?: string;
-    packageDir?: string;
-    distDir?: string;
-  };
-  copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
-  color?: any;
-  cloneDocument?(doc: Document): Document;
-  createFsWatcher?(config: Config, fs: FileSystem, events: BuildEvents): Promise<FsWatcher>;
-  createDocument?(html: string): Document;
-  destroy?(): void;
-  addDestroy?(fn: Function): void;
-  details?: SystemDetails;
-  encodeToBase64?(str: string): string;
-  fs?: FileSystem;
-  generateContentHash?(content: string, length: number): Promise<string>;
-  getLatestCompilerVersion?(logger: Logger, forceCheck: boolean): Promise<string>;
+  // cancelWorkerTasks?(): void;
+  // copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
+  // color?: any;
+  // cloneDocument?(doc: Document): Document;
+  // createFsWatcher?(config: Config, fs: FileSystem, events: BuildEvents): Promise<FsWatcher>;
+  // createDocument?(html: string): Document;
+  // destroy?(): void;
+  // addDestroy?(fn: Function): void;
+  // details?: SystemDetails;
+  // encodeToBase64?(str: string): string;
+  // fs?: FileSystem;
+  // generateContentHash?(content: string, length: number): Promise<string>;
+  // getLatestCompilerVersion?(logger: Logger, forceCheck: boolean): Promise<string>;
   getClientPath?(staticName: string): string;
   getClientCoreFile?(opts: { staticName: string }): Promise<string>;
   glob?(pattern: string, options: {
@@ -1536,18 +1529,17 @@ export interface StencilSystem {
   nextTick?(cb: Function): void;
   open?: (url: string, opts?: any) => Promise<void>;
   optimizeCss?(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
-  path?: Path;
   prerenderUrl?: (prerenderRequest: PrerenderRequest) => Promise<PrerenderResults>;
   resolveModule?(fromDir: string, moduleId: string, opts?: ResolveModuleOptions): string;
   rollup?: RollupInterface;
   scopeCss?: (cssText: string, scopeId: string, commentOriginalSelector: boolean) => Promise<string>;
   serializeNodeToHtml?(elm: Element | Document): string;
-  storage?: Storage;
+  storage?: CacheStorage;
   transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<any>;
   validateTypes?(compilerOptions: any, emitDtsFiles: boolean, collectionNames: string[], rootTsFiles: string[], isDevMode: boolean): Promise<any>;
 }
 
-export interface Storage {
+export interface CacheStorage {
   get(key: string): Promise<any>;
   set(key: string, value: any): Promise<void>;
 }
@@ -1591,18 +1583,6 @@ export interface PrerenderRequest {
   templateId: string;
   url: string;
   writeToFilePath: string;
-}
-
-export interface Path {
-  basename(p: string, ext?: string): string;
-  dirname(p: string): string;
-  extname(p: string): string;
-  isAbsolute(p: string): boolean;
-  join(...paths: string[]): string;
-  parse(pathString: string): { root: string; dir: string; base: string; ext: string; name: string; };
-  relative(from: string, to: string): string;
-  resolve(...pathSegments: any[]): string;
-  sep: string;
 }
 
 export interface OptimizeCssInput {

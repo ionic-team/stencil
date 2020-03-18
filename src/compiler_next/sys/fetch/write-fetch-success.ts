@@ -19,7 +19,6 @@ export const writeFetchSuccessSync = (inMemoryFs: d.InMemoryFileSystem, url: str
   inMemoryFs.sys.writeFileSync(filePath, content);
 };
 
-
 export const writeFetchSuccessAsync = async (inMemoryFs: d.InMemoryFileSystem, url: string, filePath: string, content: string, pkgVersions: Map<string, string>) => {
   if (url.endsWith('package.json')) {
     setPackageVersionByContent(pkgVersions, content);

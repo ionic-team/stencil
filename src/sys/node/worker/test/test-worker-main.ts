@@ -1,10 +1,10 @@
-import { WorkerMain } from '../worker-main';
+import { NodeWorkerMain } from '../worker-main';
 
 
-export class TestWorkerMain extends WorkerMain {
+export class TestWorkerMain extends NodeWorkerMain {
 
-  constructor(private workerId: number) {
-    super(workerId, null);
+  constructor(workerId: number) {
+    super('TestWorker', workerId, null);
     this.fork();
   }
 

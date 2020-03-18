@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { createHttpServer } from './server-http';
-import { createNodeSys } from '../sys/node_next/node-sys';
+import { createNodeSys } from '../sys/node/node-sys';
 import { createWebSocket } from './server-web-socket';
 import { DEV_SERVER_INIT_URL } from './dev-server-constants';
 import { getBrowserUrl, sendError, sendMsg } from './dev-server-utils';

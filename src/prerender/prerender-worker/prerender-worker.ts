@@ -3,7 +3,7 @@ import { addModulePreloads, minifyScriptElements, minifyStyleElements } from '..
 import { catchError, normalizePath } from '@utils';
 import { crawlAnchorsForNextUrls } from '../crawl-urls';
 import { getHydrateOptions, getPrerenderConfig } from '../prerender-config';
-import { initNodeWorkerThread } from '../../sys/node_next/worker/worker-child';
+import { initNodeWorkerThread } from '../../sys/node/worker/worker-child';
 import { patchNodeGlobal, patchWindowGlobal } from '../prerender-global-patch';
 import fs from 'graceful-fs';
 import path from 'path';

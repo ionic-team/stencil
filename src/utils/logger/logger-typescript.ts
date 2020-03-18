@@ -1,11 +1,11 @@
 import * as d from '../../declarations';
+import { isIterable } from '../helpers';
+import { normalizePath } from '../normalize-path';
 import { splitLineBreaks } from './logger-utils';
 import ts from 'typescript';
-import { normalizePath } from '../normalize-path';
-import { isIterable } from '../helpers';
 
 
-export const augmentDiagnosticWithNode = (config: d.Config, d: d.Diagnostic, node: ts.Node) => {
+export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: ts.Node) => {
   if (!node) {
     return d;
   }
@@ -16,7 +16,6 @@ export const augmentDiagnosticWithNode = (config: d.Config, d: d.Diagnostic, nod
   }
 
   d.absFilePath = normalizePath(sourceFile.fileName);
-  d.relFilePath = normalizePath(config.sys.path.relative(config.rootDir, sourceFile.fileName));
 
   const sourceText = sourceFile.text;
   const srcLines = splitLineBreaks(sourceText);

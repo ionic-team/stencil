@@ -1,8 +1,8 @@
 import * as d from '../../../declarations';
-import { getAbsolutePath } from '../utils';
-import { isOutputTargetDistCollection } from '../../../compiler/output-targets/output-utils';
+import { getAbsolutePath } from '../config-utils';
+import { isOutputTargetDistCollection } from '../../output-targets/output-utils';
+import { join } from 'path';
 import { normalizePath } from '@utils';
-import path from 'path';
 
 
 export const validateCollection = (config: d.Config, userOutputs: d.OutputTarget[]) => {
@@ -22,5 +22,5 @@ export const getCollectionDistDir = (config: d.Config) => {
   if (collectionOutputTarget) {
     return normalizePath(collectionOutputTarget.dir);
   }
-  return normalizePath(path.join(config.rootDir, 'dist', 'collection'));
+  return normalizePath(join(config.rootDir, 'dist', 'collection'));
 };

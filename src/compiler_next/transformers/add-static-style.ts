@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import { createStaticGetter } from '../../compiler/transformers/transform-utils';
+import { createStaticGetter } from './transform-utils';
 import { DEFAULT_STYLE_MODE, dashToPascalCase } from '@utils';
-import { getScopeId } from '../../compiler/style/scope-css';
+import { getScopeId } from '../style/scope-css';
 import { scopeCss } from '../../utils/shadow-css';
 import ts from 'typescript';
 
@@ -50,7 +50,6 @@ const getStyleLiteral = (cmp: d.ComponentCompilerMeta) => {
   }
   return null;
 };
-
 
 const getMultipleModeStyle = (cmp: d.ComponentCompilerMeta, styles: d.StyleCompiler[]) => {
   const styleModes: ts.ObjectLiteralElementLike[] = [];
@@ -115,7 +114,6 @@ const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) =>
   return null;
 };
 
-
 const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
   if (cmp.encapsulation === 'scoped') {
     // scope the css first
@@ -127,7 +125,6 @@ const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler
 
   return ts.createStringLiteral(style.styleStr);
 };
-
 
 const createStyleIdentifierFromUrl = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
   style.styleIdentifier = dashToPascalCase(cmp.tagName);

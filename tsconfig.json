@@ -30,9 +30,6 @@
       "@app-globals": [
         "src/app-globals/index.ts"
       ],
-      "@compiler_legacy": [
-        "src/compiler/index.ts"
-      ],
       "@compiler-plugins": [
         "src/compiler_next/sys/modules/compiler-plugins.ts"
       ],
@@ -76,11 +73,9 @@
     "src/app-globals/index.ts",
     "src/client/index.ts",
     "src/client/polyfills/css-shim/index.ts",
-    "src/cli/index.ts",
     "src/cli_next/index.ts",
     "src/cli_next/public.ts",
     "src/cli_next/worker/index.ts",
-    "src/compiler/index.ts",
     "src/compiler_next/index.ts",
     "src/compiler_next/public.ts",
     "src/compiler_next/sys/modules/index.ts",
@@ -95,8 +90,6 @@
     "src/mock-doc/index.ts",
     "src/screenshot/index.ts",
     "src/screenshot/pixel-match.ts",
-    "src/sys/node/index.ts",
-    "src/sys/node/node-sys-worker.ts",
     "src/testing/index.ts",
     "src/testing/platform/index.ts"
   ],

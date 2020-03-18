@@ -1,10 +1,11 @@
 import * as d from '../../../declarations';
-import { generateRollupOutput } from '../../../compiler/app-core/bundle-app-core';
+import { generateRollupOutput } from '../../app-core/bundle-app-core';
 import { generateLazyModules } from './generate-lazy-module';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { getDynamicImportFunction } from '@utils';
 
-export async function generateEsmBrowser(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) {
+
+export const generateEsmBrowser = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) => {
   const esmOutputs = outputTargets.filter(o => !!o.esmDir && !!o.isBrowserBuild);
   if (esmOutputs.length) {
     const outputTargetType = esmOutputs[0].type;
@@ -28,4 +29,4 @@ export async function generateEsmBrowser(config: d.Config, compilerCtx: d.Compil
     }
   }
   return undefined;
-}
+};

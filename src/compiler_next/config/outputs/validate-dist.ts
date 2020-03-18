@@ -1,9 +1,9 @@
 import * as d from '../../../declarations';
-import { getAbsolutePath } from '../utils';
-import { COPY, DIST_COLLECTION, DIST_GLOBAL_STYLES, DIST_LAZY, DIST_LAZY_LOADER, DIST_TYPES, getComponentsDtsTypesFilePath, isOutputTargetDist } from '../../../compiler/output-targets/output-utils';
-import { validateCopy } from '../../../compiler/config/validate-copy';
+import { getAbsolutePath } from '../config-utils';
+import { COPY, DIST_COLLECTION, DIST_GLOBAL_STYLES, DIST_LAZY, DIST_LAZY_LOADER, DIST_TYPES, getComponentsDtsTypesFilePath, isOutputTargetDist } from '../../output-targets/output-utils';
 import { isAbsolute, join, resolve } from 'path';
 import { isBoolean, isString } from '@utils';
+import { validateCopy } from '../validate-copy';
 
 
 export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) => {
@@ -89,7 +89,7 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) =>
       esmDir,
       esmEs5Dir,
       cjsDir,
-      componentDts: getComponentsDtsTypesFilePath(config, distOutputTarget),
+      componentDts: getComponentsDtsTypesFilePath(distOutputTarget),
       empty: distOutputTarget.empty,
     });
 

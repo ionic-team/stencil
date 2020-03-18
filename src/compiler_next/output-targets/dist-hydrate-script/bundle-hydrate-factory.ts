@@ -1,12 +1,12 @@
 import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
-import { getBuildFeatures } from '../../build/app-data';
+import { getBuildFeatures } from '../../app-core/app-data';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { hydrateComponentTransform } from '../../transformers/component-hydrate/tranform-to-hydrate-component';
 import { loadRollupDiagnostics } from '@utils';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
 import { STENCIL_INTERNAL_HYDRATE_ID } from '../../bundle/entry-alias-ids';
-import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
+import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 
 
 export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, _build: d.BuildConditionals, appFactoryEntryCode: string) => {

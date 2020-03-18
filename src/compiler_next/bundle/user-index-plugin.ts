@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { Plugin } from 'rollup';
 import { USER_INDEX_ENTRY_ID } from './entry-alias-ids';
-import path from 'path';
+import { join } from 'path';
 
 
 export const userIndexPlugin = (config: d.Config, compilerCtx: d.CompilerCtx): Plugin => {
@@ -10,7 +10,7 @@ export const userIndexPlugin = (config: d.Config, compilerCtx: d.CompilerCtx): P
 
     async resolveId(importee) {
       if (importee === USER_INDEX_ENTRY_ID) {
-        const usersIndexJsPath = path.join(config.srcDir, 'index.ts');
+        const usersIndexJsPath = join(config.srcDir, 'index.ts');
         const hasUserIndex = await compilerCtx.fs.access(usersIndexJsPath);
         if (hasUserIndex) {
           return usersIndexJsPath;

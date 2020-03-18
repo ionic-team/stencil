@@ -1,10 +1,10 @@
 import * as d from '../../../declarations';
-import { addImports } from '../../../compiler/transformers/add-imports';
-import { getComponentMeta, getModuleFromSourceFile } from '../../../compiler/transformers/transform-utils';
+import { addImports } from '../add-imports';
+import { addLegacyApis } from '../core-runtime-apis';
+import { getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
 import { updateHydrateComponentClass } from './hydrate-component';
+import { updateStyleImports } from '../style-imports';
 import ts from 'typescript';
-import { addLegacyApis } from '../../../compiler/transformers/core-runtime-apis';
-import { updateStyleImports } from '../../../compiler/transformers/style-imports';
 
 
 export const hydrateComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {

@@ -1,8 +1,9 @@
 import * as d from '../../../declarations';
 import { DEFAULT_STYLE_MODE } from '@utils';
+import { join } from 'path';
 
 
-export async function writeLazyModule(
+export const writeLazyModule = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   outputTargetType: string,
@@ -12,7 +13,7 @@ export async function writeLazyModule(
   code: string,
   modeName: string,
   sufix: string
-): Promise<d.BundleModuleOutput> {
+): Promise<d.BundleModuleOutput> => {
   // code = replaceStylePlaceholders(entryModule.cmps, modeName, code);
 
   const bundleId = await getBundleId(config, entryModule.entryKey, shouldHash, code, modeName, sufix);
@@ -20,7 +21,7 @@ export async function writeLazyModule(
 
   await Promise.all(
     destinations.map(dst =>
-      compilerCtx.fs.writeFile(config.sys.path.join(dst, fileName), code, { outputTargetType })
+      compilerCtx.fs.writeFile(join(dst, fileName), code, { outputTargetType })
     )
   );
 
@@ -30,12 +31,11 @@ export async function writeLazyModule(
     code,
     modeName,
   };
-}
+};
 
-
-async function getBundleId(config: d.Config, entryKey: string, shouldHash: boolean, code: string, modeName: string, sufix: string) {
+const getBundleId = async (config: d.Config, entryKey: string, shouldHash: boolean, code: string, modeName: string, sufix: string) => {
   if (shouldHash) {
-    const hash = await config.sys.generateContentHash(code, config.hashedFileNameLength);
+    const hash = await config.sys_next.generateContentHash(code, config.hashedFileNameLength);
     return `p-${hash}${sufix}`;
   }
 
@@ -49,4 +49,4 @@ async function getBundleId(config: d.Config, entryKey: string, shouldHash: boole
   }
 
   return bundleId + sufix;
-}
+};

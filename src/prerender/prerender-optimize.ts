@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 import { flatOne, unique } from '@utils';
-import { getScopeId } from '../compiler/style/scope-css';
-import { injectModulePreloads } from '../compiler/html/inject-module-preloads';
+import { getScopeId } from '../compiler_next/style/scope-css';
+import { injectModulePreloads } from '../compiler_next/html/inject-module-preloads';
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';

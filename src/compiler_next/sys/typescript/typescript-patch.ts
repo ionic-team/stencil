@@ -1,8 +1,8 @@
 import * as d from '../../../declarations';
 import { hasError } from '@utils';
-import { patchTypeScriptSys, patchTypeScriptGetParsedCommandLineOfConfigFile } from './typescript-sys';
 import { loadTypescript, loadTypescriptSync, TypeScriptModule } from './typescript-load';
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
+import { patchTypeScriptSys, patchTypeScriptGetParsedCommandLineOfConfigFile } from './typescript-sys';
 import ts from 'typescript';
 
 

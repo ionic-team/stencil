@@ -1,15 +1,16 @@
 import * as d from '@stencil/core/internal';
-import { BuildContext, Cache } from '../compiler';
-import { InMemoryFs } from '@utils';
+import { BuildContext } from '../compiler_next/build/build-ctx';
+import { Cache } from '../compiler_next/cache';
+import { createTestingSystem } from './testing-sys';
+import { createInMemoryFs } from '../compiler_next/sys/in-memory-fs';
 import { MockWindow } from '@stencil/core/mock-doc';
 import { TestingFs } from './testing-fs';
 import { TestingLogger } from './testing-logger';
-import { TestingSystem } from './testing-sys_legacy';
 import path from 'path';
 
 
 export function mockConfig() {
-  const sys = new TestingSystem();
+  const sys = createTestingSystem();
   const config: d.Config = {
     _isTesting: true,
 
@@ -88,7 +89,7 @@ export function mockCompilerCtx() {
   Object.defineProperty(compilerCtx, 'fs', {
     get() {
       if (this._fs == null) {
-        this._fs = new InMemoryFs(mockFs(), path);
+        // this._fs = new InMemoryFs(mockFs(), path);
       }
       return this._fs;
     }
@@ -126,11 +127,12 @@ export function mockFs() {
 
 
 export function mockCache() {
-  const fs = new InMemoryFs(mockFs(), path);
+  const sys = createTestingSystem();
+  const inMemoryFs = createInMemoryFs(sys);
   const config = mockConfig();
   config.enableCache = true;
 
-  const cache = new Cache(config, fs);
+  const cache = new Cache(config, inMemoryFs);
   cache.initCacheDir();
   return cache as d.Cache;
 }
@@ -142,7 +144,7 @@ export function mockLogger() {
 
 
 export function mockStencilSystem(): d.StencilSystem {
-  return new TestingSystem();
+  return createTestingSystem();
 }
 
 

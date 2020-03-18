@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { buildWarn } from '@utils';
 
 
-export function validatePlugins(config: d.Config, diagnostics: d.Diagnostic[]) {
+export const validatePlugins = (config: d.Config, diagnostics: d.Diagnostic[]) => {
   const userPlugins = config.plugins;
 
   if (!Array.isArray(userPlugins)) {
@@ -35,4 +35,4 @@ export function validatePlugins(config: d.Config, diagnostics: d.Diagnostic[]) {
   config.plugins = userPlugins.filter(plugin => {
     return !!(plugin && typeof plugin === 'object' && plugin.pluginType);
   });
-}
+};

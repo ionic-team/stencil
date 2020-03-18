@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
 import { build } from './build';
-import { BuildContext } from '../../compiler/build/build-ctx';
-import ts from 'typescript';
+import { BuildContext } from './build-ctx';
 import { createTsBuildProgram } from '../transpile/create-build-program';
+import ts from 'typescript';
 
 
 export const createFullBuild = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
@@ -30,6 +30,7 @@ export const createFullBuild = async (config: d.Config, compilerCtx: d.CompilerC
         resolve(result);
       }
     };
+
     createTsBuildProgram(config, onBuild).then(program => {
       tsWatchProgram = program;
     });

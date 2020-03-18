@@ -1,9 +1,11 @@
 import * as d from '../../../declarations';
-import { generateRollupOutput } from '../../../compiler/app-core/bundle-app-core';
+import { generateRollupOutput } from '../../app-core/bundle-app-core';
 import { generateLazyModules } from '../dist-lazy/generate-lazy-module';
-import { getAppBrowserCorePolyfills } from '../../../compiler/app-core/app-polyfills';
+import { getAppBrowserCorePolyfills } from '../../app-core/app-polyfills';
+import { join } from 'path';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
+
 
 export const generateSystem = async (
   config: d.Config,
@@ -41,8 +43,8 @@ const generateSystemLoaders = (config: d.Config, compilerCtx: d.CompilerCtx, rol
 
 const writeSystemLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, loaderFilename: string, outputTarget: d.OutputTargetDistLazy) => {
   if (outputTarget.systemLoaderFile) {
-    const entryPointPath = config.sys.path.join(outputTarget.systemDir, loaderFilename);
-    const relativePath = relativeImport(config, outputTarget.systemLoaderFile, entryPointPath);
+    const entryPointPath = join(outputTarget.systemDir, loaderFilename);
+    const relativePath = relativeImport(outputTarget.systemLoaderFile, entryPointPath);
     const loaderContent = await getSystemLoader(config, compilerCtx, relativePath, outputTarget.polyfills);
     await compilerCtx.fs.writeFile(outputTarget.systemLoaderFile, loaderContent, { outputTargetType: outputTarget.type });
   }

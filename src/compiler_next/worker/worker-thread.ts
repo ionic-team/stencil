@@ -1,12 +1,13 @@
 import * as d from '../../declarations';
 import { compile } from '../compile-module';
-import { initNodeWorkerThread } from '../../sys/node_next/worker/worker-child';
+import { initNodeWorkerThread } from '../../sys/node/worker/worker-child';
 import { initWebWorkerThread } from '../sys/worker/web-worker-thread';
 import { IS_NODE_ENV, IS_WEB_WORKER_ENV } from '@utils';
 import { optimizeCss } from '../optimize/optimize-css';
 import { prepareModule } from '../optimize/optimize-module';
-import { transformCssToEsm } from '../../compiler/style/css-to-esm';
+import { transformCssToEsm } from '../style/css-to-esm';
 import { transpileToEs5 } from '../transpile/transpile-to-es5';
+
 
 export const createWorkerContext = (): d.CompilerWorkerContext => {
   return {
@@ -17,7 +18,6 @@ export const createWorkerContext = (): d.CompilerWorkerContext => {
     transpileToEs5
   };
 };
-
 
 export const createWorkerMsgHandler = (): d.WorkerMsgHandler => {
   const workerCtx = createWorkerContext();
@@ -33,7 +33,6 @@ export const createWorkerMsgHandler = (): d.WorkerMsgHandler => {
 
   return handleMsg;
 };
-
 
 export const initWorkerThread = (glbl: any) => {
   if (IS_WEB_WORKER_ENV) {

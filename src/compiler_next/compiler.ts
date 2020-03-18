@@ -1,4 +1,4 @@
-import { Cache } from '../compiler/cache';
+import { Cache } from './cache';
 import { CompilerNext, Config, Diagnostic } from '../declarations';
 import { CompilerContext } from './build/compiler-ctx';
 import { createFullBuild } from './build/full-build';

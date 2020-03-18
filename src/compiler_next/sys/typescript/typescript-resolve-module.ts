@@ -1,11 +1,11 @@
 import * as d from '../../../declarations';
+import { basename, dirname, join, resolve } from 'path';
 import { getStencilInternalDtsUrl } from '../fetch/fetch-utils';
 import { isDtsFile, isExternalUrl, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile } from '../resolve/resolve-utils';
 import { isString, IS_LOCATION_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV , normalizePath } from '@utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
 import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
 import { version } from '../../../version';
-import { basename, dirname, join, resolve } from 'path';
 import ts from 'typescript';
 
 

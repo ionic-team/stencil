@@ -1,17 +1,16 @@
 import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
-import { catchError, dashToPascalCase, hasError } from '@utils';
-import { formatComponentRuntimeMeta, stringifyRuntimeData } from '../../../compiler/app-core/format-component-runtime-meta';
-import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
-import { isOutputTargetDistCustomElementsBundle } from '../../../compiler/output-targets/output-utils';
-import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
+import { catchError, dashToPascalCase, formatComponentRuntimeMeta, hasError, stringifyRuntimeData } from '@utils';
+import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
+import { isOutputTargetDistCustomElementsBundle } from '../../output-targets/output-utils';
+import { join } from 'path';
+import { nativeComponentTransform } from '../../transformers/component-native/tranform-to-native-component';
 import { optimizeModule } from '../../optimize/optimize-module';
+import { OutputChunk } from 'rollup';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
 import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
-import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
-import { OutputChunk } from 'rollup';
-import { join } from 'path';
+import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 
 
 export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {

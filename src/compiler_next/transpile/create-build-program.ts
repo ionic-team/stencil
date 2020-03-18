@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { getTsOptionsToExtend } from './ts-config';
-import { GENERATED_DTS } from '../../compiler/output-targets/output-utils';
+import { GENERATED_DTS } from '../output-targets/output-utils';
 import ts from 'typescript';
 
 

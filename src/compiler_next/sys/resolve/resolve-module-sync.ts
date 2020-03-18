@@ -1,4 +1,3 @@
-
 import * as d from '../../../declarations';
 import { COMMON_DIR_FILENAMES, NODE_MODULES_FS_DIR, getCdnPackageJsonUrl, getCommonDirName, isCommonDirModuleFile, shouldFetchModule } from './resolve-utils';
 import { fetchModuleSync } from '../fetch/fetch-module-sync';
@@ -23,7 +22,6 @@ export const resolveRemoteModuleIdSync = (config: d.Config, inMemoryFs: d.InMemo
   return null;
 };
 
-
 export const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string) => {
   const filePath = join(config.rootDir, 'node_modules', moduleId, 'package.json');
   let pkgJson = inMemoryFs.readFileSync(filePath);
@@ -38,7 +36,6 @@ export const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InM
   }
   return null;
 };
-
 
 export const resolvePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, basedir: string) => {
   const opts = createCustomResolverSync(config, inMemoryFs, basedir, ['.json']);
@@ -59,7 +56,6 @@ export const resolveModuleIdSync = (config: d.Config, inMemoryFs: d.InMemoryFile
   const opts = createCustomResolverSync(config, inMemoryFs, basedir, exts);
   return resolve.sync(moduleId, opts);
 };
-
 
 export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, basedir: string, exts: string[]): SyncOpts => {
   const compilerExecutingPath = config.sys_next.getCompilerExecutingPath();

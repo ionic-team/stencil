@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { isOutputTargetDistTypes } from '../../compiler/output-targets/output-utils';
+import { isOutputTargetDistTypes } from '../output-targets/output-utils';
 import ts from 'typescript';
 
 

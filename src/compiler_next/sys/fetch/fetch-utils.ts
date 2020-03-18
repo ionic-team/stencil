@@ -19,7 +19,6 @@ export const getStencilInternalDtsUrl = (compilerExe: string) =>
 export const getCommonDirUrl = (compilerExe: string, pkgVersions: Map<string, string>, dirPath: string, fileName: string) =>
    getNodeModuleFetchUrl(compilerExe, pkgVersions, dirPath) + '/' + fileName;
 
-
 export const getNodeModuleFetchUrl = (compilerExe: string, pkgVersions: Map<string, string>, filePath: string) => {
   if (filePath.startsWith(STENCIL_CORE_MODULE)) {
     // /node_modules/@stencil/core/package.json
@@ -57,7 +56,6 @@ export const getNodeModuleFetchUrl = (compilerExe: string, pkgVersions: Map<stri
   return NODE_MODULES_CDN_URL + urlPath;
 };
 
-
 export const skipFilePathFetch = (filePath: string) => {
   if (isTsFile(filePath) || isTsxFile(filePath)) {
     // don't bother trying to resolve  node_module packages w/ typescript files
@@ -78,11 +76,9 @@ export const skipFilePathFetch = (filePath: string) => {
   return false;
 };
 
-
 export const skipUrlFetch = (url: string) =>
   // files we just already know not to try to resolve request
   (knownUrlSkips.some(knownSkip => url.endsWith(knownSkip)));
-
 
 const knownUrlSkips = [
   '/@stencil/core/internal.js',

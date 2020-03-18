@@ -1,10 +1,10 @@
 import * as d from '../../../declarations';
 import { catchError } from '@utils';
-import { isOutputTargetDistCustomElements } from '../../../compiler/output-targets/output-utils';
-import { nativeComponentTransform } from '../../../compiler/transformers/component-native/tranform-to-native-component';
+import { isOutputTargetDistCustomElements } from '../../output-targets/output-utils';
+import { nativeComponentTransform } from '../../transformers/component-native/tranform-to-native-component';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
-import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
+import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 import { join, relative } from 'path';
 import ts from 'typescript';
 
@@ -19,7 +19,7 @@ export const outputCustomElements = async (config: d.Config, compilerCtx: d.Comp
   const printer = ts.createPrinter();
   try {
     await Promise.all(changedModuleFiles.map(async mod => {
-      const transformResults = ts.transform(mod.staticSourceFile, getCustomTransformer(config, compilerCtx));
+      const transformResults = ts.transform(mod.staticSourceFile, getCustomElementTransformer(config, compilerCtx));
       const transformed = transformResults.transformed[0];
       const code = printer.printFile(transformed);
 
@@ -37,8 +37,7 @@ export const outputCustomElements = async (config: d.Config, compilerCtx: d.Comp
   timespan.finish(`generate custom elements finished`);
 };
 
-
-const getCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
+const getCustomElementTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: null,

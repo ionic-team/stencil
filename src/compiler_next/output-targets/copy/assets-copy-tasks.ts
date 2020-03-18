@@ -1,4 +1,5 @@
 import * as d from '../../../declarations';
+import { dirname, join, relative } from 'path';
 import { normalizePath } from '@utils';
 
 
@@ -19,16 +20,16 @@ export const getComponentAssetsCopyTasks = (config: d.Config, buildCtx: d.BuildC
         cmp.assetsDirs.forEach(assetsMeta => {
           copyTasks.push({
             src: assetsMeta.absolutePath,
-            dest: config.sys.path.join(dest, assetsMeta.cmpRelativePath),
+            dest: join(dest, assetsMeta.cmpRelativePath),
             warn: false,
             keepDirStructure: false,
           });
         });
       } else if (!cmp.excludeFromCollection && !cmp.isCollectionDependency) {
         cmp.assetsDirs.forEach(assetsMeta => {
-          const collectionDirDestination = config.sys.path.join(
+          const collectionDirDestination = join(
             dest,
-            config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
+            relative(config.srcDir, assetsMeta.absolutePath)
           );
           copyTasks.push({
             src: assetsMeta.absolutePath,
@@ -45,7 +46,7 @@ export const getComponentAssetsCopyTasks = (config: d.Config, buildCtx: d.BuildC
   return copyTasks;
 };
 
-export const canSkipAssetsCopy = (config: d.Config, compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[], filesChanged: string[]) => {
+export const canSkipAssetsCopy = (compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[], filesChanged: string[]) => {
   if (!compilerCtx.hasSuccessfulBuild) {
     // always copy assets if we haven't had a successful build yet
     // cannot skip build
@@ -58,7 +59,7 @@ export const canSkipAssetsCopy = (config: d.Config, compilerCtx: d.CompilerCtx, 
   // loop through each of the changed files
   filesChanged.forEach(changedFile => {
     // get the directory of where the changed file is in
-    const changedFileDirPath = normalizePath(config.sys.path.dirname(changedFile));
+    const changedFileDirPath = normalizePath(dirname(changedFile));
 
     // loop through all the possible asset directories
     entryModules.forEach(entryModule => {

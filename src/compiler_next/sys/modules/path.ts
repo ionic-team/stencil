@@ -16,7 +16,6 @@ if (IS_NODE_ENV) {
   Object.assign(path, pathBrowserify);
 }
 
-
 export const basename = path.basename;
 export const dirname = path.dirname;
 export const extname = path.extname;

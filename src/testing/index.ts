@@ -9,7 +9,6 @@ export { newSpecPage } from './spec-page';
 export { shuffleArray } from './testing-utils';
 export { transpile } from './test-transpile';
 export { TestingFs } from './testing-fs';
-export { TestingLegacy } from './testing_legacy';
 
 export {
   EventSpy,

@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
-import { PartialResolvedId } from 'rollup';
 import { basename, dirname, join, relative } from 'path';
-import { BuildContext } from '../../compiler/build/build-ctx';
+import { BuildContext } from '../build/build-ctx';
 import { getRollupOptions } from './bundle-output';
 import { OutputOptions, rollup } from 'rollup';
+import { PartialResolvedId } from 'rollup';
 
 
 export const devNodeModuleResolveId = async (config: d.Config, inMemoryFs: d.InMemoryFileSystem, resolvedId: PartialResolvedId, importee: string) => {

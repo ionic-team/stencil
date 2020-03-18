@@ -24,10 +24,10 @@
     "baseUrl": ".",
     "paths": {
       "@stencil/core/cli": [
-        "../cli/index.ts"
+        "../cli_next/index.ts"
       ],
       "@stencil/core/compiler": [
-        "../compiler/index.ts"
+        "../compiler_next/index.ts"
       ],
       "@stencil/core/declarations": [
         "../declarations/index.ts"

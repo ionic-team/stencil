@@ -1,10 +1,10 @@
 import * as d from '../../../declarations';
-import { DIST_HYDRATE_SCRIPT, isOutputTargetDist, isOutputTargetHydrate, isOutputTargetWww } from '../../../compiler/output-targets/output-utils';
+import { DIST_HYDRATE_SCRIPT, isOutputTargetDist, isOutputTargetHydrate, isOutputTargetWww } from '../../output-targets/output-utils';
 import { isBoolean, isString } from '@utils';
 import { isAbsolute, join } from 'path';
 
 
-export function validateHydrateScript(config: d.Config, userOutputs: d.OutputTarget[]) {
+export const validateHydrateScript = (config: d.Config, userOutputs: d.OutputTarget[]) => {
   const output: d.OutputTargetHydrate[] = [];
 
   const hasHydrateOutputTarget = userOutputs.some(isOutputTargetHydrate);
@@ -55,4 +55,4 @@ export function validateHydrateScript(config: d.Config, userOutputs: d.OutputTar
   });
 
   return output;
-}
+};

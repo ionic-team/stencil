@@ -1,9 +1,9 @@
 import * as d from '../../declarations';
-import { normalizePath } from '@utils';
 import { isAbsolute, join } from 'path';
+import { normalizePath } from '@utils';
 
 
-export function validatePaths(config: d.Config) {
+export const validatePaths = (config: d.Config) => {
   if (typeof config.rootDir !== 'string') {
     config.rootDir = '/';
   }
@@ -57,8 +57,7 @@ export function validatePaths(config: d.Config) {
   }
 
   config.packageJsonFilePath = normalizePath(join(config.rootDir, 'package.json'));
-}
-
+};
 
 const DEFAULT_BUILD_LOG_FILE_NAME = 'stencil-build.log';
 const DEFAULT_CACHE_DIR = '.stencil';

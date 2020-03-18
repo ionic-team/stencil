@@ -2,18 +2,18 @@ import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
-import { generateEntryModules } from '../../../compiler/entries/entry-modules';
-import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
-import { isOutputTargetDistLazy, isOutputTargetHydrate } from '../../../compiler/output-targets/output-utils';
+import { generateEntryModules } from '../../entries/entry-modules';
+import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
+import { isOutputTargetDistLazy, isOutputTargetHydrate } from '../../output-targets/output-utils';
 import { LAZY_BROWSER_ENTRY_ID, LAZY_EXTERNAL_ENTRY_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
 import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
 import { generateCjs } from './generate-cjs';
 import { generateEsmBrowser } from './generate-esm-browser';
 import { generateEsm } from './generate-esm';
 import { generateSystem } from './generate-system';
-import { generateModuleGraph } from '../../../compiler/entries/component-graph';
+import { generateModuleGraph } from '../../entries/component-graph';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
-import { updateStencilCoreImports } from '../../../compiler/transformers/update-stencil-core-import';
+import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 import MagicString from 'magic-string';
 
 
@@ -73,7 +73,6 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
   timespan.finish(`generate lazy finished`);
 };
 
-
 const getLazyBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
 
@@ -88,7 +87,6 @@ const getLazyBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMet
 
   return build;
 };
-
 
 const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
@@ -140,7 +138,6 @@ const generateLegacyLoader = (config: d.Config, compilerCtx: d.CompilerCtx, outp
     })
   );
 };
-
 
 const getLegacyLoader = (config: d.Config) => {
   const namespace = config.fsNamespace;

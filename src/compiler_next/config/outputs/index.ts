@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { buildError } from '@utils';
-import { VALID_TYPES_NEXT } from '../../../compiler/output-targets/output-utils';
+import { VALID_TYPES_NEXT } from '../../output-targets/output-utils';
 import { validateCollection } from './validate-collection';
 import { validateCustomElement } from './validate-custom-element';
 import { validateCustomOutput } from './validate-custom-output';
@@ -11,7 +11,7 @@ import { validateLazy } from './validate-lazy';
 import { validateWww } from './validate-www';
 import { validateCustomElementBundle } from './validate-custom-element-bundle';
 
-export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnostic[]) {
+export const validateOutputTargets = (config: d.Config, diagnostics: d.Diagnostic[]) => {
   const userOutputs = (config.outputTargets || []).slice();
 
   userOutputs.forEach(outputTarget => {
@@ -32,4 +32,4 @@ export function validateOutputTargets(config: d.Config, diagnostics: d.Diagnosti
     ...validateHydrateScript(config, userOutputs),
     ...validateDocs(config, diagnostics, userOutputs),
   ];
-}
+};

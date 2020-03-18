@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
-import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { basename, resolve } from 'path';
+import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { isBoolean, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, noop } from '@utils';
 import { TypeScriptModule } from './typescript-load';
 import ts from 'typescript';
@@ -14,7 +14,6 @@ export const patchTypeScriptSys = (loadedTs: TypeScriptModule, config: d.Config,
   patchTsSystemWatch(stencilSys, loadedTs.sys);
   patchTsSystemUtils(loadedTs.sys);
 };
-
 
 export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, tsSys: ts.System) => {
   const realpath = (path: string) => {
@@ -102,7 +101,6 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
   return tsSys;
 };
 
-
 const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
 
   tsSys.watchDirectory = (p, cb, recursive) => {
@@ -134,7 +132,6 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
   };
 
 };
-
 
 export const patchTsSystemUtils = (tsSys: ts.System) => {
   if (!tsSys.getCurrentDirectory) {

@@ -1,11 +1,10 @@
 import * as d from '../../declarations';
 import { buildError, isBoolean, isNumber, isString, normalizePath } from '@utils';
-import { isOutputTargetWww } from '../../compiler/output-targets/output-utils';
-import { URL } from 'url';
 import { isAbsolute, join } from 'path';
+import { isOutputTargetWww } from '../output-targets/output-utils';
 
 
-export function validateDevServer(config: d.Config, flags: d.ConfigFlags, diagnostics: d.Diagnostic[]) {
+export const validateDevServer = (config: d.Config, flags: d.ConfigFlags, diagnostics: d.Diagnostic[]) => {
   if (config.devServer === false || config.devServer === null) {
     return null;
   }
@@ -165,4 +164,4 @@ export function validateDevServer(config: d.Config, flags: d.ConfigFlags, diagno
   }
 
   return devServer;
-}
+};

@@ -1,6 +1,6 @@
 import { hasError } from '@utils';
-import { parseCss } from '../../compiler/style/css-parser/parse-css';
-import { serializeCss } from '../../compiler/style/css-parser/serialize-css';
+import { parseCss } from '../style/css-parser/parse-css';
+import { serializeCss } from '../style/css-parser/serialize-css';
 
 
 export const minifyCss = (cssString: string) => {

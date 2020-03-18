@@ -1,11 +1,9 @@
 import * as d from '../../declarations';
-import { cloneDocument, createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
+import { serializeNodeToHtml } from '@stencil/core/mock-doc';
 import { createLogger } from './logger';
 import { createSystem } from './stencil-sys';
 import { resolveModuleIdSync, resolvePackageJsonSync } from './resolve/resolve-module-sync';
 import { scopeCss } from '../../utils/shadow-css';
-import { typescriptVersion, version } from '../../version';
-import path from 'path';
 
 
 export const getConfig = (userConfig: d.Config) => {
@@ -29,27 +27,12 @@ export const getConfig = (userConfig: d.Config) => {
   }
   config.logger.level = config.logLevel;
 
-  // old sys
-  config.sys = config.sys || {};
-  config.sys.path = path;
-  config.sys.copy = config.sys_next.copy;
-  config.sys.glob = config.sys_next.glob;
-
   return config;
 };
 
 export const patchSysLegacy = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   // old way
-  config.sys.compiler = {
-    name: '@stencil/core',
-    version,
-    typescriptVersion,
-    packageDir: path.join(config.sys_next.getCompilerExecutingPath(), '..', '..'),
-  },
-    config.sys.generateContentHash = config.sys_next.generateContentHash;
   config.sys.scopeCss = (cssText, scopeId, commentOriginalSelector) => Promise.resolve(scopeCss(cssText, scopeId, commentOriginalSelector));
-  config.sys.cloneDocument = cloneDocument;
-  config.sys.createDocument = createDocument;
   config.sys.serializeNodeToHtml = serializeNodeToHtml;
   config.sys.optimizeCss = (inputOpts) => compilerCtx.worker.optimizeCss(inputOpts);
   config.sys.resolveModule = (fromDir, moduleId, opts = {}) => {
@@ -59,5 +42,4 @@ export const patchSysLegacy = (config: d.Config, compilerCtx: d.CompilerCtx) => 
       return resolveModuleIdSync(config, compilerCtx.fs, moduleId, fromDir, ['.js', '.mjs', '.css']);
     }
   };
-  config.sys.encodeToBase64 = config.sys_next.encodeToBase64;
 };

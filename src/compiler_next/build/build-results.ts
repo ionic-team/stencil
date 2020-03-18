@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import { getBuildTimestamp } from '../../compiler/build/build-ctx';
-import { hasError, isString, normalizeDiagnostics, fromEntries } from '@utils';
 import { generateHmr } from './build-hmr';
+import { getBuildTimestamp } from './build-ctx';
+import { hasError, isString, normalizeDiagnostics, fromEntries } from '@utils';
 
 
 export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {

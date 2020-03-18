@@ -1,10 +1,10 @@
 import * as d from '../../declarations';
 import { build } from './build';
-import { BuildContext } from '../../compiler/build/build-ctx';
+import { BuildContext } from './build-ctx';
 import { compilerRequest } from '../bundle/dev-module';
 import { createTsWatchProgram } from '../transpile/create-watch-program';
-import { filesChanged, hasHtmlChanges, hasScriptChanges, hasStyleChanges, scriptsAdded, scriptsDeleted } from '../../compiler/fs-watch/fs-watch-rebuild';
-import { hasServiceWorkerChanges } from '../../compiler/service-worker/generate-sw';
+import { filesChanged, hasHtmlChanges, hasScriptChanges, hasStyleChanges, scriptsAdded, scriptsDeleted } from '../fs-watch/fs-watch-rebuild';
+import { hasServiceWorkerChanges } from '../service-worker/generate-sw';
 import ts from 'typescript';
 import { dirname, resolve } from 'path';
 
@@ -48,8 +48,8 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     buildCtx.filesUpdated = Array.from(filesUpdated.keys()).sort();
     buildCtx.filesDeleted = Array.from(filesDeleted.keys()).sort();
     buildCtx.filesChanged = filesChanged(buildCtx);
-    buildCtx.scriptsAdded = scriptsAdded(config, buildCtx);
-    buildCtx.scriptsDeleted = scriptsDeleted(config, buildCtx);
+    buildCtx.scriptsAdded = scriptsAdded(buildCtx);
+    buildCtx.scriptsDeleted = scriptsDeleted(buildCtx);
     buildCtx.hasScriptChanges = hasScriptChanges(buildCtx);
     buildCtx.hasStyleChanges = hasStyleChanges(buildCtx);
     buildCtx.hasHtmlChanges = hasHtmlChanges(config, buildCtx);

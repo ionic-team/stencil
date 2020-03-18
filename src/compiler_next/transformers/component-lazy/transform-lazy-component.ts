@@ -1,9 +1,9 @@
 import * as d from '../../../declarations';
-import { addImports } from '../../../compiler/transformers/add-imports';
-import { addLegacyApis } from '../../../compiler/transformers/core-runtime-apis';
-import { getComponentMeta, getModuleFromSourceFile } from '../../../compiler/transformers/transform-utils';
+import { addImports } from '../add-imports';
+import { addLegacyApis } from '../core-runtime-apis';
+import { getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
 import { updateLazyComponentClass } from './lazy-component';
-import { updateStyleImports } from '../../../compiler/transformers/style-imports';
+import { updateStyleImports } from '../style-imports';
 import ts from 'typescript';
 
 

@@ -1,5 +1,4 @@
 
-
 const activeFetches = new Map<string, Promise<Response>>();
 
 export const cachedFetch = async (url: string) => {

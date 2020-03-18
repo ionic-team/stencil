@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { generateHydrateApp } from './generate-hydrate-app';
-import { isOutputTargetHydrate } from '../../../compiler/output-targets/output-utils';
+import { isOutputTargetHydrate } from '../../output-targets/output-utils';
 
 
 export const outputHydrateScript = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {

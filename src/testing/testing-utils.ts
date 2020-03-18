@@ -1,6 +1,7 @@
 import * as d from '@stencil/core/internal';
 import { normalizePath } from '@utils';
-import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
+import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler_next/output-targets/output-utils';
+import { join, relative } from 'path';
 
 
 export function shuffleArray(array: any[]) {
@@ -69,8 +70,8 @@ function getAppUrl(config: d.Config, browserUrl: string, appFileName: string) {
   const wwwOutput = config.outputTargets.find(isOutputTargetWww);
   if (wwwOutput) {
     const appBuildDir = wwwOutput.buildDir;
-    const appFilePath = config.sys.path.join(appBuildDir, appFileName);
-    const appUrlPath = config.sys.path.relative(wwwOutput.dir, appFilePath);
+    const appFilePath = join(appBuildDir, appFileName);
+    const appUrlPath = relative(wwwOutput.dir, appFilePath);
     const url = new URL(appUrlPath, browserUrl);
     return url.href;
   }
@@ -78,8 +79,8 @@ function getAppUrl(config: d.Config, browserUrl: string, appFileName: string) {
   const distOutput = config.outputTargets.find(isOutputTargetDistLazy);
   if (distOutput) {
     const appBuildDir = distOutput.esmDir;
-    const appFilePath = config.sys.path.join(appBuildDir, appFileName);
-    const appUrlPath = config.sys.path.relative(config.rootDir, appFilePath);
+    const appFilePath = join(appBuildDir, appFileName);
+    const appUrlPath = relative(config.rootDir, appFilePath);
     const url = new URL(appUrlPath, browserUrl);
     return url.href;
   }

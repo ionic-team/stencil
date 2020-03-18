@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
+import path from 'path';
 
 
 export async function taskServe(process: NodeJS.Process, config: d.Config) {
@@ -15,8 +16,8 @@ export async function taskServe(process: NodeJS.Process, config: d.Config) {
   config.devServer.root = process.cwd();
 
   if (typeof config.flags.root === 'string') {
-    if (!config.sys.path.isAbsolute(config.flags.root)) {
-      config.devServer.root = config.sys.path.relative(process.cwd(), config.flags.root);
+    if (!path.isAbsolute(config.flags.root)) {
+      config.devServer.root = path.relative(process.cwd(), config.flags.root);
     }
   }
   config.devServer.root = normalizePath(config.devServer.root);

@@ -42,3 +42,8 @@ dist/
 test/**/www/*
 test/**/hydrate/*
 .stencil
+
+
+src/cli_legacy
+src/compiler_legacy
+src/sys/node_legacy

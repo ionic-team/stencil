@@ -18,7 +18,6 @@ export const fetchModuleSync = (inMemoryFs: d.InMemoryFileSystem, pkgVersions: M
   return content;
 };
 
-
 export const fetchUrlSync = (url: string) => {
   if (known404Urls.has(url) || skipUrlFetch(url)) {
     return undefined;

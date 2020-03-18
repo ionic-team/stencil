@@ -1,9 +1,8 @@
 import * as d from '../../../declarations';
-import { CMP_FLAGS } from '@utils';
-import { convertValueToLiteral, createStaticGetter } from '../../../compiler/transformers/transform-utils';
+import { addStaticStyleGetterWithinClass } from '../add-static-style';
+import { CMP_FLAGS, formatComponentRuntimeMeta } from '@utils';
+import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import ts from 'typescript';
-import { addStaticStyleGetterWithinClass } from '../../../compiler_next/transformers/add-static-style';
-import { formatComponentRuntimeMeta } from '../../../compiler/app-core/format-component-runtime-meta';
 
 
 export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {

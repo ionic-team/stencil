@@ -7,14 +7,14 @@ import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { devNodeModuleResolveId } from './dev-module';
 import { extTransformsPlugin } from './ext-transforms-plugin';
 import { fileLoadPlugin } from './file-load-plugin';
-import { textPlugin } from './text-plugin';
-import { imagePlugin } from '../../compiler/rollup-plugins/image-plugin';
+import { imagePlugin } from './image-plugin';
 import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-plugin';
-import { loaderPlugin } from '../../compiler/rollup-plugins/loader';
-import { pluginHelper } from '../../compiler/rollup-plugins/plugin-helper';
+import { loaderPlugin } from './loader-plugin';
+import { pluginHelper } from './plugin-helper';
 import { resolveIdWithTypeScript, typescriptPlugin } from './typescript-plugin';
 import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-plugins';
 import { RollupOptions, TreeshakingOptions, rollup } from 'rollup';
+import { textPlugin } from './text-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
 
@@ -72,7 +72,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       loaderPlugin(bundleOpts.loader),
       userIndexPlugin(config, compilerCtx),
       typescriptPlugin(compilerCtx, bundleOpts),
-      imagePlugin(config, compilerCtx, buildCtx),
+      imagePlugin(config, buildCtx),
       textPlugin(),
       extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform),

@@ -1,15 +1,15 @@
 import * as d from '../../declarations';
-import { outputAngular } from '../../compiler/output-targets/output-angular';
+import { outputAngular } from './output-angular';
 import { outputCopy } from './copy/output-copy';
 import { outputCustomElements } from './dist-custom-elements';
 import { outputCustomElementsBundle } from './dist-custom-elements-bundle';
-import { outputDocs } from '../../compiler/output-targets/output-docs';
+import { outputDocs } from './output-docs';
 import { outputHydrateScript } from './dist-hydrate-script';
 import { outputLazy } from './dist-lazy/lazy-output';
-import { outputLazyLoader } from '../../compiler/output-targets/output-lazy-loader';
-import { outputWww } from '../../compiler/output-targets/output-www';
+import { outputLazyLoader } from './output-lazy-loader';
+import { outputWww } from './output-www';
 import { outputCollection } from './dist-collection';
-import { outputTypes } from '../../compiler/output-targets/output-types';
+import { outputTypes } from './output-types';
 import { RollupCache } from 'rollup';
 
 
@@ -57,4 +57,4 @@ const invalidateRollupCaches = (compilerCtx: d.CompilerCtx) => {
       }
     });
   });
-}
+};

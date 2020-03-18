@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { bundleHydrateFactory } from './bundle-hydrate-factory';
 import { catchError, createOnWarnFn, loadRollupDiagnostics } from '@utils';
-import { getBuildFeatures, updateBuildConditionals } from '../../build/app-data';
+import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
 import { HYDRATE_FACTORY_INTRO, HYDRATE_FACTORY_OUTRO } from './hydrate-factory-closure';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
 import { writeHydrateOutputs } from './write-hydrate-outputs';

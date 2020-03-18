@@ -45,14 +45,14 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
     const outputFile = join(outputDir, entryFileName);
     const cachedFile = join(cachedDir, entryFileName);
 
-    // if (!opts.isProd) {
-    //   const cachedExists = fs.existsSync(cachedFile);
-    //   if (cachedExists) {
-    //     await fs.copyFile(cachedFile, outputFile);
-    //     resolveBundle();
-    //     return;
-    //   }
-    // }
+    if (!opts.isProd) {
+      const cachedExists = fs.existsSync(cachedFile);
+      if (cachedExists) {
+        await fs.copyFile(cachedFile, outputFile);
+        resolveBundle();
+        return;
+      }
+    }
 
     const whitelist = new Set([
       'child_process',
@@ -61,7 +61,7 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
     ]);
 
     webpack({
-      entry: join(opts.srcDir, 'sys', 'node_next', 'bundles', entryFileName),
+      entry: join(opts.srcDir, 'sys', 'node', 'bundles', entryFileName),
       output: {
         path: outputDir,
         filename: entryFileName,

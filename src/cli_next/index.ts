@@ -1,10 +1,10 @@
 import { CompilerSystem, Logger } from '../declarations';
-import { createNodeLogger } from '../sys/node_next/node-logger';
-import { createNodeSysWithWatch } from '../sys/node_next/node-sys-watch';
+import { createNodeLogger } from '../sys/node/node-logger';
+import { createNodeSysWithWatch } from '../sys/node/node-sys-watch';
 import { parseFlags } from './parse-flags';
 import { runTask } from './tasks/run-task';
 import { shouldIgnoreError, hasError, isString } from '@utils';
-import { setupWorkerController } from '../sys/node_next/worker';
+import { setupWorkerController } from '../sys/node/worker';
 import exit from 'exit';
 import { join } from 'path';
 import { NodeLazyRequire } from '../sys/node/node-lazy-require';

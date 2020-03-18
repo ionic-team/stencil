@@ -1,5 +1,6 @@
 import * as d from '@stencil/core/internal';
 import { runJest } from './jest-runner';
+import { join } from 'path';
 
 
 export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) {
@@ -9,7 +10,7 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
   const connector: d.ScreenshotConnector = new ScreenshotConnector();
 
   // for CI, let's wait a little longer than locally before taking the screenshot
-  const pixelmatchModulePath = config.sys.path.join(config.sys.compiler.packageDir, 'screenshot', 'pixel-match.js');
+  const pixelmatchModulePath = join(config.sys_next.getCompilerExecutingPath(), '..', '..', 'screenshot', 'pixel-match.js');
   config.logger.debug(`pixelmatch module: ${pixelmatchModulePath}`);
 
   const initTimespan = config.logger.createTimeSpan(`screenshot, initBuild started`, true);
@@ -20,7 +21,7 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
     appNamespace: config.namespace,
     rootDir: config.rootDir,
     cacheDir: config.cacheDir,
-    packageDir: config.sys.compiler.packageDir,
+    packageDir: join(config.sys_next.getCompilerExecutingPath(), '..', '..'),
     updateMaster: config.flags.updateScreenshot,
     logger: config.logger,
     allowableMismatchedPixels: config.testing.allowableMismatchedPixels,

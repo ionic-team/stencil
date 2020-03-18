@@ -1,23 +1,25 @@
 import * as d from '../../../declarations';
+import { isAbsolute, join } from 'path';
+
 
 export const getSrcAbsPath = (config: d.Config, src: string) => {
-  if (config.sys.path.isAbsolute(src)) {
+  if (isAbsolute(src)) {
     return src;
   }
-  return config.sys.path.join(config.srcDir, src);
+  return join(config.srcDir, src);
 };
 
-export const getDestAbsPath = (config: d.Config, src: string, destAbsPath: string, destRelPath: string) => {
+export const getDestAbsPath = (src: string, destAbsPath: string, destRelPath: string) => {
   if (destRelPath) {
-    if (config.sys.path.isAbsolute(destRelPath)) {
+    if (isAbsolute(destRelPath)) {
       return destRelPath;
 
     } else {
-      return config.sys.path.join(destAbsPath, destRelPath);
+      return join(destAbsPath, destRelPath);
     }
   }
 
-  if (config.sys.path.isAbsolute(src)) {
+  if (isAbsolute(src)) {
     throw new Error(`copy task, "dest" property must exist if "src" property is an absolute path: ${src}`);
   }
 

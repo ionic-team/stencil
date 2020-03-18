@@ -4,61 +4,72 @@ import { EventEmitter } from 'events';
 import { TASK_CANCELED_MSG } from '@utils';
 
 
-export class WorkerMain extends EventEmitter {
+export class NodeWorkerMain extends EventEmitter {
   childProcess: cp.ChildProcess;
-  tasks: d.WorkerTask[] = [];
+  tasks = new Map<number, d.CompilerWorkerTask>();
   exitCode: number = null;
   processQueue = true;
-  sendQueue: d.WorkerMessage[] = [];
+  sendQueue: d.MsgToWorker[] = [];
   stopped = false;
   successfulMessage = false;
   totalTasksAssigned = 0;
-  workerKeys: string[] = [];
 
-  constructor(public id: number, workerModule: string) {
+  constructor(public workerDomain: string, public id: number, forkModulePath: string) {
     super();
-    this.fork(workerModule);
+    this.fork(forkModulePath);
   }
 
-  fork(workerModule: string) {
+  fork(forkModulePath: string) {
     const filteredArgs = process.execArgv.filter(
       v => !/^--(debug|inspect)/.test(v)
     );
 
+    const args = [
+      this.workerDomain
+    ];
+
     const options: cp.ForkOptions = {
       execArgv: filteredArgs,
       env: process.env,
-      cwd: process.cwd()
+      cwd: process.cwd(),
+      silent: true,
     };
 
-    const args = ['--start-worker'];
+    this.childProcess = cp.fork(forkModulePath, args, options);
 
-    this.childProcess = cp.fork(workerModule, args, options);
+    this.childProcess.stdout.setEncoding('utf8');
+    this.childProcess.stdout.on('data', data => {
+      console.log(data);
+    });
+
+    this.childProcess.stderr.setEncoding('utf8');
+    this.childProcess.stderr.on('data', data => {
+      console.log(data);
+    });
 
     this.childProcess.on('message', this.receiveFromWorker.bind(this));
+
+    this.childProcess.on('error', err => {
+      this.emit('error', err);
+    });
 
     this.childProcess.once('exit', code => {
       this.exitCode = code;
       this.emit('exit', code);
     });
-
-    this.childProcess.on('error', err => {
-      this.emit('error', err);
-    });
   }
 
-  run(task: d.WorkerTask) {
+  run(task: d.CompilerWorkerTask) {
     this.totalTasksAssigned++;
-    this.tasks.push(task);
+    this.tasks.set(task.stencilId, task);
 
     this.sendToWorker({
-      taskId: task.taskId,
-      method: task.method,
-      args: task.args
+      stencilId: task.stencilId,
+      args: task.inputArgs
     });
   }
 
-  sendToWorker(msg: d.WorkerMessage) {
+  sendToWorker(msg: d.MsgToWorker) {
     if (!this.processQueue) {
       this.sendQueue.push(msg);
       return;
@@ -83,42 +94,37 @@ export class WorkerMain extends EventEmitter {
     }
   }
 
-  receiveFromWorker(responseFromWorker: d.WorkerMessage) {
+  receiveFromWorker(msgFromWorker: d.MsgFromWorker) {
     this.successfulMessage = true;
 
     if (this.stopped) {
       return;
     }
 
-    const task = this.tasks.find(t => t.taskId === responseFromWorker.taskId);
+    const task = this.tasks.get(msgFromWorker.stencilId);
     if (!task) {
-      if (responseFromWorker.error != null) {
-        this.emit('error', responseFromWorker.error);
+      if (msgFromWorker.stencilRtnError != null) {
+        this.emit('error', msgFromWorker.stencilRtnError);
       }
       return;
     }
 
-    if (responseFromWorker.error != null) {
-      task.reject(responseFromWorker.error);
+    if (msgFromWorker.stencilRtnError != null) {
+      task.reject(msgFromWorker.stencilRtnError);
     } else {
-      task.resolve(responseFromWorker.value);
+      task.resolve(msgFromWorker.stencilRtnValue);
     }
 
-    const index = this.tasks.indexOf(task);
-    if (index > -1) {
-      this.tasks.splice(index, 1);
-    }
+    this.tasks.delete(msgFromWorker.stencilId);
 
-    this.emit('response', responseFromWorker);
+    this.emit('response', msgFromWorker);
   }
 
   stop() {
     this.stopped = true;
 
-    for (const task of this.tasks) {
-      task.reject(TASK_CANCELED_MSG);
-    }
-    this.tasks.length = 0;
+    this.tasks.forEach(t => t.reject(TASK_CANCELED_MSG));
+    this.tasks.clear();
 
     if (this.successfulMessage) {
       // we know we've had a successful startup

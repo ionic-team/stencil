@@ -1,8 +1,9 @@
 import * as d from '../../declarations';
 import { buildAbort, buildFinish } from './build-finish';
 import { catchError, isString, readPackageJson } from '@utils';
-import { emptyOutputTargets } from '../../compiler/output-targets/empty-dir';
-import { generateGlobalStyles } from '../../compiler/style/global-styles';
+import { createDocument } from '@stencil/core/mock-doc';
+import { emptyOutputTargets } from '../output-targets/empty-dir';
+import { generateGlobalStyles } from '../style/global-styles';
 import { generateOutputTargets } from '../output-targets';
 import { runTsProgram } from '../transpile/run-program';
 import { writeBuild } from './write-build';
@@ -21,7 +22,7 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
     if (config.srcIndexHtml) {
       const indexSrcHtml = await compilerCtx.fs.readFile(config.srcIndexHtml);
       if (isString(indexSrcHtml)) {
-        buildCtx.indexDoc = config.sys.createDocument(indexSrcHtml);
+        buildCtx.indexDoc = createDocument(indexSrcHtml);
       }
     }
 

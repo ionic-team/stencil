@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
 import { generateLazyModules } from '../dist-lazy/generate-lazy-module';
-import { generateRollupOutput } from '../../../compiler/app-core/bundle-app-core';
+import { generateRollupOutput } from '../../app-core/bundle-app-core';
+import { join } from 'path';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '@utils';
 import { RollupResult } from '../../../declarations';
@@ -37,14 +38,14 @@ const copyPolyfills = async (config: d.Config, compilerCtx: d.CompilerCtx, outpu
     return;
   }
 
-  const src = config.sys.path.join(config.sys.compiler.packageDir, 'internal', 'client', 'polyfills');
+  const src = join(config.sys_next.getCompilerExecutingPath(), '..', '..', 'internal', 'client', 'polyfills');
   const files = await compilerCtx.fs.readdir(src);
 
   await Promise.all(destinations.map(dest => {
     return Promise.all(files.map(f => {
       return compilerCtx.fs.copyFile(
         f.absPath,
-        config.sys.path.join(dest, 'polyfills', f.relPath));
+        join(dest, 'polyfills', f.relPath));
     }));
   }));
 };
@@ -56,10 +57,10 @@ const generateShortcuts = (config: d.Config, compilerCtx: d.CompilerCtx, outputT
     outputTargets.map(async o => {
       if (o.esmDir && o.esmIndexFile) {
         const entryPointPath = config.buildEs5 && o.esmEs5Dir
-          ? config.sys.path.join(o.esmEs5Dir, indexFilename)
-          : config.sys.path.join(o.esmDir, indexFilename);
+          ? join(o.esmEs5Dir, indexFilename)
+          : join(o.esmDir, indexFilename);
 
-        const relativePath = relativeImport(config, o.esmIndexFile, entryPointPath);
+        const relativePath = relativeImport(o.esmIndexFile, entryPointPath);
         const shortcutContent = `export * from '${relativePath}';`;
         await compilerCtx.fs.writeFile(o.esmIndexFile, shortcutContent, { outputTargetType: o.type });
       }

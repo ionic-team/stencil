@@ -1,8 +1,8 @@
 import * as d from '../../../declarations';
-import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme } from '../../../compiler/output-targets/output-utils';
-import { NOTE } from '../../../compiler/docs/constants';
 import { buildError } from '@utils';
-import path from 'path';
+import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme } from '../../output-targets/output-utils';
+import { isAbsolute, join } from 'path';
+import { NOTE } from '../../docs/constants';
 
 
 export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
@@ -56,8 +56,8 @@ const validateReadmeOutputTarget = (config: d.Config, diagnostics: d.Diagnostic[
     outputTarget.dir = config.srcDir;
   }
 
-  if (!path.isAbsolute(outputTarget.dir)) {
-    outputTarget.dir = path.join(config.rootDir, outputTarget.dir);
+  if (!isAbsolute(outputTarget.dir)) {
+    outputTarget.dir = join(config.rootDir, outputTarget.dir);
   }
 
   if (outputTarget.footer == null) {
@@ -73,9 +73,9 @@ const validateJsonDocsOutputTarget = (config: d.Config, diagnostics: d.Diagnosti
     err.messageText = `docs-json outputTarget missing the "file" option`;
   }
 
-  outputTarget.file = path.join(config.rootDir, outputTarget.file);
+  outputTarget.file = join(config.rootDir, outputTarget.file);
   if (typeof outputTarget.typesFile === 'string') {
-    outputTarget.typesFile = path.join(config.rootDir, outputTarget.typesFile);
+    outputTarget.typesFile = join(config.rootDir, outputTarget.typesFile);
   } else if (outputTarget.typesFile !== null && outputTarget.file.endsWith('.json')) {
     outputTarget.typesFile = outputTarget.file.replace(/\.json$/, '.d.ts');
   }

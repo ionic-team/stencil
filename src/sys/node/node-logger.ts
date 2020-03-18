@@ -1,15 +1,20 @@
-import * as d from '../../declarations';
+import { Diagnostic, Logger, LoggerTimeSpan, PrintLine } from '../../declarations';
 import color from 'ansi-colors';
 import fs from 'graceful-fs';
 import path from 'path';
 
 
-export class NodeLoggerLegacy implements d.Logger {
+export function createNodeLogger(prcs: NodeJS.Process) {
+  return new NodeLogger(prcs);
+}
+
+export class NodeLogger implements Logger {
+  colors = true;
   private _level = 'info';
   private writeLogQueue: string[] = [];
   buildLogFilePath: string = null;
 
-  colors = true;
+  constructor(private prcs: NodeJS.Process) {}
 
   get level() {
     return this._level;
@@ -20,7 +25,7 @@ export class NodeLoggerLegacy implements d.Logger {
       l = l.toLowerCase().trim();
 
       if (LOG_LEVELS.indexOf(l) === -1) {
-        this.error(`Invalid log level '${color.bold(l)}' (choose from: ${LOG_LEVELS.map(l => color.bold(l)).join(', ')})`);
+        this.error(`Invalid log level '${this.bold(l)}' (choose from: ${LOG_LEVELS.map(l => this.bold(l)).join(', ')})`);
       } else {
         this._level = l;
       }
@@ -29,7 +34,7 @@ export class NodeLoggerLegacy implements d.Logger {
 
   info(...msg: any[]) {
     if (this.shouldLog('info')) {
-      const lines = wordWrap(msg, getColumns());
+      const lines = wordWrap(msg, getColumns(this.prcs));
       this.infoPrefix(lines);
       console.log(lines.join('\n'));
     }
@@ -51,7 +56,7 @@ export class NodeLoggerLegacy implements d.Logger {
 
   warn(...msg: any[]) {
     if (this.shouldLog('warn')) {
-      const lines = wordWrap(msg, getColumns());
+      const lines = wordWrap(msg, getColumns(this.prcs));
       this.warnPrefix(lines);
       console.warn('\n' + lines.join('\n') + '\n');
     }
@@ -61,7 +66,7 @@ export class NodeLoggerLegacy implements d.Logger {
   warnPrefix(lines: string[]) {
     if (lines.length) {
       const prefix = '[ WARN  ]';
-      lines[0] = this.bold(color.yellow(prefix)) + lines[0].substr(prefix.length);
+      lines[0] = this.bold(this.yellow(prefix)) + lines[0].substr(prefix.length);
     }
   }
 
@@ -77,7 +82,7 @@ export class NodeLoggerLegacy implements d.Logger {
     }
 
     if (this.shouldLog('error')) {
-      const lines = wordWrap(msg, getColumns());
+      const lines = wordWrap(msg, getColumns(this.prcs));
       this.errorPrefix(lines);
       console.error('\n' + lines.join('\n') + '\n');
     }
@@ -87,14 +92,14 @@ export class NodeLoggerLegacy implements d.Logger {
   errorPrefix(lines: string[]) {
     if (lines.length) {
       const prefix = '[ ERROR ]';
-      lines[0] = this.bold(color.red(prefix)) + lines[0].substr(prefix.length);
+      lines[0] = this.bold(this.red(prefix)) + lines[0].substr(prefix.length);
     }
   }
 
   debug(...msg: any[]) {
     if (this.shouldLog('debug')) {
-      msg.push(this.dim(` MEM: ${(process.memoryUsage().rss / 1000000).toFixed(1)}MB`));
-      const lines = wordWrap(msg, getColumns());
+      msg.push(this.dim(` MEM: ${(this.prcs.memoryUsage().rss / 1000000).toFixed(1)}MB`));
+      const lines = wordWrap(msg, getColumns(this.prcs));
       this.debugPrefix(lines);
       console.log(lines.join('\n'));
     }
@@ -110,7 +115,7 @@ export class NodeLoggerLegacy implements d.Logger {
         ('0' + d.getSeconds()).slice(-2) + '.' +
         Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
 
-      lines[0] = color.cyan(prefix) + lines[0].substr(prefix.length);
+      lines[0] = this.cyan(prefix) + lines[0].substr(prefix.length);
     }
   }
 
@@ -119,15 +124,15 @@ export class NodeLoggerLegacy implements d.Logger {
 
     if (debug) {
       if (this.shouldLog('debug')) {
-        msg.push(this.dim(` MEM: ${(process.memoryUsage().rss / 1000000).toFixed(1)}MB`));
-        const lines = wordWrap(msg, getColumns());
+        msg.push(this.dim(` MEM: ${(this.prcs.memoryUsage().rss / 1000000).toFixed(1)}MB`));
+        const lines = wordWrap(msg, getColumns(this.prcs));
         this.debugPrefix(lines);
         console.log(lines.join('\n'));
         this.queueWriteLog('D', [`${startMsg} ...`]);
       }
 
     } else {
-      const lines = wordWrap(msg, getColumns());
+      const lines = wordWrap(msg, getColumns(this.prcs));
       this.infoPrefix(lines);
       console.log(lines.join('\n'));
       this.queueWriteLog('I', [`${startMsg} ...`]);
@@ -152,15 +157,15 @@ export class NodeLoggerLegacy implements d.Logger {
     if (debug) {
       if (this.shouldLog('debug')) {
         const m = [msg];
-        m.push(this.dim(` MEM: ${(process.memoryUsage().rss / 1000000).toFixed(1)}MB`));
-        const lines = wordWrap(m, getColumns());
+        m.push(this.dim(` MEM: ${(this.prcs.memoryUsage().rss / 1000000).toFixed(1)}MB`));
+        const lines = wordWrap(m, getColumns(this.prcs));
         this.debugPrefix(lines);
         console.log(lines.join('\n'));
       }
       this.queueWriteLog('D', [`${finishMsg} ${timeSuffix}`]);
 
     } else {
-      const lines = wordWrap([msg], getColumns());
+      const lines = wordWrap([msg], getColumns(this.prcs));
       this.infoPrefix(lines);
       console.log(lines.join('\n'));
       this.queueWriteLog('I', [`${finishMsg} ${timeSuffix}`]);
@@ -184,7 +189,7 @@ export class NodeLoggerLegacy implements d.Logger {
         ('0' + d.getSeconds()).slice(-2) + '.' +
         ('0' + Math.floor((d.getMilliseconds() / 1000) * 10)) +
         '  ' +
-        ('000' + (process.memoryUsage().rss / 1000000).toFixed(1)).slice(-6) + 'MB' +
+        ('000' + (this.prcs.memoryUsage().rss / 1000000).toFixed(1)).slice(-6) + 'MB' +
         '  ' + prefix +
         '  ' +
         msg.join(', ');
@@ -221,58 +226,58 @@ export class NodeLoggerLegacy implements d.Logger {
   }
 
   color(msg: string, colorName: 'red'|'green'|'yellow'|'blue'|'magenta'|'cyan'|'gray') {
-    return (color as any)[colorName](msg);
+    return this.colors ? (color as any)[colorName](msg) : msg;
   }
 
   red(msg: string) {
-    return color.red(msg);
+    return this.colors ? color.red(msg) : msg;
   }
 
   green(msg: string) {
-    return color.green(msg);
+    return this.colors ? color.green(msg) : msg;
   }
 
   yellow(msg: string) {
-    return color.yellow(msg);
+    return this.colors ? color.yellow(msg) : msg;
   }
 
   blue(msg: string) {
-    return color.blue(msg);
+    return this.colors ? color.blue(msg) : msg;
   }
 
   magenta(msg: string) {
-    return color.magenta(msg);
+    return this.colors ? color.magenta(msg) : msg;
   }
 
   cyan(msg: string) {
-    return color.cyan(msg);
+    return this.colors ? color.cyan(msg) : msg;
   }
 
   gray(msg: string) {
-    return color.gray(msg);
+    return this.colors ? color.gray(msg) : msg;
   }
 
   bold(msg: string) {
-    return color.bold(msg);
+    return this.colors ? color.bold(msg) : msg;
   }
 
   dim(msg: string) {
-    return color.dim(msg);
+    return this.colors ? color.dim(msg) : msg;
   }
 
   bgRed(msg: string) {
-    return color.bgRed(msg);
+    return this.colors ? color.bgRed(msg) : msg;
   }
 
   private shouldLog(level: string): boolean {
     return LOG_LEVELS.indexOf(level) >= LOG_LEVELS.indexOf(this.level);
   }
 
-  createTimeSpan(startMsg: string, debug = false, appendTo?: string[]): d.LoggerTimeSpan {
+  createTimeSpan(startMsg: string, debug = false, appendTo?: string[]): LoggerTimeSpan {
     return new CmdTimeSpan(this, startMsg, debug, appendTo);
   }
 
-  printDiagnostics(diagnostics: d.Diagnostic[], cwd?: string) {
+  printDiagnostics(diagnostics: Diagnostic[], cwd?: string) {
     if (!diagnostics || diagnostics.length === 0) return;
 
     let outputLines: string[] = [''];
@@ -284,8 +289,8 @@ export class NodeLoggerLegacy implements d.Logger {
     console.log(outputLines.join('\n'));
   }
 
-  printDiagnostic(diagnostic: d.Diagnostic, cwd?: string) {
-    const outputLines = wordWrap([diagnostic.messageText], getColumns());
+  printDiagnostic(diagnostic: Diagnostic, cwd?: string) {
+    const outputLines = wordWrap([diagnostic.messageText], getColumns(this.prcs));
 
     let header = '';
 
@@ -295,7 +300,7 @@ export class NodeLoggerLegacy implements d.Logger {
 
     if (typeof diagnostic.absFilePath === 'string' && typeof diagnostic.relFilePath !== 'string') {
       if (typeof cwd !== 'string') {
-        cwd = process.cwd();
+        cwd = this.prcs.cwd();
       }
 
       diagnostic.relFilePath = path.relative(cwd, diagnostic.absFilePath);
@@ -314,15 +319,15 @@ export class NodeLoggerLegacy implements d.Logger {
         header += ': ';
       }
 
-      header += color.cyan(filePath);
+      header += this.cyan(filePath);
 
       if (typeof diagnostic.lineNumber === 'number' && diagnostic.lineNumber > -1) {
-        header += color.dim(`:`);
-        header += color.yellow(`${diagnostic.lineNumber}`);
+        header += this.dim(`:`);
+        header += this.yellow(`${diagnostic.lineNumber}`);
 
         if (typeof diagnostic.columnNumber === 'number' && diagnostic.columnNumber > -1) {
-          header += color.dim(`:`);
-          header += color.yellow(`${diagnostic.columnNumber}`);
+          header += this.dim(`:`);
+          header += this.yellow(`${diagnostic.columnNumber}`);
         }
       }
     }
@@ -387,7 +392,7 @@ export class NodeLoggerLegacy implements d.Logger {
 
     if (diagnostic.debugText != null && this.level === 'debug') {
       outputLines.push(diagnostic.debugText);
-      this.debugPrefix(wordWrap([diagnostic.debugText], getColumns()));
+      this.debugPrefix(wordWrap([diagnostic.debugText], getColumns(this.prcs)));
     }
 
     return outputLines;
@@ -416,7 +421,7 @@ export class NodeLoggerLegacy implements d.Logger {
     for (var i = 0; i < lineLength; i++) {
       var chr = errorLine.charAt(i);
       if (i >= errorCharStart && i < errorCharStart + errorLength) {
-        chr = color.bgRed(chr === '' ? ' ' : chr);
+        chr = this.bgRed(chr === '' ? ' ' : chr);
       }
       lineChars.push(chr);
     }
@@ -431,7 +436,7 @@ export class NodeLoggerLegacy implements d.Logger {
 
     const words = text.split(' ').map(word => {
       if (JS_KEYWORDS.indexOf(word) > -1) {
-        return color.cyan(word);
+        return this.cyan(word);
       }
       return word;
     });
@@ -455,7 +460,7 @@ export class NodeLoggerLegacy implements d.Logger {
         cssProp = false;
       }
       if (cssProp && safeChars.indexOf(c.toLowerCase()) > -1) {
-        chars.push(color.cyan(c));
+        chars.push(this.cyan(c));
         continue;
       }
 
@@ -468,11 +473,11 @@ export class NodeLoggerLegacy implements d.Logger {
 
 
 class CmdTimeSpan {
-  private logger: NodeLoggerLegacy;
+  private logger: NodeLogger;
   private start: number;
 
   constructor(
-    logger: NodeLoggerLegacy,
+    logger: NodeLogger,
     startMsg: string,
     private debug: boolean,
     private appendTo: string[]
@@ -521,8 +526,8 @@ class CmdTimeSpan {
 const LOG_LEVELS = ['debug', 'info', 'warn', 'error'];
 
 
-function getColumns() {
-  const terminalWidth = (process.stdout && (process.stdout as any).columns) || 80;
+function getColumns(prcs: NodeJS.Process) {
+  const terminalWidth = (prcs.stdout && (prcs.stdout as any).columns) || 80;
   return Math.max(Math.min(MAX_COLUMNS, terminalWidth), MIN_COLUMNS);
 }
 
@@ -605,8 +610,8 @@ export function wordWrap(msg: any[], columns: number) {
 }
 
 
-function prepareLines(orgLines: d.PrintLine[]) {
-  const lines: d.PrintLine[] = JSON.parse(JSON.stringify(orgLines));
+function prepareLines(orgLines: PrintLine[]) {
+  const lines: PrintLine[] = JSON.parse(JSON.stringify(orgLines));
 
   for (let i = 0; i < 100; i++) {
     if (!eachLineHasLeadingWhitespace(lines)) {
@@ -625,7 +630,7 @@ function prepareLines(orgLines: d.PrintLine[]) {
 }
 
 
-function eachLineHasLeadingWhitespace(lines: d.PrintLine[]) {
+function eachLineHasLeadingWhitespace(lines: PrintLine[]) {
   if (!lines.length) {
     return false;
   }

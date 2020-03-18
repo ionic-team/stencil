@@ -2,7 +2,8 @@ import * as d from '../../../declarations';
 import { buildError, isGlob, normalizePath } from '@utils';
 import { canSkipAssetsCopy, getComponentAssetsCopyTasks } from './assets-copy-tasks';
 import { getDestAbsPath, getSrcAbsPath } from '../copy/local-copy-tasks';
-import { isOutputTargetCopy } from '../../../compiler/output-targets/output-utils';
+import { isOutputTargetCopy } from '../../output-targets/output-utils';
+import { join } from 'path';
 import minimatch from 'minimatch';
 
 
@@ -18,7 +19,7 @@ export const outputCopy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     ...buildCtx.dirsAdded
   ];
   const copyTasks: Required<d.CopyTask>[] = [];
-  const needsCopyAssets = !canSkipAssetsCopy(config, compilerCtx, buildCtx.entryModules, buildCtx.filesChanged);
+  const needsCopyAssets = !canSkipAssetsCopy(compilerCtx, buildCtx.entryModules, buildCtx.filesChanged);
   outputTargets.forEach(o => {
     if (needsCopyAssets && o.copyAssets) {
       copyTasks.push(
@@ -59,7 +60,7 @@ const getCopyTasks = (config: d.Config, buildCtx: d.BuildCtx, o: d.OutputTargetC
     ? o.copy
     : filterCopyTasks(config, o.copy, changedFiles);
 
-  return copyTasks.map(t => transformToAbs(config, t, o.dir));
+  return copyTasks.map(t => transformToAbs(t, o.dir));
 };
 
 const filterCopyTasks = (config: d.Config, tasks: d.CopyTask[], changedFiles: string[]) => {
@@ -68,7 +69,7 @@ const filterCopyTasks = (config: d.Config, tasks: d.CopyTask[], changedFiles: st
       let copySrc = copy.src;
       if (isGlob(copySrc)) {
         // test the glob
-        copySrc = config.sys.path.join(config.srcDir, copySrc);
+        copySrc = join(config.srcDir, copySrc);
         if (changedFiles.some(minimatch.filter(copySrc))) {
           return true;
         }
@@ -84,10 +85,10 @@ const filterCopyTasks = (config: d.Config, tasks: d.CopyTask[], changedFiles: st
   return [];
 };
 
-const transformToAbs = (config: d.Config, copyTask: d.CopyTask, dest: string): Required<d.CopyTask> => {
+const transformToAbs = (copyTask: d.CopyTask, dest: string): Required<d.CopyTask> => {
   return {
     src: copyTask.src,
-    dest: getDestAbsPath(config, copyTask.src, dest, copyTask.dest),
+    dest: getDestAbsPath(copyTask.src, dest, copyTask.dest),
     keepDirStructure: typeof copyTask.keepDirStructure === 'boolean' ? copyTask.keepDirStructure : copyTask.dest == null,
     warn: copyTask.warn !== false
   };

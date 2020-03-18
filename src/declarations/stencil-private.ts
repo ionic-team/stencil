@@ -2534,14 +2534,6 @@ export interface E2EProcessEnv {
 }
 
 
-export interface ITestingLegacy {
-  isValid: boolean;
-  runTests(): Promise<boolean>;
-  destroy(): Promise<void>;
-}
-
-
-
 export interface AnyHTMLElement extends HTMLElement {
   [key: string]: any;
 }

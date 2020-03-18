@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
-import { validateManifestJson } from '../../compiler/html/validate-manifest-json';
-import { validateBuildPackageJson } from '../../compiler/types/validate-build-package-json';
+import { validateBuildPackageJson } from '../types/validate-build-package-json';
+import { validateManifestJson } from '../html/validate-manifest-json';
 
 
 export const validateBuildFiles = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -9,7 +9,7 @@ export const validateBuildFiles = (config: d.Config, compilerCtx: d.CompilerCtx,
   }
 
   return Promise.all([
+    validateBuildPackageJson(config, compilerCtx, buildCtx),
     validateManifestJson(config, compilerCtx, buildCtx),
-    validateBuildPackageJson(config, compilerCtx, buildCtx)
   ]);
 };

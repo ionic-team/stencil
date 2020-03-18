@@ -1,8 +1,6 @@
 import { BuildOptions } from './utils/options';
 import { cli } from './bundles/cli';
-import { cli_legacy } from './bundles/cli_legacy';
 import { compiler } from './bundles/compiler';
-import { compiler_legacy } from './bundles/compiler_legacy';
 import { createLicense } from './license';
 import { devServer } from './bundles/dev-server';
 import { emptyDir } from 'fs-extra';
@@ -11,7 +9,6 @@ import { mockDoc } from './bundles/mock-doc';
 import { release } from './release';
 import { screenshot } from './bundles/screenshot';
 import { sysNode } from './bundles/sys-node';
-import { sysNode_legacy } from './bundles/sys-node_legacy';
 import { testing } from './bundles/testing';
 import { validateBuild } from './test/validate-build';
 import { RollupOptions, rollup } from 'rollup';
@@ -54,14 +51,11 @@ export async function createBuild(opts: BuildOptions) {
 
   const bundles = await Promise.all([
     cli(opts),
-    cli_legacy(opts),
     compiler(opts),
-    compiler_legacy(opts),
     devServer(opts),
     internal(opts),
     mockDoc(opts),
     screenshot(opts),
-    sysNode_legacy(opts),
     testing(opts),
   ]);
 
