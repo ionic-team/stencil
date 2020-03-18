@@ -459,7 +459,7 @@ export interface FunctionalUtilities {
 }
 
 export interface FunctionalComponent<T = {}> {
-  (props: T, children: VNode[], utils: FunctionalUtilities): VNode | VNode[];
+  (props: T | undefined, children: VNode[], utils: FunctionalUtilities): VNode | VNode[];
 }
 
 export interface ChildNode {
