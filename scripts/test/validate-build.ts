@@ -79,7 +79,7 @@ const pkgs: TestPackage[] = [
   },
   {
     // sys/node
-    files: ['sys/node/graceful-fs.js', 'sys/node/index.js', 'sys/node/node-fetch.js', 'sys/node/sys-worker.js'],
+    files: ['sys/node/graceful-fs.js', 'sys/node/index.js', 'sys/node/node-fetch.js'],
   },
   {
     // testing

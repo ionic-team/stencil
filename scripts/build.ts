@@ -45,7 +45,16 @@ export async function createBuild(opts: BuildOptions) {
 
   await sysNode(opts);
 
-  const bundles = await Promise.all([cli(opts), compiler(opts), devServer(opts), internal(opts), mockDoc(opts), screenshot(opts), testing(opts)]);
+  const bundles = await Promise.all([
+    //
+    cli(opts),
+    compiler(opts),
+    devServer(opts),
+    internal(opts),
+    mockDoc(opts),
+    screenshot(opts),
+    testing(opts),
+  ]);
 
   return bundles.reduce((b, bundle) => {
     b.push(...bundle);

@@ -1,6 +1,3 @@
-import { basename, dirname, relative } from 'path';
-import { normalizePath } from './normalize-path';
-
 export const isDef = (v: any) => v != null;
 
 export const toLowerCase = (str: string) => str.toLowerCase();
@@ -72,18 +69,6 @@ export const fromEntries = <V>(entries: IterableIterator<[string, V]>) => {
     object[key] = value;
   }
   return object;
-};
-
-export const relativeImport = (pathFrom: string, pathTo: string, ext?: string, addPrefix = true) => {
-  let relativePath = relative(dirname(pathFrom), dirname(pathTo));
-  if (addPrefix) {
-    if (relativePath === '') {
-      relativePath = '.';
-    } else if (relativePath[0] !== '.') {
-      relativePath = './' + relativePath;
-    }
-  }
-  return normalizePath(`${relativePath}/${basename(pathTo, ext)}`);
 };
 
 export const pluck = (obj: { [key: string]: any }, keys: string[]) => {

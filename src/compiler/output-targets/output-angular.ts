@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import { dashToPascalCase, relativeImport, sortBy } from '@utils';
+import { dashToPascalCase, sortBy } from '@utils';
 import { dirname, join } from 'path';
-import { isOutputTargetAngular } from './output-utils';
+import { isOutputTargetAngular, relativeImport } from './output-utils';
 
 export const outputAngular = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const angularOutputTargets = config.outputTargets.filter(isOutputTargetAngular);

@@ -3,7 +3,7 @@ import { generateRollupOutput } from '../../app-core/bundle-app-core';
 import { generateLazyModules } from './generate-lazy-module';
 import { join } from 'path';
 import { OutputOptions, RollupBuild } from 'rollup';
-import { relativeImport } from '@utils';
+import { relativeImport } from '../output-utils';
 
 export const generateCjs = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) => {
   const cjsOutputs = outputTargets.filter(o => !!o.cjsDir);

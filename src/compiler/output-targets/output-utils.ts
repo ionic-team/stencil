@@ -1,6 +1,18 @@
 import * as d from '../../declarations';
-import { flatOne, sortBy } from '@utils';
-import { join } from 'path';
+import { basename, dirname, join, relative } from 'path';
+import { flatOne, normalizePath, sortBy } from '@utils';
+
+export const relativeImport = (pathFrom: string, pathTo: string, ext?: string, addPrefix = true) => {
+  let relativePath = relative(dirname(pathFrom), dirname(pathTo));
+  if (addPrefix) {
+    if (relativePath === '') {
+      relativePath = '.';
+    } else if (relativePath[0] !== '.') {
+      relativePath = './' + relativePath;
+    }
+  }
+  return normalizePath(`${relativePath}/${basename(pathTo, ext)}`);
+};
 
 export const getDistEsmDir = (outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) => join(outputTarget.buildDir, 'esm', sourceTarget || '');
 
