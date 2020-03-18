@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { checkVersion } from './task-version';
 import { runPrerenderTask } from './task-prerender';
 import { startupLog } from './startup-log';
 import { taskWatch } from './task-watch';
@@ -17,7 +18,8 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config) {
   let exitCode = 0;
 
   try {
-    const { createCompiler } = await import('@stencil/core/compiler');
+    const { createCompiler, version } = await import('@stencil/core/compiler');
+    const checkVersionPromise = checkVersion(config, version);
     const compiler = await createCompiler(config);
     const results = await compiler.build();
 
@@ -34,6 +36,9 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config) {
         exitCode = 1;
       }
     }
+
+    const checkVersionResults = await checkVersionPromise;
+    checkVersionResults();
 
   } catch (e) {
     exitCode = 1;

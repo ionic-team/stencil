@@ -1,6 +1,9 @@
 import * as d from '../../declarations';
+import { noop } from '@utils';
 import { request } from 'https';
-import exit from 'exit';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 import semiver from 'semiver';
 
 
@@ -13,52 +16,56 @@ export async function taskVersion() {
   console.log(version);
 }
 
-export async function taskCheckVersion(config: d.Config) {
-  try {
-    const { version } = await import('@stencil/core/compiler');
-    const latestVersion = await getLatestCompilerVersion(config, true);
+export async function checkVersion(config: d.Config, currentVersion: string): Promise<() => any> {
+  if (config.devMode && !config.flags.ci) {
+    try {
+      const latestVersion = await getLatestCompilerVersion(config);
+      if (latestVersion != null) {
+        return () => {
+          if (semiver(currentVersion, latestVersion) < 0) {
+            printUpdateMessage(config.logger, currentVersion, latestVersion);
 
-    if (semiver(version, latestVersion) < 0) {
-      printUpdateMessage(config.logger, version, latestVersion);
+          } else {
+            console.debug(`${config.logger.cyan('@stencil/core')} version ${config.logger.green(currentVersion)} is the latest version`);
+          }
+        };
+      }
 
-    } else {
-      console.log(`${config.logger.cyan('@stencil/core')} version ${config.logger.green(version)} is the latest version`);
+    } catch (e) {
+      config.logger.debug(`unable to load latest compiler version: ${e}`);
     }
-
-  } catch (e) {
-    config.logger.error(`unable to load latest compiler version: ${e}`);
-    exit(1);
   }
+  return noop;
 }
 
-async function getLatestCompilerVersion(config: d.Config, forceCheck: boolean) {
+async function getLatestCompilerVersion(config: d.Config) {
   try {
-    if (!forceCheck) {
-      const lastCheck = await getLastCheck(config);
-      if (lastCheck == null) {
-        // we've never check before, so probably first install, so don't bother
-        // save that we did just do a check though
-        await setLastCheck(config);
-        return null;
-      }
+    const lastCheck = await getLastCheck();
+    if (lastCheck == null) {
+      // we've never check before, so probably first install, so don't bother
+      // save that we did just do a check though
+      setLastCheck();
+      return null;
+    }
 
-      if (!requiresCheck(Date.now(), lastCheck, CHECK_INTERVAL)) {
-        // within the range that we did a check recently, so don't bother
-        return null;
-      }
+    if (!requiresCheck(Date.now(), lastCheck, CHECK_INTERVAL)) {
+      // within the range that we did a check recently, so don't bother
+      return null;
     }
 
     // remember we just did a check
-    await setLastCheck(config);
+    const setPromise = setLastCheck();
 
     const body = await requestUrl(REGISTRY_URL);
     const data = JSON.parse(body) as d.PackageJsonData;
-    const latestVersion = data['dist-tags'].latest;
-    return latestVersion;
+
+    await setPromise;
+
+    return data['dist-tags'].latest;
 
   } catch (e) {
     // quietly catch, could have no network connection which is fine
-    config.logger.debug(`checkVersion error: ${e}`);
+    config.logger.debug(`getLatestCompilerVersion error: ${e}`);
   }
 
   return null;
@@ -88,22 +95,38 @@ async function requestUrl(url: string) {
   });
 }
 
-
 function requiresCheck(now: number, lastCheck: number, checkInterval: number) {
   return ((lastCheck + checkInterval) < now);
 }
 
-
-function getLastCheck(config: d.Config): Promise<number> {
-  return config.sys_next.cacheStorage.get(STORAGE_KEY);
+function getLastCheck() {
+  return new Promise<number>(resolve => {
+    fs.readFile(getLastCheckStoragePath(), 'utf8', (err, data) => {
+      if (err) {
+        resolve(null);
+      } else {
+        try {
+           resolve(JSON.parse(data));
+        } catch (e) {
+          resolve(null);
+        }
+      }
+    });
+  });
 }
 
-function setLastCheck(config: d.Config) {
-  return config.sys_next.cacheStorage.set(STORAGE_KEY, Date.now());
+function setLastCheck() {
+  return new Promise<void>(resolve => {
+    const now = JSON.stringify(Date.now());
+    fs.writeFile(getLastCheckStoragePath(), now, () => {
+      resolve();
+    });
+  });
 }
 
-const STORAGE_KEY = 'last_version_check';
-
+function getLastCheckStoragePath() {
+  return path.join(os.tmpdir(), 'stencil_last_version_check.json');
+}
 
 function printUpdateMessage(logger: d.Logger, currentVersion: string, latestVersion: string) {
   const msg = [

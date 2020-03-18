@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { checkVersion } from './task-version';
 import { startupLog } from './startup-log';
 import exit from 'exit';
 
@@ -10,7 +11,9 @@ export async function taskWatch(prcs: NodeJS.Process, config: d.Config) {
   let exitCode = 0;
 
   try {
-    const { createCompiler } = await import('@stencil/core/compiler');
+    const { createCompiler, version } = await import('@stencil/core/compiler');
+    const checkVersionPromise = checkVersion(config, version);
+
     const compiler = await createCompiler(config);
     const watcher = await compiler.createWatcher();
 
@@ -22,6 +25,9 @@ export async function taskWatch(prcs: NodeJS.Process, config: d.Config) {
     prcs.once('SIGINT', () => {
       compiler.destroy();
     });
+
+    const checkVersionResults = await checkVersionPromise;
+    checkVersionResults();
 
     const closeResults = await watcher.start();
     if (closeResults.exitCode > 0) {

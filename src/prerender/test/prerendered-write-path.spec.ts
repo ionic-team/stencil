@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
 import { getWriteFilePathFromUrlPath } from '../prerendered-write-path';
 import { mockConfig } from '@stencil/core/testing';
-import { validateOutputTargetWww } from '../../compiler/config/validate-outputs-www';
-import { resolve } from 'path';
+import { validateWww } from '../../compiler_next/config/outputs/validate-www';
+import { join, resolve } from 'path';
 
 describe('prerender-utils', () => {
   const rootDir = resolve('/');
@@ -13,16 +13,19 @@ describe('prerender-utils', () => {
 
     beforeEach(() => {
       config = mockConfig();
-      validateOutputTargetWww(config, []);
+      const outputTargets = validateWww(config, [], []);
 
       manager = {
         config: config,
-        outputTarget: config.outputTargets[0] as any,
+        outputTarget: outputTargets[0] as any,
         devServerHostUrl: 'http://localhost:3333/',
         diagnostics: [],
         hydrateAppFilePath: null,
         isDebug: true,
         logCount: 0,
+        maxConcurrency: 1,
+        prerenderUrlWorker: null,
+        prcs: process,
         prerenderConfig: null,
         prerenderConfigPath: null,
         urlsCompleted: null,

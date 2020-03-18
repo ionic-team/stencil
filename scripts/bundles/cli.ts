@@ -34,6 +34,7 @@ export async function cli(opts: BuildOptions) {
     'crypto',
     'events',
     'fs',
+    'https',
     'os',
     'path',
     'readline',
