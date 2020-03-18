@@ -18,8 +18,12 @@ export async function taskGenerate(config: d.Config) {
     exit(1);
   }
 
-  const baseDir = parse(config.configPath).dir;
-  const srcDir = config.srcDir || 'src';
+  const absoluteSrcDir = config.srcDir;
+
+  if (!absoluteSrcDir) {
+    config.logger.error(`Stencil's srcDir was not specified.`);
+    return exit(1);
+  }
 
   const input =
     config.flags.unknownArgs.find(arg => !arg.startsWith('-')) ||
@@ -35,7 +39,7 @@ export async function taskGenerate(config: d.Config) {
 
   const extensionsToGenerate: GeneratableExtension[] = ['tsx', ...(await chooseFilesToGenerate())];
 
-  const outDir = join(baseDir, srcDir, 'components', dir, componentName);
+  const outDir = join(absoluteSrcDir, 'components', dir, componentName);
   await mkdir(outDir, { recursive: true });
 
   const writtenFiles = await Promise.all(
@@ -52,7 +56,9 @@ export async function taskGenerate(config: d.Config) {
   console.log(`${config.logger.gray('$')} stencil generate ${input}`);
   console.log();
   console.log(config.logger.bold('The following files have been generated:'));
-  writtenFiles.map(file => console.log(`  - ${relative(baseDir, file)}`));
+
+  const absoluteRootDir = config.rootDir;
+  writtenFiles.map(file => console.log(`  - ${relative(absoluteRootDir, file)}`));
 }
 
 /**
@@ -64,9 +70,9 @@ const chooseFilesToGenerate = async () =>
     type: 'multiselect',
     message: 'Which additional files do you want to generate?',
     choices: [
-      { value: 'css', title: 'Stylesheet', selected: true },
-      { value: 'spec.ts', title: 'Spec Test', selected: true },
-      { value: 'e2e.ts', title: 'E2E Test', selected: true },
+      { value: 'css', title: 'Stylesheet (.css)', selected: true },
+      { value: 'spec.tsx', title: 'Spec Test  (.spec.tsx)', selected: true },
+      { value: 'e2e.ts', title: 'E2E Test (.e2e.ts)', selected: true },
     ] as any[],
   })).filesToGenerate as GeneratableExtension[];
 
@@ -93,7 +99,7 @@ const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtens
     case 'css':
       return getStyleUrlBoilerplate();
 
-    case 'spec.ts':
+    case 'spec.tsx':
       return getSpecTestBoilerplate(tagName);
 
     case 'e2e.ts':
@@ -113,7 +119,7 @@ const getComponentBoilerplate = (tagName: string, hasStyle: boolean) => {
   if (hasStyle) {
     decorator.push(`  styleUrl: '${tagName}.css',`);
   }
-  decorator.push(`  shadow: true`);
+  decorator.push(`  shadow: true,`);
   decorator.push(`}`);
 
   return `import { Component, ComponentInterface, Host, h } from '@stencil/core';
@@ -192,4 +198,4 @@ const toPascalCase = (str: string) =>
 /**
  * Extensions available to generate.
  */
-type GeneratableExtension = 'tsx' | 'css' | 'spec.ts' | 'e2e.ts';
+type GeneratableExtension = 'tsx' | 'css' | 'spec.tsx' | 'e2e.ts';

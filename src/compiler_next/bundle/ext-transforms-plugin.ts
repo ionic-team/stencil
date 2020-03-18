@@ -4,6 +4,7 @@ import { hasError, normalizeFsPath } from '@utils';
 import { parseImportPath } from '../../compiler/transformers/stencil-import-path';
 import { Plugin } from 'rollup';
 import { runPluginTransformsEsmImports } from '../../compiler/plugin/plugin';
+import { isOutputTargetDistCollection } from '../../compiler/output-targets/output-utils';
 
 
 export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions): Plugin => {
@@ -19,14 +20,13 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
       if (data != null) {
         const filePath = normalizeFsPath(id);
         const code = await compilerCtx.fs.readFile(filePath);
+        const cmp = buildCtx.components.find(c => c.tagName === data.tag);
+        const moduleFile = cmp && compilerCtx.moduleMap.get(cmp.sourceFilePath);
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, code, filePath);
-
-        const modules = Array.from(compilerCtx.moduleMap.values());
-        const moduleFile = modules.find(m => m.cmps.some(c => c.tagName === data.tag));
         const commentOriginalSelector = (bundleOpts.platform === 'hydrate') && (data.encapsulation === 'shadow');
 
         if (moduleFile) {
-          const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
+          const collectionDirs = config.outputTargets.filter(isOutputTargetDistCollection);
 
           const relPath = config.sys.path.relative(config.srcDir, pluginTransforms.id);
 
@@ -46,7 +46,13 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
           sourceMap: config.sourceMap,
           minify: config.minifyCss,
           autoprefixer: config.autoprefixCss,
+          docs: config.buildDocs
         });
+
+        // Set style docs
+        if (cmp) {
+          cmp.styleDocs = cssTransformResults.styleDocs;
+        }
 
         // Track dependencies
         pluginTransforms.dependencies.forEach(dep => {

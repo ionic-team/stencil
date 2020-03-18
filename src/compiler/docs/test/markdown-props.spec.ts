@@ -14,7 +14,9 @@ describe('markdown props', () => {
         mutable: false,
         optional: false,
         required: false,
-        reflectToAttr: false
+        reflectToAttr: false,
+        docsTags: [],
+        values: [],
       },
       {
         name: 'hello',
@@ -25,15 +27,17 @@ describe('markdown props', () => {
         mutable: false,
         optional: false,
         required: false,
-        reflectToAttr: false
+        reflectToAttr: false,
+        docsTags: [],
+        values: [],
       }
     ]).join('\n');
     expect(markdown).toEqual(`## Properties
 
 | Property | Attribute | Description    | Type                | Default |
 | -------- | --------- | -------------- | ------------------- | ------- |
-| \`hello\`  | \`hello\`   | This is a prop | \`boolean or string\` | \`false\` |
-| \`hello\`  | --        | This is a prop | \`boolean or string\` | \`false\` |
+| \`hello\`  | \`hello\`   | This is a prop | \`boolean \\| string\` | \`false\` |
+| \`hello\`  | --        | This is a prop | \`boolean \\| string\` | \`false\` |
 
 `);
   });

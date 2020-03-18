@@ -47,7 +47,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
   );
 
   const nodeResolvePlugin = rollupNodeResolvePlugin({
-    mainFields: ['browser', 'collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
+    mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
     customResolveOptions,
     ...config.nodeResolve as any
   });

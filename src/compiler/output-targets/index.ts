@@ -19,12 +19,13 @@ export async function generateOutputTargets(config: d.Config, compilerCtx: d.Com
     outputCollections(config, compilerCtx, buildCtx),
     outputModulesApp(config, compilerCtx, buildCtx),
     outputHydrate(config, compilerCtx, buildCtx),
-    outputDocs(config, compilerCtx, buildCtx),
     outputAngular(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
 
     buildCtx.stylesPromise
   ]);
+
+  await outputDocs(config, compilerCtx, buildCtx),
 
   // must run after all the other outputs
   // since it validates files were created

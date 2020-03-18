@@ -14,7 +14,10 @@ try {
   }
 } catch (e) {}
 
-if (process.argv.indexOf('--next') > -1) {
+if (process.argv.indexOf('--legacy') === -1) {
+  if (process.argv.indexOf('--next') > -1) {
+    console.warn('\nThe next compiler is now the default and the --next flag is no longer needed.\n');
+  }
   var cli = require('../cli/index.js');
   cli.run({
     process: process,

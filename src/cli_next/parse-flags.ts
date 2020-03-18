@@ -196,6 +196,7 @@ const ARG_OPTS = {
     'help',
     'log',
     'next',
+    'legacy',
     'open',
     'prerender',
     'prerender-external',
