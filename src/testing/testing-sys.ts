@@ -1,4 +1,4 @@
-import { createSystem } from '../compiler_next/sys/stencil-sys';
+import { createSystem } from '../compiler/sys/stencil-sys';
 import { CompilerSystem } from '@stencil/core/internal';
 
 export interface TestingSystem extends CompilerSystem {

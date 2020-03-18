@@ -5,8 +5,8 @@ import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
 import { generateTemplateHtml } from './prerender-template-html';
 import { getPrerenderConfig, validatePrerenderConfigPath, getHydrateOptions } from './prerender-config';
-import { getAbsoluteBuildDir } from '../compiler_next/html/html-utils';
-import { isOutputTargetWww } from '../compiler_next/output-targets/output-utils';
+import { getAbsoluteBuildDir } from '../compiler/html/html-utils';
+import { isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { NodeWorkerController } from '../sys/node/worker';
 
 import crypto from 'crypto';

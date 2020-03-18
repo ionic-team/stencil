@@ -6,9 +6,9 @@ import { initializeWindow } from './window-initialize';
 import { inspectElement } from './inspect-element';
 import { MockWindow, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import { patchDomImplementation } from './patch-dom-implementation';
-import { relocateMetaCharset } from '../../compiler_next/html/relocate-meta-charset';
-import { removeUnusedStyles } from '../../compiler_next/html/remove-unused-styles';
-import { updateCanonicalLink } from '../../compiler_next/html/canonical-link';
+import { relocateMetaCharset } from '../../compiler/html/relocate-meta-charset';
+import { removeUnusedStyles } from '../../compiler/html/remove-unused-styles';
+import { updateCanonicalLink } from '../../compiler/html/canonical-link';
 
 export function renderToString(html: string | any, options?: SerializeDocumentOptions) {
   const opts = normalizeHydrateOptions(options);

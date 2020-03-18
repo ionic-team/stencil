@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { getWriteFilePathFromUrlPath } from '../prerendered-write-path';
 import { mockConfig } from '@stencil/core/testing';
-import { validateWww } from '../../compiler_next/config/outputs/validate-www';
+import { validateWww } from '../../compiler/config/outputs/validate-www';
 import { join, resolve } from 'path';
 
 describe('prerender-utils', () => {

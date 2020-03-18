@@ -1,5 +1,5 @@
 import { CompilerSystem } from '../../declarations';
-import { buildEvents } from '../../compiler_next/events';
+import { buildEvents } from '../../compiler/events';
 import { createNodeSys } from './node-sys';
 import { normalizePath } from '@utils';
 import tsTypes from 'typescript';

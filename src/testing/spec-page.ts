@@ -19,7 +19,7 @@ import {
 import { BUILD } from '@app-data';
 import { ComponentCompilerMeta, ComponentRuntimeMeta, ComponentTestingConstructor, HostRef, LazyBundlesRuntimeData, NewSpecPageOptions, SpecPage } from '@stencil/core/internal';
 import { formatLazyBundleRuntimeMeta } from '@utils';
-import { getBuildFeatures } from '../compiler_next/app-core/app-data';
+import { getBuildFeatures } from '../compiler/app-core/app-data';
 import { resetBuildConditionals } from './reset-build-conditionals';
 
 export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {

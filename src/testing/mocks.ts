@@ -1,8 +1,8 @@
 import * as d from '@stencil/core/internal';
-import { BuildContext } from '../compiler_next/build/build-ctx';
-import { Cache } from '../compiler_next/cache';
+import { BuildContext } from '../compiler/build/build-ctx';
+import { Cache } from '../compiler/cache';
 import { createTestingSystem } from './testing-sys';
-import { createInMemoryFs } from '../compiler_next/sys/in-memory-fs';
+import { createInMemoryFs } from '../compiler/sys/in-memory-fs';
 import { MockWindow } from '@stencil/core/mock-doc';
 import { TestingLogger } from './testing-logger';
 import path from 'path';

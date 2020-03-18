@@ -1,11 +1,11 @@
 import * as d from '@stencil/core/declarations';
 import { appendDevServerClientIframe } from '../serve-file';
 import { createRequestHandler } from '../request-handler';
-import { createSystem } from '../../compiler_next/sys/stencil-sys';
+import { createSystem } from '../../compiler/sys/stencil-sys';
 import { mockConfig } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
-import { validateConfig } from '../../compiler_next/config/validate-config';
-import { validateDevServer } from '../../compiler_next/config/validate-dev-server';
+import { validateConfig } from '../../compiler/config/validate-config';
+import { validateDevServer } from '../../compiler/config/validate-dev-server';
 import nodeFs from 'fs';
 import http from 'http';
 import path from 'path';

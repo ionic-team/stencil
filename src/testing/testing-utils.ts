@@ -1,6 +1,6 @@
 import * as d from '@stencil/core/internal';
 import { normalizePath } from '@utils';
-import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler_next/output-targets/output-utils';
+import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { join, relative } from 'path';
 
 export function shuffleArray(array: any[]) {

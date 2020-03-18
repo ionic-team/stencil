@@ -16,9 +16,8 @@ import { BuildOptions } from '../utils/options';
 import { RollupOptions } from 'rollup';
 import terser from 'terser';
 
-
 export async function compiler(opts: BuildOptions) {
-  const inputDir = join(opts.transpiledDir, 'compiler_next');
+  const inputDir = join(opts.transpiledDir, 'compiler');
 
   const compilerFileName = 'stencil.js';
   const compilerDtsName = compilerFileName.replace('.js', '.d.ts');
@@ -33,13 +32,11 @@ export async function compiler(opts: BuildOptions) {
     name: '@stencil/core/compiler',
     description: 'Stencil Compiler.',
     main: compilerFileName,
-    types: compilerDtsName
+    types: compilerDtsName,
   });
-
 
   const cjsIntro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-intro.js'), 'utf8');
   const cjsOutro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-outro.js'), 'utf8');
-
 
   const compilerBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
@@ -61,7 +58,7 @@ export async function compiler(opts: BuildOptions) {
             return join(opts.transpiledDir, 'mock-doc', 'index.js');
           }
           return null;
-        }
+        },
       },
       inlinedCompilerPluginsPlugin(opts, inputDir),
       parse5Plugin(opts),
@@ -69,12 +66,12 @@ export async function compiler(opts: BuildOptions) {
       aliasPlugin(opts),
       sysModulesPlugin(inputDir),
       rollupNodeResolve({
-        preferBuiltins: false
+        preferBuiltins: false,
       }),
       rollupCommonjs(),
       replacePlugin(opts),
       rollupJson({
-        preferConst: true
+        preferConst: true,
       }),
       moduleDebugPlugin(opts),
       // {
@@ -89,15 +86,12 @@ export async function compiler(opts: BuildOptions) {
       // }
     ],
     treeshake: {
-      moduleSideEffects: false
-    }
+      moduleSideEffects: false,
+    },
   };
 
-  return [
-    compilerBundle,
-  ];
-};
-
+  return [compilerBundle];
+}
 
 function minifyStencilCompiler(code: string) {
   const opts: terser.MinifyOptions = {
@@ -108,7 +102,7 @@ function minifyStencilCompiler(code: string) {
     },
     output: {
       ecma: 7,
-    }
+    },
   };
 
   const minifyResults = terser.minify(code, opts);

@@ -31,7 +31,7 @@
         "src/app-globals/index.ts"
       ],
       "@compiler-plugins": [
-        "src/compiler_next/sys/modules/compiler-plugins.ts"
+        "src/compiler/sys/modules/compiler-plugins.ts"
       ],
       "@hydrate-factory": [
         "src/hydrate/runner/hydrate-factory.ts"
@@ -43,7 +43,7 @@
         "src/runtime/index.ts"
       ],
       "@stencil/core/compiler": [
-        "src/compiler_next/index.ts"
+        "src/compiler/index.ts"
       ],
       "@stencil/core/dev-server": [
         "src/dev-server/index.ts"
@@ -76,9 +76,9 @@
     "src/cli_next/index.ts",
     "src/cli_next/public.ts",
     "src/cli_next/worker/index.ts",
-    "src/compiler_next/index.ts",
-    "src/compiler_next/public.ts",
-    "src/compiler_next/sys/modules/index.ts",
+    "src/compiler/index.ts",
+    "src/compiler/public.ts",
+    "src/compiler/sys/modules/index.ts",
     "src/dev-server/index.ts",
     "src/dev-server/public.ts",
     "src/dev-server/server-worker.ts",
