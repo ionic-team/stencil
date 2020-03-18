@@ -6,7 +6,6 @@ import rollupJson from '@rollup/plugin-json';
 import rollupNodeResolve from '@rollup/plugin-node-resolve';
 import { BuildOptions } from '../../utils/options';
 
-
 export function inlinedCompilerPluginsPlugin(opts: BuildOptions, inputDir: string): Plugin {
   return {
     name: 'inlinedCompilerPluginsPlugin',
@@ -21,10 +20,9 @@ export function inlinedCompilerPluginsPlugin(opts: BuildOptions, inputDir: strin
         return bundleCompilerPlugins(opts, inputDir);
       }
       return null;
-    }
-  }
+    },
+  };
 }
-
 
 async function bundleCompilerPlugins(opts: BuildOptions, inputDir: string) {
   const cacheFile = path.join(opts.transpiledDir, 'compiler-plugins-bundle-cache.js');
@@ -37,12 +35,7 @@ async function bundleCompilerPlugins(opts: BuildOptions, inputDir: string) {
 
   const build = await rollup({
     input: path.join(inputDir, 'sys', 'modules', 'compiler-plugins.js'),
-    external: [
-      'fs',
-      'module',
-      'path',
-      'util',
-    ],
+    external: ['fs', 'module', 'path', 'util'],
     plugins: [
       {
         name: 'bundleCompilerPlugins',
@@ -51,24 +44,24 @@ async function bundleCompilerPlugins(opts: BuildOptions, inputDir: string) {
             return path.join(opts.bundleHelpersDir, 'resolve.js');
           }
           return null;
-        }
+        },
       },
       rollupNodeResolve({
-        preferBuiltins: false
+        preferBuiltins: false,
       }),
       rollupCommonjs(),
       rollupJson({
-        preferConst: true
+        preferConst: true,
       }),
     ],
     treeshake: {
-      moduleSideEffects: false
-    }
+      moduleSideEffects: false,
+    },
   });
 
   await build.write({
     format: 'es',
-    file: cacheFile
+    file: cacheFile,
   });
 
   return await fs.readFile(cacheFile, 'utf8');

@@ -2,7 +2,6 @@ import { Plugin } from 'rollup';
 import { BuildOptions } from '../../utils/options';
 import path from 'path';
 
-
 export function moduleDebugPlugin(opts: BuildOptions): Plugin {
   return {
     name: 'moduleDebugPlugin',
@@ -11,6 +10,6 @@ export function moduleDebugPlugin(opts: BuildOptions): Plugin {
       debugPath = debugPath.replace(/\\/g, '/');
       const comment = `// MODULE: ${debugPath}\n`;
       return comment + code;
-    }
-  }
+    },
+  };
 }

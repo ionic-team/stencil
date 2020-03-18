@@ -8,7 +8,6 @@ import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { RollupOptions, OutputOptions } from 'rollup';
 
-
 export async function internalTesting(opts: BuildOptions) {
   const inputTestingPlatform = join(opts.transpiledDir, 'testing', 'platform', 'index.js');
   const outputTestingPlatformDir = join(opts.output.internalDir, 'testing');
@@ -19,7 +18,7 @@ export async function internalTesting(opts: BuildOptions) {
   writePkgJson(opts, outputTestingPlatformDir, {
     name: '@stencil/core/internal/testing',
     description: 'Stencil internal testing platform to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
-    main: 'index.js'
+    main: 'index.js',
   });
 
   const output: OutputOptions = {
@@ -34,7 +33,7 @@ export async function internalTesting(opts: BuildOptions) {
 
   const internalTestingPlatformBundle: RollupOptions = {
     input: {
-      index: inputTestingPlatform
+      index: inputTestingPlatform,
     },
     output,
     plugins: [
@@ -45,15 +44,13 @@ export async function internalTesting(opts: BuildOptions) {
             return inputTestingPlatform;
           }
           return null;
-        }
+        },
       },
       aliasPlugin(opts),
       replacePlugin(opts),
       reorderCoreStatementsPlugin(),
-    ]
+    ],
   };
 
-  return [
-    internalTestingPlatformBundle
-  ];
-};
+  return [internalTestingPlatformBundle];
+}

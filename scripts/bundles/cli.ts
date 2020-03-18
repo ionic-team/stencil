@@ -9,9 +9,8 @@ import { writePkgJson } from '../utils/write-pkg-json';
 import { BuildOptions } from '../utils/options';
 import { RollupOptions } from 'rollup';
 
-
 export async function cli(opts: BuildOptions) {
-  const inputDir = join(opts.transpiledDir, 'cli_next');
+  const inputDir = join(opts.transpiledDir, 'cli');
 
   // create public d.ts
   let dts = await fs.readFile(join(inputDir, 'public.d.ts'), 'utf8');
@@ -23,7 +22,7 @@ export async function cli(opts: BuildOptions) {
     name: '@stencil/core/cli',
     description: 'Stencil CLI.',
     main: 'index.js',
-    types: 'index.d.ts'
+    types: 'index.d.ts',
   });
 
   const external = [
@@ -62,32 +61,32 @@ export async function cli(opts: BuildOptions) {
           if (importee === '@stencil/core/compiler') {
             return {
               id: '../compiler/stencil.js',
-              external: true
-            }
+              external: true,
+            };
           }
           if (importee === '@stencil/core/dev-server') {
             return {
               id: '../dev-server/index.js',
-              external: true
-            }
+              external: true,
+            };
           }
           if (importee === '@stencil/core/mock-doc') {
             return {
               id: '../mock-doc/index.js',
-              external: true
-            }
+              external: true,
+            };
           }
           return null;
-        }
+        },
       },
       gracefulFsPlugin(),
       aliasPlugin(opts),
       replacePlugin(opts),
       rollupResolve({
-        preferBuiltins: true
+        preferBuiltins: true,
       }),
       rollupCommonjs(),
-    ]
+    ],
   };
 
   const cliWorkerBundle: RollupOptions = {
@@ -106,30 +105,27 @@ export async function cli(opts: BuildOptions) {
           if (importee === '@stencil/core/compiler') {
             return {
               id: '../compiler/stencil.js',
-              external: true
-            }
+              external: true,
+            };
           }
           if (importee === '@stencil/core/mock-doc') {
             return {
               id: '../mock-doc/index.js',
-              external: true
-            }
+              external: true,
+            };
           }
           return null;
-        }
+        },
       },
       gracefulFsPlugin(),
       aliasPlugin(opts),
       replacePlugin(opts),
       rollupResolve({
-        preferBuiltins: true
+        preferBuiltins: true,
       }),
       rollupCommonjs(),
-    ]
+    ],
   };
 
-  return [
-    cliBundle,
-    cliWorkerBundle,
-  ];
+  return [cliBundle, cliWorkerBundle];
 }

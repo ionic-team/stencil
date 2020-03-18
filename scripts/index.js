@@ -1,7 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-
 function main() {
   const scriptsDir = __dirname;
   const rootDir = path.join(scriptsDir, '..');
@@ -16,10 +15,7 @@ function main() {
     const tscPath = path.join(rootDir, 'node_modules', '.bin', 'tsc');
     const tsconfig = path.join(scriptsDir, 'tsconfig.json');
     const execa = require('execa');
-    execa.sync(tscPath, [
-      '-p',
-      tsconfig
-    ]);
+    execa.sync(tscPath, ['-p', tsconfig]);
   }
 
   const build = require(scriptsBuildJs);

@@ -4,7 +4,6 @@ import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { RollupOptions } from 'rollup';
 
-
 export async function internalAppData(opts: BuildOptions) {
   const inputAppDataDir = join(opts.transpiledDir, 'app-data');
   const outputInternalAppDataDir = join(opts.output.internalDir, 'app-data');
@@ -12,10 +11,7 @@ export async function internalAppData(opts: BuildOptions) {
   await fs.emptyDir(outputInternalAppDataDir);
 
   // copy @stencil/core/internal/app-data/index.d.ts
-  await fs.copyFile(
-    join(inputAppDataDir, 'index.d.ts'),
-    join(outputInternalAppDataDir, 'index.d.ts')
-  );
+  await fs.copyFile(join(inputAppDataDir, 'index.d.ts'), join(outputInternalAppDataDir, 'index.d.ts'));
 
   // write @stencil/core/internal/app-data/package.json
   writePkgJson(opts, outputInternalAppDataDir, {
@@ -23,12 +19,12 @@ export async function internalAppData(opts: BuildOptions) {
     description: 'Used for default app data and build conditionals within builds.',
     main: 'index.js',
     module: 'index.mjs',
-    types: 'index.d.ts'
+    types: 'index.d.ts',
   });
 
   const internalAppDataBundle: RollupOptions = {
     input: {
-      'index': join(inputAppDataDir, 'index.js')
+      index: join(inputAppDataDir, 'index.js'),
     },
     output: [
       {
@@ -41,8 +37,8 @@ export async function internalAppData(opts: BuildOptions) {
         dir: outputInternalAppDataDir,
         entryFileNames: '[name].js',
         esModule: false,
-      }
-    ] as any
+      },
+    ] as any,
   };
 
   return internalAppDataBundle;

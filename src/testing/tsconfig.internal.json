@@ -24,7 +24,7 @@
     "baseUrl": ".",
     "paths": {
       "@stencil/core/cli": [
-        "../cli_next/index.ts"
+        "../cli/index.ts"
       ],
       "@stencil/core/compiler": [
         "../compiler/index.ts"

@@ -2,7 +2,6 @@ import { Plugin } from 'rollup';
 import { BuildOptions } from '../../utils/options';
 import { join } from 'path';
 
-
 export function urlPlugin(opts: BuildOptions): Plugin {
   return {
     name: 'urlPlugin',
@@ -13,6 +12,5 @@ export function urlPlugin(opts: BuildOptions): Plugin {
       }
       return null;
     },
-
-  }
+  };
 }

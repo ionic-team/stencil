@@ -6,11 +6,10 @@ import { aliasPlugin } from './plugins/alias-plugin';
 import { gracefulFsPlugin } from './plugins/graceful-fs-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { BuildOptions } from '../utils/options';;
+import { BuildOptions } from '../utils/options';
 import { RollupOptions, OutputChunk } from 'rollup';
 import terser from 'terser';
 import ts from 'typescript';
-
 
 export async function devServer(opts: BuildOptions) {
   const inputDir = join(opts.transpiledDir, 'dev-server');
@@ -22,27 +21,20 @@ export async function devServer(opts: BuildOptions) {
 
   // write package.json
   writePkgJson(opts, opts.output.devServerDir, {
-    name: "@stencil/core/dev-server",
+    name: '@stencil/core/dev-server',
     description: 'Stencil Development Server which communicates with the Stencil Compiler.',
     main: 'index.js',
-    types: 'index.d.ts'
+    types: 'index.d.ts',
   });
 
   // copy static files
-  await fs.copy(
-    join(opts.srcDir, 'dev-server', 'static'),
-    join(opts.output.devServerDir, 'static'),
-  );
+  await fs.copy(join(opts.srcDir, 'dev-server', 'static'), join(opts.output.devServerDir, 'static'));
 
   // copy template files
-  await fs.copy(
-    join(opts.srcDir, 'dev-server', 'templates'),
-    join(opts.output.devServerDir, 'templates')
-  );
+  await fs.copy(join(opts.srcDir, 'dev-server', 'templates'), join(opts.output.devServerDir, 'templates'));
 
   // create content-type-db.json
   await createContentTypeData(opts);
-
 
   const devServerBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
@@ -52,24 +44,16 @@ export async function devServer(opts: BuildOptions) {
       esModule: false,
       preferConst: true,
     },
-    external: [
-      'assert',
-      'child_process',
-      'fs',
-      'os',
-      'path',
-      'util',
-    ],
+    external: ['assert', 'child_process', 'fs', 'os', 'path', 'util'],
     plugins: [
       gracefulFsPlugin(),
       aliasPlugin(opts),
       rollupResolve({
-        preferBuiltins: true
+        preferBuiltins: true,
       }),
       rollupCommonjs(),
-    ]
+    ],
   };
-
 
   const devServerWorkerBundle: RollupOptions = {
     input: join(inputDir, 'server-worker.js'),
@@ -79,24 +63,7 @@ export async function devServer(opts: BuildOptions) {
       esModule: false,
       preferConst: true,
     },
-    external: [
-      'assert',
-      'buffer',
-      'child_process',
-      'crypto',
-      'events',
-      'fs',
-      'http',
-      'https',
-      'net',
-      'os',
-      'path',
-      'querystring',
-      'stream',
-      'url',
-      'util',
-      'zlib',
-    ],
+    external: ['assert', 'buffer', 'child_process', 'crypto', 'events', 'fs', 'http', 'https', 'net', 'os', 'path', 'querystring', 'stream', 'url', 'util', 'zlib'],
     plugins: [
       {
         name: 'devServerWorkerResolverPlugin',
@@ -104,28 +71,27 @@ export async function devServer(opts: BuildOptions) {
           if (importee.includes('open-in-editor-api')) {
             return {
               id: './open-in-editor-api.js',
-              external: true
-            }
+              external: true,
+            };
           }
           if (importee === 'ws') {
             return {
               id: './ws.js',
-              external: true
-            }
+              external: true,
+            };
           }
           return null;
-        }
+        },
       },
       gracefulFsPlugin(),
       aliasPlugin(opts),
       rollupResolve({
-        preferBuiltins: true
+        preferBuiltins: true,
       }),
       rollupCommonjs(),
       replacePlugin(opts),
-    ]
+    ],
   };
-
 
   const inputClientDir = join(inputDir, 'dev-client');
 
@@ -147,9 +113,9 @@ export async function devServer(opts: BuildOptions) {
 
             const tsResults = ts.transpileModule(code, {
               compilerOptions: {
-                target: ts.ScriptTarget.ES5
-              }
-            })
+                target: ts.ScriptTarget.ES5,
+              },
+            });
 
             if (tsResults.diagnostics.length > 0) {
               throw new Error(tsResults.diagnostics as any);
@@ -173,27 +139,24 @@ export async function devServer(opts: BuildOptions) {
 
             (bundle[connectorName] as OutputChunk).code = code;
           }
-        }
+        },
       },
       replacePlugin(opts),
       rollupResolve(),
-    ]
+    ],
   };
 
   await fs.ensureDir(join(opts.output.devServerDir, 'hmr-client'));
 
   // copy hmr-client dts files
-  await fs.copy(
-    join(opts.transpiledDir, 'dev-server', 'hmr-client', 'index.d.ts'),
-    join(opts.output.devServerDir, 'hmr-client', 'index.d.ts')
-  );
+  await fs.copy(join(opts.transpiledDir, 'dev-server', 'hmr-client', 'index.d.ts'), join(opts.output.devServerDir, 'hmr-client', 'index.d.ts'));
 
   // write package.json
   writePkgJson(opts, join(opts.output.devServerDir, 'hmr-client'), {
-    name: "@stencil/core/dev-server/hmr-client",
+    name: '@stencil/core/dev-server/hmr-client',
     description: 'Stencil HMR Client.',
     main: 'index.mjs',
-    types: 'index.d.ts'
+    types: 'index.d.ts',
   });
 
   const hmrClientBundle: RollupOptions = {
@@ -202,20 +165,11 @@ export async function devServer(opts: BuildOptions) {
       format: 'esm',
       file: join(opts.output.devServerDir, 'hmr-client', 'index.mjs'),
     },
-    plugins: [
-      replacePlugin(opts),
-      rollupResolve(),
-    ]
+    plugins: [replacePlugin(opts), rollupResolve()],
   };
 
-  return [
-    devServerBundle,
-    devServerWorkerBundle,
-    devServerClientBundle,
-    hmrClientBundle,
-  ];
-};
-
+  return [devServerBundle, devServerWorkerBundle, devServerClientBundle, hmrClientBundle];
+}
 
 async function createContentTypeData(opts: BuildOptions) {
   // create a focused content-type lookup object from
@@ -239,7 +193,6 @@ async function createContentTypeData(opts: BuildOptions) {
   await fs.writeJson(contentTypeDestPath, exts);
 }
 
-
 const banner = `<!doctype html><html><head><meta charset="utf-8">
 <title>Stencil Dev Server Connector __VERSION:STENCIL__ &#9889;</title></head>
 <body style="background:black;color:white;font:18px monospace;text-align:center;">
@@ -252,6 +205,6 @@ const intro = `(function(iframeWindow, appWindow, appDoc, config, exports) {
 
 const outro = `
 })(window, window.parent, window.parent.document, window.__DEV_CLIENT_CONFIG__, {});
-`
+`;
 
-const footer = `\n</script></body></html>`
+const footer = `\n</script></body></html>`;

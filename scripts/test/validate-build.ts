@@ -13,17 +13,12 @@ const pkgs: TestPackage[] = [
   {
     // cli
     packageJson: 'cli/package.json',
-    files: [
-      'cli/cli-worker.js',
-      'cli/index_legacy.js',
-    ],
+    files: ['cli/cli-worker.js', 'cli/index_legacy.js'],
   },
   {
     // compiler
     packageJson: 'compiler/package.json',
-    files: [
-      'compiler/index.js',
-    ],
+    files: ['compiler/index.js'],
   },
   {
     // dev-server
@@ -49,17 +44,12 @@ const pkgs: TestPackage[] = [
   {
     // internal/client
     packageJson: 'internal/client/package.json',
-    files: [
-      'internal/client/polyfills/'
-    ],
+    files: ['internal/client/polyfills/'],
   },
   {
     // internal/hydrate
     packageJson: 'internal/hydrate/package.json',
-    files: [
-      'internal/hydrate/runner.d.ts',
-      'internal/hydrate/runner.mjs',
-    ]
+    files: ['internal/hydrate/runner.d.ts', 'internal/hydrate/runner.mjs'],
   },
   {
     // internal/testing
@@ -76,7 +66,7 @@ const pkgs: TestPackage[] = [
       'internal/stencil-public-compiler.d.ts',
       'internal/stencil-public-docs.d.ts',
       'internal/stencil-public-runtime.d.ts',
-    ]
+    ],
   },
   {
     // mock-doc
@@ -85,56 +75,25 @@ const pkgs: TestPackage[] = [
   {
     // screenshot
     packageJson: 'screenshot/package.json',
-    files: [
-      'screenshot/compare/',
-      'screenshot/connector.js',
-      'screenshot/local-connector.js',
-      'screenshot/pixel-match.js',
-    ],
+    files: ['screenshot/compare/', 'screenshot/connector.js', 'screenshot/local-connector.js', 'screenshot/pixel-match.js'],
   },
   {
     // sys/node
-    files: [
-      'sys/node/graceful-fs.js',
-      'sys/node/index.js',
-      'sys/node/node-fetch.js',
-      'sys/node/sys-worker.js',
-    ],
+    files: ['sys/node/graceful-fs.js', 'sys/node/index.js', 'sys/node/node-fetch.js', 'sys/node/sys-worker.js'],
   },
   {
     // testing
     packageJson: 'testing/package.json',
-    files: [
-      'testing/jest-environment.js',
-      'testing/jest-preprocessor.js',
-      'testing/jest-preset.js',
-      'testing/jest-runner.js',
-      'testing/jest-setuptestframework.js',
-    ],
+    files: ['testing/jest-environment.js', 'testing/jest-preprocessor.js', 'testing/jest-preset.js', 'testing/jest-runner.js', 'testing/jest-setuptestframework.js'],
   },
   {
     // @stencil/core
     packageJson: 'package.json',
-    packageJsonFiles: [
-      'bin/',
-      'cli/',
-      'compiler/',
-      'dev-server/',
-      'internal/',
-      'mock-doc/',
-      'screenshot/',
-      'sys/',
-      'testing/'
-    ],
-    files: [
-      'CHANGELOG.md',
-      'LICENSE.md',
-      'readme.md'
-    ],
+    packageJsonFiles: ['bin/', 'cli/', 'compiler/', 'dev-server/', 'internal/', 'mock-doc/', 'screenshot/', 'sys/', 'testing/'],
+    files: ['CHANGELOG.md', 'LICENSE.md', 'readme.md'],
     hasBin: true,
-  }
+  },
 ];
-
 
 export function validateBuild(rootDir: string) {
   const dtsEntries: string[] = [];
@@ -148,12 +107,11 @@ export function validateBuild(rootDir: string) {
   console.log(`👾  Validated build files and distribution`);
 }
 
-
 function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: string[]) {
   const rootDir = opts.rootDir;
 
   if (testPkg.packageJson) {
-    testPkg.packageJson = join(rootDir, testPkg.packageJson)
+    testPkg.packageJson = join(rootDir, testPkg.packageJson);
     const pkgDir = dirname(testPkg.packageJson);
     const pkgJson: PackageData = require(testPkg.packageJson);
 
@@ -226,21 +184,13 @@ function validateDts(opts: BuildOptions, dtsEntries: string[]) {
   const program = ts.createProgram(dtsEntries, {
     baseUrl: '.',
     paths: {
-      '@stencil/core/mock-doc': [
-        join(opts.rootDir, 'mock-doc', 'index.d.ts')
-      ],
-      '@stencil/core/internal': [
-        join(opts.rootDir, 'internal', 'index.d.ts')
-      ],
-      '@stencil/core/internal/testing': [
-        join(opts.rootDir, 'internal', 'testing', 'index.d.ts')
-      ],
+      '@stencil/core/mock-doc': [join(opts.rootDir, 'mock-doc', 'index.d.ts')],
+      '@stencil/core/internal': [join(opts.rootDir, 'internal', 'index.d.ts')],
+      '@stencil/core/internal/testing': [join(opts.rootDir, 'internal', 'testing', 'index.d.ts')],
     },
   });
 
-  const tsDiagnostics = program
-		.getSemanticDiagnostics()
-    .concat(program.getSyntacticDiagnostics());
+  const tsDiagnostics = program.getSemanticDiagnostics().concat(program.getSyntacticDiagnostics());
 
   if (tsDiagnostics.length > 0) {
     const host = {

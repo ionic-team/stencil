@@ -13,7 +13,6 @@ import { testing } from './bundles/testing';
 import { validateBuild } from './test/validate-build';
 import { RollupOptions, rollup } from 'rollup';
 
-
 export async function run(rootDir: string, args: string[]) {
   try {
     if (args.includes('--release')) {
@@ -27,16 +26,13 @@ export async function run(rootDir: string, args: string[]) {
     if (args.includes('--validate-build')) {
       validateBuild(rootDir);
     }
-
   } catch (e) {
     console.error(e);
     process.exit(1);
   }
 }
 
-
 export async function createBuild(opts: BuildOptions) {
-
   await Promise.all([
     emptyDir(opts.output.cliDir),
     emptyDir(opts.output.compilerDir),
@@ -49,15 +45,7 @@ export async function createBuild(opts: BuildOptions) {
 
   await sysNode(opts);
 
-  const bundles = await Promise.all([
-    cli(opts),
-    compiler(opts),
-    devServer(opts),
-    internal(opts),
-    mockDoc(opts),
-    screenshot(opts),
-    testing(opts),
-  ]);
+  const bundles = await Promise.all([cli(opts), compiler(opts), devServer(opts), internal(opts), mockDoc(opts), screenshot(opts), testing(opts)]);
 
   return bundles.reduce((b, bundle) => {
     b.push(...bundle);
@@ -65,22 +53,24 @@ export async function createBuild(opts: BuildOptions) {
   }, [] as RollupOptions[]);
 }
 
-
 export async function bundleBuild(opts: BuildOptions) {
   const bundles = await createBuild(opts);
 
-  await Promise.all(bundles.map(async rollupOption => {
+  await Promise.all(
+    bundles.map(async rollupOption => {
+      rollupOption.onwarn = () => {};
 
-    rollupOption.onwarn = () => {};
+      const bundle = await rollup(rollupOption);
 
-    const bundle = await rollup(rollupOption);
-
-    if (Array.isArray(rollupOption.output)) {
-      await Promise.all(rollupOption.output.map(async output => {
-        await bundle.write(output);
-      }));
-    } else {
-      await bundle.write(rollupOption.output);
-    }
-  }));
+      if (Array.isArray(rollupOption.output)) {
+        await Promise.all(
+          rollupOption.output.map(async output => {
+            await bundle.write(output);
+          }),
+        );
+      } else {
+        await bundle.write(rollupOption.output);
+      }
+    }),
+  );
 }

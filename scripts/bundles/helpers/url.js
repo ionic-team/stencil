@@ -1,5 +1,4 @@
-
-const URL_ = /*@__PURE__*/(() => {
+const URL_ = /*@__PURE__*/ (() => {
   if (typeof URL === 'function') {
     return URL;
   }
@@ -9,7 +8,7 @@ const URL_ = /*@__PURE__*/(() => {
       return requireFunc('url').URL;
     } catch (e) {}
   }
-  return function() {}
+  return function() {};
 })();
 
 export { URL_ as URL };

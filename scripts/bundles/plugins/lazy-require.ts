@@ -3,7 +3,6 @@ import fs from 'fs-extra';
 import path from 'path';
 import { BuildOptions } from '../../utils/options';
 
-
 export function lazyRequirePlugin(opts: BuildOptions, moduleIds: string[], resolveToPath: string): Plugin {
   return {
     name: 'lazyRequirePlugin',
@@ -27,8 +26,8 @@ export function lazyRequirePlugin(opts: BuildOptions, moduleIds: string[], resol
           }
         }
       });
-    }
-  }
+    },
+  };
 }
 
 function getLazyRequireFn(opts: BuildOptions) {

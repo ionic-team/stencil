@@ -7,7 +7,6 @@ import { runReleaseTasks } from './release-tasks';
 import { join } from 'path';
 import { SEMVER_INCREMENTS, prettyVersionDiff, isValidVersionInput, getNewVersion, isPrereleaseVersion } from './utils/release-utils';
 
-
 export async function release(rootDir: string, args: string[]) {
   const buildDir = join(rootDir, 'build');
   const releaseDataPath = join(buildDir, 'release-data.json');
@@ -35,7 +34,6 @@ export async function release(rootDir: string, args: string[]) {
   }
 }
 
-
 async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPath: string) {
   const pkg = opts.packageJson;
   const oldVersion = opts.packageJson.version;
@@ -47,50 +45,48 @@ async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPat
       name: 'version',
       message: 'Select semver increment or specify new version',
       pageSize: SEMVER_INCREMENTS.length + 2,
-      choices: SEMVER_INCREMENTS
-        .map(inc => ({
-          name: `${inc}   ${prettyVersionDiff(oldVersion, inc)}`,
-          value: inc
-        }))
-        .concat([
-          new inquirer.Separator() as any,
-          {
-            name: 'Dry Run',
-            value: getNewVersion(oldVersion, 'patch') + '-dryrun'
-          },
-          {
-            name: 'Other (specify)',
-            value: null
-          }
-        ]),
-      filter: (input: any) => isValidVersionInput(input) ? getNewVersion(oldVersion, input) : input
+      choices: SEMVER_INCREMENTS.map(inc => ({
+        name: `${inc}   ${prettyVersionDiff(oldVersion, inc)}`,
+        value: inc,
+      })).concat([
+        new inquirer.Separator() as any,
+        {
+          name: 'Dry Run',
+          value: getNewVersion(oldVersion, 'patch') + '-dryrun',
+        },
+        {
+          name: 'Other (specify)',
+          value: null,
+        },
+      ]),
+      filter: (input: any) => (isValidVersionInput(input) ? getNewVersion(oldVersion, input) : input),
     },
     {
       type: 'input',
       name: 'version',
       message: 'Version',
       when: (answers: any) => !answers.version,
-      filter: (input: string) => isValidVersionInput(input) ? getNewVersion(pkg.version, input) : input,
+      filter: (input: string) => (isValidVersionInput(input) ? getNewVersion(pkg.version, input) : input),
       validate: (input: string) => {
         if (!isValidVersionInput(input)) {
           return 'Please specify a valid semver, for example, `1.2.3`. See http://semver.org';
         }
         return true;
-      }
+      },
     },
     {
       type: 'confirm',
       name: 'confirm',
       message: (answers: any) => {
         return `Prepare release ${opts.vermoji}  ${color.yellow(answers.version)} from ${oldVersion}. Continue?`;
-      }
-    }
+      },
+    },
   ];
 
   await inquirer
     .prompt(prompts)
     .then(answers => {
-      if (answers.confirm){
+      if (answers.confirm) {
         opts.version = answers.version;
         fs.writeJsonSync(releaseDataPath, opts, { spaces: 2 });
         runReleaseTasks(opts, args);
@@ -101,7 +97,6 @@ async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPat
       process.exit(0);
     });
 }
-
 
 async function publishRelease(opts: BuildOptions, args: string[]) {
   const pkg = opts.packageJson;
@@ -118,33 +113,32 @@ async function publishRelease(opts: BuildOptions, args: string[]) {
       name: 'tag',
       message: 'How should this pre-release version be tagged in npm?',
       when: () => isPrereleaseVersion(opts.version),
-      choices: () => execa('npm', ['view', '--json', pkg.name, 'dist-tags'])
-        .then(({stdout}) => {
+      choices: () =>
+        execa('npm', ['view', '--json', pkg.name, 'dist-tags']).then(({ stdout }) => {
           const existingPrereleaseTags = Object.keys(JSON.parse(stdout))
             .filter(tag => tag !== 'latest')
             .map(tag => {
               return {
                 name: tag,
-                value: tag
-              }
+                value: tag,
+              };
             });
 
           if (existingPrereleaseTags.length === 0) {
             existingPrereleaseTags.push({
               name: 'next',
-              value: 'next'
+              value: 'next',
             });
           }
 
-          return existingPrereleaseTags
-            .concat([
-              new inquirer.Separator() as any,
-              {
-                name: 'Other (specify)',
-                value: null
-              }
-            ]);
-        })
+          return existingPrereleaseTags.concat([
+            new inquirer.Separator() as any,
+            {
+              name: 'Other (specify)',
+              value: null,
+            },
+          ]);
+        }),
     },
     {
       type: 'input',
@@ -158,7 +152,7 @@ async function publishRelease(opts: BuildOptions, args: string[]) {
           return 'It\'s not possible to publish pre-releases under the `latest` tag. Please specify something else, for example, `next`.';
         }
         return true;
-      }
+      },
     },
     {
       type: 'confirm',
@@ -167,14 +161,14 @@ async function publishRelease(opts: BuildOptions, args: string[]) {
         opts.tag = answers.tag;
         const tagPart = opts.tag ? ` and tag this release in npm as ${color.yellow(opts.tag)}` : '';
         return `Will publish ${opts.vermoji}  ${color.yellow(opts.version)}${tagPart}. Continue?`;
-      }
-    }
+      },
+    },
   ];
 
   await inquirer
     .prompt(prompts)
     .then(answers => {
-      if (answers.confirm){
+      if (answers.confirm) {
         runReleaseTasks(opts, args);
       }
     })

@@ -7,7 +7,6 @@ import rollupResolve from '@rollup/plugin-node-resolve';
 import { rollup, OutputChunk, Plugin } from 'rollup';
 import terser from 'terser';
 
-
 export function parse5Plugin(opts: BuildOptions): Plugin {
   return {
     name: 'parse5Plugin',
@@ -31,10 +30,9 @@ export function parse5Plugin(opts: BuildOptions): Plugin {
           chunk.code = chunk.code.replace(/    /g, '  ');
         }
       });
-    }
+    },
   };
 }
-
 
 async function bundleParse5(opts: BuildOptions) {
   const cacheFile = join(opts.transpiledDir, 'parse5-bundle-cache.js');
@@ -59,12 +57,12 @@ async function bundleParse5(opts: BuildOptions) {
             return `export { parse, parseFragment } from 'parse5';`;
           }
           return null;
-        }
+        },
       },
       aliasPlugin(opts),
       rollupResolve(),
-      rollupCommonjs()
-    ]
+      rollupCommonjs(),
+    ],
   });
 
   const { output } = await rollupBuild.generate({
@@ -77,7 +75,7 @@ async function bundleParse5(opts: BuildOptions) {
       export function parseFragment(html, options) {
         return parse5.parseFragment(html, options);
       }
-    `
+    `,
   });
 
   let code = output[0].code;

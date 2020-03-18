@@ -3,7 +3,6 @@ import { BuildOptions } from '../../utils/options';
 import { join } from 'path';
 import { Plugin } from 'rollup';
 
-
 export function sizzlePlugin(opts: BuildOptions): Plugin {
   return {
     name: 'sizzlePlugin',
@@ -21,7 +20,7 @@ export function sizzlePlugin(opts: BuildOptions): Plugin {
       const sizzlePath = join(opts.nodeModulesDir, 'sizzle', 'dist', f);
       const sizzleContent = await fs.readFile(sizzlePath, 'utf8');
       return getSizzleBundle(sizzleContent);
-    }
+    },
   };
 }
 
