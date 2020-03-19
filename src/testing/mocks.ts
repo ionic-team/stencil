@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, Config } from '@stencil/core/internal';
+import { BuildCtx, CompilerCtx, CompilerSystem, Config } from '@stencil/core/internal';
 import { BuildContext } from '../compiler/build/build-ctx';
 import { Cache } from '../compiler/cache';
 import { createTestingSystem } from './testing-sys';
@@ -7,14 +7,18 @@ import { MockWindow } from '@stencil/core/mock-doc';
 import { TestingLogger } from './testing-logger';
 import path from 'path';
 
-export function mockConfig() {
-  const sys = createTestingSystem();
+export function mockConfig(sys?: CompilerSystem) {
+  if (!sys) {
+    sys = createTestingSystem();
+  }
+
+  const rootDir = path.resolve('/');
   const config: Config = {
     _isTesting: true,
 
     namespace: 'Testing',
-    rootDir: path.resolve('/'),
-    cwd: path.resolve('/'),
+    rootDir: rootDir,
+    cwd: rootDir,
     globalScript: null,
     devMode: true,
     enableCache: false,
@@ -26,7 +30,7 @@ export function mockConfig() {
     buildEs5: false,
     hashFileNames: false,
     logger: new TestingLogger(),
-    maxConcurrentWorkers: 1,
+    maxConcurrentWorkers: 0,
     minifyCss: false,
     minifyJs: false,
     sys,
