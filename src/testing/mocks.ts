@@ -1,8 +1,9 @@
 import { BuildCtx, CompilerCtx, CompilerSystem, Config } from '@stencil/core/internal';
 import { BuildContext } from '../compiler/build/build-ctx';
 import { Cache } from '../compiler/cache';
-import { createTestingSystem } from './testing-sys';
 import { createInMemoryFs } from '../compiler/sys/in-memory-fs';
+import { createTestingSystem } from './testing-sys';
+import { createWorkerContext } from '@stencil/core/compiler';
 import { MockWindow } from '@stencil/core/mock-doc';
 import { TestingLogger } from './testing-logger';
 import path from 'path';
@@ -82,6 +83,7 @@ export function mockCompilerCtx(config?: Config) {
     reset: () => {
       /**/
     },
+    worker: createWorkerContext(),
   };
 
   Object.defineProperty(compilerCtx, 'fs', {

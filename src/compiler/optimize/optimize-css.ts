@@ -8,7 +8,7 @@ export const optimizeCss = async (inputOpts: OptimizeCssInput) => {
     output: inputOpts.input,
     diagnostics: [],
   };
-  if (inputOpts.autoprefixer !== false) {
+  if (inputOpts.autoprefixer !== false && inputOpts.autoprefixer !== null) {
     result = await autoprefixCss(inputOpts.input, inputOpts.autoprefixer);
     if (hasError(result.diagnostics)) {
       return result;

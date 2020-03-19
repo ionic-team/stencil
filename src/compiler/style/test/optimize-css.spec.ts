@@ -12,7 +12,7 @@ describe('optimizeCss', () => {
 
   beforeEach(() => {
     config = mockConfig();
-    compilerCtx = mockCompilerCtx();
+    compilerCtx = mockCompilerCtx(config);
     diagnostics = [];
   });
 

@@ -5,6 +5,7 @@ module.exports = {
     "@app-globals": "<rootDir>/internal/app-globals/index.js",
     "@platform": "<rootDir>/internal/testing/index.js",
     "@runtime": "<rootDir>/internal/testing/index.js",
+    "@stencil/core/cli": "<rootDir>/cli/index.js",
     "@stencil/core/compiler": "<rootDir>/compiler/stencil.js",
     "@stencil/core/mock-doc": "<rootDir>/mock-doc/index.js",
     "@stencil/core/testing": "<rootDir>/testing/index.js",
