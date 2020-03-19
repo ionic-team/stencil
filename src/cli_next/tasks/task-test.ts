@@ -1,9 +1,13 @@
 import * as d from '../../declarations';
 import { Testing as TestingTypes } from '@stencil/core/testing';
 import exit from 'exit';
+import { startupLog } from './startup-log';
 
 
-export async function taskTest(config: d.Config) {
+export async function taskTest(prcs: NodeJS.Process,config: d.Config) {
+
+  startupLog(prcs, config);
+
   try {
     const testingRunOpts: d.TestingRunOptions = {
       e2e: !!config.flags.e2e,

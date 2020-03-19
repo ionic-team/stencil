@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { buildError, isBoolean, isString } from '@utils';
-import { COPY, DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww } from '../../../compiler/output-targets/output-utils';
+import { COPY, DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww, isOutputTargetDist } from '../../../compiler/output-targets/output-utils';
 import { getAbsolutePath } from '../utils';
 import { validateCopy } from '../../../compiler/config/validate-copy';
 import { validatePrerender } from '../../../compiler/config/validate-prerender';
@@ -13,7 +13,7 @@ export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userO
   const hasE2eTests = !!(config.flags && config.flags.e2e);
   const userWwwOutputs = userOutputs.filter(isOutputTargetWww);
 
-  if (!hasOutputTargets || (hasE2eTests && !userOutputs.some(isOutputTargetWww))) {
+  if (!hasOutputTargets || (hasE2eTests && !userOutputs.some(isOutputTargetWww) && !userOutputs.some(isOutputTargetDist))) {
     userWwwOutputs.push({ type: WWW });
   }
 

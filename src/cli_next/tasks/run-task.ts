@@ -37,7 +37,7 @@ export async function runTask(prcs: NodeJS.Process, config: Config, task: TaskCo
       break;
 
     case 'test':
-      await taskTest(config);
+      await taskTest(prcs, config);
       break;
 
     case 'version':
