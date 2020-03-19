@@ -149,12 +149,12 @@ export function setupDomTests(document: Document) {
 
           } else {
             const appLoad = () => {
-              window.removeEventListener('stencil_appload', appLoad);
+              window.removeEventListener('appload', appLoad);
               stencilReady().then(() => {
                 resolve(app);
               });
             };
-            window.addEventListener('stencil_appload', appLoad);
+            window.addEventListener('appload', appLoad);
           }
         }
 
