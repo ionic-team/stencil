@@ -1,6 +1,5 @@
 import * as d from '@stencil/core/declarations';
 import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
-import { normalizePath } from '@utils';
 import { validateConfig } from '../validate-config';
 
 describe('validation', () => {
@@ -100,19 +99,6 @@ describe('validation', () => {
     });
   });
 
-  describe('include/exclude globs', () => {
-    it('should default include glob', () => {
-      validateConfig(userConfig);
-      const normalizedIncludeSrc = userConfig.includeSrc.map(x => normalizePath(x));
-      expect(normalizedIncludeSrc).toEqual(['/User/some/path/src/**/*.ts', '/User/some/path/src/**/*.tsx']);
-    });
-
-    it('should default exclude glob', () => {
-      const { config } = validateConfig(userConfig);
-      expect(config.excludeSrc).toEqual(['/User/some/path/src/**/test/**']);
-    });
-  });
-
   describe('hashed filenames', () => {
     it('should error when hashedFileNameLength too large', () => {
       userConfig.hashedFileNameLength = 33;
@@ -126,16 +112,10 @@ describe('validation', () => {
       expect(validated.diagnostics).toHaveLength(1);
     });
 
-    it('should set from hashedfilenamelength', () => {
-      (userConfig as any).hashedfilenamelength = 28;
+    it('should set from hashedFileNameLength', () => {
+      userConfig.hashedFileNameLength = 28;
       const validated = validateConfig(userConfig);
       expect(validated.config.hashedFileNameLength).toBe(28);
-    });
-
-    it('should set hashedFileNameLength from function', () => {
-      (userConfig as any).hashedfilenamelength = () => 11;
-      const { config } = validateConfig(userConfig);
-      expect(config.hashedFileNameLength).toBe(11);
     });
 
     it('should set hashedFileNameLength', () => {
@@ -169,13 +149,13 @@ describe('validation', () => {
     });
 
     it('should set hashFileNames from hashFilenames', () => {
-      (userConfig as any).hashFilenames = false;
+      userConfig.hashFileNames = false;
       const { config } = validateConfig(userConfig);
       expect(config.hashFileNames).toBe(false);
     });
 
     it('should set hashFileNames from hashFilenames', () => {
-      (userConfig as any).hashFilenames = true;
+      userConfig.hashFileNames = true;
       const { config } = validateConfig(userConfig);
       expect(config.hashFileNames).toBe(true);
     });
@@ -264,12 +244,6 @@ describe('validation', () => {
     expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
   });
 
-  it('should require at least one output target', () => {
-    userConfig.outputTargets = [];
-    const validated = validateConfig(userConfig);
-    expect(validated.diagnostics).toHaveLength(1);
-  });
-
   it('should set devInspector false', () => {
     userConfig.devInspector = false;
     const { config } = validateConfig(userConfig);
@@ -305,12 +279,6 @@ describe('validation', () => {
     expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
   });
 
-  it('should require at least one output target', () => {
-    userConfig.outputTargets = [];
-    const validated = validateConfig(userConfig);
-    expect(validated.diagnostics).toHaveLength(1);
-  });
-
   it('should error for invalid outputTarget type', () => {
     userConfig.outputTargets = [
       {
@@ -319,16 +287,6 @@ describe('validation', () => {
     ];
     const validated = validateConfig(userConfig);
     expect(validated.diagnostics).toHaveLength(1);
-  });
-
-  it('should default add www type to outputTarget', () => {
-    userConfig.outputTargets = [
-      {
-        dir: 'somedir',
-      } as d.OutputTargetWww,
-    ];
-    const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
   });
 
   it('should default outputTargets with www', () => {

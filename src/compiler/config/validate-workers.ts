@@ -9,7 +9,7 @@ export const validateWorkers = (config: d.Config) => {
     if (typeof config.flags.maxWorkers === 'number') {
       config.maxConcurrentWorkers = config.flags.maxWorkers;
     } else if (config.flags.ci) {
-      config.maxConcurrentWorkers = 2;
+      config.maxConcurrentWorkers = 4;
     }
   }
 

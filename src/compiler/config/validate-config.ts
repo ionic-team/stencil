@@ -1,5 +1,5 @@
 import { Config, ConfigBundle, Diagnostic } from '../../declarations';
-import { buildError, isBoolean, sortBy, buildWarn } from '@utils';
+import { buildError, buildWarn, isBoolean, isNumber, sortBy } from '@utils';
 import { setBooleanConfig } from './config-utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace } from './validate-namespace';
@@ -58,7 +58,7 @@ export const validateConfig = (userConfig?: Config) => {
   if (!isBoolean(config.hashFileNames)) {
     config.hashFileNames = !config.devMode;
   }
-  if (typeof config.hashedFileNameLength !== 'number') {
+  if (!isNumber(config.hashedFileNameLength)) {
     config.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
   }
   if (config.hashedFileNameLength < MIN_HASHED_FILENAME_LENTH) {

@@ -8,6 +8,7 @@ import { validateDist } from './validate-dist';
 import { validateDocs } from './validate-docs';
 import { validateHydrateScript } from './validate-hydrate-script';
 import { validateLazy } from './validate-lazy';
+import { validateStats } from './validate-stats';
 import { validateWww } from './validate-www';
 import { validateCustomElementBundle } from './validate-custom-element-bundle';
 
@@ -31,5 +32,6 @@ export const validateOutputTargets = (config: d.Config, diagnostics: d.Diagnosti
     ...validateDist(config, userOutputs),
     ...validateHydrateScript(config, userOutputs),
     ...validateDocs(config, diagnostics, userOutputs),
+    ...validateStats(config, userOutputs),
   ];
 };

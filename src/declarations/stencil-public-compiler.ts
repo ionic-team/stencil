@@ -193,10 +193,6 @@ export interface StencilConfig {
   watch?: boolean;
   testing?: TestingConfig;
   maxConcurrentWorkers?: number;
-  /**
-   * @deprecated
-   */
-  maxConcurrentTasksPerWorker?: number;
   preamble?: string;
   /**
    * @deprecated Use the "include" option in "tsconfig.json"
