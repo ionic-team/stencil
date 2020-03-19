@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/internal';
+import { BuildCtx, CompilerCtx, Config } from '@stencil/core/internal';
 import { BuildContext } from '../compiler/build/build-ctx';
 import { Cache } from '../compiler/cache';
 import { createTestingSystem } from './testing-sys';
@@ -9,7 +9,7 @@ import path from 'path';
 
 export function mockConfig() {
   const sys = createTestingSystem();
-  const config: d.Config = {
+  const config: Config = {
     _isTesting: true,
 
     namespace: 'Testing',
@@ -42,7 +42,7 @@ export function mockConfig() {
 }
 
 export function mockCompilerCtx() {
-  const compilerCtx: d.CompilerCtx = {
+  const compilerCtx: CompilerCtx = {
     version: 1,
     activeBuildId: 0,
     activeDirsAdded: [],
@@ -101,7 +101,7 @@ export function mockCompilerCtx() {
   return compilerCtx;
 }
 
-export function mockBuildCtx(config?: d.Config, compilerCtx?: d.CompilerCtx) {
+export function mockBuildCtx(config?: Config, compilerCtx?: CompilerCtx) {
   if (!config) {
     config = mockConfig();
   }
@@ -110,7 +110,7 @@ export function mockBuildCtx(config?: d.Config, compilerCtx?: d.CompilerCtx) {
   }
   const buildCtx = new BuildContext(config, compilerCtx);
 
-  return buildCtx as d.BuildCtx;
+  return buildCtx as BuildCtx;
 }
 
 export function mockCache() {
@@ -121,7 +121,7 @@ export function mockCache() {
 
   const cache = new Cache(config, inMemoryFs);
   cache.initCacheDir();
-  return cache as d.Cache;
+  return cache as Cache;
 }
 
 export function mockLogger() {

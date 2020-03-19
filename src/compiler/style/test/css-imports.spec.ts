@@ -9,10 +9,6 @@ describe('css-imports', () => {
   const config = mockConfig();
   let buildCtx: d.BuildCtx;
 
-  config.sys.resolveModule = (_fromDir, moduleId) => {
-    return normalizePath(path.join(root, 'mocked', 'node_modules', moduleId, 'package.json'));
-  };
-
   beforeEach(() => {
     buildCtx = mockBuildCtx(config);
   });
@@ -142,12 +138,12 @@ describe('css-imports', () => {
   });
 
   describe('getCssImports', () => {
-    it('scss extension', () => {
+    it('scss extension', async () => {
       const filePath = normalizePath(path.join(root, 'src', 'cmp', 'file-a.scss'));
       const content = `
         @import "file-b";
       `;
-      const results = getCssImports(config, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.scss')),
@@ -158,12 +154,12 @@ describe('css-imports', () => {
       ]);
     });
 
-    it('less extension', () => {
+    it('less extension', async () => {
       const filePath = normalizePath(path.join(root, 'src', 'cmp', 'file-a.LESS'));
       const content = `
         @import "file-b";
       `;
-      const results = getCssImports(config, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.less')),

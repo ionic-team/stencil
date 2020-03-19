@@ -56,10 +56,11 @@ const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
   return elm;
 };
 
+// prettier-ignore
 const hostListenerOpts = (flags: number) =>
   supportsListenerOptions
-    ? {
+    ? ({
         passive: (flags & LISTENER_FLAGS.Passive) !== 0,
         capture: (flags & LISTENER_FLAGS.Capture) !== 0,
-      }
+      })
     : (flags & LISTENER_FLAGS.Capture) !== 0;

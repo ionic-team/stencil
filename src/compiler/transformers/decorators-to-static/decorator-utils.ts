@@ -24,10 +24,6 @@ export const isDecoratorNamed = (propName: string) => {
   };
 };
 
-export const CLASS_DECORATORS_TO_REMOVE = new Set(['Component']);
-
-export const MEMBER_DECORATORS_TO_REMOVE = new Set(['Element', 'Event', 'Listen', 'Method', 'Prop', 'PropDidChange', 'PropWillChange', 'State', 'Watch']);
-
 export interface GetDeclarationParameters {
   <T>(decorator: ts.Decorator): [T];
   <T, T1>(decorator: ts.Decorator): [T, T1];

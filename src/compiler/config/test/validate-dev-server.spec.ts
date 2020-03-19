@@ -9,7 +9,7 @@ describe('validateDevServer', () => {
 
   beforeEach(() => {
     inputConfig = {
-      sys_next: {} as any,
+      sys: {} as any,
       rootDir: normalizePath(path.join(root, 'some', 'path')),
       devServer: {
         contentTypes: {},

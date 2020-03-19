@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { augmentDiagnosticWithNode, buildError, normalizePath } from '@utils';
-import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorator-utils';
+import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
 import ts from 'typescript';
 
 export const getScriptTarget = () => {

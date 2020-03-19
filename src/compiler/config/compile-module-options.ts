@@ -103,7 +103,7 @@ export const getCompileModuleConfig = (input: CompileOptions) => {
     _isTesting: true,
     validateTypes: false,
     enableCache: false,
-    sys: {} as any,
+    sys: null,
     tsCompilerOptions,
   };
 
