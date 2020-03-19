@@ -34,7 +34,7 @@ describe('jsx', () => {
       first?: string;
       last?: string;
     }
-    const FunctionalCmp: FunctionalComponent<FunctionalCmpProps> = ({ first = 'Kim', last = 'Doe' } = {}) => (
+    const FunctionalCmp: FunctionalComponent<FunctionalCmpProps> = ({ first = 'Kim', last = 'Doe' }) => (
       <div>
         Hi, my name is {first} {last}.
       </div>
