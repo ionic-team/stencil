@@ -340,7 +340,33 @@ describe('css-imports', () => {
       ]);
     });
 
-    it('node path @import w/ package.json and main field', async () => {
+    it('node path @import w/ package.json, no path and main css field', async () => {
+      const files = new Map<string, string>();
+      const nodeModulePkgPath = path.join(root, 'node_modules', '@ionic', 'core', 'package.json');
+      files.set(nodeModulePkgPath, JSON.stringify({ name: '@ionic/core', main: 'index.css' }));
+
+      const nodeModuleMainPath = path.join(root, 'node_modules', '@ionic', 'core', 'index.css');
+      files.set(nodeModuleMainPath, `/*ionic.css*/`);
+
+      await compilerCtx.fs.writeFiles(files);
+      await compilerCtx.fs.commit();
+
+      const filePath = normalizePath(path.join(root, 'src', 'cmp', 'file-a.css'));
+      const content = `
+        @import '~@ionic/core';
+      `;
+      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      expect(results).toEqual([
+        {
+          filePath: normalizePath(path.join(root, 'node_modules', '@ionic', 'core', 'index.css')),
+          srcImport: `@import '~@ionic/core';`,
+          updatedImport: `@import "${normalizePath(path.join(root, 'node_modules', '@ionic', 'core', 'index.css'))}";`,
+          url: `~@ionic/core`,
+        },
+      ]);
+    });
+
+    it('node path @import w/ package.json and main JS field', async () => {
       const files = new Map<string, string>();
       const nodeModulePkgPath = path.join(root, 'node_modules', '@ionic', 'core', 'package.json');
       files.set(nodeModulePkgPath, JSON.stringify({ name: '@ionic/core', main: 'index.js' }));
@@ -405,6 +431,12 @@ describe('css-imports', () => {
       expect(m.filePath).toBe('dist/css/ionicons.css');
     });
 
+    it('getModuleId non-scoped package, no path', () => {
+      const m = getModuleId('ionicons');
+      expect(m.moduleId).toBe('ionicons');
+      expect(m.filePath).toBe('');
+    });
+
     it('getModuleId scoped ~ package', () => {
       const m = getModuleId('~@ionic/core/dist/ionic/css/ionic.css');
       expect(m.moduleId).toBe('@ionic/core');
@@ -415,6 +447,12 @@ describe('css-imports', () => {
       const m = getModuleId('@ionic/core/dist/ionic/css/ionic.css');
       expect(m.moduleId).toBe('@ionic/core');
       expect(m.filePath).toBe('dist/ionic/css/ionic.css');
+    });
+
+    it('getModuleId scoped package, no path', () => {
+      const m = getModuleId('@ionic/core');
+      expect(m.moduleId).toBe('@ionic/core');
+      expect(m.filePath).toBe('');
     });
   });
 });

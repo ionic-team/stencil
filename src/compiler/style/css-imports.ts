@@ -169,7 +169,9 @@ export const resolveCssNodeModule = async (config: d.Config, compilerCtx: d.Comp
       containingFile: filePath,
       exts: [],
       packageFilter: pkg => {
-        pkg.main = m.filePath;
+        if (m.filePath !== '') {
+          pkg.main = m.filePath;
+        }
         return pkg;
       },
     });
