@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD, NAMESPACE } from '@app-data';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
-import { consoleError, doc, getHostRef, nextTick, plt, win, writeTask } from '@platform';
+import { consoleError, doc, getHostRef, nextTick, plt, writeTask } from '@platform';
 import { PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 import { createTime } from './profile';
