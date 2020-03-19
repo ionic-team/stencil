@@ -283,7 +283,7 @@ export const appDidLoad = (who: string) => {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
   nextTick(() => (
-    emitEvent(win, 'appload', {detail:{namespace: NAMESPACE}})
+    emitEvent(doc, 'appload', { bubbles: true, detail: {namespace: NAMESPACE}})
   ));
 
   if (BUILD.profile && performance.measure) {
