@@ -41,7 +41,7 @@ export function mockConfig() {
   return config;
 }
 
-export function mockCompilerCtx() {
+export function mockCompilerCtx(config?: Config) {
   const compilerCtx: CompilerCtx = {
     version: 1,
     activeBuildId: 0,
@@ -83,7 +83,7 @@ export function mockCompilerCtx() {
   Object.defineProperty(compilerCtx, 'fs', {
     get() {
       if (this._fs == null) {
-        // this._fs = new InMemoryFs(mockFs(), path);
+        this._fs = createInMemoryFs(config.sys);
       }
       return this._fs;
     },
@@ -92,7 +92,7 @@ export function mockCompilerCtx() {
   Object.defineProperty(compilerCtx, 'cache', {
     get() {
       if (this._cache == null) {
-        this._cache = mockCache();
+        this._cache = mockCache(config, compilerCtx);
       }
       return this._cache;
     },
@@ -106,20 +106,22 @@ export function mockBuildCtx(config?: Config, compilerCtx?: CompilerCtx) {
     config = mockConfig();
   }
   if (!compilerCtx) {
-    compilerCtx = mockCompilerCtx();
+    compilerCtx = mockCompilerCtx(config);
   }
   const buildCtx = new BuildContext(config, compilerCtx);
 
   return buildCtx as BuildCtx;
 }
 
-export function mockCache() {
-  const sys = createTestingSystem();
-  const inMemoryFs = createInMemoryFs(sys);
-  const config = mockConfig();
+export function mockCache(config?: Config, compilerCtx?: CompilerCtx) {
+  if (!config) {
+    config = mockConfig();
+  }
+  if (!compilerCtx) {
+    compilerCtx = mockCompilerCtx(config);
+  }
   config.enableCache = true;
-
-  const cache = new Cache(config, inMemoryFs);
+  const cache = new Cache(config, compilerCtx.fs);
   cache.initCacheDir();
   return cache as Cache;
 }

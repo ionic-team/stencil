@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { basename, dirname, relative } from 'path';
-import { normalizePath } from '@utils';
+import { isIterable, normalizePath } from '@utils';
 
 export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const items: d.FsItems = new Map();
@@ -433,12 +433,20 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     return results;
   };
 
-  const writeFiles = (files: { [filePath: string]: string }, opts?: d.FsWriteOptions) => {
-    return Promise.all(
+  const writeFiles = (files: { [filePath: string]: string } | Map<string, string>, opts?: d.FsWriteOptions) => {
+    const writes: Promise<d.FsWriteResults>[] = [];
+
+    if (isIterable(files)) {
+      files.forEach((content, filePath) => {
+        writes.push(writeFile(filePath, content, opts));
+      });
+    } else {
       Object.keys(files).map(filePath => {
-        return writeFile(filePath, files[filePath], opts);
-      }),
-    );
+        writes.push(writeFile(filePath, files[filePath], opts));
+      });
+    }
+
+    return Promise.all(writes);
   };
 
   const commit = async () => {

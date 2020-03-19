@@ -1,21 +1,23 @@
 import * as d from '../../../declarations';
 import { COMMON_DIR_FILENAMES, NODE_MODULES_FS_DIR, getCommonDirName, isCommonDirModuleFile, shouldFetchModule } from './resolve-utils';
+import { dirname } from 'path';
 import { fetchModuleAsync } from '../fetch/fetch-module-async';
 import { getCommonDirUrl, getNodeModuleFetchUrl, packageVersions } from '../fetch/fetch-utils';
-import { isString, normalizeFsPath } from '@utils';
-import resolve from 'resolve';
+import { isString, normalizeFsPath, normalizePath } from '@utils';
+import resolve, { AsyncOpts } from 'resolve';
 
-export const resolveModuleIdAsync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, basedir: string, exts: string[]) => {
-  const opts = createCustomResolverAsync(config, inMemoryFs, exts);
-  opts.basedir = basedir;
+export const resolveModuleIdAsync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, opts: d.ResolveModuleIdOptions) => {
+  const resolverOpts: AsyncOpts = createCustomResolverAsync(config, inMemoryFs, opts.exts);
+  resolverOpts.basedir = dirname(opts.containingFile);
+  resolverOpts.packageFilter = opts.packageFilter;
 
   return new Promise<{ resolveId: string; pkgData: d.PackageJsonData }>((resolvePromise, rejectPromise) => {
-    resolve(moduleId, opts, (err, resolveId, pkgData: any) => {
+    resolve(opts.moduleId, resolverOpts, (err, resolveId, pkgData: any) => {
       if (err) {
         rejectPromise(err);
       } else {
         resolvePromise({
-          resolveId,
+          resolveId: normalizePath(resolveId),
           pkgData,
         });
       }

@@ -106,7 +106,6 @@ export const getCssImports = async (config: d.Config, compilerCtx: d.CompilerCtx
     // no @import at all, so don't bother
     return imports;
   }
-
   styleText = stripCssComments(styleText);
 
   const dir = dirname(filePath);
@@ -160,19 +159,22 @@ export const getCssImports = async (config: d.Config, compilerCtx: d.CompilerCtx
 
 const IMPORT_RE = /(@import)\s+(url\()?\s?(.*?)\s?\)?([^;]*);?/gi;
 
-export const isCssNodeModule = (url: string) => {
-  return url.startsWith('~');
-};
+export const isCssNodeModule = (url: string) => url.startsWith('~');
 
 export const resolveCssNodeModule = async (config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], filePath: string, cssImportData: d.CssImportData) => {
   try {
-    const dir = dirname(filePath);
-    const moduleId = getModuleId(cssImportData.url);
-    const resolved = await resolveModuleIdAsync(config, compilerCtx.fs, moduleId, dir, []);
-    cssImportData.filePath = resolved.resolveId;
+    const m = getModuleId(cssImportData.url);
+    const resolved = await resolveModuleIdAsync(config, compilerCtx.fs, {
+      moduleId: m.moduleId,
+      containingFile: filePath,
+      exts: [],
+      packageFilter: pkg => {
+        pkg.main = m.filePath;
+        return pkg;
+      },
+    });
 
-    cssImportData.filePath = dirname(cssImportData.filePath);
-    cssImportData.filePath += normalizePath(cssImportData.url.substring(moduleId.length + 1));
+    cssImportData.filePath = resolved.resolveId;
     cssImportData.updatedImport = `@import "${cssImportData.filePath}";`;
   } catch (e) {
     const d = buildError(diagnostics);
@@ -213,14 +215,20 @@ export const getModuleId = (orgImport: string) => {
     orgImport = orgImport.substring(1);
   }
   const splt = orgImport.split('/');
+  const m = {
+    moduleId: null as string,
+    filePath: null as string,
+  };
 
-  if (orgImport.startsWith('@')) {
-    if (splt.length > 1) {
-      return splt.slice(0, 2).join('/');
-    }
+  if (orgImport.startsWith('@') && splt.length > 1) {
+    m.moduleId = splt.slice(0, 2).join('/');
+    m.filePath = splt.slice(2).join('/');
+  } else {
+    m.moduleId = splt[0];
+    m.filePath = splt.slice(1).join('/');
   }
 
-  return splt[0];
+  return m;
 };
 
 export const replaceImportDeclarations = (styleText: string, cssImports: d.CssImportData[], isCssEntry: boolean) => {

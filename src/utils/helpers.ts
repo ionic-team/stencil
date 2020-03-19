@@ -87,5 +87,4 @@ export const isFunction = (v: any): v is boolean => typeof v === 'function';
 export const isNumber = (v: any): v is boolean => typeof v === 'number';
 export const isObject = (val: Object) => val != null && typeof val === 'object' && Array.isArray(val) === false;
 export const isString = (v: any): v is string => typeof v === 'string';
-
-export const isIterable = (o: any): boolean => isDefined(o) && typeof o[Symbol.iterator] === 'function';
+export const isIterable = (v: any): v is Iterable<any> => isDefined(v) && isFunction(v[Symbol.iterator]);

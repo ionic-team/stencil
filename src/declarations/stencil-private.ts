@@ -2751,3 +2751,10 @@ export interface TransformOptions {
   style: 'static' | null;
   target?: string;
 }
+
+export interface ResolveModuleIdOptions {
+  moduleId: string;
+  containingFile: string;
+  exts: string[];
+  packageFilter?: (pkg: PackageJsonData) => void;
+}
