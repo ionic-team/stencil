@@ -1,3 +1,12 @@
+## 🏓 [1.10.3](https://github.com/ionic-team/stencil/compare/v1.10.2...v1.10.3) (2020-03-19)
+
+
+### Bug Fixes
+
+* **vdom:** functional components always get object as props ([0f71c6c](https://github.com/ionic-team/stencil/commit/0f71c6c590624bbfe64c6038166daa0c90f74123))
+
+
+
 ## 🤘 [1.10.2](https://github.com/ionic-team/stencil/compare/v1.10.1...v1.10.2) (2020-03-19)
 
 
