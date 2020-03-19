@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD, NAMESPACE } from '@app-data';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
-import { consoleError, doc, getHostRef, nextTick, plt, writeTask } from '@platform';
+import { consoleError, doc, getHostRef, nextTick, plt, writeTask, win } from '@platform';
 import { PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 import { createTime } from './profile';
@@ -283,7 +283,7 @@ export const appDidLoad = (who: string) => {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
   nextTick(() => (
-    emitEvent(doc, 'appload', { bubbles: true, detail: {namespace: NAMESPACE}})
+    emitEvent(win, 'appload', { detail: {namespace: NAMESPACE}})
   ));
 
   if (BUILD.profile && performance.measure) {

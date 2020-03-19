@@ -45,5 +45,4 @@ describe('mode', () => {
     expect(getMode(root)).toEqual('ios');
   });
 
-
 });

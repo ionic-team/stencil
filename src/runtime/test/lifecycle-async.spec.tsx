@@ -121,7 +121,7 @@ describe('lifecycle async', () => {
     class CmpA {
       componentWillLoad() {
         expect(document.documentElement.classList.contains('hydrated')).toBe(false);
-        document.addEventListener('appload', (ev: CustomEvent) => mockEvent(ev.detail));
+        window.addEventListener('appload', (ev: CustomEvent) => mockEvent(ev.detail));
       }
 
       render() {
