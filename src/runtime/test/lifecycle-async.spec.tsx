@@ -115,4 +115,30 @@ describe('lifecycle async', () => {
     );
   });
 
+  it('windows emits event', async () => {
+    const mockEvent = jest.fn()
+    @Component({ tag: 'cmp-a'})
+    class CmpA {
+      componentWillLoad() {
+        expect(document.documentElement.classList.contains('hydrated')).toBe(false);
+        document.addEventListener('appload', (ev: CustomEvent) => mockEvent(ev.detail));
+      }
+
+      render() {
+        return 'Done';
+      }
+    }
+    await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+      includeAnnotations: true,
+    });
+
+    expect(document.documentElement.classList.contains('hydrated')).toBe(true);
+    expect(mockEvent).toHaveBeenCalledTimes(1);
+    expect(mockEvent).toHaveBeenCalledWith({
+      namespace: "app"
+    });
+  });
+
 });
