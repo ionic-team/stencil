@@ -66,22 +66,24 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
 
     proxyComponentLifeCycles(Cstr);
 
-    const bundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 899999) + 100000)}`;
-    const lazyBundleRuntimeMeta = formatLazyBundleRuntimeMeta(bundleId, [Cstr.COMPILER_META]);
-
-    registerModule(bundleId, Cstr);
-
+    let textBundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 899999) + 100000)}`;
+    let bundleId = textBundleId as any;
     if (Array.isArray(Cstr.COMPILER_META.styles)) {
+      bundleId = {};
+
       Cstr.COMPILER_META.styles.forEach(style => {
+        bundleId[style.styleId] = textBundleId;
         styles.set(style.styleId, style.styleStr);
       });
     }
 
+    registerModule(bundleId, Cstr);
+
+    const lazyBundleRuntimeMeta = formatLazyBundleRuntimeMeta(bundleId, [Cstr.COMPILER_META]);
     return lazyBundleRuntimeMeta;
   });
 
   const cmpCompilerMeta = opts.components.map(Cstr => Cstr.COMPILER_META as ComponentCompilerMeta);
-
   const cmpBuild = getBuildFeatures(cmpCompilerMeta);
   if (opts.strictBuild) {
     Object.assign(BUILD, cmpBuild);

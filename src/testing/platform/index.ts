@@ -5,5 +5,5 @@ export { Context, isMemberInElement, plt, supportsShadow, registerComponents, re
 export { doc, win } from './testing-window';
 export { flushAll, flushLoadModule, flushQueue, loadModule, nextTick, readTask, writeTask } from './testing-task-queue';
 export { getHostRef, registerHost, registerInstance } from './testing-host-ref';
-export { styles } from './testing-constants';
+export { styles, modeResolutionChain } from './testing-constants';
 export * from '@runtime';
