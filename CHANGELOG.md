@@ -1,3 +1,18 @@
+## 🤘 [1.10.2](https://github.com/ionic-team/stencil/compare/v1.10.1...v1.10.2) (2020-03-19)
+
+
+### Bug Fixes
+
+* **cli:** generate task emits in correct path ([704e13c](https://github.com/ionic-team/stencil/commit/704e13cd0a2110c13032decefd727ab605b187be)), closes [#2282](https://github.com/ionic-team/stencil/issues/2282)
+* **runtime:** always emit appload event ([#2285](https://github.com/ionic-team/stencil/issues/2285)) ([b4e34df](https://github.com/ionic-team/stencil/commit/b4e34dfc7fefc04c80fef193e5a575f5809af1b7))
+* **runtime:** emit appload eventon window ([83f2376](https://github.com/ionic-team/stencil/commit/83f23767e369e3f31cceda7caec25bd9d88a23c3))
+* **testing:** support multiple modes ([#2286](https://github.com/ionic-team/stencil/issues/2286)) ([20a1559](https://github.com/ionic-team/stencil/commit/20a1559dab40143b0e6645bb53099a89c247a485))
+* **types:** svg element only have attributes ([#2283](https://github.com/ionic-team/stencil/issues/2283)) ([667597d](https://github.com/ionic-team/stencil/commit/667597dd1aebf05aae171a4cfcba2baad59b50b8))
+* **vdom:** pass undefined to functional cmp ([1ffd4a9](https://github.com/ionic-team/stencil/commit/1ffd4a9b6b928d4ca4ff17eb315347af88839503)), closes [#2254](https://github.com/ionic-team/stencil/issues/2254)
+* remove typescript helpers workaround ([#2266](https://github.com/ionic-team/stencil/issues/2266)) ([3113af1](https://github.com/ionic-team/stencil/commit/3113af1ca0047bec7b67231a54f96591aad0570a))
+
+
+
 ## 🍋 [1.10.1](https://github.com/ionic-team/stencil/compare/v1.10.0...v1.10.1) (2020-03-17)
 
 
