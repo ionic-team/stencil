@@ -33,6 +33,7 @@ describe('validate-package-json', () => {
     it('should validate files "dist/"', async () => {
       const distPath = path.join(root, 'dist');
       await compilerCtx.fs.emptyDir(distPath);
+      await compilerCtx.fs.commit();
       buildCtx.packageJson.files = ['dist/'];
       await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics).toHaveLength(0);
@@ -41,6 +42,7 @@ describe('validate-package-json', () => {
     it('should validate files "./dist/"', async () => {
       const distPath = path.join(root, 'dist');
       await compilerCtx.fs.emptyDir(distPath);
+      await compilerCtx.fs.commit();
       buildCtx.packageJson.files = ['./dist/'];
       await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics).toHaveLength(0);
@@ -49,14 +51,16 @@ describe('validate-package-json', () => {
     it('should validate files "./dist"', async () => {
       const distPath = path.join(root, 'dist');
       await compilerCtx.fs.emptyDir(distPath);
+      await compilerCtx.fs.commit();
       buildCtx.packageJson.files = ['./dist'];
       await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
-    fit('should validate files "dist"', async () => {
+    it('should validate files "dist"', async () => {
       const distPath = path.join(root, 'dist');
       await compilerCtx.fs.emptyDir(distPath);
+      await compilerCtx.fs.commit();
       buildCtx.packageJson.files = ['dist'];
       await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics).toHaveLength(0);
