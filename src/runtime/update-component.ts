@@ -2,10 +2,11 @@ import * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD, NAMESPACE } from '@app-data';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
-import { consoleError, doc, getHostRef, nextTick, plt, writeTask } from '@platform';
+import { consoleError, doc, getHostRef, nextTick, plt, writeTask, win } from '@platform';
 import { PLATFORM_FLAGS } from './runtime-constants';
 import { renderVdom } from './vdom/vdom-render';
 import { createTime } from './profile';
+import { emitEvent } from './event-emitter';
 
 export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) => {
   if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$) {
@@ -269,9 +270,8 @@ export const appDidLoad = (who: string) => {
   if (!BUILD.hydrateServerSide) {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
-  if (BUILD.lifecycleDOMEvents) {
-    nextTick(() => emitLifecycleEvent(doc, 'appload'));
-  }
+  nextTick(() => emitEvent(win, 'appload', { detail: { namespace: NAMESPACE } }));
+
   if (BUILD.profile && performance.measure) {
     performance.measure(`[Stencil] ${NAMESPACE} initial load (by ${who})`, 'st:app:start');
   }
@@ -294,15 +294,13 @@ const then = (promise: Promise<any>, thenFn: () => any) => {
 
 const emitLifecycleEvent = (elm: EventTarget, lifecycleName: string) => {
   if (BUILD.lifecycleDOMEvents) {
-    elm.dispatchEvent(
-      new CustomEvent('stencil_' + lifecycleName, {
-        bubbles: true,
-        composed: true,
-        detail: {
-          namespace: NAMESPACE,
-        },
-      }),
-    );
+    emitEvent(elm, 'stencil_' + lifecycleName, {
+      bubbles: true,
+      composed: true,
+      detail: {
+        namespace: NAMESPACE,
+      },
+    });
   }
 };
 

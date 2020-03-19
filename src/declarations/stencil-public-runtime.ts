@@ -253,10 +253,12 @@ export declare const State: StateDecorator;
  */
 export declare const Watch: WatchDecorator;
 
+export type ResolutionHandler = (elm: HTMLElement) => string | undefined | null;
+
 /**
  * `setMode()` is used for libraries which provide multiple "modes" for styles.
  */
-export declare const setMode: (handler: (elm: HTMLElement) => string | undefined | null) => void;
+export declare const setMode: (handler: ResolutionHandler) => void;
 
 /**
  * getMode

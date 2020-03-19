@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { buildError } from '@utils';
-import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme, isOutputTargetDocsVscode } from '../../output-targets/output-utils';
 import { isAbsolute, join } from 'path';
+import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme, isOutputTargetDocsVscode } from '../../output-targets/output-utils';
 import { NOTE } from '../../docs/constants';
 
 export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {

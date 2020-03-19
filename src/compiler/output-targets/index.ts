@@ -34,9 +34,10 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
     outputApp(config, compilerCtx, buildCtx),
   ]);
 
-  // must run after all the other outputs
-  // since it validates files were created
-  await outputDocs(config, compilerCtx, buildCtx);
+  await outputDocs(config, compilerCtx, buildCtx),
+    // must run after all the other outputs
+    // since it validates files were created
+    await outputDocs(config, compilerCtx, buildCtx);
   await outputTypes(config, compilerCtx, buildCtx);
 
   timeSpan.finish('generate outputs finished');
