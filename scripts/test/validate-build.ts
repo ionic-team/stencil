@@ -18,7 +18,7 @@ const pkgs: TestPackage[] = [
   {
     // compiler
     packageJson: 'compiler/package.json',
-    files: ['compiler/index.js'],
+    files: ['compiler/stencil.js'],
   },
   {
     // dev-server
@@ -79,7 +79,7 @@ const pkgs: TestPackage[] = [
   },
   {
     // sys/node
-    files: ['sys/node/graceful-fs.js', 'sys/node/index.js', 'sys/node/node-fetch.js'],
+    files: ['sys/node/autoprefixer.js', 'sys/node/graceful-fs.js', 'sys/node/node-fetch.js'],
   },
   {
     // testing
