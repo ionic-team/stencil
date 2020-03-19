@@ -2,7 +2,7 @@ import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
-describe('build-conditionals', () => {
+xdescribe('build-conditionals', () => {
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;

@@ -21,7 +21,7 @@ xdescribe('plugin', () => {
     await compiler.destroy();
   });
 
-  fit('transform, async', async () => {
+  it('transform, async', async () => {
     compiler.config.bundles = [{ components: ['cmp-a'] }];
 
     await compiler.fs.writeFiles(

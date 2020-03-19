@@ -3,7 +3,7 @@ import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
-describe('outputTarget, dist', () => {
+xdescribe('outputTarget, dist', () => {
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;

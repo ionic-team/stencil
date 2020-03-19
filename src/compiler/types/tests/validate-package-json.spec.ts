@@ -22,7 +22,7 @@ describe('validate-package-json', () => {
     config.devMode = false;
     config.namespace = 'SomeNamespace';
     config.fsNamespace = config.namespace.toLowerCase();
-    compilerCtx = mockCompilerCtx();
+    compilerCtx = mockCompilerCtx(config);
     buildCtx = mockBuildCtx(config, compilerCtx);
     buildCtx.packageJson = {};
     config.packageJsonFilePath = path.join(root, 'package.json');
@@ -54,7 +54,7 @@ describe('validate-package-json', () => {
       expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
-    it('should validate files "dist"', async () => {
+    fit('should validate files "dist"', async () => {
       const distPath = path.join(root, 'dist');
       await compilerCtx.fs.emptyDir(distPath);
       buildCtx.packageJson.files = ['dist'];
