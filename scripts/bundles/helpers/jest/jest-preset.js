@@ -6,7 +6,7 @@ const internalDir = path.join(rootDir, 'internal');
 module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'mjs', 'jsx', 'json', 'd.ts'],
   moduleNameMapper: {
-    '^@stencil/core/cli$': path.join(rootDir, 'cli', 'index_legacy.js'),
+    '^@stencil/core/cli$': path.join(rootDir, 'cli', 'index.js'),
     '^@stencil/core/compiler$': path.join(rootDir, 'compiler', 'stencil.js'),
     '^@stencil/core/internal$': path.join(internalDir, 'testing', 'index.js'),
     '^@stencil/core/internal/app-data$': path.join(internalDir, 'app-data', 'index.js'),
