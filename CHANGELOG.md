@@ -1,3 +1,14 @@
+# 🍿 [1.11.0](https://github.com/ionic-team/stencil/compare/v1.10.3...v1.11.0) (2020-03-20)
+
+
+### Bug Fixes
+
+* **compiler:** handle component styles with literals ([2bef0f3](https://github.com/ionic-team/stencil/commit/2bef0f3f56887f3dd977794734e4db19e0adf56b))
+* **compiler:** rename @stencil/core imports in all d.ts files ([4c70fdd](https://github.com/ionic-team/stencil/commit/4c70fdd2c418a1419c8c30bd585d4a081100b28b))
+* **test:** e2e tests without www output target ([7be5255](https://github.com/ionic-team/stencil/commit/7be5255d119dd691e223eedcd0445c0a2f78bfc0))
+
+
+
 ## 🏓 [1.10.3](https://github.com/ionic-team/stencil/compare/v1.10.2...v1.10.3) (2020-03-19)
 
 
