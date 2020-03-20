@@ -8,6 +8,7 @@ import { resolveComponentDependencies } from '../entries/resolve-component-depen
 import { updateComponentBuildConditionals } from '../app-core/app-data';
 import { updateModule } from '../transformers/static-to-meta/parse-static';
 import ts from 'typescript';
+import { updateStencilTypesImports } from '../types/stencil-types';
 
 export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
   const tsSyntactic = loadTypeScriptDiagnostics(tsBuilder.getSyntacticDiagnostics());
@@ -33,7 +34,9 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
       const relativeEmitFilepath = getRelativeDts(config, tsSourceFiles[0].fileName, emitFilePath);
 
       typesOutputTarget.forEach(o => {
-        compilerCtx.fs.writeFile(join(o.typesDir, relativeEmitFilepath), data);
+        const distPath = join(o.typesDir, relativeEmitFilepath);
+        data = updateStencilTypesImports(o.typesDir, distPath, data);
+        compilerCtx.fs.writeFile(distPath, data);
       });
     }
   };

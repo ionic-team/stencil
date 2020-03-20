@@ -20,28 +20,6 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) =>
     const distOutputTarget = validateOutputTargetDist(config, o);
     outputs.push(distOutputTarget);
 
-    if (distOutputTarget.collectionDir) {
-      outputs.push({
-        type: DIST_COLLECTION,
-        dir: distOutputTarget.dir,
-        collectionDir: distOutputTarget.collectionDir,
-        empty: distOutputTarget.empty,
-      });
-      outputs.push({
-        type: COPY,
-        dir: distOutputTarget.collectionDir,
-        copyAssets: 'collection',
-        copy: [...distOutputTarget.copy, { src: '**/*.svg' }, { src: '**/*.js' }],
-      });
-    }
-
-    outputs.push({
-      type: DIST_TYPES,
-      dir: distOutputTarget.dir,
-      typesDir: distOutputTarget.typesDir,
-      empty: distOutputTarget.empty,
-    });
-
     const namespace = config.fsNamespace || 'app';
     const lazyDir = join(distOutputTarget.buildDir, namespace);
 
@@ -61,41 +39,63 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) =>
       dir: lazyDir,
       copyAssets: 'dist',
     });
-
-    // Emit global styles
     outputs.push({
       type: DIST_GLOBAL_STYLES,
       file: join(lazyDir, `${config.fsNamespace}.css`),
     });
 
-    const esmDir = join(distOutputTarget.dir, 'esm');
-    const esmEs5Dir = config.buildEs5 ? join(distOutputTarget.dir, 'esm-es5') : undefined;
-    const cjsDir = join(distOutputTarget.dir, 'cjs');
+    if (config.buildDist) {
+      if (distOutputTarget.collectionDir) {
+        outputs.push({
+          type: DIST_COLLECTION,
+          dir: distOutputTarget.dir,
+          collectionDir: distOutputTarget.collectionDir,
+          empty: distOutputTarget.empty,
+        });
+        outputs.push({
+          type: COPY,
+          dir: distOutputTarget.collectionDir,
+          copyAssets: 'collection',
+          copy: [...distOutputTarget.copy, { src: '**/*.svg' }, { src: '**/*.js' }],
+        });
+      }
 
-    // Create lazy output-target
-    outputs.push({
-      type: DIST_LAZY,
-      esmDir,
-      esmEs5Dir,
-      cjsDir,
+      outputs.push({
+        type: DIST_TYPES,
+        dir: distOutputTarget.dir,
+        typesDir: distOutputTarget.typesDir,
+        empty: distOutputTarget.empty,
+      });
 
-      cjsIndexFile: join(distOutputTarget.dir, 'index.js'),
-      esmIndexFile: join(distOutputTarget.dir, 'index.mjs'),
-      polyfills: true,
-      empty: distOutputTarget.empty,
-    });
+      const esmDir = join(distOutputTarget.dir, 'esm');
+      const esmEs5Dir = config.buildEs5 ? join(distOutputTarget.dir, 'esm-es5') : undefined;
+      const cjsDir = join(distOutputTarget.dir, 'cjs');
 
-    // Create output target that will generate the /loader entry-point
-    outputs.push({
-      type: DIST_LAZY_LOADER,
-      dir: distOutputTarget.esmLoaderPath,
+      // Create lazy output-target
+      outputs.push({
+        type: DIST_LAZY,
+        esmDir,
+        esmEs5Dir,
+        cjsDir,
 
-      esmDir,
-      esmEs5Dir,
-      cjsDir,
-      componentDts: getComponentsDtsTypesFilePath(distOutputTarget),
-      empty: distOutputTarget.empty,
-    });
+        cjsIndexFile: join(distOutputTarget.dir, 'index.js'),
+        esmIndexFile: join(distOutputTarget.dir, 'index.mjs'),
+        polyfills: true,
+        empty: distOutputTarget.empty,
+      });
+
+      // Create output target that will generate the /loader entry-point
+      outputs.push({
+        type: DIST_LAZY_LOADER,
+        dir: distOutputTarget.esmLoaderPath,
+
+        esmDir,
+        esmEs5Dir,
+        cjsDir,
+        componentDts: getComponentsDtsTypesFilePath(distOutputTarget),
+        empty: distOutputTarget.empty,
+      });
+    }
 
     return outputs;
   }, []);
