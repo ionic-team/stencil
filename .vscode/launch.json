@@ -132,7 +132,7 @@
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
-        "--dev",
+        // "--dev",
         "--max-workers=0",
         "--config",
         "${workspaceFolder}/test/end-to-end/stencil.config.ts"

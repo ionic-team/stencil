@@ -35,7 +35,7 @@
     "rollup.prod.ci": "rollup --config --config-prod --config-ci",
     "rollup.watch": "rollup --watch --config",
     "license": "node scripts --license",
-    "prettier": "prettier --write \"./src/**/*.{ts,tsx,js,json}\"",
+    "prettier": "prettier --write \"./src/**/*.{ts,tsx}\"",
     "test": "jest",
     "test.analysis": "cd test && npm run build",
     "test.dist": "node scripts --validate-build",
