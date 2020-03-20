@@ -19,6 +19,7 @@ describe('validateDistOutputTarget', () => {
       empty: false,
     };
     userConfig.outputTargets = [outputTarget];
+    userConfig.buildDist = true;
     const { config } = validateConfig(userConfig);
     expect(config.outputTargets).toEqual([
       {
@@ -29,24 +30,6 @@ describe('validateDistOutputTarget', () => {
         empty: false,
         esmLoaderPath: path.join(rootDir, 'my-dist', 'loader'),
         type: 'dist',
-        typesDir: path.join(rootDir, 'my-dist', 'types'),
-      },
-      {
-        collectionDir: path.join(rootDir, 'my-dist', 'collection'),
-        dir: path.join(rootDir, '/my-dist'),
-        empty: false,
-        type: 'dist-collection',
-      },
-      {
-        copy: [{ src: '**/*.svg' }, { src: '**/*.js' }],
-        copyAssets: 'collection',
-        dir: path.join(rootDir, 'my-dist', 'collection'),
-        type: 'copy',
-      },
-      {
-        dir: path.join(rootDir, 'my-dist'),
-        empty: false,
-        type: 'dist-types',
         typesDir: path.join(rootDir, 'my-dist', 'types'),
       },
       {
@@ -67,6 +50,24 @@ describe('validateDistOutputTarget', () => {
       {
         file: path.join(rootDir, 'my-dist', 'my-build', 'testing', 'testing.css'),
         type: 'dist-global-styles',
+      },
+      {
+        collectionDir: path.join(rootDir, 'my-dist', 'collection'),
+        dir: path.join(rootDir, '/my-dist'),
+        empty: false,
+        type: 'dist-collection',
+      },
+      {
+        copy: [{ src: '**/*.svg' }, { src: '**/*.js' }],
+        copyAssets: 'collection',
+        dir: path.join(rootDir, 'my-dist', 'collection'),
+        type: 'copy',
+      },
+      {
+        dir: path.join(rootDir, 'my-dist'),
+        empty: false,
+        type: 'dist-types',
+        typesDir: path.join(rootDir, 'my-dist', 'types'),
       },
       {
         type: 'dist-lazy',
