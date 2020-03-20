@@ -20,8 +20,6 @@ export function startupLog(prcs: NodeJS.Process, config: d.Config) {
     startupMsg += ' ' + logger.cyan(`v${version}`);
   }
 
-  startupMsg += ' ' + logger.magenta('[NEXT]');
-
   if (prcs.platform !== 'win32' && logger.colors) {
     startupMsg += ' ' + vermoji;
   }
