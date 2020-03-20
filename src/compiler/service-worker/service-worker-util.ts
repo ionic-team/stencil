@@ -1,13 +1,9 @@
 import * as d from '../../declarations';
 import { normalizePath } from '@utils';
-import { URL } from 'url';
+import { relative } from 'path';
 
-
-export function generateServiceWorkerUrl(config: d.Config, outputTarget: d.OutputTargetWww, serviceWorker: d.ServiceWorkerConfig) {
-  let swUrl = normalizePath(config.sys.path.relative(
-    outputTarget.appDir,
-    serviceWorker.swDest
-  ));
+export const generateServiceWorkerUrl = (outputTarget: d.OutputTargetWww, serviceWorker: d.ServiceWorkerConfig) => {
+  let swUrl = normalizePath(relative(outputTarget.appDir, serviceWorker.swDest));
 
   if (swUrl.charAt(0) !== '/') {
     swUrl = '/' + swUrl;
@@ -22,4 +18,4 @@ export function generateServiceWorkerUrl(config: d.Config, outputTarget: d.Outpu
   swUrl = basePath + swUrl.substring(1);
 
   return swUrl;
-}
+};

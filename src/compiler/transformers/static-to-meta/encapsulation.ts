@@ -1,7 +1,6 @@
 import { getStaticValue } from '../transform-utils';
 import ts from 'typescript';
 
-
 export const parseStaticEncapsulation = (staticMembers: ts.ClassElement[]) => {
   let encapsulation: string = getStaticValue(staticMembers, 'encapsulation');
 
@@ -14,7 +13,6 @@ export const parseStaticEncapsulation = (staticMembers: ts.ClassElement[]) => {
 
   return 'none';
 };
-
 
 export const parseStaticShadowDelegatesFocus = (encapsulation: string, staticMembers: ts.ClassElement[]) => {
   if (encapsulation === 'shadow') {

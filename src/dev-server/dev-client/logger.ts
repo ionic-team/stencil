@@ -1,25 +1,20 @@
 import * as d from '../../declarations';
 
-
 export function logBuild(msg: string) {
   log(BLUE, 'Build', msg);
 }
-
 
 export function logReload(msg: string) {
   logWarn('Reload', msg);
 }
 
-
 export function logWarn(prefix: string, msg: string) {
   log(YELLOW, prefix, msg);
 }
 
-
 export function logDisabled(prefix: string, msg: string) {
   log(GRAY, prefix, msg);
 }
-
 
 export function logDiagnostic(diagnostic: d.Diagnostic) {
   let color = RED;
@@ -54,15 +49,9 @@ export function logDiagnostic(diagnostic: d.Diagnostic) {
   log(color, prefix, msg);
 }
 
-
 function log(color: string, prefix: string, msg: string) {
-  console.log.apply(console, [
-    '%c' + prefix,
-    `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`,
-    msg
-  ]);
+  console.log.apply(console, ['%c' + prefix, `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`, msg]);
 }
-
 
 const YELLOW = `#f39c12`;
 const RED = `#c0392b`;

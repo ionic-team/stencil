@@ -8,7 +8,6 @@ import { promisify } from 'util';
 
 const readFile = promisify(fs.readFile);
 
-
 export async function inlineExternalStyleSheets(appDir: string, doc: Document) {
   const { optimizeCss } = await import('@stencil/core/compiler');
 
@@ -27,7 +26,7 @@ export async function inlineExternalStyleSheets(appDir: string, doc: Document) {
         let styles = await readFile(fsPath, 'utf8');
 
         const optimizeResults = await optimizeCss({
-          input: styles
+          input: styles,
         });
         styles = optimizeResults.output;
 
@@ -47,46 +46,44 @@ export async function inlineExternalStyleSheets(appDir: string, doc: Document) {
 
         // move <link rel="stylesheet"> to the end of <body>
         doc.body.appendChild(link);
-
-      } catch (e) {
-
-      }
-    })
+      } catch (e) {}
+    }),
   );
 }
 
 export async function minifyScriptElements(doc: Document) {
   const { optimizeJs } = await import('@stencil/core/compiler');
 
-  const scriptElms = (Array.from(doc.querySelectorAll('script')))
-    .filter(scriptElm => {
-      if (scriptElm.hasAttribute('src')) {
-        return false;
-      }
-      const scriptType = scriptElm.getAttribute('type');
-      if (typeof scriptType === 'string' && scriptType !== 'module' && scriptType !== 'text/javascript') {
-        return false;
-      }
-      return true;
-    });
-
-  return Promise.all(scriptElms.map(async scriptElm => {
-    const opts: d.OptimizeJsInput = {
-      input: scriptElm.innerHTML,
-      sourceMap: false,
-      target: 'latest',
-    };
-
-    if (scriptElm.getAttribute('type') !== 'module') {
-      opts.target = 'es5';
+  const scriptElms = Array.from(doc.querySelectorAll('script')).filter(scriptElm => {
+    if (scriptElm.hasAttribute('src')) {
+      return false;
     }
-
-    const optimizeResults = await optimizeJs(opts);
-
-    if (optimizeResults.diagnostics.length === 0) {
-      scriptElm.innerHTML = optimizeResults.output;
+    const scriptType = scriptElm.getAttribute('type');
+    if (typeof scriptType === 'string' && scriptType !== 'module' && scriptType !== 'text/javascript') {
+      return false;
     }
-  }));
+    return true;
+  });
+
+  return Promise.all(
+    scriptElms.map(async scriptElm => {
+      const opts: d.OptimizeJsInput = {
+        input: scriptElm.innerHTML,
+        sourceMap: false,
+        target: 'latest',
+      };
+
+      if (scriptElm.getAttribute('type') !== 'module') {
+        opts.target = 'es5';
+      }
+
+      const optimizeResults = await optimizeJs(opts);
+
+      if (optimizeResults.diagnostics.length === 0) {
+        scriptElm.innerHTML = optimizeResults.output;
+      }
+    }),
+  );
 }
 
 export async function minifyStyleElements(doc: Document) {
@@ -94,15 +91,17 @@ export async function minifyStyleElements(doc: Document) {
 
   const styleElms = Array.from(doc.querySelectorAll('style'));
 
-  await Promise.all(styleElms.map(async styleElm => {
-    const optimizeResults = await optimizeCss({
-      input: styleElm.innerHTML,
-      minify: true,
-    });
-    if (optimizeResults.diagnostics.length === 0) {
-      styleElm.innerHTML = optimizeResults.output;
-    }
-  }));
+  await Promise.all(
+    styleElms.map(async styleElm => {
+      const optimizeResults = await optimizeCss({
+        input: styleElm.innerHTML,
+        minify: true,
+      });
+      if (optimizeResults.diagnostics.length === 0) {
+        styleElm.innerHTML = optimizeResults.output;
+      }
+    }),
+  );
 }
 
 export function addModulePreloads(doc: Document, hydrateResults: d.HydrateResults, componentGraph: Map<string, string[]>) {
@@ -110,13 +109,7 @@ export function addModulePreloads(doc: Document, hydrateResults: d.HydrateResult
     return false;
   }
 
-  const modulePreloads = unique(
-    flatOne(
-      hydrateResults.components
-        .map(cmp => getScopeId(cmp.tag, cmp.mode))
-        .map(scopeId => componentGraph.get(scopeId) || [])
-    )
-  );
+  const modulePreloads = unique(flatOne(hydrateResults.components.map(cmp => getScopeId(cmp.tag, cmp.mode)).map(scopeId => componentGraph.get(scopeId) || [])));
 
   injectModulePreloads(doc, modulePreloads);
   return true;

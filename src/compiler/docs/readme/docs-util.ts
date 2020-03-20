@@ -1,6 +1,5 @@
 import * as d from '../../../declarations';
 
-
 export class MarkdownTable {
   private rows: RowData[] = [];
 
@@ -14,21 +13,20 @@ export class MarkdownTable {
     data.forEach(text => {
       const col: ColumnData = {
         text: escapeMarkdownTableColumn(text),
-        width: text.length
+        width: text.length,
       };
       colData.push(col);
     });
 
     this.rows.push({
       columns: colData,
-      isHeader: isHeader
+      isHeader: isHeader,
     });
   }
 
   toMarkdown() {
     return createTable(this.rows);
   }
-
 }
 
 const escapeMarkdownTableColumn = (text: string) => {
@@ -64,13 +62,13 @@ const createTable = (rows: RowData[]) => {
 const createBorder = (th: RowData) => {
   const border: RowData = {
     columns: [],
-    isHeader: false
+    isHeader: false,
   };
 
   th.columns.forEach(c => {
     const borderCol: ColumnData = {
       text: '',
-      width: c.width
+      width: c.width,
     };
     while (borderCol.text.length < borderCol.width) {
       borderCol.text += '-';
@@ -105,7 +103,7 @@ const normalizeColumCount = (rows: RowData[]) => {
     while (r.columns.length < columnCount) {
       r.columns.push({
         text: ``,
-        width: 0
+        width: 0,
       });
     }
   });
@@ -175,7 +173,7 @@ export const getMethodParameters = ({ parameters }: d.JsDoc): d.JsonDocMethodPar
     return parameters.map(({ name, type, documentation }) => ({
       name,
       type,
-      docs: documentation
+      docs: documentation,
     }));
   }
   return [];
@@ -185,8 +183,8 @@ export const getMethodReturns = ({ returns }: d.JsDoc): d.JsonDocsMethodReturn =
   if (returns) {
     return {
       type: returns.type,
-      docs: returns.documentation
+      docs: returns.documentation,
     };
   }
   return null;
-}
+};

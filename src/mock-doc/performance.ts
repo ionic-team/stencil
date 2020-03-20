@@ -1,4 +1,3 @@
-
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/Performance
  */
@@ -76,7 +75,6 @@ export class MockPerformance implements Performance {
   toJSON() {
     //
   }
-
 }
 
 export function resetPerformance(perf: Performance) {

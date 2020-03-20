@@ -2,7 +2,6 @@ import { MockDocument, createDocument } from '../document';
 import { MockStyleElement } from '../element';
 import { MockCSSStyleSheet } from '../css-style-sheet';
 
-
 describe('css-style-sheet', () => {
   let doc: MockDocument;
   let style: MockStyleElement;
@@ -79,5 +78,4 @@ describe('css-style-sheet', () => {
     doc.head.appendChild(style2);
     expect(doc.styleSheets).toHaveLength(2);
   });
-
 });

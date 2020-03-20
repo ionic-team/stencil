@@ -18,10 +18,7 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
     if (typeof manager.prerenderConfig.robotsTxt !== 'function') {
       // not set to null, but also no config.robotsTxt(), so let's make a default
       manager.prerenderConfig.robotsTxt = function robotsTxt(opts) {
-        const content = [
-          `User-agent: *`,
-          `Disallow:`
-        ];
+        const content = [`User-agent: *`, `Disallow:`];
         if (typeof opts.sitemapUrl === 'string') {
           content.push(`Sitemap: ${opts.sitemapUrl}`);
         }
@@ -33,7 +30,7 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
       urls: getSitemapUrls(manager),
       baseUrl: manager.outputTarget.baseUrl,
       sitemapUrl: sitemapResults ? sitemapResults.url : null,
-      dir: manager.outputTarget.dir
+      dir: manager.outputTarget.dir,
     };
 
     const userResults = manager.prerenderConfig.robotsTxt(opts);
@@ -44,12 +41,11 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
     const results: d.RobotsTxtResults = {
       content: null,
       filePath: null,
-      url: null
+      url: null,
     };
 
     if (typeof userResults === 'string') {
       results.content = userResults;
-
     } else {
       results.content = userResults.content;
       results.filePath = userResults.filePath;
@@ -74,7 +70,6 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
     await writeFile(results.filePath, results.content);
 
     return results;
-
   } catch (e) {
     catchError(manager.diagnostics, e);
     return null;

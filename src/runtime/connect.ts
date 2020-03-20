@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { doc } from '@platform';
 
-
 export const getConnect = (_ref: d.HostRef, tagName: string) => {
   const componentOnReady = (): Promise<any> => {
     let elm = doc.querySelector(tagName) as any;
@@ -13,8 +12,7 @@ export const getConnect = (_ref: d.HostRef, tagName: string) => {
   };
 
   const create = (...args: any[]) => {
-    return componentOnReady()
-      .then(el => el.create(...args));
+    return componentOnReady().then(el => el.create(...args));
   };
 
   return {

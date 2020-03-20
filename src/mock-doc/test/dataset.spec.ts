@@ -1,6 +1,5 @@
 import { createDocument } from '../document';
 
-
 describe('dataset', () => {
   const doc = createDocument();
   let elm: HTMLElement;
@@ -12,7 +11,7 @@ describe('dataset', () => {
   it('get dataset object', () => {
     elm.dataset.milesPerHour = '88';
     expect(elm.dataset).toEqual({
-      milesPerHour: '88'
+      milesPerHour: '88',
     });
   });
 
@@ -35,7 +34,7 @@ describe('dataset', () => {
     elm.dataset.milesPerHour = '88';
     expect(elm.getAttribute('data-miles-per-hour')).toBe('88');
     expect(elm.dataset).toEqual({
-      milesPerHour: '88'
+      milesPerHour: '88',
     });
   });
 
@@ -48,5 +47,4 @@ describe('dataset', () => {
     elm.dataset['mph'] = '88';
     expect(elm.getAttribute('data-mph')).toBe('88');
   });
-
 });

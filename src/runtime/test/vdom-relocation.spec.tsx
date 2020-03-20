@@ -1,9 +1,7 @@
 import { Component, Listen, State, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('vdom-relocation', () => {
-
   it('', async () => {
     @Component({
       tag: 'my-root',
@@ -18,7 +16,9 @@ describe('vdom-relocation', () => {
       render() {
         return (
           <my-child>
-            {this.data.map(a => <div>{a}</div>)}
+            {this.data.map(a => (
+              <div>{a}</div>
+            ))}
           </my-child>
         );
       }
@@ -28,10 +28,9 @@ describe('vdom-relocation', () => {
       tag: 'my-child',
     })
     class Child {
-
       render() {
         return (
-          <div class='wrapper'>
+          <div class="wrapper">
             <slot></slot>
           </div>
         );
@@ -54,10 +53,10 @@ describe('vdom-relocation', () => {
   </my-child>
 </my-root>`);
 
-  root.click();
-  await waitForChanges();
+    root.click();
+    await waitForChanges();
 
-  expect(root).toEqualHtml(`
+    expect(root).toEqualHtml(`
   <my-root>
     <my-child>
       <div class=\"wrapper\">

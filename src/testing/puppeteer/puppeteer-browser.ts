@@ -1,7 +1,6 @@
 import { Config, E2EProcessEnv } from '@stencil/core/internal';
 import * as puppeteer from 'puppeteer';
 
-
 export async function startPuppeteerBrowser(config: Config) {
   if (!config.flags.e2e) {
     return null;
@@ -41,17 +40,17 @@ export async function startPuppeteerBrowser(config: Config) {
     args: config.testing.browserArgs,
     headless: config.testing.browserHeadless,
     devtools: config.testing.browserDevtools,
-    slowMo: config.testing.browserSlowMo
+    slowMo: config.testing.browserSlowMo,
   };
 
   if (config.testing.browserExecutablePath) {
     launchOpts.executablePath = config.testing.browserExecutablePath;
   }
 
-  const browser = await ((config.testing.browserWSEndpoint)
+  const browser = await (config.testing.browserWSEndpoint
     ? puppeteer.connect({
         ...launchOpts,
-        browserWSEndpoint: config.testing.browserWSEndpoint
+        browserWSEndpoint: config.testing.browserWSEndpoint,
       })
     : puppeteer.launch({
         ...launchOpts,
@@ -63,7 +62,6 @@ export async function startPuppeteerBrowser(config: Config) {
 
   return browser;
 }
-
 
 export async function connectBrowser() {
   // the reason we're connecting to the browser from
@@ -79,14 +77,13 @@ export async function connectBrowser() {
 
   const connectOpts: puppeteer.ConnectOptions = {
     browserWSEndpoint: wsEndpoint,
-    ignoreHTTPSErrors: true
+    ignoreHTTPSErrors: true,
   };
 
   const puppeteer = require(env.__STENCIL_PUPPETEER_MODULE__);
 
   return await puppeteer.connect(connectOpts);
 }
-
 
 export async function disconnectBrowser(browser: puppeteer.Browser) {
   if (browser) {

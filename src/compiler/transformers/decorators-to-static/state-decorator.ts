@@ -3,8 +3,13 @@ import { createStaticGetter } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
-
-export const stateDecoratorsToStatic = (_diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], _typeChecker: ts.TypeChecker, watchable: Set<string>, newMembers: ts.ClassElement[]) => {
+export const stateDecoratorsToStatic = (
+  _diagnostics: d.Diagnostic[],
+  decoratedProps: ts.ClassElement[],
+  _typeChecker: ts.TypeChecker,
+  watchable: Set<string>,
+  newMembers: ts.ClassElement[],
+) => {
   const states = decoratedProps
     .filter(ts.isPropertyDeclaration)
     .map(prop => stateDecoratorToStatic(prop, watchable))
@@ -14,7 +19,6 @@ export const stateDecoratorsToStatic = (_diagnostics: d.Diagnostic[], decoratedP
     newMembers.push(createStaticGetter('states', ts.createObjectLiteral(states, true)));
   }
 };
-
 
 const stateDecoratorToStatic = (prop: ts.PropertyDeclaration, watchable: Set<string>) => {
   const stateDecorator = prop.decorators.find(isDecoratorNamed('State'));

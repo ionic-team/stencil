@@ -2,17 +2,16 @@ import * as d from '../../declarations';
 import { augmentDiagnosticWithNode, buildWarn } from '@utils';
 import ts from 'typescript';
 
-
-export const validatePublicName = (config: d.Config, diagnostics: d.Diagnostic[], memberName: string, decorator: string, memberType: string, node: ts.Node) => {
+export const validatePublicName = (diagnostics: d.Diagnostic[], memberName: string, decorator: string, memberType: string, node: ts.Node) => {
   if (RESERVED_PUBLIC_MEMBERS.has(memberName.toLowerCase())) {
     const warn = buildWarn(diagnostics);
     warn.messageText = [
       `The ${decorator} name "${memberName}" is a reserved public name. `,
       `Please rename the "${memberName}" ${memberType} so it does not conflict with an existing standardized prototype member. `,
       `Reusing ${memberType} names that are already defined on the element's prototype may cause `,
-      `unexpected runtime errors or user-interface issues on various browsers, so it's best to avoid them entirely.`
+      `unexpected runtime errors or user-interface issues on various browsers, so it's best to avoid them entirely.`,
     ].join('');
-    augmentDiagnosticWithNode(config, warn, node);
+    augmentDiagnosticWithNode(warn, node);
     return;
   }
 };
@@ -118,7 +117,7 @@ const HTML_ELEMENT_KEYS = [
   'nonce',
   'click',
   'focus',
-  'blur'
+  'blur',
 ];
 
 const ELEMENT_KEYS = [
@@ -210,7 +209,7 @@ const ELEMENT_KEYS = [
   'webkitRequestFullscreen',
   'part',
   'createShadowRoot',
-  'getDestinationInsertionPoints'
+  'getDestinationInsertionPoints',
 ];
 
 const NODE_KEYS = [
@@ -260,19 +259,11 @@ const NODE_KEYS = [
   'insertBefore',
   'appendChild',
   'replaceChild',
-  'removeChild'
+  'removeChild',
 ];
 
-const JSX_KEYS = [
-  'ref',
-  'key'
-];
+const JSX_KEYS = ['ref', 'key'];
 
-const ALL_KEYS = [
-  ...HTML_ELEMENT_KEYS,
-  ...ELEMENT_KEYS,
-  ...NODE_KEYS,
-  ...JSX_KEYS,
-].map(p => p.toLowerCase());
+const ALL_KEYS = [...HTML_ELEMENT_KEYS, ...ELEMENT_KEYS, ...NODE_KEYS, ...JSX_KEYS].map(p => p.toLowerCase());
 
 const RESERVED_PUBLIC_MEMBERS = new Set(ALL_KEYS);

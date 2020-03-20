@@ -3,7 +3,6 @@ import { NODE_NAMES, NODE_TYPES } from './constants';
 import { getElementById } from './document';
 
 export class MockDocumentFragment extends MockHTMLElement {
-
   constructor(ownerDocument: any) {
     super(ownerDocument, null);
     this.nodeName = NODE_NAMES.DOCUMENT_FRAGMENT_NODE;
@@ -29,5 +28,4 @@ export class MockDocumentFragment extends MockHTMLElement {
 
     return cloned;
   }
-
 }

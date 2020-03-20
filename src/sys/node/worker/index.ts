@@ -1,26 +1,32 @@
 import * as d from '../../../declarations';
 import { EventEmitter } from 'events';
 import { TASK_CANCELED_MSG } from '@utils';
-import { WorkerMain } from './worker-main';
+import { NodeWorkerMain } from './worker-main';
+import { cpus } from 'os';
 
-
-export class WorkerManager extends EventEmitter {
+export class NodeWorkerController extends EventEmitter implements d.WorkerMainController {
   workerIds = 0;
-  taskIds = 0;
+  stencilId = 0;
   isEnding = false;
-  mainThreadRunner: d.WorkerRunner;
-  taskQueue: d.WorkerTask[] = [];
-  workers: WorkerMain[] = [];
-  useForkedWorkers = false;
+  taskQueue: d.CompilerWorkerTask[] = [];
+  workers: NodeWorkerMain[] = [];
+  totalWorkers: number;
+  useForkedWorkers: boolean;
+  mainThreadRunner: { [fnName: string]: (...args: any[]) => Promise<any> };
 
-
-  constructor(public modulePath: string, public options: d.WorkerOptions) {
+  constructor(public workerDomain: string, public forkModulePath: string, maxConcurrentWorkers: number, public logger: d.Logger) {
     super();
+    const osCpus = cpus().length;
 
-    this.useForkedWorkers = (this.options.maxConcurrentWorkers > 1);
+    this.useForkedWorkers = maxConcurrentWorkers > 0;
+    this.totalWorkers = Math.max(Math.min(maxConcurrentWorkers, osCpus), 2) - 1;
 
     if (this.useForkedWorkers) {
+      // start up the forked child processes
       this.startWorkers();
+    } else {
+      // run on the main thread by just requiring the module
+      this.mainThreadRunner = require(forkModulePath);
     }
   }
 
@@ -28,8 +34,8 @@ export class WorkerManager extends EventEmitter {
     if (err.code === 'ERR_IPC_CHANNEL_CLOSED') {
       return this.stopWorker(workerId);
     }
-    if (this.options.logger && err.code !== 'EPIPE') {
-      this.options.logger.error(err);
+    if (err.code !== 'EPIPE') {
+      this.logger.error(err);
     }
   }
 
@@ -38,13 +44,13 @@ export class WorkerManager extends EventEmitter {
       let doQueue = false;
       const worker = this.workers.find(w => w.id === workerId);
 
-      if (worker && worker.tasks.length > 0) {
-        for (const task of worker.tasks) {
-          task.retries++;
-          this.taskQueue.unshift(task);
+      if (worker) {
+        worker.tasks.forEach(t => {
+          t.retries++;
+          this.taskQueue.unshift(t);
           doQueue = true;
-        }
-        worker.tasks.length = 0;
+        });
+        worker.tasks.clear();
       }
 
       this.stopWorker(workerId);
@@ -56,14 +62,14 @@ export class WorkerManager extends EventEmitter {
   }
 
   startWorkers() {
-    while (this.workers.length < this.options.maxConcurrentWorkers) {
+    while (this.workers.length < this.totalWorkers) {
       this.startWorker();
     }
   }
 
   startWorker() {
     const workerId = this.workerIds++;
-    const worker = new WorkerMain(workerId, this.modulePath);
+    const worker = new NodeWorkerMain(this.workerDomain, workerId, this.forkModulePath);
 
     worker.on('response', this.processTaskQueue.bind(this));
 
@@ -81,13 +87,6 @@ export class WorkerManager extends EventEmitter {
   stopWorker(workerId: number) {
     const worker = this.workers.find(w => w.id === workerId);
     if (worker) {
-      if (!worker.successfulMessage) {
-        // never successfully sent a message
-        // so something must be wrong, let's just
-        // use the main thread runner from now on
-        this.useForkedWorkers = false;
-      }
-
       worker.stop();
 
       const index = this.workers.indexOf(worker);
@@ -98,15 +97,16 @@ export class WorkerManager extends EventEmitter {
   }
 
   processTaskQueue() {
-    if (this.isEnding || this.taskQueue.length === 0) {
+    if (this.isEnding) {
       return;
     }
 
-    this.startWorkers();
+    if (this.useForkedWorkers) {
+      this.startWorkers();
+    }
 
     while (this.taskQueue.length > 0) {
-      const nextTask = this.taskQueue[0];
-      const worker = getWorker(nextTask, this.workers, this.options.maxConcurrentTasksPerWorker);
+      const worker = getNextWorker(this.workers);
       if (!worker) {
         break;
       }
@@ -114,22 +114,20 @@ export class WorkerManager extends EventEmitter {
     }
   }
 
-  run(method: string, args?: any[], opts: d.WorkerRunnerOptions = {}) {
+  send(...args: any[]) {
     if (this.isEnding) {
       return Promise.reject(TASK_CANCELED_MSG);
     }
 
     if (this.useForkedWorkers) {
+      // queue to be sent to a forked child process
       return new Promise<any>((resolve, reject) => {
-        const task: d.WorkerTask = {
-          taskId: this.taskIds++,
-          method: method,
-          args: args,
+        const task: d.CompilerWorkerTask = {
+          stencilId: this.stencilId++,
+          inputArgs: args,
           retries: 0,
           resolve: resolve,
           reject: reject,
-          isLongRunningTask: !!opts.isLongRunningTask,
-          workerKey: opts.workerKey
         };
         this.taskQueue.push(task);
 
@@ -137,23 +135,22 @@ export class WorkerManager extends EventEmitter {
       });
     }
 
-    if (!this.mainThreadRunner) {
-      const workerModule = require(this.modulePath);
-      this.mainThreadRunner = new workerModule.createRunner();
-    }
+    // run on the main thread, no forked child processes
+    return this.mainThreadRunner[args[0]].apply(null, args.slice(1));
+  }
 
-    return this.mainThreadRunner(method, args);
+  handler(name: string) {
+    return (...args: any[]) => {
+      return this.send(name, ...args);
+    };
   }
 
   cancelTasks() {
     for (const worker of this.workers) {
-      for (const task of worker.tasks) {
-        task.reject(TASK_CANCELED_MSG);
-      }
-      worker.tasks.length = 0;
+      worker.tasks.forEach(t => t.reject(TASK_CANCELED_MSG));
+      worker.tasks.clear();
     }
     this.taskQueue.length = 0;
-    this.taskIds = 0;
   }
 
   destroy() {
@@ -172,57 +169,12 @@ export class WorkerManager extends EventEmitter {
       }
     }
   }
-
 }
 
-
-function getWorker(task: d.WorkerTask, workers: WorkerMain[], maxConcurrentTasksPerWorker: number) {
-  if (task.workerKey) {
-    return getWorkerFromKey(workers, maxConcurrentTasksPerWorker, task.workerKey);
-  }
-
-  return getNextWorker(workers, maxConcurrentTasksPerWorker);
-}
-
-
-export function getWorkerFromKey(workers: WorkerMain[], maxConcurrentTasksPerWorker: number, workerKey: string) {
-  let workerFromKey = workers.find(w => w.workerKeys.includes(workerKey));
-  if (workerFromKey) {
-    return workerFromKey;
-  }
-
-  workerFromKey = getNextWorker(workers, maxConcurrentTasksPerWorker);
-  if (!workerFromKey) {
-    workerFromKey = workers.find(w => w.workerKeys.length === 0);
-    if (!workerFromKey) {
-      workerFromKey = workers[0];
-    }
-  }
-
-  workerFromKey.workerKeys.push(workerKey);
-
-  return workerFromKey;
-}
-
-
-export function getNextWorker(workers: WorkerMain[], maxConcurrentTasksPerWorker: number) {
+export function getNextWorker(workers: NodeWorkerMain[]) {
   const availableWorkers = workers.filter(w => {
     if (w.stopped) {
       // nope, don't use this worker if it's exiting
-      return false;
-    }
-
-    if (w.tasks.length >= maxConcurrentTasksPerWorker) {
-      // do not use this worker if it's at its max
-      return false;
-    }
-
-    // see if any of the worker's tasks has a long running task
-    if (w.tasks.some(t => t.isLongRunningTask)) {
-      // one of the tasks for this worker is a long running task
-      // so leave this worker alone and let it focus
-      // basically so the many little tasks don't have to wait up on the long task
-      // (validatingType locks up the thread, so don't use that thread for the time being!)
       return false;
     }
 
@@ -238,8 +190,8 @@ export function getNextWorker(workers: WorkerMain[], maxConcurrentTasksPerWorker
 
   const sorted = availableWorkers.sort((a, b) => {
     // worker with the fewest active tasks first
-    if (a.tasks.length < b.tasks.length) return -1;
-    if (a.tasks.length > b.tasks.length) return 1;
+    if (a.tasks.size < b.tasks.size) return -1;
+    if (a.tasks.size > b.tasks.size) return 1;
 
     // all workers have the same number of active tasks, so next sort
     // by worker with the fewest total tasks that have been assigned
@@ -250,4 +202,10 @@ export function getNextWorker(workers: WorkerMain[], maxConcurrentTasksPerWorker
   });
 
   return sorted[0];
+}
+
+export function setupWorkerController(sys: d.CompilerSystem, logger: d.Logger, workerDomain: string) {
+  sys.createWorkerController = function(compilerPath, maxConcurrentWorkers) {
+    return new NodeWorkerController(workerDomain, compilerPath, maxConcurrentWorkers, logger);
+  };
 }

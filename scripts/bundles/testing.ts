@@ -10,16 +10,12 @@ import { replacePlugin } from './plugins/replace-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { RollupOptions, OutputOptions } from 'rollup';
 
-
 export async function testing(opts: BuildOptions) {
   const inputDir = join(opts.transpiledDir, 'testing');
 
   await Promise.all([
     // copy jest testing entry files
-    fs.copy(
-      join(opts.scriptsBundlesDir, 'helpers', 'jest'),
-      opts.output.testingDir
-    ),
+    fs.copy(join(opts.scriptsBundlesDir, 'helpers', 'jest'), opts.output.testingDir),
     copyTestingInternalDts(opts, inputDir),
   ]);
 
@@ -28,7 +24,7 @@ export async function testing(opts: BuildOptions) {
     name: '@stencil/core/testing',
     description: 'Stencil testing suite.',
     main: 'index.js',
-    types: 'index.d.ts'
+    types: 'index.d.ts',
   });
 
   const external = [
@@ -61,7 +57,7 @@ export async function testing(opts: BuildOptions) {
     'util',
     'vm',
     'yargs',
-    'zlib'
+    'zlib',
   ];
 
   const output: OutputOptions = {
@@ -86,46 +82,42 @@ export async function testing(opts: BuildOptions) {
           if (importee === '@stencil/core/compiler') {
             return {
               id: '../compiler/stencil.js',
-              external: true
+              external: true,
             };
           }
           if (importee === 'chalk') {
             return require.resolve('ansi-colors');
           }
           return null;
-        }
+        },
       },
       aliasPlugin(opts),
       replacePlugin(opts),
       rollupResolve({
-        preferBuiltins: true
+        preferBuiltins: true,
       }),
       rollupCommonjs(),
       rollupJson({
-        preferConst: true
+        preferConst: true,
       }),
-    ]
+    ],
   };
 
-  return [
-    testingBundle,
-  ];
+  return [testingBundle];
 }
 
 async function copyTestingInternalDts(opts: BuildOptions, inputDir: string) {
   // copy testing d.ts files
 
-  await fs.copy(
-    join(inputDir),
-    join(opts.output.testingDir),
-    { filter: f => {
+  await fs.copy(join(inputDir), join(opts.output.testingDir), {
+    filter: f => {
       if (f.endsWith('.d.ts')) {
         return true;
       }
       if (fs.statSync(f).isDirectory() && !f.includes('platform')) {
         return true;
       }
-      return false
-    } }
-  )
+      return false;
+    },
+  });
 }

@@ -9,12 +9,8 @@ import { forceUpdate, getHostRef, registerHost, styles, supportsShadow } from '@
 import { proxyComponent } from './proxy-component';
 import { PROXY_FLAGS } from './runtime-constants';
 
-
 export const defineCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
-  customElements.define(
-    compactMeta[1],
-    proxyCustomElement(Cstr, compactMeta) as CustomElementConstructor
-  );
+  customElements.define(compactMeta[1], proxyCustomElement(Cstr, compactMeta) as CustomElementConstructor);
 };
 
 export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
@@ -55,7 +51,7 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
       if (BUILD.disconnectedCallback && originalDisconnectedCallback) {
         originalDisconnectedCallback.call(this);
       }
-    }
+    },
   });
   return proxyComponent(Cstr, cmpMeta, PROXY_FLAGS.isElementConstructor | PROXY_FLAGS.proxyState);
 };

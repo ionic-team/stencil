@@ -1,11 +1,10 @@
 import * as d from '../../../declarations';
-import { DEFAULT_STYLE_MODE, sortBy } from '@utils';
 import { ConvertIdentifier, getStaticValue } from '../transform-utils';
+import { DEFAULT_STYLE_MODE, sortBy } from '@utils';
 import { normalizeStyles } from '../../style/normalize-styles';
 import ts from 'typescript';
 
-
-export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, tagName: string, componentFilePath: string, isCollectionDependency: boolean, staticMembers: ts.ClassElement[]) => {
+export const parseStaticStyles = (compilerCtx: d.CompilerCtx, tagName: string, componentFilePath: string, isCollectionDependency: boolean, staticMembers: ts.ClassElement[]) => {
   const styles: d.StyleCompiler[] = [];
   const styleUrlsProp = isCollectionDependency ? 'styleUrls' : 'originalStyleUrls';
   const parsedStyleUrls = getStaticValue(staticMembers, styleUrlsProp) as d.CompilerModeStyles;
@@ -25,15 +24,13 @@ export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, 
           compiledStyleText: null,
           compiledStyleTextScoped: null,
           compiledStyleTextScopedCommented: null,
-          externalStyles: []
+          externalStyles: [],
         });
         compilerCtx.styleModeNames.add(DEFAULT_STYLE_MODE);
       }
-
     } else if ((parsedStyle as ConvertIdentifier).__identifier) {
       styles.push(parseStyleIdentifier(parsedStyle, DEFAULT_STYLE_MODE));
       compilerCtx.styleModeNames.add(DEFAULT_STYLE_MODE);
-
     } else if (typeof parsedStyle === 'object') {
       Object.keys(parsedStyle).forEach(modeName => {
         const parsedStyleMode = parsedStyle[modeName];
@@ -52,7 +49,7 @@ export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, 
           externalStyles.push({
             absolutePath: null,
             relativePath: null,
-            originalComponentPath: styleUrl.trim()
+            originalComponentPath: styleUrl.trim(),
           });
         }
       });
@@ -66,7 +63,7 @@ export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, 
           compiledStyleText: null,
           compiledStyleTextScoped: null,
           compiledStyleTextScopedCommented: null,
-          externalStyles: externalStyles
+          externalStyles: externalStyles,
         };
 
         styles.push(style);
@@ -75,7 +72,7 @@ export const parseStaticStyles = (config: d.Config, compilerCtx: d.CompilerCtx, 
     });
   }
 
-  normalizeStyles(config, tagName, componentFilePath, styles);
+  normalizeStyles(tagName, componentFilePath, styles);
 
   return sortBy(styles, s => s.modeName);
 };
@@ -89,7 +86,7 @@ const parseStyleIdentifier = (parsedStyle: ConvertIdentifier, modeName: string) 
     compiledStyleText: null,
     compiledStyleTextScoped: null,
     compiledStyleTextScopedCommented: null,
-    externalStyles: []
+    externalStyles: [],
   };
   return style;
 };

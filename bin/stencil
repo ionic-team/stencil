@@ -14,22 +14,13 @@ try {
   }
 } catch (e) {}
 
-if (process.argv.indexOf('--legacy') === -1) {
-  if (process.argv.indexOf('--next') > -1) {
-    console.warn('\nThe next compiler is now the default and the --next flag is no longer needed.\n');
-  }
-  var cli = require('../cli/index.js');
-  cli.run({
-    process: process,
-    logger: cli.createNodeLogger(process),
-    sys: cli.createNodeSystem(process)
-  });
-
-} else {
-  var cliLegacy = require('../cli/index_legacy.js');
-  var nodeLegacy = require('../sys/node/index.js');
-  var sysLegacy = new nodeLegacy.NodeSystem();
-  var loggerLegacy = new nodeLegacy.NodeLogger();
-
-  cliLegacy.run(process, sysLegacy, loggerLegacy);
+if (process.argv.indexOf('--next') > -1) {
+  console.warn('\nThe next compiler is now the default and the --next flag is no longer needed.\n');
 }
+
+var cli = require('../cli/index.js');
+cli.run({
+  process: process,
+  logger: cli.createNodeLogger(process),
+  sys: cli.createNodeSystem(process)
+});

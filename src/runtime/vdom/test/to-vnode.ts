@@ -2,7 +2,6 @@ import * as d from '../../../declarations';
 import { NODE_TYPE } from '../../runtime-constants';
 import { newVNode } from '../h';
 
-
 export function toVNode(node: Node): d.VNode {
   if (node.nodeType === NODE_TYPE.TextNode) {
     const vnode: d.VNode = newVNode(null, node.textContent);

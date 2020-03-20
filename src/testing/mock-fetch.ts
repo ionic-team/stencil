@@ -1,9 +1,7 @@
 import { MockHeaders, MockRequestInfo, MockResponse } from '@stencil/core/mock-doc';
 import { URL } from 'url';
 
-
 const mockedResponses = new Map<string, MockedResponseData>();
-
 
 export function setupMockFetch(global: any) {
   const win = global.window;
@@ -31,7 +29,7 @@ async function globalMockFetch(requestInput: MockRequestInfo) {
     throw new Error(`invalid url for mock fetch()`);
   }
 
-  requestUrl = (new URL(requestUrl, location.href)).href;
+  requestUrl = new URL(requestUrl, location.href).href;
 
   let mockedData = mockedResponses.get(requestUrl);
   if (mockedData == null) {
@@ -67,7 +65,7 @@ async function globalMockFetch(requestInput: MockRequestInfo) {
     }
   }
 
-  mockedResponse.ok = (mockedResponse.status >= 200 && mockedResponse.status <= 299);
+  mockedResponse.ok = mockedResponse.status >= 200 && mockedResponse.status <= 299;
 
   if (typeof mockedResponse.type !== 'string') {
     mockedResponse.type = 'basic';
@@ -75,7 +73,6 @@ async function globalMockFetch(requestInput: MockRequestInfo) {
 
   return mockedResponse;
 }
-
 
 function setMockedResponse(response: MockResponse, input: MockRequestInfo, reject: boolean) {
   if (!response) {
@@ -107,12 +104,11 @@ export function mockFetchReset() {
 }
 
 export const mockFetch = {
-
   json(data: any, url?: string) {
     const rsp = new MockResponse(JSON.stringify(data, null, 2), {
       headers: new MockHeaders({
-        'Content-Type': 'application/json'
-      })
+        'Content-Type': 'application/json',
+      }),
     });
     setMockedResponse(rsp, url, false);
   },
@@ -120,8 +116,8 @@ export const mockFetch = {
   text(data: string, url?: string) {
     const rsp = new MockResponse(data, {
       headers: new MockHeaders({
-        'Content-Type': 'text/plain'
-      })
+        'Content-Type': 'text/plain',
+      }),
     });
     setMockedResponse(rsp, url, false);
   },
@@ -134,18 +130,17 @@ export const mockFetch = {
     setMockedResponse(rsp, url, true);
   },
 
-  reset: mockFetchReset
+  reset: mockFetchReset,
 };
-
 
 class MockResponse404 extends MockResponse {
   status = 404;
-  statusText = 'Not Found'
+  statusText = 'Not Found';
   constructor() {
     super('', {
       headers: new MockHeaders({
-        'Content-Type': 'text/plain'
-      })
+        'Content-Type': 'text/plain',
+      }),
     });
   }
   async json() {
@@ -155,7 +150,6 @@ class MockResponse404 extends MockResponse {
     return 'Not Found';
   }
 }
-
 
 interface MockedResponseData {
   response: MockResponse;

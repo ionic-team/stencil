@@ -1,10 +1,8 @@
 import { Component, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('render-text', () => {
-
-  @Component({ tag: 'cmp-a'})
+  @Component({ tag: 'cmp-a' })
   class CmpA {
     render() {
       return 'Hello World';
@@ -24,7 +22,7 @@ describe('render-text', () => {
 
   it('Hello World, innerHTML, await waitForChanges', async () => {
     const { body, waitForChanges } = await newSpecPage({
-      components: [CmpA]
+      components: [CmpA],
     });
 
     body.innerHTML = `<cmp-a></cmp-a>`;
@@ -37,7 +35,7 @@ describe('render-text', () => {
 
   it('Hello World, page.setContent, await waitForChanges', async () => {
     const page = await newSpecPage({
-      components: [CmpA]
+      components: [CmpA],
     });
 
     await page.setContent(`<cmp-a></cmp-a>`);
@@ -51,7 +49,7 @@ describe('render-text', () => {
   });
 
   it('Hello World, re-render, waitForChanges', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop() excitement = '';
       render() {

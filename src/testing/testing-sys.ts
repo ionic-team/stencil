@@ -1,15 +1,22 @@
-import { createSystem } from '../compiler_next/sys/stencil-sys';
-import { CompilerSystem } from '@stencil/core/internal';
+import { createSystem } from '../compiler/sys/stencil-sys';
+import { createHash } from 'crypto';
 
-export interface TestingSystem extends CompilerSystem {
-  diskReads: number;
-  diskWrites: number;
-}
-
-export const createTestingSystem = (): TestingSystem => {
+export const createTestingSystem = () => {
   let diskReads = 0;
   let diskWrites = 0;
   const sys = createSystem();
+
+  sys.generateContentHash = (content, length) => {
+    let hash = createHash('sha1')
+      .update(content)
+      .digest('hex')
+      .toLowerCase();
+
+    if (typeof length === 'number') {
+      hash = hash.substr(0, length);
+    }
+    return Promise.resolve(hash);
+  };
 
   const wrapRead = (fn: any) => {
     const orgFn = fn;
@@ -51,7 +58,7 @@ export const createTestingSystem = (): TestingSystem => {
       },
       set(val: number) {
         diskReads = val;
-      }
+      },
     },
     diskWrites: {
       get() {
@@ -59,7 +66,7 @@ export const createTestingSystem = (): TestingSystem => {
       },
       set(val: number) {
         diskWrites = val;
-      }
-    }
+      },
+    },
   });
 };

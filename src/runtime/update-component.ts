@@ -10,7 +10,7 @@ import { emitEvent } from './event-emitter';
 
 export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) => {
   if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$) {
-    ancestorComponent['s-p'].push(new Promise(r => hostRef.$onRenderResolve$ = r));
+    ancestorComponent['s-p'].push(new Promise(r => (hostRef.$onRenderResolve$ = r)));
   }
 };
 
@@ -25,7 +25,7 @@ export const scheduleUpdate = (hostRef: d.HostRef, isInitialLoad: boolean) => {
   const elm = hostRef.$hostElement$;
   const endSchedule = createTime('scheduleUpdate', hostRef.$cmpMeta$.$tagName$);
   const ancestorComponent = hostRef.$ancestorComponent$;
-  const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
+  const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : (elm as any);
   const update = () => updateComponent(hostRef, instance, isInitialLoad);
   attachToAncestor(hostRef, ancestorComponent);
 
@@ -42,7 +42,6 @@ export const scheduleUpdate = (hostRef: d.HostRef, isInitialLoad: boolean) => {
     if (BUILD.cmpWillLoad) {
       promise = safeCall(instance, 'componentWillLoad');
     }
-
   } else {
     emitLifecycleEvent(elm, 'componentWillUpdate');
 
@@ -61,10 +60,7 @@ export const scheduleUpdate = (hostRef: d.HostRef, isInitialLoad: boolean) => {
   // there is no ancestorc omponent or the ancestor component
   // has already fired off its lifecycle update then
   // fire off the initial update
-  return then(promise, BUILD.taskQueue
-    ? () => writeTask(update)
-    : update
-  );
+  return then(promise, BUILD.taskQueue ? () => writeTask(update) : update);
 };
 
 const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boolean) => {
@@ -87,10 +83,7 @@ const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boole
       // looks like we've got child nodes to render into this host element
       // or we need to update the css class/attrs on the host element
       // DOM WRITE!
-      renderVdom(
-        hostRef,
-        callRender(instance),
-      );
+      renderVdom(hostRef, callRender(instance));
     } else {
       elm.textContent = callRender(instance);
     }
@@ -119,7 +112,6 @@ const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boole
           elm['s-en'] = 'c';
         }
       }
-
     } catch (e) {
       consoleError(e);
     }
@@ -159,7 +151,7 @@ let renderingRef: any = null;
 const callRender = (instance: any) => {
   try {
     renderingRef = instance;
-    instance = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
+    instance = BUILD.allRenderFn ? instance.render() : instance.render && instance.render();
   } catch (e) {
     consoleError(e);
   }
@@ -173,7 +165,7 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
   const tagName = hostRef.$cmpMeta$.$tagName$;
   const elm = hostRef.$hostElement$;
   const endPostUpdate = createTime('postUpdate', tagName);
-  const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm as any;
+  const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : (elm as any);
   const ancestorComponent = hostRef.$ancestorComponent$;
 
   if (BUILD.cmpDidRender) {
@@ -214,7 +206,6 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
         appDidLoad(tagName);
       }
     }
-
   } else {
     if (BUILD.cmpDidUpdate) {
       // we've already loaded this component
@@ -262,10 +253,7 @@ export const forceUpdate = (ref: any) => {
     const hostRef = getHostRef(ref);
     const isConnected = hostRef.$hostElement$.isConnected;
     if (isConnected && (hostRef.$flags$ & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
-      scheduleUpdate(
-        hostRef,
-        false
-      );
+      scheduleUpdate(hostRef, false);
     }
     // Returns "true" when the forced update was successfully scheduled
     return isConnected;
@@ -282,9 +270,7 @@ export const appDidLoad = (who: string) => {
   if (!BUILD.hydrateServerSide) {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
-  nextTick(() => (
-    emitEvent(win, 'appload', { detail: {namespace: NAMESPACE}})
-  ));
+  nextTick(() => emitEvent(win, 'appload', { detail: { namespace: NAMESPACE } }));
 
   if (BUILD.profile && performance.measure) {
     performance.measure(`[Stencil] ${NAMESPACE} initial load (by ${who})`, 'st:app:start');
@@ -309,21 +295,16 @@ const then = (promise: Promise<any>, thenFn: () => any) => {
 const emitLifecycleEvent = (elm: EventTarget, lifecycleName: string) => {
   if (BUILD.lifecycleDOMEvents) {
     emitEvent(elm, 'stencil_' + lifecycleName, {
-      'bubbles': true,
-      'composed': true,
+      bubbles: true,
+      composed: true,
       detail: {
-        namespace: NAMESPACE
-      }
+        namespace: NAMESPACE,
+      },
     });
   }
 };
 
-const addHydratedFlag = (elm: Element) =>
-  BUILD.hydratedClass ?
-    elm.classList.add('hydrated') :
-    BUILD.hydratedAttribute ?
-      elm.setAttribute('hydrated', '') :
-      undefined;
+const addHydratedFlag = (elm: Element) => (BUILD.hydratedClass ? elm.classList.add('hydrated') : BUILD.hydratedAttribute ? elm.setAttribute('hydrated', '') : undefined);
 
 const serverSideConnected = (elm: any) => {
   const children = elm.children;

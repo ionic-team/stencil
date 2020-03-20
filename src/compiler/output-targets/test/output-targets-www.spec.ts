@@ -3,16 +3,13 @@ import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
-
-describe('outputTarget, www', () => {
-
+xdescribe('outputTarget, www', () => {
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;
   const root = path.resolve('/');
 
   it('default www files', async () => {
-
     config = mockConfig();
     config.namespace = 'App';
     config.buildAppCore = true;
@@ -63,5 +60,4 @@ describe('outputTarget, www', () => {
       path.join(root, 'User', 'testing', 'dist', 'types', 'stencil.core.d.ts'),
     ]);
   });
-
 });

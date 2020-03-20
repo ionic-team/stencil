@@ -1,11 +1,9 @@
 import { Component } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('globals', () => {
-
   @Component({
-    tag: 'cmp-a'
+    tag: 'cmp-a',
   })
   class CmpA {}
 
@@ -13,7 +11,7 @@ describe('globals', () => {
     const page = await newSpecPage({
       components: [CmpA],
       html: `<p>No component used</p>`,
-      includeAnnotations: true
+      includeAnnotations: true,
     });
     const html = page.doc.documentElement;
     expect(html.classList.contains('hydrated')).toBe(false);
@@ -29,7 +27,7 @@ describe('globals', () => {
     const page = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
-      includeAnnotations: true
+      includeAnnotations: true,
     });
     const html = page.doc.documentElement;
     expect(html.classList.contains('hydrated')).toBe(true);
@@ -37,13 +35,13 @@ describe('globals', () => {
 
   it('should hide non hydrated components', async () => {
     @Component({
-      tag: 'cmp-b'
+      tag: 'cmp-b',
     })
     class CmpB {}
 
-    const {doc} = await newSpecPage({
+    const { doc } = await newSpecPage({
       components: [CmpA, CmpB],
-      includeAnnotations: true
+      includeAnnotations: true,
     });
     expect(doc.head.children[0]).toEqualHtml(`
       <style data-styles>

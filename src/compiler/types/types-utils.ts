@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 
-
 export const COMPONENTS_DTS_HEADER = `
   /* eslint-disable */
   /* tslint:disable */
@@ -9,7 +8,6 @@ export const COMPONENTS_DTS_HEADER = `
    * It contains typing information for all components that exist in this project.
    */
 `;
-
 
 export const sortImportNames = (a: d.TypesMemberNameData, b: d.TypesMemberNameData) => {
   const aName = a.localName.toLowerCase();

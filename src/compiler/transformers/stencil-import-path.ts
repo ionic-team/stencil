@@ -1,14 +1,13 @@
-import { ImportData, ParsedImport, SerializeImportData }from '../../declarations';
+import { ImportData, ParsedImport, SerializeImportData } from '../../declarations';
+import { basename, dirname, isAbsolute, relative } from 'path';
 import { DEFAULT_STYLE_MODE, isString, normalizePath } from '@utils';
-import path from 'path';
-
 
 export const serializeImportPath = (data: SerializeImportData) => {
   let p = data.importeePath;
 
   if (isString(p)) {
-    if (isString(data.importerPath) && path.isAbsolute(data.importeePath)) {
-      p = path.relative(path.dirname(data.importerPath), data.importeePath);
+    if (isString(data.importerPath) && isAbsolute(data.importeePath)) {
+      p = relative(dirname(data.importerPath), data.importeePath);
     }
     p = normalizePath(p);
     if (!p.startsWith('.')) {
@@ -47,7 +46,7 @@ export const parseImportPath = (importPath: string) => {
   if (isString(importPath)) {
     const pathParts = importPath.split('?');
 
-    parsedPath.basename = path.basename(pathParts[0].trim());
+    parsedPath.basename = basename(pathParts[0].trim());
     const extParts = parsedPath.basename.toLowerCase().split('.');
     if (extParts.length > 1) {
       parsedPath.ext = extParts[extParts.length - 1];

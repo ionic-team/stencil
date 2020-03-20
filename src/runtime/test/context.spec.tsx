@@ -2,9 +2,7 @@ import { newSpecPage } from '@stencil/core/testing';
 import { Component, Prop, readTask, writeTask } from '@stencil/core';
 import { QueueApi } from '../../declarations';
 
-
 describe('context', () => {
-
   it('should return default values of context', async () => {
     @Component({
       tag: 'cmp-a',
@@ -19,9 +17,9 @@ describe('context', () => {
       @Prop({ context: 'publicPath' }) publicPath: string;
       @Prop({ context: 'queue' }) queue: QueueApi;
     }
-    const {win, doc, rootInstance} = await newSpecPage({
+    const { win, doc, rootInstance } = await newSpecPage({
       components: [CmpA],
-      html: `<cmp-a></cmp-a>`
+      html: `<cmp-a></cmp-a>`,
     });
 
     expect(rootInstance.win).toEqual(win);
@@ -44,13 +42,13 @@ describe('context', () => {
       @Prop({ context: 'resourcesUrl' }) resourcesUrl: boolean;
       @Prop({ context: 'publicPath' }) publicPath: boolean;
     }
-    const {rootInstance} = await newSpecPage({
+    const { rootInstance } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
       context: {
         resourcesUrl: '/blabla',
-        publicPath: '/blubblub'
-      }
+        publicPath: '/blubblub',
+      },
     });
     expect(rootInstance.resourcesUrl).toEqual('/blabla');
     expect(rootInstance.publicPath).toEqual('/blubblub');
@@ -64,15 +62,14 @@ describe('context', () => {
       @Prop({ context: 'value' }) value: number;
       @Prop({ context: 'unknown' }) unknown: any;
     }
-    const {rootInstance} = await newSpecPage({
+    const { rootInstance } = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
       context: {
-        value: 1234
-      }
+        value: 1234,
+      },
     });
     expect(rootInstance.value).toEqual(1234);
     expect(rootInstance.unknown).toEqual(undefined);
   });
-
 });

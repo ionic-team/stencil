@@ -3,9 +3,7 @@ import { consoleError, getHostRef } from '@platform';
 import { getValue, parsePropertyValue, setValue } from '@runtime';
 import { MEMBER_FLAGS } from '@utils';
 
-
 export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) {
-
   if (typeof elm.componentOnReady !== 'function') {
     elm.componentOnReady = componentOnReady;
   }
@@ -22,7 +20,7 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
       const memberFlags = m[0];
 
       if (memberFlags & MEMBER_FLAGS.Prop) {
-        const attributeName = (m[1] || memberName);
+        const attributeName = m[1] || memberName;
         const attrValue = elm.getAttribute(attributeName);
 
         if (attrValue != null) {
@@ -40,37 +38,35 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
         }
 
         // create the getter/setter on the host element for this property name
-        Object.defineProperty(elm, memberName,
-          {
-            get(this: d.RuntimeRef) {
-              // proxyComponent, get value
-              return getValue(this, memberName);
-            },
-            set(this: d.RuntimeRef, newValue) {
-              // proxyComponent, set value
-              setValue(this, memberName, newValue, cmpMeta);
-            },
-            configurable: true,
-            enumerable: true
-          }
-        );
-
+        Object.defineProperty(elm, memberName, {
+          get(this: d.RuntimeRef) {
+            // proxyComponent, get value
+            return getValue(this, memberName);
+          },
+          set(this: d.RuntimeRef, newValue) {
+            // proxyComponent, set value
+            setValue(this, memberName, newValue, cmpMeta);
+          },
+          configurable: true,
+          enumerable: true,
+        });
       } else if (memberFlags & MEMBER_FLAGS.Method) {
         Object.defineProperty(elm, memberName, {
           value(this: d.HostElement) {
             const ref = getHostRef(this);
             const args = arguments;
             return ref.$onInstancePromise$.then(() => ref.$lazyInstance$[memberName].apply(ref.$lazyInstance$, args)).catch(consoleError);
-          }
+          },
         });
       }
     });
   }
 }
 
-
 function componentOnReady(this: d.HostElement) {
   return getHostRef(this).$onReadyPromise$;
 }
 
-function forceUpdate(this: d.HostElement) {/**/}
+function forceUpdate(this: d.HostElement) {
+  /**/
+}

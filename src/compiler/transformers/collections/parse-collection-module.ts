@@ -1,9 +1,9 @@
 import * as d from '../../../declarations';
+import { dirname, join, relative } from 'path';
 import { normalizePath } from '@utils';
-import { parseCollectionManifestLegacy } from './parse-collection-manifest';
+import { parseCollectionManifest } from './parse-collection-manifest';
 
-
-export const parseCollectionLegacy = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, pkgJsonFilePath: string, pkgData: d.PackageJsonData) => {
+export const parseCollection = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleId: string, pkgJsonFilePath: string, pkgData: d.PackageJsonData) => {
   // note this MUST be synchronous because this is used during transpile
   const collectionName = pkgData.name;
 
@@ -15,30 +15,28 @@ export const parseCollectionLegacy = (config: d.Config, compilerCtx: d.CompilerC
   }
 
   // get the root directory of the dependency
-  const collectionPackageRootDir = config.sys.path.dirname(pkgJsonFilePath);
+  const collectionPackageRootDir = dirname(pkgJsonFilePath);
 
   // figure out the full path to the collection collection file
-  const collectionFilePath = config.sys.path.join(collectionPackageRootDir, pkgData.collection);
+  const collectionFilePath = join(collectionPackageRootDir, pkgData.collection);
 
-  const relPath = config.sys.path.relative(config.rootDir, collectionFilePath);
+  const relPath = relative(config.rootDir, collectionFilePath);
   config.logger.debug(`load collection: ${collectionName}, ${relPath}`);
 
   // we haven't cached the collection yet, let's read this file
   // sync on purpose :(
   const collectionJsonStr = compilerCtx.fs.readFileSync(collectionFilePath);
+  if (!collectionJsonStr) {
+    return null;
+  }
 
   // get the directory where the collection collection file is sitting
-  const collectionDir = normalizePath(config.sys.path.dirname(collectionFilePath));
+  const collectionDir = normalizePath(dirname(collectionFilePath));
 
   // parse the json string into our collection data
-  collection = parseCollectionManifestLegacy(
-    config,
-    compilerCtx,
-    buildCtx,
-    collectionName,
-    collectionDir,
-    collectionJsonStr
-  );
+  collection = parseCollectionManifest(config, compilerCtx, buildCtx, collectionName, collectionDir, collectionJsonStr);
+
+  collection.moduleId = moduleId;
 
   if (pkgData.module && pkgData.module !== pkgData.main) {
     collection.hasExports = true;

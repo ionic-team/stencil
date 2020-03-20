@@ -1,9 +1,9 @@
 import * as d from '../../../declarations';
-// import { addComponentMetaStatic } from '../add-component-meta-static';
+import { addComponentMetaStatic } from '../add-component-meta-static';
+import { dirname, isAbsolute, join, relative } from 'path';
 import { normalizePath, unique } from '@utils';
 import { parseStaticMethods } from './methods';
 import { parseStaticListeners } from './listeners';
-import { setComponentBuildConditionals } from '../component-build-conditionals';
 import { parseClassMethods } from './class-methods';
 import { parseStaticElementRef } from './element-ref';
 import { parseStaticEncapsulation, parseStaticShadowDelegatesFocus } from './encapsulation';
@@ -15,18 +15,16 @@ import { parseStaticWatchers } from './watchers';
 import { parseStaticStyles } from './styles';
 import { parseCallExpression } from './call-expression';
 import { parseStringLiteral } from './string-literal';
+import { setComponentBuildConditionals } from '../component-build-conditionals';
 import ts from 'typescript';
-import { addComponentMetaStatic } from '../add-component-meta-static';
-
 
 export const parseStaticComponentMeta = (
-  config: d.Config,
   compilerCtx: d.CompilerCtx,
   typeChecker: ts.TypeChecker,
   cmpNode: ts.ClassDeclaration,
   moduleFile: d.Module,
   nodeMap: d.NodeMap,
-  transformOpts?: d.TransformOptions
+  transformOpts?: d.TransformOptions,
 ) => {
   if (cmpNode.members == null) {
     return cmpNode;
@@ -47,7 +45,7 @@ export const parseStaticComponentMeta = (
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
     isCollectionDependency,
-    componentClassName: (cmpNode.name ? cmpNode.name.text : ''),
+    componentClassName: cmpNode.name ? cmpNode.name.text : '',
     elementRef: parseStaticElementRef(staticMembers),
     encapsulation,
     shadowDelegatesFocus: parseStaticShadowDelegatesFocus(encapsulation, staticMembers),
@@ -58,11 +56,11 @@ export const parseStaticComponentMeta = (
     listeners: parseStaticListeners(staticMembers),
     events: parseStaticEvents(staticMembers),
     watchers: parseStaticWatchers(staticMembers),
-    styles: parseStaticStyles(config, compilerCtx, tagName, moduleFile.sourceFilePath, isCollectionDependency, staticMembers),
+    styles: parseStaticStyles(compilerCtx, tagName, moduleFile.sourceFilePath, isCollectionDependency, staticMembers),
     legacyConnect: getStaticValue(staticMembers, 'connectProps') || [],
     legacyContext: getStaticValue(staticMembers, 'contextProps') || [],
     internal: isInternal(docs),
-    assetsDirs: parseAssetsDirs(config, staticMembers, moduleFile.jsFilePath),
+    assetsDirs: parseAssetsDirs(staticMembers, moduleFile.jsFilePath),
     styleDocs: [],
     docs,
     jsFilePath: moduleFile.jsFilePath,
@@ -117,7 +115,7 @@ export const parseStaticComponentMeta = (
     htmlAttrNames: [],
     htmlTagNames: [],
     isUpdateable: false,
-    potentialCmpRefs: []
+    potentialCmpRefs: [],
   };
 
   const visitComponentChildNode = (node: ts.Node) => {
@@ -172,13 +170,13 @@ const parseVirtualProp = (tag: d.CompilerJsDocTagInfo): d.ComponentCompilerVirtu
   return {
     type: type == null ? 'any' : type.trim(),
     name: name.trim(),
-    docs: docs.trim()
+    docs: docs.trim(),
   };
 };
 
-const parseAssetsDirs = (config: d.Config, staticMembers: ts.ClassElement[], componentFilePath: string): d.AssetsMeta[] => {
+const parseAssetsDirs = (staticMembers: ts.ClassElement[], componentFilePath: string): d.AssetsMeta[] => {
   const dirs: string[] = getStaticValue(staticMembers, 'assetsDirs') || [];
-  const componentDir = normalizePath(config.sys.path.dirname(componentFilePath));
+  const componentDir = normalizePath(dirname(componentFilePath));
 
   return dirs.map(dir => {
     // get the relative path from the component file to the assets directory
@@ -186,12 +184,12 @@ const parseAssetsDirs = (config: d.Config, staticMembers: ts.ClassElement[], com
 
     let absolutePath = dir;
     let cmpRelativePath = dir;
-    if (config.sys.path.isAbsolute(dir)) {
+    if (isAbsolute(dir)) {
       // if this is an absolute path already, let's convert it to be relative
-      cmpRelativePath = config.sys.path.relative(componentDir, dir);
+      cmpRelativePath = relative(componentDir, dir);
     } else {
       // create the absolute path to the asset dir
-      absolutePath = config.sys.path.join(componentDir, dir);
+      absolutePath = join(componentDir, dir);
     }
     return {
       absolutePath,

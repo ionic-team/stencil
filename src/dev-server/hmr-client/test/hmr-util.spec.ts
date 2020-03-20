@@ -1,6 +1,5 @@
 import { updateCssUrlValue, getHmrHref } from '../hmr-util';
 
-
 describe('updateCssUrlValue', () => {
   const versionId = '1234';
 
@@ -51,9 +50,7 @@ describe('updateCssUrlValue', () => {
     const newCss = updateCssUrlValue(versionId, fileName, css);
     expect(newCss).toBe('background: red');
   });
-
 });
-
 
 describe('updateHmrUrl', () => {
   const versionId = '1234';
@@ -102,5 +99,4 @@ describe('updateHmrUrl', () => {
 
     expect(newHref).toBe('/build/file-b.css');
   });
-
 });

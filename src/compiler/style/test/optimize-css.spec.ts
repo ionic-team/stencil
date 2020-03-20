@@ -4,8 +4,7 @@ import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import path from 'path';
 import os from 'os';
 
-
-describe('optimizeCss',  () => {
+describe('optimizeCss', () => {
   let config: d.Config;
   let compilerCtx: d.CompilerCtx;
   let diagnostics: d.Diagnostic[];
@@ -13,10 +12,9 @@ describe('optimizeCss',  () => {
 
   beforeEach(() => {
     config = mockConfig();
-    compilerCtx = mockCompilerCtx();
+    compilerCtx = mockCompilerCtx(config);
     diagnostics = [];
   });
-
 
   it('handles error', async () => {
     const filePath = path.join(os.tmpdir(), 'my.css');
@@ -361,5 +359,4 @@ describe('optimizeCss',  () => {
     expect(diagnostics).toHaveLength(0);
     expect(output).toBe('');
   });
-
 });

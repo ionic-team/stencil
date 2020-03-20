@@ -1,11 +1,9 @@
 import { Component, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('legacy props', () => {
-
   it('load context and connect', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop({ connect: 'ion-menu-controller' }) menuController: any;
       @Prop({ context: 'isServer' }) isServer: boolean;
@@ -23,5 +21,4 @@ describe('legacy props', () => {
       <cmp-a>false-object</cmp-a>
     `);
   });
-
 });

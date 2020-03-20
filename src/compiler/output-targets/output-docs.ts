@@ -7,18 +7,13 @@ import { generateVscodeDocs } from '../docs/vscode';
 import { isOutputTargetCustom, isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme, isOutputTargetDocsVscode } from './output-utils';
 import { outputCustom } from './output-custom';
 
-
 export const outputDocs = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (!config.buildDocs) {
     return;
   }
-  const docsOutputTargets = config.outputTargets.filter(o => (
-    isOutputTargetCustom(o) ||
-    isOutputTargetDocsReadme(o) ||
-    isOutputTargetDocsJson(o) ||
-    isOutputTargetDocsCustom(o) ||
-    isOutputTargetDocsVscode(o)
-  ));
+  const docsOutputTargets = config.outputTargets.filter(
+    o => isOutputTargetCustom(o) || isOutputTargetDocsReadme(o) || isOutputTargetDocsJson(o) || isOutputTargetDocsCustom(o) || isOutputTargetDocsVscode(o),
+  );
 
   if (docsOutputTargets.length === 0) {
     return;
@@ -34,6 +29,6 @@ export const outputDocs = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     generateJsonDocs(config, compilerCtx, docsData, docsOutputTargets),
     generateVscodeDocs(compilerCtx, docsData, docsOutputTargets),
     generateCustomDocs(config, docsData, docsOutputTargets),
-    outputCustom(config, compilerCtx, buildCtx, docsData, docsOutputTargets)
+    outputCustom(config, compilerCtx, buildCtx, docsData, docsOutputTargets),
   ]);
 };

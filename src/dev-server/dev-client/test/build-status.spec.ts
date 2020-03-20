@@ -1,6 +1,5 @@
 import { ICON_ERROR, ICON_TYPE, initBuildStatus, updateFavIcon } from '../build-status';
 
-
 describe('build-status', () => {
   let linkElm: HTMLLinkElement;
 
@@ -19,5 +18,4 @@ describe('build-status', () => {
     expect(linkElm.href).toBe(ICON_ERROR);
     expect(linkElm.type).toBe(ICON_TYPE);
   });
-
 });

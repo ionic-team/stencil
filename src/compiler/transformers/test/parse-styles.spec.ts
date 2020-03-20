@@ -1,8 +1,6 @@
 import { getStaticGetter, transpileModule } from './transpile';
 
-
 describe('parse styles', () => {
-
   it('add static "styleUrl"', () => {
     const t = transpileModule(`
       @Component({
@@ -37,5 +35,4 @@ describe('parse styles', () => {
 
     expect(getStaticGetter(t.outputText, 'styles')).toEqual('p{color:red}');
   });
-
 });

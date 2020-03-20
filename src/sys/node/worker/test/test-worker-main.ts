@@ -1,15 +1,12 @@
-import { WorkerMain } from '../worker-main';
+import { NodeWorkerMain } from '../worker-main';
 
-
-export class TestWorkerMain extends WorkerMain {
-
-  constructor(private workerId: number) {
-    super(workerId, null);
+export class TestWorkerMain extends NodeWorkerMain {
+  constructor(workerId: number) {
+    super('TestWorker', workerId, null);
     this.fork();
   }
 
   fork() {
     this.childProcess = {} as any;
   }
-
 }

@@ -2,9 +2,8 @@ import { compileTemplate, executeTemplate } from './template';
 import { CSSScope, CSSSelector, CSSTemplate, Declaration } from './interfaces';
 import { StyleNode, types } from './css-parser';
 
-
 export function resolveValues(selectors: CSSSelector[]) {
-  const props: {[prop: string]: CSSTemplate} = {};
+  const props: { [prop: string]: CSSTemplate } = {};
   selectors.forEach(selector => {
     selector.declarations.forEach(dec => {
       props[dec.prop] = dec.value;
@@ -30,7 +29,6 @@ export function resolveValues(selectors: CSSSelector[]) {
   return propsValues;
 }
 
-
 export function getSelectors(root: StyleNode, index = 0): CSSSelector[] {
   if (!root.rules) {
     return [];
@@ -48,7 +46,7 @@ export function getSelectors(root: StyleNode, index = 0): CSSSelector[] {
             selector: selector,
             declarations,
             specificity: computeSpecificity(selector),
-            nu: index
+            nu: index,
           });
         });
       }
@@ -66,9 +64,9 @@ const IMPORTANT = '!important';
 const FIND_DECLARATIONS = /(?:^|[;\s{]\s*)(--[\w-]*?)\s*:\s*(?:((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^)]*?\)|[^};{])+)|\{([^}]*)\}(?:(?=[;\s}])|$))/gm;
 
 export function getDeclarations(cssText: string) {
-  const declarations: Declaration[]  = [];
+  const declarations: Declaration[] = [];
   let xArray;
-  while (xArray = FIND_DECLARATIONS.exec(cssText.trim())) {
+  while ((xArray = FIND_DECLARATIONS.exec(cssText.trim()))) {
     const { value, important } = normalizeValue(xArray[2]);
     declarations.push({
       prop: xArray[1].trim(),
@@ -88,16 +86,11 @@ export function normalizeValue(value: string) {
   }
   return {
     value,
-    important
+    important,
   };
 }
 
-export function getActiveSelectors(
-  hostEl: HTMLElement,
-  hostScopeMap: WeakMap<HTMLElement, CSSScope>,
-  globalScopes: CSSScope[],
-): CSSSelector[] {
-
+export function getActiveSelectors(hostEl: HTMLElement, hostScopeMap: WeakMap<HTMLElement, CSSScope>, globalScopes: CSSScope[]): CSSSelector[] {
   // computes the css scopes that might affect this particular element
   // avoiding using spread arrays to avoid ts helper fns when in es5
   const scopes: CSSScope[] = [];
@@ -121,7 +114,6 @@ export function getActiveSelectors(
   return sortSelectors(activeSelectors);
 }
 
-
 function getScopesForElement(hostTemplateMap: WeakMap<HTMLElement, CSSScope>, node: HTMLElement) {
   const scopes: CSSScope[] = [];
   while (node) {
@@ -133,7 +125,6 @@ function getScopesForElement(hostTemplateMap: WeakMap<HTMLElement, CSSScope>, no
   }
   return scopes;
 }
-
 
 export function getSelectorsForScopes(scopes: CSSScope[]) {
   const selectors: CSSSelector[] = [];

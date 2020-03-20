@@ -1,6 +1,5 @@
 import { setAccessor } from '../set-accessor';
 
-
 describe('setAccessor for custom elements', () => {
   let elm: any;
 
@@ -9,13 +8,16 @@ describe('setAccessor for custom elements', () => {
   });
 
   describe('event listener', () => {
-
     it('should allow public method starting with "on" and capital 3rd character', () => {
       const addEventSpy = spyOn(elm, 'addEventListener');
 
-      elm.onMyMethod = () => {/**/};
+      elm.onMyMethod = () => {
+        /**/
+      };
 
-      const fn = () => {/**/};
+      const fn = () => {
+        /**/
+      };
       setAccessor(elm, 'onMyMethod', undefined, fn, false, 0);
 
       expect(addEventSpy).toHaveBeenCalledTimes(0);
@@ -25,7 +27,9 @@ describe('setAccessor for custom elements', () => {
       const addEventSpy = spyOn(elm, 'addEventListener');
       const removeEventSpy = spyOn(elm, 'removeEventListener');
 
-      const orgValue = () => {/**/};
+      const orgValue = () => {
+        /**/
+      };
       setAccessor(elm, 'onClick', undefined, orgValue, false, 0);
 
       setAccessor(elm, 'onClick', orgValue, undefined, false, 0);
@@ -39,7 +43,9 @@ describe('setAccessor for custom elements', () => {
       const addEventSpy = spyOn(elm, 'addEventListener');
       const removeEventSpy = spyOn(elm, 'removeEventListener');
 
-      const orgValue = () => {/**/};
+      const orgValue = () => {
+        /**/
+      };
       setAccessor(elm, 'onMouseOver', undefined, orgValue, false, 0);
 
       setAccessor(elm, 'onMouseOver', orgValue, undefined, false, 0);
@@ -52,10 +58,14 @@ describe('setAccessor for custom elements', () => {
       const addEventSpy = spyOn(elm, 'addEventListener');
       const removeEventSpy = spyOn(elm, 'removeEventListener');
 
-      const orgValue = () => {/**/};
+      const orgValue = () => {
+        /**/
+      };
       setAccessor(elm, 'onClick', undefined, orgValue, false, 0);
 
-      const newValue = () => {/**/};
+      const newValue = () => {
+        /**/
+      };
       setAccessor(elm, 'onClick', orgValue, newValue, false, 0);
 
       expect(addEventSpy).toHaveBeenCalledTimes(2);
@@ -66,7 +76,9 @@ describe('setAccessor for custom elements', () => {
       const addEventSpy = spyOn(elm, 'addEventListener');
       const removeEventSpy = spyOn(elm, 'removeEventListener');
 
-      const newValue = () => {/**/};
+      const newValue = () => {
+        /**/
+      };
 
       setAccessor(elm, 'onIonChange', undefined, newValue, false, 0);
 
@@ -78,7 +90,9 @@ describe('setAccessor for custom elements', () => {
       const addEventSpy = spyOn(elm, 'addEventListener');
       const removeEventSpy = spyOn(elm, 'removeEventListener');
 
-      const newValue = () => {/**/};
+      const newValue = () => {
+        /**/
+      };
 
       setAccessor(elm, 'onMouseOver', undefined, newValue, false, 0);
 
@@ -90,14 +104,15 @@ describe('setAccessor for custom elements', () => {
       const addEventSpy = spyOn(elm, 'addEventListener');
       const removeEventSpy = spyOn(elm, 'removeEventListener');
 
-      const newValue = () => {/**/};
+      const newValue = () => {
+        /**/
+      };
 
       setAccessor(elm, 'onClick', undefined, newValue, false, 0);
 
       expect(addEventSpy).toHaveBeenCalledWith('click', newValue, false);
       expect(removeEventSpy).not.toHaveBeenCalled();
     });
-
   });
 
   it('should set object property to child', () => {
@@ -120,7 +135,9 @@ describe('setAccessor for custom elements', () => {
 
   it('should not set ref as a property', () => {
     const oldValue: any = 'someval';
-    const newValue: any = function meFun() {/**/};
+    const newValue: any = function meFun() {
+      /**/
+    };
 
     setAccessor(elm, 'ref', oldValue, newValue, false, 0);
     expect(elm.ref).toBeUndefined();
@@ -129,7 +146,9 @@ describe('setAccessor for custom elements', () => {
 
   it('should set function property to child', () => {
     const oldValue: any = 'someval';
-    const newValue: any = function meFun() {/**/};
+    const newValue: any = function meFun() {
+      /**/
+    };
 
     setAccessor(elm, 'myprop', oldValue, newValue, false, 0);
     expect(elm.myprop).toBe(newValue);
@@ -195,7 +214,7 @@ describe('setAccessor for custom elements', () => {
     setAccessor(elm, 'myprop', oldValue, newValue, false, 0);
     expect(elm.myprop).toBeUndefined();
 
-    expect(elm).toEqualAttributes({ });
+    expect(elm).toEqualAttributes({});
   });
 
   it('should add aria role attribute', () => {
@@ -217,7 +236,6 @@ describe('setAccessor for custom elements', () => {
     setAccessor(elm, 'role', 'tab', undefined, true, 0);
     expect(elm.hasAttribute('role')).toBe(false);
   });
-
 
   it('should update svg attribute', () => {
     elm.setAttribute('transform', 'rotate(45 72 72)');
@@ -254,7 +272,7 @@ describe('setAccessor for custom elements', () => {
 
     setAccessor(elm, 'myprop', oldValue, newValue, false, 0);
     expect(elm.myprop).toBeUndefined();
-    expect(elm).toEqualAttributes({ 'myprop': '' });
+    expect(elm).toEqualAttributes({ myprop: '' });
   });
 
   it('should set number to attribute', () => {
@@ -263,7 +281,7 @@ describe('setAccessor for custom elements', () => {
 
     setAccessor(elm, 'myprop', oldValue, newValue, false, 0);
     expect(elm.myprop).toBeUndefined();
-    expect(elm).toEqualAttributes({ 'myprop': '88' });
+    expect(elm).toEqualAttributes({ myprop: '88' });
   });
 
   it('should set string to attribute', () => {
@@ -272,15 +290,12 @@ describe('setAccessor for custom elements', () => {
 
     setAccessor(elm, 'myprop', oldValue, newValue, false, 0);
     expect(elm.myprop).toBeUndefined();
-    expect(elm).toEqualAttributes({ 'myprop': 'stringval' });
+    expect(elm).toEqualAttributes({ myprop: 'stringval' });
   });
-
 });
 
 describe('setAccessor for inputs', () => {
-
   describe('simple attributes', () => {
-
     describe('should not add attribute when prop is undefined or null', () => {
       function testStraightForwardAttribute(propName: string, newValue: any, oldValue: any) {
         const inputElm = document.createElement('input');
@@ -322,7 +337,7 @@ describe('setAccessor for inputs', () => {
         testStraightForwardAttribute('spellCheck', null, undefined);
       });
 
-      it ('checked', () => {
+      it('checked', () => {
         const inputElm = document.createElement('input');
         setAccessor(inputElm, 'checked', false, true, false, 0);
         expect(inputElm.checked).toEqual(true);
@@ -369,13 +384,12 @@ describe('setAccessor for inputs', () => {
   });
 
   describe('special attributes', () => {
-
     describe('should not add attribute when prop is undefined or null', () => {
       function testSpecialAttribute(propName: string, newValue: any, oldValue: any) {
         const inputElm = document.createElement('input');
         setAccessor(inputElm, propName, oldValue, newValue, false, 0);
 
-        expect(inputElm).toEqualAttributes({ });
+        expect(inputElm).toEqualAttributes({});
       }
       it(`accept`, () => {
         testSpecialAttribute('accept', undefined, undefined);
@@ -455,7 +469,6 @@ describe('setAccessor for inputs', () => {
   });
 
   describe('boolean attributes', () => {
-
     describe('should not add attribute when prop is undefined or null', () => {
       function testBooleanAttribute(propName: string, newValue: any, oldValue: any) {
         const inputElm = document.createElement('input');
@@ -504,7 +517,6 @@ describe('setAccessor for inputs', () => {
         testBooleanAttribute('readOnly', true, undefined);
       });
     });
-
   });
 
   describe('min/max attributes', () => {
@@ -543,13 +555,10 @@ describe('setAccessor for inputs', () => {
       });
     });
   });
-
 });
 
 describe('setAccessor for standard html elements', () => {
-
   describe('simple global attributes', () => {
-
     it('should not add attribute when prop is undefined or null', () => {
       const inputElm = document.createElement('section');
       setAccessor(inputElm, 'title', undefined, undefined, false, 0);
@@ -596,7 +605,6 @@ describe('setAccessor for standard html elements', () => {
   });
 
   describe('simple nonstandard attributes', () => {
-
     it('should not add attribute when prop is undefined or null', () => {
       const inputElm = document.createElement('section');
       setAccessor(inputElm, 'color', undefined, undefined, false, 0);
@@ -665,14 +673,19 @@ describe('setAccessor for standard html elements', () => {
       setAccessor(elm, 'class', undefined, 'new', false, 0);
       expect(elm).toHaveClasses(['class1', 'class2', 'class3', 'new']);
 
-      setAccessor(elm, 'class',
-        '  class1 class2',
-        'new class4', false, 0);
+      setAccessor(elm, 'class', '  class1 class2', 'new class4', false, 0);
       expect(elm).toHaveClasses(['class3', 'new', 'class4']);
 
-      setAccessor(elm, 'class', undefined, `class1
+      setAccessor(
+        elm,
+        'class',
+        undefined,
+        `class1
               class2
-       class3  `, false, 0);
+       class3  `,
+        false,
+        0,
+      );
       expect(elm).toHaveClasses(['class1', 'class2', 'class3']);
     });
 
@@ -701,8 +714,15 @@ describe('setAccessor for standard html elements', () => {
       setAccessor(elm, 'class', 'icon', 'icon2', false, 0);
       expect(elm).toHaveClasses(['ion-color', 'icon2']);
 
-      setAccessor(elm, 'class', `icon
-           ion-color`, 'icon2', false, 0);
+      setAccessor(
+        elm,
+        'class',
+        `icon
+           ion-color`,
+        'icon2',
+        false,
+        0,
+      );
       expect(elm).toHaveClasses(['icon2']);
     });
 
@@ -731,33 +751,45 @@ describe('setAccessor for standard html elements', () => {
     });
   });
 
-
   describe('style attribute', () => {
-
     it('should add styles', () => {
       let elm = document.createElement('section');
       const newStyles = {
         'box-shadow': '1px',
         'color': 'blue',
-        paddingLeft: '88px'
+        'paddingLeft': '88px',
       };
       setAccessor(elm, 'style', undefined, newStyles, false, 0);
       expect(elm.style.cssText).toEqual('box-shadow: 1px; color: blue; padding-left: 88px;');
 
       elm = document.createElement('my-tag');
-      setAccessor(elm, 'style', {}, {
-        'font-size': '12px',
-        marginRight: '55px'
-      }, false, 0);
+      setAccessor(
+        elm,
+        'style',
+        {},
+        {
+          'font-size': '12px',
+          'marginRight': '55px',
+        },
+        false,
+        0,
+      );
       expect(elm.style.cssText).toEqual('font-size: 12px; margin-right: 55px;');
 
       elm = document.createElement('my-tag');
-      setAccessor(elm, 'style', {
-        'font-size': '12px',
-        'color': 'blue'
-      }, {
-        'font-size': '20px'
-        }, false, 0);
+      setAccessor(
+        elm,
+        'style',
+        {
+          'font-size': '12px',
+          'color': 'blue',
+        },
+        {
+          'font-size': '20px',
+        },
+        false,
+        0,
+      );
 
       expect(elm.style.cssText).toEqual('font-size: 20px;');
     });
@@ -767,13 +799,10 @@ describe('setAccessor for standard html elements', () => {
       setAccessor(elm, 'style', undefined, undefined, false, 0);
       expect(elm.style.cssText).toEqual('');
 
-      setAccessor(elm, 'style',
-        { color: 'blue', 'font-size': '12px', paddingLeft: '88px' },
-        { color: 'blue', 'font-size': '12px', paddingLeft: '88px' }, false, 0);
+      setAccessor(elm, 'style', { 'color': 'blue', 'font-size': '12px', 'paddingLeft': '88px' }, { 'color': 'blue', 'font-size': '12px', 'paddingLeft': '88px' }, false, 0);
       expect(elm.style.cssText).toEqual('');
 
-      setAccessor(elm, 'style', { color: 'blue', 'font-size': '12px' },
-        undefined, false, 0);
+      setAccessor(elm, 'style', { 'color': 'blue', 'font-size': '12px' }, undefined, false, 0);
       expect(elm.style.cssText).toEqual('');
     });
 
@@ -782,9 +811,7 @@ describe('setAccessor for standard html elements', () => {
       elm.style.setProperty('color', 'black');
       elm.style.setProperty('padding', '20px');
 
-      setAccessor(elm, 'style',
-        { color: 'blue', 'padding': '20px', marginRight: '88px' },
-        { color: 'blue', 'padding': '30px', marginRight: '55px' }, false, 0);
+      setAccessor(elm, 'style', { color: 'blue', padding: '20px', marginRight: '88px' }, { color: 'blue', padding: '30px', marginRight: '55px' }, false, 0);
 
       expect(elm.style.cssText).toEqual('color: black; padding: 30px; margin-right: 55px;');
     });
@@ -804,7 +831,5 @@ describe('setAccessor for standard html elements', () => {
       setAccessor(elm, 'style', { margin: '20px' }, { margin: '30px', color: 'orange' }, false, 0);
       expect(elm.style.cssText).toEqual('margin: 30px; color: orange;');
     });
-
   });
-
 });

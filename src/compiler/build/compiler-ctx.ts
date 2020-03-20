@@ -1,8 +1,7 @@
 import * as d from '../../declarations';
+import { basename, dirname, extname, join } from 'path';
 import { buildEvents } from '../events';
-import { Cache } from '../cache';
-import { InMemoryFs, normalizePath } from '@utils';
-
+import { normalizePath } from '@utils';
 
 /**
  * The CompilerCtx is a persistent object that's reused throughout
@@ -11,7 +10,7 @@ import { InMemoryFs, normalizePath } from '@utils';
  * is always the same.
  */
 export class CompilerContext implements d.CompilerCtx {
-  version = 1;
+  version = 2;
   activeBuildId = -1;
   activeFilesAdded: string[] = [];
   activeFilesDeleted: string[] = [];
@@ -45,17 +44,7 @@ export class CompilerContext implements d.CompilerCtx {
   rollupCache = new Map();
   changedModules = new Set<string>();
   changedFiles = new Set<string>();
-
   worker: d.CompilerWorkerContext = null;
-
-  constructor(config: d.Config) {
-    const cacheFs = (config.enableCache && config.sys.fs != null) ? new InMemoryFs(config.sys.fs, config.sys.path) : null;
-    this.cache = new Cache(config, cacheFs);
-
-    this.cache.initCacheDir();
-
-    this.fs = (config.sys.fs != null ? new InMemoryFs(config.sys.fs, config.sys.path) : null);
-  }
 
   reset() {
     this.cache.clear();
@@ -78,19 +67,17 @@ export class CompilerContext implements d.CompilerCtx {
   }
 }
 
-
-export const getModuleLegacy = (config: d.Config, compilerCtx: d.CompilerCtx, sourceFilePath: string) => {
+export const getModuleLegacy = (_config: d.Config, compilerCtx: d.CompilerCtx, sourceFilePath: string) => {
   sourceFilePath = normalizePath(sourceFilePath);
 
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
   if (moduleFile != null) {
     return moduleFile;
-
   } else {
-    const sourceFileDir = config.sys.path.dirname(sourceFilePath);
-    const sourceFileExt = config.sys.path.extname(sourceFilePath);
-    const sourceFileName = config.sys.path.basename(sourceFilePath, sourceFileExt);
-    const jsFilePath = config.sys.path.join(sourceFileDir, sourceFileName + '.js');
+    const sourceFileDir = dirname(sourceFilePath);
+    const sourceFileExt = extname(sourceFilePath);
+    const sourceFileName = basename(sourceFilePath, sourceFileExt);
+    const jsFilePath = join(sourceFileDir, sourceFileName + '.js');
 
     const moduleFile: d.Module = {
       sourceFilePath: sourceFilePath,
@@ -121,15 +108,14 @@ export const getModuleLegacy = (config: d.Config, compilerCtx: d.CompilerCtx, so
       originalImports: [],
       potentialCmpRefs: [],
       staticSourceFile: null,
-      staticSourceFileText: ''
+      staticSourceFileText: '',
     };
     compilerCtx.moduleMap.set(sourceFilePath, moduleFile);
     return moduleFile;
   }
 };
 
-
-export const resetModule = (moduleFile: d.Module) => {
+export const resetModuleLegacy = (moduleFile: d.Module) => {
   moduleFile.cmps.length = 0;
   moduleFile.coreRuntimeApis.length = 0;
   moduleFile.collectionName = null;

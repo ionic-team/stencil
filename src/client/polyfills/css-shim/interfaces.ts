@@ -1,5 +1,4 @@
-
-export type CSSVariables = {[prop: string]: string};
+export type CSSVariables = { [prop: string]: string };
 export type CSSEval = (p: CSSVariables) => string;
 export type CSSSegment = string | CSSEval;
 export type CSSTemplate = CSSSegment[];

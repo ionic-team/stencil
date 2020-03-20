@@ -1,6 +1,5 @@
 import { MockWindow } from '../window';
 
-
 describe('storage', () => {
   let win: MockWindow;
   beforeEach(() => {
@@ -55,5 +54,4 @@ describe('storage', () => {
     expect(win.localStorage.getItem('12')).toEqual('bar');
     expect(win.localStorage.getItem(12 as any)).toEqual('bar');
   });
-
 });

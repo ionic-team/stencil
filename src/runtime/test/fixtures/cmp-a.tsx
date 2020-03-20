@@ -1,11 +1,10 @@
 import { Component, Event, EventEmitter, Listen, Method, Prop, State, Watch, h } from '@stencil/core';
 import { format } from './utils';
 
-
 @Component({
   tag: 'cmp-a',
   styleUrl: 'cmp-a.css',
-  shadow: true
+  shadow: true,
 })
 export class CmpA {
   // ************************
@@ -102,7 +101,7 @@ export class CmpA {
     this.parseFirstProp(this.first ? this.first : '');
     this.parseMiddleProp(this.middle ? this.middle : '');
     this.parseLastProp(this.last ? this.last : '');
-    this.initevent.emit({init: true});
+    this.initevent.emit({ init: true });
     return;
   }
 

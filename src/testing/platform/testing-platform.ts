@@ -3,14 +3,13 @@ import { cstrs, hostRefs, moduleLoaded, styles } from './testing-constants';
 import { flushAll, resetTaskQueue } from './testing-task-queue';
 import { win } from './testing-window';
 
-
 export let supportsShadow = true;
 
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
-  jmp: (h) => h(),
-  raf: (h) => requestAnimationFrame(h),
+  jmp: h => h(),
+  raf: h => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
 };

@@ -1,4 +1,3 @@
-
 export const getHmrHref = (versionId: string, fileName: string, testUrl: string) => {
   if (typeof testUrl === 'string' && testUrl.trim() !== '') {
     if (getUrlFileName(fileName) === getUrlFileName(testUrl)) {
@@ -16,7 +15,7 @@ const getUrlFileName = (url: string) => {
 };
 
 const parseQuerystring = (oldQs: string) => {
-  const newQs: {[key: string]: string} = {};
+  const newQs: { [key: string]: string } = {};
   if (typeof oldQs === 'string') {
     oldQs.split('&').forEach(kv => {
       const splt = kv.split('=');
@@ -26,8 +25,10 @@ const parseQuerystring = (oldQs: string) => {
   return newQs;
 };
 
-const stringifyQuerystring = (qs: {[key: string]: string}) =>
-  Object.keys(qs).map(key => key + '=' + qs[key]).join('&');
+const stringifyQuerystring = (qs: { [key: string]: string }) =>
+  Object.keys(qs)
+    .map(key => key + '=' + qs[key])
+    .join('&');
 
 export const setQueryString = (url: string, qsKey: string, qsValue: string) => {
   // not using URL because IE11 doesn't support it
@@ -38,41 +39,29 @@ export const setQueryString = (url: string, qsKey: string, qsValue: string) => {
   return urlPath + '?' + stringifyQuerystring(qs);
 };
 
-export const setHmrQueryString = (url: string, versionId: string) =>
-  setQueryString(url, 's-hmr', versionId);
+export const setHmrQueryString = (url: string, versionId: string) => setQueryString(url, 's-hmr', versionId);
 
 export const updateCssUrlValue = (versionId: string, fileName: string, oldCss: string) => {
-  const reg = /url\((['"]?)(.*)\1\)/ig;
+  const reg = /url\((['"]?)(.*)\1\)/gi;
   let result;
   let newCss = oldCss;
 
   while ((result = reg.exec(oldCss)) !== null) {
     const url = result[2];
-    newCss = newCss.replace(
-      url,
-      getHmrHref(versionId, fileName, url)
-    );
+    newCss = newCss.replace(url, getHmrHref(versionId, fileName, url));
   }
 
   return newCss;
 };
 
 export const isLinkStylesheet = (elm: Element) =>
-  elm.nodeName.toLowerCase() === 'link' &&
-  (elm as HTMLLinkElement).href &&
-  (elm as HTMLLinkElement).rel &&
-  (elm as HTMLLinkElement).rel.toLowerCase() === 'stylesheet';
+  elm.nodeName.toLowerCase() === 'link' && (elm as HTMLLinkElement).href && (elm as HTMLLinkElement).rel && (elm as HTMLLinkElement).rel.toLowerCase() === 'stylesheet';
 
 export const isTemplate = (elm: Element) =>
-  elm.nodeName.toLowerCase() === 'template' &&
-  !!(elm as HTMLTemplateElement).content &&
-  (elm as HTMLTemplateElement).content.nodeType === 11;
+  elm.nodeName.toLowerCase() === 'template' && !!(elm as HTMLTemplateElement).content && (elm as HTMLTemplateElement).content.nodeType === 11;
 
-export const setHmrAttr = (elm: Element, versionId: string) =>
-  elm.setAttribute('data-hmr', versionId);
+export const setHmrAttr = (elm: Element, versionId: string) => elm.setAttribute('data-hmr', versionId);
 
-export const hasShadowRoot = (elm: Element) =>
-  !!elm.shadowRoot && elm.shadowRoot.nodeType === 11 && elm.shadowRoot !== (elm as any);
+export const hasShadowRoot = (elm: Element) => !!elm.shadowRoot && elm.shadowRoot.nodeType === 11 && elm.shadowRoot !== (elm as any);
 
-export const isElement = (elm: Element) =>
-  !!elm && elm.nodeType === 1 && !!elm.getAttribute;
+export const isElement = (elm: Element) => !!elm && elm.nodeType === 1 && !!elm.getAttribute;

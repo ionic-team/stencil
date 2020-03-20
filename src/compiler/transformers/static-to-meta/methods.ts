@@ -2,9 +2,8 @@ import * as d from '../../../declarations';
 import { getStaticValue, isInternal } from '../transform-utils';
 import ts from 'typescript';
 
-
 export const parseStaticMethods = (staticMembers: ts.ClassElement[]): d.ComponentCompilerMethod[] => {
-  const parsedMethods: {[key: string]: d.ComponentCompilerStaticMethod} = getStaticValue(staticMembers, 'methods');
+  const parsedMethods: { [key: string]: d.ComponentCompilerStaticMethod } = getStaticValue(staticMembers, 'methods');
   if (!parsedMethods) {
     return [];
   }
@@ -19,7 +18,7 @@ export const parseStaticMethods = (staticMembers: ts.ClassElement[]): d.Componen
       name: methodName,
       docs: parsedMethods[methodName].docs,
       complexType: parsedMethods[methodName].complexType,
-      internal: isInternal(parsedMethods[methodName].docs)
+      internal: isInternal(parsedMethods[methodName].docs),
     };
   });
 };

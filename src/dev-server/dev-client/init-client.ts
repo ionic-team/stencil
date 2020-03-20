@@ -5,7 +5,6 @@ import { initBuildProgress } from './build-progress';
 import { initBuildStatus } from './build-status';
 import { initClientWebSocket } from './client-web-socket';
 
-
 export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig) {
   try {
     if (win['s-dev-server']) {
@@ -31,16 +30,13 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
       appReset(win, config, () => {
         initClientWebSocket(win);
       });
-
     } else {
       initClientWebSocket(win);
     }
-
   } catch (e) {
     console.error(e);
   }
 }
-
 
 function isInitialDevServerLoad(win: d.DevClientWindow, config: d.DevClientConfig) {
   let pathname = win.location.pathname;

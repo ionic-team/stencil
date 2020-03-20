@@ -1,8 +1,6 @@
 import { transpileModule } from './transpile';
 
-
 describe('parse virtual properties', () => {
-
   it('virtual properties', () => {
     const t = transpileModule(`
       /**
@@ -18,5 +16,4 @@ describe('parse virtual properties', () => {
       { name: 'mode', type: `'md' | 'ios'`, docs: 'This is the mode' },
     ]);
   });
-
 });

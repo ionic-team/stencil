@@ -2,7 +2,6 @@ import { findRegex } from './utils';
 import { CSSTemplate, CSSVariables } from './interfaces';
 import { COMMENTS, TRAILING_LINES, VAR_ASSIGN_START, VAR_USAGE_START } from './regex';
 
-
 export function resolveVar(props: CSSVariables, prop: string, fallback: CSSTemplate | undefined): string {
   if (props[prop]) {
     return props[prop];
@@ -31,7 +30,6 @@ export function findVarEndIndex(cssText: string, offset: number) {
   return i;
 }
 
-
 export function parseVar(cssText: string, offset: number) {
   const varPos = findRegex(VAR_USAGE_START, cssText, offset);
   if (!varPos) {
@@ -44,25 +42,20 @@ export function parseVar(cssText: string, offset: number) {
     start: varPos.start,
     end: endVar,
     propName: propName.trim(),
-    fallback: fallback.length > 0 ? fallback.join(',').trim() : undefined
+    fallback: fallback.length > 0 ? fallback.join(',').trim() : undefined,
   };
 }
 
 export function compileVar(cssText: string, template: CSSTemplate, offset: number): number {
   const varMeta = parseVar(cssText, offset);
   if (!varMeta) {
-    template.push(
-      cssText.substring(offset, cssText.length)
-    );
+    template.push(cssText.substring(offset, cssText.length));
     return cssText.length;
   }
   const propName = varMeta.propName;
   const fallback = varMeta.fallback != null ? compileTemplate(varMeta.fallback) : undefined;
 
-  template.push(
-    cssText.substring(offset, varMeta.start),
-    (params) => resolveVar(params, propName, fallback)
-  );
+  template.push(cssText.substring(offset, varMeta.start), params => resolveVar(params, propName, fallback));
   return varMeta.end;
 }
 
@@ -70,9 +63,7 @@ export function executeTemplate(template: CSSTemplate, props: CSSVariables): str
   let final = '';
   for (let i = 0; i < template.length; i++) {
     const s = template[i];
-    final += (typeof s === 'string')
-      ? s
-      : s(props);
+    final += typeof s === 'string' ? s : s(props);
   }
   return final;
 }
@@ -87,14 +78,14 @@ export function findEndValue(cssText: string, offset: number): number {
       if (double && c === '"') {
         onStr = false;
       }
-      if (!double && c === '\'') {
+      if (!double && c === "'") {
         onStr = false;
       }
     } else {
       if (c === '"') {
         onStr = true;
         double = true;
-      } else if (c === '\'') {
+      } else if (c === "'") {
         onStr = true;
         double = false;
       } else if (c === ';') {
@@ -127,8 +118,7 @@ export function compileTemplate(cssText: string): CSSTemplate {
   let index = 0;
   cssText = cssText.replace(COMMENTS, '');
 
-  cssText = removeCustomAssigns(cssText)
-    .replace(TRAILING_LINES, '');
+  cssText = removeCustomAssigns(cssText).replace(TRAILING_LINES, '');
 
   const segments: CSSTemplate = [];
   while (index < cssText.length) {

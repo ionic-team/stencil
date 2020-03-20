@@ -3,9 +3,7 @@ import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { transpile } from '../test-transpile';
 import ts from 'typescript';
 
-
 export const jestPreprocessor = {
-
   process(sourceText: string, filePath: string, jestConfig: { rootDir: string }) {
     if (shouldTransform(filePath, sourceText)) {
       const opts: CompileOptions = {
@@ -25,7 +23,7 @@ export const jestPreprocessor = {
 
       const results = transpile(sourceText, opts);
 
-      const hasErrors = results.diagnostics.some((diagnostic) => diagnostic.level === 'error');
+      const hasErrors = results.diagnostics.some(diagnostic => diagnostic.level === 'error');
 
       if (results.diagnostics && hasErrors) {
         const msg = results.diagnostics.map(formatDiagnostic).join('\n\n');
@@ -60,11 +58,11 @@ export const jestPreprocessor = {
       filePath,
       jestConfigStr,
       !!transformOptions.instrument,
-      3 // cache buster
+      3, // cache buster
     ];
 
     return key.join(':');
-  }
+  },
 };
 
 function formatDiagnostic(diagnostic: Diagnostic) {
@@ -110,7 +108,11 @@ function getCompilerOptions(rootDir: string) {
 }
 
 export function shouldTransform(filePath: string, sourceText: string) {
-  const ext = filePath.split('.').pop().toLowerCase().split('?')[0];
+  const ext = filePath
+    .split('.')
+    .pop()
+    .toLowerCase()
+    .split('?')[0];
 
   if (ext === 'ts' || ext === 'tsx' || ext === 'jsx') {
     // typescript extensions (to include .d.ts)

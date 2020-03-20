@@ -17,7 +17,7 @@ export const generatePropTypes = (cmpMeta: d.ComponentCompilerMeta): d.TypeInfo 
       optional: true,
       required: false,
       jsdoc: cmpProp.docs,
-      public: true
-    }))
+      public: true,
+    })),
   ];
 };

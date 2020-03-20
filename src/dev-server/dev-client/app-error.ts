@@ -3,7 +3,6 @@ import * as c from '../dev-server-constants';
 import { emitBuildStatus } from './build-events';
 import { logDiagnostic } from './logger';
 
-
 export function appError(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.BuildResults) {
   if (!Array.isArray(buildResults.diagnostics)) {
     return;
@@ -24,7 +23,6 @@ export function appError(win: d.DevClientWindow, doc: Document, config: d.DevCli
 
   emitBuildStatus(win, 'error');
 }
-
 
 function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig, modal: HTMLElement, diagnostic: d.Diagnostic) {
   const card = doc.createElement('div');
@@ -124,7 +122,6 @@ function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig,
   modal.appendChild(card);
 }
 
-
 function addOpenInEditor(win: Window, config: d.DevClientConfig, elm: HTMLElement, file: string, line: number, column: number) {
   if (elm.tagName === 'A') {
     (elm as HTMLAnchorElement).href = '#open-in-editor';
@@ -132,21 +129,22 @@ function addOpenInEditor(win: Window, config: d.DevClientConfig, elm: HTMLElemen
   if (typeof column !== 'number' || column < 1) {
     column = 1;
   }
-  elm.addEventListener('click', (ev) => {
+  elm.addEventListener('click', ev => {
     ev.preventDefault();
     ev.stopPropagation();
     const qs: d.OpenInEditorData = {
       file: file,
       line: line,
       column: column,
-      editor: config.editors[0].id
+      editor: config.editors[0].id,
     };
 
-    const url = `${c.OPEN_IN_EDITOR_URL}?${Object.keys(qs).map(k => `${k}=${(qs as any)[k]}`).join('&')}`;
+    const url = `${c.OPEN_IN_EDITOR_URL}?${Object.keys(qs)
+      .map(k => `${k}=${(qs as any)[k]}`)
+      .join('&')}`;
     win.fetch(url);
   });
 }
-
 
 function isOpenIsEditorEnabled(config: d.DevClientConfig, diagnostic: d.Diagnostic) {
   if (config.editors && config.editors.length > 0) {
@@ -156,7 +154,6 @@ function isOpenIsEditorEnabled(config: d.DevClientConfig, diagnostic: d.Diagnost
   }
   return false;
 }
-
 
 function getDevServerModal(doc: Document) {
   let outer = doc.getElementById(DEV_SERVER_MODAL);
@@ -174,8 +171,6 @@ function getDevServerModal(doc: Document) {
 
   return doc.getElementById(`${DEV_SERVER_MODAL}-inner`);
 }
-
-
 
 export function clearDevServerModal(doc: Document) {
   const appErrorElm = doc.getElementById(DEV_SERVER_MODAL);
@@ -210,32 +205,33 @@ function highlightError(text: string, errorCharStart: number, errorLength: numbe
 
   const errorCharEnd = errorCharStart + errorLength;
 
-  return text.split('').map((inputChar, charIndex) => {
-    let outputChar: string;
+  return text
+    .split('')
+    .map((inputChar, charIndex) => {
+      let outputChar: string;
 
-    if (inputChar === `<`) {
-      outputChar = `&lt;`;
-    } else if (inputChar === `>`) {
-      outputChar = `&gt;`;
-    } else if (inputChar === `"`) {
-      outputChar = `&quot;`;
-    } else if (inputChar === `'`) {
-      outputChar = `&#039;`;
-    } else if (inputChar === `&`) {
-      outputChar = `&amp;`;
-    } else {
-      outputChar = inputChar;
-    }
+      if (inputChar === `<`) {
+        outputChar = `&lt;`;
+      } else if (inputChar === `>`) {
+        outputChar = `&gt;`;
+      } else if (inputChar === `"`) {
+        outputChar = `&quot;`;
+      } else if (inputChar === `'`) {
+        outputChar = `&#039;`;
+      } else if (inputChar === `&`) {
+        outputChar = `&amp;`;
+      } else {
+        outputChar = inputChar;
+      }
 
-    if (charIndex >= errorCharStart && charIndex < errorCharEnd) {
-      outputChar = `<span class="dev-server-diagnostic-error-chr">${outputChar}</span>`;
-    }
+      if (charIndex >= errorCharStart && charIndex < errorCharEnd) {
+        outputChar = `<span class="dev-server-diagnostic-error-chr">${outputChar}</span>`;
+      }
 
-    return outputChar;
-
-  }).join('');
+      return outputChar;
+    })
+    .join('');
 }
-
 
 function prepareLines(orgLines: d.PrintLine[]) {
   const lines: d.PrintLine[] = JSON.parse(JSON.stringify(orgLines));
@@ -256,14 +252,13 @@ function prepareLines(orgLines: d.PrintLine[]) {
   return lines;
 }
 
-
 function eachLineHasLeadingWhitespace(lines: d.PrintLine[]) {
   if (!lines.length) {
     return false;
   }
 
   for (let i = 0; i < lines.length; i++) {
-    if (!(lines[i].text) || lines[i].text.length < 1) {
+    if (!lines[i].text || lines[i].text.length < 1) {
       return false;
     }
     const firstChar = lines[i].text.charAt(0);

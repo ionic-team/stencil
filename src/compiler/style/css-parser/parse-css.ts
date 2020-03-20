@@ -1,8 +1,7 @@
 import * as d from '../../../declarations';
-import { ParseCssResults, CssNode, CssParsePosition } from './css-parse-declarations'
+import { ParseCssResults, CssNode, CssParsePosition } from './css-parse-declarations';
 
-
-export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
+export const parseCss = (css: string, filePath?: string): ParseCssResults => {
   let lineno = 1;
   let column = 1;
 
@@ -35,12 +34,14 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
       header: 'CSS Parse',
       messageText: msg,
       absFilePath: filePath,
-      lines: [{
-        lineIndex: lineno - 1,
-        lineNumber: lineno,
-        errorCharStart: column,
-        text: css[lineno - 1],
-      }]
+      lines: [
+        {
+          lineIndex: lineno - 1,
+          lineNumber: lineno,
+          errorCharStart: column,
+          text: css[lineno - 1],
+        },
+      ],
     };
 
     if (lineno > 1) {
@@ -49,7 +50,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
         lineNumber: lineno - 1,
         text: css[lineno - 2],
         errorCharStart: -1,
-        errorLength: -1
+        errorLength: -1,
       };
       d.lines.unshift(previousLine);
     }
@@ -60,7 +61,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
         lineNumber: lineno + 1,
         text: srcLines[lineno],
         errorCharStart: -1,
-        errorLength: -1
+        errorLength: -1,
       };
 
       d.lines.push(nextLine);
@@ -79,9 +80,9 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
       stylesheet: {
         source: filePath,
         rules: rulesList,
-      }
+      },
     };
-  }
+  };
 
   const open = () => match(/^{\s*/);
   const close = () => match(/^}/);
@@ -109,7 +110,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
       }
     }
     return rules;
-  }
+  };
 
   /**
    * Parse whitespace.
@@ -120,7 +121,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
   const comments = (rules?: CssNode[]) => {
     let c;
     rules = rules || [];
-    while (c = comment()) {
+    while ((c = comment())) {
       if (c !== false) {
         rules.push(c);
       }
@@ -148,11 +149,11 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
 
     return pos({
       type: 'comment',
-      comment
+      comment,
     });
-  }
+  };
 
-  const selector = () =>{
+  const selector = () => {
     const m: any = match(/^([^{]+)/);
     if (!m) return null;
 
@@ -184,7 +185,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
     const ret = pos({
       type: 'declaration',
       property: prop.replace(commentre, ''),
-      value: val ? trim(val[0]).replace(commentre, '') : ''
+      value: val ? trim(val[0]).replace(commentre, '') : '',
     });
 
     match(/^[;\s]*/);
@@ -200,7 +201,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
 
     // declarations
     let decl;
-    while (decl = declaration()) {
+    while ((decl = declaration())) {
       if (decl !== false) {
         decls.push(decl);
         comments(decls);
@@ -209,14 +210,14 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
 
     if (!close()) return error(`missing '}'`);
     return decls;
-  }
+  };
 
   const keyframe = () => {
     let m;
     const values: string[] = [];
     const pos = position();
 
-    while (m = match(/^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/)) {
+    while ((m = match(/^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/))) {
       values.push(m[1]);
       match(/^,\s*/);
     }
@@ -226,9 +227,9 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
     return pos({
       type: 'keyframe',
       values,
-      declarations: declarations()
+      declarations: declarations(),
     });
-  }
+  };
 
   const atkeyframes = () => {
     const pos = position();
@@ -246,7 +247,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
 
     let frame: CssNode;
     let frames = comments();
-    while (frame = keyframe()) {
+    while ((frame = keyframe())) {
       frames.push(frame);
       frames = frames.concat(comments());
     }
@@ -257,9 +258,9 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
       type: 'keyframes',
       name: name,
       vendor: vendor,
-      keyframes: frames
+      keyframes: frames,
     });
-  }
+  };
 
   const atsupports = () => {
     const pos = position();
@@ -277,7 +278,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
     return pos({
       type: 'supports',
       supports: supports,
-      rules: style
+      rules: style,
     });
   };
 
@@ -295,7 +296,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
 
     return pos({
       type: 'host',
-      rules: style
+      rules: style,
     });
   };
 
@@ -315,7 +316,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
     return pos({
       type: 'media',
       media: media,
-      rules: style
+      rules: style,
     });
   };
 
@@ -327,7 +328,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
     return pos({
       type: 'custom-media',
       name: trim(m[1]),
-      media: trim(m[2])
+      media: trim(m[2]),
     });
   };
 
@@ -342,7 +343,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
     let decls = comments();
 
     let decl: CssNode | void;
-    while (decl = declaration()) {
+    while ((decl = declaration())) {
       decls.push(decl);
       decls = decls.concat(comments());
     }
@@ -352,9 +353,9 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
     return pos({
       type: 'page',
       selectors: sel,
-      declarations: decls
+      declarations: decls,
     });
-  }
+  };
 
   const atdocument = () => {
     const pos = position();
@@ -374,7 +375,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
       type: 'document',
       document: doc,
       vendor: vendor,
-      rules: style
+      rules: style,
     });
   };
 
@@ -387,7 +388,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
     let decls = comments();
 
     let decl: CssNode | void;
-    while (decl = declaration()) {
+    while ((decl = declaration())) {
       decls.push(decl);
       decls = decls.concat(comments());
     }
@@ -396,9 +397,9 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
 
     return pos({
       type: 'font-face',
-      declarations: decls
+      declarations: decls,
     });
-  }
+  };
 
   const _compileAtrule = (name: string) => {
     const re = new RegExp('^@' + name + '\\s*([^;]+);');
@@ -410,7 +411,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
       ret[name] = m[1].trim();
       return pos(ret);
     };
-  }
+  };
 
   const atimport = _compileAtrule('import');
 
@@ -420,17 +421,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
 
   const atrule = () => {
     if (css[0] !== '@') return null;
-    return atkeyframes()
-      || atmedia()
-      || atcustommedia()
-      || atsupports()
-      || atimport()
-      || atcharset()
-      || atnamespace()
-      || atdocument()
-      || atpage()
-      || athost()
-      || atfontface();
+    return atkeyframes() || atmedia() || atcustommedia() || atsupports() || atimport() || atcharset() || atnamespace() || atdocument() || atpage() || athost() || atfontface();
   };
 
   const rule = () => {
@@ -443,9 +434,9 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
     return pos({
       type: 'rule',
       selectors: sel,
-      declarations: declarations()
+      declarations: declarations(),
     });
-  }
+  };
 
   class ParsePosition implements CssParsePosition {
     start: any;
@@ -463,11 +454,11 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults =>  {
 
   return {
     diagnostics,
-    ...addParent(stylesheet())
+    ...addParent(stylesheet()),
   };
-}
+};
 
-const trim = (str: string) => str ? str.trim() : '';
+const trim = (str: string) => (str ? str.trim() : '');
 
 /**
  * Adds non-enumerable parent node reference to each node.
@@ -480,7 +471,9 @@ const addParent = (obj?: any, parent?: any) => {
   for (const k in obj) {
     const value = obj[k];
     if (Array.isArray(value)) {
-      value.forEach(function(v) { addParent(v, childParent); });
+      value.forEach(function(v) {
+        addParent(v, childParent);
+      });
     } else if (value && typeof value === 'object') {
       addParent(value, childParent);
     }
@@ -491,7 +484,7 @@ const addParent = (obj?: any, parent?: any) => {
       configurable: true,
       writable: true,
       enumerable: false,
-      value: parent || null
+      value: parent || null,
     });
   }
 

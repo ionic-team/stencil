@@ -5,9 +5,19 @@ import { createHash } from 'crypto';
 import { join, relative } from 'path';
 import { fork } from 'child_process';
 
-
-export async function compareScreenshot(emulateConfig: d.EmulateConfig, screenshotBuildData: d.ScreenshotBuildData, currentScreenshotBuf: Buffer, desc: string, width: number, height: number, testPath: string, pixelmatchThreshold: number) {
-  const currentImageHash = createHash('md5').update(currentScreenshotBuf).digest('hex');
+export async function compareScreenshot(
+  emulateConfig: d.EmulateConfig,
+  screenshotBuildData: d.ScreenshotBuildData,
+  currentScreenshotBuf: Buffer,
+  desc: string,
+  width: number,
+  height: number,
+  testPath: string,
+  pixelmatchThreshold: number,
+) {
+  const currentImageHash = createHash('md5')
+    .update(currentScreenshotBuf)
+    .digest('hex');
   const currentImageName = `${currentImageHash}.png`;
   const currentImagePath = join(screenshotBuildData.imagesDir, currentImageName);
 
@@ -53,8 +63,8 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
       isMobile: emulateConfig.viewport.isMobile,
       allowableMismatchedPixels: screenshotBuildData.allowableMismatchedPixels,
       allowableMismatchedRatio: screenshotBuildData.allowableMismatchedRatio,
-      testPath: testPath
-    }
+      testPath: testPath,
+    },
   };
 
   if (screenshotBuildData.updateMaster) {
@@ -88,7 +98,6 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
       // awesome, we've got cached data so we
       // can skip having to do the heavy pixelmatch comparison
       screenshot.diff.mismatchedPixels = cachedMismatchedPixels;
-
     } else {
       // images are not identical
       // and we don't have any cached data so let's
@@ -104,13 +113,10 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
         imageBPath: join(screenshotBuildData.imagesDir, screenshot.diff.imageB),
         width: naturalWidth,
         height: naturalHeight,
-        pixelmatchThreshold: pixelmatchThreshold
+        pixelmatchThreshold: pixelmatchThreshold,
       };
 
-      screenshot.diff.mismatchedPixels = await getMismatchedPixels(
-        screenshotBuildData.pixelmatchModulePath,
-        pixelMatchInput
-      );
+      screenshot.diff.mismatchedPixels = await getMismatchedPixels(screenshotBuildData.pixelmatchModulePath, pixelMatchInput);
     }
   }
 
@@ -118,7 +124,6 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
 
   return screenshot.diff;
 }
-
 
 async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput: d.PixelMatchInput) {
   return new Promise<number>((resolve, reject) => {
@@ -128,15 +133,13 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
     }, timeout);
 
     try {
-      const filteredExecArgs = process.execArgv.filter(
-        v => !/^--(debug|inspect)/.test(v)
-      );
+      const filteredExecArgs = process.execArgv.filter(v => !/^--(debug|inspect)/.test(v));
 
       const options = {
         execArgv: filteredExecArgs,
         env: process.env,
         cwd: process.cwd(),
-        stdio: ['pipe', 'pipe', 'pipe', 'ipc'] as any
+        stdio: ['pipe', 'pipe', 'pipe', 'ipc'] as any,
       };
 
       const pixelMatchProcess = fork(pixelmatchModulePath, [], options);
@@ -153,7 +156,6 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
       });
 
       pixelMatchProcess.send(pixelMatchInput);
-
     } catch (e) {
       clearTimeout(tmr);
       reject(`getMismatchedPixels error: ${e}`);
@@ -161,13 +163,11 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
   });
 }
 
-
 function getCacheKey(imageA: string, imageB: string, pixelmatchThreshold: number) {
   const hash = createHash('md5');
   hash.update(`${imageA}:${imageB}:${pixelmatchThreshold}`);
   return hash.digest('hex').substr(0, 10);
 }
-
 
 function getScreenshotId(emulateConfig: d.EmulateConfig, uniqueDescription: string) {
   if (typeof uniqueDescription !== 'string' || uniqueDescription.trim().length === 0) {
@@ -184,5 +184,8 @@ function getScreenshotId(emulateConfig: d.EmulateConfig, uniqueDescription: stri
   hash.update(emulateConfig.viewport.hasTouch + ':');
   hash.update(emulateConfig.viewport.isMobile + ':');
 
-  return hash.digest('hex').substr(0, 8).toLowerCase();
+  return hash
+    .digest('hex')
+    .substr(0, 8)
+    .toLowerCase();
 }

@@ -2,23 +2,20 @@ import * as d from '@stencil/core/declarations';
 import { mockStencilSystem } from '@stencil/core/testing';
 import { validateServiceWorker } from '../validate-service-worker';
 
-
 describe('validateServiceWorker', () => {
-
   const config: d.Config = {
     fsNamespace: 'app',
     sys: mockStencilSystem(),
     devMode: false,
-    flags: {}
+    flags: {},
   };
 
   let outputTarget: d.OutputTargetWww;
 
-
   it('should add host.config.json to globIgnores', () => {
     outputTarget = {
       type: 'www',
-      appDir: '/User/me/app/www/'
+      appDir: '/User/me/app/www/',
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker.globIgnores).toContain('**/host.config.json');
@@ -29,8 +26,8 @@ describe('validateServiceWorker', () => {
       type: 'www',
       appDir: '/User/me/app/www/',
       serviceWorker: {
-        globIgnores: '**/some-file.js'
-      }
+        globIgnores: '**/some-file.js',
+      },
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker.globIgnores).toContain('**/some-file.js');
@@ -41,8 +38,8 @@ describe('validateServiceWorker', () => {
       type: 'www',
       appDir: '/User/me/app/www/',
       serviceWorker: {
-        globDirectory: '/custom/www'
-      }
+        globDirectory: '/custom/www',
+      },
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker.globDirectory).toBe('/custom/www');
@@ -51,7 +48,7 @@ describe('validateServiceWorker', () => {
   it('should set default globDirectory', () => {
     outputTarget = {
       type: 'www',
-      appDir: '/User/me/app/www/'
+      appDir: '/User/me/app/www/',
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker.globDirectory).toBe('/User/me/app/www/');
@@ -62,8 +59,8 @@ describe('validateServiceWorker', () => {
       type: 'www',
       appDir: '/www',
       serviceWorker: {
-        globPatterns: ['**/*.{png,svg}']
-      }
+        globPatterns: ['**/*.{png,svg}'],
+      },
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker.globPatterns).toEqual(['**/*.{png,svg}']);
@@ -74,8 +71,8 @@ describe('validateServiceWorker', () => {
       type: 'www',
       appDir: '/www',
       serviceWorker: {
-        globPatterns: '**/*.{png,svg}' as any
-      }
+        globPatterns: '**/*.{png,svg}' as any,
+      },
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker.globPatterns).toEqual(['**/*.{png,svg}']);
@@ -84,19 +81,16 @@ describe('validateServiceWorker', () => {
   it('should create default globPatterns', () => {
     outputTarget = {
       type: 'www',
-      appDir: '/www'
+      appDir: '/www',
     };
     validateServiceWorker(config, outputTarget);
-    expect(outputTarget.serviceWorker.globPatterns).toEqual([
-      '*.html',
-      '**/*.{js,css,json}'
-    ]);
+    expect(outputTarget.serviceWorker.globPatterns).toEqual(['*.html', '**/*.{js,css,json}']);
   });
 
   it('should create default sw config when www type and prod mode', () => {
     outputTarget = {
       type: 'www',
-      appDir: '/www'
+      appDir: '/www',
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker).not.toBe(null);
@@ -105,7 +99,7 @@ describe('validateServiceWorker', () => {
   it('should not create default sw config when www type and devMode', () => {
     outputTarget = {
       type: 'www',
-      appDir: '/www'
+      appDir: '/www',
     };
     config.devMode = true;
     validateServiceWorker(config, outputTarget);
@@ -115,7 +109,7 @@ describe('validateServiceWorker', () => {
   it('should not create default sw config when not www type', () => {
     outputTarget = {
       type: 'www',
-      appDir: '/www'
+      appDir: '/www',
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker).toBe(null);
@@ -125,7 +119,7 @@ describe('validateServiceWorker', () => {
     outputTarget = {
       type: 'www',
       appDir: '/www',
-      serviceWorker: true as any
+      serviceWorker: true as any,
     };
     config.devMode = true;
     validateServiceWorker(config, outputTarget);
@@ -136,7 +130,7 @@ describe('validateServiceWorker', () => {
     outputTarget = {
       type: 'www',
       appDir: '/www',
-      serviceWorker: true as any
+      serviceWorker: true as any,
     };
     config.devMode = true;
     validateServiceWorker(config, outputTarget);
@@ -147,7 +141,7 @@ describe('validateServiceWorker', () => {
     outputTarget = {
       type: 'www',
       appDir: '/www',
-      serviceWorker: true as any
+      serviceWorker: true as any,
     };
     config.devMode = true;
     config.flags.serviceWorker = true;
@@ -158,7 +152,7 @@ describe('validateServiceWorker', () => {
   it('should stay null', () => {
     outputTarget = {
       type: 'www',
-      serviceWorker: null
+      serviceWorker: null,
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker).toBe(null);
@@ -167,10 +161,9 @@ describe('validateServiceWorker', () => {
   it('should stay false', () => {
     outputTarget = {
       type: 'www',
-      serviceWorker: false
+      serviceWorker: false,
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker).toBe(false);
   });
-
 });

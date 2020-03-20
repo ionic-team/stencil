@@ -1,9 +1,8 @@
 import * as d from '../../../declarations';
-import { CMP_FLAGS } from '@utils';
+import { addStaticStyleGetterWithinClass } from '../add-static-style';
+import { CMP_FLAGS, formatComponentRuntimeMeta } from '@utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
-import { formatComponentRuntimeMeta } from '../../app-core/format-component-runtime-meta';
 import ts from 'typescript';
-
 
 export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   const compactMeta: d.ComponentRuntimeMetaCompact = formatComponentRuntimeMeta(cmp, true);
@@ -13,13 +12,15 @@ export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d
     $members$: compactMeta[2],
     $listeners$: compactMeta[3],
     $lazyBundleIds$: fakeBundleIds(cmp),
-    $attrsToReflect$: []
+    $attrsToReflect$: getHydrateAttrsToReflect(cmp),
   };
   // We always need shadow-dom shim in hydrate runtime
   if (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
-    cmpMeta.$flags$ |=  CMP_FLAGS.needsShadowDomShim;
+    cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
   }
   const staticMember = createStaticGetter('cmpMeta', convertValueToLiteral(cmpMeta));
+  addStaticStyleGetterWithinClass(classMembers, cmp);
+
   classMembers.push(staticMember);
 };
 
@@ -32,4 +33,13 @@ const fakeBundleIds = (cmp: d.ComponentCompilerMeta) => {
     return modes;
   }
   return '-';
+};
+
+const getHydrateAttrsToReflect = (cmp: d.ComponentCompilerMeta) => {
+  return cmp.properties.reduce((attrs, prop) => {
+    if (prop.reflect) {
+      attrs.push([prop.name, prop.attribute]);
+    }
+    return attrs;
+  }, [] as [string, string][]);
 };

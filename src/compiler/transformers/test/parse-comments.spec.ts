@@ -1,8 +1,6 @@
 import { transpileModule } from './transpile';
 
-
 describe('parse comments', () => {
-
   it('should parse all comments', () => {
     const t = transpileModule(`
       /**
@@ -35,74 +33,74 @@ describe('parse comments', () => {
     `);
 
     expect(t.property).toEqual({
-      'attribute': 'prop',
-      'complexType': {
-        'references': {},
-        'resolved': '"md"',
-        'original': '\'md\'',
+      attribute: 'prop',
+      complexType: {
+        references: {},
+        resolved: '"md"',
+        original: "'md'",
       },
-      'defaultValue': undefined,
-      'docs': {
-        'tags': [{
-          'name': 'required',
-          'text': 'hello'
-        }],
-        'text': 'This is a prop',
-      },
-      'internal': false,
-      'mutable': false,
-      'name': 'prop',
-      'optional': false,
-      'reflect': false,
-      'required': false,
-      'type': 'string',
-    });
-    expect(t.method).toEqual({
-      'complexType': {
-        'parameters': [
+      defaultValue: undefined,
+      docs: {
+        tags: [
           {
-            'tags': [],
-            'text': '',
+            name: 'required',
+            text: 'hello',
           },
         ],
-        'return': 'unknown',
-        'references': {},
-        'signature': '(prop: string) => unknown',
+        text: 'This is a prop',
       },
-      'docs': {
-        'tags': [],
-        'text': 'This is a method',
+      internal: false,
+      mutable: false,
+      name: 'prop',
+      optional: false,
+      reflect: false,
+      required: false,
+      type: 'string',
+    });
+    expect(t.method).toEqual({
+      complexType: {
+        parameters: [
+          {
+            tags: [],
+            text: '',
+          },
+        ],
+        return: 'unknown',
+        references: {},
+        signature: '(prop: string) => unknown',
       },
-      'internal': false,
-      'name': 'method',
+      docs: {
+        tags: [],
+        text: 'This is a method',
+      },
+      internal: false,
+      name: 'method',
     });
     expect(t.event).toEqual({
-      'bubbles': true,
-      'cancelable': true,
-      'composed': true,
-      'docs': {
-        'tags': [],
-        'text': 'This is an event',
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      docs: {
+        tags: [],
+        text: 'This is an event',
       },
-      'complexType': {
-        'original': 'any',
-        'references': {},
-        'resolved': 'any',
+      complexType: {
+        original: 'any',
+        references: {},
+        resolved: 'any',
       },
-      'internal': false,
-      'method': 'event',
-      'name': 'event',
+      internal: false,
+      method: 'event',
+      name: 'event',
     });
     expect(t.cmp.docs).toEqual({
-      'tags': [
+      tags: [
         {
-          'name': 'usage',
-          'text': 'Hello',
+          name: 'usage',
+          text: 'Hello',
         },
       ],
-      'text': 'Comments',
+      text: 'Comments',
     });
-
   });
-
 });

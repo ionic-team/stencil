@@ -17,7 +17,10 @@ describe('MockHeaders', () => {
     const headers = new Headers([
       new Set(['x-header-a', '1']),
       ['x-header-b', '2'],
-      new Map([['X-header-A', null], ['3', null]]).keys(),
+      new Map([
+        ['X-header-A', null],
+        ['3', null],
+      ]).keys(),
       new Set(['x-header-c', '4']),
     ]);
     expect(headers.get('x-header-a')).toBe('1, 3');
@@ -104,8 +107,14 @@ describe('MockHeaders', () => {
     headers.append('X-HEADER-B', 'c');
     const o1 = Array.from(headers.entries());
     const o2 = Array.from(headers);
-    expect(o1).toEqual([['x-header-a', '1, 2, 3'], ['x-header-b', 'a, b, c']]);
-    expect(o2).toEqual([['x-header-a', '1, 2, 3'], ['x-header-b', 'a, b, c']]);
+    expect(o1).toEqual([
+      ['x-header-a', '1, 2, 3'],
+      ['x-header-b', 'a, b, c'],
+    ]);
+    expect(o2).toEqual([
+      ['x-header-a', '1, 2, 3'],
+      ['x-header-b', 'a, b, c'],
+    ]);
   });
 
   it('forEach', () => {
@@ -120,7 +129,9 @@ describe('MockHeaders', () => {
     headers.forEach((v, k) => {
       o.push([v, k]);
     });
-    expect(o).toEqual([['1, 2, 3', 'x-header-a'], ['a, b, c', 'x-header-b']]);
+    expect(o).toEqual([
+      ['1, 2, 3', 'x-header-a'],
+      ['a, b, c', 'x-header-b'],
+    ]);
   });
-
 });

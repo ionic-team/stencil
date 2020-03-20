@@ -2,7 +2,6 @@ import * as d from '@stencil/core/internal';
 import { addHostEventListeners } from '@runtime';
 import { hostRefs } from './testing-constants';
 
-
 export const getHostRef = (elm: d.RuntimeRef) => {
   return hostRefs.get(elm);
 };
@@ -16,7 +15,7 @@ export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) => {
     console.warn(`Use "newSpecPage()" to instanciate component instances instead of "new MyComp()".
 For further information: https://stenciljs.com/docs/unit-testing#newspecpage-`);
     const Cstr = lazyInstance.constructor as d.ComponentTestingConstructor;
-    const tagName = (Cstr.COMPILER_META && Cstr.COMPILER_META.tagName) ? Cstr.COMPILER_META.tagName : 'div';
+    const tagName = Cstr.COMPILER_META && Cstr.COMPILER_META.tagName ? Cstr.COMPILER_META.tagName : 'div';
     const elm = document.createElement(tagName);
     registerHost(elm, { $flags$: 0, $tagName$: tagName });
     hostRef = getHostRef(elm);
@@ -32,10 +31,10 @@ export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     $hostElement$: elm,
     $cmpMeta$: cmpMeta,
     $instanceValues$: new Map(),
-    $renderCount$: 0
+    $renderCount$: 0,
   };
-  hostRef.$onInstancePromise$ = new Promise(r => hostRef.$onInstanceResolve$ = r);
-  hostRef.$onReadyPromise$ = new Promise(r => hostRef.$onReadyResolve$ = r);
+  hostRef.$onInstancePromise$ = new Promise(r => (hostRef.$onInstanceResolve$ = r));
+  hostRef.$onReadyPromise$ = new Promise(r => (hostRef.$onReadyResolve$ = r));
   elm['s-p'] = [];
   elm['s-rc'] = [];
   addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);

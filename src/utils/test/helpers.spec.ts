@@ -1,10 +1,7 @@
 import { dashToPascalCase, isDef, toDashCase } from '../helpers';
 
-
 describe('util helpers', () => {
-
   describe('dashToPascalCase', () => {
-
     it('my-3d-component => My3dComponent', () => {
       expect(dashToPascalCase('my-3d-component')).toBe('My3dComponent');
     });
@@ -16,11 +13,9 @@ describe('util helpers', () => {
     it('wisconsin => Wisconsin', () => {
       expect(dashToPascalCase('wisconsin')).toBe('Wisconsin');
     });
-
   });
 
   describe('toDashCase', () => {
-
     it('My3dComponent => my-3d-component', () => {
       expect(toDashCase('My3dComponent')).toBe('my-3d-component');
     });
@@ -40,11 +35,9 @@ describe('util helpers', () => {
     it('wisconsin => wisconsin', () => {
       expect(toDashCase('wisconsin')).toBe('wisconsin');
     });
-
   });
 
   describe('isDef', () => {
-
     it('number', () => {
       expect(isDef(88)).toBe(true);
     });
@@ -76,7 +69,5 @@ describe('util helpers', () => {
     it('null', () => {
       expect(isDef(null)).toBe(false);
     });
-
   });
-
 });

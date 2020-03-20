@@ -1,8 +1,6 @@
 import { transpileModule } from './transpile';
 
-
 describe('parse events', () => {
-
   it('events', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
@@ -29,11 +27,13 @@ describe('parse events', () => {
       },
       docs: {
         text: 'Hello, this is an event',
-        tags: [{
-          name: 'foo',
-          text: 'bar'
-        }]
-      }
+        tags: [
+          {
+            name: 'foo',
+            text: 'bar',
+          },
+        ],
+      },
     });
   });
 
@@ -63,8 +63,8 @@ describe('parse events', () => {
       },
       docs: {
         text: '',
-        tags: []
-      }
+        tags: [],
+      },
     });
   });
 
@@ -103,9 +103,9 @@ describe('parse events', () => {
       original: 'Mode',
       resolved: `"ios" | "md"`,
       references: {
-        'Mode': {
-          'location': 'local'
-        }
+        Mode: {
+          location: 'local',
+        },
       },
     });
   });

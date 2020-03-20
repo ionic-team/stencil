@@ -2,12 +2,11 @@ import * as d from '../../declarations';
 import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from '../runtime-constants';
 import { getHostRef } from '@platform';
 
-
 export const insertVdomAnnotations = (doc: Document) => {
   if (doc != null) {
     const docData: DocData = {
       hostIds: 0,
-      rootLevelIds: 0
+      rootLevelIds: 0,
     };
     const orgLocationNodes: d.RenderNode[] = [];
 
@@ -29,7 +28,6 @@ export const insertVdomAnnotations = (doc: Document) => {
 
           if (nodeRef.nodeType === NODE_TYPE.ElementNode) {
             nodeRef.setAttribute(HYDRATE_CHILD_ID, childId);
-
           } else if (nodeRef.nodeType === NODE_TYPE.TextNode) {
             if (hostId === 0) {
               const textContent = nodeRef.nodeValue.trim();
@@ -54,7 +52,6 @@ export const insertVdomAnnotations = (doc: Document) => {
             // of this node's original location is a SHADOW dom element
             // and this node is apart of the root level light dom
             orgLocationNodeId += `.`;
-
           } else if (orgLocationParentNode['s-en'] === 'c') {
             // ending with a ".c" means that the parent element
             // of this node's original location is a SCOPED element
@@ -68,7 +65,6 @@ export const insertVdomAnnotations = (doc: Document) => {
     });
   }
 };
-
 
 const parseVNodeAnnotations = (doc: Document, node: d.RenderNode, docData: DocData, orgLocationNodes: d.RenderNode[]) => {
   if (node == null) {
@@ -84,7 +80,7 @@ const parseVNodeAnnotations = (doc: Document, node: d.RenderNode, docData: DocDa
       const hostRef = getHostRef(childNode);
       if (hostRef != null) {
         const cmpData: CmpData = {
-          nodeIds: 0
+          nodeIds: 0,
         };
         insertVNodeAnnotations(doc, childNode as any, hostRef.$vnode$, docData, cmpData);
       }
@@ -93,7 +89,6 @@ const parseVNodeAnnotations = (doc: Document, node: d.RenderNode, docData: DocDa
     });
   }
 };
-
 
 const insertVNodeAnnotations = (doc: Document, hostElm: d.HostElement, vnode: d.VNode, docData: DocData, cmpData: CmpData) => {
   if (vnode != null) {
@@ -114,7 +109,6 @@ const insertVNodeAnnotations = (doc: Document, hostElm: d.HostElement, vnode: d.
   }
 };
 
-
 const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, cmpData: CmpData, hostId: number, depth: number, index: number) => {
   const childElm = vnodeChild.$elm$ as d.RenderNode;
   if (childElm == null) {
@@ -129,7 +123,6 @@ const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, cmpData
 
   if (childElm.nodeType === NODE_TYPE.ElementNode) {
     childElm.setAttribute(HYDRATE_CHILD_ID, childId);
-
   } else if (childElm.nodeType === NODE_TYPE.TextNode) {
     const parentNode = childElm.parentNode;
     if (parentNode.nodeName !== 'STYLE') {
@@ -138,10 +131,9 @@ const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, cmpData
       const commentBeforeTextNode = doc.createComment(textNodeId);
       parentNode.insertBefore(commentBeforeTextNode, childElm);
     }
-
   } else if (childElm.nodeType === NODE_TYPE.CommentNode) {
     if (childElm['s-sr']) {
-      const slotName = (childElm['s-sn'] || '');
+      const slotName = childElm['s-sn'] || '';
       const slotNodeId = `${SLOT_NODE_ID}.${childId}.${slotName}`;
       childElm.nodeValue = slotNodeId;
     }
@@ -155,12 +147,10 @@ const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, cmpData
   }
 };
 
-
 interface DocData {
   hostIds: number;
   rootLevelIds: number;
 }
-
 
 interface CmpData {
   nodeIds: number;

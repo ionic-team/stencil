@@ -1,8 +1,6 @@
 import { toVNode } from './to-vnode';
 
-
 describe('toVNode()', () => {
-
   it('should create element w/ child elements and text nodes', () => {
     const elm = document.createElement('h1');
     elm.innerHTML = '<div> 1 <span> 2 </span><!--comment-->   </div>';
@@ -46,5 +44,4 @@ describe('toVNode()', () => {
     expect(vnode.$tag$).toBe('h1');
     expect(vnode.$children$).toBeNull();
   });
-
 });

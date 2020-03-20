@@ -1,29 +1,26 @@
 import * as d from '../../declarations';
+import { basename, relative } from 'path';
 import { buildError, catchError, isFunction, isString } from '@utils';
 import { isOutputTargetDocs } from '../output-targets/output-utils';
 import { parseCssImports } from '../style/css-imports';
 import { PluginCtx, PluginTransformResults } from '../../declarations';
 
-
 export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string) => {
   for (const plugin of pluginCtx.config.plugins) {
-
-    if (typeof plugin.resolveId === 'function') {
+    if (isFunction(plugin.resolveId)) {
       try {
         const results = plugin.resolveId(importee, null, pluginCtx);
 
         if (results != null) {
-          if (typeof (results as any).then === 'function') {
+          if (isFunction((results as any).then)) {
             const promiseResults = await results;
             if (promiseResults != null) {
               return promiseResults as string;
             }
-
-          } else if (typeof results === 'string') {
-            return results as string;
+          } else if (isString(results)) {
+            return results;
           }
         }
-
       } catch (e) {
         catchError(pluginCtx.diagnostics, e);
       }
@@ -36,23 +33,20 @@ export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string)
 
 export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
   for (const plugin of pluginCtx.config.plugins) {
-
-    if (typeof plugin.load === 'function') {
+    if (isFunction(plugin.load)) {
       try {
         const results = plugin.load(id, pluginCtx);
 
         if (results != null) {
-          if (typeof (results as any).then === 'function') {
+          if (isFunction((results as any).then)) {
             const promiseResults = await results;
             if (promiseResults != null) {
               return promiseResults as string;
             }
-
-          } else if (typeof results === 'string') {
-            return results as string;
+          } else if (isString(results)) {
+            return results;
           }
         }
-
       } catch (e) {
         catchError(pluginCtx.diagnostics, e);
       }
@@ -69,25 +63,25 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
     sys: config.sys,
     fs: compilerCtx.fs,
     cache: compilerCtx.cache,
-    diagnostics: []
+    diagnostics: [],
   };
 
   const resolvedId = await runPluginResolveId(pluginCtx, id);
   const sourceText = await runPluginLoad(pluginCtx, resolvedId);
   if (!isString(sourceText)) {
     const diagnostic = buildError(buildCtx.diagnostics);
-    diagnostic.header = `Unable to find "${config.sys.path.basename(id)}"`;
-    diagnostic.messageText = `The file "${config.sys.path.relative(config.rootDir, id)}" was unable to load.`;
+    diagnostic.header = `Unable to find "${basename(id)}"`;
+    diagnostic.messageText = `The file "${relative(config.rootDir, id)}" was unable to load.`;
     return null;
   }
 
   const transformResults: PluginTransformResults = {
     code: sourceText,
-    id: id
+    id: id,
   };
 
   const isRawCssFile = transformResults.id.toLowerCase().endsWith('.css');
-  const shouldParseCssDocs = (cmp != null && config.outputTargets.some(isOutputTargetDocs));
+  const shouldParseCssDocs = cmp != null && config.outputTargets.some(isOutputTargetDocs);
 
   if (isRawCssFile) {
     // concat all css @imports into one file
@@ -96,42 +90,37 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
     if (shouldParseCssDocs && cmp != null) {
       cmp.styleDocs = cmp.styleDocs || [];
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code, cmp.styleDocs);
-
     } else {
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code);
     }
   }
 
   for (const plugin of pluginCtx.config.plugins) {
-
-    if (typeof plugin.transform === 'function') {
+    if (isFunction(plugin.transform)) {
       try {
         let pluginTransformResults: PluginTransformResults | string;
         const results = plugin.transform(transformResults.code, transformResults.id, pluginCtx);
 
         if (results != null) {
-          if (typeof (results as any).then === 'function') {
+          if (isFunction((results as any).then)) {
             pluginTransformResults = await results;
-
           } else {
             pluginTransformResults = results as PluginTransformResults;
           }
 
           if (pluginTransformResults != null) {
-            if (typeof pluginTransformResults === 'string') {
-              transformResults.code = pluginTransformResults as string;
-
+            if (isString(pluginTransformResults)) {
+              transformResults.code = pluginTransformResults;
             } else {
-              if (typeof pluginTransformResults.code === 'string') {
+              if (isString(pluginTransformResults.code)) {
                 transformResults.code = pluginTransformResults.code;
               }
-              if (typeof pluginTransformResults.id === 'string') {
+              if (isString(pluginTransformResults.id)) {
                 transformResults.id = pluginTransformResults.id;
               }
             }
           }
         }
-
       } catch (e) {
         catchError(buildCtx.diagnostics, e);
       }
@@ -149,7 +138,6 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
     if (shouldParseCssDocs && cmp != null) {
       cmp.styleDocs = cmp.styleDocs || [];
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code, cmp.styleDocs);
-
     } else {
       transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code);
     }
@@ -164,7 +152,7 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
     sys: config.sys,
     fs: compilerCtx.fs,
     cache: compilerCtx.cache,
-    diagnostics: []
+    diagnostics: [],
   };
 
   const transformResults: PluginTransformResults = {
@@ -172,11 +160,10 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
     id,
     map: null,
     diagnostics: [],
-    dependencies: []
+    dependencies: [],
   };
 
   for (const plugin of pluginCtx.config.plugins) {
-
     if (isFunction(plugin.transform)) {
       try {
         let pluginTransformResults: PluginTransformResults | string;
@@ -184,7 +171,6 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
         if (results != null) {
           if (isFunction((results as any).then)) {
             pluginTransformResults = await results;
-
           } else {
             pluginTransformResults = results as PluginTransformResults;
           }
@@ -192,7 +178,6 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
           if (pluginTransformResults != null) {
             if (isString(pluginTransformResults)) {
               transformResults.code = pluginTransformResults as string;
-
             } else {
               if (isString(pluginTransformResults.code)) {
                 transformResults.code = pluginTransformResults.code;
@@ -206,7 +191,6 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
             }
           }
         }
-
       } catch (e) {
         catchError(transformResults.diagnostics, e);
       }

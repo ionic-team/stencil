@@ -1,19 +1,14 @@
 import * as d from '../../declarations';
+import { basename } from 'path';
 import { buildWarn, catchError } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
-
 
 export const generateServiceWorker = async (config: d.Config, buildCtx: d.BuildCtx, workbox: d.Workbox, outputTarget: d.OutputTargetWww) => {
   const serviceWorker = await getServiceWorker(outputTarget);
   if (serviceWorker.unregister) {
-    await config.sys.fs.writeFile(serviceWorker.swDest, SELF_UNREGISTER_SW);
-
+    await config.sys.writeFile(serviceWorker.swDest, SELF_UNREGISTER_SW);
   } else if (serviceWorker.swSrc) {
-    return Promise.all([
-      copyLib(buildCtx, outputTarget, workbox),
-      injectManifest(buildCtx, serviceWorker, workbox)
-    ]);
-
+    return Promise.all([copyLib(buildCtx, outputTarget, workbox), injectManifest(buildCtx, serviceWorker, workbox)]);
   } else {
     return generateSW(buildCtx, serviceWorker, workbox);
   }
@@ -24,7 +19,6 @@ const copyLib = async (buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, wo
 
   try {
     await workbox.copyWorkboxLibraries(outputTarget.appDir);
-
   } catch (e) {
     const d = buildWarn(buildCtx.diagnostics);
     d.messageText = 'Service worker library already exists';
@@ -39,7 +33,6 @@ const generateSW = async (buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerCo
   try {
     await workbox.generateSW(serviceWorker);
     timeSpan.finish(`generate service worker finished`);
-
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
@@ -51,7 +44,6 @@ const injectManifest = async (buildCtx: d.BuildCtx, serviceWorker: d.ServiceWork
   try {
     await workbox.injectManifest(serviceWorker);
     timeSpan.finish('inject manifest into service worker finished');
-
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
@@ -62,14 +54,12 @@ export const hasServiceWorkerChanges = (config: d.Config, buildCtx: d.BuildCtx) 
     return false;
   }
 
-  const wwwServiceOutputs = config.outputTargets
-    .filter(isOutputTargetWww)
-    .filter(o => o.serviceWorker && o.serviceWorker.swSrc);
+  const wwwServiceOutputs = config.outputTargets.filter(isOutputTargetWww).filter(o => o.serviceWorker && o.serviceWorker.swSrc);
 
   return wwwServiceOutputs.some(outputTarget => {
     return buildCtx.filesChanged.some(fileChanged => {
       if (outputTarget.serviceWorker) {
-        return config.sys.path.basename(fileChanged).toLowerCase() === config.sys.path.basename(outputTarget.serviceWorker.swSrc).toLowerCase();
+        return basename(fileChanged).toLowerCase() === basename(outputTarget.serviceWorker.swSrc).toLowerCase();
       }
       return false;
     });
@@ -82,7 +72,7 @@ const getServiceWorker = async (outputTarget: d.OutputTargetWww) => {
   }
 
   const serviceWorker: d.ServiceWorkerConfig = {
-    ...outputTarget.serviceWorker
+    ...outputTarget.serviceWorker,
   };
 
   if (serviceWorker.unregister !== true) {

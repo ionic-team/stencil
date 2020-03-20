@@ -2,13 +2,12 @@ import * as d from '../declarations';
 import * as util from './dev-server-utils';
 import { serve404 } from './serve-404';
 import { serve500 } from './serve-500';
-import * as http  from 'http';
-
+import * as http from 'http';
 
 export async function serveCompilerRequest(devServerConfig: d.DevServerConfig, req: d.HttpRequest, res: http.ServerResponse) {
   try {
     const msgResults = await util.sendMsgWithResponse(process, {
-      compilerRequestPath: req.url
+      compilerRequestPath: req.url,
     });
 
     const results = msgResults.compilerRequestResults;
@@ -31,7 +30,6 @@ export async function serveCompilerRequest(devServerConfig: d.DevServerConfig, r
     }
 
     return serve404(devServerConfig, req, res);
-
   } catch (e) {
     return serve500(devServerConfig, req, res, e);
   }

@@ -5,7 +5,6 @@ import { toEqualText } from './text';
 import { toHaveClass, toHaveClasses, toMatchClasses } from './class-list';
 import { toMatchScreenshot } from './screenshot';
 
-
 export const expectExtend = {
   toEqualAttribute,
   toEqualAttributes,
@@ -21,5 +20,5 @@ export const expectExtend = {
   toHaveReceivedEventTimes,
   toHaveFirstReceivedEventDetail,
   toHaveNthReceivedEventDetail,
-  toMatchScreenshot
+  toMatchScreenshot,
 };

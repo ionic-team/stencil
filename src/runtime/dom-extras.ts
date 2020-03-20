@@ -4,7 +4,6 @@ import { CMP_FLAGS } from '@utils';
 import { PLATFORM_FLAGS } from './runtime-constants';
 import { plt, supportsShadow } from '@platform';
 
-
 export const patchCloneNode = (HostElementPrototype: any) => {
   const orgCloneNode = HostElementPrototype.cloneNode;
 
@@ -31,10 +30,9 @@ export const patchCloneNode = (HostElementPrototype: any) => {
 };
 
 export const patchSlotAppendChild = (HostElementPrototype: any) => {
-
   HostElementPrototype.__appendChild = HostElementPrototype.appendChild;
   HostElementPrototype.appendChild = function(this: d.RenderNode, newChild: d.RenderNode) {
-    const slotName = newChild['s-sn'] = getSlotName(newChild);
+    const slotName = (newChild['s-sn'] = getSlotName(newChild));
     const slotNode = getHostSlotNode(this.childNodes, slotName);
     if (slotNode) {
       const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
@@ -43,7 +41,6 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
     }
     return (this as any).__appendChild(newChild);
   };
-
 };
 
 export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) => {
@@ -61,13 +58,13 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
           }
         }
         return children;
-      }
+      },
     });
 
     Object.defineProperty(elm, 'childElementCount', {
       get() {
         return elm.children.length;
-      }
+      },
     });
 
     Object.defineProperty(elm, 'childNodes', {
@@ -80,14 +77,12 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
           }
         }
         return childNodes;
-      }
+      },
     });
   }
 };
 
-const getSlotName = (node: d.RenderNode) =>
-  (node['s-sn']) ||
-  (node.nodeType === 1 && (node as Element).getAttribute('slot')) || '';
+const getSlotName = (node: d.RenderNode) => node['s-sn'] || (node.nodeType === 1 && (node as Element).getAttribute('slot')) || '';
 
 const getHostSlotNode = (childNodes: NodeListOf<ChildNode>, slotName: string) => {
   let i = 0;

@@ -4,7 +4,6 @@ import { patch } from '../vdom-render';
 import { SVG_NS } from '@utils';
 import { toVNode } from './to-vnode';
 
-
 describe('renderer', () => {
   let hostElm: d.HostElement;
   let vnode0: d.VNode;
@@ -16,7 +15,6 @@ describe('renderer', () => {
   });
 
   describe('created element', () => {
-
     it('has tag', () => {
       patch(vnode0, h('div', null));
       expect(hostElm.tagName).toEqual('DIV');
@@ -25,12 +23,7 @@ describe('renderer', () => {
     it('should automatically get svg namespace', () => {
       const svgElm = document.createElementNS(SVG_NS, 'svg');
       const vnode1 = toVNode(svgElm);
-      patch(vnode1, h('svg', null,
-        h('foreignObject', null,
-          h('div', null, 'I am HTML embedded in SVG')
-        ),
-        h('feGaussianBlur', null)
-      ));
+      patch(vnode1, h('svg', null, h('foreignObject', null, h('div', null, 'I am HTML embedded in SVG')), h('feGaussianBlur', null)));
 
       expect(svgElm.namespaceURI).toEqual(SVG_NS);
       expect(svgElm.firstChild.namespaceURI).toEqual(SVG_NS);
@@ -44,18 +37,11 @@ describe('renderer', () => {
             </div>
           </foreignObject>
           <feGaussianBlur></feGaussianBlur>
-        </svg>`
-      );
+        </svg>`);
     });
 
     it('should not affect subsequence element', () => {
-      patch(vnode0, h('div', null, [
-        h('svg', null, [
-          h('title', null, 'Title'),
-          h('circle', null)
-        ] as any),
-        h('div', null)
-      ] as any));
+      patch(vnode0, h('div', null, [h('svg', null, [h('title', null, 'Title'), h('circle', null)] as any), h('div', null)] as any));
 
       expect(hostElm.tagName).toEqual('DIV');
       expect(hostElm.namespaceURI).not.toEqual(SVG_NS);
@@ -68,24 +54,12 @@ describe('renderer', () => {
   });
 
   describe('created trailing svg element', () => {
-
     it('should not affect subsequent created element', () => {
-
-      patch(vnode0,  h('div', null,
-        h('div', null,
-          h('svg', null)
-        )
-      ));
+      patch(vnode0, h('div', null, h('div', null, h('svg', null))));
 
       const vnode1 = toVNode(vnode0.$elm$);
 
-      patch(vnode1, h('div', null, [
-          h('div', null,
-            h('svg', null)
-          ),
-          h('div', null)
-        ] as any
-      ));
+      patch(vnode1, h('div', null, [h('div', null, h('svg', null)), h('div', null)] as any));
 
       const vnode2 = toVNode(vnode1.$elm$);
       expect(vnode2.$children$[0].$elm$.tagName).toEqual('DIV');
@@ -93,5 +67,4 @@ describe('renderer', () => {
       expect(vnode2.$children$[1].$elm$.tagName).toEqual('DIV');
     });
   });
-
 });

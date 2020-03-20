@@ -1,8 +1,6 @@
 import { transpileModule } from './transpile';
 
-
 describe('parse component tags', () => {
-
   it('createElement', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
@@ -50,5 +48,4 @@ describe('parse component tags', () => {
     expect(t.cmp.potentialCmpRefs).toHaveLength(1);
     expect(t.cmp.potentialCmpRefs[0]).toBe('some-cmp');
   });
-
 });

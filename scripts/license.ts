@@ -3,7 +3,6 @@ import { join } from 'path';
 import { BuildOptions, getOptions } from './utils/options';
 import { PackageData } from './utils/write-pkg-json';
 
-
 const entryDeps = [
   '@rollup/plugin-commonjs',
   '@rollup/plugin-json',
@@ -52,7 +51,6 @@ const manuallyNotBundled = new Set([
   'urix',
 ]);
 
-
 export function createLicense(rootDir: string) {
   const opts = getOptions(rootDir);
   const thirdPartyLicensesRootPath = join(opts.rootDir, 'NOTICE.md');
@@ -71,13 +69,14 @@ export function createLicense(rootDir: string) {
     .map(l => l.license)
     .reduce((arr, l) => {
       if (!arr.includes(l)) {
-        arr.push(l)
+        arr.push(l);
       }
       return arr;
     }, [])
     .sort();
 
-  const output = `
+  const output =
+    `
 # Licenses of Bundled Dependencies
 
 The published Stencil distribution contains the following licenses:
@@ -124,16 +123,11 @@ function createBundledDepLicense(opts: BuildOptions, moduleId: string): BundledD
   const output: string[] = [];
   let license: string = null;
 
-  output.push(
-    `## \`${moduleId}\``,
-    ``,
-  );
+  output.push(`## \`${moduleId}\``, ``);
 
   if (typeof pkgJson.license === 'string') {
     license = pkgJson.license;
-    output.push(
-      `License: ${pkgJson.license}`, ``
-    );
+    output.push(`License: ${pkgJson.license}`, ``);
   }
 
   if (Array.isArray(pkgJson.licenses)) {
@@ -146,37 +140,32 @@ function createBundledDepLicense(opts: BuildOptions, moduleId: string): BundledD
     });
 
     if (bundledLicenses.length > 0) {
-      output.push(
-        `License: ${bundledLicenses.join(', ')}`, ``
-      );
+      output.push(`License: ${bundledLicenses.join(', ')}`, ``);
     }
   }
 
   const author = getContributors(pkgJson.author);
   if (typeof author === 'string') {
-    output.push(
-      `Author: ${author}`, ``
-    );
+    output.push(`Author: ${author}`, ``);
   }
 
   const contributors = getContributors(pkgJson.contributors);
   if (typeof contributors === 'string') {
-    output.push(
-      `Contributors: ${contributors}`, ``
-    );
+    output.push(`Contributors: ${contributors}`, ``);
   }
 
   if (typeof pkgJson.homepage === 'string') {
-    output.push(
-      `Homepage: ${pkgJson.homepage}`, ``
-    );
+    output.push(`Homepage: ${pkgJson.homepage}`, ``);
   }
 
   const depLicense = getBundledDepLicenseContent(opts, moduleId);
   if (typeof depLicense === 'string') {
-    depLicense.trim().split('\n').forEach(ln => {
-      output.push(`> ${ln}`);
-    });
+    depLicense
+      .trim()
+      .split('\n')
+      .forEach(ln => {
+        output.push(`> ${ln}`);
+      });
   }
 
   output.push(``, `-----------------------------------------`, ``);
@@ -192,10 +181,10 @@ function createBundledDepLicense(opts: BuildOptions, moduleId: string): BundledD
 }
 
 interface BundledDep {
-  moduleId: string,
-  content: string,
-  license: string,
-  dependencies: string[],
+  moduleId: string;
+  content: string;
+  license: string;
+  dependencies: string[];
 }
 
 function getContributors(prop: any) {
@@ -204,12 +193,14 @@ function getContributors(prop: any) {
   }
 
   if (Array.isArray(prop)) {
-    return prop.map(getAuthor)
-      .filter(c => !!c).join(', ');
+    return prop
+      .map(getAuthor)
+      .filter(c => !!c)
+      .join(', ');
   }
 
   if (prop) {
-    return getAuthor(prop)
+    return getAuthor(prop);
   }
 }
 
@@ -234,11 +225,9 @@ function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string) {
     const licensePath = join(opts.nodeModulesDir, moduleId, 'LICENSE');
     return fs.readFileSync(licensePath, 'utf8');
   } catch (e) {
-
     try {
       const licensePath = join(opts.nodeModulesDir, moduleId, 'LICENSE.md');
       return fs.readFileSync(licensePath, 'utf8');
-
     } catch (e) {
       try {
         const licensePath = join(opts.nodeModulesDir, moduleId, 'LICENSE-MIT');

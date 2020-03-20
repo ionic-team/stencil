@@ -1,13 +1,12 @@
 import ts from 'typescript';
 import { OutputOptions, OutputBundle, OutputChunk, Plugin } from 'rollup';
 
-
 export function reorderCoreStatementsPlugin(): Plugin {
   return {
     name: 'internalClient',
     generateBundle(options, bundles) {
       reorderCoreStatements(options, bundles);
-    }
+    },
   };
 }
 
@@ -22,9 +21,7 @@ function reorderCoreStatements(options: OutputOptions, bundles: OutputBundle) {
   }
 }
 
-
 function reorderStatements(code: string) {
-
   function transform() {
     return () => {
       return (tsSourceFile: ts.SourceFile) => {
@@ -35,22 +32,12 @@ function reorderStatements(code: string) {
         const letNoInitializerStatements = s.filter(isLetNoInitializer);
         const letWithInitializer = s.filter(isLetWithInitializer);
 
-        const otherStatements = s.filter(n => (
-          !isLet(n) &&
-          !ts.isImportDeclaration(n) &&
-          !ts.isExportDeclaration(n)
-        ));
+        const otherStatements = s.filter(n => !isLet(n) && !ts.isImportDeclaration(n) && !ts.isExportDeclaration(n));
 
-        return ts.updateSourceFileNode(tsSourceFile, [
-          ...letNoInitializerStatements,
-          ...letWithInitializer,
-          ...importStatements,
-          ...otherStatements,
-          ...exportStatements,
-        ]);
+        return ts.updateSourceFileNode(tsSourceFile, [...letNoInitializerStatements, ...letWithInitializer, ...importStatements, ...otherStatements, ...exportStatements]);
       };
     };
-  };
+  }
 
   function isLet(n: ts.Statement): n is ts.VariableStatement {
     if (ts.isVariableStatement(n) && n.declarationList) {
@@ -79,12 +66,12 @@ function reorderStatements(code: string) {
   const output = ts.transpileModule(code, {
     compilerOptions: {
       module: ts.ModuleKind.ESNext,
-      target: ts.ScriptTarget.ES2017
+      target: ts.ScriptTarget.ES2017,
     },
     transformers: {
-      after: [transform()]
-    }
+      after: [transform()],
+    },
   });
 
   return output.outputText;
-};
+}

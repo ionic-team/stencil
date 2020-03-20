@@ -1,39 +1,59 @@
 import * as d from '../../declarations';
-import { canSkipOutputTargets } from './output-utils';
-import { outputApp } from './output-app';
-import { outputCollections } from './output-collection';
-import { outputHydrate } from './output-hydrate';
-import { outputTypes } from './output-types';
+import { outputAngular } from './output-angular';
+import { outputCopy } from './copy/output-copy';
+import { outputCustomElements } from './dist-custom-elements';
+import { outputCustomElementsBundle } from './dist-custom-elements-bundle';
+import { outputDocs } from './output-docs';
+import { outputHydrateScript } from './dist-hydrate-script';
+import { outputLazy } from './dist-lazy/lazy-output';
 import { outputLazyLoader } from './output-lazy-loader';
 import { outputWww } from './output-www';
-import { outputDocs } from './output-docs';
-import { outputAngular } from './output-angular';
+import { outputCollection } from './dist-collection';
+import { outputTypes } from './output-types';
+import { RollupCache } from 'rollup';
 
+export const generateOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+  const timeSpan = buildCtx.createTimeSpan('generate outputs started', true);
 
-export async function generateOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  if (canSkipOutputTargets(buildCtx)) {
-    return;
-  }
+  const changedModuleFiles = Array.from(compilerCtx.changedModules)
+    .map(filename => compilerCtx.moduleMap.get(filename))
+    .filter(mod => mod && !mod.isCollectionDependency);
+
+  compilerCtx.changedModules.clear();
+
+  invalidateRollupCaches(compilerCtx);
 
   await Promise.all([
-    outputCollections(config, compilerCtx, buildCtx),
-    outputModulesApp(config, compilerCtx, buildCtx),
-    outputHydrate(config, compilerCtx, buildCtx),
     outputAngular(config, compilerCtx, buildCtx),
+    outputCopy(config, compilerCtx, buildCtx),
+    outputCollection(config, compilerCtx, buildCtx, changedModuleFiles),
+    outputCustomElements(config, compilerCtx, buildCtx, changedModuleFiles),
+    outputCustomElementsBundle(config, compilerCtx, buildCtx),
+    outputHydrateScript(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
-
-    buildCtx.stylesPromise
+    outputApp(config, compilerCtx, buildCtx),
   ]);
-
-  await outputDocs(config, compilerCtx, buildCtx),
 
   // must run after all the other outputs
   // since it validates files were created
+  await outputDocs(config, compilerCtx, buildCtx);
   await outputTypes(config, compilerCtx, buildCtx);
-}
 
+  timeSpan.finish('generate outputs finished');
+};
 
-async function outputModulesApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  await outputApp(config, compilerCtx, buildCtx, 'webComponentsModule');
+const outputApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+  await outputLazy(config, compilerCtx, buildCtx);
   await outputWww(config, compilerCtx, buildCtx);
-}
+};
+
+const invalidateRollupCaches = (compilerCtx: d.CompilerCtx) => {
+  const invalidatedIds = compilerCtx.changedFiles;
+  compilerCtx.rollupCache.forEach((cache: RollupCache) => {
+    cache.modules.forEach(mod => {
+      if (mod.transformDependencies.some(id => invalidatedIds.has(id))) {
+        mod.originalCode = null;
+      }
+    });
+  });
+};

@@ -8,7 +8,6 @@ import { internalTesting } from './internal-platform-testing';
 import { join } from 'path';
 import { writePkgJson } from '../utils/write-pkg-json';
 
-
 export async function internal(opts: BuildOptions) {
   const inputInternalDir = join(opts.transpiledDir, 'internal');
 
@@ -20,31 +19,22 @@ export async function internal(opts: BuildOptions) {
 
   // copy @stencil/core/internal default entry, which defaults to client
   // but we're not exposing all of Stencil's internal code (only the types)
-  await fs.copyFile(
-    join(inputInternalDir, 'default.js'),
-    join(opts.output.internalDir, 'index.mjs')
-  );
+  await fs.copyFile(join(inputInternalDir, 'default.js'), join(opts.output.internalDir, 'index.mjs'));
 
   // write @stencil/core/internal/package.json
   writePkgJson(opts, opts.output.internalDir, {
     name: '@stencil/core/internal',
     description: 'Stencil internals only to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
     main: 'index.mjs',
-    types: 'index.d.ts'
+    types: 'index.d.ts',
   });
 
   const clientPlatformBundle = await internalClient(opts);
   const hydratePlatformBundles = await internalHydrate(opts);
   const testingPlatform = await internalTesting(opts);
 
-  return [
-    ...clientPlatformBundle,
-    ...hydratePlatformBundles,
-    ...testingPlatform,
-    await internalAppData(opts),
-  ];
-};
-
+  return [...clientPlatformBundle, ...hydratePlatformBundles, ...testingPlatform, await internalAppData(opts)];
+}
 
 async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: string) {
   const declarationsInputDir = join(opts.transpiledDir, 'declarations');
@@ -100,8 +90,5 @@ function prependExtModules(content: string) {
 
 async function createStencilCoreEntry(outputInternalDir: string) {
   // write @stencil/core entry (really only used for node resolving, not its actual code as you can see)
-  await fs.writeFile(
-    join(outputInternalDir, 'stencil-core.js'),
-    `exports.h = function() {};`
-  );
+  await fs.writeFile(join(outputInternalDir, 'stencil-core.js'), `exports.h = function() {};`);
 }

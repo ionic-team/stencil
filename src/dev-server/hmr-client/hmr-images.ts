@@ -1,6 +1,5 @@
 import { setQueryString, updateCssUrlValue, getHmrHref, isLinkStylesheet, setHmrAttr, isTemplate, hasShadowRoot, isElement, setHmrQueryString } from './hmr-util';
 
-
 export const hmrImages = (win: Window, doc: Document, versionId: string, imageFileNames: string[]) => {
   if (win.location.protocol !== 'file:' && doc.styleSheets) {
     hmrStyleSheetsImages(doc, versionId, imageFileNames);
@@ -33,15 +32,14 @@ const hmrStyleSheetImages = (cssImageProps: string[], styleSheet: CSSStyleSheet,
           break;
 
         case CSSRule.STYLE_RULE:
-          hmrStyleSheetRuleImages(cssImageProps, (cssRule as CSSStyleRule), versionId, imageFileNames);
+          hmrStyleSheetRuleImages(cssImageProps, cssRule as CSSStyleRule, versionId, imageFileNames);
           break;
 
         case CSSRule.MEDIA_RULE:
-          hmrStyleSheetImages(cssImageProps, (cssRule as any), versionId, imageFileNames);
+          hmrStyleSheetImages(cssImageProps, cssRule as any, versionId, imageFileNames);
           break;
       }
     }
-
   } catch (e) {
     console.error('hmrStyleSheetImages: ' + e);
   }
@@ -101,7 +99,7 @@ const hmrImgElement = (imgElm: HTMLImageElement, versionId: string, imageFileNam
     const orgSrc = imgElm.getAttribute('src');
     const newSrc = getHmrHref(versionId, imageFileName, orgSrc);
     if (newSrc !== orgSrc) {
-      imgElm.setAttribute('src', newSrc)
+      imgElm.setAttribute('src', newSrc);
       setHmrAttr(imgElm, versionId);
     }
   });

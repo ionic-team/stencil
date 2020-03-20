@@ -1,12 +1,11 @@
 import * as d from '../declarations';
 import { createHttpServer } from './server-http';
-import { createNodeSys } from '../sys/node_next/node-sys';
+import { createNodeSys } from '../sys/node/node-sys';
 import { createWebSocket } from './server-web-socket';
 import { DEV_SERVER_INIT_URL } from './dev-server-constants';
 import { getBrowserUrl, sendError, sendMsg } from './dev-server-utils';
 import { getEditors } from './open-in-editor';
 import exit from 'exit';
-
 
 export async function startDevServerWorker(prcs: NodeJS.Process, devServerConfig: d.DevServerConfig) {
   let hasStarted = false;
@@ -33,9 +32,15 @@ export async function startDevServerWorker(prcs: NodeJS.Process, devServerConfig
     sendMsg(prcs, {
       serverStarted: {
         browserUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.basePath, '/'),
-        initialLoadUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.basePath, devServerConfig.initialLoadUrl || DEV_SERVER_INIT_URL),
-        error: null
-      }
+        initialLoadUrl: getBrowserUrl(
+          devServerConfig.protocol,
+          devServerConfig.address,
+          devServerConfig.port,
+          devServerConfig.basePath,
+          devServerConfig.initialLoadUrl || DEV_SERVER_INIT_URL,
+        ),
+        error: null,
+      },
     });
     hasStarted = true;
 
@@ -57,15 +62,14 @@ export async function startDevServerWorker(prcs: NodeJS.Process, devServerConfig
     };
 
     prcs.once('SIGINT', closeServer);
-
   } catch (e) {
     if (!hasStarted) {
       sendMsg(prcs, {
         serverStarted: {
           browserUrl: null,
           initialLoadUrl: null,
-          error: String(e)
-        }
+          error: String(e),
+        },
       });
     } else {
       sendError(prcs, e);

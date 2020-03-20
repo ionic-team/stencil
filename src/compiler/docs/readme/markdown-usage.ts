@@ -10,15 +10,14 @@ export const usageToMarkdown = (usages: d.JsonDocsUsage) => {
 
   content.push(`## Usage`);
 
-  merged.forEach(({name, text}) => {
+  merged.forEach(({ name, text }) => {
     content.push('');
     content.push(`### ${toTitleCase(name)}`);
     content.push('');
     content.push(text);
     content.push('');
   }),
-
-  content.push('');
+    content.push('');
   content.push('');
 
   return content;
@@ -33,11 +32,11 @@ export const mergeUsages = (usages: d.JsonDocsUsage) => {
     array.push(key);
     map.set(usage, array);
   });
-  const merged: {name: string, text: string}[] = [];
+  const merged: { name: string; text: string }[] = [];
   map.forEach((value, key) => {
     merged.push({
       name: value.join(' / '),
-      text: key
+      text: key,
     });
   });
   return merged;

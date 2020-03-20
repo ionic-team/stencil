@@ -1,5 +1,5 @@
 export { addHostEventListeners } from './host-listener';
-export { attachShadow, defineCustomElement, forceModeUpdate, proxyCustomElement} from './bootstrap-custom-element';
+export { attachShadow, defineCustomElement, forceModeUpdate, proxyCustomElement } from './bootstrap-custom-element';
 export { bootstrapLazy } from './bootstrap-lazy';
 export { connectedCallback } from './connected-callback';
 export { createEvent } from './event-emitter';

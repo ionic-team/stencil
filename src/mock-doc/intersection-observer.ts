@@ -1,16 +1,21 @@
-
 export class MockIntersectionObserver {
+  constructor() {
+    /**/
+  }
 
-  constructor() {/**/}
+  disconnect() {
+    /**/
+  }
 
-  disconnect() {/**/}
-
-  observe() {/**/}
+  observe() {
+    /**/
+  }
 
   takeRecords(): any[] {
     return [];
   }
 
-  unobserve() {/**/}
-
+  unobserve() {
+    /**/
+  }
 }

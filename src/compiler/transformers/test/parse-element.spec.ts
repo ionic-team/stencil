@@ -1,8 +1,6 @@
 import { getStaticGetter, transpileModule } from './transpile';
 
-
 describe('parse element', () => {
-
   it('element', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
@@ -14,5 +12,4 @@ describe('parse element', () => {
     expect(getStaticGetter(t.outputText, 'elementRef')).toEqual('val');
     expect(t.elementRef).toBe('val');
   });
-
 });

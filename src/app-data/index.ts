@@ -1,6 +1,5 @@
 import { BuildConditionals } from '@stencil/core/internal';
 
-
 export const BUILD: BuildConditionals = /* default */ {
   allRenderFn: false,
   cmpDidLoad: true,

@@ -1,26 +1,19 @@
 import * as d from '../../declarations';
-import { getAbsoluteBuildDir } from './utils';
+import { getAbsoluteBuildDir } from './html-utils';
+import { join } from 'path';
 
-export function updateGlobalStylesLink(config: d.Config, doc: Document, globalScriptFilename: string, outputTarget: d.OutputTargetWww) {
+export const updateGlobalStylesLink = (config: d.Config, doc: Document, globalScriptFilename: string, outputTarget: d.OutputTargetWww) => {
   if (!globalScriptFilename) {
     return;
   }
-  const buildDir = getAbsoluteBuildDir(config, outputTarget);
-  const originalPath = config.sys.path.join(
-    buildDir,
-    config.fsNamespace + '.css'
-  );
-  const newPath = config.sys.path.join(
-    buildDir,
-    globalScriptFilename
-  );
+  const buildDir = getAbsoluteBuildDir(outputTarget);
+  const originalPath = join(buildDir, config.fsNamespace + '.css');
+  const newPath = join(buildDir, globalScriptFilename);
   if (originalPath === newPath) {
     return;
   }
 
-  const replacer = new RegExp(
-    escapeRegExp(originalPath) + '$'
-  );
+  const replacer = new RegExp(escapeRegExp(originalPath) + '$');
 
   Array.from(doc.querySelectorAll('link')).forEach(link => {
     const href = link.getAttribute('href');
@@ -31,8 +24,6 @@ export function updateGlobalStylesLink(config: d.Config, doc: Document, globalSc
       }
     }
   });
-}
+};
 
-function escapeRegExp(text: string) {
-  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-}
+const escapeRegExp = (text: string) => text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');

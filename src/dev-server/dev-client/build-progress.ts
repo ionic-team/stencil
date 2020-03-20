@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { onBuildLog, onBuildResults, onBuildStatus } from './build-events';
 
-
 export function initBuildProgress(win: d.DevClientWindow, doc: Document) {
   const barColor = `#5851ff`;
   const errorColor = `#b70c19`;
@@ -28,7 +27,7 @@ export function initBuildProgress(win: d.DevClientWindow, doc: Document) {
 
     if (incIntervalId == null) {
       incIntervalId = setInterval(() => {
-        progressIncrease += (Math.random() * 0.05) + 0.01;
+        progressIncrease += Math.random() * 0.05 + 0.01;
         if (displayProgress() < 0.9) {
           update();
         } else {
@@ -73,7 +72,7 @@ export function initBuildProgress(win: d.DevClientWindow, doc: Document) {
   }
 
   function displayProgress() {
-    const p = (currentProgress + progressIncrease);
+    const p = currentProgress + progressIncrease;
     return Math.max(0, Math.min(1, p));
   }
 
@@ -133,5 +132,4 @@ export function initBuildProgress(win: d.DevClientWindow, doc: Document) {
     (progressBar.style as any).contain = `strict`;
     doc.body.appendChild(progressBar);
   }
-
 }

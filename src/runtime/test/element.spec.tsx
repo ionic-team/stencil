@@ -15,7 +15,7 @@ describe('element', () => {
     // @ts-ignore
     const page = await newSpecPage({
       components: [CmpA],
-      html: `<cmp-a></cmp-a>`
+      html: `<cmp-a></cmp-a>`,
     });
 
     expect(page.root).toEqualHtml(`

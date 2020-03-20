@@ -1,8 +1,6 @@
 import { transpileModule } from './transpile';
 
-
 describe('parse listeners', () => {
-
   it('listeners', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
@@ -13,13 +11,15 @@ describe('parse listeners', () => {
         }
       }
     `);
-    expect(t.listeners).toEqual([{
-      name: 'click',
-      method: 'onClick',
-      capture: false,
-      passive: false,
-      target: undefined
-    }]);
+    expect(t.listeners).toEqual([
+      {
+        name: 'click',
+        method: 'onClick',
+        capture: false,
+        passive: false,
+        target: undefined,
+      },
+    ]);
   });
 
   it('target', () => {
@@ -32,13 +32,15 @@ describe('parse listeners', () => {
         }
       }
     `);
-    expect(t.listeners).toEqual([{
-      name: 'resize',
-      method: 'windowResize',
-      target: 'window',
-      capture: false,
-      passive: true,
-    }]);
+    expect(t.listeners).toEqual([
+      {
+        name: 'resize',
+        method: 'windowResize',
+        target: 'window',
+        capture: false,
+        passive: true,
+      },
+    ]);
   });
 
   it('multiple listeners', () => {
@@ -61,15 +63,15 @@ describe('parse listeners', () => {
         method: 'onClick',
         capture: false,
         passive: false,
-        target: undefined
+        target: undefined,
       },
       {
         name: 'mousedown',
         method: 'onMouseDown',
         capture: false,
         passive: true,
-        target: undefined
-      }
+        target: undefined,
+      },
     ]);
   });
 
@@ -90,15 +92,15 @@ describe('parse listeners', () => {
         method: 'onUp',
         capture: false,
         passive: true,
-        target: undefined
+        target: undefined,
       },
       {
         name: 'mouseup',
         method: 'onUp',
         capture: false,
         passive: true,
-        target: undefined
-      }
+        target: undefined,
+      },
     ]);
   });
 
@@ -122,15 +124,15 @@ describe('parse listeners', () => {
         method: 'onEvent',
         capture: true,
         passive: false,
-        target: undefined
+        target: undefined,
       },
       {
         name: 'click',
         method: 'onEvent',
         capture: false,
         passive: true,
-        target: 'document'
-      }
+        target: 'document',
+      },
     ]);
   });
 });

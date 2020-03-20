@@ -1,7 +1,6 @@
-import { parseImportPath, serializeImportPath } from '../stencil-import-path'
+import { parseImportPath, serializeImportPath } from '../stencil-import-path';
 
 describe('stencil-import-path', () => {
-
   it('serialize/parse absolute, no data ext', () => {
     const s = serializeImportPath({
       importeePath: '/path/to/some-file.css',
@@ -18,7 +17,7 @@ describe('stencil-import-path', () => {
   it('serialize/parse relative, tag, no ext', () => {
     const s = serializeImportPath({
       importeePath: './some-file',
-      tag: 'my-tag'
+      tag: 'my-tag',
     });
     expect(s).toBe('./some-file?tag=my-tag');
     const p = parseImportPath(s);
@@ -33,7 +32,7 @@ describe('stencil-import-path', () => {
       importeePath: './some-file.CSS',
       tag: 'my-tag',
       encapsulation: 'none',
-      mode: '$'
+      mode: '$',
     });
     expect(s).toBe('./some-file.CSS?tag=my-tag');
     const p = parseImportPath(s);
@@ -50,7 +49,7 @@ describe('stencil-import-path', () => {
       importeePath: './some-file.CSS',
       tag: 'my-tag',
       encapsulation: 'scoped',
-      mode: 'ios'
+      mode: 'ios',
     });
     expect(s).toBe('./some-file.CSS?tag=my-tag&mode=ios&encapsulation=scoped');
     const p = parseImportPath(s);
@@ -73,5 +72,4 @@ describe('stencil-import-path', () => {
     expect(p.ext).toBe('d.ts');
     expect(p.data).toBe(null);
   });
-
 });

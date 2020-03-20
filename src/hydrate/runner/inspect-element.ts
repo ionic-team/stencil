@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 
-
 export function inspectElement(results: d.HydrateResults, elm: Element, depth: number) {
   const children = elm.children;
 
@@ -19,7 +18,6 @@ export function inspectElement(results: d.HydrateResults, elm: Element, depth: n
           cmp.depth = depth;
         }
       }
-
     } else {
       switch (tagName) {
         case 'a':
@@ -74,7 +72,6 @@ export function inspectElement(results: d.HydrateResults, elm: Element, depth: n
   }
 }
 
-
 function collectAttributes(node: Element) {
   const parsedElm: d.HydrateElement = {};
   const attrs = node.attributes;
@@ -93,6 +90,4 @@ function collectAttributes(node: Element) {
   return parsedElm;
 }
 
-const SKIP_ATTRS = new Set([
-  's-id', 'c-id'
-]);
+const SKIP_ATTRS = new Set(['s-id', 'c-id']);

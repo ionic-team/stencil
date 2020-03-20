@@ -1,38 +1,33 @@
 import * as d from '@stencil/core/declarations';
 import { generateServiceWorkerUrl } from '../service-worker-util';
-import { Config, validateConfig } from '@stencil/core/compiler';
+import { validateConfig } from '../../config/validate-config';
 import { mockConfig } from '@stencil/core/testing';
 
-
 describe('generateServiceWorkerUrl', () => {
-
-  let config: Config;
+  let userConfig: d.Config;
   let outputTarget: d.OutputTargetWww;
 
   it('sw url w/ baseUrl', () => {
-    config = mockConfig();
-    config.devMode = false;
-    config.outputTargets = [
+    userConfig = mockConfig();
+    userConfig.devMode = false;
+    userConfig.outputTargets = [
       {
         type: 'www',
-        baseUrl: '/docs'
-      } as d.OutputTargetWww
+        baseUrl: '/docs',
+      } as d.OutputTargetWww,
     ];
-    validateConfig(config);
+    const { config } = validateConfig(userConfig);
     outputTarget = config.outputTargets[0] as d.OutputTargetWww;
-    const swUrl = generateServiceWorkerUrl(config, outputTarget, outputTarget.serviceWorker as d.ServiceWorkerConfig);
+    const swUrl = generateServiceWorkerUrl(outputTarget, outputTarget.serviceWorker as d.ServiceWorkerConfig);
     expect(swUrl).toBe('/docs/sw.js');
   });
 
   it('default sw url', () => {
-    config = mockConfig();
-    config.devMode = false;
-    validateConfig(config);
+    userConfig = mockConfig();
+    userConfig.devMode = false;
+    const { config } = validateConfig(userConfig);
     outputTarget = config.outputTargets[0] as d.OutputTargetWww;
-    const swUrl = generateServiceWorkerUrl(config, outputTarget, outputTarget.serviceWorker as d.ServiceWorkerConfig);
+    const swUrl = generateServiceWorkerUrl(outputTarget, outputTarget.serviceWorker as d.ServiceWorkerConfig);
     expect(swUrl).toBe('/sw.js');
   });
-
 });
-
-

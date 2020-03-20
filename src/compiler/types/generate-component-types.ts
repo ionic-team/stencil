@@ -4,7 +4,6 @@ import { generateEventTypes } from './generate-event-types';
 import { generateMethodTypes } from './generate-method-types';
 import { generatePropTypes } from './generate-prop-types';
 
-
 /**
  * Generate a string based on the types that are defined within a component.
  *
@@ -20,15 +19,9 @@ export const generateComponentTypes = (cmp: d.ComponentCompilerMeta): d.TypesMod
   const methodAttributes = generateMethodTypes(cmp.methods);
   const eventAttributes = generateEventTypes(cmp.events);
 
-  const stencilComponentAttributes = attributesToMultiLineString([
-    ...propAttributes,
-    ...methodAttributes
-  ], false);
+  const stencilComponentAttributes = attributesToMultiLineString([...propAttributes, ...methodAttributes], false);
   const isDep = cmp.isCollectionDependency;
-  const stencilComponentJSXAttributes = attributesToMultiLineString([
-    ...propAttributes,
-    ...eventAttributes
-  ], true);
+  const stencilComponentJSXAttributes = attributesToMultiLineString([...propAttributes, ...eventAttributes], true);
   return {
     isDep,
     tagName,
@@ -45,22 +38,17 @@ var ${htmlElementName}: {
   };
 };
 
-
 const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: boolean, paddingString = '') => {
   const attributesStr = sortBy(attributes, a => a.name)
     .filter(type => type.public || !jsxAttributes)
     .reduce((fullList, type) => {
       if (type.jsdoc) {
         fullList.push(`/**`);
-        fullList.push(
-          ...type.jsdoc.split('\n').map(line => '  * ' + line)
-        );
+        fullList.push(...type.jsdoc.split('\n').map(line => '  * ' + line));
         fullList.push(` */`);
       }
-      const optional = (jsxAttributes)
-        ? !type.required
-        : type.optional;
-      fullList.push(`'${type.name}'${ optional ? '?' : '' }: ${type.type};`);
+      const optional = jsxAttributes ? !type.required : type.optional;
+      fullList.push(`'${type.name}'${optional ? '?' : ''}: ${type.type};`);
       return fullList;
     }, [] as string[])
     .map(item => `${paddingString}${item}`)

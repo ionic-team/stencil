@@ -1,8 +1,6 @@
 import * as util from '../util';
 
-
 describe('util', () => {
-
   describe('isTsFile', () => {
     it('should return true for regular .ts and .tsx files', () => {
       expect(util.isTsFile('.ts')).toEqual(true);
@@ -185,5 +183,4 @@ describe('util', () => {
     expect(util.createJsVarName('')).toBe('');
     expect(util.createJsVarName(null)).toBe(null);
   });
-
 });

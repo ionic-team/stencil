@@ -3,7 +3,6 @@ import { MockWindow, cloneWindow } from '../window';
 import { MockElement, MockHTMLElement } from '../node';
 import { MockSVGElement } from '../element';
 
-
 describe('element', () => {
   let doc: MockDocument;
   beforeEach(() => {
@@ -157,7 +156,6 @@ describe('element', () => {
   });
 
   describe('document', () => {
-
     it('styleSheets', () => {
       expect(document.styleSheets).toEqual([]);
       const style = document.createElement('style');
@@ -323,7 +321,14 @@ describe('element', () => {
     const rect = elm.getBoundingClientRect();
 
     expect(rect).toEqual({
-      bottom: 0, height: 0, left: 0, right: 0, top: 0, width: 0, x: 0, y: 0
+      bottom: 0,
+      height: 0,
+      left: 0,
+      right: 0,
+      top: 0,
+      width: 0,
+      x: 0,
+      y: 0,
     });
   });
 
@@ -399,7 +404,7 @@ describe('element', () => {
       expect(input.list).toEqual(null);
 
       // it's readonly
-      expect(() => input.list = 'my-list').toThrow();
+      expect(() => (input.list = 'my-list')).toThrow();
       expect(input.list).toEqual(null);
 
       // finds list
@@ -411,5 +416,4 @@ describe('element', () => {
       expect(input.list).toEqual(null);
     });
   });
-
 });

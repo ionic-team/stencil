@@ -3,7 +3,6 @@ import { BUILD } from '@app-data';
 import { doc, plt, supportsListenerOptions, win } from '@platform';
 import { HOST_FLAGS, LISTENER_FLAGS } from '@utils';
 
-
 export const addHostEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listeners: d.ComponentRuntimeHostListener[], attachParentListeners: boolean) => {
   if (BUILD.hostListener && listeners) {
     // this is called immediately within the element's constructor
@@ -17,7 +16,7 @@ export const addHostEventListeners = (elm: d.HostElement, hostRef: d.HostRef, li
         // this is being ran from within the connectedCallback
         // which is important so that we know the host element actually has a parent element
         // filter out the listeners to only have the ones that ARE being attached to the parent
-        listeners = listeners.filter(([flags]) => (flags & LISTENER_FLAGS.TargetParent));
+        listeners = listeners.filter(([flags]) => flags & LISTENER_FLAGS.TargetParent);
       } else {
         // this is being ran from within the component constructor
         // everything BUT the parent element listeners should be attached at this time
@@ -27,30 +26,27 @@ export const addHostEventListeners = (elm: d.HostElement, hostRef: d.HostRef, li
     }
 
     listeners.map(([flags, name, method]) => {
-      const target = (BUILD.hostListenerTarget ? getHostListenerTarget(elm, flags) : elm);
+      const target = BUILD.hostListenerTarget ? getHostListenerTarget(elm, flags) : elm;
       const handler = hostListenerProxy(hostRef, method);
       const opts = hostListenerOpts(flags);
       plt.ael(target, name, handler, opts);
-      (hostRef.$rmListeners$ = (hostRef.$rmListeners$ || [])).push(
-        () => plt.rel(target, name, handler, opts)
-      );
+      (hostRef.$rmListeners$ = hostRef.$rmListeners$ || []).push(() => plt.rel(target, name, handler, opts));
     });
   }
 };
 
-const hostListenerProxy = (hostRef: d.HostRef, methodName: string) =>
-  (ev: Event) => {
-    if (BUILD.lazyLoad) {
-      if (hostRef.$flags$ & HOST_FLAGS.isListenReady) {
-        // instance is ready, let's call it's member method for this event
-        hostRef.$lazyInstance$[methodName](ev);
-      } else {
-        (hostRef.$queuedListeners$ = (hostRef.$queuedListeners$ || [])).push([methodName, ev]);
-      }
+const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => (ev: Event) => {
+  if (BUILD.lazyLoad) {
+    if (hostRef.$flags$ & HOST_FLAGS.isListenReady) {
+      // instance is ready, let's call it's member method for this event
+      hostRef.$lazyInstance$[methodName](ev);
     } else {
-      (hostRef.$hostElement$ as any)[methodName](ev);
+      (hostRef.$queuedListeners$ = hostRef.$queuedListeners$ || []).push([methodName, ev]);
     }
-  };
+  } else {
+    (hostRef.$hostElement$ as any)[methodName](ev);
+  }
+};
 
 const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
   if (BUILD.hostListenerTargetDocument && flags & LISTENER_FLAGS.TargetDocument) return doc;
@@ -60,10 +56,11 @@ const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
   return elm;
 };
 
+// prettier-ignore
 const hostListenerOpts = (flags: number) =>
-  supportsListenerOptions ?
-    ({
-      'passive': (flags & LISTENER_FLAGS.Passive) !== 0,
-      'capture': (flags & LISTENER_FLAGS.Capture) !== 0,
-    })
-  : (flags & LISTENER_FLAGS.Capture) !== 0;
+  supportsListenerOptions
+    ? ({
+        passive: (flags & LISTENER_FLAGS.Passive) !== 0,
+        capture: (flags & LISTENER_FLAGS.Capture) !== 0,
+      })
+    : (flags & LISTENER_FLAGS.Capture) !== 0;

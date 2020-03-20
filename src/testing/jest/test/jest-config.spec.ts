@@ -4,15 +4,11 @@ import { mockConfig } from '@stencil/core/testing';
 import { parseFlags } from '@stencil/core/cli';
 import path from 'path';
 
-
 describe('jest-config', () => {
-
   it('pass --maxWorkers=2 arg when --max-workers=2', () => {
-    const process: any = {
-      argv: ['node', 'stencil', 'test', '--ci', '--e2e', '--max-workers=2']
-    };
+    const args = ['test', '--ci', '--e2e', '--max-workers=2'];
     const config = mockConfig();
-    config.flags = parseFlags(process);
+    config.flags = parseFlags(args);
     config.testing = {};
 
     expect(config.flags.args).toEqual(['--ci', '--e2e', '--max-workers=2']);
@@ -24,11 +20,9 @@ describe('jest-config', () => {
   });
 
   it('pass --maxWorkers=2 arg when e2e test and --ci', () => {
-    const process: any = {
-      argv: ['node', 'stencil', 'test', '--ci', '--e2e', '--max-workers=2']
-    };
+    const args = ['test', '--ci', '--e2e', '--max-workers=2'];
     const config = mockConfig();
-    config.flags = parseFlags(process);
+    config.flags = parseFlags(args);
     config.testing = {};
 
     expect(config.flags.args).toEqual(['--ci', '--e2e', '--max-workers=2']);
@@ -40,11 +34,9 @@ describe('jest-config', () => {
   });
 
   it('force --maxWorkers=4 arg when e2e test and --ci', () => {
-    const process: any = {
-      argv: ['node', 'stencil', 'test', '--ci', '--e2e']
-    };
+    const args = ['test', '--ci', '--e2e'];
     const config = mockConfig();
-    config.flags = parseFlags(process);
+    config.flags = parseFlags(args);
     config.testing = {};
 
     expect(config.flags.args).toEqual(['--ci', '--e2e']);
@@ -52,15 +44,13 @@ describe('jest-config', () => {
 
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.ci).toBe(true);
-    expect(jestArgv.maxWorkers).toBe(1);
+    expect(jestArgv.maxWorkers).toBe(0);
   });
 
   it('pass --maxWorkers=2 arg to jest', () => {
-    const process: any = {
-      argv: ['node', 'stencil', 'test', '--maxWorkers=2']
-    };
+    const args = ['test', '--maxWorkers=2'];
     const config = mockConfig();
-    config.flags = parseFlags(process);
+    config.flags = parseFlags(args);
     config.testing = {};
 
     expect(config.flags.args).toEqual(['--maxWorkers=2']);
@@ -71,11 +61,9 @@ describe('jest-config', () => {
   });
 
   it('pass --ci arg to jest', () => {
-    const process: any = {
-      argv: ['node', 'stencil', 'test', '--ci']
-    };
+    const args = ['test', '--ci'];
     const config = mockConfig();
-    config.flags = parseFlags(process);
+    config.flags = parseFlags(args);
     config.testing = {};
 
     expect(config.flags.args).toEqual(['--ci']);
@@ -87,11 +75,9 @@ describe('jest-config', () => {
   });
 
   it('pass test spec arg to jest', () => {
-    const process: any = {
-      argv: ['node', 'stencil', 'test', 'hello.spec.ts']
-    };
+    const args = ['test', 'hello.spec.ts'];
     const config = mockConfig();
-    config.flags = parseFlags(process);
+    config.flags = parseFlags(args);
     config.testing = {};
 
     expect(config.flags.args).toEqual(['hello.spec.ts']);
@@ -102,13 +88,11 @@ describe('jest-config', () => {
   });
 
   it('pass test config to jest', () => {
-    const process: any = {
-      argv: ['node', 'stencil', 'test']
-    };
+    const args = ['test'];
     const config = mockConfig();
-    config.flags = parseFlags(process);
+    config.flags = parseFlags(args);
     config.testing = {
-      testMatch: ['hello.spec.ts']
+      testMatch: ['hello.spec.ts'],
     };
 
     expect(config.flags.task).toBe('test');
@@ -120,17 +104,12 @@ describe('jest-config', () => {
 
   it('set jestArgv config reporters', () => {
     const rootDir = path.resolve('/');
-    const process: any = {
-      argv: ['node stencil test']
-    };
+    const args = ['test'];
     const config = mockConfig();
     config.rootDir = rootDir;
-    config.flags = parseFlags(process);
+    config.flags = parseFlags(args);
     config.testing = {
-      reporters: [
-        'default',
-        ['jest-junit', { suiteName: 'jest tests' } ]
-      ]
+      reporters: ['default', ['jest-junit', { suiteName: 'jest tests' }]],
     };
 
     const jestArgv = buildJestArgv(config);
@@ -143,17 +122,14 @@ describe('jest-config', () => {
 
   it('set jestArgv config rootDir', () => {
     const rootDir = path.resolve('/');
-    const process: any = {
-      argv: ['node stencil test']
-    };
+    const args = ['test'];
     const config = mockConfig();
     config.rootDir = rootDir;
-    config.flags = parseFlags(process);
+    config.flags = parseFlags(args);
     config.testing = {};
 
     const jestArgv = buildJestArgv(config);
     const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
     expect(parsedConfig.rootDir).toBe(rootDir);
   });
-
 });

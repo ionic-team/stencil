@@ -6,11 +6,13 @@ export const generateCustomDocs = async (config: d.Config, docsData: d.JsonDocs,
   if (customOutputTargets.length === 0) {
     return;
   }
-  await Promise.all(customOutputTargets.map(async customOutput => {
-    try {
-      await customOutput.generator(docsData);
-    } catch (e) {
-      config.logger.error(`uncaught custom docs error: ${e}`);
-    }
-  }));
+  await Promise.all(
+    customOutputTargets.map(async customOutput => {
+      try {
+        await customOutput.generator(docsData);
+      } catch (e) {
+        config.logger.error(`uncaught custom docs error: ${e}`);
+      }
+    }),
+  );
 };

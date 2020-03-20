@@ -1,8 +1,6 @@
 import { Plugin } from 'rollup';
 
-
 export function gracefulFsPlugin(): Plugin {
-
   return {
     name: 'gracefulFsPlugin',
     resolveId(id) {
@@ -13,6 +11,6 @@ export function gracefulFsPlugin(): Plugin {
         };
       }
       return null;
-    }
-  }
+    },
+  };
 }

@@ -1,6 +1,5 @@
 import * as d from '@stencil/core/internal';
 
-
 export function resetBuildConditionals(b: d.BuildConditionals) {
   Object.keys(b).forEach(key => {
     (b as any)[key] = true;

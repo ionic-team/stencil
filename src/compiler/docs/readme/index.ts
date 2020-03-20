@@ -12,9 +12,11 @@ export const generateReadmeDocs = async (config: d.Config, compilerCtx: d.Compil
     strickCheckDocs(config, docsData);
   }
 
-  await Promise.all(docsData.components.map(cmpData => {
-    return generateReadme(config, compilerCtx, readmeOutputTargets, cmpData, docsData.components);
-  }));
+  await Promise.all(
+    docsData.components.map(cmpData => {
+      return generateReadme(config, compilerCtx, readmeOutputTargets, cmpData, docsData.components);
+    }),
+  );
 };
 
 export const strickCheckDocs = (config: d.Config, docsData: d.JsonDocs) => {

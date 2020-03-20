@@ -1,11 +1,13 @@
-import './polyfills';
+import { initWorkerThread } from './worker/worker-thread';
 
-export { BuildContext } from './build/build-ctx';
-export { Cache } from './cache';
-export { Compiler } from './compiler';
-export { COMPILER_BUILD } from './build/compiler-build-id';
-export { Config } from '../declarations';
-export { formatComponentRuntimeMeta, formatLazyBundleRuntimeMeta } from './app-core/format-component-runtime-meta';
-export { getBuildFeatures } from '../compiler_next/build/app-data';
-export { transpileModule } from './transpile/transpile-module';
-export { validateConfig } from './config/validate-config';
+export { compile, compileSync } from './compile-module';
+export { createCompiler } from './compiler';
+export { createSystem } from './sys/stencil-sys';
+export { createWorkerContext } from './worker/worker-thread';
+export { dependencies } from './sys/dependencies';
+export { loadConfig } from './config/load-config';
+export { optimizeCss } from './optimize/optimize-css';
+export { optimizeJs } from './optimize/optimize-js';
+export { version } from '../version';
+
+initWorkerThread(globalThis);

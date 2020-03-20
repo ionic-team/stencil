@@ -1,7 +1,6 @@
 import { MockDocument } from '../document';
 import { serializeNodeToHtml } from '../serialize-node';
 
-
 describe('serializeNodeToHtml', () => {
   let doc: MockDocument;
   beforeEach(() => {
@@ -51,7 +50,7 @@ describe('serializeNodeToHtml', () => {
 
   it('pretty print with comments', () => {
     const elm = doc.createElement('div');
-    elm.innerHTML =  `
+    elm.innerHTML = `
       <p>
         <!--comment1-->
         <!--comment2-->
@@ -115,7 +114,7 @@ describe('serializeNodeToHtml', () => {
     `);
   });
 
-  it ('style', () => {
+  it('style', () => {
     const input = `<style>     \n    text   \n\n</style>`;
     doc.body.innerHTML = input;
 
@@ -143,7 +142,7 @@ describe('serializeNodeToHtml', () => {
     const input = `<input type="checkbox" checked="">`;
     doc.body.innerHTML = input;
 
-    const output = serializeNodeToHtml(doc.body, { removeBooleanAttributeQuotes: true});
+    const output = serializeNodeToHtml(doc.body, { removeBooleanAttributeQuotes: true });
     expect(output).toBe(`<input type="checkbox" checked>`);
   });
 
@@ -234,5 +233,4 @@ describe('serializeNodeToHtml', () => {
     scriptElm.innerHTML = input;
     expect(scriptElm.innerHTML).toBe(input);
   });
-
 });

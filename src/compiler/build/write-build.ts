@@ -3,8 +3,7 @@ import { catchError } from '@utils';
 import { outputServiceWorkers } from '../output-targets/output-service-workers';
 import { validateBuildFiles } from './validate-files';
 
-
-export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export const writeBuild = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
 
   let totalFilesWrote = 0;
@@ -22,26 +21,14 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
 
     // successful write
     // kick off writing the cached file stuff
-    await compilerCtx.cache.commit();
+    // await compilerCtx.cache.commit();
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
-    buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
+    // buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
-    if (!config.watch) {
-      compilerCtx.reset();
-      if (typeof global !== 'undefined' && global.gc) {
-        buildCtx.debug(`triggering forced gc`);
-        global.gc();
-        buildCtx.debug(`forced gc finished`);
-      }
-    }
-
-    await outputServiceWorkers(config, buildCtx);
-
-    await validateBuildFiles(config, compilerCtx, buildCtx);
-
+    await outputServiceWorkers(config, buildCtx), await validateBuildFiles(config, compilerCtx, buildCtx);
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
 
   timeSpan.finish(`writeBuildFiles finished, files wrote: ${totalFilesWrote}`);
-}
+};

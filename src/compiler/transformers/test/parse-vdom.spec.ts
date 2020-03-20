@@ -1,8 +1,6 @@
 import { transpileModule } from './transpile';
 
-
 describe('parse vdom', () => {
-
   it('hasVdomAttribute', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
@@ -55,7 +53,6 @@ describe('parse vdom', () => {
 
     expect(t.cmp.hasVdomFunctional).toBe(true);
   });
-
 
   it('hasVdomKey', () => {
     const t = transpileModule(`
@@ -160,5 +157,4 @@ describe('parse vdom', () => {
 
     expect(t.cmp.htmlTagNames).toContain('svg');
   });
-
 });

@@ -4,20 +4,17 @@ import { NodeFs } from '../../sys/node/node-fs';
 import path from 'path';
 import glob from 'glob';
 
-
 export async function copyTasksWorker(copyTasks: Required<d.CopyTask>[], srcDir: string) {
   const results: d.CopyResults = {
     diagnostics: [],
     dirPaths: [],
-    filePaths: []
+    filePaths: [],
   };
 
   try {
     const fs = new NodeFs(process);
 
-    copyTasks = flatOne(await Promise.all(
-      copyTasks.map(task => processGlobs(task, srcDir))
-    ));
+    copyTasks = flatOne(await Promise.all(copyTasks.map(task => processGlobs(task, srcDir))));
 
     copyTasks = unique(copyTasks, task => task.dest);
 
@@ -28,28 +25,29 @@ export async function copyTasksWorker(copyTasks: Required<d.CopyTask>[], srcDir:
     while (copyTasks.length > 0) {
       const tasks = copyTasks.splice(0, 100);
 
-      await Promise.all(tasks.map(async copyTask => {
-        await processCopyTask(fs, results, allCopyTasks, copyTask);
-      }));
+      await Promise.all(
+        tasks.map(async copyTask => {
+          await processCopyTask(fs, results, allCopyTasks, copyTask);
+        }),
+      );
     }
 
     // figure out which directories we'll need to make first
     const mkDirs = ensureDirs(allCopyTasks);
 
     try {
-      await Promise.all(
-        mkDirs.map(dir => fs.mkdir(dir, { recursive: true }))
-      );
+      await Promise.all(mkDirs.map(dir => fs.mkdir(dir, { recursive: true })));
     } catch (mkDirErr) {}
 
     while (allCopyTasks.length > 0) {
       const tasks = allCopyTasks.splice(0, 100);
 
-      await Promise.all(tasks.map(async copyTask => {
-        await fs.copyFile(copyTask.src, copyTask.dest);
-      }));
+      await Promise.all(
+        tasks.map(async copyTask => {
+          await fs.copyFile(copyTask.src, copyTask.dest);
+        }),
+      );
     }
-
   } catch (e) {
     catchError(results.diagnostics, e);
   }
@@ -57,18 +55,17 @@ export async function copyTasksWorker(copyTasks: Required<d.CopyTask>[], srcDir:
   return results;
 }
 
-
 async function processGlobs(copyTask: Required<d.CopyTask>, srcDir: string): Promise<Required<d.CopyTask>[]> {
   return isGlob(copyTask.src)
     ? await processGlobTask(copyTask, srcDir)
-    : [{
-      src: getSrcAbsPath(srcDir, copyTask.src),
-      dest: copyTask.keepDirStructure
-        ? path.join(copyTask.dest, copyTask.src)
-        : copyTask.dest,
-      warn: copyTask.warn,
-      keepDirStructure: copyTask.keepDirStructure
-    }];
+    : [
+        {
+          src: getSrcAbsPath(srcDir, copyTask.src),
+          dest: copyTask.keepDirStructure ? path.join(copyTask.dest, copyTask.src) : copyTask.dest,
+          warn: copyTask.warn,
+          keepDirStructure: copyTask.keepDirStructure,
+        },
+      ];
 }
 
 function getSrcAbsPath(srcDir: string, src: string) {
@@ -81,25 +78,20 @@ function getSrcAbsPath(srcDir: string, src: string) {
 async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): Promise<Required<d.CopyTask>[]> {
   const files = await asyncGlob(copyTask.src, {
     cwd: srcDir,
-    nodir: true
+    nodir: true,
   });
   return files.map(globRelPath => createGlobCopyTask(copyTask, srcDir, globRelPath));
 }
 
-
 function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, globRelPath: string): Required<d.CopyTask> {
-  const dest = path.join(copyTask.dest, copyTask.keepDirStructure
-    ? globRelPath
-    : path.basename(globRelPath)
-  );
+  const dest = path.join(copyTask.dest, copyTask.keepDirStructure ? globRelPath : path.basename(globRelPath));
   return {
     src: path.join(srcDir, globRelPath),
     dest,
     warn: copyTask.warn,
-    keepDirStructure: copyTask.keepDirStructure
+    keepDirStructure: copyTask.keepDirStructure,
   };
 }
-
 
 async function processCopyTask(fs: NodeFs, results: d.CopyResults, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask) {
   try {
@@ -115,7 +107,6 @@ async function processCopyTask(fs: NodeFs, results: d.CopyResults, allCopyTasks:
       }
 
       await processCopyTaskDirectory(fs, results, allCopyTasks, copyTask);
-
     } else if (!shouldIgnore(copyTask.src)) {
       // this is a file we should copy
       if (!results.filePaths.includes(copyTask.dest)) {
@@ -124,7 +115,6 @@ async function processCopyTask(fs: NodeFs, results: d.CopyResults, allCopyTasks:
 
       allCopyTasks.push(copyTask);
     }
-
   } catch (e) {
     if (copyTask.warn !== false) {
       const err = buildError(results.diagnostics);
@@ -133,26 +123,25 @@ async function processCopyTask(fs: NodeFs, results: d.CopyResults, allCopyTasks:
   }
 }
 
-
 async function processCopyTaskDirectory(fs: NodeFs, results: d.CopyResults, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask) {
   try {
     const dirItems = await fs.readdir(copyTask.src);
 
-    await Promise.all(dirItems.map(async dirItem => {
-      const subCopyTask: d.CopyTask = {
-        src: path.join(copyTask.src, dirItem),
-        dest: path.join(copyTask.dest, dirItem),
-        warn: copyTask.warn
-      };
+    await Promise.all(
+      dirItems.map(async dirItem => {
+        const subCopyTask: d.CopyTask = {
+          src: path.join(copyTask.src, dirItem),
+          dest: path.join(copyTask.dest, dirItem),
+          warn: copyTask.warn,
+        };
 
-      await processCopyTask(fs, results, allCopyTasks, subCopyTask);
-    }));
-
+        await processCopyTask(fs, results, allCopyTasks, subCopyTask);
+      }),
+    );
   } catch (e) {
     catchError(results.diagnostics, e);
   }
 }
-
 
 function ensureDirs(copyTasks: d.CopyTask[]) {
   const mkDirs: string[] = [];
@@ -175,11 +164,10 @@ function ensureDirs(copyTasks: d.CopyTask[]) {
   return mkDirs;
 }
 
-
 function addMkDir(mkDirs: string[], destDir: string) {
   destDir = normalizePath(destDir);
 
-  if (destDir === ROOT_DIR || (destDir + '/') === ROOT_DIR || destDir === '') {
+  if (destDir === ROOT_DIR || destDir + '/' === ROOT_DIR || destDir === '') {
     return;
   }
 
@@ -188,22 +176,14 @@ function addMkDir(mkDirs: string[], destDir: string) {
   }
 }
 
-
 const ROOT_DIR = normalizePath(path.resolve('/'));
-
 
 function shouldIgnore(filePath: string) {
   filePath = filePath.trim().toLowerCase();
   return IGNORE.some(ignoreFile => filePath.endsWith(ignoreFile));
 }
 
-const IGNORE = [
-  '.ds_store',
-  '.gitignore',
-  'desktop.ini',
-  'thumbs.db'
-];
-
+const IGNORE = ['.ds_store', '.gitignore', 'desktop.ini', 'thumbs.db'];
 
 function asyncGlob(pattern: string, opts: any) {
   return new Promise<string[]>((resolve, reject) => {

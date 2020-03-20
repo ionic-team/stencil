@@ -1,7 +1,6 @@
 import { shouldTransform } from '../jest-preprocessor';
 
 describe('jest preprocessor', () => {
-
   it('shouldTransform', () => {
     expect(shouldTransform('file.ts', '')).toBe(true);
     expect(shouldTransform('file.d.ts', '')).toBe(true);
@@ -19,5 +18,4 @@ describe('jest preprocessor', () => {
     expect(shouldTransform('file.js', 'export * from "./file";')).toBe(true);
     expect(shouldTransform('file.js', 'console.log("hi")')).toBe(false);
   });
-
 });

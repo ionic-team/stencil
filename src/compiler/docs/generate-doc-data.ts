@@ -1,58 +1,61 @@
 import * as d from '../../declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
+import { basename, dirname, join, relative } from 'path';
 import { flatOne, isDocsPublic, normalizePath, sortBy } from '@utils';
 import { getBuildTimestamp } from '../build/build-ctx';
 import { JsonDocsValue } from '../../declarations';
-
+import { typescriptVersion, version } from '../../version';
 
 export const generateDocData = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocs> => {
   return {
     timestamp: getBuildTimestamp(),
     compiler: {
-      name: config.sys.compiler.name,
-      version: config.sys.compiler.version,
-      typescriptVersion: config.sys.compiler.typescriptVersion
+      name: '@stencil/core',
+      version,
+      typescriptVersion,
     },
-    components: await getDocsComponents(config, compilerCtx, buildCtx)
+    components: await getDocsComponents(config, compilerCtx, buildCtx),
   };
 };
 
 const getDocsComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> => {
-  const results = await Promise.all(buildCtx.moduleFiles.map(async moduleFile => {
-    const filePath = moduleFile.sourceFilePath;
-    const dirPath = normalizePath(config.sys.path.dirname(filePath));
-    const readmePath = normalizePath(config.sys.path.join(dirPath, 'readme.md'));
-    const usagesDir = normalizePath(config.sys.path.join(dirPath, 'usage'));
-    const readme = await getUserReadmeContent(compilerCtx, readmePath);
-    const usage = await generateUsages(config, compilerCtx, usagesDir);
-    return moduleFile.cmps
-      .filter(cmp => isDocsPublic(cmp.docs) && !cmp.isCollectionDependency)
-      .map(cmp => ({
-        dirPath,
-        filePath: config.sys.path.relative(config.rootDir, filePath),
-        fileName: config.sys.path.basename(filePath),
-        readmePath,
-        usagesDir,
-        tag: cmp.tagName,
-        readme,
-        usage,
-        docs: generateDocs(readme, cmp.docs),
-        docsTags: cmp.docs.tags,
-        encapsulation: getDocsEncapsulation(cmp),
-        dependents: cmp.directDependents,
-        dependencies: cmp.directDependencies,
-        dependencyGraph: buildDocsDepGraph(cmp, buildCtx.components),
-        deprecation: getDocsDeprecationText(cmp.docs.tags),
+  const results = await Promise.all(
+    buildCtx.moduleFiles.map(async moduleFile => {
+      const filePath = moduleFile.sourceFilePath;
+      const dirPath = normalizePath(dirname(filePath));
+      const readmePath = normalizePath(join(dirPath, 'readme.md'));
+      const usagesDir = normalizePath(join(dirPath, 'usage'));
+      const readme = await getUserReadmeContent(compilerCtx, readmePath);
+      const usage = await generateUsages(compilerCtx, usagesDir);
+      return moduleFile.cmps
+        .filter(cmp => isDocsPublic(cmp.docs) && !cmp.isCollectionDependency)
+        .map(cmp => ({
+          dirPath,
+          filePath: relative(config.rootDir, filePath),
+          fileName: basename(filePath),
+          readmePath,
+          usagesDir,
+          tag: cmp.tagName,
+          readme,
+          usage,
+          docs: generateDocs(readme, cmp.docs),
+          docsTags: cmp.docs.tags,
+          encapsulation: getDocsEncapsulation(cmp),
+          dependents: cmp.directDependents,
+          dependencies: cmp.directDependencies,
+          dependencyGraph: buildDocsDepGraph(cmp, buildCtx.components),
+          deprecation: getDocsDeprecationText(cmp.docs.tags),
 
-        props: getDocsProperties(cmp),
-        methods: getDocsMethods(cmp.methods),
-        events: getDocsEvents(cmp.events),
-        styles: getDocsStyles(cmp),
-        slots: getDocsSlots(cmp.docs.tags),
-        parts: getDocsParts(cmp.docs.tags),
-        listeners: getDocsListeners(cmp.listeners),
-      }));
-  }));
+          props: getDocsProperties(cmp),
+          methods: getDocsMethods(cmp.methods),
+          events: getDocsEvents(cmp.events),
+          styles: getDocsStyles(cmp),
+          slots: getDocsSlots(cmp.docs.tags),
+          parts: getDocsParts(cmp.docs.tags),
+          listeners: getDocsListeners(cmp.listeners),
+        }));
+    }),
+  );
 
   return sortBy(flatOne(results), cmp => cmp.tag);
 };
@@ -93,14 +96,12 @@ const getDocsEncapsulation = (cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped'
 };
 
 const getDocsProperties = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] => {
-  return sortBy([
-    ...getRealProperties(cmpMeta.properties),
-    ...getVirtualProperties(cmpMeta.virtualProperties)
-  ], p => p.name);
+  return sortBy([...getRealProperties(cmpMeta.properties), ...getVirtualProperties(cmpMeta.virtualProperties)], p => p.name);
 };
 
 const getRealProperties = (properties: d.ComponentCompilerProperty[]): d.JsonDocsProp[] => {
-  return properties.filter(member => isDocsPublic(member.docs))
+  return properties
+    .filter(member => isDocsPublic(member.docs))
     .map(member => ({
       name: member.name,
       type: member.complexType.resolved,
@@ -144,14 +145,14 @@ const parseTypeIntoValues = (type: string) => {
       if (u === 'true') {
         parsedUnions.push({
           value: 'true',
-          type: 'boolean'
+          type: 'boolean',
         });
         return;
       }
       if (u === 'false') {
         parsedUnions.push({
           value: 'false',
-          type: 'boolean'
+          type: 'boolean',
         });
         return;
       }
@@ -159,7 +160,7 @@ const parseTypeIntoValues = (type: string) => {
         // union is a number
         parsedUnions.push({
           value: u,
-          type: 'number'
+          type: 'number',
         });
         return;
       }
@@ -167,12 +168,12 @@ const parseTypeIntoValues = (type: string) => {
         // ionic is a string
         parsedUnions.push({
           value: u.slice(1, -1),
-          type: 'string'
+          type: 'string',
         });
         return;
       }
       parsedUnions.push({
-        type: u
+        type: u,
       });
     });
     return parsedUnions;
@@ -193,10 +194,9 @@ const getDocsMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[
       parameters: [], // TODO
       docs: member.docs.text,
       docsTags: member.docs.tags,
-      deprecation: getDocsDeprecationText(member.docs.tags)
+      deprecation: getDocsDeprecationText(member.docs.tags),
     }));
 };
-
 
 const getDocsEvents = (events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] => {
   return sortBy(events, eventMeta => eventMeta.name.toLowerCase())
@@ -209,7 +209,7 @@ const getDocsEvents = (events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] =>
       composed: eventMeta.composed,
       docs: eventMeta.docs.text,
       docsTags: eventMeta.docs.tags,
-      deprecation: getDocsDeprecationText(eventMeta.docs.tags)
+      deprecation: getDocsDeprecationText(eventMeta.docs.tags),
     }));
 };
 
@@ -222,19 +222,19 @@ const getDocsStyles = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] => {
     return {
       name: styleDoc.name,
       annotation: styleDoc.annotation || '',
-      docs: styleDoc.docs || ''
+      docs: styleDoc.docs || '',
     };
   });
-}
+};
 
 const getDocsListeners = (listeners: d.ComponentCompilerListener[]): d.JsonDocsListener[] => {
   return listeners.map(listener => ({
     event: listener.name,
     target: listener.target,
     capture: listener.capture,
-    passive: listener.passive
+    passive: listener.passive,
   }));
-}
+};
 
 const getDocsDeprecationText = (tags: d.JsonDocsTag[]) => {
   const deprecation = tags.find(t => t.name === 'deprecated');
@@ -245,15 +245,17 @@ const getDocsDeprecationText = (tags: d.JsonDocsTag[]) => {
 };
 
 const getDocsSlots = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
-  return sortBy(getNameText('slot', tags)
-    .map(([name, docs]) => ({ name, docs }))
-    , a => a.name);
+  return sortBy(
+    getNameText('slot', tags).map(([name, docs]) => ({ name, docs })),
+    a => a.name,
+  );
 };
 
 const getDocsParts = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
-  return sortBy(getNameText('part', tags)
-    .map(([name, docs]) => ({ name, docs }))
-    , a => a.name);
+  return sortBy(
+    getNameText('part', tags).map(([name, docs]) => ({ name, docs })),
+    a => a.name,
+  );
 };
 
 export const getNameText = (name: string, tags: d.JsonDocsTag[]) => {
@@ -261,10 +263,7 @@ export const getNameText = (name: string, tags: d.JsonDocsTag[]) => {
     .filter(tag => tag.name === name && tag.text)
     .map(({ text }) => {
       const [namePart, ...rest] = (' ' + text).split(' - ');
-      return [
-        namePart.trim(),
-        rest.join(' - ').trim()
-      ];
+      return [namePart.trim(), rest.join(' - ').trim()];
     });
 };
 
@@ -275,7 +274,7 @@ const getUserReadmeContent = async (compilerCtx: d.CompilerCtx, readmePath: stri
     if (userContentIndex >= 0) {
       return existingContent.substring(0, userContentIndex);
     }
-  } catch (e) { }
+  } catch (e) {}
   return undefined;
 };
 
@@ -303,7 +302,7 @@ const generateDocs = (readme: string, jsdoc: d.CompilerJsDoc) => {
   return contentLines.join('\n').trim();
 };
 
-const generateUsages = async (config: d.Config, compilerCtx: d.CompilerCtx, usagesDir: string) => {
+const generateUsages = async (compilerCtx: d.CompilerCtx, usagesDir: string) => {
   const rtn: d.JsonDocsUsage = {};
 
   try {
@@ -311,28 +310,31 @@ const generateUsages = async (config: d.Config, compilerCtx: d.CompilerCtx, usag
 
     const usages: d.JsonDocsUsage = {};
 
-    await Promise.all(usageFilePaths.map(async f => {
-      if (!f.isFile) {
-        return;
-      }
+    await Promise.all(
+      usageFilePaths.map(async f => {
+        if (!f.isFile) {
+          return;
+        }
 
-      const fileName = config.sys.path.basename(f.relPath);
-      if (!fileName.toLowerCase().endsWith('.md')) {
-        return;
-      }
+        const fileName = basename(f.relPath);
+        if (!fileName.toLowerCase().endsWith('.md')) {
+          return;
+        }
 
-      const parts = fileName.split('.');
-      parts.pop();
-      const key = parts.join('.');
+        const parts = fileName.split('.');
+        parts.pop();
+        const key = parts.join('.');
 
-      usages[key] = await compilerCtx.fs.readFile(f.absPath);
-    }));
+        usages[key] = await compilerCtx.fs.readFile(f.absPath);
+      }),
+    );
 
-    Object.keys(usages).sort().forEach(key => {
-      rtn[key] = usages[key];
-    });
-
-  } catch (e) { }
+    Object.keys(usages)
+      .sort()
+      .forEach(key => {
+        rtn[key] = usages[key];
+      });
+  } catch (e) {}
 
   return rtn;
 };

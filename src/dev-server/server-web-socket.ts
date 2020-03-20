@@ -3,10 +3,9 @@ import * as ws from 'ws';
 import * as http from 'http';
 import { noop } from '@utils';
 
-
 export function createWebSocket(prcs: NodeJS.Process, httpServer: http.Server, destroys: d.DevServerDestroy[]) {
   const wsConfig: ws.ServerOptions = {
-    server: httpServer
+    server: httpServer,
   };
 
   const wsServer: ws.Server = new ws.Server(wsConfig);
@@ -16,8 +15,7 @@ export function createWebSocket(prcs: NodeJS.Process, httpServer: http.Server, d
   }
 
   wsServer.on('connection', (ws: DevWS) => {
-
-    ws.on('message', (data) => {
+    ws.on('message', data => {
       // the server process has received a message from the browser
       // pass the message received from the browser to the main cli process
       prcs.send(JSON.parse(data.toString()));
@@ -38,7 +36,6 @@ export function createWebSocket(prcs: NodeJS.Process, httpServer: http.Server, d
       ws.ping(noop);
     });
   }, 10000);
-
 
   function onMessageFromCli(msg: d.DevServerMessage) {
     // the server process has received a message from the cli's main thread
@@ -63,7 +60,6 @@ export function createWebSocket(prcs: NodeJS.Process, httpServer: http.Server, d
     });
   });
 }
-
 
 interface DevWS extends ws {
   isAlive: boolean;

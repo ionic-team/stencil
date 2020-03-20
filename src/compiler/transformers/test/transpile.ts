@@ -4,7 +4,6 @@ import { convertStaticToMeta } from '../static-to-meta/visitor';
 import { mockBuildCtx, mockCompilerCtx, mockConfig, mockStencilSystem } from '@stencil/core/testing';
 import ts from 'typescript';
 
-
 export function transpileModule(input: string, config?: d.Config, compilerCtx?: d.CompilerCtx, sys?: d.StencilSystem) {
   const options = ts.getDefaultCompilerOptions();
   options.isolatedModules = true;
@@ -38,8 +37,8 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
   let outputText: string;
 
   const compilerHost: ts.CompilerHost = {
-    getSourceFile: fileName => fileName === inputFileName ? sourceFile : undefined,
-    writeFile: (_, text) => outputText = text,
+    getSourceFile: fileName => (fileName === inputFileName ? sourceFile : undefined),
+    writeFile: (_, text) => (outputText = text),
     getDefaultLibFileName: () => 'lib.d.ts',
     useCaseSensitiveFileNames: () => false,
     getCanonicalFileName: fileName => fileName,
@@ -48,7 +47,7 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
     fileExists: fileName => fileName === inputFileName,
     readFile: () => '',
     directoryExists: () => true,
-    getDirectories: () => []
+    getDirectories: () => [],
   };
 
   const program = ts.createProgram([inputFileName], options, compilerHost);
@@ -67,16 +66,12 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
     componentMetadata: null,
     styleImport: null,
     scopeCss: false,
-    style: 'inline'
+    style: 'inline',
   };
 
   program.emit(undefined, undefined, undefined, undefined, {
-    before: [
-      convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker)
-    ],
-    after: [
-      convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)
-    ]
+    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker)],
+    after: [convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)],
   });
 
   while (outputText.includes('  ')) {
@@ -126,7 +121,7 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
     method,
     elementRef,
     legacyContext,
-    legacyConnect
+    legacyConnect,
   };
 }
 

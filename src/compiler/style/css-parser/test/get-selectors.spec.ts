@@ -1,8 +1,6 @@
 import { getCssSelectors } from '../get-css-selectors';
 
-
 describe('getCssSelectors', () => {
-
   it('attribute containing selector', () => {
     const s = getCssSelectors('pre[class*="language-"]');
 
@@ -67,5 +65,4 @@ describe('getCssSelectors', () => {
     expect(s.classNames[1]).toBe('class-b');
     expect(s.classNames[2]).toBe('ClAsS-c');
   });
-
 });

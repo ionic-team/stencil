@@ -1,28 +1,17 @@
 import * as d from '@stencil/core/declarations';
-import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
-import { validateOutputTargetCustom } from '../validate-outputs-custom';
+import { mockConfig } from '@stencil/core/testing';
+import { validateConfig } from '../validate-config';
 import { buildWarn } from '@utils';
 
-
 describe('validateCustom', () => {
-
-  let config: d.Config;
+  let userConfig: d.Config;
 
   beforeEach(() => {
-    config = {
-      sys: mockStencilSystem(),
-      logger: mockLogger(),
-      rootDir: '/User/some/path/',
-      srcDir: '/User/some/path/src/',
-      flags: {},
-      outputTargets: []
-    };
+    userConfig = mockConfig();
   });
 
-
   it('should log warning', () => {
-
-    config.outputTargets = [
+    userConfig.outputTargets = [
       {
         type: 'custom',
         name: 'test',
@@ -32,12 +21,10 @@ describe('validateCustom', () => {
         },
         generator: async () => {
           return;
-        }
-      }
+        },
+      },
     ];
-    const diagnostics: d.Diagnostic[] = [];
-    validateOutputTargetCustom(config, diagnostics);
+    const { diagnostics } = validateConfig(userConfig);
     expect(diagnostics.length).toBe(1);
   });
-
 });

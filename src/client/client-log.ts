@@ -1,4 +1,4 @@
-import { BUILD } from "@app-data";
+import { BUILD } from '@app-data';
 
 export const STENCIL_DEV_MODE = BUILD.isTesting
   ? ['STENCIL:'] // E2E testing

@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { MockWindow, patchWindow } from '@stencil/core/mock-doc';
 
-
 export function patchDomImplementation(doc: any, opts: d.HydrateFactoryOptions) {
   let win: any;
 
@@ -9,7 +8,6 @@ export function patchDomImplementation(doc: any, opts: d.HydrateFactoryOptions) 
     opts.destroyWindow = true;
     patchWindow(doc.defaultView);
     win = doc.defaultView;
-
   } else {
     opts.destroyWindow = true;
     opts.destroyDocument = false;
@@ -34,7 +32,7 @@ export function patchDomImplementation(doc: any, opts: d.HydrateFactoryOptions) 
   if (typeof doc.createEvent === 'function') {
     const CustomEvent = doc.createEvent('CustomEvent').constructor;
     if (win.CustomEvent !== CustomEvent) {
-        win.CustomEvent = CustomEvent;
+      win.CustomEvent = CustomEvent;
     }
   }
 
@@ -45,19 +43,18 @@ export function patchDomImplementation(doc: any, opts: d.HydrateFactoryOptions) 
       get() {
         const baseElm = doc.querySelector('base[href]');
         if (baseElm) {
-          return (new URL(baseElm.getAttribute('href'), win.location.href)).href;
+          return new URL(baseElm.getAttribute('href'), win.location.href).href;
         }
         return win.location.href;
-      }
+      },
     });
   }
 
   return win as Window;
 }
 
-
-function getRootNode(opts?: { composed?: boolean; [key: string]: any; }) {
-  const isComposed = (opts != null && opts.composed === true);
+function getRootNode(opts?: { composed?: boolean; [key: string]: any }) {
+  const isComposed = opts != null && opts.composed === true;
 
   let node: Node = this as any;
 

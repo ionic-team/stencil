@@ -5,7 +5,7 @@ import { doc, plt, styles, supportsConstructibleStylesheets, supportsShadow } fr
 import { HYDRATED_STYLE_ID, NODE_TYPE } from './runtime-constants';
 import { createTime } from './profile';
 
-const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/new WeakMap();
+const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMap();
 
 export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean) => {
   let style = styles.get(scopeId);
@@ -24,7 +24,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
 
   // if an element is NOT connected then getRootNode() will return the wrong root node
   // so the fallback is to always use the document for the root node in those cases
-  styleContainerNode = (styleContainerNode.nodeType === NODE_TYPE.DocumentFragment ? styleContainerNode : doc);
+  styleContainerNode = styleContainerNode.nodeType === NODE_TYPE.DocumentFragment ? styleContainerNode : doc;
 
   if (BUILD.mode && !style) {
     scopeId = getScopeId(cmpMeta.$tagName$);
@@ -37,13 +37,12 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
       let appliedStyles = rootAppliedStyles.get(styleContainerNode);
       let styleElm;
       if (!appliedStyles) {
-        rootAppliedStyles.set(styleContainerNode, appliedStyles = new Set());
+        rootAppliedStyles.set(styleContainerNode, (appliedStyles = new Set()));
       }
       if (!appliedStyles.has(scopeId)) {
         if (BUILD.hydrateClientSide && styleContainerNode.host && (styleElm = styleContainerNode.querySelector(`[${HYDRATED_STYLE_ID}="${scopeId}"]`))) {
           // This is only happening on native shadow-dom, do not needs CSS var shim
           styleElm.innerHTML = style;
-
         } else {
           if (BUILD.cssVarShim && plt.$cssShim$) {
             styleElm = plt.$cssShim$.createHostStyle(hostElm, scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation));
@@ -56,7 +55,6 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
               // stylesheets for the same component
               appliedStyles = null;
             }
-
           } else {
             styleElm = doc.createElement('style');
             styleElm.innerHTML = style;
@@ -66,17 +64,13 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
             styleElm.setAttribute(HYDRATED_STYLE_ID, scopeId);
           }
 
-          styleContainerNode.insertBefore(
-            styleElm,
-            styleContainerNode.querySelector('link')
-          );
+          styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
         }
 
         if (appliedStyles) {
           appliedStyles.add(scopeId);
         }
       }
-
     } else if (BUILD.constructableCSS && !styleContainerNode.adoptedStyleSheets.includes(style)) {
       styleContainerNode.adoptedStyleSheets = [...styleContainerNode.adoptedStyleSheets, style];
     }
@@ -89,10 +83,7 @@ export const attachStyles = (hostRef: d.HostRef) => {
   const elm = hostRef.$hostElement$;
   const flags = cmpMeta.$flags$;
   const endAttachStyles = createTime('attachStyles', cmpMeta.$tagName$);
-  const scopeId = addStyle(
-    (BUILD.shadowDom && supportsShadow && elm.shadowRoot)
-      ? elm.shadowRoot
-      : elm.getRootNode(), cmpMeta, hostRef.$modeName$, elm);
+  const scopeId = addStyle(BUILD.shadowDom && supportsShadow && elm.shadowRoot ? elm.shadowRoot : elm.getRootNode(), cmpMeta, hostRef.$modeName$, elm);
 
   if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && flags & CMP_FLAGS.needsScopedEncapsulation) {
     // only required when we're NOT using native shadow dom (slot)
@@ -112,13 +103,9 @@ export const attachStyles = (hostRef: d.HostRef) => {
   endAttachStyles();
 };
 
+export const getScopeId = (tagName: string, mode?: string) => 'sc-' + (BUILD.mode && mode ? tagName + '-' + mode : tagName);
 
-export const getScopeId = (tagName: string, mode?: string) =>
-  'sc-' + ((BUILD.mode && mode) ? tagName + '-' + mode : tagName);
-
-export const convertScopedToShadow = (css: string) =>
-  css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');
-
+export const convertScopedToShadow = (css: string) => css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');
 
 declare global {
   export interface CSSStyleSheet {

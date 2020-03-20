@@ -1,12 +1,12 @@
 import * as d from '../../declarations';
 import { isObject, pluck } from '@utils';
 
-export function validateRollupConfig(config: d.Config) {
+export const validateRollupConfig = (config: d.Config) => {
   const cleanRollupConfig = getCleanRollupConfig(config.rollupConfig);
   config.rollupConfig = cleanRollupConfig;
-}
+};
 
-function getCleanRollupConfig(rollupConfig: d.RollupConfig): d.RollupConfig {
+const getCleanRollupConfig = (rollupConfig: d.RollupConfig): d.RollupConfig => {
   let cleanRollupConfig = DEFAULT_ROLLUP_CONFIG;
 
   if (!rollupConfig || !isObject(rollupConfig)) {
@@ -28,9 +28,9 @@ function getCleanRollupConfig(rollupConfig: d.RollupConfig): d.RollupConfig {
   }
 
   return cleanRollupConfig;
-}
+};
 
 const DEFAULT_ROLLUP_CONFIG: d.RollupConfig = {
   inputOptions: {},
-  outputOptions: {}
+  outputOptions: {},
 };

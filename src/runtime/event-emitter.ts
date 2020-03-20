@@ -4,7 +4,6 @@ import { consoleDevWarn, win } from '@platform';
 import { EVENT_FLAGS } from '@utils';
 import { getElement } from './element';
 
-
 export const createEvent = (ref: d.RuntimeRef, name: string, flags: number) => {
   const elm = getElement(ref) as HTMLElement;
   return {
@@ -18,7 +17,7 @@ export const createEvent = (ref: d.RuntimeRef, name: string, flags: number) => {
         cancelable: !!(flags & EVENT_FLAGS.Cancellable),
         detail,
       });
-    }
+    },
   };
 };
 

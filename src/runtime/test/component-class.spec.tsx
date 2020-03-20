@@ -1,11 +1,9 @@
 import { Component, Element } from '@stencil/core';
 
-
 describe('component class only', () => {
-
   it('raw class without newSpecPage', async () => {
     @Component({
-      tag: 'cmp-a'
+      tag: 'cmp-a',
     })
     class CmpA {
       sumb(a: number, b: number) {
@@ -19,7 +17,7 @@ describe('component class only', () => {
 
   it('mock element', async () => {
     @Component({
-      tag: 'cmp-a'
+      tag: 'cmp-a',
     })
     class CmpA {
       @Element() elm: HTMLElement;
@@ -28,5 +26,4 @@ describe('component class only', () => {
     const instance = new CmpA();
     expect(instance.elm.tagName).toEqual('CMP-A');
   });
-
 });

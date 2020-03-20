@@ -1,22 +1,19 @@
 import * as d from '../../declarations';
-import { getAbsoluteBuildDir } from './utils';
+import { getAbsoluteBuildDir } from './html-utils';
 import { generateHashedCopy } from '../copy/hashed-copy';
 import { injectModulePreloads } from './inject-module-preloads';
 import { isString } from '@utils';
+import { join } from 'path';
 import ts from 'typescript';
 
-
 export const optimizeEsmImport = async (config: d.Config, compilerCtx: d.CompilerCtx, doc: Document, outputTarget: d.OutputTargetWww) => {
-  const resourcesUrl = getAbsoluteBuildDir(config, outputTarget);
+  const resourcesUrl = getAbsoluteBuildDir(outputTarget);
   const entryFilename = `${config.fsNamespace}.esm.js`;
-  const expectedSrc = config.sys.path.join(resourcesUrl, entryFilename);
+  const expectedSrc = join(resourcesUrl, entryFilename);
 
-  const script = Array.from(doc.querySelectorAll('script'))
-    .find(s => (
-      s.getAttribute('type') === 'module' &&
-      !s.hasAttribute('crossorigin') &&
-      s.getAttribute('src') === expectedSrc
-    ));
+  const script = Array.from(doc.querySelectorAll('script')).find(
+    s => s.getAttribute('type') === 'module' && !s.hasAttribute('crossorigin') && s.getAttribute('src') === expectedSrc,
+  );
 
   if (!script) {
     return false;
@@ -25,7 +22,7 @@ export const optimizeEsmImport = async (config: d.Config, compilerCtx: d.Compile
   script.setAttribute('data-resources-url', resourcesUrl);
   script.setAttribute('data-stencil-namespace', config.fsNamespace);
 
-  const entryPath = config.sys.path.join(outputTarget.buildDir, entryFilename);
+  const entryPath = join(outputTarget.buildDir, entryFilename);
   const content = await compilerCtx.fs.readFile(entryPath);
 
   if (isString(content)) {
@@ -42,7 +39,7 @@ export const optimizeEsmImport = async (config: d.Config, compilerCtx: d.Compile
     } else {
       const hashedFile = await generateHashedCopy(config, compilerCtx, entryPath);
       if (hashedFile) {
-        const hashedPath = config.sys.path.join(resourcesUrl, hashedFile);
+        const hashedPath = join(resourcesUrl, hashedFile);
         script.setAttribute('src', hashedPath);
         injectModulePreloads(doc, [hashedPath]);
       }
@@ -55,9 +52,7 @@ export const optimizeEsmImport = async (config: d.Config, compilerCtx: d.Compile
 export const updateImportPaths = (code: string, newDir: string) => {
   const orgImportPaths: string[] = [];
   const tsSourceFile = ts.createSourceFile('module.ts', code, ts.ScriptTarget.Latest);
-  ts.transform(tsSourceFile, [
-    readImportPaths(orgImportPaths)
-  ]);
+  ts.transform(tsSourceFile, [readImportPaths(orgImportPaths)]);
 
   orgImportPaths.forEach(orgImportPath => {
     const newPath = replacePathDir(orgImportPath, newDir);
@@ -70,7 +65,7 @@ export const updateImportPaths = (code: string, newDir: string) => {
   return {
     code,
     orgImportPaths,
-  }
+  };
 };
 
 const replacePathDir = (orgImportPath: string, newDir: string) => {
@@ -83,11 +78,10 @@ const replacePathDir = (orgImportPath: string, newDir: string) => {
 const readImportPaths = (orgImportPaths: string[]): ts.TransformerFactory<ts.SourceFile> => {
   return () => {
     return tsSourceFile => {
-
       const importStatements = tsSourceFile.statements
         .filter(ts.isImportDeclaration)
         .filter(s => s.moduleSpecifier != null)
-        .filter(s => ts.isStringLiteral(s.moduleSpecifier) && s.moduleSpecifier.text)
+        .filter(s => ts.isStringLiteral(s.moduleSpecifier) && s.moduleSpecifier.text);
 
       importStatements.forEach(s => {
         if (ts.isStringLiteral(s.moduleSpecifier)) {

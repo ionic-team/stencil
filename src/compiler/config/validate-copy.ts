@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { unique } from '@utils';
 
-export function validateCopy(copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTask[] = []): d.CopyTask[] {
+export const validateCopy = (copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTask[] = []): d.CopyTask[] => {
   if (copy === null || copy === false) {
     return [];
   }
@@ -15,4 +15,4 @@ export function validateCopy(copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTa
     }
   }
   return unique(copy, task => `${task.src}:${task.dest}:${task.keepDirStructure}`);
-}
+};

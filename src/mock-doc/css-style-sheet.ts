@@ -1,10 +1,9 @@
-import { MockStyleElement } from "./element";
+import { MockStyleElement } from './element';
 
 class MockCSSRule {
   cssText = '';
   type = 0;
-  constructor(public parentStyleSheet: MockCSSStyleSheet) {
-  }
+  constructor(public parentStyleSheet: MockCSSStyleSheet) {}
 }
 
 export class MockCSSStyleSheet {

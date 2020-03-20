@@ -3,7 +3,6 @@ import { emptyDir, fileExists, mkDir, readDir, readFile, readFileBuffer, rmDir, 
 import { join } from 'path';
 import { tmpdir } from 'os';
 
-
 export class ScreenshotConnector implements d.ScreenshotConnector {
   rootDir: string;
   cacheDir: string;
@@ -42,8 +41,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     this.buildAuthor = opts.buildAuthor;
     this.buildUrl = opts.buildUrl;
     this.previewUrl = opts.previewUrl;
-    this.buildTimestamp = typeof opts.buildTimestamp === 'number' ? opts.buildTimestamp : Date.now(),
-    this.cacheDir = opts.cacheDir;
+    (this.buildTimestamp = typeof opts.buildTimestamp === 'number' ? opts.buildTimestamp : Date.now()), (this.cacheDir = opts.cacheDir);
     this.packageDir = opts.packageDir;
     this.rootDir = opts.rootDir;
     this.appNamespace = opts.appNamespace;
@@ -76,7 +74,9 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     this.pixelmatchThreshold = opts.pixelmatchThreshold;
 
     this.logger.debug(`screenshot build: ${this.buildId}, ${this.buildMessage}, updateMaster: ${this.updateMaster}`);
-    this.logger.debug(`screenshot, allowableMismatchedPixels: ${this.allowableMismatchedPixels}, allowableMismatchedRatio: ${this.allowableMismatchedRatio}, pixelmatchThreshold: ${this.pixelmatchThreshold}`);
+    this.logger.debug(
+      `screenshot, allowableMismatchedPixels: ${this.allowableMismatchedPixels}, allowableMismatchedRatio: ${this.allowableMismatchedRatio}, pixelmatchThreshold: ${this.pixelmatchThreshold}`,
+    );
 
     if (typeof opts.screenshotDirName === 'string') {
       this.screenshotDirName = opts.screenshotDirName;
@@ -105,15 +105,12 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
 
     await mkDir(this.screenshotDir);
 
-    await Promise.all([
-      mkDir(this.imagesDir),
-      mkDir(this.buildsDir),
-      mkDir(this.currentBuildDir),
-      mkDir(this.cacheDir)
-    ]);
+    await Promise.all([mkDir(this.imagesDir), mkDir(this.buildsDir), mkDir(this.currentBuildDir), mkDir(this.cacheDir)]);
   }
 
-  async pullMasterBuild() {/**/}
+  async pullMasterBuild() {
+    /**/
+  }
 
   async getMasterBuild() {
     let masterBuild: d.ScreenshotBuild = null;
@@ -140,7 +137,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
         previewUrl: this.previewUrl,
         appNamespace: this.appNamespace,
         timestamp: this.buildTimestamp,
-        screenshots: screenshots
+        screenshots: screenshots,
       };
     }
 
@@ -155,7 +152,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
         previewUrl: this.previewUrl,
         appNamespace: this.appNamespace,
         timestamp: this.buildTimestamp,
-        screenshots: screenshots
+        screenshots: screenshots,
       },
       compare: {
         id: `${masterBuild.id}-${this.buildId}`,
@@ -164,7 +161,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
           message: masterBuild.message,
           author: masterBuild.author,
           url: masterBuild.url,
-          previewUrl: masterBuild.previewUrl
+          previewUrl: masterBuild.previewUrl,
         },
         b: {
           id: this.buildId,
@@ -176,12 +173,12 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
         url: null,
         appNamespace: this.appNamespace,
         timestamp: this.buildTimestamp,
-        diffs: []
-      }
+        diffs: [],
+      },
     };
 
     results.currentBuild.screenshots.forEach(screenshot => {
-      screenshot.diff.device = (screenshot.diff.device || screenshot.diff.userAgent);
+      screenshot.diff.device = screenshot.diff.device || screenshot.diff.userAgent;
       results.compare.diffs.push(screenshot.diff);
       delete screenshot.diff;
     });
@@ -243,13 +240,12 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
         if (existingItem) {
           // already have this cached, but update its timestamp
           existingItem.ts = this.buildTimestamp;
-
         } else {
           // add this item to the cache
           screenshotCache.items.push({
             key: diff.cacheKey,
             ts: this.buildTimestamp,
-            mp: diff.mismatchedPixels
+            mp: diff.mismatchedPixels,
           });
         }
       });
@@ -273,14 +269,14 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   }
 
   toJson(masterBuild: d.ScreenshotBuild, screenshotCache: d.ScreenshotCache) {
-    const masterScreenshots: {[screenshotId: string]: string} = {};
+    const masterScreenshots: { [screenshotId: string]: string } = {};
     if (masterBuild && Array.isArray(masterBuild.screenshots)) {
       masterBuild.screenshots.forEach(masterScreenshot => {
         masterScreenshots[masterScreenshot.id] = masterScreenshot.image;
       });
     }
 
-    const mismatchCache: {[cacheKey: string]: number} = {};
+    const mismatchCache: { [cacheKey: string]: number } = {};
     if (screenshotCache && Array.isArray(screenshotCache.items)) {
       screenshotCache.items.forEach(cacheItem => {
         mismatchCache[cacheItem.key] = cacheItem.mp;
@@ -301,7 +297,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
       allowableMismatchedRatio: this.allowableMismatchedRatio,
       pixelmatchThreshold: this.pixelmatchThreshold,
       timeoutBeforeScreenshot: this.waitBeforeScreenshot,
-      pixelmatchModulePath: this.pixelmatchModulePath
+      pixelmatchModulePath: this.pixelmatchModulePath,
     };
 
     return JSON.stringify(screenshotBuild);
@@ -372,5 +368,4 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
       return 0;
     });
   }
-
 }

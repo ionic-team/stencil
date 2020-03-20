@@ -1,10 +1,9 @@
 import * as d from '../declarations';
 import * as util from './dev-server-utils';
-import * as http  from 'http';
-import * as querystring  from 'querystring';
-import * as url  from 'url';
+import * as http from 'http';
+import * as querystring from 'querystring';
+import * as url from 'url';
 import openInEditorApi from './open-in-editor-api';
-
 
 export async function serveOpenInEditor(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem, req: d.HttpRequest, res: http.ServerResponse) {
   let status = 200;
@@ -18,7 +17,6 @@ export async function serveOpenInEditor(devServerConfig: d.DevServerConfig, sys:
     } else {
       data.error = `no editors available`;
     }
-
   } catch (e) {
     data.error = e + '';
     status = 500;
@@ -28,18 +26,20 @@ export async function serveOpenInEditor(devServerConfig: d.DevServerConfig, sys:
     requestLog: {
       method: req.method,
       url: req.url,
-      status
-    }
+      status,
+    },
   });
 
-  res.writeHead(status, util.responseHeaders({
-    'Content-Type': 'application/json'
-  }));
+  res.writeHead(
+    status,
+    util.responseHeaders({
+      'Content-Type': 'application/json',
+    }),
+  );
 
   res.write(JSON.stringify(data, null, 2));
   res.end();
 }
-
 
 async function parseData(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem, req: d.HttpRequest, data: d.OpenInEditorData) {
   const query = url.parse(req.url).query;
@@ -86,7 +86,6 @@ async function parseData(devServerConfig: d.DevServerConfig, sys: d.CompilerSyst
   }
 }
 
-
 async function openDataInEditor(data: d.OpenInEditorData) {
   if (!data.exists || data.error) {
     return;
@@ -94,10 +93,10 @@ async function openDataInEditor(data: d.OpenInEditorData) {
 
   try {
     const opts = {
-      editor: data.editor
+      editor: data.editor,
     };
 
-    const editor = openInEditorApi.configure(opts, err => data.error = err + '');
+    const editor = openInEditorApi.configure(opts, err => (data.error = err + ''));
 
     if (data.error) {
       return;
@@ -106,26 +105,26 @@ async function openDataInEditor(data: d.OpenInEditorData) {
     data.open = `${data.file}:${data.line}:${data.column}`;
 
     await editor.open(data.open);
-
   } catch (e) {
     data.error = e + '';
   }
 }
 
-
 export async function getEditors() {
   const editors: d.DevServerEditor[] = [];
 
   try {
-    await Promise.all(Object.keys(openInEditorApi.editors).map(async editorId => {
-      const isSupported = await isEditorSupported(editorId);
+    await Promise.all(
+      Object.keys(openInEditorApi.editors).map(async editorId => {
+        const isSupported = await isEditorSupported(editorId);
 
-      editors.push({
-        id: editorId,
-        priority: EDITOR_PRIORITY[editorId],
-        supported: isSupported
-      });
-    }));
+        editors.push({
+          id: editorId,
+          priority: EDITOR_PRIORITY[editorId],
+          supported: isSupported,
+        });
+      }),
+    );
   } catch (e) {}
 
   return editors
@@ -134,14 +133,14 @@ export async function getEditors() {
       if (a.priority < b.priority) return -1;
       if (a.priority > b.priority) return 1;
       return 0;
-    }).map(e => {
+    })
+    .map(e => {
       return {
         id: e.id,
-        name: EDITORS[e.id]
+        name: EDITORS[e.id],
       } as d.DevServerEditor;
     });
 }
-
 
 async function isEditorSupported(editorId: string) {
   let isSupported = false;
@@ -154,8 +153,7 @@ async function isEditorSupported(editorId: string) {
   return isSupported;
 }
 
-
-const EDITORS: {[editor: string]: string} = {
+const EDITORS: { [editor: string]: string } = {
   atom: 'Atom',
   code: 'Code',
   emacs: 'Emacs',
@@ -167,8 +165,7 @@ const EDITORS: {[editor: string]: string} = {
   visualstudio: 'Visual Studio',
 };
 
-
-const EDITOR_PRIORITY: {[editor: string]: number} = {
+const EDITOR_PRIORITY: { [editor: string]: number } = {
   code: 1,
   atom: 2,
   sublime: 3,

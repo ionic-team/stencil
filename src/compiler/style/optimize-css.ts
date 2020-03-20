@@ -1,9 +1,8 @@
 import * as d from '../../declarations';
-import { COMPILER_BUILD } from '../build/compiler-build-id';
+import { optimizeCssId } from '../../version';
 import { hasError, normalizePath } from '@utils';
 
-
-export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], styleText: string, filePath: string) {
+export const optimizeCss = async (config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], styleText: string, filePath: string) => {
   if (typeof styleText !== 'string' || !styleText.length) {
     //  don't bother with invalid data
     return styleText;
@@ -22,17 +21,17 @@ export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, 
     input: styleText,
     filePath: filePath,
     autoprefixer: config.autoprefixCss,
-    minify: config.minifyCss
+    minify: config.minifyCss,
   };
 
-  const cacheKey = await compilerCtx.cache.createKey('optimizeCss', COMPILER_BUILD.optimizeCss, opts);
+  const cacheKey = await compilerCtx.cache.createKey('optimizeCss', optimizeCssId, opts);
   const cachedContent = await compilerCtx.cache.get(cacheKey);
   if (cachedContent != null) {
     // let's use the cached data we already figured out
     return cachedContent;
   }
 
-  const minifyResults = await config.sys.optimizeCss(opts);
+  const minifyResults = await compilerCtx.worker.optimizeCss(opts);
   minifyResults.diagnostics.forEach(d => {
     // collect up any diagnostics from minifying
     diagnostics.push(d);
@@ -48,4 +47,4 @@ export async function optimizeCss(config: d.Config, compilerCtx: d.CompilerCtx, 
   }
 
   return styleText;
-}
+};

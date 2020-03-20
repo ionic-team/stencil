@@ -5,8 +5,14 @@ import { isDecoratorNamed } from './decorator-utils';
 import { validatePublicName } from '../reserved-public-members';
 import ts from 'typescript';
 
-
-export const methodDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], cmpNode: ts.ClassDeclaration, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
+export const methodDecoratorsToStatic = (
+  config: d.Config,
+  diagnostics: d.Diagnostic[],
+  cmpNode: ts.ClassDeclaration,
+  decoratedProps: ts.ClassElement[],
+  typeChecker: ts.TypeChecker,
+  newMembers: ts.ClassElement[],
+) => {
   const tsSourceFile = cmpNode.getSourceFile();
   const methods = decoratedProps
     .filter(ts.isMethodDeclaration)
@@ -17,7 +23,6 @@ export const methodDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagno
     newMembers.push(createStaticGetter('methods', ts.createObjectLiteral(methods, true)));
   }
 };
-
 
 const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], tsSourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, method: ts.MethodDeclaration) => {
   const methodDecorator = method.decorators.find(isDecoratorNamed('Method'));
@@ -31,39 +36,33 @@ const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], tsS
   const returnType = typeChecker.getReturnTypeOfSignature(signature);
   const returnTypeNode = typeChecker.typeToTypeNode(returnType);
   let returnString = typeToString(typeChecker, returnType);
-  let signatureString = typeChecker.signatureToString(
-    signature,
-    method,
-    flags,
-    ts.SignatureKind.Call
-  );
+  let signatureString = typeChecker.signatureToString(signature, method, flags, ts.SignatureKind.Call);
 
   if (!config._isTesting) {
     if (returnString === 'void') {
       const warn = buildWarn(diagnostics);
       warn.header = '@Method requires async';
       warn.messageText = `External @Method() ${methodName}() must return a Promise.\n\n Consider prefixing the method with async, such as @Method async ${methodName}().`;
-      augmentDiagnosticWithNode(config, warn, method.name);
+      augmentDiagnosticWithNode(warn, method.name);
 
       returnString = 'Promise<void>';
       signatureString = signatureString.replace(/=> void$/, '=> Promise<void>');
-
     } else if (!isTypePromise(returnString)) {
       const err = buildError(diagnostics);
       err.header = '@Method requires async';
       err.messageText = `External @Method() ${methodName}() must return a Promise.\n\n Consider prefixing the method with async, such as @Method async ${methodName}().`;
-      augmentDiagnosticWithNode(config, err, method.name);
+      augmentDiagnosticWithNode(err, method.name);
     }
   }
 
   if (isMemberPrivate(method)) {
     const err = buildError(diagnostics);
     err.messageText = 'Methods decorated with the @Method() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/methods';
-    augmentDiagnosticWithNode(config, err, method.modifiers[0]);
+    augmentDiagnosticWithNode(err, method.modifiers[0]);
   }
 
   // Validate if the method name does not conflict with existing public names
-  validatePublicName(config, diagnostics, methodName, '@Method()', 'method', method.name);
+  validatePublicName(diagnostics, methodName, '@Method()', 'method', method.name);
 
   const methodMeta: d.ComponentCompilerStaticMethod = {
     complexType: {
@@ -71,21 +70,18 @@ const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], tsS
       parameters: signature.parameters.map(symbol => serializeSymbol(typeChecker, symbol)),
       references: {
         ...getAttributeTypeInfo(returnTypeNode, tsSourceFile),
-        ...getAttributeTypeInfo(method, tsSourceFile)
+        ...getAttributeTypeInfo(method, tsSourceFile),
       },
-      return: returnString
+      return: returnString,
     },
     docs: {
       text: ts.displayPartsToString(signature.getDocumentationComment(typeChecker)),
-      tags: signature.getJsDocTags()
-    }
+      tags: signature.getJsDocTags(),
+    },
   };
-  validateReferences(config, diagnostics, methodMeta.complexType.references, method.type || method.name);
+  validateReferences(diagnostics, methodMeta.complexType.references, method.type || method.name);
 
-  const staticProp = ts.createPropertyAssignment(
-    ts.createLiteral(methodName),
-    convertValueToLiteral(methodMeta)
-  );
+  const staticProp = ts.createPropertyAssignment(ts.createLiteral(methodName), convertValueToLiteral(methodMeta));
 
   return staticProp;
 };

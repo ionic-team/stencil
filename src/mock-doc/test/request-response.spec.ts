@@ -1,9 +1,7 @@
 import { MockHeaders } from '../headers';
 import { MockRequest, MockResponse } from '../request-response';
 
-
 describe('MockRequest', () => {
-
   it('no input defaults', () => {
     const request = new MockRequest();
     expect(request.bodyUsed).toBe(false);
@@ -82,18 +80,16 @@ describe('MockRequest', () => {
 
   it('request input and init headers w/ object', () => {
     const headers = {
-      'x-header': 'value'
-    }
+      'x-header': 'value',
+    };
     const request = new MockRequest('/url', {
-      headers
+      headers,
     });
     expect(request.headers.get('x-header')).toBe('value');
   });
-
 });
 
 describe('MockResponse', () => {
-
   it('default', () => {
     const response = new MockResponse();
     expect(response.ok).toBe(true);
@@ -111,8 +107,8 @@ describe('MockResponse', () => {
       statusText: 'Not Found',
       type: 'basic',
       headers: {
-        'X-HeadeR': 88
-      }
+        'X-HeadeR': 88,
+      },
     });
     expect(response.ok).toBe(false);
     expect(response.status).toBe(404);
@@ -135,8 +131,7 @@ describe('MockResponse', () => {
   });
 
   it('json body', async () => {
-    const response = new MockResponse(JSON.stringify({data: 88}));
+    const response = new MockResponse(JSON.stringify({ data: 88 }));
     expect((await response.json()).data).toBe(88);
   });
-
 });

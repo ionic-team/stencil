@@ -3,7 +3,6 @@ import fs from 'graceful-fs';
 import path from 'path';
 import { normalizePath } from '@utils';
 
-
 export class NodeResolveModule {
   private resolveModuleCache = new Map<string, string>();
 
@@ -28,11 +27,13 @@ export class NodeResolveModule {
     fromDir = path.resolve(fromDir);
     const fromFile = path.join(fromDir, 'noop.js');
 
-    let dir = normalizePath(Module._resolveFilename(moduleId, {
-      id: fromFile,
-      filename: fromFile,
-      paths: Module._nodeModulePaths(fromDir)
-    }));
+    let dir = normalizePath(
+      Module._resolveFilename(moduleId, {
+        id: fromFile,
+        filename: fromFile,
+        paths: Module._nodeModulePaths(fromDir),
+      }),
+    );
 
     const root = normalizePath(path.parse(fromDir).root);
     let packageJsonFilePath: string;
@@ -41,7 +42,7 @@ export class NodeResolveModule {
       dir = normalizePath(path.dirname(dir));
       packageJsonFilePath = path.join(dir, 'package.json');
 
-      if (!hasAccess(packageJsonFilePath)) {
+      if (!fs.existsSync(packageJsonFilePath)) {
         continue;
       }
 
@@ -65,7 +66,7 @@ export class NodeResolveModule {
       dir = normalizePath(path.dirname(dir));
       typesPackageJsonFilePath = path.join(dir, 'node_modules', moduleSplt[0], moduleSplt[1], 'package.json');
 
-      if (!hasAccess(typesPackageJsonFilePath)) {
+      if (!fs.existsSync(typesPackageJsonFilePath)) {
         continue;
       }
 
@@ -87,7 +88,7 @@ export class NodeResolveModule {
       dir = normalizePath(path.dirname(dir));
       packageJsonFilePath = path.join(dir, 'node_modules', moduleId, 'package.json');
 
-      if (!hasAccess(packageJsonFilePath)) {
+      if (!fs.existsSync(packageJsonFilePath)) {
         continue;
       }
 
@@ -98,14 +99,4 @@ export class NodeResolveModule {
 
     throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
   }
-
-}
-
-function hasAccess(filePath: string) {
-  let access = false;
-  try {
-    fs.accessSync(filePath);
-    access = true;
-  } catch (e) {}
-  return access;
 }

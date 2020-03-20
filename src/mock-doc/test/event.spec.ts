@@ -1,5 +1,5 @@
 import { MockWindow } from '../window';
-import {EventTarget} from "../event";
+import { EventTarget } from '../event';
 
 describe('event', () => {
   let win: MockWindow;
@@ -30,7 +30,7 @@ describe('event', () => {
   it('Event(type, eventInitDict)', () => {
     const eventInitDict = {
       bubbles: true,
-      composed: true
+      composed: true,
     };
     const ev = new win.Event('click', eventInitDict) as Event;
     expect(ev.bubbles).toBe(true);
@@ -70,7 +70,7 @@ describe('event', () => {
     const eventInitDict = {
       bubbles: true,
       composed: true,
-      detail: 88
+      detail: 88,
     };
     const ev = new win.CustomEvent('click', eventInitDict) as CustomEvent;
     expect(ev.bubbles).toBe(true);
@@ -125,7 +125,7 @@ describe('event', () => {
       metaKey: false,
       shiftKey: true,
       location: 0,
-      repeat: true
+      repeat: true,
     };
     const ev = new win.KeyboardEvent('keyup', eventInitDict) as KeyboardEvent;
     expect(ev.bubbles).toBe(true);
@@ -193,7 +193,7 @@ describe('event', () => {
       metaKey: false,
       button: 0,
       buttons: 99,
-      relatedTarget: null
+      relatedTarget: null,
     };
     const ev = new win.MouseEvent('onmousedown', eventInitDict) as MouseEvent;
     expect(ev.bubbles).toBe(true);

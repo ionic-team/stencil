@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
+import { join } from 'path';
 
-
-export function inlineStyleSheets(config: d.Config, compilerCtx: d.CompilerCtx, doc: Document, maxSize: number, outputTarget: d.OutputTargetWww) {
+export const inlineStyleSheets = (compilerCtx: d.CompilerCtx, doc: Document, maxSize: number, outputTarget: d.OutputTargetWww) => {
   const globalLinks = Array.from(doc.querySelectorAll('link[rel=stylesheet]')) as HTMLLinkElement[];
   return Promise.all(
     globalLinks.map(async link => {
@@ -11,7 +11,7 @@ export function inlineStyleSheets(config: d.Config, compilerCtx: d.CompilerCtx, 
       }
 
       try {
-        const fsPath = config.sys.path.join(outputTarget.dir, href);
+        const fsPath = join(outputTarget.dir, href);
         const styles = await compilerCtx.fs.readFile(fsPath);
         if (styles.length > maxSize) {
           return;
@@ -23,6 +23,6 @@ export function inlineStyleSheets(config: d.Config, compilerCtx: d.CompilerCtx, 
         link.parentNode.insertBefore(inlinedStyles, link);
         link.remove();
       } catch (e) {}
-    })
+    }),
   );
-}
+};

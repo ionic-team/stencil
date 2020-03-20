@@ -1,8 +1,6 @@
 import { fixRelativeUrls, hasCssVariables, hasRelativeUrls } from '../load-link-styles';
 
-
 describe('hasCssVariables', () => {
-
   it('false for standard css', () => {
     const text = `
     .my-classname {
@@ -91,7 +89,6 @@ describe('hasCssVariables', () => {
     `;
     expect(hasCssVariables(text)).toBe(true);
   });
-
 });
 
 describe('hasRelativeUrls', () => {
@@ -134,7 +131,6 @@ describe('hasRelativeUrls', () => {
 
     expect(hasRelativeUrls(text)).toBe(false);
   });
-
 });
 
 describe('fixRelativeUrls', () => {
@@ -194,11 +190,7 @@ describe('fixRelativeUrls', () => {
     `);
   });
 
-  it.each([
-    'data:,ABC123',
-    'data:text/plain,ABC123',
-    'data:text/plain;base64,ABC123'
-  ])('should keep data url', (dataURL) => {
+  it.each(['data:,ABC123', 'data:text/plain,ABC123', 'data:text/plain;base64,ABC123'])('should keep data url', dataURL => {
     const text = `
       div {
         background-image: url('${dataURL}');
@@ -210,6 +202,5 @@ describe('fixRelativeUrls', () => {
         background-image: url('${dataURL}');
       }
     `);
-  })
-
+  });
 });

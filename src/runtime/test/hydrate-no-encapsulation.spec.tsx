@@ -1,16 +1,14 @@
 import { Component, Host, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('hydrate no encapsulation', () => {
-
   it('root element, no slot', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       render() {
         return (
           <Host>
-            <p class='hi'>Hello</p>
+            <p class="hi">Hello</p>
           </Host>
         );
       }
@@ -19,7 +17,7 @@ describe('hydrate no encapsulation', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -35,7 +33,7 @@ describe('hydrate no encapsulation', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
     expect(clientHydrated.root['s-id']).toBe('1');
     expect(clientHydrated.root['s-cr'].nodeType).toBe(8);
@@ -55,18 +53,14 @@ describe('hydrate no encapsulation', () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       render() {
-        return (
-          <Host>
-            Hello
-          </Host>
-        );
+        return <Host>Hello</Host>;
       }
     }
     // @ts-ignore
     const serverHydrated = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -80,7 +74,7 @@ describe('hydrate no encapsulation', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
     expect(clientHydrated.root['s-id']).toBe('1');
     expect(clientHydrated.root['s-cr'].nodeType).toBe(8);
@@ -111,7 +105,7 @@ describe('hydrate no encapsulation', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -131,7 +125,7 @@ describe('hydrate no encapsulation', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
     expect(clientHydrated.root['s-id']).toBe('1');
 
@@ -173,7 +167,7 @@ describe('hydrate no encapsulation', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -193,7 +187,7 @@ describe('hydrate no encapsulation', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
 
     expect(clientHydrated.root).toEqualHtml(`
@@ -237,7 +231,7 @@ describe('hydrate no encapsulation', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -257,7 +251,7 @@ describe('hydrate no encapsulation', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
 
     expect(clientHydrated.root).toEqualHtml(`
@@ -301,7 +295,7 @@ describe('hydrate no encapsulation', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -322,7 +316,7 @@ describe('hydrate no encapsulation', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
 
     expect(clientHydrated.root).toEqualHtml(`
@@ -347,8 +341,8 @@ describe('hydrate no encapsulation', () => {
         return (
           <Host>
             <cmp-b>
-              <div slot='bottom'>bottom light-dom</div>
-              <div slot='top'>top light-dom</div>
+              <div slot="bottom">bottom light-dom</div>
+              <div slot="top">top light-dom</div>
               middle light-dom
             </cmp-b>
           </Host>
@@ -361,9 +355,9 @@ describe('hydrate no encapsulation', () => {
         return (
           <Host>
             <header></header>
-            <slot name='top'></slot>
+            <slot name="top"></slot>
             <slot></slot>
-            <slot name='bottom'></slot>
+            <slot name="bottom"></slot>
             <footer></footer>
           </Host>
         );
@@ -373,7 +367,7 @@ describe('hydrate no encapsulation', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -406,7 +400,7 @@ describe('hydrate no encapsulation', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
 
     expect(clientHydrated.root).toEqualHtml(`
@@ -433,5 +427,4 @@ describe('hydrate no encapsulation', () => {
       </cmp-a>
     `);
   });
-
 });

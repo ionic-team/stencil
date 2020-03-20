@@ -1,6 +1,5 @@
-
 module.exports = {
-  sep: '/'
+  sep: '/',
 };
 
 try {

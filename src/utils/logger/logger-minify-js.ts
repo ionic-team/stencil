@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { splitLineBreaks } from './logger-utils';
 
-
 export function loadMinifyJsDiagnostics(sourceText: string, result: d.MinifyJsResult, diagnostics: d.Diagnostic[]) {
   if (!result || !result.error) {
     return;
@@ -16,7 +15,7 @@ export function loadMinifyJsDiagnostics(sourceText: string, result: d.MinifyJsRe
     messageText: result.error.message,
     absFilePath: null,
     relFilePath: null,
-    lines: []
+    lines: [],
   };
 
   if (typeof result.error.line === 'number' && result.error.line > -1) {
@@ -27,7 +26,7 @@ export function loadMinifyJsDiagnostics(sourceText: string, result: d.MinifyJsRe
       lineNumber: result.error.line,
       text: srcLines[result.error.line - 1],
       errorCharStart: result.error.col,
-      errorLength: 0
+      errorLength: 0,
     };
 
     d.lineNumber = errorLine.lineNumber;
@@ -54,7 +53,7 @@ export function loadMinifyJsDiagnostics(sourceText: string, result: d.MinifyJsRe
         lineNumber: errorLine.lineNumber - 1,
         text: srcLines[errorLine.lineIndex - 1],
         errorCharStart: -1,
-        errorLength: -1
+        errorLength: -1,
       };
 
       d.lines.unshift(previousLine);
@@ -66,7 +65,7 @@ export function loadMinifyJsDiagnostics(sourceText: string, result: d.MinifyJsRe
         lineNumber: errorLine.lineNumber + 1,
         text: srcLines[errorLine.lineIndex + 1],
         errorCharStart: -1,
-        errorLength: -1
+        errorLength: -1,
       };
 
       d.lines.push(nextLine);

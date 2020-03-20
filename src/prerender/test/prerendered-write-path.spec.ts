@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
 import { getWriteFilePathFromUrlPath } from '../prerendered-write-path';
 import { mockConfig } from '@stencil/core/testing';
-import { validateOutputTargetWww } from '../../compiler/config/validate-outputs-www';
-import { resolve } from 'path';
+import { validateWww } from '../../compiler/config/outputs/validate-www';
+import { join, resolve } from 'path';
 
 describe('prerender-utils', () => {
   const rootDir = resolve('/');
@@ -13,16 +13,19 @@ describe('prerender-utils', () => {
 
     beforeEach(() => {
       config = mockConfig();
-      validateOutputTargetWww(config, []);
+      const outputTargets = validateWww(config, [], []);
 
       manager = {
         config: config,
-        outputTarget: config.outputTargets[0] as any,
+        outputTarget: outputTargets[0] as any,
         devServerHostUrl: 'http://localhost:3333/',
         diagnostics: [],
         hydrateAppFilePath: null,
         isDebug: true,
         logCount: 0,
+        maxConcurrency: 1,
+        prerenderUrlWorker: null,
+        prcs: process,
         prerenderConfig: null,
         prerenderConfigPath: null,
         urlsCompleted: null,
@@ -30,7 +33,7 @@ describe('prerender-utils', () => {
         urlsProcessing: null,
         resolve: null,
         templateId: null,
-        componentGraphPath: null
+        componentGraphPath: null,
       };
     });
 
@@ -39,7 +42,7 @@ describe('prerender-utils', () => {
       manager.outputTarget.baseUrl = 'http://stenciljs.com/';
       manager.outputTarget.indexHtml = 'my-index.htm';
       const filePath = getWriteFilePathFromUrlPath(manager, inputUrl);
-      expect(filePath).toBe(config.sys.path.join(rootDir, '/www/subdir/index.html'));
+      expect(filePath).toBe(join(rootDir, '/www/subdir/index.html'));
     });
 
     it('/docs/my-index.htm, custom indexHtml', () => {
@@ -47,28 +50,28 @@ describe('prerender-utils', () => {
       manager.outputTarget.baseUrl = 'http://stenciljs.com/docs/';
       manager.outputTarget.indexHtml = 'my-index.htm';
       const filePath = getWriteFilePathFromUrlPath(manager, inputUrl);
-      expect(filePath).toBe(config.sys.path.join(rootDir, '/www/my-index.htm'));
+      expect(filePath).toBe(join(rootDir, '/www/my-index.htm'));
     });
 
     it('/docs/index.html', () => {
       const inputUrl = 'http://stenciljs.com/docs/index.html';
       manager.outputTarget.baseUrl = 'http://stenciljs.com/docs/';
       const filePath = getWriteFilePathFromUrlPath(manager, inputUrl);
-      expect(filePath).toBe(config.sys.path.join(rootDir, '/www/index.html'));
+      expect(filePath).toBe(join(rootDir, '/www/index.html'));
     });
 
     it('/docs/', () => {
       const inputUrl = 'http://stenciljs.com/docs/';
       manager.outputTarget.baseUrl = 'http://stenciljs.com/docs/';
       const filePath = getWriteFilePathFromUrlPath(manager, inputUrl);
-      expect(filePath).toBe(config.sys.path.join(rootDir, '/www/index.html'));
+      expect(filePath).toBe(join(rootDir, '/www/index.html'));
     });
 
     it('/docs', () => {
       const inputUrl = 'http://stenciljs.com/docs';
       manager.outputTarget.baseUrl = 'http://stenciljs.com/docs';
       const filePath = getWriteFilePathFromUrlPath(manager, inputUrl);
-      expect(filePath).toBe(config.sys.path.join(rootDir, '/www/index.html'));
+      expect(filePath).toBe(join(rootDir, '/www/index.html'));
     });
 
     it('custom indexHtml', () => {
@@ -76,37 +79,35 @@ describe('prerender-utils', () => {
       manager.outputTarget.baseUrl = 'http://stenciljs.com/';
       manager.outputTarget.indexHtml = 'my-index.htm';
       const filePath = getWriteFilePathFromUrlPath(manager, inputUrl);
-      expect(filePath).toBe(config.sys.path.join(rootDir, '/www/my-index.htm'));
+      expect(filePath).toBe(join(rootDir, '/www/my-index.htm'));
     });
 
     it('/index.html', () => {
       const inputUrl = 'http://stenciljs.com/index.html';
       manager.outputTarget.baseUrl = 'http://stenciljs.com/';
       const filePath = getWriteFilePathFromUrlPath(manager, inputUrl);
-      expect(filePath).toBe(config.sys.path.join(rootDir, '/www/index.html'));
+      expect(filePath).toBe(join(rootDir, '/www/index.html'));
     });
 
     it('default root, full input path, full path baseUrl', () => {
       const inputUrl = 'http://stenciljs.com/';
       manager.outputTarget.baseUrl = 'http://stenciljs.com/';
       const filePath = getWriteFilePathFromUrlPath(manager, inputUrl);
-      expect(filePath).toBe(config.sys.path.join(rootDir, '/www/index.html'));
+      expect(filePath).toBe(join(rootDir, '/www/index.html'));
     });
 
     it('default root, full input path', () => {
       const inputUrl = 'http://stenciljs.com/';
       manager.outputTarget.baseUrl = '/';
       const filePath = getWriteFilePathFromUrlPath(manager, inputUrl);
-      expect(filePath).toBe(config.sys.path.join(rootDir, '/www/index.html'));
+      expect(filePath).toBe(join(rootDir, '/www/index.html'));
     });
 
     it('default root, no full input path', () => {
       const inputUrl = '/';
       manager.outputTarget.baseUrl = '/';
       const filePath = getWriteFilePathFromUrlPath(manager, inputUrl);
-      expect(filePath).toBe(config.sys.path.join(rootDir, '/www/index.html'));
+      expect(filePath).toBe(join(rootDir, '/www/index.html'));
     });
-
   });
-
 });

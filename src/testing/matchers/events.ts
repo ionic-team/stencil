@@ -1,6 +1,5 @@
 import * as d from '@stencil/core/internal';
 
-
 export function toHaveReceivedEvent(eventSpy: d.EventSpy) {
   if (!eventSpy) {
     throw new Error(`toHaveReceivedEvent event spy is null`);
@@ -14,7 +13,7 @@ export function toHaveReceivedEvent(eventSpy: d.EventSpy) {
     throw new Error(`toHaveReceivedEvent did not receive an event spy`);
   }
 
-  const pass = (eventSpy.events.length > 0);
+  const pass = eventSpy.events.length > 0;
 
   return {
     message: () => `expected to have ${pass ? 'not ' : ''}called "${eventSpy.eventName}" event`,
@@ -35,10 +34,11 @@ export function toHaveReceivedEventTimes(eventSpy: d.EventSpy, count: number) {
     throw new Error(`toHaveReceivedEventTimes did not receive an event spy`);
   }
 
-  const pass = (eventSpy.length === count);
+  const pass = eventSpy.length === count;
 
   return {
-    message: () => `expected event "${eventSpy.eventName}" to have been called ${count} times, but was called ${eventSpy.events.length} time${eventSpy.events.length > 1 ? 's' : ''}`,
+    message: () =>
+      `expected event "${eventSpy.eventName}" to have been called ${count} times, but was called ${eventSpy.events.length} time${eventSpy.events.length > 1 ? 's' : ''}`,
     pass: pass,
   };
 }
@@ -136,42 +136,39 @@ const deepEqual = function equal(a: any, b: any) {
   if (a === b) return true;
 
   if (a && b && typeof a == 'object' && typeof b == 'object') {
-    var arrA = Array.isArray(a)
-      , arrB = Array.isArray(b)
-      , i
-      , length
-      , key;
+    var arrA = Array.isArray(a),
+      arrB = Array.isArray(b),
+      i,
+      length,
+      key;
 
     if (arrA && arrB) {
       length = a.length;
       if (length != b.length) return false;
-      for (i = length; i-- !== 0;)
-        if (!equal(a[i], b[i])) return false;
+      for (i = length; i-- !== 0; ) if (!equal(a[i], b[i])) return false;
       return true;
     }
 
     if (arrA != arrB) return false;
 
-    var dateA = a instanceof Date
-      , dateB = b instanceof Date;
+    var dateA = a instanceof Date,
+      dateB = b instanceof Date;
     if (dateA != dateB) return false;
     if (dateA && dateB) return a.getTime() == b.getTime();
 
-    var regexpA = a instanceof RegExp
-      , regexpB = b instanceof RegExp;
+    var regexpA = a instanceof RegExp,
+      regexpB = b instanceof RegExp;
     if (regexpA != regexpB) return false;
     if (regexpA && regexpB) return a.toString() == b.toString();
 
     var keys = Object.keys(a);
     length = keys.length;
 
-    if (length !== Object.keys(b).length)
-      return false;
+    if (length !== Object.keys(b).length) return false;
 
-    for (i = length; i-- !== 0;)
-      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+    for (i = length; i-- !== 0; ) if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
 
-    for (i = length; i-- !== 0;) {
+    for (i = length; i-- !== 0; ) {
       key = keys[i];
       if (!equal(a[key], b[key])) return false;
     }
@@ -179,5 +176,5 @@ const deepEqual = function equal(a: any, b: any) {
     return true;
   }
 
-  return a!==a && b!==b;
+  return a !== a && b !== b;
 };

@@ -2,7 +2,6 @@ import * as d from '../declarations';
 import { buildError, catchError, requireFunc } from '@utils';
 import fs from 'fs';
 
-
 export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigPath: string) {
   const prerenderConfig: d.PrerenderConfig = {};
 
@@ -12,7 +11,6 @@ export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigP
       if (userConfig != null) {
         Object.assign(prerenderConfig, userConfig);
       }
-
     } catch (e) {
       catchError(diagnostics, e);
     }
@@ -32,7 +30,6 @@ export function validatePrerenderConfigPath(diagnostics: d.Diagnostic[], prerend
       const err = buildError(diagnostics);
       err.header = `Prerender Config Not Found`;
       err.messageText = `Unable to access: ${prerenderConfigPath}`;
-
     } else {
       try {
         const userConfig = requireFunc(prerenderConfigPath);
@@ -41,7 +38,6 @@ export function validatePrerenderConfigPath(diagnostics: d.Diagnostic[], prerend
           err.header = `Invalid Prerender Config`;
           err.messageText = `Invalid prerender config: ${prerenderConfigPath}`;
         }
-
       } catch (e) {
         catchError(diagnostics, e);
       }
@@ -65,7 +61,7 @@ export function getHydrateOptions(prerenderConfig: d.PrerenderConfig, url: URL, 
     removeHtmlComments: true,
   };
 
-  if (prerenderConfig.canonicalUrl === null || (prerenderConfig.canonicalUrl) as any === false) {
+  if (prerenderConfig.canonicalUrl === null || (prerenderConfig.canonicalUrl as any) === false) {
     opts.canonicalUrl = null;
   } else if (typeof prerenderConfig.canonicalUrl === 'function') {
     try {

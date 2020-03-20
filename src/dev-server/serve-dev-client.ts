@@ -5,9 +5,8 @@ import { serve404 } from './serve-404';
 import { serve500 } from './serve-500';
 import { serveFile } from './serve-file';
 import { serveOpenInEditor } from './open-in-editor';
-import * as http  from 'http';
+import * as http from 'http';
 import path from 'path';
-
 
 export async function serveDevClient(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem, req: d.HttpRequest, res: http.ServerResponse) {
   try {
@@ -21,7 +20,6 @@ export async function serveDevClient(devServerConfig: d.DevServerConfig, sys: d.
 
     if (util.isInitialDevServerLoad(req.pathname)) {
       req.filePath = path.join(devServerConfig.devServerDir, 'templates', 'initial-load.html');
-
     } else {
       const staticFile = req.pathname.replace(c.DEV_SERVER_URL + '/', '');
       req.filePath = path.join(devServerConfig.devServerDir, 'static', staticFile);
@@ -33,16 +31,13 @@ export async function serveDevClient(devServerConfig: d.DevServerConfig, sys: d.
         return serveFile(devServerConfig, sys, req, res);
       }
       return serve404(devServerConfig, req, res);
-
     } catch (e) {
       return serve404(devServerConfig, req, res);
     }
-
   } catch (e) {
     return serve500(devServerConfig, req, res, e);
   }
 }
-
 
 async function serveDevClientScript(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem, req: d.HttpRequest, res: http.ServerResponse) {
   try {
@@ -53,21 +48,22 @@ async function serveDevClientScript(devServerConfig: d.DevServerConfig, sys: d.C
       const devClientConfig: d.DevClientConfig = {
         basePath: devServerConfig.basePath,
         editors: devServerConfig.editors,
-        reloadStrategy: devServerConfig.reloadStrategy
+        reloadStrategy: devServerConfig.reloadStrategy,
       };
 
       content = content.replace('window.__DEV_CLIENT_CONFIG__', JSON.stringify(devClientConfig));
 
-      res.writeHead(200, util.responseHeaders({
-        'Content-Type': 'text/html;charset=UTF-8'
-      }));
+      res.writeHead(
+        200,
+        util.responseHeaders({
+          'Content-Type': 'text/html;charset=UTF-8',
+        }),
+      );
       res.write(content);
       res.end();
-
     } else {
       serve404(devServerConfig, req, res);
     }
-
   } catch (e) {
     serve500(devServerConfig, req, res, e);
   }

@@ -1,14 +1,13 @@
 import * as d from '../../declarations';
 import { DEFAULT_STYLE_MODE, catchError, createJsVarName, normalizePath, hasError, isString } from '@utils';
-import { getScopeId } from '../style/scope-css';
-import { optimizeCss } from '../../compiler_next/optimize/optimize-css';
+import { getScopeId } from './scope-css';
+import { optimizeCss } from '../optimize/optimize-css';
 import { scopeCss } from '../../utils/shadow-css';
 import { serializeImportPath } from '../transformers/stencil-import-path';
 import { stripCssComments } from './style-utils';
 import MagicString from 'magic-string';
 import path from 'path';
 import { parseStyleDocs } from '../docs/style-docs';
-
 
 export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
   const results = transformCssToEsmModule(input);
@@ -43,7 +42,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput) => {
     diagnostics: [],
     imports: [],
     defaultVarName: createCssVarName(input.file, input.mode),
-    styleDocs: []
+    styleDocs: [],
   };
 
   if (input.docs) {
@@ -76,17 +75,15 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput) => {
       // str.append(`import ${cssImport.varName} from '${importPath}';\n`);
       results.imports.push({
         varName: cssImport.varName,
-        importPath
+        importPath,
       });
     });
-
   } catch (e) {
     catchError(results.diagnostics, e);
   }
 
   return results;
 };
-
 
 const generateTransformCssToEsm = (input: d.TransformCssToEsmInput, results: d.TransformCssToEsmOutput) => {
   const s = new MagicString('');
@@ -105,7 +102,6 @@ const generateTransformCssToEsm = (input: d.TransformCssToEsmInput, results: d.T
 
     s.append(`${JSON.stringify(results.styleText)};\n`);
     s.append(`module.exports = ${results.defaultVarName};`);
-
   } else {
     // ESM
     results.imports.forEach(cssImport => {
@@ -126,7 +122,6 @@ const generateTransformCssToEsm = (input: d.TransformCssToEsmInput, results: d.T
   return results;
 };
 
-
 const getCssImports = (varNames: Set<string>, cssText: string, filePath: string, modeName: string) => {
   const cssImports: d.CssToEsmImportData[] = [];
 
@@ -140,26 +135,23 @@ const getCssImports = (varNames: Set<string>, cssText: string, filePath: string,
   const dir = path.dirname(filePath);
 
   let r: RegExpExecArray;
-  while (r = CSS_IMPORT_RE.exec(cssText)) {
+  while ((r = CSS_IMPORT_RE.exec(cssText))) {
     const cssImportData: d.CssToEsmImportData = {
       srcImportText: r[0],
       url: r[4].replace(/[\"\'\)]/g, ''),
       filePath: null,
-      varName: null
+      varName: null,
     };
 
     if (!isLocalCssImport(cssImportData.srcImportText)) {
       // do nothing for @import url(http://external.css)
       continue;
-
     } else if (isCssNodeModule(cssImportData.url)) {
       // do not resolve this path cuz it starts with node resolve id ~
       continue;
-
     } else if (path.isAbsolute(cssImportData.url)) {
       // absolute path already
       cssImportData.filePath = normalizePath(cssImportData.url);
-
     } else {
       // relative path
       cssImportData.filePath = normalizePath(path.resolve(dir, cssImportData.url));
@@ -168,7 +160,7 @@ const getCssImports = (varNames: Set<string>, cssText: string, filePath: string,
     cssImportData.varName = createCssVarName(cssImportData.filePath, modeName);
 
     if (varNames.has(cssImportData.varName)) {
-      cssImportData.varName += (varNames.size);
+      cssImportData.varName += varNames.size;
     }
     varNames.add(cssImportData.varName);
 

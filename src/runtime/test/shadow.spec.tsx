@@ -1,22 +1,21 @@
 import { newSpecPage } from '@stencil/core/testing';
 import { Component, h } from '@stencil/core';
 
-
 @Component({
   tag: 'cmp-a',
   styles: ':host { color: black }',
-  shadow: true
+  shadow: true,
 })
 class CmpA {
   render() {
     return (
       <div>
-        <slot name='start'></slot>
+        <slot name="start"></slot>
         <span>
-          <slot/>
+          <slot />
         </span>
-        <div class='end'>
-          <slot name='end'></slot>
+        <div class="end">
+          <slot name="end"></slot>
         </div>
       </div>
     );
@@ -24,7 +23,6 @@ class CmpA {
 }
 
 describe('shadow', () => {
-
   it('render with shadow-dom enabled', async () => {
     const page = await newSpecPage({
       components: [CmpA],
@@ -34,9 +32,8 @@ describe('shadow', () => {
         <span slot="end">End</span>
         Text
         <span slot="start">Start</span>
-      </cmp-a>`
+      </cmp-a>`,
     });
-
 
     expect(page.root).toEqualHtml(`
     <cmp-a class="hydrated">
@@ -138,6 +135,4 @@ describe('shadow', () => {
     expect(page.root).toEqualHtml(expected);
     expect(page.root).toEqualLightHtml(expected);
   });
-
-
 });

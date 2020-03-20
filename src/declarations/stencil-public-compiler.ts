@@ -193,10 +193,6 @@ export interface StencilConfig {
   watch?: boolean;
   testing?: TestingConfig;
   maxConcurrentWorkers?: number;
-  /**
-   * @deprecated
-   */
-  maxConcurrentTasksPerWorker?: number;
   preamble?: string;
   /**
    * @deprecated Use the "include" option in "tsconfig.json"
@@ -210,8 +206,7 @@ export interface StencilConfig {
   devInspector?: boolean;
   devServer?: StencilDevServerConfig;
   enableCacheStats?: boolean;
-  sys?: StencilSystem;
-  sys_next?: CompilerSystem;
+  sys?: CompilerSystem;
   tsconfig?: string;
   validateTypes?: boolean;
   watchIgnoredRegex?: RegExp;
@@ -465,6 +460,7 @@ export interface CompilerSystem {
    * SYNC! Always returns a boolean, does not throw.
    */
   accessSync(p: string): boolean;
+  cacheStorage?: CacheStorage;
   copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
   /**
    * Always returns a boolean if the files were copied or not. Does not throw.
@@ -494,11 +490,12 @@ export interface CompilerSystem {
   /**
    * Aync glob task. Only available in NodeJS compiler system.
    */
-  glob?(pattern: string, options: { cwd?: string; nodir?: boolean; [key: string]: any; }): Promise<string[]>;
+  glob?(pattern: string, options: { cwd?: string; nodir?: boolean; [key: string]: any }): Promise<string[]>;
   /**
    * Tests if the path is a symbolic link or not. Always resolves a boolean. Does not throw.
    */
   isSymbolicLink(p: string): Promise<boolean>;
+  lazyRequire?: LazyRequire;
   /**
    * Always returns a boolean if the directory was created or not. Does not throw.
    */
@@ -578,7 +575,7 @@ export interface CompilerSystem {
 
 export interface WorkerMainController {
   send(...args: any[]): Promise<any>;
-  handler(name: string): ((...args: any[]) => Promise<any>);
+  handler(name: string): (...args: any[]) => Promise<any>;
   destroy(): void;
 }
 
@@ -716,24 +713,19 @@ export interface CompilerBuildStart {
 
 export type CompilerFileWatcherCallback = (fileName: string, eventKind: CompilerFileWatcherEvent) => void;
 
-export type CompilerFileWatcherEvent =
-  CompilerEventFileAdd |
-  CompilerEventFileDelete |
-  CompilerEventFileUpdate |
-  CompilerEventDirAdd |
-  CompilerEventDirDelete;
+export type CompilerFileWatcherEvent = CompilerEventFileAdd | CompilerEventFileDelete | CompilerEventFileUpdate | CompilerEventDirAdd | CompilerEventDirDelete;
 
 export type CompilerEventName =
-  CompilerEventFsChange |
-  CompilerEventFileUpdate |
-  CompilerEventFileAdd |
-  CompilerEventFileDelete |
-  CompilerEventDirAdd |
-  CompilerEventDirDelete |
-  CompilerEventBuildStart |
-  CompilerEventBuildFinish |
-  CompilerEventBuildNoChange |
-  CompilerEventBuildLog;
+  | CompilerEventFsChange
+  | CompilerEventFileUpdate
+  | CompilerEventFileAdd
+  | CompilerEventFileDelete
+  | CompilerEventDirAdd
+  | CompilerEventDirDelete
+  | CompilerEventBuildStart
+  | CompilerEventBuildFinish
+  | CompilerEventBuildNoChange
+  | CompilerEventBuildLog;
 
 export type CompilerEventFsChange = 'fsChange';
 export type CompilerEventFileUpdate = 'fileUpdate';
@@ -755,6 +747,9 @@ export interface CompilerFsStats {
   isDirectory(): boolean;
   isSymbolicLink(): boolean;
   size: number;
+  mtime?: {
+    getTime(): number;
+  };
 }
 
 export interface CompilerSystemMakeDirectoryOptions {
@@ -1093,9 +1088,7 @@ export interface EmulateConfig {
   viewport?: EmulateViewport;
 }
 
-
 export interface EmulateViewport {
-
   /**
    * Page width in pixels.
    */
@@ -1219,7 +1212,6 @@ export interface OutputTargetDistLazyLoader extends OutputTargetBase {
   empty: boolean;
 }
 
-
 export interface OutputTargetDistSelfContained extends OutputTargetBase {
   type: 'dist-self-contained';
 
@@ -1228,7 +1220,6 @@ export interface OutputTargetDistSelfContained extends OutputTargetBase {
 
   empty?: boolean;
 }
-
 
 export interface OutputTargetHydrate extends OutputTargetBase {
   type: 'dist-hydrate-script';
@@ -1303,9 +1294,7 @@ export interface OutputTargetBase {
   type: string;
 }
 
-export type OutputTargetBuild =
-  | OutputTargetDistCollection
-  | OutputTargetDistLazy;
+export type OutputTargetBuild = OutputTargetDistCollection | OutputTargetDistLazy;
 
 export interface OutputTargetAngular extends OutputTargetBase {
   type: 'angular';
@@ -1474,7 +1463,7 @@ export interface LoadConfigResults {
   diagnostics: Diagnostic[];
   tsconfig: {
     compilerOptions: any;
-  }
+  };
 }
 
 export interface Diagnostic {
@@ -1498,57 +1487,7 @@ export interface Diagnostic {
   }[];
 }
 
-export interface StencilSystem {
-  cancelWorkerTasks?(): void;
-  compiler?: {
-    name: string;
-    version: string;
-    typescriptVersion?: string;
-    runtime?: string;
-    packageDir?: string;
-    distDir?: string;
-  };
-  copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
-  color?: any;
-  cloneDocument?(doc: Document): Document;
-  createFsWatcher?(config: Config, fs: FileSystem, events: BuildEvents): Promise<FsWatcher>;
-  createDocument?(html: string): Document;
-  destroy?(): void;
-  addDestroy?(fn: Function): void;
-  details?: SystemDetails;
-  encodeToBase64?(str: string): string;
-  fs?: FileSystem;
-  generateContentHash?(content: string, length: number): Promise<string>;
-  getLatestCompilerVersion?(logger: Logger, forceCheck: boolean): Promise<string>;
-  getClientPath?(staticName: string): string;
-  getClientCoreFile?(opts: { staticName: string }): Promise<string>;
-  glob?(pattern: string, options: {
-    cwd?: string;
-    nodir?: boolean;
-  }): Promise<string[]>;
-  initWorkers?(maxConcurrentWorkers: number, maxConcurrentTasksPerWorker: number, logger: Logger): WorkerOptions;
-  lazyRequire?: LazyRequire;
-  loadConfigFile?(configPath: string, process?: any): Config;
-  minifyJs?(input: string, opts?: any): Promise<{
-    output: string;
-    sourceMap?: any;
-    diagnostics?: Diagnostic[];
-  }>;
-  nextTick?(cb: Function): void;
-  open?: (url: string, opts?: any) => Promise<void>;
-  optimizeCss?(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
-  path?: Path;
-  prerenderUrl?: (prerenderRequest: PrerenderRequest) => Promise<PrerenderResults>;
-  resolveModule?(fromDir: string, moduleId: string, opts?: ResolveModuleOptions): string;
-  rollup?: RollupInterface;
-  scopeCss?: (cssText: string, scopeId: string, commentOriginalSelector: boolean) => Promise<string>;
-  serializeNodeToHtml?(elm: Element | Document): string;
-  storage?: Storage;
-  transpileToEs5?(cwd: string, input: string, inlineHelpers: boolean): Promise<any>;
-  validateTypes?(compilerOptions: any, emitDtsFiles: boolean, collectionNames: string[], rootTsFiles: string[], isDevMode: boolean): Promise<any>;
-}
-
-export interface Storage {
+export interface CacheStorage {
   get(key: string): Promise<any>;
   set(key: string, value: any): Promise<void>;
 }
@@ -1594,18 +1533,6 @@ export interface PrerenderRequest {
   writeToFilePath: string;
 }
 
-export interface Path {
-  basename(p: string, ext?: string): string;
-  dirname(p: string): string;
-  extname(p: string): string;
-  isAbsolute(p: string): boolean;
-  join(...paths: string[]): string;
-  parse(pathString: string): { root: string; dir: string; base: string; ext: string; name: string; };
-  relative(from: string, to: string): string;
-  resolve(...pathSegments: any[]): string;
-  sep: string;
-}
-
 export interface OptimizeCssInput {
   input: string;
   filePath?: string;
@@ -1647,25 +1574,6 @@ export interface FsWatcher {
 
 export interface FsWatcherItem {
   close(): void;
-}
-
-export interface FileSystem {
-  access(path: string): Promise<void>;
-  copyFile(src: string, dest: string): Promise<void>;
-  createReadStream(filePath: string): any;
-  existsSync(filePath: string): boolean;
-  mkdir(dirPath: string, opts?: MakeDirectoryOptions): Promise<void>;
-  mkdirSync(dirPath: string): void;
-  readdir(dirPath: string): Promise<string[]>;
-  readdirSync(dirPath: string): string[];
-  readFile(filePath: string, format?: string): Promise<string>;
-  readFileSync(filePath: string, format?: string): string;
-  rmdir(dirPath: string): Promise<void>;
-  stat(path: string): Promise<FsStats>;
-  statSync(path: string): FsStats;
-  unlink(filePath: string): Promise<void>;
-  writeFile(filePath: string, content: string, opts?: FsWriteOptions): Promise<void>;
-  writeFileSync(filePath: string, content: string, opts?: FsWriteOptions): void;
 }
 
 export interface MakeDirectoryOptions {

@@ -2,22 +2,20 @@ import * as d from '../../declarations';
 import { generateServiceWorkerUrl } from '../service-worker/service-worker-util';
 import { UNREGISTER_SW, getRegisterSW } from '../service-worker/generate-sw';
 
-
 export const updateIndexHtmlServiceWorker = async (config: d.Config, buildCtx: d.BuildCtx, doc: Document, outputTarget: d.OutputTargetWww) => {
   const serviceWorker = outputTarget.serviceWorker;
 
   if (serviceWorker !== false) {
     if ((serviceWorker && serviceWorker.unregister) || (!serviceWorker && config.devMode)) {
       injectUnregisterServiceWorker(doc);
-
     } else if (serviceWorker) {
-      await injectRegisterServiceWorker(config, buildCtx, outputTarget, doc);
+      await injectRegisterServiceWorker(buildCtx, outputTarget, doc);
     }
   }
 };
 
-const injectRegisterServiceWorker = async (config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, doc: Document) => {
-  const swUrl = generateServiceWorkerUrl(config, outputTarget, outputTarget.serviceWorker as d.ServiceWorkerConfig);
+const injectRegisterServiceWorker = async (buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, doc: Document) => {
+  const swUrl = generateServiceWorkerUrl(outputTarget, outputTarget.serviceWorker as d.ServiceWorkerConfig);
   const serviceWorker = getRegisterSwScript(doc, buildCtx, swUrl);
   doc.body.appendChild(serviceWorker);
 };

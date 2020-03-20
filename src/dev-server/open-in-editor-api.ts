@@ -1,10 +1,9 @@
-
 const openInEditorApi = {
   // mocked fns so unit tests work too
-  configure(_opts: OpenInEditorOptions, _cb: OpenInEditorCallback): { open(openId: string): Promise<any>; } {
+  configure(_opts: OpenInEditorOptions, _cb: OpenInEditorCallback): { open(openId: string): Promise<any> } {
     return null;
   },
-  editors: {} as OpenInEditorDetections
+  editors: {} as OpenInEditorDetections,
 };
 
 export interface OpenInEditorOptions {

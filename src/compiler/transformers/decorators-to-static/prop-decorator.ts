@@ -1,17 +1,31 @@
 import * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, buildWarn, catchError, toDashCase } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isMemberPrivate, resolveType, serializeSymbol, typeToString, validateReferences } from '../transform-utils';
+import {
+  convertValueToLiteral,
+  createStaticGetter,
+  getAttributeTypeInfo,
+  isMemberPrivate,
+  resolveType,
+  serializeSymbol,
+  typeToString,
+  validateReferences,
+} from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 import { validatePublicName } from '../reserved-public-members';
 import ts from 'typescript';
 
-
-export const propDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, watchable: Set<string>, newMembers: ts.ClassElement[]) => {
+export const propDecoratorsToStatic = (
+  diagnostics: d.Diagnostic[],
+  decoratedProps: ts.ClassElement[],
+  typeChecker: ts.TypeChecker,
+  watchable: Set<string>,
+  newMembers: ts.ClassElement[],
+) => {
   const connect: any[] = [];
   const context: any[] = [];
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map(prop => parsePropDecorator(config, diagnostics, typeChecker, prop, context, connect, watchable, newMembers))
+    .map(prop => parsePropDecorator(diagnostics, typeChecker, prop, context, connect, watchable, newMembers))
     .filter(prop => prop != null);
 
   if (properties.length > 0) {
@@ -25,8 +39,15 @@ export const propDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnost
   }
 };
 
-
-const parsePropDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, context: any[], connect: any[], watchable: Set<string>, newMembers: ts.ClassElement[]) => {
+const parsePropDecorator = (
+  diagnostics: d.Diagnostic[],
+  typeChecker: ts.TypeChecker,
+  prop: ts.PropertyDeclaration,
+  context: any[],
+  connect: any[],
+  watchable: Set<string>,
+  newMembers: ts.ClassElement[],
+) => {
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
@@ -55,15 +76,15 @@ const parsePropDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeC
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);
     err.messageText = 'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
-    augmentDiagnosticWithNode(config, err, prop.modifiers[0]);
+    augmentDiagnosticWithNode(err, prop.modifiers[0]);
   }
 
   if (/^on(-|[A-Z])/.test(propName)) {
     const warn = buildWarn(diagnostics);
     warn.messageText = `The @Prop() name "${propName}" looks like an event. Please use the "@Event()" decorator to expose events instead, not properties or methods.`;
-    augmentDiagnosticWithNode(config, warn, prop.name);
+    augmentDiagnosticWithNode(warn, prop.name);
   } else {
-    validatePublicName(config, diagnostics, propName, '@Prop()', 'prop', prop.name);
+    validatePublicName(diagnostics, propName, '@Prop()', 'prop', prop.name);
   }
 
   const symbol = typeChecker.getSymbolAtLocation(prop.name);
@@ -76,13 +97,13 @@ const parsePropDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeC
     complexType: getComplexType(typeChecker, prop, type),
     required: prop.exclamationToken !== undefined && propName !== 'mode',
     optional: prop.questionToken !== undefined,
-    docs: serializeSymbol(typeChecker, symbol)
+    docs: serializeSymbol(typeChecker, symbol),
   };
-  validateReferences(config, diagnostics, propMeta.complexType.references, prop.type);
+  validateReferences(diagnostics, propMeta.complexType.references, prop.type);
 
   // prop can have an attribute if type is NOT "unknown"
   if (typeStr !== 'unknown') {
-    propMeta.attribute = getAttributeName(config, diagnostics, propName, propOptions, propDecorator);
+    propMeta.attribute = getAttributeName(diagnostics, propName, propOptions, propDecorator);
     propMeta.reflect = getReflect(diagnostics, propOptions);
   }
 
@@ -92,17 +113,14 @@ const parsePropDecorator = (config: d.Config, diagnostics: d.Diagnostic[], typeC
     propMeta.defaultValue = initializer.getText();
   }
 
-  const staticProp = ts.createPropertyAssignment(
-    ts.createLiteral(propName),
-    convertValueToLiteral(propMeta)
-  );
+  const staticProp = ts.createPropertyAssignment(ts.createLiteral(propName), convertValueToLiteral(propMeta));
   watchable.add(propName);
   return staticProp;
 };
 
-const getAttributeName = (config: d.Config, diagnostics: d.Diagnostic[], propName: string, propOptions: d.PropOptions, node: ts.Node) => {
+const getAttributeName = (diagnostics: d.Diagnostic[], propName: string, propOptions: d.PropOptions, node: ts.Node) => {
   if (propOptions.attribute === null) {
-    return  undefined;
+    return undefined;
   }
 
   if (typeof propOptions.attribute === 'string' && propOptions.attribute.trim().length > 0) {
@@ -112,7 +130,7 @@ const getAttributeName = (config: d.Config, diagnostics: d.Diagnostic[], propNam
   if (typeof propOptions.attr === 'string' && propOptions.attr.trim().length > 0) {
     const diagnostic = buildWarn(diagnostics);
     diagnostic.messageText = `@Prop option "attr" has been deprecated. Please use "attribute" instead.`;
-    augmentDiagnosticWithNode(config, diagnostic, node);
+    augmentDiagnosticWithNode(diagnostic, node);
     return propOptions.attr.trim().toLowerCase();
   }
 
@@ -138,12 +156,10 @@ const getPropOptions = (propDecorator: ts.Decorator, diagnostics: d.Diagnostic[]
     return {};
   }
 
-  const suppliedOptions = (propDecorator.expression as ts.CallExpression).arguments
-  .map(arg => {
+  const suppliedOptions = (propDecorator.expression as ts.CallExpression).arguments.map(arg => {
     try {
       const fnStr = `return ${arg.getText()};`;
       return new Function(fnStr)();
-
     } catch (e) {
       catchError(diagnostics, e, `parse prop options: ${e}`);
     }
@@ -153,13 +169,12 @@ const getPropOptions = (propDecorator: ts.Decorator, diagnostics: d.Diagnostic[]
   return propOptions || {};
 };
 
-
 const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration, type: ts.Type): d.ComponentCompilerPropertyComplexType => {
   const nodeType = node.type;
   return {
     original: nodeType ? nodeType.getText() : typeToString(typeChecker, type),
     resolved: resolveType(typeChecker, type),
-    references: getAttributeTypeInfo(node, node.getSourceFile())
+    references: getAttributeTypeInfo(node, node.getSourceFile()),
   };
 };
 
@@ -192,7 +207,7 @@ export const propTypeFromTSType = (type: ts.Type) => {
   return 'unknown';
 };
 
-const checkType = (type: ts.Type, check: (type: ts.Type) => boolean ) => {
+const checkType = (type: ts.Type, check: (type: ts.Type) => boolean) => {
   if (type.flags & ts.TypeFlags.Union) {
     const union = type as ts.UnionType;
     if (union.types.some(type => checkType(type, check))) {

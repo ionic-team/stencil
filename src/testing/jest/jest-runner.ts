@@ -2,7 +2,6 @@ import * as d from '@stencil/core/internal';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
 
-
 export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
   let success = false;
 
@@ -33,7 +32,6 @@ export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
     const cliResults = await runCLI(jestArgv, projects);
 
     success = !!cliResults.results.success;
-
   } catch (e) {
     config.logger.error(`runJest: ${e}`);
   }
@@ -41,15 +39,12 @@ export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
   return success;
 }
 
-
 export function createTestRunner(): any {
-
   const TestRunner = require('jest-runner');
 
   class StencilTestRunner extends TestRunner {
-
     async runTests(tests: { path: string }[], watcher: any, onStart: any, onResult: any, onFailure: any, options: any) {
-      const env = (process.env as d.E2EProcessEnv);
+      const env = process.env as d.E2EProcessEnv;
 
       // filter out only the tests the flags said we should run
       tests = tests.filter(t => includeTestFile(t.path, env));
@@ -72,19 +67,16 @@ export function createTestRunner(): any {
           // run the test for each emulate config
           await super.runTests(tests, watcher, onStart, onResult, onFailure, options);
         }
-
       } else {
         // not doing e2e screenshot tests
         // so just run each test once
         await super.runTests(tests, watcher, onStart, onResult, onFailure, options);
       }
     }
-
   }
 
   return StencilTestRunner;
 }
-
 
 export function includeTestFile(testPath: string, env: d.E2EProcessEnv) {
   testPath = testPath.toLowerCase().replace(/\\/g, '/');
@@ -101,7 +93,6 @@ export function includeTestFile(testPath: string, env: d.E2EProcessEnv) {
   }
   return false;
 }
-
 
 export function getEmulateConfigs(testing: d.TestingConfig, flags: d.ConfigFlags) {
   let emulateConfigs = testing.emulate.slice();

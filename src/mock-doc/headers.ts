@@ -1,6 +1,5 @@
-
 export class MockHeaders {
-  private _values: string[][] = []
+  private _values: string[][] = [];
 
   constructor(init?: string[][] | Map<string, string> | any) {
     if (typeof init === 'object') {
@@ -9,7 +8,7 @@ export class MockHeaders {
         for (const kv of init) {
           if (typeof kv[Symbol.iterator] === 'function') {
             kvs.push([...kv]);
-					}
+          }
         }
         for (const kv of kvs) {
           this.append(kv[0], kv[1]);
@@ -47,9 +46,11 @@ export class MockHeaders {
         return {
           value: entries[index],
           done: !entries[index],
-        }
+        };
       },
-      [Symbol.iterator]() { return this }
+      [Symbol.iterator]() {
+        return this;
+      },
     };
   }
 
@@ -95,9 +96,11 @@ export class MockHeaders {
         return {
           value: keys[index],
           done: !keys[index],
-        }
+        };
       },
-      [Symbol.iterator]() { return this }
+      [Symbol.iterator]() {
+        return this;
+      },
     };
   }
 
@@ -121,9 +124,11 @@ export class MockHeaders {
         return {
           value: done ? undefined : values[index][1],
           done,
-        }
+        };
       },
-      [Symbol.iterator]() { return this }
+      [Symbol.iterator]() {
+        return this;
+      },
     };
   }
 

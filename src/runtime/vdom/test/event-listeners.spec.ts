@@ -2,7 +2,6 @@ import * as d from '../../../declarations';
 import { h, newVNode } from '../h';
 import { patch } from '../vdom-render';
 
-
 describe('event listeners', () => {
   let hostElm: d.HostElement;
   let vnode0: d.VNode;
@@ -16,11 +15,11 @@ describe('event listeners', () => {
   it('attaches click event handler to element', () => {
     const result: any[] = [];
 
-    function clicked(ev: UIEvent) { result.push(ev); }
+    function clicked(ev: UIEvent) {
+      result.push(ev);
+    }
 
-    const vnode = h('div', { onClick: clicked },
-      h('a', null, 'Click my parent')
-    );
+    const vnode = h('div', { onClick: clicked }, h('a', null, 'Click my parent'));
 
     patch(vnode0, vnode, document);
     hostElm.click();
@@ -31,11 +30,23 @@ describe('event listeners', () => {
   it('does not attach new listener', () => {
     const result: any[] = [];
 
-    const vnode1 = h('div', { onClick: () => { result.push(1); } },
+    const vnode1 = h(
+      'div',
+      {
+        onClick: () => {
+          result.push(1);
+        },
+      },
       h('a', null, 'Click my parent'),
     );
 
-    const vnode2 = h('div', { onClick: () => { result.push(2); } },
+    const vnode2 = h(
+      'div',
+      {
+        onClick: () => {
+          result.push(2);
+        },
+      },
       h('a', null, 'Click my parent'),
     );
 
@@ -52,11 +63,11 @@ describe('event listeners', () => {
   it('detach attached click event handler to element', () => {
     const result: any[] = [];
 
-    function clicked(ev: UIEvent) { result.push(ev); }
+    function clicked(ev: UIEvent) {
+      result.push(ev);
+    }
 
-    const vnode1 = h('div', { onClick: clicked },
-      h('a', null, 'Click my parent'),
-    );
+    const vnode1 = h('div', { onClick: clicked }, h('a', null, 'Click my parent'));
 
     patch(vnode0, vnode1, document);
     hostElm.click();
@@ -64,9 +75,7 @@ describe('event listeners', () => {
 
     expect(result.length).toBe(2);
 
-    const vnode2 = h('div', {o: {}},
-      h('a', null, 'Click my parent'),
-    );
+    const vnode2 = h('div', { o: {} }, h('a', null, 'Click my parent'));
 
     patch(vnode1, vnode2, document);
     hostElm.click();
@@ -82,9 +91,7 @@ describe('event listeners', () => {
       result.push(ev);
     }
 
-    const vnode1 = h('div', { onClick: click },
-      h('a', { onClick: click }, 'Click my parent'),
-    );
+    const vnode1 = h('div', { onClick: click }, h('a', { onClick: click }, 'Click my parent'));
 
     patch(vnode0, vnode1, document);
     hostElm.click();

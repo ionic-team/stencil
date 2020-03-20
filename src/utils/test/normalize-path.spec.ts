@@ -1,8 +1,6 @@
 import { normalizePath } from '../normalize-path';
 
-
 describe('normalizePath', () => {
-
   it('node module', () => {
     expect(normalizePath('lodash')).toBe('lodash');
     expect(normalizePath('   lodash    ')).toBe('lodash');
@@ -96,5 +94,4 @@ describe('normalizePath', () => {
       expect(path).toBe(`/Johnny/B/Goode.js`);
     }).toThrow();
   });
-
 });

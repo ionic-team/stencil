@@ -1,4 +1,3 @@
-
 export const enum VNODE_FLAGS {
   isSlotReference = 1 << 0,
   isSlotFallback = 1 << 1,
@@ -24,7 +23,7 @@ export const enum NODE_TYPE {
   CommentNode = 8,
   DocumentNode = 9,
   DocumentTypeNode = 10,
-  DocumentFragment = 11
+  DocumentFragment = 11,
 }
 
 export const CONTENT_REF_ID = 'r';

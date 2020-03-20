@@ -7,7 +7,7 @@ export const getStyleId = (cmp: d.ComponentCompilerMeta, modeName: string, isSco
 export const escapeCssForJs = (style: string) => {
   if (typeof style === 'string') {
     return style
-      .replace(/\\[\D0-7]/g, (v) => '\\' + v)
+      .replace(/\\[\D0-7]/g, v => '\\' + v)
       .replace(/\r\n|\r|\n/g, `\\n`)
       .replace(/\"/g, `\\"`)
       .replace(/\'/g, `\\'`)
@@ -17,29 +17,30 @@ export const escapeCssForJs = (style: string) => {
 };
 
 export const requiresScopedStyles = (encapsulation: d.Encapsulation, commentOriginalSelector: boolean) => {
-  return (encapsulation === 'scoped' || (encapsulation === 'shadow' && commentOriginalSelector));
+  return encapsulation === 'scoped' || (encapsulation === 'shadow' && commentOriginalSelector);
 };
 
 export const PLUGIN_HELPERS = [
   {
     pluginName: 'PostCSS',
     pluginId: 'postcss',
-    pluginExts: ['pcss']
+    pluginExts: ['pcss'],
   },
   {
     pluginName: 'Sass',
     pluginId: 'sass',
-    pluginExts: ['scss', 'sass']
+    pluginExts: ['scss', 'sass'],
   },
   {
     pluginName: 'Stylus',
     pluginId: 'stylus',
-    pluginExts: ['styl', 'stylus']
-  }, {
+    pluginExts: ['styl', 'stylus'],
+  },
+  {
     pluginName: 'Less',
     pluginId: 'less',
-    pluginExts: ['less']
-  }
+    pluginExts: ['less'],
+  },
 ];
 
 export const stripCssComments = (input: string) => {
@@ -51,7 +52,7 @@ export const stripCssComments = (input: string) => {
     currentCharacter = input[i];
 
     if (input[i - 1] !== '\\') {
-      if (currentCharacter === '"' || currentCharacter === '\'') {
+      if (currentCharacter === '"' || currentCharacter === "'") {
         if (isInsideString === currentCharacter) {
           isInsideString = null;
         } else if (!isInsideString) {

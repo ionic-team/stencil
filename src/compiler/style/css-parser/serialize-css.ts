@@ -1,7 +1,6 @@
 import { CssNode, SerializeCssOptions, SerializeOpts } from './css-parse-declarations';
 import { getCssSelectors } from './get-css-selectors';
 
-
 export const serializeCss = (stylesheet: CssNode, serializeOpts: SerializeCssOptions) => {
   const usedSelectors = serializeOpts.usedSelectors || null;
   const opts: SerializeOpts = {
@@ -97,7 +96,7 @@ const serializeCssRule = (opts: SerializeOpts, node: CssNode) => {
 
     for (i = selectors.length - 1; i >= 0; i--) {
       const sel = getCssSelectors(selectors[i]);
-      include = true
+      include = true;
 
       // classes
       let jlen = sel.classNames.length;
@@ -265,7 +264,6 @@ const removeSelectorWhitespace = (selector: string) => {
         continue;
       }
       rtn += ' ';
-
     } else {
       rtn += char;
     }
@@ -283,7 +281,7 @@ const removeMediaWhitespace = (media: string) => {
     char = media[i];
     if (CSS_WS_REG.test(char)) {
       if (CSS_WS_REG.test(rtn[rtn.length - 1])) {
-        continue
+        continue;
       }
       rtn += ' ';
     } else {

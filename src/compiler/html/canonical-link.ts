@@ -1,6 +1,4 @@
-
-
-export function updateCanonicalLink(doc: Document, href: string) {
+export const updateCanonicalLink = (doc: Document, href: string) => {
   // https://webmasters.googleblog.com/2009/02/specify-your-canonical.html
   // <link rel="canonical" href="http://www.example.com/product.php?item=swedish-fish" />
   let canonicalLinkElm = doc.head.querySelector('link[rel="canonical"]');
@@ -16,7 +14,6 @@ export function updateCanonicalLink(doc: Document, href: string) {
 
     // set the href attribute
     canonicalLinkElm.setAttribute('href', href);
-
   } else {
     // don't have a href
     if (canonicalLinkElm != null) {
@@ -27,4 +24,4 @@ export function updateCanonicalLink(doc: Document, href: string) {
       }
     }
   }
-}
+};

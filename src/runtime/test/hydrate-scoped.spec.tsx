@@ -1,9 +1,7 @@
 import { Component, Host, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('hydrate scoped', () => {
-
   it('does not support shadow, slot, light dom', async () => {
     @Component({ tag: 'cmp-a', shadow: true })
     class CmpA {
@@ -11,7 +9,7 @@ describe('hydrate scoped', () => {
         return (
           <Host>
             <article>
-              <slot/>
+              <slot />
             </article>
           </Host>
         );
@@ -21,7 +19,7 @@ describe('hydrate scoped', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a>88mph</cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -62,7 +60,7 @@ describe('hydrate scoped', () => {
         return (
           <Host>
             <article>
-              <slot/>
+              <slot />
             </article>
           </Host>
         );
@@ -90,7 +88,7 @@ describe('hydrate scoped', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
     expect(clientHydrated.root['s-id']).toBe('1');
     expect(clientHydrated.root['s-cr'].nodeType).toBe(8);
@@ -114,7 +112,7 @@ describe('hydrate scoped', () => {
       render() {
         return (
           <Host>
-            <p class='hi'>Hello</p>
+            <p class="hi">Hello</p>
           </Host>
         );
       }
@@ -123,7 +121,7 @@ describe('hydrate scoped', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -139,7 +137,7 @@ describe('hydrate scoped', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
     expect(clientHydrated.root['s-id']).toBe('1');
     expect(clientHydrated.root['s-cr'].nodeType).toBe(8);
@@ -154,5 +152,4 @@ describe('hydrate scoped', () => {
       </cmp-a>
     `);
   });
-
 });

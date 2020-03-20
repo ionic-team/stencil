@@ -4,13 +4,12 @@ import { consoleDevInfo } from './client-log';
 import { CSS, H, doc, plt, promiseResolve, win } from './client-window';
 import { getDynamicImportFunction } from '@utils';
 
-
 export const patchEsm = () => {
   // @ts-ignore
   if (BUILD.cssVarShim && !(CSS && CSS.supports && CSS.supports('color', 'var(--c)'))) {
     // @ts-ignore
     return import(/* webpackChunkName: "stencil-polyfills-css-shim" */ './polyfills/css-shim.js').then(() => {
-      if (plt.$cssShim$ = (win as any).__cssshim) {
+      if ((plt.$cssShim$ = (win as any).__cssshim)) {
         return plt.$cssShim$.i();
       } else {
         // for better minification
@@ -39,16 +38,19 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
 
   if (BUILD.profile && !performance.mark) {
     // not all browsers support performance.mark/measure (Safari 10)
-    performance.mark = performance.measure = () => {/*noop*/ };
+    performance.mark = performance.measure = () => {
+      /*noop*/
+    };
     performance.getEntriesByName = () => [];
   }
 
   // @ts-ignore
-  const scriptElm = (BUILD.scriptDataOpts || BUILD.safari10 || BUILD.dynamicImportShim) ?
-    Array.from(doc.querySelectorAll('script')).find(s => (
-      new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) ||
-      s.getAttribute('data-stencil-namespace') === NAMESPACE
-    )) : null;
+  const scriptElm =
+    BUILD.scriptDataOpts || BUILD.safari10 || BUILD.dynamicImportShim
+      ? Array.from(doc.querySelectorAll('script')).find(
+          s => new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) || s.getAttribute('data-stencil-namespace') === NAMESPACE,
+        )
+      : null;
   const importMeta = import.meta.url;
   const opts = BUILD.scriptDataOpts ? (scriptElm as any)['data-opts'] || {} : {};
 
@@ -60,12 +62,15 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
     // has 'onbeforeload' in the script, and "history.scrollRestoration" was added
     // to Safari in v11. Return a noop then() so the async/await ESM code doesn't continue.
     // IS_ESM_BUILD is replaced at build time so this check doesn't happen in systemjs builds.
-    return { then() {/* promise noop */ } } as any;
+    return {
+      then() {
+        /* promise noop */
+      },
+    } as any;
   }
 
   if (!BUILD.safari10 && importMeta !== '') {
     opts.resourcesUrl = new URL('.', importMeta).href;
-
   } else if (BUILD.dynamicImportShim || BUILD.safari10) {
     opts.resourcesUrl = new URL('.', new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href)).href;
     if (BUILD.dynamicImportShim) {
@@ -116,11 +121,10 @@ const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
   }
 };
 
-
 const patchCloneNodeFix = (HTMLElementPrototype: any) => {
   const nativeCloneNodeFn = HTMLElementPrototype.cloneNode;
 
-  HTMLElementPrototype.cloneNode = function (this: Node, deep: boolean) {
+  HTMLElementPrototype.cloneNode = function(this: Node, deep: boolean) {
     if (this.nodeName === 'TEMPLATE') {
       return nativeCloneNodeFn.call(this, deep);
     }
@@ -130,9 +134,7 @@ const patchCloneNodeFix = (HTMLElementPrototype: any) => {
       for (let i = 0; i < srcChildNodes.length; i++) {
         // Node.ATTRIBUTE_NODE === 2, and checking because IE11
         if (srcChildNodes[i].nodeType !== 2) {
-          clonedNode.appendChild(
-            srcChildNodes[i].cloneNode(true)
-          );
+          clonedNode.appendChild(srcChildNodes[i].cloneNode(true));
         }
       }
     }

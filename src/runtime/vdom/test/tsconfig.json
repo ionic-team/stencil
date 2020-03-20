@@ -8,11 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
     "jsxFactory": "h",
-    "lib": [
-      "dom",
-      "es2017",
-      "esnext.array"
-    ],
+    "lib": ["dom", "es2017", "esnext.array"],
     "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
@@ -23,21 +19,11 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core": [
-        "../../../index.ts"
-      ],
-      "@stencil/core/testing": [
-        "../../../testing/index.ts"
-      ],
-      "@app-data": [
-        "../../../app-data/index.ts"
-      ],
-      "@app-globals": [
-        "../../../app-globals/index.ts"
-      ],
-      "@utils": [
-        "../../../utils/index.ts"
-      ]
+      "@stencil/core": ["../../../index.ts"],
+      "@stencil/core/testing": ["../../../testing/index.ts"],
+      "@app-data": ["../../../app-data/index.ts"],
+      "@app-globals": ["../../../app-globals/index.ts"],
+      "@utils": ["../../../utils/index.ts"]
     }
   }
 }

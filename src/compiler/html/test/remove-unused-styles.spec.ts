@@ -2,14 +2,12 @@ import * as d from '@stencil/core/declarations';
 import { mockDocument } from '@stencil/core/testing';
 import { removeUnusedStyles } from '../remove-unused-styles';
 
-
 describe('removeUnusedStyles', () => {
-
   let results: d.HydrateResults;
 
   beforeEach(() => {
     results = {
-      diagnostics: []
+      diagnostics: [],
     } as any;
   });
 
@@ -272,21 +270,21 @@ describe('removeUnusedStyles', () => {
     expectNoSelector(css, '.unused-class');
   });
 
-
   function expectSelector(css: string, selector: string) {
-    selector = selector.replace(/ \{ /g, '{')
-                       .replace(/ \} /g, '}')
-                       .replace(/\: /g, ':')
-                       .replace(/\; /g, ';');
+    selector = selector
+      .replace(/ \{ /g, '{')
+      .replace(/ \} /g, '}')
+      .replace(/\: /g, ':')
+      .replace(/\; /g, ';');
     expect(css).toContain(selector);
   }
 
   function expectNoSelector(css: string, selector: string) {
-    selector = selector.replace(/ \{ /g, '{')
-                       .replace(/ \} /g, '}')
-                       .replace(/\: /g, ':')
-                       .replace(/\; /g, ';');
+    selector = selector
+      .replace(/ \{ /g, '{')
+      .replace(/ \} /g, '}')
+      .replace(/\: /g, ':')
+      .replace(/\; /g, ';');
     expect(css).not.toContain(selector);
   }
-
 });

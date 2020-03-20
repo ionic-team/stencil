@@ -1,4 +1,3 @@
-
 export const DEV_SERVER_URL = '/~dev-server';
 
 export const DEV_MODULE_URL = '/~dev-module';

@@ -1,4 +1,4 @@
-import { CompilerBuildResults, CompilerNext, Config, DevServer, E2EProcessEnv, OutputTargetWww, Testing, TestingRunOptions } from '@stencil/core/internal';
+import { CompilerBuildResults, Compiler, Config, DevServer, E2EProcessEnv, OutputTargetWww, Testing, TestingRunOptions } from '@stencil/core/internal';
 import { getAppScriptUrl, getAppStyleUrl } from './testing-utils';
 import { hasError } from '@utils';
 import { runJest } from './jest/jest-runner';
@@ -7,12 +7,11 @@ import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
 import { startServer } from '@stencil/core/dev-server';
 import * as puppeteer from 'puppeteer';
 
-
 export const createTesting = async (config: Config): Promise<Testing> => {
   config = setupTestingConfig(config);
 
   const { createCompiler } = require('../compiler/stencil.js');
-  const compiler: CompilerNext = await createCompiler(config);
+  const compiler: Compiler = await createCompiler(config);
 
   let devServer: DevServer;
   let puppeteerBrowser: puppeteer.Browser;
@@ -68,10 +67,7 @@ export const createTesting = async (config: Config): Promise<Testing> => {
       config.devServer.gzip = false;
       config.devServer.reloadStrategy = null;
 
-      const startupResults = await Promise.all([
-        startServer(config.devServer, config.logger),
-        startPuppeteerBrowser(config),
-      ]);
+      const startupResults = await Promise.all([startServer(config.devServer, config.logger), startPuppeteerBrowser(config)]);
 
       devServer = startupResults[0];
       puppeteerBrowser = startupResults[1];
@@ -108,7 +104,6 @@ export const createTesting = async (config: Config): Promise<Testing> => {
         passed = await runJest(config, env);
       }
       config.logger.info('');
-
     } catch (e) {
       config.logger.error(e);
     }
@@ -119,9 +114,8 @@ export const createTesting = async (config: Config): Promise<Testing> => {
   const destroy = async () => {
     const closingTime: Promise<any>[] = []; // you don't have to go home but you can't stay here
     if (config) {
-      config.sys && config.sys.destroy && config.sys.destroy();
-      if (config.sys_next && config.sys_next.destroy) {
-        closingTime.push(config.sys_next.destroy());
+      if (config.sys && config.sys.destroy) {
+        closingTime.push(config.sys.destroy());
       }
       config = null;
     }
@@ -146,7 +140,7 @@ export const createTesting = async (config: Config): Promise<Testing> => {
   return {
     destroy,
     run,
-  }
+  };
 };
 
 function setupTestingConfig(config: Config) {

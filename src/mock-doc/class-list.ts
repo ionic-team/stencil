@@ -1,6 +1,4 @@
-
 export class MockClassList {
-
   constructor(private elm: HTMLElement) {}
 
   add(...classNames: string[]) {
@@ -61,9 +59,7 @@ export class MockClassList {
   toString() {
     return getItems(this.elm).join(' ');
   }
-
 }
-
 
 function validateClass(className: string) {
   if (className === '') {
@@ -77,7 +73,10 @@ function validateClass(className: string) {
 function getItems(elm: HTMLElement) {
   const className = elm.getAttribute('class');
   if (typeof className === 'string' && className.length > 0) {
-    return className.trim().split(' ').filter(c => c.length > 0);
+    return className
+      .trim()
+      .split(' ')
+      .filter(c => c.length > 0);
   }
   return [];
 }

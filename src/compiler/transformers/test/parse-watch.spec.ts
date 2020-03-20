@@ -1,8 +1,6 @@
 import { getStaticGetter, transpileModule } from './transpile';
 
-
 describe('parse watch', () => {
-
   it('watch', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
@@ -29,7 +27,7 @@ describe('parse watch', () => {
       { methodName: 'onUpdate', propName: 'prop1' },
       { methodName: 'onUpdate', propName: 'prop2' },
       { methodName: 'onStateUpdated', propName: 'prop1' },
-      { methodName: 'onStateUpdated', propName: 'state1' }
+      { methodName: 'onStateUpdated', propName: 'state1' },
     ]);
   });
 
@@ -57,5 +55,4 @@ describe('parse watch', () => {
       { methodName: 'onStateUpdated', propName: 'prop2' },
     ]);
   });
-
 });

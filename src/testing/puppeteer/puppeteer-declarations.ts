@@ -1,7 +1,6 @@
 import { EventInitDict, EventSpy, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
 import * as puppeteer from 'puppeteer';
 
-
 export interface NewE2EPageOptions extends puppeteer.NavigationOptions {
   url?: string;
   html?: string;
@@ -9,10 +8,41 @@ export interface NewE2EPageOptions extends puppeteer.NavigationOptions {
   failOnNetworkError?: boolean;
 }
 
-
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
-type PuppeteerPage = Omit<puppeteer.Page,
-'bringToFront' | 'browser' | 'screenshot' | 'emulate' | 'emulateMedia' | 'frames' | 'goBack' | 'goForward' | 'isClosed' | 'mainFrame' | 'pdf' | 'reload' | 'target' | 'title' | 'viewport' | 'waitForNavigation' | 'screenshot' | 'workers' | 'addListener' | 'prependListener' | 'prependOnceListener' | 'removeListener' | 'removeAllListeners' | 'setMaxListeners' | 'getMaxListeners' | 'listeners' | 'rawListeners' | 'emit' | 'eventNames' | 'listenerCount' | '$x' | 'waitForXPath'
+type PuppeteerPage = Omit<
+  puppeteer.Page,
+  | 'bringToFront'
+  | 'browser'
+  | 'screenshot'
+  | 'emulate'
+  | 'emulateMedia'
+  | 'frames'
+  | 'goBack'
+  | 'goForward'
+  | 'isClosed'
+  | 'mainFrame'
+  | 'pdf'
+  | 'reload'
+  | 'target'
+  | 'title'
+  | 'viewport'
+  | 'waitForNavigation'
+  | 'screenshot'
+  | 'workers'
+  | 'addListener'
+  | 'prependListener'
+  | 'prependOnceListener'
+  | 'removeListener'
+  | 'removeAllListeners'
+  | 'setMaxListeners'
+  | 'getMaxListeners'
+  | 'listeners'
+  | 'rawListeners'
+  | 'emit'
+  | 'eventNames'
+  | 'listenerCount'
+  | '$x'
+  | 'waitForXPath'
 >;
 
 export interface PageDiagnostic {
@@ -26,7 +56,6 @@ export interface PageDiagnostic {
  * to create easier to write and read end-to-end tests.
  */
 export interface E2EPage extends PuppeteerPage {
-
   /**
    * `Experimental`
    * Takes a screenshot of the page, then compares the current screenshot
@@ -129,7 +158,6 @@ export interface E2EPage extends PuppeteerPage {
   getDiagnostics(): PageDiagnostic[];
 }
 
-
 export interface E2EPageInternal extends E2EPage {
   isClosed(): boolean;
   _e2eElements: E2EElementInternal[];
@@ -139,7 +167,6 @@ export interface E2EPageInternal extends E2EPage {
   _e2eClose(options?: puppeteer.PageCloseOptions): Promise<void>;
   screenshot(options?: puppeteer.ScreenshotOptions): Promise<Buffer>;
 }
-
 
 export interface E2EElement {
   /**
@@ -305,7 +332,7 @@ export interface E2EElement {
    * will type the text in upper case.
    * Key names: https://github.com/GoogleChrome/puppeteer/blob/master/lib/USKeyboardLayout.js
    */
-  press(key: string, options?: { text?: string, delay?: number }): Promise<void>;
+  press(key: string, options?: { text?: string; delay?: number }): Promise<void>;
 
   /**
    * Removes the attribute on the specified element. Note that
@@ -421,13 +448,11 @@ export interface E2EElement {
   waitForEvent(eventName: string): Promise<any>;
 }
 
-
 export interface E2EElementInternal extends E2EElement {
   e2eDispose(): Promise<void>;
   e2eRunActions(): Promise<void>;
   e2eSync(): Promise<void>;
 }
-
 
 export type FindSelector = string | FindSelectorOptions;
 
@@ -444,11 +469,9 @@ export interface FindSelectorOptions {
   contains?: string;
 }
 
-
 export interface WaitForEventOptions {
   timeout?: number;
 }
-
 
 export interface WaitForEvent {
   eventName: string;

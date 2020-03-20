@@ -1,14 +1,12 @@
 import { Component, Element, Host, Prop, Watch, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('lifecycle sync', () => {
-
   it('should fire connected/disconnected when removed', async () => {
     let connectedCallback = 0;
     let disconnectedCallback = 0;
 
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       connectedCallback() {
         connectedCallback++;
@@ -42,7 +40,7 @@ describe('lifecycle sync', () => {
     let connectedCallback = 0;
     let disconnectedCallback = 0;
 
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       connectedCallback() {
         connectedCallback++;
@@ -52,7 +50,7 @@ describe('lifecycle sync', () => {
       }
     }
 
-    @Component({ tag: 'cmp-b'})
+    @Component({ tag: 'cmp-b' })
     class CmpB {
       render() {
         return (
@@ -82,11 +80,9 @@ describe('lifecycle sync', () => {
   });
 
   it('fire lifecycle methods', async () => {
-
     let log = '';
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
-
       @Prop() prop = 0;
       @Watch('prop')
       propDidChange() {
@@ -136,28 +132,20 @@ describe('lifecycle sync', () => {
       html: `<cmp-a></cmp-a>`,
     });
 
-    expect(root.textContent).toBe(
-      'connectedCallback componentWillLoad componentWillRender render'
-    );
-    expect(log.trim()).toEqual(
-      'connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad'
-    );
+    expect(root.textContent).toBe('connectedCallback componentWillLoad componentWillRender render');
+    expect(log.trim()).toEqual('connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad');
 
     log = '';
     root.prop = 1;
     await waitForChanges();
 
-    expect(root.textContent).toBe(
-      'propDidChange componentWillUpdate componentWillRender render'
-    );
+    expect(root.textContent).toBe('propDidChange componentWillUpdate componentWillRender render');
 
-    expect(log.trim()).toBe(
-      'propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate'
-    );
+    expect(log.trim()).toBe('propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate');
   });
 
   it('implement deep equality', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       renders = 0;
       @Prop() complex: any;
@@ -176,9 +164,7 @@ describe('lifecycle sync', () => {
 
     const { root, rootInstance, waitForChanges } = await newSpecPage({
       components: [CmpA],
-      template: () => (
-        <cmp-a complexObject={[1, 2, 3]}></cmp-a>
-      )
+      template: () => <cmp-a complexObject={[1, 2, 3]}></cmp-a>,
     });
 
     expect(rootInstance.renders).toBe(1);
@@ -194,11 +180,10 @@ describe('lifecycle sync', () => {
   });
 
   describe('childrens', () => {
-    it ('sync', async () => {
-
+    it('sync', async () => {
       const log: string[] = [];
       @Component({
-        tag: 'cmp-a'
+        tag: 'cmp-a',
       })
       class CmpA {
         @Prop() prop: string;
@@ -217,9 +202,9 @@ describe('lifecycle sync', () => {
         render() {
           return (
             <Host>
-              <cmp-b id='b1' prop={this.prop}>
-                <cmp-b id='b2' prop={this.prop}>
-                  <cmp-b id='b3' prop={this.prop}></cmp-b>
+              <cmp-b id="b1" prop={this.prop}>
+                <cmp-b id="b2" prop={this.prop}>
+                  <cmp-b id="b3" prop={this.prop}></cmp-b>
                 </cmp-b>
               </cmp-b>
             </Host>
@@ -227,7 +212,7 @@ describe('lifecycle sync', () => {
         }
       }
       @Component({
-        tag: 'cmp-b'
+        tag: 'cmp-b',
       })
       class CmpB {
         @Element() el: HTMLElement;
@@ -245,9 +230,9 @@ describe('lifecycle sync', () => {
           log.push(`componentDidUpdate ${this.el.id}`);
         }
       }
-      const {root, waitForChanges} = await newSpecPage({
+      const { root, waitForChanges } = await newSpecPage({
         components: [CmpA, CmpB],
-        template: () => <cmp-a></cmp-a>
+        template: () => <cmp-a></cmp-a>,
       });
       expect(log).toEqual([
         'componentWillLoad a',
@@ -262,10 +247,7 @@ describe('lifecycle sync', () => {
       log.length = 0;
       root.forceUpdate();
       await waitForChanges();
-      expect(log).toEqual([
-        'componentWillUpdate a',
-        'componentDidUpdate a',
-      ]);
+      expect(log).toEqual(['componentWillUpdate a', 'componentDidUpdate a']);
 
       log.length = 0;
       root.prop = 'something else';
