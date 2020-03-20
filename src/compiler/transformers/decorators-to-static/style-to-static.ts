@@ -63,15 +63,8 @@ export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d
       //     md
       //   }
       // })
-      const styleModeIdentifiers: any = {};
-      Object.keys(convertIdentifier).forEach(modeName => {
-        const styleModeIdentifier = (convertIdentifier as any)[modeName] as ConvertIdentifier;
-        if (styleModeIdentifier.__identifier) {
-          styleModeIdentifiers[modeName] = styleModeIdentifier.__escapedText;
-        }
-      });
-      if (Object.keys(styleModeIdentifiers).length > 0) {
-        newMembers.push(createStaticGetter('styles', ts.createIdentifier(styleModeIdentifiers)));
+      if (Object.keys(convertIdentifier).length > 0) {
+        newMembers.push(createStaticGetter('styles', convertValueToLiteral(convertIdentifier)));
       }
     }
   }

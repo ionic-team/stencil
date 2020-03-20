@@ -34,7 +34,20 @@ export const parseStaticStyles = (compilerCtx: d.CompilerCtx, tagName: string, c
     } else if (typeof parsedStyle === 'object') {
       Object.keys(parsedStyle).forEach(modeName => {
         const parsedStyleMode = parsedStyle[modeName];
-        styles.push(parseStyleIdentifier(parsedStyleMode, modeName));
+        if (typeof parsedStyleMode === 'string') {
+          styles.push({
+            modeName: modeName,
+            styleId: null,
+            styleStr: parsedStyleMode,
+            styleIdentifier: null,
+            compiledStyleText: null,
+            compiledStyleTextScoped: null,
+            compiledStyleTextScopedCommented: null,
+            externalStyles: []
+          });
+        } else {
+          styles.push(parseStyleIdentifier(parsedStyleMode, modeName));
+        }
         compilerCtx.styleModeNames.add(modeName);
       });
     }

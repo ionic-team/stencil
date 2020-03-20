@@ -39,7 +39,7 @@ export const convertValueToLiteral = (val: any, refs: WeakSet<any> = null) => {
   }
   if (typeof val === 'object') {
     if ((val as ConvertIdentifier).__identifier && (val as ConvertIdentifier).__escapedText) {
-      return ts.createLiteral((val as ConvertIdentifier).__escapedText);
+      return ts.createIdentifier((val as ConvertIdentifier).__escapedText);
     }
     return objectToObjectLiteral(val, refs);
   }
