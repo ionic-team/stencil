@@ -1,13 +1,7 @@
 import { createSystem } from '../compiler/sys/stencil-sys';
-import { CompilerSystem } from '@stencil/core/internal';
 import { createHash } from 'crypto';
 
-export interface TestingSystem extends CompilerSystem {
-  diskReads: number;
-  diskWrites: number;
-}
-
-export const createTestingSystem = (): TestingSystem => {
+export const createTestingSystem = () => {
   let diskReads = 0;
   let diskWrites = 0;
   const sys = createSystem();

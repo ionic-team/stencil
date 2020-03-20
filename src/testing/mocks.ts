@@ -1,6 +1,6 @@
-import { BuildCtx, CompilerCtx, CompilerSystem, Config } from '@stencil/core/internal';
+import { BuildCtx, Cache, CompilerCtx, CompilerSystem, Config } from '@stencil/core/internal';
 import { BuildContext } from '../compiler/build/build-ctx';
-import { Cache } from '../compiler/cache';
+import { Cache as CompilerCache } from '../compiler/cache';
 import { createInMemoryFs } from '../compiler/sys/in-memory-fs';
 import { createTestingSystem } from './testing-sys';
 import { createWorkerContext } from '@stencil/core/compiler';
@@ -127,7 +127,7 @@ export function mockCache(config?: Config, compilerCtx?: CompilerCtx) {
     compilerCtx = mockCompilerCtx(config);
   }
   config.enableCache = true;
-  const cache = new Cache(config, compilerCtx.fs);
+  const cache = new CompilerCache(config, compilerCtx.fs);
   cache.initCacheDir();
   return cache as Cache;
 }
@@ -136,7 +136,12 @@ export function mockLogger() {
   return new TestingLogger();
 }
 
-export function mockStencilSystem() {
+export interface TestingSystem extends CompilerSystem {
+  diskReads: number;
+  diskWrites: number;
+}
+
+export function mockStencilSystem(): TestingSystem {
   return createTestingSystem();
 }
 
