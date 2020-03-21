@@ -1,7 +1,8 @@
+import { PlatformPath } from '../../../declarations';
 import pathBrowserify from 'path-browserify';
 import { IS_NODE_ENV, normalizePath, requireFunc } from '@utils';
 
-const path: any = {};
+const path: PlatformPath = {} as any;
 
 if (IS_NODE_ENV) {
   const nodePath = requireFunc('path');
@@ -25,5 +26,6 @@ export const normalize = path.normalize;
 export const relative = path.relative;
 export const resolve = path.resolve;
 export const sep = path.sep;
+export const delimiter = path.delimiter;
 export const posix = path.posix;
 export default path;

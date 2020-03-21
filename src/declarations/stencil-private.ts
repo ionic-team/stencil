@@ -2758,3 +2758,18 @@ export interface ResolveModuleIdOptions {
   exts: string[];
   packageFilter?: (pkg: PackageJsonData) => void;
 }
+
+export interface PlatformPath {
+  basename(p: string, ext?: string): string;
+  dirname(p: string): string;
+  extname(p: string): string;
+  format(pP: any): string;
+  join(...paths: string[]): string;
+  isAbsolute(p: string): boolean;
+  normalize(p: string): string;
+  relative(from: string, to: string): string;
+  resolve(...pathSegments: string[]): string;
+  sep: string;
+  delimiter: string;
+  posix: PlatformPath;
+}

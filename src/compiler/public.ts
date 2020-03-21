@@ -14,6 +14,7 @@ import {
   OptimizeCssOutput,
   OptimizeJsInput,
   OptimizeJsOutput,
+  PlatformPath,
 } from '@stencil/core/internal';
 
 /**
@@ -48,6 +49,7 @@ export interface CompilerDependency {
 }
 export declare const optimizeCss: (cssInput?: OptimizeCssInput) => Promise<OptimizeCssOutput>;
 export declare const optimizeJs: (jsInput?: OptimizeJsInput) => Promise<OptimizeJsOutput>;
+export declare const path: PlatformPath;
 export declare const loadConfig: (init?: LoadConfigInit) => Promise<LoadConfigResults>;
 export declare const version: string;
 
