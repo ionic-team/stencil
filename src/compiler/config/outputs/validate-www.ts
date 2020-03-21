@@ -76,7 +76,7 @@ const validateWwwOutputTarget = (config: d.Config, outputTarget: d.OutputTargetW
   // Fix "dir" to account
   const pathname = new URL(outputTarget.baseUrl, 'http://localhost/').pathname;
   outputTarget.appDir = join(outputTarget.dir, pathname);
-  if (outputTarget.appDir.endsWith('/')) {
+  if (outputTarget.appDir.endsWith('/') || outputTarget.appDir.endsWith('\\')) {
     outputTarget.appDir = outputTarget.appDir.substring(0, outputTarget.appDir.length - 1);
   }
 

@@ -1,6 +1,5 @@
 import * as d from '@stencil/core/declarations';
 import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
-import { normalizePath } from '@utils';
 import { validateConfig } from '../validate-config';
 import path from 'path';
 
@@ -23,18 +22,18 @@ describe('validatePaths', () => {
   it('should set absolute cacheDir', () => {
     userConfig.cacheDir = path.join(ROOT, 'some', 'custom', 'cache');
     const { config } = validateConfig(userConfig);
-    expect(config.cacheDir).toBe(normalizePath(path.join(ROOT, 'some', 'custom', 'cache')));
+    expect(config.cacheDir).toBe(path.join(ROOT, 'some', 'custom', 'cache'));
   });
 
   it('should set relative cacheDir', () => {
     userConfig.cacheDir = 'custom-cache';
     const { config } = validateConfig(userConfig);
-    expect(config.cacheDir).toBe(normalizePath(path.join(ROOT, 'User', 'my-app', 'custom-cache')));
+    expect(config.cacheDir).toBe(path.join(ROOT, 'User', 'my-app', 'custom-cache'));
   });
 
   it('should set default cacheDir', () => {
     const { config } = validateConfig(userConfig);
-    expect(config.cacheDir).toBe(normalizePath(path.join(ROOT, 'User', 'my-app', '.stencil')));
+    expect(config.cacheDir).toBe(path.join(ROOT, 'User', 'my-app', '.stencil'));
   });
 
   it('should set default wwwIndexHtml and convert to absolute path', () => {
@@ -112,7 +111,7 @@ describe('validatePaths', () => {
 
   it('should set default build dir and convert to absolute path', () => {
     const { config } = validateConfig(userConfig);
-    const normalizedPathSep = '/';
+    const normalizedPathSep = path.sep;
     const parts = (config.outputTargets as d.OutputTargetDist[])[0].buildDir.split(normalizedPathSep);
     expect(parts[parts.length - 1]).toBe('build');
     expect(parts[parts.length - 2]).toBe('www');
@@ -127,7 +126,7 @@ describe('validatePaths', () => {
       },
     ] as d.OutputTargetWww[];
     const { config } = validateConfig(userConfig);
-    const normalizedPathSep = '/';
+    const normalizedPathSep = path.sep;
     const parts = (config.outputTargets as d.OutputTargetDist[])[0].buildDir.split(normalizedPathSep);
     expect(parts[parts.length - 1]).toBe('build');
     expect(parts[parts.length - 2]).toBe('custom-www');

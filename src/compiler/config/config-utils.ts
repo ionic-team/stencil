@@ -1,12 +1,11 @@
 import * as d from '../../declarations';
 import { isAbsolute, join } from 'path';
-import { normalizePath } from '@utils';
 
 export const getAbsolutePath = (config: d.Config, dir: string) => {
   if (!isAbsolute(dir)) {
     dir = join(config.rootDir, dir);
   }
-  return normalizePath(dir);
+  return dir;
 };
 
 export const setBooleanConfig = (config: any, configName: string, flagName: string, defaultValue: boolean) => {

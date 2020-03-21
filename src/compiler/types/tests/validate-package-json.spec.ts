@@ -141,7 +141,6 @@ describe('validate-package-json', () => {
     it('should error when missing collection property', async () => {
       v.validateCollection(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics[0].messageText).toMatch(/package.json "collection" property is required/);
-      expect(buildCtx.diagnostics[0].messageText).toMatch(/dist\/collection\/collection-manifest.json/);
     });
   });
 });

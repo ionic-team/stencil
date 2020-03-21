@@ -145,7 +145,7 @@ export const getCssImports = async (config: d.Config, compilerCtx: d.CompilerCtx
         const fileName = '_' + basename(cssImportData.filePath);
         const dirPath = dirname(cssImportData.filePath);
 
-        cssImportData.altFilePath = join(dirPath, fileName);
+        cssImportData.altFilePath = normalizePath(join(dirPath, fileName));
       }
     }
 
