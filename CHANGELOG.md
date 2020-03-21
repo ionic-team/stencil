@@ -1,3 +1,14 @@
+## 🔥 [1.11.1-0](https://github.com/ionic-team/stencil/compare/v1.11.0...v1.11.1-0) (2020-03-21)
+
+
+### Features
+
+* **compiler:** add minified stencil.min.js ([d2cb1f9](https://github.com/ionic-team/stencil/commit/d2cb1f93a1747f9e3603482402a6d64c7f0942af))
+* **compiler:** expose path fns in compiler ([7e95038](https://github.com/ionic-team/stencil/commit/7e950389864ce107c426fafff42d1614486e8fc0))
+* **sys:** add fetch to compiler system ([0977a44](https://github.com/ionic-team/stencil/commit/0977a44a67ec6c7b653ca4c02f8c97396e0a4916))
+
+
+
 # 🍿 [1.11.0](https://github.com/ionic-team/stencil/compare/v1.10.3...v1.11.0) (2020-03-20)
 
 
