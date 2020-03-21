@@ -13,7 +13,7 @@ import { sizzlePlugin } from './plugins/sizzle-plugin';
 import { sysModulesPlugin } from './plugins/sys-modules-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { BuildOptions } from '../utils/options';
-import { RollupOptions } from 'rollup';
+import { RollupOptions, OutputChunk } from 'rollup';
 import terser from 'terser';
 
 export async function compiler(opts: BuildOptions) {
@@ -74,16 +74,17 @@ export async function compiler(opts: BuildOptions) {
         preferConst: true,
       }),
       moduleDebugPlugin(opts),
-      // {
-      //   generateBundle(_, bundleFiles) {
-      //     Object.keys(bundleFiles).forEach(fileName => {
-      //       if (opts.isProd) {
-      //         const bundle = bundleFiles[fileName] as OutputChunk;
-      //         bundle.code = minifyStencilCompiler(bundle.code)
-      //       }
-      //     });
-      //   }
-      // }
+      {
+        name: 'compilerMinify',
+        async generateBundle(_, bundleFiles) {
+          if (opts.isProd) {
+            const compilerFilename = Object.keys(bundleFiles).find(f => f.includes('stencil'));
+            const compilerBundle = bundleFiles[compilerFilename] as OutputChunk;
+            const minified = minifyStencilCompiler(compilerBundle.code);
+            await fs.writeFile(join(opts.output.compilerDir, compilerFilename.replace('.js', '.min.js')), minified);
+          }
+        },
+      },
     ],
     treeshake: {
       moduleSideEffects: false,

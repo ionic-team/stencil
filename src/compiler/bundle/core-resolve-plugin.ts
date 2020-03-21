@@ -49,7 +49,7 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
       if (filePath === internalClient || filePath === internalHydrate) {
         if (isExternalUrl(compilerExe)) {
           const url = getStencilModuleUrl(compilerExe, filePath);
-          return fetchModuleAsync(compilerCtx.fs, packageVersions, url, filePath);
+          return fetchModuleAsync(config.sys, compilerCtx.fs, packageVersions, url, filePath);
         }
 
         let code = await compilerCtx.fs.readFile(normalizeFsPath(filePath));
