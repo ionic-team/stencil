@@ -42,7 +42,7 @@ export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemo
         const endsWithExt = exts.some(ext => fsFilePath.endsWith(ext));
         if (endsWithExt) {
           const url = getNodeModuleFetchUrl(compilerExecutingPath, packageVersions, fsFilePath);
-          const content = await fetchModuleAsync(inMemoryFs, packageVersions, url, fsFilePath);
+          const content = await fetchModuleAsync(config.sys, inMemoryFs, packageVersions, url, fsFilePath);
           const checkFileExists = isString(content);
           cb(null, checkFileExists);
           return;
@@ -79,7 +79,7 @@ export const createCustomResolverAsync = (config: d.Config, inMemoryFs: d.InMemo
         for (const fileName of COMMON_DIR_FILENAMES) {
           const url = getCommonDirUrl(compilerExecutingPath, packageVersions, fsDirPath, fileName);
           const filePath = getCommonDirName(fsDirPath, fileName);
-          const content = await fetchModuleAsync(inMemoryFs, packageVersions, url, filePath);
+          const content = await fetchModuleAsync(config.sys, inMemoryFs, packageVersions, url, filePath);
           if (isString(content)) {
             cb(null, true);
             return;

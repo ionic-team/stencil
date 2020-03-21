@@ -1,11 +1,11 @@
 import * as d from '../../../declarations';
-import { cachedFetch } from '../fetch/fetch-cache';
 import { catchError, IS_GLOBAL_THIS_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV, isFunction, requireFunc, IS_FETCH_ENV } from '@utils';
+import { httpFetch } from '../fetch/fetch-utils';
 import { getRemoteTypeScriptUrl } from '../dependencies';
 import { patchTsSystemUtils } from './typescript-sys';
 import ts from 'typescript';
 
-export const loadTypescript = async (diagnostics: d.Diagnostic[], typescriptPath: string) => {
+export const loadTypescript = async (sys: d.CompilerSystem, diagnostics: d.Diagnostic[], typescriptPath: string) => {
   const tsSync = loadTypescriptSync(diagnostics, typescriptPath);
   if (tsSync != null) {
     return tsSync;
@@ -15,7 +15,7 @@ export const loadTypescript = async (diagnostics: d.Diagnostic[], typescriptPath
     try {
       // browser main thread
       const tsUrl = typescriptPath || getRemoteTypeScriptUrl();
-      const rsp = await cachedFetch(tsUrl);
+      const rsp = await httpFetch(sys, tsUrl);
       const content = await rsp.text();
       const getTsFunction = new Function(content + ';return ts;');
       const fetchTs = getLoadedTs(getTsFunction(), 'fetch', tsUrl);

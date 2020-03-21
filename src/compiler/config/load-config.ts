@@ -21,7 +21,7 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
     const sys = init.sys || createSystem();
     const config = init.config || {};
     const cwd = sys.getCurrentDirectory();
-    const tsPromise = loadTypescript(results.diagnostics, init.typescriptPath);
+    const tsPromise = loadTypescript(sys, results.diagnostics, init.typescriptPath);
     let configPath = init.configPath || config.configPath;
     let isDefaultConfigPath = true;
 
@@ -162,7 +162,7 @@ const evaluateConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[]
 
   try {
     // TODO: this should use sys for resolving
-    const ts = await loadTypescript(diagnostics, typescriptPath);
+    const ts = await loadTypescript(sys, diagnostics, typescriptPath);
 
     if (IS_NODE_ENV) {
       // ensure we cleared out node's internal require() cache for this file

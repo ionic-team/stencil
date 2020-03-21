@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
-import { cachedFetch } from './fetch-cache';
 import { getRemoteTypeScriptUrl } from '../dependencies';
+import { httpFetch } from './fetch-utils';
 import { IS_FETCH_ENV, IS_WEB_WORKER_ENV } from '@utils';
 import { join } from 'path';
 
@@ -13,7 +13,7 @@ export const fetchPreloadFs = async (config: d.Config, inMemoryFs: d.InMemoryFil
         try {
           const fileExists = await inMemoryFs.access(preload.filePath);
           if (!fileExists) {
-            const rsp = await cachedFetch(preload.url);
+            const rsp = await httpFetch(config.sys, preload.url);
             if (rsp && rsp.ok) {
               const content = await rsp.clone().text();
               await inMemoryFs.writeFile(preload.filePath, content);

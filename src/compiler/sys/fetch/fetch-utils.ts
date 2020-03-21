@@ -1,5 +1,13 @@
-import { normalizePath } from '@utils';
+import * as d from '../../../declarations';
+import { isFunction, normalizePath } from '@utils';
 import { NODE_MODULES_CDN_URL, NODE_MODULES_FS_DIR, STENCIL_CORE_MODULE, isCommonDirModuleFile, isTsFile, isTsxFile } from '../resolve/resolve-utils';
+
+export const httpFetch = (sys: d.CompilerSystem, input: RequestInfo, init?: RequestInit) => {
+  if (sys && isFunction(sys.fetch)) {
+    return sys.fetch(input, init);
+  }
+  return fetch(input, init);
+};
 
 export const packageVersions = new Map<string, string>();
 export const known404Urls = new Set<string>();

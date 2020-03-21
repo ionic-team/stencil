@@ -476,6 +476,12 @@ export interface CompilerSystem {
   createWorkerController?(compilerPath: string, maxConcurrentWorkers: number): WorkerMainController;
   encodeToBase64(str: string): string;
   /**
+   * Optionally provide a fetch() function rather than using the built-in fetch().
+   * First arg is a url string or Request object (RequestInfo).
+   * Second arg is the RequestInit. Returns the Response object
+   */
+  fetch?(input: string | any, init?: any): Promise<any>;
+  /**
    * Generates a MD5 digest encoded as HEX
    */
   generateContentHash?(content: string, length?: number): Promise<string>;
