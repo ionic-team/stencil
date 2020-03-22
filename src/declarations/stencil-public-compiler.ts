@@ -511,6 +511,10 @@ export interface CompilerSystem {
    */
   mkdirSync(p: string, opts?: CompilerSystemMakeDirectoryOptions): boolean;
   /**
+   * Normalize file system path.
+   */
+  normalizePath(p: string): string;
+  /**
    * All return paths are full normalized paths, not just the file names. Always returns an array, does not throw.
    */
   readdir(p: string): Promise<string[]>;

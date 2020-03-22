@@ -339,6 +339,7 @@ export const createSystem = () => {
     isSymbolicLink,
     mkdir,
     mkdirSync,
+    normalizePath: normalize,
     readdir,
     readdirSync,
     readFile,

@@ -78,6 +78,7 @@ export function createNodeSys(prcs: NodeJS.Process) {
         }
       }),
     getCompilerExecutingPath: null,
+    normalizePath,
     mkdir(p, opts) {
       return new Promise(resolve => {
         if (opts) {
