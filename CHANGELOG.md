@@ -1,4 +1,4 @@
-## 🔥 [1.11.1-0](https://github.com/ionic-team/stencil/compare/v1.11.0...v1.11.1-0) (2020-03-21)
+## 🐝 [1.11.1](https://github.com/ionic-team/stencil/compare/v1.11.0...v1.11.1) (2020-03-23)
 
 
 ### Features
@@ -6,6 +6,11 @@
 * **compiler:** add minified stencil.min.js ([d2cb1f9](https://github.com/ionic-team/stencil/commit/d2cb1f93a1747f9e3603482402a6d64c7f0942af))
 * **compiler:** expose path fns in compiler ([7e95038](https://github.com/ionic-team/stencil/commit/7e950389864ce107c426fafff42d1614486e8fc0))
 * **sys:** add fetch to compiler system ([0977a44](https://github.com/ionic-team/stencil/commit/0977a44a67ec6c7b653ca4c02f8c97396e0a4916))
+
+
+### Bug Fixes
+
+* **runtime:** next tick initialize for angular ([#2299](https://github.com/ionic-team/stencil/issues/2299)) ([d771df5](https://github.com/ionic-team/stencil/commit/d771df526f798e5cfa81a183f04dc3639c34b10d))
 
 
 
