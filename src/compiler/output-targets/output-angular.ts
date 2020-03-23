@@ -5,6 +5,9 @@ import ts from 'typescript';
 import { isOutputTargetAngular, relativeImport } from './output-utils';
 
 export const outputAngular = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+  if (!config.buildDist) {
+    return;
+  }
   const angularOutputTargets = config.outputTargets.filter(isOutputTargetAngular);
   if (angularOutputTargets.length === 0) {
     return;
