@@ -1,3 +1,12 @@
+## 🕹 [1.11.2](https://github.com/ionic-team/stencil/compare/v1.11.1...v1.11.2) (2020-03-23)
+
+
+### Bug Fixes
+
+* **angular:** validate angular outputTarget ([413c451](https://github.com/ionic-team/stencil/commit/413c45199d329cb03e4cee4dfe81235f60309ab0))
+
+
+
 ## 🐝 [1.11.1](https://github.com/ionic-team/stencil/compare/v1.11.0...v1.11.1) (2020-03-23)
 
 
