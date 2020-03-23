@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { dashToPascalCase, sortBy } from '@utils';
 import { dirname, join } from 'path';
+import ts from 'typescript';
 import { isOutputTargetAngular, relativeImport } from './output-utils';
 
 export const outputAngular = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -35,7 +36,8 @@ const generateProxies = async (config: d.Config, compilerCtx: d.CompilerCtx, bui
   const dtsFilePath = join(config.rootDir, distTypesDir, GENERATED_DTS);
   const componentsTypeFile = relativeImport(outputTarget.directivesProxyFile, dtsFilePath, '.d.ts');
 
-  const imports = `/* tslint:disable */
+  const imports = `/* eslint-disable */
+/* tslint:disable */
 /* auto-generated angular directive proxies */
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, NgZone } from '@angular/core';`;
 
@@ -46,8 +48,13 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Even
   const final: string[] = [imports, getProxyUtils(outputTarget), sourceImports, proxies];
 
   const finalText = final.join('\n') + '\n';
+  const tsSourceFile = ts.createSourceFile(GENERATED_DTS, finalText, ts.ScriptTarget.Latest, false);
+  const tsPrinter = ts.createPrinter({
+    newLine: ts.NewLineKind.LineFeed,
+  });
 
-  return compilerCtx.fs.writeFile(outputTarget.directivesProxyFile, finalText);
+  const formattedCode = tsPrinter.printFile(tsSourceFile);
+  return compilerCtx.fs.writeFile(outputTarget.directivesProxyFile, formattedCode);
 };
 
 const getProxies = (components: d.ComponentCompilerMeta[]) => {
@@ -139,8 +146,8 @@ const generateAngularArray = (compilerCtx: d.CompilerCtx, components: d.Componen
   const proxyPath = relativeImport(outputTarget.directivesArrayFile, outputTarget.directivesProxyFile, '.ts');
   const directives = components
     .map(cmpMeta => dashToPascalCase(cmpMeta.tagName))
-    .map(className => `d.${className}`)
-    .join(',\n  ');
+    .map(className => `  d.${className}`)
+    .join(',\n');
 
   const c = `
 import * as d from '${proxyPath}';
@@ -154,7 +161,7 @@ ${directives}
 
 const generateAngularUtils = async (compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular) => {
   if (outputTarget.directivesUtilsFile) {
-    await compilerCtx.fs.writeFile(outputTarget.directivesUtilsFile, '/* tslint:disable */\n' + PROXY_UTILS);
+    await compilerCtx.fs.writeFile(outputTarget.directivesUtilsFile, '/* eslint-disable */\n/* tslint:disable */\n' + PROXY_UTILS);
   }
 };
 
@@ -190,7 +197,6 @@ export const proxyOutputs = (instance: any, el: any, events: string[]) => {
   events.forEach(eventName => instance[eventName] = fromEvent(el, eventName));
 }
 
-// tslint:disable-next-line: only-arrow-functions
 export function ProxyCmp(opts: { inputs?: any; methods?: any }) {
   const decorator =  function(cls: any){
     if (opts.inputs) {

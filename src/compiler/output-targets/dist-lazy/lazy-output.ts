@@ -77,12 +77,12 @@ const getLazyBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMet
   build.lazyLoad = true;
   build.hydrateServerSide = false;
   build.cssVarShim = config.extras.cssVarsShim;
+  build.initializeNextTick = config.outputTargets.some(isOutputTargetAngular);
 
   const hasHydrateOutputTargets = config.outputTargets.some(isOutputTargetHydrate);
   build.hydrateClientSide = hasHydrateOutputTargets;
 
   updateBuildConditionals(config, build);
-  build.initializeNextTick = config.outputTargets.some(isOutputTargetAngular);
 
   return build;
 };
