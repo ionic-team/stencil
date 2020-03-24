@@ -6,7 +6,6 @@ import { isAbsolute, relative, resolve } from 'path';
 import { normalizePath } from '@utils';
 import { updateReferenceTypeImports } from './update-import-refs';
 import { updateStencilTypesImports } from './stencil-types';
-import ts from 'typescript';
 
 export const generateAppTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination: string) => {
   // only gather components that are still root ts files we've found and have component metadata
@@ -135,10 +134,5 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
     ${componentsFileString}
   `;
 
-  const tsSourceFile = ts.createSourceFile(GENERATED_DTS, code, ts.ScriptTarget.Latest, false);
-  const tsPrinter = ts.createPrinter({
-    newLine: ts.NewLineKind.LineFeed,
-  });
-
-  return tsPrinter.printFile(tsSourceFile);
+  return code;
 };
