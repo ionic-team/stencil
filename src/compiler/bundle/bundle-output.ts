@@ -39,6 +39,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
   const nodeResolvePlugin = rollupNodeResolvePlugin({
     mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
     customResolveOptions,
+    browser: true,
     ...(config.nodeResolve as any),
   });
 
@@ -51,6 +52,8 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
     };
   }
 
+  const beforePlugins = config.rollupPlugins.before || [];
+  const afterPlugins = config.rollupPlugins.after || [];
   const rollupOptions: RollupOptions = {
     input: bundleOpts.inputs,
 
@@ -65,7 +68,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       textPlugin(),
       extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform),
-      ...config.rollupPlugins,
+      ...beforePlugins,
       nodeResolvePlugin,
       resolveIdWithTypeScript(config, compilerCtx),
       rollupCommonjsPlugin({
@@ -73,6 +76,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
         sourceMap: config.sourceMap,
         ...config.commonjs,
       }),
+      ...afterPlugins,
       pluginHelper(config, buildCtx),
       rollupJsonPlugin({
         preferConst: true,

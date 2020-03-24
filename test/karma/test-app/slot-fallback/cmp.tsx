@@ -2,7 +2,6 @@ import { Component, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'slot-fallback',
-  // shadow: true
 })
 export class SlotFallback {
 
