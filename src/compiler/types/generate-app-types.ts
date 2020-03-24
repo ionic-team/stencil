@@ -64,43 +64,42 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
   const jsxElementGlobal = !needsJSXElementHack
     ? ''
     : `
-    // Adding a global JSX for backcompatibility with legacy dependencies
-    export namespace JSX {
-      export interface Element {}
-    }
+// Adding a global JSX for backcompatibility with legacy dependencies
+export namespace JSX {
+  export interface Element {}
+}
     `;
 
   const componentsFileString = `
-    export namespace Components {
+export namespace Components {
       ${modules
         .map(m => `${m.component}`)
         .join('\n')
         .trim()}
     }
 
-    declare global {
-      ${jsxElementGlobal}
-      ${modules.map(m => m.element).join('\n')}
-      interface HTMLElementTagNameMap {
-        ${modules.map(m => `'${m.tagName}': ${m.htmlElementName};`).join('\n')}
-      }
-    }
+declare global {
+  ${jsxElementGlobal}
+  ${modules.map(m => m.element).join('\n')}
+  interface HTMLElementTagNameMap {
+    ${modules.map(m => `'${m.tagName}': ${m.htmlElementName};`).join('\n')}
+  }
+}
 
-    declare namespace LocalJSX {
-      ${modules
-        .map(m => `${m.jsx}`)
-        .join('\n')
-        .trim()}
+declare namespace LocalJSX {
+  ${modules
+    .map(m => `${m.jsx}`)
+    .join('\n')
+    .trim()}
 
-      interface IntrinsicElements {
-        ${modules.map(m => `'${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
-      }
-    }
+  interface IntrinsicElements {
+    ${modules.map(m => `'${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
+  }
+}
 
-    export { LocalJSX as JSX };
+export { LocalJSX as JSX };
 
-    ${jsxAugmentation}
-    `;
+${jsxAugmentation}`;
 
   const typeImportString = Object.keys(typeImportData)
     .map(filePath => {
@@ -122,16 +121,14 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
             return `${td.localName} as ${td.importName},`;
           }
         })
-        .join('\n')}
-      } from '${importFilePath}';`;
+        .join('\n')} } from '${importFilePath}';`;
     })
     .join('\n');
 
-  const code = `
-    ${COMPONENTS_DTS_HEADER}
-    import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-    ${typeImportString}
-    ${componentsFileString}
+  const code = `${COMPONENTS_DTS_HEADER}
+import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
+${typeImportString}
+${componentsFileString}
   `;
 
   return code;

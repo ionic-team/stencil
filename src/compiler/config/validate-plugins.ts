@@ -31,10 +31,7 @@ export const validatePlugins = (config: d.Config, diagnostics: d.Diagnostic[]) =
     You can configure the commonjs settings using the "commonjs" property in "stencil.config.ts`;
   }
 
-  config.rollupPlugins.before = [
-    ...config.rollupPlugins.before || [],
-    ...rollupPlugins.filter(({ name }) => name !== 'node-resolve' && name !== 'commonjs')
-  ];
+  config.rollupPlugins.before = [...(config.rollupPlugins.before || []), ...rollupPlugins.filter(({ name }) => name !== 'node-resolve' && name !== 'commonjs')];
 
   config.plugins = userPlugins.filter(plugin => {
     return !!(plugin && typeof plugin === 'object' && plugin.pluginType);

@@ -4,7 +4,6 @@ import exit from 'exit';
 import { startupLog } from './startup-log';
 
 export async function taskTest(prcs: NodeJS.Process, config: d.Config) {
-
   startupLog(prcs, config);
 
   try {

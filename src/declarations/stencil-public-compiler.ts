@@ -198,7 +198,7 @@ export interface StencilConfig {
    * @deprecated Use the "include" option in "tsconfig.json"
    */
   includeSrc?: string[];
-  rollupPlugins?: {before?: any[], after?: any[]};
+  rollupPlugins?: { before?: any[]; after?: any[] };
 
   entryComponentsHint?: string[];
   buildDist?: boolean;

@@ -49,7 +49,9 @@ describe('parse styles', () => {
       })
       export class CmpA {}
     `);
-    expect(t.outputText).toEqual(`const md = 'p{color:red}';const ios = 'p{color:black}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return { "md": md, "ios": ios }; }}`);
+    expect(t.outputText).toEqual(
+      `const md = 'p{color:red}';const ios = 'p{color:black}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return { "md": md, "ios": ios }; }}`,
+    );
   });
 
   it('add static "styles" as object (2)', () => {
@@ -65,9 +67,8 @@ describe('parse styles', () => {
     `);
 
     expect(getStaticGetter(t.outputText, 'styles')).toEqual({
-      "ios": "p{color:black}",
-      "md": "p{color:red}"
+      ios: 'p{color:black}',
+      md: 'p{color:red}',
     });
   });
-
 });

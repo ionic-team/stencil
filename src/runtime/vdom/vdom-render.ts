@@ -608,7 +608,6 @@ render() {
     plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
 
     if (checkSlotRelocate) {
-
       relocateSlotContent(rootVnode.$elm$);
 
       let relocateData: RelocateNodeData;

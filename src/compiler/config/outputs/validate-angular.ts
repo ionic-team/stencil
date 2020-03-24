@@ -3,10 +3,8 @@ import { isOutputTargetAngular } from '../../output-targets/output-utils';
 import { isAbsolute, join } from 'path';
 
 export const validateAngular = (userConfig: d.Config, userOutputs: d.OutputTarget[]) => {
-
   const angularOutputTargets = userOutputs.filter(isOutputTargetAngular);
   return angularOutputTargets.map(outputTarget => {
-
     let directivesProxyFile = outputTarget.directivesProxyFile;
     if (directivesProxyFile && !isAbsolute(directivesProxyFile)) {
       directivesProxyFile = join(userConfig.rootDir, directivesProxyFile);
@@ -27,7 +25,7 @@ export const validateAngular = (userConfig: d.Config, userOutputs: d.OutputTarge
       directivesProxyFile,
       directivesArrayFile,
       directivesUtilsFile,
-      excludeComponents: outputTarget.excludeComponents || []
+      excludeComponents: outputTarget.excludeComponents || [],
     };
   });
 };

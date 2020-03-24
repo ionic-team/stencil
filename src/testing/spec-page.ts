@@ -83,7 +83,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
 
     proxyComponentLifeCycles(Cstr);
 
-    const textBundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 899999) + 100000)}`;
+    const textBundleId = `${Cstr.COMPILER_META.tagName}.${Math.round(Math.random() * 899999) + 100000}`;
     const stylesMeta = Cstr.COMPILER_META.styles;
     let bundleId = textBundleId as any;
     if (Array.isArray(stylesMeta)) {
