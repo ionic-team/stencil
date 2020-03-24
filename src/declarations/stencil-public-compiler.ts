@@ -198,6 +198,7 @@ export interface StencilConfig {
    * @deprecated Use the "include" option in "tsconfig.json"
    */
   includeSrc?: string[];
+  rollupPlugins?: {before?: any[], after?: any[]};
 
   entryComponentsHint?: string[];
   buildDist?: boolean;
@@ -285,7 +286,6 @@ export interface Config extends StencilConfig {
   configPath?: string;
   cwd?: string;
   writeLog?: boolean;
-  rollupPlugins?: any[];
   devServer?: DevServerConfig;
   flags?: ConfigFlags;
   fsNamespace?: string;
