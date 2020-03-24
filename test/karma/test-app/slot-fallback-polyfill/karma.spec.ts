@@ -1,7 +1,7 @@
 import { setupDomTests, waitForChanges } from '../util';
 
 
-describe('slot-fallback', () => {
+describe('slot-fallback-polyfill', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -58,6 +58,7 @@ describe('slot-fallback', () => {
     result = app.querySelector('.results1 article span slot-fb[name="end"][hidden]');
     expect(result.textContent).toBe('slot end fallback 1');
 
+    console.log('here');
     // light dom content rendered
     result = app.querySelector('.results1 content-start[slot="start"]');
     expect(result.textContent).toBe('slot light dom 0 : start');
