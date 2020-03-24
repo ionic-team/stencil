@@ -603,10 +603,11 @@ render() {
   patch(oldVNode, rootVnode);
 
   if (BUILD.slotRelocation) {
+    // while we're moving nodes around existing nodes, temporarily disable
+    // the disconnectCallback from working
+    plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
+
     if (checkSlotRelocate) {
-      // while we're moving nodes around existing nodes, temporarily disable
-      // the disconnectCallback from working
-      plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
 
       relocateSlotContent(rootVnode.$elm$);
 
@@ -675,15 +676,15 @@ render() {
           }
         }
       }
-
-      // done moving nodes around
-      // allow the disconnect callback to work again
-      plt.$flags$ &= ~PLATFORM_FLAGS.isTmpDisconnected;
     }
 
     if (checkSlotFallbackVisibility) {
       updateFallbackSlotVisibility(rootVnode.$elm$);
     }
+
+    // done moving nodes around
+    // allow the disconnect callback to work again
+    plt.$flags$ &= ~PLATFORM_FLAGS.isTmpDisconnected;
 
     // always reset
     relocateNodes.length = 0;
