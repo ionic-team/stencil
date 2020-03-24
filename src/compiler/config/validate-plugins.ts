@@ -4,6 +4,9 @@ import { buildWarn } from '@utils';
 export const validatePlugins = (config: d.Config, diagnostics: d.Diagnostic[]) => {
   const userPlugins = config.plugins;
 
+  if (!config.rollupPlugins) {
+    config.rollupPlugins = {};
+  }
   if (!Array.isArray(userPlugins)) {
     config.plugins = [];
     return;
@@ -28,9 +31,6 @@ export const validatePlugins = (config: d.Config, diagnostics: d.Diagnostic[]) =
     You can configure the commonjs settings using the "commonjs" property in "stencil.config.ts`;
   }
 
-  if (!config.rollupPlugins) {
-    config.rollupPlugins = {};
-  }
   config.rollupPlugins.before = [
     ...config.rollupPlugins.before || [],
     ...rollupPlugins.filter(({ name }) => name !== 'node-resolve' && name !== 'commonjs')
