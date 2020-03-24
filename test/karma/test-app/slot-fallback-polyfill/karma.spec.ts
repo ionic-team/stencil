@@ -58,7 +58,6 @@ describe('slot-fallback-polyfill', () => {
     result = app.querySelector('.results1 article span slot-fb[name="end"][hidden]');
     expect(result.textContent).toBe('slot end fallback 1');
 
-    console.log('here');
     // light dom content rendered
     result = app.querySelector('.results1 content-start[slot="start"]');
     expect(result.textContent).toBe('slot light dom 0 : start');

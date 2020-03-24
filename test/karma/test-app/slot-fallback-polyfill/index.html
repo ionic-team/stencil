@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <meta charset="utf8">
-<script>
-  document.head.attachShadow = undefined;
-</script>
-<script src="/build/testapp.esm.js" type="module"></script>
-<script src="/build/testapp.js" nomodule></script>
+<head>
+  <script>
+    document.head.attachShadow = undefined;
+  </script>
+  <script src="/build/testapp.esm.js" type="module"></script>
+  <script src="/build/testapp.js" nomodule></script>
+</head>
+<body>
+  <slot-fallback-root-polyfill></slot-fallback-root-polyfill>
+</body>
 
-<slot-fallback-root-polyfill></slot-fallback-root-polyfill>
