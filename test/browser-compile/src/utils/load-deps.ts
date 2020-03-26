@@ -1,4 +1,3 @@
-
 export const loadDeps = async (resolveLookup: Map<string, string>, fs: Map<string, string>) => {
   resolveLookup.set('@stencil/core/internal/client', '/@stencil/core/internal/client/index.mjs');
   resolveLookup.set('@stencil/core/internal/app-data', '/@stencil/core/internal/app-data/index.mjs');
@@ -9,7 +8,7 @@ export const loadDeps = async (resolveLookup: Map<string, string>, fs: Map<strin
   const rollupDep = stencil.dependencies.find((dep: any) => dep.name === 'rollup');
 
   const depPromises = Promise.all([
-    loadDep(`https://cdn.jsdelivr.net/npm/typescript@${tsDep.version}${tsDep.main}`),
+    loadDep(`https://cdn.jsdelivr.net/npm/typescript@${tsDep.version}/${tsDep.main}`),
     loadDep(`https://cdn.jsdelivr.net/npm/rollup@${rollupDep.version}/dist/rollup.browser.js`),
   ]);
 
@@ -21,15 +20,15 @@ export const loadDeps = async (resolveLookup: Map<string, string>, fs: Map<strin
     await fetch('/@stencil/core/internal/client/dom.mjs'),
   ]);
 
-  await Promise.all(fetchResults.map(async r => {
-    const file = (new URL(r.url)).pathname;
-    const code = await r.text();
-    fs.set(file, code);
-  }));
-
-  await depPromises;
-}
-
+  await Promise.all([
+    fetchResults.map(async r => {
+      const file = new URL(r.url).pathname;
+      const code = await r.text();
+      fs.set(file, code);
+    }),
+    depPromises,
+  ]);
+};
 
 const loadDep = (url: string) => {
   return new Promise((resolve, reject) => {
@@ -38,7 +37,7 @@ const loadDep = (url: string) => {
       console.log('loaded dep:', url);
       setTimeout(resolve);
     };
-    script.onerror = (e) => {
+    script.onerror = e => {
       console.log('error loading dep:', url);
       reject(e);
     };

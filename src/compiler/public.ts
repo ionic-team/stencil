@@ -46,6 +46,7 @@ export interface CompilerDependency {
   name: string;
   version: string;
   main: string;
+  resources?: string[];
 }
 export declare const optimizeCss: (cssInput?: OptimizeCssInput) => Promise<OptimizeCssOutput>;
 export declare const optimizeJs: (jsInput?: OptimizeJsInput) => Promise<OptimizeJsOutput>;

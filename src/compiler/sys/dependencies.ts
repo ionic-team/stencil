@@ -7,7 +7,7 @@ const getRemoteModuleUrl = (sys: CompilerSystem, module: { moduleId: string; ver
     return sys.getRemoteModuleUrl(module);
   }
   const base = `https://cdn.jsdelivr.net/npm/`;
-  const path = `${module.moduleId}${module.version ? '@' + module.version : ''}${module.path}`;
+  const path = `${module.moduleId}${module.version ? '@' + module.version : ''}/${module.path}`;
   return new URL(path, base).href;
 };
 
