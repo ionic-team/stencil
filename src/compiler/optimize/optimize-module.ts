@@ -2,7 +2,7 @@ import { CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declaration
 import { minfyJsId } from '../../version';
 import { transpileToEs5 } from '../transpile/transpile-to-es5';
 import { minifyJs } from './minify-js';
-import { DEFAULT_STYLE_MODE } from '@utils';
+import { DEFAULT_STYLE_MODE, hasError } from '@utils';
 import { CompressOptions, MangleOptions, MinifyOptions } from 'terser';
 
 interface OptimizeModuleOptions {
@@ -124,7 +124,7 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
 export const prepareModule = async (input: string, minifyOpts: MinifyOptions, transpile: boolean, inlineHelpers: boolean) => {
   if (transpile) {
     const transpile = await transpileToEs5(input, inlineHelpers);
-    if (transpile.diagnostics.length > 0) {
+    if (hasError(transpile.diagnostics)) {
       return {
         sourceMap: null,
         output: null,

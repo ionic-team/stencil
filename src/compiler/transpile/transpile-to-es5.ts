@@ -35,6 +35,6 @@ export const transpileToEs5 = async (input: string, inlineHelpers: boolean) => {
 
   const tsResults = ts.transpileModule(input, transpileOpts);
   results.diagnostics.push(...loadTypeScriptDiagnostics(tsResults.diagnostics));
-
+  results.code = tsResults.outputText;
   return results;
 };
