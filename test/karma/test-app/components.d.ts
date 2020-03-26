@@ -248,12 +248,7 @@ export namespace Components {
     interface SlotFallback {
         "inc": number;
     }
-    interface SlotFallbackPolyfill {
-        "inc": number;
-    }
     interface SlotFallbackRoot {
-    }
-    interface SlotFallbackRootPolyfill {
     }
     interface SlotHtml {
         "inc": number;
@@ -850,23 +845,11 @@ declare global {
         prototype: HTMLSlotFallbackElement;
         new (): HTMLSlotFallbackElement;
     };
-    interface HTMLSlotFallbackPolyfillElement extends Components.SlotFallbackPolyfill, HTMLStencilElement {
-    }
-    var HTMLSlotFallbackPolyfillElement: {
-        prototype: HTMLSlotFallbackPolyfillElement;
-        new (): HTMLSlotFallbackPolyfillElement;
-    };
     interface HTMLSlotFallbackRootElement extends Components.SlotFallbackRoot, HTMLStencilElement {
     }
     var HTMLSlotFallbackRootElement: {
         prototype: HTMLSlotFallbackRootElement;
         new (): HTMLSlotFallbackRootElement;
-    };
-    interface HTMLSlotFallbackRootPolyfillElement extends Components.SlotFallbackRootPolyfill, HTMLStencilElement {
-    }
-    var HTMLSlotFallbackRootPolyfillElement: {
-        prototype: HTMLSlotFallbackRootPolyfillElement;
-        new (): HTMLSlotFallbackRootPolyfillElement;
     };
     interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {
     }
@@ -1103,9 +1086,7 @@ declare global {
         "slot-dynamic-wrapper": HTMLSlotDynamicWrapperElement;
         "slot-dynamic-wrapper-root": HTMLSlotDynamicWrapperRootElement;
         "slot-fallback": HTMLSlotFallbackElement;
-        "slot-fallback-polyfill": HTMLSlotFallbackPolyfillElement;
         "slot-fallback-root": HTMLSlotFallbackRootElement;
-        "slot-fallback-root-polyfill": HTMLSlotFallbackRootPolyfillElement;
         "slot-html": HTMLSlotHtmlElement;
         "slot-light-dom-content": HTMLSlotLightDomContentElement;
         "slot-light-dom-root": HTMLSlotLightDomRootElement;
@@ -1371,12 +1352,7 @@ declare namespace LocalJSX {
     interface SlotFallback {
         "inc"?: number;
     }
-    interface SlotFallbackPolyfill {
-        "inc"?: number;
-    }
     interface SlotFallbackRoot {
-    }
-    interface SlotFallbackRootPolyfill {
     }
     interface SlotHtml {
         "inc"?: number;
@@ -1522,9 +1498,7 @@ declare namespace LocalJSX {
         "slot-dynamic-wrapper": SlotDynamicWrapper;
         "slot-dynamic-wrapper-root": SlotDynamicWrapperRoot;
         "slot-fallback": SlotFallback;
-        "slot-fallback-polyfill": SlotFallbackPolyfill;
         "slot-fallback-root": SlotFallbackRoot;
-        "slot-fallback-root-polyfill": SlotFallbackRootPolyfill;
         "slot-html": SlotHtml;
         "slot-light-dom-content": SlotLightDomContent;
         "slot-light-dom-root": SlotLightDomRoot;
@@ -1645,9 +1619,7 @@ declare module "@stencil/core" {
             "slot-dynamic-wrapper": LocalJSX.SlotDynamicWrapper & JSXBase.HTMLAttributes<HTMLSlotDynamicWrapperElement>;
             "slot-dynamic-wrapper-root": LocalJSX.SlotDynamicWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotDynamicWrapperRootElement>;
             "slot-fallback": LocalJSX.SlotFallback & JSXBase.HTMLAttributes<HTMLSlotFallbackElement>;
-            "slot-fallback-polyfill": LocalJSX.SlotFallbackPolyfill & JSXBase.HTMLAttributes<HTMLSlotFallbackPolyfillElement>;
             "slot-fallback-root": LocalJSX.SlotFallbackRoot & JSXBase.HTMLAttributes<HTMLSlotFallbackRootElement>;
-            "slot-fallback-root-polyfill": LocalJSX.SlotFallbackRootPolyfill & JSXBase.HTMLAttributes<HTMLSlotFallbackRootPolyfillElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
             "slot-light-dom-content": LocalJSX.SlotLightDomContent & JSXBase.HTMLAttributes<HTMLSlotLightDomContentElement>;
             "slot-light-dom-root": LocalJSX.SlotLightDomRoot & JSXBase.HTMLAttributes<HTMLSlotLightDomRootElement>;
