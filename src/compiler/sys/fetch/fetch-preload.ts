@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { getRemoteTypeScriptUrl } from '../dependencies';
+import { dependencies, getRemoteTypeScriptUrl } from '../dependencies';
 import { httpFetch } from './fetch-utils';
 import { IS_FETCH_ENV, IS_WEB_WORKER_ENV } from '@utils';
 import { join } from 'path';
@@ -30,48 +30,23 @@ export const fetchPreloadFs = async (config: d.Config, inMemoryFs: d.InMemoryFil
 };
 
 const getCoreFetchPreloadUrls = (config: d.Config, compilerUrl: string) => {
-  const stencilUrl = new URL('..', compilerUrl);
-  const tsUrl = new URL('..', getRemoteTypeScriptUrl());
+  const stencilCoreBase = new URL('..', compilerUrl);
+  const stencilResourcePaths = dependencies.find(dep => dep.name === '@stencil/core').resources;
+  const tsLibBase = new URL('..', getRemoteTypeScriptUrl(config.sys));
+  const tsResourcePaths = dependencies.find(dep => dep.name === 'typescript').resources;
+
   return [
-    ...stencilPreloadPaths.map(p => {
+    ...stencilResourcePaths.map(p => {
       return {
-        url: new URL(p, stencilUrl).href,
+        url: new URL(p, stencilCoreBase).href,
         filePath: join(config.rootDir, 'node_modules', '@stencil', 'core', p),
       };
     }),
-    ...tsPreloadPaths.map(p => {
+    ...tsResourcePaths.map(p => {
       return {
-        url: new URL(p, tsUrl).href,
+        url: new URL(p, tsLibBase).href,
         filePath: join(config.rootDir, 'node_modules', 'typescript', p),
       };
     }),
   ];
 };
-
-const stencilPreloadPaths = [
-  'internal/index.d.ts',
-  'internal/stencil-core.js',
-  'internal/stencil-core.d.ts',
-  'internal/stencil-ext-modules.d.ts',
-  'internal/stencil-private.d.ts',
-  'internal/stencil-public-compiler.d.ts',
-  'internal/stencil-public-docs.d.ts',
-  'internal/stencil-public-runtime.d.ts',
-  'package.json',
-];
-
-const tsPreloadPaths = [
-  'lib/lib.dom.d.ts',
-  'lib/lib.es2015.d.ts',
-  'lib/lib.es5.d.ts',
-  'lib/lib.es2015.core.d.ts',
-  'lib/lib.es2015.collection.d.ts',
-  'lib/lib.es2015.generator.d.ts',
-  'lib/lib.es2015.iterable.d.ts',
-  'lib/lib.es2015.symbol.d.ts',
-  'lib/lib.es2015.promise.d.ts',
-  'lib/lib.es2015.proxy.d.ts',
-  'lib/lib.es2015.reflect.d.ts',
-  'lib/lib.es2015.symbol.wellknown.d.ts',
-  'package.json',
-];

@@ -198,7 +198,7 @@ export interface StencilConfig {
    * @deprecated Use the "include" option in "tsconfig.json"
    */
   includeSrc?: string[];
-  rollupPlugins?: {before?: any[], after?: any[]};
+  rollupPlugins?: { before?: any[]; after?: any[] };
 
   entryComponentsHint?: string[];
   buildDist?: boolean;
@@ -493,6 +493,10 @@ export interface CompilerSystem {
    * The compiler's current executing path. Like the compiler's __filename on NodeJS or location.href in a web worker.
    */
   getCompilerExecutingPath(): string;
+  /**
+   * Gets the full url when requesting a node_module to fetch from a CDN.
+   */
+  getRemoteModuleUrl?(module: { moduleId: string; path?: string; version?: string }): string;
   /**
    * Aync glob task. Only available in NodeJS compiler system.
    */
