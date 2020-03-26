@@ -270,7 +270,7 @@ const convertChunk = async (
     modeName,
   });
   buildCtx.diagnostics.push(...optimizeResults.diagnostics);
-  if (optimizeResults.diagnostics.length === 0 && typeof optimizeResults.output === 'string') {
+  if (typeof optimizeResults.output === 'string') {
     code = optimizeResults.output;
   }
   return code;
