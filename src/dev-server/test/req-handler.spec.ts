@@ -49,7 +49,7 @@ describe('request-handler', () => {
     res.writeHead = (statusCode: number, headers: any): any => {
       res.$statusCode = statusCode;
       res.$headers = headers;
-      res.$contentType = headers['Content-Type'];
+      res.$contentType = headers['content-type'];
     };
 
     res.write = (content: any) => {
@@ -147,7 +147,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content).toContain('root-index');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
 
     it('should load historyApiFallback index.html when trailing slash', async () => {
@@ -165,7 +165,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content).toContain('root-index');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
 
     it('should list directory when ended in slash and not using historyApiFallback', async () => {
@@ -183,7 +183,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content).toContain('tmpl-dir');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
   });
 
@@ -203,7 +203,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content).toContain('about-us-index-directory');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
 
     it('should redirect directory w/ slash', async () => {
@@ -233,7 +233,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content).toContain('aboutus');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
 
     it('get directory index.html with trailing slash and base url', async () => {
@@ -247,7 +247,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content).toContain('aboutus');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
 
     it('get directory index.html with trailing slash', async () => {
@@ -260,7 +260,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content).toContain('aboutus');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
   });
 
@@ -273,7 +273,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(404);
       expect(res.$content).toContain('/index.html');
-      expect(res.$contentType).toBe('text/plain;charset=UTF-8');
+      expect(res.$contentType).toBe('text/plain; charset=utf-8');
     });
   });
 
@@ -289,7 +289,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content).toContain('tmpl-dir');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
 
     it('serve root index.html w/ querystring', async () => {
@@ -302,7 +302,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content).toContain('hello');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
 
     it('serve root index.html w/ base url', async () => {
@@ -315,7 +315,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content).toContain('hello');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
 
     it('serve root index.html', async () => {
@@ -327,7 +327,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content).toContain('hello');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
 
     it('302 redirect to / when no path at all', async () => {
@@ -352,7 +352,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content.split('\n')[0]).toContain('html');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
 
     it('should load html file', async () => {
@@ -364,7 +364,7 @@ describe('request-handler', () => {
       await handler(req, res);
       expect(res.$statusCode).toBe(200);
       expect(res.$content.split('\n')[0]).toContain('html');
-      expect(res.$contentType).toBe('text/html;charset=UTF-8');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
   });
 
