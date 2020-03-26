@@ -188,6 +188,7 @@ export interface StencilConfig {
    */
   hydratedFlag?: HydratedFlag;
 
+  asyncQueue?: boolean;
   globalScript?: string;
   srcIndexHtml?: string;
   watch?: boolean;

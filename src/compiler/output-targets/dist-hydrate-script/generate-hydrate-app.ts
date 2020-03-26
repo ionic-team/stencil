@@ -119,6 +119,7 @@ const getHydrateBuildConditionals = (config: d.Config, cmps: d.ComponentCompiler
   updateBuildConditionals(config, build);
   build.lifecycleDOMEvents = false;
   build.devTools = false;
+  build.asyncQueue = false;
   build.hotModuleReplacement = false;
   build.cloneNodeFix = false;
   build.appendChildSlotFix = false;

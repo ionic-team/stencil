@@ -105,8 +105,7 @@ const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[])
   build.lazyLoad = false;
   build.hydrateClientSide = false;
   build.hydrateServerSide = false;
-
-  build.taskQueue = false;
+  build.asyncQueue = false;
   updateBuildConditionals(config, build);
   build.devTools = false;
 
