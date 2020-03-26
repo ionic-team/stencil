@@ -1302,7 +1302,7 @@ export namespace JSXBase {
     'ascent'?: number | string;
     'attributeName'?: string;
     'attributeType'?: string;
-    'auto-reverse'?: number | string;
+    'autoReverse'?: number | string;
     'azimuth'?: number | string;
     'baseFrequency'?: number | string;
     'baseline-shift'?: number | string;
