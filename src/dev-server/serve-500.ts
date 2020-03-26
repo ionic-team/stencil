@@ -8,7 +8,7 @@ export function serve500(devServerConfig: d.DevServerConfig, req: d.HttpRequest,
     res.writeHead(
       500,
       responseHeaders({
-        'Content-Type': 'text/plain;charset=UTF-8',
+        'content-type': 'text/plain; charset=utf-8',
       }),
     );
 

@@ -1199,13 +1199,23 @@ export interface CssVarShim {
 }
 
 export interface DevServer extends BuildEmitEvents {
+  address: string;
+  basePath: string;
   browserUrl: string;
+  protocol: string;
+  port: number;
+  root: string;
   close(): Promise<void>;
 }
 
 export interface DevServerStartResponse {
+  address: string;
+  basePath: string;
   browserUrl: string;
   initialLoadUrl: string;
+  protocol: string;
+  port: number;
+  root: string;
   error: string;
 }
 
@@ -1253,15 +1263,15 @@ export interface DevServerMessage {
 export type DevServerDestroy = () => void;
 
 export interface DevResponseHeaders {
-  'Cache-Control'?: string;
-  'Expires'?: string;
-  'Content-Type'?: string;
-  'Content-Length'?: number;
-  'Access-Control-Allow-Origin'?: string;
-  'Content-Encoding'?: 'gzip';
-  'Vary'?: 'Accept-Encoding';
-  'X-Powered-By'?: string;
-  'X-Directory-Index'?: string;
+  'cache-control'?: string;
+  'expires'?: string;
+  'content-type'?: string;
+  'content-length'?: number;
+  'access-control-allow-origin'?: string;
+  'content-encoding'?: 'gzip';
+  'vary'?: 'Accept-Encoding';
+  'server'?: string;
+  'x-directory-index'?: string;
 }
 
 export interface OpenInEditorData {

@@ -55,8 +55,8 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
       res.writeHead(
         200,
         responseHeaders({
-          'Content-Type': 'text/html;charset=UTF-8',
-          'X-Directory-Index': req.pathname,
+          'content-type': 'text/html; charset=utf-8',
+          'x-directory-index': req.pathname,
         }),
       );
 

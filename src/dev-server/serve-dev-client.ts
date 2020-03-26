@@ -56,7 +56,7 @@ async function serveDevClientScript(devServerConfig: d.DevServerConfig, sys: d.C
       res.writeHead(
         200,
         util.responseHeaders({
-          'Content-Type': 'text/html;charset=UTF-8',
+          'content-type': 'text/html; charset=utf-8',
         }),
       );
       res.write(content);

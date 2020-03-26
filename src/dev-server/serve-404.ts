@@ -14,7 +14,7 @@ export async function serve404(devServerConfig: d.DevServerConfig, req: d.HttpRe
         res.writeHead(
           200,
           responseHeaders({
-            'Content-Type': 'image/x-icon',
+            'content-type': 'image/x-icon',
           }),
         );
         const rs = fs.createReadStream(defaultFavicon);
@@ -22,7 +22,7 @@ export async function serve404(devServerConfig: d.DevServerConfig, req: d.HttpRe
           res.writeHead(
             404,
             responseHeaders({
-              'Content-Type': 'text/plain;charset=UTF-8',
+              'content-type': 'text/plain; charset=utf-8',
             }),
           );
           res.write(util.inspect(err));
@@ -56,7 +56,7 @@ export async function serve404(devServerConfig: d.DevServerConfig, req: d.HttpRe
 export function serve404Content(devServerConfig: d.DevServerConfig, req: d.HttpRequest, res: http.ServerResponse, content: string) {
   try {
     const headers = responseHeaders({
-      'Content-Type': 'text/plain;charset=UTF-8',
+      'content-type': 'text/plain; charset=utf-8',
     });
 
     res.writeHead(404, headers);

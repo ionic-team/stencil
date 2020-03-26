@@ -6,6 +6,7 @@ import {
   DevServer,
   DevServerConfig,
   DevServerMessage,
+  DevServerStartResponse,
   Logger,
   StencilDevServerConfig,
 } from '../declarations';
@@ -54,7 +55,12 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
     }
 
     devServer = {
+      address: starupDevServerConfig.address,
+      basePath: starupDevServerConfig.basePath,
       browserUrl: starupDevServerConfig.browserUrl,
+      port: starupDevServerConfig.port,
+      protocol: starupDevServerConfig.protocol,
+      root: starupDevServerConfig.root,
       close() {
         try {
           if (serverProcess) {
@@ -84,7 +90,7 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
 function startWorkerServer(devServerConfig: DevServerConfig, logger: Logger, watcher: CompilerWatcher, serverProcess: ChildProcess, devServerContext: DevServerMainContext) {
   let hasStarted = false;
 
-  return new Promise<DevServerConfig>((resolve, reject) => {
+  return new Promise<DevServerStartResponse>((resolve, reject) => {
     serverProcess.stdout.on('data', (data: any) => {
       // the child server process has console logged data
       logger.debug(`dev server: ${data}`);

@@ -28,6 +28,14 @@ export async function taskWatch(prcs: NodeJS.Process, config: d.Config) {
     const checkVersionResults = await checkVersionPromise;
     checkVersionResults();
 
+    if (devServer) {
+      const rmDevServerLog = watcher.on('buildFinish', () => {
+        // log the dev server url one time
+        config.logger.info(`${config.logger.cyan(devServer.browserUrl)}\n`);
+        rmDevServerLog();
+      });
+    }
+
     const closeResults = await watcher.start();
     if (closeResults.exitCode > 0) {
       exitCode = closeResults.exitCode;

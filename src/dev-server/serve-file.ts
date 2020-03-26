@@ -28,9 +28,9 @@ export async function serveFile(devServerConfig: d.DevServerConfig, sys: d.Compi
         res.writeHead(
           200,
           util.responseHeaders({
-            'Content-Type': util.getContentType(devServerConfig, req.filePath) + ';charset=UTF-8',
-            'Content-Encoding': 'gzip',
-            'Vary': 'Accept-Encoding',
+            'content-type': util.getContentType(devServerConfig, req.filePath) + '; charset=utf-8',
+            'content-encoding': 'gzip',
+            'vary': 'Accept-Encoding',
           }),
         );
 
@@ -42,8 +42,8 @@ export async function serveFile(devServerConfig: d.DevServerConfig, sys: d.Compi
         res.writeHead(
           200,
           util.responseHeaders({
-            'Content-Type': util.getContentType(devServerConfig, req.filePath) + ';charset=UTF-8',
-            'Content-Length': Buffer.byteLength(content, 'utf8'),
+            'content-type': util.getContentType(devServerConfig, req.filePath) + '; charset=utf-8',
+            'content-length': Buffer.byteLength(content, 'utf8'),
           }),
         );
         res.write(content);
@@ -55,8 +55,8 @@ export async function serveFile(devServerConfig: d.DevServerConfig, sys: d.Compi
       res.writeHead(
         200,
         util.responseHeaders({
-          'Content-Type': util.getContentType(devServerConfig, req.filePath),
-          'Content-Length': req.stats.size,
+          'content-type': util.getContentType(devServerConfig, req.filePath),
+          'content-length': req.stats.size,
         }),
       );
       fs.createReadStream(req.filePath).pipe(res);
