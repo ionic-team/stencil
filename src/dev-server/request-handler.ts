@@ -51,7 +51,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, sys: d.
           });
         }
 
-        return serve404Content(devServerConfig, req, res, `404 File Not Found, base path: ${devServerConfig.basePath}`);
+        return serve404Content(devServerConfig, req, res, `404 File Not Found, base path: ${devServerConfig.basePath}`, `invalid basePath`);
       }
 
       try {
@@ -68,21 +68,28 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, sys: d.
         }
       } catch (e) {}
 
-      if (isValidHistoryApi(devServerConfig, req)) {
+      const xSource = ['notfound'];
+      const validHistoryApi = isValidHistoryApi(devServerConfig, req);
+      xSource.push(`validHistoryApi: ${validHistoryApi}`);
+
+      if (validHistoryApi) {
         try {
           const indexFilePath = path.join(devServerConfig.root, devServerConfig.historyApiFallback.index);
+          xSource.push(`indexFilePath: ${indexFilePath}`);
 
           req.stats = await sys.stat(indexFilePath);
           if (req.stats && req.stats.isFile()) {
             req.filePath = indexFilePath;
             return serveFile(devServerConfig, sys, req, res);
           }
-        } catch (e) {}
+        } catch (e) {
+          xSource.push(`notfound error: ${e}`);
+        }
       }
 
-      return serve404(devServerConfig, req, res);
+      return serve404(devServerConfig, req, res, xSource.join(', '));
     } catch (e) {
-      return serve500(devServerConfig, incomingReq as any, res, e);
+      return serve500(devServerConfig, incomingReq as any, res, e, `not found error`);
     }
   };
 }

@@ -73,10 +73,10 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
         });
       }
     } catch (e) {
-      serve500(devServerConfig, req, res, e);
+      serve500(devServerConfig, req, res, e, 'serveDirectoryIndex');
     }
   } catch (e) {
-    serve404(devServerConfig, req, res);
+    serve404(devServerConfig, req, res, 'serveDirectoryIndex');
   }
 }
 

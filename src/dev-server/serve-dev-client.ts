@@ -30,12 +30,12 @@ export async function serveDevClient(devServerConfig: d.DevServerConfig, sys: d.
       if (req.stats) {
         return serveFile(devServerConfig, sys, req, res);
       }
-      return serve404(devServerConfig, req, res);
+      return serve404(devServerConfig, req, res, 'serveDevClient no stats');
     } catch (e) {
-      return serve404(devServerConfig, req, res);
+      return serve404(devServerConfig, req, res, `serveDevClient stats error ${e}`);
     }
   } catch (e) {
-    return serve500(devServerConfig, req, res, e);
+    return serve500(devServerConfig, req, res, e, 'serveDevClient');
   }
 }
 
@@ -62,9 +62,9 @@ async function serveDevClientScript(devServerConfig: d.DevServerConfig, sys: d.C
       res.write(content);
       res.end();
     } else {
-      serve404(devServerConfig, req, res);
+      serve404(devServerConfig, req, res, 'serveDevClientScript');
     }
   } catch (e) {
-    serve500(devServerConfig, req, res, e);
+    serve500(devServerConfig, req, res, e, 'serveDevClientScript');
   }
 }

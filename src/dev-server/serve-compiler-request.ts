@@ -29,8 +29,8 @@ export async function serveCompilerRequest(devServerConfig: d.DevServerConfig, r
       return;
     }
 
-    return serve404(devServerConfig, req, res);
+    return serve404(devServerConfig, req, res, 'serveCompilerRequest');
   } catch (e) {
-    return serve500(devServerConfig, req, res, e);
+    return serve500(devServerConfig, req, res, e, 'serveCompilerRequest');
   }
 }

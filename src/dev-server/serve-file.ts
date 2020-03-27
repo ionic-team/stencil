@@ -72,7 +72,7 @@ export async function serveFile(devServerConfig: d.DevServerConfig, sys: d.Compi
       });
     }
   } catch (e) {
-    serve500(devServerConfig, req, res, e);
+    serve500(devServerConfig, req, res, e, 'serveFile');
   }
 }
 

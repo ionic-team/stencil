@@ -1272,6 +1272,7 @@ export interface DevResponseHeaders {
   'vary'?: 'Accept-Encoding';
   'server'?: string;
   'x-directory-index'?: string;
+  'x-source'?: string;
 }
 
 export interface OpenInEditorData {
