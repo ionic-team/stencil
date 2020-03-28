@@ -1267,7 +1267,9 @@ export interface DevResponseHeaders {
   'expires'?: string;
   'content-type'?: string;
   'content-length'?: number;
+  'date'?: string;
   'access-control-allow-origin'?: string;
+  'access-control-expose-headers'?: string;
   'content-encoding'?: 'gzip';
   'vary'?: 'Accept-Encoding';
   'server'?: string;
