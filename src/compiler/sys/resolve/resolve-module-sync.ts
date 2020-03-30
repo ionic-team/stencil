@@ -1,9 +1,9 @@
 import * as d from '../../../declarations';
-import { COMMON_DIR_FILENAMES, NODE_MODULES_FS_DIR, getCdnPackageJsonUrl, getCommonDirName, isCommonDirModuleFile, shouldFetchModule } from './resolve-utils';
+import { COMMON_DIR_FILENAMES, getCdnPackageJsonUrl, getCommonDirName, isCommonDirModuleFile, shouldFetchModule } from './resolve-utils';
 import { fetchModuleSync } from '../fetch/fetch-module-sync';
 import { getCommonDirUrl, getNodeModuleFetchUrl, packageVersions } from '../fetch/fetch-utils';
 import { isString, IS_WEB_WORKER_ENV, normalizeFsPath } from '@utils';
-import { dirname, join } from 'path';
+import { basename, dirname, join } from 'path';
 import resolve, { SyncOpts } from 'resolve';
 
 export const resolveRemoteModuleIdSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, containingFile: string) => {
@@ -25,7 +25,7 @@ export const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InM
   const filePath = join(config.rootDir, 'node_modules', moduleId, 'package.json');
   let pkgJson = inMemoryFs.readFileSync(filePath);
   if (!isString(pkgJson) && IS_WEB_WORKER_ENV) {
-    const url = getCdnPackageJsonUrl(moduleId);
+    const url = getCdnPackageJsonUrl(config.sys, moduleId);
     pkgJson = fetchModuleSync(inMemoryFs, packageVersions, url, filePath);
   }
   if (isString(pkgJson)) {
@@ -51,12 +51,11 @@ export const resolvePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryF
 
 export const resolveModuleIdSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, basedir: string, exts: string[]) => {
   const opts = createCustomResolverSync(config, inMemoryFs, basedir, exts);
-  return resolve.sync(moduleId, opts);
+  const resolvedModule = resolve.sync(moduleId, opts);
+  return resolvedModule;
 };
 
 export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, basedir: string, exts: string[]): SyncOpts => {
-  const compilerExecutingPath = config.sys.getCompilerExecutingPath();
-
   return {
     basedir,
 
@@ -74,9 +73,9 @@ export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemor
           return false;
         }
 
-        const url = getNodeModuleFetchUrl(compilerExecutingPath, packageVersions, fsFilePath);
+        const url = getNodeModuleFetchUrl(config.sys, packageVersions, fsFilePath);
         const content = fetchModuleSync(inMemoryFs, packageVersions, url, fsFilePath);
-        return isString(content);
+        return typeof content === 'string';
       }
 
       return false;
@@ -91,9 +90,9 @@ export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemor
       }
 
       if (shouldFetchModule(fsDirPath)) {
-        if (fsDirPath === NODE_MODULES_FS_DIR) {
+        if (basename(fsDirPath) === 'node_modules') {
           // just the /node_modules directory
-          inMemoryFs.sys.mkdirSync(NODE_MODULES_FS_DIR);
+          inMemoryFs.sys.mkdirSync(fsDirPath);
           inMemoryFs.clearFileCache(fsDirPath);
           return true;
         }
@@ -104,7 +103,7 @@ export const createCustomResolverSync = (config: d.Config, inMemoryFs: d.InMemor
         }
 
         const checkFileExists = (fileName: string) => {
-          const url = getCommonDirUrl(compilerExecutingPath, packageVersions, fsDirPath, fileName);
+          const url = getCommonDirUrl(config.sys, packageVersions, fsDirPath, fileName);
           const filePath = getCommonDirName(fsDirPath, fileName);
           const content = fetchModuleSync(inMemoryFs, packageVersions, url, filePath);
           return isString(content);

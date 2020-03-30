@@ -1,15 +1,6 @@
 import { CompilerSystem } from '../../declarations';
 import { rollupVersion, version, terserVersion, typescriptVersion } from '../../version';
-import { isFunction } from '@utils';
-
-const getRemoteModuleUrl = (sys: CompilerSystem, module: { moduleId: string; version: string; path: string }) => {
-  if (sys && isFunction(sys.getRemoteModuleUrl)) {
-    return sys.getRemoteModuleUrl(module);
-  }
-  const base = `https://cdn.jsdelivr.net/npm/`;
-  const path = `${module.moduleId}${module.version ? '@' + module.version : ''}/${module.path}`;
-  return new URL(path, base).href;
-};
+import { getRemoteModuleUrl } from '../sys/resolve/resolve-utils';
 
 export const getRemoteTypeScriptUrl = (sys: CompilerSystem) => {
   const tsDep = dependencies.find(dep => dep.name === 'typescript');

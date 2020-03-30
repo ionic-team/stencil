@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
 import { isFunction, normalizePath } from '@utils';
-import { NODE_MODULES_CDN_URL, NODE_MODULES_FS_DIR, STENCIL_CORE_MODULE, isCommonDirModuleFile, isTsFile, isTsxFile } from '../resolve/resolve-utils';
+import { getRemoteModuleUrl, isCommonDirModuleFile, isTsFile, isTsxFile } from '../resolve/resolve-utils';
+import { join } from 'path';
 
 export const httpFetch = (sys: d.CompilerSystem, input: RequestInfo, init?: RequestInit) => {
   if (sys && isFunction(sys.fetch)) {
@@ -12,49 +13,62 @@ export const httpFetch = (sys: d.CompilerSystem, input: RequestInfo, init?: Requ
 export const packageVersions = new Map<string, string>();
 export const known404Urls = new Set<string>();
 
+export const getStencilModulePath = (config: d.Config, p: string) => join(config.rootDir, 'node_modules', '@stencil', 'core', p);
+
+export const getStencilInternalDtsPath = (config: d.Config) => getStencilModulePath(config, 'internal/index.d.ts');
+
 export const getStencilRootUrl = (compilerExe: string) => new URL('../', compilerExe).href;
 
 export const getStencilModuleUrl = (compilerExe: string, p: string) => {
-  p = p.replace(STENCIL_CORE_MODULE, '');
+  p = normalizePath(p);
+  let parts = p.split('/');
+  const nmIndex = parts.lastIndexOf('node_modules');
+  if (nmIndex > -1 && nmIndex < parts.length - 1) {
+    parts = parts.slice(nmIndex + 1);
+    if (parts[0].startsWith('@')) {
+      parts = parts.slice(2);
+    } else {
+      parts = parts.slice(1);
+    }
+    p = parts.join('/');
+  }
   return new URL('./' + p, getStencilRootUrl(compilerExe)).href;
 };
 
 export const getStencilInternalDtsUrl = (compilerExe: string) => getStencilModuleUrl(compilerExe, 'internal/index.d.ts');
 
-export const getCommonDirUrl = (compilerExe: string, pkgVersions: Map<string, string>, dirPath: string, fileName: string) =>
-  getNodeModuleFetchUrl(compilerExe, pkgVersions, dirPath) + '/' + fileName;
+export const getCommonDirUrl = (sys: d.CompilerSystem, pkgVersions: Map<string, string>, dirPath: string, fileName: string) =>
+  getNodeModuleFetchUrl(sys, pkgVersions, dirPath) + '/' + fileName;
 
-export const getNodeModuleFetchUrl = (compilerExe: string, pkgVersions: Map<string, string>, filePath: string) => {
-  if (filePath.startsWith(STENCIL_CORE_MODULE)) {
-    // /node_modules/@stencil/core/package.json
-    return getStencilModuleUrl(compilerExe, filePath);
-  }
-
+export const getNodeModuleFetchUrl = (sys: d.CompilerSystem, pkgVersions: Map<string, string>, filePath: string) => {
   // /node_modules/lodash/package.json
-  const pathParts = normalizePath(filePath)
-    .split('/')
-    .filter(p => p.length);
+  filePath = normalizePath(filePath);
+
   // ["node_modules", "lodash", "package.json"]
+  let pathParts = filePath.split('/').filter(p => p.length);
 
-  if (pathParts[0] === 'node_modules') {
-    // ["lodash", "package.json"]
-    pathParts.shift();
+  const nmIndex = pathParts.lastIndexOf('node_modules');
+  if (nmIndex > -1 && nmIndex < pathParts.length - 1) {
+    pathParts = pathParts.slice(nmIndex + 1);
   }
 
-  let urlPath = filePath.replace(NODE_MODULES_FS_DIR + '/', '/');
-  const checkScopedModule = `/${pathParts[0]}/${pathParts[1]}/`;
-  const scopedPkgVersion = pkgVersions.get(checkScopedModule);
-  if (scopedPkgVersion) {
-    urlPath = urlPath.replace(checkScopedModule, checkScopedModule.substring(0, checkScopedModule.length - 1) + '@' + scopedPkgVersion + '/');
-  } else {
-    const checkModule = `/${pathParts[0]}/`;
-    const pkgVersion = pkgVersions.get(checkModule);
-    if (pkgVersion) {
-      urlPath = urlPath.replace(checkModule, checkModule.substring(0, checkModule.length - 1) + '@' + pkgVersion + '/');
-    }
+  let moduleId = pathParts.shift();
+
+  if (moduleId.startsWith('@')) {
+    moduleId += '/' + pathParts.shift();
   }
 
-  return NODE_MODULES_CDN_URL + urlPath;
+  const path = pathParts.join('/');
+  if (moduleId === '@stencil/core') {
+    const compilerExe = sys.getCompilerExecutingPath();
+    return getStencilModuleUrl(compilerExe, path);
+  }
+
+  return getRemoteModuleUrl(sys, {
+    moduleId,
+    version: pkgVersions.get(moduleId),
+    path,
+  });
 };
 
 export const skipFilePathFetch = (filePath: string) => {
