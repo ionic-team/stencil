@@ -1,6 +1,6 @@
 import { Config, ConfigBundle, Diagnostic } from '../../declarations';
 import { buildError, buildWarn, isBoolean, isNumber, sortBy } from '@utils';
-import { setBooleanConfig, setStringConfig } from './config-utils';
+import { setBooleanConfig } from './config-utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace } from './validate-namespace';
 import { validateHydrated } from './validate-hydrated';
