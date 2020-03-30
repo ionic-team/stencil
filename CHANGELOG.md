@@ -1,17 +1,18 @@
-## 🎱 [1.11.3-0](https://github.com/ionic-team/stencil/compare/v1.11.2...v1.11.3-0) (2020-03-26)
-
-
-### Bug Fixes
-
-* **bundle:** add browser main field back ([#2305](https://github.com/ionic-team/stencil/issues/2305)) ([8d7d49f](https://github.com/ionic-team/stencil/commit/8d7d49ffbcc41123fae93d5f8d4d4b10d3b249c7))
-* **runtime:** slot fallback in IE11 ([#2308](https://github.com/ionic-team/stencil/issues/2308)) ([504619d](https://github.com/ionic-team/stencil/commit/504619d0cf30b0451bb30dd62b072f430a78e52b)), closes [#2307](https://github.com/ionic-team/stencil/issues/2307)
-* **sys:** await writeFetchSuccessAsync ([bd6734d](https://github.com/ionic-team/stencil/commit/bd6734d3ce7f37b05d8d54ef4dc4d75639295064))
-
+## 🦁 [1.11.3](https://github.com/ionic-team/stencil/compare/v1.11.2...v1.11.3) (2020-03-30)
 
 ### Features
 
 * before and after rollup plugins ([#2306](https://github.com/ionic-team/stencil/issues/2306)) ([d04fb90](https://github.com/ionic-team/stencil/commit/d04fb902bfd3e0834e59677e15a5cd0710fc802c))
 
+
+### Bug Fixes
+
+* **compiler:** transpile to es5 ([#2316](https://github.com/ionic-team/stencil/issues/2316)) ([4f3986b](https://github.com/ionic-team/stencil/commit/4f3986b34828fb99c47a0c3048b0980c637e6a46)), closes [#2315](https://github.com/ionic-team/stencil/issues/2315) [#2314](https://github.com/ionic-team/stencil/issues/2314)
+* **sys:** resolve to fs path when url ([3e591f1](https://github.com/ionic-team/stencil/commit/3e591f1d739f66370b50ecab69276069946702c9))
+* **types:** svg types match spec ([#2317](https://github.com/ionic-team/stencil/issues/2317)) ([c91d8e4](https://github.com/ionic-team/stencil/commit/c91d8e4c94afb93344efb90024565056e8ee8a16)), closes [#2313](https://github.com/ionic-team/stencil/issues/2313)
+* **bundle:** add browser main field back ([#2305](https://github.com/ionic-team/stencil/issues/2305)) ([8d7d49f](https://github.com/ionic-team/stencil/commit/8d7d49ffbcc41123fae93d5f8d4d4b10d3b249c7))
+* **runtime:** slot fallback in IE11 ([#2308](https://github.com/ionic-team/stencil/issues/2308)) ([504619d](https://github.com/ionic-team/stencil/commit/504619d0cf30b0451bb30dd62b072f430a78e52b)), closes [#2307](https://github.com/ionic-team/stencil/issues/2307)
+* **sys:** await writeFetchSuccessAsync ([bd6734d](https://github.com/ionic-team/stencil/commit/bd6734d3ce7f37b05d8d54ef4dc4d75639295064))
 
 ### Performance Improvements
 
