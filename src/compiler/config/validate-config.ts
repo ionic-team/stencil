@@ -1,6 +1,6 @@
 import { Config, ConfigBundle, Diagnostic } from '../../declarations';
 import { buildError, buildWarn, isBoolean, isNumber, sortBy } from '@utils';
-import { setBooleanConfig } from './config-utils';
+import { setBooleanConfig, setStringConfig } from './config-utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace } from './validate-namespace';
 import { validateHydrated } from './validate-hydrated';
@@ -54,7 +54,10 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'autoprefixCss', null, config.buildEs5);
   setBooleanConfig(config, 'validateTypes', null, !config._isTesting);
   setBooleanConfig(config, 'allowInlineScripts', null, true);
-  setBooleanConfig(config, 'asyncQueue', null, true);
+
+  if (typeof config.taskQueue !== 'string') {
+    config.taskQueue = 'congestionAsync';
+  }
 
   // hash file names
   if (!isBoolean(config.hashFileNames)) {
