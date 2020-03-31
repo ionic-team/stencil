@@ -1,3 +1,12 @@
+# 🎷 [1.12.0-0](https://github.com/ionic-team/stencil/compare/v1.11.3...v1.12.0-0) (2020-03-31)
+
+
+### Features
+
+* **runtime:** select the task queue ([#2318](https://github.com/ionic-team/stencil/issues/2318)) ([dd4647a](https://github.com/ionic-team/stencil/commit/dd4647a6607eec3d252c37acb89947ea8c5508c9)), closes [#2294](https://github.com/ionic-team/stencil/issues/2294) [#2058](https://github.com/ionic-team/stencil/issues/2058)
+
+
+
 ## 🦁 [1.11.3](https://github.com/ionic-team/stencil/compare/v1.11.2...v1.11.3) (2020-03-30)
 
 ### Features
