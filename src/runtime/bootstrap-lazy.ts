@@ -33,8 +33,10 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
-  if (options.syncQueue) {
-    plt.$flags$ |= PLATFORM_FLAGS.queueSync;
+  if (BUILD.asyncQueue) {
+    if (options.syncQueue) {
+      plt.$flags$ |= PLATFORM_FLAGS.queueSync;
+    }
   }
   if (BUILD.hydrateClientSide) {
     // If the app is already hydrated there is not point to disable the

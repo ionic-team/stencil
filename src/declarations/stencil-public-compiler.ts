@@ -188,6 +188,22 @@ export interface StencilConfig {
    */
   hydratedFlag?: HydratedFlag;
 
+  /**
+   * Sets the task queue used by stencil's runtime. The task queue schedules DOM read and writes
+   * across the frames, by default, the "congestionAsync" is used.
+   *
+   * - "congestionAsync": DOM reads and writes and scheduled in the next frame, preventing layout thrashing,
+   *   it also can split work across different frames to prevent blocking the main thread.
+   *   However it can introduce unnecesary reflows and flickering in some cases.
+   *
+   * - "async": DOM read and writes are scheduled in the next frame, preventing layout thrashing,
+   *   it can block the main thread and introduce jank.
+   *
+   * - "sync": Makes writeTask() and readTask() callbacks to be executed syncronously, while inmediate,
+   *   it can cause layout thrashing.
+   */
+  taskQueue?: 'sync' | 'async' | 'congestionAsync';
+
   globalScript?: string;
   srcIndexHtml?: string;
   watch?: boolean;

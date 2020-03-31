@@ -255,6 +255,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   safari10?: boolean;
   scriptDataOpts?: boolean;
   shadowDomShim?: boolean;
+  asyncQueue?: boolean;
 }
 
 export type ModuleFormat = 'amd' | 'cjs' | 'commonjs' | 'es' | 'esm' | 'iife' | 'module' | 'system' | 'umd';

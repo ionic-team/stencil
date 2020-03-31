@@ -77,6 +77,8 @@ const getLazyBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMet
   build.lazyLoad = true;
   build.hydrateServerSide = false;
   build.cssVarShim = config.extras.cssVarsShim;
+  build.asyncQueue = config.taskQueue === 'congestionAsync';
+  build.taskQueue = config.taskQueue !== 'sync';
   build.initializeNextTick = config.outputTargets.some(isOutputTargetAngular);
 
   const hasHydrateOutputTargets = config.outputTargets.some(isOutputTargetHydrate);

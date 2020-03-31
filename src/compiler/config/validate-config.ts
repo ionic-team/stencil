@@ -55,6 +55,10 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'validateTypes', null, !config._isTesting);
   setBooleanConfig(config, 'allowInlineScripts', null, true);
 
+  if (typeof config.taskQueue !== 'string') {
+    config.taskQueue = 'congestionAsync';
+  }
+
   // hash file names
   if (!isBoolean(config.hashFileNames)) {
     config.hashFileNames = !config.devMode;

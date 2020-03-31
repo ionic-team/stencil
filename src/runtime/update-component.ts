@@ -267,7 +267,7 @@ export const appDidLoad = (who: string) => {
   if (BUILD.cssAnnotations) {
     addHydratedFlag(doc.documentElement);
   }
-  if (!BUILD.hydrateServerSide) {
+  if (BUILD.asyncQueue) {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
   nextTick(() => emitEvent(win, 'appload', { detail: { namespace: NAMESPACE } }));
