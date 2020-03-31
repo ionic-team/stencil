@@ -1217,7 +1217,6 @@ export namespace JSXBase {
     is?: string;
     radioGroup?: string; // <command>, <menuitem>
     radiogroup?: string;
-    part?: string;
 
     // WAI-ARIA
     role?: string;
@@ -1537,6 +1536,7 @@ export namespace JSXBase {
 
     ref?: (elm?: T) => void;
     slot?: string;
+    part?: string;
 
     // Clipboard Events
     onCopy?: (event: ClipboardEvent) => void;
