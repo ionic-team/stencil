@@ -4,7 +4,13 @@ import { bundleOutput } from './bundle-output';
 import { normalizeFsPath, hasError } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';
 
-export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, platform: string): Plugin => {
+export const workerPlugin = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  platform: string,
+  inlineWorkers: boolean
+): Plugin => {
   if (platform === 'worker' || platform === 'hydrate') {
     return {
       name: 'workerPlugin',
@@ -45,10 +51,25 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
       if (id.endsWith('?worker')) {
         const workerEntryPath = normalizeFsPath(id);
         const workerName = getWorkerName(workerEntryPath);
-        const { referenceId, dependencies } = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
+        const { code, dependencies, workerMsgId } = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
+        const referenceId = this.emitFile({
+          type: 'asset',
+          source: code,
+          name: workerName + '.js',
+        });
         dependencies.forEach(id => this.addWatchFile(id));
         return {
-          code: getWorkerMain(referenceId, workerName),
+          code: getWorkerMain(referenceId, workerName, workerMsgId),
+          moduleSideEffects: false,
+        };
+
+      } else if (id.endsWith('?worker-inline')) {
+        const workerEntryPath = normalizeFsPath(id);
+        const workerName = getWorkerName(workerEntryPath);
+        const { code, dependencies, workerMsgId } = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
+        dependencies.forEach(id => this.addWatchFile(id));
+        return {
+          code: getInlineWorker(code, workerName, workerMsgId),
           moduleSideEffects: false,
         };
       }
@@ -58,10 +79,17 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
       if (workerEntryPath != null) {
         const worker = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
         if (worker) {
-          return {
-            code: getWorkerProxy(workerEntryPath, worker.exports),
-            moduleSideEffects: false,
-          };
+          if (inlineWorkers) {
+            return {
+              code: getInlineWorkerProxy(workerEntryPath, worker.workerMsgId, worker.exports),
+              moduleSideEffects: false,
+            };
+          } else {
+            return {
+              code: getWorkerProxy(workerEntryPath, worker.exports),
+              moduleSideEffects: false,
+            };
+          }
         }
       }
       return null;
@@ -77,7 +105,8 @@ const getWorkerEntryPath = (id: string) => {
 };
 
 interface WorkerMeta {
-  referenceId: string;
+  code: string;
+  workerMsgId: string;
   exports: string[];
   dependencies: string[];
 }
@@ -106,6 +135,7 @@ const getWorkerName = (id: string) => {
 
 const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, ctx: PluginContext, workerEntryPath: string) => {
   const workerName = getWorkerName(workerEntryPath);
+  const workerMsgId = `stencil.${workerName}`;
   const build = await bundleOutput(config, compilerCtx, buildCtx, {
     platform: 'worker',
     id: workerName,
@@ -119,7 +149,7 @@ const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCt
     // Generate commonjs output so we can intercept exports at runtme
     const output = await build.generate({
       format: 'commonjs',
-      intro: getWorkerIntro(workerName, config.devMode),
+      intro: getWorkerIntro(workerMsgId, config.devMode),
       esModule: false,
       preferConst: true,
       externalLiveBindings: false,
@@ -143,16 +173,10 @@ const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCt
       code = results.output;
     }
 
-    // Put worker in an asset so new Worker() can reference it later
-    const referenceId = ctx.emitFile({
-      type: 'asset',
-      source: code,
-      name: workerName + '.js',
-    });
-
     return {
-      referenceId,
+      code,
       exports: entryPoint.exports,
+      workerMsgId,
       dependencies: Object.keys(entryPoint.modules).filter(id => !/\0/.test(id) && id !== workerEntryPath),
     };
   }
@@ -163,9 +187,9 @@ const WORKER_SUFFIX = ['.worker.ts', '.worker.tsx', '.worker/index.ts', '.worker
 
 const WORKER_HELPER_ID = '@worker-helper';
 
-const getWorkerIntro = (workerName: string, isDev: boolean) => `
+const getWorkerIntro = (workerMsgId: string, isDev: boolean) => `
 const exports = {};
-const workerMsgId = 'stencil.${workerName}';
+const workerMsgId = '${workerMsgId}';
 const workerMsgCallbackId = workerMsgId + '.cb';
 const getTransferables = (value) => {
   if (!!value) {
@@ -293,22 +317,38 @@ export const createWorkerProxy = (worker, workerMsgId, exportedMethod) => (
         (mainData[2] = mainData[2] || []).push(callbackId);
       }
     }
-
-    worker.postMessage(
-      [workerMsgId, pendingId, exportedMethod, args],
-      args.filter(a => a instanceof ArrayBuffer)
+    const postMessage = (w) => (
+      w.postMessage(
+        [workerMsgId, pendingId, exportedMethod, args],
+        args.filter(a => a instanceof ArrayBuffer)
+      )
     );
+    if (worker.then) {
+      worker.then(postMessage);
+    } else {
+      postMessage(worker);
+    }
   })
 );
 `;
 
-const getWorkerMain = (referenceId: string, workerName: string) => {
+const getWorkerMain = (referenceId: string, workerName: string, workerMsgId: string) => {
   return `
 import { createWorker } from '${WORKER_HELPER_ID}';
 export const workerName = '${workerName}';
-export const workerMsgId = 'stencil.' + workerName;
+export const workerMsgId = '${workerMsgId}';
 export const workerPath = /*@__PURE__*/import.meta.ROLLUP_FILE_URL_${referenceId};
 export const worker = /*@__PURE__*/createWorker(workerPath, workerName, workerMsgId);
+`;
+};
+
+const getInlineWorker = (code: string, workerName: string, workerMsgId: string) => {
+  return `
+import { createWorker } from '${WORKER_HELPER_ID}';
+const blob = new Blob([${JSON.stringify(code)}], { type: 'text/javascript' });
+const url = URL.createObjectURL(blob);
+export const worker = createWorker(url, '${workerName}', '${workerMsgId}');
+URL.revokeObjectURL(url);
 `;
 };
 
@@ -319,6 +359,18 @@ import { worker, workerName, workerMsgId } from '${workerEntryPath}?worker';
 ${exportedMethods
   .map(exportedMethod => {
     return `export const ${exportedMethod} = /*@__PURE__*/createWorkerProxy(worker, workerMsgId, '${exportedMethod}');`;
+  })
+  .join('\n')}
+`;
+};
+
+const getInlineWorkerProxy = (workerEntryPath: string, workerMsgId: string, exportedMethods: string[]) => {
+  return `
+import { createWorkerProxy } from '${WORKER_HELPER_ID}';
+const workerPromise = import('${workerEntryPath}?worker-inline').then(m => m.worker);
+${exportedMethods
+  .map(exportedMethod => {
+    return `export const ${exportedMethod} = /*@__PURE__*/createWorkerProxy(workerPromise, '${workerMsgId}', '${exportedMethod}');`;
   })
   .join('\n')}
 `;
