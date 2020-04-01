@@ -1,9 +1,15 @@
-# 🎷 [1.12.0-0](https://github.com/ionic-team/stencil/compare/v1.11.3...v1.12.0-0) (2020-03-31)
+# 🌳 [1.12.0-1](https://github.com/ionic-team/stencil/compare/v1.11.3...v1.12.0-1) (2020-04-01)
+
+
+### Bug Fixes
+
+* **types:** part can be used in svg ([45f02de](https://github.com/ionic-team/stencil/commit/45f02de4e784feaffb1ab5f81b66d3376bbbdfba))
 
 
 ### Features
 
 * **runtime:** select the task queue ([#2318](https://github.com/ionic-team/stencil/issues/2318)) ([dd4647a](https://github.com/ionic-team/stencil/commit/dd4647a6607eec3d252c37acb89947ea8c5508c9)), closes [#2294](https://github.com/ionic-team/stencil/issues/2294) [#2058](https://github.com/ionic-team/stencil/issues/2058)
+* **sys:** add sys.resolveModuleId for plugins ([d2b6fc0](https://github.com/ionic-team/stencil/commit/d2b6fc0ffcc37c0ed4db01d10e5034998da30a95)), closes [#2292](https://github.com/ionic-team/stencil/issues/2292)
 
 
 
