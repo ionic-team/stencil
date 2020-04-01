@@ -1,4 +1,4 @@
-# 🌳 [1.12.0-1](https://github.com/ionic-team/stencil/compare/v1.11.3...v1.12.0-1) (2020-04-01)
+# ⛸ [1.12.0](https://github.com/ionic-team/stencil/compare/v1.11.3...v1.12.0) (2020-04-01)
 
 
 ### Bug Fixes
@@ -10,6 +10,7 @@
 
 * **runtime:** select the task queue ([#2318](https://github.com/ionic-team/stencil/issues/2318)) ([dd4647a](https://github.com/ionic-team/stencil/commit/dd4647a6607eec3d252c37acb89947ea8c5508c9)), closes [#2294](https://github.com/ionic-team/stencil/issues/2294) [#2058](https://github.com/ionic-team/stencil/issues/2058)
 * **sys:** add sys.resolveModuleId for plugins ([d2b6fc0](https://github.com/ionic-team/stencil/commit/d2b6fc0ffcc37c0ed4db01d10e5034998da30a95)), closes [#2292](https://github.com/ionic-team/stencil/issues/2292)
+* inline workers in custom-element-bundle ([2d716b3](https://github.com/ionic-team/stencil/commit/2d716b3afa184a4afe3da01f34e978910ff00558))
 
 
 
