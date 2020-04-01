@@ -3,6 +3,7 @@ import { basename, dirname } from 'path';
 import { buildEvents } from '../events';
 import { createWebWorkerMainController } from './worker/web-worker-main';
 import { HAS_WEB_WORKER, IS_NODE_ENV, IS_WEB_WORKER_ENV, normalizePath } from '@utils';
+import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 
 export const createSystem = () => {
   const items = new Map<string, FsItem>();
@@ -363,6 +364,8 @@ export const createSystem = () => {
     details: getDetails(),
     copy,
   };
+
+  sys.resolveModuleId = opts => resolveModuleIdAsync(sys, null, opts);
 
   return sys;
 };

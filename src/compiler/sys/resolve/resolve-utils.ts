@@ -1,7 +1,6 @@
 import * as d from '../../../declarations';
-import { IS_FETCH_ENV, IS_NODE_ENV, isFunction, isString, normalizePath } from '@utils';
-
-export const NODE_MODULES_URL = 'https://cdn.jsdelivr.net/npm/';
+import { IS_FETCH_ENV, IS_NODE_ENV, normalizePath } from '@utils';
+import { join } from 'path';
 
 const COMMON_DIR_MODULE_EXTS = ['.tsx', '.ts', '.mjs', '.js', '.jsx', '.json', '.md'];
 
@@ -38,28 +37,11 @@ export const setPackageVersionByContent = (pkgVersions: Map<string, string>, pkg
   } catch (e) {}
 };
 
-export const isExternalUrl = (p: string) => {
-  if (isString(p)) {
-    p = p.toLowerCase();
-    return p.startsWith('https://') || p.startsWith('http://');
-  }
-  return false;
-};
+export const getNodeModulePath = (rootDir: string, ...pathParts: string[]) => normalizePath(join.apply(null, [rootDir, 'node_modules', ...pathParts]));
 
-export const getRemoteModuleUrl = (sys: d.CompilerSystem, module: { moduleId: string; path: string; version?: string }) => {
-  if (sys && isFunction(sys.getRemoteModuleUrl)) {
-    return sys.getRemoteModuleUrl(module);
-  }
-  const path = `${module.moduleId}${module.version ? '@' + module.version : ''}/${module.path}`;
-  return new URL(path, NODE_MODULES_URL).href;
-};
+export const getStencilModulePath = (rootDir: string, ...pathParts: string[]) => getNodeModulePath(rootDir, '@stencil', 'core', ...pathParts);
 
-export const getCdnPackageJsonUrl = (sys: d.CompilerSystem, moduleId: string) => {
-  return getRemoteModuleUrl(sys, {
-    moduleId,
-    path: `package.json`,
-  });
-};
+export const getStencilInternalDtsPath = (rootDir: string) => getStencilModulePath(rootDir, 'internal', 'index.d.ts');
 
 export const isLocalModule = (p: string) => p.startsWith('.') || p.startsWith('/');
 
@@ -67,7 +49,17 @@ export const isStencilCoreImport = (p: string) => p.startsWith('@stencil/core');
 
 export const shouldFetchModule = (p: string) => IS_FETCH_ENV && !IS_NODE_ENV && isNodeModulePath(p);
 
-export const isNodeModulePath = (p: string) => {
+export const isNodeModulePath = (p: string) =>
+  normalizePath(p)
+    .split('/')
+    .includes('node_modules');
+
+export const getPackageDirPath = (p: string, moduleId: string) => {
   const parts = normalizePath(p).split('/');
-  return parts.includes('node_modules');
+  for (let i = parts.length - 1; i >= 1; i--) {
+    if (parts[i - 1] === 'node_modules' && parts[i] === moduleId) {
+      return parts.slice(0, i + 1).join('/');
+    }
+  }
+  return null;
 };

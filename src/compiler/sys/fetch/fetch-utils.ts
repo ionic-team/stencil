@@ -1,7 +1,6 @@
 import * as d from '../../../declarations';
-import { isFunction, normalizePath } from '@utils';
-import { getRemoteModuleUrl, isCommonDirModuleFile, isTsFile, isTsxFile } from '../resolve/resolve-utils';
-import { join } from 'path';
+import { isFunction, isString, normalizePath } from '@utils';
+import { isCommonDirModuleFile, isTsFile, isTsxFile } from '../resolve/resolve-utils';
 
 export const httpFetch = (sys: d.CompilerSystem, input: RequestInfo, init?: RequestInit) => {
   if (sys && isFunction(sys.fetch)) {
@@ -13,9 +12,30 @@ export const httpFetch = (sys: d.CompilerSystem, input: RequestInfo, init?: Requ
 export const packageVersions = new Map<string, string>();
 export const known404Urls = new Set<string>();
 
-export const getStencilModulePath = (config: d.Config, p: string) => join(config.rootDir, 'node_modules', '@stencil', 'core', p);
+export const isExternalUrl = (p: string) => {
+  if (isString(p)) {
+    p = p.toLowerCase();
+    return p.startsWith('https://') || p.startsWith('http://');
+  }
+  return false;
+};
 
-export const getStencilInternalDtsPath = (config: d.Config) => getStencilModulePath(config, 'internal/index.d.ts');
+export const getRemoteModuleUrl = (sys: d.CompilerSystem, module: { moduleId: string; path: string; version?: string }) => {
+  if (sys && isFunction(sys.getRemoteModuleUrl)) {
+    return sys.getRemoteModuleUrl(module);
+  }
+
+  const nmBaseUrl = 'https://cdn.jsdelivr.net/npm/';
+  const path = `${module.moduleId}${module.version ? '@' + module.version : ''}/${module.path}`;
+  return new URL(path, nmBaseUrl).href;
+};
+
+export const getRemotePackageJsonUrl = (sys: d.CompilerSystem, moduleId: string) => {
+  return getRemoteModuleUrl(sys, {
+    moduleId,
+    path: `package.json`,
+  });
+};
 
 export const getStencilRootUrl = (compilerExe: string) => new URL('../', compilerExe).href;
 

@@ -1,16 +1,11 @@
 import * as d from '../../../../declarations';
-import { getNodeModuleFetchUrl, getStencilInternalDtsPath, getStencilModuleUrl, getStencilRootUrl, skipFilePathFetch } from '../fetch-utils';
+import { getNodeModuleFetchUrl, getStencilModuleUrl, getStencilRootUrl, isExternalUrl, skipFilePathFetch } from '../fetch-utils';
 
 describe('fetch module', () => {
   let compilerExe: string;
-  const config: d.Config = { rootDir: '/my-app/' };
 
   beforeEach(() => {
     compilerExe = 'http://localhost:3333/@stencil/core/compiler/stencil.js';
-  });
-
-  it('getStencilInternalDtsPath', () => {
-    expect(getStencilInternalDtsPath(config)).toBe('/my-app/node_modules/@stencil/core/internal/index.d.ts');
   });
 
   it('getStencilRootUrl', () => {
@@ -18,6 +13,13 @@ describe('fetch module', () => {
 
     compilerExe = 'https://cdn.stenciljs.com/npm/@stencil/core@1.2.3/compiler/stencil.js';
     expect(getStencilRootUrl(compilerExe)).toBe('https://cdn.stenciljs.com/npm/@stencil/core@1.2.3/');
+  });
+
+  it('isExternalUrl', () => {
+    expect(isExternalUrl('http://localhost/comiler/stencil.js')).toBe(true);
+    expect(isExternalUrl('https://localhost/comiler/stencil.js')).toBe(true);
+    expect(isExternalUrl('/User/app/node_modules/stencil.js')).toBe(false);
+    expect(isExternalUrl('C:\\path\\to\\local\\index.js')).toBe(false);
   });
 
   describe('getStencilModulePath', () => {

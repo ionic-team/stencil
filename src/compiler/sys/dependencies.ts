@@ -1,6 +1,6 @@
 import { CompilerSystem } from '../../declarations';
+import { getRemoteModuleUrl } from '../sys/fetch/fetch-utils';
 import { rollupVersion, version, terserVersion, typescriptVersion } from '../../version';
-import { getRemoteModuleUrl } from '../sys/resolve/resolve-utils';
 
 export const getRemoteTypeScriptUrl = (sys: CompilerSystem) => {
   const tsDep = dependencies.find(dep => dep.name === 'typescript');

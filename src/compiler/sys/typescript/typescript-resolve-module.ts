@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { basename, dirname, isAbsolute, join, resolve } from 'path';
-import { getStencilInternalDtsPath } from '../fetch/fetch-utils';
-import { isDtsFile, isExternalUrl, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile, isJsonFile } from '../resolve/resolve-utils';
+import { getStencilInternalDtsPath, isDtsFile, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile, isJsonFile } from '../resolve/resolve-utils';
+import { isExternalUrl } from '../fetch/fetch-utils';
 import { isString, IS_LOCATION_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV, normalizePath } from '@utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
 import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
@@ -77,7 +77,7 @@ export const patchedTsResolveModule = (
   if (isLocalModule(moduleName)) {
     const containingDir = dirname(containingFile);
     let resolvedFileName = join(containingDir, moduleName);
-    resolvedFileName = ensureExtension(resolvedFileName, containingFile);
+    resolvedFileName = normalizePath(ensureExtension(resolvedFileName, containingFile));
 
     if (!isAbsolute(resolvedFileName) && !resolvedFileName.startsWith('.') && !resolvedFileName.startsWith('/')) {
       resolvedFileName = './' + resolvedFileName;
@@ -100,14 +100,14 @@ export const patchedTsResolveModule = (
   return tsResolveNodeModule(config, inMemoryFs, moduleName, containingFile);
 };
 
-export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleName: string, containingFile: string): ts.ResolvedModuleWithFailedLookupLocations => {
-  if (isStencilCoreImport(moduleName)) {
+export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, containingFile: string): ts.ResolvedModuleWithFailedLookupLocations => {
+  if (isStencilCoreImport(moduleId)) {
     return {
       resolvedModule: {
         extension: ts.Extension.Dts,
-        resolvedFileName: getStencilInternalDtsPath(config),
+        resolvedFileName: getStencilInternalDtsPath(config.rootDir),
         packageId: {
-          name: moduleName,
+          name: moduleId,
           subModuleName: '',
           version,
         },
@@ -115,14 +115,17 @@ export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFile
     };
   }
 
-  const resolved = resolveRemoteModuleIdSync(config, inMemoryFs, moduleName, containingFile);
+  const resolved = resolveRemoteModuleIdSync(config, inMemoryFs, {
+    moduleId,
+    containingFile,
+  });
   if (resolved) {
     return {
       resolvedModule: {
         extension: ts.Extension.Js,
         resolvedFileName: resolved.resolvedUrl,
         packageId: {
-          name: moduleName,
+          name: moduleId,
           subModuleName: '',
           version: resolved.packageJson.version,
         },

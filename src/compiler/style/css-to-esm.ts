@@ -59,7 +59,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput) => {
       }
     }
 
-    const cssImports = getCssImports(varNames, results.styleText, input.file, input.mode);
+    const cssImports = getCssToEsmImports(varNames, results.styleText, input.file, input.mode);
     cssImports.forEach(cssImport => {
       // remove the original css @imports
       results.styleText = results.styleText.replace(cssImport.srcImportText, '');
@@ -122,7 +122,7 @@ const generateTransformCssToEsm = (input: d.TransformCssToEsmInput, results: d.T
   return results;
 };
 
-const getCssImports = (varNames: Set<string>, cssText: string, filePath: string, modeName: string) => {
+const getCssToEsmImports = (varNames: Set<string>, cssText: string, filePath: string, modeName: string) => {
   const cssImports: d.CssToEsmImportData[] = [];
 
   if (!cssText.includes('@import')) {

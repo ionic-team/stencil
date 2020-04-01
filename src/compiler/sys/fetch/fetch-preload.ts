@@ -1,8 +1,8 @@
 import * as d from '../../../declarations';
 import { dependencies, getRemoteTypeScriptUrl } from '../dependencies';
+import { getNodeModulePath } from '../resolve/resolve-utils';
 import { httpFetch } from './fetch-utils';
 import { IS_FETCH_ENV, IS_WEB_WORKER_ENV } from '@utils';
-import { join } from 'path';
 
 export const fetchPreloadFs = async (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
   if (IS_WEB_WORKER_ENV && IS_FETCH_ENV) {
@@ -39,13 +39,13 @@ const getCoreFetchPreloadUrls = (config: d.Config, compilerUrl: string) => {
     ...stencilResourcePaths.map(p => {
       return {
         url: new URL(p, stencilCoreBase).href,
-        filePath: join(config.rootDir, 'node_modules', '@stencil', 'core', p),
+        filePath: getNodeModulePath(config.rootDir, '@stencil', 'core', p),
       };
     }),
     ...tsResourcePaths.map(p => {
       return {
         url: new URL(p, tsLibBase).href,
-        filePath: join(config.rootDir, 'node_modules', 'typescript', p),
+        filePath: getNodeModulePath(config.rootDir, 'typescript', p),
       };
     }),
   ];

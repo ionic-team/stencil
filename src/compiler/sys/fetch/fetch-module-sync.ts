@@ -4,14 +4,14 @@ import { isString } from '@utils';
 import { skipFilePathFetch, skipUrlFetch } from './fetch-utils';
 import { writeFetchSuccessSync } from './write-fetch-success';
 
-export const fetchModuleSync = (inMemoryFs: d.InMemoryFileSystem, pkgVersions: Map<string, string>, url: string, filePath: string) => {
+export const fetchModuleSync = (sys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, pkgVersions: Map<string, string>, url: string, filePath: string) => {
   if (skipFilePathFetch(filePath)) {
     return undefined;
   }
 
   const content = fetchUrlSync(url);
   if (isString(content)) {
-    writeFetchSuccessSync(inMemoryFs, url, filePath, content, pkgVersions);
+    writeFetchSuccessSync(sys, inMemoryFs, url, filePath, content, pkgVersions);
   }
 
   return content;

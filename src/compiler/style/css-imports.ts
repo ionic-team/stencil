@@ -15,7 +15,7 @@ export const parseCssImports = async (
   styleDocs?: d.StyleDoc[],
 ) => {
   const isCssEntry = resolvedFilePath.toLowerCase().endsWith('.css');
-  return cssImports(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, resolvedFilePath, styleText, [], styleDocs);
+  return cssImports(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, resolvedFilePath, styleText, new Set(), styleDocs);
 };
 
 const cssImports = async (
@@ -26,13 +26,13 @@ const cssImports = async (
   srcFilePath: string,
   resolvedFilePath: string,
   styleText: string,
-  noLoop: string[],
+  noLoop: Set<string>,
   styleDocs?: d.StyleDoc[],
 ) => {
-  if (noLoop.includes(resolvedFilePath)) {
+  if (noLoop.has(resolvedFilePath)) {
     return styleText;
   }
-  noLoop.push(resolvedFilePath);
+  noLoop.add(resolvedFilePath);
 
   if (styleDocs != null) {
     parseStyleDocs(styleDocs, styleText);
@@ -59,7 +59,7 @@ const concatCssImport = async (
   isCssEntry: boolean,
   srcFilePath: string,
   cssImportData: d.CssImportData,
-  noLoop: string[],
+  noLoop: Set<string>,
   styleDocs?: d.StyleDoc[],
 ) => {
   cssImportData.styleText = await loadStyleText(compilerCtx, cssImportData);
@@ -164,7 +164,7 @@ export const isCssNodeModule = (url: string) => url.startsWith('~');
 export const resolveCssNodeModule = async (config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], filePath: string, cssImportData: d.CssImportData) => {
   try {
     const m = getModuleId(cssImportData.url);
-    const resolved = await resolveModuleIdAsync(config, compilerCtx.fs, {
+    const resolved = await resolveModuleIdAsync(config.sys, compilerCtx.fs, {
       moduleId: m.moduleId,
       containingFile: filePath,
       exts: [],

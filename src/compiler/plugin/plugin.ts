@@ -146,7 +146,7 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
   return transformResults;
 };
 
-export const runPluginTransformsEsmImports = async (config: d.Config, compilerCtx: d.CompilerCtx, code: string, id: string) => {
+export const runPluginTransformsEsmImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, code: string, id: string) => {
   const pluginCtx: PluginCtx = {
     config: config,
     sys: config.sys,
@@ -162,6 +162,14 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
     diagnostics: [],
     dependencies: [],
   };
+
+  const isRawCssFile = id.toLowerCase().endsWith('.css');
+  if (isRawCssFile) {
+    // concat all css @imports into one file
+    // when the entry file is a .css file (not .scss)
+    // do this BEFORE transformations on css files
+    transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code);
+  }
 
   for (const plugin of pluginCtx.config.plugins) {
     if (isFunction(plugin.transform)) {
@@ -198,6 +206,15 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
   }
 
   transformResults.diagnostics.push(...pluginCtx.diagnostics);
+
+  if (!isRawCssFile) {
+    // precompilers just ran and converted @import "my.css" into @import url("my.css")
+    // because of the ".css" extension. Precompilers did NOT concat the ".css" files into
+    // the output but only updated it to use url() instead. Let's go ahead and concat
+    // the url() css files into one file like we did for raw .css files. Do this
+    // AFTER transformations on non-css files
+    transformResults.code = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code);
+  }
 
   return transformResults;
 };

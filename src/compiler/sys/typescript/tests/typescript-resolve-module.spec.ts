@@ -2,7 +2,7 @@ import * as d from '../../../../declarations';
 import { createInMemoryFs } from '../../../sys/in-memory-fs';
 import { createSystem } from '../../../sys/stencil-sys';
 import { ensureExtension } from '../typescript-resolve-module';
-import { getStencilInternalDtsPath } from '../../fetch/fetch-utils';
+import { getStencilInternalDtsPath } from '../../resolve/resolve-utils';
 import { patchedTsResolveModule } from '../typescript-resolve-module';
 import ts from 'typescript';
 
@@ -10,9 +10,9 @@ describe('typescript resolve module', () => {
   const config: d.Config = { rootDir: '/some/path' };
   let inMemoryFs: d.InMemoryFileSystem;
   let sys: d.CompilerSystem;
-  const compilerExe = 'https://unpkg.com/@stencil/core/compiler/stencil.js';
 
   beforeEach(() => {
+    config.rootDir = '/some/path';
     sys = createSystem();
     inMemoryFs = createInMemoryFs(sys);
   });
@@ -42,7 +42,7 @@ describe('typescript resolve module', () => {
 
   it('resolve ./stencil-private.d.ts to full dts path when imported by internal dts url', () => {
     const moduleName = './stencil-private';
-    const containingFile = getStencilInternalDtsPath(config);
+    const containingFile = getStencilInternalDtsPath(config.rootDir);
     expect(containingFile).toBe('/some/path/node_modules/@stencil/core/internal/index.d.ts');
 
     const r = patchedTsResolveModule(config, inMemoryFs, moduleName, containingFile);
