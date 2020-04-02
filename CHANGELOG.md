@@ -1,3 +1,8 @@
+## 🐓 [1.12.1](https://github.com/ionic-team/stencil/compare/v1.12.0...v1.12.1) (2020-04-02)
+
+Added `taskQueue: 'immediate'` config setting.
+
+
 # ⛸ [1.12.0](https://github.com/ionic-team/stencil/compare/v1.11.3...v1.12.0) (2020-04-01)
 
 
