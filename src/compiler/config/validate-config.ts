@@ -57,6 +57,9 @@ export const validateConfig = (userConfig?: Config) => {
 
   if (typeof config.taskQueue !== 'string') {
     config.taskQueue = 'congestionAsync';
+  } else if (config.taskQueue === ('sync' as any)) {
+    // deprecated 1.12.1
+    config.taskQueue = 'immediate';
   }
 
   // hash file names

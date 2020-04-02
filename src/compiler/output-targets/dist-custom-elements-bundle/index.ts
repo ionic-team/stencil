@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError, dashToPascalCase, formatComponentRuntimeMeta, hasError, stringifyRuntimeData } from '@utils';
-import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
+import { getCustomElementsBuildConditionals } from './custom-elements-build-conditionals';
 import { isOutputTargetDistCustomElementsBundle } from '../output-utils';
 import { join } from 'path';
 import { nativeComponentTransform } from '../../transformers/component-native/tranform-to-native-component';
@@ -23,24 +23,17 @@ export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: 
 
   const timespan = buildCtx.createTimeSpan(`generate custom elements bundle started`);
 
-  await Promise.all(
-    outputTargets.map(o => bundleCustomElements(config, compilerCtx, buildCtx, o))
-  );
+  await Promise.all(outputTargets.map(o => bundleCustomElements(config, compilerCtx, buildCtx, o)));
 
   timespan.finish(`generate custom elements bundle finished`);
 };
 
-const bundleCustomElements = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistCustomElementsBundle
-) => {
+const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistCustomElementsBundle) => {
   try {
     const bundleOpts: BundleOptions = {
       id: 'customElementsBundle',
       platform: 'client',
-      conditionals: getBuildConditionals(config, buildCtx.components),
+      conditionals: getCustomElementsBuildConditionals(config, buildCtx.components),
       customTransformers: getCustomElementBundleCustomTransformer(config, compilerCtx),
       inlineWorkers: true,
       inputs: {
@@ -58,7 +51,7 @@ const bundleCustomElements = async (
         format: 'esm',
         sourcemap: config.sourceMap,
         chunkFileNames: config.devMode ? '[name]-[hash].mjs' : 'p-[hash].mjs',
-        entryFileNames: '[name].mjs'
+        entryFileNames: '[name].mjs',
       });
       const files = rollupOutput.output.map(async bundle => {
         if (bundle.type === 'chunk') {
@@ -113,22 +106,8 @@ export const defineCustomElements = () => {
   [
     ${exportNames.join(',\n    ')}
   ].forEach(cmp => customElements.define(cmp.is, cmp));
-};`)
+};`);
   return [...importStatements, ...exportStatements, ''].join('\n');
-};
-
-const getBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
-  const build = getBuildFeatures(cmps) as d.BuildConditionals;
-
-  build.lazyLoad = false;
-  build.hydrateClientSide = false;
-  build.hydrateServerSide = false;
-  build.asyncQueue = config.taskQueue === 'congestionAsync';
-  build.taskQueue = config.taskQueue !== 'sync';
-  updateBuildConditionals(config, build);
-  build.devTools = false;
-
-  return build;
 };
 
 const getCustomElementBundleCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {

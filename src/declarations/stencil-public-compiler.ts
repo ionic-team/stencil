@@ -190,19 +190,32 @@ export interface StencilConfig {
 
   /**
    * Sets the task queue used by stencil's runtime. The task queue schedules DOM read and writes
-   * across the frames, by default, the "congestionAsync" is used.
+   * across the frames to efficiently render and reduce layout thrashing. By default, the
+   * `congestionAsync` is used. It's recommended to also try each setting to decide which works
+   * best for your use-case. In all cases, if your app has many CPU intensive tasks causing the
+   * main thread to periodically lock-up, it's always recommended to try
+   * [Web Workers](https://stenciljs.com/docs/web-workers) for those tasks.
    *
-   * - "congestionAsync": DOM reads and writes and scheduled in the next frame, preventing layout thrashing,
-   *   it also can split work across different frames to prevent blocking the main thread.
-   *   However it can introduce unnecesary reflows and flickering in some cases.
+   * - `congestionAsync`: DOM reads and writes are scheduled in the next frame to prevent layout
+   *   thrashing. When the app is heavily tasked and the queue becomes congested it will then
+   *   split the work across multiple frames to prevent blocking the main thread. However, it can
+   *   also introduce unnecesary reflows in some cases, especially during startup. `congestionAsync`
+   *   is ideal for apps running animations while also simultaniously executing intesive tasks
+   *   which may lock-up the main thread.
    *
-   * - "async": DOM read and writes are scheduled in the next frame, preventing layout thrashing,
-   *   it can block the main thread and introduce jank.
+   * - `async`: DOM read and writes are scheduled in the next frame to prevent layout thrashing.
+   *   During intensive CPU tasks it will not reschedule rendering to happen in the next frame.
+   *   `async` is ideal for most apps, and if the app has many intensive tasks causing the main
+   *   thread to lock-up, it's recommended to try [Web Workers](https://stenciljs.com/docs/web-workers)
+   *   rather than the congestion async queue.
    *
-   * - "sync": Makes writeTask() and readTask() callbacks to be executed syncronously, while inmediate,
-   *   it can cause layout thrashing.
+   * - `immediate`: Makes writeTask() and readTask() callbacks to be executed syncronously. Tasks
+   *   are not scheduled to run in the next frame, but do note there is at least one microtask.
+   *   The `immediate` setting is ideal for apps that do not provide long running and smooth
+   *   animations. Like the async setting, if the app has intensive tasks causing the main thread
+   *   to lock-up, it's recommended to try [Web Workers](https://stenciljs.com/docs/web-workers).
    */
-  taskQueue?: 'sync' | 'async' | 'congestionAsync';
+  taskQueue?: 'async' | 'immediate' | 'congestionAsync';
 
   globalScript?: string;
   srcIndexHtml?: string;
