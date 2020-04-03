@@ -139,8 +139,14 @@ export interface StencilConfig {
   rollupConfig?: RollupConfig;
 
   /**
-   * Sets if the ES5 build must be generated or not. It defaults to `false` in dev mode, and `true` in production mode.
-   * Notice that Stencil always generates a modern build too, this setting will just disable the additional `es5` build.
+   * Sets if the ES5 build should be generated or not. It defaults to `false` in dev mode, and `true` in
+   * production mode. Notice that Stencil always generates a modern build too, whereas this setting
+   * will either disable es5 builds entirely with `false`, or always create es5 builds (even in dev mode)
+   * when set to `true`. Basically if the app does not need to run on legacy browsers
+   * (IE11 and Edge 18 and below), it's safe to set `buildEs5` to `false`, which will also speed up
+   * production build times. In addition to not creating es5 builds, apps may also be interested in
+   * disabling any unnecessary runtime when support legacy browsers. See
+   * [https://stenciljs.com/docs/config-extras](/docs/config-extras) for more information.
    */
   buildEs5?: boolean;
 
@@ -267,7 +273,9 @@ export interface ConfigExtras {
   cssVarsShim?: boolean;
 
   /**
-   * Dynamic `import()` shim. This is only needed for Edge 18 and below, and Firefox 67 and below.
+   * Dynamic `import()` shim. This is only needed for Edge 18 and below, and Firefox 67
+   * and below. If you do not need to support Edge 18 and below (Edge before it moved
+   * to Chromium) then it's recommended to set `dynamicImportShim` to `false`.
    * Defaults to `true`.
    */
   dynamicImportShim?: boolean;
@@ -296,7 +304,8 @@ export interface ConfigExtras {
    * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
    * if it's determined that shadow dom is already natively supported by the browser then
    * it does not request the shim. Setting to `false` will avoid all shadow dom tests.
-   * Defaults to `true`.
+   * If the app does not need to support IE11 or Edge 18 it's recommended to set `shadowDomShim` to
+   * `false`. Defaults to `true`.
    */
   shadowDomShim?: boolean;
 
@@ -473,6 +482,130 @@ export interface ConfigFlags {
 export type TaskCommand = 'build' | 'docs' | 'generate' | 'help' | 'prerender' | 'serve' | 'test' | 'version';
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
+
+export interface PrerenderConfig {
+  afterHydrate?(document?: Document, url?: URL): any | Promise<any>;
+  beforeHydrate?(document?: Document, url?: URL): any | Promise<any>;
+  /**
+   * Runs after the template Document object has serialize into an
+   * HTML formatted string. Returns an HTML string to be used as the
+   * base template for all prerendered pages.
+   */
+  afterSerializeTemplate?(html: string): Promise<string>;
+  /**
+   * Runs before the template Document object is serialize into an
+   * HTML formatted string. Returns the Document to be serialized which
+   * will become the base template html for all prerendered pages.
+   */
+  beforeSerializeTemplate?(document: Document): Promise<Document>;
+  /**
+   * A custom function to be used to generate the canonical `<link>` tag
+   * which goes in the `<head>` of every prerendered page. Returning `null`
+   * will not add a canonical url tag to the page.
+   */
+  canonicalUrl?(url?: URL): string | null;
+  /**
+   * URLs to start the prerender crawling from. By default the root URL of `/` is used.
+   */
+  entryUrls?: string[];
+  /**
+   * Return `true` the given `<a>` element should be crawled or not.
+   */
+  filterAnchor?(attrs: { [attrName: string]: string }, base?: URL): boolean;
+  /**
+   * Return `true` if the given URL should be prerendered or not.
+   */
+  filterUrl?(url?: URL, base?: URL): boolean;
+  /**
+   * Returns the file path which the prerendered HTML content
+   * should be written to.
+   */
+  filePath?(url?: URL, filePath?: string): string;
+  /**
+   * Returns the hydrate options to use for each individual prerendered page.
+   */
+  hydrateOptions?(url?: URL): PrerenderHydrateOptions;
+  /**
+   * Returns the template file's content. The template is the base
+   * HTML used for all prerendered pages.
+   */
+  loadTemplate?(filePath?: string): Promise<string>;
+  normalizeUrl?(href?: string, base?: URL): URL;
+  robotsTxt?(opts: RobotsTxtOpts): string | RobotsTxtResults;
+  sitemapXml?(opts: SitemapXmpOpts): string | SitemapXmpResults;
+  /**
+   * If the prerenndered URLs should have a trailing "/"" or not. Defaults to `false`.
+   */
+  trailingSlash?: boolean;
+}
+
+export interface HydrateDocumentOptions {
+  canonicalUrl?: string;
+  constrainTimeouts?: boolean;
+  clientHydrateAnnotations?: boolean;
+  cookie?: string;
+  direction?: string;
+  excludeComponents?: string[];
+  language?: string;
+  maxHydrateCount?: number;
+  referrer?: string;
+  removeScripts?: boolean;
+  removeUnusedStyles?: boolean;
+  resourcesUrl?: string;
+  timeout?: number;
+  title?: string;
+  url?: string;
+  userAgent?: string;
+}
+
+export interface SerializeDocumentOptions extends HydrateDocumentOptions {
+  afterHydrate?(document: any): any | Promise<any>;
+  approximateLineWidth?: number;
+  beforeHydrate?(document: any): any | Promise<any>;
+  prettyHtml?: boolean;
+  removeAttributeQuotes?: boolean;
+  removeBooleanAttributeQuotes?: boolean;
+  removeEmptyAttributes?: boolean;
+  removeHtmlComments?: boolean;
+}
+
+export interface HydrateFactoryOptions extends SerializeDocumentOptions {
+  serializeToHtml: boolean;
+  destroyWindow: boolean;
+  destroyDocument: boolean;
+}
+
+export interface PrerenderHydrateOptions extends SerializeDocumentOptions {
+  addModulePreloads?: boolean;
+  inlineExternalStyleSheets?: boolean;
+  minifyStyleElements?: boolean;
+  minifyScriptElements?: boolean;
+}
+
+export interface RobotsTxtOpts {
+  urls: string[];
+  sitemapUrl: string;
+  baseUrl: string;
+  dir: string;
+}
+
+export interface RobotsTxtResults {
+  content: string;
+  filePath: string;
+  url: string;
+}
+
+export interface SitemapXmpOpts {
+  urls: string[];
+  baseUrl: string;
+  dir: string;
+}
+
+export interface SitemapXmpResults {
+  content: string;
+  filePath: string;
+  url: string;
+}
 
 export interface CompilerSystem {
   events?: BuildEvents;

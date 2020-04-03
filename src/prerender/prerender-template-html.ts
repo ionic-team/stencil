@@ -7,6 +7,7 @@ import { promisify } from 'util';
 const readFile = promisify(fs.readFile);
 
 export async function generateTemplateHtml(
+  prerenderConfig: d.PrerenderConfig,
   diagnostics: d.Diagnostic[],
   isDebug: boolean,
   srcIndexHtmlPath: string,
@@ -19,8 +20,14 @@ export async function generateTemplateHtml(
     if (typeof srcIndexHtmlPath !== 'string') {
       srcIndexHtmlPath = outputTarget.indexHtml;
     }
-    const templateHtml = await readFile(srcIndexHtmlPath, 'utf8');
-    const doc = createDocument(templateHtml);
+    let templateHtml: string;
+    if (typeof prerenderConfig.loadTemplate === 'function') {
+      templateHtml = await prerenderConfig.loadTemplate(srcIndexHtmlPath);
+    } else {
+      templateHtml = await readFile(srcIndexHtmlPath, 'utf8');
+    }
+
+    let doc = createDocument(templateHtml);
 
     if (hydrateOpts.inlineExternalStyleSheets && !isDebug) {
       try {
@@ -46,7 +53,15 @@ export async function generateTemplateHtml(
       }
     }
 
-    return serializeNodeToHtml(doc);
+    if (typeof prerenderConfig.beforeSerializeTemplate === 'function') {
+      doc = await prerenderConfig.beforeSerializeTemplate(doc);
+    }
+
+    let html = serializeNodeToHtml(doc);
+    if (typeof prerenderConfig.afterSerializeTemplate === 'function') {
+      html = await prerenderConfig.afterSerializeTemplate(html);
+    }
+    return html;
   } catch (e) {
     catchError(diagnostics, e);
   }

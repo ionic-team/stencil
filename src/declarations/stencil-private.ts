@@ -22,6 +22,7 @@ import {
   OptimizeCssOutput,
   OutputTargetWww,
   PageReloadStrategy,
+  PrerenderConfig,
   PrerenderRequest,
   PrerenderResults,
   StyleDoc,
@@ -1525,42 +1526,6 @@ export interface InMemoryFileSystem {
   getMemoryStats(): string;
 }
 
-export interface HydrateDocumentOptions {
-  canonicalUrl?: string;
-  constrainTimeouts?: boolean;
-  clientHydrateAnnotations?: boolean;
-  cookie?: string;
-  direction?: string;
-  excludeComponents?: string[];
-  language?: string;
-  maxHydrateCount?: number;
-  referrer?: string;
-  removeScripts?: boolean;
-  removeUnusedStyles?: boolean;
-  resourcesUrl?: string;
-  timeout?: number;
-  title?: string;
-  url?: string;
-  userAgent?: string;
-}
-
-export interface SerializeDocumentOptions extends HydrateDocumentOptions {
-  afterHydrate?(document: any): any | Promise<any>;
-  approximateLineWidth?: number;
-  beforeHydrate?(document: any): any | Promise<any>;
-  prettyHtml?: boolean;
-  removeAttributeQuotes?: boolean;
-  removeBooleanAttributeQuotes?: boolean;
-  removeEmptyAttributes?: boolean;
-  removeHtmlComments?: boolean;
-}
-
-export interface HydrateFactoryOptions extends SerializeDocumentOptions {
-  serializeToHtml: boolean;
-  destroyWindow: boolean;
-  destroyDocument: boolean;
-}
-
 export interface HydrateResults {
   diagnostics: Diagnostic[];
   url: string;
@@ -1730,53 +1695,6 @@ export interface PrerenderManager {
   urlsPending: Set<string>;
   urlsCompleted: Set<string>;
   maxConcurrency: number;
-}
-
-export interface PrerenderHydrateOptions extends SerializeDocumentOptions {
-  addModulePreloads?: boolean;
-  inlineExternalStyleSheets?: boolean;
-  minifyStyleElements?: boolean;
-  minifyScriptElements?: boolean;
-}
-
-export interface PrerenderConfig {
-  afterHydrate?(document?: Document, url?: URL): any | Promise<any>;
-  beforeHydrate?(document?: Document, url?: URL): any | Promise<any>;
-  canonicalUrl?(url?: URL): string | null;
-  entryUrls?: string[];
-  filterAnchor?(attrs: { [attrName: string]: string }, base?: URL): boolean;
-  filterUrl?(url?: URL, base?: URL): boolean;
-  filePath?(url?: URL, filePath?: string): string;
-  hydrateOptions?(url?: URL): PrerenderHydrateOptions;
-  normalizeUrl?(href?: string, base?: URL): URL;
-  robotsTxt?(opts: RobotsTxtOpts): string | RobotsTxtResults;
-  sitemapXml?(opts: SitemapXmpOpts): string | SitemapXmpResults;
-  trailingSlash?: boolean;
-}
-
-export interface RobotsTxtOpts {
-  urls: string[];
-  sitemapUrl: string;
-  baseUrl: string;
-  dir: string;
-}
-
-export interface RobotsTxtResults {
-  content: string;
-  filePath: string;
-  url: string;
-}
-
-export interface SitemapXmpOpts {
-  urls: string[];
-  baseUrl: string;
-  dir: string;
-}
-
-export interface SitemapXmpResults {
-  content: string;
-  filePath: string;
-  url: string;
 }
 
 /**

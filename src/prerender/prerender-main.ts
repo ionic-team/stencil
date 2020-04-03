@@ -135,7 +135,7 @@ async function runPrerenderOutputTarget(
       return;
     }
 
-    const templateHtml = await generateTemplateHtml(diagnostics, manager.isDebug, srcIndexHtmlPath, outputTarget, hydrateOpts);
+    const templateHtml = await generateTemplateHtml(prerenderConfig, diagnostics, manager.isDebug, srcIndexHtmlPath, outputTarget, hydrateOpts);
     if (diagnostics.length > 0 || typeof templateHtml !== 'string') {
       return;
     }
