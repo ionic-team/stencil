@@ -229,7 +229,8 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   const pageUrl = env.__STENCIL_BROWSER_URL__;
 
   await page.setRequestInterception(true);
-  page.on('request', interceptedRequest => {
+  
+  const interceptedReqCallback = (interceptedRequest: any) => {
     if (pageUrl === interceptedRequest.url()) {
       interceptedRequest.respond({
         status: 200,
@@ -239,7 +240,9 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
     } else {
       interceptedRequest.continue();
     }
-  });
+  }
+
+  page.on('request', interceptedReqCallback);
 
   if (!options.waitUntil) {
     options.waitUntil = env.__STENCIL_BROWSER_WAIT_UNTIL as any;
@@ -251,6 +254,8 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   }
 
   await waitForStencil(page);
+
+  page.removeListener('request', interceptedReqCallback);
 
   return rsp;
 }
