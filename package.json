@@ -126,16 +126,6 @@
     "webpack": "^4.42.1",
     "ws": "7.2.3"
   },
-  "lazyDependencies": {
-    "@types/jest": "24.0.20",
-    "@types/puppeteer": "1.19.0",
-    "jest": "24.9.0",
-    "jest-cli": "24.9.0",
-    "pixelmatch": "4.0.2",
-    "puppeteer": "2.1.0",
-    "puppeteer-core": "2.1.0",
-    "workbox-build": "4.3.1"
-  },
   "engines": {
     "node": ">=8.9.0",
     "npm": ">=6.0.0"

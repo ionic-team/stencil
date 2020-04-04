@@ -8,17 +8,12 @@ import semiver from 'semiver';
 export class NodeLazyRequire implements d.LazyRequire {
   private moduleData = new Map<string, { fromDir: string; modulePath: string }>();
 
-  constructor(private nodeResolveModule: NodeResolveModule, private stencilPackageJson: d.PackageJsonData) {}
+  constructor(
+    private nodeResolveModule: NodeResolveModule,
+    private lazyDependencies: {[dep: string]: [string, string]}
+  ) {}
 
   async ensure(logger: d.Logger, fromDir: string, ensureModuleIds: string[]) {
-    if (!this.stencilPackageJson || !this.stencilPackageJson.lazyDependencies) {
-      return Promise.resolve();
-    }
-
-    if (!this.stencilPackageJson.lazyDependencies) {
-      return Promise.resolve();
-    }
-
     const depsToInstall: DepToInstall[] = [];
     let isUpdate = false;
 
@@ -28,7 +23,7 @@ export class NodeLazyRequire implements d.LazyRequire {
         return;
       }
 
-      const requiredVersionRange = this.stencilPackageJson.lazyDependencies[ensureModuleId];
+      const [minVersion, maxVersion] = this.lazyDependencies[ensureModuleId];
 
       try {
         const resolvedPkgJsonPath = this.nodeResolveModule.resolveModule(fromDir, ensureModuleId);
@@ -37,7 +32,7 @@ export class NodeLazyRequire implements d.LazyRequire {
 
         isUpdate = true;
 
-        if (semiver(installedPkgJson.version, requiredVersionRange) >= 0) {
+        if (semiver(installedPkgJson.version, minVersion) >= 0) {
           this.moduleData.set(ensureModuleId, {
             fromDir: fromDir,
             modulePath: dirname(resolvedPkgJsonPath),
@@ -48,7 +43,7 @@ export class NodeLazyRequire implements d.LazyRequire {
 
       depsToInstall.push({
         moduleId: ensureModuleId,
-        requiredVersionRange: requiredVersionRange,
+        requiredVersionRange: maxVersion,
       });
     });
 
