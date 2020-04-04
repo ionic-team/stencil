@@ -23,6 +23,10 @@ export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
     outputOpts.maxHydrateCount = 300;
   }
 
+  if (typeof outputOpts.runtimeLogging !== 'boolean') {
+    outputOpts.runtimeLogging = false;
+  }
+
   if (typeof outputOpts.timeout !== 'number') {
     outputOpts.timeout = 15000;
   }

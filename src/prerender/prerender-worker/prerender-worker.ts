@@ -93,8 +93,10 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     const html = hydrateApp.serializeDocumentToString(doc, hydrateOpts);
 
-    const baseUrl = new URL(prerenderRequest.baseUrl);
-    results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, baseUrl, url, hydrateResults.anchors);
+    if (prerenderConfig.crawlUrls !== false) {
+      const baseUrl = new URL(prerenderRequest.baseUrl);
+      results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, baseUrl, url, hydrateResults.anchors);
+    }
 
     if (typeof prerenderConfig.filePath === 'function') {
       try {

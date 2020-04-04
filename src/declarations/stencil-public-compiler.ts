@@ -505,7 +505,12 @@ export interface PrerenderConfig {
    */
   canonicalUrl?(url?: URL): string | null;
   /**
-   * URLs to start the prerender crawling from. By default the root URL of `/` is used.
+   * While prerendering, crawl same-origin URLs found within `<a href>` elements.
+   * Default to `true`.
+   */
+  crawlUrls?: boolean;
+  /**
+   * URLs to start the prerendering from. By default the root URL of `/` is used.
    */
   entryUrls?: string[];
   /**
@@ -552,6 +557,10 @@ export interface HydrateDocumentOptions {
   removeScripts?: boolean;
   removeUnusedStyles?: boolean;
   resourcesUrl?: string;
+  /**
+   * Prints out runtime console logs to the NodeJS process. Defaults to `false`.
+   */
+  runtimeLogging?: boolean;
   timeout?: number;
   title?: string;
   url?: string;

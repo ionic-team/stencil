@@ -35,13 +35,13 @@ export const isMemberInElement = (elm: any, memberName: string) => {
 };
 
 export const registerComponents = (Cstrs: d.ComponentNativeConstructor[]) => {
-  Cstrs.forEach(Cstr => {
+  for (const Cstr of Cstrs) {
     // using this format so it follows exactly how client-side modules work
     const exportName = Cstr.cmpMeta.$tagName$;
     cmpModules.set(exportName, {
       [exportName]: Cstr,
     });
-  });
+  }
 };
 
 export const win = window;

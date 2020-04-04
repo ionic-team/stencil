@@ -21,9 +21,9 @@ export async function generateSitemapXml(manager: d.PrerenderManager) {
         content.push(`<?xml version="1.0" encoding="UTF-8"?>`);
         content.push(`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`);
 
-        opts.urls.forEach(url => {
+        for (const url of opts.urls) {
           content.push(` <url><loc>${url}</loc></url>`);
-        });
+        }
 
         content.push(`</urlset>`);
         return content.join('\n');
@@ -83,18 +83,18 @@ export function getSitemapUrls(manager: d.PrerenderManager) {
     // user provide a canonicalUrl() function
     // use that to normalize the urls for the sitemap.xml
     // if it returned null then don't add it to the sitemap
-    manager.urlsCompleted.forEach(url => {
+    for (const url of manager.urlsCompleted) {
       const canonicalUrl = manager.prerenderConfig.canonicalUrl(new URL(url));
       if (typeof canonicalUrl === 'string' && canonicalUrl.trim() !== '') {
         urls.push(canonicalUrl);
       }
-    });
+    }
   } else {
-    manager.urlsCompleted.forEach(url => {
+    for (const url of manager.urlsCompleted) {
       if (typeof url === 'string') {
         urls.push(url);
       }
-    });
+    }
   }
 
   return urls.sort(sortUrls);

@@ -6,7 +6,7 @@ export async function generateHostConfig(
   compilerCtx: d.CompilerCtx,
   outputTarget: d.OutputTargetWww,
   entryModules: d.EntryModule[],
-  hydrateResultss: d.HydrateResults[],
+  hydrateResults: d.HydrateResults[],
 ) {
   const hostConfig: d.HostConfig = {
     hosting: {
@@ -14,18 +14,18 @@ export async function generateHostConfig(
     },
   };
 
-  hydrateResultss = hydrateResultss.sort((a, b) => {
+  hydrateResults = hydrateResults.sort((a, b) => {
     if (a.url.toLowerCase() < b.url.toLowerCase()) return -1;
     if (a.url.toLowerCase() > b.url.toLowerCase()) return 1;
     return 0;
   });
 
-  hydrateResultss.forEach(hydrateResults => {
-    const hostRule = generateHostRule(outputTarget, entryModules, hydrateResults);
+  for (const hydrateResult of hydrateResults) {
+    const hostRule = generateHostRule(outputTarget, entryModules, hydrateResult);
     if (hostRule) {
       hostConfig.hosting.rules.push(hostRule);
     }
-  });
+  }
 
   addDefaults(outputTarget, hostConfig);
 
@@ -71,14 +71,13 @@ export function addBundles(outputTarget: d.OutputTargetWww, entryModules: d.Entr
   components = sortComponents(components);
 
   const bundleIds = getBundleIds(entryModules, components);
-
-  bundleIds.forEach(bundleId => {
+  for (const bundleId of bundleIds) {
     if (hostRuleHeaders.length < MAX_LINK_REL_PRELOAD_COUNT) {
       const bundleUrl = getBundleUrl(outputTarget, bundleId);
 
       hostRuleHeaders.push(formatLinkRelPreloadHeader(bundleUrl));
     }
-  });
+  }
 }
 
 export function getBundleIds(_entryModules: d.EntryModule[], _components: d.HydrateComponent[]) {
@@ -138,7 +137,7 @@ export function sortComponents(components: d.HydrateComponent[]) {
 }
 
 function addStyles(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
-  hydrateResults.styles.forEach(style => {
+  for (const style of hydrateResults.styles) {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
@@ -147,11 +146,11 @@ function addStyles(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.Hydrat
     if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.pathname));
     }
-  });
+  }
 }
 
 function addScripts(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
-  hydrateResults.scripts.forEach(script => {
+  for (const script of hydrateResults.scripts) {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
@@ -160,11 +159,11 @@ function addScripts(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.Hydra
     if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.pathname));
     }
-  });
+  }
 }
 
 function addImgs(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
-  hydrateResults.imgs.forEach(img => {
+  for (const img of hydrateResults.imgs) {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
@@ -173,7 +172,7 @@ function addImgs(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateR
     if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.pathname));
     }
-  });
+  }
 }
 
 export function formatLinkRelPreloadHeader(url: string) {

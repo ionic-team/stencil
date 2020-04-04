@@ -16,6 +16,10 @@ export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigP
     }
   }
 
+  if (typeof prerenderConfig.crawlUrls !== 'boolean') {
+    prerenderConfig.crawlUrls = true;
+  }
+
   if (typeof prerenderConfig.trailingSlash !== 'boolean') {
     prerenderConfig.trailingSlash = false;
   }

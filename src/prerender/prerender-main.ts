@@ -127,7 +127,7 @@ async function runPrerenderOutputTarget(
       manager.progressLogger = startProgressLogger(prcs);
     }
 
-    initializePrerenderEntryUrls(manager);
+    initializePrerenderEntryUrls(manager, diagnostics);
 
     if (manager.urlsPending.size === 0) {
       const err = buildError(diagnostics);
@@ -169,9 +169,9 @@ async function runPrerenderOutputTarget(
     if (prerenderBuildErrors.length > 0) {
       // convert to just runtime errors so the other build files still write
       // but the CLI knows an error occurred and should have an exit code 1
-      prerenderBuildErrors.forEach(diagnostic => {
+      for (const diagnostic of prerenderBuildErrors) {
         diagnostic.type = 'runtime';
-      });
+      }
       diagnostics.push(...prerenderBuildErrors);
     }
     diagnostics.push(...prerenderRuntimeErrors);
