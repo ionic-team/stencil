@@ -1,3 +1,19 @@
+## 🐷 [1.12.2](https://github.com/ionic-team/stencil/compare/v1.12.0...v1.12.2) (2020-04-04)
+
+
+### Bug Fixes
+
+* **testing:** skip debug logs ([23b2566](https://github.com/ionic-team/stencil/commit/23b2566b5909f6807b3a9147de747e22cdb0c1cb))
+* install correct lazy dependencies ([dd47dbe](https://github.com/ionic-team/stencil/commit/dd47dbe8fb61472ed47c5791de6ab8d883b23f49))
+* **vdom:** reflect props need vdomAttribute ([2b1291c](https://github.com/ionic-team/stencil/commit/2b1291c139a49cca75761a21b81dade97a52c4cb))
+
+
+### Features
+
+* **prerender:** add more hooks to prerender config ([5d9165f](https://github.com/ionic-team/stencil/commit/5d9165fd4a8c3059ddd2ed4a943305c0e788d970))
+
+
+
 ## 🐓 [1.12.1](https://github.com/ionic-team/stencil/compare/v1.12.0...v1.12.1) (2020-04-02)
 
 Added `taskQueue: 'immediate'` config setting.
