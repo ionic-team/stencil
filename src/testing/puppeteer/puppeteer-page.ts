@@ -341,11 +341,12 @@ async function waitForChanges(page: E2EPageInternal) {
 
 function consoleMessage(c: puppeteer.ConsoleMessage) {
   const msg = serializeConsoleMessage(c);
-  if (msg.includes('STENCIL-DEV-MODE') || msg.includes('development mode')) {
-    return;
-  }
   const type = c.type();
   const normalizedType = type === 'warning' ? 'warn' : type;
+  if (normalizedType === 'debug') {
+    // Skip debug messages
+    return;
+  }
   if (typeof (console as any)[normalizedType] === 'function') {
     (console as any)[normalizedType](msg);
   } else {

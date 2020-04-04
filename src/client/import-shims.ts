@@ -22,7 +22,7 @@ export const patchEsm = () => {
 
 export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   // NOTE!! This fn cannot use async/await!
-  if (BUILD.isDev) {
+  if (BUILD.isDev && !BUILD.isTesting) {
     consoleDevInfo('Running in development mode.');
   }
 
