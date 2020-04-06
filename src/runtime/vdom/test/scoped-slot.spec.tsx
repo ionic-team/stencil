@@ -755,4 +755,26 @@ describe('scoped slot', () => {
     // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].nodeName).toBe('GOAT');
     // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].textContent).toBe('hey goat!');
   });
+
+  it('should hide the slot\'s fallback content when slot content passed in', async() => {
+    @Component({ tag: 'fallback-test', scoped: true })
+    class FallbackSlotTest {
+      render() {
+        return (
+          <div>
+            <slot>
+              <p>Fallback Content</p>
+            </slot>
+          </div>
+        );
+      }
+    }
+    const { root } = await newSpecPage({
+      components: [FallbackSlotTest],
+      html: `<fallback-test><span>Content</span></fallback-test>`,
+    });
+
+    expect(root.firstElementChild.children[1].nodeName).toBe('SLOT-FB');
+    expect(root.firstElementChild.children[1]).toHaveAttribute('hidden');
+  });
 });
