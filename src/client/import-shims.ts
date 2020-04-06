@@ -8,7 +8,7 @@ export const patchEsm = () => {
   // @ts-ignore
   if (BUILD.cssVarShim && !(CSS && CSS.supports && CSS.supports('color', 'var(--c)'))) {
     // @ts-ignore
-    return import(/* webpackChunkName: "stencil-polyfills-css-shim" */ './polyfills/css-shim.js').then(() => {
+    return import(/* webpackChunkName: "polyfills-css-shim" */ './polyfills/css-shim.js').then(() => {
       if ((plt.$cssShim$ = (win as any).__cssshim)) {
         return plt.$cssShim$.i();
       } else {
@@ -80,7 +80,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
     if (BUILD.dynamicImportShim && !win.customElements) {
       // module support, but no custom elements support (Old Edge)
       // @ts-ignore
-      return import(/* webpackChunkName: "stencil-polyfills-dom" */ './polyfills/dom.js').then(() => opts);
+      return import(/* webpackChunkName: "polyfills-dom" */ './polyfills/dom.js').then(() => opts);
     }
   }
   return promiseResolve(opts);
