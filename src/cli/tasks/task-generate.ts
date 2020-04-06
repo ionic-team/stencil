@@ -204,4 +204,4 @@ const toPascalCase = (str: string) => str.split('-').reduce((res, part) => res +
 /**
  * Extensions available to generate.
  */
-type GeneratableExtension = 'tsx' | 'css' | 'scss' | 'less' | 'spec.tsx' | 'e2e.ts';
+type GeneratableExtension = 'tsx' | 'css' | 'scss' | 'less' | 'styl' | 'spec.tsx' | 'e2e.ts';
