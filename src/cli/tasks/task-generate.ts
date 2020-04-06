@@ -36,13 +36,21 @@ export async function taskGenerate(config: d.Config) {
     return exit(1);
   }
 
-  const extensionsToGenerate: GeneratableExtension[] = ['tsx', ...(await chooseFilesToGenerate())];
+  let cssExtension = "css";
+  if (!!config.plugins.find(plugin => plugin.name === "sass")) {
+    cssExtension = "scss";
+  } else if (!!config.plugins.find(plugin => plugin.name === "less")) {
+    cssExtension = "less";
+  } else if (!!config.plugins.find(plugin => plugin.name === "stylus")) {
+    cssExtension = "styl";
+  }
+  const extensionsToGenerate: GeneratableExtension[] = ['tsx', ...(await chooseFilesToGenerate(cssExtension))];
 
   const outDir = join(absoluteSrcDir, 'components', dir, componentName);
   await mkdir(outDir, { recursive: true });
 
   const writtenFiles = await Promise.all(
-    extensionsToGenerate.map(extension => writeFileByExtension(outDir, componentName, extension, extensionsToGenerate.includes('css'))),
+    extensionsToGenerate.map(extension => writeFileByExtension(outDir, componentName, extension, (extensionsToGenerate as string[]).includes(cssExtension), cssExtension)),
   ).catch(error => config.logger.error(error));
 
   if (!writtenFiles) {
@@ -61,14 +69,14 @@ export async function taskGenerate(config: d.Config) {
 /**
  * Show a checkbox prompt to select the files to be generated.
  */
-const chooseFilesToGenerate = async () =>
+const chooseFilesToGenerate = async (cssExtension: string) =>
   (
     await prompt({
       name: 'filesToGenerate',
       type: 'multiselect',
       message: 'Which additional files do you want to generate?',
       choices: [
-        { value: 'css', title: 'Stylesheet (.css)', selected: true },
+        { value: cssExtension, title: `Stylesheet (.${cssExtension})`, selected: true },
         { value: 'spec.tsx', title: 'Spec Test  (.spec.tsx)', selected: true },
         { value: 'e2e.ts', title: 'E2E Test (.e2e.ts)', selected: true },
       ] as any[],
@@ -78,9 +86,9 @@ const chooseFilesToGenerate = async () =>
 /**
  * Get a file's boilerplate by its extension and write it to disk.
  */
-const writeFileByExtension = async (path: string, name: string, extension: GeneratableExtension, withCss: boolean) => {
+const writeFileByExtension = async (path: string, name: string, extension: GeneratableExtension, withCss: boolean, cssExtension: string) => {
   const outFile = join(path, `${name}.${extension}`);
-  const boilerplate = getBoilerplateByExtension(name, extension, withCss);
+  const boilerplate = getBoilerplateByExtension(name, extension, withCss, cssExtension);
 
   await writeFile(outFile, boilerplate, { flag: 'wx' });
 
@@ -90,12 +98,12 @@ const writeFileByExtension = async (path: string, name: string, extension: Gener
 /**
  * Get the boilerplate for a file by its extension.
  */
-const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtension, withCss: boolean) => {
+const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtension, withCss: boolean, cssExtension: string) => {
   switch (extension) {
     case 'tsx':
-      return getComponentBoilerplate(tagName, withCss);
+      return getComponentBoilerplate(tagName, withCss, cssExtension);
 
-    case 'css':
+    case cssExtension:
       return getStyleUrlBoilerplate();
 
     case 'spec.tsx':
@@ -112,11 +120,11 @@ const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtens
 /**
  * Get the boilerplate for a component.
  */
-const getComponentBoilerplate = (tagName: string, hasStyle: boolean) => {
+const getComponentBoilerplate = (tagName: string, hasStyle: boolean, cssExtension: string) => {
   const decorator = [`{`];
   decorator.push(`  tag: '${tagName}',`);
   if (hasStyle) {
-    decorator.push(`  styleUrl: '${tagName}.css',`);
+    decorator.push(`  styleUrl: '${tagName}.${cssExtension}',`);
   }
   decorator.push(`  shadow: true,`);
   decorator.push(`}`);
@@ -196,4 +204,4 @@ const toPascalCase = (str: string) => str.split('-').reduce((res, part) => res +
 /**
  * Extensions available to generate.
  */
-type GeneratableExtension = 'tsx' | 'css' | 'spec.tsx' | 'e2e.ts';
+type GeneratableExtension = 'tsx' | 'css' | 'scss' | 'less' | 'spec.tsx' | 'e2e.ts';
