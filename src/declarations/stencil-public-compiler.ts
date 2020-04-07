@@ -316,6 +316,12 @@ export interface ConfigExtras {
    * Defaults to `false`.
    */
   slotChildNodesFix?: boolean;
+
+  /**
+   * Tagname transform enabled the tagNameTransform option of `defineCustomElements()`, so the tagName
+   * used to define the collection custom elements can be changed at runtime.
+   */
+  tagNameTransform?: boolean;
 }
 
 export interface Config extends StencilConfig {
