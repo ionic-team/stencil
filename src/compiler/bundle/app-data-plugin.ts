@@ -52,7 +52,7 @@ export const appDataPlugin = (
       id = normalizePath(id);
       if (globalScripts.some(s => s.path === id)) {
         const program = this.parse(code, {});
-        const needsDefault = !program.body.some(s => s.type === 'ExportDefaultDeclaration');
+        const needsDefault = !(program as any).body.some((s: any) => s.type === 'ExportDefaultDeclaration');
         const defaultExport = needsDefault ? '\nexport const globalFn = () => {};\nexport default globalFn;' : '';
         code = getContextImport(platform) + code + defaultExport;
 

@@ -37,7 +37,8 @@ export async function compiler(opts: BuildOptions) {
 
   const cjsIntro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-intro.js'), 'utf8');
   const cjsOutro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-outro.js'), 'utf8');
-
+  const rollupWatchPath = join(opts.nodeModulesDir, 'rollup', 'dist', 'es', 'shared', 'watch.js');
+  console.log(rollupWatchPath);
   const compilerBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
     output: {
@@ -60,12 +61,30 @@ export async function compiler(opts: BuildOptions) {
           return null;
         },
       },
+      {
+        name: 'rollupResolvePlugin',
+        resolveId(id) {
+          if (id === 'fsevents') {
+            return id;
+          }
+        },
+        load(id) {
+          if (id === 'fsevents') {
+            return '';
+          }
+          if (id === rollupWatchPath) {
+            return '';
+          }
+          return null;
+        },
+      },
       inlinedCompilerPluginsPlugin(opts, inputDir),
       parse5Plugin(opts),
       sizzlePlugin(opts),
       aliasPlugin(opts),
       sysModulesPlugin(inputDir),
       rollupNodeResolve({
+        mainFields: ['module', 'main'],
         preferBuiltins: false,
       }),
       rollupCommonjs(),
