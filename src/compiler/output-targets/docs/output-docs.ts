@@ -3,11 +3,13 @@ import { generateDocData } from '../../../compiler/docs/generate-doc-data';
 import {
   isOutputTargetCustom,
   isOutputTargetDocsCustom,
+  isOutputTargetDocsCustomElements,
   isOutputTargetDocsJson,
   isOutputTargetDocsReadme,
   isOutputTargetDocsVscode,
 } from '../../../compiler/output-targets/output-utils';
 import { generateCustomDocs } from '../../../compiler/docs/custom';
+import { generateCustomElementsDocs } from '../../../compiler/docs/custom-elements';
 import { generateReadmeDocs } from '../../../compiler/docs/readme';
 import { generateJsonDocs } from '../../../compiler/docs/json';
 import { generateVscodeDocs } from '../../../compiler/docs/vscode';
@@ -18,7 +20,7 @@ export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, b
     return;
   }
   const docsOutputTargets = config.outputTargets.filter(
-    o => isOutputTargetCustom(o) || isOutputTargetDocsReadme(o) || isOutputTargetDocsJson(o) || isOutputTargetDocsCustom(o) || isOutputTargetDocsVscode(o),
+    o => isOutputTargetCustom(o) || isOutputTargetDocsCustomElements(o) || isOutputTargetDocsReadme(o) || isOutputTargetDocsJson(o) || isOutputTargetDocsCustom(o) || isOutputTargetDocsVscode(o),
   );
 
   if (docsOutputTargets.length === 0) {
@@ -34,6 +36,7 @@ export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, b
     generateReadmeDocs(config, compilerCtx, docsData, docsOutputTargets),
     generateJsonDocs(config, compilerCtx, docsData, docsOutputTargets),
     generateVscodeDocs(compilerCtx, docsData, docsOutputTargets),
+    generateCustomElementsDocs(compilerCtx, docsData, docsOutputTargets),
     generateCustomDocs(config, docsData, docsOutputTargets),
     outputCustom(config, compilerCtx, buildCtx, docsData, docsOutputTargets),
   ]);

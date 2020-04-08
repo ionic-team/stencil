@@ -1443,6 +1443,12 @@ export interface OutputTargetCustom extends OutputTargetBase {
   copy?: CopyTask[];
 }
 
+export interface OutputTargetDocsCustomElements extends OutputTargetBase {
+  type: 'docs-custom-elements';
+  file: string;
+  sourceCodeBaseUrl?: string;
+}
+
 export interface OutputTargetDocsVscode extends OutputTargetBase {
   type: 'docs-vscode';
   file: string;
@@ -1619,6 +1625,7 @@ export type OutputTarget =
   | OutputTargetDistSelfContained
   | OutputTargetDocsJson
   | OutputTargetDocsCustom
+  | OutputTargetDocsCustomElements
   | OutputTargetDocsReadme
   | OutputTargetDocsVscode
   | OutputTargetWww

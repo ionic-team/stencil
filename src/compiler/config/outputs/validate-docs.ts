@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { buildError } from '@utils';
 import { isAbsolute, join } from 'path';
-import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme, isOutputTargetDocsVscode } from '../../output-targets/output-utils';
+import { isOutputTargetDocsCustom, isOutputTargetDocsCustomElements, isOutputTargetDocsJson, isOutputTargetDocsReadme, isOutputTargetDocsVscode } from '../../output-targets/output-utils';
 import { NOTE } from '../../docs/constants';
 
 export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
@@ -41,6 +41,12 @@ export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], user
   const customDocsOutputs = userOutputs.filter(isOutputTargetDocsCustom);
   customDocsOutputs.forEach(jsonDocsOutput => {
     docsOutputs.push(validateCustomDocsOutputTarget(diagnostics, jsonDocsOutput));
+  });
+
+  // custom-elements docs
+  const customElementsDocsOutputs = userOutputs.filter(isOutputTargetDocsCustomElements);
+  customElementsDocsOutputs.forEach(customElementsDocsOutput => {
+    docsOutputs.push(validateCustomElementsDocsOutputTarget(diagnostics, customElementsDocsOutput));
   });
 
   // vscode docs
@@ -103,10 +109,18 @@ const validateCustomDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarge
   return outputTarget;
 };
 
+const validateCustomElementsDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsCustomElements) => {
+  if (typeof outputTarget.file !== 'string') {
+    const err = buildError(diagnostics);
+    err.messageText = `docs-custom-elements outputTarget missing the "file" path`;
+  }
+  return outputTarget;
+};
+
 const validateVScodeDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsVscode) => {
   if (typeof outputTarget.file !== 'string') {
     const err = buildError(diagnostics);
-    err.messageText = `docs-vscode outputTarget missing the "file" paht`;
+    err.messageText = `docs-vscode outputTarget missing the "file" path`;
   }
   return outputTarget;
 };
