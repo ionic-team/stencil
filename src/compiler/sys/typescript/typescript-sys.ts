@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { basename, join, resolve } from 'path';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
-import { isBoolean, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, noop } from '@utils';
+import { isBoolean, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, noop, normalizePath } from '@utils';
 import { isExternalUrl } from '../fetch/fetch-utils';
 import { TypeScriptModule } from './typescript-load';
 import ts from 'typescript';
@@ -150,7 +150,7 @@ export const getTypescriptPathFromUrl = (rootDir: string, tsExecutingUrl: string
   if (url.startsWith(tsBaseUrl)) {
     const tsFilePath = url.replace(tsBaseUrl, '/');
     const tsNodePath = join(rootDir, 'node_modules', 'typescript', tsFilePath);
-    return tsNodePath;
+    return normalizePath(tsNodePath);
   }
   return url;
 };
