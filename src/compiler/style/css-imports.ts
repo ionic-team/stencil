@@ -15,10 +15,15 @@ export const parseCssImports = async (
   styleDocs?: d.StyleDoc[],
 ) => {
   const isCssEntry = resolvedFilePath.toLowerCase().endsWith('.css');
-  return cssImports(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, resolvedFilePath, styleText, new Set(), styleDocs);
+  const allCssImports: string[] = [];
+  const concatStyleText = await updateCssImports(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, resolvedFilePath, styleText, allCssImports, new Set(), styleDocs);
+  return {
+    imports: allCssImports,
+    styleText: concatStyleText,
+  };
 };
 
-const cssImports = async (
+const updateCssImports = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
@@ -26,6 +31,7 @@ const cssImports = async (
   srcFilePath: string,
   resolvedFilePath: string,
   styleText: string,
+  allCssImports: string[],
   noLoop: Set<string>,
   styleDocs?: d.StyleDoc[],
 ) => {
@@ -43,9 +49,15 @@ const cssImports = async (
     return styleText;
   }
 
+  for (const cssImport of cssImports) {
+    if (!allCssImports.includes(cssImport.filePath)) {
+      allCssImports.push(cssImport.filePath);
+    }
+  }
+
   await Promise.all(
     cssImports.map(async cssImportData => {
-      await concatCssImport(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, cssImportData, noLoop, styleDocs);
+      await concatCssImport(config, compilerCtx, buildCtx, isCssEntry, srcFilePath, cssImportData, allCssImports, noLoop, styleDocs);
     }),
   );
 
@@ -59,13 +71,14 @@ const concatCssImport = async (
   isCssEntry: boolean,
   srcFilePath: string,
   cssImportData: d.CssImportData,
+  allCssImports: string[],
   noLoop: Set<string>,
   styleDocs?: d.StyleDoc[],
 ) => {
   cssImportData.styleText = await loadStyleText(compilerCtx, cssImportData);
 
   if (typeof cssImportData.styleText === 'string') {
-    cssImportData.styleText = await cssImports(
+    cssImportData.styleText = await updateCssImports(
       config,
       compilerCtx,
       buildCtx,
@@ -73,6 +86,7 @@ const concatCssImport = async (
       cssImportData.filePath,
       cssImportData.filePath,
       cssImportData.styleText,
+      allCssImports,
       noLoop,
       styleDocs,
     );
@@ -109,10 +123,7 @@ export const getCssImports = async (config: d.Config, compilerCtx: d.CompilerCtx
   styleText = stripCssComments(styleText);
 
   const dir = dirname(filePath);
-  const importeeExt = filePath
-    .split('.')
-    .pop()
-    .toLowerCase();
+  const importeeExt = filePath.split('.').pop().toLowerCase();
 
   let r: RegExpExecArray;
   while ((r = IMPORT_RE.exec(styleText))) {
@@ -234,15 +245,14 @@ export const getModuleId = (orgImport: string) => {
 };
 
 export const replaceImportDeclarations = (styleText: string, cssImports: d.CssImportData[], isCssEntry: boolean) => {
-  cssImports.forEach(cssImportData => {
+  for (const cssImport of cssImports) {
     if (isCssEntry) {
-      if (typeof cssImportData.styleText === 'string') {
-        styleText = styleText.replace(cssImportData.srcImport, cssImportData.styleText);
+      if (typeof cssImport.styleText === 'string') {
+        styleText = styleText.replace(cssImport.srcImport, cssImport.styleText);
       }
-    } else if (typeof cssImportData.updatedImport === 'string') {
-      styleText = styleText.replace(cssImportData.srcImport, cssImportData.updatedImport);
+    } else if (typeof cssImport.updatedImport === 'string') {
+      styleText = styleText.replace(cssImport.srcImport, cssImport.updatedImport);
     }
-  });
-
+  }
   return styleText;
 };
