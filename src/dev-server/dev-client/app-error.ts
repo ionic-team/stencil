@@ -3,7 +3,7 @@ import * as c from '../dev-server-constants';
 import { emitBuildStatus } from './build-events';
 import { logDiagnostic } from './logger';
 
-export function appError(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.BuildResults) {
+export function appError(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.CompilerBuildResults) {
   if (!Array.isArray(buildResults.diagnostics)) {
     return;
   }
@@ -184,12 +184,7 @@ function escapeHtml(unsafe: string) {
     return (unsafe as any).toString();
   }
   if (typeof unsafe === 'string') {
-    return unsafe
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+    return unsafe.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   }
   return '';
 }

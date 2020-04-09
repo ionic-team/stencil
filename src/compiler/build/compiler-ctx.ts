@@ -28,7 +28,7 @@ export class CompilerContext implements d.CompilerCtx {
   hasLoggedServerUrl = false;
   hasSuccessfulBuild = false;
   isActivelyBuilding = false;
-  lastBuildResults: d.BuildResults = null;
+  lastBuildResults: d.CompilerBuildResults = null;
   lastBuildStyles = new Map<string, string>();
   lastComponentStyleInput = new Map<string, string>();
   moduleMap: d.ModuleMap = new Map();

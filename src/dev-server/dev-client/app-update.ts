@@ -10,7 +10,7 @@ export function initAppUpdate(win: d.DevClientWindow, doc: Document, config: d.D
   });
 }
 
-function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.BuildResults) {
+function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.CompilerBuildResults) {
   try {
     // remove any app errors that may already be showing
     clearDevServerModal(doc);
