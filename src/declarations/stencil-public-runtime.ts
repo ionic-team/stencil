@@ -1373,6 +1373,7 @@ export namespace JSXBase {
     'hanging'?: number | string;
     'horiz-adv-x'?: number | string;
     'horiz-origin-x'?: number | string;
+    'href'?: string,
     'ideographic'?: number | string;
     'image-rendering'?: number | string;
     'in2'?: number | string;
