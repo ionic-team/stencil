@@ -706,6 +706,7 @@ export namespace JSXBase {
   export interface SlotAttributes {
     name?: string;
     slot?: string;
+    onSlotchange?: (event: Event) => void;
   }
 
   export interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
