@@ -902,7 +902,6 @@ export namespace JSXBase {
     formtarget?: string;
     height?: number | string;
     indeterminate?: boolean;
-    inputmode?: string;
     list?: string;
     max?: number | string;
     maxLength?: number;
@@ -1215,6 +1214,8 @@ export namespace JSXBase {
     // Unknown
     inputMode?: string;
     inputmode?: string;
+    enterKeyHint?: string;
+    enterkeyhint?: string;
     is?: string;
     radioGroup?: string; // <command>, <menuitem>
     radiogroup?: string;
