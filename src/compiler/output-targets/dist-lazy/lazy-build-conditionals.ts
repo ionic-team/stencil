@@ -8,7 +8,7 @@ export const getLazyBuildConditionals = (config: d.Config, cmps: d.ComponentComp
   build.lazyLoad = true;
   build.hydrateServerSide = false;
   build.cssVarShim = config.extras.cssVarsShim;
-  build.extraTransformTagName = config.extras.tagNameTransform;
+  build.transformTagName = config.extras.tagNameTransform;
   build.asyncQueue = config.taskQueue === 'congestionAsync';
   build.taskQueue = config.taskQueue !== 'immediate';
   build.initializeNextTick = config.extras.initializeNextTick;

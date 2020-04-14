@@ -325,8 +325,7 @@ export interface ConfigExtras {
   slotChildNodesFix?: boolean;
 
   /**
-   * Tagname transform enabled the tagNameTransform option of `defineCustomElements()`, so the tagName
-   * used to define the collection custom elements can be changed at runtime.
+   * Enables the tagNameTransform option of `defineCustomElements()`, so the component tagName can be customized at runtime.
    */
   tagNameTransform?: boolean;
 }

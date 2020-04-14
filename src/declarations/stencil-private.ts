@@ -256,7 +256,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   scriptDataOpts?: boolean;
   shadowDomShim?: boolean;
   asyncQueue?: boolean;
-  extraTransformTagName?: boolean;
+  transformTagName?: boolean;
 }
 
 export type ModuleFormat = 'amd' | 'cjs' | 'commonjs' | 'es' | 'esm' | 'iife' | 'module' | 'system' | 'umd';

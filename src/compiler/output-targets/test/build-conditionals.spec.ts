@@ -101,5 +101,18 @@ describe('build-conditionals', () => {
       expect(bc.taskQueue).toBe(true);
       expect(config.taskQueue).toBe('congestionAsync');
     });
+
+    it('tagNameTransform default', () => {
+      const { config } = validateConfig(userConfig);
+      const bc = getLazyBuildConditionals(config, cmps);
+      expect(bc.transformTagName).toBe(false);
+    });
+
+    it('tagNameTransform true', () => {
+      userConfig.extras = {tagNameTransform: true};
+      const { config } = validateConfig(userConfig);
+      const bc = getLazyBuildConditionals(config, cmps);
+      expect(bc.transformTagName).toBe(true);
+    });
   });
 });

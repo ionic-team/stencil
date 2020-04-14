@@ -79,7 +79,7 @@ export const BUILD: BuildConditionals = /* default */ {
   initializeNextTick: false,
   asyncLoading: false,
   asyncQueue: true,
-  extraTransformTagName: false,
+  transformTagName: false,
 };
 
 export const NAMESPACE = /* default */ 'app' as string;
