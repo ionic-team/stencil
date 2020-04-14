@@ -3,7 +3,8 @@ export function applyPolyfills() {
   if (typeof window !== 'undefined') {
     var win = window;
 
-    if (!win.customElements || (win.Element && (!win.Element.prototype.closest || !win.Element.prototype.matches || !win.Element.prototype.remove))) {
+    if (!win.customElements ||
+      (win.Element && (!win.Element.prototype.closest || !win.Element.prototype.matches || !win.Element.prototype.remove || !win.Element.prototype.getRootNode))) {
       promises.push(import(/* webpackChunkName: "polyfills-dom" */ './dom.js'));
     }
 
