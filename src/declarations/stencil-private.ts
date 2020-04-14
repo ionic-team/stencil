@@ -256,6 +256,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   scriptDataOpts?: boolean;
   shadowDomShim?: boolean;
   asyncQueue?: boolean;
+  transformTagName?: boolean;
 }
 
 export type ModuleFormat = 'amd' | 'cjs' | 'commonjs' | 'es' | 'esm' | 'iife' | 'module' | 'system' | 'umd';
@@ -1414,6 +1415,7 @@ export interface CustomElementsDefineOptions {
   exclude?: string[];
   resourcesUrl?: string;
   syncQueue?: boolean;
+  transformTagName?: (tagName: string) => string;
   jmp?: (c: Function) => any;
   raf?: (c: FrameRequestCallback) => number;
   ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;

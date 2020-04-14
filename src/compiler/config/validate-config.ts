@@ -39,6 +39,7 @@ export const validateConfig = (userConfig?: Config) => {
   config.extras.shadowDomShim = config.extras.shadowDomShim !== false;
   config.extras.slotChildNodesFix = !!config.extras.slotChildNodesFix;
   config.extras.initializeNextTick = config.extras.initializeNextTick !== false;
+  config.extras.tagNameTransform = !!config.extras.tagNameTransform;
 
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
