@@ -486,7 +486,7 @@ export interface ConfigFlags {
   devtools?: boolean;
 }
 
-export type TaskCommand = 'build' | 'docs' | 'generate' | 'help' | 'prerender' | 'serve' | 'test' | 'version';
+export type TaskCommand = 'build' | 'docs' | 'generate' | 'g' | 'help' | 'prerender' | 'serve' | 'test' | 'version';
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
