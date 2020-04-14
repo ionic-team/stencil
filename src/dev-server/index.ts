@@ -135,8 +135,6 @@ function startWorkerServer(devServerConfig: DevServerConfig, logger: Logger, wat
             isActivelyBuilding: devServerContext.isActivelyBuilding,
           };
           delete msg.buildResults.hmr;
-          delete msg.buildResults.entries;
-          delete msg.buildResults.components;
 
           serverProcess.send(msg);
         } else {
@@ -210,10 +208,8 @@ function emitMessageToClient(serverProcess: ChildProcess, devServerContext: DevS
     // send the build results to the child server process
     devServerContext.isActivelyBuilding = false;
     const msg: DevServerMessage = {
-      buildResults: Object.assign({}, data),
+      buildResults: { ...data },
     };
-    delete msg.buildResults.entries;
-    delete msg.buildResults.components;
 
     serverProcess.send(msg);
   } else if (eventName === 'buildStart') {

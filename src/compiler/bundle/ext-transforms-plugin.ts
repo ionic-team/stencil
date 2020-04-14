@@ -57,9 +57,9 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         }
 
         // Track dependencies
-        pluginTransforms.dependencies.forEach(dep => {
+        for (const dep of pluginTransforms.dependencies) {
           this.addWatchFile(dep);
-        });
+        }
 
         buildCtx.diagnostics.push(...pluginTransforms.diagnostics);
         buildCtx.diagnostics.push(...cssTransformResults.diagnostics);

@@ -4,7 +4,7 @@ export function emitBuildLog(win: d.DevClientWindow, buildLog: d.BuildLog) {
   win.dispatchEvent(new CustomEvent(BUILD_LOG, { detail: buildLog }));
 }
 
-export function emitBuildResults(win: d.DevClientWindow, buildResults: d.BuildResults) {
+export function emitBuildResults(win: d.DevClientWindow, buildResults: d.CompilerBuildResults) {
   win.dispatchEvent(new CustomEvent(BUILD_RESULTS, { detail: buildResults }));
 }
 
@@ -18,7 +18,7 @@ export function onBuildLog(win: d.DevClientWindow, cb: (buildLog: d.BuildLog) =>
   });
 }
 
-export function onBuildResults(win: d.DevClientWindow, cb: (buildResults: d.BuildResults) => void) {
+export function onBuildResults(win: d.DevClientWindow, cb: (buildResults: d.CompilerBuildResults) => void) {
   win.addEventListener(BUILD_RESULTS, (ev: any) => {
     cb(ev.detail);
   });

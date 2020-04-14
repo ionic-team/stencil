@@ -1,5 +1,4 @@
 import * as d from '@stencil/core/internal';
-import { normalizePath } from '@utils';
 import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { join, relative } from 'path';
 
@@ -41,12 +40,6 @@ export function doNotExpectFiles(fs: d.InMemoryFileSystem, filePaths: string[]) 
     if (fs.accessSync(filePath)) {
       throw new Error(`did not expect access: ${filePath}`);
     }
-  });
-}
-
-export function wroteFile(r: d.BuildResults, p: string) {
-  return r.filesWritten.some(f => {
-    return normalizePath(f) === normalizePath(p);
   });
 }
 

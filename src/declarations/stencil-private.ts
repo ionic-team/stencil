@@ -15,7 +15,6 @@ import {
   Diagnostic,
   FsWatcher,
   FsWriteOptions,
-  HotModuleReplacement,
   Logger,
   LoggerTimeSpan,
   OptimizeCssInput,
@@ -271,8 +270,7 @@ export interface RollupResults {
 
 export interface BuildCtx {
   buildId: number;
-  buildResults: BuildResults;
-  buildResults_next: CompilerBuildResults;
+  buildResults: CompilerBuildResults;
   buildMessages: string[];
   bundleBuildCount: number;
   collections: Collection[];
@@ -333,36 +331,6 @@ export interface BuildStyleUpdate {
 }
 
 export type BuildTask = any;
-
-export interface BuildResults {
-  buildId: number;
-  buildConditionals: {
-    shadow: boolean;
-    slot: boolean;
-    svg: boolean;
-    vdom: boolean;
-  };
-  bundleBuildCount: number;
-  components: BuildComponent[];
-  componentGraph: Map<string, string[]>;
-  diagnostics: Diagnostic[];
-  dirsAdded: string[];
-  dirsDeleted: string[];
-  duration: number;
-  entries: BuildEntry[];
-  filesAdded: string[];
-  filesChanged: string[];
-  filesDeleted: string[];
-  filesUpdated: string[];
-  filesWritten: string[];
-  hasError: boolean;
-  hasSuccessfulBuild: boolean;
-  hmr?: HotModuleReplacement;
-  hydrateAppFilePath?: string;
-  isRebuild: boolean;
-  styleBuildCount: number;
-  transpileBuildCount: number;
-}
 
 export type BuildStatus = 'pending' | 'error' | 'disabled' | 'default';
 
@@ -857,7 +825,7 @@ export interface CompilerCtx {
   hasSuccessfulBuild: boolean;
   isActivelyBuilding: boolean;
   lastComponentStyleInput: Map<string, string>;
-  lastBuildResults: BuildResults;
+  lastBuildResults: CompilerBuildResults;
   lastBuildStyles: Map<string, string>;
   moduleMap: ModuleMap;
   nodeMap: NodeMap;
@@ -1250,7 +1218,7 @@ export interface DevServerMessage {
   startServer?: DevServerConfig;
   serverStarted?: DevServerStartResponse;
   buildLog?: BuildLog;
-  buildResults?: BuildResults;
+  buildResults?: CompilerBuildResults;
   requestBuildResults?: boolean;
   error?: { message?: string; type?: string; stack?: any };
   isActivelyBuilding?: boolean;
@@ -1768,7 +1736,7 @@ export interface RenderNode extends HostElement {
    * Used to know the components encapsulation.
    * empty "" for shadow, "c" from scoped
    */
-  ['s-en']?: '' /*shadow*/ | 'c' /*scoped*/;
+  ['s-en']?: '' | /*shadow*/ 'c' /*scoped*/;
 }
 
 export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
