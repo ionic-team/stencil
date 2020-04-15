@@ -1194,12 +1194,14 @@ export interface DevClientWindow extends Window {
   ['s-dev-server']: boolean;
   ['s-initial-load']: boolean;
   WebSocket: new (socketUrl: string, protos: string[]) => WebSocket;
+  devServerConfig?: DevClientConfig;
 }
 
 export interface DevClientConfig {
   basePath: string;
   editors: DevServerEditor[];
   reloadStrategy: PageReloadStrategy;
+  socketUrl?: string;
 }
 
 export interface HttpRequest {

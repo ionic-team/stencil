@@ -28,10 +28,10 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
       // we're doing this so we can force the server
       // worker to unregister, but do not fully reload the page yet
       appReset(win, config, () => {
-        initClientWebSocket(win);
+        initClientWebSocket(win, config);
       });
     } else {
-      initClientWebSocket(win);
+      initClientWebSocket(win, config);
     }
   } catch (e) {
     console.error(e);
