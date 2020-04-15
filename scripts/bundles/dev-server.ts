@@ -2,6 +2,7 @@ import fs from 'fs-extra';
 import { join } from 'path';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
+import { dataToEsm } from '@rollup/pluginutils';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { gracefulFsPlugin } from './plugins/graceful-fs-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
@@ -106,6 +107,21 @@ export async function devServer(opts: BuildOptions) {
     },
     plugins: [
       {
+        name: 'appErrorCss',
+        resolveId(id) {
+          if (id.endsWith('app-error.css')) {
+            return join(opts.srcDir, 'dev-server', 'dev-client', 'app-error.css');
+          }
+          return null;
+        },
+        transform(code, id) {
+          if (id.endsWith('.css')) {
+            return dataToEsm(code);
+          }
+          return null;
+        },
+      },
+      {
         name: 'clientConnectorPlugin',
         generateBundle(_options, bundle) {
           if (bundle[connectorName]) {
@@ -126,7 +142,10 @@ export async function devServer(opts: BuildOptions) {
             code = intro + code + outro;
 
             if (opts.isProd) {
-              const minifyResults = terser.minify(code);
+              const minifyResults = terser.minify(code, {
+                compress: { hoist_vars: true, hoist_funs: true, ecma: 5 },
+                output: { ecma: 5 },
+              });
               if (minifyResults.error) {
                 throw minifyResults.error;
               }

@@ -2,6 +2,7 @@ import * as d from '../../declarations';
 import * as c from '../dev-server-constants';
 import { emitBuildStatus } from './build-events';
 import { logDiagnostic } from './logger';
+import appErrorCss from '../static/app-error.css';
 
 export function appError(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.CompilerBuildResults) {
   if (!Array.isArray(buildResults.diagnostics)) {
@@ -164,8 +165,7 @@ function getDevServerModal(doc: Document) {
   }
 
   outer.innerHTML = `
-    <style>#${DEV_SERVER_MODAL} { display: none; }</style>
-    <link href="${c.DEV_SERVER_URL}/app-error.css" rel="stylesheet">
+    <style>${appErrorCss}</style>
     <div id="${DEV_SERVER_MODAL}-inner"></div>
   `;
 
