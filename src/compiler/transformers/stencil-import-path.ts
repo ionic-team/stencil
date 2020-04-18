@@ -66,6 +66,10 @@ export const parseImportPath = (importPath: string) => {
           mode: urlParams.get('mode') || DEFAULT_STYLE_MODE,
         };
       }
+    } else if (parsedPath.basename.endsWith('.css')) {
+      parsedPath.data = {
+        encapsulation: 'none',
+      };
     }
   }
 
