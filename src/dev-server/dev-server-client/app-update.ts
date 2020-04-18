@@ -1,24 +1,44 @@
 import * as d from '../../declarations';
-import { appError, clearDevServerModal } from './app-error';
-import { hmrWindow } from '../hmr-client';
-import { logBuild, logReload, logWarn } from './logger';
-import { onBuildResults } from './build-events';
+import { appError, clearAppErrorModal, hmrWindow, logBuild, logDiagnostic, logReload, logWarn, emitBuildStatus, onBuildResults } from '../client';
+import { OPEN_IN_EDITOR_URL } from '../dev-server-constants';
 
-export function initAppUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig) {
+export const initAppUpdate = (win: d.DevClientWindow, config: d.DevClientConfig) => {
   onBuildResults(win, buildResults => {
-    appUpdate(win, doc, config, buildResults);
+    appUpdate(win, config, buildResults);
   });
-}
+};
 
-function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.CompilerBuildResults) {
+const appUpdate = (win: d.DevClientWindow, config: d.DevClientConfig, buildResults: d.CompilerBuildResults) => {
   try {
     // remove any app errors that may already be showing
-    clearDevServerModal(doc);
+    clearAppErrorModal({ window: win });
 
     if (buildResults.hasError) {
       // looks like we've got an error
       // let's show the error all pretty like
-      appError(win, doc, config, buildResults);
+      const editorId = Array.isArray(config.editors) && config.editors.length > 0 ? config.editors[0].id : null;
+      const errorResults = appError({
+        window: win,
+        buildResults: buildResults,
+        openInEditor: editorId
+          ? data => {
+              const qs: d.OpenInEditorData = {
+                file: data.file,
+                line: data.line,
+                column: data.column,
+                editor: editorId,
+              };
+
+              const url = `${OPEN_IN_EDITOR_URL}?${Object.keys(qs)
+                .map(k => `${k}=${(qs as any)[k]}`)
+                .join('&')}`;
+              win.fetch(url);
+            }
+          : null,
+      });
+
+      errorResults.diagnostics.forEach(logDiagnostic);
+      emitBuildStatus(win, errorResults.status);
       return;
     }
 
@@ -41,9 +61,9 @@ function appUpdate(win: d.DevClientWindow, doc: Document, config: d.DevClientCon
   } catch (e) {
     console.error(e);
   }
-}
+};
 
-function appHmr(win: Window, hmr: d.HotModuleReplacement) {
+const appHmr = (win: Window, hmr: d.HotModuleReplacement) => {
   let shouldWindowReload = false;
 
   if (hmr.reloadStrategy === 'pageReload') {
@@ -80,7 +100,7 @@ function appHmr(win: Window, hmr: d.HotModuleReplacement) {
     return;
   }
 
-  const results = hmrWindow(win, hmr);
+  const results = hmrWindow({ window: win, hmr: hmr });
 
   if (results.updatedComponents.length > 0) {
     logBuild(`Updated component${results.updatedComponents.length > 1 ? 's' : ''}: ${results.updatedComponents.join(', ')}`);
@@ -97,9 +117,9 @@ function appHmr(win: Window, hmr: d.HotModuleReplacement) {
   if (results.updatedImages.length > 0) {
     logBuild(`Updated images: ${results.updatedImages.join(', ')}`);
   }
-}
+};
 
-export function appReset(win: d.DevClientWindow, config: d.DevClientConfig, cb: () => void) {
+export const appReset = (win: d.DevClientWindow, config: d.DevClientConfig, cb: () => void) => {
   // we're probably at some ugly url
   // let's update the url to be the expect root url: /
   // avoiding Promise to keep things simple for our ie11 buddy
@@ -130,4 +150,4 @@ export function appReset(win: d.DevClientWindow, config: d.DevClientConfig, cb: 
         cb();
       });
   }
-}
+};

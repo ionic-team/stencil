@@ -1,10 +1,9 @@
 import * as d from '../../declarations';
 import { applyPolyfills } from './polyfills';
-import { initClient } from './init-client';
+import { initDevClient } from './init-dev-client';
 
 declare const iframeWindow: Window;
 declare const appWindow: d.DevClientWindow;
-declare const appDoc: Document;
 declare const config: d.DevClientConfig;
 
 const defaultConfig: d.DevClientConfig = {
@@ -17,4 +16,4 @@ const defaultConfig: d.DevClientConfig = {
 const devClientConfig = Object.assign({}, defaultConfig, appWindow.devServerConfig, config);
 
 applyPolyfills(iframeWindow);
-initClient(appWindow, appDoc, devClientConfig);
+initDevClient(appWindow, devClientConfig);
