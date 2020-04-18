@@ -1,3 +1,12 @@
+## 🍦 [1.12.5](https://github.com/ionic-team/stencil/compare/v1.12.4...v1.12.5) (2020-04-18)
+
+
+### Bug Fixes
+
+* **polyfills:** check for `getRootNode` on Element when applying dom.js polyfill ([#2370](https://github.com/ionic-team/stencil/issues/2370)) ([4b74027](https://github.com/ionic-team/stencil/commit/4b74027aee8c9051265f54e969406bbd108a4dd3)), closes [#2369](https://github.com/ionic-team/stencil/issues/2369)
+* support .css imports ([d1edb0d](https://github.com/ionic-team/stencil/commit/d1edb0db90442e2a0a738172d46e997b7b4a8994))
+
+
 ## 🚞 [1.12.4](https://github.com/ionic-team/stencil/compare/v1.12.2...v1.12.4) (2020-04-15)
 
 
