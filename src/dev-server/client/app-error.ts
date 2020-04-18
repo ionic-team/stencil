@@ -1,30 +1,39 @@
-import * as d from '../../declarations';
-import * as c from '../dev-server-constants';
-import { emitBuildStatus } from './build-events';
-import { logDiagnostic } from './logger';
+import { CompilerBuildResults, Diagnostic, PrintLine } from '../../declarations';
+import appErrorCss from './app-error.css';
 
-export function appError(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig, buildResults: d.BuildResults) {
-  if (!Array.isArray(buildResults.diagnostics)) {
-    return;
-  }
-
-  const diagnostics = buildResults.diagnostics.filter(diagnostic => diagnostic.level === 'error');
-
-  if (diagnostics.length === 0) {
-    return;
-  }
-
-  const modal = getDevServerModal(doc);
-
-  diagnostics.forEach(diagnostic => {
-    logDiagnostic(diagnostic);
-    appendDiagnostic(win, doc, config, modal, diagnostic);
-  });
-
-  emitBuildStatus(win, 'error');
+interface AppErrorData {
+  window: Window;
+  buildResults: any;
+  openInEditor?: OpenInEditorCallback;
 }
 
-function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig, modal: HTMLElement, diagnostic: d.Diagnostic) {
+type OpenInEditorCallback = (data: { file: string; line: number; column: number }) => void;
+
+export const appError = (data: AppErrorData) => {
+  const results = {
+    diagnostics: [] as any[],
+    status: null as string,
+  };
+
+  if (data && data.window && Array.isArray(data.buildResults.diagnostics)) {
+    const diagnostics = (data.buildResults as CompilerBuildResults).diagnostics.filter(diagnostic => diagnostic.level === 'error');
+
+    if (diagnostics.length > 0) {
+      const modal = getDevServerModal(data.window.document);
+
+      diagnostics.forEach((diagnostic: Diagnostic) => {
+        results.diagnostics.push(diagnostic);
+        appendDiagnostic(data.window.document, data.openInEditor, modal, diagnostic);
+      });
+
+      results.status = 'error';
+    }
+  }
+
+  return results;
+};
+
+const appendDiagnostic = (doc: Document, openInEditor: OpenInEditorCallback, modal: HTMLElement, diagnostic: Diagnostic) => {
   const card = doc.createElement('div');
   card.className = 'dev-server-diagnostic';
 
@@ -51,7 +60,7 @@ function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig,
   file.className = 'dev-server-diagnostic-file';
   card.appendChild(file);
 
-  const canOpenInEditor = isOpenIsEditorEnabled(config, diagnostic);
+  const canOpenInEditor = typeof openInEditor === 'function' && typeof diagnostic.absFilePath === 'string';
 
   if (diagnostic.relFilePath) {
     const fileHeader = doc.createElement(canOpenInEditor ? 'a' : 'div');
@@ -61,7 +70,7 @@ function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig,
       fileHeader.title = escapeHtml(diagnostic.absFilePath);
 
       if (canOpenInEditor) {
-        addOpenInEditor(win, config, fileHeader, diagnostic.absFilePath, diagnostic.lineNumber, diagnostic.columnNumber);
+        addOpenInEditor(openInEditor, fileHeader, diagnostic.absFilePath, diagnostic.lineNumber, diagnostic.columnNumber);
       }
     }
 
@@ -107,7 +116,7 @@ function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig,
 
         if (canOpenInEditor) {
           const column = l.lineNumber === diagnostic.lineNumber ? diagnostic.columnNumber : 1;
-          addOpenInEditor(win, config, tdNum, diagnostic.absFilePath, l.lineNumber, column);
+          addOpenInEditor(openInEditor, tdNum, diagnostic.absFilePath, l.lineNumber, column);
         }
       }
       tr.appendChild(tdNum);
@@ -120,85 +129,66 @@ function appendDiagnostic(win: Window, doc: Document, config: d.DevClientConfig,
   }
 
   modal.appendChild(card);
-}
+};
 
-function addOpenInEditor(win: Window, config: d.DevClientConfig, elm: HTMLElement, file: string, line: number, column: number) {
+const addOpenInEditor = (openInEditor: OpenInEditorCallback, elm: HTMLElement, file: string, line: number, column: number) => {
   if (elm.tagName === 'A') {
     (elm as HTMLAnchorElement).href = '#open-in-editor';
   }
+
+  if (typeof line !== 'number' || line < 1) {
+    line = 1;
+  }
+
   if (typeof column !== 'number' || column < 1) {
     column = 1;
   }
+
   elm.addEventListener('click', ev => {
     ev.preventDefault();
     ev.stopPropagation();
-    const qs: d.OpenInEditorData = {
+    openInEditor({
       file: file,
       line: line,
       column: column,
-      editor: config.editors[0].id,
-    };
-
-    const url = `${c.OPEN_IN_EDITOR_URL}?${Object.keys(qs)
-      .map(k => `${k}=${(qs as any)[k]}`)
-      .join('&')}`;
-    win.fetch(url);
+    });
   });
-}
+};
 
-function isOpenIsEditorEnabled(config: d.DevClientConfig, diagnostic: d.Diagnostic) {
-  if (config.editors && config.editors.length > 0) {
-    if (diagnostic && typeof diagnostic.absFilePath === 'string') {
-      return true;
-    }
-  }
-  return false;
-}
-
-function getDevServerModal(doc: Document) {
+const getDevServerModal = (doc: Document) => {
   let outer = doc.getElementById(DEV_SERVER_MODAL);
   if (!outer) {
     outer = doc.createElement('div');
     outer.id = DEV_SERVER_MODAL;
+    outer.setAttribute('role', 'dialog');
     doc.body.appendChild(outer);
   }
 
-  outer.innerHTML = `
-    <style>#${DEV_SERVER_MODAL} { display: none; }</style>
-    <link href="${c.DEV_SERVER_URL}/app-error.css" rel="stylesheet">
-    <div id="${DEV_SERVER_MODAL}-inner"></div>
-  `;
+  outer.innerHTML = `<style>${appErrorCss}</style><div id="${DEV_SERVER_MODAL}-inner"></div>`;
 
   return doc.getElementById(`${DEV_SERVER_MODAL}-inner`);
-}
+};
 
-export function clearDevServerModal(doc: Document) {
-  const appErrorElm = doc.getElementById(DEV_SERVER_MODAL);
+export const clearAppErrorModal = (data: { window: Window }) => {
+  const appErrorElm = data.window.document.getElementById(DEV_SERVER_MODAL);
   if (appErrorElm) {
     appErrorElm.parentNode.removeChild(appErrorElm);
   }
-}
+};
 
-function escapeHtml(unsafe: string) {
+const escapeHtml = (unsafe: string) => {
   if (typeof unsafe === 'number' || typeof unsafe === 'boolean') {
     return (unsafe as any).toString();
   }
   if (typeof unsafe === 'string') {
-    return unsafe
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+    return unsafe.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   }
   return '';
-}
+};
 
-function titleCase(str: string) {
-  return str.charAt(0).toUpperCase() + str.substr(1);
-}
+const titleCase = (str: string) => str.charAt(0).toUpperCase() + str.substr(1);
 
-function highlightError(text: string, errorCharStart: number, errorLength: number) {
+const highlightError = (text: string, errorCharStart: number, errorLength: number) => {
   if (typeof text !== 'string') {
     return '';
   }
@@ -231,10 +221,10 @@ function highlightError(text: string, errorCharStart: number, errorLength: numbe
       return outputChar;
     })
     .join('');
-}
+};
 
-function prepareLines(orgLines: d.PrintLine[]) {
-  const lines: d.PrintLine[] = JSON.parse(JSON.stringify(orgLines));
+const prepareLines = (orgLines: PrintLine[]) => {
+  const lines: PrintLine[] = JSON.parse(JSON.stringify(orgLines));
 
   for (let i = 0; i < 100; i++) {
     if (!eachLineHasLeadingWhitespace(lines)) {
@@ -250,9 +240,9 @@ function prepareLines(orgLines: d.PrintLine[]) {
   }
 
   return lines;
-}
+};
 
-function eachLineHasLeadingWhitespace(lines: d.PrintLine[]) {
+const eachLineHasLeadingWhitespace = (lines: PrintLine[]) => {
   if (!lines.length) {
     return false;
   }
@@ -268,6 +258,6 @@ function eachLineHasLeadingWhitespace(lines: d.PrintLine[]) {
   }
 
   return true;
-}
+};
 
 const DEV_SERVER_MODAL = `dev-server-modal`;

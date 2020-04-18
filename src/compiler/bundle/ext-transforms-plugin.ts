@@ -18,24 +18,28 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
 
       const { data } = parseImportPath(id);
       if (data != null) {
+        let cmp: d.ComponentCompilerMeta;
         const filePath = normalizeFsPath(id);
         const code = await compilerCtx.fs.readFile(filePath);
-        const cmp = buildCtx.components.find(c => c.tagName === data.tag);
-        const moduleFile = cmp && compilerCtx.moduleMap.get(cmp.sourceFilePath);
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, buildCtx, code, filePath);
         const commentOriginalSelector = bundleOpts.platform === 'hydrate' && data.encapsulation === 'shadow';
 
-        if (moduleFile) {
-          const collectionDirs = config.outputTargets.filter(isOutputTargetDistCollection);
+        if (data.tag) {
+          cmp = buildCtx.components.find(c => c.tagName === data.tag);
+          const moduleFile = cmp && compilerCtx.moduleMap.get(cmp.sourceFilePath);
 
-          const relPath = relative(config.srcDir, pluginTransforms.id);
+          if (moduleFile) {
+            const collectionDirs = config.outputTargets.filter(isOutputTargetDistCollection);
 
-          await Promise.all(
-            collectionDirs.map(async outputTarget => {
-              const collectionPath = join(outputTarget.collectionDir, relPath);
-              await compilerCtx.fs.writeFile(collectionPath, pluginTransforms.code);
-            }),
-          );
+            const relPath = relative(config.srcDir, pluginTransforms.id);
+
+            await Promise.all(
+              collectionDirs.map(async outputTarget => {
+                const collectionPath = join(outputTarget.collectionDir, relPath);
+                await compilerCtx.fs.writeFile(collectionPath, pluginTransforms.code);
+              }),
+            );
+          }
         }
 
         const cssTransformResults = await compilerCtx.worker.transformCssToEsm({
@@ -57,9 +61,9 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         }
 
         // Track dependencies
-        pluginTransforms.dependencies.forEach(dep => {
+        for (const dep of pluginTransforms.dependencies) {
           this.addWatchFile(dep);
-        });
+        }
 
         buildCtx.diagnostics.push(...pluginTransforms.diagnostics);
         buildCtx.diagnostics.push(...cssTransformResults.diagnostics);

@@ -310,12 +310,24 @@ export interface ConfigExtras {
   shadowDomShim?: boolean;
 
   /**
+   * When a component is first attached to the DOM, wait a single tick before rendering.
+   * This worksaround an angular issue, where it attaches the elements before settings their initial state,
+   * leading to double renders and unnecesary event dispatchs.
+   */
+  initializeNextTick?: boolean;
+
+  /**
    * For browsers that do not support shadow dom (IE11 and Edge 18 and below), slot is polyfilled
    * to simulate the same behavior. However, the host element's `childNodes` and `children`
    * getters are not patched to only show the child nodes and elements of the default slot.
    * Defaults to `false`.
    */
   slotChildNodesFix?: boolean;
+
+  /**
+   * Enables the tagNameTransform option of `defineCustomElements()`, so the component tagName can be customized at runtime.
+   */
+  tagNameTransform?: boolean;
 }
 
 export interface Config extends StencilConfig {
@@ -479,7 +491,7 @@ export interface ConfigFlags {
   devtools?: boolean;
 }
 
-export type TaskCommand = 'build' | 'docs' | 'generate' | 'help' | 'prerender' | 'serve' | 'test' | 'version';
+export type TaskCommand = 'build' | 'docs' | 'generate' | 'g' | 'help' | 'prerender' | 'serve' | 'test' | 'version';
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 

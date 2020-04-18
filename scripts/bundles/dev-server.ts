@@ -2,12 +2,13 @@ import fs from 'fs-extra';
 import { join } from 'path';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
+import { dataToEsm } from '@rollup/pluginutils';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { gracefulFsPlugin } from './plugins/graceful-fs-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { BuildOptions } from '../utils/options';
-import { RollupOptions, OutputChunk } from 'rollup';
+import { RollupOptions, OutputChunk, Plugin } from 'rollup';
 import terser from 'terser';
 import ts from 'typescript';
 
@@ -93,11 +94,31 @@ export async function devServer(opts: BuildOptions) {
     ],
   };
 
-  const inputClientDir = join(inputDir, 'dev-client');
+  function appErrorCssPlugin(): Plugin {
+    return {
+      name: 'appErrorCss',
+      resolveId(id) {
+        if (id.endsWith('app-error.css')) {
+          return join(opts.srcDir, 'dev-server', 'client', 'app-error.css');
+        }
+        return null;
+      },
+      transform(code, id) {
+        if (id.endsWith('.css')) {
+          code = code.replace(/\n/g, ' ').trim();
+          while (code.includes('  ')) {
+            code = code.replace(/  /g, ' ');
+          }
+          return dataToEsm(code, { preferConst: true });
+        }
+        return null;
+      },
+    };
+  }
 
   const connectorName = 'connector.html';
-  const devServerClientBundle: RollupOptions = {
-    input: join(inputClientDir, 'index.js'),
+  const connectorBundle: RollupOptions = {
+    input: join(inputDir, 'dev-server-client', 'index.js'),
     output: {
       format: 'cjs',
       file: join(opts.output.devServerDir, connectorName),
@@ -105,6 +126,15 @@ export async function devServer(opts: BuildOptions) {
       preferConst: true,
     },
     plugins: [
+      {
+        name: 'connectorPlugin',
+        resolveId(id) {
+          if (id === '@stencil/core/dev-server/client') {
+            return join(inputDir, 'client', 'index.js');
+          }
+        },
+      },
+      appErrorCssPlugin(),
       {
         name: 'clientConnectorPlugin',
         generateBundle(_options, bundle) {
@@ -126,7 +156,10 @@ export async function devServer(opts: BuildOptions) {
             code = intro + code + outro;
 
             if (opts.isProd) {
-              const minifyResults = terser.minify(code);
+              const minifyResults = terser.minify(code, {
+                compress: { hoist_vars: true, hoist_funs: true, ecma: 5 },
+                output: { ecma: 5 },
+              });
               if (minifyResults.error) {
                 throw minifyResults.error;
               }
@@ -146,29 +179,40 @@ export async function devServer(opts: BuildOptions) {
     ],
   };
 
-  await fs.ensureDir(join(opts.output.devServerDir, 'hmr-client'));
+  await fs.ensureDir(join(opts.output.devServerDir, 'client'));
 
-  // copy hmr-client dts files
-  await fs.copy(join(opts.transpiledDir, 'dev-server', 'hmr-client', 'index.d.ts'), join(opts.output.devServerDir, 'hmr-client', 'index.d.ts'));
+  // copy dev server client dts files
+  await fs.copy(join(opts.transpiledDir, 'dev-server', 'client'), join(opts.output.devServerDir, 'client'), {
+    filter: src => {
+      if (src.endsWith('.d.ts')) {
+        return true;
+      }
+      const stats = fs.statSync(src);
+      if (stats.isDirectory()) {
+        return true;
+      }
+      return false;
+    },
+  });
 
   // write package.json
-  writePkgJson(opts, join(opts.output.devServerDir, 'hmr-client'), {
-    name: '@stencil/core/dev-server/hmr-client',
-    description: 'Stencil HMR Client.',
+  writePkgJson(opts, join(opts.output.devServerDir, 'client'), {
+    name: '@stencil/core/dev-server/client',
+    description: 'Stencil Dev Server Client.',
     main: 'index.mjs',
     types: 'index.d.ts',
   });
 
-  const hmrClientBundle: RollupOptions = {
-    input: join(opts.transpiledDir, 'dev-server', 'hmr-client', 'index.js'),
+  const devServerClientBundle: RollupOptions = {
+    input: join(opts.transpiledDir, 'dev-server', 'client', 'index.js'),
     output: {
       format: 'esm',
-      file: join(opts.output.devServerDir, 'hmr-client', 'index.mjs'),
+      file: join(opts.output.devServerDir, 'client', 'index.mjs'),
     },
-    plugins: [replacePlugin(opts), rollupResolve()],
+    plugins: [appErrorCssPlugin(), replacePlugin(opts), rollupResolve()],
   };
 
-  return [devServerBundle, devServerWorkerBundle, devServerClientBundle, hmrClientBundle];
+  return [devServerBundle, devServerWorkerBundle, connectorBundle, devServerClientBundle];
 }
 
 async function createContentTypeData(opts: BuildOptions) {
@@ -193,18 +237,19 @@ async function createContentTypeData(opts: BuildOptions) {
   await fs.writeJson(contentTypeDestPath, exts);
 }
 
-const banner = `<!doctype html><html><head><meta charset="utf-8">
-<title>Stencil Dev Server Connector __VERSION:STENCIL__ &#9889;</title></head>
-<body style="background:black;color:white;font:18px monospace;text-align:center;">
+const banner = `<!doctype html><html><head><meta charset="utf-8"><style>body{background:black;color:white;font:18px monospace;text-align:center}</style></head><body>
+
 Stencil Dev Server Connector __VERSION:STENCIL__ &#9889;
+
 <script>`;
 
-const intro = `(function(iframeWindow, appWindow, appDoc, config, exports) {
-  "use strict";
+const intro = `(function(iframeWindow, appWindow, config, exports) {
+"use strict";
 `;
 
 const outro = `
-})(window, window.parent, window.parent.document, window.__DEV_CLIENT_CONFIG__, {});
+document.title = document.body.innerText;
+})(window, window.parent, window.__DEV_CLIENT_CONFIG__, {});
 `;
 
 const footer = `\n</script></body></html>`;

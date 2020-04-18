@@ -1,3 +1,31 @@
+## 🚞 [1.12.4](https://github.com/ionic-team/stencil/compare/v1.12.2...v1.12.4) (2020-04-15)
+
+
+### Bug Fixes
+
+* **cli:** add g shortcut for generate ([035972c](https://github.com/ionic-team/stencil/commit/035972ce740e00c82b62961415fa02c103f9564b)), closes [#2346](https://github.com/ionic-team/stencil/issues/2346)
+* **cli:** pass --esm flag to th compiler ([#2339](https://github.com/ionic-team/stencil/issues/2339)) ([939a493](https://github.com/ionic-team/stencil/commit/939a4931c15a30a75eabf07e6555e1de39e16849))
+* **compiler:** initializeNextTick=true by default ([cb71057](https://github.com/ionic-team/stencil/commit/cb71057b7fc4123738f83d03713a06d8f0a50d64))
+* **types:** add href SVG attribute ([#2359](https://github.com/ionic-team/stencil/issues/2359)) ([0c0a3d0](https://github.com/ionic-team/stencil/commit/0c0a3d0b3014356602aa9c65f08030f508af1a41)), closes [#2358](https://github.com/ionic-team/stencil/issues/2358)
+* **types:** add onSlotchange to slot element attribute ([#2357](https://github.com/ionic-team/stencil/issues/2357)) ([5b9b89e](https://github.com/ionic-team/stencil/commit/5b9b89e699195b5261007c2366bacd264c0933cf)), closes [#2356](https://github.com/ionic-team/stencil/issues/2356)
+* **watch:** rebuild on css import file changes ([b7ca6e1](https://github.com/ionic-team/stencil/commit/b7ca6e17f828656f0294a624922049dbb54c8aa8))
+* **workers:** wrap code around iife ([c4479cc](https://github.com/ionic-team/stencil/commit/c4479cc6d76195311d24f0a6a6062cf14f5b12e6))
+
+
+### Features
+
+* **compiler:** add extra for transformTagName ([#2343](https://github.com/ionic-team/stencil/issues/2343)) ([253894d](https://github.com/ionic-team/stencil/commit/253894d3ea154c0471e1345ad79fea3e708121d5))
+* **devserver:** dynamic dev server / socket url config ([acecc68](https://github.com/ionic-team/stencil/commit/acecc6825446119e0fc9d512c56a61930aa196d5))
+* **prerender:** improve prerender logging, disable crawlUrls options ([0683598](https://github.com/ionic-team/stencil/commit/06835987e33b552b5435b746f359705d0899c906))
+* **types:** add enterkeyhint HTMLAttribute ([#2367](https://github.com/ionic-team/stencil/issues/2367)) ([5adcdd3](https://github.com/ionic-team/stencil/commit/5adcdd3d601525232247a9471ae8e459ce2fbc07))
+
+
+### Performance Improvements
+
+* don't emit webpack chunk names ([#2338](https://github.com/ionic-team/stencil/issues/2338)) ([bbadb54](https://github.com/ionic-team/stencil/commit/bbadb540278209e80c7de9ea059e74c699938d0b)), closes [#2337](https://github.com/ionic-team/stencil/issues/2337)
+
+
+
 ## 🌙 [1.12.3](https://github.com/ionic-team/stencil/compare/v1.12.2...v1.12.3) (2020-04-06)
 
 

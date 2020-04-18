@@ -1,7 +1,8 @@
-import * as d from '../../declarations';
-import { onBuildLog, onBuildResults, onBuildStatus } from './build-events';
+import { onBuildLog, onBuildResults, onBuildStatus } from './events';
 
-export function initBuildProgress(win: d.DevClientWindow, doc: Document) {
+export const initBuildProgress = (data: { window: Window }) => {
+  const win = data.window;
+  const doc = win.document;
   const barColor = `#5851ff`;
   const errorColor = `#b70c19`;
   let addBarTimerId: any;
@@ -132,4 +133,4 @@ export function initBuildProgress(win: d.DevClientWindow, doc: Document) {
     (progressBar.style as any).contain = `strict`;
     doc.body.appendChild(progressBar);
   }
-}
+};

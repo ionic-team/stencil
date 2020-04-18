@@ -1,11 +1,10 @@
 import * as d from '../../declarations';
 import * as c from '../dev-server-constants';
 import { appReset, initAppUpdate } from './app-update';
-import { initBuildProgress } from './build-progress';
-import { initBuildStatus } from './build-status';
+import { initBuildProgress, initBuildStatus } from '../client';
 import { initClientWebSocket } from './client-web-socket';
 
-export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevClientConfig) {
+export const initDevClient = (win: d.DevClientWindow, config: d.DevClientConfig) => {
   try {
     if (win['s-dev-server']) {
       // somehow we've already initialized the dev server client-side script
@@ -14,9 +13,9 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
     }
     win['s-dev-server'] = true;
 
-    initBuildStatus(win, doc);
-    initBuildProgress(win, doc);
-    initAppUpdate(win, doc, config);
+    initBuildStatus({ window: win });
+    initBuildProgress({ window: win });
+    initAppUpdate(win, config);
 
     if (isInitialDevServerLoad(win, config)) {
       win['s-initial-load'] = true;
@@ -28,18 +27,18 @@ export function initClient(win: d.DevClientWindow, doc: Document, config: d.DevC
       // we're doing this so we can force the server
       // worker to unregister, but do not fully reload the page yet
       appReset(win, config, () => {
-        initClientWebSocket(win);
+        initClientWebSocket(win, config);
       });
     } else {
-      initClientWebSocket(win);
+      initClientWebSocket(win, config);
     }
   } catch (e) {
     console.error(e);
   }
-}
+};
 
-function isInitialDevServerLoad(win: d.DevClientWindow, config: d.DevClientConfig) {
+const isInitialDevServerLoad = (win: d.DevClientWindow, config: d.DevClientConfig) => {
   let pathname = win.location.pathname;
   pathname = '/' + pathname.substring(config.basePath.length);
   return pathname === c.DEV_SERVER_INIT_URL;
-}
+};

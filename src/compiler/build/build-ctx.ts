@@ -8,8 +8,7 @@ import { hasError, hasWarning } from '@utils';
 export class BuildContext implements d.BuildCtx {
   buildId = -1;
   buildMessages: string[] = [];
-  buildResults: d.BuildResults = null;
-  buildResults_next: d.CompilerBuildResults = null;
+  buildResults: d.CompilerBuildResults = null;
   bundleBuildCount = 0;
   collections: d.Collection[] = [];
   completedTasks: d.BuildTask[] = [];

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import { HostElement } from '../../declarations';
 import { setHmrAttr, hasShadowRoot } from './hmr-util';
 
 export const hmrComponents = (elm: Element, versionId: string, hmrTagNames: string[]) => {
@@ -15,8 +15,8 @@ const hmrComponent = (updatedTags: string[], elm: Element, versionId: string, cm
   // drill down through every node in the page
   // to include shadow roots and look for this
   // component tag to run hmr() on
-  if (elm.nodeName.toLowerCase() === cmpTagName && typeof (elm as d.HostElement)['s-hmr'] === 'function') {
-    (elm as d.HostElement)['s-hmr'](versionId);
+  if (elm.nodeName.toLowerCase() === cmpTagName && typeof (elm as HostElement)['s-hmr'] === 'function') {
+    (elm as HostElement)['s-hmr'](versionId);
     setHmrAttr(elm, versionId);
 
     if (updatedTags.indexOf(cmpTagName) === -1) {

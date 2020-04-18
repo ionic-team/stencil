@@ -149,6 +149,8 @@ const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCt
     // Generate commonjs output so we can intercept exports at runtme
     const output = await build.generate({
       format: 'commonjs',
+      banner: '(()=>{\n',
+      footer: '})();',
       intro: getWorkerIntro(workerMsgId, config.devMode),
       esModule: false,
       preferConst: true,

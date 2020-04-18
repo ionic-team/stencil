@@ -24,7 +24,6 @@ const pkgs: TestPackage[] = [
     // dev-server
     packageJson: 'dev-server/package.json',
     files: [
-      'dev-server/static/app-error.css',
       'dev-server/static/favicon.ico',
       'dev-server/templates/directory-index.html',
       'dev-server/templates/initial-load.html',

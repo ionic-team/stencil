@@ -47,10 +47,9 @@ export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildC
     await generateOutputTargets(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildAbort(buildCtx);
 
-    /// write outputs
+    // write outputs
     await buildCtx.stylesPromise;
     await writeBuild(config, compilerCtx, buildCtx);
-    // await copyPromise;
   } catch (e) {
     // ¯\_(ツ)_/¯
     catchError(buildCtx.diagnostics, e);

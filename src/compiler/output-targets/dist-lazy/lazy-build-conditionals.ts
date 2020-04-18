@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
-import { isOutputTargetHydrate, isOutputTargetAngular } from '../output-utils';
+import { isOutputTargetHydrate } from '../output-utils';
 
 export const getLazyBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
@@ -8,9 +8,10 @@ export const getLazyBuildConditionals = (config: d.Config, cmps: d.ComponentComp
   build.lazyLoad = true;
   build.hydrateServerSide = false;
   build.cssVarShim = config.extras.cssVarsShim;
+  build.transformTagName = config.extras.tagNameTransform;
   build.asyncQueue = config.taskQueue === 'congestionAsync';
   build.taskQueue = config.taskQueue !== 'immediate';
-  build.initializeNextTick = config.outputTargets.some(isOutputTargetAngular);
+  build.initializeNextTick = config.extras.initializeNextTick;
 
   const hasHydrateOutputTargets = config.outputTargets.some(isOutputTargetHydrate);
   build.hydrateClientSide = hasHydrateOutputTargets;

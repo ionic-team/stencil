@@ -13,11 +13,10 @@
   z-index: 100000;
   margin: 0 !important;
   padding: 0 !important;
-  font-family: -apple-system, "Roboto", BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
+  font-family: -apple-system, 'Roboto', BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol' !important;
   font-size: 14px !important;
   line-height: 1.5 !important;
   -webkit-font-smoothing: antialiased;
-  font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   text-size-adjust: none;
   word-wrap: break-word;
@@ -72,12 +71,12 @@
   border-top-left-radius: 2px !important;
   border-top-right-radius: 2px !important;
   background-color: #f9f9f9 !important;
-  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace !important;
+  font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace !important;
   font-size: 12px !important;
 }
 
 a.dev-server-diagnostic-file-header {
-  color: #0000EE !important;
+  color: #0000ee !important;
   text-decoration: underline !important;
 }
 
@@ -100,8 +99,8 @@ a.dev-server-diagnostic-file-header:hover {
 .dev-server-diagnostic-table {
   margin: 0 !important;
   padding: 0 !important;
-  border-spacing: 0 !important;;
-  border-collapse: collapse !important;;
+  border-spacing: 0 !important;
+  border-collapse: collapse !important;
   border-width: 0 !important;
   border-style: none !important;
   -moz-tab-size: 2;
@@ -120,7 +119,7 @@ td.dev-server-diagnostic-blob-num {
   padding-left: 10px !important;
   width: 1% !important;
   min-width: 50px !important;
-  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace !important;
+  font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace !important;
   font-size: 12px !important;
   line-height: 20px !important;
   color: rgba(0, 0, 0, 0.3) !important;
@@ -166,7 +165,7 @@ td.dev-server-diagnostic-blob-code {
   line-height: 20px !important;
   vertical-align: top !important;
   overflow: visible !important;
-  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace !important;
+  font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace !important;
   font-size: 12px !important;
   color: #333 !important;
   word-wrap: normal !important;
@@ -174,7 +173,7 @@ td.dev-server-diagnostic-blob-code {
 }
 
 td.dev-server-diagnostic-blob-code::before {
-  content: "" !important;
+  content: '' !important;
 }
 
 .dev-server-diagnostic-error-chr {
@@ -189,7 +188,7 @@ td.dev-server-diagnostic-blob-code::before {
   width: 8px !important;
   height: 20px !important;
   background-color: #ffdddd !important;
-  content: "" !important;
+  content: '' !important;
 }
 
 /**

@@ -21,27 +21,27 @@ export const buildAbort = (buildCtx: d.BuildCtx) => {
 };
 
 const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, aborted: boolean) => {
-  if (buildCtx.hasFinished && buildCtx.buildResults_next) {
+  if (buildCtx.hasFinished && buildCtx.buildResults) {
     // we've already marked this build as finished and
     // already created the build results, just return these
-    return buildCtx.buildResults_next;
+    return buildCtx.buildResults;
   }
 
   buildCtx.debug(`${aborted ? 'aborted' : 'finished'} build, ${buildCtx.timestamp}`);
 
   // create the build results data
-  buildCtx.buildResults_next = generateBuildResults(config, compilerCtx, buildCtx);
+  buildCtx.buildResults = generateBuildResults(config, compilerCtx, buildCtx);
 
   // log any errors/warnings
   if (!buildCtx.hasFinished) {
     // haven't set this build as finished yet
     if (!buildCtx.hasPrintedResults) {
-      cleanDiagnostics(config, buildCtx.buildResults_next.diagnostics);
-      config.logger.printDiagnostics(buildCtx.buildResults_next.diagnostics);
+      cleanDiagnostics(config, buildCtx.buildResults.diagnostics);
+      config.logger.printDiagnostics(buildCtx.buildResults.diagnostics);
     }
 
     const hasChanges = buildCtx.hasScriptChanges || buildCtx.hasStyleChanges;
-    if (buildCtx.isRebuild && hasChanges && buildCtx.buildResults_next.hmr && !aborted) {
+    if (buildCtx.isRebuild && hasChanges && buildCtx.buildResults.hmr && !aborted) {
       // this is a rebuild, and we've got hmr data
       // and this build hasn't been aborted
       logHmr(config.logger, buildCtx);
@@ -63,7 +63,7 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
       // ┏(°.°)┛ ┗(°.°)┓ ┗(°.°)┛ ┏(°.°)┓
       compilerCtx.changedFiles.clear();
       compilerCtx.hasSuccessfulBuild = true;
-      buildCtx.buildResults_next.hasSuccessfulBuild = true;
+      buildCtx.buildResults.hasSuccessfulBuild = true;
     }
 
     // print out the time it took to build
@@ -74,7 +74,7 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
     }
 
     // emit a buildFinish event for anyone who cares
-    compilerCtx.events.emit('buildFinish', buildCtx.buildResults_next);
+    compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
 
     // write all of our logs to disk if config'd to do so
     // do this even if there are errors or not the active build
@@ -93,13 +93,13 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
     }
   }
 
-  return buildCtx.buildResults_next;
+  return buildCtx.buildResults;
 };
 
 const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {
   // this is a rebuild, and we've got hmr data
   // and this build hasn't been aborted
-  const hmr = buildCtx.buildResults_next.hmr;
+  const hmr = buildCtx.buildResults.hmr;
   if (hmr.componentsUpdated) {
     cleanupUpdateMsg(logger, `updated component`, hmr.componentsUpdated);
   }

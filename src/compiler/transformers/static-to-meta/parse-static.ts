@@ -3,7 +3,7 @@ import { createModule, getModule } from '../../transpile/transpiled-module';
 import { dirname, basename, join } from 'path';
 import { normalizePath } from '@utils';
 import { parseCallExpression } from './call-expression';
-import { parseImport } from './import';
+import { parseModuleImport } from './import';
 import { parseStaticComponentMeta } from './component';
 import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
@@ -39,7 +39,7 @@ export const updateModule = (
       parseStaticComponentMeta(compilerCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap);
       return;
     } else if (ts.isImportDeclaration(node)) {
-      parseImport(config, compilerCtx, buildCtx, moduleFile, srcDirPath, node);
+      parseModuleImport(config, compilerCtx, buildCtx, moduleFile, srcDirPath, node);
       return;
     } else if (ts.isCallExpression(node)) {
       parseCallExpression(moduleFile, node);

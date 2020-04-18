@@ -38,8 +38,12 @@ export async function taskGenerate(config: d.Config) {
 
   const extensionsToGenerate: GeneratableExtension[] = ['tsx', ...(await chooseFilesToGenerate())];
 
+  const testFolder = extensionsToGenerate.some(isTest)
+    ? 'test'
+    : '';
+
   const outDir = join(absoluteSrcDir, 'components', dir, componentName);
-  await mkdir(outDir, { recursive: true });
+  await mkdir(join(outDir, testFolder), { recursive: true });
 
   const writtenFiles = await Promise.all(
     extensionsToGenerate.map(extension => writeFileByExtension(outDir, componentName, extension, extensionsToGenerate.includes('css'))),
@@ -79,12 +83,19 @@ const chooseFilesToGenerate = async () =>
  * Get a file's boilerplate by its extension and write it to disk.
  */
 const writeFileByExtension = async (path: string, name: string, extension: GeneratableExtension, withCss: boolean) => {
+  if (isTest(extension)) {
+    path = join(path, 'test');
+  }
   const outFile = join(path, `${name}.${extension}`);
   const boilerplate = getBoilerplateByExtension(name, extension, withCss);
 
   await writeFile(outFile, boilerplate, { flag: 'wx' });
 
   return outFile;
+};
+
+const isTest = (extension: string) => {
+  return extension === 'e2e.ts' || extension === 'spec.tsx';
 };
 
 /**
@@ -121,10 +132,10 @@ const getComponentBoilerplate = (tagName: string, hasStyle: boolean) => {
   decorator.push(`  shadow: true,`);
   decorator.push(`}`);
 
-  return `import { Component, ComponentInterface, Host, h } from '@stencil/core';
+  return `import { Component, Host, h } from '@stencil/core';
 
 @Component(${decorator.join('\n')})
-export class ${toPascalCase(tagName)} implements ComponentInterface {
+export class ${toPascalCase(tagName)} {
 
   render() {
     return (

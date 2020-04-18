@@ -1,8 +1,8 @@
-export function applyPolyfills(win: any) {
+export const applyPolyfills = (win: any) => {
   applyCustomEvent(win);
-}
+};
 
-function applyCustomEvent(win: any) {
+const applyCustomEvent = (win: any) => {
   if (typeof win.CustomEvent === 'function') {
     return;
   }
@@ -17,4 +17,4 @@ function applyCustomEvent(win: any) {
   CustomEvent.prototype = win.Event.prototype;
 
   win.CustomEvent = CustomEvent;
-}
+};
