@@ -23,7 +23,7 @@ const isEmptable = (o: d.OutputTarget): o is OutputTargetEmptiable =>
   isOutputTargetHydrate(o);
 
 export const emptyOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  if (buildCtx.isRebuild || config.logLevel === 'debug') {
+  if (buildCtx.isRebuild) {
     return;
   }
   const cleanDirs = config.outputTargets
