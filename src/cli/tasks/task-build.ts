@@ -27,7 +27,7 @@ export async function taskBuild(prcs: NodeJS.Process, config: d.Config) {
     if (results.hasError) {
       exitCode = 1;
     } else if (config.flags.prerender) {
-      const prerenderDiagnostics = await runPrerenderTask(prcs, config, results.hydrateAppFilePath, results.componentGraph, null);
+      const prerenderDiagnostics = await runPrerenderTask(prcs, config, null, results.hydrateAppFilePath, results.componentGraph, null);
       config.logger.printDiagnostics(prerenderDiagnostics);
 
       if (prerenderDiagnostics.some(d => d.level === 'error')) {

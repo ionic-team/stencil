@@ -71,7 +71,7 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
             removeWatcher = null;
           }
         } catch (e) {}
-        logger.debug(`dev server closed`);
+        logger.debug(`dev server closed, port ${starupDevServerConfig.port}`);
         return Promise.resolve();
       },
       emit(eventName: any, data: any) {
