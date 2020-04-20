@@ -32,7 +32,7 @@ const writeHydrateOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, 
       if (output.type === 'chunk') {
         output.code = relocateHydrateContextConst(config, compilerCtx, output.code);
         const filePath = join(hydrateAppDirPath, output.fileName);
-        await compilerCtx.fs.writeFile(filePath, output.code);
+        await compilerCtx.fs.writeFile(filePath, output.code, { immediateWrite: true });
       }
     }),
   );
