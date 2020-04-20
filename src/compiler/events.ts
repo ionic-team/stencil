@@ -37,8 +37,9 @@ export const buildEvents = (): d.BuildEvents => {
 
   const emit = (eventName: d.CompilerEventName, data: any) => {
     const normalizedEventName = eventName.toLowerCase().trim();
+    const callbacks = evCallbacks.slice();
 
-    for (const ev of evCallbacks) {
+    for (const ev of callbacks) {
       if (ev.eventName == null) {
         try {
           ev.callback(eventName, data);
