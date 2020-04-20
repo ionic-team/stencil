@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
 import { getNameText } from '../generate-doc-data';
 import { isOutputTargetDocsVscode } from '../../output-targets/output-utils';
+import { join } from 'path';
 
 export const generateVscodeDocs = async (compilerCtx: d.CompilerCtx, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) => {
   const vsCodeOutputTargets = outputTargets.filter(isOutputTargetDocsVscode);
@@ -33,7 +34,7 @@ const getReferences = (cmp: d.JsonDocsComponent, repoBaseUrl: string) => {
   if (repoBaseUrl) {
     references.push({
       name: 'Source code',
-      url: repoBaseUrl + cmp.filePath,
+      url: join(repoBaseUrl, cmp.filePath),
     });
   }
   if (references.length > 0) {
