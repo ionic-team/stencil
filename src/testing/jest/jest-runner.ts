@@ -28,7 +28,7 @@ export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
 
     // run the jest-cli with our data rather than letting the
     // jest-cli parse the args itself
-    const { runCLI } = require('jest-cli');
+    const { runCLI } = require('@jest/core');
     const cliResults = await runCLI(jestArgv, projects);
 
     success = !!cliResults.results.success;
