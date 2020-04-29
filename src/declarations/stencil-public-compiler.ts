@@ -690,13 +690,13 @@ export interface CompilerSystem {
   isSymbolicLink(p: string): Promise<boolean>;
   lazyRequire?: LazyRequire;
   /**
-   * Always returns a boolean if the directory was created or not. Does not throw.
+   * Does not throw.
    */
-  mkdir(p: string, opts?: CompilerSystemMakeDirectoryOptions): Promise<boolean>;
+  mkdir(p: string, opts?: CompilerSystemMakeDirectoryOptions): Promise<CompilerSystemMakeDirectoryResults>;
   /**
-   * SYNC! Always returns a boolean if the directory was created or not. Does not throw.
+   * SYNC! Does not throw.
    */
-  mkdirSync(p: string, opts?: CompilerSystemMakeDirectoryOptions): boolean;
+  mkdirSync(p: string, opts?: CompilerSystemMakeDirectoryOptions): CompilerSystemMakeDirectoryResults;
   /**
    * Normalize file system path.
    */
@@ -726,19 +726,23 @@ export interface CompilerSystem {
    */
   removeDestory(cb: () => void): void;
   /**
+   * Rename old path to new path. Does not throw.
+   */
+  rename(oldPath: string, newPath: string): Promise<CompilerSystemRenameResults>;
+  /**
    * SYNC! Returns undefined if there's an error. Does not throw.
    */
   realpathSync(p: string): string;
   resolveModuleId?(opts: ResolveModuleIdOptions): Promise<ResolveModuleIdResults>;
   resolvePath(p: string): string;
   /**
-   * Always returns a boolean if the directory was removed or not. Does not throw.
+   * Does not throw.
    */
-  rmdir(p: string): Promise<boolean>;
+  rmdir(p: string, opts?: CompilerSystemRemoveDirectoryOptions): Promise<CompilerSystemRemoveDirectoryResults>;
   /**
-   * SYNC! Always returns a boolean if the directory was removed or not. Does not throw.
+   * SYNC! Does not throw.
    */
-  rmdirSync(p: string): boolean;
+  rmdirSync(p: string, opts?: CompilerSystemRemoveDirectoryOptions): CompilerSystemRemoveDirectoryResults;
   /**
    * Returns undefined if stat not found. Does not throw.
    */
@@ -748,13 +752,13 @@ export interface CompilerSystem {
    */
   statSync(p: string): CompilerFsStats;
   /**
-   * Always returns a boolean if the file was removed or not. Does not throw.
+   * Does not throw.
    */
-  unlink(p: string): Promise<boolean>;
+  unlink(p: string): Promise<CompilerSystemUnlinkResults>;
   /**
-   * SYNC! Always returns a boolean if the file was removed or not. Does not throw.
+   * SYNC! Does not throw.
    */
-  unlinkSync(p: string): boolean;
+  unlinkSync(p: string): CompilerSystemUnlinkResults;
   watchDirectory?(p: string, callback: CompilerFileWatcherCallback, recursive?: boolean): CompilerFileWatcher;
   watchFile?(p: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
   /**
@@ -762,13 +766,13 @@ export interface CompilerSystem {
    */
   watchTimeout?: number;
   /**
-   * Always returns a boolean if the file was written or not. Does not throw.
+   * Does not throw.
    */
-  writeFile(p: string, content: string): Promise<boolean>;
+  writeFile(p: string, content: string): Promise<CompilerSystemWriteFileResults>;
   /**
-   * SYNC! Always returns a boolean if the file was written or not. Does not throw.
+   * SYNC! Does not throw.
    */
-  writeFileSync(p: string, content: string): boolean;
+  writeFileSync(p: string, content: string): CompilerSystemWriteFileResults;
 }
 
 export interface ResolveModuleIdOptions {
@@ -966,7 +970,7 @@ export interface CompilerFsStats {
 
 export interface CompilerSystemMakeDirectoryOptions {
   /**
-   * Indicates whether parent folders should be created.
+   * Indicates whether parent directories should be created.
    * @default false
    */
   recursive?: boolean;
@@ -975,6 +979,59 @@ export interface CompilerSystemMakeDirectoryOptions {
    * @default 0o777.
    */
   mode?: number;
+}
+
+export interface CompilerSystemMakeDirectoryResults {
+  basename: string;
+  dirname: string;
+  path: string;
+  newDirs: string[];
+  error: any;
+}
+
+export interface CompilerSystemRemoveDirectoryOptions {
+  /**
+   * Indicates whether child files and subdirectories should be removed.
+   * @default false
+   */
+  recursive?: boolean;
+}
+
+export interface CompilerSystemRemoveDirectoryResults {
+  basename: string;
+  dirname: string;
+  path: string;
+  removedDirs: string[];
+  removedFiles: string[];
+  error: any;
+}
+
+export interface CompilerSystemRenameResults extends CompilerSystemRenamedPath {
+  renamed: CompilerSystemRenamedPath[];
+  oldDirs: string[];
+  oldFiles: string[];
+  newDirs: string[];
+  newFiles: string[];
+  error: any;
+}
+
+export interface CompilerSystemRenamedPath {
+  oldPath: string;
+  newPath: string;
+  isFile: boolean;
+  isDirectory: boolean;
+}
+
+export interface CompilerSystemUnlinkResults {
+  basename: string;
+  dirname: string;
+  path: string;
+  error: any;
+}
+
+export interface CompilerSystemWriteFileResults {
+  path: string;
+  error: any;
 }
 
 export interface Credentials {

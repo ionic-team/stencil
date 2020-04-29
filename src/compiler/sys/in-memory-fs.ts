@@ -582,9 +582,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     const dirsDeleted: string[] = [];
 
     for (const dirPath of dirsToDelete) {
-      try {
-        await sys.rmdir(dirPath);
-      } catch (e) {}
+      await sys.rmdir(dirPath);
       dirsDeleted.push(dirPath);
     }
 
