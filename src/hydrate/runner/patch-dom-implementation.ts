@@ -50,7 +50,7 @@ export function patchDomImplementation(doc: any, opts: d.HydrateFactoryOptions) 
     });
   }
 
-  return win as Window;
+  return win as Window & typeof globalThis;
 }
 
 function getRootNode(opts?: { composed?: boolean; [key: string]: any }) {

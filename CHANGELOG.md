@@ -1,3 +1,27 @@
+## 🚩 [1.12.6](https://github.com/ionic-team/stencil/compare/v1.12.5...v1.12.6) (2020-04-24)
+
+
+### Bug Fixes
+
+* **buildevents:** ensure all events are emitted after one is removed ([48f18f2](https://github.com/ionic-team/stencil/commit/48f18f234ba1cc336bc7b51b59d38afbe1c8ef33))
+* **hydrate:** console.debug diagnostic fix ([6c1f058](https://github.com/ionic-team/stencil/commit/6c1f0588a0489d81199abd74e67f28c3e43792f7))
+
+
+### Features
+
+* **prerender:** prerender app while in dev/watch mode ([6641c12](https://github.com/ionic-team/stencil/commit/6641c1227f8b4ee7203b79d51429a8544aad3be5))
+
+
+
+## 🍦 [1.12.5](https://github.com/ionic-team/stencil/compare/v1.12.4...v1.12.5) (2020-04-18)
+
+
+### Bug Fixes
+
+* **polyfills:** check for `getRootNode` on Element when applying dom.js polyfill ([#2370](https://github.com/ionic-team/stencil/issues/2370)) ([4b74027](https://github.com/ionic-team/stencil/commit/4b74027aee8c9051265f54e969406bbd108a4dd3)), closes [#2369](https://github.com/ionic-team/stencil/issues/2369)
+* support .css imports ([d1edb0d](https://github.com/ionic-team/stencil/commit/d1edb0db90442e2a0a738172d46e997b7b4a8994))
+
+
 ## 🚞 [1.12.4](https://github.com/ionic-team/stencil/compare/v1.12.2...v1.12.4) (2020-04-15)
 
 

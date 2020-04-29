@@ -21,7 +21,7 @@ export async function taskPrerender(prcs: NodeJS.Process, config: d.Config) {
 
   const srcIndexHtmlPath = config.srcIndexHtml;
 
-  const diagnostics = await runPrerenderTask(prcs, config, hydrateAppFilePath, null, srcIndexHtmlPath);
+  const diagnostics = await runPrerenderTask(prcs, config, null, hydrateAppFilePath, null, srcIndexHtmlPath);
   config.logger.printDiagnostics(diagnostics);
 
   if (diagnostics.some(d => d.level === 'error')) {
@@ -29,16 +29,27 @@ export async function taskPrerender(prcs: NodeJS.Process, config: d.Config) {
   }
 }
 
-export async function runPrerenderTask(prcs: NodeJS.Process, config: d.Config, hydrateAppFilePath: string, componentGraph: d.BuildResultsComponentGraph, srcIndexHtmlPath: string) {
+export async function runPrerenderTask(
+  prcs: NodeJS.Process,
+  config: d.Config,
+  devServer: d.DevServer,
+  hydrateAppFilePath: string,
+  componentGraph: d.BuildResultsComponentGraph,
+  srcIndexHtmlPath: string,
+) {
   const devServerConfig = { ...config.devServer };
   devServerConfig.openBrowser = false;
   devServerConfig.gzip = false;
   devServerConfig.logRequests = false;
   devServerConfig.reloadStrategy = null;
 
-  const { startServer } = await import('@stencil/core/dev-server');
+  let closeDevServer = false;
+  if (!devServer) {
+    const { startServer } = await import('@stencil/core/dev-server');
+    devServer = await startServer(devServerConfig, config.logger);
+    closeDevServer = true;
+  }
 
-  const devServer = await startServer(devServerConfig, config.logger);
   const diagnostics: d.Diagnostic[] = [];
 
   try {
@@ -48,7 +59,7 @@ export async function runPrerenderTask(prcs: NodeJS.Process, config: d.Config, h
     catchError(diagnostics, e);
   }
 
-  if (devServer) {
+  if (devServer && closeDevServer) {
     await devServer.close();
   }
 

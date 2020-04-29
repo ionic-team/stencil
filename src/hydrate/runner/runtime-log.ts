@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
-import { renderCatchError } from './render-utils';
+import { renderCatchError, renderBuildDiagnostic } from './render-utils';
 
-export function runtimeLogging(win: Window, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
+export function runtimeLogging(win: Window & typeof globalThis, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
   try {
     const pathname = win.location.pathname;
 
@@ -13,9 +13,7 @@ export function runtimeLogging(win: Window, opts: d.HydrateDocumentOptions, resu
     };
 
     win.console.debug = (...msgs: any[]) => {
-      const diagnostic = renderCatchError(results, [...msgs].join(', '));
-      diagnostic.level = 'debug';
-      diagnostic.messageText = 'Hydrate Debug';
+      renderBuildDiagnostic(results, 'debug', 'Hydrate Debug', [...msgs].join(', '));
       if (opts.runtimeLogging) {
         runtimeLog(pathname, 'debug', msgs);
       }

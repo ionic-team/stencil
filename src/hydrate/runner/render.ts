@@ -23,7 +23,7 @@ export function renderToString(html: string | any, options?: SerializeDocumentOp
         opts.destroyWindow = true;
         opts.destroyDocument = true;
 
-        const win = (new MockWindow(html) as any) as Window;
+        const win = (new MockWindow(html) as any) as Window & typeof globalThis;
         render(win, opts, results, resolve);
       } catch (e) {
         renderCatchError(results, e);
@@ -58,7 +58,7 @@ export function hydrateDocument(doc: any | string, options?: HydrateDocumentOpti
         opts.destroyWindow = true;
         opts.destroyDocument = true;
 
-        const win = (new MockWindow(doc) as any) as Window;
+        const win = (new MockWindow(doc) as any) as Window & typeof globalThis;
         render(win, opts, results, resolve);
       } catch (e) {
         renderCatchError(results, e);
@@ -80,7 +80,7 @@ export function hydrateDocument(doc: any | string, options?: HydrateDocumentOpti
   });
 }
 
-function render(win: Window, opts: HydrateFactoryOptions, results: HydrateResults, resolve: (results: HydrateResults) => void) {
+function render(win: Window & typeof globalThis, opts: HydrateFactoryOptions, results: HydrateResults, resolve: (results: HydrateResults) => void) {
   if (!(process as any).__stencilErrors) {
     (process as any).__stencilErrors = true;
 

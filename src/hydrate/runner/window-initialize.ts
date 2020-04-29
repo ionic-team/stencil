@@ -3,7 +3,7 @@ import { constrainTimeouts } from '@stencil/core/mock-doc';
 import { renderCatchError } from './render-utils';
 import { runtimeLogging } from './runtime-log';
 
-export function initializeWindow(win: Window, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
+export function initializeWindow(win: Window & typeof globalThis, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
   try {
     win.location.href = opts.url;
   } catch (e) {

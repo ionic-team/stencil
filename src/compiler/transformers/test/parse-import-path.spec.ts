@@ -11,7 +11,7 @@ describe('stencil-import-path', () => {
     expect(p.importPath).toBe('./some-file.css');
     expect(p.basename).toBe('some-file.css');
     expect(p.ext).toBe('css');
-    expect(p.data).toBe(null);
+    expect(p.data).toEqual({"encapsulation": "none"});
   });
 
   it('serialize/parse relative, tag, no ext', () => {

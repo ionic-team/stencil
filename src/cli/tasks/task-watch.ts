@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { checkVersion } from './task-version';
+import { runPrerenderTask } from './task-prerender';
 import { startupLog } from './startup-log';
 import exit from 'exit';
 
@@ -33,6 +34,15 @@ export async function taskWatch(prcs: NodeJS.Process, config: d.Config) {
         // log the dev server url one time
         config.logger.info(`${config.logger.cyan(devServer.browserUrl)}\n`);
         rmDevServerLog();
+      });
+    }
+
+    if (config.flags.prerender) {
+      watcher.on('buildFinish', async results => {
+        if (!results.hasError) {
+          const prerenderDiagnostics = await runPrerenderTask(prcs, config, devServer, results.hydrateAppFilePath, results.componentGraph, null);
+          config.logger.printDiagnostics(prerenderDiagnostics);
+        }
       });
     }
 

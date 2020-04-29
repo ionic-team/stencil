@@ -5,7 +5,7 @@ import { proxyHostElement } from './proxy-host-element';
 import { globalScripts } from '@app-globals';
 
 export function hydrateApp(
-  win: Window,
+  win: Window & typeof globalThis,
   opts: d.HydrateFactoryOptions,
   results: d.HydrateResults,
   afterHydrate: (win: Window, opts: d.HydrateFactoryOptions, results: d.HydrateResults, resolve: (results: d.HydrateResults) => void) => void,
@@ -151,7 +151,7 @@ export function hydrateApp(
   }
 }
 
-async function hydrateComponent(win: Window, results: d.HydrateResults, tagName: string, elm: d.HostElement, waitingElements: Set<HTMLElement>) {
+async function hydrateComponent(win: Window & typeof globalThis, results: d.HydrateResults, tagName: string, elm: d.HostElement, waitingElements: Set<HTMLElement>) {
   tagName = tagName.toLowerCase();
   const Cstr = loadModule(
     {

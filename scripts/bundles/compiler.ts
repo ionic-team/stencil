@@ -37,9 +37,7 @@ export async function compiler(opts: BuildOptions) {
 
   const cjsIntro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-intro.js'), 'utf8');
   const cjsOutro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-outro.js'), 'utf8');
-  const rollupWatchPath = join(opts.nodeModulesDir, 'rollup', 'dist', 'es', 'shared', 'watch.js');
-  console.log(rollupWatchPath);
-  const compilerBundle: RollupOptions = {
+  const rollupWatchPath = join(opts.nodeModulesDir, 'rollup', 'dist', 'es', 'shared', 'watch.js');  const compilerBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
     output: {
       format: 'cjs',
