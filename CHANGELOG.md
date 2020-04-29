@@ -1,3 +1,11 @@
+## 🗻 [1.12.7](https://github.com/ionic-team/stencil/compare/v1.12.5...v1.12.7) (2020-04-29)
+
+
+* **chore(deps):** bump dependencies ([e29dd21])(https://github.com/ionic-team/stencil/commit/e29dd2105f920c5a24aa56ba30879c289c6db6ff)
+* **refactor(sys):** add rename, add rmdir opts, data/error results ([f436b43])(https://github.com/ionic-team/stencil/commit/f436b4301525a5b1a9ebfabe4270ec157a0072f9)
+
+
+
 ## 🚩 [1.12.6](https://github.com/ionic-team/stencil/compare/v1.12.5...v1.12.6) (2020-04-24)
 
 
