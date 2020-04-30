@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { addScriptDataAttribute } from '../html/add-script-attr';
 import { catchError, flatOne, unique } from '@utils';
 import { cloneDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
@@ -102,6 +103,7 @@ const generateIndexHtml = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       if (scriptFound) {
         optimizeCriticalPath(doc, criticalPath, outputTarget);
       }
+      addScriptDataAttribute(config, doc, outputTarget);
     }
 
     const indexContent = serializeNodeToHtml(doc);

@@ -44,6 +44,10 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     const prerenderConfig = getPrerenderConfig(results.diagnostics, prerenderRequest.prerenderConfigPath);
 
     const hydrateOpts = getHydrateOptions(prerenderConfig, url, results.diagnostics);
+    if (prerenderRequest.staticSite) {
+      hydrateOpts.addModulePreloads = false;
+      hydrateOpts.clientHydrateAnnotations = false;
+    }
 
     if (typeof prerenderConfig.beforeHydrate === 'function') {
       try {
@@ -61,8 +65,8 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     const hydrateResults = (await hydrateApp.hydrateDocument(doc, hydrateOpts)) as d.HydrateResults;
     results.diagnostics.push(...hydrateResults.diagnostics);
 
-    if (hydrateOpts.addModulePreloads && !prerenderRequest.isDebug) {
-      addModulePreloads(doc, hydrateResults, componentGraph);
+    if (hydrateOpts.addModulePreloads && !prerenderRequest.isDebug && !prerenderRequest.staticSite) {
+      addModulePreloads(doc, hydrateOpts, hydrateResults, componentGraph);
     }
 
     if (hydrateOpts.minifyStyleElements && !prerenderRequest.isDebug) {

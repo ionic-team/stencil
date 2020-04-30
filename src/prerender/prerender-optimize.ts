@@ -9,12 +9,15 @@ import { promisify } from 'util';
 const readFile = promisify(fs.readFile);
 
 export async function inlineExternalStyleSheets(appDir: string, doc: Document) {
+  const documentLinks = Array.from(doc.querySelectorAll('link[rel=stylesheet]')) as HTMLLinkElement[];
+  if (documentLinks.length === 0) {
+    return;
+  }
+
   const { optimizeCss } = await import('@stencil/core/compiler');
 
-  const globalLinks = Array.from(doc.querySelectorAll('link[rel=stylesheet]')) as HTMLLinkElement[];
-
-  return Promise.all(
-    globalLinks.map(async link => {
+  await Promise.all(
+    documentLinks.map(async link => {
       const href = link.getAttribute('href');
       if (!href.startsWith('/') || link.getAttribute('media') !== null) {
         return;
@@ -52,10 +55,8 @@ export async function inlineExternalStyleSheets(appDir: string, doc: Document) {
 }
 
 export async function minifyScriptElements(doc: Document) {
-  const { optimizeJs } = await import('@stencil/core/compiler');
-
   const scriptElms = Array.from(doc.querySelectorAll('script')).filter(scriptElm => {
-    if (scriptElm.hasAttribute('src')) {
+    if (scriptElm.hasAttribute('src') || scriptElm.hasAttribute('data-minified')) {
       return false;
     }
     const scriptType = scriptElm.getAttribute('type');
@@ -65,51 +66,79 @@ export async function minifyScriptElements(doc: Document) {
     return true;
   });
 
-  return Promise.all(
+  if (scriptElms.length === 0) {
+    return;
+  }
+
+  const { optimizeJs } = await import('@stencil/core/compiler');
+
+  await Promise.all(
     scriptElms.map(async scriptElm => {
-      const opts: d.OptimizeJsInput = {
-        input: scriptElm.innerHTML,
-        sourceMap: false,
-        target: 'latest',
-      };
+      const content = scriptElm.innerHTML.trim();
+      if (content.length > 0) {
+        const opts: d.OptimizeJsInput = {
+          input: content,
+          sourceMap: false,
+          target: 'latest',
+        };
 
-      if (scriptElm.getAttribute('type') !== 'module') {
-        opts.target = 'es5';
-      }
+        if (scriptElm.getAttribute('type') !== 'module') {
+          opts.target = 'es5';
+        }
 
-      const optimizeResults = await optimizeJs(opts);
+        const optimizeResults = await optimizeJs(opts);
 
-      if (optimizeResults.diagnostics.length === 0) {
-        scriptElm.innerHTML = optimizeResults.output;
+        if (optimizeResults.diagnostics.length === 0) {
+          scriptElm.innerHTML = optimizeResults.output;
+        }
+
+        scriptElm.setAttribute('data-minified', '');
       }
     }),
   );
 }
 
 export async function minifyStyleElements(doc: Document) {
-  const { optimizeCss } = await import('@stencil/core/compiler');
+  const styleElms = Array.from(doc.querySelectorAll('style')).filter(styleElm => {
+    if (styleElm.hasAttribute('data-minified')) {
+      return false;
+    }
+    return true;
+  });
 
-  const styleElms = Array.from(doc.querySelectorAll('style'));
+  if (styleElms.length === 0) {
+    return;
+  }
+
+  const { optimizeCss } = await import('@stencil/core/compiler');
 
   await Promise.all(
     styleElms.map(async styleElm => {
-      const optimizeResults = await optimizeCss({
-        input: styleElm.innerHTML,
-        minify: true,
-      });
-      if (optimizeResults.diagnostics.length === 0) {
-        styleElm.innerHTML = optimizeResults.output;
+      const content = styleElm.innerHTML.trim();
+      if (content.length > 0) {
+        const optimizeResults = await optimizeCss({
+          input: content,
+          minify: true,
+        });
+        if (optimizeResults.diagnostics.length === 0) {
+          styleElm.innerHTML = optimizeResults.output;
+        }
+        styleElm.setAttribute('data-minified', '');
       }
     }),
   );
 }
 
-export function addModulePreloads(doc: Document, hydrateResults: d.HydrateResults, componentGraph: Map<string, string[]>) {
+export function addModulePreloads(doc: Document, hydrateOpts: d.PrerenderHydrateOptions, hydrateResults: d.HydrateResults, componentGraph: Map<string, string[]>) {
   if (!componentGraph) {
     return false;
   }
 
-  const modulePreloads = unique(flatOne(hydrateResults.components.map(cmp => getScopeId(cmp.tag, cmp.mode)).map(scopeId => componentGraph.get(scopeId) || [])));
+  const staticComponents = hydrateOpts.staticComponents || [];
+
+  const cmpTags = hydrateResults.components.filter(cmp => !staticComponents.includes(cmp.tag));
+
+  const modulePreloads = unique(flatOne(cmpTags.map(cmp => getScopeId(cmp.tag, cmp.mode)).map(scopeId => componentGraph.get(scopeId) || [])));
 
   injectModulePreloads(doc, modulePreloads);
   return true;

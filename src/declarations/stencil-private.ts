@@ -1661,6 +1661,7 @@ export interface PrerenderManager {
   prerenderConfigPath: string;
   progressLogger?: ProgressLogger;
   resolve: Function;
+  staticSite: boolean;
   templateId: string;
   componentGraphPath: string;
   urlsProcessing: Set<string>;

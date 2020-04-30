@@ -116,6 +116,7 @@ async function runPrerenderOutputTarget(
       outputTarget: outputTarget,
       prerenderConfig: prerenderConfig,
       prerenderConfigPath: outputTarget.prerenderConfig,
+      staticSite: false,
       templateId: null,
       urlsCompleted: new Set(),
       urlsPending: new Set(),
@@ -135,12 +136,13 @@ async function runPrerenderOutputTarget(
       return;
     }
 
-    const templateHtml = await generateTemplateHtml(prerenderConfig, diagnostics, manager.isDebug, srcIndexHtmlPath, outputTarget, hydrateOpts);
-    if (diagnostics.length > 0 || typeof templateHtml !== 'string') {
+    const templateData = await generateTemplateHtml(prerenderConfig, diagnostics, manager.isDebug, srcIndexHtmlPath, outputTarget, hydrateOpts);
+    if (diagnostics.length > 0 || !templateData || typeof templateData.html !== 'string') {
       return;
     }
 
-    manager.templateId = createPrerenderTemplate(config, templateHtml);
+    manager.templateId = createPrerenderTemplate(config, templateData.html);
+    manager.staticSite = templateData.staticSite;
     manager.componentGraphPath = createComponentGraphPath(componentGraph, outputTarget);
 
     await new Promise(resolve => {
@@ -253,10 +255,5 @@ function startProgressLogger(prcs: NodeJS.Process): d.ProgressLogger {
 }
 
 function generateContentHash(content: string) {
-  return crypto
-    .createHash('md5')
-    .update(content)
-    .digest('hex')
-    .toLowerCase()
-    .substr(0, 12);
+  return crypto.createHash('md5').update(content).digest('hex').toLowerCase().substr(0, 12);
 }
