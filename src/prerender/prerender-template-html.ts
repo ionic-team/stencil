@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { catchError } from '@utils';
-import { inlineExternalStyleSheets, minifyScriptElements, minifyStyleElements } from './prerender-optimize';
+import { hasStencilScript, inlineExternalStyleSheets, minifyScriptElements, minifyStyleElements, removeStencilScripts } from './prerender-optimize';
 import fs from 'fs';
 import { promisify } from 'util';
 
@@ -34,19 +34,14 @@ export async function generateTemplateHtml(
     if (prerenderConfig.staticSite) {
       // purposely do not want any clientside JS
       // go through the document and remove only stencil's scripts
-      const stencilScripts = doc.querySelectorAll('script[data-stencil]');
-      for (let i = stencilScripts.length - 1; i >= 0; i--) {
-        stencilScripts[i].remove();
-      }
+      removeStencilScripts(doc);
       staticSite = true;
     } else {
       // config didn't set if it's a staticSite only,
       // but the HTML may not have any stencil scripts at all,
       // so we'll need to know that so we don't add preload modules
-      const stencilScript = doc.querySelector('script[data-stencil]');
-
       // if there isn't at least one stencil script then it's a static site
-      staticSite = !stencilScript;
+      staticSite = !hasStencilScript(doc);
     }
 
     doc.documentElement.classList.add('hydrated');

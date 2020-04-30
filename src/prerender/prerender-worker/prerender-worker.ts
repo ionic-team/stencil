@@ -44,7 +44,9 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     const prerenderConfig = getPrerenderConfig(results.diagnostics, prerenderRequest.prerenderConfigPath);
 
     const hydrateOpts = getHydrateOptions(prerenderConfig, url, results.diagnostics);
-    if (prerenderRequest.staticSite) {
+
+    const staticDocument = !!(prerenderRequest.staticSite || hydrateOpts.staticDocument);
+    if (staticDocument) {
       hydrateOpts.addModulePreloads = false;
       hydrateOpts.clientHydrateAnnotations = false;
     }
@@ -65,16 +67,21 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     const hydrateResults = (await hydrateApp.hydrateDocument(doc, hydrateOpts)) as d.HydrateResults;
     results.diagnostics.push(...hydrateResults.diagnostics);
 
-    if (hydrateOpts.addModulePreloads && !prerenderRequest.isDebug && !prerenderRequest.staticSite) {
+    if (hydrateOpts.addModulePreloads && !staticDocument && !prerenderRequest.isDebug) {
       addModulePreloads(doc, hydrateOpts, hydrateResults, componentGraph);
     }
 
+    const minifyPromises: Promise<any>[] = [];
     if (hydrateOpts.minifyStyleElements && !prerenderRequest.isDebug) {
-      await minifyStyleElements(doc);
+      minifyPromises.push(minifyStyleElements(doc));
     }
 
     if (hydrateOpts.minifyScriptElements && !prerenderRequest.isDebug) {
-      await minifyScriptElements(doc);
+      minifyPromises.push(minifyScriptElements(doc));
+    }
+
+    if (minifyPromises.length > 0) {
+      await Promise.all(minifyPromises);
     }
 
     if (typeof prerenderConfig.afterHydrate === 'function') {

@@ -32,12 +32,20 @@ export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
   }
 
   if (Array.isArray(outputOpts.excludeComponents)) {
-    outputOpts.excludeComponents = outputOpts.excludeComponents.filter(c => typeof c === 'string' && c.includes('-')).map(c => c.toLowerCase());
+    outputOpts.excludeComponents = outputOpts.excludeComponents.filter(filterValidTags).map(mapValidTags);
   } else {
     outputOpts.excludeComponents = [];
   }
 
   return outputOpts;
+}
+
+function filterValidTags(tag: string) {
+  return typeof tag === 'string' && tag.includes('-');
+}
+
+function mapValidTags(tag: string) {
+  return tag.trim().toLowerCase();
 }
 
 export function generateHydrateResults(opts: d.HydrateDocumentOptions) {

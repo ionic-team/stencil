@@ -143,3 +143,14 @@ export function addModulePreloads(doc: Document, hydrateOpts: d.PrerenderHydrate
   injectModulePreloads(doc, modulePreloads);
   return true;
 }
+
+export function removeStencilScripts(doc: Document) {
+  const stencilScripts = doc.querySelectorAll('script[data-stencil]');
+  for (let i = stencilScripts.length - 1; i >= 0; i--) {
+    stencilScripts[i].remove();
+  }
+}
+
+export function hasStencilScript(doc: Document) {
+  return !!doc.querySelector('script[data-stencil]');
+}
