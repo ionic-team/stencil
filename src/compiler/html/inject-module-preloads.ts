@@ -13,15 +13,16 @@ export const injectModulePreloads = (doc: Document, paths: string[]) => {
 
   const addLinks = paths.filter(path => !existingLinks.includes(path)).map(path => createModulePreload(doc, path));
 
-  const firstScript = doc.head.querySelector('script');
+  const head = doc.head;
+  const firstScript = head.querySelector('script');
   if (firstScript) {
-    addLinks.forEach(link => {
-      doc.head.insertBefore(link, firstScript);
-    });
+    for (const link of addLinks) {
+      head.insertBefore(link, firstScript);
+    }
   } else {
-    addLinks.forEach(link => {
-      doc.head.appendChild(link);
-    });
+    for (const link of addLinks) {
+      head.appendChild(link);
+    }
   }
 };
 

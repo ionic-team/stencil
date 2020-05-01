@@ -27,7 +27,7 @@ export function hydrateApp(
 
     try {
       if (opts.clientHydrateAnnotations) {
-        insertVdomAnnotations(win.document);
+        insertVdomAnnotations(win.document, opts.staticComponents);
       }
       win.document.createElement = orgDocumentCreateElement;
       win.document.createElementNS = orgDocumentCreateElementNS;
@@ -143,9 +143,7 @@ export function hydrateApp(
 
     patchChild(win.document.body);
 
-    waitLoop()
-      .then(hydratedComplete)
-      .catch(hydratedError);
+    waitLoop().then(hydratedComplete).catch(hydratedError);
   } catch (e) {
     hydratedError(e);
   }

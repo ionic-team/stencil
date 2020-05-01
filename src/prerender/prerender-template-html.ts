@@ -56,7 +56,7 @@ export async function generateTemplateHtml(
 
     if (hydrateOpts.minifyScriptElements && !isDebug) {
       try {
-        await minifyScriptElements(doc);
+        await minifyScriptElements(doc, true);
       } catch (e) {
         catchError(diagnostics, e);
       }
@@ -64,7 +64,7 @@ export async function generateTemplateHtml(
 
     if (hydrateOpts.minifyStyleElements && !isDebug) {
       try {
-        await minifyStyleElements(doc);
+        await minifyStyleElements(doc, true);
       } catch (e) {
         catchError(diagnostics, e);
       }

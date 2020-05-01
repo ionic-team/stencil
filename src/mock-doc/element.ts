@@ -356,78 +356,78 @@ export class MockCanvasElement extends MockHTMLElement {
   }
   getContext() {
     return {
-      fillRect: function() {
+      fillRect: function () {
         return;
       },
-      clearRect: function() {
+      clearRect: function () {
         return;
       },
-      getImageData: function(_: number, __: number, w: number, h: number) {
+      getImageData: function (_: number, __: number, w: number, h: number) {
         return {
           data: new Array(w * h * 4),
         };
       },
-      putImageData: function() {
+      putImageData: function () {
         return;
       },
-      createImageData: function(): any[] {
+      createImageData: function (): any[] {
         return [];
       },
-      setTransform: function() {
+      setTransform: function () {
         return;
       },
-      drawImage: function() {
+      drawImage: function () {
         return;
       },
-      save: function() {
+      save: function () {
         return;
       },
-      fillText: function() {
+      fillText: function () {
         return;
       },
-      restore: function() {
+      restore: function () {
         return;
       },
-      beginPath: function() {
+      beginPath: function () {
         return;
       },
-      moveTo: function() {
+      moveTo: function () {
         return;
       },
-      lineTo: function() {
+      lineTo: function () {
         return;
       },
-      closePath: function() {
+      closePath: function () {
         return;
       },
-      stroke: function() {
+      stroke: function () {
         return;
       },
-      translate: function() {
+      translate: function () {
         return;
       },
-      scale: function() {
+      scale: function () {
         return;
       },
-      rotate: function() {
+      rotate: function () {
         return;
       },
-      arc: function() {
+      arc: function () {
         return;
       },
-      fill: function() {
+      fill: function () {
         return;
       },
-      measureText: function() {
+      measureText: function () {
         return { width: 0 };
       },
-      transform: function() {
+      transform: function () {
         return;
       },
-      rect: function() {
+      rect: function () {
         return;
       },
-      clip: function() {
+      clip: function () {
         return;
       },
     };
@@ -441,8 +441,10 @@ function fullUrl(elm: MockElement, attrName: string) {
     if (win != null) {
       const loc = win.location;
       if (loc != null) {
-        const url = new URL(val, loc.href);
-        return url.href;
+        try {
+          const url = new URL(val, loc.href);
+          return url.href;
+        } catch (e) {}
       }
     }
   }
@@ -490,7 +492,7 @@ function patchPropAttributes(prototype: any, attrs: any, defaults: any = {}) {
   });
 }
 
-MockElement.prototype.cloneNode = function(this: MockElement, deep?: boolean) {
+MockElement.prototype.cloneNode = function (this: MockElement, deep?: boolean) {
   // because we're creating elements, which extending specific HTML base classes there
   // is a MockElement circular reference that bundling has trouble dealing with so
   // the fix is to add cloneNode() to MockElement's prototype after the HTML classes

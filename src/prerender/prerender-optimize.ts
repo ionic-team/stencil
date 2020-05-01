@@ -54,9 +54,9 @@ export async function inlineExternalStyleSheets(appDir: string, doc: Document) {
   );
 }
 
-export async function minifyScriptElements(doc: Document) {
+export async function minifyScriptElements(doc: Document, addMinifiedAttr: boolean) {
   const scriptElms = Array.from(doc.querySelectorAll('script')).filter(scriptElm => {
-    if (scriptElm.hasAttribute('src') || scriptElm.hasAttribute('data-minified')) {
+    if (scriptElm.hasAttribute('src') || scriptElm.hasAttribute(dataMinifiedAttr)) {
       return false;
     }
     const scriptType = scriptElm.getAttribute('type');
@@ -92,15 +92,17 @@ export async function minifyScriptElements(doc: Document) {
           scriptElm.innerHTML = optimizeResults.output;
         }
 
-        scriptElm.setAttribute('data-minified', '');
+        if (addMinifiedAttr) {
+          scriptElm.setAttribute(dataMinifiedAttr, '');
+        }
       }
     }),
   );
 }
 
-export async function minifyStyleElements(doc: Document) {
+export async function minifyStyleElements(doc: Document, addMinifiedAttr: boolean) {
   const styleElms = Array.from(doc.querySelectorAll('style')).filter(styleElm => {
-    if (styleElm.hasAttribute('data-minified')) {
+    if (styleElm.hasAttribute(dataMinifiedAttr)) {
       return false;
     }
     return true;
@@ -123,11 +125,43 @@ export async function minifyStyleElements(doc: Document) {
         if (optimizeResults.diagnostics.length === 0) {
           styleElm.innerHTML = optimizeResults.output;
         }
-        styleElm.setAttribute('data-minified', '');
+        if (addMinifiedAttr) {
+          styleElm.setAttribute(dataMinifiedAttr, '');
+        }
       }
     }),
   );
 }
+
+export function excludeStaticComponents(doc: Document, hydrateOpts: d.PrerenderHydrateOptions, hydrateResults: d.HydrateResults) {
+  const staticComponents = hydrateOpts.staticComponents.filter(tag => {
+    return hydrateResults.components.some(cmp => cmp.tag === tag);
+  });
+
+  if (staticComponents.length > 0) {
+    const stencilScriptElm = doc.querySelector('script[data-stencil-namespace]');
+    if (stencilScriptElm) {
+      const namespace = stencilScriptElm.getAttribute('data-stencil-namespace');
+      let scriptContent = excludeComponentScript.replace('__NAMESPACE__', namespace);
+      scriptContent = scriptContent.replace('__EXCLUDE__', JSON.stringify(staticComponents));
+
+      const dataOptsScript = doc.createElement('script');
+      dataOptsScript.innerHTML = scriptContent;
+      dataOptsScript.setAttribute(dataMinifiedAttr, '');
+
+      stencilScriptElm.parentNode.insertBefore(dataOptsScript, stencilScriptElm.nextSibling);
+    }
+  }
+}
+
+const excludeComponentScript = `
+(function(){
+var s=document.querySelector('[data-stencil-namespace="__NAMESPACE__"]');
+s&&((s['data-opts']=s['data-opts']||{}).exclude=__EXCLUDE__);
+})();
+`
+  .replace(/\n/g, '')
+  .trim();
 
 export function addModulePreloads(doc: Document, hydrateOpts: d.PrerenderHydrateOptions, hydrateResults: d.HydrateResults, componentGraph: Map<string, string[]>) {
   if (!componentGraph) {
@@ -144,6 +178,16 @@ export function addModulePreloads(doc: Document, hydrateOpts: d.PrerenderHydrate
   return true;
 }
 
+export function removeModulePreloads(doc: Document) {
+  const links = doc.querySelectorAll('link[rel="modulepreload"]');
+  for (let i = links.length - 1; i >= 0; i--) {
+    const href = links[i].getAttribute('href');
+    if (href && href.includes('/p-')) {
+      links[i].remove();
+    }
+  }
+}
+
 export function removeStencilScripts(doc: Document) {
   const stencilScripts = doc.querySelectorAll('script[data-stencil]');
   for (let i = stencilScripts.length - 1; i >= 0; i--) {
@@ -154,3 +198,5 @@ export function removeStencilScripts(doc: Document) {
 export function hasStencilScript(doc: Document) {
   return !!doc.querySelector('script[data-stencil]');
 }
+
+const dataMinifiedAttr = 'data-m';

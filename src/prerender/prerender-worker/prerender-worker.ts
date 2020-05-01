@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { addModulePreloads, minifyScriptElements, minifyStyleElements } from '../prerender-optimize';
+import { addModulePreloads, excludeStaticComponents, minifyScriptElements, minifyStyleElements, removeModulePreloads, removeStencilScripts } from '../prerender-optimize';
 import { catchError, normalizePath } from '@utils';
 import { crawlAnchorsForNextUrls } from '../crawl-urls';
 import { getHydrateOptions, getPrerenderConfig } from '../prerender-config';
@@ -45,8 +45,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     const hydrateOpts = getHydrateOptions(prerenderConfig, url, results.diagnostics);
 
-    const staticDocument = !!(prerenderRequest.staticSite || hydrateOpts.staticDocument);
-    if (staticDocument) {
+    if (prerenderRequest.staticSite || hydrateOpts.staticDocument) {
       hydrateOpts.addModulePreloads = false;
       hydrateOpts.clientHydrateAnnotations = false;
     }
@@ -67,17 +66,31 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     const hydrateResults = (await hydrateApp.hydrateDocument(doc, hydrateOpts)) as d.HydrateResults;
     results.diagnostics.push(...hydrateResults.diagnostics);
 
-    if (hydrateOpts.addModulePreloads && !staticDocument && !prerenderRequest.isDebug) {
-      addModulePreloads(doc, hydrateOpts, hydrateResults, componentGraph);
+    if (hydrateOpts.staticDocument) {
+      removeStencilScripts(doc);
+      removeModulePreloads(doc);
+    } else {
+      if (Array.isArray(hydrateOpts.staticComponents)) {
+        excludeStaticComponents(doc, hydrateOpts, hydrateResults);
+      }
+
+      if (hydrateOpts.addModulePreloads) {
+        if (!prerenderRequest.isDebug) {
+          addModulePreloads(doc, hydrateOpts, hydrateResults, componentGraph);
+        }
+      } else {
+        // remove module preloads
+        removeModulePreloads(doc);
+      }
     }
 
     const minifyPromises: Promise<any>[] = [];
     if (hydrateOpts.minifyStyleElements && !prerenderRequest.isDebug) {
-      minifyPromises.push(minifyStyleElements(doc));
+      minifyPromises.push(minifyStyleElements(doc, false));
     }
 
     if (hydrateOpts.minifyScriptElements && !prerenderRequest.isDebug) {
-      minifyPromises.push(minifyScriptElements(doc));
+      minifyPromises.push(minifyScriptElements(doc, false));
     }
 
     if (minifyPromises.length > 0) {

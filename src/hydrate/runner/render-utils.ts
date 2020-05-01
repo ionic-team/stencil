@@ -37,6 +37,12 @@ export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
     outputOpts.excludeComponents = [];
   }
 
+  if (Array.isArray(outputOpts.staticComponents)) {
+    outputOpts.staticComponents = outputOpts.staticComponents.filter(filterValidTags).map(mapValidTags);
+  } else {
+    outputOpts.staticComponents = [];
+  }
+
   return outputOpts;
 }
 

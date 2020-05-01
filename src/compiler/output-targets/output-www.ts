@@ -92,6 +92,7 @@ const generateIndexHtml = async (config: d.Config, compilerCtx: d.CompilerCtx, b
   // get the source index html content
   try {
     const doc = cloneDocument(buildCtx.indexDoc);
+    addScriptDataAttribute(config, doc, outputTarget);
 
     // validateHtml(config, buildCtx, doc);
     await updateIndexHtmlServiceWorker(config, buildCtx, doc, outputTarget);
@@ -103,7 +104,6 @@ const generateIndexHtml = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       if (scriptFound) {
         optimizeCriticalPath(doc, criticalPath, outputTarget);
       }
-      addScriptDataAttribute(config, doc, outputTarget);
     }
 
     const indexContent = serializeNodeToHtml(doc);

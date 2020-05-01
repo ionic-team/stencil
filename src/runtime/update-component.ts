@@ -9,7 +9,7 @@ import { createTime } from './profile';
 import { emitEvent } from './event-emitter';
 
 export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) => {
-  if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$) {
+  if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$ && ancestorComponent['s-p']) {
     ancestorComponent['s-p'].push(new Promise(r => (hostRef.$onRenderResolve$ = r)));
   }
 };

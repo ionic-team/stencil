@@ -620,6 +620,14 @@ export interface HydrateDocumentOptions {
    */
   runtimeLogging?: boolean;
   /**
+   * Component tags listed here will only be prerendered or serverside-rendered
+   * and will not be clientside hydrated. This is useful for components that
+   * are not dynamic and do not need to be defined as a custom element within the
+   * browser. For example, a header or footer component would be a good example that
+   * may not require any clientside JavaScript.
+   */
+  staticComponents?: string[];
+  /**
    * The amount of milliseconds to wait for a page to finish rendering until
    * a timeout error is thrown. Defaults to `15000`.
    */
@@ -706,15 +714,6 @@ export interface PrerenderHydrateOptions extends SerializeDocumentOptions {
    * Minify JavaScript content within `<script>` elements. Defaults to `true`.
    */
   minifyScriptElements?: boolean;
-  /**
-   * Component tags listed here will only be prerendered or serverside-rendered
-   * and will not be clientside hydrated. This is useful for components that
-   * are not dynamic and do not need to be defined as a custom element within the
-   * browser. For example, a header or footer component would be a good example that
-   * may not require any clientside JavaScript. If the entire `document` should be
-   * static then use `staticDocument` instead.
-   */
-  staticComponents?: string[];
   /**
    * Entire `document` should be static. This is useful for specific pages that
    * should be static, rather than the entire site. If the whole site should be static,
