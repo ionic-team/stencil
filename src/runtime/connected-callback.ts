@@ -54,7 +54,10 @@ export const connectedCallback = (elm: d.HostElement) => {
         while ((ancestorComponent = (ancestorComponent.parentNode as any) || (ancestorComponent.host as any))) {
           // climb up the ancestors looking for the first
           // component that hasn't finished its lifecycle update yet
-          if ((BUILD.hydrateClientSide && ancestorComponent.nodeType === NODE_TYPE.ElementNode && ancestorComponent.hasAttribute('s-id')) || ancestorComponent['s-p']) {
+          if (
+            (BUILD.hydrateClientSide && ancestorComponent.nodeType === NODE_TYPE.ElementNode && ancestorComponent.hasAttribute('s-id') && ancestorComponent['s-p']) ||
+            ancestorComponent['s-p']
+          ) {
             // we found this components first ancestor component
             // keep a reference to this component's ancestor component
             attachToAncestor(hostRef, (hostRef.$ancestorComponent$ = ancestorComponent));

@@ -204,8 +204,8 @@
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
+        "--prerender",
         "--max-workers=0",
-        "--debug",
         "--config",
         "${workspaceFolder}/../stencil-site/stencil.config.ts"
       ],

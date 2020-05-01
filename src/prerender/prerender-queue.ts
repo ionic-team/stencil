@@ -121,6 +121,7 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
       hydrateAppFilePath: manager.hydrateAppFilePath,
       isDebug: manager.isDebug,
       prerenderConfigPath: manager.prerenderConfigPath,
+      staticSite: manager.staticSite,
       templateId: manager.templateId,
       url: url,
       writeToFilePath: getWriteFilePathFromUrlPath(manager, url),

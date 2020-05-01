@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { addScriptDataAttribute } from '../html/add-script-attr';
 import { catchError, flatOne, unique } from '@utils';
 import { cloneDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
@@ -91,6 +92,7 @@ const generateIndexHtml = async (config: d.Config, compilerCtx: d.CompilerCtx, b
   // get the source index html content
   try {
     const doc = cloneDocument(buildCtx.indexDoc);
+    addScriptDataAttribute(config, doc, outputTarget);
 
     // validateHtml(config, buildCtx, doc);
     await updateIndexHtmlServiceWorker(config, buildCtx, doc, outputTarget);

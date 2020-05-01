@@ -83,7 +83,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
 
     proxyComponentLifeCycles(Cstr);
 
-    const textBundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 899999) + 100000)}`;
+    const textBundleId = `${Cstr.COMPILER_META.tagName}.${Math.round(Math.random() * 899999) + 100000}`;
     const stylesMeta = Cstr.COMPILER_META.styles;
     let bundleId = textBundleId as any;
     if (Array.isArray(stylesMeta)) {
@@ -212,7 +212,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   });
 
   if (opts.hydrateServerSide) {
-    insertVdomAnnotations(doc);
+    insertVdomAnnotations(doc, []);
   }
 
   if (opts.autoApplyChanges) {
@@ -241,7 +241,7 @@ function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
 
   if (typeof Cstr.prototype.componentWillLoad === 'function') {
     Cstr.prototype.__componentWillLoad = Cstr.prototype.componentWillLoad;
-    Cstr.prototype.componentWillLoad = function() {
+    Cstr.prototype.componentWillLoad = function () {
       const result = this.__componentWillLoad();
       if (result != null && typeof result.then === 'function') {
         writeTask(() => result);
@@ -254,7 +254,7 @@ function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
 
   if (typeof Cstr.prototype.componentWillUpdate === 'function') {
     Cstr.prototype.__componentWillUpdate = Cstr.prototype.componentWillUpdate;
-    Cstr.prototype.componentWillUpdate = function() {
+    Cstr.prototype.componentWillUpdate = function () {
       const result = this.__componentWillUpdate();
       if (result != null && typeof result.then === 'function') {
         writeTask(() => result);
@@ -267,7 +267,7 @@ function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
 
   if (typeof Cstr.prototype.componentWillRender === 'function') {
     Cstr.prototype.__componentWillRender = Cstr.prototype.componentWillRender;
-    Cstr.prototype.componentWillRender = function() {
+    Cstr.prototype.componentWillRender = function () {
       const result = this.__componentWillRender();
       if (result != null && typeof result.then === 'function') {
         writeTask(() => result);
