@@ -13,7 +13,7 @@ export const insertVdomAnnotations = (doc: Document, staticComponents: string[])
 
     parseVNodeAnnotations(doc, doc.body, docData, orgLocationNodes);
 
-    for (const orgLocationNode of orgLocationNodes) {
+    orgLocationNodes.forEach(orgLocationNode => {
       if (orgLocationNode != null) {
         const nodeRef = orgLocationNode['s-nr'];
 
@@ -63,7 +63,7 @@ export const insertVdomAnnotations = (doc: Document, staticComponents: string[])
 
         orgLocationNode.nodeValue = orgLocationNodeId;
       }
-    }
+    });
   }
 };
 
