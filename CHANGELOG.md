@@ -1,3 +1,20 @@
+# 🛩 [1.13.0-0](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0-0) (2020-05-01)
+
+
+### Features
+
+* **ssg:** static site generation ([2a38293](https://github.com/ionic-team/stencil/commit/2a382933f6cef826084e91610833165fb6e8e7fa))
+
+- Add `staticSite` to prerender.config.js
+- Add `staticDocument` to PrerenderHydrateOptions
+- Add `staticComponents` to HydrateDocumentOptions
+- Assume a static site build when index.html does not include scripts
+- Do not define custom element for static only components
+- Do not add link rel=modulepreload for static only components
+- Do not minify inline script/styles if already minified within template
+- Ensure valid "src" URL within mock-doc
+
+
 ## 🗻 [1.12.7](https://github.com/ionic-team/stencil/compare/v1.12.5...v1.12.7) (2020-04-29)
 
 
