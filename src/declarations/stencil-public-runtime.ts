@@ -955,6 +955,7 @@ export namespace JSXBase {
   }
 
   export interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
+    as?: string;
     href?: string;
     hrefLang?: string;
     hreflang?: string;
