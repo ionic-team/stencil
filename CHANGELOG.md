@@ -1,9 +1,10 @@
-# 🛩 [1.13.0-0](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0-0) (2020-05-01)
+# 🍎 [1.13.0-1](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0-1) (2020-05-04)
 
 
 ### Features
 
 * **ssg:** static site generation ([2a38293](https://github.com/ionic-team/stencil/commit/2a382933f6cef826084e91610833165fb6e8e7fa))
+* **prerender:** parse typed prerender config ([7b6aaf7](https://github.com/ionic-team/stencil/commit/7b6aaf7b0c6ec7e7050f7494fc7d475fe0db5bf8))
 
 - Add `staticSite` to prerender.config.js
 - Add `staticDocument` to PrerenderHydrateOptions
