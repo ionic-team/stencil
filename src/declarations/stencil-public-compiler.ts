@@ -495,8 +495,45 @@ export type TaskCommand = 'build' | 'docs' | 'generate' | 'g' | 'help' | 'preren
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
+/**
+ * The prerender config is used when prerendering a `www` output target.
+ * Within `stencil.config.ts`, set the path to the prerendering
+ * config file path using the `prerenderConfig` property, such as:
+ *
+ * ```tsx
+ * import { Config } from '@stencil/core';
+ * export const config: Config = {
+ *   outputTargets: [
+ *     {
+ *       type: 'www',
+ *       baseUrl: 'https://stenciljs.com/',
+ *       prerenderConfig: './prerender.config.ts',
+ *     }
+ *   ]
+ * };
+ * ```
+ *
+ * The `prerender.config.ts` should export a `config` object using
+ * the `PrerenderConfig` interface.
+ *
+ * ```tsx
+ * import { PrerenderConfig } from '@stencil/core';
+ * export const config: PrerenderConfig = {
+ *   ...
+ * };
+ * ```
+ *
+ * For more info: https://stenciljs.com/docs/prerendering
+ */
 export interface PrerenderConfig {
+  /**
+   * Run after each `document` is hydrated, but before it is serialized
+   * into an HTML string. Hook is passed the `document` and its `URL`.
+   */
   afterHydrate?(document?: Document, url?: URL): any | Promise<any>;
+  /**
+   * Run before each `document` is hydrated. Hook is passed the `document` it's `URL`.
+   */
   beforeHydrate?(document?: Document, url?: URL): any | Promise<any>;
   /**
    * Runs after the template Document object has serialize into an
@@ -511,14 +548,14 @@ export interface PrerenderConfig {
    */
   beforeSerializeTemplate?(document: Document): Promise<Document>;
   /**
-   * A custom function to be used to generate the canonical `<link>` tag
+   * A hook to be used to generate the canonical `<link>` tag
    * which goes in the `<head>` of every prerendered page. Returning `null`
    * will not add a canonical url tag to the page.
    */
   canonicalUrl?(url?: URL): string | null;
   /**
    * While prerendering, crawl same-origin URLs found within `<a href>` elements.
-   * Default to `true`.
+   * Defaults to `true`.
    */
   crawlUrls?: boolean;
   /**
@@ -547,6 +584,11 @@ export interface PrerenderConfig {
    * HTML used for all prerendered pages.
    */
   loadTemplate?(filePath?: string): Promise<string>;
+  /**
+   * Used to normalize the page's URL from a given a string and the current
+   * page's base URL. Largely used when reading an anchor's `href` attribute
+   * value and normalizing it into a `URL`.
+   */
   normalizeUrl?(href?: string, base?: URL): URL;
   robotsTxt?(opts: RobotsTxtOpts): string | RobotsTxtResults;
   sitemapXml?(opts: SitemapXmpOpts): string | SitemapXmpResults;
@@ -614,6 +656,9 @@ export interface HydrateDocumentOptions {
    * Removes CSS not used by elements within the `document`. Defaults to `true`.
    */
   removeUnusedStyles?: boolean;
+  /**
+   * The url the runtime uses for the resources, such as the assets directory.
+   */
   resourcesUrl?: string;
   /**
    * Prints out runtime console logs to the NodeJS process. Defaults to `false`.

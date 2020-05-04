@@ -2175,6 +2175,10 @@ export interface PackageJsonData {
     url?: string;
   };
   'private'?: boolean;
+  'scripts'?: {
+    [runName: string]: string;
+  };
+  'license'?: string;
 }
 
 export interface Workbox {
