@@ -1,5 +1,5 @@
 import * as d from '../declarations';
-import { catchError } from '@utils';
+import { catchError, isPromise } from '@utils';
 import { hasStencilScript, inlineExternalStyleSheets, minifyScriptElements, minifyStyleElements, removeStencilScripts } from './prerender-optimize';
 import fs from 'fs';
 import { promisify } from 'util';
@@ -20,9 +20,15 @@ export async function generateTemplateHtml(
     if (typeof srcIndexHtmlPath !== 'string') {
       srcIndexHtmlPath = outputTarget.indexHtml;
     }
+
     let templateHtml: string;
     if (typeof prerenderConfig.loadTemplate === 'function') {
-      templateHtml = await prerenderConfig.loadTemplate(srcIndexHtmlPath);
+      const loadTemplateResult = prerenderConfig.loadTemplate(srcIndexHtmlPath);
+      if (isPromise(loadTemplateResult)) {
+        templateHtml = await loadTemplateResult;
+      } else {
+        templateHtml = loadTemplateResult;
+      }
     } else {
       templateHtml = await readFile(srcIndexHtmlPath, 'utf8');
     }
@@ -71,12 +77,23 @@ export async function generateTemplateHtml(
     }
 
     if (typeof prerenderConfig.beforeSerializeTemplate === 'function') {
-      doc = await prerenderConfig.beforeSerializeTemplate(doc);
+      const beforeSerializeResults = prerenderConfig.beforeSerializeTemplate(doc);
+      if (isPromise(beforeSerializeResults)) {
+        doc = await beforeSerializeResults;
+      } else {
+        doc = beforeSerializeResults;
+      }
     }
 
     let html = serializeNodeToHtml(doc);
+
     if (typeof prerenderConfig.afterSerializeTemplate === 'function') {
-      html = await prerenderConfig.afterSerializeTemplate(html);
+      const afterSerializeResults = prerenderConfig.afterSerializeTemplate(html);
+      if (isPromise(afterSerializeResults)) {
+        html = await afterSerializeResults;
+      } else {
+        html = afterSerializeResults;
+      }
     }
 
     return {

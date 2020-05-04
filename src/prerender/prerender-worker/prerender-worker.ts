@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { addModulePreloads, excludeStaticComponents, minifyScriptElements, minifyStyleElements, removeModulePreloads, removeStencilScripts } from '../prerender-optimize';
-import { catchError, normalizePath } from '@utils';
+import { catchError, normalizePath, isPromise } from '@utils';
 import { crawlAnchorsForNextUrls } from '../crawl-urls';
 import { getHydrateOptions, getPrerenderConfig } from '../prerender-config';
 import { initNodeWorkerThread } from '../../sys/node/worker/worker-child';
@@ -53,7 +53,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     if (typeof prerenderConfig.beforeHydrate === 'function') {
       try {
         const rtn = prerenderConfig.beforeHydrate(doc, url);
-        if (rtn != null && typeof rtn.then === 'function') {
+        if (isPromise(rtn)) {
           await rtn;
         }
       } catch (e) {
@@ -100,7 +100,7 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     if (typeof prerenderConfig.afterHydrate === 'function') {
       try {
         const rtn = prerenderConfig.afterHydrate(doc, url);
-        if (rtn != null && typeof rtn.then === 'function') {
+        if (isPromise(rtn)) {
           await rtn;
         }
       } catch (e) {

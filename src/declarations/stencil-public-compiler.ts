@@ -540,13 +540,13 @@ export interface PrerenderConfig {
    * HTML formatted string. Returns an HTML string to be used as the
    * base template for all prerendered pages.
    */
-  afterSerializeTemplate?(html: string): Promise<string>;
+  afterSerializeTemplate?(html: string): string | Promise<string>;
   /**
    * Runs before the template Document object is serialize into an
    * HTML formatted string. Returns the Document to be serialized which
    * will become the base template html for all prerendered pages.
    */
-  beforeSerializeTemplate?(document: Document): Promise<Document>;
+  beforeSerializeTemplate?(document: Document): Document | Promise<Document>;
   /**
    * A hook to be used to generate the canonical `<link>` tag
    * which goes in the `<head>` of every prerendered page. Returning `null`
@@ -583,7 +583,7 @@ export interface PrerenderConfig {
    * Returns the template file's content. The template is the base
    * HTML used for all prerendered pages.
    */
-  loadTemplate?(filePath?: string): Promise<string>;
+  loadTemplate?(filePath?: string): string | Promise<string>;
   /**
    * Used to normalize the page's URL from a given a string and the current
    * page's base URL. Largely used when reading an anchor's `href` attribute
