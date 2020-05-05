@@ -63,6 +63,7 @@ export interface StencilConfig {
    * @deprecated Use the "exclude" option in "tsconfig.json"
    */
   excludeSrc?: string[];
+  exclude?: string[];
 
   /**
    * Stencil is traditionally used to compile many components into an app,
@@ -229,10 +230,13 @@ export interface StencilConfig {
   testing?: TestingConfig;
   maxConcurrentWorkers?: number;
   preamble?: string;
+
   /**
    * @deprecated Use the "include" option in "tsconfig.json"
    */
   includeSrc?: string[];
+  include?: string[];
+  
   rollupPlugins?: { before?: any[]; after?: any[] };
 
   entryComponentsHint?: string[];
