@@ -100,7 +100,7 @@ const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
     // basically this code is for old Edge, v18 and below
     const moduleMap = new Map<string, any>();
     (win as any)[importFunctionName] = (src: string) => {
-      const url = new URL(src, base).href;
+      const url = new URL(src, win.location.href + base).href;
       let mod = moduleMap.get(url);
       if (!mod) {
         const script = doc.createElement('script');
