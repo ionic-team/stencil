@@ -1,5 +1,6 @@
 import { Component, Element, Host, Method, Prop, Watch, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+import { expectExtend } from '../../testing/matchers';
 
 describe('lifecycle sync', () => {
   it('should fire connected/disconnected when removed', async () => {
@@ -297,10 +298,24 @@ describe('lifecycle sync', () => {
     @Component({ tag: 'cmp-root' })
     class CmpRoot {
       @Prop() value = 100;
+      @Prop() value2 = 100;
 
       @Method()
       next() {
         this.value *= 2;
+        this.value2 *= 2;
+      }
+
+      componentWillLoad() {
+        expect(this.value).toEqual(this.value2);
+      }
+
+      componentWillUpdate() {
+        expect(this.value).toEqual(this.value2);
+      }
+
+      componentWillRender() {
+        expect(this.value).toEqual(this.value2);
       }
 
       render() {
