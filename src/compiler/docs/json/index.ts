@@ -36,6 +36,7 @@ export default _default;
       listeners: cmp.listeners,
       styles: cmp.styles,
       slots: cmp.slots,
+      parts: cmp.parts,
       dependents: cmp.dependents,
       dependencies: cmp.dependencies,
       dependencyGraph: cmp.dependencyGraph,
