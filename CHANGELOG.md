@@ -1,4 +1,4 @@
-# 🍎 [1.13.0-1](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0-1) (2020-05-04)
+# 🌜 [1.13.0-2](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0-2) (2020-05-05)
 
 
 ### Features
@@ -6,14 +6,24 @@
 * **ssg:** static site generation ([2a38293](https://github.com/ionic-team/stencil/commit/2a382933f6cef826084e91610833165fb6e8e7fa))
 * **prerender:** parse typed prerender config ([7b6aaf7](https://github.com/ionic-team/stencil/commit/7b6aaf7b0c6ec7e7050f7494fc7d475fe0db5bf8))
 
-- Add `staticSite` to prerender.config.js
-- Add `staticDocument` to PrerenderHydrateOptions
-- Add `staticComponents` to HydrateDocumentOptions
-- Assume a static site build when index.html does not include scripts
+- Add `staticSite` to `prerender.config.ts`
+- Add `staticDocument` to `PrerenderHydrateOptions`
+- Add `staticComponents` to `HydrateDocumentOptions`
+- Assume a static site build when `index.html` does not include scripts
 - Do not define custom element for static only components
 - Do not add link rel=modulepreload for static only components
 - Do not minify inline script/styles if already minified within template
 - Ensure valid "src" URL within mock-doc
+
+
+### Bug Fixes
+
+* **docs:** include parts in top level docs json ([#2412](https://github.com/ionic-team/stencil/issues/2412)) ([131904f](https://github.com/ionic-team/stencil/commit/131904f33e8a57c2219b6d4e17f5193a781c2139))
+* **gatsby:** prevent clientside for ssr/ssg node env ([6bec727](https://github.com/ionic-team/stencil/commit/6bec7275fb8870f552f682a3b26814984a6641fe)), closes [#2411](https://github.com/ionic-team/stencil/issues/2411)
+* **jest:** change package used to import runCli ([#2387](https://github.com/ionic-team/stencil/issues/2387)) ([620d350](https://github.com/ionic-team/stencil/commit/620d35008323312f5e8898beb295dc527a7b4bdf))
+* **jest:** jest testing updates ([6d69f53](https://github.com/ionic-team/stencil/commit/6d69f53b84e087217fd49a5914d6799ebc366e70))
+* **polyfill:** slot child fix ([#2375](https://github.com/ionic-team/stencil/issues/2375)) ([654d753](https://github.com/ionic-team/stencil/commit/654d75353cf13e511f54d10208c03f7a6d8a2e89)), closes [#2373](https://github.com/ionic-team/stencil/issues/2373)
+* **runtime:** fix lifecycle state values ([#2414](https://github.com/ionic-team/stencil/issues/2414)) ([8302fed](https://github.com/ionic-team/stencil/commit/8302fed01b13b18436dc1a8d6bde231643f8f448))
 
 
 ## 🗻 [1.12.7](https://github.com/ionic-team/stencil/compare/v1.12.5...v1.12.7) (2020-04-29)
