@@ -1,4 +1,4 @@
-import { Component, Element, Host, Prop, Watch, h } from '@stencil/core';
+import { Component, Element, Host, Method, Prop, Watch, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('lifecycle sync', () => {
@@ -264,4 +264,75 @@ describe('lifecycle sync', () => {
       ]);
     });
   });
+
+  it('all state is available on "will" lifecycles', async () => {
+    @Component({ tag: 'cmp-child' })
+    class CmpChild {
+
+      @Prop() width = 0;
+      @Prop() height = 0;
+
+      componentWillLoad() {
+        expect(this.width).toEqual(100);
+        expect(this.height).toEqual(100);
+      }
+
+      componentWillUpdate() {
+        expect(this.width).toEqual(this.height);
+      }
+
+      componentWillRender() {
+        expect(this.width).toEqual(this.height);
+      }
+
+      render() {
+        return (
+          <Host>
+            {this.width}x{this.height}
+          </Host>
+        );
+      }
+    }
+
+    @Component({ tag: 'cmp-root' })
+    class CmpRoot {
+      @Prop() value = 100;
+
+      @Method()
+      next() {
+        this.value *= 2;
+      }
+
+      render() {
+        return (
+          <cmp-child
+            width={this.value}
+            height={this.value}
+          />
+        )
+      }
+    }
+
+    const { root, waitForChanges } = await newSpecPage({
+      components: [CmpChild, CmpRoot],
+      template: () => <cmp-root></cmp-root>,
+    });
+    expect(root).toEqualHtml(`
+      <cmp-root>
+        <cmp-child>
+          100x100
+        </cmp-child>
+      </cmp-root>
+    `);
+    await root.next();
+    await waitForChanges();
+    expect(root).toEqualHtml(`
+      <cmp-root>
+        <cmp-child>
+          200x200
+        </cmp-child>
+      </cmp-root>
+    `);
+  });
+
 });
