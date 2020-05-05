@@ -10,7 +10,6 @@ export class LifecycleUpdateA {
   testClick() {
     this.values.push(this.values.length + 1);
     this.values = this.values.slice();
-/// HERE
 
     const li = document.createElement('li');
     li.innerHTML = `<span style="color:gray">async add child components to lifecycle-update-a</span> ${this.values[this.values.length - 1]}`;
