@@ -17,85 +17,92 @@ export const createTesting = async (config: Config): Promise<Testing> => {
   let puppeteerBrowser: puppeteer.Browser;
 
   const run = async (opts: TestingRunOptions = {}) => {
-    if (!opts.spec && !opts.e2e) {
-      config.logger.error(`Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`);
-      return false;
-    }
-
-    const env: E2EProcessEnv = process.env;
+    let doScreenshots = false;
+    let passed = false;
+    let env: E2EProcessEnv;
     const msg: string[] = [];
 
-    if (opts.e2e) {
-      msg.push('e2e');
-      env.__STENCIL_E2E_TESTS__ = 'true';
-    }
-
-    if (opts.spec) {
-      msg.push('spec');
-      env.__STENCIL_SPEC_TESTS__ = 'true';
-    }
-
-    config.logger.info(config.logger.magenta(`testing ${msg.join(' and ')} files`));
-
-    const doScreenshots = !!(opts.e2e && opts.screenshot);
-    if (doScreenshots) {
-      env.__STENCIL_SCREENSHOT__ = 'true';
-
-      if (opts.updateScreenshot) {
-        config.logger.info(config.logger.magenta(`updating master screenshots`));
-      } else {
-        config.logger.info(config.logger.magenta(`comparing against master screenshots`));
-      }
-    }
-
-    if (opts.e2e) {
-      // e2e tests only
-      // do a build, start a dev server
-      // and spin up a puppeteer browser
-      let buildTask: Promise<CompilerBuildResults> = null;
-
-      (config.outputTargets as OutputTargetWww[]).forEach(outputTarget => {
-        outputTarget.empty = false;
-      });
-
-      const doBuild = !(config.flags && config.flags.build === false);
-      if (doBuild) {
-        buildTask = compiler.build();
+    try {
+      if (!opts.spec && !opts.e2e) {
+        config.logger.error(`Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`);
+        return false;
       }
 
-      config.devServer.openBrowser = false;
-      config.devServer.gzip = false;
-      config.devServer.reloadStrategy = null;
+      env = process.env;
 
-      const startupResults = await Promise.all([startServer(config.devServer, config.logger), startPuppeteerBrowser(config)]);
+      if (opts.e2e) {
+        msg.push('e2e');
+        env.__STENCIL_E2E_TESTS__ = 'true';
+      }
 
-      devServer = startupResults[0];
-      puppeteerBrowser = startupResults[1];
+      if (opts.spec) {
+        msg.push('spec');
+        env.__STENCIL_SPEC_TESTS__ = 'true';
+      }
 
-      if (doBuild) {
-        const results = await buildTask;
-        if (!results || (!config.watch && hasError(results && results.diagnostics))) {
-          await destroy();
-          return false;
+      config.logger.info(config.logger.magenta(`testing ${msg.join(' and ')} files`));
+
+      doScreenshots = !!(opts.e2e && opts.screenshot);
+      if (doScreenshots) {
+        env.__STENCIL_SCREENSHOT__ = 'true';
+
+        if (opts.updateScreenshot) {
+          config.logger.info(config.logger.magenta(`updating master screenshots`));
+        } else {
+          config.logger.info(config.logger.magenta(`comparing against master screenshots`));
         }
       }
 
-      if (devServer) {
-        env.__STENCIL_BROWSER_URL__ = devServer.browserUrl;
-        config.logger.debug(`e2e dev server url: ${env.__STENCIL_BROWSER_URL__}`);
+      if (opts.e2e) {
+        // e2e tests only
+        // do a build, start a dev server
+        // and spin up a puppeteer browser
+        let buildTask: Promise<CompilerBuildResults> = null;
 
-        env.__STENCIL_APP_SCRIPT_URL__ = getAppScriptUrl(config, devServer.browserUrl);
-        config.logger.debug(`e2e app script url: ${env.__STENCIL_APP_SCRIPT_URL__}`);
+        (config.outputTargets as OutputTargetWww[]).forEach(outputTarget => {
+          outputTarget.empty = false;
+        });
 
-        const styleUrl = getAppStyleUrl(config, devServer.browserUrl);
-        if (styleUrl) {
-          env.__STENCIL_APP_STYLE_URL__ = getAppStyleUrl(config, devServer.browserUrl);
-          config.logger.debug(`e2e app style url: ${env.__STENCIL_APP_STYLE_URL__}`);
+        const doBuild = !(config.flags && config.flags.build === false);
+        if (doBuild) {
+          buildTask = compiler.build();
+        }
+
+        config.devServer.openBrowser = false;
+        config.devServer.gzip = false;
+        config.devServer.reloadStrategy = null;
+
+        const startupResults = await Promise.all([startServer(config.devServer, config.logger), startPuppeteerBrowser(config)]);
+
+        devServer = startupResults[0];
+        puppeteerBrowser = startupResults[1];
+
+        if (doBuild) {
+          const results = await buildTask;
+          if (!results || (!config.watch && hasError(results && results.diagnostics))) {
+            await destroy();
+            return false;
+          }
+        }
+
+        if (devServer) {
+          env.__STENCIL_BROWSER_URL__ = devServer.browserUrl;
+          config.logger.debug(`e2e dev server url: ${env.__STENCIL_BROWSER_URL__}`);
+
+          env.__STENCIL_APP_SCRIPT_URL__ = getAppScriptUrl(config, devServer.browserUrl);
+          config.logger.debug(`e2e app script url: ${env.__STENCIL_APP_SCRIPT_URL__}`);
+
+          const styleUrl = getAppStyleUrl(config, devServer.browserUrl);
+          if (styleUrl) {
+            env.__STENCIL_APP_STYLE_URL__ = getAppStyleUrl(config, devServer.browserUrl);
+            config.logger.debug(`e2e app style url: ${env.__STENCIL_APP_STYLE_URL__}`);
+          }
         }
       }
+    } catch (e) {
+      config.logger.error(e);
+      return false;
     }
-
-    let passed = false;
 
     try {
       if (doScreenshots) {

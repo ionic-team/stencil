@@ -35,6 +35,7 @@ export async function testing(opts: BuildOptions) {
     'constants',
     'crypto',
     'fs',
+    '@jest/core',
     'jest-cli',
     'jest',
     'expect',

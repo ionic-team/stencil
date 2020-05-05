@@ -284,8 +284,7 @@ export function createNodeSys(prcs: NodeJS.Process) {
   sys.lazyRequire = new NodeLazyRequire(nodeResolve, {
     '@types/jest': ['24.9.1', '24.9.1'],
     '@types/puppeteer': ['1.19.0', '2.0.1'],
-    'jest': ['24.9.0', '24.9.0'],
-    'jest-cli': ['24.9.0', '24.9.0'],
+    'jest': ['24.9.0', '26.0.1'],
     'pixelmatch': ['4.0.2', '4.0.2'],
     'puppeteer': ['1.19.0', '2.1.1'],
     'puppeteer-core': ['1.19.0', '2.1.1'],

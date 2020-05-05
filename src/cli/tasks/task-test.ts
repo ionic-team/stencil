@@ -1,10 +1,9 @@
 import * as d from '../../declarations';
-import { Testing as TestingTypes } from '@stencil/core/testing';
+import type { Testing } from '@stencil/core/testing';
 import exit from 'exit';
 import { startupLog } from './startup-log';
 
 export async function taskTest(prcs: NodeJS.Process, config: d.Config) {
-
   startupLog(prcs, config);
 
   try {
@@ -16,7 +15,7 @@ export async function taskTest(prcs: NodeJS.Process, config: d.Config) {
     };
 
     // always ensure we have jest modules installed
-    const ensureModuleIds = ['@types/jest', 'jest', 'jest-cli'];
+    const ensureModuleIds = ['@types/jest', 'jest'];
 
     if (testingRunOpts.e2e) {
       // if it's an e2e test, also make sure we're got
@@ -43,7 +42,7 @@ export async function taskTest(prcs: NodeJS.Process, config: d.Config) {
 
     // let's test!
     const { createTesting } = require('../testing/index.js');
-    const testing: TestingTypes = await createTesting(config);
+    const testing: Testing = await createTesting(config);
     const passed = await testing.run(testingRunOpts);
     await testing.destroy();
 
