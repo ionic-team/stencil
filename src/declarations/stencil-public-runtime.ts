@@ -1540,6 +1540,7 @@ export namespace JSXBase {
     ref?: (elm?: T) => void;
     slot?: string;
     part?: string;
+    exportparts?: string;
 
     // Clipboard Events
     onCopy?: (event: ClipboardEvent) => void;
