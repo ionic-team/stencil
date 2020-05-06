@@ -134,6 +134,7 @@ export const mockFetch = {
 };
 
 class MockResponse404 extends MockResponse {
+  ok = false;
   status = 404;
   statusText = 'Not Found';
   constructor() {
