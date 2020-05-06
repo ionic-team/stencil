@@ -45,10 +45,11 @@ export const validateTsConfig = async (ts: typeof tsTypes, config: d.Config, sys
         });
       } else {
         if (results.raw) {
-          if (!hasSrcDirectoryInclude(results.raw.include)) {
+          const srcDir = relative(config.rootDir, config.srcDir);
+          if (!hasSrcDirectoryInclude(results.raw.include, srcDir)) {
             const warn = buildWarn(tsconfig.diagnostics);
             warn.header = `tsconfig.json "include" required`;
-            warn.messageText = `In order for TypeScript to improve watch performance, it's recommended the "tsconfig.json" file should have the "include" property, with at least the app's "src" directory listed. For example: "include": ["src"]`;
+            warn.messageText = `In order for TypeScript to improve watch performance, it's recommended the "tsconfig.json" file should have the "include" property, with at least the app's "${srcDir}" directory listed. For example: "include": ["${srcDir}"]`;
           }
 
           if (hasStencilConfigInclude(results.raw.include)) {
@@ -134,6 +135,6 @@ const createDefaultTsConfig = (config: d.Config) =>
     2,
   );
 
-const hasSrcDirectoryInclude = (includeProp: string[]) => Array.isArray(includeProp) && includeProp.length > 0;
+const hasSrcDirectoryInclude = (includeProp: string[], src: string) => Array.isArray(includeProp) && includeProp.includes(src);
 
 const hasStencilConfigInclude = (includeProp: string[]) => Array.isArray(includeProp) && includeProp.includes('stencil.config.ts');
