@@ -1206,8 +1206,7 @@ export namespace JSXBase {
     hidden?: boolean;
     id?: string;
     lang?: string;
-    spellCheck?: boolean;
-    spellcheck?: boolean | string;
+    spellcheck?: 'true' | 'false';
     style?: { [key: string]: string | undefined };
     tabIndex?: number;
     tabindex?: number | string;
