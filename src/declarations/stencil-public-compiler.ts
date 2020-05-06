@@ -1411,13 +1411,6 @@ export interface JestConfig {
   watchPathIgnorePatterns?: any[];
 }
 
-export interface JestArgv extends JestConfig {
-  _: string[];
-  ci: boolean;
-  config: string;
-  maxWorkers: number;
-}
-
 export interface TestingConfig extends JestConfig {
   /**
    * The `allowableMismatchedPixels` value is used to determine an acceptable

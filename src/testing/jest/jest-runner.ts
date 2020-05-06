@@ -1,6 +1,7 @@
 import * as d from '@stencil/core/internal';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
+import type { AggregatedResult } from '@jest/test-result';
 
 export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
   let success = false;
@@ -29,7 +30,9 @@ export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
     // run the @jest/core with our data rather than letting the
     // @jest/core parse the args itself
     const { runCLI } = require('@jest/core');
-    const cliResults = await runCLI(jestArgv, projects);
+    const cliResults = (await runCLI(jestArgv, projects)) as {
+      results: AggregatedResult;
+    };
 
     success = !!cliResults.results.success;
   } catch (e) {

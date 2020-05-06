@@ -15,7 +15,7 @@ export async function taskTest(prcs: NodeJS.Process, config: d.Config) {
     };
 
     // always ensure we have jest modules installed
-    const ensureModuleIds = ['@types/jest', 'jest'];
+    const ensureModuleIds = ['@types/jest', 'jest', 'jest-cli'];
 
     if (testingRunOpts.e2e) {
       // if it's an e2e test, also make sure we're got
