@@ -1,4 +1,4 @@
-# 🌜 [1.13.0-2](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0-2) (2020-05-05)
+# 🎖 [1.13.0-3](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0-3) (2020-05-06)
 
 
 ### Features
@@ -22,6 +22,7 @@
 * **gatsby:** prevent clientside for ssr/ssg node env ([6bec727](https://github.com/ionic-team/stencil/commit/6bec7275fb8870f552f682a3b26814984a6641fe)), closes [#2411](https://github.com/ionic-team/stencil/issues/2411)
 * **jest:** change package used to import runCli ([#2387](https://github.com/ionic-team/stencil/issues/2387)) ([620d350](https://github.com/ionic-team/stencil/commit/620d35008323312f5e8898beb295dc527a7b4bdf))
 * **jest:** jest testing updates ([6d69f53](https://github.com/ionic-team/stencil/commit/6d69f53b84e087217fd49a5914d6799ebc366e70))
+* **jest:** ensure jest-cli, set presets ([0d3ed7d](https://github.com/ionic-team/stencil/commit/0d3ed7d4cb7983f1e949d3a9d31c7b5ecfe58f1a))
 * **polyfill:** slot child fix ([#2375](https://github.com/ionic-team/stencil/issues/2375)) ([654d753](https://github.com/ionic-team/stencil/commit/654d75353cf13e511f54d10208c03f7a6d8a2e89)), closes [#2373](https://github.com/ionic-team/stencil/issues/2373)
 * **runtime:** fix lifecycle state values ([#2414](https://github.com/ionic-team/stencil/issues/2414)) ([8302fed](https://github.com/ionic-team/stencil/commit/8302fed01b13b18436dc1a8d6bde231643f8f448))
 
