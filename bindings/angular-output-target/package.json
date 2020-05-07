@@ -1,0 +1,66 @@
+{
+  "name": "@stencil/angular-output-target",
+  "version": "0.0.2",
+  "description": "This is an output plugin for stencil.",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/",
+    "resources/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "prebuild": "rimraf ./dist && npm run test",
+    "build": "tsc && npm run rollup",
+    "watch": "tsc --watch",
+    "rollup": "rollup -c",
+    "version": "npm run build",
+    "release": "np",
+    "test": "jest",
+    "test.watch": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ionic-team/stencil-ds-plugins.git"
+  },
+  "author": "Ionic Team",
+  "homepage": "https://stenciljs.com/",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ionic-team/stencil-ds-plugins/issues"
+  },
+  "devDependencies": {
+    "@angular/core": "8.2.14",
+    "@angular/forms": "8.2.14",
+    "@types/jest": "^24.0.11",
+    "@stencil/core": ">=1.8.0",
+    "jest": "^24.5.0",
+    "np": "^4.0.2",
+    "rimraf": "^2.6.3",
+    "rollup": "^1.6.0",
+    "tslint": "^5.14.0",
+    "tslint-ionic-rules": "0.0.21",
+    "typescript": "^3.3.3333"
+  },
+  "peerDependencies": {
+    "@stencil/core": ">=1.8.0"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.(js|ts|tsx)$": "<rootDir>/test/jest.preprocessor.js"
+    },
+    "testRegex": "(\\.(test|spec))\\.(ts?|tsx?|jsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json",
+      "jsx"
+    ],
+    "testURL": "http://localhost"
+  },
+  "gitHead": "a3588e905186a0e86e7f88418fd5b2f9531b55e0"
+}

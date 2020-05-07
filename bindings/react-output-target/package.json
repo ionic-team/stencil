@@ -1,0 +1,70 @@
+{
+  "name": "@stencil/react-output-target",
+  "version": "0.0.6",
+  "description": "This is an output plugin for stencil.",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/",
+    "react-component-lib/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "prebuild": "rimraf ./dist && npm run lint",
+    "build": "tsc && npm run rollup",
+    "watch": "tsc --watch",
+    "rollup": "rollup -c",
+    "version": "npm run build",
+    "release": "np",
+    "lint": "tslint --project tsconfig.json",
+    "test": "jest --passWithNoTests",
+    "test.watch": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ionic-team/stencil-ds-plugins.git"
+  },
+  "author": "Ionic Team",
+  "homepage": "https://stenciljs.com/",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ionic-team/stencil-ds-plugins/issues"
+  },
+  "peerDependencies": {
+    "@stencil/core": ">=1.8.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.11",
+    "@types/react": "^16.7.0",
+    "@types/react-dom": "^16.7.0",
+    "@stencil/core": ">=1.8.0",
+    "jest": "^24.5.0",
+    "np": "^5.0.2",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "react-testing-library": "^7.0.0",
+    "rimraf": "^2.6.3",
+    "rollup": "^1.6.0",
+    "tslint": "^5.14.0",
+    "tslint-ionic-rules": "0.0.21",
+    "typescript": "^3.3.3333"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.(js|ts|tsx)$": "<rootDir>/test/jest.preprocessor.js"
+    },
+    "testRegex": "(\\.(test|spec))\\.(ts?|tsx?|jsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json",
+      "jsx"
+    ],
+    "testURL": "http://localhost"
+  },
+  "gitHead": "a3588e905186a0e86e7f88418fd5b2f9531b55e0"
+}

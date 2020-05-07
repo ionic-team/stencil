@@ -1,5 +1,28 @@
-import { Component, Event, EventEmitter, Listen, Method, State } from '@stencil/core';
+import { Component, Event, EventEmitter, Listen, Method, State, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+
+describe('MyCmp', () => {
+  it('processes child clicks', async () => {
+    @Component({
+      tag: 'my-cmp',
+    })
+    class MyCmp {
+      private mouseClick = (e: MouseEvent): void => {
+        console.log(e.currentTarget); // error
+      };
+      render() {
+        return <div onClick={this.mouseClick}></div>;
+      }
+    }
+    const page = await newSpecPage({
+      components: [MyCmp],
+      html: '<my-cmp></my-cmp>',
+    });
+    const div = page.root.querySelector('div');
+    div.click();
+    expect(div).toBeTruthy();
+  });
+});
 
 describe('event', () => {
   it('event normal ionChange event', async () => {
