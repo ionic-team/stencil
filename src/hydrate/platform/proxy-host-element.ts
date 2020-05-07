@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { consoleError, getHostRef } from '@platform';
 import { getValue, parsePropertyValue, setValue } from '@runtime';
-import { MEMBER_FLAGS } from '@utils';
+import { CMP_FLAGS, MEMBER_FLAGS } from '@utils';
 
 export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) {
   if (typeof elm.componentOnReady !== 'function') {
@@ -9,6 +9,9 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
   }
   if (typeof elm.forceUpdate !== 'function') {
     elm.forceUpdate = forceUpdate;
+  }
+  if (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
+    (elm as any).shadowRoot = elm;
   }
 
   if (cmpMeta.$members$ != null) {
