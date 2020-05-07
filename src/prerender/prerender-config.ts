@@ -45,7 +45,6 @@ function requireTsConfigFile(diagnostics: d.Diagnostic[], prerenderConfigPath: s
             },
           });
           sourceText = tsResults.outputText;
-          console.log(sourceText);
 
           if (tsResults.diagnostics.length > 0) {
             diagnostics.push(...loadTypeScriptDiagnostics(tsResults.diagnostics));
