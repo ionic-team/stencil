@@ -2,7 +2,6 @@ import * as d from '../declarations';
 import { buildError, catchError, requireFunc, loadTypeScriptDiagnostics } from '@utils';
 import path from 'path';
 import fs from 'fs';
-import ts from 'typescript';
 
 export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigPath: string) {
   const prerenderConfig: d.PrerenderConfig = {};
@@ -22,6 +21,8 @@ let cachedPrerenderConfig: d.PrerenderConfig = null;
 function requireTsConfigFile(diagnostics: d.Diagnostic[], prerenderConfigPath: string) {
   if (!cachedPrerenderConfig) {
     try {
+      const ts: typeof import('typescript') = require('typescript');
+
       // ensure we cleared out node's internal require() cache for this file
       delete require.cache[path.resolve(prerenderConfigPath)];
 
