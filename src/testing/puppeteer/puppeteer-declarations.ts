@@ -32,7 +32,6 @@ type PuppeteerPage = Omit<
   | 'addListener'
   | 'prependListener'
   | 'prependOnceListener'
-  | 'removeListener'
   | 'removeAllListeners'
   | 'setMaxListeners'
   | 'getMaxListeners'
