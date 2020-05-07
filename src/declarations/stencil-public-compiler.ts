@@ -523,7 +523,7 @@ export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
  * };
  * ```
  *
- * For more info: https://stenciljs.com/docs/prerendering
+ * For more info: https://stenciljs.com/docs/static-site-generation
  */
 export interface PrerenderConfig {
   /**
