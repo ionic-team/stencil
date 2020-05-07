@@ -222,7 +222,7 @@ const transpileTypedConfig = (ts: typeof tsTypes, diagnostics: Diagnostic[], sou
       module: ts.ModuleKind.CommonJS,
       moduleResolution: ts.ModuleResolutionKind.NodeJs,
       esModuleInterop: true,
-      target: ts.ScriptTarget.ES5,
+      target: ts.ScriptTarget.ES2015,
       allowJs: true,
     },
     reportDiagnostics: false,
