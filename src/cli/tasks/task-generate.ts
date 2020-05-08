@@ -29,14 +29,17 @@ export async function taskGenerate(config: d.Config) {
     config.flags.unknownArgs.find(arg => !arg.startsWith('-')) || ((await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string);
 
   const { dir, base: componentName } = parse(input);
+  const prefix = config.componentGeneratorConfig?.prefix;
+  const componentTag = prefix ? `${prefix}-${componentName}` : `app-${componentName}`;
+  const styleExt = config.componentGeneratorConfig?.styleFormat || 'css';
 
-  const tagError = validateComponentTag(componentName);
+  const tagError = validateComponentTag(componentTag);
   if (tagError) {
     config.logger.error(tagError);
     return exit(1);
   }
 
-  const extensionsToGenerate: GeneratableExtension[] = ['tsx', ...(await chooseFilesToGenerate())];
+  const extensionsToGenerate: GeneratableExtension[] = ['tsx', ...(await chooseFilesToGenerate(styleExt))];
 
   const testFolder = extensionsToGenerate.some(isTest)
     ? 'test'
@@ -46,7 +49,7 @@ export async function taskGenerate(config: d.Config) {
   await mkdir(join(outDir, testFolder), { recursive: true });
 
   const writtenFiles = await Promise.all(
-    extensionsToGenerate.map(extension => writeFileByExtension(outDir, componentName, extension, extensionsToGenerate.includes('css'))),
+    extensionsToGenerate.map(extension => writeFileByExtension(outDir, componentName, componentTag, extension, extensionsToGenerate.includes('css'), styleExt)),
   ).catch(error => config.logger.error(error));
 
   if (!writtenFiles) {
@@ -65,14 +68,14 @@ export async function taskGenerate(config: d.Config) {
 /**
  * Show a checkbox prompt to select the files to be generated.
  */
-const chooseFilesToGenerate = async () =>
+const chooseFilesToGenerate = async (styleExt: string) =>
   (
     await prompt({
       name: 'filesToGenerate',
       type: 'multiselect',
       message: 'Which additional files do you want to generate?',
       choices: [
-        { value: 'css', title: 'Stylesheet (.css)', selected: true },
+        { value: 'css', title: `Stylesheet (.${styleExt})`, selected: true },
         { value: 'spec.tsx', title: 'Spec Test  (.spec.tsx)', selected: true },
         { value: 'e2e.ts', title: 'E2E Test (.e2e.ts)', selected: true },
       ] as any[],
@@ -82,12 +85,14 @@ const chooseFilesToGenerate = async () =>
 /**
  * Get a file's boilerplate by its extension and write it to disk.
  */
-const writeFileByExtension = async (path: string, name: string, extension: GeneratableExtension, withCss: boolean) => {
+const writeFileByExtension = async (path: string, name: string, tag: string, extension: GeneratableExtension, withCss: boolean, styleExt: string) => {
   if (isTest(extension)) {
     path = join(path, 'test');
   }
-  const outFile = join(path, `${name}.${extension}`);
-  const boilerplate = getBoilerplateByExtension(name, extension, withCss);
+
+  const ext = isStyle(extension) ? styleExt : extension;
+  const outFile = join(path, `${name}.${ext}`);
+  const boilerplate = getBoilerplateByExtension(name, tag, extension, withCss, styleExt);
 
   await writeFile(outFile, boilerplate, { flag: 'wx' });
 
@@ -98,36 +103,40 @@ const isTest = (extension: string) => {
   return extension === 'e2e.ts' || extension === 'spec.tsx';
 };
 
+const isStyle = (extension: string) => {
+  return extension === 'css';
+};
+
 /**
  * Get the boilerplate for a file by its extension.
  */
-const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtension, withCss: boolean) => {
+const getBoilerplateByExtension = (componentName: string, tagName: string, extension: GeneratableExtension, withCss: boolean, styleExt: string) => {
   switch (extension) {
     case 'tsx':
-      return getComponentBoilerplate(tagName, withCss);
+      return getComponentBoilerplate(componentName, tagName, withCss, styleExt);
 
     case 'css':
       return getStyleUrlBoilerplate();
 
     case 'spec.tsx':
-      return getSpecTestBoilerplate(tagName);
+      return getSpecTestBoilerplate(componentName, tagName);
 
     case 'e2e.ts':
       return getE2eTestBoilerplate(tagName);
 
     default:
-      throw new Error(`Unkown extension "${extension}".`);
+      throw new Error(`Unknown extension "${extension}".`);
   }
 };
 
 /**
  * Get the boilerplate for a component.
  */
-const getComponentBoilerplate = (tagName: string, hasStyle: boolean) => {
+const getComponentBoilerplate = (componentName: string, tagName: string, hasStyle: boolean, styleExt: string) => {
   const decorator = [`{`];
   decorator.push(`  tag: '${tagName}',`);
   if (hasStyle) {
-    decorator.push(`  styleUrl: '${tagName}.css',`);
+    decorator.push(`  styleUrl: '${componentName}.${styleExt}',`);
   }
   decorator.push(`  shadow: true,`);
   decorator.push(`}`);
@@ -161,9 +170,9 @@ const getStyleUrlBoilerplate = () =>
 /**
  * Get the boilerplate for a spec test.
  */
-const getSpecTestBoilerplate = (tagName: string) =>
+const getSpecTestBoilerplate = (componentName: string, tagName: string) =>
   `import { newSpecPage } from '@stencil/core/testing';
-import { ${toPascalCase(tagName)} } from './${tagName}';
+import { ${toPascalCase(tagName)} } from '../${componentName}';
 
 describe('${tagName}', () => {
   it('renders', async () => {

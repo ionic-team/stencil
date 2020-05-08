@@ -249,6 +249,7 @@ export interface StencilConfig {
   excludeUnusedDependencies?: boolean;
   typescriptPath?: string;
   stencilCoreResolvedId?: string;
+  componentGeneratorConfig?: ComponentGeneratorConfig;
 }
 
 export interface ConfigExtras {
@@ -1870,6 +1871,11 @@ export interface ServiceWorkerConfig {
   runtimeCaching?: any[];
   ignoreUrlParametersMatching?: any[];
   handleFetch?: boolean;
+}
+
+export interface ComponentGeneratorConfig {
+  prefix?: string;
+  styleFormat?: string;
 }
 
 export interface LoadConfigInit {
