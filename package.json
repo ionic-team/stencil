@@ -116,7 +116,6 @@
     "semiver": "^1.1.0",
     "semver": "7.3.2",
     "sizzle": "^2.3.5",
-    "stream-browserify": "^2.0.2",
     "terser": "4.6.13",
     "tslib": "^1.11.2",
     "webpack": "^4.43.0",
