@@ -6,13 +6,11 @@ import { cssTemplatePlugin } from '../../utils/css-template-plugin';
 import { loadDeps } from '../../utils/load-deps';
 import { templates, templateList } from '../../utils/templates';
 
-
 @Component({
   tag: 'app-root',
-  styleUrl: 'app-root.css'
+  styleUrl: 'app-root.css',
 })
 export class AppRoot {
-
   file: HTMLInputElement;
   sourceCodeInput: HTMLTextAreaElement;
   transpiledInput: HTMLTextAreaElement;
@@ -84,7 +82,7 @@ export class AppRoot {
     this.diagnostics.forEach((d: any) => {
       if (d.level === 'error') {
         console.error(d.messageText);
-      } else if  (d.level === 'warn') {
+      } else if (d.level === 'warn') {
         console.warn(d.messageText);
       } else {
         console.info(d.messageText);
@@ -130,21 +128,21 @@ export class AppRoot {
             console.log('bundle load:', id);
             const code = this.fs.get(id.split('?')[0]);
             return code;
-          }
+          },
         },
-        cssTemplatePlugin
+        cssTemplatePlugin,
       ],
       onwarn(warning: any) {
-				console.group(warning.loc ? warning.loc.file : '');
-				console.warn(warning.message);
-				if ( warning.frame ) {
-					console.log(warning.frame);
-				}
-				if ( warning.url ) {
-					console.log(`See ${warning.url} for more information`);
-				}
-				console.groupEnd();
-			}
+        console.group(warning.loc ? warning.loc.file : '');
+        console.warn(warning.message);
+        if (warning.frame) {
+          console.log(warning.frame);
+        }
+        if (warning.url) {
+          console.log(`See ${warning.url} for more information`);
+        }
+        console.groupEnd();
+      },
     };
 
     const generateOptions: RollupTypes.OutputOptions = {
@@ -166,7 +164,6 @@ export class AppRoot {
         });
         this.bundledInput.value = results.output;
         this.wrap = 'on';
-
       } else if (this.minified === 'pretty') {
         const results = await stencil.optimizeJs({
           input: this.bundledInput.value,
@@ -177,7 +174,6 @@ export class AppRoot {
       }
 
       this.preview();
-
     } catch (e) {
       this.bundledInput.value = e;
       if (e.loc && e.loc.file) {
@@ -218,33 +214,31 @@ export class AppRoot {
   render() {
     return (
       <Host>
-
         <section class="source">
           <header>Source</header>
-          <textarea
-            spellCheck={false}
-            wrap="off"
-            autocapitalize="off"
-            ref={el => this.sourceCodeInput = el}
-            onInput={() => this.compile()}/>
+          <textarea spellcheck="false" wrap="off" autocapitalize="off" ref={el => (this.sourceCodeInput = el)} onInput={() => this.compile()} />
 
           <div class="options">
             <label>
               <span>Templates:</span>
-              <select ref={el => this.fileTemplate = el} onInput={(ev: any) => {
-                this.loadTemplate(ev.target.value);
-              }}>{templateList.map(fileName => (
-                <option value={fileName}>{fileName.replace('.tsx', '')}</option>
-              ))}
+              <select
+                ref={el => (this.fileTemplate = el)}
+                onInput={(ev: any) => {
+                  this.loadTemplate(ev.target.value);
+                }}
+              >
+                {templateList.map(fileName => (
+                  <option value={fileName}>{fileName.replace('.tsx', '')}</option>
+                ))}
               </select>
             </label>
             <label>
               <span>File:</span>
-              <input ref={el => this.file = el} onInput={this.compile.bind(this)}/>
+              <input ref={el => (this.file = el)} onInput={this.compile.bind(this)} />
             </label>
             <label>
               <span>Export:</span>
-              <select ref={el => this.componentExport = el} onInput={this.compile.bind(this)}>
+              <select ref={el => (this.componentExport = el)} onInput={this.compile.bind(this)}>
                 <option value="customelement">customelement</option>
                 <option value="module">module</option>
                 <option value="null">null</option>
@@ -252,7 +246,7 @@ export class AppRoot {
             </label>
             <label>
               <span>Module:</span>
-              <select ref={el => this.module = el} onInput={this.compile.bind(this)}>
+              <select ref={el => (this.module = el)} onInput={this.compile.bind(this)}>
                 <option value="esm">esm</option>
                 <option value="cjs">cjs</option>
                 <option value="null">null</option>
@@ -260,7 +254,7 @@ export class AppRoot {
             </label>
             <label>
               <span>Target:</span>
-              <select ref={el => this.target = el} onInput={this.compile.bind(this)}>
+              <select ref={el => (this.target = el)} onInput={this.compile.bind(this)}>
                 <option value="latest">latest</option>
                 <option value="esnext">esnext</option>
                 <option value="es2020">es2020</option>
@@ -272,7 +266,7 @@ export class AppRoot {
             </label>
             <label>
               <span>Source Map:</span>
-              <select ref={el => this.sourceMap = el} onInput={this.compile.bind(this)}>
+              <select ref={el => (this.sourceMap = el)} onInput={this.compile.bind(this)}>
                 <option value="true">true</option>
                 <option value="inline">inline</option>
                 <option value="false">false</option>
@@ -281,28 +275,28 @@ export class AppRoot {
             </label>
             <label>
               <span>Style:</span>
-              <select ref={el => this.style = el} onInput={this.compile.bind(this)}>
+              <select ref={el => (this.style = el)} onInput={this.compile.bind(this)}>
                 <option value="static">static</option>
                 <option value="null">null</option>
               </select>
             </label>
             <label>
               <span>Proxy:</span>
-              <select ref={el => this.proxy = el} onInput={this.compile.bind(this)}>
+              <select ref={el => (this.proxy = el)} onInput={this.compile.bind(this)}>
                 <option value="defineproperty">defineproperty</option>
                 <option value="null">null</option>
               </select>
             </label>
             <label>
               <span>Metadata:</span>
-              <select ref={el => this.componentMetadata = el} onInput={this.compile.bind(this)}>
+              <select ref={el => (this.componentMetadata = el)} onInput={this.compile.bind(this)}>
                 <option value="null">null</option>
                 <option value="compilerstatic">compilerstatic</option>
               </select>
             </label>
             <label>
               <span>Core:</span>
-              <select ref={el => this.coreImportPath = el} onInput={this.compile.bind(this)}>
+              <select ref={el => (this.coreImportPath = el)} onInput={this.compile.bind(this)}>
                 <option value="null">null</option>
                 <option value="@stencil/core/internal/client">@stencil/core/internal/client</option>
                 <option value="@stencil/core/internal/testing">@stencil/core/internal/testing</option>
@@ -315,27 +309,32 @@ export class AppRoot {
           <header>{this.buildView === 'transpiled' ? 'Transpiled Build' : 'Bundled Build'}</header>
 
           <textarea
-            ref={el => this.transpiledInput = el}
+            ref={el => (this.transpiledInput = el)}
             onInput={this.bundle.bind(this)}
             hidden={this.buildView !== 'transpiled'}
-            spellCheck={false}
+            spellcheck="false"
             autocapitalize="off"
-            wrap="off"/>
+            wrap="off"
+          />
 
           <textarea
-            ref={el => this.bundledInput = el}
+            ref={el => (this.bundledInput = el)}
             onInput={this.preview.bind(this)}
             hidden={this.buildView !== 'bundled'}
-            spellCheck={false}
+            spellcheck="false"
             autocapitalize="off"
-            wrap={this.wrap}/>
+            wrap={this.wrap}
+          />
 
           <div class="options">
             <label>
               <span>Build:</span>
-              <select ref={el => this.build = el} onInput={(ev: any) => {
-                this.buildView = ev.target.value;
-              }}>
+              <select
+                ref={el => (this.build = el)}
+                onInput={(ev: any) => {
+                  this.buildView = ev.target.value;
+                }}
+              >
                 <option value="transpiled">Transpiled</option>
                 <option value="bundled">Bundled</option>
               </select>
@@ -343,17 +342,17 @@ export class AppRoot {
 
             <label hidden={this.buildView !== 'bundled'}>
               <span>Minify:</span>
-              <select onInput={(ev: any) => {
-                this.minified = ev.target.value;
-                this.bundle();
-              }}>
+              <select
+                onInput={(ev: any) => {
+                  this.minified = ev.target.value;
+                  this.bundle();
+                }}
+              >
                 <option value="uncompressed">Uncompressed</option>
                 <option value="pretty">Pretty Minified</option>
                 <option value="minified">Minified</option>
               </select>
-              <span class="file-size">
-                {this.bundledLength} b
-              </span>
+              <span class="file-size">{this.bundledLength} b</span>
             </label>
           </div>
         </section>
@@ -361,38 +360,28 @@ export class AppRoot {
         <section class="diagnostics" hidden={this.diagnostics.length === 0}>
           <header>Diagnostics</header>
           {this.diagnostics.map((d: any) => (
-            <div>
-              {d.messageText}
-            </div>
+            <div>{d.messageText}</div>
           ))}
         </section>
 
         <section class="preview">
           <header>HTML</header>
-            <textarea
-              spellCheck={false}
-              wrap="off"
-              autocapitalize="off"
-              ref={el => this.htmlCodeInput = el}
-              onInput={this.preview.bind(this)}
-            />
-            <div class="options">
-
-            </div>
+          <textarea spellcheck="false" wrap="off" autocapitalize="off" ref={el => (this.htmlCodeInput = el)} onInput={this.preview.bind(this)} />
+          <div class="options"></div>
 
           <div class="view">
             <header>
               Preview
-              <a href="#" onClick={this.openInWindow}>Open in window</a>
+              <a href="#" onClick={this.openInWindow}>
+                Open in window
+              </a>
             </header>
-            <iframe ref={el => this.iframe = el}></iframe>
+            <iframe ref={el => (this.iframe = el)}></iframe>
           </div>
         </section>
-
       </Host>
-    )
+    );
   }
-
 }
 
 declare const stencil: typeof StencilTypes;
