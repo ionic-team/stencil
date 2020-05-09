@@ -126,18 +126,18 @@ export {
 import { TranspileOptions as CompileOptions, TranspileResults as CompileResults } from '@stencil/core/internal';
 
 /**
- * Deprecated, used `transpile()` instead.
+ * @deprecated Use `transpile()` instead.
  */
 export declare const compile: (code: string, opts?: any) => Promise<any>;
 
 /**
- * Deprecated, used `transpileSync()` instead.
+ * @deprecated Use `transpileSync()` instead.
  */
 export declare const compileSync: (code: string, opts?: any) => any;
 
 export {
-  /** Deprecated, use TranspileOptions instead */
+  /** @deprecated Use TranspileOptions instead */
   CompileOptions,
-  /** Deprecated, use TranspileResults instead */
+  /** @deprecated Use TranspileResults instead */
   CompileResults,
 };
