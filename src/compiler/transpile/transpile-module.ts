@@ -33,7 +33,7 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     sourceFilePath = tsCompilerOptions.jsx ? `module.tsx` : `module.ts`;
   }
 
-  const results: d.TranspileResults = {
+  const results: d.TranspileToEs5Results = {
     sourceFilePath: sourceFilePath,
     code: null,
     map: null,

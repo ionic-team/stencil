@@ -69,7 +69,7 @@ export class AppRoot {
       style: this.style.value,
     };
 
-    const results = await stencil.compile(this.sourceCodeInput.value, opts);
+    const results = await stencil.transpile(this.sourceCodeInput.value, opts);
 
     results.imports.forEach(imprt => {
       console.log('import:', imprt);

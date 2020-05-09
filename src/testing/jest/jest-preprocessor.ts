@@ -1,4 +1,4 @@
-import { CompileOptions, Diagnostic } from '@stencil/core/internal';
+import { TranspileOptions, Diagnostic } from '@stencil/core/internal';
 import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { transpile } from '../test-transpile';
 import ts from 'typescript';
@@ -6,7 +6,7 @@ import ts from 'typescript';
 export const jestPreprocessor = {
   process(sourceText: string, filePath: string, jestConfig: { rootDir: string }) {
     if (shouldTransform(filePath, sourceText)) {
-      const opts: CompileOptions = {
+      const opts: TranspileOptions = {
         file: filePath,
         currentDirectory: jestConfig.rootDir,
       };
@@ -108,11 +108,7 @@ function getCompilerOptions(rootDir: string) {
 }
 
 export function shouldTransform(filePath: string, sourceText: string) {
-  const ext = filePath
-    .split('.')
-    .pop()
-    .toLowerCase()
-    .split('?')[0];
+  const ext = filePath.split('.').pop().toLowerCase().split('?')[0];
 
   if (ext === 'ts' || ext === 'tsx' || ext === 'jsx') {
     // typescript extensions (to include .d.ts)
