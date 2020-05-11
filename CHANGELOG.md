@@ -1,4 +1,4 @@
-# 🎙 [1.13.0-4](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0-4) (2020-05-07)
+# 🚂 [1.13.0](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0) (2020-05-11)
 
 
 ### Features
@@ -36,6 +36,8 @@
 * **test:** allow setRequestInterception to ba called from user tests ([#2330](https://github.com/ionic-team/stencil/issues/2330)) ([ff7fb41](https://github.com/ionic-team/stencil/commit/ff7fb41185bac5510b429551a2808249f4547c23))
 * **testing:** MockResponse404 is not ok ([#2420](https://github.com/ionic-team/stencil/issues/2420)) ([43d30dc](https://github.com/ionic-team/stencil/commit/43d30dc5bb25caef747ec6e6398371888b6034e6))
 * add warning for missing include of the srcDir ([c6b954c](https://github.com/ionic-team/stencil/commit/c6b954ca6ddb25f90123a841726c4f8f8daf9c9b)), closes [#2380](https://github.com/ionic-team/stencil/issues/2380)
+* **output:** fix custom elements build for plain cmps ([1a5095a](https://github.com/ionic-team/stencil/commit/1a5095ac36fbcff8566f77dff551a776a2e0dce1))
+* **testing:** don't remove request interceptor ([8a18112](https://github.com/ionic-team/stencil/commit/8a18112de392dfdd70529dcefdd8436cec29402a))
 
 
 ## 🗻 [1.12.7](https://github.com/ionic-team/stencil/compare/v1.12.5...v1.12.7) (2020-04-29)
