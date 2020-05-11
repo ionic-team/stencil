@@ -2179,6 +2179,7 @@ export interface PackageJsonData {
     [runName: string]: string;
   };
   'license'?: string;
+  'keywords'?: string[];
 }
 
 export interface Workbox {
