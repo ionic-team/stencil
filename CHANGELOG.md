@@ -1,4 +1,4 @@
-# 🎖 [1.13.0-3](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0-3) (2020-05-06)
+# 🚂 [1.13.0](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0) (2020-05-11)
 
 
 ### Features
@@ -25,6 +25,19 @@
 * **jest:** ensure jest-cli, set presets ([0d3ed7d](https://github.com/ionic-team/stencil/commit/0d3ed7d4cb7983f1e949d3a9d31c7b5ecfe58f1a))
 * **polyfill:** slot child fix ([#2375](https://github.com/ionic-team/stencil/issues/2375)) ([654d753](https://github.com/ionic-team/stencil/commit/654d75353cf13e511f54d10208c03f7a6d8a2e89)), closes [#2373](https://github.com/ionic-team/stencil/issues/2373)
 * **runtime:** fix lifecycle state values ([#2414](https://github.com/ionic-team/stencil/issues/2414)) ([8302fed](https://github.com/ionic-team/stencil/commit/8302fed01b13b18436dc1a8d6bde231643f8f448))
+* **dev-mode:** always add dist-types ([#2402](https://github.com/ionic-team/stencil/issues/2402)) ([f523461](https://github.com/ionic-team/stencil/commit/f523461c325aacc28aa6141097ff94b8fbd8550f))
+* **e2e:** fix puppeteer types ([4b38e7d](https://github.com/ionic-team/stencil/commit/4b38e7dc40078a2f8ffb2cda65114dbea9b062d7))
+* **hydrate:** set shadowRoot property on host element ([28128df](https://github.com/ionic-team/stencil/commit/28128dfb3c1edbb7d7b1acf9fae132b9dfe2ac8f)), closes [#2301](https://github.com/ionic-team/stencil/issues/2301)
+* **jsx:** add missing 'as' attribute to LinkHTMLAttributes ([#2404](https://github.com/ionic-team/stencil/issues/2404)) ([28f6cc5](https://github.com/ionic-team/stencil/commit/28f6cc5ec47443516be54e3c3594dfeb32fad647))
+* **jsx:** expose exportparts ([180e890](https://github.com/ionic-team/stencil/commit/180e890d0b86f0156dd57759ddb7ab60f472ed34)), closes [#2383](https://github.com/ionic-team/stencil/issues/2383)
+* **prerender:** fix prerender.config.ts transpiling ([763c0be](https://github.com/ionic-team/stencil/commit/763c0bea7b636b2387b3efa0c1c0513ec0fdbf4c))
+* **types:** spellcheck is an string attribute ([caf03fa](https://github.com/ionic-team/stencil/commit/caf03faca3fc1bab6cfb5df0fea2675ea37f4807)), closes [#2186](https://github.com/ionic-team/stencil/issues/2186) [#2181](https://github.com/ionic-team/stencil/issues/2181)
+* add types for toggle event of html5 details ([#2421](https://github.com/ionic-team/stencil/issues/2421)) ([ebf42cf](https://github.com/ionic-team/stencil/commit/ebf42cfc238a77b8c224a95fcdedfe0a56a006eb)), closes [#2398](https://github.com/ionic-team/stencil/issues/2398)
+* **test:** allow setRequestInterception to ba called from user tests ([#2330](https://github.com/ionic-team/stencil/issues/2330)) ([ff7fb41](https://github.com/ionic-team/stencil/commit/ff7fb41185bac5510b429551a2808249f4547c23))
+* **testing:** MockResponse404 is not ok ([#2420](https://github.com/ionic-team/stencil/issues/2420)) ([43d30dc](https://github.com/ionic-team/stencil/commit/43d30dc5bb25caef747ec6e6398371888b6034e6))
+* add warning for missing include of the srcDir ([c6b954c](https://github.com/ionic-team/stencil/commit/c6b954ca6ddb25f90123a841726c4f8f8daf9c9b)), closes [#2380](https://github.com/ionic-team/stencil/issues/2380)
+* **output:** fix custom elements build for plain cmps ([1a5095a](https://github.com/ionic-team/stencil/commit/1a5095ac36fbcff8566f77dff551a776a2e0dce1))
+* **testing:** don't remove request interceptor ([8a18112](https://github.com/ionic-team/stencil/commit/8a18112de392dfdd70529dcefdd8436cec29402a))
 
 
 ## 🗻 [1.12.7](https://github.com/ionic-team/stencil/compare/v1.12.5...v1.12.7) (2020-04-29)

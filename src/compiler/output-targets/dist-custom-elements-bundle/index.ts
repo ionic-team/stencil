@@ -92,7 +92,7 @@ const generateEntryPoint = (buildCtx: d.BuildCtx) => {
     const importAs = `$Cmp${exportName}`;
 
     if (cmp.isPlain) {
-      exports.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
+      exportStatements.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
     } else {
       const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
 

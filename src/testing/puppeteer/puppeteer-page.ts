@@ -229,7 +229,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   const pageUrl = env.__STENCIL_BROWSER_URL__;
 
   await page.setRequestInterception(true);
-  
+
   const interceptedReqCallback = (interceptedRequest: any) => {
     if (pageUrl === interceptedRequest.url()) {
       interceptedRequest.respond({
@@ -254,8 +254,6 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
   }
 
   await waitForStencil(page);
-
-  page.removeListener('request', interceptedReqCallback);
 
   return rsp;
 }
@@ -305,8 +303,11 @@ async function waitForChanges(page: E2EPageInternal) {
         requestAnimationFrame(() => {
           const promises: Promise<any>[] = [];
 
-          const waitComponentOnReady = (elm: Element, promises: Promise<any>[]) => {
+          const waitComponentOnReady = (elm: Element | ShadowRoot, promises: Promise<any>[]) => {
             if (elm != null) {
+              if ('shadowRoot' in elm && elm.shadowRoot instanceof ShadowRoot) {
+                waitComponentOnReady(elm.shadowRoot, promises);
+              }
               const children = elm.children;
               const len = children.length;
               for (let i = 0; i < len; i++) {

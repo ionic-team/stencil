@@ -1,27 +1,27 @@
-import { CompileOptions, CompileResults, Config, TransformOptions, TransformCssToEsmInput } from '../declarations';
+import { TranspileOptions, TranspileResults, Config, TransformOptions, TransformCssToEsmInput } from '../declarations';
 import { catchError, isString } from '@utils';
-import { getCompileCssConfig, getCompileModuleConfig, getCompileResults } from './config/compile-module-options';
+import { getTranspileCssConfig, getTranspileConfig, getTranspileResults } from './config/transpile-options';
 import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
 import { patchTypescript, patchTypescriptSync } from './sys/typescript/typescript-patch';
 import { rollupPluginUtils } from '@compiler-plugins';
 import { transformCssToEsm, transformCssToEsmSync } from './style/css-to-esm';
 import { transpileModule } from './transpile/transpile-module';
 
-export const compile = async (code: string, opts: CompileOptions = {}) => {
-  const { importData, results } = getCompileResults(code, opts);
+export const transpile = async (code: string, opts: TranspileOptions = {}) => {
+  const { importData, results } = getTranspileResults(code, opts);
 
   try {
-    if (shouldTranspileCode(results.inputFileExtension)) {
-      const { config, compileOpts, transformOpts } = getCompileModuleConfig(opts);
+    if (shouldTranspileModule(results.inputFileExtension)) {
+      const { config, compileOpts, transformOpts } = getTranspileConfig(opts);
       await patchTypescript(config, results.diagnostics, null);
-      compileModule(config, compileOpts, transformOpts, results);
+      transpileCode(config, compileOpts, transformOpts, results);
     } else if (results.inputFileExtension === 'd.ts') {
       results.code = '';
     } else if (results.inputFileExtension === 'css') {
-      const transformInput = getCompileCssConfig(opts, importData, results);
-      await compileCss(transformInput, results);
+      const transformInput = getTranspileCssConfig(opts, importData, results);
+      await transpileCss(transformInput, results);
     } else if (results.inputFileExtension === 'json') {
-      compileJson(results);
+      transpileJson(results);
     }
   } catch (e) {
     catchError(results.diagnostics, e);
@@ -30,21 +30,21 @@ export const compile = async (code: string, opts: CompileOptions = {}) => {
   return results;
 };
 
-export const compileSync = (code: string, opts: CompileOptions = {}) => {
-  const { importData, results } = getCompileResults(code, opts);
+export const transpileSync = (code: string, opts: TranspileOptions = {}) => {
+  const { importData, results } = getTranspileResults(code, opts);
 
   try {
-    if (shouldTranspileCode(results.inputFileExtension)) {
-      const { config, compileOpts, transformOpts } = getCompileModuleConfig(opts);
+    if (shouldTranspileModule(results.inputFileExtension)) {
+      const { config, compileOpts, transformOpts } = getTranspileConfig(opts);
       patchTypescriptSync(config, results.diagnostics, null);
-      compileModule(config, compileOpts, transformOpts, results);
+      transpileCode(config, compileOpts, transformOpts, results);
     } else if (results.inputFileExtension === 'd.ts') {
       results.code = '';
     } else if (results.inputFileExtension === 'css') {
-      const transformInput = getCompileCssConfig(opts, importData, results);
-      compileCssSync(transformInput, results);
+      const transformInput = getTranspileCssConfig(opts, importData, results);
+      transpileCssSync(transformInput, results);
     } else if (results.inputFileExtension === 'json') {
-      compileJson(results);
+      transpileJson(results);
     }
   } catch (e) {
     catchError(results.diagnostics, e);
@@ -53,7 +53,7 @@ export const compileSync = (code: string, opts: CompileOptions = {}) => {
   return results;
 };
 
-const compileModule = (config: Config, compileOpts: CompileOptions, transformOpts: TransformOptions, results: CompileResults) => {
+const transpileCode = (config: Config, transpileOpts: TranspileOptions, transformOpts: TransformOptions, results: TranspileResults) => {
   const transpileResults = transpileModule(config, results.code, transformOpts);
 
   results.diagnostics.push(...transpileResults.diagnostics);
@@ -62,11 +62,11 @@ const compileModule = (config: Config, compileOpts: CompileOptions, transformOpt
     results.code = transpileResults.code;
     results.map = transpileResults.map;
 
-    if (compileOpts.sourceMap === 'inline') {
+    if (transpileOpts.sourceMap === 'inline') {
       try {
         const mapObject = JSON.parse(transpileResults.map);
-        mapObject.file = compileOpts.file;
-        mapObject.sources = [compileOpts.file];
+        mapObject.file = transpileOpts.file;
+        mapObject.sources = [transpileOpts.file];
         delete mapObject.sourceRoot;
 
         const mapBase64 = Buffer.from(JSON.stringify(mapObject), 'utf8').toString('base64');
@@ -99,7 +99,7 @@ const compileModule = (config: Config, compileOpts: CompileOptions, transformOpt
   }
 };
 
-const compileCss = async (transformInput: TransformCssToEsmInput, results: CompileResults) => {
+const transpileCss = async (transformInput: TransformCssToEsmInput, results: TranspileResults) => {
   const cssResults = await transformCssToEsm(transformInput);
   results.code = cssResults.output;
   results.map = cssResults.map;
@@ -107,7 +107,7 @@ const compileCss = async (transformInput: TransformCssToEsmInput, results: Compi
   results.diagnostics.push(...cssResults.diagnostics);
 };
 
-const compileCssSync = (transformInput: TransformCssToEsmInput, results: CompileResults) => {
+const transpileCssSync = (transformInput: TransformCssToEsmInput, results: TranspileResults) => {
   const cssResults = transformCssToEsmSync(transformInput);
   results.code = cssResults.output;
   results.map = cssResults.map;
@@ -115,7 +115,7 @@ const compileCssSync = (transformInput: TransformCssToEsmInput, results: Compile
   results.diagnostics.push(...cssResults.diagnostics);
 };
 
-const compileJson = (results: CompileResults) => {
+const transpileJson = (results: TranspileResults) => {
   results.code = rollupPluginUtils.dataToEsm(JSON.parse(results.code), {
     preferConst: true,
     compact: false,
@@ -124,4 +124,14 @@ const compileJson = (results: CompileResults) => {
   results.map = { mappings: '' };
 };
 
-const shouldTranspileCode = (ext: string) => ext === 'tsx' || ext === 'ts' || ext === 'jsx' || ext === 'mjs';
+const shouldTranspileModule = (ext: string) => ext === 'tsx' || ext === 'ts' || ext === 'jsx' || ext === 'mjs';
+
+export const compile = (code: string, opts: any = {}): Promise<any> => {
+  console.warn(`compile() deprecated, please use compile() instead`);
+  return transpile(code, opts);
+};
+
+export const compileSync = (code: string, opts: any = {}): any => {
+  console.warn(`compileSync() deprecated, please use transpileSync() instead`);
+  return transpileSync(code, opts);
+};

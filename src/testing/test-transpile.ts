@@ -1,8 +1,8 @@
-import { compileSync } from '@stencil/core/compiler';
-import { CompileOptions, CompileResults } from '@stencil/core/internal';
+import { transpileSync } from '@stencil/core/compiler';
+import { TranspileOptions, TranspileResults } from '@stencil/core/internal';
 import { isString } from '@utils';
 
-export function transpile(input: string, opts: CompileOptions = {}): CompileResults {
+export function transpile(input: string, opts: TranspileOptions = {}): TranspileResults {
   opts = {
     ...opts,
     componentExport: null,
@@ -24,5 +24,5 @@ export function transpile(input: string, opts: CompileOptions = {}): CompileResu
     }
   } catch (e) {}
 
-  return compileSync(input, opts);
+  return transpileSync(input, opts);
 }
