@@ -1,3 +1,13 @@
+## 🐅 [1.13.1-0](https://github.com/ionic-team/stencil/compare/v1.13.0...v1.13.1-0) (2020-05-12)
+
+
+### Bug Fixes
+
+* **compiler:** use transformed css to check changed imports of globalStyle ([#2422](https://github.com/ionic-team/stencil/issues/2422)) ([7742a87](https://github.com/ionic-team/stencil/commit/7742a87be0b204fb7e59e2185188efef157a51fe))
+* **dev-server:** allow no trailing slash for custom base url ([0fae632](https://github.com/ionic-team/stencil/commit/0fae632c703604a53a76a488a8905e270baf4f38))
+
+
+
 # 🚂 [1.13.0](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0) (2020-05-11)
 
 
