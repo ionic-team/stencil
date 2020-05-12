@@ -523,7 +523,7 @@ export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
  * };
  * ```
  *
- * For more info: https://stenciljs.com/docs/prerendering
+ * For more info: https://stenciljs.com/docs/static-site-generation
  */
 export interface PrerenderConfig {
   /**
@@ -793,6 +793,15 @@ export interface SitemapXmpResults {
   url: string;
 }
 
+/**
+ * Common system used by the compiler. All file reads, writes, access, etc. will all use
+ * this system. Additionally, throughout each build, the compiler will use an internal
+ * in-memory file system as to prevent unnecessary fs reads and writes. At the end of each
+ * build all actions the in-memory fs performed will be written to disk using this system.
+ * A NodeJS based system will use APIs such as `fs` and `crypto`, and a web-based system
+ * will use in-memory Maps and browser APIs. Either way, the compiler itself is unaware
+ * of the actual platform it's being ran ontop of.
+ */
 export interface CompilerSystem {
   events?: BuildEvents;
   details?: SystemDetails;
@@ -1547,6 +1556,11 @@ export interface EmulateViewport {
   isLandscape?: boolean;
 }
 
+/**
+ * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a
+ * NodeJS based console logging and colors, and the web will use browser based
+ * logs and colors.
+ */
 export interface Logger {
   colors?: boolean;
   level: string;

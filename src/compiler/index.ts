@@ -1,7 +1,7 @@
 import { initWorkerThread } from './worker/worker-thread';
 import path from './sys/modules/path';
 
-export { compile, compileSync } from './compile-module';
+export { compile, compileSync, transpile, transpileSync } from './transpile';
 export { createCompiler } from './compiler';
 export { createSystem } from './sys/stencil-sys';
 export { createWorkerContext } from './worker/worker-thread';

@@ -1,16 +1,16 @@
-import { CompileOptions, CompileResults, Config, TransformOptions, TransformCssToEsmInput, ImportData } from '../../declarations';
+import { TranspileOptions, TranspileResults, Config, TransformOptions, TransformCssToEsmInput, ImportData } from '../../declarations';
 import { isString } from '@utils';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
 import { parseImportPath } from '../transformers/stencil-import-path';
 import ts from 'typescript';
 
-export const getCompileResults = (code: string, input: CompileOptions) => {
+export const getTranspileResults = (code: string, input: TranspileOptions) => {
   if (!isString(input.file)) {
     input.file = 'module.tsx';
   }
   const parsedImport = parseImportPath(input.file);
 
-  const results: CompileResults = {
+  const results: TranspileResults = {
     code: typeof code === 'string' ? code : '',
     data: [],
     diagnostics: [],
@@ -27,8 +27,8 @@ export const getCompileResults = (code: string, input: CompileOptions) => {
   };
 };
 
-export const getCompileModuleConfig = (input: CompileOptions) => {
-  const compileOpts: CompileOptions = {
+export const getTranspileConfig = (input: TranspileOptions) => {
+  const compileOpts: TranspileOptions = {
     componentExport: getCompileConfigOpt(input.componentExport, VALID_EXPORT, 'customelement'),
     componentMetadata: getCompileConfigOpt(input.componentMetadata, VALID_METADATA, null),
     coreImportPath: isString(input.coreImportPath) ? input.coreImportPath : STENCIL_INTERNAL_CLIENT_ID,
@@ -114,7 +114,7 @@ export const getCompileModuleConfig = (input: CompileOptions) => {
   };
 };
 
-export const getCompileCssConfig = (compileOpts: CompileOptions, importData: ImportData, results: CompileResults) => {
+export const getTranspileCssConfig = (compileOpts: TranspileOptions, importData: ImportData, results: TranspileResults) => {
   const transformInput: TransformCssToEsmInput = {
     file: results.inputFilePath,
     input: results.code,

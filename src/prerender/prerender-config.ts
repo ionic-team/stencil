@@ -2,7 +2,6 @@ import * as d from '../declarations';
 import { buildError, catchError, requireFunc, loadTypeScriptDiagnostics } from '@utils';
 import path from 'path';
 import fs from 'fs';
-import ts from 'typescript';
 
 export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigPath: string) {
   const prerenderConfig: d.PrerenderConfig = {};
@@ -22,22 +21,28 @@ let cachedPrerenderConfig: d.PrerenderConfig = null;
 function requireTsConfigFile(diagnostics: d.Diagnostic[], prerenderConfigPath: string) {
   if (!cachedPrerenderConfig) {
     try {
+      const ts: typeof import('typescript') = require('typescript');
+
       // ensure we cleared out node's internal require() cache for this file
       delete require.cache[path.resolve(prerenderConfigPath)];
 
       // let's override node's require for a second
       // don't worry, we'll revert this when we're done
-      require.extensions['.ts'] = (module: NodeModuleWithCompile, filename: string) => {
-        let sourceText = fs.readFileSync(filename, 'utf8');
+      require.extensions['.ts'] = (module: NodeModuleWithCompile, fileName: string) => {
+        let sourceText = fs.readFileSync(fileName, 'utf8');
 
         if (prerenderConfigPath.endsWith('.ts')) {
           // looks like we've got a typed config file
           // let's transpile it to .js quick
           // const ts = require('typescript');
           const tsResults = ts.transpileModule(sourceText, {
+            fileName,
             compilerOptions: {
               module: ts.ModuleKind.CommonJS,
+              moduleResolution: ts.ModuleResolutionKind.NodeJs,
+              esModuleInterop: true,
               target: ts.ScriptTarget.ES2017,
+              allowJs: true,
             },
           });
           sourceText = tsResults.outputText;
@@ -51,7 +56,7 @@ function requireTsConfigFile(diagnostics: d.Diagnostic[], prerenderConfigPath: s
           sourceText = sourceText.replace(/export\s+\w+\s+(\w+)/gm, 'exports.$1');
         }
 
-        module._compile(sourceText, filename);
+        module._compile(sourceText, fileName);
       };
 
       // let's do this!

@@ -6,7 +6,7 @@ export const transpileToEs5 = async (input: string, inlineHelpers: boolean) => {
   const diagnostics: d.Diagnostic[] = [];
   const ts = await loadTypescript(null, diagnostics, null);
 
-  const results: d.TranspileResults = {
+  const results: d.TranspileToEs5Results = {
     sourceFilePath: null,
     code: input,
     map: null,

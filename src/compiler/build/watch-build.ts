@@ -130,8 +130,10 @@ export const watchSrcDirectory = async (config: d.Config, compilerCtx: d.Compile
   watching.set(
     config.srcDir,
     config.sys.watchDirectory(config.srcDir, (filename, kind) => {
-      watchFile(filename);
-      callback(filename, kind);
+      if (kind != null) {
+        watchFile(filename);
+        callback(filename, kind);
+      }
     }),
   );
 
