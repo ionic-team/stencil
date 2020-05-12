@@ -250,6 +250,20 @@ describe('request-handler', () => {
       expect(res.$contentType).toBe('text/html; charset=utf-8');
     });
 
+    it('get directory index.html without trailing slash and base url', async () => {
+      config.basePath = '/my-base-url/';
+      await sys.mkdir(path.join(root, 'www', 'about-us'));
+      await sys.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
+      const handler = createRequestHandler(config, sys);
+
+      req.url = '/my-base-url/about-us';
+
+      await handler(req, res);
+      expect(res.$statusCode).toBe(200);
+      expect(res.$content).toContain('aboutus');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
+    });
+
     it('get directory index.html with trailing slash', async () => {
       await sys.mkdir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
@@ -298,6 +312,45 @@ describe('request-handler', () => {
       const handler = createRequestHandler(config, sys);
 
       req.url = '/?qs=123';
+
+      await handler(req, res);
+      expect(res.$statusCode).toBe(200);
+      expect(res.$content).toContain('hello');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
+    });
+
+    it('serve root index.html w/ base url without url trailing slash', async () => {
+      config.basePath = '/my-base-url/';
+      await sys.writeFile(path.join(root, 'www', 'index.html'), `hello`);
+      const handler = createRequestHandler(config, sys);
+
+      req.url = '/my-base-url';
+
+      await handler(req, res);
+      expect(res.$statusCode).toBe(200);
+      expect(res.$content).toContain('hello');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
+    });
+
+    it('serve root index.html w/ base url without trailing slash, with trailing slash url', async () => {
+      config.basePath = '/my-base-url';
+      await sys.writeFile(path.join(root, 'www', 'index.html'), `hello`);
+      const handler = createRequestHandler(config, sys);
+
+      req.url = '/my-base-url/';
+
+      await handler(req, res);
+      expect(res.$statusCode).toBe(200);
+      expect(res.$content).toContain('hello');
+      expect(res.$contentType).toBe('text/html; charset=utf-8');
+    });
+
+    it('serve root index.html w/ base url w/ index.html', async () => {
+      config.basePath = '/my-base-url/';
+      await sys.writeFile(path.join(root, 'www', 'index.html'), `hello`);
+      const handler = createRequestHandler(config, sys);
+
+      req.url = '/my-base-url/index.html';
 
       await handler(req, res);
       expect(res.$statusCode).toBe(200);

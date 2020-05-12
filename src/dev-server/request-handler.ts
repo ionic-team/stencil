@@ -12,7 +12,7 @@ import path from 'path';
 import * as url from 'url';
 
 export function createRequestHandler(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem) {
-  return async function(incomingReq: http.IncomingMessage, res: http.ServerResponse) {
+  return async function (incomingReq: http.IncomingMessage, res: http.ServerResponse) {
     try {
       const req = normalizeHttpRequest(devServerConfig, incomingReq);
 
@@ -40,7 +40,8 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, sys: d.
         return serveCompilerRequest(devServerConfig, req, res);
       }
 
-      if (!req.url.startsWith(devServerConfig.basePath)) {
+      if (!isValidUrlBasePath(devServerConfig.basePath, req.url)) {
+        console.log(1);
         if (devServerConfig.logRequests) {
           sendMsg(process, {
             requestLog: {
@@ -92,6 +93,17 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, sys: d.
       return serve500(devServerConfig, incomingReq as any, res, e, `not found error`);
     }
   };
+}
+
+export function isValidUrlBasePath(basePath: string, url: string) {
+  // normalize the paths to always end with a slash for the check
+  if (!url.endsWith('/')) {
+    url += '/';
+  }
+  if (!basePath.endsWith('/')) {
+    basePath += '/';
+  }
+  return url.startsWith(basePath);
 }
 
 function normalizeHttpRequest(devServerConfig: d.DevServerConfig, incomingReq: http.IncomingMessage) {
