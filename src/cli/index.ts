@@ -7,6 +7,7 @@ import { parseFlags } from './parse-flags';
 import { runTask } from './tasks/run-task';
 import { shouldIgnoreError, hasError, isString } from '@utils';
 import { setupWorkerController } from '../sys/node/worker';
+import { taskVersion } from './tasks/task-version';
 
 export async function run(init: CliInitOptions) {
   if (!init) {
@@ -30,6 +31,15 @@ export async function run(init: CliInitOptions) {
 
     if (flags.ci) {
       logger.colors = false;
+    }
+
+    if (flags.task === 'version' || flags.version) {
+      taskVersion();
+      return;
+    }
+
+    if (flags.help) {
+      flags.task = 'help';
     }
 
     setupNodeProcess(prcs, logger);
