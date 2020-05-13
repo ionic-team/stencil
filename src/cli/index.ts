@@ -34,8 +34,7 @@ export async function run(init: CliInitOptions) {
     }
 
     if (flags.task === 'version' || flags.version) {
-      taskVersion();
-      return;
+      return taskVersion();
     }
 
     if (flags.help) {
