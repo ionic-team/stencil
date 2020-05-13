@@ -65,6 +65,8 @@ const HTML_ELEMENT_KEYS = [
   'onended',
   'onerror',
   'onfocus',
+  'onfocusin',
+  'onfocusout',
   'oninput',
   'oninvalid',
   'onkeydown',

@@ -590,6 +590,12 @@ export class MockWindow {
   onfocus() {
     /**/
   }
+  onfocusin() {
+    /**/
+  }
+  onfocusout() {
+    /**/
+  }
   onformdata() {
     /**/
   }
