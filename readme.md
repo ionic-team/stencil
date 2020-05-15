@@ -174,7 +174,6 @@ require('core-js-builder')({
     'es.data-view',
     'es.typed-array',
     'es.reflect',
-    'es.promise'
   ]
 });
 ```
