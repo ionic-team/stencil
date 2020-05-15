@@ -127,7 +127,7 @@ export const generatePreamble = (config: d.Config, opts: { prefix?: string; suff
 };
 
 export const isDocsPublic = (jsDocs: d.JsDoc | d.CompilerJsDoc | undefined) => {
-  return !(jsDocs && jsDocs.tags.some(s => s.name === 'internal'));
+  return !(jsDocs && jsDocs.tags.some((s) => s.name === 'internal' || s.name === 'exclude-docs'));
 };
 
 const lineBreakRegex = /\r?\n|\r/g;

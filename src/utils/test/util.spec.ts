@@ -1,4 +1,5 @@
 import * as util from '../util';
+import { JsDoc } from '../../declarations/stencil-private';
 
 describe('util', () => {
   describe('isTsFile', () => {
@@ -182,5 +183,62 @@ describe('util', () => {
     expect(util.createJsVarName('    ')).toBe('');
     expect(util.createJsVarName('')).toBe('');
     expect(util.createJsVarName(null)).toBe(null);
+  });
+
+  it('should exclude tags with @exclude-docs', () => {
+    const jsdoc: JsDoc = {
+      name: 'test',
+      documentation: 'test',
+      type: 'test',
+      tags: [{ name: 'exclude-docs', text: 'test' }],
+      default: 'test',
+      parameters: [],
+      returns: {
+        type: 'test',
+        documentation: 'test',
+      },
+    };
+
+    const result = util.isDocsPublic(jsdoc);
+
+    expect(result).toBeFalsy();
+  });
+
+  it('should exclude tags with @internal', () => {
+    const jsdoc: JsDoc = {
+      name: 'test',
+      documentation: 'test',
+      type: 'test',
+      tags: [{ name: 'internal', text: 'test' }],
+      default: 'test',
+      parameters: [],
+      returns: {
+        type: 'test',
+        documentation: 'test',
+      },
+    };
+
+    const result = util.isDocsPublic(jsdoc);
+
+    expect(result).toBeFalsy();
+  });
+
+  it('should include tags which are NOT @internal or @exclude-docs', () => {
+    const jsdoc: JsDoc = {
+      name: 'test',
+      documentation: 'test',
+      type: 'test',
+      tags: [{ name: 'custom', text: 'test' }],
+      default: 'test',
+      parameters: [],
+      returns: {
+        type: 'test',
+        documentation: 'test',
+      },
+    };
+
+    const result = util.isDocsPublic(jsdoc);
+
+    expect(result).toBeTruthy();
   });
 });
