@@ -1,10 +1,24 @@
-## 🐅 [1.13.1-0](https://github.com/ionic-team/stencil/compare/v1.13.0...v1.13.1-0) (2020-05-12)
+# 🍺 [1.14.0-0](https://github.com/ionic-team/stencil/compare/v1.13.0...v1.14.0-0) (2020-05-16)
 
 
 ### Bug Fixes
 
+* emit private types in local component.d.ts ([#2447](https://github.com/ionic-team/stencil/issues/2447)) ([9d444ff](https://github.com/ionic-team/stencil/commit/9d444ff9dfa13f961c95fc067f280972a75599b5)), closes [#2440](https://github.com/ionic-team/stencil/issues/2440)
+* **cli:** fix --version and --help flags ([40baa54](https://github.com/ionic-team/stencil/commit/40baa54a5f02233afaf559d6163754463d2d9dfb))
+* **compiler:** components without mode should never get mode suffix ([#2445](https://github.com/ionic-team/stencil/issues/2445)) ([11e1ccb](https://github.com/ionic-team/stencil/commit/11e1ccb73034f09e625d2bef2e5e4886bb900199))
 * **compiler:** use transformed css to check changed imports of globalStyle ([#2422](https://github.com/ionic-team/stencil/issues/2422)) ([7742a87](https://github.com/ionic-team/stencil/commit/7742a87be0b204fb7e59e2185188efef157a51fe))
 * **dev-server:** allow no trailing slash for custom base url ([0fae632](https://github.com/ionic-team/stencil/commit/0fae632c703604a53a76a488a8905e270baf4f38))
+
+
+### Features
+
+* add focusin and focusout event declarations ([#2436](https://github.com/ionic-team/stencil/issues/2436)) ([0d730d6](https://github.com/ionic-team/stencil/commit/0d730d672ef477266b12b31cf93bc98fc86ba8f0)), closes [#2435](https://github.com/ionic-team/stencil/issues/2435)
+
+
+### Performance Improvements
+
+* **compiler:** do not build hydrated in dev mode ([#2448](https://github.com/ionic-team/stencil/issues/2448)) ([8e65201](https://github.com/ionic-team/stencil/commit/8e6520175e48eee729a372ca9304ffbf586518f0))
+* **transpile:** skip component.d.ts formatting ([#2304](https://github.com/ionic-team/stencil/issues/2304)) ([e3f2700](https://github.com/ionic-team/stencil/commit/e3f270037dc39c9026d28803ed35c2c1c4117c31))
 
 
 
