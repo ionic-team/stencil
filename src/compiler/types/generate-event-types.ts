@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { getTextDocs, isDocsPublic, toTitleCase } from '@utils';
+import { getTextDocs, toTitleCase } from '@utils';
 
 export const generateEventTypes = (cmpEvents: d.ComponentCompilerEvent[]): d.TypeInfo => {
   return cmpEvents.map(cmpEvent => {
@@ -10,7 +10,7 @@ export const generateEventTypes = (cmpEvents: d.ComponentCompilerEvent[]): d.Typ
       type,
       optional: false,
       required: false,
-      public: isDocsPublic(cmpEvent.docs),
+      internal: cmpEvent.internal,
       jsdoc: getTextDocs(cmpEvent.docs),
     };
   });

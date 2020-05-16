@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { getTextDocs, isDocsPublic } from '@utils';
+import { getTextDocs } from '@utils';
 
 export const generateMethodTypes = (cmpMethods: d.ComponentCompilerMethod[]): d.TypeInfo => {
   return cmpMethods.map(cmpMethod => ({
@@ -7,7 +7,7 @@ export const generateMethodTypes = (cmpMethods: d.ComponentCompilerMethod[]): d.
     type: cmpMethod.complexType.signature,
     optional: false,
     required: false,
-    public: isDocsPublic(cmpMethod.docs),
+    internal: cmpMethod.internal,
     jsdoc: getTextDocs(cmpMethod.docs),
   }));
 };
