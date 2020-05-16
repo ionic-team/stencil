@@ -44,6 +44,10 @@ export namespace Components {
     interface PropCmp {
         "first": string;
         "lastName": string;
+        /**
+          * Mode
+         */
+        "mode"?: any;
     }
     interface SlotCmp {
     }
@@ -217,6 +221,10 @@ declare namespace LocalJSX {
     interface PropCmp {
         "first"?: string;
         "lastName"?: string;
+        /**
+          * Mode
+         */
+        "mode"?: any;
     }
     interface SlotCmp {
     }
