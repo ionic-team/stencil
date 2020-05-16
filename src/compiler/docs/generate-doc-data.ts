@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { basename, dirname, join, relative } from 'path';
-import { flatOne, isDocsPublic, normalizePath, sortBy } from '@utils';
+import { flatOne, normalizePath, sortBy } from '@utils';
 import { getBuildTimestamp } from '../build/build-ctx';
 import { JsonDocsValue } from '../../declarations';
 import { typescriptVersion, version } from '../../version';
@@ -28,7 +28,7 @@ const getDocsComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       const readme = await getUserReadmeContent(compilerCtx, readmePath);
       const usage = await generateUsages(compilerCtx, usagesDir);
       return moduleFile.cmps
-        .filter(cmp => isDocsPublic(cmp.docs) && !cmp.isCollectionDependency)
+        .filter(cmp => !cmp.internal && !cmp.isCollectionDependency)
         .map(cmp => ({
           dirPath,
           filePath: relative(config.rootDir, filePath),
@@ -101,7 +101,7 @@ const getDocsProperties = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] =
 
 const getRealProperties = (properties: d.ComponentCompilerProperty[]): d.JsonDocsProp[] => {
   return properties
-    .filter(member => isDocsPublic(member.docs))
+    .filter(member => !member.internal)
     .map(member => ({
       name: member.name,
       type: member.complexType.resolved,
@@ -183,7 +183,7 @@ const parseTypeIntoValues = (type: string) => {
 
 const getDocsMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] => {
   return sortBy(methods, member => member.name)
-    .filter(member => isDocsPublic(member.docs))
+    .filter(member => !member.internal)
     .map(member => ({
       name: member.name,
       returns: {
@@ -200,7 +200,7 @@ const getDocsMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[
 
 const getDocsEvents = (events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] => {
   return sortBy(events, eventMeta => eventMeta.name.toLowerCase())
-    .filter(eventMeta => isDocsPublic(eventMeta.docs))
+    .filter(eventMeta => !eventMeta.internal)
     .map(eventMeta => ({
       event: eventMeta.name,
       detail: eventMeta.complexType.resolved,

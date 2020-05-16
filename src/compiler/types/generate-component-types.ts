@@ -10,7 +10,7 @@ import { generatePropTypes } from './generate-prop-types';
  * @param cmp the metadata for the component that a type definition string is generated for
  * @param importPath the path of the component file
  */
-export const generateComponentTypes = (cmp: d.ComponentCompilerMeta): d.TypesModule => {
+export const generateComponentTypes = (cmp: d.ComponentCompilerMeta, internal: boolean): d.TypesModule => {
   const tagName = cmp.tagName.toLowerCase();
   const tagNameAsPascal = dashToPascalCase(tagName);
   const htmlElementName = `HTML${tagNameAsPascal}Element`;
@@ -19,9 +19,9 @@ export const generateComponentTypes = (cmp: d.ComponentCompilerMeta): d.TypesMod
   const methodAttributes = generateMethodTypes(cmp.methods);
   const eventAttributes = generateEventTypes(cmp.events);
 
-  const stencilComponentAttributes = attributesToMultiLineString([...propAttributes, ...methodAttributes], false);
+  const stencilComponentAttributes = attributesToMultiLineString([...propAttributes, ...methodAttributes], false, internal);
   const isDep = cmp.isCollectionDependency;
-  const stencilComponentJSXAttributes = attributesToMultiLineString([...propAttributes, ...eventAttributes], true);
+  const stencilComponentJSXAttributes = attributesToMultiLineString([...propAttributes, ...eventAttributes], true, internal);
   return {
     isDep,
     tagName,
@@ -38,9 +38,15 @@ var ${htmlElementName}: {
   };
 };
 
-const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: boolean, paddingString = '') => {
+const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: boolean, internal: boolean) => {
+  const paddingString = '';
   const attributesStr = sortBy(attributes, a => a.name)
-    .filter(type => type.public || !jsxAttributes)
+    .filter(type => {
+      if (jsxAttributes && !internal && type.internal) {
+        return false;
+      }
+      return true;
+    })
     .reduce((fullList, type) => {
       if (type.jsdoc) {
         fullList.push(`/**`);
