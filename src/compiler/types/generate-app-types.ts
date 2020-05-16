@@ -12,14 +12,15 @@ export const generateAppTypes = async (config: d.Config, compilerCtx: d.Compiler
   // only gather components that are still root ts files we've found and have component metadata
   // the compilerCtx cache may still have files that may have been deleted/renamed
   const timespan = buildCtx.createTimeSpan(`generated app types started`, true);
+  const internal = destination === 'src';
 
   // Generate d.ts files for component types
-  let componentTypesFileContent = await generateComponentTypesFile(config, buildCtx, destination);
+  let componentTypesFileContent = await generateComponentTypesFile(config, buildCtx, internal);
 
   // immediately write the components.d.ts file to disk and put it into fs memory
   let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
 
-  if (destination !== 'src') {
+  if (!internal) {
     componentsDtsFilePath = resolve(destination, GENERATED_DTS);
     componentTypesFileContent = updateStencilTypesImports(destination, componentsDtsFilePath, componentTypesFileContent);
   }
@@ -41,7 +42,7 @@ export const generateAppTypes = async (config: d.Config, compilerCtx: d.Compiler
  * @param config the project build configuration
  * @param options compiler options from tsconfig
  */
-const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx, _destination: string) => {
+const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx, internal: boolean) => {
   let typeImportData: d.TypesImportData = {};
   const allTypes = new Map<string, number>();
   const needsJSXElementHack = buildCtx.components.some(cmp => cmp.isLegacy);
@@ -49,7 +50,7 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
 
   const modules: d.TypesModule[] = components.map(cmp => {
     typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath);
-    return generateComponentTypes(cmp);
+    return generateComponentTypes(cmp, internal);
   });
 
   const jsxAugmentation = `

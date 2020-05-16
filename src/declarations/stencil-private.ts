@@ -2546,7 +2546,7 @@ export type TypeInfo = {
   type: string;
   optional: boolean;
   required: boolean;
-  public: boolean;
+  internal: boolean;
   jsdoc?: string;
 }[];
 
