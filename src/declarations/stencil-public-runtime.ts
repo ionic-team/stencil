@@ -1562,6 +1562,10 @@ export namespace JSXBase {
     // Focus Events
     onFocus?: (event: FocusEvent) => void;
     onFocusCapture?: (event: FocusEvent) => void;
+    onFocusIn?: (event: FocusEvent) => void;
+    onFocusInCapture?: (event: FocusEvent) => void;
+    onFocusOut?: (event: FocusEvent) => void;
+    onFocusOutCapture?: (event: FocusEvent) => void;
     onBlur?: (event: FocusEvent) => void;
     onBlurCapture?: (event: FocusEvent) => void;
 

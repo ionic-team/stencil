@@ -764,6 +764,12 @@ export class MockElement extends MockNode {
   onfocus() {
     /**/
   }
+  onfocusin() {
+    /**/
+  }
+  onfocusout() {
+    /**/
+  }
   onformdata() {
     /**/
   }
