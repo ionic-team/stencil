@@ -43,7 +43,7 @@ export const generateHydrateApp = async (config: d.Config, compilerCtx: d.Compil
         },
       ],
       treeshake: false,
-      onwarn: createOnWarnFn(buildCtx.diagnostics),
+      onwarn: createOnWarnFn(compilerCtx),
     };
 
     const rollupAppBuild = await rollup(rollupOptions);
@@ -55,7 +55,7 @@ export const generateHydrateApp = async (config: d.Config, compilerCtx: d.Compil
     await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, rollupOutput);
   } catch (e) {
     if (!buildCtx.hasError) {
-      loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
+      loadRollupDiagnostics(config, compilerCtx, e);
     }
   }
 };

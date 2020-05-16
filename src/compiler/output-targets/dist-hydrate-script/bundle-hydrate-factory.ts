@@ -24,11 +24,11 @@ export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.Comp
       },
     };
 
-    const rollupBuild = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
+    const rollupBuild = await bundleOutput(config, compilerCtx, bundleOpts);
     return rollupBuild;
   } catch (e) {
     if (!buildCtx.hasError) {
-      loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
+      loadRollupDiagnostics(config, compilerCtx, e);
     }
   }
   return undefined;

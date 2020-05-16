@@ -18,22 +18,36 @@ import { textPlugin } from './text-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
 
-export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
-  try {
-    const rollupOptions = getRollupOptions(config, compilerCtx, buildCtx, bundleOpts);
-    const rollupBuild = await rollup(rollupOptions);
+const getCachedRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions): RollupOptions => {
+  let options = compilerCtx.rollupOptions.get(bundleOpts.id);
+  if (!options) {
+    compilerCtx.rollupOptions.set(bundleOpts.id, options = getRollupOptions(config, compilerCtx, bundleOpts))
+  }
+  const cache = compilerCtx.rollupCache.get(bundleOpts.id);
+  return {
+    ...options,
+    cache,
+  };
+};
 
+export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions) => {
+  try {
+    const rollupOptions = getCachedRollupOptions(config, compilerCtx, bundleOpts);
+    const rollupBuild = await rollup(rollupOptions);
+    if (config.flags.verbose) {
+      console.log(rollupBuild.getTimings());
+    }
     compilerCtx.rollupCache.set(bundleOpts.id, rollupBuild.cache);
     return rollupBuild;
   } catch (e) {
-    if (!buildCtx.hasError) {
-      loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
+    if (!compilerCtx.buildCtx.hasError) {
+      loadRollupDiagnostics(config, compilerCtx, e);
     }
   }
   return undefined;
 };
 
-export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
+export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions) => {
   const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, ['.tsx', '.ts', '.js', '.mjs', '.json', '.d.ts']);
   const nodeResolvePlugin = rollupNodeResolvePlugin({
     mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
@@ -70,15 +84,15 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
 
     plugins: [
       coreResolvePlugin(config, compilerCtx, bundleOpts.platform),
-      appDataPlugin(config, compilerCtx, buildCtx, bundleOpts.conditionals, bundleOpts.platform),
-      lazyComponentPlugin(buildCtx),
+      appDataPlugin(config, compilerCtx, bundleOpts.conditionals, bundleOpts.platform),
+      lazyComponentPlugin(compilerCtx),
       loaderPlugin(bundleOpts.loader),
       userIndexPlugin(config, compilerCtx),
       typescriptPlugin(compilerCtx, bundleOpts),
-      imagePlugin(config, buildCtx),
+      imagePlugin(config, compilerCtx),
       textPlugin(),
-      extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
-      workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),
+      extTransformsPlugin(config, compilerCtx, bundleOpts),
+      workerPlugin(config, compilerCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),
       ...beforePlugins,
       nodeResolvePlugin,
       resolveIdWithTypeScript(config, compilerCtx),
@@ -88,7 +102,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
         ...config.commonjs,
       }),
       ...afterPlugins,
-      pluginHelper(config, buildCtx),
+      pluginHelper(config, compilerCtx),
       rollupJsonPlugin({
         preferConst: true,
       }),
@@ -101,10 +115,11 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
     treeshake: getTreeshakeOption(config, bundleOpts),
     inlineDynamicImports: bundleOpts.inlineDynamicImports,
 
-    onwarn: createOnWarnFn(buildCtx.diagnostics),
+    onwarn: createOnWarnFn(compilerCtx),
 
-    cache: compilerCtx.rollupCache.get(bundleOpts.id),
+    perf: config.flags.verbose,
   };
+
 
   return rollupOptions;
 };

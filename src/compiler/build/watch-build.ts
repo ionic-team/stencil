@@ -70,6 +70,7 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     filesUpdated.clear();
     filesDeleted.clear();
 
+    compilerCtx.buildCtx = buildCtx;
     emitFsChange(compilerCtx, buildCtx);
 
     buildCtx.start();

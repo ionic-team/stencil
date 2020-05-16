@@ -2,14 +2,14 @@ import * as d from '../../../declarations';
 import { normalizePath } from '@utils';
 import { Plugin } from 'rollup';
 
-export const lazyComponentPlugin = (buildCtx: d.BuildCtx) => {
+export const lazyComponentPlugin = (compilerCtx: d.CompilerCtx) => {
   const entrys = new Map<string, d.EntryModule>();
 
   const plugin: Plugin = {
     name: 'lazyComponentPlugin',
 
     resolveId(importee) {
-      const entryModule = buildCtx.entryModules.find(entryModule => entryModule.entryKey === importee);
+      const entryModule = compilerCtx.buildCtx.entryModules.find(entryModule => entryModule.entryKey === importee);
       if (entryModule) {
         entrys.set(importee, entryModule);
         return importee;

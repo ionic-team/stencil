@@ -42,6 +42,8 @@ export class CompilerContext implements d.CompilerCtx {
   cachedGlobalStyle: string;
   styleModeNames = new Set<string>();
   rollupCache = new Map();
+  rollupOptions = new Map();
+  diagnostics: d.Diagnostic[] = [];
   changedModules = new Set<string>();
   changedFiles = new Set<string>();
   worker: d.CompilerWorkerContext = null;

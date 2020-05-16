@@ -7,7 +7,6 @@ import { optimizeModule } from '../optimize/optimize-module';
 export const workerPlugin = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
   platform: string,
   inlineWorkers: boolean
 ): Plugin => {
@@ -51,7 +50,7 @@ export const workerPlugin = (
       if (id.endsWith('?worker')) {
         const workerEntryPath = normalizeFsPath(id);
         const workerName = getWorkerName(workerEntryPath);
-        const { code, dependencies, workerMsgId } = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
+        const { code, dependencies, workerMsgId } = await getWorker(config, compilerCtx, this, workersMap, workerEntryPath);
         const referenceId = this.emitFile({
           type: 'asset',
           source: code,
@@ -66,7 +65,7 @@ export const workerPlugin = (
       } else if (id.endsWith('?worker-inline')) {
         const workerEntryPath = normalizeFsPath(id);
         const workerName = getWorkerName(workerEntryPath);
-        const { code, dependencies, workerMsgId } = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
+        const { code, dependencies, workerMsgId } = await getWorker(config, compilerCtx, this, workersMap, workerEntryPath);
         dependencies.forEach(id => this.addWatchFile(id));
         return {
           code: getInlineWorker(code, workerName, workerMsgId),
@@ -77,7 +76,7 @@ export const workerPlugin = (
       // Proxy worker path
       const workerEntryPath = getWorkerEntryPath(id);
       if (workerEntryPath != null) {
-        const worker = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
+        const worker = await getWorker(config, compilerCtx, this, workersMap, workerEntryPath);
         if (worker) {
           if (inlineWorkers) {
             return {
@@ -114,14 +113,13 @@ interface WorkerMeta {
 const getWorker = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
   ctx: PluginContext,
   workersMap: Map<string, WorkerMeta>,
   workerEntryPath: string,
 ): Promise<WorkerMeta> => {
   let worker = workersMap.get(workerEntryPath);
   if (!worker) {
-    worker = await buildWorker(config, compilerCtx, buildCtx, ctx, workerEntryPath);
+    worker = await buildWorker(config, compilerCtx, ctx, workerEntryPath);
     workersMap.set(workerEntryPath, worker);
   }
   return worker;
@@ -133,10 +131,10 @@ const getWorkerName = (id: string) => {
   return id.replace('.tsx', '').replace('.ts', '');
 };
 
-const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, ctx: PluginContext, workerEntryPath: string) => {
+const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, ctx: PluginContext, workerEntryPath: string) => {
   const workerName = getWorkerName(workerEntryPath);
   const workerMsgId = `stencil.${workerName}`;
-  const build = await bundleOutput(config, compilerCtx, buildCtx, {
+  const build = await bundleOutput(config, compilerCtx, {
     platform: 'worker',
     id: workerName,
     inputs: {
@@ -170,7 +168,7 @@ const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCt
       minify: config.minifyJs,
       inlineHelpers: true,
     });
-    buildCtx.diagnostics.push(...results.diagnostics);
+    compilerCtx.buildCtx.diagnostics.push(...results.diagnostics);
     if (!hasError(results.diagnostics)) {
       code = results.output;
     }

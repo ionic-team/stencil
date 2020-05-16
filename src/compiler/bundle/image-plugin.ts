@@ -7,7 +7,7 @@ const svgMimeTypes: any = {
   '.svg': 'image/svg+xml',
 };
 
-export const imagePlugin = (config: d.Config, buildCtx: d.BuildCtx): Plugin => {
+export const imagePlugin = (config: d.Config, compilerCtx: d.CompilerCtx): Plugin => {
   return {
     name: 'image',
 
@@ -26,13 +26,13 @@ export const imagePlugin = (config: d.Config, buildCtx: d.BuildCtx): Plugin => {
         const base64 = config.sys.encodeToBase64(code);
 
         if (config.devMode && base64.length > SVG_MAX_IMAGE_SIZE) {
-          const warn = buildWarn(buildCtx.diagnostics);
+          const warn = buildWarn(compilerCtx.buildCtx.diagnostics);
           warn.messageText = 'Importing big images will bloat your bundle, please use assets instead.';
           warn.absFilePath = normalizePath(id);
         }
         return `const ${varName} = 'data:${mime};base64,${base64}';export default ${varName};`;
       } catch (e) {
-        catchError(buildCtx.diagnostics, e);
+        catchError(compilerCtx.buildCtx.diagnostics, e);
       }
 
       return null;

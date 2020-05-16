@@ -9,7 +9,6 @@ import ts from 'typescript';
 export const appDataPlugin = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
   build: d.BuildConditionals,
   platform: 'client' | 'hydrate' | 'worker',
 ): Plugin => {
@@ -49,6 +48,9 @@ export const appDataPlugin = (
     },
 
     transform(code, id) {
+      if (/\0/.test(id)) {
+        return null;
+      }
       id = normalizePath(id);
       if (globalScripts.some(s => s.path === id)) {
         const program = this.parse(code, {});
@@ -66,8 +68,7 @@ export const appDataPlugin = (
             after: [removeCollectionImports(compilerCtx)],
           },
         });
-
-        buildCtx.diagnostics.push(...loadTypeScriptDiagnostics(results.diagnostics));
+        compilerCtx.buildCtx.diagnostics.push(...loadTypeScriptDiagnostics(results.diagnostics));
 
         return results.outputText;
       }

@@ -841,6 +841,9 @@ export interface CompilerCtx {
   worker?: CompilerWorkerContext;
 
   rollupCache: Map<string, any>;
+  rollupOptions: Map<string, any>;
+
+  buildCtx?: BuildCtx;
 
   reset(): void;
 }

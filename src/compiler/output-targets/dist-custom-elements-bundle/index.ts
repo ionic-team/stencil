@@ -45,7 +45,7 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
       inlineDynamicImports: outputTarget.inlineDynamicImports,
     };
 
-    const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
+    const build = await bundleOutput(config, compilerCtx, bundleOpts);
     if (build) {
       const rollupOutput = await build.generate({
         format: 'esm',

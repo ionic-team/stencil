@@ -123,7 +123,7 @@ const bundleDevModule = async (config: d.Config, compilerCtx: d.CompilerCtx, par
   const buildCtx = new BuildContext(config, compilerCtx);
 
   try {
-    const inputOpts = getRollupOptions(config, compilerCtx, buildCtx, {
+    const inputOpts = getRollupOptions(config, compilerCtx, {
       id: parsedUrl.nodeModuleId,
       platform: 'client',
       inputs: {
