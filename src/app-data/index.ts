@@ -78,6 +78,8 @@ export const BUILD: BuildConditionals = /* default */ {
   shadowDelegatesFocus: true,
   initializeNextTick: false,
   asyncLoading: false,
+  asyncQueue: true,
+  transformTagName: false,
 };
 
 export const NAMESPACE = /* default */ 'app' as string;

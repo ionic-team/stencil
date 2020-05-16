@@ -14,13 +14,13 @@ export async function serveCompilerRequest(devServerConfig: d.DevServerConfig, r
 
     if (results) {
       const headers = {
-        'Content-Type': 'application/javascript',
-        'Content-Length': Buffer.byteLength(results.content, 'utf8'),
-        'X-Dev-Node-Module-Id': results.nodeModuleId,
-        'X-Dev-Node-Module-Version': results.nodeModuleVersion,
-        'X-Dev-Node-Module-Resolved-Path': results.nodeResolvedPath,
-        'X-Dev-Node-Module-Cache-Path': results.cachePath,
-        'X-Dev-Node-Module-Cache-Hit': results.cacheHit,
+        'content-type': 'application/javascript; charset=utf-8',
+        'content-length': Buffer.byteLength(results.content, 'utf8'),
+        'x-dev-node-module-id': results.nodeModuleId,
+        'x-dev-node-module-version': results.nodeModuleVersion,
+        'x-dev-node-module-resolved-path': results.nodeResolvedPath,
+        'x-dev-node-module-cache-path': results.cachePath,
+        'x-dev-node-module-cache-hit': results.cacheHit,
       };
 
       res.writeHead(results.status, util.responseHeaders(headers));
@@ -29,8 +29,8 @@ export async function serveCompilerRequest(devServerConfig: d.DevServerConfig, r
       return;
     }
 
-    return serve404(devServerConfig, req, res);
+    return serve404(devServerConfig, req, res, 'serveCompilerRequest');
   } catch (e) {
-    return serve500(devServerConfig, req, res, e);
+    return serve500(devServerConfig, req, res, e, 'serveCompilerRequest');
   }
 }

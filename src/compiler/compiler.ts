@@ -9,6 +9,7 @@ import { fetchPreloadFs } from './sys/fetch/fetch-preload';
 import { getConfig } from './sys/config';
 import { patchFs } from './sys/fs-patch';
 import { patchTypescript } from './sys/typescript/typescript-patch';
+import { resolveModuleIdAsync } from './sys/resolve/resolve-module-async';
 
 export const createCompiler = async (config: Config) => {
   // actual compiler code
@@ -25,6 +26,7 @@ export const createCompiler = async (config: Config) => {
   compilerCtx.cache = new Cache(config, createInMemoryFs(sys));
   await compilerCtx.cache.initCacheDir();
 
+  sys.resolveModuleId = opts => resolveModuleIdAsync(sys, compilerCtx.fs, opts);
   compilerCtx.worker = createSysWorker(sys, config.maxConcurrentWorkers);
 
   await fetchPreloadFs(config, compilerCtx.fs);

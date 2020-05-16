@@ -53,6 +53,7 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
       }
     },
   });
+  Cstr.is = cmpMeta.$tagName$;
   return proxyComponent(Cstr, cmpMeta, PROXY_FLAGS.isElementConstructor | PROXY_FLAGS.proxyState);
 };
 

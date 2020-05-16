@@ -1,9 +1,6 @@
 import * as d from '../../../declarations';
-import { IS_FETCH_ENV, IS_NODE_ENV, isString } from '@utils';
-
-export const NODE_MODULES_FS_DIR = '/node_modules';
-export const STENCIL_CORE_MODULE = NODE_MODULES_FS_DIR + '/@stencil/core/';
-export const NODE_MODULES_CDN_URL = 'https://cdn.jsdelivr.net/npm';
+import { IS_FETCH_ENV, IS_NODE_ENV, normalizePath } from '@utils';
+import { join } from 'path';
 
 const COMMON_DIR_MODULE_EXTS = ['.tsx', '.ts', '.mjs', '.js', '.jsx', '.json', '.md'];
 
@@ -28,7 +25,7 @@ export const getCommonDirName = (dirPath: string, fileName: string) => dirPath +
 export const isCommonDirModuleFile = (p: string) => COMMON_DIR_MODULE_EXTS.some(ext => p.endsWith(ext));
 
 export const setPackageVersion = (pkgVersions: Map<string, string>, pkgName: string, pkgVersion: string) => {
-  pkgVersions.set('/' + pkgName + '/', pkgVersion);
+  pkgVersions.set(pkgName, pkgVersion);
 };
 
 export const setPackageVersionByContent = (pkgVersions: Map<string, string>, pkgContent: string) => {
@@ -40,18 +37,29 @@ export const setPackageVersionByContent = (pkgVersions: Map<string, string>, pkg
   } catch (e) {}
 };
 
-export const isExternalUrl = (p: string) => {
-  if (isString(p)) {
-    p = p.toLowerCase();
-    return p.startsWith('https://') || p.startsWith('http://');
-  }
-  return false;
-};
+export const getNodeModulePath = (rootDir: string, ...pathParts: string[]) => normalizePath(join.apply(null, [rootDir, 'node_modules', ...pathParts]));
 
-export const getCdnPackageJsonUrl = (moduleId: string) => new URL(`./${moduleId}/package.json`, NODE_MODULES_CDN_URL).href;
+export const getStencilModulePath = (rootDir: string, ...pathParts: string[]) => getNodeModulePath(rootDir, '@stencil', 'core', ...pathParts);
+
+export const getStencilInternalDtsPath = (rootDir: string) => getStencilModulePath(rootDir, 'internal', 'index.d.ts');
 
 export const isLocalModule = (p: string) => p.startsWith('.') || p.startsWith('/');
 
 export const isStencilCoreImport = (p: string) => p.startsWith('@stencil/core');
 
-export const shouldFetchModule = (p: string) => IS_FETCH_ENV && !IS_NODE_ENV && p.startsWith(NODE_MODULES_FS_DIR + '/');
+export const shouldFetchModule = (p: string) => IS_FETCH_ENV && !IS_NODE_ENV && isNodeModulePath(p);
+
+export const isNodeModulePath = (p: string) =>
+  normalizePath(p)
+    .split('/')
+    .includes('node_modules');
+
+export const getPackageDirPath = (p: string, moduleId: string) => {
+  const parts = normalizePath(p).split('/');
+  for (let i = parts.length - 1; i >= 1; i--) {
+    if (parts[i - 1] === 'node_modules' && parts[i] === moduleId) {
+      return parts.slice(0, i + 1).join('/');
+    }
+  }
+  return null;
+};

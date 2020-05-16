@@ -20,9 +20,16 @@ export async function taskServe(process: NodeJS.Process, config: d.Config) {
     }
   }
   config.devServer.root = normalizePath(config.devServer.root);
+  const absRoot = path.join(process.cwd(), config.devServer.root);
 
   const { startServer } = await import('@stencil/core/dev-server');
   const devServer = await startServer(config.devServer, config.logger);
+
+  console.log(`${config.logger.cyan('     Root:')} ${absRoot}`);
+  console.log(`${config.logger.cyan('  Address:')} ${devServer.address}`);
+  console.log(`${config.logger.cyan('     Port:')} ${devServer.port}`);
+  console.log(`${config.logger.cyan('   Server:')} ${devServer.browserUrl}`);
+  console.log(``);
 
   process.once('SIGINT', () => {
     devServer && devServer.close();

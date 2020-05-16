@@ -33,8 +33,10 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
-  if (options.syncQueue) {
-    plt.$flags$ |= PLATFORM_FLAGS.queueSync;
+  if (BUILD.asyncQueue) {
+    if (options.syncQueue) {
+      plt.$flags$ |= PLATFORM_FLAGS.queueSync;
+    }
   }
   if (BUILD.hydrateClientSide) {
     // If the app is already hydrated there is not point to disable the
@@ -70,7 +72,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       if (BUILD.shadowDom && !supportsShadow && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
         cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
       }
-      const tagName = cmpMeta.$tagName$;
+      const tagName = BUILD.transformTagName && options.transformTagName ? options.transformTagName(cmpMeta.$tagName$) : cmpMeta.$tagName$;
       const HostElement = class extends HTMLElement {
         ['s-p']: Promise<void>[];
         ['s-rc']: (() => void)[];

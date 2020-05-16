@@ -1,35 +1,67 @@
 import * as d from '../../../declarations';
+import { dirname } from 'path';
 import { setPackageVersionByContent } from '../resolve/resolve-utils';
-import path from 'path';
 
-export const writeFetchSuccessSync = (inMemoryFs: d.InMemoryFileSystem, url: string, filePath: string, content: string, pkgVersions: Map<string, string>) => {
+export const writeFetchSuccessSync = (
+  sys: d.CompilerSystem,
+  inMemoryFs: d.InMemoryFileSystem,
+  url: string,
+  filePath: string,
+  content: string,
+  pkgVersions: Map<string, string>,
+) => {
   if (url.endsWith('package.json')) {
     setPackageVersionByContent(pkgVersions, content);
   }
 
-  let dir = path.dirname(filePath);
+  let dir = dirname(filePath);
   while (dir !== '/' && dir !== '') {
-    inMemoryFs.clearFileCache(dir);
-    inMemoryFs.sys.mkdirSync(dir);
-    dir = path.dirname(dir);
+    if (inMemoryFs) {
+      inMemoryFs.clearFileCache(dir);
+      inMemoryFs.sys.mkdirSync(dir);
+    } else {
+      sys.mkdirSync(dir);
+    }
+
+    dir = dirname(dir);
   }
 
-  inMemoryFs.clearFileCache(filePath);
-  inMemoryFs.sys.writeFileSync(filePath, content);
+  if (inMemoryFs) {
+    inMemoryFs.clearFileCache(filePath);
+    inMemoryFs.sys.writeFileSync(filePath, content);
+  } else {
+    sys.writeFileSync(filePath, content);
+  }
 };
 
-export const writeFetchSuccessAsync = async (inMemoryFs: d.InMemoryFileSystem, url: string, filePath: string, content: string, pkgVersions: Map<string, string>) => {
+export const writeFetchSuccessAsync = async (
+  sys: d.CompilerSystem,
+  inMemoryFs: d.InMemoryFileSystem,
+  url: string,
+  filePath: string,
+  content: string,
+  pkgVersions: Map<string, string>,
+) => {
   if (url.endsWith('package.json')) {
     setPackageVersionByContent(pkgVersions, content);
   }
 
-  let dir = path.dirname(filePath);
+  let dir = dirname(filePath);
   while (dir !== '/' && dir !== '') {
-    inMemoryFs.clearFileCache(dir);
-    await inMemoryFs.sys.mkdir(dir);
-    dir = path.dirname(dir);
+    if (inMemoryFs) {
+      inMemoryFs.clearFileCache(dir);
+      await inMemoryFs.sys.mkdir(dir);
+    } else {
+      await sys.mkdir(dir);
+    }
+
+    dir = dirname(dir);
   }
 
-  inMemoryFs.clearFileCache(filePath);
-  await inMemoryFs.sys.writeFile(filePath, content);
+  if (inMemoryFs) {
+    inMemoryFs.clearFileCache(filePath);
+    await inMemoryFs.sys.writeFile(filePath, content);
+  } else {
+    await sys.writeFile(filePath, content);
+  }
 };

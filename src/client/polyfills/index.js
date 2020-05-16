@@ -3,8 +3,9 @@ export function applyPolyfills() {
   if (typeof window !== 'undefined') {
     var win = window;
 
-    if (!win.customElements || (win.Element && (!win.Element.prototype.closest || !win.Element.prototype.matches || !win.Element.prototype.remove))) {
-      promises.push(import(/* webpackChunkName: "stencil-polyfills-dom" */ './dom.js'));
+    if (!win.customElements ||
+      (win.Element && (!win.Element.prototype.closest || !win.Element.prototype.matches || !win.Element.prototype.remove || !win.Element.prototype.getRootNode))) {
+      promises.push(import(/* webpackChunkName: "polyfills-dom" */ './dom.js'));
     }
 
     function checkIfURLIsSupported() {
@@ -26,7 +27,7 @@ export function applyPolyfills() {
       !checkIfURLIsSupported() ||
       typeof WeakMap == 'undefined'
     ) {
-      promises.push(import(/* webpackChunkName: "stencil-polyfills-core-js" */ './core-js.js'));
+      promises.push(import(/* webpackChunkName: "polyfills-core-js" */ './core-js.js'));
     }
   }
   return Promise.all(promises);

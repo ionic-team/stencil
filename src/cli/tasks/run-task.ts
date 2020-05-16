@@ -20,6 +20,7 @@ export async function runTask(prcs: NodeJS.Process, config: Config, task: TaskCo
       break;
 
     case 'generate':
+    case 'g':
       await taskGenerate(config);
       break;
 

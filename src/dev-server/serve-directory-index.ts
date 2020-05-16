@@ -55,8 +55,8 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
       res.writeHead(
         200,
         responseHeaders({
-          'Content-Type': 'text/html;charset=UTF-8',
-          'X-Directory-Index': req.pathname,
+          'content-type': 'text/html; charset=utf-8',
+          'x-directory-index': req.pathname,
         }),
       );
 
@@ -73,10 +73,10 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
         });
       }
     } catch (e) {
-      serve500(devServerConfig, req, res, e);
+      serve500(devServerConfig, req, res, e, 'serveDirectoryIndex');
     }
   } catch (e) {
-    serve404(devServerConfig, req, res);
+    serve404(devServerConfig, req, res, 'serveDirectoryIndex');
   }
 }
 

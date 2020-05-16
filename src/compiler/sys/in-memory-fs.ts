@@ -467,13 +467,9 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     // remove all the queued dirs to be deleted
     const dirsDeleted = await commitDeleteDirs(instructions.dirsToDelete);
 
-    instructions.filesToDelete.forEach(fileToDelete => {
-      clearFileCache(fileToDelete);
-    });
+    instructions.filesToDelete.forEach(clearFileCache);
 
-    instructions.dirsToDelete.forEach(dirToDelete => {
-      clearDirCache(dirToDelete);
-    });
+    instructions.dirsToDelete.forEach(clearDirCache);
 
     // return only the files that were
     return {
@@ -586,9 +582,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     const dirsDeleted: string[] = [];
 
     for (const dirPath of dirsToDelete) {
-      try {
-        await sys.rmdir(dirPath);
-      } catch (e) {}
+      await sys.rmdir(dirPath);
       dirsDeleted.push(dirPath);
     }
 
@@ -615,21 +609,21 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   const cancelDeleteFilesFromDisk = (filePaths: string[]) => {
-    filePaths.forEach(filePath => {
+    for (const filePath of filePaths) {
       const item = getItem(filePath);
       if (item.isFile === true && item.queueDeleteFromDisk === true) {
         item.queueDeleteFromDisk = false;
       }
-    });
+    }
   };
 
   const cancelDeleteDirectoriesFromDisk = (dirPaths: string[]) => {
-    dirPaths.forEach(dirPath => {
+    for (const dirPath of dirPaths) {
       const item = getItem(dirPath);
       if (item.queueDeleteFromDisk === true) {
         item.queueDeleteFromDisk = false;
       }
-    });
+    }
   };
 
   const getItem = (itemPath: string): d.FsItem => {
@@ -826,12 +820,12 @@ export const getCommitInstructions = (items: d.FsItems) => {
     return 0;
   });
 
-  instructions.dirsToEnsure.forEach(dirToEnsure => {
+  for (const dirToEnsure of instructions.dirsToEnsure) {
     const i = instructions.dirsToDelete.indexOf(dirToEnsure);
     if (i > -1) {
       instructions.dirsToDelete.splice(i, 1);
     }
-  });
+  }
 
   instructions.dirsToDelete = instructions.dirsToDelete.filter(dir => {
     if (dir === '/' || dir.endsWith(':/') === true) {

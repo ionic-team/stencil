@@ -6,6 +6,7 @@ import {
   DevServer,
   DevServerConfig,
   DevServerMessage,
+  DevServerStartResponse,
   Logger,
   StencilDevServerConfig,
 } from '../declarations';
@@ -54,7 +55,12 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
     }
 
     devServer = {
+      address: starupDevServerConfig.address,
+      basePath: starupDevServerConfig.basePath,
       browserUrl: starupDevServerConfig.browserUrl,
+      port: starupDevServerConfig.port,
+      protocol: starupDevServerConfig.protocol,
+      root: starupDevServerConfig.root,
       close() {
         try {
           if (serverProcess) {
@@ -65,7 +71,7 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
             removeWatcher = null;
           }
         } catch (e) {}
-        logger.debug(`dev server closed`);
+        logger.debug(`dev server closed, port ${starupDevServerConfig.port}`);
         return Promise.resolve();
       },
       emit(eventName: any, data: any) {
@@ -84,7 +90,7 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
 function startWorkerServer(devServerConfig: DevServerConfig, logger: Logger, watcher: CompilerWatcher, serverProcess: ChildProcess, devServerContext: DevServerMainContext) {
   let hasStarted = false;
 
-  return new Promise<DevServerConfig>((resolve, reject) => {
+  return new Promise<DevServerStartResponse>((resolve, reject) => {
     serverProcess.stdout.on('data', (data: any) => {
       // the child server process has console logged data
       logger.debug(`dev server: ${data}`);
@@ -129,8 +135,6 @@ function startWorkerServer(devServerConfig: DevServerConfig, logger: Logger, wat
             isActivelyBuilding: devServerContext.isActivelyBuilding,
           };
           delete msg.buildResults.hmr;
-          delete msg.buildResults.entries;
-          delete msg.buildResults.components;
 
           serverProcess.send(msg);
         } else {
@@ -204,10 +208,8 @@ function emitMessageToClient(serverProcess: ChildProcess, devServerContext: DevS
     // send the build results to the child server process
     devServerContext.isActivelyBuilding = false;
     const msg: DevServerMessage = {
-      buildResults: Object.assign({}, data),
+      buildResults: { ...data },
     };
-    delete msg.buildResults.entries;
-    delete msg.buildResults.components;
 
     serverProcess.send(msg);
   } else if (eventName === 'buildStart') {

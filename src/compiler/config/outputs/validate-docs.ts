@@ -106,7 +106,7 @@ const validateCustomDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarge
 const validateVScodeDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsVscode) => {
   if (typeof outputTarget.file !== 'string') {
     const err = buildError(diagnostics);
-    err.messageText = `docs-vscode outputTarget missing the "file" paht`;
+    err.messageText = `docs-vscode outputTarget missing the "file" path`;
   }
   return outputTarget;
 };

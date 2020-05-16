@@ -65,6 +65,8 @@ export const getBuildFeatures = (cmps: ComponentCompilerMeta[]) => {
     taskQueue: true,
   };
   f.asyncLoading = f.cmpWillUpdate || f.cmpWillLoad || f.cmpWillRender;
+  f.vdomAttribute = f.vdomAttribute || f.reflect;
+  f.vdomPropOrAttr = f.vdomPropOrAttr || f.reflect;
 
   return f;
 };
@@ -76,6 +78,7 @@ export const updateComponentBuildConditionals = (moduleMap: ModuleMap, cmps: Com
       // if the component already has a boolean true value it'll keep it
       // otherwise we get the boolean value from the imported module
       cmp.hasVdomAttribute = cmp.hasVdomAttribute || importedModule.hasVdomAttribute;
+      cmp.hasVdomPropOrAttr = cmp.hasVdomPropOrAttr || importedModule.hasVdomPropOrAttr;
       cmp.hasVdomXlink = cmp.hasVdomXlink || importedModule.hasVdomXlink;
       cmp.hasVdomClass = cmp.hasVdomClass || importedModule.hasVdomClass;
       cmp.hasVdomFunctional = cmp.hasVdomFunctional || importedModule.hasVdomFunctional;

@@ -34,8 +34,7 @@ export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx,
 };
 
 export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
-  const customResolveOptions = createCustomResolverAsync(config, compilerCtx.fs, ['.tsx', '.ts', '.js', '.mjs', '.json']);
-
+  const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, ['.tsx', '.ts', '.js', '.mjs', '.json']);
   const nodeResolvePlugin = rollupNodeResolvePlugin({
     mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
     customResolveOptions,
@@ -67,7 +66,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       imagePlugin(config, buildCtx),
       textPlugin(),
       extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
-      workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform),
+      workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),
       ...beforePlugins,
       nodeResolvePlugin,
       resolveIdWithTypeScript(config, compilerCtx),

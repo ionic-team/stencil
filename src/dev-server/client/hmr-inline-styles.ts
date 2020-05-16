@@ -1,7 +1,8 @@
-import * as d from '../../declarations';
+import { HmrStyleUpdate } from '../../declarations';
 import { isTemplate, hasShadowRoot, isElement } from './hmr-util';
 
-export const hmrInlineStyles = (elm: Element, versionId: string, stylesUpdated: d.HmrStyleUpdate[]) => {
+export const hmrInlineStyles = (elm: Element, versionId: string, stylesUpdatedData: any[]) => {
+  const stylesUpdated: HmrStyleUpdate[] = stylesUpdatedData;
   if (isElement(elm) && elm.nodeName.toLowerCase() === 'style') {
     stylesUpdated.forEach(styleUpdated => {
       hmrStyleElement(elm, versionId, styleUpdated);
@@ -33,7 +34,7 @@ export const hmrInlineStyles = (elm: Element, versionId: string, stylesUpdated: 
     .sort();
 };
 
-const hmrStyleElement = (elm: Element, versionId: string, stylesUpdated: d.HmrStyleUpdate) => {
+const hmrStyleElement = (elm: Element, versionId: string, stylesUpdated: HmrStyleUpdate) => {
   const styleId = elm.getAttribute('sty-id');
   if (styleId === stylesUpdated.styleId && stylesUpdated.styleText) {
     // if we made it this far then it's a match!

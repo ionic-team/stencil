@@ -1,4 +1,4 @@
-import { Component, Element, Prop } from '@stencil/core';
+import { Component, Element, Prop, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('attribute', () => {
@@ -289,6 +289,33 @@ describe('attribute', () => {
 
       expect(root).toEqualHtml(`
         <cmp-a str="second" nu="-12.2" undef="no undef" null="no null" bool dynamic-str="value" dynamic-nu="123"></cmp-a>
+      `);
+    });
+    it('should reflect properties as attributes', async () => {
+
+      @Component({ tag: 'cmp-a', shadow: true })
+      class CmpA {
+        @Prop({ reflect: true }) foo = 'bar';
+
+        render() {
+          return <div>Hello world</div>;
+        }
+      }
+
+      const { root } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+        strictBuild: true,
+      });
+
+      expect(root).toEqualHtml(`
+        <cmp-a foo="bar">
+          <mock:shadow-root>
+            <div>
+              Hello world
+            </div>
+          </mock:shadow-root>
+        </cmp-a>
       `);
     });
   });

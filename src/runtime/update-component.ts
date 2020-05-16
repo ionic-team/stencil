@@ -9,7 +9,7 @@ import { createTime } from './profile';
 import { emitEvent } from './event-emitter';
 
 export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) => {
-  if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$) {
+  if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$ && ancestorComponent['s-p']) {
     ancestorComponent['s-p'].push(new Promise(r => (hostRef.$onRenderResolve$ = r)));
   }
 };
@@ -22,12 +22,19 @@ export const scheduleUpdate = (hostRef: d.HostRef, isInitialLoad: boolean) => {
     hostRef.$flags$ |= HOST_FLAGS.needsRerender;
     return;
   }
+  attachToAncestor(hostRef, hostRef.$ancestorComponent$);
+
+  // there is no ancestorc omponent or the ancestor component
+  // has already fired off its lifecycle update then
+  // fire off the initial update
+  const dispatch = () => dispatchHooks(hostRef, isInitialLoad);
+  return BUILD.taskQueue ? writeTask(dispatch) : dispatch;
+};
+
+const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean) => {
   const elm = hostRef.$hostElement$;
   const endSchedule = createTime('scheduleUpdate', hostRef.$cmpMeta$.$tagName$);
-  const ancestorComponent = hostRef.$ancestorComponent$;
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : (elm as any);
-  const update = () => updateComponent(hostRef, instance, isInitialLoad);
-  attachToAncestor(hostRef, ancestorComponent);
 
   let promise: Promise<void>;
   if (isInitialLoad) {
@@ -56,12 +63,10 @@ export const scheduleUpdate = (hostRef: d.HostRef, isInitialLoad: boolean) => {
   }
 
   endSchedule();
-
-  // there is no ancestorc omponent or the ancestor component
-  // has already fired off its lifecycle update then
-  // fire off the initial update
-  return then(promise, BUILD.taskQueue ? () => writeTask(update) : update);
-};
+  return then(promise, () => (
+    updateComponent(hostRef, instance, isInitialLoad)
+  ));
+}
 
 const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boolean) => {
   // updateComponent
@@ -267,7 +272,7 @@ export const appDidLoad = (who: string) => {
   if (BUILD.cssAnnotations) {
     addHydratedFlag(doc.documentElement);
   }
-  if (!BUILD.hydrateServerSide) {
+  if (BUILD.asyncQueue) {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
   nextTick(() => emitEvent(win, 'appload', { detail: { namespace: NAMESPACE } }));

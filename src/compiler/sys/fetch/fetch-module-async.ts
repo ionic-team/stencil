@@ -13,7 +13,7 @@ export const fetchModuleAsync = async (sys: d.CompilerSystem, inMemoryFs: d.InMe
     if (rsp) {
       if (rsp.ok) {
         const content = await rsp.clone().text();
-        writeFetchSuccessAsync(inMemoryFs, url, filePath, content, pkgVersions);
+        await writeFetchSuccessAsync(sys, inMemoryFs, url, filePath, content, pkgVersions);
         return content;
       }
 

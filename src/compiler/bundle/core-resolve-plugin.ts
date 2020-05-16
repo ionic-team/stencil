@@ -1,11 +1,11 @@
 import * as d from '../../declarations';
+import { dirname, join } from 'path';
 import { fetchModuleAsync } from '../sys/fetch/fetch-module-async';
-import { getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
+import { getNodeModulePath } from '../sys/resolve/resolve-utils';
 import { HYDRATED_CSS } from '../../runtime/runtime-constants';
-import { isExternalUrl } from '../sys/resolve/resolve-utils';
+import { isExternalUrl, getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
 import { normalizePath, normalizeFsPath } from '@utils';
 import { STENCIL_CORE_ID, STENCIL_INTERNAL_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
-import path from 'path';
 import { Plugin } from 'rollup';
 
 export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, platform: 'client' | 'hydrate' | 'worker'): Plugin => {
@@ -84,11 +84,11 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
 
 export const getStencilInternalModule = (rootDir: string, compilerExe: string, internalModule: string) => {
   if (isExternalUrl(compilerExe)) {
-    return normalizePath(path.join(rootDir, 'node_modules', '@stencil', 'core', 'internal', internalModule, 'index.mjs'));
+    return getNodeModulePath(rootDir, '@stencil', 'core', 'internal', internalModule, 'index.mjs');
   }
 
-  const compilerExeDir = path.dirname(compilerExe);
-  return normalizePath(path.join(compilerExeDir, '..', 'internal', internalModule, 'index.mjs'));
+  const compilerExeDir = dirname(compilerExe);
+  return normalizePath(join(compilerExeDir, '..', 'internal', internalModule, 'index.mjs'));
 };
 
 export const getHydratedFlagHead = (h: d.HydratedFlag) => {

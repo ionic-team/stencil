@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
-import { basename, dirname, join, resolve } from 'path';
-import { getStencilInternalDtsUrl } from '../fetch/fetch-utils';
-import { isDtsFile, isExternalUrl, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile } from '../resolve/resolve-utils';
+import { basename, dirname, isAbsolute, join, resolve } from 'path';
+import { getStencilInternalDtsPath, isDtsFile, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile, isJsonFile } from '../resolve/resolve-utils';
+import { isExternalUrl } from '../fetch/fetch-utils';
 import { isString, IS_LOCATION_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV, normalizePath } from '@utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
 import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
@@ -20,7 +20,7 @@ export const patchTypeScriptResolveModule = (loadedTs: typeof ts, config: d.Conf
     const resolveModuleName = ((loadedTs as any).__resolveModuleName = loadedTs.resolveModuleName);
 
     loadedTs.resolveModuleName = (moduleName, containingFile, compilerOptions, host, cache, redirectedReference) => {
-      const resolvedModule = patchedTsResolveModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
+      const resolvedModule = patchedTsResolveModule(config, inMemoryFs, moduleName, containingFile);
       if (resolvedModule) {
         return resolvedModule;
       }
@@ -71,50 +71,22 @@ export const tsResolveModuleNamePackageJsonPath = (config: d.Config, compilerCtx
 export const patchedTsResolveModule = (
   config: d.Config,
   inMemoryFs: d.InMemoryFileSystem,
-  compilerExe: string,
   moduleName: string,
   containingFile: string,
 ): ts.ResolvedModuleWithFailedLookupLocations => {
   if (isLocalModule(moduleName)) {
-    // local file
+    const containingDir = dirname(containingFile);
+    let resolvedFileName = join(containingDir, moduleName);
+    resolvedFileName = normalizePath(ensureExtension(resolvedFileName, containingFile));
 
-    if (isExternalUrl(containingFile)) {
-      // containing file is a
-      let resolvedUrl = new URL(moduleName, containingFile).href;
-      resolvedUrl = ensureUrlExtension(resolvedUrl, containingFile);
-
-      return {
-        resolvedModule: {
-          extension: getTsResolveExtension(resolvedUrl),
-          resolvedFileName: resolvedUrl,
-          packageId: {
-            name: moduleName,
-            subModuleName: '',
-            version,
-          },
-        },
-      };
+    if (!isAbsolute(resolvedFileName) && !resolvedFileName.startsWith('.') && !resolvedFileName.startsWith('/')) {
+      resolvedFileName = './' + resolvedFileName;
     }
-  } else {
-    // node module id
-    return tsResolveNodeModule(config, inMemoryFs, compilerExe, moduleName, containingFile);
-  }
 
-  return null;
-};
-
-export const tsResolveNodeModule = (
-  config: d.Config,
-  inMemoryFs: d.InMemoryFileSystem,
-  compilerExe: string,
-  moduleName: string,
-  containingFile: string,
-): ts.ResolvedModuleWithFailedLookupLocations => {
-  if (isStencilCoreImport(moduleName)) {
     return {
       resolvedModule: {
-        extension: ts.Extension.Dts,
-        resolvedFileName: getStencilInternalDtsUrl(compilerExe),
+        extension: getTsResolveExtension(resolvedFileName),
+        resolvedFileName,
         packageId: {
           name: moduleName,
           subModuleName: '',
@@ -124,14 +96,36 @@ export const tsResolveNodeModule = (
     };
   }
 
-  const resolved = resolveRemoteModuleIdSync(config, inMemoryFs, moduleName, containingFile);
+  // node module id
+  return tsResolveNodeModule(config, inMemoryFs, moduleName, containingFile);
+};
+
+export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, containingFile: string): ts.ResolvedModuleWithFailedLookupLocations => {
+  if (isStencilCoreImport(moduleId)) {
+    return {
+      resolvedModule: {
+        extension: ts.Extension.Dts,
+        resolvedFileName: getStencilInternalDtsPath(config.rootDir),
+        packageId: {
+          name: moduleId,
+          subModuleName: '',
+          version,
+        },
+      },
+    };
+  }
+
+  const resolved = resolveRemoteModuleIdSync(config, inMemoryFs, {
+    moduleId,
+    containingFile,
+  });
   if (resolved) {
     return {
       resolvedModule: {
         extension: ts.Extension.Js,
         resolvedFileName: resolved.resolvedUrl,
         packageId: {
-          name: moduleName,
+          name: moduleId,
           subModuleName: '',
           version: resolved.packageJson.version,
         },
@@ -142,25 +136,23 @@ export const tsResolveNodeModule = (
   return null;
 };
 
-export const ensureUrlExtension = (url: string, containingUrl: string) => {
-  const fileName = basename(url);
-
-  if (!fileName.includes('.') && isString(containingUrl)) {
-    containingUrl = containingUrl.toLowerCase();
-    if (isJsFile(containingUrl)) {
-      url += '.js';
-    } else if (isDtsFile(containingUrl)) {
-      url += '.d.ts';
-    } else if (isTsxFile(containingUrl)) {
-      url += '.tsx';
-    } else if (isTsFile(containingUrl)) {
-      url += '.ts';
-    } else if (isJsxFile(containingUrl)) {
-      url += '.jsx';
+export const ensureExtension = (fileName: string, containingFile: string) => {
+  if (!basename(fileName).includes('.') && isString(containingFile)) {
+    containingFile = containingFile.toLowerCase();
+    if (isJsFile(containingFile)) {
+      fileName += '.js';
+    } else if (isDtsFile(containingFile)) {
+      fileName += '.d.ts';
+    } else if (isTsxFile(containingFile)) {
+      fileName += '.tsx';
+    } else if (isTsFile(containingFile)) {
+      fileName += '.ts';
+    } else if (isJsxFile(containingFile)) {
+      fileName += '.jsx';
     }
   }
 
-  return url;
+  return fileName;
 };
 
 const getTsResolveExtension = (p: string) => {
@@ -175,6 +167,9 @@ const getTsResolveExtension = (p: string) => {
   }
   if (isJsxFile(p)) {
     return ts.Extension.Jsx;
+  }
+  if (isJsonFile(p)) {
+    return ts.Extension.Json;
   }
   return ts.Extension.Ts;
 };

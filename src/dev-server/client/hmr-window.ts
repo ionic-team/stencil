@@ -1,11 +1,11 @@
-import * as d from '../../declarations';
+import { HotModuleReplacement } from '../../declarations';
 import { hmrComponents } from './hmr-components';
 import { hmrExternalStyles } from './hmr-external-styles';
 import { hmrImages } from './hmr-images';
 import { hmrInlineStyles } from './hmr-inline-styles';
 import { setHmrAttr } from './hmr-util';
 
-export const hmrWindow = (win: Window, buildResultsHmr: any) => {
+export const hmrWindow = (data: { window: Window; hmr: any }) => {
   const results = {
     updatedComponents: [] as string[],
     updatedExternalStyles: [] as string[],
@@ -15,12 +15,13 @@ export const hmrWindow = (win: Window, buildResultsHmr: any) => {
   };
 
   try {
-    const hmr: d.HotModuleReplacement = buildResultsHmr;
-    if (!win || !win.document || !win.document.documentElement || !hmr || typeof hmr.versionId !== 'string') {
+    if (!data || !data.window || !data.window.document.documentElement || !data.hmr || typeof data.hmr.versionId !== 'string') {
       return results;
     }
 
+    const win = data.window;
     const doc = win.document;
+    const hmr: HotModuleReplacement = data.hmr;
     const documentElement = doc.documentElement;
     const versionId = hmr.versionId;
     results.versionId = versionId;

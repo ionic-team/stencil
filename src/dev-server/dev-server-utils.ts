@@ -54,10 +54,12 @@ export function responseHeaders(headers: d.DevResponseHeaders): any {
 }
 
 const DEFAULT_HEADERS: d.DevResponseHeaders = {
-  'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-  'Expires': '0',
-  'X-Powered-By': 'Stencil Dev Server ' + version,
-  'Access-Control-Allow-Origin': '*',
+  'cache-control': 'no-cache, no-store, must-revalidate, max-age=0',
+  'expires': '0',
+  'server': 'Stencil Dev Server ' + version,
+  'date': 'Wed, 1 Jan 2000 00:00:00 GMT',
+  'access-control-allow-origin': '*',
+  'access-control-expose-headers': '*',
 };
 
 export function getBrowserUrl(protocol: string, address: string, port: number, basePath: string, pathname: string) {

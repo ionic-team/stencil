@@ -116,6 +116,7 @@ async function runPrerenderOutputTarget(
       outputTarget: outputTarget,
       prerenderConfig: prerenderConfig,
       prerenderConfigPath: outputTarget.prerenderConfig,
+      staticSite: false,
       templateId: null,
       urlsCompleted: new Set(),
       urlsPending: new Set(),
@@ -127,7 +128,7 @@ async function runPrerenderOutputTarget(
       manager.progressLogger = startProgressLogger(prcs);
     }
 
-    initializePrerenderEntryUrls(manager);
+    initializePrerenderEntryUrls(manager, diagnostics);
 
     if (manager.urlsPending.size === 0) {
       const err = buildError(diagnostics);
@@ -135,12 +136,13 @@ async function runPrerenderOutputTarget(
       return;
     }
 
-    const templateHtml = await generateTemplateHtml(diagnostics, manager.isDebug, srcIndexHtmlPath, outputTarget, hydrateOpts);
-    if (diagnostics.length > 0 || typeof templateHtml !== 'string') {
+    const templateData = await generateTemplateHtml(prerenderConfig, diagnostics, manager.isDebug, srcIndexHtmlPath, outputTarget, hydrateOpts);
+    if (diagnostics.length > 0 || !templateData || typeof templateData.html !== 'string') {
       return;
     }
 
-    manager.templateId = createPrerenderTemplate(config, templateHtml);
+    manager.templateId = createPrerenderTemplate(config, templateData.html);
+    manager.staticSite = templateData.staticSite;
     manager.componentGraphPath = createComponentGraphPath(componentGraph, outputTarget);
 
     await new Promise(resolve => {
@@ -169,9 +171,9 @@ async function runPrerenderOutputTarget(
     if (prerenderBuildErrors.length > 0) {
       // convert to just runtime errors so the other build files still write
       // but the CLI knows an error occurred and should have an exit code 1
-      prerenderBuildErrors.forEach(diagnostic => {
+      for (const diagnostic of prerenderBuildErrors) {
         diagnostic.type = 'runtime';
-      });
+      }
       diagnostics.push(...prerenderBuildErrors);
     }
     diagnostics.push(...prerenderRuntimeErrors);
@@ -253,10 +255,5 @@ function startProgressLogger(prcs: NodeJS.Process): d.ProgressLogger {
 }
 
 function generateContentHash(content: string) {
-  return crypto
-    .createHash('md5')
-    .update(content)
-    .digest('hex')
-    .toLowerCase()
-    .substr(0, 12);
+  return crypto.createHash('md5').update(content).digest('hex').toLowerCase().substr(0, 12);
 }

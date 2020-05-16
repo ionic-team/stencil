@@ -13,6 +13,7 @@ export function hydrateApp(
 ) {
   const connectedElements = new Set<any>();
   const createdElements = new Set<HTMLElement>();
+  const waitingElements = new Set<HTMLElement>();
   const orgDocumentCreateElement = win.document.createElement;
   const orgDocumentCreateElementNS = win.document.createElementNS;
   const resolved = Promise.resolve();
@@ -26,7 +27,7 @@ export function hydrateApp(
 
     try {
       if (opts.clientHydrateAnnotations) {
-        insertVdomAnnotations(win.document);
+        insertVdomAnnotations(win.document, opts.staticComponents);
       }
       win.document.createElement = orgDocumentCreateElement;
       win.document.createElementNS = orgDocumentCreateElementNS;
@@ -43,7 +44,7 @@ export function hydrateApp(
   }
 
   function timeoutExceeded() {
-    hydratedError(`Hydrate exceeded timeout`);
+    hydratedError(`Hydrate exceeded timeout${waitingOnElementsMsg(waitingElements)}`);
   }
 
   try {
@@ -106,7 +107,7 @@ export function hydrateApp(
 
           // add it to our Set so we know it's already being connected
           connectedElements.add(elm);
-          return hydrateComponent(win, results, elm.nodeName, elm);
+          return hydrateComponent(win, results, elm.nodeName, elm, waitingElements);
         }
       }
 
@@ -142,15 +143,13 @@ export function hydrateApp(
 
     patchChild(win.document.body);
 
-    waitLoop()
-      .then(hydratedComplete)
-      .catch(hydratedError);
+    waitLoop().then(hydratedComplete).catch(hydratedError);
   } catch (e) {
     hydratedError(e);
   }
 }
 
-async function hydrateComponent(win: Window, results: d.HydrateResults, tagName: string, elm: d.HostElement) {
+async function hydrateComponent(win: Window, results: d.HydrateResults, tagName: string, elm: d.HostElement, waitingElements: Set<HTMLElement>) {
   tagName = tagName.toLowerCase();
   const Cstr = loadModule(
     {
@@ -164,6 +163,7 @@ async function hydrateComponent(win: Window, results: d.HydrateResults, tagName:
     const cmpMeta = Cstr.cmpMeta;
 
     if (cmpMeta != null) {
+      waitingElements.add(elm);
       try {
         connectedCallback(elm);
         await elm.componentOnReady();
@@ -183,6 +183,7 @@ async function hydrateComponent(win: Window, results: d.HydrateResults, tagName:
       } catch (e) {
         win.console.error(e);
       }
+      waitingElements.delete(elm);
     }
   }
 }
@@ -254,4 +255,44 @@ function renderCatchError(opts: d.HydrateFactoryOptions, results: d.HydrateResul
   }
 
   results.diagnostics.push(diagnostic);
+}
+
+function printTag(elm: HTMLElement) {
+  let tag = `<${elm.nodeName.toLowerCase()}`;
+  if (Array.isArray(elm.attributes)) {
+    for (let i = 0; i < elm.attributes.length; i++) {
+      const attr = elm.attributes[i];
+      tag += ` ${attr.name}`;
+      if (attr.value !== '') {
+        tag += `="${attr.value}"`;
+      }
+    }
+  }
+  tag += `>`;
+  return tag;
+}
+
+function waitingOnElementMsg(waitingElement: HTMLElement) {
+  let msg = '';
+  if (waitingElement) {
+    const lines = [];
+
+    msg = ' - waiting on:';
+    let elm = waitingElement;
+    while (elm && elm.nodeType !== 9 && elm.nodeName !== 'BODY') {
+      lines.unshift(printTag(elm));
+      elm = elm.parentElement;
+    }
+
+    let indent = '';
+    for (const ln of lines) {
+      indent += '  ';
+      msg += `\n${indent}${ln}`;
+    }
+  }
+  return msg;
+}
+
+function waitingOnElementsMsg(waitingElements: Set<HTMLElement>) {
+  return Array.from(waitingElements).map(waitingOnElementMsg);
 }

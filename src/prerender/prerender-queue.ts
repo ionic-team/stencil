@@ -4,16 +4,16 @@ import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 import path from 'path';
 
-export function initializePrerenderEntryUrls(manager: d.PrerenderManager) {
+export function initializePrerenderEntryUrls(manager: d.PrerenderManager, diagnostics: d.Diagnostic[]) {
   const entryAnchors: d.HydrateAnchorElement[] = [];
 
   if (Array.isArray(manager.prerenderConfig.entryUrls)) {
-    manager.prerenderConfig.entryUrls.forEach(entryUrl => {
+    for (const entryUrl of manager.prerenderConfig.entryUrls) {
       const entryAnchor: d.HydrateAnchorElement = {
         href: entryUrl,
       };
       entryAnchors.push(entryAnchor);
-    });
+    }
   } else {
     const entryAnchor: d.HydrateAnchorElement = {
       href: manager.outputTarget.baseUrl,
@@ -25,9 +25,9 @@ export function initializePrerenderEntryUrls(manager: d.PrerenderManager) {
     // ensure each entry url is valid
     // and has a domain
     try {
-      new URL(entryAnchor.href);
+      new URL(entryAnchor.href, manager.outputTarget.baseUrl);
     } catch (e) {
-      const diagnostic = buildError(manager.diagnostics);
+      const diagnostic = buildError(diagnostics);
       diagnostic.header = `Invalid Prerender Entry Url: ${entryAnchor.href}`;
       diagnostic.messageText = `Entry Urls must include the protocol and domain of the site being prerendered.`;
       return;
@@ -36,10 +36,10 @@ export function initializePrerenderEntryUrls(manager: d.PrerenderManager) {
 
   const base = new URL(manager.outputTarget.baseUrl);
 
-  const hrefs = crawlAnchorsForNextUrls(manager.prerenderConfig, manager.diagnostics, base, base, entryAnchors);
-  hrefs.forEach(href => {
+  const hrefs = crawlAnchorsForNextUrls(manager.prerenderConfig, diagnostics, base, base, entryAnchors);
+  for (const href of hrefs) {
     addUrlToPendingQueue(manager, href, '#entryUrl');
-  });
+  }
 }
 
 function addUrlToPendingQueue(manager: d.PrerenderManager, queueUrl: string, fromUrl: string) {
@@ -59,8 +59,8 @@ function addUrlToPendingQueue(manager: d.PrerenderManager, queueUrl: string, fro
   manager.urlsPending.add(queueUrl);
 
   if (manager.isDebug) {
-    const url = new URL(queueUrl).pathname;
-    const from = fromUrl.startsWith('#') ? fromUrl : new URL(fromUrl).pathname;
+    const url = new URL(queueUrl, manager.outputTarget.baseUrl).pathname;
+    const from = fromUrl.startsWith('#') ? fromUrl : new URL(fromUrl, manager.outputTarget.baseUrl).pathname;
     manager.config.logger.debug(`prerender queue: ${url} (from ${from})`);
   }
 }
@@ -121,6 +121,7 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
       hydrateAppFilePath: manager.hydrateAppFilePath,
       isDebug: manager.isDebug,
       prerenderConfigPath: manager.prerenderConfigPath,
+      staticSite: manager.staticSite,
       templateId: manager.templateId,
       url: url,
       writeToFilePath: getWriteFilePathFromUrlPath(manager, url),
@@ -142,9 +143,9 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
     manager.diagnostics.push(...results.diagnostics);
 
     if (Array.isArray(results.anchorUrls)) {
-      results.anchorUrls.forEach(anchorUrl => {
+      for (const anchorUrl of results.anchorUrls) {
         addUrlToPendingQueue(manager, anchorUrl, url);
-      });
+      }
     }
   } catch (e) {
     // darn, idk, bad news

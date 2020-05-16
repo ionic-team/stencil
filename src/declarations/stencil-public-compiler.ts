@@ -139,8 +139,14 @@ export interface StencilConfig {
   rollupConfig?: RollupConfig;
 
   /**
-   * Sets if the ES5 build must be generated or not. It defaults to `false` in dev mode, and `true` in production mode.
-   * Notice that Stencil always generates a modern build too, this setting will just disable the additional `es5` build.
+   * Sets if the ES5 build should be generated or not. It defaults to `false` in dev mode, and `true` in
+   * production mode. Notice that Stencil always generates a modern build too, whereas this setting
+   * will either disable es5 builds entirely with `false`, or always create es5 builds (even in dev mode)
+   * when set to `true`. Basically if the app does not need to run on legacy browsers
+   * (IE11 and Edge 18 and below), it's safe to set `buildEs5` to `false`, which will also speed up
+   * production build times. In addition to not creating es5 builds, apps may also be interested in
+   * disabling any unnecessary runtime when support legacy browsers. See
+   * [https://stenciljs.com/docs/config-extras](/docs/config-extras) for more information.
    */
   buildEs5?: boolean;
 
@@ -187,6 +193,35 @@ export interface StencilConfig {
    * can also be used to not include the hydrated flag at all by setting it to `null`.
    */
   hydratedFlag?: HydratedFlag;
+
+  /**
+   * Sets the task queue used by stencil's runtime. The task queue schedules DOM read and writes
+   * across the frames to efficiently render and reduce layout thrashing. By default, the
+   * `congestionAsync` is used. It's recommended to also try each setting to decide which works
+   * best for your use-case. In all cases, if your app has many CPU intensive tasks causing the
+   * main thread to periodically lock-up, it's always recommended to try
+   * [Web Workers](https://stenciljs.com/docs/web-workers) for those tasks.
+   *
+   * - `congestionAsync`: DOM reads and writes are scheduled in the next frame to prevent layout
+   *   thrashing. When the app is heavily tasked and the queue becomes congested it will then
+   *   split the work across multiple frames to prevent blocking the main thread. However, it can
+   *   also introduce unnecesary reflows in some cases, especially during startup. `congestionAsync`
+   *   is ideal for apps running animations while also simultaniously executing intesive tasks
+   *   which may lock-up the main thread.
+   *
+   * - `async`: DOM read and writes are scheduled in the next frame to prevent layout thrashing.
+   *   During intensive CPU tasks it will not reschedule rendering to happen in the next frame.
+   *   `async` is ideal for most apps, and if the app has many intensive tasks causing the main
+   *   thread to lock-up, it's recommended to try [Web Workers](https://stenciljs.com/docs/web-workers)
+   *   rather than the congestion async queue.
+   *
+   * - `immediate`: Makes writeTask() and readTask() callbacks to be executed syncronously. Tasks
+   *   are not scheduled to run in the next frame, but do note there is at least one microtask.
+   *   The `immediate` setting is ideal for apps that do not provide long running and smooth
+   *   animations. Like the async setting, if the app has intensive tasks causing the main thread
+   *   to lock-up, it's recommended to try [Web Workers](https://stenciljs.com/docs/web-workers).
+   */
+  taskQueue?: 'async' | 'immediate' | 'congestionAsync';
 
   globalScript?: string;
   srcIndexHtml?: string;
@@ -238,7 +273,9 @@ export interface ConfigExtras {
   cssVarsShim?: boolean;
 
   /**
-   * Dynamic `import()` shim. This is only needed for Edge 18 and below, and Firefox 67 and below.
+   * Dynamic `import()` shim. This is only needed for Edge 18 and below, and Firefox 67
+   * and below. If you do not need to support Edge 18 and below (Edge before it moved
+   * to Chromium) then it's recommended to set `dynamicImportShim` to `false`.
    * Defaults to `true`.
    */
   dynamicImportShim?: boolean;
@@ -267,9 +304,17 @@ export interface ConfigExtras {
    * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
    * if it's determined that shadow dom is already natively supported by the browser then
    * it does not request the shim. Setting to `false` will avoid all shadow dom tests.
-   * Defaults to `true`.
+   * If the app does not need to support IE11 or Edge 18 it's recommended to set `shadowDomShim` to
+   * `false`. Defaults to `true`.
    */
   shadowDomShim?: boolean;
+
+  /**
+   * When a component is first attached to the DOM, wait a single tick before rendering.
+   * This worksaround an angular issue, where it attaches the elements before settings their initial state,
+   * leading to double renders and unnecesary event dispatchs.
+   */
+  initializeNextTick?: boolean;
 
   /**
    * For browsers that do not support shadow dom (IE11 and Edge 18 and below), slot is polyfilled
@@ -278,6 +323,11 @@ export interface ConfigExtras {
    * Defaults to `false`.
    */
   slotChildNodesFix?: boolean;
+
+  /**
+   * Enables the tagNameTransform option of `defineCustomElements()`, so the component tagName can be customized at runtime.
+   */
+  tagNameTransform?: boolean;
 }
 
 export interface Config extends StencilConfig {
@@ -441,10 +491,317 @@ export interface ConfigFlags {
   devtools?: boolean;
 }
 
-export type TaskCommand = 'build' | 'docs' | 'generate' | 'help' | 'prerender' | 'serve' | 'test' | 'version';
+export type TaskCommand = 'build' | 'docs' | 'generate' | 'g' | 'help' | 'prerender' | 'serve' | 'test' | 'version';
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
+/**
+ * The prerender config is used when prerendering a `www` output target.
+ * Within `stencil.config.ts`, set the path to the prerendering
+ * config file path using the `prerenderConfig` property, such as:
+ *
+ * ```tsx
+ * import { Config } from '@stencil/core';
+ * export const config: Config = {
+ *   outputTargets: [
+ *     {
+ *       type: 'www',
+ *       baseUrl: 'https://stenciljs.com/',
+ *       prerenderConfig: './prerender.config.ts',
+ *     }
+ *   ]
+ * };
+ * ```
+ *
+ * The `prerender.config.ts` should export a `config` object using
+ * the `PrerenderConfig` interface.
+ *
+ * ```tsx
+ * import { PrerenderConfig } from '@stencil/core';
+ * export const config: PrerenderConfig = {
+ *   ...
+ * };
+ * ```
+ *
+ * For more info: https://stenciljs.com/docs/static-site-generation
+ */
+export interface PrerenderConfig {
+  /**
+   * Run after each `document` is hydrated, but before it is serialized
+   * into an HTML string. Hook is passed the `document` and its `URL`.
+   */
+  afterHydrate?(document?: Document, url?: URL): any | Promise<any>;
+  /**
+   * Run before each `document` is hydrated. Hook is passed the `document` it's `URL`.
+   */
+  beforeHydrate?(document?: Document, url?: URL): any | Promise<any>;
+  /**
+   * Runs after the template Document object has serialize into an
+   * HTML formatted string. Returns an HTML string to be used as the
+   * base template for all prerendered pages.
+   */
+  afterSerializeTemplate?(html: string): string | Promise<string>;
+  /**
+   * Runs before the template Document object is serialize into an
+   * HTML formatted string. Returns the Document to be serialized which
+   * will become the base template html for all prerendered pages.
+   */
+  beforeSerializeTemplate?(document: Document): Document | Promise<Document>;
+  /**
+   * A hook to be used to generate the canonical `<link>` tag
+   * which goes in the `<head>` of every prerendered page. Returning `null`
+   * will not add a canonical url tag to the page.
+   */
+  canonicalUrl?(url?: URL): string | null;
+  /**
+   * While prerendering, crawl same-origin URLs found within `<a href>` elements.
+   * Defaults to `true`.
+   */
+  crawlUrls?: boolean;
+  /**
+   * URLs to start the prerendering from. By default the root URL of `/` is used.
+   */
+  entryUrls?: string[];
+  /**
+   * Return `true` the given `<a>` element should be crawled or not.
+   */
+  filterAnchor?(attrs: { [attrName: string]: string }, base?: URL): boolean;
+  /**
+   * Return `true` if the given URL should be prerendered or not.
+   */
+  filterUrl?(url?: URL, base?: URL): boolean;
+  /**
+   * Returns the file path which the prerendered HTML content
+   * should be written to.
+   */
+  filePath?(url?: URL, filePath?: string): string;
+  /**
+   * Returns the hydrate options to use for each individual prerendered page.
+   */
+  hydrateOptions?(url?: URL): PrerenderHydrateOptions;
+  /**
+   * Returns the template file's content. The template is the base
+   * HTML used for all prerendered pages.
+   */
+  loadTemplate?(filePath?: string): string | Promise<string>;
+  /**
+   * Used to normalize the page's URL from a given a string and the current
+   * page's base URL. Largely used when reading an anchor's `href` attribute
+   * value and normalizing it into a `URL`.
+   */
+  normalizeUrl?(href?: string, base?: URL): URL;
+  robotsTxt?(opts: RobotsTxtOpts): string | RobotsTxtResults;
+  sitemapXml?(opts: SitemapXmpOpts): string | SitemapXmpResults;
+  /**
+   * Static Site Generated (SSG). Does not include Stencil's clientside
+   * JavaScript, custom elements or preload modules.
+   */
+  staticSite?: boolean;
+  /**
+   * If the prerenndered URLs should have a trailing "/"" or not. Defaults to `false`.
+   */
+  trailingSlash?: boolean;
+}
+
+export interface HydrateDocumentOptions {
+  /**
+   * Sets the `href` attribute on the `<link rel="canonical">`
+   * tag within the `<head>`. If the value is not defined it will
+   * ensure a canonical link tag is no included in the `<head>`.
+   */
+  canonicalUrl?: string;
+  /**
+   * Constrain `setTimeout()` to 1ms, but still async. Also
+   * only allows `setInterval()` to fire once, also constrained to 1ms.
+   * Defaults to `true`.
+   */
+  constrainTimeouts?: boolean;
+  /**
+   * Include the HTML comments and attributes used by the clientside
+   * JavaScript to read the structure of the HTML and rebuild each
+   * component. Defaults to `true`.
+   */
+  clientHydrateAnnotations?: boolean;
+  /**
+   * Sets `document.cookie`
+   */
+  cookie?: string;
+  /**
+   * Sets the `dir` attribute on the top level `<html>`.
+   */
+  direction?: string;
+  /**
+   * Component tag names listed here will not be prerendered, nor will
+   * hydrated on the clientside. Components listed here will be ignored
+   * as custom elements and treated no differently than a `<div>`.
+   */
+  excludeComponents?: string[];
+  /**
+   * Sets the `lang` attribute on the top level `<html>`.
+   */
+  language?: string;
+  /**
+   * Maximum number of components to hydrate on one page. Defaults to `300`.
+   */
+  maxHydrateCount?: number;
+  /**
+   * Sets `document.referrer`
+   */
+  referrer?: string;
+  /**
+   * Removes every `<script>` element found in the `document`. Defaults to `false`.
+   */
+  removeScripts?: boolean;
+  /**
+   * Removes CSS not used by elements within the `document`. Defaults to `true`.
+   */
+  removeUnusedStyles?: boolean;
+  /**
+   * The url the runtime uses for the resources, such as the assets directory.
+   */
+  resourcesUrl?: string;
+  /**
+   * Prints out runtime console logs to the NodeJS process. Defaults to `false`.
+   */
+  runtimeLogging?: boolean;
+  /**
+   * Component tags listed here will only be prerendered or serverside-rendered
+   * and will not be clientside hydrated. This is useful for components that
+   * are not dynamic and do not need to be defined as a custom element within the
+   * browser. For example, a header or footer component would be a good example that
+   * may not require any clientside JavaScript.
+   */
+  staticComponents?: string[];
+  /**
+   * The amount of milliseconds to wait for a page to finish rendering until
+   * a timeout error is thrown. Defaults to `15000`.
+   */
+  timeout?: number;
+  /**
+   * Sets `document.title`.
+   */
+  title?: string;
+  /**
+   * Sets `location.href`
+   */
+  url?: string;
+  /**
+   * Sets `navigator.userAgent`
+   */
+  userAgent?: string;
+}
+
+export interface SerializeDocumentOptions extends HydrateDocumentOptions {
+  /**
+   * Runs after the `document` has been hydrated.
+   */
+  afterHydrate?(document: any): any | Promise<any>;
+  /**
+   * Sets an approximate line width the HTML should attempt to stay within.
+   * Note that this is "approximate", in that HTML may often not be able
+   * to be split at an exact line width. Additionally, new lines created
+   * is where HTML naturally already has whitespce, such as before an
+   * attribute or spaces between words. Defaults to `100`.
+   */
+  approximateLineWidth?: number;
+  /**
+   * Runs before the `document` has been hydrated.
+   */
+  beforeHydrate?(document: any): any | Promise<any>;
+  /**
+   * Format the HTML in a nicely indented format.
+   * Defaults to `false`.
+   */
+  prettyHtml?: boolean;
+  /**
+   * Remove quotes from attribute values when possible.
+   * Defaults to `true`.
+   */
+  removeAttributeQuotes?: boolean;
+  /**
+   * Remove the `=""` from standardized `boolean` attributes,
+   * such as `hidden` or `checked`. Defaults to `true`.
+   */
+  removeBooleanAttributeQuotes?: boolean;
+  /**
+   * Remove these standardized attributes when their value is empty:
+   * `class`, `dir`, `id`, `lang`, and `name`, `title`. Defaults to `true`.
+   */
+  removeEmptyAttributes?: boolean;
+  /**
+   * Remove HTML comments. Defaults to `true`.
+   */
+  removeHtmlComments?: boolean;
+}
+
+export interface HydrateFactoryOptions extends SerializeDocumentOptions {
+  serializeToHtml: boolean;
+  destroyWindow: boolean;
+  destroyDocument: boolean;
+}
+
+export interface PrerenderHydrateOptions extends SerializeDocumentOptions {
+  /**
+   * Adds `<link rel="modulepreload">` for modules that will eventually be requested.
+   * Defaults to `true`.
+   */
+  addModulePreloads?: boolean;
+  /**
+   * External stylesheets from `<link rel="stylesheet">` are instead inlined
+   * into `<style>` elements. Defaults to `true`.
+   */
+  inlineExternalStyleSheets?: boolean;
+  /**
+   * Minify CSS content within `<style>` elements. Defaults to `true`.
+   */
+  minifyStyleElements?: boolean;
+  /**
+   * Minify JavaScript content within `<script>` elements. Defaults to `true`.
+   */
+  minifyScriptElements?: boolean;
+  /**
+   * Entire `document` should be static. This is useful for specific pages that
+   * should be static, rather than the entire site. If the whole site should be static,
+   * use the `staticSite` property on the prerender config instead. If only certain
+   * components should be static then use `staticComponents` instead.
+   */
+  staticDocument?: boolean;
+}
+
+export interface RobotsTxtOpts {
+  urls: string[];
+  sitemapUrl: string;
+  baseUrl: string;
+  dir: string;
+}
+
+export interface RobotsTxtResults {
+  content: string;
+  filePath: string;
+  url: string;
+}
+
+export interface SitemapXmpOpts {
+  urls: string[];
+  baseUrl: string;
+  dir: string;
+}
+
+export interface SitemapXmpResults {
+  content: string;
+  filePath: string;
+  url: string;
+}
+
+/**
+ * Common system used by the compiler. All file reads, writes, access, etc. will all use
+ * this system. Additionally, throughout each build, the compiler will use an internal
+ * in-memory file system as to prevent unnecessary fs reads and writes. At the end of each
+ * build all actions the in-memory fs performed will be written to disk using this system.
+ * A NodeJS based system will use APIs such as `fs` and `crypto`, and a web-based system
+ * will use in-memory Maps and browser APIs. Either way, the compiler itself is unaware
+ * of the actual platform it's being ran ontop of.
+ */
 export interface CompilerSystem {
   events?: BuildEvents;
   details?: SystemDetails;
@@ -494,6 +851,10 @@ export interface CompilerSystem {
    */
   getCompilerExecutingPath(): string;
   /**
+   * Gets the full url when requesting a node_module to fetch from a CDN.
+   */
+  getRemoteModuleUrl?(module: { moduleId: string; path?: string; version?: string }): string;
+  /**
    * Aync glob task. Only available in NodeJS compiler system.
    */
   glob?(pattern: string, options: { cwd?: string; nodir?: boolean; [key: string]: any }): Promise<string[]>;
@@ -503,13 +864,13 @@ export interface CompilerSystem {
   isSymbolicLink(p: string): Promise<boolean>;
   lazyRequire?: LazyRequire;
   /**
-   * Always returns a boolean if the directory was created or not. Does not throw.
+   * Does not throw.
    */
-  mkdir(p: string, opts?: CompilerSystemMakeDirectoryOptions): Promise<boolean>;
+  mkdir(p: string, opts?: CompilerSystemMakeDirectoryOptions): Promise<CompilerSystemMakeDirectoryResults>;
   /**
-   * SYNC! Always returns a boolean if the directory was created or not. Does not throw.
+   * SYNC! Does not throw.
    */
-  mkdirSync(p: string, opts?: CompilerSystemMakeDirectoryOptions): boolean;
+  mkdirSync(p: string, opts?: CompilerSystemMakeDirectoryOptions): CompilerSystemMakeDirectoryResults;
   /**
    * Normalize file system path.
    */
@@ -539,18 +900,23 @@ export interface CompilerSystem {
    */
   removeDestory(cb: () => void): void;
   /**
+   * Rename old path to new path. Does not throw.
+   */
+  rename(oldPath: string, newPath: string): Promise<CompilerSystemRenameResults>;
+  /**
    * SYNC! Returns undefined if there's an error. Does not throw.
    */
   realpathSync(p: string): string;
+  resolveModuleId?(opts: ResolveModuleIdOptions): Promise<ResolveModuleIdResults>;
   resolvePath(p: string): string;
   /**
-   * Always returns a boolean if the directory was removed or not. Does not throw.
+   * Does not throw.
    */
-  rmdir(p: string): Promise<boolean>;
+  rmdir(p: string, opts?: CompilerSystemRemoveDirectoryOptions): Promise<CompilerSystemRemoveDirectoryResults>;
   /**
-   * SYNC! Always returns a boolean if the directory was removed or not. Does not throw.
+   * SYNC! Does not throw.
    */
-  rmdirSync(p: string): boolean;
+  rmdirSync(p: string, opts?: CompilerSystemRemoveDirectoryOptions): CompilerSystemRemoveDirectoryResults;
   /**
    * Returns undefined if stat not found. Does not throw.
    */
@@ -560,13 +926,13 @@ export interface CompilerSystem {
    */
   statSync(p: string): CompilerFsStats;
   /**
-   * Always returns a boolean if the file was removed or not. Does not throw.
+   * Does not throw.
    */
-  unlink(p: string): Promise<boolean>;
+  unlink(p: string): Promise<CompilerSystemUnlinkResults>;
   /**
-   * SYNC! Always returns a boolean if the file was removed or not. Does not throw.
+   * SYNC! Does not throw.
    */
-  unlinkSync(p: string): boolean;
+  unlinkSync(p: string): CompilerSystemUnlinkResults;
   watchDirectory?(p: string, callback: CompilerFileWatcherCallback, recursive?: boolean): CompilerFileWatcher;
   watchFile?(p: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
   /**
@@ -574,13 +940,27 @@ export interface CompilerSystem {
    */
   watchTimeout?: number;
   /**
-   * Always returns a boolean if the file was written or not. Does not throw.
+   * Does not throw.
    */
-  writeFile(p: string, content: string): Promise<boolean>;
+  writeFile(p: string, content: string): Promise<CompilerSystemWriteFileResults>;
   /**
-   * SYNC! Always returns a boolean if the file was written or not. Does not throw.
+   * SYNC! Does not throw.
    */
-  writeFileSync(p: string, content: string): boolean;
+  writeFileSync(p: string, content: string): CompilerSystemWriteFileResults;
+}
+
+export interface ResolveModuleIdOptions {
+  moduleId: string;
+  containingFile?: string;
+  exts?: string[];
+  packageFilter?: (pkg: any) => void;
+}
+
+export interface ResolveModuleIdResults {
+  moduleId: string;
+  resolveId: string;
+  pkgData: { name: string; version: string; [key: string]: any };
+  pkgDirPath: string;
 }
 
 export interface WorkerMainController {
@@ -764,7 +1144,7 @@ export interface CompilerFsStats {
 
 export interface CompilerSystemMakeDirectoryOptions {
   /**
-   * Indicates whether parent folders should be created.
+   * Indicates whether parent directories should be created.
    * @default false
    */
   recursive?: boolean;
@@ -773,6 +1153,59 @@ export interface CompilerSystemMakeDirectoryOptions {
    * @default 0o777.
    */
   mode?: number;
+}
+
+export interface CompilerSystemMakeDirectoryResults {
+  basename: string;
+  dirname: string;
+  path: string;
+  newDirs: string[];
+  error: any;
+}
+
+export interface CompilerSystemRemoveDirectoryOptions {
+  /**
+   * Indicates whether child files and subdirectories should be removed.
+   * @default false
+   */
+  recursive?: boolean;
+}
+
+export interface CompilerSystemRemoveDirectoryResults {
+  basename: string;
+  dirname: string;
+  path: string;
+  removedDirs: string[];
+  removedFiles: string[];
+  error: any;
+}
+
+export interface CompilerSystemRenameResults extends CompilerSystemRenamedPath {
+  renamed: CompilerSystemRenamedPath[];
+  oldDirs: string[];
+  oldFiles: string[];
+  newDirs: string[];
+  newFiles: string[];
+  error: any;
+}
+
+export interface CompilerSystemRenamedPath {
+  oldPath: string;
+  newPath: string;
+  isFile: boolean;
+  isDirectory: boolean;
+}
+
+export interface CompilerSystemUnlinkResults {
+  basename: string;
+  dirname: string;
+  path: string;
+  error: any;
+}
+
+export interface CompilerSystemWriteFileResults {
+  path: string;
+  error: any;
 }
 
 export interface Credentials {
@@ -987,13 +1420,6 @@ export interface JestConfig {
   watchPathIgnorePatterns?: any[];
 }
 
-export interface JestArgv extends JestConfig {
-  _: string[];
-  ci: boolean;
-  config: string;
-  maxWorkers: number;
-}
-
 export interface TestingConfig extends JestConfig {
   /**
    * The `allowableMismatchedPixels` value is used to determine an acceptable
@@ -1130,6 +1556,11 @@ export interface EmulateViewport {
   isLandscape?: boolean;
 }
 
+/**
+ * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a
+ * NodeJS based console logging and colors, and the web will use browser based
+ * logs and colors.
+ */
 export interface Logger {
   colors?: boolean;
   level: string;
@@ -1298,6 +1729,7 @@ export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNe
   empty?: boolean;
   externalRuntime?: boolean;
   copy?: CopyTask[];
+  inlineDynamicImports?: boolean;
 }
 
 export interface OutputTargetBase {
@@ -1538,6 +1970,7 @@ export interface PrerenderRequest {
   hydrateAppFilePath: string;
   isDebug: boolean;
   prerenderConfigPath: string;
+  staticSite: boolean;
   templateId: string;
   url: string;
   writeToFilePath: string;

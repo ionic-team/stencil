@@ -15,13 +15,13 @@ import {
   Diagnostic,
   FsWatcher,
   FsWriteOptions,
-  HotModuleReplacement,
   Logger,
   LoggerTimeSpan,
   OptimizeCssInput,
   OptimizeCssOutput,
   OutputTargetWww,
   PageReloadStrategy,
+  PrerenderConfig,
   PrerenderRequest,
   PrerenderResults,
   StyleDoc,
@@ -43,7 +43,7 @@ export interface AssetsMeta {
   originalComponentPath: string;
 }
 
-export interface CompileOptions {
+export interface TranspileOptions {
   /**
    * A component can be defined as a custom element by using `customelement`, or the
    * component class can be exported by using `module`. Default is `customelement`.
@@ -116,7 +116,7 @@ export interface CompileOptions {
   paths?: { [key: string]: string[] };
 }
 
-export interface CompileResults {
+export interface TranspileResults {
   code: string;
   data?: any[];
   diagnostics: Diagnostic[];
@@ -255,6 +255,8 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   safari10?: boolean;
   scriptDataOpts?: boolean;
   shadowDomShim?: boolean;
+  asyncQueue?: boolean;
+  transformTagName?: boolean;
 }
 
 export type ModuleFormat = 'amd' | 'cjs' | 'commonjs' | 'es' | 'esm' | 'iife' | 'module' | 'system' | 'umd';
@@ -268,8 +270,7 @@ export interface RollupResults {
 
 export interface BuildCtx {
   buildId: number;
-  buildResults: BuildResults;
-  buildResults_next: CompilerBuildResults;
+  buildResults: CompilerBuildResults;
   buildMessages: string[];
   bundleBuildCount: number;
   collections: Collection[];
@@ -330,36 +331,6 @@ export interface BuildStyleUpdate {
 }
 
 export type BuildTask = any;
-
-export interface BuildResults {
-  buildId: number;
-  buildConditionals: {
-    shadow: boolean;
-    slot: boolean;
-    svg: boolean;
-    vdom: boolean;
-  };
-  bundleBuildCount: number;
-  components: BuildComponent[];
-  componentGraph: Map<string, string[]>;
-  diagnostics: Diagnostic[];
-  dirsAdded: string[];
-  dirsDeleted: string[];
-  duration: number;
-  entries: BuildEntry[];
-  filesAdded: string[];
-  filesChanged: string[];
-  filesDeleted: string[];
-  filesUpdated: string[];
-  filesWritten: string[];
-  hasError: boolean;
-  hasSuccessfulBuild: boolean;
-  hmr?: HotModuleReplacement;
-  hydrateAppFilePath?: string;
-  isRebuild: boolean;
-  styleBuildCount: number;
-  transpileBuildCount: number;
-}
 
 export type BuildStatus = 'pending' | 'error' | 'disabled' | 'default';
 
@@ -854,7 +825,7 @@ export interface CompilerCtx {
   hasSuccessfulBuild: boolean;
   isActivelyBuilding: boolean;
   lastComponentStyleInput: Map<string, string>;
-  lastBuildResults: BuildResults;
+  lastBuildResults: CompilerBuildResults;
   lastBuildStyles: Map<string, string>;
   moduleMap: ModuleMap;
   nodeMap: NodeMap;
@@ -1199,13 +1170,23 @@ export interface CssVarShim {
 }
 
 export interface DevServer extends BuildEmitEvents {
+  address: string;
+  basePath: string;
   browserUrl: string;
+  protocol: string;
+  port: number;
+  root: string;
   close(): Promise<void>;
 }
 
 export interface DevServerStartResponse {
+  address: string;
+  basePath: string;
   browserUrl: string;
   initialLoadUrl: string;
+  protocol: string;
+  port: number;
+  root: string;
   error: string;
 }
 
@@ -1213,12 +1194,14 @@ export interface DevClientWindow extends Window {
   ['s-dev-server']: boolean;
   ['s-initial-load']: boolean;
   WebSocket: new (socketUrl: string, protos: string[]) => WebSocket;
+  devServerConfig?: DevClientConfig;
 }
 
 export interface DevClientConfig {
   basePath: string;
   editors: DevServerEditor[];
   reloadStrategy: PageReloadStrategy;
+  socketUrl?: string;
 }
 
 export interface HttpRequest {
@@ -1237,7 +1220,7 @@ export interface DevServerMessage {
   startServer?: DevServerConfig;
   serverStarted?: DevServerStartResponse;
   buildLog?: BuildLog;
-  buildResults?: BuildResults;
+  buildResults?: CompilerBuildResults;
   requestBuildResults?: boolean;
   error?: { message?: string; type?: string; stack?: any };
   isActivelyBuilding?: boolean;
@@ -1253,15 +1236,18 @@ export interface DevServerMessage {
 export type DevServerDestroy = () => void;
 
 export interface DevResponseHeaders {
-  'Cache-Control'?: string;
-  'Expires'?: string;
-  'Content-Type'?: string;
-  'Content-Length'?: number;
-  'Access-Control-Allow-Origin'?: string;
-  'Content-Encoding'?: 'gzip';
-  'Vary'?: 'Accept-Encoding';
-  'X-Powered-By'?: string;
-  'X-Directory-Index'?: string;
+  'cache-control'?: string;
+  'expires'?: string;
+  'content-type'?: string;
+  'content-length'?: number;
+  'date'?: string;
+  'access-control-allow-origin'?: string;
+  'access-control-expose-headers'?: string;
+  'content-encoding'?: 'gzip';
+  'vary'?: 'Accept-Encoding';
+  'server'?: string;
+  'x-directory-index'?: string;
+  'x-source'?: string;
 }
 
 export interface OpenInEditorData {
@@ -1431,6 +1417,7 @@ export interface CustomElementsDefineOptions {
   exclude?: string[];
   resourcesUrl?: string;
   syncQueue?: boolean;
+  transformTagName?: (tagName: string) => string;
   jmp?: (c: Function) => any;
   raf?: (c: FrameRequestCallback) => number;
   ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
@@ -1509,42 +1496,6 @@ export interface InMemoryFileSystem {
   clearCache(): void;
   keys(): string[];
   getMemoryStats(): string;
-}
-
-export interface HydrateDocumentOptions {
-  canonicalUrl?: string;
-  constrainTimeouts?: boolean;
-  clientHydrateAnnotations?: boolean;
-  cookie?: string;
-  direction?: string;
-  excludeComponents?: string[];
-  language?: string;
-  maxHydrateCount?: number;
-  referrer?: string;
-  removeScripts?: boolean;
-  removeUnusedStyles?: boolean;
-  resourcesUrl?: string;
-  timeout?: number;
-  title?: string;
-  url?: string;
-  userAgent?: string;
-}
-
-export interface SerializeDocumentOptions extends HydrateDocumentOptions {
-  afterHydrate?(document: any): any | Promise<any>;
-  approximateLineWidth?: number;
-  beforeHydrate?(document: any): any | Promise<any>;
-  prettyHtml?: boolean;
-  removeAttributeQuotes?: boolean;
-  removeBooleanAttributeQuotes?: boolean;
-  removeEmptyAttributes?: boolean;
-  removeHtmlComments?: boolean;
-}
-
-export interface HydrateFactoryOptions extends SerializeDocumentOptions {
-  serializeToHtml: boolean;
-  destroyWindow: boolean;
-  destroyDocument: boolean;
 }
 
 export interface HydrateResults {
@@ -1710,59 +1661,13 @@ export interface PrerenderManager {
   prerenderConfigPath: string;
   progressLogger?: ProgressLogger;
   resolve: Function;
+  staticSite: boolean;
   templateId: string;
   componentGraphPath: string;
   urlsProcessing: Set<string>;
   urlsPending: Set<string>;
   urlsCompleted: Set<string>;
   maxConcurrency: number;
-}
-
-export interface PrerenderHydrateOptions extends SerializeDocumentOptions {
-  addModulePreloads?: boolean;
-  inlineExternalStyleSheets?: boolean;
-  minifyStyleElements?: boolean;
-  minifyScriptElements?: boolean;
-}
-
-export interface PrerenderConfig {
-  afterHydrate?(document?: Document, url?: URL): any | Promise<any>;
-  beforeHydrate?(document?: Document, url?: URL): any | Promise<any>;
-  canonicalUrl?(url?: URL): string | null;
-  entryUrls?: string[];
-  filterAnchor?(attrs: { [attrName: string]: string }, base?: URL): boolean;
-  filterUrl?(url?: URL, base?: URL): boolean;
-  filePath?(url?: URL, filePath?: string): string;
-  hydrateOptions?(url?: URL): PrerenderHydrateOptions;
-  normalizeUrl?(href?: string, base?: URL): URL;
-  robotsTxt?(opts: RobotsTxtOpts): string | RobotsTxtResults;
-  sitemapXml?(opts: SitemapXmpOpts): string | SitemapXmpResults;
-  trailingSlash?: boolean;
-}
-
-export interface RobotsTxtOpts {
-  urls: string[];
-  sitemapUrl: string;
-  baseUrl: string;
-  dir: string;
-}
-
-export interface RobotsTxtResults {
-  content: string;
-  filePath: string;
-  url: string;
-}
-
-export interface SitemapXmpOpts {
-  urls: string[];
-  baseUrl: string;
-  dir: string;
-}
-
-export interface SitemapXmpResults {
-  content: string;
-  filePath: string;
-  url: string;
 }
 
 /**
@@ -1834,7 +1739,7 @@ export interface RenderNode extends HostElement {
    * Used to know the components encapsulation.
    * empty "" for shadow, "c" from scoped
    */
-  ['s-en']?: '' /*shadow*/ | 'c' /*scoped*/;
+  ['s-en']?: '' | /*shadow*/ 'c' /*scoped*/;
 }
 
 export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
@@ -2270,6 +2175,11 @@ export interface PackageJsonData {
     url?: string;
   };
   'private'?: boolean;
+  'scripts'?: {
+    [runName: string]: string;
+  };
+  'license'?: string;
+  'keywords'?: string[];
 }
 
 export interface Workbox {
@@ -2664,11 +2574,11 @@ export interface VNodeProdData {
 }
 
 export interface CompilerWorkerContext {
-  compileModule(code: string, opts: CompileOptions): Promise<CompileResults>;
+  transpile(code: string, opts: TranspileOptions): Promise<TranspileResults>;
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
   prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string; sourceMap: any; diagnostics: Diagnostic[] }>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
-  transpileToEs5(input: string, inlineHelpers: boolean): Promise<TranspileResults>;
+  transpileToEs5(input: string, inlineHelpers: boolean): Promise<TranspileToEs5Results>;
 }
 
 export interface MsgToWorker {
@@ -2725,7 +2635,7 @@ export interface WorkerContext {
   tsProgram?: any;
 }
 
-export interface TranspileResults {
+export interface TranspileToEs5Results {
   sourceFilePath: string;
   code: string;
   map: any;
@@ -2750,13 +2660,6 @@ export interface TransformOptions {
   proxy: 'defineproperty' | null;
   style: 'static' | null;
   target?: string;
-}
-
-export interface ResolveModuleIdOptions {
-  moduleId: string;
-  containingFile: string;
-  exts: string[];
-  packageFilter?: (pkg: PackageJsonData) => void;
 }
 
 export interface PlatformPath {

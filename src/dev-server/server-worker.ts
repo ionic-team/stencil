@@ -13,8 +13,13 @@ async function startServer(devServerConfig: d.DevServerConfig) {
   } catch (e) {
     sendMsg(process, {
       serverStarted: {
+        address: null,
+        basePath: null,
         browserUrl: null,
         initialLoadUrl: null,
+        port: null,
+        protocol: null,
+        root: null,
         error: String(e),
       },
     });

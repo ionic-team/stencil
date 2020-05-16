@@ -100,7 +100,8 @@ Here's an example `index.html` file that runs a Stencil app:
 <html>
 <head>
   <title>My App</title>
-  <script src="build/app.js"></script>
+  <script type="module" src="/build/app.esm.js"></script>
+  <script nomodule src="/build/app.js"></script>
 </head>
 <body>
   <my-component first="Stencil" last="JS"></my-component>

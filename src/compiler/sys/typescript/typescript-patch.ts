@@ -12,7 +12,7 @@ export const patchTypescript = async (config: d.Config, diagnostics: d.Diagnosti
 };
 
 export const patchTypescriptSync = (config: d.Config, diagnostics: d.Diagnostic[], inMemoryFs: d.InMemoryFileSystem) => {
-  const loadedTs = loadTypescriptSync(diagnostics, config.typescriptPath);
+  const loadedTs = loadTypescriptSync(config.sys, diagnostics, config.typescriptPath);
   patchTypescriptModule(config, diagnostics, inMemoryFs, loadedTs);
 };
 

@@ -23,17 +23,35 @@ export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
     outputOpts.maxHydrateCount = 300;
   }
 
+  if (typeof outputOpts.runtimeLogging !== 'boolean') {
+    outputOpts.runtimeLogging = false;
+  }
+
   if (typeof outputOpts.timeout !== 'number') {
     outputOpts.timeout = 15000;
   }
 
   if (Array.isArray(outputOpts.excludeComponents)) {
-    outputOpts.excludeComponents = outputOpts.excludeComponents.filter(c => typeof c === 'string' && c.includes('-')).map(c => c.toLowerCase());
+    outputOpts.excludeComponents = outputOpts.excludeComponents.filter(filterValidTags).map(mapValidTags);
   } else {
     outputOpts.excludeComponents = [];
   }
 
+  if (Array.isArray(outputOpts.staticComponents)) {
+    outputOpts.staticComponents = outputOpts.staticComponents.filter(filterValidTags).map(mapValidTags);
+  } else {
+    outputOpts.staticComponents = [];
+  }
+
   return outputOpts;
+}
+
+function filterValidTags(tag: string) {
+  return typeof tag === 'string' && tag.includes('-');
+}
+
+function mapValidTags(tag: string) {
+  return tag.trim().toLowerCase();
 }
 
 export function generateHydrateResults(opts: d.HydrateDocumentOptions) {
@@ -79,11 +97,11 @@ export function generateHydrateResults(opts: d.HydrateDocumentOptions) {
   return results;
 }
 
-export function renderBuildError(results: d.HydrateResults, msg: string) {
+export function renderBuildDiagnostic(results: d.HydrateResults, level: 'error' | 'warn' | 'info' | 'log' | 'debug', header: string, msg: string) {
   const diagnostic: d.Diagnostic = {
-    level: 'error',
+    level: level,
     type: 'build',
-    header: 'Hydrate Error',
+    header: header,
     messageText: msg,
     relFilePath: null,
     absFilePath: null,
@@ -100,6 +118,10 @@ export function renderBuildError(results: d.HydrateResults, msg: string) {
 
   results.diagnostics.push(diagnostic);
   return diagnostic;
+}
+
+export function renderBuildError(results: d.HydrateResults, msg: string) {
+  return renderBuildDiagnostic(results, 'error', 'Hydrate Error', msg);
 }
 
 export function renderCatchError(results: d.HydrateResults, err: any) {

@@ -1,7 +1,8 @@
 import * as d from '../../../declarations';
-import { basename, resolve } from 'path';
+import { basename, join, resolve } from 'path';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
-import { isBoolean, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, noop } from '@utils';
+import { isBoolean, isString, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, noop, normalizePath } from '@utils';
+import { isExternalUrl } from '../fetch/fetch-utils';
 import { TypeScriptModule } from './typescript-load';
 import ts from 'typescript';
 
@@ -17,7 +18,7 @@ export const patchTypeScriptSys = (loadedTs: TypeScriptModule, config: d.Config,
 export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, tsSys: ts.System) => {
   const realpath = (path: string) => {
     const rp = stencilSys.realpathSync(path);
-    if (rp) {
+    if (isString(rp)) {
       return rp;
     }
     return path;
@@ -50,7 +51,9 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
     }
   };
 
-  tsSys.createDirectory = p => stencilSys.mkdirSync(p);
+  tsSys.createDirectory = p => {
+    stencilSys.mkdirSync(p);
+  };
 
   tsSys.directoryExists = p => {
     const s = inMemoryFs.statSync(p);
@@ -58,8 +61,14 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
   };
 
   tsSys.fileExists = p => {
-    const s = inMemoryFs.statSync(p);
-    return s.isFile;
+    let filePath = p;
+
+    if (isExternalUrl(p)) {
+      filePath = getTypescriptPathFromUrl(config.rootDir, tsSys.getExecutingFilePath(), p);
+    }
+
+    const s = inMemoryFs.statSync(filePath);
+    return !!(s && s.isFile);
   };
 
   tsSys.getDirectories = p => {
@@ -76,14 +85,20 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
   };
 
   tsSys.readFile = p => {
-    const isUrl = p.startsWith('https:') || p.startsWith('http:');
-    let content = inMemoryFs.readFileSync(p, { useCache: isUrl });
+    let filePath = p;
+    const isUrl = isExternalUrl(p);
+
+    if (isUrl) {
+      filePath = getTypescriptPathFromUrl(config.rootDir, tsSys.getExecutingFilePath(), p);
+    }
+
+    let content = inMemoryFs.readFileSync(filePath, { useCache: isUrl });
 
     if (typeof content !== 'string' && isUrl) {
       if (IS_WEB_WORKER_ENV) {
         content = fetchUrlSync(p);
         if (typeof content === 'string') {
-          inMemoryFs.writeFile(p, content);
+          inMemoryFs.writeFile(filePath, content);
         }
       } else {
         config.logger.error(`ts.sys can only request http resources from within a web worker: ${p}`);
@@ -130,6 +145,16 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
       },
     };
   };
+};
+
+export const getTypescriptPathFromUrl = (rootDir: string, tsExecutingUrl: string, url: string) => {
+  const tsBaseUrl = new URL('..', tsExecutingUrl).href;
+  if (url.startsWith(tsBaseUrl)) {
+    const tsFilePath = url.replace(tsBaseUrl, '/');
+    const tsNodePath = join(rootDir, 'node_modules', 'typescript', tsFilePath);
+    return normalizePath(tsNodePath);
+  }
+  return url;
 };
 
 export const patchTsSystemUtils = (tsSys: ts.System) => {

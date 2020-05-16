@@ -33,7 +33,7 @@ export async function serveOpenInEditor(devServerConfig: d.DevServerConfig, sys:
   res.writeHead(
     status,
     util.responseHeaders({
-      'Content-Type': 'application/json',
+      'content-type': 'application/json; charset=utf-8',
     }),
   );
 

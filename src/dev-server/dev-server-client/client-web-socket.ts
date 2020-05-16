@@ -1,9 +1,7 @@
 import * as d from '../../declarations';
-import { emitBuildLog, emitBuildResults, emitBuildStatus } from './build-events';
-import { logDisabled, logReload, logWarn } from './logger';
+import { emitBuildLog, emitBuildResults, emitBuildStatus, logDisabled, logReload, logWarn } from '../client';
 
-export function initClientWebSocket(win: d.DevClientWindow) {
-  const wsUrl = getSocketUrl(win.location);
+export const initClientWebSocket = (win: d.DevClientWindow, config: d.DevClientConfig) => {
   let clientWs: WebSocket;
   let reconnectTmrId: any;
   let reconnectAttempts = 0;
@@ -104,7 +102,7 @@ export function initClientWebSocket(win: d.DevClientWindow) {
     clearTimeout(reconnectTmrId);
 
     // have the browser open a web socket with the server
-    clientWs = new win.WebSocket(wsUrl, ['xmpp']);
+    clientWs = new win.WebSocket(config.socketUrl, ['xmpp']);
 
     // add all our event listeners to our new web socket
     clientWs.addEventListener('open', onOpen);
@@ -151,11 +149,7 @@ export function initClientWebSocket(win: d.DevClientWindow) {
   // let's do this!
   // try to connect up with our web socket server
   connect();
-}
-
-function getSocketUrl(location: Location) {
-  return `${location.protocol === 'https:' ? `wss:` : `ws:`}//${location.hostname}:${location.port}/`;
-}
+};
 
 const RECONNECT_ATTEMPTS = 1000;
 const RECONNECT_RETRY_MS = 2500;

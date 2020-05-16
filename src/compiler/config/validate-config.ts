@@ -38,6 +38,8 @@ export const validateConfig = (userConfig?: Config) => {
   config.extras.scriptDataOpts = config.extras.scriptDataOpts !== false;
   config.extras.shadowDomShim = config.extras.shadowDomShim !== false;
   config.extras.slotChildNodesFix = !!config.extras.slotChildNodesFix;
+  config.extras.initializeNextTick = config.extras.initializeNextTick !== false;
+  config.extras.tagNameTransform = !!config.extras.tagNameTransform;
 
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
@@ -54,6 +56,13 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'autoprefixCss', null, config.buildEs5);
   setBooleanConfig(config, 'validateTypes', null, !config._isTesting);
   setBooleanConfig(config, 'allowInlineScripts', null, true);
+
+  if (typeof config.taskQueue !== 'string') {
+    config.taskQueue = 'congestionAsync';
+  } else if (config.taskQueue === ('sync' as any)) {
+    // deprecated 1.12.1
+    config.taskQueue = 'immediate';
+  }
 
   // hash file names
   if (!isBoolean(config.hashFileNames)) {

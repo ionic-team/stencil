@@ -3,8 +3,8 @@ import { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
 import { generateEntryModules } from '../../entries/entry-modules';
-import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
-import { isOutputTargetDistLazy, isOutputTargetHydrate, isOutputTargetAngular } from '../output-utils';
+import { getLazyBuildConditionals } from './lazy-build-conditionals';
+import { isOutputTargetDistLazy } from '../output-utils';
 import { LAZY_BROWSER_ENTRY_ID, LAZY_EXTERNAL_ENTRY_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
 import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
 import { generateCjs } from './generate-cjs';
@@ -71,22 +71,6 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
   timespan.finish(`generate lazy finished`);
 };
 
-const getLazyBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
-  const build = getBuildFeatures(cmps) as d.BuildConditionals;
-
-  build.lazyLoad = true;
-  build.hydrateServerSide = false;
-  build.cssVarShim = config.extras.cssVarsShim;
-  build.initializeNextTick = config.outputTargets.some(isOutputTargetAngular);
-
-  const hasHydrateOutputTargets = config.outputTargets.some(isOutputTargetHydrate);
-  build.hydrateClientSide = hasHydrateOutputTargets;
-
-  updateBuildConditionals(config, build);
-
-  return build;
-};
-
 const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
@@ -113,10 +97,13 @@ const getLazyEntry = (isBrowser: boolean) => {
   } else {
     s.append(`import { patchEsm } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
     s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
-    s.append(`export const defineCustomElements = (win, options) => patchEsm().then(() => {\n`);
-    s.append(`  globalScripts();\n`);
-    s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
-    s.append(`});\n`);
+    s.append(`export const defineCustomElements = (win, options) => {\n`);
+    s.append(`  if (typeof window === 'undefined') return Promise.resolve();\n`);
+    s.append(`  return patchEsm().then(() => {\n`);
+    s.append(`    globalScripts();\n`);
+    s.append(`    return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
+    s.append(`  });\n`);
+    s.append(`};\n`);
   }
 
   return s.toString();

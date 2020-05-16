@@ -6,7 +6,7 @@ import { patchTsSystemUtils } from './typescript-sys';
 import ts from 'typescript';
 
 export const loadTypescript = async (sys: d.CompilerSystem, diagnostics: d.Diagnostic[], typescriptPath: string) => {
-  const tsSync = loadTypescriptSync(diagnostics, typescriptPath);
+  const tsSync = loadTypescriptSync(sys, diagnostics, typescriptPath);
   if (tsSync != null) {
     return tsSync;
   }
@@ -14,7 +14,7 @@ export const loadTypescript = async (sys: d.CompilerSystem, diagnostics: d.Diagn
   if (IS_FETCH_ENV) {
     try {
       // browser main thread
-      const tsUrl = typescriptPath || getRemoteTypeScriptUrl();
+      const tsUrl = typescriptPath || getRemoteTypeScriptUrl(sys);
       const rsp = await httpFetch(sys, tsUrl);
       const content = await rsp.text();
       const getTsFunction = new Function(content + ';return ts;');
@@ -31,7 +31,7 @@ export const loadTypescript = async (sys: d.CompilerSystem, diagnostics: d.Diagn
   return null;
 };
 
-export const loadTypescriptSync = (diagnostics: d.Diagnostic[], typescriptPath: string): TypeScriptModule => {
+export const loadTypescriptSync = (sys: d.CompilerSystem, diagnostics: d.Diagnostic[], typescriptPath: string): TypeScriptModule => {
   try {
     if ((ts as TypeScriptModule).__loaded) {
       // already loaded
@@ -60,7 +60,7 @@ export const loadTypescriptSync = (diagnostics: d.Diagnostic[], typescriptPath: 
       // browser web worker
       // doing this before the globalThis check cuz we'd
       // rather ensure we're using a valid typescript version
-      const tsUrl = typescriptPath || getRemoteTypeScriptUrl();
+      const tsUrl = typescriptPath || getRemoteTypeScriptUrl(sys);
       // importScripts() will be synchronous within a web worker
       (self as any).importScripts(tsUrl);
       const webWorkerTs = getLoadedTs((self as any).ts, 'importScripts', tsUrl);

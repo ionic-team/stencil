@@ -9,4 +9,5 @@ export interface BundleOptions {
   inputs: { [entryKey: string]: string };
   loader?: { [id: string]: string };
   inlineDynamicImports?: boolean;
+  inlineWorkers?: boolean;
 }

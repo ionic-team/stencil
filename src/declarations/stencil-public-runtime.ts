@@ -706,6 +706,7 @@ export namespace JSXBase {
   export interface SlotAttributes {
     name?: string;
     slot?: string;
+    onSlotchange?: (event: Event) => void;
   }
 
   export interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -776,6 +777,7 @@ export namespace JSXBase {
 
   export interface DetailsHTMLAttributes<T> extends HTMLAttributes<T> {
     open?: boolean;
+    onToggle?: (event: Event) => void;
   }
 
   export interface DelHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -901,7 +903,6 @@ export namespace JSXBase {
     formtarget?: string;
     height?: number | string;
     indeterminate?: boolean;
-    inputmode?: string;
     list?: string;
     max?: number | string;
     maxLength?: number;
@@ -955,6 +956,7 @@ export namespace JSXBase {
   }
 
   export interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
+    as?: string;
     href?: string;
     hrefLang?: string;
     hreflang?: string;
@@ -1204,8 +1206,7 @@ export namespace JSXBase {
     hidden?: boolean;
     id?: string;
     lang?: string;
-    spellCheck?: boolean;
-    spellcheck?: boolean | string;
+    spellcheck?: 'true' | 'false';
     style?: { [key: string]: string | undefined };
     tabIndex?: number;
     tabindex?: number | string;
@@ -1214,10 +1215,11 @@ export namespace JSXBase {
     // Unknown
     inputMode?: string;
     inputmode?: string;
+    enterKeyHint?: string;
+    enterkeyhint?: string;
     is?: string;
     radioGroup?: string; // <command>, <menuitem>
     radiogroup?: string;
-    part?: string;
 
     // WAI-ARIA
     role?: string;
@@ -1295,27 +1297,27 @@ export namespace JSXBase {
       | 'hanging'
       | 'mathematical'
       | 'inherit';
-    'allow-reorder'?: 'no' | 'yes';
+    'allowReorder'?: 'no' | 'yes';
     'alphabetic'?: number | string;
     'amplitude'?: number | string;
     'arabic-form'?: 'initial' | 'medial' | 'terminal' | 'isolated';
     'ascent'?: number | string;
-    'attribute-name'?: string;
-    'attribute-type'?: string;
-    'auto-reverse'?: number | string;
+    'attributeName'?: string;
+    'attributeType'?: string;
+    'autoReverse'?: number | string;
     'azimuth'?: number | string;
-    'base-frequency'?: number | string;
+    'baseFrequency'?: number | string;
     'baseline-shift'?: number | string;
     'baseProfile'?: number | string;
     'bbox'?: number | string;
     'begin'?: number | string;
     'bias'?: number | string;
     'by'?: number | string;
-    'calc-mode'?: number | string;
+    'calcMode'?: number | string;
     'cap-height'?: number | string;
     'clip'?: number | string;
     'clip-path'?: string;
-    'clip-path-units'?: number | string;
+    'clipPathUnits'?: number | string;
     'clip-rule'?: number | string;
     'color-interpolation'?: number | string;
     'color-interpolation-filters'?: 'auto' | 's-rGB' | 'linear-rGB' | 'inherit';
@@ -1329,7 +1331,7 @@ export namespace JSXBase {
     'd'?: string;
     'decelerate'?: number | string;
     'descent'?: number | string;
-    'diffuse-constant'?: number | string;
+    'diffuseConstant'?: number | string;
     'direction'?: number | string;
     'display'?: number | string;
     'divisor'?: number | string;
@@ -1342,13 +1344,13 @@ export namespace JSXBase {
     'enable-background'?: number | string;
     'end'?: number | string;
     'exponent'?: number | string;
-    'external-resources-required'?: number | string;
+    'externalResourcesRequired'?: number | string;
     'fill'?: string;
     'fill-opacity'?: number | string;
     'fill-rule'?: 'nonzero' | 'evenodd' | 'inherit';
     'filter'?: string;
-    'filter-res'?: number | string;
-    'filter-units'?: number | string;
+    'filterRes'?: number | string;
+    'filterUnits'?: number | string;
     'flood-color'?: number | string;
     'flood-opacity'?: number | string;
     'focusable'?: number | string;
@@ -1368,12 +1370,13 @@ export namespace JSXBase {
     'glyph-name'?: number | string;
     'glyph-orientation-horizontal'?: number | string;
     'glyph-orientation-vertical'?: number | string;
-    'glyph-ref'?: number | string;
-    'gradient-transform'?: string;
-    'gradient-units'?: string;
+    'glyphRef'?: number | string;
+    'gradientTransform'?: string;
+    'gradientUnits'?: string;
     'hanging'?: number | string;
     'horiz-adv-x'?: number | string;
     'horiz-origin-x'?: number | string;
+    'href'?: string,
     'ideographic'?: number | string;
     'image-rendering'?: number | string;
     'in2'?: number | string;
@@ -1384,29 +1387,29 @@ export namespace JSXBase {
     'k3'?: number | string;
     'k4'?: number | string;
     'k'?: number | string;
-    'kernel-matrix'?: number | string;
-    'kernel-unit-length'?: number | string;
+    'kernelMatrix'?: number | string;
+    'kernelUnitLength'?: number | string;
     'kerning'?: number | string;
-    'key-points'?: number | string;
-    'key-splines'?: number | string;
-    'key-times'?: number | string;
-    'length-adjust'?: number | string;
+    'keyPoints'?: number | string;
+    'keySplines'?: number | string;
+    'keyTimes'?: number | string;
+    'lengthAdjust'?: number | string;
     'letter-spacing'?: number | string;
     'lighting-color'?: number | string;
-    'limiting-cone-angle'?: number | string;
+    'limitingConeAngle'?: number | string;
     'local'?: number | string;
     'marker-end'?: string;
-    'marker-height'?: number | string;
+    'markerHeight'?: number | string;
     'marker-mid'?: string;
     'marker-start'?: string;
-    'marker-units'?: number | string;
-    'marker-width'?: number | string;
+    'markerUnits'?: number | string;
+    'markerWidth'?: number | string;
     'mask'?: string;
-    'mask-content-units'?: number | string;
-    'mask-units'?: number | string;
+    'maskContentUnits'?: number | string;
+    'maskUnits'?: number | string;
     'mathematical'?: number | string;
     'mode'?: number | string;
-    'num-octaves'?: number | string;
+    'numOctaves'?: number | string;
     'offset'?: number | string;
     'opacity'?: number | string;
     'operator'?: number | string;
@@ -1419,27 +1422,27 @@ export namespace JSXBase {
     'overline-thickness'?: number | string;
     'paint-order'?: number | string;
     'panose1'?: number | string;
-    'path-length'?: number | string;
-    'pattern-content-units'?: string;
-    'pattern-transform'?: number | string;
-    'pattern-units'?: string;
+    'pathLength'?: number | string;
+    'patternContentUnits'?: string;
+    'patternTransform'?: number | string;
+    'patternUnits'?: string;
     'pointer-events'?: number | string;
     'points'?: string;
-    'points-at-x'?: number | string;
-    'points-at-y'?: number | string;
-    'points-at-z'?: number | string;
-    'preserve-alpha'?: number | string;
+    'pointsAtX'?: number | string;
+    'pointsAtY'?: number | string;
+    'pointsAtZ'?: number | string;
+    'preserveAlpha'?: number | string;
     'preserveAspectRatio'?: string;
-    'primitive-units'?: number | string;
+    'primitiveUnits'?: number | string;
     'r'?: number | string;
     'radius'?: number | string;
     'ref-x'?: number | string;
     'ref-y'?: number | string;
     'rendering-intent'?: number | string;
-    'repeat-count'?: number | string;
-    'repeat-dur'?: number | string;
-    'required-extensions'?: number | string;
-    'required-features'?: number | string;
+    'repeatCount'?: number | string;
+    'repeatDur'?: number | string;
+    'requiredextensions'?: number | string;
+    'requiredFeatures'?: number | string;
     'restart'?: number | string;
     'result'?: string;
     'rotate'?: number | string;
@@ -1450,15 +1453,15 @@ export namespace JSXBase {
     'shape-rendering'?: number | string;
     'slope'?: number | string;
     'spacing'?: number | string;
-    'specular-constant'?: number | string;
-    'specular-exponent'?: number | string;
+    'specularConstant'?: number | string;
+    'specularExponent'?: number | string;
     'speed'?: number | string;
-    'spread-method'?: string;
-    'start-offset'?: number | string;
-    'std-deviation'?: number | string;
+    'spreadMethod'?: string;
+    'startOffset'?: number | string;
+    'stdDeviation'?: number | string;
     'stemh'?: number | string;
     'stemv'?: number | string;
-    'stitch-tiles'?: number | string;
+    'stitchTiles'?: number | string;
     'stop-color'?: string;
     'stop-opacity'?: number | string;
     'strikethrough-position'?: number | string;
@@ -1472,14 +1475,14 @@ export namespace JSXBase {
     'stroke-miterlimit'?: string;
     'stroke-opacity'?: number | string;
     'stroke-width'?: number | string;
-    'surface-scale'?: number | string;
-    'system-language'?: number | string;
-    'table-values'?: number | string;
-    'target-x'?: number | string;
-    'target-y'?: number | string;
+    'surfaceScale'?: number | string;
+    'systemLanguage'?: number | string;
+    'tableValues'?: number | string;
+    'targetX'?: number | string;
+    'targetY'?: number | string;
     'text-anchor'?: string;
     'text-decoration'?: number | string;
-    'text-length'?: number | string;
+    'textLength'?: number | string;
     'text-rendering'?: number | string;
     'to'?: number | string;
     'transform'?: string;
@@ -1501,7 +1504,7 @@ export namespace JSXBase {
     'v-hanging'?: number | string;
     'v-ideographic'?: number | string;
     'viewBox'?: string;
-    'view-target'?: number | string;
+    'viewTarget'?: number | string;
     'visibility'?: number | string;
     'v-mathematical'?: number | string;
     'widths'?: number | string;
@@ -1512,22 +1515,21 @@ export namespace JSXBase {
     'x'?: number | string;
     'x-channel-selector'?: string;
     'x-height'?: number | string;
-    'xlink-actuate'?: string;
-    'xlink-arcrole'?: string;
-    'xlink-href'?: string;
-    'xlink-role'?: string;
-    'xlink-show'?: string;
-    'xlink-title'?: string;
-    'xlink-type'?: string;
-    'xml-base'?: string;
-    'xml-lang'?: string;
+    'xlinkActuate'?: string;
+    'xlinkArcrole'?: string;
+    'xlinkHref'?: string;
+    'xlinkRole'?: string;
+    'xlinkShow'?: string;
+    'xlinkTitle'?: string;
+    'xlinkType'?: string;
+    'xmlBase'?: string;
+    'xmlLang'?: string;
     'xmlns'?: string;
-    'xmlns-xlink'?: string;
-    'xml-space'?: string;
+    'xmlSpace'?: string;
     'y1'?: number | string;
     'y2'?: number | string;
     'y'?: number | string;
-    'y-channel-selector'?: string;
+    'yChannelSelector'?: string;
     'z'?: number | string;
     'zoomAndPan'?: string;
   }
@@ -1538,6 +1540,8 @@ export namespace JSXBase {
 
     ref?: (elm?: T) => void;
     slot?: string;
+    part?: string;
+    exportparts?: string;
 
     // Clipboard Events
     onCopy?: (event: ClipboardEvent) => void;

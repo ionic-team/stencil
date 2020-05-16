@@ -1,8 +1,23 @@
-import { CompilerFileWatcherCallback, CompilerFsStats, CompilerSystem, CompilerSystemMakeDirectoryOptions, CopyResults, CopyTask, SystemDetails } from '../../declarations';
+import {
+  CompilerFileWatcherCallback,
+  CompilerSystemRemoveDirectoryOptions,
+  CompilerFsStats,
+  CompilerSystem,
+  CompilerSystemMakeDirectoryOptions,
+  CompilerSystemMakeDirectoryResults,
+  CopyResults,
+  CopyTask,
+  SystemDetails,
+  CompilerSystemRemoveDirectoryResults,
+  CompilerSystemWriteFileResults,
+  CompilerSystemRenameResults,
+  CompilerSystemUnlinkResults,
+} from '../../declarations';
 import { basename, dirname } from 'path';
 import { buildEvents } from '../events';
 import { createWebWorkerMainController } from './worker/web-worker-main';
-import { HAS_WEB_WORKER, IS_NODE_ENV, IS_WEB_WORKER_ENV, normalizePath } from '@utils';
+import { HAS_WEB_WORKER, IS_NODE_ENV, IS_WEB_WORKER_ENV, normalizePath, isRootPath } from '@utils';
+import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 
 export const createSystem = () => {
   const items = new Map<string, FsItem>();
@@ -71,29 +86,44 @@ export const createSystem = () => {
     throw new Error('unable to find executing path');
   };
 
-  const isSymbolicLink = (_p: string) =>
-    new Promise<boolean>(resolve => {
-      resolve(false);
-    });
+  const isSymbolicLink = async (_p: string) => false;
 
-  const mkdirSync = (p: string, _opts?: CompilerSystemMakeDirectoryOptions) => {
+  const mkdirSync = (p: string, opts?: CompilerSystemMakeDirectoryOptions) => {
     p = normalize(p);
+    const results: CompilerSystemMakeDirectoryResults = {
+      basename: basename(p),
+      dirname: dirname(p),
+      path: p,
+      newDirs: [],
+      error: null,
+    };
+    mkdirRecursiveSync(p, opts, results);
+    return results;
+  };
+
+  const mkdirRecursiveSync = (p: string, opts: CompilerSystemMakeDirectoryOptions, results: CompilerSystemMakeDirectoryResults) => {
+    const parentDir = dirname(p);
+
+    if (opts && opts.recursive && !isRootPath(parentDir)) {
+      mkdirRecursiveSync(parentDir, opts, results);
+    }
+
     const item = items.get(p);
     if (!item) {
       items.set(p, {
         basename: basename(p),
-        dirname: dirname(p),
+        dirname: parentDir,
         isDirectory: true,
         isFile: false,
         watcherCallbacks: null,
         data: undefined,
       });
+      results.newDirs.push(p);
       emitDirectoryWatch(p, new Set());
     } else {
       item.isDirectory = true;
       item.isFile = false;
     }
-    return true;
   };
 
   const mkdir = async (p: string, opts?: CompilerSystemMakeDirectoryOptions) => mkdirSync(p, opts);
@@ -133,16 +163,153 @@ export const createSystem = () => {
 
   const realpath = async (p: string) => realpathSync(p);
 
-  const resolvePath = (p: string) => normalize(p);
+  const rename = async (oldPath: string, newPath: string) => {
+    oldPath = normalizePath(oldPath);
+    newPath = normalizePath(newPath);
 
-  const rmdirSync = (p: string) => {
-    p = normalize(p);
-    items.delete(p);
-    emitDirectoryWatch(p, new Set());
-    return true;
+    const results: CompilerSystemRenameResults = {
+      oldPath,
+      newPath,
+      renamed: [],
+      oldDirs: [],
+      oldFiles: [],
+      newDirs: [],
+      newFiles: [],
+      isFile: false,
+      isDirectory: false,
+      error: null,
+    };
+
+    const stats = statSync(oldPath);
+
+    if (stats) {
+      if (stats.isFile()) {
+        results.isFile = true;
+      } else if (stats.isDirectory()) {
+        results.isDirectory = true;
+      }
+
+      renameNewRecursiveSync(oldPath, newPath, results);
+
+      if (!results.error) {
+        if (results.isDirectory) {
+          const rmdirResults = rmdirSync(oldPath, { recursive: true });
+          if (rmdirResults.error) {
+            results.error = rmdirResults.error;
+          } else {
+            results.oldDirs.push(...rmdirResults.removedDirs);
+            results.oldFiles.push(...rmdirResults.removedFiles);
+          }
+        } else if (results.isFile) {
+          const unlinkResults = unlinkSync(oldPath);
+          if (unlinkResults.error) {
+            results.error = unlinkResults.error;
+          } else {
+            results.oldFiles.push(oldPath);
+          }
+        }
+      }
+    } else {
+      results.error = `${oldPath} does not exist`;
+    }
+
+    return results;
   };
 
-  const rmdir = async (p: string) => rmdirSync(p);
+  const renameNewRecursiveSync = (oldPath: string, newPath: string, results: CompilerSystemRenameResults) => {
+    const itemStat = statSync(oldPath);
+    if (itemStat && !results.error) {
+      if (itemStat.isFile()) {
+        const newFileParentDir = dirname(newPath);
+        const mkdirResults = mkdirSync(newFileParentDir, { recursive: true });
+        const fileContent = items.get(oldPath).data;
+        const writeResults = writeFileSync(newPath, fileContent);
+
+        results.newDirs.push(...mkdirResults.newDirs);
+        results.renamed.push({
+          oldPath,
+          newPath,
+          isDirectory: false,
+          isFile: true,
+        });
+
+        if (writeResults.error) {
+          results.error = writeResults.error;
+        } else {
+          results.newFiles.push(newPath);
+        }
+      } else if (itemStat.isDirectory()) {
+        const oldDirItemChildPaths = readdirSync(oldPath);
+        const mkdirResults = mkdirSync(newPath, { recursive: true });
+        results.newDirs.push(...mkdirResults.newDirs);
+        results.renamed.push({
+          oldPath,
+          newPath,
+          isDirectory: true,
+          isFile: false,
+        });
+
+        for (const oldDirItemChildPath of oldDirItemChildPaths) {
+          const newDirItemChildPath = oldDirItemChildPath.replace(oldPath, newPath);
+          renameNewRecursiveSync(oldDirItemChildPath, newDirItemChildPath, results);
+        }
+      }
+    }
+  };
+
+  const resolvePath = (p: string) => normalize(p);
+
+  const rmdirSync = (p: string, opts: CompilerSystemRemoveDirectoryOptions = {}) => {
+    const results: CompilerSystemRemoveDirectoryResults = {
+      basename: basename(p),
+      dirname: dirname(p),
+      path: p,
+      removedDirs: [],
+      removedFiles: [],
+      error: null,
+    };
+
+    rmdirSyncRecursive(p, opts, results);
+
+    return results;
+  };
+
+  const rmdirSyncRecursive = (p: string, opts: CompilerSystemRemoveDirectoryOptions, results: CompilerSystemRemoveDirectoryResults) => {
+    if (!results.error) {
+      p = normalize(p);
+
+      const dirItemPaths = readdirSync(p);
+
+      if (opts && opts.recursive) {
+        for (const dirItemPath of dirItemPaths) {
+          const item = items.get(dirItemPath);
+          if (item) {
+            if (item.isDirectory) {
+              rmdirSyncRecursive(dirItemPath, opts, results);
+            } else if (item.isFile) {
+              const unlinkResults = unlinkSync(dirItemPath);
+              if (unlinkResults.error) {
+                results.error = unlinkResults.error;
+              } else {
+                results.removedFiles.push(dirItemPath);
+              }
+            }
+          }
+        }
+      } else {
+        if (dirItemPaths.length > 0) {
+          results.error = `cannot delete directory that contains files/subdirectories`;
+          return;
+        }
+      }
+
+      items.delete(p);
+      emitDirectoryWatch(p, new Set());
+      results.removedDirs.push(p);
+    }
+  };
+
+  const rmdir = async (p: string, opts: CompilerSystemRemoveDirectoryOptions = {}) => rmdirSync(p, opts);
 
   const statSync = (p: string) => {
     p = normalize(p);
@@ -163,17 +330,23 @@ export const createSystem = () => {
 
   const unlinkSync = (p: string) => {
     p = normalize(p);
+    const results: CompilerSystemUnlinkResults = {
+      basename: basename(p),
+      dirname: dirname(p),
+      path: p,
+      error: null,
+    };
     const item = items.get(p);
     if (item) {
       if (item.watcherCallbacks) {
-        item.watcherCallbacks.forEach(watcherCallback => {
+        for (const watcherCallback of item.watcherCallbacks) {
           watcherCallback(p, 'fileDelete');
-        });
+        }
       }
       items.delete(p);
       emitDirectoryWatch(p, new Set());
     }
-    return true;
+    return results;
   };
 
   const unlink = async (p: string) => unlinkSync(p);
@@ -263,9 +436,9 @@ export const createSystem = () => {
     const dirItem = items.get(parentDir);
 
     if (dirItem && dirItem.isDirectory && dirItem.watcherCallbacks) {
-      dirItem.watcherCallbacks.forEach(watcherCallback => {
+      for (const watcherCallback of dirItem.watcherCallbacks) {
         watcherCallback(p, null);
-      });
+      }
     }
     if (!emitted.has(parentDir)) {
       emitted.add(parentDir);
@@ -275,14 +448,18 @@ export const createSystem = () => {
 
   const writeFileSync = (p: string, data: string) => {
     p = normalize(p);
+    const results: CompilerSystemWriteFileResults = {
+      path: p,
+      error: null,
+    };
     const item = items.get(p);
     if (item) {
       const hasChanged = item.data !== data;
       item.data = data;
       if (hasChanged && item.watcherCallbacks) {
-        item.watcherCallbacks.forEach(watcherCallback => {
+        for (const watcherCallback of item.watcherCallbacks) {
           watcherCallback(p, 'fileUpdate');
-        });
+        }
       }
     } else {
       items.set(p, {
@@ -296,8 +473,10 @@ export const createSystem = () => {
 
       emitDirectoryWatch(p, new Set());
     }
-    return true;
+    return results;
   };
+
+  const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
   const generateContentHash = async (content: string) => {
     const arrayBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(content));
@@ -308,8 +487,6 @@ export const createSystem = () => {
     }
     return hashHex;
   };
-
-  const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
   const copy = async (copyTasks: Required<CopyTask>[], srcDir: string) => {
     const results: CopyResults = {
@@ -347,6 +524,7 @@ export const createSystem = () => {
     realpath,
     realpathSync,
     removeDestory,
+    rename,
     resolvePath,
     rmdir,
     rmdirSync,
@@ -363,6 +541,8 @@ export const createSystem = () => {
     details: getDetails(),
     copy,
   };
+
+  sys.resolveModuleId = opts => resolveModuleIdAsync(sys, null, opts);
 
   return sys;
 };

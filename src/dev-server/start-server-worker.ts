@@ -13,7 +13,6 @@ export async function startDevServerWorker(prcs: NodeJS.Process, devServerConfig
   try {
     const sys = createNodeSys(prcs);
     const destroys: d.DevServerDestroy[] = [];
-
     devServerConfig.editors = await getEditors();
 
     // create the http server listening for and responding to requests from the browser
@@ -31,7 +30,12 @@ export async function startDevServerWorker(prcs: NodeJS.Process, devServerConfig
     // process that the server has successfully started up
     sendMsg(prcs, {
       serverStarted: {
+        address: devServerConfig.address,
+        basePath: devServerConfig.basePath,
         browserUrl: getBrowserUrl(devServerConfig.protocol, devServerConfig.address, devServerConfig.port, devServerConfig.basePath, '/'),
+        port: devServerConfig.port,
+        protocol: devServerConfig.protocol,
+        root: devServerConfig.root,
         initialLoadUrl: getBrowserUrl(
           devServerConfig.protocol,
           devServerConfig.address,
@@ -66,8 +70,13 @@ export async function startDevServerWorker(prcs: NodeJS.Process, devServerConfig
     if (!hasStarted) {
       sendMsg(prcs, {
         serverStarted: {
+          address: null,
+          basePath: null,
           browserUrl: null,
           initialLoadUrl: null,
+          port: null,
+          protocol: null,
+          root: null,
           error: String(e),
         },
       });
