@@ -8,6 +8,9 @@ export const fileLoadPlugin = (fs: d.InMemoryFileSystem): Plugin => {
 
     load(id) {
       const fsFilePath = normalizeFsPath(id);
+      if (id.endsWith('.d.ts')) {
+        return '';
+      }
       return fs.readFile(fsFilePath);
     },
   };

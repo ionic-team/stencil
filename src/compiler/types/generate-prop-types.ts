@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { getTextDocs, isDocsPublic } from '@utils';
+import { getTextDocs } from '@utils';
 
 export const generatePropTypes = (cmpMeta: d.ComponentCompilerMeta): d.TypeInfo => {
   return [
@@ -8,7 +8,7 @@ export const generatePropTypes = (cmpMeta: d.ComponentCompilerMeta): d.TypeInfo 
       type: cmpProp.complexType.original,
       optional: cmpProp.optional,
       required: cmpProp.required,
-      public: isDocsPublic(cmpProp.docs),
+      internal: cmpProp.internal,
       jsdoc: getTextDocs(cmpProp.docs),
     })),
     ...cmpMeta.virtualProperties.map(cmpProp => ({
@@ -17,7 +17,7 @@ export const generatePropTypes = (cmpMeta: d.ComponentCompilerMeta): d.TypeInfo 
       optional: true,
       required: false,
       jsdoc: cmpProp.docs,
-      public: true,
+      internal: false,
     })),
   ];
 };

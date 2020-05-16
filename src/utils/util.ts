@@ -126,10 +126,6 @@ export const generatePreamble = (config: d.Config, opts: { prefix?: string; suff
   return '';
 };
 
-export const isDocsPublic = (jsDocs: d.JsDoc | d.CompilerJsDoc | undefined) => {
-  return !(jsDocs && jsDocs.tags.some(s => s.name === 'internal'));
-};
-
 const lineBreakRegex = /\r?\n|\r/g;
 export function getTextDocs(docs: d.CompilerJsDoc | undefined | null) {
   if (docs == null) {

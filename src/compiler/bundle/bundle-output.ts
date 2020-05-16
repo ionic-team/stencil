@@ -34,19 +34,31 @@ export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx,
 };
 
 export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
-  const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, ['.tsx', '.ts', '.js', '.mjs', '.json']);
+  const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, ['.tsx', '.ts', '.js', '.mjs', '.json', '.d.ts']);
   const nodeResolvePlugin = rollupNodeResolvePlugin({
     mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
     customResolveOptions,
     browser: true,
     ...(config.nodeResolve as any),
   });
-
+  const orgNodeResolveId = nodeResolvePlugin.resolveId;
+  const orgNodeResolveId2 = nodeResolvePlugin.resolveId = async function(importee: string, importer: string) {
+    const [readImportee, query] = importee.split('?');
+    const resolved = await orgNodeResolveId.call(nodeResolvePlugin, readImportee, importer);
+    if (resolved) {
+      return {
+        ...resolved,
+        id: query
+          ? resolved.id + '?' + query
+          : resolved.id,
+      }
+    }
+    return resolved;
+  }
   if (config.devServer && config.devServer.experimentalDevModules) {
-    const orgNodeResolveId = nodeResolvePlugin.resolveId;
 
     nodeResolvePlugin.resolveId = async function(importee: string, importer: string) {
-      const resolvedId = await orgNodeResolveId.call(nodeResolvePlugin, importee, importer);
+      const resolvedId = await orgNodeResolveId2.call(nodeResolvePlugin, importee, importer);
       return devNodeModuleResolveId(config, compilerCtx.fs, resolvedId, importee);
     };
   }

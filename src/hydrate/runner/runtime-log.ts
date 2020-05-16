@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { renderCatchError, renderBuildDiagnostic } from './render-utils';
 
-export function runtimeLogging(win: Window, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
+export function runtimeLogging(win: Window & typeof globalThis, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
   try {
     const pathname = win.location.pathname;
 
