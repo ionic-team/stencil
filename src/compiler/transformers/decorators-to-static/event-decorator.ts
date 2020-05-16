@@ -123,7 +123,6 @@ const DOM_EVENT_NAMES: Set<string> = new Set(
     'SVGScroll',
     'SVGUnload',
     'SVGZoom',
-    'ValueChange',
     'abort',
     'afterprint',
     'afterscriptexecute',

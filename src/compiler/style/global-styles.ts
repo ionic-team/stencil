@@ -65,7 +65,7 @@ const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx,
     return false;
   }
 
-  const hasChangedImports = await hasChangedImportFile(config, compilerCtx, buildCtx, config.globalStyle, []);
+  const hasChangedImports = await hasChangedImportFile(config, compilerCtx, buildCtx, config.globalStyle, compilerCtx.cachedGlobalStyle, []);
   if (hasChangedImports) {
     return false;
   }
@@ -73,20 +73,13 @@ const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx,
   return true;
 };
 
-const hasChangedImportFile = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filePath: string, noLoop: string[]): Promise<boolean> => {
+const hasChangedImportFile = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filePath: string, content: string, noLoop: string[]): Promise<boolean> => {
   if (noLoop.includes(filePath)) {
     return false;
   }
   noLoop.push(filePath);
 
-  let rtn = false;
-
-  try {
-    const content = await compilerCtx.fs.readFile(filePath);
-    rtn = await hasChangedImportContent(config, compilerCtx, buildCtx, filePath, content, noLoop);
-  } catch (e) {}
-
-  return rtn;
+  return hasChangedImportContent(config, compilerCtx, buildCtx, filePath, content, noLoop);
 };
 
 const hasChangedImportContent = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filePath: string, content: string, checkedFiles: string[]) => {
@@ -106,8 +99,13 @@ const hasChangedImportContent = async (config: d.Config, compilerCtx: d.Compiler
   }
 
   // keep diggin'
-  const promises = cssImports.map(cssImportData => {
-    return hasChangedImportFile(config, compilerCtx, buildCtx, cssImportData.filePath, checkedFiles);
+  const promises = cssImports.map(async cssImportData => {
+    try {
+      const content = await compilerCtx.fs.readFile(cssImportData.filePath);
+      return hasChangedImportFile(config, compilerCtx, buildCtx, cssImportData.filePath, content, checkedFiles);
+    } catch (e) {
+      return false;
+    }
   });
 
   const results = await Promise.all(promises);

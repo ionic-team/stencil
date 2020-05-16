@@ -1,8 +1,8 @@
 import * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { CMP_FLAGS } from '@utils';
+import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { PLATFORM_FLAGS } from './runtime-constants';
-import { plt, supportsShadow } from '@platform';
+import { plt, supportsShadow, getHostRef } from '@platform';
 
 export const patchCloneNode = (HostElementPrototype: any) => {
   const orgCloneNode = HostElementPrototype.cloneNode;
@@ -44,20 +44,17 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
 };
 
 export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) => {
+  class FakeNodeList extends Array {
+    item(n: number) {
+      return this[n];
+    }
+  }
   if (cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
-    const childrenFn = elm.__lookupGetter__('children');
     const childNodesFn = elm.__lookupGetter__('childNodes');
 
     Object.defineProperty(elm, 'children', {
       get() {
-        const children = childrenFn.call(this);
-        if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {
-          const slotNode = getHostSlotNode(children, '');
-          if (slotNode && slotNode.parentNode) {
-            return slotNode.parentNode.children;
-          }
-        }
-        return children;
+        return this.childNodes.map((n: any) => n.nodeType === 1);
       },
     });
 
@@ -70,13 +67,17 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
     Object.defineProperty(elm, 'childNodes', {
       get() {
         const childNodes = childNodesFn.call(this);
-        if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {
-          const slotNode = getHostSlotNode(childNodes, '');
-          if (slotNode && slotNode.parentNode) {
-            return slotNode.parentNode.childNodes;
+        if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0 && getHostRef(this).$flags$ & HOST_FLAGS.hasRendered) {
+          const result = new FakeNodeList();
+          for (let i = 0; i < childNodes.length; i++) {
+            const slot = childNodes[i]['s-nr'];
+            if (slot) {
+              result.push(slot);
+            }
           }
+          return result
         }
-        return childNodes;
+        return FakeNodeList.from(childNodes);
       },
     });
   }

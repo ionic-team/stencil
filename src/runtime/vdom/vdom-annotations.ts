@@ -2,17 +2,18 @@ import * as d from '../../declarations';
 import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from '../runtime-constants';
 import { getHostRef } from '@platform';
 
-export const insertVdomAnnotations = (doc: Document) => {
+export const insertVdomAnnotations = (doc: Document, staticComponents: string[]) => {
   if (doc != null) {
     const docData: DocData = {
       hostIds: 0,
       rootLevelIds: 0,
+      staticComponents: new Set(staticComponents),
     };
     const orgLocationNodes: d.RenderNode[] = [];
 
     parseVNodeAnnotations(doc, doc.body, docData, orgLocationNodes);
 
-    orgLocationNodes.map(orgLocationNode => {
+    orgLocationNodes.forEach(orgLocationNode => {
       if (orgLocationNode != null) {
         const nodeRef = orgLocationNode['s-nr'];
 
@@ -78,7 +79,7 @@ const parseVNodeAnnotations = (doc: Document, node: d.RenderNode, docData: DocDa
   if (node.nodeType === NODE_TYPE.ElementNode) {
     node.childNodes.forEach(childNode => {
       const hostRef = getHostRef(childNode);
-      if (hostRef != null) {
+      if (hostRef != null && !docData.staticComponents.has(childNode.nodeName.toLowerCase())) {
         const cmpData: CmpData = {
           nodeIds: 0,
         };
@@ -102,7 +103,7 @@ const insertVNodeAnnotations = (doc: Document, hostElm: d.HostElement, vnode: d.
 
     if (vnode.$children$ != null) {
       const depth = 0;
-      vnode.$children$.map((vnodeChild, index) => {
+      vnode.$children$.forEach((vnodeChild, index) => {
         insertChildVNodeAnnotations(doc, vnodeChild, cmpData, hostId, depth, index);
       });
     }
@@ -141,7 +142,7 @@ const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, cmpData
 
   if (vnodeChild.$children$ != null) {
     const childDepth = depth + 1;
-    vnodeChild.$children$.map((vnode, index) => {
+    vnodeChild.$children$.forEach((vnode, index) => {
       insertChildVNodeAnnotations(doc, vnode, cmpData, hostId, childDepth, index);
     });
   }
@@ -150,6 +151,7 @@ const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, cmpData
 interface DocData {
   hostIds: number;
   rootLevelIds: number;
+  staticComponents: Set<string>;
 }
 
 interface CmpData {

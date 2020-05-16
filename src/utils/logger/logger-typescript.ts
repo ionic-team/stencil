@@ -2,9 +2,9 @@ import * as d from '../../declarations';
 import { isIterable } from '../helpers';
 import { normalizePath } from '../normalize-path';
 import { splitLineBreaks } from './logger-utils';
-import ts from 'typescript';
+import type { Diagnostic, DiagnosticMessageChain, Node } from 'typescript';
 
-export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: ts.Node) => {
+export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: Node) => {
   if (!node) {
     return d;
   }
@@ -70,7 +70,7 @@ export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: ts.Node) => {
  * error reporting within a terminal. So, yeah, let's code it up, shall we?
  */
 
-export const loadTypeScriptDiagnostics = (tsDiagnostics: readonly ts.Diagnostic[]) => {
+export const loadTypeScriptDiagnostics = (tsDiagnostics: readonly Diagnostic[]) => {
   const diagnostics: d.Diagnostic[] = [];
   const maxErrors = Math.min(tsDiagnostics.length, 50);
 
@@ -81,7 +81,7 @@ export const loadTypeScriptDiagnostics = (tsDiagnostics: readonly ts.Diagnostic[
   return diagnostics;
 };
 
-export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
+export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic) => {
   const d: d.Diagnostic = {
     level: 'warn',
     type: 'typescript',
@@ -152,7 +152,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: ts.Diagnostic) => {
   return d;
 };
 
-const flattenDiagnosticMessageText = (tsDiagnostic: ts.Diagnostic, diag: string | ts.DiagnosticMessageChain | undefined) => {
+const flattenDiagnosticMessageText = (tsDiagnostic: Diagnostic, diag: string | DiagnosticMessageChain | undefined) => {
   if (typeof diag === 'string') {
     return diag;
   } else if (diag === undefined) {

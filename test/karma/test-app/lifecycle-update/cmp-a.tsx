@@ -34,6 +34,7 @@ export class LifecycleUpdateA {
   }
 
   componentWillUpdate() {
+
     const li = document.createElement('li');
     li.innerHTML = `<span style="color:maroon">lifecycle-update-a</span> <span style="color:cyan">componentWillUpdate</span> ${this.values[this.values.length - 1]}`;
     document.getElementById('output')!.appendChild(li);

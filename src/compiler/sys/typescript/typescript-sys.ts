@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { basename, join, resolve } from 'path';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
-import { isBoolean, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, noop, normalizePath } from '@utils';
+import { isBoolean, isString, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, noop, normalizePath } from '@utils';
 import { isExternalUrl } from '../fetch/fetch-utils';
 import { TypeScriptModule } from './typescript-load';
 import ts from 'typescript';
@@ -18,7 +18,7 @@ export const patchTypeScriptSys = (loadedTs: TypeScriptModule, config: d.Config,
 export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, tsSys: ts.System) => {
   const realpath = (path: string) => {
     const rp = stencilSys.realpathSync(path);
-    if (rp) {
+    if (isString(rp)) {
       return rp;
     }
     return path;
@@ -51,7 +51,9 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
     }
   };
 
-  tsSys.createDirectory = p => stencilSys.mkdirSync(p);
+  tsSys.createDirectory = p => {
+    stencilSys.mkdirSync(p);
+  };
 
   tsSys.directoryExists = p => {
     const s = inMemoryFs.statSync(p);
@@ -66,7 +68,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
     }
 
     const s = inMemoryFs.statSync(filePath);
-    return s.isFile;
+    return !!(s && s.isFile);
   };
 
   tsSys.getDirectories = p => {

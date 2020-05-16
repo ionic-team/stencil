@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
-import { addModulePreloads, minifyScriptElements, minifyStyleElements } from '../prerender-optimize';
-import { catchError, normalizePath } from '@utils';
+import { addModulePreloads, excludeStaticComponents, minifyScriptElements, minifyStyleElements, removeModulePreloads, removeStencilScripts } from '../prerender-optimize';
+import { catchError, normalizePath, isPromise } from '@utils';
 import { crawlAnchorsForNextUrls } from '../crawl-urls';
 import { getHydrateOptions, getPrerenderConfig } from '../prerender-config';
 import { initNodeWorkerThread } from '../../sys/node/worker/worker-child';
@@ -45,10 +45,15 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
     const hydrateOpts = getHydrateOptions(prerenderConfig, url, results.diagnostics);
 
+    if (prerenderRequest.staticSite || hydrateOpts.staticDocument) {
+      hydrateOpts.addModulePreloads = false;
+      hydrateOpts.clientHydrateAnnotations = false;
+    }
+
     if (typeof prerenderConfig.beforeHydrate === 'function') {
       try {
         const rtn = prerenderConfig.beforeHydrate(doc, url);
-        if (rtn != null && typeof rtn.then === 'function') {
+        if (isPromise(rtn)) {
           await rtn;
         }
       } catch (e) {
@@ -61,22 +66,41 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
     const hydrateResults = (await hydrateApp.hydrateDocument(doc, hydrateOpts)) as d.HydrateResults;
     results.diagnostics.push(...hydrateResults.diagnostics);
 
-    if (hydrateOpts.addModulePreloads && !prerenderRequest.isDebug) {
-      addModulePreloads(doc, hydrateResults, componentGraph);
+    if (hydrateOpts.staticDocument) {
+      removeStencilScripts(doc);
+      removeModulePreloads(doc);
+    } else {
+      if (Array.isArray(hydrateOpts.staticComponents)) {
+        excludeStaticComponents(doc, hydrateOpts, hydrateResults);
+      }
+
+      if (hydrateOpts.addModulePreloads) {
+        if (!prerenderRequest.isDebug) {
+          addModulePreloads(doc, hydrateOpts, hydrateResults, componentGraph);
+        }
+      } else {
+        // remove module preloads
+        removeModulePreloads(doc);
+      }
     }
 
+    const minifyPromises: Promise<any>[] = [];
     if (hydrateOpts.minifyStyleElements && !prerenderRequest.isDebug) {
-      await minifyStyleElements(doc);
+      minifyPromises.push(minifyStyleElements(doc, false));
     }
 
     if (hydrateOpts.minifyScriptElements && !prerenderRequest.isDebug) {
-      await minifyScriptElements(doc);
+      minifyPromises.push(minifyScriptElements(doc, false));
+    }
+
+    if (minifyPromises.length > 0) {
+      await Promise.all(minifyPromises);
     }
 
     if (typeof prerenderConfig.afterHydrate === 'function') {
       try {
         const rtn = prerenderConfig.afterHydrate(doc, url);
-        if (rtn != null && typeof rtn.then === 'function') {
+        if (isPromise(rtn)) {
           await rtn;
         }
       } catch (e) {

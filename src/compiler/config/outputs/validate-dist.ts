@@ -44,6 +44,13 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) =>
       file: join(lazyDir, `${config.fsNamespace}.css`),
     });
 
+    outputs.push({
+      type: DIST_TYPES,
+      dir: distOutputTarget.dir,
+      typesDir: distOutputTarget.typesDir,
+      empty: distOutputTarget.empty,
+    });
+
     if (config.buildDist) {
       if (distOutputTarget.collectionDir) {
         outputs.push({
@@ -59,13 +66,6 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) =>
           copy: [...distOutputTarget.copy, { src: '**/*.svg' }, { src: '**/*.js' }],
         });
       }
-
-      outputs.push({
-        type: DIST_TYPES,
-        dir: distOutputTarget.dir,
-        typesDir: distOutputTarget.typesDir,
-        empty: distOutputTarget.empty,
-      });
 
       const esmDir = join(distOutputTarget.dir, 'esm');
       const esmEs5Dir = config.buildEs5 ? join(distOutputTarget.dir, 'esm-es5') : undefined;

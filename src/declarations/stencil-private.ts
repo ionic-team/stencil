@@ -43,7 +43,7 @@ export interface AssetsMeta {
   originalComponentPath: string;
 }
 
-export interface CompileOptions {
+export interface TranspileOptions {
   /**
    * A component can be defined as a custom element by using `customelement`, or the
    * component class can be exported by using `module`. Default is `customelement`.
@@ -116,7 +116,7 @@ export interface CompileOptions {
   paths?: { [key: string]: string[] };
 }
 
-export interface CompileResults {
+export interface TranspileResults {
   code: string;
   data?: any[];
   diagnostics: Diagnostic[];
@@ -1661,6 +1661,7 @@ export interface PrerenderManager {
   prerenderConfigPath: string;
   progressLogger?: ProgressLogger;
   resolve: Function;
+  staticSite: boolean;
   templateId: string;
   componentGraphPath: string;
   urlsProcessing: Set<string>;
@@ -2174,6 +2175,11 @@ export interface PackageJsonData {
     url?: string;
   };
   'private'?: boolean;
+  'scripts'?: {
+    [runName: string]: string;
+  };
+  'license'?: string;
+  'keywords'?: string[];
 }
 
 export interface Workbox {
@@ -2568,11 +2574,11 @@ export interface VNodeProdData {
 }
 
 export interface CompilerWorkerContext {
-  compileModule(code: string, opts: CompileOptions): Promise<CompileResults>;
+  transpile(code: string, opts: TranspileOptions): Promise<TranspileResults>;
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
   prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string; sourceMap: any; diagnostics: Diagnostic[] }>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
-  transpileToEs5(input: string, inlineHelpers: boolean): Promise<TranspileResults>;
+  transpileToEs5(input: string, inlineHelpers: boolean): Promise<TranspileToEs5Results>;
 }
 
 export interface MsgToWorker {
@@ -2629,7 +2635,7 @@ export interface WorkerContext {
   tsProgram?: any;
 }
 
-export interface TranspileResults {
+export interface TranspileToEs5Results {
   sourceFilePath: string;
   code: string;
   map: any;

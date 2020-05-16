@@ -1,6 +1,6 @@
 import { HydrateDocumentOptions, HydrateFactoryOptions, HydrateResults, SerializeDocumentOptions } from '../../declarations';
 import { generateHydrateResults, normalizeHydrateOptions, renderBuildError, renderCatchError } from './render-utils';
-import { hasError } from '@utils';
+import { hasError, isPromise } from '@utils';
 import { hydrateFactory } from '@hydrate-factory';
 import { initializeWindow } from './window-initialize';
 import { inspectElement } from './inspect-element';
@@ -94,7 +94,7 @@ function render(win: Window & typeof globalThis, opts: HydrateFactoryOptions, re
   if (typeof opts.beforeHydrate === 'function') {
     try {
       const rtn = opts.beforeHydrate(win.document);
-      if (rtn != null && typeof rtn.then === 'function') {
+      if (isPromise(rtn)) {
         rtn.then(() => {
           hydrateFactory(win, opts, results, afterHydrate, resolve);
         });
@@ -114,7 +114,7 @@ function afterHydrate(win: Window, opts: HydrateFactoryOptions, results: Hydrate
   if (typeof opts.afterHydrate === 'function') {
     try {
       const rtn = opts.afterHydrate(win.document);
-      if (rtn != null && typeof rtn.then === 'function') {
+      if (isPromise(rtn)) {
         rtn.then(() => {
           finalizeHydrate(win, win.document, opts, results, resolve);
         });

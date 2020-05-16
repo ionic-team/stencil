@@ -777,6 +777,7 @@ export namespace JSXBase {
 
   export interface DetailsHTMLAttributes<T> extends HTMLAttributes<T> {
     open?: boolean;
+    onToggle?: (event: Event) => void;
   }
 
   export interface DelHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -955,6 +956,7 @@ export namespace JSXBase {
   }
 
   export interface LinkHTMLAttributes<T> extends HTMLAttributes<T> {
+    as?: string;
     href?: string;
     hrefLang?: string;
     hreflang?: string;
@@ -1204,8 +1206,7 @@ export namespace JSXBase {
     hidden?: boolean;
     id?: string;
     lang?: string;
-    spellCheck?: boolean;
-    spellcheck?: boolean | string;
+    spellcheck?: 'true' | 'false';
     style?: { [key: string]: string | undefined };
     tabIndex?: number;
     tabindex?: number | string;
@@ -1540,6 +1541,7 @@ export namespace JSXBase {
     ref?: (elm?: T) => void;
     slot?: string;
     part?: string;
+    exportparts?: string;
 
     // Clipboard Events
     onCopy?: (event: ClipboardEvent) => void;

@@ -31,9 +31,23 @@ export const existsSync = (fs.existsSync = (p: string) => {
   return fs.__sys.accessSync(p);
 });
 
-export const mkdirSync = (fs.mkdirSync = (p: string) => {
-  const success = fs.__sys.mkdirSync(p);
-  if (!success) {
+export const mkdir = (fs.mkdir = (p: string, opts: any, cb: any) => {
+  cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
+  opts = typeof opts === 'function' ? undefined : opts;
+  fs.__sys.mkdir(p, opts).then(results => {
+    if (cb) {
+      if (results.error) {
+        cb(new FsError('mkdir', p));
+      } else {
+        cb(null);
+      }
+    }
+  });
+});
+
+export const mkdirSync = (fs.mkdirSync = (p: string, opts: any) => {
+  const results = fs.__sys.mkdirSync(p, opts);
+  if (results.error) {
     throw new FsError('mkdir', p);
   }
 });
@@ -84,27 +98,27 @@ export const realpath = (fs.realpath = (p: string, opts: any, cb: (err: any, dat
 
 export const realpathSync = (fs.realpathSync = (p: string) => {
   const data = fs.__sys.realpathSync(p);
-  if (!data) {
+  if (typeof data !== 'string') {
     throw new FsError('realpathSync', p);
   }
   return data;
 });
 
 export const statSync = (fs.statSync = (p: string) => {
-  const s = fs.__sys.statSync(p);
-  if (!s) {
+  const fsStats = fs.__sys.statSync(p);
+  if (!fsStats) {
     throw new FsError('statSync', p);
   }
-  return s;
+  return fsStats;
 });
 
 export const lstatSync = (fs.lstatSync = statSync);
 
 export const stat = (fs.stat = (p: string, opts: any, cb: any) => {
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
-  fs.__sys.stat(p).then(success => {
+  fs.__sys.stat(p).then(fsStats => {
     if (cb) {
-      if (success) {
+      if (fsStats) {
         cb(null);
       } else {
         cb(new FsError('stat', p));
@@ -119,12 +133,12 @@ export const watch = (fs.watch = () => {
 
 export const writeFile = (fs.writeFile = (p: string, data: string, opts: any, cb: any) => {
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
-  fs.__sys.writeFile(p, data).then(success => {
+  fs.__sys.writeFile(p, data).then(writeResults => {
     if (cb) {
-      if (success) {
-        cb(null);
-      } else {
+      if (writeResults.error) {
         cb(new FsError('writeFile', p));
+      } else {
+        cb(null);
       }
     }
   });

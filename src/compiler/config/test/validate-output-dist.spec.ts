@@ -52,6 +52,12 @@ describe('validateDistOutputTarget', () => {
         type: 'dist-global-styles',
       },
       {
+        dir: path.join(rootDir, 'my-dist'),
+        empty: false,
+        type: 'dist-types',
+        typesDir: path.join(rootDir, 'my-dist', 'types'),
+      },
+      {
         collectionDir: path.join(rootDir, 'my-dist', 'collection'),
         dir: path.join(rootDir, '/my-dist'),
         empty: false,
@@ -62,12 +68,6 @@ describe('validateDistOutputTarget', () => {
         copyAssets: 'collection',
         dir: path.join(rootDir, 'my-dist', 'collection'),
         type: 'copy',
-      },
-      {
-        dir: path.join(rootDir, 'my-dist'),
-        empty: false,
-        type: 'dist-types',
-        typesDir: path.join(rootDir, 'my-dist', 'types'),
       },
       {
         type: 'dist-lazy',
