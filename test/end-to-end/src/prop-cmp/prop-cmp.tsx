@@ -1,6 +1,9 @@
 import { Component, Prop, h, Host } from '@stencil/core';
 import { saveAs } from 'file-saver';
 
+/**
+ * @virtualProp mode - Mode
+ */
 @Component({
   tag: 'prop-cmp',
   styleUrls: {

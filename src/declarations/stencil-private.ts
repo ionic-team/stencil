@@ -259,7 +259,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   transformTagName?: boolean;
 }
 
-export type ModuleFormat = 'amd' | 'cjs' | 'commonjs' | 'es' | 'esm' | 'iife' | 'module' | 'system' | 'umd';
+export type ModuleFormat = 'amd' | 'cjs' | 'es' | 'iife' | 'system' | 'umd' | 'commonjs' | 'esm' | 'module' | 'systemjs';
 
 export interface RollupResultModule {
   id: string;

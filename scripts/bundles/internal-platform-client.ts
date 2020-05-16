@@ -41,7 +41,7 @@ export async function internalClient(opts: BuildOptions) {
     input: join(inputClientDir, 'index.js'),
     output,
     treeshake: {
-      pureExternalModules: true,
+      moduleSideEffects: 'no-external',
     },
     plugins: [
       {

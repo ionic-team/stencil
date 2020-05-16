@@ -56,10 +56,7 @@ export async function createBuild(opts: BuildOptions) {
     testing(opts),
   ]);
 
-  return bundles.reduce((b, bundle) => {
-    b.push(...bundle);
-    return b;
-  }, [] as RollupOptions[]);
+  return bundles.flat();
 }
 
 export async function bundleBuild(opts: BuildOptions) {
