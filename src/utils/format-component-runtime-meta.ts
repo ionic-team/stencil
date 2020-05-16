@@ -18,6 +18,9 @@ export const formatComponentRuntimeMeta = (compilerMeta: d.ComponentCompilerMeta
   if (compilerMeta.encapsulation !== 'shadow' && compilerMeta.htmlTagNames.includes('slot')) {
     flags |= CMP_FLAGS.hasSlotRelocation;
   }
+  if (compilerMeta.hasMode) {
+    flags |= CMP_FLAGS.hasMode;
+  }
 
   const members = formatComponentRuntimeMembers(compilerMeta, includeMethods);
   const hostListeners = formatHostListeners(compilerMeta);

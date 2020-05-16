@@ -19,17 +19,12 @@ export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean
 };
 
 export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMeta, mode?: string, hostElm?: HTMLElement) => {
-  let scopeId = BUILD.mode ? getScopeId(cmpMeta.$tagName$, mode) : getScopeId(cmpMeta.$tagName$);
+  let scopeId = getScopeId(cmpMeta, mode);
   let style = styles.get(scopeId);
 
   // if an element is NOT connected then getRootNode() will return the wrong root node
   // so the fallback is to always use the document for the root node in those cases
   styleContainerNode = styleContainerNode.nodeType === NODE_TYPE.DocumentFragment ? styleContainerNode : doc;
-
-  if (BUILD.mode && !style) {
-    scopeId = getScopeId(cmpMeta.$tagName$);
-    style = styles.get(scopeId);
-  }
 
   if (style) {
     if (typeof style === 'string') {
@@ -103,7 +98,8 @@ export const attachStyles = (hostRef: d.HostRef) => {
   endAttachStyles();
 };
 
-export const getScopeId = (tagName: string, mode?: string) => 'sc-' + (BUILD.mode && mode ? tagName + '-' + mode : tagName);
+export const getScopeId = (cmp: d.ComponentRuntimeMeta, mode?: string) =>
+  'sc-' + (BUILD.mode && mode && cmp.$flags$ & CMP_FLAGS.hasMode ? cmp.$tagName$ + '-' + mode : cmp.$tagName$);
 
 export const convertScopedToShadow = (css: string) => css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');
 

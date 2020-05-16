@@ -80,7 +80,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       Cstr = elm.constructor as any;
     }
 
-    const scopeId = BUILD.mode ? getScopeId(cmpMeta.$tagName$, hostRef.$modeName$) : getScopeId(cmpMeta.$tagName$);
+    const scopeId = getScopeId(cmpMeta, hostRef.$modeName$);
     if (BUILD.style && !styles.has(scopeId) && Cstr.style) {
       const endRegisterStyles = createTime('registerStyles', cmpMeta.$tagName$);
       // this component has styles but we haven't registered them yet
