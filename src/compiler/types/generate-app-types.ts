@@ -53,48 +53,46 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
   });
 
   const jsxAugmentation = `
-    declare module "@stencil/core" {
-      export namespace JSX {
-        interface IntrinsicElements {
-          ${modules.map(m => `'${m.tagName}': LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`).join('\n')}
-        }
+declare module "@stencil/core" {
+  export namespace JSX {
+      interface IntrinsicElements {
+${modules.map(m => `        '${m.tagName}': LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`).join('\n')}
       }
-    }
-    `;
+  }
+}`;
 
   const jsxElementGlobal = !needsJSXElementHack
     ? ''
     : `
-// Adding a global JSX for backcompatibility with legacy dependencies
-export namespace JSX {
-  export interface Element {}
-}
+  // Adding a global JSX for backcompatibility with legacy dependencies
+  export namespace JSX {
+    export interface Element {}
+  }
     `;
 
-  const componentsFileString = `
-export namespace Components {
-      ${modules
-        .map(m => `${m.component}`)
-        .join('\n')
-        .trim()}
-    }
+  const componentsFileString = `export namespace Components {
+${modules
+  .map(m => `${m.component}`)
+  .join('\n')
+  .trim()}
+}
 
 declare global {
   ${jsxElementGlobal}
   ${modules.map(m => m.element).join('\n')}
   interface HTMLElementTagNameMap {
-    ${modules.map(m => `'${m.tagName}': ${m.htmlElementName};`).join('\n')}
+${modules.map(m => `      '${m.tagName}': ${m.htmlElementName};`).join('\n')}
   }
 }
 
 declare namespace LocalJSX {
-  ${modules
-    .map(m => `${m.jsx}`)
+${modules
+    .map(m => `  ${m.jsx}`)
     .join('\n')
     .trim()}
 
   interface IntrinsicElements {
-    ${modules.map(m => `'${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
+${modules.map(m => `      '${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
   }
 }
 
@@ -113,18 +111,18 @@ ${jsxAugmentation}`;
       }
 
       return `import {
-      ${typeData
-        .sort(sortImportNames)
-        .map(td => {
-          if (td.localName === td.importName) {
-            return `${td.importName},`;
-          } else {
-            return `${td.localName} as ${td.importName},`;
-          }
-        })
-        .join('\n')} } from '${importFilePath}';`;
-    })
-    .join('\n');
+${typeData
+  .sort(sortImportNames)
+  .map(td => {
+    if (td.localName === td.importName) {
+      return `  ${td.importName},`;
+    } else {
+      return `  ${td.localName} as ${td.importName},`;
+    }
+  })
+  .join('\n')}
+} from '${importFilePath}';`;
+    }).join('\n');
 
   const code = `${COMPONENTS_DTS_HEADER}
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
