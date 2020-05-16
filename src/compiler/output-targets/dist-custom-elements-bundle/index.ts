@@ -12,7 +12,7 @@ import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 
 export const outputCustomElementsBundle = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  if (config.devMode) {
+  if (!config.buildDist) {
     return;
   }
 
