@@ -24,7 +24,6 @@ describe('style', () => {
   });
 
   describe('mode', () => {
-
     it('md mode', async () => {
       setMode(() => 'md');
       @Component({
@@ -32,7 +31,7 @@ describe('style', () => {
         styles: {
           ios: `:host { color: black }`,
           md: `:host { color: red }`,
-        }
+        },
       })
       class CmpA {
         render() {
@@ -57,7 +56,7 @@ describe('style', () => {
         styles: {
           ios: `:host { color: black };`,
           md: `:host { color: red };`,
-        }
+        },
       })
       class CmpA {
         render() {

@@ -43,7 +43,7 @@ export const parseStaticStyles = (compilerCtx: d.CompilerCtx, tagName: string, c
             compiledStyleText: null,
             compiledStyleTextScoped: null,
             compiledStyleTextScopedCommented: null,
-            externalStyles: []
+            externalStyles: [],
           });
         } else {
           styles.push(parseStyleIdentifier(parsedStyleMode, modeName));

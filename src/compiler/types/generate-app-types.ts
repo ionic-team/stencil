@@ -6,7 +6,6 @@ import { isAbsolute, relative, resolve } from 'path';
 import { normalizePath } from '@utils';
 import { updateReferenceTypeImports } from './update-import-refs';
 import { updateStencilTypesImports } from './stencil-types';
-import ts from 'typescript';
 
 export const generateAppTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination: string) => {
   // only gather components that are still root ts files we've found and have component metadata
@@ -54,55 +53,52 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
   });
 
   const jsxAugmentation = `
-    declare module "@stencil/core" {
-      export namespace JSX {
-        interface IntrinsicElements {
-          ${modules.map(m => `'${m.tagName}': LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`).join('\n')}
-        }
+declare module "@stencil/core" {
+  export namespace JSX {
+      interface IntrinsicElements {
+${modules.map(m => `        '${m.tagName}': LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`).join('\n')}
       }
-    }
-    `;
+  }
+}`;
 
   const jsxElementGlobal = !needsJSXElementHack
     ? ''
     : `
-    // Adding a global JSX for backcompatibility with legacy dependencies
-    export namespace JSX {
-      export interface Element {}
-    }
+  // Adding a global JSX for backcompatibility with legacy dependencies
+  export namespace JSX {
+    export interface Element {}
+  }
     `;
 
-  const componentsFileString = `
-    export namespace Components {
-      ${modules
-        .map(m => `${m.component}`)
-        .join('\n')
-        .trim()}
-    }
+  const componentsFileString = `export namespace Components {
+${modules
+  .map(m => `${m.component}`)
+  .join('\n')
+  .trim()}
+}
 
-    declare global {
-      ${jsxElementGlobal}
-      ${modules.map(m => m.element).join('\n')}
-      interface HTMLElementTagNameMap {
-        ${modules.map(m => `'${m.tagName}': ${m.htmlElementName};`).join('\n')}
-      }
-    }
+declare global {
+  ${jsxElementGlobal}
+  ${modules.map(m => m.element).join('\n')}
+  interface HTMLElementTagNameMap {
+${modules.map(m => `      '${m.tagName}': ${m.htmlElementName};`).join('\n')}
+  }
+}
 
-    declare namespace LocalJSX {
-      ${modules
-        .map(m => `${m.jsx}`)
-        .join('\n')
-        .trim()}
+declare namespace LocalJSX {
+${modules
+    .map(m => `  ${m.jsx}`)
+    .join('\n')
+    .trim()}
 
-      interface IntrinsicElements {
-        ${modules.map(m => `'${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
-      }
-    }
+  interface IntrinsicElements {
+${modules.map(m => `      '${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
+  }
+}
 
-    export { LocalJSX as JSX };
+export { LocalJSX as JSX };
 
-    ${jsxAugmentation}
-    `;
+${jsxAugmentation}`;
 
   const typeImportString = Object.keys(typeImportData)
     .map(filePath => {
@@ -115,31 +111,24 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
       }
 
       return `import {
-      ${typeData
-        .sort(sortImportNames)
-        .map(td => {
-          if (td.localName === td.importName) {
-            return `${td.importName},`;
-          } else {
-            return `${td.localName} as ${td.importName},`;
-          }
-        })
-        .join('\n')}
-      } from '${importFilePath}';`;
-    })
-    .join('\n');
+${typeData
+  .sort(sortImportNames)
+  .map(td => {
+    if (td.localName === td.importName) {
+      return `  ${td.importName},`;
+    } else {
+      return `  ${td.localName} as ${td.importName},`;
+    }
+  })
+  .join('\n')}
+} from '${importFilePath}';`;
+    }).join('\n');
 
-  const code = `
-    ${COMPONENTS_DTS_HEADER}
-    import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-    ${typeImportString}
-    ${componentsFileString}
+  const code = `${COMPONENTS_DTS_HEADER}
+import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
+${typeImportString}
+${componentsFileString}
   `;
 
-  const tsSourceFile = ts.createSourceFile(GENERATED_DTS, code, ts.ScriptTarget.Latest, false);
-  const tsPrinter = ts.createPrinter({
-    newLine: ts.NewLineKind.LineFeed,
-  });
-
-  return tsPrinter.printFile(tsSourceFile);
+  return code;
 };
