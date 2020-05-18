@@ -79,7 +79,7 @@ const parsePropDecorator = (
     augmentDiagnosticWithNode(err, prop.modifiers[0]);
   }
 
-  if (/^on(-|[A-Z])/.test(propName)) {
+  if (typeof prop === 'function') {
     const warn = buildWarn(diagnostics);
     warn.messageText = `The @Prop() name "${propName}" looks like an event. Please use the "@Event()" decorator to expose events instead, not properties or methods.`;
     augmentDiagnosticWithNode(warn, prop.name);
