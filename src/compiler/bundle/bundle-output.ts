@@ -85,6 +85,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       rollupCommonjsPlugin({
         include: /node_modules/,
         sourceMap: config.sourceMap,
+        transformMixedEsModules: false,
         ...config.commonjs,
       }),
       ...afterPlugins,
