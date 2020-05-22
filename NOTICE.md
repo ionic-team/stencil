@@ -7,6 +7,7 @@ The published Stencil distribution contains the following licenses:
     CC-BY-4.0
     ISC
     MIT
+    public domain
 
 
 -----------------------------------------
@@ -745,6 +746,39 @@ Author: [Ben Briggs](http://beneb.info)
 
 -----------------------------------------
 
+## `commondir`
+
+License: MIT
+
+Author: [James Halliday](http://substack.net)
+
+> The MIT License
+> 
+> Copyright (c) 2013 James Halliday (mail@substack.net)
+> 
+> Permission is hereby granted, free of charge, 
+> to any person obtaining a copy of this software and 
+> associated documentation files (the "Software"), to 
+> deal in the Software without restriction, including 
+> without limitation the rights to use, copy, modify, 
+> merge, publish, distribute, sublicense, and/or sell 
+> copies of the Software, and to permit persons to whom 
+> the Software is furnished to do so, 
+> subject to the following conditions:
+> 
+> The above copyright notice and this permission notice 
+> shall be included in all copies or substantial portions of the Software.
+> 
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+> EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
+> OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+> IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR 
+> ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+> TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+> SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+-----------------------------------------
+
 ## `concat-map`
 
 License: MIT
@@ -787,6 +821,32 @@ Author: TJ Holowaychuk <tj@vision-media.ca>
 > The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 > 
 > THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+-----------------------------------------
+
+## `deep-freeze`
+
+License: public domain
+
+Author: [James Halliday](http://substack.net)
+
+Homepage: https://github.com/substack/deep-freeze
+
+> This software is released to the public domain.
+> 
+> It is based in part on the deepFreeze function from:
+> https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/freeze
+> 
+> https://developer.mozilla.org/en-US/docs/Project:Copyrights
+
+-----------------------------------------
+
+## `deepmerge`
+
+License: MIT
+
+Homepage: https://github.com/TehShrike/deepmerge
+
 
 -----------------------------------------
 

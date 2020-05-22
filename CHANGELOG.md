@@ -1,8 +1,9 @@
-# 🍺 [1.14.0-0](https://github.com/ionic-team/stencil/compare/v1.13.0...v1.14.0-0) (2020-05-16)
+# 🚜 [1.14.0-1](https://github.com/ionic-team/stencil/compare/v1.13.0...v1.14.0-1) (2020-05-22)
 
 
 ### Bug Fixes
 
+* **runtime:** schedule update when value change in ref() ([54ee75f](https://github.com/ionic-team/stencil/commit/54ee75f6cb8130276a00af6fff479ea8e0741833))
 * emit private types in local component.d.ts ([#2447](https://github.com/ionic-team/stencil/issues/2447)) ([9d444ff](https://github.com/ionic-team/stencil/commit/9d444ff9dfa13f961c95fc067f280972a75599b5)), closes [#2440](https://github.com/ionic-team/stencil/issues/2440)
 * **cli:** fix --version and --help flags ([40baa54](https://github.com/ionic-team/stencil/commit/40baa54a5f02233afaf559d6163754463d2d9dfb))
 * **compiler:** components without mode should never get mode suffix ([#2445](https://github.com/ionic-team/stencil/issues/2445)) ([11e1ccb](https://github.com/ionic-team/stencil/commit/11e1ccb73034f09e625d2bef2e5e4886bb900199))
