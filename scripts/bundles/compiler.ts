@@ -85,7 +85,9 @@ export async function compiler(opts: BuildOptions) {
         mainFields: ['module', 'main'],
         preferBuiltins: false,
       }),
-      rollupCommonjs(),
+      rollupCommonjs({
+        transformMixedEsModules: false,
+      }),
       replacePlugin(opts),
       rollupJson({
         preferConst: true,
