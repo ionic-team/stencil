@@ -41,6 +41,7 @@ export async function startPuppeteerBrowser(config: Config) {
     headless: config.testing.browserHeadless,
     devtools: config.testing.browserDevtools,
     slowMo: config.testing.browserSlowMo,
+    product: config.testing.product
   };
 
   if (config.testing.browserExecutablePath) {
@@ -55,7 +56,6 @@ export async function startPuppeteerBrowser(config: Config) {
     : puppeteer.launch({
         ...launchOpts,
       }));
-
   env.__STENCIL_BROWSER_WS_ENDPOINT__ = browser.wsEndpoint();
 
   config.logger.debug(`puppeteer browser wsEndpoint: ${env.__STENCIL_BROWSER_WS_ENDPOINT__}`);

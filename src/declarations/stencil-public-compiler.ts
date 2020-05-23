@@ -1507,6 +1507,12 @@ export interface TestingConfig extends JestConfig {
    * Amount of time in milliseconds to wait before a screenshot is taken.
    */
   waitBeforeScreenshot?: number;
+
+
+  /**
+   * Browser to be launched when running e2e tests.
+   */
+  product?: 'chrome' | 'firefox';
 }
 
 export interface EmulateConfig {
