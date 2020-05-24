@@ -14,7 +14,7 @@ export const generateAppTypes = async (config: d.Config, compilerCtx: d.Compiler
   const internal = destination === 'src';
 
   // Generate d.ts files for component types
-  let componentTypesFileContent = await generateComponentTypesFile(config, buildCtx, internal);
+  let componentTypesFileContent = generateComponentTypesFile(config, buildCtx, internal);
 
   // immediately write the components.d.ts file to disk and put it into fs memory
   let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
@@ -41,8 +41,9 @@ export const generateAppTypes = async (config: d.Config, compilerCtx: d.Compiler
  * @param config the project build configuration
  * @param options compiler options from tsconfig
  */
-const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx, internal: boolean) => {
+const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, internal: boolean) => {
   let typeImportData: d.TypesImportData = {};
+  const c: string[] = [];
   const allTypes = new Map<string, number>();
   const needsJSXElementHack = buildCtx.components.some(cmp => cmp.isLegacy);
   const components = buildCtx.components.filter(m => !m.isCollectionDependency);
@@ -52,56 +53,11 @@ const generateComponentTypesFile = async (config: d.Config, buildCtx: d.BuildCtx
     return generateComponentTypes(cmp, internal);
   });
 
-  const jsxAugmentation = `
-declare module "@stencil/core" {
-  export namespace JSX {
-      interface IntrinsicElements {
-${modules.map(m => `        '${m.tagName}': LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`).join('\n')}
-      }
-  }
-}`;
+  c.push(COMPONENTS_DTS_HEADER);
+  c.push(`import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";`);
 
-  const jsxElementGlobal = !needsJSXElementHack
-    ? ''
-    : `
-  // Adding a global JSX for backcompatibility with legacy dependencies
-  export namespace JSX {
-    export interface Element {}
-  }
-    `;
-
-  const componentsFileString = `export namespace Components {
-${modules
-  .map(m => `${m.component}`)
-  .join('\n')
-  .trim()}
-}
-
-declare global {
-  ${jsxElementGlobal}
-  ${modules.map(m => m.element).join('\n')}
-  interface HTMLElementTagNameMap {
-${modules.map(m => `      '${m.tagName}': ${m.htmlElementName};`).join('\n')}
-  }
-}
-
-declare namespace LocalJSX {
-${modules
-    .map(m => `  ${m.jsx}`)
-    .join('\n')
-    .trim()}
-
-  interface IntrinsicElements {
-${modules.map(m => `      '${m.tagName}': ${m.tagNameAsPascal};`).join('\n')}
-  }
-}
-
-export { LocalJSX as JSX };
-
-${jsxAugmentation}`;
-
-  const typeImportString = Object.keys(typeImportData)
-    .map(filePath => {
+  c.push(
+    ...Object.keys(typeImportData).map(filePath => {
       const typeData = typeImportData[filePath];
       let importFilePath: string;
       if (isAbsolute(filePath)) {
@@ -110,25 +66,56 @@ ${jsxAugmentation}`;
         importFilePath = filePath;
       }
 
-      return `import {
-${typeData
-  .sort(sortImportNames)
-  .map(td => {
-    if (td.localName === td.importName) {
-      return `  ${td.importName},`;
-    } else {
-      return `  ${td.localName} as ${td.importName},`;
-    }
-  })
-  .join('\n')}
-} from '${importFilePath}';`;
-    }).join('\n');
+      return `import { ${typeData
+        .sort(sortImportNames)
+        .map(td => {
+          if (td.localName === td.importName) {
+            return `${td.importName}`;
+          } else {
+            return `${td.localName} as ${td.importName}`;
+          }
+        })
+        .join(`, `)} } from "${importFilePath}";`;
+    }),
+  );
 
-  const code = `${COMPONENTS_DTS_HEADER}
-import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-${typeImportString}
-${componentsFileString}
-  `;
+  c.push(`export namespace Components {\n${modules.map(m => `${m.component}`).join('\n')}\n}`);
 
-  return code;
+  c.push(`declare global {`);
+
+  if (needsJSXElementHack) {
+    c.push(`    // Adding a global JSX for backcompatibility with legacy dependencies`);
+    c.push(`    export namespace JSX {`);
+    c.push(`        export interface Element {}`);
+    c.push(`    }`);
+  }
+
+  c.push(...modules.map(m => m.element));
+
+  c.push(`        interface HTMLElementTagNameMap {`);
+  c.push(...modules.map(m => `                "${m.tagName}": ${m.htmlElementName};`));
+  c.push(`        }`);
+
+  c.push(`}`);
+
+  c.push(`declare namespace LocalJSX {`);
+  c.push(...modules.map(m => `  ${m.jsx}`));
+
+  c.push(`        interface IntrinsicElements {`);
+  c.push(...modules.map(m => `              "${m.tagName}": ${m.tagNameAsPascal};`));
+  c.push(`        }`);
+
+  c.push(`}`);
+
+  c.push(`export { LocalJSX as JSX };`);
+
+  c.push(`declare module "@stencil/core" {`);
+  c.push(`        export namespace JSX {`);
+  c.push(`                interface IntrinsicElements {`);
+  c.push(...modules.map(m => `                        "${m.tagName}": LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`));
+  c.push(`                }`);
+  c.push(`        }`);
+  c.push(`}`);
+
+  return c.join(`\n`) + `\n`;
 };
