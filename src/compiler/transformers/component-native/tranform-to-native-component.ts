@@ -5,6 +5,7 @@ import { addModuleMetadataProxies } from '../add-component-meta-proxy';
 import { getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
 import { catchError, loadTypeScriptDiagnostics } from '@utils';
 import { defineCustomElement } from '../define-custom-element';
+import { STENCIL_CORE_ID } from '../../bundle/entry-alias-ids';
 import { updateNativeComponentClass } from './native-component';
 import { updateStyleImports } from '../style-imports';
 import ts from 'typescript';
@@ -19,7 +20,7 @@ export const transformToNativeComponentText = (config: d.Config, compilerCtx: d.
     };
 
     const transformOpts: d.TransformOptions = {
-      coreImportPath: '@stencil/core',
+      coreImportPath: STENCIL_CORE_ID,
       componentExport: null,
       componentMetadata: null,
       currentDirectory: config.cwd,

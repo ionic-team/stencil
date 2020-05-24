@@ -8,7 +8,7 @@ import { normalizePath, normalizeFsPath } from '@utils';
 import { STENCIL_CORE_ID, STENCIL_INTERNAL_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
 import { Plugin } from 'rollup';
 
-export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, platform: 'client' | 'hydrate' | 'worker'): Plugin => {
+export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, platform: 'client' | 'hydrate' | 'worker', externalRuntime: boolean): Plugin => {
   if (platform === 'worker') {
     return {
       name: 'coreResolvePlugin',
@@ -30,6 +30,12 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
     resolveId(id) {
       if (id === STENCIL_CORE_ID || id === STENCIL_INTERNAL_ID) {
         if (platform === 'client') {
+          if (externalRuntime) {
+            return {
+              id: STENCIL_INTERNAL_CLIENT_ID,
+              external: true,
+            };
+          }
           return internalClient;
         }
         if (platform === 'hydrate') {

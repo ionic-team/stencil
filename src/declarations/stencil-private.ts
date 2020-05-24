@@ -414,15 +414,6 @@ export interface BundleOutputChunk {
 
 export type SourceTarget = 'es5' | 'es2017' | 'latest';
 
-export interface BundleAppOptions {
-  inputs: BundleEntryInputs;
-  loader: { [id: string]: string };
-  cache?: any;
-  externalRuntime?: string;
-  skipDeps?: boolean;
-  isServer?: boolean;
-}
-
 export interface BundleEntryInputs {
   [entryKey: string]: string;
 }
