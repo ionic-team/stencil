@@ -56,6 +56,7 @@ describe('typescript resolve module', () => {
           version: '__VERSION:STENCIL__',
         },
       },
+      failedLookupLocations: [],
     });
   });
 
@@ -73,6 +74,7 @@ describe('typescript resolve module', () => {
           version: '__VERSION:STENCIL__',
         },
       },
+      failedLookupLocations: [],
     });
   });
 
@@ -90,6 +92,7 @@ describe('typescript resolve module', () => {
           version: '__VERSION:STENCIL__',
         },
       },
+      failedLookupLocations: [],
     });
   });
 
