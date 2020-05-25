@@ -3,7 +3,7 @@ import { catchError } from '@utils';
 import { isOutputTargetDistCustomElements } from '../output-utils';
 import { nativeComponentTransform } from '../../transformers/component-native/tranform-to-native-component';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
-import { STENCIL_INTERNAL_CLIENT_ID } from '../../bundle/entry-alias-ids';
+import { STENCIL_CORE_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 import { join, relative } from 'path';
 import ts from 'typescript';
@@ -41,7 +41,7 @@ export const outputCustomElements = async (config: d.Config, compilerCtx: d.Comp
 
 const getCustomElementTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
-    coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
+    coreImportPath: STENCIL_CORE_ID,
     componentExport: null,
     componentMetadata: null,
     currentDirectory: config.cwd,

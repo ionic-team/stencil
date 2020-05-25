@@ -43,6 +43,12 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
         }
       }
       if (id === STENCIL_INTERNAL_CLIENT_ID) {
+        if (externalRuntime) {
+          return {
+            id: STENCIL_INTERNAL_CLIENT_ID,
+            external: true,
+          };
+        }
         return internalClient;
       }
       if (id === STENCIL_INTERNAL_HYDRATE_ID) {

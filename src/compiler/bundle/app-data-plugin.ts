@@ -3,7 +3,7 @@ import MagicString from 'magic-string';
 import { createJsVarName, normalizePath, isString, loadTypeScriptDiagnostics } from '@utils';
 import { Plugin } from 'rollup';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
-import { STENCIL_APP_DATA_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID, STENCIL_APP_GLOBALS_ID } from './entry-alias-ids';
+import { STENCIL_APP_DATA_ID, STENCIL_CORE_ID, STENCIL_INTERNAL_HYDRATE_ID, STENCIL_APP_GLOBALS_ID } from './entry-alias-ids';
 import ts from 'typescript';
 
 export const appDataPlugin = (
@@ -140,7 +140,7 @@ const appendNamespace = (config: d.Config, s: MagicString) => {
 };
 
 const getContextImport = (platform: string) => {
-  return `import { Context } from '${platform === 'hydrate' ? STENCIL_INTERNAL_HYDRATE_ID : STENCIL_INTERNAL_CLIENT_ID}';\n`;
+  return `import { Context } from '${platform === 'hydrate' ? STENCIL_INTERNAL_HYDRATE_ID : STENCIL_CORE_ID}';\n`;
 };
 
 interface GlobalScript {
