@@ -5,7 +5,7 @@ import { getNodeModulePath } from '../sys/resolve/resolve-utils';
 import { HYDRATED_CSS } from '../../runtime/runtime-constants';
 import { isExternalUrl, getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
 import { normalizePath, normalizeFsPath } from '@utils';
-import { STENCIL_CORE_ID, STENCIL_INTERNAL_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
+import { APP_DATA_CONDITIONAL, STENCIL_CORE_ID, STENCIL_INTERNAL_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
 import { Plugin } from 'rollup';
 
 export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, platform: 'client' | 'hydrate' | 'worker', externalRuntime: boolean): Plugin => {
@@ -36,7 +36,9 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
               external: true,
             };
           }
-          return internalClient;
+          // adding ?app-data=conditional as an identifier to ensure we don't
+          // use the default app-data, but build a custom one based on component meta
+          return internalClient + APP_DATA_CONDITIONAL;
         }
         if (platform === 'hydrate') {
           return internalHydrate;
@@ -44,11 +46,16 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
       }
       if (id === STENCIL_INTERNAL_CLIENT_ID) {
         if (externalRuntime) {
+          // not bunding the client runtime and the user's component together this
+          // must be the custom elements build, where @stencil/core/internal/client
+          // is an import, rather than bundling
           return {
             id: STENCIL_INTERNAL_CLIENT_ID,
             external: true,
           };
         }
+        // importing @stencil/core/internal/client directly, so it shouldn't get
+        // the custom app-data conditionals
         return internalClient;
       }
       if (id === STENCIL_INTERNAL_HYDRATE_ID) {
