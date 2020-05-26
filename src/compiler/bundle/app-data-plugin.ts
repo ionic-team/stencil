@@ -28,6 +28,10 @@ export const appDataPlugin = (
         if (platform === 'worker') {
           this.error('@stencil/core packages cannot be imported from a worker.');
         }
+        if (STENCIL_APP_GLOBALS_ID) {
+          // the load() fn will build a custom globals import
+          return id;
+        }
         if (importer && importer.endsWith(APP_DATA_CONDITIONAL)) {
           // since the importer ends with ?app-data=conditional we know that
           // we need to build custom app-data based off of component metadata
