@@ -28,17 +28,20 @@ export const appDataPlugin = (
         if (platform === 'worker') {
           this.error('@stencil/core packages cannot be imported from a worker.');
         }
-        if (STENCIL_APP_GLOBALS_ID) {
-          // the load() fn will build a custom globals import
+
+        if (platform === 'hydrate' || STENCIL_APP_GLOBALS_ID) {
+          // hydrate will always bundle app-data and runtime
+          // and the load() fn will build a custom globals import
           return id;
-        }
-        if (importer && importer.endsWith(APP_DATA_CONDITIONAL)) {
+        } else if (platform === 'client' && importer && importer.endsWith(APP_DATA_CONDITIONAL)) {
           // since the importer ends with ?app-data=conditional we know that
           // we need to build custom app-data based off of component metadata
           // return the same "id" so that the "load()" method knows to
           // build custom app-data
           return id;
         }
+        // for a client build that does not have ?app-data=conditional at the end then we
+        // do not want to create custom app-data, but should use the default
       }
       return null;
     },
