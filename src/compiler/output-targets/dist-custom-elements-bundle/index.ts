@@ -35,6 +35,7 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
       platform: 'client',
       conditionals: getCustomElementsBuildConditionals(config, buildCtx.components),
       customTransformers: getCustomElementBundleCustomTransformer(config, compilerCtx),
+      externalRuntime: !!outputTarget.externalRuntime,
       inlineWorkers: true,
       inputs: {
         index: '\0core',
@@ -59,7 +60,7 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
           const optimizeResults = await optimizeModule(config, compilerCtx, {
             input: code,
             isCore: bundle.isEntry,
-            minify: config.minifyJs,
+            minify: outputTarget.externalRuntime ? false : config.minifyJs,
           });
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
           if (!hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {

@@ -1,6 +1,6 @@
-import { BuildConditionals } from '@stencil/core/internal';
+import type { BuildConditionals } from '@stencil/core/internal';
 
-export const BUILD: BuildConditionals = /* default */ {
+export const BUILD: BuildConditionals = {
   allRenderFn: false,
   cmpDidLoad: true,
   cmpDidUnload: true,
@@ -49,7 +49,7 @@ export const BUILD: BuildConditionals = /* default */ {
   vdomText: true,
   watchCallback: true,
   taskQueue: true,
-  hotModuleReplacement: true,
+  hotModuleReplacement: false,
   isDebug: false,
   isDev: false,
   isTesting: false,
@@ -78,7 +78,7 @@ export const BUILD: BuildConditionals = /* default */ {
   shadowDelegatesFocus: true,
   initializeNextTick: false,
   asyncLoading: false,
-  asyncQueue: true,
+  asyncQueue: false,
   transformTagName: false,
 };
 

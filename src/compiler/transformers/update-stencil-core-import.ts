@@ -4,6 +4,10 @@ import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.TransformerFactory<ts.SourceFile> => {
   return () => {
     return tsSourceFile => {
+      if (STENCIL_CORE_ID === updatedCoreImportPath) {
+        return tsSourceFile;
+      }
+
       let madeChanges = false;
       const newStatements: ts.Statement[] = [];
 

@@ -3,7 +3,7 @@ import MagicString from 'magic-string';
 import { createJsVarName, normalizePath, isString, loadTypeScriptDiagnostics } from '@utils';
 import { Plugin } from 'rollup';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
-import { STENCIL_APP_DATA_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID, STENCIL_APP_GLOBALS_ID } from './entry-alias-ids';
+import { APP_DATA_CONDITIONAL, STENCIL_APP_DATA_ID, STENCIL_APP_GLOBALS_ID, STENCIL_CORE_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
 import ts from 'typescript';
 
 export const appDataPlugin = (
@@ -23,12 +23,25 @@ export const appDataPlugin = (
   return {
     name: 'appDataPlugin',
 
-    resolveId(id) {
+    resolveId(id, importer) {
       if (id === STENCIL_APP_DATA_ID || id === STENCIL_APP_GLOBALS_ID) {
         if (platform === 'worker') {
           this.error('@stencil/core packages cannot be imported from a worker.');
         }
-        return id;
+
+        if (platform === 'hydrate' || STENCIL_APP_GLOBALS_ID) {
+          // hydrate will always bundle app-data and runtime
+          // and the load() fn will build a custom globals import
+          return id;
+        } else if (platform === 'client' && importer && importer.endsWith(APP_DATA_CONDITIONAL)) {
+          // since the importer ends with ?app-data=conditional we know that
+          // we need to build custom app-data based off of component metadata
+          // return the same "id" so that the "load()" method knows to
+          // build custom app-data
+          return id;
+        }
+        // for a client build that does not have ?app-data=conditional at the end then we
+        // do not want to create custom app-data, but should use the default
       }
       return null;
     },
@@ -40,6 +53,7 @@ export const appDataPlugin = (
         return s.toString();
       }
       if (id === STENCIL_APP_DATA_ID) {
+        // build custom app-data based off of component metadata
         const s = new MagicString(``);
         appendNamespace(config, s);
         appendBuildConditionals(config, build, s);
@@ -140,7 +154,7 @@ const appendNamespace = (config: d.Config, s: MagicString) => {
 };
 
 const getContextImport = (platform: string) => {
-  return `import { Context } from '${platform === 'hydrate' ? STENCIL_INTERNAL_HYDRATE_ID : STENCIL_INTERNAL_CLIENT_ID}';\n`;
+  return `import { Context } from '${platform === 'hydrate' ? STENCIL_INTERNAL_HYDRATE_ID : STENCIL_CORE_ID}';\n`;
 };
 
 interface GlobalScript {

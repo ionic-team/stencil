@@ -7,10 +7,13 @@ export const validateCustomElementBundle = (config: d.Config, userOutputs: d.Out
   return userOutputs.filter(isOutputTargetDistCustomElementsBundle).map(o => {
     const outputTarget = {
       ...o,
-      dir: getAbsolutePath(config, o.dir || 'dist/custom-elements-bundle'),
+      dir: getAbsolutePath(config, o.dir || 'dist/custom-elements'),
     };
     if (!isBoolean(outputTarget.empty)) {
       outputTarget.empty = true;
+    }
+    if (!isBoolean(outputTarget.externalRuntime)) {
+      outputTarget.externalRuntime = true;
     }
     return outputTarget;
   });
