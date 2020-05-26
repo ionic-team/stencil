@@ -3,11 +3,16 @@ import _ from 'lodash';
 import _es from 'lodash-es';
 
 
+function format(target: any, propertyKey: string) {
+  console.log(target, propertyKey);
+}
+
 @Component({
   tag: 'app-root'
 })
 export class AppRoot {
 
+  @format something = '12';
   @State() first: string;
   @State() last: string;
 
