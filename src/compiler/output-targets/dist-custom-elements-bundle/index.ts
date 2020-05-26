@@ -60,7 +60,7 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
           const optimizeResults = await optimizeModule(config, compilerCtx, {
             input: code,
             isCore: bundle.isEntry,
-            minify: false,
+            minify: outputTarget.externalRuntime ? false : config.minifyJs,
           });
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
           if (!hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
