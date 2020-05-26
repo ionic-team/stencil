@@ -4,7 +4,7 @@ import { isString, toTitleCase } from '../helpers';
 import { splitLineBreaks } from './logger-utils';
 import { RollupError } from 'rollup';
 
-export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: RollupError) => {
+export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerCtx, rollupError: RollupError) => {
   const formattedCode = formatErrorCode(rollupError.code);
 
   const diagnostic: d.Diagnostic = {
@@ -101,13 +101,14 @@ export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerC
     }
   }
 
-  buildCtx.diagnostics.push(diagnostic);
+  compilerCtx.buildCtx.diagnostics.push(diagnostic);
 };
 
-export const createOnWarnFn = (diagnostics: d.Diagnostic[], bundleModulesFiles?: d.Module[]) => {
+export const createOnWarnFn = (compilerCtx: d.CompilerCtx, bundleModulesFiles?: d.Module[]) => {
   const previousWarns = new Set<string>();
 
   return function onWarningMessage(warning: { code: string; importer: string; message: string }) {
+    const diagnostics = compilerCtx.buildCtx.diagnostics;
     if (warning == null || ignoreWarnCodes.has(warning.code) || previousWarns.has(warning.message)) {
       return;
     }

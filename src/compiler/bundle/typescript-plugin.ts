@@ -24,6 +24,9 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
       return null;
     },
     transform(_, id) {
+      if (/\0/.test(id)) {
+        return null;
+      }
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
         const mod = getModule(compilerCtx, fsFilePath);

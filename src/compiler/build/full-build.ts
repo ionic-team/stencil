@@ -17,6 +17,8 @@ export const createFullBuild = async (config: d.Config, compilerCtx: d.CompilerC
       const buildCtx = new BuildContext(config, compilerCtx);
       buildCtx.isRebuild = false;
       buildCtx.requiresFullBuild = true;
+      compilerCtx.buildCtx = buildCtx;
+
       buildCtx.start();
 
       const result = await build(config, compilerCtx, buildCtx, tsBuilder);

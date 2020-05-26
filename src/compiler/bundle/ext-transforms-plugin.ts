@@ -7,7 +7,7 @@ import { parseImportPath } from '../transformers/stencil-import-path';
 import { Plugin } from 'rollup';
 import { runPluginTransformsEsmImports } from '../plugin/plugin';
 
-export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions): Plugin => {
+export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions): Plugin => {
   return {
     name: 'extTransformsPlugin',
 
@@ -21,11 +21,11 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         let cmp: d.ComponentCompilerMeta;
         const filePath = normalizeFsPath(id);
         const code = await compilerCtx.fs.readFile(filePath);
-        const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, buildCtx, code, filePath);
+        const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, compilerCtx.buildCtx, code, filePath);
         const commentOriginalSelector = bundleOpts.platform === 'hydrate' && data.encapsulation === 'shadow';
 
         if (data.tag) {
-          cmp = buildCtx.components.find(c => c.tagName === data.tag);
+          cmp = compilerCtx.buildCtx.components.find(c => c.tagName === data.tag);
           const moduleFile = cmp && compilerCtx.moduleMap.get(cmp.sourceFilePath);
 
           if (moduleFile) {
@@ -65,19 +65,19 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
           this.addWatchFile(dep);
         }
 
-        buildCtx.diagnostics.push(...pluginTransforms.diagnostics);
-        buildCtx.diagnostics.push(...cssTransformResults.diagnostics);
+        compilerCtx.buildCtx.diagnostics.push(...pluginTransforms.diagnostics);
+        compilerCtx.buildCtx.diagnostics.push(...cssTransformResults.diagnostics);
         const didError = hasError(cssTransformResults.diagnostics) || hasError(pluginTransforms.diagnostics);
         if (didError) {
           this.error('Plugin CSS transform error');
         }
 
-        const hasUpdatedStyle = buildCtx.stylesUpdated.some(s => {
+        const hasUpdatedStyle = compilerCtx.buildCtx.stylesUpdated.some(s => {
           return s.styleTag === data.tag && s.styleMode === data.mode && s.styleText === cssTransformResults.styleText;
         });
 
         if (!hasUpdatedStyle) {
-          buildCtx.stylesUpdated.push({
+          compilerCtx.buildCtx.stylesUpdated.push({
             styleTag: data.tag,
             styleMode: data.mode,
             styleText: cssTransformResults.styleText,

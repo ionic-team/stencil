@@ -49,7 +49,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       bundleOpts.inputs[entryModule.entryKey] = entryModule.entryKey;
     });
 
-    const rollupBuild = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
+    const rollupBuild = await bundleOutput(config, compilerCtx, bundleOpts);
     if (rollupBuild != null) {
       const [componentBundle] = await Promise.all([
         generateEsmBrowser(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
