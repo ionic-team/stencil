@@ -1,4 +1,4 @@
-import { normalizePath } from '../normalize-path';
+import { normalizePath, normalizeFsPathQuery } from '../normalize-path';
 
 describe('normalizePath', () => {
   it('node module', () => {
@@ -93,5 +93,41 @@ describe('normalizePath', () => {
       const path = normalizePath(null);
       expect(path).toBe(`/Johnny/B/Goode.js`);
     }).toThrow();
+  });
+});
+
+describe('normalizeFsPathQuery', () => {
+  it('format query', () => {
+    const p = normalizeFsPathQuery(`/Johnny/B/Goode.js?format=text`);
+    expect(p.filePath).toBe(`/Johnny/B/Goode.js`);
+    expect(p.params.get('format')).toBe('text');
+    expect(p.format).toBe('text');
+    expect(p.ext).toBe(`js`);
+  });
+
+  it('any query', () => {
+    const p = normalizeFsPathQuery(`/Johnny/B/Goode.svg?a=1&b=2&c=3`);
+    expect(p.filePath).toBe(`/Johnny/B/Goode.svg`);
+    expect(p.params.get('a')).toBe('1');
+    expect(p.params.get('b')).toBe('2');
+    expect(p.params.get('c')).toBe('3');
+    expect(p.format).toBe(null);
+    expect(p.ext).toBe(`svg`);
+  });
+
+  it('no query', () => {
+    const p = normalizeFsPathQuery(`/Johnny/B/Goode.js`);
+    expect(p.filePath).toBe(`/Johnny/B/Goode.js`);
+    expect(p.params).toBe(null);
+    expect(p.format).toBe(null);
+    expect(p.ext).toBe(`js`);
+  });
+
+  it('no ext', () => {
+    const p = normalizeFsPathQuery(`/Johnny/B/Goode`);
+    expect(p.filePath).toBe(`/Johnny/B/Goode`);
+    expect(p.params).toBe(null);
+    expect(p.format).toBe(null);
+    expect(p.ext).toBe(`/johnny/b/goode`);
   });
 });

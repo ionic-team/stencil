@@ -31,6 +31,8 @@ export namespace Components {
         "methodThatFiresMyDocumentEvent": () => Promise<void>;
         "methodThatFiresMyWindowEvent": (value: number) => Promise<void>;
     }
+    interface ImportAssets {
+    }
     interface ListenCmp {
         "opened": boolean;
     }
@@ -114,6 +116,12 @@ declare global {
         prototype: HTMLEventCmpElement;
         new (): HTMLEventCmpElement;
     };
+    interface HTMLImportAssetsElement extends Components.ImportAssets, HTMLStencilElement {
+    }
+    var HTMLImportAssetsElement: {
+        prototype: HTMLImportAssetsElement;
+        new (): HTMLImportAssetsElement;
+    };
     interface HTMLListenCmpElement extends Components.ListenCmp, HTMLStencilElement {
     }
     var HTMLListenCmpElement: {
@@ -172,6 +180,7 @@ declare global {
         "dom-visible": HTMLDomVisibleElement;
         "element-cmp": HTMLElementCmpElement;
         "event-cmp": HTMLEventCmpElement;
+        "import-assets": HTMLImportAssetsElement;
         "listen-cmp": HTMLListenCmpElement;
         "method-cmp": HTMLMethodCmpElement;
         "path-alias-cmp": HTMLPathAliasCmpElement;
@@ -208,6 +217,8 @@ declare namespace LocalJSX {
         "onMyDocumentEvent"?: (event: CustomEvent<any>) => void;
         "onMyWindowEvent"?: (event: CustomEvent<number>) => void;
     }
+    interface ImportAssets {
+    }
     interface ListenCmp {
         "opened"?: boolean;
     }
@@ -243,6 +254,7 @@ declare namespace LocalJSX {
         "dom-visible": DomVisible;
         "element-cmp": ElementCmp;
         "event-cmp": EventCmp;
+        "import-assets": ImportAssets;
         "listen-cmp": ListenCmp;
         "method-cmp": MethodCmp;
         "path-alias-cmp": PathAliasCmp;
@@ -266,6 +278,7 @@ declare module "@stencil/core" {
             "dom-visible": LocalJSX.DomVisible & JSXBase.HTMLAttributes<HTMLDomVisibleElement>;
             "element-cmp": LocalJSX.ElementCmp & JSXBase.HTMLAttributes<HTMLElementCmpElement>;
             "event-cmp": LocalJSX.EventCmp & JSXBase.HTMLAttributes<HTMLEventCmpElement>;
+            "import-assets": LocalJSX.ImportAssets & JSXBase.HTMLAttributes<HTMLImportAssetsElement>;
             "listen-cmp": LocalJSX.ListenCmp & JSXBase.HTMLAttributes<HTMLListenCmpElement>;
             "method-cmp": LocalJSX.MethodCmp & JSXBase.HTMLAttributes<HTMLMethodCmpElement>;
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
