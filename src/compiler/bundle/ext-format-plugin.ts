@@ -1,10 +1,9 @@
 import * as d from '../../declarations';
 import { basename } from 'path';
-import { buildWarn, catchError, createJsVarName, normalizeFsPathQuery } from '@utils';
-import { Plugin } from 'rollup';
-import {} from '@rollup/pluginutils';
+import { createJsVarName, normalizeFsPathQuery } from '@utils';
+import { Plugin, TransformPluginContext } from 'rollup';
 
-export const extFormatPlugin = (config: d.Config, buildCtx: d.BuildCtx): Plugin => {
+export const extFormatPlugin = (config: d.Config): Plugin => {
   return {
     name: 'extFormatPlugin',
 
@@ -13,28 +12,24 @@ export const extFormatPlugin = (config: d.Config, buildCtx: d.BuildCtx): Plugin 
         return null;
       }
 
-      try {
-        const { ext, filePath, format } = normalizeFsPathQuery(importPath);
+      const { ext, filePath, format } = normalizeFsPathQuery(importPath);
 
-        // ?format= param takes precedence before file extension
-        switch (format) {
-          case 'url':
-            return formatUrl(config, buildCtx, code, filePath, ext);
-          case 'text':
-            return formatText(code, filePath);
-        }
-
-        // didn't provide a ?format= param
-        // check if it's a known extension we should format
-        if (FORMAT_TEXT_EXTS.includes(ext)) {
+      // ?format= param takes precedence before file extension
+      switch (format) {
+        case 'url':
+          return formatUrl(config, this, code, filePath, ext);
+        case 'text':
           return formatText(code, filePath);
-        }
+      }
 
-        if (FORMAT_URL_MIME[ext]) {
-          return formatUrl(config, buildCtx, code, filePath, ext);
-        }
-      } catch (e) {
-        catchError(buildCtx.diagnostics, e);
+      // didn't provide a ?format= param
+      // check if it's a known extension we should format
+      if (FORMAT_TEXT_EXTS.includes(ext)) {
+        return formatText(code, filePath);
+      }
+
+      if (FORMAT_URL_MIME[ext]) {
+        return formatUrl(config, this, code, filePath, ext);
       }
 
       return null;
@@ -55,15 +50,17 @@ const formatText = (code: string, filePath: string) => {
   return `const ${varName} = ${JSON.stringify(code)};export default ${varName};`;
 };
 
-const formatUrl = (config: d.Config, buildCtx: d.BuildCtx, code: string, filePath: string, ext: string) => {
-  const varName = createJsVarName(basename(filePath));
+const formatUrl = (config: d.Config, pluginCtx: TransformPluginContext, code: string, filePath: string, ext: string) => {
   const mime = FORMAT_URL_MIME[ext];
-  const base64 = config.sys.encodeToBase64(code);
+  if (!mime) {
+    pluginCtx.warn(`Unsupported url format for "${ext}" extension.`);
+    return formatText('', filePath);
+  }
 
+  const varName = createJsVarName(basename(filePath));
+  const base64 = config.sys.encodeToBase64(code);
   if (config.devMode && base64.length > DATAURL_MAX_IMAGE_SIZE) {
-    const warn = buildWarn(buildCtx.diagnostics);
-    warn.messageText = 'Importing large images will bloat your bundle size, please use assets instead.';
-    warn.absFilePath = filePath;
+    pluginCtx.warn(`Importing large files will bloat your bundle size, please use external assets instead.`);
   }
 
   return `const ${varName} = 'data:${mime};base64,${base64}';export default ${varName};`;

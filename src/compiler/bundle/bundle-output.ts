@@ -71,7 +71,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       loaderPlugin(bundleOpts.loader),
       userIndexPlugin(config, compilerCtx),
       typescriptPlugin(compilerCtx, bundleOpts),
-      extFormatPlugin(config, buildCtx),
+      extFormatPlugin(config),
       extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),
       ...beforePlugins,
