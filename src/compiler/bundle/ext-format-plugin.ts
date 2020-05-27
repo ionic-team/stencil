@@ -60,7 +60,7 @@ const formatUrl = (config: d.Config, pluginCtx: TransformPluginContext, code: st
   const varName = createJsVarName(basename(filePath));
   const base64 = config.sys.encodeToBase64(code);
   if (config.devMode && base64.length > DATAURL_MAX_IMAGE_SIZE) {
-    pluginCtx.warn(`Importing large images will bloat your bundle size, please use assets instead.`);
+    pluginCtx.warn(`Importing large files will bloat your bundle size, please use external assets instead.`);
   }
 
   return `const ${varName} = 'data:${mime};base64,${base64}';export default ${varName};`;
