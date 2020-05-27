@@ -1206,7 +1206,7 @@ export namespace JSXBase {
     hidden?: boolean;
     id?: string;
     lang?: string;
-    spellcheck?: 'true' | 'false';
+    spellcheck?: 'true' | 'false' | any;
     style?: { [key: string]: string | undefined };
     tabIndex?: number;
     tabindex?: number | string;
@@ -1376,7 +1376,7 @@ export namespace JSXBase {
     'hanging'?: number | string;
     'horiz-adv-x'?: number | string;
     'horiz-origin-x'?: number | string;
-    'href'?: string,
+    'href'?: string;
     'ideographic'?: number | string;
     'image-rendering'?: number | string;
     'in2'?: number | string;
