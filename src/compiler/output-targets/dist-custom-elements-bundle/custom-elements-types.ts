@@ -24,9 +24,9 @@ const generateCustomElementsTypesOutput = async (
   const code = [
     `/* ${config.namespace} custom elements bundle */`,
     ``,
-    `import { Components } from '${componentsDtsRelPath}';`,
+    `import { Components } from "${componentsDtsRelPath}";`,
     ``,
-    components.map(generateCustomElementType),
+    ...components.map(generateCustomElementType),
     `/**`,
     ` * Utility to automatically define all custom elements within this package. `,
     ` * Use the standard [customElements.define()](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/define) `,
@@ -53,8 +53,8 @@ const generateCustomElementType = (cmp: d.ComponentCompilerMeta) => {
   const o: string[] = [
     `interface ${tagNameAsPascal} extends Components.${tagNameAsPascal}, HTMLElement {}`,
     `export const ${tagNameAsPascal}: {`,
-    `  prototype: ${tagNameAsPascal};`,
-    `  new (): ${tagNameAsPascal};`,
+    `    prototype: ${tagNameAsPascal};`,
+    `    new (): ${tagNameAsPascal};`,
     `};`,
     ``,
   ];
