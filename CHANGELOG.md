@@ -1,4 +1,4 @@
-# 🚜 [1.14.0-1](https://github.com/ionic-team/stencil/compare/v1.13.0...v1.14.0-1) (2020-05-22)
+# 🌪 [1.14.0-2](https://github.com/ionic-team/stencil/compare/v1.13.0...v1.14.0-2) (2020-05-27)
 
 
 ### Bug Fixes
@@ -9,6 +9,10 @@
 * **compiler:** components without mode should never get mode suffix ([#2445](https://github.com/ionic-team/stencil/issues/2445)) ([11e1ccb](https://github.com/ionic-team/stencil/commit/11e1ccb73034f09e625d2bef2e5e4886bb900199))
 * **compiler:** use transformed css to check changed imports of globalStyle ([#2422](https://github.com/ionic-team/stencil/issues/2422)) ([7742a87](https://github.com/ionic-team/stencil/commit/7742a87be0b204fb7e59e2185188efef157a51fe))
 * **dev-server:** allow no trailing slash for custom base url ([0fae632](https://github.com/ionic-team/stencil/commit/0fae632c703604a53a76a488a8905e270baf4f38))
+* **compiler:** disable const class optimization ([eac02cb](https://github.com/ionic-team/stencil/commit/eac02cb06cb7b3507aa5fc89c0bc3c804ac66936)), closes [#2462](https://github.com/ionic-team/stencil/issues/2462)
+* **custom-elements:** generate types for ce build, fix import paths ([22f3f23](https://github.com/ionic-team/stencil/commit/22f3f23783e5bd0790c13c0e7f3720c0d7be28c0))
+* **transform:** always update lazy class declaration ([6dd59b3](https://github.com/ionic-team/stencil/commit/6dd59b3b1fa922518e96335efe42f75f311583e0))
+* **ts:** ts resolve failedLookupLocations fix ([30203b8](https://github.com/ionic-team/stencil/commit/30203b86b0bb2f43706d55ba6d07f6867f81ce38))
 
 
 ### Features
