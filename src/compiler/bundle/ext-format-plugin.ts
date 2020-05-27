@@ -54,7 +54,7 @@ const formatUrl = (config: d.Config, pluginCtx: TransformPluginContext, code: st
   const mime = FORMAT_URL_MIME[ext];
   if (!mime) {
     pluginCtx.warn(`Unsupported url format for "${ext}" extension.`);
-    return formatText(code, filePath);
+    return formatText('', filePath);
   }
 
   const varName = createJsVarName(basename(filePath));
