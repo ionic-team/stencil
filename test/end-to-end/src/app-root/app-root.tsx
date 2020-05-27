@@ -1,17 +1,15 @@
-import { Component, State, h } from '@stencil/core';
+import { Component, State, h, Host } from '@stencil/core';
 import _ from 'lodash';
 import _es from 'lodash-es';
-
 
 function format(target: any, propertyKey: string) {
   console.log(target, propertyKey);
 }
 
 @Component({
-  tag: 'app-root'
+  tag: 'app-root',
 })
 export class AppRoot {
-
   @format something = '12';
   @State() first: string;
   @State() last: string;
@@ -25,7 +23,10 @@ export class AppRoot {
   }
 
   render() {
-    return <prop-cmp first={this.first} lastName={this.last} mode="ios"></prop-cmp>
+    return (
+      <Host>
+        <prop-cmp first={this.first} lastName={this.last} mode="ios" />
+      </Host>
+    );
   }
-
 }

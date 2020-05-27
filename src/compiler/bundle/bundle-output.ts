@@ -5,16 +5,15 @@ import { coreResolvePlugin } from './core-resolve-plugin';
 import { createCustomResolverAsync } from '../sys/resolve/resolve-module-async';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { devNodeModuleResolveId } from './dev-module';
+import { extFormatPlugin } from './ext-format-plugin';
 import { extTransformsPlugin } from './ext-transforms-plugin';
 import { fileLoadPlugin } from './file-load-plugin';
-import { imagePlugin } from './image-plugin';
 import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-plugin';
 import { loaderPlugin } from './loader-plugin';
 import { pluginHelper } from './plugin-helper';
 import { resolveIdWithTypeScript, typescriptPlugin } from './typescript-plugin';
 import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-plugins';
 import { RollupOptions, TreeshakingOptions, rollup } from 'rollup';
-import { textPlugin } from './text-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
 
@@ -72,8 +71,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       loaderPlugin(bundleOpts.loader),
       userIndexPlugin(config, compilerCtx),
       typescriptPlugin(compilerCtx, bundleOpts),
-      imagePlugin(config, buildCtx),
-      textPlugin(),
+      extFormatPlugin(config, buildCtx),
       extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),
       ...beforePlugins,

@@ -142,6 +142,21 @@ const pathComponents = (path: string, rootLength: number) => {
  */
 export const normalizeFsPath = (p: string) => normalizePath(p.split('?')[0]);
 
+export const normalizeFsPathQuery = (importPath: string) => {
+  const pathParts = importPath.split('?');
+  const filePath = normalizePath(pathParts[0]);
+  const ext = filePath.split('.').pop().toLowerCase();
+  const params = pathParts.length > 1 ? new URLSearchParams(pathParts[1]) : null;
+  const format = params ? params.get('format') : null;
+
+  return {
+    filePath,
+    ext,
+    params,
+    format,
+  };
+};
+
 const enum CharacterCodes {
   a = 0x61,
   A = 0x41,
