@@ -1,6 +1,6 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { appDataPlugin } from './app-data-plugin';
-import { BundleOptions } from './bundle-interface';
+import type { BundleOptions } from './bundle-interface';
 import { coreResolvePlugin } from './core-resolve-plugin';
 import { createCustomResolverAsync } from '../sys/resolve/resolve-module-async';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
@@ -96,6 +96,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
 
     treeshake: getTreeshakeOption(config, bundleOpts),
     inlineDynamicImports: bundleOpts.inlineDynamicImports,
+    preserveEntrySignatures: bundleOpts.preserveEntrySignatures ?? 'strict',
 
     onwarn: createOnWarnFn(buildCtx.diagnostics),
 
@@ -105,14 +106,15 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
   return rollupOptions;
 };
 
-const getTreeshakeOption = (config: d.Config, bundleOpts: BundleOptions) => {
+const getTreeshakeOption = (config: d.Config, bundleOpts: BundleOptions): TreeshakingOptions | boolean => {
   if (bundleOpts.platform === 'hydrate') {
     return {
       propertyReadSideEffects: false,
       tryCatchDeoptimization: false,
     };
   }
-  const treeshake: TreeshakingOptions | boolean =
+
+  const treeshake =
     !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
       ? {
           propertyReadSideEffects: false,

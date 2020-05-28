@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { BundleOptions } from '../../bundle/bundle-interface';
+import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError, dashToPascalCase, formatComponentRuntimeMeta, hasError, stringifyRuntimeData } from '@utils';
 import { getCustomElementsBuildConditionals } from './custom-elements-build-conditionals';
@@ -44,6 +44,7 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
         '\0core': generateEntryPoint(buildCtx),
       },
       inlineDynamicImports: outputTarget.inlineDynamicImports,
+      preserveEntrySignatures: 'allow-extension'
     };
 
     const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
@@ -51,8 +52,10 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
       const rollupOutput = await build.generate({
         format: 'esm',
         sourcemap: config.sourceMap,
-        chunkFileNames: config.devMode ? '[name]-[hash].mjs' : 'p-[hash].mjs',
+        chunkFileNames: outputTarget.externalRuntime || !config.hashFileNames ? '[name].mjs' : 'p-[hash].mjs',
         entryFileNames: '[name].mjs',
+        hoistTransitiveImports: false,
+        preferConst: true,
       });
       const files = rollupOutput.output.map(async bundle => {
         if (bundle.type === 'chunk') {
@@ -102,12 +105,13 @@ const generateEntryPoint = (buildCtx: d.BuildCtx) => {
       exportNames.push(exportName);
     }
   });
-  exportStatements.push(`
-export const defineCustomElements = () => {
-  [
-    ${exportNames.join(',\n    ')}
-  ].forEach(cmp => customElements.define(cmp.is, cmp));
-};`);
+
+  exportStatements.push(`export const defineCustomElements = () => {`);
+  exportStatements.push(`  [`);
+  exportStatements.push(`    ${exportNames.join(',\n    ')}`);
+  exportStatements.push(`  ].forEach(cmp => customElements.define(cmp.is, cmp));`);
+  exportStatements.push(`};`);
+
   return [...importStatements, ...exportStatements, ''].join('\n');
 };
 

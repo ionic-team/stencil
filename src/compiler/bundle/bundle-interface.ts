@@ -1,5 +1,6 @@
-import { BuildConditionals } from '../../declarations';
-import { SourceFile, TransformerFactory } from 'typescript';
+import type { BuildConditionals } from '../../declarations';
+import type { SourceFile, TransformerFactory } from 'typescript';
+import type { PreserveEntrySignaturesOption } from 'rollup';
 
 export interface BundleOptions {
   id: string;
@@ -11,4 +12,5 @@ export interface BundleOptions {
   loader?: { [id: string]: string };
   inlineDynamicImports?: boolean;
   inlineWorkers?: boolean;
+  preserveEntrySignatures?: PreserveEntrySignaturesOption,
 }
