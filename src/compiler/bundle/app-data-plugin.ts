@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import MagicString from 'magic-string';
 import { createJsVarName, normalizePath, isString, loadTypeScriptDiagnostics } from '@utils';
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
 import { APP_DATA_CONDITIONAL, STENCIL_APP_DATA_ID, STENCIL_APP_GLOBALS_ID, STENCIL_CORE_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
 import ts from 'typescript';

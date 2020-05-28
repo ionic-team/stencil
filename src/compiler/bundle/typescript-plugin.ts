@@ -1,8 +1,8 @@
 import * as d from '../../declarations';
-import { BundleOptions } from './bundle-interface';
+import type { BundleOptions } from './bundle-interface';
 import { getModule } from '../transpile/transpiled-module';
 import { isString, normalizeFsPath } from '@utils';
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
 import { tsResolveModuleName } from '../sys/typescript/typescript-resolve-module';
 import { isAbsolute } from 'path';
 import ts from 'typescript';

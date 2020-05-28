@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { normalizePath } from '@utils';
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
 
 export const lazyComponentPlugin = (buildCtx: d.BuildCtx) => {
   const entrys = new Map<string, d.EntryModule>();

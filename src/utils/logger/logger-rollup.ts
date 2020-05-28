@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { buildWarn } from '../message-utils';
 import { isString, toTitleCase } from '../helpers';
 import { splitLineBreaks } from './logger-utils';
-import { RollupError } from 'rollup';
+import type { RollupError } from 'rollup';
 
 export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: RollupError) => {
   const formattedCode = formatErrorCode(rollupError.code);

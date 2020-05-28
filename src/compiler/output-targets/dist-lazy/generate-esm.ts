@@ -2,9 +2,9 @@ import * as d from '../../../declarations';
 import { generateLazyModules } from './generate-lazy-module';
 import { generateRollupOutput } from '../../app-core/bundle-app-core';
 import { join } from 'path';
-import { OutputOptions, RollupBuild } from 'rollup';
+import type { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '../output-utils';
-import { RollupResult } from '../../../declarations';
+import type { RollupResult } from '../../../declarations';
 
 export const generateEsm = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) => {
   const esmEs5Outputs = config.buildEs5 ? outputTargets.filter(o => !!o.esmEs5Dir && !o.isBrowserBuild) : [];

@@ -1,7 +1,7 @@
 import { Component, Host, h, State } from '@stencil/core';
-import StencilTypes from '@stencil/core/compiler';
-import TypeScriptTypes from 'typescript';
-import RollupTypes from 'rollup';
+import type StencilTypes from '@stencil/core/compiler';
+import type TypeScriptTypes from 'typescript';
+import type RollupTypes from 'rollup';
 import { cssTemplatePlugin } from '../../utils/css-template-plugin';
 import { loadDeps } from '../../utils/load-deps';
 import { templates, templateList } from '../../utils/templates';

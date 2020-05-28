@@ -1,10 +1,10 @@
 import * as d from '../../declarations';
-import { BundleOptions } from './bundle-interface';
+import type { BundleOptions } from './bundle-interface';
 import { hasError, normalizeFsPath } from '@utils';
 import { isOutputTargetDistCollection } from '../output-targets/output-utils';
 import { join, relative } from 'path';
 import { parseImportPath } from '../transformers/stencil-import-path';
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
 import { runPluginTransformsEsmImports } from '../plugin/plugin';
 
 export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions): Plugin => {

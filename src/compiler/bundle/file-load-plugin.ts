@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { normalizeFsPath } from '@utils';
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
 
 export const fileLoadPlugin = (fs: d.InMemoryFileSystem): Plugin => {
   return {

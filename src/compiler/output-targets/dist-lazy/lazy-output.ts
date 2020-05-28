@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { BundleOptions } from '../../bundle/bundle-interface';
+import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
 import { generateEntryModules } from '../../entries/entry-modules';

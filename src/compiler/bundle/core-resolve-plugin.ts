@@ -6,7 +6,7 @@ import { HYDRATED_CSS } from '../../runtime/runtime-constants';
 import { isExternalUrl, getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
 import { normalizePath, normalizeFsPath } from '@utils';
 import { APP_DATA_CONDITIONAL, STENCIL_CORE_ID, STENCIL_INTERNAL_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
 
 export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, platform: 'client' | 'hydrate' | 'worker', externalRuntime: boolean): Plugin => {
   if (platform === 'worker') {
