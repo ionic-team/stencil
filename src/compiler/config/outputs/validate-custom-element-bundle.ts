@@ -1,10 +1,11 @@
 import * as d from '../../../declarations';
+import { COPY, isOutputTargetDistCustomElementsBundle } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';
 import { isBoolean } from '@utils';
-import { isOutputTargetDistCustomElementsBundle } from '../../output-targets/output-utils';
+import { validateCopy } from '../validate-copy';
 
 export const validateCustomElementBundle = (config: d.Config, userOutputs: d.OutputTarget[]) => {
-  return userOutputs.filter(isOutputTargetDistCustomElementsBundle).map(o => {
+  return userOutputs.filter(isOutputTargetDistCustomElementsBundle).reduce((arr, o) => {
     const outputTarget = {
       ...o,
       dir: getAbsolutePath(config, o.dir || 'dist/custom-elements'),
@@ -15,6 +16,17 @@ export const validateCustomElementBundle = (config: d.Config, userOutputs: d.Out
     if (!isBoolean(outputTarget.externalRuntime)) {
       outputTarget.externalRuntime = true;
     }
-    return outputTarget;
-  });
+    outputTarget.copy = validateCopy(outputTarget.copy, config.copy);
+
+    if (outputTarget.copy.length > 0) {
+      arr.push({
+        type: COPY,
+        dir: config.rootDir,
+        copy: [...outputTarget.copy],
+      });
+    }
+    arr.push(outputTarget)
+
+    return arr;
+  }, [] as (d.OutputTargetDistCustomElementsBundle | d.OutputTargetCopy)[]);
 };
