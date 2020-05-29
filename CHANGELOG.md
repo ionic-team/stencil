@@ -1,11 +1,11 @@
-# 🌝 [1.14.0-3](https://github.com/ionic-team/stencil/compare/v1.13.0...v1.14.0-3) (2020-05-28)
+# 🎂 [1.14.0](https://github.com/ionic-team/stencil/compare/v1.13.0...v1.14.0) (2020-05-29)
 
 
 ### Features
 
 * `dist-custom-elements-bundle` output target improvements/fixes
 * TypeScript 3.9.3
-* Rollup 2.11.2
+* Rollup 2.10.9
 * Requires NodeJS >= 10.13.0
 * **import-format:** text and url format import param ([4f1f39a](https://github.com/ionic-team/stencil/commit/4f1f39a4e4d76d55952df1724448164aa3730f3f))
 * add focusin and focusout event declarations ([#2436](https://github.com/ionic-team/stencil/issues/2436)) ([0d730d6](https://github.com/ionic-team/stencil/commit/0d730d672ef477266b12b31cf93bc98fc86ba8f0)), closes [#2435](https://github.com/ionic-team/stencil/issues/2435)
@@ -30,6 +30,7 @@
 * **transform:** always update lazy class declaration ([6dd59b3](https://github.com/ionic-team/stencil/commit/6dd59b3b1fa922518e96335efe42f75f311583e0))
 * **ts:** ts resolve failedLookupLocations fix ([30203b8](https://github.com/ionic-team/stencil/commit/30203b86b0bb2f43706d55ba6d07f6867f81ce38))
 * **spellcheck:** put an any on it ([#2476](https://github.com/ionic-team/stencil/issues/2476)) ([1418c04](https://github.com/ionic-team/stencil/commit/1418c04ec88df877c8f7539a9e5103bc6f9ed0ba))
+* **custom-elements:** fix copy tasks ([d810649](https://github.com/ionic-team/stencil/commit/d810649a70b133776ee07cd41e4f9150487e8586))
 
 
 # 🚂 [1.13.0](https://github.com/ionic-team/stencil/compare/v1.12.7...v1.13.0) (2020-05-11)
