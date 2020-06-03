@@ -1,4 +1,4 @@
-import { Component, Element, Prop, h } from '@stencil/core';
+import { Component, Element, Prop, h, Host } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('attribute', () => {
@@ -318,5 +318,50 @@ describe('attribute', () => {
         </cmp-a>
       `);
     });
+
+    it('should reflect draggable', async () => {
+
+      @Component({ tag: 'cmp-draggable', shadow: true })
+      class CmpABC {
+        @Prop() foo = false;
+
+        render() {
+          return (
+            <Host>
+              <div draggable={this.foo}></div>
+              <img draggable={this.foo} />
+            </Host>
+          );
+        }
+      }
+
+      const { root, waitForChanges } = await newSpecPage({
+        components: [CmpABC],
+        html: `<cmp-draggable></cmp-draggable>`,
+      });
+
+      expect(root).toEqualHtml(`
+        <cmp-draggable>
+          <mock:shadow-root>
+            <div draggable="false"></div>
+            <img draggable="false"/>
+          </mock:shadow-root>
+        </cmp-draggable>
+      `);
+
+      root.foo = true;
+      await waitForChanges();
+
+      expect(root).toEqualHtml(`
+      <cmp-draggable>
+        <mock:shadow-root>
+          <div draggable="true"></div>
+          <img draggable="true"/>
+        </mock:shadow-root>
+      </cmp-draggable>
+    `);
+
+    });
+
   });
 });

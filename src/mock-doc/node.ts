@@ -327,7 +327,7 @@ export class MockElement extends MockNode {
     return { bottom: 0, height: 0, left: 0, right: 0, top: 0, width: 0, x: 0, y: 0 };
   }
 
-  getRootNode(opts?: { composed?: boolean; [key: string]: any }) {
+  getRootNode(opts?: { composed?: boolean;[key: string]: any }) {
     const isComposed = opts != null && opts.composed === true;
 
     let node: Node = this as any;
@@ -341,6 +341,13 @@ export class MockElement extends MockNode {
     }
 
     return node;
+  }
+
+  get draggable() {
+    return this.getAttributeNS(null, 'draggable') === 'true';
+  }
+  set draggable(value: boolean) {
+    this.setAttributeNS(null, 'draggable', value);
   }
 
   hasChildNodes() {

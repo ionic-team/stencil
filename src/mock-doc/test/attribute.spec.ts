@@ -1,6 +1,7 @@
 import { MockDocument } from '../document';
 import { MockElement, MockHTMLElement } from '../node';
 import { XLINK_NS } from '../../runtime/runtime-constants';
+import { MockImageElement } from '../element';
 
 describe('attributes', () => {
   let doc: MockDocument;
@@ -122,6 +123,32 @@ describe('attributes', () => {
     const element = new MockHTMLElement(doc, 'div');
     element.setAttributeNS(XLINK_NS, 'href', 'google.com');
     expect(element.getAttribute('href')).toEqual('google.com');
+  });
+
+  it('draggable default value', () => {
+    const div = doc.createElement('div')
+    expect(div.draggable).toEqual(false);
+
+    const img = doc.createElement('img');
+    expect(img.draggable).toEqual(true);
+  });
+
+  it('draggable should reflect props to attributes', () => {
+    const div = doc.createElement('div');
+    div.draggable = true;
+    expect(div.getAttribute('draggable')).toEqual('true');
+    div.draggable = false;
+    expect(div.getAttribute('draggable')).toEqual('false');
+  });
+
+  it('draggable should reflect attributes to props', () => {
+    const div = doc.createElement('div');
+    div.setAttribute('draggable', 'true');
+    expect(div.draggable).toEqual(true);
+
+    const img = doc.createElement('img');
+    img.setAttribute('draggable', 'false');
+    expect(img.draggable).toEqual(false);
   });
 
   function testNsAttributes(element) {

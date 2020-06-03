@@ -105,7 +105,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
           } else {
             (elm as any)[memberName] = newValue;
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       /**
@@ -123,10 +123,12 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
         }
       }
       if (newValue == null || newValue === false) {
-        if (BUILD.vdomXlink && xlink) {
-          elm.removeAttributeNS(XLINK_NS, memberName);
-        } else {
-          elm.removeAttribute(memberName);
+        if (newValue !== false || elm.getAttribute(memberName) === '') {
+          if (BUILD.vdomXlink && xlink) {
+            elm.removeAttributeNS(XLINK_NS, memberName);
+          } else {
+            elm.removeAttribute(memberName);
+          }
         }
       } else if ((!isProp || flags & VNODE_FLAGS.isHost || isSvg) && !isComplex) {
         newValue = newValue === true ? '' : newValue;

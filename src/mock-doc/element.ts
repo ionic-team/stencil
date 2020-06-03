@@ -104,6 +104,13 @@ export class MockImageElement extends MockHTMLElement {
     super(ownerDocument, 'img');
   }
 
+  get draggable() {
+    return this.getAttributeNS(null, 'draggable') !== 'false';
+  }
+  set draggable(value: boolean) {
+    this.setAttributeNS(null, 'draggable', value);
+  }
+
   get src() {
     return fullUrl(this, 'src');
   }
@@ -444,7 +451,7 @@ function fullUrl(elm: MockElement, attrName: string) {
         try {
           const url = new URL(val, loc.href);
           return url.href;
-        } catch (e) {}
+        } catch (e) { }
       }
     }
   }
