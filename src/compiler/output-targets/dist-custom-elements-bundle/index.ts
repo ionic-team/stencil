@@ -44,7 +44,7 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
         '\0core': generateEntryPoint(buildCtx),
       },
       inlineDynamicImports: outputTarget.inlineDynamicImports,
-      preserveEntrySignatures: 'allow-extension'
+      preserveEntrySignatures: 'allow-extension',
     };
 
     const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
@@ -52,8 +52,8 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
       const rollupOutput = await build.generate({
         format: 'esm',
         sourcemap: config.sourceMap,
-        chunkFileNames: outputTarget.externalRuntime || !config.hashFileNames ? '[name].mjs' : 'p-[hash].mjs',
-        entryFileNames: '[name].mjs',
+        chunkFileNames: outputTarget.externalRuntime || !config.hashFileNames ? '[name].js' : 'p-[hash].js',
+        entryFileNames: '[name].js',
         hoistTransitiveImports: false,
         preferConst: true,
       });
@@ -80,10 +80,11 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
 };
 
 const generateEntryPoint = (buildCtx: d.BuildCtx) => {
-  const importStatements: string[] = [];
-  const exportStatements: string[] = [];
+  const imp: string[] = [];
+  const exp: string[] = [];
   const exportNames: string[] = [];
-  importStatements.push(
+
+  imp.push(
     `import { proxyCustomElement } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
     `export * from '${USER_INDEX_ENTRY_ID}';`,
     `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';`,
@@ -96,23 +97,35 @@ const generateEntryPoint = (buildCtx: d.BuildCtx) => {
     const importAs = `$Cmp${exportName}`;
 
     if (cmp.isPlain) {
-      exportStatements.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
+      exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
     } else {
       const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
 
-      importStatements.push(`import { ${importName} as ${importAs} } from '${cmp.sourceFilePath}';`);
-      exportStatements.push(`export const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});`);
-      exportNames.push(exportName);
+      imp.push(`import { ${importName} as ${importAs} } from '${cmp.sourceFilePath}';`);
+      exp.push(`export const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});`);
     }
+    exportNames.push(exportName);
   });
 
-  exportStatements.push(`export const defineCustomElements = () => {`);
-  exportStatements.push(`  [`);
-  exportStatements.push(`    ${exportNames.join(',\n    ')}`);
-  exportStatements.push(`  ].forEach(cmp => customElements.define(cmp.is, cmp));`);
-  exportStatements.push(`};`);
+  exp.push(`export const safeDefineCustomElement = (tag, cmp, opts) => {`);
+  exp.push(`    if (typeof customElements !== 'undefined' && !customElements.get(tag)) {`);
+  exp.push(`        customElements.define(tag, cmp, opts);`);
+  exp.push(`    }`);
+  exp.push(`};`);
+  exp.push(``);
 
-  return [...importStatements, ...exportStatements, ''].join('\n');
+  if (exportNames.length === 1) {
+    exp.push(`export const defineCustomElements = (opts) =>`);
+    exp.push(`    safeDefineCustomElement(${exportNames[0]}.is, ${exportNames[0]}, opts);`);
+  } else {
+    exp.push(`export const defineCustomElements = (opts) => {`);
+    exp.push(`    [`);
+    exp.push(`        ${exportNames.join(',\n    ')}`);
+    exp.push(`    ].forEach(cmp => safeDefineCustomElement(cmp.is, cmp, opts));`);
+    exp.push(`};`);
+  }
+
+  return [...imp, ...exp].join('\n') + '\n';
 };
 
 const getCustomElementBundleCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {

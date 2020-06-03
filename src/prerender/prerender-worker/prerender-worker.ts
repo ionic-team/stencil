@@ -7,7 +7,6 @@ import { initNodeWorkerThread } from '../../sys/node/worker/worker-child';
 import { patchNodeGlobal, patchWindowGlobal } from '../prerender-global-patch';
 import fs from 'graceful-fs';
 import path from 'path';
-import { URL } from 'url';
 
 let componentGraph: Map<string, string[]>;
 let templateHtml: string = null;

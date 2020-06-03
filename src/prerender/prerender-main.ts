@@ -14,7 +14,6 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import readline from 'readline';
-import { URL } from 'url';
 
 export async function runPrerender(
   prcs: NodeJS.Process,

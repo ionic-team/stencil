@@ -2,7 +2,7 @@ export const IS_NODE_ENV =
   typeof global !== 'undefined' &&
   typeof require === 'function' &&
   !!global.process &&
-  Array.isArray(global.process.argv) &&
+  /*@__PURE__*/ Array.isArray(global.process.argv) &&
   typeof __filename === 'string' &&
   (!((global as any) as Window).origin || typeof ((global as any) as Window).origin !== 'string');
 

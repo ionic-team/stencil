@@ -20,20 +20,20 @@ export async function mockDoc(opts: BuildOptions) {
   writePkgJson(opts, outputDir, {
     name: '@stencil/core/mock-doc',
     description: 'Mock window, document and DOM outside of a browser environment.',
-    main: 'index.js',
-    module: 'index.mjs',
+    main: 'index.cjs.js',
+    module: 'index.js',
     types: 'index.d.ts',
   });
 
   const esOutput: OutputOptions = {
     format: 'es',
-    file: join(outputDir, 'index.mjs'),
+    file: join(outputDir, 'index.js'),
     preferConst: true,
   };
 
   const cjsOutput: OutputOptions = {
     format: 'cjs',
-    file: join(outputDir, 'index.js'),
+    file: join(outputDir, 'index.cjs.js'),
     intro: CJS_INTRO,
     outro: CJS_OUTRO,
     strict: false,
@@ -126,10 +126,7 @@ function getMockDocExports(srcIndexDts: string) {
   const dtsExports: string[] = [];
 
   exportLines.forEach(ln => {
-    const splt = ln
-      .split('{')[1]
-      .split('}')[0]
-      .trim();
+    const splt = ln.split('{')[1].split('}')[0].trim();
     const exportNames = splt
       .split(',')
       .map(n => n.trim())

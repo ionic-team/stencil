@@ -24,22 +24,20 @@ export async function internalClient(opts: BuildOptions) {
   // write @stencil/core/internal/client/package.json
   writePkgJson(opts, outputInternalClientDir, {
     name: '@stencil/core/internal/client',
-    description: 'Stencil internal client platform to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
-    main: 'index.mjs',
+    description: 'Stencil internal client platform to be imported by the Stencil Compiler and internal runtime. Breaking changes can and will happen at any time.',
+    main: 'index.js',
   });
-
-  const output: OutputOptions = {
-    format: 'es',
-    dir: outputInternalClientDir,
-    entryFileNames: '[name].mjs',
-    chunkFileNames: '[name].mjs',
-    banner: getBanner(opts, 'Stencil Client Platform'),
-    preferConst: true,
-  };
 
   const internalClientBundle: RollupOptions = {
     input: join(inputClientDir, 'index.js'),
-    output,
+    output: {
+      format: 'es',
+      dir: outputInternalClientDir,
+      entryFileNames: '[name].js',
+      chunkFileNames: '[name].js',
+      banner: getBanner(opts, 'Stencil Client Platform'),
+      preferConst: true,
+    },
     treeshake: {
       moduleSideEffects: 'no-external',
     },
@@ -49,6 +47,37 @@ export async function internalClient(opts: BuildOptions) {
         resolveId(importee) {
           if (importee === '@platform') {
             return join(inputClientDir, 'index.js');
+          }
+        },
+      },
+      aliasPlugin(opts),
+      replacePlugin(opts),
+      reorderCoreStatementsPlugin(),
+    ],
+  };
+
+  const internalClientPatchBundle: RollupOptions = {
+    input: join(inputClientDir, 'client-patch.js'),
+    output: {
+      format: 'es',
+      dir: outputInternalClientDir,
+      entryFileNames: 'patch.js',
+      chunkFileNames: '[name].js',
+      banner: getBanner(opts, 'Stencil Client Patch'),
+      preferConst: true,
+    },
+    treeshake: {
+      moduleSideEffects: 'no-external',
+    },
+    plugins: [
+      {
+        name: 'internalClientPatchPlugin',
+        resolveId(importee) {
+          if (importee === '@platform') {
+            return {
+              id: `@stencil/core/internal/client`,
+              external: true,
+            };
           }
         },
       },
@@ -112,8 +141,7 @@ export async function internalClient(opts: BuildOptions) {
       reorderCoreStatementsPlugin(),
     ],
   };
-
-  return [internalClientBundle];
+  return [internalClientBundle, internalClientPatchBundle];
 }
 
 async function copyPolyfills(opts: BuildOptions, outputInternalClientPolyfillsDir: string) {

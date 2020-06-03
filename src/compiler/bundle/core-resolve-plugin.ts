@@ -5,7 +5,14 @@ import { getNodeModulePath } from '../sys/resolve/resolve-utils';
 import { HYDRATED_CSS } from '../../runtime/runtime-constants';
 import { isExternalUrl, getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
 import { normalizePath, normalizeFsPath } from '@utils';
-import { APP_DATA_CONDITIONAL, STENCIL_CORE_ID, STENCIL_INTERNAL_ID, STENCIL_INTERNAL_CLIENT_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
+import {
+  APP_DATA_CONDITIONAL,
+  STENCIL_CORE_ID,
+  STENCIL_INTERNAL_ID,
+  STENCIL_INTERNAL_CLIENT_ID,
+  STENCIL_INTERNAL_CLIENT_PATCH_ID,
+  STENCIL_INTERNAL_HYDRATE_ID,
+} from './entry-alias-ids';
 import type { Plugin } from 'rollup';
 
 export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, platform: 'client' | 'hydrate' | 'worker', externalRuntime: boolean): Plugin => {
@@ -21,8 +28,9 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
     };
   }
   const compilerExe = config.sys.getCompilerExecutingPath();
-  const internalClient = getStencilInternalModule(config.rootDir, compilerExe, 'client');
-  const internalHydrate = getStencilInternalModule(config.rootDir, compilerExe, 'hydrate');
+  const internalClient = getStencilInternalModule(config.rootDir, compilerExe, 'client/index.js');
+  const internalClientPatch = getStencilInternalModule(config.rootDir, compilerExe, 'client/patch.js');
+  const internalHydrate = getStencilInternalModule(config.rootDir, compilerExe, 'hydrate/index.js');
 
   return {
     name: 'coreResolvePlugin',
@@ -57,6 +65,15 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
         // importing @stencil/core/internal/client directly, so it shouldn't get
         // the custom app-data conditionals
         return internalClient;
+      }
+      if (id === STENCIL_INTERNAL_CLIENT_PATCH_ID) {
+        if (externalRuntime) {
+          return {
+            id: STENCIL_INTERNAL_CLIENT_PATCH_ID,
+            external: true,
+          };
+        }
+        return internalClientPatch;
       }
       if (id === STENCIL_INTERNAL_HYDRATE_ID) {
         return internalHydrate;
@@ -103,11 +120,11 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
 
 export const getStencilInternalModule = (rootDir: string, compilerExe: string, internalModule: string) => {
   if (isExternalUrl(compilerExe)) {
-    return getNodeModulePath(rootDir, '@stencil', 'core', 'internal', internalModule, 'index.mjs');
+    return getNodeModulePath(rootDir, '@stencil', 'core', 'internal', internalModule);
   }
 
   const compilerExeDir = dirname(compilerExe);
-  return normalizePath(join(compilerExeDir, '..', 'internal', internalModule, 'index.mjs'));
+  return normalizePath(join(compilerExeDir, '..', 'internal', internalModule));
 };
 
 export const getHydratedFlagHead = (h: d.HydratedFlag) => {
