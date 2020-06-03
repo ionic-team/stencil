@@ -41,7 +41,6 @@ export async function cli(opts: BuildOptions) {
     'string_decoder',
     'tty',
     'typescript',
-    'url',
     'util',
   ];
 
@@ -72,7 +71,7 @@ export async function cli(opts: BuildOptions) {
           }
           if (importee === '@stencil/core/mock-doc') {
             return {
-              id: '../mock-doc/index.js',
+              id: '../mock-doc/index.cjs.js',
               external: true,
             };
           }
@@ -110,7 +109,7 @@ export async function cli(opts: BuildOptions) {
           }
           if (importee === '@stencil/core/mock-doc') {
             return {
-              id: '../mock-doc/index.js',
+              id: '../mock-doc/index.cjs.js',
               external: true,
             };
           }

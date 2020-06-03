@@ -1,17 +1,16 @@
 import { MockHeaders, MockRequestInfo, MockResponse } from '@stencil/core/mock-doc';
-import { URL } from 'url';
 
 const mockedResponses = new Map<string, MockedResponseData>();
 
 export function setupMockFetch(global: any) {
   const win = global.window;
   if (!('fetch' in win)) {
-    win.fetch = function(input: MockRequestInfo) {
+    win.fetch = function (input: MockRequestInfo) {
       return globalMockFetch(input);
     };
   }
   if (!('fetch' in global)) {
-    global.fetch = function(input: MockRequestInfo) {
+    global.fetch = function (input: MockRequestInfo) {
       return globalMockFetch(input);
     };
   }

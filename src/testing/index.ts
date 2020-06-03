@@ -12,9 +12,3 @@ export { transpile } from './test-transpile';
 export { EventSpy, SpecPage, Testing } from '@stencil/core/internal';
 
 export { E2EElement, E2EPage, newE2EPage } from './puppeteer';
-
-import { URL as nodeURL } from 'url';
-if (typeof URL === 'undefined') {
-  // polyfill global URL for Node version < 10.0.0
-  (global as any).URL = nodeURL;
-}

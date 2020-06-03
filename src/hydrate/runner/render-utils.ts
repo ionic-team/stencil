@@ -1,5 +1,4 @@
 import * as d from '../../declarations';
-import { URL } from 'url';
 
 export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
   const outputOpts: d.HydrateFactoryOptions = Object.assign(

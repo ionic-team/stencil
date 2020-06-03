@@ -14,8 +14,8 @@ import { join } from 'path';
 export const generateHydrateApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[]) => {
   try {
     const packageDir = join(config.sys.getCompilerExecutingPath(), '..', '..');
-    const input = join(packageDir, 'internal', 'hydrate', 'runner.mjs');
-    const mockDoc = join(packageDir, 'mock-doc', 'index.mjs');
+    const input = join(packageDir, 'internal', 'hydrate', 'runner.js');
+    const mockDoc = join(packageDir, 'mock-doc', 'index.js');
 
     const rollupOptions: RollupOptions = {
       ...config.rollupConfig.inputOptions,

@@ -45,7 +45,7 @@ export async function devServer(opts: BuildOptions) {
       esModule: false,
       preferConst: true,
     },
-    external: ['assert', 'child_process', 'fs', 'os', 'path', 'util'],
+    external: ['assert', 'child_process', 'fs', 'os', 'path', 'url', 'util'],
     plugins: [
       gracefulFsPlugin(),
       aliasPlugin(opts),
@@ -199,7 +199,7 @@ export async function devServer(opts: BuildOptions) {
   writePkgJson(opts, join(opts.output.devServerDir, 'client'), {
     name: '@stencil/core/dev-server/client',
     description: 'Stencil Dev Server Client.',
-    main: 'index.mjs',
+    main: 'index.js',
     types: 'index.d.ts',
   });
 
@@ -207,7 +207,7 @@ export async function devServer(opts: BuildOptions) {
     input: join(opts.transpiledDir, 'dev-server', 'client', 'index.js'),
     output: {
       format: 'esm',
-      file: join(opts.output.devServerDir, 'client', 'index.mjs'),
+      file: join(opts.output.devServerDir, 'client', 'index.js'),
     },
     plugins: [appErrorCssPlugin(), replacePlugin(opts), rollupResolve()],
   };

@@ -1,10 +1,10 @@
 import * as d from '../declarations';
 import { BUILD, NAMESPACE } from '@app-data';
-import { consoleDevInfo } from './client-log';
-import { CSS, H, doc, plt, promiseResolve, win } from './client-window';
+import { consoleDevInfo, CSS, H, doc, plt, promiseResolve, win } from '@platform';
 import { getDynamicImportFunction } from '@utils';
 
 export const patchEsm = () => {
+  // NOTE!! This fn cannot use async/await!
   // @ts-ignore
   if (BUILD.cssVarShim && !(CSS && CSS.supports && CSS.supports('color', 'var(--c)'))) {
     // @ts-ignore
@@ -124,7 +124,7 @@ const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
 const patchCloneNodeFix = (HTMLElementPrototype: any) => {
   const nativeCloneNodeFn = HTMLElementPrototype.cloneNode;
 
-  HTMLElementPrototype.cloneNode = function(this: Node, deep: boolean) {
+  HTMLElementPrototype.cloneNode = function (this: Node, deep: boolean) {
     if (this.nodeName === 'TEMPLATE') {
       return nativeCloneNodeFn.call(this, deep);
     }

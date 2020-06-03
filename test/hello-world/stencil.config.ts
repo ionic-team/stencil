@@ -9,8 +9,8 @@ export const config: Config = {
     {
       type: 'www',
       serviceWorker: null,
-      baseUrl: 'https://helloworld.stencil.js.com/'
-    }
+      baseUrl: 'https://helloworld.stencil.js.com/',
+    },
   ],
   enableCache: false,
   hydratedFlag: null,
@@ -21,5 +21,5 @@ export const config: Config = {
     safari10: false,
     scriptDataOpts: false,
     shadowDomShim: false,
-  }
+  },
 };

@@ -1,4 +1,5 @@
 import * as d from '../../../declarations';
+import { addNativeComponentMeta } from './native-meta';
 import { addNativeConnectedCallback } from './native-connected-callback';
 import { addNativeElementGetter } from './native-element-getter';
 import { addNativeStaticStyle } from './native-static-style';
@@ -37,6 +38,10 @@ const updateNativeHostComponentMembers = (transformOpts: d.TransformOptions, cla
   addNativeConnectedCallback(classMembers, cmp);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
+  
+  if (cmp.isPlain) {
+    addNativeComponentMeta(classMembers, cmp)
+  }
 
   if (transformOpts.style === 'static') {
     addNativeStaticStyle(classMembers, cmp);

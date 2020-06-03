@@ -4,7 +4,6 @@ import { getSitemapUrls } from './sitemap-xml';
 import fs from 'graceful-fs';
 import path from 'path';
 import { promisify } from 'util';
-import { URL } from 'url';
 
 const writeFile = promisify(fs.writeFile);
 
