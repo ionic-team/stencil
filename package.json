@@ -112,7 +112,7 @@
     "prettier": "^2.0.5",
     "prompts": "2.3.2",
     "puppeteer": "~3.3.0",
-    "rollup": "2.10.9",
+    "rollup": "2.12.1",
     "semiver": "^1.1.0",
     "semver": "7.3.2",
     "sizzle": "^2.3.5",
