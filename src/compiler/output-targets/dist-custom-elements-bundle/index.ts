@@ -109,19 +109,13 @@ const generateEntryPoint = (buildCtx: d.BuildCtx) => {
 
   exp.push(`export const defineCustomElements = (opts) => {`);
   exp.push(`    if (typeof customElements !== 'undefined') {`);
-  if (exportNames.length === 1) {
-    exp.push(`        if (!customElements.get(tag)) {`);
-    exp.push(`            customElements.define(${exportNames[0]}.is, ${exportNames[0]}, opts);`);
-    exp.push(`        }`);
-  } else {
-    exp.push(`        [`);
-    exp.push(`            ${exportNames.join(',\n    ')}`);
-    exp.push(`        ].forEach(cmp => {`);
-    exp.push(`            if (!customElements.get(cmp.is)) {`);
-    exp.push(`                customElements.define(cmp.is, cmp, opts);`);
-    exp.push(`            }`);
-    exp.push(`        });`);
-  }
+  exp.push(`        [`);
+  exp.push(`            ${exportNames.join(',\n    ')}`);
+  exp.push(`        ].forEach(cmp => {`);
+  exp.push(`            if (!customElements.get(cmp.is)) {`);
+  exp.push(`                customElements.define(cmp.is, cmp, opts);`);
+  exp.push(`            }`);
+  exp.push(`        });`);
   exp.push(`    }`);
   exp.push(`};`);
 
