@@ -138,4 +138,16 @@ describe('jsx', () => {
       expect(root.textContent).toBe('on-ALLCAPS');
     });
   });
+
+  describe('attributes', () => {
+    describe('draggable', () => {
+      for (const value of [undefined, 'true', 'false'] as const) {
+        it(String(value), async () => {
+          const { root } = await newSpecPage({ components: [], template: () => <img draggable={value} /> });
+
+          expect(root).toEqualHtml(`<img ${value !== undefined ? `draggable=${value}` : ''} >`);
+        });
+      }
+    });
+  });
 });
