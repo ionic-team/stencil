@@ -107,23 +107,23 @@ const generateEntryPoint = (buildCtx: d.BuildCtx) => {
     exportNames.push(exportName);
   });
 
-  exp.push(`export const safeDefineCustomElement = (tag, cmp, opts) => {`);
-  exp.push(`    if (typeof customElements !== 'undefined' && !customElements.get(tag)) {`);
-  exp.push(`        customElements.define(tag, cmp, opts);`);
+  exp.push(`export const defineCustomElements = (opts) => {`);
+  exp.push(`    if (typeof customElements !== 'undefined') {`);
+  if (exportNames.length === 1) {
+    exp.push(`        if (!customElements.get(tag)) {`);
+    exp.push(`            customElements.define(${exportNames[0]}.is, ${exportNames[0]}, opts);`);
+    exp.push(`        }`);
+  } else {
+    exp.push(`        [`);
+    exp.push(`            ${exportNames.join(',\n    ')}`);
+    exp.push(`        ].forEach(cmp => {`);
+    exp.push(`            if (!customElements.get(cmp.is)) {`);
+    exp.push(`                customElements.define(cmp.is, cmp, opts);`);
+    exp.push(`            }`);
+    exp.push(`        });`);
+  }
   exp.push(`    }`);
   exp.push(`};`);
-  exp.push(``);
-
-  if (exportNames.length === 1) {
-    exp.push(`export const defineCustomElements = (opts) =>`);
-    exp.push(`    safeDefineCustomElement(${exportNames[0]}.is, ${exportNames[0]}, opts);`);
-  } else {
-    exp.push(`export const defineCustomElements = (opts) => {`);
-    exp.push(`    [`);
-    exp.push(`        ${exportNames.join(',\n    ')}`);
-    exp.push(`    ].forEach(cmp => safeDefineCustomElement(cmp.is, cmp, opts));`);
-    exp.push(`};`);
-  }
 
   return [...imp, ...exp].join('\n') + '\n';
 };
