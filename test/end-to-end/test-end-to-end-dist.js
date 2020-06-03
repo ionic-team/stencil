@@ -13,7 +13,7 @@ fs.accessSync(path.join(distDir, 'index.mjs'));
 
 const customElementsDir = path.join(distDir, 'custom-elements');
 fs.accessSync(path.join(customElementsDir, 'index.d.ts'));
-fs.accessSync(path.join(customElementsDir, 'index.mjs'));
+fs.accessSync(path.join(customElementsDir, 'index.js'));
 
 const collectionDir = path.join(distDir, 'collection');
 fs.accessSync(path.join(collectionDir, 'car-list', 'car-data.js'));
