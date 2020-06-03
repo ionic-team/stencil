@@ -1202,7 +1202,7 @@ export namespace JSXBase {
     contextMenu?: string;
     contextmenu?: string;
     dir?: string;
-    draggable?: boolean;
+    draggable?: 'true' | 'false';
     hidden?: boolean;
     id?: string;
     lang?: string;
