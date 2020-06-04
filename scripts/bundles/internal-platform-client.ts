@@ -68,6 +68,7 @@ export async function internalClient(opts: BuildOptions) {
     },
     treeshake: {
       moduleSideEffects: 'no-external',
+      propertyReadSideEffects: false,
     },
     plugins: [
       {
@@ -75,7 +76,7 @@ export async function internalClient(opts: BuildOptions) {
         resolveId(importee) {
           if (importee === '@platform') {
             return {
-              id: `@stencil/core/internal/client`,
+              id: `@stencil/core`,
               external: true,
             };
           }
