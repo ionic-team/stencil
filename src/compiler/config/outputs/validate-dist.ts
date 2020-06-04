@@ -38,6 +38,7 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) =>
       type: COPY,
       dir: lazyDir,
       copyAssets: 'dist',
+      copy: [...distOutputTarget.copy],
     });
     outputs.push({
       type: DIST_GLOBAL_STYLES,
