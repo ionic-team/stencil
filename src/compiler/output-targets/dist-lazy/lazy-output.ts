@@ -148,13 +148,14 @@ const getLegacyLoader = (config: d.Config) => {
   scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
   doc.head.appendChild(scriptElm);
 
+  ${config.buildEs5 && `
   scriptElm = doc.createElement('script');
   scriptElm.setAttribute('nomodule', '');
   scriptElm.src = url + '/${namespace}.js';
   warn.push(scriptElm.outerHTML);
   scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
-  doc.head.appendChild(scriptElm);
-
+  doc.head.appendChild(scriptElm)
+  `}
   console.warn(warn.join('\\n'));
 
 })(document);`;
