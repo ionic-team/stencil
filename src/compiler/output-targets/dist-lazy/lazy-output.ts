@@ -4,7 +4,7 @@ import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
 import { generateEntryModules } from '../../entries/entry-modules';
 import { getLazyBuildConditionals } from './lazy-build-conditionals';
-import { isOutputTargetDistLazy } from '../output-utils';
+import { isOutputTargetDistLazy, isOutputTargetDist } from '../output-utils';
 import {
   LAZY_BROWSER_ENTRY_ID,
   LAZY_EXTERNAL_ENTRY_ID,
@@ -38,6 +38,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       platform: 'client',
       conditionals: getLazyBuildConditionals(config, buildCtx.components),
       customTransformers: getLazyCustomTransformer(config, compilerCtx),
+      inlineWorkers: config.outputTargets.some(isOutputTargetDist),
       inputs: {
         [config.fsNamespace]: LAZY_BROWSER_ENTRY_ID,
         loader: LAZY_EXTERNAL_ENTRY_ID,
