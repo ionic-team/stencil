@@ -8,14 +8,9 @@ export const outputTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, 
     return;
   }
 
-  const pkgData = buildCtx.packageJson;
-  if (pkgData == null) {
-    return;
-  }
-
   const timespan = buildCtx.createTimeSpan(`generate types started`, true);
 
-  await Promise.all(outputTargets.map(outputsTarget => generateTypes(config, compilerCtx, buildCtx, pkgData, outputsTarget)));
+  await Promise.all(outputTargets.map(outputsTarget => generateTypes(config, compilerCtx, buildCtx, outputsTarget)));
 
   timespan.finish(`generate types finished`);
 };
