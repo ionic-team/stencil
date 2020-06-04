@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { getAbsoluteBuildDir } from './html-utils';
-import { generateHashedCopy } from '../copy/hashed-copy';
+import { generateHashedCopy } from '../output-targets/copy/hashed-copy';
 import { injectModulePreloads } from './inject-module-preloads';
 import { isString } from '@utils';
 import { join } from 'path';

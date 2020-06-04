@@ -3,8 +3,17 @@ import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decor
 import { convertStaticToMeta } from '../static-to-meta/visitor';
 import { mockBuildCtx, mockCompilerCtx, mockConfig, mockStencilSystem } from '@stencil/core/testing';
 import ts from 'typescript';
+import { updateModule } from '../static-to-meta/parse-static';
+import { getScriptTarget } from '../transform-utils';
 
-export function transpileModule(input: string, config?: d.Config, compilerCtx?: d.CompilerCtx, sys?: d.StencilSystem) {
+export function transpileModule(
+  input: string,
+  config?: d.Config,
+  compilerCtx?: d.CompilerCtx,
+  sys?: d.CompilerSystem,
+  beforeTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
+  afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
+) {
   const options = ts.getDefaultCompilerOptions();
   options.isolatedModules = true;
   options.suppressOutputPathCheck = true;
@@ -15,6 +24,7 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
   options.types = undefined;
   options.noEmit = undefined;
   options.noEmitOnError = undefined;
+  options.noEmitHelpers = true;
   options.paths = undefined;
   options.rootDirs = undefined;
   options.declaration = undefined;
@@ -25,7 +35,7 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
   options.noResolve = true;
 
   options.module = ts.ModuleKind.ESNext;
-  options.target = ts.ScriptTarget.ES2017;
+  options.target = getScriptTarget();
   options.experimentalDecorators = true;
 
   options.jsx = ts.JsxEmit.React;
@@ -36,9 +46,16 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
 
   let outputText: string;
 
+  const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
+    if (emitFilePath.endsWith('.js')) {
+      outputText = data;
+      updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
+    }
+  };
+
   const compilerHost: ts.CompilerHost = {
     getSourceFile: fileName => (fileName === inputFileName ? sourceFile : undefined),
-    writeFile: (_, text) => (outputText = text),
+    writeFile: emitCallback,
     getDefaultLibFileName: () => 'lib.d.ts',
     useCaseSensitiveFileNames: () => false,
     getCanonicalFileName: fileName => fileName,
@@ -50,13 +67,12 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
     getDirectories: () => [],
   };
 
-  const program = ts.createProgram([inputFileName], options, compilerHost);
-
-  const typeChecker = program.getTypeChecker();
+  const tsProgram = ts.createProgram([inputFileName], options, compilerHost);
+  const tsTypeChecker = tsProgram.getTypeChecker();
 
   config = config || mockConfig();
   compilerCtx = compilerCtx || mockCompilerCtx();
-  sys = sys || mockStencilSystem();
+  sys = sys || (mockStencilSystem() as any);
 
   const buildCtx = mockBuildCtx(config, compilerCtx);
 
@@ -64,14 +80,14 @@ export function transpileModule(input: string, config?: d.Config, compilerCtx?: 
     coreImportPath: '@stencil/core',
     componentExport: 'lazy',
     componentMetadata: null,
-    styleImport: null,
-    scopeCss: false,
-    style: 'inline',
+    currentDirectory: '/',
+    proxy: null,
+    style: 'static',
   };
 
-  program.emit(undefined, undefined, undefined, undefined, {
-    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker)],
-    after: [convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)],
+  tsProgram.emit(undefined, undefined, undefined, undefined, {
+    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker), ...beforeTransformers],
+    after: [convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts), ...afterTransformers],
   });
 
   while (outputText.includes('  ')) {

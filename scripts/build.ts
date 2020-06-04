@@ -11,7 +11,7 @@ import { screenshot } from './bundles/screenshot';
 import { sysNode } from './bundles/sys-node';
 import { testing } from './bundles/testing';
 import { validateBuild } from './test/validate-build';
-import { RollupOptions, rollup } from 'rollup';
+import { rollup } from 'rollup';
 
 export async function run(rootDir: string, args: string[]) {
   try {

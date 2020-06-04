@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { OutputOptions, RollupBuild } from 'rollup';
-import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
+import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 
 export const generateRollupOutput = async (build: RollupBuild, options: OutputOptions, config: d.Config, entryModules: d.EntryModule[]): Promise<d.RollupResult[]> => {
   if (build == null) {
@@ -35,7 +35,7 @@ export const generateRollupOutput = async (build: RollupBuild, options: OutputOp
 };
 
 export const DEFAULT_CORE = `
-export * from '${STENCIL_INTERNAL_CLIENT_ID}';
+export * from '${STENCIL_CORE_ID}';
 `;
 
 export const DEFAULT_ENTRY = `

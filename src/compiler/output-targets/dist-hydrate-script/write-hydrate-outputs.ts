@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { basename, join } from 'path';
 import { relocateHydrateContextConst } from './relocate-hydrate-context';
-import { RollupOutput } from 'rollup';
+import type { RollupOutput } from 'rollup';
 
 export const writeHydrateOutputs = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[], rollupOutput: RollupOutput) => {
   return Promise.all(

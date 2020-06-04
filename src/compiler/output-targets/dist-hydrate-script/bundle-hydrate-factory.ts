@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { BundleOptions } from '../../bundle/bundle-interface';
+import type { BundleOptions } from '../../bundle/bundle-interface';
 import { getBuildFeatures } from '../../app-core/app-data';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { hydrateComponentTransform } from '../../transformers/component-hydrate/tranform-to-hydrate-component';

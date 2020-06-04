@@ -3,7 +3,6 @@ import { fileExists, readFile, writeFile } from './screenshot-fs';
 import { join, relative } from 'path';
 import { normalizePath } from '@utils';
 import { ScreenshotConnector } from './connector-base';
-import { URL } from 'url';
 
 export class ScreenshotLocalConnector extends ScreenshotConnector {
   async publishBuild(results: d.ScreenshotBuildResults) {

@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { Plugin, TransformResult, PluginContext } from 'rollup';
+import type { Plugin, TransformResult, PluginContext } from 'rollup';
 import { bundleOutput } from './bundle-output';
 import { normalizeFsPath, hasError } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';

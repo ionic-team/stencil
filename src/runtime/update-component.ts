@@ -63,10 +63,8 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean) => {
   }
 
   endSchedule();
-  return then(promise, () => (
-    updateComponent(hostRef, instance, isInitialLoad)
-  ));
-}
+  return then(promise, () => updateComponent(hostRef, instance, isInitialLoad));
+};
 
 const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boolean) => {
   // updateComponent
@@ -88,9 +86,9 @@ const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boole
       // looks like we've got child nodes to render into this host element
       // or we need to update the css class/attrs on the host element
       // DOM WRITE!
-      renderVdom(hostRef, callRender(instance));
+      renderVdom(hostRef, callRender(hostRef, instance));
     } else {
-      elm.textContent = callRender(instance);
+      elm.textContent = callRender(hostRef, instance);
     }
   }
   if (BUILD.cssVarShim && plt.$cssShim$) {
@@ -99,9 +97,6 @@ const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boole
   if (BUILD.isDev) {
     hostRef.$renderCount$++;
     hostRef.$flags$ &= ~HOST_FLAGS.devOnRender;
-  }
-  if (BUILD.updatable && BUILD.taskQueue) {
-    hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
   }
 
   if (BUILD.hydrateServerSide) {
@@ -122,9 +117,6 @@ const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boole
     }
   }
 
-  if (BUILD.updatable || BUILD.lazyLoad) {
-    hostRef.$flags$ |= HOST_FLAGS.hasRendered;
-  }
   if (BUILD.asyncLoading && rc) {
     // ok, so turns out there are some child host elements
     // waiting on this parent element to load
@@ -153,10 +145,18 @@ const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boole
 
 let renderingRef: any = null;
 
-const callRender = (instance: any) => {
+const callRender = (hostRef: d.HostRef, instance: any) => {
   try {
     renderingRef = instance;
     instance = BUILD.allRenderFn ? instance.render() : instance.render && instance.render();
+
+    if (BUILD.updatable && BUILD.taskQueue) {
+      hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
+    }
+
+    if (BUILD.updatable || BUILD.lazyLoad) {
+      hostRef.$flags$ |= HOST_FLAGS.hasRendered;
+    }
   } catch (e) {
     consoleError(e);
   }

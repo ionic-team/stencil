@@ -19,27 +19,30 @@ export const generateComponentTypes = (cmp: d.ComponentCompilerMeta, internal: b
   const methodAttributes = generateMethodTypes(cmp.methods);
   const eventAttributes = generateEventTypes(cmp.events);
 
-  const stencilComponentAttributes = attributesToMultiLineString([...propAttributes, ...methodAttributes], false, internal);
+  const componentAttributes = attributesToMultiLineString([...propAttributes, ...methodAttributes], false, internal);
   const isDep = cmp.isCollectionDependency;
-  const stencilComponentJSXAttributes = attributesToMultiLineString([...propAttributes, ...eventAttributes], true, internal);
+  const jsxAttributes = attributesToMultiLineString([...propAttributes, ...eventAttributes], true, internal);
+
+  const element = [
+    `        interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {`,
+    `        }`,
+    `        var ${htmlElementName}: {`,
+    `                prototype: ${htmlElementName};`,
+    `                new (): ${htmlElementName};`,
+    `        };`,
+  ];
   return {
     isDep,
     tagName,
     tagNameAsPascal,
     htmlElementName,
-    component: `interface ${tagNameAsPascal} {${stencilComponentAttributes}}`,
-    jsx: `interface ${tagNameAsPascal} {${stencilComponentJSXAttributes}}`,
-    element: `
-interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {}
-var ${htmlElementName}: {
-  prototype: ${htmlElementName};
-  new (): ${htmlElementName};
-};`,
+    component: `        interface ${tagNameAsPascal} {\n${componentAttributes}        }`,
+    jsx: `    interface ${tagNameAsPascal} {\n${jsxAttributes}        }`,
+    element: element.join(`\n`),
   };
 };
 
 const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: boolean, internal: boolean) => {
-  const paddingString = '';
   const attributesStr = sortBy(attributes, a => a.name)
     .filter(type => {
       if (jsxAttributes && !internal && type.internal) {
@@ -49,16 +52,15 @@ const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: bool
     })
     .reduce((fullList, type) => {
       if (type.jsdoc) {
-        fullList.push(`/**`);
-        fullList.push(...type.jsdoc.split('\n').map(line => '  * ' + line));
-        fullList.push(` */`);
+        fullList.push(`                /**`);
+        fullList.push(...type.jsdoc.split('\n').map(line => '                  * ' + line));
+        fullList.push(`                 */`);
       }
       const optional = jsxAttributes ? !type.required : type.optional;
-      fullList.push(`'${type.name}'${optional ? '?' : ''}: ${type.type};`);
+      fullList.push(`                "${type.name}"${optional ? '?' : ''}: ${type.type};`);
       return fullList;
     }, [] as string[])
-    .map(item => `${paddingString}${item}`)
     .join(`\n`);
 
-  return attributesStr !== '' ? `\n${attributesStr}\n` : '';
+  return attributesStr !== '' ? `${attributesStr}\n` : '';
 };

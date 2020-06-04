@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import path from 'path';
-import { URL } from 'url';
 
 export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputHref: string) {
   const baseUrl = new URL(manager.outputTarget.baseUrl, manager.devServerHostUrl);

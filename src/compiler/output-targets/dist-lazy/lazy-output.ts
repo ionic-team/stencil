@@ -1,11 +1,18 @@
 import * as d from '../../../declarations';
-import { BundleOptions } from '../../bundle/bundle-interface';
+import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
 import { generateEntryModules } from '../../entries/entry-modules';
 import { getLazyBuildConditionals } from './lazy-build-conditionals';
 import { isOutputTargetDistLazy, isOutputTargetDist } from '../output-utils';
-import { LAZY_BROWSER_ENTRY_ID, LAZY_EXTERNAL_ENTRY_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
+import {
+  LAZY_BROWSER_ENTRY_ID,
+  LAZY_EXTERNAL_ENTRY_ID,
+  STENCIL_APP_GLOBALS_ID,
+  STENCIL_CORE_ID,
+  STENCIL_INTERNAL_CLIENT_PATCH_ID,
+  USER_INDEX_ENTRY_ID,
+} from '../../bundle/entry-alias-ids';
 import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
 import { generateCjs } from './generate-cjs';
 import { generateEsmBrowser } from './generate-esm-browser';
@@ -74,7 +81,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
 
 const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
-    coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
+    coreImportPath: STENCIL_CORE_ID,
     componentExport: 'lazy',
     componentMetadata: null,
     currentDirectory: config.cwd,
@@ -86,17 +93,17 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
 
 const getLazyEntry = (isBrowser: boolean) => {
   const s = new MagicString(``);
-  s.append(`import { bootstrapLazy } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
+  s.append(`import { bootstrapLazy } from '${STENCIL_CORE_ID}';\n`);
 
   if (isBrowser) {
-    s.append(`import { patchBrowser } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
+    s.append(`import { patchBrowser } from '${STENCIL_INTERNAL_CLIENT_PATCH_ID}';\n`);
     s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
     s.append(`patchBrowser().then(options => {\n`);
     s.append(`  globalScripts();\n`);
     s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
     s.append(`});\n`);
   } else {
-    s.append(`import { patchEsm } from '${STENCIL_INTERNAL_CLIENT_ID}';\n`);
+    s.append(`import { patchEsm } from '${STENCIL_INTERNAL_CLIENT_PATCH_ID}';\n`);
     s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
     s.append(`export const defineCustomElements = (win, options) => {\n`);
     s.append(`  if (typeof window === 'undefined') return Promise.resolve();\n`);
@@ -142,13 +149,14 @@ const getLegacyLoader = (config: d.Config) => {
   scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
   doc.head.appendChild(scriptElm);
 
+  ${config.buildEs5 && `
   scriptElm = doc.createElement('script');
   scriptElm.setAttribute('nomodule', '');
   scriptElm.src = url + '/${namespace}.js';
   warn.push(scriptElm.outerHTML);
   scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
-  doc.head.appendChild(scriptElm);
-
+  doc.head.appendChild(scriptElm)
+  `}
   console.warn(warn.join('\\n'));
 
 })(document);`;

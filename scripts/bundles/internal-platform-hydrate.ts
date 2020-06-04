@@ -3,7 +3,6 @@ import { join } from 'path';
 import { bundleDts } from '../utils/bundle-dts';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
-import { urlPlugin } from './plugins/url-plugin';
 import { getBanner } from '../utils/banner';
 import { BuildOptions } from '../utils/options';
 import rollupCommonjs from '@rollup/plugin-commonjs';
@@ -21,7 +20,7 @@ export async function internalHydrate(opts: BuildOptions) {
   writePkgJson(opts, outputInternalHydrateDir, {
     name: '@stencil/core/internal/hydrate',
     description: 'Stencil internal hydrate platform to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
-    main: 'index.mjs',
+    main: 'index.js',
   });
 
   await createHydrateRunnerDtsBundle(opts, inputHydrateDir, outputInternalHydrateDir);
@@ -32,8 +31,8 @@ export async function internalHydrate(opts: BuildOptions) {
     output: {
       format: 'es',
       dir: outputInternalHydrateDir,
-      entryFileNames: '[name].mjs',
-      chunkFileNames: '[name].mjs',
+      entryFileNames: '[name].js',
+      chunkFileNames: '[name].js',
       banner: getBanner(opts, 'Stencil Hydrate Platform'),
       preferConst: true,
     },
@@ -48,7 +47,6 @@ export async function internalHydrate(opts: BuildOptions) {
       },
       aliasPlugin(opts),
       replacePlugin(opts),
-      urlPlugin(opts),
       rollupResolve({
         preferBuiltins: true,
       }),
@@ -60,14 +58,13 @@ export async function internalHydrate(opts: BuildOptions) {
     input: join(inputHydrateDir, 'runner', 'index.js'),
     output: {
       format: 'es',
-      file: join(outputInternalHydrateDir, 'runner.mjs'),
+      file: join(outputInternalHydrateDir, 'runner.js'),
       banner: getBanner(opts, 'Stencil Hydrate Runner'),
       preferConst: true,
     },
     plugins: [
       aliasPlugin(opts),
       replacePlugin(opts),
-      urlPlugin(opts),
       rollupResolve({
         preferBuiltins: true,
       }),

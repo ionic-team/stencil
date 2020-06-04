@@ -1,4 +1,4 @@
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
 
 export const loaderPlugin = (entries: { [id: string]: string } = {}): Plugin => {
   return {

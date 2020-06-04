@@ -83,7 +83,7 @@ export const patchedTsResolveModule = (
       resolvedFileName = './' + resolvedFileName;
     }
 
-    return {
+    const rtn: ts.ResolvedModuleWithFailedLookupLocations = {
       resolvedModule: {
         extension: getTsResolveExtension(resolvedFileName),
         resolvedFileName,
@@ -94,6 +94,8 @@ export const patchedTsResolveModule = (
         },
       },
     };
+    (rtn as any).failedLookupLocations = [];
+    return rtn;
   }
 
   // node module id
@@ -102,7 +104,7 @@ export const patchedTsResolveModule = (
 
 export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, containingFile: string): ts.ResolvedModuleWithFailedLookupLocations => {
   if (isStencilCoreImport(moduleId)) {
-    return {
+    const rtn: ts.ResolvedModuleWithFailedLookupLocations = {
       resolvedModule: {
         extension: ts.Extension.Dts,
         resolvedFileName: getStencilInternalDtsPath(config.rootDir),
@@ -113,6 +115,8 @@ export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFile
         },
       },
     };
+    (rtn as any).failedLookupLocations = [];
+    return rtn;
   }
 
   const resolved = resolveRemoteModuleIdSync(config, inMemoryFs, {
@@ -120,7 +124,7 @@ export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFile
     containingFile,
   });
   if (resolved) {
-    return {
+    const rtn: ts.ResolvedModuleWithFailedLookupLocations = {
       resolvedModule: {
         extension: ts.Extension.Js,
         resolvedFileName: resolved.resolvedUrl,
@@ -131,6 +135,8 @@ export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFile
         },
       },
     };
+    (rtn as any).failedLookupLocations = [];
+    return rtn;
   }
 
   return null;

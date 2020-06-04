@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { BundleOptions } from '../../bundle/bundle-interface';
+import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError, dashToPascalCase, formatComponentRuntimeMeta, hasError, stringifyRuntimeData } from '@utils';
 import { getCustomElementsBuildConditionals } from './custom-elements-build-conditionals';
@@ -35,6 +35,7 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
       platform: 'client',
       conditionals: getCustomElementsBuildConditionals(config, buildCtx.components),
       customTransformers: getCustomElementBundleCustomTransformer(config, compilerCtx),
+      externalRuntime: !!outputTarget.externalRuntime,
       inlineWorkers: true,
       inputs: {
         index: '\0core',
@@ -43,6 +44,7 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
         '\0core': generateEntryPoint(buildCtx),
       },
       inlineDynamicImports: outputTarget.inlineDynamicImports,
+      preserveEntrySignatures: 'allow-extension',
     };
 
     const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
@@ -50,8 +52,10 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
       const rollupOutput = await build.generate({
         format: 'esm',
         sourcemap: config.sourceMap,
-        chunkFileNames: config.devMode ? '[name]-[hash].mjs' : 'p-[hash].mjs',
-        entryFileNames: '[name].mjs',
+        chunkFileNames: outputTarget.externalRuntime || !config.hashFileNames ? '[name].js' : 'p-[hash].js',
+        entryFileNames: '[name].js',
+        hoistTransitiveImports: false,
+        preferConst: true,
       });
       const files = rollupOutput.output.map(async bundle => {
         if (bundle.type === 'chunk') {
@@ -59,7 +63,7 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
           const optimizeResults = await optimizeModule(config, compilerCtx, {
             input: code,
             isCore: bundle.isEntry,
-            minify: config.minifyJs,
+            minify: outputTarget.externalRuntime ? false : config.minifyJs,
           });
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
           if (!hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
@@ -76,10 +80,11 @@ const bundleCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx
 };
 
 const generateEntryPoint = (buildCtx: d.BuildCtx) => {
-  const importStatements: string[] = [];
-  const exportStatements: string[] = [];
+  const imp: string[] = [];
+  const exp: string[] = [];
   const exportNames: string[] = [];
-  importStatements.push(
+
+  imp.push(
     `import { proxyCustomElement } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
     `export * from '${USER_INDEX_ENTRY_ID}';`,
     `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';`,
@@ -92,22 +97,29 @@ const generateEntryPoint = (buildCtx: d.BuildCtx) => {
     const importAs = `$Cmp${exportName}`;
 
     if (cmp.isPlain) {
-      exportStatements.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
+      exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
     } else {
       const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
 
-      importStatements.push(`import { ${importName} as ${importAs} } from '${cmp.sourceFilePath}';`);
-      exportStatements.push(`export const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});`);
-      exportNames.push(exportName);
+      imp.push(`import { ${importName} as ${importAs} } from '${cmp.sourceFilePath}';`);
+      exp.push(`export const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});`);
     }
+    exportNames.push(exportName);
   });
-  exportStatements.push(`
-export const defineCustomElements = () => {
-  [
-    ${exportNames.join(',\n    ')}
-  ].forEach(cmp => customElements.define(cmp.is, cmp));
-};`);
-  return [...importStatements, ...exportStatements, ''].join('\n');
+
+  exp.push(`export const defineCustomElements = (opts) => {`);
+  exp.push(`    if (typeof customElements !== 'undefined') {`);
+  exp.push(`        [`);
+  exp.push(`            ${exportNames.join(',\n    ')}`);
+  exp.push(`        ].forEach(cmp => {`);
+  exp.push(`            if (!customElements.get(cmp.is)) {`);
+  exp.push(`                customElements.define(cmp.is, cmp, opts);`);
+  exp.push(`            }`);
+  exp.push(`        });`);
+  exp.push(`    }`);
+  exp.push(`};`);
+
+  return [...imp, ...exp].join('\n') + '\n';
 };
 
 const getCustomElementBundleCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {

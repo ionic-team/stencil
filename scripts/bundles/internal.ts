@@ -19,13 +19,13 @@ export async function internal(opts: BuildOptions) {
 
   // copy @stencil/core/internal default entry, which defaults to client
   // but we're not exposing all of Stencil's internal code (only the types)
-  await fs.copyFile(join(inputInternalDir, 'default.js'), join(opts.output.internalDir, 'index.mjs'));
+  await fs.copyFile(join(inputInternalDir, 'default.js'), join(opts.output.internalDir, 'index.js'));
 
   // write @stencil/core/internal/package.json
   writePkgJson(opts, opts.output.internalDir, {
     name: '@stencil/core/internal',
     description: 'Stencil internals only to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
-    main: 'index.mjs',
+    main: 'index.js',
     types: 'index.d.ts',
   });
 

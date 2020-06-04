@@ -2,8 +2,7 @@ import * as d from '../../declarations';
 import { basename, dirname, join, relative } from 'path';
 import { BuildContext } from '../build/build-ctx';
 import { getRollupOptions } from './bundle-output';
-import { OutputOptions, rollup } from 'rollup';
-import { PartialResolvedId } from 'rollup';
+import { OutputOptions, PartialResolvedId, rollup } from 'rollup';
 
 export const devNodeModuleResolveId = async (config: d.Config, inMemoryFs: d.InMemoryFileSystem, resolvedId: PartialResolvedId, importee: string) => {
   if (!shouldCheckDevModule(resolvedId, importee)) {

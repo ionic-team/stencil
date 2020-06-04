@@ -5,16 +5,16 @@ describe('core resolve plugin', () => {
 
   it('http localhost with port url path', () => {
     const compilerExe = 'http://localhost:3333/@stencil/core/compiler/stencil.js?v=1.2.3';
-    const internalModule = 'hydrate';
+    const internalModule = 'hydrate/index.js';
     const m = getStencilInternalModule(rootDir, compilerExe, internalModule);
-    expect(m).toBe('/node_modules/@stencil/core/internal/hydrate/index.mjs');
+    expect(m).toBe('/node_modules/@stencil/core/internal/hydrate/index.js');
   });
 
   it('node path', () => {
     const compilerExe = '/Users/me/node_modules/stencil/compiler/stencil.js';
-    const internalModule = 'client';
+    const internalModule = 'client/index.js';
     const m = getStencilInternalModule(rootDir, compilerExe, internalModule);
-    expect(m).toBe('/Users/me/node_modules/stencil/internal/client/index.mjs');
+    expect(m).toBe('/Users/me/node_modules/stencil/internal/client/index.js');
   });
 
   it('should not set initialValue', () => {

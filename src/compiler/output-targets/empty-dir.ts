@@ -6,6 +6,7 @@ import {
   isOutputTargetHydrate,
   isOutputTargetWww,
   isOutputTargetDistCustomElements,
+  isOutputTargetDistCustomElementsBundle,
   isOutputTargetDistLazy,
 } from './output-utils';
 import { isString } from '@utils';
@@ -16,6 +17,7 @@ type OutputTargetEmptiable = d.OutputTargetDist | d.OutputTargetWww | d.OutputTa
 const isEmptable = (o: d.OutputTarget): o is OutputTargetEmptiable =>
   isOutputTargetDist(o) ||
   isOutputTargetDistCustomElements(o) ||
+  isOutputTargetDistCustomElementsBundle(o) ||
   isOutputTargetWww(o) ||
   isOutputTargetDistLazy(o) ||
   isOutputTargetDistLazyLoader(o) ||

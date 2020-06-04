@@ -383,6 +383,48 @@ describe('render-vdom', () => {
     });
   });
 
+  it('rerender on ref mutation', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      private nuRender = 0;
+      @State() valid = false;
+      render() {
+        this.nuRender++;
+        return <div ref={() => this.valid = true}>{this.valid ? 'true' : 'false'} - {this.nuRender}</div>;
+      }
+    }
+    const { root } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml(`
+      <cmp-a><div>true - 2</div></cmp-a>
+    `);
+  });
+
+  it('not rerender on render() mutation', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      private nuRender = 0;
+      @State() valid = false;
+      render() {
+        this.valid = true;
+        this.nuRender++;
+        return <div>{this.valid ? 'true' : 'false'} - {this.nuRender}</div>;
+      }
+    }
+    const { root } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml(`
+      <cmp-a><div>true - 1</div></cmp-a>
+    `);
+  });
+
+
   it('Hello VDOM, re-render, flush', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {

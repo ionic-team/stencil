@@ -2,15 +2,35 @@
 'use strict';
 
 try {
-  var v = process.version.replace('v', '').split('.');
-  var major = parseInt(v[0], 10);
-  var minor = parseInt(v[1], 10);
-  if (major < 10 || (major === 10 && minor < 13)) {
-    console.error('\nYour current version of Node is ' + process.version + ' but Stencil needs v10.13 at least. It\'s recommended to install latest Node (https://github.com/nodejs/Release).\n');
-    exit(1);
+  var minimumVersion = '10.13';
+  var recommendedVersion = '12.17';
+  var currentVersion = process.versions.node;
+
+  function isNodeLT(v) {
+    var check = v.split('.').map(Number);
+    var node = currentVersion.split('.').map(Number);
+    return node[0] < check[0] || (node[0] === check[0] && node[1] < check[1]);
   }
-  if (major < 12 || (major === 12 && minor < 16)) {
-    console.log('\nYour current version of Node is ' + process.version + ', however the recommendation is a minimum of Node LTS (https://github.com/nodejs/Release). Note that future versions of Stencil will eventually remove support for non-LTS Node versions.\n');
+
+  if (isNodeLT(minimumVersion)) {
+    console.error(
+      '\nYour current version of Node is v' +
+        currentVersion +
+        ', however Stencil requires v' +
+        minimumVersion +
+        '.0 or greater. It is recommended to install latest version of Node (https://github.com/nodejs/Release).\n',
+    );
+    process.exit(1);
+  }
+
+  if (isNodeLT(recommendedVersion)) {
+    console.warn(
+      '\nYour current version of Node is v' +
+        currentVersion +
+        ', however Stencil\'s recommendation is v' +
+        recommendedVersion +
+        '.0 or greater. Note that future versions of Stencil will eventually remove support for non-LTS Node versions (https://github.com/nodejs/Release).\n',
+    );
   }
 } catch (e) {}
 

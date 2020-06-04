@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
 import { USER_INDEX_ENTRY_ID } from './entry-alias-ids';
 import { join } from 'path';
 

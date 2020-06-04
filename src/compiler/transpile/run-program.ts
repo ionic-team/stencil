@@ -26,7 +26,6 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
 
   const tsTypeChecker = tsProgram.getTypeChecker();
   const typesOutputTarget = config.outputTargets.filter(isOutputTargetDistTypes);
-
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
     if (emitFilePath.endsWith('.js')) {
       updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
@@ -45,6 +44,9 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
   tsBuilder.emit(undefined, emitCallback, undefined, false, {
     before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker)],
   });
+
+  const changedmodules = Array.from(compilerCtx.changedModules.keys());
+  buildCtx.debug('Transpiled modules: ' + JSON.stringify(changedmodules, null, '\n'));
 
   // Finalize components metadata
   buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());

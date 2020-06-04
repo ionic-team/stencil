@@ -10,7 +10,7 @@ import { outputLazyLoader } from './output-lazy-loader';
 import { outputWww } from './output-www';
 import { outputCollection } from './dist-collection';
 import { outputTypes } from './output-types';
-import { RollupCache } from 'rollup';
+import type { RollupCache } from 'rollup';
 
 export const generateOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const timeSpan = buildCtx.createTimeSpan('generate outputs started', true);

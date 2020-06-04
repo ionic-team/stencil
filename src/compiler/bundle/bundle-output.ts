@@ -1,20 +1,19 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { appDataPlugin } from './app-data-plugin';
-import { BundleOptions } from './bundle-interface';
+import type { BundleOptions } from './bundle-interface';
 import { coreResolvePlugin } from './core-resolve-plugin';
 import { createCustomResolverAsync } from '../sys/resolve/resolve-module-async';
 import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { devNodeModuleResolveId } from './dev-module';
+import { extFormatPlugin } from './ext-format-plugin';
 import { extTransformsPlugin } from './ext-transforms-plugin';
 import { fileLoadPlugin } from './file-load-plugin';
-import { imagePlugin } from './image-plugin';
 import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-plugin';
 import { loaderPlugin } from './loader-plugin';
 import { pluginHelper } from './plugin-helper';
 import { resolveIdWithTypeScript, typescriptPlugin } from './typescript-plugin';
 import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-plugins';
 import { RollupOptions, TreeshakingOptions, rollup } from 'rollup';
-import { textPlugin } from './text-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
 
@@ -42,22 +41,19 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
     ...(config.nodeResolve as any),
   });
   const orgNodeResolveId = nodeResolvePlugin.resolveId;
-  const orgNodeResolveId2 = nodeResolvePlugin.resolveId = async function(importee: string, importer: string) {
+  const orgNodeResolveId2 = (nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
     const [readImportee, query] = importee.split('?');
     const resolved = await orgNodeResolveId.call(nodeResolvePlugin, readImportee, importer);
     if (resolved) {
       return {
         ...resolved,
-        id: query
-          ? resolved.id + '?' + query
-          : resolved.id,
-      }
+        id: query ? resolved.id + '?' + query : resolved.id,
+      };
     }
     return resolved;
-  }
+  });
   if (config.devServer && config.devServer.experimentalDevModules) {
-
-    nodeResolvePlugin.resolveId = async function(importee: string, importer: string) {
+    nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
       const resolvedId = await orgNodeResolveId2.call(nodeResolvePlugin, importee, importer);
       return devNodeModuleResolveId(config, compilerCtx.fs, resolvedId, importee);
     };
@@ -69,14 +65,13 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
     input: bundleOpts.inputs,
 
     plugins: [
-      coreResolvePlugin(config, compilerCtx, bundleOpts.platform),
+      coreResolvePlugin(config, compilerCtx, bundleOpts.platform, bundleOpts.externalRuntime),
       appDataPlugin(config, compilerCtx, buildCtx, bundleOpts.conditionals, bundleOpts.platform),
       lazyComponentPlugin(buildCtx),
       loaderPlugin(bundleOpts.loader),
       userIndexPlugin(config, compilerCtx),
       typescriptPlugin(compilerCtx, bundleOpts),
-      imagePlugin(config, buildCtx),
-      textPlugin(),
+      extFormatPlugin(config),
       extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),
       ...beforePlugins,
@@ -85,6 +80,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       rollupCommonjsPlugin({
         include: /node_modules/,
         sourceMap: config.sourceMap,
+        transformMixedEsModules: false,
         ...config.commonjs,
       }),
       ...afterPlugins,
@@ -100,6 +96,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
 
     treeshake: getTreeshakeOption(config, bundleOpts),
     inlineDynamicImports: bundleOpts.inlineDynamicImports,
+    preserveEntrySignatures: bundleOpts.preserveEntrySignatures ?? 'strict',
 
     onwarn: createOnWarnFn(buildCtx.diagnostics),
 
@@ -109,14 +106,15 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
   return rollupOptions;
 };
 
-const getTreeshakeOption = (config: d.Config, bundleOpts: BundleOptions) => {
+const getTreeshakeOption = (config: d.Config, bundleOpts: BundleOptions): TreeshakingOptions | boolean => {
   if (bundleOpts.platform === 'hydrate') {
     return {
       propertyReadSideEffects: false,
       tryCatchDeoptimization: false,
     };
   }
-  const treeshake: TreeshakingOptions | boolean =
+
+  const treeshake =
     !config.devMode && config.rollupConfig.inputOptions.treeshake !== false
       ? {
           propertyReadSideEffects: false,

@@ -11,6 +11,7 @@
 | ---------- | ----------- | ----------- | -------- | ----------- |
 | `first`    | `first`     |             | `string` | `undefined` |
 | `lastName` | `last-name` |             | `string` | `undefined` |
+| `mode`     | `mode`      | Mode        | `any`    | `undefined` |
 
 
 ## Dependencies
