@@ -1,4 +1,4 @@
-# 🏐 [1.15.0-1](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0-1) (2020-06-04)
+# 📟 [1.15.0-2](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0-2) (2020-06-04)
 
 ### Features
 
@@ -6,6 +6,9 @@
 
 ### Bug Fixes
 
+* **cli:** correct import in generated spec tests ([#2486](https://github.com/ionic-team/stencil/issues/2486)) ([9a80c41](https://github.com/ionic-team/stencil/commit/9a80c4158a488b57bfdd1244d1ba126dc4a586ff))
+* **client:** import client platform from patch ([dbacafc](https://github.com/ionic-team/stencil/commit/dbacafc443f3819ba05f3bd4f79c75965b5de0bd))
+* **compiler:** types should not be based on package.json ([65cdfbd](https://github.com/ionic-team/stencil/commit/65cdfbd10f28299465dab8897849cd6e1a6a823e)), closes [#2460](https://github.com/ionic-team/stencil/issues/2460)
 * **dist:** copy assets to the dist folder ([2a8b1f1](https://github.com/ionic-team/stencil/commit/2a8b1f1381a8cd7f6008dd9873ebe6784a47ba48))
 * **worker:** inline worker if there is a dist output target ([#2450](https://github.com/ionic-team/stencil/issues/2450)) ([a96b346](https://github.com/ionic-team/stencil/commit/a96b346d55c560e9990b6b4628f1aca34730918e)), closes [#2438](https://github.com/ionic-team/stencil/issues/2438)
 * do not emit nomodule script of es5 is disabled ([39c51db](https://github.com/ionic-team/stencil/commit/39c51db66886846b0d224f8c02affd6933dd096b))
