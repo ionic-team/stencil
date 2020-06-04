@@ -163,7 +163,7 @@ const getStyleUrlBoilerplate = () =>
  */
 const getSpecTestBoilerplate = (tagName: string) =>
   `import { newSpecPage } from '@stencil/core/testing';
-import { ${toPascalCase(tagName)} } from './${tagName}';
+import { ${toPascalCase(tagName)} } from '../${tagName}';
 
 describe('${tagName}', () => {
   it('renders', async () => {
