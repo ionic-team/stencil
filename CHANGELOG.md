@@ -1,11 +1,14 @@
-# 🏉 [1.15.0-0](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0-0) (2020-06-03)
+# 🏐 [1.15.0-1](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0-1) (2020-06-04)
 
 ### Features
 
-- Rollup 2.12.1
+- Rollup 2.13.1
 
 ### Bug Fixes
 
+* **dist:** copy assets to the dist folder ([2a8b1f1](https://github.com/ionic-team/stencil/commit/2a8b1f1381a8cd7f6008dd9873ebe6784a47ba48))
+* **worker:** inline worker if there is a dist output target ([#2450](https://github.com/ionic-team/stencil/issues/2450)) ([a96b346](https://github.com/ionic-team/stencil/commit/a96b346d55c560e9990b6b4628f1aca34730918e)), closes [#2438](https://github.com/ionic-team/stencil/issues/2438)
+* do not emit nomodule script of es5 is disabled ([39c51db](https://github.com/ionic-team/stencil/commit/39c51db66886846b0d224f8c02affd6933dd096b))
 * **runtime:** enumerated boolean attributes ([0d72aee](https://github.com/ionic-team/stencil/commit/0d72aeea51cb754615fed74020b035b1853ad740))
 * **watch:** fix watch callbacks in custom elements build ([d052fe4](https://github.com/ionic-team/stencil/commit/d052fe40a1007e39d636455d1dbbb3eb171cea16)), closes [#2478](https://github.com/ionic-team/stencil/issues/2478)
 
