@@ -44,6 +44,7 @@ describe('validateDistOutputTarget', () => {
       },
       {
         copyAssets: 'dist',
+        copy: [],
         dir: path.join(rootDir, 'my-dist', 'my-build', 'testing'),
         type: 'copy',
       },
