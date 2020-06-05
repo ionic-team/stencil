@@ -40,6 +40,7 @@ export async function internalClient(opts: BuildOptions) {
     },
     treeshake: {
       moduleSideEffects: 'no-external',
+      propertyReadSideEffects: false,
     },
     plugins: [
       {
