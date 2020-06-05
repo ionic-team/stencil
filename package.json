@@ -49,7 +49,7 @@
     "test.watch": "jest --watch"
   },
   "dependencies": {
-    "typescript": "3.9.3"
+    "typescript": "3.9.5"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "12.0.0",
