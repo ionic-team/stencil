@@ -120,7 +120,7 @@ function updateStyleUrls(cssUrl: string, oldCss: string) {
 const urlVersionIds = new Map<string, string>();
 
 function appendDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest, content: string) {
-  const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.host);
+  const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.headers?.['x-forwarded-host'] ?? req.host, req.headers?.['x-forwarded-proto']);
   const iframe = `<iframe title="Stencil Dev Server Connector ${version} &#9889;" src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0;visibility:hidden" aria-hidden="true"></iframe>`;
   return appendDevServerClientIframe(content, iframe);
 }
