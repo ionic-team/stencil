@@ -452,4 +452,78 @@ describe('hydrate, shadow parent', () => {
       </ion-tab-button>
     `);
   });
+
+  it('nested cmp-b, parent slot', async () => {
+    @Component({ tag: 'cmp-a', shadow: true })
+    class CmpA {
+      render() {
+        return <slot></slot>;
+      }
+    }
+    @Component({ tag: 'cmp-b' })
+    class CmpB {
+      render() {
+        return (
+          <Host>
+            <slot></slot>
+          </Host>
+        );
+      }
+    }
+    // @ts-ignore
+    const serverHydrated = await newSpecPage({
+      components: [CmpA, CmpB],
+      html: `<cmp-a><cmp-b>cmp-a-light-dom</cmp-b></cmp-a>`,
+      hydrateServerSide: true,
+    });
+
+    expect(serverHydrated.root).toEqualHtml(`
+      <cmp-a class="hydrated" s-id="1">
+        <!--r.1-->
+        <!--o.0.1.-->
+        <!--s.1.0.0.0.-->
+        <cmp-b class="hydrated" c-id="0.1" s-id="2">
+          <!--r.2-->
+          <!--o.0.2-->
+          <!--s.2.0.0.0.-->
+          <!--t.0.2-->
+          cmp-a-light-dom
+        </cmp-b>
+      </cmp-a>
+    `);
+
+    // @ts-ignore
+    const clientHydrated = await newSpecPage({
+      components: [CmpA, CmpB],
+      html: serverHydrated.root.outerHTML,
+      hydrateClientSide: true,
+    });
+
+    expect(clientHydrated.root).toEqualHtml(`
+      <cmp-a class="hydrated">
+        <mock:shadow-root>
+            <slot></slot>
+        </mock:shadow-root>
+        <!---->
+        <cmp-b class="hydrated">
+          <!--r.2-->
+          <!---->
+          <!--s.2.0.0.0.-->
+          cmp-a-light-dom
+        </cmp-b>
+      </cmp-a>
+    `);
+
+    expect(clientHydrated.root).toEqualLightHtml(`
+      <cmp-a class="hydrated">
+        <!---->
+        <cmp-b class="hydrated">
+            <!--r.2-->
+            <!---->
+            <!--s.2.0.0.0.-->
+            cmp-a-light-dom
+        </cmp-b>
+      </cmp-a>
+    `);
+  });
 });
