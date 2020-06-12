@@ -107,7 +107,35 @@ const insertVNodeAnnotations = (doc: Document, hostElm: d.HostElement, vnode: d.
         insertChildVNodeAnnotations(doc, vnodeChild, cmpData, hostId, depth, index);
       });
     }
+
+    insertParentVNodeAnnotations(hostElm, vnode);
   }
+};
+
+const insertParentVNodeAnnotations = (hostElm: d.HostElement, vnode: d.VNode) => {
+  if (!hostElm || !vnode || !vnode.$elm$) {
+    return;
+  }
+
+  if (hostElm.getAttribute('c-id') !== null) {
+    return;
+  }
+
+  const parent: HTMLElement = hostElm.parentElement;
+
+  if (!parent || !parent.childNodes || parent.childNodes.length <= 0) {
+    return;
+  }
+
+  const comment = Array.from(parent.childNodes).find(node => {
+    return node.nodeType === NODE_TYPE.CommentNode && (node as d.RenderNode)['s-sr'];
+  });
+
+  if (!comment) {
+    return;
+  }
+
+  (vnode.$elm$ as d.RenderNode).setAttribute(HYDRATE_CHILD_ID, `${(comment as d.RenderNode)['s-host-id']}.${(comment as d.RenderNode)['s-node-id']}.0.1`);
 };
 
 const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, cmpData: CmpData, hostId: number, depth: number, index: number) => {
