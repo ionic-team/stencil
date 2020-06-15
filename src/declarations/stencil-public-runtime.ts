@@ -877,8 +877,8 @@ export namespace JSXBase {
     alt?: string;
     autoCapitalize?: any;
     autocapitalize?: any;
-    autoComplete?: any;
-    autocomplete?: any;
+    autoComplete?: string;
+    autocomplete?: string;
     autoFocus?: boolean;
     autofocus?: boolean | string;
     capture?: string; // https://www.w3.org/TR/html-media-capture/#the-capture-attribute
@@ -1235,8 +1235,8 @@ export namespace JSXBase {
     vocab?: string;
 
     // Non-standard Attributes
-    autoCapitalize?: string;
-    autocapitalize?: string;
+    autoCapitalize?: any;
+    autocapitalize?: any;
     autoCorrect?: string;
     autocorrect?: string;
     autoSave?: string;
