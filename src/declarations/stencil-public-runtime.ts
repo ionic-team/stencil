@@ -875,8 +875,8 @@ export namespace JSXBase {
     accept?: string;
     allowdirs?: boolean;
     alt?: string;
-    autoCapitalize?: string;
-    autocapitalize?: string;
+    autoCapitalize?: any;
+    autocapitalize?: any;
     autoComplete?: string;
     autocomplete?: string;
     autoFocus?: boolean;
@@ -1235,8 +1235,8 @@ export namespace JSXBase {
     vocab?: string;
 
     // Non-standard Attributes
-    autoCapitalize?: string;
-    autocapitalize?: string;
+    autoCapitalize?: any;
+    autocapitalize?: any;
     autoCorrect?: string;
     autocorrect?: string;
     autoSave?: string;
