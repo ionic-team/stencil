@@ -401,6 +401,16 @@ export interface ComponentInterface {
   componentDidLoad?(): void;
 
   /**
+   * A `@Prop` or `@State` property changed and a rerender is about to be requested.
+   *
+   * Called multiple times throughout the life of
+   * the component as its properties change.
+   *
+   * componentShouldUpdate is not called on the first render.
+   */
+  componentShouldUpdate?(newVal: any, oldVal: any, propName: string): boolean | void;
+
+  /**
    * The component is about to update and re-render.
    *
    * Called multiple times throughout the life of
