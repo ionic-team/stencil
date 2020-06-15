@@ -875,10 +875,10 @@ export namespace JSXBase {
     accept?: string;
     allowdirs?: boolean;
     alt?: string;
-    autoCapitalize?: string;
-    autocapitalize?: string;
-    autoComplete?: string;
-    autocomplete?: string;
+    autoCapitalize?: any;
+    autocapitalize?: any;
+    autoComplete?: any;
+    autocomplete?: any;
     autoFocus?: boolean;
     autofocus?: boolean | string;
     capture?: string; // https://www.w3.org/TR/html-media-capture/#the-capture-attribute
