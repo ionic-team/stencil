@@ -1436,8 +1436,8 @@ export namespace JSXBase {
     'primitiveUnits'?: number | string;
     'r'?: number | string;
     'radius'?: number | string;
-    'ref-x'?: number | string;
-    'ref-y'?: number | string;
+    'refX'?: number | string;
+    'refY'?: number | string;
     'rendering-intent'?: number | string;
     'repeatCount'?: number | string;
     'repeatDur'?: number | string;
