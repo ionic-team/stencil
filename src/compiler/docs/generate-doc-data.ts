@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { basename, dirname, join, relative } from 'path';
-import { flatOne, normalizePath, sortBy } from '@utils';
+import { flatOne, normalizePath, sortBy, unique } from '@utils';
 import { getBuildTimestamp } from '../build/build-ctx';
 import { JsonDocsValue } from '../../declarations';
 import { typescriptVersion, version } from '../../version';
@@ -51,7 +51,7 @@ const getDocsComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, b
           events: getDocsEvents(cmp.events),
           styles: getDocsStyles(cmp),
           slots: getDocsSlots(cmp.docs.tags),
-          parts: getDocsParts(cmp.docs.tags),
+          parts: getDocsParts(cmp.htmlParts, cmp.docs.tags),
           listeners: getDocsListeners(cmp.listeners),
         }));
     }),
@@ -251,10 +251,12 @@ const getDocsSlots = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
   );
 };
 
-const getDocsParts = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
+const getDocsParts = (vdom: string[], tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
+  const docsParts = getNameText('part', tags).map(([name, docs]) => ({ name, docs }));
+  const vdomParts = vdom.map(name => ({ name, docs: '' }));
   return sortBy(
-    getNameText('part', tags).map(([name, docs]) => ({ name, docs })),
-    a => a.name,
+    unique([...docsParts, ...vdomParts], p => p.name),
+    p => p.name,
   );
 };
 

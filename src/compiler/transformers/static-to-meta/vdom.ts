@@ -51,6 +51,15 @@ export const gatherVdomMeta = (m: d.Module | d.ComponentCompilerMeta, args: ts.N
           } else {
             m.hasVdomPropOrAttr = true;
           }
+          ts.SyntaxKind.StringLiteral;
+          if (attrName === 'part' && ts.isPropertyAssignment(prop) && ts.isStringLiteral(prop.initializer)) {
+            m.htmlParts.push(
+              ...prop.initializer.text
+                .toLowerCase()
+                .split(' ')
+                .filter(part => part.length > 0),
+            );
+          }
           m.htmlAttrNames.push(attrName);
         }
       });

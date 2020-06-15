@@ -114,6 +114,7 @@ export const parseStaticComponentMeta = (
     isPlain: false,
     htmlAttrNames: [],
     htmlTagNames: [],
+    htmlParts: [],
     isUpdateable: false,
     potentialCmpRefs: [],
   };

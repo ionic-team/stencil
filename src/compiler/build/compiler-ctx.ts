@@ -101,6 +101,7 @@ export const getModuleLegacy = (_config: d.Config, compilerCtx: d.CompilerCtx, s
       hasVdomText: false,
       htmlAttrNames: [],
       htmlTagNames: [],
+      htmlParts: [],
       isCollectionDependency: false,
       isLegacy: false,
       localImports: [],

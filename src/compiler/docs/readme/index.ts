@@ -36,5 +36,10 @@ export const strickCheckDocs = (config: d.Config, docsData: d.JsonDocs) => {
         config.logger.warn(`Event "${ev.event}" of "${component.tag}" is not documented. ${component.filePath}`);
       }
     });
+    component.parts.forEach(ev => {
+      if (ev.docs === '') {
+        config.logger.warn(`Part "${ev.name}" of "${component.tag}" is not documented. ${component.filePath}`);
+      }
+    });
   });
 };
