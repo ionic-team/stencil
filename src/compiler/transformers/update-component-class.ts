@@ -20,6 +20,33 @@ export const updateComponentClass = (
     }
   }
 
-  // ESM with export
-  return ts.updateClassDeclaration(classNode, classNode.decorators, classModifiers, classNode.name, classNode.typeParameters, heritageClauses, members);
+  return createConstClass(transformOpts, classNode, heritageClauses, members);
+};
+
+const createConstClass = (
+  transformOpts: d.TransformOptions,
+  classNode: ts.ClassDeclaration,
+  heritageClauses: ts.HeritageClause[] | ts.NodeArray<ts.HeritageClause>,
+  members: ts.ClassElement[],
+) => {
+  const className = classNode.name;
+
+  const classModifiers = (Array.isArray(classNode.modifiers) ? classNode.modifiers : []).filter(m => {
+    // remove the export
+    return m.kind !== ts.SyntaxKind.ExportKeyword;
+  });
+
+  const constModifiers: ts.Modifier[] = [];
+
+  if (transformOpts.componentExport !== 'customelement') {
+    constModifiers.push(ts.createModifier(ts.SyntaxKind.ExportKeyword));
+  }
+
+  return ts.createVariableStatement(
+    constModifiers,
+    ts.createVariableDeclarationList(
+      [ts.createVariableDeclaration(className, undefined, ts.createClassExpression(classModifiers, undefined, classNode.typeParameters, heritageClauses, members))],
+      ts.NodeFlags.Const,
+    ),
+  );
 };
