@@ -889,6 +889,7 @@ export interface ComponentCompilerFeatures {
   hasWatchCallback: boolean;
   htmlAttrNames: string[];
   htmlTagNames: string[];
+  htmlParts: string[];
   isUpdateable: boolean;
   isPlain: boolean;
   potentialCmpRefs: string[];
@@ -1584,6 +1585,7 @@ export interface Module {
   externalImports: string[];
   htmlAttrNames: string[];
   htmlTagNames: string[];
+  htmlParts: string[];
   isCollectionDependency: boolean;
   isLegacy: boolean;
   jsFilePath: string;

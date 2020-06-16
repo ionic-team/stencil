@@ -107,6 +107,7 @@ function parseComponentDeprecated(config: d.Config, compilerCtx: d.CompilerCtx, 
     isPlain: false,
     htmlAttrNames: [],
     htmlTagNames: [],
+    htmlParts: [],
     isUpdateable: false,
     potentialCmpRefs: [],
   };
