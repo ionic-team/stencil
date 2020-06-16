@@ -150,12 +150,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       }
 
       if (BUILD.hotModuleReplacement) {
-        (HostElement as any).prototype['s-hmr'] = function(hmrVersionId: string) {
+        (HostElement as any).prototype['s-hmr'] = function (hmrVersionId: string) {
           hmrStart(this, cmpMeta, hmrVersionId);
         };
       }
 
-      cmpMeta.$lazyBundleIds$ = lazyBundle[0];
+      cmpMeta.$lazyBundleId$ = lazyBundle[0];
 
       if (!exclude.includes(tagName) && !customElements.get(tagName)) {
         cmpTags.push(tagName);

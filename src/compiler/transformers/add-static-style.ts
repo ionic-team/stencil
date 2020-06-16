@@ -76,7 +76,6 @@ const getMultipleModeStyle = (cmp: d.ComponentCompilerMeta, styles: d.StyleCompi
 
 const createPropertyAssignment = (mode: string, initializer: ts.Expression) => {
   const node = ts.createPropertyAssignment(mode, initializer);
-  ts.addSyntheticLeadingComment(node, ts.SyntaxKind.MultiLineCommentTrivia, `STENCIL:MODE:${mode}`);
   return node;
 };
 

@@ -8,11 +8,6 @@ export const generateModuleGraph = (cmps: d.ComponentCompilerMeta[], bundleModul
     if (bundle) {
       // add default case for no mode
       cmpMap.set(getScopeId(cmp.tagName), bundle.rollupResult.imports);
-
-      // add modes cases
-      bundle.outputs.map(o => {
-        cmpMap.set(getScopeId(cmp.tagName, o.modeName), [...bundle.rollupResult.imports, o.fileName]);
-      });
     }
   });
 

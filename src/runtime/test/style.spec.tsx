@@ -20,7 +20,7 @@ describe('style', () => {
     });
 
     expect(root).toHaveClass('hydrated');
-    expect(styles.get('CMP-A')).toBe(`div { color: red; }`);
+    expect(styles.get('sc-cmp-a')).toBe(`div { color: red; }`);
   });
 
   describe('mode', () => {
@@ -44,9 +44,8 @@ describe('style', () => {
         html: `<cmp-a></cmp-a>`,
       });
 
+      expect(styles.get('sc-cmp-a-md')).toEqual(':host { color: red }');
       expect(getMode(root)).toEqual('md');
-      expect(styles.get('CMP-A#ios')).toEqual(':host { color: black }');
-      expect(styles.get('CMP-A#md')).toEqual(':host { color: red }');
     });
 
     it('ios mode', async () => {
@@ -63,11 +62,12 @@ describe('style', () => {
           return `Hola`;
         }
       }
-      const { root } = await newSpecPage({
+      const { root, styles } = await newSpecPage({
         components: [CmpA],
         html: `<cmp-a></cmp-a>`,
       });
 
+      expect(styles.get('sc-cmp-a-ios')).toEqual(':host { color: black };');
       expect(getMode(root)).toEqual('ios');
     });
   });

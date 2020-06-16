@@ -2,7 +2,7 @@ import { CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declaration
 import { minfyJsId } from '../../version';
 import { transpileToEs5 } from '../transpile/transpile-to-es5';
 import { minifyJs } from './minify-js';
-import { DEFAULT_STYLE_MODE, hasError } from '@utils';
+import { hasError } from '@utils';
 import { CompressOptions, MangleOptions, MinifyOptions } from 'terser';
 
 interface OptimizeModuleOptions {
@@ -56,11 +56,6 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
       compressOpts.inline = 1;
       compressOpts.unsafe = true;
       compressOpts.unsafe_undefined = true;
-    }
-
-    if (opts.modeName && opts.modeName !== DEFAULT_STYLE_MODE) {
-      const regex = new RegExp(`\\/\\*STENCIL:MODE:((?!${opts.modeName}).)*\\*\\/.*$`, 'gm');
-      opts.input = opts.input.replace(regex, '');
     }
   }
 

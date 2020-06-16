@@ -23,7 +23,6 @@ export function createEntryModule(cmps: d.ComponentCompilerMeta[]): d.EntryModul
   return {
     cmps,
     entryKey,
-    modeNames: getEntryModes(cmps),
   };
 }
 

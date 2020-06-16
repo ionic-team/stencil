@@ -442,17 +442,15 @@ export interface RollupChunkResult {
 
 export interface BundleModule {
   entryKey: string;
-  modeNames: string[];
   rollupResult: RollupChunkResult;
   cmps: ComponentCompilerMeta[];
-  outputs: BundleModuleOutput[];
+  output: BundleModuleOutput;
 }
 
 export interface BundleModuleOutput {
   bundleId: string;
   fileName: string;
   code: string;
-  modeName: string;
 }
 
 export interface Cache {
@@ -1255,7 +1253,6 @@ export interface OpenInEditorData {
 export interface EntryModule {
   entryKey: string;
   cmps: ComponentCompilerMeta[];
-  modeNames: string[];
 }
 
 export interface EntryBundle {
@@ -1739,7 +1736,7 @@ export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
 
 export type LazyBundleRuntimeData = [
   /** bundleIds */
-  any,
+  string,
   ComponentRuntimeMetaCompact[],
 ];
 
@@ -1764,7 +1761,7 @@ export interface ComponentRuntimeMeta {
   $listeners$?: ComponentRuntimeHostListener[];
   $attrsToReflect$?: [string, string][];
   $watchers$?: ComponentConstructorWatchers;
-  $lazyBundleIds$?: ModeBundleIds;
+  $lazyBundleId$?: string;
 }
 
 export interface ComponentRuntimeMembers {

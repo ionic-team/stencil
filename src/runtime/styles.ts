@@ -22,6 +22,9 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
   let scopeId = getScopeId(cmpMeta, mode);
   let style = styles.get(scopeId);
 
+  if (BUILD.isTesting) {
+    return scopeId;
+  }
   // if an element is NOT connected then getRootNode() will return the wrong root node
   // so the fallback is to always use the document for the root node in those cases
   styleContainerNode = styleContainerNode.nodeType === NODE_TYPE.DocumentFragment ? styleContainerNode : doc;
