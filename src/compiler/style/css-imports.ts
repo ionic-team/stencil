@@ -126,6 +126,7 @@ export const getCssImports = async (config: d.Config, compilerCtx: d.CompilerCtx
   const importeeExt = filePath.split('.').pop().toLowerCase();
 
   let r: RegExpExecArray;
+  const IMPORT_RE = /(@import)\s+(url\()?\s?(.*?)\s?\)?([^;]*);?/gi;
   while ((r = IMPORT_RE.exec(styleText))) {
     const cssImportData: d.CssImportData = {
       srcImport: r[0],
@@ -167,8 +168,6 @@ export const getCssImports = async (config: d.Config, compilerCtx: d.CompilerCtx
 
   return imports;
 };
-
-const IMPORT_RE = /(@import)\s+(url\()?\s?(.*?)\s?\)?([^;]*);?/gi;
 
 export const isCssNodeModule = (url: string) => url.startsWith('~');
 

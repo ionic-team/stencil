@@ -1,11 +1,18 @@
-# 📟 [1.15.0-2](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0-2) (2020-06-04)
+# 🚢 [1.15.0-3](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0-3) (2020-06-17)
 
 ### Features
 
-- Rollup 2.13.1
+* **compiler:** auto detect css parts ([#2510](https://github.com/ionic-team/stencil/issues/2510)) ([bce12b9](https://github.com/ionic-team/stencil/commit/bce12b92c560d3d90335ad43125969e913ea6e8d))
+* **types:** add `componentShouldUpdate` docs ([#2505](https://github.com/ionic-team/stencil/issues/2505)) ([0425a78](https://github.com/ionic-team/stencil/commit/0425a78ecec6c6f2fe047b9c9ba6f77b46cc554a)), closes [#2489](https://github.com/ionic-team/stencil/issues/2489)
+* **typescript:** update to typescript 3.9.5 ([2a8cd7d](https://github.com/ionic-team/stencil/commit/2a8cd7d9a27b1f14f0da8b95ac03307f384cd65d))
+- Rollup 2.16.1
+
 
 ### Bug Fixes
 
+* **css:** fix compilation of multiple styleURLs ([#2493](https://github.com/ionic-team/stencil/issues/2493)) ([d91819c](https://github.com/ionic-team/stencil/commit/d91819ccf8a4d91af2e9a1a01bb5cbb7160a9236)), closes [#2432](https://github.com/ionic-team/stencil/issues/2432)
+* **jsx:** fix refX / refY types ([6cec36e](https://github.com/ionic-team/stencil/commit/6cec36eb792b9af9d1d3367916273b3a320c327d)), closes [#2503](https://github.com/ionic-team/stencil/issues/2503)
+* change autocapitalize types to any to avoid conflicts ([#2509](https://github.com/ionic-team/stencil/issues/2509)) ([19746d6](https://github.com/ionic-team/stencil/commit/19746d6ab99b26ccb1b7b13ca5af2b7d2d362220))
 * **cli:** correct import in generated spec tests ([#2486](https://github.com/ionic-team/stencil/issues/2486)) ([9a80c41](https://github.com/ionic-team/stencil/commit/9a80c4158a488b57bfdd1244d1ba126dc4a586ff))
 * **client:** import client platform from patch ([dbacafc](https://github.com/ionic-team/stencil/commit/dbacafc443f3819ba05f3bd4f79c75965b5de0bd))
 * **compiler:** types should not be based on package.json ([65cdfbd](https://github.com/ionic-team/stencil/commit/65cdfbd10f28299465dab8897849cd6e1a6a823e)), closes [#2460](https://github.com/ionic-team/stencil/issues/2460)
@@ -14,6 +21,12 @@
 * do not emit nomodule script of es5 is disabled ([39c51db](https://github.com/ionic-team/stencil/commit/39c51db66886846b0d224f8c02affd6933dd096b))
 * **runtime:** enumerated boolean attributes ([0d72aee](https://github.com/ionic-team/stencil/commit/0d72aeea51cb754615fed74020b035b1853ad740))
 * **watch:** fix watch callbacks in custom elements build ([d052fe4](https://github.com/ionic-team/stencil/commit/d052fe40a1007e39d636455d1dbbb3eb171cea16)), closes [#2478](https://github.com/ionic-team/stencil/issues/2478)
+
+
+### Performance Improvements
+
+* reenable const class optimization ([438c6b3](https://github.com/ionic-team/stencil/commit/438c6b310f24d93dc82aba1614e0f9d91dbccd7a))
+
 
 ### Internal Changes
 
