@@ -107,6 +107,20 @@ const insertVNodeAnnotations = (doc: Document, hostElm: d.HostElement, vnode: d.
         insertChildVNodeAnnotations(doc, vnodeChild, cmpData, hostId, depth, index);
       });
     }
+
+    if (hostElm && vnode && vnode.$elm$ && !hostElm.hasAttribute('c-id')) {
+      const parent: HTMLElement = hostElm.parentElement;
+      if (parent && parent.childNodes) {
+        const parentChildNodes: ChildNode[] = Array.from(parent.childNodes);
+        const comment: d.RenderNode | undefined = parentChildNodes.find(node => node.nodeType === NODE_TYPE.CommentNode && (node as d.RenderNode)['s-sr']) as
+          | d.RenderNode
+          | undefined;
+        if (comment) {
+          const index: number = parentChildNodes.indexOf(hostElm) - 1;
+          (vnode.$elm$ as d.RenderNode).setAttribute(HYDRATE_CHILD_ID, `${comment['s-host-id']}.${comment['s-node-id']}.0.${index}`);
+        }
+      }
+    }
   }
 };
 
