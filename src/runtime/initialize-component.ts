@@ -68,7 +68,6 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     } else {
       Cstr = elm.constructor as any;
     }
-    debugger;
 
     if (BUILD.style && Cstr.style) {
       // this component has styles but we haven't registered them yet

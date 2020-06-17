@@ -30,7 +30,6 @@ describe('SVG element', () => {
       </cmp-a>
     `);
     root.lines = [1, 2];
-    debugger;
     await waitForChanges();
     expect(root).toEqualHtml(`
       <cmp-a>
