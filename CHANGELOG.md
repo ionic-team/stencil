@@ -1,4 +1,4 @@
-# 🚢 [1.15.0-3](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0-3) (2020-06-17)
+# 🛥 [1.15.0-4](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0-4) (2020-06-17)
 
 ### Features
 
@@ -21,6 +21,7 @@
 * do not emit nomodule script of es5 is disabled ([39c51db](https://github.com/ionic-team/stencil/commit/39c51db66886846b0d224f8c02affd6933dd096b))
 * **runtime:** enumerated boolean attributes ([0d72aee](https://github.com/ionic-team/stencil/commit/0d72aeea51cb754615fed74020b035b1853ad740))
 * **watch:** fix watch callbacks in custom elements build ([d052fe4](https://github.com/ionic-team/stencil/commit/d052fe40a1007e39d636455d1dbbb3eb171cea16)), closes [#2478](https://github.com/ionic-team/stencil/issues/2478)
+* **#2366:** rehydrate slot child ([e152773](https://github.com/ionic-team/stencil/commit/e1527738bcbac87d9cfbdcf492a681a72f56d699)), closes [#2366](https://github.com/ionic-team/stencil/issues/2366)
 
 
 ### Performance Improvements
