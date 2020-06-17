@@ -11,7 +11,7 @@ export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d
     $tagName$: compactMeta[1],
     $members$: compactMeta[2],
     $listeners$: compactMeta[3],
-    $lazyBundleIds$: fakeBundleIds(cmp),
+    $lazyBundleId$: fakeBundleIds(cmp),
     $attrsToReflect$: getHydrateAttrsToReflect(cmp),
   };
   // We always need shadow-dom shim in hydrate runtime
@@ -24,14 +24,7 @@ export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d
   classMembers.push(staticMember);
 };
 
-const fakeBundleIds = (cmp: d.ComponentCompilerMeta) => {
-  if (cmp.hasMode) {
-    const modes: any = {};
-    cmp.styles.forEach(s => {
-      modes[s.modeName] = '-';
-    });
-    return modes;
-  }
+const fakeBundleIds = (_cmp: d.ComponentCompilerMeta) => {
   return '-';
 };
 

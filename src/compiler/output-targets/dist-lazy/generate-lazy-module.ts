@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { writeLazyModule } from './write-lazy-entry-module';
-import { DEFAULT_STYLE_MODE, formatComponentRuntimeMeta, stringifyRuntimeData, hasDependency, sortBy } from '@utils';
+import { formatComponentRuntimeMeta, stringifyRuntimeData, hasDependency } from '@utils';
 import { optimizeModule } from '../../optimize/optimize-module';
 import { join } from 'path';
 
@@ -76,19 +76,15 @@ const generateLazyEntryModule = async (
 ): Promise<d.BundleModule> => {
   const entryModule = buildCtx.entryModules.find(entryModule => entryModule.entryKey === rollupResult.entryKey);
   const shouldHash = config.hashFileNames && isBrowserBuild;
-  const outputs = await Promise.all(
-    entryModule.modeNames.map(async modeName => {
-      const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, rollupResult.code, modeName);
-      return writeLazyModule(config, compilerCtx, outputTargetType, destinations, entryModule, shouldHash, code, modeName, sufix);
-    }),
-  );
+
+  const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, rollupResult.code);
+  const output = await writeLazyModule(config, compilerCtx, outputTargetType, destinations, entryModule, shouldHash, code, sufix);
 
   return {
     rollupResult,
     entryKey: rollupResult.entryKey,
-    modeNames: entryModule.modeNames.slice(),
     cmps: entryModule.cmps,
-    outputs: sortBy(outputs, o => o.modeName),
+    output,
   };
 };
 
@@ -146,24 +142,8 @@ const formatLazyBundlesRuntimeMeta = (bundleModules: d.BundleModule[]) => {
 };
 
 const formatLazyRuntimeBundle = (bundleModule: d.BundleModule): d.LazyBundleRuntimeData => {
-  let bundleId: any;
-  if (bundleModule.outputs.length === 0) {
-    throw new Error('bundleModule.output must be at least one');
-  }
-
-  if (bundleModule.outputs[0].modeName !== DEFAULT_STYLE_MODE) {
-    // more than one mode, object of bundleIds with the mode as a key
-    bundleId = {};
-    bundleModule.outputs.forEach(output => {
-      bundleId[output.modeName] = output.bundleId;
-    });
-  } else {
-    // only one default mode, bundleId is a string
-    bundleId = bundleModule.outputs[0].bundleId;
-  }
-
+  let bundleId = bundleModule.output.bundleId;
   const bundleCmps = bundleModule.cmps.slice().sort(sortBundleComponents);
-
   return [bundleId, bundleCmps.map(cmp => formatComponentRuntimeMeta(cmp, true))];
 };
 
@@ -258,7 +238,6 @@ const convertChunk = async (
   isCore: boolean,
   isBrowserBuild: boolean,
   code: string,
-  modeName?: string,
 ) => {
   const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
   const optimizeResults = await optimizeModule(config, compilerCtx, {
@@ -267,7 +246,6 @@ const convertChunk = async (
     sourceTarget,
     inlineHelpers,
     minify: shouldMinify,
-    modeName,
   });
   buildCtx.diagnostics.push(...optimizeResults.diagnostics);
   if (typeof optimizeResults.output === 'string') {

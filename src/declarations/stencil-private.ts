@@ -257,6 +257,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   shadowDomShim?: boolean;
   asyncQueue?: boolean;
   transformTagName?: boolean;
+  attachStyles?: boolean;
 }
 
 export type ModuleFormat = 'amd' | 'cjs' | 'es' | 'iife' | 'system' | 'umd' | 'commonjs' | 'esm' | 'module' | 'systemjs';
@@ -442,17 +443,15 @@ export interface RollupChunkResult {
 
 export interface BundleModule {
   entryKey: string;
-  modeNames: string[];
   rollupResult: RollupChunkResult;
   cmps: ComponentCompilerMeta[];
-  outputs: BundleModuleOutput[];
+  output: BundleModuleOutput;
 }
 
 export interface BundleModuleOutput {
   bundleId: string;
   fileName: string;
   code: string;
-  modeName: string;
 }
 
 export interface Cache {
@@ -1255,7 +1254,6 @@ export interface OpenInEditorData {
 export interface EntryModule {
   entryKey: string;
   cmps: ComponentCompilerMeta[];
-  modeNames: string[];
 }
 
 export interface EntryBundle {
@@ -1739,7 +1737,7 @@ export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
 
 export type LazyBundleRuntimeData = [
   /** bundleIds */
-  any,
+  string,
   ComponentRuntimeMetaCompact[],
 ];
 
@@ -1764,7 +1762,7 @@ export interface ComponentRuntimeMeta {
   $listeners$?: ComponentRuntimeHostListener[];
   $attrsToReflect$?: [string, string][];
   $watchers$?: ComponentConstructorWatchers;
-  $lazyBundleIds$?: ModeBundleIds;
+  $lazyBundleId$?: string;
 }
 
 export interface ComponentRuntimeMembers {
@@ -2509,6 +2507,12 @@ export interface NewSpecPageOptions {
    * By default, any changes to component properties and attributes must `page.waitForChanges()` in order to test the updates. As an option, `autoAppluChanges` continuously flushes the queue on the background. Default is `false`.
    */
   autoApplyChanges?: boolean;
+
+  /**
+   * By default, styles are not attached to the DOM and they are not reflected in the serialized HTML.
+   * Setting this option to `true` will include the component's styles in the serializable output.
+   */
+  attachStyles?: boolean;
 
   strictBuild?: boolean;
   /** @deprecated */
