@@ -108,39 +108,20 @@ const insertVNodeAnnotations = (doc: Document, hostElm: d.HostElement, vnode: d.
       });
     }
 
-    insertParentVNodeAnnotations(hostElm, vnode);
+    if (hostElm && vnode && vnode.$elm$ && !hostElm.hasAttribute('c-id')) {
+      const parent: HTMLElement = hostElm.parentElement;
+      if (parent && parent.childNodes) {
+        const parentChildNodes: ChildNode[] = Array.from(parent.childNodes);
+        const comment: d.RenderNode | undefined = parentChildNodes.find(node => node.nodeType === NODE_TYPE.CommentNode && (node as d.RenderNode)['s-sr']) as
+          | d.RenderNode
+          | undefined;
+        if (comment) {
+          const index: number = parentChildNodes.indexOf(hostElm) - 1;
+          (vnode.$elm$ as d.RenderNode).setAttribute(HYDRATE_CHILD_ID, `${comment['s-host-id']}.${comment['s-node-id']}.0.${index}`);
+        }
+      }
+    }
   }
-};
-
-const insertParentVNodeAnnotations = (hostElm: d.HostElement, vnode: d.VNode) => {
-  if (!hostElm || !vnode || !vnode.$elm$) {
-    return;
-  }
-
-  if (hostElm.getAttribute('c-id') !== null) {
-    return;
-  }
-
-  const parent: HTMLElement = hostElm.parentElement;
-
-  if (!parent || !parent.childNodes || parent.childNodes.length <= 0) {
-    return;
-  }
-
-  const parentChildNodes: ChildNode[] = Array.from(parent.childNodes);
-
-  const comment: d.RenderNode | undefined = parentChildNodes.find(node => {
-    return node.nodeType === NODE_TYPE.CommentNode && (node as d.RenderNode)['s-sr'];
-  }) as d.RenderNode | undefined;
-
-  if (!comment) {
-    return;
-  }
-
-  // We have got at least the element plus a comment. First element should be indexed with 1, second element with 2, etc.
-  const index: number = parentChildNodes.indexOf(hostElm) - 1;
-
-  (vnode.$elm$ as d.RenderNode).setAttribute(HYDRATE_CHILD_ID, `${comment['s-host-id']}.${comment['s-node-id']}.0.${index}`);
 };
 
 const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, cmpData: CmpData, hostId: number, depth: number, index: number) => {
