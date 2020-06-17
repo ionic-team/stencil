@@ -142,6 +142,7 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.safari10 = config.extras.safari10;
   b.scriptDataOpts = config.extras.scriptDataOpts;
   b.shadowDomShim = config.extras.shadowDomShim;
+  b.attachStyles = true;
   if (b.shadowDomShim) {
     b.slotRelocation = b.slot;
   }

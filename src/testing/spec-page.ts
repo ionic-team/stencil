@@ -124,6 +124,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   BUILD.cloneNodeFix = false;
   BUILD.shadowDomShim = false;
   BUILD.safari10 = false;
+  BUILD.attachStyles = !!opts.attachStyles;
 
   (page as any).flush = () => {
     console.warn(`DEPRECATED: page.flush(), please use page.waitForChanges() instead`);

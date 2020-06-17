@@ -257,6 +257,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   shadowDomShim?: boolean;
   asyncQueue?: boolean;
   transformTagName?: boolean;
+  attachStyles?: boolean;
 }
 
 export type ModuleFormat = 'amd' | 'cjs' | 'es' | 'iife' | 'system' | 'umd' | 'commonjs' | 'esm' | 'module' | 'systemjs';
@@ -2506,6 +2507,12 @@ export interface NewSpecPageOptions {
    * By default, any changes to component properties and attributes must `page.waitForChanges()` in order to test the updates. As an option, `autoAppluChanges` continuously flushes the queue on the background. Default is `false`.
    */
   autoApplyChanges?: boolean;
+
+  /**
+   * By default, styles are not attached to the DOM and they are not reflected in the serialized HTML.
+   * Setting this option to `true` will include the component's styles in the serializable output.
+   */
+  attachStyles?: boolean;
 
   strictBuild?: boolean;
   /** @deprecated */

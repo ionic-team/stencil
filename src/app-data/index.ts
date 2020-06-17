@@ -80,6 +80,7 @@ export const BUILD: BuildConditionals = {
   asyncLoading: false,
   asyncQueue: false,
   transformTagName: false,
+  attachStyles: true,
 };
 
 export const NAMESPACE = /* default */ 'app' as string;

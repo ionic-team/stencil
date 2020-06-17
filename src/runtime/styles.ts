@@ -22,7 +22,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
   let scopeId = getScopeId(cmpMeta, mode);
   let style = styles.get(scopeId);
 
-  if (BUILD.isTesting) {
+  if (!BUILD.attachStyles) {
     return scopeId;
   }
   // if an element is NOT connected then getRootNode() will return the wrong root node
