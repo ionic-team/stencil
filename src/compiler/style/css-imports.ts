@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
 import { basename, dirname, isAbsolute, join, relative } from 'path';
 import { buildError, normalizePath } from '@utils';
+import { getModuleId } from '../sys/resolve/resolve-utils';
 import { parseStyleDocs } from '../docs/style-docs';
 import { resolveModuleIdAsync } from '../sys/resolve/resolve-module-async';
 import { stripCssComments } from './style-utils';
@@ -220,27 +221,6 @@ export const replaceNodeModuleUrl = (baseCssFilePath: string, moduleId: string, 
 
   const relToRoot = normalizePath(relative(baseCssDir, absPathToNodeModuleCss));
   return relToRoot;
-};
-
-export const getModuleId = (orgImport: string) => {
-  if (orgImport.startsWith('~')) {
-    orgImport = orgImport.substring(1);
-  }
-  const splt = orgImport.split('/');
-  const m = {
-    moduleId: null as string,
-    filePath: null as string,
-  };
-
-  if (orgImport.startsWith('@') && splt.length > 1) {
-    m.moduleId = splt.slice(0, 2).join('/');
-    m.filePath = splt.slice(2).join('/');
-  } else {
-    m.moduleId = splt[0];
-    m.filePath = splt.slice(1).join('/');
-  }
-
-  return m;
 };
 
 export const replaceImportDeclarations = (styleText: string, cssImports: d.CssImportData[], isCssEntry: boolean) => {

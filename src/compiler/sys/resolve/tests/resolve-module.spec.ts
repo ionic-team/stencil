@@ -1,4 +1,4 @@
-import { getStencilInternalDtsPath, getPackageDirPath, isLocalModule, isStencilCoreImport, isNodeModulePath, setPackageVersionByContent } from '../resolve-utils';
+import { getModuleId, getStencilInternalDtsPath, getPackageDirPath, isLocalModule, isStencilCoreImport, isNodeModulePath, setPackageVersionByContent } from '../resolve-utils';
 
 describe('resolve modules', () => {
   const pkgVersions = new Map<string, string>();
@@ -35,7 +35,58 @@ describe('resolve modules', () => {
     expect(getStencilInternalDtsPath('C:\\my-windowz\\')).toBe('C:/my-windowz/node_modules/@stencil/core/internal/index.d.ts');
   });
 
+  describe('getModuleId', () => {
+    it('getModuleId non-scoped ~ package', () => {
+      const m = getModuleId('~ionicons/dist/css/ionicons.css');
+      expect(m.moduleId).toBe('ionicons');
+      expect(m.filePath).toBe('dist/css/ionicons.css');
+      expect(m.scope).toBe(null);
+      expect(m.scopeSubModuleId).toBe(null);
+    });
+
+    it('getModuleId non-scoped package', () => {
+      const m = getModuleId('ionicons/dist/css/ionicons.css');
+      expect(m.moduleId).toBe('ionicons');
+      expect(m.filePath).toBe('dist/css/ionicons.css');
+      expect(m.scope).toBe(null);
+      expect(m.scopeSubModuleId).toBe(null);
+    });
+
+    it('getModuleId non-scoped package, no path', () => {
+      const m = getModuleId('ionicons');
+      expect(m.moduleId).toBe('ionicons');
+      expect(m.filePath).toBe('');
+      expect(m.scope).toBe(null);
+      expect(m.scopeSubModuleId).toBe(null);
+    });
+
+    it('getModuleId scoped ~ package', () => {
+      const m = getModuleId('~@ionic/core/dist/ionic/css/ionic.css');
+      expect(m.moduleId).toBe('@ionic/core');
+      expect(m.filePath).toBe('dist/ionic/css/ionic.css');
+      expect(m.scope).toBe('@ionic');
+      expect(m.scopeSubModuleId).toBe('core');
+    });
+
+    it('getModuleId scoped package', () => {
+      const m = getModuleId('@ionic/core/dist/ionic/css/ionic.css');
+      expect(m.moduleId).toBe('@ionic/core');
+      expect(m.filePath).toBe('dist/ionic/css/ionic.css');
+      expect(m.scope).toBe('@ionic');
+      expect(m.scopeSubModuleId).toBe('core');
+    });
+
+    it('getModuleId scoped package, no path', () => {
+      const m = getModuleId('@ionic/core');
+      expect(m.moduleId).toBe('@ionic/core');
+      expect(m.filePath).toBe('');
+      expect(m.scope).toBe('@ionic');
+      expect(m.scopeSubModuleId).toBe('core');
+    });
+  });
+
   it('getPackageDirPath', () => {
+    expect(getPackageDirPath('/node_modules/@my/pkg/some/path.js', '@my/pkg')).toBe('/node_modules/@my/pkg');
     expect(getPackageDirPath('\\node_modules\\my-pkg\\', 'my-pkg')).toBe('/node_modules/my-pkg');
     expect(getPackageDirPath('/node_modules/my-pkg/', 'my-pkg')).toBe('/node_modules/my-pkg');
     expect(getPackageDirPath('/node_modules/my-pkg/some/path.js', 'my-pkg')).toBe('/node_modules/my-pkg');

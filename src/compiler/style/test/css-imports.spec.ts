@@ -1,5 +1,5 @@
 import * as d from '@stencil/core/declarations';
-import { getCssImports, getModuleId, isCssNodeModule, isLocalCssImport, replaceImportDeclarations } from '../css-imports';
+import { getCssImports, isCssNodeModule, isLocalCssImport, replaceImportDeclarations } from '../css-imports';
 import { mockBuildCtx, mockConfig, mockCompilerCtx } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
 import path from 'path';
@@ -418,41 +418,4 @@ describe('css-imports', () => {
     });
   });
 
-  describe('getModuleId', () => {
-    it('getModuleId non-scoped ~ package', () => {
-      const m = getModuleId('~ionicons/dist/css/ionicons.css');
-      expect(m.moduleId).toBe('ionicons');
-      expect(m.filePath).toBe('dist/css/ionicons.css');
-    });
-
-    it('getModuleId non-scoped package', () => {
-      const m = getModuleId('ionicons/dist/css/ionicons.css');
-      expect(m.moduleId).toBe('ionicons');
-      expect(m.filePath).toBe('dist/css/ionicons.css');
-    });
-
-    it('getModuleId non-scoped package, no path', () => {
-      const m = getModuleId('ionicons');
-      expect(m.moduleId).toBe('ionicons');
-      expect(m.filePath).toBe('');
-    });
-
-    it('getModuleId scoped ~ package', () => {
-      const m = getModuleId('~@ionic/core/dist/ionic/css/ionic.css');
-      expect(m.moduleId).toBe('@ionic/core');
-      expect(m.filePath).toBe('dist/ionic/css/ionic.css');
-    });
-
-    it('getModuleId scoped package', () => {
-      const m = getModuleId('@ionic/core/dist/ionic/css/ionic.css');
-      expect(m.moduleId).toBe('@ionic/core');
-      expect(m.filePath).toBe('dist/ionic/css/ionic.css');
-    });
-
-    it('getModuleId scoped package, no path', () => {
-      const m = getModuleId('@ionic/core');
-      expect(m.moduleId).toBe('@ionic/core');
-      expect(m.filePath).toBe('');
-    });
-  });
 });
