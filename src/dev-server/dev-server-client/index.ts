@@ -13,7 +13,8 @@ const defaultConfig: d.DevClientConfig = {
   socketUrl: `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.hostname}${location.port !== '' ? ':' + location.port : ''}/`,
 };
 
+applyPolyfills(iframeWindow);
+
 const devClientConfig = Object.assign({}, defaultConfig, appWindow.devServerConfig, config);
 
-applyPolyfills(iframeWindow);
 initDevClient(appWindow, devClientConfig);
