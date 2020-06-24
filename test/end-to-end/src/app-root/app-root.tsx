@@ -1,6 +1,7 @@
 import { Component, State, h, Host } from '@stencil/core';
 import _ from 'lodash';
 import _es from 'lodash-es';
+import videojs from 'video.js';
 
 function format(target: any, propertyKey: string) {
   console.log(target, propertyKey);
@@ -22,10 +23,15 @@ export class AppRoot {
     console.log('lodash-es', _es.camelCase('LODASH-ES'));
   }
 
+  componentDidLoad() {
+    videojs('video')
+  }
+
   render() {
     return (
       <Host>
         <prop-cmp first={this.first} lastName={this.last} mode="ios" />
+        <div id="video"></div>
       </Host>
     );
   }
