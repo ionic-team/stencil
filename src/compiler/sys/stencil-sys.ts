@@ -12,6 +12,7 @@ import {
   CompilerSystemWriteFileResults,
   CompilerSystemRenameResults,
   CompilerSystemUnlinkResults,
+  CompilerSystemRealpathResults,
 } from '../../declarations';
 import { basename, dirname } from 'path';
 import { buildEvents } from '../events';
@@ -159,7 +160,13 @@ export const createSystem = () => {
 
   const readFile = async (p: string) => readFileSync(p);
 
-  const realpathSync = (p: string) => normalize(p);
+  const realpathSync = (p: string) => {
+    const results: CompilerSystemRealpathResults = {
+      path: normalize(p),
+      error: null
+    }
+    return results;
+  }
 
   const realpath = async (p: string) => realpathSync(p);
 

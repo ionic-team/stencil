@@ -115,6 +115,14 @@ export const createCustomResolverSync = (sys: d.CompilerSystem, inMemoryFs: d.In
       throw new Error(`file not found: ${p}`);
     },
 
+    realpathSync(p: string) {
+      const results = sys.realpathSync(normalizeFsPath(p));
+      if (results.error) {
+        throw results.error;
+      }
+      return results.path;
+    },
+
     extensions: exts,
   } as any;
 };

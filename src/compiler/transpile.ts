@@ -3,7 +3,7 @@ import { catchError, isString } from '@utils';
 import { getTranspileCssConfig, getTranspileConfig, getTranspileResults } from './config/transpile-options';
 import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
 import { patchTypescript, patchTypescriptSync } from './sys/typescript/typescript-patch';
-import { rollupPluginUtils } from '@compiler-plugins';
+import { rollupPluginUtils } from '@compiler-deps';
 import { transformCssToEsm, transformCssToEsmSync } from './style/css-to-esm';
 import { transpileModule } from './transpile/transpile-module';
 

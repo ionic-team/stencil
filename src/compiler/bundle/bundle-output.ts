@@ -3,7 +3,7 @@ import { appDataPlugin } from './app-data-plugin';
 import type { BundleOptions } from './bundle-interface';
 import { coreResolvePlugin } from './core-resolve-plugin';
 import { createCustomResolverAsync } from '../sys/resolve/resolve-module-async';
-import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
+import { createOnWarnFn, loadRollupDiagnostics, isString } from '@utils';
 import { devNodeModuleResolveId } from './dev-module';
 import { extFormatPlugin } from './ext-format-plugin';
 import { extTransformsPlugin } from './ext-transforms-plugin';
@@ -12,7 +12,7 @@ import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-
 import { loaderPlugin } from './loader-plugin';
 import { pluginHelper } from './plugin-helper';
 import { resolveIdWithTypeScript, typescriptPlugin } from './typescript-plugin';
-import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-plugins';
+import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-deps';
 import { RollupOptions, TreeshakingOptions, rollup } from 'rollup';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
@@ -38,13 +38,17 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
     mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
     customResolveOptions,
     browser: true,
+    rootDir: config.rootDir,
     ...(config.nodeResolve as any),
   });
   const orgNodeResolveId = nodeResolvePlugin.resolveId;
   const orgNodeResolveId2 = (nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
-    const [readImportee, query] = importee.split('?');
-    const resolved = await orgNodeResolveId.call(nodeResolvePlugin, readImportee, importer);
+    const [realImportee, query] = importee.split('?');
+    const resolved = await orgNodeResolveId.call(nodeResolvePlugin, realImportee, importer);
     if (resolved) {
+      if (isString(resolved)) {
+        return query ? resolved + '?' + query : resolved;
+      }
       return {
         ...resolved,
         id: query ? resolved.id + '?' + query : resolved.id,

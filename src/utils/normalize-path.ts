@@ -140,7 +140,7 @@ const pathComponents = (path: string, rootLength: number) => {
  * Same as normalizePath(), expect it'll also strip any querystrings
  * from the path name. So /dir/file.css?tag=cmp-a becomes /dir/file.css
  */
-export const normalizeFsPath = (p: string) => normalizePath(p.split('?')[0]);
+export const normalizeFsPath = (p: string) => normalizePath(p.split('?')[0].replace(/\0/g, ''));
 
 export const normalizeFsPathQuery = (importPath: string) => {
   const pathParts = importPath.split('?');

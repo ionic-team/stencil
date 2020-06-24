@@ -25,8 +25,8 @@ export const addExternalImport = (config: d.Config, compilerCtx: d.CompilerCtx, 
   }
 
   const realPkgJsonFilePath = config.sys.realpathSync(pkgJsonFilePath);
-  if (realPkgJsonFilePath) {
-    pkgJsonFilePath = realPkgJsonFilePath;
+  if (realPkgJsonFilePath.path) {
+    pkgJsonFilePath = realPkgJsonFilePath.path;
   }
 
   if (pkgJsonFilePath === config.packageJsonFilePath) {

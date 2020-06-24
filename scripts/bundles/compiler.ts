@@ -5,7 +5,7 @@ import rollupJson from '@rollup/plugin-json';
 import rollupNodeResolve from '@rollup/plugin-node-resolve';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { getBanner } from '../utils/banner';
-import { inlinedCompilerPluginsPlugin } from './plugins/inlined-compiler-plugins-plugin';
+import { inlinedCompilerDepsPlugin } from './plugins/inlined-compiler-deps-plugin';
 import { moduleDebugPlugin } from './plugins/module-debug-plugin';
 import { parse5Plugin } from './plugins/parse5-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
@@ -37,7 +37,8 @@ export async function compiler(opts: BuildOptions) {
 
   const cjsIntro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-intro.js'), 'utf8');
   const cjsOutro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-outro.js'), 'utf8');
-  const rollupWatchPath = join(opts.nodeModulesDir, 'rollup', 'dist', 'es', 'shared', 'watch.js');  const compilerBundle: RollupOptions = {
+  const rollupWatchPath = join(opts.nodeModulesDir, 'rollup', 'dist', 'es', 'shared', 'watch.js');
+  const compilerBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
     output: {
       format: 'cjs',
@@ -76,7 +77,7 @@ export async function compiler(opts: BuildOptions) {
           return null;
         },
       },
-      inlinedCompilerPluginsPlugin(opts, inputDir),
+      inlinedCompilerDepsPlugin(opts, inputDir),
       parse5Plugin(opts),
       sizzlePlugin(opts),
       aliasPlugin(opts),

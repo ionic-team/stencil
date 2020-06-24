@@ -892,9 +892,13 @@ export interface CompilerSystem {
    */
   readFileSync(p: string, encoding?: string): string;
   /**
-   * Returns undefined if there's an error. Does not throw.
+   * Does not throw.
    */
-  realpath(p: string): Promise<string>;
+  realpath(p: string): Promise<CompilerSystemRealpathResults>;
+  /**
+   * SYNC! Does not throw.
+   */
+  realpathSync(p: string): CompilerSystemRealpathResults;
   /**
    * Remove a callback which will be ran when destroy() is called.
    */
@@ -903,10 +907,6 @@ export interface CompilerSystem {
    * Rename old path to new path. Does not throw.
    */
   rename(oldPath: string, newPath: string): Promise<CompilerSystemRenameResults>;
-  /**
-   * SYNC! Returns undefined if there's an error. Does not throw.
-   */
-  realpathSync(p: string): string;
   resolveModuleId?(opts: ResolveModuleIdOptions): Promise<ResolveModuleIdResults>;
   resolvePath(p: string): string;
   /**
@@ -1194,6 +1194,11 @@ export interface CompilerSystemRenamedPath {
   newPath: string;
   isFile: boolean;
   isDirectory: boolean;
+}
+
+export interface CompilerSystemRealpathResults {
+  path: string;
+  error: any;
 }
 
 export interface CompilerSystemUnlinkResults {

@@ -8,7 +8,7 @@ import resolve, { AsyncOpts } from 'resolve';
 
 export const resolveModuleIdAsync = (sys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, opts: d.ResolveModuleIdOptions) => {
   const resolverOpts: AsyncOpts = createCustomResolverAsync(sys, inMemoryFs, opts.exts);
-  resolverOpts.basedir = dirname(opts.containingFile);
+  resolverOpts.basedir = dirname(normalizeFsPath(opts.containingFile));
 
   if (opts.packageFilter) {
     resolverOpts.packageFilter = opts.packageFilter;
@@ -111,6 +111,11 @@ export const createCustomResolverAsync = (sys: d.CompilerSystem, inMemoryFs: d.I
       }
 
       return cb(`readFile not found: ${p}`, undefined);
+    },
+
+    async realpath(p: string, cb: (err: any, data: any) => void) {
+      const results = await sys.realpath(normalizeFsPath(p));
+      cb(results.error, results.path);
     },
 
     extensions: exts,

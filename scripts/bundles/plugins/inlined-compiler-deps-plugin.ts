@@ -6,26 +6,26 @@ import rollupJson from '@rollup/plugin-json';
 import rollupNodeResolve from '@rollup/plugin-node-resolve';
 import { BuildOptions } from '../../utils/options';
 
-export function inlinedCompilerPluginsPlugin(opts: BuildOptions, inputDir: string): Plugin {
+export function inlinedCompilerDepsPlugin(opts: BuildOptions, inputDir: string): Plugin {
   return {
-    name: 'inlinedCompilerPluginsPlugin',
+    name: 'inlinedCompilerDepsPlugin',
     resolveId(id) {
-      if (id === '@compiler-plugins') {
+      if (id === '@compiler-deps') {
         return id;
       }
       return null;
     },
     load(id) {
-      if (id === '@compiler-plugins') {
-        return bundleCompilerPlugins(opts, inputDir);
+      if (id === '@compiler-deps') {
+        return bundleCompilerDeps(opts, inputDir);
       }
       return null;
     },
   };
 }
 
-async function bundleCompilerPlugins(opts: BuildOptions, inputDir: string) {
-  const cacheFile = path.join(opts.transpiledDir, 'compiler-plugins-bundle-cache.js');
+async function bundleCompilerDeps(opts: BuildOptions, inputDir: string) {
+  const cacheFile = path.join(opts.transpiledDir, 'compiler-deps-bundle-cache.js');
 
   if (!opts.isProd) {
     try {
@@ -34,18 +34,9 @@ async function bundleCompilerPlugins(opts: BuildOptions, inputDir: string) {
   }
 
   const build = await rollup({
-    input: path.join(inputDir, 'sys', 'modules', 'compiler-plugins.js'),
-    external: ['fs', 'module', 'path', 'util'],
+    input: path.join(inputDir, 'sys', 'modules', 'compiler-deps.js'),
+    external: ['fs', 'module', 'path', 'util', 'resolve'],
     plugins: [
-      {
-        name: 'bundleCompilerPlugins',
-        resolveId(id) {
-          if (id === 'resolve') {
-            return path.join(opts.bundleHelpersDir, 'resolve.js');
-          }
-          return null;
-        },
-      },
       rollupNodeResolve({
         preferBuiltins: false,
       }),
