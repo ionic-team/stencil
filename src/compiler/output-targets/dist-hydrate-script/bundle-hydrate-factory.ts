@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import type { BundleOptions } from '../../bundle/bundle-interface';
-import { getBuildFeatures } from '../../app-core/app-data';
 import { bundleOutput } from '../../bundle/bundle-output';
+import { getHydrateBuildConditionals } from './hydrate-build-conditionals';
 import { hydrateComponentTransform } from '../../transformers/component-hydrate/tranform-to-hydrate-component';
 import { loadRollupDiagnostics } from '@utils';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
@@ -32,38 +32,6 @@ export const bundleHydrateFactory = async (config: d.Config, compilerCtx: d.Comp
     }
   }
   return undefined;
-};
-
-const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => {
-  const build = getBuildFeatures(cmps) as d.BuildConditionals;
-
-  build.lazyLoad = true;
-  build.hydrateServerSide = true;
-  build.cssVarShim = false;
-  build.hydrateClientSide = true;
-  build.isDebug = false;
-  build.isDev = false;
-  build.isTesting = false;
-  build.devTools = false;
-  build.lifecycleDOMEvents = false;
-  build.profile = false;
-  build.hotModuleReplacement = false;
-  build.updatable = true;
-  build.member = true;
-  build.constructableCSS = false;
-  build.asyncLoading = true;
-  build.appendChildSlotFix = false;
-  build.slotChildNodesFix = false;
-  build.cloneNodeFix = false;
-  build.cssAnnotations = true;
-  build.shadowDomShim = true;
-  build.safari10 = false;
-  build.hydratedAttribute = false;
-  build.hydratedClass = true;
-  build.scriptDataOpts = false;
-  build.dynamicImportShim = false;
-
-  return build;
 };
 
 const getHydrateCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
