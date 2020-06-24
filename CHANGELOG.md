@@ -1,11 +1,12 @@
-# 🛥 [1.15.0-4](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0-4) (2020-06-17)
+# 🐌 [1.15.0-5](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0-5) (2020-06-24)
+
 
 ### Features
 
 * **compiler:** auto detect css parts ([#2510](https://github.com/ionic-team/stencil/issues/2510)) ([bce12b9](https://github.com/ionic-team/stencil/commit/bce12b92c560d3d90335ad43125969e913ea6e8d))
 * **types:** add `componentShouldUpdate` docs ([#2505](https://github.com/ionic-team/stencil/issues/2505)) ([0425a78](https://github.com/ionic-team/stencil/commit/0425a78ecec6c6f2fe047b9c9ba6f77b46cc554a)), closes [#2489](https://github.com/ionic-team/stencil/issues/2489)
 * **typescript:** update to typescript 3.9.5 ([2a8cd7d](https://github.com/ionic-team/stencil/commit/2a8cd7d9a27b1f14f0da8b95ac03307f384cd65d))
-- Rollup 2.16.1
+- Rollup 2.18.0
 
 
 ### Bug Fixes
@@ -22,6 +23,11 @@
 * **runtime:** enumerated boolean attributes ([0d72aee](https://github.com/ionic-team/stencil/commit/0d72aeea51cb754615fed74020b035b1853ad740))
 * **watch:** fix watch callbacks in custom elements build ([d052fe4](https://github.com/ionic-team/stencil/commit/d052fe40a1007e39d636455d1dbbb3eb171cea16)), closes [#2478](https://github.com/ionic-team/stencil/issues/2478)
 * **#2366:** rehydrate slot child ([e152773](https://github.com/ionic-team/stencil/commit/e1527738bcbac87d9cfbdcf492a681a72f56d699)), closes [#2366](https://github.com/ionic-team/stencil/issues/2366)
+* **dev-server:** fix dev-server on ie11 ([db19ba7](https://github.com/ionic-team/stencil/commit/db19ba7420729051b0ad277703097175a93e74a8))
+* **hydrate:** fix hydrate attach styles ([d891537](https://github.com/ionic-team/stencil/commit/d891537fcb7fab309f3c2ba5d15f22e68d7d1c87))
+* **polyfill:** add proper url base to import shim ([#2410](https://github.com/ionic-team/stencil/issues/2410)) ([96dd746](https://github.com/ionic-team/stencil/commit/96dd746798895a6200981d253c358bee90d4c6cc))
+* **resolve:** fix rollup and commonjs resolve ([0ea9c71](https://github.com/ionic-team/stencil/commit/0ea9c714ed9bb4cfb85492c0d9afbb92cf3c2985)), closes [#2461](https://github.com/ionic-team/stencil/issues/2461)
+* **sass:** fix sass imports for scoped packages ([e551be2](https://github.com/ionic-team/stencil/commit/e551be263150c34a9c339db18416677085b2e4fe)), closes [#2521](https://github.com/ionic-team/stencil/issues/2521)
 
 
 ### Performance Improvements
