@@ -80,7 +80,7 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
   }
 
   if (typeof testing.testEnvironment === 'string') {
-    if (!isAbsolute(testing.testEnvironment)) {
+    if (isAbsolute(testing.testEnvironment)) {
       testing.testEnvironment = join(config.configPath, testing.testEnvironment);
     }
   }
