@@ -12,8 +12,7 @@ import ts from 'typescript';
 const pkgs: TestPackage[] = [
   {
     // cli
-    packageJson: 'cli/package.json',
-    files: ['cli/cli-worker.js', 'cli/index.js'],
+    files: ['cli/index.js', 'cli/index.cjs.js'],
   },
   {
     // compiler

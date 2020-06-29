@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import path from 'path';
+import { join } from 'path';
 import { rollup, Plugin } from 'rollup';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupJson from '@rollup/plugin-json';
@@ -25,7 +25,7 @@ export function inlinedCompilerDepsPlugin(opts: BuildOptions, inputDir: string):
 }
 
 async function bundleCompilerDeps(opts: BuildOptions, inputDir: string) {
-  const cacheFile = path.join(opts.transpiledDir, 'compiler-deps-bundle-cache.js');
+  const cacheFile = join(opts.transpiledDir, 'compiler-deps-bundle-cache.js');
 
   if (!opts.isProd) {
     try {
@@ -34,7 +34,7 @@ async function bundleCompilerDeps(opts: BuildOptions, inputDir: string) {
   }
 
   const build = await rollup({
-    input: path.join(inputDir, 'sys', 'modules', 'compiler-deps.js'),
+    input: join(inputDir, 'sys', 'modules', 'compiler-deps.js'),
     external: ['fs', 'module', 'path', 'util', 'resolve'],
     plugins: [
       rollupNodeResolve({

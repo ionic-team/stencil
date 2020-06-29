@@ -9,6 +9,7 @@ import { lazyRequirePlugin } from './plugins/lazy-require';
 import { replacePlugin } from './plugins/replace-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { RollupOptions, OutputOptions } from 'rollup';
+import { prettyMinifyPlugin } from './plugins/pretty-minify';
 
 export async function testing(opts: BuildOptions) {
   const inputDir = join(opts.transpiledDir, 'testing');
@@ -101,7 +102,11 @@ export async function testing(opts: BuildOptions) {
       rollupJson({
         preferConst: true,
       }),
+      prettyMinifyPlugin(opts),
     ],
+    treeshake: {
+      moduleSideEffects: false,
+    },
   };
 
   return [testingBundle];

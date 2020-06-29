@@ -14,7 +14,6 @@ const entryDeps = [
   'glob',
   'graceful-fs',
   'fast-deep-equal',
-  'is-glob',
   'is-extglob',
   'minimatch',
   'node-fetch',

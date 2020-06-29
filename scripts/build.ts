@@ -8,7 +8,8 @@ import { internal } from './bundles/internal';
 import { mockDoc } from './bundles/mock-doc';
 import { release } from './release';
 import { screenshot } from './bundles/screenshot';
-import { sysNode } from './bundles/sys-node';
+import { sysDeno } from './bundles/sys-deno';
+import { sysNode, sysNodeExternalBundles } from './bundles/sys-node';
 import { testing } from './bundles/testing';
 import { validateBuild } from './test/validate-build';
 import { rollup } from 'rollup';
@@ -39,22 +40,14 @@ export async function createBuild(opts: BuildOptions) {
     emptyDir(opts.output.devServerDir),
     emptyDir(opts.output.internalDir),
     emptyDir(opts.output.mockDocDir),
+    emptyDir(opts.output.sysDenoDir),
     emptyDir(opts.output.sysNodeDir),
     emptyDir(opts.output.testingDir),
   ]);
 
-  await sysNode(opts);
+  await sysNodeExternalBundles(opts);
 
-  const bundles = await Promise.all([
-    //
-    cli(opts),
-    compiler(opts),
-    devServer(opts),
-    internal(opts),
-    mockDoc(opts),
-    screenshot(opts),
-    testing(opts),
-  ]);
+  const bundles = await Promise.all([cli(opts), compiler(opts), devServer(opts), internal(opts), mockDoc(opts), screenshot(opts), testing(opts), sysDeno(opts), sysNode(opts)]);
 
   return bundles.flat();
 }

@@ -7,6 +7,7 @@ import { getBanner } from '../utils/banner';
 import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { RollupOptions, OutputOptions } from 'rollup';
+import { prettyMinifyPlugin } from './plugins/pretty-minify';
 
 export async function internalTesting(opts: BuildOptions) {
   const inputTestingPlatform = join(opts.transpiledDir, 'testing', 'platform', 'index.js');
@@ -49,6 +50,7 @@ export async function internalTesting(opts: BuildOptions) {
       aliasPlugin(opts),
       replacePlugin(opts),
       reorderCoreStatementsPlugin(),
+      prettyMinifyPlugin(opts),
     ],
   };
 

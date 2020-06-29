@@ -1,19 +1,93 @@
 import fs from 'fs-extra';
 import { join } from 'path';
-import glob from 'glob';
 import webpack from 'webpack';
 import terser from 'terser';
+import rollupCommonjs from '@rollup/plugin-commonjs';
+import rollupResolve from '@rollup/plugin-node-resolve';
 import { BuildOptions } from '../utils/options';
+import { RollupOptions } from 'rollup';
+import { relativePathPlugin } from './plugins/relative-path-plugin';
+import { aliasPlugin } from './plugins/alias-plugin';
+import { prettyMinifyPlugin } from './plugins/pretty-minify';
 
 export async function sysNode(opts: BuildOptions) {
+  const inputFile = join(opts.transpiledDir, 'sys', 'node', 'index.js');
+  const outputFile = join(opts.output.sysNodeDir, 'index.js');
+
+  const sysNodeBundle: RollupOptions = {
+    input: inputFile,
+    output: {
+      format: 'cjs',
+      file: outputFile,
+      preferConst: true,
+      freeze: false,
+    },
+    external: ['child_process', 'crypto', 'events', 'https', 'path', 'readline', 'os', 'util'],
+    plugins: [
+      relativePathPlugin('glob', './glob.js'),
+      relativePathPlugin('graceful-fs', './graceful-fs.js'),
+      relativePathPlugin('prompts', './prompts.js'),
+      aliasPlugin(opts),
+      rollupResolve({
+        preferBuiltins: true,
+      }),
+      rollupCommonjs({
+        transformMixedEsModules: false,
+      }),
+      prettyMinifyPlugin(opts),
+    ],
+    treeshake: {
+      moduleSideEffects: false,
+      propertyReadSideEffects: false,
+      unknownGlobalSideEffects: false,
+    },
+  };
+
+  const inputWorkerFile = join(opts.transpiledDir, 'sys', 'node', 'worker.js');
+  const outputWorkerFile = join(opts.output.sysNodeDir, 'worker.js');
+  const sysNodeWorkerBundle: RollupOptions = {
+    input: inputWorkerFile,
+    output: {
+      format: 'cjs',
+      file: outputWorkerFile,
+      preferConst: true,
+      freeze: false,
+    },
+    external: ['child_process', 'crypto', 'events', 'https', 'path', 'readline', 'os', 'util'],
+    plugins: [
+      {
+        name: 'sysNodeWorkerAlias',
+        resolveId(id) {
+          if (id === '@stencil/core/compiler') {
+            return {
+              id: '../../compiler/stencil.js',
+              external: true,
+            };
+          }
+        },
+      },
+      rollupResolve({
+        preferBuiltins: true,
+      }),
+      aliasPlugin(opts),
+      prettyMinifyPlugin(opts),
+    ],
+  };
+
+  return [sysNodeBundle, sysNodeWorkerBundle];
+}
+
+export async function sysNodeExternalBundles(opts: BuildOptions) {
   const cachedDir = join(opts.transpiledDir, 'sys-node-bundle-cache');
 
-  fs.ensureDirSync(cachedDir);
+  await fs.ensureDir(cachedDir);
 
   await Promise.all([
     bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'autoprefixer.js'),
+    bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'glob.js'),
     bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'graceful-fs.js'),
     bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'node-fetch.js'),
+    bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'prompts.js'),
     bundleExternal(opts, opts.output.devServerDir, cachedDir, 'open-in-editor-api.js'),
     bundleExternal(opts, opts.output.devServerDir, cachedDir, 'ws.js'),
   ]);
@@ -24,17 +98,9 @@ export async function sysNode(opts: BuildOptions) {
   await fs.copy(visualstudioVbsSrc, visualstudioVbsDesc);
 
   // copy open's xdg-open file
-  const xdgOpenSrcPath = glob.sync('xdg-open', {
-    cwd: join(opts.nodeModulesDir, 'open'),
-    absolute: true,
-  });
-
-  if (xdgOpenSrcPath.length !== 1) {
-    throw new Error(`cannot find xdg-open`);
-  }
-
+  const xdgOpenSrcPath = join(opts.nodeModulesDir, 'open', 'xdg-open');
   const xdgOpenDestPath = join(opts.output.devServerDir, 'xdg-open');
-  await fs.copy(xdgOpenSrcPath[0], xdgOpenDestPath);
+  await fs.copy(xdgOpenSrcPath, xdgOpenDestPath);
 }
 
 function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string, entryFileName: string) {

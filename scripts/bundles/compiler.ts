@@ -77,6 +77,14 @@ export async function compiler(opts: BuildOptions) {
           return null;
         },
       },
+      replacePlugin(opts),
+      {
+        name: 'hackReplace',
+        transform(code) {
+          code = code.replace(` || Object.keys(process.binding('natives'))`, '');
+          return code;
+        }
+      },
       inlinedCompilerDepsPlugin(opts, inputDir),
       parse5Plugin(opts),
       sizzlePlugin(opts),
@@ -89,7 +97,6 @@ export async function compiler(opts: BuildOptions) {
       rollupCommonjs({
         transformMixedEsModules: false,
       }),
-      replacePlugin(opts),
       rollupJson({
         preferConst: true,
       }),
@@ -108,6 +115,8 @@ export async function compiler(opts: BuildOptions) {
     ],
     treeshake: {
       moduleSideEffects: false,
+      propertyReadSideEffects: false,
+      unknownGlobalSideEffects: false,
     },
   };
 
@@ -116,13 +125,13 @@ export async function compiler(opts: BuildOptions) {
 
 function minifyStencilCompiler(code: string) {
   const opts: terser.MinifyOptions = {
-    ecma: 7,
+    ecma: 2017,
     compress: {
       passes: 2,
-      ecma: 7,
+      ecma: 2017,
     },
     output: {
-      ecma: 7,
+      ecma: 2017,
     },
   };
 

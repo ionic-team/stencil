@@ -1,130 +1,50 @@
-import fs from 'fs-extra';
 import { join } from 'path';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
 import { aliasPlugin } from './plugins/alias-plugin';
-import { gracefulFsPlugin } from './plugins/graceful-fs-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
-import { writePkgJson } from '../utils/write-pkg-json';
+import { relativePathPlugin } from './plugins/relative-path-plugin';
 import { BuildOptions } from '../utils/options';
-import { RollupOptions } from 'rollup';
+import { RollupOptions, OutputOptions } from 'rollup';
+import { prettyMinifyPlugin } from './plugins/pretty-minify';
 
 export async function cli(opts: BuildOptions) {
   const inputDir = join(opts.transpiledDir, 'cli');
+  const outputDir = opts.output.cliDir;
 
-  // create public d.ts
-  let dts = await fs.readFile(join(inputDir, 'public.d.ts'), 'utf8');
-  dts = dts.replace('@stencil/core/internal', '../internal/index');
-  await fs.writeFile(join(opts.output.cliDir, 'index.d.ts'), dts);
+  const esOutput: OutputOptions = {
+    format: 'es',
+    file: join(outputDir, 'index.js'),
+    preferConst: true,
+  };
 
-  // write package.json
-  writePkgJson(opts, opts.output.cliDir, {
-    name: '@stencil/core/cli',
-    description: 'Stencil CLI.',
-    main: 'index.js',
-    types: 'index.d.ts',
-  });
-
-  const external = [
-    'assert',
-    'buffer',
-    'child_process',
-    'constants',
-    'crypto',
-    'events',
-    'fs',
-    'https',
-    'os',
-    'path',
-    'readline',
-    'stream',
-    'string_decoder',
-    'tty',
-    'typescript',
-    'util',
-  ];
+  const cjsOutput: OutputOptions = {
+    format: 'cjs',
+    file: join(outputDir, 'index.cjs.js'),
+    preferConst: true,
+  };
 
   const cliBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
-    output: {
-      format: 'cjs',
-      file: join(opts.output.cliDir, 'index.js'),
-      esModule: false,
-      preferConst: true,
-    },
-    external,
+    output: [esOutput, cjsOutput],
+    external: ['path'],
     plugins: [
-      {
-        name: 'cliImportResolverPlugin',
-        resolveId(importee) {
-          if (importee === '@stencil/core/compiler') {
-            return {
-              id: '../compiler/stencil.js',
-              external: true,
-            };
-          }
-          if (importee === '@stencil/core/dev-server') {
-            return {
-              id: '../dev-server/index.js',
-              external: true,
-            };
-          }
-          if (importee === '@stencil/core/mock-doc') {
-            return {
-              id: '../mock-doc/index.cjs.js',
-              external: true,
-            };
-          }
-          return null;
-        },
-      },
-      gracefulFsPlugin(),
+      relativePathPlugin('@stencil/core/testing', '../testing/index.js'),
+      relativePathPlugin('prompts', '../sys/node/prompts.js'),
       aliasPlugin(opts),
-      replacePlugin(opts),
       rollupResolve({
         preferBuiltins: true,
       }),
       rollupCommonjs(),
-    ],
-  };
-
-  const cliWorkerBundle: RollupOptions = {
-    input: join(inputDir, 'worker', 'index.js'),
-    output: {
-      format: 'cjs',
-      file: join(opts.output.cliDir, 'cli-worker.js'),
-      esModule: false,
-      preferConst: true,
-    },
-    external,
-    plugins: [
-      {
-        name: 'cliWorkerImportResolverPlugin',
-        resolveId(importee) {
-          if (importee === '@stencil/core/compiler') {
-            return {
-              id: '../compiler/stencil.js',
-              external: true,
-            };
-          }
-          if (importee === '@stencil/core/mock-doc') {
-            return {
-              id: '../mock-doc/index.cjs.js',
-              external: true,
-            };
-          }
-          return null;
-        },
-      },
-      gracefulFsPlugin(),
-      aliasPlugin(opts),
       replacePlugin(opts),
-      rollupResolve({
-        preferBuiltins: true,
-      }),
-      rollupCommonjs(),
+      prettyMinifyPlugin(opts),
     ],
+    treeshake: {
+      moduleSideEffects: false,
+      propertyReadSideEffects: false,
+      unknownGlobalSideEffects: false,
+    },
   };
 
-  return [cliBundle, cliWorkerBundle];
+  return [cliBundle];
 }

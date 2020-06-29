@@ -9,6 +9,9 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
     ['@hydrate-factory', '@stencil/core/hydrate-factory'],
     ['@stencil/core/mock-doc', '@stencil/core/mock-doc'],
     ['@stencil/core/testing', '@stencil/core/testing'],
+    ['@sys-api-deno', './index.js'],
+    ['@sys-api-node', './index.js'],
+    ['@deno-node-compat', './node-compat.js'],
   ]);
 
   // ensure we use the same one

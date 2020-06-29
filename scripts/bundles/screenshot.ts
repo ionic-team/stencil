@@ -3,7 +3,7 @@ import { join } from 'path';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupNodeResolve from '@rollup/plugin-node-resolve';
 import { aliasPlugin } from './plugins/alias-plugin';
-import { gracefulFsPlugin } from './plugins/graceful-fs-plugin';
+import { relativePathPlugin } from './plugins/relative-path-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
@@ -45,7 +45,7 @@ export async function screenshot(opts: BuildOptions) {
     },
     external,
     plugins: [
-      gracefulFsPlugin(),
+      relativePathPlugin('graceful-fs', '../sys/node/graceful-fs.js'),
       aliasPlugin(opts),
       rollupNodeResolve({
         preferBuiltins: false,
@@ -53,6 +53,9 @@ export async function screenshot(opts: BuildOptions) {
       rollupCommonjs(),
       replacePlugin(opts),
     ],
+    treeshake: {
+      moduleSideEffects: false,
+    },
   };
 
   const pixelMatchBundle: RollupOptions = {

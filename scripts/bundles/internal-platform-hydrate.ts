@@ -9,6 +9,7 @@ import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { RollupOptions } from 'rollup';
+import { prettyMinifyPlugin } from './plugins/pretty-minify';
 
 export async function internalHydrate(opts: BuildOptions) {
   const inputHydrateDir = join(opts.transpiledDir, 'hydrate');
@@ -51,6 +52,7 @@ export async function internalHydrate(opts: BuildOptions) {
         preferBuiltins: true,
       }),
       rollupCommonjs(),
+      prettyMinifyPlugin(opts),
     ],
   };
 
@@ -69,6 +71,7 @@ export async function internalHydrate(opts: BuildOptions) {
         preferBuiltins: true,
       }),
       rollupCommonjs(),
+      prettyMinifyPlugin(opts),
     ],
   };
 

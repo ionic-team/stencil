@@ -3,7 +3,6 @@ import { getVermoji } from './vermoji';
 import { PackageData } from './write-pkg-json';
 import { readJSONSync } from 'fs-extra';
 
-
 export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
   const srcDir = join(rootDir, 'src');
   const packageJsonPath = join(rootDir, 'package.json');
@@ -33,6 +32,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
       internalDir: join(rootDir, 'internal'),
       mockDocDir: join(rootDir, 'mock-doc'),
       screenshotDir: join(rootDir, 'screenshot'),
+      sysDenoDir: join(rootDir, 'sys', 'deno'),
       sysNodeDir: join(rootDir, 'sys', 'node'),
       testingDir: join(rootDir, 'testing'),
     },
@@ -43,7 +43,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
     isCI: false,
     isPublishRelease: false,
     vermoji: null,
-    tag: 'dev'
+    tag: 'dev',
   };
 
   Object.assign(opts, inputOpts);
@@ -64,7 +64,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
 
   if (!opts.vermoji) {
     if (opts.isProd) {
-      opts.vermoji = getVermoji(opts.changelogPath)
+      opts.vermoji = getVermoji(opts.changelogPath);
     } else {
       opts.vermoji = '💎';
     }
@@ -72,7 +72,6 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
 
   return opts;
 }
-
 
 export function createReplaceData(opts: BuildOptions) {
   const CACHE_BUSTER = 6;
@@ -110,7 +109,6 @@ export function createReplaceData(opts: BuildOptions) {
   };
 }
 
-
 export interface BuildOptions {
   rootDir?: string;
   srcDir?: string;
@@ -127,15 +125,16 @@ export interface BuildOptions {
     internalDir: string;
     mockDocDir: string;
     screenshotDir: string;
+    sysDenoDir: string;
     sysNodeDir: string;
-    testingDir: string
+    testingDir: string;
   };
 
   version?: string;
   buildId?: string;
   isProd?: boolean;
   isPublishRelease?: boolean;
-  isCI?: boolean,
+  isCI?: boolean;
   vermoji?: string;
   packageJsonPath?: string;
   packageLockJsonPath?: string;
@@ -147,22 +146,20 @@ export interface BuildOptions {
   terserVersion?: string;
 }
 
-
 export interface CmdLineArgs {
   'config-version'?: string;
   'config-build-id'?: string;
   'config-prod'?: string;
 }
 
-
 function getBuildId() {
   const d = new Date();
-  return[
+  return [
     d.getUTCFullYear() + '',
     ('0' + (d.getUTCMonth() + 1)).slice(-2),
     ('0' + d.getUTCDate()).slice(-2),
     ('0' + d.getUTCHours()).slice(-2),
     ('0' + d.getUTCMinutes()).slice(-2),
-    ('0' + d.getUTCSeconds()).slice(-2)
+    ('0' + d.getUTCSeconds()).slice(-2),
   ].join('');
 }
