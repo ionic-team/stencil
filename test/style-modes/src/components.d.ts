@@ -12,13 +12,13 @@ export namespace Components {
         /**
           * This is the mode
          */
-        "mode"?: "buford" | "griff";
+        "mode"?: 'buford' | 'griff';
     }
     interface ShadowMode {
         /**
           * This is the mode
          */
-        "mode"?: "buford" | "griff";
+        "mode"?: 'buford' | 'griff';
     }
 }
 declare global {
@@ -53,13 +53,13 @@ declare namespace LocalJSX {
         /**
           * This is the mode
          */
-        "mode"?: "buford" | "griff";
+        "mode"?: 'buford' | 'griff';
     }
     interface ShadowMode {
         /**
           * This is the mode
          */
-        "mode"?: "buford" | "griff";
+        "mode"?: 'buford' | 'griff';
     }
     interface IntrinsicElements {
         "app-root": AppRoot;

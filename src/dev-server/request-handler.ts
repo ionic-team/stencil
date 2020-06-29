@@ -41,7 +41,6 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, sys: d.
       }
 
       if (!isValidUrlBasePath(devServerConfig.basePath, req.url)) {
-        console.log(1);
         if (devServerConfig.logRequests) {
           sendMsg(process, {
             requestLog: {

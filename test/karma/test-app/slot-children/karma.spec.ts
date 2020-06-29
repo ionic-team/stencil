@@ -1,7 +1,6 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { setupDomTests } from '../util';
 
-
-describe('slot-children', function() {
+describe('slot-children', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -14,5 +13,4 @@ describe('slot-children', function() {
     const elm = app.querySelector('slot-children-root');
     expect(elm.childElementCount).toBe(3);
   });
-
 });

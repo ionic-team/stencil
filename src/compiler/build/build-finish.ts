@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { generateBuildResults } from './build-results';
-import { IS_NODE_ENV } from '@utils';
+import { IS_NODE_ENV, isFunction } from '@utils';
 import path from 'path';
 
 export const buildFinish = async (buildCtx: d.BuildCtx) => {
@@ -78,7 +78,9 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
 
     // write all of our logs to disk if config'd to do so
     // do this even if there are errors or not the active build
-    config.logger.writeLogs(buildCtx.isRebuild);
+    if (isFunction(config.logger.writeLogs)) {
+      config.logger.writeLogs(buildCtx.isRebuild);
+    }
   }
 
   // it's official, this build has finished

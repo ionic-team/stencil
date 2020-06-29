@@ -1,7 +1,6 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { setupDomTests } from '../util';
 
-
-describe('static-styles', function() {
+describe('static-styles', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -15,5 +14,4 @@ describe('static-styles', function() {
 
     expect(window.getComputedStyle(h1).color).toBe('rgb(255, 0, 0)');
   });
-
 });

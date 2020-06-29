@@ -71,8 +71,8 @@ export function transpileModule(
   const tsTypeChecker = tsProgram.getTypeChecker();
 
   config = config || mockConfig();
-  compilerCtx = compilerCtx || mockCompilerCtx();
-  sys = sys || (mockStencilSystem() as any);
+  compilerCtx = compilerCtx || mockCompilerCtx(config);
+  sys = sys || config.sys || (mockStencilSystem() as any);
 
   const buildCtx = mockBuildCtx(config, compilerCtx);
 

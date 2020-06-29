@@ -1,4 +1,4 @@
-import { getModuleId, getStencilInternalDtsPath, getPackageDirPath, isLocalModule, isStencilCoreImport, isNodeModulePath, setPackageVersionByContent } from '../resolve-utils';
+import { getModuleId, getPackageDirPath, isLocalModule, isStencilCoreImport, isNodeModulePath, setPackageVersionByContent } from '../resolve-utils';
 
 describe('resolve modules', () => {
   const pkgVersions = new Map<string, string>();
@@ -28,11 +28,6 @@ describe('resolve modules', () => {
     expect(isNodeModulePath('/node_modules/lodash/index.js')).toBe(true);
     expect(isNodeModulePath('C:\\path\\to\\node_modules\\lodash\\index.js')).toBe(true);
     expect(isNodeModulePath('C:\\path\\to\\local\\index.js')).toBe(false);
-  });
-
-  it('getStencilInternalDtsPath', () => {
-    expect(getStencilInternalDtsPath('/my-app/')).toBe('/my-app/node_modules/@stencil/core/internal/index.d.ts');
-    expect(getStencilInternalDtsPath('C:\\my-windowz\\')).toBe('C:/my-windowz/node_modules/@stencil/core/internal/index.d.ts');
   });
 
   describe('getModuleId', () => {

@@ -127,7 +127,7 @@ const transpileJson = (results: TranspileResults) => {
 const shouldTranspileModule = (ext: string) => ext === 'tsx' || ext === 'ts' || ext === 'jsx' || ext === 'mjs';
 
 export const compile = (code: string, opts: any = {}): Promise<any> => {
-  console.warn(`compile() deprecated, please use compile() instead`);
+  console.warn(`compile() deprecated, please use transpile() instead`);
   return transpile(code, opts);
 };
 

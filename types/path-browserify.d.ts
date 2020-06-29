@@ -1,5 +1,4 @@
-
-declare module "path-browserify" {
+declare module 'path-browserify' {
   namespace pathBrowserify {}
   const pathBrowserify: any;
 
