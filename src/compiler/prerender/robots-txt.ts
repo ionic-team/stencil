@@ -1,13 +1,9 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import { catchError } from '@utils';
 import { getSitemapUrls } from './sitemap-xml';
-import fs from 'graceful-fs';
-import path from 'path';
-import { promisify } from 'util';
+import { join } from 'path';
 
-const writeFile = promisify(fs.writeFile);
-
-export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResults: d.SitemapXmpResults) {
+export const generateRobotsTxt = async (manager: d.PrerenderManager, sitemapResults: d.SitemapXmpResults) => {
   if (manager.prerenderConfig.robotsTxt === null) {
     // if it's set to null then let's not create a robots.txt file
     return null;
@@ -58,7 +54,7 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
     results.content = lines.map(l => l.trim()).join('\n');
 
     if (typeof results.filePath !== 'string') {
-      results.filePath = path.join(manager.outputTarget.dir, `robots.txt`);
+      results.filePath = join(manager.outputTarget.dir, `robots.txt`);
     }
 
     if (typeof results.url !== 'string') {
@@ -66,11 +62,11 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
       results.url = robotsTxtUrl.href;
     }
 
-    await writeFile(results.filePath, results.content);
+    await manager.config.sys.writeFile(results.filePath, results.content);
 
     return results;
   } catch (e) {
     catchError(manager.diagnostics, e);
     return null;
   }
-}
+};

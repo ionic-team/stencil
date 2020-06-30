@@ -1,12 +1,8 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import { catchError } from '@utils';
-import fs from 'graceful-fs';
-import path from 'path';
-import { promisify } from 'util';
+import { join } from 'path';
 
-const writeFile = promisify(fs.writeFile);
-
-export async function generateSitemapXml(manager: d.PrerenderManager) {
+export const generateSitemapXml = async (manager: d.PrerenderManager) => {
   if (manager.prerenderConfig.sitemapXml === null) {
     // if it's set to null then let's not create a sitemap.xml file
     return null;
@@ -21,7 +17,7 @@ export async function generateSitemapXml(manager: d.PrerenderManager) {
         content.push(`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`);
 
         for (const url of opts.urls) {
-          content.push(` <url><loc>${url}</loc></url>`);
+          content.push(`<url><loc>${url}</loc></url>`);
         }
 
         content.push(`</urlset>`);
@@ -58,7 +54,7 @@ export async function generateSitemapXml(manager: d.PrerenderManager) {
     }
 
     if (typeof results.filePath !== 'string') {
-      results.filePath = path.join(manager.outputTarget.appDir, `sitemap.xml`);
+      results.filePath = join(manager.outputTarget.appDir, `sitemap.xml`);
     }
 
     if (typeof results.url !== 'string') {
@@ -66,16 +62,16 @@ export async function generateSitemapXml(manager: d.PrerenderManager) {
       results.url = sitemapUrl.href;
     }
 
-    await writeFile(results.filePath, results.content);
+    await manager.config.sys.writeFile(results.filePath, results.content);
 
     return results;
   } catch (e) {
     catchError(manager.diagnostics, e);
     return null;
   }
-}
+};
 
-export function getSitemapUrls(manager: d.PrerenderManager) {
+export const getSitemapUrls = (manager: d.PrerenderManager) => {
   const urls: string[] = [];
 
   if (typeof manager.prerenderConfig.canonicalUrl === 'function') {
@@ -97,9 +93,9 @@ export function getSitemapUrls(manager: d.PrerenderManager) {
   }
 
   return urls.sort(sortUrls);
-}
+};
 
-function sortUrls(a: string, b: string) {
+const sortUrls = (a: string, b: string) => {
   const partsA = a.split('/').length;
   const partsB = b.split('/').length;
   if (partsA < partsB) return -1;
@@ -107,4 +103,4 @@ function sortUrls(a: string, b: string) {
   if (a < b) return -1;
   if (a > b) return 1;
   return 0;
-}
+};

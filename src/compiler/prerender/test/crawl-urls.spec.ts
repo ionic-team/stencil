@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import * as d from '../../../declarations';
 import { crawlAnchorsForNextUrls } from '../crawl-urls';
 
 describe('crawlAnchorsForNextUrls', () => {
@@ -17,7 +17,7 @@ describe('crawlAnchorsForNextUrls', () => {
 
   it('user filterUrl()', () => {
     parsedAnchors = [{ href: '/docs' }, { href: '/docs/v3' }, { href: '/docs/v3/components' }];
-    prerenderConfig.filterUrl = function(url) {
+    prerenderConfig.filterUrl = function (url) {
       if (url.pathname.startsWith('/docs/v3')) {
         return false;
       }
@@ -33,7 +33,7 @@ describe('crawlAnchorsForNextUrls', () => {
 
   it('user normalizeUrl()', () => {
     parsedAnchors = [{ href: '/doczz' }, { href: '/docs' }];
-    prerenderConfig.normalizeUrl = function(href, base) {
+    prerenderConfig.normalizeUrl = function (href, base) {
       const url = new URL(href, base);
 
       if (url.pathname === '/doczz') {
@@ -52,7 +52,7 @@ describe('crawlAnchorsForNextUrls', () => {
 
   it('user filterAnchor()', () => {
     parsedAnchors = [{ href: '/docs' }, { 'href': '/docs/about-us', 'data-prerender': 'yes-plz' }, { 'href': '/docs/app', 'data-prerender': 'no-prerender' }];
-    prerenderConfig.filterAnchor = function(anchor) {
+    prerenderConfig.filterAnchor = function (anchor) {
       if (anchor['data-prerender'] === 'no-prerender') {
         return false;
       }

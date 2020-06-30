@@ -1,13 +1,13 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import { join, relative } from 'path';
 
-export async function generateHostConfig(
+export const generateHostConfig = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   outputTarget: d.OutputTargetWww,
   entryModules: d.EntryModule[],
   hydrateResults: d.HydrateResults[],
-) {
+) => {
   const hostConfig: d.HostConfig = {
     hosting: {
       rules: [],
@@ -34,9 +34,9 @@ export async function generateHostConfig(
   await mergeUserHostConfigFile(config, compilerCtx, hostConfig);
 
   await compilerCtx.fs.writeFile(hostConfigFilePath, JSON.stringify(hostConfig, null, 2));
-}
+};
 
-export function generateHostRule(outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) {
+export const generateHostRule = (outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) => {
   const hostRule: d.HostRule = {
     include: hydrateResults.pathname,
     headers: generateHostRuleHeaders(outputTarget, entryModules, hydrateResults),
@@ -47,9 +47,9 @@ export function generateHostRule(outputTarget: d.OutputTargetWww, entryModules: 
   }
 
   return hostRule;
-}
+};
 
-export function generateHostRuleHeaders(outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) {
+export const generateHostRuleHeaders = (outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) => {
   const hostRuleHeaders: d.HostRuleHeader[] = [];
 
   addStyles(hostRuleHeaders, hydrateResults);
@@ -59,15 +59,15 @@ export function generateHostRuleHeaders(outputTarget: d.OutputTargetWww, entryMo
   addImgs(hostRuleHeaders, hydrateResults);
 
   return hostRuleHeaders;
-}
+};
 
-function addCoreJs(outputTarget: d.OutputTargetWww, appCoreWWWPath: string, hostRuleHeaders: d.HostRuleHeader[]) {
+const addCoreJs = (outputTarget: d.OutputTargetWww, appCoreWWWPath: string, hostRuleHeaders: d.HostRuleHeader[]) => {
   const url = getUrlFromFilePath(outputTarget, appCoreWWWPath);
 
   hostRuleHeaders.push(formatLinkRelPreloadHeader(url));
-}
+};
 
-export function addBundles(outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hostRuleHeaders: d.HostRuleHeader[], components: d.HydrateComponent[]) {
+export const addBundles = (outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hostRuleHeaders: d.HostRuleHeader[], components: d.HydrateComponent[]) => {
   components = sortComponents(components);
 
   const bundleIds = getBundleIds(entryModules, components);
@@ -78,9 +78,9 @@ export function addBundles(outputTarget: d.OutputTargetWww, entryModules: d.Entr
       hostRuleHeaders.push(formatLinkRelPreloadHeader(bundleUrl));
     }
   }
-}
+};
 
-export function getBundleIds(_entryModules: d.EntryModule[], _components: d.HydrateComponent[]) {
+export const getBundleIds = (_entryModules: d.EntryModule[], _components: d.HydrateComponent[]) => {
   const bundleIds: string[] = [];
 
   // components.forEach(cmp => {
@@ -108,23 +108,23 @@ export function getBundleIds(_entryModules: d.EntryModule[], _components: d.Hydr
   // });
 
   return bundleIds;
-}
+};
 
-function getBundleUrl(outputTarget: d.OutputTargetWww, _bundleId: string) {
+const getBundleUrl = (outputTarget: d.OutputTargetWww, _bundleId: string) => {
   // const unscopedFileName = 'getBrowserFilename(bundleId, false)';
   const unscopedWwwBuildPath = 'sys.path.join(getAppBuildDir(config, outputTarget), unscopedFileName)';
   return getUrlFromFilePath(outputTarget, unscopedWwwBuildPath);
-}
+};
 
-export function getUrlFromFilePath(outputTarget: d.OutputTargetWww, filePath: string) {
+export const getUrlFromFilePath = (outputTarget: d.OutputTargetWww, filePath: string) => {
   let url = join('/', relative(outputTarget.appDir, filePath));
 
   url = outputTarget.baseUrl + url.substring(1);
 
   return url;
-}
+};
 
-export function sortComponents(components: d.HydrateComponent[]) {
+export const sortComponents = (components: d.HydrateComponent[]) => {
   return components.sort((a, b) => {
     if (a.depth > b.depth) return -1;
     if (a.depth < b.depth) return 1;
@@ -134,9 +134,9 @@ export function sortComponents(components: d.HydrateComponent[]) {
     if (a.tag > b.tag) return 1;
     return 0;
   });
-}
+};
 
-function addStyles(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
+const addStyles = (hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) => {
   for (const style of hydrateResults.styles) {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
@@ -147,9 +147,9 @@ function addStyles(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.Hydrat
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.pathname));
     }
   }
-}
+};
 
-function addScripts(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
+const addScripts = (hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) => {
   for (const script of hydrateResults.scripts) {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
@@ -160,9 +160,9 @@ function addScripts(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.Hydra
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.pathname));
     }
   }
-}
+};
 
-function addImgs(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) {
+const addImgs = (hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateResults) => {
   for (const img of hydrateResults.imgs) {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
@@ -173,23 +173,20 @@ function addImgs(hostRuleHeaders: d.HostRuleHeader[], hydrateResults: d.HydrateR
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.pathname));
     }
   }
-}
+};
 
-export function formatLinkRelPreloadHeader(url: string) {
+export const formatLinkRelPreloadHeader = (url: string) => {
   const header: d.HostRuleHeader = {
     name: 'Link',
     value: formatLinkRelPreloadValue(url),
   };
   return header;
-}
+};
 
-function formatLinkRelPreloadValue(url: string) {
+const formatLinkRelPreloadValue = (url: string) => {
   const parts = [`<${url}>`, `rel=preload`];
 
-  const ext = url
-    .split('.')
-    .pop()
-    .toLowerCase();
+  const ext = url.split('.').pop().toLowerCase();
   if (ext === SCRIPT_EXT) {
     parts.push(`as=script`);
   } else if (ext === STYLE_EXT) {
@@ -199,14 +196,14 @@ function formatLinkRelPreloadValue(url: string) {
   }
 
   return parts.join(';');
-}
+};
 
-function addDefaults(outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
+const addDefaults = (outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) => {
   addBuildDirCacheControl(outputTarget, hostConfig);
   addServiceWorkerNoCacheControl(outputTarget, hostConfig);
-}
+};
 
-function addBuildDirCacheControl(outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
+const addBuildDirCacheControl = (outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) => {
   const url = getUrlFromFilePath(outputTarget, 'getAppBuildDir(config, outputTarget)');
 
   hostConfig.hosting.rules.push({
@@ -218,9 +215,9 @@ function addBuildDirCacheControl(outputTarget: d.OutputTargetWww, hostConfig: d.
       },
     ],
   });
-}
+};
 
-function addServiceWorkerNoCacheControl(outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) {
+const addServiceWorkerNoCacheControl = (outputTarget: d.OutputTargetWww, hostConfig: d.HostConfig) => {
   if (!outputTarget.serviceWorker) {
     return;
   }
@@ -236,9 +233,9 @@ function addServiceWorkerNoCacheControl(outputTarget: d.OutputTargetWww, hostCon
       },
     ],
   });
-}
+};
 
-async function mergeUserHostConfigFile(config: d.Config, compilerCtx: d.CompilerCtx, hostConfig: d.HostConfig) {
+const mergeUserHostConfigFile = async (config: d.Config, compilerCtx: d.CompilerCtx, hostConfig: d.HostConfig) => {
   const hostConfigFilePath = join(config.srcDir, HOST_CONFIG_FILENAME);
   try {
     const userHostConfigStr = await compilerCtx.fs.readFile(hostConfigFilePath);
@@ -247,9 +244,9 @@ async function mergeUserHostConfigFile(config: d.Config, compilerCtx: d.Compiler
 
     mergeUserHostConfig(userHostConfig, hostConfig);
   } catch (e) {}
-}
+};
 
-export function mergeUserHostConfig(userHostConfig: d.HostConfig, hostConfig: d.HostConfig) {
+export const mergeUserHostConfig = (userHostConfig: d.HostConfig, hostConfig: d.HostConfig) => {
   if (!userHostConfig || !userHostConfig.hosting) {
     return;
   }
@@ -261,7 +258,7 @@ export function mergeUserHostConfig(userHostConfig: d.HostConfig, hostConfig: d.
   const rules = userHostConfig.hosting.rules.concat(hostConfig.hosting.rules);
 
   hostConfig.hosting.rules = rules;
-}
+};
 
 export const DEFAULT_MODE = 'md';
 const MAX_LINK_REL_PRELOAD_COUNT = 6;

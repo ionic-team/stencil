@@ -1,20 +1,16 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import { flatOne, unique } from '@utils';
-import { getScopeId } from '../compiler/style/scope-css';
-import { injectModulePreloads } from '../compiler/html/inject-module-preloads';
-import fs from 'fs';
-import path from 'path';
-import { promisify } from 'util';
+import { getScopeId } from '../style/scope-css';
+import { injectModulePreloads } from '../html/inject-module-preloads';
+import { optimizeCss } from '../optimize/optimize-css';
+import { optimizeJs } from '../optimize/optimize-js';
+import { join } from 'path';
 
-const readFile = promisify(fs.readFile);
-
-export async function inlineExternalStyleSheets(appDir: string, doc: Document) {
+export const inlineExternalStyleSheets = async (config: d.Config, appDir: string, doc: Document) => {
   const documentLinks = Array.from(doc.querySelectorAll('link[rel=stylesheet]')) as HTMLLinkElement[];
   if (documentLinks.length === 0) {
     return;
   }
-
-  const { optimizeCss } = await import('@stencil/core/compiler');
 
   await Promise.all(
     documentLinks.map(async link => {
@@ -23,10 +19,10 @@ export async function inlineExternalStyleSheets(appDir: string, doc: Document) {
         return;
       }
 
-      const fsPath = path.join(appDir, href);
+      const fsPath = join(appDir, href);
 
       try {
-        let styles = await readFile(fsPath, 'utf8');
+        let styles = await config.sys.readFile(fsPath);
 
         const optimizeResults = await optimizeCss({
           input: styles,
@@ -52,9 +48,9 @@ export async function inlineExternalStyleSheets(appDir: string, doc: Document) {
       } catch (e) {}
     }),
   );
-}
+};
 
-export async function minifyScriptElements(doc: Document, addMinifiedAttr: boolean) {
+export const minifyScriptElements = async (doc: Document, addMinifiedAttr: boolean) => {
   const scriptElms = Array.from(doc.querySelectorAll('script')).filter(scriptElm => {
     if (scriptElm.hasAttribute('src') || scriptElm.hasAttribute(dataMinifiedAttr)) {
       return false;
@@ -69,8 +65,6 @@ export async function minifyScriptElements(doc: Document, addMinifiedAttr: boole
   if (scriptElms.length === 0) {
     return;
   }
-
-  const { optimizeJs } = await import('@stencil/core/compiler');
 
   await Promise.all(
     scriptElms.map(async scriptElm => {
@@ -98,9 +92,9 @@ export async function minifyScriptElements(doc: Document, addMinifiedAttr: boole
       }
     }),
   );
-}
+};
 
-export async function minifyStyleElements(doc: Document, addMinifiedAttr: boolean) {
+export const minifyStyleElements = async (doc: Document, addMinifiedAttr: boolean) => {
   const styleElms = Array.from(doc.querySelectorAll('style')).filter(styleElm => {
     if (styleElm.hasAttribute(dataMinifiedAttr)) {
       return false;
@@ -111,8 +105,6 @@ export async function minifyStyleElements(doc: Document, addMinifiedAttr: boolea
   if (styleElms.length === 0) {
     return;
   }
-
-  const { optimizeCss } = await import('@stencil/core/compiler');
 
   await Promise.all(
     styleElms.map(async styleElm => {
@@ -131,9 +123,9 @@ export async function minifyStyleElements(doc: Document, addMinifiedAttr: boolea
       }
     }),
   );
-}
+};
 
-export function excludeStaticComponents(doc: Document, hydrateOpts: d.PrerenderHydrateOptions, hydrateResults: d.HydrateResults) {
+export const excludeStaticComponents = (doc: Document, hydrateOpts: d.PrerenderHydrateOptions, hydrateResults: d.HydrateResults) => {
   const staticComponents = hydrateOpts.staticComponents.filter(tag => {
     return hydrateResults.components.some(cmp => cmp.tag === tag);
   });
@@ -152,7 +144,7 @@ export function excludeStaticComponents(doc: Document, hydrateOpts: d.PrerenderH
       stencilScriptElm.parentNode.insertBefore(dataOptsScript, stencilScriptElm.nextSibling);
     }
   }
-}
+};
 
 const excludeComponentScript = `
 (function(){
@@ -163,7 +155,7 @@ s&&((s['data-opts']=s['data-opts']||{}).exclude=__EXCLUDE__);
   .replace(/\n/g, '')
   .trim();
 
-export function addModulePreloads(doc: Document, hydrateOpts: d.PrerenderHydrateOptions, hydrateResults: d.HydrateResults, componentGraph: Map<string, string[]>) {
+export const addModulePreloads = (doc: Document, hydrateOpts: d.PrerenderHydrateOptions, hydrateResults: d.HydrateResults, componentGraph: Map<string, string[]>) => {
   if (!componentGraph) {
     return false;
   }
@@ -176,9 +168,9 @@ export function addModulePreloads(doc: Document, hydrateOpts: d.PrerenderHydrate
 
   injectModulePreloads(doc, modulePreloads);
   return true;
-}
+};
 
-export function removeModulePreloads(doc: Document) {
+export const removeModulePreloads = (doc: Document) => {
   const links = doc.querySelectorAll('link[rel="modulepreload"]');
   for (let i = links.length - 1; i >= 0; i--) {
     const href = links[i].getAttribute('href');
@@ -186,17 +178,17 @@ export function removeModulePreloads(doc: Document) {
       links[i].remove();
     }
   }
-}
+};
 
-export function removeStencilScripts(doc: Document) {
+export const removeStencilScripts = (doc: Document) => {
   const stencilScripts = doc.querySelectorAll('script[data-stencil]');
   for (let i = stencilScripts.length - 1; i >= 0; i--) {
     stencilScripts[i].remove();
   }
-}
+};
 
-export function hasStencilScript(doc: Document) {
+export const hasStencilScript = (doc: Document) => {
   return !!doc.querySelector('script[data-stencil]');
-}
+};
 
 const dataMinifiedAttr = 'data-m';

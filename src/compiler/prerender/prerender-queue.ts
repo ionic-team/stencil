@@ -1,10 +1,10 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import { buildError, catchError } from '@utils';
 import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
-import path from 'path';
+import { relative } from 'path';
 
-export function initializePrerenderEntryUrls(manager: d.PrerenderManager, diagnostics: d.Diagnostic[]) {
+export const initializePrerenderEntryUrls = (results: d.PrerenderResults, manager: d.PrerenderManager) => {
   const entryAnchors: d.HydrateAnchorElement[] = [];
 
   if (Array.isArray(manager.prerenderConfig.entryUrls)) {
@@ -27,7 +27,7 @@ export function initializePrerenderEntryUrls(manager: d.PrerenderManager, diagno
     try {
       new URL(entryAnchor.href, manager.outputTarget.baseUrl);
     } catch (e) {
-      const diagnostic = buildError(diagnostics);
+      const diagnostic = buildError(results.diagnostics);
       diagnostic.header = `Invalid Prerender Entry Url: ${entryAnchor.href}`;
       diagnostic.messageText = `Entry Urls must include the protocol and domain of the site being prerendered.`;
       return;
@@ -36,13 +36,13 @@ export function initializePrerenderEntryUrls(manager: d.PrerenderManager, diagno
 
   const base = new URL(manager.outputTarget.baseUrl);
 
-  const hrefs = crawlAnchorsForNextUrls(manager.prerenderConfig, diagnostics, base, base, entryAnchors);
+  const hrefs = crawlAnchorsForNextUrls(manager.prerenderConfig, results.diagnostics, base, base, entryAnchors);
   for (const href of hrefs) {
     addUrlToPendingQueue(manager, href, '#entryUrl');
   }
-}
+};
 
-function addUrlToPendingQueue(manager: d.PrerenderManager, queueUrl: string, fromUrl: string) {
+const addUrlToPendingQueue = (manager: d.PrerenderManager, queueUrl: string, fromUrl: string) => {
   if (typeof queueUrl !== 'string' || queueUrl === '') {
     return;
   }
@@ -63,16 +63,14 @@ function addUrlToPendingQueue(manager: d.PrerenderManager, queueUrl: string, fro
     const from = fromUrl.startsWith('#') ? fromUrl : new URL(fromUrl, manager.outputTarget.baseUrl).pathname;
     manager.config.logger.debug(`prerender queue: ${url} (from ${from})`);
   }
-}
+};
 
-export function drainPrerenderQueue(manager: d.PrerenderManager) {
+export const drainPrerenderQueue = (results: d.PrerenderResults, manager: d.PrerenderManager) => {
   const nextUrl = manager.urlsPending.values().next();
   if (!nextUrl.done) {
     if (manager.urlsProcessing.size > manager.maxConcurrency) {
       // slow it down there buddy, too many at one time
-      setTimeout(() => {
-        drainPrerenderQueue(manager);
-      });
+      setTimeout(() => drainPrerenderQueue(results, manager));
     } else {
       const url = nextUrl.value;
 
@@ -84,13 +82,13 @@ export function drainPrerenderQueue(manager: d.PrerenderManager) {
       manager.urlsProcessing.add(url);
 
       // kick off async prerendering
-      prerenderUrl(manager, url);
+      prerenderUrl(results, manager, url);
 
-      // could be more ready for prerendering
-      // let's check again after a tick
-      manager.prcs.nextTick(() => {
-        drainPrerenderQueue(manager);
-      });
+      if (manager.urlsProcessing.size < manager.maxConcurrency) {
+        // could be more ready for prerendering
+        // let's check again after a tick
+        manager.config.sys.nextTick(() => drainPrerenderQueue(results, manager));
+      }
     }
   }
 
@@ -103,9 +101,9 @@ export function drainPrerenderQueue(manager: d.PrerenderManager) {
       manager.resolve = null;
     }
   }
-}
+};
 
-async function prerenderUrl(manager: d.PrerenderManager, url: string) {
+const prerenderUrl = async (results: d.PrerenderResults, manager: d.PrerenderManager, url: string) => {
   let previewUrl = url;
   try {
     previewUrl = new URL(url).pathname;
@@ -114,7 +112,7 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
       timespan = manager.config.logger.createTimeSpan(`prerender start: ${previewUrl}`, true);
     }
 
-    const prerenderRequest: d.PrerenderRequest = {
+    const prerenderRequest: d.PrerenderUrlRequest = {
       baseUrl: manager.outputTarget.baseUrl,
       componentGraphPath: manager.componentGraphPath,
       devServerHostUrl: manager.devServerHostUrl,
@@ -128,11 +126,11 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
     };
 
     // prender this path and wait on the results
-    const results = await manager.prerenderUrlWorker(prerenderRequest);
+    const urlResults = await manager.prerenderUrlWorker(prerenderRequest);
 
     if (manager.isDebug) {
-      const filePath = path.relative(manager.config.rootDir, results.filePath);
-      const hasError = results.diagnostics.some(d => d.level === 'error');
+      const filePath = relative(manager.config.rootDir, urlResults.filePath);
+      const hasError = urlResults.diagnostics.some(d => d.level === 'error');
       if (hasError) {
         timespan.finish(`prerender failed: ${previewUrl}, ${filePath}`, 'red');
       } else {
@@ -140,10 +138,10 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
       }
     }
 
-    manager.diagnostics.push(...results.diagnostics);
+    manager.diagnostics.push(...urlResults.diagnostics);
 
-    if (Array.isArray(results.anchorUrls)) {
-      for (const anchorUrl of results.anchorUrls) {
+    if (Array.isArray(urlResults.anchorUrls)) {
+      for (const anchorUrl of urlResults.anchorUrls) {
         addUrlToPendingQueue(manager, anchorUrl, url);
       }
     }
@@ -155,13 +153,14 @@ async function prerenderUrl(manager: d.PrerenderManager, url: string) {
   manager.urlsProcessing.delete(url);
   manager.urlsCompleted.add(url);
 
+  results.urls++;
+
   const urlsCompletedSize = manager.urlsCompleted.size;
   if (manager.progressLogger && urlsCompletedSize > 1) {
     manager.progressLogger.update(`           prerendered ${urlsCompletedSize} urls: ${manager.config.logger.dim(previewUrl)}`);
   }
+
   // let's try to drain the queue again and let this
   // next call figure out if we're actually done or not
-  manager.prcs.nextTick(() => {
-    drainPrerenderQueue(manager);
-  });
-}
+  manager.config.sys.nextTick(() => drainPrerenderQueue(results, manager));
+};

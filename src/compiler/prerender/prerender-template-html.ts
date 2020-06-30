@@ -1,22 +1,18 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import { catchError, isPromise } from '@utils';
 import { hasStencilScript, inlineExternalStyleSheets, minifyScriptElements, minifyStyleElements, removeStencilScripts } from './prerender-optimize';
-import fs from 'fs';
-import { promisify } from 'util';
+import { createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 
-const readFile = promisify(fs.readFile);
-
-export async function generateTemplateHtml(
+export const generateTemplateHtml = async (
+  config: d.Config,
   prerenderConfig: d.PrerenderConfig,
   diagnostics: d.Diagnostic[],
   isDebug: boolean,
   srcIndexHtmlPath: string,
   outputTarget: d.OutputTargetWww,
   hydrateOpts: d.PrerenderHydrateOptions,
-) {
+) => {
   try {
-    const { createDocument, serializeNodeToHtml } = await import('@stencil/core/mock-doc');
-
     if (typeof srcIndexHtmlPath !== 'string') {
       srcIndexHtmlPath = outputTarget.indexHtml;
     }
@@ -30,7 +26,7 @@ export async function generateTemplateHtml(
         templateHtml = loadTemplateResult;
       }
     } else {
-      templateHtml = await readFile(srcIndexHtmlPath, 'utf8');
+      templateHtml = await config.sys.readFile(srcIndexHtmlPath);
     }
 
     let doc = createDocument(templateHtml);
@@ -54,7 +50,7 @@ export async function generateTemplateHtml(
 
     if (hydrateOpts.inlineExternalStyleSheets && !isDebug) {
       try {
-        await inlineExternalStyleSheets(outputTarget.appDir, doc);
+        await inlineExternalStyleSheets(config, outputTarget.appDir, doc);
       } catch (e) {
         catchError(diagnostics, e);
       }
@@ -104,4 +100,4 @@ export async function generateTemplateHtml(
     catchError(diagnostics, e);
   }
   return undefined;
-}
+};

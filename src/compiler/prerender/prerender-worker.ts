@@ -1,19 +1,21 @@
 import * as d from '../../declarations';
-import { addModulePreloads, excludeStaticComponents, minifyScriptElements, minifyStyleElements, removeModulePreloads, removeStencilScripts } from '../prerender-optimize';
-import { catchError, normalizePath, isPromise } from '@utils';
-import { crawlAnchorsForNextUrls } from '../crawl-urls';
-import { getHydrateOptions, getPrerenderConfig } from '../prerender-config';
-import { initNodeWorkerThread } from '../../sys/node/worker/worker-child';
-import { patchNodeGlobal, patchWindowGlobal } from '../prerender-global-patch';
-import fs from 'graceful-fs';
-import path from 'path';
+import { addModulePreloads, excludeStaticComponents, minifyScriptElements, minifyStyleElements, removeModulePreloads, removeStencilScripts } from './prerender-optimize';
+import { catchError, isPromise, isRootPath, normalizePath, requireFunc } from '@utils';
+import { crawlAnchorsForNextUrls } from './crawl-urls';
+import { getHydrateOptions } from './prerender-hydrate-options';
+import { getPrerenderConfig } from './prerender-config';
+import { patchNodeGlobal, patchWindowGlobal } from './prerender-global-patch';
 
-let componentGraph: Map<string, string[]>;
-let templateHtml: string = null;
+const prerenderCtx = {
+  componentGraph: null as Map<string, string[]>,
+  prerenderConfig: null as d.PrerenderConfig,
+  ensuredDirs: new Set<string>(),
+  templateHtml: null as string,
+};
 
-export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
+export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d.PrerenderUrlRequest) => {
   // worker thread!
-  const results: d.PrerenderResults = {
+  const results: d.PrerenderUrlResults = {
     diagnostics: [],
     anchorUrls: [],
     filePath: prerenderRequest.writeToFilePath,
@@ -21,26 +23,28 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
 
   try {
     const url = new URL(prerenderRequest.url, prerenderRequest.devServerHostUrl);
-    const componentGraph = getComponentGraph(prerenderRequest.componentGraphPath);
+    const componentGraph = getComponentGraph(sys, prerenderRequest.componentGraphPath);
 
     // webpack work-around/hack
-    const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
     const hydrateApp = requireFunc(prerenderRequest.hydrateAppFilePath);
 
-    if (templateHtml == null) {
+    if (prerenderCtx.templateHtml == null) {
       // cache template html in this process
-      templateHtml = fs.readFileSync(prerenderRequest.templateId, 'utf8');
+      prerenderCtx.templateHtml = sys.readFileSync(prerenderRequest.templateId);
     }
 
     // create a new window by cloning the cached parsed window
-    const win = hydrateApp.createWindowFromHtml(templateHtml, prerenderRequest.templateId);
+    const win = hydrateApp.createWindowFromHtml(prerenderCtx.templateHtml, prerenderRequest.templateId);
     const doc = win.document;
 
     // patch this new window
-    patchNodeGlobal(global, prerenderRequest.devServerHostUrl);
-    patchWindowGlobal(global, win);
+    patchNodeGlobal(globalThis, prerenderRequest.devServerHostUrl);
+    patchWindowGlobal(globalThis, win);
 
-    const prerenderConfig = getPrerenderConfig(results.diagnostics, prerenderRequest.prerenderConfigPath);
+    if (prerenderCtx.prerenderConfig == null) {
+      prerenderCtx.prerenderConfig = getPrerenderConfig(results.diagnostics, prerenderRequest.prerenderConfigPath);
+    }
+    const prerenderConfig = prerenderCtx.prerenderConfig;
 
     const hydrateOpts = getHydrateOptions(prerenderConfig, url, results.diagnostics);
 
@@ -132,7 +136,8 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
       }
     }
 
-    await writePrerenderedHtml(results, html);
+    prerenderEnsureDir(sys, results.filePath);
+    await sys.writeFile(results.filePath, html);
 
     try {
       win.close();
@@ -143,30 +148,25 @@ export async function prerenderWorker(prerenderRequest: d.PrerenderRequest) {
   }
 
   return results;
-}
+};
 
-function writePrerenderedHtml(results: d.PrerenderResults, html: string) {
-  ensureDir(results.filePath);
+const getComponentGraph = (sys: d.CompilerSystem, componentGraphPath: string) => {
+  if (componentGraphPath == null) {
+    return undefined;
+  }
+  if (prerenderCtx.componentGraph == null) {
+    const componentGraphJson = JSON.parse(sys.readFileSync(componentGraphPath));
+    prerenderCtx.componentGraph = new Map<string, string[]>(Object.entries(componentGraphJson));
+  }
+  return prerenderCtx.componentGraph;
+};
 
-  return new Promise(resolve => {
-    fs.writeFile(results.filePath, html, err => {
-      if (err != null) {
-        results.filePath = null;
-        catchError(results.diagnostics, err);
-      }
-      resolve();
-    });
-  });
-}
-
-const ensuredDirs = new Set<string>();
-
-function ensureDir(p: string) {
+const prerenderEnsureDir = (sys: d.CompilerSystem, p: string) => {
   const allDirs: string[] = [];
 
   while (true) {
-    p = normalizePath(path.dirname(p));
-    if (typeof p === 'string' && p.length > 0 && p !== '/' && !p.endsWith(':/')) {
+    p = normalizePath(sys.platformPath.dirname(p));
+    if (typeof p === 'string' && p.length > 0 && !isRootPath(p)) {
       allDirs.push(p);
     } else {
       break;
@@ -177,47 +177,9 @@ function ensureDir(p: string) {
 
   for (let i = 0; i < allDirs.length; i++) {
     const dir = allDirs[i];
-    if (!ensuredDirs.has(dir)) {
-      ensuredDirs.add(dir);
-
-      try {
-        fs.mkdirSync(dir);
-      } catch (e) {}
+    if (!prerenderCtx.ensuredDirs.has(dir)) {
+      prerenderCtx.ensuredDirs.add(dir);
+      sys.mkdirSync(dir);
     }
   }
-}
-
-function getComponentGraph(componentGraphPath: string) {
-  if (componentGraphPath == null) {
-    return undefined;
-  }
-  if (componentGraph == null) {
-    const componentGraphJson = JSON.parse(fs.readFileSync(componentGraphPath, 'utf8'));
-    componentGraph = new Map<string, string[]>(Object.entries(componentGraphJson));
-  }
-  return componentGraph;
-}
-
-function initPrerenderWorker(prcs: NodeJS.Process) {
-  if (prcs.argv.includes('stencil-cli-worker')) {
-    // cmd line arg used to start the worker
-    // and attached a message handler to the process
-    initNodeWorkerThread(prcs, msgFromMain => {
-      const fnName: string = msgFromMain.args[0];
-      const fnArgs = msgFromMain.args.slice(1);
-
-      switch (fnName) {
-        case 'prerenderWorker':
-          return prerenderWorker.apply(null, fnArgs);
-
-        default:
-          throw new Error(`invalid prerender worker msg: ${JSON.stringify(msgFromMain)}`);
-      }
-    });
-  }
-}
-
-initPrerenderWorker(process);
-
-declare const __webpack_require__: any;
-declare const __non_webpack_require__: any;
+};

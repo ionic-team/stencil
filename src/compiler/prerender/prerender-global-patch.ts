@@ -1,10 +1,10 @@
-export function patchNodeGlobal(nodeGlobal: any, devServerHostUrl: string) {
-  if (typeof nodeGlobal.fetch !== 'function') {
-    const path = require('path');
+import { join } from 'path';
+import { requireFunc } from '@utils';
 
+export const patchNodeGlobal = (nodeGlobal: any, devServerHostUrl: string) => {
+  if (typeof nodeGlobal.fetch !== 'function') {
     // webpack work-around/hack
-    const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
-    const nodeFetch = requireFunc(path.join(__dirname, '..', 'sys', 'node', 'node-fetch.js'));
+    const nodeFetch = requireFunc(join(__dirname, '..', 'sys', 'node', 'node-fetch.js'));
 
     nodeGlobal.fetch = (input: any, init: any) => {
       if (typeof input === 'string') {
@@ -23,20 +23,17 @@ export function patchNodeGlobal(nodeGlobal: any, devServerHostUrl: string) {
     nodeGlobal.Response = nodeFetch.Response;
     nodeGlobal.FetchError = nodeFetch.FetchError;
   }
-}
+};
 
-function normalizeUrl(inputUrl: string, devServerHostUrl: string) {
+const normalizeUrl = (inputUrl: string, devServerHostUrl: string) => {
   const requestUrl = new URL(inputUrl, devServerHostUrl);
   return requestUrl.href;
-}
+};
 
-export function patchWindowGlobal(nodeGlobal: any, win: any) {
+export const patchWindowGlobal = (nodeGlobal: any, win: any) => {
   win.fetch = nodeGlobal.fetch;
   win.Headers = nodeGlobal.Headers;
   win.Request = nodeGlobal.Request;
   win.Response = nodeGlobal.Response;
   win.FetchError = nodeGlobal.FetchError;
-}
-
-declare const __webpack_require__: any;
-declare const __non_webpack_require__: any;
+};

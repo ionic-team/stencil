@@ -1,7 +1,7 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import path from 'path';
 
-export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputHref: string) {
+export const getWriteFilePathFromUrlPath = (manager: d.PrerenderManager, inputHref: string) => {
   const baseUrl = new URL(manager.outputTarget.baseUrl, manager.devServerHostUrl);
   const basePathname = baseUrl.pathname.toLowerCase();
 
@@ -46,4 +46,4 @@ export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputHr
 
   // figure out the directory where this file will be saved
   return path.join(manager.outputTarget.appDir, ...pathParts);
-}
+};

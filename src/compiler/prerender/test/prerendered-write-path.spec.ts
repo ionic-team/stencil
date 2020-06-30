@@ -1,7 +1,7 @@
-import * as d from '../../declarations';
+import * as d from '../../../declarations';
 import { getWriteFilePathFromUrlPath } from '../prerendered-write-path';
 import { mockConfig } from '@stencil/core/testing';
-import { validateWww } from '../../compiler/config/outputs/validate-www';
+import { validateWww } from '../../config/outputs/validate-www';
 import { join, resolve } from 'path';
 
 describe('prerender-utils', () => {
@@ -25,7 +25,6 @@ describe('prerender-utils', () => {
         logCount: 0,
         maxConcurrency: 1,
         prerenderUrlWorker: null,
-        prcs: process,
         prerenderConfig: null,
         prerenderConfigPath: null,
         urlsCompleted: null,

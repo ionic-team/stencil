@@ -1,7 +1,13 @@
-import * as d from '../declarations';
+import * as d from '../../declarations';
 import { catchError } from '@utils';
 
-export function crawlAnchorsForNextUrls(prerenderConfig: d.PrerenderConfig, diagnostics: d.Diagnostic[], baseUrl: URL, currentUrl: URL, parsedAnchors: d.HydrateAnchorElement[]) {
+export const crawlAnchorsForNextUrls = (
+  prerenderConfig: d.PrerenderConfig,
+  diagnostics: d.Diagnostic[],
+  baseUrl: URL,
+  currentUrl: URL,
+  parsedAnchors: d.HydrateAnchorElement[],
+) => {
   if (!Array.isArray(parsedAnchors) || parsedAnchors.length === 0) {
     return [];
   }
@@ -98,9 +104,9 @@ export function crawlAnchorsForNextUrls(prerenderConfig: d.PrerenderConfig, diag
       if (a > b) return 1;
       return 0;
     });
-}
+};
 
-function standardFilterAnchor(diagnostics: d.Diagnostic[], attrs: { [attrName: string]: string }, _base: URL) {
+const standardFilterAnchor = (diagnostics: d.Diagnostic[], attrs: { [attrName: string]: string }, _base: URL) => {
   try {
     let href = attrs.href;
     if (typeof attrs.download === 'string') {
@@ -122,9 +128,9 @@ function standardFilterAnchor(diagnostics: d.Diagnostic[], attrs: { [attrName: s
   }
 
   return false;
-}
+};
 
-function standardNormalizeUrl(diagnostics: d.Diagnostic[], href: string, currentUrl: URL) {
+const standardNormalizeUrl = (diagnostics: d.Diagnostic[], href: string, currentUrl: URL) => {
   if (typeof href === 'string') {
     try {
       const outputUrl = new URL(href, currentUrl.href);
@@ -145,9 +151,9 @@ function standardNormalizeUrl(diagnostics: d.Diagnostic[], href: string, current
     }
   }
   return null;
-}
+};
 
-function standardFilterUrl(diagnostics: d.Diagnostic[], url: URL, currentUrl: URL, basePathParts: string[]) {
+const standardFilterUrl = (diagnostics: d.Diagnostic[], url: URL, currentUrl: URL, basePathParts: string[]) => {
   try {
     if (url.hostname != null && currentUrl.hostname != null && url.hostname !== currentUrl.hostname) {
       return false;
@@ -181,9 +187,9 @@ function standardFilterUrl(diagnostics: d.Diagnostic[], url: URL, currentUrl: UR
     catchError(diagnostics, e);
   }
   return false;
-}
+};
 
-export function standardNormalizeHref(prerenderConfig: d.PrerenderConfig, diagnostics: d.Diagnostic[], url: URL) {
+export const standardNormalizeHref = (prerenderConfig: d.PrerenderConfig, diagnostics: d.Diagnostic[], url: URL) => {
   try {
     if (url != null && typeof url.href === 'string') {
       let href = url.href.trim();
@@ -213,15 +219,13 @@ export function standardNormalizeHref(prerenderConfig: d.PrerenderConfig, diagno
   }
 
   return null;
-}
+};
 
-function shouldSkipExtension(filename: string) {
-  return SKIP_EXT.has(extname(filename).toLowerCase());
-}
+const shouldSkipExtension = (filename: string) => SKIP_EXT.has(extname(filename).toLowerCase());
 
-function extname(str: string) {
+const extname = (str: string) => {
   const parts = str.split('.');
   return parts[parts.length - 1].toLowerCase();
-}
+};
 
 const SKIP_EXT = new Set(['zip', 'rar', 'tar', 'gz', 'bz2', 'png', 'jpeg', 'jpg', 'gif', 'pdf', 'tiff', 'psd']);
