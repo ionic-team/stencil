@@ -1,8 +1,7 @@
-import * as d from '../../declarations';
+import type { CompilerSystem, Logger } from '../declarations';
 
-export function taskHelp(prcs: NodeJS.Process, config: d.Config) {
-  const logger = config.logger;
-  const p = logger.dim(prcs.platform === 'win32' ? '>' : '$');
+export function taskHelp(sys: CompilerSystem, logger: Logger) {
+  const p = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
 
   console.log(`
   ${logger.bold('Build:')} ${logger.dim('Build components for development or production.')}

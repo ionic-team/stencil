@@ -1,7 +1,7 @@
-import { ConfigFlags } from '../declarations';
+import type { CompilerSystem, ConfigFlags } from '../declarations';
 import { dashToPascalCase } from '@utils';
 
-export function parseFlags(args: string[]): ConfigFlags {
+export function parseFlags(sys: CompilerSystem, args: string[]): ConfigFlags {
   const flags: any = {
     task: null,
     args: [],
@@ -16,14 +16,16 @@ export function parseFlags(args: string[]): ConfigFlags {
   }
   parseArgs(flags, flags.args, flags.knownArgs);
 
-  const npmScriptCmdArgs = getNpmScriptArgs();
-  parseArgs(flags, npmScriptCmdArgs, flags.knownArgs);
+  if (sys.name === 'node') {
+    const envArgs = getNpmConfigEnvArgs(sys);
+    parseArgs(flags, envArgs, flags.knownArgs);
 
-  npmScriptCmdArgs.forEach(npmArg => {
-    if (!flags.args.includes(npmArg)) {
-      flags.args.push(npmArg);
-    }
-  });
+    envArgs.forEach(envArg => {
+      if (!flags.args.includes(envArg)) {
+        flags.args.push(envArg);
+      }
+    });
+  }
 
   if (flags.task != null) {
     const i = flags.args.indexOf(flags.task);
@@ -201,18 +203,16 @@ const ARG_OPTS = {
   },
 };
 
-function getNpmScriptArgs() {
+function getNpmConfigEnvArgs(sys: CompilerSystem) {
   // process.env.npm_config_argv
   // {"remain":["4444"],"cooked":["run","serve","--port","4444"],"original":["run","serve","--port","4444"]}
   let args: string[] = [];
   try {
-    if (typeof process !== 'undefined' && process.env) {
-      const npmConfigArgs = process.env.npm_config_argv;
-      if (npmConfigArgs) {
-        args = JSON.parse(npmConfigArgs).original as string[];
-        if (args[0] === 'run') {
-          args = args.slice(2);
-        }
+    const npmConfigArgs = sys.getEnvironmentVar('npm_config_argv');
+    if (npmConfigArgs) {
+      args = JSON.parse(npmConfigArgs).original as string[];
+      if (args[0] === 'run') {
+        args = args.slice(2);
       }
     }
   } catch (e) {}

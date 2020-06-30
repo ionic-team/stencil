@@ -1,56 +1,56 @@
-import * as d from '../../declarations';
-import fs from 'graceful-fs';
-import { join, parse, relative } from 'path';
-import { promisify } from 'util';
-import { validateComponentTag } from '@utils';
-import prompt from 'prompts';
-import exit from 'exit';
-
-const writeFile = promisify(fs.writeFile);
-const mkdir = promisify(fs.mkdir);
+import type { Config } from '../declarations';
+import type { CoreCompiler } from './load-compiler';
+import { IS_NODE_ENV, validateComponentTag } from '@utils';
 
 /**
  * Task to generate component boilerplate.
  */
-export async function taskGenerate(config: d.Config) {
+export async function taskGenerate(coreCompiler: CoreCompiler, config: Config) {
+  if (!IS_NODE_ENV) {
+    config.logger.error(`"generate" command is currently only implemented for a NodeJS environment`);
+    config.sys.exit(1);
+  }
+
+  const path = coreCompiler.path;
+
   if (!config.configPath) {
     config.logger.error('Please run this command in your root directory (i. e. the one containing stencil.config.ts).');
-    exit(1);
+    config.sys.exit(1);
   }
 
   const absoluteSrcDir = config.srcDir;
 
   if (!absoluteSrcDir) {
     config.logger.error(`Stencil's srcDir was not specified.`);
-    return exit(1);
+    config.sys.exit(1);
   }
+
+  const { prompt } = await import('prompts');
 
   const input =
     config.flags.unknownArgs.find(arg => !arg.startsWith('-')) || ((await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string);
 
-  const { dir, base: componentName } = parse(input);
+  const { dir, base: componentName } = path.parse(input);
 
   const tagError = validateComponentTag(componentName);
   if (tagError) {
     config.logger.error(tagError);
-    return exit(1);
+    config.sys.exit(1);
   }
 
   const extensionsToGenerate: GeneratableExtension[] = ['tsx', ...(await chooseFilesToGenerate())];
 
-  const testFolder = extensionsToGenerate.some(isTest)
-    ? 'test'
-    : '';
+  const testFolder = extensionsToGenerate.some(isTest) ? 'test' : '';
 
-  const outDir = join(absoluteSrcDir, 'components', dir, componentName);
-  await mkdir(join(outDir, testFolder), { recursive: true });
+  const outDir = path.join(absoluteSrcDir, 'components', dir, componentName);
+  await config.sys.mkdir(path.join(outDir, testFolder), { recursive: true });
 
   const writtenFiles = await Promise.all(
-    extensionsToGenerate.map(extension => writeFileByExtension(outDir, componentName, extension, extensionsToGenerate.includes('css'))),
+    extensionsToGenerate.map(extension => writeFileByExtension(coreCompiler, config, outDir, componentName, extension, extensionsToGenerate.includes('css'))),
   ).catch(error => config.logger.error(error));
 
   if (!writtenFiles) {
-    return exit(1);
+    return config.sys.exit(1);
   }
 
   console.log();
@@ -59,14 +59,15 @@ export async function taskGenerate(config: d.Config) {
   console.log(config.logger.bold('The following files have been generated:'));
 
   const absoluteRootDir = config.rootDir;
-  writtenFiles.map(file => console.log(`  - ${relative(absoluteRootDir, file)}`));
+  writtenFiles.map(file => console.log(`  - ${path.relative(absoluteRootDir, file)}`));
 }
 
 /**
  * Show a checkbox prompt to select the files to be generated.
  */
-const chooseFilesToGenerate = async () =>
-  (
+const chooseFilesToGenerate = async () => {
+  const { prompt } = await import('prompts');
+  return (
     await prompt({
       name: 'filesToGenerate',
       type: 'multiselect',
@@ -78,18 +79,19 @@ const chooseFilesToGenerate = async () =>
       ] as any[],
     })
   ).filesToGenerate as GeneratableExtension[];
+};
 
 /**
  * Get a file's boilerplate by its extension and write it to disk.
  */
-const writeFileByExtension = async (path: string, name: string, extension: GeneratableExtension, withCss: boolean) => {
+const writeFileByExtension = async (coreCompiler: CoreCompiler, config: Config, path: string, name: string, extension: GeneratableExtension, withCss: boolean) => {
   if (isTest(extension)) {
-    path = join(path, 'test');
+    path = coreCompiler.path.join(path, 'test');
   }
-  const outFile = join(path, `${name}.${extension}`);
+  const outFile = coreCompiler.path.join(path, `${name}.${extension}`);
   const boilerplate = getBoilerplateByExtension(name, extension, withCss);
 
-  await writeFile(outFile, boilerplate, { flag: 'wx' });
+  await config.sys.writeFile(outFile, boilerplate);
 
   return outFile;
 };

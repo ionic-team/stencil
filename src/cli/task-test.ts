@@ -1,13 +1,14 @@
-import * as d from '../../declarations';
-import type { Testing } from '@stencil/core/testing';
-import exit from 'exit';
-import { startupLog } from './startup-log';
+import type { Config, TestingRunOptions } from '../declarations';
+import { IS_NODE_ENV } from '@utils';
 
-export async function taskTest(prcs: NodeJS.Process, config: d.Config) {
-  startupLog(prcs, config);
+export async function taskTest(config: Config) {
+  if (!IS_NODE_ENV) {
+    config.logger.error(`"test" command is currently only implemented for a NodeJS environment`);
+    config.sys.exit(1);
+  }
 
   try {
-    const testingRunOpts: d.TestingRunOptions = {
+    const testingRunOpts: TestingRunOptions = {
       e2e: !!config.flags.e2e,
       screenshot: !!config.flags.screenshot,
       spec: !!config.flags.spec,
@@ -41,16 +42,16 @@ export async function taskTest(prcs: NodeJS.Process, config: d.Config) {
     await config.sys.lazyRequire.ensure(config.logger, config.rootDir, ensureModuleIds);
 
     // let's test!
-    const { createTesting } = require('../testing/index.js');
-    const testing: Testing = await createTesting(config);
+    const { createTesting } = await import('@stencil/core/testing');
+    const testing = await createTesting(config);
     const passed = await testing.run(testingRunOpts);
     await testing.destroy();
 
     if (!passed) {
-      exit(1);
+      config.sys.exit(1);
     }
   } catch (e) {
     config.logger.error(e);
-    exit(1);
+    config.sys.exit(1);
   }
 }
