@@ -146,15 +146,23 @@ const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boole
 let renderingRef: any = null;
 
 const callRender = (hostRef: d.HostRef, instance: any) => {
+  // in order for bundlers to correctly treeshake the BUILD object
+  // we need to ensure BUILD is not deoptimized within a try/catch
+  // https://rollupjs.org/guide/en/#treeshake tryCatchDeoptimization
+  const allRenderFn = BUILD.allRenderFn ? true : false;
+  const lazyLoad = BUILD.lazyLoad ? true : false;
+  const taskQueue = BUILD.taskQueue ? true : false;
+  const updatable = BUILD.updatable ? true : false;
+
   try {
     renderingRef = instance;
-    instance = BUILD.allRenderFn ? instance.render() : instance.render && instance.render();
+    instance = allRenderFn ? instance.render() : instance.render && instance.render();
 
-    if (BUILD.updatable && BUILD.taskQueue) {
+    if (updatable && taskQueue) {
       hostRef.$flags$ &= ~HOST_FLAGS.isQueuedForUpdate;
     }
 
-    if (BUILD.updatable || BUILD.lazyLoad) {
+    if (updatable || lazyLoad) {
       hostRef.$flags$ |= HOST_FLAGS.hasRendered;
     }
   } catch (e) {
