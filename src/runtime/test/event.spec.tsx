@@ -58,6 +58,25 @@ describe('event', () => {
     `);
   });
 
+  it('should set Event in constructor before users constructor statements', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      constructor() {
+        this.style.emit();
+      }
+      @Event() style: EventEmitter;
+    }
+
+    const { root } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml(`
+      <cmp-a></cmp-a>
+    `);
+  });
+
   it('should have custom name', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {

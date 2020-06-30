@@ -14,7 +14,7 @@ export const updateNativeConstructor = (classMembers: ts.ClassElement[], moduleF
     // add to the existing constructor()
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
 
-    let statements: ts.Statement[] = [...nativeInit(moduleFile, cmp), ...cstrMethod.body.statements, ...addCreateEvents(moduleFile, cmp), ...addLegacyProps(moduleFile, cmp)];
+    let statements: ts.Statement[] = [...nativeInit(moduleFile, cmp), ...addCreateEvents(moduleFile, cmp), ...cstrMethod.body.statements, ...addLegacyProps(moduleFile, cmp)];
 
     if (ensureSuper) {
       const hasSuper = cstrMethod.body.statements.some(s => s.kind === ts.SyntaxKind.SuperKeyword);

@@ -14,8 +14,8 @@ export const updateLazyComponentConstructor = (classMembers: ts.ClassElement[], 
 
     const body = ts.updateBlock(cstrMethod.body, [
       registerInstanceStatement(moduleFile),
-      ...cstrMethod.body.statements,
       ...addCreateEvents(moduleFile, cmp),
+      ...cstrMethod.body.statements,
       ...addLegacyProps(moduleFile, cmp),
     ]);
 
