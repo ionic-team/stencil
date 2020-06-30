@@ -19,15 +19,15 @@
     "preset": "../../testing/jest-preset.js"
   },
   "devDependencies": {
-    "@types/video.js": "^7.3.9",
-    "@stencil/react-output-target": "^0.0.4",
+    "@stencil/react-output-target": "^0.0.7",
     "@types/file-saver": "^2.0.1",
-    "@types/lodash": "^4.14.149",
+    "@types/lodash": "^4.14.157",
     "@types/lodash-es": "^4.17.3",
+    "@types/video.js": "^7.3.10",
     "file-saver": "^2.0.2",
     "lodash": "^4.17.15",
     "lodash-es": "^4.17.15",
     "rollup-plugin-node-builtins": "^2.1.2",
-    "video.js": "^7.8.2"
+    "video.js": "^7.8.3"
   }
 }
