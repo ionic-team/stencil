@@ -47,21 +47,19 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
 
     if (!BUILD.lazyLoad || instance) {
       // get an array of method names of watch functions to call
-      if (BUILD.watchCallback && cmpMeta.$watchers$) {
-        if (!BUILD.lazyLoad || flags & HOST_FLAGS.isWatchReady) {
-          const watchMethods = cmpMeta.$watchers$[propName];
+      if (BUILD.watchCallback && cmpMeta.$watchers$ && flags & HOST_FLAGS.isWatchReady) {
+        const watchMethods = cmpMeta.$watchers$[propName];
 
-          if (watchMethods) {
-            // this instance is watching for when this property changed
-            watchMethods.map(watchMethodName => {
-              try {
-                // fire off each of the watch methods that are watching this property
-                instance[watchMethodName](newVal, oldVal, propName);
-              } catch (e) {
-                consoleError(e);
-              }
-            });
-          }
+        if (watchMethods) {
+          // this instance is watching for when this property changed
+          watchMethods.map(watchMethodName => {
+            try {
+              // fire off each of the watch methods that are watching this property
+              instance[watchMethodName](newVal, oldVal, propName);
+            } catch (e) {
+              consoleError(e);
+            }
+          });
         }
       }
 

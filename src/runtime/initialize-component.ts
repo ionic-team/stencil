@@ -12,10 +12,10 @@ import { createTime, uniqueTime } from './profile';
 export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: any) => {
   // initializeComponent
   if ((BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.style) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
-    // we haven't initialized this element yet
-    hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
-
     if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
+      // we haven't initialized this element yet
+      hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
+
       // lazy loaded components
       // request the component's implementation to be
       // wired up with the host element
@@ -66,7 +66,9 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       endNewInstance();
       fireConnectedCallback(hostRef.$lazyInstance$);
     } else {
+      // sync constructor component
       Cstr = elm.constructor as any;
+      hostRef.$flags$ |= HOST_FLAGS.isWatchReady | HOST_FLAGS.hasInitializedComponent;
     }
 
     if (BUILD.style && Cstr.style) {
