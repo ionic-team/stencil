@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import * as d from '../../declarations';
 import * as cp from 'child_process';
 import { EventEmitter } from 'events';
 import { TASK_CANCELED_MSG } from '@utils';
@@ -13,15 +13,13 @@ export class NodeWorkerMain extends EventEmitter {
   successfulMessage = false;
   totalTasksAssigned = 0;
 
-  constructor(public workerDomain: string, public id: number, forkModulePath: string) {
+  constructor(public id: number, forkModulePath: string) {
     super();
     this.fork(forkModulePath);
   }
 
   fork(forkModulePath: string) {
     const filteredArgs = process.execArgv.filter(v => !/^--(debug|inspect)/.test(v));
-
-    const args = [this.workerDomain];
 
     const options: cp.ForkOptions = {
       execArgv: filteredArgs,
@@ -30,7 +28,7 @@ export class NodeWorkerMain extends EventEmitter {
       silent: true,
     };
 
-    this.childProcess = cp.fork(forkModulePath, args, options);
+    this.childProcess = cp.fork(forkModulePath, [], options);
 
     this.childProcess.stdout.setEncoding('utf8');
     this.childProcess.stdout.on('data', data => {

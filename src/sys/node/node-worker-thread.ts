@@ -1,5 +1,4 @@
-import * as d from '../../../declarations';
-import { isNumber, isString } from '@utils';
+import type * as d from '../../declarations';
 
 export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerMsgHandler) => {
   const sendHandle = (err: NodeJS.ErrnoException) => {
@@ -14,7 +13,7 @@ export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerM
       stencilRtnValue: null,
       stencilRtnError: 'Error',
     };
-    if (isString(err)) {
+    if (typeof err === 'string') {
       errMsgBackToMain.stencilRtnError += ': ' + err;
     } else if (err) {
       if (err.stack) {
@@ -28,7 +27,7 @@ export const initNodeWorkerThread = (prcs: NodeJS.Process, msgHandler: d.WorkerM
 
   prcs.on('message', async (msgToWorker: d.MsgToWorker) => {
     // message from the main thread
-    if (msgToWorker && isNumber(msgToWorker.stencilId)) {
+    if (msgToWorker && typeof msgToWorker.stencilId === 'number') {
       try {
         // run the handler to get the data
         const msgFromWorker: d.MsgFromWorker = {

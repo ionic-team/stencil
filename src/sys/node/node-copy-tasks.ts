@@ -177,7 +177,8 @@ const IGNORE = ['.ds_store', '.gitignore', 'desktop.ini', 'thumbs.db'];
 
 export function asyncGlob(pattern: string, opts: any) {
   return new Promise<string[]>((resolve, reject) => {
-    glob(pattern, opts, (err: any, files: string[]) => {
+    const g: typeof glob = (glob as any).glob;
+    g(pattern, opts, (err: any, files: string[]) => {
       if (err) {
         reject(err);
       } else {

@@ -1,4 +1,4 @@
-import { getNextWorker } from '..';
+import { getNextWorker } from '../node-worker-controller';
 import { TestWorkerMain } from './test-worker-main';
 
 describe('getNextWorker', () => {

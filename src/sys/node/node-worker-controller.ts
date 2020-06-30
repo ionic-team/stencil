@@ -1,7 +1,7 @@
-import * as d from '../../../declarations';
+import type * as d from '../../declarations';
 import { EventEmitter } from 'events';
 import { TASK_CANCELED_MSG } from '@utils';
-import { NodeWorkerMain } from './worker-main';
+import { NodeWorkerMain } from './node-worker-main';
 import { cpus } from 'os';
 
 export class NodeWorkerController extends EventEmitter implements d.WorkerMainController {
@@ -10,16 +10,16 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
   isEnding = false;
   taskQueue: d.CompilerWorkerTask[] = [];
   workers: NodeWorkerMain[] = [];
-  totalWorkers: number;
+  maxWorkers: number;
   useForkedWorkers: boolean;
   mainThreadRunner: { [fnName: string]: (...args: any[]) => Promise<any> };
 
-  constructor(public workerDomain: string, public forkModulePath: string, maxConcurrentWorkers: number, public logger: d.Logger) {
+  constructor(private logger: d.Logger, public forkModulePath: string, maxConcurrentWorkers: number) {
     super();
     const osCpus = cpus().length;
 
     this.useForkedWorkers = maxConcurrentWorkers > 0;
-    this.totalWorkers = Math.max(Math.min(maxConcurrentWorkers, osCpus), 2) - 1;
+    this.maxWorkers = Math.max(Math.min(maxConcurrentWorkers, osCpus), 2) - 1;
 
     if (this.useForkedWorkers) {
       // start up the forked child processes
@@ -62,14 +62,14 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
   }
 
   startWorkers() {
-    while (this.workers.length < this.totalWorkers) {
+    while (this.workers.length < this.maxWorkers) {
       this.startWorker();
     }
   }
 
   startWorker() {
     const workerId = this.workerIds++;
-    const worker = new NodeWorkerMain(this.workerDomain, workerId, this.forkModulePath);
+    const worker = new NodeWorkerMain(workerId, this.forkModulePath);
 
     worker.on('response', this.processTaskQueue.bind(this));
 
@@ -202,10 +202,4 @@ export function getNextWorker(workers: NodeWorkerMain[]) {
   });
 
   return sorted[0];
-}
-
-export function setupWorkerController(sys: d.CompilerSystem, logger: d.Logger, workerDomain: string) {
-  sys.createWorkerController = function(compilerPath, maxConcurrentWorkers) {
-    return new NodeWorkerController(workerDomain, compilerPath, maxConcurrentWorkers, logger);
-  };
 }

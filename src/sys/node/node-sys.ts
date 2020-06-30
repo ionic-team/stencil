@@ -1,17 +1,37 @@
-import { CompilerSystem, SystemDetails, CompilerSystemUnlinkResults, CompilerSystemMakeDirectoryResults, CompilerSystemWriteFileResults, CompilerSystemRealpathResults } from '../../declarations';
+import type {
+  CompilerSystem,
+  CompilerSystemMakeDirectoryResults,
+  CompilerSystemRealpathResults,
+  CompilerSystemUnlinkResults,
+  CompilerSystemWriteFileResults,
+  Logger,
+  TranspileOnlyResults,
+} from '../../declarations';
 import { asyncGlob, nodeCopyTasks } from './node-copy-tasks';
 import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
 import { createHash } from 'crypto';
+import exit from 'exit';
 import fs from 'graceful-fs';
-import { normalizePath } from '@utils';
-import path from 'path';
 import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
+import { NodeWorkerController } from './node-worker-controller';
+import { normalizePath, requireFunc, catchError } from '@utils';
+import path from 'path';
+import type TypeScript from 'typescript';
 
-export function createNodeSys(prcs: NodeJS.Process) {
+export function createNodeSys(c: { process: any; logger: Logger }) {
+  const prcs: NodeJS.Process = c.process;
+  const logger = c.logger;
   const destroys = new Set<() => Promise<void> | void>();
+  const onInterruptsCallbacks: (() => void)[] = [];
+
+  const sysCpus = cpus();
+  const hardwareConcurrency = sysCpus.length;
+  const osPlatform = platform();
 
   const sys: CompilerSystem = {
+    name: 'node',
+    version: prcs.versions.node,
     access(p) {
       return new Promise(resolve => {
         fs.access(p, err => {
@@ -41,6 +61,10 @@ export function createNodeSys(prcs: NodeJS.Process) {
         });
       });
     },
+    createWorkerController(maxConcurrentWorkers) {
+      const forkModulePath = path.join(__dirname, 'worker.js');
+      return new NodeWorkerController(logger, forkModulePath, maxConcurrentWorkers);
+    },
     async destroy() {
       const waits: Promise<void>[] = [];
       destroys.forEach(cb => {
@@ -50,21 +74,45 @@ export function createNodeSys(prcs: NodeJS.Process) {
             waits.push(rtn);
           }
         } catch (e) {
-          console.error(`node sys destroy: ${e}`);
+          logger.error(`node sys destroy: ${e}`);
         }
       });
-      await Promise.all(waits);
+      if (waits.length > 0) {
+        await Promise.all(waits);
+      }
       destroys.clear();
+    },
+    dynamicImport(p) {
+      return Promise.resolve(requireFunc(p));
     },
     encodeToBase64(str) {
       return Buffer.from(str).toString('base64');
     },
+    exit(exitCode) {
+      exit(exitCode);
+    },
     getCurrentDirectory() {
       return normalizePath(prcs.cwd());
     },
+    getCompilerExecutingPath() {
+      return path.join(__dirname, '..', '..', 'compiler', 'stencil.js');
+    },
+    getDevServerExecutingPath() {
+      return path.join(__dirname, '..', '..', 'dev-server', 'index.js');
+    },
+    getEnvironmentVar(key) {
+      return process.env[key];
+    },
+    getLocalModulePath() {
+      return null;
+    },
+    getRemoteModuleUrl() {
+      return null;
+    },
     glob: asyncGlob,
-    isSymbolicLink: (p: string) =>
-      new Promise<boolean>(resolve => {
+    hardwareConcurrency,
+    isSymbolicLink(p: string) {
+      return new Promise<boolean>(resolve => {
         try {
           fs.lstat(p, (err, stats) => {
             if (err) {
@@ -76,9 +124,8 @@ export function createNodeSys(prcs: NodeJS.Process) {
         } catch (e) {
           resolve(false);
         }
-      }),
-    getCompilerExecutingPath: null,
-    normalizePath,
+      });
+    },
     mkdir(p, opts) {
       return new Promise(resolve => {
         if (opts) {
@@ -119,6 +166,14 @@ export function createNodeSys(prcs: NodeJS.Process) {
       }
       return results;
     },
+    nextTick(cb) {
+      prcs.nextTick(cb);
+    },
+    normalizePath,
+    onProcessInterrupt(cb) {
+      onInterruptsCallbacks.push(cb);
+    },
+    platformPath: path,
     readdir(p) {
       return new Promise(resolve => {
         fs.readdir(p, (err, files) => {
@@ -160,7 +215,7 @@ export function createNodeSys(prcs: NodeJS.Process) {
         fs.realpath(p, 'utf8', (e, data) => {
           resolve({
             path: data,
-            error: e
+            error: e,
           });
         });
       });
@@ -168,8 +223,8 @@ export function createNodeSys(prcs: NodeJS.Process) {
     realpathSync(p) {
       const results: CompilerSystemRealpathResults = {
         path: undefined,
-        error: null
-      }
+        error: null,
+      };
       try {
         results.path = fs.realpathSync(p, 'utf8');
       } catch (e) {
@@ -231,6 +286,27 @@ export function createNodeSys(prcs: NodeJS.Process) {
       } catch (e) {}
       return undefined;
     },
+    tmpdir() {
+      return tmpdir();
+    },
+    async transpile(input, filePath, compilerOptions) {
+      const results: TranspileOnlyResults = {
+        diagnostics: [],
+        output: input,
+        sourceMap: null,
+      };
+
+      try {
+        const ts: typeof TypeScript = require('typescript');
+        const tsResults = ts.transpileModule(input, { fileName: filePath, compilerOptions });
+        results.output = tsResults.outputText;
+        results.sourceMap = tsResults.sourceMapText;
+      } catch (e) {
+        catchError(results.diagnostics, e);
+      }
+
+      return results;
+    },
     unlink(p) {
       return new Promise(resolve => {
         fs.unlink(p, err => {
@@ -285,7 +361,15 @@ export function createNodeSys(prcs: NodeJS.Process) {
       return Promise.resolve(hash);
     },
     copy: nodeCopyTasks,
-    details: getDetails(),
+    details: {
+      cpuModel: sysCpus[0].model,
+      freemem() {
+        return freemem();
+      },
+      platform: osPlatform === 'darwin' || osPlatform === 'linux' ? osPlatform : osPlatform === 'win32' ? 'windows' : '',
+      release: release(),
+      totalmem: totalmem(),
+    },
   };
 
   const nodeResolve = new NodeResolveModule();
@@ -303,29 +387,3 @@ export function createNodeSys(prcs: NodeJS.Process) {
 
   return sys;
 }
-
-const getDetails = () => {
-  const details: SystemDetails = {
-    cpuModel: '',
-    cpus: -1,
-    freemem() {
-      return freemem();
-    },
-    platform: '',
-    release: '',
-    runtime: 'node',
-    runtimeVersion: '',
-    tmpDir: tmpdir(),
-    totalmem: -1,
-  };
-  try {
-    const sysCpus = cpus();
-    details.cpuModel = sysCpus[0].model;
-    details.cpus = sysCpus.length;
-    details.platform = platform();
-    details.release = release();
-    details.runtimeVersion = process.version;
-    details.totalmem = totalmem();
-  } catch (e) {}
-  return details;
-};
