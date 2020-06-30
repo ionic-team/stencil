@@ -11,7 +11,7 @@ export async function startDevServerWorker(prcs: NodeJS.Process, devServerConfig
   let hasStarted = false;
 
   try {
-    const sys = createNodeSys(prcs);
+    const sys = createNodeSys({ process: prcs, logger: null });
     const destroys: d.DevServerDestroy[] = [];
     devServerConfig.editors = await getEditors();
 

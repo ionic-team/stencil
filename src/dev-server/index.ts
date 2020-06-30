@@ -10,13 +10,14 @@ import {
   Logger,
   StencilDevServerConfig,
 } from '../declarations';
+import { normalizePath } from '@utils';
 import { ChildProcess, fork } from 'child_process';
 import path from 'path';
 import open from 'open';
 
-export async function startServer(stencilDevServerConfig: StencilDevServerConfig, logger: Logger, watcher?: CompilerWatcher) {
+export async function start(stencilDevServerConfig: StencilDevServerConfig, logger: Logger, watcher?: CompilerWatcher) {
   let devServer: DevServer = null;
-  const devServerConfig = Object.assign({}, stencilDevServerConfig) as DevServerConfig;
+  const devServerConfig = { ...stencilDevServerConfig } as DevServerConfig;
   const timespan = logger.createTimeSpan(`starting dev server`, true);
 
   try {
@@ -53,6 +54,11 @@ export async function startServer(stencilDevServerConfig: StencilDevServerConfig
         emitMessageToClient(serverProcess, devServerContext, eventName, data);
       });
     }
+
+    if (!path.isAbsolute(starupDevServerConfig.root)) {
+      starupDevServerConfig.root = path.join(process.cwd(), starupDevServerConfig.root);
+    }
+    starupDevServerConfig.root = normalizePath(starupDevServerConfig.root);
 
     devServer = {
       address: starupDevServerConfig.address,
