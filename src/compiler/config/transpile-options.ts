@@ -86,6 +86,7 @@ export const getTranspileConfig = (input: TranspileOptions) => {
     componentExport: compileOpts.componentExport as any,
     componentMetadata: compileOpts.componentMetadata as any,
     currentDirectory: compileOpts.currentDirectory,
+    isolatedModules: true,
     module: compileOpts.module as any,
     proxy: compileOpts.proxy as any,
     file: compileOpts.file,
@@ -94,7 +95,6 @@ export const getTranspileConfig = (input: TranspileOptions) => {
   };
 
   const config: Config = {
-    cwd: compileOpts.currentDirectory,
     rootDir: compileOpts.currentDirectory,
     srcDir: compileOpts.currentDirectory,
     devMode: true,

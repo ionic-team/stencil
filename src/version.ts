@@ -7,3 +7,9 @@ export const transpilerId = '__BUILDID:TRANSPILE__';
 export const typescriptVersion = '__VERSION:TYPESCRIPT__';
 export const vermoji = '__VERMOJI__';
 export const version = '__VERSION:STENCIL__';
+export const versions = {
+  stencil: version,
+  typescript: typescriptVersion,
+  rollup: rollupVersion,
+  terser: terserVersion,
+};

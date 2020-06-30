@@ -1,13 +1,12 @@
 import {
-  BuildEmitEvents,
   BuildEvents,
   BuildLog,
-  BuildOnEvents,
   BuildOutput,
   CompilerBuildResults,
   CompilerBuildStart,
   CompilerFsStats,
   CompilerSystem,
+  CompilerRequestResponse,
   Config,
   CopyResults,
   DevServerConfig,
@@ -22,9 +21,8 @@ import {
   OutputTargetWww,
   PageReloadStrategy,
   PrerenderConfig,
-  PrerenderRequest,
-  PrerenderResults,
   StyleDoc,
+  LoggerLineUpdater,
 } from './stencil-public-compiler';
 
 import { ComponentInterface, ListenOptions, ListenTargetOptions, VNode, VNodeData } from './stencil-public-runtime';
@@ -757,33 +755,6 @@ export interface HostElementData {
   name: string;
 }
 
-export interface Compiler {
-  build(): Promise<CompilerBuildResults>;
-  createWatcher(): Promise<CompilerWatcher>;
-  destroy(): Promise<void>;
-  sys: CompilerSystem;
-}
-
-export interface CompilerWatcher extends BuildOnEvents {
-  start(): Promise<WatcherCloseResults>;
-  close(): Promise<WatcherCloseResults>;
-  request(data: CompilerRequest): Promise<CompilerRequestResponse>;
-}
-
-export interface CompilerRequest {
-  path?: string;
-}
-
-export interface CompilerRequestResponse {
-  nodeModuleId: string;
-  nodeModuleVersion: string;
-  nodeResolvedPath: string;
-  cachePath: string;
-  cacheHit: boolean;
-  content: string;
-  status: number;
-}
-
 export interface BuildOutputFile {
   name: string;
   content: string;
@@ -791,10 +762,6 @@ export interface BuildOutputFile {
 
 export type OnCallback = (buildStart: CompilerBuildStart) => void;
 export type RemoveCallback = () => boolean;
-
-export interface WatcherCloseResults {
-  exitCode: number;
-}
 
 export interface CompilerCtx {
   version: number;
@@ -1160,16 +1127,6 @@ export interface CssVarShim {
   updateGlobal(): void;
 }
 
-export interface DevServer extends BuildEmitEvents {
-  address: string;
-  basePath: string;
-  browserUrl: string;
-  protocol: string;
-  port: number;
-  root: string;
-  close(): Promise<void>;
-}
-
 export interface DevServerStartResponse {
   address: string;
   basePath: string;
@@ -1433,7 +1390,7 @@ export interface InMemoryFileSystem {
    */
   accessSync(filePath: string): boolean;
   copyFile(srcFile: string, dest: string): Promise<void>;
-  emptyDir(dirPath: string): Promise<void>;
+  emptyDirs(dirPaths: string[]): Promise<void>;
   readdir(dirPath: string, opts?: FsReaddirOptions): Promise<FsReaddirItem[]>;
   readFile(filePath: string, opts?: FsReadOptions): Promise<string>;
   /**
@@ -1633,15 +1590,28 @@ export interface PluginCtx {
   diagnostics: Diagnostic[];
 }
 
-export interface ProgressLogger {
-  update(text: string): Promise<void>;
-  stop(): Promise<void>;
+export interface PrerenderUrlResults {
+  anchorUrls: string[];
+  diagnostics: Diagnostic[];
+  filePath: string;
+}
+
+export interface PrerenderUrlRequest {
+  baseUrl: string;
+  componentGraphPath: string;
+  devServerHostUrl: string;
+  hydrateAppFilePath: string;
+  isDebug: boolean;
+  prerenderConfigPath: string;
+  staticSite: boolean;
+  templateId: string;
+  url: string;
+  writeToFilePath: string;
 }
 
 export interface PrerenderManager {
-  prcs: NodeJS.Process;
   config: Config;
-  prerenderUrlWorker: (prerenderRequest: PrerenderRequest) => Promise<PrerenderResults>;
+  prerenderUrlWorker: (prerenderRequest: PrerenderUrlRequest) => Promise<PrerenderUrlResults>;
   devServerHostUrl: string;
   diagnostics: Diagnostic[];
   hydrateAppFilePath: string;
@@ -1650,7 +1620,7 @@ export interface PrerenderManager {
   outputTarget: OutputTargetWww;
   prerenderConfig: PrerenderConfig;
   prerenderConfigPath: string;
-  progressLogger?: ProgressLogger;
+  progressLogger?: LoggerLineUpdater;
   resolve: Function;
   staticSite: boolean;
   templateId: string;
@@ -2571,11 +2541,10 @@ export interface VNodeProdData {
 }
 
 export interface CompilerWorkerContext {
-  transpile(code: string, opts: TranspileOptions): Promise<TranspileResults>;
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
   prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string; sourceMap: any; diagnostics: Diagnostic[] }>;
+  prerenderWorker(prerenderRequest: PrerenderUrlRequest): Promise<PrerenderUrlResults>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
-  transpileToEs5(input: string, inlineHelpers: boolean): Promise<TranspileToEs5Results>;
 }
 
 export interface MsgToWorker {
@@ -2632,13 +2601,12 @@ export interface WorkerContext {
   tsProgram?: any;
 }
 
-export interface TranspileToEs5Results {
+export interface TranspileModuleResults {
   sourceFilePath: string;
   code: string;
   map: any;
   diagnostics: Diagnostic[];
   moduleFile: Module;
-  build: BuildConditionals;
 }
 
 export interface ValidateTypesResults {
@@ -2653,23 +2621,18 @@ export interface TransformOptions {
   componentMetadata: 'runtimestatic' | 'compilerstatic' | null;
   currentDirectory: string;
   file?: string;
+  isolatedModules?: boolean;
   module?: 'cjs' | 'esm';
   proxy: 'defineproperty' | null;
   style: 'static' | null;
   target?: string;
 }
 
-export interface PlatformPath {
-  basename(p: string, ext?: string): string;
-  dirname(p: string): string;
-  extname(p: string): string;
-  format(pP: any): string;
-  join(...paths: string[]): string;
-  isAbsolute(p: string): boolean;
-  normalize(p: string): string;
-  relative(from: string, to: string): string;
-  resolve(...pathSegments: string[]): string;
-  sep: string;
-  delimiter: string;
-  posix: PlatformPath;
+export interface CliInitOptions {
+  args: string[];
+  logger: Logger;
+  sys: CompilerSystem;
+  checkVersion?: CheckVersion;
 }
+
+export type CheckVersion = (config: Config, currentVersion: string) => Promise<() => void>;

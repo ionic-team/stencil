@@ -84,7 +84,7 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
     coreImportPath: STENCIL_CORE_ID,
     componentExport: 'lazy',
     componentMetadata: null,
-    currentDirectory: config.cwd,
+    currentDirectory: config.sys.getCurrentDirectory(),
     proxy: null,
     style: 'static',
   };
@@ -149,14 +149,17 @@ const getLegacyLoader = (config: d.Config) => {
   scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
   doc.head.appendChild(scriptElm);
 
-  ${config.buildEs5 && `
+  ${
+    config.buildEs5 &&
+    `
   scriptElm = doc.createElement('script');
   scriptElm.setAttribute('nomodule', '');
   scriptElm.src = url + '/${namespace}.js';
   warn.push(scriptElm.outerHTML);
   scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
   doc.head.appendChild(scriptElm)
-  `}
+  `
+  }
   console.warn(warn.join('\\n'));
 
 })(document);`;

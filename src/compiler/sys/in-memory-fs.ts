@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { basename, dirname, relative } from 'path';
-import { isIterable, normalizePath } from '@utils';
+import { isIterable, normalizePath, isString } from '@utils';
 
 export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const items: d.FsItems = new Map();
@@ -64,15 +64,45 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     item.queueCopyFileToDest = dest;
   };
 
-  const emptyDir = async (dirPath: string) => {
-    const item = getItem(dirPath);
+  const emptyDirs = async (dirs: string[]) => {
+    dirs = dirs
+      .filter(isString)
+      .map(normalizePath)
+      .reduce((dirs, dir) => {
+        if (!dirs.includes(dir)) {
+          dirs.push(dir);
+        }
+        return dirs;
+      }, [] as string[]);
 
-    await removeDir(dirPath);
+    const allFsItems = await Promise.all(dirs.map(dir => readdir(dir, { recursive: true })));
+    const reducedItems: string[] = [];
 
-    item.isFile = false;
-    item.isDirectory = true;
-    item.queueWriteToDisk = true;
-    item.queueDeleteFromDisk = false;
+    for (const fsItems of allFsItems) {
+      for (const f of fsItems) {
+        if (!reducedItems.includes(f.absPath)) {
+          reducedItems.push(f.absPath);
+        }
+      }
+    }
+
+    reducedItems.sort((a, b) => {
+      const partsA = a.split('/').length;
+      const partsB = b.split('/').length;
+      if (partsA < partsB) return 1;
+      if (partsA > partsB) return -1;
+      return 0;
+    });
+
+    await Promise.all(reducedItems.map(removeItem));
+
+    dirs.forEach(dir => {
+      const item = getItem(dir);
+      item.isFile = false;
+      item.isDirectory = true;
+      item.queueWriteToDisk = true;
+      item.queueDeleteFromDisk = false;
+    });
   };
 
   const readdir = async (dirPath: string, opts: d.FsReaddirOptions = {}) => {
@@ -124,7 +154,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const readDirectory = async (initPath: string, dirPath: string, opts: d.FsReaddirOptions, collectedPaths: d.FsReaddirItem[]) => {
     // used internally only so we could easily recursively drill down
     // loop through this directory and sub directories
-    // always a disk read!!
+    // always a disk read!!removeDir
     const dirItems = await sys.readdir(dirPath);
     if (dirItems.length > 0) {
       // cache some facts about this path
@@ -258,7 +288,14 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     try {
       const dirItems = await readdir(dirPath, { recursive: true });
 
-      await Promise.all(dirItems.map(item => removeItem(item.absPath)));
+      await Promise.all(
+        dirItems.map(item => {
+          if (item.relPath.endsWith('.gitkeep')) {
+            return null;
+          }
+          return removeItem(item.absPath);
+        }),
+      );
     } catch (e) {
       // do not throw error if the directory never existed
     }
@@ -699,7 +736,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     clearFileCache,
     commit,
     copyFile,
-    emptyDir,
+    emptyDirs,
     getBuildOutputs,
     getItem,
     getMemoryStats,

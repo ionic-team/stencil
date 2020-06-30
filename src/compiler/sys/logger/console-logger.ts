@@ -1,69 +1,44 @@
-import * as d from '../../declarations';
+import * as d from '../../../declarations';
+import { IS_BROWSER_ENV } from '@utils';
 
 export const createLogger = () => {
+  let useColors = IS_BROWSER_ENV;
+  let level: d.LogLevel = 'info';
+
   const logger: d.Logger = {
-    colors: true,
-    level: '',
+    enableColors: uc => (useColors = uc),
+    getLevel: () => level,
+    setLevel: l => (level = l),
+    emoji: e => e,
     info: console.log.bind(console),
     warn: console.warn.bind(console),
     error: console.error.bind(console),
     debug: console.debug.bind(console),
-    red(msg: string) {
-      return msg;
-    },
-    green(msg: string) {
-      return msg;
-    },
-    yellow(msg: string) {
-      return msg;
-    },
-    blue(msg: string) {
-      return msg;
-    },
-    magenta(msg: string) {
-      return msg;
-    },
-    cyan(msg: string) {
-      return msg;
-    },
-    gray(msg: string) {
-      return msg;
-    },
-    bold(msg: string) {
-      return msg;
-    },
-    dim(msg: string) {
-      return msg;
-    },
-    bgRed(msg: string) {
-      return msg;
-    },
-    createTimeSpan(_startMsg: string, _debug = false): d.LoggerTimeSpan {
-      return {
-        duration() {
-          return 0;
-        },
-        finish() {
-          return 0;
-        },
-      };
-    },
+    red: msg => msg,
+    green: msg => msg,
+    yellow: msg => msg,
+    blue: msg => msg,
+    magenta: msg => msg,
+    cyan: msg => msg,
+    gray: msg => msg,
+    bold: msg => msg,
+    dim: msg => msg,
+    bgRed: msg => msg,
+    createTimeSpan: (_startMsg: string, _debug = false): d.LoggerTimeSpan => ({
+      duration: () => 0,
+      finish: () => 0,
+    }),
     printDiagnostics(diagnostics: d.Diagnostic[]) {
-      diagnostics.forEach(diagnostic => {
-        logDiagnostic(diagnostic, logger.colors);
-      });
-    },
-    buildLogFilePath: null,
-    writeLogs(_: boolean) {
-      /**/
+      diagnostics.forEach(diagnostic => logDiagnostic(diagnostic, useColors));
     },
   };
   return logger;
 };
 
-const logDiagnostic = (diagnostic: d.Diagnostic, colors: boolean) => {
+const logDiagnostic = (diagnostic: d.Diagnostic, useColors: boolean) => {
   let color = BLUE;
   let prefix = 'Build';
+  let msg = '';
 
   if (diagnostic.level === 'error') {
     color = RED;
@@ -76,8 +51,6 @@ const logDiagnostic = (diagnostic: d.Diagnostic, colors: boolean) => {
   if (diagnostic.header) {
     prefix = diagnostic.header;
   }
-
-  let msg = '';
 
   const filePath = diagnostic.relFilePath || diagnostic.absFilePath;
   if (filePath) {
@@ -102,9 +75,8 @@ const logDiagnostic = (diagnostic: d.Diagnostic, colors: boolean) => {
     msg += '\n';
   }
 
-  if (colors) {
+  if (useColors) {
     const styledPrefix = ['%c' + prefix, `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`];
-
     console.log(...styledPrefix, msg);
   } else if (diagnostic.level === 'error') {
     console.error(msg);

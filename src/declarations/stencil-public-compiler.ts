@@ -334,12 +334,11 @@ export interface Config extends StencilConfig {
   buildAppCore?: boolean;
   buildDocs?: boolean;
   configPath?: string;
-  cwd?: string;
   writeLog?: boolean;
   devServer?: DevServerConfig;
   flags?: ConfigFlags;
   fsNamespace?: string;
-  logLevel?: 'error' | 'warn' | 'info' | 'debug' | string;
+  logLevel?: LogLevel;
   rootDir?: string;
   packageJsonFilePath?: string;
   sourceMap?: boolean;
@@ -491,7 +490,7 @@ export interface ConfigFlags {
   devtools?: boolean;
 }
 
-export type TaskCommand = 'build' | 'docs' | 'generate' | 'g' | 'help' | 'prerender' | 'serve' | 'test' | 'version';
+export type TaskCommand = 'build' | 'docs' | 'generate' | 'g' | 'help' | 'info' | 'prerender' | 'serve' | 'test' | 'version';
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
@@ -803,6 +802,8 @@ export interface SitemapXmpResults {
  * of the actual platform it's being ran ontop of.
  */
 export interface CompilerSystem {
+  name: 'deno' | 'node' | 'in-memory';
+  version: string;
   events?: BuildEvents;
   details?: SystemDetails;
   /**
@@ -817,6 +818,7 @@ export interface CompilerSystem {
    * SYNC! Always returns a boolean, does not throw.
    */
   accessSync(p: string): boolean;
+  applyGlobalPatch?(fromDir: string): Promise<void>;
   cacheStorage?: CacheStorage;
   copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
   /**
@@ -827,11 +829,17 @@ export interface CompilerSystem {
    * Used to destroy any listeners, file watchers or child processes.
    */
   destroy(): Promise<void>;
+  dynamicImport?(p: string): Promise<any>;
   /**
    * Creates the worker controller for the current system.
    */
-  createWorkerController?(compilerPath: string, maxConcurrentWorkers: number): WorkerMainController;
+  createWorkerController?(maxConcurrentWorkers: number): WorkerMainController;
   encodeToBase64(str: string): string;
+  ensureDependencies?(opts: { rootDir: string; dependencies: CompilerDependency[] }): Promise<void>;
+  /**
+   * process.exit()
+   */
+  exit(exitCode: number): void;
   /**
    * Optionally provide a fetch() function rather than using the built-in fetch().
    * First arg is a url string or Request object (RequestInfo).
@@ -847,17 +855,30 @@ export interface CompilerSystem {
    */
   getCurrentDirectory(): string;
   /**
-   * The compiler's current executing path. Like the compiler's __filename on NodeJS or location.href in a web worker.
+   * The compiler's executing path.
    */
   getCompilerExecutingPath(): string;
   /**
-   * Gets the full url when requesting a node_module to fetch from a CDN.
+   * The dev server's executing path.
    */
-  getRemoteModuleUrl?(module: { moduleId: string; path?: string; version?: string }): string;
+  getDevServerExecutingPath?(): string;
+  getEnvironmentVar?(key: string): string;
+  /**
+   * Gets the absolute file path when for a dependency module.
+   */
+  getLocalModulePath(opts: { rootDir: string; moduleId: string; path: string }): string;
+  /**
+   * Gets the full url when requesting a dependency module to fetch from a CDN.
+   */
+  getRemoteModuleUrl(opts: { moduleId: string; path?: string; version?: string }): string;
   /**
    * Aync glob task. Only available in NodeJS compiler system.
    */
   glob?(pattern: string, options: { cwd?: string; nodir?: boolean; [key: string]: any }): Promise<string[]>;
+  /**
+   * The number of logical processors available to run threads on the user's computer (cpus).
+   */
+  hardwareConcurrency: number;
   /**
    * Tests if the path is a symbolic link or not. Always resolves a boolean. Does not throw.
    */
@@ -871,10 +892,13 @@ export interface CompilerSystem {
    * SYNC! Does not throw.
    */
   mkdirSync(p: string, opts?: CompilerSystemMakeDirectoryOptions): CompilerSystemMakeDirectoryResults;
+  nextTick(cb: () => void): void;
   /**
    * Normalize file system path.
    */
   normalizePath(p: string): string;
+  onProcessInterrupt?(cb: () => void): void;
+  platformPath: PlatformPath;
   /**
    * All return paths are full normalized paths, not just the file names. Always returns an array, does not throw.
    */
@@ -925,6 +949,8 @@ export interface CompilerSystem {
    * SYNC! Returns undefined if stat not found. Does not throw.
    */
   statSync(p: string): CompilerFsStats;
+  transpile?(input: string, filePath: string, compilerOptions: any): Promise<TranspileOnlyResults>;
+  tmpdir(): string;
   /**
    * Does not throw.
    */
@@ -949,6 +975,43 @@ export interface CompilerSystem {
   writeFileSync(p: string, content: string): CompilerSystemWriteFileResults;
 }
 
+export interface TranspileOnlyResults {
+  diagnostics: Diagnostic[];
+  output: string;
+  sourceMap: any;
+}
+
+export interface ParsedPath {
+  root: string;
+  dir: string;
+  base: string;
+  ext: string;
+  name: string;
+}
+
+export interface PlatformPath {
+  normalize(p: string): string;
+  join(...paths: string[]): string;
+  resolve(...pathSegments: string[]): string;
+  isAbsolute(p: string): boolean;
+  relative(from: string, to: string): string;
+  dirname(p: string): string;
+  basename(p: string, ext?: string): string;
+  extname(p: string): string;
+  parse(p: string): ParsedPath;
+  sep: string;
+  delimiter: string;
+  posix: any;
+  win32: any;
+}
+
+export interface CompilerDependency {
+  name: string;
+  version: string;
+  main: string;
+  resources?: string[];
+}
+
 export interface ResolveModuleIdOptions {
   moduleId: string;
   containingFile?: string;
@@ -967,6 +1030,7 @@ export interface WorkerMainController {
   send(...args: any[]): Promise<any>;
   handler(name: string): (...args: any[]) => Promise<any>;
   destroy(): void;
+  maxWorkers: number;
 }
 
 export interface CopyResults {
@@ -977,14 +1041,10 @@ export interface CopyResults {
 
 export interface SystemDetails {
   cpuModel: string;
-  cpus: number;
   freemem(): number;
-  platform: string;
-  runtime: string;
-  runtimeVersion: string;
+  platform: 'darwin' | 'windows' | 'linux' | '';
   release: string;
   totalmem: number;
-  tmpDir: string;
 }
 
 export interface BuildOnEvents {
@@ -1129,7 +1189,7 @@ export type CompilerEventBuildLog = 'buildLog';
 export type CompilerEventBuildNoChange = 'buildNoChange';
 
 export interface CompilerFileWatcher {
-  close(): void;
+  close(): void | Promise<void>;
 }
 
 export interface CompilerFsStats {
@@ -1561,32 +1621,42 @@ export interface EmulateViewport {
   isLandscape?: boolean;
 }
 
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | string;
+
 /**
  * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a
  * NodeJS based console logging and colors, and the web will use browser based
  * logs and colors.
  */
 export interface Logger {
-  colors?: boolean;
-  level: string;
-  debug(...msg: any[]): void;
-  info(...msg: any[]): void;
-  warn(...msg: any[]): void;
-  error(...msg: any[]): void;
-  createTimeSpan(startMsg: string, debug?: boolean, appendTo?: string[]): LoggerTimeSpan;
-  printDiagnostics(diagnostics: Diagnostic[], cwd?: string): void;
-  red(msg: string): string;
-  green(msg: string): string;
-  yellow(msg: string): string;
-  blue(msg: string): string;
-  magenta(msg: string): string;
-  cyan(msg: string): string;
-  gray(msg: string): string;
-  bold(msg: string): string;
-  dim(msg: string): string;
-  bgRed(msg: string): string;
-  buildLogFilePath: string;
-  writeLogs(append: boolean): void;
+  enableColors: (useColors: boolean) => void;
+  setLevel: (level: LogLevel) => void;
+  getLevel: () => LogLevel;
+  debug: (...msg: any[]) => void;
+  info: (...msg: any[]) => void;
+  warn: (...msg: any[]) => void;
+  error: (...msg: any[]) => void;
+  createTimeSpan: (startMsg: string, debug?: boolean, appendTo?: string[]) => LoggerTimeSpan;
+  printDiagnostics: (diagnostics: Diagnostic[], cwd?: string) => void;
+  red: (msg: string) => string;
+  green: (msg: string) => string;
+  yellow: (msg: string) => string;
+  blue: (msg: string) => string;
+  magenta: (msg: string) => string;
+  cyan: (msg: string) => string;
+  gray: (msg: string) => string;
+  bold: (msg: string) => string;
+  dim: (msg: string) => string;
+  bgRed: (msg: string) => string;
+  emoji: (e: string) => string;
+  setLogFilePath?: (p: string) => void;
+  writeLogs?: (append: boolean) => void;
+  createLineUpdater?: () => Promise<LoggerLineUpdater>;
+}
+
+export interface LoggerLineUpdater {
+  update(text: string): Promise<void>;
+  stop(): Promise<void>;
 }
 
 export interface LoggerTimeSpan {
@@ -1962,23 +2032,17 @@ export interface ResolveModuleOptions {
   packageJson?: boolean;
 }
 
-export interface PrerenderResults {
-  anchorUrls: string[];
-  diagnostics: Diagnostic[];
-  filePath: string;
+export interface PrerenderStartOptions {
+  hydrateAppFilePath: string;
+  componentGraph: BuildResultsComponentGraph;
+  srcIndexHtmlPath: string;
 }
 
-export interface PrerenderRequest {
-  baseUrl: string;
-  componentGraphPath: string;
-  devServerHostUrl: string;
-  hydrateAppFilePath: string;
-  isDebug: boolean;
-  prerenderConfigPath: string;
-  staticSite: boolean;
-  templateId: string;
-  url: string;
-  writeToFilePath: string;
+export interface PrerenderResults {
+  diagnostics: Diagnostic[];
+  urls: number;
+  duration: number;
+  average: number;
 }
 
 export interface OptimizeCssInput {
@@ -2067,4 +2131,45 @@ export interface FsWriteOptions {
   immediateWrite?: boolean;
   useCache?: boolean;
   outputTargetType?: string;
+}
+
+export interface Compiler {
+  build(): Promise<CompilerBuildResults>;
+  createWatcher(): Promise<CompilerWatcher>;
+  destroy(): Promise<void>;
+  sys: CompilerSystem;
+}
+
+export interface CompilerWatcher extends BuildOnEvents {
+  start(): Promise<WatcherCloseResults>;
+  close(): Promise<WatcherCloseResults>;
+  request(data: CompilerRequest): Promise<CompilerRequestResponse>;
+}
+
+export interface CompilerRequest {
+  path?: string;
+}
+
+export interface WatcherCloseResults {
+  exitCode: number;
+}
+
+export interface CompilerRequestResponse {
+  nodeModuleId: string;
+  nodeModuleVersion: string;
+  nodeResolvedPath: string;
+  cachePath: string;
+  cacheHit: boolean;
+  content: string;
+  status: number;
+}
+
+export interface DevServer extends BuildEmitEvents {
+  address: string;
+  basePath: string;
+  browserUrl: string;
+  protocol: string;
+  port: number;
+  root: string;
+  close(): Promise<void>;
 }

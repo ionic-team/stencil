@@ -4,7 +4,15 @@ import { isAbsolute, resolve } from 'path';
 import { normalizePath } from '@utils';
 import ts from 'typescript';
 
-export const parseModuleImport = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, dirPath: string, importNode: ts.ImportDeclaration) => {
+export const parseModuleImport = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  moduleFile: d.Module,
+  dirPath: string,
+  importNode: ts.ImportDeclaration,
+  resolveCollections: boolean,
+) => {
   if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
     let importPath = importNode.moduleSpecifier.text;
 
@@ -22,7 +30,7 @@ export const parseModuleImport = (config: d.Config, compilerCtx: d.CompilerCtx, 
       moduleFile.localImports.push(importPath);
     } else {
       // node resolve side effect import
-      addExternalImport(config, compilerCtx, buildCtx, moduleFile, moduleFile.sourceFilePath, importPath);
+      addExternalImport(config, compilerCtx, buildCtx, moduleFile, moduleFile.sourceFilePath, importPath, resolveCollections);
     }
   }
 };

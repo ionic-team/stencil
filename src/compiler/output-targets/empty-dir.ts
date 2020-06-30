@@ -10,7 +10,6 @@ import {
   isOutputTargetDistLazy,
 } from './output-utils';
 import { isString } from '@utils';
-import { join } from 'path';
 
 type OutputTargetEmptiable = d.OutputTargetDist | d.OutputTargetWww | d.OutputTargetDistLazyLoader | d.OutputTargetDistSelfContained | d.OutputTargetHydrate;
 
@@ -32,36 +31,14 @@ export const emptyOutputTargets = async (config: d.Config, compilerCtx: d.Compil
     .filter(isEmptable)
     .filter(o => o.empty === true)
     .map(o => o.dir || (o as any).esmDir)
-    .filter(isString)
-    .reduce((dirs, dir) => {
-      if (!dirs.includes(dir)) {
-        dirs.push(dir);
-      }
-      return dirs;
-    }, [] as string[]);
+    .filter(isString);
 
   if (cleanDirs.length === 0) {
     return;
   }
 
   const timeSpan = buildCtx.createTimeSpan(`cleaning ${cleanDirs.length} dirs`, true);
-  await Promise.all(cleanDirs.map(dir => emptyDir(compilerCtx, buildCtx, dir)));
+  await compilerCtx.fs.emptyDirs(cleanDirs);
+
   timeSpan.finish('cleaning dirs finished');
-};
-
-const emptyDir = async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, dir: string) => {
-  buildCtx.debug(`empty dir: ${dir}`);
-
-  // Check if there is a .gitkeep file
-  // We want to keep it so people don't have to readd manually
-  // to their projects each time.
-  const gitkeepPath = join(dir, '.gitkeep');
-  const existsGitkeep = await compilerCtx.fs.access(gitkeepPath);
-
-  await compilerCtx.fs.emptyDir(dir);
-
-  // If there was a .gitkeep file, add it again.
-  if (existsGitkeep) {
-    await compilerCtx.fs.writeFile(gitkeepPath, '', { immediateWrite: true });
-  }
 };

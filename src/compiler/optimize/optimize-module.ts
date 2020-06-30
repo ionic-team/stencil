@@ -1,6 +1,5 @@
-import { CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declarations';
+import { CompilerCtx, CompilerSystem, Config, Diagnostic, SourceTarget } from '../../declarations';
 import { minfyJsId } from '../../version';
-import { transpileToEs5 } from '../transpile/transpile-to-es5';
 import { minifyJs } from './minify-js';
 import { hasError } from '@utils';
 import { CompressOptions, MangleOptions, MinifyOptions } from 'terser';
@@ -15,7 +14,7 @@ interface OptimizeModuleOptions {
 }
 
 export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, opts: OptimizeModuleOptions) => {
-  if (!opts.minify && opts.sourceTarget !== 'es5') {
+  if ((!opts.minify && opts.sourceTarget !== 'es5') || opts.input === '') {
     return {
       output: opts.input,
       diagnostics: [] as Diagnostic[],
@@ -39,7 +38,7 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
 
     if (opts.sourceTarget !== 'es5' && opts.isCore) {
       if (!isDebug) {
-        compressOpts.passes = 3;
+        compressOpts.passes = 2;
         compressOpts.global_defs = {
           'supportsListenerOptions': true,
           'plt.$cssShim$': false,
@@ -67,6 +66,7 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
     }
     await compilerCtx.cache.put(cacheKey, results.output);
   }
+
   return results;
 };
 
@@ -116,24 +116,35 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
   return opts;
 };
 
-export const prepareModule = async (input: string, minifyOpts: MinifyOptions, transpile: boolean, inlineHelpers: boolean) => {
-  if (transpile) {
-    const transpile = await transpileToEs5(input, inlineHelpers);
-    if (hasError(transpile.diagnostics)) {
-      return {
-        sourceMap: null,
-        output: null,
-        diagnostics: transpile.diagnostics,
-      };
-    }
-    input = transpile.code;
-  }
-  if (minifyOpts) {
-    return minifyJs(input, minifyOpts);
-  }
-  return {
+export const prepareModule = async (sys: CompilerSystem, input: string, minifyOpts: MinifyOptions, transpileToEs5: boolean, inlineHelpers: boolean) => {
+  const results = {
+    sourceMap: null as string,
     output: input,
     diagnostics: [] as Diagnostic[],
-    sourceMap: null,
   };
+  if (transpileToEs5) {
+    const transpileResults = await sys.transpile(input, 'module.ts', {
+      sourceMap: false,
+      allowJs: true,
+      declaration: false,
+      target: 'es5',
+      module: 'esnext',
+      removeComments: false,
+      isolatedModules: true,
+      skipLibCheck: true,
+      noEmitHelpers: !inlineHelpers,
+      importHelpers: !inlineHelpers,
+    });
+
+    if (hasError(transpileResults.diagnostics)) {
+      results.diagnostics = transpileResults.diagnostics;
+      return results;
+    }
+    results.output = transpileResults.output;
+    results.sourceMap = transpileResults.sourceMap;
+  }
+  if (minifyOpts) {
+    return minifyJs(results.output, minifyOpts);
+  }
+  return results;
 };

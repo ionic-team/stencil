@@ -127,7 +127,7 @@ const getCustomElementBundleCustomTransformer = (config: d.Config, compilerCtx: 
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: null,
     componentMetadata: null,
-    currentDirectory: config.cwd,
+    currentDirectory: config.sys.getCurrentDirectory(),
     proxy: null,
     style: 'static',
   };

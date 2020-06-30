@@ -44,7 +44,7 @@ const getCustomElementTransformer = (config: d.Config, compilerCtx: d.CompilerCt
     coreImportPath: STENCIL_CORE_ID,
     componentExport: null,
     componentMetadata: null,
-    currentDirectory: config.cwd,
+    currentDirectory: config.sys.getCurrentDirectory(),
     module: 'esm',
     proxy: null,
     style: 'static',

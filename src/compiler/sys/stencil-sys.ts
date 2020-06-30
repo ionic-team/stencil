@@ -1,32 +1,38 @@
 import {
+  CompilerDependency,
   CompilerFileWatcherCallback,
-  CompilerSystemRemoveDirectoryOptions,
   CompilerFsStats,
   CompilerSystem,
   CompilerSystemMakeDirectoryOptions,
   CompilerSystemMakeDirectoryResults,
-  CopyResults,
-  CopyTask,
-  SystemDetails,
+  CompilerSystemRealpathResults,
+  CompilerSystemRemoveDirectoryOptions,
   CompilerSystemRemoveDirectoryResults,
-  CompilerSystemWriteFileResults,
   CompilerSystemRenameResults,
   CompilerSystemUnlinkResults,
-  CompilerSystemRealpathResults,
+  CompilerSystemWriteFileResults,
+  CopyResults,
+  CopyTask,
+  Logger,
 } from '../../declarations';
-import { basename, dirname } from 'path';
+import platformPath from 'path-browserify';
+import { basename, dirname, join } from 'path';
 import { buildEvents } from '../events';
+import { dependencies } from './dependencies';
+import { createLogger } from './logger/console-logger';
 import { createWebWorkerMainController } from './worker/web-worker-main';
-import { HAS_WEB_WORKER, IS_NODE_ENV, IS_WEB_WORKER_ENV, normalizePath, isRootPath } from '@utils';
+import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV, normalizePath, isRootPath } from '@utils';
 import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 
-export const createSystem = () => {
+export const createSystem = (c?: { logger?: Logger }) => {
+  const logger = c && c.logger ? c.logger : createLogger();
   const items = new Map<string, FsItem>();
   const destroys = new Set<() => Promise<void> | void>();
 
   const addDestory = (cb: () => void) => destroys.add(cb);
   const removeDestory = (cb: () => void) => destroys.delete(cb);
   const events = buildEvents();
+  const hardwareConcurrency = (IS_BROWSER_ENV && navigator.hardwareConcurrency) || 1;
 
   const destroy = async () => {
     const waits: Promise<void>[] = [];
@@ -37,7 +43,7 @@ export const createSystem = () => {
           waits.push(rtn);
         }
       } catch (e) {
-        console.error(`stencil sys destroy: ${e}`);
+        logger.error(`stencil sys destroy: ${e}`);
       }
     });
     await Promise.all(waits);
@@ -70,21 +76,14 @@ export const createSystem = () => {
 
   const encodeToBase64 = (str: string) => btoa(unescape(encodeURIComponent(str)));
 
-  const getCurrentDirectory = () => {
-    if (IS_NODE_ENV) {
-      return global['process'].cwd();
-    }
-    return '/';
-  };
+  const getCurrentDirectory = () => '/';
 
   const getCompilerExecutingPath = () => {
-    if (IS_NODE_ENV) {
-      return __filename;
-    }
     if (IS_WEB_WORKER_ENV) {
       return location.href;
     }
-    throw new Error('unable to find executing path');
+    const stencilDep = dependencies.find(dep => dep.name === '@stencil/core');
+    return sys.getRemoteModuleUrl({ moduleId: stencilDep.name, path: stencilDep.main });
   };
 
   const isSymbolicLink = async (_p: string) => false;
@@ -163,10 +162,10 @@ export const createSystem = () => {
   const realpathSync = (p: string) => {
     const results: CompilerSystemRealpathResults = {
       path: normalize(p),
-      error: null
-    }
+      error: null,
+    };
     return results;
-  }
+  };
 
   const realpath = async (p: string) => realpathSync(p);
 
@@ -485,12 +484,18 @@ export const createSystem = () => {
 
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
-  const generateContentHash = async (content: string) => {
+  const tmpdir = () => '/.tmp';
+
+  const tick = Promise.resolve();
+
+  const nextTick = (cb: () => void) => tick.then(cb);
+
+  const generateContentHash = async (content: string, hashLength: number) => {
     const arrayBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(content));
     const hashArray = Array.from(new Uint8Array(arrayBuffer)); // convert buffer to byte array
     let hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
-    if (typeof length === 'number') {
-      hashHex = hashHex.substr(0, length);
+    if (typeof hashLength === 'number') {
+      hashHex = hashHex.substr(0, hashLength);
     }
     return hashHex;
   };
@@ -501,8 +506,80 @@ export const createSystem = () => {
       dirPaths: [],
       filePaths: [],
     };
-    console.log('todo, copy task', copyTasks.length, srcDir);
+    logger.info('todo, copy task', copyTasks.length, srcDir);
     return results;
+  };
+
+  const ensureDirSync = (p: string) => {
+    const allDirs: string[] = [];
+
+    while (true) {
+      p = normalizePath(dirname(p));
+      if (typeof p === 'string' && p.length > 0 && !isRootPath(p)) {
+        allDirs.push(p);
+      } else {
+        break;
+      }
+    }
+
+    allDirs.reverse();
+
+    for (let i = 0; i < allDirs.length; i++) {
+      mkdirSync(allDirs[i]);
+    }
+  };
+
+  const fetchAndWrite = async (opts: { url: string; filePath: string }) => {
+    const s = await stat(opts.filePath);
+    if (!s) {
+      try {
+        const rsp = await fetch(opts.url);
+        if (rsp.ok) {
+          ensureDirSync(opts.filePath);
+          const content = await rsp.clone().text();
+          await writeFile(opts.filePath, content);
+          logger.debug('fetch', opts.url, opts.filePath);
+        } else {
+          logger.warn('fetch', opts.url, rsp.status);
+        }
+      } catch (e) {
+        logger.error(e);
+      }
+    }
+  };
+
+  const getLocalModulePath = (opts: { rootDir: string; moduleId: string; path: string }) => join(opts.rootDir, 'node_modules', opts.moduleId, opts.path);
+
+  const getRemoteModuleUrl = (opts: { moduleId: string; path: string; version?: string }) => {
+    const npmBaseUrl = 'https://cdn.jsdelivr.net/npm/';
+    const path = `${opts.moduleId}${opts.version ? '@' + opts.version : ''}/${opts.path}`;
+    return new URL(path, npmBaseUrl).href;
+  };
+
+  const ensureDependencies = async (opts: { rootDir: string; dependencies: CompilerDependency[] }) => {
+    const stencilDep = opts.dependencies.find(dep => dep.name === 'stencil');
+    const tsDep = opts.dependencies.find(dep => dep.name === 'typescript');
+
+    const timespace = logger.createTimeSpan(`ensureDependencies start`, true);
+
+    const deps = [
+      ...stencilDep.resources.map(p => ({
+        url: sys.getRemoteModuleUrl({ moduleId: stencilDep.name, version: stencilDep.version, path: p }),
+        filePath: normalizePath(sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: stencilDep.name, path: p })),
+      })),
+      {
+        url: sys.getRemoteModuleUrl({ moduleId: tsDep.name, version: tsDep.version, path: tsDep.main }),
+        filePath: normalizePath(sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: tsDep.name, path: tsDep.main })),
+      },
+      ...tsDep.resources.map(p => ({
+        url: sys.getRemoteModuleUrl({ moduleId: tsDep.name, version: tsDep.version, path: p }),
+        filePath: normalizePath(sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: tsDep.name, path: p })),
+      })),
+    ];
+
+    await Promise.all(deps.map(fetchAndWrite));
+
+    timespace.finish(`ensureDependencies end`);
   };
 
   const fileWatchTimeout = 32;
@@ -510,6 +587,8 @@ export const createSystem = () => {
   mkdirSync('/');
 
   const sys: CompilerSystem = {
+    name: 'in-memory',
+    version: '0.0.0',
     events,
     access,
     accessSync,
@@ -517,13 +596,19 @@ export const createSystem = () => {
     copyFile,
     destroy,
     encodeToBase64,
-    watchTimeout: fileWatchTimeout,
+    ensureDependencies,
+    exit: exitCode => logger.warn(`exit ${exitCode}`),
     getCurrentDirectory,
     getCompilerExecutingPath,
+    getLocalModulePath,
+    getRemoteModuleUrl,
+    hardwareConcurrency,
     isSymbolicLink,
     mkdir,
     mkdirSync,
+    nextTick,
     normalizePath: normalize,
+    platformPath,
     readdir,
     readdirSync,
     readFile,
@@ -537,15 +622,23 @@ export const createSystem = () => {
     rmdirSync,
     stat,
     statSync,
+    tmpdir,
     unlink,
     unlinkSync,
     watchDirectory,
     watchFile,
+    watchTimeout: fileWatchTimeout,
     writeFile,
     writeFileSync,
     generateContentHash,
-    createWorkerController: HAS_WEB_WORKER ? createWebWorkerMainController : null,
-    details: getDetails(),
+    createWorkerController: HAS_WEB_WORKER ? maxConcurrentWorkers => createWebWorkerMainController(sys, maxConcurrentWorkers) : null,
+    details: {
+      cpuModel: '',
+      freemem: () => 0,
+      platform: '',
+      release: '',
+      totalmem: 0,
+    },
     copy,
   };
 
@@ -562,20 +655,3 @@ interface FsItem {
   isDirectory: boolean;
   watcherCallbacks: CompilerFileWatcherCallback[];
 }
-
-const getDetails = () => {
-  const details: SystemDetails = {
-    cpuModel: '',
-    cpus: -1,
-    freemem() {
-      return 0;
-    },
-    platform: '',
-    release: '',
-    runtime: 'node',
-    runtimeVersion: '',
-    tmpDir: '/.tmp',
-    totalmem: -1,
-  };
-  return details;
-};

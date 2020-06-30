@@ -4,13 +4,21 @@ import { isString, parsePackageJson } from '@utils';
 import { parseCollection } from './parse-collection-module';
 import { tsResolveModuleNamePackageJsonPath } from '../../sys/typescript/typescript-resolve-module';
 
-export const addExternalImport = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, containingFile: string, moduleId: string) => {
+export const addExternalImport = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  moduleFile: d.Module,
+  containingFile: string,
+  moduleId: string,
+  resolveCollections: boolean,
+) => {
   if (!moduleFile.externalImports.includes(moduleId)) {
     moduleFile.externalImports.push(moduleId);
     moduleFile.externalImports.sort();
   }
 
-  if (compilerCtx.resolvedCollections.has(moduleId)) {
+  if (!resolveCollections || compilerCtx.resolvedCollections.has(moduleId)) {
     // we've already handled this collection moduleId before
     return;
   }
@@ -82,7 +90,7 @@ export const addExternalImport = (config: d.Config, compilerCtx: d.CompilerCtx, 
     // let's keep digging down and discover all of them
     collection.dependencies.forEach(dependencyModuleId => {
       const resolveFromDir = dirname(pkgJsonFilePath);
-      addExternalImport(config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId);
+      addExternalImport(config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId, resolveCollections);
     });
   }
 };

@@ -1,7 +1,7 @@
 import { isNumber, isString } from '@utils';
 import { MsgFromWorker, MsgToWorker, WorkerMsgHandler } from '../../../declarations';
 
-export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHandler) => {
+export const initWebWorkerThread = (msgHandler: WorkerMsgHandler) => {
   let isQueued = false;
 
   const tick = Promise.resolve();
@@ -10,7 +10,7 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
 
   const drainMsgQueueFromWorkerToMain = () => {
     isQueued = false;
-    selfWorker.postMessage(msgsFromWorkerQueue);
+    (self as any).postMessage(msgsFromWorkerQueue);
     msgsFromWorkerQueue.length = 0;
   };
 
@@ -57,7 +57,7 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
     }
   };
 
-  selfWorker.onmessage = ev => {
+  self.onmessage = (ev: MessageEvent) => {
     // message from the main thread
     const msgsFromMainToWorker: MsgToWorker[] = ev.data;
     if (Array.isArray(msgsFromMainToWorker)) {
@@ -67,7 +67,7 @@ export const initWebWorkerThread = (selfWorker: Worker, msgHandler: WorkerMsgHan
     }
   };
 
-  selfWorker.onerror = e => {
+  self.onerror = e => {
     // uncaught error occurred on the worker thread
     error(-1, e);
   };

@@ -1,31 +1,49 @@
-import { PlatformPath } from '../../../declarations';
+import * as d from '../../../declarations';
+import { normalizePath, IS_NODE_ENV, requireFunc } from '@utils';
 import pathBrowserify from 'path-browserify';
-import { IS_NODE_ENV, normalizePath, requireFunc } from '@utils';
 
-const path: PlatformPath = {} as any;
+export let basename: any;
+export let dirname: any;
+export let extname: any;
+export let isAbsolute: any;
+export let join: any;
+export let normalize: any;
+export let parse: any;
+export let relative: any;
+export let resolve: any;
+export let sep: any;
+export let delimiter: any;
+export let posix: any;
 
-if (IS_NODE_ENV) {
-  const nodePath = requireFunc('path');
-  Object.assign(path, nodePath);
+export const path: d.PlatformPath = {} as any;
 
-  path.join = (...args: string[]) => normalizePath(nodePath.join.apply(nodePath, args));
-  path.normalize = (...args: string[]) => normalizePath(nodePath.normalize.apply(nodePath, args));
-  path.relative = (...args: string[]) => normalizePath(nodePath.relative.apply(nodePath, args));
-  path.resolve = (...args: string[]) => normalizePath(nodePath.resolve.apply(nodePath, args));
-} else {
-  Object.assign(path, pathBrowserify);
-}
+export const setPlatformPath = (platformPath: d.PlatformPath) => {
+  if (!platformPath) {
+    platformPath = pathBrowserify;
+  }
 
-export const basename = path.basename;
-export const dirname = path.dirname;
-export const extname = path.extname;
-export const format = path.format;
-export const isAbsolute = path.isAbsolute;
-export const join = path.join;
-export const normalize = path.normalize;
-export const relative = path.relative;
-export const resolve = path.resolve;
-export const sep = path.sep;
-export const delimiter = path.delimiter;
-export const posix = path.posix;
+  Object.assign(path, platformPath);
+
+  const normalizeOrg = path.normalize;
+  const joinOrg = path.join;
+  const relativeOrg = path.relative;
+  const resolveOrg = path.resolve;
+
+  normalize = path.normalize = (...args: string[]) => normalizePath(normalizeOrg.apply(path, args));
+  join = path.join = (...args: string[]) => normalizePath(joinOrg.apply(path, args));
+  relative = path.relative = (...args: string[]) => normalizePath(relativeOrg.apply(path, args));
+  resolve = path.resolve = (...args: string[]) => normalizePath(resolveOrg.apply(path, args));
+
+  basename = path.basename;
+  dirname = path.dirname;
+  extname = path.extname;
+  isAbsolute = path.isAbsolute;
+  parse = path.parse;
+  sep = path.sep;
+  delimiter = path.delimiter;
+  posix = path.posix;
+};
+
+setPlatformPath(IS_NODE_ENV ? requireFunc('path') : pathBrowserify);
+
 export default path;

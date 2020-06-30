@@ -1,46 +1,56 @@
 #!/usr/bin/env node
 'use strict';
 
-try {
-  var minimumVersion = '10.13';
-  var recommendedVersion = '12.17';
-  var currentVersion = process.versions.node;
+var minimumVersion = '10.13';
+var recommendedVersion = '12.17';
+var currentVersion = process.versions.node;
 
-  function isNodeLT(v) {
-    var check = v.split('.').map(Number);
-    var node = currentVersion.split('.').map(Number);
-    return node[0] < check[0] || (node[0] === check[0] && node[1] < check[1]);
-  }
+function isNodeLT(v) {
+  var check = v.split('.').map(Number);
+  var node = currentVersion.split('.').map(Number);
+  return node[0] < check[0] || (node[0] === check[0] && node[1] < check[1]);
+}
 
-  if (isNodeLT(minimumVersion)) {
-    console.error(
-      '\nYour current version of Node is v' +
-        currentVersion +
-        ', however Stencil requires v' +
-        minimumVersion +
-        '.0 or greater. It is recommended to install latest version of Node (https://github.com/nodejs/Release).\n',
-    );
-    process.exit(1);
-  }
+if (isNodeLT(minimumVersion)) {
+  console.error(
+    '\nYour current version of Node is v' +
+      currentVersion +
+      ', however Stencil requires v' +
+      minimumVersion +
+      '.0 or greater. It is recommended to install latest version of Node (https://github.com/nodejs/Release).\n',
+  );
+  process.exit(1);
+}
 
-  if (isNodeLT(recommendedVersion)) {
-    console.warn(
-      '\nYour current version of Node is v' +
-        currentVersion +
-        ', however Stencil\'s recommendation is v' +
-        recommendedVersion +
-        '.0 or greater. Note that future versions of Stencil will eventually remove support for non-LTS Node versions (https://github.com/nodejs/Release).\n',
-    );
-  }
-} catch (e) {}
+if (isNodeLT(recommendedVersion)) {
+  console.warn(
+    '\nYour current version of Node is v' +
+      currentVersion +
+      ", however Stencil's recommendation is v" +
+      recommendedVersion +
+      '.0 or greater. Note that future versions of Stencil will eventually remove support for non-LTS Node versions (https://github.com/nodejs/Release).\n',
+  );
+}
 
 if (process.argv.indexOf('--next') > -1) {
   console.warn('\nThe next compiler is now the default and the --next flag is no longer needed.\n');
 }
 
-var cli = require('../cli/index.js');
+if (typeof globalThis === 'undefined') {
+  // globalThis not added until node 12
+  global.globalThis = global;
+}
+
+var cli = require('../cli/index.cjs.js');
+var nodeApi = require('../sys/node/index.js');
+var nodeLogger = nodeApi.createNodeLogger({ process: process });
+var nodeSys = nodeApi.createNodeSysWithWatch({ process: process, logger: nodeLogger });
+
+nodeApi.setupNodeProcess({ process: process, logger: nodeLogger });
+
 cli.run({
-  process: process,
-  logger: cli.createNodeLogger(process),
-  sys: cli.createNodeSystem(process)
+  args: process.argv.slice(2),
+  logger: nodeLogger,
+  sys: nodeSys,
+  checkVersion: nodeApi.checkVersion
 });

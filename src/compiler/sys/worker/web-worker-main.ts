@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { TASK_CANCELED_MSG } from '@utils';
 
-export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWorkers: number): d.WorkerMainController => {
+export const createWebWorkerMainController = (sys: d.CompilerSystem, maxConcurrentWorkers: number): d.WorkerMainController => {
   let msgIds = 0;
   let isDestroyed = false;
   let isQueued = false;
@@ -10,8 +10,7 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
   const tasks = new Map<number, d.CompilerWorkerTask>();
   const queuedSendMsgs: d.MsgToWorker[] = [];
   const workers: WorkerChild[] = [];
-  const hardwareConcurrency = navigator.hardwareConcurrency || 1;
-  const totalWorkers = Math.max(Math.min(maxConcurrentWorkers, hardwareConcurrency), 2) - 1;
+  const maxWorkers = Math.max(Math.min(maxConcurrentWorkers, sys.hardwareConcurrency), 2) - 1;
   const tick = Promise.resolve();
 
   const onMsgsFromWorker = (worker: WorkerChild, ev: MessageEvent) => {
@@ -42,10 +41,11 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
     }
   };
 
-  const onError = (e: ErrorEvent) => console.error(e);
+  const onWorkerError = (e: ErrorEvent) => console.error(e);
 
-  const createWebWorkerMain = () => {
+  const createWorkerMain = () => {
     let worker: Worker = null;
+    const workerUrl = sys.getCompilerExecutingPath();
     const workerOpts: WorkerOptions = {
       name: `stencil.worker.${workerIds++}`,
     };
@@ -66,7 +66,7 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
       activeTasks: 0,
       sendQueue: [],
     };
-    worker.onerror = onError;
+    worker.onerror = onWorkerError;
     worker.onmessage = ev => onMsgsFromWorker(workerChild, ev);
 
     return workerChild;
@@ -80,30 +80,30 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
   };
 
   const queueMsgToWorker = (msg: d.MsgToWorker) => {
-    let theChoseOne: WorkerChild;
+    let theChosenOne: WorkerChild;
 
     if (workers.length > 0) {
-      theChoseOne = workers[0];
+      theChosenOne = workers[0];
 
-      if (totalWorkers > 1) {
+      if (maxWorkers > 1) {
         for (const worker of workers) {
-          if (worker.activeTasks < theChoseOne.activeTasks) {
-            theChoseOne = worker;
+          if (worker.activeTasks < theChosenOne.activeTasks) {
+            theChosenOne = worker;
           }
         }
 
-        if (theChoseOne.activeTasks > 0 && workers.length < totalWorkers) {
-          theChoseOne = createWebWorkerMain();
-          workers.push(theChoseOne);
+        if (theChosenOne.activeTasks > 0 && workers.length < maxWorkers) {
+          theChosenOne = createWorkerMain();
+          workers.push(theChosenOne);
         }
       }
     } else {
-      theChoseOne = createWebWorkerMain();
-      workers.push(theChoseOne);
+      theChosenOne = createWorkerMain();
+      workers.push(theChosenOne);
     }
 
-    theChoseOne.activeTasks++;
-    theChoseOne.sendQueue.push(msg);
+    theChosenOne.activeTasks++;
+    theChosenOne.sendQueue.push(msg);
   };
 
   const flushSendQueue = () => {
@@ -145,7 +145,7 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
   };
 
   const handler = (name: string) => {
-    return function(...args: any[]) {
+    return function (...args: any[]) {
       return send(name, ...args);
     };
   };
@@ -154,6 +154,7 @@ export const createWebWorkerMainController = (workerUrl: string, maxConcurrentWo
     send,
     destroy,
     handler,
+    maxWorkers,
   };
 };
 

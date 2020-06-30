@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { HOST_CONFIG_FILENAME } from '../../prerender/host-config';
+import { HOST_CONFIG_FILENAME } from '../prerender/host-config';
 import { isAbsolute, join } from 'path';
 import { isString } from '@utils';
 

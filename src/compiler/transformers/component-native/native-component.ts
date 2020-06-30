@@ -38,9 +38,9 @@ const updateNativeHostComponentMembers = (transformOpts: d.TransformOptions, cla
   addNativeConnectedCallback(classMembers, cmp);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);
-  
+
   if (cmp.isPlain) {
-    addNativeComponentMeta(classMembers, cmp)
+    addNativeComponentMeta(classMembers, cmp);
   }
 
   if (transformOpts.style === 'static') {

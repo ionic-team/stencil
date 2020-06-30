@@ -1,5 +1,6 @@
 import * as d from '../../../../declarations';
 import { getNodeModuleFetchUrl, getStencilModuleUrl, getStencilRootUrl, isExternalUrl, skipFilePathFetch } from '../fetch-utils';
+import { createSystem } from '../../stencil-sys';
 
 describe('fetch module', () => {
   let compilerExe: string;
@@ -62,7 +63,7 @@ describe('getNodeModuleFetchUrl', () => {
   const pkgVersions = new Map<string, string>();
   const config: d.Config = {
     rootDir: '/my-app/',
-    sys: {} as any,
+    sys: createSystem(),
   };
   const sys = config.sys;
 

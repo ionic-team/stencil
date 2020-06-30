@@ -23,7 +23,7 @@ export const transformToNativeComponentText = (config: d.Config, compilerCtx: d.
       coreImportPath: STENCIL_CORE_ID,
       componentExport: null,
       componentMetadata: null,
-      currentDirectory: config.cwd,
+      currentDirectory: config.sys.getCurrentDirectory(),
       proxy: null,
       style: 'static',
     };

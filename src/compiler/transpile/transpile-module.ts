@@ -1,12 +1,12 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../build/compiler-ctx';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
-import { isString, loadTypeScriptDiagnostics, normalizePath } from '@utils';
-import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
+import { createLogger } from '../sys/logger/console-logger';
+import { isNumber, isString, loadTypeScriptDiagnostics, normalizePath, getCurrentDirectory } from '@utils';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
-import { TestingLogger } from '../../testing/testing-logger';
+import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
 import ts from 'typescript';
 
@@ -16,8 +16,8 @@ import ts from 'typescript';
 export const transpileModule = (config: d.Config, input: string, transformOpts: d.TransformOptions) => {
   if (!config.logger) {
     config = {
-      logger: new TestingLogger(),
       ...config,
+      logger: createLogger(),
     };
   }
   const compilerCtx = new CompilerContext();
@@ -33,13 +33,12 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     sourceFilePath = tsCompilerOptions.jsx ? `module.tsx` : `module.ts`;
   }
 
-  const results: d.TranspileToEs5Results = {
+  const results: d.TranspileModuleResults = {
     sourceFilePath: sourceFilePath,
     code: null,
     map: null,
     diagnostics: [],
     moduleFile: null,
-    build: {},
   };
 
   if (transformOpts.module === 'cjs') {
@@ -80,8 +79,8 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     getDefaultLibFileName: () => `lib.d.ts`,
     useCaseSensitiveFileNames: () => false,
     getCanonicalFileName: fileName => fileName,
-    getCurrentDirectory: () => transformOpts.currentDirectory || '',
-    getNewLine: () => ts.sys.newLine,
+    getCurrentDirectory: () => transformOpts.currentDirectory || getCurrentDirectory(),
+    getNewLine: () => ts.sys.newLine || '\n',
     fileExists: fileName => normalizePath(fileName) === normalizePath(sourceFilePath),
     readFile: () => '',
     directoryExists: () => true,
@@ -120,33 +119,10 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
 };
 
 const getScriptTargetKind = (transformOpts: d.TransformOptions) => {
-  switch (transformOpts.target) {
-    case 'esnext': {
-      return ts.ScriptTarget.ESNext;
-    }
-    case 'es2020': {
-      return ts.ScriptTarget.ES2020;
-    }
-    case 'es2019': {
-      return ts.ScriptTarget.ES2019;
-    }
-    case 'es2018': {
-      return ts.ScriptTarget.ES2018;
-    }
-    case 'es2017': {
-      return ts.ScriptTarget.ES2017;
-    }
-    case 'es2016': {
-      return ts.ScriptTarget.ES2016;
-    }
-    case 'es2015': {
-      return ts.ScriptTarget.ES2015;
-    }
-    case 'es5': {
-      return ts.ScriptTarget.ES5;
-    }
-    default: {
-      return ts.ScriptTarget.Latest;
-    }
+  const target = transformOpts.target && transformOpts.target.toUpperCase();
+  if (isNumber((ts.ScriptTarget as any)[target])) {
+    return (ts.ScriptTarget as any)[target];
   }
+  // ESNext and Latest are the same
+  return ts.ScriptTarget.Latest;
 };

@@ -39,7 +39,7 @@ const getHydrateCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCt
     coreImportPath: STENCIL_INTERNAL_HYDRATE_ID,
     componentExport: null,
     componentMetadata: null,
-    currentDirectory: config.cwd,
+    currentDirectory: config.sys.getCurrentDirectory(),
     proxy: null,
     style: 'static',
   };

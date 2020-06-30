@@ -1,100 +1,110 @@
-import * as d from '../../../declarations';
-import { catchError, IS_GLOBAL_THIS_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV, isFunction, requireFunc, IS_FETCH_ENV } from '@utils';
-import { httpFetch } from '../fetch/fetch-utils';
-import { getRemoteTypeScriptUrl } from '../dependencies';
-import { patchTsSystemUtils } from './typescript-sys';
+import type * as d from '../../../declarations';
+import { isFunction, IS_NODE_ENV, IS_BROWSER_ENV, IS_WEB_WORKER_ENV, IS_DENO_ENV } from '@utils';
+import { createSystem } from '../stencil-sys';
+import { dependencies } from '../dependencies';
+import { denoLoadTypeScript } from '../../../sys/deno/deno-load-typescript';
+import { nodeLoadTypeScript } from '../../../sys/node/node-load-typescript';
+import { patchImportedTsSys as patchRemoteTsSys } from './typescript-patch';
 import ts from 'typescript';
 
-export const loadTypescript = async (sys: d.CompilerSystem, diagnostics: d.Diagnostic[], typescriptPath: string) => {
-  const tsSync = loadTypescriptSync(sys, diagnostics, typescriptPath);
-  if (tsSync != null) {
-    return tsSync;
+export const loadTypescript = (sys: d.CompilerSystem, rootDir: string, typeScriptPath: string, sync: boolean): TypeScriptModule | Promise<TypeScriptModule> => {
+  // try sync load typescript methods first
+
+  if ((ts as TypeScriptModule).__loaded) {
+    // already loaded
+    return ts as TypeScriptModule;
   }
 
-  if (IS_FETCH_ENV) {
-    try {
-      // browser main thread
-      const tsUrl = typescriptPath || getRemoteTypeScriptUrl(sys);
-      const rsp = await httpFetch(sys, tsUrl);
-      const content = await rsp.text();
-      const getTsFunction = new Function(content + ';return ts;');
-      const fetchTs = getLoadedTs(getTsFunction(), 'fetch', tsUrl);
-      if (fetchTs) {
-        patchImportedTsSys(fetchTs, tsUrl);
-        return fetchTs;
-      }
-    } catch (e) {
-      catchError(diagnostics, e);
+  // check if the global object has "ts" on it
+  // could be browser main thread, browser web worker, or nodejs global
+  const globalThisTs = getLoadedTs((globalThis as any).ts);
+  if (globalThisTs) {
+    return globalThisTs;
+  }
+
+  if (IS_NODE_ENV) {
+    const nodeTs = getLoadedTs(nodeLoadTypeScript(typeScriptPath));
+    if (nodeTs) {
+      return nodeTs;
     }
   }
 
-  return null;
-};
+  const tsUrl = getTsUrl(sys, typeScriptPath);
 
-export const loadTypescriptSync = (sys: d.CompilerSystem, diagnostics: d.Diagnostic[], typescriptPath: string): TypeScriptModule => {
-  try {
-    if ((ts as TypeScriptModule).__loaded) {
-      // already loaded
-      return ts as TypeScriptModule;
+  if (IS_WEB_WORKER_ENV) {
+    const webWorkerTs = getLoadedTs(webWorkerLoadTypeScript(tsUrl));
+    if (webWorkerTs) {
+      patchRemoteTsSys(webWorkerTs, tsUrl);
+      return webWorkerTs;
     }
-
-    if (IS_GLOBAL_THIS_ENV) {
-      // check if the global object has "ts" on it
-      // could be browser main thread, browser web worker, or nodejs global
-      const globalThisTs = getLoadedTs((globalThis as any).ts, 'globalThis', typescriptPath);
-      if (globalThisTs) {
-        return globalThisTs;
-      }
-    }
-
-    if (IS_NODE_ENV) {
-      // NodeJS
-      const nodeModuleId = typescriptPath || 'typescript';
-      const nodeTs = getLoadedTs(requireFunc(nodeModuleId), 'nodejs', nodeModuleId);
-      if (nodeTs) {
-        return nodeTs;
-      }
-    }
-
-    if (IS_WEB_WORKER_ENV) {
-      // browser web worker
-      // doing this before the globalThis check cuz we'd
-      // rather ensure we're using a valid typescript version
-      const tsUrl = typescriptPath || getRemoteTypeScriptUrl(sys);
-      // importScripts() will be synchronous within a web worker
-      (self as any).importScripts(tsUrl);
-      const webWorkerTs = getLoadedTs((self as any).ts, 'importScripts', tsUrl);
-      if (webWorkerTs) {
-        patchImportedTsSys(webWorkerTs, tsUrl);
-        return webWorkerTs;
-      }
-    }
-  } catch (e) {
-    catchError(diagnostics, e);
   }
-  return null;
+
+  if (sync) {
+    throw new Error(`TypeScript "ts" must already be available on the global scope`);
+  }
+
+  // async at this point
+  if (!(ts as TypeScriptModule).__promise) {
+    if (IS_DENO_ENV) {
+      (ts as TypeScriptModule).__promise = denoLoadTypeScript(sys, rootDir, typeScriptPath);
+    }
+
+    if (IS_BROWSER_ENV) {
+      (ts as TypeScriptModule).__promise = browserMainLoadTypeScript(tsUrl);
+    }
+
+    throw new Error(`Unable to load TypeScript`);
+  }
+
+  return (ts as TypeScriptModule).__promise;
 };
 
-const patchImportedTsSys = (importedTs: TypeScriptModule, tsUrl: string) => {
-  importedTs.sys = importedTs.sys || ({} as any);
-  importedTs.sys.getExecutingFilePath = () => tsUrl;
-  patchTsSystemUtils(importedTs.sys);
+const webWorkerLoadTypeScript = (tsUrl: string) => {
+  // browser web worker
+  // doing this before the globalThis check cuz we'd
+  // rather ensure we're using a valid typescript version
+  // importScripts() will be synchronous within a web worker
+  (self as any).importScripts(tsUrl);
+  return (self as any).ts;
 };
 
-const getLoadedTs = (loadedTs: TypeScriptModule, source: string, typescriptPath: string) => {
+const browserMainLoadTypeScript = (tsUrl: string): any =>
+  // browser main thread
+  new Promise((resolve, reject) => {
+    const scriptElm = document.createElement('script');
+    scriptElm.onload = () => {
+      const browserTs = getLoadedTs((globalThis as any).ts);
+      if (browserTs) {
+        resolve(patchRemoteTsSys(browserTs, tsUrl));
+      } else {
+        reject(`Unable to load TypeScript via browser script`);
+      }
+    };
+    scriptElm.onerror = ev => reject(ev);
+    scriptElm.src = tsUrl;
+  });
+
+const getTsUrl = (sys: d.CompilerSystem, typeScriptPath: string) => {
+  if (typeScriptPath) {
+    return typeScriptPath;
+  }
+  sys = sys || createSystem();
+  const tsDep = dependencies.find(dep => dep.name === 'typescript');
+  return sys.getRemoteModuleUrl({ moduleId: tsDep.name, version: tsDep.version, path: tsDep.main });
+};
+
+const getLoadedTs = (loadedTs: TypeScriptModule) => {
   if (loadedTs != null && isFunction(loadedTs.transpileModule)) {
     loadedTs.__loaded = true;
-    loadedTs.__source = source;
-    loadedTs.__path = typescriptPath;
+    Object.assign(ts, loadedTs);
     return loadedTs;
   }
   return null;
 };
 
-type TS = typeof ts;
+type TypeScript = typeof ts;
 
-export interface TypeScriptModule extends TS {
+export interface TypeScriptModule extends TypeScript {
   __loaded: boolean;
-  __source: string;
-  __path: string;
+  __promise?: Promise<TypeScriptModule>;
 }

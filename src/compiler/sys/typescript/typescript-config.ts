@@ -1,9 +1,9 @@
 import * as d from '../../../declarations';
 import { buildError, buildWarn, catchError, isString, loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { isAbsolute, join, relative } from 'path';
-import tsTypes from 'typescript';
+import type TypeScript from 'typescript';
 
-export const validateTsConfig = async (ts: typeof tsTypes, config: d.Config, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
+export const validateTsConfig = async (ts: typeof TypeScript, config: d.Config, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
   const tsconfig = {
     path: null as string,
     compilerOptions: null as any,
@@ -18,15 +18,16 @@ export const validateTsConfig = async (ts: typeof tsTypes, config: d.Config, sys
       diagnostic.messageText = `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "${config.rootDir}" directory.`;
     } else {
       tsconfig.path = readTsConfig.path;
-      const host: any = {
+      const host: TypeScript.ParseConfigFileHost = {
         ...ts.sys,
-        readFile: (p: string) => {
+        readFile: p => {
           if (p === tsconfig.path) {
             return readTsConfig.content;
           }
           return sys.readFileSync(p);
         },
-        readDirectory: (p: string) => sys.readdirSync(p),
+        readDirectory: p => sys.readdirSync(p),
+        fileExists: p => sys.accessSync(p),
         onUnRecoverableConfigFileDiagnostic: (e: any) => console.error(e),
       };
 

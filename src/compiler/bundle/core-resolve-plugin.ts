@@ -1,7 +1,6 @@
 import * as d from '../../declarations';
 import { dirname, join } from 'path';
 import { fetchModuleAsync } from '../sys/fetch/fetch-module-async';
-import { getNodeModulePath } from '../sys/resolve/resolve-utils';
 import { HYDRATED_CSS } from '../../runtime/runtime-constants';
 import { isExternalUrl, getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
 import { normalizePath, normalizeFsPath } from '@utils';
@@ -28,9 +27,9 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
     };
   }
   const compilerExe = config.sys.getCompilerExecutingPath();
-  const internalClient = getStencilInternalModule(config.rootDir, compilerExe, 'client/index.js');
-  const internalClientPatch = getStencilInternalModule(config.rootDir, compilerExe, 'client/patch.js');
-  const internalHydrate = getStencilInternalModule(config.rootDir, compilerExe, 'hydrate/index.js');
+  const internalClient = getStencilInternalModule(config, compilerExe, 'client/index.js');
+  const internalClientPatch = getStencilInternalModule(config, compilerExe, 'client/patch.js');
+  const internalHydrate = getStencilInternalModule(config, compilerExe, 'hydrate/index.js');
 
   return {
     name: 'coreResolvePlugin',
@@ -118,9 +117,9 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
   };
 };
 
-export const getStencilInternalModule = (rootDir: string, compilerExe: string, internalModule: string) => {
+export const getStencilInternalModule = (config: d.Config, compilerExe: string, internalModule: string) => {
   if (isExternalUrl(compilerExe)) {
-    return getNodeModulePath(rootDir, '@stencil', 'core', 'internal', internalModule);
+    return normalizePath(config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId: '@stencil/core', path: 'internal/' + internalModule }));
   }
 
   const compilerExeDir = dirname(compilerExe);

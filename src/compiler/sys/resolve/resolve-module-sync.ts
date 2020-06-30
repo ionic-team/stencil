@@ -1,8 +1,8 @@
 import * as d from '../../../declarations';
-import { COMMON_DIR_FILENAMES, getNodeModulePath, getCommonDirName, isCommonDirModuleFile, shouldFetchModule } from './resolve-utils';
+import { COMMON_DIR_FILENAMES, getCommonDirName, isCommonDirModuleFile, shouldFetchModule } from './resolve-utils';
 import { fetchModuleSync } from '../fetch/fetch-module-sync';
-import { getCommonDirUrl, getRemotePackageJsonUrl, getNodeModuleFetchUrl, packageVersions } from '../fetch/fetch-utils';
-import { isString, IS_WEB_WORKER_ENV, normalizeFsPath } from '@utils';
+import { getCommonDirUrl, getNodeModuleFetchUrl, packageVersions } from '../fetch/fetch-utils';
+import { isString, IS_WEB_WORKER_ENV, normalizeFsPath, normalizePath } from '@utils';
 import { basename, dirname } from 'path';
 import resolve, { SyncOpts } from 'resolve';
 
@@ -25,10 +25,10 @@ export const resolveRemoteModuleIdSync = (config: d.Config, inMemoryFs: d.InMemo
 };
 
 const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string) => {
-  const filePath = getNodeModulePath(config.rootDir, moduleId, 'package.json');
+  const filePath = normalizePath(config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId, path: 'package.json' }));
   let pkgJson = inMemoryFs.readFileSync(filePath);
   if (!isString(pkgJson) && IS_WEB_WORKER_ENV) {
-    const url = getRemotePackageJsonUrl(config.sys, moduleId);
+    const url = config.sys.getRemoteModuleUrl({ moduleId, path: 'package.json' });
     pkgJson = fetchModuleSync(config.sys, inMemoryFs, packageVersions, url, filePath);
   }
   if (typeof pkgJson === 'string') {

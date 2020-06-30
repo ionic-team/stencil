@@ -15,6 +15,8 @@ import {
   PlatformPath,
   TranspileOptions,
   TranspileResults,
+  PrerenderStartOptions,
+  PrerenderResults,
 } from '@stencil/core/internal';
 
 /**
@@ -54,6 +56,8 @@ export declare const transpileSync: (code: string, opts?: TranspileOptions) => T
  * config provided should already be created using the `loadConfig({...})` method.
  */
 export declare const createCompiler: (config: Config) => Promise<Compiler>;
+
+export declare const createPrerenderer: (config: Config) => Promise<{ start: (opts: PrerenderStartOptions) => Promise<PrerenderResults> }>;
 
 /**
  * The compiler uses a `CompilerSystem` instance to access any file system reads and writes.
@@ -95,7 +99,6 @@ export declare const optimizeJs: (jsInput?: OptimizeJsInput) => Promise<Optimize
 
 /**
  * Utility of the `path` API providied by NodeJS, but capable of running in any environment.
- * This `path` API is only the POSIX version: https://nodejs.org/api/path.html
  */
 export declare const path: PlatformPath;
 
@@ -103,6 +106,23 @@ export declare const path: PlatformPath;
  * Current version of `@stencil/core`.
  */
 export declare const version: string;
+
+export declare const versions: {
+  stencil: string;
+  typescript: string;
+  rollup: string;
+  terser: string;
+};
+
+/**
+ * Current version's emoji :)
+ */
+export declare const vermoji: string;
+
+/**
+ * Compiler's unique build ID.
+ */
+export declare const buildId: string;
 
 export {
   CompileScriptMinifyOptions,
@@ -122,9 +142,6 @@ export {
   TranspileResults,
 };
 
-// Deprecated
-import { TranspileOptions as CompileOptions, TranspileResults as CompileResults } from '@stencil/core/internal';
-
 /**
  * @deprecated Use `transpile()` instead.
  */
@@ -135,9 +152,12 @@ export declare const compile: (code: string, opts?: any) => Promise<any>;
  */
 export declare const compileSync: (code: string, opts?: any) => any;
 
-export {
-  /** @deprecated Use TranspileOptions instead */
-  CompileOptions,
-  /** @deprecated Use TranspileResults instead */
-  CompileResults,
-};
+/**
+ * @deprecated Use TranspileOptions instead
+ */
+export type CompileOptions = any;
+
+/**
+ * @deprecated Use TranspileResults instead
+ */
+export type CompileResults = any;

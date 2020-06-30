@@ -2,7 +2,7 @@ import * as d from '../../../../declarations';
 import { createInMemoryFs } from '../../../sys/in-memory-fs';
 import { createSystem } from '../../../sys/stencil-sys';
 import { ensureExtension } from '../typescript-resolve-module';
-import { getStencilInternalDtsPath } from '../../resolve/resolve-utils';
+import { normalizePath } from '../../../../utils';
 import { patchedTsResolveModule } from '../typescript-resolve-module';
 import ts from 'typescript';
 
@@ -13,7 +13,7 @@ describe('typescript resolve module', () => {
 
   beforeEach(() => {
     config.rootDir = '/some/path';
-    sys = createSystem();
+    config.sys = sys = createSystem();
     inMemoryFs = createInMemoryFs(sys);
   });
 
@@ -42,7 +42,7 @@ describe('typescript resolve module', () => {
 
   it('resolve ./stencil-private.d.ts to full dts path when imported by internal dts url', () => {
     const moduleName = './stencil-private';
-    const containingFile = getStencilInternalDtsPath(config.rootDir);
+    const containingFile = normalizePath(sys.getLocalModulePath({ rootDir: config.rootDir, moduleId: '@stencil/core', path: 'internal/index.d.ts' }));
     expect(containingFile).toBe('/some/path/node_modules/@stencil/core/internal/index.d.ts');
 
     const r = patchedTsResolveModule(config, inMemoryFs, moduleName, containingFile);

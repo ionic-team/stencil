@@ -32,7 +32,7 @@ describe('validate-package-json', () => {
   describe('files', () => {
     it('should validate files "dist/"', async () => {
       const distPath = path.join(root, 'dist');
-      await compilerCtx.fs.emptyDir(distPath);
+      await compilerCtx.fs.emptyDirs([distPath]);
       await compilerCtx.fs.commit();
       buildCtx.packageJson.files = ['dist/'];
       await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
@@ -41,7 +41,7 @@ describe('validate-package-json', () => {
 
     it('should validate files "./dist/"', async () => {
       const distPath = path.join(root, 'dist');
-      await compilerCtx.fs.emptyDir(distPath);
+      await compilerCtx.fs.emptyDirs([distPath]);
       await compilerCtx.fs.commit();
       buildCtx.packageJson.files = ['./dist/'];
       await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
@@ -50,7 +50,7 @@ describe('validate-package-json', () => {
 
     it('should validate files "./dist"', async () => {
       const distPath = path.join(root, 'dist');
-      await compilerCtx.fs.emptyDir(distPath);
+      await compilerCtx.fs.emptyDirs([distPath]);
       await compilerCtx.fs.commit();
       buildCtx.packageJson.files = ['./dist'];
       await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);
@@ -59,7 +59,7 @@ describe('validate-package-json', () => {
 
     it('should validate files "dist"', async () => {
       const distPath = path.join(root, 'dist');
-      await compilerCtx.fs.emptyDir(distPath);
+      await compilerCtx.fs.emptyDirs([distPath]);
       await compilerCtx.fs.commit();
       buildCtx.packageJson.files = ['dist'];
       await v.validatePackageFiles(config, compilerCtx, buildCtx, outputTarget);

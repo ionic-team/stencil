@@ -39,7 +39,7 @@ export const updateModule = (
       parseStaticComponentMeta(compilerCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap);
       return;
     } else if (ts.isImportDeclaration(node)) {
-      parseModuleImport(config, compilerCtx, buildCtx, moduleFile, srcDirPath, node);
+      parseModuleImport(config, compilerCtx, buildCtx, moduleFile, srcDirPath, node, true);
       return;
     } else if (ts.isCallExpression(node)) {
       parseCallExpression(moduleFile, node);
