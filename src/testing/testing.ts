@@ -4,7 +4,7 @@ import { hasError } from '@utils';
 import { runJest } from './jest/jest-runner';
 import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
-import { startServer } from '@stencil/core/dev-server';
+import { start } from '@stencil/core/dev-server';
 import * as puppeteer from 'puppeteer';
 
 export const createTesting = async (config: Config): Promise<Testing> => {
@@ -72,7 +72,7 @@ export const createTesting = async (config: Config): Promise<Testing> => {
         config.devServer.gzip = false;
         config.devServer.reloadStrategy = null;
 
-        const startupResults = await Promise.all([startServer(config.devServer, config.logger), startPuppeteerBrowser(config)]);
+        const startupResults = await Promise.all([start(config.devServer, config.logger), startPuppeteerBrowser(config)]);
 
         devServer = startupResults[0];
         puppeteerBrowser = startupResults[1];

@@ -1,32 +1,37 @@
-import { Diagnostic, Logger, LoggerTimeSpan } from '@stencil/core/internal';
+import { Diagnostic, Logger, LogLevel, LoggerTimeSpan } from '@stencil/core/internal';
 
 export class TestingLogger implements Logger {
-  colors = false;
-  enable = false;
-  level: string;
+  private isEnabled = false;
+
+  setLevel(_level: LogLevel) {}
+  getLevel(): LogLevel {
+    return 'info';
+  }
+  enableColors(_useColors: boolean) {}
+  emoji(_: string) {
+    return '';
+  }
   info(...msg: any[]) {
-    if (this.enable) {
+    if (this.isEnabled) {
       console.log.apply(console, msg);
     }
   }
   warn(...msg: any[]) {
-    if (this.enable) {
+    if (this.isEnabled) {
       console.warn.apply(console, msg);
     }
   }
   error(...msg: any[]) {
-    if (this.enable) {
+    if (this.isEnabled) {
       console.error.apply(console, msg);
     }
   }
   debug(...msg: any[]) {
-    if (this.enable) {
+    if (this.isEnabled) {
       console.log.apply(console, msg);
     }
   }
-  color(_msg: string, _color: 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan' | 'gray') {
-    /* */
-  }
+  color(_msg: string, _color: 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan' | 'gray') {}
   red(msg: string) {
     return msg;
   }
@@ -67,11 +72,5 @@ export class TestingLogger implements Logger {
       },
     };
   }
-  printDiagnostics(_diagnostics: Diagnostic[]) {
-    /* */
-  }
-  buildLogFilePath: string = null;
-  writeLogs(_: boolean) {
-    /**/
-  }
+  printDiagnostics(_diagnostics: Diagnostic[]) {}
 }

@@ -1,16 +1,16 @@
 import { createSystem } from '../compiler/sys/stencil-sys';
 import { createHash } from 'crypto';
+import path from 'path';
 
 export const createTestingSystem = () => {
   let diskReads = 0;
   let diskWrites = 0;
   const sys = createSystem();
 
+  sys.platformPath = path;
+
   sys.generateContentHash = (content, length) => {
-    let hash = createHash('sha1')
-      .update(content)
-      .digest('hex')
-      .toLowerCase();
+    let hash = createHash('sha1').update(content).digest('hex').toLowerCase();
 
     if (typeof length === 'number') {
       hash = hash.substr(0, length);

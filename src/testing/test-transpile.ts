@@ -17,7 +17,7 @@ export function transpile(input: string, opts: TranspileOptions = {}): Transpile
   };
 
   try {
-    const v = process.version.replace('v', '').split('.');
+    const v = process.versions.node.split('.');
     if (parseInt(v[0], 10) >= 10) {
       // let's go with ES2017 for node 10 and above
       opts.target = 'es2017';

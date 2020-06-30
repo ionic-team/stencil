@@ -1,4 +1,4 @@
-import { MockHeaders, MockRequestInfo, MockResponse } from '@stencil/core/mock-doc';
+import { MockHeaders, MockRequestInfo, MockResponse } from '../mock-doc';
 
 const mockedResponses = new Map<string, MockedResponseData>();
 
@@ -158,4 +158,4 @@ interface MockedResponseData {
 
 const FETCH_DEFAULT_PATH = '/mock-fetch-data';
 
-export { MockHeaders, MockRequest, MockRequestInit, MockRequestInfo, MockResponse, MockResponseInit } from '@stencil/core/mock-doc';
+export { MockHeaders, MockRequest, MockRequestInit, MockRequestInfo, MockResponse, MockResponseInit } from '../mock-doc';

@@ -9,17 +9,18 @@ import { TestingLogger } from './testing-logger';
 import path from 'path';
 
 export function mockConfig(sys?: CompilerSystem) {
+  const rootDir = path.resolve('/');
+
   if (!sys) {
     sys = createTestingSystem();
   }
+  sys.getCurrentDirectory = () => rootDir;
 
-  const rootDir = path.resolve('/');
   const config: Config = {
     _isTesting: true,
 
     namespace: 'Testing',
     rootDir: rootDir,
-    cwd: rootDir,
     globalScript: null,
     devMode: true,
     enableCache: false,
@@ -47,6 +48,9 @@ export function mockConfig(sys?: CompilerSystem) {
 }
 
 export function mockCompilerCtx(config?: Config) {
+  if (!config) {
+    config = mockConfig();
+  }
   const compilerCtx: CompilerCtx = {
     version: 1,
     activeBuildId: 0,
@@ -83,7 +87,7 @@ export function mockCompilerCtx(config?: Config) {
     reset: () => {
       /**/
     },
-    worker: createWorkerContext(),
+    worker: createWorkerContext(config.sys),
   };
 
   Object.defineProperty(compilerCtx, 'fs', {
