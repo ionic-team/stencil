@@ -1,10 +1,16 @@
-# 🎷 [1.16.0-0](https://github.com/ionic-team/stencil/compare/v1.15.0...v1.16.0-0) (2020-06-30)
+# 🐮 [1.16.0-1](https://github.com/ionic-team/stencil/compare/v1.15.0...v1.16.0-1) (2020-07-01)
 
 
 ### Features
 
 * **deno:** create deno system to run cli and compiler from [Deno](https://deno.land/) _Experimental!!_ ([b3d79c6](https://github.com/ionic-team/stencil/commit/b3d79c681d22d6c9aac51f70215e909f82b89048))
 
+
+### Bug Fixes
+
+* **compiler:** ensure event emitters defined before user statements ([1b52d43](https://github.com/ionic-team/stencil/commit/1b52d435f204a3241b69e37973c56741d2050e22))
+* **runtime:** correctly set isWatchReady flag for custom elements build ([36b4978](https://github.com/ionic-team/stencil/commit/36b4978e467383d8ea4181c7104fd46654c06698))
+* **treeshaking:** update build conditional treeskaking optimization ([2ba24b1](https://github.com/ionic-team/stencil/commit/2ba24b1e109b27daa69a8e9a4571a3a6d0577e70))
 
 
 # 🎙 [1.15.0](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0) (2020-06-25)
