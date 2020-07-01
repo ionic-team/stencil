@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import { TASK_CANCELED_MSG } from '@utils';
 
-export const createDenoWorkerMainController = (sys: d.CompilerSystem, logger: d.Logger, maxConcurrentWorkers: number): d.WorkerMainController => {
+export const createDenoWorkerMainController = (sys: d.CompilerSystem, maxConcurrentWorkers: number): d.WorkerMainController => {
   let msgIds = 0;
   let isDestroyed = false;
   let isQueued = false;
@@ -33,7 +33,7 @@ export const createDenoWorkerMainController = (sys: d.CompilerSystem, logger: d.
                 worker.activeTasks = 0;
               }
             } else if (msgFromWorker.stencilRtnError) {
-              logger.error(msgFromWorker.stencilRtnError);
+              console.error(msgFromWorker.stencilRtnError);
             }
           }
         }
@@ -41,7 +41,7 @@ export const createDenoWorkerMainController = (sys: d.CompilerSystem, logger: d.
     }
   };
 
-  const onWorkerError = (e: ErrorEvent) => logger.error(e);
+  const onWorkerError = (e: ErrorEvent) => console.error(e);
 
   const createWorkerMain = () => {
     const workerUrl = new URL('./worker.js', import.meta.url).href;

@@ -41,97 +41,6 @@ export interface AssetsMeta {
   originalComponentPath: string;
 }
 
-export interface TranspileOptions {
-  /**
-   * A component can be defined as a custom element by using `customelement`, or the
-   * component class can be exported by using `module`. Default is `customelement`.
-   */
-  componentExport?: 'customelement' | 'module' | string | undefined;
-  /**
-   * Sets how and if component metadata should be assigned on the compiled
-   * component output. The `compilerstatic` value will set the metadata to
-   * a static `COMPILER_META` getter on the component class. This option
-   * is useful for unit testing preprocessors. Default is `null`.
-   */
-  componentMetadata?: 'runtimestatic' | 'compilerstatic' | string | undefined;
-  /**
-   * The actual internal import path for any `@stencil/core` imports.
-   * Default is `@stencil/core/internal/client`.
-   */
-  coreImportPath?: string;
-  /**
-   * The current working directory. Default is `/`.
-   */
-  currentDirectory?: string;
-  /**
-   * The filename of the code being compiled. Default is `module.tsx`.
-   */
-  file?: string;
-  /**
-   * Module format to use for the compiled code output, which can be either `esm` or `cjs`.
-   * Default is `esm`.
-   */
-  module?: 'cjs' | 'esm' | string;
-  /**
-   * Sets how and if any properties, methods and events are proxied on the
-   * component class. The `defineproperty` value sets the getters and setters
-   * using Object.defineProperty. Default is `defineproperty`.
-   */
-  proxy?: 'defineproperty' | string | undefined;
-  /**
-   * How component styles should be associated to the component. The `static`
-   * setting will assign the styles as a static getter on the component class.
-   */
-  style?: 'static' | string | undefined;
-  /**
-   * The JavaScript source target TypeScript should to transpile to. Values can be
-   * `latest`, `esnext`, `es2017`, `es2015`, or `es5`. Defaults to `latest`.
-   */
-  target?: CompileTarget;
-  /**
-   * The path used to load TypeScript, which is dependent on which environment
-   * the compiler is being used on. Default for NodeJS is `typescript`. Default
-   * url to downloaded TypeScript in a brower's web worker or main thread is
-   * from `https://cdn.jsdelivr.net/npm/`.
-   */
-  typescriptPath?: string;
-  /**
-   * Create a source map. Using `inline` will inline the source map into the
-   * code, otherwise the source map will be in the returned `map` property.
-   * Default is `true`.
-   */
-  sourceMap?: boolean | 'inline';
-  /**
-   * Base directory to resolve non-relative module names. Same as the `baseUrl`
-   * TypeScript compiler option: https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping
-   */
-  baseUrl?: string;
-  /**
-   * List of path mapping entries for module names to locations relative to the `baseUrl`.
-   * Same as the `baseUrl` TypeScript compiler option:
-   * https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping
-   */
-  paths?: { [key: string]: string[] };
-}
-
-export interface TranspileResults {
-  code: string;
-  data?: any[];
-  diagnostics: Diagnostic[];
-  imports?: { path: string }[];
-  inputFileExtension: string;
-  inputFilePath: string;
-  map: any;
-  outputFilePath: string;
-}
-
-export interface CompileScriptMinifyOptions {
-  target?: CompileTarget;
-  pretty?: boolean;
-}
-
-export type CompileTarget = 'latest' | 'esnext' | 'es2020' | 'es2019' | 'es2018' | 'es2017' | 'es2015' | 'es5' | string | undefined;
-
 export interface ParsedImport {
   importPath: string;
   basename: string;
@@ -2542,7 +2451,7 @@ export interface VNodeProdData {
 
 export interface CompilerWorkerContext {
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
-  prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string; sourceMap: any; diagnostics: Diagnostic[] }>;
+  prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string; diagnostics: Diagnostic[] }>;
   prerenderWorker(prerenderRequest: PrerenderUrlRequest): Promise<PrerenderUrlResults>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
 }
@@ -2550,7 +2459,6 @@ export interface CompilerWorkerContext {
 export interface MsgToWorker {
   stencilId: number;
   args: any[];
-  terminate?: boolean;
 }
 
 export interface MsgFromWorker {
@@ -2613,19 +2521,6 @@ export interface ValidateTypesResults {
   diagnostics: Diagnostic[];
   dirPaths: string[];
   filePaths: string[];
-}
-
-export interface TransformOptions {
-  coreImportPath: string;
-  componentExport: 'lazy' | 'module' | 'customelement' | null;
-  componentMetadata: 'runtimestatic' | 'compilerstatic' | null;
-  currentDirectory: string;
-  file?: string;
-  isolatedModules?: boolean;
-  module?: 'cjs' | 'esm';
-  proxy: 'defineproperty' | null;
-  style: 'static' | null;
-  target?: string;
 }
 
 export interface CliInitOptions {

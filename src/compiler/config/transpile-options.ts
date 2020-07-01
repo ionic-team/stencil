@@ -1,8 +1,9 @@
-import { TranspileOptions, TranspileResults, Config, TransformOptions, TransformCssToEsmInput, ImportData } from '../../declarations';
-import { isString } from '@utils';
-import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
+import type { TranspileOptions, TranspileResults, Config, TransformOptions, TransformCssToEsmInput, ImportData, CompilerSystem } from '../../declarations';
+import { createSystem } from '../sys/stencil-sys';
+import { isString, IS_NODE_ENV, requireFunc, IS_DENO_ENV } from '@utils';
 import { parseImportPath } from '../transformers/stencil-import-path';
-import ts from 'typescript';
+import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
+import type { CompilerOptions } from 'typescript';
 
 export const getTranspileResults = (code: string, input: TranspileOptions) => {
   if (!isString(input.file)) {
@@ -27,12 +28,26 @@ export const getTranspileResults = (code: string, input: TranspileOptions) => {
   };
 };
 
+const transpileCtx = { sys: null as CompilerSystem };
+
 export const getTranspileConfig = (input: TranspileOptions) => {
+  if (input.sys) {
+    transpileCtx.sys = input.sys;
+  } else if (!transpileCtx.sys) {
+    if (IS_NODE_ENV) {
+      transpileCtx.sys = requireFunc('../sys/node/index.js').createNodeSys();
+    } else if (IS_DENO_ENV) {
+      throw new Error(`sys must be provided in options`);
+    } else {
+      transpileCtx.sys = createSystem();
+    }
+  }
+
   const compileOpts: TranspileOptions = {
     componentExport: getCompileConfigOpt(input.componentExport, VALID_EXPORT, 'customelement'),
     componentMetadata: getCompileConfigOpt(input.componentMetadata, VALID_METADATA, null),
     coreImportPath: isString(input.coreImportPath) ? input.coreImportPath : STENCIL_INTERNAL_CLIENT_ID,
-    currentDirectory: isString(input.currentDirectory) ? input.currentDirectory : '/',
+    currentDirectory: isString(input.currentDirectory) ? input.currentDirectory : transpileCtx.sys.getCurrentDirectory(),
     file: input.file,
     proxy: getCompileConfigOpt(input.proxy, VALID_PROXY, 'defineproperty'),
     module: getCompileConfigOpt(input.module, VALID_MODULE, 'esm'),
@@ -42,7 +57,7 @@ export const getTranspileConfig = (input: TranspileOptions) => {
     typescriptPath: input.typescriptPath,
   };
 
-  const tsCompilerOptions: ts.CompilerOptions = {
+  const tsCompilerOptions: CompilerOptions = {
     // best we always set this to true
     allowSyntheticDefaultImports: true,
 
@@ -103,7 +118,7 @@ export const getTranspileConfig = (input: TranspileOptions) => {
     _isTesting: true,
     validateTypes: false,
     enableCache: false,
-    sys: null,
+    sys: transpileCtx.sys,
     tsCompilerOptions,
   };
 

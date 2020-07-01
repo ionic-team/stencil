@@ -1,10 +1,9 @@
 import type * as d from '../../../declarations';
-import { isFunction, IS_NODE_ENV, IS_BROWSER_ENV, IS_WEB_WORKER_ENV, IS_DENO_ENV } from '@utils';
-import { createSystem } from '../stencil-sys';
-import { dependencies } from '../dependencies';
 import { denoLoadTypeScript } from '../../../sys/deno/deno-load-typescript';
+import { isFunction, IS_NODE_ENV, IS_BROWSER_ENV, IS_WEB_WORKER_ENV, IS_DENO_ENV } from '@utils';
 import { nodeLoadTypeScript } from '../../../sys/node/node-load-typescript';
 import { patchImportedTsSys as patchRemoteTsSys } from './typescript-patch';
+import { typecriptDep } from '../dependencies';
 import ts from 'typescript';
 
 export const loadTypescript = (sys: d.CompilerSystem, rootDir: string, typeScriptPath: string, sync: boolean): TypeScriptModule | Promise<TypeScriptModule> => {
@@ -47,13 +46,11 @@ export const loadTypescript = (sys: d.CompilerSystem, rootDir: string, typeScrip
   if (!(ts as TypeScriptModule).__promise) {
     if (IS_DENO_ENV) {
       (ts as TypeScriptModule).__promise = denoLoadTypeScript(sys, rootDir, typeScriptPath);
-    }
-
-    if (IS_BROWSER_ENV) {
+    } else if (IS_BROWSER_ENV) {
       (ts as TypeScriptModule).__promise = browserMainLoadTypeScript(tsUrl);
+    } else {
+      throw new Error(`Unable to load TypeScript`);
     }
-
-    throw new Error(`Unable to load TypeScript`);
   }
 
   return (ts as TypeScriptModule).__promise;
@@ -82,15 +79,14 @@ const browserMainLoadTypeScript = (tsUrl: string): any =>
     };
     scriptElm.onerror = ev => reject(ev);
     scriptElm.src = tsUrl;
+    document.head.appendChild(scriptElm);
   });
 
 const getTsUrl = (sys: d.CompilerSystem, typeScriptPath: string) => {
   if (typeScriptPath) {
     return typeScriptPath;
   }
-  sys = sys || createSystem();
-  const tsDep = dependencies.find(dep => dep.name === 'typescript');
-  return sys.getRemoteModuleUrl({ moduleId: tsDep.name, version: tsDep.version, path: tsDep.main });
+  return sys.getRemoteModuleUrl({ moduleId: typecriptDep.name, version: typecriptDep.version, path: typecriptDep.main });
 };
 
 const getLoadedTs = (loadedTs: TypeScriptModule) => {

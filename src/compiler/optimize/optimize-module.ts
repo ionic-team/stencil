@@ -1,8 +1,8 @@
-import { CompilerCtx, CompilerSystem, Config, Diagnostic, SourceTarget } from '../../declarations';
+import { loadTypescript } from '../sys/typescript/typescript-load';
 import { minfyJsId } from '../../version';
 import { minifyJs } from './minify-js';
-import { hasError } from '@utils';
-import { CompressOptions, MangleOptions, MinifyOptions } from 'terser';
+import type { CompilerCtx, CompilerSystem, Config, Diagnostic, SourceTarget } from '../../declarations';
+import type { CompressOptions, MangleOptions, MinifyOptions } from 'terser';
 
 interface OptimizeModuleOptions {
   input: string;
@@ -118,33 +118,33 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
 
 export const prepareModule = async (sys: CompilerSystem, input: string, minifyOpts: MinifyOptions, transpileToEs5: boolean, inlineHelpers: boolean) => {
   const results = {
-    sourceMap: null as string,
     output: input,
     diagnostics: [] as Diagnostic[],
   };
-  if (transpileToEs5) {
-    const transpileResults = await sys.transpile(input, 'module.ts', {
-      sourceMap: false,
-      allowJs: true,
-      declaration: false,
-      target: 'es5',
-      module: 'esnext',
-      removeComments: false,
-      isolatedModules: true,
-      skipLibCheck: true,
-      noEmitHelpers: !inlineHelpers,
-      importHelpers: !inlineHelpers,
-    });
 
-    if (hasError(transpileResults.diagnostics)) {
-      results.diagnostics = transpileResults.diagnostics;
-      return results;
-    }
-    results.output = transpileResults.output;
-    results.sourceMap = transpileResults.sourceMap;
+  if (transpileToEs5) {
+    const ts = await loadTypescript(sys, null, null, false);
+    const tsResults = ts.transpileModule(input, {
+      fileName: 'module.ts',
+      compilerOptions: {
+        sourceMap: false,
+        allowJs: true,
+        target: ts.ScriptTarget.ES5,
+        module: ts.ModuleKind.ESNext,
+        removeComments: false,
+        isolatedModules: true,
+        skipLibCheck: true,
+        noEmitHelpers: !inlineHelpers,
+        importHelpers: !inlineHelpers,
+      },
+      reportDiagnostics: false,
+    });
+    results.output = tsResults.outputText;
   }
+
   if (minifyOpts) {
     return minifyJs(results.output, minifyOpts);
   }
+
   return results;
 };

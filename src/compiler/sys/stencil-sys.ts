@@ -18,11 +18,11 @@ import {
 import platformPath from 'path-browserify';
 import { basename, dirname, join } from 'path';
 import { buildEvents } from '../events';
-import { dependencies } from './dependencies';
 import { createLogger } from './logger/console-logger';
 import { createWebWorkerMainController } from './worker/web-worker-main';
 import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV, normalizePath, isRootPath } from '@utils';
 import { resolveModuleIdAsync } from './resolve/resolve-module-async';
+import { stencilDep } from './dependencies';
 
 export const createSystem = (c?: { logger?: Logger }) => {
   const logger = c && c.logger ? c.logger : createLogger();
@@ -82,7 +82,6 @@ export const createSystem = (c?: { logger?: Logger }) => {
     if (IS_WEB_WORKER_ENV) {
       return location.href;
     }
-    const stencilDep = dependencies.find(dep => dep.name === '@stencil/core');
     return sys.getRemoteModuleUrl({ moduleId: stencilDep.name, path: stencilDep.main });
   };
 

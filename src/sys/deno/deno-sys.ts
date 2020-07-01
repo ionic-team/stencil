@@ -7,22 +7,19 @@ import type {
   CompilerSystemRenameResults,
   CompilerSystemUnlinkResults,
   CompilerSystemWriteFileResults,
-  Logger,
   PackageJsonData,
-  TranspileOnlyResults,
 } from '../../declarations';
 import { basename, delimiter, dirname, ensureDirSync, extname, isAbsolute, join, normalize, parse, relative, resolve, sep, win32, posix } from './deps';
 import { createDenoWorkerMainController } from './deno-worker-main';
 import { denoCopyTasks } from './deno-copy-tasks';
-import { normalizePath, catchError } from '@utils';
+import { normalizePath } from '@utils';
 import type { Deno as DenoTypes } from '../../../types/lib.deno';
 
-export function createDenoSys(c: { Deno: any; logger: Logger }) {
+export function createDenoSys(c: { Deno?: any } = {}) {
   let tmpDir: string = null;
-  const deno: typeof DenoTypes = c.Deno;
-  const logger = c.logger;
+  const deno: typeof DenoTypes = c.Deno || (globalThis as any).Deno;
   const destroys = new Set<() => Promise<void> | void>();
-  const hardwareConcurrency = 4;
+  const hardwareConcurrency = 0;
 
   const getLocalModulePath = (opts: { rootDir: string; moduleId: string; path: string }) => join(opts.rootDir, 'node_modules', opts.moduleId, opts.path);
 
@@ -46,12 +43,9 @@ export function createDenoSys(c: { Deno: any; logger: Logger }) {
         const content = await rsp.clone().text();
         const encoder = new TextEncoder();
         await deno.writeFile(opts.filePath, encoder.encode(content));
-        c.logger.debug('fetch', opts.url, opts.filePath);
-      } else {
-        c.logger.warn('fetch', opts.url, rsp.status);
       }
     } catch (e) {
-      c.logger.error(e);
+      console.error(e);
     }
   };
 
@@ -88,7 +82,7 @@ export function createDenoSys(c: { Deno: any; logger: Logger }) {
         return false;
       }
     },
-    createWorkerController: maxConcurrentWorkers => createDenoWorkerMainController(sys, logger, maxConcurrentWorkers),
+    createWorkerController: maxConcurrentWorkers => createDenoWorkerMainController(sys, maxConcurrentWorkers),
     async destroy() {
       const waits: Promise<void>[] = [];
       destroys.forEach(cb => {
@@ -122,16 +116,12 @@ export function createDenoSys(c: { Deno: any; logger: Logger }) {
         }
       } catch (e) {}
 
-      const timespace = logger.createTimeSpan(`ensureDependencies start`, true);
-
       const deps = tsDep.resources.map(p => ({
         url: sys.getRemoteModuleUrl({ moduleId: tsDep.name, version: tsDep.version, path: p }),
         filePath: sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: tsDep.name, path: p }),
       }));
 
       await Promise.all(deps.map(fetchAndWrite));
-
-      timespace.finish(`ensureDependencies end`);
     },
     exit(exitCode) {
       deno.exit(exitCode);
@@ -190,10 +180,7 @@ export function createDenoSys(c: { Deno: any; logger: Logger }) {
       }
       return results;
     },
-    nextTick(cb) {
-      // https://doc.deno.land/https/github.com/denoland/deno/releases/latest/download/lib.deno.d.ts#queueMicrotask
-      queueMicrotask(cb);
-    },
+    nextTick: queueMicrotask,
     normalizePath,
     platformPath: {
       basename,
@@ -353,47 +340,9 @@ export function createDenoSys(c: { Deno: any; logger: Logger }) {
     },
     tmpdir() {
       if (tmpDir == null) {
-        tmpDir = deno.makeTempDirSync();
+        tmpDir = dirname(deno.makeTempDirSync());
       }
       return tmpDir;
-    },
-    async transpile(input, filePath, compilerOptions) {
-      const results: TranspileOnlyResults = {
-        diagnostics: [],
-        output: input,
-        sourceMap: null,
-      };
-
-      try {
-        Object.assign(compilerOptions, {
-          sourceMap: false,
-          allowJs: true,
-          declaration: false,
-          target: 'es5',
-          module: 'esnext',
-          removeComments: false,
-          isolatedModules: true,
-          skipLibCheck: true,
-          noLib: true,
-          noResolve: true,
-          suppressOutputPathCheck: true,
-          allowNonTsExtensions: true,
-          composite: false,
-        });
-        const [, emitted] = await (deno as any).compile(
-          filePath,
-          {
-            [filePath]: input,
-          },
-          compilerOptions,
-        );
-
-        results.output = emitted[filePath.replace('.ts', '.js')];
-      } catch (e) {
-        catchError(results.diagnostics, e);
-      }
-
-      return results;
     },
     async unlink(p) {
       const results: CompilerSystemUnlinkResults = {

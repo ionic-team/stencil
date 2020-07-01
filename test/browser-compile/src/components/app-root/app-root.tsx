@@ -55,7 +55,7 @@ export class AppRoot {
 
   async compile() {
     console.clear();
-    console.log(`compile: stencil v${stencil.version}, typescript v${ts.version}`);
+    console.log(`compile: stencil v${stencil.version}, typescript v${stencil.versions.typescript}`);
 
     const opts: StencilTypes.CompileOptions = {
       file: this.file.value,

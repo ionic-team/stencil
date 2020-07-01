@@ -14,7 +14,7 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
   useForkedWorkers: boolean;
   mainThreadRunner: { [fnName: string]: (...args: any[]) => Promise<any> };
 
-  constructor(private logger: d.Logger, public forkModulePath: string, maxConcurrentWorkers: number) {
+  constructor(public forkModulePath: string, maxConcurrentWorkers: number) {
     super();
     const osCpus = cpus().length;
 
@@ -35,7 +35,7 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
       return this.stopWorker(workerId);
     }
     if (err.code !== 'EPIPE') {
-      this.logger.error(err);
+      console.error(err);
     }
   }
 

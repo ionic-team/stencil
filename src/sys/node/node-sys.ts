@@ -4,8 +4,6 @@ import type {
   CompilerSystemRealpathResults,
   CompilerSystemUnlinkResults,
   CompilerSystemWriteFileResults,
-  Logger,
-  TranspileOnlyResults,
 } from '../../declarations';
 import { asyncGlob, nodeCopyTasks } from './node-copy-tasks';
 import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
@@ -15,13 +13,11 @@ import fs from 'graceful-fs';
 import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
 import { NodeWorkerController } from './node-worker-controller';
-import { normalizePath, requireFunc, catchError } from '@utils';
+import { normalizePath, requireFunc } from '@utils';
 import path from 'path';
-import type TypeScript from 'typescript';
 
-export function createNodeSys(c: { process: any; logger: Logger }) {
-  const prcs: NodeJS.Process = c.process;
-  const logger = c.logger;
+export function createNodeSys(c: { process?: any } = {}) {
+  const prcs: NodeJS.Process = c.process || global.process;
   const destroys = new Set<() => Promise<void> | void>();
   const onInterruptsCallbacks: (() => void)[] = [];
 
@@ -63,7 +59,7 @@ export function createNodeSys(c: { process: any; logger: Logger }) {
     },
     createWorkerController(maxConcurrentWorkers) {
       const forkModulePath = path.join(__dirname, 'worker.js');
-      return new NodeWorkerController(logger, forkModulePath, maxConcurrentWorkers);
+      return new NodeWorkerController(forkModulePath, maxConcurrentWorkers);
     },
     async destroy() {
       const waits: Promise<void>[] = [];
@@ -74,7 +70,7 @@ export function createNodeSys(c: { process: any; logger: Logger }) {
             waits.push(rtn);
           }
         } catch (e) {
-          logger.error(`node sys destroy: ${e}`);
+          console.error(`node sys destroy: ${e}`);
         }
       });
       if (waits.length > 0) {
@@ -288,24 +284,6 @@ export function createNodeSys(c: { process: any; logger: Logger }) {
     },
     tmpdir() {
       return tmpdir();
-    },
-    async transpile(input, filePath, compilerOptions) {
-      const results: TranspileOnlyResults = {
-        diagnostics: [],
-        output: input,
-        sourceMap: null,
-      };
-
-      try {
-        const ts: typeof TypeScript = require('typescript');
-        const tsResults = ts.transpileModule(input, { fileName: filePath, compilerOptions });
-        results.output = tsResults.outputText;
-        results.sourceMap = tsResults.sourceMapText;
-      } catch (e) {
-        catchError(results.diagnostics, e);
-      }
-
-      return results;
     },
     unlink(p) {
       return new Promise(resolve => {
