@@ -141,6 +141,24 @@ const convertToPublic = (node: d.VNode): d.ChildNode => ({
 });
 
 const convertToPrivate = (node: d.ChildNode): d.VNode => {
+  if (typeof node.vtag === 'function') {
+    const vnodeData = { ...node.vattrs };
+
+    if (node.vkey) {
+      vnodeData.key = node.vkey;
+    }
+
+    if (node.vname) {
+      vnodeData.name = node.vname;
+    }
+
+    return h(
+      node.vtag, 
+      vnodeData, 
+      ...node.vchildren || [],
+    );
+  }
+
   const vnode = newVNode(node.vtag as any, node.vtext);
   vnode.$attrs$ = node.vattrs;
   vnode.$children$ = node.vchildren;

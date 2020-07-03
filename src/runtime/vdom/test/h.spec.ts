@@ -452,5 +452,54 @@ describe('h()', () => {
         },
       ]);
     });
+
+    it('changing the vtag to a functional component should expand the component', () => {
+      const ReplacementCmp: d.FunctionalComponent = (nodeData, children) => {
+        return h('article', nodeData, h('p', null, ...children));
+      };
+      const FunctionalCmp: d.FunctionalComponent = (_nodeData, children, util) => {
+        return util.map(children, child => {
+          return {
+            ...child,
+            vtag: child.vtag === 'div' ? ReplacementCmp : child.vtag,
+          };
+        });
+      };
+      const vnode = h(FunctionalCmp, null, h('div', { id: 'blue' }, 'innerText'), h('span', null));
+
+      expect(vnode).toEqual([
+        {
+          $flags$: 0,
+          $tag$: 'article',
+          $text$: null,
+          $elm$: null,
+          $children$: [
+            {
+              $flags$: 0,
+              $tag$: 'p',
+              $text$: null,
+              $elm$: null,
+              $children$: [newVNode(null, 'innerText')],
+              $attrs$: null,
+              $key$: null,
+              $name$: null,
+            },
+          ],
+          $attrs$: { id: 'blue' },
+          $key$: null,
+          $name$: null,
+        },
+        {
+          $flags$: 0,
+          $tag$: 'span',
+          $text$: null,
+          $elm$: null,
+          $children$: null,
+          $attrs$: null,
+          $key$: null,
+          $name$: null,
+        },
+      ]);
+    });
   });
 });
