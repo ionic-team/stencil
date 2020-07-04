@@ -58,7 +58,7 @@ export function buildJestConfig(config: d.Config) {
   if (isString(stencilConfigTesting.coverageDirectory)) {
     jestConfig.coverageDirectory = stencilConfigTesting.coverageDirectory;
   }
-  if (isString(stencilConfigTesting.coverageThreshold)) {
+  if (stencilConfigTesting.coverageThreshold) {
     jestConfig.coverageThreshold = stencilConfigTesting.coverageThreshold;
   }
   if (isString(stencilConfigTesting.globalSetup)) {
