@@ -222,6 +222,10 @@ function browserContextEvents() {
   if (window.document.readyState === 'complete') {
     stencilReady();
   } else {
-    window.addEventListener('load', stencilReady);
+    document.addEventListener('readystatechange', function (e) {
+      if ((e.target as Document).readyState == "complete") {
+        stencilReady();
+      }
+    });
   }
 }
