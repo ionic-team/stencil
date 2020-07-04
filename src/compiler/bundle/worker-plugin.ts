@@ -357,7 +357,7 @@ export const workerMsgId = '${workerMsgId}';
 export const workerPath = /*@__PURE__*/import.meta.ROLLUP_FILE_URL_${referenceId};
 const blob = new Blob(['importScripts("' + workerPath + '")'], { type: 'text/javascript' });
 const url = URL.createObjectURL(blob);
-export const worker = /*@__PURE__*/createWorker(workerPath, workerName, workerMsgId);
+export const worker = /*@__PURE__*/createWorker(url, workerName, workerMsgId);
 URL.revokeObjectURL(url);
 `;
 };
