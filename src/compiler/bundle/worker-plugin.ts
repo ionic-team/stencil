@@ -67,9 +67,14 @@ export const workerPlugin = (
         const workerEntryPath = normalizeFsPath(id);
         const workerName = getWorkerName(workerEntryPath);
         const { code, dependencies, workerMsgId } = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
+        const referenceId = this.emitFile({
+          type: 'asset',
+          source: code,
+          name: workerName + '.js',
+        });
         dependencies.forEach(id => this.addWatchFile(id));
         return {
-          code: getInlineWorker(code, workerName, workerMsgId),
+          code: getInlineWorker(referenceId, workerName, workerMsgId),
           moduleSideEffects: false,
         };
       }
@@ -344,12 +349,15 @@ export const worker = /*@__PURE__*/createWorker(workerPath, workerName, workerMs
 `;
 };
 
-const getInlineWorker = (code: string, workerName: string, workerMsgId: string) => {
+const getInlineWorker = (referenceId: string, workerName: string, workerMsgId: string) => {
   return `
 import { createWorker } from '${WORKER_HELPER_ID}';
-const blob = new Blob([${JSON.stringify(code)}], { type: 'text/javascript' });
+export const workerName = '${workerName}';
+export const workerMsgId = '${workerMsgId}';
+export const workerPath = /*@__PURE__*/import.meta.ROLLUP_FILE_URL_${referenceId};
+const blob = new Blob(['importScripts("' + workerPath + '")'], { type: 'text/javascript' });
 const url = URL.createObjectURL(blob);
-export const worker = createWorker(url, '${workerName}', '${workerMsgId}');
+export const worker = /*@__PURE__*/createWorker(workerPath, workerName, workerMsgId);
 URL.revokeObjectURL(url);
 `;
 };
