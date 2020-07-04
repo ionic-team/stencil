@@ -124,7 +124,8 @@ const transpileJson = (results: TranspileResults) => {
   results.map = { mappings: '' };
 };
 
-const shouldTranspileModule = (ext: string) => ext === 'tsx' || ext === 'ts' || ext === 'jsx' || ext === 'mjs';
+// @todo: could/should this be borrowed from either tsconfig's allowJs or jest config's ?
+const shouldTranspileModule = (ext: string) => ['tsx', 'ts', 'mjs', 'jsx', 'js'].includes(ext);
 
 export const compile = (code: string, opts: any = {}): Promise<any> => {
   console.warn(`compile() deprecated, please use transpile() instead`);
