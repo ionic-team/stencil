@@ -96,6 +96,7 @@
     "hash.js": "^1.1.7",
     "inquirer": "^7.2.0",
     "jest": "^26.1.0",
+    "jest-cli": "^26.1.0",
     "jest-environment-node": "^26.1.0",
     "listr": "^0.14.3",
     "magic-string": "^0.25.7",
