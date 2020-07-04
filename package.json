@@ -49,7 +49,7 @@
     "test.watch": "jest --watch"
   },
   "dependencies": {
-    "typescript": "3.9.5"
+    "typescript": "3.9.6"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "13.0.0",
@@ -111,7 +111,7 @@
     "prettier": "^2.0.5",
     "prompts": "2.3.2",
     "puppeteer": "~4.0.1",
-    "rollup": "2.18.1",
+    "rollup": "2.18.2",
     "semiver": "^1.1.0",
     "semver": "7.3.2",
     "sizzle": "^2.3.5",
