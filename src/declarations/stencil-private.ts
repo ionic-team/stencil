@@ -682,7 +682,7 @@ export interface CompilerCtx {
   activeFilesUpdated: string[];
   cache: Cache;
   cachedStyleMeta: Map<string, StyleCompiler>;
-  cachedGlobalStyle: string;
+  cachedGlobalStyles: Map<string, PluginTransformResults>;
   collections: CollectionCompilerMeta[];
   compilerOptions: any;
   events: BuildEvents;

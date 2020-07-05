@@ -70,10 +70,15 @@ export interface StencilConfig {
    * However, it's still common to have styles which should be "global" across all components and the website.
    * A global CSS file is often useful to set CSS Variables.
    *
-   * Additonally, the globalStyle config is can be used to precompile styles with Sass, PostCss, etc.
+   * Additonally, the globalStyle config can be used to precompile styles with Sass, PostCss, etc.
    * Below is an example folder structure containing a webapp's global sass file, named app.css.
    */
   globalStyle?: string;
+
+  /**
+   * Allows to output multiple global styles
+   */
+  globalStyles?: string[];
 
   /**
    * When the hashFileNames config is set to true, and it is a production build,
@@ -1712,7 +1717,7 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
 
 export interface OutputTargetDistGlobalStyles extends OutputTargetBase {
   type: 'dist-global-styles';
-  file: string;
+  dir: string;
 }
 
 export interface OutputTargetDistLazyLoader extends OutputTargetBase {

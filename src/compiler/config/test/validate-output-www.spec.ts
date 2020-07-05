@@ -69,7 +69,7 @@ describe('validateOutputTargetWww', () => {
         type: 'copy',
       },
       {
-        file: path.join(rootDir, 'www', 'docs', 'build', 'app.css'),
+        dir: path.join(rootDir, 'www', 'docs', 'build'),
         type: 'dist-global-styles',
       },
     ]);

@@ -54,7 +54,7 @@ export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userO
     // Generate global style with original name
     outputs.push({
       type: DIST_GLOBAL_STYLES,
-      file: join(buildDir, `${config.fsNamespace}.css`),
+      dir: buildDir,
     });
 
     return outputs;

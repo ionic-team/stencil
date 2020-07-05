@@ -60,7 +60,7 @@ export function mockCompilerCtx(config?: Config) {
     activeFilesDeleted: [],
     activeFilesUpdated: [],
     fs: null,
-    cachedGlobalStyle: null,
+    cachedGlobalStyles: new Map(),
     collections: [],
     compilerOptions: null,
     cache: null,

@@ -6,6 +6,10 @@ export const config: Config = {
   namespace: 'EndToEnd',
   globalScript: './src/global.ts',
   globalStyle: './src/global.css',
+  globalStyles: [
+    './src/foo.css',
+    './src/bar.css',
+  ],
   plugins: [
     builtins()
   ],

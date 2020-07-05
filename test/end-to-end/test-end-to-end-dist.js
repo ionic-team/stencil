@@ -11,6 +11,10 @@ fs.accessSync(path.join(distDir, 'endtoend.js'));
 fs.accessSync(path.join(distDir, 'index.js'));
 fs.accessSync(path.join(distDir, 'index.mjs'));
 
+fs.accessSync(path.join(distDir, 'endtoend', 'endtoend.css'));
+fs.accessSync(path.join(distDir, 'endtoend', 'foo.css'));
+fs.accessSync(path.join(distDir, 'endtoend', 'bar.css'));
+
 const customElementsDir = path.join(distDir, 'custom-elements');
 fs.accessSync(path.join(customElementsDir, 'index.d.ts'));
 fs.accessSync(path.join(customElementsDir, 'index.js'));

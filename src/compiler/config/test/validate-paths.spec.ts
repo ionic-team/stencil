@@ -159,4 +159,20 @@ describe('validatePaths', () => {
     expect(path.basename(config.globalStyle)).toBe('styles.css');
     expect(path.isAbsolute(config.globalStyle)).toBe(true);
   });
+
+  it('should convert globalStyles strings to absolute path array, if a globalStyles property was provided', () => {
+    userConfig.globalStyles = [
+      path.join('src', 'global', 'first.css'),
+      path.join('src', 'global', 'second.css')
+    ];
+    const { config } = validateConfig(userConfig);
+
+    expect(config.globalStyles.length).toBe(2);
+
+    expect(path.basename(config.globalStyles[0])).toBe('first.css');
+    expect(path.isAbsolute(config.globalStyles[0])).toBe(true);
+
+    expect(path.basename(config.globalStyles[1])).toBe('second.css');
+    expect(path.isAbsolute(config.globalStyles[1])).toBe(true);
+  });
 });

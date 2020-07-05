@@ -39,7 +39,7 @@ export class CompilerContext implements d.CompilerCtx {
   rollupCacheNative: any = null;
   rootTsFiles: string[] = [];
   tsService: d.TsService = null;
-  cachedGlobalStyle: string;
+  cachedGlobalStyles: Map<string, d.PluginTransformResults>;
   styleModeNames = new Set<string>();
   rollupCache = new Map();
   changedModules = new Set<string>();
@@ -49,7 +49,7 @@ export class CompilerContext implements d.CompilerCtx {
   reset() {
     this.cache.clear();
     this.cachedStyleMeta.clear();
-    this.cachedGlobalStyle = null;
+    this.cachedGlobalStyles = null;
     this.collections.length = 0;
     this.compilerOptions = null;
     this.lastComponentStyleInput.clear();

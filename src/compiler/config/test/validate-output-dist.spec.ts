@@ -49,7 +49,7 @@ describe('validateDistOutputTarget', () => {
         type: 'copy',
       },
       {
-        file: path.join(rootDir, 'my-dist', 'my-build', 'testing', 'testing.css'),
+        dir: path.join(rootDir, 'my-dist', 'my-build', 'testing'),
         type: 'dist-global-styles',
       },
       {

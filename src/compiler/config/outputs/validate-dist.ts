@@ -42,7 +42,7 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) =>
     });
     outputs.push({
       type: DIST_GLOBAL_STYLES,
-      file: join(lazyDir, `${config.fsNamespace}.css`),
+      dir: lazyDir,
     });
 
     outputs.push({

@@ -33,11 +33,24 @@ export const validatePaths = (config: d.Config) => {
     }
   }
 
-  if (typeof config.globalStyle === 'string') {
-    if (!isAbsolute(config.globalStyle)) {
-      config.globalStyle = join(config.rootDir, config.globalStyle);
-    }
+  if (!Array.isArray(config.globalStyles)) {
+    config.globalStyles = [];
   }
+
+  const validateGlobalStyle = (globalStyle: string) => {
+    if (isAbsolute(globalStyle)) {
+      return globalStyle;
+    }
+    return join(config.rootDir, globalStyle);
+  };
+
+  if (typeof config.globalStyle === 'string') {
+    config.globalStyle = validateGlobalStyle(config.globalStyle);
+  }
+
+  config.globalStyles = config.globalStyles
+    .filter(globalStyle => typeof globalStyle === 'string')
+    .map(validateGlobalStyle.bind(this));
 
   if (config.writeLog) {
     if (typeof config.buildLogFilePath !== 'string') {

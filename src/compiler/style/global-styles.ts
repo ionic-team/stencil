@@ -4,6 +4,7 @@ import { getCssImports } from './css-imports';
 import { isOutputTargetDistGlobalStyles } from '../output-targets/output-utils';
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
+import { basename, join } from 'path';
 
 export const generateGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistGlobalStyles);
@@ -11,21 +12,32 @@ export const generateGlobalStyles = async (config: d.Config, compilerCtx: d.Comp
     return;
   }
 
-  const globalStyles = await buildGlobalStyles(config, compilerCtx, buildCtx);
-  if (globalStyles) {
-    await Promise.all(outputTargets.map(o => compilerCtx.fs.writeFile(o.file, globalStyles)));
+  const globalStyles: Promise<void>[] = [];
+  if (config.globalStyle) {
+    globalStyles.push(generateGlobalStyle(config, compilerCtx, buildCtx, outputTargets, config.globalStyle, `${config.fsNamespace}.css`));
   }
+
+  if (config.globalStyles) {
+    globalStyles.push(...config.globalStyles.map((globalStyle) => generateGlobalStyle(config, compilerCtx, buildCtx, outputTargets, globalStyle)));
+  }
+
+  await Promise.all(globalStyles);
 };
 
-const buildGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  let globalStylePath = config.globalStyle;
-  if (!globalStylePath) {
-    return null;
+const generateGlobalStyle = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistGlobalStyles[], globalStylePath: string, cssFileName?: string): Promise<void> => {
+  const globalStyle = await buildGlobalStyle(config, compilerCtx, buildCtx, globalStylePath);
+  if (!globalStyle) {
+    return;
   }
 
-  const canSkip = await canSkipGlobalStyles(config, compilerCtx, buildCtx);
+  const destinationFilePath = basename(cssFileName || globalStyle.id);
+  await Promise.all(outputTargets.map(o => compilerCtx.fs.writeFile(join(o.dir, destinationFilePath), globalStyle.code)));
+};
+
+const buildGlobalStyle = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, globalStylePath: string): Promise<d.PluginTransformResults> => {
+  const canSkip = await canSkipGlobalStyle(config, compilerCtx, buildCtx, globalStylePath);
   if (canSkip) {
-    return compilerCtx.cachedGlobalStyle;
+    return compilerCtx.cachedGlobalStyles.get(globalStylePath);
   }
 
   try {
@@ -34,21 +46,28 @@ const buildGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, globalStylePath);
 
     if (transformResults) {
-      const optimizedCss = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, transformResults.code, globalStylePath);
-      compilerCtx.cachedGlobalStyle = optimizedCss;
-      return optimizedCss;
+      transformResults.code = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, transformResults.code, globalStylePath);
+      compilerCtx.cachedGlobalStyles = (compilerCtx.cachedGlobalStyles || new Map()).set(globalStylePath, transformResults);
+      return transformResults;
     }
   } catch (e) {
     const d = catchError(buildCtx.diagnostics, e);
     d.absFilePath = globalStylePath;
   }
 
-  compilerCtx.cachedGlobalStyle = null;
+  if (compilerCtx.cachedGlobalStyles) {
+    compilerCtx.cachedGlobalStyles.delete(globalStylePath);
+  }
   return null;
 };
 
-const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  if (!compilerCtx.cachedGlobalStyle) {
+const canSkipGlobalStyle = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, globalStylePath: string) => {
+  if (!compilerCtx.cachedGlobalStyles) {
+    return false;
+  }
+
+  const cachedGlobalStyle = compilerCtx.cachedGlobalStyles.get(globalStylePath);
+  if (!cachedGlobalStyle) {
     return false;
   }
 
@@ -60,12 +79,12 @@ const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx,
     return true;
   }
 
-  if (buildCtx.filesChanged.includes(config.globalStyle)) {
+  if (buildCtx.filesChanged.includes(globalStylePath)) {
     // changed file IS the global entry style
     return false;
   }
 
-  const hasChangedImports = await hasChangedImportFile(config, compilerCtx, buildCtx, config.globalStyle, compilerCtx.cachedGlobalStyle, []);
+  const hasChangedImports = await hasChangedImportFile(config, compilerCtx, buildCtx, globalStylePath, cachedGlobalStyle.code, []);
   if (hasChangedImports) {
     return false;
   }
