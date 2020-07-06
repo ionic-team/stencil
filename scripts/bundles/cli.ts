@@ -1,4 +1,5 @@
 import { join } from 'path';
+import rollupJson from '@rollup/plugin-json';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
 import { aliasPlugin } from './plugins/alias-plugin';
@@ -36,6 +37,9 @@ export async function cli(opts: BuildOptions) {
         preferBuiltins: true,
       }),
       rollupCommonjs(),
+      rollupJson({
+        preferConst: true,
+      }),
       replacePlugin(opts),
       prettyMinifyPlugin(opts),
     ],

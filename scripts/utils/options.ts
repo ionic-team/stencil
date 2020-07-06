@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { getVermoji } from './vermoji';
 import { PackageData } from './write-pkg-json';
-import { readJSONSync } from 'fs-extra';
+import { readJSONSync, writeJSONSync } from 'fs-extra';
 
 export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
   const srcDir = join(rootDir, 'src');
@@ -92,6 +92,13 @@ export function createReplaceData(opts: BuildOptions) {
   const postcssPkg = require(join(opts.nodeModulesDir, 'postcss', 'package.json'));
 
   const optimizeCssId = autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version + '_' + CACHE_BUSTER;
+
+  const data = readJSONSync(join(opts.srcDir, 'compiler', 'sys', 'dependencies.json'));
+  data.dependencies[0].version = opts.version;
+  data.dependencies[1].version = typescriptPkg.version;
+  data.dependencies[2].version = rollupPkg.version;
+  data.dependencies[3].version = terserPkg.version;
+  writeJSONSync(join(opts.rootDir, 'dependencies.json'), data, { spaces: 2 });
 
   return {
     '__BUILDID__': opts.buildId,

@@ -1,8 +1,7 @@
 import type * as d from '../../../declarations';
 import { basename } from 'path';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
-import { IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, isString, normalizePath } from '@utils';
-import { isExternalUrl } from '../fetch/fetch-utils';
+import { IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, isRemoteUrl, isString, normalizePath } from '@utils';
 import { TypeScriptModule } from './typescript-load';
 import ts from 'typescript';
 
@@ -67,7 +66,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
   tsSys.fileExists = p => {
     let filePath = p;
 
-    if (isExternalUrl(p)) {
+    if (isRemoteUrl(p)) {
       filePath = getTypescriptPathFromUrl(config, tsSys.getExecutingFilePath(), p);
     }
 
@@ -90,7 +89,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
 
   tsSys.readFile = p => {
     let filePath = p;
-    const isUrl = isExternalUrl(p);
+    const isUrl = isRemoteUrl(p);
 
     if (isUrl) {
       filePath = getTypescriptPathFromUrl(config, tsSys.getExecutingFilePath(), p);

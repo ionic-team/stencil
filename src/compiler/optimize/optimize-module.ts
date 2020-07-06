@@ -59,7 +59,7 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
   }
 
   const shouldTranspile = opts.sourceTarget === 'es5';
-  const results = await compilerCtx.worker.prepareModule(opts.input, minifyOpts, shouldTranspile, opts.inlineHelpers);
+  const results = await compilerCtx.worker.prepareModule(config.typescriptPath, opts.input, minifyOpts, shouldTranspile, opts.inlineHelpers);
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
     if (opts.isCore) {
       results.output = results.output.replace(/disconnectedCallback\(\)\{\},/g, '');
@@ -116,14 +116,14 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
   return opts;
 };
 
-export const prepareModule = async (sys: CompilerSystem, input: string, minifyOpts: MinifyOptions, transpileToEs5: boolean, inlineHelpers: boolean) => {
+export const prepareModule = async (sys: CompilerSystem, typescriptPath: string, input: string, minifyOpts: MinifyOptions, transpileToEs5: boolean, inlineHelpers: boolean) => {
   const results = {
     output: input,
     diagnostics: [] as Diagnostic[],
   };
 
   if (transpileToEs5) {
-    const ts = await loadTypescript(sys, null, null, false);
+    const ts = await loadTypescript(sys, typescriptPath, false);
     const tsResults = ts.transpileModule(input, {
       fileName: 'module.ts',
       compilerOptions: {

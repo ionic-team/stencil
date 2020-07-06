@@ -13,7 +13,7 @@ export { createPrerenderer } from './prerender/prerender-main';
 export { createSystem } from './sys/stencil-sys';
 export { createWorkerContext } from './worker/worker-thread';
 export { createWorkerMessageHandler } from './worker/worker-thread';
-export { dependencies } from './sys/dependencies';
+export { dependencies } from './sys/dependencies.json';
 export { loadConfig } from './config/load-config';
 export { optimizeCss } from './optimize/optimize-css';
 export { optimizeJs } from './optimize/optimize-js';

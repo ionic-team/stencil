@@ -2451,7 +2451,7 @@ export interface VNodeProdData {
 
 export interface CompilerWorkerContext {
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
-  prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string; diagnostics: Diagnostic[] }>;
+  prepareModule(typescriptPath: string, input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string; diagnostics: Diagnostic[] }>;
   prerenderWorker(prerenderRequest: PrerenderUrlRequest): Promise<PrerenderUrlResults>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
 }

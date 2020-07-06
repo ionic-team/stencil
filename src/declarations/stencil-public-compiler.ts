@@ -835,7 +835,12 @@ export interface CompilerSystem {
    */
   createWorkerController?(maxConcurrentWorkers: number): WorkerMainController;
   encodeToBase64(str: string): string;
-  ensureDependencies?(opts: { rootDir: string; dependencies: CompilerDependency[] }): Promise<void>;
+  ensureDependencies?(opts: {
+    rootDir: string;
+    logger: Logger;
+    dependencies: CompilerDependency[];
+  }): Promise<{ stencilPath: string; typescriptPath: string; diagnostics: Diagnostic[] }>;
+  ensureResources?(opts: { rootDir: string; logger: Logger; dependencies: CompilerDependency[] }): Promise<void>;
   /**
    * process.exit()
    */
@@ -1961,7 +1966,15 @@ export interface ServiceWorkerConfig {
 }
 
 export interface LoadConfigInit {
+  /**
+   * User config object to merge into default config and
+   * config loaded from a file path.
+   */
   config?: Config;
+  /**
+   * Absolute path to a Stencil config file. This path cannot be
+   * relative and it does not resolve config files within a directory.
+   */
   configPath?: string;
   logger?: Logger;
   sys?: CompilerSystem;

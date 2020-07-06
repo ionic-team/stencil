@@ -1,16 +1,14 @@
+import type { Compiler, Config, Diagnostic } from '../declarations';
 import { Cache } from './cache';
-import { Compiler, Config, Diagnostic } from '../declarations';
 import { CompilerContext } from './build/compiler-ctx';
 import { createFullBuild } from './build/full-build';
 import { createInMemoryFs } from './sys/in-memory-fs';
 import { createSysWorker } from './sys/worker/sys-worker';
 import { createWatchBuild } from './build/watch-build';
-import { dependencies } from './sys/dependencies';
 import { getConfig } from './sys/config';
 import { patchFs } from './sys/fs-patch';
 import { patchTypescript } from './sys/typescript/typescript-patch';
 import { resolveModuleIdAsync } from './sys/resolve/resolve-module-async';
-import { isFunction } from '@utils';
 
 export const createCompiler = async (config: Config) => {
   // actual compiler code
@@ -22,10 +20,6 @@ export const createCompiler = async (config: Config) => {
   const compilerCtx = new CompilerContext();
 
   patchFs(sys);
-
-  if (isFunction(sys.ensureDependencies)) {
-    await sys.ensureDependencies({ rootDir: config.rootDir, dependencies });
-  }
 
   compilerCtx.fs = createInMemoryFs(sys);
   compilerCtx.cache = new Cache(config, createInMemoryFs(sys));

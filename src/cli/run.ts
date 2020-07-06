@@ -1,4 +1,6 @@
 import type { CliInitOptions } from '../declarations';
+import { dependencies } from '../compiler/sys/dependencies.json';
+import { findConfig } from './find-config';
 import { hasError, isFunction, shouldIgnoreError } from '@utils';
 import { loadCoreCompiler } from './load-compiler';
 import { loadedCompilerLog, startupLog } from './logs';
@@ -42,6 +44,18 @@ export async function run(init: CliInitOptions) {
 
     startupLog(logger, flags);
 
+    const findConfigResults = await findConfig({ sys, configPath: flags.config });
+    if (hasError(findConfigResults.diagnostics)) {
+      logger.printDiagnostics(findConfigResults.diagnostics);
+      sys.exit(1);
+    }
+
+    const ensureDepsResults = await sys.ensureDependencies({ rootDir: findConfigResults.rootDir, logger, dependencies });
+    if (hasError(ensureDepsResults.diagnostics)) {
+      logger.printDiagnostics(ensureDepsResults.diagnostics);
+      sys.exit(1);
+    }
+
     const coreCompiler = await loadCoreCompiler(sys);
 
     loadedCompilerLog(sys, logger, flags, coreCompiler);
@@ -55,9 +69,10 @@ export async function run(init: CliInitOptions) {
       config: {
         flags,
       },
-      configPath: flags.config,
+      configPath: findConfigResults.configPath,
       logger,
       sys,
+      typescriptPath: ensureDepsResults.typescriptPath,
     });
 
     if (validated.diagnostics.length > 0) {
@@ -70,6 +85,8 @@ export async function run(init: CliInitOptions) {
     if (isFunction(sys.applyGlobalPatch)) {
       sys.applyGlobalPatch(validated.config.rootDir);
     }
+
+    await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies });
 
     switch (flags.task) {
       case 'build':

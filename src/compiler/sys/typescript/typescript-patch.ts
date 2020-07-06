@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { exit, getCurrentDirectory, hasError, isBoolean, noop } from '@utils';
 import { loadTypescript, TypeScriptModule } from './typescript-load';
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
@@ -8,12 +8,12 @@ import ts from 'typescript';
 
 export const patchTypescript = async (config: d.Config, diagnostics: d.Diagnostic[], inMemoryFs: d.InMemoryFileSystem) => {
   // dynamically load the typescript dependency
-  const loadedTs = await loadTypescript(config.sys, config.rootDir, config.typescriptPath, false);
+  const loadedTs = await loadTypescript(config.sys, config.typescriptPath, false);
   patchTypescriptModule(config, diagnostics, inMemoryFs, loadedTs);
 };
 
 export const patchTypescriptSync = (config: d.Config, diagnostics: d.Diagnostic[], inMemoryFs: d.InMemoryFileSystem) => {
-  const loadedTs = loadTypescript(config.sys, config.rootDir, config.typescriptPath, true) as TypeScriptModule;
+  const loadedTs = loadTypescript(config.sys, config.typescriptPath, true) as TypeScriptModule;
   patchTypescriptModule(config, diagnostics, inMemoryFs, loadedTs);
 };
 

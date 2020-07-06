@@ -1,5 +1,4 @@
-import {
-  CompilerDependency,
+import type {
   CompilerFileWatcherCallback,
   CompilerFsStats,
   CompilerSystem,
@@ -20,9 +19,8 @@ import { basename, dirname, join } from 'path';
 import { buildEvents } from '../events';
 import { createLogger } from './logger/console-logger';
 import { createWebWorkerMainController } from './worker/web-worker-main';
-import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV, normalizePath, isRootPath } from '@utils';
+import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV, isRootPath, normalizePath } from '@utils';
 import { resolveModuleIdAsync } from './resolve/resolve-module-async';
-import { stencilDep } from './dependencies';
 
 export const createSystem = (c?: { logger?: Logger }) => {
   const logger = c && c.logger ? c.logger : createLogger();
@@ -82,7 +80,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     if (IS_WEB_WORKER_ENV) {
       return location.href;
     }
-    return sys.getRemoteModuleUrl({ moduleId: stencilDep.name, path: stencilDep.main });
+    return sys.getRemoteModuleUrl({ moduleId: '@stencil/core', path: 'compiler/stencil.min.js' });
   };
 
   const isSymbolicLink = async (_p: string) => false;
@@ -509,76 +507,12 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
-  const ensureDirSync = (p: string) => {
-    const allDirs: string[] = [];
-
-    while (true) {
-      p = normalizePath(dirname(p));
-      if (typeof p === 'string' && p.length > 0 && !isRootPath(p)) {
-        allDirs.push(p);
-      } else {
-        break;
-      }
-    }
-
-    allDirs.reverse();
-
-    for (let i = 0; i < allDirs.length; i++) {
-      mkdirSync(allDirs[i]);
-    }
-  };
-
-  const fetchAndWrite = async (opts: { url: string; filePath: string }) => {
-    const s = await stat(opts.filePath);
-    if (!s) {
-      try {
-        const rsp = await fetch(opts.url);
-        if (rsp.ok) {
-          ensureDirSync(opts.filePath);
-          const content = await rsp.clone().text();
-          await writeFile(opts.filePath, content);
-          logger.debug('fetch', opts.url, opts.filePath);
-        } else {
-          logger.warn('fetch', opts.url, rsp.status);
-        }
-      } catch (e) {
-        logger.error(e);
-      }
-    }
-  };
-
   const getLocalModulePath = (opts: { rootDir: string; moduleId: string; path: string }) => join(opts.rootDir, 'node_modules', opts.moduleId, opts.path);
 
   const getRemoteModuleUrl = (opts: { moduleId: string; path: string; version?: string }) => {
     const npmBaseUrl = 'https://cdn.jsdelivr.net/npm/';
     const path = `${opts.moduleId}${opts.version ? '@' + opts.version : ''}/${opts.path}`;
     return new URL(path, npmBaseUrl).href;
-  };
-
-  const ensureDependencies = async (opts: { rootDir: string; dependencies: CompilerDependency[] }) => {
-    const stencilDep = opts.dependencies.find(dep => dep.name === 'stencil');
-    const tsDep = opts.dependencies.find(dep => dep.name === 'typescript');
-
-    const timespace = logger.createTimeSpan(`ensureDependencies start`, true);
-
-    const deps = [
-      ...stencilDep.resources.map(p => ({
-        url: sys.getRemoteModuleUrl({ moduleId: stencilDep.name, version: stencilDep.version, path: p }),
-        filePath: normalizePath(sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: stencilDep.name, path: p })),
-      })),
-      {
-        url: sys.getRemoteModuleUrl({ moduleId: tsDep.name, version: tsDep.version, path: tsDep.main }),
-        filePath: normalizePath(sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: tsDep.name, path: tsDep.main })),
-      },
-      ...tsDep.resources.map(p => ({
-        url: sys.getRemoteModuleUrl({ moduleId: tsDep.name, version: tsDep.version, path: p }),
-        filePath: normalizePath(sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: tsDep.name, path: p })),
-      })),
-    ];
-
-    await Promise.all(deps.map(fetchAndWrite));
-
-    timespace.finish(`ensureDependencies end`);
   };
 
   const fileWatchTimeout = 32;
@@ -595,7 +529,6 @@ export const createSystem = (c?: { logger?: Logger }) => {
     copyFile,
     destroy,
     encodeToBase64,
-    ensureDependencies,
     exit: exitCode => logger.warn(`exit ${exitCode}`),
     getCurrentDirectory,
     getCompilerExecutingPath,

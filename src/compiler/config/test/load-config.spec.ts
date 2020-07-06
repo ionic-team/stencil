@@ -47,16 +47,6 @@ describe('load config', () => {
     expect(c.config.hashedFileNameLength).toBe(13);
   });
 
-  it('invalid given configPath', async () => {
-    const c = await loadConfig({
-      configPath: 'no-good.fu',
-      sys: createSystem(),
-    });
-    expect(c.diagnostics).toHaveLength(1);
-    expect(c.diagnostics[0].header).toBe('Invalid config path');
-    expect(c.config).toBe(null);
-  });
-
   it('empty init, no error cuz created tsconfig, warn no files', async () => {
     const c = await loadConfig({ initTsConfig: true });
     expect(c.diagnostics.filter(d => d.level === 'error')).toHaveLength(0);

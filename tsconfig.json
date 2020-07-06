@@ -17,6 +17,7 @@
     "noUnusedParameters": true,
     "outDir": "build",
     "pretty": true,
+    "resolveJsonModule": true,
     "target": "es2017",
     "baseUrl": ".",
     "paths": {

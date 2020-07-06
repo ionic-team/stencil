@@ -4,6 +4,7 @@ import type {
   CompilerSystemRealpathResults,
   CompilerSystemUnlinkResults,
   CompilerSystemWriteFileResults,
+  Diagnostic,
 } from '../../declarations';
 import { asyncGlob, nodeCopyTasks } from './node-copy-tasks';
 import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
@@ -13,7 +14,7 @@ import fs from 'graceful-fs';
 import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
 import { NodeWorkerController } from './node-worker-controller';
-import { normalizePath, requireFunc } from '@utils';
+import { normalizePath, requireFunc, buildError } from '@utils';
 import path from 'path';
 
 export function createNodeSys(c: { process?: any } = {}) {
@@ -84,9 +85,25 @@ export function createNodeSys(c: { process?: any } = {}) {
     encodeToBase64(str) {
       return Buffer.from(str).toString('base64');
     },
-    exit(exitCode) {
-      exit(exitCode);
+    async ensureDependencies() {
+      const diagnostics: Diagnostic[] = [];
+      let typescriptPath: string = null;
+      try {
+        typescriptPath = require.resolve('typescript');
+      } catch (e) {
+        const diagnostic = buildError(diagnostics);
+        diagnostic.header = `Unable to find TypeScript`;
+        diagnostic.messageText = `Please ensure you install the dependencies first, for example: "npm install"`;
+      }
+
+      return {
+        stencilPath: sys.getCompilerExecutingPath(),
+        typescriptPath,
+        diagnostics,
+      };
     },
+    async ensureResources() {},
+    exit: exit,
     getCurrentDirectory() {
       return normalizePath(prcs.cwd());
     },

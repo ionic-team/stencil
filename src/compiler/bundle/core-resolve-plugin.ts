@@ -1,9 +1,9 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { dirname, join } from 'path';
 import { fetchModuleAsync } from '../sys/fetch/fetch-module-async';
+import { getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
 import { HYDRATED_CSS } from '../../runtime/runtime-constants';
-import { isExternalUrl, getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
-import { normalizePath, normalizeFsPath } from '@utils';
+import { isRemoteUrl, normalizePath, normalizeFsPath } from '@utils';
 import {
   APP_DATA_CONDITIONAL,
   STENCIL_CORE_ID,
@@ -82,7 +82,7 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
 
     async load(filePath) {
       if (filePath === internalClient || filePath === internalHydrate) {
-        if (isExternalUrl(compilerExe)) {
+        if (isRemoteUrl(compilerExe)) {
           const url = getStencilModuleUrl(compilerExe, filePath);
           return fetchModuleAsync(config.sys, compilerCtx.fs, packageVersions, url, filePath);
         }
@@ -118,7 +118,7 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
 };
 
 export const getStencilInternalModule = (config: d.Config, compilerExe: string, internalModule: string) => {
-  if (isExternalUrl(compilerExe)) {
+  if (isRemoteUrl(compilerExe)) {
     return normalizePath(config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId: '@stencil/core', path: 'internal/' + internalModule }));
   }
 

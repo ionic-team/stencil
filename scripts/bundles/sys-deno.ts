@@ -4,6 +4,7 @@ import { aliasPlugin } from './plugins/alias-plugin';
 import { BuildOptions } from '../utils/options';
 import { RollupOptions } from 'rollup';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
+import { replacePlugin } from './plugins/replace-plugin';
 import { denoStdPlugin } from './plugins/deno-std-plugin';
 
 export async function sysDeno(opts: BuildOptions) {
@@ -18,7 +19,7 @@ export async function sysDeno(opts: BuildOptions) {
       preferConst: true,
       freeze: false,
     },
-    plugins: [aliasPlugin(opts), prettyMinifyPlugin(opts), denoStdPlugin()],
+    plugins: [replacePlugin(opts), aliasPlugin(opts), prettyMinifyPlugin(opts), denoStdPlugin()],
     treeshake: {
       moduleSideEffects: false,
       propertyReadSideEffects: false,
@@ -48,6 +49,7 @@ export async function sysDeno(opts: BuildOptions) {
           }
         },
       },
+      replacePlugin(opts),
       aliasPlugin(opts),
       prettyMinifyPlugin(opts),
     ],
@@ -73,6 +75,7 @@ export async function sysDeno(opts: BuildOptions) {
           return null;
         },
       },
+      replacePlugin(opts),
       aliasPlugin(opts),
       denoStdPlugin(),
       prettyMinifyPlugin(opts),

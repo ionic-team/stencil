@@ -1,6 +1,6 @@
-import * as d from '../../../declarations';
-import { isFunction, isString, normalizePath } from '@utils';
+import type * as d from '../../../declarations';
 import { isCommonDirModuleFile, isTsFile, isTsxFile } from '../resolve/resolve-utils';
+import { isFunction, normalizePath } from '@utils';
 
 export const httpFetch = (sys: d.CompilerSystem, input: RequestInfo, init?: RequestInit): Promise<Response> => {
   console.trace(input);
@@ -12,14 +12,6 @@ export const httpFetch = (sys: d.CompilerSystem, input: RequestInfo, init?: Requ
 
 export const packageVersions = new Map<string, string>();
 export const known404Urls = new Set<string>();
-
-export const isExternalUrl = (p: string) => {
-  if (isString(p)) {
-    p = p.toLowerCase();
-    return p.startsWith('https://') || p.startsWith('http://');
-  }
-  return false;
-};
 
 export const getStencilRootUrl = (compilerExe: string) => new URL('../', compilerExe).href;
 

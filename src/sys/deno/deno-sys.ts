@@ -7,19 +7,26 @@ import type {
   CompilerSystemRenameResults,
   CompilerSystemUnlinkResults,
   CompilerSystemWriteFileResults,
-  PackageJsonData,
+  Diagnostic,
 } from '../../declarations';
-import { basename, delimiter, dirname, ensureDirSync, extname, isAbsolute, join, normalize, parse, relative, resolve, sep, win32, posix } from './deps';
+import { basename, delimiter, dirname, extname, isAbsolute, join, normalize, parse, relative, resolve, sep, win32, posix } from './deps';
+import { convertPathToFileProtocol, isRemoteUrl, normalizePath, catchError, buildError } from '@utils';
 import { createDenoWorkerMainController } from './deno-worker-main';
 import { denoCopyTasks } from './deno-copy-tasks';
-import { normalizePath } from '@utils';
+import { version } from '../../version';
 import type { Deno as DenoTypes } from '../../../types/lib.deno';
 
 export function createDenoSys(c: { Deno?: any } = {}) {
   let tmpDir: string = null;
+  let stencilBaseUrl: URL;
+  let stencilRemoteUrl: string;
+  let stencilExePath = new URL(`../../compiler/stencil.js`, import.meta.url).href;
+  let typescriptRemoteUrl: string;
+  let typescriptExePath: string;
   const deno: typeof DenoTypes = c.Deno || (globalThis as any).Deno;
   const destroys = new Set<() => Promise<void> | void>();
   const hardwareConcurrency = 0;
+  const isRemoteHost = isRemoteUrl(import.meta.url);
 
   const getLocalModulePath = (opts: { rootDir: string; moduleId: string; path: string }) => join(opts.rootDir, 'node_modules', opts.moduleId, opts.path);
 
@@ -29,23 +36,29 @@ export function createDenoSys(c: { Deno?: any } = {}) {
     return new URL(path, npmBaseUrl).href;
   };
 
-  const fetchAndWrite = async (opts: { url: string; filePath: string }) => {
+  const fetchWrite = async (diagnostics: Diagnostic[], remoteUrl: string, localPath: string) => {
     try {
-      await deno.stat(opts.filePath);
+      await deno.stat(localPath);
       return;
     } catch (e) {}
 
     try {
-      const rsp = await fetch(opts.url);
+      const rsp = await fetch(remoteUrl);
       if (rsp.ok) {
-        ensureDirSync(dirname(opts.filePath));
+        const localDir = dirname(localPath);
+        try {
+          await deno.mkdir(localDir, { recursive: true });
+        } catch (e) {}
 
         const content = await rsp.clone().text();
         const encoder = new TextEncoder();
-        await deno.writeFile(opts.filePath, encoder.encode(content));
+        await deno.writeFile(localPath, encoder.encode(content));
+      } else {
+        const diagnostic = buildError(diagnostics);
+        diagnostic.messageText = `Unable to fetch: ${remoteUrl}, ${rsp.status}`;
       }
     } catch (e) {
-      console.error(e);
+      catchError(diagnostics, e);
     }
   };
 
@@ -99,37 +112,109 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       destroys.clear();
     },
     dynamicImport(p) {
-      return import(p);
+      if (isRemoteHost) {
+        // if this sys is hosted from http://, but the path to be
+        // imported is a local file, then ensure it is a file:// protocol
+        p = convertPathToFileProtocol(p);
+      }
+      return import(`${p}?${version}`);
     },
     encodeToBase64(str) {
       return Buffer.from(str).toString('base64');
     },
     async ensureDependencies(opts) {
-      const tsDep = opts.dependencies.find(dep => dep.name === 'typescript');
+      const timespan = opts.logger.createTimeSpan(`ensure dependencies start`, true);
+      const diagnostics: Diagnostic[] = [];
+      const stencilDep = opts.dependencies.find(dep => dep.name === '@stencil/core');
+      const typescriptDep = opts.dependencies.find(dep => dep.name === 'typescript');
 
-      try {
-        const decoder = new TextDecoder('utf-8');
-        const pkgContent = await deno.readFile(sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: tsDep.name, path: tsDep.main }));
-        const pkgData: PackageJsonData = JSON.parse(decoder.decode(pkgContent));
-        if (pkgData.version === tsDep.version) {
-          return;
-        }
-      } catch (e) {}
+      stencilRemoteUrl = new URL(`../../compiler/stencil.js`, import.meta.url).href;
+      if (!isRemoteUrl(stencilRemoteUrl)) {
+        stencilRemoteUrl = sys.getRemoteModuleUrl({ moduleId: stencilDep.name, version: stencilDep.version, path: stencilDep.main });
+      }
+      stencilBaseUrl = new URL(`../../`, stencilRemoteUrl);
+      stencilExePath = sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: stencilDep.name, path: stencilDep.main });
 
-      const deps = tsDep.resources.map(p => ({
-        url: sys.getRemoteModuleUrl({ moduleId: tsDep.name, version: tsDep.version, path: p }),
-        filePath: sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: tsDep.name, path: p }),
-      }));
+      typescriptRemoteUrl = sys.getRemoteModuleUrl({ moduleId: typescriptDep.name, version: typescriptDep.version, path: typescriptDep.main });
+      typescriptExePath = sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: typescriptDep.name, path: typescriptDep.main });
 
-      await Promise.all(deps.map(fetchAndWrite));
+      const ensureStencil = fetchWrite(diagnostics, stencilRemoteUrl, stencilExePath);
+      const ensureTypescript = fetchWrite(diagnostics, typescriptRemoteUrl, typescriptExePath);
+
+      await Promise.all([ensureStencil, ensureTypescript]);
+
+      sys.getCompilerExecutingPath = () => stencilExePath;
+
+      timespan.finish(`ensure dependencies end`);
+
+      return {
+        stencilPath: stencilExePath,
+        typescriptPath: typescriptExePath,
+        diagnostics,
+      };
     },
-    exit(exitCode) {
-      deno.exit(exitCode);
+    async ensureResources(opts) {
+      const stencilDep = opts.dependencies.find(dep => dep.name === '@stencil/core');
+      const typescriptDep = opts.dependencies.find(dep => dep.name === 'typescript');
+
+      const deps: { url: string; path: string }[] = [];
+
+      const stencilPkg = sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: stencilDep.name, path: 'package.json' });
+      const typescriptPkg = sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: typescriptDep.name, path: 'package.json' });
+
+      const stencilCheck = sys.access(stencilPkg);
+      const typescriptCheck = sys.access(typescriptPkg);
+
+      const stencilResourcesExist = await stencilCheck;
+      const typescriptResourcesExist = await typescriptCheck;
+
+      if (!stencilResourcesExist) {
+        opts.logger.debug(`stencilBaseUrl: ${stencilBaseUrl.href}`);
+        stencilDep.resources.forEach(p => {
+          deps.push({
+            url: new URL(p, stencilBaseUrl).href,
+            path: sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: stencilDep.name, path: p }),
+          });
+        });
+      }
+
+      if (!typescriptResourcesExist) {
+        typescriptDep.resources.forEach(p => {
+          deps.push({
+            url: sys.getRemoteModuleUrl({ moduleId: typescriptDep.name, version: typescriptDep.version, path: p }),
+            path: sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: typescriptDep.name, path: p }),
+          });
+        });
+      }
+
+      if (deps.length > 0) {
+        console.log(deps);
+        const ensuredDirs = new Set<string>();
+        const timespan = opts.logger.createTimeSpan(`ensure resources start`, true);
+
+        await Promise.all(
+          deps.map(async dep => {
+            const rsp = await fetch(dep.url);
+            if (rsp.ok) {
+              const content = rsp.text();
+              const dir = dirname(dep.path);
+              if (!ensuredDirs.has(dir)) {
+                sys.mkdir(dir, { recursive: true });
+                ensuredDirs.add(dir);
+              }
+              await sys.writeFile(dep.path, await content);
+            } else {
+              opts.logger.error(`unable to fetch: ${dep.url}`);
+            }
+          }),
+        );
+
+        timespan.finish(`ensure resources end: ${deps.length}`);
+      }
     },
-    hardwareConcurrency,
+    exit: deno.exit,
     getCompilerExecutingPath() {
-      const current = new URL('../../compiler/stencil.js', import.meta.url);
-      return normalizePath(current.pathname);
+      return stencilExePath;
     },
     getCurrentDirectory() {
       return normalizePath(deno.cwd());
@@ -142,6 +227,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
     glob(_pattern, _opts) {
       return null;
     },
+    hardwareConcurrency,
     async isSymbolicLink(p) {
       try {
         const stat = await deno.stat(p);
@@ -201,7 +287,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       const dirEntries: string[] = [];
       try {
         for await (const dirEntry of deno.readDir(p)) {
-          dirEntries.push(normalizePath(join(p, dirEntry.name)));
+          dirEntries.push(join(p, dirEntry.name));
         }
       } catch (e) {}
       return dirEntries;
@@ -210,7 +296,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       const dirEntries: string[] = [];
       try {
         for (const dirEntry of deno.readDirSync(p)) {
-          dirEntries.push(normalizePath(join(p, dirEntry.name)));
+          dirEntries.push(join(p, dirEntry.name));
         }
       } catch (e) {}
       return dirEntries;
