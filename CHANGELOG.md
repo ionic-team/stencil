@@ -1,8 +1,10 @@
-# 🐩 [1.16.0-3](https://github.com/ionic-team/stencil/compare/v1.15.0...v1.16.0-3) (2020-07-04)
+# 🏝 [1.16.0-4](https://github.com/ionic-team/stencil/compare/v1.15.0...v1.16.0-4) (2020-07-06)
 
 
 ### Features
 
+* TypeScript 3.9.6
+* Rollup 2.19.0
 * **deno:** create deno system to run cli and compiler from [Deno](https://deno.land/) _Experimental!!_ ([b3d79c6](https://github.com/ionic-team/stencil/commit/b3d79c681d22d6c9aac51f70215e909f82b89048))
 
 
