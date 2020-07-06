@@ -3,7 +3,7 @@ import { denoLoadTypeScript } from '../../../sys/deno/deno-load-typescript';
 import { dependencies } from '../dependencies.json';
 import { isFunction, IS_NODE_ENV, IS_BROWSER_ENV, IS_WEB_WORKER_ENV, IS_DENO_ENV } from '@utils';
 import { nodeLoadTypeScript } from '../../../sys/node/node-load-typescript';
-import { patchImportedTsSys as patchRemoteTsSys } from './typescript-patch';
+import { patchRemoteTsSys } from './typescript-patch';
 import ts from 'typescript';
 
 export const loadTypescript = (sys: d.CompilerSystem, typescriptPath: string, sync: boolean): TypeScriptModule | Promise<TypeScriptModule> => {
@@ -33,7 +33,7 @@ export const loadTypescript = (sys: d.CompilerSystem, typescriptPath: string, sy
   if (IS_WEB_WORKER_ENV) {
     const webWorkerTs = getLoadedTs(webWorkerLoadTypeScript(tsUrl));
     if (webWorkerTs) {
-      patchRemoteTsSys(webWorkerTs, tsUrl);
+      patchRemoteTsSys(tsUrl);
       return webWorkerTs;
     }
   }
@@ -72,7 +72,8 @@ const browserMainLoadTypeScript = (tsUrl: string): any =>
     scriptElm.onload = () => {
       const browserTs = getLoadedTs((globalThis as any).ts);
       if (browserTs) {
-        resolve(patchRemoteTsSys(browserTs, tsUrl));
+        patchRemoteTsSys(tsUrl);
+        resolve(browserTs);
       } else {
         reject(`Unable to load TypeScript via browser script`);
       }
@@ -90,11 +91,10 @@ const getTsUrl = (sys: d.CompilerSystem, typeScriptPath: string) => {
   return sys.getRemoteModuleUrl({ moduleId: typecriptDep.name, version: typecriptDep.version, path: typecriptDep.main });
 };
 
-const getLoadedTs = (loadedTs: TypeScriptModule) => {
+const getLoadedTs = (loadedTs: TypeScriptModule): TypeScriptModule => {
   if (loadedTs != null && isFunction(loadedTs.transpileModule)) {
     loadedTs.__loaded = true;
-    Object.assign(ts, loadedTs);
-    return loadedTs;
+    return Object.assign(ts, loadedTs);
   }
   return null;
 };

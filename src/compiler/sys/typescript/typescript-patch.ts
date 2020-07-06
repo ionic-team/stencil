@@ -31,9 +31,9 @@ const patchTypescriptModule = async (config: d.Config, diagnostics: d.Diagnostic
   }
 };
 
-export const patchImportedTsSys = (importedTs: any, tsUrl: string) => {
+export const patchRemoteTsSys = (tsUrl: string) => {
   // patches just the bare minimum
-  const tsSys: ts.System = (importedTs.sys = importedTs.sys || ({} as any));
+  const tsSys: ts.System = (ts.sys = ts.sys || ({} as any));
   tsSys.getExecutingFilePath = () => tsUrl;
 
   if (!tsSys.getCurrentDirectory) {
@@ -57,5 +57,4 @@ export const patchImportedTsSys = (importedTs: any, tsUrl: string) => {
   if (!tsSys.write) {
     tsSys.write = noop;
   }
-  return importedTs;
 };
