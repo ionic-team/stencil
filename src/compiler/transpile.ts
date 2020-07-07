@@ -124,7 +124,7 @@ const transpileJson = (results: TranspileResults) => {
   results.map = { mappings: '' };
 };
 
-// @todo: could/should this be borrowed from either tsconfig's allowJs or jest config's ?
+// NOTE: if you change this, also change scripts/bundles/helpers/jest/jest-preset.js
 const shouldTranspileModule = (ext: string) => ['tsx', 'ts', 'mjs', 'jsx', 'js'].includes(ext);
 
 export const compile = (code: string, opts: any = {}): Promise<any> => {
