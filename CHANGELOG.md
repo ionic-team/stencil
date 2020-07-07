@@ -20,7 +20,6 @@
 * **treeshaking:** update build conditional treeskaking optimization ([2ba24b1](https://github.com/ionic-team/stencil/commit/2ba24b1e109b27daa69a8e9a4571a3a6d0577e70))
 
 
-
 # 🎙 [1.15.0](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0) (2020-06-25)
 
 
