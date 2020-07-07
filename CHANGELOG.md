@@ -13,11 +13,12 @@
 * **compiler:** fix transitive module dependencies in unit tests ([#2178](https://github.com/ionic-team/stencil/issues/2178)) ([#2549](https://github.com/ionic-team/stencil/issues/2549)) ([6585dd1](https://github.com/ionic-team/stencil/commit/6585dd1f9b0d4c2ad122cc4c8d568365de0a2873))
 * **e2e:** readiness flag on slow or overloaded computers ([#2525](https://github.com/ionic-team/stencil/issues/2525)) ([a19ac90](https://github.com/ionic-team/stencil/commit/a19ac9085af62b831ff78d515b92d5789f015c60))
 * **jest:** correctly set coverageThreshold ([#2529](https://github.com/ionic-team/stencil/issues/2529)) ([915bfce](https://github.com/ionic-team/stencil/commit/915bfce417630b71806c4a1a1d90ad5e86ed0093))
-* **jsx:** add autocomplete to <select> ([69ccbf1](https://github.com/ionic-team/stencil/commit/69ccbf1fcffed429257349ea269da90fbd9acc73))
+* **jsx:** add autocomplete to `<select>` ([69ccbf1](https://github.com/ionic-team/stencil/commit/69ccbf1fcffed429257349ea269da90fbd9acc73))
 * **worker:** use importScript() to load cross-origin worker ([d6b73b1](https://github.com/ionic-team/stencil/commit/d6b73b1bbf0024ab93baa8577193408db9801f85))
 * **compiler:** ensure event emitters defined before user statements ([1b52d43](https://github.com/ionic-team/stencil/commit/1b52d435f204a3241b69e37973c56741d2050e22))
 * **runtime:** correctly set isWatchReady flag for custom elements build ([36b4978](https://github.com/ionic-team/stencil/commit/36b4978e467383d8ea4181c7104fd46654c06698))
 * **treeshaking:** update build conditional treeskaking optimization ([2ba24b1](https://github.com/ionic-team/stencil/commit/2ba24b1e109b27daa69a8e9a4571a3a6d0577e70))
+
 
 
 # 🎙 [1.15.0](https://github.com/ionic-team/stencil/compare/v1.14.0...v1.15.0) (2020-06-25)
