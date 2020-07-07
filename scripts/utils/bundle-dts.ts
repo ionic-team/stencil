@@ -1,7 +1,6 @@
 import fs from 'fs-extra';
-import { generateDtsBundle } from 'dts-bundle-generator/bundle-generator.js';
+import { generateDtsBundle } from 'dts-bundle-generator/dist/bundle-generator.js';
 import { BuildOptions } from './options';
-
 
 export async function bundleDts(opts: BuildOptions, inputFile: string) {
   const cachedDtsOutput = inputFile + '-bundled.d.ts';
@@ -12,9 +11,11 @@ export async function bundleDts(opts: BuildOptions, inputFile: string) {
     } catch (e) {}
   }
 
-  const entries = [{
-    filePath: inputFile
-  }];
+  const entries = [
+    {
+      filePath: inputFile,
+    },
+  ];
 
   let outputCode = generateDtsBundle(entries).join('\n');
 
