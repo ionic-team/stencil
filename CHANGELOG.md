@@ -1,3 +1,15 @@
+## 🎱 [1.16.1](https://github.com/ionic-team/stencil/compare/v1.16.0...v1.16.1) (2020-07-09)
+
+
+### Bug Fixes
+
+* **cli:** export cli types and runTask, move checkVersion to sys, add tests ([02c62b5](https://github.com/ionic-team/stencil/commit/02c62b5e23322c3e46d92514d1abceed870727b6))
+* **sys:** ensure typescript sys patched for initial load ([90913df](https://github.com/ionic-team/stencil/commit/90913df7fee5ccf1b17cbebda2c5e9edaaaa5648))
+* **typescript:** correctly patch typescript import ([b24933d](https://github.com/ionic-team/stencil/commit/b24933dfe9b285578d90e15846ea4f5991254415)), closes [#2561](https://github.com/ionic-team/stencil/issues/2561)
+
+* Rollup 2.21.0
+
+
 # 🏊 [1.16.0](https://github.com/ionic-team/stencil/compare/v1.15.0...v1.16.0) (2020-07-06)
 
 
