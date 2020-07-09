@@ -2522,12 +2522,3 @@ export interface ValidateTypesResults {
   dirPaths: string[];
   filePaths: string[];
 }
-
-export interface CliInitOptions {
-  args: string[];
-  logger: Logger;
-  sys: CompilerSystem;
-  checkVersion?: CheckVersion;
-}
-
-export type CheckVersion = (config: Config, currentVersion: string) => Promise<() => void>;

@@ -820,6 +820,7 @@ export interface CompilerSystem {
   accessSync(p: string): boolean;
   applyGlobalPatch?(fromDir: string): Promise<void>;
   cacheStorage?: CacheStorage;
+  checkVersion?: (logger: Logger, currentVersion: string) => Promise<() => void>;
   copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
   /**
    * Always returns a boolean if the files were copied or not. Does not throw.
@@ -2290,4 +2291,10 @@ export interface DevServer extends BuildEmitEvents {
   port: number;
   root: string;
   close(): Promise<void>;
+}
+
+export interface CliInitOptions {
+  args: string[];
+  logger: Logger;
+  sys: CompilerSystem;
 }

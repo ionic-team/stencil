@@ -9,10 +9,25 @@ import { RollupOptions } from 'rollup';
 import { relativePathPlugin } from './plugins/relative-path-plugin';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
+import { writePkgJson } from '../utils/write-pkg-json';
 
 export async function sysNode(opts: BuildOptions) {
-  const inputFile = join(opts.transpiledDir, 'sys', 'node', 'index.js');
+  const inputDir = join(opts.transpiledDir, 'sys', 'node');
+  const inputFile = join(inputDir, 'index.js');
   const outputFile = join(opts.output.sysNodeDir, 'index.js');
+
+  // create public d.ts
+  let dts = await fs.readFile(join(inputDir, 'public.d.ts'), 'utf8');
+  dts = dts.replace('@stencil/core/internal', '../../internal/index');
+  await fs.writeFile(join(opts.output.sysNodeDir, 'index.d.ts'), dts);
+
+  // write @stencil/core/compiler/package.json
+  writePkgJson(opts, opts.output.sysNodeDir, {
+    name: '@stencil/core/sys/node',
+    description: 'Stencil Node System.',
+    main: 'index.js',
+    types: 'index.d.ts',
+  });
 
   const sysNodeBundle: RollupOptions = {
     input: inputFile,

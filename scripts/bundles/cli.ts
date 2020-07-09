@@ -1,3 +1,4 @@
+import fs from 'fs-extra';
 import { join } from 'path';
 import rollupJson from '@rollup/plugin-json';
 import rollupCommonjs from '@rollup/plugin-commonjs';
@@ -8,22 +9,40 @@ import { relativePathPlugin } from './plugins/relative-path-plugin';
 import { BuildOptions } from '../utils/options';
 import { RollupOptions, OutputOptions } from 'rollup';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
+import { writePkgJson } from '../utils/write-pkg-json';
 
 export async function cli(opts: BuildOptions) {
   const inputDir = join(opts.transpiledDir, 'cli');
   const outputDir = opts.output.cliDir;
+  const esmFilename = 'index.js';
+  const cjsFilename = 'index.cjs.js';
+  const dtsFilename = 'index.d.ts';
 
   const esOutput: OutputOptions = {
     format: 'es',
-    file: join(outputDir, 'index.js'),
+    file: join(outputDir, esmFilename),
     preferConst: true,
   };
 
   const cjsOutput: OutputOptions = {
     format: 'cjs',
-    file: join(outputDir, 'index.cjs.js'),
+    file: join(outputDir, cjsFilename),
     preferConst: true,
   };
+
+  // create public d.ts
+  let dts = await fs.readFile(join(inputDir, 'public.d.ts'), 'utf8');
+  dts = dts.replace('@stencil/core/internal', '../internal/index');
+  await fs.writeFile(join(opts.output.cliDir, dtsFilename), dts);
+
+  // write @stencil/core/compiler/package.json
+  writePkgJson(opts, opts.output.cliDir, {
+    name: '@stencil/core/cli',
+    description: 'Stencil CLI.',
+    main: cjsFilename,
+    module: esmFilename,
+    types: dtsFilename,
+  });
 
   const cliBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),

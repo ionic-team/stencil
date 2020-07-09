@@ -7,6 +7,8 @@ import type {
   Diagnostic,
 } from '../../declarations';
 import { asyncGlob, nodeCopyTasks } from './node-copy-tasks';
+import { buildEvents } from '../../compiler/events';
+import { checkVersion } from './node-stencil-version-checker';
 import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
 import { createHash } from 'crypto';
 import exit from 'exit';
@@ -16,8 +18,73 @@ import { NodeResolveModule } from './node-resolve-module';
 import { NodeWorkerController } from './node-worker-controller';
 import { normalizePath, requireFunc, buildError } from '@utils';
 import path from 'path';
+import type TypeScript from 'typescript';
 
 export function createNodeSys(c: { process?: any } = {}) {
+  const sys = createNodeSysNoWatch(c);
+  const ts = require('typescript') as typeof TypeScript;
+  const tsWatchFile = ts.sys.watchFile;
+  const tsWatchDirectory = ts.sys.watchDirectory;
+
+  sys.watchTimeout = 80;
+  sys.events = buildEvents();
+
+  sys.watchDirectory = (p, callback, recursive) => {
+    const tsFileWatcher = tsWatchDirectory(
+      p,
+      fileName => {
+        fileName = normalizePath(fileName);
+        callback(fileName, null);
+      },
+      recursive,
+    );
+
+    const close = () => {
+      tsFileWatcher.close();
+    };
+
+    sys.addDestory(close);
+
+    return {
+      close() {
+        sys.removeDestory(close);
+        tsFileWatcher.close();
+      },
+    };
+  };
+
+  sys.watchFile = (p, callback) => {
+    const tsFileWatcher = tsWatchFile(p, (fileName, tsEventKind) => {
+      fileName = normalizePath(fileName);
+      if (tsEventKind === ts.FileWatcherEventKind.Created) {
+        callback(fileName, 'fileAdd');
+        sys.events.emit('fileAdd', fileName);
+      } else if (tsEventKind === ts.FileWatcherEventKind.Changed) {
+        callback(fileName, 'fileUpdate');
+        sys.events.emit('fileUpdate', fileName);
+      } else if (tsEventKind === ts.FileWatcherEventKind.Deleted) {
+        callback(fileName, 'fileDelete');
+        sys.events.emit('fileDelete', fileName);
+      }
+    });
+
+    const close = () => {
+      tsFileWatcher.close();
+    };
+    sys.addDestory(close);
+
+    return {
+      close() {
+        sys.removeDestory(close);
+        tsFileWatcher.close();
+      },
+    };
+  };
+
+  return sys;
+}
+
+export function createNodeSysNoWatch(c: { process?: any } = {}) {
   const prcs: NodeJS.Process = c.process || global.process;
   const destroys = new Set<() => Promise<void> | void>();
   const onInterruptsCallbacks: (() => void)[] = [];
@@ -51,6 +118,7 @@ export function createNodeSys(c: { process?: any } = {}) {
     removeDestory(cb) {
       destroys.delete(cb);
     },
+    checkVersion,
     copyFile(src, dst) {
       return new Promise(resolve => {
         fs.copyFile(src, dst, err => {
@@ -179,9 +247,7 @@ export function createNodeSys(c: { process?: any } = {}) {
       }
       return results;
     },
-    nextTick(cb) {
-      prcs.nextTick(cb);
-    },
+    nextTick: prcs.nextTick,
     normalizePath,
     onProcessInterrupt(cb) {
       onInterruptsCallbacks.push(cb);

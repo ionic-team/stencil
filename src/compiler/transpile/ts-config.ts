@@ -9,8 +9,8 @@ export const getTsOptionsToExtend = (config: d.Config) => {
     module: ts.ModuleKind.ESNext,
     moduleResolution: ts.ModuleResolutionKind.NodeJs,
     noEmitOnError: false,
-    outDir: config.cacheDir,
-    sourceMap: config.sourceMap,
+    outDir: config.cacheDir || config.sys.tmpdir(),
+    sourceMap: !!config.sourceMap,
   };
   return tsOptions;
 };

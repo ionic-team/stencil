@@ -1,13 +1,14 @@
-import type { Config, CheckVersion } from '../declarations';
+import type { Config } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
 import { runPrerenderTask } from './task-prerender';
+import { startCheckVersion, printCheckVersionResults } from './check-version';
 import { startupCompilerLog } from './logs';
 import { taskWatch } from './task-watch';
 
-export async function taskBuild(coreCompiler: CoreCompiler, config: Config, checkVersion: CheckVersion) {
+export const taskBuild = async (coreCompiler: CoreCompiler, config: Config) => {
   if (config.flags.watch) {
     // watch build
-    await taskWatch(coreCompiler, config, checkVersion);
+    await taskWatch(coreCompiler, config);
     return;
   }
 
@@ -17,7 +18,8 @@ export async function taskBuild(coreCompiler: CoreCompiler, config: Config, chec
   try {
     startupCompilerLog(coreCompiler, config);
 
-    const checkVersionPromise = checkVersion ? checkVersion(config, coreCompiler.version) : null;
+    const versionChecker = startCheckVersion(config, coreCompiler.version);
+
     const compiler = await coreCompiler.createCompiler(config);
     const results = await compiler.build();
 
@@ -34,10 +36,7 @@ export async function taskBuild(coreCompiler: CoreCompiler, config: Config, chec
       }
     }
 
-    if (checkVersionPromise != null) {
-      const checkVersionResults = await checkVersionPromise;
-      checkVersionResults();
-    }
+    await printCheckVersionResults(versionChecker);
   } catch (e) {
     exitCode = 1;
     config.logger.error(e);
@@ -46,4 +45,4 @@ export async function taskBuild(coreCompiler: CoreCompiler, config: Config, chec
   if (exitCode > 0) {
     config.sys.exit(exitCode);
   }
-}
+};

@@ -1,9 +1,9 @@
-import type { CliInitOptions } from '../declarations';
+import type { CliInitOptions, Config, TaskCommand } from '../declarations';
 import { dependencies } from '../compiler/sys/dependencies.json';
 import { findConfig } from './find-config';
 import { hasError, isFunction, shouldIgnoreError } from '@utils';
-import { loadCoreCompiler } from './load-compiler';
-import { loadedCompilerLog, startupLog } from './logs';
+import { loadCoreCompiler, CoreCompiler } from './load-compiler';
+import { loadedCompilerLog, startupLog, startupLogVersion } from './logs';
 import { parseFlags } from './parse-flags';
 import { taskBuild } from './task-build';
 import { taskDocs } from './task-docs';
@@ -13,13 +13,13 @@ import { taskInfo } from './task-info';
 import { taskPrerender } from './task-prerender';
 import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
-import { version } from '../version';
 
-export async function run(init: CliInitOptions) {
-  const { args, logger, sys, checkVersion } = init;
+export const run = async (init: CliInitOptions) => {
+  const { args, logger, sys } = init;
 
   try {
     const flags = parseFlags(sys, args);
+    const task = flags.task;
     if (flags.debug || flags.verbose) {
       logger.setLevel('debug');
     }
@@ -32,17 +32,12 @@ export async function run(init: CliInitOptions) {
       sys.applyGlobalPatch(sys.getCurrentDirectory());
     }
 
-    if (flags.task === 'version' || flags.version) {
-      console.log(version);
-      return;
-    }
-
-    if (flags.task === 'help' || flags.help) {
+    if (task === 'help' || flags.help) {
       taskHelp(sys, logger);
       return;
     }
 
-    startupLog(logger, flags);
+    startupLog(logger, task);
 
     const findConfigResults = await findConfig({ sys, configPath: flags.config });
     if (hasError(findConfigResults.diagnostics)) {
@@ -57,10 +52,17 @@ export async function run(init: CliInitOptions) {
     }
 
     const coreCompiler = await loadCoreCompiler(sys);
+ 
+    if (task === 'version' || flags.version) {
+      console.log(coreCompiler.version);
+      return;
+    }
+
+    startupLogVersion(logger, task, coreCompiler);
 
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
-    if (flags.task === 'info') {
+    if (task === 'info') {
       taskInfo(coreCompiler, sys, logger);
       return;
     }
@@ -88,41 +90,57 @@ export async function run(init: CliInitOptions) {
 
     await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies });
 
-    switch (flags.task) {
-      case 'build':
-        await taskBuild(coreCompiler, validated.config, checkVersion);
-        break;
+    await runTask(coreCompiler, validated.config, task);
 
-      case 'docs':
-        await taskDocs(coreCompiler, validated.config);
-        break;
-
-      case 'generate':
-      case 'g':
-        await taskGenerate(coreCompiler, validated.config);
-        break;
-
-      case 'prerender':
-        await taskPrerender(coreCompiler, validated.config);
-        break;
-
-      case 'serve':
-        await taskServe(validated.config);
-        break;
-
-      case 'test':
-        await taskTest(validated.config);
-        break;
-
-      default:
-        logger.error(`${logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-        taskHelp(sys, logger);
-        sys.exit(1);
-    }
   } catch (e) {
     if (!shouldIgnoreError(e)) {
       logger.error(`uncaught cli error: ${e}${logger.getLevel() === 'debug' ? e.stack : ''}`);
       sys.exit(1);
     }
   }
-}
+};
+
+export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: TaskCommand) => {
+  config.flags = config.flags || {};
+  config.outputTargets = config.outputTargets || [];
+
+  switch (task) {
+    case 'build':
+      await taskBuild(coreCompiler, config);
+      break;
+
+    case 'docs':
+      await taskDocs(coreCompiler, config);
+      break;
+
+    case 'help':
+      taskHelp(config.sys, config.logger);
+      break;
+
+    case 'generate':
+    case 'g':
+      await taskGenerate(coreCompiler, config);
+      break;
+
+    case 'prerender':
+      await taskPrerender(coreCompiler, config);
+      break;
+
+    case 'serve':
+      await taskServe(config);
+      break;
+
+    case 'test':
+      await taskTest(config);
+      break;
+
+    case 'version':
+      console.log(coreCompiler.version);
+      break;
+  
+    default:
+      config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
+      taskHelp(config.sys, config.logger);
+      config.sys.exit(1);
+  }
+};
