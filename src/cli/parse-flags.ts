@@ -1,7 +1,7 @@
 import type { CompilerSystem, ConfigFlags } from '../declarations';
 import { dashToPascalCase } from '@utils';
 
-export function parseFlags(sys: CompilerSystem, args: string[]): ConfigFlags {
+export const parseFlags = (sys: CompilerSystem, args: string[]): ConfigFlags => {
   const flags: any = {
     task: null,
     args: [],
@@ -39,9 +39,9 @@ export function parseFlags(sys: CompilerSystem, args: string[]): ConfigFlags {
   });
 
   return flags;
-}
+};
 
-function parseArgs(flags: any, args: string[], knownArgs: string[]) {
+const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
   ARG_OPTS.boolean.forEach(booleanName => {
     const alias = (ARG_OPTS.alias as any)[booleanName];
     const flagKey = configCase(booleanName);
@@ -153,7 +153,7 @@ function parseArgs(flags: any, args: string[], knownArgs: string[]) {
       }
     }
   });
-}
+};
 
 const configCase = (prop: string) => {
   prop = dashToPascalCase(prop);
@@ -203,7 +203,7 @@ const ARG_OPTS = {
   },
 };
 
-function getNpmConfigEnvArgs(sys: CompilerSystem) {
+const getNpmConfigEnvArgs = (sys: CompilerSystem) => {
   // process.env.npm_config_argv
   // {"remain":["4444"],"cooked":["run","serve","--port","4444"],"original":["run","serve","--port","4444"]}
   let args: string[] = [];
@@ -217,4 +217,4 @@ function getNpmConfigEnvArgs(sys: CompilerSystem) {
     }
   } catch (e) {}
   return args;
-}
+};

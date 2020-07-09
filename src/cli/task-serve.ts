@@ -1,7 +1,7 @@
 import type { Config } from '../declarations';
 import { isString } from '@utils';
 
-export async function taskServe(config: Config) {
+export const taskServe = async (config: Config) => {
   config.suppressLogs = true;
 
   config.flags.serve = true;
@@ -25,4 +25,4 @@ export async function taskServe(config: Config) {
   config.sys.onProcessInterrupt(() => {
     devServer && devServer.close();
   });
-}
+};

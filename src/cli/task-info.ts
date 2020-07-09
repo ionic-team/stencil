@@ -1,7 +1,7 @@
 import type { CompilerSystem, Logger } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
 
-export function taskInfo(coreCompiler: CoreCompiler, sys: CompilerSystem, logger: Logger) {
+export const taskInfo = (coreCompiler: CoreCompiler, sys: CompilerSystem, logger: Logger) => {
   const details = sys.details;
   const versions = coreCompiler.versions;
 
@@ -16,4 +16,4 @@ export function taskInfo(coreCompiler: CoreCompiler, sys: CompilerSystem, logger
   console.log(`${logger.cyan('      Rollup:')} ${versions.rollup}`);
   console.log(`${logger.cyan('      Terser:')} ${versions.terser}`);
   console.log(``);
-}
+};

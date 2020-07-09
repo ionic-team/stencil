@@ -1,7 +1,7 @@
 import type { Config, TestingRunOptions } from '../declarations';
 import { IS_NODE_ENV } from '@utils';
 
-export async function taskTest(config: Config) {
+export const taskTest = async (config: Config) => {
   if (!IS_NODE_ENV) {
     config.logger.error(`"test" command is currently only implemented for a NodeJS environment`);
     config.sys.exit(1);
@@ -54,4 +54,4 @@ export async function taskTest(config: Config) {
     config.logger.error(e);
     config.sys.exit(1);
   }
-}
+};

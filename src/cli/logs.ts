@@ -2,7 +2,7 @@ import type { Config, Logger, ConfigFlags, CompilerSystem } from '../declaration
 import type { CoreCompiler } from './load-compiler';
 import { version, vermoji } from '../version';
 
-export function startupLog(logger: Logger, flags: ConfigFlags) {
+export const startupLog = (logger: Logger, flags: ConfigFlags) => {
   if (flags.task === 'info' || flags.task === 'serve') {
     return;
   }
@@ -19,9 +19,9 @@ export function startupLog(logger: Logger, flags: ConfigFlags) {
   startupMsg += logger.emoji(' ' + vermoji);
 
   logger.info(startupMsg);
-}
+};
 
-export function loadedCompilerLog(sys: CompilerSystem, logger: Logger, flags: ConfigFlags, coreCompiler: CoreCompiler) {
+export const loadedCompilerLog = (sys: CompilerSystem, logger: Logger, flags: ConfigFlags, coreCompiler: CoreCompiler) => {
   const sysDetails = sys.details;
   const runtimeInfo = `${sys.name} ${sys.version}`;
   const platformInfo = `${sysDetails.platform}, ${sysDetails.cpuModel}`;
@@ -38,9 +38,9 @@ export function loadedCompilerLog(sys: CompilerSystem, logger: Logger, flags: Co
     logger.info(platformInfo);
     logger.info(statsInfo);
   }
-}
+};
 
-export function startupCompilerLog(coreCompiler: CoreCompiler, config: Config) {
+export const startupCompilerLog = (coreCompiler: CoreCompiler, config: Config) => {
   if (config.suppressLogs === true) {
     return;
   }
@@ -69,4 +69,4 @@ export function startupCompilerLog(coreCompiler: CoreCompiler, config: Config) {
       logger.warn(`Disabling cache during development will slow down incremental builds.`);
     }
   }
-}
+};

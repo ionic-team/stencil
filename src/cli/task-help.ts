@@ -1,6 +1,6 @@
 import type { CompilerSystem, Logger } from '../declarations';
 
-export function taskHelp(sys: CompilerSystem, logger: Logger) {
+export const taskHelp = (sys: CompilerSystem, logger: Logger) => {
   const p = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
 
   console.log(`
@@ -34,4 +34,4 @@ export function taskHelp(sys: CompilerSystem, logger: Logger) {
     ${p} ${logger.green('stencil test --spec --e2e')}
 
 `);
-}
+};
