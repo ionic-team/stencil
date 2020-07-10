@@ -2,7 +2,7 @@ import type { Config } from '../declarations';
 import { isFunction } from '@utils';
 
 export const startCheckVersion = async (config: Config, currentVersion: string) => {
-  if (config.devMode && !config.flags.ci && isFunction(config.sys.checkVersion)) {
+  if (config.devMode && !config.flags.ci && !currentVersion.includes('-dev.') && isFunction(config.sys.checkVersion)) {
     return config.sys.checkVersion(config.logger, currentVersion);
   }
   return null;

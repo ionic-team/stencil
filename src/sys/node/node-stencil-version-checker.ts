@@ -6,7 +6,7 @@ import semiver from 'semiver';
 import { tmpdir } from 'os';
 
 const REGISTRY_URL = `https://registry.npmjs.org/@stencil/core`;
-const CHECK_INTERVAL = 1; //1000 * 60 * 60 * 24 * 7;
+const CHECK_INTERVAL = 1000 * 60 * 60 * 24 * 7;
 
 export async function checkVersion(logger: Logger, currentVersion: string): Promise<() => void> {
   try {
