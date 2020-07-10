@@ -87,7 +87,7 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     const otherRead = watchOtherFiles(config, compilerCtx);
     srcFileWatchCloser = await srcRead;
     otherFileWatchCloser = await otherRead;
-    tsWatchProgram = createTsWatchProgram(config, onBuild);
+    tsWatchProgram = await createTsWatchProgram(config, onBuild);
     return watchWaiter;
   };
 
