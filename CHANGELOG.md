@@ -1,3 +1,12 @@
+## 🍷 [1.16.2](https://github.com/ionic-team/stencil/compare/v1.16.1...v1.16.2) (2020-07-10)
+
+
+### Bug Fixes
+
+* **checker:** fix how often to check for stencil updates ([eb0da10](https://github.com/ionic-team/stencil/commit/eb0da107b531287b5fcce712f49b6198b52781c6))
+
+
+
 ## 🎱 [1.16.1](https://github.com/ionic-team/stencil/compare/v1.16.0...v1.16.1) (2020-07-09)
 
 
