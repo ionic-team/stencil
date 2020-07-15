@@ -48,6 +48,7 @@ const getCustomElementTransformer = (config: d.Config, compilerCtx: d.CompilerCt
     module: 'esm',
     proxy: null,
     style: 'static',
+    styleImportData: 'queryparams',
   };
   return [updateStencilCoreImports(transformOpts.coreImportPath), nativeComponentTransform(compilerCtx, transformOpts), removeCollectionImports(compilerCtx)];
 };

@@ -1,1 +1,1 @@
-export { run } from './run';
+export { run, runTask } from './run';

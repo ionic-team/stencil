@@ -130,6 +130,7 @@ const getCustomElementBundleCustomTransformer = (config: d.Config, compilerCtx: 
     currentDirectory: config.sys.getCurrentDirectory(),
     proxy: null,
     style: 'static',
+    styleImportData: 'queryparams',
   };
   return [updateStencilCoreImports(transformOpts.coreImportPath), nativeComponentTransform(compilerCtx, transformOpts), removeCollectionImports(compilerCtx)];
 };

@@ -42,6 +42,7 @@ const getHydrateCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCt
     currentDirectory: config.sys.getCurrentDirectory(),
     proxy: null,
     style: 'static',
+    styleImportData: 'queryparams',
   };
 
   return [updateStencilCoreImports(transformOpts.coreImportPath), hydrateComponentTransform(compilerCtx, transformOpts), removeCollectionImports(compilerCtx)];

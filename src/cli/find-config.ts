@@ -1,7 +1,7 @@
 import type { CompilerSystem, Diagnostic } from '../declarations';
 import { isString, normalizePath, buildError } from '@utils';
 
-export async function findConfig(opts: { sys: CompilerSystem; configPath: string }) {
+export const findConfig = async (opts: { sys: CompilerSystem; configPath: string }) => {
   const sys = opts.sys;
   const cwd = sys.getCurrentDirectory();
   const results = {
@@ -51,4 +51,4 @@ export async function findConfig(opts: { sys: CompilerSystem; configPath: string
   }
 
   return results;
-}
+};

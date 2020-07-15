@@ -5,7 +5,7 @@ import { IS_NODE_ENV, validateComponentTag } from '@utils';
 /**
  * Task to generate component boilerplate.
  */
-export async function taskGenerate(coreCompiler: CoreCompiler, config: Config) {
+export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config) => {
   if (!IS_NODE_ENV) {
     config.logger.error(`"generate" command is currently only implemented for a NodeJS environment`);
     config.sys.exit(1);
@@ -60,7 +60,7 @@ export async function taskGenerate(coreCompiler: CoreCompiler, config: Config) {
 
   const absoluteRootDir = config.rootDir;
   writtenFiles.map(file => console.log(`  - ${path.relative(absoluteRootDir, file)}`));
-}
+};
 
 /**
  * Show a checkbox prompt to select the files to be generated.

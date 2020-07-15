@@ -13,7 +13,7 @@ export class Cache implements d.Cache {
   }
 
   async initCacheDir() {
-    if (this.config._isTesting) {
+    if (this.config._isTesting || !this.config.cacheDir) {
       return;
     }
 

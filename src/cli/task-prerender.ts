@@ -3,7 +3,7 @@ import type { CoreCompiler } from './load-compiler';
 import { catchError } from '@utils';
 import { startupCompilerLog } from './logs';
 
-export async function taskPrerender(coreCompiler: CoreCompiler, config: Config) {
+export const taskPrerender = async (coreCompiler: CoreCompiler, config: Config) => {
   startupCompilerLog(coreCompiler, config);
 
   const hydrateAppFilePath = config.flags.unknownArgs[0];
@@ -21,15 +21,15 @@ export async function taskPrerender(coreCompiler: CoreCompiler, config: Config) 
   if (diagnostics.some(d => d.level === 'error')) {
     config.sys.exit(1);
   }
-}
+};
 
-export async function runPrerenderTask(
+export const runPrerenderTask = async (
   coreCompiler: CoreCompiler,
   config: Config,
   hydrateAppFilePath: string,
   componentGraph: BuildResultsComponentGraph,
   srcIndexHtmlPath: string,
-) {
+) => {
   const diagnostics: Diagnostic[] = [];
 
   try {
@@ -46,4 +46,4 @@ export async function runPrerenderTask(
   }
 
   return diagnostics;
-}
+};

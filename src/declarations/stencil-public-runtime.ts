@@ -1174,6 +1174,7 @@ export namespace JSXBase {
   }
 
   export interface ThHTMLAttributes<T> extends HTMLAttributes<T> {
+    abbr?: string;
     colSpan?: number;
     headers?: string;
     rowSpan?: number;

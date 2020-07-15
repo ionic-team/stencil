@@ -6,12 +6,16 @@ import { nodeLoadTypeScript } from '../../../sys/node/node-load-typescript';
 import { patchRemoteTsSys } from './typescript-patch';
 import ts from 'typescript';
 
-export const loadTypescript = (sys: d.CompilerSystem, typescriptPath: string, sync: boolean): TypeScriptModule | Promise<TypeScriptModule> => {
-  // try sync load typescript methods first
+const importedTs: ImportTypeScriptModule = {
+  ts: null,
+  p: null,
+};
 
-  if ((ts as TypeScriptModule).__loaded) {
+export const loadTypescript = (sys: d.CompilerSystem, typescriptPath: string, sync: boolean): typeof ts | Promise<typeof ts> => {
+  // try sync load typescript methods first
+  if (importedTs.ts) {
     // already loaded
-    return ts as TypeScriptModule;
+    return importedTs.ts;
   }
 
   // check if the global object has "ts" on it
@@ -33,7 +37,7 @@ export const loadTypescript = (sys: d.CompilerSystem, typescriptPath: string, sy
   if (IS_WEB_WORKER_ENV) {
     const webWorkerTs = getLoadedTs(webWorkerLoadTypeScript(tsUrl));
     if (webWorkerTs) {
-      patchRemoteTsSys(tsUrl);
+      patchRemoteTsSys(webWorkerTs, tsUrl);
       return webWorkerTs;
     }
   }
@@ -43,17 +47,17 @@ export const loadTypescript = (sys: d.CompilerSystem, typescriptPath: string, sy
   }
 
   // async at this point
-  if (!(ts as TypeScriptModule).__promise) {
+  if (!importedTs.p) {
     if (IS_DENO_ENV) {
-      (ts as TypeScriptModule).__promise = denoLoadTypeScript(sys, typescriptPath);
+      importedTs.p = denoLoadTypeScript(sys, typescriptPath);
     } else if (IS_BROWSER_ENV) {
-      (ts as TypeScriptModule).__promise = browserMainLoadTypeScript(tsUrl);
+      importedTs.p = browserMainLoadTypeScript(tsUrl);
     } else {
       throw new Error(`Unable to load TypeScript`);
     }
   }
 
-  return (ts as TypeScriptModule).__promise;
+  return importedTs.p;
 };
 
 const webWorkerLoadTypeScript = (tsUrl: string) => {
@@ -72,7 +76,7 @@ const browserMainLoadTypeScript = (tsUrl: string): any =>
     scriptElm.onload = () => {
       const browserTs = getLoadedTs((globalThis as any).ts);
       if (browserTs) {
-        patchRemoteTsSys(tsUrl);
+        patchRemoteTsSys(browserTs, tsUrl);
         resolve(browserTs);
       } else {
         reject(`Unable to load TypeScript via browser script`);
@@ -91,17 +95,15 @@ const getTsUrl = (sys: d.CompilerSystem, typeScriptPath: string) => {
   return sys.getRemoteModuleUrl({ moduleId: typecriptDep.name, version: typecriptDep.version, path: typecriptDep.main });
 };
 
-const getLoadedTs = (loadedTs: TypeScriptModule): TypeScriptModule => {
+const getLoadedTs = (loadedTs: typeof ts) => {
   if (loadedTs != null && isFunction(loadedTs.transpileModule)) {
-    loadedTs.__loaded = true;
-    return Object.assign(ts, loadedTs);
+    Object.assign(ts, loadedTs);
+    return (importedTs.ts = loadedTs);
   }
   return null;
 };
 
-type TypeScript = typeof ts;
-
-export interface TypeScriptModule extends TypeScript {
-  __loaded: boolean;
-  __promise?: Promise<TypeScriptModule>;
+export interface ImportTypeScriptModule {
+  ts: typeof ts;
+  p: Promise<typeof ts>;
 }

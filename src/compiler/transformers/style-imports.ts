@@ -1,17 +1,17 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { serializeImportPath } from './stencil-import-path';
 import ts from 'typescript';
 
 export const updateStyleImports = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, moduleFile: d.Module) => {
   // add style imports built from @Component() styleUrl option
   if (transformOpts.module === 'cjs') {
-    return updateCjsStyleRequires(tsSourceFile, moduleFile);
+    return updateCjsStyleRequires(transformOpts, tsSourceFile, moduleFile);
   }
 
-  return updateEsmStyleImports(tsSourceFile, moduleFile);
+  return updateEsmStyleImports(transformOpts, tsSourceFile, moduleFile);
 };
 
-const updateEsmStyleImports = (tsSourceFile: ts.SourceFile, moduleFile: d.Module) => {
+const updateEsmStyleImports = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, moduleFile: d.Module) => {
   const styleImports: ts.Statement[] = [];
   let statements = tsSourceFile.statements.slice();
   let updateSourceFile = false;
@@ -22,10 +22,10 @@ const updateEsmStyleImports = (tsSourceFile: ts.SourceFile, moduleFile: d.Module
         updateSourceFile = true;
         if (style.externalStyles.length > 0) {
           // add style imports built from @Component() styleUrl option
-          styleImports.push(createEsmStyleImport(tsSourceFile, cmp, style));
+          styleImports.push(createEsmStyleImport(transformOpts, tsSourceFile, cmp, style));
         } else {
           // update existing esm import of a style identifier
-          statements = updateEsmStyleImportPath(tsSourceFile, statements, cmp, style);
+          statements = updateEsmStyleImportPath(transformOpts, tsSourceFile, statements, cmp, style);
         }
       }
     });
@@ -48,13 +48,19 @@ const updateEsmStyleImports = (tsSourceFile: ts.SourceFile, moduleFile: d.Module
   return tsSourceFile;
 };
 
-const updateEsmStyleImportPath = (tsSourceFile: ts.SourceFile, statements: ts.Statement[], cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+const updateEsmStyleImportPath = (
+  transformOpts: d.TransformOptions,
+  tsSourceFile: ts.SourceFile,
+  statements: ts.Statement[],
+  cmp: d.ComponentCompilerMeta,
+  style: d.StyleCompiler,
+) => {
   for (let i = 0; i < statements.length; i++) {
     const n = statements[i];
     if (ts.isImportDeclaration(n) && n.importClause && n.moduleSpecifier && ts.isStringLiteral(n.moduleSpecifier)) {
       if (n.importClause.name && n.importClause.name.escapedText === style.styleIdentifier) {
         const orgImportPath = n.moduleSpecifier.text;
-        const importPath = getStyleImportPath(tsSourceFile, cmp, style, orgImportPath);
+        const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, orgImportPath);
 
         statements[i] = ts.updateImportDeclaration(n, n.decorators, n.modifiers, n.importClause, ts.createStringLiteral(importPath));
         break;
@@ -64,21 +70,21 @@ const updateEsmStyleImportPath = (tsSourceFile: ts.SourceFile, statements: ts.St
   return statements;
 };
 
-const createEsmStyleImport = (tsSourceFile: ts.SourceFile, cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+const createEsmStyleImport = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
   const importName = ts.createIdentifier(style.styleIdentifier);
-  const importPath = getStyleImportPath(tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
+  const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
 
   return ts.createImportDeclaration(undefined, undefined, ts.createImportClause(importName, undefined), ts.createLiteral(importPath));
 };
 
-const updateCjsStyleRequires = (tsSourceFile: ts.SourceFile, moduleFile: d.Module) => {
+const updateCjsStyleRequires = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, moduleFile: d.Module) => {
   const styleRequires: ts.Statement[] = [];
 
   moduleFile.cmps.forEach(cmp => {
     cmp.styles.forEach(style => {
       if (typeof style.styleIdentifier === 'string' && style.externalStyles.length > 0) {
         // add style imports built from @Component() styleUrl option
-        styleRequires.push(createCjsStyleRequire(tsSourceFile, cmp, style));
+        styleRequires.push(createCjsStyleRequire(transformOpts, tsSourceFile, cmp, style));
       }
     });
   });
@@ -90,9 +96,9 @@ const updateCjsStyleRequires = (tsSourceFile: ts.SourceFile, moduleFile: d.Modul
   return tsSourceFile;
 };
 
-const createCjsStyleRequire = (tsSourceFile: ts.SourceFile, cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+const createCjsStyleRequire = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
   const importName = ts.createIdentifier(style.styleIdentifier);
-  const importPath = getStyleImportPath(tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
+  const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
 
   return ts.createVariableStatement(
     undefined,
@@ -103,7 +109,7 @@ const createCjsStyleRequire = (tsSourceFile: ts.SourceFile, cmp: d.ComponentComp
   );
 };
 
-const getStyleImportPath = (tsSourceFile: ts.SourceFile, cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, importPath: string) => {
+const getStyleImportPath = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, importPath: string) => {
   const importData: d.SerializeImportData = {
     importeePath: importPath,
     importerPath: tsSourceFile.fileName,
@@ -111,5 +117,5 @@ const getStyleImportPath = (tsSourceFile: ts.SourceFile, cmp: d.ComponentCompile
     encapsulation: cmp.encapsulation,
     mode: style.modeName,
   };
-  return serializeImportPath(importData);
+  return serializeImportPath(importData, transformOpts.styleImportData);
 };

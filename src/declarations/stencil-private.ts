@@ -2002,6 +2002,7 @@ export interface TransformCssToEsmInput {
   minify?: boolean;
   docs?: boolean;
   autoprefixer?: any;
+  styleImportData?: string;
 }
 
 export interface TransformCssToEsmOutput {
@@ -2522,12 +2523,3 @@ export interface ValidateTypesResults {
   dirPaths: string[];
   filePaths: string[];
 }
-
-export interface CliInitOptions {
-  args: string[];
-  logger: Logger;
-  sys: CompilerSystem;
-  checkVersion?: CheckVersion;
-}
-
-export type CheckVersion = (config: Config, currentVersion: string) => Promise<() => void>;

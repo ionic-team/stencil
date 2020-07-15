@@ -6,35 +6,40 @@ export const config: Config = {
   namespace: 'EndToEnd',
   globalScript: './src/global.ts',
   globalStyle: './src/global.css',
-  plugins: [
-    builtins()
-  ],
+  plugins: [builtins()],
 
   testing: {
     moduleNameMapper: {
-      'lodash-es': 'lodash'
-    }
+      'lodash-es': 'lodash',
+    },
   },
   outputTargets: [
     {
       type: 'www',
-      serviceWorker: null
+      serviceWorker: null,
     },
     {
       type: 'dist',
     },
     {
-      type: 'experimental-dist-module'
+      type: 'experimental-dist-module',
     },
     reactOutputTarget({
       componentCorePackage: '@stencil/e2e-react-output-target',
       proxiesFile: './dist-react/components.ts',
-    })
+    }),
   ],
   commonjs: {
     namedExports: {
-      'file-saver': ['saveAs']
-    }
+      'file-saver': ['saveAs'],
+    },
+  },
+  hydratedFlag: {
+    name: 'custom-hydrate-flag',
+    selector: 'attribute',
+    property: 'opacity',
+    initialValue: '0',
+    hydratedValue: '1',
   },
   enableCache: false,
   hashFileNames: false,

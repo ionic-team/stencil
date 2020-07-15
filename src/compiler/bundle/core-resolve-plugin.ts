@@ -81,29 +81,32 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
     },
 
     async load(filePath) {
-      if (filePath === internalClient || filePath === internalHydrate) {
-        if (isRemoteUrl(compilerExe)) {
-          const url = getStencilModuleUrl(compilerExe, filePath);
-          return fetchModuleAsync(config.sys, compilerCtx.fs, packageVersions, url, filePath);
-        }
-
-        let code = await compilerCtx.fs.readFile(normalizeFsPath(filePath));
-        const hydratedFlag = config.hydratedFlag;
-        if (hydratedFlag) {
-          const hydratedFlagHead = getHydratedFlagHead(hydratedFlag);
-          if (HYDRATED_CSS !== hydratedFlagHead) {
-            code = code.replace(HYDRATED_CSS, hydratedFlagHead);
-            if (hydratedFlag.name !== 'hydrated') {
-              code = code.replace(`.classList.add("hydrated")`, `.classList.add("${hydratedFlag.name}")`);
-              code = code.replace(`.classList.add('hydrated')`, `.classList.add('${hydratedFlag.name}')`);
-              code = code.replace(`.setAttribute("hydrated",`, `.setAttribute("${hydratedFlag.name}",`);
-              code = code.replace(`.setAttribute('hydrated',`, `.setAttribute('${hydratedFlag.name}',`);
-            }
+      if (filePath && !filePath.startsWith('\0')) {
+        filePath = normalizeFsPath(filePath);
+        if (filePath === internalClient || filePath === internalHydrate) {
+          if (isRemoteUrl(compilerExe)) {
+            const url = getStencilModuleUrl(compilerExe, filePath);
+            return fetchModuleAsync(config.sys, compilerCtx.fs, packageVersions, url, filePath);
           }
-        } else {
-          code = code.replace(HYDRATED_CSS, '{}');
+
+          let code = await compilerCtx.fs.readFile(normalizeFsPath(filePath));
+          const hydratedFlag = config.hydratedFlag;
+          if (hydratedFlag) {
+            const hydratedFlagHead = getHydratedFlagHead(hydratedFlag);
+            if (HYDRATED_CSS !== hydratedFlagHead) {
+              code = code.replace(HYDRATED_CSS, hydratedFlagHead);
+              if (hydratedFlag.name !== 'hydrated') {
+                code = code.replace(`.classList.add("hydrated")`, `.classList.add("${hydratedFlag.name}")`);
+                code = code.replace(`.classList.add('hydrated')`, `.classList.add('${hydratedFlag.name}')`);
+                code = code.replace(`.setAttribute("hydrated",`, `.setAttribute("${hydratedFlag.name}",`);
+                code = code.replace(`.setAttribute('hydrated',`, `.setAttribute('${hydratedFlag.name}',`);
+              }
+            }
+          } else {
+            code = code.replace(HYDRATED_CSS, '{}');
+          }
+          return code;
         }
-        return code;
       }
       return null;
     },

@@ -1,27 +1,33 @@
-import type { Config, Logger, ConfigFlags, CompilerSystem } from '../declarations';
+import type { Config, Logger, ConfigFlags, CompilerSystem, TaskCommand } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
-import { version, vermoji } from '../version';
 
-export function startupLog(logger: Logger, flags: ConfigFlags) {
-  if (flags.task === 'info' || flags.task === 'serve') {
+export const startupLog = (logger: Logger, task: TaskCommand) => {
+  if (task === 'info' || task === 'serve' || task === 'version') {
     return;
   }
 
-  const isDevBuild = version.includes('-dev.');
+  logger.info(logger.cyan(`@stencil/core`));
+};
 
-  let startupMsg = logger.cyan(`@stencil/core`);
+export const startupLogVersion = (logger: Logger, task: TaskCommand, coreCompiler: CoreCompiler) => {
+  if (task === 'info' || task === 'serve' || task === 'version') {
+    return;
+  }
+  const isDevBuild = coreCompiler.version.includes('-dev.');
+
+  let startupMsg: string
 
   if (isDevBuild) {
-    startupMsg += ' ' + logger.yellow('[LOCAL DEV]');
+    startupMsg = logger.yellow('[LOCAL DEV]');
   } else {
-    startupMsg += ' ' + logger.cyan(`v${version}`);
+    startupMsg = logger.cyan(`v${coreCompiler.version}`);
   }
-  startupMsg += logger.emoji(' ' + vermoji);
+  startupMsg += logger.emoji(' ' + coreCompiler.vermoji);
 
   logger.info(startupMsg);
 }
 
-export function loadedCompilerLog(sys: CompilerSystem, logger: Logger, flags: ConfigFlags, coreCompiler: CoreCompiler) {
+export const loadedCompilerLog = (sys: CompilerSystem, logger: Logger, flags: ConfigFlags, coreCompiler: CoreCompiler) => {
   const sysDetails = sys.details;
   const runtimeInfo = `${sys.name} ${sys.version}`;
   const platformInfo = `${sysDetails.platform}, ${sysDetails.cpuModel}`;
@@ -38,9 +44,9 @@ export function loadedCompilerLog(sys: CompilerSystem, logger: Logger, flags: Co
     logger.info(platformInfo);
     logger.info(statsInfo);
   }
-}
+};
 
-export function startupCompilerLog(coreCompiler: CoreCompiler, config: Config) {
+export const startupCompilerLog = (coreCompiler: CoreCompiler, config: Config) => {
   if (config.suppressLogs === true) {
     return;
   }
@@ -69,4 +75,4 @@ export function startupCompilerLog(coreCompiler: CoreCompiler, config: Config) {
       logger.warn(`Disabling cache during development will slow down incremental builds.`);
     }
   }
-}
+};

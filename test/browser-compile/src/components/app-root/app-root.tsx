@@ -22,6 +22,7 @@ export class AppRoot {
   target: HTMLSelectElement;
   sourceMap: HTMLSelectElement;
   style: HTMLSelectElement;
+  styleImportData: HTMLSelectElement;
   componentExport: HTMLSelectElement;
   coreImportPath: HTMLSelectElement;
   build: HTMLSelectElement;
@@ -57,7 +58,7 @@ export class AppRoot {
     console.clear();
     console.log(`compile: stencil v${stencil.version}, typescript v${stencil.versions.typescript}`);
 
-    const opts: StencilTypes.CompileOptions = {
+    const opts: StencilTypes.TranspileOptions = {
       file: this.file.value,
       componentExport: this.componentExport.value,
       componentMetadata: this.componentMetadata.value,
@@ -67,9 +68,13 @@ export class AppRoot {
       target: this.target.value,
       sourceMap: this.sourceMap.value === 'true' ? true : this.sourceMap.value === 'inline' ? 'inline' : false,
       style: this.style.value,
+      styleImportData: this.styleImportData.value,
     };
 
+    const start = Date.now();
+    console.log('transpile start');
     const results = await stencil.transpile(this.sourceCodeInput.value, opts);
+    console.log('transpile end', Date.now() - start);
 
     results.imports.forEach(imprt => {
       console.log('import:', imprt);
@@ -188,6 +193,7 @@ export class AppRoot {
   }
 
   preview() {
+    console.log('preview reload');
     this.bundledLength = this.bundledInput.value.length;
 
     this.iframe.contentWindow.location.reload();
@@ -196,6 +202,7 @@ export class AppRoot {
     (window as any).htmlCodeInput = this.htmlCodeInput.value;
 
     setTimeout(() => {
+      console.log('preview update');
       const doc = this.iframe.contentDocument;
 
       const script = doc.createElement('script');
@@ -204,7 +211,7 @@ export class AppRoot {
       doc.head.appendChild(script);
 
       doc.body.innerHTML = this.htmlCodeInput.value;
-    });
+    }, 20);
   }
 
   openInWindow = () => {
@@ -277,6 +284,13 @@ export class AppRoot {
               <span>Style:</span>
               <select ref={el => (this.style = el)} onInput={this.compile.bind(this)}>
                 <option value="static">static</option>
+                <option value="null">null</option>
+              </select>
+            </label>
+            <label>
+              <span>Style Import Data:</span>
+              <select ref={el => (this.styleImportData = el)} onInput={this.compile.bind(this)}>
+                <option value="queryparams">queryparams</option>
                 <option value="null">null</option>
               </select>
             </label>

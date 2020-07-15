@@ -44,7 +44,7 @@ if (typeof globalThis === 'undefined') {
 var cli = require('../cli/index.cjs.js');
 var nodeApi = require('../sys/node/index.js');
 var nodeLogger = nodeApi.createNodeLogger({ process: process });
-var nodeSys = nodeApi.createNodeSysWithWatch({ process: process, logger: nodeLogger });
+var nodeSys = nodeApi.createNodeSys({ process: process, logger: nodeLogger });
 
 nodeApi.setupNodeProcess({ process: process, logger: nodeLogger });
 

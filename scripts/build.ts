@@ -25,7 +25,7 @@ export async function run(rootDir: string, args: string[]) {
     }
 
     if (args.includes('--validate-build')) {
-      validateBuild(rootDir);
+      await validateBuild(rootDir);
     }
   } catch (e) {
     console.error(e);

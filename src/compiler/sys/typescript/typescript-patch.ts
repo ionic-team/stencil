@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
 import { exit, getCurrentDirectory, hasError, isBoolean, noop } from '@utils';
-import { loadTypescript, TypeScriptModule } from './typescript-load';
+import { loadTypescript } from './typescript-load';
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 import { patchTypeScriptSys, patchTypeScriptGetParsedCommandLineOfConfigFile } from './typescript-sys';
 import { resolve } from 'path';
@@ -13,16 +13,16 @@ export const patchTypescript = async (config: d.Config, diagnostics: d.Diagnosti
 };
 
 export const patchTypescriptSync = (config: d.Config, diagnostics: d.Diagnostic[], inMemoryFs: d.InMemoryFileSystem) => {
-  const loadedTs = loadTypescript(config.sys, config.typescriptPath, true) as TypeScriptModule;
+  const loadedTs = loadTypescript(config.sys, config.typescriptPath, true) as typeof ts;
   patchTypescriptModule(config, diagnostics, inMemoryFs, loadedTs);
 };
 
-const patchTypescriptModule = async (config: d.Config, diagnostics: d.Diagnostic[], inMemoryFs: d.InMemoryFileSystem, loadedTs: TypeScriptModule) => {
+const patchTypescriptModule = async (config: d.Config, diagnostics: d.Diagnostic[], inMemoryFs: d.InMemoryFileSystem, loadedTs: typeof ts) => {
   if (loadedTs && !hasError(diagnostics)) {
     // override some properties on the original imported ts object
     patchTypeScriptSys(loadedTs, config, inMemoryFs);
     patchTypeScriptResolveModule(loadedTs, config, inMemoryFs);
-    patchTypeScriptGetParsedCommandLineOfConfigFile(loadedTs, config);
+    patchTypeScriptGetParsedCommandLineOfConfigFile(loadedTs);
 
     // the ts object you see imported here is actually a bogus {} object right now
     // so assign the loaded ts object to our project's imported "ts" object
@@ -31,9 +31,9 @@ const patchTypescriptModule = async (config: d.Config, diagnostics: d.Diagnostic
   }
 };
 
-export const patchRemoteTsSys = (tsUrl: string) => {
+export const patchRemoteTsSys = (loadedTs: typeof ts, tsUrl: string) => {
   // patches just the bare minimum
-  const tsSys: ts.System = (ts.sys = ts.sys || ({} as any));
+  const tsSys: ts.System = (loadedTs.sys = loadedTs.sys || ({} as any));
   tsSys.getExecutingFilePath = () => tsUrl;
 
   if (!tsSys.getCurrentDirectory) {

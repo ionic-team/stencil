@@ -1,38 +1,38 @@
-import { Config, PackageJsonData } from '../../declarations';
+import { Logger, PackageJsonData } from '../../declarations';
 import { isString, noop } from '@utils';
-import semiver from 'semiver';
+import fs from 'graceful-fs';
 import path from 'path';
+import semiver from 'semiver';
+import { tmpdir } from 'os';
 
 const REGISTRY_URL = `https://registry.npmjs.org/@stencil/core`;
 const CHECK_INTERVAL = 1000 * 60 * 60 * 24 * 7;
 
-export async function checkVersion(config: Config, currentVersion: string): Promise<() => void> {
-  if (config.devMode && !config.flags.ci) {
-    try {
-      const latestVersion = await getLatestCompilerVersion(config);
-      if (latestVersion != null) {
-        return () => {
-          if (semiver(currentVersion, latestVersion) < 0) {
-            printUpdateMessage(config, currentVersion, latestVersion);
-          } else {
-            console.debug(`${config.logger.cyan('@stencil/core')} version ${config.logger.green(currentVersion)} is the latest version`);
-          }
-        };
-      }
-    } catch (e) {
-      config.logger.debug(`unable to load latest compiler version: ${e}`);
+export async function checkVersion(logger: Logger, currentVersion: string): Promise<() => void> {
+  try {
+    const latestVersion = await getLatestCompilerVersion(logger);
+    if (latestVersion != null) {
+      return () => {
+        if (semiver(currentVersion, latestVersion) < 0) {
+          printUpdateMessage(logger, currentVersion, latestVersion);
+        } else {
+          console.debug(`${logger.cyan('@stencil/core')} version ${logger.green(currentVersion)} is the latest version`);
+        }
+      };
     }
+  } catch (e) {
+    logger.debug(`unable to load latest compiler version: ${e}`);
   }
   return noop;
 }
 
-async function getLatestCompilerVersion(config: Config) {
+async function getLatestCompilerVersion(logger: Logger) {
   try {
-    const lastCheck = await getLastCheck(config);
+    const lastCheck = await getLastCheck();
     if (lastCheck == null) {
       // we've never check before, so probably first install, so don't bother
       // save that we did just do a check though
-      setLastCheck(config);
+      setLastCheck();
       return null;
     }
 
@@ -42,7 +42,7 @@ async function getLatestCompilerVersion(config: Config) {
     }
 
     // remember we just did a check
-    const setPromise = setLastCheck(config);
+    const setPromise = setLastCheck();
 
     const body = await requestUrl(REGISTRY_URL);
     const data = JSON.parse(body) as PackageJsonData;
@@ -52,7 +52,7 @@ async function getLatestCompilerVersion(config: Config) {
     return data['dist-tags'].latest;
   } catch (e) {
     // quietly catch, could have no network connection which is fine
-    config.logger.debug(`getLatestCompilerVersion error: ${e}`);
+    logger.debug(`getLatestCompilerVersion error: ${e}`);
   }
 
   return null;
@@ -88,28 +88,33 @@ function requiresCheck(now: number, lastCheck: number, checkInterval: number) {
   return lastCheck + checkInterval < now;
 }
 
-async function getLastCheck(config: Config) {
-  try {
-    const data = await config.sys.readFile(getLastCheckStoragePath(config));
-    if (isString(data)) {
-      return JSON.parse(data);
-    }
-  } catch (e) {}
-  return null;
+function getLastCheck() {
+  return new Promise<number>(resolve => {
+    fs.readFile(getLastCheckStoragePath(), 'utf8', (err, data) => {
+      if (!err && isString(data)) {
+        try {
+          resolve(JSON.parse(data));
+        } catch (e) {}
+      }
+      resolve(null);
+    });
+  });
 }
 
-async function setLastCheck(config: Config) {
-  try {
+function setLastCheck() {
+  return new Promise<void>(resolve => {
     const now = JSON.stringify(Date.now());
-    await config.sys.writeFile(getLastCheckStoragePath(config), now);
-  } catch (e) {}
+    fs.writeFile(getLastCheckStoragePath(), now, () => {
+      resolve();
+    });
+  });
 }
 
-function getLastCheckStoragePath(config: Config) {
-  return path.join(config.sys.tmpdir(), 'stencil_last_version_check.json');
+function getLastCheckStoragePath() {
+  return path.join(tmpdir(), 'stencil_last_version_node.json');
 }
 
-function printUpdateMessage(config: Config, currentVersion: string, latestVersion: string) {
+function printUpdateMessage(logger: Logger, currentVersion: string, latestVersion: string) {
   const installMessage = `npm install @stencil/core`;
   const msg = [`Update available: ${currentVersion} ${ARROW} ${latestVersion}`, `To get the latest, please run:`, installMessage];
 
@@ -146,9 +151,9 @@ function printUpdateMessage(config: Config, currentVersion: string, latestVersio
 
   let output = `\n${INDENT}${o.join(`\n${INDENT}`)}\n`;
 
-  output = output.replace(currentVersion, config.logger.red(currentVersion));
-  output = output.replace(latestVersion, config.logger.green(latestVersion));
-  output = output.replace(installMessage, config.logger.cyan(installMessage));
+  output = output.replace(currentVersion, logger.red(currentVersion));
+  output = output.replace(latestVersion, logger.green(latestVersion));
+  output = output.replace(installMessage, logger.cyan(installMessage));
 
   console.log(output);
 }

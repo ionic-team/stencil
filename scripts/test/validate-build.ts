@@ -12,6 +12,7 @@ import ts from 'typescript';
 const pkgs: TestPackage[] = [
   {
     // cli
+    packageJson: 'cli/package.json',
     files: ['cli/index.js', 'cli/index.cjs.js'],
   },
   {
@@ -77,6 +78,7 @@ const pkgs: TestPackage[] = [
   },
   {
     // sys/node
+    packageJson: 'sys/node/package.json',
     files: ['sys/node/autoprefixer.js', 'sys/node/graceful-fs.js', 'sys/node/node-fetch.js'],
   },
   {
@@ -93,16 +95,17 @@ const pkgs: TestPackage[] = [
   },
 ];
 
-export function validateBuild(rootDir: string) {
+export async function validateBuild(rootDir: string) {
   const dtsEntries: string[] = [];
   const opts = getOptions(rootDir);
   pkgs.forEach(testPkg => {
     validatePackage(opts, testPkg, dtsEntries);
   });
+  console.log(`🐡  Validated packages`);
 
   validateDts(opts, dtsEntries);
 
-  console.log(`👾  Validated build files and distribution`);
+  await validateCompiler(opts);
 }
 
 function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: string[]) {
@@ -198,6 +201,54 @@ function validateDts(opts: BuildOptions, dtsEntries: string[]) {
     };
     throw new Error('🧨  ' + ts.formatDiagnostics(tsDiagnostics, host));
   }
+  console.log(`🐟  Validated dts files`);
+}
+
+async function validateCompiler(opts: BuildOptions) {
+  const compilerPath = join(opts.output.compilerDir, 'stencil.js');
+  const cliPath = join(opts.output.cliDir, 'index.cjs.js');
+  const sysNodePath = join(opts.output.sysNodeDir, 'index.js');
+
+  const compiler = await import(compilerPath);
+  const cli = await import(cliPath);
+  const sysNodeApi = await import(sysNodePath);
+
+  const nodeLogger = sysNodeApi.createNodeLogger({ process });
+  const nodeSys = sysNodeApi.createNodeSys({ process });
+
+  if (!nodeSys || nodeSys.name !== 'node' || nodeSys.version.length < 4) {
+    throw new Error(`🧨  unable to validate sys node`);
+  }
+  console.log(`🐳  Validated sys node, current ${nodeSys.name} version: ${nodeSys.version}`);
+
+  const validated = await compiler.loadConfig({
+    config: {
+      logger: nodeLogger,
+      sys: nodeSys,
+    },
+  });
+  console.log(`${compiler.vermoji}  Validated compiler: ${compiler.version}`);
+
+  const transpileResults = compiler.transpileSync('const m: string = `transpile!`;', { target: 'es5' });
+  if (!transpileResults || transpileResults.diagnostics.length > 0 || !transpileResults.code.startsWith(`var m = "transpile!";`)) {
+    console.error(transpileResults);
+    throw new Error(`🧨  transpileSync error`);
+  }
+  console.log(`🐋  Validated compiler.transpileSync()`);
+
+  const orgConsoleLog = console.log;
+  let loggedVersion = null;
+  console.log = (value: string) => (loggedVersion = value);
+
+  await cli.runTask(compiler, validated.config, 'version');
+
+  console.log = orgConsoleLog;
+
+  if (typeof loggedVersion !== 'string' || loggedVersion.length < 4) {
+    throw new Error(`🧨  unable to validate compiler. loggedVersion: "${loggedVersion}"`);
+  }
+
+  console.log(`🐬  Validated cli`);
 }
 
 interface TestPackage {

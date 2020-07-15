@@ -3,7 +3,7 @@ import type { CoreCompiler } from './load-compiler';
 import { isOutputTargetDocs } from '../compiler/output-targets/output-utils';
 import { startupCompilerLog } from './logs';
 
-export async function taskDocs(coreCompiler: CoreCompiler, config: Config) {
+export const taskDocs = async (coreCompiler: CoreCompiler, config: Config) => {
   config.devServer = null;
   config.outputTargets = config.outputTargets.filter(isOutputTargetDocs);
   config.devMode = true;
@@ -14,4 +14,4 @@ export async function taskDocs(coreCompiler: CoreCompiler, config: Config) {
   await compiler.build();
 
   await compiler.destroy();
-}
+};

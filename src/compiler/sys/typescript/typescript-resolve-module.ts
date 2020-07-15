@@ -32,7 +32,7 @@ export const tsResolveModuleName = (config: d.Config, compilerCtx: d.CompilerCtx
   const resolveModuleName: typeof ts.resolveModuleName = (ts as any).__resolveModuleName || ts.resolveModuleName;
 
   if (moduleName && resolveModuleName && config.tsCompilerOptions) {
-    const host: ts.ModuleResolutionHost = patchTsSystemFileSystem(config, config.sys, compilerCtx.fs, {} as any);
+    const host: ts.ModuleResolutionHost = patchTsSystemFileSystem(config, config.sys, compilerCtx.fs, ts, {} as any);
 
     const compilerOptions: ts.CompilerOptions = { ...config.tsCompilerOptions };
     compilerOptions.resolveJsonModule = true;

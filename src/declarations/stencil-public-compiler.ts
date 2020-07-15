@@ -359,7 +359,10 @@ export interface HydratedFlag {
    */
   selector?: 'class' | 'attribute';
   /**
-   * Defaults to use CSS `visibility` property.
+   * The CSS property used to show and hide components. Defaults to use the CSS `visibility`
+   * property. Other commonly used CSS properties would be `display` with the `initialValue`
+   * setting as `none`, or `opacity` with the `initialValue` as `0`. Defaults to `visibility`
+   * and the default `initialValue` is `hidden`.
    */
   property?: string;
   /**
@@ -369,7 +372,7 @@ export interface HydratedFlag {
   initialValue?: string;
   /**
    * This is the CSS value to assign once a component has finished hydrating.
-   * Defaults to `inherit`.
+   * This is the CSS value that'll allow the component to show. Defaults to `inherit`.
    */
   hydratedValue?: string;
 }
@@ -820,6 +823,7 @@ export interface CompilerSystem {
   accessSync(p: string): boolean;
   applyGlobalPatch?(fromDir: string): Promise<void>;
   cacheStorage?: CacheStorage;
+  checkVersion?: (logger: Logger, currentVersion: string) => Promise<() => void>;
   copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
   /**
    * Always returns a boolean if the files were copied or not. Does not throw.
@@ -2219,16 +2223,18 @@ export interface TranspileOptions {
    */
   style?: 'static' | string | undefined;
   /**
+   * How style data should be added for imports. For example, the `queryparams` value
+   * adds the component's tagname and encapsulation info as querystring parameter
+   * to the style's import, such as `style.css?tag=my-tag&encapsulation=shadow`. This
+   * style data can be used by bundlers to further optimize each component's css.
+   * Set to `null` to not include the querystring parameters. Default is `queryparams`.
+   */
+  styleImportData?: 'queryparams' | string | undefined;
+  /**
    * The JavaScript source target TypeScript should to transpile to. Values can be
    * `latest`, `esnext`, `es2017`, `es2015`, or `es5`. Defaults to `latest`.
    */
   target?: CompileTarget;
-  /**
-   * The path used to load TypeScript, which is dependent on which environment
-   * the compiler is being used on. Default for NodeJS is `typescript`. Default
-   * url to downloaded TypeScript in a brower's web worker or main thread is
-   * from `https://cdn.jsdelivr.net/npm/`.
-   */
   typescriptPath?: string;
   /**
    * Create a source map. Using `inline` will inline the source map into the
@@ -2243,11 +2249,13 @@ export interface TranspileOptions {
   baseUrl?: string;
   /**
    * List of path mapping entries for module names to locations relative to the `baseUrl`.
-   * Same as the `baseUrl` TypeScript compiler option:
+   * Same as the `paths` TypeScript compiler option:
    * https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping
    */
   paths?: { [key: string]: string[] };
-
+  /**
+   * Passed in Stencil Compiler System, otherwise falls back to the internal in-memory only system.
+   */
   sys?: CompilerSystem;
 }
 
@@ -2274,6 +2282,7 @@ export interface TransformOptions {
   module?: 'cjs' | 'esm';
   proxy: 'defineproperty' | null;
   style: 'static' | null;
+  styleImportData: 'queryparams' | null;
   target?: string;
 }
 
@@ -2290,4 +2299,10 @@ export interface DevServer extends BuildEmitEvents {
   port: number;
   root: string;
   close(): Promise<void>;
+}
+
+export interface CliInitOptions {
+  args: string[];
+  logger: Logger;
+  sys: CompilerSystem;
 }

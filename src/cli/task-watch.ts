@@ -1,16 +1,18 @@
-import type { Config, CheckVersion, DevServer } from '../declarations';
+import type { Config, DevServer } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
 import { runPrerenderTask } from './task-prerender';
+import { startCheckVersion, printCheckVersionResults } from './check-version';
 import { startupCompilerLog } from './logs';
 
-export async function taskWatch(coreCompiler: CoreCompiler, config: Config, checkVersion: CheckVersion) {
+export const taskWatch = async (coreCompiler: CoreCompiler, config: Config) => {
   let devServer: DevServer = null;
   let exitCode = 0;
 
   try {
     startupCompilerLog(coreCompiler, config);
 
-    const checkVersionPromise = checkVersion ? checkVersion(config, coreCompiler.version) : null;
+    const versionChecker = startCheckVersion(config, coreCompiler.version);
+
     const compiler = await coreCompiler.createCompiler(config);
     const watcher = await compiler.createWatcher();
 
@@ -24,16 +26,17 @@ export async function taskWatch(coreCompiler: CoreCompiler, config: Config, chec
       compiler.destroy();
     });
 
-    if (checkVersionPromise != null) {
-      const checkVersionResults = await checkVersionPromise;
-      checkVersionResults();
-    }
+    const rmVersionCheckerLog = watcher.on('buildFinish', async () => {
+      // log the version check one time
+      rmVersionCheckerLog();
+      printCheckVersionResults(versionChecker);
+    });
 
     if (devServer) {
       const rmDevServerLog = watcher.on('buildFinish', () => {
         // log the dev server url one time
-        config.logger.info(`${config.logger.cyan(devServer.browserUrl)}\n`);
         rmDevServerLog();
+        config.logger.info(`${config.logger.cyan(devServer.browserUrl)}\n`);
       });
     }
 
@@ -62,4 +65,4 @@ export async function taskWatch(coreCompiler: CoreCompiler, config: Config, chec
   if (exitCode > 0) {
     config.sys.exit(exitCode);
   }
-}
+};
