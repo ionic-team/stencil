@@ -167,7 +167,7 @@ const runPrerenderOutputTarget = async (
       return;
     }
 
-    manager.templateId = createPrerenderTemplate(config, templateData.html);
+    manager.templateId = await createPrerenderTemplate(config, templateData.html);
     manager.staticSite = templateData.staticSite;
     manager.componentGraphPath = createComponentGraphPath(config, componentGraph, outputTarget);
 
@@ -221,9 +221,9 @@ const runPrerenderOutputTarget = async (
   }
 };
 
-const createPrerenderTemplate = (config: d.Config, templateHtml: string) => {
-  const hash = config.sys.generateContentHash(templateHtml);
-  const templateFileName = `prerender-template-${hash}.html`;
+const createPrerenderTemplate = async (config: d.Config, templateHtml: string) => {
+  const hash = await config.sys.generateContentHash(templateHtml, 12);
+  const templateFileName = `prerender-${hash}.html`;
   const templateId = join(config.sys.tmpdir(), templateFileName);
   config.logger.debug(`prerender template: ${templateId}`);
   config.sys.writeFileSync(templateId, templateHtml);
