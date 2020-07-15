@@ -17,6 +17,7 @@ describe('validateTesting', () => {
       srcDir: path.join(ROOT, 'User', 'some', 'path', 'src'),
       flags: {},
       namespace: 'Testing',
+      configPath: path.join(ROOT, 'User', 'some', 'path', 'stencil.config.ts'),
     };
     userConfig.outputTargets = [
       ({
@@ -93,5 +94,29 @@ describe('validateTesting', () => {
       path.join(ROOT, 'User', 'some', 'path', 'www-folder'),
       path.join(ROOT, 'User', 'some', 'path', 'dist-folder'),
     ]);
+  });
+
+  it('set relative testEnvironment to absolute', () => {
+    userConfig.flags.e2e = true;
+    userConfig.testing = {
+      testEnvironment: './rel-path.js',
+    };
+    const { config } = validateConfig(userConfig);
+    expect(path.isAbsolute(config.testing.testEnvironment)).toBe(true);
+    expect(path.basename(config.testing.testEnvironment)).toEqual('rel-path.js');
+  });
+
+  it('set node module testEnvironment', () => {
+    userConfig.flags.e2e = true;
+    userConfig.testing = {
+      testEnvironment: 'jsdom',
+    };
+    const { config } = validateConfig(userConfig);
+    expect(config.testing.testEnvironment).toEqual('jsdom');
+  });
+
+  it('do nothing for empty testEnvironment', () => {
+    const { config } = validateConfig(userConfig);
+    expect(config.testing.testEnvironment).toBeUndefined();
   });
 });
