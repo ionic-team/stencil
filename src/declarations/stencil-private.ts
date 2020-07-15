@@ -2002,6 +2002,7 @@ export interface TransformCssToEsmInput {
   minify?: boolean;
   docs?: boolean;
   autoprefixer?: any;
+  styleImportData?: string;
 }
 
 export interface TransformCssToEsmOutput {

@@ -1,8 +1,8 @@
-import { ImportData, ParsedImport, SerializeImportData } from '../../declarations';
+import type { ImportData, ParsedImport, SerializeImportData } from '../../declarations';
 import { basename, dirname, isAbsolute, relative } from 'path';
 import { DEFAULT_STYLE_MODE, isString, normalizePath } from '@utils';
 
-export const serializeImportPath = (data: SerializeImportData) => {
+export const serializeImportPath = (data: SerializeImportData, styleImportData: string) => {
   let p = data.importeePath;
 
   if (isString(p)) {
@@ -14,21 +14,22 @@ export const serializeImportPath = (data: SerializeImportData) => {
       p = './' + p;
     }
 
-    const paramData: ImportData = {};
-    if (isString(data.tag)) {
-      paramData.tag = data.tag;
-    }
-    if (isString(data.mode) && data.mode !== DEFAULT_STYLE_MODE) {
-      paramData.mode = data.mode;
-    }
-    if (isString(data.encapsulation) && data.encapsulation !== 'none') {
-      paramData.encapsulation = data.encapsulation;
-    }
-
-    const paramEntries = Object.entries(paramData);
-    if (paramEntries.length > 0) {
-      const params = new URLSearchParams(paramEntries);
-      p += '?' + params.toString();
+    if (styleImportData === 'queryparams' || styleImportData === undefined) {
+      const paramData: ImportData = {};
+      if (isString(data.tag)) {
+        paramData.tag = data.tag;
+      }
+      if (isString(data.mode) && data.mode !== DEFAULT_STYLE_MODE) {
+        paramData.mode = data.mode;
+      }
+      if (isString(data.encapsulation) && data.encapsulation !== 'none') {
+        paramData.encapsulation = data.encapsulation;
+      }
+      const paramEntries = Object.entries(paramData);
+      if (paramEntries.length > 0) {
+        const params = new URLSearchParams(paramEntries);
+        p += '?' + params.toString();
+      }
     }
   }
 

@@ -26,6 +26,7 @@ export const transformToNativeComponentText = (config: d.Config, compilerCtx: d.
       currentDirectory: config.sys.getCurrentDirectory(),
       proxy: null,
       style: 'static',
+      styleImportData: 'queryparams',
     };
 
     const transpileOpts: ts.TranspileOptions = {

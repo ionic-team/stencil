@@ -13,6 +13,7 @@ export function transpile(input: string, opts: TranspileOptions = {}): Transpile
     proxy: null,
     sourceMap: 'inline',
     style: null,
+    styleImportData: 'queryparams',
     target: 'es2015', // default to es2015
   };
 

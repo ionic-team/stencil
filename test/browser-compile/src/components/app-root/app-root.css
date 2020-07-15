@@ -57,7 +57,7 @@ textarea {
 }
 
 .source textarea {
-  height: calc(100% - 255px);
+  height: calc(100% - 295px);
 }
 
 .build textarea {
@@ -84,7 +84,7 @@ span[hidden] {
 label span {
   display: inline-block;
   font-size: 12px;
-  width: 80px;
+  width: 115px;
 }
 
 .file-size {

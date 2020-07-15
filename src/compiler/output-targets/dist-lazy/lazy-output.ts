@@ -87,6 +87,7 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
     currentDirectory: config.sys.getCurrentDirectory(),
     proxy: null,
     style: 'static',
+    styleImportData: 'queryparams',
   };
   return [updateStencilCoreImports(transformOpts.coreImportPath), lazyComponentTransform(compilerCtx, transformOpts), removeCollectionImports(compilerCtx)];
 };

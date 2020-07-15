@@ -2220,16 +2220,18 @@ export interface TranspileOptions {
    */
   style?: 'static' | string | undefined;
   /**
+   * How style data should be added for imports. For example, the `queryparams` value
+   * adds the component's tagname and encapsulation info as querystring parameter
+   * to the style's import, such as `style.css?tag=my-tag&encapsulation=shadow`. This
+   * style data can be used by bundlers to further optimize each component's css.
+   * Set to `null` to not include the querystring parameters. Default is `queryparams`.
+   */
+  styleImportData?: 'queryparams' | string | undefined;
+  /**
    * The JavaScript source target TypeScript should to transpile to. Values can be
    * `latest`, `esnext`, `es2017`, `es2015`, or `es5`. Defaults to `latest`.
    */
   target?: CompileTarget;
-  /**
-   * The path used to load TypeScript, which is dependent on which environment
-   * the compiler is being used on. Default for NodeJS is `typescript`. Default
-   * url to downloaded TypeScript in a brower's web worker or main thread is
-   * from `https://cdn.jsdelivr.net/npm/`.
-   */
   typescriptPath?: string;
   /**
    * Create a source map. Using `inline` will inline the source map into the
@@ -2244,11 +2246,13 @@ export interface TranspileOptions {
   baseUrl?: string;
   /**
    * List of path mapping entries for module names to locations relative to the `baseUrl`.
-   * Same as the `baseUrl` TypeScript compiler option:
+   * Same as the `paths` TypeScript compiler option:
    * https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping
    */
   paths?: { [key: string]: string[] };
-
+  /**
+   * Passed in Stencil Compiler System, otherwise falls back to the internal in-memory only system.
+   */
   sys?: CompilerSystem;
 }
 
@@ -2275,6 +2279,7 @@ export interface TransformOptions {
   module?: 'cjs' | 'esm';
   proxy: 'defineproperty' | null;
   style: 'static' | null;
+  styleImportData: 'queryparams' | null;
   target?: string;
 }
 

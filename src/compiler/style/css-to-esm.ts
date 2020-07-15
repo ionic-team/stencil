@@ -1,13 +1,13 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { DEFAULT_STYLE_MODE, catchError, createJsVarName, normalizePath, hasError, isString } from '@utils';
 import { getScopeId } from './scope-css';
+import MagicString from 'magic-string';
 import { optimizeCss } from '../optimize/optimize-css';
+import path from 'path';
+import { parseStyleDocs } from '../docs/style-docs';
 import { scopeCss } from '../../utils/shadow-css';
 import { serializeImportPath } from '../transformers/stencil-import-path';
 import { stripCssComments } from './style-utils';
-import MagicString from 'magic-string';
-import path from 'path';
-import { parseStyleDocs } from '../docs/style-docs';
 
 export const transformCssToEsm = async (input: d.TransformCssToEsmInput) => {
   const results = transformCssToEsmModule(input);
@@ -64,13 +64,16 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput) => {
       // remove the original css @imports
       results.styleText = results.styleText.replace(cssImport.srcImportText, '');
 
-      const importPath = serializeImportPath({
-        importeePath: cssImport.filePath,
-        importerPath: input.file,
-        tag: input.tag,
-        encapsulation: input.encapsulation,
-        mode: input.mode,
-      });
+      const importPath = serializeImportPath(
+        {
+          importeePath: cssImport.filePath,
+          importerPath: input.file,
+          tag: input.tag,
+          encapsulation: input.encapsulation,
+          mode: input.mode,
+        },
+        input.styleImportData,
+      );
 
       // str.append(`import ${cssImport.varName} from '${importPath}';\n`);
       results.imports.push({

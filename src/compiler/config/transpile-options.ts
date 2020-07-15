@@ -44,17 +44,17 @@ export const getTranspileConfig = (input: TranspileOptions) => {
   }
 
   const compileOpts: TranspileOptions = {
-    componentExport: getCompileConfigOpt(input.componentExport, VALID_EXPORT, 'customelement'),
-    componentMetadata: getCompileConfigOpt(input.componentMetadata, VALID_METADATA, null),
+    componentExport: getTranspileConfigOpt(input.componentExport, VALID_EXPORT, 'customelement'),
+    componentMetadata: getTranspileConfigOpt(input.componentMetadata, VALID_METADATA, null),
     coreImportPath: isString(input.coreImportPath) ? input.coreImportPath : STENCIL_INTERNAL_CLIENT_ID,
     currentDirectory: isString(input.currentDirectory) ? input.currentDirectory : transpileCtx.sys.getCurrentDirectory(),
     file: input.file,
-    proxy: getCompileConfigOpt(input.proxy, VALID_PROXY, 'defineproperty'),
-    module: getCompileConfigOpt(input.module, VALID_MODULE, 'esm'),
+    proxy: getTranspileConfigOpt(input.proxy, VALID_PROXY, 'defineproperty'),
+    module: getTranspileConfigOpt(input.module, VALID_MODULE, 'esm'),
     sourceMap: input.sourceMap === 'inline' ? 'inline' : input.sourceMap !== false,
-    style: getCompileConfigOpt(input.style, VALID_STYLE, 'static'),
-    target: getCompileConfigOpt(input.target || (input as any).script /* deprecated */, VALID_TARGET, 'latest'),
-    typescriptPath: input.typescriptPath,
+    style: getTranspileConfigOpt(input.style, VALID_STYLE, 'static'),
+    styleImportData: getTranspileConfigOpt(input.styleImportData, VALID_STYLE_IMPORT_DATA, 'queryparams'),
+    target: getTranspileConfigOpt(input.target || (input as any).script /* deprecated */, VALID_TARGET, 'latest'),
   };
 
   const tsCompilerOptions: CompilerOptions = {
@@ -106,6 +106,7 @@ export const getTranspileConfig = (input: TranspileOptions) => {
     proxy: compileOpts.proxy as any,
     file: compileOpts.file,
     style: compileOpts.style as any,
+    styleImportData: compileOpts.styleImportData as any,
     target: compileOpts.target as any,
   };
 
@@ -141,11 +142,12 @@ export const getTranspileCssConfig = (compileOpts: TranspileOptions, importData:
     minify: false,
     autoprefixer: false,
     module: compileOpts.module,
+    styleImportData: compileOpts.styleImportData,
   };
   return transformInput;
 };
 
-const getCompileConfigOpt = (value: any, validValues: Set<string>, defaultValue: string) => {
+const getTranspileConfigOpt = (value: any, validValues: Set<string>, defaultValue: string) => {
   if (value === null || value === 'null') {
     return null;
   }
@@ -161,4 +163,5 @@ const VALID_METADATA = new Set(['compilerstatic', null]);
 const VALID_MODULE = new Set(['cjs', 'esm']);
 const VALID_PROXY = new Set(['defineproperty', null]);
 const VALID_STYLE = new Set(['static']);
+const VALID_STYLE_IMPORT_DATA = new Set(['queryparams']);
 const VALID_TARGET = new Set(['latest', 'esnext', 'es2020', 'es2019', 'es2018', 'es2017', 'es2016', 'es2015', 'es5']);
