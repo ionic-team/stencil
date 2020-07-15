@@ -110,7 +110,7 @@
     "postcss": "^7.0.32",
     "prettier": "^2.0.5",
     "prompts": "2.3.2",
-    "puppeteer": "~5.0.0",
+    "puppeteer": "~5.1.0",
     "rollup": "2.21.0",
     "semiver": "^1.1.0",
     "semver": "7.3.2",
