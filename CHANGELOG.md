@@ -1,3 +1,25 @@
+## 🚁 [1.16.3](https://github.com/ionic-team/stencil/compare/v1.16.2...v1.16.3) (2020-07-15)
+
+
+### Bug Fixes
+
+* **cli:** export parseFlags api ([3bd1904](https://github.com/ionic-team/stencil/commit/3bd190460120cde9d5def74a7cb9e928d1fb5546))
+* **commonjs:** bump commonjs plugin to 14.0.0 ([7eee192](https://github.com/ionic-team/stencil/commit/7eee19286c8878cee498c61418db502ede17b33c))
+* **compiler:** check reference type text ([fdc271c](https://github.com/ionic-team/stencil/commit/fdc271c47b8d0e540469077ff495b35c0633e7e0)), closes [#2569](https://github.com/ionic-team/stencil/issues/2569)
+* **hydrated:** fix custom hydratedFlag config ([013ca8c](https://github.com/ionic-team/stencil/commit/013ca8c8ae79ea76ae8fe78daf4d856c96cb6454)), closes [#2574](https://github.com/ionic-team/stencil/issues/2574)
+* **prerender:** await hashed template html ([f4b1799](https://github.com/ionic-team/stencil/commit/f4b17994d43106f3e6e54b5db1bca3244692794d))
+* **sys-node:** improve os.cpu() checks to read model ([05ea6df](https://github.com/ionic-team/stencil/commit/05ea6dfb61be3cd64dad1abc86e4d88a338ee961)), closes [#2565](https://github.com/ionic-team/stencil/issues/2565)
+* **test:** fix testing.testEnvironment setting ([645f3a0](https://github.com/ionic-team/stencil/commit/645f3a0ba98ec322b1f2f21feb68caa813ab30e5)), closes [#2425](https://github.com/ionic-team/stencil/issues/2425)
+* **type definition:** add abbr to ThHTMLAttributes ([#2568](https://github.com/ionic-team/stencil/issues/2568)) ([d0f7ff1](https://github.com/ionic-team/stencil/commit/d0f7ff145973bbb397eb9801b3c13faff683eda3))
+
+
+### Features
+
+* **prerendering:** pass results to afterHydrate ([#2567](https://github.com/ionic-team/stencil/issues/2567)) ([135d49e](https://github.com/ionic-team/stencil/commit/135d49e6d0621fa9f0143f0b67cf2e0bc2ea6ddc))
+* **transpile:** add styleImportData option to not include style import queryparams ([38d5821](https://github.com/ionic-team/stencil/commit/38d582139ba06951a2e0509ca1153bf980291c87))
+
+
+
 ## 🍷 [1.16.2](https://github.com/ionic-team/stencil/compare/v1.16.1...v1.16.2) (2020-07-10)
 
 
