@@ -1500,12 +1500,14 @@ export interface PluginCtx {
 }
 
 export interface PrerenderUrlResults {
+  id: string;
   anchorUrls: string[];
   diagnostics: Diagnostic[];
   filePath: string;
 }
 
 export interface PrerenderUrlRequest {
+  id: string;
   baseUrl: string;
   componentGraphPath: string;
   devServerHostUrl: string;
@@ -1519,6 +1521,7 @@ export interface PrerenderUrlRequest {
 }
 
 export interface PrerenderManager {
+  id: string;
   config: Config;
   prerenderUrlWorker: (prerenderRequest: PrerenderUrlRequest) => Promise<PrerenderUrlResults>;
   devServerHostUrl: string;

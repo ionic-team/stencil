@@ -1,4 +1,5 @@
 import { JsonDocs } from './stencil-public-docs';
+import { PrerenderUrlResults } from '../internal';
 export * from './stencil-public-docs';
 
 /**
@@ -532,11 +533,11 @@ export interface PrerenderConfig {
    * Run after each `document` is hydrated, but before it is serialized
    * into an HTML string. Hook is passed the `document` and its `URL`.
    */
-  afterHydrate?(document?: Document, url?: URL): any | Promise<any>;
+  afterHydrate?(document: Document, url: URL, results: PrerenderUrlResults): any | Promise<any>;
   /**
    * Run before each `document` is hydrated. Hook is passed the `document` it's `URL`.
    */
-  beforeHydrate?(document?: Document, url?: URL): any | Promise<any>;
+  beforeHydrate?(document: Document, url: URL): any | Promise<any>;
   /**
    * Runs after the template Document object has serialize into an
    * HTML formatted string. Returns an HTML string to be used as the
@@ -554,7 +555,7 @@ export interface PrerenderConfig {
    * which goes in the `<head>` of every prerendered page. Returning `null`
    * will not add a canonical url tag to the page.
    */
-  canonicalUrl?(url?: URL): string | null;
+  canonicalUrl?(url: URL): string | null;
   /**
    * While prerendering, crawl same-origin URLs found within `<a href>` elements.
    * Defaults to `true`.
@@ -571,27 +572,27 @@ export interface PrerenderConfig {
   /**
    * Return `true` if the given URL should be prerendered or not.
    */
-  filterUrl?(url?: URL, base?: URL): boolean;
+  filterUrl?(url: URL, base: URL): boolean;
   /**
    * Returns the file path which the prerendered HTML content
    * should be written to.
    */
-  filePath?(url?: URL, filePath?: string): string;
+  filePath?(url: URL, filePath: string): string;
   /**
    * Returns the hydrate options to use for each individual prerendered page.
    */
-  hydrateOptions?(url?: URL): PrerenderHydrateOptions;
+  hydrateOptions?(url: URL): PrerenderHydrateOptions;
   /**
    * Returns the template file's content. The template is the base
    * HTML used for all prerendered pages.
    */
-  loadTemplate?(filePath?: string): string | Promise<string>;
+  loadTemplate?(filePath: string): string | Promise<string>;
   /**
    * Used to normalize the page's URL from a given a string and the current
    * page's base URL. Largely used when reading an anchor's `href` attribute
    * value and normalizing it into a `URL`.
    */
-  normalizeUrl?(href?: string, base?: URL): URL;
+  normalizeUrl?(href: string, base: URL): URL;
   robotsTxt?(opts: RobotsTxtOpts): string | RobotsTxtResults;
   sitemapXml?(opts: SitemapXmpOpts): string | SitemapXmpResults;
   /**

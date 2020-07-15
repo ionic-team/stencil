@@ -16,6 +16,7 @@ const prerenderCtx = {
 export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d.PrerenderUrlRequest) => {
   // worker thread!
   const results: d.PrerenderUrlResults = {
+    id: prerenderRequest.id,
     diagnostics: [],
     anchorUrls: [],
     filePath: prerenderRequest.writeToFilePath,
@@ -100,9 +101,25 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
       await Promise.all(minifyPromises);
     }
 
+    if (typeof prerenderConfig.filePath === 'function') {
+      try {
+        const userWriteToFilePath = prerenderConfig.filePath(url, results.filePath);
+        if (typeof userWriteToFilePath === 'string') {
+          results.filePath = userWriteToFilePath;
+        }
+      } catch (e) {
+        catchError(results.diagnostics, e);
+      }
+    }
+
+    if (prerenderConfig.crawlUrls !== false) {
+      const baseUrl = new URL(prerenderRequest.baseUrl);
+      results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, baseUrl, url, hydrateResults.anchors);
+    }
+
     if (typeof prerenderConfig.afterHydrate === 'function') {
       try {
-        const rtn = prerenderConfig.afterHydrate(doc, url);
+        const rtn = prerenderConfig.afterHydrate(doc, url, results);
         if (isPromise(rtn)) {
           await rtn;
         }
@@ -119,23 +136,6 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
     }
 
     const html = hydrateApp.serializeDocumentToString(doc, hydrateOpts);
-
-    if (prerenderConfig.crawlUrls !== false) {
-      const baseUrl = new URL(prerenderRequest.baseUrl);
-      results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, baseUrl, url, hydrateResults.anchors);
-    }
-
-    if (typeof prerenderConfig.filePath === 'function') {
-      try {
-        const userWriteToFilePath = prerenderConfig.filePath(url, results.filePath);
-        if (typeof userWriteToFilePath === 'string') {
-          results.filePath = userWriteToFilePath;
-        }
-      } catch (e) {
-        catchError(results.diagnostics, e);
-      }
-    }
-
     prerenderEnsureDir(sys, results.filePath);
     await sys.writeFile(results.filePath, html);
 

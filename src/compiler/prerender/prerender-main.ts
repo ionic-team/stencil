@@ -130,6 +130,7 @@ const runPrerenderOutputTarget = async (
     // get the prerender urls to queue up
     const prerenderDiagnostics: d.Diagnostic[] = [];
     const manager: d.PrerenderManager = {
+      id: `${Math.random() * Number.MAX_VALUE}`,
       prerenderUrlWorker: (prerenderRequest: d.PrerenderUrlRequest) => workerCtx.prerenderWorker(prerenderRequest),
       componentGraphPath: null,
       config: config,
