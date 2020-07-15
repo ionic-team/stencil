@@ -1,7 +1,7 @@
 import type { CompilerSystem, ConfigFlags } from '../declarations';
 import { dashToPascalCase } from '@utils';
 
-export const parseFlags = (sys: CompilerSystem, args: string[]): ConfigFlags => {
+export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags => {
   const flags: any = {
     task: null,
     args: [],
@@ -16,7 +16,7 @@ export const parseFlags = (sys: CompilerSystem, args: string[]): ConfigFlags => 
   }
   parseArgs(flags, flags.args, flags.knownArgs);
 
-  if (sys.name === 'node') {
+  if (sys && sys.name === 'node') {
     const envArgs = getNpmConfigEnvArgs(sys);
     parseArgs(flags, envArgs, flags.knownArgs);
 

@@ -14,4 +14,6 @@ export declare function run(init: CliInitOptions): Promise<void>;
  */
 export declare function runTask(coreCompiler: any, config: Config, task: TaskCommand): Promise<void>;
 
+export declare function parseFlags(args: string[], sys?: CompilerSystem): ConfigFlags;
+
 export { CompilerSystem, Config, ConfigFlags, Logger, TaskCommand };
