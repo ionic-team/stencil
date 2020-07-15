@@ -359,7 +359,10 @@ export interface HydratedFlag {
    */
   selector?: 'class' | 'attribute';
   /**
-   * Defaults to use CSS `visibility` property.
+   * The CSS property used to show and hide components. Defaults to use the CSS `visibility`
+   * property. Other commonly used CSS properties would be `display` with the `initialValue`
+   * setting as `none`, or `opacity` with the `initialValue` as `0`. Defaults to `visibility`
+   * and the default `initialValue` is `hidden`.
    */
   property?: string;
   /**
@@ -369,7 +372,7 @@ export interface HydratedFlag {
   initialValue?: string;
   /**
    * This is the CSS value to assign once a component has finished hydrating.
-   * Defaults to `inherit`.
+   * This is the CSS value that'll allow the component to show. Defaults to `inherit`.
    */
   hydratedValue?: string;
 }

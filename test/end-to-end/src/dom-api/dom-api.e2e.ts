@@ -1,18 +1,18 @@
 import { newE2EPage } from '@stencil/core/testing';
 
-
 describe('dom api e2e tests', () => {
-
   it('should add css classes', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-api class="class-a"></dom-api>
-    `});
+    `,
+    });
 
     const elm = await page.find('.class-a');
 
     expect(elm).toHaveClass('class-a');
     expect(elm).not.toHaveClass('class-b');
-    expect(elm.className).toBe('class-a hydrated');
+    expect(elm.className).toBe('class-a');
 
     elm.classList.add('class-b', 'class-c');
 
@@ -40,13 +40,15 @@ describe('dom api e2e tests', () => {
     expect(elm.classList.contains('class-c')).toBe(true);
     expect(elm.classList.contains('class-d')).toBe(false);
 
-    expect(elm.className).toBe('class-a hydrated class-b class-c');
+    expect(elm.className).toBe('class-a class-b class-c');
   });
 
   it('should remove css classes', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-api class="class-a"></dom-api>
-    `});
+    `,
+    });
 
     const elm = await page.find('.class-a');
 
@@ -68,9 +70,11 @@ describe('dom api e2e tests', () => {
   });
 
   it('should toggles css classes', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-api class="class-a"></dom-api>
-    `});
+    `,
+    });
 
     const elm = await page.find('.class-a');
 
@@ -87,9 +91,11 @@ describe('dom api e2e tests', () => {
   });
 
   it('should set id', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-api id="my-cmp"></dom-api>
-    `});
+    `,
+    });
 
     const elm = await page.find('#my-cmp');
 
@@ -103,9 +109,11 @@ describe('dom api e2e tests', () => {
   });
 
   it('should get/set attributes', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-api id="my-cmp" mph="88"></dom-api>
-    `});
+    `,
+    });
 
     const elm = await page.find('#my-cmp');
 
@@ -118,7 +126,7 @@ describe('dom api e2e tests', () => {
 
     expect(elm).toEqualAttributes({
       id: 'my-cmp',
-      mph: 88
+      mph: 88,
     });
 
     expect(elm.getAttribute('id')).toBe('my-cmp');
@@ -135,7 +143,7 @@ describe('dom api e2e tests', () => {
     expect(elm).toEqualAttribute('id', 'my-changed-id');
     expect(elm).toEqualAttributes({
       id: 'my-changed-id',
-      mph: '88'
+      mph: '88',
     });
     expect(elm).toHaveAttribute('town');
     expect(elm).toHaveAttribute('enabled');
@@ -148,14 +156,16 @@ describe('dom api e2e tests', () => {
   });
 
   it('should test html', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-api></dom-api>
-    `});
+    `,
+    });
 
     const elm = await page.find('dom-api');
 
     expect(elm).toEqualHtml(`
-      <dom-api class="hydrated">
+      <dom-api custom-hydrate-flag="">
         <span data-z="z" class="red green blue" data-a="a">
           dom api
         </span>
@@ -185,13 +195,13 @@ describe('dom api e2e tests', () => {
     await page.waitForChanges();
 
     expect(elm).toEqualHtml(`
-      <dom-api class="hydrated">
+      <dom-api custom-hydrate-flag="">
         <div>changed content</div>
       </dom-api>
     `);
 
     expect(elm.outerHTML).toEqualHtml(`
-      <dom-api class="hydrated">
+      <dom-api custom-hydrate-flag="">
         <div>changed content</div>
       </dom-api>
     `);
@@ -206,9 +216,11 @@ describe('dom api e2e tests', () => {
   });
 
   it('should test textContent', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-api></dom-api>
-    `});
+    `,
+    });
 
     const elm = await page.find('dom-api');
 
@@ -233,16 +245,15 @@ describe('dom api e2e tests', () => {
     `);
 
     expect(elm).toEqualHtml(`
-      <dom-api class="hydrated">
+      <dom-api custom-hydrate-flag="">
         updated text content
       </dom-api>
     `);
 
-    elm.click
+    elm.click;
 
     expect(elm.nodeType).toBe(1);
     expect(elm.nodeName).toBe(`DOM-API`);
     expect(elm.tagName).toBe(`DOM-API`);
   });
-
 });

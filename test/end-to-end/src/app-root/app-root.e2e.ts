@@ -1,7 +1,18 @@
 import { newE2EPage } from '@stencil/core/testing';
 
-
 describe('goto root url', () => {
+  it('have custom hydrate flags and css', async () => {
+    const page = await newE2EPage({ url: '/' });
+
+    const elm = await page.find('app-root');
+    expect(elm).toHaveAttribute('custom-hydrate-flag');
+
+    const elmStyle = await elm.getComputedStyle();
+    expect(elmStyle.opacity).toBe('1');
+
+    const headStyleElm = await page.find('head style[data-styles]');
+    expect(headStyleElm.innerHTML).toContain('{opacity:0}[custom-hydrate-flag]{opacity:1}');
+  });
 
   it('should navigate to the index.html page w/out url searchParams', async () => {
     // create a new puppeteer page
@@ -14,14 +25,16 @@ describe('goto root url', () => {
     expect(elm).toEqualText('Hello, my name is Stencil JS');
 
     await page.compareScreenshot('navigate to homepage', {
-      fullPage: false, clip: { x: 0, y: 0, width: 400, height: 250 }, omitBackground: true,
+      fullPage: false,
+      clip: { x: 0, y: 0, width: 400, height: 250 },
+      omitBackground: true,
     });
   });
 
   it('should navigate to the index.html page with custom url searchParams', async () => {
     // create a new puppeteer page
     const page = await newE2EPage({
-      url: '/?first=Doc&last=Brown'
+      url: '/?first=Doc&last=Brown',
     });
 
     const elm = await page.find('prop-cmp >>> div');
@@ -32,7 +45,7 @@ describe('goto root url', () => {
 
   it('should apply global style when navigating to root page', async () => {
     const page = await newE2EPage({
-      url: '/'
+      url: '/',
     });
 
     const elm = await page.find('app-root');
@@ -45,7 +58,7 @@ describe('goto root url', () => {
 
   it('should apply global style when setting html', async () => {
     const page = await newE2EPage({
-      html: '<app-root></app-root>'
+      html: '<app-root></app-root>',
     });
 
     const elm = await page.find('app-root');
@@ -55,5 +68,4 @@ describe('goto root url', () => {
     expect(elmStyle.borderWidth).toBe('5px');
     expect(elmStyle.borderStyle).toBe('dotted');
   });
-
 });
