@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { augmentDiagnosticWithNode, buildError, normalizePath } from '@utils';
 import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
 import ts from 'typescript';
@@ -296,7 +296,9 @@ const getAllTypeReferences = (node: ts.Node) => {
           .filter(ta => ts.isTypeReferenceNode(ta))
           .forEach((tr: ts.TypeReferenceNode) => {
             const typeName = tr.typeName as ts.Identifier;
-            referencedTypes.push(typeName.escapedText.toString());
+            if (typeName && typeName.escapedText) {
+              referencedTypes.push(typeName.escapedText.toString());
+            }
           });
       }
     }
