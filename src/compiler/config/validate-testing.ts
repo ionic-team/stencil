@@ -1,9 +1,8 @@
 import * as d from '../../declarations';
-import { buildError, buildWarn } from '@utils';
+import { buildError, buildWarn, isString } from '@utils';
 import { isAbsolute, join, basename, dirname } from 'path';
-import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 import { isLocalModule } from '../sys/resolve/resolve-utils';
-import { isString } from 'util';
+import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 
 export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) => {
   const testing = (config.testing = Object.assign({}, config.testing || {}));
