@@ -5,6 +5,7 @@ import type RollupTypes from 'rollup';
 import { cssTemplatePlugin } from '../../utils/css-template-plugin';
 import { loadDeps } from '../../utils/load-deps';
 import { templates, templateList } from '../../utils/templates';
+import { transpileWorker } from '../../compiler.worker';
 
 @Component({
   tag: 'app-root',
@@ -27,6 +28,7 @@ export class AppRoot {
   coreImportPath: HTMLSelectElement;
   build: HTMLSelectElement;
   fileTemplate: HTMLSelectElement;
+  transpilerThread: HTMLSelectElement;
   iframe: HTMLIFrameElement;
 
   fs = new Map<string, string>();
@@ -71,10 +73,13 @@ export class AppRoot {
       styleImportData: this.styleImportData.value,
     };
 
-    const start = Date.now();
-    console.log('transpile start');
-    const results = await stencil.transpile(this.sourceCodeInput.value, opts);
-    console.log('transpile end', Date.now() - start);
+    const browserPromise = stencil.transpile(this.sourceCodeInput.value, opts);
+    const workerPromise = transpileWorker(this.sourceCodeInput.value, opts);
+
+    const browserResults = await browserPromise;
+    const workerResults = await workerPromise;
+
+    const results = this.transpilerThread.value === 'worker' ? workerResults : browserResults;
 
     results.imports.forEach(imprt => {
       console.log('import:', imprt);
@@ -314,6 +319,13 @@ export class AppRoot {
                 <option value="null">null</option>
                 <option value="@stencil/core/internal/client">@stencil/core/internal/client</option>
                 <option value="@stencil/core/internal/testing">@stencil/core/internal/testing</option>
+              </select>
+            </label>
+            <label>
+              <span>Transpiler:</span>
+              <select ref={el => (this.transpilerThread = el)} onInput={this.compile.bind(this)}>
+                <option value="main">Main thread</option>
+                <option value="worker">Worker thread</option>
               </select>
             </label>
           </div>
