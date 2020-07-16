@@ -1,7 +1,7 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { generateBuildResults } from './build-results';
-import { IS_NODE_ENV, isFunction } from '@utils';
-import path from 'path';
+import { IS_NODE_ENV, isFunction, isRemoteUrl } from '@utils';
+import { relative } from 'path';
 
 export const buildFinish = async (buildCtx: d.BuildCtx) => {
   const results = await buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, false);
@@ -149,8 +149,8 @@ const cleanupUpdateMsg = (logger: d.Logger, msg: string, fileNames: string[]) =>
 
 const cleanDiagnostics = (config: d.Config, diagnostics: d.Diagnostic[]) => {
   diagnostics.forEach(diagnostic => {
-    if (!diagnostic.relFilePath && diagnostic.absFilePath && config.rootDir) {
-      diagnostic.relFilePath = path.relative(config.rootDir, diagnostic.absFilePath);
+    if (!diagnostic.relFilePath && !isRemoteUrl(diagnostic.absFilePath) && diagnostic.absFilePath && config.rootDir) {
+      diagnostic.relFilePath = relative(config.rootDir, diagnostic.absFilePath);
     }
   });
 };

@@ -1,4 +1,4 @@
-import { CompilerBuildResults, Diagnostic, PrintLine } from '../../declarations';
+import type { CompilerBuildResults, Diagnostic, PrintLine } from '../../declarations';
 import appErrorCss from './app-error.css';
 
 interface AppErrorData {
@@ -60,9 +60,23 @@ const appendDiagnostic = (doc: Document, openInEditor: OpenInEditorCallback, mod
   file.className = 'dev-server-diagnostic-file';
   card.appendChild(file);
 
-  const canOpenInEditor = typeof openInEditor === 'function' && typeof diagnostic.absFilePath === 'string';
+  const isUrl = typeof diagnostic.absFilePath === 'string' && diagnostic.absFilePath.indexOf('http') === 0;
+  const canOpenInEditor = typeof openInEditor === 'function' && typeof diagnostic.absFilePath === 'string' && !isUrl;
 
-  if (diagnostic.relFilePath) {
+  if (isUrl) {
+    const fileHeader = doc.createElement('a');
+    fileHeader.href = diagnostic.absFilePath;
+    fileHeader.setAttribute('target', '_blank');
+    fileHeader.setAttribute('rel', 'noopener noreferrer');
+    fileHeader.className = 'dev-server-diagnostic-file-header';
+
+    const filePath = doc.createElement('span');
+    filePath.className = 'dev-server-diagnostic-file-path';
+    filePath.textContent = diagnostic.absFilePath;
+
+    fileHeader.appendChild(filePath);
+    file.appendChild(fileHeader);
+  } else if (diagnostic.relFilePath) {
     const fileHeader = doc.createElement(canOpenInEditor ? 'a' : 'div');
     fileHeader.className = 'dev-server-diagnostic-file-header';
 
