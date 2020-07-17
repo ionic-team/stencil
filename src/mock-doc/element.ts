@@ -363,80 +363,40 @@ export class MockCanvasElement extends MockHTMLElement {
   }
   getContext() {
     return {
-      fillRect: function () {
+      fillRect() {
         return;
       },
-      clearRect: function () {
-        return;
-      },
+      clearRect() {},
       getImageData: function (_: number, __: number, w: number, h: number) {
         return {
           data: new Array(w * h * 4),
         };
       },
-      putImageData: function () {
-        return;
-      },
+      putImageData() {},
       createImageData: function (): any[] {
         return [];
       },
-      setTransform: function () {
-        return;
-      },
-      drawImage: function () {
-        return;
-      },
-      save: function () {
-        return;
-      },
-      fillText: function () {
-        return;
-      },
-      restore: function () {
-        return;
-      },
-      beginPath: function () {
-        return;
-      },
-      moveTo: function () {
-        return;
-      },
-      lineTo: function () {
-        return;
-      },
-      closePath: function () {
-        return;
-      },
-      stroke: function () {
-        return;
-      },
-      translate: function () {
-        return;
-      },
-      scale: function () {
-        return;
-      },
-      rotate: function () {
-        return;
-      },
-      arc: function () {
-        return;
-      },
-      fill: function () {
-        return;
-      },
-      measureText: function () {
+      setTransform() {},
+      drawImage() {},
+      save() {},
+      fillText() {},
+      restore() {},
+      beginPath() {},
+      moveTo() {},
+      lineTo() {},
+      closePath() {},
+      stroke() {},
+      translate() {},
+      scale() {},
+      rotate() {},
+      arc() {},
+      fill() {},
+      measureText() {
         return { width: 0 };
       },
-      transform: function () {
-        return;
-      },
-      rect: function () {
-        return;
-      },
-      clip: function () {
-        return;
-      },
+      transform() {},
+      rect() {},
+      clip() {},
     };
   }
 }
