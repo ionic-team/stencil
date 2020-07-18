@@ -1,3 +1,15 @@
+## 🏜 [1.16.4](https://github.com/ionic-team/stencil/compare/v1.16.3...v1.16.4) (2020-07-18)
+
+* TypeScript 3.9.7
+* @rollup/plugin-node-resolve 8.4.0
+
+
+### Bug Fixes
+
+* **resolve:** fix rollup node resolve realpath checks ([d3f4c4f](https://github.com/ionic-team/stencil/commit/d3f4c4f03cb54c7ef2a0e89273161f731db9bcba))
+
+
+
 ## 🚁 [1.16.3](https://github.com/ionic-team/stencil/compare/v1.16.2...v1.16.3) (2020-07-15)
 
 
