@@ -116,11 +116,15 @@ export const createCustomResolverSync = (sys: d.CompilerSystem, inMemoryFs: d.In
     },
 
     realpathSync(p: string) {
-      const results = sys.realpathSync(normalizeFsPath(p));
-      if (results.error) {
-        throw results.error;
+      const fsFilePath = normalizeFsPath(p);
+      try {
+        return sys.realpathSync(fsFilePath);
+      } catch (realpathErr) {
+        if (realpathErr.code !== 'ENOENT') {
+          throw realpathErr;
+        }
       }
-      return results.path;
+      return fsFilePath;
     },
 
     extensions: exts,

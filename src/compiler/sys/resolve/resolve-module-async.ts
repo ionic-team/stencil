@@ -102,7 +102,7 @@ export const createCustomResolverAsync = (sys: d.CompilerSystem, inMemoryFs: d.I
       cb(null, false);
     },
 
-    async readFile(p: string, cb: (err: any, data: any) => void) {
+    async readFile(p: string, cb: (err: any, data?: any) => void) {
       const fsFilePath = normalizeFsPath(p);
 
       const data = await inMemoryFs.readFile(fsFilePath);
@@ -110,12 +110,18 @@ export const createCustomResolverAsync = (sys: d.CompilerSystem, inMemoryFs: d.I
         return cb(null, data);
       }
 
-      return cb(`readFile not found: ${p}`, undefined);
+      return cb(`readFile not found: ${p}`);
     },
 
-    async realpath(p: string, cb: (err: any, data: any) => void) {
-      const results = await sys.realpath(normalizeFsPath(p));
-      cb(results.error, results.path);
+    async realpath(p: string, cb: (err: any, data?: any) => void) {
+      const fsFilePath = normalizeFsPath(p);
+      const results = await sys.realpath(fsFilePath);
+
+      if (results.error && results.error.code !== 'ENOENT') {
+        cb(results.error);
+      } else {
+        cb(null, results.error ? fsFilePath : results.path);
+      }
     },
 
     extensions: exts,
