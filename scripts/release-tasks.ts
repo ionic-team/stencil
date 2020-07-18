@@ -224,12 +224,15 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
     }
   }
 
-  tasks.push({
-    title: 'Create Github Release',
-    task: () => {
-      return postGithubRelease(opts);
-    },
-  });
+  if (opts.isPublishRelease) {
+    tasks.push({
+      title: 'Create Github Release',
+      task: () => {
+        return postGithubRelease(opts);
+      },
+    });
+  }
+
   const listr = new Listr(tasks);
 
   listr
