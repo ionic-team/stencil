@@ -36,10 +36,10 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
         };
       }
       if (id === '@runtime') {
-        return join(opts.transpiledDir, 'runtime', 'index.js');
+        return join(opts.buildDir, 'runtime', 'index.js');
       }
       if (id === '@utils') {
-        return join(opts.transpiledDir, 'utils', 'index.js');
+        return join(opts.buildDir, 'utils', 'index.js');
       }
       if (helperResolvers.has(id)) {
         return join(opts.bundleHelpersDir, `${id}.js`);

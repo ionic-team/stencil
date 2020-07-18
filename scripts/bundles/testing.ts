@@ -12,7 +12,7 @@ import { RollupOptions, OutputOptions } from 'rollup';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
 
 export async function testing(opts: BuildOptions) {
-  const inputDir = join(opts.transpiledDir, 'testing');
+  const inputDir = join(opts.buildDir, 'testing');
 
   await Promise.all([
     // copy jest testing entry files

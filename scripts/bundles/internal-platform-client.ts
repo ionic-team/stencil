@@ -12,7 +12,7 @@ import ts from 'typescript';
 import { minify } from 'terser';
 
 export async function internalClient(opts: BuildOptions) {
-  const inputClientDir = join(opts.transpiledDir, 'client');
+  const inputClientDir = join(opts.buildDir, 'client');
   const outputInternalClientDir = join(opts.output.internalDir, 'client');
   const outputInternalClientPolyfillsDir = join(outputInternalClientDir, 'polyfills');
 

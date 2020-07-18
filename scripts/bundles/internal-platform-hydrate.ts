@@ -12,7 +12,7 @@ import { RollupOptions } from 'rollup';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
 
 export async function internalHydrate(opts: BuildOptions) {
-  const inputHydrateDir = join(opts.transpiledDir, 'hydrate');
+  const inputHydrateDir = join(opts.buildDir, 'hydrate');
   const outputInternalHydrateDir = join(opts.output.internalDir, 'hydrate');
 
   await fs.emptyDir(outputInternalHydrateDir);

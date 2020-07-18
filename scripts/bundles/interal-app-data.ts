@@ -5,7 +5,7 @@ import { writePkgJson } from '../utils/write-pkg-json';
 import { RollupOptions } from 'rollup';
 
 export async function internalAppData(opts: BuildOptions) {
-  const inputAppDataDir = join(opts.transpiledDir, 'app-data');
+  const inputAppDataDir = join(opts.buildDir, 'app-data');
   const outputInternalAppDataDir = join(opts.output.internalDir, 'app-data');
 
   await fs.emptyDir(outputInternalAppDataDir);

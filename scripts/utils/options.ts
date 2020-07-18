@@ -9,19 +9,21 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
   const packageLockJsonPath = join(rootDir, 'package-lock.json');
   const changelogPath = join(rootDir, 'CHANGELOG.md');
   const nodeModulesDir = join(rootDir, 'node_modules');
-  const transpiledDir = join(rootDir, 'build');
+  const buildDir = join(rootDir, 'build');
   const scriptsDir = join(rootDir, 'scripts');
   const scriptsBundlesDir = join(scriptsDir, 'bundles');
   const bundleHelpersDir = join(scriptsBundlesDir, 'helpers');
 
   const opts: BuildOptions = {
+    ghRepoOrg: 'ionic-team',
+    ghRepoName: 'stencil',
     rootDir,
     srcDir,
     packageJsonPath,
     packageLockJsonPath,
     changelogPath,
     nodeModulesDir,
-    transpiledDir,
+    buildDir,
     scriptsDir,
     scriptsBundlesDir,
     bundleHelpersDir,
@@ -117,10 +119,12 @@ export function createReplaceData(opts: BuildOptions) {
 }
 
 export interface BuildOptions {
+  ghRepoOrg?: string;
+  ghRepoName?: string;
   rootDir?: string;
   srcDir?: string;
   nodeModulesDir?: string;
-  transpiledDir?: string;
+  buildDir?: string;
   scriptsDir?: string;
   scriptsBundlesDir?: string;
   bundleHelpersDir?: string;

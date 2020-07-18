@@ -1,6 +1,10 @@
+import fs from 'fs-extra';
+import execa from 'execa';
 import color from 'ansi-colors';
 import semver from 'semver';
-
+import open from 'open';
+import { BuildOptions } from './options';
+import { join } from 'path';
 
 export const SEMVER_INCREMENTS = ['patch', 'minor', 'major', 'prepatch', 'preminor', 'premajor', 'prerelease'];
 
@@ -18,7 +22,7 @@ export function getNewVersion(oldVersion: string, input: any): string {
   }
 
   return SEMVER_INCREMENTS.indexOf(input) === -1 ? input : semver.inc(oldVersion, input);
-};
+}
 
 export const isVersionGreater = (oldVersion: string, newVersion: string) => {
   if (!isValidVersion(newVersion)) {
@@ -35,7 +39,7 @@ export function prettyVersionDiff(oldVersion: any, inc: any) {
   const output = [];
 
   for (let i = 0; i < newVersion.length; i++) {
-    if ((newVersion[i] !== oldVersion[i] && !firstVersionChange)) {
+    if (newVersion[i] !== oldVersion[i] && !firstVersionChange) {
       output.push(`${color.dim.cyan(newVersion[i])}`);
       firstVersionChange = true;
     } else if (newVersion[i].indexOf('-') >= 1) {
@@ -47,4 +51,35 @@ export function prettyVersionDiff(oldVersion: any, inc: any) {
     }
   }
   return output.join(color.reset.dim('.'));
+}
+
+export async function updateChangeLog(opts: BuildOptions) {
+  const ccPath = join(opts.nodeModulesDir, '.bin', 'conventional-changelog');
+  await execa('node', [ccPath, '-p', 'angular', '-o', '-i', opts.changelogPath, '-s'], { cwd: opts.rootDir });
+
+  let changelog = await fs.readFile(opts.changelogPath, 'utf8');
+  changelog = changelog.replace(/\# \[/, '# ' + opts.vermoji + ' [');
+  await fs.writeFile(opts.changelogPath, changelog);
+}
+
+export async function postGithubRelease(opts: BuildOptions) {
+  const tag = `v${opts.version}`;
+  const title = `${opts.vermoji} ${opts.version}`;
+
+  const lines = (await fs.readFile(opts.changelogPath, 'utf8')).trim().split('\n');
+
+  let body = '';
+  for (let i = 1; i < 500; i++) {
+    if (lines[i].startsWith('## ')) {
+      break;
+    }
+    body += lines[i] + '\n';
+  }
+
+  const url = new URL(`https://github.com/${opts.ghRepoOrg}/${opts.ghRepoName}/releases/new`);
+  url.searchParams.set('tag', tag);
+  url.searchParams.set('title', title);
+  url.searchParams.set('body', body.trim());
+
+  await open(url.href);
 }

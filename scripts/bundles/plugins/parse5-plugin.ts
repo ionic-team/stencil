@@ -35,7 +35,7 @@ export function parse5Plugin(opts: BuildOptions): Plugin {
 }
 
 async function bundleParse5(opts: BuildOptions) {
-  const cacheFile = join(opts.transpiledDir, 'parse5-bundle-cache.js');
+  const cacheFile = join(opts.buildDir, 'parse5-bundle-cache.js');
 
   try {
     return await fs.readFile(cacheFile, 'utf8');

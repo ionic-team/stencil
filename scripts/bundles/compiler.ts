@@ -17,7 +17,7 @@ import { RollupOptions, OutputChunk } from 'rollup';
 import terser from 'terser';
 
 export async function compiler(opts: BuildOptions) {
-  const inputDir = join(opts.transpiledDir, 'compiler');
+  const inputDir = join(opts.buildDir, 'compiler');
 
   const compilerFileName = 'stencil.js';
   const compilerDtsName = compilerFileName.replace('.js', '.d.ts');
@@ -55,7 +55,7 @@ export async function compiler(opts: BuildOptions) {
         name: 'compilerMockDocResolvePlugin',
         resolveId(id) {
           if (id === '@stencil/core/mock-doc') {
-            return join(opts.transpiledDir, 'mock-doc', 'index.js');
+            return join(opts.buildDir, 'mock-doc', 'index.js');
           }
           return null;
         },
@@ -83,7 +83,7 @@ export async function compiler(opts: BuildOptions) {
         transform(code) {
           code = code.replace(` || Object.keys(process.binding('natives'))`, '');
           return code;
-        }
+        },
       },
       inlinedCompilerDepsPlugin(opts, inputDir),
       parse5Plugin(opts),

@@ -100,7 +100,7 @@ ${bundledDeps.map(l => l.content).join('\n')}
     licenseSource.push('');
   });
 
-  fs.writeFileSync(join(opts.transpiledDir, 'license-source.txt'), licenseSource.join('\n'));
+  fs.writeFileSync(join(opts.buildDir, 'license-source.txt'), licenseSource.join('\n'));
 }
 
 function createBundledDeps(opts: BuildOptions, bundledDeps: BundledDep[], deps: string[]) {

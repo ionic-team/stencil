@@ -10,7 +10,7 @@ import { writePkgJson } from '../utils/write-pkg-json';
 import { RollupOptions } from 'rollup';
 
 export async function screenshot(opts: BuildOptions) {
-  const inputScreenshotDir = join(opts.transpiledDir, 'screenshot');
+  const inputScreenshotDir = join(opts.buildDir, 'screenshot');
 
   // copy @stencil/core/screenshot/index.d.ts
   await fs.copy(inputScreenshotDir, opts.output.screenshotDir, {

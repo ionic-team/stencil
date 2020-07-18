@@ -14,7 +14,7 @@ import ts from 'typescript';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
 
 export async function devServer(opts: BuildOptions) {
-  const inputDir = join(opts.transpiledDir, 'dev-server');
+  const inputDir = join(opts.buildDir, 'dev-server');
 
   // create public d.ts
   let dts = await fs.readFile(join(inputDir, 'public.d.ts'), 'utf8');
@@ -190,7 +190,7 @@ export async function devServer(opts: BuildOptions) {
   await fs.ensureDir(join(opts.output.devServerDir, 'client'));
 
   // copy dev server client dts files
-  await fs.copy(join(opts.transpiledDir, 'dev-server', 'client'), join(opts.output.devServerDir, 'client'), {
+  await fs.copy(join(opts.buildDir, 'dev-server', 'client'), join(opts.output.devServerDir, 'client'), {
     filter: src => {
       if (src.endsWith('.d.ts')) {
         return true;
@@ -212,7 +212,7 @@ export async function devServer(opts: BuildOptions) {
   });
 
   const devServerClientBundle: RollupOptions = {
-    input: join(opts.transpiledDir, 'dev-server', 'client', 'index.js'),
+    input: join(opts.buildDir, 'dev-server', 'client', 'index.js'),
     output: {
       format: 'esm',
       file: join(opts.output.devServerDir, 'client', 'index.js'),

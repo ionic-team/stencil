@@ -12,7 +12,7 @@ import { prettyMinifyPlugin } from './plugins/pretty-minify';
 import { writePkgJson } from '../utils/write-pkg-json';
 
 export async function sysNode(opts: BuildOptions) {
-  const inputDir = join(opts.transpiledDir, 'sys', 'node');
+  const inputDir = join(opts.buildDir, 'sys', 'node');
   const inputFile = join(inputDir, 'index.js');
   const outputFile = join(opts.output.sysNodeDir, 'index.js');
 
@@ -58,7 +58,7 @@ export async function sysNode(opts: BuildOptions) {
     },
   };
 
-  const inputWorkerFile = join(opts.transpiledDir, 'sys', 'node', 'worker.js');
+  const inputWorkerFile = join(opts.buildDir, 'sys', 'node', 'worker.js');
   const outputWorkerFile = join(opts.output.sysNodeDir, 'worker.js');
   const sysNodeWorkerBundle: RollupOptions = {
     input: inputWorkerFile,
@@ -93,7 +93,7 @@ export async function sysNode(opts: BuildOptions) {
 }
 
 export async function sysNodeExternalBundles(opts: BuildOptions) {
-  const cachedDir = join(opts.transpiledDir, 'sys-node-bundle-cache');
+  const cachedDir = join(opts.buildDir, 'sys-node-bundle-cache');
 
   await fs.ensureDir(cachedDir);
 
@@ -170,7 +170,7 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
         },
         resolve: {
           alias: {
-            '@utils': join(opts.transpiledDir, 'utils', 'index.js'),
+            '@utils': join(opts.buildDir, 'utils', 'index.js'),
             'postcss': join(opts.nodeModulesDir, 'postcss'),
             'source-map': join(opts.nodeModulesDir, 'source-map'),
             'chalk': join(opts.bundleHelpersDir, 'empty.js'),

@@ -25,7 +25,7 @@ export function inlinedCompilerDepsPlugin(opts: BuildOptions, inputDir: string):
 }
 
 async function bundleCompilerDeps(opts: BuildOptions, inputDir: string) {
-  const cacheFile = join(opts.transpiledDir, 'compiler-deps-bundle-cache.js');
+  const cacheFile = join(opts.buildDir, 'compiler-deps-bundle-cache.js');
 
   if (!opts.isProd) {
     try {

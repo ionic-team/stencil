@@ -9,7 +9,7 @@ import { join } from 'path';
 import { writePkgJson } from '../utils/write-pkg-json';
 
 export async function internal(opts: BuildOptions) {
-  const inputInternalDir = join(opts.transpiledDir, 'internal');
+  const inputInternalDir = join(opts.buildDir, 'internal');
 
   await fs.emptyDir(opts.output.internalDir);
 
@@ -37,7 +37,7 @@ export async function internal(opts: BuildOptions) {
 }
 
 async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: string) {
-  const declarationsInputDir = join(opts.transpiledDir, 'declarations');
+  const declarationsInputDir = join(opts.buildDir, 'declarations');
 
   // copy to @stencil/core/internal
 
@@ -74,7 +74,7 @@ async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: str
 
   // @stencil/core/internal/stencil-core.d.ts file
   // actual public dts when importing @stencil/core
-  const stencilCoreDtsSrc = join(opts.transpiledDir, 'declarations', 'stencil-core.d.ts');
+  const stencilCoreDtsSrc = join(opts.buildDir, 'declarations', 'stencil-core.d.ts');
   const stencilCoreDtsDst = join(outputInternalDir, 'stencil-core.d.ts');
   await fs.copyFile(stencilCoreDtsSrc, stencilCoreDtsDst);
 

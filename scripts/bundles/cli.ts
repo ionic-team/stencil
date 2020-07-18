@@ -12,7 +12,7 @@ import { prettyMinifyPlugin } from './plugins/pretty-minify';
 import { writePkgJson } from '../utils/write-pkg-json';
 
 export async function cli(opts: BuildOptions) {
-  const inputDir = join(opts.transpiledDir, 'cli');
+  const inputDir = join(opts.buildDir, 'cli');
   const outputDir = opts.output.cliDir;
   const esmFilename = 'index.js';
   const cjsFilename = 'index.cjs.js';

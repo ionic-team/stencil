@@ -11,7 +11,7 @@ import { sizzlePlugin } from './plugins/sizzle-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
 
 export async function mockDoc(opts: BuildOptions) {
-  const inputDir = join(opts.transpiledDir, 'mock-doc');
+  const inputDir = join(opts.buildDir, 'mock-doc');
   const outputDir = opts.output.mockDocDir;
 
   // bundle d.ts

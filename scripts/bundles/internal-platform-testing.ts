@@ -10,7 +10,7 @@ import { RollupOptions, OutputOptions } from 'rollup';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
 
 export async function internalTesting(opts: BuildOptions) {
-  const inputTestingPlatform = join(opts.transpiledDir, 'testing', 'platform', 'index.js');
+  const inputTestingPlatform = join(opts.buildDir, 'testing', 'platform', 'index.js');
   const outputTestingPlatformDir = join(opts.output.internalDir, 'testing');
 
   await fs.emptyDir(outputTestingPlatformDir);

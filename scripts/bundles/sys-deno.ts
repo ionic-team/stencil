@@ -8,7 +8,7 @@ import { replacePlugin } from './plugins/replace-plugin';
 import { denoStdPlugin } from './plugins/deno-std-plugin';
 
 export async function sysDeno(opts: BuildOptions) {
-  const inputFile = join(opts.transpiledDir, 'sys', 'deno', 'index.js');
+  const inputFile = join(opts.buildDir, 'sys', 'deno', 'index.js');
   const outputFile = join(opts.output.sysDenoDir, 'index.js');
 
   const sysDenoBundle: RollupOptions = {
@@ -27,7 +27,7 @@ export async function sysDeno(opts: BuildOptions) {
     },
   };
 
-  const inputWorkerFile = join(opts.transpiledDir, 'sys', 'deno', 'worker.js');
+  const inputWorkerFile = join(opts.buildDir, 'sys', 'deno', 'worker.js');
   const outputWorkerFile = join(opts.output.sysDenoDir, 'worker.js');
   const sysDenoWorkerBundle: RollupOptions = {
     input: inputWorkerFile,
@@ -55,7 +55,7 @@ export async function sysDeno(opts: BuildOptions) {
     ],
   };
 
-  const inputNodeCompatFile = join(opts.transpiledDir, 'sys', 'deno', 'deno-node-compat.js');
+  const inputNodeCompatFile = join(opts.buildDir, 'sys', 'deno', 'deno-node-compat.js');
   const outputNodeCompatFile = join(opts.output.sysDenoDir, 'node-compat.js');
   const sysDenoNodeCompatBundle: RollupOptions = {
     input: inputNodeCompatFile,
@@ -70,7 +70,7 @@ export async function sysDeno(opts: BuildOptions) {
         name: 'denoNodeCompatPlugin',
         resolveId(importee) {
           if (importee.endsWith('process.ts')) {
-            return join(opts.transpiledDir, 'sys', 'deno', 'deno-node-process.js');
+            return join(opts.buildDir, 'sys', 'deno', 'deno-node-process.js');
           }
           return null;
         },
