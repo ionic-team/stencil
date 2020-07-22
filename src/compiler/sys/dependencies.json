@@ -3,8 +3,9 @@
     {
       "name": "@stencil/core",
       "version": "__VERSION:STENCIL__",
-      "main": "compiler/stencil.min.js",
+      "main": "compiler/stencil.js",
       "resources": [
+        "internal/index.js",
         "internal/index.d.ts",
         "internal/package.json",
         "internal/stencil-core.js",
