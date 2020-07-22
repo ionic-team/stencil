@@ -35,6 +35,7 @@ export {
   RafCallback,
   readTask,
   setMode,
+  setAssetPath,
   State,
   VNode,
   VNodeData,

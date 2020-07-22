@@ -266,9 +266,25 @@ export declare const setMode: (handler: ResolutionHandler) => void;
 export declare function getMode<T = string | undefined>(ref: any): T;
 
 /**
- * getAssetPath
+ * Get the base path to where the assets can be found. Use `setAssetPath(path)`
+ * if the path needs to be customized.
  */
 export declare function getAssetPath(path: string): string;
+
+/**
+ * Used to manually set the base path where assets can be found. For lazy-loaded
+ * builds the asset path is automatically set and assets copied to the correct
+ * build directory. However, for custom elements builds, the `setAssetPath(path)` could
+ * be used to customize the asset path depending on how the script file is consumed.
+ * If the script is used as "module", it's recommended to use "import.meta.url", such
+ * as `setAssetPath(import.meta.url)`. Other options include
+ * `setAssetPath(document.currentScript.src)`, or using a bundler's replace plugin to
+ * dynamically set the path at build time, such as `setAssetPath(process.env.ASSET_PATH)`.
+ * But do note that this configuration depends on how your script is bundled, or lack of
+ * bunding, and where your assets can be loaded from. Additionally custom bundling
+ * will have to ensure the static assets are copied to its build directory.
+ */
+export declare function setAssetPath(path: string): string;
 
 /**
  * getElement

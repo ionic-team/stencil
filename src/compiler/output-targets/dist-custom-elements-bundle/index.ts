@@ -86,9 +86,10 @@ const generateEntryPoint = (buildCtx: d.BuildCtx) => {
 
   imp.push(
     `import { proxyCustomElement } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
+    `export { setAssetPath } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
     `export * from '${USER_INDEX_ENTRY_ID}';`,
     `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';`,
-    'globalScripts();',
+    `globalScripts();`,
   );
 
   buildCtx.components.forEach(cmp => {

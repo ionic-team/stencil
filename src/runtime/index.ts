@@ -4,7 +4,7 @@ export { bootstrapLazy } from './bootstrap-lazy';
 export { connectedCallback } from './connected-callback';
 export { createEvent } from './event-emitter';
 export { disconnectedCallback } from './disconnected-callback';
-export { getAssetPath } from './get-asset-path';
+export { getAssetPath, setAssetPath } from './asset-path';
 export { getConnect } from './connect';
 export { getContext } from './context';
 export { getElement } from './element';

@@ -1,6 +1,6 @@
 import { BUILD } from '@app-data';
 import { Context, doc, nextTick, readTask, win, writeTask } from '@platform';
-import { getAssetPath } from './get-asset-path';
+import { getAssetPath } from './asset-path';
 
 export const getContext = (_elm: HTMLElement, context: string) => {
   if (context in Context) {
