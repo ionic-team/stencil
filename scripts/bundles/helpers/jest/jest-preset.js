@@ -3,8 +3,12 @@ const testingDir = __dirname;
 const rootDir = path.join(testingDir, '..');
 const internalDir = path.join(rootDir, 'internal');
 
+// NOTE: if you change this, also change compiler/transpile.ts
+const moduleExtensions = ['ts', 'tsx', 'mjs', 'js', 'jsx'];
+const moduleExtensionRegexp = '(' + moduleExtensions.join('|') + ')';
+
 module.exports = {
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'mjs', 'jsx', 'json', 'd.ts'],
+  moduleFileExtensions: [...moduleExtensions, 'json', 'd.ts'],
   moduleNameMapper: {
     '^@stencil/core/cli$': path.join(rootDir, 'cli', 'index.js'),
     '^@stencil/core/compiler$': path.join(rootDir, 'compiler', 'stencil.js'),
@@ -21,8 +25,8 @@ module.exports = {
   testEnvironment: path.join(testingDir, 'jest-environment.js'),
   testPathIgnorePatterns: ['/.cache', '/.stencil', '/.vscode', '/dist', '/node_modules', '/www'],
   maxConcurrency: 1,
-  testRegex: '(/__tests__/.*|\\.?(test|spec))\\.(tsx?|ts?|jsx?|js?)$',
+  testRegex: '(/__tests__/.*|\\.?(test|spec))\\.' + moduleExtensionRegexp + '$',
   transform: {
-    '^.+\\.(ts|tsx|jsx|css)$': path.join(testingDir, 'jest-preprocessor.js'),
+    ['^.+\\.' + moduleExtensionRegexp + '$']: path.join(testingDir, 'jest-preprocessor.js'),
   },
 };
