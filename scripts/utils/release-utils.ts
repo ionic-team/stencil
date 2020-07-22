@@ -63,7 +63,7 @@ export async function updateChangeLog(opts: BuildOptions) {
 }
 
 export async function postGithubRelease(opts: BuildOptions) {
-  const tag = `v${opts.version}`;
+  const versionTag = `v${opts.version}`;
   const title = `${opts.vermoji} ${opts.version}`;
 
   const lines = (await fs.readFile(opts.changelogPath, 'utf8')).trim().split('\n');
@@ -76,10 +76,14 @@ export async function postGithubRelease(opts: BuildOptions) {
     body += lines[i] + '\n';
   }
 
+  // https://docs.github.com/en/github/administering-a-repository/automation-for-release-forms-with-query-parameters
   const url = new URL(`https://github.com/${opts.ghRepoOrg}/${opts.ghRepoName}/releases/new`);
-  url.searchParams.set('tag', tag);
+  url.searchParams.set('tag', versionTag);
   url.searchParams.set('title', title);
   url.searchParams.set('body', body.trim());
+  if (opts.tag === 'next' || opts.tag === 'test') {
+    url.searchParams.set('prerelease', '1');
+  }
 
   await open(url.href);
 }
