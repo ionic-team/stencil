@@ -23,6 +23,9 @@ export const taskServe = async (config: Config) => {
   console.log(``);
 
   config.sys.onProcessInterrupt(() => {
-    devServer && devServer.close();
+    if (devServer) {
+      config.logger.debug(`dev server close: ${devServer.browserUrl}`);
+      devServer.close();
+    }
   });
 };
