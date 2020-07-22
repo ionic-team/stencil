@@ -1,6 +1,6 @@
 import * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { consoleDevWarn, win } from '@platform';
+import { consoleDevWarn, plt } from '@platform';
 import { EVENT_FLAGS } from '@utils';
 import { getElement } from './element';
 
@@ -22,7 +22,7 @@ export const createEvent = (ref: d.RuntimeRef, name: string, flags: number) => {
 };
 
 export const emitEvent = (elm: EventTarget, name: string, opts?: CustomEventInit) => {
-  const ev = new (BUILD.hydrateServerSide ? (win as any).CustomEvent : CustomEvent)(name, opts);
+  const ev = plt.ce(name, opts);
   elm.dispatchEvent(ev);
   return ev;
 };

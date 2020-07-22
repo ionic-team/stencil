@@ -12,6 +12,7 @@ export const plt: d.PlatformRuntime = {
   raf: h => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
+  ce: (eventName, opts) => new (win as any).CustomEvent(eventName, opts),
 };
 
 export const cssVarShim: d.CssVarShim = false as any;
