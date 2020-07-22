@@ -65,15 +65,29 @@ describe('dev-server, util', () => {
 });
 
 describe('getDevServerClientUrl', () => {
-  it('should get path for dev server w/ host w/ port', () => {
+  it('should get path for dev server w/ host w/ port w/ protocol', () => {
     const devServerConfig: d.DevServerConfig = {
       protocol: 'http',
       address: '0.0.0.0',
       port: 3333,
       basePath: '/my-base-url/',
     };
+    const proto = 'https';
     const host = 'staging.stenciljs:5555.com';
-    const url = getDevServerClientUrl(devServerConfig, host);
+    const url = getDevServerClientUrl(devServerConfig, host, proto);
+    expect(url).toBe(`https://staging.stenciljs:5555.com/my-base-url${DEV_SERVER_URL}`);
+  });
+
+  it('should get path for dev server w/ host w/ port no protocol', () => {
+    const devServerConfig: d.DevServerConfig = {
+      protocol: 'http',
+      address: '0.0.0.0',
+      port: 3333,
+      basePath: '/my-base-url/',
+    };
+    const proto: string = null;
+    const host = 'staging.stenciljs:5555.com';
+    const url = getDevServerClientUrl(devServerConfig, host, proto);
     expect(url).toBe(`http://staging.stenciljs:5555.com/my-base-url${DEV_SERVER_URL}`);
   });
 
@@ -84,8 +98,9 @@ describe('getDevServerClientUrl', () => {
       port: 3333,
       basePath: '/my-base-url/',
     };
+    const proto: string = null;
     const host = 'staging.stenciljs.com';
-    const url = getDevServerClientUrl(devServerConfig, host);
+    const url = getDevServerClientUrl(devServerConfig, host, proto);
     expect(url).toBe(`http://staging.stenciljs.com/my-base-url${DEV_SERVER_URL}`);
   });
 
@@ -96,8 +111,9 @@ describe('getDevServerClientUrl', () => {
       port: 3333,
       basePath: '/my-base-url/',
     };
+    const proto: string = null;
     const host: string = null;
-    const url = getDevServerClientUrl(devServerConfig, host);
+    const url = getDevServerClientUrl(devServerConfig, host, proto);
     expect(url).toBe(`http://localhost:3333/my-base-url${DEV_SERVER_URL}`);
   });
 
@@ -107,8 +123,9 @@ describe('getDevServerClientUrl', () => {
       address: '0.0.0.0',
       basePath: '/my-base-url/',
     };
+    const proto: string = null;
     const host: string = null;
-    const url = getDevServerClientUrl(devServerConfig, host);
+    const url = getDevServerClientUrl(devServerConfig, host, proto);
     expect(url).toBe(`${devServerConfig.protocol}://localhost/my-base-url${DEV_SERVER_URL}`);
   });
 
@@ -119,8 +136,9 @@ describe('getDevServerClientUrl', () => {
       port: 3333,
       basePath: '/my-base-url/',
     };
+    const proto: string = null;
     const host: string = null;
-    const url = getDevServerClientUrl(devServerConfig, host);
+    const url = getDevServerClientUrl(devServerConfig, host, proto);
     expect(url).toBe(`${devServerConfig.protocol}://${devServerConfig.address}:3333/my-base-url${DEV_SERVER_URL}`);
   });
 });

@@ -77,7 +77,7 @@ export function getBrowserUrl(protocol: string, address: string, port: number, b
   return `${protocol}://${address}${portSuffix}${path}`;
 }
 
-export function getDevServerClientUrl(devServerConfig: d.DevServerConfig, host: string) {
+export function getDevServerClientUrl(devServerConfig: d.DevServerConfig, host: string, protocol: string) {
   let address = devServerConfig.address;
   let port = devServerConfig.port;
 
@@ -86,7 +86,7 @@ export function getDevServerClientUrl(devServerConfig: d.DevServerConfig, host: 
     port = null;
   }
 
-  return getBrowserUrl(devServerConfig.protocol, address, port, devServerConfig.basePath, c.DEV_SERVER_URL);
+  return getBrowserUrl(protocol ?? devServerConfig.protocol, address, port, devServerConfig.basePath, c.DEV_SERVER_URL);
 }
 
 export function getContentType(devServerConfig: d.DevServerConfig, filePath: string) {
