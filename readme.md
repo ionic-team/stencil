@@ -131,62 +131,9 @@ A Stencil is a tool artists use for drawing perfect shapes easily. We want Stenc
 
 Stencil is a tool developers use to create Web Components with some powerful features baked in, but it gets out of the way at runtime.
 
-[Using Web Components in Ionic - Polymer Summit 2017](https://youtu.be/UfD-k7aHkQE)
-
-
-## Browser Support
-
-Web Components, specifically Custom Elements, are natively supported in Chrome and Safari and are coming to both Edge and Firefox. A dynamic polyfill loader is already included in order to only load the polyfills for the browsers that are missing specific features.
-
- - Chrome (and all Chromium based browsers)
- - Safari
- - Edge
- - Firefox
- - IE 11
-
-
-## Polyfills
-
-Stencil includes a subset of the `core-js` polyfills for old browsers like IE11, `fetch` and conditionally downloads the [Custom Elements v1](https://github.com/webcomponents/polyfills/tree/master/packages/custom-elements) only when it's needed for modern browsers (EDGE and old versions of Firefox.)
-
-
-### Internet Explorer 11
-
-Browsers that do not support native ESM (at the moment, only IE11 and older) will download a subset of [`core-js`](https://github.com/zloirock/core-js).
-
-This subset is generated using the [`core-js-builder` tool](https://github.com/zloirock/core-js/tree/master/packages/core-js-builder) with the following configuration:
-
-```js
-require('core-js-builder')({
-  targets: 'ie 11',
-  modules: [
-    'es',
-    'web.url',
-    'web.url.to-json',
-    'web.url-search-params',
-    'web.dom-collections.for-each'
-  ],
-  blacklist: [
-    'es.math',
-    'es.date',
-    'es.symbol',
-    'es.array-buffer',
-    'es.data-view',
-    'es.typed-array',
-    'es.reflect',
-  ]
-});
-```
-
-In addition, the following set of polyfills are also included:
-
- - [Promise](https://github.com/stefanpenner/es6-promise)
- - [fetch()](https://github.com/github/fetch)
- - [CSS variables](https://github.com/ionic-team/stencil/tree/master/src/client/polyfills/css-shim): We implemented our own CSS variables polyfill that integrates into the Stenciljs runtime.
-
-### All browsers
-
-Some modern browsers like Edge do not include native support for Web Components. In that case, we conditionally load the [Custom Elements v1](https://github.com/webcomponents/polyfills/tree/master/packages/custom-elements) polyfill.
+- [Using Web Components in Ionic - Polymer Summit](https://youtu.be/UfD-k7aHkQE)
+- [Stencil: A built-time approach to the web - JSConf EU](https://youtu.be/M1F81V-NhP0)
+- [Architecting A Component Compiler - dotJS](https://youtu.be/RZ6MLELGsD8)
 
 
 ## Related
