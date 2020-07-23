@@ -84,7 +84,7 @@
     "conventional-changelog-cli": "^2.0.34",
     "core-js-builder": "~3.6.5",
     "css": "^3.0.0",
-    "dts-bundle-generator": "~5.0.0",
+    "dts-bundle-generator": "~5.1.0",
     "execa": "4.0.3",
     "exit": "^0.1.2",
     "fast-deep-equal": "3.1.3",
