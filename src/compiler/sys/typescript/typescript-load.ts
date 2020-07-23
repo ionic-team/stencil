@@ -7,15 +7,14 @@ import { patchRemoteTsSys } from './typescript-patch';
 import ts from 'typescript';
 
 const importedTs: ImportTypeScriptModule = {
-  ts: null,
   p: null,
 };
 
 export const loadTypescript = (sys: d.CompilerSystem, typescriptPath: string, sync: boolean): typeof ts | Promise<typeof ts> => {
   // try sync load typescript methods first
-  if (importedTs.ts) {
+  if (exports.ts) {
     // already loaded
-    return importedTs.ts;
+    return exports.ts;
   }
 
   // check if the global object has "ts" on it
@@ -98,12 +97,13 @@ const getTsUrl = (sys: d.CompilerSystem, typeScriptPath: string) => {
 const getLoadedTs = (loadedTs: typeof ts) => {
   if (loadedTs != null && isFunction(loadedTs.transpileModule)) {
     Object.assign(ts, loadedTs);
-    return (importedTs.ts = loadedTs);
+    return (exports.ts = loadedTs);
   }
   return null;
 };
 
-export interface ImportTypeScriptModule {
-  ts: typeof ts;
+interface ImportTypeScriptModule {
   p: Promise<typeof ts>;
 }
+
+declare const exports: any;
