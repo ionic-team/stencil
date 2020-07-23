@@ -62,7 +62,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
 
   const accessSync = (p: string) => {
     const item = items.get(normalize(p));
-    return !!(item && (item.isDirectory || item.isFile));
+    return !!(item && (item.isDirectory || (item.isFile && typeof item.data === 'string')));
   };
 
   const access = async (p: string) => accessSync(p);
@@ -131,7 +131,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     const dir = items.get(p);
     if (dir && dir.isDirectory) {
       items.forEach((item, itemPath) => {
-        if (itemPath !== '/') {
+        if (itemPath !== '/' && (item.isDirectory || (item.isFile && typeof item.data === 'string'))) {
           if (p.endsWith('/') && `${p}${item.basename}` === itemPath) {
             dirItems.push(itemPath);
           } else if (`${p}/${item.basename}` === itemPath) {
@@ -317,7 +317,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const statSync = (p: string) => {
     p = normalize(p);
     const item = items.get(p);
-    if (item && (item.isDirectory || item.isFile)) {
+    if (item && (item.isDirectory || (item.isFile && typeof item.data === 'string'))) {
       const s: CompilerFsStats = {
         isDirectory: () => item.isDirectory,
         isFile: () => item.isFile,
@@ -419,8 +419,8 @@ export const createSystem = (c?: { logger?: Logger }) => {
       items.set(p, {
         basename: basename(p),
         dirname: dirname(p),
-        isDirectory: true,
-        isFile: false,
+        isDirectory: false,
+        isFile: true,
         watcherCallbacks: [fileWatcherCallback],
         data: undefined,
       });
