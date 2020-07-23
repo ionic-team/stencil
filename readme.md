@@ -9,7 +9,7 @@
 npm init stencil
 ```
 
-[Stencil](https://stenciljs.com/) is a simple compiler for generating Web Components and static site generated progressive web apps (PWA). Stencil was built by the [Ionic Framework](http://ionicframework.com/) team for its next generation of performant mobile and desktop Web Components.
+[Stencil](https://stenciljs.com/) is a simple compiler for generating Web Components and static site generated progressive web apps (PWA). Stencil was built by the [Ionic](http://ionic.io/) team for its next generation of performant mobile and desktop Web Components.
 
 Stencil combines the best concepts of the most popular frontend frameworks into a compile-time rather than run-time tool. It takes TypeScript, JSX, an asynchronous rendering pipeline to ensure smooth running animations, lazy-loading out of the box, and generates 100% standards-based Web Components that run on both [modern browsers and legacy browsers](https://stenciljs.com/docs/browser-support).
 
@@ -17,7 +17,7 @@ Stencil components are just Web Components, so they work in any major framework 
 
 Stencil also enables a number of key capabilities on top of Web Components, in particular Server Side Rendering (SSR) without the need to run a headless browser, pre-rendering, and objects-as-properties (instead of just strings).
 
-*Note: Stencil and [Ionic](https://ionicframework.com/) are completely independent projects. Stencil does not prescribe any specific UI framework, but Ionic is the largest user of Stencil (today!)*
+*Note: Stencil and [Ionic Framework](https://ionicframework.com/) are completely independent projects. Stencil does not prescribe any specific UI framework, but Ionic Framework is the largest user of Stencil (today!)*
 
 
 ## Why Stencil?
