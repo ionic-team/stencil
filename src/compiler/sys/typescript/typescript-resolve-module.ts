@@ -78,6 +78,10 @@ export const patchedTsResolveModule = (
     let resolvedFileName = join(containingDir, moduleName);
     resolvedFileName = normalizePath(ensureExtension(resolvedFileName, containingFile));
 
+    if (isAbsolute(resolvedFileName) && !inMemoryFs.accessSync(resolvedFileName)) {
+      return null;
+    }
+
     if (!isAbsolute(resolvedFileName) && !resolvedFileName.startsWith('.') && !resolvedFileName.startsWith('/')) {
       resolvedFileName = './' + resolvedFileName;
     }
@@ -94,6 +98,7 @@ export const patchedTsResolveModule = (
       },
     };
     (rtn as any).failedLookupLocations = [];
+
     return rtn;
   }
 
