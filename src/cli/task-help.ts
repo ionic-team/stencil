@@ -27,11 +27,18 @@ export const taskHelp = (sys: CompilerSystem, logger: Logger) => {
       ${logger.cyan('--e2e')} ${logger.dim('.............')} Run e2e tests with Puppeteer
 
 
+  ${logger.bold('Generate:')} ${logger.dim('Bootstrap components.')}
+
+    ${p} ${logger.green('stencil generate')} or ${logger.green('stencil g')}
+
+
   ${logger.bold('Examples:')}
 
     ${p} ${logger.green('stencil build --dev --watch --serve')}
     ${p} ${logger.green('stencil build --prerender')}
     ${p} ${logger.green('stencil test --spec --e2e')}
+    ${p} ${logger.green('stencil generate')}
+    ${p} ${logger.green('stencil g my-component')}
 
 `);
 };
