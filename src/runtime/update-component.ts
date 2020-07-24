@@ -66,7 +66,7 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean) => {
   return then(promise, () => updateComponent(hostRef, instance, isInitialLoad));
 };
 
-const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boolean) => {
+const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad: boolean) => {
   // updateComponent
   const elm = hostRef.$hostElement$ as d.RenderNode;
   const endUpdate = createTime('update', hostRef.$cmpMeta$.$tagName$);
@@ -86,7 +86,11 @@ const updateComponent = (hostRef: d.HostRef, instance: any, isInitialLoad: boole
       // looks like we've got child nodes to render into this host element
       // or we need to update the css class/attrs on the host element
       // DOM WRITE!
-      renderVdom(hostRef, callRender(hostRef, instance));
+      if (BUILD.hydrateServerSide) {
+        renderVdom(hostRef, await callRender(hostRef, instance));
+      } else {
+        renderVdom(hostRef, callRender(hostRef, instance));
+      }
     } else {
       elm.textContent = callRender(hostRef, instance);
     }
