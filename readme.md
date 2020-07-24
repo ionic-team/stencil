@@ -115,7 +115,7 @@ Stencil is a tool developers use to create Web Components with some powerful fea
  - [Ionic](https://ionicframework.com/)
  - [Ionic Worldwide Slack](http://ionicworldwide.herokuapp.com/)
  - [Ionicons](http://ionicons.com/)
- - [Capacitor](https://capacitor.ionicframework.com/)
+ - [Capacitor](https://capacitorjs.com/)
 
 
 ## License
