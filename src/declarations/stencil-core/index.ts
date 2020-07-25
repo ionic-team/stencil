@@ -41,6 +41,6 @@ export {
   VNodeData,
   Watch,
   writeTask,
-} from './stencil-public-runtime';
+} from '../stencil-public-runtime';
 
-export { StencilConfig as Config, PrerenderConfig } from './stencil-public-compiler';
+export { StencilConfig as Config, PrerenderConfig } from '../stencil-public-compiler';

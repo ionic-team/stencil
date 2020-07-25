@@ -52,6 +52,7 @@
     "src/compiler/index.ts",
     "src/compiler/public.ts",
     "src/compiler/sys/modules/index.ts",
+    "src/declarations/stencil-core/index.ts",
     "src/dev-server/index.ts",
     "src/dev-server/public.ts",
     "src/dev-server/server-worker.ts",

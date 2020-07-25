@@ -58,8 +58,8 @@ const pkgs: TestPackage[] = [
     // internal
     packageJson: 'internal/package.json',
     files: [
-      'internal/stencil-core.d.ts',
-      'internal/stencil-core.js',
+      'internal/stencil-core/index.js',
+      'internal/stencil-core/index.d.ts',
       'internal/stencil-ext-modules.d.ts',
       'internal/stencil-private.d.ts',
       'internal/stencil-public-compiler.d.ts',

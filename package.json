@@ -2,8 +2,8 @@
   "name": "@stencil/core",
   "version": "1.17.0",
   "license": "MIT",
-  "main": "internal/stencil-core.js",
-  "types": "internal/stencil-core.d.ts",
+  "main": "internal/stencil-core/index.js",
+  "types": "internal/stencil-core/index.d.ts",
   "bin": {
     "stencil": "bin/stencil"
   },

@@ -72,10 +72,12 @@ async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: str
   const runtimeDts = cleanDts(await fs.readFile(runtimeDtsSrcPath, 'utf8'));
   await fs.writeFile(runtimeDtsDestPath, runtimeDts);
 
-  // @stencil/core/internal/stencil-core.d.ts file
+  // @stencil/core/internal/stencil-core/index.d.ts file
   // actual public dts when importing @stencil/core
-  const stencilCoreDtsSrc = join(opts.buildDir, 'declarations', 'stencil-core.d.ts');
-  const stencilCoreDtsDst = join(outputInternalDir, 'stencil-core.d.ts');
+  const stencilCoreDtsSrc = join(opts.buildDir, 'declarations', 'stencil-core', 'index.d.ts');
+  const stencilCoreDstDir = join(outputInternalDir, 'stencil-core');
+  const stencilCoreDtsDst = join(stencilCoreDstDir, 'index.d.ts');
+  await fs.ensureDir(stencilCoreDstDir);
   await fs.copyFile(stencilCoreDtsSrc, stencilCoreDtsDst);
 
   // @stencil/core/internal/stencil-ext-modules.d.ts (.svg/.css)
@@ -90,5 +92,7 @@ function prependExtModules(content: string) {
 
 async function createStencilCoreEntry(outputInternalDir: string) {
   // write @stencil/core entry (really only used for node resolving, not its actual code as you can see)
-  await fs.writeFile(join(outputInternalDir, 'stencil-core.js'), `exports.h = function() {};`);
+  const stencilCoreDstDir = join(outputInternalDir, 'stencil-core');
+  await fs.ensureDir(stencilCoreDstDir);
+  await fs.writeFile(join(stencilCoreDstDir, 'index.js'), `exports.h = function() {};`);
 }
