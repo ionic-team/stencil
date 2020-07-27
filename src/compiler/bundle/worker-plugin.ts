@@ -4,18 +4,19 @@ import { bundleOutput } from './bundle-output';
 import { normalizeFsPath, hasError } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';
 
-export const workerPlugin = (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  platform: string,
-  inlineWorkers: boolean
-): Plugin => {
+export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, platform: string, inlineWorkers: boolean): Plugin => {
   if (platform === 'worker' || platform === 'hydrate') {
     return {
       name: 'workerPlugin',
+      transform(_, id) {
+        if (id.endsWith('?worker') || id.endsWith('?worker-inline')) {
+          return getMockedWorkerMain();
+        }
+        return null;
+      },
     };
   }
+
   const workersMap = new Map<string, WorkerMeta>();
 
   return {
@@ -62,7 +63,6 @@ export const workerPlugin = (
           code: getWorkerMain(referenceId, workerName, workerMsgId),
           moduleSideEffects: false,
         };
-
       } else if (id.endsWith('?worker-inline')) {
         const workerEntryPath = normalizeFsPath(id);
         const workerName = getWorkerName(workerEntryPath);
@@ -359,6 +359,18 @@ const blob = new Blob(['importScripts("' + workerPath + '")'], { type: 'text/jav
 const url = URL.createObjectURL(blob);
 export const worker = /*@__PURE__*/createWorker(url, workerName, workerMsgId);
 URL.revokeObjectURL(url);
+`;
+};
+
+const getMockedWorkerMain = () => {
+  // for the hydrate build the workers won't actually work
+  // however, we still need to make the {worker} export
+  // kick-in otherwise bundling chokes
+  return `
+export const workerName = 'mocked-worker';
+export const workerMsgId = workerName;
+export const workerPath = workerName;
+export const worker = { name: workerName };  
 `;
 };
 
