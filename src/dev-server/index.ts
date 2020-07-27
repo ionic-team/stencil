@@ -213,6 +213,7 @@ function emitMessageToClient(serverProcess: ChildProcess, devServerContext: DevS
     // a compiler build has finished
     // send the build results to the child server process
     devServerContext.isActivelyBuilding = false;
+    devServerContext.lastBuildResults = { ...data };
     const msg: DevServerMessage = {
       buildResults: { ...data },
     };

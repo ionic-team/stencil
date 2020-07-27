@@ -7,6 +7,7 @@ export const initClientWebSocket = (win: d.DevClientWindow, config: d.DevClientC
   let reconnectAttempts = 0;
   let requestBuildResultsTmrId: any;
   let hasGottenBuildResults = false;
+  let buildResultsRequests = 0;
 
   function onOpen(this: WebSocket) {
     if (reconnectAttempts > 0) {
@@ -17,7 +18,8 @@ export const initClientWebSocket = (win: d.DevClientWindow, config: d.DevClientC
 
     if (!hasGottenBuildResults) {
       requestBuildResultsTmrId = setInterval(() => {
-        if (!hasGottenBuildResults && this.readyState === WebSocket.OPEN) {
+        buildResultsRequests++;
+        if (!hasGottenBuildResults && this.readyState === WebSocket.OPEN && buildResultsRequests < 500) {
           const msg: d.DevServerMessage = {
             requestBuildResults: true,
           };
@@ -70,6 +72,7 @@ export const initClientWebSocket = (win: d.DevClientWindow, config: d.DevClientC
         // so it's probably best if we do a full page refresh
         logReload(`Reconnected to dev server`);
         hasGottenBuildResults = true;
+        buildResultsRequests = 0;
         clearInterval(requestBuildResultsTmrId);
         win.location.reload(true);
         return;
@@ -89,6 +92,7 @@ export const initClientWebSocket = (win: d.DevClientWindow, config: d.DevClientC
       // we just got build results from the server
       // let's update our app with the data received
       hasGottenBuildResults = true;
+      buildResultsRequests = 0;
       clearInterval(requestBuildResultsTmrId);
 
       emitBuildStatus(win, 'default');
