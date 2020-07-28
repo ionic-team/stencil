@@ -27,10 +27,10 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
     return buildCtx.buildResults;
   }
 
-  buildCtx.debug(`${aborted ? 'aborted' : 'finished'} build, ${buildCtx.timestamp}`);
-
   // create the build results data
   buildCtx.buildResults = generateBuildResults(config, compilerCtx, buildCtx);
+
+  buildCtx.debug(`${aborted ? 'aborted' : 'finished'} build, ${buildCtx.buildResults.duration}ms`);
 
   // log any errors/warnings
   if (!buildCtx.hasFinished) {
