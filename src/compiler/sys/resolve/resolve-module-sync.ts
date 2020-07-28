@@ -25,27 +25,32 @@ export const resolveRemoteModuleIdSync = (config: d.Config, inMemoryFs: d.InMemo
 };
 
 const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string) => {
-  const filePath = normalizePath(config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId, path: 'package.json' }));
-  let pkgJson = inMemoryFs.readFileSync(filePath);
-  if (!isString(pkgJson) && IS_WEB_WORKER_ENV) {
-    const url = config.sys.getRemoteModuleUrl({ moduleId, path: 'package.json' });
-    pkgJson = fetchModuleSync(config.sys, inMemoryFs, packageVersions, url, filePath);
-  }
-  if (typeof pkgJson === 'string') {
-    try {
-      return JSON.parse(pkgJson) as d.PackageJsonData;
-    } catch (e) {}
+  if (inMemoryFs) {
+    const filePath = normalizePath(config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId, path: 'package.json' }));
+    let pkgJson = inMemoryFs.readFileSync(filePath);
+    if (!isString(pkgJson) && IS_WEB_WORKER_ENV) {
+      const url = config.sys.getRemoteModuleUrl({ moduleId, path: 'package.json' });
+      pkgJson = fetchModuleSync(config.sys, inMemoryFs, packageVersions, url, filePath);
+    }
+    if (typeof pkgJson === 'string') {
+      try {
+        return JSON.parse(pkgJson) as d.PackageJsonData;
+      } catch (e) {}
+    }
   }
   return null;
 };
 
 export const resolveModuleIdSync = (sys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, opts: d.ResolveModuleIdOptions) => {
-  const resolverOpts = createCustomResolverSync(sys, inMemoryFs, opts.exts);
-  resolverOpts.basedir = dirname(opts.containingFile);
-  resolverOpts.packageFilter = opts.packageFilter;
+  if (inMemoryFs) {
+    const resolverOpts = createCustomResolverSync(sys, inMemoryFs, opts.exts);
+    resolverOpts.basedir = dirname(opts.containingFile);
+    resolverOpts.packageFilter = opts.packageFilter;
 
-  const resolvedModule = resolve.sync(opts.moduleId, resolverOpts);
-  return resolvedModule;
+    const resolvedModule = resolve.sync(opts.moduleId, resolverOpts);
+    return resolvedModule;
+  }
+  return null;
 };
 
 export const createCustomResolverSync = (sys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, exts: string[]): SyncOpts => {
