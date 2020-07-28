@@ -6,7 +6,7 @@ import { replacePlugin } from './plugins/replace-plugin';
 import { reorderCoreStatementsPlugin } from './plugins/reorder-statements';
 import { getBanner } from '../utils/banner';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { rollup, RollupOptions, OutputOptions } from 'rollup';
+import { rollup, RollupOptions } from 'rollup';
 import glob from 'glob';
 import ts from 'typescript';
 import { minify } from 'terser';
