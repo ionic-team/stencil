@@ -118,6 +118,34 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
     removeDestory(cb) {
       destroys.delete(cb);
     },
+    applyPrerenderGlobalPatch(opts) {
+      if (typeof global.fetch !== 'function') {
+        const nodeFetch = require(path.join(__dirname, 'node-fetch.js'));
+
+        global.fetch = (input: any, init: any) => {
+          if (typeof input === 'string') {
+            // fetch(url) w/ url string
+            const urlStr = new URL(input, opts.devServerHostUrl).href;
+            return nodeFetch.fetch(urlStr, init);
+          } else {
+            // fetch(Request) w/ request object
+            input.url = new URL(input.url, opts.devServerHostUrl).href;
+            return nodeFetch.fetch(input, init);
+          }
+        };
+
+        global.Headers = nodeFetch.Headers;
+        global.Request = nodeFetch.Request;
+        global.Response = nodeFetch.Response;
+        (global as any).FetchError = nodeFetch.FetchError;
+      }
+
+      opts.window.fetch = global.fetch;
+      opts.window.Headers = global.Headers;
+      opts.window.Request = global.Request;
+      opts.window.Response = global.Response;
+      opts.window.FetchError = (global as any).FetchError;
+    },
     checkVersion,
     copyFile(src, dst) {
       return new Promise(resolve => {

@@ -823,6 +823,7 @@ export interface CompilerSystem {
    */
   accessSync(p: string): boolean;
   applyGlobalPatch?(fromDir: string): Promise<void>;
+  applyPrerenderGlobalPatch?(opts: { devServerHostUrl: string; window: any }): void;
   cacheStorage?: CacheStorage;
   checkVersion?: (logger: Logger, currentVersion: string) => Promise<() => void>;
   copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
