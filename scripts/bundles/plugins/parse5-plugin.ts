@@ -67,24 +67,19 @@ async function bundleParse5(opts: BuildOptions) {
 
   const { output } = await rollupBuild.generate({
     format: 'iife',
-    name: 'EXPORT_PARSE5',
-    footer: `
-      export function parse(html, options) {
-        return parse5.parse(html, options);
-      }
-      export function parseFragment(html, options) {
-        return parse5.parseFragment(html, options);
-      }
-    `,
+    name: 'PARSE5',
+    footer: ['export const parse = PARSE5.parse;', 'export const parseFragment = PARSE5.parseFragment;'].join('\n'),
+    preferConst: true,
+    strict: false,
   });
 
-  let code = output[0].code;
+  const minified = terser.minify(output[0].code);
 
-  const minify = terser.minify(code);
+  if (minified.error) {
+    throw minified.error;
+  }
 
-  code = minify.code.replace('var EXPORT_PARSE5=function', 'const parse5=/*@__PURE__*/function');
+  await fs.writeFile(cacheFile, minified.code);
 
-  await fs.writeFile(cacheFile, code);
-
-  return code;
+  return minified.code;
 }
