@@ -13,7 +13,12 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
     config: null,
     diagnostics: [],
     tsconfig: {
+      path: null,
       compilerOptions: null,
+      files: null,
+      include: null,
+      exclude: null,
+      extends: null,
     },
   };
 
@@ -70,7 +75,13 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
 
       results.config.tsconfig = tsConfigResults.path;
       results.config.tsCompilerOptions = tsConfigResults.compilerOptions;
-      results.tsconfig.compilerOptions = tsConfigResults.compilerOptions;
+
+      results.tsconfig.path = tsConfigResults.path;
+      results.tsconfig.compilerOptions = JSON.parse(JSON.stringify(tsConfigResults.compilerOptions));
+      results.tsconfig.files = tsConfigResults.files;
+      results.tsconfig.include = tsConfigResults.include;
+      results.tsconfig.exclude = tsConfigResults.exclude;
+      results.tsconfig.extends = tsConfigResults.extends;
     }
 
     if (isString(init.typescriptPath)) {

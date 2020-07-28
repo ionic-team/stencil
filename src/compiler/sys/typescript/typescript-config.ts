@@ -7,6 +7,10 @@ export const validateTsConfig = async (ts: typeof TypeScript, config: d.Config, 
   const tsconfig = {
     path: null as string,
     compilerOptions: null as any,
+    files: null as string[],
+    include: null as string[],
+    exclude: null as string[],
+    extends: null as string,
     diagnostics: [] as d.Diagnostic[],
   };
 
@@ -57,6 +61,19 @@ export const validateTsConfig = async (ts: typeof TypeScript, config: d.Config, 
             const warn = buildWarn(tsconfig.diagnostics);
             warn.header = `tsconfig.json should not reference stencil.config.ts`;
             warn.messageText = `stencil.config.ts is not part of the output build, it should not be included.`;
+          }
+
+          if (Array.isArray(results.raw.files)) {
+            tsconfig.files = results.raw.files.slice();
+          }
+          if (Array.isArray(results.raw.include)) {
+            tsconfig.include = results.raw.include.slice();
+          }
+          if (Array.isArray(results.raw.exclude)) {
+            tsconfig.exclude = results.raw.exclude.slice();
+          }
+          if (isString(results.raw.extends)) {
+            tsconfig.extends = results.raw.extends;
           }
         }
 

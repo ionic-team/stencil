@@ -1996,7 +1996,12 @@ export interface LoadConfigResults {
   config: Config;
   diagnostics: Diagnostic[];
   tsconfig: {
+    path: string;
     compilerOptions: any;
+    files: string[];
+    include: string[];
+    exclude: string[];
+    extends: string;
   };
 }
 
