@@ -42,7 +42,7 @@ const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], tsS
     if (returnString === 'void') {
       const warn = buildWarn(diagnostics);
       warn.header = '@Method requires async';
-      warn.messageText = `External @Method() ${methodName}() must return a Promise.\n\n Consider prefixing the method with async, such as @Method async ${methodName}().`;
+      warn.messageText = `External @Method() ${methodName}() must return a Promise.\n\n Consider prefixing the method with async, such as @Method() async ${methodName}().`;
       augmentDiagnosticWithNode(warn, method.name);
 
       returnString = 'Promise<void>';
@@ -50,7 +50,7 @@ const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], tsS
     } else if (!isTypePromise(returnString)) {
       const err = buildError(diagnostics);
       err.header = '@Method requires async';
-      err.messageText = `External @Method() ${methodName}() must return a Promise.\n\n Consider prefixing the method with async, such as @Method async ${methodName}().`;
+      err.messageText = `External @Method() ${methodName}() must return a Promise.\n\n Consider prefixing the method with async, such as @Method() async ${methodName}().`;
       augmentDiagnosticWithNode(err, method.name);
     }
   }
