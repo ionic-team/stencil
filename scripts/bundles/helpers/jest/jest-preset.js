@@ -4,7 +4,7 @@ const rootDir = path.join(testingDir, '..');
 const internalDir = path.join(rootDir, 'internal');
 
 // NOTE: if you change this, also change compiler/transpile.ts
-const moduleExtensions = ['ts', 'tsx', 'mjs', 'js', 'jsx'];
+const moduleExtensions = ['ts', 'tsx', 'js', 'mjs', 'jsx'];
 const moduleExtensionRegexp = '(' + moduleExtensions.join('|') + ')';
 
 module.exports = {
