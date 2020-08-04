@@ -92,11 +92,6 @@ export interface PropOptions {
    * In this case you can set the `reflect` option to `true`, since it defaults to `false`:
    */
   reflect?: boolean;
-
-  /** @deprecated: "attr" has been deprecated, please use "attribute" instead. */
-  attr?: string;
-  /** @deprecated "reflectToAttr" has been deprecated, please use "reflect" instead. */
-  reflectToAttr?: boolean;
 }
 
 export interface MethodDecorator {
