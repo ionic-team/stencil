@@ -126,13 +126,3 @@ const transpileJson = (results: TranspileResults) => {
 
 // NOTE: if you change this, also change scripts/bundles/helpers/jest/jest-preset.js
 const shouldTranspileModule = (ext: string) => ['tsx', 'ts', 'mjs', 'jsx', 'js'].includes(ext);
-
-export const compile = (code: string, opts: any = {}): Promise<any> => {
-  console.warn(`compile() deprecated, please use transpile() instead`);
-  return transpile(code, opts);
-};
-
-export const compileSync = (code: string, opts: any = {}): any => {
-  console.warn(`compileSync() deprecated, please use transpileSync() instead`);
-  return transpileSync(code, opts);
-};
