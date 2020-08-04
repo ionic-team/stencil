@@ -4,7 +4,6 @@ import type {
   CompilerSystemRealpathResults,
   CompilerSystemUnlinkResults,
   CompilerSystemWriteFileResults,
-  Diagnostic,
 } from '../../declarations';
 import { asyncGlob, nodeCopyTasks } from './node-copy-tasks';
 import { buildEvents } from '../../compiler/events';
@@ -16,75 +15,11 @@ import fs from 'graceful-fs';
 import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
 import { NodeWorkerController } from './node-worker-controller';
-import { normalizePath, requireFunc, buildError, isFunction } from '@utils';
+import { normalizePath, isFunction } from '@utils';
 import path from 'path';
 import type TypeScript from 'typescript';
 
 export function createNodeSys(c: { process?: any } = {}) {
-  const sys = createNodeSysNoWatch(c);
-  const ts = require('typescript') as typeof TypeScript;
-  const tsWatchFile = ts.sys.watchFile;
-  const tsWatchDirectory = ts.sys.watchDirectory;
-
-  sys.watchTimeout = 80;
-  sys.events = buildEvents();
-
-  sys.watchDirectory = (p, callback, recursive) => {
-    const tsFileWatcher = tsWatchDirectory(
-      p,
-      fileName => {
-        fileName = normalizePath(fileName);
-        callback(fileName, null);
-      },
-      recursive,
-    );
-
-    const close = () => {
-      tsFileWatcher.close();
-    };
-
-    sys.addDestory(close);
-
-    return {
-      close() {
-        sys.removeDestory(close);
-        tsFileWatcher.close();
-      },
-    };
-  };
-
-  sys.watchFile = (p, callback) => {
-    const tsFileWatcher = tsWatchFile(p, (fileName, tsEventKind) => {
-      fileName = normalizePath(fileName);
-      if (tsEventKind === ts.FileWatcherEventKind.Created) {
-        callback(fileName, 'fileAdd');
-        sys.events.emit('fileAdd', fileName);
-      } else if (tsEventKind === ts.FileWatcherEventKind.Changed) {
-        callback(fileName, 'fileUpdate');
-        sys.events.emit('fileUpdate', fileName);
-      } else if (tsEventKind === ts.FileWatcherEventKind.Deleted) {
-        callback(fileName, 'fileDelete');
-        sys.events.emit('fileDelete', fileName);
-      }
-    });
-
-    const close = () => {
-      tsFileWatcher.close();
-    };
-    sys.addDestory(close);
-
-    return {
-      close() {
-        sys.removeDestory(close);
-        tsFileWatcher.close();
-      },
-    };
-  };
-
-  return sys;
-}
-
-export function createNodeSysNoWatch(c: { process?: any } = {}) {
   const prcs: NodeJS.Process = c.process || global.process;
   const destroys = new Set<() => Promise<void> | void>();
   const onInterruptsCallbacks: (() => void)[] = [];
@@ -92,6 +27,9 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
   const sysCpus = cpus();
   const hardwareConcurrency = sysCpus.length;
   const osPlatform = platform();
+
+  const compilerExecutingPath = path.join(__dirname, '..', '..', 'compiler', 'stencil.js');
+  const devServerExecutingPath = path.join(__dirname, '..', '..', 'dev-server', 'index.js');
 
   const sys: CompilerSystem = {
     name: 'node',
@@ -176,26 +114,15 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
       destroys.clear();
     },
     dynamicImport(p) {
-      return Promise.resolve(requireFunc(p));
+      return Promise.resolve(require(p));
     },
     encodeToBase64(str) {
       return Buffer.from(str).toString('base64');
     },
     async ensureDependencies() {
-      const diagnostics: Diagnostic[] = [];
-      let typescriptPath: string = null;
-      try {
-        typescriptPath = require.resolve('typescript');
-      } catch (e) {
-        const diagnostic = buildError(diagnostics);
-        diagnostic.header = `Unable to find TypeScript`;
-        diagnostic.messageText = `Please ensure you install the dependencies first, for example: "npm install"`;
-      }
-
       return {
         stencilPath: sys.getCompilerExecutingPath(),
-        typescriptPath,
-        diagnostics,
+        diagnostics: [],
       };
     },
     async ensureResources() {},
@@ -204,10 +131,10 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
       return normalizePath(prcs.cwd());
     },
     getCompilerExecutingPath() {
-      return path.join(__dirname, '..', '..', 'compiler', 'stencil.js');
+      return compilerExecutingPath;
     },
     getDevServerExecutingPath() {
-      return path.join(__dirname, '..', '..', 'dev-server', 'index.js');
+      return devServerExecutingPath;
     },
     getEnvironmentVar(key) {
       return process.env[key];
@@ -377,6 +304,67 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
       } catch (e) {
         return { basename: path.basename(p), dirname: path.dirname(p), path: p, removedDirs: [], removedFiles: [], error: e };
       }
+    },
+    setupCompiler(c) {
+      const ts: typeof TypeScript = c.ts;
+      const tsSysWatchDirectory = ts.sys.watchDirectory;
+      const tsSysWatchFile = ts.sys.watchFile;
+
+      sys.watchTimeout = 80;
+
+      sys.events = buildEvents();
+
+      sys.watchDirectory = (p, callback, recursive) => {
+        const tsFileWatcher = tsSysWatchDirectory(
+          p,
+          fileName => {
+            fileName = normalizePath(fileName);
+            callback(fileName, null);
+          },
+          recursive,
+        );
+
+        const close = () => {
+          tsFileWatcher.close();
+        };
+
+        sys.addDestory(close);
+
+        return {
+          close() {
+            sys.removeDestory(close);
+            tsFileWatcher.close();
+          },
+        };
+      };
+
+      sys.watchFile = (p, callback) => {
+        const tsFileWatcher = tsSysWatchFile(p, (fileName, tsEventKind) => {
+          fileName = normalizePath(fileName);
+          if (tsEventKind === ts.FileWatcherEventKind.Created) {
+            callback(fileName, 'fileAdd');
+            sys.events.emit('fileAdd', fileName);
+          } else if (tsEventKind === ts.FileWatcherEventKind.Changed) {
+            callback(fileName, 'fileUpdate');
+            sys.events.emit('fileUpdate', fileName);
+          } else if (tsEventKind === ts.FileWatcherEventKind.Deleted) {
+            callback(fileName, 'fileDelete');
+            sys.events.emit('fileDelete', fileName);
+          }
+        });
+
+        const close = () => {
+          tsFileWatcher.close();
+        };
+        sys.addDestory(close);
+
+        return {
+          close() {
+            sys.removeDestory(close);
+            tsFileWatcher.close();
+          },
+        };
+      };
     },
     stat(p) {
       return new Promise(resolve => {

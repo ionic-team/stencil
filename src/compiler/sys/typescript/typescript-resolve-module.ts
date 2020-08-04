@@ -1,13 +1,13 @@
 import * as d from '../../../declarations';
 import { basename, dirname, isAbsolute, join, resolve } from 'path';
 import { isDtsFile, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile, isJsonFile } from '../resolve/resolve-utils';
-import { isRemoteUrl, isString, IS_BROWSER_ENV, IS_NODE_ENV, IS_WEB_WORKER_ENV, normalizePath } from '@utils';
+import { isRemoteUrl, isString, IS_BROWSER_ENV, IS_NODE_ENV, normalizePath } from '@utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
 import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
 import { version } from '../../../version';
 import ts from 'typescript';
 
-export const patchTypeScriptResolveModule = (loadedTs: typeof ts, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
   let compilerExe: string;
   if (config.sys) {
     compilerExe = config.sys.getCompilerExecutingPath();
@@ -16,9 +16,9 @@ export const patchTypeScriptResolveModule = (loadedTs: typeof ts, config: d.Conf
   }
 
   if (shouldPatchRemoteTypeScript(compilerExe)) {
-    const resolveModuleName = ((loadedTs as any).__resolveModuleName = loadedTs.resolveModuleName);
+    const resolveModuleName = ((ts as any).__resolveModuleName = ts.resolveModuleName);
 
-    loadedTs.resolveModuleName = (moduleName, containingFile, compilerOptions, host, cache, redirectedReference) => {
+    ts.resolveModuleName = (moduleName, containingFile, compilerOptions, host, cache, redirectedReference) => {
       const resolvedModule = patchedTsResolveModule(config, inMemoryFs, moduleName, containingFile);
       if (resolvedModule) {
         return resolvedModule;
@@ -32,7 +32,7 @@ export const tsResolveModuleName = (config: d.Config, compilerCtx: d.CompilerCtx
   const resolveModuleName: typeof ts.resolveModuleName = (ts as any).__resolveModuleName || ts.resolveModuleName;
 
   if (moduleName && resolveModuleName && config.tsCompilerOptions) {
-    const host: ts.ModuleResolutionHost = patchTsSystemFileSystem(config, config.sys, compilerCtx.fs, ts, {} as any);
+    const host: ts.ModuleResolutionHost = patchTsSystemFileSystem(config, config.sys, compilerCtx.fs, ts.sys);
 
     const compilerOptions: ts.CompilerOptions = { ...config.tsCompilerOptions };
     compilerOptions.resolveJsonModule = true;
@@ -184,4 +184,4 @@ const getTsResolveExtension = (p: string) => {
   return ts.Extension.Ts;
 };
 
-const shouldPatchRemoteTypeScript = (compilerExe: string) => !IS_NODE_ENV && IS_WEB_WORKER_ENV && isRemoteUrl(compilerExe);
+const shouldPatchRemoteTypeScript = (compilerExe: string) => !IS_NODE_ENV && isRemoteUrl(compilerExe);

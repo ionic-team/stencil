@@ -1,7 +1,7 @@
 import path from 'path';
 import { Plugin } from 'rollup';
 
-const modules = new Set(['crypto', 'events', 'fs', 'module', 'os', 'path', 'stream', 'typescript', 'url', 'util']);
+const modules = new Set(['crypto', 'events', 'fs', 'module', 'os', 'path', 'stream', 'url', 'util']);
 
 export function sysModulesPlugin(inputDir: string): Plugin {
   return {

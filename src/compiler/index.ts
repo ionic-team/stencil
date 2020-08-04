@@ -2,6 +2,7 @@ import { IS_WEB_WORKER_ENV } from '@utils';
 import { createSystem } from './sys/stencil-sys';
 import { createWorkerMessageHandler } from './worker/worker-thread';
 import { initWebWorkerThread } from './sys/worker/web-worker-thread';
+import ts from 'typescript';
 
 if (IS_WEB_WORKER_ENV) {
   initWebWorkerThread(createWorkerMessageHandler(createSystem()));
@@ -19,3 +20,4 @@ export { optimizeCss } from './optimize/optimize-css';
 export { optimizeJs } from './optimize/optimize-js';
 export { path } from './sys/modules/path';
 export { version, versions, vermoji, buildId } from '../version';
+export { ts };

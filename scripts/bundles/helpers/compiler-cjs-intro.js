@@ -33,3 +33,4 @@ if (!process.platform) {
 if (!process.version) {
   process.version = 'v12.0.0';
 }
+process.browser = !!globalThis.location;

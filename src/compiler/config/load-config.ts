@@ -3,10 +3,9 @@ import { buildError, catchError, isString, normalizePath, hasError, IS_NODE_ENV 
 import { createLogger } from '../sys/logger/console-logger';
 import { createSystem } from '../sys/stencil-sys';
 import { dirname, resolve } from 'path';
-import { loadTypescript } from '../sys/typescript/typescript-load';
 import { validateConfig } from './validate-config';
 import { validateTsConfig } from '../sys/typescript/typescript-config';
-import type TypeScript from 'typescript';
+import ts from 'typescript';
 
 export const loadConfig = async (init: LoadConfigInit = {}) => {
   const results: LoadConfigResults = {
@@ -27,9 +26,7 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
     const config = init.config || {};
     let configPath = init.configPath || config.configPath;
 
-    const loadedTs = await loadTypescript(sys, init.typescriptPath, false);
-
-    const loadedConfigFile = await loadConfigFile(loadedTs, sys, results.diagnostics, configPath);
+    const loadedConfigFile = await loadConfigFile(sys, results.diagnostics, configPath);
     if (hasError(results.diagnostics)) {
       return results;
     }
@@ -70,7 +67,7 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
     results.config.logger.setLevel(results.config.logLevel);
 
     if (!hasError(results.diagnostics)) {
-      const tsConfigResults = await validateTsConfig(loadedTs, results.config, sys, init);
+      const tsConfigResults = await validateTsConfig(results.config, sys, init);
       results.diagnostics.push(...tsConfigResults.diagnostics);
 
       results.config.tsconfig = tsConfigResults.path;
@@ -83,10 +80,6 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
       results.tsconfig.exclude = tsConfigResults.exclude;
       results.tsconfig.extends = tsConfigResults.extends;
     }
-
-    if (isString(init.typescriptPath)) {
-      results.config.typescriptPath = init.typescriptPath;
-    }
   } catch (e) {
     catchError(results.diagnostics, e);
   }
@@ -94,12 +87,12 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
   return results;
 };
 
-const loadConfigFile = async (loadedTs: typeof TypeScript, sys: CompilerSystem, diagnostics: Diagnostic[], configPath: string) => {
+const loadConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[], configPath: string) => {
   let config: Config = null;
 
   if (isString(configPath)) {
     // the passed in config was a string, so it's probably a path to the config we need to load
-    const configFileData = await evaluateConfigFile(loadedTs, sys, diagnostics, configPath);
+    const configFileData = await evaluateConfigFile(sys, diagnostics, configPath);
     if (hasError(diagnostics)) {
       return config;
     }
@@ -117,7 +110,7 @@ const loadConfigFile = async (loadedTs: typeof TypeScript, sys: CompilerSystem, 
   return config;
 };
 
-const evaluateConfigFile = async (loadedTs: typeof TypeScript, sys: CompilerSystem, diagnostics: Diagnostic[], configFilePath: string) => {
+const evaluateConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[], configFilePath: string) => {
   let configFileData: { config?: Config } = null;
 
   try {
@@ -133,7 +126,7 @@ const evaluateConfigFile = async (loadedTs: typeof TypeScript, sys: CompilerSyst
         if (configFilePath.endsWith('.ts')) {
           // looks like we've got a typed config file
           // let's transpile it to .js quick
-          sourceText = transpileTypedConfig(loadedTs, diagnostics, sourceText, configFilePath);
+          sourceText = transpileTypedConfig(diagnostics, sourceText, configFilePath);
         } else {
           // quick hack to turn a modern es module
           // into and old school commonjs module
@@ -151,7 +144,7 @@ const evaluateConfigFile = async (loadedTs: typeof TypeScript, sys: CompilerSyst
     } else {
       // browser environment, can't use node's require() to evaluate
       let sourceText = await sys.readFile(configFilePath);
-      sourceText = transpileTypedConfig(loadedTs, diagnostics, sourceText, configFilePath);
+      sourceText = transpileTypedConfig(diagnostics, sourceText, configFilePath);
       if (hasError(diagnostics)) {
         return configFileData;
       }
@@ -166,26 +159,26 @@ const evaluateConfigFile = async (loadedTs: typeof TypeScript, sys: CompilerSyst
   return configFileData;
 };
 
-const transpileTypedConfig = (loadedTs: typeof TypeScript, diagnostics: Diagnostic[], sourceText: string, filePath: string) => {
+const transpileTypedConfig = (diagnostics: Diagnostic[], sourceText: string, filePath: string) => {
   // let's transpile an awesome stencil.config.ts file into
   // a boring stencil.config.js file
   if (hasError(diagnostics)) {
     return sourceText;
   }
 
-  const opts: TypeScript.TranspileOptions = {
+  const opts: ts.TranspileOptions = {
     fileName: filePath,
     compilerOptions: {
-      module: loadedTs.ModuleKind.CommonJS,
-      moduleResolution: loadedTs.ModuleResolutionKind.NodeJs,
+      module: ts.ModuleKind.CommonJS,
+      moduleResolution: ts.ModuleResolutionKind.NodeJs,
       esModuleInterop: true,
-      target: loadedTs.ScriptTarget.ES2015,
+      target: ts.ScriptTarget.ES2015,
       allowJs: true,
     },
     reportDiagnostics: false,
   };
 
-  const output = loadedTs.transpileModule(sourceText, opts);
+  const output = ts.transpileModule(sourceText, opts);
 
   return output.outputText;
 };

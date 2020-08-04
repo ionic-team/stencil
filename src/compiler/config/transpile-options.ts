@@ -35,7 +35,7 @@ export const getTranspileConfig = (input: TranspileOptions) => {
     transpileCtx.sys = input.sys;
   } else if (!transpileCtx.sys) {
     if (IS_NODE_ENV) {
-      transpileCtx.sys = requireFunc('../sys/node/index.js').createNodeSysNoWatch();
+      transpileCtx.sys = requireFunc('../sys/node/index.js').createNodeSys();
     } else if (IS_DENO_ENV) {
       throw new Error(`"sys" must be provided in options`);
     } else {

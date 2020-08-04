@@ -74,7 +74,6 @@ export const run = async (init: CliInitOptions) => {
       configPath: findConfigResults.configPath,
       logger,
       sys,
-      typescriptPath: ensureDepsResults.typescriptPath,
     });
 
     if (validated.diagnostics.length > 0) {

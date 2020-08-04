@@ -248,7 +248,6 @@ export interface StencilConfig {
   validateTypes?: boolean;
   watchIgnoredRegex?: RegExp;
   excludeUnusedDependencies?: boolean;
-  typescriptPath?: string;
   stencilCoreResolvedId?: string;
 }
 
@@ -841,11 +840,7 @@ export interface CompilerSystem {
    */
   createWorkerController?(maxConcurrentWorkers: number): WorkerMainController;
   encodeToBase64(str: string): string;
-  ensureDependencies?(opts: {
-    rootDir: string;
-    logger: Logger;
-    dependencies: CompilerDependency[];
-  }): Promise<{ stencilPath: string; typescriptPath: string; diagnostics: Diagnostic[] }>;
+  ensureDependencies?(opts: { rootDir: string; logger: Logger; dependencies: CompilerDependency[] }): Promise<{ stencilPath: string; diagnostics: Diagnostic[] }>;
   ensureResources?(opts: { rootDir: string; logger: Logger; dependencies: CompilerDependency[] }): Promise<void>;
   /**
    * process.exit()
@@ -952,6 +947,7 @@ export interface CompilerSystem {
    * SYNC! Does not throw.
    */
   rmdirSync(p: string, opts?: CompilerSystemRemoveDirectoryOptions): CompilerSystemRemoveDirectoryResults;
+  setupCompiler?: (c: { ts: any }) => void;
   /**
    * Returns undefined if stat not found. Does not throw.
    */
@@ -1990,7 +1986,6 @@ export interface LoadConfigInit {
    * within the root directory.
    */
   initTsConfig?: boolean;
-  typescriptPath?: string;
 }
 
 export interface LoadConfigResults {
@@ -2242,7 +2237,6 @@ export interface TranspileOptions {
    * `latest`, `esnext`, `es2017`, `es2015`, or `es5`. Defaults to `latest`.
    */
   target?: CompileTarget;
-  typescriptPath?: string;
   /**
    * Create a source map. Using `inline` will inline the source map into the
    * code, otherwise the source map will be in the returned `map` property.
