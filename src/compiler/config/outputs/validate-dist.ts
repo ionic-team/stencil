@@ -144,7 +144,7 @@ const validateOutputTargetDist = (config: d.Config, o: d.OutputTargetDist) => {
     outputTarget.empty = true;
   }
 
-  outputTarget.copy = validateCopy(outputTarget.copy, config.copy);
+  outputTarget.copy = validateCopy(outputTarget.copy, []);
   return outputTarget;
 };
 

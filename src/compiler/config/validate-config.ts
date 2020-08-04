@@ -109,9 +109,6 @@ export const validateConfig = (userConfig?: Config) => {
     config.bundles = [];
   }
 
-  // Default copy
-  config.copy = config.copy || [];
-
   // validate how many workers we can use
   validateWorkers(config);
 

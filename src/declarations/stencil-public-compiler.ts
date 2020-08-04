@@ -35,21 +35,6 @@ export interface StencilConfig {
   bundles?: ConfigBundle[];
 
   /**
-   * The copy config is an array of objects that defines any files or folders that should
-   * be copied over to the build directory.
-   *
-   * Each object in the array must include a src property which can be either an absolute path,
-   * a relative path or a glob pattern. The config can also provide an optional dest property
-   * which can be either an absolute path or a path relative to the build directory.
-   * Also note that any files within src/assets are automatically copied to www/assets for convenience.
-   *
-   * In the copy config below, it will copy the entire directory from src/docs-content over to www/docs-content.
-   *
-   * @deprecated
-   */
-  copy?: CopyTask[];
-
-  /**
    * Stencil will cache build results in order to speed up rebuilds.
    * To disable this feature, set enableCache to false.
    */

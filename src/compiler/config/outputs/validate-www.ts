@@ -48,7 +48,10 @@ export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userO
     outputs.push({
       type: COPY,
       dir: outputTarget.appDir,
-      copy: validateCopy(outputTarget.copy, [...(config.copy || []), { src: 'assets', warn: false }, { src: 'manifest.json', warn: false }]),
+      copy: validateCopy(outputTarget.copy, [
+        { src: 'assets', warn: false },
+        { src: 'manifest.json', warn: false },
+      ]),
     });
 
     // Generate global style with original name
