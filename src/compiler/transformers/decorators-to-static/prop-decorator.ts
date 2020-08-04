@@ -102,12 +102,6 @@ const getReflect = (_diagnostics: d.Diagnostic[], propOptions: d.PropOptions) =>
     return propOptions.reflect;
   }
 
-  if (typeof (propOptions as any).reflectToAttr === 'boolean') {
-    // const diagnostic = buildWarn(diagnostics);
-    // diagnostic.messageText = `@Prop option "reflectToAttr" has been depreciated. Please use "reflect" instead.`;
-    return (propOptions as any).reflectToAttr;
-  }
-
   return false;
 };
 
