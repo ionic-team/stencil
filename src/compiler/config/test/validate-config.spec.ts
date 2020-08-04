@@ -293,4 +293,19 @@ describe('validation', () => {
     const { config } = validateConfig(userConfig);
     expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
   });
+
+  it('should set extras defaults', () => {
+    const { config } = validateConfig(userConfig);
+    expect(config.extras.appendChildSlotFix).toBe(false);
+    expect(config.extras.cloneNodeFix).toBe(false);
+    expect(config.extras.cssVarsShim).toBe(false);
+    expect(config.extras.dynamicImportShim).toBe(false);
+    expect(config.extras.lifecycleDOMEvents).toBe(false);
+    expect(config.extras.safari10).toBe(false);
+    expect(config.extras.scriptDataOpts).toBe(false);
+    expect(config.extras.shadowDomShim).toBe(false);
+    expect(config.extras.slotChildNodesFix).toBe(false);
+    expect(config.extras.initializeNextTick).toBe(false);
+    expect(config.extras.tagNameTransform).toBe(false);
+  });
 });

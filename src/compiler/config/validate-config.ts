@@ -31,14 +31,14 @@ export const validateConfig = (userConfig?: Config) => {
   config.extras = config.extras || {};
   config.extras.appendChildSlotFix = !!config.extras.appendChildSlotFix;
   config.extras.cloneNodeFix = !!config.extras.cloneNodeFix;
-  config.extras.cssVarsShim = config.extras.cssVarsShim !== false;
-  config.extras.dynamicImportShim = config.extras.dynamicImportShim !== false;
+  config.extras.cssVarsShim = !!config.extras.cssVarsShim;
+  config.extras.dynamicImportShim = !!config.extras.dynamicImportShim;
   config.extras.lifecycleDOMEvents = !!config.extras.lifecycleDOMEvents;
-  config.extras.safari10 = config.extras.safari10 !== false;
-  config.extras.scriptDataOpts = config.extras.scriptDataOpts !== false;
-  config.extras.shadowDomShim = config.extras.shadowDomShim !== false;
+  config.extras.safari10 = !!config.extras.safari10;
+  config.extras.scriptDataOpts = !!config.extras.scriptDataOpts;
+  config.extras.shadowDomShim = !!config.extras.shadowDomShim;
   config.extras.slotChildNodesFix = !!config.extras.slotChildNodesFix;
-  config.extras.initializeNextTick = config.extras.initializeNextTick !== false;
+  config.extras.initializeNextTick = !!config.extras.initializeNextTick;
   config.extras.tagNameTransform = !!config.extras.tagNameTransform;
 
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
