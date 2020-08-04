@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { buildError, buildWarn, isString } from '@utils';
+import { buildError, isString } from '@utils';
 import { isAbsolute, join, basename, dirname } from 'path';
 import { isLocalModule } from '../sys/resolve/resolve-utils';
 import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
@@ -84,10 +84,6 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
   }
 
   testing.setupFilesAfterEnv.unshift(join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js'));
-  if (testing.setupTestFrameworkScriptFile) {
-    const err = buildWarn(diagnostics);
-    err.messageText = `setupTestFrameworkScriptFile has been deprecated.`;
-  }
 
   if (isString(testing.testEnvironment)) {
     if (!isAbsolute(testing.testEnvironment) && isLocalModule(testing.testEnvironment)) {

@@ -1454,10 +1454,6 @@ export interface JestConfig {
 
   setupFilesAfterEnv?: string[];
 
-  /**
-   * @deprecated Use setupFilesAfterEnv instead.
-   */
-  setupTestFrameworkScriptFile?: string;
   snapshotSerializers?: any[];
   testEnvironment?: string;
   testEnvironmentOptions?: any;
