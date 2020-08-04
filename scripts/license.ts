@@ -28,6 +28,7 @@ const entryDeps = [
   'sizzle',
   'source-map',
   'terser',
+  'typescript',
   'ws',
 ];
 
@@ -82,8 +83,9 @@ The published Stencil distribution contains the following licenses:
 
 ${licenses.map(l => `    ` + l).join('\n')}
 
+The following distributions have been modified to be bundled within this distribution:
 
------------------------------------------
+--------
 
 ${bundledDeps.map(l => l.content).join('\n')}
 
@@ -167,7 +169,7 @@ function createBundledDepLicense(opts: BuildOptions, moduleId: string): BundledD
       });
   }
 
-  output.push(``, `-----------------------------------------`, ``);
+  output.push(``, `--------`, ``);
 
   const dependencies = (pkgJson.dependencies ? Object.keys(pkgJson.dependencies) : []).sort();
 
@@ -220,19 +222,12 @@ function getAuthor(c: any) {
 }
 
 function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string) {
-  try {
-    const licensePath = join(opts.nodeModulesDir, moduleId, 'LICENSE');
-    return fs.readFileSync(licensePath, 'utf8');
-  } catch (e) {
+  const licenseFiles = ['LICENSE', 'LICENSE.md', 'LICENSE-MIT', 'LICENSE.txt']
+  for (const licenseFile of licenseFiles) {
     try {
-      const licensePath = join(opts.nodeModulesDir, moduleId, 'LICENSE.md');
+      const licensePath = join(opts.nodeModulesDir, moduleId, licenseFile);
       return fs.readFileSync(licensePath, 'utf8');
-    } catch (e) {
-      try {
-        const licensePath = join(opts.nodeModulesDir, moduleId, 'LICENSE-MIT');
-        return fs.readFileSync(licensePath, 'utf8');
-      } catch (e) {}
-    }
+    } catch (e) {}
   }
 }
 
