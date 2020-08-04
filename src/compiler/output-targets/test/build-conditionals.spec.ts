@@ -32,15 +32,6 @@ describe('build-conditionals', () => {
       expect(config.taskQueue).toBe('immediate');
     });
 
-    it('taskQueue sync (deprecated), same as immediate', () => {
-      userConfig.taskQueue = 'sync' as any;
-      const { config } = validateConfig(userConfig);
-      const bc = getCustomElementsBuildConditionals(config, cmps);
-      expect(bc.asyncQueue).toBe(false);
-      expect(bc.taskQueue).toBe(false);
-      expect(config.taskQueue).toBe('immediate');
-    });
-
     it('taskQueue congestionAsync', () => {
       userConfig.taskQueue = 'congestionAsync';
       const { config } = validateConfig(userConfig);
@@ -49,12 +40,13 @@ describe('build-conditionals', () => {
       expect(bc.taskQueue).toBe(true);
       expect(config.taskQueue).toBe('congestionAsync');
     });
+
     it('taskQueue defaults', () => {
       const { config } = validateConfig(userConfig);
       const bc = getCustomElementsBuildConditionals(config, cmps);
-      expect(bc.asyncQueue).toBe(true);
+      expect(bc.asyncQueue).toBe(false);
       expect(bc.taskQueue).toBe(true);
-      expect(config.taskQueue).toBe('congestionAsync');
+      expect(config.taskQueue).toBe('async');
     });
   });
 
@@ -77,15 +69,6 @@ describe('build-conditionals', () => {
       expect(config.taskQueue).toBe('immediate');
     });
 
-    it('taskQueue sync (deprecated), same as immediate', () => {
-      userConfig.taskQueue = 'sync' as any;
-      const { config } = validateConfig(userConfig);
-      const bc = getLazyBuildConditionals(config, cmps);
-      expect(bc.asyncQueue).toBe(false);
-      expect(bc.taskQueue).toBe(false);
-      expect(config.taskQueue).toBe('immediate');
-    });
-
     it('taskQueue congestionAsync', () => {
       userConfig.taskQueue = 'congestionAsync';
       const { config } = validateConfig(userConfig);
@@ -94,12 +77,13 @@ describe('build-conditionals', () => {
       expect(bc.taskQueue).toBe(true);
       expect(config.taskQueue).toBe('congestionAsync');
     });
+
     it('taskQueue defaults', () => {
       const { config } = validateConfig(userConfig);
       const bc = getLazyBuildConditionals(config, cmps);
-      expect(bc.asyncQueue).toBe(true);
+      expect(bc.asyncQueue).toBe(false);
       expect(bc.taskQueue).toBe(true);
-      expect(config.taskQueue).toBe('congestionAsync');
+      expect(config.taskQueue).toBe('async');
     });
 
     it('tagNameTransform default', () => {
@@ -109,7 +93,7 @@ describe('build-conditionals', () => {
     });
 
     it('tagNameTransform true', () => {
-      userConfig.extras = {tagNameTransform: true};
+      userConfig.extras = { tagNameTransform: true };
       const { config } = validateConfig(userConfig);
       const bc = getLazyBuildConditionals(config, cmps);
       expect(bc.transformTagName).toBe(true);
