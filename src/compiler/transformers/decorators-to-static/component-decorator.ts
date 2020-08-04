@@ -38,10 +38,7 @@ export const componentDecoratorToStatic = (
 
   styleToStatic(newMembers, componentOptions);
 
-  let assetsDirs = componentOptions.assetsDirs || [];
-  if (componentOptions.assetsDir) {
-    assetsDirs = [...assetsDirs, componentOptions.assetsDir];
-  }
+  const assetsDirs = componentOptions.assetsDirs || [];
   if (assetsDirs.length > 0) {
     newMembers.push(createStaticGetter('assetsDirs', convertValueToLiteral(assetsDirs)));
   }
