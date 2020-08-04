@@ -109,9 +109,6 @@ export namespace Components {
     }
     interface KeyReorderRoot {
     }
-    interface LegacyContext {
-        "getData": () => Promise<{ win: Window; doc: Document; hasQueue: boolean; isServer: boolean; unknown: any; myService: any; }>;
-    }
     interface LessCmp {
     }
     interface LifecycleAsyncA {
@@ -519,12 +516,6 @@ declare global {
     var HTMLKeyReorderRootElement: {
         prototype: HTMLKeyReorderRootElement;
         new (): HTMLKeyReorderRootElement;
-    };
-    interface HTMLLegacyContextElement extends Components.LegacyContext, HTMLStencilElement {
-    }
-    var HTMLLegacyContextElement: {
-        prototype: HTMLLegacyContextElement;
-        new (): HTMLLegacyContextElement;
     };
     interface HTMLLessCmpElement extends Components.LessCmp, HTMLStencilElement {
     }
@@ -1026,7 +1017,6 @@ declare global {
         "json-basic": HTMLJsonBasicElement;
         "key-reorder": HTMLKeyReorderElement;
         "key-reorder-root": HTMLKeyReorderRootElement;
-        "legacy-context": HTMLLegacyContextElement;
         "less-cmp": HTMLLessCmpElement;
         "lifecycle-async-a": HTMLLifecycleAsyncAElement;
         "lifecycle-async-b": HTMLLifecycleAsyncBElement;
@@ -1205,8 +1195,6 @@ declare namespace LocalJSX {
         "num"?: number;
     }
     interface KeyReorderRoot {
-    }
-    interface LegacyContext {
     }
     interface LessCmp {
     }
@@ -1438,7 +1426,6 @@ declare namespace LocalJSX {
         "json-basic": JsonBasic;
         "key-reorder": KeyReorder;
         "key-reorder-root": KeyReorderRoot;
-        "legacy-context": LegacyContext;
         "less-cmp": LessCmp;
         "lifecycle-async-a": LifecycleAsyncA;
         "lifecycle-async-b": LifecycleAsyncB;
@@ -1559,7 +1546,6 @@ declare module "@stencil/core" {
             "json-basic": LocalJSX.JsonBasic & JSXBase.HTMLAttributes<HTMLJsonBasicElement>;
             "key-reorder": LocalJSX.KeyReorder & JSXBase.HTMLAttributes<HTMLKeyReorderElement>;
             "key-reorder-root": LocalJSX.KeyReorderRoot & JSXBase.HTMLAttributes<HTMLKeyReorderRootElement>;
-            "legacy-context": LocalJSX.LegacyContext & JSXBase.HTMLAttributes<HTMLLegacyContextElement>;
             "less-cmp": LocalJSX.LessCmp & JSXBase.HTMLAttributes<HTMLLessCmpElement>;
             "lifecycle-async-a": LocalJSX.LifecycleAsyncA & JSXBase.HTMLAttributes<HTMLLifecycleAsyncAElement>;
             "lifecycle-async-b": LocalJSX.LifecycleAsyncB & JSXBase.HTMLAttributes<HTMLLifecycleAsyncBElement>;
