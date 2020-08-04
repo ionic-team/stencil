@@ -86,14 +86,15 @@ describe('validation', () => {
       expect(config.buildEs5).toBe(true);
     });
 
-    it('prod mode default to both es2017 and es5', () => {
+    it('prod mode, set modern and es5', () => {
       userConfig.devMode = false;
+      userConfig.buildEs5 = true;
       const { config } = validateConfig(userConfig);
       expect(config.buildEs5).toBe(true);
     });
 
-    it('dev mode default to only es2017', () => {
-      userConfig.devMode = true;
+    it('prod mode default to only modern and not es5', () => {
+      userConfig.devMode = false;
       const { config } = validateConfig(userConfig);
       expect(config.buildEs5).toBe(false);
     });
