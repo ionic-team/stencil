@@ -21,33 +21,17 @@ export const propDecoratorsToStatic = (
   watchable: Set<string>,
   newMembers: ts.ClassElement[],
 ) => {
-  const connect: any[] = [];
-  const context: any[] = [];
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map(prop => parsePropDecorator(diagnostics, typeChecker, prop, context, connect, watchable, newMembers))
+    .map(prop => parsePropDecorator(diagnostics, typeChecker, prop, watchable))
     .filter(prop => prop != null);
 
   if (properties.length > 0) {
     newMembers.push(createStaticGetter('properties', ts.createObjectLiteral(properties, true)));
   }
-  if (context.length > 0) {
-    newMembers.push(createStaticGetter('contextProps', convertValueToLiteral(context)));
-  }
-  if (connect.length > 0) {
-    newMembers.push(createStaticGetter('connectProps', convertValueToLiteral(connect)));
-  }
 };
 
-const parsePropDecorator = (
-  diagnostics: d.Diagnostic[],
-  typeChecker: ts.TypeChecker,
-  prop: ts.PropertyDeclaration,
-  context: any[],
-  connect: any[],
-  watchable: Set<string>,
-  newMembers: ts.ClassElement[],
-) => {
+const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, watchable: Set<string>) => {
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
@@ -55,23 +39,6 @@ const parsePropDecorator = (
 
   const propName = prop.name.getText();
   const propOptions = getPropOptions(propDecorator, diagnostics);
-
-  if (propOptions.context) {
-    context.push({
-      name: propName,
-      context: propOptions.context,
-    });
-    removeProp(prop, newMembers);
-    return null;
-  }
-  if (propOptions.connect) {
-    connect.push({
-      name: propName,
-      connect: propOptions.connect,
-    });
-    removeProp(prop, newMembers);
-    return null;
-  }
 
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);
@@ -243,11 +210,4 @@ const isAny = (t: ts.Type) => {
     return !!(t.flags & ts.TypeFlags.Any);
   }
   return false;
-};
-
-const removeProp = (prop: ts.ClassElement, classElements: ts.ClassElement[]) => {
-  const index = classElements.findIndex(p => prop === p);
-  if (index >= 0) {
-    classElements.splice(index, 1);
-  }
 };
