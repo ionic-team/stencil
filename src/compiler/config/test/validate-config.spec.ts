@@ -309,4 +309,15 @@ describe('validation', () => {
     expect(config.extras.initializeNextTick).toBe(false);
     expect(config.extras.tagNameTransform).toBe(false);
   });
+
+  it('should set taskQueue "async" by default', () => {
+    const { config } = validateConfig(userConfig);
+    expect(config.taskQueue).toBe('async');
+  });
+
+  it('should set taskQueue', () => {
+    userConfig.taskQueue = 'congestionAsync'
+    const { config } = validateConfig(userConfig);
+    expect(config.taskQueue).toBe('congestionAsync');
+  });
 });

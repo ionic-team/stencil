@@ -1,5 +1,5 @@
 import { Config, ConfigBundle, Diagnostic } from '../../declarations';
-import { buildError, buildWarn, isBoolean, isNumber, sortBy } from '@utils';
+import { buildError, buildWarn, isBoolean, isNumber, isString, sortBy } from '@utils';
 import { setBooleanConfig } from './config-utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace } from './validate-namespace';
@@ -58,11 +58,8 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'validateTypes', null, !config._isTesting);
   setBooleanConfig(config, 'allowInlineScripts', null, true);
 
-  if (typeof config.taskQueue !== 'string') {
-    config.taskQueue = 'congestionAsync';
-  } else if (config.taskQueue === ('sync' as any)) {
-    // deprecated 1.12.1
-    config.taskQueue = 'immediate';
+  if (!isString(config.taskQueue)) {
+    config.taskQueue = 'async';
   }
 
   // hash file names
