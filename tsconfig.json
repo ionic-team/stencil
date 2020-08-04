@@ -18,7 +18,7 @@
     "outDir": "build",
     "pretty": true,
     "resolveJsonModule": true,
-    "target": "es2017",
+    "target": "es2018",
     "baseUrl": ".",
     "paths": {
       "@app-data": ["src/app-data/index.ts"],

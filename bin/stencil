@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
-var minimumVersion = '10.13';
-var recommendedVersion = '12.17';
+var minimumVersion = '12.10';
+var recommendedVersion = '14.5';
 var currentVersion = process.versions.node;
 
 function isNodeLT(v) {
