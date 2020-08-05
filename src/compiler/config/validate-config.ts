@@ -1,5 +1,5 @@
 import { Config, ConfigBundle, Diagnostic } from '../../declarations';
-import { buildError, buildWarn, isBoolean, isNumber, isString, sortBy } from '@utils';
+import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
 import { setBooleanConfig } from './config-utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace } from './validate-namespace';
@@ -120,16 +120,6 @@ export const validateConfig = (userConfig?: Config) => {
   }
 
   setBooleanConfig(config, 'enableCache', 'cache', true);
-
-  if (config.excludeSrc) {
-    const warn = buildWarn(diagnostics);
-    warn.messageText = `"excludeSrc" is deprecated, use the "exclude" option in tsconfig.json`;
-  }
-
-  if (config.includeSrc) {
-    const warn = buildWarn(diagnostics);
-    warn.messageText = `"includeSrc" is deprecated, use the "include" option in tsconfig.json`;
-  }
 
   return {
     config,

@@ -41,16 +41,6 @@ export interface StencilConfig {
   enableCache?: boolean;
 
   /**
-   * The excludeSrc config setting specifies a set of regular expressions that should be excluded
-   * from the build process.
-   *
-   * The defaults are meant to exclude possible test files that you would not want to include in your final build.
-   *
-   * @deprecated Use the "exclude" option in "tsconfig.json"
-   */
-  excludeSrc?: string[];
-
-  /**
    * Stencil is traditionally used to compile many components into an app,
    * and each component comes with its own compartmentalized styles.
    * However, it's still common to have styles which should be "global" across all components and the website.
@@ -215,10 +205,6 @@ export interface StencilConfig {
   testing?: TestingConfig;
   maxConcurrentWorkers?: number;
   preamble?: string;
-  /**
-   * @deprecated Use the "include" option in "tsconfig.json"
-   */
-  includeSrc?: string[];
   rollupPlugins?: { before?: any[]; after?: any[] };
 
   entryComponentsHint?: string[];
