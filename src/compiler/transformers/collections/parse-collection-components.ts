@@ -1,6 +1,5 @@
 import * as d from '../../../declarations';
 import { join } from 'path';
-import { parseComponentsDeprecated } from './parse-collection-deprecated';
 import { updateModule } from '../static-to-meta/parse-static';
 import ts from 'typescript';
 
@@ -12,8 +11,6 @@ export const parseCollectionComponents = (
   collectionManifest: d.CollectionManifest,
   collection: d.CollectionCompilerMeta,
 ) => {
-  parseComponentsDeprecated(config, compilerCtx, collection, collectionDir, collectionManifest);
-
   if (collectionManifest.entries) {
     collectionManifest.entries.forEach(entryPath => {
       const componentPath = join(collectionDir, entryPath);
