@@ -151,7 +151,7 @@ export interface ListenOptions {
   passive?: boolean;
 }
 
-export type ListenTargetOptions = 'parent' | 'body' | 'document' | 'window';
+export type ListenTargetOptions = 'body' | 'document' | 'window';
 
 export interface StateDecorator {
   (): PropertyDecorator;

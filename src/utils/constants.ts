@@ -30,8 +30,7 @@ export const enum LISTENER_FLAGS {
 
   TargetDocument = 1 << 2,
   TargetWindow = 1 << 3,
-  TargetParent = 1 << 4,
-  TargetBody = 1 << 5,
+  TargetBody = 1 << 4,
 }
 
 export const enum HOST_FLAGS {

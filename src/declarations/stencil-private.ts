@@ -104,7 +104,6 @@ export interface BuildFeatures {
   hostListenerTargetWindow: boolean;
   hostListenerTargetDocument: boolean;
   hostListenerTargetBody: boolean;
-  hostListenerTargetParent: boolean;
   hostListenerTarget: boolean;
   method: boolean;
   prop: boolean;
@@ -737,7 +736,6 @@ export interface ComponentCompilerFeatures {
   hasListenerTargetWindow: boolean;
   hasListenerTargetDocument: boolean;
   hasListenerTargetBody: boolean;
-  hasListenerTargetParent: boolean;
   hasMember: boolean;
   hasMethod: boolean;
   hasMode: boolean;

@@ -26,7 +26,7 @@ export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     elm['s-p'] = [];
     elm['s-rc'] = [];
   }
-  addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);
+  addHostEventListeners(elm, hostRef, cmpMeta.$listeners$);
   return hostRefs.set(elm, hostRef);
 };
 

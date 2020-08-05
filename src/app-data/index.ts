@@ -19,7 +19,6 @@ export const BUILD: BuildConditionals = {
   hostListenerTargetWindow: true,
   hostListenerTargetDocument: true,
   hostListenerTargetBody: true,
-  hostListenerTargetParent: true,
   hostListenerTarget: true,
   member: true,
   method: true,
