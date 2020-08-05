@@ -6,7 +6,6 @@ fs.accessSync(path.join(distDir, 'cjs'));
 fs.accessSync(path.join(distDir, 'endtoend'));
 fs.accessSync(path.join(distDir, 'esm'));
 fs.accessSync(path.join(distDir, 'loader'));
-fs.accessSync(path.join(distDir, 'endtoend.js'));
 fs.accessSync(path.join(distDir, 'index.js'));
 fs.accessSync(path.join(distDir, 'index.mjs'));
 
