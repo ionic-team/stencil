@@ -6,7 +6,6 @@ import {
   getHostRef,
   insertVdomAnnotations,
   registerComponents,
-  registerContext,
   registerModule,
   renderVdom,
   resetPlatform,
@@ -30,8 +29,6 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   // reset the platform for this new test
   resetPlatform();
   resetBuildConditionals(BUILD);
-
-  registerContext(opts.context);
 
   if (Array.isArray(opts.components)) {
     registerComponents(opts.components);

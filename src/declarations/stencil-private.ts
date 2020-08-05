@@ -2386,8 +2386,6 @@ export interface NewSpecPageOptions {
   attachStyles?: boolean;
 
   strictBuild?: boolean;
-  /** @deprecated */
-  context?: { [key: string]: any };
 }
 
 export interface TypesImportData {
