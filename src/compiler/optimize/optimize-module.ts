@@ -31,7 +31,14 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
   }
 
   let minifyOpts: MinifyOptions;
-  if (opts.minify) {
+  let code = opts.input;
+  if (opts.isCore) {
+    // IS_ESM_BUILD is replaced at build time so systemjs and esm builds have diff values
+    // not using the BUILD conditional since rollup would input the same value
+    code = code.replace(/\/\* IS_ESM_BUILD \*\//g, '&& false /* IS_SYSTEM_JS_BUILD */');
+  }
+
+  if (opts.sourceTarget === 'es5' && opts.minify) {
     minifyOpts = getTerserOptions(config, opts.sourceTarget, isDebug);
     const compressOpts = minifyOpts.compress as CompressOptions;
     const mangleOptions = minifyOpts.mangle as MangleOptions;
@@ -59,7 +66,7 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
   }
 
   const shouldTranspile = opts.sourceTarget === 'es5';
-  const results = await compilerCtx.worker.prepareModule(opts.input, minifyOpts, shouldTranspile, opts.inlineHelpers);
+  const results = await compilerCtx.worker.prepareModule(code, minifyOpts, shouldTranspile, opts.inlineHelpers);
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
     if (opts.isCore) {
       results.output = results.output.replace(/disconnectedCallback\(\)\{\},/g, '');
