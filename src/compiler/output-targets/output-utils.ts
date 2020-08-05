@@ -63,14 +63,16 @@ export const isOutputTargetHydrate = (o: d.OutputTarget): o is d.OutputTargetHyd
 
 export const isOutputTargetCustom = (o: d.OutputTarget): o is d.OutputTargetCustom => o.type === CUSTOM;
 
-export const isOutputTargetDocs = (o: d.OutputTarget): o is d.OutputTargetDocsJson | d.OutputTargetDocsReadme | d.OutputTargetDocsVscode | d.OutputTargetDocsCustom =>
-  o.type === DOCS || o.type === DOCS_README || o.type === DOCS_JSON || o.type === DOCS_CUSTOM || o.type === DOCS_VSCODE;
+export const isOutputTargetDocs = (o: d.OutputTarget): o is d.OutputTargetDocsJson | d.OutputTargetDocsReadme | d.OutputTargetDocsVscode | d.OutputTargetDocsCustomElements | d.OutputTargetDocsCustom =>
+  o.type === DOCS || o.type === DOCS_README || o.type === DOCS_JSON || o.type === DOCS_CUSTOM || o.type === DOCS_CUSTOM_ELEMENTS || o.type === DOCS_VSCODE;
 
 export const isOutputTargetDocsReadme = (o: d.OutputTarget): o is d.OutputTargetDocsReadme => o.type === DOCS_README || o.type === DOCS;
 
 export const isOutputTargetDocsJson = (o: d.OutputTarget): o is d.OutputTargetDocsJson => o.type === DOCS_JSON;
 
 export const isOutputTargetDocsCustom = (o: d.OutputTarget): o is d.OutputTargetDocsCustom => o.type === DOCS_CUSTOM;
+
+export const isOutputTargetDocsCustomElements = (o: d.OutputTarget): o is d.OutputTargetDocsCustomElements => o.type === DOCS_CUSTOM_ELEMENTS;
 
 export const isOutputTargetDocsVscode = (o: d.OutputTarget): o is d.OutputTargetDocsVscode => o.type === DOCS_VSCODE;
 
@@ -112,6 +114,7 @@ export const DIST_SELF_CONTAINED = `dist-self-contained`;
 export const DIST_GLOBAL_STYLES = 'dist-global-styles';
 export const DOCS = `docs`;
 export const DOCS_CUSTOM = 'docs-custom';
+export const DOCS_CUSTOM_ELEMENTS = 'docs-custom-elements';
 export const DOCS_JSON = `docs-json`;
 export const DOCS_README = `docs-readme`;
 export const DOCS_VSCODE = `docs-vscode`;
@@ -134,6 +137,7 @@ export const VALID_TYPES = [
   DOCS_JSON,
   DOCS_README,
   DOCS_VSCODE,
+  DOCS_CUSTOM_ELEMENTS,
   DOCS_CUSTOM,
   STATS,
   WWW,
@@ -155,6 +159,7 @@ export const VALID_TYPES_NEXT = [
   DOCS_JSON,
   DOCS_README,
   DOCS_VSCODE,
+  DOCS_CUSTOM_ELEMENTS,
   DOCS_CUSTOM,
 
   // MISC
