@@ -5,7 +5,6 @@ const distDir = path.join(__dirname, 'dist');
 fs.accessSync(path.join(distDir, 'cjs'));
 fs.accessSync(path.join(distDir, 'endtoend'));
 fs.accessSync(path.join(distDir, 'esm'));
-fs.accessSync(path.join(distDir, 'esm-es5'));
 fs.accessSync(path.join(distDir, 'loader'));
 fs.accessSync(path.join(distDir, 'endtoend.js'));
 fs.accessSync(path.join(distDir, 'index.js'));
