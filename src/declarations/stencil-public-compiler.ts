@@ -1680,7 +1680,6 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   esmIndexFile?: string;
   cjsIndexFile?: string;
   systemLoaderFile?: string;
-  legacyLoaderFile?: string;
   empty?: boolean;
 }
 
