@@ -27,14 +27,14 @@ export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], user
   if (config.flags.docs || config.flags.task === 'docs') {
     if (!userOutputs.some(isOutputTargetDocsReadme)) {
       // didn't provide a docs config, so let's add one
-      docsOutputs.push(validateReadmeOutputTarget(config, diagnostics, { type: 'docs-readme' }));
+      docsOutputs.push(validateReadmeOutputTarget(config, { type: 'docs-readme' }));
     }
   }
 
   // readme docs
   const readmeDocsOutputs = userOutputs.filter(isOutputTargetDocsReadme);
   readmeDocsOutputs.forEach(readmeDocsOutput => {
-    docsOutputs.push(validateReadmeOutputTarget(config, diagnostics, readmeDocsOutput));
+    docsOutputs.push(validateReadmeOutputTarget(config, readmeDocsOutput));
   });
 
   // custom docs
@@ -51,17 +51,7 @@ export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], user
   return docsOutputs;
 };
 
-const validateReadmeOutputTarget = (config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsReadme) => {
-  if (outputTarget.type === 'docs') {
-    diagnostics.push({
-      type: 'config',
-      level: 'warn',
-      header: 'Deprecated "docs"',
-      messageText: `The output target { type: "docs" } has been deprecated, please use "docs-readme" instead.`,
-      absFilePath: config.configPath,
-    });
-    outputTarget.type = 'docs-readme';
-  }
+const validateReadmeOutputTarget = (config: d.Config, outputTarget: d.OutputTargetDocsReadme) => {
   if (typeof outputTarget.dir !== 'string') {
     outputTarget.dir = config.srcDir;
   }

@@ -1731,7 +1731,7 @@ export interface OutputTargetDocsVscode extends OutputTargetBase {
 }
 
 export interface OutputTargetDocsReadme extends OutputTargetBase {
-  type: 'docs-readme' | 'docs';
+  type: 'docs-readme';
   dir?: string;
   dependencies?: boolean;
   footer?: string;
