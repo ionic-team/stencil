@@ -54,7 +54,7 @@ export const getTranspileConfig = (input: TranspileOptions) => {
     sourceMap: input.sourceMap === 'inline' ? 'inline' : input.sourceMap !== false,
     style: getTranspileConfigOpt(input.style, VALID_STYLE, 'static'),
     styleImportData: getTranspileConfigOpt(input.styleImportData, VALID_STYLE_IMPORT_DATA, 'queryparams'),
-    target: getTranspileConfigOpt(input.target || (input as any).script /* deprecated */, VALID_TARGET, 'latest'),
+    target: getTranspileConfigOpt(input.target, VALID_TARGET, 'latest'),
   };
 
   const tsCompilerOptions: CompilerOptions = {
