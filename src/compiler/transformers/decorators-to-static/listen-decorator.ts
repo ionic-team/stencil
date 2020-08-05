@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { augmentDiagnosticWithNode, buildError, buildWarn, flatOne } from '@utils';
+import { augmentDiagnosticWithNode, buildError, flatOne } from '@utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
@@ -30,40 +30,16 @@ const parseListenDecorators = (diagnostics: d.Diagnostic[], method: ts.MethodDec
       augmentDiagnosticWithNode(err, listenDecorator);
     }
 
-    return parseListener(diagnostics, eventNames[0], listenOptions, methodName, listenDecorator);
+    return parseListener(eventNames[0], listenOptions, methodName);
   });
 };
 
-export const parseListener = (diagnostics: d.Diagnostic[], eventName: string, opts: d.ListenOptions = {}, methodName: string, decoratorNode: ts.Decorator) => {
-  let rawEventName = eventName.trim();
-  let target = opts.target;
-
-  // DEPRECATED: handle old syntax (`TARGET:event`)
-  if (!target) {
-    const splt = eventName.split(':');
-    const prefix = splt[0].toLowerCase().trim();
-    if (splt.length > 1 && isValidTargetValue(prefix)) {
-      rawEventName = splt[1].trim();
-      target = prefix;
-      const warn = buildWarn(diagnostics);
-      warn.messageText = `Deprecated @Listen() feature on "${methodName}". Use @Listen('${rawEventName}', { target: '${prefix}' }) instead.`;
-      augmentDiagnosticWithNode(warn, decoratorNode);
-    }
-  }
-
-  // DEPRECATED: handle keycode syntax (`event:KEY`)
-  const [finalEvent, keycode, rest] = rawEventName.split('.');
-  if (rest === undefined && isValidKeycodeSuffix(keycode)) {
-    rawEventName = finalEvent;
-    const warn = buildError(diagnostics);
-    warn.messageText = `Deprecated @Listen() feature on "${methodName}". Using "${rawEventName}" is no longer supported, use "event.key" within the function itself instead.`;
-    augmentDiagnosticWithNode(warn, decoratorNode);
-  }
-
+export const parseListener = (eventName: string, opts: d.ListenOptions = {}, methodName: string) => {
+  const rawEventName = eventName.trim();
   const listener: d.ComponentCompilerListener = {
     name: rawEventName,
     method: methodName,
-    target,
+    target: opts.target,
     capture: typeof opts.capture === 'boolean' ? opts.capture : false,
     passive:
       typeof opts.passive === 'boolean'
