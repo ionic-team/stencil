@@ -57,14 +57,14 @@ export async function internalClient(opts: BuildOptions) {
     ],
   };
 
-  const internalClientPatchBundle: RollupOptions = {
-    input: join(inputClientDir, 'client-patch.js'),
+  const internalClientPatchBrowserBundle: RollupOptions = {
+    input: join(inputClientDir, 'client-patch-browser.js'),
     output: {
       format: 'es',
       dir: outputInternalClientDir,
-      entryFileNames: 'patch.js',
+      entryFileNames: 'patch-browser.js',
       chunkFileNames: '[name].js',
-      banner: getBanner(opts, 'Stencil Client Patch'),
+      banner: getBanner(opts, 'Stencil Client Patch Browser'),
       preferConst: true,
     },
     treeshake: {
@@ -143,7 +143,19 @@ export async function internalClient(opts: BuildOptions) {
       reorderCoreStatementsPlugin(),
     ],
   };
-  return [internalClientBundle, internalClientPatchBundle];
+
+  const internalClientPatchEsmBundle = { ...internalClientPatchBrowserBundle };
+  internalClientPatchEsmBundle.input = join(inputClientDir, 'client-patch-esm.js');
+  internalClientPatchEsmBundle.output = {
+    format: 'es',
+    dir: outputInternalClientDir,
+    entryFileNames: 'patch-esm.js',
+    chunkFileNames: '[name].js',
+    banner: getBanner(opts, 'Stencil Client Patch Esm'),
+    preferConst: true,
+  };
+
+  return [internalClientBundle, internalClientPatchBrowserBundle, internalClientPatchEsmBundle];
 }
 
 async function copyPolyfills(opts: BuildOptions, outputInternalClientPolyfillsDir: string) {

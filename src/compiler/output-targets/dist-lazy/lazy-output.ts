@@ -10,7 +10,8 @@ import {
   LAZY_EXTERNAL_ENTRY_ID,
   STENCIL_APP_GLOBALS_ID,
   STENCIL_CORE_ID,
-  STENCIL_INTERNAL_CLIENT_PATCH_ID,
+  STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID,
+  STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
   USER_INDEX_ENTRY_ID,
 } from '../../bundle/entry-alias-ids';
 import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
@@ -97,14 +98,14 @@ const getLazyEntry = (isBrowser: boolean) => {
   s.append(`import { bootstrapLazy } from '${STENCIL_CORE_ID}';\n`);
 
   if (isBrowser) {
-    s.append(`import { patchBrowser } from '${STENCIL_INTERNAL_CLIENT_PATCH_ID}';\n`);
+    s.append(`import { patchBrowser } from '${STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID}';\n`);
     s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
     s.append(`patchBrowser().then(options => {\n`);
     s.append(`  globalScripts();\n`);
     s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
     s.append(`});\n`);
   } else {
-    s.append(`import { patchEsm } from '${STENCIL_INTERNAL_CLIENT_PATCH_ID}';\n`);
+    s.append(`import { patchEsm } from '${STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID}';\n`);
     s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
     s.append(`export const defineCustomElements = (win, options) => {\n`);
     s.append(`  if (typeof window === 'undefined') return Promise.resolve();\n`);

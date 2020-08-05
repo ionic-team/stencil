@@ -16,7 +16,7 @@ export const generateEsmBrowser = async (config: d.Config, compilerCtx: d.Compil
       preferConst: true,
     };
     if (config.extras.dynamicImportShim) {
-      // for Edge 18 and below
+      // for Edge 16-18
       esmOpts.dynamicImportFunction = getDynamicImportFunction(config.fsNamespace);
     }
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
