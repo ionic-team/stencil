@@ -693,7 +693,6 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   shadowDelegatesFocus: boolean;
   excludeFromCollection: boolean;
   isCollectionDependency: boolean;
-  isLegacy: boolean;
   docs: CompilerJsDoc;
   jsFilePath: string;
   listeners: ComponentCompilerListener[];

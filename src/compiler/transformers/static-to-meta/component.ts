@@ -41,7 +41,6 @@ export const parseStaticComponentMeta = (
   const encapsulation = parseStaticEncapsulation(staticMembers);
 
   const cmp: d.ComponentCompilerMeta = {
-    isLegacy: false,
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
     isCollectionDependency,

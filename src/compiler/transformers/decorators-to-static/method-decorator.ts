@@ -89,3 +89,14 @@ const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], tsS
 const isTypePromise = (typeStr: string) => {
   return /^Promise<.+>$/.test(typeStr);
 };
+
+export const validateMethods = (diagnostics: d.Diagnostic[], members: ts.NodeArray<ts.ClassElement>) => {
+  members.filter(ts.isMethodDeclaration).map(method => {
+    if (method.name.getText() === 'componentDidUnload') {
+      const err = buildError(diagnostics);
+      err.header = `Replace "componentDidUnload()" with "disconnectedCallback()"`;
+      err.messageText = `The "componentDidUnload()" method was removed in Stencil 2. Please use the "disconnectedCallbac()" method instead.`;
+      augmentDiagnosticWithNode(err, method.name);
+    }
+  });
+};

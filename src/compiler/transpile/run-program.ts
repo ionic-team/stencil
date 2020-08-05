@@ -1,14 +1,15 @@
-import * as d from '../../declarations';
-import { basename, join, relative } from 'path';
-import { buildError, loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import type * as d from '../../declarations';
+import { basename, join } from 'path';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { generateAppTypes } from '../types/generate-app-types';
 import { getComponentsFromModules, isOutputTargetDistTypes } from '../output-targets/output-utils';
+import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { resolveComponentDependencies } from '../entries/resolve-component-dependencies';
+import type ts from 'typescript';
 import { updateComponentBuildConditionals } from '../app-core/app-data';
 import { updateModule } from '../transformers/static-to-meta/parse-static';
-import ts from 'typescript';
 import { updateStencilTypesImports } from '../types/stencil-types';
+import { validateTranspiledComponents } from './validate-components';
 
 export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
   const tsSyntactic = loadTypeScriptDiagnostics(tsBuilder.getSyntacticDiagnostics());
@@ -54,7 +55,7 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
   updateComponentBuildConditionals(compilerCtx.moduleMap, buildCtx.components);
   resolveComponentDependencies(buildCtx.components);
 
-  validateUniqueTagNames(config, buildCtx);
+  validateTranspiledComponents(config, buildCtx);
 
   if (buildCtx.hasError) {
     return false;
@@ -80,18 +81,6 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
   }
 
   return false;
-};
-
-const validateUniqueTagNames = (config: d.Config, buildCtx: d.BuildCtx) => {
-  buildCtx.components.forEach(cmp => {
-    const tagName = cmp.tagName;
-    const cmpsWithTagName = buildCtx.components.filter(c => c.tagName === tagName);
-    if (cmpsWithTagName.length > 1) {
-      const err = buildError(buildCtx.diagnostics);
-      err.header = `Component Tag Name "${tagName}" Must Be Unique`;
-      err.messageText = `Please update the components so "${tagName}" is only used once: ${cmpsWithTagName.map(c => relative(config.rootDir, c.sourceFilePath)).join(' ')}`;
-    }
-  });
 };
 
 const getRelativeDts = (config: d.Config, srcPath: string, emitDtsPath: string) => {

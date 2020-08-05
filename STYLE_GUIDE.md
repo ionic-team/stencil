@@ -209,13 +209,10 @@ export class Something {
    * Ordered by their natural call order, for example
    * WillLoad should go before DidLoad.
    */
+  connectedCallback() {}
   componentWillLoad() {}
   componentDidLoad() {}
-  componentWillEnter() {}
-  componentDidEnter() {}
-  componentWillLeave() {}
-  componentDidLeave() {}
-  componentDidUnload() {}
+  disconnectedCallbac() {}
 
   /**
    * 8. Listeners

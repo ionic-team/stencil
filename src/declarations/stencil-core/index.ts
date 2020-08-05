@@ -4,7 +4,6 @@ export {
   Component,
   ComponentOptions,
   ComponentDidLoad,
-  ComponentDidUnload,
   ComponentDidUpdate,
   ComponentInterface,
   ComponentWillLoad,

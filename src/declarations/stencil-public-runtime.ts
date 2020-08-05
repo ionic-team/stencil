@@ -363,14 +363,6 @@ export interface ComponentDidUpdate {
   componentDidUpdate(): void;
 }
 
-export interface ComponentDidUnload {
-  /**
-   * The component did unload and the element
-   * will be destroyed.
-   */
-  componentDidUnload(): void;
-}
-
 export interface ComponentInterface {
   connectedCallback?(): void;
   disconnectedCallback?(): void;
