@@ -55,6 +55,9 @@ export function buildJestConfig(config: d.Config) {
   if (isString(stencilConfigTesting.collectCoverage)) {
     jestConfig.collectCoverage = stencilConfigTesting.collectCoverage;
   }
+  if (Array.isArray(stencilConfigTesting.collectCoverageFrom)) {
+    jestConfig.collectCoverageFrom = stencilConfigTesting.collectCoverageFrom;
+  }
   if (isString(stencilConfigTesting.coverageDirectory)) {
     jestConfig.coverageDirectory = stencilConfigTesting.coverageDirectory;
   }
