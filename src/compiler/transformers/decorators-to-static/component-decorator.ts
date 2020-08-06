@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
+import { augmentDiagnosticWithNode, buildError, validateComponentTag, isString, buildWarn } from '@utils';
 import { getDeclarationParameters } from './decorator-utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { styleToStatic } from './style-to-static';
@@ -39,13 +39,16 @@ export const componentDecoratorToStatic = (
   styleToStatic(newMembers, componentOptions);
 
   const assetsDirs = componentOptions.assetsDirs || [];
+  
+  if (isString((componentOptions as any).assetsDir)) {
+    assetsDirs.push((componentOptions as any).assetsDir);
+    const warn = buildWarn(diagnostics);
+    warn.messageText = `@Component option "assetsDir" should be renamed to "assetsDirs" and the value should be an array of strings.`;
+    augmentDiagnosticWithNode(warn, componentDecorator);
+  }
+
   if (assetsDirs.length > 0) {
     newMembers.push(createStaticGetter('assetsDirs', convertValueToLiteral(assetsDirs)));
-  }
-  if (typeof (componentOptions as any).assetsDir === 'string') {
-    const err = buildError(diagnostics);
-    err.messageText = `@Component option "assetsDir" should be renamed to "assetsDirs" and the value should be an array of strings.`;
-    augmentDiagnosticWithNode(err, componentDecorator);
   }
 };
 
