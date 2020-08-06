@@ -1,9 +1,9 @@
 import { Component, Prop, h } from '@stencil/core';
 import { CarData } from '../car-list/car-data';
 
-
 @Component({
-  tag: 'car-detail'
+  tag: 'car-detail',
+  assetsDirs: ['assets-a'],
 })
 export class CarDetail {
   @Prop() car: CarData;

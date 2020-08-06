@@ -1,6 +1,6 @@
 import type * as d from '../../declarations';
 import type { Deno } from '../../../types/lib.deno';
-import { buildError, catchError, flatOne, normalizePath, unique } from '@utils';
+import { buildError, catchError, flatOne, normalizePath } from '@utils';
 import { basename, dirname, expandGlob, isGlob, isAbsolute, join, resolve } from './deps';
 
 export async function denoCopyTasks(deno: typeof Deno, copyTasks: Required<d.CopyTask>[], srcDir: string) {
@@ -12,8 +12,6 @@ export async function denoCopyTasks(deno: typeof Deno, copyTasks: Required<d.Cop
 
   try {
     copyTasks = flatOne(await Promise.all(copyTasks.map(task => processGlobs(task, srcDir))));
-
-    copyTasks = unique(copyTasks, task => task.dest);
 
     const allCopyTasks: d.CopyTask[] = [];
 

@@ -32,6 +32,10 @@ fs.accessSync(path.join(typesDir, 'car-list', 'car-list.d.ts'));
 const wwwDir = path.join(__dirname, 'www');
 fs.accessSync(path.join(wwwDir, 'build', 'endtoend.js'));
 fs.accessSync(path.join(wwwDir, 'build', 'endtoend.esm.js'));
+fs.accessSync(path.join(wwwDir, 'build', 'endtoend.css'));
+fs.accessSync(path.join(wwwDir, 'build', 'assets-a/file-1.txt'));
+fs.accessSync(path.join(wwwDir, 'build', 'assets-a/file-2.txt'));
+fs.accessSync(path.join(wwwDir, 'build', 'assets-b/file-3.txt'));
 fs.accessSync(path.join(wwwDir, 'index.html'));
 
 fs.accessSync(path.join(__dirname, 'dist-react', 'components.ts'));
