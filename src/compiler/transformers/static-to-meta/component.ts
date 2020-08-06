@@ -84,6 +84,7 @@ export const parseStaticComponentMeta = (
     hasListenerTargetWindow: false,
     hasListenerTargetDocument: false,
     hasListenerTargetBody: false,
+    hasListenerTargetParent: false,
     hasMember: false,
     hasMethod: false,
     hasMode: false,

@@ -3,12 +3,27 @@ import { BUILD } from '@app-data';
 import { doc, plt, supportsListenerOptions, win } from '@platform';
 import { HOST_FLAGS, LISTENER_FLAGS } from '@utils';
 
-export const addHostEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listeners: d.ComponentRuntimeHostListener[]) => {
+export const addHostEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listeners: d.ComponentRuntimeHostListener[], attachParentListeners: boolean) => {
   if (BUILD.hostListener && listeners) {
     // this is called immediately within the element's constructor
     // initialize our event listeners on the host element
     // we do this now so that we can listen to events that may
     // have fired even before the instance is ready
+
+    if (BUILD.hostListenerTargetParent) {
+      // this component may have event listeners that should be attached to the parent
+      if (attachParentListeners) {
+        // this is being ran from within the connectedCallback
+        // which is important so that we know the host element actually has a parent element
+        // filter out the listeners to only have the ones that ARE being attached to the parent
+        listeners = listeners.filter(([flags]) => flags & LISTENER_FLAGS.TargetParent);
+      } else {
+        // this is being ran from within the component constructor
+        // everything BUT the parent element listeners should be attached at this time
+        // filter out the listeners that are NOT being attached to the parent
+        listeners = listeners.filter(([flags]) => !(flags & LISTENER_FLAGS.TargetParent));
+      }
+    }
 
     listeners.map(([flags, name, method]) => {
       const target = BUILD.hostListenerTarget ? getHostListenerTarget(elm, flags) : elm;
@@ -37,6 +52,7 @@ const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
   if (BUILD.hostListenerTargetDocument && flags & LISTENER_FLAGS.TargetDocument) return doc;
   if (BUILD.hostListenerTargetWindow && flags & LISTENER_FLAGS.TargetWindow) return win;
   if (BUILD.hostListenerTargetBody && flags & LISTENER_FLAGS.TargetBody) return doc.body;
+  if (BUILD.hostListenerTargetParent && flags & LISTENER_FLAGS.TargetParent) return elm.parentElement;
   return elm;
 };
 

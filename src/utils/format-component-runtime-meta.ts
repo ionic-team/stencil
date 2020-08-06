@@ -159,6 +159,9 @@ const computeListenerFlags = (listener: d.ComponentCompilerListener) => {
     case 'body':
       flags |= LISTENER_FLAGS.TargetBody;
       break;
+    case 'parent' as any:
+      flags |= LISTENER_FLAGS.TargetParent;
+      break;
   }
   return flags;
 };
