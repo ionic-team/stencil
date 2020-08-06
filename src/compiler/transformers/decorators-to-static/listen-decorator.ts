@@ -30,7 +30,13 @@ const parseListenDecorators = (diagnostics: d.Diagnostic[], method: ts.MethodDec
       augmentDiagnosticWithNode(err, listenDecorator);
     }
 
-    return parseListener(eventNames[0], listenOptions, methodName);
+    const listener = parseListener(eventNames[0], listenOptions, methodName);
+    if (listener.target === 'parent' as any) {
+      const err = buildError(diagnostics);
+      err.messageText = 'The "parent" target is no longer available as of Stencil 2. Please use "window", "document" or "body" instead.';
+      augmentDiagnosticWithNode(err, listenDecorator);
+    }
+    return listener;
   });
 };
 
@@ -48,14 +54,6 @@ export const parseListener = (eventName: string, opts: d.ListenOptions = {}, met
           PASSIVE_TRUE_DEFAULTS.has(rawEventName.toLowerCase()),
   };
   return listener;
-};
-
-export const isValidTargetValue = (prefix: string): prefix is d.ListenTargetOptions => {
-  return VALID_ELEMENT_REF_PREFIXES.has(prefix);
-};
-
-export const isValidKeycodeSuffix = (prefix: string) => {
-  return VALID_KEYCODE_SUFFIX.has(prefix);
 };
 
 const PASSIVE_TRUE_DEFAULTS = new Set([
@@ -92,7 +90,3 @@ const PASSIVE_TRUE_DEFAULTS = new Set([
   'touchcancel',
   'wheel',
 ]);
-
-const VALID_ELEMENT_REF_PREFIXES = new Set(['parent', 'body', 'document', 'window']);
-
-const VALID_KEYCODE_SUFFIX = new Set(['enter', 'escape', 'space', 'tab', 'up', 'right', 'down', 'left']);

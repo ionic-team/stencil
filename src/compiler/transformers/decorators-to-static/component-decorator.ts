@@ -42,6 +42,11 @@ export const componentDecoratorToStatic = (
   if (assetsDirs.length > 0) {
     newMembers.push(createStaticGetter('assetsDirs', convertValueToLiteral(assetsDirs)));
   }
+  if (typeof (componentOptions as any).assetsDir === 'string') {
+    const err = buildError(diagnostics);
+    err.messageText = `@Component option "assetsDir" should be renamed to "assetsDirs" and the value should be an array of strings.`;
+    augmentDiagnosticWithNode(err, componentDecorator);
+  }
 };
 
 const validateComponent = (

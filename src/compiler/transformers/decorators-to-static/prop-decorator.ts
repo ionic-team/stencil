@@ -71,7 +71,7 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
   // prop can have an attribute if type is NOT "unknown"
   if (typeStr !== 'unknown') {
     propMeta.attribute = getAttributeName(propName, propOptions);
-    propMeta.reflect = getReflect(diagnostics, propOptions);
+    propMeta.reflect = getReflect(diagnostics, propDecorator, propOptions);
   }
 
   // extract default value
@@ -97,11 +97,17 @@ const getAttributeName = (propName: string, propOptions: d.PropOptions) => {
   return toDashCase(propName);
 };
 
-const getReflect = (_diagnostics: d.Diagnostic[], propOptions: d.PropOptions) => {
+const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, propOptions: d.PropOptions) => {
   if (typeof propOptions.reflect === 'boolean') {
     return propOptions.reflect;
   }
-
+  if (typeof (propOptions as any).reflectToAttr === 'boolean') {
+    const err = buildError(diagnostics);
+    err.header = `Rename "reflectToAttr" to "reflect"`;
+    err.messageText = `@Prop option "reflectToAttr" should be renamed to "reflect".`;
+    augmentDiagnosticWithNode(err, propDecorator);
+    return (propOptions as any).reflectToAttr;
+  }
   return false;
 };
 
