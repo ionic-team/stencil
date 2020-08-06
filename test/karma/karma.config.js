@@ -8,12 +8,12 @@ var browserStackLaunchers = {
     os: 'Windows',
     os_version: '10',
   },
-  bs_firefox: {
-    base: 'BrowserStack',
-    browser: 'firefox',
-    os: 'Windows',
-    os_version: '10',
-  },
+  // bs_firefox: {
+  //   base: 'BrowserStack',
+  //   browser: 'firefox',
+  //   os: 'Windows',
+  //   os_version: '10',
+  // },
   bs_edge: {
     base: 'BrowserStack',
     browser: 'edge',
@@ -63,17 +63,7 @@ if (process.platform === 'win32') {
 
 module.exports = function (config) {
   config.set({
-    plugins: [
-      'karma-chrome-launcher',
-      'karma-firefox-launcher',
-      'karma-safari-launcher',
-      'karma-browserstack-launcher',
-      'karma-ie-launcher',
-      'karma-edge-launcher',
-      'karma-jasmine',
-      'karma-typescript',
-      'karma-polyfill',
-    ],
+    plugins: ['karma-chrome-launcher', 'karma-browserstack-launcher', 'karma-ie-launcher', 'karma-edge-launcher', 'karma-jasmine', 'karma-typescript', 'karma-polyfill'],
     browsers: browserStack ? Object.keys(browserStackLaunchers) : Object.keys(localLaunchers),
 
     singleRun: true, // set this to false to leave the browser open
