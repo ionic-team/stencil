@@ -15,10 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
-      - name: Use Node.js ${{ matrix.node }}.x
+      - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node }}.x
+          node-version: ${{ matrix.node }}
 
       - name: Install dependencies
         run: npm ci
@@ -48,14 +48,14 @@ jobs:
 
       - name: Unload build artifacts
         uses: actions/upload-artifact@master
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '12'
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '12.10.0'
         with:
           name: stencil-build
           path: stencil-build.tgz
 
       - name: Run karma tests
         working-directory: ./test/karma
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '12'
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '12.10.0'
         run: |
           wget "https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip"
           unzip BrowserStackLocal-linux-x64.zip
