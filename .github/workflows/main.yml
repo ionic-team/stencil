@@ -6,7 +6,7 @@ jobs:
   build_and_test:
     strategy:
       matrix:
-        node: [12]
+        node: [12.10.0]
         os: ['ubuntu-latest', 'windows-latest']
 
     name: Node ${{ matrix.node }} on ${{ matrix.os }}
