@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/declarations';
+import type * as d from '@stencil/core/declarations';
 import { appendDevServerClientIframe } from '../serve-file';
 import { createRequestHandler } from '../request-handler';
 import { createSystem } from '../../compiler/sys/stencil-sys';

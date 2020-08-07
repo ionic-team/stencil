@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { createTestingSystem } from '../../../testing/testing-sys';
 import { getCommitInstructions, createInMemoryFs, shouldIgnore } from '../in-memory-fs';
 import { normalizePath } from '../../../utils';

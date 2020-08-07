@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { build } from './build';
 import { BuildContext } from './build-ctx';
 import { createTsBuildProgram } from '../transpile/create-build-program';

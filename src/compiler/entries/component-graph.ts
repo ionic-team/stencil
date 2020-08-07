@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { getScopeId } from '../style/scope-css';
 
 export const generateModuleGraph = (cmps: d.ComponentCompilerMeta[], bundleModules: d.BundleModule[]) => {

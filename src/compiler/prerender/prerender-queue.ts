@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { buildError, catchError } from '@utils';
 import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';

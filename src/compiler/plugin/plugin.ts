@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { basename, relative } from 'path';
 import { buildError, catchError, isFunction, isString } from '@utils';
 import { isOutputTargetDocs } from '../output-targets/output-utils';

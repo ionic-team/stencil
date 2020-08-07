@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { getTextDocs } from '@utils';
 
 export const generateMethodTypes = (cmpMethods: d.ComponentCompilerMethod[]): d.TypeInfo => {

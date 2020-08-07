@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { catchError } from '@utils';
 import { isOutputTargetDistCollection } from '../output-utils';
 import { join, relative } from 'path';

@@ -1,4 +1,4 @@
-export {
+export type {
   Build,
   ChildNode,
   Component,
@@ -42,4 +42,4 @@ export {
   writeTask,
 } from '../stencil-public-runtime';
 
-export { StencilConfig as Config, PrerenderConfig } from '../stencil-public-compiler';
+export type { StencilConfig as Config, PrerenderConfig } from '../stencil-public-compiler';

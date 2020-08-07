@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { CMP_FLAGS, LISTENER_FLAGS, MEMBER_FLAGS } from './constants';
 
 export const formatLazyBundleRuntimeMeta = (bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData => {

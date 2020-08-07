@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { isObject, pluck } from '@utils';
 
 export const validateRollupConfig = (config: d.Config) => {

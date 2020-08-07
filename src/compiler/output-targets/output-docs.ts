@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { generateDocData } from '../docs/generate-doc-data';
 import { generateCustomDocs } from '../docs/custom';
 import { generateJsonDocs } from '../docs/json';

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, validateComponentTag, isString, buildWarn } from '@utils';
 import { getDeclarationParameters } from './decorator-utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
@@ -39,7 +39,7 @@ export const componentDecoratorToStatic = (
   styleToStatic(newMembers, componentOptions);
 
   const assetsDirs = componentOptions.assetsDirs || [];
-  
+
   if (isString((componentOptions as any).assetsDir)) {
     assetsDirs.push((componentOptions as any).assetsDir);
     const warn = buildWarn(diagnostics);

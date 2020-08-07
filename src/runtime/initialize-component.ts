@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { consoleError, loadModule, styles } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';

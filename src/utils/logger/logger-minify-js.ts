@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { splitLineBreaks } from './logger-utils';
 
 export function loadMinifyJsDiagnostics(sourceText: string, result: d.MinifyJsResult, diagnostics: d.Diagnostic[]) {

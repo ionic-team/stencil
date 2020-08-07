@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { createSystem } from '../stencil-sys';
 
 describe('stencil system', () => {

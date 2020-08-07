@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { emitBuildLog, emitBuildResults, emitBuildStatus, logDisabled, logReload, logWarn } from '../client';
 
 export const initClientWebSocket = (win: d.DevClientWindow, config: d.DevClientConfig) => {

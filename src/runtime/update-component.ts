@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { attachStyles } from './styles';
 import { BUILD, NAMESPACE } from '@app-data';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';

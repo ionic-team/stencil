@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import ts from 'typescript';
 
 export const addImports = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) => {

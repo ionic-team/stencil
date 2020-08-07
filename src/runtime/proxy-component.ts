@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { consoleDevWarn, getHostRef, plt } from '@platform';
 import { getValue, setValue } from './set-value';
@@ -53,7 +53,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
     if (BUILD.observeAttribute && (!BUILD.lazyLoad || flags & PROXY_FLAGS.isElementConstructor)) {
       const attrNameToPropName = new Map();
 
-      prototype.attributeChangedCallback = function(attrName: string, _oldValue: string, newValue: string) {
+      prototype.attributeChangedCallback = function (attrName: string, _oldValue: string, newValue: string) {
         plt.jmp(() => {
           const propName = attrNameToPropName.get(attrName);
           this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;

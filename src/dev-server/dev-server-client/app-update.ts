@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { appError, clearAppErrorModal, hmrWindow, logBuild, logDiagnostic, logReload, logWarn, emitBuildStatus, onBuildResults } from '../client';
 import { OPEN_IN_EDITOR_URL } from '../dev-server-constants';
 

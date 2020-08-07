@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { addComponentMetaStatic } from '../add-component-meta-static';
 import { dirname, isAbsolute, join, relative } from 'path';
 import { normalizePath, unique } from '@utils';

@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/internal';
+import type * as d from '@stencil/core/internal';
 import { normalizePath } from '@utils';
 import { writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
 import { createHash } from 'crypto';
@@ -15,9 +15,7 @@ export async function compareScreenshot(
   testPath: string,
   pixelmatchThreshold: number,
 ) {
-  const currentImageHash = createHash('md5')
-    .update(currentScreenshotBuf)
-    .digest('hex');
+  const currentImageHash = createHash('md5').update(currentScreenshotBuf).digest('hex');
   const currentImageName = `${currentImageHash}.png`;
   const currentImagePath = join(screenshotBuildData.imagesDir, currentImageName);
 
@@ -184,8 +182,5 @@ function getScreenshotId(emulateConfig: d.EmulateConfig, uniqueDescription: stri
   hash.update(emulateConfig.viewport.hasTouch + ':');
   hash.update(emulateConfig.viewport.isMobile + ':');
 
-  return hash
-    .digest('hex')
-    .substr(0, 8)
-    .toLowerCase();
+  return hash.digest('hex').substr(0, 8).toLowerCase();
 }

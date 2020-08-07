@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { known404Urls } from './fetch-utils';
 import { isString } from '@utils';
 import { skipFilePathFetch, skipUrlFetch } from './fetch-utils';

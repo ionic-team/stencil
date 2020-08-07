@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';
 import { isBoolean } from '@utils';
 import { isOutputTargetDistCustomElements } from '../../output-targets/output-utils';

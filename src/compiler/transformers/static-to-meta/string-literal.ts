@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import ts from 'typescript';
 
 export const parseStringLiteral = (m: d.Module | d.ComponentCompilerMeta, node: ts.StringLiteral) => {

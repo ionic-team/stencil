@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { doc } from '@platform';
 
 export const getConnect = (_ref: d.HostRef, tagName: string) => {

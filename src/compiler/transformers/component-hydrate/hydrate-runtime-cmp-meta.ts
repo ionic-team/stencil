@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { addStaticStyleGetterWithinClass } from '../add-static-style';
 import { CMP_FLAGS, formatComponentRuntimeMeta } from '@utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';

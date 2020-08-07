@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { IS_BROWSER_ENV } from '@utils';
 
 export const createLogger = () => {

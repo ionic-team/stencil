@@ -1,4 +1,4 @@
-import { HydrateDocumentOptions, HydrateFactoryOptions, HydrateResults, SerializeDocumentOptions } from '../../declarations';
+import type { HydrateDocumentOptions, HydrateFactoryOptions, HydrateResults, SerializeDocumentOptions } from '../../declarations';
 import { generateHydrateResults, normalizeHydrateOptions, renderBuildError, renderCatchError } from './render-utils';
 import { hasError, isPromise } from '@utils';
 import { hydrateFactory } from '@hydrate-factory';

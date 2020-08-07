@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
 
 export const getCustomElementsBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {

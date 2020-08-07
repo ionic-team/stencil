@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/internal';
+import type * as d from '@stencil/core/internal';
 import { caughtErrors, moduleLoaded, queuedLoadModules, queuedReadTasks, queuedTicks, queuedWriteTasks } from './testing-constants';
 
 export function resetTaskQueue() {

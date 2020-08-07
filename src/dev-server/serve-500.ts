@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import * as http from 'http';
 import { responseHeaders, sendError, sendMsg } from './dev-server-utils';
 import util from 'util';

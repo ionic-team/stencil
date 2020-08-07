@@ -1,5 +1,5 @@
-import { EventInitDict, EventSpy, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
-import * as puppeteer from 'puppeteer';
+import type { EventInitDict, EventSpy, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
+import type * as puppeteer from 'puppeteer';
 
 export interface NewE2EPageOptions extends puppeteer.NavigationOptions {
   url?: string;

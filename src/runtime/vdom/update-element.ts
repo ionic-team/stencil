@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { BUILD } from '@app-data';
 import { EMPTY_OBJ } from '@utils';
 import { NODE_TYPE } from '../runtime-constants';

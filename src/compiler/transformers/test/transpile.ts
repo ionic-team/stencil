@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/declarations';
+import type * as d from '@stencil/core/declarations';
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../static-to-meta/visitor';
 import { mockBuildCtx, mockCompilerCtx, mockConfig, mockStencilSystem } from '@stencil/core/testing';

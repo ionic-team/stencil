@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { consoleDevWarn, consoleError, getHostRef } from '@platform';
 import { HOST_FLAGS } from '@utils';

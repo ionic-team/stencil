@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { buildError, dashToPascalCase, isString } from '@utils';
 import { isOutputTargetDist } from '../output-targets/output-utils';
 

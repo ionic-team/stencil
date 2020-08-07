@@ -1,4 +1,4 @@
-import {
+import type {
   BuildEvents,
   BuildLog,
   BuildOutput,
@@ -25,7 +25,7 @@ import {
   LoggerLineUpdater,
 } from './stencil-public-compiler';
 
-import { ComponentInterface, ListenOptions, ListenTargetOptions, VNode, VNodeData } from './stencil-public-runtime';
+import type { ComponentInterface, ListenOptions, ListenTargetOptions, VNode, VNodeData } from './stencil-public-runtime';
 
 export interface PrintLine {
   lineIndex: number;

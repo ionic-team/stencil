@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { transpileModule } from './transpile';
 import { lazyComponentTransform } from '../component-lazy/transform-lazy-component';
 import { mockCompilerCtx } from '@stencil/core/testing';

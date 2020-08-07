@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { join } from 'path';
 import { updateModule } from '../static-to-meta/parse-static';
 import ts from 'typescript';

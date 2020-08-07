@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 
 export const validateWorkers = (config: d.Config) => {
   if (typeof config.maxConcurrentWorkers !== 'number') {

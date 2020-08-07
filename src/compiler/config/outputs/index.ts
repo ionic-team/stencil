@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { buildError } from '@utils';
 import { VALID_TYPES_NEXT } from '../../output-targets/output-utils';
 import { validateCollection } from './validate-collection';

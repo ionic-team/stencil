@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { connectedCallback, insertVdomAnnotations } from '@runtime';
 import { doc, getHostRef, loadModule, plt, registerHost } from '@platform';
 import { proxyHostElement } from './proxy-host-element';

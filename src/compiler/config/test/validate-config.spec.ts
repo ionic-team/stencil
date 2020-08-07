@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/declarations';
+import type * as d from '@stencil/core/declarations';
 import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import { validateConfig } from '../validate-config';
 
@@ -316,7 +316,7 @@ describe('validation', () => {
   });
 
   it('should set taskQueue', () => {
-    userConfig.taskQueue = 'congestionAsync'
+    userConfig.taskQueue = 'congestionAsync';
     const { config } = validateConfig(userConfig);
     expect(config.taskQueue).toBe('congestionAsync');
   });

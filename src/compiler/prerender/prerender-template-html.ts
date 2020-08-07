@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { catchError, isPromise } from '@utils';
 import { hasStencilScript, inlineExternalStyleSheets, minifyScriptElements, minifyStyleElements, removeStencilScripts } from './prerender-optimize';
 import { createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';

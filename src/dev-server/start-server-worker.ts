@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { createHttpServer } from './server-http';
 import { createNodeSys } from '../sys/node/node-sys';
 import { createWebSocket } from './server-web-socket';

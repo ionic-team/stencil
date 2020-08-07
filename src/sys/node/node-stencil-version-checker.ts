@@ -1,4 +1,4 @@
-import { Logger, PackageJsonData } from '../../declarations';
+import type { Logger, PackageJsonData } from '../../declarations';
 import { isString, noop } from '@utils';
 import fs from 'graceful-fs';
 import path from 'path';

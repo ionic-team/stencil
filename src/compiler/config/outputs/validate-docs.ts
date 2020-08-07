@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { buildError } from '@utils';
 import { isAbsolute, join } from 'path';
 import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme, isOutputTargetDocsVscode } from '../../output-targets/output-utils';

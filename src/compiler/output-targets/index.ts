@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { outputAngular } from './output-angular';
 import { outputCopy } from './copy/output-copy';
 import { outputCustomElements } from './dist-custom-elements';

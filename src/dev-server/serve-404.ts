@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import * as http from 'http';
 import fs from 'graceful-fs';
 import path from 'path';

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 import { loadConfig } from '../load-config';
 import { normalizePath } from '../../../utils';

@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/declarations';
+import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import * as v from '../validate-build-package-json';
 import path from 'path';

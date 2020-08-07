@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE } from './decorators-constants';
 import { componentDecoratorToStatic } from './component-decorator';
 import { elementDecoratorsToStatic } from './element-decorator';

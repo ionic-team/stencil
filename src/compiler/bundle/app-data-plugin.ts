@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import MagicString from 'magic-string';
 import { createJsVarName, normalizePath, isString, loadTypeScriptDiagnostics } from '@utils';
 import type { Plugin } from 'rollup';

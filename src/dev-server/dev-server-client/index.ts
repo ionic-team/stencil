@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { applyPolyfills } from './polyfills';
 import { initDevClient } from './init-dev-client';
 

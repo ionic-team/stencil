@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/declarations';
+import type * as d from '@stencil/core/declarations';
 import { createCompiler, validateConfig } from '@stencil/core/compiler';
 import { mockConfig, mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import path from 'path';

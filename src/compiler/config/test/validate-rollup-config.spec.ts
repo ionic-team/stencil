@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/declarations';
+import type * as d from '@stencil/core/declarations';
 import { validateRollupConfig } from '../validate-rollup-config';
 
 describe('validateStats', () => {

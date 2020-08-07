@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 

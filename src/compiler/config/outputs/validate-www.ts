@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { buildError, isBoolean, isString } from '@utils';
 import { COPY, DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww, isOutputTargetDist } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';

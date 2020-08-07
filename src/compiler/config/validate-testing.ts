@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { buildError, isString } from '@utils';
 import { isAbsolute, join, basename, dirname } from 'path';
 import { isLocalModule } from '../sys/resolve/resolve-utils';

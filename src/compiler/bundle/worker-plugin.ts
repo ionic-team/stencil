@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import type { Plugin, TransformResult, PluginContext } from 'rollup';
 import { bundleOutput } from './bundle-output';
 import { normalizeFsPath, hasError } from '@utils';

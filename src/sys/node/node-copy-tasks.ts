@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { buildError, catchError, flatOne, isGlob, normalizePath } from '@utils';
 import { copyFile, mkdir, readdir, stat } from './node-fs-promisify';
 import path from 'path';

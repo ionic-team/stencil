@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/declarations';
+import type * as d from '@stencil/core/declarations';
 import { getCssImports, isCssNodeModule, isLocalCssImport, replaceImportDeclarations } from '../css-imports';
 import { mockBuildCtx, mockConfig, mockCompilerCtx } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
@@ -417,5 +417,4 @@ describe('css-imports', () => {
       expect(results).toEqual([]);
     });
   });
-
 });

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { buildWarn } from '../message-utils';
 import { isString, toTitleCase } from '../helpers';
 import { splitLineBreaks } from './logger-utils';

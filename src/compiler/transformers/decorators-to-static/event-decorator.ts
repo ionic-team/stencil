@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildWarn } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, resolveType, serializeSymbol, validateReferences } from '../transform-utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { isAbsolute, join } from 'path';
 
 export const getSrcAbsPath = (config: d.Config, src: string) => {

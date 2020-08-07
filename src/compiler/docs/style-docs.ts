@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 
 export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string) {
   if (typeof styleText !== 'string') {
@@ -36,10 +36,7 @@ function parseCssComment(styleDocs: d.StyleDoc[], comment: string) {
     return line;
   });
 
-  comment = lines
-    .join(' ')
-    .replace(/\t/g, ' ')
-    .trim();
+  comment = lines.join(' ').replace(/\t/g, ' ').trim();
 
   while (comment.includes('  ')) {
     comment = comment.replace('  ', ' ');

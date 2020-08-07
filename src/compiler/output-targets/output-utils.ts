@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { basename, dirname, join, relative } from 'path';
 import { flatOne, normalizePath, sortBy } from '@utils';
 

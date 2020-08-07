@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/internal';
+import type * as d from '@stencil/core/internal';
 
 export function toHaveReceivedEvent(eventSpy: d.EventSpy) {
   if (!eventSpy) {

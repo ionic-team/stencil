@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, buildWarn, catchError, toDashCase } from '@utils';
 import {
   convertValueToLiteral,

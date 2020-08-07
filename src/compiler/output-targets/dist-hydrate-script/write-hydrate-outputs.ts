@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { basename, join } from 'path';
 import { relocateHydrateContextConst } from './relocate-hydrate-context';
 import type { RollupOutput } from 'rollup';

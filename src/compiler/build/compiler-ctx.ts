@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { basename, dirname, extname, join } from 'path';
 import { buildEvents } from '../events';
 import { normalizePath } from '@utils';

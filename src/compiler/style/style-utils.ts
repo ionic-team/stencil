@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 
 export const getStyleId = (cmp: d.ComponentCompilerMeta, modeName: string, isScopedStyles: boolean) => {
   return `${cmp.tagName}${modeName}${isScopedStyles ? '.sc' : ''}`;

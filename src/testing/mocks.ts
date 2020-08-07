@@ -1,4 +1,4 @@
-import { BuildCtx, Cache, CompilerCtx, CompilerSystem, Config } from '@stencil/core/internal';
+import type { BuildCtx, Cache, CompilerCtx, CompilerSystem, Config } from '@stencil/core/internal';
 import { BuildContext } from '../compiler/build/build-ctx';
 import { Cache as CompilerCache } from '../compiler/cache';
 import { createInMemoryFs } from '../compiler/sys/in-memory-fs';

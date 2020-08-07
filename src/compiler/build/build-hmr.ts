@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { getScopeId } from '../style/scope-css';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 import minimatch from 'minimatch';

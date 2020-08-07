@@ -1,9 +1,9 @@
-import { E2EProcessEnv, EmulateConfig, HostElement, JestEnvironmentGlobal } from '@stencil/core/internal';
-import { E2EPage, E2EPageInternal, FindSelector, NewE2EPageOptions, PageDiagnostic } from './puppeteer-declarations';
+import type { E2EProcessEnv, EmulateConfig, HostElement, JestEnvironmentGlobal } from '@stencil/core/internal';
+import type { E2EPage, E2EPageInternal, FindSelector, NewE2EPageOptions, PageDiagnostic } from './puppeteer-declarations';
 import { find, findAll } from './puppeteer-element';
 import { initPageEvents, waitForEvent } from './puppeteer-events';
 import { initPageScreenshot } from './puppeteer-screenshot';
-import * as puppeteer from 'puppeteer';
+import type * as puppeteer from 'puppeteer';
 
 declare const global: JestEnvironmentGlobal;
 
@@ -240,7 +240,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
     } else {
       interceptedRequest.continue();
     }
-  }
+  };
 
   page.on('request', interceptedReqCallback);
 

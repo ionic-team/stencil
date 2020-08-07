@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { catchError, hasError, normalizeDiagnostics } from '@utils';
 import { BuildContext } from '../build/build-ctx';
 import { transpileApp } from '../transpile/transpile-app';

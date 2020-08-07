@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { buildError, normalizePath } from '@utils';
 import { isAbsolute, join } from 'path';
 

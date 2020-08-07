@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, flatOne } from '@utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
@@ -31,7 +31,7 @@ const parseListenDecorators = (diagnostics: d.Diagnostic[], method: ts.MethodDec
     }
 
     const listener = parseListener(eventNames[0], listenOptions, methodName);
-    if (listener.target === 'parent' as any) {
+    if (listener.target === ('parent' as any)) {
       const err = buildError(diagnostics);
       err.messageText = 'The "parent" target is no longer available as of Stencil 2. Please use "window", "document" or "body" instead.';
       augmentDiagnosticWithNode(err, listenDecorator);

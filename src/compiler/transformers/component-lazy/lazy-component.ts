@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { addLazyElementGetter } from './lazy-element-getter';
 import { addStaticStylePropertyToClass } from '../add-static-style';
 import { addWatchers } from '../watcher-meta-transform';

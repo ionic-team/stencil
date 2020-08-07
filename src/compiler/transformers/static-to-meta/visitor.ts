@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { dirname } from 'path';
 import { getModuleLegacy, resetModuleLegacy } from '../../build/compiler-ctx';
 import { parseCallExpression } from './call-expression';

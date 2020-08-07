@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { generateLazyModules } from './generate-lazy-module';
 import { generateRollupOutput } from '../../app-core/bundle-app-core';
 import { join } from 'path';

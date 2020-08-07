@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { isOutputTargetAngular } from '../../output-targets/output-utils';
 import { isAbsolute, join } from 'path';
 

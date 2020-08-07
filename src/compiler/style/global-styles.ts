@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { catchError, normalizePath } from '@utils';
 import { getCssImports } from './css-imports';
 import { isOutputTargetDistGlobalStyles } from '../output-targets/output-utils';

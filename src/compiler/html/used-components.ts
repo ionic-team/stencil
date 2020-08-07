@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 
 export const getUsedComponents = (doc: Document, cmps: d.ComponentCompilerMeta[]) => {
   const tags = new Set(cmps.map(cmp => cmp.tagName.toUpperCase()));

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { escapeHtml } from '@utils';
 import { join } from 'path';
 
@@ -142,8 +142,5 @@ h2 {
 };
 
 const inlineHTML = (html: string) => {
-  return html
-    .replace(/\n/g, '\\n')
-    .replace(/\'/g, `\\'`)
-    .trim();
+  return html.replace(/\n/g, '\\n').replace(/\'/g, `\\'`).trim();
 };

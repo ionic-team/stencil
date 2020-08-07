@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { addScriptDataAttribute } from '../html/add-script-attr';
 import { catchError, flatOne, unique } from '@utils';
 import { cloneDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';

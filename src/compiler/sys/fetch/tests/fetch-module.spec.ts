@@ -1,4 +1,4 @@
-import * as d from '../../../../declarations';
+import type * as d from '../../../../declarations';
 import { getNodeModuleFetchUrl, getStencilModuleUrl, getStencilRootUrl, skipFilePathFetch } from '../fetch-utils';
 import { createSystem } from '../../stencil-sys';
 

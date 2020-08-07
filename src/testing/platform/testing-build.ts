@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/internal';
+import type * as d from '@stencil/core/internal';
 
 export const Build: d.UserBuildConditionals = {
   isDev: true,
