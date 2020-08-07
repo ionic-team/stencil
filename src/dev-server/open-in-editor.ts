@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import * as util from './dev-server-utils';
 import * as http from 'http';
 import * as querystring from 'querystring';
@@ -78,12 +78,8 @@ async function parseData(devServerConfig: d.DevServerConfig, sys: d.CompilerSyst
     data.editor = devServerConfig.editors[0].id;
   }
 
-  try {
-    const stat = await sys.stat(data.file);
-    data.exists = !!stat && stat.isFile();
-  } catch (e) {
-    data.exists = false;
-  }
+  const stat = await sys.stat(data.file);
+  data.exists = stat.isFile;
 }
 
 async function openDataInEditor(data: d.OpenInEditorData) {

@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import * as c from './dev-server-constants';
 import * as util from './dev-server-utils';
 import { serve404 } from './serve-404';
@@ -27,7 +27,7 @@ export async function serveDevClient(devServerConfig: d.DevServerConfig, sys: d.
 
     try {
       req.stats = await sys.stat(req.filePath);
-      if (req.stats) {
+      if (req.stats.isFile) {
         return serveFile(devServerConfig, sys, req, res);
       }
       return serve404(devServerConfig, req, res, 'serveDevClient no stats');

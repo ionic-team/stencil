@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { buildError, buildWarn, catchError, isString, loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { isAbsolute, join, relative } from 'path';
 import ts from 'typescript';
@@ -30,7 +30,7 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
           }
           return sys.readFileSync(p);
         },
-        readDirectory: p => sys.readdirSync(p),
+        readDirectory: p => sys.readDirSync(p),
         fileExists: p => sys.accessSync(p),
         onUnRecoverableConfigFileDiagnostic: (e: any) => console.error(e),
       };

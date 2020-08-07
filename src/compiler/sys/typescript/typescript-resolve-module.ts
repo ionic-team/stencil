@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { basename, dirname, isAbsolute, join, resolve } from 'path';
 import { isDtsFile, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile, isJsonFile } from '../resolve/resolve-utils';
 import { isRemoteUrl, isString, IS_BROWSER_ENV, IS_NODE_ENV, normalizePath } from '@utils';

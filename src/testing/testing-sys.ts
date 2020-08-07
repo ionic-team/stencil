@@ -38,16 +38,16 @@ export const createTestingSystem = () => {
   sys.accessSync = wrapRead(sys.accessSync);
   sys.readFile = wrapRead(sys.readFile);
   sys.readFileSync = wrapRead(sys.readFileSync);
-  sys.readdir = wrapRead(sys.readdir);
-  sys.readdirSync = wrapRead(sys.readdirSync);
+  sys.readDir = wrapRead(sys.readDir);
+  sys.readDirSync = wrapRead(sys.readDirSync);
   sys.stat = wrapRead(sys.stat);
   sys.statSync = wrapRead(sys.statSync);
 
   sys.copyFile = wrapWrite(sys.copyFile);
-  sys.mkdir = wrapWrite(sys.mkdir);
-  sys.mkdirSync = wrapWrite(sys.mkdirSync);
-  sys.unlink = wrapWrite(sys.unlink);
-  sys.unlinkSync = wrapWrite(sys.unlinkSync);
+  sys.createDir = wrapWrite(sys.createDir);
+  sys.createDirSync = wrapWrite(sys.createDirSync);
+  sys.removeFile = wrapWrite(sys.removeFile);
+  sys.removeFileSync = wrapWrite(sys.removeFileSync);
   sys.writeFile = wrapWrite(sys.writeFile);
   sys.writeFileSync = wrapWrite(sys.writeFileSync);
 

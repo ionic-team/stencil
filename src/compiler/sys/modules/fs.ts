@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { basename } from 'path';
 import { promisify } from './util';
 
@@ -18,11 +18,10 @@ const fs: FsObj = {
 };
 
 export const exists = (fs.exists = (p: string, cb: any) => {
-  fs.__sys.access(p).then(hasAccess => {
-    cb(hasAccess);
-  }).catch(() => {
-    cb(false);
-  });
+  fs.__sys
+    .access(p)
+    .then(cb)
+    .catch(() => cb(false));
 });
 
 // https://nodejs.org/api/util.html#util_custom_promisified_functions
@@ -36,21 +35,24 @@ export const existsSync = (fs.existsSync = (p: string) => {
 export const mkdir = (fs.mkdir = (p: string, opts: any, cb: any) => {
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
   opts = typeof opts === 'function' ? undefined : opts;
-  fs.__sys.mkdir(p, opts).then(results => {
-    if (cb) {
-      if (results.error) {
-        cb(new FsError('mkdir', p));
-      } else {
-        cb(null);
+  fs.__sys
+    .createDir(p, opts)
+    .then(results => {
+      if (cb) {
+        if (results.error) {
+          cb(new FsError('mkdir', p));
+        } else {
+          cb(null);
+        }
       }
-    }
-  }).catch(e => {
-    cb && cb(e);
-  });
+    })
+    .catch(e => {
+      cb && cb(e);
+    });
 });
 
 export const mkdirSync = (fs.mkdirSync = (p: string, opts: any) => {
-  const results = fs.__sys.mkdirSync(p, opts);
+  const results = fs.__sys.createDirSync(p, opts);
   if (results.error) {
     throw new FsError('mkdir', p);
   }
@@ -60,24 +62,27 @@ export const readdirSync = (fs.readdirSync = (p: string) => {
   // sys.readdirSync includes full paths
   // but if fs.readdirSync was called, the expected
   // nodejs results are of just the basename for each dir item
-  const dirItems = fs.__sys.readdirSync(p);
+  const dirItems = fs.__sys.readDirSync(p);
   return dirItems.map(dirItem => basename(dirItem));
 });
 
 export const readFile = (fs.readFile = async (p: string, opts: any, cb: (err: any, data?: string) => void) => {
   const encoding = typeof opts === 'object' ? opts.encoding : typeof opts === 'string' ? opts : 'utf-8';
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
-  fs.__sys.readFile(p, encoding).then(data => {
-    if (cb) {
-      if (typeof data === 'string') {
-        cb(null, data);
-      } else {
-        cb(new FsError('open', p), data);
+  fs.__sys
+    .readFile(p, encoding)
+    .then(data => {
+      if (cb) {
+        if (typeof data === 'string') {
+          cb(null, data);
+        } else {
+          cb(new FsError('open', p), data);
+        }
       }
-    }
-  }).catch(e => {
-    cb && cb(e);
-  });
+    })
+    .catch(e => {
+      cb && cb(e);
+    });
 });
 
 export const readFileSync = (fs.readFileSync = (p: string, opts: any) => {
@@ -91,13 +96,14 @@ export const readFileSync = (fs.readFileSync = (p: string, opts: any) => {
 
 export const realpath = (fs.realpath = (p: string, opts: any, cb: (err: any, data?: string) => void) => {
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
-  fs.__sys.realpath(p).then(results => {
-    if (cb) {
-      cb(results.error, results.path);
-    }
-  }).catch(e => {
-    cb(e);
-  });
+  fs.__sys
+    .realpath(p)
+    .then(results => {
+      cb && cb(results.error, results.path);
+    })
+    .catch(e => {
+      cb && cb(e);
+    });
 });
 
 export const realpathSync = (fs.realpathSync = (p: string) => {
@@ -110,27 +116,42 @@ export const realpathSync = (fs.realpathSync = (p: string) => {
 
 export const statSync = (fs.statSync = (p: string) => {
   const fsStats = fs.__sys.statSync(p);
-  if (!fsStats) {
+  if (fsStats.error) {
     throw new FsError('statSync', p);
   }
-  return fsStats;
+  return {
+    isDirectory: () => fsStats.isDirectory,
+    isFile: () => fsStats.isFile,
+    isSymbolicLink: () => fsStats.isSymbolicLink,
+    size: fsStats.size,
+    mtimeMs: fsStats.mtimeMs,
+  };
 });
 
 export const lstatSync = (fs.lstatSync = statSync);
 
 export const stat = (fs.stat = (p: string, opts: any, cb: any) => {
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
-  fs.__sys.stat(p).then(fsStats => {
-    if (cb) {
-      if (fsStats) {
-        cb(null);
-      } else {
-        cb(new FsError('stat', p));
+  fs.__sys
+    .stat(p)
+    .then(fsStats => {
+      if (cb) {
+        if (fsStats.error) {
+          cb(new FsError('stat', p));
+        } else {
+          cb({
+            isDirectory: () => fsStats.isDirectory,
+            isFile: () => fsStats.isFile,
+            isSymbolicLink: () => fsStats.isSymbolicLink,
+            size: fsStats.size,
+            mtimeMs: fsStats.mtimeMs,
+          });
+        }
       }
-    }
-  }).catch(e => {
-    cb && cb(e);
-  });
+    })
+    .catch(e => {
+      cb && cb(e);
+    });
 });
 
 export const watch = (fs.watch = () => {
@@ -139,17 +160,20 @@ export const watch = (fs.watch = () => {
 
 export const writeFile = (fs.writeFile = (p: string, data: string, opts: any, cb: any) => {
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
-  fs.__sys.writeFile(p, data).then(writeResults => {
-    if (cb) {
-      if (writeResults.error) {
-        cb(new FsError('writeFile', p));
-      } else {
-        cb(null);
+  fs.__sys
+    .writeFile(p, data)
+    .then(writeResults => {
+      if (cb) {
+        if (writeResults.error) {
+          cb(new FsError('writeFile', p));
+        } else {
+          cb(null);
+        }
       }
-    }
-  }).catch(e => {
-    cb && cb(e);
-  });
+    })
+    .catch(e => {
+      cb && cb(e);
+    });
 });
 
 export default fs;

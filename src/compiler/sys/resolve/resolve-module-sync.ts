@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { COMMON_DIR_FILENAMES, getCommonDirName, isCommonDirModuleFile, shouldFetchModule } from './resolve-utils';
 import { fetchModuleSync } from '../fetch/fetch-module-sync';
 import { getCommonDirUrl, getNodeModuleFetchUrl, packageVersions } from '../fetch/fetch-utils';
@@ -88,7 +88,7 @@ export const createCustomResolverSync = (sys: d.CompilerSystem, inMemoryFs: d.In
       if (shouldFetchModule(fsDirPath)) {
         if (basename(fsDirPath) === 'node_modules') {
           // just the /node_modules directory
-          inMemoryFs.sys.mkdirSync(fsDirPath);
+          inMemoryFs.sys.createDirSync(fsDirPath);
           inMemoryFs.clearFileCache(fsDirPath);
           return true;
         }

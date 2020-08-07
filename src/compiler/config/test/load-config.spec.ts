@@ -16,8 +16,8 @@ describe('load config', () => {
     sys = createSystem();
     sys.writeFileSync(configPath, ``);
     sys.writeFileSync(configPath2, ``);
-    sys.mkdirSync(fixturesPath);
-    sys.mkdirSync(srcPath);
+    sys.createDirSync(fixturesPath);
+    sys.createDirSync(srcPath);
     sys.writeFileSync(indexPath, `console.log('fixture');`);
   });
 

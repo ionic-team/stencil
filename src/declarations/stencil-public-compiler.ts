@@ -1,5 +1,5 @@
-import { JsonDocs } from './stencil-public-docs';
-import { PrerenderUrlResults } from '../internal';
+import type { JsonDocs } from './stencil-public-docs';
+import type { PrerenderUrlResults } from '../internal';
 export * from './stencil-public-docs';
 
 /**
@@ -805,6 +805,17 @@ export interface CompilerSystem {
    * Used to destroy any listeners, file watchers or child processes.
    */
   destroy(): Promise<void>;
+  /**
+   * Does not throw.
+   */
+  createDir(p: string, opts?: CompilerSystemCreateDirectoryOptions): Promise<CompilerSystemCreateDirectoryResults>;
+  /**
+   * SYNC! Does not throw.
+   */
+  createDirSync(p: string, opts?: CompilerSystemCreateDirectoryOptions): CompilerSystemCreateDirectoryResults;
+  /**
+   * Each plaform as a different way to dynamically import modules.
+   */
   dynamicImport?(p: string): Promise<any>;
   /**
    * Creates the worker controller for the current system.
@@ -861,14 +872,6 @@ export interface CompilerSystem {
    */
   isSymbolicLink(p: string): Promise<boolean>;
   lazyRequire?: LazyRequire;
-  /**
-   * Does not throw.
-   */
-  mkdir(p: string, opts?: CompilerSystemMakeDirectoryOptions): Promise<CompilerSystemMakeDirectoryResults>;
-  /**
-   * SYNC! Does not throw.
-   */
-  mkdirSync(p: string, opts?: CompilerSystemMakeDirectoryOptions): CompilerSystemMakeDirectoryResults;
   nextTick(cb: () => void): void;
   /**
    * Normalize file system path.
@@ -877,13 +880,13 @@ export interface CompilerSystem {
   onProcessInterrupt?(cb: () => void): void;
   platformPath: PlatformPath;
   /**
-   * All return paths are full normalized paths, not just the file names. Always returns an array, does not throw.
+   * All return paths are full normalized paths, not just the basenames. Always returns an array, does not throw.
    */
-  readdir(p: string): Promise<string[]>;
+  readDir(p: string): Promise<string[]>;
   /**
-   * SYNC! All return paths are full normalized paths, not just the file names. Always returns an array, does not throw.
+   * SYNC! All return paths are full normalized paths, not just the basenames. Always returns an array, does not throw.
    */
-  readdirSync(p: string): string[];
+  readDirSync(p: string): string[];
   /**
    * Returns undefined if file is not found. Does not throw.
    */
@@ -913,29 +916,29 @@ export interface CompilerSystem {
   /**
    * Does not throw.
    */
-  rmdir(p: string, opts?: CompilerSystemRemoveDirectoryOptions): Promise<CompilerSystemRemoveDirectoryResults>;
+  removeDir(p: string, opts?: CompilerSystemRemoveDirectoryOptions): Promise<CompilerSystemRemoveDirectoryResults>;
   /**
    * SYNC! Does not throw.
    */
-  rmdirSync(p: string, opts?: CompilerSystemRemoveDirectoryOptions): CompilerSystemRemoveDirectoryResults;
-  setupCompiler?: (c: { ts: any }) => void;
-  /**
-   * Returns undefined if stat not found. Does not throw.
-   */
-  stat(p: string): Promise<CompilerFsStats>;
-  /**
-   * SYNC! Returns undefined if stat not found. Does not throw.
-   */
-  statSync(p: string): CompilerFsStats;
-  tmpdir(): string;
+  removeDirSync(p: string, opts?: CompilerSystemRemoveDirectoryOptions): CompilerSystemRemoveDirectoryResults;
   /**
    * Does not throw.
    */
-  unlink(p: string): Promise<CompilerSystemUnlinkResults>;
+  removeFile(p: string): Promise<CompilerSystemRemoveFileResults>;
   /**
    * SYNC! Does not throw.
    */
-  unlinkSync(p: string): CompilerSystemUnlinkResults;
+  removeFileSync(p: string): CompilerSystemRemoveFileResults;
+  setupCompiler?: (c: { ts: any }) => void;
+  /**
+   * Always returns an object. Does not throw. Check for "error" property if there's an error.
+   */
+  stat(p: string): Promise<CompilerFsStats>;
+  /**
+   * SYNC! Always returns an object. Does not throw. Check for "error" property if there's an error.
+   */
+  statSync(p: string): CompilerFsStats;
+  tmpDirSync(): string;
   watchDirectory?(p: string, callback: CompilerFileWatcherCallback, recursive?: boolean): CompilerFileWatcher;
   watchFile?(p: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
   /**
@@ -1170,16 +1173,33 @@ export interface CompilerFileWatcher {
 }
 
 export interface CompilerFsStats {
-  isFile(): boolean;
-  isDirectory(): boolean;
-  isSymbolicLink(): boolean;
+  /**
+   * If it's a directory. `false` if there was an error.
+   */
+  isDirectory: boolean;
+  /**
+   * If it's a file. `false` if there was an error.
+   */
+  isFile: boolean;
+  /**
+   * If it's a symlink. `false` if there was an error.
+   */
+  isSymbolicLink: boolean;
+  /**
+   * The size of the file in bytes. `0` for directories or if there was an error.
+   */
   size: number;
-  mtime?: {
-    getTime(): number;
-  };
+  /**
+   * The timestamp indicating the last time this file was modified expressed in milliseconds since the POSIX Epoch.
+   */
+  mtimeMs?: number;
+  /**
+   * Error if there was one, otherwise `null`. `stat` and `statSync` do not throw errors but always returns this interface.
+   */
+  error: any;
 }
 
-export interface CompilerSystemMakeDirectoryOptions {
+export interface CompilerSystemCreateDirectoryOptions {
   /**
    * Indicates whether parent directories should be created.
    * @default false
@@ -1192,7 +1212,7 @@ export interface CompilerSystemMakeDirectoryOptions {
   mode?: number;
 }
 
-export interface CompilerSystemMakeDirectoryResults {
+export interface CompilerSystemCreateDirectoryResults {
   basename: string;
   dirname: string;
   path: string;
@@ -1238,7 +1258,7 @@ export interface CompilerSystemRealpathResults {
   error: any;
 }
 
-export interface CompilerSystemUnlinkResults {
+export interface CompilerSystemRemoveFileResults {
   basename: string;
   dirname: string;
   path: string;

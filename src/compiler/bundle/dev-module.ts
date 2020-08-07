@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { basename, dirname, join, relative } from 'path';
 import { BuildContext } from '../build/build-ctx';
 import { getRollupOptions } from './bundle-output';
@@ -175,7 +175,7 @@ const useDevModuleCache = async (config: d.Config, p: string) => {
 
 const writeCachedFile = async (config: d.Config, results: d.CompilerRequestResponse) => {
   try {
-    await config.sys.mkdir(config.cacheDir);
+    await config.sys.createDir(config.cacheDir);
     config.sys.writeFile(results.cachePath, results.content);
   } catch (e) {
     console.error(e);

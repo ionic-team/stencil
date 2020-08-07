@@ -1,8 +1,8 @@
 import type {
   CompilerSystem,
-  CompilerSystemMakeDirectoryResults,
+  CompilerSystemCreateDirectoryResults,
   CompilerSystemRealpathResults,
-  CompilerSystemUnlinkResults,
+  CompilerSystemRemoveFileResults,
   CompilerSystemWriteFileResults,
 } from '../../declarations';
 import { asyncGlob, nodeCopyTasks } from './node-copy-tasks';
@@ -36,10 +36,7 @@ export function createNodeSys(c: { process?: any } = {}) {
     version: prcs.versions.node,
     access(p) {
       return new Promise(resolve => {
-        fs.access(p, err => {
-          const hasAccess = !err;
-          resolve(hasAccess);
-        });
+        fs.access(p, err => resolve(!err));
       });
     },
     accessSync(p) {
@@ -91,6 +88,46 @@ export function createNodeSys(c: { process?: any } = {}) {
           resolve(!err);
         });
       });
+    },
+    createDir(p, opts) {
+      return new Promise(resolve => {
+        if (opts) {
+          fs.mkdir(p, opts, err => {
+            resolve({
+              basename: path.basename(p),
+              dirname: path.dirname(p),
+              path: p,
+              newDirs: [],
+              error: err,
+            });
+          });
+        } else {
+          fs.mkdir(p, err => {
+            resolve({
+              basename: path.basename(p),
+              dirname: path.dirname(p),
+              path: p,
+              newDirs: [],
+              error: err,
+            });
+          });
+        }
+      });
+    },
+    createDirSync(p, opts) {
+      const results: CompilerSystemCreateDirectoryResults = {
+        basename: path.basename(p),
+        dirname: path.dirname(p),
+        path: p,
+        newDirs: [],
+        error: null,
+      };
+      try {
+        fs.mkdirSync(p, opts);
+      } catch (e) {
+        results.error = e;
+      }
+      return results;
     },
     createWorkerController(maxConcurrentWorkers) {
       const forkModulePath = path.join(__dirname, 'worker.js');
@@ -162,46 +199,6 @@ export function createNodeSys(c: { process?: any } = {}) {
         }
       });
     },
-    mkdir(p, opts) {
-      return new Promise(resolve => {
-        if (opts) {
-          fs.mkdir(p, opts, err => {
-            resolve({
-              basename: path.basename(p),
-              dirname: path.dirname(p),
-              path: p,
-              newDirs: [],
-              error: err,
-            });
-          });
-        } else {
-          fs.mkdir(p, err => {
-            resolve({
-              basename: path.basename(p),
-              dirname: path.dirname(p),
-              path: p,
-              newDirs: [],
-              error: err,
-            });
-          });
-        }
-      });
-    },
-    mkdirSync(p, opts) {
-      const results: CompilerSystemMakeDirectoryResults = {
-        basename: path.basename(p),
-        dirname: path.dirname(p),
-        path: p,
-        newDirs: [],
-        error: null,
-      };
-      try {
-        fs.mkdirSync(p, opts);
-      } catch (e) {
-        results.error = e;
-      }
-      return results;
-    },
     nextTick: prcs.nextTick,
     normalizePath,
     onProcessInterrupt: cb => {
@@ -210,7 +207,7 @@ export function createNodeSys(c: { process?: any } = {}) {
       }
     },
     platformPath: path,
-    readdir(p) {
+    readDir(p) {
       return new Promise(resolve => {
         fs.readdir(p, (err, files) => {
           if (err) {
@@ -225,7 +222,7 @@ export function createNodeSys(c: { process?: any } = {}) {
         });
       });
     },
-    readdirSync(p) {
+    readDirSync(p) {
       try {
         return fs.readdirSync(p).map(f => {
           return normalizePath(path.join(p, f));
@@ -278,7 +275,7 @@ export function createNodeSys(c: { process?: any } = {}) {
     resolvePath(p) {
       return normalizePath(p);
     },
-    rmdir(p, opts) {
+    removeDir(p, opts) {
       return new Promise(resolve => {
         const recursive = !!(opts && opts.recursive);
         if (recursive) {
@@ -292,7 +289,7 @@ export function createNodeSys(c: { process?: any } = {}) {
         }
       });
     },
-    rmdirSync(p, opts) {
+    removeDirSync(p, opts) {
       try {
         const recursive = !!(opts && opts.recursive);
         if (recursive) {
@@ -304,6 +301,32 @@ export function createNodeSys(c: { process?: any } = {}) {
       } catch (e) {
         return { basename: path.basename(p), dirname: path.dirname(p), path: p, removedDirs: [], removedFiles: [], error: e };
       }
+    },
+    removeFile(p) {
+      return new Promise(resolve => {
+        fs.unlink(p, err => {
+          resolve({
+            basename: path.basename(p),
+            dirname: path.dirname(p),
+            path: p,
+            error: err,
+          });
+        });
+      });
+    },
+    removeFileSync(p) {
+      const results: CompilerSystemRemoveFileResults = {
+        basename: path.basename(p),
+        dirname: path.dirname(p),
+        path: p,
+        error: null,
+      };
+      try {
+        fs.unlinkSync(p);
+      } catch (e) {
+        results.error = e;
+      }
+      return results;
     },
     setupCompiler(c) {
       const ts: typeof TypeScript = c.ts;
@@ -368,49 +391,53 @@ export function createNodeSys(c: { process?: any } = {}) {
     },
     stat(p) {
       return new Promise(resolve => {
-        fs.stat(p, (err, s) => {
+        fs.stat(p, (err, fsStat) => {
           if (err) {
-            resolve(undefined);
+            resolve({
+              isDirectory: false,
+              isFile: false,
+              isSymbolicLink: false,
+              size: 0,
+              mtimeMs: 0,
+              error: err,
+            });
           } else {
-            resolve(s);
+            resolve({
+              isDirectory: fsStat.isDirectory(),
+              isFile: fsStat.isFile(),
+              isSymbolicLink: fsStat.isSymbolicLink(),
+              size: fsStat.size,
+              mtimeMs: fsStat.mtimeMs,
+              error: null,
+            });
           }
         });
       });
     },
     statSync(p) {
       try {
-        return fs.statSync(p);
-      } catch (e) {}
-      return undefined;
-    },
-    tmpdir() {
-      return tmpdir();
-    },
-    unlink(p) {
-      return new Promise(resolve => {
-        fs.unlink(p, err => {
-          resolve({
-            basename: path.basename(p),
-            dirname: path.dirname(p),
-            path: p,
-            error: err,
-          });
-        });
-      });
-    },
-    unlinkSync(p) {
-      const results: CompilerSystemUnlinkResults = {
-        basename: path.basename(p),
-        dirname: path.dirname(p),
-        path: p,
-        error: null,
-      };
-      try {
-        fs.unlinkSync(p);
+        const fsStat = fs.statSync(p);
+        return {
+          isDirectory: fsStat.isDirectory(),
+          isFile: fsStat.isFile(),
+          isSymbolicLink: fsStat.isSymbolicLink(),
+          size: fsStat.size,
+          mtimeMs: fsStat.mtimeMs,
+          error: null,
+        };
       } catch (e) {
-        results.error = e;
+        return {
+          isDirectory: false,
+          isFile: false,
+          isSymbolicLink: false,
+          size: 0,
+          mtimeMs: 0,
+          error: e,
+        };
       }
-      return results;
+    },
+    tmpDirSync() {
+      return tmpdir();
     },
     writeFile(p, content) {
       return new Promise(resolve => {

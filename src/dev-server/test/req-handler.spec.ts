@@ -39,7 +39,7 @@ describe('request-handler', () => {
       basePath: '/',
     };
 
-    await sys.mkdir(stencilConfig.devServer.root);
+    await sys.createDir(stencilConfig.devServer.root);
     await sys.writeFile(path.join(stencilConfig.devServer.devServerDir, 'templates', 'directory-index.html'), tmplDir);
 
     config = validateDevServer(stencilConfig, []);
@@ -169,7 +169,7 @@ describe('request-handler', () => {
     });
 
     it('should list directory when ended in slash and not using historyApiFallback', async () => {
-      await sys.mkdir(path.join(root, 'www', 'about-us'));
+      await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'somefile1.html'), `somefile1`);
       await sys.writeFile(path.join(root, 'www', 'about-us', 'somefile2.html'), `somefile2`);
       config.historyApiFallback = null;
@@ -189,7 +189,7 @@ describe('request-handler', () => {
 
   describe('serve directory index', () => {
     it('should load index.html in directory', async () => {
-      await sys.mkdir(path.join(root, 'www', 'about-us'));
+      await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us.html'), `about-us.html page`);
       await sys.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `about-us-index-directory`);
       config.historyApiFallback = null;
@@ -207,7 +207,7 @@ describe('request-handler', () => {
     });
 
     it('should redirect directory w/ slash', async () => {
-      await sys.mkdir(path.join(root, 'www', 'about-us'));
+      await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'somefile1.html'), `somefile1`);
       await sys.writeFile(path.join(root, 'www', 'about-us', 'somefile2.html'), `somefile2`);
       config.historyApiFallback = {};
@@ -224,7 +224,7 @@ describe('request-handler', () => {
     });
 
     it('get directory index.html with no trailing slash', async () => {
-      await sys.mkdir(path.join(root, 'www', 'about-us'));
+      await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
       const handler = createRequestHandler(config, sys);
 
@@ -238,7 +238,7 @@ describe('request-handler', () => {
 
     it('get directory index.html with trailing slash and base url', async () => {
       config.basePath = '/my-base-url/';
-      await sys.mkdir(path.join(root, 'www', 'about-us'));
+      await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
       const handler = createRequestHandler(config, sys);
 
@@ -252,7 +252,7 @@ describe('request-handler', () => {
 
     it('get directory index.html without trailing slash and base url', async () => {
       config.basePath = '/my-base-url/';
-      await sys.mkdir(path.join(root, 'www', 'about-us'));
+      await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
       const handler = createRequestHandler(config, sys);
 
@@ -265,7 +265,7 @@ describe('request-handler', () => {
     });
 
     it('get directory index.html with trailing slash', async () => {
-      await sys.mkdir(path.join(root, 'www', 'about-us'));
+      await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
       const handler = createRequestHandler(config, sys);
 

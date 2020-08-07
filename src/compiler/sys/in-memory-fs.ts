@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { basename, dirname, relative } from 'path';
 import { isIterable, normalizePath, isString } from '@utils';
 
@@ -155,7 +155,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     // used internally only so we could easily recursively drill down
     // loop through this directory and sub directories
     // always a disk read!!removeDir
-    const dirItems = await sys.readdir(dirPath);
+    const dirItems = await sys.readDir(dirPath);
     if (dirItems.length > 0) {
       // cache some facts about this path
       const item = getItem(dirPath);
@@ -312,17 +312,17 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     const item = getItem(itemPath);
 
     if (typeof item.isDirectory !== 'boolean' || typeof item.isFile !== 'boolean') {
-      const s = await sys.stat(itemPath);
-      if (s) {
+      const stat = await sys.stat(itemPath);
+      if (!stat.error) {
         item.exists = true;
-        if (s.isFile()) {
+        if (stat.isFile) {
           item.isFile = true;
           item.isDirectory = false;
-          item.size = s.size;
-        } else if (s.isDirectory()) {
+          item.size = stat.size;
+        } else if (stat.isDirectory) {
           item.isFile = false;
           item.isDirectory = true;
-          item.size = s.size;
+          item.size = stat.size;
         } else {
           item.isFile = false;
           item.isDirectory = false;
@@ -350,17 +350,17 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const statSync = (itemPath: string) => {
     const item = getItem(itemPath);
     if (typeof item.isDirectory !== 'boolean' || typeof item.isFile !== 'boolean') {
-      const s = sys.statSync(itemPath);
-      if (s) {
+      const stat = sys.statSync(itemPath);
+      if (!stat.error) {
         item.exists = true;
-        if (s.isFile()) {
+        if (stat.isFile) {
           item.isFile = true;
           item.isDirectory = false;
-          item.size = s.size;
-        } else if (s.isDirectory()) {
+          item.size = stat.size;
+        } else if (stat.isDirectory) {
           item.isFile = false;
           item.isDirectory = true;
-          item.size = s.size;
+          item.size = stat.size;
         } else {
           item.isFile = false;
           item.isDirectory = false;
@@ -553,7 +553,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         item.isFile = false;
 
         if (!inMemoryOnly) {
-          await sys.mkdir(dirPath);
+          await sys.createDir(dirPath);
         }
 
         dirsAdded.push(dirPath);
@@ -608,7 +608,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         if (typeof filePath !== 'string') {
           throw new Error(`unable to unlink without filePath`);
         }
-        await sys.unlink(filePath);
+        await sys.removeFile(filePath);
         return filePath;
       }),
     );
@@ -619,7 +619,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     const dirsDeleted: string[] = [];
 
     for (const dirPath of dirsToDelete) {
-      await sys.rmdir(dirPath);
+      await sys.removeDir(dirPath);
       dirsDeleted.push(dirPath);
     }
 

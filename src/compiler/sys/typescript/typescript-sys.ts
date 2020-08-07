@@ -16,7 +16,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
 
   const getAccessibleFileSystemEntries = (path: string) => {
     try {
-      const entries = stencilSys.readdirSync(path || '.').sort();
+      const entries = stencilSys.readDirSync(path || '.').sort();
       const files: string[] = [];
       const directories: string[] = [];
 
@@ -44,7 +44,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
   tsSys.getCurrentDirectory = stencilSys.getCurrentDirectory;
 
   tsSys.createDirectory = p => {
-    stencilSys.mkdirSync(p, { recursive: true });
+    stencilSys.createDirSync(p, { recursive: true });
   };
 
   tsSys.directoryExists = p => {
@@ -66,7 +66,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
   };
 
   tsSys.getDirectories = p => {
-    const items = stencilSys.readdirSync(p);
+    const items = stencilSys.readDirSync(p);
     return items.filter(itemPath => {
       const s = inMemoryFs.statSync(itemPath);
       return !!(s && s.exists && s.isDirectory);

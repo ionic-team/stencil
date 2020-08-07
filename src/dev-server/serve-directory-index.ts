@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { responseHeaders, sendMsg } from './dev-server-utils';
 import { serve404 } from './serve-404';
 import { serve500 } from './serve-500';
@@ -14,7 +14,7 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
     const indexFilePath = path.join(req.filePath, 'index.html');
 
     req.stats = await sys.stat(indexFilePath);
-    if (req.stats && req.stats.isFile()) {
+    if (req.stats.isFile) {
       req.filePath = indexFilePath;
       return serveFile(devServerConfig, sys, req, res);
     }
@@ -38,7 +38,7 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
   }
 
   try {
-    const dirFilePaths = await sys.readdir(req.filePath);
+    const dirFilePaths = await sys.readDir(req.filePath);
 
     try {
       if (dirTemplate == null) {
@@ -47,10 +47,7 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
       }
       const files = await getFiles(sys, req.pathname, dirFilePaths);
 
-      const templateHtml = dirTemplate
-        .replace('{{title}}', getTitle(req.pathname))
-        .replace('{{nav}}', getName(req.pathname))
-        .replace('{{files}}', files);
+      const templateHtml = dirTemplate.replace('{{title}}', getTitle(req.pathname)).replace('{{nav}}', getName(req.pathname)).replace('{{files}}', files);
 
       res.writeHead(
         200,
@@ -113,7 +110,7 @@ async function getDirectoryItems(sys: d.CompilerSystem, urlPathName: string, dir
       const item: DirectoryItem = {
         name: fileName,
         pathname: url.resolve(urlPathName, fileName),
-        isDirectory: !!(stats && stats.isDirectory()),
+        isDirectory: stats.isDirectory,
       };
 
       return item;

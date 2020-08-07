@@ -1,11 +1,10 @@
 import type {
-  CompilerFsStats,
   CompilerSystem,
-  CompilerSystemMakeDirectoryResults,
+  CompilerSystemCreateDirectoryResults,
   CompilerSystemRealpathResults,
   CompilerSystemRemoveDirectoryResults,
+  CompilerSystemRemoveFileResults,
   CompilerSystemRenameResults,
-  CompilerSystemUnlinkResults,
   CompilerSystemWriteFileResults,
   Diagnostic,
 } from '../../declarations';
@@ -94,6 +93,36 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       } catch (e) {
         return false;
       }
+    },
+    async createDir(p, opts) {
+      const results: CompilerSystemCreateDirectoryResults = {
+        basename: basename(p),
+        dirname: dirname(p),
+        path: p,
+        newDirs: [],
+        error: null,
+      };
+      try {
+        await deno.mkdir(p, opts);
+      } catch (e) {
+        results.error = e;
+      }
+      return results;
+    },
+    createDirSync(p, opts) {
+      const results: CompilerSystemCreateDirectoryResults = {
+        basename: basename(p),
+        dirname: dirname(p),
+        path: p,
+        newDirs: [],
+        error: null,
+      };
+      try {
+        deno.mkdirSync(p, opts);
+      } catch (e) {
+        results.error = e;
+      }
+      return results;
     },
     createWorkerController: maxConcurrentWorkers => createDenoWorkerMainController(sys, maxConcurrentWorkers),
     async destroy() {
@@ -199,7 +228,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
               const content = rsp.text();
               const dir = dirname(dep.path);
               if (!ensuredDirs.has(dir)) {
-                sys.mkdir(dir, { recursive: true });
+                sys.createDir(dir, { recursive: true });
                 ensuredDirs.add(dir);
               }
               await sys.writeFile(dep.path, await content);
@@ -236,36 +265,6 @@ export function createDenoSys(c: { Deno?: any } = {}) {
         return false;
       }
     },
-    async mkdir(p, opts) {
-      const results: CompilerSystemMakeDirectoryResults = {
-        basename: basename(p),
-        dirname: dirname(p),
-        path: p,
-        newDirs: [],
-        error: null,
-      };
-      try {
-        await deno.mkdir(p, opts);
-      } catch (e) {
-        results.error = e;
-      }
-      return results;
-    },
-    mkdirSync(p, opts) {
-      const results: CompilerSystemMakeDirectoryResults = {
-        basename: basename(p),
-        dirname: dirname(p),
-        path: p,
-        newDirs: [],
-        error: null,
-      };
-      try {
-        deno.mkdirSync(p, opts);
-      } catch (e) {
-        results.error = e;
-      }
-      return results;
-    },
     nextTick: queueMicrotask,
     normalizePath,
     platformPath: {
@@ -283,7 +282,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       posix,
       win32,
     },
-    async readdir(p) {
+    async readDir(p) {
       const dirEntries: string[] = [];
       try {
         for await (const dirEntry of deno.readDir(p)) {
@@ -292,7 +291,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       } catch (e) {}
       return dirEntries;
     },
-    readdirSync(p) {
+    readDirSync(p) {
       const dirEntries: string[] = [];
       try {
         for (const dirEntry of deno.readDirSync(p)) {
@@ -364,7 +363,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
     resolvePath(p) {
       return normalizePath(p);
     },
-    async rmdir(p, opts) {
+    async removeDir(p, opts) {
       const results: CompilerSystemRemoveDirectoryResults = {
         basename: basename(p),
         dirname: dirname(p),
@@ -380,7 +379,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       }
       return results;
     },
-    rmdirSync(p, opts) {
+    removeDirSync(p, opts) {
       const results: CompilerSystemRemoveDirectoryResults = {
         basename: basename(p),
         dirname: dirname(p),
@@ -396,42 +395,8 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       }
       return results;
     },
-    async stat(p) {
-      try {
-        // deno hangs when using `stat()`!?!?!
-        // idk why compilerCtx.fs.emptyDirs(cleanDirs) will hang when stat is async
-        const stat = deno.statSync(p);
-        const results: CompilerFsStats = {
-          isFile: () => stat.isFile,
-          isDirectory: () => stat.isDirectory,
-          isSymbolicLink: () => stat.isSymlink,
-          size: stat.size,
-        };
-        return results;
-      } catch (e) {}
-      return undefined;
-    },
-    statSync(p) {
-      try {
-        const stat = deno.statSync(p);
-        const results: CompilerFsStats = {
-          isFile: () => stat.isFile,
-          isDirectory: () => stat.isDirectory,
-          isSymbolicLink: () => stat.isSymlink,
-          size: stat.size,
-        };
-        return results;
-      } catch (e) {}
-      return undefined;
-    },
-    tmpdir() {
-      if (tmpDir == null) {
-        tmpDir = dirname(deno.makeTempDirSync());
-      }
-      return tmpDir;
-    },
-    async unlink(p) {
-      const results: CompilerSystemUnlinkResults = {
+    async removeFile(p) {
+      const results: CompilerSystemRemoveFileResults = {
         basename: basename(p),
         dirname: dirname(p),
         path: p,
@@ -444,8 +409,8 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       }
       return results;
     },
-    unlinkSync(p) {
-      const results: CompilerSystemUnlinkResults = {
+    removeFileSync(p) {
+      const results: CompilerSystemRemoveFileResults = {
         basename: basename(p),
         dirname: dirname(p),
         path: p,
@@ -457,6 +422,58 @@ export function createDenoSys(c: { Deno?: any } = {}) {
         results.error = e;
       }
       return results;
+    },
+    async stat(p) {
+      // deno hangs when using `stat()`!?!?!
+      // idk why compilerCtx.fs.emptyDirs(cleanDirs) will hang when stat is async
+      try {
+        const fsStat = deno.statSync(p);
+        return {
+          isDirectory: fsStat.isDirectory,
+          isFile: fsStat.isFile,
+          isSymbolicLink: fsStat.isSymlink,
+          size: fsStat.size,
+          mtimeMs: fsStat.mtime.getTime(),
+          error: null,
+        };
+      } catch (e) {
+        return {
+          isDirectory: false,
+          isFile: false,
+          isSymbolicLink: false,
+          size: 0,
+          mtimeMs: 0,
+          error: e,
+        };
+      }
+    },
+    statSync(p) {
+      try {
+        const fsStat = deno.statSync(p);
+        return {
+          isDirectory: fsStat.isDirectory,
+          isFile: fsStat.isFile,
+          isSymbolicLink: fsStat.isSymlink,
+          size: fsStat.size,
+          mtimeMs: fsStat.mtime.getTime(),
+          error: null,
+        };
+      } catch (e) {
+        return {
+          isDirectory: false,
+          isFile: false,
+          isSymbolicLink: false,
+          size: 0,
+          mtimeMs: 0,
+          error: e,
+        };
+      }
+    },
+    tmpDirSync() {
+      if (tmpDir == null) {
+        tmpDir = dirname(deno.makeTempDirSync());
+      }
+      return tmpDir;
     },
     async writeFile(p, content) {
       const results: CompilerSystemWriteFileResults = {
