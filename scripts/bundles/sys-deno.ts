@@ -19,7 +19,7 @@ export async function sysDeno(opts: BuildOptions) {
       preferConst: true,
       freeze: false,
     },
-    plugins: [replacePlugin(opts), aliasPlugin(opts), prettyMinifyPlugin(opts), denoStdPlugin()],
+    plugins: [replacePlugin(opts), aliasPlugin(opts), prettyMinifyPlugin(opts, getDenoBanner()), denoStdPlugin(opts)],
     treeshake: {
       moduleSideEffects: false,
       propertyReadSideEffects: false,
@@ -51,7 +51,7 @@ export async function sysDeno(opts: BuildOptions) {
       },
       replacePlugin(opts),
       aliasPlugin(opts),
-      prettyMinifyPlugin(opts),
+      prettyMinifyPlugin(opts, getDenoBanner()),
     ],
   };
 
@@ -77,8 +77,8 @@ export async function sysDeno(opts: BuildOptions) {
       },
       replacePlugin(opts),
       aliasPlugin(opts),
-      denoStdPlugin(),
-      prettyMinifyPlugin(opts),
+      denoStdPlugin(opts),
+      prettyMinifyPlugin(opts, getDenoBanner()),
     ],
     treeshake: {
       moduleSideEffects: false,
@@ -88,4 +88,12 @@ export async function sysDeno(opts: BuildOptions) {
   };
 
   return [sysDenoBundle, sysDenoWorkerBundle, sysDenoNodeCompatBundle];
+}
+
+function getDenoBanner() {
+  return [
+    `/*! Copyright 2018-2020 the Deno authors. All rights reserved. MIT license.`,
+    ` *  https://github.com/denoland/deno/blob/master/LICENSE`,
+    ` *  https://deno.land/  */`,
+  ].join('\n');
 }

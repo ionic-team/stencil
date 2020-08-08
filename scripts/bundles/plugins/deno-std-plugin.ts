@@ -1,8 +1,14 @@
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
+import fs from 'fs-extra';
 import fetch from 'node-fetch';
 import ts from 'typescript';
+import { BuildOptions } from '../../utils/options';
+import { join } from 'path';
 
-export function denoStdPlugin(): Plugin {
+export function denoStdPlugin(opts: BuildOptions): Plugin {
+  const denoCacheDir = join(opts.buildDir, 'deno-cache');
+  fs.ensureDirSync(denoCacheDir);
+
   return {
     name: 'denoStdPlugin',
     resolveId(id, importer) {
@@ -19,8 +25,19 @@ export function denoStdPlugin(): Plugin {
     },
     async load(id) {
       if (id.startsWith('http')) {
+        const cacheName = id.split('://')[1].replace(/:|\/|\.|@/g, '_') + '.ts';
+        const cachePath = join(denoCacheDir, cacheName);
+        try {
+          const cachedContent = await fs.readFile(cachePath, 'utf8');
+          return cachedContent;
+        } catch (e) {}
+
         const rsp = await fetch(id);
-        return rsp.text();
+        const fetchedContent = await rsp.text();
+
+        await fs.writeFile(cachePath, fetchedContent);
+
+        return fetchedContent;
       }
       return null;
     },
