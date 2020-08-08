@@ -10,9 +10,9 @@ import { NON_ESCAPABLE_CONTENT, SerializeNodeToHtmlOptions, serializeNodeToHtml 
 import { parseFragmentUtil } from './parse-util';
 
 export class MockNode {
+  private _nodeValue: string;
   nodeName: string;
   nodeType: number;
-  nodeValue: string;
   ownerDocument: any;
   parentNode: MockNode;
   childNodes: MockNode[];
@@ -21,7 +21,7 @@ export class MockNode {
     this.ownerDocument = ownerDocument;
     this.nodeType = nodeType;
     this.nodeName = nodeName;
-    this.nodeValue = nodeValue;
+    this._nodeValue = nodeValue;
     this.parentNode = null;
     this.childNodes = [];
   }
@@ -115,6 +115,13 @@ export class MockNode {
     return null;
   }
 
+  get nodeValue() {
+    return this._nodeValue;
+  }
+  set nodeValue(value: string) {
+    this._nodeValue = value;
+  }
+
   get parentElement() {
     return ((this.parentNode as any) as MockElement) || null;
   }
@@ -172,10 +179,10 @@ export class MockNode {
   }
 
   get textContent() {
-    return this.nodeValue;
+    return this._nodeValue;
   }
   set textContent(value: string) {
-    this.nodeValue = String(value);
+    this._nodeValue = String(value);
   }
 
   static ELEMENT_NODE = 1;
@@ -327,7 +334,7 @@ export class MockElement extends MockNode {
     return { bottom: 0, height: 0, left: 0, right: 0, top: 0, width: 0, x: 0, y: 0 };
   }
 
-  getRootNode(opts?: { composed?: boolean;[key: string]: any }) {
+  getRootNode(opts?: { composed?: boolean; [key: string]: any }) {
     const isComposed = opts != null && opts.composed === true;
 
     let node: Node = this as any;

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, buildWarn } from '@utils';
 import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isMemberPrivate, serializeSymbol, typeToString, validateReferences } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
@@ -34,7 +34,7 @@ const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], tsS
   const flags = ts.TypeFormatFlags.WriteArrowStyleSignature | ts.TypeFormatFlags.NoTruncation;
   const signature = typeChecker.getSignatureFromDeclaration(method);
   const returnType = typeChecker.getReturnTypeOfSignature(signature);
-  const returnTypeNode = typeChecker.typeToTypeNode(returnType);
+  const returnTypeNode = typeChecker.typeToTypeNode(returnType, method, ts.NodeBuilderFlags.NoTruncation | ts.NodeBuilderFlags.NoTypeReduction);
   let returnString = typeToString(typeChecker, returnType);
   let signatureString = typeChecker.signatureToString(signature, method, flags, ts.SignatureKind.Call);
 
