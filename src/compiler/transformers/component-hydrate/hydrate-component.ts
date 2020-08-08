@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { addLazyElementGetter } from '../component-lazy/lazy-element-getter';
 import { addHydrateRuntimeCmpMeta } from './hydrate-runtime-cmp-meta';
 import { addWatchers } from '../watcher-meta-transform';

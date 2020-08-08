@@ -1,8 +1,8 @@
 import { TranspileOptions, TranspileResults, Config, TransformOptions, TransformCssToEsmInput } from '../declarations';
 import { catchError, isString } from '@utils';
-import { getTranspileCssConfig, getTranspileConfig, getTranspileResults } from './config/transpile-options';
 import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
-import { patchTypescript, patchTypescriptSync } from './sys/typescript/typescript-patch';
+import { getTranspileCssConfig, getTranspileConfig, getTranspileResults } from './config/transpile-options';
+import { patchTypescript } from './sys/typescript/typescript-sys';
 import { rollupPluginUtils } from '@compiler-deps';
 import { transformCssToEsm, transformCssToEsmSync } from './style/css-to-esm';
 import { transpileModule } from './transpile/transpile-module';
@@ -13,7 +13,7 @@ export const transpile = async (code: string, opts: TranspileOptions = {}) => {
   try {
     if (shouldTranspileModule(results.inputFileExtension)) {
       const { config, compileOpts, transformOpts } = getTranspileConfig(opts);
-      await patchTypescript(config, results.diagnostics, null);
+      patchTypescript(config, null);
       transpileCode(config, compileOpts, transformOpts, results);
     } else if (results.inputFileExtension === 'd.ts') {
       results.code = '';
@@ -36,7 +36,7 @@ export const transpileSync = (code: string, opts: TranspileOptions = {}) => {
   try {
     if (shouldTranspileModule(results.inputFileExtension)) {
       const { config, compileOpts, transformOpts } = getTranspileConfig(opts);
-      patchTypescriptSync(config, results.diagnostics, null);
+      patchTypescript(config, null);
       transpileCode(config, compileOpts, transformOpts, results);
     } else if (results.inputFileExtension === 'd.ts') {
       results.code = '';
@@ -126,13 +126,3 @@ const transpileJson = (results: TranspileResults) => {
 
 // NOTE: if you change this, also change scripts/bundles/helpers/jest/jest-preset.js
 const shouldTranspileModule = (ext: string) => ['tsx', 'ts', 'mjs', 'jsx', 'js'].includes(ext);
-
-export const compile = (code: string, opts: any = {}): Promise<any> => {
-  console.warn(`compile() deprecated, please use transpile() instead`);
-  return transpile(code, opts);
-};
-
-export const compileSync = (code: string, opts: any = {}): any => {
-  console.warn(`compileSync() deprecated, please use transpileSync() instead`);
-  return transpileSync(code, opts);
-};

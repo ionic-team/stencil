@@ -9,6 +9,8 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
   const packageLockJsonPath = join(rootDir, 'package-lock.json');
   const changelogPath = join(rootDir, 'CHANGELOG.md');
   const nodeModulesDir = join(rootDir, 'node_modules');
+  const typescriptDir = join(nodeModulesDir, 'typescript');
+  const typescriptLibDir = join(typescriptDir, 'lib');
   const buildDir = join(rootDir, 'build');
   const scriptsDir = join(rootDir, 'scripts');
   const scriptsBundlesDir = join(scriptsDir, 'bundles');
@@ -23,6 +25,8 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
     packageLockJsonPath,
     changelogPath,
     nodeModulesDir,
+    typescriptDir,
+    typescriptLibDir,
     buildDir,
     scriptsDir,
     scriptsBundlesDir,
@@ -78,7 +82,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
 export function createReplaceData(opts: BuildOptions) {
   const CACHE_BUSTER = 6;
 
-  const typescriptPkg = require(join(opts.nodeModulesDir, 'typescript', 'package.json'));
+  const typescriptPkg = require(join(opts.typescriptDir, 'package.json'));
   opts.typescriptVersion = typescriptPkg.version;
   const transpileId = typescriptPkg.name + typescriptPkg.version + '_' + CACHE_BUSTER;
 
@@ -94,6 +98,9 @@ export function createReplaceData(opts: BuildOptions) {
   const postcssPkg = require(join(opts.nodeModulesDir, 'postcss', 'package.json'));
 
   const optimizeCssId = autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version + '_' + CACHE_BUSTER;
+
+  const parse5Pkg = require(join(opts.nodeModulesDir, 'parse5', 'package.json'));
+  opts.parse5Verion = parse5Pkg.version;
 
   const data = readJSONSync(join(opts.srcDir, 'compiler', 'sys', 'dependencies.json'));
   data.dependencies[0].version = opts.version;
@@ -124,6 +131,8 @@ export interface BuildOptions {
   rootDir?: string;
   srcDir?: string;
   nodeModulesDir?: string;
+  typescriptDir?: string;
+  typescriptLibDir?: string;
   buildDir?: string;
   scriptsDir?: string;
   scriptsBundlesDir?: string;
@@ -154,6 +163,7 @@ export interface BuildOptions {
   tag?: string;
   typescriptVersion?: string;
   rollupVersion?: string;
+  parse5Verion?: string;
   terserVersion?: string;
 }
 

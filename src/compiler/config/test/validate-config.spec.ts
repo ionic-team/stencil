@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/declarations';
+import type * as d from '@stencil/core/declarations';
 import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import { validateConfig } from '../validate-config';
 
@@ -86,14 +86,15 @@ describe('validation', () => {
       expect(config.buildEs5).toBe(true);
     });
 
-    it('prod mode default to both es2017 and es5', () => {
+    it('prod mode, set modern and es5', () => {
       userConfig.devMode = false;
+      userConfig.buildEs5 = true;
       const { config } = validateConfig(userConfig);
       expect(config.buildEs5).toBe(true);
     });
 
-    it('dev mode default to only es2017', () => {
-      userConfig.devMode = true;
+    it('prod mode default to only modern and not es5', () => {
+      userConfig.devMode = false;
       const { config } = validateConfig(userConfig);
       expect(config.buildEs5).toBe(false);
     });
@@ -292,5 +293,31 @@ describe('validation', () => {
   it('should default outputTargets with www', () => {
     const { config } = validateConfig(userConfig);
     expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+  });
+
+  it('should set extras defaults', () => {
+    const { config } = validateConfig(userConfig);
+    expect(config.extras.appendChildSlotFix).toBe(false);
+    expect(config.extras.cloneNodeFix).toBe(false);
+    expect(config.extras.cssVarsShim).toBe(false);
+    expect(config.extras.dynamicImportShim).toBe(false);
+    expect(config.extras.lifecycleDOMEvents).toBe(false);
+    expect(config.extras.safari10).toBe(false);
+    expect(config.extras.scriptDataOpts).toBe(false);
+    expect(config.extras.shadowDomShim).toBe(false);
+    expect(config.extras.slotChildNodesFix).toBe(false);
+    expect(config.extras.initializeNextTick).toBe(false);
+    expect(config.extras.tagNameTransform).toBe(false);
+  });
+
+  it('should set taskQueue "async" by default', () => {
+    const { config } = validateConfig(userConfig);
+    expect(config.taskQueue).toBe('async');
+  });
+
+  it('should set taskQueue', () => {
+    userConfig.taskQueue = 'congestionAsync';
+    const { config } = validateConfig(userConfig);
+    expect(config.taskQueue).toBe('congestionAsync');
   });
 });

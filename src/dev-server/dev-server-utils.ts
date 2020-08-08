@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import * as c from './dev-server-constants';
 import { version } from '../version';
 import util from 'util';
@@ -112,11 +112,7 @@ export function isCssFile(filePath: string) {
 const TXT_EXT = ['css', 'html', 'htm', 'js', 'json', 'svg', 'xml'];
 
 export function isSimpleText(filePath: string) {
-  const ext = filePath
-    .toLowerCase()
-    .trim()
-    .split('.')
-    .pop();
+  const ext = filePath.toLowerCase().trim().split('.').pop();
   return TXT_EXT.includes(ext);
 }
 

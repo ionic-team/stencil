@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { FsObj } from './modules/fs';
 import fs from 'fs';
 

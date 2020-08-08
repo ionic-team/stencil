@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';
 import { isOutputTargetDistCollection } from '../../output-targets/output-utils';
 import { join } from 'path';

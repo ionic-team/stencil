@@ -26,7 +26,7 @@ export const findConfig = async (opts: { sys: CompilerSystem; configPath: string
   }
 
   const stat = await sys.stat(configPath);
-  if (!stat) {
+  if (stat.error) {
     const diagnostic = buildError(results.diagnostics);
     diagnostic.absFilePath = configPath;
     diagnostic.header = `Invalid config path`;
@@ -34,15 +34,15 @@ export const findConfig = async (opts: { sys: CompilerSystem; configPath: string
     return results;
   }
 
-  if (stat.isFile()) {
+  if (stat.isFile) {
     results.configPath = configPath;
     results.rootDir = sys.platformPath.dirname(configPath);
-  } else if (stat.isDirectory()) {
+  } else if (stat.isDirectory) {
     // this is only a directory, so let's make some assumptions
     for (const configName of ['stencil.config.ts', 'stencil.config.js']) {
       const testConfigFilePath = sys.platformPath.join(configPath, configName);
       const stat = await sys.stat(testConfigFilePath);
-      if (stat && stat.isFile()) {
+      if (stat.isFile) {
         results.configPath = testConfigFilePath;
         results.rootDir = sys.platformPath.dirname(testConfigFilePath);
         break;

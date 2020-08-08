@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { consoleError } from './client-log';
 import { plt, promiseResolve } from './client-window';
 import { PLATFORM_FLAGS } from '../runtime/runtime-constants';
@@ -82,7 +82,6 @@ const flush = () => {
     } else {
       queueCongestion = 0;
     }
-
   } else {
     consume(queueDomWrites);
     if ((queuePending = queueDomReads.length > 0)) {

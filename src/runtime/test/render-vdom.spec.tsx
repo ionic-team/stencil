@@ -390,7 +390,11 @@ describe('render-vdom', () => {
       @State() valid = false;
       render() {
         this.nuRender++;
-        return <div ref={() => this.valid = true}>{this.valid ? 'true' : 'false'} - {this.nuRender}</div>;
+        return (
+          <div ref={() => (this.valid = true)}>
+            {this.valid ? 'true' : 'false'} - {this.nuRender}
+          </div>
+        );
       }
     }
     const { root } = await newSpecPage({
@@ -411,7 +415,11 @@ describe('render-vdom', () => {
       render() {
         this.valid = true;
         this.nuRender++;
-        return <div>{this.valid ? 'true' : 'false'} - {this.nuRender}</div>;
+        return (
+          <div>
+            {this.valid ? 'true' : 'false'} - {this.nuRender}
+          </div>
+        );
       }
     }
     const { root } = await newSpecPage({
@@ -423,7 +431,6 @@ describe('render-vdom', () => {
       <cmp-a><div>true - 1</div></cmp-a>
     `);
   });
-
 
   it('Hello VDOM, re-render, flush', async () => {
     @Component({ tag: 'cmp-a' })
@@ -1010,7 +1017,7 @@ describe('render-vdom', () => {
       });
 
       expect(rootInstance.counter).toEqual(1);
-      root.forceUpdate();
+      forceUpdate(root);
       await waitForChanges();
 
       expect(rootInstance.counter).toEqual(1);

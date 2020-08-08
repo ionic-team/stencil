@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { generateHmr } from './build-hmr';
 import { getBuildTimestamp } from './build-ctx';
 import { hasError, isString, normalizeDiagnostics, fromEntries } from '@utils';

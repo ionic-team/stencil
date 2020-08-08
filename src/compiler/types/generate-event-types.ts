@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { getTextDocs, toTitleCase } from '@utils';
 
 export const generateEventTypes = (cmpEvents: d.ComponentCompilerEvent[]): d.TypeInfo => {

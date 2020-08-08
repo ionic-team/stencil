@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { DIST_HYDRATE_SCRIPT, isOutputTargetDist, isOutputTargetHydrate, isOutputTargetWww } from '../../output-targets/output-utils';
 import { isBoolean, isString } from '@utils';
 import { isAbsolute, join } from 'path';

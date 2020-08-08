@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { createMessageReceiver, sendMsg } from './dev-server-utils';
 import { startDevServerWorker } from './start-server-worker';
 import fs from 'graceful-fs';

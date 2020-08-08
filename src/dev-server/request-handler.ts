@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { isDevClient, isDevModule, sendMsg } from './dev-server-utils';
 import { normalizePath } from '@utils';
 import { serveDevClient } from './serve-dev-client';
@@ -56,15 +56,12 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, sys: d.
 
       try {
         req.stats = await sys.stat(req.filePath);
+        if (req.stats.isFile) {
+          return serveFile(devServerConfig, sys, req, res);
+        }
 
-        if (req.stats) {
-          if (req.stats.isFile()) {
-            return serveFile(devServerConfig, sys, req, res);
-          }
-
-          if (req.stats.isDirectory()) {
-            return serveDirectoryIndex(devServerConfig, sys, req, res);
-          }
+        if (req.stats.isDirectory) {
+          return serveDirectoryIndex(devServerConfig, sys, req, res);
         }
       } catch (e) {}
 
@@ -78,7 +75,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, sys: d.
           xSource.push(`indexFilePath: ${indexFilePath}`);
 
           req.stats = await sys.stat(indexFilePath);
-          if (req.stats && req.stats.isFile()) {
+          if (req.stats.isFile) {
             req.filePath = indexFilePath;
             return serveFile(devServerConfig, sys, req, res);
           }

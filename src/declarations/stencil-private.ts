@@ -1,4 +1,4 @@
-import {
+import type {
   BuildEvents,
   BuildLog,
   BuildOutput,
@@ -25,7 +25,7 @@ import {
   LoggerLineUpdater,
 } from './stencil-public-compiler';
 
-import { ComponentInterface, ListenOptions, ListenTargetOptions, VNode, VNodeData } from './stencil-public-runtime';
+import type { ComponentInterface, ListenOptions, ListenTargetOptions, VNode, VNodeData } from './stencil-public-runtime';
 
 export interface PrintLine {
   lineIndex: number;
@@ -104,6 +104,9 @@ export interface BuildFeatures {
   hostListenerTargetWindow: boolean;
   hostListenerTargetDocument: boolean;
   hostListenerTargetBody: boolean;
+  /**
+   * @deprecated Prevented from new apps, but left in for older collections
+   */
   hostListenerTargetParent: boolean;
   hostListenerTarget: boolean;
   method: boolean;
@@ -400,11 +403,6 @@ export interface CollectionManifest {
   global?: string;
   compiler?: CollectionCompilerVersion;
   bundles?: CollectionBundleManifest[];
-
-  /**
-   * DEPRECATED
-   */
-  components?: ComponentDataDeprecated[];
 }
 
 export type CollectionComponentEntryPath = string;
@@ -416,85 +414,6 @@ export interface CollectionBundleManifest {
 export interface CollectionDependencyManifest {
   name: string;
   tags: string[];
-}
-
-/**** DEPRECATED *****/
-export interface ComponentDataDeprecated {
-  tag?: string;
-  componentPath?: string;
-  componentClass?: string;
-  dependencies?: string[];
-  styles?: StylesDataDeprecated;
-  props?: PropManifestDeprecated[];
-  states?: StateManifestDeprecated[];
-  listeners?: ListenerManifestDeprecated[];
-  methods?: MethodManifestDeprecated[];
-  events?: EventManifestDeprecated[];
-  connect?: ConnectManifestDeprecated[];
-  context?: ContextManifestDeprecated[];
-  hostElement?: HostElementManifestDeprecated;
-  host?: any;
-  assetPaths?: string[];
-  slot?: 'hasSlots' | 'hasNamedSlots';
-  shadow?: boolean;
-  scoped?: boolean;
-  priority?: 'low';
-}
-
-export interface StylesDataDeprecated {
-  [modeName: string]: StyleDataDeprecated;
-}
-
-export interface StyleDataDeprecated {
-  stylePaths?: string[];
-  style?: string;
-}
-
-export interface PropManifestDeprecated {
-  name?: string;
-  type?: 'Boolean' | 'Number' | 'String' | 'Any';
-  mutable?: boolean;
-  attr?: string;
-  reflectToAttr?: boolean;
-  watch?: string[];
-}
-
-export interface StateManifestDeprecated {
-  name: string;
-}
-
-export interface ListenerManifestDeprecated {
-  event: string;
-  method: string;
-  capture?: boolean;
-  passive?: boolean;
-  enabled?: boolean;
-}
-
-export interface MethodManifestDeprecated {
-  name: string;
-}
-
-export interface EventManifestDeprecated {
-  event: string;
-  method?: string;
-  bubbles?: boolean;
-  cancelable?: boolean;
-  composed?: boolean;
-}
-
-export interface ConnectManifestDeprecated {
-  name: string;
-  tag?: string;
-}
-
-export interface ContextManifestDeprecated {
-  name: string;
-  id?: string;
-}
-
-export interface HostElementManifestDeprecated {
-  name: string;
 }
 
 /** OLD WAY */
@@ -737,6 +656,9 @@ export interface ComponentCompilerFeatures {
   hasListenerTargetWindow: boolean;
   hasListenerTargetDocument: boolean;
   hasListenerTargetBody: boolean;
+  /**
+   * @deprecated Prevented from new apps, but left in for older collections
+   */
   hasListenerTargetParent: boolean;
   hasMember: boolean;
   hasMethod: boolean;
@@ -779,7 +701,6 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   shadowDelegatesFocus: boolean;
   excludeFromCollection: boolean;
   isCollectionDependency: boolean;
-  isLegacy: boolean;
   docs: CompilerJsDoc;
   jsFilePath: string;
   listeners: ComponentCompilerListener[];
@@ -2388,8 +2309,6 @@ export interface NewSpecPageOptions {
   attachStyles?: boolean;
 
   strictBuild?: boolean;
-  /** @deprecated */
-  context?: { [key: string]: any };
 }
 
 export interface TypesImportData {
@@ -2445,7 +2364,7 @@ export interface VNodeProdData {
 
 export interface CompilerWorkerContext {
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
-  prepareModule(typescriptPath: string, input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string; diagnostics: Diagnostic[] }>;
+  prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string; diagnostics: Diagnostic[] }>;
   prerenderWorker(prerenderRequest: PrerenderUrlRequest): Promise<PrerenderUrlResults>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
 }

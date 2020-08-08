@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { h, newVNode } from '../h';
 import { patch } from '../vdom-render';
 import { SVG_NS } from '@utils';

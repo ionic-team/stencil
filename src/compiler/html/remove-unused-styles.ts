@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { getUsedSelectors, UsedSelectors } from '../style/css-parser/used-selectors';
 import { hasError, catchError } from '@utils';
 import { parseCss } from '../style/css-parser/parse-css';

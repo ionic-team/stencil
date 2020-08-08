@@ -9,7 +9,8 @@ import {
   STENCIL_CORE_ID,
   STENCIL_INTERNAL_ID,
   STENCIL_INTERNAL_CLIENT_ID,
-  STENCIL_INTERNAL_CLIENT_PATCH_ID,
+  STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID,
+  STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
   STENCIL_INTERNAL_HYDRATE_ID,
 } from './entry-alias-ids';
 import type { Plugin } from 'rollup';
@@ -28,7 +29,8 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
   }
   const compilerExe = config.sys.getCompilerExecutingPath();
   const internalClient = getStencilInternalModule(config, compilerExe, 'client/index.js');
-  const internalClientPatch = getStencilInternalModule(config, compilerExe, 'client/patch.js');
+  const internalClientPatchBrowser = getStencilInternalModule(config, compilerExe, 'client/patch-browser.js');
+  const internalClientPatchEsm = getStencilInternalModule(config, compilerExe, 'client/patch-esm.js');
   const internalHydrate = getStencilInternalModule(config, compilerExe, 'hydrate/index.js');
 
   return {
@@ -65,14 +67,23 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
         // the custom app-data conditionals
         return internalClient;
       }
-      if (id === STENCIL_INTERNAL_CLIENT_PATCH_ID) {
+      if (id === STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID) {
         if (externalRuntime) {
           return {
-            id: STENCIL_INTERNAL_CLIENT_PATCH_ID,
+            id: STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID,
             external: true,
           };
         }
-        return internalClientPatch;
+        return internalClientPatchBrowser;
+      }
+      if (id === STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID) {
+        if (externalRuntime) {
+          return {
+            id: STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
+            external: true,
+          };
+        }
+        return internalClientPatchEsm;
       }
       if (id === STENCIL_INTERNAL_HYDRATE_ID) {
         return internalHydrate;

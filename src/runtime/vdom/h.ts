@@ -7,7 +7,7 @@
  * Modified for Stencil's compiler and vdom
  */
 
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { BUILD } from '@app-data';
 import { consoleDevError, consoleDevWarn } from '@platform';
 import { isComplexType } from '@utils';
@@ -124,11 +124,7 @@ export const isHost = (node: any): node is d.VNode => node && node.$tag$ === Hos
 
 const vdomFnUtils: d.FunctionalUtilities = {
   forEach: (children, cb) => children.map(convertToPublic).forEach(cb),
-  map: (children, cb) =>
-    children
-      .map(convertToPublic)
-      .map(cb)
-      .map(convertToPrivate),
+  map: (children, cb) => children.map(convertToPublic).map(cb).map(convertToPrivate),
 };
 
 const convertToPublic = (node: d.VNode): d.ChildNode => ({
@@ -152,11 +148,7 @@ const convertToPrivate = (node: d.ChildNode): d.VNode => {
       vnodeData.name = node.vname;
     }
 
-    return h(
-      node.vtag, 
-      vnodeData, 
-      ...node.vchildren || [],
-    );
+    return h(node.vtag, vnodeData, ...(node.vchildren || []));
   }
 
   const vnode = newVNode(node.vtag as any, node.vtext);

@@ -6,7 +6,7 @@ import { transformCssToEsm } from '../style/css-to-esm';
 
 export const createWorkerContext = (sys: d.CompilerSystem): d.CompilerWorkerContext => ({
   transformCssToEsm,
-  prepareModule: (typescriptPath, input, minifyOpts, transpile, inlineHelpers) => prepareModule(sys, typescriptPath, input, minifyOpts, transpile, inlineHelpers),
+  prepareModule,
   optimizeCss,
   prerenderWorker: prerenderRequest => prerenderWorker(sys, prerenderRequest),
 });

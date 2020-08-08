@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { buildError, catchError, hasError } from '@utils';
 import { createWorkerContext } from '../worker/worker-thread';
 import { createWorkerMainContext } from '../worker/main-thread';
@@ -225,7 +225,7 @@ const runPrerenderOutputTarget = async (
 const createPrerenderTemplate = async (config: d.Config, templateHtml: string) => {
   const hash = await config.sys.generateContentHash(templateHtml, 12);
   const templateFileName = `prerender-${hash}.html`;
-  const templateId = join(config.sys.tmpdir(), templateFileName);
+  const templateId = join(config.sys.tmpDirSync(), templateFileName);
   config.logger.debug(`prerender template: ${templateId}`);
   config.sys.writeFileSync(templateId, templateHtml);
   return templateId;
@@ -236,7 +236,7 @@ const createComponentGraphPath = (config: d.Config, componentGraph: d.BuildResul
     const content = getComponentPathContent(componentGraph, outputTarget);
     const hash = config.sys.generateContentHash(content);
     const fileName = `prerender-component-graph-${hash}.json`;
-    const componentGraphPath = join(config.sys.tmpdir(), fileName);
+    const componentGraphPath = join(config.sys.tmpDirSync(), fileName);
     config.sys.writeFileSync(componentGraphPath, content);
     return componentGraphPath;
   }

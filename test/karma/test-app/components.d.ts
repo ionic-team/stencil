@@ -93,8 +93,6 @@ export namespace Components {
     }
     interface FactoryJsx {
     }
-    interface IePolyfills {
-    }
     interface ImageImport {
     }
     interface InitCssRoot {
@@ -108,9 +106,6 @@ export namespace Components {
         "num"?: number;
     }
     interface KeyReorderRoot {
-    }
-    interface LegacyContext {
-        "getData": () => Promise<{ win: Window; doc: Document; hasQueue: boolean; isServer: boolean; unknown: any; myService: any; }>;
     }
     interface LessCmp {
     }
@@ -478,12 +473,6 @@ declare global {
         prototype: HTMLFactoryJsxElement;
         new (): HTMLFactoryJsxElement;
     };
-    interface HTMLIePolyfillsElement extends Components.IePolyfills, HTMLStencilElement {
-    }
-    var HTMLIePolyfillsElement: {
-        prototype: HTMLIePolyfillsElement;
-        new (): HTMLIePolyfillsElement;
-    };
     interface HTMLImageImportElement extends Components.ImageImport, HTMLStencilElement {
     }
     var HTMLImageImportElement: {
@@ -519,12 +508,6 @@ declare global {
     var HTMLKeyReorderRootElement: {
         prototype: HTMLKeyReorderRootElement;
         new (): HTMLKeyReorderRootElement;
-    };
-    interface HTMLLegacyContextElement extends Components.LegacyContext, HTMLStencilElement {
-    }
-    var HTMLLegacyContextElement: {
-        prototype: HTMLLegacyContextElement;
-        new (): HTMLLegacyContextElement;
     };
     interface HTMLLessCmpElement extends Components.LessCmp, HTMLStencilElement {
     }
@@ -1019,14 +1002,12 @@ declare global {
         "external-import-b": HTMLExternalImportBElement;
         "external-import-c": HTMLExternalImportCElement;
         "factory-jsx": HTMLFactoryJsxElement;
-        "ie-polyfills": HTMLIePolyfillsElement;
         "image-import": HTMLImageImportElement;
         "init-css-root": HTMLInitCssRootElement;
         "input-basic-root": HTMLInputBasicRootElement;
         "json-basic": HTMLJsonBasicElement;
         "key-reorder": HTMLKeyReorderElement;
         "key-reorder-root": HTMLKeyReorderRootElement;
-        "legacy-context": HTMLLegacyContextElement;
         "less-cmp": HTMLLessCmpElement;
         "lifecycle-async-a": HTMLLifecycleAsyncAElement;
         "lifecycle-async-b": HTMLLifecycleAsyncBElement;
@@ -1190,8 +1171,6 @@ declare namespace LocalJSX {
     }
     interface FactoryJsx {
     }
-    interface IePolyfills {
-    }
     interface ImageImport {
     }
     interface InitCssRoot {
@@ -1205,8 +1184,6 @@ declare namespace LocalJSX {
         "num"?: number;
     }
     interface KeyReorderRoot {
-    }
-    interface LegacyContext {
     }
     interface LessCmp {
     }
@@ -1431,14 +1408,12 @@ declare namespace LocalJSX {
         "external-import-b": ExternalImportB;
         "external-import-c": ExternalImportC;
         "factory-jsx": FactoryJsx;
-        "ie-polyfills": IePolyfills;
         "image-import": ImageImport;
         "init-css-root": InitCssRoot;
         "input-basic-root": InputBasicRoot;
         "json-basic": JsonBasic;
         "key-reorder": KeyReorder;
         "key-reorder-root": KeyReorderRoot;
-        "legacy-context": LegacyContext;
         "less-cmp": LessCmp;
         "lifecycle-async-a": LifecycleAsyncA;
         "lifecycle-async-b": LifecycleAsyncB;
@@ -1552,14 +1527,12 @@ declare module "@stencil/core" {
             "external-import-b": LocalJSX.ExternalImportB & JSXBase.HTMLAttributes<HTMLExternalImportBElement>;
             "external-import-c": LocalJSX.ExternalImportC & JSXBase.HTMLAttributes<HTMLExternalImportCElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
-            "ie-polyfills": LocalJSX.IePolyfills & JSXBase.HTMLAttributes<HTMLIePolyfillsElement>;
             "image-import": LocalJSX.ImageImport & JSXBase.HTMLAttributes<HTMLImageImportElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "input-basic-root": LocalJSX.InputBasicRoot & JSXBase.HTMLAttributes<HTMLInputBasicRootElement>;
             "json-basic": LocalJSX.JsonBasic & JSXBase.HTMLAttributes<HTMLJsonBasicElement>;
             "key-reorder": LocalJSX.KeyReorder & JSXBase.HTMLAttributes<HTMLKeyReorderElement>;
             "key-reorder-root": LocalJSX.KeyReorderRoot & JSXBase.HTMLAttributes<HTMLKeyReorderRootElement>;
-            "legacy-context": LocalJSX.LegacyContext & JSXBase.HTMLAttributes<HTMLLegacyContextElement>;
             "less-cmp": LocalJSX.LessCmp & JSXBase.HTMLAttributes<HTMLLessCmpElement>;
             "lifecycle-async-a": LocalJSX.LifecycleAsyncA & JSXBase.HTMLAttributes<HTMLLifecycleAsyncAElement>;
             "lifecycle-async-b": LocalJSX.LifecycleAsyncB & JSXBase.HTMLAttributes<HTMLLifecycleAsyncBElement>;

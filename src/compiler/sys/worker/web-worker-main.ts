@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { TASK_CANCELED_MSG } from '@utils';
 
 export const createWebWorkerMainController = (sys: d.CompilerSystem, maxConcurrentWorkers: number): d.WorkerMainController => {

@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/internal';
+import type * as d from '@stencil/core/internal';
 import { BUILD } from '@app-data';
 import { expectExtend } from '../matchers';
 import { setupGlobal, teardownGlobal } from '@stencil/core/mock-doc';

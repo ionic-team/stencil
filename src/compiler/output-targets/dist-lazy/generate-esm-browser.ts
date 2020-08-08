@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { generateRollupOutput } from '../../app-core/bundle-app-core';
 import { generateLazyModules } from './generate-lazy-module';
 import type { OutputOptions, RollupBuild } from 'rollup';
@@ -16,7 +16,7 @@ export const generateEsmBrowser = async (config: d.Config, compilerCtx: d.Compil
       preferConst: true,
     };
     if (config.extras.dynamicImportShim) {
-      // for Edge 18 and below
+      // for Edge 16-18
       esmOpts.dynamicImportFunction = getDynamicImportFunction(config.fsNamespace);
     }
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { buildError, buildJsonFileError } from '@utils';
 import { dirname, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';

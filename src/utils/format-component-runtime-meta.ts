@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { CMP_FLAGS, LISTENER_FLAGS, MEMBER_FLAGS } from './constants';
 
 export const formatLazyBundleRuntimeMeta = (bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData => {
@@ -156,11 +156,11 @@ const computeListenerFlags = (listener: d.ComponentCompilerListener) => {
     case 'window':
       flags |= LISTENER_FLAGS.TargetWindow;
       break;
-    case 'parent':
-      flags |= LISTENER_FLAGS.TargetParent;
-      break;
     case 'body':
       flags |= LISTENER_FLAGS.TargetBody;
+      break;
+    case 'parent' as any:
+      flags |= LISTENER_FLAGS.TargetParent;
       break;
   }
   return flags;

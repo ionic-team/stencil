@@ -1,4 +1,4 @@
-import * as d from '../../../../declarations';
+import type * as d from '../../../../declarations';
 import { createInMemoryFs } from '../../../sys/in-memory-fs';
 import { createSystem } from '../../../sys/stencil-sys';
 import { ensureExtension } from '../typescript-resolve-module';

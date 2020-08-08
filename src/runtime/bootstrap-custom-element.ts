@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { attachStyles, getScopeId, registerStyle } from './styles';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS } from '@utils';

@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, Listen, State, h } from '@stencil/core';
+import { Component, Event, EventEmitter, Listen, State } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('listen', () => {
@@ -45,7 +45,6 @@ describe('listen', () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       @State() selfClicks = 0;
-      @State() parentClicks = 0;
       @State() bodyClicks = 0;
       @State() documentClicks = 0;
       @State() windowClicks = 0;
@@ -53,11 +52,6 @@ describe('listen', () => {
       @Listen('click')
       onClick() {
         this.selfClicks++;
-      }
-
-      @Listen('click', { target: 'parent' })
-      onParentClick() {
-        this.parentClicks++;
       }
 
       @Listen('click', { target: 'body' })
@@ -76,7 +70,7 @@ describe('listen', () => {
       }
 
       render() {
-        return `${this.selfClicks},${this.parentClicks},${this.bodyClicks},${this.documentClicks},${this.windowClicks}`;
+        return `${this.selfClicks},${this.bodyClicks},${this.documentClicks},${this.windowClicks}`;
       }
     }
 
@@ -89,43 +83,43 @@ describe('listen', () => {
     const other = doc.querySelector('other') as any;
 
     expect(root).toEqualHtml(`
-      <cmp-a>0,0,0,0,0</cmp-a>
+      <cmp-a>0,0,0,0</cmp-a>
     `);
 
     root.click();
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,1,1,1,1</cmp-a>
+      <cmp-a>1,1,1,1</cmp-a>
     `);
 
     parent.click();
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,2,2,2,2</cmp-a>
+      <cmp-a>1,2,2,2</cmp-a>
     `);
 
     other.click();
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,2,3,3,3</cmp-a>
+      <cmp-a>1,3,3,3</cmp-a>
     `);
 
     body.click();
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,2,4,4,4</cmp-a>
+      <cmp-a>1,4,4,4</cmp-a>
     `);
 
     doc.dispatchEvent(new CustomEvent('click', { bubbles: true }));
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,2,4,5,5</cmp-a>
+      <cmp-a>1,4,5,5</cmp-a>
     `);
 
     win.dispatchEvent(new CustomEvent('click', { bubbles: true }));
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,2,4,5,6</cmp-a>
+      <cmp-a>1,4,5,6</cmp-a>
     `);
   });
 

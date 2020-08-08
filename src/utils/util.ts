@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { BANNER } from './constants';
 import { buildError } from './message-utils';
 import { dashToPascalCase, isString, toDashCase } from './helpers';

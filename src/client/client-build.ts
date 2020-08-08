@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 
 export const Build: d.UserBuildConditionals = {

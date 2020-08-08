@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { ParseCssResults, CssNode, CssParsePosition } from './css-parse-declarations';
 
 export const parseCss = (css: string, filePath?: string): ParseCssResults => {
@@ -159,11 +159,11 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
 
     return trim(m[0])
       .replace(/\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/+/g, '')
-      .replace(/"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, function(m) {
+      .replace(/"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, function (m) {
         return m.replace(/,/g, '\u200C');
       })
       .split(/\s*(?![^(]*\)),\s*/)
-      .map(function(s) {
+      .map(function (s) {
         return s.replace(/\u200C/g, ',');
       });
   };
@@ -471,7 +471,7 @@ const addParent = (obj?: any, parent?: any) => {
   for (const k in obj) {
     const value = obj[k];
     if (Array.isArray(value)) {
-      value.forEach(function(v) {
+      value.forEach(function (v) {
         addParent(v, childParent);
       });
     } else if (value && typeof value === 'object') {

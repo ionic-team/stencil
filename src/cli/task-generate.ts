@@ -43,7 +43,7 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config) =
   const testFolder = extensionsToGenerate.some(isTest) ? 'test' : '';
 
   const outDir = path.join(absoluteSrcDir, 'components', dir, componentName);
-  await config.sys.mkdir(path.join(outDir, testFolder), { recursive: true });
+  await config.sys.createDir(path.join(outDir, testFolder), { recursive: true });
 
   const writtenFiles = await Promise.all(
     extensionsToGenerate.map(extension => writeFileByExtension(coreCompiler, config, outDir, componentName, extension, extensionsToGenerate.includes('css'))),

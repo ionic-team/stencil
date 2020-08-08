@@ -1,11 +1,11 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE } from './decorators-constants';
 import { componentDecoratorToStatic } from './component-decorator';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
 import { listenDecoratorsToStatic } from './listen-decorator';
 import { isDecoratorNamed } from './decorator-utils';
-import { methodDecoratorsToStatic } from './method-decorator';
+import { methodDecoratorsToStatic, validateMethods } from './method-decorator';
 import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
@@ -36,8 +36,9 @@ export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnosti
     return classNode;
   }
 
-  const decoratedMembers = classNode.members.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
-  const newMembers = removeStencilDecorators(Array.from(classNode.members));
+  const classMembers = classNode.members;
+  const decoratedMembers = classMembers.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
+  const newMembers = removeStencilDecorators(Array.from(classMembers));
 
   // parser component decorator (Component)
   componentDecoratorToStatic(config, typeChecker, diagnostics, classNode, newMembers, componentDecorator);
@@ -53,6 +54,8 @@ export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnosti
     watchDecoratorsToStatic(config, diagnostics, decoratedMembers, watchable, newMembers);
     listenDecoratorsToStatic(diagnostics, decoratedMembers, newMembers);
   }
+
+  validateMethods(diagnostics, classMembers);
 
   return ts.updateClassDeclaration(
     classNode,

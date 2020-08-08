@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { generateReadme } from './output-docs';
 import { isOutputTargetDocsReadme } from '../../output-targets/output-utils';
 

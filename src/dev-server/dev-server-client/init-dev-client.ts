@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import * as c from '../dev-server-constants';
 import { appReset, initAppUpdate } from './app-update';
 import { initBuildProgress, initBuildStatus } from '../client';

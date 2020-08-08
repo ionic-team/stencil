@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { join } from 'path';
 
 export class Cache implements d.Cache {
@@ -121,18 +121,18 @@ export class Cache implements d.Cache {
       }
 
       const fs = this.cacheFs.sys;
-      const cachedFileNames = await fs.readdir(this.config.cacheDir);
+      const cachedFileNames = await fs.readDir(this.config.cacheDir);
       const cachedFilePaths = cachedFileNames.map(f => join(this.config.cacheDir, f));
 
       let totalCleared = 0;
 
       const promises = cachedFilePaths.map(async filePath => {
         const stat = await fs.stat(filePath);
-        const lastModified = stat.mtime.getTime();
+        const lastModified = stat.mtimeMs;
 
         const diff = now - lastModified;
         if (diff > ONE_WEEK) {
-          await fs.unlink(filePath);
+          await fs.removeFile(filePath);
           totalCleared++;
         }
       });

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { catchError, requireFunc, loadTypeScriptDiagnostics, IS_NODE_ENV } from '@utils';
 import { resolve } from 'path';
 

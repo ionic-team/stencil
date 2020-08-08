@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { catchError } from '@utils';
 import { isOutputTargetDistCustomElements } from '../output-utils';
 import { nativeComponentTransform } from '../../transformers/component-native/tranform-to-native-component';

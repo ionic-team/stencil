@@ -12,17 +12,17 @@ export const config: Config = {
   tsconfig: 'tsconfig-stencil.json',
   outputTargets: [
     {
-      type: 'www'
+      type: 'www',
+      copy: [
+        { src: '**/*.html' },
+        { src: '**/*.css' },
+        { src: 'noscript.js' }
+      ],
     },
     {
       type: 'dist',
       dir: 'test-dist'
     }
-  ],
-  copy: [
-    { src: '**/*.html' },
-    { src: '**/*.css' },
-    { src: 'noscript.js' }
   ],
   globalScript: 'test-app/global.ts',
   globalStyle: 'test-app/style-plugin/global-sass-entry.scss',
@@ -33,10 +33,16 @@ export const config: Config = {
     postcss(),
     stylus()
   ],
+  buildEs5: true,
   extras: {
     appendChildSlotFix: true,
     cloneNodeFix: true,
+    cssVarsShim: true,
+    dynamicImportShim: true,
     lifecycleDOMEvents: true,
+    safari10: true,
+    scriptDataOpts: true,
+    shadowDomShim: true,
     slotChildNodesFix: true,
   },
   devServer: {

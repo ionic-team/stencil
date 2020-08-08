@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { join, relative } from 'path';
 
 export const getAbsoluteBuildDir = (outputTarget: d.OutputTargetWww) => {

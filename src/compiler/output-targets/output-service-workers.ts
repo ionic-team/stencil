@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { generateServiceWorker } from '../service-worker/generate-sw';
 import { isOutputTargetWww } from './output-utils';
 

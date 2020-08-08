@@ -1,15 +1,15 @@
-import { Component, Element, Host, h } from '@stencil/core';
+import { Component, Element, Host, h, forceUpdate } from '@stencil/core';
 
 @Component({
   tag: 'slot-cmp-container',
   styles: ':host { display: block; margin: 5em; }',
-  shadow: true
+  shadow: true,
 })
 export class PropCmp {
   @Element() host: HTMLPropCmpElement;
 
   componentDidLoad() {
-    setTimeout(() => this.host.forceUpdate(), 1);
+    setTimeout(() => forceUpdate(this.host), 1);
   }
 
   render() {

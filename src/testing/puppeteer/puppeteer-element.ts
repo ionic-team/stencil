@@ -1,6 +1,6 @@
-import { EventInitDict, HostElement, SerializedEvent } from '@stencil/core/internal';
-import * as pd from './puppeteer-declarations';
-import * as puppeteer from 'puppeteer';
+import type { EventInitDict, HostElement, SerializedEvent } from '@stencil/core/internal';
+import type * as pd from './puppeteer-declarations';
+import type * as puppeteer from 'puppeteer';
 import { EventSpy, addE2EListener, waitForEvent } from './puppeteer-events';
 import { MockHTMLElement, cloneAttributes, parseHtmlToFragment } from '@stencil/core/mock-doc';
 

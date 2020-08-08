@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { buildAbort, buildFinish } from './build-finish';
 import { catchError, isString, readPackageJson } from '@utils';
 import { createDocument } from '@stencil/core/mock-doc';

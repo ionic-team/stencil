@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { buildError, isBoolean, isNumber, isString, normalizePath } from '@utils';
 import { isAbsolute, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';

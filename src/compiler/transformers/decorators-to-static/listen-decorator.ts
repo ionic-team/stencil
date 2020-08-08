@@ -1,5 +1,5 @@
-import * as d from '../../../declarations';
-import { augmentDiagnosticWithNode, buildError, buildWarn, flatOne } from '@utils';
+import type * as d from '../../../declarations';
+import { augmentDiagnosticWithNode, buildError, flatOne } from '@utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
@@ -30,40 +30,22 @@ const parseListenDecorators = (diagnostics: d.Diagnostic[], method: ts.MethodDec
       augmentDiagnosticWithNode(err, listenDecorator);
     }
 
-    return parseListener(diagnostics, eventNames[0], listenOptions, methodName, listenDecorator);
+    const listener = parseListener(eventNames[0], listenOptions, methodName);
+    if (listener.target === ('parent' as any)) {
+      const err = buildError(diagnostics);
+      err.messageText = 'The "parent" target is no longer available as of Stencil 2. Please use "window", "document" or "body" instead.';
+      augmentDiagnosticWithNode(err, listenDecorator);
+    }
+    return listener;
   });
 };
 
-export const parseListener = (diagnostics: d.Diagnostic[], eventName: string, opts: d.ListenOptions = {}, methodName: string, decoratorNode: ts.Decorator) => {
-  let rawEventName = eventName.trim();
-  let target = opts.target;
-
-  // DEPRECATED: handle old syntax (`TARGET:event`)
-  if (!target) {
-    const splt = eventName.split(':');
-    const prefix = splt[0].toLowerCase().trim();
-    if (splt.length > 1 && isValidTargetValue(prefix)) {
-      rawEventName = splt[1].trim();
-      target = prefix;
-      const warn = buildWarn(diagnostics);
-      warn.messageText = `Deprecated @Listen() feature on "${methodName}". Use @Listen('${rawEventName}', { target: '${prefix}' }) instead.`;
-      augmentDiagnosticWithNode(warn, decoratorNode);
-    }
-  }
-
-  // DEPRECATED: handle keycode syntax (`event:KEY`)
-  const [finalEvent, keycode, rest] = rawEventName.split('.');
-  if (rest === undefined && isValidKeycodeSuffix(keycode)) {
-    rawEventName = finalEvent;
-    const warn = buildError(diagnostics);
-    warn.messageText = `Deprecated @Listen() feature on "${methodName}". Using "${rawEventName}" is no longer supported, use "event.key" within the function itself instead.`;
-    augmentDiagnosticWithNode(warn, decoratorNode);
-  }
-
+export const parseListener = (eventName: string, opts: d.ListenOptions = {}, methodName: string) => {
+  const rawEventName = eventName.trim();
   const listener: d.ComponentCompilerListener = {
     name: rawEventName,
     method: methodName,
-    target,
+    target: opts.target,
     capture: typeof opts.capture === 'boolean' ? opts.capture : false,
     passive:
       typeof opts.passive === 'boolean'
@@ -72,14 +54,6 @@ export const parseListener = (diagnostics: d.Diagnostic[], eventName: string, op
           PASSIVE_TRUE_DEFAULTS.has(rawEventName.toLowerCase()),
   };
   return listener;
-};
-
-export const isValidTargetValue = (prefix: string): prefix is d.ListenTargetOptions => {
-  return VALID_ELEMENT_REF_PREFIXES.has(prefix);
-};
-
-export const isValidKeycodeSuffix = (prefix: string) => {
-  return VALID_KEYCODE_SUFFIX.has(prefix);
 };
 
 const PASSIVE_TRUE_DEFAULTS = new Set([
@@ -116,7 +90,3 @@ const PASSIVE_TRUE_DEFAULTS = new Set([
   'touchcancel',
   'wheel',
 ]);
-
-const VALID_ELEMENT_REF_PREFIXES = new Set(['parent', 'body', 'document', 'window']);
-
-const VALID_KEYCODE_SUFFIX = new Set(['enter', 'escape', 'space', 'tab', 'up', 'right', 'down', 'left']);

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { dirname } from 'path';
 import { isString, parsePackageJson } from '@utils';
 import { parseCollection } from './parse-collection-module';

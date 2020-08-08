@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { gatherVdomMeta } from './vdom';
 import { H } from '../core-runtime-apis';
 import ts from 'typescript';

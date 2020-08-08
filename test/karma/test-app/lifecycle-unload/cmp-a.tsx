@@ -2,10 +2,9 @@ import { Component, Element, h } from '@stencil/core';
 
 @Component({
   tag: 'lifecycle-unload-a',
-  shadow: true
+  shadow: true,
 })
 export class LifecycleUnloadA {
-
   @Element() el!: HTMLElement;
   results?: HTMLDivElement | null;
 
@@ -13,7 +12,7 @@ export class LifecycleUnloadA {
     this.results = this.el.ownerDocument!.body.querySelector('#lifecycle-unload-results') as HTMLDivElement;
   }
 
-  componentDidUnload() {
+  disconnectedCallback() {
     const elm = document.createElement('div');
     elm.textContent = 'cmp-a unload';
     this.results!.appendChild(elm);

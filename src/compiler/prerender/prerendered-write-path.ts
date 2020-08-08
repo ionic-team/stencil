@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import path from 'path';
 
 export const getWriteFilePathFromUrlPath = (manager: d.PrerenderManager, inputHref: string) => {

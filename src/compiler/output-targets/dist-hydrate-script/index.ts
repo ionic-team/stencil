@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { generateHydrateApp } from './generate-hydrate-app';
 import { isOutputTargetHydrate } from '../output-utils';
 
@@ -6,7 +6,7 @@ export const outputHydrateScript = async (config: d.Config, compilerCtx: d.Compi
   if (!config.buildDist) {
     return;
   }
-  
+
   const hydrateOutputTargets = config.outputTargets.filter(isOutputTargetHydrate);
   if (hydrateOutputTargets.length > 0) {
     const timespan = buildCtx.createTimeSpan(`generate hydrate app started`);

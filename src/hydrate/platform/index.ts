@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { addHostEventListeners } from '@runtime';
 
 export const cmpModules = new Map<string, { [exportName: string]: d.ComponentConstructor }>();

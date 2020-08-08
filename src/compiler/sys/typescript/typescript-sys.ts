@@ -1,19 +1,11 @@
 import type * as d from '../../../declarations';
-import { basename } from 'path';
+import { basename, resolve } from 'path';
+import { exit, getCurrentDirectory, getExecutingFilePath, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, isRemoteUrl, isString, normalizePath, noop } from '@utils';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
-import { IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, isRemoteUrl, isString, normalizePath } from '@utils';
-import type ts from 'typescript';
+import { patchTypeScriptResolveModule } from './typescript-resolve-module';
+import ts from 'typescript';
 
-export const patchTypeScriptSys = (loadedTs: typeof ts, config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
-  loadedTs.sys = loadedTs.sys || ({} as ts.System);
-
-  if (config.sys) {
-    patchTsSystemFileSystem(config, config.sys, inMemoryFs, loadedTs, loadedTs.sys);
-    patchTsSystemWatch(config.sys, loadedTs, loadedTs.sys);
-  }
-};
-
-export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, loadedTs: typeof ts, tsSys: ts.System) => {
+export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, tsSys: ts.System) => {
   const realpath = (path: string) => {
     const rp = stencilSys.realpathSync(path);
     if (isString(rp)) {
@@ -24,7 +16,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
 
   const getAccessibleFileSystemEntries = (path: string) => {
     try {
-      const entries = stencilSys.readdirSync(path || '.').sort();
+      const entries = stencilSys.readDirSync(path || '.').sort();
       const files: string[] = [];
       const directories: string[] = [];
 
@@ -52,7 +44,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
   tsSys.getCurrentDirectory = stencilSys.getCurrentDirectory;
 
   tsSys.createDirectory = p => {
-    stencilSys.mkdirSync(p, { recursive: true });
+    stencilSys.createDirSync(p, { recursive: true });
   };
 
   tsSys.directoryExists = p => {
@@ -74,7 +66,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
   };
 
   tsSys.getDirectories = p => {
-    const items = stencilSys.readdirSync(p);
+    const items = stencilSys.readDirSync(p);
     return items.filter(itemPath => {
       const s = inMemoryFs.statSync(itemPath);
       return !!(s && s.exists && s.isDirectory);
@@ -83,7 +75,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
 
   tsSys.readDirectory = (path, extensions, exclude, include, depth) => {
     const cwd = stencilSys.getCurrentDirectory();
-    return (loadedTs as any).matchFiles(path, extensions, exclude, include, IS_CASE_SENSITIVE_FILE_NAMES, cwd, depth, getAccessibleFileSystemEntries, realpath);
+    return (ts as any).matchFiles(path, extensions, exclude, include, IS_CASE_SENSITIVE_FILE_NAMES, cwd, depth, getAccessibleFileSystemEntries, realpath);
   };
 
   tsSys.readFile = p => {
@@ -115,7 +107,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
   return tsSys;
 };
 
-const patchTsSystemWatch = (stencilSys: d.CompilerSystem, loadedTs: typeof ts, tsSys: ts.System) => {
+const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
   tsSys.watchDirectory = (p, cb, recursive) => {
     const watcher = stencilSys.watchDirectory(
       p,
@@ -134,11 +126,11 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, loadedTs: typeof ts, t
   tsSys.watchFile = (p, cb) => {
     const watcher = stencilSys.watchFile(p, (filePath, eventKind) => {
       if (eventKind === 'fileAdd') {
-        cb(filePath, loadedTs.FileWatcherEventKind.Created);
+        cb(filePath, ts.FileWatcherEventKind.Created);
       } else if (eventKind === 'fileUpdate') {
-        cb(filePath, loadedTs.FileWatcherEventKind.Changed);
+        cb(filePath, ts.FileWatcherEventKind.Changed);
       } else if (eventKind === 'fileDelete') {
-        cb(filePath, loadedTs.FileWatcherEventKind.Deleted);
+        cb(filePath, ts.FileWatcherEventKind.Deleted);
       }
     });
     return {
@@ -148,6 +140,45 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, loadedTs: typeof ts, t
     };
   };
 };
+
+export const patchTypescript = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+  if (!(ts as any).__patched) {
+    if (config.sys) {
+      patchTsSystemFileSystem(config, config.sys, inMemoryFs, ts.sys);
+      patchTsSystemWatch(config.sys, ts.sys);
+    }
+    patchTypeScriptResolveModule(config, inMemoryFs);
+    patchTypeScriptGetParsedCommandLineOfConfigFile();
+    (ts as any).__patched = true;
+  }
+};
+
+const patchTypeScriptSysMinimum = () => {
+  if (!ts.sys) {
+    // patches just the bare minimum
+    // if ts.sys already exists then it must be node ts.sys
+    // otherwise we're either browser or deno
+    // will be updated later on with the stencil sys
+    ts.sys = {
+      args: [],
+      createDirectory: noop,
+      directoryExists: () => false,
+      exit,
+      fileExists: () => false,
+      getCurrentDirectory,
+      getDirectories: () => [],
+      getExecutingFilePath,
+      readDirectory: () => [],
+      readFile: noop,
+      newLine: '\n',
+      resolvePath: resolve,
+      useCaseSensitiveFileNames: false,
+      write: noop,
+      writeFile: noop,
+    };
+  }
+};
+patchTypeScriptSysMinimum();
 
 export const getTypescriptPathFromUrl = (config: d.Config, tsExecutingUrl: string, url: string) => {
   const tsBaseUrl = new URL('..', tsExecutingUrl).href;
@@ -159,10 +190,10 @@ export const getTypescriptPathFromUrl = (config: d.Config, tsExecutingUrl: strin
   return url;
 };
 
-export const patchTypeScriptGetParsedCommandLineOfConfigFile = (loadedTs: typeof ts) => {
-  const orgGetParsedCommandLineOfConfigFile = loadedTs.getParsedCommandLineOfConfigFile;
+export const patchTypeScriptGetParsedCommandLineOfConfigFile = () => {
+  const orgGetParsedCommandLineOfConfigFile = ts.getParsedCommandLineOfConfigFile;
 
-  loadedTs.getParsedCommandLineOfConfigFile = (configFileName, optionsToExtend, host, extendedConfigCache) => {
+  ts.getParsedCommandLineOfConfigFile = (configFileName, optionsToExtend, host, extendedConfigCache) => {
     const results = orgGetParsedCommandLineOfConfigFile(configFileName, optionsToExtend, host, extendedConfigCache);
 
     // manually filter out any .spec or .e2e files

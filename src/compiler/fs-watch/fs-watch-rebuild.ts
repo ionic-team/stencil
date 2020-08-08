@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { basename } from 'path';
 import { unique } from '@utils';
 
@@ -39,11 +39,7 @@ export const hasStyleChanges = (buildCtx: d.BuildCtx) => {
   });
 };
 
-const getExt = (filePath: string) =>
-  filePath
-    .split('.')
-    .pop()
-    .toLowerCase();
+const getExt = (filePath: string) => filePath.split('.').pop().toLowerCase();
 
 const SCRIPT_EXT = ['ts', 'tsx', 'js', 'jsx'];
 export const isScriptExt = (ext: string) => SCRIPT_EXT.includes(ext);

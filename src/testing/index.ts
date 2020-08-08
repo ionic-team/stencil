@@ -9,6 +9,6 @@ export { newSpecPage } from './spec-page';
 export { shuffleArray } from './testing-utils';
 export { transpile } from './test-transpile';
 
-export { EventSpy, SpecPage, Testing } from '@stencil/core/internal';
+export type { EventSpy, SpecPage, Testing } from '@stencil/core/internal';
 
 export { E2EElement, E2EPage, newE2EPage } from './puppeteer';

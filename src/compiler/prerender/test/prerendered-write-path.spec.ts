@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { getWriteFilePathFromUrlPath } from '../prerendered-write-path';
 import { mockConfig } from '@stencil/core/testing';
 import { validateWww } from '../../config/outputs/validate-www';

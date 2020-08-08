@@ -1,5 +1,5 @@
 import { Config, ConfigBundle, Diagnostic } from '../../declarations';
-import { buildError, buildWarn, isBoolean, isNumber, sortBy } from '@utils';
+import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
 import { setBooleanConfig } from './config-utils';
 import { validateDevServer } from './validate-dev-server';
 import { validateDistNamespace } from './validate-namespace';
@@ -31,15 +31,17 @@ export const validateConfig = (userConfig?: Config) => {
   config.extras = config.extras || {};
   config.extras.appendChildSlotFix = !!config.extras.appendChildSlotFix;
   config.extras.cloneNodeFix = !!config.extras.cloneNodeFix;
-  config.extras.cssVarsShim = config.extras.cssVarsShim !== false;
-  config.extras.dynamicImportShim = config.extras.dynamicImportShim !== false;
+  config.extras.cssVarsShim = !!config.extras.cssVarsShim;
+  config.extras.dynamicImportShim = !!config.extras.dynamicImportShim;
   config.extras.lifecycleDOMEvents = !!config.extras.lifecycleDOMEvents;
-  config.extras.safari10 = config.extras.safari10 !== false;
-  config.extras.scriptDataOpts = config.extras.scriptDataOpts !== false;
-  config.extras.shadowDomShim = config.extras.shadowDomShim !== false;
+  config.extras.safari10 = !!config.extras.safari10;
+  config.extras.scriptDataOpts = !!config.extras.scriptDataOpts;
+  config.extras.shadowDomShim = !!config.extras.shadowDomShim;
   config.extras.slotChildNodesFix = !!config.extras.slotChildNodesFix;
-  config.extras.initializeNextTick = config.extras.initializeNextTick !== false;
+  config.extras.initializeNextTick = !!config.extras.initializeNextTick;
   config.extras.tagNameTransform = !!config.extras.tagNameTransform;
+
+  config.buildEs5 = !!config.buildEs5;
 
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
@@ -47,7 +49,6 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'watch', 'watch', false);
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
-  setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
   setBooleanConfig(config, 'buildDocs', 'docs', !config.devMode);
   setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
   setBooleanConfig(config, 'profile', 'profile', config.devMode);
@@ -57,11 +58,8 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'validateTypes', null, !config._isTesting);
   setBooleanConfig(config, 'allowInlineScripts', null, true);
 
-  if (typeof config.taskQueue !== 'string') {
-    config.taskQueue = 'congestionAsync';
-  } else if (config.taskQueue === ('sync' as any)) {
-    // deprecated 1.12.1
-    config.taskQueue = 'immediate';
+  if (!isString(config.taskQueue)) {
+    config.taskQueue = 'async';
   }
 
   // hash file names
@@ -111,9 +109,6 @@ export const validateConfig = (userConfig?: Config) => {
     config.bundles = [];
   }
 
-  // Default copy
-  config.copy = config.copy || [];
-
   // validate how many workers we can use
   validateWorkers(config);
 
@@ -125,16 +120,6 @@ export const validateConfig = (userConfig?: Config) => {
   }
 
   setBooleanConfig(config, 'enableCache', 'cache', true);
-
-  if (config.excludeSrc) {
-    const warn = buildWarn(diagnostics);
-    warn.messageText = `"excludeSrc" is deprecated, use the "exclude" option in tsconfig.json`;
-  }
-
-  if (config.includeSrc) {
-    const warn = buildWarn(diagnostics);
-    warn.messageText = `"includeSrc" is deprecated, use the "include" option in tsconfig.json`;
-  }
 
   return {
     config,

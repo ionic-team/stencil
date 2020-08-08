@@ -14,6 +14,7 @@ import { sysModulesPlugin } from './plugins/sys-modules-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { BuildOptions } from '../utils/options';
 import { RollupOptions, OutputChunk } from 'rollup';
+import { typescriptSourcePlugin } from './plugins/typescript-source-plugin';
 import terser from 'terser';
 
 export async function compiler(opts: BuildOptions) {
@@ -46,16 +47,22 @@ export async function compiler(opts: BuildOptions) {
       intro: cjsIntro,
       outro: cjsOutro,
       strict: false,
-      banner: getBanner(opts, 'Stencil Compiler', true),
+      banner: getBanner(opts, `Stencil Compiler`, true),
       esModule: false,
       preferConst: true,
+      freeze: false,
+      sourcemap: false,
     },
     plugins: [
+      typescriptSourcePlugin(opts),
       {
         name: 'compilerMockDocResolvePlugin',
         resolveId(id) {
           if (id === '@stencil/core/mock-doc') {
             return join(opts.buildDir, 'mock-doc', 'index.js');
+          }
+          if (id === '@microsoft/typescript-etw' || id === 'inspector') {
+            return id;
           }
           return null;
         },
@@ -68,7 +75,7 @@ export async function compiler(opts: BuildOptions) {
           }
         },
         load(id) {
-          if (id === 'fsevents') {
+          if (id === 'fsevents' || id === '@microsoft/typescript-etw' || id === 'inspector') {
             return '';
           }
           if (id === rollupWatchPath) {
@@ -107,7 +114,7 @@ export async function compiler(opts: BuildOptions) {
           if (opts.isProd) {
             const compilerFilename = Object.keys(bundleFiles).find(f => f.includes('stencil'));
             const compilerBundle = bundleFiles[compilerFilename] as OutputChunk;
-            const minified = minifyStencilCompiler(compilerBundle.code);
+            const minified = minifyStencilCompiler(compilerBundle.code, opts);
             await fs.writeFile(join(opts.output.compilerDir, compilerFilename.replace('.js', '.min.js')), minified);
           }
         },
@@ -118,28 +125,47 @@ export async function compiler(opts: BuildOptions) {
       propertyReadSideEffects: false,
       unknownGlobalSideEffects: false,
     },
+    onwarn(warning) {
+      if (warning.code === `THIS_IS_UNDEFINED`) {
+        return;
+      }
+      console.warn(warning.message || warning);
+    },
   };
+
+  // copy typescript default lib dts files
+  const dtsFiles = (await fs.readdir(opts.typescriptLibDir)).filter(f => {
+    return f.startsWith('lib.') && f.endsWith('.d.ts');
+  });
+
+  await Promise.all(dtsFiles.map(f => fs.copy(join(opts.typescriptLibDir, f), join(opts.output.compilerDir, f))));
 
   return [compilerBundle];
 }
 
-function minifyStencilCompiler(code: string) {
-  const opts: terser.MinifyOptions = {
-    ecma: 2017,
+function minifyStencilCompiler(code: string, opts: BuildOptions) {
+  const minifyOpts: terser.MinifyOptions = {
+    ecma: 2018,
     compress: {
+      ecma: 2018,
       passes: 2,
-      ecma: 2017,
+      side_effects: false,
+      unsafe_arrows: true,
+      unsafe_methods: true,
     },
     output: {
-      ecma: 2017,
+      ecma: 2018,
+      comments: false,
     },
   };
 
-  const minifyResults = terser.minify(code, opts);
+  const results = terser.minify(code, minifyOpts);
 
-  if (minifyResults.error) {
-    throw minifyResults.error;
+  if (results.error) {
+    throw results.error;
   }
 
-  return minifyResults.code;
+  code = getBanner(opts, `Stencil Compiler`, true) + '\n' + results.code;
+
+  return code;
 }

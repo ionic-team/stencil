@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { addImports } from '../add-imports';
 import { addLegacyApis } from '../core-runtime-apis';
 import { addModuleMetadataProxies } from '../add-component-meta-proxy';

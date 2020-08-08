@@ -1,10 +1,9 @@
 import type {
   CompilerSystem,
-  CompilerSystemMakeDirectoryResults,
+  CompilerSystemCreateDirectoryResults,
   CompilerSystemRealpathResults,
-  CompilerSystemUnlinkResults,
+  CompilerSystemRemoveFileResults,
   CompilerSystemWriteFileResults,
-  Diagnostic,
 } from '../../declarations';
 import { asyncGlob, nodeCopyTasks } from './node-copy-tasks';
 import { buildEvents } from '../../compiler/events';
@@ -16,75 +15,11 @@ import fs from 'graceful-fs';
 import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
 import { NodeWorkerController } from './node-worker-controller';
-import { normalizePath, requireFunc, buildError, isFunction } from '@utils';
+import { normalizePath, isFunction } from '@utils';
 import path from 'path';
 import type TypeScript from 'typescript';
 
 export function createNodeSys(c: { process?: any } = {}) {
-  const sys = createNodeSysNoWatch(c);
-  const ts = require('typescript') as typeof TypeScript;
-  const tsWatchFile = ts.sys.watchFile;
-  const tsWatchDirectory = ts.sys.watchDirectory;
-
-  sys.watchTimeout = 80;
-  sys.events = buildEvents();
-
-  sys.watchDirectory = (p, callback, recursive) => {
-    const tsFileWatcher = tsWatchDirectory(
-      p,
-      fileName => {
-        fileName = normalizePath(fileName);
-        callback(fileName, null);
-      },
-      recursive,
-    );
-
-    const close = () => {
-      tsFileWatcher.close();
-    };
-
-    sys.addDestory(close);
-
-    return {
-      close() {
-        sys.removeDestory(close);
-        tsFileWatcher.close();
-      },
-    };
-  };
-
-  sys.watchFile = (p, callback) => {
-    const tsFileWatcher = tsWatchFile(p, (fileName, tsEventKind) => {
-      fileName = normalizePath(fileName);
-      if (tsEventKind === ts.FileWatcherEventKind.Created) {
-        callback(fileName, 'fileAdd');
-        sys.events.emit('fileAdd', fileName);
-      } else if (tsEventKind === ts.FileWatcherEventKind.Changed) {
-        callback(fileName, 'fileUpdate');
-        sys.events.emit('fileUpdate', fileName);
-      } else if (tsEventKind === ts.FileWatcherEventKind.Deleted) {
-        callback(fileName, 'fileDelete');
-        sys.events.emit('fileDelete', fileName);
-      }
-    });
-
-    const close = () => {
-      tsFileWatcher.close();
-    };
-    sys.addDestory(close);
-
-    return {
-      close() {
-        sys.removeDestory(close);
-        tsFileWatcher.close();
-      },
-    };
-  };
-
-  return sys;
-}
-
-export function createNodeSysNoWatch(c: { process?: any } = {}) {
   const prcs: NodeJS.Process = c.process || global.process;
   const destroys = new Set<() => Promise<void> | void>();
   const onInterruptsCallbacks: (() => void)[] = [];
@@ -93,15 +28,15 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
   const hardwareConcurrency = sysCpus.length;
   const osPlatform = platform();
 
+  const compilerExecutingPath = path.join(__dirname, '..', '..', 'compiler', 'stencil.js');
+  const devServerExecutingPath = path.join(__dirname, '..', '..', 'dev-server', 'index.js');
+
   const sys: CompilerSystem = {
     name: 'node',
     version: prcs.versions.node,
     access(p) {
       return new Promise(resolve => {
-        fs.access(p, err => {
-          const hasAccess = !err;
-          resolve(hasAccess);
-        });
+        fs.access(p, err => resolve(!err));
       });
     },
     accessSync(p) {
@@ -154,6 +89,46 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
         });
       });
     },
+    createDir(p, opts) {
+      return new Promise(resolve => {
+        if (opts) {
+          fs.mkdir(p, opts, err => {
+            resolve({
+              basename: path.basename(p),
+              dirname: path.dirname(p),
+              path: p,
+              newDirs: [],
+              error: err,
+            });
+          });
+        } else {
+          fs.mkdir(p, err => {
+            resolve({
+              basename: path.basename(p),
+              dirname: path.dirname(p),
+              path: p,
+              newDirs: [],
+              error: err,
+            });
+          });
+        }
+      });
+    },
+    createDirSync(p, opts) {
+      const results: CompilerSystemCreateDirectoryResults = {
+        basename: path.basename(p),
+        dirname: path.dirname(p),
+        path: p,
+        newDirs: [],
+        error: null,
+      };
+      try {
+        fs.mkdirSync(p, opts);
+      } catch (e) {
+        results.error = e;
+      }
+      return results;
+    },
     createWorkerController(maxConcurrentWorkers) {
       const forkModulePath = path.join(__dirname, 'worker.js');
       return new NodeWorkerController(forkModulePath, maxConcurrentWorkers);
@@ -176,26 +151,15 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
       destroys.clear();
     },
     dynamicImport(p) {
-      return Promise.resolve(requireFunc(p));
+      return Promise.resolve(require(p));
     },
     encodeToBase64(str) {
       return Buffer.from(str).toString('base64');
     },
     async ensureDependencies() {
-      const diagnostics: Diagnostic[] = [];
-      let typescriptPath: string = null;
-      try {
-        typescriptPath = require.resolve('typescript');
-      } catch (e) {
-        const diagnostic = buildError(diagnostics);
-        diagnostic.header = `Unable to find TypeScript`;
-        diagnostic.messageText = `Please ensure you install the dependencies first, for example: "npm install"`;
-      }
-
       return {
         stencilPath: sys.getCompilerExecutingPath(),
-        typescriptPath,
-        diagnostics,
+        diagnostics: [],
       };
     },
     async ensureResources() {},
@@ -204,10 +168,10 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
       return normalizePath(prcs.cwd());
     },
     getCompilerExecutingPath() {
-      return path.join(__dirname, '..', '..', 'compiler', 'stencil.js');
+      return compilerExecutingPath;
     },
     getDevServerExecutingPath() {
-      return path.join(__dirname, '..', '..', 'dev-server', 'index.js');
+      return devServerExecutingPath;
     },
     getEnvironmentVar(key) {
       return process.env[key];
@@ -235,46 +199,6 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
         }
       });
     },
-    mkdir(p, opts) {
-      return new Promise(resolve => {
-        if (opts) {
-          fs.mkdir(p, opts, err => {
-            resolve({
-              basename: path.basename(p),
-              dirname: path.dirname(p),
-              path: p,
-              newDirs: [],
-              error: err,
-            });
-          });
-        } else {
-          fs.mkdir(p, err => {
-            resolve({
-              basename: path.basename(p),
-              dirname: path.dirname(p),
-              path: p,
-              newDirs: [],
-              error: err,
-            });
-          });
-        }
-      });
-    },
-    mkdirSync(p, opts) {
-      const results: CompilerSystemMakeDirectoryResults = {
-        basename: path.basename(p),
-        dirname: path.dirname(p),
-        path: p,
-        newDirs: [],
-        error: null,
-      };
-      try {
-        fs.mkdirSync(p, opts);
-      } catch (e) {
-        results.error = e;
-      }
-      return results;
-    },
     nextTick: prcs.nextTick,
     normalizePath,
     onProcessInterrupt: cb => {
@@ -283,7 +207,7 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
       }
     },
     platformPath: path,
-    readdir(p) {
+    readDir(p) {
       return new Promise(resolve => {
         fs.readdir(p, (err, files) => {
           if (err) {
@@ -298,7 +222,7 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
         });
       });
     },
-    readdirSync(p) {
+    readDirSync(p) {
       try {
         return fs.readdirSync(p).map(f => {
           return normalizePath(path.join(p, f));
@@ -351,7 +275,7 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
     resolvePath(p) {
       return normalizePath(p);
     },
-    rmdir(p, opts) {
+    removeDir(p, opts) {
       return new Promise(resolve => {
         const recursive = !!(opts && opts.recursive);
         if (recursive) {
@@ -365,7 +289,7 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
         }
       });
     },
-    rmdirSync(p, opts) {
+    removeDirSync(p, opts) {
       try {
         const recursive = !!(opts && opts.recursive);
         if (recursive) {
@@ -378,27 +302,7 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
         return { basename: path.basename(p), dirname: path.dirname(p), path: p, removedDirs: [], removedFiles: [], error: e };
       }
     },
-    stat(p) {
-      return new Promise(resolve => {
-        fs.stat(p, (err, s) => {
-          if (err) {
-            resolve(undefined);
-          } else {
-            resolve(s);
-          }
-        });
-      });
-    },
-    statSync(p) {
-      try {
-        return fs.statSync(p);
-      } catch (e) {}
-      return undefined;
-    },
-    tmpdir() {
-      return tmpdir();
-    },
-    unlink(p) {
+    removeFile(p) {
       return new Promise(resolve => {
         fs.unlink(p, err => {
           resolve({
@@ -410,8 +314,8 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
         });
       });
     },
-    unlinkSync(p) {
-      const results: CompilerSystemUnlinkResults = {
+    removeFileSync(p) {
+      const results: CompilerSystemRemoveFileResults = {
         basename: path.basename(p),
         dirname: path.dirname(p),
         path: p,
@@ -423,6 +327,117 @@ export function createNodeSysNoWatch(c: { process?: any } = {}) {
         results.error = e;
       }
       return results;
+    },
+    setupCompiler(c) {
+      const ts: typeof TypeScript = c.ts;
+      const tsSysWatchDirectory = ts.sys.watchDirectory;
+      const tsSysWatchFile = ts.sys.watchFile;
+
+      sys.watchTimeout = 80;
+
+      sys.events = buildEvents();
+
+      sys.watchDirectory = (p, callback, recursive) => {
+        const tsFileWatcher = tsSysWatchDirectory(
+          p,
+          fileName => {
+            fileName = normalizePath(fileName);
+            callback(fileName, null);
+          },
+          recursive,
+        );
+
+        const close = () => {
+          tsFileWatcher.close();
+        };
+
+        sys.addDestory(close);
+
+        return {
+          close() {
+            sys.removeDestory(close);
+            tsFileWatcher.close();
+          },
+        };
+      };
+
+      sys.watchFile = (p, callback) => {
+        const tsFileWatcher = tsSysWatchFile(p, (fileName, tsEventKind) => {
+          fileName = normalizePath(fileName);
+          if (tsEventKind === ts.FileWatcherEventKind.Created) {
+            callback(fileName, 'fileAdd');
+            sys.events.emit('fileAdd', fileName);
+          } else if (tsEventKind === ts.FileWatcherEventKind.Changed) {
+            callback(fileName, 'fileUpdate');
+            sys.events.emit('fileUpdate', fileName);
+          } else if (tsEventKind === ts.FileWatcherEventKind.Deleted) {
+            callback(fileName, 'fileDelete');
+            sys.events.emit('fileDelete', fileName);
+          }
+        });
+
+        const close = () => {
+          tsFileWatcher.close();
+        };
+        sys.addDestory(close);
+
+        return {
+          close() {
+            sys.removeDestory(close);
+            tsFileWatcher.close();
+          },
+        };
+      };
+    },
+    stat(p) {
+      return new Promise(resolve => {
+        fs.stat(p, (err, fsStat) => {
+          if (err) {
+            resolve({
+              isDirectory: false,
+              isFile: false,
+              isSymbolicLink: false,
+              size: 0,
+              mtimeMs: 0,
+              error: err,
+            });
+          } else {
+            resolve({
+              isDirectory: fsStat.isDirectory(),
+              isFile: fsStat.isFile(),
+              isSymbolicLink: fsStat.isSymbolicLink(),
+              size: fsStat.size,
+              mtimeMs: fsStat.mtimeMs,
+              error: null,
+            });
+          }
+        });
+      });
+    },
+    statSync(p) {
+      try {
+        const fsStat = fs.statSync(p);
+        return {
+          isDirectory: fsStat.isDirectory(),
+          isFile: fsStat.isFile(),
+          isSymbolicLink: fsStat.isSymbolicLink(),
+          size: fsStat.size,
+          mtimeMs: fsStat.mtimeMs,
+          error: null,
+        };
+      } catch (e) {
+        return {
+          isDirectory: false,
+          isFile: false,
+          isSymbolicLink: false,
+          size: 0,
+          mtimeMs: 0,
+          error: e,
+        };
+      }
+    },
+    tmpDirSync() {
+      return tmpdir();
     },
     writeFile(p, content) {
       return new Promise(resolve => {

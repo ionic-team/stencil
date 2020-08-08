@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { PLATFORM_FLAGS } from './runtime-constants';
@@ -7,7 +7,7 @@ import { plt, supportsShadow, getHostRef } from '@platform';
 export const patchCloneNode = (HostElementPrototype: any) => {
   const orgCloneNode = HostElementPrototype.cloneNode;
 
-  HostElementPrototype.cloneNode = function(deep?: boolean) {
+  HostElementPrototype.cloneNode = function (deep?: boolean) {
     const srcNode = this;
     const isShadowDom = BUILD.shadowDom ? srcNode.shadowRoot && supportsShadow : false;
     const clonedNode = orgCloneNode.call(srcNode, isShadowDom ? deep : false) as Node;
@@ -31,7 +31,7 @@ export const patchCloneNode = (HostElementPrototype: any) => {
 
 export const patchSlotAppendChild = (HostElementPrototype: any) => {
   HostElementPrototype.__appendChild = HostElementPrototype.appendChild;
-  HostElementPrototype.appendChild = function(this: d.RenderNode, newChild: d.RenderNode) {
+  HostElementPrototype.appendChild = function (this: d.RenderNode, newChild: d.RenderNode) {
     const slotName = (newChild['s-sn'] = getSlotName(newChild));
     const slotNode = getHostSlotNode(this.childNodes, slotName);
     if (slotNode) {
@@ -75,7 +75,7 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
               result.push(slot);
             }
           }
-          return result
+          return result;
         }
         return FakeNodeList.from(childNodes);
       },

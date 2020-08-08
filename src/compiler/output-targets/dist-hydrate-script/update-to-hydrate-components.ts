@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { dashToPascalCase, sortBy, toTitleCase } from '@utils';
 
 export const updateToHydrateComponents = async (cmps: d.ComponentCompilerMeta[]) => {

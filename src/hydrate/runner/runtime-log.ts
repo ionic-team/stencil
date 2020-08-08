@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { renderCatchError, renderBuildDiagnostic } from './render-utils';
 
 export function runtimeLogging(win: Window & typeof globalThis, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {

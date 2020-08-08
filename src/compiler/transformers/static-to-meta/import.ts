@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { addExternalImport } from '../collections/add-external-import';
 import { isAbsolute, resolve } from 'path';
 import { normalizePath } from '@utils';

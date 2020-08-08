@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { bundleHydrateFactory } from './bundle-hydrate-factory';
 import { catchError, createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { catchError, sortBy } from '@utils';
 import { DEFAULT_STYLE_MODE } from '@utils';
 import { generateComponentBundles } from './component-bundles';

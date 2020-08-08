@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import { catchError } from '@utils';
@@ -10,7 +10,8 @@ import {
   LAZY_EXTERNAL_ENTRY_ID,
   STENCIL_APP_GLOBALS_ID,
   STENCIL_CORE_ID,
-  STENCIL_INTERNAL_CLIENT_PATCH_ID,
+  STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID,
+  STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
   USER_INDEX_ENTRY_ID,
 } from '../../bundle/entry-alias-ids';
 import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
@@ -66,8 +67,6 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
         generateCjs(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
       ]);
 
-      await generateLegacyLoader(config, compilerCtx, outputTargets);
-
       if (componentBundle != null) {
         buildCtx.componentGraph = generateModuleGraph(buildCtx.components, componentBundle);
       }
@@ -97,14 +96,14 @@ const getLazyEntry = (isBrowser: boolean) => {
   s.append(`import { bootstrapLazy } from '${STENCIL_CORE_ID}';\n`);
 
   if (isBrowser) {
-    s.append(`import { patchBrowser } from '${STENCIL_INTERNAL_CLIENT_PATCH_ID}';\n`);
+    s.append(`import { patchBrowser } from '${STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID}';\n`);
     s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
     s.append(`patchBrowser().then(options => {\n`);
     s.append(`  globalScripts();\n`);
     s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
     s.append(`});\n`);
   } else {
-    s.append(`import { patchEsm } from '${STENCIL_INTERNAL_CLIENT_PATCH_ID}';\n`);
+    s.append(`import { patchEsm } from '${STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID}';\n`);
     s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
     s.append(`export const defineCustomElements = (win, options) => {\n`);
     s.append(`  if (typeof window === 'undefined') return Promise.resolve();\n`);
@@ -116,52 +115,4 @@ const getLazyEntry = (isBrowser: boolean) => {
   }
 
   return s.toString();
-};
-
-const generateLegacyLoader = (config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) => {
-  return Promise.all(
-    outputTargets.map(async o => {
-      if (o.legacyLoaderFile) {
-        const loaderContent = getLegacyLoader(config);
-        await compilerCtx.fs.writeFile(o.legacyLoaderFile, loaderContent, { outputTargetType: o.type });
-      }
-    }),
-  );
-};
-
-const getLegacyLoader = (config: d.Config) => {
-  const namespace = config.fsNamespace;
-  return `
-(function(doc){
-  var scriptElm = doc.scripts[doc.scripts.length - 1];
-  var warn = ['[${namespace}] Deprecated script, please remove: ' + scriptElm.outerHTML];
-
-  warn.push('To improve performance it is recommended to set the differential scripts in the head as follows:')
-
-  var parts = scriptElm.src.split('/');
-  parts.pop();
-  parts.push('${namespace}');
-  var url = parts.join('/');
-
-  var scriptElm = doc.createElement('script');
-  scriptElm.setAttribute('type', 'module');
-  scriptElm.src = url + '/${namespace}.esm.js';
-  warn.push(scriptElm.outerHTML);
-  scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
-  doc.head.appendChild(scriptElm);
-
-  ${
-    config.buildEs5 &&
-    `
-  scriptElm = doc.createElement('script');
-  scriptElm.setAttribute('nomodule', '');
-  scriptElm.src = url + '/${namespace}.js';
-  warn.push(scriptElm.outerHTML);
-  scriptElm.setAttribute('data-stencil-namespace', '${namespace}');
-  doc.head.appendChild(scriptElm)
-  `
-  }
-  console.warn(warn.join('\\n'));
-
-})(document);`;
 };

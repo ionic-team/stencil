@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { constrainTimeouts } from '@stencil/core/mock-doc';
 import { renderCatchError } from './render-utils';
 import { runtimeLogging } from './runtime-log';

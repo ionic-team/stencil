@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { COMMON_DIR_FILENAMES, getCommonDirName, getPackageDirPath, isCommonDirModuleFile, shouldFetchModule } from './resolve-utils';
 import { basename, dirname } from 'path';
 import { fetchModuleAsync } from '../fetch/fetch-module-async';
@@ -76,7 +76,7 @@ export const createCustomResolverAsync = (sys: d.CompilerSystem, inMemoryFs: d.I
       if (shouldFetchModule(fsDirPath)) {
         if (basename(fsDirPath) === 'node_modules') {
           // just the /node_modules directory
-          inMemoryFs.sys.mkdirSync(fsDirPath);
+          inMemoryFs.sys.createDirSync(fsDirPath);
           inMemoryFs.clearFileCache(fsDirPath);
           cb(null, true);
           return;

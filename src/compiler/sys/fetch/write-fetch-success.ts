@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { dirname } from 'path';
 import { setPackageVersionByContent } from '../resolve/resolve-utils';
 
@@ -18,9 +18,9 @@ export const writeFetchSuccessSync = (
   while (dir !== '/' && dir !== '') {
     if (inMemoryFs) {
       inMemoryFs.clearFileCache(dir);
-      inMemoryFs.sys.mkdirSync(dir);
+      inMemoryFs.sys.createDirSync(dir);
     } else {
-      sys.mkdirSync(dir);
+      sys.createDirSync(dir);
     }
 
     dir = dirname(dir);
@@ -50,9 +50,9 @@ export const writeFetchSuccessAsync = async (
   while (dir !== '/' && dir !== '') {
     if (inMemoryFs) {
       inMemoryFs.clearFileCache(dir);
-      await inMemoryFs.sys.mkdir(dir);
+      await inMemoryFs.sys.createDir(dir);
     } else {
-      await sys.mkdir(dir);
+      await sys.createDir(dir);
     }
 
     dir = dirname(dir);

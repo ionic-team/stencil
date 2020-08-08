@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { addComponentMetaStatic } from '../add-component-meta-static';
 import { dirname, isAbsolute, join, relative } from 'path';
 import { normalizePath, unique } from '@utils';
@@ -41,7 +41,6 @@ export const parseStaticComponentMeta = (
   const encapsulation = parseStaticEncapsulation(staticMembers);
 
   const cmp: d.ComponentCompilerMeta = {
-    isLegacy: false,
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
     isCollectionDependency,

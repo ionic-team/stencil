@@ -48,9 +48,6 @@
     "test.prod": "npm run test.dist && npm run test.end-to-end && npm run test.jest && npm run test.karma && npm run test.sys.node && npm run test.testing",
     "test.watch": "jest --watch"
   },
-  "dependencies": {
-    "typescript": "3.9.7"
-  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "12.0.0",
     "@rollup/plugin-json": "4.1.0",
@@ -116,11 +113,12 @@
     "sizzle": "^2.3.5",
     "terser": "4.8.0",
     "tslib": "^2.0.0",
+    "typescript": "4.0.0-beta",
     "webpack": "^4.44.0",
     "ws": "7.3.1"
   },
   "engines": {
-    "node": ">=10.13.0",
+    "node": ">=12.10.0",
     "npm": ">=6.0.0"
   },
   "repository": {

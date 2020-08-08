@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { writeLazyModule } from './write-lazy-entry-module';
 import { formatComponentRuntimeMeta, stringifyRuntimeData, hasDependency } from '@utils';
 import { optimizeModule } from '../../optimize/optimize-module';

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { getBuildFeatures } from '../../app-core/app-data';
 
 export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => {

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import type { BundleOptions } from './bundle-interface';
 import { hasError, normalizeFsPath } from '@utils';
 import { isOutputTargetDistCollection } from '../output-targets/output-utils';

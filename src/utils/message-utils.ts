@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { isString } from './helpers';
 
 export const buildError = (diagnostics?: d.Diagnostic[]) => {

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { isOutputTargetDocsCustom } from '../../output-targets/output-utils';
 
 export const generateCustomDocs = async (config: d.Config, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) => {

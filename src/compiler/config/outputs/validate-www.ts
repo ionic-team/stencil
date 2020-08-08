@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { buildError, isBoolean, isString } from '@utils';
 import { COPY, DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww, isOutputTargetDist } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';
@@ -48,7 +48,10 @@ export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userO
     outputs.push({
       type: COPY,
       dir: outputTarget.appDir,
-      copy: validateCopy(outputTarget.copy, [...(config.copy || []), { src: 'assets', warn: false }, { src: 'manifest.json', warn: false }]),
+      copy: validateCopy(outputTarget.copy, [
+        { src: 'assets', warn: false },
+        { src: 'manifest.json', warn: false },
+      ]),
     });
 
     // Generate global style with original name

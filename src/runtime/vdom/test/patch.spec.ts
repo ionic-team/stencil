@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { h, newVNode } from '../h';
 import { patch } from '../vdom-render';
 import { shuffleArray } from '@stencil/core/testing';
@@ -223,7 +223,7 @@ describe('renderer', () => {
         prevElm.className = 'class';
 
         const text = document.createTextNode('Foobar');
-        (<any>text).testProperty = function() {
+        (<any>text).testProperty = function () {
           /**/
         }; // ensures we dont recreate the Text Node
         prevElm.appendChild(text);
@@ -596,7 +596,7 @@ describe('renderer', () => {
           const vnode1 = h(
             'span',
             null,
-            ...arr.map(function(n) {
+            ...arr.map(function (n) {
               return spanNumWithOpacity(n, '1');
             }),
           );
@@ -609,15 +609,13 @@ describe('renderer', () => {
 
           for (i = 0; i < elms; ++i) {
             expect(elm.children[i].innerHTML).toEqual(i.toString());
-            opacities[i] = Math.random()
-              .toFixed(5)
-              .toString();
+            opacities[i] = Math.random().toFixed(5).toString();
           }
 
           const vnode2 = h(
             'span',
             null,
-            ...arr.map(function(n) {
+            ...arr.map(function (n) {
               return spanNumWithOpacity(shufArr[n], opacities[n]);
             }),
           );
@@ -678,7 +676,7 @@ describe('renderer', () => {
 
           patch(vnode1, vnode2);
           expect(map(inner, hostElm.children)).toEqual(
-            arr.filter(function(x) {
+            arr.filter(function (x) {
               return x != null;
             }),
           );
@@ -850,7 +848,7 @@ describe('renderer', () => {
   });
 
   function prop(name: any) {
-    return function(obj: any) {
+    return function (obj: any) {
       return obj[name];
     };
   }

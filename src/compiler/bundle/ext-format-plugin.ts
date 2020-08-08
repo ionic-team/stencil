@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { basename } from 'path';
 import { createJsVarName, normalizeFsPathQuery } from '@utils';
 import type { Plugin, TransformPluginContext } from 'rollup';

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { dirname, extname, join } from 'path';
 
 export const generateHashedCopy = async (config: d.Config, compilerCtx: d.CompilerCtx, path: string) => {

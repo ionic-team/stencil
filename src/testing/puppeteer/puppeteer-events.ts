@@ -1,6 +1,6 @@
-import { SerializedEvent } from '@stencil/core/internal';
-import * as pd from './puppeteer-declarations';
-import * as puppeteer from 'puppeteer';
+import type { SerializedEvent } from '@stencil/core/internal';
+import type * as pd from './puppeteer-declarations';
+import type * as puppeteer from 'puppeteer';
 
 export async function initPageEvents(page: pd.E2EPageInternal) {
   page._e2eEvents = new Map();
@@ -223,7 +223,7 @@ function browserContextEvents() {
     stencilReady();
   } else {
     document.addEventListener('readystatechange', function (e) {
-      if ((e.target as Document).readyState == "complete") {
+      if ((e.target as Document).readyState == 'complete') {
         stencilReady();
       }
     });

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { createStaticGetter } from './transform-utils';
 import { DEFAULT_STYLE_MODE, dashToPascalCase } from '@utils';
 import { getScopeId } from '../style/scope-css';

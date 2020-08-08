@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { addHostEventListeners, doc, getHostRef, nextTick, plt, supportsShadow } from '@platform';
 import { addStyle } from './styles';
 import { attachToAncestor } from './update-component';

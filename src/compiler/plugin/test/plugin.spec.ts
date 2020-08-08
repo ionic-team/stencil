@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { createCompiler } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
@@ -44,7 +44,7 @@ xdescribe('plugin', () => {
 
     function myPlugin() {
       return {
-        transform: function(sourceText: string) {
+        transform: function (sourceText: string) {
           return new Promise(resolve => {
             sourceText += `\nconsole.log('transformed!')`;
             resolve(sourceText);

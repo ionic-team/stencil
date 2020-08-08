@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { normalizePath, IS_NODE_ENV, requireFunc } from '@utils';
 import pathBrowserify from 'path-browserify';
 

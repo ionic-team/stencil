@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import path from 'path';
 import { NodeResolveModule } from './node-resolve-module';
 import { readFile } from './node-fs-promisify';

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 
 export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
   const outputOpts: d.HydrateFactoryOptions = Object.assign(

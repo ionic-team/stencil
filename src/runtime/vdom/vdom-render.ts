@@ -6,7 +6,7 @@
  *
  * Modified for Stencil's renderer and slot projection
  */
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS, HTML_NS, SVG_NS, isDef } from '@utils';
 import { consoleError, doc, plt, supportsShadow } from '@platform';

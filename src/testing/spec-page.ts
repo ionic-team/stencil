@@ -6,7 +6,6 @@ import {
   getHostRef,
   insertVdomAnnotations,
   registerComponents,
-  registerContext,
   registerModule,
   renderVdom,
   resetPlatform,
@@ -17,7 +16,15 @@ import {
   setSupportsShadowDom,
 } from '@stencil/core/internal/testing';
 import { BUILD } from '@app-data';
-import { ComponentCompilerMeta, ComponentRuntimeMeta, ComponentTestingConstructor, HostRef, LazyBundlesRuntimeData, NewSpecPageOptions, SpecPage } from '@stencil/core/internal';
+import type {
+  ComponentCompilerMeta,
+  ComponentRuntimeMeta,
+  ComponentTestingConstructor,
+  HostRef,
+  LazyBundlesRuntimeData,
+  NewSpecPageOptions,
+  SpecPage,
+} from '@stencil/core/internal';
 import { formatLazyBundleRuntimeMeta } from '@utils';
 import { getBuildFeatures } from '../compiler/app-core/app-data';
 import { resetBuildConditionals } from './reset-build-conditionals';
@@ -30,8 +37,6 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   // reset the platform for this new test
   resetPlatform();
   resetBuildConditionals(BUILD);
-
-  registerContext(opts.context);
 
   if (Array.isArray(opts.components)) {
     registerComponents(opts.components);
@@ -125,11 +130,6 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   BUILD.shadowDomShim = false;
   BUILD.safari10 = false;
   BUILD.attachStyles = !!opts.attachStyles;
-
-  (page as any).flush = () => {
-    console.warn(`DEPRECATED: page.flush(), please use page.waitForChanges() instead`);
-    return page.waitForChanges();
-  };
 
   if (typeof opts.url === 'string') {
     page.win.location.href = opts.url;

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { COPY, isOutputTargetDistCustomElementsBundle } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';
 import { isBoolean } from '@utils';
@@ -16,7 +16,7 @@ export const validateCustomElementBundle = (config: d.Config, userOutputs: d.Out
     if (!isBoolean(outputTarget.externalRuntime)) {
       outputTarget.externalRuntime = true;
     }
-    outputTarget.copy = validateCopy(outputTarget.copy, config.copy);
+    outputTarget.copy = validateCopy(outputTarget.copy, []);
 
     if (outputTarget.copy.length > 0) {
       arr.push({
@@ -25,7 +25,7 @@ export const validateCustomElementBundle = (config: d.Config, userOutputs: d.Out
         copy: [...outputTarget.copy],
       });
     }
-    arr.push(outputTarget)
+    arr.push(outputTarget);
 
     return arr;
   }, [] as (d.OutputTargetDistCustomElementsBundle | d.OutputTargetCopy)[]);

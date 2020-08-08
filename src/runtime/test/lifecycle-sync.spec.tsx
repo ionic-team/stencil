@@ -1,6 +1,5 @@
-import { Component, Element, Host, Method, Prop, Watch, h } from '@stencil/core';
+import { Component, Element, Host, Method, Prop, Watch, h, forceUpdate } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { expectExtend } from '../../testing/matchers';
 
 describe('lifecycle sync', () => {
   it('should fire connected/disconnected when removed', async () => {
@@ -246,7 +245,7 @@ describe('lifecycle sync', () => {
         'componentDidLoad a',
       ]);
       log.length = 0;
-      root.forceUpdate();
+      forceUpdate(root);
       await waitForChanges();
       expect(log).toEqual(['componentWillUpdate a', 'componentDidUpdate a']);
 
@@ -269,7 +268,6 @@ describe('lifecycle sync', () => {
   it('all state is available on "will" lifecycles', async () => {
     @Component({ tag: 'cmp-child' })
     class CmpChild {
-
       @Prop() width = 0;
       @Prop() height = 0;
 
@@ -319,12 +317,7 @@ describe('lifecycle sync', () => {
       }
 
       render() {
-        return (
-          <cmp-child
-            width={this.value}
-            height={this.value}
-          />
-        )
+        return <cmp-child width={this.value} height={this.value} />;
       }
     }
 
@@ -349,5 +342,4 @@ describe('lifecycle sync', () => {
       </cmp-root>
     `);
   });
-
 });

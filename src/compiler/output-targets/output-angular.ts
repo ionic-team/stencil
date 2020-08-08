@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { dashToPascalCase, sortBy } from '@utils';
 import { dirname, join } from 'path';
 import ts from 'typescript';
@@ -153,7 +153,7 @@ const generateAngularArray = (compilerCtx: d.CompilerCtx, components: d.Componen
     .join(',\n');
 
   const c = `
-import * as d from '${proxyPath}';
+import type * as d from '${proxyPath}';
 
 export const DIRECTIVES = [
 ${directives}

@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { createModule, getModule } from '../../transpile/transpiled-module';
 import { dirname, basename, join } from 'path';
 import { normalizePath } from '@utils';

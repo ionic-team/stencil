@@ -141,23 +141,3 @@ export {
   TranspileOptions,
   TranspileResults,
 };
-
-/**
- * @deprecated Use `transpile()` instead.
- */
-export declare const compile: (code: string, opts?: any) => Promise<any>;
-
-/**
- * @deprecated Use `transpileSync()` instead.
- */
-export declare const compileSync: (code: string, opts?: any) => any;
-
-/**
- * @deprecated Use TranspileOptions instead
- */
-export type CompileOptions = any;
-
-/**
- * @deprecated Use TranspileResults instead
- */
-export type CompileResults = any;

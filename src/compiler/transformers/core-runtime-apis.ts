@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 
 export const ATTACH_SHADOW = '__stencil_attachShadow';
 export const CREATE_EVENT = '__stencil_createEvent';

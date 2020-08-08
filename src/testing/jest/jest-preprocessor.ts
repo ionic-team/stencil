@@ -1,4 +1,4 @@
-import { TranspileOptions, Diagnostic } from '@stencil/core/internal';
+import type { TranspileOptions, Diagnostic } from '@stencil/core/internal';
 import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { transpile } from '../test-transpile';
 import ts from 'typescript';

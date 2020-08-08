@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { basename, dirname, join, relative } from 'path';
 import { flatOne, normalizePath, sortBy } from '@utils';
 
@@ -64,9 +64,9 @@ export const isOutputTargetHydrate = (o: d.OutputTarget): o is d.OutputTargetHyd
 export const isOutputTargetCustom = (o: d.OutputTarget): o is d.OutputTargetCustom => o.type === CUSTOM;
 
 export const isOutputTargetDocs = (o: d.OutputTarget): o is d.OutputTargetDocsJson | d.OutputTargetDocsReadme | d.OutputTargetDocsVscode | d.OutputTargetDocsCustom =>
-  o.type === DOCS || o.type === DOCS_README || o.type === DOCS_JSON || o.type === DOCS_CUSTOM || o.type === DOCS_VSCODE;
+  o.type === DOCS_README || o.type === DOCS_JSON || o.type === DOCS_CUSTOM || o.type === DOCS_VSCODE;
 
-export const isOutputTargetDocsReadme = (o: d.OutputTarget): o is d.OutputTargetDocsReadme => o.type === DOCS_README || o.type === DOCS;
+export const isOutputTargetDocsReadme = (o: d.OutputTarget): o is d.OutputTargetDocsReadme => o.type === DOCS_README;
 
 export const isOutputTargetDocsJson = (o: d.OutputTarget): o is d.OutputTargetDocsJson => o.type === DOCS_JSON;
 
@@ -110,7 +110,6 @@ export const DIST_LAZY = `dist-lazy`;
 export const DIST_LAZY_LOADER = `dist-lazy-loader`;
 export const DIST_SELF_CONTAINED = `dist-self-contained`;
 export const DIST_GLOBAL_STYLES = 'dist-global-styles';
-export const DOCS = `docs`;
 export const DOCS_CUSTOM = 'docs-custom';
 export const DOCS_JSON = `docs-json`;
 export const DOCS_README = `docs-readme`;
@@ -130,7 +129,6 @@ export const VALID_TYPES = [
   DIST_HYDRATE_SCRIPT,
   DIST_LAZY,
   DIST_SELF_CONTAINED,
-  DOCS,
   DOCS_JSON,
   DOCS_README,
   DOCS_VSCODE,
@@ -151,7 +149,6 @@ export const VALID_TYPES_NEXT = [
   DIST_HYDRATE_SCRIPT,
 
   // DOCS
-  DOCS,
   DOCS_JSON,
   DOCS_README,
   DOCS_VSCODE,

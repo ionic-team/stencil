@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { getAbsoluteBuildDir } from './html-utils';
 import { generateHashedCopy } from '../output-targets/copy/hashed-copy';
 import { injectModulePreloads } from './inject-module-preloads';

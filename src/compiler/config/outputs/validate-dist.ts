@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';
 import {
   COPY,
@@ -144,7 +144,7 @@ const validateOutputTargetDist = (config: d.Config, o: d.OutputTargetDist) => {
     outputTarget.empty = true;
   }
 
-  outputTarget.copy = validateCopy(outputTarget.copy, config.copy);
+  outputTarget.copy = validateCopy(outputTarget.copy, []);
   return outputTarget;
 };
 

@@ -7,8 +7,10 @@ import { createSysWorker } from './sys/worker/sys-worker';
 import { createWatchBuild } from './build/watch-build';
 import { getConfig } from './sys/config';
 import { patchFs } from './sys/fs-patch';
-import { patchTypescript } from './sys/typescript/typescript-patch';
+import { patchTypescript } from './sys/typescript/typescript-sys';
 import { resolveModuleIdAsync } from './sys/resolve/resolve-module-async';
+import { isFunction } from '@utils';
+import ts from 'typescript';
 
 export const createCompiler = async (config: Config) => {
   // actual compiler code
@@ -18,6 +20,10 @@ export const createCompiler = async (config: Config) => {
   const diagnostics: Diagnostic[] = [];
   const sys = config.sys;
   const compilerCtx = new CompilerContext();
+
+  if (isFunction(config.sys.setupCompiler)) {
+    config.sys.setupCompiler({ ts });
+  }
 
   patchFs(sys);
 
@@ -32,7 +38,7 @@ export const createCompiler = async (config: Config) => {
     // Pipe events from sys.events to compilerCtx
     sys.events.on(compilerCtx.events.emit);
   }
-  await patchTypescript(config, diagnostics, compilerCtx.fs);
+  patchTypescript(config, compilerCtx.fs);
 
   const build = () => createFullBuild(config, compilerCtx);
 

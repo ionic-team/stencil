@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { COMPONENTS_DTS_HEADER, sortImportNames } from './types-utils';
 import { generateComponentTypes } from './generate-component-types';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
@@ -45,7 +45,6 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, inte
   let typeImportData: d.TypesImportData = {};
   const c: string[] = [];
   const allTypes = new Map<string, number>();
-  const needsJSXElementHack = buildCtx.components.some(cmp => cmp.isLegacy);
   const components = buildCtx.components.filter(m => !m.isCollectionDependency);
 
   const modules: d.TypesModule[] = components.map(cmp => {
@@ -82,13 +81,6 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, inte
   c.push(`export namespace Components {\n${modules.map(m => `${m.component}`).join('\n')}\n}`);
 
   c.push(`declare global {`);
-
-  if (needsJSXElementHack) {
-    c.push(`    // Adding a global JSX for backcompatibility with legacy dependencies`);
-    c.push(`    export namespace JSX {`);
-    c.push(`        export interface Element {}`);
-    c.push(`    }`);
-  }
 
   c.push(...modules.map(m => m.element));
 

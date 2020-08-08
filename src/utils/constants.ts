@@ -30,8 +30,12 @@ export const enum LISTENER_FLAGS {
 
   TargetDocument = 1 << 2,
   TargetWindow = 1 << 3,
-  TargetParent = 1 << 4,
-  TargetBody = 1 << 5,
+  TargetBody = 1 << 4,
+
+  /**
+   * @deprecated Prevented from new apps, but left in for older collections
+   */
+  TargetParent = 1 << 5,
 }
 
 export const enum HOST_FLAGS {

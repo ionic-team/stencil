@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, buildWarn, catchError, toDashCase } from '@utils';
 import {
   convertValueToLiteral,
@@ -21,33 +21,17 @@ export const propDecoratorsToStatic = (
   watchable: Set<string>,
   newMembers: ts.ClassElement[],
 ) => {
-  const connect: any[] = [];
-  const context: any[] = [];
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map(prop => parsePropDecorator(diagnostics, typeChecker, prop, context, connect, watchable, newMembers))
+    .map(prop => parsePropDecorator(diagnostics, typeChecker, prop, watchable))
     .filter(prop => prop != null);
 
   if (properties.length > 0) {
     newMembers.push(createStaticGetter('properties', ts.createObjectLiteral(properties, true)));
   }
-  if (context.length > 0) {
-    newMembers.push(createStaticGetter('contextProps', convertValueToLiteral(context)));
-  }
-  if (connect.length > 0) {
-    newMembers.push(createStaticGetter('connectProps', convertValueToLiteral(connect)));
-  }
 };
 
-const parsePropDecorator = (
-  diagnostics: d.Diagnostic[],
-  typeChecker: ts.TypeChecker,
-  prop: ts.PropertyDeclaration,
-  context: any[],
-  connect: any[],
-  watchable: Set<string>,
-  newMembers: ts.ClassElement[],
-) => {
+const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, watchable: Set<string>) => {
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
@@ -55,23 +39,6 @@ const parsePropDecorator = (
 
   const propName = prop.name.getText();
   const propOptions = getPropOptions(propDecorator, diagnostics);
-
-  if (propOptions.context) {
-    context.push({
-      name: propName,
-      context: propOptions.context,
-    });
-    removeProp(prop, newMembers);
-    return null;
-  }
-  if (propOptions.connect) {
-    connect.push({
-      name: propName,
-      connect: propOptions.connect,
-    });
-    removeProp(prop, newMembers);
-    return null;
-  }
 
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);
@@ -103,8 +70,8 @@ const parsePropDecorator = (
 
   // prop can have an attribute if type is NOT "unknown"
   if (typeStr !== 'unknown') {
-    propMeta.attribute = getAttributeName(diagnostics, propName, propOptions, propDecorator);
-    propMeta.reflect = getReflect(diagnostics, propOptions);
+    propMeta.attribute = getAttributeName(propName, propOptions);
+    propMeta.reflect = getReflect(diagnostics, propDecorator, propOptions);
   }
 
   // extract default value
@@ -118,7 +85,7 @@ const parsePropDecorator = (
   return staticProp;
 };
 
-const getAttributeName = (diagnostics: d.Diagnostic[], propName: string, propOptions: d.PropOptions, node: ts.Node) => {
+const getAttributeName = (propName: string, propOptions: d.PropOptions) => {
   if (propOptions.attribute === null) {
     return undefined;
   }
@@ -127,27 +94,20 @@ const getAttributeName = (diagnostics: d.Diagnostic[], propName: string, propOpt
     return propOptions.attribute.trim().toLowerCase();
   }
 
-  if (typeof propOptions.attr === 'string' && propOptions.attr.trim().length > 0) {
-    const diagnostic = buildWarn(diagnostics);
-    diagnostic.messageText = `@Prop option "attr" has been deprecated. Please use "attribute" instead.`;
-    augmentDiagnosticWithNode(diagnostic, node);
-    return propOptions.attr.trim().toLowerCase();
-  }
-
   return toDashCase(propName);
 };
 
-const getReflect = (_diagnostics: d.Diagnostic[], propOptions: d.PropOptions) => {
+const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, propOptions: d.PropOptions) => {
   if (typeof propOptions.reflect === 'boolean') {
     return propOptions.reflect;
   }
-
   if (typeof (propOptions as any).reflectToAttr === 'boolean') {
-    // const diagnostic = buildWarn(diagnostics);
-    // diagnostic.messageText = `@Prop option "reflectToAttr" has been depreciated. Please use "reflect" instead.`;
+    const err = buildError(diagnostics);
+    err.header = `Rename "reflectToAttr" to "reflect"`;
+    err.messageText = `@Prop option "reflectToAttr" should be renamed to "reflect".`;
+    augmentDiagnosticWithNode(err, propDecorator);
     return (propOptions as any).reflectToAttr;
   }
-
   return false;
 };
 
@@ -243,11 +203,4 @@ const isAny = (t: ts.Type) => {
     return !!(t.flags & ts.TypeFlags.Any);
   }
   return false;
-};
-
-const removeProp = (prop: ts.ClassElement, classElements: ts.ClassElement[]) => {
-  const index = classElements.findIndex(p => prop === p);
-  if (index >= 0) {
-    classElements.splice(index, 1);
-  }
 };

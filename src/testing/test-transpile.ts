@@ -1,5 +1,5 @@
 import { transpileSync } from '@stencil/core/compiler';
-import { TranspileOptions, TranspileResults } from '@stencil/core/internal';
+import type { TranspileOptions, TranspileResults } from '@stencil/core/internal';
 import { isString } from '@utils';
 
 export function transpile(input: string, opts: TranspileOptions = {}): TranspileResults {

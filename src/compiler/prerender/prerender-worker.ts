@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { addModulePreloads, excludeStaticComponents, minifyScriptElements, minifyStyleElements, removeModulePreloads, removeStencilScripts } from './prerender-optimize';
 import { catchError, isPromise, isRootPath, normalizePath, requireFunc, isFunction } from '@utils';
 import { crawlAnchorsForNextUrls } from './crawl-urls';
@@ -182,7 +182,7 @@ const prerenderEnsureDir = (sys: d.CompilerSystem, p: string) => {
     const dir = allDirs[i];
     if (!prerenderCtx.ensuredDirs.has(dir)) {
       prerenderCtx.ensuredDirs.add(dir);
-      sys.mkdirSync(dir);
+      sys.createDirSync(dir);
     }
   }
 };

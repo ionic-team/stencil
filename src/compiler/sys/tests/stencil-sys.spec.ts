@@ -1,11 +1,11 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { createSystem } from '../stencil-sys';
 
 describe('stencil system', () => {
   let sys: d.CompilerSystem;
   beforeEach(() => {
     sys = createSystem();
-    sys.mkdirSync('/');
+    sys.createDirSync('/');
   });
 
   it('read/write', async () => {
@@ -14,38 +14,38 @@ describe('stencil system', () => {
     expect(content).toBe('file1');
 
     const dirStat = await sys.stat('/');
-    expect(dirStat.isFile()).toBe(false);
-    expect(dirStat.isDirectory()).toBe(true);
+    expect(dirStat.isFile).toBe(false);
+    expect(dirStat.isDirectory).toBe(true);
 
     const fileStat = await sys.stat('/file1');
-    expect(fileStat.isFile()).toBe(true);
-    expect(fileStat.isDirectory()).toBe(false);
+    expect(fileStat.isFile).toBe(true);
+    expect(fileStat.isDirectory).toBe(false);
   });
 
-  it('mkdir', async () => {
-    const mkDirResults = await sys.mkdir('/a/b/c');
-    expect(mkDirResults.basename).toBe('c');
-    expect(mkDirResults.dirname).toBe('/a/b');
-    expect(mkDirResults.path).toBe('/a/b/c');
-    expect(mkDirResults.newDirs).toHaveLength(1);
-    expect(mkDirResults.newDirs[0]).toBe('/a/b/c');
-    expect(mkDirResults.error).toBe(null);
+  it('createDir', async () => {
+    const createDirResults = await sys.createDir('/a/b/c');
+    expect(createDirResults.basename).toBe('c');
+    expect(createDirResults.dirname).toBe('/a/b');
+    expect(createDirResults.path).toBe('/a/b/c');
+    expect(createDirResults.newDirs).toHaveLength(1);
+    expect(createDirResults.newDirs[0]).toBe('/a/b/c');
+    expect(createDirResults.error).toBe(null);
   });
 
-  it('mkdir recursive', async () => {
-    const mkDirResults = await sys.mkdir('/a/b/c', { recursive: true });
-    expect(mkDirResults.basename).toBe('c');
-    expect(mkDirResults.dirname).toBe('/a/b');
-    expect(mkDirResults.path).toBe('/a/b/c');
-    expect(mkDirResults.newDirs).toHaveLength(3);
-    expect(mkDirResults.newDirs).toContain('/a');
-    expect(mkDirResults.newDirs).toContain('/a/b');
-    expect(mkDirResults.newDirs).toContain('/a/b/c');
-    expect(mkDirResults.error).toBe(null);
+  it('createDir recursive', async () => {
+    const createDirResults = await sys.createDir('/a/b/c', { recursive: true });
+    expect(createDirResults.basename).toBe('c');
+    expect(createDirResults.dirname).toBe('/a/b');
+    expect(createDirResults.path).toBe('/a/b/c');
+    expect(createDirResults.newDirs).toHaveLength(3);
+    expect(createDirResults.newDirs).toContain('/a');
+    expect(createDirResults.newDirs).toContain('/a/b');
+    expect(createDirResults.newDirs).toContain('/a/b/c');
+    expect(createDirResults.error).toBe(null);
   });
 
   it('rename file', async () => {
-    await sys.mkdir('/dir');
+    await sys.createDir('/dir');
     await sys.writeFile('/dir/file-old', 'content');
     const results = await sys.rename('/dir/file-old', '/dir/file-new');
     expect(results.error).toBe(null);
@@ -64,17 +64,17 @@ describe('stencil system', () => {
       },
     ]);
 
-    expect(await sys.stat('/dir/file-old')).toBe(undefined);
+    expect((await sys.stat('/dir/file-old')).error).toBe(`ENOENT: no such file or directory, statSync '/dir/file-old'`);
 
     const newStat = await sys.stat('/dir/file-new');
-    expect(newStat.isFile()).toBe(true);
+    expect(newStat.isFile).toBe(true);
 
     const content = await sys.readFile('/dir/file-new');
     expect('content').toBe('content');
   });
 
   it('rename directory', async () => {
-    await sys.mkdir('/old');
+    await sys.createDir('/old');
     const results = await sys.rename('/old', '/new');
     expect(results.error).toBe(null);
     expect(results.isDirectory).toBe(true);
@@ -95,14 +95,14 @@ describe('stencil system', () => {
     ]);
 
     const oldStat = await sys.stat('/old');
-    expect(oldStat).toBe(undefined);
+    expect(oldStat.error).toBe(`ENOENT: no such file or directory, statSync '/old'`);
 
     const newStat = await sys.stat('/new');
-    expect(newStat.isDirectory()).toBe(true);
+    expect(newStat.isDirectory).toBe(true);
   });
 
   it('rename directory, deep path', async () => {
-    await sys.mkdir('/z');
+    await sys.createDir('/z');
     const results = await sys.rename('/z', '/a/b/c');
     expect(results.error).toBe(null);
     expect(results.isDirectory).toBe(true);
@@ -125,20 +125,20 @@ describe('stencil system', () => {
     ]);
 
     const oldStat = await sys.stat('/z');
-    expect(oldStat).toBe(undefined);
+    expect(oldStat.error).not.toBe(null);
 
     const newAStat = await sys.stat('/a');
-    expect(newAStat.isDirectory()).toBe(true);
+    expect(newAStat.isDirectory).toBe(true);
     const newABStat = await sys.stat('/a/b');
-    expect(newABStat.isDirectory()).toBe(true);
+    expect(newABStat.isDirectory).toBe(true);
     const newABCStat = await sys.stat('/a/b/c');
-    expect(newABCStat.isDirectory()).toBe(true);
+    expect(newABCStat.isDirectory).toBe(true);
   });
 
   it('rename directory, with files/subfolders', async () => {
-    await sys.mkdir('/x/y/z', { recursive: true });
-    await sys.mkdir('/x/y/y1-dir', { recursive: true });
-    await sys.mkdir('/x/y/y2-dir', { recursive: true });
+    await sys.createDir('/x/y/z', { recursive: true });
+    await sys.createDir('/x/y/y1-dir', { recursive: true });
+    await sys.createDir('/x/y/y2-dir', { recursive: true });
     await sys.writeFile('/x/y/y1-dir/y1-file', 'y1-file');
     await sys.writeFile('/x/y/y2-dir/y2-file', 'y2-file');
     await sys.writeFile('/x/x1-file', 'x1-file');
@@ -147,33 +147,41 @@ describe('stencil system', () => {
 
     const results = await sys.rename('/x', '/a/b/c');
 
-    expect(await sys.stat('/x')).toBe(undefined);
-    expect(await sys.stat('/x/y')).toBe(undefined);
-    expect(await sys.stat('/x/y/z')).toBe(undefined);
+    const stat1 = await sys.stat('/x');
+    expect(stat1.error).toBe(`ENOENT: no such file or directory, statSync '/x'`);
+    expect(stat1.isFile).toBe(false);
+    expect(stat1.isDirectory).toBe(false);
+    expect(stat1.isSymbolicLink).toBe(false);
+    expect(stat1.size).toBe(0);
 
-    expect((await sys.stat('/a')).isDirectory()).toBe(true);
-    expect((await sys.stat('/a/b')).isDirectory()).toBe(true);
-    expect((await sys.stat('/a/b/c')).isDirectory()).toBe(true);
-    expect((await sys.stat('/a/b/c/y')).isDirectory()).toBe(true);
-    expect((await sys.stat('/a/b/c/y/y1-dir')).isDirectory()).toBe(true);
-    expect((await sys.stat('/a/b/c/y/y2-dir')).isDirectory()).toBe(true);
+    const stat2 = await sys.stat('/x/y');
+    expect(stat2.error).not.toBe(null);
 
-    expect((await sys.stat('/a/b/c/y/y1-dir/y1-file')).isFile()).toBe(true);
+    expect((await sys.stat('/x/y/z')).error).not.toBe(null);
+
+    expect((await sys.stat('/a')).isDirectory).toBe(true);
+    expect((await sys.stat('/a/b')).isDirectory).toBe(true);
+    expect((await sys.stat('/a/b/c')).isDirectory).toBe(true);
+    expect((await sys.stat('/a/b/c/y')).isDirectory).toBe(true);
+    expect((await sys.stat('/a/b/c/y/y1-dir')).isDirectory).toBe(true);
+    expect((await sys.stat('/a/b/c/y/y2-dir')).isDirectory).toBe(true);
+
+    expect((await sys.stat('/a/b/c/y/y1-dir/y1-file')).isFile).toBe(true);
     expect(await sys.readFile('/a/b/c/y/y1-dir/y1-file')).toBe('y1-file');
 
-    expect((await sys.stat('/a/b/c/y/y2-dir/y2-file')).isFile()).toBe(true);
+    expect((await sys.stat('/a/b/c/y/y2-dir/y2-file')).isFile).toBe(true);
     expect(await sys.readFile('/a/b/c/y/y2-dir/y2-file')).toBe('y2-file');
 
-    expect(await sys.stat('/x/x1-file')).toBe(undefined);
-    expect((await sys.stat('/a/b/c/x1-file')).isFile()).toBe(true);
+    expect((await sys.stat('/x/x1-file')).error).not.toBe(null);
+    expect((await sys.stat('/a/b/c/x1-file')).isFile).toBe(true);
     expect(await sys.readFile('/a/b/c/x1-file')).toBe('x1-file');
 
-    expect(await sys.stat('/x/x2-file')).toBe(undefined);
-    expect((await sys.stat('/a/b/c/x2-file')).isFile()).toBe(true);
+    expect((await sys.stat('/x/x2-file')).error).not.toBe(null);
+    expect((await sys.stat('/a/b/c/x2-file')).isFile).toBe(true);
     expect(await sys.readFile('/a/b/c/x2-file')).toBe('x2-file');
 
-    expect(await sys.stat('/x/y/z/z1-file')).toBe(undefined);
-    expect((await sys.stat('/a/b/c/y/z/z1-file')).isFile()).toBe(true);
+    expect((await sys.stat('/x/y/z/z1-file')).error).not.toBe(null);
+    expect((await sys.stat('/a/b/c/y/z/z1-file')).isFile).toBe(true);
     expect(await sys.readFile('/a/b/c/y/z/z1-file')).toBe('z1-file');
 
     expect(results.error).toBe(null);

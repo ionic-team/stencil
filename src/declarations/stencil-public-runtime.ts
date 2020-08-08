@@ -48,11 +48,6 @@ export interface ComponentOptions {
    * Array of relative links to folders of assets required by the component.
    */
   assetsDirs?: string[];
-
-  /**
-   * @deprecated Use `assetsDirs` instead
-   */
-  assetsDir?: string;
 }
 
 export interface ShadowRootOptions {
@@ -92,15 +87,6 @@ export interface PropOptions {
    * In this case you can set the `reflect` option to `true`, since it defaults to `false`:
    */
   reflect?: boolean;
-
-  /** @deprecated: "attr" has been deprecated, please use "attribute" instead. */
-  attr?: string;
-  /** @deprecated "context" has been deprecated. */
-  context?: string;
-  /** @deprecated "connect" has been deprecated, please use ES modules and/or dynamic imports instead. */
-  connect?: string;
-  /** @deprecated "reflectToAttr" has been deprecated, please use "reflect" instead. */
-  reflectToAttr?: boolean;
 }
 
 export interface MethodDecorator {
@@ -165,7 +151,7 @@ export interface ListenOptions {
   passive?: boolean;
 }
 
-export type ListenTargetOptions = 'parent' | 'body' | 'document' | 'window';
+export type ListenTargetOptions = 'body' | 'document' | 'window';
 
 export interface StateDecorator {
   (): PropertyDecorator;
@@ -305,9 +291,6 @@ export declare function getRenderingRef(): any;
 
 export interface HTMLStencilElement extends HTMLElement {
   componentOnReady(): Promise<this>;
-
-  /** @deprecated */
-  forceUpdate(): void;
 }
 
 /**
@@ -378,14 +361,6 @@ export interface ComponentDidUpdate {
    * first render.
    */
   componentDidUpdate(): void;
-}
-
-export interface ComponentDidUnload {
-  /**
-   * The component did unload and the element
-   * will be destroyed.
-   */
-  componentDidUnload(): void;
 }
 
 export interface ComponentInterface {

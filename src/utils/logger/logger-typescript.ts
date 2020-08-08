@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { isIterable } from '../helpers';
 import { normalizePath } from '../normalize-path';
 import { splitLineBreaks } from './logger-utils';

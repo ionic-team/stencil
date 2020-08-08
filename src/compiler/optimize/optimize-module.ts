@@ -1,8 +1,8 @@
-import { loadTypescript } from '../sys/typescript/typescript-load';
 import { minfyJsId } from '../../version';
 import { minifyJs } from './minify-js';
-import type { CompilerCtx, CompilerSystem, Config, Diagnostic, SourceTarget } from '../../declarations';
+import type { CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declarations';
 import type { CompressOptions, MangleOptions, MinifyOptions } from 'terser';
+import ts from 'typescript';
 
 interface OptimizeModuleOptions {
   input: string;
@@ -66,7 +66,7 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
   }
 
   const shouldTranspile = opts.sourceTarget === 'es5';
-  const results = await compilerCtx.worker.prepareModule(config.typescriptPath, code, minifyOpts, shouldTranspile, opts.inlineHelpers);
+  const results = await compilerCtx.worker.prepareModule(code, minifyOpts, shouldTranspile, opts.inlineHelpers);
   if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
     if (opts.isCore) {
       results.output = results.output.replace(/disconnectedCallback\(\)\{\},/g, '');
@@ -123,14 +123,13 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
   return opts;
 };
 
-export const prepareModule = async (sys: CompilerSystem, typescriptPath: string, input: string, minifyOpts: MinifyOptions, transpileToEs5: boolean, inlineHelpers: boolean) => {
+export const prepareModule = async (input: string, minifyOpts: MinifyOptions, transpileToEs5: boolean, inlineHelpers: boolean) => {
   const results = {
     output: input,
     diagnostics: [] as Diagnostic[],
   };
 
   if (transpileToEs5) {
-    const ts = await loadTypescript(sys, typescriptPath, false);
     const tsResults = ts.transpileModule(input, {
       fileName: 'module.ts',
       compilerOptions: {

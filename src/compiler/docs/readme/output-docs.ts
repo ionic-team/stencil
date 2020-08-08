@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { propsToMarkdown } from './markdown-props';
 import { eventsToMarkdown } from './markdown-events';
 import { join, relative } from 'path';

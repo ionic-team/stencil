@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { ConvertIdentifier, getStaticValue } from '../transform-utils';
 import { DEFAULT_STYLE_MODE, sortBy } from '@utils';
 import { normalizeStyles } from '../../style/normalize-styles';

@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { createLogger } from './logger/console-logger';
 import { createSystem } from './stencil-sys';
 import { setPlatformPath } from '../sys/modules/path';

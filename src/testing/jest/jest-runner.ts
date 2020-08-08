@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/internal';
+import type * as d from '@stencil/core/internal';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
 import type { AggregatedResult } from '@jest/test-result';

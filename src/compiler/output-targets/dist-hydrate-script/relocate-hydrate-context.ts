@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { getGlobalScriptData } from '../../bundle/app-data-plugin';
 import { HYDRATE_APP_CLOSURE_START } from './hydrate-factory-closure';
 

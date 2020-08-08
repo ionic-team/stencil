@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { createRequestHandler } from './request-handler';
 import { findClosestOpenPort } from './find-closest-port';
 import * as http from 'http';

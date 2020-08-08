@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { outputAngular } from './output-angular';
 import { outputCopy } from './copy/output-copy';
 import { outputCustomElements } from './dist-custom-elements';
@@ -31,7 +31,8 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
     outputCustomElementsBundle(config, compilerCtx, buildCtx),
     outputHydrateScript(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
-    outputApp(config, compilerCtx, buildCtx),
+    outputLazy(config, compilerCtx, buildCtx),
+    outputWww(config, compilerCtx, buildCtx),
   ]);
 
   // must run after all the other outputs
@@ -40,11 +41,6 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
   await outputTypes(config, compilerCtx, buildCtx);
 
   timeSpan.finish('generate outputs finished');
-};
-
-const outputApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  await outputLazy(config, compilerCtx, buildCtx);
-  await outputWww(config, compilerCtx, buildCtx);
 };
 
 const invalidateRollupCaches = (compilerCtx: d.CompilerCtx) => {

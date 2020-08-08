@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { getTsOptionsToExtend } from './ts-config';
 import ts from 'typescript';
 

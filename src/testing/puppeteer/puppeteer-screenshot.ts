@@ -1,7 +1,7 @@
-import { E2EProcessEnv, EmulateConfig, JestEnvironmentGlobal, ScreenshotBuildData, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
+import type { E2EProcessEnv, EmulateConfig, JestEnvironmentGlobal, ScreenshotBuildData, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
 import { compareScreenshot } from '../../screenshot/screenshot-compare';
-import * as pd from './puppeteer-declarations';
-import * as puppeteer from 'puppeteer';
+import type * as pd from './puppeteer-declarations';
+import type * as puppeteer from 'puppeteer';
 
 export function initPageScreenshot(page: pd.E2EPageInternal) {
   const env = process.env as E2EProcessEnv;

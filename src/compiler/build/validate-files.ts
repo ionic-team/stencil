@@ -1,4 +1,4 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { validateBuildPackageJson } from '../types/validate-build-package-json';
 import { validateManifestJson } from '../html/validate-manifest-json';
 
