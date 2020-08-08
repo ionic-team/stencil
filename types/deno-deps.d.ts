@@ -1,4 +1,4 @@
-declare module 'https://deno.land/std/fs/mod.ts' {
+declare module 'https://deno.land/std@0.63.0/fs/mod.ts' {
   export interface WalkEntry {
     name: string;
     isFile: boolean;
@@ -19,7 +19,7 @@ declare module 'https://deno.land/std/fs/mod.ts' {
   ): AsyncIterableIterator<WalkEntry>;
 }
 
-declare module 'https://deno.land/std/path/mod.ts' {
+declare module 'https://deno.land/std@0.63.0/path/mod.ts' {
   export function isGlob(p: string): boolean;
   export function normalize(p: string): string;
   export function join(...paths: string[]): string;
@@ -36,11 +36,11 @@ declare module 'https://deno.land/std/path/mod.ts' {
   export const win32: any;
 }
 
-declare module 'https://deno.land/std/node/fs.ts' {
+declare module 'https://deno.land/std@0.63.0/node/fs.ts' {
   export default function nodeFs(): any;
 }
 
-declare module 'https://deno.land/std/fmt/colors.ts' {
+declare module 'https://deno.land/std@0.63.0/fmt/colors.ts' {
   export function bgRed(str: string): string;
   export function blue(str: string): string;
   export function bold(str: string): string;
@@ -53,7 +53,7 @@ declare module 'https://deno.land/std/fmt/colors.ts' {
   export function yellow(str: string): string;
 }
 
-declare module 'https://deno.land/std/node/module.ts' {
+declare module 'https://deno.land/std@0.63.0/node/module.ts' {
   export const builtinModules: string[];
   export function createRequire(filename: string | URL): any;
 }
