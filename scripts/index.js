@@ -11,7 +11,6 @@ function main() {
   if (args.includes('--prepare') || !fs.existsSync(scriptsBuildJs)) {
     // ensure we've transpiled the build scripts first
     console.log('🧩  transpiling build scripts');
-    fs.emptyDirSync(scriptsBuildDir);
     const tscPath = path.join(rootDir, 'node_modules', '.bin', 'tsc');
     const tsconfig = path.join(scriptsDir, 'tsconfig.json');
     const execa = require('execa');
