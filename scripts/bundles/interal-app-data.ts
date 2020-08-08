@@ -31,14 +31,16 @@ export async function internalAppData(opts: BuildOptions) {
         format: 'esm',
         dir: outputInternalAppDataDir,
         entryFileNames: '[name].js',
+        preferConst: true,
       },
       {
         format: 'cjs',
         dir: outputInternalAppDataDir,
         entryFileNames: '[name].cjs.js',
         esModule: false,
+        preferConst: true,
       },
-    ] as any,
+    ],
   };
 
   return internalAppDataBundle;

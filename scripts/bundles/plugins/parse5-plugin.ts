@@ -35,8 +35,8 @@ export function parse5Plugin(opts: BuildOptions): Plugin {
 }
 
 async function bundleParse5(opts: BuildOptions) {
-  const fileName = `parse5-${opts.parse5Verion.replace(/\./g, '_')}-bundle-cache.js`;
-  const cacheFile = join(opts.buildDir, fileName);
+  const fileName = `parse5-${opts.parse5Verion.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
+  const cacheFile = join(opts.scriptsBuildDir, fileName);
 
   try {
     return await fs.readFile(cacheFile, 'utf8');
@@ -74,13 +74,29 @@ async function bundleParse5(opts: BuildOptions) {
     strict: false,
   });
 
-  const minified = terser.minify(output[0].code);
+  let code = output[0].code;
 
-  if (minified.error) {
-    throw minified.error;
+  if (opts.isProd) {
+    const minified = terser.minify(code, {
+      ecma: 2018,
+      module: true,
+      compress: {
+        ecma: 2018,
+        passes: 2,
+      },
+      output: {
+        ecma: 2018,
+        comments: false,
+      },
+    });
+
+    if (minified.error) {
+      throw minified.error;
+    }
+    code = minified.code;
   }
 
-  await fs.writeFile(cacheFile, minified.code);
+  await fs.writeFile(cacheFile, code);
 
-  return minified.code;
+  return code;
 }

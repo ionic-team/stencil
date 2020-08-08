@@ -6,8 +6,8 @@ import { BuildOptions } from '../../utils/options';
 import { join } from 'path';
 
 export function denoStdPlugin(opts: BuildOptions): Plugin {
-  const denoCacheDir = join(opts.buildDir, 'deno-cache');
-  fs.ensureDirSync(denoCacheDir);
+  const cacheDir = join(opts.scriptsBuildDir, 'deno-cache');
+  fs.ensureDirSync(cacheDir);
 
   return {
     name: 'denoStdPlugin',
@@ -26,7 +26,7 @@ export function denoStdPlugin(opts: BuildOptions): Plugin {
     async load(id) {
       if (id.startsWith('http')) {
         const cacheName = id.split('://')[1].replace(/:|\/|\.|@/g, '_') + '.ts';
-        const cachePath = join(denoCacheDir, cacheName);
+        const cachePath = join(cacheDir, cacheName);
         try {
           const cachedContent = await fs.readFile(cachePath, 'utf8');
           return cachedContent;

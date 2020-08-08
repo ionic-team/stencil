@@ -13,6 +13,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
   const typescriptLibDir = join(typescriptDir, 'lib');
   const buildDir = join(rootDir, 'build');
   const scriptsDir = join(rootDir, 'scripts');
+  const scriptsBuildDir = join(scriptsDir, 'build');
   const scriptsBundlesDir = join(scriptsDir, 'bundles');
   const bundleHelpersDir = join(scriptsBundlesDir, 'helpers');
 
@@ -29,6 +30,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
     typescriptLibDir,
     buildDir,
     scriptsDir,
+    scriptsBuildDir,
     scriptsBundlesDir,
     bundleHelpersDir,
     output: {
@@ -136,6 +138,7 @@ export interface BuildOptions {
   buildDir?: string;
   scriptsDir?: string;
   scriptsBundlesDir?: string;
+  scriptsBuildDir?: string;
   bundleHelpersDir?: string;
 
   output?: {

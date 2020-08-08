@@ -93,7 +93,7 @@ export async function sysNode(opts: BuildOptions) {
 }
 
 export async function sysNodeExternalBundles(opts: BuildOptions) {
-  const cachedDir = join(opts.buildDir, 'sys-node-bundle-cache');
+  const cachedDir = join(opts.scriptsBuildDir, 'sys-node-bundle-cache');
 
   await fs.ensureDir(cachedDir);
 
@@ -121,15 +121,13 @@ export async function sysNodeExternalBundles(opts: BuildOptions) {
 function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string, entryFileName: string) {
   return new Promise(async (resolveBundle, rejectBundle) => {
     const outputFile = join(outputDir, entryFileName);
-    const cachedFile = join(cachedDir, entryFileName);
+    const cachedFile = join(cachedDir, entryFileName) + (opts.isProd ? '.min.js' : '');
 
-    if (!opts.isProd) {
-      const cachedExists = fs.existsSync(cachedFile);
-      if (cachedExists) {
-        await fs.copyFile(cachedFile, outputFile);
-        resolveBundle();
-        return;
-      }
+    const cachedExists = fs.existsSync(cachedFile);
+    if (cachedExists) {
+      await fs.copyFile(cachedFile, outputFile);
+      resolveBundle();
+      return;
     }
 
     const whitelist = new Set(['child_process', 'os', 'typescript']);
@@ -190,18 +188,18 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
             const webpackError = info.errors.join('\n');
             rejectBundle(webpackError);
           } else {
+            let code = await fs.readFile(outputFile, 'utf8');
+
             if (opts.isProd) {
-              let code = await fs.readFile(outputFile, 'utf8');
               const minifyResults = terser.minify(code);
               if (minifyResults.error) {
                 rejectBundle(minifyResults.error);
                 return;
               }
               code = minifyResults.code;
-              await fs.writeFile(outputFile, code);
-            } else {
-              await fs.copyFile(outputFile, cachedFile);
             }
+            await fs.writeFile(cachedFile, code);
+            await fs.writeFile(outputFile, code);
 
             resolveBundle();
           }

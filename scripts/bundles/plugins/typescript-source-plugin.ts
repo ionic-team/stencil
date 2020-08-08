@@ -25,7 +25,7 @@ export function typescriptSourcePlugin(opts: BuildOptions): Plugin {
 
 async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions) {
   const fileName = `typescript-${opts.typescriptVersion.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
-  const cacheFile = join(opts.buildDir, fileName);
+  const cacheFile = join(opts.scriptsBuildDir, fileName);
 
   try {
     // check if we've already cached this bundle

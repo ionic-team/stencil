@@ -42,6 +42,7 @@ export async function screenshot(opts: BuildOptions) {
       format: 'cjs',
       dir: opts.output.screenshotDir,
       esModule: false,
+      preferConst: true,
     },
     external,
     plugins: [

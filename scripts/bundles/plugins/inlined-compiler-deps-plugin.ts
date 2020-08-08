@@ -53,6 +53,7 @@ async function bundleCompilerDeps(opts: BuildOptions, inputDir: string) {
   await build.write({
     format: 'es',
     file: cacheFile,
+    preferConst: true,
   });
 
   return await fs.readFile(cacheFile, 'utf8');
