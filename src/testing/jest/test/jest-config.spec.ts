@@ -132,4 +132,20 @@ describe('jest-config', () => {
     const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
     expect(parsedConfig.rootDir).toBe(rootDir);
   });
+
+  it('set jestArgv config collectCoverageFrom', () => {
+    const rootDir = path.resolve('/');
+    const args = ['test'];
+    const config = mockConfig();
+    config.rootDir = rootDir;
+    config.flags = parseFlags(args, config.sys);
+    config.testing = {
+      collectCoverageFrom: ['**/*.+(ts|tsx)'],
+    };
+
+    const jestArgv = buildJestArgv(config);
+    const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
+    expect(parsedConfig.collectCoverageFrom).toHaveLength(1);
+    expect(parsedConfig.collectCoverageFrom[0]).toBe('**/*.+(ts|tsx)');
+  });
 });
