@@ -212,7 +212,7 @@ export class Something {
   connectedCallback() {}
   componentWillLoad() {}
   componentDidLoad() {}
-  disconnectedCallbac() {}
+  disconnectedCallback() {}
 
   /**
    * 8. Listeners
