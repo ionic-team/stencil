@@ -95,7 +95,7 @@ export const validateMethods = (diagnostics: d.Diagnostic[], members: ts.NodeArr
     if (method.name.getText() === 'componentDidUnload') {
       const err = buildError(diagnostics);
       err.header = `Replace "componentDidUnload()" with "disconnectedCallback()"`;
-      err.messageText = `The "componentDidUnload()" method was removed in Stencil 2. Please use the "disconnectedCallbac()" method instead.`;
+      err.messageText = `The "componentDidUnload()" method was removed in Stencil 2. Please use the "disconnectedCallback()" method instead.`;
       augmentDiagnosticWithNode(err, method.name);
     }
   });
