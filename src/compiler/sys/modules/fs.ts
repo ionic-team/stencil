@@ -1,6 +1,7 @@
 import type * as d from '../../../declarations';
 import { basename } from 'path';
 import { promisify } from './util';
+import { normalizePath } from '@utils';
 
 export interface FsObj {
   __sys: d.CompilerSystem;
@@ -111,7 +112,7 @@ export const realpathSync = (fs.realpathSync = (p: string) => {
   if (results.error) {
     throw results.error;
   }
-  return results.path;
+  return normalizePath(results.path);
 });
 
 export const statSync = (fs.statSync = (p: string) => {
