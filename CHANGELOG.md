@@ -20,7 +20,7 @@ Just like having to opt-in for IE11, the same goes for opting-in for ES5 and Sys
 
 * **componentDidUnload:** use disconnectedCallback instead of componentDidUnload ([4e45862](https://github.com/ionic-team/stencil/commit/4e45862f73609599a7195fcf5c93d9fb39492154))
 
-When Stencil is used within other frameworks, DOM elements may be reused, making it impossible for `componentDidUnload()` to be accurate 100% of the time if it is disconnected, then re-connected, an disconnected again. Instead, `disconnectedCallback()` is the preferred way to always know if a component was disconnected from the DOM.
+When Stencil is used within other frameworks, DOM elements may be reused, making it impossible for `componentDidUnload()` to be accurate 100% of the time if it is disconnected, then re-connected, and disconnected again. Instead, `disconnectedCallback()` is the preferred way to always know if a component was disconnected from the DOM.
 
 _Note that the runtime still works for any collections that have been built with componentDidUnload(). However, updates to Stencil 2 will require it's changed to disconnectedCallback()._
 
@@ -36,7 +36,7 @@ Update taskQueue default to "async". Stencil 1 default was "congestionAsync". Se
 
 * **node:** minimum node 12.10.0, recommend 14.5.0 ([55331be](https://github.com/ionic-team/stencil/commit/55331be42f311a6e2a4e4f8ac13c01d28dc31613))
 
-With the major release, now's a good time to updated the minimum and recommended version of NodeJS.
+With the major release, now's a good time to update the minimum and recommended version of NodeJS.
 
 * [Node Releases](https://nodejs.org/en/about/releases/)
 * [node.green](https://node.green/)
