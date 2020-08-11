@@ -82,33 +82,48 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
 }
 
 export function createReplaceData(opts: BuildOptions) {
-  const CACHE_BUSTER = 6;
+  const CACHE_BUSTER = 7;
 
   const typescriptPkg = require(join(opts.typescriptDir, 'package.json'));
   opts.typescriptVersion = typescriptPkg.version;
   const transpileId = typescriptPkg.name + typescriptPkg.version + '_' + CACHE_BUSTER;
 
-  const terserPkg = require(join(opts.nodeModulesDir, 'terser', 'package.json'));
+  const terserPkg = getPkg(opts, 'terser');
   opts.terserVersion = terserPkg.version;
   const minifyJsId = terserPkg.name + terserPkg.version + '_' + CACHE_BUSTER;
 
-  const rollupPkg = require(join(opts.nodeModulesDir, 'rollup', 'package.json'));
+  const rollupPkg = getPkg(opts, 'rollup');
   opts.rollupVersion = rollupPkg.version;
   const bundlerId = rollupPkg.name + rollupPkg.version + '_' + CACHE_BUSTER;
 
-  const autoprefixerPkg = require(join(opts.nodeModulesDir, 'autoprefixer', 'package.json'));
-  const postcssPkg = require(join(opts.nodeModulesDir, 'postcss', 'package.json'));
+  const autoprefixerPkg = getPkg(opts, 'autoprefixer');
+  const postcssPkg = getPkg(opts, 'postcss');
 
   const optimizeCssId = autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version + '_' + CACHE_BUSTER;
 
-  const parse5Pkg = require(join(opts.nodeModulesDir, 'parse5', 'package.json'));
+  const parse5Pkg = getPkg(opts, 'parse5');
   opts.parse5Verion = parse5Pkg.version;
 
+  const sizzlePkg = getPkg(opts, 'sizzle');
+  opts.sizzleVersion = sizzlePkg.version;
+
   const data = readJSONSync(join(opts.srcDir, 'compiler', 'sys', 'dependencies.json'));
-  data.dependencies[0].version = opts.version;
-  data.dependencies[1].version = typescriptPkg.version;
-  data.dependencies[2].version = rollupPkg.version;
-  data.dependencies[3].version = terserPkg.version;
+  for (const dep of data.dependencies) {
+    switch (dep.name) {
+      case '@stencil/core':
+        dep.version = opts.version;
+        break;
+      case 'rollup':
+        dep.version = rollupPkg.version;
+        break;
+      case 'terser':
+        dep.version = terserPkg.version;
+        break;
+      case 'typescript':
+        dep.version = typescriptPkg.version;
+        break;
+    }
+  }
   writeJSONSync(join(opts.rootDir, 'dependencies.json'), data, { spaces: 2 });
 
   return {
@@ -119,12 +134,18 @@ export function createReplaceData(opts: BuildOptions) {
     '__BUILDID:TRANSPILE__': transpileId,
 
     '__VERSION:STENCIL__': opts.version,
+    '__VERSION:PARSE5__': parse5Pkg.version,
     '__VERSION:ROLLUP__': rollupPkg.version,
-    '__VERSION:TYPESCRIPT__': typescriptPkg.version,
+    '__VERSION:SIZZLE__': rollupPkg.version,
     '__VERSION:TERSER__': terserPkg.version,
+    '__VERSION:TYPESCRIPT__': typescriptPkg.version,
 
     '__VERMOJI__': opts.vermoji,
   };
+}
+
+function getPkg(opts: BuildOptions, pkgName: string): PackageData {
+  return require(join(opts.nodeModulesDir, pkgName, 'package.json'));
 }
 
 export interface BuildOptions {
@@ -167,6 +188,7 @@ export interface BuildOptions {
   typescriptVersion?: string;
   rollupVersion?: string;
   parse5Verion?: string;
+  sizzleVersion?: string;
   terserVersion?: string;
 }
 
