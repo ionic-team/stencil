@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
 import { basename, resolve } from 'path';
-import { exit, getCurrentDirectory, getExecutingFilePath, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, isRemoteUrl, isString, normalizePath, noop } from '@utils';
+import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, isRemoteUrl, isString, normalizePath, noop } from '@utils';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 import ts from 'typescript';
@@ -41,8 +41,6 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
     }
   };
 
-  tsSys.getCurrentDirectory = stencilSys.getCurrentDirectory;
-
   tsSys.createDirectory = p => {
     stencilSys.createDirSync(p, { recursive: true });
   };
@@ -64,6 +62,10 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
     const s = inMemoryFs.statSync(filePath);
     return !!(s && s.isFile);
   };
+
+  tsSys.getCurrentDirectory = stencilSys.getCurrentDirectory;
+
+  tsSys.getExecutingFilePath = stencilSys.getCompilerExecutingPath;
 
   tsSys.getDirectories = p => {
     const items = stencilSys.readDirSync(p);
@@ -163,11 +165,11 @@ const patchTypeScriptSysMinimum = () => {
       args: [],
       createDirectory: noop,
       directoryExists: () => false,
-      exit,
+      exit: noop,
       fileExists: () => false,
       getCurrentDirectory,
       getDirectories: () => [],
-      getExecutingFilePath,
+      getExecutingFilePath: () => './',
       readDirectory: () => [],
       readFile: noop,
       newLine: '\n',
