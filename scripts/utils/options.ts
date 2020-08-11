@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { getVermoji } from './vermoji';
 import { PackageData } from './write-pkg-json';
-import { readJSONSync, writeJSONSync } from 'fs-extra';
+import { readFileSync } from 'fs-extra';
 
 export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
   const srcDir = join(rootDir, 'src');
@@ -44,7 +44,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
       sysNodeDir: join(rootDir, 'sys', 'node'),
       testingDir: join(rootDir, 'testing'),
     },
-    packageJson: readJSONSync(packageJsonPath),
+    packageJson: JSON.parse(readFileSync(packageJsonPath, 'utf8')),
     version: null,
     buildId: null,
     isProd: false,
@@ -106,25 +106,6 @@ export function createReplaceData(opts: BuildOptions) {
 
   const sizzlePkg = getPkg(opts, 'sizzle');
   opts.sizzleVersion = sizzlePkg.version;
-
-  const data = readJSONSync(join(opts.srcDir, 'compiler', 'sys', 'dependencies.json'));
-  for (const dep of data.dependencies) {
-    switch (dep.name) {
-      case '@stencil/core':
-        dep.version = opts.version;
-        break;
-      case 'rollup':
-        dep.version = rollupPkg.version;
-        break;
-      case 'terser':
-        dep.version = terserPkg.version;
-        break;
-      case 'typescript':
-        dep.version = typescriptPkg.version;
-        break;
-    }
-  }
-  writeJSONSync(join(opts.rootDir, 'dependencies.json'), data, { spaces: 2 });
 
   return {
     '__BUILDID__': opts.buildId,

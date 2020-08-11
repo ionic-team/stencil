@@ -5,6 +5,7 @@ import rollupJson from '@rollup/plugin-json';
 import rollupNodeResolve from '@rollup/plugin-node-resolve';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { getBanner } from '../utils/banner';
+import { getTypeScriptDefaultLibNames } from '../utils/dependencies-json';
 import { inlinedCompilerDepsPlugin } from './plugins/inlined-compiler-deps-plugin';
 import { moduleDebugPlugin } from './plugins/module-debug-plugin';
 import { parse5Plugin } from './plugins/parse5-plugin';
@@ -134,11 +135,9 @@ export async function compiler(opts: BuildOptions) {
   };
 
   // copy typescript default lib dts files
-  const dtsFiles = (await fs.readdir(opts.typescriptLibDir)).filter(f => {
-    return f.startsWith('lib.') && f.endsWith('.d.ts');
-  });
+  const tsLibNames = await getTypeScriptDefaultLibNames(opts);
 
-  await Promise.all(dtsFiles.map(f => fs.copy(join(opts.typescriptLibDir, f), join(opts.output.compilerDir, f))));
+  await Promise.all(tsLibNames.map(f => fs.copy(join(opts.typescriptLibDir, f), join(opts.output.compilerDir, f))));
 
   return [compilerBundle];
 }

@@ -45,7 +45,7 @@ export const run = async (init: CliInitOptions) => {
       sys.exit(1);
     }
 
-    const ensureDepsResults = await sys.ensureDependencies({ rootDir: findConfigResults.rootDir, logger, dependencies });
+    const ensureDepsResults = await sys.ensureDependencies({ rootDir: findConfigResults.rootDir, logger, dependencies: dependencies as any });
     if (hasError(ensureDepsResults.diagnostics)) {
       logger.printDiagnostics(ensureDepsResults.diagnostics);
       sys.exit(1);
@@ -87,7 +87,7 @@ export const run = async (init: CliInitOptions) => {
       sys.applyGlobalPatch(validated.config.rootDir);
     }
 
-    await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies });
+    await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies as any });
 
     await runTask(coreCompiler, validated.config, task);
   } catch (e) {

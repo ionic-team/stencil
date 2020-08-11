@@ -1,6 +1,7 @@
 import { BuildOptions } from './utils/options';
 import { cli } from './bundles/cli';
 import { compiler } from './bundles/compiler';
+import { updateDependenciesJson } from './utils/dependencies-json';
 import { createLicense } from './license';
 import { devServer } from './bundles/dev-server';
 import { emptyDir } from 'fs-extra';
@@ -43,6 +44,7 @@ export async function createBuild(opts: BuildOptions) {
     emptyDir(opts.output.sysDenoDir),
     emptyDir(opts.output.sysNodeDir),
     emptyDir(opts.output.testingDir),
+    updateDependenciesJson(opts),
   ]);
 
   await sysNodeExternalBundles(opts);
