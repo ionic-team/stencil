@@ -3,7 +3,7 @@ import styles from './styles.css';
 
 @Component({
   tag: 'hello-vdom',
-  styles: styles,
+  styles,
 })
 export class HelloWorld {
   render() {
