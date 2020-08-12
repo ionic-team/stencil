@@ -1,12 +1,23 @@
 import { Config } from '../../internal';
 import builtins from 'rollup-plugin-node-builtins';
+import linaria from 'linaria/rollup';
+import css from 'rollup-plugin-css-only';
 import { reactOutputTarget } from '@stencil/react-output-target';
+import path from 'path';
 
 export const config: Config = {
   namespace: 'EndToEnd',
   globalScript: './src/global.ts',
   globalStyle: './src/global.css',
   plugins: [builtins()],
+  rollupPlugins: {
+    after: [
+      linaria(),
+      css({
+        output: path.join(__dirname, 'www', 'linaria.css'),
+      }),
+    ],
+  },
 
   testing: {
     moduleNameMapper: {
@@ -16,6 +27,7 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
+      empty: false,
       serviceWorker: null,
     },
     {
@@ -29,11 +41,6 @@ export const config: Config = {
       proxiesFile: './dist-react/components.ts',
     }),
   ],
-  commonjs: {
-    namedExports: {
-      'file-saver': ['saveAs'],
-    },
-  },
   hydratedFlag: {
     name: 'custom-hydrate-flag',
     selector: 'attribute',

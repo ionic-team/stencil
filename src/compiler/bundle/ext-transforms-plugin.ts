@@ -21,6 +21,10 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         let cmp: d.ComponentCompilerMeta;
         const filePath = normalizeFsPath(id);
         const code = await compilerCtx.fs.readFile(filePath);
+        if (typeof code !== 'string') {
+          return null;
+        }
+
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, buildCtx, code, filePath);
         const commentOriginalSelector = bundleOpts.platform === 'hydrate' && data.encapsulation === 'shadow';
 

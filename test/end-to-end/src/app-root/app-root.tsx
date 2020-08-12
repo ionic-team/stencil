@@ -2,6 +2,22 @@ import { Component, State, h, Host, Listen } from '@stencil/core';
 import _ from 'lodash';
 import _es from 'lodash-es';
 import videojs from 'video.js';
+import { css } from 'linaria';
+
+const linariaCss = css`
+  background-color: rgba(0, 0, 255, 0.1);
+`;
+
+const styles = `
+  #video {
+    position: absolute;
+    top: 400px;
+    width: 80%;
+    height: 300px;
+    border: 2px solid blue;
+    padding: 10px;
+  }
+`;
 
 function format(target: any, propertyKey: string) {
   console.log(target, propertyKey);
@@ -9,6 +25,7 @@ function format(target: any, propertyKey: string) {
 
 @Component({
   tag: 'app-root',
+  styles,
 })
 export class AppRoot {
   @format something = '12';
@@ -36,7 +53,7 @@ export class AppRoot {
     return (
       <Host>
         <prop-cmp first={this.first} lastName={this.last} mode="ios" />
-        <div id="video"></div>
+        <div id="video" class={linariaCss}></div>
       </Host>
     );
   }

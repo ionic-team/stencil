@@ -58,7 +58,7 @@ describe('goto root url', () => {
 
   it('should apply global style when setting html', async () => {
     const page = await newE2EPage({
-      html: '<app-root></app-root>',
+      url: '/',
     });
 
     const elm = await page.find('app-root');
@@ -67,5 +67,15 @@ describe('goto root url', () => {
     expect(elmStyle.borderColor).toBe('rgb(255, 0, 0)');
     expect(elmStyle.borderWidth).toBe('5px');
     expect(elmStyle.borderStyle).toBe('dotted');
+
+    const videoElm = await page.find('#video');
+    const videoStyle = await videoElm.getComputedStyle();
+
+    // @Component() styles
+    expect(videoStyle.borderColor).toBe('rgb(0, 0, 255)');
+    expect(videoStyle.borderWidth).toBe('2px');
+
+    // linaria styles
+    expect(videoStyle.backgroundColor).toBe('rgba(0, 0, 255, 0.1)');
   });
 });
