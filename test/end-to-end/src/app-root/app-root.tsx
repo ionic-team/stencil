@@ -1,4 +1,4 @@
-import { Component, State, h, Host } from '@stencil/core';
+import { Component, State, h, Host, Listen } from '@stencil/core';
 import _ from 'lodash';
 import _es from 'lodash-es';
 import videojs from 'video.js';
@@ -24,7 +24,12 @@ export class AppRoot {
   }
 
   componentDidLoad() {
-    videojs('video')
+    videojs('video');
+  }
+
+  @Listen('scroll', { target: 'window' })
+  scroll(ev: UIEvent) {
+    console.log(ev.type);
   }
 
   render() {
