@@ -24,7 +24,7 @@ export const scheduleUpdate = (hostRef: d.HostRef, isInitialLoad: boolean) => {
   }
   attachToAncestor(hostRef, hostRef.$ancestorComponent$);
 
-  // there is no ancestorc omponent or the ancestor component
+  // there is no ancestor component or the ancestor component
   // has already fired off its lifecycle update then
   // fire off the initial update
   const dispatch = () => dispatchHooks(hostRef, isInitialLoad);

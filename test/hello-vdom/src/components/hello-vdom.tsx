@@ -1,15 +1,12 @@
 import { Component, h } from '@stencil/core';
+import styles from './styles.css';
 
 @Component({
   tag: 'hello-vdom',
-  styleUrl: 'styles.css'
+  styles: styles,
 })
 export class HelloWorld {
   render() {
-    return (
-      <h1>
-        Hello VaasA! dfhj
-      </h1>
-    );
+    return <h1>Hello VDom!</h1>;
   }
 }

@@ -182,63 +182,68 @@ export const arrayLiteralToArray = (arr: ts.ArrayLiteralExpression) => {
   });
 };
 
-export const objectLiteralToObjectMap = (objectLiteral: ts.ObjectLiteralExpression): ObjectMap => {
-  const attrs: ts.ObjectLiteralElementLike[] = objectLiteral.properties as any;
+export const objectLiteralToObjectMap = (objectLiteral: ts.ObjectLiteralExpression) => {
+  const properties = objectLiteral.properties;
+  const final: ObjectMap = {};
 
-  return attrs.reduce((final: ObjectMap, attr: ts.PropertyAssignment) => {
-    const attrName = getTextOfPropertyName(attr.name);
+  for (const propAssignment of properties) {
+    const propName = getTextOfPropertyName(propAssignment.name);
     let val: any;
 
-    switch (attr.initializer.kind) {
-      case ts.SyntaxKind.ArrayLiteralExpression:
-        val = arrayLiteralToArray(attr.initializer as ts.ArrayLiteralExpression);
-        break;
+    if (ts.isShorthandPropertyAssignment(propAssignment)) {
+      val = getIdentifierValue(propName);
+    } else if (ts.isPropertyAssignment(propAssignment)) {
+      switch (propAssignment.initializer.kind) {
+        case ts.SyntaxKind.ArrayLiteralExpression:
+          val = arrayLiteralToArray(propAssignment.initializer as ts.ArrayLiteralExpression);
+          break;
 
-      case ts.SyntaxKind.ObjectLiteralExpression:
-        val = objectLiteralToObjectMap(attr.initializer as ts.ObjectLiteralExpression);
-        break;
+        case ts.SyntaxKind.ObjectLiteralExpression:
+          val = objectLiteralToObjectMap(propAssignment.initializer as ts.ObjectLiteralExpression);
+          break;
 
-      case ts.SyntaxKind.StringLiteral:
-        val = (attr.initializer as ts.StringLiteral).text;
-        break;
+        case ts.SyntaxKind.StringLiteral:
+          val = (propAssignment.initializer as ts.StringLiteral).text;
+          break;
 
-      case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
-        val = (attr.initializer as ts.StringLiteral).text;
-        break;
+        case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
+          val = (propAssignment.initializer as ts.StringLiteral).text;
+          break;
 
-      case ts.SyntaxKind.TrueKeyword:
-        val = true;
-        break;
+        case ts.SyntaxKind.TrueKeyword:
+          val = true;
+          break;
 
-      case ts.SyntaxKind.FalseKeyword:
-        val = false;
-        break;
+        case ts.SyntaxKind.FalseKeyword:
+          val = false;
+          break;
 
-      case ts.SyntaxKind.Identifier:
-        const escapedText = (attr.initializer as ts.Identifier).escapedText;
-        if (escapedText === 'String') {
-          val = String;
-        } else if (escapedText === 'Number') {
-          val = Number;
-        } else if (escapedText === 'Boolean') {
-          val = Boolean;
-        } else if (escapedText === 'undefined') {
-          val = undefined;
-        } else if (escapedText === 'null') {
-          val = null;
-        } else {
-          val = getIdentifierValue((attr.initializer as ts.Identifier).escapedText);
-        }
-        break;
+        case ts.SyntaxKind.Identifier:
+          const escapedText = (propAssignment.initializer as ts.Identifier).escapedText;
+          if (escapedText === 'String') {
+            val = String;
+          } else if (escapedText === 'Number') {
+            val = Number;
+          } else if (escapedText === 'Boolean') {
+            val = Boolean;
+          } else if (escapedText === 'undefined') {
+            val = undefined;
+          } else if (escapedText === 'null') {
+            val = null;
+          } else {
+            val = getIdentifierValue((propAssignment.initializer as ts.Identifier).escapedText);
+          }
+          break;
 
-      case ts.SyntaxKind.PropertyAccessExpression:
-      default:
-        val = attr.initializer;
+        case ts.SyntaxKind.PropertyAccessExpression:
+        default:
+          val = propAssignment.initializer;
+      }
     }
+    final[propName] = val;
+  }
 
-    final[attrName] = val;
-    return final;
-  }, <ObjectMap>{});
+  return final;
 };
 
 const getIdentifierValue = (escapedText: any) => {

@@ -71,4 +71,16 @@ describe('parse styles', () => {
       md: 'p{color:red}',
     });
   });
+
+  it('add static "styles" const', () => {
+    const t = transpileModule(`
+      const styles = 'p{color:red}';
+      @Component({
+        tag: 'cmp-a',
+        styles,
+      })
+      export class CmpA {}
+    `);
+    expect(t.outputText).toEqual(`const styles = 'p{color:red}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return styles; }}`);
+  });
 });
