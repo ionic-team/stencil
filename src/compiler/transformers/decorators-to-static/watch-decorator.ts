@@ -20,25 +20,19 @@ export const watchDecoratorsToStatic = (
   }
 };
 
-const isWatchDecorator = isDecoratorNamed('Watch');
-const isPropWillChangeDecorator = isDecoratorNamed('PropWillChange');
-const isPropDidChangeDecorator = isDecoratorNamed('PropDidChange');
-
 const parseWatchDecorator = (config: d.Config, diagnostics: d.Diagnostic[], watchable: Set<string>, method: ts.MethodDeclaration): d.ComponentCompilerWatch[] => {
   const methodName = method.name.getText();
-  return method.decorators
-    .filter(decorator => isWatchDecorator(decorator) || isPropWillChangeDecorator(decorator) || isPropDidChangeDecorator(decorator))
-    .map(decorator => {
-      const [propName] = getDeclarationParameters<string>(decorator);
-      if (!watchable.has(propName)) {
-        const dianostic = config.devMode ? buildWarn(diagnostics) : buildError(diagnostics);
-        dianostic.messageText = `@Watch('${propName}') is trying to watch for changes in a property that does not exist.
+  return method.decorators.filter(isDecoratorNamed('Watch')).map(decorator => {
+    const [propName] = getDeclarationParameters<string>(decorator);
+    if (!watchable.has(propName)) {
+      const dianostic = config.devMode ? buildWarn(diagnostics) : buildError(diagnostics);
+      dianostic.messageText = `@Watch('${propName}') is trying to watch for changes in a property that does not exist.
         Make sure only properties decorated with @State() or @Prop() are watched.`;
-        augmentDiagnosticWithNode(dianostic, decorator);
-      }
-      return {
-        propName,
-        methodName,
-      };
-    });
+      augmentDiagnosticWithNode(dianostic, decorator);
+    }
+    return {
+      propName,
+      methodName,
+    };
+  });
 };
