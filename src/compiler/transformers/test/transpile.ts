@@ -83,6 +83,7 @@ export function transpileModule(
     currentDirectory: '/',
     proxy: null,
     style: 'static',
+    styleImportData: 'queryparams',
   };
 
   tsProgram.emit(undefined, undefined, undefined, undefined, {

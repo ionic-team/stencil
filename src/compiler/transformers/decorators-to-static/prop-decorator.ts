@@ -1,5 +1,5 @@
 import type * as d from '../../../declarations';
-import { augmentDiagnosticWithNode, buildError, buildWarn, catchError, toDashCase } from '@utils';
+import { augmentDiagnosticWithNode, buildError, buildWarn, toDashCase } from '@utils';
 import {
   convertValueToLiteral,
   createStaticGetter,
@@ -10,7 +10,7 @@ import {
   typeToString,
   validateReferences,
 } from '../transform-utils';
-import { isDecoratorNamed } from './decorator-utils';
+import { isDecoratorNamed, getDeclarationParameters } from './decorator-utils';
 import { validatePublicName } from '../reserved-public-members';
 import ts from 'typescript';
 
@@ -37,8 +37,10 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
     return null;
   }
 
+  const decoratorParms = getDeclarationParameters<d.PropOptions>(propDecorator);
+  const propOptions: d.PropOptions = decoratorParms[0] || {};
+
   const propName = prop.name.getText();
-  const propOptions = getPropOptions(propDecorator, diagnostics);
 
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);
@@ -109,24 +111,6 @@ const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, pr
     return (propOptions as any).reflectToAttr;
   }
   return false;
-};
-
-const getPropOptions = (propDecorator: ts.Decorator, diagnostics: d.Diagnostic[]) => {
-  if (propDecorator.expression == null) {
-    return {};
-  }
-
-  const suppliedOptions = (propDecorator.expression as ts.CallExpression).arguments.map(arg => {
-    try {
-      const fnStr = `return ${arg.getText()};`;
-      return new Function(fnStr)();
-    } catch (e) {
-      catchError(diagnostics, e, `parse prop options: ${e}`);
-    }
-  });
-
-  const propOptions: d.PropOptions = suppliedOptions[0];
-  return propOptions || {};
 };
 
 const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration, type: ts.Type): d.ComponentCompilerPropertyComplexType => {

@@ -1,15 +1,8 @@
-import type * as d from '../../../declarations';
 import { createStaticGetter } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
-export const stateDecoratorsToStatic = (
-  _diagnostics: d.Diagnostic[],
-  decoratedProps: ts.ClassElement[],
-  _typeChecker: ts.TypeChecker,
-  watchable: Set<string>,
-  newMembers: ts.ClassElement[],
-) => {
+export const stateDecoratorsToStatic = (decoratedProps: ts.ClassElement[], watchable: Set<string>, newMembers: ts.ClassElement[]) => {
   const states = decoratedProps
     .filter(ts.isPropertyDeclaration)
     .map(prop => stateDecoratorToStatic(prop, watchable))

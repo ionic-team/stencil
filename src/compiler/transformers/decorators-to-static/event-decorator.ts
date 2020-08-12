@@ -22,24 +22,23 @@ const parseEventDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeCh
     return null;
   }
 
-  const [opts] = getDeclarationParameters<d.EventOptions>(eventDecorator);
-
   const memberName = prop.name.getText();
   if (!memberName) {
     return null;
   }
 
+  const [eventOpts] = getDeclarationParameters<d.EventOptions>(eventDecorator);
   const symbol = typeChecker.getSymbolAtLocation(prop.name);
-  const name = getEventName(opts, memberName);
+  const eventName = getEventName(eventOpts, memberName);
 
-  validateEventName(diagnostics, prop.name, name);
+  validateEventName(diagnostics, prop.name, eventName);
 
   const eventMeta = {
     method: memberName,
-    name,
-    bubbles: opts && typeof opts.bubbles === 'boolean' ? opts.bubbles : true,
-    cancelable: opts && typeof opts.cancelable === 'boolean' ? opts.cancelable : true,
-    composed: opts && typeof opts.composed === 'boolean' ? opts.composed : true,
+    name: eventName,
+    bubbles: eventOpts && typeof eventOpts.bubbles === 'boolean' ? eventOpts.bubbles : true,
+    cancelable: eventOpts && typeof eventOpts.cancelable === 'boolean' ? eventOpts.cancelable : true,
+    composed: eventOpts && typeof eventOpts.composed === 'boolean' ? eventOpts.composed : true,
     docs: serializeSymbol(typeChecker, symbol),
     complexType: getComplexType(typeChecker, prop),
   };

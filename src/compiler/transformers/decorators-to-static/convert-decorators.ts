@@ -47,7 +47,7 @@ export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnosti
   const watchable = new Set<string>();
   if (decoratedMembers.length > 0) {
     propDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, watchable, newMembers);
-    stateDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, watchable, newMembers);
+    stateDecoratorsToStatic(decoratedMembers, watchable, newMembers);
     eventDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, newMembers);
     methodDecoratorsToStatic(config, diagnostics, classNode, decoratedMembers, typeChecker, newMembers);
     elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, newMembers);
