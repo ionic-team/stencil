@@ -172,11 +172,17 @@ export interface StencilConfig {
 
   /**
    * Sets the task queue used by stencil's runtime. The task queue schedules DOM read and writes
-   * across the frames to efficiently render and reduce layout thrashing. By default, the
-   * `congestionAsync` is used. It's recommended to also try each setting to decide which works
+   * across the frames to efficiently render and reduce layout thrashing. By default,
+   * `async` is used. It's recommended to also try each setting to decide which works
    * best for your use-case. In all cases, if your app has many CPU intensive tasks causing the
    * main thread to periodically lock-up, it's always recommended to try
    * [Web Workers](https://stenciljs.com/docs/web-workers) for those tasks.
+   *
+   * - `async`: DOM read and writes are scheduled in the next frame to prevent layout thrashing.
+   *   During intensive CPU tasks it will not reschedule rendering to happen in the next frame.
+   *   `async` is ideal for most apps, and if the app has many intensive tasks causing the main
+   *   thread to lock-up, it's recommended to try [Web Workers](https://stenciljs.com/docs/web-workers)
+   *   rather than the congestion async queue.
    *
    * - `congestionAsync`: DOM reads and writes are scheduled in the next frame to prevent layout
    *   thrashing. When the app is heavily tasked and the queue becomes congested it will then
@@ -184,12 +190,6 @@ export interface StencilConfig {
    *   also introduce unnecesary reflows in some cases, especially during startup. `congestionAsync`
    *   is ideal for apps running animations while also simultaniously executing intesive tasks
    *   which may lock-up the main thread.
-   *
-   * - `async`: DOM read and writes are scheduled in the next frame to prevent layout thrashing.
-   *   During intensive CPU tasks it will not reschedule rendering to happen in the next frame.
-   *   `async` is ideal for most apps, and if the app has many intensive tasks causing the main
-   *   thread to lock-up, it's recommended to try [Web Workers](https://stenciljs.com/docs/web-workers)
-   *   rather than the congestion async queue.
    *
    * - `immediate`: Makes writeTask() and readTask() callbacks to be executed syncronously. Tasks
    *   are not scheduled to run in the next frame, but do note there is at least one microtask.
@@ -226,28 +226,30 @@ export interface ConfigExtras {
   /**
    * By default, the slot polyfill does not update `appendChild()` so that it appends
    * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
-   * polyfill for those who need it. Defaults to `false`.
+   * polyfill for those who need it when using `element.appendChild(node)` and expecting the
+   * child to be appended in the same location shadom dom would. This is not required for
+   * IE11 or Edge 18, but can be enabled if the app is using `appendChild()`. Defaults to `false`.
    */
   appendChildSlotFix?: boolean;
 
   /**
    * By default, the runtime does not polyfill `cloneNode()` when cloning a component
    * that uses the slot polyfill. This is an opt-in polyfill for those who need it.
-   * Defaults to `false`.
+   * This is not required for IE11 or Edge 18, but can be enabled if the app is using
+   * `cloneNode()` and unexpected node are being cloned due to the slot polyfill
+   * simulating shadow dom. Defaults to `false`.
    */
   cloneNodeFix?: boolean;
 
   /**
-   * Include the CSS Custom Property polyfill/shim for legacy browsers. Defaults to `true`
-   * for legacy builds only. ESM builds will not include the css vars shim.
+   * Include the CSS Custom Property polyfill/shim for legacy browsers. ESM builds will
+   * not include the css vars shim. Defaults to `false`
    */
   cssVarsShim?: boolean;
 
   /**
    * Dynamic `import()` shim. This is only needed for Edge 18 and below, and Firefox 67
-   * and below. If you do not need to support Edge 18 and below (Edge before it moved
-   * to Chromium) then it's recommended to set `dynamicImportShim` to `false`.
-   * Defaults to `true`.
+   * and below. Defaults to `false`.
    */
   dynamicImportShim?: boolean;
 
@@ -258,32 +260,32 @@ export interface ConfigExtras {
 
   /**
    * Safari 10 supports ES modules with `<script type="module">`, however, it did not implement
-   * `<script nomodule>`. When set to `false`, the runtime will not patch support for Safari 10.
-   * Defaults to `true`.
+   * `<script nomodule>`. When set to `true`, the runtime will patch support for Safari 10
+   * due to its lack of `nomodule` support.
+   * Defaults to `false`.
    */
   safari10?: boolean;
 
   /**
    * It is possible to assign data to the actual `<script>` element's `data-opts` property,
    * which then gets passed to Stencil's initial bootstrap. This feature is only required
-   * for very special cases and rarely needed. When set to `false` it will not read
-   * this data. Defaults to `true`.
+   * for very special cases and rarely needed. Defaults to `false`.
    */
   scriptDataOpts?: boolean;
 
   /**
    * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
    * if it's determined that shadow dom is already natively supported by the browser then
-   * it does not request the shim. Setting to `false` will avoid all shadow dom tests.
-   * If the app does not need to support IE11 or Edge 18 it's recommended to set `shadowDomShim` to
-   * `false`. Defaults to `true`.
+   * it does not request the shim. When set to `false` it will avoid all shadow dom tests.
+   * Defaults to `false`.
    */
   shadowDomShim?: boolean;
 
   /**
-   * When a component is first attached to the DOM, wait a single tick before rendering.
-   * This worksaround an angular issue, where it attaches the elements before settings their initial state,
-   * leading to double renders and unnecesary event dispatchs.
+   * When a component is first attached to the DOM, this setting will wait a single tick before
+   * rendering. This worksaround an Angular issue, where Angular attaches the elements before
+   * settings their initial state, leading to double renders and unnecesary event dispatchs.
+   * Defaults to `false`.
    */
   initializeNextTick?: boolean;
 
@@ -296,7 +298,8 @@ export interface ConfigExtras {
   slotChildNodesFix?: boolean;
 
   /**
-   * Enables the tagNameTransform option of `defineCustomElements()`, so the component tagName can be customized at runtime.
+   * Enables the tagNameTransform option of `defineCustomElements()`, so the component tagName
+   * can be customized at runtime. Defaults to `false`.
    */
   tagNameTransform?: boolean;
 }
