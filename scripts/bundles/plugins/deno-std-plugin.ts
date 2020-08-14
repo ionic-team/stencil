@@ -2,7 +2,7 @@ import type { Plugin } from 'rollup';
 import fs from 'fs-extra';
 import fetch from 'node-fetch';
 import ts from 'typescript';
-import { BuildOptions } from '../../utils/options';
+import type { BuildOptions } from '../../utils/options';
 import { join } from 'path';
 
 export function denoStdPlugin(opts: BuildOptions): Plugin {

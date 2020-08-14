@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
-import { BuildOptions } from '../../utils/options';
+import type { BuildOptions } from '../../utils/options';
 import { join } from 'path';
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
 
 export function sizzlePlugin(opts: BuildOptions): Plugin {
   return {

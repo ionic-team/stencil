@@ -1,5 +1,5 @@
-import { Plugin } from 'rollup';
-import { BuildOptions } from '../../utils/options';
+import type { Plugin } from 'rollup';
+import type { BuildOptions } from '../../utils/options';
 import { join } from 'path';
 
 export function aliasPlugin(opts: BuildOptions): Plugin {

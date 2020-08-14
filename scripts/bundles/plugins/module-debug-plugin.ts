@@ -1,5 +1,5 @@
-import { Plugin } from 'rollup';
-import { BuildOptions } from '../../utils/options';
+import type { Plugin } from 'rollup';
+import type { BuildOptions } from '../../utils/options';
 import path from 'path';
 
 export function moduleDebugPlugin(opts: BuildOptions): Plugin {

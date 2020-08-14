@@ -4,7 +4,7 @@ import { rollup, Plugin } from 'rollup';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupJson from '@rollup/plugin-json';
 import rollupNodeResolve from '@rollup/plugin-node-resolve';
-import { BuildOptions } from '../../utils/options';
+import type { BuildOptions } from '../../utils/options';
 
 export function inlinedCompilerDepsPlugin(opts: BuildOptions, inputDir: string): Plugin {
   return {

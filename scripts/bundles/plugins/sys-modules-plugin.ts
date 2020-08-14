@@ -1,5 +1,5 @@
 import path from 'path';
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
 
 const modules = new Set(['crypto', 'events', 'fs', 'module', 'os', 'path', 'stream', 'url', 'util']);
 

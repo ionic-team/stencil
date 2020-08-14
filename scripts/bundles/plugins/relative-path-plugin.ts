@@ -1,4 +1,4 @@
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
 
 export function relativePathPlugin(moduleId: string, relativePath: string): Plugin {
   return {
