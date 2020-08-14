@@ -7,9 +7,9 @@ import { aliasPlugin } from './plugins/alias-plugin';
 import { relativePathPlugin } from './plugins/relative-path-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { BuildOptions } from '../utils/options';
-import { RollupOptions, OutputChunk, Plugin } from 'rollup';
-import terser from 'terser';
+import type { BuildOptions } from '../utils/options';
+import type { RollupOptions, OutputChunk, Plugin } from 'rollup';
+import { minify } from 'terser';
 import ts from 'typescript';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
 
@@ -145,7 +145,7 @@ export async function devServer(opts: BuildOptions) {
       appErrorCssPlugin(),
       {
         name: 'clientConnectorPlugin',
-        generateBundle(_options, bundle) {
+        async generateBundle(_options, bundle) {
           if (bundle[connectorName]) {
             let code = (bundle[connectorName] as OutputChunk).code;
 
@@ -164,13 +164,10 @@ export async function devServer(opts: BuildOptions) {
             code = intro + code + outro;
 
             if (opts.isProd) {
-              const minifyResults = terser.minify(code, {
+              const minifyResults = await minify(code, {
                 compress: { hoist_vars: true, hoist_funs: true, ecma: 5 },
-                output: { ecma: 5 },
+                format: { ecma: 5 },
               });
-              if (minifyResults.error) {
-                throw minifyResults.error;
-              }
               code = minifyResults.code;
             }
 

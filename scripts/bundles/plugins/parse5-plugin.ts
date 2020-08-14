@@ -1,11 +1,11 @@
 import fs from 'fs-extra';
 import { aliasPlugin } from './alias-plugin';
 import { join } from 'path';
-import { BuildOptions } from '../../utils/options';
+import type { BuildOptions } from '../../utils/options';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
 import { rollup, OutputChunk, Plugin } from 'rollup';
-import terser from 'terser';
+import { minify } from 'terser';
 
 export function parse5Plugin(opts: BuildOptions): Plugin {
   return {
@@ -77,22 +77,18 @@ async function bundleParse5(opts: BuildOptions) {
   let code = output[0].code;
 
   if (opts.isProd) {
-    const minified = terser.minify(code, {
+    const minified = await minify(code, {
       ecma: 2018,
       module: true,
       compress: {
         ecma: 2018,
         passes: 2,
       },
-      output: {
+      format: {
         ecma: 2018,
         comments: false,
       },
     });
-
-    if (minified.error) {
-      throw minified.error;
-    }
     code = minified.code;
   }
 

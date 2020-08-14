@@ -1,11 +1,11 @@
 import fs from 'fs-extra';
 import { join } from 'path';
 import webpack from 'webpack';
-import terser from 'terser';
+import { minify } from 'terser';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
-import { BuildOptions } from '../utils/options';
-import { RollupOptions } from 'rollup';
+import type { BuildOptions } from '../utils/options';
+import type { RollupOptions } from 'rollup';
 import { relativePathPlugin } from './plugins/relative-path-plugin';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
@@ -191,12 +191,13 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
             let code = await fs.readFile(outputFile, 'utf8');
 
             if (opts.isProd) {
-              const minifyResults = terser.minify(code);
-              if (minifyResults.error) {
-                rejectBundle(minifyResults.error);
+              try {
+                const minifyResults = await minify(code);
+                code = minifyResults.code;
+              } catch (e) {
+                rejectBundle(e);
                 return;
               }
-              code = minifyResults.code;
             }
             await fs.writeFile(cachedFile, code);
             await fs.writeFile(outputFile, code);

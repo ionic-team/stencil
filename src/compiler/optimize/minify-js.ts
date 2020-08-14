@@ -1,8 +1,14 @@
 import type * as d from '../../declarations';
 import { splitLineBreaks } from '@utils';
-import terser, { CompressOptions, MangleOptions, ManglePropertiesOptions, MinifyOptions } from 'terser';
+import { CompressOptions, MangleOptions, ManglePropertiesOptions, MinifyOptions, minify } from 'terser';
 
 export const minifyJs = async (input: string, opts?: MinifyOptions) => {
+  const results = {
+    output: input,
+    sourceMap: null as any,
+    diagnostics: [] as d.Diagnostic[],
+  };
+
   if (opts) {
     const mangle = opts.mangle as MangleOptions;
     if (mangle) {
@@ -12,36 +18,32 @@ export const minifyJs = async (input: string, opts?: MinifyOptions) => {
       }
     }
   }
-  const result = terser.minify(input, opts);
-  const diagnostics = loadMinifyJsDiagnostics(input, result);
 
-  if (diagnostics.length === 0) {
+  try {
+    const minifyResults = await minify(input, opts);
+
+    results.output = minifyResults.code;
+
     const compress = opts.compress as CompressOptions;
-    if (compress && compress.module && result.code.endsWith('};')) {
-      result.code = result.code.substring(0, result.code.length - 1);
+    if (compress && compress.module && results.output.endsWith('};')) {
+      results.output = results.output.substring(0, results.output.length - 1);
     }
+  } catch (e) {
+    console.log(e.stack)
+    loadMinifyJsDiagnostics(input, results.diagnostics, e);
   }
 
-  return {
-    output: result.code,
-    sourceMap: result.map as any,
-    diagnostics: diagnostics,
-  };
+  return results;
 };
 
-const loadMinifyJsDiagnostics = (sourceText: string, result: terser.MinifyOutput) => {
-  const diagnostics: d.Diagnostic[] = [];
-  if (!result || !result.error) {
-    return diagnostics;
-  }
-
+const loadMinifyJsDiagnostics = (sourceText: string, diagnostics: d.Diagnostic[], error: any) => {
   const d: d.Diagnostic = {
     level: 'error',
     type: 'build',
     language: 'javascript',
     header: 'Minify JS',
     code: '',
-    messageText: result.error.message,
+    messageText: error.message,
     absFilePath: null,
     relFilePath: null,
     lines: [],
@@ -55,7 +57,7 @@ const loadMinifyJsDiagnostics = (sourceText: string, result: terser.MinifyOutput
     name: string;
     pos: number;
     stack: string;
-  } = result.error as any;
+  } = error;
 
   if (typeof err.line === 'number' && err.line > -1) {
     const srcLines = splitLineBreaks(sourceText);
@@ -73,7 +75,7 @@ const loadMinifyJsDiagnostics = (sourceText: string, result: terser.MinifyOutput
 
     const highlightLine = errorLine.text.substr(d.columnNumber);
     for (let i = 0; i < highlightLine.length; i++) {
-      if (CHAR_BREAK.has(highlightLine.charAt(i))) {
+      if (MINIFY_CHAR_BREAK.has(highlightLine.charAt(i))) {
         break;
       }
       errorLine.errorLength++;
@@ -112,8 +114,6 @@ const loadMinifyJsDiagnostics = (sourceText: string, result: terser.MinifyOutput
   }
 
   diagnostics.push(d);
-
-  return diagnostics;
 };
 
-const CHAR_BREAK = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);
+const MINIFY_CHAR_BREAK = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);

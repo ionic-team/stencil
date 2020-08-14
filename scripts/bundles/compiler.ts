@@ -13,10 +13,11 @@ import { replacePlugin } from './plugins/replace-plugin';
 import { sizzlePlugin } from './plugins/sizzle-plugin';
 import { sysModulesPlugin } from './plugins/sys-modules-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { BuildOptions } from '../utils/options';
-import { RollupOptions, OutputChunk } from 'rollup';
+import type { BuildOptions } from '../utils/options';
+import type { RollupOptions, OutputChunk } from 'rollup';
 import { typescriptSourcePlugin } from './plugins/typescript-source-plugin';
-import terser from 'terser';
+import { MinifyOptions, minify } from 'terser';
+import { terserPlugin } from './plugins/terser-plugin';
 
 export async function compiler(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'compiler');
@@ -56,6 +57,7 @@ export async function compiler(opts: BuildOptions) {
     },
     plugins: [
       typescriptSourcePlugin(opts),
+      terserPlugin(opts),
       {
         name: 'compilerMockDocResolvePlugin',
         resolveId(id) {
@@ -115,7 +117,7 @@ export async function compiler(opts: BuildOptions) {
           if (opts.isProd) {
             const compilerFilename = Object.keys(bundleFiles).find(f => f.includes('stencil'));
             const compilerBundle = bundleFiles[compilerFilename] as OutputChunk;
-            const minified = minifyStencilCompiler(compilerBundle.code, opts);
+            const minified = await minifyStencilCompiler(compilerBundle.code, opts);
             await fs.writeFile(join(opts.output.compilerDir, compilerFilename.replace('.js', '.min.js')), minified);
           }
         },
@@ -142,8 +144,8 @@ export async function compiler(opts: BuildOptions) {
   return [compilerBundle];
 }
 
-function minifyStencilCompiler(code: string, opts: BuildOptions) {
-  const minifyOpts: terser.MinifyOptions = {
+async function minifyStencilCompiler(code: string, opts: BuildOptions) {
+  const minifyOpts: MinifyOptions = {
     ecma: 2018,
     compress: {
       ecma: 2018,
@@ -152,17 +154,13 @@ function minifyStencilCompiler(code: string, opts: BuildOptions) {
       unsafe_arrows: true,
       unsafe_methods: true,
     },
-    output: {
+    format: {
       ecma: 2018,
       comments: false,
     },
   };
 
-  const results = terser.minify(code, minifyOpts);
-
-  if (results.error) {
-    throw results.error;
-  }
+  const results = await minify(code, minifyOpts);
 
   code = getBanner(opts, `Stencil Compiler`, true) + '\n' + results.code;
 

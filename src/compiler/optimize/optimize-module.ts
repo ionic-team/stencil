@@ -38,7 +38,7 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
     code = code.replace(/\/\* IS_ESM_BUILD \*\//g, '&& false /* IS_SYSTEM_JS_BUILD */');
   }
 
-  if (opts.sourceTarget === 'es5' && opts.minify) {
+  if (opts.sourceTarget === 'es5' || opts.minify) {
     minifyOpts = getTerserOptions(config, opts.sourceTarget, isDebug);
     const compressOpts = minifyOpts.compress as CompressOptions;
     const mangleOptions = minifyOpts.mangle as MangleOptions;
@@ -81,11 +81,11 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
   const opts: MinifyOptions = {
     ie8: false,
     safari10: !!config.extras.safari10,
-    output: {},
+    format: {},
   };
 
   if (sourceTarget === 'es5') {
-    opts.ecma = opts.output.ecma = 5;
+    opts.ecma = opts.format.ecma = 5;
     opts.compress = false;
     opts.mangle = true;
   } else {
@@ -100,7 +100,7 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
       passes: 2,
     };
 
-    opts.ecma = opts.output.ecma = opts.compress.ecma = 8;
+    opts.ecma = opts.format.ecma = opts.compress.ecma = 2018;
     opts.toplevel = true;
     opts.module = true;
     opts.mangle.toplevel = true;
@@ -115,9 +115,9 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
     opts.compress.drop_console = false;
     opts.compress.drop_debugger = false;
     opts.compress.pure_funcs = [];
-    opts.output.beautify = true;
-    opts.output.indent_level = 2;
-    opts.output.comments = 'all';
+    opts.format.beautify = true;
+    opts.format.indent_level = 2;
+    opts.format.comments = 'all';
   }
 
   return opts;

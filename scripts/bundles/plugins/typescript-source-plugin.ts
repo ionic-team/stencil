@@ -1,8 +1,8 @@
 import fs from 'fs-extra';
-import { Plugin } from 'rollup';
+import type { Plugin } from 'rollup';
 import { join } from 'path';
-import { BuildOptions } from '../../utils/options';
-import terser from 'terser';
+import type { BuildOptions } from '../../utils/options';
+import { minify } from 'terser';
 
 export function typescriptSourcePlugin(opts: BuildOptions): Plugin {
   const tsPath = require.resolve('typescript');
@@ -73,22 +73,18 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions) {
   code = o.join('\n');
 
   if (opts.isProd) {
-    const minified = terser.minify(code, {
+    const minified = await minify(code, {
       ecma: 2018,
       module: true,
       compress: {
         ecma: 2018,
         passes: 2,
       },
-      output: {
+      format: {
         ecma: 2018,
         comments: false,
       },
     });
-
-    if (minified.error) {
-      throw minified.error;
-    }
     code = minified.code;
   }
 

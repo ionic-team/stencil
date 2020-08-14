@@ -47,8 +47,6 @@ export const validateConfig = (userConfig?: Config) => {
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
   setBooleanConfig(config, 'sourceMap', null, false);
   setBooleanConfig(config, 'watch', 'watch', false);
-  setBooleanConfig(config, 'minifyCss', null, !config.devMode);
-  setBooleanConfig(config, 'minifyJs', null, !config.devMode);
   setBooleanConfig(config, 'buildDocs', 'docs', !config.devMode);
   setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
   setBooleanConfig(config, 'profile', 'profile', config.devMode);

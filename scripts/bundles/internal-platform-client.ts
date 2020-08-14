@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import { basename, join } from 'path';
-import { BuildOptions } from '../utils/options';
+import type { BuildOptions } from '../utils/options';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { reorderCoreStatementsPlugin } from './plugins/reorder-statements';
@@ -114,7 +114,7 @@ export async function internalClient(opts: BuildOptions) {
             let code = transpileToEs5.outputText;
 
             if (opts.isProd) {
-              const minifyResults = minify(code);
+              const minifyResults = await minify(code);
               code = minifyResults.code;
             }
 
