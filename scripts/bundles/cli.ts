@@ -8,7 +8,6 @@ import { replacePlugin } from './plugins/replace-plugin';
 import { relativePathPlugin } from './plugins/relative-path-plugin';
 import { BuildOptions } from '../utils/options';
 import { RollupOptions, OutputOptions } from 'rollup';
-import { prettyMinifyPlugin } from './plugins/pretty-minify';
 import { writePkgJson } from '../utils/write-pkg-json';
 
 export async function cli(opts: BuildOptions) {
@@ -60,7 +59,6 @@ export async function cli(opts: BuildOptions) {
         preferConst: true,
       }),
       replacePlugin(opts),
-      prettyMinifyPlugin(opts),
     ],
     treeshake: {
       moduleSideEffects: false,
