@@ -1,4 +1,4 @@
-# 🐗 [2.0.0-1](https://github.com/ionic-team/stencil/compare/v1.17.3...v2.0.0-1) (2020-08-12)
+# 🌐 [2.0.0-2](https://github.com/ionic-team/stencil/compare/v1.17.3...v2.0.0-2) (2020-08-14)
 
 In keeping with [Semver](https://semver.org/), Stencil `2.0.0` was released due to changes in the API (mainly from some updates to the config API). But even though this is a new major version, there are few breaking changes, and any changes will be flagged and described by the compiler during development. For the most part, most of the changes are removal of deprecated APIs that have been printing out warning logs for quite some time now.
 
@@ -104,8 +104,10 @@ The other change is the update to [TypeScript 4](https://devblogs.microsoft.com/
 
 ### Features
 
-* **jest:** update to jest 26.3.0 ([fa9214d](https://github.com/ionic-team/stencil/commit/fa9214d7bd5a7d644ca1168f7711a445457ce8e4))
-* **rollup:** rollup 2.23.1 ([c51afca](https://github.com/ionic-team/stencil/commit/c51afca797f96c0be5124e76861daa94b0ce0856))
+* **buildEs5:** add "prod" as an option for config.buildEs5 ([1af30a2](https://github.com/ionic-team/stencil/commit/1af30a2177e6cc920c88c30a6c0c939a73918c1b))
+* **jest:** update to jest 26.4.0 ([9e3a6a8](https://github.com/ionic-team/stencil/commit/9e3a6a85cf40ad61bdc687fa047beda30b47f8a4))
+* **rollup:** update rollup dependencies ([#2638](https://github.com/ionic-team/stencil/issues/2638)) ([8f807bf](https://github.com/ionic-team/stencil/commit/8f807bfb578608d7ccc4b5e7ef9551c5294a4e50))
+* **terser:** update to terser v5 and use its esm build ([4b67c5a](https://github.com/ionic-team/stencil/commit/4b67c5a229541fcf3ab3d943c4fb2b650a11e80a))
 
 
 
