@@ -35,7 +35,7 @@ Update taskQueue default to "async". Stencil 1 default was "congestionAsync". Se
 ### Restore Stencil 1 defaults
 ```ts
 export const config: Config = {
-  buildEs5: true,
+  buildEs5: 'prod',
   extras: {
     cssVarsShim: true,
     dynamicImportShim: true,
