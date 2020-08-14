@@ -115,16 +115,13 @@ export interface StencilConfig {
   rollupConfig?: RollupConfig;
 
   /**
-   * Sets if the ES5 build should be generated or not. It defaults to `false` in dev mode, and `true` in
-   * production mode. Notice that Stencil always generates a modern build too, whereas this setting
-   * will either disable es5 builds entirely with `false`, or always create es5 builds (even in dev mode)
-   * when set to `true`. Basically if the app does not need to run on legacy browsers
-   * (IE11 and Edge 18 and below), it's safe to set `buildEs5` to `false`, which will also speed up
-   * production build times. In addition to not creating es5 builds, apps may also be interested in
-   * disabling any unnecessary runtime when support legacy browsers. See
-   * [https://stenciljs.com/docs/config-extras](/docs/config-extras) for more information.
+   * Sets if the ES5 build should be generated or not. Stencil generates a modern build without ES5,
+   * whereas this setting to `true` will also create es5 builds for both dev and prod modes. Setting
+   * `buildEs5` to `prod` will only build ES5 in prod mode. Basically if the app does not need to run
+   * on legacy browsers (IE11 and Edge 18 and below), it's safe to not build ES5, which will also speed
+   * up build times. Defaults to `false`.
    */
-  buildEs5?: boolean;
+  buildEs5?: boolean | 'prod';
 
   /**
    * Sets if the JS browser files are minified or not. Stencil uses `terser` under the hood.

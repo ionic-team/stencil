@@ -86,11 +86,32 @@ describe('validation', () => {
       expect(config.buildEs5).toBe(true);
     });
 
+    it('set buildEs5 true, dev mode', () => {
+      userConfig.devMode = true;
+      userConfig.buildEs5 = true;
+      const { config } = validateConfig(userConfig);
+      expect(config.buildEs5).toBe(true);
+    });
+
     it('prod mode, set modern and es5', () => {
       userConfig.devMode = false;
       userConfig.buildEs5 = true;
       const { config } = validateConfig(userConfig);
       expect(config.buildEs5).toBe(true);
+    });
+
+    it('build es5 when set to "prod" and in prod', () => {
+      userConfig.devMode = false;
+      userConfig.buildEs5 = 'prod';
+      const { config } = validateConfig(userConfig);
+      expect(config.buildEs5).toBe(true);
+    });
+
+    it('do not build es5 when set to "prod" and in dev', () => {
+      userConfig.devMode = true;
+      userConfig.buildEs5 = 'prod';
+      const { config } = validateConfig(userConfig);
+      expect(config.buildEs5).toBe(false);
     });
 
     it('prod mode default to only modern and not es5', () => {

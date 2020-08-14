@@ -41,7 +41,7 @@ export const validateConfig = (userConfig?: Config) => {
   config.extras.initializeNextTick = !!config.extras.initializeNextTick;
   config.extras.tagNameTransform = !!config.extras.tagNameTransform;
 
-  config.buildEs5 = !!config.buildEs5;
+  config.buildEs5 = config.buildEs5 === true || (!config.devMode && config.buildEs5 === 'prod');
 
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);
