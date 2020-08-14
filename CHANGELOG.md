@@ -32,6 +32,20 @@ _Note that the runtime still works for any collections that have been built with
 Update taskQueue default to "async". Stencil 1 default was "congestionAsync". See [config.taskQueue](https://stenciljs.com/docs/config#taskqueue) for more info.
 
 
+### Restore Stencil 1 defaults
+```ts
+export const config: Config = {
+  buildEs5: 'prod',
+  extras: {
+    cssVarsShim: true,
+    dynamicImportShim: true,
+    safari10: true,
+    shadowDomShim: true,
+  }
+};
+```
+
+
 ### NodeJS Update
 
 * **node:** minimum node 12.10.0, recommend 14.5.0 ([55331be](https://github.com/ionic-team/stencil/commit/55331be42f311a6e2a4e4f8ac13c01d28dc31613))
