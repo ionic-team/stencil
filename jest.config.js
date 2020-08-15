@@ -1,13 +1,13 @@
 module.exports = {
   preset: './testing/jest-preset.js',
   moduleNameMapper: {
-    '@app-data': '<rootDir>/internal/app-data/index.cjs.js',
-    '@app-globals': '<rootDir>/internal/app-globals/index.cjs.js',
+    '@app-data': '<rootDir>/internal/app-data/index.cjs',
+    '@app-globals': '<rootDir>/internal/app-globals/index.cjs',
     '@platform': '<rootDir>/internal/testing/index.js',
     '@runtime': '<rootDir>/internal/testing/index.js',
     '@stencil/core/cli': '<rootDir>/cli/index.js',
     '@stencil/core/compiler': '<rootDir>/compiler/stencil.js',
-    '@stencil/core/mock-doc': '<rootDir>/mock-doc/index.cjs.js',
+    '@stencil/core/mock-doc': '<rootDir>/mock-doc/index.cjs',
     '@stencil/core/testing': '<rootDir>/testing/index.js',
     '@utils': '<rootDir>/src/utils',
   },

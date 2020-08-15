@@ -78,7 +78,7 @@ export async function testing(opts: BuildOptions) {
       lazyRequirePlugin(opts, ['@app-data'], '@stencil/core/internal/app-data'),
       lazyRequirePlugin(opts, ['@platform', '@stencil/core/internal/testing'], '@stencil/core/internal/testing'),
       lazyRequirePlugin(opts, ['@stencil/core/dev-server'], '../dev-server/index.js'),
-      lazyRequirePlugin(opts, ['@stencil/core/mock-doc'], '../mock-doc/index.cjs.js'),
+      lazyRequirePlugin(opts, ['@stencil/core/mock-doc'], '../mock-doc/index.cjs'),
       {
         name: 'testingImportResolverPlugin',
         resolveId(importee) {

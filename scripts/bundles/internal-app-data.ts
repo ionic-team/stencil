@@ -17,7 +17,7 @@ export async function internalAppData(opts: BuildOptions) {
   writePkgJson(opts, outputInternalAppDataDir, {
     name: '@stencil/core/internal/app-data',
     description: 'Used for default app data and build conditionals within builds.',
-    main: 'index.cjs.js',
+    main: 'index.cjs',
     module: 'index.js',
     types: 'index.d.ts',
   });
@@ -36,7 +36,7 @@ export async function internalAppData(opts: BuildOptions) {
       {
         format: 'cjs',
         dir: outputInternalAppDataDir,
-        entryFileNames: '[name].cjs.js',
+        entryFileNames: '[name].cjs',
         esModule: false,
         preferConst: true,
       },
