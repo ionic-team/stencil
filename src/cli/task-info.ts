@@ -14,6 +14,8 @@ export const taskInfo = (coreCompiler: CoreCompiler, sys: CompilerSystem, logger
   console.log(`${logger.cyan('     Stencil:')} ${coreCompiler.version}${logger.emoji(' ' + coreCompiler.vermoji)}`);
   console.log(`${logger.cyan('  TypeScript:')} ${versions.typescript}`);
   console.log(`${logger.cyan('      Rollup:')} ${versions.rollup}`);
+  console.log(`${logger.cyan('      Parse5:')} ${versions.parse5}`);
+  console.log(`${logger.cyan('      Sizzle:')} ${versions.sizzle}`);
   console.log(`${logger.cyan('      Terser:')} ${versions.terser}`);
   console.log(``);
 };
