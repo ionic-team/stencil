@@ -15,7 +15,7 @@ export async function cli(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'cli');
   const outputDir = opts.output.cliDir;
   const esmFilename = 'index.js';
-  const cjsFilename = 'index.cjs.js';
+  const cjsFilename = 'index.cjs';
   const dtsFilename = 'index.d.ts';
 
   const esOutput: OutputOptions = {

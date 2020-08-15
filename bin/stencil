@@ -17,7 +17,7 @@ if (isNodeLT(minimumVersion)) {
       currentVersion +
       ', however Stencil requires v' +
       minimumVersion +
-      '.0 or greater. It is recommended to install latest version of Node (https://github.com/nodejs/Release).\n',
+      '.0 or greater. It is recommended to install latest version of Node (https://nodejs.org/en/about/releases/).\n',
   );
   process.exit(1);
 }
@@ -28,20 +28,11 @@ if (isNodeLT(recommendedVersion)) {
       currentVersion +
       ", however Stencil's recommendation is v" +
       recommendedVersion +
-      '.0 or greater. Note that future versions of Stencil will eventually remove support for non-LTS Node versions (https://github.com/nodejs/Release).\n',
+      '.0 or greater. Note that future versions of Stencil will eventually remove support for non-LTS Node versions (https://nodejs.org/en/about/releases/).\n',
   );
 }
 
-if (process.argv.indexOf('--next') > -1) {
-  console.warn('\nThe next compiler is now the default and the --next flag is no longer needed.\n');
-}
-
-if (typeof globalThis === 'undefined') {
-  // globalThis not added until node 12
-  global.globalThis = global;
-}
-
-var cli = require('../cli/index.cjs.js');
+var cli = require('../cli/index.cjs');
 var nodeApi = require('../sys/node/index.js');
 var nodeLogger = nodeApi.createNodeLogger({ process: process });
 var nodeSys = nodeApi.createNodeSys({ process: process, logger: nodeLogger });
@@ -53,4 +44,8 @@ cli.run({
   logger: nodeLogger,
   sys: nodeSys,
   checkVersion: nodeApi.checkVersion
+})
+.catch(function (err) {
+  console.error('uncaught error', err);
+  process.exit(1);
 });
