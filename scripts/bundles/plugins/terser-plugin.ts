@@ -58,6 +58,8 @@ async function bundleTerser(opts: BuildOptions) {
     code = minified.code;
   }
 
+  code = `// Terser ${opts.terserVersion}\n` + code;
+
   await fs.writeFile(cacheFile, code);
 
   return code;

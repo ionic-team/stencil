@@ -19,14 +19,14 @@ export function sizzlePlugin(opts: BuildOptions): Plugin {
       const f = opts.isProd ? 'sizzle.min.js' : 'sizzle.js';
       const sizzlePath = join(opts.nodeModulesDir, 'sizzle', 'dist', f);
       const sizzleContent = await fs.readFile(sizzlePath, 'utf8');
-      return getSizzleBundle(sizzleContent);
+      return getSizzleBundle(opts, sizzleContent);
     },
   };
 }
 
-function getSizzleBundle(content: string) {
-  return `export default (function() {
-
+function getSizzleBundle(opts: BuildOptions, content: string) {
+  return `// Sizzle ${opts.sizzleVersion}
+export default (function() {
 const window = {
   document: {
     createElement() {
@@ -39,7 +39,6 @@ const window = {
     }
   }
 };
-
 const module = { exports: {} };
 
 ${content}

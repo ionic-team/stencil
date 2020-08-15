@@ -92,6 +92,8 @@ async function bundleParse5(opts: BuildOptions) {
     code = minified.code;
   }
 
+  code = `// Parse5 ${opts.parse5Verion}\n` + code;
+
   await fs.writeFile(cacheFile, code);
 
   return code;
