@@ -481,7 +481,7 @@ export function createNodeSys(c: { process?: any } = {}) {
   const nodeResolve = new NodeResolveModule();
 
   sys.lazyRequire = new NodeLazyRequire(nodeResolve, {
-    '@types/jest': ['24.9.1', '26.0.9'],
+    '@types/jest': ['24.9.1', '26.0.10'],
     '@types/puppeteer': ['1.19.0', '3.0.1'],
     'jest': ['24.9.0', '26.4.0'],
     'jest-cli': ['24.9.0', '26.4.0'],
