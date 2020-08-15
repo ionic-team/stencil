@@ -10,6 +10,7 @@ import { replacePlugin } from './plugins/replace-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { RollupOptions, OutputOptions } from 'rollup';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
+import { getBanner } from '../utils/banner';
 
 export async function testing(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'testing');
@@ -102,7 +103,7 @@ export async function testing(opts: BuildOptions) {
       rollupJson({
         preferConst: true,
       }),
-      prettyMinifyPlugin(opts),
+      prettyMinifyPlugin(opts, getBanner(opts, `Stencil Testing`, true)),
     ],
     treeshake: {
       moduleSideEffects: false,

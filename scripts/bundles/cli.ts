@@ -9,6 +9,7 @@ import { relativePathPlugin } from './plugins/relative-path-plugin';
 import { BuildOptions } from '../utils/options';
 import { RollupOptions, OutputOptions } from 'rollup';
 import { writePkgJson } from '../utils/write-pkg-json';
+import { getBanner } from '../utils/banner';
 
 export async function cli(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'cli');
@@ -21,12 +22,14 @@ export async function cli(opts: BuildOptions) {
     format: 'es',
     file: join(outputDir, esmFilename),
     preferConst: true,
+    banner: getBanner(opts, `Stencil CLI`, true),
   };
 
   const cjsOutput: OutputOptions = {
     format: 'cjs',
     file: join(outputDir, cjsFilename),
     preferConst: true,
+    banner: getBanner(opts, `Stencil CLI (CommonJS)`, true),
   };
 
   // create public d.ts

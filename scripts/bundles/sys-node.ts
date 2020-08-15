@@ -10,6 +10,7 @@ import { relativePathPlugin } from './plugins/relative-path-plugin';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
 import { writePkgJson } from '../utils/write-pkg-json';
+import { getBanner } from '../utils/banner';
 
 export async function sysNode(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'sys', 'node');
@@ -49,7 +50,7 @@ export async function sysNode(opts: BuildOptions) {
       rollupCommonjs({
         transformMixedEsModules: false,
       }),
-      prettyMinifyPlugin(opts),
+      prettyMinifyPlugin(opts, getBanner(opts, `Stencil Node System`, true)),
     ],
     treeshake: {
       moduleSideEffects: false,
@@ -85,7 +86,7 @@ export async function sysNode(opts: BuildOptions) {
         preferBuiltins: true,
       }),
       aliasPlugin(opts),
-      prettyMinifyPlugin(opts),
+      prettyMinifyPlugin(opts, getBanner(opts, `Stencil Node System Worker`, true)),
     ],
   };
 

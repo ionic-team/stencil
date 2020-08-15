@@ -12,6 +12,7 @@ import type { RollupOptions, OutputChunk, Plugin } from 'rollup';
 import { minify } from 'terser';
 import ts from 'typescript';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
+import { getBanner } from '../utils/banner';
 
 export async function devServer(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'dev-server');
@@ -56,7 +57,7 @@ export async function devServer(opts: BuildOptions) {
         preferBuiltins: true,
       }),
       rollupCommonjs(),
-      prettyMinifyPlugin(opts),
+      prettyMinifyPlugin(opts, getBanner(opts, `Stencil Dev Server`, true)),
     ],
     treeshake: {
       moduleSideEffects: false,
@@ -95,7 +96,7 @@ export async function devServer(opts: BuildOptions) {
       }),
       rollupCommonjs(),
       replacePlugin(opts),
-      prettyMinifyPlugin(opts),
+      prettyMinifyPlugin(opts, getBanner(opts, `Stencil Dev Server`, true)),
     ],
     treeshake: {
       moduleSideEffects: false,
@@ -213,6 +214,7 @@ export async function devServer(opts: BuildOptions) {
     output: {
       format: 'esm',
       file: join(opts.output.devServerDir, 'client', 'index.js'),
+      banner: getBanner(opts, `Stencil Dev Server Client`, true),
     },
     plugins: [appErrorCssPlugin(), replacePlugin(opts), rollupResolve()],
   };

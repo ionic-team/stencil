@@ -9,6 +9,7 @@ import { replacePlugin } from './plugins/replace-plugin';
 import { RollupOptions, OutputOptions } from 'rollup';
 import { sizzlePlugin } from './plugins/sizzle-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
+import { getBanner } from '../utils/banner';
 
 export async function mockDoc(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'mock-doc');
@@ -29,6 +30,7 @@ export async function mockDoc(opts: BuildOptions) {
     format: 'es',
     file: join(outputDir, 'index.js'),
     preferConst: true,
+    banner: getBanner(opts, `Stencil Mock Doc`, true),
   };
 
   const cjsOutput: OutputOptions = {
@@ -38,11 +40,12 @@ export async function mockDoc(opts: BuildOptions) {
     outro: CJS_OUTRO,
     strict: false,
     esModule: false,
+    banner: getBanner(opts, `Stencil Mock Doc (CommonJS)`, true),
   };
 
   const mockDocBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
-    output: [esOutput, cjsOutput] as any,
+    output: [esOutput, cjsOutput],
     plugins: [parse5Plugin(opts), sizzlePlugin(opts), aliasPlugin(opts), replacePlugin(opts), rollupResolve(), rollupCommonjs()],
   };
 
