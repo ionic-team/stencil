@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import { BuildOptions } from '../utils/options';
+import type { BuildOptions } from '../utils/options';
 import { cleanDts } from '../utils/bundle-dts';
 import { internalAppData } from './interal-app-data';
 import { internalClient } from './internal-platform-client';
@@ -15,7 +15,7 @@ export async function internal(opts: BuildOptions) {
 
   await copyStencilInternalDts(opts, opts.output.internalDir);
 
-  await createStencilCoreEntry(opts.output.internalDir);
+  await copyStencilCoreEntry(opts);
 
   // copy @stencil/core/internal default entry, which defaults to client
   // but we're not exposing all of Stencil's internal code (only the types)
@@ -72,14 +72,6 @@ async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: str
   const runtimeDts = cleanDts(await fs.readFile(runtimeDtsSrcPath, 'utf8'));
   await fs.writeFile(runtimeDtsDestPath, runtimeDts);
 
-  // @stencil/core/internal/stencil-core/index.d.ts file
-  // actual public dts when importing @stencil/core
-  const stencilCoreDtsSrc = join(opts.buildDir, 'declarations', 'stencil-core', 'index.d.ts');
-  const stencilCoreDstDir = join(outputInternalDir, 'stencil-core');
-  const stencilCoreDtsDst = join(stencilCoreDstDir, 'index.d.ts');
-  await fs.ensureDir(stencilCoreDstDir);
-  await fs.copyFile(stencilCoreDtsSrc, stencilCoreDtsDst);
-
   // @stencil/core/internal/stencil-ext-modules.d.ts (.svg/.css)
   const srcExtModuleOutput = join(opts.srcDir, 'declarations', 'stencil-ext-modules.d.ts');
   const dstExtModuleOutput = join(outputInternalDir, 'stencil-ext-modules.d.ts');
@@ -90,9 +82,10 @@ function prependExtModules(content: string) {
   return `/// <reference path="./stencil-ext-modules.d.ts" />\n` + content;
 }
 
-async function createStencilCoreEntry(outputInternalDir: string) {
-  // write @stencil/core entry (really only used for node resolving, not its actual code as you can see)
-  const stencilCoreDstDir = join(outputInternalDir, 'stencil-core');
+async function copyStencilCoreEntry(opts: BuildOptions) {
+  // write @stencil/core entry
+  const stencilCoreSrcDir = join(opts.srcDir, 'internal', 'stencil-core');
+  const stencilCoreDstDir = join(opts.output.internalDir, 'stencil-core');
   await fs.ensureDir(stencilCoreDstDir);
-  await fs.writeFile(join(stencilCoreDstDir, 'index.js'), `exports.h = function() {};`);
+  await fs.copy(stencilCoreSrcDir, stencilCoreDstDir);
 }

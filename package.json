@@ -2,8 +2,9 @@
   "name": "@stencil/core",
   "version": "2.0.0-2",
   "license": "MIT",
-  "main": "internal/stencil-core/index.js",
-  "types": "internal/stencil-core/index.d.ts",
+  "main": "./internal/stencil-core/index.cjs",
+  "module": "./internal/stencil-core/index.js",
+  "types": "./internal/stencil-core/index.d.ts",
   "bin": {
     "stencil": "bin/stencil"
   },
@@ -137,5 +138,6 @@
     "custom elements",
     "pwa",
     "progressive web app"
-  ]
+  ],
+  "dependencies": {}
 }
