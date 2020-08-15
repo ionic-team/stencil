@@ -13,12 +13,11 @@ const pkgs: TestPackage[] = [
   {
     // cli
     packageJson: 'cli/package.json',
-    files: ['cli/index.js', 'cli/index.cjs.js'],
   },
   {
     // compiler
     packageJson: 'compiler/package.json',
-    files: ['compiler/stencil.js'],
+    files: ['compiler/lib.d.ts', 'compiler/lib.dom.d.ts', 'compiler/stencil.min.js'],
   },
   {
     // dev-server
@@ -58,6 +57,7 @@ const pkgs: TestPackage[] = [
     // internal
     packageJson: 'internal/package.json',
     files: [
+      'internal/stencil-core/index.cjs',
       'internal/stencil-core/index.js',
       'internal/stencil-core/index.d.ts',
       'internal/stencil-ext-modules.d.ts',
@@ -206,7 +206,7 @@ function validateDts(opts: BuildOptions, dtsEntries: string[]) {
 
 async function validateCompiler(opts: BuildOptions) {
   const compilerPath = join(opts.output.compilerDir, 'stencil.js');
-  const cliPath = join(opts.output.cliDir, 'index.cjs.js');
+  const cliPath = join(opts.output.cliDir, 'index.cjs');
   const sysNodePath = join(opts.output.sysNodeDir, 'index.js');
 
   const compiler = await import(compilerPath);
