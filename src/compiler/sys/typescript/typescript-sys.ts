@@ -186,7 +186,7 @@ export const getTypescriptPathFromUrl = (config: d.Config, tsExecutingUrl: strin
   const tsBaseUrl = new URL('..', tsExecutingUrl).href;
   if (url.startsWith(tsBaseUrl)) {
     const tsFilePath = url.replace(tsBaseUrl, '/');
-    const tsNodePath = config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId: 'typescript', path: tsFilePath });
+    const tsNodePath = config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId: '@stencil/core', path: tsFilePath });
     return normalizePath(tsNodePath);
   }
   return url;
