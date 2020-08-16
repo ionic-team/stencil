@@ -1,7 +1,8 @@
-import { dirname, join } from 'path';
+import { basename, dirname, join, relative } from 'path';
 import fs from 'fs-extra';
 import { BuildOptions, getOptions } from '../utils/options';
 import { PackageData } from '../utils/write-pkg-json';
+import { rollup } from 'rollup';
 import ts from 'typescript';
 
 /**
@@ -17,7 +18,7 @@ const pkgs: TestPackage[] = [
   {
     // compiler
     packageJson: 'compiler/package.json',
-    files: ['compiler/lib.d.ts', 'compiler/lib.dom.d.ts', 'compiler/stencil.min.js'],
+    files: ['compiler/lib.d.ts', 'compiler/lib.dom.d.ts'],
   },
   {
     // dev-server
@@ -74,7 +75,12 @@ const pkgs: TestPackage[] = [
   {
     // screenshot
     packageJson: 'screenshot/package.json',
-    files: ['screenshot/compare/', 'screenshot/connector.js', 'screenshot/local-connector.js', 'screenshot/pixel-match.js'],
+    files: [
+      'screenshot/compare/',
+      'screenshot/connector.js',
+      'screenshot/local-connector.js',
+      'screenshot/pixel-match.js',
+    ],
   },
   {
     // sys/node
@@ -84,12 +90,28 @@ const pkgs: TestPackage[] = [
   {
     // testing
     packageJson: 'testing/package.json',
-    files: ['testing/jest-environment.js', 'testing/jest-preprocessor.js', 'testing/jest-preset.js', 'testing/jest-runner.js', 'testing/jest-setuptestframework.js'],
+    files: [
+      'testing/jest-environment.js',
+      'testing/jest-preprocessor.js',
+      'testing/jest-preset.js',
+      'testing/jest-runner.js',
+      'testing/jest-setuptestframework.js',
+    ],
   },
   {
     // @stencil/core
     packageJson: 'package.json',
-    packageJsonFiles: ['bin/', 'cli/', 'compiler/', 'dev-server/', 'internal/', 'mock-doc/', 'screenshot/', 'sys/', 'testing/'],
+    packageJsonFiles: [
+      'bin/',
+      'cli/',
+      'compiler/',
+      'dev-server/',
+      'internal/',
+      'mock-doc/',
+      'screenshot/',
+      'sys/',
+      'testing/',
+    ],
     files: ['CHANGELOG.md', 'LICENSE.md', 'readme.md'],
     hasBin: true,
   },
@@ -106,6 +128,7 @@ export async function validateBuild(rootDir: string) {
   validateDts(opts, dtsEntries);
 
   await validateCompiler(opts);
+  await validateTreeshaking(opts);
 }
 
 function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: string[]) {
@@ -229,8 +252,14 @@ async function validateCompiler(opts: BuildOptions) {
   });
   console.log(`${compiler.vermoji}  Validated compiler: ${compiler.version}`);
 
-  const transpileResults = compiler.transpileSync('const m: string = `transpile!`;', { target: 'es5' });
-  if (!transpileResults || transpileResults.diagnostics.length > 0 || !transpileResults.code.startsWith(`var m = "transpile!";`)) {
+  const transpileResults = compiler.transpileSync('const m: string = `transpile!`;', {
+    target: 'es5',
+  });
+  if (
+    !transpileResults ||
+    transpileResults.diagnostics.length > 0 ||
+    !transpileResults.code.startsWith(`var m = "transpile!";`)
+  ) {
     console.error(transpileResults);
     throw new Error(`🧨  transpileSync error`);
   }
@@ -249,6 +278,73 @@ async function validateCompiler(opts: BuildOptions) {
   }
 
   console.log(`🐬  Validated cli`);
+}
+
+async function validateTreeshaking(opts: BuildOptions) {
+  await validateModuleTreeshake(opts, 'app-data', join(opts.output.internalDir, 'app-data', 'index.js'));
+  await validateModuleTreeshake(opts, 'client', join(opts.output.internalDir, 'client', 'index.js'));
+  await validateModuleTreeshake(opts, 'patch-browser', join(opts.output.internalDir, 'client', 'patch-browser.js'));
+  await validateModuleTreeshake(opts, 'patch-esm', join(opts.output.internalDir, 'client', 'patch-esm.js'));
+  await validateModuleTreeshake(opts, 'shadow-css', join(opts.output.internalDir, 'client', 'shadow-css.js'));
+  await validateModuleTreeshake(opts, 'hydrate', join(opts.output.internalDir, 'hydrate', 'index.js'));
+  await validateModuleTreeshake(opts, 'stencil-core', join(opts.output.internalDir, 'stencil-core', 'index.js'));
+  await validateModuleTreeshake(opts, 'cli', join(opts.output.cliDir, 'index.js'));
+}
+
+async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, entryModule: string) {
+  const inputCode = `import "${entryModule}";`;
+  const inputFile = join(opts.scriptsBuildDir, `treeshake_input_${moduleName}.js`);
+  const outputFile = join(opts.scriptsBuildDir, `treeshake_output_${moduleName}.js`);
+  await fs.writeFile(inputFile, inputCode);
+
+  const bundle = await rollup({
+    input: inputFile,
+    treeshake: true,
+    plugins: [
+      {
+        name: 'stencilResolver',
+        resolveId(id) {
+          if (id === '@stencil/core/internal/client' || id === '@stencil/core') {
+            return join(opts.output.internalDir, 'client', 'index.js');
+          }
+          if (id === '@stencil/core/internal/app-data') {
+            return join(opts.output.internalDir, 'app-data', 'index.js');
+          }
+          if (id === '@stencil/core/internal/app-globals') {
+            return id;
+          }
+        },
+        load(id) {
+          if (id === '@stencil/core/internal/app-globals') {
+            return 'export const globalScripts = () => {};';
+          }
+        },
+      },
+    ],
+    onwarn(warning) {
+      if (warning.code !== 'EMPTY_BUNDLE') {
+        throw warning;
+      }
+    },
+  });
+
+  const o = await bundle.generate({
+    format: 'es',
+  });
+
+  const output = o.output[0];
+  const outputCode = output.code.trim();
+
+  await fs.writeFile(outputFile, outputCode);
+
+  if (outputCode !== '') {
+    console.error(`\nTreeshake input: ${inputFile}\n`);
+    console.error(`\nTreeshake output: ${outputFile}\n`);
+
+    throw new Error(`🧨  Not all code was not treeshaken (treeshooken? treeshaked?)`);
+  }
+
+  console.log(`🌳  validated treeshake: ${relative(opts.rootDir, entryModule)}`);
 }
 
 interface TestPackage {
