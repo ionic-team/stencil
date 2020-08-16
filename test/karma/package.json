@@ -1,7 +1,7 @@
 {
   "private": true,
-  "module": "test-dist/index.mjs",
-  "main": "test-dist/index.js",
+  "main": "test-dist/index.cjs.js",
+  "module": "test-dist/index.js",
   "types": "test-dist/types/components.d.ts",
   "collection": "test-dist/collection/collection-manifest.json",
   "scripts": {

@@ -29,20 +29,19 @@ const generateLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, outp
     {
       'name': config.fsNamespace + '-loader',
       'typings': './index.d.ts',
-      'module': './index.mjs',
+      'module': './index.js',
       'main': './index.cjs.js',
-      'node:main': './node-main.js',
-      'jsnext:main': './index.es2017.mjs',
-      'es2015': './index.es2017.mjs',
-      'es2017': './index.es2017.mjs',
+      'jsnext:main': './index.es2017.js',
+      'es2015': './index.es2017.js',
+      'es2017': './index.es2017.js',
       'unpkg': './cdn.js',
     },
     null,
     2,
   );
 
-  const es5EntryPoint = join(es5Dir, 'loader.mjs');
-  const es2017EntryPoint = join(es2017Dir, 'loader.mjs');
+  const es5EntryPoint = join(es5Dir, 'loader.js');
+  const es2017EntryPoint = join(es2017Dir, 'loader.js');
   const polyfillsEntryPoint = join(es2017Dir, 'polyfills/index.js');
   const cjsEntryPoint = join(cjsDir, 'loader.cjs.js');
   const polyfillsExport = `export * from '${normalizePath(relative(loaderPath, polyfillsEntryPoint))}';`;
@@ -59,20 +58,15 @@ export * from '${normalizePath(relative(loaderPath, es2017EntryPoint))}';
 module.exports = require('${normalizePath(relative(loaderPath, cjsEntryPoint))}');
 module.exports.applyPolyfills = function() { return Promise.resolve() };
 `;
-  const nodeMainContent = `
-module.exports.applyPolyfills = function() { return Promise.resolve() };
-module.exports.defineCustomElements = function() { return Promise.resolve() };
-`;
 
   const indexDtsPath = join(loaderPath, 'index.d.ts');
   await Promise.all([
     compilerCtx.fs.writeFile(join(loaderPath, 'package.json'), packageJsonContent),
     compilerCtx.fs.writeFile(join(loaderPath, 'index.d.ts'), generateIndexDts(indexDtsPath, outputTarget.componentDts)),
-    compilerCtx.fs.writeFile(join(loaderPath, 'index.mjs'), indexContent),
+    compilerCtx.fs.writeFile(join(loaderPath, 'index.js'), indexContent),
     compilerCtx.fs.writeFile(join(loaderPath, 'index.cjs.js'), indexCjsContent),
     compilerCtx.fs.writeFile(join(loaderPath, 'cdn.js'), indexCjsContent),
-    compilerCtx.fs.writeFile(join(loaderPath, 'index.es2017.mjs'), indexES2017Content),
-    compilerCtx.fs.writeFile(join(loaderPath, 'node-main.js'), nodeMainContent),
+    compilerCtx.fs.writeFile(join(loaderPath, 'index.es2017.js'), indexES2017Content),
   ]);
 };
 

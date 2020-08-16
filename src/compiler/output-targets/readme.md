@@ -11,15 +11,13 @@ Stencil is able to generate components into various formats so they can be best 
 
 `host`: The actual "host" element sitting in the webpage's DOM.
 
-`lazy-loaded`: A lazy-loaded webapp creates all the proxied host web components up front, but only downloads the component implementation on-demand. Lazy-loaded components work by having a proxied "host" web component, and lazy-loads the component class and css, and rather than the host element having the "instance", such as a traditional web component, the instance is of the lazy-loaded component class. If a Stencil library has a low number of components, then having them all packaged into a single-file would be best. But for a very large library of components, such as Ionic, it'd be best to have them lazy-loaded instead. Part of the configuration can decide when to make a library either lazy-loaded or single-file.
+`lazy-loaded`: A lazy-loaded webapp creates all the proxied host custom elements up front, but only downloads the component implementation on-demand. Lazy-loaded components work by having a proxied "host" custom element, and lazy-loads the component class and css, and rather than the host element having the "instance", such as a traditional custom element, the instance is of the lazy-loaded component class. If a Stencil library has a low number of components, then having them all packaged into a single-file would be best. But for a very large library of components, such as Ionic, it'd be best to have them lazy-loaded instead. Part of the configuration can decide when to make a library either lazy-loaded or single-file.
 
 `module`: Component code meant to be imported by other bundlers in order for them to be intergrated within other apps.
 
-`native`: Lazy-loaded components split the host web component and the component implementation apart. A "native" component is a traditional web component in that the instance and host element are the same.
+`native`: Lazy-loaded components split the host custom element and the component implementation apart. A "native" component is a traditional custom element in that the instance and host element are the same. 
 
-`self-contained`: Individual web components packaged up into stand-alone, self-contained code. Each component has it's own runtime, but customized to only include exact what that component requires.
-
-`single-file`: Opposite of lazy-loaded. When a library has a low number of components, it'd be best to have them all in one file rather than lazy-loading them.
+`custom-element`: Individual custom elements packaged up into stand-alone, self-contained code. Each component imports shared runtime from `@stencil/core`. Opposite of lazy-loaded components that define themselves and load on deman, the custom elements builds must be imported and defined by the consumer, and any lazy-loaded depends on the consumer's bundling methods.
 
 
 ## Output Target Types
@@ -33,7 +31,7 @@ Stencil is able to generate components into various formats so they can be best 
 
 ### `dist`
 
-- Generates `modules` to be imported by other bundlers, such as `dist/es2017/` and `dist/es5`.
+- Generates `modules` to be imported by other bundlers, such as `dist/esm/` and `dist/esm-es5/` (when enabling buildEs5 config).
 - Generates an `app` at the root of the `dist/` directory. It's the same stand-alone webapp as the `www` type, but located in dist so it's easy to package up and shared.
 - Generates a `collection` into the `dist/collection/` directory to be used by other projects.
 
@@ -53,107 +51,72 @@ Stencil is able to generate components into various formats so they can be best 
 
 ### `dist-hydrate-script`
 
-- Generates a hydrate app, which is used by prerendering and Angular Universal server module.
+- Used by NodeJS to do Static Site Generation (SSG) and/or Server Side Rendering (SSR). 
+- Used by Stencil prerendering commands.
+- Formats the componets so that the server can generate new global window environments that are scoped to each rendering, rather than having global information bleed between each URL rendered.
 
 
-## Output Folder Structure
+## Output Folder Structure Defaults
 
 ```
 - dist/
-  - collection/
-    - components
-      - cmp-a
-        - cmp-a.css
-        - cmp-a.mjs
-      - cmp-b
-        - cmp-b.css
-        - cmp-b.mjs
-      - collection-manifest.json
 
-  - loader
-    - index.mjs (points to the esm/es2017/ directory)
+  - cjs/ (bundler ready, cjs modules)
+    - index.cjs.js
+    - loader.cjs.js
 
-  - components/ (custom elements to be imported)
-
-  - components-es5/ (custom elements to be imported)
-    - es5/
-      - index.mjs
-
-    - es2017/
-      - index.mjs
-
-    - package.json
-        {
-          "module": "es5/",
-          "main": "es5/",
-          "es2015": "es2017/"
-        }
-
-  - selfcontained/
-    - cmp-a.mjs
-    - cmp-b.mjs
-    - app.mjs (self-contained of all native components)
-
-  - hydrate/
-    - hydrate.d.ts
-    - hydrate.js
-    - index.js
-    - package.json
-
-  - types/
+  - collection/ (metadata when this is lazy-loaded dependency)
+    - my-cmp/
+      - my-cmp.js (esm)
+      - my-cmp.css
+    - collection-manifest.json
+    - global.js
+  
+  - custom-elements (bundler ready custom elements, esm only)
+    - index.js (esm)
     - index.d.ts
 
-  - app.js (legacy es5 script)
-  - app.mjs (modern esm script)
+  - esm (bundler ready, esm modules, es2017 source)
+    - index.js
+    - loader.js
 
-- www/
+  - esm-es5 (buildEs5, bundler ready, esm modules, es5 source)
+    - index.js
+    - loader.js
+
+  - loader (bundler entry for lazy builds)
+    - cdn.js
+    - index.js
+    - index.cjs.js
+    - index.d.ts
+    - index.es2017.js
+    - package.json (to import loader package, such as myapp/loader)
+
+  - myapp (browser ready script, named from stencil config namespace)
+    - myapp.css
+    - myapp.esm.js
+    - myapp.js (buildEs5 entry, systemjs modules, es5 source)
+    - myapp.system.js (buildEs5, systemjs modules, es5 source)
+
+  - types (dts files for each component)
+    - my-cmp/
+      -my-cmp.d.ts
+
+  - index.cjs.js (dist cjs entry)
+  - index.js (dist esm entry)
+
+- hydrate
+  - index.js (NodeJS ready hydrate script, cjs module)
+  - index.d.ts (types for hydrate API)
+  - package.json (to import hydrate package, such as myapp/hydrate)
+
+- www/ (www output target)
   - build/
-    - app.js (legacy es5 script)
-    - app.mjs (modern esm script)
+    - myapp.esm.js (browser ready esm modern script)
+    - myapp.js (buildEs5, browser ready systemjs modules, es5 script)
 
-  - index.html
+  - index.html (optimized html from src/index.html)
 
-- package.json
+- package.json (top-level package.json is not auto-updated)
 - stencil.config.ts
-```
-
-
-### Module Format
-
-```
-dist/module/index.mjs
----------
-
-class IonButton extends HTMLElement {
-
-  static get observedAttributes() {
-    return proxyComponent(IonButton, meta);
-  }
-
-  render() {
-    // implementation
-    return (
-      'Hello World'
-    );
-  }
-}
-
-
-export class IonButton_ios extends IonButton {
-  static get mode() {
-    return 'ios';
-  }
-  static get styles() {
-    return 'ios';
-  }
-}
-
-export class IonButton_md extends IonButton {
-  static get mode() {
-    return 'md';
-  }
-  static get styles() {
-    return 'md';
-  }
-}
 ```

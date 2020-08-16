@@ -46,9 +46,29 @@ export const config: Config = {
 ```
 
 
+### dist package.json
+
+To ensure the extensions are built for the future and work with today's bundlers, we've found it best to use `.cjs.js` extension for CommonJS files, and `.js` for ESM files, with the idea that cjs files will no longer be needed some day, and the ESM files are the standard. _(We were using `.mjs` files, but not all of today's tooling and bundlers work well with that extension)._
+
+If you're using the `dist` output target, update the `package.json` in the root of your project, like this:
+
+```diff
+  {
+-     "main": "dist/index.js",
++     "main": "dist/index.cjs.js",
+
+-    "module": "dist/index.mjs",
++    "module": "dist/index.js",
+  }
+```
+
+Additionally the `dist/loader` output directory has renamed its extensions too, but since its `dist/loader/package.json` file is auto-generated, the entries were renamed too. So unless you were referencing the loader files directly you will not have to do external updates.
+
+See the [Output Folder Structure Defaults](https://github.com/ionic-team/stencil/blob/master/src/compiler/output-targets/readme.md) for more info.
+
 ### NodeJS Update
 
-* **node:** minimum node 12.10.0, recommend 14.5.0 ([55331be](https://github.com/ionic-team/stencil/commit/55331be42f311a6e2a4e4f8ac13c01d28dc31613))
+* **node:** minimum of Node 12.10.0, recommend 14.5.0 or greater ([55331be](https://github.com/ionic-team/stencil/commit/55331be42f311a6e2a4e4f8ac13c01d28dc31613))
 
 With the major release, now's a good time to update the minimum and recommended version of NodeJS.
 

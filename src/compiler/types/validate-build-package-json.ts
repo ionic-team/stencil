@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { COLLECTION_MANIFEST_FILE_NAME, buildJsonFileError, isGlob, normalizePath } from '@utils';
+import { COLLECTION_MANIFEST_FILE_NAME, buildJsonFileError, isGlob, normalizePath, isString } from '@utils';
 import { dirname, join, relative } from 'path';
 import { getComponentsDtsTypesFilePath, isOutputTargetDistCollection, isOutputTargetDistTypes } from '../output-targets/output-utils';
 
@@ -65,10 +65,10 @@ export const validatePackageFiles = async (config: d.Config, compilerCtx: d.Comp
 };
 
 export const validateMain = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistCollection) => {
-  const mainAbs = join(outputTarget.dir, 'index.js');
+  const mainAbs = join(outputTarget.dir, 'index.cjs.js');
   const mainRel = relative(config.rootDir, mainAbs);
 
-  if (typeof buildCtx.packageJson.main !== 'string' || buildCtx.packageJson.main === '') {
+  if (!isString(buildCtx.packageJson.main) || buildCtx.packageJson.main === '') {
     const msg = `package.json "main" property is required when generating a distribution. It's recommended to set the "main" property to: ${mainRel}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"main"`);
   } else if (normalizePath(buildCtx.packageJson.main) !== normalizePath(mainRel)) {
@@ -78,10 +78,10 @@ export const validateMain = (config: d.Config, compilerCtx: d.CompilerCtx, build
 };
 
 export const validateModule = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistCollection) => {
-  const moduleAbs = join(outputTarget.dir, 'index.mjs');
+  const moduleAbs = join(outputTarget.dir, 'index.js');
   const moduleRel = relative(config.rootDir, moduleAbs);
 
-  if (typeof buildCtx.packageJson.module !== 'string') {
+  if (!isString(buildCtx.packageJson.module)) {
     const msg = `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ${moduleRel}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"module"`);
   } else if (normalizePath(buildCtx.packageJson.module) !== normalizePath(moduleRel)) {
@@ -94,7 +94,7 @@ export const validateTypes = async (config: d.Config, compilerCtx: d.CompilerCtx
   const typesAbs = getComponentsDtsTypesFilePath(outputTarget);
   const recommendedPath = relative(config.rootDir, typesAbs);
 
-  if (typeof buildCtx.packageJson.types !== 'string' || buildCtx.packageJson.types === '') {
+  if (!isString(buildCtx.packageJson.types) || buildCtx.packageJson.types === '') {
     const msg = `package.json "types" property is required when generating a distribution. It's recommended to set the "types" property to: ${recommendedPath}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"types"`);
   } else if (!buildCtx.packageJson.types.endsWith('.d.ts')) {
@@ -124,7 +124,7 @@ export const validateCollection = (config: d.Config, compilerCtx: d.CompilerCtx,
 };
 
 export const validateBrowser = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  if (typeof buildCtx.packageJson.browser === 'string') {
+  if (isString(buildCtx.packageJson.browser)) {
     const msg = `package.json "browser" property is set to "${buildCtx.packageJson.browser}". However, for maximum compatibility with all bundlers it's recommended to not set the "browser" property and instead ensure both "module" and "main" properties are set.`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"browser"`);
   }

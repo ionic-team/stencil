@@ -12,7 +12,7 @@ export const generateEsm = async (config: d.Config, compilerCtx: d.CompilerCtx, 
   if (esmOutputs.length + esmEs5Outputs.length > 0) {
     const esmOpts: OutputOptions = {
       format: 'es',
-      entryFileNames: '[name].mjs',
+      entryFileNames: '[name].js',
       assetFileNames: '[name]-[hash][extname]',
       preferConst: true,
     };

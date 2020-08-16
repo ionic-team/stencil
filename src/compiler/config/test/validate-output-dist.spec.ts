@@ -73,11 +73,11 @@ describe('validateDistOutputTarget', () => {
       {
         type: 'dist-lazy',
         cjsDir: path.join(rootDir, 'my-dist', 'cjs'),
-        cjsIndexFile: path.join(rootDir, 'my-dist', 'index.js'),
+        cjsIndexFile: path.join(rootDir, 'my-dist', 'index.cjs.js'),
         empty: false,
         esmDir: path.join(rootDir, 'my-dist', 'esm'),
         esmEs5Dir: undefined,
-        esmIndexFile: path.join(rootDir, 'my-dist', 'index.mjs'),
+        esmIndexFile: path.join(rootDir, 'my-dist', 'index.js'),
         polyfills: true,
       },
       {

@@ -36,6 +36,9 @@ export const config: Config = {
     {
       type: 'dist-custom-elements-bundle',
     },
+    {
+      type: 'dist-hydrate-script',
+    },
     reactOutputTarget({
       componentCorePackage: '@stencil/e2e-react-output-target',
       proxiesFile: './dist-react/components.ts',
@@ -50,4 +53,5 @@ export const config: Config = {
   },
   enableCache: false,
   hashFileNames: false,
+  buildEs5: false,
 };

@@ -79,8 +79,8 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) =>
         esmEs5Dir,
         cjsDir,
 
-        cjsIndexFile: join(distOutputTarget.dir, 'index.js'),
-        esmIndexFile: join(distOutputTarget.dir, 'index.mjs'),
+        cjsIndexFile: join(distOutputTarget.dir, 'index.cjs.js'),
+        esmIndexFile: join(distOutputTarget.dir, 'index.js'),
         polyfills: true,
         empty: distOutputTarget.empty,
       });
