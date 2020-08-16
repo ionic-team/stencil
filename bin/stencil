@@ -17,7 +17,7 @@ if (isNodeLT(minimumVersion)) {
       currentVersion +
       ', however Stencil requires v' +
       minimumVersion +
-      '.0 or greater. It is recommended to install latest version of Node (https://nodejs.org/en/about/releases/).\n',
+      '.0 or greater. It is recommended to use an Active LTS version of Node (https://nodejs.org/en/about/releases/).\n',
   );
   process.exit(1);
 }
@@ -28,7 +28,7 @@ if (isNodeLT(recommendedVersion)) {
       currentVersion +
       ", however Stencil's recommendation is v" +
       recommendedVersion +
-      '.0 or greater. Note that future versions of Stencil will eventually remove support for non-LTS Node versions (https://nodejs.org/en/about/releases/).\n',
+      '.0 or greater. Note that future versions of Stencil will eventually remove support for non-LTS Node versions and an Active LTS version is recommended (https://nodejs.org/en/about/releases/).\n',
   );
 }
 
