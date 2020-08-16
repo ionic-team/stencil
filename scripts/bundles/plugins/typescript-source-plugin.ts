@@ -68,7 +68,7 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions) {
   // because we don't want deno using the node apis
   const o: string[] = [];
   o.push(`// TypeScript ${opts.typescriptVersion}`);
-  o.push(`import { IS_NODE_ENV } from '${join(opts.buildDir, 'compiler', 'sys', 'environment.js')}';`);
+  o.push(`import { IS_NODE_ENV } from '@environment';`);
   o.push(`process.browser = !IS_NODE_ENV;`);
   o.push(`const ts = {};`);
   o.push(code);
