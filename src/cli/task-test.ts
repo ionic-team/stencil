@@ -1,5 +1,5 @@
 import type { Config, TestingRunOptions } from '../declarations';
-import { IS_NODE_ENV } from '@utils';
+import { IS_NODE_ENV } from '../compiler/sys/environment';
 
 export const taskTest = async (config: Config) => {
   if (!IS_NODE_ENV) {

@@ -1,5 +1,4 @@
 export * from './constants';
-export * from './environment';
 export * from './format-component-runtime-meta';
 export * from './helpers';
 export * from './is-glob';

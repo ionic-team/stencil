@@ -1,5 +1,5 @@
 import type * as d from '../../../declarations';
-import { IS_BROWSER_ENV } from '@utils';
+import { IS_BROWSER_ENV } from '../environment';
 
 export const createLogger = () => {
   let useColors = IS_BROWSER_ENV;

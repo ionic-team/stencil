@@ -1,6 +1,7 @@
 import type { TranspileOptions, TranspileResults, Config, TransformOptions, TransformCssToEsmInput, ImportData, CompilerSystem } from '../../declarations';
 import { createSystem } from '../sys/stencil-sys';
-import { isString, IS_NODE_ENV, requireFunc, IS_DENO_ENV } from '@utils';
+import { IS_DENO_ENV, IS_NODE_ENV, requireFunc } from '../sys/environment';
+import { isString } from '@utils';
 import { parseImportPath } from '../transformers/stencil-import-path';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
 import type { CompilerOptions } from 'typescript';

@@ -1,5 +1,6 @@
 import type * as d from '../../declarations';
-import { catchError, requireFunc, loadTypeScriptDiagnostics, IS_NODE_ENV } from '@utils';
+import { catchError, loadTypeScriptDiagnostics } from '@utils';
+import { IS_NODE_ENV, requireFunc } from '../sys/environment';
 import { resolve } from 'path';
 
 export const getPrerenderConfig = (diagnostics: d.Diagnostic[], prerenderConfigPath: string) => {

@@ -1,7 +1,7 @@
-import { IS_WEB_WORKER_ENV } from '@utils';
 import { createSystem } from './sys/stencil-sys';
 import { createWorkerMessageHandler } from './worker/worker-thread';
 import { initWebWorkerThread } from './sys/worker/web-worker-thread';
+import { IS_WEB_WORKER_ENV } from './sys/environment';
 import ts from 'typescript';
 
 if (IS_WEB_WORKER_ENV) {

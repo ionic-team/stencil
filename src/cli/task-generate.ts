@@ -1,6 +1,7 @@
 import type { Config } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
-import { IS_NODE_ENV, validateComponentTag } from '@utils';
+import { IS_NODE_ENV } from '../compiler/sys/environment';
+import { validateComponentTag } from '@utils';
 
 /**
  * Task to generate component boilerplate.

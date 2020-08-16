@@ -19,7 +19,8 @@ import { basename, dirname, join } from 'path';
 import { buildEvents } from '../events';
 import { createLogger } from './logger/console-logger';
 import { createWebWorkerMainController } from './worker/web-worker-main';
-import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV, isRootPath, normalizePath } from '@utils';
+import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV } from './environment';
+import { isRootPath, normalizePath } from '@utils';
 import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 import { version } from '../../version';
 

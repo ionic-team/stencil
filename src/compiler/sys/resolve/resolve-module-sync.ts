@@ -2,7 +2,8 @@ import type * as d from '../../../declarations';
 import { COMMON_DIR_FILENAMES, getCommonDirName, isCommonDirModuleFile, shouldFetchModule } from './resolve-utils';
 import { fetchModuleSync } from '../fetch/fetch-module-sync';
 import { getCommonDirUrl, getNodeModuleFetchUrl, packageVersions } from '../fetch/fetch-utils';
-import { isString, IS_WEB_WORKER_ENV, normalizeFsPath, normalizePath } from '@utils';
+import { isString, normalizeFsPath, normalizePath } from '@utils';
+import { IS_WEB_WORKER_ENV } from '../environment';
 import { basename, dirname } from 'path';
 import resolve, { SyncOpts } from 'resolve';
 

@@ -1,6 +1,7 @@
 import type * as d from '../../declarations';
 import { generateBuildResults } from './build-results';
-import { IS_NODE_ENV, isFunction, isRemoteUrl } from '@utils';
+import { isFunction, isRemoteUrl } from '@utils';
+import { IS_NODE_ENV } from '../sys/environment';
 import { relative } from 'path';
 
 export const buildFinish = async (buildCtx: d.BuildCtx) => {

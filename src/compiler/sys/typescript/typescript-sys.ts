@@ -1,7 +1,8 @@
 import type * as d from '../../../declarations';
 import { basename, resolve } from 'path';
-import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV, isRemoteUrl, isString, normalizePath, noop } from '@utils';
+import { isRemoteUrl, isString, normalizePath, noop } from '@utils';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
+import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 import ts from 'typescript';
 

@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { IS_NODE_ENV, requireFunc } from '@utils';
+import { IS_NODE_ENV, requireFunc } from '../sys/environment';
 
 let cssProcessor: any;
 

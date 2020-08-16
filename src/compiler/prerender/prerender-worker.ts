@@ -1,9 +1,10 @@
 import type * as d from '../../declarations';
 import { addModulePreloads, excludeStaticComponents, minifyScriptElements, minifyStyleElements, removeModulePreloads, removeStencilScripts } from './prerender-optimize';
-import { catchError, isPromise, isRootPath, normalizePath, requireFunc, isFunction } from '@utils';
+import { catchError, isPromise, isRootPath, normalizePath, isFunction } from '@utils';
 import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getHydrateOptions } from './prerender-hydrate-options';
 import { getPrerenderConfig } from './prerender-config';
+import { requireFunc } from '../sys/environment';
 
 const prerenderCtx = {
   componentGraph: null as Map<string, string[]>,

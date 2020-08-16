@@ -1,4 +1,4 @@
-import { OS_PLATFORM } from '@utils';
+import { OS_PLATFORM } from '../environment';
 
 export const EOL = '\n';
 
