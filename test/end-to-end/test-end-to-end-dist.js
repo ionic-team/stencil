@@ -6,8 +6,8 @@ fs.accessSync(path.join(distDir, 'cjs'));
 fs.accessSync(path.join(distDir, 'endtoend'));
 fs.accessSync(path.join(distDir, 'esm'));
 fs.accessSync(path.join(distDir, 'loader'));
+fs.accessSync(path.join(distDir, 'index.cjs.js'));
 fs.accessSync(path.join(distDir, 'index.js'));
-fs.accessSync(path.join(distDir, 'index.mjs'));
 
 const customElementsDir = path.join(distDir, 'custom-elements');
 fs.accessSync(path.join(customElementsDir, 'index.d.ts'));
