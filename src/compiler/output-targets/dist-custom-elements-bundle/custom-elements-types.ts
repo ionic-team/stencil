@@ -24,7 +24,7 @@ const generateCustomElementsTypesOutput = async (
   const code = [
     `/* ${config.namespace} custom elements bundle */`,
     ``,
-    `import { Components } from "${componentsDtsRelPath}";`,
+    `import { Components, JSX } from "${componentsDtsRelPath}";`,
     ``,
     ...components.map(generateCustomElementType),
     `/**`,
@@ -51,6 +51,8 @@ const generateCustomElementsTypesOutput = async (
     ` */`,
     `export declare const setAssetPath: (path: string) => void;`,
     ``,
+    `export { Components, JSX };`,
+    ``
   ];
 
   const usersIndexJsPath = join(config.srcDir, 'index.ts');
