@@ -44,8 +44,7 @@ export const isOutputTargetDistCollection = (o: d.OutputTarget): o is d.OutputTa
 
 export const isOutputTargetDistCustomElements = (o: d.OutputTarget): o is d.OutputTargetDistCustomElements => o.type === DIST_CUSTOM_ELEMENTS;
 
-export const isOutputTargetDistCustomElementsBundle = (o: d.OutputTarget): o is d.OutputTargetDistCustomElementsBundle =>
-  o.type === DIST_CUSTOM_ELEMENTS_BUNDLE || o.type === EXPERIMENTAL_DIST_MODULE;
+export const isOutputTargetDistCustomElementsBundle = (o: d.OutputTarget): o is d.OutputTargetDistCustomElementsBundle => o.type === DIST_CUSTOM_ELEMENTS_BUNDLE;
 
 export const isOutputTargetCopy = (o: d.OutputTarget): o is d.OutputTargetCopy => o.type === COPY;
 
@@ -102,7 +101,6 @@ export const DIST = `dist`;
 export const DIST_COLLECTION = `dist-collection`;
 export const DIST_CUSTOM_ELEMENTS = `dist-custom-elements`;
 export const DIST_CUSTOM_ELEMENTS_BUNDLE = `dist-custom-elements-bundle`;
-export const EXPERIMENTAL_DIST_MODULE = `experimental-dist-module`;
 
 export const DIST_TYPES = `dist-types`;
 export const DIST_HYDRATE_SCRIPT = `dist-hydrate-script`;
@@ -124,7 +122,6 @@ export const VALID_TYPES = [
   DIST,
   DIST_COLLECTION,
   DIST_CUSTOM_ELEMENTS,
-  EXPERIMENTAL_DIST_MODULE,
   DIST_GLOBAL_STYLES,
   DIST_HYDRATE_SCRIPT,
   DIST_LAZY,
@@ -144,7 +141,6 @@ export const VALID_TYPES_NEXT = [
   DIST_COLLECTION,
   // DIST_CUSTOM_ELEMENTS,
   DIST_CUSTOM_ELEMENTS_BUNDLE,
-  EXPERIMENTAL_DIST_MODULE,
   DIST_LAZY,
   DIST_HYDRATE_SCRIPT,
 

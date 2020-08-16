@@ -34,7 +34,7 @@ export const config: Config = {
       type: 'dist',
     },
     {
-      type: 'experimental-dist-module',
+      type: 'dist-custom-elements-bundle',
     },
     reactOutputTarget({
       componentCorePackage: '@stencil/e2e-react-output-target',
