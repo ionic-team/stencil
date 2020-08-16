@@ -292,13 +292,12 @@ async function validateTreeshaking(opts: BuildOptions) {
 }
 
 async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, entryModule: string) {
+  const entryId = `@g@doo`;
   const inputCode = `import "${entryModule}";`;
-  const inputFile = join(opts.scriptsBuildDir, `treeshake_input_${moduleName}.js`);
-  const outputFile = join(opts.scriptsBuildDir, `treeshake_output_${moduleName}.js`);
-  await fs.writeFile(inputFile, inputCode);
+  const outputFile = join(opts.scriptsBuildDir, `treeshake_${moduleName}.js`);
 
   const bundle = await rollup({
-    input: inputFile,
+    input: entryId,
     treeshake: true,
     plugins: [
       {
@@ -313,10 +312,16 @@ async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, e
           if (id === '@stencil/core/internal/app-globals') {
             return id;
           }
+          if (id === entryId) {
+            return entryId;
+          }
         },
         load(id) {
           if (id === '@stencil/core/internal/app-globals') {
             return 'export const globalScripts = () => {};';
+          }
+          if (id === entryId) {
+            return inputCode;
           }
         },
       },
@@ -338,7 +343,7 @@ async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, e
   await fs.writeFile(outputFile, outputCode);
 
   if (outputCode !== '') {
-    console.error(`\nTreeshake input: ${inputFile}\n`);
+    console.error(`\nTreeshake input: ${inputCode}\n`);
     console.error(`\nTreeshake output: ${outputFile}\n`);
 
     throw new Error(`🧨  Not all code was not treeshaken (treeshooken? treeshaked?)`);
