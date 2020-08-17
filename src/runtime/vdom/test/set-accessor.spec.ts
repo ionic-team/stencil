@@ -115,6 +115,45 @@ describe('setAccessor for custom elements', () => {
     });
   });
 
+  describe('data attribute', () => {
+    const attribute = 'data-attribute';
+
+    it('should add attribute when value is a string', () => {
+      setAccessor(elm, attribute, undefined, 'test', false, 0);
+      expect(elm.hasAttribute(attribute)).toBe(true);
+      expect(elm.getAttribute(attribute)).toBe('test');
+    });
+
+    it('should add attribute when there is no value', () => {
+      setAccessor(elm, attribute, undefined, undefined, false, 0);
+      expect(elm.hasAttribute(attribute)).toBe(true);
+    });
+
+    it('should set value to empty string when there is no value', () => {
+      setAccessor(elm, attribute, undefined, undefined, false, 0);
+      expect(elm.hasAttribute(attribute)).toBe(true);
+      expect(elm.getAttribute(attribute)).toBe('');
+    });
+
+    it('should add attribute when value is a non-string', () => {
+      setAccessor(elm, attribute, undefined, 123, false, 0);
+      expect(elm.hasAttribute(attribute)).toBe(true);
+      expect(elm.getAttribute(attribute)).toBe('123');
+    });
+
+    it('should add attribute when value is false', () => {
+      setAccessor(elm, attribute, undefined, false, false, 0);
+      expect(elm.hasAttribute(attribute)).toBe(true);
+      expect(elm.getAttribute(attribute)).toBe('false');
+    });
+
+    it('should set value on attribute when value is boolean true', () => {
+      setAccessor(elm, attribute, undefined, true, false, 0);
+      expect(elm.hasAttribute(attribute)).toBe(true);
+      expect(elm.getAttribute(attribute)).toBe('true');
+    });
+  });
+
   it('should set object property to child', () => {
     const oldValue: any = 'someval';
     const newValue: any = { some: 'obj' };
@@ -799,7 +838,14 @@ describe('setAccessor for standard html elements', () => {
       setAccessor(elm, 'style', undefined, undefined, false, 0);
       expect(elm.style.cssText).toEqual('');
 
-      setAccessor(elm, 'style', { 'color': 'blue', 'font-size': '12px', 'paddingLeft': '88px' }, { 'color': 'blue', 'font-size': '12px', 'paddingLeft': '88px' }, false, 0);
+      setAccessor(
+        elm,
+        'style',
+        { 'color': 'blue', 'font-size': '12px', 'paddingLeft': '88px' },
+        { 'color': 'blue', 'font-size': '12px', 'paddingLeft': '88px' },
+        false,
+        0,
+      );
       expect(elm.style.cssText).toEqual('');
 
       setAccessor(elm, 'style', { 'color': 'blue', 'font-size': '12px' }, undefined, false, 0);
@@ -811,7 +857,14 @@ describe('setAccessor for standard html elements', () => {
       elm.style.setProperty('color', 'black');
       elm.style.setProperty('padding', '20px');
 
-      setAccessor(elm, 'style', { color: 'blue', padding: '20px', marginRight: '88px' }, { color: 'blue', padding: '30px', marginRight: '55px' }, false, 0);
+      setAccessor(
+        elm,
+        'style',
+        { color: 'blue', padding: '20px', marginRight: '88px' },
+        { color: 'blue', padding: '30px', marginRight: '55px' },
+        false,
+        0,
+      );
 
       expect(elm.style.cssText).toEqual('color: black; padding: 30px; margin-right: 55px;');
     });
