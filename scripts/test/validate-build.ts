@@ -1,4 +1,4 @@
-import { basename, dirname, join, relative } from 'path';
+import { dirname, join, relative, resolve } from 'path';
 import fs from 'fs-extra';
 import { BuildOptions, getOptions } from '../utils/options';
 import { PackageData } from '../utils/write-pkg-json';
@@ -291,13 +291,13 @@ async function validateTreeshaking(opts: BuildOptions) {
   await validateModuleTreeshake(opts, 'cli', join(opts.output.cliDir, 'index.js'));
 }
 
-async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, entryModule: string) {
-  const entryId = `@g@doo`;
-  const inputCode = `import "${entryModule}";`;
+async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, entryModulePath: string) {
+  const virtualInputId = `@g@doo`;
+  const entryId = `@entry-module`;
   const outputFile = join(opts.scriptsBuildDir, `treeshake_${moduleName}.js`);
 
   const bundle = await rollup({
-    input: entryId,
+    input: virtualInputId,
     treeshake: true,
     plugins: [
       {
@@ -312,16 +312,19 @@ async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, e
           if (id === '@stencil/core/internal/app-globals') {
             return id;
           }
+          if (id === virtualInputId) {
+            return id;
+          }
           if (id === entryId) {
-            return entryId;
+            return entryModulePath;
           }
         },
         load(id) {
           if (id === '@stencil/core/internal/app-globals') {
             return 'export const globalScripts = () => {};';
           }
-          if (id === entryId) {
-            return inputCode;
+          if (id === virtualInputId) {
+            return `import "${entryId}";`;
           }
         },
       },
@@ -343,13 +346,12 @@ async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, e
   await fs.writeFile(outputFile, outputCode);
 
   if (outputCode !== '') {
-    console.error(`\nTreeshake input: ${inputCode}\n`);
     console.error(`\nTreeshake output: ${outputFile}\n`);
 
     throw new Error(`🧨  Not all code was not treeshaken (treeshooken? treeshaked?)`);
   }
 
-  console.log(`🌳  validated treeshake: ${relative(opts.rootDir, entryModule)}`);
+  console.log(`🌳  validated treeshake: ${relative(opts.rootDir, entryModulePath)}`);
 }
 
 interface TestPackage {
