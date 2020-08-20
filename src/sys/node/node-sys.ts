@@ -268,7 +268,18 @@ export function createNodeSys(c: { process?: any } = {}) {
     rename(oldPath, newPath) {
       return new Promise(resolve => {
         fs.rename(oldPath, newPath, error => {
-          resolve({ oldPath, newPath, error, oldDirs: [], oldFiles: [], newDirs: [], newFiles: [], renamed: [], isFile: false, isDirectory: false });
+          resolve({
+            oldPath,
+            newPath,
+            error,
+            oldDirs: [],
+            oldFiles: [],
+            newDirs: [],
+            newFiles: [],
+            renamed: [],
+            isFile: false,
+            isDirectory: false,
+          });
         });
       });
     },
@@ -280,11 +291,25 @@ export function createNodeSys(c: { process?: any } = {}) {
         const recursive = !!(opts && opts.recursive);
         if (recursive) {
           fs.rmdir(p, { recursive: true }, err => {
-            resolve({ basename: path.basename(p), dirname: path.dirname(p), path: p, removedDirs: [], removedFiles: [], error: err });
+            resolve({
+              basename: path.basename(p),
+              dirname: path.dirname(p),
+              path: p,
+              removedDirs: [],
+              removedFiles: [],
+              error: err,
+            });
           });
         } else {
           fs.rmdir(p, err => {
-            resolve({ basename: path.basename(p), dirname: path.dirname(p), path: p, removedDirs: [], removedFiles: [], error: err });
+            resolve({
+              basename: path.basename(p),
+              dirname: path.dirname(p),
+              path: p,
+              removedDirs: [],
+              removedFiles: [],
+              error: err,
+            });
           });
         }
       });
@@ -297,9 +322,23 @@ export function createNodeSys(c: { process?: any } = {}) {
         } else {
           fs.rmdirSync(p);
         }
-        return { basename: path.basename(p), dirname: path.dirname(p), path: p, removedDirs: [], removedFiles: [], error: null };
+        return {
+          basename: path.basename(p),
+          dirname: path.dirname(p),
+          path: p,
+          removedDirs: [],
+          removedFiles: [],
+          error: null,
+        };
       } catch (e) {
-        return { basename: path.basename(p), dirname: path.dirname(p), path: p, removedDirs: [], removedFiles: [], error: e };
+        return {
+          basename: path.basename(p),
+          dirname: path.dirname(p),
+          path: p,
+          removedDirs: [],
+          removedFiles: [],
+          error: e,
+        };
       }
     },
     removeFile(p) {
@@ -472,7 +511,8 @@ export function createNodeSys(c: { process?: any } = {}) {
       freemem() {
         return freemem();
       },
-      platform: osPlatform === 'darwin' || osPlatform === 'linux' ? osPlatform : osPlatform === 'win32' ? 'windows' : '',
+      platform:
+        osPlatform === 'darwin' || osPlatform === 'linux' ? osPlatform : osPlatform === 'win32' ? 'windows' : '',
       release: release(),
       totalmem: totalmem(),
     },
@@ -491,18 +531,17 @@ export function createNodeSys(c: { process?: any } = {}) {
     'workbox-build': ['4.3.1', '4.3.1'],
   });
 
-  prcs.on('SIGINT', () => {
-    while (true) {
-      const cb = onInterruptsCallbacks.pop();
-      if (isFunction(cb)) {
-        try {
-          cb();
-        } catch (e) {}
-      } else {
-        break;
-      }
+  const runInterruptsCallbacks = () => {
+    let cb: () => void;
+    while (isFunction((cb = onInterruptsCallbacks.pop()))) {
+      try {
+        cb();
+      } catch (e) {}
     }
-  });
+  };
+
+  prcs.on('SIGINT', runInterruptsCallbacks);
+  prcs.on('exit', runInterruptsCallbacks);
 
   return sys;
 }
