@@ -1,16 +1,20 @@
 import type * as d from '../declarations';
+import type { ServerResponse } from 'http';
 import * as util from './dev-server-utils';
 import { version } from '../version';
 import { serve500 } from './serve-500';
-import * as http from 'http';
 import path from 'path';
 import fs from 'graceful-fs';
-import * as querystring from 'querystring';
-import * as Url from 'url';
 import * as zlib from 'zlib';
 import { Buffer } from 'buffer';
 
-export async function serveFile(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem, req: d.HttpRequest, res: http.ServerResponse) {
+export async function serveFile(
+  devServerConfig: d.DevServerConfig,
+  sys: d.CompilerSystem,
+  req: d.HttpRequest,
+  res: ServerResponse,
+  sendMsg: d.DevServerSendMessage,
+) {
   try {
     if (util.isSimpleText(req.filePath)) {
       // easy text file, use the internal cache
@@ -28,7 +32,7 @@ export async function serveFile(devServerConfig: d.DevServerConfig, sys: d.Compi
         res.writeHead(
           200,
           util.responseHeaders({
-            'content-type': util.getContentType(devServerConfig, req.filePath) + '; charset=utf-8',
+            'content-type': util.getContentType(req.filePath) + '; charset=utf-8',
             'content-encoding': 'gzip',
             'vary': 'Accept-Encoding',
           }),
@@ -42,7 +46,7 @@ export async function serveFile(devServerConfig: d.DevServerConfig, sys: d.Compi
         res.writeHead(
           200,
           util.responseHeaders({
-            'content-type': util.getContentType(devServerConfig, req.filePath) + '; charset=utf-8',
+            'content-type': util.getContentType(req.filePath) + '; charset=utf-8',
             'content-length': Buffer.byteLength(content, 'utf8'),
           }),
         );
@@ -55,33 +59,22 @@ export async function serveFile(devServerConfig: d.DevServerConfig, sys: d.Compi
       res.writeHead(
         200,
         util.responseHeaders({
-          'content-type': util.getContentType(devServerConfig, req.filePath),
+          'content-type': util.getContentType(req.filePath),
           'content-length': req.stats.size,
         }),
       );
       fs.createReadStream(req.filePath).pipe(res);
     }
 
-    if (devServerConfig.logRequests) {
-      util.sendMsg(process, {
-        requestLog: {
-          method: req.method,
-          url: req.url,
-          status: 200,
-        },
-      });
-    }
+    util.sendLogRequest(devServerConfig, req, 200, sendMsg);
   } catch (e) {
-    serve500(devServerConfig, req, res, e, 'serveFile');
+    serve500(devServerConfig, req, res, e, 'serveFile', sendMsg);
   }
 }
 
-function updateStyleUrls(cssUrl: string, oldCss: string) {
-  const parsedUrl = Url.parse(cssUrl);
-  const qs = querystring.parse(parsedUrl.query);
-
-  const versionId = qs['s-hmr'];
-  const hmrUrls = qs['s-hmr-urls'];
+function updateStyleUrls(url: URL, oldCss: string) {
+  const versionId = url.searchParams.get('s-hmr');
+  const hmrUrls = url.searchParams.get('s-hmr-urls');
 
   if (versionId && hmrUrls) {
     (hmrUrls as string).split(',').forEach(hmrUrl => {
@@ -96,7 +89,7 @@ function updateStyleUrls(cssUrl: string, oldCss: string) {
   while ((result = reg.exec(oldCss)) !== null) {
     const oldUrl = result[2];
 
-    const parsedUrl = Url.parse(oldUrl);
+    const parsedUrl = new URL(oldUrl, url);
 
     const fileName = path.basename(parsedUrl.pathname);
     const versionId = urlVersionIds.get(fileName);
@@ -104,14 +97,9 @@ function updateStyleUrls(cssUrl: string, oldCss: string) {
       continue;
     }
 
-    const qs = querystring.parse(parsedUrl.query);
-    qs['s-hmr'] = versionId;
+    parsedUrl.searchParams.set('s-hmr', versionId);
 
-    parsedUrl.search = querystring.stringify(qs);
-
-    const newUrl = Url.format(parsedUrl);
-
-    newCss = newCss.replace(oldUrl, newUrl);
+    newCss = newCss.replace(oldUrl, parsedUrl.pathname);
   }
 
   return newCss;
@@ -120,7 +108,11 @@ function updateStyleUrls(cssUrl: string, oldCss: string) {
 const urlVersionIds = new Map<string, string>();
 
 function appendDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest, content: string) {
-  const devServerClientUrl = util.getDevServerClientUrl(devServerConfig, req.headers?.['x-forwarded-host'] ?? req.host, req.headers?.['x-forwarded-proto']);
+  const devServerClientUrl = util.getDevServerClientUrl(
+    devServerConfig,
+    req.headers?.['x-forwarded-host'] ?? req.host,
+    req.headers?.['x-forwarded-proto'],
+  );
   const iframe = `<iframe title="Stencil Dev Server Connector ${version} &#9889;" src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0;visibility:hidden" aria-hidden="true"></iframe>`;
   return appendDevServerClientIframe(content, iframe);
 }

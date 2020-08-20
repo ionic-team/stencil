@@ -11,15 +11,15 @@ import type { BuildOptions } from '../utils/options';
 import type { RollupOptions, OutputChunk, Plugin } from 'rollup';
 import { minify } from 'terser';
 import ts from 'typescript';
-import { prettyMinifyPlugin } from './plugins/pretty-minify';
 import { getBanner } from '../utils/banner';
+import { contentTypesPlugin } from './plugins/content-types-plugin';
 
 export async function devServer(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'dev-server');
 
   // create public d.ts
-  let dts = await fs.readFile(join(inputDir, 'public.d.ts'), 'utf8');
-  dts = dts.replace('@stencil/core/internal', '../internal/index');
+  let dts = await fs.readFile(join(inputDir, 'index.d.ts'), 'utf8');
+  dts = dts.replace('../declarations', '../internal/index');
   await fs.writeFile(join(opts.output.devServerDir, 'index.d.ts'), dts);
 
   // write package.json
@@ -33,71 +33,86 @@ export async function devServer(opts: BuildOptions) {
   // copy static files
   await fs.copy(join(opts.srcDir, 'dev-server', 'static'), join(opts.output.devServerDir, 'static'));
 
+  // copy server-worker-thread.js
+  await fs.copy(join(opts.srcDir, 'dev-server', 'server-worker-thread.js'), join(opts.output.devServerDir, 'server-worker-thread.js'));
+
   // copy template files
   await fs.copy(join(opts.srcDir, 'dev-server', 'templates'), join(opts.output.devServerDir, 'templates'));
 
-  // create content-type-db.json
-  await createContentTypeData(opts);
+  const external = [
+    'assert',
+    'buffer',
+    'child_process',
+    'crypto',
+    'events',
+    'fs',
+    'http',
+    'https',
+    'net',
+    'os',
+    'path',
+    'stream',
+    'url',
+    'util',
+    'zlib',
+  ];
 
-  const devServerBundle: RollupOptions = {
+  const plugins = [
+    contentTypesPlugin(opts),
+    {
+      name: 'devServerWorkerResolverPlugin',
+      resolveId(importee) {
+        if (importee.includes('open-in-editor-api')) {
+          return {
+            id: './open-in-editor-api.js',
+            external: true,
+          };
+        }
+        return null;
+      },
+    },
+    relativePathPlugin('@sys-api-node', '../sys/node/index.js'),
+    relativePathPlugin('glob', '../sys/node/glob.js'),
+    relativePathPlugin('graceful-fs', '../sys/node/graceful-fs.js'),
+    relativePathPlugin('ws', './ws.js'),
+    relativePathPlugin('../sys/node/node-sys.js', '../sys/node/node-sys.js'),
+    aliasPlugin(opts),
+    rollupResolve({
+      preferBuiltins: true,
+    }),
+    rollupCommonjs(),
+    replacePlugin(opts),
+  ];
+
+  const devServerIndexBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
     output: {
       format: 'cjs',
       file: join(opts.output.devServerDir, 'index.js'),
+      hoistTransitiveImports: false,
       esModule: false,
       preferConst: true,
+      banner: getBanner(opts, `Stencil Dev Server`, true),
     },
-    external: ['assert', 'child_process', 'fs', 'os', 'path', 'url', 'util'],
-    plugins: [
-      relativePathPlugin('glob', '../sys/node/glob.js'),
-      relativePathPlugin('graceful-fs', '../sys/node/graceful-fs.js'),
-      relativePathPlugin('../sys/node/node-sys.js', '../sys/node/node-sys.js'),
-      aliasPlugin(opts),
-      rollupResolve({
-        preferBuiltins: true,
-      }),
-      rollupCommonjs(),
-      prettyMinifyPlugin(opts, getBanner(opts, `Stencil Dev Server`, true)),
-    ],
+    external,
+    plugins,
     treeshake: {
       moduleSideEffects: false,
     },
   };
 
-  const devServerWorkerBundle: RollupOptions = {
-    input: join(inputDir, 'server-worker.js'),
+  const devServerProcessBundle: RollupOptions = {
+    input: join(inputDir, 'server-process.js'),
     output: {
       format: 'cjs',
-      file: join(opts.output.devServerDir, 'server-worker.js'),
+      file: join(opts.output.devServerDir, 'server-process.js'),
+      hoistTransitiveImports: false,
       esModule: false,
       preferConst: true,
+      banner: getBanner(opts, `Stencil Dev Server Process`, true),
     },
-    external: ['assert', 'buffer', 'child_process', 'crypto', 'events', 'fs', 'http', 'https', 'net', 'os', 'path', 'querystring', 'stream', 'url', 'util', 'zlib'],
-    plugins: [
-      {
-        name: 'devServerWorkerResolverPlugin',
-        resolveId(importee) {
-          if (importee.includes('open-in-editor-api')) {
-            return {
-              id: './open-in-editor-api.js',
-              external: true,
-            };
-          }
-          return null;
-        },
-      },
-      relativePathPlugin('ws', './ws.js'),
-      relativePathPlugin('graceful-fs', '../sys/node/graceful-fs.js'),
-      relativePathPlugin('glob', '../sys/node/glob.js'),
-      relativePathPlugin('../sys/node/node-sys.js', '../sys/node/node-sys.js'),
-      aliasPlugin(opts),
-      rollupResolve({
-        preferBuiltins: true,
-      }),
-      rollupCommonjs(),
-      replacePlugin(opts),
-      prettyMinifyPlugin(opts, getBanner(opts, `Stencil Dev Server`, true)),
-    ],
+    external,
+    plugins,
     treeshake: {
       moduleSideEffects: false,
     },
@@ -219,32 +234,10 @@ export async function devServer(opts: BuildOptions) {
     plugins: [appErrorCssPlugin(), replacePlugin(opts), rollupResolve()],
   };
 
-  return [devServerBundle, devServerWorkerBundle, connectorBundle, devServerClientBundle];
+  return [devServerIndexBundle, devServerProcessBundle, connectorBundle, devServerClientBundle];
 }
 
-async function createContentTypeData(opts: BuildOptions) {
-  // create a focused content-type lookup object from
-  // the mime db json file
-  const mimeDbSrcPath = join(opts.nodeModulesDir, 'mime-db', 'db.json');
-  const mimeDbJson = await fs.readJson(mimeDbSrcPath);
-
-  const contentTypeDestPath = join(opts.output.devServerDir, 'content-type-db.json');
-
-  const exts = {};
-
-  Object.keys(mimeDbJson).forEach(mimeType => {
-    const mimeTypeData = mimeDbJson[mimeType];
-    if (Array.isArray(mimeTypeData.extensions)) {
-      mimeTypeData.extensions.forEach(ext => {
-        exts[ext] = mimeType;
-      });
-    }
-  });
-
-  await fs.writeJson(contentTypeDestPath, exts);
-}
-
-const banner = `<!doctype html><html><head><meta charset="utf-8"><style>body{background:black;color:white;font:18px monospace;text-align:center}</style></head><body>
+const banner = `<!doctype html><html><head><meta charset="utf-8"><title>Stencil Dev Server Connector __VERSION:STENCIL__ &#9889</title><style>body{background:black;color:white;font:18px monospace;text-align:center}</style></head><body>
 
 Stencil Dev Server Connector __VERSION:STENCIL__ &#9889;
 
@@ -255,7 +248,6 @@ const intro = `(function(iframeWindow, appWindow, config, exports) {
 `;
 
 const outro = `
-document.title = document.body.innerText;
 })(window, window.parent, window.__DEV_CLIENT_CONFIG__, {});
 `;
 

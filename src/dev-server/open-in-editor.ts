@@ -1,18 +1,23 @@
 import type * as d from '../declarations';
-import * as util from './dev-server-utils';
-import * as http from 'http';
-import * as querystring from 'querystring';
-import * as url from 'url';
+import type { ServerResponse } from 'http';
+import { responseHeaders, sendLogRequest } from './dev-server-utils';
 import openInEditorApi from './open-in-editor-api';
 
-export async function serveOpenInEditor(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem, req: d.HttpRequest, res: http.ServerResponse) {
+export async function serveOpenInEditor(
+  devServerConfig: d.DevServerConfig,
+  sys: d.CompilerSystem,
+  req: d.HttpRequest,
+  res: ServerResponse,
+  sendMsg: d.DevServerSendMessage,
+) {
   let status = 200;
 
   const data: d.OpenInEditorData = {};
 
   try {
-    if (devServerConfig.editors.length > 0) {
-      await parseData(devServerConfig, sys, req, data);
+    const editors = await getEditors();
+    if (editors.length > 0) {
+      await parseData(editors, sys, req, data);
       await openDataInEditor(data);
     } else {
       data.error = `no editors available`;
@@ -22,17 +27,11 @@ export async function serveOpenInEditor(devServerConfig: d.DevServerConfig, sys:
     status = 500;
   }
 
-  util.sendMsg(process, {
-    requestLog: {
-      method: req.method,
-      url: req.url,
-      status,
-    },
-  });
+  sendLogRequest(devServerConfig, req, status, sendMsg);
 
   res.writeHead(
     status,
-    util.responseHeaders({
+    responseHeaders({
       'content-type': 'application/json; charset=utf-8',
     }),
   );
@@ -41,41 +40,46 @@ export async function serveOpenInEditor(devServerConfig: d.DevServerConfig, sys:
   res.end();
 }
 
-async function parseData(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem, req: d.HttpRequest, data: d.OpenInEditorData) {
-  const query = url.parse(req.url).query;
-  const qs = querystring.parse(query) as any;
+async function parseData(
+  editors: d.DevServerEditor[],
+  sys: d.CompilerSystem,
+  req: d.HttpRequest,
+  data: d.OpenInEditorData,
+) {
+  const qs = req.searchParams;
 
-  if (typeof qs.file !== 'string') {
+  if (!qs.has('file')) {
     data.error = `missing file`;
     return;
   }
 
-  data.file = qs.file;
+  data.file = qs.get('file');
 
-  if (qs.line != null && !isNaN(qs.line)) {
-    data.line = parseInt(qs.line, 10);
+  if (qs.has('line') && !isNaN(qs.get('line') as any)) {
+    data.line = parseInt(qs.get('line'), 10);
   }
   if (typeof data.line !== 'number' || data.line < 1) {
     data.line = 1;
   }
 
-  if (qs.column != null && !isNaN(qs.column)) {
-    data.column = parseInt(qs.column, 10);
+  if (qs.has('column') && !isNaN(qs.get('column') as any)) {
+    data.column = parseInt(qs.get('column'), 10);
   }
   if (typeof data.column !== 'number' || data.column < 1) {
     data.column = 1;
   }
 
-  if (typeof qs.editor === 'string') {
-    qs.editor = qs.editor.trim().toLowerCase();
-    if (devServerConfig.editors.some(e => e.id === qs.editor)) {
-      data.editor = qs.editor;
+  let editor = qs.get('editor');
+  if (typeof editor === 'string') {
+    editor = editor.trim().toLowerCase();
+    if (editors.some(e => e.id === editor)) {
+      data.editor = editor;
     } else {
-      data.error = `invalid editor: ${qs.editor}`;
+      data.error = `invalid editor: ${editor}`;
       return;
     }
   } else {
-    data.editor = devServerConfig.editors[0].id;
+    data.editor = editors[0].id;
   }
 
   const stat = await sys.stat(data.file);
@@ -106,36 +110,46 @@ async function openDataInEditor(data: d.OpenInEditorData) {
   }
 }
 
-export async function getEditors() {
-  const editors: d.DevServerEditor[] = [];
+let editors: Promise<d.DevServerEditor[]> = null;
 
-  try {
-    await Promise.all(
-      Object.keys(openInEditorApi.editors).map(async editorId => {
-        const isSupported = await isEditorSupported(editorId);
+export function getEditors() {
+  if (!editors) {
+    editors = new Promise(async resolve => {
+      const editors: d.DevServerEditor[] = [];
 
-        editors.push({
-          id: editorId,
-          priority: EDITOR_PRIORITY[editorId],
-          supported: isSupported,
-        });
-      }),
-    );
-  } catch (e) {}
+      try {
+        await Promise.all(
+          Object.keys(openInEditorApi.editors).map(async editorId => {
+            const isSupported = await isEditorSupported(editorId);
 
-  return editors
-    .filter(e => e.supported)
-    .sort((a, b) => {
-      if (a.priority < b.priority) return -1;
-      if (a.priority > b.priority) return 1;
-      return 0;
-    })
-    .map(e => {
-      return {
-        id: e.id,
-        name: EDITORS[e.id],
-      } as d.DevServerEditor;
+            editors.push({
+              id: editorId,
+              priority: EDITOR_PRIORITY[editorId],
+              supported: isSupported,
+            });
+          }),
+        );
+      } catch (e) {}
+
+      resolve(
+        editors
+          .filter(e => e.supported)
+          .sort((a, b) => {
+            if (a.priority < b.priority) return -1;
+            if (a.priority > b.priority) return 1;
+            return 0;
+          })
+          .map(e => {
+            return {
+              id: e.id,
+              name: EDITORS[e.id],
+            } as d.DevServerEditor;
+          }),
+      );
     });
+  }
+
+  return editors;
 }
 
 async function isEditorSupported(editorId: string) {

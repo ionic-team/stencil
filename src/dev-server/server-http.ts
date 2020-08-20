@@ -1,26 +1,51 @@
 import type * as d from '../declarations';
 import { createRequestHandler } from './request-handler';
-import { findClosestOpenPort } from './find-closest-port';
 import * as http from 'http';
 import * as https from 'https';
+import * as net from 'net';
 
-export async function createHttpServer(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem, destroys: d.DevServerDestroy[]) {
-  // figure out the port to be listening on
-  // by figuring out the first one available
-  devServerConfig.port = await findClosestOpenPort(devServerConfig.address, devServerConfig.port);
-
+export function createHttpServer(
+  devServerConfig: d.DevServerConfig,
+  sys: d.CompilerSystem,
+  sendMsg: d.DevServerSendMessage,
+) {
   // create our request handler
-  const reqHandler = createRequestHandler(devServerConfig, sys);
+  const reqHandler = createRequestHandler(devServerConfig, sys, sendMsg);
 
   const credentials = devServerConfig.https;
 
-  let server = credentials ? https.createServer(credentials, reqHandler) : http.createServer(reqHandler);
+  return credentials ? https.createServer(credentials, reqHandler) : http.createServer(reqHandler);
+}
 
-  destroys.push(() => {
-    // close down the serve on destroy
-    server.close();
-    server = null;
+export async function findClosestOpenPort(host: string, port: number): Promise<number> {
+  async function t(portToCheck: number): Promise<number> {
+    const isTaken = await isPortTaken(host, portToCheck);
+    if (!isTaken) {
+      return portToCheck;
+    }
+    return t(portToCheck + 1);
+  }
+
+  return t(port);
+}
+
+function isPortTaken(host: string, port: number): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    const tester = net
+      .createServer()
+      .once('error', () => {
+        resolve(true);
+      })
+      .once('listening', () => {
+        tester
+          .once('close', () => {
+            resolve(false);
+          })
+          .close();
+      })
+      .on('error', (err: any) => {
+        reject(err);
+      })
+      .listen(port, host);
   });
-
-  return server;
 }

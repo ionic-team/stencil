@@ -14,4 +14,8 @@ export const validateWorkers = (config: d.Config) => {
   }
 
   config.maxConcurrentWorkers = Math.max(Math.min(config.maxConcurrentWorkers, 16), 0);
+
+  if (config.devServer) {
+    config.devServer.worker = config.maxConcurrentWorkers > 0;
+  }
 };

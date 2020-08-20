@@ -1,56 +1,10 @@
 import type * as d from '../declarations';
 import * as c from './dev-server-constants';
+import contentTypes from './content-types-db.json';
 import { version } from '../version';
-import util from 'util';
-
-const msgResolves = new Map<number, (v: any) => void>();
-let resolveIds = 1;
-
-export function sendMsg(prcs: NodeJS.Process, msg: d.DevServerMessage) {
-  prcs.send(msg);
-}
-
-export function sendMsgWithResponse(prcs: NodeJS.Process, msg: d.DevServerMessage) {
-  return new Promise<d.DevServerMessage>(resolve => {
-    msg.resolveId = resolveIds++;
-    msgResolves.set(msg.resolveId, resolve);
-    sendMsg(prcs, msg);
-  });
-}
-
-export function createMessageReceiver(prcs: NodeJS.Process, cb: (msg: d.DevServerMessage) => void) {
-  prcs.on('message', (msg: d.DevServerMessage) => {
-    if (typeof msg.resolveId === 'number') {
-      const resolve = msgResolves.get(msg.resolveId);
-      if (resolve) {
-        msgResolves.delete(msg.resolveId);
-        resolve(msg);
-      }
-    }
-    cb(msg);
-  });
-}
-
-export function sendError(prcs: NodeJS.Process, e: any) {
-  const msg: d.DevServerMessage = {
-    error: {
-      message: e,
-    },
-  };
-
-  if (typeof e === 'string') {
-    msg.error.message = e + '';
-  } else if (e) {
-    try {
-      msg.error.message = util.inspect(e) + '';
-    } catch (e) {}
-  }
-
-  sendMsg(prcs, msg);
-}
 
 export function responseHeaders(headers: d.DevResponseHeaders): any {
-  return Object.assign({}, DEFAULT_HEADERS, headers);
+  return { ...DEFAULT_HEADERS, ...headers };
 }
 
 const DEFAULT_HEADERS: d.DevResponseHeaders = {
@@ -89,14 +43,14 @@ export function getDevServerClientUrl(devServerConfig: d.DevServerConfig, host: 
   return getBrowserUrl(protocol ?? devServerConfig.protocol, address, port, devServerConfig.basePath, c.DEV_SERVER_URL);
 }
 
-export function getContentType(devServerConfig: d.DevServerConfig, filePath: string) {
+export function getContentType(filePath: string) {
   const last = filePath.replace(/^.*[/\\]/, '').toLowerCase();
   const ext = last.replace(/^.*\./, '').toLowerCase();
 
   const hasPath = last.length < filePath.length;
   const hasDot = ext.length < last.length - 1;
 
-  return ((hasDot || !hasPath) && devServerConfig.contentTypes[ext]) || 'application/octet-stream';
+  return ((hasDot || !hasPath) && (contentTypes as any)[ext]) || 'application/octet-stream';
 }
 
 export function isHtmlFile(filePath: string) {
@@ -155,4 +109,21 @@ export function shouldCompress(devServerConfig: d.DevServerConfig, req: d.HttpRe
   }
 
   return true;
+}
+
+export function sendLogRequest(
+  devServerConfig: d.DevServerConfig,
+  req: d.HttpRequest,
+  status: number,
+  sendMsg: d.DevServerSendMessage,
+) {
+  if (devServerConfig.logRequests) {
+    sendMsg({
+      requestLog: {
+        method: req.method,
+        url: req.pathname,
+        status,
+      },
+    });
+  }
 }

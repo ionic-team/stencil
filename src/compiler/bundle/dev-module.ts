@@ -4,7 +4,12 @@ import { BuildContext } from '../build/build-ctx';
 import { getRollupOptions } from './bundle-output';
 import { OutputOptions, PartialResolvedId, rollup } from 'rollup';
 
-export const devNodeModuleResolveId = async (config: d.Config, inMemoryFs: d.InMemoryFileSystem, resolvedId: PartialResolvedId, importee: string) => {
+export const devNodeModuleResolveId = async (
+  config: d.Config,
+  inMemoryFs: d.InMemoryFileSystem,
+  resolvedId: PartialResolvedId,
+  importee: string,
+) => {
   if (!shouldCheckDevModule(resolvedId, importee)) {
     return resolvedId;
   }
@@ -52,6 +57,7 @@ const getPackageJsonPath = (resolvedPath: string, importee: string): string => {
 
 export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerCtx, data: d.CompilerRequest) => {
   const results: d.CompilerRequestResponse = {
+    path: data.path,
     nodeModuleId: null,
     nodeModuleVersion: null,
     nodeResolvedPath: null,
@@ -118,7 +124,12 @@ export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerC
   return results;
 };
 
-const bundleDevModule = async (config: d.Config, compilerCtx: d.CompilerCtx, parsedUrl: ParsedDevModuleUrl, results: d.CompilerRequestResponse) => {
+const bundleDevModule = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  parsedUrl: ParsedDevModuleUrl,
+  results: d.CompilerRequestResponse,
+) => {
   const buildCtx = new BuildContext(config, compilerCtx);
 
   try {
@@ -221,7 +232,10 @@ const parseDevModuleUrl = (config: d.Config, u: string) => {
 };
 
 const getDevModuleCachePath = (config: d.Config, parsedUrl: ParsedDevModuleUrl) => {
-  return join(config.cacheDir, `dev_module_${parsedUrl.nodeModuleId}_${parsedUrl.nodeModuleVersion}_${DEV_MODULE_CACHE_BUSTER}.log`);
+  return join(
+    config.cacheDir,
+    `dev_module_${parsedUrl.nodeModuleId}_${parsedUrl.nodeModuleVersion}_${DEV_MODULE_CACHE_BUSTER}.log`,
+  );
 };
 
 const DEV_MODULE_CACHE_BUSTER = 0;

@@ -1,36 +1,58 @@
 import type * as d from '../declarations';
-import * as util from './dev-server-utils';
-import { serve404 } from './serve-404';
+import type { ServerResponse } from 'http';
+import { responseHeaders, sendLogRequest } from './dev-server-utils';
 import { serve500 } from './serve-500';
-import * as http from 'http';
 
-export async function serveCompilerRequest(devServerConfig: d.DevServerConfig, req: d.HttpRequest, res: http.ServerResponse) {
+const compilerRequests = new Map<string, { req: d.HttpRequest; res: ServerResponse; tmr: any }>();
+
+export function serveCompilerRequest(
+  devServerConfig: d.DevServerConfig,
+  req: d.HttpRequest,
+  res: ServerResponse,
+  sendMsg: d.DevServerSendMessage,
+) {
+  const tmr = setTimeout(() => {
+    serve500(devServerConfig, req, res, 'Timeout exceeded for dev module', 'serveCompilerRequest', sendMsg);
+  }, 15000);
+
+  compilerRequests.set(req.pathname, {
+    req,
+    res,
+    tmr,
+  });
+  sendMsg({
+    compilerRequestPath: req.pathname,
+  });
+}
+
+export function serveCompilerResponse(
+  devServerConfig: d.DevServerConfig,
+  compilerRequestResponse: d.CompilerRequestResponse,
+  sendMsg: d.DevServerSendMessage,
+) {
   try {
-    const msgResults = await util.sendMsgWithResponse(process, {
-      compilerRequestPath: req.url,
-    });
+    const data = compilerRequests.get(compilerRequestResponse.path);
+    if (data) {
+      compilerRequests.delete(compilerRequestResponse.path);
+      clearTimeout(data.tmr);
 
-    const results = msgResults.compilerRequestResults;
-
-    if (results) {
       const headers = {
         'content-type': 'application/javascript; charset=utf-8',
-        'content-length': Buffer.byteLength(results.content, 'utf8'),
-        'x-dev-node-module-id': results.nodeModuleId,
-        'x-dev-node-module-version': results.nodeModuleVersion,
-        'x-dev-node-module-resolved-path': results.nodeResolvedPath,
-        'x-dev-node-module-cache-path': results.cachePath,
-        'x-dev-node-module-cache-hit': results.cacheHit,
+        'content-length': Buffer.byteLength(compilerRequestResponse.content, 'utf8'),
+        'x-dev-node-module-id': compilerRequestResponse.nodeModuleId,
+        'x-dev-node-module-version': compilerRequestResponse.nodeModuleVersion,
+        'x-dev-node-module-resolved-path': compilerRequestResponse.nodeResolvedPath,
+        'x-dev-node-module-cache-path': compilerRequestResponse.cachePath,
+        'x-dev-node-module-cache-hit': compilerRequestResponse.cacheHit,
       };
 
-      res.writeHead(results.status, util.responseHeaders(headers));
-      res.write(results.content);
-      res.end();
-      return;
-    }
+      data.res.writeHead(compilerRequestResponse.status, responseHeaders(headers));
+      data.res.write(compilerRequestResponse.content);
+      data.res.end();
 
-    return serve404(devServerConfig, req, res, 'serveCompilerRequest');
+      sendLogRequest(devServerConfig, data.req, compilerRequestResponse.status, sendMsg);
+    }
   } catch (e) {
-    return serve500(devServerConfig, req, res, e, 'serveCompilerRequest');
+    sendMsg({ error: { message: 'serveCompilerResponse: ' + e } });
   }
 }

@@ -1,9 +1,16 @@
 import type * as d from '../declarations';
-import * as http from 'http';
-import { responseHeaders, sendError, sendMsg } from './dev-server-utils';
+import type { ServerResponse } from 'http';
+import { responseHeaders, sendLogRequest } from './dev-server-utils';
 import util from 'util';
 
-export function serve500(devServerConfig: d.DevServerConfig, req: d.HttpRequest, res: http.ServerResponse, error: any, xSource: string) {
+export function serve500(
+  devServerConfig: d.DevServerConfig,
+  req: d.HttpRequest,
+  res: ServerResponse,
+  error: any,
+  xSource: string,
+  sendMsg: d.DevServerSendMessage,
+) {
   try {
     res.writeHead(
       500,
@@ -16,16 +23,8 @@ export function serve500(devServerConfig: d.DevServerConfig, req: d.HttpRequest,
     res.write(util.inspect(error));
     res.end();
 
-    if (devServerConfig.logRequests) {
-      sendMsg(process, {
-        requestLog: {
-          method: req.method,
-          url: req.url,
-          status: 500,
-        },
-      });
-    }
+    sendLogRequest(devServerConfig, req, 500, sendMsg);
   } catch (e) {
-    sendError(process, 'serve500: ' + e);
+    sendMsg({ error: { message: 'serve500: ' + e } });
   }
 }

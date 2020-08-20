@@ -10,11 +10,11 @@ const defaultConfig: d.DevClientConfig = {
   basePath: appWindow.location.pathname,
   editors: [],
   reloadStrategy: 'hmr',
-  socketUrl: `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.hostname}${location.port !== '' ? ':' + location.port : ''}/`,
+  socketUrl: `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.hostname}${
+    location.port !== '' ? ':' + location.port : ''
+  }/`,
 };
 
 applyPolyfills(iframeWindow);
 
-const devClientConfig = Object.assign({}, defaultConfig, appWindow.devServerConfig, config);
-
-initDevClient(appWindow, devClientConfig);
+initDevClient(appWindow, Object.assign({}, defaultConfig, appWindow.devServerConfig, config));

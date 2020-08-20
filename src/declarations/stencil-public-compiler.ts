@@ -395,13 +395,12 @@ export interface StencilDevServerConfig {
   reloadStrategy?: PageReloadStrategy;
   root?: string;
   websocket?: boolean;
+  worker?: boolean;
 }
 
 export interface DevServerConfig extends StencilDevServerConfig {
   browserUrl?: string;
-  contentTypes?: { [ext: string]: string };
   devServerDir?: string;
-  editors?: DevServerEditor[];
   excludeHmr?: string[];
   historyApiFallback?: HistoryApiFallback;
   openBrowser?: boolean;
@@ -464,7 +463,17 @@ export interface ConfigFlags {
   devtools?: boolean;
 }
 
-export type TaskCommand = 'build' | 'docs' | 'generate' | 'g' | 'help' | 'info' | 'prerender' | 'serve' | 'test' | 'version';
+export type TaskCommand =
+  | 'build'
+  | 'docs'
+  | 'generate'
+  | 'g'
+  | 'help'
+  | 'info'
+  | 'prerender'
+  | 'serve'
+  | 'test'
+  | 'version';
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
@@ -822,7 +831,11 @@ export interface CompilerSystem {
    */
   createWorkerController?(maxConcurrentWorkers: number): WorkerMainController;
   encodeToBase64(str: string): string;
-  ensureDependencies?(opts: { rootDir: string; logger: Logger; dependencies: CompilerDependency[] }): Promise<{ stencilPath: string; diagnostics: Diagnostic[] }>;
+  ensureDependencies?(opts: {
+    rootDir: string;
+    logger: Logger;
+    dependencies: CompilerDependency[];
+  }): Promise<{ stencilPath: string; diagnostics: Diagnostic[] }>;
   ensureResources?(opts: { rootDir: string; logger: Logger; dependencies: CompilerDependency[] }): Promise<void>;
   /**
    * process.exit()
@@ -1143,7 +1156,12 @@ export interface CompilerBuildStart {
 
 export type CompilerFileWatcherCallback = (fileName: string, eventKind: CompilerFileWatcherEvent) => void;
 
-export type CompilerFileWatcherEvent = CompilerEventFileAdd | CompilerEventFileDelete | CompilerEventFileUpdate | CompilerEventDirAdd | CompilerEventDirDelete;
+export type CompilerFileWatcherEvent =
+  | CompilerEventFileAdd
+  | CompilerEventFileDelete
+  | CompilerEventFileUpdate
+  | CompilerEventDirAdd
+  | CompilerEventDirDelete;
 
 export type CompilerEventName =
   | CompilerEventFsChange
@@ -2144,9 +2162,9 @@ export interface Compiler {
 }
 
 export interface CompilerWatcher extends BuildOnEvents {
-  start(): Promise<WatcherCloseResults>;
-  close(): Promise<WatcherCloseResults>;
-  request(data: CompilerRequest): Promise<CompilerRequestResponse>;
+  start: () => Promise<WatcherCloseResults>;
+  close: () => Promise<WatcherCloseResults>;
+  request: (data: CompilerRequest) => Promise<CompilerRequestResponse>;
 }
 
 export interface CompilerRequest {
@@ -2158,6 +2176,7 @@ export interface WatcherCloseResults {
 }
 
 export interface CompilerRequestResponse {
+  path: string;
   nodeModuleId: string;
   nodeModuleVersion: string;
   nodeResolvedPath: string;
@@ -2245,7 +2264,17 @@ export interface TranspileOptions {
   sys?: CompilerSystem;
 }
 
-export type CompileTarget = 'latest' | 'esnext' | 'es2020' | 'es2019' | 'es2018' | 'es2017' | 'es2015' | 'es5' | string | undefined;
+export type CompileTarget =
+  | 'latest'
+  | 'esnext'
+  | 'es2020'
+  | 'es2019'
+  | 'es2018'
+  | 'es2017'
+  | 'es2015'
+  | 'es5'
+  | string
+  | undefined;
 
 export interface TranspileResults {
   code: string;

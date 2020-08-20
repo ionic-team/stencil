@@ -12,6 +12,7 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
     ['@sys-api-deno', './index.js'],
     ['@sys-api-node', './index.js'],
     ['@deno-node-compat', './node-compat.js'],
+    ['@dev-server-process', './server-process.js'],
   ]);
 
   // ensure we use the same one

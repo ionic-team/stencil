@@ -7,7 +7,7 @@
   "collection": "./dist/collection/collection-manifest.json",
   "scripts": {
     "build": "node ../../bin/stencil build",
-    "start": "node ../../bin/stencil build --dev --watch --serve",
+    "start": "node ../../bin/stencil build --dev --watch --serve --debug",
     "start.prod": "node ../../bin/stencil build --watch --serve"
   }
 }

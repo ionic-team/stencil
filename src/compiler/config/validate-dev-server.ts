@@ -4,7 +4,7 @@ import { isAbsolute, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[]) => {
-  if (config.devServer === false || config.devServer === null) {
+  if ((config.devServer === null || (config.devServer as any)) === false) {
     return null;
   }
 
@@ -49,18 +49,15 @@ export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[])
     }
   }
 
-  if ((devServer as any).hotReplacement === true) {
-    // DEPRECATED: 2019-05-20
+  if (devServer.reloadStrategy === undefined) {
     devServer.reloadStrategy = 'hmr';
-  } else if ((devServer as any).hotReplacement === false || (devServer as any).hotReplacement === null) {
-    // DEPRECATED: 2019-05-20
-    devServer.reloadStrategy = null;
-  } else {
-    if (devServer.reloadStrategy === undefined) {
-      devServer.reloadStrategy = 'hmr';
-    } else if (devServer.reloadStrategy !== 'hmr' && devServer.reloadStrategy !== 'pageReload' && devServer.reloadStrategy !== null) {
-      throw new Error(`Invalid devServer reloadStrategy "${devServer.reloadStrategy}". Valid configs include "hmr", "pageReload" and null.`);
-    }
+  } else if (
+    devServer.reloadStrategy !== 'hmr' &&
+    devServer.reloadStrategy !== 'pageReload' &&
+    devServer.reloadStrategy !== null
+  ) {
+    const err = buildError(diagnostics);
+    err.messageText = `Invalid devServer reloadStrategy "${devServer.reloadStrategy}". Valid configs include "hmr", "pageReload" and null.`;
   }
 
   if (!isBoolean(devServer.gzip)) {

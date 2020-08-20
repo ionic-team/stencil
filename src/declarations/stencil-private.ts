@@ -5,8 +5,8 @@ import type {
   CompilerBuildResults,
   CompilerBuildStart,
   CompilerFsStats,
-  CompilerSystem,
   CompilerRequestResponse,
+  CompilerSystem,
   Config,
   CopyResults,
   DevServerConfig,
@@ -25,7 +25,13 @@ import type {
   LoggerLineUpdater,
 } from './stencil-public-compiler';
 
-import type { ComponentInterface, ListenOptions, ListenTargetOptions, VNode, VNodeData } from './stencil-public-runtime';
+import type {
+  ComponentInterface,
+  ListenOptions,
+  ListenTargetOptions,
+  VNode,
+  VNodeData,
+} from './stencil-public-runtime';
 
 export interface PrintLine {
   lineIndex: number;
@@ -170,7 +176,17 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   attachStyles?: boolean;
 }
 
-export type ModuleFormat = 'amd' | 'cjs' | 'es' | 'iife' | 'system' | 'umd' | 'commonjs' | 'esm' | 'module' | 'systemjs';
+export type ModuleFormat =
+  | 'amd'
+  | 'cjs'
+  | 'es'
+  | 'iife'
+  | 'system'
+  | 'umd'
+  | 'commonjs'
+  | 'esm'
+  | 'module'
+  | 'systemjs';
 
 export interface RollupResultModule {
   id: string;
@@ -632,7 +648,13 @@ export interface CompilerCtx {
 
 export type NodeMap = WeakMap<any, ComponentCompilerMeta>;
 
-export type TsService = (compilerCtx: CompilerCtx, buildCtx: BuildCtx, tsFilePaths: string[], checkCacheKey: boolean, useFsCache: boolean) => Promise<boolean>;
+export type TsService = (
+  compilerCtx: CompilerCtx,
+  buildCtx: BuildCtx,
+  tsFilePaths: string[],
+  checkCacheKey: boolean,
+  useFsCache: boolean,
+) => Promise<boolean>;
 
 /** Must be serializable to JSON!! */
 export interface ComponentCompilerFeatures {
@@ -912,7 +934,13 @@ export interface ComponentConstructorProperty {
   watchCallbacks?: string[];
 }
 
-export type ComponentConstructorPropertyType = StringConstructor | BooleanConstructor | NumberConstructor | 'string' | 'boolean' | 'number';
+export type ComponentConstructorPropertyType =
+  | StringConstructor
+  | BooleanConstructor
+  | NumberConstructor
+  | 'string'
+  | 'boolean'
+  | 'number';
 
 export interface ComponentConstructorEvent {
   name: string;
@@ -957,17 +985,6 @@ export interface CssVarShim {
   updateGlobal(): void;
 }
 
-export interface DevServerStartResponse {
-  address: string;
-  basePath: string;
-  browserUrl: string;
-  initialLoadUrl: string;
-  protocol: string;
-  port: number;
-  root: string;
-  error: string;
-}
-
 export interface DevClientWindow extends Window {
   ['s-dev-server']: boolean;
   ['s-initial-load']: boolean;
@@ -985,7 +1002,8 @@ export interface DevClientConfig {
 export interface HttpRequest {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS';
   acceptHeader: string;
-  url: string;
+  url: URL;
+  searchParams: URLSearchParams;
   pathname?: string;
   filePath?: string;
   stats?: CompilerFsStats;
@@ -994,9 +1012,11 @@ export interface HttpRequest {
 }
 
 export interface DevServerMessage {
-  resolveId?: number;
   startServer?: DevServerConfig;
-  serverStarted?: DevServerStartResponse;
+  closeServer?: boolean;
+  serverStarted?: DevServerConfig;
+  serverClosed?: boolean;
+  buildStart?: boolean;
   buildLog?: BuildLog;
   buildResults?: CompilerBuildResults;
   requestBuildResults?: boolean;
@@ -1011,7 +1031,9 @@ export interface DevServerMessage {
   };
 }
 
-export type DevServerDestroy = () => void;
+export type DevServerSendMessage = (msg: DevServerMessage) => void;
+
+export type InitServerProcess = (sendMsg: (msg: DevServerMessage) => void) => (msg: DevServerMessage) => void;
 
 export interface DevResponseHeaders {
   'cache-control'?: string;
@@ -1390,7 +1412,11 @@ export interface Plugin {
   pluginType?: string;
   load?: (id: string, context: PluginCtx) => Promise<string> | string;
   resolveId?: (importee: string, importer: string, context: PluginCtx) => Promise<string> | string;
-  transform?: (sourceText: string, id: string, context: PluginCtx) => Promise<PluginTransformResults> | PluginTransformResults | string;
+  transform?: (
+    sourceText: string,
+    id: string,
+    context: PluginCtx,
+  ) => Promise<PluginTransformResults> | PluginTransformResults | string;
 }
 
 export interface PluginTransformResults {
@@ -1624,8 +1650,18 @@ export interface PlatformRuntime {
   $resourcesUrl$: string;
   jmp: (c: Function) => any;
   raf: (c: FrameRequestCallback) => number;
-  ael: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
-  rel: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
+  ael: (
+    el: EventTarget,
+    eventName: string,
+    listener: EventListenerOrEventListenerObject,
+    options: boolean | AddEventListenerOptions,
+  ) => void;
+  rel: (
+    el: EventTarget,
+    eventName: string,
+    listener: EventListenerOrEventListenerObject,
+    options: boolean | AddEventListenerOptions,
+  ) => void;
   ce: (eventName: string, opts?: any) => CustomEvent;
 }
 
@@ -1646,7 +1682,10 @@ export interface ScreenshotConnector {
   pullMasterBuild(): Promise<void>;
   publishBuild(buildResults: ScreenshotBuildResults): Promise<ScreenshotBuildResults>;
   getScreenshotCache(): Promise<ScreenshotCache>;
-  updateScreenshotCache(screenshotCache: ScreenshotCache, buildResults: ScreenshotBuildResults): Promise<ScreenshotCache>;
+  updateScreenshotCache(
+    screenshotCache: ScreenshotCache,
+    buildResults: ScreenshotBuildResults,
+  ): Promise<ScreenshotCache>;
   generateJsonpDataUris(build: ScreenshotBuild): Promise<void>;
   sortScreenshots(screenshots: Screenshot[]): Screenshot[];
   toJson(masterBuild: ScreenshotBuild, screenshotCache: ScreenshotCache): string;
@@ -2364,7 +2403,12 @@ export interface VNodeProdData {
 
 export interface CompilerWorkerContext {
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
-  prepareModule(input: string, minifyOpts: any, transpile: boolean, inlineHelpers: boolean): Promise<{ output: string; diagnostics: Diagnostic[] }>;
+  prepareModule(
+    input: string,
+    minifyOpts: any,
+    transpile: boolean,
+    inlineHelpers: boolean,
+  ): Promise<{ output: string; diagnostics: Diagnostic[] }>;
   prerenderWorker(prerenderRequest: PrerenderUrlRequest): Promise<PrerenderUrlResults>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
 }

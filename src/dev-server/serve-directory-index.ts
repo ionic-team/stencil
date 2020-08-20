@@ -1,36 +1,32 @@
 import type * as d from '../declarations';
-import { responseHeaders, sendMsg } from './dev-server-utils';
+import type { ServerResponse } from 'http';
+import { responseHeaders, sendLogRequest } from './dev-server-utils';
 import { serve404 } from './serve-404';
 import { serve500 } from './serve-500';
 import { serveFile } from './serve-file';
-import * as http from 'http';
 import path from 'path';
-import * as url from 'url';
 
 let dirTemplate: string = null;
 
-export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sys: d.CompilerSystem, req: d.HttpRequest, res: http.ServerResponse) {
+export async function serveDirectoryIndex(
+  devServerConfig: d.DevServerConfig,
+  sys: d.CompilerSystem,
+  req: d.HttpRequest,
+  res: ServerResponse,
+  sendMsg: d.DevServerSendMessage,
+) {
   try {
     const indexFilePath = path.join(req.filePath, 'index.html');
 
     req.stats = await sys.stat(indexFilePath);
     if (req.stats.isFile) {
       req.filePath = indexFilePath;
-      return serveFile(devServerConfig, sys, req, res);
+      return serveFile(devServerConfig, sys, req, res, sendMsg);
     }
   } catch (e) {}
 
   if (!req.pathname.endsWith('/')) {
-    if (devServerConfig.logRequests) {
-      sendMsg(process, {
-        requestLog: {
-          method: req.method,
-          url: req.url,
-          status: 302,
-        },
-      });
-    }
-
+    sendLogRequest(devServerConfig, req, 302, sendMsg);
     res.writeHead(302, {
       location: req.pathname + '/',
     });
@@ -43,11 +39,16 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
     try {
       if (dirTemplate == null) {
         const dirTemplatePath = path.join(devServerConfig.devServerDir, 'templates', 'directory-index.html');
-        dirTemplate = await sys.readFile(dirTemplatePath, 'utf8');
+        dirTemplate = sys.readFileSync(dirTemplatePath);
       }
-      const files = await getFiles(sys, req.pathname, dirFilePaths);
+      const files = await getFiles(sys, req.url, dirFilePaths);
 
-      const templateHtml = dirTemplate.replace('{{title}}', getTitle(req.pathname)).replace('{{nav}}', getName(req.pathname)).replace('{{files}}', files);
+      const templateHtml = (await dirTemplate)
+        .replace('{{title}}', getTitle(req.pathname))
+        .replace('{{nav}}', getName(req.pathname))
+        .replace('{{files}}', files);
+
+      sendLogRequest(devServerConfig, req, 200, sendMsg);
 
       res.writeHead(
         200,
@@ -59,28 +60,18 @@ export async function serveDirectoryIndex(devServerConfig: d.DevServerConfig, sy
 
       res.write(templateHtml);
       res.end();
-
-      if (devServerConfig.logRequests) {
-        sendMsg(process, {
-          requestLog: {
-            method: req.method,
-            url: req.url,
-            status: 200,
-          },
-        });
-      }
     } catch (e) {
-      serve500(devServerConfig, req, res, e, 'serveDirectoryIndex');
+      serve500(devServerConfig, req, res, e, 'serveDirectoryIndex', sendMsg);
     }
   } catch (e) {
-    serve404(devServerConfig, req, res, 'serveDirectoryIndex');
+    serve404(devServerConfig, req, res, 'serveDirectoryIndex', sendMsg);
   }
 }
 
-async function getFiles(sys: d.CompilerSystem, urlPathName: string, dirItemNames: string[]) {
-  const items = await getDirectoryItems(sys, urlPathName, dirItemNames);
+async function getFiles(sys: d.CompilerSystem, baseUrl: URL, dirItemNames: string[]) {
+  const items = await getDirectoryItems(sys, baseUrl, dirItemNames);
 
-  if (urlPathName !== '/') {
+  if (baseUrl.pathname !== '/') {
     items.unshift({
       isDirectory: true,
       pathname: '../',
@@ -101,15 +92,16 @@ async function getFiles(sys: d.CompilerSystem, urlPathName: string, dirItemNames
     .join('');
 }
 
-async function getDirectoryItems(sys: d.CompilerSystem, urlPathName: string, dirFilePaths: string[]) {
+async function getDirectoryItems(sys: d.CompilerSystem, baseUrl: URL, dirFilePaths: string[]) {
   const items = await Promise.all(
     dirFilePaths.map(async dirFilePath => {
       const fileName = path.basename(dirFilePath);
+      const url = new URL(fileName, baseUrl);
       const stats = await sys.stat(dirFilePath);
 
       const item: DirectoryItem = {
         name: fileName,
-        pathname: url.resolve(urlPathName, fileName),
+        pathname: url.pathname,
         isDirectory: stats.isDirectory,
       };
 

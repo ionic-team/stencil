@@ -1,1 +1,1 @@
-export * from './components/index';
+export { Components, JSX } from './components';

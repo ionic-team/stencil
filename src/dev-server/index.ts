@@ -1,240 +1,191 @@
 import type {
   BuildOnEventRemove,
-  CompilerBuildResults,
-  CompilerEventName,
   CompilerWatcher,
-  DevServer,
   DevServerConfig,
-  DevServerMessage,
-  DevServerStartResponse,
   Logger,
   StencilDevServerConfig,
+  DevServer,
+  CompilerBuildResults,
+  InitServerProcess,
+  DevServerMessage,
 } from '../declarations';
-import { normalizePath } from '@utils';
-import { ChildProcess, fork } from 'child_process';
+import { initServerProcessWorkerProxy } from './server-worker-main';
 import path from 'path';
-import open from 'open';
 
-export async function start(stencilDevServerConfig: StencilDevServerConfig, logger: Logger, watcher?: CompilerWatcher) {
-  let devServer: DevServer = null;
-  const devServerConfig = { ...stencilDevServerConfig } as DevServerConfig;
-  const timespan = logger.createTimeSpan(`starting dev server`, true);
+export function start(stencilDevServerConfig: StencilDevServerConfig, logger: Logger, watcher?: CompilerWatcher) {
+  return new Promise<DevServer>(async (resolve, reject) => {
+    try {
+      const devServerConfig: DevServerConfig = {
+        devServerDir: __dirname,
+        ...stencilDevServerConfig,
+      };
 
-  try {
-    // using the path stuff below because after the the bundles are created
-    // then these files are no longer relative to how they are in the src directory
-    devServerConfig.devServerDir = __dirname;
+      if (!path.isAbsolute(devServerConfig.root)) {
+        devServerConfig.root = path.join(process.cwd(), devServerConfig.root);
+      }
 
-    // get the path of the dev server module
-    const workerPath = require.resolve(path.join(devServerConfig.devServerDir, 'server-worker.js'));
+      let initServerProcess: InitServerProcess;
 
-    const filteredExecArgs = process.execArgv.filter(v => !/^--(debug|inspect)/.test(v));
+      if (stencilDevServerConfig.worker === true || stencilDevServerConfig.worker === undefined) {
+        // fork a worker process
+        initServerProcess = initServerProcessWorkerProxy;
+      } else {
+        // same process
+        const devServerProcess = await import('@dev-server-process');
+        initServerProcess = devServerProcess.initServerProcess;
+      }
 
-    const forkOpts: any = {
-      execArgv: filteredExecArgs,
-      env: process.env,
-      cwd: process.cwd(),
-      stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
-    };
-
-    // start a new child process of the CLI process
-    // for the http and web socket server
-    const serverProcess = fork(workerPath, [], forkOpts);
-
-    const devServerContext: DevServerMainContext = {
-      isActivelyBuilding: false,
-      lastBuildResults: null,
-    };
-
-    const starupDevServerConfig = await startWorkerServer(devServerConfig, logger, watcher, serverProcess, devServerContext);
-
-    let removeWatcher: BuildOnEventRemove = null;
-    if (watcher) {
-      removeWatcher = watcher.on((eventName, data) => {
-        emitMessageToClient(serverProcess, devServerContext, eventName, data);
-      });
+      startServer(devServerConfig, logger, watcher, initServerProcess, resolve, reject);
+    } catch (e) {
+      reject(e);
     }
-
-    if (!path.isAbsolute(starupDevServerConfig.root)) {
-      starupDevServerConfig.root = path.join(process.cwd(), starupDevServerConfig.root);
-    }
-    starupDevServerConfig.root = normalizePath(starupDevServerConfig.root);
-
-    devServer = {
-      address: starupDevServerConfig.address,
-      basePath: starupDevServerConfig.basePath,
-      browserUrl: starupDevServerConfig.browserUrl,
-      port: starupDevServerConfig.port,
-      protocol: starupDevServerConfig.protocol,
-      root: starupDevServerConfig.root,
-      close() {
-        try {
-          if (serverProcess) {
-            serverProcess.kill('SIGINT');
-          }
-          if (removeWatcher) {
-            removeWatcher();
-            removeWatcher = null;
-          }
-        } catch (e) {}
-        logger.debug(`dev server closed, port ${starupDevServerConfig.port}`);
-        return Promise.resolve();
-      },
-      emit(eventName: any, data: any) {
-        emitMessageToClient(serverProcess, devServerContext, eventName, data);
-      },
-    };
-
-    timespan.finish(`dev server started: ${starupDevServerConfig.browserUrl}`);
-  } catch (e) {
-    console.error(`dev server error: ${e}`);
-  }
-
-  return devServer;
-}
-
-function startWorkerServer(devServerConfig: DevServerConfig, logger: Logger, watcher: CompilerWatcher, serverProcess: ChildProcess, devServerContext: DevServerMainContext) {
-  let hasStarted = false;
-
-  return new Promise<DevServerStartResponse>((resolve, reject) => {
-    serverProcess.stdout.on('data', (data: any) => {
-      // the child server process has console logged data
-      logger.debug(`dev server: ${data}`);
-    });
-
-    serverProcess.stderr.on('data', (data: any) => {
-      // the child server process has console logged an error
-      logger.error(`dev server error: ${data}, hasStarted: ${hasStarted}`);
-      if (!hasStarted) {
-        reject(`dev server error: ${data}`);
-      }
-    });
-
-    serverProcess.on('message', async (msg: DevServerMessage) => {
-      // main process has received a message from the child server process
-
-      if (msg.serverStarted) {
-        if (msg.serverStarted.error) {
-          // error!
-          reject(msg.serverStarted.error);
-        } else {
-          hasStarted = true;
-          // received a message from the child process that the server has successfully started
-          if (devServerConfig.openBrowser && msg.serverStarted.initialLoadUrl) {
-            openInBrowser({ url: msg.serverStarted.initialLoadUrl });
-          }
-
-          // resolve that everything is good to go
-          resolve(msg.serverStarted);
-        }
-
-        return;
-      }
-
-      if (msg.requestBuildResults) {
-        // we received a request to send up the latest build results
-        if (devServerContext.lastBuildResults != null) {
-          // we do have build results, so let's send them to the child process
-          // but don't send any previous live reload data
-          const msg: DevServerMessage = {
-            buildResults: Object.assign({}, devServerContext.lastBuildResults) as any,
-            isActivelyBuilding: devServerContext.isActivelyBuilding,
-          };
-          delete msg.buildResults.hmr;
-
-          serverProcess.send(msg);
-        } else {
-          const msg: DevServerMessage = {
-            isActivelyBuilding: true,
-          };
-          serverProcess.send(msg);
-        }
-        return;
-      }
-
-      if (msg.compilerRequestPath && watcher && watcher.request) {
-        const rspMsg: DevServerMessage = {
-          resolveId: msg.resolveId,
-          compilerRequestResults: await watcher.request({
-            path: msg.compilerRequestPath,
-          }),
-        };
-        serverProcess.send(rspMsg);
-        return;
-      }
-
-      if (msg.error) {
-        // received a message from the child process that is an error
-        if (msg.error.message) {
-          if (typeof msg.error.message === 'string') {
-            logger.error(msg.error.message);
-          } else {
-            try {
-              logger.error(JSON.stringify(msg.error.message));
-            } catch (e) {
-              console.error(e);
-            }
-          }
-        }
-
-        logger.debug(msg.error);
-        return;
-      }
-
-      if (msg.requestLog) {
-        const req = msg.requestLog;
-
-        let status: any;
-        if (req.status >= 400) {
-          status = logger.red(req.method);
-        } else if (req.status >= 300) {
-          status = logger.magenta(req.method);
-        } else {
-          status = logger.cyan(req.method);
-        }
-
-        logger.info(logger.dim(`${status} ${req.url}`));
-        return;
-      }
-    });
-
-    // have the main process send a message to the child server process
-    // to start the http and web socket server
-    serverProcess.send({
-      startServer: devServerConfig,
-    });
-
-    return devServerConfig;
   });
 }
 
-function emitMessageToClient(serverProcess: ChildProcess, devServerContext: DevServerMainContext, eventName: CompilerEventName, data: any) {
-  if (eventName === 'buildFinish') {
-    // a compiler build has finished
-    // send the build results to the child server process
-    devServerContext.isActivelyBuilding = false;
-    devServerContext.lastBuildResults = { ...data };
-    const msg: DevServerMessage = {
-      buildResults: { ...data },
+function startServer(
+  devServerConfig: DevServerConfig,
+  logger: Logger,
+  watcher: CompilerWatcher,
+  initServerProcess: InitServerProcess,
+  resolve: (devServer: DevServer) => void,
+  reject: (err: any) => void,
+) {
+  const timespan = logger.createTimeSpan(`starting dev server`, true);
+
+  const startupTimeout =
+    logger.getLevel() !== 'debug'
+      ? setTimeout(() => {
+          reject(`dev server startup timeout`);
+        }, 15000)
+      : null;
+
+  let isActivelyBuilding = false;
+  let lastBuildResults: CompilerBuildResults = null;
+  let devServer: DevServer = null;
+  let removeWatcher: BuildOnEventRemove = null;
+  let closeResolve: () => void = null;
+  let hasStarted = false;
+  let browserUrl = '';
+
+  let sendToWorker: (msg: DevServerMessage) => void = null;
+
+  const closePromise = new Promise<void>(resolve => (closeResolve = resolve));
+
+  const close = async () => {
+    clearTimeout(startupTimeout);
+    isActivelyBuilding = false;
+
+    if (removeWatcher) {
+      removeWatcher();
+    }
+    if (devServer) {
+      devServer = null;
+    }
+    if (sendToWorker) {
+      sendToWorker({
+        closeServer: true,
+      });
+      sendToWorker = null;
+    }
+    return closePromise;
+  };
+
+  const emit = async (eventName: any, data: any) => {
+    if (sendToWorker) {
+      if (eventName === 'buildFinish') {
+        isActivelyBuilding = false;
+        lastBuildResults = { ...data };
+        delete lastBuildResults.hmr;
+        sendToWorker({ buildResults: { ...lastBuildResults }, isActivelyBuilding });
+      } else if (eventName === 'buildLog') {
+        sendToWorker({
+          buildLog: { ...data },
+        });
+      } else if (eventName === 'buildStart') {
+        isActivelyBuilding = true;
+      }
+    }
+  };
+
+  const serverStarted = (msg: DevServerMessage) => {
+    hasStarted = true;
+    clearTimeout(startupTimeout);
+    devServerConfig = msg.serverStarted;
+
+    devServer = {
+      address: devServerConfig.address,
+      basePath: devServerConfig.basePath,
+      browserUrl: devServerConfig.browserUrl,
+      protocol: devServerConfig.protocol,
+      port: devServerConfig.port,
+      root: devServerConfig.root,
+      emit,
+      close,
     };
 
-    serverProcess.send(msg);
-  } else if (eventName === 'buildStart') {
-    devServerContext.isActivelyBuilding = true;
-  } else if (eventName === 'buildLog') {
-    const msg: DevServerMessage = {
-      buildLog: Object.assign({}, data),
-    };
+    browserUrl = devServerConfig.browserUrl;
 
-    serverProcess.send(msg);
+    timespan.finish(`dev server started: ${browserUrl}`);
+
+    resolve(devServer);
+  };
+
+  const requestLog = (msg: DevServerMessage) => {
+    if (devServerConfig.logRequests) {
+      let statusMsg: any;
+      if (msg.requestLog.status >= 400) {
+        statusMsg = logger.red(msg.requestLog.method);
+      } else if (msg.requestLog.status >= 300) {
+        statusMsg = logger.magenta(msg.requestLog.method);
+      } else {
+        statusMsg = logger.cyan(msg.requestLog.method);
+      }
+      logger.info(logger.dim(`${statusMsg} ${msg.requestLog.url}`));
+    }
+  };
+
+  const serverError = (msg: DevServerMessage) => {
+    if (hasStarted) {
+      logger.error(msg.error.message + ' ' + msg.error.stack);
+    } else {
+      close();
+      reject(msg.error.message);
+    }
+  };
+
+  const receiveFromWorker = async (msg: DevServerMessage) => {
+    try {
+      if (msg.serverStarted) {
+        serverStarted(msg);
+      } else if (msg.serverClosed) {
+        logger.debug(`dev server closed: ${browserUrl}`);
+        closeResolve();
+      } else if (msg.requestBuildResults) {
+        sendToWorker({ buildResults: { ...lastBuildResults }, isActivelyBuilding });
+      } else if (msg.compilerRequestPath) {
+        if (watcher) {
+          const compilerRequestResults = await watcher.request({ path: msg.compilerRequestPath });
+          sendToWorker({ compilerRequestResults });
+        }
+      } else if (msg.requestLog) {
+        requestLog(msg);
+      } else if (msg.error) {
+        serverError(msg);
+      }
+    } catch (e) {
+      logger.error('receiveFromWorker: ' + e);
+    }
+  };
+
+  if (watcher) {
+    removeWatcher = watcher.on(emit);
   }
+
+  sendToWorker = initServerProcess(receiveFromWorker);
+
+  sendToWorker({
+    startServer: devServerConfig,
+  });
 }
 
-export async function openInBrowser(opts: { url: string }) {
-  await open(opts.url);
-}
-
-interface DevServerMainContext {
-  isActivelyBuilding: boolean;
-  lastBuildResults: CompilerBuildResults;
-}
+export { DevServer, StencilDevServerConfig as DevServerConfig, Logger };
