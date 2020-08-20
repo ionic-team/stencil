@@ -1,4 +1,4 @@
-# 🚅 [2.0.0-3](https://github.com/ionic-team/stencil/compare/v1.17.3...v2.0.0-3) (2020-08-16)
+# 🎺 [2.0.0-4](https://github.com/ionic-team/stencil/compare/v1.17.3...v2.0.0-4) (2020-08-20)
 
 In keeping with [Semver](https://semver.org/), Stencil `2.0.0` was released due to changes in the API (mainly from some updates to the config API). But even though this is a new major version, there are few breaking changes, and any changes will be flagged and described by the compiler during development. For the most part, most of the changes are removal of deprecated APIs that have been printing out warning logs for quite some time now.
 
@@ -91,8 +91,9 @@ With the major release, now's a good time to update the minimum and recommended 
 * **typescript:** bundle typescript ([1973032](https://github.com/ionic-team/stencil/commit/197303210e76f048b470d3cf91237b015ce3f116))
 * **typescript:** update to typescript 4.0.0-beta ([a274e11](https://github.com/ionic-team/stencil/commit/a274e1149c2da53b224bfba69e0a798c47920417))
 * **typescript:** update to typescript 4.0.1-rc ([def2e6b](https://github.com/ionic-team/stencil/commit/def2e6b8c926c6b4d79ffcfd9bcb4300f82312fa))
+* **typescript:** update to typescript 4.0.2 ([f55f0bf](https://github.com/ionic-team/stencil/commit/f55f0bf7e331d043dbee990b8bd5b7934cbac92b))
 
-The other change is the update to [TypeScript 4](https://devblogs.microsoft.com/typescript/announcing-typescript-4-0-beta/). With Stencil 2, TypeScript will no longer be a `dependency`, but instead included within the Stencil compiler. There are a few advantages to this we'll be experimenting with:
+The other change is the update to [TypeScript 4](https://devblogs.microsoft.com/typescript/announcing-typescript-4-0/). With Stencil 2, TypeScript will no longer be a `dependency`, but instead included within the Stencil compiler. There are a few advantages to this we'll be experimenting with:
 
 - Faster compiler startup times and overall smaller install size.
 - The custom elements build should have a `dependency` of `@stencil/core`, so not having TypeScript as a dependency of `@stencil/core` simplifies the dependency graph for end-users and libraries.
@@ -131,6 +132,9 @@ The `Context` object was originally added in the `0.x.x` versions of Stencil, be
 
 * **assetsDirs:** allow same destination asset dir copy task ([b6379b3](https://github.com/ionic-team/stencil/commit/b6379b31da4fe40bf6251d307368d43e7ceee091)), closes [#2615](https://github.com/ionic-team/stencil/issues/2615)
 * **compiler:** normalizePath result from fs.realpathSync ([#2625](https://github.com/ionic-team/stencil/issues/2625)) ([df83c83](https://github.com/ionic-team/stencil/commit/df83c8341e4690aee54efaae5e8c527e1b6323b6))
+* **dist:** export Components, JSX types from custom-elements build ([abae5d1](https://github.com/ionic-team/stencil/commit/abae5d1f695647ea04bac66ff4b9ee2b933a102b))
+* **exit:** ensure all node processes are destroyed on exit ([73a04c2](https://github.com/ionic-team/stencil/commit/73a04c2a9d8c7c224b9ca95ea856665c41f3f410))
+* **exit:** sys.exit() returns a promise ([208ef8c](https://github.com/ionic-team/stencil/commit/208ef8c90dd2e65b46823c0420f7c5811bfa3c86))
 * **export:** export client runtime from @stencil/core ([4c6cb60](https://github.com/ionic-team/stencil/commit/4c6cb6099581843fd00a3eb7dddda77c9675f0de))
 * **parse:** parse decorator shorthand property assignment ([6b9e035](https://github.com/ionic-team/stencil/commit/6b9e0357c43e155c03d450d5209e87dbe3a92d60))
 * **plugin:** ensure external plugin css do not require physical file ([b5a2536](https://github.com/ionic-team/stencil/commit/b5a2536d0ac40a6ad940c55fcc52c8cdfcfa8b15)), closes [#2622](https://github.com/ionic-team/stencil/issues/2622)
@@ -138,15 +142,18 @@ The `Context` object was originally added in the `0.x.x` versions of Stencil, be
 * **sys:** set ts.getExecutingFilePath() from stencil sys ([2b21f2d](https://github.com/ionic-team/stencil/commit/2b21f2d01af313be32310de29f297172a1318b56))
 * **taskQueue:** fix "immediate" rendering ([#2630](https://github.com/ionic-team/stencil/issues/2630)) ([62ea511](https://github.com/ionic-team/stencil/commit/62ea51121b8b77b9e9122e37657ce4c911538a5d))
 * **testing:** add collectCoverageFrom jest parameter ([#2613](https://github.com/ionic-team/stencil/issues/2613)) ([370a701](https://github.com/ionic-team/stencil/commit/370a70122789570f80290e6b3ef7683cf00d9b5a))
+* **treeshaking:** move environment helpers out of utils ([c9306b9](https://github.com/ionic-team/stencil/commit/c9306b9f3d359620f10b5a756bd717b1a210a576))
 * **ts:** update ts lib default local module path ([16f30bc](https://github.com/ionic-team/stencil/commit/16f30bcd1db5dec163dbaa7d719a01110b471a32))
 
 
 ### Features
 
 * **buildEs5:** add "prod" as an option for config.buildEs5 ([1af30a2](https://github.com/ionic-team/stencil/commit/1af30a2177e6cc920c88c30a6c0c939a73918c1b))
+* **dev-server:** single-threaded dev-server for debugging ([cf335e3](https://github.com/ionic-team/stencil/commit/cf335e312a25335fd3c2cec55278ff74dcdb82e1))
 * **jest:** update to jest 26.4.0 ([9e3a6a8](https://github.com/ionic-team/stencil/commit/9e3a6a85cf40ad61bdc687fa047beda30b47f8a4))
-* **rollup:** update to rollup 2.26.2 ([9724453](https://github.com/ionic-team/stencil/commit/9724453da656d7a86e44f7217475962426990173))
+* **rollup:** update to rollup 2.26.4 ([393d02d](https://github.com/ionic-team/stencil/commit/393d02dcad1761b3c06b5ad56b4bf05256584a05))
 * **terser:** update to terser 5.1.0 and use its esm build ([4b67c5a](https://github.com/ionic-team/stencil/commit/4b67c5a229541fcf3ab3d943c4fb2b650a11e80a))
+* **terser:** update to terser 5.2.1 ([7582974](https://github.com/ionic-team/stencil/commit/758297447e512a8d5753ab2c5be950bd6cdc2045))
 
 
 
