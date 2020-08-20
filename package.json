@@ -112,7 +112,7 @@
     "semiver": "^1.1.0",
     "semver": "7.3.2",
     "sizzle": "^2.3.5",
-    "terser": "5.1.0",
+    "terser": "5.2.1",
     "tslib": "^2.0.1",
     "typescript": "4.0.1-rc",
     "webpack": "^4.44.1",
