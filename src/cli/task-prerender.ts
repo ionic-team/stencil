@@ -10,7 +10,7 @@ export const taskPrerender = async (coreCompiler: CoreCompiler, config: Config) 
 
   if (typeof hydrateAppFilePath !== 'string') {
     config.logger.error(`Missing hydrate app script path`);
-    config.sys.exit(1);
+    return config.sys.exit(1);
   }
 
   const srcIndexHtmlPath = config.srcIndexHtml;
@@ -19,7 +19,7 @@ export const taskPrerender = async (coreCompiler: CoreCompiler, config: Config) 
   config.logger.printDiagnostics(diagnostics);
 
   if (diagnostics.some(d => d.level === 'error')) {
-    config.sys.exit(1);
+    return config.sys.exit(1);
   }
 };
 

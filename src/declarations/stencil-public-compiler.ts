@@ -840,7 +840,7 @@ export interface CompilerSystem {
   /**
    * process.exit()
    */
-  exit(exitCode: number): void;
+  exit(exitCode: number): Promise<void>;
   /**
    * Optionally provide a fetch() function rather than using the built-in fetch().
    * First arg is a url string or Request object (RequestInfo).

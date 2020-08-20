@@ -8,7 +8,21 @@ import type {
   CompilerSystemWriteFileResults,
   Diagnostic,
 } from '../../declarations';
-import { basename, delimiter, dirname, extname, isAbsolute, join, normalize, parse, relative, resolve, sep, win32, posix } from './deps';
+import {
+  basename,
+  delimiter,
+  dirname,
+  extname,
+  isAbsolute,
+  join,
+  normalize,
+  parse,
+  relative,
+  resolve,
+  sep,
+  win32,
+  posix,
+} from './deps';
 import { convertPathToFileProtocol, isRemoteUrl, normalizePath, catchError, buildError } from '@utils';
 import { createDenoWorkerMainController } from './deno-worker-main';
 import { denoCopyTasks } from './deno-copy-tasks';
@@ -27,7 +41,8 @@ export function createDenoSys(c: { Deno?: any } = {}) {
   const hardwareConcurrency = 0;
   const isRemoteHost = isRemoteUrl(import.meta.url);
 
-  const getLocalModulePath = (opts: { rootDir: string; moduleId: string; path: string }) => join(opts.rootDir, 'node_modules', opts.moduleId, opts.path);
+  const getLocalModulePath = (opts: { rootDir: string; moduleId: string; path: string }) =>
+    join(opts.rootDir, 'node_modules', opts.moduleId, opts.path);
 
   const getRemoteModuleUrl = (module: { moduleId: string; path: string; version?: string }) => {
     const npmBaseUrl = 'https://cdn.jsdelivr.net/npm/';
@@ -159,13 +174,29 @@ export function createDenoSys(c: { Deno?: any } = {}) {
 
       stencilRemoteUrl = new URL(`../../compiler/stencil.js`, import.meta.url).href;
       if (!isRemoteUrl(stencilRemoteUrl)) {
-        stencilRemoteUrl = sys.getRemoteModuleUrl({ moduleId: stencilDep.name, version: stencilDep.version, path: stencilDep.main });
+        stencilRemoteUrl = sys.getRemoteModuleUrl({
+          moduleId: stencilDep.name,
+          version: stencilDep.version,
+          path: stencilDep.main,
+        });
       }
       stencilBaseUrl = new URL(`../../`, stencilRemoteUrl);
-      stencilExePath = sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: stencilDep.name, path: stencilDep.main });
+      stencilExePath = sys.getLocalModulePath({
+        rootDir: opts.rootDir,
+        moduleId: stencilDep.name,
+        path: stencilDep.main,
+      });
 
-      typescriptRemoteUrl = sys.getRemoteModuleUrl({ moduleId: typescriptDep.name, version: typescriptDep.version, path: typescriptDep.main });
-      typescriptExePath = sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: typescriptDep.name, path: typescriptDep.main });
+      typescriptRemoteUrl = sys.getRemoteModuleUrl({
+        moduleId: typescriptDep.name,
+        version: typescriptDep.version,
+        path: typescriptDep.main,
+      });
+      typescriptExePath = sys.getLocalModulePath({
+        rootDir: opts.rootDir,
+        moduleId: typescriptDep.name,
+        path: typescriptDep.main,
+      });
 
       const ensureStencil = fetchWrite(diagnostics, stencilRemoteUrl, stencilExePath);
       const ensureTypescript = fetchWrite(diagnostics, typescriptRemoteUrl, typescriptExePath);
@@ -188,8 +219,16 @@ export function createDenoSys(c: { Deno?: any } = {}) {
 
       const deps: { url: string; path: string }[] = [];
 
-      const stencilPkg = sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: stencilDep.name, path: 'package.json' });
-      const typescriptPkg = sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: typescriptDep.name, path: 'package.json' });
+      const stencilPkg = sys.getLocalModulePath({
+        rootDir: opts.rootDir,
+        moduleId: stencilDep.name,
+        path: 'package.json',
+      });
+      const typescriptPkg = sys.getLocalModulePath({
+        rootDir: opts.rootDir,
+        moduleId: typescriptDep.name,
+        path: 'package.json',
+      });
 
       const stencilCheck = sys.access(stencilPkg);
       const typescriptCheck = sys.access(typescriptPkg);
@@ -241,7 +280,9 @@ export function createDenoSys(c: { Deno?: any } = {}) {
         timespan.finish(`ensure resources end: ${deps.length}`);
       }
     },
-    exit: deno.exit,
+    exit: async exitCode => {
+      deno.exit(exitCode);
+    },
     getCompilerExecutingPath() {
       return stencilExePath;
     },

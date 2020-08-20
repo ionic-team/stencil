@@ -44,7 +44,13 @@ export const taskWatch = async (coreCompiler: CoreCompiler, config: Config) => {
     if (config.flags.prerender) {
       watcher.on('buildFinish', async results => {
         if (!results.hasError) {
-          const prerenderDiagnostics = await runPrerenderTask(coreCompiler, config, results.hydrateAppFilePath, results.componentGraph, null);
+          const prerenderDiagnostics = await runPrerenderTask(
+            coreCompiler,
+            config,
+            results.hydrateAppFilePath,
+            results.componentGraph,
+            null,
+          );
           config.logger.printDiagnostics(prerenderDiagnostics);
         }
       });
@@ -64,6 +70,6 @@ export const taskWatch = async (coreCompiler: CoreCompiler, config: Config) => {
   }
 
   if (exitCode > 0) {
-    config.sys.exit(exitCode);
+    return config.sys.exit(exitCode);
   }
 };

@@ -9,34 +9,35 @@ import { validateComponentTag } from '@utils';
 export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config) => {
   if (!IS_NODE_ENV) {
     config.logger.error(`"generate" command is currently only implemented for a NodeJS environment`);
-    config.sys.exit(1);
+    return config.sys.exit(1);
   }
 
   const path = coreCompiler.path;
 
   if (!config.configPath) {
     config.logger.error('Please run this command in your root directory (i. e. the one containing stencil.config.ts).');
-    config.sys.exit(1);
+    return config.sys.exit(1);
   }
 
   const absoluteSrcDir = config.srcDir;
 
   if (!absoluteSrcDir) {
     config.logger.error(`Stencil's srcDir was not specified.`);
-    config.sys.exit(1);
+    return config.sys.exit(1);
   }
 
   const { prompt } = await import('prompts');
 
   const input =
-    config.flags.unknownArgs.find(arg => !arg.startsWith('-')) || ((await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string);
+    config.flags.unknownArgs.find(arg => !arg.startsWith('-')) ||
+    ((await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string);
 
   const { dir, base: componentName } = path.parse(input);
 
   const tagError = validateComponentTag(componentName);
   if (tagError) {
     config.logger.error(tagError);
-    config.sys.exit(1);
+    return config.sys.exit(1);
   }
 
   const extensionsToGenerate: GeneratableExtension[] = ['tsx', ...(await chooseFilesToGenerate())];
@@ -47,7 +48,16 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config) =
   await config.sys.createDir(path.join(outDir, testFolder), { recursive: true });
 
   const writtenFiles = await Promise.all(
-    extensionsToGenerate.map(extension => writeFileByExtension(coreCompiler, config, outDir, componentName, extension, extensionsToGenerate.includes('css'))),
+    extensionsToGenerate.map(extension =>
+      writeFileByExtension(
+        coreCompiler,
+        config,
+        outDir,
+        componentName,
+        extension,
+        extensionsToGenerate.includes('css'),
+      ),
+    ),
   ).catch(error => config.logger.error(error));
 
   if (!writtenFiles) {
@@ -85,7 +95,14 @@ const chooseFilesToGenerate = async () => {
 /**
  * Get a file's boilerplate by its extension and write it to disk.
  */
-const writeFileByExtension = async (coreCompiler: CoreCompiler, config: Config, path: string, name: string, extension: GeneratableExtension, withCss: boolean) => {
+const writeFileByExtension = async (
+  coreCompiler: CoreCompiler,
+  config: Config,
+  path: string,
+  name: string,
+  extension: GeneratableExtension,
+  withCss: boolean,
+) => {
   if (isTest(extension)) {
     path = coreCompiler.path.join(path, 'test');
   }
@@ -205,7 +222,8 @@ describe('${name}', () => {
 /**
  * Convert a dash case string to pascal case.
  */
-const toPascalCase = (str: string) => str.split('-').reduce((res, part) => res + part[0].toUpperCase() + part.substr(1), '');
+const toPascalCase = (str: string) =>
+  str.split('-').reduce((res, part) => res + part[0].toUpperCase() + part.substr(1), '');
 
 /**
  * Extensions available to generate.

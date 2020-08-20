@@ -4,7 +4,7 @@ import { IS_NODE_ENV } from '../compiler/sys/environment';
 export const taskTest = async (config: Config) => {
   if (!IS_NODE_ENV) {
     config.logger.error(`"test" command is currently only implemented for a NodeJS environment`);
-    config.sys.exit(1);
+    return config.sys.exit(1);
   }
 
   try {
@@ -48,10 +48,10 @@ export const taskTest = async (config: Config) => {
     await testing.destroy();
 
     if (!passed) {
-      config.sys.exit(1);
+      return config.sys.exit(1);
     }
   } catch (e) {
     config.logger.error(e);
-    config.sys.exit(1);
+    return config.sys.exit(1);
   }
 };

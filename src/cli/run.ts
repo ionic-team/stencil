@@ -42,13 +42,17 @@ export const run = async (init: CliInitOptions) => {
     const findConfigResults = await findConfig({ sys, configPath: flags.config });
     if (hasError(findConfigResults.diagnostics)) {
       logger.printDiagnostics(findConfigResults.diagnostics);
-      sys.exit(1);
+      return sys.exit(1);
     }
 
-    const ensureDepsResults = await sys.ensureDependencies({ rootDir: findConfigResults.rootDir, logger, dependencies: dependencies as any });
+    const ensureDepsResults = await sys.ensureDependencies({
+      rootDir: findConfigResults.rootDir,
+      logger,
+      dependencies: dependencies as any,
+    });
     if (hasError(ensureDepsResults.diagnostics)) {
       logger.printDiagnostics(ensureDepsResults.diagnostics);
-      sys.exit(1);
+      return sys.exit(1);
     }
 
     const coreCompiler = await loadCoreCompiler(sys);
@@ -79,7 +83,7 @@ export const run = async (init: CliInitOptions) => {
     if (validated.diagnostics.length > 0) {
       logger.printDiagnostics(validated.diagnostics);
       if (hasError(validated.diagnostics)) {
-        sys.exit(1);
+        return sys.exit(1);
       }
     }
 
@@ -93,7 +97,7 @@ export const run = async (init: CliInitOptions) => {
   } catch (e) {
     if (!shouldIgnoreError(e)) {
       logger.error(`uncaught cli error: ${e}${logger.getLevel() === 'debug' ? e.stack : ''}`);
-      sys.exit(1);
+      return sys.exit(1);
     }
   }
 };
@@ -139,6 +143,6 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
     default:
       config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
       taskHelp(config.sys, config.logger);
-      config.sys.exit(1);
+      return config.sys.exit(1);
   }
 };

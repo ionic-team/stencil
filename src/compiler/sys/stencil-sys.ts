@@ -87,7 +87,11 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
-  const createDirRecursiveSync = (p: string, opts: CompilerSystemCreateDirectoryOptions, results: CompilerSystemCreateDirectoryResults) => {
+  const createDirRecursiveSync = (
+    p: string,
+    opts: CompilerSystemCreateDirectoryOptions,
+    results: CompilerSystemCreateDirectoryResults,
+  ) => {
     const parentDir = dirname(p);
 
     if (opts && opts.recursive && !isRootPath(parentDir)) {
@@ -279,7 +283,11 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
-  const remoreDirSyncRecursive = (p: string, opts: CompilerSystemRemoveDirectoryOptions, results: CompilerSystemRemoveDirectoryResults) => {
+  const remoreDirSyncRecursive = (
+    p: string,
+    opts: CompilerSystemRemoveDirectoryOptions,
+    results: CompilerSystemRemoveDirectoryResults,
+  ) => {
     if (!results.error) {
       p = normalize(p);
 
@@ -515,7 +523,8 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
-  const getLocalModulePath = (opts: { rootDir: string; moduleId: string; path: string }) => join(opts.rootDir, 'node_modules', opts.moduleId, opts.path);
+  const getLocalModulePath = (opts: { rootDir: string; moduleId: string; path: string }) =>
+    join(opts.rootDir, 'node_modules', opts.moduleId, opts.path);
 
   const getRemoteModuleUrl = (opts: { moduleId: string; path: string; version?: string }) => {
     const npmBaseUrl = 'https://cdn.jsdelivr.net/npm/';
@@ -539,7 +548,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     createDirSync,
     destroy,
     encodeToBase64,
-    exit: exitCode => logger.warn(`exit ${exitCode}`),
+    exit: async exitCode => logger.warn(`exit ${exitCode}`),
     getCurrentDirectory,
     getCompilerExecutingPath,
     getLocalModulePath,
@@ -571,7 +580,9 @@ export const createSystem = (c?: { logger?: Logger }) => {
     writeFile,
     writeFileSync,
     generateContentHash,
-    createWorkerController: HAS_WEB_WORKER ? maxConcurrentWorkers => createWebWorkerMainController(sys, maxConcurrentWorkers) : null,
+    createWorkerController: HAS_WEB_WORKER
+      ? maxConcurrentWorkers => createWebWorkerMainController(sys, maxConcurrentWorkers)
+      : null,
     details: {
       cpuModel: '',
       freemem: () => 0,

@@ -15,7 +15,7 @@ import fs from 'graceful-fs';
 import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
 import { NodeWorkerController } from './node-worker-controller';
-import { normalizePath, isFunction } from '@utils';
+import { normalizePath, isFunction, isPromise } from '@utils';
 import path from 'path';
 import type TypeScript from 'typescript';
 
@@ -30,6 +30,23 @@ export function createNodeSys(c: { process?: any } = {}) {
 
   const compilerExecutingPath = path.join(__dirname, '..', '..', 'compiler', 'stencil.js');
   const devServerExecutingPath = path.join(__dirname, '..', '..', 'dev-server', 'index.js');
+
+  const runInterruptsCallbacks = () => {
+    const promises: Promise<any>[] = [];
+    let cb: () => any;
+    while (isFunction((cb = onInterruptsCallbacks.pop()))) {
+      try {
+        const rtn = cb();
+        if (isPromise(rtn)) {
+          promises.push(rtn);
+        }
+      } catch (e) {}
+    }
+    if (promises.length > 0) {
+      return Promise.all(promises);
+    }
+    return null;
+  };
 
   const sys: CompilerSystem = {
     name: 'node',
@@ -163,7 +180,10 @@ export function createNodeSys(c: { process?: any } = {}) {
       };
     },
     async ensureResources() {},
-    exit: exit,
+    exit: async exitCode => {
+      await runInterruptsCallbacks();
+      exit(exitCode);
+    },
     getCurrentDirectory() {
       return normalizePath(prcs.cwd());
     },
@@ -530,15 +550,6 @@ export function createNodeSys(c: { process?: any } = {}) {
     'puppeteer-core': ['1.19.0', '5.2.1'],
     'workbox-build': ['4.3.1', '4.3.1'],
   });
-
-  const runInterruptsCallbacks = () => {
-    let cb: () => void;
-    while (isFunction((cb = onInterruptsCallbacks.pop()))) {
-      try {
-        cb();
-      } catch (e) {}
-    }
-  };
 
   prcs.on('SIGINT', runInterruptsCallbacks);
   prcs.on('exit', runInterruptsCallbacks);
