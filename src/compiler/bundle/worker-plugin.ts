@@ -249,10 +249,7 @@ addEventListener('message', async ({data}) => {
     } catch (e) {
       value = null;
       ${isDev ? 'console.error(e);' : ''}
-      err = {
-        message: typeof e === 'string' ? e : e.message,
-        stack: e.stack
-      };
+      err = e;
       value = undefined;
     }
 
