@@ -143,36 +143,38 @@ function startServer(
     }
   };
 
-  const serverError = (msg: DevServerMessage) => {
+  const serverError = async (msg: DevServerMessage) => {
     if (hasStarted) {
       logger.error(msg.error.message + ' ' + msg.error.stack);
     } else {
-      close();
+      await close();
       reject(msg.error.message);
     }
   };
 
   const requestBuildResults = () => {
     // we received a request to send up the latest build results
-    if (lastBuildResults != null) {
-      // we do have build results, so let's send them to the child process
-      const msg: DevServerMessage = {
-        buildResults: { ...lastBuildResults },
-        isActivelyBuilding: isActivelyBuilding,
-      };
+    if (sendToWorker) {
+      if (lastBuildResults != null) {
+        // we do have build results, so let's send them to the child process
+        const msg: DevServerMessage = {
+          buildResults: { ...lastBuildResults },
+          isActivelyBuilding: isActivelyBuilding,
+        };
 
-      // but don't send any previous live reload data
-      delete msg.buildResults.hmr;
-      sendToWorker(msg);
-    } else {
-      sendToWorker({
-        isActivelyBuilding: true,
-      });
+        // but don't send any previous live reload data
+        delete msg.buildResults.hmr;
+        sendToWorker(msg);
+      } else {
+        sendToWorker({
+          isActivelyBuilding: true,
+        });
+      }
     }
   };
 
   const compilerRequest = async (compilerRequestPath: string) => {
-    if (watcher) {
+    if (watcher && watcher.request && sendToWorker) {
       const compilerRequestResults = await watcher.request({ path: compilerRequestPath });
       sendToWorker({ compilerRequestResults });
     }
@@ -193,21 +195,28 @@ function startServer(
         requestLog(msg);
       } else if (msg.error) {
         serverError(msg);
+      } else {
+        logger.debug(`server msg not handled: ${JSON.stringify(msg)}`);
       }
     } catch (e) {
       logger.error('receiveFromWorker: ' + e);
     }
   };
 
-  if (watcher) {
-    removeWatcher = watcher.on(emit);
+  try {
+    if (watcher) {
+      removeWatcher = watcher.on(emit);
+    }
+
+    sendToWorker = initServerProcess(receiveFromWorker);
+
+    sendToWorker({
+      startServer: devServerConfig,
+    });
+  } catch (e) {
+    close();
+    reject(e);
   }
-
-  sendToWorker = initServerProcess(receiveFromWorker);
-
-  sendToWorker({
-    startServer: devServerConfig,
-  });
 }
 
 export { DevServer, StencilDevServerConfig as DevServerConfig, Logger };

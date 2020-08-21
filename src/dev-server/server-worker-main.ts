@@ -22,6 +22,8 @@ export function initServerProcessWorkerProxy(sendToMain: (msg: d.DevServerMessag
     // get a message from main to send to the worker
     if (serverProcess) {
       serverProcess.send(msg);
+    } else if (msg.closeServer) {
+      sendToMain({ serverClosed: true });
     }
   };
 
