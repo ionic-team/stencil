@@ -95,7 +95,6 @@ function startServer(
       if (eventName === 'buildFinish') {
         isActivelyBuilding = false;
         lastBuildResults = { ...data };
-        delete lastBuildResults.hmr;
         sendToWorker({ buildResults: { ...lastBuildResults }, isActivelyBuilding });
       } else if (eventName === 'buildLog') {
         sendToWorker({
@@ -153,7 +152,33 @@ function startServer(
     }
   };
 
-  const receiveFromWorker = async (msg: DevServerMessage) => {
+  const requestBuildResults = () => {
+    // we received a request to send up the latest build results
+    if (lastBuildResults != null) {
+      // we do have build results, so let's send them to the child process
+      const msg: DevServerMessage = {
+        buildResults: { ...lastBuildResults },
+        isActivelyBuilding: isActivelyBuilding,
+      };
+
+      // but don't send any previous live reload data
+      delete msg.buildResults.hmr;
+      sendToWorker(msg);
+    } else {
+      sendToWorker({
+        isActivelyBuilding: true,
+      });
+    }
+  };
+
+  const compilerRequest = async (compilerRequestPath: string) => {
+    if (watcher) {
+      const compilerRequestResults = await watcher.request({ path: compilerRequestPath });
+      sendToWorker({ compilerRequestResults });
+    }
+  };
+
+  const receiveFromWorker = (msg: DevServerMessage) => {
     try {
       if (msg.serverStarted) {
         serverStarted(msg);
@@ -161,12 +186,9 @@ function startServer(
         logger.debug(`dev server closed: ${browserUrl}`);
         closeResolve();
       } else if (msg.requestBuildResults) {
-        sendToWorker({ buildResults: { ...lastBuildResults }, isActivelyBuilding });
+        requestBuildResults();
       } else if (msg.compilerRequestPath) {
-        if (watcher) {
-          const compilerRequestResults = await watcher.request({ path: msg.compilerRequestPath });
-          sendToWorker({ compilerRequestResults });
-        }
+        compilerRequest(msg.compilerRequestPath);
       } else if (msg.requestLog) {
         requestLog(msg);
       } else if (msg.error) {
