@@ -1,4 +1,4 @@
-# 🎺 [2.0.0-4](https://github.com/ionic-team/stencil/compare/v1.17.3...v2.0.0-4) (2020-08-20)
+# 🐘 [2.0.0-5](https://github.com/ionic-team/stencil/compare/v1.17.3...v2.0.0-5) (2020-08-21)
 
 In keeping with [Semver](https://semver.org/), Stencil `2.0.0` was released due to changes in the API (mainly from some updates to the config API). But even though this is a new major version, there are few breaking changes, and any changes will be flagged and described by the compiler during development. For the most part, most of the changes are removal of deprecated APIs that have been printing out warning logs for quite some time now.
 
@@ -118,6 +118,7 @@ The other change is the update to [TypeScript 4](https://devblogs.microsoft.com/
 * **listen:** remove Listen target: 'parent' option ([ed63707](https://github.com/ionic-team/stencil/commit/ed6370743a99e0965b62fa3b118215fb26383747))
 * **listen:** remove deprecated listen target ([1a3b519](https://github.com/ionic-team/stencil/commit/1a3b5197103d9f4fbfbfb1972b65743bad936a92))
 * **reflectToAttr:** remove deprecated prop reflectToAttr ([6eae6f8](https://github.com/ionic-team/stencil/commit/6eae6f83085ff084f672e27cdafb8be4483b5eac))
+* **prerender:** use internal typescript ([8f0bb51](https://github.com/ionic-team/stencil/commit/8f0bb516dbe2b143375dc6397d0852543600daa1))
 * **test:** remove deprecated testing configs ([fb8a02b](https://github.com/ionic-team/stencil/commit/fb8a02b4be0f7214d131e7c228964ca8423c3be0))
 * **transpile:** remove deprecated "script" option ([75dfebb](https://github.com/ionic-team/stencil/commit/75dfebb68659e09a5d2139e4cd16616448ebd122))
 * **watch:** remove deprecated PropWillChange/PropDidChange ([fa2b400](https://github.com/ionic-team/stencil/commit/fa2b400cf36696365487b7c2445ab096ee354e50))
@@ -136,6 +137,7 @@ The `Context` object was originally added in the `0.x.x` versions of Stencil, be
 * **exit:** ensure all node processes are destroyed on exit ([73a04c2](https://github.com/ionic-team/stencil/commit/73a04c2a9d8c7c224b9ca95ea856665c41f3f410))
 * **exit:** sys.exit() returns a promise ([208ef8c](https://github.com/ionic-team/stencil/commit/208ef8c90dd2e65b46823c0420f7c5811bfa3c86))
 * **export:** export client runtime from @stencil/core ([4c6cb60](https://github.com/ionic-team/stencil/commit/4c6cb6099581843fd00a3eb7dddda77c9675f0de))
+* **hmr:** fix dev server hmr ([fa480b6](https://github.com/ionic-team/stencil/commit/fa480b60d1d0867a741506c9aff953c3534c63dc))
 * **parse:** parse decorator shorthand property assignment ([6b9e035](https://github.com/ionic-team/stencil/commit/6b9e0357c43e155c03d450d5209e87dbe3a92d60))
 * **plugin:** ensure external plugin css do not require physical file ([b5a2536](https://github.com/ionic-team/stencil/commit/b5a2536d0ac40a6ad940c55fcc52c8cdfcfa8b15)), closes [#2622](https://github.com/ionic-team/stencil/issues/2622)
 * **safari:** fix safari10 builds ([63f02f8](https://github.com/ionic-team/stencil/commit/63f02f8fc125a21c0338850ef9060f27a9ebb87b))
