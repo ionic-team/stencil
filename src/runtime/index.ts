@@ -16,3 +16,4 @@ export { forceUpdate, postUpdateComponent, getRenderingRef } from './update-comp
 export { proxyComponent } from './proxy-component';
 export { renderVdom } from './vdom/vdom-render';
 export { setMode, getMode } from './mode';
+export { Fragment } from './fragment';

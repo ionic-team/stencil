@@ -59,6 +59,10 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     tsCompilerOptions.jsxFactory = 'h';
   }
 
+  if (tsCompilerOptions.jsxFragmentFactory != null && !isString(tsCompilerOptions.jsxFragmentFactory)) {
+    tsCompilerOptions.jsxFragmentFactory = 'Fragment';
+  }
+
   if (tsCompilerOptions.paths && !isString(tsCompilerOptions.baseUrl)) {
     tsCompilerOptions.baseUrl = '.';
   }

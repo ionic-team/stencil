@@ -482,6 +482,11 @@ export interface ChildNode {
 export declare const Host: FunctionalComponent<HostAttributes>;
 
 /**
+ * Fragment
+ */
+export declare const Fragment: FunctionalComponent<{}>;
+
+/**
  * The "h" namespace is used to import JSX types for elements and attributes.
  * It is imported in order to avoid conflicting global JSX issues.
  */
