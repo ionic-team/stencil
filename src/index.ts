@@ -1,1 +1,1 @@
-export * from './declarations/stencil-core';
+export * from './internal/stencil-core';
