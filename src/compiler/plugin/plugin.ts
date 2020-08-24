@@ -57,7 +57,13 @@ export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
   return pluginCtx.fs.readFile(id);
 };
 
-export const runPluginTransforms = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, id: string, cmp?: d.ComponentCompilerMeta) => {
+export const runPluginTransforms = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  id: string,
+  cmp?: d.ComponentCompilerMeta,
+) => {
   const pluginCtx: PluginCtx = {
     config: config,
     sys: config.sys,
@@ -89,7 +95,15 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
     // do this BEFORE transformations on css files
     if (shouldParseCssDocs && cmp != null) {
       cmp.styleDocs = cmp.styleDocs || [];
-      const cssParseResults = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code, cmp.styleDocs);
+      const cssParseResults = await parseCssImports(
+        config,
+        compilerCtx,
+        buildCtx,
+        id,
+        id,
+        transformResults.code,
+        cmp.styleDocs,
+      );
       transformResults.code = cssParseResults.styleText;
       transformResults.dependencies = cssParseResults.imports;
     } else {
@@ -141,11 +155,26 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
     // do this AFTER transformations on non-css files
     if (shouldParseCssDocs && cmp != null) {
       cmp.styleDocs = cmp.styleDocs || [];
-      const cssParseResults = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code, cmp.styleDocs);
+      const cssParseResults = await parseCssImports(
+        config,
+        compilerCtx,
+        buildCtx,
+        id,
+        transformResults.id,
+        transformResults.code,
+        cmp.styleDocs,
+      );
       transformResults.code = cssParseResults.styleText;
       transformResults.dependencies = cssParseResults.imports;
     } else {
-      const cssParseResults = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code);
+      const cssParseResults = await parseCssImports(
+        config,
+        compilerCtx,
+        buildCtx,
+        id,
+        transformResults.id,
+        transformResults.code,
+      );
       transformResults.code = cssParseResults.styleText;
       transformResults.dependencies = cssParseResults.imports;
     }
@@ -154,7 +183,13 @@ export const runPluginTransforms = async (config: d.Config, compilerCtx: d.Compi
   return transformResults;
 };
 
-export const runPluginTransformsEsmImports = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, code: string, id: string) => {
+export const runPluginTransformsEsmImports = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  code: string,
+  id: string,
+) => {
   const pluginCtx: PluginCtx = {
     config: config,
     sys: config.sys,
@@ -178,7 +213,9 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
     // do this BEFORE transformations on css files
     const cssParseResults = await parseCssImports(config, compilerCtx, buildCtx, id, id, transformResults.code);
     transformResults.code = cssParseResults.styleText;
-    transformResults.dependencies = cssParseResults.imports;
+    if (Array.isArray(cssParseResults.imports)) {
+      transformResults.dependencies.push(...cssParseResults.imports);
+    }
   }
 
   for (const plugin of pluginCtx.config.plugins) {
@@ -204,7 +241,10 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
                 transformResults.id = pluginTransformResults.id;
               }
               if (Array.isArray(pluginTransformResults.dependencies)) {
-                transformResults.dependencies.push(...pluginTransformResults.dependencies);
+                const imports = pluginTransformResults.dependencies.filter(
+                  f => !transformResults.dependencies.includes(f),
+                );
+                transformResults.dependencies.push(...imports);
               }
             }
           }
@@ -223,9 +263,19 @@ export const runPluginTransformsEsmImports = async (config: d.Config, compilerCt
     // the output but only updated it to use url() instead. Let's go ahead and concat
     // the url() css files into one file like we did for raw .css files. Do this
     // AFTER transformations on non-css files
-    const cssParseResults = await parseCssImports(config, compilerCtx, buildCtx, id, transformResults.id, transformResults.code);
+    const cssParseResults = await parseCssImports(
+      config,
+      compilerCtx,
+      buildCtx,
+      id,
+      transformResults.id,
+      transformResults.code,
+    );
     transformResults.code = cssParseResults.styleText;
-    transformResults.dependencies = cssParseResults.imports;
+    if (Array.isArray(cssParseResults.imports)) {
+      const imports = cssParseResults.imports.filter(f => !transformResults.dependencies.includes(f));
+      transformResults.dependencies.push(...imports);
+    }
   }
 
   return transformResults;
