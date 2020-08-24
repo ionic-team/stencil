@@ -248,8 +248,22 @@ addEventListener('message', async ({data}) => {
 
     } catch (e) {
       value = null;
-      ${isDev ? 'console.error(e);' : ''}
-      err = e;
+      ${isDev ? 'console.error("Error when calling worker routine", e);' : ''}
+      if (e instanceof Error) {
+        err = {
+          isError: true,
+          value: {
+            message: e.message,
+            name: e.name,
+            stack: e.stack,
+          }
+        };
+      } else {
+        err = {
+          isError: false,
+          value: e
+        };
+      }
       value = undefined;
     }
 
@@ -285,7 +299,10 @@ export const createWorker = (workerPath, workerName, workerMsgId) => {
         pending.delete(id);
 
         if (err) {
-          reject(err);
+          reject((err.isError)
+            ? Object.assign(new Error(err.value.message), err.value)
+            : err.value
+          );
         } else {
           if (callbackIds) {
             callbackIds.forEach(id => callbacks.delete(id));
