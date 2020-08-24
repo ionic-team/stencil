@@ -1,7 +1,7 @@
 import type { TranspileOptions, Diagnostic } from '@stencil/core/internal';
 import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { transpile } from '../test-transpile';
-import ts from 'typescript';
+import { ts } from '@stencil/core/compiler';
 
 export const jestPreprocessor = {
   process(sourceText: string, filePath: string, jestConfig: { rootDir: string }) {
@@ -44,7 +44,12 @@ export const jestPreprocessor = {
     return this._tsCompilerOptions;
   },
 
-  getCacheKey(code: string, filePath: string, jestConfigStr: string, transformOptions: { instrument: boolean; rootDir: string }) {
+  getCacheKey(
+    code: string,
+    filePath: string,
+    jestConfigStr: string,
+    transformOptions: { instrument: boolean; rootDir: string },
+  ) {
     // https://github.com/facebook/jest/blob/v23.6.0/packages/jest-runtime/src/script_transformer.js#L61-L90
     if (!this._tsCompilerOptionsKey) {
       const opts = this.getCompilerOptions(transformOptions.rootDir);
@@ -102,7 +107,13 @@ function getCompilerOptions(rootDir: string) {
     throw new Error(formatDiagnostic(loadTypeScriptDiagnostic(tsconfigResults.error)));
   }
 
-  const parseResult = ts.parseJsonConfigFileContent(tsconfigResults.config, ts.sys, rootDir, undefined, tsconfigFilePath);
+  const parseResult = ts.parseJsonConfigFileContent(
+    tsconfigResults.config,
+    ts.sys,
+    rootDir,
+    undefined,
+    tsconfigFilePath,
+  );
 
   return parseResult.options;
 }

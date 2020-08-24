@@ -55,7 +55,6 @@ export async function testing(opts: BuildOptions) {
     '@rollup/plugin-node-resolve',
     'stream',
     'tty',
-    'typescript',
     'url',
     'util',
     'vm',
