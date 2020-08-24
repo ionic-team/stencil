@@ -62,6 +62,7 @@ const KEEP_IMPORTS = new Set([
   'getMode',
   'Build',
   'Host',
+  'Fragment',
   'getAssetPath',
   'writeTask',
   'readTask',
