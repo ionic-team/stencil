@@ -142,4 +142,33 @@ export const modeResolutionChain: d.ResolutionHandler[] = [];
 export { BUILD, NAMESPACE } from '@app-data';
 export { hydrateApp } from './hydrate-app';
 
-export * from '@runtime';
+export {
+  addHostEventListeners,
+  attachShadow,
+  defineCustomElement,
+  forceModeUpdate,
+  proxyCustomElement,
+  bootstrapLazy,
+  connectedCallback,
+  createEvent,
+  disconnectedCallback,
+  getAssetPath,
+  setAssetPath,
+  getConnect,
+  getContext,
+  getElement,
+  getValue,
+  setValue,
+  Host,
+  insertVdomAnnotations,
+  parsePropertyValue,
+  forceUpdate,
+  postUpdateComponent,
+  getRenderingRef,
+  proxyComponent,
+  renderVdom,
+  setMode,
+  getMode,
+} from '@runtime';
+
+export { hAsync as h } from './h-async';

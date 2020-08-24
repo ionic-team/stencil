@@ -1,11 +1,16 @@
-import { Component } from '@stencil/core';
-import { HelloWorldText } from 'hello-world-text';
+import { Component, h } from '@stencil/core';
 
 @Component({
-  tag: 'hello-world'
+  tag: 'hello-world',
 })
 export class HelloWorld {
   render() {
-    return HelloWorldText;
+    return <div>{getData()}</div>;
   }
 }
+
+const getData = async () => {
+  const rsp = await fetch('http://ionic.io/');
+  const txt = await rsp.text();
+  return txt;
+};
