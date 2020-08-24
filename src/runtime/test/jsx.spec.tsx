@@ -1,8 +1,38 @@
-import { Component, Host, Prop, State, h } from '@stencil/core';
+import { Component, Host, Prop, State, h, Fragment } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 import { FunctionalComponent } from '../../declarations';
 
 describe('jsx', () => {
+  it('Fragment', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      render() {
+        return (
+          <>
+            <div>A</div>
+            <div>B</div>
+          </>
+        );
+      }
+    }
+
+    const { root } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml(`
+      <cmp-a>
+        <div>
+          A
+        </div>
+        <div>
+          B
+        </div>
+      </cmp-a>
+    `);
+  });
+
   it('render template', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {

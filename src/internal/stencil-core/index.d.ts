@@ -31,6 +31,7 @@ export {
   getElement,
   getMode,
   getRenderingRef,
+  Fragment,
   forceUpdate,
   h,
   Host,

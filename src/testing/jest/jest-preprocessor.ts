@@ -58,7 +58,7 @@ export const jestPreprocessor = {
       filePath,
       jestConfigStr,
       !!transformOptions.instrument,
-      5, // cache buster
+      6, // cache buster
     ];
 
     return key.join(':');
