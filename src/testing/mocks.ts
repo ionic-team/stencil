@@ -7,6 +7,7 @@ import { createWorkerContext } from '@stencil/core/compiler';
 import { MockWindow } from '@stencil/core/mock-doc';
 import { TestingLogger } from './testing-logger';
 import path from 'path';
+import { noop } from '@utils';
 
 export function mockConfig(sys?: CompilerSystem) {
   const rootDir = path.resolve('/');
@@ -59,34 +60,29 @@ export function mockCompilerCtx(config?: Config) {
     activeFilesAdded: [],
     activeFilesDeleted: [],
     activeFilesUpdated: [],
-    fs: null,
+    addWatchDir: noop,
+    addWatchFile: noop,
     cachedGlobalStyle: null,
+    changedFiles: new Set(),
+    changedModules: new Set(),
     collections: [],
     compilerOptions: null,
     cache: null,
     cachedStyleMeta: new Map(),
     events: null,
-    fsWatcher: null,
+    fs: null,
     hasSuccessfulBuild: false,
     isActivelyBuilding: false,
-    lastComponentStyleInput: new Map(),
     lastBuildResults: null,
-    lastBuildStyles: null,
     moduleMap: new Map(),
     nodeMap: new WeakMap(),
+    reset: noop,
     resolvedCollections: new Set(),
+    rollupCache: new Map(),
     rollupCacheHydrate: null,
     rollupCacheLazy: null,
     rollupCacheNative: null,
-    rollupCache: new Map(),
-    rootTsFiles: [],
     styleModeNames: new Set(),
-    tsService: null,
-    changedModules: new Set(),
-    changedFiles: new Set(),
-    reset: () => {
-      /**/
-    },
     worker: createWorkerContext(config.sys),
   };
 

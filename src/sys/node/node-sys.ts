@@ -400,8 +400,7 @@ export function createNodeSys(c: { process?: any } = {}) {
         const tsFileWatcher = tsSysWatchDirectory(
           p,
           fileName => {
-            fileName = normalizePath(fileName);
-            callback(fileName, null);
+            callback(normalizePath(fileName), null);
           },
           recursive,
         );
@@ -541,6 +540,7 @@ export function createNodeSys(c: { process?: any } = {}) {
   const nodeResolve = new NodeResolveModule();
 
   sys.lazyRequire = new NodeLazyRequire(nodeResolve, {
+    // [minimumVersion, recommendedVersion]
     '@types/jest': ['24.9.1', '26.0.10'],
     '@types/puppeteer': ['1.19.0', '3.0.1'],
     'jest': ['24.9.0', '26.4.1'],

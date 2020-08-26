@@ -36,10 +36,11 @@ export const taskTest = async (config: Config) => {
     }
 
     // ensure we've got the required modules installed
-    // jest and puppeteer are quite large, so this
-    // is an experiment to lazy install these
-    // modules only when you need them
-    await config.sys.lazyRequire.ensure(config.logger, config.rootDir, ensureModuleIds);
+    const diagnostics = await config.sys.lazyRequire.ensure(config.rootDir, ensureModuleIds);
+    if (diagnostics.length > 0) {
+      config.logger.printDiagnostics(diagnostics);
+      return config.sys.exit(1);
+    }
 
     // let's test!
     const { createTesting } = await import('@stencil/core/testing');

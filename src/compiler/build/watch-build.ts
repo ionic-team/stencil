@@ -4,16 +4,24 @@ import { BuildContext } from './build-ctx';
 import { compilerRequest } from '../bundle/dev-module';
 import { createTsWatchProgram } from '../transpile/create-watch-program';
 import { dirname, resolve } from 'path';
-import { filesChanged, hasHtmlChanges, hasScriptChanges, hasStyleChanges, scriptsAdded, scriptsDeleted } from '../fs-watch/fs-watch-rebuild';
+import {
+  filesChanged,
+  hasHtmlChanges,
+  hasScriptChanges,
+  hasStyleChanges,
+  scriptsAdded,
+  scriptsDeleted,
+} from '../fs-watch/fs-watch-rebuild';
 import { hasServiceWorkerChanges } from '../service-worker/generate-sw';
+import { isString } from '@utils';
 import type ts from 'typescript';
 
 export const createWatchBuild = async (config: d.Config, compilerCtx: d.CompilerCtx): Promise<d.CompilerWatcher> => {
   let isRebuild = false;
-  let tsWatchProgram: { program: ts.WatchOfConfigFile<ts.EmitAndSemanticDiagnosticsBuilderProgram>; rebuild: () => void };
-  let srcFileWatchCloser: () => void;
-  let otherFileWatchCloser: () => void;
-
+  let tsWatchProgram: {
+    program: ts.WatchOfConfigFile<ts.EmitAndSemanticDiagnosticsBuilderProgram>;
+    rebuild: () => void;
+  };
   let closeResolver: Function;
   const watchWaiter = new Promise<d.WatcherCloseResults>(resolve => (closeResolver = resolve));
 
@@ -22,31 +30,6 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   const filesAdded = new Set<string>();
   const filesUpdated = new Set<string>();
   const filesDeleted = new Set<string>();
-
-  const onSrcFileChange: d.CompilerFileWatcherCallback = (p, eventKind) => {
-    updateCompilerCtxCache(config, compilerCtx, p, eventKind);
-
-    switch (eventKind) {
-      case 'dirAdd':
-        dirsAdded.add(p);
-        break;
-      case 'dirDelete':
-        dirsDeleted.add(p);
-        break;
-      case 'fileAdd':
-        filesAdded.add(p);
-        break;
-      case 'fileUpdate':
-        filesUpdated.add(p);
-        break;
-      case 'fileDelete':
-        filesDeleted.add(p);
-        break;
-    }
-
-    config.logger.debug(`${eventKind}: ${p}`);
-    tsWatchProgram.rebuild();
-  };
 
   const onBuild = async (tsBuilder: ts.BuilderProgram) => {
     const buildCtx = new BuildContext(config, compilerCtx);
@@ -83,26 +66,60 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   };
 
   const start = async () => {
-    const srcRead = watchSrcDirectory(config, compilerCtx, onSrcFileChange);
-    const otherRead = watchOtherFiles(config, compilerCtx);
-    srcFileWatchCloser = await srcRead;
-    otherFileWatchCloser = await otherRead;
+    const srcRead = watchSrcDirectory(config, compilerCtx);
+    const otherRead = watchRootFiles(config, compilerCtx);
+    await srcRead;
+    await otherRead;
     tsWatchProgram = await createTsWatchProgram(config, onBuild);
     return watchWaiter;
   };
 
+  const watchingDirs = new Map<string, d.CompilerFileWatcher>();
+  const watchingFiles = new Map<string, d.CompilerFileWatcher>();
+
+  const onFsChange: d.CompilerFileWatcherCallback = (p, eventKind) => {
+    if (tsWatchProgram) {
+      updateCompilerCtxCache(config, compilerCtx, p, eventKind);
+
+      switch (eventKind) {
+        case 'dirAdd':
+          dirsAdded.add(p);
+          break;
+        case 'dirDelete':
+          dirsDeleted.add(p);
+          break;
+        case 'fileAdd':
+          filesAdded.add(p);
+          break;
+        case 'fileUpdate':
+          filesUpdated.add(p);
+          break;
+        case 'fileDelete':
+          filesDeleted.add(p);
+          break;
+      }
+
+      config.logger.debug(`onFsChange ${eventKind}: ${p}`);
+      tsWatchProgram.rebuild();
+    }
+  };
+
+  const onDirChange: d.CompilerFileWatcherCallback = (p, eventKind) => {
+    if (eventKind != null) {
+      onFsChange(p, eventKind);
+    }
+  };
+
   const close = async () => {
-    if (srcFileWatchCloser) {
-      srcFileWatchCloser();
-    }
-    if (otherFileWatchCloser) {
-      otherFileWatchCloser();
-    }
+    watchingDirs.forEach(w => w.close());
+    watchingFiles.forEach(w => w.close());
+    watchingDirs.clear();
+    watchingFiles.clear();
+
     if (tsWatchProgram) {
       tsWatchProgram.program.close();
+      tsWatchProgram = null;
     }
-
-    srcFileWatchCloser = otherFileWatchCloser = tsWatchProgram = null;
 
     const watcherCloseResults: d.WatcherCloseResults = {
       exitCode: 0,
@@ -112,6 +129,18 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   };
 
   const request = async (data: d.CompilerRequest) => compilerRequest(config, compilerCtx, data);
+
+  compilerCtx.addWatchFile = filePath => {
+    if (isString(filePath) && !watchingFiles.has(filePath)) {
+      watchingFiles.set(filePath, config.sys.watchFile(filePath, onFsChange));
+    }
+  };
+
+  compilerCtx.addWatchDir = (dirPath, recursive) => {
+    if (isString(dirPath) && !watchingDirs.has(dirPath)) {
+      watchingDirs.set(dirPath, config.sys.watchDirectory(dirPath, onDirChange, recursive));
+    }
+  };
 
   config.sys.addDestory(close);
 
@@ -123,90 +152,47 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   };
 };
 
-const watchSrcDirectory = async (config: d.Config, compilerCtx: d.CompilerCtx, callback: d.CompilerFileWatcherCallback) => {
-  const watching = new Map();
-  const watchFile = (path: string) => {
-    if (!watching.has(path)) {
-      watching.set(path, config.sys.watchFile(path, callback));
-    }
-  };
-
+const watchSrcDirectory = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const srcFiles = await compilerCtx.fs.readdir(config.srcDir, {
     recursive: true,
     excludeDirNames: ['.cache', '.git', '.github', '.stencil', '.vscode', 'node_modules'],
-    excludeExtensions: ['.md', '.markdown', '.txt', '.spec.ts', '.spec.tsx', '.e2e.ts', '.e2e.tsx', '.gitignore', '.editorconfig'],
+    excludeExtensions: [
+      '.md',
+      '.markdown',
+      '.txt',
+      '.spec.ts',
+      '.spec.tsx',
+      '.e2e.ts',
+      '.e2e.tsx',
+      '.gitignore',
+      '.editorconfig',
+    ],
   });
 
-  srcFiles.filter(({ isFile }) => isFile).forEach(({ absPath }) => watchFile(absPath));
+  srcFiles.filter(({ isFile }) => isFile).forEach(({ absPath }) => compilerCtx.addWatchFile(absPath));
 
-  watching.set(
-    config.srcDir,
-    config.sys.watchDirectory(config.srcDir, (filename, kind) => {
-      if (kind != null) {
-        watchFile(filename);
-        callback(filename, kind);
-      }
-    }),
-  );
-
-  return () => {
-    watching.forEach(w => w.close());
-  };
+  compilerCtx.addWatchDir(config.srcDir, true);
 };
 
-const watchOtherFiles = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
+const watchRootFiles = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
   // non-src files that cause a rebuild
   // mainly for root level config files, and getting an event when they change
-  const onFileChange: d.CompilerFileWatcherCallback = (p, eventKind) => {
-    const data: d.FsWatchResults = {
-      dirsAdded: [],
-      dirsDeleted: [],
-      filesUpdated: [],
-      filesAdded: [],
-      filesDeleted: [],
-    };
-
-    switch (eventKind) {
-      case 'dirAdd':
-        data.dirsAdded.push(p);
-        break;
-      case 'dirDelete':
-        data.dirsDeleted.push(p);
-        break;
-      case 'fileAdd':
-        data.filesAdded.push(p);
-        break;
-      case 'fileUpdate':
-        data.filesUpdated.push(p);
-        break;
-      case 'fileDelete':
-        data.filesDeleted.push(p);
-        break;
-    }
-
-    compilerCtx.events.emit('fsChange', data);
-  };
-  const watching = new Map();
-  const watchFile = (path: string) => {
-    if (!watching.has(path)) {
-      watching.set(path, config.sys.watchFile(path, onFileChange));
-    }
-  };
-
   const rootFiles = await compilerCtx.fs.readdir(config.rootDir, {
     recursive: false,
     excludeDirNames: ['.cache', '.git', '.github', '.stencil', '.vscode', 'node_modules'],
   });
 
-  rootFiles.filter(({ isFile }) => isFile).forEach(({ absPath }) => watchFile(absPath));
-
-  return () => {
-    watching.forEach(w => w.close());
-  };
+  rootFiles.filter(({ isFile }) => isFile).forEach(({ absPath }) => compilerCtx.addWatchFile(absPath));
 };
 
 const emitFsChange = (compilerCtx: d.CompilerCtx, buildCtx: BuildContext) => {
-  if (buildCtx.dirsAdded.length > 0 || buildCtx.dirsDeleted.length > 0 || buildCtx.filesUpdated.length > 0 || buildCtx.filesAdded.length > 0 || buildCtx.filesDeleted.length > 0) {
+  if (
+    buildCtx.dirsAdded.length > 0 ||
+    buildCtx.dirsDeleted.length > 0 ||
+    buildCtx.filesUpdated.length > 0 ||
+    buildCtx.filesAdded.length > 0 ||
+    buildCtx.filesDeleted.length > 0
+  ) {
     compilerCtx.events.emit('fsChange', {
       dirsAdded: buildCtx.dirsAdded.slice(),
       dirsDeleted: buildCtx.dirsDeleted.slice(),
@@ -217,7 +203,12 @@ const emitFsChange = (compilerCtx: d.CompilerCtx, buildCtx: BuildContext) => {
   }
 };
 
-const updateCompilerCtxCache = (config: d.Config, compilerCtx: d.CompilerCtx, path: string, kind: d.CompilerFileWatcherEvent) => {
+const updateCompilerCtxCache = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  path: string,
+  kind: d.CompilerFileWatcherEvent,
+) => {
   compilerCtx.fs.clearFileCache(path);
   compilerCtx.changedFiles.add(path);
 

@@ -3,23 +3,24 @@ import { generateServiceWorker } from '../service-worker/generate-sw';
 import { isOutputTargetWww } from './output-utils';
 
 export const outputServiceWorkers = async (config: d.Config, buildCtx: d.BuildCtx) => {
-  const wwwServiceOutputs = config.outputTargets.filter(isOutputTargetWww).filter(o => typeof o.indexHtml === 'string' && !!o.serviceWorker);
+  const wwwServiceOutputs = config.outputTargets
+    .filter(isOutputTargetWww)
+    .filter(o => typeof o.indexHtml === 'string' && !!o.serviceWorker);
 
-  if (wwwServiceOutputs.length === 0) {
-    return;
-  }
-
-  if (config.sys.lazyRequire == null) {
+  if (wwwServiceOutputs.length === 0 || config.sys.lazyRequire == null) {
     return;
   }
 
   // let's make sure they have what we need from workbox installed
-  await config.sys.lazyRequire.ensure(config.logger, config.rootDir, [WORKBOX_BUILD_MODULE_ID]);
+  const diagnostics = await config.sys.lazyRequire.ensure(config.rootDir, ['workbox-build']);
+  if (diagnostics.length > 0) {
+    buildCtx.diagnostics.push(...diagnostics);
+  } else {
+    // we've ensure workbox is installed, so let's require it now
+    const workbox: d.Workbox = config.sys.lazyRequire.require(config.rootDir, 'workbox-build');
 
-  // we've ensure workbox is installed, so let's require it now
-  const workbox: d.Workbox = config.sys.lazyRequire.require(WORKBOX_BUILD_MODULE_ID);
-
-  await Promise.all(wwwServiceOutputs.map(outputTarget => generateServiceWorker(config, buildCtx, workbox, outputTarget)));
+    await Promise.all(
+      wwwServiceOutputs.map(outputTarget => generateServiceWorker(config, buildCtx, workbox, outputTarget)),
+    );
+  }
 };
-
-const WORKBOX_BUILD_MODULE_ID = 'workbox-build';

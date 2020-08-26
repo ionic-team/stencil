@@ -2094,15 +2094,9 @@ export interface OptimizeJsOutput {
 }
 
 export interface LazyRequire {
-  ensure(logger: Logger, fromDir: string, moduleIds: string[]): Promise<void>;
-  require(moduleId: string): any;
-  getModulePath(moduleId: string): string;
-}
-
-export interface FsWatcher {
-  addFile(path: string): Promise<boolean>;
-  addDirectory(path: string): Promise<boolean>;
-  close(): void;
+  ensure(fromDir: string, moduleIds: string[]): Promise<Diagnostic[]>;
+  require(fromDir: string, moduleId: string): any;
+  getModulePath(fromDir: string, moduleId: string): string;
 }
 
 export interface FsWatcherItem {

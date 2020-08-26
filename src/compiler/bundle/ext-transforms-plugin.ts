@@ -7,7 +7,12 @@ import { parseImportPath } from '../transformers/stencil-import-path';
 import type { Plugin } from 'rollup';
 import { runPluginTransformsEsmImports } from '../plugin/plugin';
 
-export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions): Plugin => {
+export const extTransformsPlugin = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  bundleOpts: BundleOptions,
+): Plugin => {
   return {
     name: 'extTransformsPlugin',
 
@@ -67,6 +72,7 @@ export const extTransformsPlugin = (config: d.Config, compilerCtx: d.CompilerCtx
         // Track dependencies
         for (const dep of pluginTransforms.dependencies) {
           this.addWatchFile(dep);
+          compilerCtx.addWatchFile(dep);
         }
 
         buildCtx.diagnostics.push(...pluginTransforms.diagnostics);

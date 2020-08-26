@@ -12,7 +12,6 @@ import type {
   DevServerConfig,
   DevServerEditor,
   Diagnostic,
-  FsWatcher,
   FsWriteOptions,
   Logger,
   LoggerTimeSpan,
@@ -615,6 +614,8 @@ export interface CompilerCtx {
   activeFilesAdded: string[];
   activeFilesDeleted: string[];
   activeFilesUpdated: string[];
+  addWatchDir: (path: string, recursive: boolean) => void;
+  addWatchFile: (path: string) => void;
   cache: Cache;
   cachedStyleMeta: Map<string, StyleCompiler>;
   cachedGlobalStyle: string;
@@ -622,21 +623,16 @@ export interface CompilerCtx {
   compilerOptions: any;
   events: BuildEvents;
   fs: InMemoryFileSystem;
-  fsWatcher: FsWatcher;
   hasSuccessfulBuild: boolean;
   isActivelyBuilding: boolean;
-  lastComponentStyleInput: Map<string, string>;
   lastBuildResults: CompilerBuildResults;
-  lastBuildStyles: Map<string, string>;
   moduleMap: ModuleMap;
   nodeMap: NodeMap;
   resolvedCollections: Set<string>;
   rollupCacheHydrate: any;
   rollupCacheLazy: any;
   rollupCacheNative: any;
-  rootTsFiles: string[];
   styleModeNames: Set<string>;
-  tsService: TsService;
   changedModules: Set<string>;
   changedFiles: Set<string>;
   worker?: CompilerWorkerContext;
@@ -647,14 +643,6 @@ export interface CompilerCtx {
 }
 
 export type NodeMap = WeakMap<any, ComponentCompilerMeta>;
-
-export type TsService = (
-  compilerCtx: CompilerCtx,
-  buildCtx: BuildCtx,
-  tsFilePaths: string[],
-  checkCacheKey: boolean,
-  useFsCache: boolean,
-) => Promise<boolean>;
 
 /** Must be serializable to JSON!! */
 export interface ComponentCompilerFeatures {
@@ -1989,9 +1977,6 @@ export interface PackageJsonData {
     [moduleId: string]: string;
   };
   'devDependencies'?: {
-    [moduleId: string]: string;
-  };
-  'lazyDependencies'?: {
     [moduleId: string]: string;
   };
   'repository'?: {

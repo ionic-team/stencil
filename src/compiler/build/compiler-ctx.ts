@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import { basename, dirname, extname, join } from 'path';
 import { buildEvents } from '../events';
-import { normalizePath } from '@utils';
+import { noop, normalizePath } from '@utils';
 
 /**
  * The CompilerCtx is a persistent object that's reused throughout
@@ -17,33 +17,28 @@ export class CompilerContext implements d.CompilerCtx {
   activeFilesUpdated: string[] = [];
   activeDirsAdded: string[] = [];
   activeDirsDeleted: string[] = [];
+  addWatchDir: (path: string) => void = noop;
+  addWatchFile: (path: string) => void = noop;
   cache: d.Cache;
   cachedStyleMeta = new Map<string, d.StyleCompiler>();
+  changedFiles = new Set<string>();
+  changedModules = new Set<string>();
   collections: d.CollectionCompilerMeta[] = [];
   compilerOptions: any = null;
   events = buildEvents();
   fs: d.InMemoryFileSystem;
-  fsWatcher: d.FsWatcher = null;
-  hasFsWatcherEvents = false;
-  hasLoggedServerUrl = false;
   hasSuccessfulBuild = false;
   isActivelyBuilding = false;
   lastBuildResults: d.CompilerBuildResults = null;
-  lastBuildStyles = new Map<string, string>();
-  lastComponentStyleInput = new Map<string, string>();
   moduleMap: d.ModuleMap = new Map();
   nodeMap = new WeakMap();
   resolvedCollections = new Set<string>();
+  rollupCache = new Map();
   rollupCacheHydrate: any = null;
   rollupCacheLazy: any = null;
   rollupCacheNative: any = null;
-  rootTsFiles: string[] = [];
-  tsService: d.TsService = null;
   cachedGlobalStyle: string;
   styleModeNames = new Set<string>();
-  rollupCache = new Map();
-  changedModules = new Set<string>();
-  changedFiles = new Set<string>();
   worker: d.CompilerWorkerContext = null;
 
   reset() {
@@ -52,14 +47,12 @@ export class CompilerContext implements d.CompilerCtx {
     this.cachedGlobalStyle = null;
     this.collections.length = 0;
     this.compilerOptions = null;
-    this.lastComponentStyleInput.clear();
+    this.hasSuccessfulBuild = false;
     this.rollupCacheHydrate = null;
     this.rollupCacheLazy = null;
     this.rollupCacheNative = null;
     this.moduleMap.clear();
     this.resolvedCollections.clear();
-    this.rootTsFiles.length = 0;
-    this.tsService = null;
 
     if (this.fs != null) {
       this.fs.clearCache();
