@@ -26,6 +26,8 @@ JSON.parse(fs.readFileSync(path.join(collectionDir, 'collection-manifest.json'),
 const typesDir = path.join(distDir, 'types');
 fs.accessSync(path.join(typesDir, 'components.d.ts'));
 fs.accessSync(path.join(typesDir, 'stencil-public-runtime.d.ts'));
+fs.accessSync(path.join(typesDir, 'app-root', 'app-root.d.ts'));
+fs.accessSync(path.join(typesDir, 'app-root', 'interfaces.d.ts'));
 fs.accessSync(path.join(typesDir, 'car-list', 'car-data.d.ts'));
 fs.accessSync(path.join(typesDir, 'car-list', 'car-list.d.ts'));
 

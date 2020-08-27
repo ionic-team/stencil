@@ -3,6 +3,7 @@ import _ from 'lodash';
 import _es from 'lodash-es';
 import videojs from 'video.js';
 import { css } from 'linaria';
+import { MeString } from './interfaces';
 
 const linariaCss = css`
   background-color: rgba(0, 0, 255, 0.1);
@@ -30,7 +31,7 @@ function format(target: any, propertyKey: string) {
 export class AppRoot {
   @format something = '12';
   @State() first: string;
-  @State() last: string;
+  @State() last: MeString;
 
   componentWillLoad() {
     const url = new URL(window.location.href);

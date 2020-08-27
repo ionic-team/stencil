@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { basename, join } from 'path';
+import { basename, join, relative } from 'path';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { generateAppTypes } from '../types/generate-app-types';
 import { getComponentsFromModules, isOutputTargetDistTypes } from '../output-targets/output-utils';
@@ -11,7 +11,12 @@ import { updateModule } from '../transformers/static-to-meta/parse-static';
 import { updateStencilTypesImports } from '../types/stencil-types';
 import { validateTranspiledComponents } from './validate-components';
 
-export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
+export const runTsProgram = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  tsBuilder: ts.BuilderProgram,
+) => {
   const tsSyntactic = loadTypeScriptDiagnostics(tsBuilder.getSyntacticDiagnostics());
   const tsGlobal = loadTypeScriptDiagnostics(tsBuilder.getGlobalDiagnostics());
   const tsOptions = loadTypeScriptDiagnostics(tsBuilder.getOptionsDiagnostics());
@@ -27,12 +32,15 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
 
   const tsTypeChecker = tsProgram.getTypeChecker();
   const typesOutputTarget = config.outputTargets.filter(isOutputTargetDistTypes);
+  const emittedDts: string[] = [];
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
     if (emitFilePath.endsWith('.js')) {
       updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
     } else if (emitFilePath.endsWith('.d.ts')) {
-      const relativeEmitFilepath = getRelativeDts(config, tsSourceFiles[0].fileName, emitFilePath);
+      const srcDtsPath = normalizePath(tsSourceFiles[0].fileName);
+      const relativeEmitFilepath = getRelativeDts(config, srcDtsPath, emitFilePath);
 
+      emittedDts.push(srcDtsPath);
       typesOutputTarget.forEach(o => {
         const distPath = join(o.typesDir, relativeEmitFilepath);
         data = updateStencilTypesImports(o.typesDir, distPath, data);
@@ -67,6 +75,29 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
     return true;
   }
 
+  if (typesOutputTarget.length > 0) {
+    // copy src dts files that do not get emitted by the compiler
+    // but we still want to ship them in the dist directory
+    const srcRootDtsFiles = tsProgram
+      .getRootFileNames()
+      .filter(f => f.endsWith('.d.ts') && !f.endsWith('components.d.ts'))
+      .map(normalizePath)
+      .filter(f => !emittedDts.includes(f))
+      .map(srcRootDtsFilePath => {
+        const relativeEmitFilepath = relative(config.srcDir, srcRootDtsFilePath);
+        return Promise.all(
+          typesOutputTarget.map(async o => {
+            const distPath = join(o.typesDir, relativeEmitFilepath);
+            let dtsContent = await compilerCtx.fs.readFile(srcRootDtsFilePath);
+            dtsContent = updateStencilTypesImports(o.typesDir, distPath, dtsContent);
+            await compilerCtx.fs.writeFile(distPath, dtsContent);
+          }),
+        );
+      });
+
+    await Promise.all(srcRootDtsFiles);
+  }
+
   if (config.validateTypes) {
     const tsSemantic = loadTypeScriptDiagnostics(tsBuilder.getSemanticDiagnostics());
     if (config.devMode) {
@@ -85,7 +116,6 @@ export const runTsProgram = async (config: d.Config, compilerCtx: d.CompilerCtx,
 
 const getRelativeDts = (config: d.Config, srcPath: string, emitDtsPath: string) => {
   const parts: string[] = [];
-  srcPath = normalizePath(srcPath);
   for (let i = 0; i < 30; i++) {
     if (config.srcDir === srcPath) {
       break;
