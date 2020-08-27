@@ -711,6 +711,7 @@ export namespace JSXBase {
 
   export interface SlotAttributes {
     name?: string;
+    ref?: any;
     slot?: string;
     onSlotchange?: (event: Event) => void;
   }
