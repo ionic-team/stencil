@@ -418,24 +418,24 @@ const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
         childNode.hidden = false;
 
         for (j = 0; j < ilen; j++) {
-          if (childNodes[j]['s-hn'] !== childNode['s-hn']) {
-            // this sibling node is from a different component
-            nodeType = childNodes[j].nodeType;
+          nodeType = childNodes[j].nodeType;
 
-            if (slotNameAttr !== '') {
-              // this is a named fallback slot node
-              if (nodeType === NODE_TYPE.ElementNode && slotNameAttr === childNodes[j].getAttribute('slot')) {
-                childNode.hidden = true;
-                break;
-              }
-            } else {
-              // this is a default fallback slot node
-              // any element or text node (with content)
-              // should hide the default fallback slot node
-              if (nodeType === NODE_TYPE.ElementNode || (nodeType === NODE_TYPE.TextNode && childNodes[j].textContent.trim() !== '')) {
-                childNode.hidden = true;
-                break;
-              }
+          if (childNodes[j]['s-hn'] !== childNode['s-hn'] || slotNameAttr !== '') {
+            // this sibling node is from a different component OR is a named fallback slot node
+            if (nodeType === NODE_TYPE.ElementNode && slotNameAttr === childNodes[j].getAttribute('slot')) {
+              childNode.hidden = true;
+              break;
+            }
+          } else {
+            // this is a default fallback slot node
+            // any element or text node (with content)
+            // should hide the default fallback slot node
+            if (
+              nodeType === NODE_TYPE.ElementNode ||
+              (nodeType === NODE_TYPE.TextNode && childNodes[j].textContent.trim() !== '')
+            ) {
+              childNode.hidden = true;
+              break;
             }
           }
         }
