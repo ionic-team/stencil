@@ -1,4 +1,14 @@
-import type { CompilerBuildResults, Compiler, Config, DevServer, E2EProcessEnv, OutputTargetWww, Testing, TestingRunOptions } from '@stencil/core/internal';
+import type {
+  CompilerBuildResults,
+  Compiler,
+  CompilerWatcher,
+  Config,
+  DevServer,
+  E2EProcessEnv,
+  OutputTargetWww,
+  Testing,
+  TestingRunOptions,
+} from '@stencil/core/internal';
 import { getAppScriptUrl, getAppStyleUrl } from './testing-utils';
 import { hasError } from '@utils';
 import { runJest } from './jest/jest-runner';
@@ -20,11 +30,14 @@ export const createTesting = async (config: Config): Promise<Testing> => {
     let doScreenshots = false;
     let passed = false;
     let env: E2EProcessEnv;
+    let compilerWatcher: CompilerWatcher = null;
     const msg: string[] = [];
 
     try {
       if (!opts.spec && !opts.e2e) {
-        config.logger.error(`Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`);
+        config.logger.error(
+          `Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`,
+        );
         return false;
       }
 
@@ -40,7 +53,7 @@ export const createTesting = async (config: Config): Promise<Testing> => {
         env.__STENCIL_SPEC_TESTS__ = 'true';
       }
 
-      config.logger.info(config.logger.magenta(`testing ${msg.join(' and ')} files`));
+      config.logger.info(config.logger.magenta(`testing ${msg.join(' and ')} files${config.watch ? ' (watch)' : ''}`));
 
       doScreenshots = !!(opts.e2e && opts.screenshot);
       if (doScreenshots) {
@@ -64,20 +77,37 @@ export const createTesting = async (config: Config): Promise<Testing> => {
         });
 
         const doBuild = !(config.flags && config.flags.build === false);
+        if (doBuild && config.watch) {
+          compilerWatcher = await compiler.createWatcher();
+        }
+
         if (doBuild) {
-          buildTask = compiler.build();
+          if (compilerWatcher) {
+            buildTask = new Promise(resolve => {
+              const removeListener = compilerWatcher.on('buildFinish', buildResults => {
+                removeListener();
+                resolve(buildResults);
+              });
+            });
+            compilerWatcher.start();
+          } else {
+            buildTask = compiler.build();
+          }
         }
 
         config.devServer.openBrowser = false;
         config.devServer.gzip = false;
         config.devServer.reloadStrategy = null;
 
-        const startupResults = await Promise.all([start(config.devServer, config.logger), startPuppeteerBrowser(config)]);
+        const startupResults = await Promise.all([
+          start(config.devServer, config.logger),
+          startPuppeteerBrowser(config),
+        ]);
 
         devServer = startupResults[0];
         puppeteerBrowser = startupResults[1];
 
-        if (doBuild) {
+        if (buildTask) {
           const results = await buildTask;
           if (!results || (!config.watch && hasError(results && results.diagnostics))) {
             await destroy();
@@ -111,6 +141,9 @@ export const createTesting = async (config: Config): Promise<Testing> => {
         passed = await runJest(config, env);
       }
       config.logger.info('');
+      if (compilerWatcher) {
+        await compilerWatcher.close();
+      }
     } catch (e) {
       config.logger.error(e);
     }
@@ -169,6 +202,10 @@ function setupTestingConfig(config: Config) {
       o.serviceWorker = null;
     }
   });
+
+  if (config.flags.args.includes('--watchAll')) {
+    config.watch = true;
+  }
 
   return config;
 }

@@ -29,4 +29,5 @@ module.exports = {
   transform: {
     '^.+\\.(ts|tsx|jsx|css)$': path.join(testingDir, 'jest-preprocessor.js'),
   },
+  watchPathIgnorePatterns: ['^.+\\.d\\.ts$'],
 };
