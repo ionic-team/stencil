@@ -217,8 +217,8 @@ export class MockDocument extends MockHTMLElement {
 
   get title() {
     const title = this.head.childNodes.find(elm => elm.nodeName === 'TITLE') as MockElement;
-    if (title != null) {
-      return title.textContent;
+    if (title != null && typeof title.textContent === 'string') {
+      return title.textContent.trim();
     }
     return '';
   }
@@ -277,7 +277,15 @@ export function resetDocument(doc: Document) {
   }
 }
 
-const DOC_KEY_KEEPERS = new Set(['nodeName', 'nodeType', 'nodeValue', 'ownerDocument', 'parentNode', 'childNodes', '_shadowRoot']);
+const DOC_KEY_KEEPERS = new Set([
+  'nodeName',
+  'nodeType',
+  'nodeValue',
+  'ownerDocument',
+  'parentNode',
+  'childNodes',
+  '_shadowRoot',
+]);
 
 export function getElementById(elm: MockElement, id: string): MockElement {
   const children = elm.children;
