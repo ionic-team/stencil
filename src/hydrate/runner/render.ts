@@ -1,4 +1,9 @@
-import type { HydrateDocumentOptions, HydrateFactoryOptions, HydrateResults, SerializeDocumentOptions } from '../../declarations';
+import type {
+  HydrateDocumentOptions,
+  HydrateFactoryOptions,
+  HydrateResults,
+  SerializeDocumentOptions,
+} from '../../declarations';
 import { generateHydrateResults, normalizeHydrateOptions, renderBuildError, renderCatchError } from './render-utils';
 import { hasError, isPromise } from '@utils';
 import { hydrateFactory } from '@hydrate-factory';
@@ -15,26 +20,35 @@ export function renderToString(html: string | any, options?: SerializeDocumentOp
   opts.serializeToHtml = true;
 
   return new Promise<HydrateResults>(resolve => {
+    let win: Window & typeof globalThis;
     const results = generateHydrateResults(opts);
+
     if (hasError(results.diagnostics)) {
       resolve(results);
     } else if (typeof html === 'string') {
       try {
         opts.destroyWindow = true;
         opts.destroyDocument = true;
-
-        const win = (new MockWindow(html) as any) as Window & typeof globalThis;
+        win = new MockWindow(html) as any;
         render(win, opts, results, resolve);
       } catch (e) {
+        if (win && win.close) {
+          win.close();
+        }
+        win = null;
         renderCatchError(results, e);
         resolve(results);
       }
     } else if (isValidDocument(html)) {
       try {
         opts.destroyDocument = false;
-        const win = patchDomImplementation(html, opts);
+        win = patchDomImplementation(html, opts);
         render(win, opts, results, resolve);
       } catch (e) {
+        if (win && win.close) {
+          win.close();
+        }
+        win = null;
         renderCatchError(results, e);
         resolve(results);
       }
@@ -50,26 +64,35 @@ export function hydrateDocument(doc: any | string, options?: HydrateDocumentOpti
   opts.serializeToHtml = false;
 
   return new Promise<HydrateResults>(resolve => {
+    let win: Window & typeof globalThis;
     const results = generateHydrateResults(opts);
+
     if (hasError(results.diagnostics)) {
       resolve(results);
     } else if (typeof doc === 'string') {
       try {
         opts.destroyWindow = true;
         opts.destroyDocument = true;
-
-        const win = (new MockWindow(doc) as any) as Window & typeof globalThis;
+        win = new MockWindow(doc) as any;
         render(win, opts, results, resolve);
       } catch (e) {
+        if (win && win.close) {
+          win.close();
+        }
+        win = null;
         renderCatchError(results, e);
         resolve(results);
       }
     } else if (isValidDocument(doc)) {
       try {
         opts.destroyDocument = false;
-        const win = patchDomImplementation(doc, opts);
+        win = patchDomImplementation(doc, opts);
         render(win, opts, results, resolve);
       } catch (e) {
+        if (win && win.close) {
+          win.close();
+        }
+        win = null;
         renderCatchError(results, e);
         resolve(results);
       }
@@ -80,7 +103,12 @@ export function hydrateDocument(doc: any | string, options?: HydrateDocumentOpti
   });
 }
 
-function render(win: Window & typeof globalThis, opts: HydrateFactoryOptions, results: HydrateResults, resolve: (results: HydrateResults) => void) {
+function render(
+  win: Window & typeof globalThis,
+  opts: HydrateFactoryOptions,
+  results: HydrateResults,
+  resolve: (results: HydrateResults) => void,
+) {
   if (!(process as any).__stencilErrors) {
     (process as any).__stencilErrors = true;
 
@@ -110,7 +138,12 @@ function render(win: Window & typeof globalThis, opts: HydrateFactoryOptions, re
   }
 }
 
-function afterHydrate(win: Window, opts: HydrateFactoryOptions, results: HydrateResults, resolve: (results: HydrateResults) => void) {
+function afterHydrate(
+  win: Window,
+  opts: HydrateFactoryOptions,
+  results: HydrateResults,
+  resolve: (results: HydrateResults) => void,
+) {
   if (typeof opts.afterHydrate === 'function') {
     try {
       const rtn = opts.afterHydrate(win.document);
@@ -130,7 +163,13 @@ function afterHydrate(win: Window, opts: HydrateFactoryOptions, results: Hydrate
   }
 }
 
-function finalizeHydrate(win: Window, doc: Document, opts: HydrateFactoryOptions, results: HydrateResults, resolve: (results: HydrateResults) => void) {
+function finalizeHydrate(
+  win: Window,
+  doc: Document,
+  opts: HydrateFactoryOptions,
+  results: HydrateResults,
+  resolve: (results: HydrateResults) => void,
+) {
   try {
     inspectElement(results, doc.documentElement, 0);
 
@@ -198,7 +237,9 @@ function finalizeHydrate(win: Window, doc: Document, opts: HydrateFactoryOptions
         (doc as any).defaultView = null;
       }
 
-      win.close();
+      if (win.close) {
+        win.close();
+      }
     } catch (e) {
       renderCatchError(results, e);
     }
@@ -221,7 +262,14 @@ export function serializeDocumentToString(doc: any, opts: HydrateFactoryOptions)
 }
 
 function isValidDocument(doc: Document) {
-  return doc != null && doc.nodeType === 9 && doc.documentElement != null && doc.documentElement.nodeType === 1 && doc.body != null && doc.body.nodeType === 1;
+  return (
+    doc != null &&
+    doc.nodeType === 9 &&
+    doc.documentElement != null &&
+    doc.documentElement.nodeType === 1 &&
+    doc.body != null &&
+    doc.body.nodeType === 1
+  );
 }
 
 function removeScripts(elm: HTMLElement) {
