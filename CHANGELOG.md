@@ -1,4 +1,4 @@
-# ♨️ [2.0.0-7](https://github.com/ionic-team/stencil/compare/v1.17.3...v2.0.0-7) (2020-08-28)
+# 🎖 [2.0.0-8](https://github.com/ionic-team/stencil/compare/v1.17.3...v2.0.0-8) (2020-08-28)
 
 
 In keeping with [Semver](https://semver.org/), Stencil `2.0.0` was released due to changes in the API (mainly from some updates to the config API). But even though this is a new major version, there are few breaking changes, and any changes will be flagged and described by the compiler during development. For the most part, most of the changes are removal of deprecated APIs that have been printing out warning logs for quite some time now.
@@ -142,9 +142,11 @@ The `Context` object was originally added in the `0.x.x` versions of Stencil, be
 * **exit:** sys.exit() returns a promise ([208ef8c](https://github.com/ionic-team/stencil/commit/208ef8c90dd2e65b46823c0420f7c5811bfa3c86))
 * **export:** export client runtime from @stencil/core ([4c6cb60](https://github.com/ionic-team/stencil/commit/4c6cb6099581843fd00a3eb7dddda77c9675f0de))
 * **hmr:** fix dev server hmr ([fa480b6](https://github.com/ionic-team/stencil/commit/fa480b60d1d0867a741506c9aff953c3534c63dc))
+* **hydrate:** ensure all timers are cleared ([db1d747](https://github.com/ionic-team/stencil/commit/db1d7475f81dfb575365c75636eb26c9f7835fed))
 * **monorepos:** do not lazy require missing dependencies ([7f739a0](https://github.com/ionic-team/stencil/commit/7f739a0cac7423e91ac8614206b71894796965d8))
 * **parse:** parse decorator shorthand property assignment ([6b9e035](https://github.com/ionic-team/stencil/commit/6b9e0357c43e155c03d450d5209e87dbe3a92d60))
 * **plugin:** ensure external plugin css do not require physical file ([b5a2536](https://github.com/ionic-team/stencil/commit/b5a2536d0ac40a6ad940c55fcc52c8cdfcfa8b15)), closes [#2622](https://github.com/ionic-team/stencil/issues/2622)
+* **prerender:** flatten hAsync children to resolve promises ([363d258](https://github.com/ionic-team/stencil/commit/363d2585faa1f0a365f86b564a14440e5777e0cc))
 * **prerender:** hAsync only returns promise if it has to ([25a547a](https://github.com/ionic-team/stencil/commit/25a547a359a4cdb9fde83723497b75c99c11a5cc))
 * **safari:** fix safari10 builds ([63f02f8](https://github.com/ionic-team/stencil/commit/63f02f8fc125a21c0338850ef9060f27a9ebb87b))
 * **sys:** set ts.getExecutingFilePath() from stencil sys ([2b21f2d](https://github.com/ionic-team/stencil/commit/2b21f2d01af313be32310de29f297172a1318b56))
