@@ -423,7 +423,31 @@ export class MockWindow {
 
     if (this.__allowInterval) {
       const intervalId = this.__setInterval(() => {
-        this.__timeouts.delete(intervalId);
+        if (this.__timeouts) {
+          this.__timeouts.delete(intervalId);
+
+          try {
+            callback(...args);
+          } catch (e) {
+            if (this.console) {
+              this.console.error(e);
+            } else {
+              console.error(e);
+            }
+          }
+        }
+      }, ms) as any;
+
+      if (this.__timeouts) {
+        this.__timeouts.add(intervalId);
+      }
+
+      return intervalId;
+    }
+
+    const timeoutId = this.__setTimeout(() => {
+      if (this.__timeouts) {
+        this.__timeouts.delete(timeoutId);
 
         try {
           callback(...args);
@@ -434,28 +458,12 @@ export class MockWindow {
             console.error(e);
           }
         }
-      }, ms) as any;
-
-      this.__timeouts.add(intervalId);
-
-      return intervalId;
-    }
-
-    const timeoutId = this.__setTimeout(() => {
-      this.__timeouts.delete(timeoutId);
-
-      try {
-        callback(...args);
-      } catch (e) {
-        if (this.console) {
-          this.console.error(e);
-        } else {
-          console.error(e);
-        }
       }
     }, ms) as any;
 
-    this.__timeouts.add(timeoutId);
+    if (this.__timeouts) {
+      this.__timeouts.add(timeoutId);
+    }
 
     return timeoutId;
   }
@@ -468,20 +476,24 @@ export class MockWindow {
     ms = Math.min(ms, this.__maxTimeout);
 
     const timeoutId = (this.__setTimeout(() => {
-      this.__timeouts.delete(timeoutId);
+      if (this.__timeouts) {
+        this.__timeouts.delete(timeoutId);
 
-      try {
-        callback(...args);
-      } catch (e) {
-        if (this.console) {
-          this.console.error(e);
-        } else {
-          console.error(e);
+        try {
+          callback(...args);
+        } catch (e) {
+          if (this.console) {
+            this.console.error(e);
+          } else {
+            console.error(e);
+          }
         }
       }
     }, ms) as any) as number;
 
-    this.__timeouts.add(timeoutId);
+    if (this.__timeouts) {
+      this.__timeouts.add(timeoutId);
+    }
 
     return timeoutId;
   }
