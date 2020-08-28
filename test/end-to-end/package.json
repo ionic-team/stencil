@@ -9,8 +9,9 @@
     "build": "node ../../bin/stencil build --docs",
     "start": "node ../../bin/stencil build --debug --watch --dev --serve",
     "test": "node ../../bin/stencil test --ci --e2e --spec --screenshot --debug",
-    "test.dist": "npm run build && node test-end-to-end-dist.js",
+    "test.dist": "npm run build && node test-end-to-end-dist.js && node test-end-to-end-hydrate.js",
     "test.e2e": "node ../../bin/stencil test --e2e",
+    "test.hydrate": "node test-end-to-end-hydrate.js",
     "test.screenshot": "node ../../bin/stencil test --e2e --debug --screenshot",
     "test.spec": "node ../../bin/stencil test --spec --debug",
     "jest": "jest --coverage"
@@ -30,6 +31,7 @@
     "lodash-es": "^4.17.15",
     "rollup-plugin-css-only": "^2.1.0",
     "rollup-plugin-node-builtins": "^2.1.2",
-    "video.js": "^7.8.4"
+    "video.js": "^7.8.4",
+    "why-is-node-running": "^2.2.0"
   }
 }

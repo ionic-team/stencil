@@ -43,6 +43,8 @@ export namespace Components {
     }
     interface PathAliasCmp {
     }
+    interface PrerenderCmp {
+    }
     interface PropCmp {
         "first": string;
         "lastName": string;
@@ -140,6 +142,12 @@ declare global {
         prototype: HTMLPathAliasCmpElement;
         new (): HTMLPathAliasCmpElement;
     };
+    interface HTMLPrerenderCmpElement extends Components.PrerenderCmp, HTMLStencilElement {
+    }
+    var HTMLPrerenderCmpElement: {
+        prototype: HTMLPrerenderCmpElement;
+        new (): HTMLPrerenderCmpElement;
+    };
     interface HTMLPropCmpElement extends Components.PropCmp, HTMLStencilElement {
     }
     var HTMLPropCmpElement: {
@@ -184,6 +192,7 @@ declare global {
         "listen-cmp": HTMLListenCmpElement;
         "method-cmp": HTMLMethodCmpElement;
         "path-alias-cmp": HTMLPathAliasCmpElement;
+        "prerender-cmp": HTMLPrerenderCmpElement;
         "prop-cmp": HTMLPropCmpElement;
         "slot-cmp": HTMLSlotCmpElement;
         "slot-cmp-container": HTMLSlotCmpContainerElement;
@@ -227,6 +236,8 @@ declare namespace LocalJSX {
     }
     interface PathAliasCmp {
     }
+    interface PrerenderCmp {
+    }
     interface PropCmp {
         "first"?: string;
         "lastName"?: string;
@@ -258,6 +269,7 @@ declare namespace LocalJSX {
         "listen-cmp": ListenCmp;
         "method-cmp": MethodCmp;
         "path-alias-cmp": PathAliasCmp;
+        "prerender-cmp": PrerenderCmp;
         "prop-cmp": PropCmp;
         "slot-cmp": SlotCmp;
         "slot-cmp-container": SlotCmpContainer;
@@ -282,6 +294,7 @@ declare module "@stencil/core" {
             "listen-cmp": LocalJSX.ListenCmp & JSXBase.HTMLAttributes<HTMLListenCmpElement>;
             "method-cmp": LocalJSX.MethodCmp & JSXBase.HTMLAttributes<HTMLMethodCmpElement>;
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
+            "prerender-cmp": LocalJSX.PrerenderCmp & JSXBase.HTMLAttributes<HTMLPrerenderCmpElement>;
             "prop-cmp": LocalJSX.PropCmp & JSXBase.HTMLAttributes<HTMLPropCmpElement>;
             "slot-cmp": LocalJSX.SlotCmp & JSXBase.HTMLAttributes<HTMLSlotCmpElement>;
             "slot-cmp-container": LocalJSX.SlotCmpContainer & JSXBase.HTMLAttributes<HTMLSlotCmpContainerElement>;
