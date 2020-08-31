@@ -24,7 +24,6 @@ module.exports = {
   setupFilesAfterEnv: [path.join(testingDir, 'jest-setuptestframework.js')],
   testEnvironment: path.join(testingDir, 'jest-environment.js'),
   testPathIgnorePatterns: ['/.cache', '/.stencil', '/.vscode', '/dist', '/node_modules', '/www'],
-  maxConcurrency: 1,
   testRegex: '(/__tests__/.*|\\.?(test|spec))\\.' + moduleExtensionRegexp + '$',
   transform: {
     '^.+\\.(ts|tsx|jsx|css)$': path.join(testingDir, 'jest-preprocessor.js'),
