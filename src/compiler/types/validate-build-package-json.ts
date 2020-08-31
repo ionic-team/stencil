@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import { COLLECTION_MANIFEST_FILE_NAME, buildJsonFileError, isGlob, normalizePath, isString } from '@utils';
 import { dirname, join, relative } from 'path';
-import { getComponentsDtsTypesFilePath, isOutputTargetDistCollection, isOutputTargetDistTypes } from '../output-targets/output-utils';
+import { getComponentsDtsTypesFilePath, isOutputTargetDistCollection, isOutputTargetDistCustomElementsBundle, isOutputTargetDistTypes } from '../output-targets/output-utils';
 
 export const validateBuildPackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (config.watch) {
@@ -78,14 +78,22 @@ export const validateMain = (config: d.Config, compilerCtx: d.CompilerCtx, build
 };
 
 export const validateModule = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistCollection) => {
-  const moduleAbs = join(outputTarget.dir, 'index.js');
-  const moduleRel = relative(config.rootDir, moduleAbs);
+  const customElementsOutput = config.outputTargets.find(isOutputTargetDistCustomElementsBundle);
+  const currentModule = buildCtx.packageJson.module;
+  const distAbs = join(outputTarget.dir, 'index.js');
+  const distRel = relative(config.rootDir, distAbs);
 
-  if (!isString(buildCtx.packageJson.module)) {
-    const msg = `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ${moduleRel}`;
+  let recommendedRelPath = distRel;
+  if (customElementsOutput) {
+    const customElementsAbs = join(customElementsOutput.dir, 'index.js');
+    recommendedRelPath = relative(config.rootDir, customElementsAbs);
+  }
+
+  if (!isString(currentModule)) {
+    const msg = `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ${recommendedRelPath}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"module"`);
-  } else if (normalizePath(buildCtx.packageJson.module) !== normalizePath(moduleRel)) {
-    const msg = `package.json "module" property is set to "${buildCtx.packageJson.module}". It's recommended to set the "module" property to: ${moduleRel}`;
+  } else if (normalizePath(currentModule) !== normalizePath(recommendedRelPath) && normalizePath(currentModule) !== normalizePath(distRel)) {
+    const msg = `package.json "module" property is set to "${currentModule}". It's recommended to set the "module" property to: ${recommendedRelPath}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"module"`);
   }
 };

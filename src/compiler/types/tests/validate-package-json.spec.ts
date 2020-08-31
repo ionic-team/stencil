@@ -79,14 +79,36 @@ describe('validate-package-json', () => {
   });
 
   describe('module', () => {
-    it('validate module', async () => {
+    it('validate dist module', async () => {
+      config.outputTargets = [];
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.js'), '');
       buildCtx.packageJson.module = 'dist/index.js';
       v.validateModule(config, compilerCtx, buildCtx, collectionOutputTarget);
       expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
-    it('missing module', async () => {
+    it('validate custom elements module', async () => {
+      config.outputTargets = [{
+        type: 'dist-custom-elements-bundle',
+        dir: path.join(root, 'custom-elements')
+      }];
+      compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.js'), '');
+      buildCtx.packageJson.module = 'custom-elements/index.js';
+      v.validateModule(config, compilerCtx, buildCtx, collectionOutputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(0);
+    });
+
+    it('missing dist module', async () => {
+      config.outputTargets = [];
+      v.validateModule(config, compilerCtx, buildCtx, collectionOutputTarget);
+      expect(buildCtx.diagnostics).toHaveLength(1);
+    });
+
+    it('missing dist module, but has custom elements output', async () => {
+      config.outputTargets = [{
+        type: 'dist-custom-elements-bundle',
+        dir: path.join(root, 'custom-elements')
+      }];
       v.validateModule(config, compilerCtx, buildCtx, collectionOutputTarget);
       expect(buildCtx.diagnostics).toHaveLength(1);
     });
