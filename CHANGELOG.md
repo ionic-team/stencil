@@ -1,4 +1,4 @@
-# 🎖 [2.0.0-8](https://github.com/ionic-team/stencil/compare/v1.17.3...v2.0.0-8) (2020-08-28)
+# 🚗 [2.0.0](https://github.com/ionic-team/stencil/compare/v1.17.3...v2.0.0) (2020-08-31)
 
 
 In keeping with [Semver](https://semver.org/), Stencil `2.0.0` was released due to changes in the API (mainly from some updates to the config API). But even though this is a new major version, there are few breaking changes, and any changes will be flagged and described by the compiler during development. For the most part, most of the changes are removal of deprecated APIs that have been printing out warning logs for quite some time now.
