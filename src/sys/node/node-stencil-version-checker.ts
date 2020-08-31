@@ -7,6 +7,7 @@ import { tmpdir } from 'os';
 
 const REGISTRY_URL = `https://registry.npmjs.org/@stencil/core`;
 const CHECK_INTERVAL = 1000 * 60 * 60 * 24 * 7;
+const CHANGELOG = `https://github.com/ionic-team/stencil/blob/master/CHANGELOG.md`;
 
 export async function checkVersion(logger: Logger, currentVersion: string): Promise<() => void> {
   try {
@@ -16,7 +17,9 @@ export async function checkVersion(logger: Logger, currentVersion: string): Prom
         if (semiver(currentVersion, latestVersion) < 0) {
           printUpdateMessage(logger, currentVersion, latestVersion);
         } else {
-          console.debug(`${logger.cyan('@stencil/core')} version ${logger.green(currentVersion)} is the latest version`);
+          console.debug(
+            `${logger.cyan('@stencil/core')} version ${logger.green(currentVersion)} is the latest version`,
+          );
         }
       };
     }
@@ -116,9 +119,14 @@ function getLastCheckStoragePath() {
 
 function printUpdateMessage(logger: Logger, currentVersion: string, latestVersion: string) {
   const installMessage = `npm install @stencil/core`;
-  const msg = [`Update available: ${currentVersion} ${ARROW} ${latestVersion}`, `To get the latest, please run:`, installMessage];
+  const msg = [
+    `Update available: ${currentVersion} ${ARROW} ${latestVersion}`,
+    `To get the latest, please run:`,
+    installMessage,
+    CHANGELOG,
+  ];
 
-  const lineLength = msg[0].length;
+  const lineLength = msg.reduce((longest, line) => (line.length > longest ? line.length : longest), 0);
 
   const o: string[] = [];
 
@@ -149,11 +157,12 @@ function printUpdateMessage(logger: Logger, currentVersion: string, latestVersio
   bottom += BOX_BOTTOM_RIGHT;
   o.push(bottom);
 
-  let output = `\n${INDENT}${o.join(`\n${INDENT}`)}\n`;
+  let output = `${INDENT}${o.join(`\n${INDENT}`)}\n`;
 
   output = output.replace(currentVersion, logger.red(currentVersion));
   output = output.replace(latestVersion, logger.green(latestVersion));
   output = output.replace(installMessage, logger.cyan(installMessage));
+  output = output.replace(CHANGELOG, logger.dim(CHANGELOG));
 
   console.log(output);
 }
@@ -166,4 +175,4 @@ const BOX_BOTTOM_RIGHT = `╯`;
 const BOX_VERTICAL = `│`;
 const BOX_HORIZONTAL = `─`;
 const PADDING = 2;
-const INDENT = `           `;
+const INDENT = `   `;
