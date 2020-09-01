@@ -111,7 +111,8 @@ const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = new WeakMap();
 
 export const getHostRef = (ref: d.RuntimeRef) => hostRefs.get(ref);
 
-export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) => hostRefs.set((hostRef.$lazyInstance$ = lazyInstance), hostRef);
+export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) =>
+  hostRefs.set((hostRef.$lazyInstance$ = lazyInstance), hostRef);
 
 export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
   const hostRef: d.HostRef = {
@@ -159,6 +160,7 @@ export {
   getElement,
   getValue,
   setValue,
+  Fragment,
   Host,
   insertVdomAnnotations,
   parsePropertyValue,
