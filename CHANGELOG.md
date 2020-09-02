@@ -1,3 +1,14 @@
+## 🐡 [2.0.2](https://github.com/ionic-team/stencil/compare/v2.0.1...v2.0.2) (2020-09-02)
+
+
+### Bug Fixes
+
+* **prerender:** export Fragment for prerender builds ([142adc8](https://github.com/ionic-team/stencil/commit/142adc852dc080a3c936d263ba645b6a31c6ad7a))
+* **test:** do not build docs from test command ([557b371](https://github.com/ionic-team/stencil/commit/557b3712f047d789122caf398aed46199c7b41e2))
+* **watch:** fix config.watchIgnoredRegex and update w/ RegExp array ([981e0ae](https://github.com/ionic-team/stencil/commit/981e0aebc5cf2e5fc42b33226dba8c9c2f1c7351))
+
+
+
 ## 👽 [2.0.1](https://github.com/ionic-team/stencil/compare/v2.0.0...v2.0.1) (2020-08-31)
 
 
