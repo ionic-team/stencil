@@ -16,17 +16,6 @@ import {
 import type { Plugin } from 'rollup';
 
 export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, platform: 'client' | 'hydrate' | 'worker', externalRuntime: boolean): Plugin => {
-  if (platform === 'worker') {
-    return {
-      name: 'coreResolvePlugin',
-      resolveId(id) {
-        if (id === STENCIL_CORE_ID || id === STENCIL_INTERNAL_CLIENT_ID || id === STENCIL_INTERNAL_HYDRATE_ID) {
-          this.error(`${id} cannot be imported from a worker`);
-        }
-        return null;
-      },
-    };
-  }
   const compilerExe = config.sys.getCompilerExecutingPath();
   const internalClient = getStencilInternalModule(config, compilerExe, 'client/index.js');
   const internalClientPatchBrowser = getStencilInternalModule(config, compilerExe, 'client/patch-browser.js');
@@ -96,6 +85,15 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
         filePath = normalizeFsPath(filePath);
 
         if (filePath === internalClient || filePath === internalHydrate) {
+          if (platform === 'worker') {
+            return `
+export const Build = {
+  isDev: false,
+  isBrowser: true,
+  isServer: false,
+  isTesting: false,
+};`;
+          }
           let code = await compilerCtx.fs.readFile(filePath);
 
           if (typeof code !== 'string' && isRemoteUrl(compilerExe)) {
