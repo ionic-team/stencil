@@ -79,9 +79,7 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   const watchingFiles = new Map<string, d.CompilerFileWatcher>();
 
   const onFsChange: d.CompilerFileWatcherCallback = (p, eventKind) => {
-    if (tsWatchProgram && isWatchIgnorePath(config, p)) {
-      config.watchIgnoredRegex;
-
+    if (tsWatchProgram && !isWatchIgnorePath(config, p)) {
       updateCompilerCtxCache(config, compilerCtx, p, eventKind);
 
       switch (eventKind) {
