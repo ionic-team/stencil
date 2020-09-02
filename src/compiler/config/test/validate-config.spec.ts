@@ -1,5 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
+import { isWatchIgnorePath } from '../../fs-watch/fs-watch-rebuild';
 import { validateConfig } from '../validate-config';
 
 describe('validation', () => {
@@ -340,5 +341,33 @@ describe('validation', () => {
     userConfig.taskQueue = 'congestionAsync';
     const { config } = validateConfig(userConfig);
     expect(config.taskQueue).toBe('congestionAsync');
+  });
+
+  it('empty watchIgnoredRegex, all valid', () => {
+    const { config } = validateConfig(userConfig);
+    expect(config.watchIgnoredRegex).toEqual([]);
+    expect(isWatchIgnorePath(config, '/some/image.gif')).toBe(false);
+    expect(isWatchIgnorePath(config, '/some/typescript.ts')).toBe(false);
+  });
+
+  it('should change a single watchIgnoredRegex to an array', () => {
+    userConfig.watchIgnoredRegex = /\.(gif|jpe?g|png)$/i;
+    const { config } = validateConfig(userConfig);
+    expect(config.watchIgnoredRegex).toHaveLength(1);
+    expect((config.watchIgnoredRegex as any[])[0]).toEqual(/\.(gif|jpe?g|png)$/i);
+    expect(isWatchIgnorePath(config, '/some/image.gif')).toBe(true);
+    expect(isWatchIgnorePath(config, '/some/typescript.ts')).toBe(false);
+  });
+
+  it('should clean up valid watchIgnoredRegex', () => {
+    userConfig.watchIgnoredRegex = [/\.(gif|jpe?g)$/i, null, 'me-regex' as any, /\.(png)$/i];
+    const { config } = validateConfig(userConfig);
+    expect(config.watchIgnoredRegex).toHaveLength(2);
+    expect((config.watchIgnoredRegex as any[])[0]).toEqual(/\.(gif|jpe?g)$/i);
+    expect((config.watchIgnoredRegex as any[])[1]).toEqual(/\.(png)$/i);
+    expect(isWatchIgnorePath(config, '/some/image.gif')).toBe(true);
+    expect(isWatchIgnorePath(config, '/some/image.jpg')).toBe(true);
+    expect(isWatchIgnorePath(config, '/some/image.png')).toBe(true);
+    expect(isWatchIgnorePath(config, '/some/typescript.ts')).toBe(false);
   });
 });

@@ -214,7 +214,12 @@ export interface StencilConfig {
   sys?: CompilerSystem;
   tsconfig?: string;
   validateTypes?: boolean;
-  watchIgnoredRegex?: RegExp;
+  /**
+   * An array of RegExp patterns that are matched against all source files before adding
+   * to the watch list in watch mode. If the file path matches any of the patterns, when it
+   * is updated, it will not trigger a re-run of tests.
+   */
+  watchIgnoredRegex?: RegExp | RegExp[];
   excludeUnusedDependencies?: boolean;
   stencilCoreResolvedId?: string;
 }

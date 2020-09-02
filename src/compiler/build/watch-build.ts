@@ -9,6 +9,7 @@ import {
   hasHtmlChanges,
   hasScriptChanges,
   hasStyleChanges,
+  isWatchIgnorePath,
   scriptsAdded,
   scriptsDeleted,
 } from '../fs-watch/fs-watch-rebuild';
@@ -78,7 +79,9 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   const watchingFiles = new Map<string, d.CompilerFileWatcher>();
 
   const onFsChange: d.CompilerFileWatcherCallback = (p, eventKind) => {
-    if (tsWatchProgram) {
+    if (tsWatchProgram && isWatchIgnorePath(config, p)) {
+      config.watchIgnoredRegex;
+
       updateCompilerCtxCache(config, compilerCtx, p, eventKind);
 
       switch (eventKind) {
@@ -131,13 +134,13 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   const request = async (data: d.CompilerRequest) => compilerRequest(config, compilerCtx, data);
 
   compilerCtx.addWatchFile = filePath => {
-    if (isString(filePath) && !watchingFiles.has(filePath)) {
+    if (isString(filePath) && !watchingFiles.has(filePath) && !isWatchIgnorePath(config, filePath)) {
       watchingFiles.set(filePath, config.sys.watchFile(filePath, onFsChange));
     }
   };
 
   compilerCtx.addWatchDir = (dirPath, recursive) => {
-    if (isString(dirPath) && !watchingDirs.has(dirPath)) {
+    if (isString(dirPath) && !watchingDirs.has(dirPath) && !isWatchIgnorePath(config, dirPath)) {
       watchingDirs.set(dirPath, config.sys.watchDirectory(dirPath, onDirChange, recursive));
     }
   };

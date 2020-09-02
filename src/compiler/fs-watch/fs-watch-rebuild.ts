@@ -1,6 +1,6 @@
 import type * as d from '../../declarations';
 import { basename } from 'path';
-import { unique } from '@utils';
+import { isString, unique } from '@utils';
 
 export const filesChanged = (buildCtx: d.BuildCtx) => {
   // files changed include updated, added and deleted
@@ -76,4 +76,13 @@ export const updateCacheFromRebuild = (compilerCtx: d.CompilerCtx, buildCtx: d.B
   buildCtx.dirsDeleted.forEach(dirDeleted => {
     compilerCtx.fs.clearDirCache(dirDeleted);
   });
+};
+
+export const isWatchIgnorePath = (config: d.Config, path: string) => {
+  if (isString(path)) {
+    return (config.watchIgnoredRegex as RegExp[]).some(reg => {
+      return reg.test(path);
+    });
+  }
+  return false;
 };

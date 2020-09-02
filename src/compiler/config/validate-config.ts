@@ -119,6 +119,16 @@ export const validateConfig = (userConfig?: Config) => {
 
   setBooleanConfig(config, 'enableCache', 'cache', true);
 
+  if (!Array.isArray(config.watchIgnoredRegex) && config.watchIgnoredRegex != null) {
+    config.watchIgnoredRegex = [config.watchIgnoredRegex];
+  }
+  config.watchIgnoredRegex = ((config.watchIgnoredRegex as RegExp[]) || []).reduce((arr, reg) => {
+    if (reg instanceof RegExp) {
+      arr.push(reg);
+    }
+    return arr;
+  }, [] as RegExp[]);
+
   return {
     config,
     diagnostics,
