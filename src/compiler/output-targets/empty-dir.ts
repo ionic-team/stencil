@@ -2,7 +2,6 @@ import type * as d from '../../declarations';
 import {
   isOutputTargetDist,
   isOutputTargetDistLazyLoader,
-  isOutputTargetDistSelfContained,
   isOutputTargetHydrate,
   isOutputTargetWww,
   isOutputTargetDistCustomElements,
@@ -11,7 +10,11 @@ import {
 } from './output-utils';
 import { isString } from '@utils';
 
-type OutputTargetEmptiable = d.OutputTargetDist | d.OutputTargetWww | d.OutputTargetDistLazyLoader | d.OutputTargetDistSelfContained | d.OutputTargetHydrate;
+type OutputTargetEmptiable =
+  | d.OutputTargetDist
+  | d.OutputTargetWww
+  | d.OutputTargetDistLazyLoader
+  | d.OutputTargetHydrate;
 
 const isEmptable = (o: d.OutputTarget): o is OutputTargetEmptiable =>
   isOutputTargetDist(o) ||
@@ -20,7 +23,6 @@ const isEmptable = (o: d.OutputTarget): o is OutputTargetEmptiable =>
   isOutputTargetWww(o) ||
   isOutputTargetDistLazy(o) ||
   isOutputTargetDistLazyLoader(o) ||
-  isOutputTargetDistSelfContained(o) ||
   isOutputTargetHydrate(o);
 
 export const emptyOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {

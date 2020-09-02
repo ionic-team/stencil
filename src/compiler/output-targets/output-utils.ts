@@ -14,17 +14,26 @@ export const relativeImport = (pathFrom: string, pathTo: string, ext?: string, a
   return normalizePath(`${relativePath}/${basename(pathTo, ext)}`);
 };
 
-export const getDistEsmDir = (outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) => join(outputTarget.buildDir, 'esm', sourceTarget || '');
+export const getDistEsmDir = (outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) =>
+  join(outputTarget.buildDir, 'esm', sourceTarget || '');
 
-export const getDistEsmComponentsDir = (outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) => join(getDistEsmDir(outputTarget, sourceTarget), 'build');
+export const getDistEsmComponentsDir = (outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) =>
+  join(getDistEsmDir(outputTarget, sourceTarget), 'build');
 
-export const getDistEsmIndexPath = (outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) => join(getDistEsmDir(outputTarget, sourceTarget), 'index.js');
+export const getDistEsmIndexPath = (outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) =>
+  join(getDistEsmDir(outputTarget, sourceTarget), 'index.js');
 
-export const getDefineCustomElementsPath = (config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) =>
-  join(getDistEsmDir(outputTarget, sourceTarget), getDefineEsmFilename(config));
+export const getDefineCustomElementsPath = (
+  config: d.Config,
+  outputTarget: d.OutputTargetDist,
+  sourceTarget: d.SourceTarget,
+) => join(getDistEsmDir(outputTarget, sourceTarget), getDefineEsmFilename(config));
 
-export const getComponentsEsmBuildPath = (config: d.Config, outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) =>
-  join(getDistEsmDir(outputTarget, sourceTarget), getComponentsEsmFileName(config));
+export const getComponentsEsmBuildPath = (
+  config: d.Config,
+  outputTarget: d.OutputTargetDist,
+  sourceTarget: d.SourceTarget,
+) => join(getDistEsmDir(outputTarget, sourceTarget), getComponentsEsmFileName(config));
 
 export const getCoreEsmFileName = (config: d.Config) => `${config.fsNamespace}.core.js`;
 
@@ -32,19 +41,25 @@ export const getDefineEsmFilename = (config: d.Config) => `${config.fsNamespace}
 
 export const getComponentsEsmFileName = (config: d.Config) => `${config.fsNamespace}.components.js`;
 
-export const getLoaderEsmPath = (outputTarget: d.OutputTargetDist) => join(outputTarget.buildDir, outputTarget.esmLoaderPath);
+export const getLoaderEsmPath = (outputTarget: d.OutputTargetDist) =>
+  join(outputTarget.buildDir, outputTarget.esmLoaderPath);
 
 export const getComponentsDtsSrcFilePath = (config: d.Config) => join(config.srcDir, GENERATED_DTS);
 
-export const getComponentsDtsTypesFilePath = (outputTarget: d.OutputTargetDist | d.OutputTargetDistTypes) => join(outputTarget.typesDir, GENERATED_DTS);
+export const getComponentsDtsTypesFilePath = (outputTarget: d.OutputTargetDist | d.OutputTargetDistTypes) =>
+  join(outputTarget.typesDir, GENERATED_DTS);
 
 export const isOutputTargetDist = (o: d.OutputTarget): o is d.OutputTargetDist => o.type === DIST;
 
-export const isOutputTargetDistCollection = (o: d.OutputTarget): o is d.OutputTargetDistCollection => o.type === DIST_COLLECTION;
+export const isOutputTargetDistCollection = (o: d.OutputTarget): o is d.OutputTargetDistCollection =>
+  o.type === DIST_COLLECTION;
 
-export const isOutputTargetDistCustomElements = (o: d.OutputTarget): o is d.OutputTargetDistCustomElements => o.type === DIST_CUSTOM_ELEMENTS;
+export const isOutputTargetDistCustomElements = (o: d.OutputTarget): o is d.OutputTargetDistCustomElements =>
+  o.type === DIST_CUSTOM_ELEMENTS;
 
-export const isOutputTargetDistCustomElementsBundle = (o: d.OutputTarget): o is d.OutputTargetDistCustomElementsBundle => o.type === DIST_CUSTOM_ELEMENTS_BUNDLE;
+export const isOutputTargetDistCustomElementsBundle = (
+  o: d.OutputTarget,
+): o is d.OutputTargetDistCustomElementsBundle => o.type === DIST_CUSTOM_ELEMENTS_BUNDLE;
 
 export const isOutputTargetCopy = (o: d.OutputTarget): o is d.OutputTargetCopy => o.type === COPY;
 
@@ -52,17 +67,19 @@ export const isOutputTargetDistLazy = (o: d.OutputTarget): o is d.OutputTargetDi
 
 export const isOutputTargetAngular = (o: d.OutputTarget): o is d.OutputTargetAngular => o.type === ANGULAR;
 
-export const isOutputTargetDistLazyLoader = (o: d.OutputTarget): o is d.OutputTargetDistLazyLoader => o.type === DIST_LAZY_LOADER;
+export const isOutputTargetDistLazyLoader = (o: d.OutputTarget): o is d.OutputTargetDistLazyLoader =>
+  o.type === DIST_LAZY_LOADER;
 
-export const isOutputTargetDistGlobalStyles = (o: d.OutputTarget): o is d.OutputTargetDistGlobalStyles => o.type === DIST_GLOBAL_STYLES;
-
-export const isOutputTargetDistSelfContained = (o: d.OutputTarget): o is d.OutputTargetDistSelfContained => o.type === DIST_SELF_CONTAINED;
+export const isOutputTargetDistGlobalStyles = (o: d.OutputTarget): o is d.OutputTargetDistGlobalStyles =>
+  o.type === DIST_GLOBAL_STYLES;
 
 export const isOutputTargetHydrate = (o: d.OutputTarget): o is d.OutputTargetHydrate => o.type === DIST_HYDRATE_SCRIPT;
 
 export const isOutputTargetCustom = (o: d.OutputTarget): o is d.OutputTargetCustom => o.type === CUSTOM;
 
-export const isOutputTargetDocs = (o: d.OutputTarget): o is d.OutputTargetDocsJson | d.OutputTargetDocsReadme | d.OutputTargetDocsVscode | d.OutputTargetDocsCustom =>
+export const isOutputTargetDocs = (
+  o: d.OutputTarget,
+): o is d.OutputTargetDocsJson | d.OutputTargetDocsReadme | d.OutputTargetDocsVscode | d.OutputTargetDocsCustom =>
   o.type === DOCS_README || o.type === DOCS_JSON || o.type === DOCS_CUSTOM || o.type === DOCS_VSCODE;
 
 export const isOutputTargetDocsReadme = (o: d.OutputTarget): o is d.OutputTargetDocsReadme => o.type === DOCS_README;
@@ -79,7 +96,8 @@ export const isOutputTargetStats = (o: d.OutputTarget): o is d.OutputTargetStats
 
 export const isOutputTargetDistTypes = (o: d.OutputTarget): o is d.OutputTargetDistTypes => o.type === DIST_TYPES;
 
-export const getComponentsFromModules = (moduleFiles: d.Module[]) => sortBy(flatOne(moduleFiles.map(m => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
+export const getComponentsFromModules = (moduleFiles: d.Module[]) =>
+  sortBy(flatOne(moduleFiles.map(m => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
 
 export const canSkipOutputTargets = (buildCtx: d.BuildCtx) => {
   if (buildCtx.components.length === 0) {
@@ -106,7 +124,6 @@ export const DIST_TYPES = `dist-types`;
 export const DIST_HYDRATE_SCRIPT = `dist-hydrate-script`;
 export const DIST_LAZY = `dist-lazy`;
 export const DIST_LAZY_LOADER = `dist-lazy-loader`;
-export const DIST_SELF_CONTAINED = `dist-self-contained`;
 export const DIST_GLOBAL_STYLES = 'dist-global-styles';
 export const DOCS_CUSTOM = 'docs-custom';
 export const DOCS_JSON = `docs-json`;
@@ -125,7 +142,6 @@ export const VALID_TYPES = [
   DIST_GLOBAL_STYLES,
   DIST_HYDRATE_SCRIPT,
   DIST_LAZY,
-  DIST_SELF_CONTAINED,
   DOCS_JSON,
   DOCS_README,
   DOCS_VSCODE,
