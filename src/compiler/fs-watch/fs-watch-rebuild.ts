@@ -1,6 +1,7 @@
 import type * as d from '../../declarations';
 import { basename } from 'path';
 import { isString, unique } from '@utils';
+import { isOutputTargetDocsJson, isOutputTargetStats, isOutputTargetDocsVscode } from '../output-targets/output-utils';
 
 export const filesChanged = (buildCtx: d.BuildCtx) => {
   // files changed include updated, added and deleted
@@ -80,9 +81,20 @@ export const updateCacheFromRebuild = (compilerCtx: d.CompilerCtx, buildCtx: d.B
 
 export const isWatchIgnorePath = (config: d.Config, path: string) => {
   if (isString(path)) {
-    return (config.watchIgnoredRegex as RegExp[]).some(reg => {
-      return reg.test(path);
-    });
+    const isWatchIgnore = (config.watchIgnoredRegex as RegExp[]).some(reg => reg.test(path));
+    if (isWatchIgnore) {
+      return true;
+    }
+    const outputTargets = config.outputTargets;
+    const ignoreFiles = [
+      ...outputTargets.filter(isOutputTargetDocsJson).map(o => o.file),
+      ...outputTargets.filter(isOutputTargetDocsJson).map(o => o.typesFile),
+      ...outputTargets.filter(isOutputTargetStats).map(o => o.file),
+      ...outputTargets.filter(isOutputTargetDocsVscode).map(o => o.file),
+    ];
+    if (ignoreFiles.includes(path)) {
+      return true;
+    }
   }
   return false;
 };

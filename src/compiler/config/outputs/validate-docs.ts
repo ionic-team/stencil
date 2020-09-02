@@ -1,14 +1,19 @@
 import type * as d from '../../../declarations';
-import { buildError } from '@utils';
+import { buildError, isFunction, isString } from '@utils';
 import { isAbsolute, join } from 'path';
-import { isOutputTargetDocsCustom, isOutputTargetDocsJson, isOutputTargetDocsReadme, isOutputTargetDocsVscode } from '../../output-targets/output-utils';
+import {
+  isOutputTargetDocsCustom,
+  isOutputTargetDocsJson,
+  isOutputTargetDocsReadme,
+  isOutputTargetDocsVscode,
+} from '../../output-targets/output-utils';
 import { NOTE } from '../../docs/constants';
 
 export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
   const docsOutputs: d.OutputTarget[] = [];
 
   // json docs flag
-  if (typeof config.flags.docsJson === 'string') {
+  if (isString(config.flags.docsJson)) {
     docsOutputs.push(
       validateJsonDocsOutputTarget(config, diagnostics, {
         type: 'docs-json',
@@ -52,7 +57,7 @@ export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], user
 };
 
 const validateReadmeOutputTarget = (config: d.Config, outputTarget: d.OutputTargetDocsReadme) => {
-  if (typeof outputTarget.dir !== 'string') {
+  if (!isString(outputTarget.dir)) {
     outputTarget.dir = config.srcDir;
   }
 
@@ -67,14 +72,18 @@ const validateReadmeOutputTarget = (config: d.Config, outputTarget: d.OutputTarg
   return outputTarget;
 };
 
-const validateJsonDocsOutputTarget = (config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsJson) => {
-  if (typeof outputTarget.file !== 'string') {
+const validateJsonDocsOutputTarget = (
+  config: d.Config,
+  diagnostics: d.Diagnostic[],
+  outputTarget: d.OutputTargetDocsJson,
+) => {
+  if (!isString(outputTarget.file)) {
     const err = buildError(diagnostics);
     err.messageText = `docs-json outputTarget missing the "file" option`;
   }
 
   outputTarget.file = join(config.rootDir, outputTarget.file);
-  if (typeof outputTarget.typesFile === 'string') {
+  if (isString(outputTarget.typesFile)) {
     outputTarget.typesFile = join(config.rootDir, outputTarget.typesFile);
   } else if (outputTarget.typesFile !== null && outputTarget.file.endsWith('.json')) {
     outputTarget.typesFile = outputTarget.file.replace(/\.json$/, '.d.ts');
@@ -84,7 +93,7 @@ const validateJsonDocsOutputTarget = (config: d.Config, diagnostics: d.Diagnosti
 };
 
 const validateCustomDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsCustom) => {
-  if (typeof outputTarget.generator !== 'function') {
+  if (!isFunction(outputTarget.generator)) {
     const err = buildError(diagnostics);
     err.messageText = `docs-custom outputTarget missing the "generator" function`;
   }
@@ -94,7 +103,7 @@ const validateCustomDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarge
 };
 
 const validateVScodeDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsVscode) => {
-  if (typeof outputTarget.file !== 'string') {
+  if (!isString(outputTarget.file)) {
     const err = buildError(diagnostics);
     err.messageText = `docs-vscode outputTarget missing the "file" path`;
   }
