@@ -8,6 +8,7 @@ export const taskTest = async (config: Config) => {
   }
 
   try {
+    config.buildDocs = false;
     const testingRunOpts: TestingRunOptions = {
       e2e: !!config.flags.e2e,
       screenshot: !!config.flags.screenshot,

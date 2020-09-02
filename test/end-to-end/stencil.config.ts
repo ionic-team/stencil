@@ -39,6 +39,10 @@ export const config: Config = {
     {
       type: 'dist-hydrate-script',
     },
+    {
+      type: 'docs-json',
+      file: 'docs.json',
+    },
     reactOutputTarget({
       componentCorePackage: '@stencil/e2e-react-output-target',
       proxiesFile: './dist-react/components.ts',

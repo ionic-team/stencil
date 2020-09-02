@@ -42,4 +42,7 @@ fs.accessSync(path.join(wwwDir, 'index.html'));
 
 fs.accessSync(path.join(__dirname, 'dist-react', 'components.ts'));
 
+fs.accessSync(path.join(__dirname, 'docs.json'));
+fs.accessSync(path.join(__dirname, 'docs.d.ts'));
+
 console.log('🍄  validated test/end-to-end/dist files\n');
