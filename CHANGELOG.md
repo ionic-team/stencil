@@ -30,7 +30,7 @@
 
 In keeping with [Semver](https://semver.org/), Stencil `2.0.0` was released due to changes in the API (mainly from some updates to the config API).
 
-But even though this is a new major version, there are few [BREAKING CHANGES](BREAKING_CHANGE.md), and any changes will be flagged and described by the compiler during development. For the most part, most of the changes are removal of deprecated APIs that have been printing out warning logs for quite some time now.
+But even though this is a new major version, there are few [BREAKING CHANGES](BREAKING_CHANGES.md), and any changes will be flagged and described by the compiler during development. For the most part, most of the changes are removal of deprecated APIs that have been printing out warning logs for quite some time now.
 
 
 ### TypeScript 4
