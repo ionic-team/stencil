@@ -89,6 +89,8 @@ With the major release, now's a good time to update the minimum and recommended 
 * [Node Releases](https://nodejs.org/en/about/releases/)
 * [node.green](https://node.green/)
 
+*****
+
 # Stencil One
 
 Most of the updates for the `1.0.0` release involve removing custom APIs, and continuing to leverage web-standards in order to generate future-proof components that scale.
