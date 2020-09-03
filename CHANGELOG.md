@@ -1,3 +1,17 @@
+## 🍮 [2.0.3](https://github.com/ionic-team/stencil/compare/v2.0.2...v2.0.3) (2020-09-03)
+
+
+### Bug Fixes
+
+* **watch:** do not rebuild on docs output target file changes ([4529de7](https://github.com/ionic-team/stencil/commit/4529de75171f6702f3c277208bdb5b85298e9417))
+
+
+### Features
+
+* **worker:** can import Build from @stencil/core ([3058143](https://github.com/ionic-team/stencil/commit/30581437481f1375ee267c0e4387f40c66eefa7b))
+
+
+
 ## 🐡 [2.0.2](https://github.com/ionic-team/stencil/compare/v2.0.1...v2.0.2) (2020-09-02)
 
 
