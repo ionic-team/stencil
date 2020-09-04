@@ -8,7 +8,7 @@ import type * as puppeteer from 'puppeteer';
 declare const global: JestEnvironmentGlobal;
 
 const env: E2EProcessEnv = process.env;
-export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage> {
+export async function newE2EPage(opts: NewE2EPageOptions & { timeout?: number } = {}): Promise<E2EPage> {
   if (!global.__NEW_TEST_PAGE__) {
     throw new Error(`newE2EPage() is only available from E2E tests, and ran with the --e2e cmd line flag.`);
   }
@@ -143,7 +143,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
     });
 
     if (typeof opts.html === 'string') {
-      await e2eSetContent(page, opts.html, { waitUntil: opts.waitUntil });
+      await e2eSetContent(page, opts.html, { waitUntil: opts.waitUntil, timeout: opts.timeout });
     } else if (typeof opts.url === 'string') {
       await e2eGoTo(page, opts.url, { waitUntil: opts.waitUntil });
     } else {
@@ -195,7 +195,7 @@ async function e2eGoTo(page: E2EPageInternal, url: string, options: puppeteer.Na
   return rsp;
 }
 
-async function e2eSetContent(page: E2EPageInternal, html: string, options: puppeteer.NavigationOptions = {}) {
+async function e2eSetContent(page: E2EPageInternal, html: string, options: puppeteer.NavigationOptions & { timeout?: number } = {}) {
   if (page.isClosed()) {
     throw new Error('e2eSetContent unavailable: page already closed');
   }
@@ -253,16 +253,16 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: puppe
     throw new Error(`Testing unable to load content`);
   }
 
-  await waitForStencil(page);
+  await waitForStencil(page, { timeout: options.timeout } );
 
   return rsp;
 }
 
-async function waitForStencil(page: E2EPage) {
+async function waitForStencil(page: E2EPage, { timeout }:{ timeout?: number} = { timeout: 4750 }) {
   try {
-    await page.waitForFunction('window.stencilAppLoaded', { timeout: 4750 });
+    await page.waitForFunction('window.stencilAppLoaded', { timeout });
   } catch (e) {
-    throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
+    throw new Error(`App did not load in allowed time (${timeout}ms). Please ensure the content loads a stencil application.`);
   }
 }
 
