@@ -49,7 +49,7 @@ In keeping with [Semver](https://semver.org/), Stencil `2.0.0` was released due 
 
 * **config:** update config extra defaults to not build IE11, Edge 16-18 and Safari 10 by default ([363bf59](https://github.com/ionic-team/stencil/commit/363bf59fc9212a771a766c21909263d6c4ccdf18))
 
-A change in Stencil 2 is that the IE11, Edge 16-18 and Safari 10 builds will not be enabled by default. However, the ability to opt-in is still available, and can be enabled by setting each `extras` config flag to `true`. And advantages of this is less runtime within your builds. See the [config.extras docs](https://stenciljs.com/docs/config-extras) for more info.
+A change in Stencil 2 is that the IE11, Edge 16-18 and Safari 10 builds will not be enabled by default. However, the ability to opt-in is still available, and can be enabled by setting each `extras` config flag to `true`. An advantage of this is less runtime within your builds. See the [config.extras docs](https://stenciljs.com/docs/config-extras) for more info.
 
 
 ### Opt-in for ES5 and SystemJS Builds
