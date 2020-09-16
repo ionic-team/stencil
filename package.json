@@ -98,7 +98,7 @@
     "magic-string": "^0.25.7",
     "mime-db": "^1.44.0",
     "minimatch": "3.0.4",
-    "node-fetch": "2.6.0",
+    "node-fetch": "2.6.1",
     "open": "7.1.0",
     "open-in-editor": "2.2.0",
     "parse5": "6.0.1",
