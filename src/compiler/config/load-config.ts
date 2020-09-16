@@ -1,9 +1,10 @@
 import type { CompilerSystem, Config, Diagnostic, LoadConfigInit, LoadConfigResults } from '../../declarations';
-import { buildError, catchError, isString, normalizePath, hasError } from '@utils';
+import { buildError, catchError, hasError, isString, normalizePath } from '@utils';
 import { createLogger } from '../sys/logger/console-logger';
 import { createSystem } from '../sys/stencil-sys';
-import { dirname, resolve } from 'path';
+import { dirname } from 'path';
 import { IS_NODE_ENV } from '../sys/environment';
+import { nodeRequire } from '../sys/node-require';
 import { validateConfig } from './validate-config';
 import { validateTsConfig } from '../sys/typescript/typescript-config';
 import ts from 'typescript';
@@ -116,32 +117,9 @@ const evaluateConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[]
 
   try {
     if (IS_NODE_ENV) {
-      // ensure we cleared out node's internal require() cache for this file
-      delete require.cache[resolve(configFilePath)];
-
-      // let's override node's require for a second
-      // don't worry, we'll revert this when we're done
-      require.extensions['.ts'] = (module: NodeModuleWithCompile, filename: string) => {
-        let sourceText = sys.readFileSync(filename, 'utf8');
-
-        if (configFilePath.endsWith('.ts')) {
-          // looks like we've got a typed config file
-          // let's transpile it to .js quick
-          sourceText = transpileTypedConfig(diagnostics, sourceText, configFilePath);
-        } else {
-          // quick hack to turn a modern es module
-          // into and old school commonjs module
-          sourceText = sourceText.replace(/export\s+\w+\s+(\w+)/gm, 'exports.$1');
-        }
-
-        module._compile(sourceText, filename);
-      };
-
-      // let's do this!
-      configFileData = require(configFilePath);
-
-      // all set, let's go ahead and reset the require back to the default
-      require.extensions['.ts'] = undefined;
+      const results = nodeRequire(configFilePath);
+      diagnostics.push(...results.diagnostics);
+      configFileData = results.module;
     } else {
       // browser environment, can't use node's require() to evaluate
       let sourceText = await sys.readFile(configFilePath);
@@ -183,7 +161,3 @@ const transpileTypedConfig = (diagnostics: Diagnostic[], sourceText: string, fil
 
   return output.outputText;
 };
-
-interface NodeModuleWithCompile extends NodeModule {
-  _compile(code: string, filename: string): any;
-}

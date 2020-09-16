@@ -15,6 +15,7 @@ export { createWorkerContext } from './worker/worker-thread';
 export { createWorkerMessageHandler } from './worker/worker-thread';
 export { dependencies } from './sys/dependencies.json';
 export { loadConfig } from './config/load-config';
+export { nodeRequire } from './sys/node-require';
 export { optimizeCss } from './optimize/optimize-css';
 export { optimizeJs } from './optimize/optimize-js';
 export { path } from './sys/modules/path';
