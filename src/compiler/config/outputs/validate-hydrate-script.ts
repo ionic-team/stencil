@@ -1,7 +1,13 @@
 import type * as d from '../../../declarations';
-import { DIST_HYDRATE_SCRIPT, isOutputTargetDist, isOutputTargetHydrate, isOutputTargetWww } from '../../output-targets/output-utils';
+import {
+  DIST_HYDRATE_SCRIPT,
+  isOutputTargetDist,
+  isOutputTargetHydrate,
+  isOutputTargetWww,
+} from '../../output-targets/output-utils';
 import { isBoolean, isString } from '@utils';
 import { isAbsolute, join } from 'path';
+import { NODE_BUILTINS } from '../../sys/modules';
 
 export const validateHydrateScript = (config: d.Config, userOutputs: d.OutputTarget[]) => {
   const output: d.OutputTargetHydrate[] = [];
@@ -13,8 +19,9 @@ export const validateHydrateScript = (config: d.Config, userOutputs: d.OutputTar
     // let's still see if we require one because of other output targets
 
     const hasWwwOutput = userOutputs.filter(isOutputTargetWww).some(o => isString(o.indexHtml));
+    const shouldBuildHydrate = config?.flags.prerender || config?.flags.ssr;
 
-    if (hasWwwOutput && config.flags && config.flags.prerender) {
+    if (hasWwwOutput && shouldBuildHydrate) {
       // we're prerendering a www output target, so we'll need a hydrate app
       let hydrateDir: string;
       const distOutput = userOutputs.find(isOutputTargetDist);
@@ -47,6 +54,11 @@ export const validateHydrateScript = (config: d.Config, userOutputs: d.OutputTar
     if (!isBoolean(outputTarget.empty)) {
       outputTarget.empty = true;
     }
+
+    outputTarget.external = outputTarget.external || [];
+
+    outputTarget.external.push(...NODE_BUILTINS);
+
     output.push(outputTarget);
   });
 

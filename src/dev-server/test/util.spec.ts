@@ -1,5 +1,11 @@
 import type * as d from '@stencil/core/declarations';
-import { getBrowserUrl, getDevServerClientUrl } from '../dev-server-utils';
+import {
+  getBrowserUrl,
+  getDevServerClientUrl,
+  getSsrStaticDataPath,
+  isExtensionLessPath,
+  isSsrStaticDataPath,
+} from '../dev-server-utils';
 import { DEV_SERVER_URL } from '../dev-server-constants';
 
 describe('dev-server, util', () => {
@@ -140,5 +146,33 @@ describe('getDevServerClientUrl', () => {
     const host: string = null;
     const url = getDevServerClientUrl(devServerConfig, host, proto);
     expect(url).toBe(`${devServerConfig.protocol}://${devServerConfig.address}:3333/my-base-url${DEV_SERVER_URL}`);
+  });
+
+  it('isExtensionLessPath', () => {
+    expect(isExtensionLessPath('http://stenciljs.com/')).toBe(true);
+    expect(isExtensionLessPath('http://stenciljs.com/blog')).toBe(true);
+    expect(isExtensionLessPath('http://stenciljs.com/blog/')).toBe(true);
+    expect(isExtensionLessPath('http://stenciljs.com/.')).toBe(false);
+    expect(isExtensionLessPath('http://stenciljs.com/data.json')).toBe(false);
+    expect(isExtensionLessPath('http://stenciljs.com/index.html')).toBe(false);
+    expect(isExtensionLessPath('http://stenciljs.com/blog.html')).toBe(false);
+  });
+
+  it('isSsrStaticDataPath', () => {
+    expect(isSsrStaticDataPath('http://stenciljs.com/')).toBe(false);
+    expect(isSsrStaticDataPath('http://stenciljs.com/index.html')).toBe(false);
+    expect(isSsrStaticDataPath('http://stenciljs.com/page.state.json')).toBe(true);
+  });
+
+  it('getSsrStaticDataPath', () => {
+    let r = getSsrStaticDataPath('http://stenciljs.com/page.static.json');
+    expect(r.fileName).toBe('page.static.json');
+    expect(r.hasQueryString).toBe(false);
+    expect(r.ssrPath).toBe('http://stenciljs.com');
+
+    r = getSsrStaticDataPath('http://stenciljs.com/blog/page.static.json?1234');
+    expect(r.fileName).toBe('page.static.json');
+    expect(r.hasQueryString).toBe(true);
+    expect(r.ssrPath).toBe('http://stenciljs.com/blog');
   });
 });

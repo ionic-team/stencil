@@ -131,15 +131,19 @@ function startServer(
 
   const requestLog = (msg: DevServerMessage) => {
     if (devServerConfig.logRequests) {
-      let statusMsg: any;
-      if (msg.requestLog.status >= 400) {
-        statusMsg = logger.red(msg.requestLog.method);
+      if (msg.requestLog.status >= 500) {
+        logger.info(logger.red(`${msg.requestLog.method} ${msg.requestLog.url} (${msg.requestLog.status})`));
+      } else if (msg.requestLog.status >= 400) {
+        logger.info(
+          logger.dim(logger.red(`${msg.requestLog.method} ${msg.requestLog.url} (${msg.requestLog.status})`)),
+        );
       } else if (msg.requestLog.status >= 300) {
-        statusMsg = logger.magenta(msg.requestLog.method);
+        logger.info(
+          logger.dim(logger.magenta(`${msg.requestLog.method} ${msg.requestLog.url} (${msg.requestLog.status})`)),
+        );
       } else {
-        statusMsg = logger.cyan(msg.requestLog.method);
+        logger.info(logger.dim(`${logger.cyan(msg.requestLog.method)} ${msg.requestLog.url}`));
       }
-      logger.info(logger.dim(`${statusMsg} ${msg.requestLog.url}`));
     }
   };
 

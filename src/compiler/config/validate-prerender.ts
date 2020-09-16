@@ -1,9 +1,9 @@
 import type * as d from '../../declarations';
-import { buildError, normalizePath } from '@utils';
+import { buildError, isString, normalizePath } from '@utils';
 import { isAbsolute, join } from 'path';
 
 export const validatePrerender = (config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetWww) => {
-  if (!config.flags || (!config.flags.prerender && config.flags.task !== 'prerender')) {
+  if (!config.flags || (!config.flags.ssr && !config.flags.prerender && config.flags.task !== 'prerender')) {
     return;
   }
 
@@ -25,7 +25,7 @@ export const validatePrerender = (config: d.Config, diagnostics: d.Diagnostic[],
     outputTarget.baseUrl += '/';
   }
 
-  if (typeof outputTarget.prerenderConfig === 'string') {
+  if (isString(outputTarget.prerenderConfig)) {
     if (!isAbsolute(outputTarget.prerenderConfig)) {
       outputTarget.prerenderConfig = join(config.rootDir, outputTarget.prerenderConfig);
     }

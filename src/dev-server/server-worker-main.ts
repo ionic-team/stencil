@@ -30,7 +30,7 @@ export function initServerProcessWorkerProxy(sendToMain: (msg: d.DevServerMessag
   // get a message from the worker and send it to main
   serverProcess.on('message', (msg: d.DevServerMessage) => {
     if (msg.serverClosed && serverProcess) {
-      serverProcess.kill();
+      serverProcess.kill('SIGINT');
       serverProcess = null;
     }
     sendToMain(msg);

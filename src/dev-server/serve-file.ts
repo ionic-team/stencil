@@ -2,7 +2,6 @@ import type * as d from '../declarations';
 import type { ServerResponse } from 'http';
 import * as util from './dev-server-utils';
 import { version } from '../version';
-import { serve500 } from './serve-500';
 import path from 'path';
 import fs from 'graceful-fs';
 import * as zlib from 'zlib';
@@ -10,15 +9,14 @@ import { Buffer } from 'buffer';
 
 export async function serveFile(
   devServerConfig: d.DevServerConfig,
-  sys: d.CompilerSystem,
+  serverCtx: d.DevServerContext,
   req: d.HttpRequest,
   res: ServerResponse,
-  sendMsg: d.DevServerSendMessage,
 ) {
   try {
     if (util.isSimpleText(req.filePath)) {
       // easy text file, use the internal cache
-      let content = await sys.readFile(req.filePath, 'utf8');
+      let content = await serverCtx.sys.readFile(req.filePath, 'utf8');
 
       if (devServerConfig.websocket && util.isHtmlFile(req.filePath) && !util.isDevServerClient(req.pathname)) {
         // auto inject our dev server script
@@ -66,9 +64,9 @@ export async function serveFile(
       fs.createReadStream(req.filePath).pipe(res);
     }
 
-    util.sendLogRequest(devServerConfig, req, 200, sendMsg);
+    serverCtx.logRequest(req, 200);
   } catch (e) {
-    serve500(devServerConfig, req, res, e, 'serveFile', sendMsg);
+    serverCtx.serve500(req, res, e, 'serveFile');
   }
 }
 
@@ -107,7 +105,7 @@ function updateStyleUrls(url: URL, oldCss: string) {
 
 const urlVersionIds = new Map<string, string>();
 
-function appendDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest, content: string) {
+export function appendDevServerClientScript(devServerConfig: d.DevServerConfig, req: d.HttpRequest, content: string) {
   const devServerClientUrl = util.getDevServerClientUrl(
     devServerConfig,
     req.headers?.['x-forwarded-host'] ?? req.host,

@@ -1,54 +1,42 @@
 import type * as d from '../declarations';
 import type { ServerResponse } from 'http';
-import { responseHeaders, sendLogRequest } from './dev-server-utils';
-import { serve404 } from './serve-404';
-import { serve500 } from './serve-500';
+import { responseHeaders } from './dev-server-utils';
 import { serveFile } from './serve-file';
 import path from 'path';
 
-let dirTemplate: string = null;
-
 export async function serveDirectoryIndex(
   devServerConfig: d.DevServerConfig,
-  sys: d.CompilerSystem,
+  serverCtx: d.DevServerContext,
   req: d.HttpRequest,
   res: ServerResponse,
-  sendMsg: d.DevServerSendMessage,
 ) {
-  try {
-    const indexFilePath = path.join(req.filePath, 'index.html');
-
-    req.stats = await sys.stat(indexFilePath);
-    if (req.stats.isFile) {
-      req.filePath = indexFilePath;
-      return serveFile(devServerConfig, sys, req, res, sendMsg);
-    }
-  } catch (e) {}
+  const indexFilePath = path.join(req.filePath, 'index.html');
+  req.stats = await serverCtx.sys.stat(indexFilePath);
+  if (req.stats.isFile) {
+    req.filePath = indexFilePath;
+    return serveFile(devServerConfig, serverCtx, req, res);
+  }
 
   if (!req.pathname.endsWith('/')) {
-    sendLogRequest(devServerConfig, req, 302, sendMsg);
-    res.writeHead(302, {
-      location: req.pathname + '/',
-    });
-    return res.end();
+    return serverCtx.serve302(req, res, req.pathname + '/');
   }
 
   try {
-    const dirFilePaths = await sys.readDir(req.filePath);
+    const dirFilePaths = await serverCtx.sys.readDir(req.filePath);
 
     try {
-      if (dirTemplate == null) {
+      if (serverCtx.dirTemplate == null) {
         const dirTemplatePath = path.join(devServerConfig.devServerDir, 'templates', 'directory-index.html');
-        dirTemplate = sys.readFileSync(dirTemplatePath);
+        serverCtx.dirTemplate = serverCtx.sys.readFileSync(dirTemplatePath);
       }
-      const files = await getFiles(sys, req.url, dirFilePaths);
+      const files = await getFiles(serverCtx.sys, req.url, dirFilePaths);
 
-      const templateHtml = (await dirTemplate)
+      const templateHtml = serverCtx.dirTemplate
         .replace('{{title}}', getTitle(req.pathname))
         .replace('{{nav}}', getName(req.pathname))
         .replace('{{files}}', files);
 
-      sendLogRequest(devServerConfig, req, 200, sendMsg);
+      serverCtx.logRequest(req, 200);
 
       res.writeHead(
         200,
@@ -61,10 +49,10 @@ export async function serveDirectoryIndex(
       res.write(templateHtml);
       res.end();
     } catch (e) {
-      serve500(devServerConfig, req, res, e, 'serveDirectoryIndex', sendMsg);
+      return serverCtx.serve500(req, res, e, 'serveDirectoryIndex');
     }
   } catch (e) {
-    serve404(devServerConfig, req, res, 'serveDirectoryIndex', sendMsg);
+    return serverCtx.serve404(req, res, 'serveDirectoryIndex');
   }
 }
 

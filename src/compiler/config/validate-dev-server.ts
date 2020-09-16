@@ -72,6 +72,19 @@ export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[])
     devServer.websocket = true;
   }
 
+  if (config?.flags?.ssr) {
+    devServer.ssr = true;
+  } else {
+    devServer.ssr = !!devServer.ssr;
+  }
+
+  if (devServer.ssr) {
+    const wwwOutput = config.outputTargets.find(isOutputTargetWww);
+    devServer.prerenderConfig = wwwOutput?.prerenderConfig;
+  }
+
+  devServer.srcIndexHtml = config.srcIndexHtml;
+
   if (devServer.protocol !== 'http' && devServer.protocol !== 'https') {
     devServer.protocol = devServer.https ? 'https' : addressProtocol ? addressProtocol : 'http';
   }

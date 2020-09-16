@@ -4,13 +4,9 @@ import * as http from 'http';
 import * as https from 'https';
 import * as net from 'net';
 
-export function createHttpServer(
-  devServerConfig: d.DevServerConfig,
-  sys: d.CompilerSystem,
-  sendMsg: d.DevServerSendMessage,
-) {
+export function createHttpServer(devServerConfig: d.DevServerConfig, serverCtx: d.DevServerContext) {
   // create our request handler
-  const reqHandler = createRequestHandler(devServerConfig, sys, sendMsg);
+  const reqHandler = createRequestHandler(devServerConfig, serverCtx);
 
   const credentials = devServerConfig.https;
 

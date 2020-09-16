@@ -187,6 +187,7 @@ const ARG_OPTS = {
     'serve',
     'skip-node-check',
     'spec',
+    'ssr',
     'stats',
     'update-screenshot',
     'verbose',

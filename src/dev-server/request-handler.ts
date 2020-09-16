@@ -1,61 +1,57 @@
 import type * as d from '../declarations';
 import type { IncomingMessage, ServerResponse } from 'http';
-import { isDevClient, isDevModule, sendLogRequest } from './dev-server-utils';
+import { isDevClient, isDevModule, isExtensionLessPath, isSsrStaticDataPath } from './dev-server-utils';
 import { normalizePath } from '@utils';
 import { serveDevClient } from './serve-dev-client';
-import { serveFile } from './serve-file';
-import { serve404, serve404Content } from './serve-404';
-import { serve500 } from './serve-500';
-import { serveCompilerRequest } from './serve-compiler-request';
+import { serveDevNodeModule } from './serve-dev-node-module';
 import { serveDirectoryIndex } from './serve-directory-index';
+import { serveFile } from './serve-file';
+import { ssrPageRequest, ssrStaticDataRequest } from './ssr-request';
 import path from 'path';
 
-export function createRequestHandler(
-  devServerConfig: d.DevServerConfig,
-  sys: d.CompilerSystem,
-  sendMsg: d.DevServerSendMessage,
-) {
+export function createRequestHandler(devServerConfig: d.DevServerConfig, serverCtx: d.DevServerContext) {
   return async function (incomingReq: IncomingMessage, res: ServerResponse) {
     try {
       const req = normalizeHttpRequest(devServerConfig, incomingReq);
 
       if (!req.url) {
-        res.writeHead(302, { location: '/' });
-        sendLogRequest(devServerConfig, req, 302, sendMsg);
-        return res.end();
+        return serverCtx.serve302(req, res);
       }
 
       if (isDevClient(req.pathname) && devServerConfig.websocket) {
-        return serveDevClient(devServerConfig, sys, req, res, sendMsg);
+        return serveDevClient(devServerConfig, serverCtx, req, res);
       }
 
       if (isDevModule(req.pathname)) {
-        return serveCompilerRequest(devServerConfig, req, res, sendMsg);
+        return serveDevNodeModule(serverCtx, req, res);
       }
 
       if (!isValidUrlBasePath(devServerConfig.basePath, req.url)) {
-        sendLogRequest(devServerConfig, req, 404, sendMsg);
-
-        return serve404Content(
-          devServerConfig,
+        return serverCtx.serve404(
           req,
           res,
-          `404 File Not Found, base path: ${devServerConfig.basePath}`,
           `invalid basePath`,
-          sendMsg,
+          `404 File Not Found, base path: ${devServerConfig.basePath}`,
         );
       }
 
-      try {
-        req.stats = await sys.stat(req.filePath);
-        if (req.stats.isFile) {
-          return serveFile(devServerConfig, sys, req, res, sendMsg);
+      if (devServerConfig.ssr) {
+        if (isExtensionLessPath(req.url.pathname)) {
+          return ssrPageRequest(devServerConfig, serverCtx, req, res);
         }
+        if (isSsrStaticDataPath(req.url.pathname)) {
+          return ssrStaticDataRequest(devServerConfig, serverCtx, req, res);
+        }
+      }
 
-        if (req.stats.isDirectory) {
-          return serveDirectoryIndex(devServerConfig, sys, req, res, sendMsg);
-        }
-      } catch (e) {}
+      req.stats = await serverCtx.sys.stat(req.filePath);
+      if (req.stats.isFile) {
+        return serveFile(devServerConfig, serverCtx, req, res);
+      }
+
+      if (req.stats.isDirectory) {
+        return serveDirectoryIndex(devServerConfig, serverCtx, req, res);
+      }
 
       const xSource = ['notfound'];
       const validHistoryApi = isValidHistoryApi(devServerConfig, req);
@@ -66,32 +62,33 @@ export function createRequestHandler(
           const indexFilePath = path.join(devServerConfig.root, devServerConfig.historyApiFallback.index);
           xSource.push(`indexFilePath: ${indexFilePath}`);
 
-          req.stats = await sys.stat(indexFilePath);
+          req.stats = await serverCtx.sys.stat(indexFilePath);
           if (req.stats.isFile) {
             req.filePath = indexFilePath;
-            return serveFile(devServerConfig, sys, req, res, sendMsg);
+            return serveFile(devServerConfig, serverCtx, req, res);
           }
         } catch (e) {
           xSource.push(`notfound error: ${e}`);
         }
       }
 
-      serve404(devServerConfig, req, res, xSource.join(', '), sendMsg);
+      return serverCtx.serve404(req, res, xSource.join(', '));
     } catch (e) {
-      serve500(devServerConfig, incomingReq as any, res, e, `not found error`, sendMsg);
+      return serverCtx.serve500(incomingReq, res, e, `not found error`);
     }
   };
 }
 
 export function isValidUrlBasePath(basePath: string, url: URL) {
   // normalize the paths to always end with a slash for the check
-  if (!url.pathname.endsWith('/')) {
-    url.pathname += '/';
+  let pathname = url.pathname;
+  if (!pathname.endsWith('/')) {
+    pathname += '/';
   }
   if (!basePath.endsWith('/')) {
     basePath += '/';
   }
-  return url.pathname.startsWith(basePath);
+  return pathname.startsWith(basePath);
 }
 
 function normalizeHttpRequest(devServerConfig: d.DevServerConfig, incomingReq: IncomingMessage) {

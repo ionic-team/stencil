@@ -1,5 +1,15 @@
 import type * as d from '../../declarations';
-import { appError, clearAppErrorModal, hmrWindow, logBuild, logDiagnostic, logReload, logWarn, emitBuildStatus, onBuildResults } from '../client';
+import {
+  appError,
+  clearAppErrorModal,
+  hmrWindow,
+  logBuild,
+  logDiagnostic,
+  logReload,
+  logWarn,
+  emitBuildStatus,
+  onBuildResults,
+} from '../client';
 import { OPEN_IN_EDITOR_URL } from '../dev-server-constants';
 
 export const initAppUpdate = (win: d.DevClientWindow, config: d.DevClientConfig) => {
@@ -10,6 +20,11 @@ export const initAppUpdate = (win: d.DevClientWindow, config: d.DevClientConfig)
 
 const appUpdate = (win: d.DevClientWindow, config: d.DevClientConfig, buildResults: d.CompilerBuildResults) => {
   try {
+    if (buildResults.buildId === win['s-build-id']) {
+      return;
+    }
+    win['s-build-id'] = buildResults.buildId;
+
     // remove any app errors that may already be showing
     clearAppErrorModal({ window: win });
 
@@ -103,7 +118,9 @@ const appHmr = (win: Window, hmr: d.HotModuleReplacement) => {
   const results = hmrWindow({ window: win, hmr: hmr });
 
   if (results.updatedComponents.length > 0) {
-    logBuild(`Updated component${results.updatedComponents.length > 1 ? 's' : ''}: ${results.updatedComponents.join(', ')}`);
+    logBuild(
+      `Updated component${results.updatedComponents.length > 1 ? 's' : ''}: ${results.updatedComponents.join(', ')}`,
+    );
   }
 
   if (results.updatedInlineStyles.length > 0) {

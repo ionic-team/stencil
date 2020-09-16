@@ -2,26 +2,23 @@ import type * as d from '../declarations';
 import type { ServerResponse } from 'http';
 import { DEV_SERVER_URL } from './dev-server-constants';
 import { isDevServerClient, isInitialDevServerLoad, isOpenInEditor, responseHeaders } from './dev-server-utils';
-import { serve404 } from './serve-404';
-import { serve500 } from './serve-500';
 import { serveFile } from './serve-file';
 import { serveOpenInEditor, getEditors } from './open-in-editor';
 import path from 'path';
 
 export async function serveDevClient(
   devServerConfig: d.DevServerConfig,
-  sys: d.CompilerSystem,
+  serverCtx: d.DevServerContext,
   req: d.HttpRequest,
   res: ServerResponse,
-  sendMsg: d.DevServerSendMessage,
 ) {
   try {
     if (isOpenInEditor(req.pathname)) {
-      return serveOpenInEditor(devServerConfig, sys, req, res, sendMsg);
+      return serveOpenInEditor(serverCtx, req, res);
     }
 
     if (isDevServerClient(req.pathname)) {
-      return serveDevClientScript(devServerConfig, sys, req, res, sendMsg);
+      return serveDevClientScript(devServerConfig, serverCtx, req, res);
     }
 
     if (isInitialDevServerLoad(req.pathname)) {
@@ -32,45 +29,44 @@ export async function serveDevClient(
     }
 
     try {
-      req.stats = await sys.stat(req.filePath);
+      req.stats = await serverCtx.sys.stat(req.filePath);
       if (req.stats.isFile) {
-        return serveFile(devServerConfig, sys, req, res, sendMsg);
+        return serveFile(devServerConfig, serverCtx, req, res);
       }
-      return serve404(devServerConfig, req, res, 'serveDevClient not file', sendMsg);
+      return serverCtx.serve404(req, res, 'serveDevClient not file');
     } catch (e) {
-      return serve404(devServerConfig, req, res, `serveDevClient stats error ${e}`, sendMsg);
+      return serverCtx.serve404(req, res, `serveDevClient stats error ${e}`);
     }
   } catch (e) {
-    return serve500(devServerConfig, req, res, e, 'serveDevClient', sendMsg);
+    return serverCtx.serve500(req, res, e, 'serveDevClient');
   }
 }
 
-let connectorHtml: string = null;
-
 async function serveDevClientScript(
   devServerConfig: d.DevServerConfig,
-  sys: d.CompilerSystem,
+  serverCtx: d.DevServerContext,
   req: d.HttpRequest,
   res: ServerResponse,
-  sendMsg: d.DevServerSendMessage,
 ) {
   try {
-    if (connectorHtml == null) {
+    if (serverCtx.connectorHtml == null) {
       const filePath = path.join(devServerConfig.devServerDir, 'connector.html');
 
-      connectorHtml = await sys.readFile(filePath, 'utf8');
-      if (typeof connectorHtml === 'string') {
-        const devClientConfig: d.DevClientConfig = {
-          basePath: devServerConfig.basePath,
-          editors: await getEditors(),
-          reloadStrategy: devServerConfig.reloadStrategy,
-        };
-
-        connectorHtml = connectorHtml.replace('window.__DEV_CLIENT_CONFIG__', JSON.stringify(devClientConfig));
-      } else {
-        serve404(devServerConfig, req, res, 'serveDevClientScript', sendMsg);
-        return;
+      serverCtx.connectorHtml = serverCtx.sys.readFileSync(filePath, 'utf8');
+      if (typeof serverCtx.connectorHtml !== 'string') {
+        return serverCtx.serve404(req, res, `serveDevClientScript`);
       }
+
+      const devClientConfig: d.DevClientConfig = {
+        basePath: devServerConfig.basePath,
+        editors: await getEditors(),
+        reloadStrategy: devServerConfig.reloadStrategy,
+      };
+
+      serverCtx.connectorHtml = serverCtx.connectorHtml.replace(
+        'window.__DEV_CLIENT_CONFIG__',
+        JSON.stringify(devClientConfig),
+      );
     }
 
     res.writeHead(
@@ -79,9 +75,9 @@ async function serveDevClientScript(
         'content-type': 'text/html; charset=utf-8',
       }),
     );
-    res.write(connectorHtml);
+    res.write(serverCtx.connectorHtml);
     res.end();
   } catch (e) {
-    serve500(devServerConfig, req, res, e, 'serveDevClientScript', sendMsg);
+    return serverCtx.serve500(req, res, e, `serveDevClientScript`);
   }
 }

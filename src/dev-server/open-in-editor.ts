@@ -1,15 +1,9 @@
 import type * as d from '../declarations';
 import type { ServerResponse } from 'http';
-import { responseHeaders, sendLogRequest } from './dev-server-utils';
+import { responseHeaders } from './dev-server-utils';
 import openInEditorApi from './open-in-editor-api';
 
-export async function serveOpenInEditor(
-  devServerConfig: d.DevServerConfig,
-  sys: d.CompilerSystem,
-  req: d.HttpRequest,
-  res: ServerResponse,
-  sendMsg: d.DevServerSendMessage,
-) {
+export async function serveOpenInEditor(serverCtx: d.DevServerContext, req: d.HttpRequest, res: ServerResponse) {
   let status = 200;
 
   const data: d.OpenInEditorData = {};
@@ -17,7 +11,7 @@ export async function serveOpenInEditor(
   try {
     const editors = await getEditors();
     if (editors.length > 0) {
-      await parseData(editors, sys, req, data);
+      await parseData(editors, serverCtx.sys, req, data);
       await openDataInEditor(data);
     } else {
       data.error = `no editors available`;
@@ -27,7 +21,7 @@ export async function serveOpenInEditor(
     status = 500;
   }
 
-  sendLogRequest(devServerConfig, req, status, sendMsg);
+  serverCtx.logRequest(req, status);
 
   res.writeHead(
     status,

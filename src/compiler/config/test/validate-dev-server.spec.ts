@@ -11,9 +11,7 @@ describe('validateDevServer', () => {
     inputConfig = {
       sys: {} as any,
       rootDir: normalizePath(path.join(root, 'some', 'path')),
-      devServer: {
-        contentTypes: {},
-      },
+      devServer: {},
       flags: {
         serve: true,
       },
@@ -225,5 +223,44 @@ describe('validateDevServer', () => {
     inputConfig.devServer.https = { key: 'fake-key', cert: 'fake-cert' };
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.protocol).toBe('https');
+  });
+
+  it('should set ssr true', () => {
+    inputConfig.devServer.ssr = true;
+    const { config } = validateConfig(inputConfig);
+    expect(config.devServer.ssr).toBe(true);
+  });
+
+  it('should set ssr false', () => {
+    inputConfig.devServer.ssr = false;
+    const { config } = validateConfig(inputConfig);
+    expect(config.devServer.ssr).toBe(false);
+  });
+
+  it('should set ssr from flag', () => {
+    inputConfig.flags.ssr = true;
+    const { config } = validateConfig(inputConfig);
+    expect(config.devServer.ssr).toBe(true);
+  });
+
+  it('should set ssr false by default', () => {
+    const { config } = validateConfig(inputConfig);
+    expect(config.devServer.ssr).toBe(false);
+  });
+
+  it('should set srcIndexHtml from config', () => {
+    const { config } = validateConfig(inputConfig);
+    expect(config.devServer.srcIndexHtml).toBe(normalizePath(path.join(root, 'some', 'path', 'src', 'index.html')));
+  });
+
+  it('should set srcIndexHtml from config', () => {
+    const wwwOutputTarget: d.OutputTargetWww = {
+      type: 'www',
+      prerenderConfig: normalizePath(path.join(root, 'some', 'path', 'prerender.config.ts')),
+    };
+    inputConfig.outputTargets = [wwwOutputTarget];
+    inputConfig.flags.ssr = true;
+    const { config } = validateConfig(inputConfig);
+    expect(config.devServer.prerenderConfig).toBe(wwwOutputTarget.prerenderConfig);
   });
 });

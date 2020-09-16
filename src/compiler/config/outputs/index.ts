@@ -19,7 +19,9 @@ export const validateOutputTargets = (config: d.Config, diagnostics: d.Diagnosti
   userOutputs.forEach(outputTarget => {
     if (!VALID_TYPES_NEXT.includes(outputTarget.type)) {
       const err = buildError(diagnostics);
-      err.messageText = `Invalid outputTarget type "${outputTarget.type}". Valid outputTarget types include: ${VALID_TYPES_NEXT.map(t => `"${t}"`).join(', ')}`;
+      err.messageText = `Invalid outputTarget type "${
+        outputTarget.type
+      }". Valid outputTarget types include: ${VALID_TYPES_NEXT.map(t => `"${t}"`).join(', ')}`;
     }
   });
 
@@ -31,9 +33,14 @@ export const validateOutputTargets = (config: d.Config, diagnostics: d.Diagnosti
     ...validateLazy(config, userOutputs),
     ...validateWww(config, diagnostics, userOutputs),
     ...validateDist(config, userOutputs),
-    ...validateHydrateScript(config, userOutputs),
     ...validateDocs(config, diagnostics, userOutputs),
     ...validateAngular(config, userOutputs),
     ...validateStats(config, userOutputs),
+  ];
+
+  // hydrate also gets info from the www output
+  config.outputTargets = [
+    ...config.outputTargets,
+    ...validateHydrateScript(config, [...userOutputs, ...config.outputTargets]),
   ];
 };

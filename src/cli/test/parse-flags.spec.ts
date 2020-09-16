@@ -496,6 +496,12 @@ describe('parseFlags', () => {
     expect(flags.watch).toBe(true);
   });
 
+  it('should parse --ssr', () => {
+    args[0] = '--ssr';
+    const flags = parseFlags(args, sys);
+    expect(flags.ssr).toBe(true);
+  });
+
   it('should parse many', () => {
     args[0] = '-v';
     args[1] = '--help';

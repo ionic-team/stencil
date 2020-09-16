@@ -74,7 +74,11 @@ export const initClientWebSocket = (win: d.DevClientWindow, config: d.DevClientC
         hasGottenBuildResults = true;
         buildResultsRequests = 0;
         clearInterval(requestBuildResultsTmrId);
-        win.location.reload(true);
+
+        if (win['s-build-id'] !== msg.buildResults.buildId) {
+          win.location.reload(true);
+        }
+        win['s-build-id'] = msg.buildResults.buildId;
         return;
       }
     }
