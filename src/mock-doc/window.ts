@@ -210,6 +210,13 @@ export class MockWindow {
     return this.__elementCstr;
   }
 
+  fetch(input: any, init?: any): any {
+    if (typeof fetch === 'function') {
+      return fetch(input, init);
+    }
+    throw new Error(`fetch() not implemented`);
+  }
+
   focus(): any {
     /**/
   }
@@ -856,6 +863,13 @@ function resetWindow(win: MockWindow) {
         (win.document as any).defaultView = win;
       } catch (e) {}
     }
+
+    // ensure we don't hold onto nodeFetch values
+    (win as any).fetch = null;
+    (win as any).Headers = null;
+    (win as any).Request = null;
+    (win as any).Response = null;
+    (win as any).FetchError = null;
   }
 }
 
