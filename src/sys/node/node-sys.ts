@@ -12,10 +12,10 @@ import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
 import { createHash } from 'crypto';
 import exit from 'exit';
 import fs from 'graceful-fs';
+import { isFunction, isPromise, normalizePath } from '@utils';
 import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
 import { NodeWorkerController } from './node-worker-controller';
-import { normalizePath, isFunction, isPromise } from '@utils';
 import path from 'path';
 import type TypeScript from 'typescript';
 
@@ -541,7 +541,7 @@ export function createNodeSys(c: { process?: any } = {}) {
 
   sys.lazyRequire = new NodeLazyRequire(nodeResolve, {
     // [minimumVersion, recommendedVersion]
-    '@types/jest': ['24.9.1', '26.0.12'],
+    '@types/jest': ['24.9.1', '26.0.14'],
     '@types/puppeteer': ['1.19.0', '3.0.1'],
     'jest': ['24.9.0', '26.4.2'],
     'jest-cli': ['24.9.0', '26.4.2'],
