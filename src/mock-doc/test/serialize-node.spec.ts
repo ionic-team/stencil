@@ -25,6 +25,42 @@ describe('serializeNodeToHtml', () => {
     expect(html).toBe(`<div><span>var </span><b> value </b><span> =</span><code>     88     </code>;</div>`);
   });
 
+  it('do not pretty print <pre><code>', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<pre><code><span>88</span></code></pre>`;
+
+    const html = serializeNodeToHtml(elm, { prettyHtml: true });
+    expect(html).toBe(`<pre><code><span>88</span></code></pre>`);
+  });
+
+  it('do not pretty print <pre><code> w/ highlights and new', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<pre><code><span>install</span> cordova-plugin-purchase\nnpx cap update</code></pre>`;
+
+    const html = serializeNodeToHtml(elm, { prettyHtml: true });
+    expect(html).toBe(`<pre><code><span>install</span> cordova-plugin-purchase\nnpx cap update</code></pre>`);
+  });
+
+  it('do not pretty print <pre><code> w/ html comments', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<pre><code><span><!--a-->88</span>c<!--b--></code></pre>`;
+
+    const html = serializeNodeToHtml(elm, { prettyHtml: true });
+    expect(html).toBe(`<pre><code><span><!--a-->88</span>c<!--b--></code></pre>`);
+  });
+
+  it('do not pretty print <script>', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<script>value = '';</script>`;
+
+    const html = serializeNodeToHtml(elm, { prettyHtml: true });
+    expect(html).toBe(`<script>value = '';</script>`);
+  });
+
   it('do not remove whitespace within <code>', () => {
     const elm = doc.createElement('div');
 

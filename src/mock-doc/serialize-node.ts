@@ -84,12 +84,14 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
     const ignoreTag = opts.excludeTags != null && opts.excludeTags.includes(tagName);
 
     if (ignoreTag === false) {
-      if (opts.newLines) {
+      const isWithinWhitespaceSensitiveNode =
+        opts.newLines || opts.indentSpaces > 0 ? isWithinWhitespaceSensitive(node) : false;
+      if (opts.newLines && !isWithinWhitespaceSensitiveNode) {
         output.text.push('\n');
         output.currentLineWidth = 0;
       }
 
-      if (opts.indentSpaces > 0) {
+      if (opts.indentSpaces > 0 && !isWithinWhitespaceSensitiveNode) {
         for (let i = 0; i < output.indent; i++) {
           output.text.push(' ');
         }
@@ -100,7 +102,10 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       output.currentLineWidth += tagName.length + 1;
 
       const attrsLength = (node as HTMLElement).attributes.length;
-      const attributes = opts.prettyHtml && attrsLength > 1 ? cloneAttributes((node as HTMLElement).attributes as any, true) : (node as Element).attributes;
+      const attributes =
+        opts.prettyHtml && attrsLength > 1
+          ? cloneAttributes((node as HTMLElement).attributes as any, true)
+          : (node as Element).attributes;
 
       for (let i = 0; i < attrsLength; i++) {
         const attr = attributes.item(i);
@@ -173,7 +178,10 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       if ((node as Element).hasAttribute('style')) {
         const cssText = (node as HTMLElement).style.cssText;
 
-        if (opts.approximateLineWidth > 0 && output.currentLineWidth + cssText.length + 10 > opts.approximateLineWidth) {
+        if (
+          opts.approximateLineWidth > 0 &&
+          output.currentLineWidth + cssText.length + 10 > opts.approximateLineWidth
+        ) {
           output.text.push(`\nstyle="${cssText}">`);
           output.currentLineWidth = 0;
         } else {
@@ -194,7 +202,10 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
 
         if (
           opts.newLines &&
-          (node.childNodes.length === 0 || (node.childNodes.length === 1 && node.childNodes[0].nodeType === NODE_TYPES.TEXT_NODE && node.childNodes[0].nodeValue.trim() === ''))
+          (node.childNodes.length === 0 ||
+            (node.childNodes.length === 1 &&
+              node.childNodes[0].nodeType === NODE_TYPES.TEXT_NODE &&
+              node.childNodes[0].nodeValue.trim() === ''))
         ) {
           output.text.push('\n');
           output.currentLineWidth = 0;
@@ -207,11 +218,16 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       }
 
       if (opts.excludeTagContent == null || opts.excludeTagContent.includes(tagName) === false) {
-        const childNodes = tagName === 'template' ? (((node as any) as HTMLTemplateElement).content.childNodes as any) : node.childNodes;
+        const childNodes =
+          tagName === 'template' ? (((node as any) as HTMLTemplateElement).content.childNodes as any) : node.childNodes;
         const childNodeLength = childNodes.length;
 
         if (childNodeLength > 0) {
-          if (childNodeLength === 1 && childNodes[0].nodeType === NODE_TYPES.TEXT_NODE && (typeof childNodes[0].nodeValue !== 'string' || childNodes[0].nodeValue.trim() === '')) {
+          if (
+            childNodeLength === 1 &&
+            childNodes[0].nodeType === NODE_TYPES.TEXT_NODE &&
+            (typeof childNodes[0].nodeValue !== 'string' || childNodes[0].nodeValue.trim() === '')
+          ) {
             // skip over empty text nodes
           } else {
             if (opts.indentSpaces > 0 && ignoreTag === false) {
@@ -223,12 +239,14 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
             }
 
             if (ignoreTag === false) {
-              if (opts.newLines) {
+              const isWithinWhitespaceSensitiveNode =
+                opts.newLines || opts.indentSpaces > 0 ? isWithinWhitespaceSensitive(node) : false;
+              if (opts.newLines && !isWithinWhitespaceSensitiveNode) {
                 output.text.push('\n');
                 output.currentLineWidth = 0;
               }
 
-              if (opts.indentSpaces > 0) {
+              if (opts.indentSpaces > 0 && !isWithinWhitespaceSensitiveNode) {
                 output.indent = output.indent - opts.indentSpaces;
                 for (let i = 0; i < output.indent; i++) {
                   output.text.push(' ');
@@ -287,12 +305,14 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
         }
       } else {
         // this text node has text content
-        if (opts.newLines) {
+        const isWithinWhitespaceSensitiveNode =
+          opts.newLines || opts.indentSpaces > 0 || opts.prettyHtml ? isWithinWhitespaceSensitive(node) : false;
+        if (opts.newLines && !isWithinWhitespaceSensitiveNode) {
           output.text.push('\n');
           output.currentLineWidth = 0;
         }
 
-        if (opts.indentSpaces > 0) {
+        if (opts.indentSpaces > 0 && !isWithinWhitespaceSensitiveNode) {
           for (let i = 0; i < output.indent; i++) {
             output.text.push(' ');
           }
@@ -303,7 +323,10 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
         if (textContentLength > 0) {
           // this text node has text content
 
-          const parentTagName = node.parentNode != null && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE ? node.parentNode.nodeName : null;
+          const parentTagName =
+            node.parentNode != null && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE
+              ? node.parentNode.nodeName
+              : null;
           if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
             // this text node cannot have its content escaped since it's going
             // into an element like <style> or <script>
@@ -316,7 +339,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
             output.currentLineWidth += textContentLength;
           } else {
             // this text node is going into a normal element and html can be escaped
-            if (opts.prettyHtml) {
+            if (opts.prettyHtml && !isWithinWhitespaceSensitiveNode) {
               // pretty print the text node
               output.text.push(escapeString(textContent.replace(/\s\s+/g, ' ').trim(), false));
               output.currentLineWidth += textContentLength;
@@ -334,7 +357,10 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
                 textContentLength = textContent.length;
                 if (textContentLength > 1) {
                   if (/\s/.test(textContent.charAt(textContentLength - 1))) {
-                    if (opts.approximateLineWidth > 0 && output.currentLineWidth + textContentLength > opts.approximateLineWidth) {
+                    if (
+                      opts.approximateLineWidth > 0 &&
+                      output.currentLineWidth + textContentLength > opts.approximateLineWidth
+                    ) {
                       textContent = textContent.trimRight() + '\n';
                       output.currentLineWidth = 0;
                     } else {
@@ -365,12 +391,14 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       }
     }
 
-    if (opts.newLines) {
+    const isWithinWhitespaceSensitiveNode =
+      opts.newLines || opts.indentSpaces > 0 ? isWithinWhitespaceSensitive(node) : false;
+    if (opts.newLines && !isWithinWhitespaceSensitiveNode) {
       output.text.push('\n');
       output.currentLineWidth = 0;
     }
 
-    if (opts.indentSpaces > 0) {
+    if (opts.indentSpaces > 0 && !isWithinWhitespaceSensitiveNode) {
       for (let i = 0; i < output.indent; i++) {
         output.text.push(' ');
       }
@@ -419,9 +447,26 @@ function isWithinWhitespaceSensitive(node: Node) {
   return false;
 }
 
-/*@__PURE__*/ export const NON_ESCAPABLE_CONTENT = new Set(['STYLE', 'SCRIPT', 'IFRAME', 'NOSCRIPT', 'XMP', 'NOEMBED', 'NOFRAMES', 'PLAINTEXT']);
+/*@__PURE__*/ export const NON_ESCAPABLE_CONTENT = new Set([
+  'STYLE',
+  'SCRIPT',
+  'IFRAME',
+  'NOSCRIPT',
+  'XMP',
+  'NOEMBED',
+  'NOFRAMES',
+  'PLAINTEXT',
+]);
 
-/*@__PURE__*/ export const WHITESPACE_SENSITIVE = new Set(['CODE', 'OUTPUT', 'PLAINTEXT', 'PRE', 'TEMPLATE', 'TEXTAREA']);
+/*@__PURE__*/ export const WHITESPACE_SENSITIVE = new Set([
+  'CODE',
+  'OUTPUT',
+  'PLAINTEXT',
+  'PRE',
+  'SCRIPT',
+  'TEMPLATE',
+  'TEXTAREA',
+]);
 
 /*@__PURE__*/ const EMPTY_ELEMENTS = new Set([
   'area',
@@ -491,7 +536,18 @@ function isWithinWhitespaceSensitive(node: Node) {
   'visible',
 ]);
 
-/*@__PURE__*/ const STRUCTURE_ELEMENTS = new Set(['html', 'body', 'head', 'iframe', 'meta', 'link', 'base', 'title', 'script', 'style']);
+/*@__PURE__*/ const STRUCTURE_ELEMENTS = new Set([
+  'html',
+  'body',
+  'head',
+  'iframe',
+  'meta',
+  'link',
+  'base',
+  'title',
+  'script',
+  'style',
+]);
 
 interface SerializeOutput {
   currentLineWidth: number;
