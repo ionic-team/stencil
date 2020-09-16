@@ -2,7 +2,7 @@ import type * as d from '../../declarations';
 import { buildError } from '@utils';
 import { relative } from 'path';
 
-export const pluginHelper = (config: d.Config, builtCtx: d.BuildCtx) => {
+export const pluginHelper = (config: d.Config, builtCtx: d.BuildCtx, platform: string) => {
   return {
     name: 'pluginHelper',
     resolveId(importee: string, importer: string): null {
@@ -22,7 +22,7 @@ export const pluginHelper = (config: d.Config, builtCtx: d.BuildCtx) => {
         }
         const diagnostic = buildError(builtCtx.diagnostics);
         diagnostic.header = `Node Polyfills Required`;
-        diagnostic.messageText = `For the import "${importee}" to be bundled${fromMsg}, ensure the "rollup-plugin-node-polyfills" plugin is installed and added to the stencil config plugins. Please see the bundling docs for more information.
+        diagnostic.messageText = `For the import "${importee}" to be bundled${fromMsg}, ensure the "rollup-plugin-node-polyfills" plugin is installed and added to the stencil config plugins (${platform}). Please see the bundling docs for more information.
         Further information: https://stenciljs.com/docs/module-bundling`;
       }
       return null;

@@ -14,10 +14,16 @@ import { pluginHelper } from './plugin-helper';
 import { resolveIdWithTypeScript, typescriptPlugin } from './typescript-plugin';
 import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-deps';
 import { RollupOptions, TreeshakingOptions, rollup } from 'rollup';
+import { serverPlugin } from './server-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
 
-export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
+export const bundleOutput = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  bundleOpts: BundleOptions,
+) => {
   try {
     const rollupOptions = getRollupOptions(config, compilerCtx, buildCtx, bundleOpts);
     const rollupBuild = await rollup(rollupOptions);
@@ -32,8 +38,20 @@ export const bundleOutput = async (config: d.Config, compilerCtx: d.CompilerCtx,
   return undefined;
 };
 
-export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
-  const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, ['.tsx', '.ts', '.js', '.mjs', '.json', '.d.ts']);
+export const getRollupOptions = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  bundleOpts: BundleOptions,
+) => {
+  const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, [
+    '.tsx',
+    '.ts',
+    '.js',
+    '.mjs',
+    '.json',
+    '.d.ts',
+  ]);
   const nodeResolvePlugin = rollupNodeResolvePlugin({
     mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
     customResolveOptions,
@@ -78,6 +96,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
       extFormatPlugin(config),
       extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),
+      serverPlugin(config, bundleOpts.platform),
       ...beforePlugins,
       nodeResolvePlugin,
       resolveIdWithTypeScript(config, compilerCtx),
@@ -88,7 +107,7 @@ export const getRollupOptions = (config: d.Config, compilerCtx: d.CompilerCtx, b
         ...config.commonjs,
       }),
       ...afterPlugins,
-      pluginHelper(config, buildCtx),
+      pluginHelper(config, buildCtx, bundleOpts.platform),
       rollupJsonPlugin({
         preferConst: true,
       }),
