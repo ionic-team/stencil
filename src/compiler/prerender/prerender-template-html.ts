@@ -1,6 +1,12 @@
 import type * as d from '../../declarations';
-import { catchError, isPromise } from '@utils';
-import { hasStencilScript, inlineExternalStyleSheets, minifyScriptElements, minifyStyleElements, removeStencilScripts } from './prerender-optimize';
+import { catchError, isPromise, isFunction, isString } from '@utils';
+import {
+  hasStencilScript,
+  inlineExternalStyleSheets,
+  minifyScriptElements,
+  minifyStyleElements,
+  removeStencilScripts,
+} from './prerender-optimize';
 import { createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 
 export const generateTemplateHtml = async (
@@ -13,12 +19,12 @@ export const generateTemplateHtml = async (
   hydrateOpts: d.PrerenderHydrateOptions,
 ) => {
   try {
-    if (typeof srcIndexHtmlPath !== 'string') {
+    if (!isString(srcIndexHtmlPath)) {
       srcIndexHtmlPath = outputTarget.indexHtml;
     }
 
     let templateHtml: string;
-    if (typeof prerenderConfig.loadTemplate === 'function') {
+    if (isFunction(prerenderConfig.loadTemplate)) {
       const loadTemplateResult = prerenderConfig.loadTemplate(srcIndexHtmlPath);
       if (isPromise(loadTemplateResult)) {
         templateHtml = await loadTemplateResult;
@@ -72,7 +78,7 @@ export const generateTemplateHtml = async (
       }
     }
 
-    if (typeof prerenderConfig.beforeSerializeTemplate === 'function') {
+    if (isFunction(prerenderConfig.beforeSerializeTemplate)) {
       const beforeSerializeResults = prerenderConfig.beforeSerializeTemplate(doc);
       if (isPromise(beforeSerializeResults)) {
         doc = await beforeSerializeResults;
@@ -83,7 +89,7 @@ export const generateTemplateHtml = async (
 
     let html = serializeNodeToHtml(doc);
 
-    if (typeof prerenderConfig.afterSerializeTemplate === 'function') {
+    if (isFunction(prerenderConfig.afterSerializeTemplate)) {
       const afterSerializeResults = prerenderConfig.afterSerializeTemplate(html);
       if (isPromise(afterSerializeResults)) {
         html = await afterSerializeResults;

@@ -56,10 +56,23 @@ export function inspectElement(results: d.HydrateResults, elm: Element, depth: n
 
         case 'script':
           const script = collectAttributes(childElm);
-          script.src = (childElm as HTMLScriptElement).src;
-          if (typeof script.src === 'string') {
-            if (!results.scripts.some(s => s.src === script.src)) {
-              results.scripts.push(script);
+
+          if (childElm.hasAttribute('src')) {
+            script.src = (childElm as HTMLScriptElement).src;
+            if (typeof script.src === 'string') {
+              if (!results.scripts.some(s => s.src === script.src)) {
+                results.scripts.push(script);
+              }
+            }
+          } else {
+            const staticDataKey = childElm.getAttribute('data-stencil-static');
+            if (staticDataKey) {
+              // <script data-stencil-static="page.state" type="application/json">DATA</script>
+              results.staticData.push({
+                id: staticDataKey,
+                type: childElm.getAttribute('type'),
+                content: childElm.textContent,
+              });
             }
           }
           break;

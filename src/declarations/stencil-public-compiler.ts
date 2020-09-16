@@ -355,7 +355,8 @@ export interface HydratedFlag {
 
 export interface StencilDevServerConfig {
   /**
-   * IP address used by the dev server. The default is `0.0.0.0`, which points to all IPv4 addresses on the local machine, such as `localhost`.
+   * IP address used by the dev server. The default is `0.0.0.0`, which points to all IPv4 addresses
+   * on the local machine, such as `localhost`.
    */
   address?: string;
   /**
@@ -375,7 +376,8 @@ export interface StencilDevServerConfig {
    */
   gzip?: boolean;
   /**
-   * When set, the dev server will run via https using the SSL certificate and key you provide (use `fs` if you want to read them from files).
+   * When set, the dev server will run via https using the SSL certificate and key you provide
+   * (use `fs` if you want to read them from files).
    */
   https?: Credentials;
   /**
@@ -383,11 +385,13 @@ export interface StencilDevServerConfig {
    */
   initialLoadUrl?: string;
   /**
-   * When `true`, every request to the server will be logged within the terminal. Defaults to `false`.
+   * When `true`, every request to the server will be logged within the terminal.
+   * Defaults to `false`.
    */
   logRequests?: boolean;
   /**
-   * By default, when dev server is started the local dev URL is opened in your default browser. However, to prevent this URL to be opened change this value to `false`. Defaults to `true`.
+   * By default, when dev server is started the local dev URL is opened in your default browser.
+   * However, to prevent this URL to be opened change this value to `false`. Defaults to `true`.
    */
   openBrowser?: boolean;
   /**
@@ -395,11 +399,23 @@ export interface StencilDevServerConfig {
    */
   port?: number;
   /**
-   * When files are watched and updated, by default the dev server will use `hmr` (Hot Module Replacement) to update the page without a full page refresh. To have the page do a full refresh use `pageReload`. To disable any reloading, use `null`. Defaults to `hmr`.
+   * When files are watched and updated, by default the dev server will use `hmr` (Hot Module Replacement)
+   * to update the page without a full page refresh. To have the page do a full refresh use `pageReload`.
+   * To disable any reloading, use `null`. Defaults to `hmr`.
    */
   reloadStrategy?: PageReloadStrategy;
+  /**
+   * The root directory to serve the files from.
+   */
   root?: string;
+  /**
+   * If to use the dev server's websocket client or not. Defaults to `true`.
+   */
   websocket?: boolean;
+  /**
+   * If the dev server should fork a worker for the server process or not. A singled-threaded dev server
+   * is slower, however it is useful for debugging http requests and responses. Defaults to `true`.
+   */
   worker?: boolean;
 }
 
@@ -592,23 +608,28 @@ export interface PrerenderConfig {
 
 export interface HydrateDocumentOptions {
   /**
+   * Build ID that will be added to `<html data-stencil-build="BUILD_ID">`. By default
+   * a random ID will be generated
+   */
+  buildId?: string;
+  /**
    * Sets the `href` attribute on the `<link rel="canonical">`
    * tag within the `<head>`. If the value is not defined it will
    * ensure a canonical link tag is no included in the `<head>`.
    */
   canonicalUrl?: string;
   /**
-   * Constrain `setTimeout()` to 1ms, but still async. Also
-   * only allows `setInterval()` to fire once, also constrained to 1ms.
-   * Defaults to `true`.
-   */
-  constrainTimeouts?: boolean;
-  /**
    * Include the HTML comments and attributes used by the clientside
    * JavaScript to read the structure of the HTML and rebuild each
    * component. Defaults to `true`.
    */
   clientHydrateAnnotations?: boolean;
+  /**
+   * Constrain `setTimeout()` to 1ms, but still async. Also
+   * only allows `setInterval()` to fire once, also constrained to 1ms.
+   * Defaults to `true`.
+   */
+  constrainTimeouts?: boolean;
   /**
    * Sets `document.cookie`
    */
@@ -1746,7 +1767,12 @@ export interface OutputTargetDistLazyLoader extends OutputTargetBase {
 export interface OutputTargetHydrate extends OutputTargetBase {
   type: 'dist-hydrate-script';
   dir?: string;
-
+  /**
+   * Module IDs that should not be bundled into the script.
+   * By default, all node builtin's, such as `fs` or `path`
+   * will be considered "external" and not bundled.
+   */
+  external?: string[];
   empty?: boolean;
 }
 
@@ -2049,12 +2075,14 @@ export interface ResolveModuleOptions {
 }
 
 export interface PrerenderStartOptions {
+  buildId?: string;
   hydrateAppFilePath: string;
   componentGraph: BuildResultsComponentGraph;
   srcIndexHtmlPath: string;
 }
 
 export interface PrerenderResults {
+  buildId: string;
   diagnostics: Diagnostic[];
   urls: number;
   duration: number;

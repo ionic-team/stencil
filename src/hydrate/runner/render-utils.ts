@@ -58,7 +58,11 @@ export function generateHydrateResults(opts: d.HydrateDocumentOptions) {
     opts.url = `https://hydrate.stenciljs.com/`;
   }
 
+  if (typeof opts.buildId !== 'string') {
+    opts.buildId = createHydrateBuildId();
+  }
   const results: d.HydrateResults = {
+    buildId: opts.buildId,
     diagnostics: [],
     url: opts.url,
     host: null,
@@ -75,6 +79,7 @@ export function generateHydrateResults(opts: d.HydrateDocumentOptions) {
     components: [],
     imgs: [],
     scripts: [],
+    staticData: [],
     styles: [],
     title: null,
   };
@@ -96,7 +101,27 @@ export function generateHydrateResults(opts: d.HydrateDocumentOptions) {
   return results;
 }
 
-export function renderBuildDiagnostic(results: d.HydrateResults, level: 'error' | 'warn' | 'info' | 'log' | 'debug', header: string, msg: string) {
+export const createHydrateBuildId = () => {
+  // should be case insensitive because it could be in a URL
+  // and shouldn't start with a number cuz we might use it as a js prop
+  let chars = 'abcdefghijklmnopqrstuvwxyz';
+  let buildId = '';
+  while (buildId.length < 8) {
+    const char = chars[Math.floor(Math.random() * chars.length)];
+    buildId += char;
+    if (buildId.length === 1) {
+      chars += '0123456789';
+    }
+  }
+  return buildId;
+};
+
+export function renderBuildDiagnostic(
+  results: d.HydrateResults,
+  level: 'error' | 'warn' | 'info' | 'log' | 'debug',
+  header: string,
+  msg: string,
+) {
   const diagnostic: d.Diagnostic = {
     level: level,
     type: 'build',

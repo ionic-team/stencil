@@ -8,7 +8,12 @@ export function hydrateApp(
   win: Window & typeof globalThis,
   opts: d.HydrateFactoryOptions,
   results: d.HydrateResults,
-  afterHydrate: (win: Window, opts: d.HydrateFactoryOptions, results: d.HydrateResults, resolve: (results: d.HydrateResults) => void) => void,
+  afterHydrate: (
+    win: Window,
+    opts: d.HydrateFactoryOptions,
+    results: d.HydrateResults,
+    resolve: (results: d.HydrateResults) => void,
+  ) => void,
   resolve: (results: d.HydrateResults) => void,
 ) {
   const connectedElements = new Set<any>();
@@ -19,20 +24,27 @@ export function hydrateApp(
   const resolved = Promise.resolve();
 
   let tmrId: any;
+  let ranCompleted = false;
 
   function hydratedComplete() {
     global.clearTimeout(tmrId);
     createdElements.clear();
     connectedElements.clear();
 
-    try {
-      if (opts.clientHydrateAnnotations) {
-        insertVdomAnnotations(win.document, opts.staticComponents);
+    if (!ranCompleted) {
+      ranCompleted = true;
+      try {
+        if (opts.clientHydrateAnnotations) {
+          insertVdomAnnotations(win.document, opts.staticComponents);
+        }
+
+        win.dispatchEvent(new win.Event('DOMContentLoaded'));
+
+        win.document.createElement = orgDocumentCreateElement;
+        win.document.createElementNS = orgDocumentCreateElementNS;
+      } catch (e) {
+        renderCatchError(opts, results, e);
       }
-      win.document.createElement = orgDocumentCreateElement;
-      win.document.createElementNS = orgDocumentCreateElementNS;
-    } catch (e) {
-      renderCatchError(opts, results, e);
     }
 
     afterHydrate(win, opts, results, resolve);
@@ -149,7 +161,13 @@ export function hydrateApp(
   }
 }
 
-async function hydrateComponent(win: Window & typeof globalThis, results: d.HydrateResults, tagName: string, elm: d.HostElement, waitingElements: Set<HTMLElement>) {
+async function hydrateComponent(
+  win: Window & typeof globalThis,
+  results: d.HydrateResults,
+  tagName: string,
+  elm: d.HostElement,
+  waitingElements: Set<HTMLElement>,
+) {
   tagName = tagName.toLowerCase();
   const Cstr = loadModule(
     {
@@ -222,7 +240,21 @@ function shouldHydrate(elm: Element): boolean {
   return shouldHydrate(parentNode as Element);
 }
 
-const NO_HYDRATE_TAGS = new Set(['CODE', 'HEAD', 'IFRAME', 'INPUT', 'OBJECT', 'OUTPUT', 'NOSCRIPT', 'PRE', 'SCRIPT', 'SELECT', 'STYLE', 'TEMPLATE', 'TEXTAREA']);
+const NO_HYDRATE_TAGS = new Set([
+  'CODE',
+  'HEAD',
+  'IFRAME',
+  'INPUT',
+  'OBJECT',
+  'OUTPUT',
+  'NOSCRIPT',
+  'PRE',
+  'SCRIPT',
+  'SELECT',
+  'STYLE',
+  'TEMPLATE',
+  'TEXTAREA',
+]);
 
 function renderCatchError(opts: d.HydrateFactoryOptions, results: d.HydrateResults, err: any) {
   const diagnostic: d.Diagnostic = {

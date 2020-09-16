@@ -3,7 +3,12 @@ import { constrainTimeouts } from '@stencil/core/mock-doc';
 import { renderCatchError } from './render-utils';
 import { runtimeLogging } from './runtime-log';
 
-export function initializeWindow(win: Window & typeof globalThis, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
+export function initializeWindow(
+  win: Window & typeof globalThis,
+  doc: Document,
+  opts: d.HydrateDocumentOptions,
+  results: d.HydrateResults,
+) {
   try {
     win.location.href = opts.url;
   } catch (e) {
@@ -17,22 +22,27 @@ export function initializeWindow(win: Window & typeof globalThis, opts: d.Hydrat
   }
   if (typeof opts.cookie === 'string') {
     try {
-      win.document.cookie = opts.cookie;
+      doc.cookie = opts.cookie;
     } catch (e) {}
   }
   if (typeof opts.referrer === 'string') {
     try {
-      (win.document as any).referrer = opts.referrer;
+      (doc as any).referrer = opts.referrer;
     } catch (e) {}
   }
   if (typeof opts.direction === 'string') {
     try {
-      win.document.documentElement.setAttribute('dir', opts.direction);
+      doc.documentElement.setAttribute('dir', opts.direction);
     } catch (e) {}
   }
   if (typeof opts.language === 'string') {
     try {
-      win.document.documentElement.setAttribute('lang', opts.language);
+      doc.documentElement.setAttribute('lang', opts.language);
+    } catch (e) {}
+  }
+  if (typeof opts.buildId === 'string') {
+    try {
+      doc.documentElement.setAttribute('data-stencil-build', opts.buildId);
     } catch (e) {}
   }
 

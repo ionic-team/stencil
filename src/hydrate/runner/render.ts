@@ -117,7 +117,7 @@ function render(
     });
   }
 
-  initializeWindow(win, opts, results);
+  initializeWindow(win, win.document, opts, results);
 
   if (typeof opts.beforeHydrate === 'function') {
     try {

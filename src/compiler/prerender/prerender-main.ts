@@ -1,5 +1,6 @@
 import type * as d from '../../declarations';
-import { buildError, catchError, hasError } from '@utils';
+import { buildError, catchError, hasError, isString } from '@utils';
+import { createHydrateBuildId } from '../../hydrate/runner/render-utils';
 import { createWorkerContext } from '../worker/worker-thread';
 import { createWorkerMainContext } from '../worker/main-thread';
 import { drainPrerenderQueue, initializePrerenderEntryUrls } from './prerender-queue';
@@ -14,29 +15,40 @@ import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const createPrerenderer = async (config: d.Config) => {
   const start = (opts: d.PrerenderStartOptions) => {
-    return runPrerender(config, opts.hydrateAppFilePath, opts.componentGraph, opts.srcIndexHtmlPath);
+    return runPrerender(config, opts.hydrateAppFilePath, opts.componentGraph, opts.srcIndexHtmlPath, opts.buildId);
   };
   return {
     start,
   };
 };
 
-const runPrerender = async (config: d.Config, hydrateAppFilePath: string, componentGraph: d.BuildResultsComponentGraph, srcIndexHtmlPath: string) => {
+const runPrerender = async (
+  config: d.Config,
+  hydrateAppFilePath: string,
+  componentGraph: d.BuildResultsComponentGraph,
+  srcIndexHtmlPath: string,
+  buildId: string,
+) => {
   const startTime = Date.now();
   const diagnostics: d.Diagnostic[] = [];
   const results: d.PrerenderResults = {
+    buildId,
     diagnostics,
     urls: 0,
     duration: 0,
     average: 0,
   };
-  const outputTargets = config.outputTargets.filter(isOutputTargetWww).filter(o => typeof o.indexHtml === 'string');
+  const outputTargets = config.outputTargets.filter(isOutputTargetWww).filter(o => isString(o.indexHtml));
+
+  if (!isString(results.buildId)) {
+    results.buildId = createHydrateBuildId();
+  }
 
   if (outputTargets.length === 0) {
     return results;
   }
 
-  if (typeof hydrateAppFilePath !== 'string') {
+  if (!isString(hydrateAppFilePath)) {
     const diagnostic = buildError(diagnostics);
     diagnostic.header = `Prerender Error`;
     diagnostic.messageText = `Build results missing "hydrateAppFilePath"`;
@@ -77,7 +89,17 @@ const runPrerender = async (config: d.Config, hydrateAppFilePath: string, compon
     try {
       await Promise.all(
         outputTargets.map(outputTarget => {
-          return runPrerenderOutputTarget(workerCtx, results, diagnostics, config, devServer, hydrateAppFilePath, componentGraph, srcIndexHtmlPath, outputTarget);
+          return runPrerenderOutputTarget(
+            workerCtx,
+            results,
+            diagnostics,
+            config,
+            devServer,
+            hydrateAppFilePath,
+            componentGraph,
+            srcIndexHtmlPath,
+            outputTarget,
+          );
         }),
       );
     } catch (e) {
@@ -130,7 +152,6 @@ const runPrerenderOutputTarget = async (
     // get the prerender urls to queue up
     const prerenderDiagnostics: d.Diagnostic[] = [];
     const manager: d.PrerenderManager = {
-      id: `${Math.random() * Number.MAX_VALUE}`,
       prerenderUrlWorker: (prerenderRequest: d.PrerenderUrlRequest) => workerCtx.prerenderWorker(prerenderRequest),
       componentGraphPath: null,
       config: config,
@@ -163,8 +184,16 @@ const runPrerenderOutputTarget = async (
       return;
     }
 
-    const templateData = await generateTemplateHtml(config, prerenderConfig, diagnostics, manager.isDebug, srcIndexHtmlPath, outputTarget, hydrateOpts);
-    if (diagnostics.length > 0 || !templateData || typeof templateData.html !== 'string') {
+    const templateData = await generateTemplateHtml(
+      config,
+      prerenderConfig,
+      diagnostics,
+      manager.isDebug,
+      srcIndexHtmlPath,
+      outputTarget,
+      hydrateOpts,
+    );
+    if (diagnostics.length > 0 || !templateData || !isString(templateData.html)) {
       return;
     }
 
@@ -231,7 +260,11 @@ const createPrerenderTemplate = async (config: d.Config, templateHtml: string) =
   return templateId;
 };
 
-const createComponentGraphPath = (config: d.Config, componentGraph: d.BuildResultsComponentGraph, outputTarget: d.OutputTargetWww) => {
+const createComponentGraphPath = (
+  config: d.Config,
+  componentGraph: d.BuildResultsComponentGraph,
+  outputTarget: d.OutputTargetWww,
+) => {
   if (componentGraph) {
     const content = getComponentPathContent(componentGraph, outputTarget);
     const hash = config.sys.generateContentHash(content);

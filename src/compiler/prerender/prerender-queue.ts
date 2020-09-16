@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { buildError, catchError } from '@utils';
+import { buildError, catchError, isFunction, isString } from '@utils';
 import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 import { relative } from 'path';
@@ -43,7 +43,7 @@ export const initializePrerenderEntryUrls = (results: d.PrerenderResults, manage
 };
 
 const addUrlToPendingQueue = (manager: d.PrerenderManager, queueUrl: string, fromUrl: string) => {
-  if (typeof queueUrl !== 'string' || queueUrl === '') {
+  if (!isString(queueUrl) || queueUrl === '') {
     return;
   }
   if (manager.urlsPending.has(queueUrl)) {
@@ -93,7 +93,7 @@ export const drainPrerenderQueue = (results: d.PrerenderResults, manager: d.Prer
   }
 
   if (manager.urlsProcessing.size === 0 && manager.urlsPending.size === 0) {
-    if (typeof manager.resolve === 'function') {
+    if (isFunction(manager.resolve)) {
       // we're not actively processing anything
       // and there aren't anymore urls in the queue to be prerendered
       // so looks like our job here is done, good work team
@@ -113,8 +113,8 @@ const prerenderUrl = async (results: d.PrerenderResults, manager: d.PrerenderMan
     }
 
     const prerenderRequest: d.PrerenderUrlRequest = {
-      id: manager.id,
       baseUrl: manager.outputTarget.baseUrl,
+      buildId: results.buildId,
       componentGraphPath: manager.componentGraphPath,
       devServerHostUrl: manager.devServerHostUrl,
       hydrateAppFilePath: manager.hydrateAppFilePath,
@@ -158,7 +158,9 @@ const prerenderUrl = async (results: d.PrerenderResults, manager: d.PrerenderMan
 
   const urlsCompletedSize = manager.urlsCompleted.size;
   if (manager.progressLogger && urlsCompletedSize > 1) {
-    manager.progressLogger.update(`           prerendered ${urlsCompletedSize} urls: ${manager.config.logger.dim(previewUrl)}`);
+    manager.progressLogger.update(
+      `           prerendered ${urlsCompletedSize} urls: ${manager.config.logger.dim(previewUrl)}`,
+    );
   }
 
   // let's try to drain the queue again and let this

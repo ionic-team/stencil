@@ -1,5 +1,12 @@
 import type * as d from '../../declarations';
-import { addModulePreloads, excludeStaticComponents, minifyScriptElements, minifyStyleElements, removeModulePreloads, removeStencilScripts } from './prerender-optimize';
+import {
+  addModulePreloads,
+  excludeStaticComponents,
+  minifyScriptElements,
+  minifyStyleElements,
+  removeModulePreloads,
+  removeStencilScripts,
+} from './prerender-optimize';
 import { catchError, isPromise, isRootPath, normalizePath, isFunction } from '@utils';
 import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getHydrateOptions } from './prerender-hydrate-options';
@@ -16,7 +23,6 @@ const prerenderCtx = {
 export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d.PrerenderUrlRequest) => {
   // worker thread!
   const results: d.PrerenderUrlResults = {
-    id: prerenderRequest.id,
     diagnostics: [],
     anchorUrls: [],
     filePath: prerenderRequest.writeToFilePath,
@@ -56,6 +62,10 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
     if (prerenderRequest.staticSite || hydrateOpts.staticDocument) {
       hydrateOpts.addModulePreloads = false;
       hydrateOpts.clientHydrateAnnotations = false;
+    }
+
+    if (typeof hydrateOpts.buildId !== 'string') {
+      hydrateOpts.buildId = prerenderRequest.buildId;
     }
 
     if (typeof prerenderConfig.beforeHydrate === 'function') {
@@ -118,7 +128,13 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
 
     if (prerenderConfig.crawlUrls !== false) {
       const baseUrl = new URL(prerenderRequest.baseUrl);
-      results.anchorUrls = crawlAnchorsForNextUrls(prerenderConfig, results.diagnostics, baseUrl, url, hydrateResults.anchors);
+      results.anchorUrls = crawlAnchorsForNextUrls(
+        prerenderConfig,
+        results.diagnostics,
+        baseUrl,
+        url,
+        hydrateResults.anchors,
+      );
     }
 
     if (typeof prerenderConfig.afterHydrate === 'function') {
