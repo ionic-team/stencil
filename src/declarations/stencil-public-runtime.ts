@@ -1,4 +1,8 @@
-declare type CustomMethodDecorator<T> = (target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
+declare type CustomMethodDecorator<T> = (
+  target: Object,
+  propertyKey: string | symbol,
+  descriptor: TypedPropertyDescriptor<T>,
+) => TypedPropertyDescriptor<T> | void;
 
 export interface ComponentDecorator {
   (opts?: ComponentOptions): ClassDecorator;
@@ -492,13 +496,13 @@ export declare const Fragment: FunctionalComponent<{}>;
  */
 export declare namespace h {
   export function h(sel: any): VNode;
-  export function h(sel: Node, data: VNodeData): VNode;
-  export function h(sel: any, data: VNodeData): VNode;
+  export function h(sel: Node, data: VNodeData | null): VNode;
+  export function h(sel: any, data: VNodeData | null): VNode;
   export function h(sel: any, text: string): VNode;
   export function h(sel: any, children: Array<VNode | undefined | null>): VNode;
-  export function h(sel: any, data: VNodeData, text: string): VNode;
-  export function h(sel: any, data: VNodeData, children: Array<VNode | undefined | null>): VNode;
-  export function h(sel: any, data: VNodeData, children: VNode): VNode;
+  export function h(sel: any, data: VNodeData | null, text: string): VNode;
+  export function h(sel: any, data: VNodeData | null, children: Array<VNode | undefined | null>): VNode;
+  export function h(sel: any, data: VNodeData | null, children: VNode): VNode;
 
   export namespace JSX {
     interface IntrinsicElements extends LocalJSX.IntrinsicElements, JSXBase.IntrinsicElements {
@@ -506,6 +510,15 @@ export declare namespace h {
     }
   }
 }
+
+export declare function h(sel: any): VNode;
+export declare function h(sel: Node, data: VNodeData | null): VNode;
+export declare function h(sel: any, data: VNodeData | null): VNode;
+export declare function h(sel: any, text: string): VNode;
+export declare function h(sel: any, children: Array<VNode | undefined | null>): VNode;
+export declare function h(sel: any, data: VNodeData | null, text: string): VNode;
+export declare function h(sel: any, data: VNodeData | null, children: Array<VNode | undefined | null>): VNode;
+export declare function h(sel: any, data: VNodeData | null, children: VNode): VNode;
 
 export interface VNode {
   $flags$: number;
@@ -1702,7 +1715,17 @@ export interface CustomElementsDefineOptions {
   transformTagName?: (tagName: string) => string;
   jmp?: (c: Function) => any;
   raf?: (c: FrameRequestCallback) => number;
-  ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
-  rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
+  ael?: (
+    el: EventTarget,
+    eventName: string,
+    listener: EventListenerOrEventListenerObject,
+    options: boolean | AddEventListenerOptions,
+  ) => void;
+  rel?: (
+    el: EventTarget,
+    eventName: string,
+    listener: EventListenerOrEventListenerObject,
+    options: boolean | AddEventListenerOptions,
+  ) => void;
   ce?: (eventName: string, opts?: any) => CustomEvent;
 }
