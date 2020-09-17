@@ -1,7 +1,14 @@
 import type { EventInitDict, EventSpy, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
-import type * as puppeteer from 'puppeteer';
+import type {
+  ClickOptions,
+  NavigationOptions,
+  Page,
+  PageCloseOptions,
+  ScreenshotOptions as PuppeteerScreenshotOptions,
+  Response,
+} from 'puppeteer';
 
-export interface NewE2EPageOptions extends puppeteer.NavigationOptions {
+export interface NewE2EPageOptions extends NavigationOptions {
   url?: string;
   html?: string;
   failOnConsoleError?: boolean;
@@ -10,7 +17,7 @@ export interface NewE2EPageOptions extends puppeteer.NavigationOptions {
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
 type PuppeteerPage = Omit<
-  puppeteer.Page,
+  Page,
   | 'bringToFront'
   | 'browser'
   | 'screenshot'
@@ -120,7 +127,7 @@ export interface E2EPage extends PuppeteerPage {
    * a localhost address. A shortcut to `page.goto(url)` is to set the `url` option
    * when creating a new page, such as `const page = await newE2EPage({ url })`.
    */
-  goTo(url: string, options?: puppeteer.NavigationOptions): Promise<puppeteer.Response | null>;
+  goTo(url: string, options?: NavigationOptions): Promise<Response | null>;
 
   /**
    * Instead of testing a url directly, html content can be mocked using
@@ -128,7 +135,7 @@ export interface E2EPage extends PuppeteerPage {
    * the `html` option when creating a new page, such as
    * `const page = await newE2EPage({ html })`.
    */
-  setContent(html: string, options?: puppeteer.NavigationOptions): Promise<void>;
+  setContent(html: string, options?: NavigationOptions): Promise<void>;
 
   /**
    * Used to test if an event was, or was not dispatched. This method
@@ -162,9 +169,9 @@ export interface E2EPageInternal extends E2EPage {
   _e2eElements: E2EElementInternal[];
   _e2eEvents: Map<number, WaitForEvent>;
   _e2eEventIds: number;
-  _e2eGoto(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
-  _e2eClose(options?: puppeteer.PageCloseOptions): Promise<void>;
-  screenshot(options?: puppeteer.ScreenshotOptions): Promise<Buffer>;
+  _e2eGoto(url: string, options?: Partial<NavigationOptions>): Promise<Response | null>;
+  _e2eClose(options?: PageCloseOptions): Promise<void>;
+  screenshot(options?: PuppeteerScreenshotOptions): Promise<Buffer>;
 }
 
 export interface E2EElement {
@@ -215,7 +222,7 @@ export interface E2EElement {
    * then uses `page.mouse` to click in the center of the element.
    * Please see the puppeteer docs for more information.
    */
-  click(options?: puppeteer.ClickOptions): Promise<void>;
+  click(options?: ClickOptions): Promise<void>;
 
   /**
    * Find a child element that matches the selector, which is the same as
