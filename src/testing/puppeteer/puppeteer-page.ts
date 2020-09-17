@@ -6,10 +6,18 @@ import type {
   NewE2EPageOptions,
   PageDiagnostic,
 } from './puppeteer-declarations';
+import type {
+  ConsoleMessage,
+  ConsoleMessageLocation,
+  EmulateOptions,
+  JSHandle,
+  NavigationOptions,
+  Page,
+  PageCloseOptions,
+} from 'puppeteer';
 import { find, findAll } from './puppeteer-element';
 import { initPageEvents, waitForEvent } from './puppeteer-events';
 import { initPageScreenshot } from './puppeteer-screenshot';
-import type * as puppeteer from 'puppeteer';
 
 declare const global: JestEnvironmentGlobal;
 
@@ -33,9 +41,9 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
 
     initPageScreenshot(page);
 
-    let docPromise: Promise<puppeteer.JSHandle> = null;
+    let docPromise: Promise<JSHandle> = null;
 
-    page.close = async (options?: puppeteer.PageCloseOptions) => {
+    page.close = async (options?: PageCloseOptions) => {
       try {
         if (Array.isArray(page._e2eElements)) {
           const disposes = page._e2eElements.map(async elmHande => {
@@ -167,7 +175,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
   return page;
 }
 
-async function e2eGoTo(page: E2EPageInternal, url: string, options: puppeteer.NavigationOptions = {}) {
+async function e2eGoTo(page: E2EPageInternal, url: string, options: NavigationOptions = {}) {
   if (page.isClosed()) {
     throw new Error('e2eGoTo unavailable: page already closed');
   }
@@ -201,7 +209,7 @@ async function e2eGoTo(page: E2EPageInternal, url: string, options: puppeteer.Na
   return rsp;
 }
 
-async function e2eSetContent(page: E2EPageInternal, html: string, options: puppeteer.NavigationOptions = {}) {
+async function e2eSetContent(page: E2EPageInternal, html: string, options: NavigationOptions = {}) {
   if (page.isClosed()) {
     throw new Error('e2eSetContent unavailable: page already closed');
   }
@@ -272,7 +280,7 @@ async function waitForStencil(page: E2EPage) {
   }
 }
 
-async function setPageEmulate(page: puppeteer.Page) {
+async function setPageEmulate(page: Page) {
   if (page.isClosed()) {
     return;
   }
@@ -284,12 +292,12 @@ async function setPageEmulate(page: puppeteer.Page) {
 
   const screenshotEmulate = JSON.parse(emulateJsonContent) as EmulateConfig;
 
-  const emulateOptions: puppeteer.EmulateOptions = {
+  const emulateOptions: EmulateOptions = {
     viewport: screenshotEmulate.viewport,
     userAgent: screenshotEmulate.userAgent,
   };
 
-  await (page as puppeteer.Page).emulate(emulateOptions);
+  await (page as Page).emulate(emulateOptions);
 }
 
 async function waitForChanges(page: E2EPageInternal) {
@@ -359,7 +367,7 @@ async function waitForChanges(page: E2EPageInternal) {
   } catch (e) {}
 }
 
-function consoleMessage(c: puppeteer.ConsoleMessage) {
+function consoleMessage(c: ConsoleMessage) {
   const msg = serializeConsoleMessage(c);
   const type = c.type();
   const normalizedType = type === 'warning' ? 'warn' : type;
@@ -374,11 +382,11 @@ function consoleMessage(c: puppeteer.ConsoleMessage) {
   }
 }
 
-function serializeConsoleMessage(c: puppeteer.ConsoleMessage) {
+function serializeConsoleMessage(c: ConsoleMessage) {
   return `${c.text()} ${serializeLocation(c.location())}`;
 }
 
-function serializeLocation(loc: puppeteer.ConsoleMessageLocation) {
+function serializeLocation(loc: ConsoleMessageLocation) {
   let locStr = '';
   if (loc && loc.url) {
     locStr = `\nLocation: ${loc.url}`;
