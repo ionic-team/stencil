@@ -1027,6 +1027,7 @@ export interface DevServerContext {
   dirTemplate: string;
   getBuildResults: () => Promise<CompilerBuildResults>;
   getCompilerRequest: (path: string) => Promise<CompilerRequestResponse>;
+  isServerListening: boolean;
   logRequest: (req: { method: string; pathname?: string }, status: number) => void;
   prerenderConfig: PrerenderConfig;
   serve302: (req: any, res: any, pathname?: string) => void;

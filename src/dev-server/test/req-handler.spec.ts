@@ -1,29 +1,26 @@
 import type * as d from '@stencil/core/declarations';
 import { appendDevServerClientIframe } from '../serve-file';
 import { createRequestHandler } from '../request-handler';
+import { createServerContext } from '../server-context';
 import { createSystem } from '../../compiler/sys/stencil-sys';
 import { mockConfig } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
 import { validateConfig } from '../../compiler/config/validate-config';
 import { validateDevServer } from '../../compiler/config/validate-dev-server';
 import nodeFs from 'fs';
-import http from 'http';
+import type { IncomingMessage, ServerResponse } from 'http';
 import path from 'path';
 
 describe('request-handler', () => {
-  let config: d.DevServerConfig;
+  let devServerConfig: d.DevServerConfig;
+  let serverCtx: d.DevServerContext;
   let sys: d.CompilerSystem;
-  let req: http.IncomingMessage;
+  let req: IncomingMessage;
   let res: TestServerResponse;
+  let sendMsg: d.DevServerSendMessage;
   const root = path.resolve('/');
   const tmplDirPath = normalizePath(path.join(__dirname, '..', 'templates', 'directory-index.html'));
   const tmplDir = nodeFs.readFileSync(tmplDirPath, 'utf8');
-  const contentTypes = {
-    html: 'text/html',
-    css: 'text/css',
-    js: 'application/javascript',
-    svg: 'image/svg+xml',
-  };
 
   beforeEach(async () => {
     sys = createSystem();
@@ -33,7 +30,6 @@ describe('request-handler', () => {
     stencilConfig.flags.serve = true;
 
     stencilConfig.devServer = {
-      contentTypes: contentTypes,
       devServerDir: normalizePath(path.join(__dirname, '..')),
       root: normalizePath(path.join(root, 'www')),
       basePath: '/',
@@ -42,14 +38,14 @@ describe('request-handler', () => {
     await sys.createDir(stencilConfig.devServer.root);
     await sys.writeFile(path.join(stencilConfig.devServer.devServerDir, 'templates', 'directory-index.html'), tmplDir);
 
-    config = validateDevServer(stencilConfig, []);
+    devServerConfig = validateDevServer(stencilConfig, []);
     req = {} as any;
     res = {} as any;
 
     res.writeHead = (statusCode: number, headers: any): any => {
       res.$statusCode = statusCode;
       res.$headers = headers;
-      res.$contentType = headers['content-type'];
+      res.$contentType = headers && headers['content-type'];
     };
 
     res.write = (content: any) => {
@@ -60,16 +56,20 @@ describe('request-handler', () => {
     res.end = () => {
       res.$content = res.$contentWrite;
     };
+
+    sendMsg = () => {};
+
+    serverCtx = createServerContext(sys, sendMsg, devServerConfig, [], []);
   });
 
   describe('historyApiFallback', () => {
     it('should load historyApiFallback index.html when dot in the url disableDotRule true', async () => {
       await sys.writeFile(path.join(root, 'www', 'index.html'), `root-index`);
-      config.historyApiFallback = {
+      devServerConfig.historyApiFallback = {
         index: 'index.html',
         disableDotRule: true,
       };
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.headers = {
         accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -83,10 +83,10 @@ describe('request-handler', () => {
 
     it('should not load historyApiFallback index.html when dot in the url', async () => {
       await sys.writeFile(path.join(root, 'www', 'index.html'), `root-index`);
-      config.historyApiFallback = {
+      devServerConfig.historyApiFallback = {
         index: 'index.html',
       };
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.headers = {
         accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -100,10 +100,10 @@ describe('request-handler', () => {
 
     it('should not load historyApiFallback index.html when no text/html accept header', async () => {
       await sys.writeFile(path.join(root, 'www', 'index.html'), `root-index`);
-      config.historyApiFallback = {
+      devServerConfig.historyApiFallback = {
         index: 'index.html',
       };
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.headers = {
         accept: '*/*',
@@ -117,10 +117,10 @@ describe('request-handler', () => {
 
     it('should not load historyApiFallback index.html when not GET request', async () => {
       await sys.writeFile(path.join(root, 'www', 'index.html'), `root-index`);
-      config.historyApiFallback = {
+      devServerConfig.historyApiFallback = {
         index: 'index.html',
       };
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.headers = {
         accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -134,10 +134,10 @@ describe('request-handler', () => {
 
     it('should load historyApiFallback index.html when no trailing slash', async () => {
       await sys.writeFile(path.join(root, 'www', 'index.html'), `root-index`);
-      config.historyApiFallback = {
+      devServerConfig.historyApiFallback = {
         index: 'index.html',
       };
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.headers = {
         accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -152,10 +152,10 @@ describe('request-handler', () => {
 
     it('should load historyApiFallback index.html when trailing slash', async () => {
       await sys.writeFile(path.join(root, 'www', 'index.html'), `root-index`);
-      config.historyApiFallback = {
+      devServerConfig.historyApiFallback = {
         index: 'index.html',
       };
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.headers = {
         accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -172,8 +172,8 @@ describe('request-handler', () => {
       await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'somefile1.html'), `somefile1`);
       await sys.writeFile(path.join(root, 'www', 'about-us', 'somefile2.html'), `somefile2`);
-      config.historyApiFallback = null;
-      const handler = createRequestHandler(config, sys);
+      devServerConfig.historyApiFallback = null;
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.headers = {
         accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -192,8 +192,8 @@ describe('request-handler', () => {
       await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us.html'), `about-us.html page`);
       await sys.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `about-us-index-directory`);
-      config.historyApiFallback = null;
-      const handler = createRequestHandler(config, sys);
+      devServerConfig.historyApiFallback = null;
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.headers = {
         accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -210,8 +210,8 @@ describe('request-handler', () => {
       await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'somefile1.html'), `somefile1`);
       await sys.writeFile(path.join(root, 'www', 'about-us', 'somefile2.html'), `somefile2`);
-      config.historyApiFallback = {};
-      const handler = createRequestHandler(config, sys);
+      devServerConfig.historyApiFallback = {};
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.headers = {
         accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -226,7 +226,7 @@ describe('request-handler', () => {
     it('get directory index.html with no trailing slash', async () => {
       await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/about-us';
 
@@ -237,10 +237,10 @@ describe('request-handler', () => {
     });
 
     it('get directory index.html with trailing slash and base url', async () => {
-      config.basePath = '/my-base-url/';
+      devServerConfig.basePath = '/my-base-url/';
       await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/my-base-url/about-us/';
 
@@ -251,10 +251,10 @@ describe('request-handler', () => {
     });
 
     it('get directory index.html without trailing slash and base url', async () => {
-      config.basePath = '/my-base-url/';
+      devServerConfig.basePath = '/my-base-url/';
       await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/my-base-url/about-us';
 
@@ -267,7 +267,7 @@ describe('request-handler', () => {
     it('get directory index.html with trailing slash', async () => {
       await sys.createDir(path.join(root, 'www', 'about-us'));
       await sys.writeFile(path.join(root, 'www', 'about-us', 'index.html'), `aboutus`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/about-us/';
 
@@ -280,7 +280,7 @@ describe('request-handler', () => {
 
   describe('error not found static files', () => {
     it('not find file', async () => {
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/www/index.html';
 
@@ -296,7 +296,7 @@ describe('request-handler', () => {
       await sys.writeFile(path.join(root, 'www', 'styles.css'), `/* hi */`);
       await sys.writeFile(path.join(root, 'www', 'scripts.js'), `// hi`);
       await sys.writeFile(path.join(root, 'www', '.gitignore'), `# gitignore`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/';
 
@@ -308,8 +308,8 @@ describe('request-handler', () => {
 
     it('serve root index.html w/ querystring', async () => {
       await sys.writeFile(path.join(root, 'www', 'index.html'), `hello`);
-      config.gzip = false;
-      const handler = createRequestHandler(config, sys);
+      devServerConfig.gzip = false;
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/?qs=123';
 
@@ -320,9 +320,9 @@ describe('request-handler', () => {
     });
 
     it('serve root index.html w/ base url without url trailing slash', async () => {
-      config.basePath = '/my-base-url/';
+      devServerConfig.basePath = '/my-base-url/';
       await sys.writeFile(path.join(root, 'www', 'index.html'), `hello`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/my-base-url';
 
@@ -333,9 +333,9 @@ describe('request-handler', () => {
     });
 
     it('serve root index.html w/ base url without trailing slash, with trailing slash url', async () => {
-      config.basePath = '/my-base-url';
+      devServerConfig.basePath = '/my-base-url';
       await sys.writeFile(path.join(root, 'www', 'index.html'), `hello`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/my-base-url/';
 
@@ -346,9 +346,9 @@ describe('request-handler', () => {
     });
 
     it('serve root index.html w/ base url w/ index.html', async () => {
-      config.basePath = '/my-base-url/';
+      devServerConfig.basePath = '/my-base-url/';
       await sys.writeFile(path.join(root, 'www', 'index.html'), `hello`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/my-base-url/index.html';
 
@@ -359,9 +359,9 @@ describe('request-handler', () => {
     });
 
     it('serve root index.html w/ base url', async () => {
-      config.basePath = '/my-base-url/';
+      devServerConfig.basePath = '/my-base-url/';
       await sys.writeFile(path.join(root, 'www', 'index.html'), `hello`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/my-base-url/';
 
@@ -373,7 +373,7 @@ describe('request-handler', () => {
 
     it('serve root index.html', async () => {
       await sys.writeFile(path.join(root, 'www', 'index.html'), `hello`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/';
 
@@ -385,7 +385,7 @@ describe('request-handler', () => {
 
     it('302 redirect to / when no path at all', async () => {
       await sys.writeFile(path.join(root, 'www', 'index.html'), `hello`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '';
 
@@ -398,7 +398,7 @@ describe('request-handler', () => {
   describe('serve static text files', () => {
     it('should load file w/ querystring', async () => {
       await sys.writeFile(path.join(root, 'www', 'scripts', 'file1.html'), `html`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/scripts/file1.html?qs=1234';
 
@@ -410,7 +410,7 @@ describe('request-handler', () => {
 
     it('should load html file', async () => {
       await sys.writeFile(path.join(root, 'www', 'scripts', 'file1.html'), `html`);
-      const handler = createRequestHandler(config, sys);
+      const handler = createRequestHandler(devServerConfig, serverCtx);
 
       req.url = '/scripts/file1.html';
 
@@ -439,7 +439,7 @@ describe('request-handler', () => {
   });
 });
 
-interface TestServerResponse extends http.ServerResponse {
+interface TestServerResponse extends ServerResponse {
   $statusCode?: number;
   $headers?: any;
   $contentWrite?: string;
