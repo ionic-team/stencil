@@ -1,5 +1,11 @@
 import type { E2EProcessEnv, EmulateConfig, HostElement, JestEnvironmentGlobal } from '@stencil/core/internal';
-import type { E2EPage, E2EPageInternal, FindSelector, NewE2EPageOptions, PageDiagnostic } from './puppeteer-declarations';
+import type {
+  E2EPage,
+  E2EPageInternal,
+  FindSelector,
+  NewE2EPageOptions,
+  PageDiagnostic,
+} from './puppeteer-declarations';
 import { find, findAll } from './puppeteer-element';
 import { initPageEvents, waitForEvent } from './puppeteer-events';
 import { initPageScreenshot } from './puppeteer-screenshot';
@@ -313,7 +319,10 @@ async function waitForChanges(page: E2EPageInternal) {
               for (let i = 0; i < len; i++) {
                 const childElm = children[i];
                 if (childElm != null) {
-                  if (childElm.tagName.includes('-') && typeof (childElm as HostElement).componentOnReady === 'function') {
+                  if (
+                    childElm.tagName.includes('-') &&
+                    typeof (childElm as HostElement).componentOnReady === 'function'
+                  ) {
                     promises.push((childElm as HostElement).componentOnReady());
                   }
                   waitComponentOnReady(childElm, promises);
@@ -339,7 +348,12 @@ async function waitForChanges(page: E2EPageInternal) {
       return;
     }
 
-    await page.waitFor(100);
+    if (typeof (page as any).waitForTimeout === 'function') {
+      // https://github.com/puppeteer/puppeteer/issues/6214
+      await (page as any).waitForTimeout(100);
+    } else {
+      await page.waitFor(100);
+    }
 
     await Promise.all(page._e2eElements.map(elm => elm.e2eSync()));
   } catch (e) {}
