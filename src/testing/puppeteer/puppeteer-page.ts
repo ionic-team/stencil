@@ -204,7 +204,7 @@ async function e2eGoTo(page: E2EPageInternal, url: string, options: NavigationOp
     throw new Error(`Testing unable to load ${url}, HTTP status: ${rsp.status()}`);
   }
 
-  await waitForStencil(page);
+  await waitForStencil(page, options);
 
   return rsp;
 }
@@ -267,14 +267,15 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: Navig
     throw new Error(`Testing unable to load content`);
   }
 
-  await waitForStencil(page);
+  await waitForStencil(page, options);
 
   return rsp;
 }
 
-async function waitForStencil(page: E2EPage) {
+async function waitForStencil(page: E2EPage, options: NavigationOptions) {
   try {
-    await page.waitForFunction('window.stencilAppLoaded', { timeout: 4750 });
+    const timeout = typeof options.timeout === 'number' ? options.timeout : 4750;
+    await page.waitForFunction('window.stencilAppLoaded', { timeout });
   } catch (e) {
     throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
   }
