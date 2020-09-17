@@ -1,3 +1,28 @@
+# 🛳 [2.1.0-0](https://github.com/ionic-team/stencil/compare/v2.0.3...v2.1.0-0) (2020-09-17)
+
+
+### Features
+
+* **deps:** update to puppeteer 5.3.0, node-fetch 2.6.1, open 7.2.1 ([03decfa](https://github.com/ionic-team/stencil/commit/03decfa48caaf2be299e2649adf002b07cbd5e95))
+* **deps:** update to rollup 2.27.0 and terser 5.3.1 ([21a10c9](https://github.com/ionic-team/stencil/commit/21a10c936a503e4ec6ab8212f6b57f7d8ba68103))
+* **dev-server:** add ssr option for dev server for prerending dev ([2574094](https://github.com/ionic-team/stencil/commit/2574094df12a22fc699c53242cbfbd84ab712801))
+* **e2e:** e2e timeout configurable ([8b69731](https://github.com/ionic-team/stencil/commit/8b69731080efd5febab83620e6624870e4f45dc5)), closes [#2662](https://github.com/ionic-team/stencil/issues/2662)
+* **nodeRequire:** export nodeRequire utility from compiler ([10ea2fb](https://github.com/ionic-team/stencil/commit/10ea2fbbf291409a16a6a8fe43d54534d0a94878))
+* **prerender:** add buildId, hydrate externals, DOMContentLoaded ([4d49c63](https://github.com/ionic-team/stencil/commit/4d49c636bb7764c500bc4c87f07a161ea20630a2))
+* **prerender:** server-side only bundle modules w/ .server directory ([d8fcb60](https://github.com/ionic-team/stencil/commit/d8fcb60caedff6ac4a8b166e51f14143abe0c73a))
+
+
+### Bug Fixes
+
+* **dev-server:** improve exiting dev server process ([eb02517](https://github.com/ionic-team/stencil/commit/eb025171f327a28de002fa6b73ffffc03ae0f905))
+* **e2e:** update to use page.waitForTimeout() ([e48d306](https://github.com/ionic-team/stencil/commit/e48d30682565c08acd72f791e73319453234b0fb))
+* **mock-doc:** do not pretty print whitespace senstive elements ([de0dc65](https://github.com/ionic-team/stencil/commit/de0dc651f51adefe0a189c4ccb5ba60b1dff456a))
+* **mock-doc:** provide mocked global fetch() fn ([8fbc694](https://github.com/ionic-team/stencil/commit/8fbc694eb46dd8f88b1c65a81091880bcd729f21))
+* **types:** do not require @types/node because of puppeteer types ([1a907f7](https://github.com/ionic-team/stencil/commit/1a907f784f58463cfe52f87518f1a1d38a2908e5))
+* **types:** export h() function types ([be20372](https://github.com/ionic-team/stencil/commit/be2037290f55ac4ac49c128e62fc2468b58082cf))
+
+
+
 ## 🍮 [2.0.3](https://github.com/ionic-team/stencil/compare/v2.0.2...v2.0.3) (2020-09-03)
 
 
