@@ -409,6 +409,13 @@ export interface StencilDevServerConfig {
    */
   root?: string;
   /**
+   * If the dev server should Server-Side Render (SSR) each page, meaning it'll dynamically generate
+   * server-side rendered html on each page load. The `--ssr` flag will most commonly be used with
+   * the`--dev --watch --serve` flags during development. Note that this is for development purposes
+   * only, and the built-in dev server should not be used for production. Defaults to `false`.
+   */
+  ssr?: boolean;
+  /**
    * If to use the dev server's websocket client or not. Defaults to `true`.
    */
   websocket?: boolean;
@@ -425,7 +432,9 @@ export interface DevServerConfig extends StencilDevServerConfig {
   excludeHmr?: string[];
   historyApiFallback?: HistoryApiFallback;
   openBrowser?: boolean;
+  prerenderConfig?: string;
   protocol?: 'http' | 'https';
+  srcIndexHtml?: string;
 }
 
 export interface HistoryApiFallback {
@@ -477,6 +486,7 @@ export interface ConfigFlags {
   serve?: boolean;
   serviceWorker?: boolean;
   spec?: boolean;
+  ssr?: boolean;
   stats?: boolean;
   updateScreenshot?: boolean;
   version?: boolean;
