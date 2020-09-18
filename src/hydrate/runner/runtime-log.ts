@@ -1,14 +1,36 @@
 import type * as d from '../../declarations';
 import { renderCatchError, renderBuildDiagnostic } from './render-utils';
 
-export function runtimeLogging(win: Window & typeof globalThis, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
+export function runtimeLogging(
+  win: Window & typeof globalThis,
+  opts: d.HydrateDocumentOptions,
+  results: d.HydrateResults,
+) {
   try {
     const pathname = win.location.pathname;
 
     win.console.error = (...msgs: any[]) => {
-      renderCatchError(results, [...msgs].join(', '));
-      if (opts.runtimeLogging) {
-        runtimeLog(pathname, 'error', msgs);
+      const errMsg = msgs
+        .reduce<string>((errMsg, m) => {
+          if (m) {
+            if (m.stack != null) {
+              return errMsg + ' ' + String(m.stack);
+            } else {
+              if (m.message != null) {
+                return errMsg + ' ' + String(m.message);
+              }
+            }
+          }
+          return String(m);
+        }, '')
+        .trim();
+
+      if (errMsg !== '') {
+        renderCatchError(results, errMsg);
+
+        if (opts.runtimeLogging) {
+          runtimeLog(pathname, 'error', [errMsg]);
+        }
       }
     };
 
