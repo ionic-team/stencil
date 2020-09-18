@@ -1586,6 +1586,7 @@ export type ComponentRuntimeMetaCompact = [
 export interface ComponentRuntimeMeta {
   $flags$: number;
   $tagName$: string;
+  $transformedTagName$?: string;
   $members$?: ComponentRuntimeMembers;
   $listeners$?: ComponentRuntimeHostListener[];
   $attrsToReflect$?: [string, string][];

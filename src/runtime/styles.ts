@@ -25,6 +25,26 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
   if (!BUILD.attachStyles) {
     return scopeId;
   }
+
+  if (cmpMeta.$transformedTagName$) {
+    const initialScopeId = scopeId;
+    const transformedScopeId = getTransformedScopeId(cmpMeta, mode);
+    const transformScopeId = (initialCss?: string) => {
+      if (initialCss == null) { 
+        return initialCss; 
+      }
+      return initialCss.replace(new RegExp(initialScopeId,'g'), transformedScopeId);
+    }
+    scopeId = transformedScopeId
+    if (style instanceof CSSStyleSheet){
+      Array.from(style.rules).forEach((rule: CSSRule) => { 
+        rule.cssText = transformScopeId(rule.cssText);
+      })
+    } else {
+      style = transformScopeId(style);
+    }
+  }
+
   // if an element is NOT connected then getRootNode() will return the wrong root node
   // so the fallback is to always use the document for the root node in those cases
   styleContainerNode = styleContainerNode.nodeType === NODE_TYPE.DocumentFragment ? styleContainerNode : doc;
@@ -102,7 +122,10 @@ export const attachStyles = (hostRef: d.HostRef) => {
 };
 
 export const getScopeId = (cmp: d.ComponentRuntimeMeta, mode?: string) =>
-  'sc-' + (BUILD.mode && mode && cmp.$flags$ & CMP_FLAGS.hasMode ? cmp.$tagName$ + '-' + mode : cmp.$tagName$);
+  'sc-' + cmp.$tagName$ + (BUILD.mode && mode && cmp.$flags$ & CMP_FLAGS.hasMode ? '-' + mode : '');
+
+export const getTransformedScopeId = (cmp: d.ComponentRuntimeMeta, mode?: string) =>
+  'sc-' + cmp.$transformedTagName$ + (BUILD.mode && mode && cmp.$flags$ & CMP_FLAGS.hasMode ? '-' + mode : '');
 
 export const convertScopedToShadow = (css: string) => css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');
 
