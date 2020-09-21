@@ -1,5 +1,4 @@
-# 🛳 [2.1.0-0](https://github.com/ionic-team/stencil/compare/v2.0.3...v2.1.0-0) (2020-09-17)
-
+# 🎳 [2.1.0-1](https://github.com/ionic-team/stencil/compare/v2.0.3...v2.1.0-1) (2020-09-21)
 
 ### Features
 
@@ -10,12 +9,14 @@
 * **nodeRequire:** export nodeRequire utility from compiler ([10ea2fb](https://github.com/ionic-team/stencil/commit/10ea2fbbf291409a16a6a8fe43d54534d0a94878))
 * **prerender:** add buildId, hydrate externals, DOMContentLoaded ([4d49c63](https://github.com/ionic-team/stencil/commit/4d49c636bb7764c500bc4c87f07a161ea20630a2))
 * **prerender:** server-side only bundle modules w/ .server directory ([d8fcb60](https://github.com/ionic-team/stencil/commit/d8fcb60caedff6ac4a8b166e51f14143abe0c73a))
+* **prerender:** write page.state.json data from hydrate builds ([a2c93f6](https://github.com/ionic-team/stencil/commit/a2c93f6a989bfcc44e07e0a15aa4f8ba284e3f6b))
 
 
 ### Bug Fixes
 
 * **dev-server:** improve exiting dev server process ([eb02517](https://github.com/ionic-team/stencil/commit/eb025171f327a28de002fa6b73ffffc03ae0f905))
 * **e2e:** update to use page.waitForTimeout() ([e48d306](https://github.com/ionic-team/stencil/commit/e48d30682565c08acd72f791e73319453234b0fb))
+* **hydrate:** improve dev server console error ([9cb31a5](https://github.com/ionic-team/stencil/commit/9cb31a5ee4d24fbbb29e7d78061ce4d47350150a))
 * **mock-doc:** do not pretty print whitespace senstive elements ([de0dc65](https://github.com/ionic-team/stencil/commit/de0dc651f51adefe0a189c4ccb5ba60b1dff456a))
 * **mock-doc:** provide mocked global fetch() fn ([8fbc694](https://github.com/ionic-team/stencil/commit/8fbc694eb46dd8f88b1c65a81091880bcd729f21))
 * **types:** do not require @types/node because of puppeteer types ([1a907f7](https://github.com/ionic-team/stencil/commit/1a907f784f58463cfe52f87518f1a1d38a2908e5))
