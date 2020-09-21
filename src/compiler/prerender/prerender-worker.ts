@@ -12,6 +12,7 @@ import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getHydrateOptions } from './prerender-hydrate-options';
 import { getPrerenderConfig } from './prerender-config';
 import { requireFunc } from '../sys/environment';
+import { dirname, join } from 'path';
 
 const prerenderCtx = {
   componentGraph: null as Map<string, string[]>,
@@ -156,8 +157,34 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
     }
 
     const html = hydrateApp.serializeDocumentToString(doc, hydrateOpts);
+
     prerenderEnsureDir(sys, results.filePath);
-    await sys.writeFile(results.filePath, html);
+
+    const writePromise = sys.writeFile(results.filePath, html);
+
+    if (Array.isArray(hydrateResults.staticData) && hydrateResults.staticData.length > 0) {
+      const pageDir = dirname(results.filePath);
+
+      await Promise.all(
+        hydrateResults.staticData.map(async s => {
+          if (s.type === 'application/json') {
+            const data: any = {
+              [s.id]: JSON.parse(s.content),
+              components: hydrateResults.components.map(c => c.tag),
+            };
+            const dataFileName = `${s.id}.json`;
+            const dataFilePath = join(pageDir, dataFileName);
+            await sys.writeFile(dataFilePath, JSON.stringify(data));
+          } else {
+            const contentFileName = `${s.id}.txt`;
+            const contentFilePath = join(pageDir, contentFileName);
+            await sys.writeFile(contentFilePath, s.content);
+          }
+        }),
+      );
+    }
+
+    await writePromise;
 
     try {
       win.close();
