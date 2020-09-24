@@ -230,7 +230,10 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
           ) {
             // skip over empty text nodes
           } else {
-            if (opts.indentSpaces > 0 && ignoreTag === false) {
+            const isWithinWhitespaceSensitiveNode =
+              opts.newLines || opts.indentSpaces > 0 ? isWithinWhitespaceSensitive(node) : false;
+
+            if (!isWithinWhitespaceSensitiveNode && opts.indentSpaces > 0 && ignoreTag === false) {
               output.indent = output.indent + opts.indentSpaces;
             }
 
@@ -239,8 +242,6 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
             }
 
             if (ignoreTag === false) {
-              const isWithinWhitespaceSensitiveNode =
-                opts.newLines || opts.indentSpaces > 0 ? isWithinWhitespaceSensitive(node) : false;
               if (opts.newLines && !isWithinWhitespaceSensitiveNode) {
                 output.text.push('\n');
                 output.currentLineWidth = 0;

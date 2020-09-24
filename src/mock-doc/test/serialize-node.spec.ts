@@ -25,6 +25,15 @@ describe('serializeNodeToHtml', () => {
     expect(html).toBe(`<div><span>var </span><b> value </b><span> =</span><code>     88     </code>;</div>`);
   });
 
+  it('do not add extra indentation when pretty print <pre><code>', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<section><article><pre><code><span>88</span></code></pre></article></section>`;
+
+    const html = serializeNodeToHtml(elm, { prettyHtml: true });
+    expect(html).toBe(`<section>\n  <article><pre><code><span>88</span></code></pre>\n  </article>\n</section>`);
+  });
+
   it('do not pretty print <pre><code>', () => {
     const elm = doc.createElement('div');
 
