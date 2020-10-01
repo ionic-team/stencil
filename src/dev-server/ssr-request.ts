@@ -154,6 +154,8 @@ async function setupHydrateApp(devServerConfig: d.DevServerConfig, serverCtx: d.
       // brute force way of clearning node's module cache
       // not using `delete require.cache[id]` since it'll cause memory leaks
       require.cache = {};
+      const Module = require('module');
+      Module._cache[hydrateAppFilePath] = undefined;
 
       hydrateApp = require(hydrateAppFilePath);
     }
