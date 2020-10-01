@@ -50,7 +50,7 @@
     "test.watch": "jest --watch"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "15.0.0",
+    "@rollup/plugin-commonjs": "15.1.0",
     "@rollup/plugin-json": "4.1.0",
     "@rollup/plugin-node-resolve": "9.0.0",
     "@rollup/plugin-replace": "2.3.3",
@@ -108,7 +108,7 @@
     "prettier": "^2.1.2",
     "prompts": "2.3.2",
     "puppeteer": "~5.3.0",
-    "rollup": "2.27.0",
+    "rollup": "2.28.2",
     "semiver": "^1.1.0",
     "semver": "7.3.2",
     "sizzle": "^2.3.5",
