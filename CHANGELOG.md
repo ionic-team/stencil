@@ -1,3 +1,22 @@
+# 🦂 [2.1.0-2](https://github.com/ionic-team/stencil/compare/v2.1.0-1...v2.1.0-2) (2020-10-01)
+
+
+### Bug Fixes
+
+* **dev-server:** clear module cache on ssr reload ([cfd5d39](https://github.com/ionic-team/stencil/commit/cfd5d39bad4ce2cab431595ae8c8f11d1fabb192))
+* **mock-doc:** no indentation w/in whitespace sensitive elements ([46ff715](https://github.com/ionic-team/stencil/commit/46ff71588e20cd7f0bdc3173e6cdca9b126d05d5))
+
+
+### Features
+
+* **open:** update to open 7.3.0 ([807f7e7](https://github.com/ionic-team/stencil/commit/807f7e79749b49305b8804ebc72a68d6ac8f5281))
+* **puppeteer:** update to puppeteer 5.3.1 ([6910875](https://github.com/ionic-team/stencil/commit/69108759fd67a470a3481a9205ba27976a2bd0fa))
+* **rollup:** update to rollup 2.28.2 and @rollup/plugin-commonjs 15.10 ([ddcf1d0](https://github.com/ionic-team/stencil/commit/ddcf1d09e60fe0364269193ff45b955b17807758))
+* **terser:** update to terser 5.3.3 ([de68d85](https://github.com/ionic-team/stencil/commit/de68d85bbc29a7456dc97313038d4b2903936bde))
+* **typescript:** update to typescript 4.0.3 ([9b72eb0](https://github.com/ionic-team/stencil/commit/9b72eb0954e5ded63f4750650dd9669b0aca75f8))
+
+
+
 # 🎳 [2.1.0-1](https://github.com/ionic-team/stencil/compare/v2.0.3...v2.1.0-1) (2020-09-21)
 
 ### Features
