@@ -17,7 +17,7 @@ export const cloneNodeFix = (HostElementPrototype: any) => {
       
       for (; i < srcNode.childNodes.length; i++) {
         slotted = (srcNode.childNodes[i] as any)['s-nr'];
-        nonStencilNode = stencilPrivates.some((privateField) => (srcNode.childNodes[i] as any)[privateField]);
+        nonStencilNode = stencilPrivates.every((privateField) => !(srcNode.childNodes[i] as any)[privateField]);
         if (slotted) {
           if (BUILD.appendChildSlotFix && (clonedNode as any).__appendChild) {
             (clonedNode as any).__appendChild(slotted.cloneNode(true));
