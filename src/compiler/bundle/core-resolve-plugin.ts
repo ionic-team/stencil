@@ -88,7 +88,7 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
           if (platform === 'worker') {
             return `
 export const Build = {
-  isDev: false,
+  isDev: ${config.devMode},
   isBrowser: true,
   isServer: false,
   isTesting: false,
