@@ -5,7 +5,6 @@ describe('slot-ng-if', function() {
   let app: HTMLElement;
 
   beforeEach(async () => {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
     app = await setupDom('/slot-ng-if/index.html');
   });
   afterEach(tearDownDom);
