@@ -1819,7 +1819,7 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
 export interface OutputTargetDocsCustom extends OutputTargetBase {
   type: 'docs-custom';
 
-  generator: (docs: JsonDocs) => void | Promise<void>;
+  generator: (docs: JsonDocs, config: Config) => void | Promise<void>;
   strict?: boolean;
 }
 
