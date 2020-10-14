@@ -250,8 +250,15 @@ export function createNodeSys(c: { process?: any } = {}) {
       } catch (e) {}
       return [];
     },
-    readFile(p) {
-      return new Promise(resolve => {
+    readFile(p: string, encoding?: string) {
+      if (encoding === 'binary') {
+        return new Promise<any>(resolve => {
+          fs.readFile(p, (_, data) => {
+            resolve(data);
+          });
+        });
+      }
+      return new Promise<string>(resolve => {
         fs.readFile(p, 'utf8', (_, data) => {
           resolve(data);
         });

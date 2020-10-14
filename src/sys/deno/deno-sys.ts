@@ -341,10 +341,13 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       } catch (e) {}
       return dirEntries;
     },
-    async readFile(p) {
+    async readFile(p: string, encoding?: string) {
       try {
-        const decoder = new TextDecoder('utf-8');
         const data = await deno.readFile(p);
+        if (encoding === 'binary') {
+          return data as any;
+        }
+        const decoder = new TextDecoder('utf-8');
         return decoder.decode(data);
       } catch (e) {}
       return undefined;

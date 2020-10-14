@@ -886,7 +886,7 @@ export interface CompilerSystem {
   /**
    * Generates a MD5 digest encoded as HEX
    */
-  generateContentHash?(content: string, length?: number): Promise<string>;
+  generateContentHash?(content: string | any, length?: number): Promise<string>;
   /**
    * Get the current directory.
    */
@@ -939,7 +939,9 @@ export interface CompilerSystem {
   /**
    * Returns undefined if file is not found. Does not throw.
    */
-  readFile(p: string, encoding?: string): Promise<string>;
+  readFile(p: string): Promise<string>;
+  readFile(p: string, encoding: 'utf8'): Promise<string>;
+  readFile(p: string, encoding: 'binary'): Promise<any>;
   /**
    * SYNC! Returns undefined if file is not found. Does not throw.
    */
