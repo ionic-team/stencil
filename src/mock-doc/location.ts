@@ -20,6 +20,7 @@ export class MockLocation implements Location {
     this._href = url.href;
     this.protocol = url.protocol;
     this.host = url.host;
+    this.hostname = url.hostname;
     this.port = url.port;
     this.pathname = url.pathname;
     this.search = url.search;
