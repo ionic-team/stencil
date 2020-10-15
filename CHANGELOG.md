@@ -1,3 +1,20 @@
+# 🍟 [2.1.0-3](https://github.com/ionic-team/stencil/compare/v2.1.0-2...v2.1.0-3) (2020-10-15)
+
+
+### Bug Fixes
+
+* **mock-doc:** set hostname when location is updated ([#2689](https://github.com/ionic-team/stencil/issues/2689)) ([9598a05](https://github.com/ionic-team/stencil/commit/9598a05e778538656a233cf02f276084b59d4098))
+* **worker:** Build.isDev in worker ([#2702](https://github.com/ionic-team/stencil/issues/2702)) ([e8ced45](https://github.com/ionic-team/stencil/commit/e8ced45654b0de41170541d193c0a3bdff77ffcb))
+
+
+### Features
+
+* add setErrorHandler() ([#2704](https://github.com/ionic-team/stencil/issues/2704)) ([5d2780a](https://github.com/ionic-team/stencil/commit/5d2780ac98cc046a71f8b766e4ffd4e750c3a903))
+* **docs-custom:** add config argument ([#2696](https://github.com/ionic-team/stencil/issues/2696)) ([d285879](https://github.com/ionic-team/stencil/commit/d285879ec596f42d1542152d42afa1619e27ff62))
+* **sys:** add encoding option to readFile ([99ef518](https://github.com/ionic-team/stencil/commit/99ef5184e86101ed6695bfc0af3c4e8ee54ecd51))
+
+
+
 # 🦂 [2.1.0-2](https://github.com/ionic-team/stencil/compare/v2.1.0-1...v2.1.0-2) (2020-10-01)
 
 
