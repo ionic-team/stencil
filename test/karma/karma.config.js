@@ -86,6 +86,7 @@ module.exports = function (config) {
       // 'test-app/prerender-test/karma.spec.ts',
       'test-app/**/*.spec.ts',
       'test-app/util.ts',
+      'test-app/assets/angular.min.js',
       { pattern: 'www/**/*', watched: false, included: false, served: true, nocache: true, type: 'module' },
     ],
 
