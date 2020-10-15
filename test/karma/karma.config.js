@@ -58,13 +58,11 @@ if (process.platform === 'win32') {
   localLaunchers.Edge = {
     base: 'Edge'
   };
-
 } else if (process.platform === 'darwin') {
   // localLaunchers.Safari = {
   //   base: 'Safari'
   // };
 }
-
 
 module.exports = function (config) {
   config.set({
@@ -109,6 +107,7 @@ module.exports = function (config) {
       // 'test-app/prerender-test/karma.spec.ts',
       'test-app/**/*.spec.ts',
       'test-app/util.ts',
+      'test-app/assets/angular.min.js',
       { pattern: 'www/**/*', watched: false, included: false, served: true, nocache: true, type: 'module' }
     ],
 

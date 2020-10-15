@@ -196,6 +196,7 @@ export namespace Components {
   interface SlotMapOrderRoot {}
   interface SlotNestedOrderChild {}
   interface SlotNestedOrderParent {}
+  interface SlotNgIf {}
   interface SlotNoDefault {}
   interface SlotReorder {
     'reordered': boolean;
@@ -811,6 +812,12 @@ declare global {
     new (): HTMLSlotNestedOrderParentElement;
   };
 
+  interface HTMLSlotNgIfElement extends Components.SlotNgIf, HTMLStencilElement {}
+  var HTMLSlotNgIfElement: {
+    prototype: HTMLSlotNgIfElement;
+    new (): HTMLSlotNgIfElement;
+  };
+
   interface HTMLSlotNoDefaultElement extends Components.SlotNoDefault, HTMLStencilElement {}
   var HTMLSlotNoDefaultElement: {
     prototype: HTMLSlotNoDefaultElement;
@@ -982,6 +989,7 @@ declare global {
     'slot-map-order-root': HTMLSlotMapOrderRootElement;
     'slot-nested-order-child': HTMLSlotNestedOrderChildElement;
     'slot-nested-order-parent': HTMLSlotNestedOrderParentElement;
+    'slot-ng-if': HTMLSlotNgIfElement;
     'slot-no-default': HTMLSlotNoDefaultElement;
     'slot-reorder': HTMLSlotReorderElement;
     'slot-reorder-root': HTMLSlotReorderRootElement;
@@ -1183,6 +1191,7 @@ declare namespace LocalJSX {
   interface SlotMapOrderRoot {}
   interface SlotNestedOrderChild {}
   interface SlotNestedOrderParent {}
+  interface SlotNgIf {}
   interface SlotNoDefault {}
   interface SlotReorder {
     'reordered'?: boolean;
@@ -1300,6 +1309,7 @@ declare namespace LocalJSX {
     'slot-map-order-root': SlotMapOrderRoot;
     'slot-nested-order-child': SlotNestedOrderChild;
     'slot-nested-order-parent': SlotNestedOrderParent;
+    'slot-ng-if': SlotNgIf;
     'slot-no-default': SlotNoDefault;
     'slot-reorder': SlotReorder;
     'slot-reorder-root': SlotReorderRoot;
@@ -1420,6 +1430,7 @@ declare module "@stencil/core" {
       'slot-map-order-root': LocalJSX.SlotMapOrderRoot & JSXBase.HTMLAttributes<HTMLSlotMapOrderRootElement>;
       'slot-nested-order-child': LocalJSX.SlotNestedOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedOrderChildElement>;
       'slot-nested-order-parent': LocalJSX.SlotNestedOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedOrderParentElement>;
+      'slot-ng-if': LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
       'slot-no-default': LocalJSX.SlotNoDefault & JSXBase.HTMLAttributes<HTMLSlotNoDefaultElement>;
       'slot-reorder': LocalJSX.SlotReorder & JSXBase.HTMLAttributes<HTMLSlotReorderElement>;
       'slot-reorder-root': LocalJSX.SlotReorderRoot & JSXBase.HTMLAttributes<HTMLSlotReorderRootElement>;
