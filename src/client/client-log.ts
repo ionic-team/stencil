@@ -1,6 +1,5 @@
 import type * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { h } from '../declarations';
 
 export let consoleError: d.ErrorHandler = (e: any, _?: any) => console.error(e);
 
