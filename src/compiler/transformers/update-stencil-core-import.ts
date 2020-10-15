@@ -70,4 +70,5 @@ const KEEP_IMPORTS = new Set([
   'forceUpdate',
   'getRenderingRef',
   'forceModeUpdate',
+  'setErrorHandler'
 ]);

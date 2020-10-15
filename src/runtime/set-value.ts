@@ -57,7 +57,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
               // fire off each of the watch methods that are watching this property
               instance[watchMethodName](newVal, oldVal, propName);
             } catch (e) {
-              consoleError(e);
+              consoleError(e, elm);
             }
           });
         }

@@ -117,7 +117,7 @@ const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad:
         }
       }
     } catch (e) {
-      consoleError(e);
+      consoleError(e, elm);
     }
   }
 
@@ -170,7 +170,7 @@ const callRender = (hostRef: d.HostRef, instance: any) => {
       hostRef.$flags$ |= HOST_FLAGS.hasRendered;
     }
   } catch (e) {
-    consoleError(e);
+    consoleError(e, hostRef.$hostElement$);
   }
   renderingRef = null;
   return instance;
