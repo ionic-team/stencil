@@ -13,15 +13,21 @@ export const patchCloneNode = (HostElementPrototype: any) => {
     const clonedNode = orgCloneNode.call(srcNode, isShadowDom ? deep : false) as Node;
     if (BUILD.slot && !isShadowDom && deep) {
       let i = 0;
-      let slotted;
+      let slotted, nonStencilNode;
+      let stencilPrivates = ['s-id', 's-cr', 's-lr', 's-rc', 's-sc', 's-p', 's-cn', 's-sr', 's-sn', 's-hn', 's-ol', 's-nr', 's-si'];
+      
       for (; i < srcNode.childNodes.length; i++) {
         slotted = (srcNode.childNodes[i] as any)['s-nr'];
+        nonStencilNode = stencilPrivates.every((privateField) => !(srcNode.childNodes[i] as any)[privateField]);
         if (slotted) {
           if (BUILD.appendChildSlotFix && (clonedNode as any).__appendChild) {
             (clonedNode as any).__appendChild(slotted.cloneNode(true));
           } else {
             clonedNode.appendChild(slotted.cloneNode(true));
           }
+        }
+        if (nonStencilNode){
+          clonedNode.appendChild((srcNode.childNodes[i] as any).cloneNode(true));
         }
       }
     }
