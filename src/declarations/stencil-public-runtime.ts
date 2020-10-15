@@ -316,7 +316,8 @@ export declare function writeTask(task: RafCallback): void;
 export declare function readTask(task: RafCallback): void;
 
 /**
- * `setMode()` is used for libraries which provide multiple "modes" for styles.
+ * `setErrorHandler()` can be used to inject a custom global error handler.
+ * Unhandled exception raised while rendering, during event handling, or lifecycles will trigger the custom event handler.
  */
 export declare const setErrorHandler: (handler: ErrorHandler) => void;
 

@@ -1,6 +1,6 @@
 import type * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { doc, plt, supportsListenerOptions, win } from '@platform';
+import { doc, plt, consoleError, supportsListenerOptions, win } from '@platform';
 import { HOST_FLAGS, LISTENER_FLAGS } from '@utils';
 
 export const addHostEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listeners: d.ComponentRuntimeHostListener[], attachParentListeners: boolean) => {
@@ -36,15 +36,19 @@ export const addHostEventListeners = (elm: d.HostElement, hostRef: d.HostRef, li
 };
 
 const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => (ev: Event) => {
-  if (BUILD.lazyLoad) {
-    if (hostRef.$flags$ & HOST_FLAGS.isListenReady) {
-      // instance is ready, let's call it's member method for this event
-      hostRef.$lazyInstance$[methodName](ev);
+  try {
+    if (BUILD.lazyLoad) {
+      if (hostRef.$flags$ & HOST_FLAGS.isListenReady) {
+        // instance is ready, let's call it's member method for this event
+        hostRef.$lazyInstance$[methodName](ev);
+      } else {
+        (hostRef.$queuedListeners$ = hostRef.$queuedListeners$ || []).push([methodName, ev]);
+      }
     } else {
-      (hostRef.$queuedListeners$ = hostRef.$queuedListeners$ || []).push([methodName, ev]);
+      (hostRef.$hostElement$ as any)[methodName](ev);
     }
-  } else {
-    (hostRef.$hostElement$ as any)[methodName](ev);
+  } catch (e)  {
+    consoleError(e);
   }
 };
 
