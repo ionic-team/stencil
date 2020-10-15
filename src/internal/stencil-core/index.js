@@ -11,4 +11,5 @@ export {
   setMode,
   setAssetPath,
   writeTask,
+  setErrorHandler,
 } from '../client/index.js';

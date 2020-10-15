@@ -44,6 +44,7 @@ export {
   State,
   Watch,
   writeTask,
+  setErrorHandler,
 } from '../stencil-public-runtime';
 
 export type { StencilConfig as Config, PrerenderConfig } from '../stencil-public-compiler';

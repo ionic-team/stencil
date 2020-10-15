@@ -9,7 +9,7 @@
 import type * as d from '../../declarations';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS, HTML_NS, SVG_NS, isDef } from '@utils';
-import { consoleError, doc, plt, supportsShadow } from '@platform';
+import { consoleDevError, doc, plt, supportsShadow } from '@platform';
 import { h, isHost, newVNode } from './h';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
 import { updateElement } from './update-element';
@@ -52,7 +52,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
   }
 
   if (BUILD.isDev && newVNode.$elm$) {
-    consoleError(
+    consoleDevError(
       `The JSX ${
         newVNode.$text$ !== null ? `"${newVNode.$text$}" text` : `"${newVNode.$tag$}" element`
       } node should not be shared within the same renderer. The renderer caches element lookups in order to improve performance. However, a side effect from this is that the exact same JSX node should not be reused. For more information please see https://stenciljs.com/docs/templating-jsx#avoid-shared-jsx-nodes`,

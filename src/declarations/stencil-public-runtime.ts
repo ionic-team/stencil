@@ -245,6 +245,8 @@ export declare const Watch: WatchDecorator;
 
 export type ResolutionHandler = (elm: HTMLElement) => string | undefined | null;
 
+export type ErrorHandler = (err: any, element?: HTMLElement) => void;
+
 /**
  * `setMode()` is used for libraries which provide multiple "modes" for styles.
  */
@@ -312,6 +314,13 @@ export declare function writeTask(task: RafCallback): void;
  * For further information: https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing
  */
 export declare function readTask(task: RafCallback): void;
+
+/**
+ * `setErrorHandler()` can be used to inject a custom global error handler.
+ * Unhandled exception raised while rendering, during event handling, or lifecycles will trigger the custom event handler.
+ */
+export declare const setErrorHandler: (handler: ErrorHandler) => void;
+
 /**
  * This file gets copied to all distributions of stencil component collections.
  * - no imports
