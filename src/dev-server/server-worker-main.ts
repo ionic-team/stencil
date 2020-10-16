@@ -43,7 +43,10 @@ export function initServerProcessWorkerProxy(sendToMain: (msg: d.DevServerMessag
 
   serverProcess.stderr.on('data', (data: any) => {
     // the child server process has console logged an error
-    sendToMain({ error: { message: 'stderr: ' + data } });
+
+    // commented this line to temporally allow ccompilation
+    console.log('serverProcess.stderr');
+    // sendToMain({ error: { message: 'stderr: ' + data } });
   });
 
   return receiveFromMain;
