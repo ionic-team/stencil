@@ -20,7 +20,7 @@ export class CompilerContext implements d.CompilerCtx {
   addWatchDir: (path: string) => void = noop;
   addWatchFile: (path: string) => void = noop;
   cache: d.Cache;
-  cachedStyleMeta = new Map<string, d.StyleCompiler>();
+  cssModuleImports = new Map<string, string[]>();
   changedFiles = new Set<string>();
   changedModules = new Set<string>();
   collections: d.CollectionCompilerMeta[] = [];
@@ -43,7 +43,7 @@ export class CompilerContext implements d.CompilerCtx {
 
   reset() {
     this.cache.clear();
-    this.cachedStyleMeta.clear();
+    this.cssModuleImports.clear();
     this.cachedGlobalStyle = null;
     this.collections.length = 0;
     this.compilerOptions = null;

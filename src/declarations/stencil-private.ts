@@ -617,7 +617,7 @@ export interface CompilerCtx {
   addWatchDir: (path: string, recursive: boolean) => void;
   addWatchFile: (path: string) => void;
   cache: Cache;
-  cachedStyleMeta: Map<string, StyleCompiler>;
+  cssModuleImports: Map<string, string[]>;
   cachedGlobalStyle: string;
   collections: CollectionCompilerMeta[];
   compilerOptions: any;

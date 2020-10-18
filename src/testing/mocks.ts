@@ -68,7 +68,7 @@ export function mockCompilerCtx(config?: Config) {
     collections: [],
     compilerOptions: null,
     cache: null,
-    cachedStyleMeta: new Map(),
+    cssModuleImports: new Map(),
     events: null,
     fs: null,
     hasSuccessfulBuild: false,

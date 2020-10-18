@@ -43,8 +43,16 @@ const buildGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, b
         globalStylePath,
       );
       compilerCtx.cachedGlobalStyle = optimizedCss;
+      
       if (Array.isArray(transformResults.dependencies)) {
-        transformResults.dependencies.forEach(dep => compilerCtx.addWatchFile(dep));
+        const cssModuleImports = compilerCtx.cssModuleImports.get(globalStylePath) || [];
+        transformResults.dependencies.forEach(dep => {
+          compilerCtx.addWatchFile(dep);
+          if (!cssModuleImports.includes(dep)) {
+            cssModuleImports.push(dep);
+          }
+        });
+        compilerCtx.cssModuleImports.set(globalStylePath, cssModuleImports);
       }
       return optimizedCss;
     }
@@ -72,6 +80,11 @@ const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx,
 
   if (buildCtx.filesChanged.includes(config.globalStyle)) {
     // changed file IS the global entry style
+    return false;
+  }
+
+  const cssModuleImports = compilerCtx.cssModuleImports.get(config.globalStyle);
+  if (cssModuleImports && buildCtx.filesChanged.some(f => cssModuleImports.includes(f))) {
     return false;
   }
 
