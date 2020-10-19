@@ -23,9 +23,11 @@ const resolveStylesheetUrl = async (nodes: CssNode[], resolveUrl: (url: string) 
       for (let i = 0; i < urlSplt.length; i++) {
         const r = /url\((.*?)\)/.exec(urlSplt[i]);
         if (r) {
-          const orgUrl = r[1].replace(/(\'|\")/g, '');
-          const newUrl = await resolveUrl(orgUrl);
-          urlSplt[i] = urlSplt[i].replace(orgUrl, newUrl);
+          try {
+            const orgUrl = r[1].replace(/(\'|\")/g, '');
+            const newUrl = await resolveUrl(orgUrl);
+            urlSplt[i] = urlSplt[i].replace(orgUrl, newUrl);
+          } catch (e) {}
         }
       }
       node.value = urlSplt.join(',');

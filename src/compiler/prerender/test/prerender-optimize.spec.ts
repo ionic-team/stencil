@@ -42,9 +42,9 @@ describe('prerender optimize', () => {
   });
 
   it('setAttrUrls src w/ descriptor', () => {
-    const url = new URL('https://stenciljs.com/assets/image.png?s-cache=123');
+    const url = new URL('https://stenciljs.com/assets/image.png?v=123');
     const s1 = setAttrUrls(url, '640w');
-    expect(s1).toEqual('/assets/image.png?s-cache=123 640w');
+    expect(s1).toEqual('/assets/image.png?v=123 640w');
   });
 
 });

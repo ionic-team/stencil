@@ -238,6 +238,21 @@ export const hashAssets = async (sys: d.CompilerSystem, diagnostics: d.Diagnosti
   await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'script', ['src']);
   await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'img', ['src', 'srcset']);
   await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'picture > source', ['srcset']);
+  
+  const pageStates = Array.from(doc.querySelectorAll('script[data-stencil-static="page.state"][type="application/json"]')) as HTMLScriptElement[];
+  if (pageStates.length > 0) {
+    await Promise.all(pageStates.map(async pageStateScript => {
+      const pageState = JSON.parse(pageStateScript.textContent);
+      if (pageState && Array.isArray(pageState.ast)) {
+        for (const node of pageState.ast) {
+          if (Array.isArray(node)) {
+            await hashPageStateAstAssets(sys, hydrateOpts, appDir, currentUrl, pageStateScript, node);
+          }
+        }
+        pageStateScript.textContent = JSON.stringify(pageState);
+      }
+    }));
+  }
 }
 
 const hashAsset = async (sys: d.CompilerSystem, hydrateOpts: d.PrerenderHydrateOptions, appDir: string, doc: Document, currentUrl: URL, selector: string, srcAttrs: string[]) => {
@@ -251,18 +266,56 @@ const hashAsset = async (sys: d.CompilerSystem, hydrateOpts: d.PrerenderHydrateO
         const assetUrl = new URL(srcValue.src, currentUrl);
         if (assetUrl.hostname === currentUrl.hostname) {
           if (hydrateOpts.hashAssets === 'querystring' && !assetUrl.searchParams.has('v')) {
-            const hash = await getAssetFileHash(sys, appDir, assetUrl);
-            if (isString(hash)) {
-              assetUrl.searchParams.append('v', hash);
-              const attrValue = setAttrUrls(assetUrl, srcValue.descriptor);
-              elm.setAttribute(attrName, attrValue);
-            }
+            try {
+              const hash = await getAssetFileHash(sys, appDir, assetUrl);
+              if (isString(hash)) {
+                assetUrl.searchParams.append('v', hash);
+                const attrValue = setAttrUrls(assetUrl, srcValue.descriptor);
+                elm.setAttribute(attrName, attrValue);
+              }
+            } catch (e) {}
           }
         }
       }
     }
   }
-}
+};
+
+const hashPageStateAstAssets = async (sys: d.CompilerSystem, hydrateOpts: d.PrerenderHydrateOptions, appDir: string, currentUrl: URL, pageStateScript: HTMLScriptElement, node: any[]) => {
+  const tagName = node[0];
+  const attrs = node[1];
+
+  if (isString(tagName)) {
+    if (attrs) {
+      if (tagName === 'img' || tagName === 'source') {
+        for (const attrName of ['src', 'srcset']) {
+          const srcValues = getAttrUrls(attrName, attrs[attrName]);
+          for (const srcValue of srcValues) {
+            const assetUrl = new URL(srcValue.src, currentUrl);
+            if (assetUrl.hostname === currentUrl.hostname) {
+              if (hydrateOpts.hashAssets === 'querystring' && !assetUrl.searchParams.has('v')) {
+                try {
+                  const hash = await getAssetFileHash(sys, appDir, assetUrl);
+                  if (isString(hash)) {
+                    assetUrl.searchParams.append('v', hash);
+                    const attrValue = setAttrUrls(assetUrl, srcValue.descriptor);
+                    attrs[attrName] = attrValue;
+                  }
+                } catch (e) {}
+              }
+            }
+          }
+        }
+      }
+    }
+
+    for (let i = 2, l = node.length; i < l; i++) {
+      if (Array.isArray(node[i])) {
+        await hashPageStateAstAssets(sys, hydrateOpts, appDir, currentUrl, pageStateScript, node[i]);
+      }
+    }
+  }
+};
 
 export const getAttrUrls = (attrName: string, attrValue: string) => {
   const srcValues: { src: string, descriptor?: string }[] = [];
@@ -294,20 +347,8 @@ const hashedAssets = new Map<string, Promise<string | null>>();
 const getAssetFileHash = async (sys: d.CompilerSystem, appDir: string, assetUrl: URL) => {
   let p = hashedAssets.get(assetUrl.pathname);
   if (!p) {
-    p = new Promise<string | null>(async resolve => {
-      const assetFilePath = join(appDir, assetUrl.pathname);
-      try {
-        const data = await sys.readFile(assetFilePath, 'binary');
-        if (data != null) {
-          const hash = await sys.generateContentHash(data, 10);
-          resolve(hash);
-          return;
-        }
-      } catch (e) {
-        console.error(e);
-      }
-      resolve(null);
-    });
+    const assetFilePath = join(appDir, assetUrl.pathname);
+    p = sys.generateFileHash(assetFilePath, 10);
     hashedAssets.set(assetUrl.pathname, p);
   }
   return p;
