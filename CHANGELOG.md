@@ -1,3 +1,17 @@
+## 🐸 [1.8.12](https://github.com/ionic-team/stencil/compare/v1.8.11...v1.8.12) (2020-10-19)
+
+
+### Bug Fixes
+
+* **runtime:** do regular clone of normal slotting ([#2694](https://github.com/ionic-team/stencil/issues/2694)) ([8306f0e](https://github.com/ionic-team/stencil/commit/8306f0ec2cd2fa0ad907c7062f68c9363b8311cf))
+
+
+### Features
+
+* **styles:** use static get styles() with template literals ([a741c39](https://github.com/ionic-team/stencil/commit/a741c394f1b6ff1385ab10becff3fbf868cee308)), closes [#2234](https://github.com/ionic-team/stencil/issues/2234)
+
+
+
 ## 🏰 [1.8.11](https://github.com/ionic-team/stencil/compare/v1.8.10...v1.8.11) (2020-02-27)
 
 
