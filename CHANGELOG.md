@@ -1,71 +1,38 @@
-# 🐨 [2.1.0-4](https://github.com/ionic-team/stencil/compare/v2.1.0-3...v2.1.0-4) (2020-10-19)
+# 🐽 [2.1.0-5](https://github.com/ionic-team/stencil/compare/v2.1.0-4...v2.1.0-5) (2020-10-19)
+
+
+### Features
+
+- TypeScript 4.0.3
+- Rollup 2.32.0
+- Terser 5.3.7
+- Jest 26.6.0
+- Puppeteer 5.3.1
+- Open 7.3.0
+- Node Fetch 2.6.1
+
+* **prerender:** hash assets and add version querystring ([e20c284](https://github.com/ionic-team/stencil/commit/e20c284d74a3366f8b5c31c11037334e4a138316))
+* **prerender:** hash assets in page.state static content ([baeb842](https://github.com/ionic-team/stencil/commit/baeb842a805972b81ff662e3bb48e7582501c643))
+* **prerender:** add buildId, hydrate externals, DOMContentLoaded ([4d49c63](https://github.com/ionic-team/stencil/commit/4d49c636bb7764c500bc4c87f07a161ea20630a2))
+* **prerender:** server-side only bundle modules w/ .server directory ([d8fcb60](https://github.com/ionic-team/stencil/commit/d8fcb60caedff6ac4a8b166e51f14143abe0c73a))
+* **prerender:** write page.state.json data from hydrat
+* add setErrorHandler() ([#2704](https://github.com/ionic-team/stencil/issues/2704)) ([5d2780a](https://github.com/ionic-team/stencil/commit/5d2780ac98cc046a71f8b766e4ffd4e750c3a903))
+* **docs-custom:** add config argument ([#2696](https://github.com/ionic-team/stencil/issues/2696)) ([d285879](https://github.com/ionic-team/stencil/commit/d285879ec596f42d1542152d42afa1619e27ff62))
+* **sys:** add encoding option to readFile ([99ef518](https://github.com/ionic-team/stencil/commit/99ef5184e86101ed6695bfc0af3c4e8ee54ecd51))
+* **sys:** add sys.generateFileHash() for more efficient file hashing ([d762c6d](https://github.com/ionic-team/stencil/commit/d762c6d082d6e794eab7697c228c1456a4417f41))
+* **dev-server:** add ssr option for dev server for prerending dev ([2574094](https://github.com/ionic-team/stencil/commit/2574094df12a22fc699c53242cbfbd84ab712801))
+* **e2e:** e2e timeout configurable ([8b69731](https://github.com/ionic-team/stencil/commit/8b69731080efd5febab83620e6624870e4f45dc5)), closes [#2662](https://github.com/ionic-team/stencil/issues/2662)
+* **nodeRequire:** export nodeRequire utility from compiler ([10ea2fb](https://github.com/ionic-team/stencil/commit/10ea2fbbf291409a16a6a8fe43d54534d0a94878))e builds ([a2c93f6](https://github.com/ionic-team/stencil/commit/a2c93f6a989bfcc44e07e0a15aa4f8ba284e3f6b))
 
 
 ### Bug Fixes
 
 * **hmr:** reload from changed css import in global styles ([4f8934d](https://github.com/ionic-team/stencil/commit/4f8934d7f5432c2c06fbd0d6f1a0b3c5ae880a73))
 * **runtime:** do regular clone of normal slotting ([#2694](https://github.com/ionic-team/stencil/issues/2694)) ([602c1e2](https://github.com/ionic-team/stencil/commit/602c1e2b70dc9980bcd90f726c0045307a8cb942))
-
-
-### Features
-
-* **prerender:** hash assets and add version querystring ([e20c284](https://github.com/ionic-team/stencil/commit/e20c284d74a3366f8b5c31c11037334e4a138316))
-* **rollup:** update to rollup 2.32.0 and jest 26.5.3 ([241c23c](https://github.com/ionic-team/stencil/commit/241c23c5ae38f6b973465dd7e0ca93f07329d5d0))
-
-
-
-# 🍟 [2.1.0-3](https://github.com/ionic-team/stencil/compare/v2.1.0-2...v2.1.0-3) (2020-10-15)
-
-
-### Bug Fixes
-
 * **mock-doc:** set hostname when location is updated ([#2689](https://github.com/ionic-team/stencil/issues/2689)) ([9598a05](https://github.com/ionic-team/stencil/commit/9598a05e778538656a233cf02f276084b59d4098))
 * **worker:** Build.isDev in worker ([#2702](https://github.com/ionic-team/stencil/issues/2702)) ([e8ced45](https://github.com/ionic-team/stencil/commit/e8ced45654b0de41170541d193c0a3bdff77ffcb))
-
-
-### Features
-
-* add setErrorHandler() ([#2704](https://github.com/ionic-team/stencil/issues/2704)) ([5d2780a](https://github.com/ionic-team/stencil/commit/5d2780ac98cc046a71f8b766e4ffd4e750c3a903))
-* **docs-custom:** add config argument ([#2696](https://github.com/ionic-team/stencil/issues/2696)) ([d285879](https://github.com/ionic-team/stencil/commit/d285879ec596f42d1542152d42afa1619e27ff62))
-* **sys:** add encoding option to readFile ([99ef518](https://github.com/ionic-team/stencil/commit/99ef5184e86101ed6695bfc0af3c4e8ee54ecd51))
-
-
-
-# 🦂 [2.1.0-2](https://github.com/ionic-team/stencil/compare/v2.1.0-1...v2.1.0-2) (2020-10-01)
-
-
-### Bug Fixes
-
 * **dev-server:** clear module cache on ssr reload ([cfd5d39](https://github.com/ionic-team/stencil/commit/cfd5d39bad4ce2cab431595ae8c8f11d1fabb192))
 * **mock-doc:** no indentation w/in whitespace sensitive elements ([46ff715](https://github.com/ionic-team/stencil/commit/46ff71588e20cd7f0bdc3173e6cdca9b126d05d5))
-
-
-### Features
-
-* **open:** update to open 7.3.0 ([807f7e7](https://github.com/ionic-team/stencil/commit/807f7e79749b49305b8804ebc72a68d6ac8f5281))
-* **puppeteer:** update to puppeteer 5.3.1 ([6910875](https://github.com/ionic-team/stencil/commit/69108759fd67a470a3481a9205ba27976a2bd0fa))
-* **rollup:** update to rollup 2.28.2 and @rollup/plugin-commonjs 15.10 ([ddcf1d0](https://github.com/ionic-team/stencil/commit/ddcf1d09e60fe0364269193ff45b955b17807758))
-* **terser:** update to terser 5.3.3 ([de68d85](https://github.com/ionic-team/stencil/commit/de68d85bbc29a7456dc97313038d4b2903936bde))
-* **typescript:** update to typescript 4.0.3 ([9b72eb0](https://github.com/ionic-team/stencil/commit/9b72eb0954e5ded63f4750650dd9669b0aca75f8))
-
-
-
-# 🎳 [2.1.0-1](https://github.com/ionic-team/stencil/compare/v2.0.3...v2.1.0-1) (2020-09-21)
-
-### Features
-
-* **deps:** update to puppeteer 5.3.0, node-fetch 2.6.1, open 7.2.1 ([03decfa](https://github.com/ionic-team/stencil/commit/03decfa48caaf2be299e2649adf002b07cbd5e95))
-* **deps:** update to rollup 2.27.0 and terser 5.3.1 ([21a10c9](https://github.com/ionic-team/stencil/commit/21a10c936a503e4ec6ab8212f6b57f7d8ba68103))
-* **dev-server:** add ssr option for dev server for prerending dev ([2574094](https://github.com/ionic-team/stencil/commit/2574094df12a22fc699c53242cbfbd84ab712801))
-* **e2e:** e2e timeout configurable ([8b69731](https://github.com/ionic-team/stencil/commit/8b69731080efd5febab83620e6624870e4f45dc5)), closes [#2662](https://github.com/ionic-team/stencil/issues/2662)
-* **nodeRequire:** export nodeRequire utility from compiler ([10ea2fb](https://github.com/ionic-team/stencil/commit/10ea2fbbf291409a16a6a8fe43d54534d0a94878))
-* **prerender:** add buildId, hydrate externals, DOMContentLoaded ([4d49c63](https://github.com/ionic-team/stencil/commit/4d49c636bb7764c500bc4c87f07a161ea20630a2))
-* **prerender:** server-side only bundle modules w/ .server directory ([d8fcb60](https://github.com/ionic-team/stencil/commit/d8fcb60caedff6ac4a8b166e51f14143abe0c73a))
-* **prerender:** write page.state.json data from hydrate builds ([a2c93f6](https://github.com/ionic-team/stencil/commit/a2c93f6a989bfcc44e07e0a15aa4f8ba284e3f6b))
-
-
-### Bug Fixes
-
 * **dev-server:** improve exiting dev server process ([eb02517](https://github.com/ionic-team/stencil/commit/eb025171f327a28de002fa6b73ffffc03ae0f905))
 * **e2e:** update to use page.waitForTimeout() ([e48d306](https://github.com/ionic-team/stencil/commit/e48d30682565c08acd72f791e73319453234b0fb))
 * **hydrate:** improve dev server console error ([9cb31a5](https://github.com/ionic-team/stencil/commit/9cb31a5ee4d24fbbb29e7d78061ce4d47350150a))
