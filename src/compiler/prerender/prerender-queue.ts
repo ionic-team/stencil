@@ -113,6 +113,7 @@ const prerenderUrl = async (results: d.PrerenderResults, manager: d.PrerenderMan
     }
 
     const prerenderRequest: d.PrerenderUrlRequest = {
+      appDir: manager.outputTarget.appDir,
       baseUrl: manager.outputTarget.baseUrl,
       buildId: results.buildId,
       componentGraphPath: manager.componentGraphPath,

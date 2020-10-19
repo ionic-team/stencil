@@ -2,6 +2,7 @@ import type * as d from '../../declarations';
 import {
   addModulePreloads,
   excludeStaticComponents,
+  hashAssets,
   minifyScriptElements,
   minifyStyleElements,
   removeModulePreloads,
@@ -31,6 +32,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
 
   try {
     const url = new URL(prerenderRequest.url, prerenderRequest.devServerHostUrl);
+    const baseUrl = new URL(prerenderRequest.baseUrl);
     const componentGraph = getComponentGraph(sys, prerenderRequest.componentGraphPath);
 
     // webpack work-around/hack
@@ -44,6 +46,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
     // create a new window by cloning the cached parsed window
     const win = hydrateApp.createWindowFromHtml(prerenderCtx.templateHtml, prerenderRequest.templateId);
     const doc = win.document;
+    win.location.href = url.href;
 
     // patch this new window
     if (isFunction(sys.applyPrerenderGlobalPatch)) {
@@ -85,6 +88,17 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
     const hydrateResults = (await hydrateApp.hydrateDocument(doc, hydrateOpts)) as d.HydrateResults;
     results.diagnostics.push(...hydrateResults.diagnostics);
 
+    if (typeof prerenderConfig.filePath === 'function') {
+      try {
+        const userWriteToFilePath = prerenderConfig.filePath(url, results.filePath);
+        if (typeof userWriteToFilePath === 'string') {
+          results.filePath = userWriteToFilePath;
+        }
+      } catch (e) {
+        catchError(results.diagnostics, e);
+      }
+    }
+
     if (hydrateOpts.staticDocument) {
       removeStencilScripts(doc);
       removeModulePreloads(doc);
@@ -103,32 +117,28 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
       }
     }
 
-    const minifyPromises: Promise<any>[] = [];
+    const docPromises: Promise<any>[] = [];
     if (hydrateOpts.minifyStyleElements && !prerenderRequest.isDebug) {
-      minifyPromises.push(minifyStyleElements(doc, false));
+      docPromises.push(minifyStyleElements(sys, prerenderRequest.appDir, doc, url, false));
     }
 
     if (hydrateOpts.minifyScriptElements && !prerenderRequest.isDebug) {
-      minifyPromises.push(minifyScriptElements(doc, false));
+      docPromises.push(minifyScriptElements(doc, false));
     }
 
-    if (minifyPromises.length > 0) {
-      await Promise.all(minifyPromises);
-    }
-
-    if (typeof prerenderConfig.filePath === 'function') {
+    if (hydrateOpts.hashAssets && !prerenderRequest.isDebug) {
       try {
-        const userWriteToFilePath = prerenderConfig.filePath(url, results.filePath);
-        if (typeof userWriteToFilePath === 'string') {
-          results.filePath = userWriteToFilePath;
-        }
+        docPromises.push(hashAssets(sys, results.diagnostics, hydrateOpts, prerenderRequest.appDir, doc, url));
       } catch (e) {
         catchError(results.diagnostics, e);
       }
     }
+    
+    if (docPromises.length > 0) {
+      await Promise.all(docPromises);
+    }
 
     if (prerenderConfig.crawlUrls !== false) {
-      const baseUrl = new URL(prerenderRequest.baseUrl);
       results.anchorUrls = crawlAnchorsForNextUrls(
         prerenderConfig,
         results.diagnostics,

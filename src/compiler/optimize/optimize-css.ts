@@ -15,7 +15,10 @@ export const optimizeCss = async (inputOpts: OptimizeCssInput) => {
     }
   }
   if (inputOpts.minify !== false) {
-    result.output = minifyCss(result.output);
+    result.output = await minifyCss({
+      css: result.output,
+      resolveUrl: inputOpts.resolveUrl
+    });
   }
   return result;
 };

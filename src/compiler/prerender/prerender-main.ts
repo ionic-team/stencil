@@ -192,6 +192,7 @@ const runPrerenderOutputTarget = async (
       srcIndexHtmlPath,
       outputTarget,
       hydrateOpts,
+      manager
     );
     if (diagnostics.length > 0 || !templateData || !isString(templateData.html)) {
       return;

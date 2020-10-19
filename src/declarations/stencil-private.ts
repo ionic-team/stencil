@@ -1453,6 +1453,7 @@ export interface PrerenderUrlResults {
 }
 
 export interface PrerenderUrlRequest {
+  appDir: string;
   buildId: string;
   baseUrl: string;
   componentGraphPath: string;

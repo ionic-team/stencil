@@ -12,6 +12,7 @@ describe('optimizeCss', () => {
 
   beforeEach(() => {
     config = mockConfig();
+    config.maxConcurrentWorkers = 0;
     compilerCtx = mockCompilerCtx(config);
     diagnostics = [];
   });

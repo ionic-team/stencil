@@ -6,23 +6,24 @@ export interface ParseCssResults {
   stylesheet: CssNode;
 }
 
-export type CssNodeType =
-  | 'charset'
-  | 'comment'
-  | 'custom-media'
-  | 'document'
-  | 'declaration'
-  | 'font-face'
-  | 'host'
-  | 'import'
-  | 'keyframes'
-  | 'keyframe'
-  | 'media'
-  | 'namespace'
-  | 'page'
-  | 'rule'
-  | 'stylesheet'
-  | 'supports';
+export const enum  CssNodeType  {
+  Charset,
+  Comment,
+  CustomMedia,
+  Document,
+  Declaration,
+  FontFace,
+  Host,
+  Import,
+  KeyFrames,
+  KeyFrame,
+  Media,
+  Namespace,
+  Page,
+  Rule,
+  StyleSheet,
+  Supports,
+}
 
 export interface CssNode {
   type?: CssNodeType;

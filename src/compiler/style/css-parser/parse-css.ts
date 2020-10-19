@@ -1,5 +1,5 @@
 import type * as d from '../../../declarations';
-import { ParseCssResults, CssNode, CssParsePosition } from './css-parse-declarations';
+import { ParseCssResults, CssNode, CssParsePosition, CssNodeType } from './css-parse-declarations';
 
 export const parseCss = (css: string, filePath?: string): ParseCssResults => {
   let lineno = 1;
@@ -76,7 +76,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     const rulesList = rules();
 
     return {
-      type: 'stylesheet',
+      type: CssNodeType.StyleSheet,
       stylesheet: {
         source: filePath,
         rules: rulesList,
@@ -148,7 +148,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     column += 2;
 
     return pos({
-      type: 'comment',
+      type: CssNodeType.Comment,
       comment,
     });
   };
@@ -183,7 +183,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     const val = match(/^((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^\)]*?\)|[^};])+)/);
 
     const ret = pos({
-      type: 'declaration',
+      type: CssNodeType.Declaration,
       property: prop.replace(commentre, ''),
       value: val ? trim(val[0]).replace(commentre, '') : '',
     });
@@ -225,7 +225,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     if (!values.length) return null;
 
     return pos({
-      type: 'keyframe',
+      type: CssNodeType.KeyFrame,
       values,
       declarations: declarations(),
     });
@@ -255,7 +255,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     if (!close()) return error(`@keyframes missing '}'`);
 
     return pos({
-      type: 'keyframes',
+      type: CssNodeType.KeyFrames,
       name: name,
       vendor: vendor,
       keyframes: frames,
@@ -276,7 +276,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     if (!close()) return error(`@supports missing '}'`);
 
     return pos({
-      type: 'supports',
+      type: CssNodeType.Supports,
       supports: supports,
       rules: style,
     });
@@ -295,7 +295,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     if (!close()) return error(`@host missing '}'`);
 
     return pos({
-      type: 'host',
+      type: CssNodeType.Host,
       rules: style,
     });
   };
@@ -314,7 +314,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     if (!close()) return error(`@media missing '}'`);
 
     return pos({
-      type: 'media',
+      type: CssNodeType.Media,
       media: media,
       rules: style,
     });
@@ -326,7 +326,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     if (!m) return null;
 
     return pos({
-      type: 'custom-media',
+      type: CssNodeType.CustomMedia,
       name: trim(m[1]),
       media: trim(m[2]),
     });
@@ -351,7 +351,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     if (!close()) return error(`@page missing '}'`);
 
     return pos({
-      type: 'page',
+      type: CssNodeType.Page,
       selectors: sel,
       declarations: decls,
     });
@@ -372,7 +372,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     if (!close()) return error(`@document missing '}'`);
 
     return pos({
-      type: 'document',
+      type: CssNodeType.Document,
       document: doc,
       vendor: vendor,
       rules: style,
@@ -396,28 +396,30 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     if (!close()) return error(`@font-face missing '}'`);
 
     return pos({
-      type: 'font-face',
+      type: CssNodeType.FontFace,
       declarations: decls,
     });
   };
 
-  const _compileAtrule = (name: string) => {
-    const re = new RegExp('^@' + name + '\\s*([^;]+);');
+  const compileAtrule = (nodeName: string, nodeType: CssNodeType) => {
+    const re = new RegExp('^@' + nodeName + '\\s*([^;]+);');
     return () => {
       const pos = position();
       const m = match(re);
       if (!m) return null;
-      const ret: any = { type: name };
-      ret[name] = m[1].trim();
-      return pos(ret);
+      const node: any = {
+        type: nodeType
+      };
+      (node as any)[nodeName] = m[1].trim();
+      return pos(node);
     };
   };
 
-  const atimport = _compileAtrule('import');
+  const atimport = compileAtrule('import', CssNodeType.Import);
 
-  const atcharset = _compileAtrule('charset');
+  const atcharset = compileAtrule('charset', CssNodeType.Charset);
 
-  const atnamespace = _compileAtrule('namespace');
+  const atnamespace = compileAtrule('namespace', CssNodeType.Namespace);
 
   const atrule = () => {
     if (css[0] !== '@') return null;
@@ -432,7 +434,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     comments();
 
     return pos({
-      type: 'rule',
+      type: CssNodeType.Rule,
       selectors: sel,
       declarations: declarations(),
     });

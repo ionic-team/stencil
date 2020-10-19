@@ -1,12 +1,13 @@
 import type * as d from '../../declarations';
-import { flatOne, unique } from '@utils';
+import { catchError, flatOne, isString, unique } from '@utils';
 import { getScopeId } from '../style/scope-css';
 import { injectModulePreloads } from '../html/inject-module-preloads';
 import { optimizeCss } from '../optimize/optimize-css';
 import { optimizeJs } from '../optimize/optimize-js';
 import { join } from 'path';
+import { minifyCss } from '../optimize/minify-css';
 
-export const inlineExternalStyleSheets = async (config: d.Config, appDir: string, doc: Document) => {
+export const inlineExternalStyleSheets = async (sys: d.CompilerSystem, appDir: string, doc: Document) => {
   const documentLinks = Array.from(doc.querySelectorAll('link[rel=stylesheet]')) as HTMLLinkElement[];
   if (documentLinks.length === 0) {
     return;
@@ -22,7 +23,7 @@ export const inlineExternalStyleSheets = async (config: d.Config, appDir: string
       const fsPath = join(appDir, href);
 
       try {
-        let styles = await config.sys.readFile(fsPath);
+        let styles = await sys.readFile(fsPath);
 
         const optimizeResults = await optimizeCss({
           input: styles,
@@ -94,17 +95,13 @@ export const minifyScriptElements = async (doc: Document, addMinifiedAttr: boole
   );
 };
 
-export const minifyStyleElements = async (doc: Document, addMinifiedAttr: boolean) => {
+export const minifyStyleElements = async (sys: d.CompilerSystem, appDir: string, doc: Document, currentUrl: URL, addMinifiedAttr: boolean) => {
   const styleElms = Array.from(doc.querySelectorAll('style')).filter(styleElm => {
     if (styleElm.hasAttribute(dataMinifiedAttr)) {
       return false;
     }
     return true;
   });
-
-  if (styleElms.length === 0) {
-    return;
-  }
 
   await Promise.all(
     styleElms.map(async styleElm => {
@@ -113,6 +110,12 @@ export const minifyStyleElements = async (doc: Document, addMinifiedAttr: boolea
         const optimizeResults = await optimizeCss({
           input: content,
           minify: true,
+          async resolveUrl(urlProp) {
+            const assetUrl = new URL(urlProp, currentUrl);
+            const hash = await getAssetFileHash(sys, appDir, assetUrl);
+            assetUrl.searchParams.append('v', hash);
+            return assetUrl.pathname + assetUrl.search;
+          }
         });
         if (optimizeResults.diagnostics.length === 0) {
           styleElm.innerHTML = optimizeResults.output;
@@ -190,5 +193,124 @@ export const removeStencilScripts = (doc: Document) => {
 export const hasStencilScript = (doc: Document) => {
   return !!doc.querySelector('script[data-stencil]');
 };
+
+export const hashAssets = async (sys: d.CompilerSystem, diagnostics: d.Diagnostic[], hydrateOpts: d.PrerenderHydrateOptions, appDir: string, doc: Document, currentUrl: URL) => {
+  // do one at a time to prevent too many opened files and memory usage issues
+  // hash id is cached in each worker, so shouldn't have to do this for every page
+
+  // update the stylesheet content first so the hash url()s are apart of the file's hash too
+  const links = Array.from(doc.querySelectorAll('link[rel=stylesheet][href]')) as HTMLLinkElement[];
+
+  for (const link of links) {
+    const href = link.getAttribute('href');
+    if (isString(href) && href.length > 0) {
+      const stylesheetUrl = new URL(href, currentUrl);
+      if (currentUrl.host === stylesheetUrl.host) {
+        try {
+          const filePath = join(appDir, stylesheetUrl.pathname);
+          let css = await sys.readFile(filePath);
+          if (isString(css)) {
+            css = await minifyCss({
+              css,
+              async resolveUrl(urlProp) {
+                const assetUrl = new URL(urlProp, stylesheetUrl);
+                const hash = await getAssetFileHash(sys, appDir, assetUrl);
+                assetUrl.searchParams.append('v', hash);
+                return assetUrl.pathname + assetUrl.search;
+              }
+            });
+            await sys.writeFile(filePath, css);
+          }
+        } catch (e) {
+          catchError(diagnostics, e);
+        }
+      }
+    }
+  }
+
+  await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'link[rel="stylesheet"]', ['href']);
+  await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'link[rel="prefetch"]', ['href']);
+  await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'link[rel="preload"]', ['href']);
+  await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'link[rel="modulepreload"]', ['href']);
+  await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'link[rel="icon"]', ['href']);
+  await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'link[rel="apple-touch-icon"]', ['href']);
+  await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'link[rel="manifest"]', ['href']);
+  await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'script', ['src']);
+  await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'img', ['src', 'srcset']);
+  await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'picture > source', ['srcset']);
+}
+
+const hashAsset = async (sys: d.CompilerSystem, hydrateOpts: d.PrerenderHydrateOptions, appDir: string, doc: Document, currentUrl: URL, selector: string, srcAttrs: string[]) => {
+  const elms = Array.from(doc.querySelectorAll(selector));
+
+  // do one at a time to prevent too many opened files and memory usage issues
+  for (const elm of elms) {
+    for (const attrName of srcAttrs) {
+      const srcValues = getAttrUrls(attrName, elm.getAttribute(attrName));
+      for (const srcValue of srcValues) {
+        const assetUrl = new URL(srcValue.src, currentUrl);
+        if (assetUrl.hostname === currentUrl.hostname) {
+          if (hydrateOpts.hashAssets === 'querystring' && !assetUrl.searchParams.has('v')) {
+            const hash = await getAssetFileHash(sys, appDir, assetUrl);
+            if (isString(hash)) {
+              assetUrl.searchParams.append('v', hash);
+              const attrValue = setAttrUrls(assetUrl, srcValue.descriptor);
+              elm.setAttribute(attrName, attrValue);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+export const getAttrUrls = (attrName: string, attrValue: string) => {
+  const srcValues: { src: string, descriptor?: string }[] = [];
+  if (isString(attrValue)) {
+    if (attrName.toLowerCase() === 'srcset') {
+      attrValue.split(',').map(a => a.trim()).filter(a => a.length > 0).forEach(src => {
+        const spaceSplt = src.split(' ');
+        if (spaceSplt[0].length > 0) {
+          srcValues.push({ src: spaceSplt[0], descriptor: spaceSplt[1] });
+        }
+      });
+    } else {
+      srcValues.push({ src: attrValue });
+    }
+  }
+  return srcValues;
+}
+
+export const setAttrUrls = (url: URL, descriptor: string) => {
+  let src = url.pathname + url.search;
+  if (isString(descriptor)) {
+    src += ' ' + descriptor;
+  }
+  return src;
+};
+
+const hashedAssets = new Map<string, Promise<string | null>>();
+
+const getAssetFileHash = async (sys: d.CompilerSystem, appDir: string, assetUrl: URL) => {
+  let p = hashedAssets.get(assetUrl.pathname);
+  if (!p) {
+    p = new Promise<string | null>(async resolve => {
+      const assetFilePath = join(appDir, assetUrl.pathname);
+      try {
+        const data = await sys.readFile(assetFilePath, 'binary');
+        if (data != null) {
+          const hash = await sys.generateContentHash(data, 10);
+          resolve(hash);
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      resolve(null);
+    });
+    hashedAssets.set(assetUrl.pathname, p);
+  }
+  return p;
+}
 
 const dataMinifiedAttr = 'data-m';

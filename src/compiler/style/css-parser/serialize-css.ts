@@ -1,4 +1,4 @@
-import { CssNode, SerializeCssOptions, SerializeOpts } from './css-parse-declarations';
+import { CssNode, CssNodeType, SerializeCssOptions, SerializeOpts } from './css-parse-declarations';
 import { getCssSelectors } from './get-css-selectors';
 
 export const serializeCss = (stylesheet: CssNode, serializeOpts: SerializeCssOptions) => {
@@ -28,53 +28,53 @@ export const serializeCss = (stylesheet: CssNode, serializeOpts: SerializeCssOpt
 
 const serializeCssVisitNode = (opts: SerializeOpts, node: CssNode, index: number, len: number) => {
   const nodeType = node.type;
-  if (nodeType === 'declaration') {
+  if (nodeType === CssNodeType.Declaration) {
     return serializeCssDeclaration(node, index, len);
   }
-  if (nodeType === 'rule') {
+  if (nodeType === CssNodeType.Rule) {
     return serializeCssRule(opts, node);
   }
-  if (nodeType === 'comment') {
+  if (nodeType === CssNodeType.Comment) {
     if (node.comment[0] === '!') {
       return `/*${node.comment}*/`;
     } else {
       return '';
     }
   }
-  if (nodeType === 'media') {
+  if (nodeType === CssNodeType.Media) {
     return serializeCssMedia(opts, node);
   }
-  if (nodeType === 'keyframes') {
+  if (nodeType === CssNodeType.KeyFrames) {
     return serializeCssKeyframes(opts, node);
   }
-  if (nodeType === 'keyframe') {
+  if (nodeType === CssNodeType.KeyFrame) {
     return serializeCssKeyframe(opts, node);
   }
-  if (nodeType === 'font-face') {
+  if (nodeType === CssNodeType.FontFace) {
     return serializeCssFontFace(opts, node);
   }
-  if (nodeType === 'supports') {
+  if (nodeType === CssNodeType.Supports) {
     return serializeCssSupports(opts, node);
   }
-  if (nodeType === 'import') {
+  if (nodeType === CssNodeType.Import) {
     return '@import ' + node.import + ';';
   }
-  if (nodeType === 'charset') {
+  if (nodeType === CssNodeType.Charset) {
     return '@charset ' + node.charset + ';';
   }
-  if (nodeType === 'page') {
+  if (nodeType === CssNodeType.Page) {
     return serializeCssPage(opts, node);
   }
-  if (nodeType === 'host') {
+  if (nodeType === CssNodeType.Host) {
     return '@host{' + serializeCssMapVisit(opts, node.rules) + '}';
   }
-  if (nodeType === 'custom-media') {
+  if (nodeType === CssNodeType.CustomMedia) {
     return '@custom-media ' + node.name + ' ' + node.media + ';';
   }
-  if (nodeType === 'document') {
+  if (nodeType === CssNodeType.Document) {
     return serializeCssDocument(opts, node);
   }
-  if (nodeType === 'namespace') {
+  if (nodeType === CssNodeType.Namespace) {
     return '@namespace ' + node.namespace + ';';
   }
   return '';
