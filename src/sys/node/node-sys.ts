@@ -525,11 +525,25 @@ export function createNodeSys(c: { process?: any } = {}) {
     },
     generateContentHash(content, length) {
       let hash = createHash('sha1').update(content).digest('hex').toLowerCase();
-
       if (typeof length === 'number') {
         hash = hash.substr(0, length);
       }
       return Promise.resolve(hash);
+    },
+    generateFileHash(filePath, length) {
+      return new Promise((resolve, reject) => {
+        const h = createHash('sha1');
+        fs.createReadStream(filePath)
+          .on('error', err => reject(err))
+          .on('data', data => h.update(data))
+          .on('end', () => {
+            let hash = h.digest('hex').toLowerCase();
+            if (typeof length === 'number') {
+              hash = hash.substr(0, length);
+            }
+            resolve(hash);
+          });
+      });
     },
     copy: nodeCopyTasks,
     details: {

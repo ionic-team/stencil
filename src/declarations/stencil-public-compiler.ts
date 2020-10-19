@@ -892,9 +892,13 @@ export interface CompilerSystem {
    */
   fetch?(input: string | any, init?: any): Promise<any>;
   /**
-   * Generates a MD5 digest encoded as HEX
+   * Generates a sha1 digest encoded as HEX
    */
   generateContentHash?(content: string | any, length?: number): Promise<string>;
+  /**
+   * Generates a sha1 digest encoded as HEX from a file path
+   */
+  generateFileHash?(filePath: string | any, length?: number): Promise<string>;
   /**
    * Get the current directory.
    */
