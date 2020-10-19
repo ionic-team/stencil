@@ -1,3 +1,19 @@
+# 🐨 [2.1.0-4](https://github.com/ionic-team/stencil/compare/v2.1.0-3...v2.1.0-4) (2020-10-19)
+
+
+### Bug Fixes
+
+* **hmr:** reload from changed css import in global styles ([4f8934d](https://github.com/ionic-team/stencil/commit/4f8934d7f5432c2c06fbd0d6f1a0b3c5ae880a73))
+* **runtime:** do regular clone of normal slotting ([#2694](https://github.com/ionic-team/stencil/issues/2694)) ([602c1e2](https://github.com/ionic-team/stencil/commit/602c1e2b70dc9980bcd90f726c0045307a8cb942))
+
+
+### Features
+
+* **prerender:** hash assets and add version querystring ([e20c284](https://github.com/ionic-team/stencil/commit/e20c284d74a3366f8b5c31c11037334e4a138316))
+* **rollup:** update to rollup 2.32.0 and jest 26.5.3 ([241c23c](https://github.com/ionic-team/stencil/commit/241c23c5ae38f6b973465dd7e0ca93f07329d5d0))
+
+
+
 # 🍟 [2.1.0-3](https://github.com/ionic-team/stencil/compare/v2.1.0-2...v2.1.0-3) (2020-10-15)
 
 
