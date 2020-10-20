@@ -1,5 +1,4 @@
-# 🐽 [2.1.0-5](https://github.com/ionic-team/stencil/compare/v2.1.0-4...v2.1.0-5) (2020-10-19)
-
+# 🖍 [2.1.0](https://github.com/ionic-team/stencil/compare/v2.0.3...v2.1.0) (2020-10-20)
 
 ### Features
 
