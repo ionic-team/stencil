@@ -1,7 +1,8 @@
 import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 
-export let consoleError: d.ErrorHandler = (e: any, _?: any) => console.error(e);
+let customError: d.ErrorHandler ;
+export const consoleError: d.ErrorHandler = (e: any, el?: any) => (customError || console.error)(e, el);
 
 export const STENCIL_DEV_MODE = BUILD.isTesting
   ? ['STENCIL:'] // E2E testing
@@ -13,4 +14,4 @@ export const consoleDevWarn = (...m: any[]) => console.warn(...STENCIL_DEV_MODE,
 
 export const consoleDevInfo = (...m: any[]) => console.info(...STENCIL_DEV_MODE, ...m);
 
-export const setErrorHandler = (handler: d.ErrorHandler) => consoleError = handler;
+export const setErrorHandler = (handler: d.ErrorHandler) => customError = handler;
