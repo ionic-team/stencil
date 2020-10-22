@@ -1,3 +1,12 @@
+## 🏏 [1.17.4](https://github.com/ionic-team/stencil/compare/v1.17.3...v1.17.4) (2020-10-22)
+
+
+### Bug Fixes
+
+* **runtime:** do regular clone of normal slotting ([#2694](https://github.com/ionic-team/stencil/issues/2694)) ([fd0143b](https://github.com/ionic-team/stencil/commit/fd0143bd0cf297fe0020c186270cd8cb34e71288))
+
+
+
 ## ⛱ [1.17.3](https://github.com/ionic-team/stencil/compare/v1.17.2...v1.17.3) (2020-08-04)
 
 
