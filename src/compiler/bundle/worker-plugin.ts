@@ -3,6 +3,7 @@ import type { Plugin, TransformResult, PluginContext } from 'rollup';
 import { bundleOutput } from './bundle-output';
 import { normalizeFsPath, hasError } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';
+import { STENCIL_INTERNAL_ID } from './entry-alias-ids';
 
 export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, platform: string, inlineWorkers: boolean): Plugin => {
   if (platform === 'worker' || platform === 'hydrate') {
@@ -248,7 +249,6 @@ addEventListener('message', async ({data}) => {
 
     } catch (e) {
       value = null;
-      ${isDev ? 'console.error("Error when calling worker routine", e);' : ''}
       if (e instanceof Error) {
         err = {
           isError: true,
@@ -279,6 +279,8 @@ addEventListener('message', async ({data}) => {
 `;
 
 export const WORKER_HELPERS = `
+import { consoleError } from '${STENCIL_INTERNAL_ID}';
+
 let pendingIds = 0;
 let callbackIds = 0;
 const pending = new Map();
@@ -299,10 +301,12 @@ export const createWorker = (workerPath, workerName, workerMsgId) => {
         pending.delete(id);
 
         if (err) {
-          reject((err.isError)
+          const errObj = (err.isError)
             ? Object.assign(new Error(err.value.message), err.value)
-            : err.value
-          );
+            : err.value;
+
+          consoleError(errObj);
+          reject(errObj);
         } else {
           if (callbackIds) {
             callbackIds.forEach(id => callbacks.delete(id));
@@ -313,7 +317,7 @@ export const createWorker = (workerPath, workerName, workerMsgId) => {
         try {
           callbacks.get(id)(...value);
         } catch (e) {
-          console.error(e);
+          consoleError(e);
         }
       }
     }
