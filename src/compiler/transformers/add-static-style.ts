@@ -11,8 +11,8 @@ import ts from 'typescript';
  *   static get style() { return "styles"; }
  * }
  */
-export const addStaticStyleGetterWithinClass = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
-  const styleLiteral = getStyleLiteral(cmp);
+export const addStaticStyleGetterWithinClass = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, commentOriginalSelector: boolean) => {
+  const styleLiteral = getStyleLiteral(cmp, commentOriginalSelector);
   if (styleLiteral) {
     classMembers.push(createStaticGetter('style', styleLiteral));
   }
@@ -23,35 +23,35 @@ export const addStaticStyleGetterWithinClass = (classMembers: ts.ClassElement[],
  * const MyComponent = class {}
  * MyComponent.style = "styles";
  */
-export const addStaticStylePropertyToClass = (styleStatements: ts.Statement[], cmp: d.ComponentCompilerMeta) => {
-  const styleLiteral = getStyleLiteral(cmp);
+export const addStaticStylePropertyToClass = (styleStatements: ts.Statement[], cmp: d.ComponentCompilerMeta, commentOriginalSelector: boolean) => {
+  const styleLiteral = getStyleLiteral(cmp, commentOriginalSelector);
   if (styleLiteral) {
     const statement = ts.createStatement(ts.createAssignment(ts.createPropertyAccess(ts.createIdentifier(cmp.componentClassName), 'style'), styleLiteral));
     styleStatements.push(statement);
   }
 };
 
-const getStyleLiteral = (cmp: d.ComponentCompilerMeta) => {
+const getStyleLiteral = (cmp: d.ComponentCompilerMeta, commentOriginalSelector: boolean) => {
   if (Array.isArray(cmp.styles) && cmp.styles.length > 0) {
     if (cmp.styles.length > 1 || (cmp.styles.length === 1 && cmp.styles[0].modeName !== DEFAULT_STYLE_MODE)) {
       // multiple style modes
-      return getMultipleModeStyle(cmp, cmp.styles);
+      return getMultipleModeStyle(cmp, cmp.styles, commentOriginalSelector);
     } else {
       // single style
-      return getSingleStyle(cmp, cmp.styles[0]);
+      return getSingleStyle(cmp, cmp.styles[0], commentOriginalSelector);
     }
   }
   return null;
 };
 
-const getMultipleModeStyle = (cmp: d.ComponentCompilerMeta, styles: d.StyleCompiler[]) => {
+const getMultipleModeStyle = (cmp: d.ComponentCompilerMeta, styles: d.StyleCompiler[], commentOriginalSelector: boolean) => {
   const styleModes: ts.ObjectLiteralElementLike[] = [];
 
   styles.forEach(style => {
     if (typeof style.styleStr === 'string') {
       // inline the style string
       // static get style() { return { ios: "string" }; }
-      const styleLiteral = createStyleLiteral(cmp, style);
+      const styleLiteral = createStyleLiteral(cmp, style, commentOriginalSelector);
       const propStr = createPropertyAssignment(style.modeName, styleLiteral);
       styleModes.push(propStr);
     } else if (typeof style.styleIdentifier === 'string') {
@@ -79,11 +79,11 @@ const createPropertyAssignment = (mode: string, initializer: ts.Expression) => {
   return node;
 };
 
-const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, commentOriginalSelector: boolean) => {
   if (typeof style.styleStr === 'string') {
     // inline the style string
     // static get style() { return "string"; }
-    return createStyleLiteral(cmp, style);
+    return createStyleLiteral(cmp, style, commentOriginalSelector);
   }
 
   if (typeof style.styleIdentifier === 'string') {
@@ -103,11 +103,11 @@ const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) =>
   return null;
 };
 
-const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
-  if (cmp.encapsulation === 'scoped') {
+const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, commentOriginalSelector: boolean) => {
+  if (cmp.encapsulation === 'scoped' || (commentOriginalSelector && cmp.encapsulation === 'shadow')) {
     // scope the css first
     const scopeId = getScopeId(cmp.tagName, style.modeName);
-    return ts.createStringLiteral(scopeCss(style.styleStr, scopeId, false));
+    return ts.createStringLiteral(scopeCss(style.styleStr, scopeId, commentOriginalSelector));
   }
 
   return ts.createStringLiteral(style.styleStr);

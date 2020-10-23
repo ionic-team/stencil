@@ -1922,9 +1922,6 @@ export interface StyleCompiler {
   styleStr: string;
   styleIdentifier: string;
   externalStyles: ExternalStyleCompiler[];
-  compiledStyleText: string;
-  compiledStyleTextScoped: string;
-  compiledStyleTextScopedCommented: string;
 }
 
 export interface ExternalStyleCompiler {

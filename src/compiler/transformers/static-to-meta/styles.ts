@@ -21,9 +21,6 @@ export const parseStaticStyles = (compilerCtx: d.CompilerCtx, tagName: string, c
           styleId: null,
           styleStr: parsedStyle,
           styleIdentifier: null,
-          compiledStyleText: null,
-          compiledStyleTextScoped: null,
-          compiledStyleTextScopedCommented: null,
           externalStyles: [],
         });
         compilerCtx.styleModeNames.add(DEFAULT_STYLE_MODE);
@@ -40,9 +37,6 @@ export const parseStaticStyles = (compilerCtx: d.CompilerCtx, tagName: string, c
             styleId: null,
             styleStr: parsedStyleMode,
             styleIdentifier: null,
-            compiledStyleText: null,
-            compiledStyleTextScoped: null,
-            compiledStyleTextScopedCommented: null,
             externalStyles: [],
           });
         } else {
@@ -73,9 +67,6 @@ export const parseStaticStyles = (compilerCtx: d.CompilerCtx, tagName: string, c
           styleId: null,
           styleStr: null,
           styleIdentifier: null,
-          compiledStyleText: null,
-          compiledStyleTextScoped: null,
-          compiledStyleTextScopedCommented: null,
           externalStyles: externalStyles,
         };
 
@@ -96,9 +87,6 @@ const parseStyleIdentifier = (parsedStyle: ConvertIdentifier, modeName: string) 
     styleId: null,
     styleStr: null,
     styleIdentifier: parsedStyle.__escapedText,
-    compiledStyleText: null,
-    compiledStyleTextScoped: null,
-    compiledStyleTextScopedCommented: null,
     externalStyles: [],
   };
   return style;

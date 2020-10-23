@@ -4,6 +4,7 @@ import { getBuildFeatures } from '../../app-core/app-data';
 export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
 
+  build.slotRelocation = true;
   build.lazyLoad = true;
   build.hydrateServerSide = true;
   build.cssVarShim = false;
