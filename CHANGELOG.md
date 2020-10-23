@@ -1,3 +1,13 @@
+## 🎂 [2.1.1](https://github.com/ionic-team/stencil/compare/v2.1.0...v2.1.1) (2020-10-23)
+
+
+### Bug Fixes
+
+* **prerender:** fix slot relocation and inline styles ([2af380f](https://github.com/ionic-team/stencil/commit/2af380f7e5f403ff71998ba6a34ac386e4468cf7))
+* **worker:** capture worker errors ([#2709](https://github.com/ionic-team/stencil/issues/2709)) ([dcd49c0](https://github.com/ionic-team/stencil/commit/dcd49c0fedad464bd9e482db8fd98ed28f6ebd69))
+
+
+
 # 🖍 [2.1.0](https://github.com/ionic-team/stencil/compare/v2.0.3...v2.1.0) (2020-10-20)
 
 ### Features
