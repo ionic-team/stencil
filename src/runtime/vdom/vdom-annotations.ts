@@ -140,7 +140,8 @@ const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, cmpData
     childElm.setAttribute(HYDRATE_CHILD_ID, childId);
   } else if (childElm.nodeType === NODE_TYPE.TextNode) {
     const parentNode = childElm.parentNode;
-    if (parentNode.nodeName !== 'STYLE') {
+    const nodeName = parentNode.nodeName;
+    if (nodeName !== 'STYLE' && nodeName !== 'SCRIPT') {
       const textNodeId = `${TEXT_NODE_ID}.${childId}`;
 
       const commentBeforeTextNode = doc.createComment(textNodeId);

@@ -2,6 +2,31 @@ import { Component, Host, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('hydrate no encapsulation', () => {
+  it('no script annotations', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      render() {
+        return (
+          <Host>
+            <script>console.log('script')</script>
+          </Host>
+        );
+      }
+    }
+    // @ts-ignore
+    const serverHydrated = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+      hydrateServerSide: true,
+    });
+    expect(serverHydrated.root).toEqualHtml(`
+      <cmp-a class="hydrated" s-id="1">
+        <!--r.1-->
+        <script c-id="1.0.0.0">console.log('script')</script>
+      </cmp-a>
+    `);
+  });
+
   it('root element, no slot', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
