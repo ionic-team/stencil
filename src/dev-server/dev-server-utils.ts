@@ -88,14 +88,23 @@ export function isSsrStaticDataPath(pathname: string) {
   return fileName === 'page.state.json';
 }
 
-export function getSsrStaticDataPath(pathname: string) {
-  const parts = pathname.split('/');
+export function getSsrStaticDataPath(req: d.HttpRequest) {
+  const parts = req.url.href.split('/');
   let fileName = parts[parts.length - 1];
   const fileNameParts = fileName.split('?');
 
   parts.pop();
+
+  let ssrPath = new URL(parts.join('/')).href;
+  if (!ssrPath.endsWith('/') && req.headers) {
+    const h = new Headers(req.headers);
+    if (h.get('referer').endsWith('/')) {
+      ssrPath += '/';
+    }
+  }
+
   return {
-    ssrPath: parts.join('/'),
+    ssrPath,
     fileName: fileNameParts[0],
     hasQueryString: typeof fileNameParts[1] === 'string' && fileNameParts[1].length > 0,
   };

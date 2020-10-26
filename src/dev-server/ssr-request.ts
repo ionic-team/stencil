@@ -70,7 +70,7 @@ export async function ssrStaticDataRequest(
 
     if (!diagnostics.some(diagnostic => diagnostic.level === 'error')) {
       try {
-        const { ssrPath, hasQueryString } = getSsrStaticDataPath(req.url.href);
+        const { ssrPath, hasQueryString } = getSsrStaticDataPath(req);
         const url = new URL(ssrPath, req.url);
 
         const opts = getSsrHydrateOptions(devServerConfig, serverCtx, url);

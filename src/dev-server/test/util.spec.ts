@@ -164,15 +164,48 @@ describe('getDevServerClientUrl', () => {
     expect(isSsrStaticDataPath('http://stenciljs.com/page.state.json')).toBe(true);
   });
 
-  it('getSsrStaticDataPath', () => {
-    let r = getSsrStaticDataPath('http://stenciljs.com/page.static.json');
+  it('getSsrStaticDataPath, root', () => {
+    const req: d.HttpRequest = {
+      url: new URL('http://stenciljs.com/page.static.json'),
+      method: 'GET',
+      acceptHeader: '',
+      searchParams: null,
+    };
+    let r = getSsrStaticDataPath(req);
     expect(r.fileName).toBe('page.static.json');
     expect(r.hasQueryString).toBe(false);
-    expect(r.ssrPath).toBe('http://stenciljs.com');
+    expect(r.ssrPath).toBe('http://stenciljs.com/');
+  });
 
-    r = getSsrStaticDataPath('http://stenciljs.com/blog/page.static.json?1234');
+  it('getSsrStaticDataPath, no trailing slash refer', () => {
+    const req: d.HttpRequest = {
+      url: new URL('http://stenciljs.com/blog/page.static.json?v=1234'),
+      method: 'GET',
+      acceptHeader: '',
+      searchParams: null,
+      headers: {
+        Referer: 'http://stenciljs.com/page',
+      },
+    };
+    const r = getSsrStaticDataPath(req);
     expect(r.fileName).toBe('page.static.json');
     expect(r.hasQueryString).toBe(true);
     expect(r.ssrPath).toBe('http://stenciljs.com/blog');
+  });
+
+  it('getSsrStaticDataPath, with trailing slash refer', () => {
+    const req: d.HttpRequest = {
+      url: new URL('http://stenciljs.com/blog/page.static.json?v=1234'),
+      method: 'GET',
+      acceptHeader: '',
+      searchParams: null,
+      headers: {
+        Referer: 'http://stenciljs.com/page/',
+      },
+    };
+    const r = getSsrStaticDataPath(req);
+    expect(r.fileName).toBe('page.static.json');
+    expect(r.hasQueryString).toBe(true);
+    expect(r.ssrPath).toBe('http://stenciljs.com/blog/');
   });
 });
