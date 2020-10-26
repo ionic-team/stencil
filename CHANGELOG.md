@@ -1,3 +1,13 @@
+## 🍗 [2.1.2](https://github.com/ionic-team/stencil/compare/v2.1.1...v2.1.2) (2020-10-26)
+
+
+### Bug Fixes
+
+* **devserver:** fix dev server static data with trailing slash ([d70423d](https://github.com/ionic-team/stencil/commit/d70423d9c0eac832128adb94adea886988747315))
+* **hydrate:** do not add html comments inside inline scripts ([3c16737](https://github.com/ionic-team/stencil/commit/3c167374f15571e990eb8ff66321a7019ea2c6fe))
+
+
+
 ## 🎂 [2.1.1](https://github.com/ionic-team/stencil/compare/v2.1.0...v2.1.1) (2020-10-23)
 
 
