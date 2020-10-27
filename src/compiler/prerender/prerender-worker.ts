@@ -10,17 +10,11 @@ import {
 } from './prerender-optimize';
 import { catchError, isPromise, isRootPath, normalizePath, isFunction } from '@utils';
 import { crawlAnchorsForNextUrls } from './crawl-urls';
+import { getPrerenderCtx, PrerenderContext } from './prerender-worker-ctx';
 import { getHydrateOptions } from './prerender-hydrate-options';
 import { getPrerenderConfig } from './prerender-config';
 import { requireFunc } from '../sys/environment';
 import { dirname, join } from 'path';
-
-const prerenderCtx = {
-  componentGraph: null as Map<string, string[]>,
-  prerenderConfig: null as d.PrerenderConfig,
-  ensuredDirs: new Set<string>(),
-  templateHtml: null as string,
-};
 
 export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d.PrerenderUrlRequest) => {
   // worker thread!
@@ -31,9 +25,11 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
   };
 
   try {
+    const prerenderCtx = getPrerenderCtx(prerenderRequest);
+
     const url = new URL(prerenderRequest.url, prerenderRequest.devServerHostUrl);
     const baseUrl = new URL(prerenderRequest.baseUrl);
-    const componentGraph = getComponentGraph(sys, prerenderRequest.componentGraphPath);
+    const componentGraph = getComponentGraph(sys, prerenderCtx, prerenderRequest.componentGraphPath);
 
     // webpack work-around/hack
     const hydrateApp = requireFunc(prerenderRequest.hydrateAppFilePath);
@@ -128,12 +124,14 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
 
     if (hydrateOpts.hashAssets && !prerenderRequest.isDebug) {
       try {
-        docPromises.push(hashAssets(sys, results.diagnostics, hydrateOpts, prerenderRequest.appDir, doc, url));
+        docPromises.push(
+          hashAssets(sys, prerenderCtx, results.diagnostics, hydrateOpts, prerenderRequest.appDir, doc, url),
+        );
       } catch (e) {
         catchError(results.diagnostics, e);
       }
     }
-    
+
     if (docPromises.length > 0) {
       await Promise.all(docPromises);
     }
@@ -168,7 +166,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
 
     const html = hydrateApp.serializeDocumentToString(doc, hydrateOpts);
 
-    prerenderEnsureDir(sys, results.filePath);
+    prerenderEnsureDir(sys, prerenderCtx, results.filePath);
 
     const writePromise = sys.writeFile(results.filePath, html);
 
@@ -207,7 +205,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
   return results;
 };
 
-const getComponentGraph = (sys: d.CompilerSystem, componentGraphPath: string) => {
+const getComponentGraph = (sys: d.CompilerSystem, prerenderCtx: PrerenderContext, componentGraphPath: string) => {
   if (componentGraphPath == null) {
     return undefined;
   }
@@ -218,7 +216,7 @@ const getComponentGraph = (sys: d.CompilerSystem, componentGraphPath: string) =>
   return prerenderCtx.componentGraph;
 };
 
-const prerenderEnsureDir = (sys: d.CompilerSystem, p: string) => {
+const prerenderEnsureDir = (sys: d.CompilerSystem, prerenderCtx: PrerenderContext, p: string) => {
   const allDirs: string[] = [];
 
   while (true) {

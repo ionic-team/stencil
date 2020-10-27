@@ -6,6 +6,7 @@ import { optimizeCss } from '../optimize/optimize-css';
 import { optimizeJs } from '../optimize/optimize-js';
 import { join } from 'path';
 import { minifyCss } from '../optimize/minify-css';
+import { PrerenderContext } from './prerender-worker-ctx';
 
 export const inlineExternalStyleSheets = async (sys: d.CompilerSystem, appDir: string, doc: Document) => {
   const documentLinks = Array.from(doc.querySelectorAll('link[rel=stylesheet]')) as HTMLLinkElement[];
@@ -95,7 +96,13 @@ export const minifyScriptElements = async (doc: Document, addMinifiedAttr: boole
   );
 };
 
-export const minifyStyleElements = async (sys: d.CompilerSystem, appDir: string, doc: Document, currentUrl: URL, addMinifiedAttr: boolean) => {
+export const minifyStyleElements = async (
+  sys: d.CompilerSystem,
+  appDir: string,
+  doc: Document,
+  currentUrl: URL,
+  addMinifiedAttr: boolean,
+) => {
   const styleElms = Array.from(doc.querySelectorAll('style')).filter(styleElm => {
     if (styleElm.hasAttribute(dataMinifiedAttr)) {
       return false;
@@ -115,7 +122,7 @@ export const minifyStyleElements = async (sys: d.CompilerSystem, appDir: string,
             const hash = await getAssetFileHash(sys, appDir, assetUrl);
             assetUrl.searchParams.append('v', hash);
             return assetUrl.pathname + assetUrl.search;
-          }
+          },
         });
         if (optimizeResults.diagnostics.length === 0) {
           styleElm.innerHTML = optimizeResults.output;
@@ -128,7 +135,11 @@ export const minifyStyleElements = async (sys: d.CompilerSystem, appDir: string,
   );
 };
 
-export const excludeStaticComponents = (doc: Document, hydrateOpts: d.PrerenderHydrateOptions, hydrateResults: d.HydrateResults) => {
+export const excludeStaticComponents = (
+  doc: Document,
+  hydrateOpts: d.PrerenderHydrateOptions,
+  hydrateResults: d.HydrateResults,
+) => {
   const staticComponents = hydrateOpts.staticComponents.filter(tag => {
     return hydrateResults.components.some(cmp => cmp.tag === tag);
   });
@@ -158,7 +169,12 @@ s&&((s['data-opts']=s['data-opts']||{}).exclude=__EXCLUDE__);
   .replace(/\n/g, '')
   .trim();
 
-export const addModulePreloads = (doc: Document, hydrateOpts: d.PrerenderHydrateOptions, hydrateResults: d.HydrateResults, componentGraph: Map<string, string[]>) => {
+export const addModulePreloads = (
+  doc: Document,
+  hydrateOpts: d.PrerenderHydrateOptions,
+  hydrateResults: d.HydrateResults,
+  componentGraph: Map<string, string[]>,
+) => {
   if (!componentGraph) {
     return false;
   }
@@ -167,7 +183,9 @@ export const addModulePreloads = (doc: Document, hydrateOpts: d.PrerenderHydrate
 
   const cmpTags = hydrateResults.components.filter(cmp => !staticComponents.includes(cmp.tag));
 
-  const modulePreloads = unique(flatOne(cmpTags.map(cmp => getScopeId(cmp.tag, cmp.mode)).map(scopeId => componentGraph.get(scopeId) || [])));
+  const modulePreloads = unique(
+    flatOne(cmpTags.map(cmp => getScopeId(cmp.tag, cmp.mode)).map(scopeId => componentGraph.get(scopeId) || [])),
+  );
 
   injectModulePreloads(doc, modulePreloads);
   return true;
@@ -194,7 +212,15 @@ export const hasStencilScript = (doc: Document) => {
   return !!doc.querySelector('script[data-stencil]');
 };
 
-export const hashAssets = async (sys: d.CompilerSystem, diagnostics: d.Diagnostic[], hydrateOpts: d.PrerenderHydrateOptions, appDir: string, doc: Document, currentUrl: URL) => {
+export const hashAssets = async (
+  sys: d.CompilerSystem,
+  prerenderCtx: PrerenderContext,
+  diagnostics: d.Diagnostic[],
+  hydrateOpts: d.PrerenderHydrateOptions,
+  appDir: string,
+  doc: Document,
+  currentUrl: URL,
+) => {
   // do one at a time to prevent too many opened files and memory usage issues
   // hash id is cached in each worker, so shouldn't have to do this for every page
 
@@ -208,8 +234,13 @@ export const hashAssets = async (sys: d.CompilerSystem, diagnostics: d.Diagnosti
       if (currentUrl.host === stylesheetUrl.host) {
         try {
           const filePath = join(appDir, stylesheetUrl.pathname);
+          if (prerenderCtx.hashedFile.has(filePath)) {
+            continue;
+          }
+          prerenderCtx.hashedFile.add(filePath);
+
           let css = await sys.readFile(filePath);
-          if (isString(css)) {
+          if (isString(css) && css.length > 0) {
             css = await minifyCss({
               css,
               async resolveUrl(urlProp) {
@@ -217,9 +248,9 @@ export const hashAssets = async (sys: d.CompilerSystem, diagnostics: d.Diagnosti
                 const hash = await getAssetFileHash(sys, appDir, assetUrl);
                 assetUrl.searchParams.append('v', hash);
                 return assetUrl.pathname + assetUrl.search;
-              }
+              },
             });
-            await sys.writeFile(filePath, css);
+            sys.writeFileSync(filePath, css);
           }
         } catch (e) {
           catchError(diagnostics, e);
@@ -238,24 +269,36 @@ export const hashAssets = async (sys: d.CompilerSystem, diagnostics: d.Diagnosti
   await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'script', ['src']);
   await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'img', ['src', 'srcset']);
   await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'picture > source', ['srcset']);
-  
-  const pageStates = Array.from(doc.querySelectorAll('script[data-stencil-static="page.state"][type="application/json"]')) as HTMLScriptElement[];
-  if (pageStates.length > 0) {
-    await Promise.all(pageStates.map(async pageStateScript => {
-      const pageState = JSON.parse(pageStateScript.textContent);
-      if (pageState && Array.isArray(pageState.ast)) {
-        for (const node of pageState.ast) {
-          if (Array.isArray(node)) {
-            await hashPageStateAstAssets(sys, hydrateOpts, appDir, currentUrl, pageStateScript, node);
-          }
-        }
-        pageStateScript.textContent = JSON.stringify(pageState);
-      }
-    }));
-  }
-}
 
-const hashAsset = async (sys: d.CompilerSystem, hydrateOpts: d.PrerenderHydrateOptions, appDir: string, doc: Document, currentUrl: URL, selector: string, srcAttrs: string[]) => {
+  const pageStates = Array.from(
+    doc.querySelectorAll('script[data-stencil-static="page.state"][type="application/json"]'),
+  ) as HTMLScriptElement[];
+  if (pageStates.length > 0) {
+    await Promise.all(
+      pageStates.map(async pageStateScript => {
+        const pageState = JSON.parse(pageStateScript.textContent);
+        if (pageState && Array.isArray(pageState.ast)) {
+          for (const node of pageState.ast) {
+            if (Array.isArray(node)) {
+              await hashPageStateAstAssets(sys, hydrateOpts, appDir, currentUrl, pageStateScript, node);
+            }
+          }
+          pageStateScript.textContent = JSON.stringify(pageState);
+        }
+      }),
+    );
+  }
+};
+
+const hashAsset = async (
+  sys: d.CompilerSystem,
+  hydrateOpts: d.PrerenderHydrateOptions,
+  appDir: string,
+  doc: Document,
+  currentUrl: URL,
+  selector: string,
+  srcAttrs: string[],
+) => {
   const elms = Array.from(doc.querySelectorAll(selector));
 
   // do one at a time to prevent too many opened files and memory usage issues
@@ -281,7 +324,14 @@ const hashAsset = async (sys: d.CompilerSystem, hydrateOpts: d.PrerenderHydrateO
   }
 };
 
-const hashPageStateAstAssets = async (sys: d.CompilerSystem, hydrateOpts: d.PrerenderHydrateOptions, appDir: string, currentUrl: URL, pageStateScript: HTMLScriptElement, node: any[]) => {
+const hashPageStateAstAssets = async (
+  sys: d.CompilerSystem,
+  hydrateOpts: d.PrerenderHydrateOptions,
+  appDir: string,
+  currentUrl: URL,
+  pageStateScript: HTMLScriptElement,
+  node: any[],
+) => {
   const tagName = node[0];
   const attrs = node[1];
 
@@ -318,21 +368,25 @@ const hashPageStateAstAssets = async (sys: d.CompilerSystem, hydrateOpts: d.Prer
 };
 
 export const getAttrUrls = (attrName: string, attrValue: string) => {
-  const srcValues: { src: string, descriptor?: string }[] = [];
+  const srcValues: { src: string; descriptor?: string }[] = [];
   if (isString(attrValue)) {
     if (attrName.toLowerCase() === 'srcset') {
-      attrValue.split(',').map(a => a.trim()).filter(a => a.length > 0).forEach(src => {
-        const spaceSplt = src.split(' ');
-        if (spaceSplt[0].length > 0) {
-          srcValues.push({ src: spaceSplt[0], descriptor: spaceSplt[1] });
-        }
-      });
+      attrValue
+        .split(',')
+        .map(a => a.trim())
+        .filter(a => a.length > 0)
+        .forEach(src => {
+          const spaceSplt = src.split(' ');
+          if (spaceSplt[0].length > 0) {
+            srcValues.push({ src: spaceSplt[0], descriptor: spaceSplt[1] });
+          }
+        });
     } else {
       srcValues.push({ src: attrValue });
     }
   }
   return srcValues;
-}
+};
 
 export const setAttrUrls = (url: URL, descriptor: string) => {
   let src = url.pathname + url.search;
@@ -352,6 +406,6 @@ const getAssetFileHash = async (sys: d.CompilerSystem, appDir: string, assetUrl:
     hashedAssets.set(assetUrl.pathname, p);
   }
   return p;
-}
+};
 
 const dataMinifiedAttr = 'data-m';
