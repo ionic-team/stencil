@@ -192,7 +192,7 @@ const runPrerenderOutputTarget = async (
       srcIndexHtmlPath,
       outputTarget,
       hydrateOpts,
-      manager
+      manager,
     );
     if (diagnostics.length > 0 || !templateData || !isString(templateData.html)) {
       return;
@@ -200,7 +200,7 @@ const runPrerenderOutputTarget = async (
 
     manager.templateId = await createPrerenderTemplate(config, templateData.html);
     manager.staticSite = templateData.staticSite;
-    manager.componentGraphPath = createComponentGraphPath(config, componentGraph, outputTarget);
+    manager.componentGraphPath = await createComponentGraphPath(config, componentGraph, outputTarget);
 
     await new Promise(resolve => {
       manager.resolve = resolve;
@@ -261,14 +261,14 @@ const createPrerenderTemplate = async (config: d.Config, templateHtml: string) =
   return templateId;
 };
 
-const createComponentGraphPath = (
+const createComponentGraphPath = async (
   config: d.Config,
   componentGraph: d.BuildResultsComponentGraph,
   outputTarget: d.OutputTargetWww,
 ) => {
   if (componentGraph) {
     const content = getComponentPathContent(componentGraph, outputTarget);
-    const hash = config.sys.generateContentHash(content);
+    const hash = await config.sys.generateContentHash(content);
     const fileName = `prerender-component-graph-${hash}.json`;
     const componentGraphPath = join(config.sys.tmpDirSync(), fileName);
     config.sys.writeFileSync(componentGraphPath, content);
