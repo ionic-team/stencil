@@ -765,16 +765,16 @@ export interface PrerenderHydrateOptions extends SerializeDocumentOptions {
    */
   addModulePreloads?: boolean;
   /**
-   * Hash the content of assets, such as images, fonts and css files, 
+   * Hash the content of assets, such as images, fonts and css files,
    * and add the hashed value as `v` querystring. For example,
-   * `/assets/image.png?v=abcd1234`. This allows for assets to be 
-   * heavily cached by setting the server's response header with 
+   * `/assets/image.png?v=abcd1234`. This allows for assets to be
+   * heavily cached by setting the server's response header with
    * `Cache-Control: max-age=31536000, immutable`.
    */
   hashAssets?: 'querystring';
   /**
    * External stylesheets from `<link rel="stylesheet">` are instead inlined
-   * into `<style>` elements. Defaults to `true`.
+   * into `<style>` elements. Defaults to `false`.
    */
   inlineExternalStyleSheets?: boolean;
   /**
