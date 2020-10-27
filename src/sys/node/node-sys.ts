@@ -562,7 +562,7 @@ export function createNodeSys(c: { process?: any } = {}) {
 
   sys.lazyRequire = new NodeLazyRequire(nodeResolve, {
     // [minimumVersion, recommendedVersion]
-    '@types/jest': ['24.9.1', '26.0.14'],
+    '@types/jest': ['24.9.1', '26.0.15'],
     '@types/puppeteer': ['1.19.0', '3.0.2'],
     'jest': ['24.9.0', '26.6.1'],
     'jest-cli': ['24.9.0', '26.6.1'],
