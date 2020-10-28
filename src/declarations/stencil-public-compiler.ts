@@ -435,6 +435,7 @@ export interface DevServerConfig extends StencilDevServerConfig {
   prerenderConfig?: string;
   protocol?: 'http' | 'https';
   srcIndexHtml?: string;
+  startupTimeout?: number;
 }
 
 export interface HistoryApiFallback {
