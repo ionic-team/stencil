@@ -35,6 +35,7 @@ export {
   forceUpdate,
   h,
   Host,
+  Env,
   Listen,
   Method,
   Prop,

@@ -75,6 +75,9 @@ export const validateConfig = (userConfig?: Config) => {
     const err = buildError(diagnostics);
     err.messageText = `config.hashedFileNameLength cannot be more than ${MAX_HASHED_FILENAME_LENTH} characters`;
   }
+  if (!config.env) {
+    config.env = {};
+  }
 
   // get a good namespace
   validateNamespace(config, diagnostics);

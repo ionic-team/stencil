@@ -7,4 +7,4 @@ export * from './client-style';
 export * from './client-task-queue';
 export * from './client-build';
 export * from '@runtime';
-export { BUILD, NAMESPACE } from '@app-data';
+export { BUILD, NAMESPACE, Env } from '@app-data';
