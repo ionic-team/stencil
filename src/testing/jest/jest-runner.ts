@@ -10,6 +10,7 @@ export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
     // set all of the emulate configs to the process.env to be read later on
     const emulateConfigs = getEmulateConfigs(config.testing, config.flags);
     env.__STENCIL_EMULATE_CONFIGS__ = JSON.stringify(emulateConfigs);
+    env.__STENCIL_ENV__ = JSON.stringify(config.env);
 
     if (config.flags.ci || config.flags.e2e) {
       env.__STENCIL_DEFAULT_TIMEOUT__ = '30000';

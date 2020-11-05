@@ -55,6 +55,10 @@ export const config: Config = {
     initialValue: '0',
     hydratedValue: '1',
   },
+  env: {
+    'foo': 'bar',
+    'HOST': 'example.com'
+  },
   enableCache: false,
   hashFileNames: false,
   buildEs5: 'prod',

@@ -26,6 +26,8 @@ export namespace Components {
     }
     interface ElementCmp {
     }
+    interface EnvData {
+    }
     interface EventCmp {
         "methodThatFiresEventWithOptions": () => Promise<void>;
         "methodThatFiresMyDocumentEvent": () => Promise<void>;
@@ -112,6 +114,12 @@ declare global {
         prototype: HTMLElementCmpElement;
         new (): HTMLElementCmpElement;
     };
+    interface HTMLEnvDataElement extends Components.EnvData, HTMLStencilElement {
+    }
+    var HTMLEnvDataElement: {
+        prototype: HTMLEnvDataElement;
+        new (): HTMLEnvDataElement;
+    };
     interface HTMLEventCmpElement extends Components.EventCmp, HTMLStencilElement {
     }
     var HTMLEventCmpElement: {
@@ -187,6 +195,7 @@ declare global {
         "dom-interaction": HTMLDomInteractionElement;
         "dom-visible": HTMLDomVisibleElement;
         "element-cmp": HTMLElementCmpElement;
+        "env-data": HTMLEnvDataElement;
         "event-cmp": HTMLEventCmpElement;
         "import-assets": HTMLImportAssetsElement;
         "listen-cmp": HTMLListenCmpElement;
@@ -220,6 +229,8 @@ declare namespace LocalJSX {
     interface DomVisible {
     }
     interface ElementCmp {
+    }
+    interface EnvData {
     }
     interface EventCmp {
         "onMy-event-with-options"?: (event: CustomEvent<{ mph: number }>) => void;
@@ -264,6 +275,7 @@ declare namespace LocalJSX {
         "dom-interaction": DomInteraction;
         "dom-visible": DomVisible;
         "element-cmp": ElementCmp;
+        "env-data": EnvData;
         "event-cmp": EventCmp;
         "import-assets": ImportAssets;
         "listen-cmp": ListenCmp;
@@ -289,6 +301,7 @@ declare module "@stencil/core" {
             "dom-interaction": LocalJSX.DomInteraction & JSXBase.HTMLAttributes<HTMLDomInteractionElement>;
             "dom-visible": LocalJSX.DomVisible & JSXBase.HTMLAttributes<HTMLDomVisibleElement>;
             "element-cmp": LocalJSX.ElementCmp & JSXBase.HTMLAttributes<HTMLElementCmpElement>;
+            "env-data": LocalJSX.EnvData & JSXBase.HTMLAttributes<HTMLEnvDataElement>;
             "event-cmp": LocalJSX.EventCmp & JSXBase.HTMLAttributes<HTMLEventCmpElement>;
             "import-assets": LocalJSX.ImportAssets & JSXBase.HTMLAttributes<HTMLImportAssetsElement>;
             "listen-cmp": LocalJSX.ListenCmp & JSXBase.HTMLAttributes<HTMLListenCmpElement>;
