@@ -564,8 +564,8 @@ export function createNodeSys(c: { process?: any } = {}) {
     // [minimumVersion, recommendedVersion]
     '@types/jest': ['24.9.1', '26.0.15'],
     '@types/puppeteer': ['1.19.0', '5.4.0'],
-    'jest': ['24.9.0', '26.6.1'],
-    'jest-cli': ['24.9.0', '26.6.1'],
+    'jest': ['24.9.0', '26.6.3'],
+    'jest-cli': ['24.9.0', '26.6.3'],
     'pixelmatch': ['4.0.2', '4.0.2'],
     'puppeteer': ['1.19.0', '5.4.1'],
     'puppeteer-core': ['1.19.0', '5.2.1'],
