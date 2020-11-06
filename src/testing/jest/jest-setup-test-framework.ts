@@ -1,5 +1,5 @@
 import type * as d from '@stencil/core/internal';
-import { BUILD } from '@app-data';
+import { BUILD, Env } from '@app-data';
 import { expectExtend } from '../matchers';
 import { setupGlobal, teardownGlobal } from '@stencil/core/mock-doc';
 import { setupMockFetch } from '../mock-fetch';
@@ -54,5 +54,9 @@ export function jestSetupTestFramework() {
     const time = parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10);
     jest.setTimeout(time * 1.5);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = time;
+  }
+  if (typeof env.__STENCIL_ENV__ === 'string') {
+    const stencilEnv = JSON.parse(env.__STENCIL_ENV__);
+    Object.assign(Env, stencilEnv);
   }
 }

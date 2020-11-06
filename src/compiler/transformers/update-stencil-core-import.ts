@@ -61,6 +61,7 @@ const KEEP_IMPORTS = new Set([
   'setMode',
   'getMode',
   'Build',
+  'Env',
   'Host',
   'Fragment',
   'getAssetPath',

@@ -196,6 +196,11 @@ export interface StencilConfig {
    */
   taskQueue?: 'async' | 'immediate' | 'congestionAsync';
 
+  /**
+   * Provide a object of key/values accessible within the app, using the `Env` object.
+   */
+  env?: {[prop: string]: string | undefined};
+
   globalScript?: string;
   srcIndexHtml?: string;
   watch?: boolean;
