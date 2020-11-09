@@ -4,7 +4,9 @@ import { lazyComponentTransform } from '../component-lazy/transform-lazy-compone
 import { mockCompilerCtx } from '@stencil/core/testing';
 
 describe('lazy-component', () => {
-  it('add registerInstance() to constructor w/ decorator on class', () => {
+  let t: ReturnType<typeof transpileModule>;
+
+  beforeEach(() => {
     const compilerCtx = mockCompilerCtx();
     const transformOpts: d.TransformOptions = {
       coreImportPath: '@stencil/core',
@@ -26,9 +28,15 @@ describe('lazy-component', () => {
 
     const transformer = lazyComponentTransform(compilerCtx, transformOpts);
 
-    const t = transpileModule(code, null, compilerCtx, null, [], [transformer]);
+    t = transpileModule(code, null, compilerCtx, null, [], [transformer]);
+  });
 
+  it('add registerInstance() to constructor w/ decorator on class', () => {
     expect(t.outputText).toContain(`import { registerInstance as __stencil_registerInstance } from "@stencil/core"`);
     expect(t.outputText).toContain(`__stencil_registerInstance(this, hostRef)`);
+  });
+
+  it('has `static get is()` which returns correct component tag name', () => {
+    expect(t.outputText).toContain(`static get is() { return "cmp-a"; }`);
   });
 });

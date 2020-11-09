@@ -17,6 +17,7 @@ import { isComplexType } from '@utils';
 // export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, child?: d.ChildType): d.VNode;
 // export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
 export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.VNode => {
+  if (typeof nodeName === 'function' && 'is' in nodeName){ nodeName = nodeName.is; }
   let child = null;
   let key: string = null;
   let slotName: string = null;
