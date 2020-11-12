@@ -12,10 +12,11 @@ export interface StencilConfig {
    */
   allowInlineScripts?: boolean;
   /**
-   * By default, Stencil will use the appropriate config to automatically prefix css. For example,
-   * developers can write modern and standard css properties, such as "transform", and Stencil
-   * will automatically add in the prefixed version, such as "-webkit-transform". To disable
-   * autoprefixing css, set this value to `false`.
+   * By setting `autoprefixCss` to `true`, Stencil will use the appropriate config to automatically
+   * prefix css. For example, developers can write modern and standard css properties, such as
+   * "transform", and Stencil will automatically add in the prefixed version, such as "-webkit-transform".
+   * As of Stencil v2, autoprefixing CSS is no longer the default.
+   * Defaults to `false`
    */
   autoprefixCss?: boolean | any;
 
@@ -199,7 +200,7 @@ export interface StencilConfig {
   /**
    * Provide a object of key/values accessible within the app, using the `Env` object.
    */
-  env?: {[prop: string]: string | undefined};
+  env?: { [prop: string]: string | undefined };
 
   globalScript?: string;
   srcIndexHtml?: string;
