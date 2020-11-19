@@ -81,19 +81,10 @@ const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad:
     hostRef.$flags$ |= HOST_FLAGS.devOnRender;
   }
 
-  if (BUILD.hasRenderFn || BUILD.reflect) {
-    if (BUILD.vdomRender || BUILD.reflect) {
-      // looks like we've got child nodes to render into this host element
-      // or we need to update the css class/attrs on the host element
-      // DOM WRITE!
-      if (BUILD.hydrateServerSide) {
-        renderVdom(hostRef, await callRender(hostRef, instance));
-      } else {
-        renderVdom(hostRef, callRender(hostRef, instance));
-      }
-    } else {
-      elm.textContent = callRender(hostRef, instance);
-    }
+  if (BUILD.hydrateServerSide) {
+    await callRender(hostRef, instance, elm);
+  } else {
+    callRender(hostRef, instance, elm);
   }
   if (BUILD.cssVarShim && plt.$cssShim$) {
     plt.$cssShim$.updateHost(elm);
@@ -149,7 +140,7 @@ const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad:
 
 let renderingRef: any = null;
 
-const callRender = (hostRef: d.HostRef, instance: any) => {
+const callRender = (hostRef: d.HostRef, instance: any, elm: HTMLElement) => {
   // in order for bundlers to correctly treeshake the BUILD object
   // we need to ensure BUILD is not deoptimized within a try/catch
   // https://rollupjs.org/guide/en/#treeshake tryCatchDeoptimization
@@ -169,11 +160,25 @@ const callRender = (hostRef: d.HostRef, instance: any) => {
     if (updatable || lazyLoad) {
       hostRef.$flags$ |= HOST_FLAGS.hasRendered;
     }
+    if (BUILD.hasRenderFn || BUILD.reflect) {
+      if (BUILD.vdomRender || BUILD.reflect) {
+        // looks like we've got child nodes to render into this host element
+        // or we need to update the css class/attrs on the host element
+        // DOM WRITE!
+        if (BUILD.hydrateServerSide) {
+          return Promise.resolve(instance).then(value => renderVdom(hostRef, value))
+        } else {
+          renderVdom(hostRef, instance);
+        }
+      } else {
+        elm.textContent = instance;
+      }
+    }
   } catch (e) {
     consoleError(e, hostRef.$hostElement$);
   }
   renderingRef = null;
-  return instance;
+  return null;
 };
 
 export const getRenderingRef = () => renderingRef;

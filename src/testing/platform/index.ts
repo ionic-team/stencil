@@ -1,5 +1,5 @@
 export { Build } from './testing-build';
-export { consoleDevError, consoleDevInfo, consoleDevWarn, consoleError } from './testing-log';
+export { consoleDevError, consoleDevInfo, consoleDevWarn, consoleError, setErrorHandler } from './testing-log';
 export {
   Context,
   isMemberInElement,

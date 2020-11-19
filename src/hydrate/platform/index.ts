@@ -1,6 +1,8 @@
 import type * as d from '../../declarations';
 import { addHostEventListeners } from '@runtime';
 
+let customError: d.ErrorHandler;
+
 export const cmpModules = new Map<string, { [exportName: string]: d.ComponentConstructor }>();
 
 const getModule = (tagName: string): d.ComponentConstructor => {
@@ -71,11 +73,13 @@ export const writeTask = (cb: Function) => {
 const resolved = /*@__PURE__*/ Promise.resolve();
 export const nextTick = /*@__PURE__*/ (cb: () => void) => resolved.then(cb);
 
-export const consoleError = (e: any) => {
+const defaultConsoleError = (e: any) => {
   if (e != null) {
     console.error(e.stack || e.message || e);
   }
 };
+
+export const consoleError: d.ErrorHandler = (e: any, el?: any) => (customError || defaultConsoleError)(e, el);
 
 export const consoleDevError = (..._: any[]) => {
   /* noop for hydrate */
@@ -88,6 +92,8 @@ export const consoleDevWarn = (..._: any[]) => {
 export const consoleDevInfo = (..._: any[]) => {
   /* noop for hydrate */
 };
+
+export const setErrorHandler = (handler: d.ErrorHandler) => customError = handler;
 
 /*hydrate context start*/ export const Context = {}; /*hydrate context end*/
 
