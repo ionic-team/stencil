@@ -12,6 +12,13 @@ import { isComplexType } from '@utils';
 import { isMemberInElement, plt, win } from '@platform';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
+// Some events are supported in all browsers but not yet efined by the spec or present in GlobalEventHandlers. We need
+// to make sure to transform these so they work as users expect. See https://github.com/whatwg/html/issues/3514
+export const eventNameTransformations: { [key: string]: string } = {
+  onFocusIn: 'focusin',
+  onFocusOut: 'focusout',
+};
+
 export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, flags: number) => {
   if (oldValue !== newValue) {
     let isProp = isMemberInElement(elm, memberName);
@@ -73,6 +80,8 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
         // member name "onmouseover" is on the window's prototype
         // so let's add the listener "mouseover", which is all lowercased
         memberName = ln.slice(2);
+      } else if (eventNameTransformations.hasOwnProperty(memberName)) {
+        memberName = eventNameTransformations[memberName];
       } else {
         // custom event
         // the JSX attribute could have been "onMyCustomEvent"
