@@ -1,4 +1,4 @@
-import { Component, Element, Host, Prop, State, forceUpdate, getRenderingRef, h } from '@stencil/core';
+import { Component, Element, setErrorHandler, Host, Prop, State, forceUpdate, getRenderingRef, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('render-vdom', () => {
@@ -463,6 +463,42 @@ describe('render-vdom', () => {
     expect(root).toEqualHtml(`
       <cmp-a><div>Hello VDOM!!</div></cmp-a>
     `);
+  });
+
+  it('render crash should not remove the content', async () => {
+    let didError = false;
+    setErrorHandler((err) => {
+      didError = true;
+    });
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      @Prop() crash = false;
+      render() {
+        if (this.crash) {
+          throw new Error('YOLO');
+        }
+        return <div>Hello</div>;
+      }
+    }
+
+    const { root, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml(`
+      <cmp-a><div>Hello</div></cmp-a>
+    `);
+
+    expect(didError).toBe(false);
+    root.crash = true;
+    await waitForChanges();
+
+    expect(root).toEqualHtml(`
+      <cmp-a><div>Hello</div></cmp-a>
+    `);
+    expect(didError).toBe(true);
   });
 
   it('Hello VDOM, html option', async () => {
