@@ -56,7 +56,7 @@ function startServer(
     logger.getLevel() !== 'debug'
       ? setTimeout(() => {
           reject(`dev server startup timeout`);
-        }, 15000)
+        }, devServerConfig.startupTimeout || 15000)
       : null;
 
   let isActivelyBuilding = false;

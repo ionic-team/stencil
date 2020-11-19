@@ -83,4 +83,6 @@ export const BUILD: BuildConditionals = {
   attachStyles: true,
 };
 
+export const Env = {};
+
 export const NAMESPACE = /* default */ 'app' as string;

@@ -146,7 +146,7 @@ export const Build: d.UserBuildConditionals = {
 export const styles: d.StyleMap = new Map();
 export const modeResolutionChain: d.ResolutionHandler[] = [];
 
-export { BUILD, NAMESPACE } from '@app-data';
+export { BUILD, NAMESPACE, Env } from '@app-data';
 export { hydrateApp } from './hydrate-app';
 
 export {

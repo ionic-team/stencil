@@ -2213,6 +2213,7 @@ export interface JestEnvironmentGlobal {
     fullName: string;
     testPath: string;
   };
+  env: {[prop: string]: string};
   screenshotDescriptions: Set<string>;
 }
 
@@ -2224,6 +2225,7 @@ export interface E2EProcessEnv {
   STENCIL_SCREENSHOT_SERVER?: string;
 
   __STENCIL_EMULATE_CONFIGS__?: string;
+  __STENCIL_ENV__?: string;
   __STENCIL_EMULATE__?: string;
   __STENCIL_BROWSER_URL__?: string;
   __STENCIL_APP_SCRIPT_URL__?: string;

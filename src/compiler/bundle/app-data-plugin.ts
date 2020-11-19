@@ -57,6 +57,7 @@ export const appDataPlugin = (
         const s = new MagicString(``);
         appendNamespace(config, s);
         appendBuildConditionals(config, build, s);
+        appendEnv(config, s);
         return s.toString();
       }
       return null;
@@ -147,6 +148,10 @@ const appendBuildConditionals = (config: d.Config, build: d.BuildConditionals, s
     .join(', ');
 
   s.append(`export const BUILD = /* ${config.fsNamespace} */ { ${builData} };\n`);
+};
+
+const appendEnv = (config: d.Config, s: MagicString) => {
+  s.append(`export const Env = /* ${config.fsNamespace} */ ${JSON.stringify(config.env) };\n`);
 };
 
 const appendNamespace = (config: d.Config, s: MagicString) => {

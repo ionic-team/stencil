@@ -15,6 +15,7 @@ export let resolve: any;
 export let sep: any;
 export let delimiter: any;
 export let posix: any;
+export let win32: any;
 
 export const path: d.PlatformPath = {} as any;
 
@@ -43,6 +44,12 @@ export const setPlatformPath = (platformPath: d.PlatformPath) => {
   sep = path.sep;
   delimiter = path.delimiter;
   posix = path.posix;
+  if (path.win32) {
+    win32 = path.win32;
+  } else {
+    win32 = { ...posix };
+    win32.sep = '\\';
+  }
 };
 
 setPlatformPath(IS_NODE_ENV ? requireFunc('path') : pathBrowserify);
