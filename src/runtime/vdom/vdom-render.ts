@@ -464,7 +464,7 @@ const relocateSlotContent = (elm: d.RenderNode) => {
   for (; i < ilen; i++) {
     childNode = childNodes[i];
 
-    if (childNode['s-sr'] && (node = childNode['s-cr'])) {
+    if (childNode['s-sr'] && (node = childNode['s-cr']) && node.parentNode) {
       // first got the content reference comment node
       // then we got it's parent, which is where all the host content is in now
       hostContentNodes = node.parentNode.childNodes;
