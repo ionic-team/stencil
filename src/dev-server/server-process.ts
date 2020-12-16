@@ -72,7 +72,7 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
     }
     if (server) {
       promises.push(
-        new Promise(resolve => {
+        new Promise<void>(resolve => {
           server.close(err => {
             if (err) {
               console.error(`close error: ${err}`);

@@ -1,5 +1,12 @@
 import type * as d from '@stencil/core/internal';
-import { caughtErrors, moduleLoaded, queuedLoadModules, queuedReadTasks, queuedTicks, queuedWriteTasks } from './testing-constants';
+import {
+  caughtErrors,
+  moduleLoaded,
+  queuedLoadModules,
+  queuedReadTasks,
+  queuedTicks,
+  queuedWriteTasks,
+} from './testing-constants';
 
 export function resetTaskQueue() {
   queuedTicks.length = 0;
@@ -15,7 +22,7 @@ export const nextTick = (cb: Function) => {
 };
 
 export function flushTicks() {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     function drain() {
       try {
         if (queuedTicks.length > 0) {

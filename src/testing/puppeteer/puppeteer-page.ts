@@ -111,7 +111,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
         throw new Error('Set the --devtools flag in order to use E2EPage.debugger()');
       }
       return page.evaluate(() => {
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
           // tslint:disable-next-line: no-debugger
           debugger;
           resolve();
@@ -314,7 +314,7 @@ async function waitForChanges(page: E2EPageInternal) {
 
     await page.evaluate(() => {
       // BROWSER CONTEXT
-      return new Promise(resolve => {
+      return new Promise<void>(resolve => {
         requestAnimationFrame(() => {
           const promises: Promise<any>[] = [];
 
