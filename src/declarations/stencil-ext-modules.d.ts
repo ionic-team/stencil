@@ -25,7 +25,9 @@ declare module '*.vert' {
 
 declare module '*?worker' {
   export const worker: Worker;
-  export const fileName: string;
+  export const workerMsgId: string;
+  export const workerName: string;
+  export const workerPath: string;
 }
 
 declare module '*?format=url' {
