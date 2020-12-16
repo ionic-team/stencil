@@ -1,4 +1,11 @@
-import type { E2EProcessEnv, EmulateConfig, JestEnvironmentGlobal, ScreenshotBuildData, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
+import type {
+  E2EProcessEnv,
+  EmulateConfig,
+  JestEnvironmentGlobal,
+  ScreenshotBuildData,
+  ScreenshotDiff,
+  ScreenshotOptions,
+} from '@stencil/core/internal';
 import { compareScreenshot } from '../../screenshot/screenshot-compare';
 import type * as pd from './puppeteer-declarations';
 import type * as puppeteer from 'puppeteer';
@@ -70,7 +77,13 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
   }
 }
 
-export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: E2EProcessEnv, desc: string, testPath: string, opts: ScreenshotOptions) {
+export async function pageCompareScreenshot(
+  page: pd.E2EPageInternal,
+  env: E2EProcessEnv,
+  desc: string,
+  testPath: string,
+  opts: ScreenshotOptions,
+) {
   if (typeof env.__STENCIL_EMULATE__ !== 'string') {
     throw new Error(`compareScreenshot, missing screenshot emulate env var`);
   }
@@ -84,7 +97,7 @@ export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: E2EPr
 
   await wait(screenshotBuildData.timeoutBeforeScreenshot);
   await page.evaluate(() => {
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
       window.requestAnimationFrame(() => {
         resolve();
       });
@@ -93,7 +106,8 @@ export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: E2EPr
 
   const screenshotOpts = createPuppeteerScreenshopOptions(opts);
   const screenshotBuf = await page.screenshot(screenshotOpts);
-  const pixelmatchThreshold = typeof opts.pixelmatchThreshold === 'number' ? opts.pixelmatchThreshold : screenshotBuildData.pixelmatchThreshold;
+  const pixelmatchThreshold =
+    typeof opts.pixelmatchThreshold === 'number' ? opts.pixelmatchThreshold : screenshotBuildData.pixelmatchThreshold;
 
   let width = emulateConfig.viewport.width;
   let height = emulateConfig.viewport.height;
@@ -107,7 +121,16 @@ export async function pageCompareScreenshot(page: pd.E2EPageInternal, env: E2EPr
     }
   }
 
-  const results = await compareScreenshot(emulateConfig, screenshotBuildData, screenshotBuf, desc, width, height, testPath, pixelmatchThreshold);
+  const results = await compareScreenshot(
+    emulateConfig,
+    screenshotBuildData,
+    screenshotBuf,
+    desc,
+    width,
+    height,
+    testPath,
+    pixelmatchThreshold,
+  );
 
   return results;
 }

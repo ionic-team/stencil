@@ -120,7 +120,7 @@ export async function sysNodeExternalBundles(opts: BuildOptions) {
 }
 
 function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string, entryFileName: string) {
-  return new Promise(async (resolveBundle, rejectBundle) => {
+  return new Promise<void>(async (resolveBundle, rejectBundle) => {
     const outputFile = join(outputDir, entryFileName);
     const cachedFile = join(cachedDir, entryFileName) + (opts.isProd ? '.min.js' : '');
 

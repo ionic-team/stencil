@@ -29,7 +29,11 @@ async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selec
   return eventSpy;
 }
 
-export async function waitForEvent(page: pd.E2EPageInternal, eventName: string, elementHandle: puppeteer.ElementHandle) {
+export async function waitForEvent(
+  page: pd.E2EPageInternal,
+  eventName: string,
+  elementHandle: puppeteer.ElementHandle,
+) {
   const timeoutMs = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
   const ev = await page.evaluate(
     (element: Element, eventName: string, timeoutMs: number) => {
@@ -86,7 +90,7 @@ export class EventSpy implements EventSpy {
       });
     } else {
       let resolve: () => void;
-      const promise = new Promise(r => (resolve = r));
+      const promise = new Promise<void>(r => (resolve = r));
       this.queuedHandler.push(resolve);
       return promise.then(() => ({
         done: false,
@@ -104,7 +108,12 @@ export class EventSpy implements EventSpy {
   }
 }
 
-export async function addE2EListener(page: pd.E2EPageInternal, elmHandle: puppeteer.JSHandle, eventName: string, callback: (ev: any) => void) {
+export async function addE2EListener(
+  page: pd.E2EPageInternal,
+  elmHandle: puppeteer.JSHandle,
+  eventName: string,
+  callback: (ev: any) => void,
+) {
   // NODE CONTEXT
   const id = page._e2eEventIds++;
   page._e2eEvents.set(id, {
@@ -118,7 +127,10 @@ export async function addE2EListener(page: pd.E2EPageInternal, elmHandle: puppet
   await executionContext.evaluate(
     (elm: any, id: number, eventName: string) => {
       elm.addEventListener(eventName, (ev: any) => {
-        ((window as unknown) as pd.BrowserWindow).stencilOnEvent(id, ((window as unknown) as pd.BrowserWindow).stencilSerializeEvent(ev));
+        ((window as unknown) as pd.BrowserWindow).stencilOnEvent(
+          id,
+          ((window as unknown) as pd.BrowserWindow).stencilSerializeEvent(ev),
+        );
       });
     },
     elmHandle,

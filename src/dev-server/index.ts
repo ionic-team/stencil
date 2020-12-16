@@ -53,10 +53,10 @@ function startServer(
   const timespan = logger.createTimeSpan(`starting dev server`, true);
 
   const startupTimeout =
-    logger.getLevel() !== 'debug'
+    logger.getLevel() !== 'debug' || devServerConfig.startupTimeout !== 0
       ? setTimeout(() => {
           reject(`dev server startup timeout`);
-        }, devServerConfig.startupTimeout || 15000)
+        }, devServerConfig.startupTimeout ?? 15000)
       : null;
 
   let isActivelyBuilding = false;

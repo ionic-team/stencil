@@ -1,6 +1,6 @@
 export { Build } from './testing-build';
 export { Env } from '@app-data';
-export { consoleDevError, consoleDevInfo, consoleDevWarn, consoleError } from './testing-log';
+export { consoleDevError, consoleDevInfo, consoleDevWarn, consoleError, setErrorHandler } from './testing-log';
 export {
   Context,
   isMemberInElement,
