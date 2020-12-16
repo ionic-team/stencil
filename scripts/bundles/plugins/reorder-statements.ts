@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import type { OutputOptions, OutputBundle, OutputChunk, Plugin } from 'rollup';
+import type { NormalizedOutputOptions, OutputBundle, OutputChunk, Plugin } from 'rollup';
 
 export function reorderCoreStatementsPlugin(): Plugin {
   return {
@@ -10,7 +10,7 @@ export function reorderCoreStatementsPlugin(): Plugin {
   };
 }
 
-function reorderCoreStatements(options: OutputOptions, bundles: OutputBundle) {
+function reorderCoreStatements(options: NormalizedOutputOptions, bundles: OutputBundle) {
   if (options.format === 'es') {
     Object.keys(bundles).forEach(fileName => {
       const bundle = bundles[fileName];
@@ -34,7 +34,13 @@ function reorderStatements(code: string) {
 
         const otherStatements = s.filter(n => !isLet(n) && !ts.isImportDeclaration(n) && !ts.isExportDeclaration(n));
 
-        return ts.updateSourceFileNode(tsSourceFile, [...letNoInitializerStatements, ...letWithInitializer, ...importStatements, ...otherStatements, ...exportStatements]);
+        return ts.updateSourceFileNode(tsSourceFile, [
+          ...letNoInitializerStatements,
+          ...letWithInitializer,
+          ...importStatements,
+          ...otherStatements,
+          ...exportStatements,
+        ]);
       };
     };
   }
