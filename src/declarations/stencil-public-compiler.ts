@@ -1871,6 +1871,7 @@ export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNe
   externalRuntime?: boolean;
   copy?: CopyTask[];
   inlineDynamicImports?: boolean;
+  includeGlobalScripts?: boolean;
 }
 
 export interface OutputTargetBase {
