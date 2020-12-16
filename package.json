@@ -62,7 +62,7 @@
     "@types/graceful-fs": "^4.1.4",
     "@types/inquirer": "^7.3.1",
     "@types/is-glob": "^4.0.1",
-    "@types/jest": "^26.0.15",
+    "@types/jest": "^26.0.19",
     "@types/listr": "^0.14.2",
     "@types/mime-types": "^2.1.0",
     "@types/node": "^14.14.14",
