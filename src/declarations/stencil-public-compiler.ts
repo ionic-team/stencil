@@ -422,7 +422,12 @@ export interface StencilDevServerConfig {
    */
   ssr?: boolean;
   /**
-   * If to use the dev server's websocket client or not. Defaults to `true`.
+   * If the dev server fails to start up within the given timout (in milliseconds), the startup will
+   * be canceled. Set to zero to disable the timeout. Defaults to `15000`.
+   */
+  startupTimeout?: number;
+  /**
+   * Whether to use the dev server's websocket client or not. Defaults to `true`.
    */
   websocket?: boolean;
   /**
@@ -441,7 +446,6 @@ export interface DevServerConfig extends StencilDevServerConfig {
   prerenderConfig?: string;
   protocol?: 'http' | 'https';
   srcIndexHtml?: string;
-  startupTimeout?: number;
 }
 
 export interface HistoryApiFallback {
@@ -1867,6 +1871,7 @@ export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNe
   externalRuntime?: boolean;
   copy?: CopyTask[];
   inlineDynamicImports?: boolean;
+  includeGlobalScripts?: boolean;
 }
 
 export interface OutputTargetBase {

@@ -562,12 +562,12 @@ export function createNodeSys(c: { process?: any } = {}) {
 
   sys.lazyRequire = new NodeLazyRequire(nodeResolve, {
     // [minimumVersion, recommendedVersion]
-    '@types/jest': ['24.9.1', '26.0.15'],
-    '@types/puppeteer': ['1.19.0', '5.4.0'],
+    '@types/jest': ['24.9.1', '26.0.19'],
+    '@types/puppeteer': ['1.19.0', '5.4.2'],
     'jest': ['24.9.0', '26.6.3'],
     'jest-cli': ['24.9.0', '26.6.3'],
     'pixelmatch': ['4.0.2', '4.0.2'],
-    'puppeteer': ['1.19.0', '5.4.1'],
+    'puppeteer': ['1.19.0', '5.5.0'],
     'puppeteer-core': ['1.19.0', '5.2.1'],
     'workbox-build': ['4.3.1', '4.3.1'],
   });
