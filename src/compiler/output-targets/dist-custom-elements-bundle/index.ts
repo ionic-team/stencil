@@ -66,13 +66,15 @@ const bundleCustomElements = async (
         hoistTransitiveImports: false,
         preferConst: true,
       });
+      
+      const minify = outputTarget.externalRuntime || outputTarget.minify !== true ? false : config.minifyJs;
       const files = rollupOutput.output.map(async bundle => {
         if (bundle.type === 'chunk') {
           let code = bundle.code;
           const optimizeResults = await optimizeModule(config, compilerCtx, {
             input: code,
             isCore: bundle.isEntry,
-            minify: outputTarget.externalRuntime ? false : config.minifyJs,
+            minify,
           });
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
           if (!hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {

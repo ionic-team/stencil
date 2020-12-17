@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
 import { buildError } from '@utils';
-import { VALID_TYPES_NEXT } from '../../output-targets/output-utils';
+import { VALID_TYPES } from '../../output-targets/output-utils';
 import { validateCollection } from './validate-collection';
 import { validateCustomElement } from './validate-custom-element';
 import { validateCustomOutput } from './validate-custom-output';
@@ -17,11 +17,11 @@ export const validateOutputTargets = (config: d.Config, diagnostics: d.Diagnosti
   const userOutputs = (config.outputTargets || []).slice();
 
   userOutputs.forEach(outputTarget => {
-    if (!VALID_TYPES_NEXT.includes(outputTarget.type)) {
+    if (!VALID_TYPES.includes(outputTarget.type)) {
       const err = buildError(diagnostics);
       err.messageText = `Invalid outputTarget type "${
         outputTarget.type
-      }". Valid outputTarget types include: ${VALID_TYPES_NEXT.map(t => `"${t}"`).join(', ')}`;
+      }". Valid outputTarget types include: ${VALID_TYPES.map(t => `"${t}"`).join(', ')}`;
     }
   });
 

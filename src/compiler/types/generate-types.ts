@@ -2,7 +2,8 @@ import type * as d from '../../declarations';
 import { copyStencilCoreDts, updateStencilTypesImports } from './stencil-types';
 import { join, relative } from 'path';
 import { generateAppTypes } from './generate-app-types';
-import { generateCustomElementsTypes } from '../output-targets/dist-custom-elements-bundle/custom-elements-types';
+import { generateCustomElementsBundleTypes } from '../output-targets/dist-custom-elements-bundle/custom-elements-bundle-types';
+import { generateCustomElementsTypes } from '../output-targets/dist-custom-elements/custom-elements-types';
 import { isDtsFile } from '@utils';
 
 export const generateTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDistTypes) => {
@@ -37,5 +38,6 @@ const generateTypesOutput = async (config: d.Config, compilerCtx: d.CompilerCtx,
 
   if (distDtsFilePath) {
     await generateCustomElementsTypes(config, compilerCtx, buildCtx, distDtsFilePath);
+    await generateCustomElementsBundleTypes(config, compilerCtx, buildCtx, distDtsFilePath);
   }
 };

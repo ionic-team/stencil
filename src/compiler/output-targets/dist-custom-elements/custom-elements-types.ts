@@ -1,43 +1,28 @@
 import type * as d from '../../../declarations';
-import { isOutputTargetDistCustomElementsBundle } from '../output-utils';
+import { isOutputTargetDistCustomElements } from '../output-utils';
 import { dirname, join, relative } from 'path';
 import { normalizePath, dashToPascalCase } from '@utils';
 
 export const generateCustomElementsTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, distDtsFilePath: string) => {
-  const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElementsBundle);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
 
   await Promise.all(outputTargets.map(outputTarget => generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, distDtsFilePath, outputTarget)));
 };
 
-const generateCustomElementsTypesOutput = async (
+export const generateCustomElementsTypesOutput = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   distDtsFilePath: string,
-  outputTarget: d.OutputTargetDistCustomElementsBundle,
+  outputTarget: d.OutputTargetDistCustomElementsBundle | d.OutputTargetDistCustomElements,
 ) => {
   const customElementsDtsPath = join(outputTarget.dir, 'index.d.ts');
   const componentsDtsRelPath = relDts(outputTarget.dir, distDtsFilePath);
 
-  const components = buildCtx.components.filter(m => !m.isCollectionDependency);
-
   const code = [
-    `/* ${config.namespace} custom elements bundle */`,
+    `/* ${config.namespace} custom elements */`,
     ``,
-    `import { Components, JSX } from "${componentsDtsRelPath}";`,
-    ``,
-    ...components.map(generateCustomElementType),
-    `/**`,
-    ` * Utility to define all custom elements within this package using the tag name provided in the component's source. `,
-    ` * When defining each custom element, it will also check it's safe to define by:`,
-    ` *`,
-    ` * 1. Ensuring the "customElements" registry is available in the global context (window).`,
-    ` * 2. The component tag name is not already defined.`,
-    ` *`,
-    ` * Use the standard [customElements.define()](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/define) `,
-    ` * method instead to define custom elements individually, or to provide a different tag name.`,
-    ` */`,
-    `export declare const defineCustomElements: (opts?: any) => void;`,
+    `import type { Components, JSX } from "${componentsDtsRelPath}";`,
     ``,
     `/**`,
     ` * Used to manually set the base path where assets can be found.`,
@@ -51,7 +36,7 @@ const generateCustomElementsTypesOutput = async (
     ` */`,
     `export declare const setAssetPath: (path: string) => void;`,
     ``,
-    `export { Components, JSX };`,
+    `export type { Components, JSX };`,
     ``
   ];
 
@@ -65,11 +50,21 @@ const generateCustomElementsTypesOutput = async (
   }
 
   await compilerCtx.fs.writeFile(customElementsDtsPath, code.join('\n') + `\n`, { outputTargetType: outputTarget.type });
+
+  const components = buildCtx.components.filter(m => !m.isCollectionDependency);
+  await Promise.all(components.map(async cmp => {
+    const dtsCode = generateCustomElementType(componentsDtsRelPath, cmp);
+    const fileName = `${cmp.tagName}.d.ts`;
+    const filePath = join(outputTarget.dir, fileName);
+    await compilerCtx.fs.writeFile(filePath, dtsCode, { outputTargetType: outputTarget.type });
+  }));
 };
 
-const generateCustomElementType = (cmp: d.ComponentCompilerMeta) => {
+const generateCustomElementType = (componentsDtsRelPath: string, cmp: d.ComponentCompilerMeta) => {
   const tagNameAsPascal = dashToPascalCase(cmp.tagName);
   const o: string[] = [
+    `import type { Components, JSX } from "${componentsDtsRelPath}";`,
+    ``,
     `interface ${tagNameAsPascal} extends Components.${tagNameAsPascal}, HTMLElement {}`,
     `export const ${tagNameAsPascal}: {`,
     `    prototype: ${tagNameAsPascal};`,

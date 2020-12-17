@@ -27,7 +27,7 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
     outputAngular(config, compilerCtx, buildCtx),
     outputCopy(config, compilerCtx, buildCtx),
     outputCollection(config, compilerCtx, buildCtx, changedModuleFiles),
-    outputCustomElements(config, compilerCtx, buildCtx, changedModuleFiles),
+    outputCustomElements(config, compilerCtx, buildCtx),
     outputCustomElementsBundle(config, compilerCtx, buildCtx),
     outputHydrateScript(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),

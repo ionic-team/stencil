@@ -1862,7 +1862,11 @@ export interface OutputTargetBaseNext {
 export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   type: 'dist-custom-elements';
   empty?: boolean;
+  externalRuntime?: boolean;
   copy?: CopyTask[];
+  inlineDynamicImports?: boolean;
+  includeGlobalScripts?: boolean;
+  minify?: boolean;
 }
 
 export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
@@ -1872,6 +1876,7 @@ export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNe
   copy?: CopyTask[];
   inlineDynamicImports?: boolean;
   includeGlobalScripts?: boolean;
+  minify?: boolean;
 }
 
 export interface OutputTargetBase {
