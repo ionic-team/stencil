@@ -1,22 +1,26 @@
-# 🍐 [2.4.0-0](https://github.com/ionic-team/stencil/compare/v2.3.0...v2.4.0-0) (2020-12-16)
+# ☀️ [2.4.0-1](https://github.com/ionic-team/stencil/compare/v2.3.0...v2.4.0-1) (2020-12-17)
+
+
+### Features
+
+* **custom-elements:** enable dist-custom-elements output ([fc70564](https://github.com/ionic-team/stencil/commit/fc70564b8ab551f19b76b4fc034557d17b86643c))
+* **output:** includeGlobalScripts option for custom elements ([e7fa9c8](https://github.com/ionic-team/stencil/commit/e7fa9c8d175dc1b721c449cdf0efd7b326e91b59))
+* **typescript:** update to typescript 4.1.3 ([adf9c93](https://github.com/ionic-team/stencil/commit/adf9c93dfed04a91dc4cf29ac5a09eebd523e96c))
 
 - TypeScript 4.1.3
 - Rollup 2.35.1
 - Terser 5.5.1
 - Puppeteer 5.4.2
 
+
 ### Bug Fixes
 
+* **events:** map onFocusIn/Out to correct events ([#2745](https://github.com/ionic-team/stencil/issues/2745)) ([2dc930f](https://github.com/ionic-team/stencil/commit/2dc930fdc6b6a64ca99e15edf0fe3b26d129d2e2))
+* **vdom:** prevent error for parentless nodes ([#2761](https://github.com/ionic-team/stencil/issues/2761)) ([a08f3a8](https://github.com/ionic-team/stencil/commit/a08f3a82b5b472ec605aa07a8df53d976336da44))
 * **devserver:** expose startupTimeout ([0046051](https://github.com/ionic-team/stencil/commit/004605114d7996d1829348d81ee1fef7afcffc0c))
 * **runtime:** don't render when crashing ([#2746](https://github.com/ionic-team/stencil/issues/2746)) ([c91e0c8](https://github.com/ionic-team/stencil/commit/c91e0c8fd16b4709533c8023b90bd68c43f31b2d))
 * **vdom:** hide fallback slot when content present in scoped/non-shadow components ([#2650](https://github.com/ionic-team/stencil/issues/2650)) ([2ae6f5f](https://github.com/ionic-team/stencil/commit/2ae6f5f2a2b0950b8d7890e1a3b3b59212dc7540))
 * **worker:** update *?worker declaration ([#2754](https://github.com/ionic-team/stencil/issues/2754)) ([7b96ada](https://github.com/ionic-team/stencil/commit/7b96ada03e1cd7bd620f7cde6f36777cd2a5d514))
-
-
-### Features
-
-* **output:** includeGlobalScripts option for custom elements ([e7fa9c8](https://github.com/ionic-team/stencil/commit/e7fa9c8d175dc1b721c449cdf0efd7b326e91b59))
-* **typescript:** update to typescript 4.1.3 ([adf9c93](https://github.com/ionic-team/stencil/commit/adf9c93dfed04a91dc4cf29ac5a09eebd523e96c))
 
 
 
