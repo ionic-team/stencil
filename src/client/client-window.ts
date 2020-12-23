@@ -43,7 +43,7 @@ export const supportsConstructibleStylesheets = BUILD.constructableCSS
   ? /*@__PURE__*/ (() => {
       try {
         new CSSStyleSheet();
-        return true;
+        return typeof (new CSSStyleSheet()).replace === 'function';
       } catch (e) {}
       return false;
     })()
