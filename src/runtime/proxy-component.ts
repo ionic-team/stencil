@@ -2,7 +2,7 @@ import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { consoleDevWarn, getHostRef, plt } from '@platform';
 import { getValue, setValue } from './set-value';
-import { MEMBER_FLAGS } from '../utils/constants';
+import { HOST_FLAGS, MEMBER_FLAGS } from '../utils/constants';
 import { PROXY_FLAGS } from './runtime-constants';
 
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, flags: number) => {
@@ -23,15 +23,21 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
             return getValue(this, memberName);
           },
           set(this: d.RuntimeRef, newValue) {
-            if (
-              // only during dev time
-              BUILD.isDev &&
-              // we are proxing the instance (not element)
-              (flags & PROXY_FLAGS.isElementConstructor) === 0 &&
-              // the member is a non-mutable prop
-              (memberFlags & (MEMBER_FLAGS.Prop | MEMBER_FLAGS.Mutable)) === MEMBER_FLAGS.Prop
-            ) {
-              consoleDevWarn(`@Prop() "${memberName}" on "${cmpMeta.$tagName$}" cannot be modified.\nFurther information: https://stenciljs.com/docs/properties#prop-mutability`);
+            // only during dev time
+            if (BUILD.isDev) {
+              const ref = getHostRef(this);
+              if (
+                // we are proxying the instance (not element)
+                (flags & PROXY_FLAGS.isElementConstructor) === 0 &&
+                // the element is not constructing
+                (ref.$flags$ & HOST_FLAGS.isConstructingInstance) === 0 &&
+                // the member is a prop
+                (memberFlags & MEMBER_FLAGS.Prop) !== 0 && 
+                // the member is not mutable
+                (memberFlags & MEMBER_FLAGS.Mutable) === 0
+              ) {
+                consoleDevWarn(`@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`);
+              }
             }
             // proxyComponent, set value
             setValue(this, memberName, newValue, cmpMeta);
