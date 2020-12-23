@@ -1,0 +1,92 @@
+import { Component, Prop, Method, h } from '@stencil/core';
+import { newSpecPage } from '@stencil/core/testing';
+
+describe('prop', () => {
+  const spy = jest.spyOn(console, 'warn').mockImplementation();
+
+  afterEach(() => spy.mockReset());
+  afterAll(() => spy.mockRestore());
+
+  it('should show warning when immutable prop is mutated', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      @Prop() a = 1;
+
+      @Method()
+      async update() {
+        this.a = 2;
+      }
+
+      render() {
+        return `${this.a}`;
+      }
+    }
+
+    const { root, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml('<cmp-a>1</cmp-a>');
+
+    await root.update();
+    await waitForChanges();
+
+    expect(root).toEqualHtml('<cmp-a>2</cmp-a>');
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0][0]).toMatch(/@Prop\(\) "[A-Za-z-]+" on <[A-Za-z-]+> is immutable/);
+  });
+
+  it('should not show warning when mutable prop is mutated', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      @Prop({ mutable: true }) a = 1;
+
+      @Method()
+      async update() {
+        this.a = 2;
+      }
+
+      render() {
+        return `${this.a}`;
+      }
+    }
+
+    const { root, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml('<cmp-a>1</cmp-a>');
+
+    await root.update();
+    await waitForChanges();
+
+    expect(root).toEqualHtml('<cmp-a>2</cmp-a>');
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('should not show warning when immutable prop is mutated from parent', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      @Prop() a = 1;
+
+      render() {
+        return `${this.a}`;
+      }
+    }
+
+    const { root, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml('<cmp-a>1</cmp-a>');
+
+    root.a = 2;
+    await waitForChanges();
+
+    expect(root).toEqualHtml('<cmp-a>2</cmp-a>');
+    expect(spy).not.toHaveBeenCalled();
+  });
+});
