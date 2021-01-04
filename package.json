@@ -104,7 +104,7 @@
     "parse5": "6.0.1",
     "path-browserify": "^1.0.1",
     "pixelmatch": "4.0.2",
-    "postcss": "^7.0.32",
+    "postcss": "^8.2.2",
     "prettier": "^2.2.1",
     "prompts": "2.4.0",
     "puppeteer": "~5.5.0",
