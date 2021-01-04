@@ -41,7 +41,7 @@ export const createTesting = async (config: Config): Promise<Testing> => {
         return false;
       }
 
-      env = process.env;
+      env = process.env as E2EProcessEnv;
 
       if (opts.e2e) {
         msg.push('e2e');

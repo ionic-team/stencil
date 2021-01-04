@@ -1,4 +1,5 @@
 import type * as d from '@stencil/core/internal';
+import type { E2EProcessEnv } from '@stencil/core/internal';
 import { BUILD, Env } from '@app-data';
 import { expectExtend } from '../matchers';
 import { setupGlobal, teardownGlobal } from '@stencil/core/mock-doc';
@@ -49,7 +50,7 @@ export function jestSetupTestFramework() {
 
   global.screenshotDescriptions = new Set();
 
-  const env: d.E2EProcessEnv = process.env;
+  const env: d.E2EProcessEnv = process.env as E2EProcessEnv;
 
   if (typeof env.__STENCIL_DEFAULT_TIMEOUT__ === 'string') {
     const time = parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10);

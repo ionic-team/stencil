@@ -6,7 +6,7 @@ export async function startPuppeteerBrowser(config: Config) {
     return null;
   }
 
-  const env: E2EProcessEnv = process.env;
+  const env: E2EProcessEnv = process.env as E2EProcessEnv;
   const puppeteerDep = config.testing.browserExecutablePath ? 'puppeteer-core' : 'puppeteer';
 
   const puppeteerModulePath = config.sys.lazyRequire.getModulePath(config.rootDir, puppeteerDep);
@@ -68,7 +68,7 @@ export async function connectBrowser() {
   // a web socket is because jest probably has us
   // in a different thread, this is also why this
   // uses process.env for data
-  const env: E2EProcessEnv = process.env;
+  const env: E2EProcessEnv = process.env as E2EProcessEnv;
 
   const wsEndpoint = env.__STENCIL_BROWSER_WS_ENDPOINT__;
   if (!wsEndpoint) {
