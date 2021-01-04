@@ -77,10 +77,10 @@
     "@types/webpack": "^4.41.25",
     "@types/ws": "^7.4.0",
     "ansi-colors": "4.1.1",
-    "autoprefixer": "9.8.6",
+    "autoprefixer": "^10.1.0",
     "concurrently": "^5.3.0",
     "conventional-changelog-cli": "^2.1.1",
-    "core-js-builder": "~3.6.5",
+    "core-js-builder": "~3.8.2",
     "css": "^3.0.0",
     "dts-bundle-generator": "~5.3.0",
     "execa": "4.1.0",
@@ -138,5 +138,6 @@
     "custom elements",
     "pwa",
     "progressive web app"
-  ]
+  ],
+  "dependencies": {}
 }
