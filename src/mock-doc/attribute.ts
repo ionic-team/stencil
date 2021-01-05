@@ -5,14 +5,15 @@ const attrHandler = {
     if (prop in obj) {
       return obj[prop];
     }
-    if (!isNaN(prop as any)) {
+    if (typeof prop !== 'symbol' && !isNaN(prop as any)) {
       return (obj as MockAttributeMap).__items[prop as any];
     }
     return undefined;
   },
 };
 
-export const createAttributeProxy = (caseInsensitive: boolean) => new Proxy(new MockAttributeMap(caseInsensitive), attrHandler);
+export const createAttributeProxy = (caseInsensitive: boolean) =>
+  new Proxy(new MockAttributeMap(caseInsensitive), attrHandler);
 
 export class MockAttributeMap {
   __items: MockAttr[] = [];
@@ -54,7 +55,9 @@ export class MockAttributeMap {
 
   getNamedItemNS(namespaceURI: string, attrName: string) {
     namespaceURI = getNamespaceURI(namespaceURI);
-    return this.__items.find(attr => attr.name === attrName && getNamespaceURI(attr.namespaceURI) === namespaceURI) || null;
+    return (
+      this.__items.find(attr => attr.name === attrName && getNamespaceURI(attr.namespaceURI) === namespaceURI) || null
+    );
   }
 
   removeNamedItem(attr: MockAttr) {
@@ -68,6 +71,17 @@ export class MockAttributeMap {
         break;
       }
     }
+  }
+
+  [Symbol.iterator]() {
+    let i = 0;
+
+    return {
+      next: () => ({
+        done: i === this.length,
+        value: this.item(i++),
+      }),
+    };
   }
 }
 
