@@ -14,12 +14,13 @@ export const consoleDevError = (...e: any[]) => {
   caughtErrors.push(new Error(e.join(', ')));
 };
 
-export const consoleDevWarn = (..._: any[]) => {
-  /* noop for testing */
+export const consoleDevWarn = (args: any) => {
+  // log warnings so we can spy on them when testing
+  console.warn(args);
 };
 
 export const consoleDevInfo = (..._: any[]) => {
   /* noop for testing */
 };
 
-export const setErrorHandler = (handler: d.ErrorHandler) => customError = handler;
+export const setErrorHandler = (handler: d.ErrorHandler) => (customError = handler);
