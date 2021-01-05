@@ -55,6 +55,10 @@ export class MockCSSStyleDeclaration {
       }
     });
   }
+
+  hasAttribute() {
+    return false;
+  }
 }
 
 export function createCSSStyleDeclaration() {
