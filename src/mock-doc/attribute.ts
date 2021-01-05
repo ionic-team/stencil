@@ -83,6 +83,10 @@ export class MockAttributeMap {
       }),
     };
   }
+
+  get [Symbol.toStringTag]() {
+    return 'MockAttributeMap';
+  }
 }
 
 function getNamespaceURI(namespaceURI: string) {
