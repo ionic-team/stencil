@@ -1,12 +1,20 @@
+import { MockAttr, MockAttributeMap } from '../attribute';
 import { MockDocument } from '../document';
 import { MockElement, MockHTMLElement } from '../node';
 import { XLINK_NS } from '../../runtime/runtime-constants';
-import { MockImageElement } from '../element';
 
 describe('attributes', () => {
   let doc: MockDocument;
   beforeEach(() => {
     doc = new MockDocument();
+  });
+
+  it('attribute map is iterable', () => {
+    const map = new MockAttributeMap();
+    const attr = new MockAttr('attr', 'value');
+    map.setNamedItem(attr);
+
+    expect(Array.from(map)[0]).toBe(attr);
   });
 
   it('should get attributes by index', () => {
@@ -67,7 +75,9 @@ describe('attributes', () => {
     expect(element.getAttribute('prop5')).toBe('hola');
     expect(element.getAttribute('prop6')).toBe('');
 
-    expect(element).toEqualHtml(`<div prop1=\"null\" prop2=\"undefined\" prop3=\"0\" prop4=\"1\" prop5=\"hola\" prop6></div>`);
+    expect(element).toEqualHtml(
+      `<div prop1=\"null\" prop2=\"undefined\" prop3=\"0\" prop4=\"1\" prop5=\"hola\" prop6></div>`,
+    );
   });
 
   it('should cast attributeNS values to string', () => {
@@ -86,7 +96,9 @@ describe('attributes', () => {
     expect(element.getAttribute('prop5')).toBe('hola');
     expect(element.getAttribute('prop6')).toBe('');
 
-    expect(element).toEqualHtml(`<div prop1=\"null\" prop2=\"undefined\" prop3=\"0\" prop4=\"1\" prop5=\"hola\" prop6></div>`);
+    expect(element).toEqualHtml(
+      `<div prop1=\"null\" prop2=\"undefined\" prop3=\"0\" prop4=\"1\" prop5=\"hola\" prop6></div>`,
+    );
   });
 
   it('attributes are case insensible in HTMLElement', () => {
@@ -126,7 +138,7 @@ describe('attributes', () => {
   });
 
   it('draggable default value', () => {
-    const div = doc.createElement('div')
+    const div = doc.createElement('div');
     expect(div.draggable).toEqual(false);
 
     const img = doc.createElement('img');
