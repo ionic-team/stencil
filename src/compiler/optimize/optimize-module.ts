@@ -3,6 +3,7 @@ import { minifyJs } from './minify-js';
 import type { CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declarations';
 import type { CompressOptions, MangleOptions, MinifyOptions } from 'terser';
 import ts from 'typescript';
+import { generatePreamble } from '../../utils/util';
 
 interface OptimizeModuleOptions {
   input: string;
@@ -81,7 +82,10 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
   const opts: MinifyOptions = {
     ie8: false,
     safari10: !!config.extras.safari10,
-    format: {},
+    format: {
+      comments: /^!/,
+      preamble: generatePreamble(config),
+    },
   };
 
   if (sourceTarget === 'es5') {
