@@ -3,7 +3,7 @@ import { minifyJs } from './minify-js';
 import type { CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declarations';
 import type { CompressOptions, MangleOptions, MinifyOptions } from 'terser';
 import ts from 'typescript';
-import { generatePreamble } from '../../utils/util';
+import { generatePreamble } from '@utils';
 
 interface OptimizeModuleOptions {
   input: string;
