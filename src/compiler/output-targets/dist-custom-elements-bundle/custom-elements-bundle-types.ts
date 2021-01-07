@@ -1,7 +1,7 @@
 import type * as d from '../../../declarations';
 import { isOutputTargetDistCustomElementsBundle } from '../output-utils';
 import { dirname, join, relative } from 'path';
-import { generatePreamble, normalizePath, dashToPascalCase } from '@utils';
+import { normalizePath, dashToPascalCase } from '@utils';
 
 export const generateCustomElementsBundleTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, distDtsFilePath: string) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElementsBundle);
@@ -18,14 +18,11 @@ const generateCustomElementsTypesOutput = async (
 ) => {
   const customElementsDtsPath = join(outputTarget.dir, 'index.d.ts');
   const componentsDtsRelPath = relDts(outputTarget.dir, distDtsFilePath);
-  const preamble = generatePreamble(config, {
-    suffix: `${config.namespace} custom elements bundle` 
-  });
-  
-  const components = buildCtx.components.filter(m => !m.isCollectionDependency);  
+
+  const components = buildCtx.components.filter(m => !m.isCollectionDependency);
 
   const code = [
-    preamble,
+    `/* ${config.namespace} custom elements bundle */`,
     ``,
     `import type { Components, JSX } from "${componentsDtsRelPath}";`,
     ``,
