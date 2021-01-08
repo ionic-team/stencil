@@ -11,11 +11,7 @@ import { removeCollectionImports } from '../../transformers/remove-collection-im
 import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 
-export const outputCustomElements = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-) => {
+export const outputCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (!config.buildDist) {
     return;
   }
@@ -94,14 +90,18 @@ const bundleCustomElements = async (
   }
 };
 
-const addCustomElementInputs = (_outputTarget: d.OutputTargetDistCustomElements, buildCtx: d.BuildCtx,  bundleOpts: BundleOptions) => {
+const addCustomElementInputs = (
+  _outputTarget: d.OutputTargetDistCustomElements,
+  buildCtx: d.BuildCtx,
+  bundleOpts: BundleOptions,
+) => {
   const components = buildCtx.components;
   components.forEach(cmp => {
     const exp: string[] = [];
     const exportName = dashToPascalCase(cmp.tagName);
     const importName = cmp.componentClassName;
     const importAs = `$Cmp${exportName}`;
-    const coreKey = `\0${exportName}`
+    const coreKey = `\0${exportName}`;
 
     if (cmp.isPlain) {
       exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
@@ -116,14 +116,14 @@ const addCustomElementInputs = (_outputTarget: d.OutputTargetDistCustomElements,
     bundleOpts.inputs[cmp.tagName] = coreKey;
     bundleOpts.loader[coreKey] = exp.join('\n');
   });
-}
+};
 
 const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements, _buildCtx: d.BuildCtx) => {
   const imp: string[] = [];
   const exp: string[] = [];
 
   imp.push(
-    `export { setAssetPath } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
+    `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
     `export * from '${USER_INDEX_ENTRY_ID}';`,
   );
 

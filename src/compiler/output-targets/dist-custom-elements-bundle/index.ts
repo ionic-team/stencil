@@ -66,7 +66,7 @@ const bundleCustomElements = async (
         hoistTransitiveImports: false,
         preferConst: true,
       });
-      
+
       const minify = outputTarget.externalRuntime || outputTarget.minify !== true ? false : config.minifyJs;
       const files = rollupOutput.output.map(async bundle => {
         if (bundle.type === 'chunk') {
@@ -99,7 +99,7 @@ const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElementsBundle
 
   imp.push(
     `import { proxyCustomElement } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
-    `export { setAssetPath } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
+    `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
     `export * from '${USER_INDEX_ENTRY_ID}';`,
   );
 

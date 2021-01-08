@@ -3,10 +3,19 @@ import { isOutputTargetDistCustomElements } from '../output-utils';
 import { dirname, join, relative } from 'path';
 import { normalizePath, dashToPascalCase } from '@utils';
 
-export const generateCustomElementsTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, distDtsFilePath: string) => {
+export const generateCustomElementsTypes = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  distDtsFilePath: string,
+) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
 
-  await Promise.all(outputTargets.map(outputTarget => generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, distDtsFilePath, outputTarget)));
+  await Promise.all(
+    outputTargets.map(outputTarget =>
+      generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, distDtsFilePath, outputTarget),
+    ),
+  );
 };
 
 export const generateCustomElementsTypesOutput = async (
@@ -36,8 +45,15 @@ export const generateCustomElementsTypesOutput = async (
     ` */`,
     `export declare const setAssetPath: (path: string) => void;`,
     ``,
+    `export interface SetPlatformOptions {`,
+    `  raf?: (c: FrameRequestCallback) => number;`,
+    `  ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;`,
+    `  rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;`,
+    `}`,
+    `export declare const setPlatformOptions: (opts: SetPlatformOptions) => void;`,
+    ``,
     `export type { Components, JSX };`,
-    ``
+    ``,
   ];
 
   const usersIndexJsPath = join(config.srcDir, 'index.ts');
@@ -49,15 +65,19 @@ export const generateCustomElementsTypesOutput = async (
     code.push(`export * from '${componentsDtsRelPath}';`);
   }
 
-  await compilerCtx.fs.writeFile(customElementsDtsPath, code.join('\n') + `\n`, { outputTargetType: outputTarget.type });
+  await compilerCtx.fs.writeFile(customElementsDtsPath, code.join('\n') + `\n`, {
+    outputTargetType: outputTarget.type,
+  });
 
   const components = buildCtx.components.filter(m => !m.isCollectionDependency);
-  await Promise.all(components.map(async cmp => {
-    const dtsCode = generateCustomElementType(componentsDtsRelPath, cmp);
-    const fileName = `${cmp.tagName}.d.ts`;
-    const filePath = join(outputTarget.dir, fileName);
-    await compilerCtx.fs.writeFile(filePath, dtsCode, { outputTargetType: outputTarget.type });
-  }));
+  await Promise.all(
+    components.map(async cmp => {
+      const dtsCode = generateCustomElementType(componentsDtsRelPath, cmp);
+      const fileName = `${cmp.tagName}.d.ts`;
+      const filePath = join(outputTarget.dir, fileName);
+      await compilerCtx.fs.writeFile(filePath, dtsCode, { outputTargetType: outputTarget.type });
+    }),
+  );
 };
 
 const generateCustomElementType = (componentsDtsRelPath: string, cmp: d.ComponentCompilerMeta) => {
