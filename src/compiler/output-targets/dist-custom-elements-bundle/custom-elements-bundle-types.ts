@@ -64,6 +64,7 @@ const generateCustomElementsTypesOutput = async (
     `  raf?: (c: FrameRequestCallback) => number;`,
     `  ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;`,
     `  rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;`,
+    `  ce?: (eventName: string, opts?: any) => CustomEvent;`,
     `}`,
     `export declare const setPlatformOptions: (opts: SetPlatformOptions) => void;`,
     ``,
