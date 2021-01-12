@@ -27,6 +27,7 @@ export async function internal(opts: BuildOptions) {
     description: 'Stencil internals only to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
     main: 'index.js',
     types: 'index.d.ts',
+    sideEffects: false,
   });
 
   const clientPlatformBundle = await internalClient(opts);

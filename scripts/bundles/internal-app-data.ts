@@ -20,6 +20,7 @@ export async function internalAppData(opts: BuildOptions) {
     main: 'index.cjs',
     module: 'index.js',
     types: 'index.d.ts',
+    sideEffects: false
   });
 
   const internalAppDataBundle: RollupOptions = {

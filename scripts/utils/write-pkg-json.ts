@@ -35,7 +35,7 @@ export function writePkgJson(opts: BuildOptions, pkgDir: string, pkgData: Packag
   fs.writeFileSync(path.join(pkgDir, 'package.json'), JSON.stringify(formatedPkg, null, 2) + '\n');
 }
 
-const PROPS_ORDER = ['name', 'version', 'description', 'main', 'module', 'browser', 'types', 'exports', 'type', 'private'];
+const PROPS_ORDER = ['name', 'version', 'description', 'bin', 'main', 'module', 'browser', 'types', 'exports', 'type', 'files', 'private', 'sideEffects'];
 
 export interface PackageData {
   name: string;
@@ -57,4 +57,5 @@ export interface PackageData {
   repository?: any;
   files?: string[];
   bin?: { [key: string]: string };
+  sideEffects?: false;
 }

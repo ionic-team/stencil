@@ -26,6 +26,7 @@ export async function internalClient(opts: BuildOptions) {
     name: '@stencil/core/internal/client',
     description: 'Stencil internal client platform to be imported by the Stencil Compiler and internal runtime. Breaking changes can and will happen at any time.',
     main: 'index.js',
+    sideEffects: false,
   });
 
   const internalClientBundle: RollupOptions = {

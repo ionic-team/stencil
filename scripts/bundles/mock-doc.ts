@@ -24,6 +24,7 @@ export async function mockDoc(opts: BuildOptions) {
     main: 'index.cjs',
     module: 'index.js',
     types: 'index.d.ts',
+    sideEffects: false,
   });
 
   const esOutput: OutputOptions = {
