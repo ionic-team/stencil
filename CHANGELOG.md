@@ -1,4 +1,4 @@
-# 🍸 [2.4.0-2](https://github.com/ionic-team/stencil/compare/v2.3.0...v2.4.0-2) (2021-01-08)
+# 🎬 [2.4.0-3](https://github.com/ionic-team/stencil/compare/v2.3.0...v2.4.0-3) (2021-01-12)
 
 ### Features
 
@@ -24,6 +24,7 @@
 * **mock-doc:** make MockAttributeMap iterable ([#2788](https://github.com/ionic-team/stencil/issues/2788)) ([1aa9cae](https://github.com/ionic-team/stencil/commit/1aa9cae288288f84a85b9e636c09502544431458))
 * show warning when immutable props change ([9c18fa0](https://github.com/ionic-team/stencil/commit/9c18fa0da217be0bd9e28672f2a0b3c9599de2db)), closes [#2433](https://github.com/ionic-team/stencil/issues/2433)
 * **client:** test for presence of replace method of CSSStyleSheet ([#2773](https://github.com/ionic-team/stencil/issues/2773)) ([67e0ea8](https://github.com/ionic-team/stencil/commit/67e0ea841985cdc506edd03aef7c5678fe5a0fae))
+* **bundles:** add sideEffects false to package ([d3bc9e6](https://github.com/ionic-team/stencil/commit/d3bc9e67fb806d97aa5b9d57c725fbb0b45a7d85))
 
 
 
