@@ -17,7 +17,6 @@ export function hydrateFactory($stencilWindow, $stencilHydrateOpts, $stencilHydr
   var close = () => {};
   var confirm = $stencilWindow.confirm.bind($stencilWindow);
   var dispatchEvent = $stencilWindow.dispatchEvent.bind($stencilWindow);
-  var fetch = $stencilWindow.fetch.bind($stencilWindow);
   var focus = $stencilWindow.focus.bind($stencilWindow);
   var getComputedStyle = $stencilWindow.getComputedStyle.bind($stencilWindow);
   var matchMedia = $stencilWindow.matchMedia.bind($stencilWindow);
@@ -38,8 +37,6 @@ export function hydrateFactory($stencilWindow, $stencilHydrateOpts, $stencilHydr
   var DOMTokenList = $stencilWindow.DOMTokenList;
   var Element = $stencilWindow.Element;
   var Event = $stencilWindow.Event;
-  var FetchError = $stencilWindow.FetchError;
-  var Headers = $stencilWindow.Headers;
   var HTMLAnchorElement = $stencilWindow.HTMLAnchorElement;
   var HTMLBaseElement = $stencilWindow.HTMLBaseElement;
   var HTMLButtonElement = $stencilWindow.HTMLButtonElement;
@@ -59,8 +56,6 @@ export function hydrateFactory($stencilWindow, $stencilHydrateOpts, $stencilHydr
   var MouseEvent = $stencilWindow.MouseEvent;
   var Node = $stencilWindow.Node;
   var NodeList = $stencilWindow.NodeList;
-  var Request = $stencilWindow.Request;
-  var Response = $stencilWindow.Response;
   var URL = $stencilWindow.URL;
 
   var console = $stencilWindow.console;
@@ -86,6 +81,38 @@ export function hydrateFactory($stencilWindow, $stencilHydrateOpts, $stencilHydr
   var scrollX = $stencilWindow.scrollX;
   var scrollY = $stencilWindow.scrollY;
   var exports = {};
+
+  var fetch, FetchError, Headers, Request, Response;
+
+  if (typeof $stencilWindow.fetch === 'function') {
+    fetch = $stencilWindow.fetch;
+  } else {
+    fetch = $stencilWindow.fetch = function() { throw new Error('fetch() is not implemented'); };
+  }
+
+  if (typeof $stencilWindow.FetchError === 'function') {
+    FetchError = $stencilWindow.FetchError;
+  } else {
+    FetchError = $stencilWindow.FetchError = class FetchError { constructor() { throw new Error('FetchError is not implemented'); } };
+  }
+
+  if (typeof $stencilWindow.Headers === 'function') {
+    Headers = $stencilWindow.Headers;
+  } else {
+    Headers = $stencilWindow.Headers = class Headers { constructor() { throw new Error('Headers is not implemented'); } };
+  }
+
+  if (typeof $stencilWindow.Request === 'function') {
+    Request = $stencilWindow.Request;
+  } else {
+    Request = $stencilWindow.Request = class Request { constructor() { throw new Error('Request is not implemented'); } };
+  }
+
+  if (typeof $stencilWindow.Response === 'function') {
+    Response = $stencilWindow.Response;
+  } else {
+    Response = $stencilWindow.Response = class Response { constructor() { throw new Error('Response is not implemented'); } };
+  }
 
   function hydrateAppClosure($stencilWindow) {
     const window = $stencilWindow;
