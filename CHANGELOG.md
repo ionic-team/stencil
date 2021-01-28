@@ -1,4 +1,4 @@
-# 🎬 [2.4.0-3](https://github.com/ionic-team/stencil/compare/v2.3.0...v2.4.0-3) (2021-01-12)
+# 📷 [2.4.0](https://github.com/ionic-team/stencil/compare/v2.3.0...v2.4.0) (2021-01-28)
 
 ### Features
 
@@ -25,6 +25,9 @@
 * show warning when immutable props change ([9c18fa0](https://github.com/ionic-team/stencil/commit/9c18fa0da217be0bd9e28672f2a0b3c9599de2db)), closes [#2433](https://github.com/ionic-team/stencil/issues/2433)
 * **client:** test for presence of replace method of CSSStyleSheet ([#2773](https://github.com/ionic-team/stencil/issues/2773)) ([67e0ea8](https://github.com/ionic-team/stencil/commit/67e0ea841985cdc506edd03aef7c5678fe5a0fae))
 * **bundles:** add sideEffects false to package ([d3bc9e6](https://github.com/ionic-team/stencil/commit/d3bc9e67fb806d97aa5b9d57c725fbb0b45a7d85))
+* **autoprefixer:** update autoprefixer ([75acfca](https://github.com/ionic-team/stencil/commit/75acfcab0c3ee767a3f75d17b224f866d0c0e1f9))
+* **hydrate:** check for fetch patch ([16a3330](https://github.com/ionic-team/stencil/commit/16a333014e6f453c5383d7c9e0bcce4ca0aa7362))
+* **polyfill:** convert checkIfURLIsSupported to function expression ([#2799](https://github.com/ionic-team/stencil/issues/2799)) ([f8618d6](https://github.com/ionic-team/stencil/commit/f8618d6d2db00c3735fbb585843bf8cd7e8eb288))
 
 
 
