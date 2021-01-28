@@ -4,7 +4,6 @@ import { caughtErrors } from './testing-constants';
 let customError: d.ErrorHandler;
 
 const defaultConsoleError = (e: any) => {
-  console.log('here', customError);
   caughtErrors.push(e);
 };
 
@@ -14,9 +13,10 @@ export const consoleDevError = (...e: any[]) => {
   caughtErrors.push(new Error(e.join(', ')));
 };
 
-export const consoleDevWarn = (args: any) => {
+export const consoleDevWarn = (...args: any[]) => {
   // log warnings so we can spy on them when testing
-  console.warn(args);
+  const params = args.filter(a => typeof a === 'string' || typeof a === 'number' || typeof a === 'boolean');
+  console.warn.apply(console, params);
 };
 
 export const consoleDevInfo = (..._: any[]) => {
