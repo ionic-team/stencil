@@ -10,71 +10,85 @@ import { ssrPageRequest, ssrStaticDataRequest } from './ssr-request';
 import path from 'path';
 
 export function createRequestHandler(devServerConfig: d.DevServerConfig, serverCtx: d.DevServerContext) {
+  let userRequestHandler: (req: IncomingMessage, res: ServerResponse, next: () => void) => void = null;
+
+  if (typeof devServerConfig.requestListenerPath === 'string') {
+    userRequestHandler = require(devServerConfig.requestListenerPath);
+  }
+
   return async function (incomingReq: IncomingMessage, res: ServerResponse) {
-    try {
-      const req = normalizeHttpRequest(devServerConfig, incomingReq);
+    async function defaultHandler() {
+      try {
+        const req = normalizeHttpRequest(devServerConfig, incomingReq);
 
-      if (!req.url) {
-        return serverCtx.serve302(req, res);
-      }
-
-      if (isDevClient(req.pathname) && devServerConfig.websocket) {
-        return serveDevClient(devServerConfig, serverCtx, req, res);
-      }
-
-      if (isDevModule(req.pathname)) {
-        return serveDevNodeModule(serverCtx, req, res);
-      }
-
-      if (!isValidUrlBasePath(devServerConfig.basePath, req.url)) {
-        return serverCtx.serve404(
-          req,
-          res,
-          `invalid basePath`,
-          `404 File Not Found, base path: ${devServerConfig.basePath}`,
-        );
-      }
-
-      if (devServerConfig.ssr) {
-        if (isExtensionLessPath(req.url.pathname)) {
-          return ssrPageRequest(devServerConfig, serverCtx, req, res);
+        if (!req.url) {
+          return serverCtx.serve302(req, res);
         }
-        if (isSsrStaticDataPath(req.url.pathname)) {
-          return ssrStaticDataRequest(devServerConfig, serverCtx, req, res);
+
+        if (isDevClient(req.pathname) && devServerConfig.websocket) {
+          return serveDevClient(devServerConfig, serverCtx, req, res);
         }
-      }
 
-      req.stats = await serverCtx.sys.stat(req.filePath);
-      if (req.stats.isFile) {
-        return serveFile(devServerConfig, serverCtx, req, res);
-      }
+        if (isDevModule(req.pathname)) {
+          return serveDevNodeModule(serverCtx, req, res);
+        }
 
-      if (req.stats.isDirectory) {
-        return serveDirectoryIndex(devServerConfig, serverCtx, req, res);
-      }
+        if (!isValidUrlBasePath(devServerConfig.basePath, req.url)) {
+          return serverCtx.serve404(
+            req,
+            res,
+            `invalid basePath`,
+            `404 File Not Found, base path: ${devServerConfig.basePath}`,
+          );
+        }
 
-      const xSource = ['notfound'];
-      const validHistoryApi = isValidHistoryApi(devServerConfig, req);
-      xSource.push(`validHistoryApi: ${validHistoryApi}`);
-
-      if (validHistoryApi) {
-        try {
-          const indexFilePath = path.join(devServerConfig.root, devServerConfig.historyApiFallback.index);
-          xSource.push(`indexFilePath: ${indexFilePath}`);
-
-          req.stats = await serverCtx.sys.stat(indexFilePath);
-          if (req.stats.isFile) {
-            req.filePath = indexFilePath;
-            return serveFile(devServerConfig, serverCtx, req, res);
+        if (devServerConfig.ssr) {
+          if (isExtensionLessPath(req.url.pathname)) {
+            return ssrPageRequest(devServerConfig, serverCtx, req, res);
           }
-        } catch (e) {
-          xSource.push(`notfound error: ${e}`);
+          if (isSsrStaticDataPath(req.url.pathname)) {
+            return ssrStaticDataRequest(devServerConfig, serverCtx, req, res);
+          }
         }
-      }
 
-      return serverCtx.serve404(req, res, xSource.join(', '));
-    } catch (e) {
-      return serverCtx.serve500(incomingReq, res, e, `not found error`);
+        req.stats = await serverCtx.sys.stat(req.filePath);
+        if (req.stats.isFile) {
+          return serveFile(devServerConfig, serverCtx, req, res);
+        }
+
+        if (req.stats.isDirectory) {
+          return serveDirectoryIndex(devServerConfig, serverCtx, req, res);
+        }
+
+        const xSource = ['notfound'];
+        const validHistoryApi = isValidHistoryApi(devServerConfig, req);
+        xSource.push(`validHistoryApi: ${validHistoryApi}`);
+
+        if (validHistoryApi) {
+          try {
+            const indexFilePath = path.join(devServerConfig.root, devServerConfig.historyApiFallback.index);
+            xSource.push(`indexFilePath: ${indexFilePath}`);
+
+            req.stats = await serverCtx.sys.stat(indexFilePath);
+            if (req.stats.isFile) {
+              req.filePath = indexFilePath;
+              return serveFile(devServerConfig, serverCtx, req, res);
+            }
+          } catch (e) {
+            xSource.push(`notfound error: ${e}`);
+          }
+        }
+
+        return serverCtx.serve404(req, res, xSource.join(', '));
+      } catch (e) {
+        return serverCtx.serve500(incomingReq, res, e, `not found error`);
+      }
+    }
+
+    if (typeof userRequestHandler === 'function') {
+      userRequestHandler(incomingReq, res, defaultHandler);
+    } else {
+      defaultHandler();
     }
   };
 }

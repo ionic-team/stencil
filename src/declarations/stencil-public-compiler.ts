@@ -411,6 +411,31 @@ export interface StencilDevServerConfig {
    */
   reloadStrategy?: PageReloadStrategy;
   /**
+   * Local path to a NodeJs file with a dev server request listener as the default export.
+   * The user's request listener is given the first chance to handle every request the dev server
+   * receives, and can choose to handle it or instead pass it on to the default dev server
+   * by calling `next()`.
+   *
+   * Below is an example of a NodeJs file the `requestListenerPath` config is using.
+   * The request and response arguments are the same as Node's `http` module and `RequestListener`
+   * callback. https://nodejs.org/api/http.html#http_http_createserver_options_requestlistener
+   *
+   * ```js
+   * module.exports = function (req, res, next) {
+   *    if (req.url === '/ping') {
+   *      // custom response overriding the dev server
+   *      res.setHeader('Content-Type', 'text/plain');
+   *      res.writeHead(200);
+   *      res.end('pong');
+   *    } else {
+   *      // pass request on to the default dev server
+   *      next();
+   *    }
+   * };
+   * ```
+   */
+  requestListenerPath?: string;
+  /**
    * The root directory to serve the files from.
    */
   root?: string;

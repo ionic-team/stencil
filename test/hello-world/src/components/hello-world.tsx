@@ -5,12 +5,6 @@ import { Component, h } from '@stencil/core';
 })
 export class HelloWorld {
   render() {
-    return <div>{getData()}</div>;
+    return <div>Hello World</div>;
   }
 }
-
-const getData = async () => {
-  const rsp = await fetch('http://ionic.io/');
-  const txt = await rsp.text();
-  return txt;
-};
