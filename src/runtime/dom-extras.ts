@@ -49,6 +49,35 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
   };
 };
 
+export const patchTextContent = (HostElementPrototype: any) => {
+  const descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
+  Object.defineProperty(HostElementPrototype, '__textContent', descriptor);
+
+  Object.defineProperty(HostElementPrototype, 'textContent', {
+    get() {
+      const slotNode = getHostSlotNode(this.childNodes, '');
+      if (slotNode) {
+        return slotNode.textContent;
+      } else {
+        return this.__textContent;
+      }
+    },
+
+    set(value) {
+      const slotNode = getHostSlotNode(this.childNodes, '');
+      if (slotNode) {
+        slotNode.textContent = value;
+      } else {
+        this.__textContent = value;
+        const contentRefElm = this['s-cr'];
+        if (contentRefElm) {
+          this.insertBefore(contentRefElm, this.firstChild);
+        }
+      }
+    }
+  });
+};
+
 export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) => {
   class FakeNodeList extends Array {
     item(n: number) {
