@@ -4,7 +4,7 @@ import { isMethod } from '../transform-utils';
 
 export const parseClassMethods = (cmpNode: ts.ClassDeclaration, cmpMeta: d.ComponentCompilerMeta) => {
   const classMembers = cmpNode.members;
-  if (!classMembers) {
+  if (!classMembers || classMembers.length === 0) {
     return;
   }
 
