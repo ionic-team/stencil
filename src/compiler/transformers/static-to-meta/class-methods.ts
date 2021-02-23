@@ -4,28 +4,40 @@ import { isMethod } from '../transform-utils';
 
 export const parseClassMethods = (cmpNode: ts.ClassDeclaration, cmpMeta: d.ComponentCompilerMeta) => {
   const classMembers = cmpNode.members;
-  if (!classMembers || classMembers.length === 0) {
+  if (!classMembers) {
     return;
   }
 
-  const classMethods = classMembers.filter(m => ts.isMethodDeclaration(m));
-  if (classMethods.length === 0) {
-    return;
-  }
+  const classMethods = classMembers.filter(m => ts.isMethodDeclaration(m) || ts.isPropertyDeclaration(m));
   const hasHostData = classMethods.some(m => isMethod(m, 'hostData'));
 
-  cmpMeta.hasAttributeChangedCallbackFn = classMethods.some(m => isMethod(m, 'attributeChangedCallback'));
-  cmpMeta.hasConnectedCallbackFn = classMethods.some(m => isMethod(m, 'connectedCallback'));
-  cmpMeta.hasDisconnectedCallbackFn = classMethods.some(m => isMethod(m, 'disconnectedCallback'));
-  cmpMeta.hasComponentWillLoadFn = classMethods.some(m => isMethod(m, 'componentWillLoad'));
-  cmpMeta.hasComponentWillUpdateFn = classMethods.some(m => isMethod(m, 'componentWillUpdate'));
-  cmpMeta.hasComponentWillRenderFn = classMethods.some(m => isMethod(m, 'componentWillRender'));
-  cmpMeta.hasComponentDidRenderFn = classMethods.some(m => isMethod(m, 'componentDidRender'));
-  cmpMeta.hasComponentDidLoadFn = classMethods.some(m => isMethod(m, 'componentDidLoad'));
-  cmpMeta.hasComponentShouldUpdateFn = classMethods.some(m => isMethod(m, 'componentShouldUpdate'));
-  cmpMeta.hasComponentDidUpdateFn = classMethods.some(m => isMethod(m, 'componentDidUpdate'));
-  cmpMeta.hasComponentDidUnloadFn = classMethods.some(m => isMethod(m, 'componentDidUnload'));
+  const ctrs = classMembers.find(m => ts.isConstructorDeclaration(m)) as ts.ConstructorDeclaration;
+  const assignments = ctrs?.body?.statements?.filter(st => (
+    ts.isExpressionStatement(st) &&
+    ts.isBinaryExpression(st.expression) &&
+    st.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+    ts.isPropertyAccessExpression(st.expression.left) &&
+    st.expression.left.expression.kind === ts.SyntaxKind.ThisKeyword &&
+    ts.isIdentifier(st.expression.left.name)
+  ))
+  .map(st => (st as any).expression.left.name.escapedText) ?? [];
+
+  const hasMethodOrProp = (prop: string) => {
+    return assignments.includes(prop) || classMethods.some(m => isMethod(m, prop))
+  };
+  cmpMeta.hasAttributeChangedCallbackFn = hasMethodOrProp('attributeChangedCallback');
+  cmpMeta.hasConnectedCallbackFn = hasMethodOrProp('connectedCallback');
+  cmpMeta.hasDisconnectedCallbackFn = hasMethodOrProp('disconnectedCallback');
+  cmpMeta.hasComponentWillLoadFn = hasMethodOrProp('componentWillLoad');
+  cmpMeta.hasComponentWillUpdateFn = hasMethodOrProp('componentWillUpdate');
+  cmpMeta.hasComponentWillRenderFn = hasMethodOrProp('componentWillRender');
+  cmpMeta.hasComponentDidRenderFn = hasMethodOrProp('componentDidRender');
+  cmpMeta.hasComponentDidLoadFn = hasMethodOrProp('componentDidLoad');
+  cmpMeta.hasComponentShouldUpdateFn = hasMethodOrProp('componentShouldUpdate');
+  cmpMeta.hasComponentDidUpdateFn = hasMethodOrProp('componentDidUpdate');
+  cmpMeta.hasComponentDidUnloadFn = hasMethodOrProp('componentDidUnload');
+
   cmpMeta.hasLifecycle = cmpMeta.hasComponentWillLoadFn || cmpMeta.hasComponentDidLoadFn || cmpMeta.hasComponentWillUpdateFn || cmpMeta.hasComponentDidUpdateFn;
-  cmpMeta.hasRenderFn = classMethods.some(m => isMethod(m, 'render')) || hasHostData;
+  cmpMeta.hasRenderFn = hasMethodOrProp('render') || hasHostData;
   cmpMeta.hasVdomRender = cmpMeta.hasVdomRender || hasHostData;
 };
