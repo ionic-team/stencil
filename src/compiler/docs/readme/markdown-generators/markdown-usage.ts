@@ -1,4 +1,4 @@
-import type * as d from '../../../declarations';
+import type * as d from '../../../../declarations';
 import { toTitleCase } from '@utils';
 
 export const usageToMarkdown = (usages: d.JsonDocsUsage) => {

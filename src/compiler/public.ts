@@ -17,6 +17,13 @@ import {
   TranspileResults,
   PrerenderStartOptions,
   PrerenderResults,
+  JsonDocsStyle,
+  JsonDocsComponent,
+  JsonDocsEvent,
+  JsonDocsMethod,
+  JsonDocsSlot,
+  JsonDocsProp,
+  JsonDocsUsage,
 } from '@stencil/core/internal';
 
 /**
@@ -123,6 +130,24 @@ export declare const vermoji: string;
  * Compiler's unique build ID.
  */
 export declare const buildId: string;
+
+/**
+ *  Helper functions that are used in [default API docs](https://stenciljs.com/docs/docs-readme) (`docs-readme`)
+ *  generation process for markdown compilation of different API sections (like attributes, events, methods,
+ *  CSS custom props, etc.).
+ *  These functions could be re-used in [custom API docs](https://stenciljs.com/docs/docs-custom) (`docs-custom`)
+ *  generation process, in case business needs require only partial modification of default template.
+ */
+export declare const apiDocsGenerationUtils: {
+  stylesToMarkdown: (styles: JsonDocsStyle[]) => string;
+  depsToMarkdown: (cmp: JsonDocsComponent, cmps: JsonDocsComponent[]) => string;
+  eventsToMarkdown: (events: JsonDocsEvent[]) => string;
+  methodsToMarkdown: (methods: JsonDocsMethod[]) => string;
+  partsToMarkdown: (parts: JsonDocsSlot[]) => string;
+  propsToMarkdown: (props: JsonDocsProp[]) => string;
+  slotsToMarkdown: (slots: JsonDocsSlot[]) => string;
+  usageToMarkdown: (usages: JsonDocsUsage) => string;
+};
 
 export {
   CompileScriptMinifyOptions,

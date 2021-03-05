@@ -1,4 +1,4 @@
-import { propsToMarkdown } from '../../docs/readme/markdown-props';
+import { propsToMarkdown } from '../readme/markdown-generators';
 
 describe('markdown props', () => {
   it('advanced union types', () => {

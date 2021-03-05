@@ -3,6 +3,7 @@ import { createWorkerMessageHandler } from './worker/worker-thread';
 import { initWebWorkerThread } from './sys/worker/web-worker-thread';
 import { IS_WEB_WORKER_ENV } from './sys/environment';
 import ts from 'typescript';
+import * as apiDocsGenerationUtils from './docs/readme/markdown-generators';
 
 if (IS_WEB_WORKER_ENV) {
   initWebWorkerThread(createWorkerMessageHandler(createSystem()));
@@ -22,3 +23,4 @@ export { path } from './sys/modules/path';
 export { transpile, transpileSync } from './transpile';
 export { version, versions, vermoji, buildId } from '../version';
 export { ts };
+export { apiDocsGenerationUtils };

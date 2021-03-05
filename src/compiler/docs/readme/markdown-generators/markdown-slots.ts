@@ -1,5 +1,5 @@
-import type * as d from '../../../declarations';
-import { MarkdownTable } from './docs-util';
+import type * as d from '../../../../declarations';
+import { MarkdownTable } from '../docs-util';
 
 export const slotsToMarkdown = (slots: d.JsonDocsSlot[]) => {
   const content: string[] = [];
