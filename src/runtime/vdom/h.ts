@@ -9,7 +9,7 @@
 
 import type * as d from '../../declarations';
 import { BUILD } from '@app-data';
-import { consoleDevError, consoleDevWarn, Fragment } from '@platform';
+import { consoleDevError, consoleDevWarn } from '@platform';
 import { isComplexType } from '@utils';
 
 // const stack: any[] = [];
@@ -98,13 +98,12 @@ Empty objects can also be the cause, look for JSX comments that became objects.`
   return vnode;
 };
 
+export const Fragment: d.FunctionalComponent = (_, children: any) => children;
+
 // Exposing this here allows to set `jsxFragmentFactory` to `h.Fragment` in
 // tsconfig, so that `Fragment` doesn't need to be imported explicitly (just
-// importing `h` is sufficient then).
-//
-// It has to be wrapped in a function call because `Fragment` is only
-// initialised later on, probably because of a circular dependency.
-h.Fragment = (...args: Parameters<typeof Fragment>) => Fragment(...args);
+// importing `h` is sufficient).
+h.Fragment = Fragment;
 
 export const newVNode = (tag: string, text: string) => {
   const vnode: d.VNode = {
