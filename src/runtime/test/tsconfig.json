@@ -8,7 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
     "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment",
+    "jsxFragmentFactory": "h.Fragment",
     "lib": ["dom", "es2017", "esnext.array"],
     "module": "esnext",
     "moduleResolution": "node",

@@ -146,7 +146,7 @@ const createDefaultTsConfig = (config: d.Config) =>
         target: 'es2017',
         jsx: 'react',
         jsxFactory: 'h',
-        jsxFragmentFactory: 'Fragment'
+        jsxFragmentFactory: 'h.Fragment',
       },
       include: [relative(config.rootDir, config.srcDir)],
     },
