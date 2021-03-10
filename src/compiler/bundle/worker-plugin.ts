@@ -201,7 +201,10 @@ const workerMsgId = '${workerMsgId}';
 const workerMsgCallbackId = workerMsgId + '.cb';
 const getTransferables = (value) => {
   if (!!value) {
-    if (value instanceof ArrayBuffer || value instanceof OffscreenCanvas) {
+    if (value instanceof ArrayBuffer
+        || value instanceof MessagePort 
+        || value instanceof ImageBitmap 
+        || value instanceof OffscreenCanvas) {
       return [value];
     }
     if (value.constructor === Object) {
@@ -345,7 +348,10 @@ export const createWorkerProxy = (worker, workerMsgId, exportedMethod) => (
     const postMessage = (w) => (
       w.postMessage(
         [workerMsgId, pendingId, exportedMethod, args],
-        args.filter(a => a instanceof ArrayBuffer || a instanceof OffscreenCanvas)
+        args.filter(a => a instanceof ArrayBuffer 
+                      || a instanceof MessagePort 
+                      || a instanceof ImageBitmap 
+                      || a instanceof OffscreenCanvas)
       )
     );
     if (worker.then) {
