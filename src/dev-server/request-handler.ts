@@ -86,9 +86,9 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, serverC
     }
 
     if (typeof userRequestHandler === 'function') {
-      userRequestHandler(incomingReq, res, defaultHandler);
+      await userRequestHandler(incomingReq, res, defaultHandler);
     } else {
-      defaultHandler();
+      await defaultHandler();
     }
   };
 }
