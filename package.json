@@ -118,6 +118,13 @@
     "webpack": "^4.46.0",
     "ws": "7.4.2"
   },
+  "peerDependencies": {
+    "@types/jest": "^26.6.3",
+    "@types/puppeteer": "^5.4.2",
+    "jest": "^26.6.3",
+    "jest-cli": "^26.6.3",
+    "puppeteer": "5.5.0"
+  },
   "engines": {
     "node": ">=12.10.0",
     "npm": ">=6.0.0"
