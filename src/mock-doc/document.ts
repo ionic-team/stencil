@@ -42,6 +42,13 @@ export class MockDocument extends MockHTMLElement {
     }
   }
 
+  get dir() {
+    return this.documentElement.dir;
+  }
+  set dir(value: string) {
+    this.documentElement.dir = value;
+  }
+
   get location() {
     if (this.defaultView != null) {
       return (this.defaultView as Window).location;
