@@ -96,7 +96,7 @@
     "jest-environment-node": "^26.6.2",
     "listr": "^0.14.3",
     "magic-string": "^0.25.7",
-    "mime-db": "^1.45.0",
+    "mime-db": "^1.46.0",
     "minimatch": "3.0.4",
     "node-fetch": "2.6.1",
     "open": "7.3.1",
