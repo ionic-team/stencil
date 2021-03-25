@@ -195,27 +195,32 @@ const WORKER_SUFFIX = ['.worker.ts', '.worker.tsx', '.worker/index.ts', '.worker
 
 const WORKER_HELPER_ID = '@worker-helper';
 
-const getWorkerIntro = (workerMsgId: string, isDev: boolean) => `
-const exports = {};
-const workerMsgId = '${workerMsgId}';
-const workerMsgCallbackId = workerMsgId + '.cb';
+const GET_TRANSFERABLES = `
 const getTransferables = (value) => {
-  if (!!value) {
+  if (value != null) {
     if (value instanceof ArrayBuffer
-        || value instanceof MessagePort 
-        || value instanceof ImageBitmap 
+        || value instanceof MessagePort
+        || value instanceof ImageBitmap
         || value instanceof OffscreenCanvas) {
       return [value];
     }
-    if (value.constructor === Object) {
-      return [].concat(...Object.keys(value).map(k => getTransferables(value[k])))
-    }
-    if (typeof value === 'object') {
+    if (typeof value === "object") {
+      if (value.constructor === Object) {
+        value = Object.values(value);
+      }
+      if (Array.isArray(value)) {
+        return value.flatMap(getTransferables);
+      }
       return getTransferables(value.buffer);
     }
   }
   return [];
-};
+};`
+const getWorkerIntro = (workerMsgId: string, isDev: boolean) => `
+${GET_TRANSFERABLES}
+const exports = {};
+const workerMsgId = '${workerMsgId}';
+const workerMsgCallbackId = workerMsgId + '.cb';
 addEventListener('message', async ({data}) => {
   if (data && data[0] === workerMsgId) {
     let id = data[1];
@@ -284,6 +289,8 @@ addEventListener('message', async ({data}) => {
 export const WORKER_HELPERS = `
 import { consoleError } from '${STENCIL_INTERNAL_ID}';
 
+${GET_TRANSFERABLES}
+
 let pendingIds = 0;
 let callbackIds = 0;
 const pending = new Map();
@@ -348,10 +355,7 @@ export const createWorkerProxy = (worker, workerMsgId, exportedMethod) => (
     const postMessage = (w) => (
       w.postMessage(
         [workerMsgId, pendingId, exportedMethod, args],
-        args.filter(a => a instanceof ArrayBuffer 
-                      || a instanceof MessagePort 
-                      || a instanceof ImageBitmap 
-                      || a instanceof OffscreenCanvas)
+        getTransferables(args)
       )
     );
     if (worker.then) {
@@ -394,7 +398,7 @@ const getMockedWorkerMain = () => {
 export const workerName = 'mocked-worker';
 export const workerMsgId = workerName;
 export const workerPath = workerName;
-export const worker = { name: workerName };  
+export const worker = { name: workerName };
 `;
 };
 
