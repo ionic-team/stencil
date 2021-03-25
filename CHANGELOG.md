@@ -1,3 +1,13 @@
+## 🐭 [2.5.1](https://github.com/ionic-team/stencil/compare/v2.5.0...v2.5.1) (2021-03-25)
+
+
+### Bug Fixes
+
+* worker transferable work both ways ([#2866](https://github.com/ionic-team/stencil/issues/2866)) ([46ee1a2](https://github.com/ionic-team/stencil/commit/46ee1a2520b31636e2f58ea37ced71c852a5d2e8))
+* **worker-plugin:** transfer OffscreenCanvas ([#2849](https://github.com/ionic-team/stencil/issues/2849)) ([969da47](https://github.com/ionic-team/stencil/commit/969da47ef752cfb74a84f0bb7cea017854205071))
+
+
+
 # 🎠 [2.5.0](https://github.com/ionic-team/stencil/compare/v2.4.0...v2.5.0) (2021-03-22)
 
 ### Features
