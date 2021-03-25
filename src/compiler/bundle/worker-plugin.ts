@@ -209,7 +209,7 @@ const getTransferables = (value) => {
         value = Object.values(value);
       }
       if (Array.isArray(value)) {
-        return value.flatMap(v => getTransferables(v));
+        return value.flatMap(getTransferables);
       }
       return getTransferables(value.buffer);
     }
