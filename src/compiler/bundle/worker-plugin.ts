@@ -196,12 +196,18 @@ const WORKER_SUFFIX = ['.worker.ts', '.worker.tsx', '.worker/index.ts', '.worker
 const WORKER_HELPER_ID = '@worker-helper';
 
 const GET_TRANSFERABLES = `
+const isInstanceOf = (value, className) => {
+  const C = globalThis[className];
+  return C != null && value instanceof C;
+}
 const getTransferables = (value) => {
   if (value != null) {
-    if (value instanceof ArrayBuffer
-        || value instanceof MessagePort
-        || value instanceof ImageBitmap
-        || value instanceof OffscreenCanvas) {
+    if (
+      isInstanceOf(value, "ArrayBuffer") ||
+      isInstanceOf(value, "MessagePort") ||
+      isInstanceOf(value, "ImageBitmap") ||
+      isInstanceOf(value, "OffscreenCanvas")
+    ) {
       return [value];
     }
     if (typeof value === "object") {
