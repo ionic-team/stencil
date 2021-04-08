@@ -25,6 +25,7 @@ export type {
 export {
   Build,
   Component,
+  Mixin,
   Element,
   Event,
   getAssetPath,
