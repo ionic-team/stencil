@@ -728,6 +728,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   internal: boolean;
   legacyConnect: ComponentCompilerLegacyConnect[];
   legacyContext: ComponentCompilerLegacyContext[];
+  mixinFilePaths: string[];
 
   dependencies?: string[];
   dependents?: string[];
@@ -1398,6 +1399,7 @@ export interface Module {
   sourceFilePath: string;
   staticSourceFile: any;
   staticSourceFileText: string;
+  mixinFilePaths: string[];
 
   // build features
   hasVdomAttribute: boolean;

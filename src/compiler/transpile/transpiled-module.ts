@@ -40,4 +40,5 @@ export const createModule = (
   originalCollectionComponentPath: null,
   originalImports: [],
   potentialCmpRefs: [],
+  mixinFilePaths: [],
 });

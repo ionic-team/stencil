@@ -34,10 +34,31 @@ export const runTsProgram = async (
   const typesOutputTarget = config.outputTargets.filter(isOutputTargetDistTypes);
   const emittedDts: string[] = [];
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
+    const tsSourceFile = tsSourceFiles[0]?.fileName;
     if (emitFilePath.endsWith('.js')) {
       updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
+
+      // re-reun transpile for any mixin dependents
+      let mixinDependents: ts.SourceFile[] = [];
+      for (const mod of buildCtx.compilerCtx.moduleMap.values()) {
+        if (
+          mod.mixinFilePaths.length &&
+          mod.mixinFilePaths.find(file => file === tsSourceFile)
+        ) {
+          mixinDependents = [
+            ...mixinDependents,
+            ...mod.cmps
+              .filter(cmp => cmp.mixinFilePaths.find(file => file === tsSourceFile))
+              .map(cmp => tsProgram.getSourceFile(cmp.sourceFilePath))
+          ];
+        }
+      }
+
+      mixinDependents.forEach(dep => tsProgram.emit(dep, emitCallback, undefined, false, {
+        before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker)]
+      }));
     } else if (emitFilePath.endsWith('.d.ts')) {
-      const srcDtsPath = normalizePath(tsSourceFiles[0].fileName);
+      const srcDtsPath = normalizePath(tsSourceFile);
       const relativeEmitFilepath = getRelativeDts(config, srcDtsPath, emitFilePath);
 
       emittedDts.push(srcDtsPath);

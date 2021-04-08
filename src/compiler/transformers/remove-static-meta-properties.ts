@@ -19,6 +19,7 @@ export const removeStaticMetaProperties = (classNode: ts.ClassDeclaration) => {
 
 const REMOVE_STATIC_GETTERS = new Set([
   'is',
+  'mixinFilePaths',
   'properties',
   'encapsulation',
   'elementRef',
