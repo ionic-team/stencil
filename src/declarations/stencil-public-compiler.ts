@@ -2410,7 +2410,3 @@ export interface CliInitOptions {
   logger: Logger;
   sys: CompilerSystem;
 }
-
-export interface WatchConfig {
-  excludeExtensions?: string[];
-}
