@@ -157,7 +157,7 @@ const watchSrcDirectory = async (config: d.Config, compilerCtx: d.CompilerCtx) =
   const srcFiles = await compilerCtx.fs.readdir(config.srcDir, {
     recursive: true,
     excludeDirNames: ['.cache', '.git', '.github', '.stencil', '.vscode', 'node_modules'],
-    excludeExtensions: [
+    excludeExtensions: config.watchExcludeExtensions || [
       '.md',
       '.markdown',
       '.txt',

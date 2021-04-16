@@ -228,6 +228,11 @@ export interface StencilConfig {
   watchIgnoredRegex?: RegExp | RegExp[];
   excludeUnusedDependencies?: boolean;
   stencilCoreResolvedId?: string;
+
+  /**
+   * Set file extensions that should be ignored during watch mode.
+   */
+  watchExcludeExtensions?: string[];
 }
 
 export interface ConfigExtras {
@@ -2404,4 +2409,8 @@ export interface CliInitOptions {
   args: string[];
   logger: Logger;
   sys: CompilerSystem;
+}
+
+export interface WatchConfig {
+  excludeExtensions?: string[];
 }
