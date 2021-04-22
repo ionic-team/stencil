@@ -19,6 +19,7 @@ export const generateRollupOutput = async (
       return {
         type: 'chunk',
         fileName: chunk.fileName,
+        map: chunk.map,
         code: chunk.code,
         moduleFormat: options.format,
         entryKey: chunk.name,

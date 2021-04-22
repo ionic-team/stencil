@@ -20,6 +20,7 @@ export const generateEsmBrowser = async (
       chunkFileNames: config.hashFileNames ? 'p-[hash].js' : '[name]-[hash].js',
       assetFileNames: config.hashFileNames ? 'p-[hash][extname]' : '[name]-[hash][extname]',
       preferConst: true,
+      sourcemap: !!config.sourceMap,
     };
     if (config.extras.dynamicImportShim) {
       // for Edge 16-18
