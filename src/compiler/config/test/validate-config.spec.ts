@@ -370,4 +370,23 @@ describe('validation', () => {
     expect(isWatchIgnorePath(config, '/some/image.png')).toBe(true);
     expect(isWatchIgnorePath(config, '/some/typescript.ts')).toBe(false);
   });
+
+  describe('sourceMap', () => {
+    it('set sourceMap true', () => {
+      userConfig.sourceMap = true;
+      const { config } = validateConfig(userConfig);
+      expect(config.sourceMap).toBe(true);
+    });
+
+    it('set sourceMap false', () => {
+      userConfig.sourceMap = false;
+      const { config } = validateConfig(userConfig);
+      expect(config.sourceMap).toBe(false);
+    });
+
+    it('default sourceMap undefined', () => {
+      const { config } = validateConfig(userConfig);
+      expect(config.sourceMap).toBe(undefined);
+    });
+  });
 });

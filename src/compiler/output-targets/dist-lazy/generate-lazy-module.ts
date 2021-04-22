@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
 import { writeLazyModule } from './write-lazy-entry-module';
-import { formatComponentRuntimeMeta, stringifyRuntimeData, hasDependency } from '@utils';
+import { formatComponentRuntimeMeta, stringifyRuntimeData, hasDependency, rollupSrcMapToObj } from '@utils';
 import { optimizeModule } from '../../optimize/optimize-module';
 import { join } from 'path';
 
@@ -106,7 +106,7 @@ const generateLazyEntryModule = async (
   const entryModule = buildCtx.entryModules.find((entryModule) => entryModule.entryKey === rollupResult.entryKey);
   const shouldHash = config.hashFileNames && isBrowserBuild;
 
-  const code = await convertChunk(
+  const { code, sourceMap } = await convertChunk(
     config,
     compilerCtx,
     buildCtx,
@@ -114,7 +114,8 @@ const generateLazyEntryModule = async (
     shouldMinify,
     false,
     isBrowserBuild,
-    rollupResult.code
+    rollupResult.code,
+    rollupResult.map
   );
 
   const output = await writeLazyModule(
@@ -125,6 +126,7 @@ const generateLazyEntryModule = async (
     entryModule,
     shouldHash,
     code,
+    sourceMap,
     sufix
   );
 
@@ -147,7 +149,7 @@ const writeLazyChunk = async (
   shouldMinify: boolean,
   isBrowserBuild: boolean
 ) => {
-  const code = await convertChunk(
+  const { code, sourceMap } = await convertChunk(
     config,
     compilerCtx,
     buildCtx,
@@ -155,13 +157,19 @@ const writeLazyChunk = async (
     shouldMinify,
     rollupResult.isCore,
     isBrowserBuild,
-    rollupResult.code
+    rollupResult.code,
+    rollupResult.map
   );
 
   await Promise.all(
     destinations.map((dst) => {
       const filePath = join(dst, rollupResult.fileName);
-      return compilerCtx.fs.writeFile(filePath, code, { outputTargetType });
+      let fileCode = code;
+      if (rollupResult.map) {
+        fileCode = code + '\n//# sourceMappingURL=' + rollupResult.fileName + '.map';
+        compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType });
+      }
+      compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType });
     })
   );
 };
@@ -181,13 +189,28 @@ const writeLazyEntry = async (
   if (isBrowserBuild && ['loader'].includes(rollupResult.entryKey)) {
     return;
   }
-  let code = rollupResult.code.replace(`[/*!__STENCIL_LAZY_DATA__*/]`, `${lazyRuntimeData}`);
-  code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, code);
+  let inputCode = rollupResult.code.replace(`[/*!__STENCIL_LAZY_DATA__*/]`, `${lazyRuntimeData}`);
+  const { code, sourceMap } = await convertChunk(
+    config,
+    compilerCtx,
+    buildCtx,
+    sourceTarget,
+    shouldMinify,
+    false,
+    isBrowserBuild,
+    inputCode,
+    rollupResult.map
+  );
 
   await Promise.all(
     destinations.map((dst) => {
       const filePath = join(dst, rollupResult.fileName);
-      return compilerCtx.fs.writeFile(filePath, code, { outputTargetType });
+      let fileCode = code;
+      if (sourceMap) {
+        fileCode = code + '\n//# sourceMappingURL=' + rollupResult.fileName + '.map';
+        compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType });
+      }
+      return compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType });
     })
   );
 };
@@ -294,11 +317,14 @@ const convertChunk = async (
   shouldMinify: boolean,
   isCore: boolean,
   isBrowserBuild: boolean,
-  code: string
+  code: string,
+  rollupSrcMap: d.RollupSourceMap
 ) => {
+  let sourceMap = rollupSrcMapToObj(rollupSrcMap);
   const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
   const optimizeResults = await optimizeModule(config, compilerCtx, {
     input: code,
+    sourceMap: sourceMap,
     isCore,
     sourceTarget,
     inlineHelpers,
@@ -308,6 +334,7 @@ const convertChunk = async (
 
   if (typeof optimizeResults.output === 'string') {
     code = optimizeResults.output;
+    sourceMap = optimizeResults.sourceMap;
   }
-  return code;
+  return { code, sourceMap };
 };

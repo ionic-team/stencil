@@ -11,6 +11,8 @@ import {
   STENCIL_INTERNAL_HYDRATE_ID,
 } from './entry-alias-ids';
 import ts from 'typescript';
+import { basename } from 'path';
+import sourceMapMerge from 'merge-source-map';
 
 export const appDataPlugin = (
   config: d.Config,
@@ -52,7 +54,7 @@ export const appDataPlugin = (
       return null;
     },
 
-    load(id) {
+    load(id): d.RollupLoadHook {
       if (id === STENCIL_APP_GLOBALS_ID) {
         const s = new MagicString(``);
         appendGlobalScripts(globalScripts, s);
@@ -66,7 +68,16 @@ export const appDataPlugin = (
         appendEnv(config, s);
         return s.toString();
       }
-      return null;
+      if (id !== config.globalScript) {
+        return null;
+      }
+
+      const module = compilerCtx.moduleMap.get(config.globalScript);
+      if (!module.sourceMapFileText) return { code: module.staticSourceFileText, map: null };
+
+      const sourceMap: d.SourceMap = JSON.parse(module.sourceMapFileText);
+      sourceMap.sources = sourceMap.sources.map((src) => basename(src));
+      return { code: module.staticSourceFileText, map: sourceMap };
     },
 
     transform(code, id) {
@@ -75,22 +86,35 @@ export const appDataPlugin = (
         const program = this.parse(code, {});
         const needsDefault = !(program as any).body.some((s: any) => s.type === 'ExportDefaultDeclaration');
         const defaultExport = needsDefault ? '\nexport const globalFn = () => {};\nexport default globalFn;' : '';
-        code = getContextImport(platform) + code + defaultExport;
+
+        var codeMs = new MagicString(code);
+        codeMs.prepend(getContextImport(platform));
+        codeMs.append(defaultExport);
 
         const compilerOptions: ts.CompilerOptions = { ...config.tsCompilerOptions };
         compilerOptions.module = ts.ModuleKind.ESNext;
 
-        const results = ts.transpileModule(code, {
+        const results = ts.transpileModule(codeMs.toString(), {
           compilerOptions,
           fileName: id,
           transformers: {
             after: [removeCollectionImports(compilerCtx)],
           },
         });
-
+        const sourceMap = results.sourceMapText ? JSON.parse(results.sourceMapText) : null;
         buildCtx.diagnostics.push(...loadTypeScriptDiagnostics(results.diagnostics));
 
-        return results.outputText;
+        if (config.sourceMap) {
+          const codeMap = codeMs.generateMap({
+            source: id,
+            file: id + '.map',
+            includeContent: true,
+            hires: true,
+          });
+          return { code: results.outputText, map: sourceMapMerge(codeMap, sourceMap) };
+        }
+
+        return { code: results.outputText };
       }
       return null;
     },
