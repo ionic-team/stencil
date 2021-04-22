@@ -15,6 +15,7 @@ export const generateEsm = async (config: d.Config, compilerCtx: d.CompilerCtx, 
       entryFileNames: '[name].js',
       assetFileNames: '[name]-[hash][extname]',
       preferConst: true,
+      sourcemap: !!config.sourceMap
     };
     const outputTargetType = esmOutputs[0].type;
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);

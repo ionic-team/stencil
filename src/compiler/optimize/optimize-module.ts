@@ -1,11 +1,14 @@
 import { minfyJsId } from '../../version';
 import { minifyJs } from './minify-js';
-import type { CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declarations';
-import type { CompressOptions, MangleOptions, MinifyOptions } from 'terser';
+import type { CompilerCtx, Config, Diagnostic, SourceTarget, SourceMap } from '../../declarations';
+import type { CompressOptions, MangleOptions, MinifyOptions, SourceMapOptions } from 'terser';
+// @ts-ignore
+import sourceMapMerge from 'merge-source-map';
 import ts from 'typescript';
 
 interface OptimizeModuleOptions {
   input: string;
+  sourceMap?: SourceMap;
   sourceTarget?: SourceTarget;
   isCore?: boolean;
   minify?: boolean;
@@ -18,15 +21,18 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
     return {
       output: opts.input,
       diagnostics: [] as Diagnostic[],
+      sourceMap: opts.sourceMap as SourceMap
     };
   }
   const isDebug = config.logLevel === 'debug';
   const cacheKey = await compilerCtx.cache.createKey('optimizeModule', minfyJsId, opts, isDebug);
   const cachedContent = await compilerCtx.cache.get(cacheKey);
   if (cachedContent != null) {
+    const cachedMap = await compilerCtx.cache.get(cacheKey + 'Map');
     return {
       output: cachedContent,
       diagnostics: [] as Diagnostic[],
+      sourceMap: cachedMap ? JSON.parse(cachedMap) as SourceMap : null
     };
   }
 
@@ -40,6 +46,8 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
 
   if (opts.sourceTarget === 'es5' || opts.minify) {
     minifyOpts = getTerserOptions(config, opts.sourceTarget, isDebug);
+    if (config.sourceMap) minifyOpts.sourceMap = { content: opts.sourceMap }
+
     const compressOpts = minifyOpts.compress as CompressOptions;
     const mangleOptions = minifyOpts.mangle as MangleOptions;
 
@@ -72,6 +80,7 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
       results.output = results.output.replace(/disconnectedCallback\(\)\{\},/g, '');
     }
     await compilerCtx.cache.put(cacheKey, results.output);
+    if (results.sourceMap) await compilerCtx.cache.put(cacheKey + 'Map', JSON.stringify(results.sourceMap));
   }
 
   return results;
@@ -82,6 +91,7 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
     ie8: false,
     safari10: !!config.extras.safari10,
     format: {},
+    sourceMap: !!config.sourceMap
   };
 
   if (sourceTarget === 'es5') {
@@ -127,13 +137,14 @@ export const prepareModule = async (input: string, minifyOpts: MinifyOptions, tr
   const results = {
     output: input,
     diagnostics: [] as Diagnostic[],
+    sourceMap: null as SourceMap
   };
 
   if (transpileToEs5) {
     const tsResults = ts.transpileModule(input, {
       fileName: 'module.ts',
       compilerOptions: {
-        sourceMap: false,
+        sourceMap: !!minifyOpts.sourceMap,
         allowJs: true,
         target: ts.ScriptTarget.ES5,
         module: ts.ModuleKind.ESNext,
@@ -146,6 +157,15 @@ export const prepareModule = async (input: string, minifyOpts: MinifyOptions, tr
       reportDiagnostics: false,
     });
     results.output = tsResults.outputText;
+
+    if (tsResults.sourceMapText) {
+      // need to merge sourcemaps at this point
+      const mergeMap = sourceMapMerge(
+        (minifyOpts.sourceMap as SourceMapOptions).content,
+        JSON.parse(tsResults.sourceMapText)
+      ) as SourceMap;
+      minifyOpts.sourceMap = {content: mergeMap};
+    }
   }
 
   if (minifyOpts) {

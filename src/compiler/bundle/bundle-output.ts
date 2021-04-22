@@ -92,7 +92,7 @@ export const getRollupOptions = (
       lazyComponentPlugin(buildCtx),
       loaderPlugin(bundleOpts.loader),
       userIndexPlugin(config, compilerCtx),
-      typescriptPlugin(compilerCtx, bundleOpts),
+      typescriptPlugin(compilerCtx, bundleOpts, config),
       extFormatPlugin(config),
       extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),

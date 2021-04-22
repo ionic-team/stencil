@@ -5,6 +5,7 @@ import type { Plugin } from 'rollup';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
 import { APP_DATA_CONDITIONAL, STENCIL_APP_DATA_ID, STENCIL_APP_GLOBALS_ID, STENCIL_CORE_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
 import ts from 'typescript';
+import { basename } from 'path';
 
 export const appDataPlugin = (
   config: d.Config,
@@ -60,6 +61,21 @@ export const appDataPlugin = (
         appendEnv(config, s);
         return s.toString();
       }
+      if (id === config.globalScript) {
+        const mod = compilerCtx.moduleMap.get(config.globalScript);
+        if (!mod) null
+        if (!mod.sourceMapFileText) return {code: mod.staticSourceFileText, map: null};
+
+        const sourceMap: d.SourceMap = JSON.parse(mod.sourceMapFileText);
+        const rollupSrcMap = {
+          mappings: sourceMap.mappings,
+          sourcesContent: sourceMap.sourcesContent,
+          sources: sourceMap.sources.map(src => basename(src)),
+          names: sourceMap.names,
+          version: sourceMap.version
+        };
+        return {code: mod.staticSourceFileText, map: rollupSrcMap};
+      }
       return null;
     },
 
@@ -81,10 +97,14 @@ export const appDataPlugin = (
             after: [removeCollectionImports(compilerCtx)],
           },
         });
-
+        const sourceMap = results.sourceMapText ? JSON.parse(results.sourceMapText) : null;
+        if (sourceMap) {
+          // little dirty. Manually shift mappings down 1 line because of the cheeky line added ^
+          sourceMap.mappings = ';' + sourceMap.mappings;
+        }
         buildCtx.diagnostics.push(...loadTypeScriptDiagnostics(results.diagnostics));
 
-        return results.outputText;
+        return {code: results.outputText, map: sourceMap};
       }
       return null;
     },

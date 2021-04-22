@@ -93,6 +93,11 @@ export interface StencilConfig {
   plugins?: any[];
 
   /**
+   * Generate source maps files for all relevent outputs
+   */
+  sourceMap?: boolean;
+
+  /**
    * The srcDir config specifies the directory which should contain the source typescript files
    * for each component. The standard for Stencil apps is to use src, which is the default.
    */
@@ -323,7 +328,6 @@ export interface Config extends StencilConfig {
   logLevel?: LogLevel;
   rootDir?: string;
   packageJsonFilePath?: string;
-  sourceMap?: boolean;
   suppressLogs?: boolean;
   profile?: boolean;
   tsCompilerOptions?: any;

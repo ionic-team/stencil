@@ -4,11 +4,10 @@ import { getModule } from '../transpile/transpiled-module';
 import { isString, normalizeFsPath } from '@utils';
 import type { Plugin } from 'rollup';
 import { tsResolveModuleName } from '../sys/typescript/typescript-resolve-module';
-import { isAbsolute } from 'path';
+import { isAbsolute, basename } from 'path';
 import ts from 'typescript';
 
-export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions): Plugin => {
-  const tsPrinter = ts.createPrinter();
+export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions, config: d.Config): Plugin => {
 
   return {
     name: `${bundleOpts.id}TypescriptPlugin`,
@@ -17,8 +16,22 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
         const mod = getModule(compilerCtx, fsFilePath);
+
         if (mod) {
-          return mod.staticSourceFileText;
+          if (!mod.sourceMapFileText) {
+            return {code: mod.staticSourceFileText, map: null};
+          }
+
+          const sourceMap: d.SourceMap = JSON.parse(mod.sourceMapFileText);
+          const rollupSrcMap = {
+            mappings: sourceMap.mappings,
+            sourcesContent: sourceMap.sourcesContent,
+            sources: sourceMap.sources.map(src => basename(src)),
+            names: sourceMap.names,
+            version: sourceMap.version
+          };
+
+          return {code: mod.staticSourceFileText, map: rollupSrcMap};
         }
       }
       return null;
@@ -28,8 +41,13 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
         const fsFilePath = normalizeFsPath(id);
         const mod = getModule(compilerCtx, fsFilePath);
         if (mod && mod.cmps.length > 0) {
-          const transformed = ts.transform(mod.staticSourceFile, bundleOpts.customTransformers).transformed[0];
-          return tsPrinter.printFile(transformed);
+          const tsResult = ts.transpileModule(mod.staticSourceFileText, {
+            compilerOptions: config.tsCompilerOptions,
+            fileName: mod.sourceFilePath,
+            transformers: { before: bundleOpts.customTransformers}
+          })
+          const sourceMap: d.SourceMap = tsResult.sourceMapText ? JSON.parse(tsResult.sourceMapText) : null;
+          return {code: tsResult.outputText, map: sourceMap};
         }
       }
       return null;
