@@ -93,7 +93,7 @@ export interface StencilConfig {
   plugins?: any[];
 
   /**
-   * Generate source maps files for all relevent outputs
+   * Generate js source map files for all bundles
    */
   sourceMap?: boolean;
 

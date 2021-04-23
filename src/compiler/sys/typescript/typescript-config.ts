@@ -97,6 +97,9 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
     catchError(tsconfig.diagnostics, e);
   }
 
+  tsconfig.compilerOptions.sourceMap = !!config.sourceMap;
+  tsconfig.compilerOptions.inlineSources = !!config.sourceMap;
+
   return tsconfig;
 };
 
@@ -146,7 +149,9 @@ const createDefaultTsConfig = (config: d.Config) =>
         target: 'es2017',
         jsx: 'react',
         jsxFactory: 'h',
-        jsxFragmentFactory: 'Fragment'
+        jsxFragmentFactory: 'Fragment',
+        sourceMap: !!config.sourceMap,
+        inlineSources: !!config.sourceMap
       },
       include: [relative(config.rootDir, config.srcDir)],
     },

@@ -11,6 +11,7 @@ export const getTsOptionsToExtend = (config: d.Config) => {
     noEmitOnError: false,
     outDir: config.cacheDir || config.sys.tmpDirSync(),
     sourceMap: !!config.sourceMap,
+    inlineSources: !!config.sourceMap,
   };
   return tsOptions;
 };

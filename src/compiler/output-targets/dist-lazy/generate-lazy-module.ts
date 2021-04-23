@@ -50,7 +50,6 @@ export const generateLazyModules = async (
       .map((r: d.RollupAssetResult) => {
         return Promise.all(
           destinations.map(dest => {
-            console.log('asset', r.fileName);
             return compilerCtx.fs.writeFile(join(dest, r.fileName), r.content);
           }),
         );

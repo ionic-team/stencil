@@ -2,7 +2,6 @@ import { minfyJsId } from '../../version';
 import { minifyJs } from './minify-js';
 import type { CompilerCtx, Config, Diagnostic, SourceTarget, SourceMap } from '../../declarations';
 import type { CompressOptions, MangleOptions, MinifyOptions, SourceMapOptions } from 'terser';
-// @ts-ignore
 import sourceMapMerge from 'merge-source-map';
 import ts from 'typescript';
 
@@ -161,7 +160,7 @@ export const prepareModule = async (input: string, minifyOpts: MinifyOptions, tr
     if (tsResults.sourceMapText) {
       // need to merge sourcemaps at this point
       const mergeMap = sourceMapMerge(
-        (minifyOpts.sourceMap as SourceMapOptions).content,
+        (minifyOpts.sourceMap as SourceMapOptions).content as SourceMap,
         JSON.parse(tsResults.sourceMapText)
       ) as SourceMap;
       minifyOpts.sourceMap = {content: mergeMap};
