@@ -64,7 +64,6 @@ export const appDataPlugin = (
       }
       if (id === config.globalScript) {
         const mod = compilerCtx.moduleMap.get(config.globalScript);
-        if (!mod) null
         if (!mod.sourceMapFileText) return {code: mod.staticSourceFileText, map: null};
 
         const sourceMap: d.SourceMap = JSON.parse(mod.sourceMapFileText);
