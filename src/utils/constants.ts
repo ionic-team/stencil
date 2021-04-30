@@ -13,6 +13,9 @@ export const enum MEMBER_FLAGS {
   ReflectAttr = 1 << 9,
   Mutable = 1 << 10,
 
+  Getter = 1 << 11,
+  Setter = 1 << 12,
+
   Prop = String | Number | Boolean | Any | Unknown,
   HasAttribute = String | Number | Boolean | Any,
   PropLike = Prop | State,

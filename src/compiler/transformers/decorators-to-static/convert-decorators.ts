@@ -77,6 +77,8 @@ const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {
         return ts.updateMethod(m, newDecorators, m.modifiers, m.asteriskToken, m.name, m.questionToken, m.typeParameters, m.parameters, m.type, m.body);
       } else if (ts.isPropertyDeclaration(m)) {
         return ts.updateProperty(m, newDecorators, m.modifiers, m.name, m.questionToken, m.type, m.initializer);
+      } else if (ts.isGetAccessor(m)) {
+        return ts.updateGetAccessor(m, newDecorators, m.modifiers, m.name, m.parameters, m.type, m.body);
       } else {
         console.log('unknown class node');
       }
