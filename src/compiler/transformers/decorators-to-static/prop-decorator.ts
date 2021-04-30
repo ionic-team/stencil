@@ -22,21 +22,16 @@ export const propDecoratorsToStatic = (
   newMembers: ts.ClassElement[]
 ) => {
   const properties = decoratedProps
-    .filter(ts.isPropertyDeclaration)
-    .map((prop) => parsePropDecorator(diagnostics, typeChecker, prop, watchable))
-    .filter((prop) => prop != null);
+    .filter(prop => (ts.isPropertyDeclaration(prop) && !!prop.name) || ts.isGetAccessor(prop))
+    .map(prop => parsePropDecorator(diagnostics, typeChecker, prop as ts.PropertyDeclaration | ts.GetAccessorDeclaration, watchable, newMembers))
+    .filter(prop => prop != null);
 
   if (properties.length > 0) {
     newMembers.push(createStaticGetter('properties', ts.createObjectLiteral(properties, true)));
   }
 };
 
-const parsePropDecorator = (
-  diagnostics: d.Diagnostic[],
-  typeChecker: ts.TypeChecker,
-  prop: ts.PropertyDeclaration,
-  watchable: Set<string>
-) => {
+const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration | ts.GetAccessorDeclaration, watchable: Set<string>, newMembers: ts.ClassElement[]) => {
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
@@ -65,14 +60,17 @@ const parsePropDecorator = (
   const symbol = typeChecker.getSymbolAtLocation(prop.name);
   const type = typeChecker.getTypeAtLocation(prop);
   const typeStr = propTypeFromTSType(type);
+  const foundSetter = ts.isGetAccessor(prop) ? findSetter(propName, newMembers) : null;
 
   const propMeta: d.ComponentCompilerStaticProperty = {
-    type: typeStr,
+    type: typeStr as any,
     mutable: !!propOptions.mutable,
     complexType: getComplexType(typeChecker, prop, type),
     required: prop.exclamationToken !== undefined && propName !== 'mode',
     optional: prop.questionToken !== undefined,
     docs: serializeSymbol(typeChecker, symbol),
+    getter: ts.isGetAccessor(prop),
+    setter: !!foundSetter,
   };
   validateReferences(diagnostics, propMeta.complexType.references, prop.type);
 
@@ -83,15 +81,32 @@ const parsePropDecorator = (
   }
 
   // extract default value
-  const initializer = prop.initializer;
-  if (initializer) {
-    propMeta.defaultValue = initializer.getText();
+  if (ts.isPropertyDeclaration(prop) && prop.initializer) {
+    propMeta.defaultValue = prop.initializer.getText();
+  } else if (ts.isGetAccessorDeclaration(prop)) {
+    // shallow comb to find default value for a getter
+    const returnSt = prop.body.statements.find(st => ts.isReturnStatement(st));
+    if (ts.isLiteralExpression(returnSt))  {
+      propMeta.defaultValue = returnSt.getText();
+    } else if (ts.isPropertyAccessExpression(returnSt)) {
+      const nameToFind = returnSt.name.getText();
+      const foundProp = findGetProp(nameToFind, newMembers);
+      if (foundProp.initializer) propMeta.defaultValue = foundProp.initializer.getText();
+    }
   }
 
   const staticProp = ts.createPropertyAssignment(ts.createLiteral(propName), convertValueToLiteral(propMeta));
   watchable.add(propName);
   return staticProp;
 };
+
+const findSetter = (propName: string, members: ts.ClassElement[]) => {
+  return members.find(m => ts.isSetAccessor(m) && m.name.getText() === propName) as ts.SetAccessorDeclaration
+}
+
+const findGetProp = (propName: string, members: ts.ClassElement[]) => {
+  return members.find(m => ts.isPropertyDeclaration(m) && m.name.getText() === propName) as ts.PropertyDeclaration
+}
 
 const getAttributeName = (propName: string, propOptions: d.PropOptions) => {
   if (propOptions.attribute === null) {
@@ -119,11 +134,7 @@ const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, pr
   return false;
 };
 
-const getComplexType = (
-  typeChecker: ts.TypeChecker,
-  node: ts.PropertyDeclaration,
-  type: ts.Type
-): d.ComponentCompilerPropertyComplexType => {
+const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration | ts.GetAccessorDeclaration, type: ts.Type): d.ComponentCompilerPropertyComplexType => {
   const nodeType = node.type;
   return {
     original: nodeType ? nodeType.getText() : typeToString(typeChecker, type),

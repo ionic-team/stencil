@@ -82,6 +82,12 @@ const formatFlags = (compilerProperty: d.ComponentCompilerProperty) => {
   if (compilerProperty.reflect) {
     type |= MEMBER_FLAGS.ReflectAttr;
   }
+  if (compilerProperty.getter) {
+    type |= MEMBER_FLAGS.Getter;
+  }
+  if (compilerProperty.setter) {
+    type |= MEMBER_FLAGS.Setter;
+  }
   return type;
 };
 

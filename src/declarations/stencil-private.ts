@@ -751,6 +751,8 @@ export interface ComponentCompilerStaticProperty {
   mutable: boolean;
   optional: boolean;
   required: boolean;
+  getter: boolean;
+  setter: boolean;
   type: ComponentCompilerPropertyType;
   complexType: ComponentCompilerPropertyComplexType;
   attribute?: string;
