@@ -101,6 +101,8 @@ const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {
         return ts.updateProperty(m, newDecorators, m.modifiers, m.name, m.questionToken, m.type, m.initializer);
       } else if (ts.isGetAccessor(m)) {
         return ts.updateGetAccessor(m, newDecorators, m.modifiers, m.name, m.parameters, m.type, m.body);
+      } else if (ts.isSetAccessor(m)) {
+        console.log('A get accessor should be decorated before a set accessor');
       } else {
         console.log('unknown class node');
       }
