@@ -62,7 +62,7 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
   const foundSetter = ts.isGetAccessor(prop) ? findSetter(propName, newMembers) : null;
 
   const propMeta: d.ComponentCompilerStaticProperty = {
-    type: typeStr as any,
+    type: typeStr,
     mutable: !!propOptions.mutable,
     complexType: getComplexType(typeChecker, prop, type),
     required: prop.exclamationToken !== undefined && propName !== 'mode',
