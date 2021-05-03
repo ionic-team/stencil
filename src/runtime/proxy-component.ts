@@ -49,7 +49,6 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         } else if (flags & PROXY_FLAGS.isElementConstructor && memberFlags & MEMBER_FLAGS.Getter) {
           if (BUILD.lazyLoad) {
             // lazy maps the element get / set to the class get / set
-
             // proxyComponent - lazy prop getter
             Object.defineProperty(prototype, memberName, {
               get(this: d.RuntimeRef) {
@@ -77,7 +76,6 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
             }
           } else if (memberFlags & MEMBER_FLAGS.Setter) {
             // non-lazy setter - amends original set to fire update
-
             // proxyComponent - non-lazy prop setter
             const origSetter =  Object.getOwnPropertyDescriptor(prototype, memberName).set;
             Object.defineProperty(prototype, memberName, {

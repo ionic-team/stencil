@@ -14,6 +14,7 @@ describe('attribute-basic', function() {
     expect(app.querySelector('.single').textContent).toBe('single');
     expect(app.querySelector('.multiWord').textContent).toBe('multiWord');
     expect(app.querySelector('.customAttr').textContent).toBe('my-custom-attr');
+    expect(app.querySelector('.getter').textContent).toBe('getter');
     expect(app.querySelector('.htmlForLabel').getAttribute('for')).toBe('a');
 
     const button = app.querySelector('button');
@@ -24,6 +25,7 @@ describe('attribute-basic', function() {
     expect(app.querySelector('.single').textContent).toBe('single-update');
     expect(app.querySelector('.multiWord').textContent).toBe('multiWord-update');
     expect(app.querySelector('.customAttr').textContent).toBe('my-custom-attr-update');
+    expect(app.querySelector('.getter').textContent).toBe('getter-update');
   });
 
 });

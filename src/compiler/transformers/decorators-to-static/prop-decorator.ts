@@ -84,11 +84,12 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
     propMeta.defaultValue = prop.initializer.getText();
   } else if (ts.isGetAccessorDeclaration(prop)) {
     // shallow comb to find default value for a getter
-    const returnSt = prop.body.statements.find(st => ts.isReturnStatement(st));
-    if (ts.isLiteralExpression(returnSt))  {
-      propMeta.defaultValue = returnSt.getText();
-    } else if (ts.isPropertyAccessExpression(returnSt)) {
-      const nameToFind = returnSt.name.getText();
+    const returnSt = prop.body.statements.find(st => ts.isReturnStatement(st)) as ts.ReturnStatement;
+    const retExp = returnSt.expression;
+    if (ts.isLiteralExpression(retExp))  {
+      propMeta.defaultValue = retExp.getText();
+    } else if (ts.isPropertyAccessExpression(retExp)) {
+      const nameToFind = retExp.name.getText();
       const foundProp = findGetProp(nameToFind, newMembers);
       if (foundProp.initializer) propMeta.defaultValue = foundProp.initializer.getText();
     }
