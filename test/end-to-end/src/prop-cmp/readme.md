@@ -7,13 +7,13 @@
 
 ## Properties
 
-| Property   | Attribute   | Description | Type     | Default     |
-| ---------- | ----------- | ----------- | -------- | ----------- |
-| `clothes`  | `clothes`   |             | `string` | `undefined` |
-| `first`    | `first`     |             | `string` | `undefined` |
-| `fullName` | `full-name` |             | `string` | `undefined` |
-| `lastName` | `last-name` |             | `string` | `undefined` |
-| `mode`     | `mode`      | Mode        | `any`    | `undefined` |
+| Property   | Attribute   | Description | Type     | Default             |
+| ---------- | ----------- | ----------- | -------- | ------------------- |
+| `clothes`  | `clothes`   |             | `string` | `'life preservers'` |
+| `first`    | `first`     |             | `string` | `undefined`         |
+| `fullName` | `full-name` |  (readonly) | `string` | `undefined`         |
+| `lastName` | `last-name` |             | `string` | `undefined`         |
+| `mode`     | `mode`      | Mode        | `any`    | `undefined`         |
 
 
 ## Dependencies
