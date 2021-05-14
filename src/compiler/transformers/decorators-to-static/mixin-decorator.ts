@@ -70,9 +70,10 @@ export const hasMixins = (
   if (!classNode) return false;
 
   const mixinDecorators = classNode.decorators.filter(isDecoratorNamed('Mixin'));
-  const {mixinMap, mixinClassNames} = getMixinsFromDecorator(mixinDecorators);
+  if (!mixinDecorators) return false;
 
-  if (!mixinClassNames) return false;
+  const {mixinMap, mixinClassNames} = getMixinsFromDecorator(mixinDecorators);
+  if (!mixinClassNames || !mixinClassNames.length) return false;
 
   // used to setup and cache all mixin meta for efficiency.
   // e.g. we'll need to get the class members later on our second visit
@@ -218,6 +219,7 @@ const getMixinsInSources = (
     }
   });
 
+
   if (importDeclMap.size !== decoratorMap.size) {
     const notFound = decoratorNames.filter(incl => !importDeclMap.get(incl));
 
@@ -234,6 +236,13 @@ const getMixinsInSources = (
     if (!classNames.length) continue;
 
     classNames.forEach((className, i) => {
+      if (!mod || !mod.resolvedFileName) {
+        const error = buildError(diagnostics);
+        error.messageText = `@Mixin module (${modName}) cannot be found and resolved within the current fileSystem.`;
+        augmentDiagnosticWithNode(error, decoratorMap.get(className));
+        return;
+      }
+
       const {foundClass, sourceFile} = findMixedInClassInImport(mod.resolvedFileName, sourceFiles, importObjs[i]);
 
       if (!foundClass) {
@@ -272,6 +281,8 @@ const collateImportDecls = (
 ) => {
   const imports: ImportMeta[] = [];
   [hostSource, ...foundMixins.map(mx => mx.mixinSrc)].forEach(src => {
+
+    if (!src.resolvedModules) return;
     // We need to use resolved modules because import paths are absolute - not relative
     // we'll need this to move mixin imports to our host
     for (const [modName, mod] of src.resolvedModules.entries()) {
