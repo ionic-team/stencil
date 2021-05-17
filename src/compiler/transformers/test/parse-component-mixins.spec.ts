@@ -232,6 +232,73 @@ describe('parse mixins', () => {
     expect(t.properties[0].defaultValue).toBe("'should-override-c'");
   });
 
+  it('does not include omitted class members', () => {
+    const t = transpileModule([{
+      fileName: 'mixin1.tsx',
+      code: `
+        export class Mixin {
+          @Prop() omittedName: string = 'I should not exist';
+          @Prop() includedName: string = 'I should exist';
+          @Prop() includedName2: string = 'I should exist';
+        }
+      `
+    }, {
+      fileName: 'component.tsx',
+      code: `
+        import { Mixin } from 'mixin1';
+        @Mixin(Mixin)
+        @Component({
+          tag: 'cmp-host'
+        })
+        export class CmpHost {}
+        export interface CmpHost extends Omit<Mixin, 'omittedName', 'omittedName2'> {}
+      `
+    }]);
+
+    expect(t.componentClassName).toBe('CmpHost');
+    expect(t.tagName).toBe('cmp-host');
+
+    expect(t.property.name).toBe('includedName');
+    expect(t.property.defaultValue).toBe("'I should exist'");
+
+    expect(t.properties[1].name).toBe('includedName2');
+    expect(t.properties[1].defaultValue).toBe("'I should exist'");
+
+    expect(t.properties[2]).toBe(undefined);
+  });
+
+  it('includes picked class members only', () => {
+    const t = transpileModule([{
+      fileName: 'mixin1.tsx',
+      code: `
+        export class Mixin {
+          @Prop() pickedName: string = 'I should exist';
+          @Prop() notPicked: string = 'I should not exist';
+          @Prop() notPicked2: string = 'I should not exist';
+        }
+      `
+    }, {
+      fileName: 'component.tsx',
+      code: `
+        import { Mixin } from 'mixin1';
+        @Mixin(Mixin)
+        @Component({
+          tag: 'cmp-host'
+        })
+        export class CmpHost {}
+        export interface CmpHost extends Pick<Mixin, 'pickedName', 'pickedName2'> {}
+      `
+    }]);
+
+    expect(t.componentClassName).toBe('CmpHost');
+    expect(t.tagName).toBe('cmp-host');
+
+    expect(t.property.name).toBe('pickedName');
+    expect(t.property.defaultValue).toBe("'I should exist'");
+
+    expect(t.properties[1]).toBe(undefined);
+  });
+
   it('throws error when trying to use a mixin which uses mixins', () => {
     const t = transpileModule([{
       fileName: 'mixin1.tsx',
