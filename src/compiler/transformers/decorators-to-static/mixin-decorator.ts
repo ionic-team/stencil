@@ -20,14 +20,14 @@ import { cloneNode } from '@wessberg/ts-clone-node';
  * 2. Visit the host class - Inject Class Members.
  * Use the classes we found during phase 1. De-dupe and merge members with host.
  */
-
 interface FoundMixin {
   identifier: string, // the string used in the @Mixin
   importDeclaration: ts.ImportDeclaration, // the matching import declaration
   importAbsPath: string, // abs path to import
   mixinIdentifier: string, // the class identifier used to find the mixin. Either named or default.
   mixinClass: ts.ClassDeclaration, // the found mixinClass
-  mixinSrc: TSsourceFileWithModules // the found mixin source file
+  mixinSrc: TSsourceFileWithModules, // the found mixin source file
+  mixinClassMembers: null | ts.ClassElement[] // a picked or filtered list of named class members
 };
 interface TSModule {
   resolvedFileName: string,
@@ -65,7 +65,7 @@ export const hasMixins = (
     ts.isClassDeclaration(st) &&
     st.decorators &&
     st.decorators.find(isDecoratorNamed('Component'))
-  ));
+  )) as ts.ClassDeclaration;
 
   if (!classNode) return false;
 
@@ -77,15 +77,14 @@ export const hasMixins = (
 
   // used to setup and cache all mixin meta for efficiency.
   // e.g. we'll need to get the class members later on our second visit
-  const foundMixins = getMixinsInSources(sourceNode as TSsourceFileWithModules, mixinMap, mixinClassNames, sourceFiles, diagnostics);
-
+  const foundMixins = getMixinsInSources(sourceNode as TSsourceFileWithModules, mixinMap, mixinClassNames, sourceFiles, diagnostics, classNode);
   if (!foundMixins || !foundMixins.length) return false;
 
   return foundMixins;
 }
 
 /**
- * Visit 1) add merge all mixin statements with host.
+ * Visit 1) add and merge all mixin statements with host.
  */
 export const mixinStatements = (sourceNode: ts.SourceFile, foundMixins: FoundMixin[]) => {
   const dedupeNamedStatements = (
@@ -164,7 +163,8 @@ const getMixinsInSources = (
   decoratorMap: MixinDecorators,
   decoratorNames: string[],
   sourceFiles: VisitedFiles,
-  diagnostics: d.Diagnostic[]
+  diagnostics: d.Diagnostic[],
+  sourceClassNode: ts.ClassDeclaration
 ) => {
   // find an import declarations from a Map via module name
   const findImportDeclObjWithModule = (declarationMap: Map<string, ImportDeclObj>, moduleName: string) => {
@@ -268,11 +268,57 @@ const getMixinsInSources = (
         importAbsPath: mod.resolvedFileName,
         mixinIdentifier: importObjs[i].identifier,
         mixinClass: foundClass,
-        mixinSrc: sourceFile as TSsourceFileWithModules
+        mixinSrc: sourceFile as TSsourceFileWithModules,
+        mixinClassMembers: filterClassMemebers(source, sourceClassNode, className, foundClass)
       });
     })
   }
   return foundMixins;
+}
+
+const filterClassMemebers = (
+  sourceNode: ts.SourceFile,
+  sourceClassNode: ts.ClassDeclaration,
+  importedClassName: string,
+  mixinClassNode: ts.ClassDeclaration
+) => {
+  let toReturn: null | ts.ClassElement[] = null;
+  sourceNode.statements.forEach(st => {
+    if (
+      !ts.isInterfaceDeclaration(st) ||
+      st.name.getText() !== sourceClassNode.name.getText() ||
+      !st.heritageClauses
+    ) return;
+
+    st.heritageClauses.forEach(hc => {
+      hc.types.forEach(hct => {
+        if (
+          ts.isExpressionWithTypeArguments(hct) &&
+          hct.expression.getText().match(/^(Pick|Omit)$/) &&
+          hct.typeArguments.length &&
+          ts.isTypeReferenceNode(hct.typeArguments[0])
+        ) {
+          const className = hct.typeArguments[0].getText();
+          if (importedClassName !== className) return;
+
+          const filteredMemberNames = hct.typeArguments
+            .slice(1)
+            .map(ta => ta.getText().replace(/^('|")(.*)('|")$/, '$2'));
+
+          if (hct.expression.getText() === 'Omit') {
+            toReturn = mixinClassNode.members.filter(mb => (
+              !mb.name || !filteredMemberNames.includes(mb.name.getText())
+            ));
+          } else if (hct.expression.getText() === 'Pick') {
+            toReturn = mixinClassNode.members.filter(mb => (
+              mb.name && filteredMemberNames.includes(mb.name.getText())
+            ));
+          }
+        }
+      })
+    })
+  })
+  return toReturn;
 }
 
 const collateImportDecls = (
@@ -432,15 +478,14 @@ const findMixedInClassInImport = (
 
 const collateMixinClassesMembers = (decoratorNames: string[], mixinClasses: FoundMixin[]) => {
   // sort map into the order of added declarations
-  const foundClasses: ts.ClassDeclaration[] = decoratorNames.reverse().flatMap(
+  let deDupedMembers: ts.ClassElement[] = [];
+  decoratorNames.reverse().forEach(
     dec => {
       const foundClass = mixinClasses.find(mixin => mixin.identifier === dec);
-      return foundClass ? foundClass.mixinClass : [];
+      if (foundClass) deDupedMembers = dedupeClassMembers(deDupedMembers, (foundClass.mixinClassMembers || foundClass.mixinClass.members));
     }
   );
-  return foundClasses.reduce((members: ts.ClassElement[], classNode) => {
-    return dedupeClassMembers(members, classNode.members)
-  }, []);
+  return deDupedMembers;
 }
 
 /** filter out any named members from toStrip class members that are in the main */

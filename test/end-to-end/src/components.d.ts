@@ -43,9 +43,19 @@ export namespace Components {
         "someMethodWithArgs": (unit: string, value: number) => Promise<string>;
         "someProp": number;
     }
+    interface MixedInCmp {
+        "middleName": string;
+    }
+    interface MixinCmp {
+        "firstName": string;
+        "middleName": string;
+        "surname": string;
+        "surnameWithTitle": () => Promise<string>;
+    }
     interface PathAliasCmp {
     }
     interface PrerenderCmp {
+        "mixinTest": string;
     }
     interface PropCmp {
         "first": string;
@@ -144,6 +154,18 @@ declare global {
         prototype: HTMLMethodCmpElement;
         new (): HTMLMethodCmpElement;
     };
+    interface HTMLMixedInCmpElement extends Components.MixedInCmp, HTMLStencilElement {
+    }
+    var HTMLMixedInCmpElement: {
+        prototype: HTMLMixedInCmpElement;
+        new (): HTMLMixedInCmpElement;
+    };
+    interface HTMLMixinCmpElement extends Components.MixinCmp, HTMLStencilElement {
+    }
+    var HTMLMixinCmpElement: {
+        prototype: HTMLMixinCmpElement;
+        new (): HTMLMixinCmpElement;
+    };
     interface HTMLPathAliasCmpElement extends Components.PathAliasCmp, HTMLStencilElement {
     }
     var HTMLPathAliasCmpElement: {
@@ -200,6 +222,8 @@ declare global {
         "import-assets": HTMLImportAssetsElement;
         "listen-cmp": HTMLListenCmpElement;
         "method-cmp": HTMLMethodCmpElement;
+        "mixed-in-cmp": HTMLMixedInCmpElement;
+        "mixin-cmp": HTMLMixinCmpElement;
         "path-alias-cmp": HTMLPathAliasCmpElement;
         "prerender-cmp": HTMLPrerenderCmpElement;
         "prop-cmp": HTMLPropCmpElement;
@@ -245,9 +269,18 @@ declare namespace LocalJSX {
     interface MethodCmp {
         "someProp"?: number;
     }
+    interface MixedInCmp {
+        "middleName"?: string;
+    }
+    interface MixinCmp {
+        "firstName"?: string;
+        "middleName"?: string;
+        "surname"?: string;
+    }
     interface PathAliasCmp {
     }
     interface PrerenderCmp {
+        "mixinTest"?: string;
     }
     interface PropCmp {
         "first"?: string;
@@ -280,6 +313,8 @@ declare namespace LocalJSX {
         "import-assets": ImportAssets;
         "listen-cmp": ListenCmp;
         "method-cmp": MethodCmp;
+        "mixed-in-cmp": MixedInCmp;
+        "mixin-cmp": MixinCmp;
         "path-alias-cmp": PathAliasCmp;
         "prerender-cmp": PrerenderCmp;
         "prop-cmp": PropCmp;
@@ -306,6 +341,8 @@ declare module "@stencil/core" {
             "import-assets": LocalJSX.ImportAssets & JSXBase.HTMLAttributes<HTMLImportAssetsElement>;
             "listen-cmp": LocalJSX.ListenCmp & JSXBase.HTMLAttributes<HTMLListenCmpElement>;
             "method-cmp": LocalJSX.MethodCmp & JSXBase.HTMLAttributes<HTMLMethodCmpElement>;
+            "mixed-in-cmp": LocalJSX.MixedInCmp & JSXBase.HTMLAttributes<HTMLMixedInCmpElement>;
+            "mixin-cmp": LocalJSX.MixinCmp & JSXBase.HTMLAttributes<HTMLMixinCmpElement>;
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
             "prerender-cmp": LocalJSX.PrerenderCmp & JSXBase.HTMLAttributes<HTMLPrerenderCmpElement>;
             "prop-cmp": LocalJSX.PropCmp & JSXBase.HTMLAttributes<HTMLPropCmpElement>;

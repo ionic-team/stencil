@@ -1,6 +1,9 @@
-import { Component, h } from '@stencil/core';
+import { Component, h, Mixin } from '@stencil/core';
+import { PrerenderMixin } from './prerender-mixin';
+
 import styles from './prerender-cmp.css';
 
+@Mixin(PrerenderMixin)
 @Component({
   tag: 'prerender-cmp',
   styles,
@@ -32,6 +35,8 @@ export class PrerenderCmp {
         </div>
       </div>,
       <a href="/some-link">Some Link</a>,
+      <div>{this.mixinTest}</div>
     ];
   }
 }
+export interface PrerenderCmp extends PrerenderMixin {}
