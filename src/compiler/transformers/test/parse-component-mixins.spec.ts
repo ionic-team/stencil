@@ -251,7 +251,7 @@ describe('parse mixins', () => {
           tag: 'cmp-host'
         })
         export class CmpHost {}
-        export interface CmpHost extends Omit<Mixin, 'omittedName', 'omittedName2'> {}
+        export interface CmpHost extends Omit<Mixin, 'omittedName', "omittedName2"> {}
       `
     }]);
 
@@ -275,6 +275,7 @@ describe('parse mixins', () => {
           @Prop() pickedName: string = 'I should exist';
           @Prop() notPicked: string = 'I should not exist';
           @Prop() notPicked2: string = 'I should not exist';
+          @Prop() pickedName2: string = 'I should exist';
         }
       `
     }, {
@@ -286,7 +287,7 @@ describe('parse mixins', () => {
           tag: 'cmp-host'
         })
         export class CmpHost {}
-        export interface CmpHost extends Pick<Mixin, 'pickedName', 'pickedName2'> {}
+        export interface CmpHost extends Pick<Mixin, "pickedName", \`pickedName2\`> {}
       `
     }]);
 
@@ -296,7 +297,10 @@ describe('parse mixins', () => {
     expect(t.property.name).toBe('pickedName');
     expect(t.property.defaultValue).toBe("'I should exist'");
 
-    expect(t.properties[1]).toBe(undefined);
+    expect(t.properties[1].name).toBe('pickedName2');
+    expect(t.properties[1].defaultValue).toBe("'I should exist'");
+
+    expect(t.properties[2]).toBe(undefined);
   });
 
   it('throws error when trying to use a mixin which uses mixins', () => {
