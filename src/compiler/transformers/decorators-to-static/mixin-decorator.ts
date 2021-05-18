@@ -303,7 +303,7 @@ const filterClassMemebers = (
 
           const filteredMemberNames = hct.typeArguments
             .slice(1)
-            .map(ta => ta.getText().replace(/^('|")(.*)('|")$/, '$2'));
+            .map(ta => ta.getText().replace(/^('|"|`)(.*)('|"|`)$/, '$2'));
 
           if (hct.expression.getText() === 'Omit') {
             toReturn = mixinClassNode.members.filter(mb => (
