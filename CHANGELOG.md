@@ -1,3 +1,12 @@
+# 🚌 [2.6.0-0](https://github.com/ionic-team/stencil/compare/v2.5.2...v2.6.0-0) (2021-05-27)
+
+
+### Features
+
+* **platform:** add setPlatformHelpers() api ([f09abe6](https://github.com/ionic-team/stencil/commit/f09abe6455887025d508e645e7c8c024a5c42fa2))
+
+
+
 ## 🛥 [2.5.2](https://github.com/ionic-team/stencil/compare/v2.5.1...v2.5.2) (2021-03-30)
 
 ### Bug Fixes
