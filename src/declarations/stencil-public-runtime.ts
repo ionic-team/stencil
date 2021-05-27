@@ -275,11 +275,21 @@ export declare const setMode: (handler: ResolutionHandler) => void;
  */
 export declare function getMode<T = string | undefined>(ref: any): T;
 
-export declare function setPlatformHelpers(helpers: {
+export declare function setPlatformHelpers (helpers: {
   jmp?: (c: any) => any;
   raf?: (c: any) => number;
-  ael?: (el: any, eventName: string, listener: any, options: any) => void;
-  rel?: (el: any, eventName: string, listener: any, options: any) => void;
+  ael?: (
+    el: any,
+    eventName: string,
+    listener: any,
+    options: any,
+  ) => void;
+  rel?: (
+    el: any,
+    eventName: string,
+    listener: any,
+    options: any,
+  ) => void;
   ce?: (eventName: string, opts?: any) => any;
 }): void;
 
