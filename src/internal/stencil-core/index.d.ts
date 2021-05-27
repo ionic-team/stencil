@@ -43,6 +43,7 @@ export {
   readTask,
   setAssetPath,
   setMode,
+  setPlatformHelpers,
   State,
   Watch,
   writeTask,

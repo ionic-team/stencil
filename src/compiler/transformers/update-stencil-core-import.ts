@@ -68,6 +68,7 @@ const KEEP_IMPORTS = new Set([
   'h',
   'setMode',
   'getMode',
+  'setPlatformHelpers',
   'Build',
   'Env',
   'Host',
