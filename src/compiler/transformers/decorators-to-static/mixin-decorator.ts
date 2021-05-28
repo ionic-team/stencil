@@ -150,7 +150,6 @@ export const getMixinsInSources = (
   const importDeclMap = findImportDeclsWithMemberNames(source, decoratorNames);
   const foundMixins: FoundMixin[] = [];
 
-
   if (importDeclMap.size !== decoratorMap.size) {
     const notFound = decoratorNames.filter(incl => !importDeclMap.get(incl));
 
