@@ -162,10 +162,10 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
 export const patchTypescript = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
   if (!(ts as any).__patched) {
     if (config.sys) {
-      patchTsSystemFileSystem(config, config.sys, inMemoryFs, ts.sys);
+      if (inMemoryFs) patchTsSystemFileSystem(config, config.sys, inMemoryFs, ts.sys);
       patchTsSystemWatch(config.sys, ts.sys);
     }
-    patchTypeScriptResolveModule(config, inMemoryFs);
+    if (inMemoryFs) patchTypeScriptResolveModule(config, inMemoryFs);
     patchTypeScriptGetParsedCommandLineOfConfigFile();
     (ts as any).__patched = true;
   }

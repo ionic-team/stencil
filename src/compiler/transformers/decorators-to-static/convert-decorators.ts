@@ -16,7 +16,7 @@ import ts from 'typescript';
 const visitedFiles: VisitedFiles = new Map();
 const allMixins: FoundMixins = new Map();
 
-export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker): ts.TransformerFactory<ts.SourceFile> => {
+export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, compilerHost?: ts.CompilerHost): ts.TransformerFactory<ts.SourceFile> => {
   return transformCtx => {
     const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
@@ -26,26 +26,25 @@ export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagn
     };
 
     return tsSourceFile => {
-      const sourceFile = visitSourceFile(tsSourceFile, diagnostics);
+      const sourceFile = visitSourceFile(tsSourceFile, diagnostics, compilerHost);
       return ts.visitEachChild(sourceFile, visit, transformCtx);
     };
   };
 };
 
-export const visitSourceFile = (sourceNode: ts.SourceFile, diagnostics: d.Diagnostic[]) => {
+export const visitSourceFile = (sourceNode: ts.SourceFile, diagnostics: d.Diagnostic[], compilerHost?: ts.CompilerHost) => {
   visitedFiles.set(sourceNode.fileName, sourceNode);
-  const mixinsFound = hasMixins(sourceNode, diagnostics, visitedFiles);
-
+  const mixinsFound = hasMixins(sourceNode, diagnostics, visitedFiles, compilerHost);
   if (!mixinsFound) {
     return sourceNode;
   }
 
-  const statements = mixinStatements(sourceNode, mixinsFound);
+  const statements = mixinStatements(sourceNode, mixinsFound, diagnostics);
   allMixins.set(sourceNode.fileName, mixinsFound);
 
   return ts.factory.updateSourceFile(
     sourceNode,
-    statements
+    statements,
   );
 }
 
@@ -80,17 +79,15 @@ export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnosti
 
   validateMethods(diagnostics, classMembers);
 
-  return ts.updateClassDeclaration(
+  return ts.factory.updateClassDeclaration(
     classNode,
     removeDecorators(classNode, CLASS_DECORATORS_TO_REMOVE),
     classNode.modifiers,
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    // because members can be from multiple files,
-    // we need to clone nodes to remove their sourceFile refs
-    newMembers.map(member => cloneNode(member, {typescript: ts})),
-  )
+    newMembers.map(member => cloneNode(member, {typescript: ts, setOriginalNodes: true })),
+  );
 };
 
 const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {

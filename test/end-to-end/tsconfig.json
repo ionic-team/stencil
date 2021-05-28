@@ -15,8 +15,8 @@
     ],
     "module": "esnext",
     "moduleResolution": "node",
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "pretty": true,
@@ -38,6 +38,17 @@
     }
   },
   "include": [
-    "src"
+    "src",
+    "node_modules/ionic-git/core/src/utils/**/*",
+    "node_modules/ionic-git/core/src/global/**/*",
+    "node_modules/ionic-git/core/src/components/button/**/*",
+    "node_modules/ionic-git/core/src/components/router/**/*",
+    "node_modules/ionic-git/core/src/components/route/**/*"
+  ],
+  "files": [
+    "node_modules/ionic-git/core/src/interface.d.ts"
+  ],
+  "exclude": [
+    "node_modules/ionic-git/core/src/**/test"
   ]
 }

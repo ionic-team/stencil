@@ -18,9 +18,9 @@ const getDeclarationParameter = (arg: ts.Expression): any => {
   throw new Error(`invalid decorator argument: ${arg.getText()}`);
 };
 
-export const isDecoratorNamed = (propName: string) => {
+export const isDecoratorNamed = (propName: string, sourceFile?: ts.SourceFile) => {
   return (dec: ts.Decorator): boolean => {
-    return ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === propName;
+    return ts.isCallExpression(dec.expression) && dec.expression.expression.getText(sourceFile) === propName;
   };
 };
 
