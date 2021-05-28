@@ -137,6 +137,9 @@ describe('parse mixins', () => {
         export default class CmpB {
           @Prop() file1MixinPropDeafult?: string;
         }
+        export default class CmpC {
+          @Prop() willNotMixThisIn?: string;
+        }
       `
     }, {
       fileName: 'mixin2.tsx',
@@ -169,6 +172,7 @@ describe('parse mixins', () => {
     expect(t.componentClassName).toBe('CmpHost');
     expect(t.tagName).toBe('cmp-host');
 
+    expect(t.properties[5]).toBe(undefined);
     expect(t.properties[4].name).toBe('file1MixinPropA');
     expect(t.properties[3].name).toBe('file1MixinPropDeafult');
     expect(t.properties[2].name).toBe('file2MixinPropA');
@@ -251,7 +255,7 @@ describe('parse mixins', () => {
           tag: 'cmp-host'
         })
         export class CmpHost {}
-        export interface CmpHost extends Omit<Mixin, 'omittedName', "omittedName2"> {}
+        export interface CmpHost extends Omit<Mixin, 'omittedName' | "omittedName2"> {}
       `
     }]);
 
@@ -287,7 +291,7 @@ describe('parse mixins', () => {
           tag: 'cmp-host'
         })
         export class CmpHost {}
-        export interface CmpHost extends Pick<Mixin, "pickedName", \`pickedName2\`> {}
+        export interface CmpHost extends Pick<Mixin, "pickedName" | \`pickedName2\`> {}
       `
     }]);
 
@@ -332,6 +336,31 @@ describe('parse mixins', () => {
     expect(t.diagnostics[0].level).toBe('error');
     expect(t.diagnostics[0].messageText).toBe(`@Mixin decorator references a class (CmpB) that is itself decorated with a @Mixin (CmpA).
         In order to keep design and behaviour transparent, mixins cannot be nested. Consider refacoring.`);
+  });
+
+  it('throws warning when there are import name clashes', () => {
+    const t = transpileModule([{
+      fileName: 'mixin.tsx',
+      code: `
+        import { util } from 'utils';
+        @Component({
+          tag: 'cmp-b'
+        }) export class CmpB {}
+      `
+    }, {
+      fileName: 'component.tsx',
+      code: `
+        import { util } from 'different/utils';
+        import { CmpB } from 'mixin';
+        @Mixin(CmpB)
+        @Component({
+          tag: 'cmp-host'
+        })
+        export class CmpHost {}
+      `
+    }]);
+    expect(t.diagnostics[0].level).toBe('warn');
+    expect(t.diagnostics[0].messageText).toBe(`@Mixin import uses a name already used by another import (either within the host component or another @Mixin) which can lead to unexpected results. Consider renaming.`);
   });
 });
 

@@ -36,9 +36,16 @@
     "test-app/**/*.tsx",
     "test-app/util.ts",
     "test-app/global.ts",
+    "node_modules/ionic-git/core/src/utils/**/*",
+    "node_modules/ionic-git/core/src/global/**/*",
+    "node_modules/ionic-git/core/src/components/button/**/*",
+    "node_modules/ionic-git/core/src/components/router/**/*",
+    "node_modules/ionic-git/core/src/components/route/**/*",
+    "node_modules/ionic-git/core/src/interface.d.ts"
   ],
   "exclude": [
     "test-prerender",
-    "test-sibling"
+    "test-sibling",
+    "node_modules/ionic-git/core/src/**/test"
   ]
 }

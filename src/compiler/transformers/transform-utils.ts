@@ -326,7 +326,7 @@ export const validateReferences = (diagnostics: d.Diagnostic[], references: d.Co
 };
 
 const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.ComponentCompilerTypeReference => {
-  const sourceFileObj = tsNode.getSourceFile();
+  const sourceFileObj = tsNode.getSourceFile() as TSsourceFileWithModules;
 
   // Loop through all top level imports to find any reference to the type for 'import' reference location
   const importTypeDeclaration = sourceFileObj.statements.find(st => {
@@ -345,7 +345,13 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
   }) as ts.ImportDeclaration;
 
   if (importTypeDeclaration) {
-    const localImportPath = (<ts.StringLiteral>importTypeDeclaration.moduleSpecifier).text;
+    let localImportPath = (<ts.StringLiteral>importTypeDeclaration.moduleSpecifier).text;
+    if (sourceFileObj.resolvedModules) {
+      for (const [modName, mod] of sourceFileObj.resolvedModules.entries()) {
+        if (!mod) continue;
+        if (localImportPath === modName) localImportPath = mod.resolvedFileName;
+      }
+    }
     return {
       location: 'import',
       path: localImportPath,
@@ -525,6 +531,114 @@ export const isAsyncFn = (typeChecker: ts.TypeChecker, methodDeclaration: ts.Met
 
   return typeStr.includes('Promise<');
 };
+
+/** get the actual class name from import declaration */
+export const resolveClassName = (importSp: ts.ImportSpecifier, sourceFile?: ts.SourceFile) => {
+  if (importSp.propertyName && ts.isIdentifier(importSp.propertyName)) {
+    return importSp.propertyName.getText(sourceFile);
+  } else return importSp.name.getText(sourceFile);
+}
+
+/** util. Returns named bindings from an import declaration */
+export const getImportNamedBindings = (importDec: ts.ImportDeclaration): ts.ImportSpecifier[] => {
+  if (
+    ts.isImportDeclaration(importDec) &&
+    importDec.importClause &&
+    ts.isImportClause(importDec.importClause) &&
+    importDec.importClause.namedBindings &&
+    ts.isNamedImports(importDec.importClause.namedBindings) &&
+    Array.isArray(importDec.importClause.namedBindings.elements)
+  ) return importDec.importClause.namedBindings.elements;
+  return [];
+}
+
+export const findImportDeclsWithMemberNames = (sourceFile: ts.SourceFile, memberNames: string[]) => {
+  // loops through all source imports to find those containing member names
+  let foundClassName: string;
+  let impSpecs: ts.ImportSpecifier[];
+  const importDeclMap: Map<string, {declaration: ts.ImportDeclaration, identifier: string}> = new Map();
+
+  sourceFile.statements.filter(st => ts.isImportDeclaration(st)).forEach((st: ts.ImportDeclaration) => {
+    foundClassName = null;
+    impSpecs = [];
+
+    if (
+      st.importClause &&
+      ts.isImportClause(st.importClause) &&
+      (impSpecs = getImportNamedBindings(st)) &&
+      impSpecs.length
+    ) {
+      // named modules
+      impSpecs.forEach(nbe => {
+        if (foundClassName = memberNames.find(dec => dec === nbe.name.getText(sourceFile))) {
+          importDeclMap.set(foundClassName, {
+            declaration: st,
+            identifier: resolveClassName(nbe, sourceFile)
+          });
+        }
+      })
+    }
+    // default modules
+    if (
+      st.importClause.name &&
+      ts.isIdentifier(st.importClause.name) &&
+      (foundClassName = memberNames.find(dec => dec === st.importClause.name.getText(sourceFile)))
+    ) {
+      importDeclMap.set(foundClassName, {
+        declaration: st,
+        identifier: 'default'
+      });
+    }
+  });
+  return importDeclMap;
+}
+
+/** get the class names from the decorator */
+export const getMixinsFromDecorator = (mixinDecorators: ts.Decorator[], sourceFile?: ts.SourceFile) => {
+  let mixinMap = new Map() as MixinDecorators;
+  let mixinClassNames: string[] = [];
+
+  mixinDecorators.forEach(dec => {
+    if (ts.isCallExpression(dec.expression)) {
+      const mixinName = dec.expression.arguments[0].getText(sourceFile).replace(/'|"|`/g, '');
+      mixinMap.set(mixinName, dec);
+      mixinClassNames.push(mixinName);
+    }
+  });
+  return {mixinMap, mixinClassNames};
+}
+
+// find an import declarations from a Map via module path
+export const findImportDeclObjWithModPath = (declarationMap: Map<string, ImportDeclObj>, moduleName: string) => {
+  const classNames: string[] = [];
+  const foundImportObjs: ImportDeclObj[] = [];
+
+  for (const [className, importObj] of declarationMap.entries()) {
+    if ((<ts.StringLiteral>importObj.declaration.moduleSpecifier).text === moduleName) {
+      classNames.push(className);
+      foundImportObjs.push(importObj);
+    }
+  }
+  return {classNames: classNames, importObjs: foundImportObjs};
+}
+
+export interface ImportDeclObj {declaration: ts.ImportDeclaration, identifier: string};
+
+export type MixinDecorators = Map<string, ts.Decorator>;
+
+export interface TSsourceFileWithModules extends ts.SourceFile { resolvedModules: Map<string, TSModule> }
+
+export interface TSModule {
+  resolvedFileName: string,
+  originalPath: string | undefined,
+  extension: string,
+  isExternalLibraryImport: boolean,
+  packageId: {
+    name: string,
+    subModuleName: string,
+    version: string
+  } | undefined
+}
 
 export interface ConvertIdentifier {
   __identifier: boolean;

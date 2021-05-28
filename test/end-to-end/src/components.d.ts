@@ -6,6 +6,8 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { CarData } from "./car-list/car-data";
+import { AnimationBuilder, Color, RouterDirection } from "../node_modules/ionic-git/core/src/interface.d";
+import { Title } from "./mixin-cmp/interfaces";
 export namespace Components {
     interface AppRoot {
     }
@@ -47,10 +49,71 @@ export namespace Components {
         "middleName": string;
     }
     interface MixinCmp {
+        /**
+          * The type of button.
+         */
+        "buttonType": string;
+        /**
+          * The color to use from your application's color palette. Default options are: `"primary"`, `"secondary"`, `"tertiary"`, `"success"`, `"warning"`, `"danger"`, `"light"`, `"medium"`, and `"dark"`. For more information on colors, see [theming](/docs/theming/basics).
+         */
+        "color"?: Color;
+        /**
+          * If `true`, the user cannot interact with the button.
+         */
+        "disabled": boolean;
+        /**
+          * This attribute instructs browsers to download a URL instead of navigating to it, so the user will be prompted to save it as a local file. If the attribute has a value, it is used as the pre-filled file name in the Save prompt (the user can still change the file name if they want).
+         */
+        "download": string | undefined;
+        /**
+          * Set to `"block"` for a full-width button or to `"full"` for a full-width button without left and right borders.
+         */
+        "expand"?: 'full' | 'block';
+        /**
+          * Set to `"clear"` for a transparent button, to `"outline"` for a transparent button with a border, or to `"solid"`. The default style is `"solid"` except inside of a toolbar, where the default is `"clear"`.
+         */
+        "fill"?: 'clear' | 'outline' | 'solid' | 'default';
         "firstName": string;
+        /**
+          * Contains a URL or a URL fragment that the hyperlink points to. If this property is set, an anchor tag will be rendered.
+         */
+        "href": string | undefined;
         "middleName": string;
+        "nameTitle": Title;
+        /**
+          * Specifies the relationship of the target object to the link object. The value is a space-separated list of [link types](https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types).
+         */
+        "rel": string | undefined;
+        /**
+          * When using a router, it specifies the transition animation when navigating to another page using `href`.
+         */
+        "routerAnimation": AnimationBuilder | undefined;
+        /**
+          * When using a router, it specifies the transition direction when navigating to another page using `href`.
+         */
+        "routerDirection": RouterDirection;
+        /**
+          * The button shape.
+         */
+        "shape"?: 'round';
+        /**
+          * The button size.
+         */
+        "size"?: 'small' | 'default' | 'large';
+        /**
+          * If `true`, activates a button with a heavier font weight.
+         */
+        "strong": boolean;
         "surname": string;
         "surnameWithTitle": () => Promise<string>;
+        /**
+          * Specifies where to display the linked URL. Only applies when an `href` is provided. Special keywords: `"_blank"`, `"_self"`, `"_parent"`, `"_top"`.
+         */
+        "target": string | undefined;
+        /**
+          * The type of the button.
+         */
+        "type": 'submit' | 'reset' | 'button';
     }
     interface PathAliasCmp {
     }
@@ -273,9 +336,78 @@ declare namespace LocalJSX {
         "middleName"?: string;
     }
     interface MixinCmp {
+        /**
+          * The type of button.
+         */
+        "buttonType"?: string;
+        /**
+          * The color to use from your application's color palette. Default options are: `"primary"`, `"secondary"`, `"tertiary"`, `"success"`, `"warning"`, `"danger"`, `"light"`, `"medium"`, and `"dark"`. For more information on colors, see [theming](/docs/theming/basics).
+         */
+        "color"?: Color;
+        /**
+          * If `true`, the user cannot interact with the button.
+         */
+        "disabled"?: boolean;
+        /**
+          * This attribute instructs browsers to download a URL instead of navigating to it, so the user will be prompted to save it as a local file. If the attribute has a value, it is used as the pre-filled file name in the Save prompt (the user can still change the file name if they want).
+         */
+        "download"?: string | undefined;
+        /**
+          * Set to `"block"` for a full-width button or to `"full"` for a full-width button without left and right borders.
+         */
+        "expand"?: 'full' | 'block';
+        /**
+          * Set to `"clear"` for a transparent button, to `"outline"` for a transparent button with a border, or to `"solid"`. The default style is `"solid"` except inside of a toolbar, where the default is `"clear"`.
+         */
+        "fill"?: 'clear' | 'outline' | 'solid' | 'default';
         "firstName"?: string;
+        /**
+          * Contains a URL or a URL fragment that the hyperlink points to. If this property is set, an anchor tag will be rendered.
+         */
+        "href"?: string | undefined;
         "middleName"?: string;
+        "nameTitle"?: Title;
+        /**
+          * Emitted when the button loses focus.
+         */
+        "onIonBlur"?: (event: CustomEvent<void>) => void;
+        /**
+          * Emitted when the button has focus.
+         */
+        "onIonFocus"?: (event: CustomEvent<void>) => void;
+        /**
+          * Specifies the relationship of the target object to the link object. The value is a space-separated list of [link types](https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types).
+         */
+        "rel"?: string | undefined;
+        /**
+          * When using a router, it specifies the transition animation when navigating to another page using `href`.
+         */
+        "routerAnimation"?: AnimationBuilder | undefined;
+        /**
+          * When using a router, it specifies the transition direction when navigating to another page using `href`.
+         */
+        "routerDirection"?: RouterDirection;
+        /**
+          * The button shape.
+         */
+        "shape"?: 'round';
+        /**
+          * The button size.
+         */
+        "size"?: 'small' | 'default' | 'large';
+        /**
+          * If `true`, activates a button with a heavier font weight.
+         */
+        "strong"?: boolean;
         "surname"?: string;
+        /**
+          * Specifies where to display the linked URL. Only applies when an `href` is provided. Special keywords: `"_blank"`, `"_self"`, `"_parent"`, `"_top"`.
+         */
+        "target"?: string | undefined;
+        /**
+          * The type of the button.
+         */
+        "type"?: 'submit' | 'reset' | 'button';
     }
     interface PathAliasCmp {
     }
