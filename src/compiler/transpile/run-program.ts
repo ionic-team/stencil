@@ -35,6 +35,9 @@ export const runTsProgram = async (
   const emittedDts: string[] = [];
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
     const tsSourceFile = tsSourceFiles[0]?.fileName;
+
+    if (tsSourceFile.endsWith('.tsx') && tsSourceFile.match('/node_modules/') && emitFilePath.endsWith('.js')) return;
+
     if (emitFilePath.endsWith('.js')) {
       updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
 

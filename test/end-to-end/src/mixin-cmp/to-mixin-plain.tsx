@@ -1,12 +1,12 @@
 import { Method, Prop } from '@stencil/core';
+import type { Title } from './interfaces';
 
-export class ToMixin {
+export default class ToMixin {
   @Prop() surname: string = 'Good';
-
-  protected title: string = 'Mr';
+  @Prop() nameTitle: Title = 'Mr';
 
   @Method()
   async surnameWithTitle() {
-    return `${this.title} ${this.surname}`;
+    return `${this.nameTitle} ${this.surname}`;
   }
 }

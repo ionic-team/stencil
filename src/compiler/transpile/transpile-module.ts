@@ -10,6 +10,10 @@ import { lazyComponentTransform } from '../transformers/component-lazy/transform
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
 import ts from 'typescript';
+import { isDecoratorNamed } from '../transformers/decorators-to-static/decorator-utils';
+import { findImportDeclObjWithModPath, findImportDeclsWithMemberNames, getMixinsFromDecorator, TSsourceFileWithModules } from '../transformers/transform-utils';
+
+interface SourceFiles {path: string, source: ts.SourceFile, normalizedPath: string}
 
 /**
  * Stand-alone compiling of a single string
@@ -67,18 +71,44 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     tsCompilerOptions.baseUrl = '.';
   }
 
-  const sourceFile = ts.createSourceFile(sourceFilePath, input, tsCompilerOptions.target);
+  const sourceFile = ts.createSourceFile(sourceFilePath, input, tsCompilerOptions.target) as unknown as TSsourceFileWithModules;
+  const sourceFiles: SourceFiles[] = [{path: sourceFilePath, source: sourceFile, normalizedPath: normalizePath(sourceFilePath)}];
+
+  // Add mixins and dependents to TS programe
+  const classNode = sourceFile.statements.find(st => (
+    ts.isClassDeclaration(st) &&
+    st.decorators &&
+    st.decorators.find(isDecoratorNamed('Component', sourceFile))
+  )) as ts.ClassDeclaration;
+
+  if (classNode) {
+    const mixinDecorators = classNode.decorators.filter(isDecoratorNamed('Mixin', sourceFile));
+
+    if (mixinDecorators) {
+      const {mixinClassNames} = getMixinsFromDecorator(mixinDecorators, sourceFile);
+      const importDeclMap = findImportDeclsWithMemberNames(sourceFile, mixinClassNames);
+
+      importDeclMap.forEach((value) => {
+        const modPath = value.declaration.moduleSpecifier.getText(sourceFile).replace(/('|"|`)/g, '');
+        const {classNames} = findImportDeclObjWithModPath(importDeclMap, modPath);
+        if (!classNames.length) return;
+        recursiveDependants(sourceFilePath, sourceFiles, modPath, tsCompilerOptions);
+      })
+    }
+  }
 
   // Create a compilerHost object to allow the compiler to read and write files
   const compilerHost: ts.CompilerHost = {
     getSourceFile: fileName => {
-      return normalizePath(fileName) === normalizePath(sourceFilePath) ? sourceFile : undefined;
+      return sourceFiles.find(sf => sf.normalizedPath === normalizePath(fileName))?.source || undefined;
     },
-    writeFile: (name, text) => {
-      if (name.endsWith('.js.map')) {
-        results.map = text;
-      } else if (name.endsWith('.js')) {
-        results.code = text;
+    writeFile: (name, text, _wom, _onerror, sourceFiles) => {
+      if (normalizePath(sourceFiles[0].fileName) === normalizePath(sourceFilePath)) {
+        if (name.endsWith('.js.map')) {
+          results.map = text;
+        } else if (name.endsWith('.js')) {
+          results.code = text;
+        }
       }
     },
     getDefaultLibFileName: () => `lib.d.ts`,
@@ -86,13 +116,13 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     getCanonicalFileName: fileName => fileName,
     getCurrentDirectory: () => transformOpts.currentDirectory || getCurrentDirectory(),
     getNewLine: () => ts.sys.newLine || '\n',
-    fileExists: fileName => normalizePath(fileName) === normalizePath(sourceFilePath),
+    fileExists: fileName => !!sourceFiles.find(sf => sf.normalizedPath === normalizePath(fileName)),
     readFile: () => '',
     directoryExists: () => true,
     getDirectories: () => [],
   };
 
-  const program = ts.createProgram([sourceFilePath], tsCompilerOptions, compilerHost);
+  const program = ts.createProgram(sourceFiles.map(sf => sf.path), tsCompilerOptions, compilerHost);
   const typeChecker = program.getTypeChecker();
 
   const after: ts.TransformerFactory<ts.SourceFile>[] = [convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)];
@@ -104,7 +134,10 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
   }
 
   program.emit(undefined, undefined, undefined, false, {
-    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker), updateStencilCoreImports(transformOpts.coreImportPath)],
+    before: [
+      convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker, compilerHost),
+      updateStencilCoreImports(transformOpts.coreImportPath)
+    ],
     after,
   });
 
@@ -131,3 +164,23 @@ const getScriptTargetKind = (transformOpts: d.TransformOptions) => {
   // ESNext and Latest are the same
   return ts.ScriptTarget.Latest;
 };
+
+const fileExists = (fileName: string): boolean => {
+  return ts.sys.fileExists(fileName);
+}
+const readFile = (fileName: string): string | undefined => {
+  return ts.sys.readFile(fileName);
+}
+
+const recursiveDependants = (srcFilePath: string, sourceFiles: SourceFiles[], modPath: string, tsCompilerOptions: ts.CompilerOptions) => {
+  let mod = ts.resolveModuleName(modPath, srcFilePath, tsCompilerOptions, {fileExists, readFile});
+  if (mod && mod.resolvedModule) {
+    const foundPath = mod.resolvedModule.resolvedFileName;
+    const foundSourceFile = ts.createSourceFile(foundPath, readFile(foundPath), tsCompilerOptions.target) as unknown as TSsourceFileWithModules;
+    sourceFiles.push({path: foundPath, source: foundSourceFile, normalizedPath: normalizePath(foundPath)});
+
+    foundSourceFile.statements.filter(st => ts.isImportDeclaration(st)).forEach((
+      st: ts.ImportDeclaration) => recursiveDependants(foundPath, sourceFiles, (<ts.StringLiteral>st.moduleSpecifier).text, tsCompilerOptions)
+    )
+  }
+}
