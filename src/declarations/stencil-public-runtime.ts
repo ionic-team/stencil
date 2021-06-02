@@ -7,6 +7,7 @@ declare type CustomMethodDecorator<T> = (
 export interface ComponentDecorator {
   (opts?: ComponentOptions): ClassDecorator;
 }
+
 export interface ComponentOptions {
   /**
    * Tag name of the web component. Ideally, the tag name must be globally unique,
@@ -70,6 +71,7 @@ export interface ModeStyles {
 export interface PropDecorator {
   (opts?: PropOptions): PropertyDecorator;
 }
+
 export interface PropOptions {
   /**
    * The name of the associated DOM attribute.
@@ -96,6 +98,7 @@ export interface PropOptions {
 export interface MethodDecorator {
   (opts?: MethodOptions): CustomMethodDecorator<any>;
 }
+
 export interface MethodOptions {}
 
 export interface ElementDecorator {
@@ -105,6 +108,7 @@ export interface ElementDecorator {
 export interface EventDecorator {
   (opts?: EventOptions): PropertyDecorator;
 }
+
 export interface EventOptions {
   /**
    * A string custom event name to override the default.
@@ -129,6 +133,7 @@ export interface EventOptions {
 export interface ListenDecorator {
   (eventName: string, opts?: ListenOptions): CustomMethodDecorator<any>;
 }
+
 export interface ListenOptions {
   /**
    * Handlers can also be registered for an event other than the host itself.
@@ -754,7 +759,7 @@ export namespace JSXBase {
     view: JSXBase.SVGAttributes;
   }
 
-  export interface SlotAttributes {
+  export interface SlotAttributes extends JSXAttributes {
     name?: string;
     slot?: string;
     onSlotchange?: (event: Event) => void;
@@ -1588,11 +1593,7 @@ export namespace JSXBase {
     'zoomAndPan'?: string;
   }
 
-  export interface DOMAttributes<T = Element> {
-    // vdom specific
-    key?: string | number;
-
-    ref?: (elm?: T) => void;
+  export interface DOMAttributes<T = Element> extends JSXAttributes {
     slot?: string;
     part?: string;
     exportparts?: string;
@@ -1737,6 +1738,12 @@ export namespace JSXBase {
     // Transition Events
     onTransitionEnd?: (event: TransitionEvent) => void;
     onTransitionEndCapture?: (event: TransitionEvent) => void;
+  }
+  
+  export interface JSXAttributes {
+    // vdom specific
+    key?: string | number;
+    ref?: (elm?: T) => void;
   }
 }
 
