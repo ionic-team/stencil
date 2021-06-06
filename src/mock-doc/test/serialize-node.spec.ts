@@ -1,7 +1,6 @@
 import { MockDocument } from '../document';
 import { serializeNodeToHtml } from '../serialize-node';
 
-
 describe('serializeNodeToHtml', () => {
   let doc: MockDocument;
   beforeEach(() => {
@@ -24,6 +23,51 @@ describe('serializeNodeToHtml', () => {
 
     const html = serializeNodeToHtml(elm);
     expect(html).toBe(`<div><span>var </span><b> value </b><span> =</span><code>     88     </code>;</div>`);
+  });
+
+  it('do not add extra indentation when pretty print <pre><code>', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<section><article><pre><code><span>88</span></code></pre></article></section>`;
+
+    const html = serializeNodeToHtml(elm, { prettyHtml: true });
+    expect(html).toBe(`<section>\n  <article><pre><code><span>88</span></code></pre>\n  </article>\n</section>`);
+  });
+
+  it('do not pretty print <pre><code>', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<pre><code><span>88</span></code></pre>`;
+
+    const html = serializeNodeToHtml(elm, { prettyHtml: true });
+    expect(html).toBe(`<pre><code><span>88</span></code></pre>`);
+  });
+
+  it('do not pretty print <pre><code> w/ highlights and new', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<pre><code><span>install</span> cordova-plugin-purchase\nnpx cap update</code></pre>`;
+
+    const html = serializeNodeToHtml(elm, { prettyHtml: true });
+    expect(html).toBe(`<pre><code><span>install</span> cordova-plugin-purchase\nnpx cap update</code></pre>`);
+  });
+
+  it('do not pretty print <pre><code> w/ html comments', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<pre><code><span><!--a-->88</span>c<!--b--></code></pre>`;
+
+    const html = serializeNodeToHtml(elm, { prettyHtml: true });
+    expect(html).toBe(`<pre><code><span><!--a-->88</span>c<!--b--></code></pre>`);
+  });
+
+  it('do not pretty print <script>', () => {
+    const elm = doc.createElement('div');
+
+    elm.innerHTML = `<script>value = '';</script>`;
+
+    const html = serializeNodeToHtml(elm, { prettyHtml: true });
+    expect(html).toBe(`<script>value = '';</script>`);
   });
 
   it('do not remove whitespace within <code>', () => {
@@ -51,7 +95,7 @@ describe('serializeNodeToHtml', () => {
 
   it('pretty print with comments', () => {
     const elm = doc.createElement('div');
-    elm.innerHTML =  `
+    elm.innerHTML = `
       <p>
         <!--comment1-->
         <!--comment2-->
@@ -115,6 +159,14 @@ describe('serializeNodeToHtml', () => {
     `);
   });
 
+  it('style', () => {
+    const input = `<style>     \n    text   \n\n</style>`;
+    doc.body.innerHTML = input;
+
+    const output = serializeNodeToHtml(doc.body);
+    expect(output).toBe(`<style>text</style>`);
+  });
+
   it('template', () => {
     const input = `<template>text</template>`;
     doc.body.innerHTML = input;
@@ -135,7 +187,7 @@ describe('serializeNodeToHtml', () => {
     const input = `<input type="checkbox" checked="">`;
     doc.body.innerHTML = input;
 
-    const output = serializeNodeToHtml(doc.body, { removeBooleanAttributeQuotes: true});
+    const output = serializeNodeToHtml(doc.body, { removeBooleanAttributeQuotes: true });
     expect(output).toBe(`<input type="checkbox" checked>`);
   });
 
@@ -226,5 +278,4 @@ describe('serializeNodeToHtml', () => {
     scriptElm.innerHTML = input;
     expect(scriptElm.innerHTML).toBe(input);
   });
-
 });

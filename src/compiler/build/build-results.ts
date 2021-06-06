@@ -1,15 +1,13 @@
-import * as d from '../../declarations';
-import { hasError, normalizeDiagnostics } from '@utils';
+import type * as d from '../../declarations';
 import { generateHmr } from './build-hmr';
+import { getBuildTimestamp } from './build-ctx';
+import { hasError, isString, normalizeDiagnostics, fromEntries } from '@utils';
 
+export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+  const componentGraph = buildCtx.componentGraph ? fromEntries(buildCtx.componentGraph.entries()) : undefined;
 
-export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const timeSpan = buildCtx.createTimeSpan(`generateBuildResults started`, true);
-
-  const buildResults: d.BuildResults = {
+  const buildResults: d.CompilerBuildResults = {
     buildId: buildCtx.buildId,
-    buildConditionals: getBuildConditionals(buildCtx),
-    bundleBuildCount: buildCtx.bundleBuildCount,
     diagnostics: normalizeDiagnostics(compilerCtx, buildCtx.diagnostics),
     dirsAdded: buildCtx.dirsAdded.slice().sort(),
     dirsDeleted: buildCtx.dirsDeleted.slice().sort(),
@@ -18,73 +16,27 @@ export function generateBuildResults(config: d.Config, compilerCtx: d.CompilerCt
     filesChanged: buildCtx.filesChanged.slice().sort(),
     filesDeleted: buildCtx.filesDeleted.slice().sort(),
     filesUpdated: buildCtx.filesUpdated.slice().sort(),
-    filesWritten: buildCtx.filesWritten.sort(),
     hasError: hasError(buildCtx.diagnostics),
     hasSuccessfulBuild: compilerCtx.hasSuccessfulBuild,
     isRebuild: buildCtx.isRebuild,
-    styleBuildCount: buildCtx.styleBuildCount,
-    transpileBuildCount: buildCtx.transpileBuildCount,
-
-    components: [],
-    entries: []
+    namespace: config.namespace,
+    outputs: compilerCtx.fs.getBuildOutputs(),
+    rootDir: config.rootDir,
+    srcDir: config.srcDir,
+    timestamp: getBuildTimestamp(),
+    componentGraph,
   };
-
-  compilerCtx.lastBuildResults = Object.assign({}, buildResults);
 
   const hmr = generateHmr(config, compilerCtx, buildCtx);
   if (hmr != null) {
     buildResults.hmr = hmr;
   }
 
-  buildCtx.entryModules.forEach(en => {
-    const buildEntry: d.BuildEntry = {
-      entryId: en.entryKey,
-      components: [],
-      bundles: [],
-      inputs: [],
-      modes: en.modeNames.slice(),
-      encapsulations: []
-    };
-    en.cmps.forEach(cmp => {
-      if (!buildEntry.inputs.includes(cmp.sourceFilePath)) {
-        buildEntry.inputs.push(cmp.sourceFilePath);
-      }
-      if (!buildEntry.encapsulations.includes(cmp.encapsulation)) {
-        buildEntry.encapsulations.push(cmp.encapsulation);
-      }
-      const buildCmp: d.BuildComponent = {
-        tag: cmp.tagName,
-        dependencyOf: cmp.dependants.slice(),
-        dependencies: cmp.dependencies.slice()
-      };
-      buildEntry.components.push(buildCmp);
-    });
-    buildResults.entries.push(buildEntry);
-  });
+  if (isString(buildCtx.hydrateAppFilePath)) {
+    buildResults.hydrateAppFilePath = buildCtx.hydrateAppFilePath;
+  }
 
-  buildResults.entries.forEach(en => {
-    buildResults.components.push(...en.components);
-  });
-
-  timeSpan.finish(`generateBuildResults finished`);
+  compilerCtx.lastBuildResults = Object.assign({}, buildResults as any);
 
   return buildResults;
-}
-
-function getBuildConditionals(buildCtx: d.BuildCtx) {
-  const b = {
-    shadow: false,
-    slot: false,
-    svg: false,
-    vdom: false
-  };
-
-  buildCtx.components.forEach(cmp => {
-    b.shadow = b.shadow || (cmp.encapsulation === 'shadow');
-    b.slot = b.slot || cmp.htmlTagNames.includes('slot');
-    b.svg = b.svg || cmp.htmlTagNames.includes('svg');
-    b.vdom = b.vdom || cmp.hasVdomRender;
-  });
-
-  return b;
-}
+};

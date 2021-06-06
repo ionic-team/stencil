@@ -1,55 +1,6 @@
 import * as util from '../util';
-import { normalizePath } from '../normalize-path';
-
 
 describe('util', () => {
-
-  describe('normalizePath', () => {
-
-    it('remove trailing slash, windows', () => {
-      const path = normalizePath(`C:\\Johnny\\B\\Goode\\`);
-      expect(path).toBe(`C:/Johnny/B/Goode`);
-    });
-
-    it('normalize file, windows', () => {
-      const path = normalizePath(`C:\\Johnny\\B\\Goode.js`);
-      expect(path).toBe(`C:/Johnny/B/Goode.js`);
-    });
-
-    it('not remove trailing slash for root dir, windows', () => {
-      const path = normalizePath(`C:\\`);
-      expect(path).toBe(`C:/`);
-    });
-
-    it('not remove trailing slash for root dir, unix', () => {
-      const path = normalizePath(`/`);
-      expect(path).toBe(`/`);
-    });
-
-    it('remove trailing slash, unix', () => {
-      const path = normalizePath(`/Johnny/B/Goode/`);
-      expect(path).toBe(`/Johnny/B/Goode`);
-    });
-
-    it('normalize file, unix', () => {
-      const path = normalizePath(`/Johnny/B/Goode.js`);
-      expect(path).toBe(`/Johnny/B/Goode.js`);
-    });
-
-    it('normalize file with spaces to trim', () => {
-      const path = normalizePath(`    /Johnny/B/Goode.js    `);
-      expect(path).toBe(`/Johnny/B/Goode.js`);
-    });
-
-    it('throw error when invalid string', () => {
-      expect(() => {
-        const path = normalizePath(null);
-        expect(path).toBe(`/Johnny/B/Goode.js`);
-      }).toThrow();
-    });
-
-  });
-
   describe('isTsFile', () => {
     it('should return true for regular .ts and .tsx files', () => {
       expect(util.isTsFile('.ts')).toEqual(true);
@@ -209,33 +160,27 @@ describe('util', () => {
     });
   });
 
-  describe('isWebDevFile', () => {
-    it('should return true for all web dev file types', () => {
-      expect(util.isWebDevFile('foo.ts')).toEqual(true);
-      expect(util.isWebDevFile('foo.tsx')).toEqual(true);
-      expect(util.isWebDevFile('foo.js')).toEqual(true);
-      expect(util.isWebDevFile('foo.jsx')).toEqual(true);
-      expect(util.isWebDevFile('foo.html')).toEqual(true);
-      expect(util.isWebDevFile('foo.htm')).toEqual(true);
-      expect(util.isWebDevFile('foo.css')).toEqual(true);
-      expect(util.isWebDevFile('foo.scss')).toEqual(true);
-      expect(util.isWebDevFile('foo.sass')).toEqual(true);
-      expect(util.isWebDevFile('foo.less')).toEqual(true);
-      expect(util.isWebDevFile('foo.styl')).toEqual(true);
-    });
-
-    it('should return false for d.ts file', () => {
-      expect(util.isWebDevFile('components.d.ts')).toEqual(false);
-    });
-
-    it('should return false for other types of files', () => {
-      expect(util.isWebDevFile('foo.txt')).toEqual(false);
-    });
-
-    it('should be case insensitive', () => {
-      expect(util.isWebDevFile('foo.TS')).toEqual(true);
-      expect(util.isWebDevFile('foo.tSx')).toEqual(true);
-      expect(util.isWebDevFile('foo.JS')).toEqual(true);
-    });
+  it('createJsVarName', () => {
+    expect(util.createJsVarName('./scoped-style-import.css?tag=my-button&encapsulation=scoped')).toBe('scopedStyleImportCss');
+    expect(util.createJsVarName('./scoped-style-import.css#hash')).toBe('scopedStyleImportCss');
+    expect(util.createJsVarName('./scoped-style-import.css&data')).toBe('scopedStyleImportCss');
+    expect(util.createJsVarName('./scoped-style-import.css=data')).toBe('scopedStyleImportCss');
+    expect(util.createJsVarName('@ionic/core')).toBe('ionicCore');
+    expect(util.createJsVarName('@ionic\\core')).toBe('ionicCore');
+    expect(util.createJsVarName('88mph')).toBe('_88mph');
+    expect(util.createJsVarName('Doc.brown&')).toBe('docBrown');
+    expect(util.createJsVarName('  Doc!  Brown?  ')).toBe('docBrown');
+    expect(util.createJsVarName('doc---Brown')).toBe('docBrown');
+    expect(util.createJsVarName('doc-brown')).toBe('docBrown');
+    expect(util.createJsVarName('DocBrown')).toBe('docBrown');
+    expect(util.createJsVarName('Doc')).toBe('doc');
+    expect(util.createJsVarName('doc')).toBe('doc');
+    expect(util.createJsVarName('AB')).toBe('aB');
+    expect(util.createJsVarName('Ab')).toBe('ab');
+    expect(util.createJsVarName('a')).toBe('a');
+    expect(util.createJsVarName('A')).toBe('a');
+    expect(util.createJsVarName('    ')).toBe('');
+    expect(util.createJsVarName('')).toBe('');
+    expect(util.createJsVarName(null)).toBe(null);
   });
 });

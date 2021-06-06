@@ -1,67 +1,72 @@
-import { normalizePath } from '@utils';
-import { TestingFs } from './testing-fs';
-import { TestingLogger } from './testing-logger';
-import { StencilSystem } from '../declarations';
-import fs from 'fs';
+import { createSystem } from '../compiler/sys/stencil-sys';
+import { createHash } from 'crypto';
 import path from 'path';
 
+export const createTestingSystem = () => {
+  let diskReads = 0;
+  let diskWrites = 0;
+  const sys = createSystem();
 
-const relDistPath = path.join(__dirname, '..', '..', 'dist');
+  sys.platformPath = path;
 
-const nodeSys = require('../sys/node/index');
-export const NodeSystem: NodeSystemSystemConstructor = nodeSys.NodeSystem;
+  sys.generateContentHash = (content, length) => {
+    let hash = createHash('sha1').update(content).digest('hex').toLowerCase();
 
-export interface NodeSystemSystemConstructor {
-  new (fs: any): StencilSystem;
-}
+    if (typeof length === 'number') {
+      hash = hash.substr(0, length);
+    }
+    return Promise.resolve(hash);
+  };
 
-export class TestingSystem extends NodeSystem {
-
-  constructor() {
-    const fs = new TestingFs();
-    super(fs);
-    this.path = Object.assign({}, path);
-
-    const orgPathJoin = path.join;
-    this.path.join = function(...paths) {
-      return normalizePath(orgPathJoin.apply(path, paths));
+  const wrapRead = (fn: any) => {
+    const orgFn = fn;
+    return (...args: any[]) => {
+      diskReads++;
+      return orgFn.apply(orgFn, args);
     };
+  };
 
-    this.createFsWatcher = null;
+  const wrapWrite = (fn: any) => {
+    const orgFn = fn;
+    return (...args: any[]) => {
+      diskWrites++;
+      return orgFn.apply(orgFn, args);
+    };
+  };
 
-    const logger = new TestingLogger();
-    logger.enable = true;
+  sys.access = wrapRead(sys.access);
+  sys.accessSync = wrapRead(sys.accessSync);
+  sys.readFile = wrapRead(sys.readFile);
+  sys.readFileSync = wrapRead(sys.readFileSync);
+  sys.readDir = wrapRead(sys.readDir);
+  sys.readDirSync = wrapRead(sys.readDirSync);
+  sys.stat = wrapRead(sys.stat);
+  sys.statSync = wrapRead(sys.statSync);
 
-    this.initWorkers(1, 1, logger);
-  }
+  sys.copyFile = wrapWrite(sys.copyFile);
+  sys.createDir = wrapWrite(sys.createDir);
+  sys.createDirSync = wrapWrite(sys.createDirSync);
+  sys.removeFile = wrapWrite(sys.removeFile);
+  sys.removeFileSync = wrapWrite(sys.removeFileSync);
+  sys.writeFile = wrapWrite(sys.writeFile);
+  sys.writeFileSync = wrapWrite(sys.writeFileSync);
 
-  get compiler() {
-    const compiler = super.compiler;
-    compiler.name = 'test';
-    compiler.version += '-test';
-    return compiler;
-  }
-
-  getClientPath(staticName: string) {
-    return normalizePath(path.join(relDistPath, 'client', staticName));
-  }
-
-  getClientCoreFile(opts: any) {
-    const filePath = this.getClientPath(opts.staticName);
-
-    return new Promise<string>((resolve, reject) => {
-      fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data);
-        }
-      });
-    });
-  }
-
-  tmpdir() {
-    return path.join(path.resolve('/'), 'tmp', 'testing');
-  }
-
-}
+  return Object.defineProperties(sys, {
+    diskReads: {
+      get() {
+        return diskReads;
+      },
+      set(val: number) {
+        diskReads = val;
+      },
+    },
+    diskWrites: {
+      get() {
+        return diskWrites;
+      },
+      set(val: number) {
+        diskWrites = val;
+      },
+    },
+  });
+};

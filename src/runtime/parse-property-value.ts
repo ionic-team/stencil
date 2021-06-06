@@ -1,7 +1,5 @@
 import { MEMBER_FLAGS, isComplexType } from '@utils';
-import { BUILD } from '@build-conditionals';
-
-
+import { BUILD } from '@app-data';
 
 export const parsePropertyValue = (propValue: any, propType: number) => {
   // ensure this value is of the correct prop type
@@ -10,7 +8,7 @@ export const parsePropertyValue = (propValue: any, propType: number) => {
     if (BUILD.propBoolean && propType & MEMBER_FLAGS.Boolean) {
       // per the HTML spec, any string value means it is a boolean true value
       // but we'll cheat here and say that the string "false" is the boolean false
-      return (propValue === 'false' ? false : propValue === '' || !!propValue);
+      return propValue === 'false' ? false : propValue === '' || !!propValue;
     }
 
     if (BUILD.propNumber && propType & MEMBER_FLAGS.Number) {

@@ -1,23 +1,21 @@
-import * as d from '../../declarations';
+import type { E2EProcessEnv, JestEnvironmentGlobal } from '@stencil/core/internal';
 import { connectBrowser, disconnectBrowser, newBrowserPage } from '../puppeteer/puppeteer-browser';
-import NodeEnvironment from 'jest-environment-node';
-
 
 export function createJestPuppeteerEnvironment() {
-
-  const JestEnvironment = class extends NodeEnvironment {
-    global: d.JestEnvironmentGlobal;
+  const NodeEnvironment = require('jest-environment-node');
+  const JestEnvironment = class extends (NodeEnvironment as any) {
+    global: JestEnvironmentGlobal;
     browser: any = null;
     pages: any[] = [];
-
 
     constructor(config: any) {
       super(config);
     }
 
     async setup() {
-      if ((process.env as d.E2EProcessEnv).__STENCIL_E2E_TESTS__ === 'true') {
+      if ((process.env as E2EProcessEnv).__STENCIL_E2E_TESTS__ === 'true') {
         this.global.__NEW_TEST_PAGE__ = this.newPuppeteerPage.bind(this);
+        this.global.__CLOSE_OPEN_PAGES__ = this.closeOpenPages.bind(this);
       }
     }
 
@@ -27,29 +25,27 @@ export function createJestPuppeteerEnvironment() {
         this.browser = await connectBrowser();
       }
 
-      if (!this.browser) {
-        return null;
-      }
-
       const page = await newBrowserPage(this.browser);
-
       this.pages.push(page);
-
+      const env: E2EProcessEnv = process.env;
+      if (typeof env.__STENCIL_DEFAULT_TIMEOUT__ === 'string') {
+        page.setDefaultTimeout(parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10));
+      }
       return page;
+    }
+
+    async closeOpenPages() {
+      await Promise.all(this.pages.map(page => page.close()));
+      this.pages.length = 0;
     }
 
     async teardown() {
       await super.teardown();
-
-      await disconnectBrowser(this.browser, this.pages);
-
-      this.pages.length = 0;
-
+      await this.closeOpenPages();
+      await disconnectBrowser(this.browser);
       this.browser = null;
     }
-
   };
-
 
   return JestEnvironment;
 }

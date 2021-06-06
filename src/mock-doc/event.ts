@@ -2,7 +2,6 @@ import { MockDocument } from './document';
 import { MockElement } from './node';
 import { NODE_NAMES } from './constants';
 
-
 export class MockEvent {
   bubbles = false;
   cancelBubble = false;
@@ -38,9 +37,7 @@ export class MockEvent {
   stopImmediatePropagation() {
     this.cancelBubble = true;
   }
-
 }
-
 
 export class MockCustomEvent extends MockEvent {
   detail: any = null;
@@ -52,9 +49,48 @@ export class MockCustomEvent extends MockEvent {
       Object.assign(this, customEventInitDic);
     }
   }
-
 }
 
+export class MockKeyboardEvent extends MockEvent {
+  code = '';
+  key = '';
+  altKey = false;
+  ctrlKey = false;
+  metaKey = false;
+  shiftKey = false;
+  location = 0;
+  repeat = false;
+
+  constructor(type: string, keyboardEventInitDic?: KeyboardEventInit) {
+    super(type);
+
+    if (keyboardEventInitDic != null) {
+      Object.assign(this, keyboardEventInitDic);
+    }
+  }
+}
+
+export class MockMouseEvent extends MockEvent {
+  screenX = 0;
+  screenY = 0;
+  clientX = 0;
+  clientY = 0;
+  ctrlKey = false;
+  shiftKey = false;
+  altKey = false;
+  metaKey = false;
+  button = 0;
+  buttons = 0;
+  relatedTarget: EventTarget = null;
+
+  constructor(type: string, mouseEventInitDic?: MouseEventInit) {
+    super(type);
+
+    if (mouseEventInitDic != null) {
+      Object.assign(this, mouseEventInitDic);
+    }
+  }
+}
 
 export class MockEventListener {
   type: string;
@@ -66,7 +102,6 @@ export class MockEventListener {
   }
 }
 
-
 export function addEventListener(elm: any, type: string, handler: any) {
   const target: EventTarget = elm;
 
@@ -76,7 +111,6 @@ export function addEventListener(elm: any, type: string, handler: any) {
 
   target.__listeners.push(new MockEventListener(type, handler));
 }
-
 
 export function removeEventListener(elm: any, type: string, handler: any) {
   const target: EventTarget = elm;
@@ -90,13 +124,11 @@ export function removeEventListener(elm: any, type: string, handler: any) {
   }
 }
 
-
 export function resetEventListeners(target: any) {
   if (target != null && (target as EventTarget).__listeners != null) {
     (target as EventTarget).__listeners = null;
   }
 }
-
 
 function triggerEventListener(elm: any, ev: MockEvent) {
   if (elm == null || ev.cancelBubble === true) {
@@ -133,7 +165,6 @@ export function dispatchEvent(currentTarget: any, ev: MockEvent) {
   triggerEventListener(currentTarget, ev);
   return true;
 }
-
 
 export interface EventTarget {
   __listeners: MockEventListener[];

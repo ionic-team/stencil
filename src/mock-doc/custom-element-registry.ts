@@ -1,12 +1,10 @@
-import { MockElement, MockNode } from './node';
+import { MockHTMLElement, MockNode } from './node';
 import { NODE_TYPES } from './constants';
 
-
-const registryMap = new WeakMap<MockCustomElementRegistry, Map<string, { cstr: any, options: any }>>();
-const whenDefinedResolvesMap = new WeakMap<MockCustomElementRegistry, Map<string, Function[]>>();
-
-
 export class MockCustomElementRegistry implements CustomElementRegistry {
+  private __registry: Map<string, { cstr: any; options: any }>;
+  private __whenDefined: Map<string, Function[]>;
+
   constructor(private win: Window) {}
 
   define(tagName: string, cstr: any, options?: any) {
@@ -14,22 +12,19 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
       throw new Error(`Failed to execute 'define' on 'CustomElementRegistry': "${tagName}" is not a valid custom element name`);
     }
 
-    let registry = registryMap.get(this);
-    if (registry == null) {
-      registry = new Map();
-      registryMap.set(this, registry);
+    if (this.__registry == null) {
+      this.__registry = new Map();
     }
-    registry.set(tagName, { cstr, options });
+    this.__registry.set(tagName, { cstr, options });
 
-    const whenDefinedResolves = whenDefinedResolvesMap.get(this);
-    if (whenDefinedResolves != null) {
-      const whenDefinedResolveFns = whenDefinedResolves.get(tagName);
+    if (this.__whenDefined != null) {
+      const whenDefinedResolveFns = this.__whenDefined.get(tagName);
       if (whenDefinedResolveFns != null) {
         whenDefinedResolveFns.forEach(whenDefinedResolveFn => {
           whenDefinedResolveFn();
         });
         whenDefinedResolveFns.length = 0;
-        whenDefinedResolves.delete(tagName);
+        this.__whenDefined.delete(tagName);
       }
     }
 
@@ -61,9 +56,8 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
   }
 
   get(tagName: string) {
-    const registry = registryMap.get(this);
-    if (registry != null) {
-      const def = registry.get(tagName.toLowerCase());
+    if (this.__registry != null) {
+      const def = this.__registry.get(tagName.toLowerCase());
       if (def != null) {
         return def.cstr;
       }
@@ -75,47 +69,38 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
     //
   }
 
+  clear() {
+    if (this.__registry != null) {
+      this.__registry.clear();
+    }
+
+    if (this.__whenDefined != null) {
+      this.__whenDefined.clear();
+    }
+  }
+
   whenDefined(tagName: string) {
     tagName = tagName.toLowerCase();
 
-    const registry = registryMap.get(this);
-    if (registry != null && registry.has(tagName) === true) {
+    if (this.__registry != null && this.__registry.has(tagName) === true) {
       return Promise.resolve();
     }
 
     return new Promise<void>(resolve => {
-      let whenDefinedResolves = whenDefinedResolvesMap.get(this);
-      if (whenDefinedResolves == null) {
-        whenDefinedResolves = new Map();
-        whenDefinedResolvesMap.set(this, whenDefinedResolves);
+      if (this.__whenDefined == null) {
+        this.__whenDefined = new Map();
       }
 
-      let whenDefinedResolveFns = whenDefinedResolves.get(tagName);
+      let whenDefinedResolveFns = this.__whenDefined.get(tagName);
       if (whenDefinedResolveFns == null) {
         whenDefinedResolveFns = [];
-        whenDefinedResolves.set(tagName, whenDefinedResolveFns);
+        this.__whenDefined.set(tagName, whenDefinedResolveFns);
       }
 
       whenDefinedResolveFns.push(resolve);
     });
   }
 }
-
-
-export function resetCustomElementRegistry(customElements: CustomElementRegistry) {
-  if (customElements != null) {
-    const registry = registryMap.get(customElements as any);
-    if (registry != null) {
-      registry.clear();
-    }
-
-    const whenDefinedResolves = whenDefinedResolvesMap.get(customElements as any);
-    if (whenDefinedResolves != null) {
-      whenDefinedResolves.clear();
-    }
-  }
-}
-
 
 export function createCustomElement(customElements: MockCustomElementRegistry, ownerDocument: any, tagName: string) {
   const Cstr = customElements.get(tagName);
@@ -127,36 +112,39 @@ export function createCustomElement(customElements: MockCustomElementRegistry, o
     return cmp;
   }
 
-  const host = new Proxy({}, {
-    get(obj: any, prop: string) {
-      const elm = proxyElements.get(host);
-      if (elm != null) {
-        return elm[prop];
-      }
-      return obj[prop];
-    },
-    set(obj: any, prop: string, val: any) {
-      const elm = proxyElements.get(host);
-      if (elm != null) {
-        elm[prop] = val;
-      } else {
-        obj[prop] = val;
-      }
-      return true;
-    },
-    has(obj: any, prop: string) {
-      const elm = proxyElements.get(host);
-      if (prop in elm) {
+  const host = new Proxy(
+    {},
+    {
+      get(obj: any, prop: string) {
+        const elm = proxyElements.get(host);
+        if (elm != null) {
+          return elm[prop];
+        }
+        return obj[prop];
+      },
+      set(obj: any, prop: string, val: any) {
+        const elm = proxyElements.get(host);
+        if (elm != null) {
+          elm[prop] = val;
+        } else {
+          obj[prop] = val;
+        }
         return true;
-      }
-      if (prop in obj) {
-        return true;
-      }
-      return false;
-    }
-  });
+      },
+      has(obj: any, prop: string) {
+        const elm = proxyElements.get(host);
+        if (prop in elm) {
+          return true;
+        }
+        if (prop in obj) {
+          return true;
+        }
+        return false;
+      },
+    },
+  );
 
-  const elm = new MockElement(ownerDocument, tagName);
+  const elm = new MockHTMLElement(ownerDocument, tagName);
 
   proxyElements.set(host, elm);
 
@@ -167,17 +155,14 @@ const proxyElements = new WeakMap();
 
 const upgradedElements = new WeakSet();
 
-
 export function connectNode(ownerDocument: any, node: MockNode) {
   node.ownerDocument = ownerDocument;
 
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
     if (ownerDocument != null && node.nodeName.includes('-')) {
       const win = ownerDocument.defaultView as Window;
-      if (win != null && win.customElements != null) {
-        if (typeof (node as any).connectedCallback === 'function' && node.isConnected) {
-          fireConnectedCallback(node);
-        }
+      if (win != null && typeof (node as any).connectedCallback === 'function' && node.isConnected) {
+        fireConnectedCallback(node);
       }
 
       const shadowRoot = ((node as any) as Element).shadowRoot;
@@ -191,7 +176,6 @@ export function connectNode(ownerDocument: any, node: MockNode) {
     node.childNodes.forEach(childNode => {
       connectNode(ownerDocument, childNode);
     });
-
   } else {
     node.childNodes.forEach(childNode => {
       childNode.ownerDocument = ownerDocument;
@@ -210,7 +194,6 @@ function fireConnectedCallback(node: any) {
     }
   }
 }
-
 
 export function disconnectNode(node: MockNode) {
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE) {
@@ -241,7 +224,7 @@ export function attributeChanged(node: MockNode, attrName: string, oldValue: str
 }
 
 export function checkAttributeChanged(node: MockNode) {
-  return (node.nodeName.includes('-') === true && typeof (node as any).attributeChangedCallback === 'function');
+  return node.nodeName.includes('-') === true && typeof (node as any).attributeChangedCallback === 'function';
 }
 
 const tempDisableCallbacks = new Set();

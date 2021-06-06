@@ -1,67 +1,55 @@
-import { Config } from '../../declarations';
-import { normalizePath } from '@utils';
-import { setStringConfig } from './config-utils';
-import ts from 'typescript';
+import type * as d from '../../declarations';
+import { isAbsolute, join } from 'path';
 
+export const validatePaths = (config: d.Config) => {
+  if (typeof config.rootDir !== 'string') {
+    config.rootDir = '/';
+  }
 
-export function validatePaths(config: Config) {
-  const path = config.sys.path;
+  if (typeof config.srcDir !== 'string') {
+    config.srcDir = DEFAULT_SRC_DIR;
+  }
+  if (!isAbsolute(config.srcDir)) {
+    config.srcDir = join(config.rootDir, config.srcDir);
+  }
 
-  if (typeof config.globalScript === 'string' && !path.isAbsolute(config.globalScript)) {
-    if (!path.isAbsolute(config.globalScript)) {
-      config.globalScript = path.join(config.rootDir, config.globalScript);
+  if (typeof config.cacheDir !== 'string') {
+    config.cacheDir = DEFAULT_CACHE_DIR;
+  }
+  if (!isAbsolute(config.cacheDir)) {
+    config.cacheDir = join(config.rootDir, config.cacheDir);
+  }
+
+  if (typeof config.srcIndexHtml !== 'string') {
+    config.srcIndexHtml = join(config.srcDir, DEFAULT_INDEX_HTML);
+  }
+  if (!isAbsolute(config.srcIndexHtml)) {
+    config.srcIndexHtml = join(config.rootDir, config.srcIndexHtml);
+  }
+
+  if (typeof config.globalScript === 'string' && !isAbsolute(config.globalScript)) {
+    if (!isAbsolute(config.globalScript)) {
+      config.globalScript = join(config.rootDir, config.globalScript);
     }
-    config.globalScript = normalizePath(config.globalScript);
   }
 
   if (typeof config.globalStyle === 'string') {
-    if (!path.isAbsolute(config.globalStyle)) {
-      config.globalStyle = path.join(config.rootDir, config.globalStyle);
+    if (!isAbsolute(config.globalStyle)) {
+      config.globalStyle = join(config.rootDir, config.globalStyle);
     }
-    config.globalStyle = normalizePath(config.globalStyle);
   }
-
-  setStringConfig(config, 'srcDir', DEFAULT_SRC_DIR);
-  if (!path.isAbsolute(config.srcDir)) {
-    config.srcDir = path.join(config.rootDir, config.srcDir);
-  }
-  config.srcDir = normalizePath(config.srcDir);
-
-  setStringConfig(config, 'cacheDir', DEFAULT_CACHE_DIR);
-  if (!path.isAbsolute(config.cacheDir)) {
-    config.cacheDir = path.join(config.rootDir, config.cacheDir);
-  }
-  config.cacheDir = normalizePath(config.cacheDir);
-
-  if (typeof config.tsconfig === 'string') {
-    if (!path.isAbsolute(config.tsconfig)) {
-      config.tsconfig = path.join(config.rootDir, config.tsconfig);
-    }
-
-  } else {
-    config.tsconfig = ts.findConfigFile(config.rootDir, ts.sys.fileExists);
-  }
-
-  if (typeof config.tsconfig === 'string') {
-    config.tsconfig = normalizePath(config.tsconfig);
-  }
-
-  setStringConfig(config, 'srcIndexHtml', normalizePath(path.join(config.srcDir, DEFAULT_INDEX_HTML)));
-  if (!path.isAbsolute(config.srcIndexHtml)) {
-    config.srcIndexHtml = path.join(config.rootDir, config.srcIndexHtml);
-  }
-  config.srcIndexHtml = normalizePath(config.srcIndexHtml);
 
   if (config.writeLog) {
-    setStringConfig(config, 'buildLogFilePath', DEFAULT_BUILD_LOG_FILE_NAME);
-    if (!path.isAbsolute(config.buildLogFilePath)) {
-      config.buildLogFilePath = path.join(config.rootDir, config.buildLogFilePath);
+    if (typeof config.buildLogFilePath !== 'string') {
+      config.buildLogFilePath = DEFAULT_BUILD_LOG_FILE_NAME;
     }
-    config.buildLogFilePath = normalizePath(config.buildLogFilePath);
-    config.logger.buildLogFilePath = config.buildLogFilePath;
+    if (!isAbsolute(config.buildLogFilePath)) {
+      config.buildLogFilePath = join(config.rootDir, config.buildLogFilePath);
+    }
   }
-}
 
+  config.packageJsonFilePath = join(config.rootDir, 'package.json');
+};
 
 const DEFAULT_BUILD_LOG_FILE_NAME = 'stencil-build.log';
 const DEFAULT_CACHE_DIR = '.stencil';

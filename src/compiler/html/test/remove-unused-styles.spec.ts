@@ -1,15 +1,13 @@
-import * as d from '@stencil/core/declarations';
+import type * as d from '@stencil/core/declarations';
 import { mockDocument } from '@stencil/core/testing';
 import { removeUnusedStyles } from '../remove-unused-styles';
 
-
 describe('removeUnusedStyles', () => {
-
   let results: d.HydrateResults;
 
   beforeEach(() => {
     results = {
-      diagnostics: []
+      diagnostics: [],
     } as any;
   });
 
@@ -31,7 +29,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -58,7 +56,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -87,7 +85,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -121,18 +119,18 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
     const css = doc.querySelector('style').innerHTML;
 
-    expectSelector(css, 'div { font: used; }');
-    expectSelector(css, 'label { font: used; }');
-    expectSelector(css, 'div label { font: used; }');
-    expectSelector(css, 'div label#usedId { font: used; }');
-    expectSelector(css, 'div label#usedId.my-used { font: used; }');
-    expectSelector(css, 'div label#usedId.my-used[mph] { font: used; }');
+    expectSelector(css, 'div{font:used}');
+    expectSelector(css, 'label{font:used}');
+    expectSelector(css, 'div label{font:used}');
+    expectSelector(css, 'div label#usedId{font:used}');
+    expectSelector(css, 'div label#usedId.my-used{font:used}');
+    expectSelector(css, 'div label#usedId.my-used[mph]{font:used}');
   });
 
   it('should remove unused id selector', () => {
@@ -156,13 +154,13 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
     const css = doc.querySelector('style').innerHTML;
 
-    expectSelector(css, 'label { font: used; }');
+    expectSelector(css, 'label{font:used}');
     expectSelector(css, 'label#usedId');
     expectSelector(css, '#another-UsedId');
     expectNoSelector(css, 'label#unusedId');
@@ -185,13 +183,13 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
     const css = doc.querySelector('style').innerHTML;
 
-    expectSelector(css, 'label { font: used; }');
+    expectSelector(css, 'label{font:used}');
     expectSelector(css, 'label[mph="88"]');
     expectNoSelector(css, 'label[unused="val"]');
   });
@@ -211,7 +209,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -236,7 +234,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -262,7 +260,7 @@ describe('removeUnusedStyles', () => {
       </html>
     `);
 
-    removeUnusedStyles(doc, results);
+    removeUnusedStyles(doc, results.diagnostics);
 
     expect(results.diagnostics).toHaveLength(0);
 
@@ -272,21 +270,13 @@ describe('removeUnusedStyles', () => {
     expectNoSelector(css, '.unused-class');
   });
 
-
   function expectSelector(css: string, selector: string) {
-    selector = selector.replace(/ \{ /g, '{')
-                       .replace(/ \} /g, '}')
-                       .replace(/\: /g, ':')
-                       .replace(/\; /g, ';');
+    selector = selector.replace(/ \{ /g, '{').replace(/ \} /g, '}').replace(/\: /g, ':').replace(/\; /g, ';');
     expect(css).toContain(selector);
   }
 
   function expectNoSelector(css: string, selector: string) {
-    selector = selector.replace(/ \{ /g, '{')
-                       .replace(/ \} /g, '}')
-                       .replace(/\: /g, ':')
-                       .replace(/\; /g, ';');
+    selector = selector.replace(/ \{ /g, '{').replace(/ \} /g, '}').replace(/\: /g, ':').replace(/\; /g, ';');
     expect(css).not.toContain(selector);
   }
-
 });

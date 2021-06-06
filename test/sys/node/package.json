@@ -1,7 +1,0 @@
-{
-  "scripts": {
-    "test": "node ../../../node_modules/.bin/jest --no-cache",
-    "test.watch": "node ../../../node_modules/.bin/jest --watch",
-    "test.prod": "npm run test"
-  }
-}

@@ -1,16 +1,16 @@
-import { createElement } from './element';
 import { MockComment } from './comment-node';
+import { NODE_NAMES, NODE_TYPES } from './constants';
 import { MockDocumentFragment } from './document-fragment';
 import { MockDocumentTypeNode } from './document-type-node';
-import { MockElement, MockTextNode, resetElement } from './node';
-import { NODE_NAMES, NODE_TYPES } from './constants';
+import { MockElement, MockHTMLElement, MockTextNode, resetElement } from './node';
+import { MockBaseElement, createElement, createElementNS } from './element';
 import { parseDocumentUtil } from './parse-util';
 import { parseHtmlToFragment } from './parse-html';
 import { resetEventListeners } from './event';
 import { MockWindow } from './window';
+import { MockAttr } from './attribute';
 
-
-export class MockDocument extends MockElement {
+export class MockDocument extends MockHTMLElement {
   defaultView: any;
   cookie: string;
   referrer: string;
@@ -33,14 +33,20 @@ export class MockDocument extends MockElement {
         this.appendChild(documentElement);
         setOwnerDocument(documentElement, this);
       }
-
     } else if (html !== false) {
-      const documentElement = new MockElement(this, 'html');
+      const documentElement = new MockHTMLElement(this, 'html');
       this.appendChild(documentElement);
 
-      documentElement.appendChild(new MockElement(this, 'head'));
-      documentElement.appendChild(new MockElement(this, 'body'));
+      documentElement.appendChild(new MockHTMLElement(this, 'head'));
+      documentElement.appendChild(new MockHTMLElement(this, 'body'));
     }
+  }
+
+  get dir() {
+    return this.documentElement.dir;
+  }
+  set dir(value: string) {
+    this.documentElement.dir = value;
   }
 
   get location() {
@@ -56,15 +62,35 @@ export class MockDocument extends MockElement {
   }
 
   get baseURI() {
-    if (this.defaultView != null) {
-      return (this.defaultView as Window).location.href;
+    const baseNode = this.head.childNodes.find(node => node.nodeName === 'BASE') as MockBaseElement;
+    if (baseNode) {
+      return baseNode.href;
     }
-    return '';
+    return this.URL;
   }
-  set baseURI(value: string) {
-    if (this.defaultView != null) {
-      (this.defaultView as Window).location.href = value;
-    }
+
+  get URL() {
+    return this.location.href;
+  }
+
+  get styleSheets() {
+    return this.querySelectorAll('style');
+  }
+
+  get scripts() {
+    return this.querySelectorAll('script');
+  }
+
+  get forms() {
+    return this.querySelectorAll('form');
+  }
+
+  get images() {
+    return this.querySelectorAll('img');
+  }
+
+  get scrollingElement() {
+    return this.documentElement;
   }
 
   get documentElement() {
@@ -74,7 +100,7 @@ export class MockDocument extends MockElement {
       }
     }
 
-    const documentElement = new MockElement(this, 'html');
+    const documentElement = new MockHTMLElement(this, 'html');
     this.appendChild(documentElement);
     return documentElement;
   }
@@ -98,7 +124,7 @@ export class MockDocument extends MockElement {
       }
     }
 
-    const head = new MockElement(this, 'head');
+    const head = new MockHTMLElement(this, 'head');
     documentElement.insertBefore(head, documentElement.firstChild);
     return head;
   }
@@ -123,7 +149,7 @@ export class MockDocument extends MockElement {
       }
     }
 
-    const body = new MockElement(this, 'body');
+    const body = new MockHTMLElement(this, 'body');
     documentElement.appendChild(body);
     return body;
   }
@@ -151,6 +177,14 @@ export class MockDocument extends MockElement {
     return new MockComment(this, data);
   }
 
+  createAttribute(attrName: string) {
+    return new MockAttr(attrName.toLowerCase(), '');
+  }
+
+  createAttributeNS(namespaceURI: string, attrName: string) {
+    return new MockAttr(attrName, '', namespaceURI);
+  }
+
   createElement(tagName: string) {
     if (tagName === NODE_NAMES.DOCUMENT_NODE) {
       const doc = new MockDocument(false as any);
@@ -163,7 +197,7 @@ export class MockDocument extends MockElement {
   }
 
   createElementNS(namespaceURI: string, tagName: string) {
-    const elmNs = new MockElement(this, tagName);
+    const elmNs = createElementNS(this, namespaceURI, tagName);
     elmNs.namespaceURI = namespaceURI;
     return elmNs;
   }
@@ -184,29 +218,14 @@ export class MockDocument extends MockElement {
     return getElementById(this, id);
   }
 
-  getElementsByClassName(classNames: string) {
-    const foundElms: MockElement[] = [];
-    const classes = classNames.trim().split(' ').filter(c => c.length > 0);
-    getElementsByClassName(this, classes, foundElms);
-    return foundElms;
-  }
-
-  getElementsByTagName(tagName: string) {
-    const foundElms: MockElement[] = [];
-    getElementsByTagName(this, tagName.toLowerCase(), foundElms);
-    return foundElms;
-  }
-
   getElementsByName(elmName: string) {
-    const foundElms: MockElement[] = [];
-    getElementsByName(this, elmName.toLowerCase(), foundElms);
-    return foundElms;
+    return getElementsByName(this, elmName.toLowerCase());
   }
 
   get title() {
     const title = this.head.childNodes.find(elm => elm.nodeName === 'TITLE') as MockElement;
-    if (title != null) {
-      return title.textContent;
+    if (title != null && typeof title.textContent === 'string') {
+      return title.textContent.trim();
     }
     return '';
   }
@@ -219,7 +238,6 @@ export class MockDocument extends MockElement {
     }
     title.textContent = value;
   }
-
 }
 
 export function createDocument(html: string | boolean = null): Document {
@@ -236,12 +254,12 @@ export function resetDocument(doc: Document) {
 
     const documentElement = doc.documentElement;
     if (documentElement != null) {
-      resetElement(documentElement);
+      resetElement(documentElement as any);
 
       for (let i = 0, ii = documentElement.childNodes.length; i < ii; i++) {
         const childNode = documentElement.childNodes[i];
-        resetElement(childNode);
-        childNode.childNodes.length = 0;
+        resetElement(childNode as any);
+        (childNode.childNodes as any).length = 0;
       }
     }
 
@@ -273,10 +291,10 @@ const DOC_KEY_KEEPERS = new Set([
   'ownerDocument',
   'parentNode',
   'childNodes',
-  '_shadowRoot'
+  '_shadowRoot',
 ]);
 
-function getElementById(elm: MockElement, id: string): MockElement {
+export function getElementById(elm: MockElement, id: string): MockElement {
   const children = elm.children;
   for (let i = 0, ii = children.length; i < ii; i++) {
     const childElm = children[i];
@@ -291,34 +309,7 @@ function getElementById(elm: MockElement, id: string): MockElement {
   return null;
 }
 
-
-function getElementsByClassName(elm: MockElement, classNames: string[], foundElms: MockElement[]) {
-  const children = elm.children;
-  for (let i = 0, ii = children.length; i < ii; i++) {
-    const childElm = children[i];
-    for (let j = 0, jj = classNames.length; j < jj; j++) {
-      if (childElm.classList.contains(classNames[j])) {
-        foundElms.push(childElm);
-      }
-    }
-    getElementsByClassName(childElm, classNames, foundElms);
-  }
-}
-
-
-function getElementsByTagName(elm: MockElement, tagName: string, foundElms: MockElement[]) {
-  const children = elm.children;
-  for (let i = 0, ii = children.length; i < ii; i++) {
-    const childElm = children[i];
-    if (childElm.nodeName.toLowerCase() === tagName) {
-      foundElms.push(childElm);
-    }
-    getElementsByTagName(childElm, tagName, foundElms);
-  }
-}
-
-
-function getElementsByName(elm: MockElement, elmName: string, foundElms: MockElement[]) {
+function getElementsByName(elm: MockElement, elmName: string, foundElms: MockElement[] = []) {
   const children = elm.children;
   for (let i = 0, ii = children.length; i < ii; i++) {
     const childElm = children[i];
@@ -327,8 +318,8 @@ function getElementsByName(elm: MockElement, elmName: string, foundElms: MockEle
     }
     getElementsByName(childElm, elmName, foundElms);
   }
+  return foundElms;
 }
-
 
 export function setOwnerDocument(elm: MockElement, ownerDocument: any) {
   for (let i = 0, ii = elm.childNodes.length; i < ii; i++) {

@@ -1,8 +1,6 @@
 import { propsToMarkdown } from '../../docs/readme/markdown-props';
 
-
 describe('markdown props', () => {
-
   it('advanced union types', () => {
     const markdown = propsToMarkdown([
       {
@@ -14,7 +12,9 @@ describe('markdown props', () => {
         mutable: false,
         optional: false,
         required: false,
-        reflectToAttr: false
+        reflectToAttr: false,
+        docsTags: [],
+        values: [],
       },
       {
         name: 'hello',
@@ -25,8 +25,10 @@ describe('markdown props', () => {
         mutable: false,
         optional: false,
         required: false,
-        reflectToAttr: false
-      }
+        reflectToAttr: false,
+        docsTags: [],
+        values: [],
+      },
     ]).join('\n');
     expect(markdown).toEqual(`## Properties
 

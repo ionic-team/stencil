@@ -1,4 +1,3 @@
-
 export const enum MEMBER_FLAGS {
   String = 1 << 0,
   Number = 1 << 1,
@@ -31,29 +30,38 @@ export const enum LISTENER_FLAGS {
 
   TargetDocument = 1 << 2,
   TargetWindow = 1 << 3,
-  TargetParent = 1 << 4,
-  TargetBody = 1 << 5,
+  TargetBody = 1 << 4,
+
+  /**
+   * @deprecated Prevented from new apps, but left in for older collections
+   */
+  TargetParent = 1 << 5,
 }
 
 export const enum HOST_FLAGS {
   hasConnected = 1 << 0,
   hasRendered = 1 << 1,
-  isActiveRender = 1 << 2,
+  isWaitingForChildren = 1 << 2,
   isConstructingInstance = 1 << 3,
   isQueuedForUpdate = 1 << 4,
-  isShadowDom = 1 << 5,
-  isScoped = 1 << 6,
-  useNativeShadowDom = 1 << 7,
-  hasInitializedComponent = 1 << 8,
-  hasLoadedComponent = 1 << 9,
+  hasInitializedComponent = 1 << 5,
+  hasLoadedComponent = 1 << 6,
+  isWatchReady = 1 << 7,
+  isListenReady = 1 << 8,
+  needsRerender = 1 << 9,
+
+  // DEV ONLY
+  devOnRender = 1 << 10,
+  devOnDidLoad = 1 << 11,
 }
 
 export const enum CMP_FLAGS {
   shadowDomEncapsulation = 1 << 0,
   scopedCssEncapsulation = 1 << 1,
   hasSlotRelocation = 1 << 2,
-
   needsShadowDomShim = 1 << 3,
+  shadowDelegatesFocus = 1 << 4,
+  hasMode = 1 << 5,
   needsScopedEncapsulation = scopedCssEncapsulation | needsShadowDomShim,
 }
 
@@ -72,6 +80,7 @@ export const EMPTY_OBJ: any = {};
  * Namespaces
  */
 export const SVG_NS = 'http://www.w3.org/2000/svg';
+export const HTML_NS = 'http://www.w3.org/1999/xhtml';
 export const XLINK_NS = 'http://www.w3.org/1999/xlink';
 export const XML_NS = 'http://www.w3.org/XML/1998/namespace';
 

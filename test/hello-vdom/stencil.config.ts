@@ -1,20 +1,12 @@
-import { Config } from '../../dist';
+import { Config } from '../../internal';
 
 export const config: Config = {
-
-  hashFileNames: false,
-
-  outputTargets: [
-    {
-      type: 'www',
-      serviceWorker: null
-    }
-  ],
-
-  enableCache: false,
-
+  namespace: 'HelloVDom',
+  outputTargets: [{ type: 'dist' }, { type: 'www', serviceWorker: null }],
   devServer: {
-    logRequests: true
-  }
-
+    logRequests: true,
+  },
+  hashFileNames: false,
+  hydratedFlag: null,
+  taskQueue: 'immediate',
 };

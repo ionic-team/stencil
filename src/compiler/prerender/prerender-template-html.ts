@@ -1,106 +1,111 @@
-import * as d from '../../declarations';
-import { catchError } from '@utils';
+import type * as d from '../../declarations';
+import { catchError, isPromise, isFunction, isString } from '@utils';
+import {
+  hasStencilScript,
+  inlineExternalStyleSheets,
+  minifyScriptElements,
+  minifyStyleElements,
+  removeStencilScripts,
+} from './prerender-optimize';
+import { createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 
-
-export async function generateTemplateHtml(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
+export const generateTemplateHtml = async (
+  config: d.Config,
+  prerenderConfig: d.PrerenderConfig,
+  diagnostics: d.Diagnostic[],
+  isDebug: boolean,
+  srcIndexHtmlPath: string,
+  outputTarget: d.OutputTargetWww,
+  hydrateOpts: d.PrerenderHydrateOptions,
+  manager: d.PrerenderManager
+) => {
   try {
-    const templateHtml = await config.sys.fs.readFile(outputTarget.indexHtml);
-    const templateDoc = config.sys.createDocument(templateHtml);
-
-    validateTemplateHtml(config, buildCtx, templateDoc);
-
-    await inlineStyleSheets(config, templateDoc, outputTarget);
-
-    if (config.minifyJs && config.logLevel !== 'debug') {
-      await minifyScriptElements(config, templateDoc);
+    if (!isString(srcIndexHtmlPath)) {
+      srcIndexHtmlPath = outputTarget.indexHtml;
     }
 
-    return config.sys.serializeNodeToHtml(templateDoc);
+    let templateHtml: string;
+    if (isFunction(prerenderConfig.loadTemplate)) {
+      const loadTemplateResult = prerenderConfig.loadTemplate(srcIndexHtmlPath);
+      if (isPromise(loadTemplateResult)) {
+        templateHtml = await loadTemplateResult;
+      } else {
+        templateHtml = loadTemplateResult;
+      }
+    } else {
+      templateHtml = await config.sys.readFile(srcIndexHtmlPath);
+    }
+
+    let doc = createDocument(templateHtml);
+
+    let staticSite = false;
+
+    if (prerenderConfig.staticSite) {
+      // purposely do not want any clientside JS
+      // go through the document and remove only stencil's scripts
+      removeStencilScripts(doc);
+      staticSite = true;
+    } else {
+      // config didn't set if it's a staticSite only,
+      // but the HTML may not have any stencil scripts at all,
+      // so we'll need to know that so we don't add preload modules
+      // if there isn't at least one stencil script then it's a static site
+      staticSite = !hasStencilScript(doc);
+    }
+
+    doc.documentElement.classList.add('hydrated');
+
+    if (hydrateOpts.inlineExternalStyleSheets && !isDebug) {
+      try {
+        await inlineExternalStyleSheets(config.sys, outputTarget.appDir, doc);
+      } catch (e) {
+        catchError(diagnostics, e);
+      }
+    }
+
+    if (hydrateOpts.minifyScriptElements && !isDebug) {
+      try {
+        await minifyScriptElements(doc, true);
+      } catch (e) {
+        catchError(diagnostics, e);
+      }
+    }
+
+    if (hydrateOpts.minifyStyleElements && !isDebug) {
+      try {
+        const baseUrl = new URL(outputTarget.baseUrl, manager.devServerHostUrl);
+        await minifyStyleElements(config.sys, outputTarget.appDir, doc, baseUrl, true);
+      } catch (e) {
+        catchError(diagnostics, e);
+      }
+    }
+
+    if (isFunction(prerenderConfig.beforeSerializeTemplate)) {
+      const beforeSerializeResults = prerenderConfig.beforeSerializeTemplate(doc);
+      if (isPromise(beforeSerializeResults)) {
+        doc = await beforeSerializeResults;
+      } else {
+        doc = beforeSerializeResults;
+      }
+    }
+
+    let html = serializeNodeToHtml(doc);
+
+    if (isFunction(prerenderConfig.afterSerializeTemplate)) {
+      const afterSerializeResults = prerenderConfig.afterSerializeTemplate(html);
+      if (isPromise(afterSerializeResults)) {
+        html = await afterSerializeResults;
+      } else {
+        html = afterSerializeResults;
+      }
+    }
+
+    return {
+      html,
+      staticSite,
+    };
   } catch (e) {
-    catchError(buildCtx.diagnostics, e);
+    catchError(diagnostics, e);
   }
   return undefined;
-}
-
-
-function validateTemplateHtml(_config: d.Config, _buildCtx: d.BuildCtx, _doc: Document) {
-  // TODO
-}
-
-
-function inlineStyleSheets(config: d.Config, doc: Document, outputTarget: d.OutputTargetWww) {
-  const globalLinks = Array.from(doc.querySelectorAll('link[rel=stylesheet]')) as HTMLLinkElement[];
-  return Promise.all(
-    globalLinks.map(async link => {
-      const href = link.getAttribute('href');
-      if (!href.startsWith('/') || link.getAttribute('media') !== null) {
-        return;
-      }
-      const fsPath = config.sys.path.join(outputTarget.appDir, href);
-      if (!config.sys.fs.existsSync(fsPath)) {
-        return;
-      }
-      const styles = await config.sys.fs.readFile(fsPath);
-
-      // insert inline <style>
-      const inlinedStyles = doc.createElement('style');
-      inlinedStyles.innerHTML = styles;
-      link.parentNode.insertBefore(inlinedStyles, link);
-      link.remove();
-
-      // mark inlinedStyle as treeshakable
-      inlinedStyles.setAttribute('data-styles', '');
-
-      // since it's not longer a critical resource
-      link.setAttribute('importance', 'low');
-
-      // move <link rel="stylesheet"> to the end of <body>
-      doc.body.appendChild(link);
-    })
-  );
-}
-
-
-function minifyScriptElements(config: d.Config, doc: Document) {
-  const scriptElms = (Array.from(doc.querySelectorAll('script')) as HTMLScriptElement[])
-    .filter(scriptElm => {
-      if (scriptElm.hasAttribute('src')) {
-        return false;
-      }
-      const scriptType = scriptElm.getAttribute('type');
-      if (typeof scriptType === 'string' && scriptType !== 'module' && scriptType !== 'text/javascript') {
-        return false;
-      }
-      return true;
-    });
-
-  return Promise.all(scriptElms.map(async scriptElm => {
-    const innerHTML = scriptElm.innerHTML;
-
-    const opts: any = {
-      output: {},
-      compress: {}
-    };
-
-    if (scriptElm.getAttribute('type') === 'module') {
-      opts.ecma = 7;
-      opts.module = true;
-      opts.output.ecma = 7;
-      opts.compress.ecma = 7;
-      opts.compress.arrows = true;
-      opts.compress.module = true;
-
-    } else {
-      opts.ecma = 5;
-      opts.output.ecma = 5;
-      opts.compress.ecma = 5;
-      opts.compress.arrows = false;
-      opts.compress.module = false;
-    }
-
-    const results = await config.sys.minifyJs(innerHTML, opts);
-    if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0) {
-      scriptElm.innerHTML = results.output;
-    }
-  }));
-}
+};

@@ -1,8 +1,7 @@
-import * as d from '../declarations';
+import type { CompilerSystem, Logger } from '../declarations';
 
-
-export function taskHelp(process: NodeJS.Process, logger: d.Logger) {
-  const p = logger.dim((process.platform === 'win32') ? '>' : '$');
+export const taskHelp = (sys: CompilerSystem, logger: Logger) => {
+  const p = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
 
   console.log(`
   ${logger.bold('Build:')} ${logger.dim('Build components for development or production.')}
@@ -28,11 +27,18 @@ export function taskHelp(process: NodeJS.Process, logger: d.Logger) {
       ${logger.cyan('--e2e')} ${logger.dim('.............')} Run e2e tests with Puppeteer
 
 
+  ${logger.bold('Generate:')} ${logger.dim('Bootstrap components.')}
+
+    ${p} ${logger.green('stencil generate')} or ${logger.green('stencil g')}
+
+
   ${logger.bold('Examples:')}
 
     ${p} ${logger.green('stencil build --dev --watch --serve')}
     ${p} ${logger.green('stencil build --prerender')}
     ${p} ${logger.green('stencil test --spec --e2e')}
+    ${p} ${logger.green('stencil generate')}
+    ${p} ${logger.green('stencil g my-component')}
 
 `);
-}
+};

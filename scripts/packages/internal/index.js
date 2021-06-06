@@ -1,1 +1,0 @@
-/*  @stencil/core/internal  */

@@ -1,8 +1,11 @@
-import * as d from '../../declarations';
+import type * as d from '@stencil/core/internal';
+import { BUILD, Env } from '@app-data';
 import { expectExtend } from '../matchers';
-import { setupGlobal, teardownGlobal } from '@mock-doc';
+import { setupGlobal, teardownGlobal } from '@stencil/core/mock-doc';
 import { setupMockFetch } from '../mock-fetch';
 import { HtmlSerializer } from './jest-serializer';
+import { resetBuildConditionals } from '../reset-build-conditionals';
+import { resetPlatform, stopAutoApplyChanges, modeResolutionChain, setErrorHandler } from '@stencil/core/internal/testing';
 
 declare const global: d.JestEnvironmentGlobal;
 
@@ -17,17 +20,18 @@ export function jestSetupTestFramework() {
   setupMockFetch(global);
 
   beforeEach(() => {
-    const bc = require('@stencil/core/build-conditionals');
-    const platform = require('@stencil/core/platform');
-
     // reset the platform for this new test
-    platform.resetPlatform();
-    bc.resetBuildConditionals(bc.BUILD);
+    resetPlatform();
+    setErrorHandler(undefined);
+    resetBuildConditionals(BUILD);
+    modeResolutionChain.length = 0;
   });
 
-  afterEach(() => {
-    const platform = require('@stencil/core/platform');
-    platform.stopAutoApplyChanges();
+  afterEach(async () => {
+    if (global.__CLOSE_OPEN_PAGES__) {
+      await global.__CLOSE_OPEN_PAGES__();
+    }
+    stopAutoApplyChanges();
 
     teardownGlobal(global);
     global.Context = {};
@@ -39,7 +43,7 @@ export function jestSetupTestFramework() {
     jasmineEnv.addReporter({
       specStarted: (spec: any) => {
         global.currentSpec = spec;
-      }
+      },
     });
   }
 
@@ -48,6 +52,12 @@ export function jestSetupTestFramework() {
   const env: d.E2EProcessEnv = process.env;
 
   if (typeof env.__STENCIL_DEFAULT_TIMEOUT__ === 'string') {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10);
+    const time = parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10);
+    jest.setTimeout(time * 1.5);
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = time;
+  }
+  if (typeof env.__STENCIL_ENV__ === 'string') {
+    const stencilEnv = JSON.parse(env.__STENCIL_ENV__);
+    Object.assign(Env, stencilEnv);
   }
 }

@@ -11,15 +11,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { ShadowCss } from '../shadow-css';
+import { scopeCss } from '../shadow-css';
 import { convertScopedToShadow } from '../../runtime/styles';
 
-
 describe('ShadowCss', function() {
-
-  function s(cssText: string, scopeId: string, hostScopeId = '', slotScopeId = '', commentOriginalSelector = false) {
-    const sc = new ShadowCss();
-    const shim = sc.shimCssText(cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector);
+  function s(cssText: string, scopeId: string, commentOriginalSelector = false) {
+    const shim = scopeCss(cssText, scopeId, commentOriginalSelector);
 
     const nlRegexp = /\n/g;
     return normalizeCSS(shim.replace(nlRegexp, ''));
@@ -30,18 +27,18 @@ describe('ShadowCss', function() {
   });
 
   it('should handle empty string, commented org selector', () => {
-    expect(s('', 'a', 'h', 's', true)).toEqual('');
+    expect(s('', 'a', true)).toEqual('');
   });
 
   it('div', () => {
-    const r = s('div {}', 'sc-ion-tag', 'sc-ion-tag-h', '', true);
+    const r = s('div {}', 'sc-ion-tag', true);
     expect(r).toEqual('/*!@div*/div.sc-ion-tag {}');
   });
 
   it('should add an attribute to every rule, commented org selector', () => {
     const css = 'one {color: red;}two {color: red;}';
     const expected = '/*!@one*/one.a {color:red;}/*!@two*/two.a {color:red;}';
-    expect(s(css, 'a', 'h', 's', true)).toEqual(expected);
+    expect(s(css, 'a', true)).toEqual(expected);
   });
 
   it('should add an attribute to every rule', () => {
@@ -70,16 +67,14 @@ describe('ShadowCss', function() {
 
   it('should handle media rules', () => {
     const css = '@media screen and (max-width:800px, max-height:100%) {div {font-size:50px;}}';
-    const expected =
-        '@media screen and (max-width:800px, max-height:100%) {div.a {font-size:50px;}}';
+    const expected = '@media screen and (max-width:800px, max-height:100%) {div.a {font-size:50px;}}';
     expect(s(css, 'a')).toEqual(expected);
   });
 
   it('should handle media rules, commentOriginalSelector', () => {
     const css = '@media screen and (max-width:800px, max-height:100%) {div {font-size:50px;}}';
-    const expected =
-        '@media screen and (max-width:800px, max-height:100%) {/*!@div*/div.a {font-size:50px;}}';
-    expect(s(css, 'a', 'h', 's', true)).toEqual(expected);
+    const expected = '@media screen and (max-width:800px, max-height:100%) {/*!@div*/div.a {font-size:50px;}}';
+    expect(s(css, 'a', true)).toEqual(expected);
   });
 
   it('should handle page rules', () => {
@@ -91,7 +86,7 @@ describe('ShadowCss', function() {
   it('should handle page rules, commentOriginalSelector', () => {
     const css = '@page {div {font-size:50px;}}';
     const expected = '@page {/*!@div*/div.a {font-size:50px;}}';
-    expect(s(css, 'a', '', '', true)).toEqual(expected);
+    expect(s(css, 'a', true)).toEqual(expected);
   });
 
   it('should handle document rules', () => {
@@ -120,7 +115,7 @@ describe('ShadowCss', function() {
 
   it('should handle keyframes rules, commentOriginalSelector', () => {
     const css = '@keyframes foo {0% {transform:translate(-50%) scaleX(0);}}';
-    expect(s(css, 'a', '', '', true)).toEqual(css);
+    expect(s(css, 'a', true)).toEqual(css);
   });
 
   it('should handle -webkit-keyframes rules', () => {
@@ -134,9 +129,8 @@ describe('ShadowCss', function() {
     expect(s('one > two {}', 'a')).toEqual('one.a > two.a {}');
     expect(s('one + two {}', 'a')).toEqual('one.a + two.a {}');
     expect(s('one ~ two {}', 'a')).toEqual('one.a ~ two.a {}');
-    const res = s('.one.two > three {}', 'a');  // IE swap classes
-    expect(res === '.one.two.a > three.a {}' || res === '.two.one.a > three.a {}')
-        .toEqual(true);
+    const res = s('.one.two > three {}', 'a'); // IE swap classes
+    expect(res === '.one.two.a > three.a {}' || res === '.two.one.a > three.a {}').toEqual(true);
     expect(s('one[attr="value"] {}', 'a')).toEqual('one[attr="value"].a {}');
     expect(s('one[attr=value] {}', 'a')).toEqual('one[attr="value"].a {}');
     expect(s('one[attr^="value"] {}', 'a')).toEqual('one[attr^="value"].a {}');
@@ -149,155 +143,162 @@ describe('ShadowCss', function() {
     expect(s('[is="one"] {}', 'a')).toEqual('[is="one"].a {}');
   });
 
-  describe((':host'), () => {
-    it('should handle no context, commentOriginalSelector',
-        () => { expect(s(':host {}', 'a', 'a-h', '', true)).toEqual('/*!@:host*/.a-h {}'); });
-
-    it('should handle no context',
-        () => { expect(s(':host {}', 'a', 'a-h')).toEqual('.a-h {}'); });
-
-    it('should handle tag selector',
-        () => { expect(s(':host(ul) {}', 'a', 'a-h')).toEqual('ul.a-h {}'); });
-
-    it('should handle class selector',
-        () => { expect(s(':host(.x) {}', 'a', 'a-h')).toEqual('.x.a-h {}'); });
-
-    it('should handle attribute selector', () => {
-      expect(s(':host([a="b"]) {}', 'a', 'a-h')).toEqual('[a="b"].a-h {}');
-      expect(s(':host([a=b]) {}', 'a', 'a-h')).toEqual('[a="b"].a-h {}');
+  describe(':host', () => {
+    it('should handle no context, commentOriginalSelector', () => {
+      expect(s(':host {}', 'a', true)).toEqual('/*!@:host*/.a-h {}');
     });
 
-    it('should handle multiple tag selectors', () => {
-      expect(s(':host(ul,li) {}', 'a', 'a-h', '', true))
-        .toEqual('/*!@:host(ul,li)*/ul.a-h, li.a-h {}');
-      expect(s(':host(ul,li) > .z {}', 'a', 'a-h', '', true))
-        .toEqual('/*!@:host(ul,li) > .z*/ul.a-h > .z.a, li.a-h > .z.a {}');
-    });
-
-    it('should handle multiple tag selectors', () => {
-      expect(s(':host(ul,li) {}', 'a', 'a-h')).toEqual('ul.a-h, li.a-h {}');
-      expect(s(':host(ul,li) > .z {}', 'a', 'a-h'))
-          .toEqual('ul.a-h > .z.a, li.a-h > .z.a {}');
-    });
-
-    it('should handle multiple class selectors', () => {
-      expect(s(':host(.x,.y) {}', 'a', 'a-h')).toEqual('.x.a-h, .y.a-h {}');
-      expect(s(':host(.x,.y) > .z {}', 'a', 'a-h'))
-          .toEqual('.x.a-h > .z.a, .y.a-h > .z.a {}');
-    });
-
-    it('should handle multiple attribute selectors', () => {
-      expect(s(':host([a="b"],[c=d]) {}', 'a', 'a-h'))
-          .toEqual('[a="b"].a-h, [c="d"].a-h {}');
-    });
-
-    it('should handle multiple attribute selectors, commentOriginalSelector', () => {
-      expect(s(':host([a="b"],[c=d]) {}', 'a', 'a-h', '', true))
-          .toEqual('/*!@:host([a=\"b\"],[c=d])*/[a="b"].a-h, [c="d"].a-h {}');
-    });
-
-    it('should handle multiple attribute selectors, commentOriginalSelector', () => {
-      expect(s(':host([a="b"],[c=d]) {}', 'a', 'a-h', '', true))
-          .toEqual('/*!@:host([a="b"],[c=d])*/[a="b"].a-h, [c="d"].a-h {}');
-    });
-
-    it('should handle pseudo selectors', () => {
-      expect(s(':host(:before) {}', 'a', 'a-h')).toEqual('.a-h:before {}');
-      expect(s(':host:before {}', 'a', 'a-h')).toEqual('.a-h:before {}');
-      expect(s(':host:nth-child(8n+1) {}', 'a', 'a-h')).toEqual('.a-h:nth-child(8n+1) {}');
-      expect(s(':host:nth-of-type(8n+1) {}', 'a', 'a-h'))
-          .toEqual('.a-h:nth-of-type(8n+1) {}');
-      expect(s(':host(.class):before {}', 'a', 'a-h')).toEqual('.class.a-h:before {}');
-      expect(s(':host.class:before {}', 'a', 'a-h')).toEqual('.class.a-h:before {}');
-      expect(s(':host(:not(p)):before {}', 'a', 'a-h')).toEqual('.a-h:not(p):before {}');
-    });
-  });
-
-  describe((':host-context'), () => {
-
-    it('should handle tag selector, commentOriginalSelector', () => {
-      expect(s(':host-context(div) {}', 'a', 'a-h', '', true)).toEqual('/*!@:host-context(div)*/div.a-h, div .a-h {}');
-      expect(s(':host-context(ul) > .y {}', 'a', 'a-h', '', true))
-          .toEqual('/*!@:host-context(ul) > .y*/ul.a-h > .y.a, ul .a-h > .y.a {}');
+    it('should handle no context', () => {
+      expect(s(':host {}', 'a')).toEqual('.a-h {}');
     });
 
     it('should handle tag selector', () => {
-      expect(s(':host-context(div) {}', 'a', 'a-h')).toEqual('div.a-h, div .a-h {}');
-      expect(s(':host-context(ul) > .y {}', 'a', 'a-h'))
-          .toEqual('ul.a-h > .y.a, ul .a-h > .y.a {}');
+      expect(s(':host(ul) {}', 'a')).toEqual('ul.a-h {}');
     });
 
     it('should handle class selector', () => {
-      expect(s(':host-context(.x) {}', 'a', 'a-h')).toEqual('.x.a-h, .x .a-h {}');
-
-      expect(s(':host-context(.x) > .y {}', 'a', 'a-h'))
-          .toEqual('.x.a-h > .y.a, .x .a-h > .y.a {}');
+      expect(s(':host(.x) {}', 'a')).toEqual('.x.a-h {}');
     });
 
     it('should handle attribute selector', () => {
-      expect(s(':host-context([a="b"]) {}', 'a', 'a-h'))
-          .toEqual('[a="b"].a-h, [a="b"] .a-h {}');
-      expect(s(':host-context([a=b]) {}', 'a', 'a-h'))
-          .toEqual('[a=b].a-h, [a="b"] .a-h {}');
+      expect(s(':host([a="b"]) {}', 'a')).toEqual('[a="b"].a-h {}');
+      expect(s(':host([a=b]) {}', 'a')).toEqual('[a="b"].a-h {}');
+    });
+
+    it('should handle multiple tag selectors', () => {
+      expect(s(':host(ul,li) {}', 'a', true)).toEqual('/*!@:host(ul,li)*/ul.a-h, li.a-h {}');
+      expect(s(':host(ul,li) > .z {}', 'a', true)).toEqual('/*!@:host(ul,li) > .z*/ul.a-h > .z.a, li.a-h > .z.a {}');
+    });
+
+    it('should handle multiple tag selectors', () => {
+      expect(s(':host(ul,li) {}', 'a')).toEqual('ul.a-h, li.a-h {}');
+      expect(s(':host(ul,li) > .z {}', 'a')).toEqual('ul.a-h > .z.a, li.a-h > .z.a {}');
+    });
+
+    it('should handle multiple class selectors', () => {
+      expect(s(':host(.x,.y) {}', 'a')).toEqual('.x.a-h, .y.a-h {}');
+      expect(s(':host(.x,.y) > .z {}', 'a')).toEqual('.x.a-h > .z.a, .y.a-h > .z.a {}');
+    });
+
+    it('should handle multiple attribute selectors', () => {
+      expect(s(':host([a="b"],[c=d]) {}', 'a')).toEqual('[a="b"].a-h, [c="d"].a-h {}');
+    });
+
+    it('should handle multiple attribute selectors, commentOriginalSelector', () => {
+      expect(s(':host([a="b"],[c=d]) {}', 'a', true)).toEqual('/*!@:host([a="b"],[c=d])*/[a="b"].a-h, [c="d"].a-h {}');
+    });
+
+    it('should handle multiple attribute selectors, commentOriginalSelector', () => {
+      expect(s(':host([a="b"],[c=d]) {}', 'a', true)).toEqual('/*!@:host([a="b"],[c=d])*/[a="b"].a-h, [c="d"].a-h {}');
+    });
+
+    it('should handle pseudo selectors', () => {
+      expect(s(':host(:before) {}', 'a')).toEqual('.a-h:before {}');
+      expect(s(':host:before {}', 'a')).toEqual('.a-h:before {}');
+      expect(s(':host:nth-child(8n+1) {}', 'a')).toEqual('.a-h:nth-child(8n+1) {}');
+      expect(s(':host:nth-of-type(8n+1) {}', 'a')).toEqual('.a-h:nth-of-type(8n+1) {}');
+      expect(s(':host(.class):before {}', 'a')).toEqual('.class.a-h:before {}');
+      expect(s(':host.class:before {}', 'a')).toEqual('.class.a-h:before {}');
+      expect(s(':host(:not(p)):before {}', 'a')).toEqual('.a-h:not(p):before {}');
     });
   });
 
-  describe(('::slotted'), () => {
+  describe(':host-context', () => {
+    it('should handle tag selector, commentOriginalSelector', () => {
+      expect(s(':host-context(div) {}', 'a', true)).toEqual('/*!@:host-context(div)*/div.a-h, div .a-h {}');
+      expect(s(':host-context(ul) > .y {}', 'a', true)).toEqual('/*!@:host-context(ul) > .y*/ul.a-h > .y.a, ul .a-h > .y.a {}');
+    });
 
+    it('should handle tag selector', () => {
+      expect(s(':host-context(div) {}', 'a')).toEqual('div.a-h, div .a-h {}');
+      expect(s(':host-context(ul) > .y {}', 'a')).toEqual('ul.a-h > .y.a, ul .a-h > .y.a {}');
+    });
+
+    it('should handle class selector', () => {
+      expect(s(':host-context(.x) {}', 'a')).toEqual('.x.a-h, .x .a-h {}');
+
+      expect(s(':host-context(.x) > .y {}', 'a')).toEqual('.x.a-h > .y.a, .x .a-h > .y.a {}');
+    });
+
+    it('should handle attribute selector', () => {
+      expect(s(':host-context([a="b"]) {}', 'a')).toEqual('[a="b"].a-h, [a="b"] .a-h {}');
+      expect(s(':host-context([a=b]) {}', 'a')).toEqual('[a=b].a-h, [a="b"] .a-h {}');
+    });
+  });
+
+  describe('::slotted', () => {
     it('should handle *, commentOriginalSelector', () => {
-      const r = s('::slotted(*) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s', true);
+      const r = s('::slotted(*) {}', 'sc-ion-tag', true);
       expect(r).toEqual('/*!@::slotted(*)*/.sc-ion-tag-s > * {}');
     });
 
     it('should handle *', () => {
-      const r = s('::slotted(*) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      const r = s('::slotted(*) {}', 'sc-ion-tag');
       expect(r).toEqual('.sc-ion-tag-s > * {}');
     });
 
     it('should handle * descendant', () => {
-      const r = s('::slotted(*) .my-class {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      const r = s('::slotted(*) .my-class {}', 'sc-ion-tag');
       expect(r).toEqual('.sc-ion-tag-s .my-class {}');
     });
 
     it('should handle :host complex selector', () => {
-      const r = s(':host > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      const r = s(':host > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag');
       expect(r).toEqual('.sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}');
     });
 
     it('should handle host-context complex selector', () => {
-      const r = s(':host-context(.red) > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      const r = s(':host-context(.red) > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag');
       expect(r).toEqual('.sc-ion-tag-h.red > .sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}');
     });
 
     it('should handle left side selector', () => {
-      const r = s('div::slotted(ul) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      const r = s('div::slotted(ul) {}', 'sc-ion-tag');
       expect(r).toEqual('div.sc-ion-tag-s > ul {}');
     });
 
     it('should handle tag selector', () => {
-      const r = s('::slotted(ul) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      const r = s('::slotted(ul) {}', 'sc-ion-tag');
       expect(r).toEqual('.sc-ion-tag-s > ul {}');
     });
 
     it('should handle class selector', () => {
-      const r = s('::slotted(.foo) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      const r = s('::slotted(.foo) {}', 'sc-ion-tag');
       expect(r).toEqual('.sc-ion-tag-s > .foo {}');
     });
 
     it('should handle multiple selector', () => {
-      const r = s('::slotted(ul), ::slotted(li) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s');
+      const r = s('::slotted(ul), ::slotted(li) {}', 'sc-ion-tag');
       expect(r).toEqual('.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}');
     });
 
-    it('should handle multiple selector, commentOriginalSelector', () => {
-      const r = s('::slotted(ul), ::slotted(li) {}', 'sc-ion-tag', 'sc-ion-tag-h', 'sc-ion-tag-s', true);
-      expect(r).toEqual('/*!@::slotted(ul), ::slotted(li)*/.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}');
+    it('should combine parent selector', () => {
+      const r = s('div{} .a .b .c ::slotted(*) {}', 'sc-ion-tag');
+      expect(r).toEqual('div.sc-ion-tag{} .a .b .c.sc-ion-tag-s > *, .a .b .c .sc-ion-tag-s > * {}');
     });
 
+    it('same selectors', () => {
+      const r = s('::slotted(*) {}, ::slotted(*) {}, ::slotted(*) {}', 'sc-ion-tag');
+      expect(r).toEqual('.sc-ion-tag-s > * {}, .sc-ion-tag-s > * {}, .sc-ion-tag-s > * {}');
+    });
+
+    it('same selectors, commentOriginalSelector', () => {
+      const r = s('::slotted(*) {}, ::slotted(*) {}, ::slotted(*) {}', 'sc-ion-tag', true);
+      expect(r).toEqual('/*!@::slotted(*)*/.sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}');
+    });
+
+    it('should combine parent selector when comma', () => {
+      const r = s('.a .b, .c ::slotted(*) {}', 'sc-ion-tag');
+      expect(r).toEqual('.a.sc-ion-tag .b.sc-ion-tag, .c.sc-ion-tag-s > *, .c .sc-ion-tag-s > * {}');
+    });
+
+    it('should handle multiple selector, commentOriginalSelector', () => {
+      const r = s('::slotted(ul), ::slotted(li) {}', 'sc-ion-tag', true);
+      expect(r).toEqual('/*!@::slotted(ul), ::slotted(li)*/.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}');
+    });
   });
 
   describe('convertScopedToShadow', () => {
-
     it('media query', () => {
       const input = `@media screen and (max-width:800px, max-height:100%) {/*!@div*/div.a {font-size:50px;}}`;
       const expected = `@media screen and (max-width:800px, max-height:100%) {div{font-size:50px;}}`;
@@ -327,7 +328,6 @@ describe('ShadowCss', function() {
       const expected = `::slotted(ul), ::slotted(li){}`;
       expect(convertScopedToShadow(input)).toBe(expected);
     });
-
   });
 
   it('should handle ::shadow', () => {
@@ -353,29 +353,30 @@ describe('ShadowCss', function() {
     expect(css).toEqual('div.a {height:calc(100% - 55px);}');
   });
 
-  it('should strip comments', () => { expect(s('/* x */b {c}', 'a')).toEqual('b.a {c}'); });
-
-  it('should ignore special characters in comments',
-      () => { expect(s('/* {;, */b {c}', 'a')).toEqual('b.a {c}'); });
-
-  it('should support multiline comments',
-      () => { expect(s('/* \n */b {c}', 'a')).toEqual('b.a {c}'); });
-
-  it('should keep sourceMappingURL comments', () => {
-    expect(s('b {c}/*# sourceMappingURL=data:x */', 'a'))
-        .toEqual('b.a {c}/*# sourceMappingURL=data:x */');
-    expect(s('b {c}/* #sourceMappingURL=data:x */', 'a'))
-        .toEqual('b.a {c}/* #sourceMappingURL=data:x */');
+  it('should strip comments', () => {
+    expect(s('/* x */b {c}', 'a')).toEqual('b.a {c}');
   });
 
+  it('should ignore special characters in comments', () => {
+    expect(s('/* {;, */b {c}', 'a')).toEqual('b.a {c}');
+  });
+
+  it('should support multiline comments', () => {
+    expect(s('/* \n */b {c}', 'a')).toEqual('b.a {c}');
+  });
+
+  it('should keep sourceMappingURL comments', () => {
+    expect(s('b {c}/*# sourceMappingURL=data:x */', 'a')).toEqual('b.a {c}/*# sourceMappingURL=data:x */');
+    expect(s('b {c}/* #sourceMappingURL=data:x */', 'a')).toEqual('b.a {c}/* #sourceMappingURL=data:x */');
+  });
 
   function normalizeCSS(css: string): string {
-    return css.replace(/\s+/g, ' ')
-        .replace(/:\s/g, ':')
-        .replace(/'/g, '"')
-        .replace(/ }/g, '}')
-        .replace(/url\((\"|\s)(.+)(\"|\s)\)(\s*)/g, (...match: string[]) => `url("${match[2]}")`)
-        .replace(/\[(.+)=([^"\]]+)\]/g, (...match: string[]) => `[${match[1]}="${match[2]}"]`);
+    return css
+      .replace(/\s+/g, ' ')
+      .replace(/:\s/g, ':')
+      .replace(/'/g, '"')
+      .replace(/ }/g, '}')
+      .replace(/url\((\"|\s)(.+)(\"|\s)\)(\s*)/g, (...match: string[]) => `url("${match[2]}")`)
+      .replace(/\[(.+)=([^"\]]+)\]/g, (...match: string[]) => `[${match[1]}="${match[2]}"]`);
   }
-
 });

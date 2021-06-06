@@ -1,71 +1,84 @@
-import * as d from '../declarations';
-import { formatLazyBundleRuntimeMeta, getBuildFeatures } from '../compiler';
+import {
+  bootstrapLazy,
+  flushAll,
+  flushLoadModule,
+  flushQueue,
+  getHostRef,
+  insertVdomAnnotations,
+  registerComponents,
+  registerModule,
+  renderVdom,
+  resetPlatform,
+  startAutoApplyChanges,
+  styles,
+  win,
+  writeTask,
+  setSupportsShadowDom,
+} from '@stencil/core/internal/testing';
+import { BUILD } from '@app-data';
+import type {
+  ComponentCompilerMeta,
+  ComponentRuntimeMeta,
+  ComponentTestingConstructor,
+  HostRef,
+  LazyBundlesRuntimeData,
+  NewSpecPageOptions,
+  SpecPage,
+} from '@stencil/core/internal';
+import { formatLazyBundleRuntimeMeta } from '@utils';
+import { getBuildFeatures } from '../compiler/app-core/app-data';
+import { resetBuildConditionals } from './reset-build-conditionals';
 
-
-export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPage> {
+export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   if (opts == null) {
     throw new Error(`NewSpecPageOptions required`);
   }
 
-  if (!Array.isArray(opts.components) || opts.components.length === 0) {
-    throw new Error(`opts.components required`);
-  }
-
-  // * WHY THE REQUIRES?!
-  // using require() in a closure so jest has a moment
-  // to jest.mock w/ moduleNameMapper in the jest config
-  // otherwise the require() happens at the top of the file before jest is setup
-  const bc = require('@stencil/core/build-conditionals');
-  const platform = require('@stencil/core/platform');
-
   // reset the platform for this new test
-  platform.resetPlatform();
-  bc.resetBuildConditionals(bc.BUILD);
+  resetPlatform();
+  resetBuildConditionals(BUILD);
 
-  platform.registerContext(opts.context);
-  platform.registerComponents(opts.components);
-
+  if (Array.isArray(opts.components)) {
+    registerComponents(opts.components);
+  }
 
   if (opts.hydrateClientSide) {
     opts.includeAnnotations = true;
   }
   if (opts.hydrateServerSide) {
     opts.includeAnnotations = true;
-    platform.supportsShadowDom = false;
+    setSupportsShadowDom(false);
   } else {
     opts.includeAnnotations = !!opts.includeAnnotations;
     if (opts.supportsShadowDom === false) {
-      platform.supportsShadowDom = false;
+      setSupportsShadowDom(false);
     } else {
-      platform.supportsShadowDom = true;
+      setSupportsShadowDom(true);
     }
   }
-  bc.BUILD.cssAnnotations = opts.includeAnnotations;
+  BUILD.cssAnnotations = opts.includeAnnotations;
 
   const cmpTags = new Set<string>();
 
-  const win = platform.win as Window;
   (win as any)['__stencil_spec_options'] = opts;
   const doc = win.document;
 
-  const page: d.SpecPage = {
+  const page: SpecPage = {
     win: win,
     doc: doc,
     body: doc.body as any,
-    root: null as any,
-    rootInstance: null as any,
-    build: bc.BUILD as d.Build,
-    styles: platform.styles as Map<string, string>,
-    setContent: (html: string) => {
+    build: BUILD,
+    styles: styles as Map<string, string>,
+    setContent: html => {
       doc.body.innerHTML = html;
-      return platform.flushAll();
+      return flushAll();
     },
-    waitForChanges: (): Promise<void> => platform.flushAll(),
-    flushLoadModule: (bundleId?: string): Promise<void> => platform.flushLoadModule(bundleId),
-    flushQueue: (): Promise<void> => platform.flushQueue()
+    waitForChanges: flushAll,
+    flushLoadModule: flushLoadModule,
+    flushQueue: flushQueue,
   };
 
-  const lazyBundles: d.LazyBundlesRuntimeData = opts.components.map((Cstr: d.ComponentTestingConstructor) => {
+  const lazyBundles: LazyBundlesRuntimeData = opts.components.map((Cstr: ComponentTestingConstructor) => {
     if (Cstr.COMPILER_META == null) {
       throw new Error(`Invalid component class: Missing static "COMPILER_META" property.`);
     }
@@ -73,55 +86,50 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     cmpTags.add(Cstr.COMPILER_META.tagName);
     Cstr.isProxied = false;
 
-    proxyComponentLifeCycles(platform, Cstr);
+    proxyComponentLifeCycles(Cstr);
 
-    const bundleId = `${Cstr.COMPILER_META.tagName}.${(Math.round(Math.random() * 899999) + 100000)}`;
-    const lazyBundleRuntimeMeta = formatLazyBundleRuntimeMeta(bundleId, [Cstr.COMPILER_META]);
-
-    platform.registerModule(bundleId, Cstr);
-
-    if (Array.isArray(Cstr.COMPILER_META.styles)) {
-      Cstr.COMPILER_META.styles.forEach(style => {
-        platform.styles.set(style.styleId, style.styleStr);
-      });
+    const bundleId = `${Cstr.COMPILER_META.tagName}.${Math.round(Math.random() * 899999) + 100000}`;
+    const stylesMeta = Cstr.COMPILER_META.styles;
+    if (Array.isArray(stylesMeta)) {
+      if (stylesMeta.length > 1) {
+        const styles: any = {};
+        stylesMeta.forEach(style => {
+          styles[style.modeName] = style.styleStr;
+        });
+        Cstr.style = styles;
+      } else if (stylesMeta.length === 1) {
+        Cstr.style = stylesMeta[0].styleStr;
+      }
     }
+    registerModule(bundleId, Cstr);
 
+    const lazyBundleRuntimeMeta = formatLazyBundleRuntimeMeta(bundleId, [Cstr.COMPILER_META]);
     return lazyBundleRuntimeMeta;
   });
 
-  const cmpCompilerMeta = opts.components.map(Cstr => Cstr.COMPILER_META as d.ComponentCompilerMeta);
-
+  const cmpCompilerMeta = opts.components.map(Cstr => Cstr.COMPILER_META as ComponentCompilerMeta);
   const cmpBuild = getBuildFeatures(cmpCompilerMeta);
-  cmpBuild.vdomAttribute = true;
-  cmpBuild.vdomClass = true;
-  cmpBuild.vdomStyle = true;
-  cmpBuild.vdomKey = true;
-  cmpBuild.vdomRef = true;
-  cmpBuild.vdomListener = true;
-  cmpBuild.vdomFunctional = true;
-  cmpBuild.vdomText = true;
-  cmpBuild.slot = true;
-  cmpBuild.svg = true;
-
-  Object.keys(cmpBuild).forEach(key => {
-    if ((cmpBuild as any)[key] === true) {
-      (bc.BUILD as any)[key] = true;
-    }
-  });
-
-  if (opts.hydrateClientSide) {
-    bc.BUILD.hydrateClientSide = true;
-    bc.BUILD.hydrateServerSide = false;
-
-  } else if (opts.hydrateServerSide) {
-    bc.BUILD.hydrateServerSide = true;
-    bc.BUILD.hydrateClientSide = false;
+  if (opts.strictBuild) {
+    Object.assign(BUILD, cmpBuild);
+  } else {
+    Object.keys(cmpBuild).forEach(key => {
+      if ((cmpBuild as any)[key] === true) {
+        (BUILD as any)[key] = true;
+      }
+    });
   }
-
-  (page as any).flush = () => {
-    console.warn(`DEPRECATED: page.flush(), please use page.waitForChanges() instead`);
-    return page.waitForChanges();
-  };
+  BUILD.asyncLoading = true;
+  if (opts.hydrateClientSide) {
+    BUILD.hydrateClientSide = true;
+    BUILD.hydrateServerSide = false;
+  } else if (opts.hydrateServerSide) {
+    BUILD.hydrateServerSide = true;
+    BUILD.hydrateClientSide = false;
+  }
+  BUILD.cloneNodeFix = false;
+  BUILD.shadowDomShim = false;
+  BUILD.safari10 = false;
+  BUILD.attachStyles = !!opts.attachStyles;
 
   if (typeof opts.url === 'string') {
     page.win.location.href = opts.url;
@@ -153,9 +161,22 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     } catch (e) {}
   }
 
-  platform.bootstrapLazy(lazyBundles);
+  bootstrapLazy(lazyBundles);
 
-  if (typeof opts.html === 'string') {
+  if (typeof opts.template === 'function') {
+    const cmpMeta: ComponentRuntimeMeta = {
+      $flags$: 0,
+      $tagName$: 'body',
+    };
+    const ref: HostRef = {
+      $ancestorComponent$: undefined,
+      $flags$: 0,
+      $modeName$: undefined,
+      $cmpMeta$: cmpMeta,
+      $hostElement$: page.body,
+    };
+    renderVdom(ref, opts.template());
+  } else if (typeof opts.html === 'string') {
     page.body.innerHTML = opts.html;
   }
 
@@ -163,26 +184,39 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
     await page.waitForChanges();
   }
 
-  page.root = findRootComponent(cmpTags, page.body);
-  if (page.root != null) {
-    const hostRef = platform.getHostRef(page.root);
-    if (hostRef != null) {
-      page.rootInstance = hostRef.$lazyInstance$;
-    }
+  let rootComponent: any = null;
+  Object.defineProperty(page, 'root', {
+    get() {
+      if (rootComponent == null) {
+        rootComponent = findRootComponent(cmpTags, page.body);
+      }
+      if (rootComponent != null) {
+        return rootComponent;
+      }
+      const firstElementChild = page.body.firstElementChild;
+      if (firstElementChild != null) {
+        return firstElementChild as any;
+      }
+      return null;
+    },
+  });
 
-  } else {
-    const firstElementChild = page.body.firstElementChild;
-    if (firstElementChild != null) {
-      page.root = firstElementChild as any;
-    }
-  }
+  Object.defineProperty(page, 'rootInstance', {
+    get() {
+      const hostRef = getHostRef(page.root);
+      if (hostRef != null) {
+        return hostRef.$lazyInstance$;
+      }
+      return null;
+    },
+  });
 
   if (opts.hydrateServerSide) {
-    platform.insertVdomAnnotations(doc);
+    insertVdomAnnotations(doc, []);
   }
 
   if (opts.autoApplyChanges) {
-    platform.startAutoApplyChanges();
+    startAutoApplyChanges();
     page.waitForChanges = () => {
       console.error('waitForChanges() cannot be used manually if the "startAutoApplyChanges" option is enabled');
       return Promise.resolve();
@@ -191,8 +225,7 @@ export async function newSpecPage(opts: d.NewSpecPageOptions): Promise<d.SpecPag
   return page;
 }
 
-
-function proxyComponentLifeCycles(platform: any, Cstr: d.ComponentTestingConstructor) {
+function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
   if (typeof Cstr.prototype.__componentWillLoad === 'function') {
     Cstr.prototype.componentWillLoad = Cstr.prototype.__componentWillLoad;
     Cstr.prototype.__componentWillLoad = null;
@@ -208,12 +241,12 @@ function proxyComponentLifeCycles(platform: any, Cstr: d.ComponentTestingConstru
 
   if (typeof Cstr.prototype.componentWillLoad === 'function') {
     Cstr.prototype.__componentWillLoad = Cstr.prototype.componentWillLoad;
-    Cstr.prototype.componentWillLoad = function() {
+    Cstr.prototype.componentWillLoad = function () {
       const result = this.__componentWillLoad();
       if (result != null && typeof result.then === 'function') {
-        platform.writeTask(() => result);
+        writeTask(() => result);
       } else {
-        platform.writeTask(() => Promise.resolve());
+        writeTask(() => Promise.resolve());
       }
       return result;
     };
@@ -221,12 +254,12 @@ function proxyComponentLifeCycles(platform: any, Cstr: d.ComponentTestingConstru
 
   if (typeof Cstr.prototype.componentWillUpdate === 'function') {
     Cstr.prototype.__componentWillUpdate = Cstr.prototype.componentWillUpdate;
-    Cstr.prototype.componentWillUpdate = function() {
+    Cstr.prototype.componentWillUpdate = function () {
       const result = this.__componentWillUpdate();
       if (result != null && typeof result.then === 'function') {
-        platform.writeTask(() => result);
+        writeTask(() => result);
       } else {
-        platform.writeTask(() => Promise.resolve());
+        writeTask(() => Promise.resolve());
       }
       return result;
     };
@@ -234,18 +267,17 @@ function proxyComponentLifeCycles(platform: any, Cstr: d.ComponentTestingConstru
 
   if (typeof Cstr.prototype.componentWillRender === 'function') {
     Cstr.prototype.__componentWillRender = Cstr.prototype.componentWillRender;
-    Cstr.prototype.componentWillRender = function() {
+    Cstr.prototype.componentWillRender = function () {
       const result = this.__componentWillRender();
       if (result != null && typeof result.then === 'function') {
-        platform.writeTask(() => result);
+        writeTask(() => result);
       } else {
-        platform.writeTask(() => Promise.resolve());
+        writeTask(() => Promise.resolve());
       }
       return result;
     };
   }
 }
-
 
 function findRootComponent(cmpTags: Set<string>, node: Element): any {
   if (node != null) {
@@ -267,25 +299,4 @@ function findRootComponent(cmpTags: Set<string>, node: Element): any {
     }
   }
   return null;
-}
-
-
-export function flushAll() {
-  // see comment at the bottom of the page
-  const platform = require('@stencil/core/platform');
-  return platform.flushAll();
-}
-
-
-export function flushQueue() {
-  // see comment at the bottom of the page
-  const platform = require('@stencil/core/platform');
-  return platform.flushQueue();
-}
-
-
-export function flushLoadModule() {
-  // see comment at the bottom of the page
-  const platform = require('@stencil/core/platform');
-  return platform.flushLoadModule();
 }

@@ -1,5 +1,4 @@
-import { NODE_TYPES } from '@mock-doc';
-
+import { NODE_TYPES } from '@stencil/core/mock-doc';
 
 export function toEqualAttribute(elm: HTMLElement, expectAttrName: string, expectAttrValue: string) {
   if (!elm) {
@@ -24,7 +23,7 @@ export function toEqualAttribute(elm: HTMLElement, expectAttrName: string, expec
     receivedAttrValue = String(receivedAttrValue);
   }
 
-  const pass = (expectAttrValue === receivedAttrValue);
+  const pass = expectAttrValue === receivedAttrValue;
 
   return {
     message: () => `expected attribute ${expectAttrName} "${expectAttrValue}" to ${pass ? 'not ' : ''}equal "${receivedAttrValue}"`,
@@ -32,8 +31,7 @@ export function toEqualAttribute(elm: HTMLElement, expectAttrName: string, expec
   };
 }
 
-
-export function toEqualAttributes(elm: HTMLElement, expectAttrs: {[attrName: string]: any}) {
+export function toEqualAttributes(elm: HTMLElement, expectAttrs: { [attrName: string]: any }) {
   if (!elm) {
     throw new Error(`expect toEqualAttributes value is null`);
   }
@@ -61,7 +59,6 @@ export function toEqualAttributes(elm: HTMLElement, expectAttrs: {[attrName: str
     pass: pass,
   };
 }
-
 
 export function toHaveAttribute(elm: HTMLElement, expectAttrName: string) {
   if (!elm) {

@@ -1,8 +1,7 @@
-import * as d from '../../declarations';
-import { URL } from 'url';
+import type * as d from '../../declarations';
+import path from 'path';
 
-
-export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputHref: string) {
+export const getWriteFilePathFromUrlPath = (manager: d.PrerenderManager, inputHref: string) => {
   const baseUrl = new URL(manager.outputTarget.baseUrl, manager.devServerHostUrl);
   const basePathname = baseUrl.pathname.toLowerCase();
 
@@ -12,12 +11,12 @@ export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputHr
   const basePathParts = basePathname.split('/');
   const inputPathParts = inputPathname.split('/');
 
-  const isPrerrenderRoot = (basePathname === inputPathname);
+  const isPrerrenderRoot = basePathname === inputPathname;
 
   let fileName: string;
 
   if (isPrerrenderRoot) {
-    fileName = manager.config.sys.path.basename(manager.outputTarget.indexHtml);
+    fileName = path.basename(manager.outputTarget.indexHtml);
   } else {
     fileName = 'index.html';
   }
@@ -46,10 +45,5 @@ export function getWriteFilePathFromUrlPath(manager: d.PrerenderManager, inputHr
   pathParts.push(fileName);
 
   // figure out the directory where this file will be saved
-  const filePath = manager.config.sys.path.join(
-    manager.outputTarget.appDir,
-    ...pathParts
-  );
-
-  return filePath;
-}
+  return path.join(manager.outputTarget.appDir, ...pathParts);
+};

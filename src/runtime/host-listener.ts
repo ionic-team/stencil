@@ -1,36 +1,56 @@
-import * as d from '../declarations';
-import { BUILD } from '@build-conditionals';
-import { consoleError, doc, plt, supportsListenerOptions, win } from '@platform';
-import { LISTENER_FLAGS } from '@utils';
+import type * as d from '../declarations';
+import { BUILD } from '@app-data';
+import { doc, plt, consoleError, supportsListenerOptions, win } from '@platform';
+import { HOST_FLAGS, LISTENER_FLAGS } from '@utils';
 
+export const addHostEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listeners: d.ComponentRuntimeHostListener[], attachParentListeners: boolean) => {
+  if (BUILD.hostListener && listeners) {
+    // this is called immediately within the element's constructor
+    // initialize our event listeners on the host element
+    // we do this now so that we can listen to events that may
+    // have fired even before the instance is ready
 
-export const addEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listeners: d.ComponentRuntimeHostListener[]) => {
-  const removeFns = listeners.map(([flags, name, method]) => {
-    const target = (BUILD.hostListenerTarget ? getHostListenerTarget(elm, flags) : elm);
-    const handler = hostListenerProxy(hostRef, method);
-    const opts = hostListenerOpts(flags);
-    plt.ael(target, name, handler, opts);
-    return () => plt.rel(target, name, handler, opts);
-  });
-  return () => removeFns.forEach(fn => fn());
+    if (BUILD.hostListenerTargetParent) {
+      // this component may have event listeners that should be attached to the parent
+      if (attachParentListeners) {
+        // this is being ran from within the connectedCallback
+        // which is important so that we know the host element actually has a parent element
+        // filter out the listeners to only have the ones that ARE being attached to the parent
+        listeners = listeners.filter(([flags]) => flags & LISTENER_FLAGS.TargetParent);
+      } else {
+        // this is being ran from within the component constructor
+        // everything BUT the parent element listeners should be attached at this time
+        // filter out the listeners that are NOT being attached to the parent
+        listeners = listeners.filter(([flags]) => !(flags & LISTENER_FLAGS.TargetParent));
+      }
+    }
+
+    listeners.map(([flags, name, method]) => {
+      const target = BUILD.hostListenerTarget ? getHostListenerTarget(elm, flags) : elm;
+      const handler = hostListenerProxy(hostRef, method);
+      const opts = hostListenerOpts(flags);
+      plt.ael(target, name, handler, opts);
+      (hostRef.$rmListeners$ = hostRef.$rmListeners$ || []).push(() => plt.rel(target, name, handler, opts));
+    });
+  }
 };
 
-const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => {
-  return (ev: Event) => {
+const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => (ev: Event) => {
+  try {
     if (BUILD.lazyLoad) {
-      if (hostRef.$lazyInstance$) {
+      if (hostRef.$flags$ & HOST_FLAGS.isListenReady) {
         // instance is ready, let's call it's member method for this event
-        return hostRef.$lazyInstance$[methodName](ev);
-
+        hostRef.$lazyInstance$[methodName](ev);
       } else {
-        return hostRef.$onReadyPromise$.then(() => hostRef.$lazyInstance$[methodName](ev)).catch(consoleError);
+        (hostRef.$queuedListeners$ = hostRef.$queuedListeners$ || []).push([methodName, ev]);
       }
     } else {
-      return (hostRef.$hostElement$ as any)[methodName](ev);
+      (hostRef.$hostElement$ as any)[methodName](ev);
     }
-  };
+  } catch (e)  {
+    consoleError(e);
+  }
 };
-
 
 const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
   if (BUILD.hostListenerTargetDocument && flags & LISTENER_FLAGS.TargetDocument) return doc;
@@ -40,11 +60,11 @@ const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
   return elm;
 };
 
-
+// prettier-ignore
 const hostListenerOpts = (flags: number) =>
-  supportsListenerOptions ?
-    {
-      'passive': (flags & LISTENER_FLAGS.Passive) !== 0,
-      'capture': (flags & LISTENER_FLAGS.Capture) !== 0,
-    }
-  : (flags & LISTENER_FLAGS.Capture) !== 0;
+  supportsListenerOptions
+    ? ({
+        passive: (flags & LISTENER_FLAGS.Passive) !== 0,
+        capture: (flags & LISTENER_FLAGS.Capture) !== 0,
+      })
+    : (flags & LISTENER_FLAGS.Capture) !== 0;

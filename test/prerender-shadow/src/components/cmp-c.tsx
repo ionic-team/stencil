@@ -20,7 +20,10 @@ export class CmpC {
 
   componentWillLoad() {
     return new Promise(resolve => {
-      setTimeout(resolve, 1500);
+      setTimeout(() => {
+        console.log('cmp-c componentWillLoad resolved');
+        resolve();
+      }, 1500);
     });
   }
 

@@ -1,6 +1,4 @@
-
-
-export class CSSStyleDeclaration {
+export class MockCSSStyleDeclaration {
   private _styles = new Map<string, string>();
 
   setProperty(prop: string, value: string) {
@@ -59,16 +57,11 @@ export class CSSStyleDeclaration {
   }
 }
 
-
 export function createCSSStyleDeclaration() {
-  return new Proxy(
-    new CSSStyleDeclaration(),
-    cssProxyHandler
-  );
+  return new Proxy(new MockCSSStyleDeclaration(), cssProxyHandler);
 }
 
-
-const cssProxyHandler: ProxyHandler<CSSStyleDeclaration> = {
+const cssProxyHandler: ProxyHandler<MockCSSStyleDeclaration> = {
   get(cssStyle, prop: string) {
     if (prop in cssStyle) {
       return (cssStyle as any)[prop];
@@ -84,24 +77,30 @@ const cssProxyHandler: ProxyHandler<CSSStyleDeclaration> = {
       cssStyle.setProperty(prop, value);
     }
     return true;
-  }
+  },
 };
-
 
 function cssCaseToJsCase(str: string) {
   // font-size to fontSize
   if (str.length > 1 && str.includes('-') === true) {
-    str = str.toLowerCase().split('-').map(segment => segment.charAt(0).toUpperCase() + segment.slice(1)).join('');
+    str = str
+      .toLowerCase()
+      .split('-')
+      .map(segment => segment.charAt(0).toUpperCase() + segment.slice(1))
+      .join('');
     str = str.substr(0, 1).toLowerCase() + str.substr(1);
   }
   return str;
 }
 
-
 function jsCaseToCssCase(str: string) {
   // fontSize to font-size
-  if (str.length > 1 && (str.includes('-') === false && /[A-Z]/.test(str) === true)) {
-    str = str.replace(/([A-Z])/g, g => ' ' + g[0]).trim().replace(/ /g, '-').toLowerCase();
+  if (str.length > 1 && str.includes('-') === false && /[A-Z]/.test(str) === true) {
+    str = str
+      .replace(/([A-Z])/g, g => ' ' + g[0])
+      .trim()
+      .replace(/ /g, '-')
+      .toLowerCase();
   }
 
   return str;

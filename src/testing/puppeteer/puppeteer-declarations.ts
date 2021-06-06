@@ -1,25 +1,67 @@
-import * as d from '../../declarations';
-import * as puppeteer from 'puppeteer';
+import type { EventInitDict, EventSpy, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
+import type {
+  ClickOptions,
+  NavigationOptions,
+  Page,
+  PageCloseOptions,
+  ScreenshotOptions as PuppeteerScreenshotOptions,
+  Response,
+} from 'puppeteer';
 
-
-export interface NewE2EPageOptions {
+export interface NewE2EPageOptions extends NavigationOptions {
   url?: string;
   html?: string;
+  failOnConsoleError?: boolean;
+  failOnNetworkError?: boolean;
 }
 
-
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
-type PuppeteerPage = Omit<puppeteer.Page,
-'bringToFront' | 'browser' | 'screenshot' | 'close' | 'emulate' | 'emulateMedia' | 'frames' | 'goBack' | 'goForward' | 'isClosed' | 'mainFrame' | 'pdf' | 'reload' | 'target' | 'title' | 'viewport' | 'waitForNavigation' | 'screenshot' | 'workers' | 'addListener' | 'prependListener' | 'prependOnceListener' | 'removeListener' | 'removeAllListeners' | 'setMaxListeners' | 'getMaxListeners' | 'listeners' | 'rawListeners' | 'emit' | 'eventNames' | 'listenerCount' | '$x' | 'waitForXPath'
+type PuppeteerPage = Omit<
+  Page,
+  | 'bringToFront'
+  | 'browser'
+  | 'screenshot'
+  | 'emulate'
+  | 'emulateMedia'
+  | 'frames'
+  | 'goBack'
+  | 'goForward'
+  | 'isClosed'
+  | 'mainFrame'
+  | 'pdf'
+  | 'reload'
+  | 'target'
+  | 'title'
+  | 'viewport'
+  | 'waitForNavigation'
+  | 'screenshot'
+  | 'workers'
+  | 'addListener'
+  | 'prependListener'
+  | 'prependOnceListener'
+  | 'removeAllListeners'
+  | 'setMaxListeners'
+  | 'getMaxListeners'
+  | 'listeners'
+  | 'rawListeners'
+  | 'emit'
+  | 'eventNames'
+  | 'listenerCount'
+  | '$x'
+  | 'waitForXPath'
 >;
 
+export interface PageDiagnostic {
+  type: 'error' | 'pageerror' | 'requestfailed';
+  message?: string;
+  location?: string;
+}
 
 /**
  * The E2EPage is a wrapper utility to Puppeteer in order to
  * to create easier to write and read end-to-end tests.
  */
 export interface E2EPage extends PuppeteerPage {
-
   /**
    * `Experimental`
    * Takes a screenshot of the page, then compares the current screenshot
@@ -27,7 +69,7 @@ export interface E2EPage extends PuppeteerPage {
    * results can then be used to test pixel mismatches, such as
    * `expect(results).toMatchScreenshot()`.
    */
-  compareScreenshot(): Promise<d.ScreenshotDiff>;
+  compareScreenshot(): Promise<ScreenshotDiff>;
 
   /**
    * `Experimental`
@@ -35,7 +77,7 @@ export interface E2EPage extends PuppeteerPage {
    * against the master screenshot. The provided `description` will be
    * added onto its current description, which comes from the test description.
    */
-  compareScreenshot(description: string): Promise<d.ScreenshotDiff>;
+  compareScreenshot(description: string): Promise<ScreenshotDiff>;
 
   /**
    * `Experimental`
@@ -43,7 +85,7 @@ export interface E2EPage extends PuppeteerPage {
    * against the master screenshot. The `opts` argument can be used to
    * customize screenshot options.
    */
-  compareScreenshot(opts: d.ScreenshotOptions): Promise<d.ScreenshotDiff>;
+  compareScreenshot(opts: ScreenshotOptions): Promise<ScreenshotDiff>;
 
   /**
    * `Experimental`
@@ -52,7 +94,12 @@ export interface E2EPage extends PuppeteerPage {
    * added onto its current description, which comes from the test description.
    * The `opts` argument can be used to customize screenshot options.
    */
-  compareScreenshot(description: string, opts: d.ScreenshotOptions): Promise<d.ScreenshotDiff>;
+  compareScreenshot(description: string, opts: ScreenshotOptions): Promise<ScreenshotDiff>;
+
+  /**
+   * Sets a debugger;
+   */
+  debugger(): Promise<void>;
 
   /**
    * Find an element that matches the selector, which is the same as
@@ -80,7 +127,7 @@ export interface E2EPage extends PuppeteerPage {
    * a localhost address. A shortcut to `page.goto(url)` is to set the `url` option
    * when creating a new page, such as `const page = await newE2EPage({ url })`.
    */
-  goTo(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
+  goTo(url: string, options?: NavigationOptions): Promise<Response | null>;
 
   /**
    * Instead of testing a url directly, html content can be mocked using
@@ -88,7 +135,7 @@ export interface E2EPage extends PuppeteerPage {
    * the `html` option when creating a new page, such as
    * `const page = await newE2EPage({ html })`.
    */
-  setContent(html: string): Promise<void>;
+  setContent(html: string, options?: NavigationOptions): Promise<void>;
 
   /**
    * Used to test if an event was, or was not dispatched. This method
@@ -97,7 +144,7 @@ export interface E2EPage extends PuppeteerPage {
    * `expect(spy).toHaveReceivedEventTimes(x)` and
    * `expect(spy).toHaveReceivedEventDetail({...})`.
    */
-  spyOnEvent(eventName: string, selector?: 'window' | 'document'): Promise<d.EventSpy>;
+  spyOnEvent(eventName: string, selector?: 'window' | 'document'): Promise<EventSpy>;
 
   /**
    * Both Stencil and Puppeteer have an asynchronous architecture, which is a good thing
@@ -112,19 +159,20 @@ export interface E2EPage extends PuppeteerPage {
    * Waits for the event to be received on `window`. The optional second argument
    * allows the listener to be set to `document` if needed.
    */
-  waitForEvent(eventName: string, selector?: 'window' | 'document'): Promise<CustomEvent>;
-}
+  waitForEvent(eventName: string): Promise<any>;
 
+  getDiagnostics(): PageDiagnostic[];
+}
 
 export interface E2EPageInternal extends E2EPage {
   isClosed(): boolean;
   _e2eElements: E2EElementInternal[];
-  _e2eEvents: WaitForEvent[];
+  _e2eEvents: Map<number, WaitForEvent>;
   _e2eEventIds: number;
-  _e2eGoto(url: string, options?: Partial<puppeteer.NavigationOptions>): Promise<puppeteer.Response | null>;
-  screenshot(options?: puppeteer.ScreenshotOptions): Promise<Buffer>;
+  _e2eGoto(url: string, options?: Partial<NavigationOptions>): Promise<Response | null>;
+  _e2eClose(options?: PageCloseOptions): Promise<void>;
+  screenshot(options?: PuppeteerScreenshotOptions): Promise<Buffer>;
 }
-
 
 export interface E2EElement {
   /**
@@ -174,7 +222,7 @@ export interface E2EElement {
    * then uses `page.mouse` to click in the center of the element.
    * Please see the puppeteer docs for more information.
    */
-  click(options?: puppeteer.ClickOptions): Promise<void>;
+  click(options?: ClickOptions): Promise<void>;
 
   /**
    * Find a child element that matches the selector, which is the same as
@@ -288,9 +336,16 @@ export interface E2EElement {
    * text option can be specified to force an input event to be generated.
    * Note: Modifier keys DO effect `elementHandle.press`. Holding down Shift
    * will type the text in upper case.
-   * Key names: https://github.com/GoogleChrome/puppeteer/blob/master/lib/USKeyboardLayout.js
+   * Key names: https://github.com/puppeteer/puppeteer/blob/main/src/common/USKeyboardLayout.ts
    */
-  press(key: string, options?: { text?: string, delay?: number }): Promise<void>;
+  press(key: string, options?: { text?: string; delay?: number }): Promise<void>;
+
+  /**
+   * Removes the attribute on the specified element. Note that
+   * `await page.waitForChanges()` must be called before reading
+   * the value if content has changed.
+   */
+  removeAttribute(name: string): void;
 
   /**
    * Sets the value of an attribute on the specified element. If the
@@ -324,7 +379,7 @@ export interface E2EElement {
    * `expect(spy).toHaveReceivedEventTimes(x)` and
    * `expect(spy).toHaveReceivedEventDetail({...})`.
    */
-  spyOnEvent(eventName: string): Promise<d.EventSpy>;
+  spyOnEvent(eventName: string): Promise<EventSpy>;
 
   /**
    * Represents the tab order of the current element. Setting the
@@ -357,11 +412,21 @@ export interface E2EElement {
   title: string;
 
   /**
+   * Toggles a `boolean` attribute (removing it if it is present and adding
+   * it if it is not present) on the given element. Note that
+   * `await page.waitForChanges()` must be called before reading
+   * the value if content has changed. The optional `force` argument is a
+   * `boolean` value to determine whether the attribute should be added or
+   * removed, no matter whether the attribute is present or not at the moment.
+   */
+  toggleAttribute(name: string, force?: boolean): void;
+
+  /**
    * This is a convenience method to easily create a `CustomEvent`,
    * and dispatch it from the element, to include any custom event
    * `detail` data as the second argument.
    */
-  triggerEvent(eventName: string, eventInitDict?: d.EventInitDict): void;
+  triggerEvent(eventName: string, eventInitDict?: EventInitDict): void;
 
   /**
    * Sends a keydown, keypress/input, and keyup event for each character in the text.
@@ -382,15 +447,18 @@ export interface E2EElement {
    * is no longer connected to the document.
    */
   waitForNotVisible(): Promise<void>;
-}
 
+  /**
+   * Waits until the given event is listened in the element.
+   */
+  waitForEvent(eventName: string): Promise<any>;
+}
 
 export interface E2EElementInternal extends E2EElement {
   e2eDispose(): Promise<void>;
   e2eRunActions(): Promise<void>;
   e2eSync(): Promise<void>;
 }
-
 
 export type FindSelector = string | FindSelectorOptions;
 
@@ -407,28 +475,17 @@ export interface FindSelectorOptions {
   contains?: string;
 }
 
-
 export interface WaitForEventOptions {
   timeout?: number;
 }
 
-
 export interface WaitForEvent {
-  id: number;
   eventName: string;
-  resolve: (ev: any) => void;
-  cancelRejectId: any;
+  callback: (ev: any) => void;
 }
-
-
-export interface BrowserContextEvent {
-  id: number;
-  event: any;
-}
-
 
 export interface BrowserWindow extends Window {
-  stencilOnEvent(ev: BrowserContextEvent): void;
+  stencilOnEvent(id: number, event: any): void;
   stencilSerializeEvent(ev: CustomEvent): any;
   stencilSerializeEventTarget(target: any): any;
   stencilAppLoaded: boolean;

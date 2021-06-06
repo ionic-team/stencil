@@ -11,6 +11,9 @@ export class InputBasicRoot {
   render() {
     return (
       <div>
+        <p>
+          Value: <span class="value">{this.value}</span>
+        </p>
         <input type="text" value={this.value} onInput={(ev: any) => this.value = ev.target.value}></input>
       </div>
     );

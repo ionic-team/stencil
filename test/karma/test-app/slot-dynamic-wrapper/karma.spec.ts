@@ -35,6 +35,9 @@ describe('slot-dynamic-wrapper', () => {
 
     result = app.querySelector('.results1 article h1');
     expect(result).toBe(null);
+
+    const hiddenCmp = app.querySelector('[hidden]');
+    expect(hiddenCmp).toBe(null);
   });
 
 });

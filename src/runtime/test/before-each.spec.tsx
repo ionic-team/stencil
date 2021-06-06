@@ -1,6 +1,5 @@
-import { newSpecPage} from '@stencil/core/testing';
+import { newSpecPage } from '@stencil/core/testing';
 import { CmpA } from './fixtures/cmp-a';
-
 
 describe('newSpecPage, spec testing', () => {
   let page: any;
@@ -10,7 +9,7 @@ describe('newSpecPage, spec testing', () => {
     page = await newSpecPage({
       components: [CmpA],
       includeAnnotations: true,
-      html: '<cmp-a></cmp-a>'
+      html: '<cmp-a></cmp-a>',
     });
     root = page.root;
   });
@@ -60,9 +59,13 @@ describe('newSpecPage, spec testing', () => {
   });
 
   it('should emit "initevent" on init ', async () => {
-    root.addEventListener('initevent', (ev: CustomEvent) => {
-      expect(ev.detail.init).toBeTruthy();
-    }, false);
+    root.addEventListener(
+      'initevent',
+      (ev: CustomEvent) => {
+        expect(ev.detail.init).toBeTruthy();
+      },
+      false,
+    );
     root.init();
     await page.waitForChanges();
   });
@@ -70,13 +73,12 @@ describe('newSpecPage, spec testing', () => {
   it('should respond to "testevent" ', async () => {
     const myevent = new CustomEvent('testevent', {
       detail: {
-        last: 'Jeep'
-      }
+        last: 'Jeep',
+      },
     });
     page.doc.dispatchEvent(myevent);
     await page.waitForChanges();
     const div = root.shadowRoot.querySelector('div');
     expect(div.textContent).toEqual(`Hello, World! I'm  Jeep`);
   });
-
 });

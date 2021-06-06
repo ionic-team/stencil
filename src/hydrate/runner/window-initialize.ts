@@ -1,11 +1,16 @@
-import * as d from '../../declarations';
-import { constrainTimeouts } from '@mock-doc';
+import type * as d from '../../declarations';
+import { constrainTimeouts } from '@stencil/core/mock-doc';
 import { renderCatchError } from './render-utils';
+import { runtimeLogging } from './runtime-log';
 
-
-export function initializeWindow(win: Window, doc: Document, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
+export function initializeWindow(
+  win: Window & typeof globalThis,
+  doc: Document,
+  opts: d.HydrateDocumentOptions,
+  results: d.HydrateResults,
+) {
   try {
-    win.location.href = results.url;
+    win.location.href = opts.url;
   } catch (e) {
     renderCatchError(results, e);
   }
@@ -35,6 +40,11 @@ export function initializeWindow(win: Window, doc: Document, opts: d.HydrateDocu
       doc.documentElement.setAttribute('lang', opts.language);
     } catch (e) {}
   }
+  if (typeof opts.buildId === 'string') {
+    try {
+      doc.documentElement.setAttribute('data-stencil-build', opts.buildId);
+    } catch (e) {}
+  }
 
   try {
     win.customElements = null;
@@ -44,41 +54,7 @@ export function initializeWindow(win: Window, doc: Document, opts: d.HydrateDocu
     constrainTimeouts(win);
   }
 
-  try {
-    win.console.error = function() {
+  runtimeLogging(win, opts, results);
 
-      const diagnostic: d.Diagnostic = {
-        level: 'error',
-        type: 'runtime',
-        header: 'Hydrate Error',
-        messageText: [...arguments].join(', '),
-        relFilePath: null,
-        absFilePath: null,
-        lines: []
-      };
-      if (typeof results.pathname === 'string') {
-        diagnostic.header += `: ${results.pathname}`;
-      }
-      results.diagnostics.push(diagnostic);
-    };
-
-    win.console.debug = function() {
-      const diagnostic: d.Diagnostic = {
-        level: 'debug',
-        type: 'build',
-        header: 'Hydrate Debug',
-        messageText: [...arguments].join(', '),
-        relFilePath: null,
-        absFilePath: null,
-        lines: []
-      };
-      if (typeof results.pathname === 'string') {
-        diagnostic.header += `: ${results.pathname}`;
-      }
-      results.diagnostics.push(diagnostic);
-    };
-
-  } catch (e) {
-    renderCatchError(results, e);
-  }
+  return win;
 }

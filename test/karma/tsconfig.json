@@ -2,8 +2,9 @@
   "compilerOptions": {
     "alwaysStrict": true,
     "allowSyntheticDefaultImports": true,
-    "allowUnreachableCode": false,
+    "allowUnreachableCode": true,
     "declaration": false,
+    "resolveJsonModule": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
@@ -14,25 +15,30 @@
     ],
     "module": "commonjs",
     "moduleResolution": "node",
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "pretty": true,
     "target": "es5",
     "outDir": "www",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core": ["../../dist"],
-      "@stencil/core/internal": ["../../internal"]
+      "@stencil/core": ["../../internal"],
+      "@stencil/core/internal": ["../../internal"],
+      "@stencil/core/testing": ["../../testing"]
     }
   },
   "include": [
     "test-app/components.d.ts",
     "test-app/**/*.spec.ts",
     "test-app/**/*.tsx",
+    "test-app/**/*.ts",
     "test-app/util.ts",
-    "test-sibling/**/*.spec.ts",
-    "test-sibling/**/*.tsx"
+    "test-app/global.ts"
+  ],
+  "exclude": [
+    "test-prerender",
+    "test-sibling"
   ]
 }

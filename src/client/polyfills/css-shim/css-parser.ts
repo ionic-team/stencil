@@ -1,4 +1,3 @@
-
 /*
 Extremely simple css parser. Intended to be not more than what we need
 and definitely not necessarily correct =).
@@ -10,18 +9,17 @@ and definitely not necessarily correct =).
 export class StyleNode {
   start = 0;
   end = 0;
-  previous: StyleNode|null = null;
-  parent: StyleNode|null = null;
-  rules: StyleNode[]|null = null;
+  previous: StyleNode | null = null;
+  parent: StyleNode | null = null;
+  rules: StyleNode[] | null = null;
   parsedCssText = '';
   cssText = '';
   atRule = false;
   type = 0;
-  keyframesName: string |undefined = '';
+  keyframesName: string | undefined = '';
   selector = '';
   parsedSelector = '';
 }
-
 
 // given a string of css, return a simple rule tree
 /**
@@ -89,8 +87,8 @@ function parseCss(node: StyleNode, text: string) {
     // TODO(sorvell): ad hoc; make selector include only after last ;
     // helps with mixin syntax
     t = t.substring(t.lastIndexOf(';') + 1);
-    const s = node['parsedSelector'] = node['selector'] = t.trim();
-    node['atRule'] = (s.indexOf(AT_START) === 0);
+    const s = (node['parsedSelector'] = node['selector'] = t.trim());
+    node['atRule'] = s.indexOf(AT_START) === 0;
     // note, support a subset of rule types...
     if (node['atRule']) {
       if (s.indexOf(MEDIA_START) === 0) {
@@ -109,8 +107,7 @@ function parseCss(node: StyleNode, text: string) {
   }
   const r$ = node['rules'];
   if (r$) {
-    for (let i = 0, l = r$.length, r;
-      (i < l) && (r = r$[i]); i++) {
+    for (let i = 0, l = r$.length, r; i < l && (r = r$[i]); i++) {
       parseCss(r, text);
     }
   }
@@ -147,13 +144,11 @@ export function stringify(node: StyleNode, preserveProperties: any, text = '') {
   if (node['cssText'] || node['rules']) {
     const r$ = node['rules'];
     if (r$ && !_hasMixinRules(r$)) {
-      for (let i = 0, l = r$.length, r;
-        (i < l) && (r = r$[i]); i++) {
+      for (let i = 0, l = r$.length, r; i < l && (r = r$[i]); i++) {
         cssText = stringify(r, preserveProperties, cssText);
       }
     } else {
-      cssText = preserveProperties ? node['cssText'] :
-        removeCustomProps(node['cssText']);
+      cssText = preserveProperties ? node['cssText'] : removeCustomProps(node['cssText']);
       cssText = cssText.trim();
       if (cssText) {
         cssText = '  ' + cssText + '\n';
@@ -196,9 +191,7 @@ function removeCustomProps(cssText: string) {
  * @return {string}
  */
 export function removeCustomPropAssignment(cssText: string) {
-  return cssText
-    .replace(RX.customProp, '')
-    .replace(RX.mixinProp, '');
+  return cssText.replace(RX.customProp, '').replace(RX.mixinProp, '');
 }
 
 /**
@@ -206,9 +199,7 @@ export function removeCustomPropAssignment(cssText: string) {
  * @return {string}
  */
 function removeCustomPropApply(cssText: string) {
-  return cssText
-    .replace(RX.mixinApply, '')
-    .replace(RX.varApply, '');
+  return cssText.replace(RX.mixinApply, '').replace(RX.varApply, '');
 }
 
 /** @enum {number} */
@@ -216,7 +207,7 @@ export const types = {
   STYLE_RULE: 1,
   KEYFRAMES_RULE: 7,
   MEDIA_RULE: 4,
-  MIXIN_RULE: 1000
+  MIXIN_RULE: 1000,
 };
 
 const OPEN_BRACE = '{';
@@ -231,7 +222,7 @@ const RX = {
   mixinApply: /@apply\s*\(?[^);]*\)?\s*(?:[;\n]|$)?/gim,
   varApply: /[^;:]*?:[^;]*?var\([^;]*\)(?:[;\n]|$)?/gim,
   keyframesRule: /^@[^\s]*keyframes/,
-  multipleSpaces: /\s+/g
+  multipleSpaces: /\s+/g,
 };
 
 const VAR_START = '--';

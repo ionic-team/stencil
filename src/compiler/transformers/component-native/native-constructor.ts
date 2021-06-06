@@ -1,11 +1,10 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { addCreateEvents } from '../create-event';
-import ts from 'typescript';
-import { ATTACH_SHADOW, REGISTER_HOST } from '../exports';
 import { addLegacyProps } from '../legacy-props';
+import { ATTACH_SHADOW, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
+import ts from 'typescript';
 
-
-export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, ensureSuper: boolean) {
+export const updateNativeConstructor = (classMembers: ts.ClassElement[], moduleFile: d.Module, cmp: d.ComponentCompilerMeta, ensureSuper: boolean) => {
   if (cmp.isPlain) {
     return;
   }
@@ -15,20 +14,12 @@ export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.
     // add to the existing constructor()
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
 
-    let statements: ts.Statement[] = [
-      ...nativeInit(cmp),
-      ...cstrMethod.body.statements,
-      ...addCreateEvents(cmp),
-      ...addLegacyProps(cmp)
-    ];
+    let statements: ts.Statement[] = [...nativeInit(moduleFile, cmp), ...addCreateEvents(moduleFile, cmp), ...cstrMethod.body.statements, ...addLegacyProps(moduleFile, cmp)];
 
     if (ensureSuper) {
       const hasSuper = cstrMethod.body.statements.some(s => s.kind === ts.SyntaxKind.SuperKeyword);
       if (!hasSuper) {
-        statements = [
-          createSuper(),
-          ...statements
-        ];
+        statements = [createNativeConstructorSuper(), ...statements];
       }
     }
 
@@ -37,66 +28,39 @@ export function updateNativeConstructor(classMembers: ts.ClassElement[], cmp: d.
       cstrMethod.decorators,
       cstrMethod.modifiers,
       cstrMethod.parameters,
-      ts.updateBlock(cstrMethod.body, statements)
+      ts.updateBlock(cstrMethod.body, statements),
     );
-
   } else {
     // create a constructor()
-    let statements: ts.Statement[] = [
-      ...nativeInit(cmp),
-      ...addCreateEvents(cmp),
-      ...addLegacyProps(cmp),
-    ];
+    let statements: ts.Statement[] = [...nativeInit(moduleFile, cmp), ...addCreateEvents(moduleFile, cmp), ...addLegacyProps(moduleFile, cmp)];
 
     if (ensureSuper) {
-      statements = [
-        createSuper(),
-        ...statements
-      ];
+      statements = [createNativeConstructorSuper(), ...statements];
     }
 
-    const cstrMethod = ts.createConstructor(
-      undefined,
-      undefined,
-      undefined,
-      ts.createBlock(statements, true)
-    );
+    const cstrMethod = ts.createConstructor(undefined, undefined, undefined, ts.createBlock(statements, true));
     classMembers.unshift(cstrMethod);
   }
-}
+};
 
-
-function nativeInit(cmp: d.ComponentCompilerMeta) {
-  const initStatements =  [
-    nativeRegisterHostStatement(),
-  ];
+const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
+  const initStatements = [nativeRegisterHostStatement()];
   if (cmp.encapsulation === 'shadow') {
-    initStatements.push(nativeAttachShadowStatement());
+    initStatements.push(nativeAttachShadowStatement(moduleFile));
   }
   return initStatements;
-}
+};
 
-function nativeRegisterHostStatement() {
-  return ts.createStatement(ts.createCall(
-    ts.createIdentifier(REGISTER_HOST),
-    undefined,
-    [ ts.createThis() ]
-  ));
-}
+const nativeRegisterHostStatement = () => {
+  return ts.createStatement(ts.createCall(ts.createPropertyAccess(ts.createThis(), ts.createIdentifier('__registerHost')), undefined, undefined));
+};
 
-function nativeAttachShadowStatement() {
-  return ts.createStatement(ts.createCall(
-    ts.createIdentifier(ATTACH_SHADOW),
-    undefined,
-    [ ts.createThis() ]
-  ));
-}
+const nativeAttachShadowStatement = (moduleFile: d.Module) => {
+  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.attachShadow);
 
+  return ts.createStatement(ts.createCall(ts.createIdentifier(ATTACH_SHADOW), undefined, [ts.createThis()]));
+};
 
-function createSuper() {
-  return ts.createExpressionStatement(ts.createCall(
-    ts.createIdentifier('super'),
-    undefined,
-    undefined
-  ));
-}
+const createNativeConstructorSuper = () => {
+  return ts.createExpressionStatement(ts.createCall(ts.createIdentifier('super'), undefined, undefined));
+};

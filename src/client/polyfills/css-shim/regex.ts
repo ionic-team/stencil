@@ -1,4 +1,3 @@
-
 export const VAR_USAGE_START = /\bvar\(/;
 export const VAR_ASSIGN_START = /\B--[\w-]+\s*:/;
 

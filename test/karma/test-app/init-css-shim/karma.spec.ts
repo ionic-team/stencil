@@ -2,7 +2,6 @@ import { setupDomTests } from '../util';
 
 describe('init-css-shim', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
-  const imageUrl = '/path/to/image.png';
 
   let app: HTMLElement;
 
@@ -16,16 +15,15 @@ describe('init-css-shim', () => {
     let imagePath = window.getComputedStyle(root).getPropertyValue('background-image');
     imagePath = imagePath.replace(/\"/g, '');
     imagePath = imagePath.replace(/\'/g, '');
-    expect(imagePath).toBe(`url(${window.location.origin}${imageUrl})`);
+    expect(imagePath).toBe(`url(${window.location.origin}/assets/favicon.ico?relativeToRoot)`);
   });
 
   it('should not replace "absolute" paths', async () => {
-    const domain = 'http://domain';
     const root = app.querySelector('init-css-root #absolute');
     let imagePath = window.getComputedStyle(root).getPropertyValue('background-image');
     imagePath = imagePath.replace(/\"/g, '');
     imagePath = imagePath.replace(/\'/g, '');
-    expect(imagePath).toBe(`url(${domain}${imageUrl})`);
+    expect(imagePath).toBe(`url(https://www.google.com/favicon.ico)`);
   });
 
 });

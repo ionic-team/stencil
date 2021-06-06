@@ -1,8 +1,7 @@
-import * as d from '../declarations';
-import fs from 'graceful-fs';
+import type * as d from '@stencil/core/internal';
+import fs from 'fs';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
-
 
 function getMismatchedPixels(pixelMatchInput: d.PixelMatchInput) {
   const imgA = fs.createReadStream(pixelMatchInput.imageAPath).pipe(new PNG()).on('parsed', doneReading);
@@ -15,7 +14,7 @@ function getMismatchedPixels(pixelMatchInput: d.PixelMatchInput) {
 
     const mismatchedPixels = pixelmatch(imgA.data, imgB.data, null, pixelMatchInput.width, pixelMatchInput.height, {
       threshold: pixelMatchInput.pixelmatchThreshold,
-      includeAA: false
+      includeAA: false,
     });
 
     process.send(mismatchedPixels);

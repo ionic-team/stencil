@@ -1,8 +1,7 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { MarkdownTable } from './docs-util';
 
-
-export function methodsToMarkdown(methods: d.JsonDocsMethod[]) {
+export const methodsToMarkdown = (methods: d.JsonDocsMethod[]) => {
   const content: string[] = [];
   if (methods.length === 0) {
     return content;
@@ -14,7 +13,7 @@ export function methodsToMarkdown(methods: d.JsonDocsMethod[]) {
   methods.forEach(method => {
     content.push(`### \`${method.signature}\``);
     content.push(``);
-    content.push(method.docs);
+    content.push(getDocsField(method));
     content.push(``);
 
     if (method.parameters.length > 0) {
@@ -45,4 +44,8 @@ export function methodsToMarkdown(methods: d.JsonDocsMethod[]) {
   content.push(``);
 
   return content;
-}
+};
+
+const getDocsField = (prop: d.JsonDocsMethod) => {
+  return `${prop.deprecation !== undefined ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>` : ''}${prop.docs}`;
+};

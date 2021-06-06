@@ -4,16 +4,12 @@ import { MockElement, MockNode, MockTextNode } from './node';
 import { MockTemplateElement } from './element';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { Attribute, ParserOptions, TreeAdapter, parse, parseFragment } from 'parse5';
-
+import { MockDocumentFragment } from './document-fragment';
 
 const docParser = new WeakMap<any, any>();
 
-
 export function parseDocumentUtil(ownerDocument: any, html: string) {
-  const doc = parse(
-    html.trim(),
-    getParser(ownerDocument)
-  ) as any;
+  const doc = parse(html.trim(), getParser(ownerDocument)) as any;
 
   doc.documentElement = doc.firstElementChild;
   doc.head = doc.documentElement.firstElementChild;
@@ -22,20 +18,15 @@ export function parseDocumentUtil(ownerDocument: any, html: string) {
   return doc;
 }
 
-
 export function parseFragmentUtil(ownerDocument: any, html: string) {
   if (typeof html === 'string') {
     html = html.trim();
   } else {
     html = '';
   }
-  const frag = parseFragment(
-    html,
-    getParser(ownerDocument)
-  ) as any;
+  const frag = parseFragment(html, getParser(ownerDocument)) as any;
   return frag;
 }
-
 
 function getParser(ownerDocument: MockDocument) {
   let parseOptions: ParserOptions = docParser.get(ownerDocument);
@@ -45,11 +36,19 @@ function getParser(ownerDocument: MockDocument) {
   }
 
   const treeAdapter: TreeAdapter = {
-
+    
     createDocument() {
       const doc = ownerDocument.createElement(NODE_NAMES.DOCUMENT_NODE);
       (doc as any)['x-mode'] = 'no-quirks';
       return doc;
+    },
+
+    setNodeSourceCodeLocation(node, location) {
+      (node as any).sourceCodeLocation = location;
+    },
+
+    getNodeSourceCodeLocation(node) {
+      return (node as any).sourceCodeLocation;
     },
 
     createDocumentFragment() {
@@ -57,9 +56,7 @@ function getParser(ownerDocument: MockDocument) {
     },
 
     createElement(tagName: string, namespaceURI: string, attrs: Attribute[]) {
-      const elm = ownerDocument.createElement(tagName);
-      elm.namespaceURI = namespaceURI;
-
+      const elm = ownerDocument.createElementNS(namespaceURI, tagName);
       for (let i = 0; i < attrs.length; i++) {
         const attr = attrs[i];
 
@@ -85,7 +82,7 @@ function getParser(ownerDocument: MockDocument) {
       parentNode.insertBefore(newNode, referenceNode);
     },
 
-    setTemplateContent(templateElement: MockTemplateElement, contentElement: MockElement) {
+    setTemplateContent(templateElement: MockTemplateElement, contentElement: MockDocumentFragment) {
       templateElement.content = contentElement;
     },
 
@@ -125,7 +122,6 @@ function getParser(ownerDocument: MockDocument) {
       if (lastChild != null && lastChild.nodeType === NODE_TYPES.TEXT_NODE) {
         lastChild.nodeValue += text;
       } else {
-
         parentNode.appendChild(ownerDocument.createTextNode(text));
       }
     },
@@ -163,19 +159,23 @@ function getParser(ownerDocument: MockDocument) {
     },
 
     getAttrList(element: MockElement) {
-      const attrs: Attribute[] = element.attributes.items.map(attr => {
+      const attrs: Attribute[] = element.attributes.__items.map(attr => {
         return {
           name: attr.name,
           value: attr.value,
           namespace: attr.namespaceURI,
-          prefix: null
+          prefix: null,
         };
       });
       return attrs;
     },
 
     getTagName(element: MockElement) {
-      return element.nodeName.toLowerCase();
+      if (element.namespaceURI === 'http://www.w3.org/1999/xhtml') {
+        return element.nodeName.toLowerCase();
+      } else {
+        return element.nodeName;
+      }
     },
 
     getNamespaceURI(element: MockElement) {
@@ -216,11 +216,11 @@ function getParser(ownerDocument: MockDocument) {
 
     isElementNode(node: MockNode) {
       return node.nodeType === NODE_TYPES.ELEMENT_NODE;
-    }
+    },
   };
 
   parseOptions = {
-    treeAdapter: treeAdapter
+    treeAdapter: treeAdapter,
   };
 
   docParser.set(ownerDocument, parseOptions);

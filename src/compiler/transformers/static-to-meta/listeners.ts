@@ -1,9 +1,8 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { getStaticValue } from '../transform-utils';
 import ts from 'typescript';
 
-
-export function parseStaticListeners(staticMembers: ts.ClassElement[]): d.ComponentCompilerListener[] {
+export const parseStaticListeners = (staticMembers: ts.ClassElement[]): d.ComponentCompilerListener[] => {
   const parsedListeners: d.ComponentCompilerListener[] = getStaticValue(staticMembers, 'listeners');
   if (!parsedListeners || parsedListeners.length === 0) {
     return [];
@@ -15,7 +14,7 @@ export function parseStaticListeners(staticMembers: ts.ClassElement[]): d.Compon
       method: parsedListener.method,
       capture: !!parsedListener.capture,
       passive: !!parsedListener.passive,
-      target: parsedListener.target
+      target: parsedListener.target,
     };
   });
-}
+};

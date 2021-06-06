@@ -1,12 +1,13 @@
-import { Config } from '../../dist';
+import { Config } from '../../internal';
 
 export const config: Config = {
 
   hashFileNames: false,
-
+  minifyJs: false,
   outputTargets: [
     {
       type: 'www',
+      baseUrl: 'http://testing.stenciljs.com',
       serviceWorker: null
     },
     {

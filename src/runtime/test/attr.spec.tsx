@@ -1,11 +1,9 @@
-import { Component, Element, Prop } from '@stencil/core';
+import { Component, Element, Prop, h, Host } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('attribute', () => {
-
   it('multi-word attribute', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop() multiWord: string;
       render() {
@@ -27,7 +25,7 @@ describe('attribute', () => {
   });
 
   it('custom attribute name', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop({ attribute: 'some-customName' }) customAttr: string;
       render() {
@@ -49,9 +47,8 @@ describe('attribute', () => {
   });
 
   describe('already set', () => {
-
     it('set boolean, "false"', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() bool: boolean;
         render() {
@@ -73,7 +70,7 @@ describe('attribute', () => {
     });
 
     it('set boolean, undefined when missing attribute', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() bool: boolean;
         render() {
@@ -95,7 +92,7 @@ describe('attribute', () => {
     });
 
     it('set boolean, "true"', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() bool: boolean;
         render() {
@@ -117,7 +114,7 @@ describe('attribute', () => {
     });
 
     it('set boolean true from no attribute value', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() bool: boolean;
         render() {
@@ -139,7 +136,7 @@ describe('attribute', () => {
     });
 
     it('set boolean true from empty string', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() bool: boolean;
         render() {
@@ -161,7 +158,7 @@ describe('attribute', () => {
     });
 
     it('set zero', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() num: number;
         render() {
@@ -183,7 +180,7 @@ describe('attribute', () => {
     });
 
     it('set number', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() num: number;
         render() {
@@ -205,7 +202,7 @@ describe('attribute', () => {
     });
 
     it('set string', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() str: string;
         render() {
@@ -227,7 +224,7 @@ describe('attribute', () => {
     });
 
     it('set empty string', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Prop() str: string;
         render() {
@@ -247,25 +244,24 @@ describe('attribute', () => {
       expect(root.textContent).toBe('');
       expect(root.str).toBe('');
     });
-
   });
 
   describe('reflect', () => {
     it('should reflect properties as attributes', async () => {
-      @Component({ tag: 'cmp-a'})
+      @Component({ tag: 'cmp-a' })
       class CmpA {
         @Element() el: any;
 
-        @Prop({reflect: true}) str = 'single';
-        @Prop({reflect: true}) nu = 2;
-        @Prop({reflect: true}) undef: string;
-        @Prop({reflect: true}) null: string = null;
-        @Prop({reflect: true}) bool = false;
-        @Prop({reflect: true}) otherBool = true;
-        @Prop({reflect: true}) disabled = false;
+        @Prop({ reflect: true }) str = 'single';
+        @Prop({ reflect: true }) nu = 2;
+        @Prop({ reflect: true }) undef: string;
+        @Prop({ reflect: true }) null: string = null;
+        @Prop({ reflect: true }) bool = false;
+        @Prop({ reflect: true }) otherBool = true;
+        @Prop({ reflect: true }) disabled = false;
 
-        @Prop({reflect: true, mutable: true}) dynamicStr: string;
-        @Prop({reflect: true}) dynamicNu: number;
+        @Prop({ reflect: true, mutable: true }) dynamicStr: string;
+        @Prop({ reflect: true }) dynamicNu: number;
 
         componentWillLoad() {
           this.dynamicStr = 'value';
@@ -295,6 +291,77 @@ describe('attribute', () => {
         <cmp-a str="second" nu="-12.2" undef="no undef" null="no null" bool dynamic-str="value" dynamic-nu="123"></cmp-a>
       `);
     });
-  });
+    it('should reflect properties as attributes', async () => {
 
+      @Component({ tag: 'cmp-a', shadow: true })
+      class CmpA {
+        @Prop({ reflect: true }) foo = 'bar';
+
+        render() {
+          return <div>Hello world</div>;
+        }
+      }
+
+      const { root } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+        strictBuild: true,
+      });
+
+      expect(root).toEqualHtml(`
+        <cmp-a foo="bar">
+          <mock:shadow-root>
+            <div>
+              Hello world
+            </div>
+          </mock:shadow-root>
+        </cmp-a>
+      `);
+    });
+
+    it('should reflect draggable', async () => {
+
+      @Component({ tag: 'cmp-draggable', shadow: true })
+      class CmpABC {
+        @Prop() foo = false;
+
+        render() {
+          return (
+            <Host>
+              <div draggable={this.foo}></div>
+              <img draggable={this.foo} />
+            </Host>
+          );
+        }
+      }
+
+      const { root, waitForChanges } = await newSpecPage({
+        components: [CmpABC],
+        html: `<cmp-draggable></cmp-draggable>`,
+      });
+
+      expect(root).toEqualHtml(`
+        <cmp-draggable>
+          <mock:shadow-root>
+            <div draggable="false"></div>
+            <img draggable="false"/>
+          </mock:shadow-root>
+        </cmp-draggable>
+      `);
+
+      root.foo = true;
+      await waitForChanges();
+
+      expect(root).toEqualHtml(`
+      <cmp-draggable>
+        <mock:shadow-root>
+          <div draggable="true"></div>
+          <img draggable="true"/>
+        </mock:shadow-root>
+      </cmp-draggable>
+    `);
+
+    });
+
+  });
 });

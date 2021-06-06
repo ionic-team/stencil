@@ -8,33 +8,39 @@ log.txt
 *.sublime-project
 *.sublime-workspace
 
+.DS_Store
 .idea/
 .vscode/
+.history/
 .sass-cache/
 .versions/
 node_modules/
 coverage/
 
+/build/
+/scripts/build/
 dist/
-**/www/build/
 
 # submodule packages
+/build-conditionals
+/cli
 /compiler
 /hydrate
+/dev-server
 /internal
 /mock-doc
 /polyfills
+/runtime
 /server
 /sys
 /testing
-/build-conditionals
-/runtime
 
 /screenshot/index.js
 /screenshot/package.json
-/screenshot/connector.js
-/screenshot/local-connector.js
 /screenshot/pixel-match.js
+/screenshot/*.d.ts
 
 test/**/www/*
+test/**/hydrate/*
 .stencil
+/dependencies.json

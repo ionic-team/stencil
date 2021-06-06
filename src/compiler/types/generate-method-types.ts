@@ -1,14 +1,13 @@
-import * as d from '../../declarations';
-import { isDocsPublic } from '@utils';
+import type * as d from '../../declarations';
+import { getTextDocs } from '@utils';
 
-
-export function generateMethodTypes(cmpMethods: d.ComponentCompilerMethod[]): d.TypeInfo {
+export const generateMethodTypes = (cmpMethods: d.ComponentCompilerMethod[]): d.TypeInfo => {
   return cmpMethods.map(cmpMethod => ({
     name: cmpMethod.name,
     type: cmpMethod.complexType.signature,
     optional: false,
     required: false,
-    public: isDocsPublic(cmpMethod.docs),
-    jsdoc: (cmpMethod.docs != null && typeof cmpMethod.docs.text === 'string') ? cmpMethod.docs.text : undefined
+    internal: cmpMethod.internal,
+    jsdoc: getTextDocs(cmpMethod.docs),
   }));
-}
+};

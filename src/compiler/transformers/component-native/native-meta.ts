@@ -1,11 +1,7 @@
-import ts from 'typescript';
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
+import ts from 'typescript';
 
-
-export function addComponentMeta(classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) {
-  // function call to stencil's exported connectedCallback(elm, plt)
-  classMembers.push(
-    createStaticGetter('is', convertValueToLiteral(cmp.tagName))
-  );
-}
+export const addNativeComponentMeta = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
+  classMembers.push(createStaticGetter('is', convertValueToLiteral(cmp.tagName)));
+};

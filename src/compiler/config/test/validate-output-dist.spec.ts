@@ -1,18 +1,14 @@
-import * as d from '@stencil/core/declarations';
-import { validateOutputTargetDist } from '../validate-outputs-dist';
+import type * as d from '@stencil/core/declarations';
+import { validateConfig } from '../validate-config';
+import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
-
 describe('validateDistOutputTarget', () => {
+  const rootDir = path.resolve('/');
 
-  let config: d.Config;
+  let userConfig: d.Config;
   beforeEach(() => {
-    config = {
-      sys: {
-        path: path
-      },
-      rootDir: '/'
-    };
+    userConfig = mockConfig();
   });
 
   it('should set dist values', () => {
@@ -20,33 +16,95 @@ describe('validateDistOutputTarget', () => {
       type: 'dist',
       dir: 'my-dist',
       buildDir: 'my-build',
-      empty: false
+      empty: false,
     };
-    config.outputTargets = [outputTarget];
-    validateOutputTargetDist(config);
-    expect(config.outputTargets).toHaveLength(4);
-    expect(outputTarget).toBeDefined();
-    expect(outputTarget.dir).toBe('/my-dist');
-    expect(outputTarget.buildDir).toBe('/my-dist/my-build');
-    expect(outputTarget.empty).toBe(false);
+    userConfig.outputTargets = [outputTarget];
+    userConfig.buildDist = true;
+    const { config } = validateConfig(userConfig);
+    expect(config.outputTargets).toEqual([
+      {
+        buildDir: path.join(rootDir, 'my-dist', 'my-build'),
+        collectionDir: path.join(rootDir, 'my-dist', 'collection'),
+        copy: [],
+        dir: path.join(rootDir, 'my-dist'),
+        empty: false,
+        esmLoaderPath: path.join(rootDir, 'my-dist', 'loader'),
+        type: 'dist',
+        typesDir: path.join(rootDir, 'my-dist', 'types'),
+      },
+      {
+        esmDir: path.join(rootDir, 'my-dist', 'my-build', 'testing'),
+        empty: false,
+        isBrowserBuild: true,
+        legacyLoaderFile: path.join(rootDir, 'my-dist', 'my-build', 'testing.js'),
+        polyfills: true,
+        systemDir: undefined,
+        systemLoaderFile: undefined,
+        type: 'dist-lazy',
+      },
+      {
+        copyAssets: 'dist',
+        copy: [],
+        dir: path.join(rootDir, 'my-dist', 'my-build', 'testing'),
+        type: 'copy',
+      },
+      {
+        file: path.join(rootDir, 'my-dist', 'my-build', 'testing', 'testing.css'),
+        type: 'dist-global-styles',
+      },
+      {
+        dir: path.join(rootDir, 'my-dist'),
+        empty: false,
+        type: 'dist-types',
+        typesDir: path.join(rootDir, 'my-dist', 'types'),
+      },
+      {
+        collectionDir: path.join(rootDir, 'my-dist', 'collection'),
+        dir: path.join(rootDir, '/my-dist'),
+        empty: false,
+        type: 'dist-collection',
+      },
+      {
+        copy: [{ src: '**/*.svg' }, { src: '**/*.js' }],
+        copyAssets: 'collection',
+        dir: path.join(rootDir, 'my-dist', 'collection'),
+        type: 'copy',
+      },
+      {
+        type: 'dist-lazy',
+        cjsDir: path.join(rootDir, 'my-dist', 'cjs'),
+        cjsIndexFile: path.join(rootDir, 'my-dist', 'index.cjs.js'),
+        empty: false,
+        esmDir: path.join(rootDir, 'my-dist', 'esm'),
+        esmEs5Dir: undefined,
+        esmIndexFile: path.join(rootDir, 'my-dist', 'index.js'),
+        polyfills: true,
+      },
+      {
+        cjsDir: path.join(rootDir, 'my-dist', 'cjs'),
+        componentDts: path.join(rootDir, 'my-dist', 'types', 'components.d.ts'),
+        dir: path.join(rootDir, 'my-dist', 'loader'),
+        empty: false,
+        esmDir: path.join(rootDir, 'my-dist', 'esm'),
+        esmEs5Dir: undefined,
+        type: 'dist-lazy-loader',
+      },
+    ]);
   });
 
   it('should set defaults when outputTargets dist is empty', () => {
-    config.outputTargets = [
-      { type: 'dist' }
-    ];
-    validateOutputTargetDist(config);
+    userConfig.outputTargets = [{ type: 'dist' }];
+    const { config } = validateConfig(userConfig);
     const outputTarget = config.outputTargets.find(o => o.type === 'dist') as d.OutputTargetDist;
     expect(outputTarget).toBeDefined();
-    expect(outputTarget.dir).toBe('/dist');
-    expect(outputTarget.buildDir).toBe('/dist');
+    expect(outputTarget.dir).toBe(path.join(rootDir, 'dist'));
+    expect(outputTarget.buildDir).toBe(path.join(rootDir, '/dist'));
     expect(outputTarget.empty).toBe(true);
   });
 
   it('should default to not add dist when outputTargets exists, but without dist', () => {
-    config.outputTargets = [];
-    validateOutputTargetDist(config);
+    userConfig.outputTargets = [];
+    const { config } = validateConfig(userConfig);
     expect(config.outputTargets.some(o => o.type === 'dist')).toBe(false);
   });
-
 });

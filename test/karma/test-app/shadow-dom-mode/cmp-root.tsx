@@ -10,7 +10,7 @@ export class ShadowDomModeRoot {
   componentDidLoad() {
     setTimeout(() => {
       this.showRed = true;
-    }, 500);
+    }, 50);
   }
 
   render() {

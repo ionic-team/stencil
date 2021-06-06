@@ -1,12 +1,20 @@
-import * as d from '../declarations';
+import type * as d from '@stencil/core/internal';
 import { normalizePath } from '@utils';
 import { writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
 import { createHash } from 'crypto';
 import { join, relative } from 'path';
 import { fork } from 'child_process';
 
-
-export async function compareScreenshot(emulateConfig: d.EmulateConfig, screenshotBuildData: d.ScreenshotBuildData, currentScreenshotBuf: Buffer, desc: string, testPath: string, pixelmatchThreshold: number) {
+export async function compareScreenshot(
+  emulateConfig: d.EmulateConfig,
+  screenshotBuildData: d.ScreenshotBuildData,
+  currentScreenshotBuf: Buffer,
+  desc: string,
+  width: number,
+  height: number,
+  testPath: string,
+  pixelmatchThreshold: number,
+) {
   const currentImageHash = createHash('md5').update(currentScreenshotBuf).digest('hex');
   const currentImageName = `${currentImageHash}.png`;
   const currentImagePath = join(screenshotBuildData.imagesDir, currentImageName);
@@ -31,8 +39,8 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
     userAgent: emulateConfig.userAgent,
     desc: desc,
     testPath: testPath,
-    width: emulateConfig.viewport.width,
-    height: emulateConfig.viewport.height,
+    width: width,
+    height: height,
     deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
     hasTouch: emulateConfig.viewport.hasTouch,
     isLandscape: emulateConfig.viewport.isLandscape,
@@ -45,16 +53,16 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
       mismatchedPixels: 0,
       device: emulateConfig.device,
       userAgent: emulateConfig.userAgent,
-      width: emulateConfig.viewport.width,
-      height: emulateConfig.viewport.height,
+      width: width,
+      height: height,
       deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
       hasTouch: emulateConfig.viewport.hasTouch,
       isLandscape: emulateConfig.viewport.isLandscape,
       isMobile: emulateConfig.viewport.isMobile,
       allowableMismatchedPixels: screenshotBuildData.allowableMismatchedPixels,
       allowableMismatchedRatio: screenshotBuildData.allowableMismatchedRatio,
-      testPath: testPath
-    }
+      testPath: testPath,
+    },
   };
 
   if (screenshotBuildData.updateMaster) {
@@ -88,7 +96,6 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
       // awesome, we've got cached data so we
       // can skip having to do the heavy pixelmatch comparison
       screenshot.diff.mismatchedPixels = cachedMismatchedPixels;
-
     } else {
       // images are not identical
       // and we don't have any cached data so let's
@@ -104,13 +111,10 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
         imageBPath: join(screenshotBuildData.imagesDir, screenshot.diff.imageB),
         width: naturalWidth,
         height: naturalHeight,
-        pixelmatchThreshold: pixelmatchThreshold
+        pixelmatchThreshold: pixelmatchThreshold,
       };
 
-      screenshot.diff.mismatchedPixels = await getMismatchedPixels(
-        screenshotBuildData.pixelmatchModulePath,
-        pixelMatchInput
-      );
+      screenshot.diff.mismatchedPixels = await getMismatchedPixels(screenshotBuildData.pixelmatchModulePath, pixelMatchInput);
     }
   }
 
@@ -119,29 +123,26 @@ export async function compareScreenshot(emulateConfig: d.EmulateConfig, screensh
   return screenshot.diff;
 }
 
-
 async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput: d.PixelMatchInput) {
   return new Promise<number>((resolve, reject) => {
-    const timeout = 30000;
+    const timeout = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
     const tmr = setTimeout(() => {
       reject(`getMismatchedPixels timeout: ${timeout}ms`);
     }, timeout);
 
     try {
-      const filteredExecArgs = process.execArgv.filter(
-        v => !/^--(debug|inspect)/.test(v)
-      );
+      const filteredExecArgs = process.execArgv.filter(v => !/^--(debug|inspect)/.test(v));
 
       const options = {
         execArgv: filteredExecArgs,
         env: process.env,
         cwd: process.cwd(),
-        stdio: ['pipe', 'pipe', 'pipe', 'ipc'] as any
+        stdio: ['pipe', 'pipe', 'pipe', 'ipc'] as any,
       };
 
       const pixelMatchProcess = fork(pixelmatchModulePath, [], options);
 
-      pixelMatchProcess.on('message', data => {
+      pixelMatchProcess.on('message', (data: any) => {
         pixelMatchProcess.kill();
         clearTimeout(tmr);
         resolve(data);
@@ -153,7 +154,6 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
       });
 
       pixelMatchProcess.send(pixelMatchInput);
-
     } catch (e) {
       clearTimeout(tmr);
       reject(`getMismatchedPixels error: ${e}`);
@@ -161,13 +161,11 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
   });
 }
 
-
 function getCacheKey(imageA: string, imageB: string, pixelmatchThreshold: number) {
   const hash = createHash('md5');
   hash.update(`${imageA}:${imageB}:${pixelmatchThreshold}`);
   return hash.digest('hex').substr(0, 10);
 }
-
 
 function getScreenshotId(emulateConfig: d.EmulateConfig, uniqueDescription: string) {
   if (typeof uniqueDescription !== 'string' || uniqueDescription.trim().length === 0) {

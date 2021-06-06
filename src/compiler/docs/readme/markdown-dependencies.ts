@@ -1,6 +1,8 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
+import { normalizePath } from '@utils';
+import { relative } from 'path';
 
-export function depsToMarkdown(config: d.Config, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) {
+export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) => {
   const content: string[] = [];
   const deps = Object.entries(cmp.dependencyGraph);
   if (deps.length === 0) {
@@ -10,9 +12,8 @@ export function depsToMarkdown(config: d.Config, cmp: d.JsonDocsComponent, cmps:
   content.push(`## Dependencies`);
   content.push(``);
 
-  if (cmp.dependants.length > 0) {
-    const usedBy = cmp.dependants
-      .map(tag => ' - ' + getCmpLink(config, cmp, tag, cmps));
+  if (cmp.dependents.length > 0) {
+    const usedBy = cmp.dependents.map(tag => ' - ' + getCmpLink(cmp, tag, cmps));
 
     content.push(`### Used by`);
     content.push(``);
@@ -20,8 +21,7 @@ export function depsToMarkdown(config: d.Config, cmp: d.JsonDocsComponent, cmps:
     content.push(``);
   }
   if (cmp.dependencies.length > 0) {
-    const dependsOn = cmp.dependencies
-      .map(tag => '- ' + getCmpLink(config, cmp, tag, cmps));
+    const dependsOn = cmp.dependencies.map(tag => '- ' + getCmpLink(cmp, tag, cmps));
 
     content.push(`### Depends on`);
     content.push(``);
@@ -45,13 +45,13 @@ export function depsToMarkdown(config: d.Config, cmp: d.JsonDocsComponent, cmps:
   content.push(``);
 
   return content;
-}
+};
 
-function getCmpLink(config: d.Config, from: d.JsonDocsComponent, to: string, cmps: d.JsonDocsComponent[]) {
+const getCmpLink = (from: d.JsonDocsComponent, to: string, cmps: d.JsonDocsComponent[]) => {
   const destCmp = cmps.find(c => c.tag === to);
   if (destCmp) {
-    const cmpRelPath = config.sys.path.relative(from.dirPath, destCmp.dirPath);
+    const cmpRelPath = normalizePath(relative(from.dirPath, destCmp.dirPath));
     return `[${to}](${cmpRelPath})`;
   }
   return to;
-}
+};

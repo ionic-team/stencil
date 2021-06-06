@@ -1,13 +1,13 @@
-import * as d from '../../declarations';
-import { isOutputTargetDist } from '../output-targets/output-utils';
+import type * as d from '../../declarations';
+import { dirname, join, relative } from 'path';
+import { isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { normalizePath } from '@utils';
 
+export const updateStencilTypesImports = (typesDir: string, dtsFilePath: string, dtsContent: string) => {
+  const dir = dirname(dtsFilePath);
+  const relPath = relative(dir, typesDir);
 
-export function updateStencilTypesImports(path: d.Path, typesDir: string, dtsFilePath: string, dtsContent: string) {
-  const dir = path.dirname(dtsFilePath);
-  const relPath = path.relative(dir, typesDir);
-
-  let coreDtsPath = path.join(relPath, CORE_FILENAME);
+  let coreDtsPath = join(relPath, CORE_FILENAME);
   if (!coreDtsPath.startsWith('.')) {
     coreDtsPath = `./${coreDtsPath}`;
   }
@@ -18,24 +18,21 @@ export function updateStencilTypesImports(path: d.Path, typesDir: string, dtsFil
     dtsContent = dtsContent.replace(/(from\s*(:?'|"))@stencil\/core('|")/g, `$1${coreDtsPath}$2`);
   }
   return dtsContent;
-}
+};
 
+export const copyStencilCoreDts = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
+  const typesOutputTargets = config.outputTargets.filter(isOutputTargetDistTypes).filter(o => o.typesDir);
 
-export async function copyStencilCoreDts(config: d.Config, compilerCtx: d.CompilerCtx) {
-  const typesOutputTargets = config.outputTargets
-    .filter(isOutputTargetDist)
-    .filter(o => o.typesDir);
+  const srcStencilDtsPath = join(config.sys.getCompilerExecutingPath(), '..', '..', 'internal', CORE_DTS);
+  const srcStencilCoreDts = await compilerCtx.fs.readFile(srcStencilDtsPath);
 
-  const srcStencilCoreDts = await config.sys.getClientCoreFile({
-    staticName: 'declarations/stencil.core.d.ts'
-  });
+  return Promise.all(
+    typesOutputTargets.map(o => {
+      const coreDtsFilePath = join(o.typesDir, CORE_DTS);
+      return compilerCtx.fs.writeFile(coreDtsFilePath, srcStencilCoreDts, { outputTargetType: o.type });
+    }),
+  );
+};
 
-  return Promise.all(typesOutputTargets.map(outputTarget => {
-    const coreDtsFilePath = config.sys.path.join(outputTarget.typesDir, CORE_DTS);
-    return compilerCtx.fs.writeFile(coreDtsFilePath, srcStencilCoreDts);
-  }));
-}
-
-
-const CORE_FILENAME = `stencil.core`;
+const CORE_FILENAME = `stencil-public-runtime`;
 const CORE_DTS = `${CORE_FILENAME}.d.ts`;

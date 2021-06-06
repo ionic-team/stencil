@@ -3,7 +3,6 @@ import { CSSScope } from './interfaces';
 import { getSelectors, getSelectorsForScopes, resolveValues } from './selectors';
 import { compileTemplate, executeTemplate } from './template';
 
-
 export function parseCSS(original: string): CSSScope {
   const ast = parse(original);
   const template = compileTemplate(original);
@@ -12,38 +11,39 @@ export function parseCSS(original: string): CSSScope {
     original,
     template,
     selectors,
-    isDynamic: template.length > 1
+    usesCssVars: template.length > 1,
   };
 }
 
 export function addGlobalStyle(globalScopes: CSSScope[], styleEl: HTMLStyleElement) {
-  const css = parseCSS(styleEl.innerHTML);
+  if (globalScopes.some(css => css.styleEl === styleEl)) {
+    return false;
+  }
+  const css = parseCSS(styleEl.textContent);
   css.styleEl = styleEl;
   globalScopes.push(css);
+  return true;
 }
 
 export function updateGlobalScopes(scopes: CSSScope[]) {
   const selectors = getSelectorsForScopes(scopes);
   const props = resolveValues(selectors);
   scopes.forEach(scope => {
-    if (scope.isDynamic) {
-      scope.styleEl.innerHTML = executeTemplate(scope.template, props);
+    if (scope.usesCssVars) {
+      scope.styleEl.textContent = executeTemplate(scope.template, props);
     }
   });
 }
 
-export function reScope(scope: CSSScope, cssScopeId: string): CSSScope {
-
+export function reScope(scope: CSSScope, scopeId: string): CSSScope {
   const template = scope.template.map(segment => {
-    return (typeof segment === 'string')
-      ? replaceScope(segment, scope.cssScopeId, cssScopeId)
-      : segment;
+    return typeof segment === 'string' ? replaceScope(segment, scope.scopeId, scopeId) : segment;
   });
 
   const selectors = scope.selectors.map(sel => {
     return {
       ...sel,
-      selector: replaceScope(sel.selector, scope.cssScopeId, cssScopeId)
+      selector: replaceScope(sel.selector, scope.scopeId, scopeId),
     };
   });
 
@@ -51,7 +51,7 @@ export function reScope(scope: CSSScope, cssScopeId: string): CSSScope {
     ...scope,
     template,
     selectors,
-    cssScopeId,
+    scopeId,
   };
 }
 

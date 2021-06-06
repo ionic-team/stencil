@@ -45,5 +45,8 @@ describe('slot array basic', () => {
     expect(elm.children[3].textContent.trim()).toBe('Content Bottom');
     expect(elm.children[4].nodeName.toLowerCase()).toContain('footer');
     expect(elm.children[4].textContent.trim()).toBe('Footer');
+
+    const hiddenCmp = app.querySelector('[hidden]');
+    expect(hiddenCmp).toBe(null);
   });
 });

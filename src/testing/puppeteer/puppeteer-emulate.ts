@@ -1,9 +1,8 @@
-import * as d from '../../declarations';
-import * as puppeteer from 'puppeteer';
+import type { E2EProcessEnv, EmulateConfig } from '@stencil/core/internal';
+import type * as puppeteer from 'puppeteer';
 
-
-export function setScreenshotEmulateData(userEmulateConfig: d.EmulateConfig, env: d.E2EProcessEnv) {
-  const screenshotEmulate: d.EmulateConfig = {
+export function setScreenshotEmulateData(userEmulateConfig: EmulateConfig, env: E2EProcessEnv) {
+  const screenshotEmulate: EmulateConfig = {
     userAgent: 'default',
     viewport: {
       width: 800,
@@ -11,8 +10,8 @@ export function setScreenshotEmulateData(userEmulateConfig: d.EmulateConfig, env
       deviceScaleFactor: 1,
       isMobile: false,
       hasTouch: false,
-      isLandscape: false
-    }
+      isLandscape: false,
+    },
   };
 
   if (typeof userEmulateConfig.device === 'string') {
@@ -28,7 +27,6 @@ export function setScreenshotEmulateData(userEmulateConfig: d.EmulateConfig, env
       screenshotEmulate.device = userEmulateConfig.device;
       screenshotEmulate.userAgent = puppeteerEmulateOpts.userAgent;
       screenshotEmulate.viewport = puppeteerEmulateOpts.viewport;
-
     } catch (e) {
       console.error('error loading puppeteer DeviceDescriptors', e);
       return;

@@ -1,4 +1,3 @@
-
 export const GLOBAL_SCOPE = ':root';
 
 export function findRegex(regex: RegExp, cssText: string, offset: number) {
@@ -8,7 +7,7 @@ export function findRegex(regex: RegExp, cssText: string, offset: number) {
     const start = offset + r['index'];
     return {
       start,
-      end: start + r[0].length
+      end: start + r[0].length,
     };
   }
   return null;

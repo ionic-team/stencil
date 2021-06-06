@@ -12,32 +12,28 @@ const rootDir = path.join(__dirname, '..');
 
 
 fileSizeProfile('Hello World App',
-  [
-    path.join(rootDir, 'hello-world', 'www', '*.js'),
-  ],
+  path.join(rootDir, 'hello-world', 'www', 'build'),
   output
 );
 
 fileSizeProfile('Hello VDOM App',
-  [
-    path.join(rootDir, 'hello-vdom', 'www', 'build', '*'),
-  ],
+  path.join(rootDir, 'hello-vdom', 'www', 'build'),
   output
 );
 
 fileSizeProfile('Todo App',
-  [
-    path.join(rootDir, 'todo-app', 'www', 'build', '*'),
-  ],
+  path.join(rootDir, 'todo-app', 'www', 'build'),
   output
 );
 
 fileSizeProfile('End-to-end App',
-  [
-    path.join(rootDir, 'end-to-end', 'www', 'build', 'app.js'),
-  ],
+  path.join(rootDir, 'end-to-end', 'www', 'build'),
   output
 );
 
+fileSizeProfile('Ionic App',
+  path.join(rootDir, 'ionic-app', 'www', 'build'),
+  output
+);
 
 fs.writeFileSync(path.join(rootDir, 'readme.md'), output.join('\n'));

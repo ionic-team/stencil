@@ -1,6 +1,6 @@
-import * as d from '../../declarations';
+import type * as d from '@stencil/core/internal';
 import { runJest } from './jest-runner';
-
+import { join } from 'path';
 
 export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) {
   config.logger.debug(`screenshot connector: ${config.testing.screenshotConnector}`);
@@ -9,9 +9,7 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
   const connector: d.ScreenshotConnector = new ScreenshotConnector();
 
   // for CI, let's wait a little longer than locally before taking the screenshot
-  const timeoutBeforeScreenshot = config.flags.ci ? 30 : 10;
-
-  const pixelmatchModulePath = config.sys.path.join(config.sys.compiler.packageDir, 'screenshot', 'pixel-match.js');
+  const pixelmatchModulePath = join(config.sys.getCompilerExecutingPath(), '..', '..', 'screenshot', 'pixel-match.js');
   config.logger.debug(`pixelmatch module: ${pixelmatchModulePath}`);
 
   const initTimespan = config.logger.createTimeSpan(`screenshot, initBuild started`, true);
@@ -22,14 +20,14 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
     appNamespace: config.namespace,
     rootDir: config.rootDir,
     cacheDir: config.cacheDir,
-    packageDir: config.sys.compiler.packageDir,
+    packageDir: join(config.sys.getCompilerExecutingPath(), '..', '..'),
     updateMaster: config.flags.updateScreenshot,
     logger: config.logger,
     allowableMismatchedPixels: config.testing.allowableMismatchedPixels,
     allowableMismatchedRatio: config.testing.allowableMismatchedRatio,
     pixelmatchThreshold: config.testing.pixelmatchThreshold,
-    timeoutBeforeScreenshot: timeoutBeforeScreenshot,
-    pixelmatchModulePath: pixelmatchModulePath
+    waitBeforeScreenshot: config.testing.waitBeforeScreenshot,
+    pixelmatchModulePath: pixelmatchModulePath,
   });
 
   if (!config.flags.updateScreenshot) {
@@ -38,10 +36,7 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
 
   initTimespan.finish(`screenshot, initBuild finished`);
 
-  const dataPromises = await Promise.all([
-    await connector.getMasterBuild(),
-    await connector.getScreenshotCache()
-  ]);
+  const dataPromises = await Promise.all([await connector.getMasterBuild(), await connector.getScreenshotCache()]);
 
   const masterBuild = dataPromises[0];
   const screenshotCache = dataPromises[1];
@@ -69,7 +64,6 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
         if (results.currentBuild && typeof results.currentBuild.previewUrl === 'string') {
           config.logger.info(config.logger.magenta(results.currentBuild.previewUrl));
         }
-
       } else {
         // comparing the screenshot to master
         if (results.compare) {
@@ -87,7 +81,6 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
         }
       }
     }
-
   } catch (e) {
     config.logger.error(e, e.stack);
   }
@@ -95,11 +88,10 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
   return passed;
 }
 
-
 function createBuildId() {
   const d = new Date();
 
-  let fmDt = (d.getFullYear() + '');
+  let fmDt = d.getFullYear() + '';
   fmDt += ('0' + (d.getMonth() + 1)).slice(-2);
   fmDt += ('0' + d.getDate()).slice(-2);
   fmDt += ('0' + d.getHours()).slice(-2);
@@ -109,11 +101,10 @@ function createBuildId() {
   return fmDt;
 }
 
-
 function createBuildMessage() {
   const d = new Date();
 
-  let fmDt = (d.getFullYear() + '') + '-';
+  let fmDt = d.getFullYear() + '' + '-';
   fmDt += ('0' + (d.getMonth() + 1)).slice(-2) + '-';
   fmDt += ('0' + d.getDate()).slice(-2) + ' ';
   fmDt += ('0' + d.getHours()).slice(-2) + ':';

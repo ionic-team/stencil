@@ -1,16 +1,15 @@
-import * as d from '../../declarations';
-import { isDocsPublic } from '@utils';
+import type * as d from '../../declarations';
+import { getTextDocs } from '@utils';
 
-
-export function generatePropTypes(cmpMeta: d.ComponentCompilerMeta): d.TypeInfo {
+export const generatePropTypes = (cmpMeta: d.ComponentCompilerMeta): d.TypeInfo => {
   return [
     ...cmpMeta.properties.map(cmpProp => ({
       name: cmpProp.name,
       type: cmpProp.complexType.original,
       optional: cmpProp.optional,
       required: cmpProp.required,
-      public: isDocsPublic(cmpProp.docs),
-      jsdoc: (cmpProp.docs != null && typeof cmpProp.docs.text === 'string') ? cmpProp.docs.text : undefined,
+      internal: cmpProp.internal,
+      jsdoc: getTextDocs(cmpProp.docs),
     })),
     ...cmpMeta.virtualProperties.map(cmpProp => ({
       name: cmpProp.name,
@@ -18,7 +17,7 @@ export function generatePropTypes(cmpMeta: d.ComponentCompilerMeta): d.TypeInfo 
       optional: true,
       required: false,
       jsdoc: cmpProp.docs,
-      public: true
-    }))
+      internal: false,
+    })),
   ];
-}
+};

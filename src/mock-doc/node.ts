@@ -1,19 +1,18 @@
 import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } from './custom-element-registry';
-import { closest, matches, selectAll, selectOne } from './selector';
-import { CSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
 import { dataset } from './dataset';
-import { MockAttr, MockAttributeMap, cloneAttributes } from './attribute';
+import { matches, selectAll, selectOne } from './selector';
+import { MockAttr, MockAttributeMap, createAttributeProxy } from './attribute';
 import { MockClassList } from './class-list';
+import { MockCSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
 import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { NON_ESCAPABLE_CONTENT, SerializeNodeToHtmlOptions, serializeNodeToHtml } from './serialize-node';
 import { parseFragmentUtil } from './parse-util';
 
-
 export class MockNode {
+  private _nodeValue: string;
   nodeName: string;
   nodeType: number;
-  nodeValue: string;
   ownerDocument: any;
   parentNode: MockNode;
   childNodes: MockNode[];
@@ -22,21 +21,49 @@ export class MockNode {
     this.ownerDocument = ownerDocument;
     this.nodeType = nodeType;
     this.nodeName = nodeName;
-    this.nodeValue = nodeValue;
+    this._nodeValue = nodeValue;
     this.parentNode = null;
     this.childNodes = [];
   }
 
   appendChild(newNode: MockNode) {
-    newNode.remove();
-    newNode.parentNode = this;
-    this.childNodes.push(newNode);
-    connectNode(this.ownerDocument, newNode);
+    if (newNode.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
+      const nodes = newNode.childNodes.slice();
+      for (const child of nodes) {
+        this.appendChild(child);
+      }
+    } else {
+      newNode.remove();
+      newNode.parentNode = this;
+      this.childNodes.push(newNode);
+      connectNode(this.ownerDocument, newNode);
+    }
     return newNode;
+  }
+
+  append(...items: (MockNode | string)[]) {
+    items.forEach(item => {
+      const isNode = typeof item === 'object' && item !== null && 'nodeType' in item;
+      this.appendChild(isNode ? item : this.ownerDocument.createTextNode(String(item)));
+    });
+  }
+
+  prepend(...items: (MockNode | string)[]) {
+    const firstChild = this.firstChild;
+    items.forEach(item => {
+      const isNode = typeof item === 'object' && item !== null && 'nodeType' in item;
+      this.insertBefore(isNode ? item : this.ownerDocument.createTextNode(String(item)), firstChild);
+    });
   }
 
   cloneNode(deep?: boolean): MockNode {
     throw new Error(`invalid node type to clone: ${this.nodeType}, deep: ${deep}`);
+  }
+
+  compareDocumentPosition(_other: MockNode) {
+    // unimplemented
+    // https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
+    return -1;
   }
 
   get firstChild() {
@@ -88,6 +115,13 @@ export class MockNode {
     return null;
   }
 
+  get nodeValue() {
+    return this._nodeValue;
+  }
+  set nodeValue(value: string) {
+    this._nodeValue = value;
+  }
+
   get parentElement() {
     return ((this.parentNode as any) as MockElement) || null;
   }
@@ -103,6 +137,10 @@ export class MockNode {
     return null;
   }
 
+  contains(otherNode: MockNode) {
+    return this.childNodes.includes(otherNode);
+  }
+
   removeChild(childNode: MockNode) {
     const index = this.childNodes.indexOf(childNode);
     if (index > -1) {
@@ -116,11 +154,9 @@ export class MockNode {
         if (wasConnected === true) {
           disconnectNode(childNode);
         }
-
       } else {
         childNode.parentNode = null;
       }
-
     } else {
       throw new Error(`node not found within childNodes during removeChild`);
     }
@@ -143,10 +179,10 @@ export class MockNode {
   }
 
   get textContent() {
-    return this.nodeValue;
+    return this._nodeValue;
   }
   set textContent(value: string) {
-    this.nodeValue = String(value);
+    this._nodeValue = String(value);
   }
 
   static ELEMENT_NODE = 1;
@@ -158,21 +194,26 @@ export class MockNode {
   static DOCUMENT_FRAGMENT_NODE = 11;
 }
 
+export class MockNodeList {
+  childNodes: MockNode[];
+  length: number;
+  ownerDocument: any;
 
-const attrsMap = new WeakMap<MockElement, MockAttributeMap>();
-const shadowRootMap = new WeakMap<MockElement, ShadowRoot>();
-const stylesMap = new WeakMap<MockElement, CSSStyleDeclaration>();
+  constructor(ownerDocument: any, childNodes: MockNode[], length: number) {
+    this.ownerDocument = ownerDocument;
+    this.childNodes = childNodes;
+    this.length = length;
+  }
+}
 
 export class MockElement extends MockNode {
   namespaceURI: string;
+  __attributeMap: MockAttributeMap;
+  __shadowRoot: ShadowRoot;
+  __style: MockCSSStyleDeclaration;
 
   constructor(ownerDocument: any, nodeName: string) {
-    super(
-      ownerDocument,
-      NODE_TYPES.ELEMENT_NODE,
-      typeof nodeName === 'string' ? nodeName.toUpperCase() : null,
-      null
-    );
+    super(ownerDocument, NODE_TYPES.ELEMENT_NODE, typeof nodeName === 'string' ? nodeName : null, null);
     this.namespaceURI = null;
   }
 
@@ -187,27 +228,26 @@ export class MockElement extends MockNode {
   }
 
   get shadowRoot() {
-    return shadowRootMap.get(this) || null;
+    return this.__shadowRoot || null;
   }
   set shadowRoot(shadowRoot: any) {
     if (shadowRoot != null) {
       shadowRoot.host = this;
-      shadowRootMap.set(this, shadowRoot);
+      this.__shadowRoot = shadowRoot;
     } else {
-      shadowRootMap.delete(this);
+      delete this.__shadowRoot;
     }
   }
 
   get attributes() {
-    let attrs = attrsMap.get(this);
-    if (attrs == null) {
-      attrs = new MockAttributeMap();
-      attrsMap.set(this, attrs);
+    if (this.__attributeMap == null) {
+      this.__attributeMap = createAttributeProxy(false);
     }
-    return attrs;
+    return this.__attributeMap;
   }
+
   set attributes(attrs: MockAttributeMap) {
-    attrsMap.set(this, attrs);
+    this.__attributeMap = attrs;
   }
 
   get children() {
@@ -218,8 +258,12 @@ export class MockElement extends MockNode {
     return this.childNodes.filter(n => n.nodeType === NODE_TYPES.ELEMENT_NODE).length;
   }
 
-  get className() { return this.getAttributeNS(null, 'class') || ''; }
-  set className(value: string) { this.setAttributeNS(null, 'class', value); }
+  get className() {
+    return this.getAttributeNS(null, 'class') || '';
+  }
+  set className(value: string) {
+    this.setAttributeNS(null, 'class', value);
+  }
 
   get classList() {
     return new MockClassList(this as any);
@@ -229,35 +273,32 @@ export class MockElement extends MockNode {
     dispatchEvent(this, new MockEvent('click', { bubbles: true, cancelable: true, composed: true }));
   }
 
-  cloneNode(deep?: boolean) {
-    const cloned = new MockElement(null, this.nodeName);
-    cloned.attributes = cloneAttributes(this.attributes);
-
-    const styleCssText = this.getAttribute('style');
-    if (styleCssText != null && styleCssText.length > 0) {
-      cloned.setAttribute('style', styleCssText);
-    }
-
-    if (deep) {
-      for (let i = 0, ii = this.childNodes.length; i < ii; i++) {
-        const clonedChildNode = this.childNodes[i].cloneNode(true);
-        cloned.appendChild(clonedChildNode);
-      }
-    }
-
-    return cloned;
+  cloneNode(_deep?: boolean): MockElement {
+    // implemented on MockElement.prototype from within element.ts
+    return null;
   }
 
   closest(selector: string) {
-    return closest(selector, this);
+    let elm = this;
+    while (elm != null) {
+      if (elm.matches(selector)) {
+        return elm;
+      }
+      elm = elm.parentNode as any;
+    }
+    return null;
   }
 
   get dataset() {
     return dataset(this);
   }
 
-  get dir() { return this.getAttributeNS(null, 'dir') || ''; }
-  set dir(value: string) { this.setAttributeNS(null, 'dir', value); }
+  get dir() {
+    return this.getAttributeNS(null, 'dir') || '';
+  }
+  set dir(value: string) {
+    this.setAttributeNS(null, 'dir', value);
+  }
 
   dispatchEvent(ev: MockEvent) {
     return dispatchEvent(this, ev);
@@ -268,19 +309,21 @@ export class MockElement extends MockNode {
   }
 
   getAttribute(attrName: string) {
-    attrName = attrName.toLowerCase();
     if (attrName === 'style') {
-      const style = stylesMap.get(this);
-      if (style != null && style.length > 0) {
+      if (this.__style != null && this.__style.length > 0) {
         return this.style.cssText;
       }
       return null;
     }
-    return this.getAttributeNS(null, attrName);
+    const attr = this.attributes.getNamedItem(attrName);
+    if (attr != null) {
+      return attr.value;
+    }
+    return null;
   }
 
-  getAttributeNS(namespaceURI: string, name: string) {
-    const attr = this.attributes.getNamedItemNS(namespaceURI, name);
+  getAttributeNS(namespaceURI: string, attrName: string) {
+    const attr = this.attributes.getNamedItemNS(namespaceURI, attrName);
     if (attr != null) {
       return attr.value;
     }
@@ -291,8 +334,8 @@ export class MockElement extends MockNode {
     return { bottom: 0, height: 0, left: 0, right: 0, top: 0, width: 0, x: 0, y: 0 };
   }
 
-  getRootNode(opts?: { composed?: boolean; [key: string]: any; }) {
-    const isComposed = (opts != null && opts.composed === true);
+  getRootNode(opts?: { composed?: boolean; [key: string]: any }) {
+    const isComposed = opts != null && opts.composed === true;
 
     let node: Node = this as any;
 
@@ -307,12 +350,23 @@ export class MockElement extends MockNode {
     return node;
   }
 
-  hasChildNodes() {
-    return (this.childNodes.length > 0);
+  get draggable() {
+    return this.getAttributeNS(null, 'draggable') === 'true';
+  }
+  set draggable(value: boolean) {
+    this.setAttributeNS(null, 'draggable', value);
   }
 
-  get id() { return this.getAttributeNS(null, 'id') || ''; }
-  set id(value: string) { this.setAttribute('id', value); }
+  hasChildNodes() {
+    return this.childNodes.length > 0;
+  }
+
+  get id() {
+    return this.getAttributeNS(null, 'id') || '';
+  }
+  set id(value: string) {
+    this.setAttributeNS(null, 'id', value);
+  }
 
   get innerHTML() {
     if (this.childNodes.length === 0) {
@@ -320,14 +374,13 @@ export class MockElement extends MockNode {
     }
     return serializeNodeToHtml(this as any, {
       newLines: false,
-      indentSpaces: 0
+      indentSpaces: 0,
     });
   }
 
   set innerHTML(html: string) {
     if (NON_ESCAPABLE_CONTENT.has(this.nodeName) === true) {
       setTextContent(this, html);
-
     } else {
       for (let i = this.childNodes.length - 1; i >= 0; i--) {
         this.removeChild(this.childNodes[i]);
@@ -352,20 +405,67 @@ export class MockElement extends MockNode {
     setTextContent(this, value);
   }
 
-  hasAttribute(attrName: string) {
-    attrName = attrName.toLowerCase();
-    if (attrName === 'style') {
-      const style = stylesMap.get(this);
-      return (style != null && style.length > 0);
+  insertAdjacentElement(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', elm: MockHTMLElement) {
+    if (position === 'beforebegin') {
+      insertBefore(this.parentNode, elm, this);
+    } else if (position === 'afterbegin') {
+      this.prepend(elm);
+    } else if (position === 'beforeend') {
+      this.appendChild(elm);
+    } else if (position === 'afterend') {
+      insertBefore(this.parentNode, elm, this.nextSibling);
     }
-    return this.getAttributeNS(null, attrName) !== null;
+    return elm;
+  }
+
+  insertAdjacentHTML(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', html: string) {
+    const frag = parseFragmentUtil(this.ownerDocument, html);
+    if (position === 'beforebegin') {
+      while (frag.childNodes.length > 0) {
+        insertBefore(this.parentNode, frag.childNodes[0], this);
+      }
+    } else if (position === 'afterbegin') {
+      while (frag.childNodes.length > 0) {
+        this.prepend(frag.childNodes[frag.childNodes.length - 1]);
+      }
+    } else if (position === 'beforeend') {
+      while (frag.childNodes.length > 0) {
+        this.appendChild(frag.childNodes[0]);
+      }
+    } else if (position === 'afterend') {
+      while (frag.childNodes.length > 0) {
+        insertBefore(this.parentNode, frag.childNodes[frag.childNodes.length - 1], this.nextSibling);
+      }
+    }
+  }
+
+  insertAdjacentText(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', text: string) {
+    const elm = this.ownerDocument.createTextNode(text);
+    if (position === 'beforebegin') {
+      insertBefore(this.parentNode, elm, this);
+    } else if (position === 'afterbegin') {
+      this.prepend(elm);
+    } else if (position === 'beforeend') {
+      this.appendChild(elm);
+    } else if (position === 'afterend') {
+      insertBefore(this.parentNode, elm, this.nextSibling);
+    }
+  }
+
+  hasAttribute(attrName: string) {
+    if (attrName === 'style') {
+      return this.__style != null && this.__style.length > 0;
+    }
+    return this.getAttribute(attrName) !== null;
   }
 
   hasAttributeNS(namespaceURI: string, name: string) {
     return this.getAttributeNS(namespaceURI, name) !== null;
   }
 
-  get hidden() { return this.hasAttributeNS(null, 'hidden'); }
+  get hidden() {
+    return this.hasAttributeNS(null, 'hidden');
+  }
   set hidden(isHidden: boolean) {
     if (isHidden === true) {
       this.setAttributeNS(null, 'hidden', '');
@@ -374,8 +474,12 @@ export class MockElement extends MockNode {
     }
   }
 
-  get lang() { return this.getAttributeNS(null, 'lang') || ''; }
-  set lang(value: string) { this.setAttributeNS(null, 'lang', value); }
+  get lang() {
+    return this.getAttributeNS(null, 'lang') || '';
+  }
+  set lang(value: string) {
+    this.setAttributeNS(null, 'lang', value);
+  }
 
   get lastElementChild() {
     const children = this.children;
@@ -388,7 +492,10 @@ export class MockElement extends MockNode {
 
   get nextElementSibling() {
     const parentElement = this.parentElement;
-    if (parentElement != null && (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)) {
+    if (
+      parentElement != null &&
+      (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)
+    ) {
       const children = parentElement.children;
       const index = children.indexOf(this) + 1;
       return parentElement.children[index] || null;
@@ -400,18 +507,37 @@ export class MockElement extends MockNode {
     return serializeNodeToHtml(this as any, {
       newLines: false,
       outerHtml: true,
-      indentSpaces: 0
+      indentSpaces: 0,
     });
   }
 
   get previousElementSibling() {
     const parentElement = this.parentElement;
-    if (parentElement != null && (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)) {
+    if (
+      parentElement != null &&
+      (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)
+    ) {
       const children = parentElement.children;
       const index = children.indexOf(this) - 1;
       return parentElement.children[index] || null;
     }
     return null;
+  }
+
+  getElementsByClassName(classNames: string) {
+    const classes = classNames
+      .trim()
+      .split(' ')
+      .filter(c => c.length > 0);
+    const results: MockElement[] = [];
+    getElementsByClassName(this, classes, results);
+    return results;
+  }
+
+  getElementsByTagName(tagName: string) {
+    const results: MockElement[] = [];
+    getElementsByTagName(this, tagName.toLowerCase(), results);
+    return results;
   }
 
   querySelector(selector: string) {
@@ -423,11 +549,16 @@ export class MockElement extends MockNode {
   }
 
   removeAttribute(attrName: string) {
-    attrName = attrName.toLowerCase();
     if (attrName === 'style') {
-      stylesMap.delete(this);
+      delete this.__style;
     } else {
-      this.removeAttributeNS(null, attrName);
+      const attr = this.attributes.getNamedItem(attrName);
+      if (attr != null) {
+        this.attributes.removeNamedItemNS(attr);
+        if (checkAttributeChanged(this) === true) {
+          attributeChanged(this, attrName, attr.value, null);
+        }
+      }
     }
   }
 
@@ -446,11 +577,35 @@ export class MockElement extends MockNode {
   }
 
   setAttribute(attrName: string, value: any) {
-    attrName = attrName.toLowerCase();
     if (attrName === 'style') {
       this.style = value;
     } else {
-      this.setAttributeNS(null, attrName, value);
+      const attributes = this.attributes;
+      let attr = attributes.getNamedItem(attrName);
+      const checkAttrChanged = checkAttributeChanged(this);
+
+      if (attr != null) {
+        if (checkAttrChanged === true) {
+          const oldValue = attr.value;
+          attr.value = value;
+
+          if (oldValue !== attr.value) {
+            attributeChanged(this, attr.name, oldValue, attr.value);
+          }
+        } else {
+          attr.value = value;
+        }
+      } else {
+        if (attributes.caseInsensitive) {
+          attrName = attrName.toLowerCase();
+        }
+        attr = new MockAttr(attrName, value);
+        attributes.__items.push(attr);
+
+        if (checkAttrChanged === true) {
+          attributeChanged(this, attrName, null, attr.value);
+        }
+      }
     }
   }
 
@@ -462,18 +617,17 @@ export class MockElement extends MockNode {
     if (attr != null) {
       if (checkAttrChanged === true) {
         const oldValue = attr.value;
-        attr.value = String(value);
+        attr.value = value;
 
         if (oldValue !== attr.value) {
-          attributeChanged(this, attrName, oldValue, attr.value);
+          attributeChanged(this, attr.name, oldValue, attr.value);
         }
       } else {
-        attr.value = String(value);
+        attr.value = value;
       }
-
     } else {
       attr = new MockAttr(attrName, value, namespaceURI);
-      attributes.items.push(attr);
+      attributes.__items.push(attr);
 
       if (checkAttrChanged === true) {
         attributeChanged(this, attrName, null, attr.value);
@@ -482,32 +636,35 @@ export class MockElement extends MockNode {
   }
 
   get style() {
-    let style = stylesMap.get(this);
-    if (style == null) {
-      style = createCSSStyleDeclaration();
-      stylesMap.set(this, style);
+    if (this.__style == null) {
+      this.__style = createCSSStyleDeclaration();
     }
-    return style;
+    return this.__style;
   }
   set style(val: any) {
     if (typeof val === 'string') {
-      let style = stylesMap.get(this);
-      if (style == null) {
-        style = createCSSStyleDeclaration();
-        stylesMap.set(this, style);
+      if (this.__style == null) {
+        this.__style = createCSSStyleDeclaration();
       }
-      style.cssText = val;
-
+      this.__style.cssText = val;
     } else {
-      stylesMap.set(this, val);
+      this.__style = val;
     }
   }
 
-  get tabIndex() { return parseInt(this.getAttributeNS(null, 'tabindex') || '-1', 10); }
-  set tabIndex(value: number) { this.setAttributeNS(null, 'tabindex', value); }
+  get tabIndex() {
+    return parseInt(this.getAttributeNS(null, 'tabindex') || '-1', 10);
+  }
+  set tabIndex(value: number) {
+    this.setAttributeNS(null, 'tabindex', value);
+  }
 
-  get tagName() { return this.nodeName; }
-  set tagName(value: string) { this.nodeName = value.toUpperCase(); }
+  get tagName() {
+    return this.nodeName;
+  }
+  set tagName(value: string) {
+    this.nodeName = value;
+  }
 
   get textContent() {
     const text: string[] = [];
@@ -518,104 +675,312 @@ export class MockElement extends MockNode {
     setTextContent(this, value);
   }
 
-  get title() { return this.getAttributeNS(null, 'title') || ''; }
-  set title(value: string) { this.setAttributeNS(null, 'title', value); }
+  get title() {
+    return this.getAttributeNS(null, 'title') || '';
+  }
+  set title(value: string) {
+    this.setAttributeNS(null, 'title', value);
+  }
 
-  onabort() {/**/}
-  onauxclick() {/**/}
-  onbeforecopy() {/**/}
-  onbeforecut() {/**/}
-  onbeforepaste() {/**/}
-  onblur() {/**/}
-  oncancel() {/**/}
-  oncanplay() {/**/}
-  oncanplaythrough() {/**/}
-  onchange() {/**/}
-  onclick() {/**/}
-  onclose() {/**/}
-  oncontextmenu() {/**/}
-  oncopy() {/**/}
-  oncuechange() {/**/}
-  oncut() {/**/}
-  ondblclick() {/**/}
-  ondrag() {/**/}
-  ondragend() {/**/}
-  ondragenter() {/**/}
-  ondragleave() {/**/}
-  ondragover() {/**/}
-  ondragstart() {/**/}
-  ondrop() {/**/}
-  ondurationchange() {/**/}
-  onemptied() {/**/}
-  onended() {/**/}
-  onerror() {/**/}
-  onfocus() {/**/}
-  onformdata() {/**/}
-  onfullscreenchange() {/**/}
-  onfullscreenerror() {/**/}
-  ongotpointercapture() {/**/}
-  oninput() {/**/}
-  oninvalid() {/**/}
-  onkeydown() {/**/}
-  onkeypress() {/**/}
-  onkeyup() {/**/}
-  onload() {/**/}
-  onloadeddata() {/**/}
-  onloadedmetadata() {/**/}
-  onloadstart() {/**/}
-  onlostpointercapture() {/**/}
-  onmousedown() {/**/}
-  onmouseenter() {/**/}
-  onmouseleave() {/**/}
-  onmousemove() {/**/}
-  onmouseout() {/**/}
-  onmouseover() {/**/}
-  onmouseup() {/**/}
-  onmousewheel() {/**/}
-  onpaste() {/**/}
-  onpause() {/**/}
-  onplay() {/**/}
-  onplaying() {/**/}
-  onpointercancel() {/**/}
-  onpointerdown() {/**/}
-  onpointerenter() {/**/}
-  onpointerleave() {/**/}
-  onpointermove() {/**/}
-  onpointerout() {/**/}
-  onpointerover() {/**/}
-  onpointerup() {/**/}
-  onprogress() {/**/}
-  onratechange() {/**/}
-  onreset() {/**/}
-  onresize() {/**/}
-  onscroll() {/**/}
-  onsearch() {/**/}
-  onseeked() {/**/}
-  onseeking() {/**/}
-  onselect() {/**/}
-  onselectstart() {/**/}
-  onstalled() {/**/}
-  onsubmit() {/**/}
-  onsuspend() {/**/}
-  ontimeupdate() {/**/}
-  ontoggle() {/**/}
-  onvolumechange() {/**/}
-  onwaiting() {/**/}
-  onwebkitfullscreenchange() {/**/}
-  onwebkitfullscreenerror() {/**/}
-  onwheel() {/**/}
+  onanimationstart() {
+    /**/
+  }
+  onanimationend() {
+    /**/
+  }
+  onanimationiteration() {
+    /**/
+  }
+  onabort() {
+    /**/
+  }
+  onauxclick() {
+    /**/
+  }
+  onbeforecopy() {
+    /**/
+  }
+  onbeforecut() {
+    /**/
+  }
+  onbeforepaste() {
+    /**/
+  }
+  onblur() {
+    /**/
+  }
+  oncancel() {
+    /**/
+  }
+  oncanplay() {
+    /**/
+  }
+  oncanplaythrough() {
+    /**/
+  }
+  onchange() {
+    /**/
+  }
+  onclick() {
+    /**/
+  }
+  onclose() {
+    /**/
+  }
+  oncontextmenu() {
+    /**/
+  }
+  oncopy() {
+    /**/
+  }
+  oncuechange() {
+    /**/
+  }
+  oncut() {
+    /**/
+  }
+  ondblclick() {
+    /**/
+  }
+  ondrag() {
+    /**/
+  }
+  ondragend() {
+    /**/
+  }
+  ondragenter() {
+    /**/
+  }
+  ondragleave() {
+    /**/
+  }
+  ondragover() {
+    /**/
+  }
+  ondragstart() {
+    /**/
+  }
+  ondrop() {
+    /**/
+  }
+  ondurationchange() {
+    /**/
+  }
+  onemptied() {
+    /**/
+  }
+  onended() {
+    /**/
+  }
+  onerror() {
+    /**/
+  }
+  onfocus() {
+    /**/
+  }
+  onfocusin() {
+    /**/
+  }
+  onfocusout() {
+    /**/
+  }
+  onformdata() {
+    /**/
+  }
+  onfullscreenchange() {
+    /**/
+  }
+  onfullscreenerror() {
+    /**/
+  }
+  ongotpointercapture() {
+    /**/
+  }
+  oninput() {
+    /**/
+  }
+  oninvalid() {
+    /**/
+  }
+  onkeydown() {
+    /**/
+  }
+  onkeypress() {
+    /**/
+  }
+  onkeyup() {
+    /**/
+  }
+  onload() {
+    /**/
+  }
+  onloadeddata() {
+    /**/
+  }
+  onloadedmetadata() {
+    /**/
+  }
+  onloadstart() {
+    /**/
+  }
+  onlostpointercapture() {
+    /**/
+  }
+  onmousedown() {
+    /**/
+  }
+  onmouseenter() {
+    /**/
+  }
+  onmouseleave() {
+    /**/
+  }
+  onmousemove() {
+    /**/
+  }
+  onmouseout() {
+    /**/
+  }
+  onmouseover() {
+    /**/
+  }
+  onmouseup() {
+    /**/
+  }
+  onmousewheel() {
+    /**/
+  }
+  onpaste() {
+    /**/
+  }
+  onpause() {
+    /**/
+  }
+  onplay() {
+    /**/
+  }
+  onplaying() {
+    /**/
+  }
+  onpointercancel() {
+    /**/
+  }
+  onpointerdown() {
+    /**/
+  }
+  onpointerenter() {
+    /**/
+  }
+  onpointerleave() {
+    /**/
+  }
+  onpointermove() {
+    /**/
+  }
+  onpointerout() {
+    /**/
+  }
+  onpointerover() {
+    /**/
+  }
+  onpointerup() {
+    /**/
+  }
+  onprogress() {
+    /**/
+  }
+  onratechange() {
+    /**/
+  }
+  onreset() {
+    /**/
+  }
+  onresize() {
+    /**/
+  }
+  onscroll() {
+    /**/
+  }
+  onsearch() {
+    /**/
+  }
+  onseeked() {
+    /**/
+  }
+  onseeking() {
+    /**/
+  }
+  onselect() {
+    /**/
+  }
+  onselectstart() {
+    /**/
+  }
+  onstalled() {
+    /**/
+  }
+  onsubmit() {
+    /**/
+  }
+  onsuspend() {
+    /**/
+  }
+  ontimeupdate() {
+    /**/
+  }
+  ontoggle() {
+    /**/
+  }
+  onvolumechange() {
+    /**/
+  }
+  onwaiting() {
+    /**/
+  }
+  onwebkitfullscreenchange() {
+    /**/
+  }
+  onwebkitfullscreenerror() {
+    /**/
+  }
+  onwheel() {
+    /**/
+  }
 
   toString(opts?: SerializeNodeToHtmlOptions) {
     return serializeNodeToHtml(this as any, opts);
   }
-
 }
 
-export function resetElement(elm: any) {
+function getElementsByClassName(elm: MockElement, classNames: string[], foundElms: MockElement[]) {
+  const children = elm.children;
+  for (let i = 0, ii = children.length; i < ii; i++) {
+    const childElm = children[i];
+    for (let j = 0, jj = classNames.length; j < jj; j++) {
+      if (childElm.classList.contains(classNames[j])) {
+        foundElms.push(childElm);
+      }
+    }
+    getElementsByClassName(childElm, classNames, foundElms);
+  }
+}
+
+function getElementsByTagName(elm: MockElement, tagName: string, foundElms: MockElement[]) {
+  const children = elm.children;
+  for (let i = 0, ii = children.length; i < ii; i++) {
+    const childElm = children[i];
+    if (tagName === '*' || childElm.nodeName.toLowerCase() === tagName) {
+      foundElms.push(childElm);
+    }
+    getElementsByTagName(childElm, tagName, foundElms);
+  }
+}
+
+export function resetElement(elm: MockElement) {
   resetEventListeners(elm);
-  attrsMap.delete(elm);
-  shadowRootMap.delete(elm);
-  stylesMap.delete(elm);
+  delete elm.__attributeMap;
+  delete elm.__shadowRoot;
+  delete elm.__style;
 }
 
 function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: MockNode) {
@@ -628,11 +993,9 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
       const index = parentNode.childNodes.indexOf(referenceNode);
       if (index > -1) {
         parentNode.childNodes.splice(index, 0, newNode);
-
       } else {
         throw new Error(`referenceNode not found in parentNode.childNodes`);
       }
-
     } else {
       parentNode.childNodes.push(newNode);
     }
@@ -643,16 +1006,34 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
   return newNode;
 }
 
+export class MockHTMLElement extends MockElement {
+  namespaceURI = 'http://www.w3.org/1999/xhtml';
+
+  constructor(ownerDocument: any, nodeName: string) {
+    super(ownerDocument, typeof nodeName === 'string' ? nodeName.toUpperCase() : null);
+  }
+
+  get tagName() {
+    return this.nodeName;
+  }
+  set tagName(value: string) {
+    this.nodeName = value;
+  }
+
+  get attributes() {
+    if (this.__attributeMap == null) {
+      this.__attributeMap = createAttributeProxy(true);
+    }
+    return this.__attributeMap;
+  }
+  set attributes(attrs: MockAttributeMap) {
+    this.__attributeMap = attrs;
+  }
+}
 
 export class MockTextNode extends MockNode {
-
   constructor(ownerDocument: any, text: string) {
-    super(
-      ownerDocument,
-      NODE_TYPES.TEXT_NODE,
-      NODE_NAMES.TEXT_NODE,
-      text
-    );
+    super(ownerDocument, NODE_TYPES.TEXT_NODE, NODE_NAMES.TEXT_NODE, text);
   }
 
   cloneNode(_deep?: boolean) {
@@ -663,6 +1044,13 @@ export class MockTextNode extends MockNode {
     return this.nodeValue;
   }
   set textContent(text) {
+    this.nodeValue = text;
+  }
+
+  get data() {
+    return this.nodeValue;
+  }
+  set data(text) {
     this.nodeValue = text;
   }
 
@@ -680,22 +1068,18 @@ export class MockTextNode extends MockNode {
 
     return this.nodeValue;
   }
-
 }
-
 
 function getTextContent(childNodes: MockNode[], text: string[]) {
   for (let i = 0, ii = childNodes.length; i < ii; i++) {
     const childNode = childNodes[i];
     if (childNode.nodeType === NODE_TYPES.TEXT_NODE) {
       text.push(childNode.nodeValue);
-
     } else if (childNode.nodeType === NODE_TYPES.ELEMENT_NODE) {
       getTextContent(childNode.childNodes, text);
     }
   }
 }
-
 
 function setTextContent(elm: MockElement, text: string) {
   for (let i = elm.childNodes.length - 1; i >= 0; i--) {

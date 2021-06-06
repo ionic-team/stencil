@@ -1,8 +1,7 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import ts from 'typescript';
 
-
-export function parseStringLiteral(m: d.Module | d.ComponentCompilerMeta, node: ts.StringLiteral) {
+export const parseStringLiteral = (m: d.Module | d.ComponentCompilerMeta, node: ts.StringLiteral) => {
   if (typeof node.text === 'string' && node.text.includes('</')) {
     if (node.text.includes('<slot')) {
       m.htmlTagNames.push('slot');
@@ -11,4 +10,4 @@ export function parseStringLiteral(m: d.Module | d.ComponentCompilerMeta, node: 
       m.htmlTagNames.push('svg');
     }
   }
-}
+};

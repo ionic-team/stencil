@@ -1,9 +1,9 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { flatOne, unique } from '@utils';
 
 export function resolveComponentDependencies(cmps: d.ComponentCompilerMeta[]) {
   computeDependencies(cmps);
-  computeDependants(cmps);
+  computeDependents(cmps);
 }
 
 function computeDependencies(cmps: d.ComponentCompilerMeta[]) {
@@ -14,9 +14,9 @@ function computeDependencies(cmps: d.ComponentCompilerMeta[]) {
   });
 }
 
-function computeDependants(cmps: d.ComponentCompilerMeta[]) {
+function computeDependents(cmps: d.ComponentCompilerMeta[]) {
   cmps.forEach(cmp => {
-    resolveTransitiveDependants(cmp, cmps);
+    resolveTransitiveDependents(cmp, cmps);
   });
 }
 
@@ -26,27 +26,20 @@ function resolveTransitiveDependencies(cmp: d.ComponentCompilerMeta, cmps: d.Com
   }
   visited.add(cmp);
 
-  const dependencies = cmp.potentialCmpRefs.filter(tagName => cmps.some(c => c.tagName === tagName));
-  cmp.dependencies = cmp.directDependencies = dependencies;
+  const dependencies = unique(cmp.potentialCmpRefs.filter(tagName => cmps.some(c => c.tagName === tagName)));
 
-  const transitiveDeps = flatOne(
-    dependencies
-      .map(tagName => cmps.find(c => c.tagName === tagName))
-      .map(c => resolveTransitiveDependencies(c, cmps, visited))
-  );
-  return cmp.dependencies = [
-    ...dependencies,
-    ...transitiveDeps
-  ];
+  cmp.dependencies = cmp.directDependencies = dependencies;
+  const transitiveDeps = flatOne(dependencies.map(tagName => cmps.find(c => c.tagName === tagName)).map(c => resolveTransitiveDependencies(c, cmps, visited)));
+  return (cmp.dependencies = [...dependencies, ...transitiveDeps]);
 }
 
-function resolveTransitiveDependants(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) {
-  cmp.dependants = cmps
+function resolveTransitiveDependents(cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) {
+  cmp.dependents = cmps
     .filter(c => c.dependencies.includes(cmp.tagName))
     .map(c => c.tagName)
     .sort();
 
-  cmp.directDependants = cmps
+  cmp.directDependents = cmps
     .filter(c => c.directDependencies.includes(cmp.tagName))
     .map(c => c.tagName)
     .sort();

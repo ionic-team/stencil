@@ -1,24 +1,16 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { generateTypes } from '../types/generate-types';
-import { isOutputTargetDistCollection } from './output-utils';
+import { isOutputTargetDistTypes } from './output-utils';
 
-
-export async function outputTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
-  const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
+export const outputTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistTypes);
   if (outputTargets.length === 0) {
-    return;
-  }
-
-  const pkgData = buildCtx.packageJson;
-  if (pkgData == null) {
     return;
   }
 
   const timespan = buildCtx.createTimeSpan(`generate types started`, true);
 
-  await Promise.all(outputTargets.map(outputsTarget => {
-    return generateTypes(config, compilerCtx, buildCtx, pkgData, outputsTarget as any);
-  }));
+  await Promise.all(outputTargets.map(outputsTarget => generateTypes(config, compilerCtx, buildCtx, outputsTarget)));
 
   timespan.finish(`generate types finished`);
-}
+};

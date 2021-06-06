@@ -1,8 +1,7 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { MarkdownTable } from './docs-util';
 
-
-export function stylesToMarkdown(styles: d.JsonDocsStyle[]) {
+export const stylesToMarkdown = (styles: d.JsonDocsStyle[]) => {
   const content: string[] = [];
   if (styles.length === 0) {
     return content;
@@ -15,10 +14,7 @@ export function stylesToMarkdown(styles: d.JsonDocsStyle[]) {
   table.addHeader(['Name', 'Description']);
 
   styles.forEach(style => {
-    table.addRow([
-      `\`${style.name}\``,
-      style.docs
-    ]);
+    table.addRow([`\`${style.name}\``, style.docs]);
   });
 
   content.push(...table.toMarkdown());
@@ -26,4 +22,4 @@ export function stylesToMarkdown(styles: d.JsonDocsStyle[]) {
   content.push(``);
 
   return content;
-}
+};

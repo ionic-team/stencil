@@ -1,32 +1,22 @@
-import * as d from '../../declarations';
-import { catchError } from '@utils';
+import type * as d from '../../declarations';
+import { isString } from '@utils';
+import { nodeRequire } from '../sys/node-require';
 
-
-export function getPrerenderConfig(diagnostics: d.Diagnostic[], prerenderConfigPath: string) {
+export const getPrerenderConfig = (diagnostics: d.Diagnostic[], prerenderConfigPath: string) => {
   const prerenderConfig: d.PrerenderConfig = {};
 
-  if (typeof prerenderConfigPath === 'string') {
-    try {
-      // webpack work-around/hack
-      const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
-      const userConfig = requireFunc(prerenderConfigPath);
-      if (userConfig != null) {
-        Object.assign(prerenderConfig, userConfig);
-      }
+  if (isString(prerenderConfigPath)) {
+    const results = nodeRequire(prerenderConfigPath);
+    diagnostics.push(...results.diagnostics);
 
-    } catch (e) {
-      catchError(diagnostics, e);
+    if (results.module != null && typeof results.module === 'object') {
+      if (results.module.config != null && typeof results.module.config === 'object') {
+        Object.assign(prerenderConfig, results.module.config);
+      } else {
+        Object.assign(prerenderConfig, results.module);
+      }
     }
   }
 
-  if (typeof prerenderConfig.trailingSlash !== 'boolean') {
-    prerenderConfig.trailingSlash = false;
-  }
-
   return prerenderConfig;
-}
-
-
-
-declare const __webpack_require__: any;
-declare const __non_webpack_require__: any;
+};

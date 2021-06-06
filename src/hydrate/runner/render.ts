@@ -1,165 +1,285 @@
-import * as d from '../../declarations';
-import { BootstrapHydrateResults } from '../platform/bootstrap-hydrate';
-import { createHydrateAppSandbox } from './vm-sandbox';
-import { finalizeWindow } from './window-finalize';
+import type {
+  HydrateDocumentOptions,
+  HydrateFactoryOptions,
+  HydrateResults,
+  SerializeDocumentOptions,
+} from '../../declarations';
 import { generateHydrateResults, normalizeHydrateOptions, renderBuildError, renderCatchError } from './render-utils';
+import { hasError, isPromise } from '@utils';
+import { hydrateFactory } from '@hydrate-factory';
 import { initializeWindow } from './window-initialize';
-import { inspectElement } from './inspect-document';
-import { MockWindow, serializeNodeToHtml } from '@mock-doc';
-import { polyfillDocumentImplementation } from './polyfill-implementation';
+import { inspectElement } from './inspect-element';
+import { MockWindow, serializeNodeToHtml } from '@stencil/core/mock-doc';
+import { patchDomImplementation } from './patch-dom-implementation';
+import { relocateMetaCharset } from '../../compiler/html/relocate-meta-charset';
+import { removeUnusedStyles } from '../../compiler/html/remove-unused-styles';
+import { updateCanonicalLink } from '../../compiler/html/canonical-link';
 
+export function renderToString(html: string | any, options?: SerializeDocumentOptions) {
+  const opts = normalizeHydrateOptions(options);
+  opts.serializeToHtml = true;
 
-export async function renderToString(html: string, opts: d.RenderToStringOptions = {}) {
-  opts = normalizeHydrateOptions(opts);
+  return new Promise<HydrateResults>(resolve => {
+    let win: Window & typeof globalThis;
+    const results = generateHydrateResults(opts);
 
-  const results = generateHydrateResults(opts);
-  if (results.diagnostics.length > 0) {
-    return results;
-  }
-
-  if (typeof html !== 'string') {
-    renderBuildError(results, `Invalid html`);
-    return results;
-  }
-
-  try {
-    const win: Window = new MockWindow(html) as any;
-    const doc = win.document;
-
-    if (typeof opts.beforeHydrate === 'function') {
+    if (hasError(results.diagnostics)) {
+      resolve(results);
+    } else if (typeof html === 'string') {
       try {
-        const rtn = opts.beforeHydrate(win);
-        if (rtn != null && typeof rtn.then === 'function') {
-          await rtn;
-        }
+        opts.destroyWindow = true;
+        opts.destroyDocument = true;
+        win = new MockWindow(html) as any;
+        render(win, opts, results, resolve);
       } catch (e) {
+        if (win && win.close) {
+          win.close();
+        }
+        win = null;
         renderCatchError(results, e);
+        resolve(results);
       }
-    }
-
-    await render(win, doc, opts, results);
-
-    if (typeof opts.afterHydrate === 'function') {
+    } else if (isValidDocument(html)) {
       try {
-        const rtn = opts.afterHydrate(win);
-        if (rtn != null && typeof rtn.then === 'function') {
-          await rtn;
-        }
+        opts.destroyDocument = false;
+        win = patchDomImplementation(html, opts);
+        render(win, opts, results, resolve);
       } catch (e) {
+        if (win && win.close) {
+          win.close();
+        }
+        win = null;
         renderCatchError(results, e);
+        resolve(results);
       }
+    } else {
+      renderBuildError(results, `Invalid html or document. Must be either a valid "html" string, or DOM "document".`);
+      resolve(results);
     }
-
-    if (!results.diagnostics.some(d => d.type === 'error')) {
-      results.html = serializeNodeToHtml(doc, {
-        approximateLineWidth: opts.approximateLineWidth,
-        outerHtml: false,
-        prettyHtml: opts.prettyHtml,
-        removeAttributeQuotes: opts.removeAttributeQuotes,
-        removeBooleanAttributeQuotes: opts.removeBooleanAttributeQuotes,
-        removeEmptyAttributes: opts.removeEmptyAttributes,
-        removeHtmlComments: opts.removeHtmlComments,
-        serializeShadowRoot: false
-      });
-    }
-
-  } catch (e) {
-    renderCatchError(results, e);
-  }
-
-  return results;
+  });
 }
 
+export function hydrateDocument(doc: any | string, options?: HydrateDocumentOptions) {
+  const opts = normalizeHydrateOptions(options);
+  opts.serializeToHtml = false;
 
-export async function hydrateDocument(doc: Document, opts: d.HydrateDocumentOptions = {}) {
-  opts = normalizeHydrateOptions(opts);
+  return new Promise<HydrateResults>(resolve => {
+    let win: Window & typeof globalThis;
+    const results = generateHydrateResults(opts);
 
-  const results = generateHydrateResults(opts);
-  if (results.diagnostics.length > 0) {
-    return results;
-  }
-
-  if (doc == null || doc.nodeType !== 9 || doc.documentElement == null || doc.documentElement.nodeType !== 1) {
-    renderBuildError(results, `Invalid document`);
-    return results;
-  }
-
-  try {
-    const win: Window = doc.defaultView || new MockWindow(false) as any;
-    if (win.document !== doc) {
-      (win as any).document = doc;
+    if (hasError(results.diagnostics)) {
+      resolve(results);
+    } else if (typeof doc === 'string') {
+      try {
+        opts.destroyWindow = true;
+        opts.destroyDocument = true;
+        win = new MockWindow(doc) as any;
+        render(win, opts, results, resolve);
+      } catch (e) {
+        if (win && win.close) {
+          win.close();
+        }
+        win = null;
+        renderCatchError(results, e);
+        resolve(results);
+      }
+    } else if (isValidDocument(doc)) {
+      try {
+        opts.destroyDocument = false;
+        win = patchDomImplementation(doc, opts);
+        render(win, opts, results, resolve);
+      } catch (e) {
+        if (win && win.close) {
+          win.close();
+        }
+        win = null;
+        renderCatchError(results, e);
+        resolve(results);
+      }
+    } else {
+      renderBuildError(results, `Invalid html or document. Must be either a valid "html" string, or DOM "document".`);
+      resolve(results);
     }
-    if (doc.defaultView !== win) {
-      (doc as any).defaultView = win;
-    }
-
-    polyfillDocumentImplementation(win, doc);
-
-    await render(win, doc, opts, results);
-
-  } catch (e) {
-    renderCatchError(results, e);
-  }
-
-  return results;
+  });
 }
 
+function render(
+  win: Window & typeof globalThis,
+  opts: HydrateFactoryOptions,
+  results: HydrateResults,
+  resolve: (results: HydrateResults) => void,
+) {
+  if (!(process as any).__stencilErrors) {
+    (process as any).__stencilErrors = true;
 
-async function render(win: Window, doc: Document, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
-  catchUnhandledErrors(results);
+    process.on('unhandledRejection', e => {
+      console.log('unhandledRejection', e);
+    });
+  }
 
-  initializeWindow(win, doc, opts, results);
+  initializeWindow(win, win.document, opts, results);
 
-  await new Promise(resolve => {
-    const tmr = setTimeout(() => {
-      renderBuildError(results, `Hydrate exceeded timeout`);
-      resolve();
-    }, opts.timeout);
-
+  if (typeof opts.beforeHydrate === 'function') {
     try {
-      const sandbox = createHydrateAppSandbox(win);
-
-      sandbox.bootstrapHydrate(win, opts, (bootstrapResults: BootstrapHydrateResults) => {
-        clearTimeout(tmr);
-
-        try {
-          results.hydratedCount = bootstrapResults.hydratedCount;
-          bootstrapResults.hydratedTags.forEach(hydratedTag => {
-            results.components.push({
-              tag: hydratedTag,
-              count: 0,
-              depth: -1
-            });
-          });
-
-        } catch (e) {
-          renderCatchError(results, e);
-        }
-
-        bootstrapResults = null;
-        resolve();
-      });
-
+      const rtn = opts.beforeHydrate(win.document);
+      if (isPromise(rtn)) {
+        rtn.then(() => {
+          hydrateFactory(win, opts, results, afterHydrate, resolve);
+        });
+      } else {
+        hydrateFactory(win, opts, results, afterHydrate, resolve);
+      }
     } catch (e) {
       renderCatchError(results, e);
-      clearTimeout(tmr);
-      resolve();
+      finalizeHydrate(win, win.document, opts, results, resolve);
     }
-  });
-
-  inspectElement(results, doc.documentElement, 0);
-
-  finalizeWindow(doc, opts, results);
+  } else {
+    hydrateFactory(win, opts, results, afterHydrate, resolve);
+  }
 }
 
-
-function catchUnhandledErrors(results: d.HydrateResults) {
-  if ((process as any).__stencilErrors) {
-    return;
+function afterHydrate(
+  win: Window,
+  opts: HydrateFactoryOptions,
+  results: HydrateResults,
+  resolve: (results: HydrateResults) => void,
+) {
+  if (typeof opts.afterHydrate === 'function') {
+    try {
+      const rtn = opts.afterHydrate(win.document);
+      if (isPromise(rtn)) {
+        rtn.then(() => {
+          finalizeHydrate(win, win.document, opts, results, resolve);
+        });
+      } else {
+        finalizeHydrate(win, win.document, opts, results, resolve);
+      }
+    } catch (e) {
+      renderCatchError(results, e);
+      finalizeHydrate(win, win.document, opts, results, resolve);
+    }
+  } else {
+    finalizeHydrate(win, win.document, opts, results, resolve);
   }
-  (process as any).__stencilErrors = true;
+}
 
-  process.on('unhandledRejection', e => {
+function finalizeHydrate(
+  win: Window,
+  doc: Document,
+  opts: HydrateFactoryOptions,
+  results: HydrateResults,
+  resolve: (results: HydrateResults) => void,
+) {
+  try {
+    inspectElement(results, doc.documentElement, 0);
+
+    if (opts.removeUnusedStyles !== false) {
+      try {
+        removeUnusedStyles(doc, results.diagnostics);
+      } catch (e) {
+        renderCatchError(results, e);
+      }
+    }
+
+    if (typeof opts.title === 'string') {
+      try {
+        doc.title = opts.title;
+      } catch (e) {
+        renderCatchError(results, e);
+      }
+    }
+
+    results.title = doc.title;
+
+    if (opts.removeScripts) {
+      removeScripts(doc.documentElement);
+    }
+
+    try {
+      updateCanonicalLink(doc, opts.canonicalUrl);
+    } catch (e) {
+      renderCatchError(results, e);
+    }
+
+    try {
+      relocateMetaCharset(doc);
+    } catch (e) {}
+
+    if (!hasError(results.diagnostics)) {
+      results.httpStatus = 200;
+    }
+
+    try {
+      const metaStatus = doc.head.querySelector('meta[http-equiv="status"]');
+      if (metaStatus != null) {
+        const metaStatusContent = metaStatus.getAttribute('content');
+        if (metaStatusContent && metaStatusContent.length > 0) {
+          results.httpStatus = parseInt(metaStatusContent, 10);
+        }
+      }
+    } catch (e) {}
+
+    if (opts.clientHydrateAnnotations) {
+      doc.documentElement.classList.add('hydrated');
+    }
+
+    if (opts.serializeToHtml) {
+      results.html = serializeDocumentToString(doc, opts);
+    }
+  } catch (e) {
     renderCatchError(results, e);
+  }
+
+  if (opts.destroyWindow) {
+    try {
+      if (!opts.destroyDocument) {
+        (win as any).document = null;
+        (doc as any).defaultView = null;
+      }
+
+      if (win.close) {
+        win.close();
+      }
+    } catch (e) {
+      renderCatchError(results, e);
+    }
+  }
+
+  resolve(results);
+}
+
+export function serializeDocumentToString(doc: any, opts: HydrateFactoryOptions) {
+  return serializeNodeToHtml(doc, {
+    approximateLineWidth: opts.approximateLineWidth,
+    outerHtml: false,
+    prettyHtml: opts.prettyHtml,
+    removeAttributeQuotes: opts.removeAttributeQuotes,
+    removeBooleanAttributeQuotes: opts.removeBooleanAttributeQuotes,
+    removeEmptyAttributes: opts.removeEmptyAttributes,
+    removeHtmlComments: opts.removeHtmlComments,
+    serializeShadowRoot: false,
   });
+}
+
+function isValidDocument(doc: Document) {
+  return (
+    doc != null &&
+    doc.nodeType === 9 &&
+    doc.documentElement != null &&
+    doc.documentElement.nodeType === 1 &&
+    doc.body != null &&
+    doc.body.nodeType === 1
+  );
+}
+
+function removeScripts(elm: HTMLElement) {
+  const children = elm.children;
+  for (let i = children.length - 1; i >= 0; i--) {
+    const child = children[i];
+    removeScripts(child as any);
+
+    if (child.nodeName === 'SCRIPT' || (child.nodeName === 'LINK' && child.getAttribute('rel') === 'modulepreload')) {
+      child.remove();
+    }
+  }
 }

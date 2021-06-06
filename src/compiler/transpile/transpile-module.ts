@@ -1,45 +1,73 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../build/compiler-ctx';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
+import { createLogger } from '../sys/logger/console-logger';
+import { getCurrentDirectory } from '../sys/environment';
+import { isNumber, isString, loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
-import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
+import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
 import ts from 'typescript';
 
-
 /**
- * Mainly used as the typescript preprocessor for unit tests
+ * Stand-alone compiling of a single string
  */
-export function transpileModule(config: d.Config, input: string, opts: ts.CompilerOptions = {}, sourceFilePath?: string) {
-  const compilerCtx = new CompilerContext(config);
+export const transpileModule = (config: d.Config, input: string, transformOpts: d.TransformOptions) => {
+  if (!config.logger) {
+    config = {
+      ...config,
+      logger: createLogger(),
+    };
+  }
+  const compilerCtx = new CompilerContext();
   const buildCtx = new BuildContext(config, compilerCtx);
+  const tsCompilerOptions: ts.CompilerOptions = {
+    ...config.tsCompilerOptions,
+  };
 
-  if (typeof sourceFilePath === 'string') {
+  let sourceFilePath = transformOpts.file;
+  if (isString(sourceFilePath)) {
     sourceFilePath = normalizePath(sourceFilePath);
   } else {
-    sourceFilePath = (opts.jsx ? `module.tsx` : `module.ts`);
+    sourceFilePath = tsCompilerOptions.jsx ? `module.tsx` : `module.ts`;
   }
 
-  const results: d.TranspileResults = {
+  const results: d.TranspileModuleResults = {
     sourceFilePath: sourceFilePath,
     code: null,
     map: null,
     diagnostics: [],
     moduleFile: null,
-    build: {}
   };
 
-  if ((sourceFilePath.endsWith('.tsx') || sourceFilePath.endsWith('.jsx')) && opts.jsx == null) {
+  if (transformOpts.module === 'cjs') {
+    tsCompilerOptions.module = ts.ModuleKind.CommonJS;
+  } else {
+    tsCompilerOptions.module = ts.ModuleKind.ESNext;
+  }
+
+  tsCompilerOptions.target = getScriptTargetKind(transformOpts);
+
+  if ((sourceFilePath.endsWith('.tsx') || sourceFilePath.endsWith('.jsx')) && tsCompilerOptions.jsx == null) {
     // ensure we're setup for JSX in typescript
-    opts.jsx = ts.JsxEmit.React;
+    tsCompilerOptions.jsx = ts.JsxEmit.React;
   }
 
-  if (opts.jsx != null && typeof opts.jsxFactory !== 'string') {
-    opts.jsxFactory = 'h';
+  if (tsCompilerOptions.jsx != null && !isString(tsCompilerOptions.jsxFactory)) {
+    tsCompilerOptions.jsxFactory = 'h';
   }
 
-  const sourceFile = ts.createSourceFile(sourceFilePath, input, opts.target);
+  if (tsCompilerOptions.jsx != null && !isString(tsCompilerOptions.jsxFragmentFactory)) {
+    tsCompilerOptions.jsxFragmentFactory = 'Fragment';
+  }
+
+  if (tsCompilerOptions.paths && !isString(tsCompilerOptions.baseUrl)) {
+    tsCompilerOptions.baseUrl = '.';
+  }
+
+  const sourceFile = ts.createSourceFile(sourceFilePath, input, tsCompilerOptions.target);
 
   // Create a compilerHost object to allow the compiler to read and write files
   const compilerHost: ts.CompilerHost = {
@@ -47,39 +75,37 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
       return normalizePath(fileName) === normalizePath(sourceFilePath) ? sourceFile : undefined;
     },
     writeFile: (name, text) => {
-      if (name.endsWith('.map')) {
+      if (name.endsWith('.js.map')) {
         results.map = text;
-      } else {
+      } else if (name.endsWith('.js')) {
         results.code = text;
       }
     },
     getDefaultLibFileName: () => `lib.d.ts`,
     useCaseSensitiveFileNames: () => false,
     getCanonicalFileName: fileName => fileName,
-    getCurrentDirectory: () => '',
-    getNewLine: () => ts.sys.newLine,
+    getCurrentDirectory: () => transformOpts.currentDirectory || getCurrentDirectory(),
+    getNewLine: () => ts.sys.newLine || '\n',
     fileExists: fileName => normalizePath(fileName) === normalizePath(sourceFilePath),
     readFile: () => '',
     directoryExists: () => true,
-    getDirectories: () => []
+    getDirectories: () => [],
   };
 
-  const program = ts.createProgram([sourceFilePath], opts, compilerHost);
+  const program = ts.createProgram([sourceFilePath], tsCompilerOptions, compilerHost);
   const typeChecker = program.getTypeChecker();
 
-  const transformOpts: d.TransformOptions = {
-    addCompilerMeta: true,
-    addStyle: false
-  };
+  const after: ts.TransformerFactory<ts.SourceFile>[] = [convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)];
+
+  if (transformOpts.componentExport === 'customelement' || transformOpts.componentExport === 'module') {
+    after.push(nativeComponentTransform(compilerCtx, transformOpts));
+  } else {
+    after.push(lazyComponentTransform(compilerCtx, transformOpts));
+  }
 
   program.emit(undefined, undefined, undefined, false, {
-    before: [
-      convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker)
-    ],
-    after: [
-      convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
-      lazyComponentTransform(compilerCtx, transformOpts)
-    ]
+    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker), updateStencilCoreImports(transformOpts.coreImportPath)],
+    after,
   });
 
   const tsDiagnostics = [...program.getSyntacticDiagnostics()];
@@ -88,11 +114,20 @@ export function transpileModule(config: d.Config, input: string, opts: ts.Compil
     tsDiagnostics.push(...program.getOptionsDiagnostics());
   }
 
-  loadTypeScriptDiagnostics(buildCtx.diagnostics, tsDiagnostics);
+  buildCtx.diagnostics.push(...loadTypeScriptDiagnostics(tsDiagnostics));
 
   results.diagnostics.push(...buildCtx.diagnostics);
 
   results.moduleFile = compilerCtx.moduleMap.get(results.sourceFilePath);
 
   return results;
-}
+};
+
+const getScriptTargetKind = (transformOpts: d.TransformOptions) => {
+  const target = transformOpts.target && transformOpts.target.toUpperCase();
+  if (isNumber((ts.ScriptTarget as any)[target])) {
+    return (ts.ScriptTarget as any)[target];
+  }
+  // ESNext and Latest are the same
+  return ts.ScriptTarget.Latest;
+};

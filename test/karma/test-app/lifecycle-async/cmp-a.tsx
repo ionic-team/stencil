@@ -5,9 +5,9 @@ import { Component, Listen, State, h } from '@stencil/core';
 })
 export class LifecycleAsyncA {
   @State() value = '';
-  @State() rendered = 0;
   @State() loads: string[] = [];
   @State() updates: string[] = [];
+  rendered = 0;
   componentWillUpdated = false;
   componentDidUpdated = false;
 

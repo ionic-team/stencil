@@ -1,5 +1,3 @@
-
-
 export class MockStorage {
   private items = new Map<string, string>();
 
@@ -30,5 +28,4 @@ export class MockStorage {
   clear() {
     this.items.clear();
   }
-
 }

@@ -1,4 +1,4 @@
-import { Config } from '../../dist';
+import { Config } from '../../internal';
 
 export const config: Config = {
   globalStyle: 'src/global/app.css',
@@ -6,11 +6,15 @@ export const config: Config = {
     {
       type: 'www',
       serviceWorker: null
-    },
-    {
-      type: 'experimental-dist-module',
-      dir: 'public',
-      empty: false
     }
   ],
+  hashFileNames: false,
+  hydratedFlag: null,
+  extras: {
+    cssVarsShim: false,
+    dynamicImportShim: false,
+    safari10: false,
+    scriptDataOpts: false,
+    shadowDomShim: false,
+  }
 };

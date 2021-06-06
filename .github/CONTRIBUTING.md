@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing to the Stencil! :tada:
+Thanks for your interest in contributing to Stencil! :tada:
 
 
 ## Contributing Etiquette
@@ -41,8 +41,38 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
 
 1. Unit test. Unit test. Unit test. Please take a look at how other unit tests are written, and you can't write too many tests.
 2. If there is a `*.spec.ts` file located in the `test/` folder, update it to include a test for your change, if needed. If this file doesn't exist, please notify us.
-3. Run `npm run test` or `npm run test.watch` to make sure all tests are working, regardless if a test was added.
+3. First run `npm run build`. Then run `npm run test` or `npm run test.watch` to make sure all tests are working, regardless if a test was added.
 
+#### Testing Changes Against a Project Locally
+
+1. In the directory of _stencil core_:
+    1. Run `npm run build`
+    2. Run `npm link`
+2. In the directory of _your stencil project_:
+    1. Run `npm link @stencil/core`
+    2. Add the following to your `tsconfig.json`, to ensures that typescript can resolve all modules correctly:
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@stencil/core/internal": ["node_modules/@stencil/core/internal"],
+      "@stencil/core/internal/*": ["node_modules/@stencil/core/internal/*"]
+    }
+  }
+}
+
+```
+
+You can then test your changes against your own stencil project.
+
+Afterwards, to clean up:
+
+1. In the directory of _your stencil project_:
+    1. Run `npm unlink @stencil/core`
+    2. Remove the modifications to your tsconfig.json
+2. In the directory of _stencil core_, run `npm unlink`
 
 ## Commit Message Format
 

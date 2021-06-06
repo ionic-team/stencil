@@ -5,7 +5,7 @@ import { Component, Prop } from '@stencil/core';
 })
 export class AttributeBoolean {
 
-  @Prop({ reflectToAttr: true }) boolState?: boolean;
-  @Prop({ reflectToAttr: true }) strState?: string;
+  @Prop({ reflect: true }) boolState?: boolean;
+  @Prop({ reflect: true }) strState?: string;
   @Prop() noreflect?: boolean;
 }

@@ -8,11 +8,8 @@
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
     "jsxFactory": "h",
-    "lib": [
-      "dom",
-      "es2017",
-      "esnext.array"
-    ],
+    "jsxFragmentFactory": "Fragment",
+    "lib": ["dom", "es2017", "esnext.array"],
     "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
@@ -23,12 +20,8 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core": [
-        "../../index.ts"
-      ],
-      "@stencil/core/testing": [
-        "../../testing/index.ts"
-      ]
+      "@stencil/core": ["../../index.ts"],
+      "@stencil/core/testing": ["../../testing/index.ts"]
     }
   }
 }

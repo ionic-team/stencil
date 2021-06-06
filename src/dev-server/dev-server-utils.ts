@@ -1,51 +1,30 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
+import * as c from './dev-server-constants';
+import contentTypes from './content-types-db.json';
+import { version } from '../version';
 
-
-export function sendMsg(process: NodeJS.Process, msg: d.DevServerMessage) {
-  process.send(msg);
-}
-
-
-export function sendError(process: NodeJS.Process, e: any) {
-  const msg: d.DevServerMessage = {
-    error: {
-      message: e
-    }
-  };
-
-  if (typeof e === 'string') {
-    msg.error.message = e + '';
-
-  } else if (e) {
-    Object.keys(e).forEach(key => {
-      try {
-        (msg.error as any)[key] = e[key] + '';
-      } catch (idk) {
-        console.log(idk);
-      }
-    });
+export function responseHeaders(headers: d.DevResponseHeaders, httpCache = false): any {
+  headers = { ...DEFAULT_HEADERS, ...headers };
+  if (httpCache) {
+    headers['cache-control'] = 'max-age=3600';
+    delete headers['date'];
+    delete headers['expires'];
   }
-
-  sendMsg(process, msg);
+  return headers;
 }
-
-
-export function responseHeaders(headers: d.DevResponseHeaders): any {
-  return Object.assign({}, DEFAULT_HEADERS, headers);
-}
-
 
 const DEFAULT_HEADERS: d.DevResponseHeaders = {
-  'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-  'Expires': '0',
-  'X-Powered-By': 'Stencil Dev Server',
-  'Access-Control-Allow-Origin': '*'
+  'cache-control': 'no-cache, no-store, must-revalidate, max-age=0',
+  'expires': '0',
+  'date': 'Wed, 1 Jan 2000 00:00:00 GMT',
+  'server': 'Stencil Dev Server ' + version,
+  'access-control-allow-origin': '*',
+  'access-control-expose-headers': '*',
 };
 
-
 export function getBrowserUrl(protocol: string, address: string, port: number, basePath: string, pathname: string) {
-  address = (address === `0.0.0.0`) ? `localhost` : address;
-  const portSuffix = (!port || port === 80 || port === 443) ? '' : (':' + port);
+  address = address === `0.0.0.0` ? `localhost` : address;
+  const portSuffix = !port || port === 80 || port === 443 ? '' : ':' + port;
 
   let path = basePath;
   if (pathname.startsWith('/')) {
@@ -58,8 +37,7 @@ export function getBrowserUrl(protocol: string, address: string, port: number, b
   return `${protocol}://${address}${portSuffix}${path}`;
 }
 
-
-export function getDevServerClientUrl(devServerConfig: d.DevServerConfig, host: string) {
+export function getDevServerClientUrl(devServerConfig: d.DevServerConfig, host: string, protocol: string) {
   let address = devServerConfig.address;
   let port = devServerConfig.port;
 
@@ -68,38 +46,28 @@ export function getDevServerClientUrl(devServerConfig: d.DevServerConfig, host: 
     port = null;
   }
 
-  return getBrowserUrl(
-    devServerConfig.protocol,
-    address,
-    port,
-    devServerConfig.basePath,
-    DEV_SERVER_URL
-  );
+  return getBrowserUrl(protocol ?? devServerConfig.protocol, address, port, devServerConfig.basePath, c.DEV_SERVER_URL);
 }
 
-
-export function getContentType(devServerConfig: d.DevServerConfig, filePath: string) {
+export function getContentType(filePath: string) {
   const last = filePath.replace(/^.*[/\\]/, '').toLowerCase();
   const ext = last.replace(/^.*\./, '').toLowerCase();
 
   const hasPath = last.length < filePath.length;
   const hasDot = ext.length < last.length - 1;
 
-  return ((hasDot || !hasPath) && devServerConfig.contentTypes[ext]) || 'application/octet-stream';
+  return ((hasDot || !hasPath) && (contentTypes as any)[ext]) || 'application/octet-stream';
 }
-
 
 export function isHtmlFile(filePath: string) {
   filePath = filePath.toLowerCase().trim();
-  return (filePath.endsWith('.html') || filePath.endsWith('.htm'));
+  return filePath.endsWith('.html') || filePath.endsWith('.htm');
 }
-
 
 export function isCssFile(filePath: string) {
   filePath = filePath.toLowerCase().trim();
   return filePath.endsWith('.css');
 }
-
 
 const TXT_EXT = ['css', 'html', 'htm', 'js', 'json', 'svg', 'xml'];
 
@@ -108,33 +76,59 @@ export function isSimpleText(filePath: string) {
   return TXT_EXT.includes(ext);
 }
 
+export function isExtensionLessPath(pathname: string) {
+  const parts = pathname.split('/');
+  const lastPart = parts[parts.length - 1];
+  return !lastPart.includes('.');
+}
+
+export function isSsrStaticDataPath(pathname: string) {
+  const parts = pathname.split('/');
+  const fileName = parts[parts.length - 1].split('?')[0];
+  return fileName === 'page.state.json';
+}
+
+export function getSsrStaticDataPath(req: d.HttpRequest) {
+  const parts = req.url.href.split('/');
+  let fileName = parts[parts.length - 1];
+  const fileNameParts = fileName.split('?');
+
+  parts.pop();
+
+  let ssrPath = new URL(parts.join('/')).href;
+  if (!ssrPath.endsWith('/') && req.headers) {
+    const h = new Headers(req.headers);
+    if (h.get('referer').endsWith('/')) {
+      ssrPath += '/';
+    }
+  }
+
+  return {
+    ssrPath,
+    fileName: fileNameParts[0],
+    hasQueryString: typeof fileNameParts[1] === 'string' && fileNameParts[1].length > 0,
+  };
+}
 
 export function isDevClient(pathname: string) {
-  return pathname.startsWith(DEV_SERVER_URL);
+  return pathname.startsWith(c.DEV_SERVER_URL);
 }
 
+export function isDevModule(pathname: string) {
+  return pathname.includes(c.DEV_MODULE_URL);
+}
 
 export function isOpenInEditor(pathname: string) {
-  return pathname === OPEN_IN_EDITOR_URL;
+  return pathname === c.OPEN_IN_EDITOR_URL;
 }
-
 
 export function isInitialDevServerLoad(pathname: string) {
-  return pathname === DEV_SERVER_INIT_URL;
+  return pathname === c.DEV_SERVER_INIT_URL;
 }
-
 
 export function isDevServerClient(pathname: string) {
-  return pathname === DEV_SERVER_URL;
+  return pathname === c.DEV_SERVER_URL;
 }
-
-
-export const DEV_SERVER_URL = '/~dev-server';
-
-export const DEV_SERVER_INIT_URL = `${DEV_SERVER_URL}-init`;
-
-export const OPEN_IN_EDITOR_URL = `${DEV_SERVER_URL}-open-in-editor`;
-
 
 export function shouldCompress(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
   if (!devServerConfig.gzip) {

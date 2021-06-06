@@ -1,12 +1,7 @@
-
 import { CustomStyle } from './custom-style';
 
-const win = window as any;
-
-function needsShim() {
-  return !(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'));
-}
-
-if (!win.__stencil_cssshim && needsShim()) {
-  win.__stencil_cssshim = new CustomStyle(win, document);
-}
+(function(win: any) {
+  if (win && !win.__cssshim && !(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'))) {
+    win.__cssshim = new CustomStyle(win, win.document);
+  }
+})(typeof window !== 'undefined' && window);

@@ -3,6 +3,11 @@
 const activeRendering = new Set();
 const onAppReadyCallbacks: Function[] = [];
 
+export declare namespace SomeTypes {
+  type Number = number;
+  type String = string;
+}
+
 function willRender(elm: any) {
   activeRendering.add(elm);
 }
@@ -27,6 +32,12 @@ function onReady(callback: Function) {
   }
 }
 
+function waitFrame() {
+  return new Promise(resolve => {
+    requestAnimationFrame(resolve);
+  });
+}
+
 /**
  * Create setup methods for dom based tests.
  */
@@ -34,14 +45,14 @@ export function setupDomTests(document: Document) {
   let testBed = document.getElementById('test-app');
   if (!testBed) {
     testBed = document.createElement('div');
-    testBed.id = 'test-bed';
+    testBed.id = 'test-app';
     document.body.appendChild(testBed);
   }
 
   /**
    * Run this before each test
    */
-  function setupDom(url?: string) {
+  function setupDom(url?: string, waitForStencilReady?: number) {
     const app = document.createElement('div');
     activeRendering.clear();
     onAppReadyCallbacks.length = 0;
@@ -53,7 +64,7 @@ export function setupDomTests(document: Document) {
 
     if (url) {
       app.setAttribute('data-url', url);
-      return renderTest(url, app);
+      return renderTest(url, app, waitForStencilReady);
     }
 
     return Promise.resolve(app);
@@ -69,11 +80,37 @@ export function setupDomTests(document: Document) {
   /**
    * Create web component for executing tests against
    */
-  function renderTest(url: string, app: HTMLElement) {
+  function renderTest(url: string, app: HTMLElement, waitForStencilReady: number) {
     url = '/base/www' + url;
 
     return new Promise<HTMLElement>((resolve, reject) => {
       try {
+        const allReady = () => {
+          const promises: Promise<any>[] = [];
+          const waitForDidLoad = (promises: Promise<any>[], elm: Element) => {
+            if (elm != null && elm.nodeType === 1) {
+              for (let i = 0; i < elm.children.length; i++) {
+                const childElm = elm.children[i];
+                if (childElm.tagName.includes('-') && typeof (childElm as any).componentOnReady === 'function') {
+                  promises.push((childElm as any).componentOnReady());
+                }
+                waitForDidLoad(promises, childElm);
+              }
+            }
+          };
+
+          waitForDidLoad(promises, window.document.documentElement);
+
+          return Promise.all(promises)
+            .catch((e) => console.error(e));
+        };
+
+        const stencilReady = (): Promise<any> => {
+          return allReady()
+            .then(() => waitFrame())
+            .then(() => allReady());
+        };
+
         const indexLoaded = function(this: XMLHttpRequest) {
           if (this.status !== 200) {
             reject(`404: ${url}`);
@@ -84,19 +121,6 @@ export function setupDomTests(document: Document) {
           elm.innerHTML = this.responseText;
           frag.appendChild(elm);
           app.innerHTML = elm.innerHTML;
-
-          function appLoad() {
-            window.removeEventListener('stencil_appload', appLoad);
-            setTimeout(() => {
-              resolve(app);
-            }, 400);
-          }
-
-          window.addEventListener('stencil_appload', appLoad);
-
-          // function scriptErrored(ev: any) {
-          //   console.error('script error', ev);
-          // }
 
           const tmpScripts = app.querySelectorAll('script') as NodeListOf<HTMLScriptElement>;
           for (let i = 0; i < tmpScripts.length; i++) {
@@ -112,13 +136,26 @@ export function setupDomTests(document: Document) {
             }
             script.innerHTML = tmpScripts[i].innerHTML;
 
-            // script.addEventListener('error', scriptErrored);
-
             tmpScripts[i].parentNode!.insertBefore(script, tmpScripts[i]);
             tmpScripts[i].parentNode!.removeChild(tmpScripts[i]);
           }
 
           elm.innerHTML = '';
+
+          if (typeof waitForStencilReady === 'number') {
+            setTimeout(() => {
+              resolve(app);
+            }, waitForStencilReady);
+
+          } else {
+            const appLoad = () => {
+              window.removeEventListener('appload', appLoad);
+              stencilReady().then(() => {
+                resolve(app);
+              });
+            };
+            window.addEventListener('appload', appLoad);
+          }
         }
 
         var oReq = new XMLHttpRequest();

@@ -1,244 +1,311 @@
-import * as d from '../../declarations';
-import * as pd from './puppeteer-declarations';
-import { closePage } from './puppeteer-browser';
-import { find, findAll } from './puppeteer-find';
-import { initPageEvents } from './puppeteer-events';
+import type { E2EProcessEnv, EmulateConfig, HostElement, JestEnvironmentGlobal } from '@stencil/core/internal';
+import type {
+  E2EPage,
+  E2EPageInternal,
+  FindSelector,
+  NewE2EPageOptions,
+  PageDiagnostic,
+} from './puppeteer-declarations';
+import type {
+  ConsoleMessage,
+  ConsoleMessageLocation,
+  EmulateOptions,
+  JSHandle,
+  NavigationOptions,
+  Page,
+  PageCloseOptions,
+} from 'puppeteer';
+import { find, findAll } from './puppeteer-element';
+import { initPageEvents, waitForEvent } from './puppeteer-events';
 import { initPageScreenshot } from './puppeteer-screenshot';
-import * as puppeteer from 'puppeteer';
 
+declare const global: JestEnvironmentGlobal;
 
-declare const global: d.JestEnvironmentGlobal;
-
-
-export async function newE2EPage(opts: pd.NewE2EPageOptions = {}): Promise<pd.E2EPage> {
+const env: E2EProcessEnv = process.env;
+export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage> {
   if (!global.__NEW_TEST_PAGE__) {
-    console.error(`newE2EPage() is only available from E2E tests, and ran with the --e2e cmd line flag.`);
-    return failedPage();
+    throw new Error(`newE2EPage() is only available from E2E tests, and ran with the --e2e cmd line flag.`);
   }
 
+  const page: E2EPageInternal = await global.__NEW_TEST_PAGE__();
+  const diagnostics: PageDiagnostic[] = [];
   try {
-    const page: pd.E2EPageInternal = await global.__NEW_TEST_PAGE__();
-
     page._e2eElements = [];
 
     page._e2eGoto = page.goto;
+    page._e2eClose = page.close;
 
     await setPageEmulate(page as any);
-
     await page.setCacheEnabled(false);
-
     await initPageEvents(page);
 
     initPageScreenshot(page);
 
-    let docPromise: Promise<puppeteer.JSHandle> = null;
+    let docPromise: Promise<JSHandle> = null;
 
-    page.find = async (selector: pd.FindSelector) => {
+    page.close = async (options?: PageCloseOptions) => {
+      try {
+        if (Array.isArray(page._e2eElements)) {
+          const disposes = page._e2eElements.map(async elmHande => {
+            if (typeof elmHande.e2eDispose === 'function') {
+              await elmHande.e2eDispose();
+            }
+          });
+          await Promise.all(disposes);
+        }
+      } catch (e) {}
+
+      const noop: any = () => {
+        throw new Error('The page was already closed');
+      };
+      page._e2eElements = noop;
+      page._e2eEvents = noop;
+      page._e2eGoto = noop;
+      page.find = noop;
+      page.debugger = noop;
+      page.findAll = noop;
+      page.compareScreenshot = noop;
+      page.setContent = noop;
+      page.spyOnEvent = noop;
+      page.waitForChanges = noop;
+      page.waitForEvent = noop;
+
+      try {
+        if (!page.isClosed()) {
+          await page._e2eClose(options);
+        }
+      } catch (e) {}
+    };
+
+    const getDocHandle = async () => {
       if (!docPromise) {
-        docPromise = page.evaluateHandle('document');
+        docPromise = page.evaluateHandle(() => document);
       }
       const documentJsHandle = await docPromise;
-      const docHandle = documentJsHandle.asElement();
+      return documentJsHandle.asElement();
+    };
+
+    page.find = async (selector: FindSelector) => {
+      const docHandle = await getDocHandle();
       return find(page, docHandle, selector) as any;
     };
 
-    page.findAll = async (selector: pd.FindSelector) => {
-      if (!docPromise) {
-        docPromise = page.evaluateHandle('document');
-      }
-      const documentJsHandle = await docPromise;
-      const docHandle = documentJsHandle.asElement();
+    page.findAll = async (selector: FindSelector) => {
+      const docHandle = await getDocHandle();
       return findAll(page, docHandle, selector) as any;
+    };
+
+    page.waitForEvent = async eventName => {
+      const docHandle = await getDocHandle();
+      return waitForEvent(page, eventName, docHandle);
+    };
+
+    page.getDiagnostics = () => {
+      return diagnostics;
     };
 
     page.waitForChanges = waitForChanges.bind(null, page);
 
-    page.on('console', consoleMessage);
-    page.on('pageerror', pageError);
-    page.on('requestfailed', requestFailed);
+    page.debugger = () => {
+      if (env.__STENCIL_E2E_DEVTOOLS__ !== 'true') {
+        throw new Error('Set the --devtools flag in order to use E2EPage.debugger()');
+      }
+      return page.evaluate(() => {
+        return new Promise<void>(resolve => {
+          // tslint:disable-next-line: no-debugger
+          debugger;
+          resolve();
+        });
+      }) as any;
+    };
+
+    const failOnConsoleError = opts.failOnConsoleError === true;
+    const failOnNetworkError = opts.failOnNetworkError === true;
+
+    page.on('console', ev => {
+      if (ev.type() === 'error') {
+        diagnostics.push({
+          type: 'error',
+          message: ev.text(),
+          location: ev.location().url,
+        });
+        if (failOnConsoleError) {
+          fail(new Error(serializeConsoleMessage(ev)));
+        }
+      }
+      consoleMessage(ev);
+    });
+    page.on('pageerror', (err: Error) => {
+      diagnostics.push({
+        type: 'pageerror',
+        message: err.message,
+        location: err.stack,
+      });
+      fail(err);
+    });
+    page.on('requestfailed', req => {
+      diagnostics.push({
+        type: 'requestfailed',
+        message: req.failure().errorText,
+        location: req.url(),
+      });
+      if (failOnNetworkError) {
+        fail(new Error(req.failure().errorText));
+      } else {
+        console.error('requestfailed', req.url());
+      }
+    });
 
     if (typeof opts.html === 'string') {
-      const errMsg = await e2eSetContent(page, opts.html);
-      if (errMsg) {
-        throw errMsg;
-      }
-
+      await e2eSetContent(page, opts.html, { waitUntil: opts.waitUntil });
     } else if (typeof opts.url === 'string') {
-      const errMsg = await e2eGoTo(page, opts.url);
-      if (errMsg) {
-        throw errMsg;
-      }
-
+      await e2eGoTo(page, opts.url, { waitUntil: opts.waitUntil });
     } else {
       page.goto = e2eGoTo.bind(null, page);
       page.setContent = e2eSetContent.bind(null, page);
     }
-
-    return page;
-
   } catch (e) {
-    console.error(e);
+    if (page) {
+      if (!page.isClosed()) {
+        await page.close();
+      }
+    }
+    throw e;
   }
-
-  return failedPage();
-}
-
-function failedPage() {
-  const page: pd.E2EPageInternal = {
-    isClosed: () => true,
-    setContent: () => Promise.resolve(),
-    waitForChanges: () => Promise.resolve(),
-    find: () => Promise.resolve(null)
-  } as any;
   return page;
 }
 
-async function e2eGoTo(page: pd.E2EPageInternal, url: string) {
-  try {
-    if (page.isClosed()) {
-      return 'e2eGoTo unavailable: page already closed';
-    }
-  } catch (e) {
-    return null;
+async function e2eGoTo(page: E2EPageInternal, url: string, options: NavigationOptions = {}) {
+  if (page.isClosed()) {
+    throw new Error('e2eGoTo unavailable: page already closed');
   }
 
   if (typeof url !== 'string') {
-    await closePage(page);
-    return 'invalid gotoTest() url';
+    throw new Error('invalid gotoTest() url');
   }
 
   if (!url.startsWith('/')) {
-    await closePage(page);
-    return 'gotoTest() url must start with /';
+    throw new Error('gotoTest() url must start with /');
   }
 
-  const browserUrl = (process.env as d.E2EProcessEnv).__STENCIL_BROWSER_URL__;
+  const browserUrl = env.__STENCIL_BROWSER_URL__;
   if (typeof browserUrl !== 'string') {
-    await closePage(page);
-    return 'invalid gotoTest() browser url';
+    throw new Error('invalid gotoTest() browser url');
   }
 
   const fullUrl = browserUrl + url.substring(1);
 
-  const rsp = await page._e2eGoto(fullUrl, { waitUntil: 'networkidle0' });
+  if (!options.waitUntil) {
+    options.waitUntil = env.__STENCIL_BROWSER_WAIT_UNTIL as any;
+  }
+  const rsp = await page._e2eGoto(fullUrl, options);
 
   if (!rsp.ok()) {
-    await closePage(page);
-    return `Testing unable to load ${url}, HTTP status: ${rsp.status()}`;
+    throw new Error(`Testing unable to load ${url}, HTTP status: ${rsp.status()}`);
   }
 
-  const tmr = setTimeout(async () => {
-    await closePage(page);
-    throw new Error(`App did not load in allowed time. Please ensure the url ${url} loads a stencil application.`);
-  }, 4500);
+  await waitForStencil(page, options);
 
-  await page.waitForFunction('window.stencilAppLoaded');
-
-  clearTimeout(tmr);
-
-  return null;
+  return rsp;
 }
 
-
-async function e2eSetContent(page: pd.E2EPageInternal, html: string) {
-  try {
-    if (page.isClosed()) {
-      return 'e2eSetContent unavailable: page already closed';
-    }
-  } catch (e) {
-    return null;
+async function e2eSetContent(page: E2EPageInternal, html: string, options: NavigationOptions = {}) {
+  if (page.isClosed()) {
+    throw new Error('e2eSetContent unavailable: page already closed');
   }
-
   if (typeof html !== 'string') {
-    await closePage(page);
-    return 'invalid e2eSetContent() html';
+    throw new Error('invalid e2eSetContent() html');
   }
 
-  const appUrl = (process.env as d.E2EProcessEnv).__STENCIL_APP_URL__;
-  if (typeof appUrl !== 'string') {
-    await closePage(page);
-    return 'invalid e2eSetContent() app script url';
+  const output: string[] = [];
+
+  const appScriptUrl = env.__STENCIL_APP_SCRIPT_URL__;
+  if (typeof appScriptUrl !== 'string') {
+    throw new Error('invalid e2eSetContent() app script url');
   }
 
-  const url = (process.env as d.E2EProcessEnv).__STENCIL_BROWSER_URL__;
-  const body = [
-    `<script type="module" src="${appUrl}"></script>`,
-    html
-  ].join('\n');
+  output.push(`<!doctype html>`);
+  output.push(`<html>`);
+  output.push(`<head>`);
+
+  const appStyleUrl = env.__STENCIL_APP_STYLE_URL__;
+  if (typeof appStyleUrl === 'string') {
+    output.push(`<link rel="stylesheet" href="${appStyleUrl}">`);
+  }
+  output.push(`<script type="module" src="${appScriptUrl}"></script>`);
+
+  output.push(`</head>`);
+  output.push(`<body>`);
+  output.push(html);
+  output.push(`</body>`);
+  output.push(`</html>`);
+
+  const pageUrl = env.__STENCIL_BROWSER_URL__;
 
   await page.setRequestInterception(true);
-  page.on('request', interceptedRequest => {
-    if (url === interceptedRequest.url()) {
+
+  const interceptedReqCallback = (interceptedRequest: any) => {
+    if (pageUrl === interceptedRequest.url()) {
       interceptedRequest.respond({
         status: 200,
         contentType: 'text/html',
-        body: body
+        body: output.join('\n'),
       });
-
     } else {
       interceptedRequest.continue();
     }
-  });
+  };
 
-  const rsp = await page._e2eGoto(url, { waitUntil: 'networkidle0' });
+  page.on('request', interceptedReqCallback);
+
+  if (!options.waitUntil) {
+    options.waitUntil = env.__STENCIL_BROWSER_WAIT_UNTIL as any;
+  }
+  const rsp = await page._e2eGoto(pageUrl, options);
 
   if (!rsp.ok()) {
-    await closePage(page);
-    return `Testing unable to load content`;
+    throw new Error(`Testing unable to load content`);
   }
 
-  const tmr = setTimeout(async () => {
-    await closePage(page);
-    throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
-  }, 4500);
+  await waitForStencil(page, options);
 
-  await page.waitForFunction('window.stencilAppLoaded');
-
-  clearTimeout(tmr);
-
-  return null;
+  return rsp;
 }
 
-
-async function setPageEmulate(page: puppeteer.Page) {
+async function waitForStencil(page: E2EPage, options: NavigationOptions) {
   try {
-    if (page.isClosed()) {
-      return;
-    }
+    const timeout = typeof options.timeout === 'number' ? options.timeout : 4750;
+    await page.waitForFunction('window.stencilAppLoaded', { timeout });
   } catch (e) {
+    throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
+  }
+}
+
+async function setPageEmulate(page: Page) {
+  if (page.isClosed()) {
     return;
   }
-
-  const env = (process.env) as d.E2EProcessEnv;
 
   const emulateJsonContent = env.__STENCIL_EMULATE__;
   if (!emulateJsonContent) {
     return;
   }
 
-  try {
-    const screenshotEmulate = JSON.parse(emulateJsonContent) as d.EmulateConfig;
+  const screenshotEmulate = JSON.parse(emulateJsonContent) as EmulateConfig;
 
-    const emulateOptions: puppeteer.EmulateOptions = {
-      viewport: screenshotEmulate.viewport,
-      userAgent: screenshotEmulate.userAgent
-    };
+  const emulateOptions: EmulateOptions = {
+    viewport: screenshotEmulate.viewport,
+    userAgent: screenshotEmulate.userAgent,
+  };
 
-    await (page as puppeteer.Page).emulate(emulateOptions);
-
-  } catch (e) {
-    console.error('setPageEmulate', e);
-    await closePage(page);
-  }
+  await (page as Page).emulate(emulateOptions);
 }
 
-
-async function waitForChanges(page: pd.E2EPageInternal) {
+async function waitForChanges(page: E2EPageInternal) {
   try {
     if (page.isClosed()) {
       return;
     }
-
     await Promise.all(page._e2eElements.map(elm => elm.e2eRunActions()));
 
     if (page.isClosed()) {
@@ -247,19 +314,25 @@ async function waitForChanges(page: pd.E2EPageInternal) {
 
     await page.evaluate(() => {
       // BROWSER CONTEXT
-      return new Promise(resolve => {
+      return new Promise<void>(resolve => {
         requestAnimationFrame(() => {
           const promises: Promise<any>[] = [];
 
-          const waitComponentOnReady = (elm: Element, promises: Promise<any>[]) => {
+          const waitComponentOnReady = (elm: Element | ShadowRoot, promises: Promise<any>[]) => {
             if (elm != null) {
+              if ('shadowRoot' in elm && elm.shadowRoot instanceof ShadowRoot) {
+                waitComponentOnReady(elm.shadowRoot, promises);
+              }
               const children = elm.children;
               const len = children.length;
               for (let i = 0; i < len; i++) {
                 const childElm = children[i];
                 if (childElm != null) {
-                  if (childElm.tagName.includes('-') && typeof (childElm as d.HostElement).componentOnReady === 'function') {
-                    promises.push((childElm as d.HostElement).componentOnReady());
+                  if (
+                    childElm.tagName.includes('-') &&
+                    typeof (childElm as HostElement).componentOnReady === 'function'
+                  ) {
+                    promises.push((childElm as HostElement).componentOnReady());
                   }
                   waitComponentOnReady(childElm, promises);
                 }
@@ -284,29 +357,46 @@ async function waitForChanges(page: pd.E2EPageInternal) {
       return;
     }
 
-    await page.waitFor(100);
+    if (typeof (page as any).waitForTimeout === 'function') {
+      // https://github.com/puppeteer/puppeteer/issues/6214
+      await (page as any).waitForTimeout(100);
+    } else {
+      await page.waitFor(100);
+    }
 
     await Promise.all(page._e2eElements.map(elm => elm.e2eSync()));
-
   } catch (e) {}
 }
 
-
-function consoleMessage(c: puppeteer.ConsoleMessage) {
+function consoleMessage(c: ConsoleMessage) {
+  const msg = serializeConsoleMessage(c);
   const type = c.type();
-  if (typeof (console as any)[type] === 'function') {
-    (console as any)[type](c.text());
+  const normalizedType = type === 'warning' ? 'warn' : type;
+  if (normalizedType === 'debug') {
+    // Skip debug messages
+    return;
+  }
+  if (typeof (console as any)[normalizedType] === 'function') {
+    (console as any)[normalizedType](msg);
   } else {
-    console.log(type, c.text());
+    console.log(type, msg);
   }
 }
 
-
-function pageError(e: any) {
-  console.error('pageerror', e);
+function serializeConsoleMessage(c: ConsoleMessage) {
+  return `${c.text()} ${serializeLocation(c.location())}`;
 }
 
-
-function requestFailed(req: puppeteer.Request) {
-  console.error('requestfailed', req.url());
+function serializeLocation(loc: ConsoleMessageLocation) {
+  let locStr = '';
+  if (loc && loc.url) {
+    locStr = `\nLocation: ${loc.url}`;
+    if (loc.lineNumber) {
+      locStr += `:${loc.lineNumber}`;
+    }
+    if (loc.columnNumber) {
+      locStr += `:${loc.columnNumber}`;
+    }
+  }
+  return locStr;
 }

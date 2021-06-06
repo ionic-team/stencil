@@ -1,8 +1,6 @@
 import { fixRelativeUrls, hasCssVariables, hasRelativeUrls } from '../load-link-styles';
 
-
 describe('hasCssVariables', () => {
-
   it('false for standard css', () => {
     const text = `
     .my-classname {
@@ -91,7 +89,6 @@ describe('hasCssVariables', () => {
     `;
     expect(hasCssVariables(text)).toBe(true);
   });
-
 });
 
 describe('hasRelativeUrls', () => {
@@ -99,6 +96,16 @@ describe('hasRelativeUrls', () => {
     const text = `
       div {
         background-image: url('http://example.com/mytestimage.jpg');
+      }
+    `;
+
+    expect(hasRelativeUrls(text)).toBe(false);
+  });
+
+  it('false for absolute https urls', () => {
+    const text = `
+      div {
+        background-image: url('https://example.com/mytestimage.jpg');
       }
     `;
 
@@ -124,7 +131,6 @@ describe('hasRelativeUrls', () => {
 
     expect(hasRelativeUrls(text)).toBe(false);
   });
-
 });
 
 describe('fixRelativeUrls', () => {
@@ -170,4 +176,31 @@ describe('fixRelativeUrls', () => {
     `);
   });
 
+  it('should transform prepend relative urls contains data folder with base path', () => {
+    const text = `
+      div {
+        background-image: url('data/images/mytestimage.jpg');
+      }
+    `;
+
+    expect(fixRelativeUrls(text, '/assets/css/styles.css')).toBe(`
+      div {
+        background-image: url('/assets/css/data/images/mytestimage.jpg');
+      }
+    `);
+  });
+
+  it.each(['data:,ABC123', 'data:text/plain,ABC123', 'data:text/plain;base64,ABC123'])('should keep data url', dataURL => {
+    const text = `
+      div {
+        background-image: url('${dataURL}');
+      }
+    `;
+
+    expect(fixRelativeUrls(text, '/assets/css/styles.css')).toBe(`
+      div {
+        background-image: url('${dataURL}');
+      }
+    `);
+  });
 });

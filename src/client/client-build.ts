@@ -1,7 +1,9 @@
-import * as d from '../declarations';
-import { BUILD } from '@build-conditionals';
+import type * as d from '../declarations';
+import { BUILD } from '@app-data';
 
 export const Build: d.UserBuildConditionals = {
-  isDev: BUILD.isDev ? true : false, // otherwise rollup can not treeshake BUILD
-  isBrowser: true
+  isDev: BUILD.isDev ? true : false,
+  isBrowser: true,
+  isServer: false,
+  isTesting: BUILD.isTesting ? true : false,
 };

@@ -1,11 +1,10 @@
-import * as d from '@stencil/core/declarations';
+import type * as d from '@stencil/core/declarations';
 import { optimizeCss } from '../optimize-css';
 import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import path from 'path';
 import os from 'os';
 
-
-describe('optimizeCss',  () => {
+describe('optimizeCss', () => {
   let config: d.Config;
   let compilerCtx: d.CompilerCtx;
   let diagnostics: d.Diagnostic[];
@@ -13,16 +12,16 @@ describe('optimizeCss',  () => {
 
   beforeEach(() => {
     config = mockConfig();
-    compilerCtx = mockCompilerCtx();
+    config.maxConcurrentWorkers = 0;
+    compilerCtx = mockCompilerCtx(config);
     diagnostics = [];
   });
-
 
   it('handles error', async () => {
     const filePath = path.join(os.tmpdir(), 'my.css');
     config.minifyCss = true;
     const styleText = `/* css */ body color: #ff0000; }`;
-    await optimizeCss(config, compilerCtx, diagnostics, styleText, filePath, true);
+    await optimizeCss(config, compilerCtx, diagnostics, styleText, filePath);
 
     expect(diagnostics).toHaveLength(1);
   });
@@ -30,10 +29,10 @@ describe('optimizeCss',  () => {
   it('discard-comments', async () => {
     config.minifyCss = true;
     const styleText = `/* css */ body { color: #ff0000; }`;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`body{color:red}`);
+    expect(output).toBe(`body{color:#ff0000}`);
   });
 
   it('minify-gradients', async () => {
@@ -44,10 +43,10 @@ describe('optimizeCss',  () => {
         background: linear-gradient(to bottom, #ffe500 0%, #ffe500 50%, #121 50%, #121 100%);
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{background:linear-gradient(180deg,#ffe500 0,#ffe500 50%,#121 0,#121)}`);
+    expect(output).toBe(`h1{background:linear-gradient(to bottom, #ffe500 0%, #ffe500 50%, #121 50%, #121 100%)}`);
   });
 
   it('reduce-initial', async () => {
@@ -57,10 +56,10 @@ describe('optimizeCss',  () => {
         min-width: initial;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{min-width:0}`);
+    expect(output).toBe(`h1{min-width:initial}`);
   });
 
   it('normalize-display-values', async () => {
@@ -70,10 +69,10 @@ describe('optimizeCss',  () => {
         display: inline flow-root;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{display:inline-block}`);
+    expect(output).toBe(`h1{display:inline flow-root}`);
   });
 
   it('reduce-transforms', async () => {
@@ -84,19 +83,19 @@ describe('optimizeCss',  () => {
         transform: rotate3d(0, 0, 1, 20deg);
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{transform:rotate(20deg)}`);
+    expect(output).toBe(`h1{transform:rotate3d(0, 0, 1, 20deg)}`);
   });
 
   it('colormin', async () => {
     config.minifyCss = true;
     const styleText = `body { color: #ff0000; }`;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`body{color:red}`);
+    expect(output).toBe(`body{color:#ff0000}`);
   });
 
   it('convert-values', async () => {
@@ -106,10 +105,10 @@ describe('optimizeCss',  () => {
         width: 0em;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{width:0}`);
+    expect(output).toBe(`h1{width:0em}`);
   });
 
   it('ordered-values', async () => {
@@ -119,10 +118,10 @@ describe('optimizeCss',  () => {
         border: red solid .5em;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{border:.5em solid red}`);
+    expect(output).toBe(`h1{border:red solid .5em}`);
   });
 
   it('minify-selectors', async () => {
@@ -130,7 +129,7 @@ describe('optimizeCss',  () => {
     const styleText = `
       h1 + p, h2, h3, h2{color:red}
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
     expect(output).toBe(`h1+p,h2,h3{color:red}`);
@@ -145,10 +144,10 @@ describe('optimizeCss',  () => {
         }
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`@media only screen and (min-width:400px,min-height:500px){h2{color:red}}`);
+    expect(output).toBe(`@media only screen and ( min-width: 400px, min-height: 500px ){h2{color:red}}`);
   });
 
   it('normalize-string', async () => {
@@ -158,10 +157,10 @@ describe('optimizeCss',  () => {
         content: '\\'string\\' is intact';
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`p:after{content:"'string' is intact"}`);
+    expect(output).toBe(`p:after{content:'\\'string\\' is intact'}`);
   });
 
   it('minify-font-values', async () => {
@@ -172,23 +171,10 @@ describe('optimizeCss',  () => {
         font-weight: normal;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`p{font-family:Helvetica Neue,Arial,sans-serif,Helvetica;font-weight:400}`);
-  });
-
-  it('normalize-url', async () => {
-    config.minifyCss = true;
-    const styleText = `
-      h1 {
-        background: url("http://site.com:80/image.jpg");
-      }
-    `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
-
-    expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{background:url(http://site.com/image.jpg)}`);
+    expect(output).toBe(`p{font-family:\"Helvetica Neue\", Arial, sans-serif, Helvetica;font-weight:normal}`);
   });
 
   it('normalize-repeat-style', async () => {
@@ -198,10 +184,10 @@ describe('optimizeCss',  () => {
         background: url(image.jpg) repeat no-repeat;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{background:url(image.jpg) repeat-x}`);
+    expect(output).toBe(`h1{background:url(image.jpg) repeat no-repeat}`);
   });
 
   it('normalize-positions', async () => {
@@ -211,10 +197,10 @@ describe('optimizeCss',  () => {
         background-position: bottom left;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{background-position:0 100%}`);
+    expect(output).toBe(`h1{background-position:bottom left}`);
   });
 
   it('normalize-whitespace', async () => {
@@ -224,10 +210,10 @@ describe('optimizeCss',  () => {
         width: calc(10px -  ( 100px / var(--test)  )) ;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{width:calc(10px - (100px / var(--test)))}`);
+    expect(output).toBe(`h1{width:calc(10px -  ( 100px / var(--test)  ))}`);
   });
 
   it('normalize-whitespace', async () => {
@@ -237,92 +223,61 @@ describe('optimizeCss',  () => {
         width: calc(10px -  ( 100px / var(--test)  )) ;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{width:calc(10px - (100px / var(--test)))}`);
+    expect(output).toBe(`h1{width:calc(10px -  ( 100px / var(--test)  ))}`);
   });
 
-  // it('merge-longhand', async () => {
+  // it('discard-duplicates', async () => {
   //   config.minifyCss = true;
   //   const styleText = `
   //     h1 {
-  //       margin-top: 10px;
-  //       margin-right: 20px;
-  //       margin-bottom: 10px;
-  //       margin-left: 20px;
+  //       margin: 0 auto;
+  //       margin: 0 auto
+  //     }
+  //     h1 {
+  //       margin: 0 auto;
   //     }
   //   `;
-  //   const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+  //   const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
   //   expect(diagnostics).toHaveLength(0);
-  //   expect(output).toBe(`h1{margin:10px 20px}`);
+  //   expect(output).toBe(`h1{margin:0 auto}`);
   // });
 
-  // it('merge-longhand w/ css vars', async () => {
+  // it('merge-rules', async () => {
   //   config.minifyCss = true;
   //   const styleText = `
   //     a {
-  //       border-width: var(--border-width);
-  //       border-style: var(--border-style);
-  //       border-color: var(--btn-border-color);
+  //       color: red;
+  //       font-weight: bold
+  //     }
+  //     p {
+  //       color: red;
+  //       font-weight: bold
   //     }
   //   `;
-  //   const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+  //   const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
   //   expect(diagnostics).toHaveLength(0);
-  //   expect(output).toBe(`a{border:var(--border-width) var(--border-style) var(--btn-border-color)}`);
+  //   expect(output).toBe(`a,p{color:red;font-weight:700}`);
   // });
 
-  it('discard-duplicates', async () => {
-    config.minifyCss = true;
-    const styleText = `
-      h1 {
-        margin: 0 auto;
-        margin: 0 auto
-      }
-      h1 {
-        margin: 0 auto;
-      }
-    `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+  // it('discard-empty', async () => {
+  //   config.minifyCss = true;
+  //   const styleText = `
+  //     @font-face;
+  //     h1 {}
+  //     {color:blue}
+  //     h3 {color:red}
+  //     h2 {color:}
+  //   `;
+  //   const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
-    expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{margin:0 auto}`);
-  });
-
-  it('merge-rules', async () => {
-    config.minifyCss = true;
-    const styleText = `
-      a {
-        color: red;
-        font-weight: bold
-      }
-      p {
-        color: red;
-        font-weight: bold
-      }
-    `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
-
-    expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`a,p{color:red;font-weight:700}`);
-  });
-
-  it('discard-empty', async () => {
-    config.minifyCss = true;
-    const styleText = `
-      @font-face;
-      h1 {}
-      {color:blue}
-      h3 {color:red}
-      h2 {color:}
-    `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
-
-    expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h3{color:red}`);
-  });
+  //   expect(diagnostics).toHaveLength(0);
+  //   expect(output).toBe(`h3{color:red}`);
+  // });
 
   it('unique-selectors', async () => {
     config.minifyCss = true;
@@ -331,10 +286,10 @@ describe('optimizeCss',  () => {
         color: red;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1,h2,h3{color:red}`);
+    expect(output).toBe(`h1,h3,h2{color:red}`);
   });
 
   it('prevent autoprefix with null', async () => {
@@ -345,7 +300,7 @@ describe('optimizeCss',  () => {
         box-shadow: 1px;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
     expect(output).toBe(`h1{box-shadow:1px}`);
@@ -359,7 +314,7 @@ describe('optimizeCss',  () => {
         box-shadow: 1px;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
     expect(output).toBe(`h1{box-shadow:1px}`);
@@ -372,7 +327,7 @@ describe('optimizeCss',  () => {
         box-shadow: 1px;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
     expect(output).toBe(`h1{-webkit-box-shadow:1px;box-shadow:1px}`);
@@ -386,24 +341,23 @@ describe('optimizeCss',  () => {
         box-shadow: 1px;
       }
     `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null, true);
+    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
     expect(diagnostics).toHaveLength(0);
     expect(output).toBe(`h1{-webkit-box-shadow:1px;box-shadow:1px}`);
   });
 
   it('do nothing for invalid data', async () => {
-    let output = await optimizeCss(config, compilerCtx, diagnostics, null, null, true);
+    let output = await optimizeCss(config, compilerCtx, diagnostics, null, null);
     expect(diagnostics).toHaveLength(0);
     expect(output).toBe(null);
 
-    output = await optimizeCss(config, compilerCtx, diagnostics, undefined, null, true);
+    output = await optimizeCss(config, compilerCtx, diagnostics, undefined, null);
     expect(diagnostics).toHaveLength(0);
     expect(output).toBe(undefined);
 
-    output = await optimizeCss(config, compilerCtx, diagnostics, '', null, true);
+    output = await optimizeCss(config, compilerCtx, diagnostics, '', null);
     expect(diagnostics).toHaveLength(0);
     expect(output).toBe('');
   });
-
 });

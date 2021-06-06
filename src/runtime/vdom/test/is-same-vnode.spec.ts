@@ -1,10 +1,8 @@
-// import * as d from '../declarations';
+// import type * as d from '../declarations';
 import { h } from '../h';
 import { isSameVnode } from '../vdom-render';
 
-
 describe('isSameVnode', () => {
-
   it('should not be same vnode with slot and no vnode2 name', () => {
     const vnode1 = h('slot', { name: 'start' }, '1');
     const vnode2 = h('slot', {}, '2');
@@ -70,5 +68,4 @@ describe('isSameVnode', () => {
     const vnode2 = h('a', null, '2');
     expect(isSameVnode(vnode1, vnode2)).toBe(true);
   });
-
 });

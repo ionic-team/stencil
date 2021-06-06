@@ -1,26 +1,30 @@
-import { addGlobalLink, loadDocument } from './load-link-styles';
+import { addGlobalLink, loadDocument, startWatcher } from './load-link-styles';
 import { executeTemplate } from './template';
 import { CSSScope } from './interfaces';
 import { addGlobalStyle, parseCSS, reScope, updateGlobalScopes } from './scope';
 import { getActiveSelectors, resolveValues } from './selectors';
+import { CssVarShim } from '../../../declarations';
 
-export class CustomStyle {
-
+export class CustomStyle implements CssVarShim {
   private count = 0;
   private hostStyleMap = new WeakMap<HTMLElement, HTMLStyleElement>();
   private hostScopeMap = new WeakMap<HTMLElement, CSSScope>();
 
   private globalScopes: CSSScope[] = [];
   private scopesMap = new Map<string, CSSScope>();
+  private didInit = false;
 
-  constructor(
-    private win: Window,
-    private doc: Document,
-  ) {}
+  constructor(private win: Window, private doc: Document) {}
 
-  initShim() {
-    return new Promise(resolve => {
+  i() {
+    if (this.didInit || !this.win.requestAnimationFrame) {
+      return Promise.resolve();
+    }
+
+    this.didInit = true;
+    return new Promise<void>(resolve => {
       this.win.requestAnimationFrame(() => {
+        startWatcher(this.doc, this.globalScopes);
         loadDocument(this.doc, this.globalScopes).then(() => resolve());
       });
     });
@@ -33,42 +37,38 @@ export class CustomStyle {
   }
 
   addGlobalStyle(styleEl: HTMLStyleElement) {
-    addGlobalStyle(this.globalScopes, styleEl);
-    this.updateGlobal();
+    if (addGlobalStyle(this.globalScopes, styleEl)) {
+      this.updateGlobal();
+    }
   }
 
-  createHostStyle(
-    hostEl: HTMLElement,
-    cssScopeId: string,
-    cssText: string,
-  ) {
+  createHostStyle(hostEl: HTMLElement, cssScopeId: string, cssText: string, isScoped: boolean) {
     if (this.hostScopeMap.has(hostEl)) {
       throw new Error('host style already created');
     }
-    const baseScope = this.registerHostTemplate(cssText, cssScopeId);
-    const isDynamicScoped = !!(baseScope.isDynamic && baseScope.cssScopeId);
-    const needStyleEl = isDynamicScoped || !baseScope.styleEl;
+    const baseScope = this.registerHostTemplate(cssText, cssScopeId, isScoped);
     const styleEl = this.doc.createElement('style');
+    styleEl.setAttribute('data-no-shim', '');
 
-    if (!needStyleEl) {
-      styleEl.innerHTML = cssText;
+    if (!baseScope.usesCssVars) {
+      // This component does not use (read) css variables
+      styleEl.textContent = cssText;
+    } else if (isScoped) {
+      // This component is dynamic: uses css var and is scoped
+      (styleEl as any)['s-sc'] = cssScopeId = `${baseScope.scopeId}-${this.count}`;
+      styleEl.textContent = '/*needs update*/';
+      this.hostStyleMap.set(hostEl, styleEl);
+      this.hostScopeMap.set(hostEl, reScope(baseScope, cssScopeId));
+      this.count++;
     } else {
-      if (isDynamicScoped) {
-        (styleEl as any)['s-sc'] = cssScopeId = `${baseScope.cssScopeId}-${this.count}`;
-        styleEl.innerHTML = '/*needs update*/';
-        this.hostStyleMap.set(hostEl, styleEl);
-        this.hostScopeMap.set(hostEl, reScope(baseScope, cssScopeId));
-        this.count++;
-
-      } else {
-        baseScope.styleEl = styleEl;
-        if (!baseScope.isDynamic) {
-          styleEl.innerHTML = executeTemplate(baseScope.template, {});
-        }
-        this.globalScopes.push(baseScope);
-        this.updateGlobal();
-        this.hostScopeMap.set(hostEl, baseScope);
+      // This component uses css vars, but it's no-encapsulation (global static)
+      baseScope.styleEl = styleEl;
+      if (!baseScope.usesCssVars) {
+        styleEl.textContent = executeTemplate(baseScope.template, {});
       }
+      this.globalScopes.push(baseScope);
+      this.updateGlobal();
+      this.hostScopeMap.set(hostEl, baseScope);
     }
     return styleEl;
   }
@@ -84,12 +84,12 @@ export class CustomStyle {
 
   updateHost(hostEl: HTMLElement) {
     const scope = this.hostScopeMap.get(hostEl);
-    if (scope && scope.isDynamic && scope.cssScopeId) {
+    if (scope && scope.usesCssVars && scope.isScoped) {
       const styleEl = this.hostStyleMap.get(hostEl);
       if (styleEl) {
         const selectors = getActiveSelectors(hostEl, this.hostScopeMap, this.globalScopes);
         const props = resolveValues(selectors);
-        styleEl.innerHTML = executeTemplate(scope.template, props);
+        styleEl.textContent = executeTemplate(scope.template, props);
       }
     }
   }
@@ -98,11 +98,12 @@ export class CustomStyle {
     updateGlobalScopes(this.globalScopes);
   }
 
-  private registerHostTemplate(cssText: string, scopeId: string) {
+  private registerHostTemplate(cssText: string, scopeId: string, isScoped: boolean) {
     let scope = this.scopesMap.get(scopeId);
     if (!scope) {
       scope = parseCSS(cssText);
-      scope.cssScopeId = scopeId;
+      scope.scopeId = scopeId;
+      scope.isScoped = isScoped;
       this.scopesMap.set(scopeId, scope);
     }
     return scope;

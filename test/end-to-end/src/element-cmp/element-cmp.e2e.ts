@@ -1,13 +1,13 @@
 import { newE2EPage } from '@stencil/core/testing';
 
-
 describe('@Element', () => {
-
   it('should read the host elements attribute', async () => {
     // create a new puppeteer page
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <element-cmp host-element-attr="Marty McFly"></element-cmp>
-    `});
+    `,
+    });
 
     // with page.find() select the "element-cmp" element (uses querySelector)
     const elm = await page.find('element-cmp');
@@ -15,9 +15,11 @@ describe('@Element', () => {
   });
 
   it('should correctly expect attrs and classes', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <element-cmp data-attr1="a" data-attr2="b" class="class1 class2"></element-cmp>
-    `});
+    `,
+    });
 
     const elm = await page.find('element-cmp');
 
@@ -32,9 +34,11 @@ describe('@Element', () => {
   });
 
   it('should set innerHTML', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <element-cmp id="my-elm"></element-cmp>
-    `});
+    `,
+    });
 
     const elm = await page.find('#my-elm');
 
@@ -43,7 +47,7 @@ describe('@Element', () => {
     await page.waitForChanges();
 
     expect(elm).toEqualHtml(`
-      <element-cmp id="my-elm" class="hydrated">
+      <element-cmp id="my-elm" custom-hydrate-flag="">
         <div>
           inner content
         </div>
@@ -52,5 +56,4 @@ describe('@Element', () => {
 
     expect(elm).toEqualText('inner content');
   });
-
 });

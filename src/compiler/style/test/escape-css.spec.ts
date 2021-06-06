@@ -1,5 +1,4 @@
-import { escapeCssForJs } from '../component-styles';
-
+import { escapeCssForJs } from '../style-utils';
 
 describe('escapeCssForJs', () => {
   /* this is all weird cuz we're testing by writing css in JS
@@ -57,8 +56,7 @@ describe('escapeCssForJs', () => {
   });
 
   it(`should escape @ in selectors`, () => {
-    const escaped = escapeCssForJs('.container--small\@tablet{}');
+    const escaped = escapeCssForJs('.container--small@tablet{}');
     expect(escaped).toBe(`.container--small\\@tablet{}`);
   });
-
 });

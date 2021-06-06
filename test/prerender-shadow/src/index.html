@@ -2,14 +2,20 @@
 <meta charset="UTF-8">
 <script id="appScript" type="module"></script>
 
-<cmp-c>
-  cmp-c light-dom text top
-  <p>cmp-c light-dom paragraph</p>
-  cmp-c light-dom text bottom
-</cmp-c>
+<cmp-a></cmp-a>
+
+<cmp-d>
+  <cmp-c>
+    cmp-c light-dom text top
+    <p>cmp-c light-dom paragraph</p>
+    cmp-c light-dom text bottom
+  </cmp-c>
+</cmp-d>
 
 <script>
+  console.log('page load');
   setTimeout(() => {
     document.getElementById('appScript').src = '/build/app.esm.js';
+    console.log('script added');
   }, 1500);
 </script>

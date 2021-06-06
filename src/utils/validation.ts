@@ -1,5 +1,4 @@
-
-export function validateComponentTag(tag: string) {
+export const validateComponentTag = (tag: string) => {
   if (tag !== tag.trim()) {
     return `Tag can not contain white spaces`;
   }
@@ -42,4 +41,4 @@ export function validateComponentTag(tag: string) {
     return `"${tag}" tag cannot end with a dash (-)`;
   }
   return undefined;
-}
+};

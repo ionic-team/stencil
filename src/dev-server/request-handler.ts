@@ -1,117 +1,144 @@
-import * as d from '../declarations';
-import { isDevClient, sendMsg } from './dev-server-utils';
+import type * as d from '../declarations';
+import type { IncomingMessage, ServerResponse } from 'http';
+import { isDevClient, isDevModule, isExtensionLessPath, isSsrStaticDataPath } from './dev-server-utils';
 import { normalizePath } from '@utils';
 import { serveDevClient } from './serve-dev-client';
-import { serveFile } from './serve-file';
-import { serve404, serve404Content } from './serve-404';
-import { serve500 } from './serve-500';
+import { serveDevNodeModule } from './serve-dev-node-module';
 import { serveDirectoryIndex } from './serve-directory-index';
-import * as http from 'http';
+import { serveFile } from './serve-file';
+import { ssrPageRequest, ssrStaticDataRequest } from './ssr-request';
 import path from 'path';
-import * as url from 'url';
 
+export function createRequestHandler(devServerConfig: d.DevServerConfig, serverCtx: d.DevServerContext) {
+  let userRequestHandler: (req: IncomingMessage, res: ServerResponse, next: () => void) => void = null;
 
-export function createRequestHandler(devServerConfig: d.DevServerConfig, fs: d.FileSystem) {
+  if (typeof devServerConfig.requestListenerPath === 'string') {
+    userRequestHandler = require(devServerConfig.requestListenerPath);
+  }
 
-  return async function(incomingReq: http.IncomingMessage, res: http.ServerResponse) {
-    try {
-      const req = normalizeHttpRequest(devServerConfig, incomingReq);
-
-      if (req.url === '') {
-        res.writeHead(302, { 'location': '/' });
-
-        if (devServerConfig.logRequests) {
-          sendMsg(process, {
-            requestLog: {
-              method: req.method,
-              url: req.url,
-              status: 302
-            }
-          });
-        }
-
-        return res.end();
-      }
-
-      if (isDevClient(req.pathname) && devServerConfig.websocket) {
-        return serveDevClient(devServerConfig, fs, req, res);
-      }
-
-      if (!req.url.startsWith(devServerConfig.basePath)) {
-        if (devServerConfig.logRequests) {
-          sendMsg(process, {
-            requestLog: {
-              method: req.method,
-              url: req.url,
-              status: 404
-            }
-          });
-        }
-
-        return serve404Content(devServerConfig, req, res, `404 File Not Found, base path: ${devServerConfig.basePath}`);
-      }
-
+  return async function (incomingReq: IncomingMessage, res: ServerResponse) {
+    async function defaultHandler() {
       try {
-        req.stats = await fs.stat(req.filePath);
+        const req = normalizeHttpRequest(devServerConfig, incomingReq);
 
-        if (req.stats.isFile()) {
-          return serveFile(devServerConfig, fs, req, res);
+        if (!req.url) {
+          return serverCtx.serve302(req, res);
         }
 
-        if (req.stats.isDirectory()) {
-          return serveDirectoryIndex(devServerConfig, fs, req, res);
+        if (isDevClient(req.pathname) && devServerConfig.websocket) {
+          return serveDevClient(devServerConfig, serverCtx, req, res);
         }
 
-      } catch (e) {}
+        if (isDevModule(req.pathname)) {
+          return serveDevNodeModule(serverCtx, req, res);
+        }
 
-      if (isValidHistoryApi(devServerConfig, req)) {
-        try {
-          const indexFilePath = path.join(devServerConfig.root, devServerConfig.historyApiFallback.index);
+        if (!isValidUrlBasePath(devServerConfig.basePath, req.url)) {
+          return serverCtx.serve404(
+            req,
+            res,
+            `invalid basePath`,
+            `404 File Not Found, base path: ${devServerConfig.basePath}`,
+          );
+        }
 
-          req.stats = await fs.stat(indexFilePath);
-          if (req.stats.isFile()) {
-            req.filePath = indexFilePath;
-            return serveFile(devServerConfig, fs, req, res);
+        if (devServerConfig.ssr) {
+          if (isExtensionLessPath(req.url.pathname)) {
+            return ssrPageRequest(devServerConfig, serverCtx, req, res);
           }
+          if (isSsrStaticDataPath(req.url.pathname)) {
+            return ssrStaticDataRequest(devServerConfig, serverCtx, req, res);
+          }
+        }
 
-        } catch (e) {}
+        req.stats = await serverCtx.sys.stat(req.filePath);
+        if (req.stats.isFile) {
+          return serveFile(devServerConfig, serverCtx, req, res);
+        }
+
+        if (req.stats.isDirectory) {
+          return serveDirectoryIndex(devServerConfig, serverCtx, req, res);
+        }
+
+        const xSource = ['notfound'];
+        const validHistoryApi = isValidHistoryApi(devServerConfig, req);
+        xSource.push(`validHistoryApi: ${validHistoryApi}`);
+
+        if (validHistoryApi) {
+          try {
+            const indexFilePath = path.join(devServerConfig.root, devServerConfig.historyApiFallback.index);
+            xSource.push(`indexFilePath: ${indexFilePath}`);
+
+            req.stats = await serverCtx.sys.stat(indexFilePath);
+            if (req.stats.isFile) {
+              req.filePath = indexFilePath;
+              return serveFile(devServerConfig, serverCtx, req, res);
+            }
+          } catch (e) {
+            xSource.push(`notfound error: ${e}`);
+          }
+        }
+
+        return serverCtx.serve404(req, res, xSource.join(', '));
+      } catch (e) {
+        return serverCtx.serve500(incomingReq, res, e, `not found error`);
       }
+    }
 
-      return serve404(devServerConfig, fs, req, res);
-
-    } catch (e) {
-      return serve500(devServerConfig, incomingReq as any, res, e);
+    if (typeof userRequestHandler === 'function') {
+      await userRequestHandler(incomingReq, res, defaultHandler);
+    } else {
+      await defaultHandler();
     }
   };
 }
 
+export function isValidUrlBasePath(basePath: string, url: URL) {
+  // normalize the paths to always end with a slash for the check
+  let pathname = url.pathname;
+  if (!pathname.endsWith('/')) {
+    pathname += '/';
+  }
+  if (!basePath.endsWith('/')) {
+    basePath += '/';
+  }
+  return pathname.startsWith(basePath);
+}
 
-function normalizeHttpRequest(devServerConfig: d.DevServerConfig, incomingReq: http.IncomingMessage) {
+function normalizeHttpRequest(devServerConfig: d.DevServerConfig, incomingReq: IncomingMessage) {
   const req: d.HttpRequest = {
     method: (incomingReq.method || 'GET').toUpperCase() as any,
     headers: incomingReq.headers as any,
-    acceptHeader: (incomingReq.headers && typeof incomingReq.headers.accept === 'string' && incomingReq.headers.accept) || '',
-    url: (incomingReq.url || '').trim() || '',
-    host: (incomingReq.headers && typeof incomingReq.headers.host === 'string' && incomingReq.headers.host) || null
+    acceptHeader:
+      (incomingReq.headers && typeof incomingReq.headers.accept === 'string' && incomingReq.headers.accept) || '',
+    host: (incomingReq.headers && typeof incomingReq.headers.host === 'string' && incomingReq.headers.host) || null,
+    url: null,
+    searchParams: null,
   };
 
-  const parsedUrl = url.parse(req.url);
-  const parts = (parsedUrl.pathname || '').replace(/\\/g, '/').split('/');
-
-  req.pathname = parts.map(part => decodeURIComponent(part)).join('/');
-  if (req.pathname.length > 0 && !isDevClient(req.pathname)) {
-    req.pathname = '/' + req.pathname.substring(devServerConfig.basePath.length);
+  const incomingUrl = (incomingReq.url || '').trim() || null;
+  if (incomingUrl) {
+    if (req.host) {
+      req.url = new URL(incomingReq.url, `http://${req.host}`);
+    } else {
+      req.url = new URL(incomingReq.url, `http://dev.stenciljs.com`);
+    }
+    req.searchParams = req.url.searchParams;
   }
 
-  req.filePath = normalizePath(path.normalize(
-    path.join(devServerConfig.root,
-      path.relative('/', req.pathname)
-    )
-  ));
+  if (req.url) {
+    const parts = req.url.pathname.replace(/\\/g, '/').split('/');
+
+    req.pathname = parts.map(part => decodeURIComponent(part)).join('/');
+    if (req.pathname.length > 0 && !isDevClient(req.pathname)) {
+      req.pathname = '/' + req.pathname.substring(devServerConfig.basePath.length);
+    }
+
+    req.filePath = normalizePath(path.normalize(path.join(devServerConfig.root, path.relative('/', req.pathname))));
+  }
 
   return req;
 }
-
 
 export function isValidHistoryApi(devServerConfig: d.DevServerConfig, req: d.HttpRequest) {
   if (!devServerConfig.historyApiFallback) {

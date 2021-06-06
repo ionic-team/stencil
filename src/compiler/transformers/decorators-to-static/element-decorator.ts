@@ -1,10 +1,10 @@
-import * as d from '../../../declarations';
-import { createStaticGetter, isDecoratorNamed } from '../transform-utils';
-import ts from 'typescript';
+import type * as d from '../../../declarations';
 import { buildError } from '@utils';
+import { createStaticGetter } from '../transform-utils';
+import { isDecoratorNamed } from './decorator-utils';
+import ts from 'typescript';
 
-
-export function elementDecoratorsToStatic(diagnostics: d.Diagnostic[], decoratedMembers: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
+export const elementDecoratorsToStatic = (diagnostics: d.Diagnostic[], decoratedMembers: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
   const elementRefs = decoratedMembers
     .filter(ts.isPropertyDeclaration)
     .map(prop => parseElementDecorator(diagnostics, typeChecker, prop))
@@ -17,14 +17,13 @@ export function elementDecoratorsToStatic(diagnostics: d.Diagnostic[], decorated
       error.messageText = `It's not valid to add more than one Element() decorator`;
     }
   }
-}
+};
 
-
-function parseElementDecorator(_diagnostics: d.Diagnostic[], _typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration) {
+const parseElementDecorator = (_diagnostics: d.Diagnostic[], _typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration) => {
   const elementDecorator = prop.decorators && prop.decorators.find(isDecoratorNamed('Element'));
 
   if (elementDecorator == null) {
     return null;
   }
   return prop.name.getText();
-}
+};

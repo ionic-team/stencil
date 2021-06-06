@@ -1,42 +1,31 @@
-import * as d from '../declarations';
-import { normalizePath } from '@utils';
-import exit from 'exit';
+import type { Config } from '../declarations';
+import { isString } from '@utils';
 
-
-export async function taskServe(process: NodeJS.Process, config: d.Config, flags: d.ConfigFlags) {
-  const { Compiler } = require('../compiler/index.js');
-
+export const taskServe = async (config: Config) => {
   config.suppressLogs = true;
 
-  const compiler: d.Compiler = new Compiler(config);
-  if (!compiler.isValid) {
-    exit(1);
-  }
-
   config.flags.serve = true;
-  config.devServer.openBrowser = flags.open;
+  config.devServer.openBrowser = config.flags.open;
   config.devServer.reloadStrategy = null;
   config.devServer.initialLoadUrl = '/';
   config.devServer.websocket = false;
   config.maxConcurrentWorkers = 1;
+  config.devServer.root = isString(config.flags.root) ? config.flags.root : config.sys.getCurrentDirectory();
 
-  config.devServer.root = process.cwd();
+  const devServerPath = config.sys.getDevServerExecutingPath();
+  const { start }: typeof import('@stencil/core/dev-server') = await config.sys.dynamicImport(devServerPath);
+  const devServer = await start(config.devServer, config.logger);
 
-  if (typeof flags.root === 'string') {
-    if (!config.sys.path.isAbsolute(config.flags.root)) {
-      config.devServer.root = config.sys.path.relative(process.cwd(), flags.root);
+  console.log(`${config.logger.cyan('     Root:')} ${devServer.root}`);
+  console.log(`${config.logger.cyan('  Address:')} ${devServer.address}`);
+  console.log(`${config.logger.cyan('     Port:')} ${devServer.port}`);
+  console.log(`${config.logger.cyan('   Server:')} ${devServer.browserUrl}`);
+  console.log(``);
+
+  config.sys.onProcessInterrupt(() => {
+    if (devServer) {
+      config.logger.debug(`dev server close: ${devServer.browserUrl}`);
+      devServer.close();
     }
-  }
-  config.devServer.root = normalizePath(config.devServer.root);
-
-  const devServer = await compiler.startDevServer();
-  if (devServer) {
-    config.logger.info(`dev server: ${devServer.browserUrl}`);
-  }
-
-  process.once('SIGINT', () => {
-    config.sys.destroy();
-    devServer && devServer.close();
-    exit(0);
   });
-}
+};

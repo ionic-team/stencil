@@ -1,10 +1,9 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { catchError } from '@utils';
 import { getSitemapUrls } from './sitemap-xml';
-import { URL } from 'url';
+import { join } from 'path';
 
-
-export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResults: d.SitemapXmpResults) {
+export const generateRobotsTxt = async (manager: d.PrerenderManager, sitemapResults: d.SitemapXmpResults) => {
   if (manager.prerenderConfig.robotsTxt === null) {
     // if it's set to null then let's not create a robots.txt file
     return null;
@@ -14,10 +13,7 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
     if (typeof manager.prerenderConfig.robotsTxt !== 'function') {
       // not set to null, but also no config.robotsTxt(), so let's make a default
       manager.prerenderConfig.robotsTxt = function robotsTxt(opts) {
-        const content = [
-          `User-agent: *`,
-          `Disallow:`
-        ];
+        const content = [`User-agent: *`, `Disallow:`];
         if (typeof opts.sitemapUrl === 'string') {
           content.push(`Sitemap: ${opts.sitemapUrl}`);
         }
@@ -29,7 +25,7 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
       urls: getSitemapUrls(manager),
       baseUrl: manager.outputTarget.baseUrl,
       sitemapUrl: sitemapResults ? sitemapResults.url : null,
-      dir: manager.outputTarget.dir
+      dir: manager.outputTarget.dir,
     };
 
     const userResults = manager.prerenderConfig.robotsTxt(opts);
@@ -40,12 +36,11 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
     const results: d.RobotsTxtResults = {
       content: null,
       filePath: null,
-      url: null
+      url: null,
     };
 
     if (typeof userResults === 'string') {
       results.content = userResults;
-
     } else {
       results.content = userResults.content;
       results.filePath = userResults.filePath;
@@ -59,7 +54,7 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
     results.content = lines.map(l => l.trim()).join('\n');
 
     if (typeof results.filePath !== 'string') {
-      results.filePath = manager.config.sys.path.join(manager.outputTarget.dir, `robots.txt`);
+      results.filePath = join(manager.outputTarget.dir, `robots.txt`);
     }
 
     if (typeof results.url !== 'string') {
@@ -67,12 +62,11 @@ export async function generateRobotsTxt(manager: d.PrerenderManager, sitemapResu
       results.url = robotsTxtUrl.href;
     }
 
-    await manager.config.sys.fs.writeFile(results.filePath, results.content);
+    await manager.config.sys.writeFile(results.filePath, results.content);
 
     return results;
-
   } catch (e) {
     catchError(manager.diagnostics, e);
     return null;
   }
-}
+};

@@ -1,11 +1,9 @@
-import { Component, Prop, State, Watch } from '@stencil/core';
+import { Component, Method, Prop, State, Watch } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('watch', () => {
-
   it('watch is called each time a prop changes', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       method1Called = 0;
       method2Called = 0;
@@ -58,7 +56,7 @@ describe('watch', () => {
   });
 
   it('should Watch correctly', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       watchCalled = 0;
 
@@ -109,5 +107,64 @@ describe('watch', () => {
 
     root.value = 1300;
     expect(rootInstance.method).toHaveBeenLastCalledWith(1300, 30, 'value');
+  });
+
+  it('should Watch from lifecycles', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      renderCount = 0;
+      watchCalled = 0;
+
+      @State() state = 0;
+      @Watch('state')
+      method() {
+        this.watchCalled++;
+      }
+
+      @Method()
+      async pushState() {
+        this.state++;
+      }
+
+      connectedCallback() {
+        expect(this.watchCalled).toBe(0);
+        this.state = 1;
+        expect(this.watchCalled).toBe(1);
+        this.state = 1;
+        expect(this.watchCalled).toBe(1);
+        this.state = 2;
+        expect(this.watchCalled).toBe(2);
+      }
+
+      componentWillLoad() {
+        expect(this.watchCalled).toBe(2);
+        this.state = 3;
+        expect(this.watchCalled).toBe(3);
+      }
+
+      componentDidLoad() {
+        this.state = 4;
+        expect(this.watchCalled).toBe(4);
+      }
+
+      render() {
+        this.renderCount++;
+        return `${this.renderCount} ${this.state} ${this.watchCalled}`;
+      }
+    }
+
+    const { root, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml(`<cmp-a>2 4 4</cmp-a>`);
+    await waitForChanges();
+    await waitForChanges();
+    expect(root).toEqualHtml(`<cmp-a>2 4 4</cmp-a>`);
+
+    await root.pushState();
+    await waitForChanges();
+    expect(root).toEqualHtml(`<cmp-a>3 5 5</cmp-a>`);
   });
 });

@@ -1,11 +1,24 @@
-import './polyfills';
+import { createSystem } from './sys/stencil-sys';
+import { createWorkerMessageHandler } from './worker/worker-thread';
+import { initWebWorkerThread } from './sys/worker/web-worker-thread';
+import { IS_WEB_WORKER_ENV } from './sys/environment';
+import ts from 'typescript';
 
-export { BuildContext } from './build/build-ctx';
-export { Cache } from './cache';
-export { Compiler } from './compiler';
-export { COMPILER_BUILD } from './build/compiler-build-id';
-export { Config } from '../declarations';
-export { formatComponentRuntimeMeta, formatLazyBundleRuntimeMeta } from './app-core/format-component-runtime-meta';
-export { getBuildFeatures } from './app-core/build-conditionals';
-export { transpileModule } from './transpile/transpile-module';
-export { validateConfig } from './config/validate-config';
+if (IS_WEB_WORKER_ENV) {
+  initWebWorkerThread(createWorkerMessageHandler(createSystem()));
+}
+
+export { createCompiler } from './compiler';
+export { createPrerenderer } from './prerender/prerender-main';
+export { createSystem } from './sys/stencil-sys';
+export { createWorkerContext } from './worker/worker-thread';
+export { createWorkerMessageHandler } from './worker/worker-thread';
+export { dependencies } from './sys/dependencies.json';
+export { loadConfig } from './config/load-config';
+export { nodeRequire } from './sys/node-require';
+export { optimizeCss } from './optimize/optimize-css';
+export { optimizeJs } from './optimize/optimize-js';
+export { path } from './sys/modules/path';
+export { transpile, transpileSync } from './transpile';
+export { version, versions, vermoji, buildId } from '../version';
+export { ts };

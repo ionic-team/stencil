@@ -1,35 +1,47 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { createRequestHandler } from './request-handler';
-import { findClosestOpenPort } from './find-closest-port';
-import { getSSL } from './ssl';
 import * as http from 'http';
 import * as https from 'https';
+import * as net from 'net';
 
-
-export async function createHttpServer(devServerConfig: d.DevServerConfig, fs: d.FileSystem, destroys: d.DevServerDestroy[]) {
-  // figure out the port to be listening on
-  // by figuring out the first one available
-  devServerConfig.port = await findClosestOpenPort(devServerConfig.address, devServerConfig.port);
-
+export function createHttpServer(devServerConfig: d.DevServerConfig, serverCtx: d.DevServerContext) {
   // create our request handler
-  const reqHandler = createRequestHandler(devServerConfig, fs);
+  const reqHandler = createRequestHandler(devServerConfig, serverCtx);
 
-  let server: http.Server;
+  const credentials = devServerConfig.https;
 
-  if (devServerConfig.protocol === 'https') {
-    // https server
-    server = https.createServer(await getSSL(), reqHandler) as any;
+  return credentials ? https.createServer(credentials, reqHandler) : http.createServer(reqHandler);
+}
 
-  } else {
-    // http server
-    server = http.createServer(reqHandler);
+export async function findClosestOpenPort(host: string, port: number): Promise<number> {
+  async function t(portToCheck: number): Promise<number> {
+    const isTaken = await isPortTaken(host, portToCheck);
+    if (!isTaken) {
+      return portToCheck;
+    }
+    return t(portToCheck + 1);
   }
 
-  destroys.push(() => {
-    // close down the serve on destroy
-    server.close();
-    server = null;
-  });
+  return t(port);
+}
 
-  return server;
+function isPortTaken(host: string, port: number): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    const tester = net
+      .createServer()
+      .once('error', () => {
+        resolve(true);
+      })
+      .once('listening', () => {
+        tester
+          .once('close', () => {
+            resolve(false);
+          })
+          .close();
+      })
+      .on('error', (err: any) => {
+        reject(err);
+      })
+      .listen(port, host);
+  });
 }

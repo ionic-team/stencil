@@ -1,32 +1,28 @@
-import { teardownGlobal } from '../global';
-import { MockWindow } from '..';
-
+import { createWindow } from '../window';
 
 describe('customElements', () => {
-
-  afterEach(() => {
-    teardownGlobal(global);
-  });
-
   it('attributeChangedCallback, removeAttribute', () => {
     let attrName: string;
     let oldValue: string;
     let newValue: string;
     let called = 0;
 
-    customElements.define('cmp-a', class extends HTMLElement {
-      attributeChangedCallback(name: string, oldVal: string, newVal: string) {
-        attrName = name;
-        oldValue = oldVal;
-        newValue = newVal;
-        called++;
-      }
-      static get observedAttributes() {
-        return ['attr-a', 'attr-b'];
-      }
-    });
+    customElements.define(
+      'cmp-a',
+      class extends HTMLElement {
+        attributeChangedCallback(name: string, oldVal: string, newVal: string) {
+          attrName = name;
+          oldValue = oldVal;
+          newValue = newVal;
+          called++;
+        }
+        static get observedAttributes() {
+          return ['attr-a', 'attr-b'];
+        }
+      },
+    );
 
-    const cmpA = document.createElement('cmp-a');
+    const cmpA = document.createElement('CMP-a');
     cmpA.setAttribute('attr-a', 'value-a');
     expect(attrName).toBe('attr-a');
     expect(oldValue).toBe(null);
@@ -48,17 +44,20 @@ describe('customElements', () => {
     let newValue: string;
     let called = 0;
 
-    customElements.define('cmp-a', class extends HTMLElement {
-      attributeChangedCallback(name: string, oldVal: string, newVal: string) {
-        attrName = name;
-        oldValue = oldVal;
-        newValue = newVal;
-        called++;
-      }
-      static get observedAttributes() {
-        return ['attr-a', 'attr-b'];
-      }
-    });
+    customElements.define(
+      'cmp-a',
+      class extends HTMLElement {
+        attributeChangedCallback(name: string, oldVal: string, newVal: string) {
+          attrName = name;
+          oldValue = oldVal;
+          newValue = newVal;
+          called++;
+        }
+        static get observedAttributes() {
+          return ['attr-a', 'attr-b'];
+        }
+      },
+    );
 
     const cmpA = document.createElement('cmp-a');
     document.body.appendChild(cmpA);
@@ -94,14 +93,17 @@ describe('customElements', () => {
     let connectedInc = 0;
     let disconnectedInc = 0;
 
-    customElements.define('cmp-a', class extends HTMLElement {
-      connectedCallback() {
-        connectedInc++;
-      }
-      disconnectedCallback() {
-        disconnectedInc++;
-      }
-    });
+    customElements.define(
+      'cmp-a',
+      class extends HTMLElement {
+        connectedCallback() {
+          connectedInc++;
+        }
+        disconnectedCallback() {
+          disconnectedInc++;
+        }
+      },
+    );
 
     expect(connectedInc).toBe(0);
     expect(disconnectedInc).toBe(0);
@@ -132,11 +134,14 @@ describe('customElements', () => {
   it('connectedCallback, multiple appendChild', () => {
     let connectedInc = 0;
 
-    customElements.define('cmp-a', class extends HTMLElement {
-      connectedCallback() {
-        connectedInc++;
-      }
-    });
+    customElements.define(
+      'cmp-a',
+      class extends HTMLElement {
+        connectedCallback() {
+          connectedInc++;
+        }
+      },
+    );
 
     expect(connectedInc).toBe(0);
     const cmpA1 = document.createElement('cmp-a');
@@ -157,11 +162,14 @@ describe('customElements', () => {
   it('connectedCallback, insertBefore null', () => {
     let connectedInc = 0;
 
-    customElements.define('cmp-a', class extends HTMLElement {
-      connectedCallback() {
-        connectedInc++;
-      }
-    });
+    customElements.define(
+      'cmp-a',
+      class extends HTMLElement {
+        connectedCallback() {
+          connectedInc++;
+        }
+      },
+    );
 
     expect(connectedInc).toBe(0);
     const cmpA = document.createElement('cmp-a');
@@ -174,11 +182,14 @@ describe('customElements', () => {
   it('connectedCallback, insertBefore elm', () => {
     let connectedInc = 0;
 
-    customElements.define('cmp-a', class extends HTMLElement {
-      connectedCallback() {
-        connectedInc++;
-      }
-    });
+    customElements.define(
+      'cmp-a',
+      class extends HTMLElement {
+        connectedCallback() {
+          connectedInc++;
+        }
+      },
+    );
 
     expect(connectedInc).toBe(0);
     const ref = document.createElement('div');
@@ -192,16 +203,19 @@ describe('customElements', () => {
   it('appendChild nested, scoped to mocked window', () => {
     let connectedInc = 0;
     let disconnectedInc = 0;
-    const win = new MockWindow() as any;
+    const win = createWindow() as any;
 
-    win.customElements.define('cmp-a', class extends win.HTMLElement {
-      connectedCallback() {
-        connectedInc++;
-      }
-      disconnectedCallback() {
-        disconnectedInc++;
-      }
-    });
+    win.customElements.define(
+      'cmp-a',
+      class extends win.HTMLElement {
+        connectedCallback() {
+          connectedInc++;
+        }
+        disconnectedCallback() {
+          disconnectedInc++;
+        }
+      },
+    );
 
     expect(connectedInc).toBe(0);
     expect(disconnectedInc).toBe(0);
@@ -220,5 +234,4 @@ describe('customElements', () => {
     expect(connectedInc).toBe(1);
     expect(disconnectedInc).toBe(1);
   });
-
 });

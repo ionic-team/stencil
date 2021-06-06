@@ -1,13 +1,23 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
+import { buildError, isString } from '@utils';
+import { isAbsolute, join, basename, dirname } from 'path';
+import { isLocalModule } from '../sys/resolve/resolve-utils';
 import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
-import { buildError } from '@utils';
 
-
-export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
-  const testing = config.testing = config.testing || {};
+export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) => {
+  const testing = (config.testing = Object.assign({}, config.testing || {}));
 
   if (!config.flags || (!config.flags.e2e && !config.flags.spec)) {
     return;
+  }
+
+  let configPathDir = config.configPath;
+  if (isString(configPathDir)) {
+    if (basename(configPathDir).includes('.')) {
+      configPathDir = dirname(configPathDir);
+    }
+  } else {
+    configPathDir = config.rootDir;
   }
 
   if (typeof config.flags.headless === 'boolean') {
@@ -16,25 +26,25 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
     testing.browserHeadless = true;
   }
 
+  if (!testing.browserWaitUntil) {
+    testing.browserWaitUntil = 'load';
+  }
+
   testing.browserArgs = testing.browserArgs || [];
-  addOption(testing.browserArgs, '--disable-gpu');
-  addOption(testing.browserArgs, '--disable-canvas-aa');
-  addOption(testing.browserArgs, '--disable-composited-antialiasing');
-  addOption(testing.browserArgs, '--disable-composited-antialiasing');
+  addTestingConfigOption(testing.browserArgs, '--font-render-hinting=medium');
+  addTestingConfigOption(testing.browserArgs, '--incognito');
 
   if (config.flags.ci) {
-    addOption(testing.browserArgs, '--no-sandbox');
-    addOption(testing.browserArgs, '--disable-setuid-sandbox');
+    addTestingConfigOption(testing.browserArgs, '--no-sandbox');
+    addTestingConfigOption(testing.browserArgs, '--disable-setuid-sandbox');
+    addTestingConfigOption(testing.browserArgs, '--disable-dev-shm-usage');
     testing.browserHeadless = true;
   }
 
-  const path = config.sys.path;
-
   if (typeof testing.rootDir === 'string') {
-    if (!path.isAbsolute(testing.rootDir)) {
-      testing.rootDir = path.join(config.rootDir, testing.rootDir);
+    if (!isAbsolute(testing.rootDir)) {
+      testing.rootDir = join(config.rootDir, testing.rootDir);
     }
-
   } else {
     testing.rootDir = config.rootDir;
   }
@@ -44,64 +54,41 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
   }
 
   if (typeof testing.screenshotConnector === 'string') {
-    if (!path.isAbsolute(testing.screenshotConnector)) {
-      testing.screenshotConnector = path.join(config.rootDir, testing.screenshotConnector);
+    if (!isAbsolute(testing.screenshotConnector)) {
+      testing.screenshotConnector = join(config.rootDir, testing.screenshotConnector);
     }
-
   } else {
-    testing.screenshotConnector = path.join(
-      config.sys.compiler.packageDir, 'screenshot', 'local-connector.js'
-    );
-  }
-
-  if (!Array.isArray(testing.moduleFileExtensions)) {
-    testing.moduleFileExtensions = DEFAULT_MODULE_FILE_EXTENSIONS;
+    testing.screenshotConnector = join(config.sys.getCompilerExecutingPath(), '..', '..', 'screenshot', 'local-connector.js');
   }
 
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
     testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map(ignorePattern => {
-      return path.join(testing.rootDir, ignorePattern);
+      return join(testing.rootDir, ignorePattern);
     });
 
-    config.outputTargets.filter(o => (isOutputTargetDist(o) || isOutputTargetWww(o)) && o.dir).forEach((outputTarget: d.OutputTargetWww) => {
-      testing.testPathIgnorePatterns.push(outputTarget.dir);
-    });
+    config.outputTargets
+      .filter(o => (isOutputTargetDist(o) || isOutputTargetWww(o)) && o.dir)
+      .forEach((outputTarget: d.OutputTargetWww) => {
+        testing.testPathIgnorePatterns.push(outputTarget.dir);
+      });
   }
 
   if (typeof testing.preset !== 'string') {
-    testing.preset = path.join(
-      config.sys.compiler.packageDir, 'testing'
-    );
-
-  } else if (!path.isAbsolute(testing.preset)) {
-    testing.preset = path.join(
-      config.configPath,
-      testing.preset
-    );
+    testing.preset = join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing');
+  } else if (!isAbsolute(testing.preset)) {
+    testing.preset = join(configPathDir, testing.preset);
   }
 
-  if (typeof testing.setupTestFrameworkScriptFile !== 'string') {
-    testing.setupTestFrameworkScriptFile = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest-setuptestframework.js'
-    );
-
-  } else if (!path.isAbsolute(testing.setupTestFrameworkScriptFile)) {
-    testing.setupTestFrameworkScriptFile = path.join(
-      config.configPath,
-      testing.setupTestFrameworkScriptFile
-    );
+  if (!Array.isArray(testing.setupFilesAfterEnv)) {
+    testing.setupFilesAfterEnv = [];
   }
 
-  if (typeof testing.testEnvironment !== 'string') {
-    testing.testEnvironment = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest-environment.js'
-    );
+  testing.setupFilesAfterEnv.unshift(join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js'));
 
-  } else if (!path.isAbsolute(testing.testEnvironment)) {
-    testing.testEnvironment = path.join(
-      config.configPath,
-      testing.testEnvironment
-    );
+  if (isString(testing.testEnvironment)) {
+    if (!isAbsolute(testing.testEnvironment) && isLocalModule(testing.testEnvironment)) {
+      testing.testEnvironment = join(configPathDir, testing.testEnvironment);
+    }
   }
 
   if (typeof testing.allowableMismatchedPixels === 'number') {
@@ -109,7 +96,6 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
       const err = buildError(diagnostics);
       err.messageText = `allowableMismatchedPixels must be a value that is 0 or greater`;
     }
-
   } else {
     testing.allowableMismatchedPixels = DEFAULT_ALLOWABLE_MISMATCHED_PIXELS;
   }
@@ -126,25 +112,31 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
       const err = buildError(diagnostics);
       err.messageText = `pixelmatchThreshold must be a value ranging from 0 to 1`;
     }
-
   } else {
     testing.pixelmatchThreshold = DEFAULT_PIXEL_MATCH_THRESHOLD;
   }
 
+  if (testing.testRegex === undefined) {
+    testing.testRegex = '(/__tests__/.*|\\.?(test|spec|e2e))\\.(tsx?|ts?|jsx?|js?)$';
+  }
+
   if (Array.isArray(testing.testMatch)) {
     delete testing.testRegex;
-
   } else if (typeof testing.testRegex === 'string') {
     delete testing.testMatch;
-
-  } else {
-    testing.testRegex = '(/__tests__/.*|\\.(test|spec|e2e))\\.(tsx?|ts?|jsx?|js?)$';
   }
 
   if (typeof testing.runner !== 'string') {
-    testing.runner = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest-runner.js'
-    );
+    testing.runner = join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-runner.js');
+  }
+
+  if (typeof testing.waitBeforeScreenshot === 'number') {
+    if (testing.waitBeforeScreenshot < 0) {
+      const err = buildError(diagnostics);
+      err.messageText = `waitBeforeScreenshot must be a value that is 0 or greater`;
+    }
+  } else {
+    testing.waitBeforeScreenshot = 10;
   }
 
   if (!Array.isArray(testing.emulate) || testing.emulate.length === 0) {
@@ -158,48 +150,18 @@ export function validateTesting(config: d.Config, diagnostics: d.Diagnostic[]) {
           isMobile: false,
           hasTouch: false,
           isLandscape: false,
-        }
-      }
+        },
+      },
     ];
   }
+};
 
-  testing.transform = testing.transform || {};
-
-  if (typeof testing.transform[DEFAULT_TS_TRANSFORM] !== 'string') {
-    testing.transform[DEFAULT_TS_TRANSFORM] = path.join(
-      config.sys.compiler.packageDir, 'testing', 'jest-preprocessor.js'
-    );
-
-  } else if (!path.isAbsolute(testing.transform[DEFAULT_TS_TRANSFORM])) {
-    testing.transform[DEFAULT_TS_TRANSFORM] = path.join(
-      config.configPath,
-      testing.transform[DEFAULT_TS_TRANSFORM]
-    );
-  }
-
-}
-
-const DEFAULT_TS_TRANSFORM = '^.+\\.(ts|tsx)$';
-
-const DEFAULT_MODULE_FILE_EXTENSIONS = [
-  'ts',
-  'tsx',
-  'js',
-  'json'
-];
-
-const DEFAULT_IGNORE_PATTERNS = [
-  '.vscode',
-  '.stencil',
-  'node_modules',
-];
-
-function addOption(setArray: string[], option: string) {
+const addTestingConfigOption = (setArray: string[], option: string) => {
   if (!setArray.includes(option)) {
     setArray.push(option);
   }
-}
-
+};
 
 const DEFAULT_ALLOWABLE_MISMATCHED_PIXELS = 100;
 const DEFAULT_PIXEL_MATCH_THRESHOLD = 0.1;
+const DEFAULT_IGNORE_PATTERNS = ['.vscode', '.stencil', 'node_modules'];

@@ -1,8 +1,6 @@
 import { getStaticGetter, transpileModule } from './transpile';
 
-
 describe('parse component', () => {
-
   it('"is" for "tag"', () => {
     const t = transpileModule(`
       @Component({
@@ -25,5 +23,4 @@ describe('parse component', () => {
 
     expect(t.componentClassName).toBe('CmpA');
   });
-
 });

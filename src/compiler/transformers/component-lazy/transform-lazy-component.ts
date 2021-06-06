@@ -1,68 +1,43 @@
-import * as d from '../../../declarations';
-import { addLazyImports } from './lazy-imports';
-import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { ModuleKind, ScriptTarget, getComponentMeta } from '../transform-utils';
+import type * as d from '../../../declarations';
+import { addImports } from '../add-imports';
+import { addLegacyApis } from '../core-runtime-apis';
+import { getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
 import { updateLazyComponentClass } from './lazy-component';
+import { updateStyleImports } from '../style-imports';
 import ts from 'typescript';
 
-
-export function transformToLazyComponentText(compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, opts: d.TransformOptions, cmp: d.ComponentCompilerMeta, inputText: string) {
-  let outputText: string = null;
-
-  try {
-    const transpileOpts: ts.TranspileOptions = {
-      compilerOptions: {
-        module: ModuleKind,
-        target: ScriptTarget,
-        skipLibCheck: true,
-        noResolve: true,
-        noLib: true,
-      },
-      fileName: cmp.jsFilePath,
-      transformers: {
-        after: [
-          lazyComponentTransform(compilerCtx, opts)
-        ]
-      }
-    };
-
-    const transpileOutput = ts.transpileModule(inputText, transpileOpts);
-
-    loadTypeScriptDiagnostics(buildCtx.diagnostics, transpileOutput.diagnostics);
-
-    if (!buildCtx.hasError && typeof transpileOutput.outputText === 'string') {
-      outputText = transpileOutput.outputText;
-    }
-
-  } catch (e) {
-    catchError(buildCtx.diagnostics, e);
-  }
-
-  return outputText;
-}
-
-
-export function lazyComponentTransform(compilerCtx: d.CompilerCtx, opts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> {
-
+export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
   return transformCtx => {
-
     return tsSourceFile => {
+      const styleStatements: ts.Statement[] = [];
+      const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
 
-      function visitNode(node: ts.Node): any {
+      const visitNode = (node: ts.Node): any => {
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            return updateLazyComponentClass(opts, node, cmp);
+            return updateLazyComponentClass(transformOpts, styleStatements, node, moduleFile, cmp);
           }
-
         }
-
         return ts.visitEachChild(node, visitNode, transformCtx);
+      };
+
+      tsSourceFile = ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
+
+      if (moduleFile.cmps.length > 0) {
+        tsSourceFile = updateStyleImports(transformOpts, tsSourceFile, moduleFile);
       }
 
-      tsSourceFile = addLazyImports(transformCtx, compilerCtx, tsSourceFile);
+      if (moduleFile.isLegacy) {
+        addLegacyApis(moduleFile);
+      }
+      tsSourceFile = addImports(transformOpts, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
 
-      return ts.visitEachChild(tsSourceFile, visitNode, transformCtx);
+      if (styleStatements.length > 0) {
+        tsSourceFile = ts.updateSourceFileNode(tsSourceFile, [...tsSourceFile.statements, ...styleStatements]);
+      }
+
+      return tsSourceFile;
     };
   };
-}
+};

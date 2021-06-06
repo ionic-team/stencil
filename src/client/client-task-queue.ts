@@ -1,8 +1,8 @@
-import * as d from '../declarations';
+import type * as d from '../declarations';
 import { consoleError } from './client-log';
-import { plt } from './client-window';
+import { plt, promiseResolve } from './client-window';
 import { PLATFORM_FLAGS } from '../runtime/runtime-constants';
-
+import { BUILD } from '@app-data';
 
 let queueCongestion = 0;
 let queuePending = false;
@@ -11,16 +11,18 @@ const queueDomReads: d.RafCallback[] = [];
 const queueDomWrites: d.RafCallback[] = [];
 const queueDomWritesLow: d.RafCallback[] = [];
 
-const queueTask = (queue: d.RafCallback[]) => (cb: d.RafCallback) => {
-  // queue dom reads
+const queueTask = (queue: d.RafCallback[], write: boolean) => (cb: d.RafCallback) => {
   queue.push(cb);
 
   if (!queuePending) {
     queuePending = true;
-    plt.raf(flush);
+    if (write && plt.$flags$ & PLATFORM_FLAGS.queueSync) {
+      nextTick(flush);
+    } else {
+      plt.raf(flush);
+    }
   }
 };
-
 
 const consume = (queue: d.RafCallback[]) => {
   for (let i = 0; i < queue.length; i++) {
@@ -32,7 +34,6 @@ const consume = (queue: d.RafCallback[]) => {
   }
   queue.length = 0;
 };
-
 
 const consumeTimeout = (queue: d.RafCallback[], timeout: number) => {
   let i = 0;
@@ -51,9 +52,10 @@ const consumeTimeout = (queue: d.RafCallback[], timeout: number) => {
   }
 };
 
-
 const flush = () => {
-  queueCongestion++;
+  if (BUILD.asyncQueue) {
+    queueCongestion++;
+  }
 
   // always force a bunch of medium callbacks to run, but still have
   // a throttle on how many can run in a certain time
@@ -61,32 +63,37 @@ const flush = () => {
   // DOM READS!!!
   consume(queueDomReads);
 
-  const timeout = (plt.$flags$ & PLATFORM_FLAGS.queueMask) === PLATFORM_FLAGS.appLoaded
-    ? performance.now() + (7 * Math.ceil(queueCongestion * (1.0 / 22.0)))
-    : Infinity;
-
   // DOM WRITES!!!
-  consumeTimeout(queueDomWrites, timeout);
-  consumeTimeout(queueDomWritesLow, timeout);
+  if (BUILD.asyncQueue) {
+    const timeout = (plt.$flags$ & PLATFORM_FLAGS.queueMask) === PLATFORM_FLAGS.appLoaded ? performance.now() + 14 * Math.ceil(queueCongestion * (1.0 / 10.0)) : Infinity;
 
-  if (queueDomWrites.length > 0) {
-    queueDomWritesLow.push(...queueDomWrites);
-    queueDomWrites.length = 0;
-  }
+    consumeTimeout(queueDomWrites, timeout);
+    consumeTimeout(queueDomWritesLow, timeout);
 
-  if (queuePending = ((queueDomReads.length + queueDomWrites.length + queueDomWritesLow.length) > 0)) {
-    // still more to do yet, but we've run out of time
-    // let's let this thing cool off and try again in the next tick
-    plt.raf(flush);
+    if (queueDomWrites.length > 0) {
+      queueDomWritesLow.push(...queueDomWrites);
+      queueDomWrites.length = 0;
+    }
 
-
+    if ((queuePending = queueDomReads.length + queueDomWrites.length + queueDomWritesLow.length > 0)) {
+      // still more to do yet, but we've run out of time
+      // let's let this thing cool off and try again in the next tick
+      plt.raf(flush);
+    } else {
+      queueCongestion = 0;
+    }
   } else {
-    queueCongestion = 0;
+    consume(queueDomWrites);
+    if ((queuePending = queueDomReads.length > 0)) {
+      // still more to do yet, but we've run out of time
+      // let's let this thing cool off and try again in the next tick
+      plt.raf(flush);
+    }
   }
 };
 
-export const nextTick = /*@__PURE__*/(cb: () => void) => Promise.resolve().then(cb);
+export const nextTick = /*@__PURE__*/ (cb: () => void) => promiseResolve().then(cb);
 
-export const readTask = /*@__PURE__*/queueTask(queueDomReads);
+export const readTask = /*@__PURE__*/ queueTask(queueDomReads, false);
 
-export const writeTask = /*@__PURE__*/queueTask(queueDomWrites);
+export const writeTask = /*@__PURE__*/ queueTask(queueDomWrites, true);

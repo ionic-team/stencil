@@ -1,9 +1,8 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { getStaticValue, isInternal } from '../transform-utils';
 import ts from 'typescript';
 
-
-export function parseStaticEvents(staticMembers: ts.ClassElement[]): d.ComponentCompilerEvent[] {
+export const parseStaticEvents = (staticMembers: ts.ClassElement[]): d.ComponentCompilerEvent[] => {
   const parsedEvents: d.ComponentCompilerEvent[] = getStaticValue(staticMembers, 'events');
   if (!parsedEvents || parsedEvents.length === 0) {
     return [];
@@ -18,8 +17,7 @@ export function parseStaticEvents(staticMembers: ts.ClassElement[]): d.Component
       composed: parsedEvent.composed,
       docs: parsedEvent.docs,
       complexType: parsedEvent.complexType,
-      internal: isInternal(parsedEvent.docs)
+      internal: isInternal(parsedEvent.docs),
     };
   });
-}
-
+};

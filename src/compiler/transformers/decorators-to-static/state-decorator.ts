@@ -1,27 +1,25 @@
-import * as d from '../../../declarations';
-import { createStaticGetter, isDecoratorNamed } from '../transform-utils';
+import { createStaticGetter } from '../transform-utils';
+import { isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
-
-export function stateDecoratorsToStatic(diagnostics: d.Diagnostic[], _sourceFile: ts.SourceFile, decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) {
+export const stateDecoratorsToStatic = (decoratedProps: ts.ClassElement[], watchable: Set<string>, newMembers: ts.ClassElement[]) => {
   const states = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map(prop => stateDecoratorToStatic(diagnostics, typeChecker, prop))
+    .map(prop => stateDecoratorToStatic(prop, watchable))
     .filter(state => !!state);
 
   if (states.length > 0) {
     newMembers.push(createStaticGetter('states', ts.createObjectLiteral(states, true)));
   }
-}
+};
 
-
-function stateDecoratorToStatic(_diagnostics: d.Diagnostic[], _typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration) {
+const stateDecoratorToStatic = (prop: ts.PropertyDeclaration, watchable: Set<string>) => {
   const stateDecorator = prop.decorators.find(isDecoratorNamed('State'));
   if (stateDecorator == null) {
     return null;
   }
 
-
   const stateName = prop.name.getText();
+  watchable.add(stateName);
   return ts.createPropertyAssignment(ts.createLiteral(stateName), ts.createObjectLiteral([], true));
-}
+};

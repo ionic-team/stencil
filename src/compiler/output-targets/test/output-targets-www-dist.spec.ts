@@ -1,12 +1,10 @@
- import * as d from '@stencil/core/declarations';
+import type * as d from '@stencil/core/declarations';
 import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
-
-describe('outputTarget, www / dist / docs', () => {
-
+xdescribe('outputTarget, www / dist / docs', () => {
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;
@@ -19,22 +17,22 @@ describe('outputTarget, www / dist / docs', () => {
     config.rootDir = path.join(root, 'User', 'testing', '/');
     config.namespace = 'TestApp';
     config.outputTargets = [
-      {
+      ({
         type: 'www',
         dir: 'custom-www',
         buildDir: 'www-build',
-        indexHtml: 'custom-index.htm'
-      } as any as d.OutputTargetDist,
+        indexHtml: 'custom-index.htm',
+      } as any) as d.OutputTargetDist,
       {
         type: 'dist',
         dir: 'custom-dist',
         buildDir: 'dist-build',
         collectionDir: 'dist-collection',
-        typesDir: 'custom-types'
+        typesDir: 'custom-types',
       },
       {
         type: 'docs',
-      } as d.OutputTargetDocsReadme
+      } as d.OutputTargetDocsReadme,
     ];
 
     compiler = new Compiler(config);
@@ -55,10 +53,7 @@ describe('outputTarget, www / dist / docs', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    expectFiles(compiler.fs, [
-      path.join(root, 'User', 'testing', 'custom-dist', 'cjs'),
-      path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js'),
-    ]);
+    expectFiles(compiler.fs, [path.join(root, 'User', 'testing', 'custom-dist', 'cjs'), path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js')]);
 
     doNotExpectFiles(compiler.fs, [
       path.join(root, 'User', 'testing', 'www', '/'),
@@ -67,5 +62,4 @@ describe('outputTarget, www / dist / docs', () => {
       path.join(root, 'User', 'testing', 'custom-www', 'index.html'),
     ]);
   });
-
 });

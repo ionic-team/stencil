@@ -1,23 +1,18 @@
 import { Component, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('hydrate style element', () => {
-
   it('style element text', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
-
       render() {
-        return (
-          (h as any)('style', null, 'div { color: red; }')
-        );
+        return (h as any)('style', null, 'div { color: red; }');
       }
     }
     const serverHydrated = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -29,7 +24,7 @@ describe('hydrate style element', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
 
     expect(clientHydrated.root).toEqualHtml(`
@@ -39,5 +34,4 @@ describe('hydrate style element', () => {
       </cmp-a>
     `);
   });
-
 });

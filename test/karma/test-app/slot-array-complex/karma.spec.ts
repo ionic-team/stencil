@@ -14,5 +14,8 @@ describe('slot array complex', () => {
     expect(result.children[0].textContent.trim()).toBe('slot - start');
     expect(result.children[1].textContent.trim()).toBe('slot - default');
     expect(result.children[2].textContent.trim()).toBe('slot - end');
+
+    const hiddenCmp = app.querySelector('[hidden]');
+    expect(hiddenCmp).toBe(null);
   });
 });

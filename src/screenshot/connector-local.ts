@@ -1,13 +1,10 @@
-import * as d from '../declarations';
+import type * as d from '@stencil/core/internal';
 import { fileExists, readFile, writeFile } from './screenshot-fs';
 import { join, relative } from 'path';
 import { normalizePath } from '@utils';
 import { ScreenshotConnector } from './connector-base';
-import { URL } from 'url';
-
 
 export class ScreenshotLocalConnector extends ScreenshotConnector {
-
   async publishBuild(results: d.ScreenshotBuildResults) {
     if (this.updateMaster || !results.masterBuild) {
       results.masterBuild = {
@@ -15,7 +12,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
         message: 'Master',
         appNamespace: this.appNamespace,
         timestamp: Date.now(),
-        screenshots: []
+        screenshots: [],
       };
     }
 
@@ -49,11 +46,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
     const gitIgnorePath = join(this.screenshotDir, '.gitignore');
     const gitIgnoreExists = await fileExists(gitIgnorePath);
     if (!gitIgnoreExists) {
-      const content = [
-        this.imagesDirName,
-        this.buildsDirName,
-        compareAppFileName
-      ];
+      const content = [this.imagesDirName, this.buildsDirName, compareAppFileName];
       await writeFile(gitIgnorePath, content.join('\n'));
     }
 
@@ -63,7 +56,6 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
 
     return results;
   }
-
 
   async getScreenshotCache() {
     let screenshotCache: d.ScreenshotCache = null;
@@ -82,9 +74,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
 
     return cache;
   }
-
 }
-
 
 function createLocalCompareApp(namespace: string, appSrcUrl: string, imagesUrl: string, jsonpUrl: string, a: d.ScreenshotBuild, b: d.ScreenshotBuild) {
   return `<!doctype html>
@@ -95,7 +85,8 @@ function createLocalCompareApp(namespace: string, appSrcUrl: string, imagesUrl: 
   <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="x-ua-compatible" content="IE=Edge">
   <link href="${appSrcUrl}/build/app.css" rel="stylesheet">
-  <script src="${appSrcUrl}/build/app.js"></script>
+  <script type="module" src="${appSrcUrl}/build/app.esm.js"></script>
+  <script nomodule src="${appSrcUrl}/build/app.js"></script>  
   <link rel="icon" type="image/x-icon" href="${appSrcUrl}/assets/favicon.ico">
 </head>
 <body>

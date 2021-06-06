@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const hydrate = require('./dist/hydrate');
+const hydrate = require('./hydrate');
 
 
 async function run() {
@@ -17,5 +17,11 @@ async function run() {
 
   const filePath = path.join(__dirname, 'www', 'index.html');
   fs.writeFileSync(filePath, results.html);
+
+  console.log(results.html);
+
+  results.diagnostics.forEach(d => {
+    console.log(d.level, d.header, d.messageText);
+  });
 }
 run();

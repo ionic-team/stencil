@@ -1,5 +1,3 @@
-
-
 export class MockHistory {
   private items: any[] = [];
 
@@ -26,5 +24,4 @@ export class MockHistory {
   replaceState(_state: any, _title: string, _url: string) {
     //
   }
-
 }

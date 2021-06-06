@@ -1,23 +1,25 @@
-import { Config } from '../../dist';
+import { Config } from '../../internal';
 
 export const config: Config = {
   namespace: 'HelloWorld',
   outputTargets: [
     { type: 'dist' },
-    {
-      type: 'experimental-dist-module',
-      dir: 'www'
-    },
+    { type: 'dist-custom-elements-bundle' },
+    { type: 'dist-hydrate-script' },
     {
       type: 'www',
       serviceWorker: null,
-      copy: [
-        {
-          src: 'index-module.html',
-          dest: 'index-module.html'
-        }
-      ]
-    }
+      baseUrl: 'https://helloworld.stencil.js.com/',
+    },
   ],
-  enableCache: false
+  enableCache: false,
+  hydratedFlag: null,
+  hashFileNames: false,
+  extras: {
+    cssVarsShim: false,
+    dynamicImportShim: false,
+    safari10: false,
+    scriptDataOpts: false,
+    shadowDomShim: false,
+  },
 };

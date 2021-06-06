@@ -1,13 +1,12 @@
 import { Component, h, Host, Prop } from '@stencil/core';
 
 @Component({
-  tag: 'dom-reattach'
+  tag: 'dom-reattach',
 })
 export class DomReattach {
-
-  @Prop({mutable: true}) willLoad = 0;
-  @Prop({mutable: true}) didLoad = 0;
-  @Prop({mutable: true}) didUnload = 0;
+  @Prop({ mutable: true }) willLoad = 0;
+  @Prop({ mutable: true }) didLoad = 0;
+  @Prop({ mutable: true }) didUnload = 0;
 
   componentWillLoad() {
     this.willLoad++;
@@ -17,7 +16,7 @@ export class DomReattach {
     this.didLoad++;
   }
 
-  componentDidUnload() {
+  disconnectedCallback() {
     this.didUnload++;
   }
 
@@ -26,8 +25,8 @@ export class DomReattach {
       <Host>
         <p>componentWillLoad: {this.willLoad}</p>
         <p>componentDidLoad: {this.didLoad}</p>
-        <p>componentDidUnload: {this.didUnload}</p>
+        <p>disconnectedCallback: {this.didUnload}</p>
       </Host>
-    )
+    );
   }
 }

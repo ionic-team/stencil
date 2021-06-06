@@ -1,63 +1,72 @@
-import * as d from '../../../declarations';
-import { getModule } from '../../build/compiler-ctx';
+import type * as d from '../../../declarations';
+import { join } from 'path';
 import { normalizePath } from '@utils';
-import { parseCollectionComponents } from './parse-collection-components';
+import { parseCollectionComponents, transpileCollectionModule } from './parse-collection-components';
 
-
-export function parseCollectionManifest(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collectionName: string, collectionDir: string, collectionJsonStr: string) {
+export const parseCollectionManifest = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  collectionName: string,
+  collectionDir: string,
+  collectionJsonStr: string,
+) => {
   const collectionManifest: d.CollectionManifest = JSON.parse(collectionJsonStr);
 
-  const compilerVersion: d.CollectionCompilerVersion = collectionManifest.compiler || {} as any;
+  const compilerVersion: d.CollectionCompilerVersion = collectionManifest.compiler || ({} as any);
 
   const collection: d.CollectionCompilerMeta = {
     collectionName: collectionName,
+    moduleId: collectionName,
+    moduleFiles: [],
     dependencies: parseCollectionDependencies(collectionManifest),
     compiler: {
       name: compilerVersion.name || '',
       version: compilerVersion.version || '',
-      typescriptVersion: compilerVersion.typescriptVersion || ''
+      typescriptVersion: compilerVersion.typescriptVersion || '',
     },
     bundles: parseBundles(collectionManifest),
-    global: parseGlobal(config, compilerCtx, collectionDir, collectionManifest)
   };
 
+  parseGlobal(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
   parseCollectionComponents(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
 
   return collection;
-}
+};
 
-
-export function parseCollectionDependencies(collectionManifest: d.CollectionManifest) {
+export const parseCollectionDependencies = (collectionManifest: d.CollectionManifest) => {
   return (collectionManifest.collections || []).map(c => c.name);
-}
+};
 
-
-export function parseGlobal(config: d.Config, compilerCtx: d.CompilerCtx, collectionDir: string, collectionManifest: d.CollectionManifest) {
+export const parseGlobal = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  collectionDir: string,
+  collectionManifest: d.CollectionManifest,
+  collection: d.CollectionCompilerMeta,
+) => {
   if (typeof collectionManifest.global !== 'string') {
-    return undefined;
+    return;
   }
 
-  const sourceFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
+  const sourceFilePath = normalizePath(join(collectionDir, collectionManifest.global));
+  const globalModule = transpileCollectionModule(config, compilerCtx, buildCtx, collection, sourceFilePath);
+  collection.global = globalModule;
+};
 
-  const globalModule = getModule(config, compilerCtx, sourceFilePath);
-  globalModule.jsFilePath = normalizePath(config.sys.path.join(collectionDir, collectionManifest.global));
-  return globalModule;
-}
-
-
-export function parseBundles(collectionManifest: d.CollectionManifest) {
+export const parseBundles = (collectionManifest: d.CollectionManifest) => {
   if (invalidArrayData(collectionManifest.bundles)) {
     return [];
   }
 
   return collectionManifest.bundles.map(b => {
     return {
-      components: b.components.slice().sort()
+      components: b.components.slice().sort(),
     };
   });
-}
+};
 
-
-function invalidArrayData(arr: any[]) {
-  return (!arr || !Array.isArray(arr) || arr.length === 0);
-}
+const invalidArrayData = (arr: any[]) => {
+  return !arr || !Array.isArray(arr) || arr.length === 0;
+};

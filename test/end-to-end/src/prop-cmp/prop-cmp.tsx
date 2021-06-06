@@ -1,19 +1,33 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop, h, Host } from '@stencil/core';
+import { saveAs } from 'file-saver';
 
+/**
+ * @virtualProp mode - Mode
+ */
 @Component({
   tag: 'prop-cmp',
-  styleUrl: 'prop-cmp.css',
+  styleUrls: {
+    ios: 'prop-cmp.ios.css',
+    md: 'prop-cmp.md.css',
+  },
   shadow: true
 })
 export class PropCmp {
   @Prop() first: string;
   @Prop() lastName: string;
 
+  saveAs() {
+    saveAs('data', 'filename.txt');
+  }
+
   render() {
     return (
-      <div>
-        Hello, my name is {this.first} {this.lastName}
-      </div>
+      <Host>
+        <div>
+          Hello, my name is {this.first} {this.lastName}
+        </div>
+        <button onClick={() => this.saveAs()}>File Save</button>
+      </Host>
     )
   }
 }

@@ -1,5 +1,3 @@
-
-
 export class MockNavigator {
   appCodeName = 'MockNavigator';
   appName = 'MockNavigator';

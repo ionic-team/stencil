@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, Prop, State, h } from '@stencil/core';
+import { Component, Event, EventEmitter, Prop, h } from '@stencil/core';
 import { timeout } from './util';
 
 @Component({
@@ -7,7 +7,7 @@ import { timeout } from './util';
 export class LifecycleAsyncB {
 
   @Prop() value = '';
-  @State() rendered = 0;
+  rendered = 0;
 
   @Event() lifecycleLoad!: EventEmitter;
   @Event() lifecycleUpdate!: EventEmitter;

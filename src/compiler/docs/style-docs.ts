@@ -1,5 +1,4 @@
-import * as d from '../../declarations';
-
+import type * as d from '../../declarations';
 
 export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string) {
   if (typeof styleText !== 'string') {
@@ -21,7 +20,6 @@ export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string) {
     styleText = styleText.substring(endIndex + CSS_DOC_END.length);
   }
 }
-
 
 function parseCssComment(styleDocs: d.StyleDoc[], comment: string) {
   /**
@@ -57,7 +55,7 @@ function parseCssComment(styleDocs: d.StyleDoc[], comment: string) {
     const cssDoc: d.StyleDoc = {
       name: splt[0].trim(),
       docs: (splt.shift() && splt.join(`:`)).trim(),
-      annotation: 'prop'
+      annotation: 'prop',
     };
 
     if (!styleDocs.some(c => c.name === cssDoc.name && c.annotation === 'prop')) {

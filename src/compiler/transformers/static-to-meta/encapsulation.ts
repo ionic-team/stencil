@@ -1,8 +1,7 @@
 import { getStaticValue } from '../transform-utils';
 import ts from 'typescript';
 
-
-export function parseStaticEncapsulation(staticMembers: ts.ClassElement[]) {
+export const parseStaticEncapsulation = (staticMembers: ts.ClassElement[]) => {
   let encapsulation: string = getStaticValue(staticMembers, 'encapsulation');
 
   if (typeof encapsulation === 'string') {
@@ -13,4 +12,12 @@ export function parseStaticEncapsulation(staticMembers: ts.ClassElement[]) {
   }
 
   return 'none';
-}
+};
+
+export const parseStaticShadowDelegatesFocus = (encapsulation: string, staticMembers: ts.ClassElement[]) => {
+  if (encapsulation === 'shadow') {
+    const delegatesFocus: boolean = getStaticValue(staticMembers, 'delegatesFocus');
+    return !!delegatesFocus;
+  }
+  return null;
+};

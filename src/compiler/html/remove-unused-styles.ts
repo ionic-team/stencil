@@ -1,55 +1,58 @@
-import * as d from '../../declarations';
-import { parseCss } from '../style/parse-css';
-import { StringifyCss } from '../style/stringify-css';
-import { UsedSelectors } from '../style/used-selectors';
+import type * as d from '../../declarations';
+import { getUsedSelectors, UsedSelectors } from '../style/css-parser/used-selectors';
+import { hasError, catchError } from '@utils';
+import { parseCss } from '../style/css-parser/parse-css';
+import { serializeCss } from '../style/css-parser/serialize-css';
 
+export const removeUnusedStyles = (doc: Document, diagnostics: d.Diagnostic[]) => {
+  try {
+    const styleElms = doc.head.querySelectorAll<HTMLStyleElement>(`style[data-styles]`);
+    const styleLen = styleElms.length;
 
-export function removeUnusedStyles(doc: Document, results: d.HydrateResults) {
-  const styleElms = doc.head.querySelectorAll<HTMLStyleElement>(`style[data-styles]`);
+    if (styleLen > 0) {
+      // pick out all of the selectors that are actually
+      // being used in the html document
+      const usedSelectors = getUsedSelectors(doc.documentElement);
 
-  if (styleElms.length > 0) {
-    // pick out all of the selectors that are actually
-    // being used in the html document
-    const usedSelectors = new UsedSelectors(doc.body);
-
-    for (let i = 0; i < styleElms.length; i++) {
-      removeUnusedStyleText(usedSelectors, results, styleElms[i]);
+      for (let i = 0; i < styleLen; i++) {
+        removeUnusedStyleText(usedSelectors, diagnostics, styleElms[i]);
+      }
     }
+  } catch (e) {
+    catchError(diagnostics, e);
   }
-}
+};
 
-
-function removeUnusedStyleText(usedSelectors: UsedSelectors, results: d.HydrateResults, styleElm: HTMLStyleElement) {
+const removeUnusedStyleText = (usedSelectors: UsedSelectors, diagnostics: d.Diagnostic[], styleElm: HTMLStyleElement) => {
   try {
     // parse the css from being applied to the document
-    const cssAst = parseCss(styleElm.innerHTML);
+    const parseResults = parseCss(styleElm.innerHTML);
 
-    if (cssAst.stylesheet.diagnostics.length > 0) {
-      results.diagnostics.push(...cssAst.stylesheet.diagnostics);
+    diagnostics.push(...parseResults.diagnostics);
+    if (hasError(diagnostics)) {
       return;
     }
 
     try {
       // convert the parsed css back into a string
       // but only keeping what was found in our active selectors
-      const stringify = new StringifyCss(usedSelectors);
-      styleElm.innerHTML = stringify.compile(cssAst);
-
+      styleElm.innerHTML = serializeCss(parseResults.stylesheet, {
+        usedSelectors,
+      });
     } catch (e) {
-      results.diagnostics.push({
+      diagnostics.push({
         level: 'warn',
         type: 'css',
         header: 'CSS Stringify',
-        messageText: e
+        messageText: e,
       });
     }
-
   } catch (e) {
-    results.diagnostics.push({
+    diagnostics.push({
       level: 'warn',
       type: 'css',
       header: 'CSS Parse',
-      messageText: e
+      messageText: e,
     });
   }
-}
+};

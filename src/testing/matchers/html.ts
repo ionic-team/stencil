@@ -1,7 +1,5 @@
-import * as d from '../../declarations';
-
-import { NODE_TYPES, parseHtmlToFragment, serializeNodeToHtml } from '@mock-doc';
-
+import type * as d from '@stencil/core/internal';
+import { NODE_TYPES, parseHtmlToFragment, serializeNodeToHtml } from '@stencil/core/mock-doc';
 
 export function toEqualHtml(input: string | HTMLElement | ShadowRoot, shouldEqual: string) {
   return compareHtml(input, shouldEqual, true);
@@ -11,7 +9,7 @@ export function toEqualLightHtml(input: string | HTMLElement | ShadowRoot, shoul
   return compareHtml(input, shouldEqual, false);
 }
 
-export function compareHtml(input: string | HTMLElement | ShadowRoot,  shouldEqual: string, serializeShadowRoot: boolean) {
+export function compareHtml(input: string | HTMLElement | ShadowRoot, shouldEqual: string, serializeShadowRoot: boolean) {
   if (input == null) {
     throw new Error(`expect toEqualHtml() value is "${input}"`);
   }
@@ -24,29 +22,26 @@ export function compareHtml(input: string | HTMLElement | ShadowRoot,  shouldEqu
 
   if ((input as HTMLElement).nodeType === NODE_TYPES.ELEMENT_NODE) {
     const options = getSpecOptions(input as any);
-    serializeA = serializeNodeToHtml((input as any), {
+    serializeA = serializeNodeToHtml(input as any, {
       prettyHtml: true,
       outerHtml: true,
       removeHtmlComments: options.includeAnnotations === false,
       excludeTags: ['body'],
-      serializeShadowRoot
+      serializeShadowRoot,
     });
-
   } else if ((input as HTMLElement).nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
-    serializeA = serializeNodeToHtml((input as any), {
+    serializeA = serializeNodeToHtml(input as any, {
       prettyHtml: true,
       excludeTags: ['style'],
       excludeTagContent: ['style'],
-      serializeShadowRoot
+      serializeShadowRoot,
     });
-
   } else if (typeof input === 'string') {
     const parseA = parseHtmlToFragment(input);
     serializeA = serializeNodeToHtml(parseA, {
       prettyHtml: true,
-      serializeShadowRoot
+      serializeShadowRoot,
     });
-
   } else {
     throw new Error(`expect toEqualHtml() value should be an element, shadow root or string.`);
   }
@@ -55,7 +50,7 @@ export function compareHtml(input: string | HTMLElement | ShadowRoot,  shouldEqu
 
   const serializeB = serializeNodeToHtml(parseB, {
     prettyHtml: true,
-    excludeTags: ['body']
+    excludeTags: ['body'],
   });
 
   if (serializeA !== serializeB) {
@@ -74,7 +69,7 @@ export function compareHtml(input: string | HTMLElement | ShadowRoot,  shouldEqu
 
 function getSpecOptions(el: HTMLElement): Partial<d.NewSpecPageOptions> {
   if (el && el.ownerDocument && el.ownerDocument.defaultView) {
-    return (el.ownerDocument.defaultView as any)['__stencil_spec_options'] || {};
+    return (el.ownerDocument.defaultView as any)['__stencil_spec_options'] || {};
   }
 
   return {};

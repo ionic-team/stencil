@@ -1,21 +1,24 @@
-import * as d from '../../declarations';
+import type * as d from '../../declarations';
 import { HOST_CONFIG_FILENAME } from '../prerender/host-config';
+import { isAbsolute, join } from 'path';
+import { isString } from '@utils';
 
-
-export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww) {
+export const validateServiceWorker = (config: d.Config, outputTarget: d.OutputTargetWww) => {
+  if (outputTarget.serviceWorker === false) {
+    return;
+  }
   if (config.devMode && !config.flags.serviceWorker) {
     outputTarget.serviceWorker = null;
     return;
   }
 
-  if (outputTarget.serviceWorker === false || outputTarget.serviceWorker === null) {
+  if (outputTarget.serviceWorker === null) {
     outputTarget.serviceWorker = null;
     return;
   }
 
   if (outputTarget.serviceWorker === true) {
     outputTarget.serviceWorker = {};
-
   } else if (!outputTarget.serviceWorker && config.devMode) {
     outputTarget.serviceWorker = null;
     return;
@@ -30,7 +33,6 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
   if (!Array.isArray(outputTarget.serviceWorker.globPatterns)) {
     if (typeof outputTarget.serviceWorker.globPatterns === 'string') {
       outputTarget.serviceWorker.globPatterns = [outputTarget.serviceWorker.globPatterns];
-
     } else if (typeof outputTarget.serviceWorker.globPatterns !== 'string') {
       outputTarget.serviceWorker.globPatterns = DEFAULT_GLOB_PATTERNS.slice();
     }
@@ -50,17 +52,20 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
 
   outputTarget.serviceWorker.dontCacheBustURLsMatching = /p-\w{8}/;
 
-  if (!outputTarget.serviceWorker.swDest) {
-    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.appDir, DEFAULT_FILENAME);
+  if (isString(outputTarget.serviceWorker.swSrc) && !isAbsolute(outputTarget.serviceWorker.swSrc)) {
+    outputTarget.serviceWorker.swSrc = join(config.rootDir, outputTarget.serviceWorker.swSrc);
   }
 
-  if (!config.sys.path.isAbsolute(outputTarget.serviceWorker.swDest)) {
-    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.appDir, outputTarget.serviceWorker.swDest);
+  if (!isString(outputTarget.serviceWorker.swDest)) {
+    outputTarget.serviceWorker.swDest = join(outputTarget.appDir, DEFAULT_FILENAME);
   }
-}
 
+  if (!isAbsolute(outputTarget.serviceWorker.swDest)) {
+    outputTarget.serviceWorker.swDest = join(outputTarget.appDir, outputTarget.serviceWorker.swDest);
+  }
+};
 
-function addGlobIgnores(config: d.Config, globIgnores: string[]) {
+const addGlobIgnores = (config: d.Config, globIgnores: string[]) => {
   globIgnores.push(
     `**/${HOST_CONFIG_FILENAME}`,
     `**/*.system.entry.js`,
@@ -69,12 +74,8 @@ function addGlobIgnores(config: d.Config, globIgnores: string[]) {
     `**/${config.fsNamespace}.esm.js`,
     `**/${config.fsNamespace}.css`,
   );
-}
+};
 
-
-const DEFAULT_GLOB_PATTERNS = [
-  '*.html',
-  '**/*.{js,css,json}',
-];
+const DEFAULT_GLOB_PATTERNS = ['*.html', '**/*.{js,css,json}'];
 
 const DEFAULT_FILENAME = 'sw.js';

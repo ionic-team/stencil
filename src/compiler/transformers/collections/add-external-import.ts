@@ -1,50 +1,65 @@
-import * as d from '../../../declarations';
-import { normalizePath } from '@utils';
+import type * as d from '../../../declarations';
+import { dirname } from 'path';
+import { isString, parsePackageJson } from '@utils';
 import { parseCollection } from './parse-collection-module';
+import { tsResolveModuleNamePackageJsonPath } from '../../sys/typescript/typescript-resolve-module';
 
-
-export function addExternalImport(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.Module, resolveFromDir: string, moduleId: string) {
-  moduleFile.externalImports = moduleFile.externalImports || [];
+export const addExternalImport = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  moduleFile: d.Module,
+  containingFile: string,
+  moduleId: string,
+  resolveCollections: boolean,
+) => {
   if (!moduleFile.externalImports.includes(moduleId)) {
     moduleFile.externalImports.push(moduleId);
     moduleFile.externalImports.sort();
   }
 
-  compilerCtx.resolvedCollections = compilerCtx.resolvedCollections || new Set();
-  if (compilerCtx.resolvedCollections.has(moduleId)) {
+  if (!resolveCollections || compilerCtx.resolvedCollections.has(moduleId)) {
     // we've already handled this collection moduleId before
     return;
   }
 
+  let pkgJsonFilePath = tsResolveModuleNamePackageJsonPath(config, compilerCtx, moduleId, containingFile);
+
   // cache that we've already parsed this
   compilerCtx.resolvedCollections.add(moduleId);
 
-  let pkgJsonFilePath: string;
-  try {
-    // get the full package.json file path
-    pkgJsonFilePath = normalizePath(config.sys.resolveModule(resolveFromDir, moduleId));
-
-  } catch (e) {
-    // it's someone else's job to handle unresolvable paths
+  if (pkgJsonFilePath == null) {
     return;
   }
 
-  if (pkgJsonFilePath === 'package.json') {
-    // the resolved package is actually this very same package, so whatever
+  const realPkgJsonFilePath = config.sys.realpathSync(pkgJsonFilePath);
+  if (realPkgJsonFilePath.path) {
+    pkgJsonFilePath = realPkgJsonFilePath.path;
+  }
+
+  if (pkgJsonFilePath === config.packageJsonFilePath) {
+    // same package silly!
     return;
   }
 
   // open up and parse the package.json
   // sync on purpose :(
   const pkgJsonStr = compilerCtx.fs.readFileSync(pkgJsonFilePath);
-  const pkgData: d.PackageJsonData = JSON.parse(pkgJsonStr);
+  if (pkgJsonStr == null) {
+    return;
+  }
+  const parsedPkgJson = parsePackageJson(pkgJsonStr, pkgJsonFilePath);
+  if (parsedPkgJson.diagnostic) {
+    buildCtx.diagnostics.push(parsedPkgJson.diagnostic);
+    return;
+  }
 
-  if (typeof pkgData.collection !== 'string' || !pkgData.collection.endsWith('.json')) {
+  if (!isString(parsedPkgJson.data.collection) || !parsedPkgJson.data.collection.endsWith('.json')) {
     // this import is not a stencil collection
     return;
   }
 
-  if (typeof pkgData.types !== 'string' || !pkgData.types.endsWith('.d.ts')) {
+  if (!isString(parsedPkgJson.data.types) || !parsedPkgJson.data.types.endsWith('.d.ts')) {
     // this import should have types
     return;
   }
@@ -52,7 +67,10 @@ export function addExternalImport(config: d.Config, compilerCtx: d.CompilerCtx, 
   // this import is a stencil collection
   // let's parse it and gather all the module data about it
   // internally it'll cached collection data if we've already done this
-  const collection = parseCollection(config, compilerCtx, buildCtx, pkgJsonFilePath, pkgData);
+  const collection = parseCollection(config, compilerCtx, buildCtx, moduleId, parsedPkgJson.filePath, parsedPkgJson.data);
+  if (!collection) {
+    return;
+  }
 
   // check if we already added this collection to the build context
   const alreadyHasCollection = buildCtx.collections.some(c => {
@@ -71,8 +89,8 @@ export function addExternalImport(config: d.Config, compilerCtx: d.CompilerCtx, 
     // this collection has more collections
     // let's keep digging down and discover all of them
     collection.dependencies.forEach(dependencyModuleId => {
-      const resolveFromDir = config.sys.path.dirname(pkgJsonFilePath);
-      addExternalImport(config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId);
+      const resolveFromDir = dirname(pkgJsonFilePath);
+      addExternalImport(config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId, resolveCollections);
     });
   }
-}
+};

@@ -1,8 +1,6 @@
 import { transpileModule } from './transpile';
 
-
 describe('parse vdom', () => {
-
   it('hasVdomAttribute', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
@@ -36,6 +34,19 @@ describe('parse vdom', () => {
       export class CmpA {
         render() {
           return <FnCmp/>
+        }
+      }
+    `);
+
+    expect(t.cmp.hasVdomFunctional).toBe(true);
+  });
+
+  it('hasVdomFunctional (2)', () => {
+    const t = transpileModule(`
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        render() {
+          return <Tunnel.Provider/>
         }
       }
     `);
@@ -146,5 +157,4 @@ describe('parse vdom', () => {
 
     expect(t.cmp.htmlTagNames).toContain('svg');
   });
-
 });

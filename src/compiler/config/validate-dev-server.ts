@@ -1,65 +1,112 @@
-import * as d from '../../declarations';
-import { buildError, normalizePath } from '@utils';
+import type * as d from '../../declarations';
+import { buildError, isBoolean, isNumber, isString, normalizePath } from '@utils';
+import { isAbsolute, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';
-import { setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
-import { URL } from 'url';
 
-
-export function validateDevServer(config: d.Config, diagnostics: d.Diagnostic[]) {
-  if (config.devServer === false || config.devServer === null) {
-    return config.devServer = null;
-  }
-  config.devServer = config.devServer || {};
-
-  if (typeof config.flags.address === 'string') {
-    config.devServer.address = config.flags.address;
-  } else {
-    setStringConfig(config.devServer, 'address', '0.0.0.0');
+export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[]) => {
+  if ((config.devServer === null || (config.devServer as any)) === false) {
+    return null;
   }
 
-  if (typeof config.flags.port === 'number') {
-    config.devServer.port = config.flags.port;
-  } else {
-    setNumberConfig(config.devServer, 'port', null, 3333);
+  const flags = config.flags;
+  const devServer = { ...config.devServer };
+
+  if (isString(flags.address)) {
+    devServer.address = flags.address;
+  } else if (!isString(devServer.address)) {
+    devServer.address = '0.0.0.0';
   }
 
-  if ((config.devServer as any).hotReplacement === true) {
-    // DEPRECATED: 2019-05-20
-    config.devServer.reloadStrategy = 'hmr';
-  } else if ((config.devServer as any).hotReplacement === false || (config.devServer as any).hotReplacement === null) {
-    // DEPRECATED: 2019-05-20
-    config.devServer.reloadStrategy = null;
-  } else {
-    if (config.devServer.reloadStrategy === undefined) {
-      config.devServer.reloadStrategy = 'hmr';
-    } else if (config.devServer.reloadStrategy !== 'hmr' && config.devServer.reloadStrategy !== 'pageReload' && config.devServer.reloadStrategy !== null) {
-      throw new Error(`Invalid devServer reloadStrategy "${config.devServer.reloadStrategy}". Valid configs include "hmr", "pageReload" and null.`);
+  let addressProtocol: 'http' | 'https';
+  if (devServer.address.toLowerCase().startsWith('http://')) {
+    devServer.address = devServer.address.substring(7);
+    addressProtocol = 'http';
+  } else if (devServer.address.toLowerCase().startsWith('https://')) {
+    devServer.address = devServer.address.substring(8);
+    addressProtocol = 'https';
+  }
+
+  devServer.address = devServer.address.split('/')[0];
+
+  let addressPort: number;
+  const addressSplit = devServer.address.split(':');
+  if (addressSplit.length > 1) {
+    if (!isNaN(addressSplit[1] as any)) {
+      devServer.address = addressSplit[0];
+      addressPort = parseInt(addressSplit[1], 10);
     }
   }
 
-  setBooleanConfig(config.devServer, 'gzip', null, true);
-  setBooleanConfig(config.devServer, 'openBrowser', null, true);
-  setBooleanConfig(config.devServer, 'websocket', null, true);
-
-  validateProtocol(config.devServer);
-
-  if (config.devServer.historyApiFallback !== null && config.devServer.historyApiFallback !== false) {
-    config.devServer.historyApiFallback = config.devServer.historyApiFallback || {};
-
-    if (typeof config.devServer.historyApiFallback.index !== 'string') {
-      config.devServer.historyApiFallback.index = 'index.html';
-    }
-
-    if (typeof config.devServer.historyApiFallback.disableDotRule !== 'boolean') {
-      config.devServer.historyApiFallback.disableDotRule = false;
+  if (isNumber(flags.port)) {
+    devServer.port = flags.port;
+  } else if (devServer.port !== null && !isNumber(devServer.port)) {
+    if (isNumber(addressPort)) {
+      devServer.port = addressPort;
+    } else if (devServer.address === 'localhost' || !isNaN(devServer.address.split('.')[0] as any)) {
+      devServer.port = 3333;
+    } else {
+      devServer.port = null;
     }
   }
 
-  if (config.flags.open === false) {
-    config.devServer.openBrowser = false;
+  if (devServer.reloadStrategy === undefined) {
+    devServer.reloadStrategy = 'hmr';
+  } else if (
+    devServer.reloadStrategy !== 'hmr' &&
+    devServer.reloadStrategy !== 'pageReload' &&
+    devServer.reloadStrategy !== null
+  ) {
+    const err = buildError(diagnostics);
+    err.messageText = `Invalid devServer reloadStrategy "${devServer.reloadStrategy}". Valid configs include "hmr", "pageReload" and null.`;
+  }
 
-  } else if (config.flags.prerender && !config.watch) {
-    config.devServer.openBrowser = false;
+  if (!isBoolean(devServer.gzip)) {
+    devServer.gzip = true;
+  }
+
+  if (!isBoolean(devServer.openBrowser)) {
+    devServer.openBrowser = true;
+  }
+
+  if (!isBoolean(devServer.websocket)) {
+    devServer.websocket = true;
+  }
+
+  if (config?.flags?.ssr) {
+    devServer.ssr = true;
+  } else {
+    devServer.ssr = !!devServer.ssr;
+  }
+
+  if (devServer.ssr) {
+    const wwwOutput = config.outputTargets.find(isOutputTargetWww);
+    devServer.prerenderConfig = wwwOutput?.prerenderConfig;
+  }
+
+  if (isString(config.srcIndexHtml)) {
+    devServer.srcIndexHtml = normalizePath(config.srcIndexHtml);
+  }
+
+  if (devServer.protocol !== 'http' && devServer.protocol !== 'https') {
+    devServer.protocol = devServer.https ? 'https' : addressProtocol ? addressProtocol : 'http';
+  }
+
+  if (devServer.historyApiFallback !== null && devServer.historyApiFallback !== false) {
+    devServer.historyApiFallback = devServer.historyApiFallback || {};
+
+    if (!isString(devServer.historyApiFallback.index)) {
+      devServer.historyApiFallback.index = 'index.html';
+    }
+
+    if (!isBoolean(devServer.historyApiFallback.disableDotRule)) {
+      devServer.historyApiFallback.disableDotRule = false;
+    }
+  }
+
+  if (flags.open === false) {
+    devServer.openBrowser = false;
+  } else if (flags.prerender && !config.watch) {
+    devServer.openBrowser = false;
   }
 
   let serveDir: string = null;
@@ -70,17 +117,11 @@ export function validateDevServer(config: d.Config, diagnostics: d.Diagnostic[])
     const baseUrl = new URL(wwwOutputTarget.baseUrl, 'http://config.stenciljs.com');
     basePath = baseUrl.pathname;
     serveDir = wwwOutputTarget.appDir;
-    config.logger.debug(`dev server www root: ${serveDir}, base path: ${basePath}`);
-
   } else {
     serveDir = config.rootDir;
-
-    if (config.flags && config.flags.serve) {
-      config.logger.debug(`dev server missing www output target, serving root directory: ${serveDir}`);
-    }
   }
 
-  if (typeof basePath !== 'string' || basePath.trim() === '') {
+  if (!isString(basePath) || basePath.trim() === '') {
     basePath = `/`;
   }
 
@@ -94,42 +135,42 @@ export function validateDevServer(config: d.Config, diagnostics: d.Diagnostic[])
     basePath += '/';
   }
 
-  if (typeof config.devServer.logRequests !== 'boolean') {
-    config.devServer.logRequests = (config.logLevel === 'debug');
+  if (!isBoolean(devServer.logRequests)) {
+    devServer.logRequests = config.logLevel === 'debug';
   }
 
-  setStringConfig(config.devServer, 'root', serveDir);
-  setStringConfig(config.devServer, 'basePath', basePath);
+  if (!isString(devServer.root)) {
+    devServer.root = serveDir;
+  }
 
-  if (typeof (config.devServer as any).baseUrl === 'string') {
+  if (!isString(devServer.basePath)) {
+    devServer.basePath = basePath;
+  }
+
+  if (isString((devServer as any).baseUrl)) {
     const err = buildError(diagnostics);
     err.messageText = `devServer config "baseUrl" has been renamed to "basePath", and should not include a domain or protocol.`;
   }
 
-  if (!config.sys.path.isAbsolute(config.devServer.root)) {
-    config.devServer.root = config.sys.path.join(config.rootDir, config.devServer.root);
+  if (!isAbsolute(devServer.root)) {
+    devServer.root = join(config.rootDir, devServer.root);
   }
+  devServer.root = normalizePath(devServer.root);
 
-  if (config.devServer.excludeHmr) {
-    if (!Array.isArray(config.devServer.excludeHmr)) {
+  if (devServer.excludeHmr) {
+    if (!Array.isArray(devServer.excludeHmr)) {
       const err = buildError(diagnostics);
       err.messageText = `dev server excludeHmr must be an array of glob strings`;
     }
-
   } else {
-    config.devServer.excludeHmr = [];
+    devServer.excludeHmr = [];
   }
 
-  return config.devServer;
-}
+  if (!config.devMode || config.buildEs5) {
+    devServer.experimentalDevModules = false;
+  } else {
+    devServer.experimentalDevModules = !!devServer.experimentalDevModules;
+  }
 
-function validateProtocol(devServer: d.DevServerConfig) {
-  if (typeof devServer.protocol === 'string') {
-    let protocol: string = devServer.protocol.trim().toLowerCase() as any;
-    protocol = protocol.replace(':', '').replace('/', '');
-    devServer.protocol = protocol as any;
-  }
-  if (devServer.protocol !== 'http' && devServer.protocol !== 'https') {
-    devServer.protocol = 'http';
-  }
-}
+  return devServer;
+};

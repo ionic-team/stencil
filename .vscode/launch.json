@@ -4,6 +4,7 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+
     {
       "type": "node",
       "request": "launch",
@@ -23,7 +24,7 @@
       "program": "${workspaceFolder}/node_modules/.bin/jest",
       "args": [
         "--runInBand",
-        "src/runtime/test/hydrate-no-encapsulation.spec.tsx"
+        "src/runtime/test/style.spec.tsx"
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -44,29 +45,25 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Style Modes",
-      "args": [
-        "${workspaceFolder}/bin/stencil",
-        "build",
-        "--dev",
-        "--config",
-        "${workspaceFolder}/test/style-modes/stencil.config.ts"
-      ],
-      "protocol": "inspector"
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "Hello World",
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
         "--dev",
         "--debug",
-        "--max-workers=1",
+        "--max-workers=0",
         "--prerender",
         "--config",
         "${workspaceFolder}/test/hello-world/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Hello World Prerender",
+      "args": [
+        "${workspaceFolder}/test/hello-world/prerender.js"
       ],
       "protocol": "inspector"
     },
@@ -77,8 +74,9 @@
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
+        "--watch",
+        "--debug",
         "--dev",
-        "--prerender",
         "--config",
         "${workspaceFolder}/test/hello-vdom/stencil.config.ts"
       ],
@@ -102,9 +100,14 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Hello World Prerender",
+      "name": "Ionic App",
       "args": [
-        "${workspaceFolder}/test/hello-world/prerender.js"
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--dev",
+        "--max-workers=0",
+        "--config",
+        "${workspaceFolder}/test/ionic-app/stencil.config.ts"
       ],
       "protocol": "inspector"
     },
@@ -117,18 +120,9 @@
         "build",
         "--dev",
         "--prerender",
-        "--max-workers=1",
+        "--max-workers=0",
         "--config",
         "${workspaceFolder}/test/prerender-shadow/stencil.config.ts"
-      ],
-      "protocol": "inspector"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Prerender Shadow Debug",
-      "args": [
-        "${workspaceFolder}/test/prerender-shadow/prerender.js"
       ],
       "protocol": "inspector"
     },
@@ -139,7 +133,8 @@
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
-        "--dev",
+        // "--dev",
+        "--max-workers=0",
         "--config",
         "${workspaceFolder}/test/end-to-end/stencil.config.ts"
       ],
@@ -182,9 +177,24 @@
         "--watch",
         "--serve",
         "--debug",
-        "--max-workers=1",
+        "--no-open",
+        "--max-workers=0",
         "--config",
         "${workspaceFolder}/test/todo-app/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Style Modes",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--dev",
+        "--max-workers=0",
+        "--config",
+        "${workspaceFolder}/test/style-modes/stencil.config.ts"
       ],
       "protocol": "inspector"
     },
@@ -196,9 +206,24 @@
         "${workspaceFolder}/bin/stencil",
         "build",
         "--prerender",
-        "--max-workers=1",
+        "--max-workers=0",
         "--config",
         "${workspaceFolder}/../stencil-site/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Ionic Docs Prerender",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--prerender",
+        "--max-workers=0",
+        "--debug",
+        "--config",
+        "${workspaceFolder}/../ionic-docs/stencil.config.ts"
       ],
       "protocol": "inspector"
     },
@@ -209,9 +234,19 @@
       "args": [
         "${workspaceFolder}/bin/stencil",
         "build",
+        "--max-workers=0",
         "--dev",
         "--config",
         "${workspaceFolder}/test/karma/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Karma Prerender",
+      "args": [
+        "${workspaceFolder}/test/karma/test-prerender/prerender.js"
       ],
       "protocol": "inspector"
     }

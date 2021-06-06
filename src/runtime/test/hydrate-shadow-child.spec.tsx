@@ -1,9 +1,7 @@
 import { Component, Host, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('hydrate, shadow child', () => {
-
   it('no slot', async () => {
     @Component({ tag: 'cmp-a', shadow: true })
     class CmpA {
@@ -19,7 +17,7 @@ describe('hydrate, shadow child', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -35,7 +33,7 @@ describe('hydrate, shadow child', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
     expect(clientHydrated.root['s-id']).toBe('1');
 
@@ -75,14 +73,14 @@ describe('hydrate, shadow child', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
         <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--o.1.1-->
+          <!--o.1.1.-->
           <!--s.2.0.0.0.-->
           <!--t.1.1.1.0-->
           light-dom
@@ -137,7 +135,7 @@ describe('hydrate, shadow child', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -196,7 +194,7 @@ describe('hydrate, shadow child', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -256,14 +254,14 @@ describe('hydrate, shadow child', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
         <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--o.1.1-->
+          <!--o.1.1.-->
           <header c-id="2.0.0.0"></header>
           <!--s.2.1.0.1.-->
           <!--t.1.1.1.0-->
@@ -276,7 +274,7 @@ describe('hydrate, shadow child', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
 
     expect(clientHydrated.root).toEqualHtml(`
@@ -320,7 +318,7 @@ describe('hydrate, shadow child', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
@@ -386,14 +384,14 @@ describe('hydrate, shadow child', () => {
     const serverHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: `<cmp-a></cmp-a>`,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
         <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--o.1.1-->
+          <!--o.1.1.-->
           <header c-id="2.0.0.0"></header>
           <!--s.2.1.0.1.-->
           <!--t.1.1.1.0-->
@@ -407,7 +405,7 @@ describe('hydrate, shadow child', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA, CmpB],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
 
     expect(clientHydrated.root).toEqualHtml(`
@@ -430,9 +428,7 @@ describe('hydrate, shadow child', () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       render() {
-        return (
-          <Host></Host>
-        );
+        return <Host></Host>;
       }
     }
     @Component({ tag: 'cmp-b', shadow: true })
@@ -452,9 +448,7 @@ describe('hydrate, shadow child', () => {
       render() {
         return (
           <Host>
-            <article>
-              cmp-c
-            </article>
+            <article>cmp-c</article>
           </Host>
         );
       }
@@ -470,15 +464,15 @@ describe('hydrate, shadow child', () => {
           </cmp-b>
         </cmp-a>
       `,
-      hydrateServerSide: true
+      hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
         <cmp-b class="hydrated" s-id="2">
           <!--r.2-->
-          <!--o.0.1-->
-          <!--o.0.2-->
+          <!--o.0.1.-->
+          <!--o.0.2.-->
           <section c-id="2.0.0.0">
             <!--s.2.1.1.0.-->
             <!--t.0.1-->
@@ -499,7 +493,7 @@ describe('hydrate, shadow child', () => {
     const clientHydrated = await newSpecPage({
       components: [CmpA, CmpB, CmpC],
       html: serverHydrated.root.outerHTML,
-      hydrateClientSide: true
+      hydrateClientSide: true,
     });
 
     expect(clientHydrated.root).toEqualHtml(`
@@ -529,13 +523,11 @@ describe('hydrate, shadow child', () => {
   it('test shadow root innerHTML', async () => {
     @Component({
       tag: 'cmp-a',
-      shadow: true
+      shadow: true,
     })
     class CmpA {
       render() {
-        return (
-          <div>Shadow Content</div>
-        );
+        return <div>Shadow Content</div>;
       }
     }
 
@@ -559,5 +551,4 @@ describe('hydrate, shadow child', () => {
       </cmp-a>
     `);
   });
-
 });

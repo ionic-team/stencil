@@ -1,18 +1,17 @@
-import * as d from '../../declarations';
-import { captializeFirstLetter, isDocsPublic } from '@utils';
+import type * as d from '../../declarations';
+import { getTextDocs, toTitleCase } from '@utils';
 
-
-export function generateEventTypes(cmpEvents: d.ComponentCompilerEvent[]): d.TypeInfo {
+export const generateEventTypes = (cmpEvents: d.ComponentCompilerEvent[]): d.TypeInfo => {
   return cmpEvents.map(cmpEvent => {
-    const name = `on${captializeFirstLetter(cmpEvent.name)}`;
-    const type = (cmpEvent.complexType.original) ? `(event: CustomEvent<${cmpEvent.complexType.original}>) => void` : `CustomEvent`;
+    const name = `on${toTitleCase(cmpEvent.name)}`;
+    const type = cmpEvent.complexType.original ? `(event: CustomEvent<${cmpEvent.complexType.original}>) => void` : `CustomEvent`;
     return {
       name,
       type,
       optional: false,
       required: false,
-      public: isDocsPublic(cmpEvent.docs),
-      jsdoc: (cmpEvent.docs != null && typeof cmpEvent.docs.text === 'string') ? cmpEvent.docs.text : undefined
+      internal: cmpEvent.internal,
+      jsdoc: getTextDocs(cmpEvent.docs),
     };
   });
-}
+};

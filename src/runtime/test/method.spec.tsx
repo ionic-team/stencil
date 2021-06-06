@@ -1,11 +1,9 @@
 import { Component, Method, State } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('method', () => {
-
   it('call method', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @State() someState = 'default';
 
@@ -48,5 +46,4 @@ describe('method', () => {
 
     expect(root.textContent).toBe('promise');
   });
-
 });

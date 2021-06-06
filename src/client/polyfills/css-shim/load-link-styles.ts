@@ -1,16 +1,28 @@
 import { CSSScope } from './interfaces';
-import { addGlobalStyle } from './scope';
+import { addGlobalStyle, updateGlobalScopes } from './scope';
 
 export function loadDocument(doc: Document, globalScopes: CSSScope[]) {
+  loadDocumentStyles(doc, globalScopes);
   return loadDocumentLinks(doc, globalScopes).then(() => {
-    loadDocumentStyles(doc, globalScopes);
+    updateGlobalScopes(globalScopes);
   });
+}
+
+export function startWatcher(doc: Document, globalScopes: CSSScope[]) {
+  if (typeof MutationObserver !== 'undefined') {
+    const mutation = new MutationObserver(() => {
+      if (loadDocumentStyles(doc, globalScopes)) {
+        updateGlobalScopes(globalScopes);
+      }
+    });
+    mutation.observe(document.head, { childList: true });
+  }
 }
 
 export function loadDocumentLinks(doc: Document, globalScopes: CSSScope[]) {
   const promises: Promise<any>[] = [];
 
-  const linkElms = doc.querySelectorAll('link[rel="stylesheet"][href]');
+  const linkElms = doc.querySelectorAll('link[rel="stylesheet"][href]:not([data-no-shim])');
   for (let i = 0; i < linkElms.length; i++) {
     promises.push(addGlobalLink(doc, globalScopes, linkElms[i] as HTMLLinkElement));
   }
@@ -18,31 +30,32 @@ export function loadDocumentLinks(doc: Document, globalScopes: CSSScope[]) {
 }
 
 export function loadDocumentStyles(doc: Document, globalScopes: CSSScope[]) {
-  const styleElms = doc.querySelectorAll('style');
-  for (let i = 0; i < styleElms.length; i++) {
-    addGlobalStyle(globalScopes, styleElms[i]);
-  }
+  const styleElms = Array.from(doc.querySelectorAll('style:not([data-styles]):not([data-no-shim])')) as HTMLStyleElement[];
+  return styleElms.map(style => addGlobalStyle(globalScopes, style)).some(Boolean);
 }
 
 export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: HTMLLinkElement) {
   const url = linkElm.href;
-  return fetch(url).then(rsp => rsp.text()).then(text => {
-    if (hasCssVariables(text) && linkElm.parentNode) {
-      if (hasRelativeUrls(text)) {
-        text = fixRelativeUrls(text, url);
+  return fetch(url)
+    .then(rsp => rsp.text())
+    .then(text => {
+      if (hasCssVariables(text) && linkElm.parentNode) {
+        if (hasRelativeUrls(text)) {
+          text = fixRelativeUrls(text, url);
+        }
+        const styleEl = doc.createElement('style');
+        styleEl.setAttribute('data-styles', '');
+        styleEl.textContent = text;
+
+        addGlobalStyle(globalScopes, styleEl);
+        linkElm.parentNode.insertBefore(styleEl, linkElm);
+        linkElm.remove();
       }
-      const styleEl = doc.createElement('style');
-      styleEl.innerHTML = text;
-
-      addGlobalStyle(globalScopes, styleEl);
-      linkElm.parentNode.insertBefore(styleEl, linkElm);
-      linkElm.remove();
-    }
-  }).catch(err => {
-    console.error(err);
-  });
+    })
+    .catch(err => {
+      console.error(err);
+    });
 }
-
 
 // This regexp tries to determine when a variable is declared, for example:
 //
@@ -61,13 +74,12 @@ export function hasCssVariables(css: string) {
 }
 
 // This regexp find all url() usages with relative urls
-const CSS_URL_REGEXP = /url[\s]*\([\s]*['"]?(?![http|/])([^\'\"\)]*)[\s]*['"]?\)[\s]*/gim;
+const CSS_URL_REGEXP = /url[\s]*\([\s]*['"]?(?!(?:https?|data)\:|\/)([^\'\"\)]*)[\s]*['"]?\)[\s]*/gim;
 
 export function hasRelativeUrls(css: string) {
   CSS_URL_REGEXP.lastIndex = 0;
   return CSS_URL_REGEXP.test(css);
 }
-
 
 export function fixRelativeUrls(css: string, originalUrl: string) {
   // get the basepath from the original import url

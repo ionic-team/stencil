@@ -1,11 +1,9 @@
 import { Component, Method, State } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('state', () => {
-
   it('set default values, update on re-render', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @State() boolFalse = false;
       @State() boolTrue = true;
@@ -14,8 +12,7 @@ describe('state', () => {
 
       @Method()
       async update() {
-        this.boolFalse = true,
-        this.boolTrue = false;
+        (this.boolFalse = true), (this.boolTrue = false);
         this.str = 'hello';
         this.num = 99;
       }
@@ -45,5 +42,4 @@ describe('state', () => {
 
     expect(root.textContent).toBe('true-false-hello-99');
   });
-
 });

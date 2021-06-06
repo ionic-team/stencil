@@ -1,4 +1,3 @@
-
 export const enum VNODE_FLAGS {
   isSlotReference = 1 << 0,
   isSlotFallback = 1 << 1,
@@ -24,7 +23,7 @@ export const enum NODE_TYPE {
   CommentNode = 8,
   DocumentNode = 9,
   DocumentTypeNode = 10,
-  DocumentFragment = 11
+  DocumentFragment = 11,
 }
 
 export const CONTENT_REF_ID = 'r';
@@ -32,8 +31,9 @@ export const ORG_LOCATION_ID = 'o';
 export const SLOT_NODE_ID = 's';
 export const TEXT_NODE_ID = 't';
 
-export const HYDRATED_CLASS = 'hydrated';
 export const HYDRATE_ID = 's-id';
+export const HYDRATED_STYLE_ID = 'sty-id';
 export const HYDRATE_CHILD_ID = 'c-id';
+export const HYDRATED_CSS = '{visibility:hidden}.hydrated{visibility:inherit}';
 
 export const XLINK_NS = 'http://www.w3.org/1999/xlink';

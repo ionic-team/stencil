@@ -1,7 +1,6 @@
 import { MockDocument, createDocument } from '../document';
 import { cloneDocument } from '../window';
 
-
 describe('cloneNode', () => {
   let doc: MockDocument;
   beforeEach(() => {
@@ -50,5 +49,4 @@ describe('cloneNode', () => {
     expect(clonedTemplate.innerHTML.trim()).toEqual(`content`);
     expect(clonedTemplate.content.firstChild.textContent.trim()).toEqual(`content`);
   });
-
 });

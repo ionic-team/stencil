@@ -1,7 +1,7 @@
-import * as d from '../../../declarations';
-import { captializeFirstLetter } from '@utils';
+import type * as d from '../../../declarations';
+import { toTitleCase } from '@utils';
 
-export function usageToMarkdown(usages: d.JsonDocsUsage) {
+export const usageToMarkdown = (usages: d.JsonDocsUsage) => {
   const content: string[] = [];
   const merged = mergeUsages(usages);
   if (merged.length === 0) {
@@ -10,21 +10,20 @@ export function usageToMarkdown(usages: d.JsonDocsUsage) {
 
   content.push(`## Usage`);
 
-  merged.forEach(({name, text}) => {
+  merged.forEach(({ name, text }) => {
     content.push('');
-    content.push(`### ${captializeFirstLetter(name)}`);
+    content.push(`### ${toTitleCase(name)}`);
     content.push('');
     content.push(text);
     content.push('');
   }),
-
-  content.push('');
+    content.push('');
   content.push('');
 
   return content;
-}
+};
 
-export function mergeUsages(usages: d.JsonDocsUsage) {
+export const mergeUsages = (usages: d.JsonDocsUsage) => {
   const keys = Object.keys(usages);
   const map = new Map<string, string[]>();
   keys.forEach(key => {
@@ -33,13 +32,12 @@ export function mergeUsages(usages: d.JsonDocsUsage) {
     array.push(key);
     map.set(usage, array);
   });
-  const merged: {name: string, text: string}[] = [];
+  const merged: { name: string; text: string }[] = [];
   map.forEach((value, key) => {
     merged.push({
       name: value.join(' / '),
-      text: key
+      text: key,
     });
   });
   return merged;
-}
-
+};

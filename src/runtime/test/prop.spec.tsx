@@ -1,22 +1,20 @@
 import { Component, Prop, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('prop', () => {
-
   it('"value" attribute', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop() value: string;
 
       render() {
-        return <code>{ this.value.trim() }</code>;
+        return <code>{this.value.trim()}</code>;
       }
     }
 
     const { root } = await newSpecPage({
       components: [CmpA],
-      html: `<cmp-a value="#005a00"></cmp-a>`
+      html: `<cmp-a value="#005a00"></cmp-a>`,
     });
 
     expect(root).toEqualHtml(`
@@ -27,7 +25,7 @@ describe('prop', () => {
   });
 
   it('override default values from attribute', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop() boolFalse = false;
       @Prop() boolTrue = true;
@@ -57,7 +55,7 @@ describe('prop', () => {
   });
 
   it('set default values', async () => {
-    @Component({ tag: 'cmp-a'})
+    @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop() boolFalse = false;
       @Prop() boolTrue = true;
@@ -84,4 +82,45 @@ describe('prop', () => {
     expect(root.num).toBe(88);
   });
 
+  it('only update on even numbers', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      @Prop() num = 1;
+
+      componentShouldUpdate(newValue: number, _: number, propName: string) {
+        if (propName === 'num') {
+          return newValue % 2 === 0;
+        }
+        return true;
+      }
+      render() {
+        return `${this.num}`;
+      }
+    }
+
+    const { root, waitForChanges } = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+    });
+
+    expect(root).toEqualHtml(`
+      <cmp-a>1</cmp-a>
+    `);
+
+    root.num++;
+    await waitForChanges();
+    expect(root).toEqualHtml(`
+      <cmp-a>2</cmp-a>
+    `);
+    root.num++;
+    await waitForChanges();
+    expect(root).toEqualHtml(`
+      <cmp-a>2</cmp-a>
+    `);
+    root.num++;
+    await waitForChanges();
+    expect(root).toEqualHtml(`
+      <cmp-a>4</cmp-a>
+    `);
+  });
 });

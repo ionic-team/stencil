@@ -1,12 +1,10 @@
-import { Component } from '@stencil/core';
+import { Component, h } from '@stencil/core';
 
 @Component({
-  tag: 'hello-world'
+  tag: 'hello-world',
 })
 export class HelloWorld {
   render() {
-    return (
-      'Hello World'
-    );
+    return <div>Hello World</div>;
   }
 }

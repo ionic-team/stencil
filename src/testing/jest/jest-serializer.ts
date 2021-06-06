@@ -1,21 +1,18 @@
+import { MockNode, serializeNodeToHtml } from '@stencil/core/mock-doc';
 
-import { MockNode, serializeNodeToHtml } from '@mock-doc';
-
-const print =  (val: HTMLElement | MockNode): string => {
-    return serializeNodeToHtml(val, {
-        serializeShadowRoot: true,
-        prettyHtml: true,
-        outerHtml: true,
-    });
+const print = (val: HTMLElement | MockNode): string => {
+  return serializeNodeToHtml(val, {
+    serializeShadowRoot: true,
+    prettyHtml: true,
+    outerHtml: true,
+  });
 };
 
 const test = (val: any): boolean => {
-    return val !== undefined &&
-    val !== null &&
-    (val instanceof HTMLElement || val instanceof MockNode);
+  return val !== undefined && val !== null && (val instanceof HTMLElement || val instanceof MockNode);
 };
 
 export const HtmlSerializer = {
-    print,
-    test
+  print,
+  test,
 };
