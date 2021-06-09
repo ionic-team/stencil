@@ -6,11 +6,11 @@ import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
 import { listenDecoratorsToStatic } from './listen-decorator';
 import { isDecoratorNamed } from './decorator-utils';
+import { cloneNode } from '../transform-utils';
 import { methodDecoratorsToStatic, validateMethods } from './method-decorator';
 import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
-import { cloneNode } from '@wessberg/ts-clone-node';
 import ts from 'typescript';
 
 const visitedFiles: VisitedFiles = new Map();
@@ -86,7 +86,7 @@ export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnosti
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    newMembers.map(member => cloneNode(member, {typescript: ts, setOriginalNodes: true })),
+    newMembers.map(member => cloneNode(member)),
   );
 };
 
