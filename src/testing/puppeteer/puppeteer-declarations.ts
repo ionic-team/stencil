@@ -4,12 +4,18 @@ import type {
   // @ts-ignore
   NavigationOptions,
   Page,
-  // @ts-ignore
-  PageCloseOptions,
   ScreenshotOptions as PuppeteerScreenshotOptions,
   // @ts-ignore
   Response,
 } from 'puppeteer';
+
+/**
+ * This type was once exported by Puppeteer, but has since moved to an object literal in (Puppeteer’s) native types.
+ * Re-create it here as a named type to use across multiple Stencil-related testing files.
+ */
+export type PageCloseOptions = {
+  runBeforeUnload?: boolean;
+}
 
 export interface NewE2EPageOptions extends NavigationOptions {
   url?: string;

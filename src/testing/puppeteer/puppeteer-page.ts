@@ -4,6 +4,7 @@ import type {
   E2EPageInternal,
   FindSelector,
   NewE2EPageOptions,
+  PageCloseOptions,
   PageDiagnostic,
 } from './puppeteer-declarations';
 
@@ -16,8 +17,6 @@ import type {
   // @ts-ignore
   NavigationOptions,
   Page,
-  // @ts-ignore
-  PageCloseOptions,
 } from 'puppeteer';
 import { find, findAll } from './puppeteer-element';
 import { initPageEvents, waitForEvent } from './puppeteer-events';
