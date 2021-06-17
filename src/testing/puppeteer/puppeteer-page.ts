@@ -6,13 +6,17 @@ import type {
   NewE2EPageOptions,
   PageDiagnostic,
 } from './puppeteer-declarations';
+
 import type {
   ConsoleMessage,
   ConsoleMessageLocation,
+  // @ts-ignore
   EmulateOptions,
   JSHandle,
+  // @ts-ignore
   NavigationOptions,
   Page,
+  // @ts-ignore
   PageCloseOptions,
 } from 'puppeteer';
 import { find, findAll } from './puppeteer-element';
@@ -157,8 +161,10 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
     });
 
     if (typeof opts.html === 'string') {
+      // @ts-ignore
       await e2eSetContent(page, opts.html, { waitUntil: opts.waitUntil });
     } else if (typeof opts.url === 'string') {
+      // @ts-ignore
       await e2eGoTo(page, opts.url, { waitUntil: opts.waitUntil });
     } else {
       page.goto = e2eGoTo.bind(null, page);

@@ -36,6 +36,7 @@ export async function startPuppeteerBrowser(config: Config) {
   }
 
   const launchOpts: puppeteer.LaunchOptions = {
+    // @ts-ignore
     ignoreHTTPSErrors: true,
     args: config.testing.browserArgs,
     headless: config.testing.browserHeadless,

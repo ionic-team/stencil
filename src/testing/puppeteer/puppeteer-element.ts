@@ -13,6 +13,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
   constructor(private _page: pd.E2EPageInternal, private _elmHandle: puppeteer.ElementHandle) {
     super(null, null);
+    // @ts-ignore
     _page._e2eElements.push(this);
   }
 
@@ -148,6 +149,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   }
 
   async press(key: string, options?: { text?: string; delay?: number }) {
+    // @ts-ignore
     await this._elmHandle.press(key, options);
     await this._page.waitForChanges();
   }
@@ -394,6 +396,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     return style;
   }
 
+  // @ts-ignore
   async e2eRunActions() {
     if (this._queuedActions.length === 0) {
       return;
@@ -512,6 +515,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
       this._elmHandle = null;
     }
 
+    // @ts-ignore
     const index = this._page._e2eElements.indexOf(this);
     if (index > -1) {
       this._page._e2eElements.splice(index, 1);

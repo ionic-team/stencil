@@ -1,10 +1,13 @@
 import type { EventInitDict, EventSpy, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
 import type {
   ClickOptions,
+  // @ts-ignore
   NavigationOptions,
   Page,
+  // @ts-ignore
   PageCloseOptions,
   ScreenshotOptions as PuppeteerScreenshotOptions,
+  // @ts-ignore
   Response,
 } from 'puppeteer';
 
