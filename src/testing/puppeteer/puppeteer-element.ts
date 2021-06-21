@@ -13,7 +13,6 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
   constructor(private _page: pd.E2EPageInternal, private _elmHandle: puppeteer.ElementHandle) {
     super(null, null);
-    // @ts-ignore
     _page._e2eElements.push(this);
   }
 
@@ -395,7 +394,6 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     return style;
   }
 
-  // @ts-ignore
   async e2eRunActions() {
     if (this._queuedActions.length === 0) {
       return;
@@ -403,7 +401,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
     const executionContext = this._elmHandle.executionContext();
 
-    const rtn = await executionContext.evaluate(
+    const rtn = await executionContext.evaluate<unknown>(
       (elm: HTMLElement, queuedActions: ElementAction[]) => {
         // BROWSER CONTEXT
         // cannot use async/await in here cuz typescript transpiles it in the node context
@@ -514,7 +512,6 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
       this._elmHandle = null;
     }
 
-    // @ts-ignore
     const index = this._page._e2eElements.indexOf(this);
     if (index > -1) {
       this._page._e2eElements.splice(index, 1);

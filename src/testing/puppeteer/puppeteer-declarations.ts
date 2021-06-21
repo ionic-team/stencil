@@ -463,7 +463,7 @@ export interface E2EElement {
 
 export interface E2EElementInternal extends E2EElement {
   e2eDispose(): Promise<void>;
-  e2eRunActions(): Promise<void>;
+  e2eRunActions(): Promise<unknown>;
   e2eSync(): Promise<void>;
 }
 
