@@ -11,8 +11,6 @@ import type {
 import type {
   ConsoleMessage,
   ConsoleMessageLocation,
-  // @ts-ignore
-  EmulateOptions,
   JSHandle,
   Page,
   WaitForOptions,
@@ -297,7 +295,7 @@ async function setPageEmulate(page: Page) {
 
   const screenshotEmulate = JSON.parse(emulateJsonContent) as EmulateConfig;
 
-  const emulateOptions: EmulateOptions = {
+  const emulateOptions = {
     viewport: screenshotEmulate.viewport,
     userAgent: screenshotEmulate.userAgent,
   };
