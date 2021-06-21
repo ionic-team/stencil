@@ -148,8 +148,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     return this._elmHandle.isIntersectingViewport();
   }
 
-  async press(key: string, options?: { text?: string; delay?: number }) {
-    // @ts-ignore
+  async press(key: puppeteer.KeyInput, options?: { text?: string; delay?: number }) {
     await this._elmHandle.press(key, options);
     await this._page.waitForChanges();
   }
