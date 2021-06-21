@@ -1,10 +1,9 @@
 import type { EventInitDict, EventSpy, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
 import type {
   ClickOptions,
+  HTTPResponse,
   Page,
   ScreenshotOptions as PuppeteerScreenshotOptions,
-  // @ts-ignore
-  Response,
   WaitForOptions,
 } from 'puppeteer';
 
@@ -135,7 +134,7 @@ export interface E2EPage extends PuppeteerPage {
    * a localhost address. A shortcut to `page.goto(url)` is to set the `url` option
    * when creating a new page, such as `const page = await newE2EPage({ url })`.
    */
-  goTo(url: string, options?: WaitForOptions): Promise<Response | null>;
+  goTo(url: string, options?: WaitForOptions): Promise<HTTPResponse | null>;
 
   /**
    * Instead of testing a url directly, html content can be mocked using
@@ -177,7 +176,7 @@ export interface E2EPageInternal extends E2EPage {
   _e2eElements: E2EElementInternal[];
   _e2eEvents: Map<number, WaitForEvent>;
   _e2eEventIds: number;
-  _e2eGoto(url: string, options?: Partial<WaitForOptions>): Promise<Response | null>;
+  _e2eGoto(url: string, options?: Partial<WaitForOptions>): Promise<HTTPResponse | null>;
   _e2eClose(options?: PageCloseOptions): Promise<void>;
   screenshot(options?: PuppeteerScreenshotOptions): Promise<Buffer>;
 }
