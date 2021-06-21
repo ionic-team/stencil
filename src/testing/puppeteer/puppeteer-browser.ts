@@ -35,7 +35,7 @@ export async function startPuppeteerBrowser(config: Config) {
     config.logger.debug(`puppeteer slowMo: ${config.testing.browserSlowMo}`);
   }
 
-  // connection options will be used regardless whether a new browser instance is created, or we attach to a
+  // connection options will be used regardless whether a new browser instance is created or we attach to a
   // pre-existing instance
   const connectOpts: puppeteer.ConnectOptions = {
     ignoreHTTPSErrors: true,
