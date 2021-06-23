@@ -1,35 +1,11 @@
 import type { EventInitDict, EventSpy, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
 import type {
   ClickOptions,
-  HTTPResponse as PuppeteerHTTPResponse,
+  HTTPResponse,
   Page,
   ScreenshotOptions as PuppeteerScreenshotOptions,
+  WaitForOptions,
 } from 'puppeteer';
-
-/**
- * This type helps with declaration merging as a part of Stencil's migration from Puppeteer v5.4.3 to v10.0.0. In
- * v5.4.3, `HttpResponse` was an interface whereas v10.0.0 declares it as a class. It is redeclared here to help teams
- * migrate to a newer version of Stencil minor version without requiring a Puppeteer upgrade. This type should be
- * removed as a part of the Stencil 3.0 release.
- */
-export type HTTPResponse = PuppeteerHTTPResponse;
-
-/**
- * These types help with declaration merging as a part of Stencil's migration from Puppeteer v5.4.3 to v10.0.0. In
- * v10.0.0, `WaitForOptions` is a renamed version of `NavigationOptions` from v5.4.3, who has had its type hierarchy
- * flattened.
- *
- * See {@link https://github.com/DefinitelyTyped/DefinitelyTyped/blob/8290e943f6b398acf39ee1b2e486824144e15bc8/types/puppeteer/index.d.ts#L605-L622}
- * for the v5.4.3 types.
- *
- * These types are redeclared here to help teams migrate to a newer version of Stencil minor version without requiring a
- * Puppeteer upgrade. This type should be removed as a part of the Stencil 3.0 release.
- */
-export type PuppeteerLifeCycleEvent = 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
-export interface WaitForOptions {
-  timeout?: number;
-  waitUntil?: PuppeteerLifeCycleEvent | PuppeteerLifeCycleEvent[];
-}
 
 /**
  * This type was once exported by Puppeteer, but has since moved to an object literal in (Puppeteer’s) native types.
