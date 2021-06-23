@@ -1,14 +1,21 @@
 import type { EventInitDict, EventSpy, ScreenshotDiff, ScreenshotOptions } from '@stencil/core/internal';
 import type {
   ClickOptions,
-  NavigationOptions,
+  HTTPResponse,
   Page,
-  PageCloseOptions,
   ScreenshotOptions as PuppeteerScreenshotOptions,
-  Response,
+  WaitForOptions,
 } from 'puppeteer';
 
-export interface NewE2EPageOptions extends NavigationOptions {
+/**
+ * This type was once exported by Puppeteer, but has since moved to an object literal in (Puppeteer’s) native types.
+ * Re-create it here as a named type to use across multiple Stencil-related testing files.
+ */
+export type PageCloseOptions = {
+  runBeforeUnload?: boolean;
+}
+
+export interface NewE2EPageOptions extends WaitForOptions {
   url?: string;
   html?: string;
   failOnConsoleError?: boolean;
@@ -127,7 +134,7 @@ export interface E2EPage extends PuppeteerPage {
    * a localhost address. A shortcut to `page.goto(url)` is to set the `url` option
    * when creating a new page, such as `const page = await newE2EPage({ url })`.
    */
-  goTo(url: string, options?: NavigationOptions): Promise<Response | null>;
+  goTo(url: string, options?: WaitForOptions): Promise<HTTPResponse | null>;
 
   /**
    * Instead of testing a url directly, html content can be mocked using
@@ -135,7 +142,7 @@ export interface E2EPage extends PuppeteerPage {
    * the `html` option when creating a new page, such as
    * `const page = await newE2EPage({ html })`.
    */
-  setContent(html: string, options?: NavigationOptions): Promise<void>;
+  setContent(html: string, options?: WaitForOptions): Promise<void>;
 
   /**
    * Used to test if an event was, or was not dispatched. This method
@@ -169,7 +176,7 @@ export interface E2EPageInternal extends E2EPage {
   _e2eElements: E2EElementInternal[];
   _e2eEvents: Map<number, WaitForEvent>;
   _e2eEventIds: number;
-  _e2eGoto(url: string, options?: Partial<NavigationOptions>): Promise<Response | null>;
+  _e2eGoto(url: string, options?: Partial<WaitForOptions>): Promise<HTTPResponse | null>;
   _e2eClose(options?: PageCloseOptions): Promise<void>;
   screenshot(options?: PuppeteerScreenshotOptions): Promise<Buffer>;
 }
@@ -456,7 +463,7 @@ export interface E2EElement {
 
 export interface E2EElementInternal extends E2EElement {
   e2eDispose(): Promise<void>;
-  e2eRunActions(): Promise<void>;
+  e2eRunActions(): Promise<unknown>;
   e2eSync(): Promise<void>;
 }
 

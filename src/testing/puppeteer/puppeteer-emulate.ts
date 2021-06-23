@@ -18,7 +18,8 @@ export function setScreenshotEmulateData(userEmulateConfig: EmulateConfig, env: 
     try {
       const deviceDescriptors = require(env.__STENCIL_PUPPETEER_MODULE__ + '/DeviceDescriptors');
 
-      const puppeteerEmulateOpts = deviceDescriptors[userEmulateConfig.device] as puppeteer.EmulateOptions;
+      const puppeteerEmulateOpts =
+        deviceDescriptors[userEmulateConfig.device] as { userAgent: string,  viewport: puppeteer.Viewport };
       if (!puppeteerEmulateOpts) {
         console.error(`invalid emulate device: ${userEmulateConfig.device}`);
         return;
