@@ -1,5 +1,5 @@
 import type * as d from '../declarations';
-import { addHostEventListeners, doc, getHostRef, nextTick, plt, supportsShadow } from '@platform';
+import { addHostEventListeners, doc, getHostRef, nextTick, plt, styles, supportsShadow } from '@platform';
 import { addStyle } from './styles';
 import { attachToAncestor } from './update-component';
 import { BUILD } from '@app-data';
@@ -96,6 +96,32 @@ export const connectedCallback = (elm: d.HostElement) => {
 
       // fire off connectedCallback() on component instance
       fireConnectedCallback(hostRef.$lazyInstance$);
+
+      // re-add css-shim because it gets removed on disconnect
+      if (plt.$cssShim$ && elm['s-sc']) {
+        // setup
+        const scopeId = 'sc-' + hostRef.$cmpMeta$.$tagName$;
+        const style = styles.get(scopeId) as string;
+        const oId = elm['s-sc'];
+
+        // construct and insert new <style>
+        const styleElm = plt.$cssShim$.createHostStyle(elm, scopeId, style, true) as d.RenderNode;
+        const nId = styleElm['s-sc'];
+        styleElm.setAttribute('sty-id', nId);
+        let doc = document.head;
+        doc.insertBefore(styleElm, doc.querySelector('link'));
+
+        // clean up old ids / add new ids
+        elm['s-sc'] = nId;
+        elm.classList.remove(oId + '-h', oId + '-s');
+        elm.classList.add(nId + '-h', nId + '-s');
+
+        Array.from(elm.querySelectorAll('.' + oId)).forEach(c => {
+          c.classList.remove(oId, oId + '-s');
+          c.classList.add(nId, nId + '-s');
+        })
+        plt.$cssShim$.updateHost(elm);
+      }
     }
 
     endConnected();

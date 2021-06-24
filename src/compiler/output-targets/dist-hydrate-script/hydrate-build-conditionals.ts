@@ -20,8 +20,6 @@ export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => 
   build.member = true;
   build.constructableCSS = false;
   build.asyncLoading = true;
-  build.appendChildSlotFix = false;
-  build.slotChildNodesFix = false;
   build.cloneNodeFix = false;
   build.cssAnnotations = true;
   build.shadowDomShim = true;

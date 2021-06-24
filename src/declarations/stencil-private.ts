@@ -1165,6 +1165,19 @@ export interface HostElement extends HTMLElement {
   disconnectedCallback?: () => void;
   host?: Element;
   forceUpdate?: () => void;
+  readonly __childNodes?: NodeListOf<ChildNode>;
+  readonly __children?: HTMLCollectionOf<Element>;
+  readonly __childElementCount?: number;
+  __innerHTML?: string;
+  __innerText?: string;
+  __append?: (...nodes: (Node | string)[]) => void
+  __prepend?: (...nodes: (Node | string)[]) => void;
+  __appendChild?: <T extends Node>(newChild: T) => T;
+  __replaceChildren?: (...nodes: (Node | string)[]) => void
+  __insertAdjacentElement?: (position: InsertPosition, insertedElement: Element) => Element | null;
+  __insertAdjacentHTML?: (where: InsertPosition, html: string) => void;
+  __insertAdjacentText?: (where: InsertPosition, text: string) => void;
+
 
   // "s-" prefixed properties should not be property renamed
   // and should be common between all versions of stencil

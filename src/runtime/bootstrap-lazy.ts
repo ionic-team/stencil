@@ -9,7 +9,7 @@ import { disconnectedCallback } from './disconnected-callback';
 import { doc, getHostRef, plt, registerHost, win, supportsShadow } from '@platform';
 import { hmrStart } from './hmr-component';
 import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
-import { patchCloneNode, patchSlotAppendChild, patchChildSlotNodes } from './dom-extras';
+import { patchCloneNode, patchPseudoShadowDom } from './dom-extras';
 import { proxyComponent } from './proxy-component';
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
@@ -73,6 +73,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
       }
       const tagName = BUILD.transformTagName && options.transformTagName ? options.transformTagName(cmpMeta.$tagName$) : cmpMeta.$tagName$;
+
       const HostElement = class extends HTMLElement {
         ['s-p']: Promise<void>[];
         ['s-rc']: (() => void)[];
@@ -98,12 +99,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
               } else {
                 self.attachShadow({ mode: 'open' });
               }
-            } else if (!BUILD.hydrateServerSide && !('shadowRoot' in self)) {
-              (self as any).shadowRoot = self;
             }
-          }
-          if (BUILD.slotChildNodesFix) {
-            patchChildSlotNodes(self, cmpMeta);
           }
         }
 
@@ -133,8 +129,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         patchCloneNode(HostElement.prototype);
       }
 
-      if (BUILD.appendChildSlotFix) {
-        patchSlotAppendChild(HostElement.prototype);
+      if (
+        !BUILD.hydrateServerSide && (cmpMeta.$flags$ & CMP_FLAGS.hasSlotRelocation) &&
+        (cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation || (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && CMP_FLAGS.needsShadowDomShim))
+      ) {
+        patchPseudoShadowDom(HostElement.prototype);
       }
 
       if (BUILD.hotModuleReplacement) {

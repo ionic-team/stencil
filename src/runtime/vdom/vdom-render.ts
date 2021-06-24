@@ -187,6 +187,23 @@ const addVnodes = (parentElm: d.RenderNode, before: d.RenderNode, parentVNode: d
   }
 };
 
+const saveSlottedNodes = (elm: d.RenderNode) => {
+  // by removing the hostname reference
+  // any current slotted elements will be 'reset' and re-slotted
+  let childNode: d.RenderNode;
+  let i: number;
+  let ilen: number;
+
+  for (i = 0, ilen = elm.childNodes.length; i < ilen; i++) {
+    childNode = elm.childNodes[i] as d.RenderNode;
+    if (childNode['s-ol']) {
+      if (childNode['s-hn']) childNode['s-hn'] = undefined;
+    } else {
+      saveSlottedNodes(childNode)
+    }
+  }
+}
+
 const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode?: d.VNode, elm?: d.RenderNode) => {
   for (; startIdx <= endIdx; ++startIdx) {
     if ((vnode = vnodes[startIdx])) {
@@ -197,6 +214,7 @@ const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode
         // we're removing this element
         // so it's possible we need to show slot fallback content now
         checkSlotFallbackVisibility = true;
+        saveSlottedNodes(elm);
 
         if (elm['s-ol']) {
           // remove the original location comment
@@ -666,6 +684,8 @@ render() {
               }
               // add it back to the dom but in its new home
               parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
+              // the node may have been hidden from when it didn't have a home. Re-show.
+              nodeToRelocate.hidden = false;
             }
           }
         } else {
