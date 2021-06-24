@@ -36,8 +36,8 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
   }
 
   if (
-    (cmpMeta.$flags$ & CMP_FLAGS.hasSlotRelocation) &&
-    (cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation || (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && CMP_FLAGS.needsShadowDomShim))
+    (cmpMeta.$flags$ & CMP_FLAGS.hasSlotRelocation) ||
+    (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && CMP_FLAGS.needsShadowDomShim)
   ) {
     patchPseudoShadowDom(Cstr.prototype);
   }

@@ -187,7 +187,7 @@ const patchSlotAppendChild = (HostElementPrototype: any) => {
       const appendAfter = slotChildNodes[slotChildNodes.length - 1];
       return appendAfter.parentNode.insertBefore(newChild, appendAfter.nextSibling);
     }
-    if (newChild.nodeType === 1 && !!newChild.getAttribute('slot')) newChild.hidden = true;
+    if (newChild.nodeType === 1 && !!newChild.getAttribute('slot') && this.__childNodes) newChild.hidden = true;
     return (this as any).__appendChild(newChild);
   };
 };
@@ -211,7 +211,7 @@ const patchSlotPrepend = (HostElementPrototype: any) => {
         const appendAfter = slotChildNodes[0];
         return appendAfter.parentNode.insertBefore(newChild, appendAfter.nextSibling);
       }
-      if (newChild.nodeType === 1 && !!newChild.getAttribute('slot')) newChild.hidden = true;
+      if (newChild.nodeType === 1 && !!newChild.getAttribute('slot') && this.__childNodes) newChild.hidden = true;
       return (this as any).__prepend(newChild);
     })
   };
