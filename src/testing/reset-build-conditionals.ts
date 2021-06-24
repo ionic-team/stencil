@@ -36,11 +36,9 @@ export function resetBuildConditionals(b: d.BuildConditionals) {
   b.hydratedAttribute = false;
   b.hydratedClass = true;
   b.invisiblePrehydration = true;
-  b.appendChildSlotFix = false;
   b.cloneNodeFix = false;
   b.dynamicImportShim = false;
   b.hotModuleReplacement = false;
   b.safari10 = false;
   b.scriptDataOpts = false;
-  b.slotChildNodesFix = false;
 }
