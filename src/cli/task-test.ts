@@ -24,7 +24,7 @@ export const taskTest = async (config: Config) => {
       // puppeteer modules installed and if browserExecutablePath is provided don't download Chromium use only puppeteer-core instead
       const puppeteer = config.testing.browserExecutablePath ? 'puppeteer-core' : 'puppeteer';
 
-      ensureModuleIds.push('@types/puppeteer', puppeteer);
+      ensureModuleIds.push(puppeteer);
 
       if (testingRunOpts.screenshot) {
         // ensure we've got pixelmatch for screenshots

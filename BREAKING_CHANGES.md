@@ -557,3 +557,10 @@ When running Jest directly, previously most of Jest had to be manually configure
 -    ]
   }
 ```
+
+# Stencil v3.0.0 [Unreleased]
+
+Stencil v3.0.0 is in development at this time and has not been released. The list below is not final and is subject to
+change. Further details on each of these items will be included prior to the release.
+
+- [fix(testing): puppeteer v10 support #2934](https://github.com/ionic-team/stencil/pull/2934)
