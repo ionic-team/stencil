@@ -4,13 +4,14 @@ import type {
   HTTPResponse as PuppeteerHTTPResponse,
   Page,
   ScreenshotOptions as PuppeteerScreenshotOptions,
+  WaitForOptions,
 } from 'puppeteer';
 
 /**
  * This type helps with declaration merging as a part of Stencil's migration from Puppeteer v5.4.3 to v10.0.0. In
  * v5.4.3, `HttpResponse` was an interface whereas v10.0.0 declares it as a class. It is redeclared here to help teams
- * migrate to a newer version of Stencil minor version without requiring a Puppeteer upgrade. This type should be
- * removed as a part of the Stencil 3.0 release.
+ * migrate to a newer minor version of Stencil without requiring a Puppeteer upgrade/major version of Stencil. This type
+ * should be removed as a part of the Stencil 3.0 release.
  */
 export type HTTPResponse = PuppeteerHTTPResponse;
 
@@ -22,13 +23,16 @@ export type HTTPResponse = PuppeteerHTTPResponse;
  * See {@link https://github.com/DefinitelyTyped/DefinitelyTyped/blob/8290e943f6b398acf39ee1b2e486824144e15bc8/types/puppeteer/index.d.ts#L605-L622}
  * for the v5.4.3 types.
  *
- * These types are redeclared here to help teams migrate to a newer version of Stencil minor version without requiring a
- * Puppeteer upgrade. This type should be removed as a part of the Stencil 3.0 release.
+ * These types are redeclared here to help teams migrate to a newer minor version of Stencil without requiring a
+ * Puppeteer upgrade/major version of Stencil. These type additions should be removed as a part of the Stencil 3.0
+ * release.
  */
-export type PuppeteerLifeCycleEvent = 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
-export interface WaitForOptions {
-  timeout?: number;
-  waitUntil?: PuppeteerLifeCycleEvent | PuppeteerLifeCycleEvent[];
+declare module "puppeteer" {
+  type LifeCycleEvent = 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
+  interface WaitForOptions {
+    timeout?: number;
+    waitUntil?: LifeCycleEvent | LifeCycleEvent[];
+  }
 }
 
 /**
