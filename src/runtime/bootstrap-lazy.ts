@@ -101,6 +101,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
               } else {
                 self.attachShadow({ mode: 'open' });
               }
+            } else if (!BUILD.hydrateServerSide && !('shadowRoot' in self)) {
+              (self as any).shadowRoot = self;
             }
           }
         }
