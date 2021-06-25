@@ -45,6 +45,10 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
 
 #### Testing Changes Against a Project Locally
 
+##### Testing with `npm link`:
+
+Using `npm link` is beneficial to the development cycle in that consecutive builds of Stencil are immediately available in your project, without any additional `npm install` steps needed:
+
 1. In the directory of _stencil core_:
     1. Run `npm run build`
     2. Run `npm link`
@@ -62,7 +66,6 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
     }
   }
 }
-
 ```
 
 You can then test your changes against your own stencil project.
@@ -73,6 +76,23 @@ Afterwards, to clean up:
     1. Run `npm unlink @stencil/core`
     2. Remove the modifications to your tsconfig.json
 2. In the directory of _stencil core_, run `npm unlink`
+
+##### Testing with `npm pack`:
+
+There are some cases where `npm link` may fall short. For instance, when upgrading a minimum/recommended package version where the package in question has changed its typings. Rather than updating `paths` in your project's `tsconfig.json` file, it may be easier to create a tarball of the project and install in manually.
+
+1. In the directory of _stencil core_:
+    1. Run `npm run build`
+    2. Run `npm pack`. This will create a tarball with the name `stencil-core-<VERSION>.tgz`
+2. In the directory of _your stencil project_:
+    1. Run `npm install --save-dev <PATH_TO_STENCIL_REPO_ON_DISK>/stencil-core-<VERSION>.tgz`. 
+       * e.g. If you cloned the stencil repo to `~/workspaces` and built v.2.6.0, you would run `npm install ~/workspaces/stencil/stencil-2.6.0.tgz`
+  
+Note that this method of testing is far more laborious than using `npm link`, and requires every step to be repeated following a change to the Stencil core source.
+
+Afterwards, to clean up:
+
+1. In the directory of your stencil project, run `npm install --save-dev stencil@<VERSION>` for the `<VERSION>` of Stencil core that was installed in your project prior to testing. 
 
 ## Commit Message Format
 
