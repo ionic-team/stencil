@@ -107,6 +107,26 @@ export const plt: d.PlatformRuntime = {
   ce: (eventName, opts) => new win.CustomEvent(eventName, opts),
 };
 
+export const setPlatformHelpers = (helpers: { 
+  jmp?: (c: any) => any;
+  raf?: (c: any) => number;
+  ael?: (
+    el: any,
+    eventName: string,
+    listener: any,
+    options: any,
+  ) => void;
+  rel?: (
+    el: any,
+    eventName: string,
+    listener: any,
+    options: any,
+  ) => void;
+  ce?: (eventName: string, opts?: any) => any;
+}) => {
+  Object.assign(plt, helpers);
+};
+
 export const supportsShadow = false;
 
 export const supportsListenerOptions = false;

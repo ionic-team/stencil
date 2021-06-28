@@ -19,6 +19,26 @@ export const plt: d.PlatformRuntime = {
   ce: (eventName, opts) => new CustomEvent(eventName, opts),
 };
 
+export const setPlatformHelpers = (helpers: { 
+  jmp?: (c: any) => any;
+  raf?: (c: any) => number;
+  ael?: (
+    el: any,
+    eventName: string,
+    listener: any,
+    options: any,
+  ) => void;
+  rel?: (
+    el: any,
+    eventName: string,
+    listener: any,
+    options: any,
+  ) => void;
+  ce?: (eventName: string, opts?: any) => any;
+}) => {
+  Object.assign(plt, helpers);
+};
+
 export const supportsShadow = BUILD.shadowDomShim && BUILD.shadowDom ? /*@__PURE__*/ (() => (doc.head.attachShadow + '').indexOf('[native') > -1)() : true;
 
 export const supportsListenerOptions = /*@__PURE__*/ (() => {
