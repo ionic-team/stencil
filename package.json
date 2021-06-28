@@ -40,7 +40,7 @@
     "test": "jest",
     "test.analysis": "cd test && npm run build",
     "test.dist": "node scripts --validate-build",
-    "test.end-to-end": "cd test/end-to-end && npm i && npm test && npm run test.dist",
+    "test.end-to-end": "cd test/end-to-end && npm ci && npm test && npm run test.dist",
     "test.jest": "jest",
     "test.karma": "cd test/karma && npm run karma",
     "test.karma.prod": "cd test/karma && npm run karma.prod",
