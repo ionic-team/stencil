@@ -4,16 +4,16 @@ import type {
   E2EPageInternal,
   FindSelector,
   NewE2EPageOptions,
+  PageCloseOptions,
   PageDiagnostic,
 } from './puppeteer-declarations';
+
 import type {
   ConsoleMessage,
   ConsoleMessageLocation,
-  EmulateOptions,
   JSHandle,
-  NavigationOptions,
   Page,
-  PageCloseOptions,
+  WaitForOptions,
 } from 'puppeteer';
 import { find, findAll } from './puppeteer-element';
 import { initPageEvents, waitForEvent } from './puppeteer-events';
@@ -175,7 +175,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
   return page;
 }
 
-async function e2eGoTo(page: E2EPageInternal, url: string, options: NavigationOptions = {}) {
+async function e2eGoTo(page: E2EPageInternal, url: string, options: WaitForOptions = {}) {
   if (page.isClosed()) {
     throw new Error('e2eGoTo unavailable: page already closed');
   }
@@ -209,7 +209,7 @@ async function e2eGoTo(page: E2EPageInternal, url: string, options: NavigationOp
   return rsp;
 }
 
-async function e2eSetContent(page: E2EPageInternal, html: string, options: NavigationOptions = {}) {
+async function e2eSetContent(page: E2EPageInternal, html: string, options: WaitForOptions = {}) {
   if (page.isClosed()) {
     throw new Error('e2eSetContent unavailable: page already closed');
   }
@@ -272,7 +272,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: Navig
   return rsp;
 }
 
-async function waitForStencil(page: E2EPage, options: NavigationOptions) {
+async function waitForStencil(page: E2EPage, options: WaitForOptions) {
   try {
     const timeout = typeof options.timeout === 'number' ? options.timeout : 4750;
     await page.waitForFunction('window.stencilAppLoaded', { timeout });
@@ -293,7 +293,7 @@ async function setPageEmulate(page: Page) {
 
   const screenshotEmulate = JSON.parse(emulateJsonContent) as EmulateConfig;
 
-  const emulateOptions: EmulateOptions = {
+  const emulateOptions = {
     viewport: screenshotEmulate.viewport,
     userAgent: screenshotEmulate.userAgent,
   };

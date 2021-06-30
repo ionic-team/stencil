@@ -35,26 +35,31 @@ export async function startPuppeteerBrowser(config: Config) {
     config.logger.debug(`puppeteer slowMo: ${config.testing.browserSlowMo}`);
   }
 
-  const launchOpts: puppeteer.LaunchOptions = {
+  // connection options will be used regardless whether a new browser instance is created or we attach to a
+  // pre-existing instance
+  const connectOpts: puppeteer.ConnectOptions = {
     ignoreHTTPSErrors: true,
-    args: config.testing.browserArgs,
-    headless: config.testing.browserHeadless,
-    devtools: config.testing.browserDevtools,
     slowMo: config.testing.browserSlowMo,
   };
 
-  if (config.testing.browserExecutablePath) {
-    launchOpts.executablePath = config.testing.browserExecutablePath;
+  let browser: puppeteer.Browser;
+  if (config.testing.browserWSEndpoint) {
+    browser = await puppeteer.connect({
+      browserWSEndpoint: config.testing.browserWSEndpoint,
+      ...connectOpts
+    });
+  } else {
+    const launchOpts: puppeteer.BrowserLaunchArgumentOptions & puppeteer.LaunchOptions & puppeteer.ConnectOptions = {
+      args: config.testing.browserArgs,
+      headless: config.testing.browserHeadless,
+      devtools: config.testing.browserDevtools,
+      ...connectOpts,
+    };
+    if (config.testing.browserExecutablePath) {
+      launchOpts.executablePath = config.testing.browserExecutablePath;
+    }
+    browser = await puppeteer.launch({ ...launchOpts });
   }
-
-  const browser = await (config.testing.browserWSEndpoint
-    ? puppeteer.connect({
-        ...launchOpts,
-        browserWSEndpoint: config.testing.browserWSEndpoint,
-      })
-    : puppeteer.launch({
-        ...launchOpts,
-      }));
 
   env.__STENCIL_BROWSER_WS_ENDPOINT__ = browser.wsEndpoint();
 
