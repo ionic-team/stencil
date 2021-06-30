@@ -42,10 +42,9 @@ describe('scoped slot', () => {
     });
 
     expect(root.firstElementChild.nodeName).toBe('SPIDER');
-    expect(root.firstElementChild.children).toHaveLength(1);
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('SLOT-FB');
-    expect(root.firstElementChild.firstElementChild.textContent).toBe('default content');
-    expect(root.firstElementChild.firstElementChild.childNodes).toHaveLength(1);
+    expect(root.firstElementChild.children).toHaveLength(0);
+    expect(root.firstElementChild.textContent).toBe('default content');
+    expect(root.firstElementChild.childNodes).toHaveLength(2);
   });
 
   it('should use components default slot node content', async () => {
@@ -68,8 +67,8 @@ describe('scoped slot', () => {
     });
 
     expect(root.firstElementChild.nodeName).toBe('SPIDER');
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('SLOT-FB');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('default content');
+    expect(root.firstElementChild.firstElementChild.nodeName).toBe('DIV');
+    expect(root.firstElementChild.firstElementChild.textContent).toBe('default content');
   });
 
   it('should relocate nested named slot nodes', async () => {
@@ -774,8 +773,8 @@ describe('scoped slot', () => {
       html: `<fallback-test><span>Content</span></fallback-test>`,
     });
 
-    expect(root.firstElementChild.children[1].nodeName).toBe('SLOT-FB');
-    expect(root.firstElementChild.children[1]).toHaveAttribute('hidden');
+    expect(root.firstElementChild.children[1].nodeName).toBe('SPAN');
+    expect(root.firstElementChild.children[2]).toBe(undefined);
   });
 
   it('should hide the slot\'s fallback content for a non-shadow component when slot content passed in', async () => {
@@ -796,7 +795,7 @@ describe('scoped slot', () => {
       html: `<fallback-test><span>Content</span></fallback-test>`,
     });
 
-    expect(root.firstElementChild.children[1].nodeName).toBe('SLOT-FB');
-    expect(root.firstElementChild.children[1]).toHaveAttribute('hidden');
+    expect(root.firstElementChild.children[1].nodeName).toBe('SPAN');
+    expect(root.firstElementChild.children[2]).toBe(undefined);
   });
 });

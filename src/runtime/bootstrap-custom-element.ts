@@ -8,7 +8,7 @@ import { disconnectedCallback } from './disconnected-callback';
 import { forceUpdate, getHostRef, registerHost, styles, supportsShadow } from '@platform';
 import { proxyComponent } from './proxy-component';
 import { PROXY_FLAGS } from './runtime-constants';
-import {  patchPseudoShadowDom } from './dom-extras';
+import { patchCloneNode, patchPseudoShadowDom } from './dom-extras';
 
 export const defineCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
   customElements.define(compactMeta[1], proxyCustomElement(Cstr, compactMeta) as CustomElementConstructor);
@@ -40,6 +40,9 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
     (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && CMP_FLAGS.needsShadowDomShim)
   ) {
     patchPseudoShadowDom(Cstr.prototype);
+    if (BUILD.cloneNodeFix) {
+      patchCloneNode(Cstr.prototype);
+    }
   }
 
   const originalConnectedCallback = Cstr.prototype.connectedCallback;
