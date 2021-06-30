@@ -310,6 +310,18 @@ export declare function getRenderingRef(): any;
 
 export interface HTMLStencilElement extends HTMLElement {
   componentOnReady(): Promise<this>;
+  readonly __childNodes?: NodeListOf<Node>;
+  readonly __children?: HTMLCollectionOf<Element>;
+  readonly __childElementCount?: number;
+  __innerHTML?: string;
+  __innerText?: string;
+  __append?: (...nodes: (Node | string)[]) => void
+  __prepend?: (...nodes: (Node | string)[]) => void;
+  __appendChild?: <T extends Node>(newChild: T) => T;
+  __replaceChildren?: (...nodes: (Node | string)[]) => void
+  __insertAdjacentElement?: (position: InsertPosition, insertedElement: Element) => Element | null;
+  __insertAdjacentHTML?: (where: InsertPosition, html: string) => void;
+  __insertAdjacentText?: (where: InsertPosition, text: string) => void;
 }
 
 /**

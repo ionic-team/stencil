@@ -1526,6 +1526,21 @@ export interface RenderNode extends HostElement {
   ['s-sn']?: string;
 
   /**
+   * Is a slot fallback node
+   */
+  ['s-sf']?: boolean;
+
+  /**
+   * Slot has fallback nodes
+   */
+   ['s-hsf']?: boolean;
+
+  /**
+   * Slot fallback node text content
+   */
+   ['s-sfc']?: string;
+
+  /**
    * Host element tag name:
    * The tag name of the host element that this
    * node was created in.

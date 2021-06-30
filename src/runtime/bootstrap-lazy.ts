@@ -129,10 +129,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
       };
 
-      if (BUILD.cloneNodeFix) {
-        patchCloneNode(HostElement.prototype);
-      }
-
       if (
         !BUILD.hydrateServerSide && (
           (cmpMeta.$flags$ & CMP_FLAGS.hasSlotRelocation) ||
@@ -140,6 +136,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         )
       ) {
         patchPseudoShadowDom(HostElement.prototype);
+        if (BUILD.cloneNodeFix) {
+          patchCloneNode(HostElement.prototype);
+        }
       }
 
       if (BUILD.hotModuleReplacement) {
