@@ -20,7 +20,7 @@
     "karma.ie": "karma start karma.config.js --browsers=IE --single-run=false",
     "karma.edge": "karma start karma.config.js --browsers=Edge --single-run=false",
     "karma.webpack": "webpack-cli --config test-app/esm-webpack/webpack.config.js",
-    "start": "node ../../bin/stencil build --dev --watch --serve",
+    "start": "node ../../bin/stencil build --dev --watch --serve --es5",
     "tsc": "node ../../node_modules/typescript/lib/tsc -p tsconfig.json"
   },
   "devDependencies": {
