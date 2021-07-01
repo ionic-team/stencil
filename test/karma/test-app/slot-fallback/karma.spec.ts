@@ -35,7 +35,7 @@ describe('slot-fallback', () => {
     buttonChangeFallbackContent.click();
     await waitForChanges();
 
-    result = app.querySelector('.results1');
+    result = app.querySelector('.results1 div');
     expect(result.textContent).toBe('slot start fallback 1slot default fallback 1slot end fallback 1');
 
     result = app.querySelector('.results1 section');
@@ -63,7 +63,7 @@ describe('slot-fallback', () => {
     await waitForChanges();
 
     // fallback content is removed. Light dom is updated
-    result = app.querySelector('.results1');
+    result = app.querySelector('.results1 div');
     expect(result.textContent).toBe('slot light dom 1 : startslot light dom 1 : defaultslot light dom 1 : end');
 
     result = app.querySelector('.results1 content-start[slot="start"]');
@@ -80,7 +80,7 @@ describe('slot-fallback', () => {
     await waitForChanges();
 
     // fallback content should not be hidden
-    result = app.querySelector('.results1');
+    result = app.querySelector('.results1 div');
     expect(result.textContent).toBe('slot start fallback 2slot default fallback 2slot end fallback 2');
 
     result = app.querySelector('.results1 section');
@@ -105,7 +105,7 @@ describe('slot-fallback', () => {
     await waitForChanges();
 
     // fallback content should not be hidden
-    result = app.querySelector('.results1');
+    result = app.querySelector('.results1 div');
     expect(result.textContent).toBe('slot start fallback 3slot default fallback 3slot end fallback 3');
 
     result = app.querySelector('.results1 section');
@@ -129,7 +129,7 @@ describe('slot-fallback', () => {
     await waitForChanges();
 
     // fallback content is removed. Light dom is updated
-    result = app.querySelector('.results1');
+    result = app.querySelector('.results1 div');
     expect(result.textContent).toBe('slot light dom 2 : startslot light dom 2 : defaultslot light dom 2 : end');
 
     result = app.querySelector('.results1 content-start[slot="start"]');

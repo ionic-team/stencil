@@ -325,6 +325,7 @@ export interface HTMLStencilElement extends HTMLElement {
   readonly __childElementCount?: number;
   __innerHTML?: string;
   __innerText?: string;
+  __textContent?: string;
   __append?: (...nodes: (Node | string)[]) => void
   __prepend?: (...nodes: (Node | string)[]) => void;
   __appendChild?: <T extends Node>(newChild: T) => T;
