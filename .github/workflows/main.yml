@@ -30,6 +30,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Prettier dry-run
+        run: npm run prettier.dry-run
+        shell: bash
+
       - name: Build
         run: npm run build -- --ci
 
