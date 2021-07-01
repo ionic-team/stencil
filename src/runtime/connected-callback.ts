@@ -137,5 +137,6 @@ const setContentReference = (elm: d.HostElement) => {
   // content was first placed, which is useful later on
   const contentRefElm = (elm['s-cr'] = doc.createComment(BUILD.isDebug ? `content-ref (host=${elm.localName})` : '') as any);
   contentRefElm['s-cn'] = true;
-  elm.insertBefore(contentRefElm, elm.firstChild);
+  if (!!elm.firstChild) elm.insertBefore(contentRefElm, elm.firstChild);
+  else elm.appendChild(contentRefElm);
 };

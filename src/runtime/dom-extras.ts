@@ -1,8 +1,5 @@
 import type * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { HOST_FLAGS } from '@utils';
-import { PLATFORM_FLAGS } from './runtime-constants';
-import { plt, getHostRef } from '@platform';
 import { updateFallbackSlotVisibility } from './vdom/render-slot-fallback';
 
 export const patchCloneNode = (HostElementPrototype: any) => {
@@ -82,18 +79,15 @@ const patchChildSlotNodes = (HostElementPrototype: any) => {
 
   Object.defineProperty(HostElementPrototype, 'childNodes', {
     get() {
-      const childNodes = this.__childNodes;
-      if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0 && getHostRef(this).$flags$ & HOST_FLAGS.hasRendered) {
-        const result = new FakeNodeList();
-        for (let i = 0; i < childNodes.length; i++) {
-          const slot = childNodes[i]['s-nr'];
-          if (slot) {
-            result.push(slot);
-          }
+      const childNodes = this.__childNodes as d.RenderNode[];
+      const result = new FakeNodeList();
+      for (let i = 0; i < childNodes.length; i++) {
+        const slot = childNodes[i]['s-nr'];
+        if (slot) {
+          result.push(slot);
         }
-        return result;
       }
-      return FakeNodeList.from(childNodes);
+      return result;
     }
   });
 };
@@ -201,7 +195,9 @@ const patchSlotAppendChild = (HostElementPrototype: any) => {
     if (slotNode) {
       const slotPlaceholder: d.RenderNode = document.createTextNode('') as any;
       slotPlaceholder['s-nr'] = newChild;
-      ((slotNode['s-cr']).parentNode as any).__appendChild(slotPlaceholder);
+      if(slotNode['s-cr'].parentNode) {
+        (slotNode['s-cr'].parentNode as any).__appendChild(slotPlaceholder);
+      }
       newChild['s-ol'] = slotPlaceholder;
       patchNodeRemove(newChild);
 
@@ -231,7 +227,9 @@ const patchSlotPrepend = (HostElementPrototype: any) => {
       if (slotNode) {
         const slotPlaceholder: d.RenderNode = document.createTextNode('') as any;
         slotPlaceholder['s-nr'] = newChild;
-        ((slotNode['s-cr']).parentNode as any).__appendChild(slotPlaceholder);
+        if(slotNode['s-cr'].parentNode) {
+          (slotNode['s-cr'].parentNode as any).__appendChild(slotPlaceholder);
+        }
         newChild['s-ol'] = slotPlaceholder;
         patchNodeRemove(newChild);
 
