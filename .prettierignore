@@ -1,0 +1,55 @@
+# auto-generated dependencies list
+/dependencies.json
+
+# npm packages in the root of the project and subdirectories
+node_modules/
+
+# submodule packages
+/build/
+/cli/
+/compiler/
+/dev-server/
+/internal/
+/mock-doc/
+/sys/
+/testing/
+
+# shims that are attributed to external authors, and are minified out of the box
+/src/client/polyfills/core-js.js
+/src/client/polyfills/dom.js
+/src/client/polyfills/es5-html-element.js
+/src/client/polyfills/index.js
+/src/client/polyfills/system.js
+
+# project notes shared with the community
+/notes/
+
+# output of building various scripts that support the project
+/scripts/build/
+
+# these files are intentionally incomplete JavaScript files (they are parts of an Immediately Invoked Funciton
+# Expression (IIFE)). They act as a 'header' and 'footer' that get prepended and appended to the Stencil compiler.
+# Ignore them so Prettier doesn't fail and the 'prettier-ignore' pragma doesn't get put in the compiler output.
+/scripts/bundles/helpers/compiler-cjs-intro.js
+/scripts/bundles/helpers/compiler-cjs-outro.js
+
+# output from compiling Stencil projects for testing purposes
+test/**/dist/
+test/**/dist-react/
+test/**/hydrate/
+test/**/test-dist/
+test/**/www/
+test/**/components.d.ts
+test/end-to-end/screenshot/
+test/end-to-end/docs.d.ts
+test/end-to-end/docs.json
+
+# minified angular that exists in the test directory
+test/karma/test-app/assets/angular.min.js
+
+# generated screenshot files
+/screenshot/index.js
+/screenshot/package.json
+/screenshot/pixel-match.js
+/screenshot/*.d.ts
+
