@@ -62,6 +62,21 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       prototype.attributeChangedCallback = function (attrName: string, _oldValue: string, newValue: string) {
         plt.jmp(() => {
           const propName = attrNameToPropName.get(attrName);
+
+          // the attr changed callback runs prior to the connected callback where we have logic that also
+          // has similar logic in it to support lazy properties so if we attempt to unshadow in both places
+          // to cover the case where an attr was set inline on the non-upgrade element and then the property
+          // was programatically set which will be handled here or the case where the attr was not set in
+          // which case the connectedCallback will catch and unshadow.
+          // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
+          // we should think about whether or not we actually want to be reflecting the attributes to properties
+          // here given that this goes against best practices outlined here
+          // https://developers.google.com/web/fundamentals/web-components/best-practices#avoid-reentrancy
+          if (this.hasOwnProperty(propName)) {
+            newValue = this[propName];
+            delete this[propName];
+          }
+
           this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
         });
       };
