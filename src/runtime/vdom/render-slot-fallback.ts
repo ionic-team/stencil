@@ -15,6 +15,7 @@ const renderSlotFallbackContent = (sr: d.RenderNode, hide: boolean) => {
 
     if (n.nodeType === NODE_TYPE.ElementNode) {
       n.hidden = hide;
+      n.style.display = hide ? 'none' : '';
     } else if (!!n['s-sfc']) {
       if (hide) {
         n['s-sfc'] = n.textContent;
