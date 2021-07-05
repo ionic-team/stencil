@@ -773,8 +773,9 @@ describe('scoped slot', () => {
       html: `<fallback-test><span>Content</span></fallback-test>`,
     });
 
+    expect(root.firstElementChild.children[0].nodeName).toBe('P');
+    expect(root.firstElementChild.children[0].getAttribute('hidden')).toBe('');
     expect(root.firstElementChild.children[1].nodeName).toBe('SPAN');
-    expect(root.firstElementChild.children[2]).toBe(undefined);
   });
 
   it('should hide the slot\'s fallback content for a non-shadow component when slot content passed in', async () => {
@@ -795,7 +796,84 @@ describe('scoped slot', () => {
       html: `<fallback-test><span>Content</span></fallback-test>`,
     });
 
+    expect(root.firstElementChild.children[0].nodeName).toBe('P');
+    expect(root.firstElementChild.children[0].getAttribute('hidden')).toBe('');
     expect(root.firstElementChild.children[1].nodeName).toBe('SPAN');
-    expect(root.firstElementChild.children[2]).toBe(undefined);
+  });
+
+  it('should deal appropriately with deeply nested slots', async () => {
+    @Component({ tag: 'slots-in-slots-test', shadow: false })
+    class DeepNestedSlots {
+      render() {
+        return (
+          <div>
+            <slot name="content">
+              <slot name="before">DEFAULT BEFORE</slot>
+              <slot>DEFAULT CONTENT</slot>
+              <slot name="after">DEFAULT AFTER
+                <p><slot name="nested">NESTED</slot></p>
+              </slot>
+            </slot>
+          </div>
+        );
+      }
+    }
+    const { body } = await newSpecPage({
+      components: [DeepNestedSlots, DeepNestedSlots, DeepNestedSlots, DeepNestedSlots, DeepNestedSlots],
+      html: `
+      <slots-in-slots-test></slots-in-slots-test>
+      <slots-in-slots-test><span slot="content">hello</span></slots-in-slots-test>
+      <slots-in-slots-test><span slot="before">hello</span></slots-in-slots-test>
+      <slots-in-slots-test><span>hello</span></slots-in-slots-test>
+      <slots-in-slots-test><span slot="after">hello</span></slots-in-slots-test>
+      <slots-in-slots-test><span slot="nested">hello</span></slots-in-slots-test>
+      `,
+    });
+
+    expect(body.children[0].firstElementChild.childNodes[0].textContent).toBe('DEFAULT BEFORE');
+    expect(body.children[0].firstElementChild.childNodes[2].textContent).toBe('DEFAULT CONTENT');
+    expect(body.children[0].firstElementChild.childNodes[4].textContent).toBe('DEFAULT AFTER');
+    expect(body.children[0].firstElementChild.childNodes[5].nodeName).toBe('P');
+    expect(body.children[0].firstElementChild.childNodes[5].getAttribute('hidden')).toBe(null);
+    expect(body.children[0].firstElementChild.childNodes[5].textContent).toBe('NESTED');
+
+    expect(body.children[1].firstElementChild.childNodes[0].textContent).toBe('');
+    expect(body.children[1].firstElementChild.childNodes[2].textContent).toBe('');
+    expect(body.children[1].firstElementChild.childNodes[4].textContent).toBe('');
+    expect(body.children[1].firstElementChild.childNodes[5].nodeName).toBe('P');
+    expect(body.children[1].firstElementChild.childNodes[5].getAttribute('hidden')).toBe('');
+    expect(body.children[1].firstElementChild.childNodes[8].nodeName).toBe('SPAN');
+    expect(body.children[1].firstElementChild.childNodes[8].textContent).toBe('hello');
+
+    expect(body.children[2].firstElementChild.childNodes[0].textContent).toBe('');
+    expect(body.children[2].firstElementChild.childNodes[2].textContent).toBe('hello');
+    expect(body.children[2].firstElementChild.childNodes[3].textContent).toBe('DEFAULT CONTENT');
+    expect(body.children[2].firstElementChild.childNodes[5].textContent).toBe('DEFAULT AFTER');
+    expect(body.children[2].firstElementChild.childNodes[6].nodeName).toBe('P');
+    expect(body.children[2].firstElementChild.childNodes[6].getAttribute('hidden')).toBe(null);
+    expect(body.children[2].firstElementChild.childNodes[6].textContent).toBe('NESTED');
+
+    expect(body.children[3].firstElementChild.childNodes[0].textContent).toBe('DEFAULT BEFORE');
+    expect(body.children[3].firstElementChild.childNodes[2].textContent).toBe('');
+    expect(body.children[3].firstElementChild.childNodes[4].textContent).toBe('hello');
+    expect(body.children[3].firstElementChild.childNodes[5].textContent).toBe('DEFAULT AFTER');
+    expect(body.children[3].firstElementChild.childNodes[6].nodeName).toBe('P');
+    expect(body.children[3].firstElementChild.childNodes[6].getAttribute('hidden')).toBe(null);
+    expect(body.children[3].firstElementChild.childNodes[6].textContent).toBe('NESTED');
+
+    expect(body.children[4].firstElementChild.childNodes[0].textContent).toBe('DEFAULT BEFORE');
+    expect(body.children[4].firstElementChild.childNodes[2].textContent).toBe('DEFAULT CONTENT');
+    expect(body.children[4].firstElementChild.childNodes[4].textContent).toBe('');
+    expect(body.children[4].firstElementChild.childNodes[5].nodeName).toBe('P');
+    expect(body.children[4].firstElementChild.childNodes[5].getAttribute('hidden')).toBe('');
+    expect(body.children[4].firstElementChild.childNodes[5].textContent).toBe('NESTED');
+    expect(body.children[4].firstElementChild.childNodes[7].textContent).toBe('hello');
+
+    expect(body.children[5].firstElementChild.childNodes[0].textContent).toBe('DEFAULT BEFORE');
+    expect(body.children[5].firstElementChild.childNodes[2].textContent).toBe('DEFAULT CONTENT');
+    expect(body.children[5].firstElementChild.childNodes[4].textContent).toBe('DEFAULT AFTER');
+    expect(body.children[5].firstElementChild.childNodes[5].nodeName).toBe('P');
+    expect(body.children[5].firstElementChild.childNodes[5].getAttribute('hidden')).toBe(null);
+    expect(body.children[5].firstElementChild.childNodes[5].textContent).toBe('hello');
   });
 });
