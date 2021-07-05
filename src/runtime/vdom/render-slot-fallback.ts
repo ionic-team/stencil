@@ -5,8 +5,14 @@ import { patchNodeRemove } from '../dom-extras';
 const renderSlotFallbackContent = (sr: d.RenderNode, hide: boolean) => {
   if (!sr['s-hsf']) return;
   let n: d.RenderNode = sr;
-  while ((n = n.previousSibling as d.RenderNode)) {
-    if (!n['s-sf'] || n['s-sn'] !== sr['s-sn']) continue;
+
+  while ((n = (n.previousSibling || n.parentNode) as d.RenderNode) && (n.tagName !== sr['s-hn'])) {
+    if (n['s-sr'] && hide && n['s-psn'] && n['s-psn'] === sr['s-sn']) {
+      renderSlotFallbackContent(n, true);
+      continue;
+    }
+    if (n['s-sn'] !== sr['s-sn']) continue;
+
     if (n.nodeType === NODE_TYPE.ElementNode) {
       n.hidden = hide;
     } else if (!!n['s-sfc']) {
@@ -54,7 +60,7 @@ export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
             patchNodeRemove(childNodes[j]);
             break;
           }
-        } else {
+        } else if (childNodes[j]['s-sn'] === slotNameAttr) {
           // this is a default fallback slot node
           // any element or text node (with content)
           // should hide the default fallback slot node

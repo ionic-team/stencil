@@ -97,7 +97,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
         // return node could have been null
         if (childNode) {
           // append our new node
-          elm.appendChild(childNode);
+          elm.__appendChild ? elm.__appendChild(childNode) : elm.appendChild(childNode);
         }
       }
     }
@@ -126,14 +126,19 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // remember the slot name, or empty string for default slot
       elm['s-sn'] = newVNode.$name$ || '';
 
+      if (newParentVNode.$name$) elm['s-psn'] = newParentVNode.$name$;
+
       if (newVNode.$flags$ & VNODE_FLAGS.isSlotFallback) {
         if (newVNode.$children$) {
           for (i = 0; i < newVNode.$children$.length; ++i) {
             // create the node
-            childNode = createElm(oldParentVNode, newVNode, i, elm);
+            let containerElm = elm.nodeType === 1 ? elm : parentElm;
+            while(containerElm.nodeType !== 1) {
+              containerElm = containerElm.parentNode as d.RenderNode;
+            }
+            childNode = createElm(oldParentVNode, newVNode, i, containerElm);
             childNode['s-sf'] = elm['s-hsf'] = true;
-            childNode['s-sn'] = newVNode.$name$ || '';
-
+            if (typeof childNode['s-sn'] === 'undefined') childNode['s-sn'] = newVNode.$name$ || '';
             if (childNode.nodeType === NODE_TYPE.TextNode) {
               childNode['s-sfc'] = childNode.textContent;
             }
@@ -141,7 +146,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
             // return node could have been null
             if (childNode) {
               // append our new node
-              parentElm.appendChild(childNode);
+              containerElm.__appendChild ?  containerElm.__appendChild(childNode) : containerElm.appendChild(childNode);
             }
           }
         }
