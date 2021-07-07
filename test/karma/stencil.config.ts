@@ -35,15 +35,13 @@ export const config: Config = {
   ],
   buildEs5: true,
   extras: {
-    appendChildSlotFix: true,
     cloneNodeFix: true,
     cssVarsShim: true,
     dynamicImportShim: true,
     lifecycleDOMEvents: true,
     safari10: true,
     scriptDataOpts: true,
-    shadowDomShim: true,
-    slotChildNodesFix: true,
+    shadowDomShim: true
   },
   devServer: {
     historyApiFallback: {
