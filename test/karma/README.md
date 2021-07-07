@@ -1,7 +1,11 @@
 # Karma Testing
 
-Karma can be used to test final rendered output on various browsers and operating systems. Use this process to recreate issues and test/fix them within browsers. Tests are then locked-in and re-validated with [BrowserStack](https://www.browserstack.com/) on every Github commit against the browsers which Stencil supports (ie11+).
+Karma can be used to test final rendered output on various browsers and operating systems. Use this process to recreate
+issues and test/fix them within browsers. Tests are then locked-in and re-validated with 
+[BrowserStack](https://www.browserstack.com/) on every Github commit against the browsers which Stencil supports
+(ie11+).
 
+To run any tests in this directory:
 1. `cd` to `test/karma`
 2. `npm install`
 
