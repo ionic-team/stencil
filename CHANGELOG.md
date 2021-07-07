@@ -1,3 +1,10 @@
+# 🕹 [2.7.0-0](https://github.com/ionic-team/stencil/compare/v2.6.0...v2.7.0-0) (2021-07-07)
+
+### Bug Fixes
+
+* **runtime:** prevent shadowing on non-upgraded components ([#2949](https://github.com/ionic-team/stencil/issues/2949)) ([afbd129](https://github.com/ionic-team/stencil/commit/afbd129be49d636a09c986e97ae85e3f9cf5080c))
+* **testing:** puppeteer v10 support ([#2939](https://github.com/ionic-team/stencil/issues/2939)) ([09afd3f](https://github.com/ionic-team/stencil/commit/09afd3fed1ad1c294d6c1677c038287212b721d2))
+
 # 📟 [2.6.0](https://github.com/ionic-team/stencil/compare/v2.6.0-0...v2.6.0) (2021-06-02)
 
 ### Features
