@@ -3,13 +3,14 @@ import builtins from 'rollup-plugin-node-builtins';
 import linaria from 'linaria/rollup';
 import css from 'rollup-plugin-css-only';
 import { reactOutputTarget } from '@stencil/react-output-target';
+import { sass } from '@stencil/sass';
 import path from 'path';
 
 export const config: Config = {
   namespace: 'EndToEnd',
   globalScript: './src/global.ts',
   globalStyle: './src/global.css',
-  plugins: [builtins()],
+  plugins: [builtins(), sass()],
   rollupPlugins: {
     after: [
       linaria(),
@@ -23,6 +24,9 @@ export const config: Config = {
     moduleNameMapper: {
       'lodash-es': 'lodash',
     },
+    transformIgnorePatterns: [
+      "node_modules/(?!(ionic-git)/)"
+    ]
   },
   outputTargets: [
     {

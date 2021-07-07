@@ -4,9 +4,16 @@ declare type CustomMethodDecorator<T> = (
   descriptor: TypedPropertyDescriptor<T>,
 ) => TypedPropertyDescriptor<T> | void;
 
+declare type MixinType = { new(...args: any[]): any; }
+
 export interface ComponentDecorator {
   (opts?: ComponentOptions): ClassDecorator;
 }
+
+export interface MixinDecorator {
+  (arg0: MixinType): ClassDecorator
+}
+
 export interface ComponentOptions {
   /**
    * Tag name of the web component. Ideally, the tag name must be globally unique,
@@ -188,6 +195,12 @@ export declare const Env: {[prop: string]: string | undefined};
  * https://stenciljs.com/docs/component
  */
 export declare const Component: ComponentDecorator;
+
+/**
+ * JS class identifier, the content of which will be mixed-in within this component when compiled;
+ * similar in behaviour to extending from a base class. To correctly type the class use an interface. e.g. `export interface MyComponent extends BaseComponent {}`
+ */
+export declare const Mixin: MixinDecorator;
 
 /**
  * The `@Element()` decorator is a reference to the actual host element

@@ -1,17 +1,22 @@
 import type * as d from '../../../declarations';
 import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE } from './decorators-constants';
+import { mixinClassMembers, hasMixins, mixinStatements, VisitedFiles, FoundMixins } from './mixin-decorator';
 import { componentDecoratorToStatic } from './component-decorator';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
 import { listenDecoratorsToStatic } from './listen-decorator';
 import { isDecoratorNamed } from './decorator-utils';
+import { cloneNode } from '../transform-utils';
 import { methodDecoratorsToStatic, validateMethods } from './method-decorator';
 import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
 import ts from 'typescript';
 
-export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker): ts.TransformerFactory<ts.SourceFile> => {
+const visitedFiles: VisitedFiles = new Map();
+const allMixins: FoundMixins = new Map();
+
+export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, compilerHost?: ts.CompilerHost): ts.TransformerFactory<ts.SourceFile> => {
   return transformCtx => {
     const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
@@ -21,10 +26,27 @@ export const convertDecoratorsToStatic = (config: d.Config, diagnostics: d.Diagn
     };
 
     return tsSourceFile => {
-      return ts.visitEachChild(tsSourceFile, visit, transformCtx);
+      const sourceFile = visitSourceFile(tsSourceFile, diagnostics, compilerHost);
+      return ts.visitEachChild(sourceFile, visit, transformCtx);
     };
   };
 };
+
+export const visitSourceFile = (sourceNode: ts.SourceFile, diagnostics: d.Diagnostic[], compilerHost?: ts.CompilerHost) => {
+  visitedFiles.set(sourceNode.fileName, sourceNode);
+  const mixinsFound = hasMixins(sourceNode, diagnostics, visitedFiles, compilerHost);
+  if (!mixinsFound) {
+    return sourceNode;
+  }
+
+  const statements = mixinStatements(sourceNode, mixinsFound, diagnostics);
+  allMixins.set(sourceNode.fileName, mixinsFound);
+
+  return ts.factory.updateSourceFile(
+    sourceNode,
+    statements,
+  );
+}
 
 export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, classNode: ts.ClassDeclaration) => {
   if (!classNode.decorators) {
@@ -36,7 +58,7 @@ export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnosti
     return classNode;
   }
 
-  const classMembers = classNode.members;
+  const classMembers = mixinClassMembers(classNode, allMixins);
   const decoratedMembers = classMembers.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
   const newMembers = removeStencilDecorators(Array.from(classMembers));
 
@@ -57,14 +79,14 @@ export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnosti
 
   validateMethods(diagnostics, classMembers);
 
-  return ts.updateClassDeclaration(
+  return ts.factory.updateClassDeclaration(
     classNode,
     removeDecorators(classNode, CLASS_DECORATORS_TO_REMOVE),
     classNode.modifiers,
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    newMembers,
+    newMembers.map(member => cloneNode(member)),
   );
 };
 

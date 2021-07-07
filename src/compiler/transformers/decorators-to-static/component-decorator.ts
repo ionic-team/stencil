@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, validateComponentTag, isString, buildWarn } from '@utils';
-import { getDeclarationParameters } from './decorator-utils';
+import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { styleToStatic } from './style-to-static';
 import ts from 'typescript';
@@ -86,12 +86,13 @@ const validateComponent = (
   }
 
   // check if class has more than one decorator
-  const otherDecorator = cmpNode.decorators && cmpNode.decorators.find(d => d !== componentDecorator);
-  if (otherDecorator) {
+  const mixinDecs = cmpNode.decorators && cmpNode.decorators.filter(isDecoratorNamed('Mixin'));
+  const otherDecorator = cmpNode.decorators && cmpNode.decorators.filter(d => (d !== componentDecorator && !mixinDecs.includes(d)));
+  if (otherDecorator.length) {
     const err = buildError(diagnostics);
     err.messageText = `Classes decorated with @Component can not be decorated with more decorators.
     Stencil performs extensive static analysis on top of your components in order to generate the necessary metadata, runtime decorators at the components level make this task very hard.`;
-    augmentDiagnosticWithNode(err, otherDecorator);
+    augmentDiagnosticWithNode(err, otherDecorator[0]);
     return false;
   }
 

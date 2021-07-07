@@ -2,6 +2,7 @@ import type * as d from '../../../declarations';
 import { addComponentMetaStatic } from '../add-component-meta-static';
 import { dirname, isAbsolute, join, relative } from 'path';
 import { normalizePath, unique } from '@utils';
+import { parseStaticMixins } from './mixins';
 import { parseStaticMethods } from './methods';
 import { parseStaticListeners } from './listeners';
 import { parseClassMethods } from './class-methods';
@@ -60,6 +61,7 @@ export const parseStaticComponentMeta = (
     legacyContext: getStaticValue(staticMembers, 'contextProps') || [],
     internal: isInternal(docs),
     assetsDirs: parseAssetsDirs(staticMembers, moduleFile.jsFilePath),
+    mixinFilePaths: parseStaticMixins(staticMembers, moduleFile),
     styleDocs: [],
     docs,
     jsFilePath: moduleFile.jsFilePath,
