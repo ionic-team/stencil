@@ -63,15 +63,39 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         plt.jmp(() => {
           const propName = attrNameToPropName.get(attrName);
 
-          // the attr changed callback runs prior to Stencil's connectedCallback, which may also attempt to
-          //  unshadow lazy properties. If we attempt to unshadow in both places
-          // to cover the case where an attr was set inline on the non-upgraded element and then the property
-          // was programmatically set which will be handled here or the case where the attr was not set in
-          // which case the connectedCallback will catch and unshadow.
-          // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
-          // we should think about whether or not we actually want to be reflecting the attributes to properties
-          // here given that this goes against best practices outlined here
-          // https://developers.google.com/web/fundamentals/web-components/best-practices#avoid-reentrancy
+          //  In a webcomponent lifecyle the attributeChangedCallback runs prior to connectedCallback
+          //  in the case where an attribute was set inline.
+          //  ```html
+          //    <my-component some-attribute="some-value"></my-component>
+          //  ```
+          //
+          //  There is an edge case where a developer sets the attribute inline on a custom element and then programatically
+          //  changes it before it has been upgraded as shown below:
+          //
+          //  ```html
+          //    <!-- this component has _not_ been upgraded yet -->
+          //    <my-component id="test" some-attribute="some-value"></my-component>
+          //    <script>
+          //      // grab non-upgraded component
+          //      el = document.querySelector("#test");
+          //      el.someAttribute = "another-value";
+          //      // upgrade component
+          //      cutsomElements.define('my-component', MyComponent);
+          //    </script>
+          //  ```
+          //  In this case if we do not unshadow here and use the value of the shadowing property attributeChangedCallback
+          //  will be called with `newValue = "some-value"` and will set the shadowed property (this.someAttribute = "another-value"
+          //  to the value that was set inline i.e. "some-value" from above example and when
+          //  the connectedCallback attempts to unshadow it will use "some-value" as the intial value rather than "another-value"
+          //
+          //  The case where the attribute was NOT set inline but was not set programmatically shall be handled/unshadowed
+          //  by connectedCallback as this attributeChangedCallback will not fire.
+          //
+          //  https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
+          //
+          //  TODO(STENCIL-16) we should think about whether or not we actually want to be reflecting the attributes to
+          //  properties here given that this goes against best practices outlined here
+          //  https://developers.google.com/web/fundamentals/web-components/best-practices#avoid-reentrancy
           if (this.hasOwnProperty(propName)) {
             newValue = this[propName];
             delete this[propName];
