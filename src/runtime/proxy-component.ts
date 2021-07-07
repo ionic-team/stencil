@@ -83,8 +83,8 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           //      cutsomElements.define('my-component', MyComponent);
           //    </script>
           //  ```
-          //  In this case if we do not unshadow here and use the value of the shadowing property attributeChangedCallback
-          //  will be called with `newValue = "some-value"` and will set the shadowed property (this.someAttribute = "another-value"
+          //  In this case if we do not unshadow here and use the value of the shadowing property, attributeChangedCallback
+          //  will be called with `newValue = "some-value"` and will set the shadowed property (this.someAttribute = "another-value")
           //  to the value that was set inline i.e. "some-value" from above example and when
           //  the connectedCallback attempts to unshadow it will use "some-value" as the intial value rather than "another-value"
           //
