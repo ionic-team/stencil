@@ -85,7 +85,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           //  ```
           //  In this case if we do not unshadow here and use the value of the shadowing property, attributeChangedCallback
           //  will be called with `newValue = "some-value"` and will set the shadowed property (this.someAttribute = "another-value")
-          //  to the value that was set inline i.e. "some-value" from above example and when
+          //  to the value that was set inline i.e. "some-value" from above example. When
           //  the connectedCallback attempts to unshadow it will use "some-value" as the intial value rather than "another-value"
           //
           //  The case where the attribute was NOT set inline but was not set programmatically shall be handled/unshadowed
