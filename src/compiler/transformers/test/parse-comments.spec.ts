@@ -56,6 +56,8 @@ describe('parse comments', () => {
       reflect: false,
       required: false,
       type: 'string',
+      getter: false,
+      setter: false,
     });
     expect(t.method).toEqual({
       complexType: {

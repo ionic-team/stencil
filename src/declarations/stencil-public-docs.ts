@@ -64,6 +64,8 @@ export interface JsonDocsProp {
   values: JsonDocsValue[];
   optional: boolean;
   required: boolean;
+  getter: boolean;
+  setter: boolean;
 }
 
 export interface JsonDocsMethod {

@@ -40,19 +40,47 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
           delete (elm as any)[memberName];
         }
 
-        // create the getter/setter on the host element for this property name
-        Object.defineProperty(elm, memberName, {
-          get(this: d.RuntimeRef) {
-            // proxyComponent, get value
-            return getValue(this, memberName);
-          },
-          set(this: d.RuntimeRef, newValue) {
-            // proxyComponent, set value
-            setValue(this, memberName, newValue, cmpMeta);
-          },
-          configurable: true,
-          enumerable: true,
-        });
+        if ((memberFlags & MEMBER_FLAGS.Getter) === 0) {
+          // create the getter/setter on the host element for this property name
+          Object.defineProperty(elm, memberName, {
+            get(this: d.RuntimeRef) {
+              // proxyComponent, get value
+              return getValue(this, memberName);
+            },
+            set(this: d.RuntimeRef, newValue) {
+              // proxyComponent, set value
+              setValue(this, memberName, newValue, cmpMeta);
+            },
+            configurable: true,
+            enumerable: true,
+          });
+        } else {
+          // lazy maps the element get / set to the class get / set
+          // proxyComponent - lazy prop getter
+          Object.defineProperty(elm, memberName, {
+            get(this: d.RuntimeRef) {
+              const ref = getHostRef(this);
+              return ref.$lazyInstance$[memberName];
+            },
+            configurable: true,
+            enumerable: true,
+          });
+          if (memberFlags & MEMBER_FLAGS.Setter) {
+            // proxyComponent - lazy prop setter
+            Object.defineProperty(elm, memberName, {
+              set(this: d.RuntimeRef, newValue) {
+                const ref = getHostRef(this);
+                const setVal = (init = false) => {
+                  ref.$lazyInstance$[memberName] = newValue;
+                  setValue(this, memberName, ref.$lazyInstance$[memberName], cmpMeta, !init);
+                };
+                // If there's a value from an attribute, (before the class is defined), queue & set async
+                if (ref.$lazyInstance$) { setVal(); }
+                else { ref.$onInstancePromise$.then(() => setVal(true)); }
+              }
+            })
+          }
+        }
       } else if (memberFlags & MEMBER_FLAGS.Method) {
         Object.defineProperty(elm, memberName, {
           value(this: d.HostElement) {

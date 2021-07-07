@@ -18,6 +18,7 @@ export class AttributeBasicRoot {
     cmp.setAttribute('single', 'single-update');
     cmp.setAttribute('multi-word', 'multiWord-update');
     cmp.setAttribute('my-custom-attr', 'my-custom-attr-update');
+    cmp.setAttribute('getter', 'getter-update');
   }
 
   render() {
