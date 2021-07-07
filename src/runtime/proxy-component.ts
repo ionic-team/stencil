@@ -66,7 +66,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           // the attr changed callback runs prior to Stencil's connectedCallback, which may also attempt to
           //  unshadow lazy properties. If we attempt to unshadow in both places
           // to cover the case where an attr was set inline on the non-upgraded element and then the property
-          // was programatically set which will be handled here or the case where the attr was not set in
+          // was programmatically set which will be handled here or the case where the attr was not set in
           // which case the connectedCallback will catch and unshadow.
           // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
           // we should think about whether or not we actually want to be reflecting the attributes to properties
