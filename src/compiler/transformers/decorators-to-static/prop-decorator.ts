@@ -31,7 +31,12 @@ export const propDecoratorsToStatic = (
   }
 };
 
-const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, watchable: Set<string>) => {
+const parsePropDecorator = (
+  diagnostics: d.Diagnostic[],
+  typeChecker: ts.TypeChecker,
+  prop: ts.PropertyDeclaration,
+  watchable: Set<string>,
+) => {
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
@@ -44,7 +49,8 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
 
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);
-    err.messageText = 'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
+    err.messageText =
+      'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
     augmentDiagnosticWithNode(err, prop.modifiers[0]);
   }
 
@@ -113,7 +119,11 @@ const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, pr
   return false;
 };
 
-const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration, type: ts.Type): d.ComponentCompilerPropertyComplexType => {
+const getComplexType = (
+  typeChecker: ts.TypeChecker,
+  node: ts.PropertyDeclaration,
+  type: ts.Type,
+): d.ComponentCompilerPropertyComplexType => {
   const nodeType = node.type;
   return {
     original: nodeType ? nodeType.getText() : typeToString(typeChecker, type),

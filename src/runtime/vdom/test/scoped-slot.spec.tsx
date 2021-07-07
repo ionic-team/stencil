@@ -281,8 +281,12 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('CAMEL');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('OWL');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('DINGO');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
+    expect(
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName,
+    ).toBe('DINGO');
+    expect(
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent,
+    ).toBe('parent message');
 
     forceUpdate(root);
     await waitForChanges();
@@ -291,8 +295,12 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('CAMEL');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('OWL');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('DINGO');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
+    expect(
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName,
+    ).toBe('DINGO');
+    expect(
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent,
+    ).toBe('parent message');
   });
 
   it('should render conditional content into a nested default slot', async () => {
@@ -389,7 +397,9 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('CHIPMUNK');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('BEAR');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
+    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe(
+      'parent message',
+    );
 
     root.msg = 'change 1';
     await waitForChanges();
@@ -647,8 +657,12 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
     expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('TEST-2');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOAT');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('1');
+    expect(
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName,
+    ).toBe('GOAT');
+    expect(
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent,
+    ).toBe('1');
 
     forceUpdate(root);
     await waitForChanges();
@@ -657,8 +671,12 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
     expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('TEST-2');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOAT');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('2');
+    expect(
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName,
+    ).toBe('GOAT');
+    expect(
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent,
+    ).toBe('2');
 
     forceUpdate(root);
     await waitForChanges();
@@ -667,8 +685,12 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
     expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('TEST-2');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOAT');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('3');
+    expect(
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName,
+    ).toBe('GOAT');
+    expect(
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent,
+    ).toBe('3');
   });
 
   it('should allow nested default slots w/ default slot content', async () => {
@@ -756,7 +778,7 @@ describe('scoped slot', () => {
     // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].textContent).toBe('hey goat!');
   });
 
-  it('should hide the slot\'s fallback content for a scoped component when slot content passed in', async () => {
+  it("should hide the slot's fallback content for a scoped component when slot content passed in", async () => {
     @Component({ tag: 'fallback-test', scoped: true })
     class ScopedFallbackSlotTest {
       render() {
@@ -778,7 +800,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.children[1]).toHaveAttribute('hidden');
   });
 
-  it('should hide the slot\'s fallback content for a non-shadow component when slot content passed in', async () => {
+  it("should hide the slot's fallback content for a non-shadow component when slot content passed in", async () => {
     @Component({ tag: 'fallback-test', shadow: false })
     class NonShadowFallbackSlotTest {
       render() {

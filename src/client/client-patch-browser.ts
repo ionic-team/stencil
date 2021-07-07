@@ -31,7 +31,9 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   const scriptElm =
     BUILD.scriptDataOpts || BUILD.safari10 || BUILD.dynamicImportShim
       ? Array.from(doc.querySelectorAll('script')).find(
-          s => new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) || s.getAttribute('data-stencil-namespace') === NAMESPACE,
+          s =>
+            new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) ||
+            s.getAttribute('data-stencil-namespace') === NAMESPACE,
         )
       : null;
   const importMeta = import.meta.url;
@@ -55,7 +57,10 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   if (!BUILD.safari10 && importMeta !== '') {
     opts.resourcesUrl = new URL('.', importMeta).href;
   } else if (BUILD.dynamicImportShim || BUILD.safari10) {
-    opts.resourcesUrl = new URL('.', new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href)).href;
+    opts.resourcesUrl = new URL(
+      '.',
+      new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href),
+    ).href;
     if (BUILD.dynamicImportShim) {
       patchDynamicImport(opts.resourcesUrl, scriptElm);
     }
@@ -89,7 +94,11 @@ const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
         const script = doc.createElement('script');
         script.type = 'module';
         script.crossOrigin = orgScriptElm.crossOrigin;
-        script.src = URL.createObjectURL(new Blob([`import * as m from '${url}'; window.${importFunctionName}.m = m;`], { type: 'application/javascript' }));
+        script.src = URL.createObjectURL(
+          new Blob([`import * as m from '${url}'; window.${importFunctionName}.m = m;`], {
+            type: 'application/javascript',
+          }),
+        );
         mod = new Promise(resolve => {
           script.onload = () => {
             resolve((win as any)[importFunctionName].m);

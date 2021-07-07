@@ -1,12 +1,22 @@
 import type * as d from '../../../declarations';
-import { COMMON_DIR_FILENAMES, getCommonDirName, getPackageDirPath, isCommonDirModuleFile, shouldFetchModule } from './resolve-utils';
+import {
+  COMMON_DIR_FILENAMES,
+  getCommonDirName,
+  getPackageDirPath,
+  isCommonDirModuleFile,
+  shouldFetchModule,
+} from './resolve-utils';
 import { basename, dirname } from 'path';
 import { fetchModuleAsync } from '../fetch/fetch-module-async';
 import { getCommonDirUrl, getNodeModuleFetchUrl, packageVersions } from '../fetch/fetch-utils';
 import { isString, normalizeFsPath, normalizePath } from '@utils';
 import resolve, { AsyncOpts } from 'resolve';
 
-export const resolveModuleIdAsync = (sys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, opts: d.ResolveModuleIdOptions) => {
+export const resolveModuleIdAsync = (
+  sys: d.CompilerSystem,
+  inMemoryFs: d.InMemoryFileSystem,
+  opts: d.ResolveModuleIdOptions,
+) => {
   const resolverOpts: AsyncOpts = createCustomResolverAsync(sys, inMemoryFs, opts.exts);
   resolverOpts.basedir = dirname(normalizeFsPath(opts.containingFile));
 
@@ -39,7 +49,11 @@ export const resolveModuleIdAsync = (sys: d.CompilerSystem, inMemoryFs: d.InMemo
   });
 };
 
-export const createCustomResolverAsync = (sys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, exts: string[]): any => {
+export const createCustomResolverAsync = (
+  sys: d.CompilerSystem,
+  inMemoryFs: d.InMemoryFileSystem,
+  exts: string[],
+): any => {
   return {
     async isFile(filePath: string, cb: (err: any, isFile: boolean) => void) {
       const fsFilePath = normalizeFsPath(filePath);

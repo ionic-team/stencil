@@ -6,7 +6,12 @@ import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } 
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 import ts from 'typescript';
 
-export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, tsSys: ts.System) => {
+export const patchTsSystemFileSystem = (
+  config: d.Config,
+  stencilSys: d.CompilerSystem,
+  inMemoryFs: d.InMemoryFileSystem,
+  tsSys: ts.System,
+) => {
   const realpath = (path: string) => {
     const rp = stencilSys.realpathSync(path);
     if (isString(rp)) {
@@ -78,7 +83,17 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
 
   tsSys.readDirectory = (path, extensions, exclude, include, depth) => {
     const cwd = stencilSys.getCurrentDirectory();
-    return (ts as any).matchFiles(path, extensions, exclude, include, IS_CASE_SENSITIVE_FILE_NAMES, cwd, depth, getAccessibleFileSystemEntries, realpath);
+    return (ts as any).matchFiles(
+      path,
+      extensions,
+      exclude,
+      include,
+      IS_CASE_SENSITIVE_FILE_NAMES,
+      cwd,
+      depth,
+      getAccessibleFileSystemEntries,
+      realpath,
+    );
   };
 
   tsSys.readFile = p => {
@@ -187,7 +202,11 @@ export const getTypescriptPathFromUrl = (config: d.Config, tsExecutingUrl: strin
   const tsBaseUrl = new URL('..', tsExecutingUrl).href;
   if (url.startsWith(tsBaseUrl)) {
     const tsFilePath = url.replace(tsBaseUrl, '/');
-    const tsNodePath = config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId: '@stencil/core', path: tsFilePath });
+    const tsNodePath = config.sys.getLocalModulePath({
+      rootDir: config.rootDir,
+      moduleId: '@stencil/core',
+      path: tsFilePath,
+    });
     return normalizePath(tsNodePath);
   }
   return url;

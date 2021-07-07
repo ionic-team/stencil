@@ -17,7 +17,7 @@ export const optimizeCss = async (inputOpts: OptimizeCssInput) => {
   if (inputOpts.minify !== false) {
     result.output = await minifyCss({
       css: result.output,
-      resolveUrl: inputOpts.resolveUrl
+      resolveUrl: inputOpts.resolveUrl,
     });
   }
   return result;

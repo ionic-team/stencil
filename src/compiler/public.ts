@@ -57,7 +57,9 @@ export declare const transpileSync: (code: string, opts?: TranspileOptions) => T
  */
 export declare const createCompiler: (config: Config) => Promise<Compiler>;
 
-export declare const createPrerenderer: (config: Config) => Promise<{ start: (opts: PrerenderStartOptions) => Promise<PrerenderResults> }>;
+export declare const createPrerenderer: (
+  config: Config,
+) => Promise<{ start: (opts: PrerenderStartOptions) => Promise<PrerenderResults> }>;
 
 /**
  * The compiler uses a `CompilerSystem` instance to access any file system reads and writes.

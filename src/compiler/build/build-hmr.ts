@@ -113,7 +113,13 @@ const getComponentsUpdated = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
   return tags.sort();
 };
 
-const addTsFileImporters = (allModuleFiles: d.Module[], filesToLookForImporters: string[], checkedFiles: Set<string>, changedScriptFiles: string[], scriptFile: string) => {
+const addTsFileImporters = (
+  allModuleFiles: d.Module[],
+  filesToLookForImporters: string[],
+  checkedFiles: Set<string>,
+  changedScriptFiles: string[],
+  scriptFile: string,
+) => {
   if (!changedScriptFiles.includes(scriptFile)) {
     // add it to our list of files to transpile
     changedScriptFiles.push(scriptFile);

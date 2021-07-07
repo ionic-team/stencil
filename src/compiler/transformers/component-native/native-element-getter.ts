@@ -6,6 +6,15 @@ export const addNativeElementGetter = (classMembers: ts.ClassElement[], cmp: d.C
   // is transformed into:
   // get element() { return this; }
   if (cmp.elementRef) {
-    classMembers.push(ts.createGetAccessor(undefined, undefined, cmp.elementRef, [], undefined, ts.createBlock([ts.createReturn(ts.createThis())])));
+    classMembers.push(
+      ts.createGetAccessor(
+        undefined,
+        undefined,
+        cmp.elementRef,
+        [],
+        undefined,
+        ts.createBlock([ts.createReturn(ts.createThis())]),
+      ),
+    );
   }
 };

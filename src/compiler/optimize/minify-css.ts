@@ -1,9 +1,9 @@
-import { CssNode, CssNodeType } from '../style/css-parser/css-parse-declarations'
+import { CssNode, CssNodeType } from '../style/css-parser/css-parse-declarations';
 import { hasError, isFunction, isString } from '@utils';
 import { parseCss } from '../style/css-parser/parse-css';
 import { serializeCss } from '../style/css-parser/serialize-css';
 
-export const minifyCss = async (input: { css: string, resolveUrl?: (url: string) => Promise<string> | string; }) => {
+export const minifyCss = async (input: { css: string; resolveUrl?: (url: string) => Promise<string> | string }) => {
   const parseResults = parseCss(input.css);
 
   if (hasError(parseResults.diagnostics)) {
@@ -16,7 +16,11 @@ export const minifyCss = async (input: { css: string, resolveUrl?: (url: string)
   return serializeCss(parseResults.stylesheet, {});
 };
 
-const resolveStylesheetUrl = async (nodes: CssNode[], resolveUrl: (url: string) => Promise<string> | string, resolved: Map<string, string>) => {
+const resolveStylesheetUrl = async (
+  nodes: CssNode[],
+  resolveUrl: (url: string) => Promise<string> | string,
+  resolved: Map<string, string>,
+) => {
   for (const node of nodes) {
     if (node.type === CssNodeType.Declaration && isString(node.value) && node.value.includes('url(')) {
       const urlSplt = node.value.split(',').map(n => n.trim());
@@ -43,4 +47,3 @@ const resolveStylesheetUrl = async (nodes: CssNode[], resolveUrl: (url: string) 
     }
   }
 };
-

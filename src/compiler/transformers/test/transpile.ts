@@ -89,7 +89,10 @@ export function transpileModule(
 
   tsProgram.emit(undefined, undefined, undefined, undefined, {
     before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker), ...beforeTransformers],
-    after: [convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts), ...afterTransformers],
+    after: [
+      convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts),
+      ...afterTransformers,
+    ],
   });
 
   while (outputText.includes('  ')) {

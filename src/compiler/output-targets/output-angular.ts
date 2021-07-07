@@ -14,12 +14,19 @@ export const outputAngular = async (config: d.Config, compilerCtx: d.CompilerCtx
   }
 
   const timespan = buildCtx.createTimeSpan(`generate angular proxies started`, true);
-  await Promise.all(angularOutputTargets.map(outputTarget => angularDirectiveProxyOutput(config, compilerCtx, buildCtx, outputTarget)));
+  await Promise.all(
+    angularOutputTargets.map(outputTarget => angularDirectiveProxyOutput(config, compilerCtx, buildCtx, outputTarget)),
+  );
 
   timespan.finish(`generate angular proxies finished`);
 };
 
-export const angularDirectiveProxyOutput = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetAngular) => {
+export const angularDirectiveProxyOutput = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  outputTarget: d.OutputTargetAngular,
+) => {
   const filteredComponents = getFilteredComponents(outputTarget.excludeComponents, buildCtx.components);
 
   return Promise.all([
@@ -33,7 +40,13 @@ const getFilteredComponents = (excludeComponents: string[] = [], cmps: d.Compone
   return sortBy(cmps, cmp => cmp.tagName).filter(c => !excludeComponents.includes(c.tagName) && !c.internal);
 };
 
-const generateProxies = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular) => {
+const generateProxies = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  components: d.ComponentCompilerMeta[],
+  outputTarget: d.OutputTargetAngular,
+) => {
   const proxies = getProxies(components);
   const distTypesDir = dirname(buildCtx.packageJson.types);
   const dtsFilePath = join(config.rootDir, distTypesDir, GENERATED_DTS);
@@ -88,7 +101,11 @@ const getProxy = (cmpMeta: d.ComponentCompilerMeta) => {
   const hasOutputs = outputs.length > 0;
 
   // Generate Angular @Directive
-  const directiveOpts = [`selector: \'${cmpMeta.tagName}\'`, `changeDetection: ChangeDetectionStrategy.OnPush`, `template: '<ng-content></ng-content>'`];
+  const directiveOpts = [
+    `selector: \'${cmpMeta.tagName}\'`,
+    `changeDetection: ChangeDetectionStrategy.OnPush`,
+    `template: '<ng-content></ng-content>'`,
+  ];
   if (inputs.length > 0) {
     directiveOpts.push(`inputs: ['${inputs.join(`', '`)}']`);
   }
@@ -121,7 +138,10 @@ export class ${tagNameAsPascal} {`,
 };
 
 const getInputs = (cmpMeta: d.ComponentCompilerMeta): string[] => {
-  return [...cmpMeta.properties.filter(prop => !prop.internal).map(prop => prop.name), ...cmpMeta.virtualProperties.map(prop => prop.name)].sort();
+  return [
+    ...cmpMeta.properties.filter(prop => !prop.internal).map(prop => prop.name),
+    ...cmpMeta.virtualProperties.map(prop => prop.name),
+  ].sort();
 };
 
 const getOutputs = (cmpMeta: d.ComponentCompilerMeta): string[] => {
@@ -141,7 +161,11 @@ const getProxyUtils = (outputTarget: d.OutputTargetAngular) => {
   }
 };
 
-const generateAngularArray = (compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[], outputTarget: d.OutputTargetAngular): Promise<any> => {
+const generateAngularArray = (
+  compilerCtx: d.CompilerCtx,
+  components: d.ComponentCompilerMeta[],
+  outputTarget: d.OutputTargetAngular,
+): Promise<any> => {
   if (!outputTarget.directivesArrayFile) {
     return Promise.resolve();
   }
@@ -164,7 +188,10 @@ ${directives}
 
 const generateAngularUtils = async (compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular) => {
   if (outputTarget.directivesUtilsFile) {
-    await compilerCtx.fs.writeFile(outputTarget.directivesUtilsFile, '/* eslint-disable */\n/* tslint:disable */\n' + PROXY_UTILS);
+    await compilerCtx.fs.writeFile(
+      outputTarget.directivesUtilsFile,
+      '/* eslint-disable */\n/* tslint:disable */\n' + PROXY_UTILS,
+    );
   }
 };
 

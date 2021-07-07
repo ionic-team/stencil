@@ -2,7 +2,10 @@ import type * as d from '../../declarations';
 import { getTsOptionsToExtend } from './ts-config';
 import ts from 'typescript';
 
-export const createTsWatchProgram = async (config: d.Config, buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>) => {
+export const createTsWatchProgram = async (
+  config: d.Config,
+  buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>,
+) => {
   let isRunning = false;
   let lastTsBuilder: any;
   let timeoutId: any;

@@ -23,7 +23,15 @@ describe('renderer', () => {
     it('should automatically get svg namespace', () => {
       const svgElm = document.createElementNS(SVG_NS, 'svg');
       const vnode1 = toVNode(svgElm);
-      patch(vnode1, h('svg', null, h('foreignObject', null, h('div', null, 'I am HTML embedded in SVG')), h('feGaussianBlur', null)));
+      patch(
+        vnode1,
+        h(
+          'svg',
+          null,
+          h('foreignObject', null, h('div', null, 'I am HTML embedded in SVG')),
+          h('feGaussianBlur', null),
+        ),
+      );
 
       expect(svgElm.namespaceURI).toEqual(SVG_NS);
       expect(svgElm.firstChild.namespaceURI).toEqual(SVG_NS);
@@ -41,7 +49,10 @@ describe('renderer', () => {
     });
 
     it('should not affect subsequence element', () => {
-      patch(vnode0, h('div', null, [h('svg', null, [h('title', null, 'Title'), h('circle', null)] as any), h('div', null)] as any));
+      patch(
+        vnode0,
+        h('div', null, [h('svg', null, [h('title', null, 'Title'), h('circle', null)] as any), h('div', null)] as any),
+      );
 
       expect(hostElm.tagName).toEqual('DIV');
       expect(hostElm.namespaceURI).not.toEqual(SVG_NS);

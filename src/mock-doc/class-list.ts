@@ -66,7 +66,9 @@ function validateClass(className: string) {
     throw new Error('The token provided must not be empty.');
   }
   if (/\s/.test(className)) {
-    throw new Error(`The token provided ('${className}') contains HTML space characters, which are not valid in tokens.`);
+    throw new Error(
+      `The token provided ('${className}') contains HTML space characters, which are not valid in tokens.`,
+    );
   }
 }
 

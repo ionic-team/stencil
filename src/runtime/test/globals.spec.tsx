@@ -37,7 +37,6 @@ describe('globals', () => {
     expect(Build.isTesting).toBe(true);
   });
 
-
   it('Env is defined', () => {
     expect(Env).toEqual({});
   });

@@ -12,7 +12,14 @@ import { isComplexType } from '@utils';
 import { isMemberInElement, plt, win } from '@platform';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
-export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, flags: number) => {
+export const setAccessor = (
+  elm: HTMLElement,
+  memberName: string,
+  oldValue: any,
+  newValue: any,
+  isSvg: boolean,
+  flags: number,
+) => {
   if (oldValue !== newValue) {
     let isProp = isMemberInElement(elm, memberName);
     let ln = memberName.toLowerCase();
@@ -53,7 +60,12 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       if (newValue) {
         newValue(elm);
       }
-    } else if (BUILD.vdomListener && (BUILD.lazyLoad ? !isProp : !(elm as any).__lookupSetter__(memberName)) && memberName[0] === 'o' && memberName[1] === 'n') {
+    } else if (
+      BUILD.vdomListener &&
+      (BUILD.lazyLoad ? !isProp : !(elm as any).__lookupSetter__(memberName)) &&
+      memberName[0] === 'o' &&
+      memberName[1] === 'n'
+    ) {
       // Event Handlers
       // so if the member name starts with "on" and the 3rd characters is
       // a capital letter, and it's not already a member on the element,
@@ -105,7 +117,7 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
           } else {
             (elm as any)[memberName] = newValue;
           }
-        } catch (e) { }
+        } catch (e) {}
       }
 
       /**

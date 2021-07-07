@@ -3,7 +3,13 @@ import MagicString from 'magic-string';
 import { createJsVarName, normalizePath, isString, loadTypeScriptDiagnostics } from '@utils';
 import type { Plugin } from 'rollup';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
-import { APP_DATA_CONDITIONAL, STENCIL_APP_DATA_ID, STENCIL_APP_GLOBALS_ID, STENCIL_CORE_ID, STENCIL_INTERNAL_HYDRATE_ID } from './entry-alias-ids';
+import {
+  APP_DATA_CONDITIONAL,
+  STENCIL_APP_DATA_ID,
+  STENCIL_APP_GLOBALS_ID,
+  STENCIL_CORE_ID,
+  STENCIL_INTERNAL_HYDRATE_ID,
+} from './entry-alias-ids';
 import ts from 'typescript';
 
 export const appDataPlugin = (
@@ -151,7 +157,7 @@ const appendBuildConditionals = (config: d.Config, build: d.BuildConditionals, s
 };
 
 const appendEnv = (config: d.Config, s: MagicString) => {
-  s.append(`export const Env = /* ${config.fsNamespace} */ ${JSON.stringify(config.env) };\n`);
+  s.append(`export const Env = /* ${config.fsNamespace} */ ${JSON.stringify(config.env)};\n`);
 };
 
 const appendNamespace = (config: d.Config, s: MagicString) => {

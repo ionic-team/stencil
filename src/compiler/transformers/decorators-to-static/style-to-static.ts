@@ -46,7 +46,7 @@ export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d
       newMembers.push(createStaticGetter('styles', ts.createLiteral(styles)));
     }
   } else if (componentOptions.styles) {
-    const convertIdentifier = (componentOptions.styles as any) as ConvertIdentifier;
+    const convertIdentifier = componentOptions.styles as any as ConvertIdentifier;
     if (convertIdentifier.__identifier) {
       // import styles from './styles.css';
       // @Component({

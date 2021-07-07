@@ -15,7 +15,11 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
     const prototype = (Cstr as any).prototype;
 
     members.map(([memberName, [memberFlags]]) => {
-      if ((BUILD.prop || BUILD.state) && (memberFlags & MEMBER_FLAGS.Prop || ((!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) && memberFlags & MEMBER_FLAGS.State))) {
+      if (
+        (BUILD.prop || BUILD.state) &&
+        (memberFlags & MEMBER_FLAGS.Prop ||
+          ((!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) && memberFlags & MEMBER_FLAGS.State))
+      ) {
         // proxyComponent - prop
         Object.defineProperty(prototype, memberName, {
           get(this: d.RuntimeRef) {
@@ -32,11 +36,13 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
                 // the element is not constructing
                 (ref.$flags$ & HOST_FLAGS.isConstructingInstance) === 0 &&
                 // the member is a prop
-                (memberFlags & MEMBER_FLAGS.Prop) !== 0 && 
+                (memberFlags & MEMBER_FLAGS.Prop) !== 0 &&
                 // the member is not mutable
                 (memberFlags & MEMBER_FLAGS.Mutable) === 0
               ) {
-                consoleDevWarn(`@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`);
+                consoleDevWarn(
+                  `@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`,
+                );
               }
             }
             // proxyComponent, set value
@@ -45,7 +51,12 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           configurable: true,
           enumerable: true,
         });
-      } else if (BUILD.lazyLoad && BUILD.method && flags & PROXY_FLAGS.isElementConstructor && memberFlags & MEMBER_FLAGS.Method) {
+      } else if (
+        BUILD.lazyLoad &&
+        BUILD.method &&
+        flags & PROXY_FLAGS.isElementConstructor &&
+        memberFlags & MEMBER_FLAGS.Method
+      ) {
         // proxyComponent - method
         Object.defineProperty(prototype, memberName, {
           value(this: d.HostElement, ...args: any[]) {

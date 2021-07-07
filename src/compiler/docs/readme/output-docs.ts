@@ -39,7 +39,12 @@ export const generateReadme = async (
   );
 };
 
-export const generateMarkdown = (userContent: string, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[], readmeOutput: d.OutputTargetDocsReadme) => {
+export const generateMarkdown = (
+  userContent: string,
+  cmp: d.JsonDocsComponent,
+  cmps: d.JsonDocsComponent[],
+  readmeOutput: d.OutputTargetDocsReadme,
+) => {
   //If the readmeOutput.dependencies is true or undefined the dependencies will be generated.
   const dependencies = readmeOutput.dependencies !== false ? depsToMarkdown(cmp, cmps) : [];
   return [

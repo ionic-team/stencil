@@ -50,7 +50,13 @@ const formatText = (code: string, filePath: string) => {
   return `const ${varName} = ${JSON.stringify(code)};export default ${varName};`;
 };
 
-const formatUrl = (config: d.Config, pluginCtx: TransformPluginContext, code: string, filePath: string, ext: string) => {
+const formatUrl = (
+  config: d.Config,
+  pluginCtx: TransformPluginContext,
+  code: string,
+  filePath: string,
+  ext: string,
+) => {
   const mime = FORMAT_URL_MIME[ext];
   if (!mime) {
     pluginCtx.warn(`Unsupported url format for "${ext}" extension.`);

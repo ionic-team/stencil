@@ -3,7 +3,13 @@ import { basename, join } from 'path';
 import { relocateHydrateContextConst } from './relocate-hydrate-context';
 import type { RollupOutput } from 'rollup';
 
-export const writeHydrateOutputs = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[], rollupOutput: RollupOutput) => {
+export const writeHydrateOutputs = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  outputTargets: d.OutputTargetHydrate[],
+  rollupOutput: RollupOutput,
+) => {
   return Promise.all(
     outputTargets.map(outputTarget => {
       return writeHydrateOutput(config, compilerCtx, buildCtx, outputTarget, rollupOutput);
@@ -11,7 +17,13 @@ export const writeHydrateOutputs = (config: d.Config, compilerCtx: d.CompilerCtx
   );
 };
 
-const writeHydrateOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetHydrate, rollupOutput: RollupOutput) => {
+const writeHydrateOutput = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  outputTarget: d.OutputTargetHydrate,
+  rollupOutput: RollupOutput,
+) => {
   const hydratePackageName = await getHydratePackageName(config, compilerCtx);
 
   const hydrateAppDirPath = outputTarget.dir;
@@ -20,9 +32,17 @@ const writeHydrateOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, 
   const hydrateCoreIndexDtsFilePath = join(hydrateAppDirPath, 'index.d.ts');
 
   const pkgJsonPath = join(hydrateAppDirPath, 'package.json');
-  const pkgJsonCode = getHydratePackageJson(config, hydrateCoreIndexPath, hydrateCoreIndexDtsFilePath, hydratePackageName);
+  const pkgJsonCode = getHydratePackageJson(
+    config,
+    hydrateCoreIndexPath,
+    hydrateCoreIndexDtsFilePath,
+    hydratePackageName,
+  );
 
-  await Promise.all([copyHydrateRunnerDts(config, compilerCtx, hydrateAppDirPath), compilerCtx.fs.writeFile(pkgJsonPath, pkgJsonCode)]);
+  await Promise.all([
+    copyHydrateRunnerDts(config, compilerCtx, hydrateAppDirPath),
+    compilerCtx.fs.writeFile(pkgJsonPath, pkgJsonCode),
+  ]);
 
   // always remember a path to the hydrate app that the prerendering may need later on
   buildCtx.hydrateAppFilePath = hydrateCoreIndexPath;
@@ -38,7 +58,12 @@ const writeHydrateOutput = async (config: d.Config, compilerCtx: d.CompilerCtx, 
   );
 };
 
-const getHydratePackageJson = (config: d.Config, hydrateAppFilePath: string, hydrateDtsFilePath: string, hydratePackageName: string) => {
+const getHydratePackageJson = (
+  config: d.Config,
+  hydrateAppFilePath: string,
+  hydrateDtsFilePath: string,
+  hydratePackageName: string,
+) => {
   const pkg: d.PackageJsonData = {
     name: hydratePackageName,
     description: `${config.namespace} component hydration app.`,

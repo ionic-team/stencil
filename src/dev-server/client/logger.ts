@@ -46,7 +46,11 @@ const log = (color: string, prefix: string, msg: string) => {
   if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.indexOf('Trident') > -1) {
     console.log(prefix, msg);
   } else {
-    console.log.apply(console, ['%c' + prefix, `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`, msg]);
+    console.log.apply(console, [
+      '%c' + prefix,
+      `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`,
+      msg,
+    ]);
   }
 };
 

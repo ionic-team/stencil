@@ -5,7 +5,9 @@ import ts from 'typescript';
 export const transformHostData = (classElements: ts.ClassElement[], moduleFile: d.Module) => {
   const hasHostData = classElements.some(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'hostData');
   if (hasHostData) {
-    const renderIndex = classElements.findIndex(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'render');
+    const renderIndex = classElements.findIndex(
+      e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'render',
+    );
     if (renderIndex >= 0) {
       const renderMethod = classElements[renderIndex] as ts.MethodDeclaration;
       classElements[renderIndex] = ts.updateMethod(

@@ -9,7 +9,12 @@ import { runTsProgram } from '../transpile/run-program';
 import { writeBuild } from './write-build';
 import ts from 'typescript';
 
-export const build = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
+export const build = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  tsBuilder: ts.BuilderProgram,
+) => {
   try {
     // reset process.cwd() for 3rd-party plugins
     process.chdir(config.rootDir);

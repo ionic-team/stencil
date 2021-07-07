@@ -2,7 +2,12 @@ import type * as d from '../../declarations';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 
-export const generateRollupOutput = async (build: RollupBuild, options: OutputOptions, config: d.Config, entryModules: d.EntryModule[]): Promise<d.RollupResult[]> => {
+export const generateRollupOutput = async (
+  build: RollupBuild,
+  options: OutputOptions,
+  config: d.Config,
+  entryModules: d.EntryModule[],
+): Promise<d.RollupResult[]> => {
   if (build == null) {
     return null;
   }

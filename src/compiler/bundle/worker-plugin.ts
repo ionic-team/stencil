@@ -5,7 +5,13 @@ import { normalizeFsPath, hasError } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';
 import { STENCIL_INTERNAL_ID } from './entry-alias-ids';
 
-export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, platform: string, inlineWorkers: boolean): Plugin => {
+export const workerPlugin = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  platform: string,
+  inlineWorkers: boolean,
+): Plugin => {
   if (platform === 'worker' || platform === 'hydrate') {
     return {
       name: 'workerPlugin',
@@ -53,7 +59,14 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
       if (id.endsWith('?worker')) {
         const workerEntryPath = normalizeFsPath(id);
         const workerName = getWorkerName(workerEntryPath);
-        const { code, dependencies, workerMsgId } = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
+        const { code, dependencies, workerMsgId } = await getWorker(
+          config,
+          compilerCtx,
+          buildCtx,
+          this,
+          workersMap,
+          workerEntryPath,
+        );
         const referenceId = this.emitFile({
           type: 'asset',
           source: code,
@@ -67,7 +80,14 @@ export const workerPlugin = (config: d.Config, compilerCtx: d.CompilerCtx, build
       } else if (id.endsWith('?worker-inline')) {
         const workerEntryPath = normalizeFsPath(id);
         const workerName = getWorkerName(workerEntryPath);
-        const { code, dependencies, workerMsgId } = await getWorker(config, compilerCtx, buildCtx, this, workersMap, workerEntryPath);
+        const { code, dependencies, workerMsgId } = await getWorker(
+          config,
+          compilerCtx,
+          buildCtx,
+          this,
+          workersMap,
+          workerEntryPath,
+        );
         const referenceId = this.emitFile({
           type: 'asset',
           source: code,
@@ -139,7 +159,13 @@ const getWorkerName = (id: string) => {
   return id.replace('.tsx', '').replace('.ts', '');
 };
 
-const buildWorker = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, ctx: PluginContext, workerEntryPath: string) => {
+const buildWorker = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  ctx: PluginContext,
+  workerEntryPath: string,
+) => {
   const workerName = getWorkerName(workerEntryPath);
   const workerMsgId = `stencil.${workerName}`;
   const build = await bundleOutput(config, compilerCtx, buildCtx, {
@@ -221,7 +247,7 @@ const getTransferables = (value) => {
     }
   }
   return [];
-};`
+};`;
 const getWorkerIntro = (workerMsgId: string, isDev: boolean) => `
 ${GET_TRANSFERABLES}
 const exports = {};

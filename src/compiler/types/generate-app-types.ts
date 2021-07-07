@@ -7,7 +7,12 @@ import { normalizePath } from '@utils';
 import { updateReferenceTypeImports } from './update-import-refs';
 import { updateStencilTypesImports } from './stencil-types';
 
-export const generateAppTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination: string) => {
+export const generateAppTypes = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  destination: string,
+) => {
   // only gather components that are still root ts files we've found and have component metadata
   // the compilerCtx cache may still have files that may have been deleted/renamed
   const timespan = buildCtx.createTimeSpan(`generated app types started`, true);
@@ -21,10 +26,16 @@ export const generateAppTypes = async (config: d.Config, compilerCtx: d.Compiler
 
   if (!internal) {
     componentsDtsFilePath = resolve(destination, GENERATED_DTS);
-    componentTypesFileContent = updateStencilTypesImports(destination, componentsDtsFilePath, componentTypesFileContent);
+    componentTypesFileContent = updateStencilTypesImports(
+      destination,
+      componentsDtsFilePath,
+      componentTypesFileContent,
+    );
   }
 
-  const writeResults = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
+  const writeResults = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, {
+    immediateWrite: true,
+  });
   const hasComponentsDtsChanged = writeResults.changedContent;
 
   const componentsDtsRelFileName = relative(config.rootDir, componentsDtsFilePath);
@@ -104,7 +115,12 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, inte
   c.push(`declare module "@stencil/core" {`);
   c.push(`        export namespace JSX {`);
   c.push(`                interface IntrinsicElements {`);
-  c.push(...modules.map(m => `                        "${m.tagName}": LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`));
+  c.push(
+    ...modules.map(
+      m =>
+        `                        "${m.tagName}": LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`,
+    ),
+  );
   c.push(`                }`);
   c.push(`        }`);
   c.push(`}`);

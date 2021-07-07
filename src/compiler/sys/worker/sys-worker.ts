@@ -4,7 +4,11 @@ import { createWorkerMainContext } from '../../worker/main-thread';
 import { isFunction } from '@utils';
 
 export const createSysWorker = (config: Config) => {
-  if (isFunction(config.sys.createWorkerController) && config.maxConcurrentWorkers > 0 && config.sys.hardwareConcurrency > 1) {
+  if (
+    isFunction(config.sys.createWorkerController) &&
+    config.maxConcurrentWorkers > 0 &&
+    config.sys.hardwareConcurrency > 1
+  ) {
     const workerCtrl = config.sys.createWorkerController(config.maxConcurrentWorkers);
 
     config.sys.addDestory(() => workerCtrl.destroy());
@@ -13,6 +17,8 @@ export const createSysWorker = (config: Config) => {
     return createWorkerMainContext(workerCtrl);
   }
 
-  config.logger.debug(`no workers, maxConcurrentWorkers: ${config.maxConcurrentWorkers}, hardwareConcurrency: ${config.sys.hardwareConcurrency}`);
+  config.logger.debug(
+    `no workers, maxConcurrentWorkers: ${config.maxConcurrentWorkers}, hardwareConcurrency: ${config.sys.hardwareConcurrency}`,
+  );
   return createWorkerContext(config.sys);
 };

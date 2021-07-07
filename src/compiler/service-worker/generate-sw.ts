@@ -3,7 +3,12 @@ import { basename } from 'path';
 import { buildWarn, catchError } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export const generateServiceWorker = async (config: d.Config, buildCtx: d.BuildCtx, workbox: d.Workbox, outputTarget: d.OutputTargetWww) => {
+export const generateServiceWorker = async (
+  config: d.Config,
+  buildCtx: d.BuildCtx,
+  workbox: d.Workbox,
+  outputTarget: d.OutputTargetWww,
+) => {
   const serviceWorker = await getServiceWorker(outputTarget);
   if (serviceWorker.unregister) {
     await config.sys.writeFile(serviceWorker.swDest, SELF_UNREGISTER_SW);
@@ -54,7 +59,9 @@ export const hasServiceWorkerChanges = (config: d.Config, buildCtx: d.BuildCtx) 
     return false;
   }
 
-  const wwwServiceOutputs = config.outputTargets.filter(isOutputTargetWww).filter(o => o.serviceWorker && o.serviceWorker.swSrc);
+  const wwwServiceOutputs = config.outputTargets
+    .filter(isOutputTargetWww)
+    .filter(o => o.serviceWorker && o.serviceWorker.swSrc);
 
   return wwwServiceOutputs.some(outputTarget => {
     return buildCtx.filesChanged.some(fileChanged => {

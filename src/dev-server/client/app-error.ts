@@ -16,7 +16,9 @@ export const appError = (data: AppErrorData) => {
   };
 
   if (data && data.window && Array.isArray(data.buildResults.diagnostics)) {
-    const diagnostics = (data.buildResults as CompilerBuildResults).diagnostics.filter(diagnostic => diagnostic.level === 'error');
+    const diagnostics = (data.buildResults as CompilerBuildResults).diagnostics.filter(
+      diagnostic => diagnostic.level === 'error',
+    );
 
     if (diagnostics.length > 0) {
       const modal = getDevServerModal(data.window.document);
@@ -33,7 +35,12 @@ export const appError = (data: AppErrorData) => {
   return results;
 };
 
-const appendDiagnostic = (doc: Document, openInEditor: OpenInEditorCallback, modal: HTMLElement, diagnostic: Diagnostic) => {
+const appendDiagnostic = (
+  doc: Document,
+  openInEditor: OpenInEditorCallback,
+  modal: HTMLElement,
+  diagnostic: Diagnostic,
+) => {
   const card = doc.createElement('div');
   card.className = 'dev-server-diagnostic';
 
@@ -84,7 +91,13 @@ const appendDiagnostic = (doc: Document, openInEditor: OpenInEditorCallback, mod
       fileHeader.title = escapeHtml(diagnostic.absFilePath);
 
       if (canOpenInEditor) {
-        addOpenInEditor(openInEditor, fileHeader, diagnostic.absFilePath, diagnostic.lineNumber, diagnostic.columnNumber);
+        addOpenInEditor(
+          openInEditor,
+          fileHeader,
+          diagnostic.absFilePath,
+          diagnostic.lineNumber,
+          diagnostic.columnNumber,
+        );
       }
     }
 
@@ -145,7 +158,13 @@ const appendDiagnostic = (doc: Document, openInEditor: OpenInEditorCallback, mod
   modal.appendChild(card);
 };
 
-const addOpenInEditor = (openInEditor: OpenInEditorCallback, elm: HTMLElement, file: string, line: number, column: number) => {
+const addOpenInEditor = (
+  openInEditor: OpenInEditorCallback,
+  elm: HTMLElement,
+  file: string,
+  line: number,
+  column: number,
+) => {
   if (elm.tagName === 'A') {
     (elm as HTMLAnchorElement).href = '#open-in-editor';
   }
@@ -195,7 +214,12 @@ const escapeHtml = (unsafe: string) => {
     return (unsafe as any).toString();
   }
   if (typeof unsafe === 'string') {
-    return unsafe.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    return unsafe
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
   return '';
 };

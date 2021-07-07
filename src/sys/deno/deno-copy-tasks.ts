@@ -82,7 +82,12 @@ function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, glob
   };
 }
 
-async function processCopyTask(deno: typeof Deno, results: d.CopyResults, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask) {
+async function processCopyTask(
+  deno: typeof Deno,
+  results: d.CopyResults,
+  allCopyTasks: d.CopyTask[],
+  copyTask: d.CopyTask,
+) {
   try {
     copyTask.src = normalizePath(copyTask.src);
     copyTask.dest = normalizePath(copyTask.dest);
@@ -112,7 +117,12 @@ async function processCopyTask(deno: typeof Deno, results: d.CopyResults, allCop
   }
 }
 
-async function processCopyTaskDirectory(deno: typeof Deno, results: d.CopyResults, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask) {
+async function processCopyTaskDirectory(
+  deno: typeof Deno,
+  results: d.CopyResults,
+  allCopyTasks: d.CopyTask[],
+  copyTask: d.CopyTask,
+) {
   try {
     for await (const dirEntry of deno.readDir(copyTask.src)) {
       const subCopyTask: d.CopyTask = {

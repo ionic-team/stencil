@@ -1,4 +1,14 @@
-import { setQueryString, updateCssUrlValue, getHmrHref, isLinkStylesheet, setHmrAttr, isTemplate, hasShadowRoot, isElement, setHmrQueryString } from './hmr-util';
+import {
+  setQueryString,
+  updateCssUrlValue,
+  getHmrHref,
+  isLinkStylesheet,
+  setHmrAttr,
+  isTemplate,
+  hasShadowRoot,
+  isElement,
+  setHmrQueryString,
+} from './hmr-util';
 
 export const hmrImages = (win: Window, doc: Document, versionId: string, imageFileNames: string[]) => {
   if (win.location.protocol !== 'file:' && doc.styleSheets) {
@@ -20,7 +30,12 @@ const hmrStyleSheetsImages = (doc: Document, versionId: string, imageFileNames: 
   }
 };
 
-const hmrStyleSheetImages = (cssImageProps: string[], styleSheet: CSSStyleSheet, versionId: string, imageFileNames: string[]) => {
+const hmrStyleSheetImages = (
+  cssImageProps: string[],
+  styleSheet: CSSStyleSheet,
+  versionId: string,
+  imageFileNames: string[],
+) => {
   try {
     const cssRules = styleSheet.cssRules;
     for (let i = 0; i < cssRules.length; i++) {
@@ -45,7 +60,12 @@ const hmrStyleSheetImages = (cssImageProps: string[], styleSheet: CSSStyleSheet,
   }
 };
 
-const hmrStyleSheetRuleImages = (cssImageProps: string[], cssRule: CSSStyleRule, versionId: string, imageFileNames: string[]) => {
+const hmrStyleSheetRuleImages = (
+  cssImageProps: string[],
+  cssRule: CSSStyleRule,
+  versionId: string,
+  imageFileNames: string[],
+) => {
   cssImageProps.forEach(cssImageProp => {
     imageFileNames.forEach(imageFileName => {
       const oldCssText = (cssRule as any).style[cssImageProp];

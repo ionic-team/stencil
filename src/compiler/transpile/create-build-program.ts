@@ -3,7 +3,10 @@ import { getTsOptionsToExtend } from './ts-config';
 import { GENERATED_DTS } from '../output-targets/output-utils';
 import ts from 'typescript';
 
-export const createTsBuildProgram = async (config: d.Config, buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>) => {
+export const createTsBuildProgram = async (
+  config: d.Config,
+  buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>,
+) => {
   let isRunning = false;
   let timeoutId: any;
 

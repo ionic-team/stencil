@@ -15,7 +15,7 @@ export const startupLogVersion = (logger: Logger, task: TaskCommand, coreCompile
   }
   const isDevBuild = coreCompiler.version.includes('-dev.');
 
-  let startupMsg: string
+  let startupMsg: string;
 
   if (isDevBuild) {
     startupMsg = logger.yellow('[LOCAL DEV]');
@@ -25,13 +25,20 @@ export const startupLogVersion = (logger: Logger, task: TaskCommand, coreCompile
   startupMsg += logger.emoji(' ' + coreCompiler.vermoji);
 
   logger.info(startupMsg);
-}
+};
 
-export const loadedCompilerLog = (sys: CompilerSystem, logger: Logger, flags: ConfigFlags, coreCompiler: CoreCompiler) => {
+export const loadedCompilerLog = (
+  sys: CompilerSystem,
+  logger: Logger,
+  flags: ConfigFlags,
+  coreCompiler: CoreCompiler,
+) => {
   const sysDetails = sys.details;
   const runtimeInfo = `${sys.name} ${sys.version}`;
   const platformInfo = `${sysDetails.platform}, ${sysDetails.cpuModel}`;
-  const statsInfo = `cpus: ${sys.hardwareConcurrency}, freemem: ${Math.round(sysDetails.freemem() / 1000000)}MB, totalmem: ${Math.round(sysDetails.totalmem / 1000000)}MB`;
+  const statsInfo = `cpus: ${sys.hardwareConcurrency}, freemem: ${Math.round(
+    sysDetails.freemem() / 1000000,
+  )}MB, totalmem: ${Math.round(sysDetails.totalmem / 1000000)}MB`;
 
   if (logger.getLevel() === 'debug') {
     logger.debug(runtimeInfo);

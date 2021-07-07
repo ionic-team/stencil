@@ -93,7 +93,7 @@ export const consoleDevInfo = (..._: any[]) => {
   /* noop for hydrate */
 };
 
-export const setErrorHandler = (handler: d.ErrorHandler) => customError = handler;
+export const setErrorHandler = (handler: d.ErrorHandler) => (customError = handler);
 
 /*hydrate context start*/ export const Context = {}; /*hydrate context end*/
 
@@ -107,21 +107,11 @@ export const plt: d.PlatformRuntime = {
   ce: (eventName, opts) => new win.CustomEvent(eventName, opts),
 };
 
-export const setPlatformHelpers = (helpers: { 
+export const setPlatformHelpers = (helpers: {
   jmp?: (c: any) => any;
   raf?: (c: any) => number;
-  ael?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
-  rel?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
+  ael?: (el: any, eventName: string, listener: any, options: any) => void;
+  rel?: (el: any, eventName: string, listener: any, options: any) => void;
   ce?: (eventName: string, opts?: any) => any;
 }) => {
   Object.assign(plt, helpers);

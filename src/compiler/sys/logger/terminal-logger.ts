@@ -23,7 +23,14 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
   const infoPrefix = (lines: string[]) => {
     if (lines.length) {
       const d = new Date();
-      const prefix = '[' + ('0' + d.getMinutes()).slice(-2) + ':' + ('0' + d.getSeconds()).slice(-2) + '.' + Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
+      const prefix =
+        '[' +
+        ('0' + d.getMinutes()).slice(-2) +
+        ':' +
+        ('0' + d.getSeconds()).slice(-2) +
+        '.' +
+        Math.floor((d.getMilliseconds() / 1000) * 10) +
+        ']';
 
       lines[0] = dim(prefix) + lines[0].substr(prefix.length);
     }
@@ -88,7 +95,14 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     if (lines.length) {
       const d = new Date();
 
-      const prefix = '[' + ('0' + d.getMinutes()).slice(-2) + ':' + ('0' + d.getSeconds()).slice(-2) + '.' + Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
+      const prefix =
+        '[' +
+        ('0' + d.getMinutes()).slice(-2) +
+        ':' +
+        ('0' + d.getSeconds()).slice(-2) +
+        '.' +
+        Math.floor((d.getMilliseconds() / 1000) * 10) +
+        ']';
 
       lines[0] = cyan(prefix) + lines[0].substr(prefix.length);
     }
@@ -119,7 +133,15 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     }
   };
 
-  const timespanFinish = (finishMsg: string, timeSuffix: string, colorName: 'red', textBold: boolean, newLineSuffix: boolean, debug: boolean, appendTo: string[]) => {
+  const timespanFinish = (
+    finishMsg: string,
+    timeSuffix: string,
+    colorName: 'red',
+    textBold: boolean,
+    newLineSuffix: boolean,
+    debug: boolean,
+    appendTo: string[],
+  ) => {
     let msg = finishMsg;
 
     if (colorName) {
@@ -138,7 +160,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
         if (mem > 0) {
           m.push(dim(` MEM: ${(mem / 1000000).toFixed(1)}MB`));
         }
-        
+
         const lines = wordWrap(m, loggerSys.getColumns());
         debugPrefix(lines);
         console.log(lines.join('\n'));

@@ -2,7 +2,13 @@ import type * as d from '../../declarations';
 import { catchError } from '@utils';
 import { isOutputTargetCustom } from './output-utils';
 
-export const outputCustom = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, docs: d.JsonDocs, outputTargets: d.OutputTarget[]) => {
+export const outputCustom = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  docs: d.JsonDocs,
+  outputTargets: d.OutputTarget[],
+) => {
   const customOutputTargets = outputTargets.filter(isOutputTargetCustom);
   if (customOutputTargets.length === 0) {
     return;

@@ -26,12 +26,33 @@ export const generateLazyModules = async (
   const [bundleModules] = await Promise.all([
     Promise.all(
       entryComponentsResults.map(rollupResult => {
-        return generateLazyEntryModule(config, compilerCtx, buildCtx, rollupResult, outputTargetType, destinations, sourceTarget, shouldMinify, isBrowserBuild, sufix);
+        return generateLazyEntryModule(
+          config,
+          compilerCtx,
+          buildCtx,
+          rollupResult,
+          outputTargetType,
+          destinations,
+          sourceTarget,
+          shouldMinify,
+          isBrowserBuild,
+          sufix,
+        );
       }),
     ),
     Promise.all(
       chunkResults.map(rollupResult => {
-        return writeLazyChunk(config, compilerCtx, buildCtx, rollupResult, outputTargetType, destinations, sourceTarget, shouldMinify, isBrowserBuild);
+        return writeLazyChunk(
+          config,
+          compilerCtx,
+          buildCtx,
+          rollupResult,
+          outputTargetType,
+          destinations,
+          sourceTarget,
+          shouldMinify,
+          isBrowserBuild,
+        );
       }),
     ),
   ]);
@@ -40,7 +61,18 @@ export const generateLazyModules = async (
   const entryResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && rollupResult.isEntry);
   await Promise.all(
     entryResults.map(rollupResult => {
-      return writeLazyEntry(config, compilerCtx, buildCtx, rollupResult, outputTargetType, destinations, lazyRuntimeData, sourceTarget, shouldMinify, isBrowserBuild);
+      return writeLazyEntry(
+        config,
+        compilerCtx,
+        buildCtx,
+        rollupResult,
+        outputTargetType,
+        destinations,
+        lazyRuntimeData,
+        sourceTarget,
+        shouldMinify,
+        isBrowserBuild,
+      );
     }),
   );
 
@@ -74,9 +106,27 @@ const generateLazyEntryModule = async (
   const entryModule = buildCtx.entryModules.find(entryModule => entryModule.entryKey === rollupResult.entryKey);
   const shouldHash = config.hashFileNames && isBrowserBuild;
 
-  const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, rollupResult.code);
+  const code = await convertChunk(
+    config,
+    compilerCtx,
+    buildCtx,
+    sourceTarget,
+    shouldMinify,
+    false,
+    isBrowserBuild,
+    rollupResult.code,
+  );
 
-  const output = await writeLazyModule(config, compilerCtx, outputTargetType, destinations, entryModule, shouldHash, code, sufix);
+  const output = await writeLazyModule(
+    config,
+    compilerCtx,
+    outputTargetType,
+    destinations,
+    entryModule,
+    shouldHash,
+    code,
+    sufix,
+  );
 
   return {
     rollupResult,
@@ -97,7 +147,16 @@ const writeLazyChunk = async (
   shouldMinify: boolean,
   isBrowserBuild: boolean,
 ) => {
-  const code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, rollupResult.isCore, isBrowserBuild, rollupResult.code);
+  const code = await convertChunk(
+    config,
+    compilerCtx,
+    buildCtx,
+    sourceTarget,
+    shouldMinify,
+    rollupResult.isCore,
+    isBrowserBuild,
+    rollupResult.code,
+  );
 
   await Promise.all(
     destinations.map(dst => {

@@ -1,10 +1,22 @@
 import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildWarn } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, resolveType, serializeSymbol, validateReferences } from '../transform-utils';
+import {
+  convertValueToLiteral,
+  createStaticGetter,
+  getAttributeTypeInfo,
+  resolveType,
+  serializeSymbol,
+  validateReferences,
+} from '../transform-utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
-export const eventDecoratorsToStatic = (diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
+export const eventDecoratorsToStatic = (
+  diagnostics: d.Diagnostic[],
+  decoratedProps: ts.ClassElement[],
+  typeChecker: ts.TypeChecker,
+  newMembers: ts.ClassElement[],
+) => {
   const events = decoratedProps
     .filter(ts.isPropertyDeclaration)
     .map(prop => parseEventDecorator(diagnostics, typeChecker, prop))
@@ -15,7 +27,11 @@ export const eventDecoratorsToStatic = (diagnostics: d.Diagnostic[], decoratedPr
   }
 };
 
-const parseEventDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration): d.ComponentCompilerStaticEvent => {
+const parseEventDecorator = (
+  diagnostics: d.Diagnostic[],
+  typeChecker: ts.TypeChecker,
+  prop: ts.PropertyDeclaration,
+): d.ComponentCompilerStaticEvent => {
   const eventDecorator = prop.decorators.find(isDecoratorNamed('Event'));
 
   if (eventDecorator == null) {
@@ -54,7 +70,10 @@ export const getEventName = (eventOptions: d.EventOptions, memberName: string) =
   return memberName;
 };
 
-const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration): d.ComponentCompilerPropertyComplexType => {
+const getComplexType = (
+  typeChecker: ts.TypeChecker,
+  node: ts.PropertyDeclaration,
+): d.ComponentCompilerPropertyComplexType => {
   const sourceFile = node.getSourceFile();
   const eventType = node.type ? getEventType(node.type) : null;
   return {
@@ -65,7 +84,13 @@ const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaratio
 };
 
 const getEventType = (type: ts.TypeNode): ts.TypeNode | null => {
-  if (ts.isTypeReferenceNode(type) && ts.isIdentifier(type.typeName) && type.typeName.text === 'EventEmitter' && type.typeArguments && type.typeArguments.length > 0) {
+  if (
+    ts.isTypeReferenceNode(type) &&
+    ts.isIdentifier(type.typeName) &&
+    type.typeName.text === 'EventEmitter' &&
+    type.typeArguments &&
+    type.typeArguments.length > 0
+  ) {
     return type.typeArguments[0];
   }
   return null;

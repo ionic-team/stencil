@@ -9,7 +9,10 @@ export const getScriptTarget = () => {
 };
 
 export const isMemberPrivate = (member: ts.ClassElement) => {
-  if (member.modifiers && member.modifiers.some(m => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword)) {
+  if (
+    member.modifiers &&
+    member.modifiers.some(m => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword)
+  ) {
     return true;
   }
   return false;
@@ -61,7 +64,10 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
   refs.add(obj);
 
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map(key => {
-    const prop = ts.createPropertyAssignment(ts.createLiteral(key), convertValueToLiteral(obj[key], refs) as ts.Expression);
+    const prop = ts.createPropertyAssignment(
+      ts.createLiteral(key),
+      convertValueToLiteral(obj[key], refs) as ts.Expression,
+    );
     return prop;
   });
 
@@ -69,13 +75,23 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
 };
 
 export const createStaticGetter = (propName: string, returnExpression: ts.Expression) => {
-  return ts.createGetAccessor(undefined, [ts.createToken(ts.SyntaxKind.StaticKeyword)], propName, undefined, undefined, ts.createBlock([ts.createReturn(returnExpression)]));
+  return ts.createGetAccessor(
+    undefined,
+    [ts.createToken(ts.SyntaxKind.StaticKeyword)],
+    propName,
+    undefined,
+    undefined,
+    ts.createBlock([ts.createReturn(returnExpression)]),
+  );
 };
 
 export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
   if (node.decorators) {
     const updatedDecoratorList = node.decorators.filter(dec => {
-      const name = ts.isCallExpression(dec.expression) && ts.isIdentifier(dec.expression.expression) && dec.expression.expression.text;
+      const name =
+        ts.isCallExpression(dec.expression) &&
+        ts.isIdentifier(dec.expression.expression) &&
+        dec.expression.expression.text;
       return !decoratorNames.has(name);
     });
     if (updatedDecoratorList.length === 0) {
@@ -88,12 +104,16 @@ export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => 
 };
 
 export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {
-  const staticMember: ts.GetAccessorDeclaration = staticMembers.find(member => (member.name as any).escapedText === staticName) as any;
+  const staticMember: ts.GetAccessorDeclaration = staticMembers.find(
+    member => (member.name as any).escapedText === staticName,
+  ) as any;
   if (!staticMember || !staticMember.body || !staticMember.body.statements) {
     return null;
   }
 
-  const rtnStatement: ts.ReturnStatement = staticMember.body.statements.find(s => s.kind === ts.SyntaxKind.ReturnStatement) as any;
+  const rtnStatement: ts.ReturnStatement = staticMember.body.statements.find(
+    s => s.kind === ts.SyntaxKind.ReturnStatement,
+  ) as any;
   if (!rtnStatement || !rtnStatement.expression) {
     return null;
   }
@@ -119,7 +139,10 @@ export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: str
     return objectLiteralToObjectMap(rtnStatement.expression as any);
   }
 
-  if (expKind === ts.SyntaxKind.ArrayLiteralExpression && (rtnStatement.expression as ts.ArrayLiteralExpression).elements) {
+  if (
+    expKind === ts.SyntaxKind.ArrayLiteralExpression &&
+    (rtnStatement.expression as ts.ArrayLiteralExpression).elements
+  ) {
     return arrayLiteralToArray(rtnStatement.expression as any);
   }
 
@@ -315,7 +338,11 @@ const getAllTypeReferences = (node: ts.Node) => {
   return referencedTypes;
 };
 
-export const validateReferences = (diagnostics: d.Diagnostic[], references: d.ComponentCompilerTypeReferences, node: ts.Node) => {
+export const validateReferences = (
+  diagnostics: d.Diagnostic[],
+  references: d.ComponentCompilerTypeReferences,
+  node: ts.Node,
+) => {
   Object.keys(references).forEach(refName => {
     const ref = references[refName];
     if (ref.path === '@stencil/core' && MEMBER_DECORATORS_TO_REMOVE.has(refName)) {
@@ -368,7 +395,10 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
       st.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword);
 
     // Is the interface exported through a named export
-    const isTypeInExportDeclaration = ts.isExportDeclaration(st) && ts.isNamedExports(st.exportClause) && st.exportClause.elements.some(nee => nee.name.getText() === typeName);
+    const isTypeInExportDeclaration =
+      ts.isExportDeclaration(st) &&
+      ts.isNamedExports(st.exportClause) &&
+      st.exportClause.elements.some(nee => nee.name.getText() === typeName);
 
     return isInterfaceDeclarationExported || isTypeAliasDeclarationExported || isTypeInExportDeclaration;
   });
@@ -408,7 +438,8 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
 };
 
 export const typeToString = (checker: ts.TypeChecker, type: ts.Type) => {
-  const TYPE_FORMAT_FLAGS = ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType;
+  const TYPE_FORMAT_FLAGS =
+    ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType;
 
   return checker.typeToString(type, undefined, TYPE_FORMAT_FLAGS);
 };
@@ -435,7 +466,11 @@ export const getModuleFromSourceFile = (compilerCtx: d.CompilerCtx, tsSourceFile
   return moduleFiles.find(m => m.jsFilePath === sourceFilePath);
 };
 
-export const getComponentMeta = (compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile, node: ts.ClassDeclaration) => {
+export const getComponentMeta = (
+  compilerCtx: d.CompilerCtx,
+  tsSourceFile: ts.SourceFile,
+  node: ts.ClassDeclaration,
+) => {
   const meta = compilerCtx.nodeMap.get(node);
   if (meta) {
     return meta;
@@ -465,7 +500,11 @@ export const getComponentTagName = (staticMembers: ts.ClassElement[]) => {
 };
 
 export const isStaticGetter = (member: ts.ClassElement) => {
-  return member.kind === ts.SyntaxKind.GetAccessor && member.modifiers && member.modifiers.some(({ kind }) => kind === ts.SyntaxKind.StaticKeyword);
+  return (
+    member.kind === ts.SyntaxKind.GetAccessor &&
+    member.modifiers &&
+    member.modifiers.some(({ kind }) => kind === ts.SyntaxKind.StaticKeyword)
+  );
 };
 
 export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.CompilerJsDoc => {
@@ -521,7 +560,11 @@ export const isAsyncFn = (typeChecker: ts.TypeChecker, methodDeclaration: ts.Met
 
   const methodSignature = typeChecker.getSignatureFromDeclaration(methodDeclaration);
   const returnType = methodSignature.getReturnType();
-  const typeStr = typeChecker.typeToString(returnType, undefined, ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType);
+  const typeStr = typeChecker.typeToString(
+    returnType,
+    undefined,
+    ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType,
+  );
 
   return typeStr.includes('Promise<');
 };

@@ -467,7 +467,7 @@ describe('render-vdom', () => {
 
   it('render crash should not remove the content', async () => {
     let didError = false;
-    setErrorHandler((err) => {
+    setErrorHandler(err => {
       didError = true;
     });
     @Component({ tag: 'cmp-a' })

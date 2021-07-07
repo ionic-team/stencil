@@ -79,7 +79,10 @@ xdescribe('component-styles', () => {
   });
 
   it('should build one component w/ out inline style, and re-compile when adding inline styles', async () => {
-    await compiler.sys.writeFile(path.join(root, 'src', 'cmp-a.tsx'), `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
+    await compiler.sys.writeFile(
+      path.join(root, 'src', 'cmp-a.tsx'),
+      `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+    );
     const watcher = await compiler.createWatcher();
     // compiler.config.watch = true;
     await watcher.start();

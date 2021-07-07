@@ -18,7 +18,15 @@ export const updateComponentClass = (
         return m.kind !== ts.SyntaxKind.ExportKeyword;
       });
     }
-    return ts.updateClassDeclaration(classNode, classNode.decorators, classModifiers, classNode.name, classNode.typeParameters, heritageClauses, members);
+    return ts.updateClassDeclaration(
+      classNode,
+      classNode.decorators,
+      classModifiers,
+      classNode.name,
+      classNode.typeParameters,
+      heritageClauses,
+      members,
+    );
   }
 
   // ESM with export
@@ -47,7 +55,13 @@ const createConstClass = (
   return ts.createVariableStatement(
     constModifiers,
     ts.createVariableDeclarationList(
-      [ts.createVariableDeclaration(className, undefined, ts.createClassExpression(classModifiers, undefined, classNode.typeParameters, heritageClauses, members))],
+      [
+        ts.createVariableDeclaration(
+          className,
+          undefined,
+          ts.createClassExpression(classModifiers, undefined, classNode.typeParameters, heritageClauses, members),
+        ),
+      ],
       ts.NodeFlags.Const,
     ),
   );

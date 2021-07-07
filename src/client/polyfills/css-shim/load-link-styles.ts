@@ -30,7 +30,9 @@ export function loadDocumentLinks(doc: Document, globalScopes: CSSScope[]) {
 }
 
 export function loadDocumentStyles(doc: Document, globalScopes: CSSScope[]) {
-  const styleElms = Array.from(doc.querySelectorAll('style:not([data-styles]):not([data-no-shim])')) as HTMLStyleElement[];
+  const styleElms = Array.from(
+    doc.querySelectorAll('style:not([data-styles]):not([data-no-shim])'),
+  ) as HTMLStyleElement[];
   return styleElms.map(style => addGlobalStyle(globalScopes, style)).some(Boolean);
 }
 

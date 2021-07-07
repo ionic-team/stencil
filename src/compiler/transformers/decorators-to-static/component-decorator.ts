@@ -60,7 +60,8 @@ const validateComponent = (
   cmpNode: ts.ClassDeclaration,
   componentDecorator: ts.Node,
 ) => {
-  const extendNode = cmpNode.heritageClauses && cmpNode.heritageClauses.find(c => c.token === ts.SyntaxKind.ExtendsKeyword);
+  const extendNode =
+    cmpNode.heritageClauses && cmpNode.heritageClauses.find(c => c.token === ts.SyntaxKind.ExtendsKeyword);
   if (extendNode) {
     const err = buildError(diagnostics);
     err.messageText = `Classes decorated with @Component can not extend from a base class.

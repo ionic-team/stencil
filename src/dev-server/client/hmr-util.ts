@@ -55,13 +55,19 @@ export const updateCssUrlValue = (versionId: string, fileName: string, oldCss: s
 };
 
 export const isLinkStylesheet = (elm: Element) =>
-  elm.nodeName.toLowerCase() === 'link' && (elm as HTMLLinkElement).href && (elm as HTMLLinkElement).rel && (elm as HTMLLinkElement).rel.toLowerCase() === 'stylesheet';
+  elm.nodeName.toLowerCase() === 'link' &&
+  (elm as HTMLLinkElement).href &&
+  (elm as HTMLLinkElement).rel &&
+  (elm as HTMLLinkElement).rel.toLowerCase() === 'stylesheet';
 
 export const isTemplate = (elm: Element) =>
-  elm.nodeName.toLowerCase() === 'template' && !!(elm as HTMLTemplateElement).content && (elm as HTMLTemplateElement).content.nodeType === 11;
+  elm.nodeName.toLowerCase() === 'template' &&
+  !!(elm as HTMLTemplateElement).content &&
+  (elm as HTMLTemplateElement).content.nodeType === 11;
 
 export const setHmrAttr = (elm: Element, versionId: string) => elm.setAttribute('data-hmr', versionId);
 
-export const hasShadowRoot = (elm: Element) => !!elm.shadowRoot && elm.shadowRoot.nodeType === 11 && elm.shadowRoot !== (elm as any);
+export const hasShadowRoot = (elm: Element) =>
+  !!elm.shadowRoot && elm.shadowRoot.nodeType === 11 && elm.shadowRoot !== (elm as any);
 
 export const isElement = (elm: Element) => !!elm && elm.nodeType === 1 && !!elm.getAttribute;

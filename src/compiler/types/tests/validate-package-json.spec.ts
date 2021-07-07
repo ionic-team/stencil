@@ -88,10 +88,12 @@ describe('validate-package-json', () => {
     });
 
     it('validate custom elements module', async () => {
-      config.outputTargets = [{
-        type: 'dist-custom-elements-bundle',
-        dir: path.join(root, 'custom-elements')
-      }];
+      config.outputTargets = [
+        {
+          type: 'dist-custom-elements-bundle',
+          dir: path.join(root, 'custom-elements'),
+        },
+      ];
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.js'), '');
       buildCtx.packageJson.module = 'custom-elements/index.js';
       v.validateModule(config, compilerCtx, buildCtx, collectionOutputTarget);
@@ -105,10 +107,12 @@ describe('validate-package-json', () => {
     });
 
     it('missing dist module, but has custom elements output', async () => {
-      config.outputTargets = [{
-        type: 'dist-custom-elements-bundle',
-        dir: path.join(root, 'custom-elements')
-      }];
+      config.outputTargets = [
+        {
+          type: 'dist-custom-elements-bundle',
+          dir: path.join(root, 'custom-elements'),
+        },
+      ];
       v.validateModule(config, compilerCtx, buildCtx, collectionOutputTarget);
       expect(buildCtx.diagnostics).toHaveLength(1);
     });

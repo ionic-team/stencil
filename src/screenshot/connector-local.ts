@@ -37,7 +37,14 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
     const imagesUrl = normalizePath(relative(this.screenshotDir, this.imagesDir));
     const jsonpUrl = normalizePath(relative(this.screenshotDir, this.cacheDir));
 
-    const compareAppHtml = createLocalCompareApp(this.appNamespace, appSrcUrl, imagesUrl, jsonpUrl, results.masterBuild, results.currentBuild);
+    const compareAppHtml = createLocalCompareApp(
+      this.appNamespace,
+      appSrcUrl,
+      imagesUrl,
+      jsonpUrl,
+      results.masterBuild,
+      results.currentBuild,
+    );
 
     const compareAppFileName = 'compare.html';
     const compareAppFilePath = join(this.screenshotDir, compareAppFileName);
@@ -76,7 +83,14 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
   }
 }
 
-function createLocalCompareApp(namespace: string, appSrcUrl: string, imagesUrl: string, jsonpUrl: string, a: d.ScreenshotBuild, b: d.ScreenshotBuild) {
+function createLocalCompareApp(
+  namespace: string,
+  appSrcUrl: string,
+  imagesUrl: string,
+  jsonpUrl: string,
+  a: d.ScreenshotBuild,
+  b: d.ScreenshotBuild,
+) {
   return `<!doctype html>
 <html dir="ltr" lang="en">
 <head>

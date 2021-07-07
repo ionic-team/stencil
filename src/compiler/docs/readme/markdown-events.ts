@@ -26,5 +26,9 @@ export const eventsToMarkdown = (events: d.JsonDocsEvent[]) => {
 };
 
 const getDocsField = (prop: d.JsonDocsEvent) => {
-  return `${prop.deprecation !== undefined ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>` : ''}${prop.docs}`;
+  return `${
+    prop.deprecation !== undefined
+      ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
+      : ''
+  }${prop.docs}`;
 };

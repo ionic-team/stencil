@@ -63,7 +63,10 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
         }
       }
 
-      if (BUILD.updatable && (flags & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
+      if (
+        BUILD.updatable &&
+        (flags & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered
+      ) {
         if (BUILD.cmpShouldUpdate && instance.componentShouldUpdate) {
           if (instance.componentShouldUpdate(newVal, oldVal, propName) === false) {
             return;

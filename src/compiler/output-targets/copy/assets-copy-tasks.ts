@@ -2,7 +2,12 @@ import type * as d from '../../../declarations';
 import { dirname, join, relative } from 'path';
 import { normalizePath } from '@utils';
 
-export const getComponentAssetsCopyTasks = (config: d.Config, buildCtx: d.BuildCtx, dest: string, collectionsPath: boolean) => {
+export const getComponentAssetsCopyTasks = (
+  config: d.Config,
+  buildCtx: d.BuildCtx,
+  dest: string,
+  collectionsPath: boolean,
+) => {
   if (!dest) {
     return [];
   }
@@ -42,7 +47,11 @@ export const getComponentAssetsCopyTasks = (config: d.Config, buildCtx: d.BuildC
   return copyTasks;
 };
 
-export const canSkipAssetsCopy = (compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[], filesChanged: string[]) => {
+export const canSkipAssetsCopy = (
+  compilerCtx: d.CompilerCtx,
+  entryModules: d.EntryModule[],
+  filesChanged: string[],
+) => {
   if (!compilerCtx.hasSuccessfulBuild) {
     // always copy assets if we haven't had a successful build yet
     // cannot skip build

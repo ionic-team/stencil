@@ -4,7 +4,13 @@ import { DEFAULT_STYLE_MODE, sortBy } from '@utils';
 import { normalizeStyles } from '../../style/normalize-styles';
 import ts from 'typescript';
 
-export const parseStaticStyles = (compilerCtx: d.CompilerCtx, tagName: string, componentFilePath: string, isCollectionDependency: boolean, staticMembers: ts.ClassElement[]) => {
+export const parseStaticStyles = (
+  compilerCtx: d.CompilerCtx,
+  tagName: string,
+  componentFilePath: string,
+  isCollectionDependency: boolean,
+  staticMembers: ts.ClassElement[],
+) => {
   const styles: d.StyleCompiler[] = [];
   const styleUrlsProp = isCollectionDependency ? 'styleUrls' : 'originalStyleUrls';
   const parsedStyleUrls = getStaticValue(staticMembers, styleUrlsProp) as d.CompilerModeStyles;

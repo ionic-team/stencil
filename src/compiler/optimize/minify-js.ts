@@ -29,7 +29,7 @@ export const minifyJs = async (input: string, opts?: MinifyOptions) => {
       results.output = results.output.substring(0, results.output.length - 1);
     }
   } catch (e) {
-    console.log(e.stack)
+    console.log(e.stack);
     loadMinifyJsDiagnostics(input, results.diagnostics, e);
   }
 
@@ -116,4 +116,22 @@ const loadMinifyJsDiagnostics = (sourceText: string, diagnostics: d.Diagnostic[]
   diagnostics.push(d);
 };
 
-const MINIFY_CHAR_BREAK = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);
+const MINIFY_CHAR_BREAK = new Set([
+  ' ',
+  '=',
+  '.',
+  ',',
+  '?',
+  ':',
+  ';',
+  '(',
+  ')',
+  '{',
+  '}',
+  '[',
+  ']',
+  '|',
+  `'`,
+  `"`,
+  '`',
+]);

@@ -15,7 +15,11 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
         if (ts.isImportDeclaration(s)) {
           if (s.moduleSpecifier != null && ts.isStringLiteral(s.moduleSpecifier)) {
             if (s.moduleSpecifier.text === STENCIL_CORE_ID) {
-              if (s.importClause && s.importClause.namedBindings && s.importClause.namedBindings.kind === ts.SyntaxKind.NamedImports) {
+              if (
+                s.importClause &&
+                s.importClause.namedBindings &&
+                s.importClause.namedBindings.kind === ts.SyntaxKind.NamedImports
+              ) {
                 const origImports = s.importClause.namedBindings.elements;
 
                 const keepImports = origImports.map(e => e.getText()).filter(name => KEEP_IMPORTS.has(name));
@@ -25,7 +29,12 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
                     s,
                     undefined,
                     undefined,
-                    ts.createImportClause(undefined, ts.createNamedImports(keepImports.map(name => ts.createImportSpecifier(undefined, ts.createIdentifier(name))))),
+                    ts.createImportClause(
+                      undefined,
+                      ts.createNamedImports(
+                        keepImports.map(name => ts.createImportSpecifier(undefined, ts.createIdentifier(name))),
+                      ),
+                    ),
                     ts.createStringLiteral(updatedCoreImportPath),
                   );
                   newStatements.push(newImport);
@@ -72,5 +81,5 @@ const KEEP_IMPORTS = new Set([
   'forceUpdate',
   'getRenderingRef',
   'forceModeUpdate',
-  'setErrorHandler'
+  'setErrorHandler',
 ]);

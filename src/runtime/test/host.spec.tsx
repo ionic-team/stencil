@@ -39,14 +39,7 @@ describe('hostData', () => {
       @Prop() hidden = false;
 
       render() {
-        return (
-          <Host
-            value="hello"
-            role="alert"
-            aria-hidden={this.hidden ? 'true' : null}
-            hidden={this.hidden}
-          />
-        );
+        return <Host value="hello" role="alert" aria-hidden={this.hidden ? 'true' : null} hidden={this.hidden} />;
       }
     }
 

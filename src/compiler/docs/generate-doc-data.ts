@@ -6,7 +6,11 @@ import { getBuildTimestamp } from '../build/build-ctx';
 import { JsonDocsValue } from '../../declarations';
 import { typescriptVersion, version } from '../../version';
 
-export const generateDocData = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocs> => {
+export const generateDocData = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+): Promise<d.JsonDocs> => {
   return {
     timestamp: getBuildTimestamp(),
     compiler: {
@@ -18,7 +22,11 @@ export const generateDocData = async (config: d.Config, compilerCtx: d.CompilerC
   };
 };
 
-const getDocsComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> => {
+const getDocsComponents = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+): Promise<d.JsonDocsComponent[]> => {
   const results = await Promise.all(
     buildCtx.moduleFiles.map(async moduleFile => {
       const filePath = moduleFile.sourceFilePath;
@@ -96,7 +104,10 @@ const getDocsEncapsulation = (cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped'
 };
 
 const getDocsProperties = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] => {
-  return sortBy([...getRealProperties(cmpMeta.properties), ...getVirtualProperties(cmpMeta.virtualProperties)], p => p.name);
+  return sortBy(
+    [...getRealProperties(cmpMeta.properties), ...getVirtualProperties(cmpMeta.virtualProperties)],
+    p => p.name,
+  );
 };
 
 const getRealProperties = (properties: d.ComponentCompilerProperty[]): d.JsonDocsProp[] => {

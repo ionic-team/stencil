@@ -10,7 +10,13 @@ import { updateNativeComponentClass } from './native-component';
 import { updateStyleImports } from '../style-imports';
 import ts from 'typescript';
 
-export const transformToNativeComponentText = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmp: d.ComponentCompilerMeta, inputJsText: string) => {
+export const transformToNativeComponentText = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  cmp: d.ComponentCompilerMeta,
+  inputJsText: string,
+) => {
   let outputText: string = null;
 
   try {
@@ -51,7 +57,10 @@ export const transformToNativeComponentText = (config: d.Config, compilerCtx: d.
   return outputText;
 };
 
-export const nativeComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
+export const nativeComponentTransform = (
+  compilerCtx: d.CompilerCtx,
+  transformOpts: d.TransformOptions,
+): ts.TransformerFactory<ts.SourceFile> => {
   return transformCtx => {
     return tsSourceFile => {
       const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);

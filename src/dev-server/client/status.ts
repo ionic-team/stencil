@@ -55,7 +55,11 @@ const getFavIcons = (doc: Document) => {
   const linkElms = doc.querySelectorAll('link');
 
   for (let i = 0; i < linkElms.length; i++) {
-    if (linkElms[i].href && linkElms[i].rel && (linkElms[i].rel.indexOf('shortcut') > -1 || linkElms[i].rel.indexOf('icon') > -1)) {
+    if (
+      linkElms[i].href &&
+      linkElms[i].rel &&
+      (linkElms[i].rel.indexOf('shortcut') > -1 || linkElms[i].rel.indexOf('icon') > -1)
+    ) {
       iconElms.push(linkElms[i]);
     }
   }

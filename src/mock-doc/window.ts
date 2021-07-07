@@ -482,7 +482,7 @@ export class MockWindow {
 
     ms = Math.min(ms, this.__maxTimeout);
 
-    const timeoutId = (this.__setTimeout(() => {
+    const timeoutId = this.__setTimeout(() => {
       if (this.__timeouts) {
         this.__timeouts.delete(timeoutId);
 
@@ -496,7 +496,7 @@ export class MockWindow {
           }
         }
       }
-    }, ms) as any) as number;
+    }, ms) as any as number;
 
     if (this.__timeouts) {
       this.__timeouts.add(timeoutId);

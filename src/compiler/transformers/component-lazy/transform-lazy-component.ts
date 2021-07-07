@@ -6,7 +6,10 @@ import { updateLazyComponentClass } from './lazy-component';
 import { updateStyleImports } from '../style-imports';
 import ts from 'typescript';
 
-export const lazyComponentTransform = (compilerCtx: d.CompilerCtx, transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
+export const lazyComponentTransform = (
+  compilerCtx: d.CompilerCtx,
+  transformOpts: d.TransformOptions,
+): ts.TransformerFactory<ts.SourceFile> => {
   return transformCtx => {
     return tsSourceFile => {
       const styleStatements: ts.Statement[] = [];

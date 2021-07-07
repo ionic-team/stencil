@@ -1219,9 +1219,7 @@ export interface InMemoryFileSystem {
   /* new compiler */
   sys?: CompilerSystem;
 
-  accessData(
-    filePath: string,
-  ): Promise<{
+  accessData(filePath: string): Promise<{
     exists: boolean;
     isDirectory: boolean;
     isFile: boolean;
@@ -1244,9 +1242,7 @@ export interface InMemoryFileSystem {
    */
   readFileSync(filePath: string, opts?: FsReadOptions): string;
   remove(itemPath: string): Promise<void>;
-  stat(
-    itemPath: string,
-  ): Promise<{
+  stat(itemPath: string): Promise<{
     isFile: boolean;
     isDirectory: boolean;
   }>;
@@ -1255,9 +1251,7 @@ export interface InMemoryFileSystem {
    * (Only typescript transpiling is allowed to use)
    * @param itemPath
    */
-  statSync(
-    itemPath: string,
-  ): {
+  statSync(itemPath: string): {
     exists: boolean;
     isFile: boolean;
     isDirectory: boolean;
@@ -2213,7 +2207,7 @@ export interface JestEnvironmentGlobal {
     fullName: string;
     testPath: string;
   };
-  env: {[prop: string]: string};
+  env: { [prop: string]: string };
   screenshotDescriptions: Set<string>;
 }
 

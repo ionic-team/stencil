@@ -35,7 +35,13 @@ export const buildWarn = (diagnostics: d.Diagnostic[]) => {
   return diagnostic;
 };
 
-export const buildJsonFileError = (compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], jsonFilePath: string, msg: string, pkgKey: string) => {
+export const buildJsonFileError = (
+  compilerCtx: d.CompilerCtx,
+  diagnostics: d.Diagnostic[],
+  jsonFilePath: string,
+  msg: string,
+  pkgKey: string,
+) => {
   const err = buildError(diagnostics);
   err.messageText = msg;
   err.absFilePath = jsonFilePath;

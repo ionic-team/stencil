@@ -8,7 +8,15 @@ export const addComponentMetaStatic = (cmpNode: ts.ClassDeclaration, cmpMeta: d.
   const cmpMetaStaticProp = createStaticGetter('COMPILER_META', convertValueToLiteral(publicCompilerMeta));
   const classMembers = [...cmpNode.members, cmpMetaStaticProp];
 
-  return ts.updateClassDeclaration(cmpNode, cmpNode.decorators, cmpNode.modifiers, cmpNode.name, cmpNode.typeParameters, cmpNode.heritageClauses, classMembers);
+  return ts.updateClassDeclaration(
+    cmpNode,
+    cmpNode.decorators,
+    cmpNode.modifiers,
+    cmpNode.name,
+    cmpNode.typeParameters,
+    cmpNode.heritageClauses,
+    classMembers,
+  );
 };
 
 export const getPublicCompilerMeta = (cmpMeta: d.ComponentCompilerMeta) => {

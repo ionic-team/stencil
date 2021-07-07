@@ -1,4 +1,11 @@
-import { BuildConditionals, BuildFeatures, ComponentCompilerMeta, Config, Module, ModuleMap } from '@stencil/core/internal';
+import {
+  BuildConditionals,
+  BuildFeatures,
+  ComponentCompilerMeta,
+  Config,
+  Module,
+  ModuleMap,
+} from '@stencil/core/internal';
 import { unique } from '@utils';
 
 export * from '../../app-data';
@@ -128,7 +135,12 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.isTesting = !!config._isTesting;
   b.devTools = b.isDev && !config._isTesting;
   b.profile = !!config.profile;
-  b.hotModuleReplacement = !!(config.devMode && config.devServer && config.devServer.reloadStrategy === 'hmr' && !config._isTesting);
+  b.hotModuleReplacement = !!(
+    config.devMode &&
+    config.devServer &&
+    config.devServer.reloadStrategy === 'hmr' &&
+    !config._isTesting
+  );
   b.updatable = b.updatable || b.hydrateClientSide || b.hotModuleReplacement;
   b.member = b.member || b.updatable || b.mode || b.lifecycle;
   b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;

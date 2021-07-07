@@ -1,6 +1,14 @@
 import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, buildWarn } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, isMemberPrivate, serializeSymbol, typeToString, validateReferences } from '../transform-utils';
+import {
+  convertValueToLiteral,
+  createStaticGetter,
+  getAttributeTypeInfo,
+  isMemberPrivate,
+  serializeSymbol,
+  typeToString,
+  validateReferences,
+} from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 import { validatePublicName } from '../reserved-public-members';
 import ts from 'typescript';
@@ -24,7 +32,13 @@ export const methodDecoratorsToStatic = (
   }
 };
 
-const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], tsSourceFile: ts.SourceFile, typeChecker: ts.TypeChecker, method: ts.MethodDeclaration) => {
+const parseMethodDecorator = (
+  config: d.Config,
+  diagnostics: d.Diagnostic[],
+  tsSourceFile: ts.SourceFile,
+  typeChecker: ts.TypeChecker,
+  method: ts.MethodDeclaration,
+) => {
   const methodDecorator = method.decorators.find(isDecoratorNamed('Method'));
   if (methodDecorator == null) {
     return null;
@@ -34,7 +48,11 @@ const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], tsS
   const flags = ts.TypeFormatFlags.WriteArrowStyleSignature | ts.TypeFormatFlags.NoTruncation;
   const signature = typeChecker.getSignatureFromDeclaration(method);
   const returnType = typeChecker.getReturnTypeOfSignature(signature);
-  const returnTypeNode = typeChecker.typeToTypeNode(returnType, method, ts.NodeBuilderFlags.NoTruncation | ts.NodeBuilderFlags.NoTypeReduction);
+  const returnTypeNode = typeChecker.typeToTypeNode(
+    returnType,
+    method,
+    ts.NodeBuilderFlags.NoTruncation | ts.NodeBuilderFlags.NoTypeReduction,
+  );
   let returnString = typeToString(typeChecker, returnType);
   let signatureString = typeChecker.signatureToString(signature, method, flags, ts.SignatureKind.Call);
 
@@ -57,7 +75,8 @@ const parseMethodDecorator = (config: d.Config, diagnostics: d.Diagnostic[], tsS
 
   if (isMemberPrivate(method)) {
     const err = buildError(diagnostics);
-    err.messageText = 'Methods decorated with the @Method() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/methods';
+    err.messageText =
+      'Methods decorated with the @Method() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/methods';
     augmentDiagnosticWithNode(err, method.modifiers[0]);
   }
 

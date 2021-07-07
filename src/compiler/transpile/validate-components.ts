@@ -14,6 +14,8 @@ const validateUniqueTagNames = (config: d.Config, buildCtx: d.BuildCtx, cmp: d.C
   if (cmpsWithTagName.length > 1) {
     const err = buildError(buildCtx.diagnostics);
     err.header = `Component Tag Name "${tagName}" Must Be Unique`;
-    err.messageText = `Please update the components so "${tagName}" is only used once: ${cmpsWithTagName.map(c => relative(config.rootDir, c.sourceFilePath)).join(' ')}`;
+    err.messageText = `Please update the components so "${tagName}" is only used once: ${cmpsWithTagName
+      .map(c => relative(config.rootDir, c.sourceFilePath))
+      .join(' ')}`;
   }
 };

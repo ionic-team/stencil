@@ -38,7 +38,9 @@ export function toHaveReceivedEventTimes(eventSpy: d.EventSpy, count: number) {
 
   return {
     message: () =>
-      `expected event "${eventSpy.eventName}" to have been called ${count} times, but was called ${eventSpy.events.length} time${eventSpy.events.length > 1 ? 's' : ''}`,
+      `expected event "${eventSpy.eventName}" to have been called ${count} times, but was called ${
+        eventSpy.events.length
+      } time${eventSpy.events.length > 1 ? 's' : ''}`,
     pass: pass,
   };
 }

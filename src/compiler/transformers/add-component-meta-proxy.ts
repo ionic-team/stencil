@@ -20,5 +20,7 @@ const addComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta) => {
   const liternalCmpClassName = ts.createIdentifier(compilerMeta.componentClassName);
   const liternalMeta = convertValueToLiteral(compactMeta);
 
-  return ts.createStatement(ts.createCall(ts.createIdentifier(PROXY_CUSTOM_ELEMENT), [], [liternalCmpClassName, liternalMeta]));
+  return ts.createStatement(
+    ts.createCall(ts.createIdentifier(PROXY_CUSTOM_ELEMENT), [], [liternalCmpClassName, liternalMeta]),
+  );
 };

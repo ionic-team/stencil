@@ -4,11 +4,19 @@ import { EMPTY_OBJ } from '@utils';
 import { NODE_TYPE } from '../runtime-constants';
 import { setAccessor } from './set-accessor';
 
-export const updateElement = (oldVnode: d.VNode | null, newVnode: d.VNode, isSvgMode: boolean, memberName?: string): void => {
+export const updateElement = (
+  oldVnode: d.VNode | null,
+  newVnode: d.VNode,
+  isSvgMode: boolean,
+  memberName?: string,
+): void => {
   // if the element passed in is a shadow root, which is a document fragment
   // then we want to be adding attrs/props to the shadow root's "host" element
   // if it's not a shadow root, then we add attrs/props to the same element
-  const elm = newVnode.$elm$.nodeType === NODE_TYPE.DocumentFragment && newVnode.$elm$.host ? newVnode.$elm$.host : (newVnode.$elm$ as any);
+  const elm =
+    newVnode.$elm$.nodeType === NODE_TYPE.DocumentFragment && newVnode.$elm$.host
+      ? newVnode.$elm$.host
+      : (newVnode.$elm$ as any);
   const oldVnodeAttrs = (oldVnode && oldVnode.$attrs$) || EMPTY_OBJ;
   const newVnodeAttrs = newVnode.$attrs$ || EMPTY_OBJ;
 

@@ -30,7 +30,15 @@ export const parseModuleImport = (
       moduleFile.localImports.push(importPath);
     } else {
       // node resolve side effect import
-      addExternalImport(config, compilerCtx, buildCtx, moduleFile, moduleFile.sourceFilePath, importPath, resolveCollections);
+      addExternalImport(
+        config,
+        compilerCtx,
+        buildCtx,
+        moduleFile,
+        moduleFile.sourceFilePath,
+        importPath,
+        resolveCollections,
+      );
     }
   }
 };

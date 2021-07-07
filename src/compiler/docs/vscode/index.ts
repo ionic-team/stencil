@@ -3,7 +3,11 @@ import { getNameText } from '../generate-doc-data';
 import { isOutputTargetDocsVscode } from '../../output-targets/output-utils';
 import { join } from 'path';
 
-export const generateVscodeDocs = async (compilerCtx: d.CompilerCtx, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) => {
+export const generateVscodeDocs = async (
+  compilerCtx: d.CompilerCtx,
+  docsData: d.JsonDocs,
+  outputTargets: d.OutputTarget[],
+) => {
   const vsCodeOutputTargets = outputTargets.filter(isOutputTargetDocsVscode);
   if (vsCodeOutputTargets.length === 0) {
     return;
@@ -48,7 +52,9 @@ const serializeAttribute = (prop: d.JsonDocsProp) => {
     name: prop.attr,
     description: prop.docs,
   };
-  const values = prop.values.filter(({ type, value }) => type === 'string' && value !== undefined).map(({ value }) => ({ name: value }));
+  const values = prop.values
+    .filter(({ type, value }) => type === 'string' && value !== undefined)
+    .map(({ value }) => ({ name: value }));
 
   if (values.length > 0) {
     attribute.values = values;

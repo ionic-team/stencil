@@ -15,7 +15,10 @@ export function getDefaultBundles(config: d.Config, buildCtx: d.BuildCtx, cmps: 
     return [];
   }
 
-  const mainBundle = unique([...entryPointsHints, ...flatOne(entryPointsHints.map(resolveTag).map(cmp => cmp.dependencies))]).map(resolveTag);
+  const mainBundle = unique([
+    ...entryPointsHints,
+    ...flatOne(entryPointsHints.map(resolveTag).map(cmp => cmp.dependencies)),
+  ]).map(resolveTag);
 
   function resolveTag(tag: string) {
     return cmps.find(cmp => cmp.tagName === tag);

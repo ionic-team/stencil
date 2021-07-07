@@ -81,7 +81,9 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
           tsconfig.compilerOptions = results.options;
 
           const target = tsconfig.compilerOptions.target ?? ts.ScriptTarget.ES5;
-          if ([ts.ScriptTarget.ES3, ts.ScriptTarget.ES5, ts.ScriptTarget.ES2015, ts.ScriptTarget.ES2016].includes(target)) {
+          if (
+            [ts.ScriptTarget.ES3, ts.ScriptTarget.ES5, ts.ScriptTarget.ES2015, ts.ScriptTarget.ES2016].includes(target)
+          ) {
             const warn = buildWarn(tsconfig.diagnostics);
             warn.messageText = `To improve bundling, it is always recommended to set the tsconfig.json “target” setting to "es2017". Note that the compiler will automatically handle transpilation for ES5-only browsers.`;
           }
@@ -146,7 +148,7 @@ const createDefaultTsConfig = (config: d.Config) =>
         target: 'es2017',
         jsx: 'react',
         jsxFactory: 'h',
-        jsxFragmentFactory: 'Fragment'
+        jsxFragmentFactory: 'Fragment',
       },
       include: [relative(config.rootDir, config.srcDir)],
     },
@@ -154,6 +156,8 @@ const createDefaultTsConfig = (config: d.Config) =>
     2,
   );
 
-const hasSrcDirectoryInclude = (includeProp: string[], src: string) => Array.isArray(includeProp) && includeProp.includes(src);
+const hasSrcDirectoryInclude = (includeProp: string[], src: string) =>
+  Array.isArray(includeProp) && includeProp.includes(src);
 
-const hasStencilConfigInclude = (includeProp: string[]) => Array.isArray(includeProp) && includeProp.includes('stencil.config.ts');
+const hasStencilConfigInclude = (includeProp: string[]) =>
+  Array.isArray(includeProp) && includeProp.includes('stencil.config.ts');

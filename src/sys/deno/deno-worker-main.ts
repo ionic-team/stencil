@@ -1,7 +1,10 @@
 import type * as d from '../../declarations';
 import { TASK_CANCELED_MSG } from '@utils';
 
-export const createDenoWorkerMainController = (sys: d.CompilerSystem, maxConcurrentWorkers: number): d.WorkerMainController => {
+export const createDenoWorkerMainController = (
+  sys: d.CompilerSystem,
+  maxConcurrentWorkers: number,
+): d.WorkerMainController => {
   let msgIds = 0;
   let isDestroyed = false;
   let isQueued = false;

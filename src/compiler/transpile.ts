@@ -53,7 +53,12 @@ export const transpileSync = (code: string, opts: TranspileOptions = {}) => {
   return results;
 };
 
-const transpileCode = (config: Config, transpileOpts: TranspileOptions, transformOpts: TransformOptions, results: TranspileResults) => {
+const transpileCode = (
+  config: Config,
+  transpileOpts: TranspileOptions,
+  transformOpts: TransformOptions,
+  results: TranspileResults,
+) => {
   const transpileResults = transpileModule(config, results.code, transformOpts);
 
   results.diagnostics.push(...transpileResults.diagnostics);

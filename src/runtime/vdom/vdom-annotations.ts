@@ -1,5 +1,13 @@
 import type * as d from '../../declarations';
-import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from '../runtime-constants';
+import {
+  CONTENT_REF_ID,
+  HYDRATE_CHILD_ID,
+  HYDRATE_ID,
+  NODE_TYPE,
+  ORG_LOCATION_ID,
+  SLOT_NODE_ID,
+  TEXT_NODE_ID,
+} from '../runtime-constants';
 import { getHostRef } from '@platform';
 
 export const insertVdomAnnotations = (doc: Document, staticComponents: string[]) => {
@@ -67,7 +75,12 @@ export const insertVdomAnnotations = (doc: Document, staticComponents: string[])
   }
 };
 
-const parseVNodeAnnotations = (doc: Document, node: d.RenderNode, docData: DocData, orgLocationNodes: d.RenderNode[]) => {
+const parseVNodeAnnotations = (
+  doc: Document,
+  node: d.RenderNode,
+  docData: DocData,
+  orgLocationNodes: d.RenderNode[],
+) => {
   if (node == null) {
     return;
   }
@@ -91,7 +104,13 @@ const parseVNodeAnnotations = (doc: Document, node: d.RenderNode, docData: DocDa
   }
 };
 
-const insertVNodeAnnotations = (doc: Document, hostElm: d.HostElement, vnode: d.VNode, docData: DocData, cmpData: CmpData) => {
+const insertVNodeAnnotations = (
+  doc: Document,
+  hostElm: d.HostElement,
+  vnode: d.VNode,
+  docData: DocData,
+  cmpData: CmpData,
+) => {
   if (vnode != null) {
     const hostId = ++docData.hostIds;
 
@@ -112,19 +131,29 @@ const insertVNodeAnnotations = (doc: Document, hostElm: d.HostElement, vnode: d.
       const parent: HTMLElement = hostElm.parentElement;
       if (parent && parent.childNodes) {
         const parentChildNodes: ChildNode[] = Array.from(parent.childNodes);
-        const comment: d.RenderNode | undefined = parentChildNodes.find(node => node.nodeType === NODE_TYPE.CommentNode && (node as d.RenderNode)['s-sr']) as
-          | d.RenderNode
-          | undefined;
+        const comment: d.RenderNode | undefined = parentChildNodes.find(
+          node => node.nodeType === NODE_TYPE.CommentNode && (node as d.RenderNode)['s-sr'],
+        ) as d.RenderNode | undefined;
         if (comment) {
           const index: number = parentChildNodes.indexOf(hostElm) - 1;
-          (vnode.$elm$ as d.RenderNode).setAttribute(HYDRATE_CHILD_ID, `${comment['s-host-id']}.${comment['s-node-id']}.0.${index}`);
+          (vnode.$elm$ as d.RenderNode).setAttribute(
+            HYDRATE_CHILD_ID,
+            `${comment['s-host-id']}.${comment['s-node-id']}.0.${index}`,
+          );
         }
       }
     }
   }
 };
 
-const insertChildVNodeAnnotations = (doc: Document, vnodeChild: d.VNode, cmpData: CmpData, hostId: number, depth: number, index: number) => {
+const insertChildVNodeAnnotations = (
+  doc: Document,
+  vnodeChild: d.VNode,
+  cmpData: CmpData,
+  hostId: number,
+  depth: number,
+  index: number,
+) => {
   const childElm = vnodeChild.$elm$ as d.RenderNode;
   if (childElm == null) {
     return;

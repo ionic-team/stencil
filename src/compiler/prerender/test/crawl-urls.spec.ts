@@ -51,7 +51,11 @@ describe('crawlAnchorsForNextUrls', () => {
   });
 
   it('user filterAnchor()', () => {
-    parsedAnchors = [{ href: '/docs' }, { 'href': '/docs/about-us', 'data-prerender': 'yes-plz' }, { 'href': '/docs/app', 'data-prerender': 'no-prerender' }];
+    parsedAnchors = [
+      { href: '/docs' },
+      { 'href': '/docs/about-us', 'data-prerender': 'yes-plz' },
+      { 'href': '/docs/app', 'data-prerender': 'no-prerender' },
+    ];
     prerenderConfig.filterAnchor = function (anchor) {
       if (anchor['data-prerender'] === 'no-prerender') {
         return false;
@@ -79,7 +83,14 @@ describe('crawlAnchorsForNextUrls', () => {
 
   it('normalize with trailing slash', () => {
     prerenderConfig.trailingSlash = true;
-    parsedAnchors = [{ href: '/' }, { href: '/about-us' }, { href: '/about-us/' }, { href: '/docs' }, { href: '/docs/' }, { href: '/docs/index.html' }];
+    parsedAnchors = [
+      { href: '/' },
+      { href: '/about-us' },
+      { href: '/about-us/' },
+      { href: '/docs' },
+      { href: '/docs/' },
+      { href: '/docs/index.html' },
+    ];
 
     const hrefs = crawlAnchorsForNextUrls(prerenderConfig, diagnostics, baseUrl, currentUrl, parsedAnchors);
     expect(diagnostics).toHaveLength(0);
@@ -91,7 +102,14 @@ describe('crawlAnchorsForNextUrls', () => {
   });
 
   it('normalize without trailing slash', () => {
-    parsedAnchors = [{ href: '/' }, { href: '/about-us' }, { href: '/about-us/' }, { href: '/docs' }, { href: '/docs/' }, { href: '/docs/index.html' }];
+    parsedAnchors = [
+      { href: '/' },
+      { href: '/about-us' },
+      { href: '/about-us/' },
+      { href: '/docs' },
+      { href: '/docs/' },
+      { href: '/docs/index.html' },
+    ];
 
     const hrefs = crawlAnchorsForNextUrls(prerenderConfig, diagnostics, baseUrl, currentUrl, parsedAnchors);
     expect(diagnostics).toHaveLength(0);
@@ -104,7 +122,13 @@ describe('crawlAnchorsForNextUrls', () => {
 
   it('skip directories below base path', () => {
     baseUrl = new URL('http://stenciljs.com/docs');
-    parsedAnchors = [{ href: '/' }, { href: '/about-us' }, { href: '/contact-us' }, { href: '/docs' }, { href: '/docs/components' }];
+    parsedAnchors = [
+      { href: '/' },
+      { href: '/about-us' },
+      { href: '/contact-us' },
+      { href: '/docs' },
+      { href: '/docs/components' },
+    ];
 
     const hrefs = crawlAnchorsForNextUrls(prerenderConfig, diagnostics, baseUrl, currentUrl, parsedAnchors);
     expect(diagnostics).toHaveLength(0);
@@ -230,7 +254,14 @@ describe('crawlAnchorsForNextUrls', () => {
   });
 
   it('parse relative paths', () => {
-    parsedAnchors = [{ href: '/' }, { href: './' }, { href: './docs/../docs/../' }, { href: '/docs' }, { href: '/docs/../' }, { href: '/docs/..' }];
+    parsedAnchors = [
+      { href: '/' },
+      { href: './' },
+      { href: './docs/../docs/../' },
+      { href: '/docs' },
+      { href: '/docs/../' },
+      { href: '/docs/..' },
+    ];
 
     const hrefs = crawlAnchorsForNextUrls(prerenderConfig, diagnostics, baseUrl, currentUrl, parsedAnchors);
     expect(diagnostics).toHaveLength(0);
@@ -241,7 +272,14 @@ describe('crawlAnchorsForNextUrls', () => {
   });
 
   it('do nothing for invalid hrefs', () => {
-    parsedAnchors = [{ href: '' }, { href: '     ' }, { href: '#' }, { href: '#some-hash' }, { href: '?' }, { href: '?some=querystring' }];
+    parsedAnchors = [
+      { href: '' },
+      { href: '     ' },
+      { href: '#' },
+      { href: '#some-hash' },
+      { href: '?' },
+      { href: '?some=querystring' },
+    ];
 
     const hrefs = crawlAnchorsForNextUrls(prerenderConfig, diagnostics, baseUrl, currentUrl, parsedAnchors);
     expect(diagnostics).toHaveLength(0);

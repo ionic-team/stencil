@@ -61,7 +61,8 @@ export function computeSpecificity(_selector: string): number {
 }
 
 const IMPORTANT = '!important';
-const FIND_DECLARATIONS = /(?:^|[;\s{]\s*)(--[\w-]*?)\s*:\s*(?:((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^)]*?\)|[^};{])+)|\{([^}]*)\}(?:(?=[;\s}])|$))/gm;
+const FIND_DECLARATIONS =
+  /(?:^|[;\s{]\s*)(--[\w-]*?)\s*:\s*(?:((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^)]*?\)|[^};{])+)|\{([^}]*)\}(?:(?=[;\s}])|$))/gm;
 
 export function getDeclarations(cssText: string) {
   const declarations: Declaration[] = [];
@@ -90,7 +91,11 @@ export function normalizeValue(value: string) {
   };
 }
 
-export function getActiveSelectors(hostEl: HTMLElement, hostScopeMap: WeakMap<HTMLElement, CSSScope>, globalScopes: CSSScope[]): CSSSelector[] {
+export function getActiveSelectors(
+  hostEl: HTMLElement,
+  hostScopeMap: WeakMap<HTMLElement, CSSScope>,
+  globalScopes: CSSScope[],
+): CSSSelector[] {
   // computes the css scopes that might affect this particular element
   // avoiding using spread arrays to avoid ts helper fns when in es5
   const scopes: CSSScope[] = [];

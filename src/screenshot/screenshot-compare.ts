@@ -114,7 +114,10 @@ export async function compareScreenshot(
         pixelmatchThreshold: pixelmatchThreshold,
       };
 
-      screenshot.diff.mismatchedPixels = await getMismatchedPixels(screenshotBuildData.pixelmatchModulePath, pixelMatchInput);
+      screenshot.diff.mismatchedPixels = await getMismatchedPixels(
+        screenshotBuildData.pixelmatchModulePath,
+        pixelMatchInput,
+      );
     }
   }
 

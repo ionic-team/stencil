@@ -13,7 +13,11 @@ export const outputLazyLoader = async (config: d.Config, compilerCtx: d.Compiler
   await Promise.all(outputTargets.map(o => generateLoader(config, compilerCtx, o)));
 };
 
-const generateLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistLazyLoader) => {
+const generateLoader = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  outputTarget: d.OutputTargetDistLazyLoader,
+) => {
   const loaderPath = outputTarget.dir;
   const es2017Dir = outputTarget.esmDir;
   const es5Dir = outputTarget.esmEs5Dir || es2017Dir;

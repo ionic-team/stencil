@@ -4,7 +4,12 @@ import { isString, toTitleCase } from '../helpers';
 import { splitLineBreaks } from './logger-utils';
 import type { RollupError } from 'rollup';
 
-export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: RollupError) => {
+export const loadRollupDiagnostics = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  rollupError: RollupError,
+) => {
   const formattedCode = formatErrorCode(rollupError.code);
 
   const diagnostic: d.Diagnostic = {
@@ -135,7 +140,13 @@ export const createOnWarnFn = (diagnostics: d.Diagnostic[], bundleModulesFiles?:
   };
 };
 
-const ignoreWarnCodes = new Set(['THIS_IS_UNDEFINED', 'NON_EXISTENT_EXPORT', 'CIRCULAR_DEPENDENCY', 'EMPTY_BUNDLE', 'UNUSED_EXTERNAL_IMPORT']);
+const ignoreWarnCodes = new Set([
+  'THIS_IS_UNDEFINED',
+  'NON_EXISTENT_EXPORT',
+  'CIRCULAR_DEPENDENCY',
+  'EMPTY_BUNDLE',
+  'UNUSED_EXTERNAL_IMPORT',
+]);
 
 const charBreak = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);
 

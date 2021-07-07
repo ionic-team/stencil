@@ -151,7 +151,12 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     });
   };
 
-  const readDirectory = async (initPath: string, dirPath: string, opts: d.FsReaddirOptions, collectedPaths: d.FsReaddirItem[]) => {
+  const readDirectory = async (
+    initPath: string,
+    dirPath: string,
+    opts: d.FsReaddirOptions,
+    collectedPaths: d.FsReaddirItem[],
+  ) => {
     // used internally only so we could easily recursively drill down
     // loop through this directory and sub directories
     // always a disk read!!removeDir
@@ -523,7 +528,13 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
     while (true) {
       p = dirname(p);
-      if (typeof p === 'string' && p.length > 0 && p !== '/' && p.endsWith(':/') === false && p.endsWith(':\\') === false) {
+      if (
+        typeof p === 'string' &&
+        p.length > 0 &&
+        p !== '/' &&
+        p.endsWith(':/') === false &&
+        p.endsWith(':\\') === false
+      ) {
         allDirs.push(p);
       } else {
         break;

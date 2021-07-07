@@ -88,7 +88,10 @@ export const isHtmlFile = (filePath: string) => {
   return hasFileExtension(filePath, ['html', 'htm']);
 };
 
-export const generatePreamble = (config: d.Config, opts: { prefix?: string; suffix?: string; defaultBanner?: boolean } = {}) => {
+export const generatePreamble = (
+  config: d.Config,
+  opts: { prefix?: string; suffix?: string; defaultBanner?: boolean } = {},
+) => {
   let preamble: string[] = [];
 
   if (config.preamble) {
@@ -172,7 +175,10 @@ export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerC
   }
 };
 
-export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): { diagnostic: d.Diagnostic; data: d.PackageJsonData; filePath: string } => {
+export const parsePackageJson = (
+  pkgJsonStr: string,
+  pkgJsonFilePath: string,
+): { diagnostic: d.Diagnostic; data: d.PackageJsonData; filePath: string } => {
   if (isString(pkgJsonFilePath)) {
     return parseJson(pkgJsonStr, pkgJsonFilePath);
   }

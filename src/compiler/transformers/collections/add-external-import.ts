@@ -67,7 +67,14 @@ export const addExternalImport = (
   // this import is a stencil collection
   // let's parse it and gather all the module data about it
   // internally it'll cached collection data if we've already done this
-  const collection = parseCollection(config, compilerCtx, buildCtx, moduleId, parsedPkgJson.filePath, parsedPkgJson.data);
+  const collection = parseCollection(
+    config,
+    compilerCtx,
+    buildCtx,
+    moduleId,
+    parsedPkgJson.filePath,
+    parsedPkgJson.data,
+  );
   if (!collection) {
     return;
   }
@@ -90,7 +97,15 @@ export const addExternalImport = (
     // let's keep digging down and discover all of them
     collection.dependencies.forEach(dependencyModuleId => {
       const resolveFromDir = dirname(pkgJsonFilePath);
-      addExternalImport(config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId, resolveCollections);
+      addExternalImport(
+        config,
+        compilerCtx,
+        buildCtx,
+        moduleFile,
+        resolveFromDir,
+        dependencyModuleId,
+        resolveCollections,
+      );
     });
   }
 };

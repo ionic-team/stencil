@@ -6,7 +6,9 @@ export function toMatchScreenshot(compare: d.ScreenshotDiff, opts: d.MatchScreen
   }
 
   if (typeof (compare as any).then === 'function') {
-    throw new Error(`expect(compare).toMatchScreenshot() must be a resolved value, not a promise, before it can be tested`);
+    throw new Error(
+      `expect(compare).toMatchScreenshot() must be a resolved value, not a promise, before it can be tested`,
+    );
   }
 
   if (typeof compare.mismatchedPixels !== 'number') {
@@ -20,7 +22,9 @@ export function toMatchScreenshot(compare: d.ScreenshotDiff, opts: d.MatchScreen
       throw new Error(`expect toMatchScreenshot() allowableMismatchedRatio must be a value ranging from 0 to 1`);
     }
 
-    const mismatchedRatio = compare.mismatchedPixels / (compare.width * compare.deviceScaleFactor * (compare.height * compare.deviceScaleFactor));
+    const mismatchedRatio =
+      compare.mismatchedPixels /
+      (compare.width * compare.deviceScaleFactor * (compare.height * compare.deviceScaleFactor));
     return {
       message: () =>
         `${device}: screenshot has a mismatch ratio of "${mismatchedRatio}" for "${compare.desc}", but expected ratio to be less than "${opts.allowableMismatchedRatio}"`,
@@ -30,7 +34,9 @@ export function toMatchScreenshot(compare: d.ScreenshotDiff, opts: d.MatchScreen
 
   if (typeof opts.allowableMismatchedPixels === 'number') {
     if (opts.allowableMismatchedPixels < 0) {
-      throw new Error(`expect toMatchScreenshot() allowableMismatchedPixels value must be a value that is 0 or greater`);
+      throw new Error(
+        `expect toMatchScreenshot() allowableMismatchedPixels value must be a value that is 0 or greater`,
+      );
     }
     return {
       message: () =>
@@ -40,7 +46,9 @@ export function toMatchScreenshot(compare: d.ScreenshotDiff, opts: d.MatchScreen
   }
 
   if (typeof compare.allowableMismatchedRatio === 'number') {
-    const mismatchedRatio = compare.mismatchedPixels / (compare.width * compare.deviceScaleFactor * (compare.height * compare.deviceScaleFactor));
+    const mismatchedRatio =
+      compare.mismatchedPixels /
+      (compare.width * compare.deviceScaleFactor * (compare.height * compare.deviceScaleFactor));
     return {
       message: () =>
         `${device}: screenshot has a mismatch ratio of "${mismatchedRatio}" for "${compare.desc}", but expected ratio to be less than "${compare.allowableMismatchedRatio}"`,

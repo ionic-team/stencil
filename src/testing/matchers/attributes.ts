@@ -26,7 +26,8 @@ export function toEqualAttribute(elm: HTMLElement, expectAttrName: string, expec
   const pass = expectAttrValue === receivedAttrValue;
 
   return {
-    message: () => `expected attribute ${expectAttrName} "${expectAttrValue}" to ${pass ? 'not ' : ''}equal "${receivedAttrValue}"`,
+    message: () =>
+      `expected attribute ${expectAttrName} "${expectAttrValue}" to ${pass ? 'not ' : ''}equal "${receivedAttrValue}"`,
     pass: pass,
   };
 }
@@ -55,7 +56,10 @@ export function toEqualAttributes(elm: HTMLElement, expectAttrs: { [attrName: st
   });
 
   return {
-    message: () => `expected attributes to ${pass ? 'not ' : ''}equal ${attrNames.map(a => `[${a}="${expectAttrs[a]}"]`).join(', ')}`,
+    message: () =>
+      `expected attributes to ${pass ? 'not ' : ''}equal ${attrNames
+        .map(a => `[${a}="${expectAttrs[a]}"]`)
+        .join(', ')}`,
     pass: pass,
   };
 }

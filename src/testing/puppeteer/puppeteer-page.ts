@@ -8,13 +8,7 @@ import type {
   PageDiagnostic,
 } from './puppeteer-declarations';
 
-import type {
-  ConsoleMessage,
-  ConsoleMessageLocation,
-  JSHandle,
-  Page,
-  WaitForOptions,
-} from 'puppeteer';
+import type { ConsoleMessage, ConsoleMessageLocation, JSHandle, Page, WaitForOptions } from 'puppeteer';
 import { find, findAll } from './puppeteer-element';
 import { initPageEvents, waitForEvent } from './puppeteer-events';
 import { initPageScreenshot } from './puppeteer-screenshot';

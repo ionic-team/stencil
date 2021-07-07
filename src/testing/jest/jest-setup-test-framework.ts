@@ -5,7 +5,12 @@ import { setupGlobal, teardownGlobal } from '@stencil/core/mock-doc';
 import { setupMockFetch } from '../mock-fetch';
 import { HtmlSerializer } from './jest-serializer';
 import { resetBuildConditionals } from '../reset-build-conditionals';
-import { resetPlatform, stopAutoApplyChanges, modeResolutionChain, setErrorHandler } from '@stencil/core/internal/testing';
+import {
+  resetPlatform,
+  stopAutoApplyChanges,
+  modeResolutionChain,
+  setErrorHandler,
+} from '@stencil/core/internal/testing';
 
 declare const global: d.JestEnvironmentGlobal;
 

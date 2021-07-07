@@ -799,7 +799,14 @@ describe('setAccessor for standard html elements', () => {
       setAccessor(elm, 'style', undefined, undefined, false, 0);
       expect(elm.style.cssText).toEqual('');
 
-      setAccessor(elm, 'style', { 'color': 'blue', 'font-size': '12px', 'paddingLeft': '88px' }, { 'color': 'blue', 'font-size': '12px', 'paddingLeft': '88px' }, false, 0);
+      setAccessor(
+        elm,
+        'style',
+        { 'color': 'blue', 'font-size': '12px', 'paddingLeft': '88px' },
+        { 'color': 'blue', 'font-size': '12px', 'paddingLeft': '88px' },
+        false,
+        0,
+      );
       expect(elm.style.cssText).toEqual('');
 
       setAccessor(elm, 'style', { 'color': 'blue', 'font-size': '12px' }, undefined, false, 0);
@@ -811,7 +818,14 @@ describe('setAccessor for standard html elements', () => {
       elm.style.setProperty('color', 'black');
       elm.style.setProperty('padding', '20px');
 
-      setAccessor(elm, 'style', { color: 'blue', padding: '20px', marginRight: '88px' }, { color: 'blue', padding: '30px', marginRight: '55px' }, false, 0);
+      setAccessor(
+        elm,
+        'style',
+        { color: 'blue', padding: '20px', marginRight: '88px' },
+        { color: 'blue', padding: '30px', marginRight: '55px' },
+        false,
+        0,
+      );
 
       expect(elm.style.cssText).toEqual('color: black; padding: 30px; margin-right: 55px;');
     });

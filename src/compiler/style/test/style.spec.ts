@@ -86,7 +86,7 @@ xdescribe('component-styles', () => {
     compiler.config.minifyJs = true;
     compiler.config.minifyCss = true;
     compiler.config.hashFileNames = true;
-    compiler.config.sys.generateContentHash = function() {
+    compiler.config.sys.generateContentHash = function () {
       return 'hashed';
     };
 
@@ -107,7 +107,7 @@ xdescribe('component-styles', () => {
     compiler.config.minifyJs = true;
     compiler.config.minifyCss = true;
     compiler.config.hashFileNames = true;
-    compiler.config.sys.generateContentHash = function() {
+    compiler.config.sys.generateContentHash = function () {
       return 'hashed';
     };
 
@@ -126,7 +126,7 @@ xdescribe('component-styles', () => {
     compiler.config.minifyJs = true;
     compiler.config.minifyCss = true;
     compiler.config.hashFileNames = true;
-    compiler.config.sys.generateContentHash = function() {
+    compiler.config.sys.generateContentHash = function () {
       return 'hashed';
     };
 

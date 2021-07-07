@@ -76,7 +76,10 @@ const logDiagnostic = (diagnostic: d.Diagnostic, useColors: boolean) => {
   }
 
   if (useColors) {
-    const styledPrefix = ['%c' + prefix, `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`];
+    const styledPrefix = [
+      '%c' + prefix,
+      `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`,
+    ];
     console.log(...styledPrefix, msg);
   } else if (diagnostic.level === 'error') {
     console.error(msg);

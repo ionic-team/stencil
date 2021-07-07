@@ -6,7 +6,12 @@ import { isString } from '@utils';
 import { join } from 'path';
 import ts from 'typescript';
 
-export const optimizeEsmImport = async (config: d.Config, compilerCtx: d.CompilerCtx, doc: Document, outputTarget: d.OutputTargetWww) => {
+export const optimizeEsmImport = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  doc: Document,
+  outputTarget: d.OutputTargetWww,
+) => {
   const resourcesUrl = getAbsoluteBuildDir(outputTarget);
   const entryFilename = `${config.fsNamespace}.esm.js`;
   const expectedSrc = join(resourcesUrl, entryFilename);

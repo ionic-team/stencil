@@ -43,7 +43,7 @@ const buildGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, b
         globalStylePath,
       );
       compilerCtx.cachedGlobalStyle = optimizedCss;
-      
+
       if (Array.isArray(transformResults.dependencies)) {
         const cssModuleImports = compilerCtx.cssModuleImports.get(globalStylePath) || [];
         transformResults.dependencies.forEach(dep => {

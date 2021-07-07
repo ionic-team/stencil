@@ -31,7 +31,12 @@ export const validateManifestJson = (config: d.Config, compilerCtx: d.CompilerCt
   );
 };
 
-const validateManifestJsonData = async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, manifestFilePath: string, manifestData: any) => {
+const validateManifestJsonData = async (
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  manifestFilePath: string,
+  manifestData: any,
+) => {
   if (Array.isArray(manifestData.icons)) {
     await Promise.all(
       manifestData.icons.map((manifestIcon: any) => {
@@ -41,7 +46,12 @@ const validateManifestJsonData = async (compilerCtx: d.CompilerCtx, buildCtx: d.
   }
 };
 
-const validateManifestJsonIcon = async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, manifestFilePath: string, manifestIcon: any) => {
+const validateManifestJsonIcon = async (
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  manifestFilePath: string,
+  manifestIcon: any,
+) => {
   let iconSrc = manifestIcon.src;
   if (typeof iconSrc !== 'string') {
     const msg = `Manifest icon missing "src"`;

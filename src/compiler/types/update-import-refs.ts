@@ -10,7 +10,12 @@ import { dirname, resolve } from 'path';
  * @param filePath the path of the component file
  * @param config general config that all of stencil uses
  */
-export const updateReferenceTypeImports = (importDataObj: d.TypesImportData, allTypes: Map<string, number>, cmp: d.ComponentCompilerMeta, filePath: string) => {
+export const updateReferenceTypeImports = (
+  importDataObj: d.TypesImportData,
+  allTypes: Map<string, number>,
+  cmp: d.ComponentCompilerMeta,
+  filePath: string,
+) => {
   const updateImportReferences = updateImportReferenceFactory(allTypes, filePath);
 
   return [...cmp.properties, ...cmp.events, ...cmp.methods]

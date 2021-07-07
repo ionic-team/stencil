@@ -47,5 +47,9 @@ export const methodsToMarkdown = (methods: d.JsonDocsMethod[]) => {
 };
 
 const getDocsField = (prop: d.JsonDocsMethod) => {
-  return `${prop.deprecation !== undefined ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>` : ''}${prop.docs}`;
+  return `${
+    prop.deprecation !== undefined
+      ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
+      : ''
+  }${prop.docs}`;
 };

@@ -22,10 +22,10 @@ const applyCustomEvent = (win: any) => {
 
 const applyObjectAssign = () => {
   if (typeof Object.assign !== 'function') {
-    Object.defineProperty(Object, "assign", {
+    Object.defineProperty(Object, 'assign', {
       value: function assign(target: any) {
         var to = Object(target);
-  
+
         for (var index = 1; index < arguments.length; index++) {
           var nextSource = arguments[index];
           if (nextSource != null) {
@@ -39,7 +39,7 @@ const applyObjectAssign = () => {
         return to;
       },
       writable: true,
-      configurable: true
+      configurable: true,
     });
   }
-}
+};

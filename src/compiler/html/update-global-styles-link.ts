@@ -2,7 +2,12 @@ import type * as d from '../../declarations';
 import { getAbsoluteBuildDir } from './html-utils';
 import { join } from 'path';
 
-export const updateGlobalStylesLink = (config: d.Config, doc: Document, globalScriptFilename: string, outputTarget: d.OutputTargetWww) => {
+export const updateGlobalStylesLink = (
+  config: d.Config,
+  doc: Document,
+  globalScriptFilename: string,
+  outputTarget: d.OutputTargetWww,
+) => {
   if (!globalScriptFilename) {
     return;
   }

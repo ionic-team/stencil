@@ -27,7 +27,7 @@ export type HTTPResponse = PuppeteerHTTPResponse;
  * Puppeteer upgrade/major version of Stencil. These type additions should be removed as a part of the Stencil 3.0
  * release.
  */
-declare module "puppeteer" {
+declare module 'puppeteer' {
   type LifeCycleEvent = 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
   interface WaitForOptions {
     timeout?: number;
@@ -41,7 +41,7 @@ declare module "puppeteer" {
  */
 export type PageCloseOptions = {
   runBeforeUnload?: boolean;
-}
+};
 
 export interface NewE2EPageOptions extends WaitForOptions {
   url?: string;

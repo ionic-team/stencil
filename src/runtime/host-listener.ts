@@ -3,7 +3,12 @@ import { BUILD } from '@app-data';
 import { doc, plt, consoleError, supportsListenerOptions, win } from '@platform';
 import { HOST_FLAGS, LISTENER_FLAGS } from '@utils';
 
-export const addHostEventListeners = (elm: d.HostElement, hostRef: d.HostRef, listeners: d.ComponentRuntimeHostListener[], attachParentListeners: boolean) => {
+export const addHostEventListeners = (
+  elm: d.HostElement,
+  hostRef: d.HostRef,
+  listeners: d.ComponentRuntimeHostListener[],
+  attachParentListeners: boolean,
+) => {
   if (BUILD.hostListener && listeners) {
     // this is called immediately within the element's constructor
     // initialize our event listeners on the host element
@@ -47,7 +52,7 @@ const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => (ev: Event
     } else {
       (hostRef.$hostElement$ as any)[methodName](ev);
     }
-  } catch (e)  {
+  } catch (e) {
     consoleError(e);
   }
 };

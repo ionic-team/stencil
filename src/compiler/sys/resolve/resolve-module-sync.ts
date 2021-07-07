@@ -7,7 +7,11 @@ import { IS_WEB_WORKER_ENV } from '../environment';
 import { basename, dirname } from 'path';
 import resolve, { SyncOpts } from 'resolve';
 
-export const resolveRemoteModuleIdSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, opts: d.ResolveModuleIdOptions) => {
+export const resolveRemoteModuleIdSync = (
+  config: d.Config,
+  inMemoryFs: d.InMemoryFileSystem,
+  opts: d.ResolveModuleIdOptions,
+) => {
   const packageJson = resolveRemotePackageJsonSync(config, inMemoryFs, opts.moduleId);
   if (packageJson) {
     const resolveModuleSyncOpts: d.ResolveModuleIdOptions = {
@@ -27,7 +31,9 @@ export const resolveRemoteModuleIdSync = (config: d.Config, inMemoryFs: d.InMemo
 
 const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string) => {
   if (inMemoryFs) {
-    const filePath = normalizePath(config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId, path: 'package.json' }));
+    const filePath = normalizePath(
+      config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId, path: 'package.json' }),
+    );
     let pkgJson = inMemoryFs.readFileSync(filePath);
     if (!isString(pkgJson) && IS_WEB_WORKER_ENV) {
       const url = config.sys.getRemoteModuleUrl({ moduleId, path: 'package.json' });
@@ -42,7 +48,11 @@ const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFi
   return null;
 };
 
-export const resolveModuleIdSync = (sys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, opts: d.ResolveModuleIdOptions) => {
+export const resolveModuleIdSync = (
+  sys: d.CompilerSystem,
+  inMemoryFs: d.InMemoryFileSystem,
+  opts: d.ResolveModuleIdOptions,
+) => {
   if (inMemoryFs) {
     const resolverOpts = createCustomResolverSync(sys, inMemoryFs, opts.exts);
     resolverOpts.basedir = dirname(opts.containingFile);
@@ -54,7 +64,11 @@ export const resolveModuleIdSync = (sys: d.CompilerSystem, inMemoryFs: d.InMemor
   return null;
 };
 
-export const createCustomResolverSync = (sys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, exts: string[]): SyncOpts => {
+export const createCustomResolverSync = (
+  sys: d.CompilerSystem,
+  inMemoryFs: d.InMemoryFileSystem,
+  exts: string[],
+): SyncOpts => {
   return {
     isFile(filePath: string) {
       const fsFilePath = normalizeFsPath(filePath);

@@ -181,7 +181,7 @@ export declare const Build: UserBuildConditionals;
 /**
  * The `Env` object provides access to the "env" object declared in the project's `stencil.config.ts`.
  */
-export declare const Env: {[prop: string]: string | undefined};
+export declare const Env: { [prop: string]: string | undefined };
 
 /**
  * The `@Component()` decorator is used to provide metadata about the component class.
@@ -262,21 +262,11 @@ export declare const setMode: (handler: ResolutionHandler) => void;
  */
 export declare function getMode<T = string | undefined>(ref: any): T;
 
-export declare function setPlatformHelpers (helpers: { 
+export declare function setPlatformHelpers(helpers: {
   jmp?: (c: any) => any;
   raf?: (c: any) => number;
-  ael?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
-  rel?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
+  ael?: (el: any, eventName: string, listener: any, options: any) => void;
+  rel?: (el: any, eventName: string, listener: any, options: any) => void;
   ce?: (eventName: string, opts?: any) => any;
 }): void;
 

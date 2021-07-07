@@ -46,7 +46,7 @@ export async function startPuppeteerBrowser(config: Config) {
   if (config.testing.browserWSEndpoint) {
     browser = await puppeteer.connect({
       browserWSEndpoint: config.testing.browserWSEndpoint,
-      ...connectOpts
+      ...connectOpts,
     });
   } else {
     const launchOpts: puppeteer.BrowserLaunchArgumentOptions & puppeteer.LaunchOptions & puppeteer.ConnectOptions = {

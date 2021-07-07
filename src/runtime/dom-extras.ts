@@ -14,11 +14,25 @@ export const patchCloneNode = (HostElementPrototype: any) => {
     if (BUILD.slot && !isShadowDom && deep) {
       let i = 0;
       let slotted, nonStencilNode;
-      let stencilPrivates = ['s-id', 's-cr', 's-lr', 's-rc', 's-sc', 's-p', 's-cn', 's-sr', 's-sn', 's-hn', 's-ol', 's-nr', 's-si'];
-      
+      let stencilPrivates = [
+        's-id',
+        's-cr',
+        's-lr',
+        's-rc',
+        's-sc',
+        's-p',
+        's-cn',
+        's-sr',
+        's-sn',
+        's-hn',
+        's-ol',
+        's-nr',
+        's-si',
+      ];
+
       for (; i < srcNode.childNodes.length; i++) {
         slotted = (srcNode.childNodes[i] as any)['s-nr'];
-        nonStencilNode = stencilPrivates.every((privateField) => !(srcNode.childNodes[i] as any)[privateField]);
+        nonStencilNode = stencilPrivates.every(privateField => !(srcNode.childNodes[i] as any)[privateField]);
         if (slotted) {
           if (BUILD.appendChildSlotFix && (clonedNode as any).__appendChild) {
             (clonedNode as any).__appendChild(slotted.cloneNode(true));
@@ -26,7 +40,7 @@ export const patchCloneNode = (HostElementPrototype: any) => {
             clonedNode.appendChild(slotted.cloneNode(true));
           }
         }
-        if (nonStencilNode){
+        if (nonStencilNode) {
           clonedNode.appendChild((srcNode.childNodes[i] as any).cloneNode(true));
         }
       }
@@ -73,7 +87,10 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
     Object.defineProperty(elm, 'childNodes', {
       get() {
         const childNodes = childNodesFn.call(this);
-        if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0 && getHostRef(this).$flags$ & HOST_FLAGS.hasRendered) {
+        if (
+          (plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0 &&
+          getHostRef(this).$flags$ & HOST_FLAGS.hasRendered
+        ) {
           const result = new FakeNodeList();
           for (let i = 0; i < childNodes.length; i++) {
             const slot = childNodes[i]['s-nr'];
@@ -89,7 +106,8 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
   }
 };
 
-const getSlotName = (node: d.RenderNode) => node['s-sn'] || (node.nodeType === 1 && (node as Element).getAttribute('slot')) || '';
+const getSlotName = (node: d.RenderNode) =>
+  node['s-sn'] || (node.nodeType === 1 && (node as Element).getAttribute('slot')) || '';
 
 const getHostSlotNode = (childNodes: NodeListOf<ChildNode>, slotName: string) => {
   let i = 0;

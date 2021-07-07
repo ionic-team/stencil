@@ -38,7 +38,11 @@ describe('style-docs', () => {
     parseStyleDocs(styleDocs, styleText);
     expect(styleDocs).toEqual([
       { name: `--color`, docs: `This is the docs for color.`, annotation: 'prop' },
-      { name: `--background`, docs: `This is the docs for background. It is two sentences and some :: man.`, annotation: 'prop' },
+      {
+        name: `--background`,
+        docs: `This is the docs for background. It is two sentences and some :: man.`,
+        annotation: 'prop',
+      },
     ]);
   });
 

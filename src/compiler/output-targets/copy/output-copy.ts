@@ -45,7 +45,8 @@ const getCopyTasks = (config: d.Config, buildCtx: d.BuildCtx, o: d.OutputTargetC
   if (!Array.isArray(o.copy)) {
     return [];
   }
-  const copyTasks = !buildCtx.isRebuild || buildCtx.requiresFullBuild ? o.copy : filterCopyTasks(config, o.copy, changedFiles);
+  const copyTasks =
+    !buildCtx.isRebuild || buildCtx.requiresFullBuild ? o.copy : filterCopyTasks(config, o.copy, changedFiles);
 
   return copyTasks.map(t => transformToAbs(t, o.dir));
 };
@@ -76,7 +77,8 @@ const transformToAbs = (copyTask: d.CopyTask, dest: string): Required<d.CopyTask
   return {
     src: copyTask.src,
     dest: getDestAbsPath(copyTask.src, dest, copyTask.dest),
-    keepDirStructure: typeof copyTask.keepDirStructure === 'boolean' ? copyTask.keepDirStructure : copyTask.dest == null,
+    keepDirStructure:
+      typeof copyTask.keepDirStructure === 'boolean' ? copyTask.keepDirStructure : copyTask.dest == null,
     warn: copyTask.warn !== false,
   };
 };

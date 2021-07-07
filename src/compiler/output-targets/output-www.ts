@@ -25,7 +25,9 @@ export const outputWww = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
   const timespan = buildCtx.createTimeSpan(`generate www started`, true);
   const criticalBundles = getCriticalPath(buildCtx);
 
-  await Promise.all(outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, criticalBundles, outputTarget)));
+  await Promise.all(
+    outputTargets.map(outputTarget => generateWww(config, compilerCtx, buildCtx, criticalBundles, outputTarget)),
+  );
 
   timespan.finish(`generate www finished`);
 };
@@ -44,7 +46,13 @@ const getCriticalPath = (buildCtx: d.BuildCtx) => {
   ).sort();
 };
 
-const generateWww = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) => {
+const generateWww = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  criticalPath: string[],
+  outputTarget: d.OutputTargetWww,
+) => {
   if (!config.buildEs5) {
     await generateEs5DisabledMessage(config, compilerCtx, outputTarget);
   }
@@ -83,7 +91,13 @@ const generateHostConfig = (compilerCtx: d.CompilerCtx, outputTarget: d.OutputTa
   return compilerCtx.fs.writeFile(hostConfigPath, hostConfigContent, { outputTargetType: outputTarget.type });
 };
 
-const generateIndexHtml = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, criticalPath: string[], outputTarget: d.OutputTargetWww) => {
+const generateIndexHtml = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  criticalPath: string[],
+  outputTarget: d.OutputTargetWww,
+) => {
   if (compilerCtx.hasSuccessfulBuild && !buildCtx.hasHtmlChanges) {
     // no need to rebuild index.html if there were no app file changes
     return;
@@ -97,7 +111,11 @@ const generateIndexHtml = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     // validateHtml(config, buildCtx, doc);
     await updateIndexHtmlServiceWorker(config, buildCtx, doc, outputTarget);
     if (!config.watch && !config.devMode) {
-      const globalStylesFilename = await generateHashedCopy(config, compilerCtx, join(outputTarget.buildDir, `${config.fsNamespace}.css`));
+      const globalStylesFilename = await generateHashedCopy(
+        config,
+        compilerCtx,
+        join(outputTarget.buildDir, `${config.fsNamespace}.css`),
+      );
       const scriptFound = await optimizeEsmImport(config, compilerCtx, doc, outputTarget);
       await inlineStyleSheets(compilerCtx, doc, MAX_CSS_INLINE_SIZE, outputTarget);
       updateGlobalStylesLink(config, doc, globalStylesFilename, outputTarget);
@@ -110,7 +128,9 @@ const generateIndexHtml = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexContent, { outputTargetType: outputTarget.type });
 
     if (outputTarget.serviceWorker && config.flags.prerender) {
-      await compilerCtx.fs.writeFile(join(outputTarget.appDir, INDEX_ORG), indexContent, { outputTargetType: outputTarget.type });
+      await compilerCtx.fs.writeFile(join(outputTarget.appDir, INDEX_ORG), indexContent, {
+        outputTargetType: outputTarget.type,
+      });
     }
 
     buildCtx.debug(`generateIndexHtml, write: ${relative(config.rootDir, outputTarget.indexHtml)}`);

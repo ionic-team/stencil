@@ -19,7 +19,13 @@ export const parseCollectionComponents = (
   }
 };
 
-export const transpileCollectionModule = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collection: d.CollectionCompilerMeta, inputFileName: string) => {
+export const transpileCollectionModule = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  collection: d.CollectionCompilerMeta,
+  inputFileName: string,
+) => {
   const sourceText = compilerCtx.fs.readFileSync(inputFileName);
   const sourceFile = ts.createSourceFile(inputFileName, sourceText, ts.ScriptTarget.ES2017, true, ts.ScriptKind.JS);
   return updateModule(config, compilerCtx, buildCtx, sourceFile, sourceText, inputFileName, undefined, collection);

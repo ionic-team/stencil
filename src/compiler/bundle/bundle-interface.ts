@@ -12,5 +12,5 @@ export interface BundleOptions {
   loader?: { [id: string]: string };
   inlineDynamicImports?: boolean;
   inlineWorkers?: boolean;
-  preserveEntrySignatures?: PreserveEntrySignaturesOption,
+  preserveEntrySignatures?: PreserveEntrySignaturesOption;
 }

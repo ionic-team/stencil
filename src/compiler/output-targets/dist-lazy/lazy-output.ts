@@ -88,7 +88,11 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
     style: 'static',
     styleImportData: 'queryparams',
   };
-  return [updateStencilCoreImports(transformOpts.coreImportPath), lazyComponentTransform(compilerCtx, transformOpts), removeCollectionImports(compilerCtx)];
+  return [
+    updateStencilCoreImports(transformOpts.coreImportPath),
+    lazyComponentTransform(compilerCtx, transformOpts),
+    removeCollectionImports(compilerCtx),
+  ];
 };
 
 const getLazyEntry = (isBrowser: boolean) => {

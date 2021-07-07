@@ -95,7 +95,9 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
   const program = ts.createProgram([sourceFilePath], tsCompilerOptions, compilerHost);
   const typeChecker = program.getTypeChecker();
 
-  const after: ts.TransformerFactory<ts.SourceFile>[] = [convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)];
+  const after: ts.TransformerFactory<ts.SourceFile>[] = [
+    convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
+  ];
 
   if (transformOpts.componentExport === 'customelement' || transformOpts.componentExport === 'module') {
     after.push(nativeComponentTransform(compilerCtx, transformOpts));
@@ -104,7 +106,10 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
   }
 
   program.emit(undefined, undefined, undefined, false, {
-    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker), updateStencilCoreImports(transformOpts.coreImportPath)],
+    before: [
+      convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker),
+      updateStencilCoreImports(transformOpts.coreImportPath),
+    ],
     after,
   });
 

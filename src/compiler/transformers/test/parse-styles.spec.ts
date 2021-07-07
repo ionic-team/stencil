@@ -81,6 +81,8 @@ describe('parse styles', () => {
       })
       export class CmpA {}
     `);
-    expect(t.outputText).toEqual(`const styles = 'p{color:red}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return styles; }}`);
+    expect(t.outputText).toEqual(
+      `const styles = 'p{color:red}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return styles; }}`,
+    );
   });
 });

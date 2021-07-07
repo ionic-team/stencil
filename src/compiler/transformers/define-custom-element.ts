@@ -4,7 +4,11 @@ import { DEFINE_CUSTOM_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from './core-r
 import { formatComponentRuntimeMeta } from '@utils';
 import ts from 'typescript';
 
-export const defineCustomElement = (tsSourceFile: ts.SourceFile, moduleFile: d.Module, transformOpts: d.TransformOptions) => {
+export const defineCustomElement = (
+  tsSourceFile: ts.SourceFile,
+  moduleFile: d.Module,
+  transformOpts: d.TransformOptions,
+) => {
   let statements = tsSourceFile.statements.slice();
 
   statements.push(
@@ -39,7 +43,9 @@ const addDefineCustomElement = (moduleFile: d.Module, compilerMeta: d.ComponentC
   const liternalCmpClassName = ts.createIdentifier(compilerMeta.componentClassName);
   const liternalMeta = convertValueToLiteral(compactMeta);
 
-  return ts.createStatement(ts.createCall(ts.createIdentifier(DEFINE_CUSTOM_ELEMENT), [], [liternalCmpClassName, liternalMeta]));
+  return ts.createStatement(
+    ts.createCall(ts.createIdentifier(DEFINE_CUSTOM_ELEMENT), [], [liternalCmpClassName, liternalMeta]),
+  );
 };
 
 const removeComponentCjsExport = (statements: ts.Statement[], moduleFile: d.Module) => {

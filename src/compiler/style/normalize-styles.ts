@@ -19,7 +19,10 @@ export const normalizeStyles = (tagName: string, componentFilePath: string, styl
 };
 
 const normalizeExternalStyle = (componentFilePath: string, externalStyle: d.ExternalStyleCompiler) => {
-  if (typeof externalStyle.originalComponentPath !== 'string' || externalStyle.originalComponentPath.trim().length === 0) {
+  if (
+    typeof externalStyle.originalComponentPath !== 'string' ||
+    externalStyle.originalComponentPath.trim().length === 0
+  ) {
     return;
   }
 

@@ -18,7 +18,12 @@ export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean
   styles.set(scopeId, style);
 };
 
-export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMeta, mode?: string, hostElm?: HTMLElement) => {
+export const addStyle = (
+  styleContainerNode: any,
+  cmpMeta: d.ComponentRuntimeMeta,
+  mode?: string,
+  hostElm?: HTMLElement,
+) => {
   let scopeId = getScopeId(cmpMeta, mode);
   let style = styles.get(scopeId);
 
@@ -38,12 +43,21 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
         rootAppliedStyles.set(styleContainerNode, (appliedStyles = new Set()));
       }
       if (!appliedStyles.has(scopeId)) {
-        if (BUILD.hydrateClientSide && styleContainerNode.host && (styleElm = styleContainerNode.querySelector(`[${HYDRATED_STYLE_ID}="${scopeId}"]`))) {
+        if (
+          BUILD.hydrateClientSide &&
+          styleContainerNode.host &&
+          (styleElm = styleContainerNode.querySelector(`[${HYDRATED_STYLE_ID}="${scopeId}"]`))
+        ) {
           // This is only happening on native shadow-dom, do not needs CSS var shim
           styleElm.innerHTML = style;
         } else {
           if (BUILD.cssVarShim && plt.$cssShim$) {
-            styleElm = plt.$cssShim$.createHostStyle(hostElm, scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation));
+            styleElm = plt.$cssShim$.createHostStyle(
+              hostElm,
+              scopeId,
+              style,
+              !!(cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation),
+            );
             const newScopeId = (styleElm as any)['s-sc'];
             if (newScopeId) {
               scopeId = newScopeId;
@@ -81,7 +95,12 @@ export const attachStyles = (hostRef: d.HostRef) => {
   const elm = hostRef.$hostElement$;
   const flags = cmpMeta.$flags$;
   const endAttachStyles = createTime('attachStyles', cmpMeta.$tagName$);
-  const scopeId = addStyle(BUILD.shadowDom && supportsShadow && elm.shadowRoot ? elm.shadowRoot : elm.getRootNode(), cmpMeta, hostRef.$modeName$, elm);
+  const scopeId = addStyle(
+    BUILD.shadowDom && supportsShadow && elm.shadowRoot ? elm.shadowRoot : elm.getRootNode(),
+    cmpMeta,
+    hostRef.$modeName$,
+    elm,
+  );
 
   if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && flags & CMP_FLAGS.needsScopedEncapsulation) {
     // only required when we're NOT using native shadow dom (slot)

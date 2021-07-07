@@ -36,7 +36,11 @@ export const generateHostConfig = async (
   await compilerCtx.fs.writeFile(hostConfigFilePath, JSON.stringify(hostConfig, null, 2));
 };
 
-export const generateHostRule = (outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) => {
+export const generateHostRule = (
+  outputTarget: d.OutputTargetWww,
+  entryModules: d.EntryModule[],
+  hydrateResults: d.HydrateResults,
+) => {
   const hostRule: d.HostRule = {
     include: hydrateResults.pathname,
     headers: generateHostRuleHeaders(outputTarget, entryModules, hydrateResults),
@@ -49,7 +53,11 @@ export const generateHostRule = (outputTarget: d.OutputTargetWww, entryModules: 
   return hostRule;
 };
 
-export const generateHostRuleHeaders = (outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hydrateResults: d.HydrateResults) => {
+export const generateHostRuleHeaders = (
+  outputTarget: d.OutputTargetWww,
+  entryModules: d.EntryModule[],
+  hydrateResults: d.HydrateResults,
+) => {
   const hostRuleHeaders: d.HostRuleHeader[] = [];
 
   addStyles(hostRuleHeaders, hydrateResults);
@@ -67,7 +75,12 @@ const addCoreJs = (outputTarget: d.OutputTargetWww, appCoreWWWPath: string, host
   hostRuleHeaders.push(formatLinkRelPreloadHeader(url));
 };
 
-export const addBundles = (outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], hostRuleHeaders: d.HostRuleHeader[], components: d.HydrateComponent[]) => {
+export const addBundles = (
+  outputTarget: d.OutputTargetWww,
+  entryModules: d.EntryModule[],
+  hostRuleHeaders: d.HostRuleHeader[],
+  components: d.HydrateComponent[],
+) => {
   components = sortComponents(components);
 
   const bundleIds = getBundleIds(entryModules, components);

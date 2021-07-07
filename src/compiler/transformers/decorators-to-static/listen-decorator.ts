@@ -4,8 +4,14 @@ import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
-export const listenDecoratorsToStatic = (diagnostics: d.Diagnostic[], decoratedMembers: ts.ClassElement[], newMembers: ts.ClassElement[]) => {
-  const listeners = decoratedMembers.filter(ts.isMethodDeclaration).map(method => parseListenDecorators(diagnostics, method));
+export const listenDecoratorsToStatic = (
+  diagnostics: d.Diagnostic[],
+  decoratedMembers: ts.ClassElement[],
+  newMembers: ts.ClassElement[],
+) => {
+  const listeners = decoratedMembers
+    .filter(ts.isMethodDeclaration)
+    .map(method => parseListenDecorators(diagnostics, method));
 
   const flatListeners = flatOne(listeners);
   if (flatListeners.length > 0) {
@@ -33,7 +39,8 @@ const parseListenDecorators = (diagnostics: d.Diagnostic[], method: ts.MethodDec
     const listener = parseListener(eventNames[0], listenOptions, methodName);
     if (listener.target === ('parent' as any)) {
       const err = buildError(diagnostics);
-      err.messageText = 'The "parent" target is no longer available as of Stencil 2. Please use "window", "document" or "body" instead.';
+      err.messageText =
+        'The "parent" target is no longer available as of Stencil 2. Please use "window", "document" or "body" instead.';
       augmentDiagnosticWithNode(err, listenDecorator);
     }
     return listener;

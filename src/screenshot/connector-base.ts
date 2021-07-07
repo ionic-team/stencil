@@ -41,7 +41,8 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     this.buildAuthor = opts.buildAuthor;
     this.buildUrl = opts.buildUrl;
     this.previewUrl = opts.previewUrl;
-    (this.buildTimestamp = typeof opts.buildTimestamp === 'number' ? opts.buildTimestamp : Date.now()), (this.cacheDir = opts.cacheDir);
+    (this.buildTimestamp = typeof opts.buildTimestamp === 'number' ? opts.buildTimestamp : Date.now()),
+      (this.cacheDir = opts.cacheDir);
     this.packageDir = opts.packageDir;
     this.rootDir = opts.rootDir;
     this.appNamespace = opts.appNamespace;
@@ -105,7 +106,12 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
 
     await mkDir(this.screenshotDir);
 
-    await Promise.all([mkDir(this.imagesDir), mkDir(this.buildsDir), mkDir(this.currentBuildDir), mkDir(this.cacheDir)]);
+    await Promise.all([
+      mkDir(this.imagesDir),
+      mkDir(this.buildsDir),
+      mkDir(this.currentBuildDir),
+      mkDir(this.cacheDir),
+    ]);
   }
 
   async pullMasterBuild() {
@@ -123,7 +129,9 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   }
 
   async completeBuild(masterBuild: d.ScreenshotBuild) {
-    const filePaths = (await readDir(this.currentBuildDir)).map(f => join(this.currentBuildDir, f)).filter(f => f.endsWith('.json'));
+    const filePaths = (await readDir(this.currentBuildDir))
+      .map(f => join(this.currentBuildDir, f))
+      .filter(f => f.endsWith('.json'));
     const screenshots = await Promise.all(filePaths.map(async f => JSON.parse(await readFile(f)) as d.Screenshot));
 
     this.sortScreenshots(screenshots);
@@ -207,7 +215,9 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
         if (!jsonpExists) {
           const imageFilePath = join(this.imagesDir, screenshot.image);
           const imageBuf = await readFileBuffer(imageFilePath);
-          const jsonpContent = `loadScreenshot("${screenshot.image}","data:image/png;base64,${imageBuf.toString('base64')}");`;
+          const jsonpContent = `loadScreenshot("${screenshot.image}","data:image/png;base64,${imageBuf.toString(
+            'base64',
+          )}");`;
           await writeFile(jsonFilePath, jsonpContent);
         }
       }

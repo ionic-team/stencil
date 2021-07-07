@@ -78,7 +78,8 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
           window.requestAnimationFrame(() => {
             if (elm.isConnected) {
               const style = window.getComputedStyle(elm);
-              const isVisible = !!style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+              const isVisible =
+                !!style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
 
               if (isVisible) {
                 window.requestAnimationFrame(() => {
@@ -541,7 +542,12 @@ export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.Eleme
   return elm;
 }
 
-async function findWithCssSelector(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, lightSelector: string, shadowSelector: string) {
+async function findWithCssSelector(
+  page: pd.E2EPageInternal,
+  rootHandle: puppeteer.ElementHandle,
+  lightSelector: string,
+  shadowSelector: string,
+) {
   let elmHandle = await rootHandle.$(lightSelector);
 
   if (!elmHandle) {
@@ -573,7 +579,12 @@ async function findWithCssSelector(page: pd.E2EPageInternal, rootHandle: puppete
   return elmHandle;
 }
 
-async function findWithText(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, text: string, contains: string) {
+async function findWithText(
+  page: pd.E2EPageInternal,
+  rootHandle: puppeteer.ElementHandle,
+  text: string,
+  contains: string,
+) {
   const jsHandle = await page.evaluateHandle(
     (rootElm: HTMLElement, text: string, contains: string) => {
       let foundElm: any = null;
@@ -621,7 +632,11 @@ async function findWithText(page: pd.E2EPageInternal, rootHandle: puppeteer.Elem
   return null;
 }
 
-export async function findAll(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, selector: pd.FindSelector) {
+export async function findAll(
+  page: pd.E2EPageInternal,
+  rootHandle: puppeteer.ElementHandle,
+  selector: pd.FindSelector,
+) {
   const foundElms: E2EElement[] = [];
 
   const { lightSelector, shadowSelector } = getSelector(selector);

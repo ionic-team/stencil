@@ -81,7 +81,11 @@ Empty objects can also be the cause, look for JSX comments that became objects.`
 
   if (BUILD.vdomFunctional && typeof nodeName === 'function') {
     // nodeName is a functional component
-    return (nodeName as d.FunctionalComponent<any>)(vnodeData === null ? {} : vnodeData, vNodeChildren, vdomFnUtils) as any;
+    return (nodeName as d.FunctionalComponent<any>)(
+      vnodeData === null ? {} : vnodeData,
+      vNodeChildren,
+      vdomFnUtils,
+    ) as any;
   }
 
   const vnode = newVNode(nodeName, null);

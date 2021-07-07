@@ -1,6 +1,15 @@
 import type * as d from '../../../declarations';
 import { basename, dirname, isAbsolute, join, resolve } from 'path';
-import { isDtsFile, isJsFile, isJsxFile, isLocalModule, isStencilCoreImport, isTsxFile, isTsFile, isJsonFile } from '../resolve/resolve-utils';
+import {
+  isDtsFile,
+  isJsFile,
+  isJsxFile,
+  isLocalModule,
+  isStencilCoreImport,
+  isTsxFile,
+  isTsFile,
+  isJsonFile,
+} from '../resolve/resolve-utils';
 import { IS_BROWSER_ENV, IS_NODE_ENV } from '../environment';
 import { isRemoteUrl, isString, normalizePath } from '@utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
@@ -29,7 +38,12 @@ export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InM
   }
 };
 
-export const tsResolveModuleName = (config: d.Config, compilerCtx: d.CompilerCtx, moduleName: string, containingFile: string) => {
+export const tsResolveModuleName = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  moduleName: string,
+  containingFile: string,
+) => {
   const resolveModuleName: typeof ts.resolveModuleName = (ts as any).__resolveModuleName || ts.resolveModuleName;
 
   if (moduleName && resolveModuleName && config.tsCompilerOptions) {
@@ -43,7 +57,12 @@ export const tsResolveModuleName = (config: d.Config, compilerCtx: d.CompilerCtx
   return null;
 };
 
-export const tsResolveModuleNamePackageJsonPath = (config: d.Config, compilerCtx: d.CompilerCtx, moduleName: string, containingFile: string) => {
+export const tsResolveModuleNamePackageJsonPath = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  moduleName: string,
+  containingFile: string,
+) => {
   try {
     const resolvedModule = tsResolveModuleName(config, compilerCtx, moduleName, containingFile);
     if (resolvedModule && resolvedModule.resolvedModule && resolvedModule.resolvedModule.resolvedFileName) {
@@ -107,12 +126,23 @@ export const patchedTsResolveModule = (
   return tsResolveNodeModule(config, inMemoryFs, moduleName, containingFile);
 };
 
-export const tsResolveNodeModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string, containingFile: string): ts.ResolvedModuleWithFailedLookupLocations => {
+export const tsResolveNodeModule = (
+  config: d.Config,
+  inMemoryFs: d.InMemoryFileSystem,
+  moduleId: string,
+  containingFile: string,
+): ts.ResolvedModuleWithFailedLookupLocations => {
   if (isStencilCoreImport(moduleId)) {
     const rtn: ts.ResolvedModuleWithFailedLookupLocations = {
       resolvedModule: {
         extension: ts.Extension.Dts,
-        resolvedFileName: normalizePath(config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId: '@stencil/core', path: 'internal/index.d.ts' })),
+        resolvedFileName: normalizePath(
+          config.sys.getLocalModulePath({
+            rootDir: config.rootDir,
+            moduleId: '@stencil/core',
+            path: 'internal/index.d.ts',
+          }),
+        ),
         packageId: {
           name: moduleId,
           subModuleName: '',

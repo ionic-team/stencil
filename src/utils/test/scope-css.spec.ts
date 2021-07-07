@@ -14,7 +14,7 @@
 import { scopeCss } from '../shadow-css';
 import { convertScopedToShadow } from '../../runtime/styles';
 
-describe('ShadowCss', function() {
+describe('ShadowCss', function () {
   function s(cssText: string, scopeId: string, commentOriginalSelector = false) {
     const shim = scopeCss(cssText, scopeId, commentOriginalSelector);
 
@@ -206,7 +206,9 @@ describe('ShadowCss', function() {
   describe(':host-context', () => {
     it('should handle tag selector, commentOriginalSelector', () => {
       expect(s(':host-context(div) {}', 'a', true)).toEqual('/*!@:host-context(div)*/div.a-h, div .a-h {}');
-      expect(s(':host-context(ul) > .y {}', 'a', true)).toEqual('/*!@:host-context(ul) > .y*/ul.a-h > .y.a, ul .a-h > .y.a {}');
+      expect(s(':host-context(ul) > .y {}', 'a', true)).toEqual(
+        '/*!@:host-context(ul) > .y*/ul.a-h > .y.a, ul .a-h > .y.a {}',
+      );
     });
 
     it('should handle tag selector', () => {
@@ -249,7 +251,9 @@ describe('ShadowCss', function() {
 
     it('should handle host-context complex selector', () => {
       const r = s(':host-context(.red) > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag');
-      expect(r).toEqual('.sc-ion-tag-h.red > .sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}');
+      expect(r).toEqual(
+        '.sc-ion-tag-h.red > .sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}',
+      );
     });
 
     it('should handle left side selector', () => {
@@ -284,7 +288,9 @@ describe('ShadowCss', function() {
 
     it('same selectors, commentOriginalSelector', () => {
       const r = s('::slotted(*) {}, ::slotted(*) {}, ::slotted(*) {}', 'sc-ion-tag', true);
-      expect(r).toEqual('/*!@::slotted(*)*/.sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}');
+      expect(r).toEqual(
+        '/*!@::slotted(*)*/.sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}',
+      );
     });
 
     it('should combine parent selector when comma', () => {

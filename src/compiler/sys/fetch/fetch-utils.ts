@@ -31,10 +31,15 @@ export const getStencilModuleUrl = (compilerExe: string, p: string) => {
   return new URL('./' + p, getStencilRootUrl(compilerExe)).href;
 };
 
-export const getStencilInternalDtsUrl = (compilerExe: string) => getStencilModuleUrl(compilerExe, 'internal/index.d.ts');
+export const getStencilInternalDtsUrl = (compilerExe: string) =>
+  getStencilModuleUrl(compilerExe, 'internal/index.d.ts');
 
-export const getCommonDirUrl = (sys: d.CompilerSystem, pkgVersions: Map<string, string>, dirPath: string, fileName: string) =>
-  getNodeModuleFetchUrl(sys, pkgVersions, dirPath) + '/' + fileName;
+export const getCommonDirUrl = (
+  sys: d.CompilerSystem,
+  pkgVersions: Map<string, string>,
+  dirPath: string,
+  fileName: string,
+) => getNodeModuleFetchUrl(sys, pkgVersions, dirPath) + '/' + fileName;
 
 export const getNodeModuleFetchUrl = (sys: d.CompilerSystem, pkgVersions: Map<string, string>, filePath: string) => {
   // /node_modules/lodash/package.json
