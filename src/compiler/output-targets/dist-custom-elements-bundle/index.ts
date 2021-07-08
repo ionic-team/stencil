@@ -1,7 +1,7 @@
 import type * as d from '../../../declarations';
 import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
-import { catchError, dashToPascalCase, formatComponentRuntimeMeta, hasError, stringifyRuntimeData } from '@utils';
+import { catchError, dashToPascalCase, formatComponentRuntimeMeta, hasError, rollupSrcMapToObj, stringifyRuntimeData } from '@utils';
 import { getCustomElementsBuildConditionals } from './custom-elements-build-conditionals';
 import { isOutputTargetDistCustomElementsBundle } from '../output-utils';
 import { join } from 'path';
@@ -71,14 +71,23 @@ const bundleCustomElements = async (
       const files = rollupOutput.output.map(async bundle => {
         if (bundle.type === 'chunk') {
           let code = bundle.code;
+          let sourceMap = rollupSrcMapToObj(bundle.map);
           const optimizeResults = await optimizeModule(config, compilerCtx, {
             input: code,
             isCore: bundle.isEntry,
             minify,
+            sourceMap
           });
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
           if (!hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
             code = optimizeResults.output;
+            sourceMap = optimizeResults.sourceMap;
+          }
+          if (sourceMap) {
+            code = code + '\n//# sourceMappingURL=' + bundle.fileName + '.map';
+            await compilerCtx.fs.writeFile(join(outputTarget.dir, bundle.fileName + '.map'), JSON.stringify(sourceMap), {
+              outputTargetType: outputTarget.type,
+            });
           }
           await compilerCtx.fs.writeFile(join(outputTarget.dir, bundle.fileName), code, {
             outputTargetType: outputTarget.type,

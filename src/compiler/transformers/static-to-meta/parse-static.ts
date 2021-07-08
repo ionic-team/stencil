@@ -30,6 +30,14 @@ export const updateModule = (
   emitFilePath = normalizePath(join(srcDirPath, emitFileName));
 
   const moduleFile = createModule(tsSourceFile, sourceFileText, emitFilePath);
+
+  if (emitFilePath.endsWith('.js.map')) {
+    moduleFile.sourceMapPath = emitFilePath;
+    moduleFile.sourceMapFileText = sourceFileText;
+  } else if (prevModuleFile && prevModuleFile.sourceMapPath) {
+    moduleFile.sourceMapPath = prevModuleFile.sourceMapPath;
+    moduleFile.sourceMapFileText = prevModuleFile.sourceMapFileText;
+  }
   const moduleFileKey = normalizePath(moduleFile.sourceFilePath);
   compilerCtx.moduleMap.set(moduleFileKey, moduleFile);
   compilerCtx.changedModules.add(moduleFile.sourceFilePath);

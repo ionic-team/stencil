@@ -43,6 +43,7 @@ export function mockConfig(sys?: CompilerSystem) {
     nodeResolve: {
       customResolveOptions: {},
     },
+    sourceMap: true,
   };
 
   return config;

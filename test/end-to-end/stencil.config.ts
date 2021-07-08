@@ -62,4 +62,5 @@ export const config: Config = {
   enableCache: false,
   hashFileNames: false,
   buildEs5: 'prod',
+  sourceMap: true,
 };

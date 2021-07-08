@@ -5,7 +5,7 @@ import { CompressOptions, MangleOptions, ManglePropertiesOptions, MinifyOptions,
 export const minifyJs = async (input: string, opts?: MinifyOptions) => {
   const results = {
     output: input,
-    sourceMap: null as any,
+    sourceMap: null as d.SourceMap,
     diagnostics: [] as d.Diagnostic[],
   };
 
@@ -23,6 +23,7 @@ export const minifyJs = async (input: string, opts?: MinifyOptions) => {
     const minifyResults = await minify(input, opts);
 
     results.output = minifyResults.code;
+    results.sourceMap = typeof minifyResults.map === 'string' ? JSON.parse(minifyResults.map) : minifyResults.map;
 
     const compress = opts.compress as CompressOptions;
     if (compress && compress.module && results.output.endsWith('};')) {

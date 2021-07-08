@@ -53,7 +53,7 @@ xdescribe('outputTarget, www / dist / docs', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    expectFiles(compiler.fs, [path.join(root, 'User', 'testing', 'custom-dist', 'cjs'), path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js')]);
+    expectFiles(compiler.fs, [path.join(root, 'User', 'testing', 'custom-dist', 'cjs'), path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js'), path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js.map')]);
 
     doNotExpectFiles(compiler.fs, [
       path.join(root, 'User', 'testing', 'www', '/'),

@@ -15,12 +15,18 @@ export const outputCollection = async (config: d.Config, compilerCtx: d.Compiler
     await Promise.all(
       changedModuleFiles.map(async mod => {
         const code = mod.staticSourceFileText;
+        const mapCode = mod.sourceMapFileText;
 
         await Promise.all(
           outputTargets.map(async o => {
             const relPath = relative(config.srcDir, mod.jsFilePath);
             const filePath = join(o.collectionDir, relPath);
             await compilerCtx.fs.writeFile(filePath, code, { outputTargetType: o.type });
+
+            if (!mod.sourceMapPath) return;
+            const relMapPath = relative(config.srcDir, mod.sourceMapPath);
+            const mapFilePath = join(o.collectionDir, relMapPath);
+            await compilerCtx.fs.writeFile(mapFilePath, mapCode, { outputTargetType: o.type });
           }),
         );
       }),

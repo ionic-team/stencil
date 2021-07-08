@@ -30,6 +30,15 @@ const writeModuleFile = async (config: d.Config, compilerCtx: d.CompilerCtx, mod
       return compilerCtx.fs.writeFile(outputFilePath, jsContent);
     }),
   );
+  if (!moduleFile.sourceMapPath) return;
+  const mapRelPath = relative(config.srcDir, moduleFile.sourceMapPath);
+  const mapContent = await compilerCtx.fs.readFile(moduleFile.sourceMapPath);
+  await Promise.all(
+    outputTargets.map(o => {
+      const outputFilePath = join(o.collectionDir, mapRelPath);
+      return compilerCtx.fs.writeFile(outputFilePath, mapContent);
+    }),
+  );
 };
 
 export const writeCollectionManifests = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetDistCollection[]) => {
