@@ -111,7 +111,7 @@ export const generatePreamble = (config: d.Config, opts: { prefix?: string; suff
     });
   }
 
-  if (preamble.length > 1) {
+  if (preamble.length > 0) {
     preamble = preamble.map(l => ` * ${l}`);
 
     preamble.unshift(`/*!`);
@@ -119,7 +119,7 @@ export const generatePreamble = (config: d.Config, opts: { prefix?: string; suff
 
     return preamble.join('\n');
   }
-
+  
   if (opts.defaultBanner === true) {
     return `/*! ${BANNER} */`;
   }
