@@ -78,8 +78,8 @@ const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx,
     return true;
   }
 
-  if (buildCtx.filesChanged.includes(config.globalStyle)) {
-    // changed file IS the global entry style
+  if (buildCtx.filesChanged && buildCtx.hasStyleChanges) {
+    // changed file if a style file has been updated
     return false;
   }
 
