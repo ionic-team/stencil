@@ -15,7 +15,7 @@ export const patchCloneNode = (HostElementPrototype: any) => {
       let i = 0;
       let slotted, nonStencilNode;
       let stencilPrivates = ['s-id', 's-cr', 's-lr', 's-rc', 's-sc', 's-p', 's-cn', 's-sr', 's-sn', 's-hn', 's-ol', 's-nr', 's-si'];
-      
+
       for (; i < srcNode.childNodes.length; i++) {
         slotted = (srcNode.childNodes[i] as any)['s-nr'];
         nonStencilNode = stencilPrivates.every((privateField) => !(srcNode.childNodes[i] as any)[privateField]);
@@ -56,7 +56,7 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
     }
   }
   if (cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
-    const childNodesFn = elm.__lookupGetter__('childNodes');
+    const childNodesFn = getChildNodesFn(elm);
 
     Object.defineProperty(elm, 'children', {
       get() {
@@ -115,3 +115,14 @@ const getHostSlotChildNodes = (n: d.RenderNode, slotName: string) => {
   }
   return childNodes;
 };
+
+const getChildNodesFn = (elm: any) => {
+  let childNodesFn = elm.__lookupGetter__('childNodes');
+  if (!childNodesFn) {
+    const childNodes = elm.childNodes
+    childNodesFn = function () {
+      return childNodes
+    }
+  }
+  return childNodesFn
+}
