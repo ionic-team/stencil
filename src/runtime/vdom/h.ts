@@ -98,6 +98,13 @@ Empty objects can also be the cause, look for JSX comments that became objects.`
   return vnode;
 };
 
+export const Fragment: d.FunctionalComponent = (_, children: any) => children;
+
+// Exposing this here allows to set `jsxFragmentFactory` to `h.Fragment` in
+// tsconfig, so that `Fragment` doesn't need to be imported explicitly (just
+// importing `h` is sufficient).
+h.Fragment = Fragment;
+
 export const newVNode = (tag: string, text: string) => {
   const vnode: d.VNode = {
     $flags$: 0,

@@ -40,7 +40,7 @@ export function transpileModule(
 
   options.jsx = ts.JsxEmit.React;
   options.jsxFactory = 'h';
-  options.jsxFragmentFactory = 'Fragment';
+  options.jsxFragmentFactory = 'h.Fragment';
 
   const inputFileName = 'module.tsx';
   const sourceFile = ts.createSourceFile(inputFileName, input, options.target);
