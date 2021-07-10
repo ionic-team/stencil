@@ -342,4 +342,45 @@ describe('lifecycle sync', () => {
       </cmp-root>
     `);
   });
+
+  it('parse lifecycle props', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      renders = 0;
+
+      connectedCallback = () => {}
+      disconnectedCallback = () => {}
+
+      componentWillLoad() {}
+      componentDidLoad = () => {}
+      componentWillUpdate = () => {}
+      componentDidUpdate = () => {}
+      componentWillRender = () => {}
+      componentDidRender = () => {}
+      componentShouldUpdate = () => {return true}
+
+      render = () => {
+        this.renders++;
+      }
+    }
+
+    const {build} = await newSpecPage({
+      components: [CmpA],
+      strictBuild: true,
+      template: () => <cmp-a></cmp-a>,
+    });
+    expect(build).toMatchObject({
+      cmpDidLoad: true,
+      cmpDidUnload: false,
+      cmpDidUpdate: true,
+      cmpDidRender: true,
+      cmpWillLoad: true,
+      cmpWillUpdate: true,
+      cmpWillRender: true,
+      connectedCallback: true,
+      disconnectedCallback: true,
+      hasRenderFn: true,
+      cmpShouldUpdate: true,
+    });
+  });
 });
