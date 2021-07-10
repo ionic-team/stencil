@@ -1,5 +1,6 @@
 import type * as d from '../declarations';
 import { appDidLoad } from './update-component';
+import { setOptions } from './options';
 import { BUILD } from '@app-data';
 import { CMP_FLAGS } from '@utils';
 import { connectedCallback } from './connected-callback';
@@ -21,6 +22,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const endBootstrap = createTime('bootstrapLazy');
   const cmpTags: string[] = [];
   const exclude = options.exclude || [];
+  const transformTagName = options.transformTagName || null;
   const customElements = win.customElements;
   const head = doc.head;
   const metaCharset = /*@__PURE__*/ head.querySelector('meta[charset]');
@@ -32,6 +34,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   let i = 0;
 
   Object.assign(plt, options);
+  setOptions(options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
   if (BUILD.asyncQueue) {
     if (options.syncQueue) {
@@ -72,7 +75,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       if (BUILD.shadowDom && !supportsShadow && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
         cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
       }
-      const tagName = BUILD.transformTagName && options.transformTagName ? options.transformTagName(cmpMeta.$tagName$) : cmpMeta.$tagName$;
+      const tagName = cmpMeta.$tagName$;
+      let transformedTagName = null;
+      if (BUILD.transformTagName && transformTagName) {
+        transformedTagName = transformTagName(cmpMeta.$tagName$);
+        cmpMeta.$transformedTagName$ = transformedTagName;
+      }
       const HostElement = class extends HTMLElement {
         ['s-p']: Promise<void>[];
         ['s-rc']: (() => void)[];
@@ -145,9 +153,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
       cmpMeta.$lazyBundleId$ = lazyBundle[0];
 
-      if (!exclude.includes(tagName) && !customElements.get(tagName)) {
-        cmpTags.push(tagName);
-        customElements.define(tagName, proxyComponent(HostElement as any, cmpMeta, PROXY_FLAGS.isElementConstructor) as any);
+      if (!exclude.includes(tagName) && !customElements.get(transformedTagName || tagName)) {
+        cmpTags.push(transformedTagName || tagName);
+        customElements.define(transformedTagName || tagName, proxyComponent(HostElement as any, cmpMeta, PROXY_FLAGS.isElementConstructor) as any);
       }
     }),
   );
