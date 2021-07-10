@@ -62,7 +62,10 @@ module.exports.applyPolyfills = function() { return Promise.resolve() };
   const indexDtsPath = join(loaderPath, 'index.d.ts');
   await Promise.all([
     compilerCtx.fs.writeFile(join(loaderPath, 'package.json'), packageJsonContent),
-    compilerCtx.fs.writeFile(join(loaderPath, 'index.d.ts'), generateIndexDts(indexDtsPath, outputTarget.componentDts)),
+    compilerCtx.fs.writeFile(
+      join(loaderPath, 'index.d.ts'),
+      generateIndexDts(indexDtsPath, outputTarget.componentDts, config),
+    ),
     compilerCtx.fs.writeFile(join(loaderPath, 'index.js'), indexContent),
     compilerCtx.fs.writeFile(join(loaderPath, 'index.cjs.js'), indexCjsContent),
     compilerCtx.fs.writeFile(join(loaderPath, 'cdn.js'), indexCjsContent),
@@ -70,13 +73,15 @@ module.exports.applyPolyfills = function() { return Promise.resolve() };
   ]);
 };
 
-const generateIndexDts = (indexDtsPath: string, componentsDtsPath: string) => {
+const generateIndexDts = (indexDtsPath: string, componentsDtsPath: string, config: d.Config) => {
+  const transformTagName = config.extras.tagNameTransform ? '\n  transformTagName?: (tagName: string) => string;' : '';
   return `
 export * from '${relativeImport(indexDtsPath, componentsDtsPath, '.d.ts')}';
 export interface CustomElementsDefineOptions {
   exclude?: string[];
   resourcesUrl?: string;
-  syncQueue?: boolean;
+  syncQueue?: boolean;\
+  ${transformTagName}
   jmp?: (c: Function) => any;
   raf?: (c: FrameRequestCallback) => number;
   ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
