@@ -1,14 +1,16 @@
 import type * as d from '../../../declarations';
-import { propsToMarkdown } from './markdown-props';
-import { eventsToMarkdown } from './markdown-events';
 import { join, relative } from 'path';
-import { methodsToMarkdown } from './markdown-methods';
-import { usageToMarkdown } from './markdown-usage';
-import { stylesToMarkdown } from './markdown-css-props';
-import { slotsToMarkdown } from './markdown-slots';
-import { partsToMarkdown } from './markdown-parts';
-import { depsToMarkdown } from './markdown-dependencies';
 import { AUTO_GENERATE_COMMENT } from '../constants';
+import {
+  propsToMarkdown,
+  eventsToMarkdown,
+  partsToMarkdown,
+  methodsToMarkdown,
+  stylesToMarkdown,
+  depsToMarkdown,
+  slotsToMarkdown,
+  usageToMarkdown,
+} from './markdown-generators';
 
 export const generateReadme = async (
   config: d.Config,

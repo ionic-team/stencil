@@ -1,5 +1,5 @@
-import type * as d from '../../../declarations';
-import { MarkdownTable } from './docs-util';
+import type * as d from '../../../../declarations';
+import { MarkdownTable } from '../docs-util';
 
 export const eventsToMarkdown = (events: d.JsonDocsEvent[]) => {
   const content: string[] = [];
