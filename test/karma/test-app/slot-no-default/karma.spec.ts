@@ -11,7 +11,7 @@ describe('slot-no-default', function() {
   afterEach(tearDownDom);
 
 
-  it('only renders slots that havea location', async () => {
+  it('only renders slots that have a location', async () => {
     const root = app.querySelector('slot-no-default');
 
     const a = root.querySelector('a');
