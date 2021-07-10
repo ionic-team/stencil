@@ -32,16 +32,6 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           '\nOld value',
           oldVal,
         );
-      } else if (hostRef.$flags$ & HOST_FLAGS.devOnDidLoad) {
-        consoleDevWarn(
-          `The state/prop "${propName}" changed during "componentDidLoad()", this triggers extra re-renders, try to setup on "componentWillLoad()"`,
-          '\nElement',
-          elm,
-          '\nNew value',
-          newVal,
-          '\nOld value',
-          oldVal,
-        );
       }
     }
 
