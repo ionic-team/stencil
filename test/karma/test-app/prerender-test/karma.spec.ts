@@ -52,7 +52,7 @@ describe('prerender', () => {
     const shadowStyle = getComputedStyle(shadow.shadowRoot.querySelector('article'));
     expect(shadowStyle.color).toBe('rgb(0, 155, 0)');
 
-    const blueText = shadow.shadowRoot.querySelector('cmp-text-blue');
+    const blueText = shadow.shadowRoot.querySelector('temp-revert-me');
     const blueTextStyle = getComputedStyle(blueText.querySelector('text-blue'));
     expect(blueTextStyle.color).toBe('rgb(0, 0, 255)');
 
