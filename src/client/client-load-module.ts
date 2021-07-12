@@ -16,6 +16,7 @@ export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, hostRef: d.HostRef, 
   if (module) {
     return module[exportName];
   }
+  // staticImportSwitch
   return import(
     /* webpackInclude: /\.entry\.js$/ */
     /* webpackExclude: /\.system\.entry\.js$/ */
