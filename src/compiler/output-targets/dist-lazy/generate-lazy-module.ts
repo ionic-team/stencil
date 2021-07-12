@@ -28,13 +28,15 @@ export const generateLazyModules = async (
       entryComponentsResults.map(rollupResult => {
         return generateLazyEntryModule(config, compilerCtx, buildCtx, rollupResult, outputTargetType, destinations, sourceTarget, shouldMinify, isBrowserBuild, sufix);
       }),
-    ),
-    Promise.all(
-      chunkResults.map(rollupResult => {
-        return writeLazyChunk(config, compilerCtx, buildCtx, rollupResult, outputTargetType, destinations, sourceTarget, shouldMinify, isBrowserBuild);
-      }),
-    ),
+    )
   ]);
+  addStaticImports(results, bundleModules, isBrowserBuild);
+
+  await Promise.all(
+    chunkResults.map(rollupResult => {
+      return writeLazyChunk(config, compilerCtx, buildCtx, rollupResult, outputTargetType, destinations, sourceTarget, shouldMinify, isBrowserBuild);
+    }),
+  );
 
   const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
   const entryResults = rollupResults.filter(rollupResult => !rollupResult.isComponent && rollupResult.isEntry);
@@ -58,6 +60,36 @@ export const generateLazyModules = async (
 
   return bundleModules;
 };
+
+const addStaticImports = (results: d.RollupResult[], bundleModules: d.BundleModule[], isBrowserBuild: boolean) => {
+  if (!isBrowserBuild) {
+    results.filter((res: d.RollupChunkResult) =>
+      res.isCore && res.entryKey === 'index' &&
+      (res.moduleFormat === 'es' || res.moduleFormat === 'esm')
+    ).forEach((index: d.RollupChunkResult) => {
+      const caseStatement = `
+        case '{COMPONENT_ENTRY}':
+          return import(
+            /* webpackInclude: /{COMPONENT_ENTRY}\.entry\.js$/ */
+            /* webpackExclude: /{COMPONENT_ENTRY}\.system\.entry\.js$/ */
+            /* webpackMode: "lazy" */
+            './{COMPONENT_ENTRY}.entry.js').then(importedModule => {
+              cmpModules.set(bundleId, importedModule);
+              return importedModule[exportName];
+            }, consoleError);
+      `
+      const switchStr = bundleModules.map(mod => {
+        return caseStatement.replaceAll('{COMPONENT_ENTRY}', mod.output.bundleId);
+      });
+      index.code = index.code.replace('// staticImportSwitch', `
+      if (!hmrVersionId || !BUILD.hotModuleReplacement) {
+        switch(bundleId) {
+          ${switchStr.join('')}
+        }
+      }`);
+    })
+  }
+}
 
 const generateLazyEntryModule = async (
   config: d.Config,
