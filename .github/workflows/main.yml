@@ -61,14 +61,12 @@ jobs:
           path: stencil-build.tgz
 
       - name: Run karma tests
-        working-directory: ./test/karma
         if: matrix.os == 'ubuntu-latest' && matrix.node == '12.10.0'
         run: |
           wget "https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip"
           unzip BrowserStackLocal-linux-x64.zip
           ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY &
-          npm ci
-          npm run karma.prod
+          npm run test.karma.prod
         env:
           BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
           BROWSER_STACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
