@@ -13,6 +13,12 @@ import { taskInfo } from './task-info';
 import { taskPrerender } from './task-prerender';
 import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
+import { taskTelemetry } from './task-telemetry';
+
+import { receive } from './telemetry/ipc';
+import { telemetryAction } from './telemetry/telemetry';
+
+process.on('message', receive);
 
 export const run = async (init: CliInitOptions) => {
   const { args, logger, sys } = init;
@@ -20,10 +26,11 @@ export const run = async (init: CliInitOptions) => {
   try {
     const flags = parseFlags(args, sys);
     const task = flags.task;
+
     if (flags.debug || flags.verbose) {
       logger.setLevel('debug');
     }
-
+    
     if (flags.ci) {
       logger.enableColors(false);
     }
@@ -67,7 +74,11 @@ export const run = async (init: CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      taskInfo(coreCompiler, sys, logger);
+      telemetryAction({
+        args, sys, logger, action: async () => {
+          taskInfo(coreCompiler, sys, logger);
+        }
+      })
       return;
     }
 
@@ -93,7 +104,12 @@ export const run = async (init: CliInitOptions) => {
 
     await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies as any });
 
-    await runTask(coreCompiler, validated.config, task);
+    await telemetryAction({
+      args, sys, logger, config: validated.config,
+      action: async () => {
+        await runTask(coreCompiler, validated.config, task)
+      }
+    })
   } catch (e) {
     if (!shouldIgnoreError(e)) {
       logger.error(`uncaught cli error: ${e}${logger.getLevel() === 'debug' ? e.stack : ''}`);
@@ -107,6 +123,10 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
   config.outputTargets = config.outputTargets || [];
 
   switch (task) {
+    case 'telemetry':
+      await taskTelemetry(coreCompiler, config)
+      break;
+    
     case 'build':
       await taskBuild(coreCompiler, config);
       break;

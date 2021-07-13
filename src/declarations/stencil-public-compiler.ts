@@ -540,7 +540,8 @@ export type TaskCommand =
   | 'prerender'
   | 'serve'
   | 'test'
-  | 'version';
+  | 'version'
+  | 'telemetry';
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
