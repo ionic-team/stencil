@@ -1,4 +1,23 @@
-import { TERMINAL_INFO } from '@ionic/utils-terminal';
+interface TerminalInfo {
+	/**
+	 * Whether this is in CI or not.
+	 */
+	readonly ci: boolean;
+	/**
+	 * Path to the user's shell program.
+	 */
+	readonly shell: string;
+	/**
+	 * Whether the terminal is an interactive TTY or not.
+	 */
+	readonly tty: boolean;
+	/**
+	 * Whether this is a Windows shell or not.
+	 */
+	readonly windows: boolean;
+}
+
+declare const TERMINAL_INFO: TerminalInfo;
 
 export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(
 	fn: T,
@@ -15,6 +34,7 @@ export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(
 
 export const isInteractive = (): boolean => TERMINAL_INFO.tty && !TERMINAL_INFO.ci;
 
+// Plucked from https://github.com/ionic-team/capacitor/blob/b893a57aaaf3a16e13db9c33037a12f1a5ac92e0/cli/src/util/uuid.ts
 export function uuidv4(): string {
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
 		const r = (Math.random() * 16) | 0;

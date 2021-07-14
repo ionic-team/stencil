@@ -1,30 +1,28 @@
-import { readJSON, writeJSON, mkdirp } from '@ionic/utils-fs';
-
+import fs from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
 
 import { uuidv4 } from './telemetry/helpers';
 
-export const CONFIG_FILE = 'config.json';
+const CONFIG_FILE = 'config.json';
 export const DEFAULT_CONFIG_DIRECTORY = path.resolve(os.homedir(), '.ionic', CONFIG_FILE);
 
-export interface SystemConfig {
-	"telemetry"?: boolean,
+export interface TelemetryConfig {
 	"telemetry.stencil"?: boolean,
 	"tokens.telemetry"?: string,
 }
 
-export async function readConfig(): Promise<SystemConfig> {
+export async function readConfig(): Promise<TelemetryConfig> {
 	try {
-		return await readJSON(DEFAULT_CONFIG_DIRECTORY);
+		
+		return await fs.readJson(DEFAULT_CONFIG_DIRECTORY);
 	} catch (e) {
 		if (e.code !== 'ENOENT') {
 			throw e;
 		}
 
-		const config: SystemConfig = {
+		const config: TelemetryConfig = {
 			"tokens.telemetry": uuidv4(),
-			"telemetry": true,
 			"telemetry.stencil": true,
 		};
 
@@ -34,12 +32,15 @@ export async function readConfig(): Promise<SystemConfig> {
 	}
 }
 
-export async function writeConfig(config: SystemConfig): Promise<void> {
-	await mkdirp(path.dirname(DEFAULT_CONFIG_DIRECTORY));
-	await writeJSON(DEFAULT_CONFIG_DIRECTORY, config, { spaces: '\t' });
+export async function writeConfig(config: TelemetryConfig): Promise<void> {
+	await fs.mkdirp(path.dirname(DEFAULT_CONFIG_DIRECTORY)).then(async () => {
+		return await fs.writeJSON(DEFAULT_CONFIG_DIRECTORY, config, { spaces: '\t' });
+	}).catch(() => {
+		console.debug(`Couldn't write to ${DEFAULT_CONFIG_DIRECTORY}. `)
+	});
 }
 
-export async function updateConfig(newOptions: SystemConfig): Promise<void> {
+export async function updateConfig(newOptions: TelemetryConfig): Promise<void> {
 	const config = await readConfig();
 	await writeConfig(Object.assign(config, newOptions));
 }
