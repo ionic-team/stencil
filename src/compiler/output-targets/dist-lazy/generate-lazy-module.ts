@@ -65,19 +65,28 @@ const addStaticImports = (results: d.RollupResult[], bundleModules: d.BundleModu
   if (!isBrowserBuild) {
     results.filter((res: d.RollupChunkResult) =>
       res.isCore && res.entryKey === 'index' &&
-      (res.moduleFormat === 'es' || res.moduleFormat === 'esm')
+      (res.moduleFormat === 'es' || res.moduleFormat === 'esm' || res.moduleFormat === 'cjs' || res.moduleFormat === 'commonjs')
     ).forEach((index: d.RollupChunkResult) => {
-      const caseStatement = `
-        case '{COMPONENT_ENTRY}':
-          return import(
-            /* webpackInclude: /{COMPONENT_ENTRY}\.entry\.js$/ */
-            /* webpackExclude: /{COMPONENT_ENTRY}\.system\.entry\.js$/ */
-            /* webpackMode: "lazy" */
-            './{COMPONENT_ENTRY}.entry.js').then(importedModule => {
-              cmpModules.set(bundleId, importedModule);
-              return importedModule[exportName];
-            }, consoleError);
-      `
+      let caseStatement = `
+      case '{COMPONENT_ENTRY}':
+        return import(
+          /* webpackMode: "lazy" */
+          './{COMPONENT_ENTRY}.entry.js').then(importedModule => {
+            cmpModules.set(bundleId, importedModule);
+            return importedModule[exportName];
+          }, consoleError);
+    `;
+      if (index.moduleFormat === 'cjs' || index.moduleFormat === 'commonjs') {
+        caseStatement = `
+          case '{COMPONENT_ENTRY}':
+            return Promise.resolve().then(function () { return /*#__PURE__*/_interopNamespace(require(
+              /* webpackMode: "lazy" */
+              './{COMPONENT_ENTRY}.entry.js')); }).then(importedModule => {
+                  cmpModules.set(bundleId, importedModule);
+                  return importedModule[exportName];
+              }, consoleError);
+        `;
+      }
       const switchStr = bundleModules.map(mod => {
         return caseStatement.replaceAll('{COMPONENT_ENTRY}', mod.output.bundleId);
       });
