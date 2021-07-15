@@ -1,3 +1,5 @@
+import fs from "fs";
+
 interface TerminalInfo {
 	/**
 	 * Whether this is in CI or not.
@@ -42,4 +44,9 @@ export function uuidv4(): string {
 
 		return v.toString(16);
 	});
+}
+
+export async function readJson(path) {
+	const rawdata = await fs.readFileSync(path);
+	return JSON.parse(rawdata.toString());
 }

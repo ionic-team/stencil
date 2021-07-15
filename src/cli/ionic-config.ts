@@ -1,8 +1,8 @@
-import fs from 'fs-extra';
+import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
-import { uuidv4 } from './telemetry/helpers';
+import { readJson, uuidv4 } from './telemetry/helpers';
 
 const CONFIG_FILE = 'config.json';
 export const DEFAULT_CONFIG_DIRECTORY = path.resolve(os.homedir(), '.ionic', CONFIG_FILE);
@@ -14,8 +14,7 @@ export interface TelemetryConfig {
 
 export async function readConfig(): Promise<TelemetryConfig> {
 	try {
-		
-		return await fs.readJson(DEFAULT_CONFIG_DIRECTORY);
+		return await readJson(DEFAULT_CONFIG_DIRECTORY);
 	} catch (e) {
 		if (e.code !== 'ENOENT') {
 			throw e;
@@ -34,8 +33,8 @@ export async function readConfig(): Promise<TelemetryConfig> {
 
 export async function writeConfig(config: TelemetryConfig): Promise<void> {
 	try {
-		await fs.mkdirp(path.dirname(DEFAULT_CONFIG_DIRECTORY))
-		await fs.writeJSON(DEFAULT_CONFIG_DIRECTORY, config, { spaces: '\t' });
+		await fs.promises.mkdir(path.dirname(DEFAULT_CONFIG_DIRECTORY), { recursive: true });
+		await fs.promises.writeFile(DEFAULT_CONFIG_DIRECTORY, JSON.stringify(config))
 	} catch (error) {
 		console.error(`Stencil Telemetry: couldn't write configuration file to ${DEFAULT_CONFIG_DIRECTORY} - ${error}.`)
 	};
