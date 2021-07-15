@@ -30,7 +30,7 @@ export const generateLazyModules = async (
       }),
     )
   ]);
-  addStaticImports(results, bundleModules, isBrowserBuild);
+  if (!isBrowserBuild) addStaticImports(results, bundleModules);
 
   await Promise.all(
     chunkResults.map(rollupResult => {
@@ -61,43 +61,39 @@ export const generateLazyModules = async (
   return bundleModules;
 };
 
-const addStaticImports = (results: d.RollupResult[], bundleModules: d.BundleModule[], isBrowserBuild: boolean) => {
-  if (!isBrowserBuild) {
-    results.filter((res: d.RollupChunkResult) =>
-      res.isCore && res.entryKey === 'index' &&
-      (res.moduleFormat === 'es' || res.moduleFormat === 'esm' || res.moduleFormat === 'cjs' || res.moduleFormat === 'commonjs')
-    ).forEach((index: d.RollupChunkResult) => {
-      let caseStatement = `
+const addStaticImports = (results: d.RollupResult[], bundleModules: d.BundleModule[]) => {
+  results.filter((res: d.RollupChunkResult) =>
+    res.isCore && res.entryKey === 'index' &&
+    (res.moduleFormat === 'es' || res.moduleFormat === 'esm' || res.moduleFormat === 'cjs' || res.moduleFormat === 'commonjs')
+  ).forEach((index: d.RollupChunkResult) => {
+    let caseStatement = `
       case '{COMPONENT_ENTRY}':
         return import(
           /* webpackMode: "lazy" */
-          './{COMPONENT_ENTRY}.entry.js').then(importedModule => {
-            cmpModules.set(bundleId, importedModule);
-            return importedModule[exportName];
-          }, consoleError);
-    `;
-      if (index.moduleFormat === 'cjs' || index.moduleFormat === 'commonjs') {
-        caseStatement = `
-          case '{COMPONENT_ENTRY}':
-            return Promise.resolve().then(function () { return /*#__PURE__*/_interopNamespace(require(
-              /* webpackMode: "lazy" */
-              './{COMPONENT_ENTRY}.entry.js')); }).then(importedModule => {
-                  cmpModules.set(bundleId, importedModule);
-                  return importedModule[exportName];
-              }, consoleError);
-        `;
+          './{COMPONENT_ENTRY}.entry.js').then(processMod, consoleError);
+      `;
+    if (index.moduleFormat === 'cjs' || index.moduleFormat === 'commonjs') {
+      caseStatement = `
+        case '{COMPONENT_ENTRY}':
+          return Promise.resolve().then(function () { return /*#__PURE__*/_interopNamespace(require(
+            /* webpackMode: "lazy" */
+            './{COMPONENT_ENTRY}.entry.js')); }).then(processMod, consoleError);
+      `;
+    }
+    const switchStr = bundleModules.map(mod => {
+      return caseStatement.replaceAll('{COMPONENT_ENTRY}', mod.output.bundleId);
+    });
+    index.code = index.code.replace('// staticImportSwitch', `
+    if (!hmrVersionId || !BUILD.hotModuleReplacement) {
+      const processMod = importedModule => {
+        cmpModules.set(bundleId, importedModule);
+        return importedModule[exportName];
       }
-      const switchStr = bundleModules.map(mod => {
-        return caseStatement.replaceAll('{COMPONENT_ENTRY}', mod.output.bundleId);
-      });
-      index.code = index.code.replace('// staticImportSwitch', `
-      if (!hmrVersionId || !BUILD.hotModuleReplacement) {
-        switch(bundleId) {
-          ${switchStr.join('')}
-        }
-      }`);
-    })
-  }
+      switch(bundleId) {
+        ${switchStr.join('')}
+      }
+    }`);
+  })
 }
 
 const generateLazyEntryModule = async (
