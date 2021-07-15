@@ -12,7 +12,6 @@ describe('readConfig', () => {
 
 		const config = await readConfig();
 
-		expect(typeof config).toBe("object");
 		expect(Object.keys(config).join()).toBe("tokens.telemetry,telemetry.stencil");
 	});
 
@@ -23,7 +22,6 @@ describe('readConfig', () => {
 
 		const config = await readConfig();
 
-		expect(typeof config).toBe("object");
 		expect(Object.keys(config).join()).toBe("telemetry.stencil,tokens.telemetry");
 		expect(config['telemetry.stencil']).toBe(true);
 		expect(config['tokens.telemetry']).toBe("12345");

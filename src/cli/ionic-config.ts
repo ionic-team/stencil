@@ -33,11 +33,12 @@ export async function readConfig(): Promise<TelemetryConfig> {
 }
 
 export async function writeConfig(config: TelemetryConfig): Promise<void> {
-	await fs.mkdirp(path.dirname(DEFAULT_CONFIG_DIRECTORY)).then(async () => {
-		return await fs.writeJSON(DEFAULT_CONFIG_DIRECTORY, config, { spaces: '\t' });
-	}).catch(() => {
+	try {
+		await fs.mkdirp(path.dirname(DEFAULT_CONFIG_DIRECTORY))
+		await fs.writeJSON(DEFAULT_CONFIG_DIRECTORY, config, { spaces: '\t' });
+	} catch (error) {
 		console.error(`Stencil Telemetry: couldn't write configuration file to ${DEFAULT_CONFIG_DIRECTORY} - ${error}.`)
-	});
+	};
 }
 
 export async function updateConfig(newOptions: TelemetryConfig): Promise<void> {
