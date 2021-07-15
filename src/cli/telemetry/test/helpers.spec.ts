@@ -1,4 +1,4 @@
-import { tryFn, uuidv4 } from '../helpers';
+import { isInteractive, TERMINAL_INFO, tryFn, uuidv4 } from '../helpers';
 
 describe('uuidv4', () => {
 
@@ -9,6 +9,27 @@ describe('uuidv4', () => {
 	});
 
 });
+
+describe('isInteractive', () => {
+	it('should return false when tty is false', async () => {
+		TERMINAL_INFO = { ci: true, shell: true, tty: false, windows: true };
+		const result = isInteractive();
+		expect(result).toBe(false)
+	});
+
+	it('should return false when ci is true', async () => {
+		TERMINAL_INFO = { ci: true, shell: true, tty: true, windows: true };
+		const result = isInteractive();
+		expect(result).toBe(false)
+	});
+
+	it('should return true when tty is true and ci is false', async () => {
+		TERMINAL_INFO = { ci: false, shell: true, tty: true, windows: true };
+		const result = isInteractive();
+		expect(result).toBe(true)
+	});
+});
+
 
 describe('tryFn', () => {
 

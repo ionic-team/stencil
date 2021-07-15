@@ -19,7 +19,7 @@ interface TerminalInfo {
 	readonly windows: boolean;
 }
 
-declare const TERMINAL_INFO: TerminalInfo;
+export declare const TERMINAL_INFO: TerminalInfo;
 
 export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(
 	fn: T,
@@ -47,6 +47,6 @@ export function uuidv4(): string {
 }
 
 export async function readJson(path: string) {
-	const rawdata = await fs.promises.readFileSync(path);
+	const rawdata = await fs.promises.readFile(path);
 	return JSON.parse(rawdata.toString());
 }
