@@ -27,6 +27,7 @@ describe('tryFn', () => {
 
 		expect(result).toBe(true)
 	});
+
 	it('handles returning false correctly', async () => {
 		const result = await tryFn(async () => {
 			return false;
