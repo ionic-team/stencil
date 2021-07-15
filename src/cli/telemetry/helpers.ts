@@ -46,7 +46,7 @@ export function uuidv4(): string {
 	});
 }
 
-export async function readJson(path) {
+export async function readJson(path: string) {
 	const rawdata = await fs.readFileSync(path);
 	return JSON.parse(rawdata.toString());
 }
