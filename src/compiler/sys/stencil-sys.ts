@@ -16,6 +16,7 @@ import type {
 } from '../../declarations';
 import platformPath from 'path-browserify';
 import { basename, dirname, join } from 'path';
+import * as os from 'os'
 import { buildEvents } from '../events';
 import { createLogger } from './logger/console-logger';
 import { createWebWorkerMainController } from './worker/web-worker-main';
@@ -73,6 +74,10 @@ export const createSystem = (c?: { logger?: Logger }) => {
     writeFileSync(dest, readFileSync(src));
     return true;
   };
+
+  const homeDir = () => {
+    return os.homedir();
+  }
 
   const createDirSync = (p: string, opts?: CompilerSystemCreateDirectoryOptions) => {
     p = normalize(p);
@@ -546,6 +551,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     copyFile,
     createDir,
     createDirSync,
+    homeDir,
     destroy,
     encodeToBase64,
     exit: async exitCode => logger.warn(`exit ${exitCode}`),

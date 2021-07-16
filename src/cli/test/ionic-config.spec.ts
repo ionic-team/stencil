@@ -1,14 +1,26 @@
-import fs from 'fs-extra';
+import { mockLogger } from '@stencil/core/testing';
+import { getCompilerSystem, initializeStencilCLIConfig } from '../state/stencil-cli-config';
 import { readConfig, writeConfig, updateConfig, DEFAULT_CONFIG_DIRECTORY } from '../ionic-config';
+import { createSystem } from '../../compiler/sys/stencil-sys';
 
 describe('readConfig', () => {
 
+	initializeStencilCLIConfig({
+		sys: createSystem(),
+		logger: mockLogger(),
+		args: []
+	});
+
 	it('should create a file if it does not exist', async () => {
-		if (await fs.pathExists(DEFAULT_CONFIG_DIRECTORY)) {
-			fs.rmSync(DEFAULT_CONFIG_DIRECTORY);
+		let result = await getCompilerSystem().stat(DEFAULT_CONFIG_DIRECTORY(true));
+
+		if (result.isFile) {
+			await getCompilerSystem().removeFile(DEFAULT_CONFIG_DIRECTORY(true))
 		}
 
-		expect(await fs.pathExists(DEFAULT_CONFIG_DIRECTORY)).toBe(false)
+		result = await getCompilerSystem().stat(DEFAULT_CONFIG_DIRECTORY(true))
+
+		expect(result.isFile).toBe(false)
 
 		const config = await readConfig();
 
@@ -16,9 +28,11 @@ describe('readConfig', () => {
 	});
 
 	it('should read a file if it exists', async () => {
-		await writeConfig({"telemetry.stencil": true, "tokens.telemetry": "12345"})
+		await writeConfig({ "telemetry.stencil": true, "tokens.telemetry": "12345" })
 
-		expect(await fs.pathExists(DEFAULT_CONFIG_DIRECTORY)).toBe(true)
+		let result = await getCompilerSystem().stat(DEFAULT_CONFIG_DIRECTORY(true));
+
+		expect(result.isFile).toBe(true)
 
 		const config = await readConfig();
 
@@ -29,11 +43,18 @@ describe('readConfig', () => {
 });
 
 describe('updateConfig', () => {
+	initializeStencilCLIConfig({
+		sys: createSystem(),
+		logger: mockLogger(),
+		args: []
+	});
 
 	it('should edit a file', async () => {
 		await writeConfig({ "telemetry.stencil": true, "tokens.telemetry": "12345" })
 
-		expect(await fs.pathExists(DEFAULT_CONFIG_DIRECTORY)).toBe(true)
+		let result = await getCompilerSystem().stat(DEFAULT_CONFIG_DIRECTORY(true));
+
+		expect(result.isFile).toBe(true)
 
 		const configPre = await readConfig();
 

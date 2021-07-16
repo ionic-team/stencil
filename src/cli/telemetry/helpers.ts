@@ -1,4 +1,4 @@
-import fs from "fs";
+import { getCompilerSystem } from '../state/stencil-cli-config'
 
 interface TerminalInfo {
 	/**
@@ -47,6 +47,6 @@ export function uuidv4(): string {
 }
 
 export async function readJson(path: string) {
-	const rawdata = await fs.promises.readFile(path);
-	return JSON.parse(rawdata.toString());
+	const file = await getCompilerSystem()?.readFile(path);
+	return !!file && JSON.parse(file);
 }

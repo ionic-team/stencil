@@ -902,6 +902,7 @@ export interface CompilerSystem {
    * SYNC! Does not throw.
    */
   createDirSync(p: string, opts?: CompilerSystemCreateDirectoryOptions): CompilerSystemCreateDirectoryResults;
+  homeDir(): string;
   /**
    * Each plaform as a different way to dynamically import modules.
    */

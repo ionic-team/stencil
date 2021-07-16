@@ -1,11 +1,10 @@
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-
+import { getCompilerSystem } from './state/stencil-cli-config';
 import { readJson, uuidv4 } from './telemetry/helpers';
 
 const CONFIG_FILE = 'config.json';
-export const DEFAULT_CONFIG_DIRECTORY = path.resolve(os.homedir(), '.ionic', CONFIG_FILE);
+export const DEFAULT_CONFIG_DIRECTORY = (file: boolean = false) => {
+	return getCompilerSystem().resolvePath(`${getCompilerSystem().homeDir()}/.ionic${file ? "/" + CONFIG_FILE : ""}`);
+}
 
 export interface TelemetryConfig {
 	"telemetry.stencil"?: boolean,
@@ -13,30 +12,26 @@ export interface TelemetryConfig {
 }
 
 export async function readConfig(): Promise<TelemetryConfig> {
-	try {
-		return await readJson(DEFAULT_CONFIG_DIRECTORY);
-	} catch (e) {
-		if (e.code !== 'ENOENT') {
-			throw e;
-		}
+	let config: TelemetryConfig = await readJson(DEFAULT_CONFIG_DIRECTORY(true));
 
-		const config: TelemetryConfig = {
+	if (!config) {
+		config = {
 			"tokens.telemetry": uuidv4(),
 			"telemetry.stencil": true,
 		};
 
 		await writeConfig(config);
-
-		return config;
 	}
+
+	return config;
 }
 
 export async function writeConfig(config: TelemetryConfig): Promise<void> {
 	try {
-		await fs.promises.mkdir(path.dirname(DEFAULT_CONFIG_DIRECTORY), { recursive: true });
-		await fs.promises.writeFile(DEFAULT_CONFIG_DIRECTORY, JSON.stringify(config))
+		await getCompilerSystem().createDir(DEFAULT_CONFIG_DIRECTORY(), { recursive: true });
+		await getCompilerSystem().writeFile(DEFAULT_CONFIG_DIRECTORY(true), JSON.stringify(config))
 	} catch (error) {
-		console.error(`Stencil Telemetry: couldn't write configuration file to ${DEFAULT_CONFIG_DIRECTORY} - ${error}.`)
+		console.error(`Stencil Telemetry: couldn't write configuration file to ${DEFAULT_CONFIG_DIRECTORY(true)} - ${error}.`)
 	};
 }
 

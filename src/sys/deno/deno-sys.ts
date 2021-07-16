@@ -124,6 +124,9 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       }
       return results;
     },
+    homeDir() {
+      return deno.env.get("HOME")
+    },
     createDirSync(p, opts) {
       const results: CompilerSystemCreateDirectoryResults = {
         basename: basename(p),

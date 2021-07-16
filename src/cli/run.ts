@@ -13,9 +13,13 @@ import { taskInfo } from './task-info';
 import { taskPrerender } from './task-prerender';
 import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
+import { initializeStencilCLIConfig } from './state/stencil-cli-config';
 
 export const run = async (init: CliInitOptions) => {
   const { args, logger, sys } = init;
+
+  // Initialize the singleton so we can use this throughout the lifecycle of the CLI.
+  const stencilCLIConfig = initializeStencilCLIConfig({ args, logger, sys});
 
   try {
     const flags = parseFlags(args, sys);
@@ -31,6 +35,12 @@ export const run = async (init: CliInitOptions) => {
     if (isFunction(sys.applyGlobalPatch)) {
       sys.applyGlobalPatch(sys.getCurrentDirectory());
     }
+
+    // Update singleton with modifications
+    stencilCLIConfig.logger = logger;
+    stencilCLIConfig.task = task;
+    stencilCLIConfig.sys = sys;
+    stencilCLIConfig.flags = flags;
 
     if (task === 'help' || flags.help) {
       taskHelp(sys, logger);
@@ -50,12 +60,14 @@ export const run = async (init: CliInitOptions) => {
       logger,
       dependencies: dependencies as any,
     });
+
     if (hasError(ensureDepsResults.diagnostics)) {
       logger.printDiagnostics(ensureDepsResults.diagnostics);
       return sys.exit(1);
     }
 
     const coreCompiler = await loadCoreCompiler(sys);
+    stencilCLIConfig.coreCompiler = coreCompiler;
 
     if (task === 'version' || flags.version) {
       console.log(coreCompiler.version);
