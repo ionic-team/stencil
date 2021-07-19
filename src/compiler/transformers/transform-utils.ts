@@ -631,11 +631,6 @@ export const cloneNode = (node: any) => {
     finalize: (clonedNode: ts.Node, oldNode: ts.Node) => {
       if (!oldNode.getSourceFile()) return clonedNode;
 
-      if (ts.isPropertyAccessChain(oldNode) && oldNode.questionDotToken) {
-        let cloneWithQuestion = (clonedNode as ts.PropertyAccessChain);
-        clonedNode = ts.factory.createPropertyAccessChain(cloneWithQuestion.expression, oldNode.questionDotToken, cloneWithQuestion.name)
-      }
-
       const srcMapSrc = ts.createSourceMapSource(
         oldNode.getSourceFile().fileName,
         ts.sys.readFile(oldNode.getSourceFile().fileName)
