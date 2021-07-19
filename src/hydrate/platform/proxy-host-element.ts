@@ -60,7 +60,7 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
             const args = arguments;
             return ref.$onInstancePromise$
               .then(() => ref.$lazyInstance$[memberName].apply(ref.$lazyInstance$, args))
-              .catch(consoleError);
+              .catch(e => consoleError(e, elm));
           },
         });
       }
