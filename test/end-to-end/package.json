@@ -27,7 +27,7 @@
     "@types/lodash-es": "^4.17.4",
     "@types/video.js": "^7.3.11",
     "file-saver": "^2.0.2",
-    "ionic-git": "github:ionic-team/ionic-framework#bc2f1b89449cdc139cb10d28159822d269e5b554",
+    "ionic-git": "github:ionic-team/ionic-framework",
     "ionicons": "^5.5.1",
     "linaria": "^1.3.3",
     "lodash": "^4.17.20",

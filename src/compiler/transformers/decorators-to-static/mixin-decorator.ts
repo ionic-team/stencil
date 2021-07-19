@@ -119,16 +119,16 @@ export const mixinStatements = (sourceNode: ts.SourceFile, foundMixins: FoundMix
  */
  export const mixinClassMembers = (hostNode: ts.ClassDeclaration, mixinClasses: FoundMixins) => {
   const mixinDecorators = hostNode.decorators.filter(isDecoratorNamed('Mixin'));
-  if (!mixinDecorators || !mixinDecorators.length) return hostNode.members;
+  if (!mixinDecorators || !mixinDecorators.length) return false;
 
   const {mixinClassNames} = getMixinsFromDecorator(mixinDecorators);
-  if (!mixinClassNames.length) return hostNode.members;
+  if (!mixinClassNames.length) return false;
 
   const foundMixinsClasses = mixinClasses.get(hostNode.getSourceFile().fileName);
-  if (!foundMixinsClasses || !foundMixinsClasses.length) return hostNode.members;
+  if (!foundMixinsClasses || !foundMixinsClasses.length) return false;
 
   const classDecls = collateMixinClassesMembers(mixinClassNames, foundMixinsClasses);
-  if (!classDecls.length) return hostNode.members;
+  if (!classDecls.length) return false;
 
   // filter out any named members from the mixin classes that are in our host
   const mergedMembers = dedupeClassMembers(hostNode.members, classDecls);
