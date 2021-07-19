@@ -54,7 +54,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       try {
         new (Cstr as any)(hostRef);
       } catch (e) {
-        consoleError(e);
+        consoleError(e, elm);
       }
 
       if (BUILD.member) {

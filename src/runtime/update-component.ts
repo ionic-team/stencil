@@ -34,32 +34,32 @@ export const scheduleUpdate = (hostRef: d.HostRef, isInitialLoad: boolean) => {
 const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean) => {
   const elm = hostRef.$hostElement$;
   const endSchedule = createTime('scheduleUpdate', hostRef.$cmpMeta$.$tagName$);
-  const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : (elm as any);
+  const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
 
   let promise: Promise<void>;
   if (isInitialLoad) {
     if (BUILD.lazyLoad && BUILD.hostListener) {
       hostRef.$flags$ |= HOST_FLAGS.isListenReady;
       if (hostRef.$queuedListeners$) {
-        hostRef.$queuedListeners$.map(([methodName, event]) => safeCall(instance, methodName, event));
+        hostRef.$queuedListeners$.map(([methodName, event]) => safeCall(instance, methodName, event, elm));
         hostRef.$queuedListeners$ = null;
       }
     }
     emitLifecycleEvent(elm, 'componentWillLoad');
     if (BUILD.cmpWillLoad) {
-      promise = safeCall(instance, 'componentWillLoad');
+      promise = safeCall(instance, 'componentWillLoad', undefined, elm);
     }
   } else {
     emitLifecycleEvent(elm, 'componentWillUpdate');
 
     if (BUILD.cmpWillUpdate) {
-      promise = safeCall(instance, 'componentWillUpdate');
+      promise = safeCall(instance, 'componentWillUpdate', undefined, elm);
     }
   }
 
   emitLifecycleEvent(elm, 'componentWillRender');
   if (BUILD.cmpWillRender) {
-    promise = then(promise, () => safeCall(instance, 'componentWillRender'));
+    promise = then(promise, () => safeCall(instance, 'componentWillRender', undefined, elm));
   }
 
   endSchedule();
@@ -194,7 +194,7 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
     if (BUILD.isDev) {
       hostRef.$flags$ |= HOST_FLAGS.devOnRender;
     }
-    safeCall(instance, 'componentDidRender');
+    safeCall(instance, 'componentDidRender', undefined, elm);
     if (BUILD.isDev) {
       hostRef.$flags$ &= ~HOST_FLAGS.devOnRender;
     }
@@ -213,7 +213,7 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
       if (BUILD.isDev) {
         hostRef.$flags$ |= HOST_FLAGS.devOnDidLoad;
       }
-      safeCall(instance, 'componentDidLoad');
+      safeCall(instance, 'componentDidLoad', undefined, elm);
       if (BUILD.isDev) {
         hostRef.$flags$ &= ~HOST_FLAGS.devOnDidLoad;
       }
@@ -237,7 +237,7 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
       if (BUILD.isDev) {
         hostRef.$flags$ |= HOST_FLAGS.devOnRender;
       }
-      safeCall(instance, 'componentDidUpdate');
+      safeCall(instance, 'componentDidUpdate', undefined, elm);
       if (BUILD.isDev) {
         hostRef.$flags$ &= ~HOST_FLAGS.devOnRender;
       }
@@ -299,12 +299,12 @@ export const appDidLoad = (who: string) => {
   }
 };
 
-export const safeCall = (instance: any, method: string, arg?: any) => {
+export const safeCall = (instance: d.ComponentInterface, method: keyof d.ComponentInterface, arg?: any, elm?: HTMLElement) => {
   if (instance && instance[method]) {
     try {
       return instance[method](arg);
     } catch (e) {
-      consoleError(e);
+      consoleError(e, elm);
     }
   }
   return undefined;

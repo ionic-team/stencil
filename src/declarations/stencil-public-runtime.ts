@@ -262,7 +262,7 @@ export declare const setMode: (handler: ResolutionHandler) => void;
  */
 export declare function getMode<T = string | undefined>(ref: any): T;
 
-export declare function setPlatformHelpers (helpers: { 
+export declare function setPlatformHelpers (helpers: {
   jmp?: (c: any) => any;
   raf?: (c: any) => number;
   ael?: (
@@ -320,6 +320,7 @@ export declare function getRenderingRef(): any;
 
 export interface HTMLStencilElement extends HTMLElement {
   componentOnReady(): Promise<this>;
+  onComponentError: (event: CustomEvent<Error>) => void;
 }
 
 /**
