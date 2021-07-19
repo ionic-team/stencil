@@ -39,7 +39,7 @@
     "rollup-plugin-node-polyfills": "^0.1.2",
     "webpack-cli": "^3.3.12",
     "workbox-build": "4.3.1",
-    "ionic-git": "github:ionic-team/ionic-framework",
+    "ionic-git": "https://gitpkg.now.sh/ionic-team/ionic-framework?main",
     "ionicons": "^5.5.1"
   }
 }
