@@ -58,7 +58,9 @@ export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnosti
     return classNode;
   }
 
-  const classMembers = mixinClassMembers(classNode, allMixins);
+  const didReplace = mixinClassMembers(classNode, allMixins);
+  const classMembers = !!didReplace ? didReplace : classNode.members;
+
   const decoratedMembers = classMembers.filter(member => Array.isArray(member.decorators) && member.decorators.length > 0);
   const newMembers = removeStencilDecorators(Array.from(classMembers));
 
@@ -86,7 +88,7 @@ export const visitClassDeclaration = (config: d.Config, diagnostics: d.Diagnosti
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    newMembers.map(member => cloneNode(member)),
+    didReplace ? newMembers.map(member => cloneNode(member)) : newMembers,
   );
 };
 
