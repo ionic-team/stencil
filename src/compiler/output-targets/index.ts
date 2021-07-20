@@ -32,12 +32,12 @@ export const generateOutputTargets = async (
     outputCustomElements(config, compilerCtx, buildCtx),
     outputHydrateScript(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
-    outputLazy(config, compilerCtx, buildCtx),
-    outputWww(config, compilerCtx, buildCtx),
+    outputLazy(config, compilerCtx, buildCtx)
   ]);
 
   // must run after all the other outputs
-  // since it validates files were created
+  // since it validates or uses files that were created
+  await outputWww(config, compilerCtx, buildCtx);
   await outputDocs(config, compilerCtx, buildCtx);
   await outputTypes(config, compilerCtx, buildCtx);
 
