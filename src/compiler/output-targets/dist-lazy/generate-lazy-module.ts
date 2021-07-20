@@ -81,7 +81,7 @@ const addStaticImports = (results: d.RollupResult[], bundleModules: d.BundleModu
       `;
     }
     const switchStr = bundleModules.map(mod => {
-      return caseStatement.replaceAll('{COMPONENT_ENTRY}', mod.output.bundleId);
+      return caseStatement.replace(/\{COMPONENT_ENTRY\}/g, mod.output.bundleId);
     });
     index.code = index.code.replace('// staticImportSwitch', `
     if (!hmrVersionId || !BUILD.hotModuleReplacement) {
