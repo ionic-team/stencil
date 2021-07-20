@@ -6,8 +6,7 @@ Please check if your PR fulfills the following requirements:
 - [ ] Tests for the changes have been added (for bug fixes / features)
 - [ ] Docs have been reviewed and added / updated if needed (for bug fixes / features)
 - [ ] Build (`npm run build`) was run locally and any changes were pushed
-- [ ] Lint (`npm run lint`) has passed locally and any fixes were made for failures
-
+- [ ] Tests (`npm run test.karma.prod`) was run locally and passed
 
 ## Pull request type
 
@@ -18,7 +17,6 @@ Please check if your PR fulfills the following requirements:
 Please check the type of change your PR introduces:
 - [ ] Bugfix
 - [ ] Feature
-- [ ] Code style update (formatting, renaming)
 - [ ] Refactoring (no functional changes, no api changes)
 - [ ] Build related changes
 - [ ] Documentation content changes
@@ -28,7 +26,7 @@ Please check the type of change your PR introduces:
 ## What is the current behavior?
 <!-- Please describe the current behavior that you are modifying, or link to a relevant issue. -->
 
-Issue Number: N/A
+GitHub Issue Number: N/A
 
 
 ## What is the new behavior?
