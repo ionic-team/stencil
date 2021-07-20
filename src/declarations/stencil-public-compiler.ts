@@ -291,8 +291,8 @@ export interface ConfigExtras {
 
   /**
    * When a component is first attached to the DOM, this setting will wait a single tick before
-   * rendering. This worksaround an Angular issue, where Angular attaches the elements before
-   * settings their initial state, leading to double renders and unnecesary event dispatchs.
+   * rendering. This works around an Angular issue, where Angular attaches the elements before
+   * settings their initial state, leading to double renders and unnecessary event dispatches.
    * Defaults to `false`.
    */
   initializeNextTick?: boolean;
