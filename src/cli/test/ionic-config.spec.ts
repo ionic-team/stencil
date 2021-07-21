@@ -1,6 +1,6 @@
 import { mockLogger } from '@stencil/core/testing';
 import { getCompilerSystem, initializeStencilCLIConfig } from '../state/stencil-cli-config';
-import { readConfig, writeConfig, updateConfig, DEFAULT_CONFIG } from '../ionic-config';
+import { readConfig, writeConfig, updateConfig, default_config } from '../ionic-config';
 import { createSystem } from '../../compiler/sys/stencil-sys';
 
 describe('readConfig', () => {
@@ -11,13 +11,13 @@ describe('readConfig', () => {
   });
 
   it('should create a file if it does not exist', async () => {
-    let result = await getCompilerSystem().stat(DEFAULT_CONFIG(true));
+    let result = await getCompilerSystem().stat(default_config());
 
     if (result.isFile) {
-      await getCompilerSystem().removeFile(DEFAULT_CONFIG(true));
+      await getCompilerSystem().removeFile(default_config());
     }
 
-    result = await getCompilerSystem().stat(DEFAULT_CONFIG(true));
+    result = await getCompilerSystem().stat(default_config());
 
     expect(result.isFile).toBe(false);
 
@@ -29,7 +29,7 @@ describe('readConfig', () => {
   it('should read a file if it exists', async () => {
     await writeConfig({ 'telemetry.stencil': true, 'tokens.telemetry': '12345' });
 
-    let result = await getCompilerSystem().stat(DEFAULT_CONFIG(true));
+    let result = await getCompilerSystem().stat(default_config());
 
     expect(result.isFile).toBe(true);
 
@@ -51,7 +51,7 @@ describe('updateConfig', () => {
   it('should edit a file', async () => {
     await writeConfig({ 'telemetry.stencil': true, 'tokens.telemetry': '12345' });
 
-    let result = await getCompilerSystem().stat(DEFAULT_CONFIG(true));
+    let result = await getCompilerSystem().stat(default_config());
 
     expect(result.isFile).toBe(true);
 
