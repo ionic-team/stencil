@@ -243,6 +243,9 @@ export function createNodeSys(c: { process?: any } = {}) {
         });
       });
     },
+    isTTY() {
+      return !!process?.stdout?.isTTY;
+    },
     readDirSync(p) {
       try {
         return fs.readdirSync(p).map(f => {
@@ -273,8 +276,8 @@ export function createNodeSys(c: { process?: any } = {}) {
     },
     homeDir() {
       try {
-        return os.homedir()
-      } catch (e) { }
+        return os.homedir();
+      } catch (e) {}
       return undefined;
     },
     realpath(p) {

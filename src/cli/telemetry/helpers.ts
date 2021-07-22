@@ -1,4 +1,4 @@
-import { getCompilerSystem } from '../state/stencil-cli-config';
+import { getCompilerSystem, getStencilCLIConfig } from '../state/stencil-cli-config';
 
 interface TerminalInfo {
   /**
@@ -27,14 +27,16 @@ export const isInteractive = (object?: TerminalInfo): boolean => {
   const terminalInfo =
     object ||
     Object.freeze({
-      tty: process.stdout.isTTY ? true : false,
+      tty: getCompilerSystem().isTTY() ? true : false,
       ci:
-        ['CI', 'BUILD_ID', 'BUILD_NUMBER', 'BITBUCKET_COMMIT', 'CODEBUILD_BUILD_ARN'].filter(v => !!process.env[v])
-          .length > 0 || process.argv.includes('--ci'),
+        ['CI', 'BUILD_ID', 'BUILD_NUMBER', 'BITBUCKET_COMMIT', 'CODEBUILD_BUILD_ARN'].filter(
+          v => !!getCompilerSystem().getEnvironmentVar(v),
+        ).length > 0 || !!getStencilCLIConfig()?.flags?.ci,
     });
 
   return terminalInfo.tty && !terminalInfo.ci;
 };
+
 // Plucked from https://github.com/ionic-team/capacitor/blob/b893a57aaaf3a16e13db9c33037a12f1a5ac92e0/cli/src/util/uuid.ts
 export function uuidv4(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {

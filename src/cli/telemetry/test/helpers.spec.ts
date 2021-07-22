@@ -1,4 +1,7 @@
+import { initializeStencilCLIConfig } from '../../state/stencil-cli-config';
 import { isInteractive, TERMINAL_INFO, tryFn, uuidv4 } from '../helpers';
+import { createSystem } from '../../../compiler/sys/stencil-sys';
+import { mockLogger } from '@stencil/core/testing';
 
 describe('uuidv4', () => {
   it('outputs a UUID', () => {
@@ -9,6 +12,12 @@ describe('uuidv4', () => {
 });
 
 describe('isInteractive', () => {
+  initializeStencilCLIConfig({
+    sys: createSystem(),
+    logger: mockLogger(),
+    args: [],
+  });
+
   it('returns false by default', () => {
     const result = isInteractive();
     expect(result).toBe(false);

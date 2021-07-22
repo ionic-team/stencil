@@ -124,8 +124,11 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       }
       return results;
     },
+    isTTY() {
+      return !!deno?.isatty(deno?.stdout?.rid);
+    },
     homeDir() {
-      return deno.env.get("HOME")
+      return deno.env.get('HOME');
     },
     createDirSync(p, opts) {
       const results: CompilerSystemCreateDirectoryResults = {
