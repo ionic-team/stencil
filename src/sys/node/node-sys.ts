@@ -17,6 +17,7 @@ import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
 import { NodeWorkerController } from './node-worker-controller';
 import path from 'path';
+import * as os from 'os';
 import type TypeScript from 'typescript';
 
 export function createNodeSys(c: { process?: any } = {}) {
@@ -242,6 +243,9 @@ export function createNodeSys(c: { process?: any } = {}) {
         });
       });
     },
+    isTTY() {
+      return !!process?.stdout?.isTTY;
+    },
     readDirSync(p) {
       try {
         return fs.readdirSync(p).map(f => {
@@ -267,6 +271,12 @@ export function createNodeSys(c: { process?: any } = {}) {
     readFileSync(p) {
       try {
         return fs.readFileSync(p, 'utf8');
+      } catch (e) {}
+      return undefined;
+    },
+    homeDir() {
+      try {
+        return os.homedir();
       } catch (e) {}
       return undefined;
     },

@@ -30,7 +30,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         throw new Error(`Constructor for "${cmpMeta.$tagName$}#${hostRef.$modeName$}" was not found`);
       }
       if (BUILD.member && !Cstr.isProxied) {
-        // we'eve never proxied this Constructor before
+        // we've never proxied this Constructor before
         // let's add the getters/setters to its prototype before
         // the first time we create an instance of the implementation
         if (BUILD.watchCallback) {
@@ -68,7 +68,11 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     } else {
       // sync constructor component
       Cstr = elm.constructor as any;
-      hostRef.$flags$ |= HOST_FLAGS.isWatchReady | HOST_FLAGS.hasInitializedComponent;
+      hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
+      // wait for the CustomElementRegistry to mark the component as ready before setting `isWatchReady`. Otherwise,
+      // watchers may fire prematurely if `customElements.get()`/`customElements.whenDefined()` resolves _before_
+      // Stencil has completed instantiating the component.
+      customElements.whenDefined(cmpMeta.$tagName$).then(() => hostRef.$flags$ |= HOST_FLAGS.isWatchReady)
     }
 
     if (BUILD.style && Cstr.style) {
