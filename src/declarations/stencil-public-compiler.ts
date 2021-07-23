@@ -902,6 +902,11 @@ export interface CompilerSystem {
    * SYNC! Does not throw.
    */
   createDirSync(p: string, opts?: CompilerSystemCreateDirectoryOptions): CompilerSystemCreateDirectoryResults;
+  homeDir(): string;
+  /**
+   * Used to determine if the current context of the terminal is TTY.
+   */
+  isTTY(): boolean;
   /**
    * Each plaform as a different way to dynamically import modules.
    */

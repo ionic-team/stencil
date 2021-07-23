@@ -36,6 +36,7 @@ export const createTestingSystem = () => {
 
   sys.access = wrapRead(sys.access);
   sys.accessSync = wrapRead(sys.accessSync);
+  sys.homeDir = wrapRead(sys.homeDir);
   sys.readFile = wrapRead(sys.readFile);
   sys.readFileSync = wrapRead(sys.readFileSync);
   sys.readDir = wrapRead(sys.readDir);
