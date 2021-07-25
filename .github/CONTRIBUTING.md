@@ -37,15 +37,15 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
 4. Run `npm install` (make sure you have [node](https://nodejs.org/en/) and [npm](http://blog.npmjs.org/post/85484771375/how-to-install-npm) installed first)
 
 
-#### Updates
+### Updates
 
 1. Unit test. Unit test. Unit test. Please take a look at how other unit tests are written, and you can't write too many tests.
 2. If there is a `*.spec.ts` file located in the `test/` folder, update it to include a test for your change, if needed. If this file doesn't exist, please notify us.
 3. First run `npm run build`. Then run `npm run test` or `npm run test.watch` to make sure all tests are working, regardless if a test was added.
 
-#### Testing Changes Against a Project Locally
+### Testing Changes Against a Project Locally
 
-##### Testing with `npm link`:
+#### Testing with `npm link`:
 
 Using `npm link` is beneficial to the development cycle in that consecutive builds of Stencil are immediately available in your project, without any additional `npm install` steps needed:
 
@@ -77,7 +77,7 @@ Afterwards, to clean up:
     2. Remove the modifications to your tsconfig.json
 2. In the directory of _stencil core_, run `npm unlink`
 
-##### Testing with `npm pack`:
+#### Testing with `npm pack`:
 
 There are some cases where `npm link` may fall short. For instance, when upgrading a minimum/recommended package version where the package in question has changed its typings. Rather than updating `paths` in your project's `tsconfig.json` file, it may be easier to create a tarball of the project and install in manually.
 
@@ -94,11 +94,20 @@ Afterwards, to clean up:
 
 1. In the directory of your stencil project, run `npm install --save-dev stencil@<VERSION>` for the `<VERSION>` of Stencil core that was installed in your project prior to testing. 
 
-## Commit Message Format
+### Commit Message Format
 
-We have very precise rules over how our git commit messages should be formatted. This leads to readable messages that are easy to follow when looking through the project history. We also use the git commit messages to generate our changelog. (Ok you got us, it's basically Angular's commit message format).
+We strive to adhere to a consistent commit message format of:
 
-`type(scope): subject`
+```
+type(scope): subject
+
+<body>
+```
+
+Doing so enables:
+- Anyone to easily understand *what* a commit does without reading the change itself
+- The history of changes to the project to be reviewed easily using tools such as `git log`
+- Automated tooling to be developed for important, if mundane tasks (e.g. change log generation)
 
 #### Type
 Must be one of the following:
@@ -111,6 +120,11 @@ Must be one of the following:
 * **perf**: A code change that improves performance
 * **test**: Adding missing tests
 * **chore**: Changes to the build process or auxiliary tools and libraries such as documentation generation
+
+If your pull request contains a *breaking change*, please add an exclamation point following the type like so:
+```
+type!(scope): subject
+```
 
 #### Scope
 The scope can be anything specifying place of the commit change. For example `renderer`, `compiler`, etc.
@@ -125,8 +139,46 @@ The subject contains succinct description of the change:
 * describe what the commit does, not what issue it relates to or fixes
 * **be brief, yet descriptive** - we should have a good understanding of what the commit does by reading the subject
 
+#### Body
+The body contains additional context regarding the change. The commit body is not considered necessary for small
+changes where the title captures the entirety of the changes.
 
-#### Adding Documentation
+* use the imperative, present tense: "change" not "changed" nor "changes"
+* describe *what* changed & *why*, rather than *how*
+
+#### Footer
+
+Members of the the Stencil engineering team should take care to add the JIRA ticket associated with a PR in the footer
+of the git commit. Community members need not worry about adding a footer.
+
+Note the newline separating the body from the footer:
+```
+<BODY>
+
+STENCIL-13 Watchers Not Firing as Expected when using the Custom Elements Build
+```
+
+#### Example
+
+Below is an example commit message that follows the guidance listed above:
+
+```
+fix(runtime): prevent watchers from prematurely firing
+
+Wait for the CustomElementRegistry to mark the component as ready
+before setting `isWatchReady`. Otherwise, watchers may fire prematurely
+if `customElements.get()` or `customElements.whenDefined()` resolve
+_before_ Stencil has completed instantiating a component
+```
+
+where:
+- the type is "fix"
+- this PR is _not_ a breaking change (as there is no '!' after the type)
+- the scope is "runtime"
+- the PR subject describes _what_ the PR is doing when applied
+- the PR body describes _what_ and _why_, rather than _how_
+
+### Adding & Updating Documentation
 
 Please see the [stencil-site](https://github.com/ionic-team/stencil-site) repo to update documentation.
 
