@@ -64,7 +64,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         hostRef.$flags$ |= HOST_FLAGS.isWatchReady;
       }
       endNewInstance();
-      fireConnectedCallback(hostRef.$lazyInstance$);
+      fireConnectedCallback(hostRef.$lazyInstance$, elm);
     } else {
       // sync constructor component
       Cstr = elm.constructor as any;
@@ -113,8 +113,8 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
   }
 };
 
-export const fireConnectedCallback = (instance: any) => {
+export const fireConnectedCallback = (instance: any, elm?: HTMLElement) => {
   if (BUILD.lazyLoad && BUILD.connectedCallback) {
-    safeCall(instance, 'connectedCallback');
+    safeCall(instance, 'connectedCallback', undefined, elm);
   }
 };

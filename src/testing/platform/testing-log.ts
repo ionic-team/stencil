@@ -9,9 +9,6 @@ const defaultConsoleError = (e: any) => {
 
 export const consoleError: d.ErrorHandler = (e: any, el?: any) => {
   (customError || defaultConsoleError)(e, el);
-  if (el) {
-    el.dispatchEvent(new CustomEvent('component:error', {detail: e}))
-  }
 }
 
 export const consoleDevError = (...e: any[]) => {
