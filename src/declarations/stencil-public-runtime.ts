@@ -320,7 +320,6 @@ export declare function getRenderingRef(): any;
 
 export interface HTMLStencilElement extends HTMLElement {
   componentOnReady(): Promise<this>;
-  onComponentError: (event: CustomEvent<Error>) => void;
 }
 
 /**
