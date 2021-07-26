@@ -539,9 +539,9 @@ export type TaskCommand =
   | 'info'
   | 'prerender'
   | 'serve'
+  | 'telemetry'
   | 'test'
-  | 'version'
-  | 'telemetry';
+  | 'version';
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
@@ -1039,7 +1039,8 @@ export interface CompilerSystem {
   /**
    * Returns a fetch request
    */
-  request(url: any, options: any, callback?: any): any;
+  request(options: Object, callback?: (args: unknown) => any): any;
+  request(url: string, options: Object, callback?: (args: unknown) => any): any;
 
   /**
    * Always returns an object. Does not throw. Check for "error" property if there's an error.

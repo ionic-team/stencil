@@ -51,3 +51,11 @@ export async function readJson(path: string) {
   const file = await getCompilerSystem().readFile(path);
   return !!file && JSON.parse(file);
 }
+
+export function hasDebug() {
+  return process.argv.includes('--debug');
+}
+
+export function hasVerbose() {
+  return process.argv.includes('--verbose') && hasDebug();
+}

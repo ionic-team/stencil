@@ -40,6 +40,11 @@ export const run = async (init: CliInitOptions) => {
       sys.applyGlobalPatch(sys.getCurrentDirectory());
     }
 
+    if (task === 'help' || flags.help) {
+      taskHelp({ sys, logger });
+      return;
+    }
+
     // Update singleton with modifications
     stencilCLIConfig.logger = logger;
     stencilCLIConfig.task = task;
@@ -78,13 +83,8 @@ export const run = async (init: CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      await telemetryAction({
-        args,
-        sys,
-        logger,
-        action: async () => {
-          await taskInfo(coreCompiler, sys, logger);
-        },
+      await telemetryAction(async () => {
+        await taskInfo(coreCompiler, sys, logger);
       });
       return;
     }
@@ -105,20 +105,16 @@ export const run = async (init: CliInitOptions) => {
       }
     }
 
+    stencilCLIConfig.validatedConfig = validated;
+
     if (isFunction(sys.applyGlobalPatch)) {
       sys.applyGlobalPatch(validated.config.rootDir);
     }
 
     await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies as any });
 
-    await telemetryAction({
-      args,
-      sys,
-      logger,
-      config: validated.config,
-      action: async () => {
-        await runTask(coreCompiler, validated.config, task);
-      },
+    await telemetryAction(async () => {
+      await runTask(coreCompiler, validated.config, task);
     });
   } catch (e) {
     if (!shouldIgnoreError(e)) {
@@ -134,7 +130,7 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
 
   switch (task) {
     case 'telemetry':
-      await taskTelemetry(config);
+      await taskTelemetry();
       break;
 
     case 'help':

@@ -1,4 +1,4 @@
-import type { Logger, CompilerSystem, ConfigFlags } from '../../declarations';
+import type { Logger, CompilerSystem, ConfigFlags, LoadConfigResults, Config } from '../../declarations';
 export type CoreCompiler = typeof import('@stencil/core/compiler');
 
 export interface StencilCLIConfigArgs {
@@ -8,6 +8,7 @@ export interface StencilCLIConfigArgs {
   sys: CompilerSystem;
   flags?: ConfigFlags;
   coreCompiler?: CoreCompiler;
+  validatedConfig?: LoadConfigResults;
 }
 
 export default class StencilCLIConfig {
@@ -19,11 +20,14 @@ export default class StencilCLIConfig {
   private _flags: ConfigFlags | undefined;
   private _task: string | undefined;
   private _coreCompiler: CoreCompiler | undefined;
+  private _validatedConfig: LoadConfigResults | undefined;
 
   private constructor(options: StencilCLIConfigArgs) {
     this._args = options?.args || [];
     this._logger = options?.logger;
     this._sys = options?.sys;
+    this._flags = options?.flags || undefined;
+    this._validatedConfig = options?.validatedConfig || undefined;
   }
 
   public static getInstance(options?: StencilCLIConfigArgs): StencilCLIConfig {
@@ -74,6 +78,13 @@ export default class StencilCLIConfig {
   }
   public set coreCompiler(coreCompiler: CoreCompiler) {
     this._coreCompiler = coreCompiler;
+  }
+
+  public get validatedConfig() {
+    return this._validatedConfig;
+  }
+  public set validatedConfig(validatedConfig: LoadConfigResults) {
+    this._validatedConfig = validatedConfig;
   }
 }
 

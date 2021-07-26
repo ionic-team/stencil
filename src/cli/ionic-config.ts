@@ -26,16 +26,20 @@ export async function readConfig(): Promise<TelemetryConfig> {
   return config;
 }
 
-export async function writeConfig(config: TelemetryConfig): Promise<void> {
+export async function writeConfig(config: TelemetryConfig): Promise<boolean> {
+  let result = false;
   try {
     await getCompilerSystem().createDir(defaultConfigDirectory(), { recursive: true });
     await getCompilerSystem().writeFile(defaultConfig(), JSON.stringify(config));
+    result = true;
   } catch (error) {
     console.error(`Stencil Telemetry: couldn't write configuration file to ${defaultConfig()} - ${error}.`);
   }
+
+  return result;
 }
 
-export async function updateConfig(newOptions: TelemetryConfig): Promise<void> {
+export async function updateConfig(newOptions: TelemetryConfig): Promise<boolean> {
   const config = await readConfig();
-  await writeConfig(Object.assign(config, newOptions));
+  return await writeConfig(Object.assign(config, newOptions));
 }
