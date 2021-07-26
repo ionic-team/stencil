@@ -540,7 +540,8 @@ export type TaskCommand =
   | 'prerender'
   | 'serve'
   | 'test'
-  | 'version';
+  | 'version'
+  | 'telemetry';
 
 export type PageReloadStrategy = 'hmr' | 'pageReload' | null;
 
@@ -1034,6 +1035,12 @@ export interface CompilerSystem {
    */
   removeFileSync(p: string): CompilerSystemRemoveFileResults;
   setupCompiler?: (c: { ts: any }) => void;
+
+  /**
+   * Returns a fetch request
+   */
+  request(url: any, options: any, callback?: any): any;
+
   /**
    * Always returns an object. Does not throw. Check for "error" property if there's an error.
    */

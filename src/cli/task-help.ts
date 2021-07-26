@@ -1,6 +1,10 @@
-import type { CompilerSystem, Logger } from '../declarations';
+import type { Config } from '../declarations';
+import { taskTelemetry } from './task-telemetry';
 
-export const taskHelp = (sys: CompilerSystem, logger: Logger) => {
+export const taskHelp = async (config: Config) => {
+  const logger = config.logger;
+  const sys = config.sys;
+
   const p = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
 
   console.log(`
@@ -31,14 +35,17 @@ export const taskHelp = (sys: CompilerSystem, logger: Logger) => {
 
     ${p} ${logger.green('stencil generate')} or ${logger.green('stencil g')}
 
+`);
+  
+  await taskTelemetry(config);
 
+  console.log(`
   ${logger.bold('Examples:')}
 
-    ${p} ${logger.green('stencil build --dev --watch --serve')}
-    ${p} ${logger.green('stencil build --prerender')}
-    ${p} ${logger.green('stencil test --spec --e2e')}
-    ${p} ${logger.green('stencil generate')}
-    ${p} ${logger.green('stencil g my-component')}
-
-`);
+  ${p} ${logger.green('stencil build --dev --watch --serve')}
+  ${p} ${logger.green('stencil build --prerender')}
+  ${p} ${logger.green('stencil test --spec --e2e')}
+  ${p} ${logger.green('stencil generate')}
+  ${p} ${logger.green('stencil g my-component')}
+`)
 };

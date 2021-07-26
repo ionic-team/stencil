@@ -14,16 +14,20 @@ import { taskPrerender } from './task-prerender';
 import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
 import { initializeStencilCLIConfig } from './state/stencil-cli-config';
+import { taskTelemetry } from './task-telemetry';
+
+import { telemetryAction } from './telemetry/telemetry';
 
 export const run = async (init: CliInitOptions) => {
   const { args, logger, sys } = init;
 
   // Initialize the singleton so we can use this throughout the lifecycle of the CLI.
-  const stencilCLIConfig = initializeStencilCLIConfig({ args, logger, sys});
+  const stencilCLIConfig = initializeStencilCLIConfig({ args, logger, sys });
 
   try {
     const flags = parseFlags(args, sys);
     const task = flags.task;
+
     if (flags.debug || flags.verbose) {
       logger.setLevel('debug');
     }
@@ -41,11 +45,6 @@ export const run = async (init: CliInitOptions) => {
     stencilCLIConfig.task = task;
     stencilCLIConfig.sys = sys;
     stencilCLIConfig.flags = flags;
-
-    if (task === 'help' || flags.help) {
-      taskHelp(sys, logger);
-      return;
-    }
 
     startupLog(logger, task);
 
@@ -79,7 +78,14 @@ export const run = async (init: CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      taskInfo(coreCompiler, sys, logger);
+      await telemetryAction({
+        args,
+        sys,
+        logger,
+        action: async () => {
+          await taskInfo(coreCompiler, sys, logger);
+        },
+      });
       return;
     }
 
@@ -105,7 +111,15 @@ export const run = async (init: CliInitOptions) => {
 
     await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies as any });
 
-    await runTask(coreCompiler, validated.config, task);
+    await telemetryAction({
+      args,
+      sys,
+      logger,
+      config: validated.config,
+      action: async () => {
+        await runTask(coreCompiler, validated.config, task);
+      },
+    });
   } catch (e) {
     if (!shouldIgnoreError(e)) {
       logger.error(`uncaught cli error: ${e}${logger.getLevel() === 'debug' ? e.stack : ''}`);
@@ -119,16 +133,20 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
   config.outputTargets = config.outputTargets || [];
 
   switch (task) {
+    case 'telemetry':
+      await taskTelemetry(config);
+      break;
+
+    case 'help':
+      taskHelp(config);
+      break;
+
     case 'build':
       await taskBuild(coreCompiler, config);
       break;
 
     case 'docs':
       await taskDocs(coreCompiler, config);
-      break;
-
-    case 'help':
-      taskHelp(config.sys, config.logger);
       break;
 
     case 'generate':
@@ -154,7 +172,7 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
 
     default:
       config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-      taskHelp(config.sys, config.logger);
+      taskHelp(config);
       return config.sys.exit(1);
   }
 };

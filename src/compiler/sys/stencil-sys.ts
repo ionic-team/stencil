@@ -25,6 +25,7 @@ import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV } from './environment
 import { isRootPath, normalizePath } from '@utils';
 import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 import { version } from '../../version';
+import { request } from 'https';
 
 export const createSystem = (c?: { logger?: Logger }) => {
   const logger = c && c.logger ? c.logger : createLogger();
@@ -583,6 +584,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     realpathSync,
     removeDestory,
     rename,
+    request,
     resolvePath,
     removeDir,
     removeDirSync,
