@@ -22,10 +22,10 @@ export const disconnectedCallback = (elm: d.HostElement) => {
     }
 
     if (BUILD.lazyLoad && BUILD.disconnectedCallback) {
-      safeCall(instance, 'disconnectedCallback');
+      safeCall(instance, 'disconnectedCallback', undefined, elm);
     }
     if (BUILD.cmpDidUnload) {
-      safeCall(instance, 'componentDidUnload');
+      safeCall(instance, 'componentDidUnload', undefined, elm);
     }
   }
 };
