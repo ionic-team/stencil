@@ -17,7 +17,7 @@ export interface Metric {
 
 /**
  * Used for deeper understanding of how people are using certain output targets
- **/
+ */
 interface OutputTargetOptions {
   serviceWorker?: boolean;
 }
