@@ -1,6 +1,7 @@
 import type * as d from '@stencil/core/internal';
 import type { Config } from '@jest/types';
 import { isString } from '@utils';
+import { options } from './jest-cli-options';
 
 export function buildJestArgv(config: d.Config) {
   const yargs = require('yargs');
@@ -17,7 +18,6 @@ export function buildJestArgv(config: d.Config) {
 
   config.logger.info(config.logger.magenta(`jest args: ${args.join(' ')}`));
 
-  const { options } = require('jest-cli/build/cli/args');
   const jestArgv = yargs(args).options(options).argv as Config.Argv;
   jestArgv.config = buildJestConfig(config);
 

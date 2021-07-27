@@ -52,7 +52,7 @@ export const jestPreprocessor = {
   ) {
     // https://github.com/facebook/jest/blob/v23.6.0/packages/jest-runtime/src/script_transformer.js#L61-L90
     if (!this._tsCompilerOptionsKey) {
-      const opts = this.getCompilerOptions(transformOptions.rootDir);
+      const opts = this.getCompilerOptions(transformOptions?.rootDir);
       this._tsCompilerOptionsKey = JSON.stringify(opts);
     }
 
@@ -62,7 +62,7 @@ export const jestPreprocessor = {
       code,
       filePath,
       jestConfigStr,
-      !!transformOptions.instrument,
+      !!transformOptions?.instrument,
       6, // cache buster
     ];
 

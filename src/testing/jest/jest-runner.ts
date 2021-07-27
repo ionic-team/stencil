@@ -37,6 +37,7 @@ export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
 
     success = !!cliResults.results.success;
   } catch (e) {
+    config.logger.error(e);
     config.logger.error(`runJest: ${e}`);
   }
 

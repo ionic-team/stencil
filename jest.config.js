@@ -33,4 +33,5 @@ module.exports = {
     '<rootDir>/testing/',
   ],
   testRegex: '/src/.*\\.spec\\.(ts|tsx|js)$',
+  testRunner: 'jest-jasmine2',
 };
