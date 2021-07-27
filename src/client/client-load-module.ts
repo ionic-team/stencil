@@ -32,5 +32,7 @@ export const loadModule = (
       cmpModules.set(bundleId, importedModule);
     }
     return importedModule[exportName];
-  }, consoleError);
+  }, (e: Error) => {
+    consoleError(e, hostRef.$hostElement$);
+  });
 };
