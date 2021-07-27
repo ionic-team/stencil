@@ -12,7 +12,7 @@ export const taskTelemetry = async () => {
   const THANK_YOU = `Thank you for helping to make Stencil better! 💖`;
   const ENABLED_MESSAGE = `${logger.green('Enabled')}. ${THANK_YOU}\n\n`;
   const DISABLED_MESSAGE = `${logger.red('Disabled')}\n`;
-  let hasTelemetry = await checkTelemetry();
+  const hasTelemetry = await checkTelemetry();
 
   if (isEnabling) {
     const result = await enableTelemetry();
