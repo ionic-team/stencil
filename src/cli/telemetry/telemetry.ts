@@ -52,7 +52,6 @@ export interface TrackableData {
 /**
  * Used to within taskBuild to provide the component_count property.
  * @param result The results of a compiler build.
- * @returns void
  */
 export async function telemetryBuildFinishedAction(result: CompilerBuildResults) {
   const { sys, flags, logger, validatedConfig } = getStencilCLIConfig();
