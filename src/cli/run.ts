@@ -15,7 +15,6 @@ import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
 import { initializeStencilCLIConfig } from './state/stencil-cli-config';
 import { taskTelemetry } from './task-telemetry';
-
 import { telemetryAction } from './telemetry/telemetry';
 
 export const run = async (init: CliInitOptions) => {

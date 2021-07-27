@@ -1,4 +1,4 @@
-import type { Logger, CompilerSystem, ConfigFlags, LoadConfigResults, Config } from '../../declarations';
+import type { Logger, CompilerSystem, ConfigFlags, LoadConfigResults } from '../../declarations';
 export type CoreCompiler = typeof import('@stencil/core/compiler');
 
 export interface StencilCLIConfigArgs {

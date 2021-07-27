@@ -25,7 +25,6 @@ import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV } from './environment
 import { isRootPath, normalizePath } from '@utils';
 import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 import { version } from '../../version';
-import { request } from 'https';
 
 export const createSystem = (c?: { logger?: Logger }) => {
   const logger = c && c.logger ? c.logger : createLogger();
@@ -506,6 +505,8 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
+  const fetch = global.fetch;
+
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
   const tmpDirSync = () => '/.tmp';
@@ -584,7 +585,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     realpathSync,
     removeDestory,
     rename,
-    request,
+    fetch,
     resolvePath,
     removeDir,
     removeDirSync,

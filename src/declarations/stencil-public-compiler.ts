@@ -1037,12 +1037,6 @@ export interface CompilerSystem {
   setupCompiler?: (c: { ts: any }) => void;
 
   /**
-   * Returns a fetch request
-   */
-  request(options: Object, callback?: (args: unknown) => any): any;
-  request(url: string, options: Object, callback?: (args: unknown) => any): any;
-
-  /**
    * Always returns an object. Does not throw. Check for "error" property if there's an error.
    */
   stat(p: string): Promise<CompilerFsStats>;

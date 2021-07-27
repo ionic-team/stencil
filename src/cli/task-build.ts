@@ -24,7 +24,7 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: Config) => {
     const compiler = await coreCompiler.createCompiler(config);
     const results = await compiler.build();
 
-    await telemetryBuildFinishedAction(results, { config, sys: config.sys, logger: config.logger });
+    await telemetryBuildFinishedAction(results);
 
     await compiler.destroy();
 

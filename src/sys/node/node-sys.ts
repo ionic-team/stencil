@@ -99,6 +99,19 @@ export function createNodeSys(c: { process?: any } = {}) {
       opts.window.Response = global.Response;
       opts.window.FetchError = (global as any).FetchError;
     },
+    fetch: (input: any, init: any) => {
+      const nodeFetch = require(path.join(__dirname, 'node-fetch.js'));
+
+      if (typeof input === 'string') {
+        // fetch(url) w/ url string
+        const urlStr = new URL(input).href;
+        return nodeFetch.fetch(urlStr, init);
+      } else {
+        // fetch(Request) w/ request object
+        input.url = new URL(input.url).href;
+        return nodeFetch.fetch(input, init);
+      }
+    },
     checkVersion,
     copyFile(src, dst) {
       return new Promise(resolve => {

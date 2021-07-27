@@ -1,7 +1,6 @@
 import { tryFn, hasDebug, readJson, hasVerbose } from './helpers';
 import { shouldTrack } from './shouldTrack';
 import { CompilerBuildResults, Config, PackageJsonData, TaskCommand } from 'src/declarations';
-import { loadCoreCompiler } from '../load-compiler';
 import { readConfig, updateConfig } from '../ionic-config';
 import { isObject } from '@utils';
 import { getCompilerSystem, getCoreCompiler, getStencilCLIConfig } from '../state/stencil-cli-config';
@@ -156,7 +155,7 @@ export async function telemetryAction(action?: TelemetryCallback) {
 }
 
 function isUsingYarn() {
-  return process.env.npm_execpath.includes('yarn');
+  return getCompilerSystem().getEnvironmentVar('npm_execpath').includes('yarn');
 }
 
 async function getActiveTargets(config: Config): Promise<string[][] | OutputTargetOptions[][]> {
@@ -178,7 +177,7 @@ async function getActiveTargets(config: Config): Promise<string[][] | OutputTarg
 async function getInstalledPackages() {
   try {
     // Read package.json and package-lock.json
-    const appRootDir = process.cwd();
+    const appRootDir = getCompilerSystem().getCurrentDirectory();
 
     const packageJson: PackageJsonData = await tryFn(
       readJson,
@@ -255,39 +254,29 @@ async function sendTelemetry(data: any) {
   try {
     const now = new Date().toISOString();
 
-    const { request } = getCompilerSystem();
-
-    // This request is only made if telemetry is on.
-    const req = request(
-      {
-        hostname: 'api.ionicjs.com',
-        port: 443,
-        path: '/events/metrics',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-      (response: any) => {
-        hasVerbose() &&
-          console.debug('Sent %O metric to events service (status: %O)', data.message.name, response.statusCode);
-
-        if (response.statusCode !== 204) {
-          response.on('data', (chunk: any) => {
-            hasVerbose() && console.debug('Bad response from events service. Request body: %O', chunk.toString());
-          });
-        }
-      },
-    );
-
     const body = {
       metrics: [data.message],
       sent_at: now,
     };
 
-    req.end(JSON.stringify(body));
+    // This request is only made if telemetry is on.
+    const response = await getCompilerSystem().fetch('https://api.ionicjs.com/events/metrics', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    hasVerbose() &&
+      console.debug('\nSent %O metric to events service (status: %O)', data.message.name, response.status, '\n');
+
+    if (response.status !== 204) {
+      hasVerbose() &&
+        console.debug('\nBad response from events service. Request body: %O', response.body.toString(), '\n');
+    }
   } catch (e) {
-    hasVerbose() && console.debug('Telemetry request failed', e);
+    hasVerbose() && console.debug('Telemetry request failed:', e);
   }
 }
 

@@ -289,6 +289,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
     exit: async exitCode => {
       deno.exit(exitCode);
     },
+    fetch,
     getCompilerExecutingPath() {
       return stencilExePath;
     },
