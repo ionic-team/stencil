@@ -120,6 +120,7 @@ export const getRollupOptions = (
     treeshake: getTreeshakeOption(config, bundleOpts),
     inlineDynamicImports: bundleOpts.inlineDynamicImports,
     preserveEntrySignatures: bundleOpts.preserveEntrySignatures ?? 'strict',
+    preserveSymlinks: config.rollupConfig.inputOptions.preserveSymlinks ?? undefined,
 
     onwarn: createOnWarnFn(buildCtx.diagnostics),
 

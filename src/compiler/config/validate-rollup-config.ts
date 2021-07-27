@@ -16,7 +16,7 @@ const getCleanRollupConfig = (rollupConfig: d.RollupConfig): d.RollupConfig => {
   if (rollupConfig.inputOptions && isObject(rollupConfig.inputOptions)) {
     cleanRollupConfig = {
       ...cleanRollupConfig,
-      inputOptions: pluck(rollupConfig.inputOptions, ['context', 'moduleContext', 'treeshake']),
+      inputOptions: pluck(rollupConfig.inputOptions, ['context', 'moduleContext', 'treeshake', 'preserveSymlinks']),
     };
   }
 

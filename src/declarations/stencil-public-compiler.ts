@@ -1434,6 +1434,7 @@ export interface RollupInputOptions {
   context?: string;
   moduleContext?: ((id: string) => string) | { [id: string]: string };
   treeshake?: boolean;
+  preserveSymlinks?: boolean;
 }
 
 export interface RollupOutputOptions {
