@@ -67,7 +67,7 @@ describe('telemetryAction', () => {
 });
 
 describe('checkTelemetry', () => {
-  it('will read from a file', async () => {
+  it('will read and write from a file, returning the correct status', async () => {
     await telemetry.enableTelemetry();
     expect(await telemetry.checkTelemetry()).toBe(true);
     await telemetry.disableTelemetry();

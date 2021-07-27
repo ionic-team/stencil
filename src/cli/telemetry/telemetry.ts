@@ -55,7 +55,7 @@ export interface TrackableData {
  */
 export async function telemetryBuildFinishedAction(result: CompilerBuildResults) {
   const { sys, flags, logger, validatedConfig } = getStencilCLIConfig();
-  const tracking = await shouldTrack(!!flags?.ci);
+  const tracking = await shouldTrack(flags.ci);
 
   if (!tracking) {
     return;
@@ -193,10 +193,10 @@ async function getInstalledPackages() {
       return [];
     }
 
-    const packages = Object.entries({
+    const packages: [string, string][] = Object.entries({
       ...packageJson.devDependencies,
       ...packageJson.dependencies,
-    }) as [string, string][];
+    });
 
     // Collect packages only in the stencil, ionic, or capacitor org's:
     // https://www.npmjs.com/org/stencil
@@ -207,11 +207,7 @@ async function getInstalledPackages() {
     const versions = packageLockJson
       ? ionicPackages.map(
           ([k, v]) =>
-            `${k}@${
-              (packageLockJson?.dependencies[k] as { version: string })?.version ??
-              (packageLockJson?.devDependencies[k] as { version: string })?.version ??
-              v
-            }`,
+            `${k}@${packageLockJson?.dependencies[k]?.version ?? packageLockJson?.devDependencies[k]?.version ?? v}`,
         )
       : ionicPackages.map(([k, v]) => `${k}@${v}`);
 
@@ -237,7 +233,7 @@ export async function sendMetric(name: string, value: TrackableData): Promise<vo
 }
 
 /**
- * Used to read the ~/.ionic/config.json file's tokens.telemetry property.
+ * Used to read the config file's tokens.telemetry property.
  * @returns string
  */
 async function getTelemetryToken() {
@@ -280,8 +276,8 @@ async function sendTelemetry(data: any) {
 }
 
 /**
- * Checks if telemetry is enabled
- * @returns boolean
+ * Checks if telemetry is enabled on this machine
+ * @returns true if telemetry is enabled, false otherwise
  */
 export async function checkTelemetry(): Promise<boolean> {
   const config = await readConfig();
@@ -290,6 +286,7 @@ export async function checkTelemetry(): Promise<boolean> {
 
 /**
  * Writes to the config file, enabling telemetry for this machine.
+ * @returns true if writing the file was successful, false otherwise
  */
 export async function enableTelemetry(): Promise<boolean> {
   return await updateConfig({ 'telemetry.stencil': true });
@@ -297,6 +294,7 @@ export async function enableTelemetry(): Promise<boolean> {
 
 /**
  * Writes to the config file, disabling telemetry for this machine.
+ * @returns true if writing the file was successful, false otherwise
  */
 export async function disableTelemetry(): Promise<boolean> {
   return await updateConfig({ 'telemetry.stencil': false });

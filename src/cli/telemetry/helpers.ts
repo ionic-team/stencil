@@ -53,9 +53,9 @@ export async function readJson(path: string) {
 }
 
 export function hasDebug() {
-  return process.argv.includes('--debug');
+  return getStencilCLIConfig().flags.debug;
 }
 
 export function hasVerbose() {
-  return process.argv.includes('--verbose') && hasDebug();
+  return getStencilCLIConfig().flags.verbose && hasDebug();
 }
