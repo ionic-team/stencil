@@ -2,7 +2,6 @@ import { tryFn, hasDebug, readJson, hasVerbose, uuidv4 } from './helpers';
 import { shouldTrack } from './shouldTrack';
 import { CompilerBuildResults, Config, PackageJsonData, TaskCommand } from 'src/declarations';
 import { readConfig, updateConfig, writeConfig } from '../ionic-config';
-import { isObject } from '@utils';
 import { getCompilerSystem, getCoreCompiler, getStencilCLIConfig } from '../state/stencil-cli-config';
 
 /**
@@ -13,13 +12,6 @@ export interface Metric {
   timestamp: string;
   source: 'stencil_cli';
   value: TrackableData;
-}
-
-/**
- * Used for deeper understanding of how people are using certain output targets
- */
-interface OutputTargetOptions {
-  serviceWorker?: boolean;
 }
 
 /**
@@ -35,7 +27,7 @@ export interface TrackableData {
   session_id: string;
   component_count?: number;
   arguments: string[];
-  targets: string[][] | OutputTargetOptions[][];
+  targets: string[];
   task: TaskCommand;
   duration_ms: number;
   packages: string[];
@@ -157,16 +149,18 @@ function isUsingYarn() {
   return getCompilerSystem().getEnvironmentVar('npm_execpath')?.includes('yarn') || false;
 }
 
-async function getActiveTargets(config: Config): Promise<string[][] | OutputTargetOptions[][]> {
-  return (config.outputTargets as any[]).map(target => {
-    let outputTargetSettings: OutputTargetOptions = {};
+async function getActiveTargets(config: Config): Promise<string[]> {
+  const result = (config.outputTargets as any[]).map(target => {
+    let type = target.type;
 
-    if (target.type === 'www') {
-      outputTargetSettings.serviceWorker = isObject(target?.serviceWorker);
+    if (type === 'www' && (!!target?.serviceWorker || target.baseUrl !== '/')) {
+      type = `${type} (PWA/App)`;
     }
 
-    return [target.type, outputTargetSettings];
+    return type;
   });
+
+  return Array.from(new Set(result));
 }
 
 /**
@@ -189,7 +183,7 @@ async function getInstalledPackages() {
     );
 
     // They don't have a package.json for some reason? Eject button.
-    if (!!packageJson) {
+    if (!packageJson) {
       return [];
     }
 
