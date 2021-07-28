@@ -154,7 +154,7 @@ export async function telemetryAction(action?: TelemetryCallback) {
 }
 
 function isUsingYarn() {
-  return getCompilerSystem().getEnvironmentVar('npm_execpath').includes('yarn');
+  return getCompilerSystem().getEnvironmentVar('npm_execpath')?.includes('yarn') || false;
 }
 
 async function getActiveTargets(config: Config): Promise<string[][] | OutputTargetOptions[][]> {
