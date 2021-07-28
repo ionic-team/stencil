@@ -47,9 +47,14 @@ export const jestPreprocessor = {
   getCacheKey(
     code: string,
     filePath: string,
-    jestConfigStr: string,
+    jestConfigStr: string | { instrument: boolean; rootDir: string },
     transformOptions: { instrument: boolean; rootDir: string },
   ) {
+    // Support changed signature in jest 27
+    if (!transformOptions) {
+      transformOptions = jestConfigStr as { instrument: boolean; rootDir: string };
+    }
+
     // https://github.com/facebook/jest/blob/v23.6.0/packages/jest-runtime/src/script_transformer.js#L61-L90
     if (!this._tsCompilerOptionsKey) {
       const opts = this.getCompilerOptions(transformOptions?.rootDir);
