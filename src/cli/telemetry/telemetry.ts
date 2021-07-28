@@ -238,6 +238,10 @@ export async function sendMetric(name: string, value: TrackableData): Promise<vo
  */
 async function getTelemetryToken() {
   const config = await readConfig();
+  if (config['tokens.telemetry'] === undefined) {
+    config['tokens.telemetry'] = uuidv4();
+    await writeConfig(config);
+  }
   return config['tokens.telemetry'];
 }
 
