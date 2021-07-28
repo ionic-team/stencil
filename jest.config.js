@@ -34,5 +34,5 @@ module.exports = {
   ],
   testRegex: '/src/.*\\.spec\\.(ts|tsx|js)$',
   // In Jest 28, this may become an explicit dependency, need to mitigate that moving forward.
-  // testRunner: 'jest-jasmine2',
+  testRunner: 'jest-jasmine2',
 };
