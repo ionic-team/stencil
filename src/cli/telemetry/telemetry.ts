@@ -12,6 +12,7 @@ export interface Metric {
   timestamp: string;
   source: 'stencil_cli';
   value: TrackableData;
+  session_id: string;
 }
 
 /**
@@ -24,7 +25,6 @@ type TelemetryCallback = (...args: any[]) => void | Promise<void>;
  */
 export interface TrackableData {
   yarn: boolean;
-  session_id: string;
   component_count?: number;
   arguments: string[];
   targets: string[];
@@ -54,14 +54,12 @@ export async function telemetryBuildFinishedAction(result: CompilerBuildResults)
   }
 
   const details = sys.details;
-  const session_id = await getTelemetryToken();
   const packages = await getInstalledPackages();
   const targets = await getActiveTargets(validatedConfig.config);
   const versions = getCoreCompiler()?.versions || { typescript: 'unknown', rollup: 'unknown' };
   const component_count = Object.keys(result.componentGraph).length;
 
   const data: TrackableData = {
-    session_id,
     yarn: isUsingYarn(),
     duration_ms: result.duration,
     component_count,
@@ -115,12 +113,10 @@ export async function telemetryAction(action?: TelemetryCallback) {
     return;
   }
 
-  const session_id = await getTelemetryToken();
   const packages = await getInstalledPackages();
   const targets = await getActiveTargets(validatedConfig.config);
 
   const data: TrackableData = {
-    session_id,
     yarn: isUsingYarn(),
     duration_ms: duration,
     targets,
@@ -216,11 +212,14 @@ async function getInstalledPackages() {
  * If telemetry is enabled, send a metric via IPC to a forked process for uploading.
  */
 export async function sendMetric(name: string, value: TrackableData): Promise<void> {
+  const session_id = await getTelemetryToken();
+
   const message: Metric = {
     name,
     timestamp: new Date().toISOString(),
     source: 'stencil_cli',
     value,
+    session_id,
   };
 
   await sendTelemetry({ type: 'telemetry', message });
