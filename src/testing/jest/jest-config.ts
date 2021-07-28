@@ -1,11 +1,8 @@
 import type * as d from '@stencil/core/internal';
 import type { Config } from '@jest/types';
 import { isString } from '@utils';
-import { options } from './jest-cli-options';
 
 export function buildJestArgv(config: d.Config) {
-  const yargs = require('yargs');
-
   const args = [...config.flags.unknownArgs.slice(), ...config.flags.knownArgs.slice()];
 
   if (!args.some(a => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
@@ -18,7 +15,11 @@ export function buildJestArgv(config: d.Config) {
 
   config.logger.info(config.logger.magenta(`jest args: ${args.join(' ')}`));
 
-  const jestArgv = yargs(args).options(options).argv as Config.Argv;
+  const jestArgv: Config.Argv = {
+    $0: '',
+    _: undefined
+  };
+  // TODO(NOW) Validate this works the same way still
   jestArgv.config = buildJestConfig(config);
 
   if (typeof jestArgv.maxWorkers === 'string') {
@@ -89,6 +90,7 @@ export function buildJestConfig(config: d.Config) {
     jestConfig.verbose = stencilConfigTesting.verbose;
   }
 
+  jestConfig.testRunner = 'jest-jasmine2';
   return JSON.stringify(jestConfig);
 }
 
