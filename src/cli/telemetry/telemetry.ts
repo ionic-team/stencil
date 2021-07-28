@@ -285,6 +285,10 @@ async function sendTelemetry(data: any) {
  */
 export async function checkTelemetry(): Promise<boolean> {
   const config = await readConfig();
+  if (config['telemetry.stencil'] === undefined) {
+    config['telemetry.stencil'] = true;
+    await writeConfig(config);
+  }
   return config['telemetry.stencil'];
 }
 
