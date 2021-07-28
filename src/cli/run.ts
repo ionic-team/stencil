@@ -39,16 +39,16 @@ export const run = async (init: CliInitOptions) => {
       sys.applyGlobalPatch(sys.getCurrentDirectory());
     }
 
-    if (task === 'help' || flags.help) {
-      taskHelp({ sys, logger });
-      return;
-    }
-
     // Update singleton with modifications
     stencilCLIConfig.logger = logger;
     stencilCLIConfig.task = task;
     stencilCLIConfig.sys = sys;
     stencilCLIConfig.flags = flags;
+
+    if (task === 'help' || flags.help) {
+      taskHelp();
+      return;
+    }
 
     startupLog(logger, task);
 
@@ -128,14 +128,6 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
   config.outputTargets = config.outputTargets || [];
 
   switch (task) {
-    case 'telemetry':
-      await taskTelemetry();
-      break;
-
-    case 'help':
-      taskHelp(config);
-      break;
-
     case 'build':
       await taskBuild(coreCompiler, config);
       break;
@@ -149,12 +141,20 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
       await taskGenerate(coreCompiler, config);
       break;
 
+    case 'help':
+      taskHelp();
+      break;
+
     case 'prerender':
       await taskPrerender(coreCompiler, config);
       break;
 
     case 'serve':
       await taskServe(config);
+      break;
+
+    case 'telemetry':
+      await taskTelemetry();
       break;
 
     case 'test':
@@ -167,7 +167,7 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
 
     default:
       config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-      taskHelp(config);
+      taskHelp();
       return config.sys.exit(1);
   }
 };

@@ -1,9 +1,9 @@
-import type { Config } from '../declarations';
+import { getCompilerSystem, getLogger } from './state/stencil-cli-config';
 import { taskTelemetry } from './task-telemetry';
 
-export const taskHelp = async (config: Config) => {
-  const logger = config.logger;
-  const sys = config.sys;
+export const taskHelp = async () => {
+  const logger = getLogger();
+  const sys = getCompilerSystem();
 
   const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
 
