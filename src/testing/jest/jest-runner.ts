@@ -2,6 +2,7 @@ import type * as d from '@stencil/core/internal';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
 import type { AggregatedResult } from '@jest/test-result';
+import type { TestRunnerOptions, OnTestFailure, OnTestStart, TestWatcher, Test } from 'jest-runner';
 
 export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
   let success = false;
@@ -45,10 +46,17 @@ export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
 }
 
 export function createTestRunner(): any {
-  const TestRunner = require('jest-runner');
+  const TestRunner = require('jest-runner').default;
 
   class StencilTestRunner extends TestRunner {
-    async runTests(tests: { path: string }[], watcher: any, onStart: any, onResult: any, onFailure: any, options: any) {
+    async runTests(
+      tests: Test[],
+      watcher: TestWatcher,
+      onStart: OnTestStart,
+      onResult: any,
+      onFailure: OnTestFailure,
+      options: TestRunnerOptions,
+    ) {
       const env = process.env as d.E2EProcessEnv;
 
       // filter out only the tests the flags said we should run
