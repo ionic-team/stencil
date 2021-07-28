@@ -100,8 +100,7 @@ export function createNodeSys(c: { process?: any } = {}) {
       opts.window.FetchError = (global as any).FetchError;
     },
     fetch: (input: any, init: any) => {
-      const nodeFetch =
-        typeof global.fetch !== 'function' ? require(path.join(__dirname, 'node-fetch.js')) : global.fetch;
+      const nodeFetch = require(path.join(__dirname, 'node-fetch.js'));
 
       if (typeof input === 'string') {
         // fetch(url) w/ url string

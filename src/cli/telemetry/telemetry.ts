@@ -1,7 +1,7 @@
-import { tryFn, hasDebug, readJson, hasVerbose } from './helpers';
+import { tryFn, hasDebug, readJson, hasVerbose, uuidv4 } from './helpers';
 import { shouldTrack } from './shouldTrack';
 import { CompilerBuildResults, Config, PackageJsonData, TaskCommand } from 'src/declarations';
-import { readConfig, updateConfig } from '../ionic-config';
+import { readConfig, updateConfig, writeConfig } from '../ionic-config';
 import { isObject } from '@utils';
 import { getCompilerSystem, getCoreCompiler, getStencilCLIConfig } from '../state/stencil-cli-config';
 
