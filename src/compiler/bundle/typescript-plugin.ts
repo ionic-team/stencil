@@ -14,24 +14,16 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
     load(id): d.RollupLoadHook {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
-        const mod = getModule(compilerCtx, fsFilePath);
+        const module = getModule(compilerCtx, fsFilePath);
 
-        if (mod) {
-          if (!mod.sourceMapFileText) {
-            return { code: mod.staticSourceFileText, map: null };
+        if (module) {
+          if (!module.sourceMapFileText) {
+            return { code: module.staticSourceFileText, map: null };
           }
 
-          const sourceMap: d.SourceMap = JSON.parse(mod.sourceMapFileText);
-
-          const rollupSrcMap = {
-            mappings: sourceMap.mappings,
-            sourcesContent: sourceMap.sourcesContent,
-            sources: sourceMap.sources.map(src => basename(src)),
-            names: sourceMap.names,
-            version: sourceMap.version,
-          };
-
-          return { code: mod.staticSourceFileText, map: sourceMap, meta: rollupSrcMap };
+          const sourceMap: d.SourceMap = JSON.parse(module.sourceMapFileText);
+          sourceMap.sources = sourceMap.sources.map(src => basename(src));
+          return { code: module.staticSourceFileText, map: sourceMap };
         }
       }
       return null;

@@ -76,16 +76,8 @@ export const appDataPlugin = (
       if (!module.sourceMapFileText) return { code: module.staticSourceFileText, map: null };
 
       const sourceMap: d.SourceMap = JSON.parse(module.sourceMapFileText);
-
-      const rollupSrcMap = {
-        mappings: sourceMap.mappings,
-        sourcesContent: sourceMap.sourcesContent,
-        sources: sourceMap.sources.map(src => basename(src)),
-        names: sourceMap.names,
-        version: sourceMap.version,
-      };
-
-      return { code: module.staticSourceFileText, map: sourceMap, meta: rollupSrcMap };
+      sourceMap.sources = sourceMap.sources.map(src => basename(src));
+      return { code: module.staticSourceFileText, map: sourceMap };
     },
 
     transform(code, id) {
