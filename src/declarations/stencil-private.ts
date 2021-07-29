@@ -53,6 +53,30 @@ export interface RollupSourceMap {
   toUrl(): string;
 }
 
+export type RollupTransformHook =
+  | string
+  | null
+  | {
+      code?: string;
+      map?: string | SourceMap;
+      ast?: any;
+      moduleSideEffects?: boolean | 'no-treeshake' | null;
+      syntheticNamedExports?: boolean | string | null;
+      meta?: { [plugin: string]: any } | null;
+    };
+
+export type RollupLoadHook =
+  | string
+  | null
+  | {
+      code: string;
+      map?: string | SourceMap;
+      ast?: any;
+      moduleSideEffects?: boolean | 'no-treeshake' | null;
+      syntheticNamedExports?: boolean | string | null;
+      meta?: { [plugin: string]: any } | null;
+    };
+
 export interface PrintLine {
   lineIndex: number;
   lineNumber: number;
@@ -2238,7 +2262,7 @@ export interface JestEnvironmentGlobal {
     fullName: string;
     testPath: string;
   };
-  env: {[prop: string]: string};
+  env: { [prop: string]: string };
   screenshotDescriptions: Set<string>;
 }
 
@@ -2439,7 +2463,7 @@ export interface CompilerWorkerContext {
     minifyOpts: any,
     transpile: boolean,
     inlineHelpers: boolean,
-  ): Promise<{ output: string; diagnostics: Diagnostic[]; sourceMap?: SourceMap; }>;
+  ): Promise<{ output: string; diagnostics: Diagnostic[]; sourceMap?: SourceMap }>;
   prerenderWorker(prerenderRequest: PrerenderUrlRequest): Promise<PrerenderUrlResults>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
 }

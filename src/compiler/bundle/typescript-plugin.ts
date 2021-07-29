@@ -8,35 +8,27 @@ import { isAbsolute, basename } from 'path';
 import ts from 'typescript';
 
 export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions, config: d.Config): Plugin => {
-
   return {
     name: `${bundleOpts.id}TypescriptPlugin`,
 
-    load(id) {
+    load(id): d.RollupLoadHook {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
-        const mod = getModule(compilerCtx, fsFilePath);
+        const module = getModule(compilerCtx, fsFilePath);
 
-        if (mod) {
-          if (!mod.sourceMapFileText) {
-            return {code: mod.staticSourceFileText, map: null};
+        if (module) {
+          if (!module.sourceMapFileText) {
+            return { code: module.staticSourceFileText, map: null };
           }
 
-          const sourceMap: d.SourceMap = JSON.parse(mod.sourceMapFileText);
-          const rollupSrcMap = {
-            mappings: sourceMap.mappings,
-            sourcesContent: sourceMap.sourcesContent,
-            sources: sourceMap.sources.map(src => basename(src)),
-            names: sourceMap.names,
-            version: sourceMap.version
-          };
-
-          return {code: mod.staticSourceFileText, map: rollupSrcMap};
+          const sourceMap: d.SourceMap = JSON.parse(module.sourceMapFileText);
+          sourceMap.sources = sourceMap.sources.map(src => basename(src));
+          return { code: module.staticSourceFileText, map: sourceMap };
         }
       }
       return null;
     },
-    transform(_, id) {
+    transform(_, id): d.RollupTransformHook {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
         const mod = getModule(compilerCtx, fsFilePath);
@@ -44,10 +36,10 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
           const tsResult = ts.transpileModule(mod.staticSourceFileText, {
             compilerOptions: config.tsCompilerOptions,
             fileName: mod.sourceFilePath,
-            transformers: { before: bundleOpts.customTransformers}
-          })
+            transformers: { before: bundleOpts.customTransformers },
+          });
           const sourceMap: d.SourceMap = tsResult.sourceMapText ? JSON.parse(tsResult.sourceMapText) : null;
-          return {code: tsResult.outputText, map: sourceMap};
+          return { code: tsResult.outputText, map: sourceMap };
         }
       }
       return null;

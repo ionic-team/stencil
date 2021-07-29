@@ -1,7 +1,14 @@
 import type * as d from '../../../declarations';
 import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
-import { catchError, dashToPascalCase, formatComponentRuntimeMeta, hasError, rollupSrcMapToObj, stringifyRuntimeData } from '@utils';
+import {
+  catchError,
+  dashToPascalCase,
+  formatComponentRuntimeMeta,
+  hasError,
+  rollupSrcMapToObj,
+  stringifyRuntimeData,
+} from '@utils';
 import { getCustomElementsBuildConditionals } from './custom-elements-build-conditionals';
 import { isOutputTargetDistCustomElementsBundle } from '../output-utils';
 import { join } from 'path';
@@ -25,11 +32,13 @@ export const outputCustomElementsBundle = async (
     return;
   }
 
-  const timespan = buildCtx.createTimeSpan(`generate custom elements bundle started`);
+  const timespan = buildCtx.createTimeSpan(
+    `generate custom elements bundle${!!config.sourceMap ? ' + source maps' : ''} started`,
+  );
 
   await Promise.all(outputTargets.map(o => bundleCustomElements(config, compilerCtx, buildCtx, o)));
 
-  timespan.finish(`generate custom elements bundle finished`);
+  timespan.finish(`generate custom elements bundle${!!config.sourceMap ? ' + source maps' : ''} finished`);
 };
 
 const bundleCustomElements = async (
@@ -76,7 +85,7 @@ const bundleCustomElements = async (
             input: code,
             isCore: bundle.isEntry,
             minify,
-            sourceMap
+            sourceMap,
           });
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
           if (!hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
@@ -85,9 +94,13 @@ const bundleCustomElements = async (
           }
           if (sourceMap) {
             code = code + '\n//# sourceMappingURL=' + bundle.fileName + '.map';
-            await compilerCtx.fs.writeFile(join(outputTarget.dir, bundle.fileName + '.map'), JSON.stringify(sourceMap), {
-              outputTargetType: outputTarget.type,
-            });
+            await compilerCtx.fs.writeFile(
+              join(outputTarget.dir, bundle.fileName + '.map'),
+              JSON.stringify(sourceMap),
+              {
+                outputTargetType: outputTarget.type,
+              },
+            );
           }
           await compilerCtx.fs.writeFile(join(outputTarget.dir, bundle.fileName), code, {
             outputTargetType: outputTarget.type,

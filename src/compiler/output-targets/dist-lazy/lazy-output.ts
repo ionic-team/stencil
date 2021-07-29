@@ -30,7 +30,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     return;
   }
 
-  const timespan = buildCtx.createTimeSpan(`generate lazy started`);
+  const timespan = buildCtx.createTimeSpan(`generate lazy${!!config.sourceMap ? ' + source maps' : ''} started`);
 
   try {
     // const criticalBundles = getCriticalPath(buildCtx);
@@ -75,7 +75,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     catchError(buildCtx.diagnostics, e);
   }
 
-  timespan.finish(`generate lazy finished`);
+  timespan.finish(`generate lazy${!!config.sourceMap ? ' + source maps' : ''} finished`);
 };
 
 const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
@@ -88,7 +88,11 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
     style: 'static',
     styleImportData: 'queryparams',
   };
-  return [updateStencilCoreImports(transformOpts.coreImportPath), lazyComponentTransform(compilerCtx, transformOpts), removeCollectionImports(compilerCtx)];
+  return [
+    updateStencilCoreImports(transformOpts.coreImportPath),
+    lazyComponentTransform(compilerCtx, transformOpts),
+    removeCollectionImports(compilerCtx),
+  ];
 };
 
 const getLazyEntry = (isBrowser: boolean) => {
