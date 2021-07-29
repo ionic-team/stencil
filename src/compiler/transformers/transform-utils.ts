@@ -347,7 +347,7 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
 
   if (importTypeDeclaration) {
     let localImportPath = (<ts.StringLiteral>importTypeDeclaration.moduleSpecifier).text;
-    if (sourceFileObj.resolvedModules) {
+    if (localImportPath.startsWith('.') && sourceFileObj.resolvedModules) {
       for (const [modName, mod] of sourceFileObj.resolvedModules.entries()) {
         if (!mod) continue;
         if (localImportPath === modName) localImportPath = mod.resolvedFileName;
