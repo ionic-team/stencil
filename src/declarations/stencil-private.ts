@@ -53,6 +53,18 @@ export interface RollupSourceMap {
   toUrl(): string;
 }
 
+export type RollupTransformHook =
+  | string
+  | null
+  | {
+      code?: string;
+      map?: string | SourceMap;
+      ast?: any;
+      moduleSideEffects?: boolean | 'no-treeshake' | null;
+      syntheticNamedExports?: boolean | string | null;
+      meta?: { [plugin: string]: any } | null;
+    };
+
 export type RollupLoadHook =
   | string
   | null

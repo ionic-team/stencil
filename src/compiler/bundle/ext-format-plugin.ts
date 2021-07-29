@@ -7,7 +7,7 @@ export const extFormatPlugin = (config: d.Config): Plugin => {
   return {
     name: 'extFormatPlugin',
 
-    transform(code, importPath) {
+    transform(code, importPath): d.RollupTransformHook {
       if (/\0/.test(importPath)) {
         return null;
       }
@@ -17,19 +17,19 @@ export const extFormatPlugin = (config: d.Config): Plugin => {
       // ?format= param takes precedence before file extension
       switch (format) {
         case 'url':
-          return {code: formatUrl(config, this, code, filePath, ext), map: null};
+          return { code: formatUrl(config, this, code, filePath, ext), map: null };
         case 'text':
-          return {code: formatText(code, filePath), map: null};
+          return { code: formatText(code, filePath), map: null };
       }
 
       // didn't provide a ?format= param
       // check if it's a known extension we should format
       if (FORMAT_TEXT_EXTS.includes(ext)) {
-        return {code: formatText(code, filePath), map: null};
+        return { code: formatText(code, filePath), map: null };
       }
 
       if (FORMAT_URL_MIME[ext]) {
-        return {code: formatUrl(config, this, code, filePath, ext), map: null};
+        return { code: formatUrl(config, this, code, filePath, ext), map: null };
       }
 
       return null;
@@ -50,7 +50,13 @@ const formatText = (code: string, filePath: string) => {
   return `const ${varName} = ${JSON.stringify(code)};export default ${varName};`;
 };
 
-const formatUrl = (config: d.Config, pluginCtx: TransformPluginContext, code: string, filePath: string, ext: string) => {
+const formatUrl = (
+  config: d.Config,
+  pluginCtx: TransformPluginContext,
+  code: string,
+  filePath: string,
+  ext: string,
+) => {
   const mime = FORMAT_URL_MIME[ext];
   if (!mime) {
     pluginCtx.warn(`Unsupported url format for "${ext}" extension.`);
