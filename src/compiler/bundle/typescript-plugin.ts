@@ -8,35 +8,35 @@ import { isAbsolute, basename } from 'path';
 import ts from 'typescript';
 
 export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions, config: d.Config): Plugin => {
-
   return {
     name: `${bundleOpts.id}TypescriptPlugin`,
 
-    load(id) {
+    load(id): d.RollupLoadHook {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
         const mod = getModule(compilerCtx, fsFilePath);
 
         if (mod) {
           if (!mod.sourceMapFileText) {
-            return {code: mod.staticSourceFileText, map: null};
+            return { code: mod.staticSourceFileText, map: null };
           }
 
           const sourceMap: d.SourceMap = JSON.parse(mod.sourceMapFileText);
+
           const rollupSrcMap = {
             mappings: sourceMap.mappings,
             sourcesContent: sourceMap.sourcesContent,
             sources: sourceMap.sources.map(src => basename(src)),
             names: sourceMap.names,
-            version: sourceMap.version
+            version: sourceMap.version,
           };
 
-          return {code: mod.staticSourceFileText, map: rollupSrcMap};
+          return { code: mod.staticSourceFileText, map: sourceMap, meta: rollupSrcMap };
         }
       }
       return null;
     },
-    transform(_, id) {
+    transform(_, id): d.RollupTransformHook {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
         const mod = getModule(compilerCtx, fsFilePath);
@@ -44,10 +44,10 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
           const tsResult = ts.transpileModule(mod.staticSourceFileText, {
             compilerOptions: config.tsCompilerOptions,
             fileName: mod.sourceFilePath,
-            transformers: { before: bundleOpts.customTransformers}
-          })
+            transformers: { before: bundleOpts.customTransformers },
+          });
           const sourceMap: d.SourceMap = tsResult.sourceMapText ? JSON.parse(tsResult.sourceMapText) : null;
-          return {code: tsResult.outputText, map: sourceMap};
+          return { code: tsResult.outputText, map: sourceMap };
         }
       }
       return null;
