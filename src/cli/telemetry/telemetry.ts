@@ -1,6 +1,6 @@
 import { tryFn, hasDebug, readJson, hasVerbose, uuidv4 } from './helpers';
 import { shouldTrack } from './shouldTrack';
-import { CompilerBuildResults, Config, PackageJsonData, TaskCommand } from 'src/declarations';
+import { CompilerBuildResults, PackageJsonData, TaskCommand } from 'src/declarations';
 import { readConfig, updateConfig, writeConfig } from '../ionic-config';
 import { getCompilerSystem, getCoreCompiler, getStencilCLIConfig } from '../state/stencil-cli-config';
 
@@ -39,6 +39,7 @@ export interface TrackableData {
   system: string;
   build: string;
   stencil: string;
+  has_app_pwa_config: boolean;
 }
 
 /**
@@ -46,7 +47,7 @@ export interface TrackableData {
  * @param result The results of a compiler build.
  */
 export async function telemetryBuildFinishedAction(result: CompilerBuildResults) {
-  const { sys, flags, logger, validatedConfig } = getStencilCLIConfig();
+  const { sys, flags, logger } = getStencilCLIConfig();
   const tracking = await shouldTrack(flags.ci);
 
   if (!tracking) {
@@ -55,7 +56,7 @@ export async function telemetryBuildFinishedAction(result: CompilerBuildResults)
 
   const details = sys.details;
   const packages = await getInstalledPackages();
-  const targets = await getActiveTargets(validatedConfig.config);
+  const targets = await getActiveTargets();
   const versions = getCoreCompiler()?.versions || { typescript: 'unknown', rollup: 'unknown' };
   const component_count = Object.keys(result.componentGraph).length;
 
@@ -75,6 +76,7 @@ export async function telemetryBuildFinishedAction(result: CompilerBuildResults)
     build: getCoreCompiler()?.buildId || 'unknown',
     typescript: versions.typescript,
     rollup: versions.rollup,
+    has_app_pwa_config: hasAppTarget(),
   };
 
   await sendMetric('stencil_cli_command', data);
@@ -87,7 +89,7 @@ export async function telemetryBuildFinishedAction(result: CompilerBuildResults)
  * @returns void
  */
 export async function telemetryAction(action?: TelemetryCallback) {
-  const { sys, flags, logger, validatedConfig } = getStencilCLIConfig();
+  const { sys, flags, logger } = getStencilCLIConfig();
   const tracking = await shouldTrack(!!flags.ci);
 
   const details = sys.details;
@@ -114,7 +116,7 @@ export async function telemetryAction(action?: TelemetryCallback) {
   }
 
   const packages = await getInstalledPackages();
-  const targets = await getActiveTargets(validatedConfig.config);
+  const targets = await getActiveTargets();
 
   const data: TrackableData = {
     yarn: isUsingYarn(),
@@ -131,6 +133,7 @@ export async function telemetryAction(action?: TelemetryCallback) {
     build: getCoreCompiler()?.buildId || 'unknown',
     typescript: versions.typescript,
     rollup: versions.rollup,
+    has_app_pwa_config: hasAppTarget(),
   };
 
   await sendMetric('stencil_cli_command', data);
@@ -141,21 +144,18 @@ export async function telemetryAction(action?: TelemetryCallback) {
   }
 }
 
+function hasAppTarget(): boolean {
+  return getStencilCLIConfig().validatedConfig.config.outputTargets.some(
+    target => target.type === 'www' && (!!target.serviceWorker || target.baseUrl !== '/'),
+  );
+}
+
 function isUsingYarn() {
   return getCompilerSystem().getEnvironmentVar('npm_execpath')?.includes('yarn') || false;
 }
 
-async function getActiveTargets(config: Config): Promise<string[]> {
-  const result = (config.outputTargets as any[]).map(target => {
-    let type = target.type;
-
-    if (type === 'www' && (!!target?.serviceWorker || target.baseUrl !== '/')) {
-      type = `${type} (PWA/App)`;
-    }
-
-    return type;
-  });
-
+async function getActiveTargets(): Promise<string[]> {
+  const result = getStencilCLIConfig().validatedConfig.config.outputTargets.map(t => t.type);
   return Array.from(new Set(result));
 }
 
