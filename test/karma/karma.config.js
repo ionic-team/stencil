@@ -63,6 +63,7 @@ if (process.platform === 'win32') {
 
 module.exports = function (config) {
   config.set({
+    failOnFailingTestSuite: false,
     plugins: ['karma-chrome-launcher', 'karma-browserstack-launcher', 'karma-ie-launcher', 'karma-edge-launcher', 'karma-jasmine', 'karma-typescript', 'karma-polyfill'],
     browsers: browserStack ? Object.keys(browserStackLaunchers) : Object.keys(localLaunchers),
 
