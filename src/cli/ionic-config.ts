@@ -30,7 +30,7 @@ export async function writeConfig(config: TelemetryConfig): Promise<boolean> {
   let result = false;
   try {
     await getCompilerSystem().createDir(defaultConfigDirectory(), { recursive: true });
-    await getCompilerSystem().writeFile(defaultConfig(), JSON.stringify(config));
+    await getCompilerSystem().writeFile(defaultConfig(), JSON.stringify(config, null, 2));
     result = true;
   } catch (error) {
     console.error(`Stencil Telemetry: couldn't write configuration file to ${defaultConfig()} - ${error}.`);
