@@ -24,7 +24,7 @@ var browserStackLaunchers = {
     base: 'BrowserStack',
     browser: 'ie',
     os: 'Windows',
-    os_version: '10'
+    os_version: '10',
   },
   // bs_safari: {
   //   base: 'BrowserStack',
@@ -63,6 +63,7 @@ if (process.platform === 'win32') {
 
 module.exports = function (config) {
   config.set({
+    failOnFailingTestSuite: false,
     plugins: [
       'karma-chrome-launcher',
       'karma-browserstack-launcher',
