@@ -18,7 +18,6 @@ export const removeStaticMetaProperties = (classNode: ts.ClassDeclaration) => {
 };
 
 const REMOVE_STATIC_GETTERS = new Set([
-  'is',
   'properties',
   'encapsulation',
   'elementRef',
