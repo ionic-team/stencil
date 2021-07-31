@@ -11,6 +11,7 @@ import type * as d from '../../declarations';
 import { BUILD } from '@app-data';
 import { consoleDevError, consoleDevWarn } from '@platform';
 import { isComplexType } from '@utils';
+import { getOptions } from '../options';
 
 // const stack: any[] = [];
 
@@ -82,6 +83,13 @@ Empty objects can also be the cause, look for JSX comments that became objects.`
   if (BUILD.vdomFunctional && typeof nodeName === 'function') {
     // nodeName is a functional component
     return (nodeName as d.FunctionalComponent<any>)(vnodeData === null ? {} : vnodeData, vNodeChildren, vdomFnUtils) as any;
+  }
+  
+  if(BUILD.transformTagName && 'string' === typeof nodeName){
+    const options = getOptions();
+    if(options.transformTagName){
+      nodeName = options.transformTagName(nodeName)
+    }
   }
 
   const vnode = newVNode(nodeName, null);
