@@ -1,8 +1,10 @@
 import { getCompilerSystem } from './state/stencil-cli-config';
 import { readJson, uuidv4, UUID_REGEX } from './telemetry/helpers';
 
+export const isTest = () => process.env.JEST_WORKER_ID !== undefined
+
 export const defaultConfig = () =>
-  getCompilerSystem().resolvePath(`${getCompilerSystem().homeDir()}/.ionic/config.json`);
+  getCompilerSystem().resolvePath(`${getCompilerSystem().homeDir()}/.ionic/${isTest() ? "tmp-config.json" : "config.json"}`);
 
 export const defaultConfigDirectory = () => getCompilerSystem().resolvePath(`${getCompilerSystem().homeDir()}/.ionic`);
 
@@ -23,7 +25,7 @@ export async function readConfig(): Promise<TelemetryConfig> {
     await writeConfig(config);
   } else if (!!config && !config['tokens.telemetry'].match(UUID_REGEX)) {
     const newUuid = uuidv4();
-    await writeConfig(Object.assign(config, { 'tokens.telemetry': newUuid }));
+    await writeConfig({...config, 'tokens.telemetry': newUuid });
     config['tokens.telemetry'] = newUuid;
   }
 
