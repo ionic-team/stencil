@@ -45,3 +45,4 @@ test/**/www/*
 test/**/hydrate/*
 .stencil
 /dependencies.json
+test-results/**

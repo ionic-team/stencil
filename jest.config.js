@@ -11,6 +11,12 @@ module.exports = {
     '@stencil/core/testing': '<rootDir>/testing/index.js',
     '@utils': '<rootDir>/src/utils',
   },
+  coverageDirectory: './test-results/',
+  coverageReporters: ["json", "lcov", "text", "clover", "json-summary"],
+  collectCoverageFrom: [
+    '<rootDir>/src/utils/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/src/cli/**/*.{js,jsx,ts,tsx}',
+  ],
   modulePathIgnorePatterns: ['/bin', '/scripts', '/www'],
   testPathIgnorePatterns: [
     '<rootDir>/.cache/',
