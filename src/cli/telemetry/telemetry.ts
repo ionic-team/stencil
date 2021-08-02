@@ -47,37 +47,16 @@ export interface TrackableData {
  * @param result The results of a compiler build.
  */
 export async function telemetryBuildFinishedAction(result: CompilerBuildResults) {
-  const { sys, flags, logger } = getStencilCLIConfig();
+  const { flags, logger } = getStencilCLIConfig();
   const tracking = await shouldTrack(flags.ci);
 
   if (!tracking) {
     return;
   }
 
-  const details = sys.details;
-  const packages = await getInstalledPackages();
-  const targets = await getActiveTargets();
-  const versions = getCoreCompiler()?.versions || { typescript: 'unknown', rollup: 'unknown' };
   const component_count = Object.keys(result.componentGraph).length;
 
-  const data: TrackableData = {
-    yarn: isUsingYarn(),
-    duration_ms: result.duration,
-    component_count,
-    targets,
-    packages: packages || [],
-    arguments: flags.args,
-    task: flags.task,
-    stencil: getCoreCompiler()?.version || 'unknown',
-    system: `${sys.name} ${sys.version}`,
-    os_name: details.platform,
-    os_version: details.release,
-    cpu_model: `${details.cpuModel}`,
-    build: getCoreCompiler()?.buildId || 'unknown',
-    typescript: versions.typescript,
-    rollup: versions.rollup,
-    has_app_pwa_config: hasAppTarget(),
-  };
+  const data = await prepareData(result.duration, component_count);
 
   await sendMetric('stencil_cli_command', data);
   logger.debug(`${logger.blue('Telemetry')}: ${logger.gray(JSON.stringify(data))}`);
@@ -89,11 +68,9 @@ export async function telemetryBuildFinishedAction(result: CompilerBuildResults)
  * @returns void
  */
 export async function telemetryAction(action?: TelemetryCallback) {
-  const { sys, flags, logger } = getStencilCLIConfig();
+  const { flags, logger } = getStencilCLIConfig();
   const tracking = await shouldTrack(!!flags.ci);
 
-  const details = sys.details;
-  const versions = getCoreCompiler()?.versions || { typescript: 'unknown', rollup: 'unknown' };
   let duration = undefined;
   let error: any;
 
@@ -115,26 +92,7 @@ export async function telemetryAction(action?: TelemetryCallback) {
     return;
   }
 
-  const packages = await getInstalledPackages();
-  const targets = await getActiveTargets();
-
-  const data: TrackableData = {
-    yarn: isUsingYarn(),
-    duration_ms: duration,
-    targets,
-    packages: packages || [],
-    arguments: flags.args,
-    task: flags.task,
-    stencil: getCoreCompiler()?.version || 'unknown',
-    system: `${sys.name} ${sys.version}`,
-    os_name: details.platform,
-    os_version: details.release,
-    cpu_model: `${details.cpuModel}`,
-    build: getCoreCompiler()?.buildId || 'unknown',
-    typescript: versions.typescript,
-    rollup: versions.rollup,
-    has_app_pwa_config: hasAppTarget(),
-  };
+  const data = await prepareData(duration);
 
   await sendMetric('stencil_cli_command', data);
   logger.debug(`${logger.blue('Telemetry')}: ${logger.gray(JSON.stringify(data))}`);
@@ -144,19 +102,53 @@ export async function telemetryAction(action?: TelemetryCallback) {
   }
 }
 
-function hasAppTarget(): boolean {
+export function hasAppTarget(): boolean {
   return getStencilCLIConfig().validatedConfig.config.outputTargets.some(
-    target => target.type === 'www' && (!!target.serviceWorker || target.baseUrl !== '/'),
+    target => target.type === 'www' && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/')),
   );
 }
 
-function isUsingYarn() {
+export function isUsingYarn() {
   return getCompilerSystem().getEnvironmentVar('npm_execpath')?.includes('yarn') || false;
 }
 
-async function getActiveTargets(): Promise<string[]> {
+export async function getActiveTargets(): Promise<string[]> {
   const result = getStencilCLIConfig().validatedConfig.config.outputTargets.map(t => t.type);
   return Array.from(new Set(result));
+}
+
+export const prepareData = async (duration_ms: number, component_count: number = undefined): Promise<TrackableData> => {
+  const { flags, sys } = getStencilCLIConfig();
+  const { typescript, rollup } = getCoreCompiler()?.versions || { typescript: 'unknown', rollup: 'unknown' };
+  const packages = await getInstalledPackages() || [];
+  const targets = await getActiveTargets();
+  const yarn = isUsingYarn()
+  const stencil = getCoreCompiler()?.version || 'unknown';
+  const system = `${sys.name} ${sys.version}`;
+  const os_name = sys.details.platform;
+  const os_version = sys.details.release;
+  const cpu_model = sys.details.cpuModel;
+  const build = getCoreCompiler()?.buildId || 'unknown';
+  const has_app_pwa_config = hasAppTarget();
+
+  return {
+    yarn,
+    duration_ms,
+    component_count,
+    targets,
+    packages,
+    arguments: flags.args,
+    task: flags.task,
+    stencil,
+    system,
+    os_name,
+    os_version,
+    cpu_model,
+    build,
+    typescript,
+    rollup,
+    has_app_pwa_config,
+  };
 }
 
 /**

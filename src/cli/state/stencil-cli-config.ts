@@ -38,6 +38,10 @@ export default class StencilCLIConfig {
     return StencilCLIConfig.instance;
   }
 
+  public resetInstance() {
+    delete StencilCLIConfig.instance;
+  }
+
   public get logger() {
     return this._logger;
   }
