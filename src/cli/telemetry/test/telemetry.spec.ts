@@ -112,18 +112,18 @@ describe('hasAppTarget', () => {
     expect(telemetry.hasAppTarget()).toBe(true)
   });
 
-  it('Result is correct when outputTargets contains www with serviceWorker', () => {
+  it('Result is correct when outputTargets contains www with baseUrl', () => {
     getStencilCLIConfig().validatedConfig = { config: { outputTargets: [{ type: "www", baseUrl: "https://example.com" }] } } as LoadConfigResults
     expect(telemetry.hasAppTarget()).toBe(true)
   });
 
-  it('Result is correct when outputTargets contains www with serviceWorker', () => {
+  it('Result is correct when outputTargets contains www with serviceWorker and baseUrl', () => {
     getStencilCLIConfig().validatedConfig = { config: { outputTargets: [{ type: "www", baseUrl: "https://example.com", serviceWorker: { swDest: "./tmp" } }] } } as LoadConfigResults
     expect(telemetry.hasAppTarget()).toBe(true)
   });
 });
 
-describe('hasAppTarget', () => {
+describe('prepareData', () => {
 
   beforeEach(() => {
     getStencilCLIConfig()?.resetInstance();
