@@ -120,7 +120,7 @@ export async function getActiveTargets(): Promise<string[]> {
 export const prepareData = async (duration_ms: number, component_count: number = undefined): Promise<TrackableData> => {
   const { flags, sys } = getStencilCLIConfig();
   const { typescript, rollup } = getCoreCompiler()?.versions || { typescript: 'unknown', rollup: 'unknown' };
-  const packages = await getInstalledPackages() || [];
+  const packages = await getInstalledPackages();
   const targets = await getActiveTargets();
   const yarn = isUsingYarn()
   const stencil = getCoreCompiler()?.version || 'unknown';
