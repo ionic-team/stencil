@@ -91,7 +91,7 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
     } else if (ts.isPropertyAccessExpression(retExp)) {
       const nameToFind = retExp.name.getText();
       const foundProp = findGetProp(nameToFind, newMembers);
-      if (foundProp.initializer) propMeta.defaultValue = foundProp.initializer.getText();
+      if (foundProp && foundProp.initializer) propMeta.defaultValue = foundProp.initializer.getText();
     }
   }
 
