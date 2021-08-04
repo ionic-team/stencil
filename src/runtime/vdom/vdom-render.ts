@@ -386,13 +386,15 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
     fbSlotsIdx = fbSlots.length-1;
     for (i = 0; i <= fbSlotsIdx; ++i) {
       fbSlot = fbSlots[i];
-      fbNodesIdx = fbNodes[fbSlot['s-sn']].length-1;
+      if (!fbNodes[fbSlot['s-sn']]) continue;
 
+      fbNodesIdx = fbNodes[fbSlot['s-sn']].length-1;
       for (j = 0; j <= fbNodesIdx; ++j) {
         fbNode = fbNodes[fbSlot['s-sn']][j];
         fbSlot.parentNode.insertBefore(fbNode, fbSlot);
       }
     }
+    checkSlotFallbackVisibility = true;
   }
 };
 
@@ -422,7 +424,7 @@ const referenceNode = (node: d.RenderNode) => {
 const parentReferenceNode = (node: d.RenderNode) => (node['s-ol'] ? node['s-ol'] : node).parentNode;
 
 export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
-  const elm = (newVNode.$elm$ = oldVNode.$elm$);
+  const elm: d.RenderNode = (newVNode.$elm$ = oldVNode.$elm$);
   const oldChildren = oldVNode.$children$;
   const newChildren = newVNode.$children$;
   const tag = newVNode.$tag$;
@@ -474,7 +476,11 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
   } else if (BUILD.vdomText && oldVNode.$text$ !== text) {
     // update the text content for the text only vnode
     // and also only if the text is different than before
-    elm.data = text;
+    elm.textContent = text;
+
+    if (elm['s-sf']) {
+      elm['s-sfc'] = text;
+    }
   }
 };
 
