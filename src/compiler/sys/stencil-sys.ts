@@ -505,6 +505,8 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
+  const fetch = global.fetch;
+
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
   const tmpDirSync = () => '/.tmp';
@@ -583,6 +585,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     realpathSync,
     removeDestory,
     rename,
+    fetch,
     resolvePath,
     removeDir,
     removeDirSync,

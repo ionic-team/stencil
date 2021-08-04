@@ -37,6 +37,8 @@ export const isInteractive = (object?: TerminalInfo): boolean => {
   return terminalInfo.tty && !terminalInfo.ci;
 };
 
+export const UUID_REGEX = new RegExp(/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i);
+
 // Plucked from https://github.com/ionic-team/capacitor/blob/b893a57aaaf3a16e13db9c33037a12f1a5ac92e0/cli/src/util/uuid.ts
 export function uuidv4(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -50,4 +52,12 @@ export function uuidv4(): string {
 export async function readJson(path: string) {
   const file = await getCompilerSystem().readFile(path);
   return !!file && JSON.parse(file);
+}
+
+export function hasDebug() {
+  return getStencilCLIConfig().flags.debug;
+}
+
+export function hasVerbose() {
+  return getStencilCLIConfig().flags.verbose && hasDebug();
 }
