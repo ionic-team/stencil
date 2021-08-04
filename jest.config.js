@@ -12,7 +12,7 @@ module.exports = {
     '@utils': '<rootDir>/src/utils',
   },
   coverageDirectory: './test-results/',
-  coverageReporters: ["json", "lcov", "text", "clover", "json-summary"],
+  coverageReporters: ["json", "lcov", "text", "clover"],
   collectCoverageFrom: [
     '<rootDir>/src/utils/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/cli/**/*.{js,jsx,ts,tsx}',
