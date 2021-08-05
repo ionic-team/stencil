@@ -1,17 +1,17 @@
 import { Component, Event, EventEmitter, Method } from '@stencil/core';
 
 @Component({
-  tag: 'event-cmp'
+  tag: 'event-cmp',
 })
 export class EventCmp {
-
   @Event() myDocumentEvent: EventEmitter<any>;
 
   @Event({
     eventName: 'my-event-with-options',
     bubbles: false,
-    cancelable: false
-  }) myEventWithOptions: EventEmitter<{ mph: number }>;
+    cancelable: false,
+  })
+  myEventWithOptions: EventEmitter<{ mph: number }>;
 
   @Event() myWindowEvent: EventEmitter<number>;
 
@@ -29,5 +29,4 @@ export class EventCmp {
   async methodThatFiresEventWithOptions() {
     this.myEventWithOptions.emit({ mph: 88 });
   }
-
 }

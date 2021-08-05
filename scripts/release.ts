@@ -5,7 +5,13 @@ import inquirer from 'inquirer';
 import { getOptions, BuildOptions } from './utils/options';
 import { runReleaseTasks } from './release-tasks';
 import { join } from 'path';
-import { SEMVER_INCREMENTS, prettyVersionDiff, isValidVersionInput, getNewVersion, isPrereleaseVersion } from './utils/release-utils';
+import {
+  SEMVER_INCREMENTS,
+  prettyVersionDiff,
+  isValidVersionInput,
+  getNewVersion,
+  isPrereleaseVersion,
+} from './utils/release-utils';
 
 export async function release(rootDir: string, args: string[]) {
   const buildDir = join(rootDir, 'build');
@@ -37,7 +43,9 @@ export async function release(rootDir: string, args: string[]) {
 async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPath: string) {
   const pkg = opts.packageJson;
   const oldVersion = opts.packageJson.version;
-  console.log(`\nPrepare to publish ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.dim(`(currently ${oldVersion})`)}\n`);
+  console.log(
+    `\nPrepare to publish ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.dim(`(currently ${oldVersion})`)}\n`
+  );
 
   const prompts = [
     {
@@ -45,7 +53,7 @@ async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPat
       name: 'version',
       message: 'Select semver increment or specify new version',
       pageSize: SEMVER_INCREMENTS.length + 2,
-      choices: SEMVER_INCREMENTS.map(inc => ({
+      choices: SEMVER_INCREMENTS.map((inc) => ({
         name: `${inc}   ${prettyVersionDiff(oldVersion, inc)}`,
         value: inc,
       })).concat([
@@ -85,14 +93,14 @@ async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPat
 
   await inquirer
     .prompt(prompts)
-    .then(answers => {
+    .then((answers) => {
       if (answers.confirm) {
         opts.version = answers.version;
         fs.writeJsonSync(releaseDataPath, opts, { spaces: 2 });
         runReleaseTasks(opts, args);
       }
     })
-    .catch(err => {
+    .catch((err) => {
       console.log('\n', color.red(err), '\n');
       process.exit(0);
     });
@@ -116,8 +124,8 @@ async function publishRelease(opts: BuildOptions, args: string[]) {
       choices: () =>
         execa('npm', ['view', '--json', pkg.name, 'dist-tags']).then(({ stdout }) => {
           const existingPrereleaseTags = Object.keys(JSON.parse(stdout))
-            .filter(tag => tag !== 'latest')
-            .map(tag => {
+            .filter((tag) => tag !== 'latest')
+            .map((tag) => {
               return {
                 name: tag,
                 value: tag,
@@ -149,7 +157,7 @@ async function publishRelease(opts: BuildOptions, args: string[]) {
         if (input.length === 0) {
           return 'Please specify a tag, for example, `next`.';
         } else if (input.toLowerCase() === 'latest') {
-          return 'It\'s not possible to publish pre-releases under the `latest` tag. Please specify something else, for example, `next`.';
+          return "It's not possible to publish pre-releases under the `latest` tag. Please specify something else, for example, `next`.";
         }
         return true;
       },
@@ -167,12 +175,12 @@ async function publishRelease(opts: BuildOptions, args: string[]) {
 
   await inquirer
     .prompt(prompts)
-    .then(answers => {
+    .then((answers) => {
       if (answers.confirm) {
         runReleaseTasks(opts, args);
       }
     })
-    .catch(err => {
+    .catch((err) => {
       console.log('\n', color.red(err), '\n');
       process.exit(0);
     });

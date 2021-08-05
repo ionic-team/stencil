@@ -4,20 +4,30 @@ import { addLegacyProps } from '../legacy-props';
 import { ATTACH_SHADOW, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
 import ts from 'typescript';
 
-export const updateNativeConstructor = (classMembers: ts.ClassElement[], moduleFile: d.Module, cmp: d.ComponentCompilerMeta, ensureSuper: boolean) => {
+export const updateNativeConstructor = (
+  classMembers: ts.ClassElement[],
+  moduleFile: d.Module,
+  cmp: d.ComponentCompilerMeta,
+  ensureSuper: boolean
+) => {
   if (cmp.isPlain) {
     return;
   }
-  const cstrMethodIndex = classMembers.findIndex(m => m.kind === ts.SyntaxKind.Constructor);
+  const cstrMethodIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
 
   if (cstrMethodIndex >= 0) {
     // add to the existing constructor()
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
 
-    let statements: ts.Statement[] = [...nativeInit(moduleFile, cmp), ...addCreateEvents(moduleFile, cmp), ...cstrMethod.body.statements, ...addLegacyProps(moduleFile, cmp)];
+    let statements: ts.Statement[] = [
+      ...nativeInit(moduleFile, cmp),
+      ...addCreateEvents(moduleFile, cmp),
+      ...cstrMethod.body.statements,
+      ...addLegacyProps(moduleFile, cmp),
+    ];
 
     if (ensureSuper) {
-      const hasSuper = cstrMethod.body.statements.some(s => s.kind === ts.SyntaxKind.SuperKeyword);
+      const hasSuper = cstrMethod.body.statements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
       if (!hasSuper) {
         statements = [createNativeConstructorSuper(), ...statements];
       }
@@ -28,11 +38,15 @@ export const updateNativeConstructor = (classMembers: ts.ClassElement[], moduleF
       cstrMethod.decorators,
       cstrMethod.modifiers,
       cstrMethod.parameters,
-      ts.updateBlock(cstrMethod.body, statements),
+      ts.updateBlock(cstrMethod.body, statements)
     );
   } else {
     // create a constructor()
-    let statements: ts.Statement[] = [...nativeInit(moduleFile, cmp), ...addCreateEvents(moduleFile, cmp), ...addLegacyProps(moduleFile, cmp)];
+    let statements: ts.Statement[] = [
+      ...nativeInit(moduleFile, cmp),
+      ...addCreateEvents(moduleFile, cmp),
+      ...addLegacyProps(moduleFile, cmp),
+    ];
 
     if (ensureSuper) {
       statements = [createNativeConstructorSuper(), ...statements];
@@ -52,7 +66,9 @@ const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
 };
 
 const nativeRegisterHostStatement = () => {
-  return ts.createStatement(ts.createCall(ts.createPropertyAccess(ts.createThis(), ts.createIdentifier('__registerHost')), undefined, undefined));
+  return ts.createStatement(
+    ts.createCall(ts.createPropertyAccess(ts.createThis(), ts.createIdentifier('__registerHost')), undefined, undefined)
+  );
 };
 
 const nativeAttachShadowStatement = (moduleFile: d.Module) => {

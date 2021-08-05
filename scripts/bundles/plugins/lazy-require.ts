@@ -16,7 +16,7 @@ export function lazyRequirePlugin(opts: BuildOptions, moduleIds: string[], resol
       return null;
     },
     generateBundle(_, bundle) {
-      Object.keys(bundle).forEach(fileName => {
+      Object.keys(bundle).forEach((fileName) => {
         const b = bundle[fileName] as OutputChunk;
         if (b.code) {
           b.code = b.code.replace(`require('${resolveToPath}')`, `_lazyRequire('${resolveToPath}')`);

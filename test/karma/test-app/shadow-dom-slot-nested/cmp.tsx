@@ -7,17 +7,17 @@ import { Component, Prop, h } from '@stencil/core';
       color: red;
     }
   `,
-  shadow: true
+  shadow: true,
 })
 export class ShadowDomSlotNested {
-
   @Prop() i?: number;
 
   render() {
     return [
       <header>shadow dom: {this.i}</header>,
-      <footer><slot/></footer>
+      <footer>
+        <slot />
+      </footer>,
     ];
   }
-
 }

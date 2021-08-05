@@ -7,7 +7,7 @@ export const taskTelemetry = async () => {
   const isEnabling = getStencilCLIConfig().flags.args.includes('on');
   const isDisabling = getStencilCLIConfig().flags.args.includes('off');
   const INFORMATION = `Opt in or our of telemetry. Information about the data we collect is available on our website: ${logger.bold(
-    'https://stenciljs.com/telemetry',
+    'https://stenciljs.com/telemetry'
   )}`;
   const THANK_YOU = `Thank you for helping to make Stencil better! 💖`;
   const ENABLED_MESSAGE = `${logger.green('Enabled')}. ${THANK_YOU}\n\n`;

@@ -72,7 +72,7 @@ const addGlobIgnores = (config: d.Config, globIgnores: string[]) => {
     `**/*.system.js`,
     `**/${config.fsNamespace}.js`,
     `**/${config.fsNamespace}.esm.js`,
-    `**/${config.fsNamespace}.css`,
+    `**/${config.fsNamespace}.css`
   );
 };
 

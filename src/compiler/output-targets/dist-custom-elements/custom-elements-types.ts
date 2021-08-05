@@ -7,14 +7,14 @@ export const generateCustomElementsTypes = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  distDtsFilePath: string,
+  distDtsFilePath: string
 ) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
 
   await Promise.all(
-    outputTargets.map(outputTarget =>
-      generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, distDtsFilePath, outputTarget),
-    ),
+    outputTargets.map((outputTarget) =>
+      generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, distDtsFilePath, outputTarget)
+    )
   );
 };
 
@@ -23,7 +23,7 @@ export const generateCustomElementsTypesOutput = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   distDtsFilePath: string,
-  outputTarget: d.OutputTargetDistCustomElementsBundle | d.OutputTargetDistCustomElements,
+  outputTarget: d.OutputTargetDistCustomElementsBundle | d.OutputTargetDistCustomElements
 ) => {
   const customElementsDtsPath = join(outputTarget.dir, 'index.d.ts');
   const componentsDtsRelPath = relDts(outputTarget.dir, distDtsFilePath);
@@ -69,14 +69,14 @@ export const generateCustomElementsTypesOutput = async (
     outputTargetType: outputTarget.type,
   });
 
-  const components = buildCtx.components.filter(m => !m.isCollectionDependency);
+  const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
   await Promise.all(
-    components.map(async cmp => {
+    components.map(async (cmp) => {
       const dtsCode = generateCustomElementType(componentsDtsRelPath, cmp);
       const fileName = `${cmp.tagName}.d.ts`;
       const filePath = join(outputTarget.dir, fileName);
       await compilerCtx.fs.writeFile(filePath, dtsCode, { outputTargetType: outputTarget.type });
-    }),
+    })
   );
 };
 

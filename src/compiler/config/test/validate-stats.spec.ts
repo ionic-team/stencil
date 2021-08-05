@@ -13,7 +13,7 @@ describe('validateStats', () => {
     userConfig.flags.stats = true;
 
     const { config } = validateConfig(userConfig);
-    const o = config.outputTargets.find(o => o.type === 'stats') as d.OutputTargetStats;
+    const o = config.outputTargets.find((o) => o.type === 'stats') as d.OutputTargetStats;
     expect(o).toBeDefined();
     expect(o.file).toContain('stencil-stats.json');
   });
@@ -26,7 +26,7 @@ describe('validateStats', () => {
       } as d.OutputTargetStats,
     ];
     const { config } = validateConfig(userConfig);
-    const o = config.outputTargets.find(o => o.type === 'stats') as d.OutputTargetStats;
+    const o = config.outputTargets.find((o) => o.type === 'stats') as d.OutputTargetStats;
     expect(o).toBeDefined();
     expect(o.file).toContain('custom-path.json');
   });
@@ -38,13 +38,13 @@ describe('validateStats', () => {
       },
     ];
     const { config } = validateConfig(userConfig);
-    const o = config.outputTargets.find(o => o.type === 'stats') as d.OutputTargetStats;
+    const o = config.outputTargets.find((o) => o.type === 'stats') as d.OutputTargetStats;
     expect(o).toBeDefined();
     expect(o.file).toContain('stencil-stats.json');
   });
 
   it('default no stats', () => {
     const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some(o => o.type === 'stats')).toBe(false);
+    expect(config.outputTargets.some((o) => o.type === 'stats')).toBe(false);
   });
 });

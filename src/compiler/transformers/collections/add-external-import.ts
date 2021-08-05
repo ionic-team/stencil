@@ -11,7 +11,7 @@ export const addExternalImport = (
   moduleFile: d.Module,
   containingFile: string,
   moduleId: string,
-  resolveCollections: boolean,
+  resolveCollections: boolean
 ) => {
   if (!moduleFile.externalImports.includes(moduleId)) {
     moduleFile.externalImports.push(moduleId);
@@ -67,13 +67,20 @@ export const addExternalImport = (
   // this import is a stencil collection
   // let's parse it and gather all the module data about it
   // internally it'll cached collection data if we've already done this
-  const collection = parseCollection(config, compilerCtx, buildCtx, moduleId, parsedPkgJson.filePath, parsedPkgJson.data);
+  const collection = parseCollection(
+    config,
+    compilerCtx,
+    buildCtx,
+    moduleId,
+    parsedPkgJson.filePath,
+    parsedPkgJson.data
+  );
   if (!collection) {
     return;
   }
 
   // check if we already added this collection to the build context
-  const alreadyHasCollection = buildCtx.collections.some(c => {
+  const alreadyHasCollection = buildCtx.collections.some((c) => {
     return c.collectionName === collection.collectionName;
   });
 
@@ -88,9 +95,17 @@ export const addExternalImport = (
   if (Array.isArray(collection.dependencies)) {
     // this collection has more collections
     // let's keep digging down and discover all of them
-    collection.dependencies.forEach(dependencyModuleId => {
+    collection.dependencies.forEach((dependencyModuleId) => {
       const resolveFromDir = dirname(pkgJsonFilePath);
-      addExternalImport(config, compilerCtx, buildCtx, moduleFile, resolveFromDir, dependencyModuleId, resolveCollections);
+      addExternalImport(
+        config,
+        compilerCtx,
+        buildCtx,
+        moduleFile,
+        resolveFromDir,
+        dependencyModuleId,
+        resolveCollections
+      );
     });
   }
 };

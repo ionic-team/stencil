@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('conditional-rerender', function() {
+describe('conditional-rerender', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -21,7 +20,5 @@ describe('conditional-rerender', function() {
 
       done();
     }, 500);
-
   });
-
 });

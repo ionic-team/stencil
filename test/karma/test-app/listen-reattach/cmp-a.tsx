@@ -1,6 +1,5 @@
 import { Component, Listen, State, h, Host } from '@stencil/core';
 
-
 @Component({
   tag: 'listen-reattach',
   styles: ':host { display: block; background: gray;}',

@@ -24,13 +24,13 @@ export function shuffleArray(array: any[]) {
 }
 
 export function expectFiles(fs: d.InMemoryFileSystem, filePaths: string[]) {
-  filePaths.forEach(filePath => {
+  filePaths.forEach((filePath) => {
     fs.sys.statSync(filePath);
   });
 }
 
 export function doNotExpectFiles(fs: d.InMemoryFileSystem, filePaths: string[]) {
-  filePaths.forEach(filePath => {
+  filePaths.forEach((filePath) => {
     try {
       fs.sys.statSync(filePath);
     } catch (e) {

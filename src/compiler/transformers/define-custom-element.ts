@@ -4,13 +4,17 @@ import { DEFINE_CUSTOM_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from './core-r
 import { formatComponentRuntimeMeta } from '@utils';
 import ts from 'typescript';
 
-export const defineCustomElement = (tsSourceFile: ts.SourceFile, moduleFile: d.Module, transformOpts: d.TransformOptions) => {
+export const defineCustomElement = (
+  tsSourceFile: ts.SourceFile,
+  moduleFile: d.Module,
+  transformOpts: d.TransformOptions
+) => {
   let statements = tsSourceFile.statements.slice();
 
   statements.push(
-    ...moduleFile.cmps.map(cmp => {
+    ...moduleFile.cmps.map((cmp) => {
       return addDefineCustomElement(moduleFile, cmp);
-    }),
+    })
   );
 
   if (transformOpts.module === 'cjs') {
@@ -28,8 +32,8 @@ const addDefineCustomElement = (moduleFile: d.Module, compilerMeta: d.ComponentC
       ts.createCall(
         ts.createPropertyAccess(ts.createIdentifier('customElements'), ts.createIdentifier('define')),
         [],
-        [ts.createLiteral(compilerMeta.tagName), ts.createIdentifier(compilerMeta.componentClassName)],
-      ),
+        [ts.createLiteral(compilerMeta.tagName), ts.createIdentifier(compilerMeta.componentClassName)]
+      )
     );
   }
 
@@ -39,13 +43,15 @@ const addDefineCustomElement = (moduleFile: d.Module, compilerMeta: d.ComponentC
   const liternalCmpClassName = ts.createIdentifier(compilerMeta.componentClassName);
   const liternalMeta = convertValueToLiteral(compactMeta);
 
-  return ts.createStatement(ts.createCall(ts.createIdentifier(DEFINE_CUSTOM_ELEMENT), [], [liternalCmpClassName, liternalMeta]));
+  return ts.createStatement(
+    ts.createCall(ts.createIdentifier(DEFINE_CUSTOM_ELEMENT), [], [liternalCmpClassName, liternalMeta])
+  );
 };
 
 const removeComponentCjsExport = (statements: ts.Statement[], moduleFile: d.Module) => {
-  const cmpClassNames = new Set<string>(moduleFile.cmps.map(cmp => cmp.componentClassName));
+  const cmpClassNames = new Set<string>(moduleFile.cmps.map((cmp) => cmp.componentClassName));
 
-  return statements.filter(s => {
+  return statements.filter((s) => {
     if (s.kind === ts.SyntaxKind.ExpressionStatement) {
       const exp = (s as ts.ExpressionStatement).expression as ts.BinaryExpression;
       if (exp && exp.kind === ts.SyntaxKind.BinaryExpression) {

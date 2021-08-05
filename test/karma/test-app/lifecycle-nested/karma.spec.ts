@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('lifecycle-nested', function() {
+describe('lifecycle-nested', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -20,5 +19,4 @@ describe('lifecycle-nested', function() {
     expect(loads[4].textContent).toBe('componentDidLoad-b');
     expect(loads[5].textContent).toBe('componentDidLoad-c');
   });
-
 });

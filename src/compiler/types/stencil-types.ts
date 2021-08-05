@@ -21,16 +21,16 @@ export const updateStencilTypesImports = (typesDir: string, dtsFilePath: string,
 };
 
 export const copyStencilCoreDts = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
-  const typesOutputTargets = config.outputTargets.filter(isOutputTargetDistTypes).filter(o => o.typesDir);
+  const typesOutputTargets = config.outputTargets.filter(isOutputTargetDistTypes).filter((o) => o.typesDir);
 
   const srcStencilDtsPath = join(config.sys.getCompilerExecutingPath(), '..', '..', 'internal', CORE_DTS);
   const srcStencilCoreDts = await compilerCtx.fs.readFile(srcStencilDtsPath);
 
   return Promise.all(
-    typesOutputTargets.map(o => {
+    typesOutputTargets.map((o) => {
       const coreDtsFilePath = join(o.typesDir, CORE_DTS);
       return compilerCtx.fs.writeFile(coreDtsFilePath, srcStencilCoreDts, { outputTargetType: o.type });
-    }),
+    })
   );
 };
 

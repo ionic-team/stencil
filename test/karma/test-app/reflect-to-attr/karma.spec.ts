@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('reflect-to-attr', function() {
+describe('reflect-to-attr', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -11,7 +10,6 @@ describe('reflect-to-attr', function() {
   afterEach(tearDownDom);
 
   it('should have proper attributes', async () => {
-
     const cmp = app.querySelector('reflect-to-attr') as any;
 
     expect(cmp.getAttribute('str')).toEqual('single');
@@ -54,5 +52,4 @@ describe('reflect-to-attr', function() {
     await waitForChanges();
     expect(cmp.disabled).toBe(false);
   });
-
 });

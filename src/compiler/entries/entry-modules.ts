@@ -17,8 +17,8 @@ export function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx) {
 
 export function createEntryModule(cmps: d.ComponentCompilerMeta[]): d.EntryModule {
   // generate a unique entry key based on the components within this entry module
-  cmps = sortBy(cmps, c => c.tagName);
-  const entryKey = cmps.map(c => c.tagName).join('.') + '.entry';
+  cmps = sortBy(cmps, (c) => c.tagName);
+  const entryKey = cmps.map((c) => c.tagName).join('.') + '.entry';
 
   return {
     cmps,
@@ -29,9 +29,9 @@ export function createEntryModule(cmps: d.ComponentCompilerMeta[]): d.EntryModul
 export function getEntryModes(cmps: d.ComponentCompilerMeta[]) {
   const styleModeNames: string[] = [];
 
-  cmps.forEach(cmp => {
+  cmps.forEach((cmp) => {
     const cmpStyleModes = getComponentStyleModes(cmp);
-    cmpStyleModes.forEach(modeName => {
+    cmpStyleModes.forEach((modeName) => {
       if (!styleModeNames.includes(modeName)) {
         styleModeNames.push(modeName);
       }
@@ -53,8 +53,8 @@ export function getEntryModes(cmps: d.ComponentCompilerMeta[]) {
 export function getEntryEncapsulations(moduleFiles: d.Module[]) {
   const encapsulations: d.Encapsulation[] = [];
 
-  moduleFiles.forEach(m => {
-    m.cmps.forEach(cmp => {
+  moduleFiles.forEach((m) => {
+    m.cmps.forEach((cmp) => {
       const encapsulation = cmp.encapsulation || 'none';
       if (!encapsulations.includes(encapsulation)) {
         encapsulations.push(encapsulation);
@@ -73,7 +73,7 @@ export function getEntryEncapsulations(moduleFiles: d.Module[]) {
 
 export function getComponentStyleModes(cmpMeta: d.ComponentCompilerMeta) {
   if (cmpMeta && cmpMeta.styles) {
-    return cmpMeta.styles.map(style => style.modeName);
+    return cmpMeta.styles.map((style) => style.modeName);
   }
   return [];
 }

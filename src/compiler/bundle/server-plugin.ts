@@ -16,7 +16,9 @@ export const serverPlugin = (config: d.Config, platform: string): Plugin => {
     return false;
   };
 
-  const externals = isHydrateBundle ? config.outputTargets.filter(isOutputTargetHydrate).flatMap(o => o.external) : [];
+  const externals = isHydrateBundle
+    ? config.outputTargets.filter(isOutputTargetHydrate).flatMap((o) => o.external)
+    : [];
 
   return {
     name: 'serverPlugin',

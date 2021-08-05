@@ -15,9 +15,9 @@ export function responseHeaders(headers: d.DevResponseHeaders, httpCache = false
 
 const DEFAULT_HEADERS: d.DevResponseHeaders = {
   'cache-control': 'no-cache, no-store, must-revalidate, max-age=0',
-  'expires': '0',
-  'date': 'Wed, 1 Jan 2000 00:00:00 GMT',
-  'server': 'Stencil Dev Server ' + version,
+  expires: '0',
+  date: 'Wed, 1 Jan 2000 00:00:00 GMT',
+  server: 'Stencil Dev Server ' + version,
   'access-control-allow-origin': '*',
   'access-control-expose-headers': '*',
 };

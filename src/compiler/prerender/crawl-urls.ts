@@ -6,7 +6,7 @@ export const crawlAnchorsForNextUrls = (
   diagnostics: d.Diagnostic[],
   baseUrl: URL,
   currentUrl: URL,
-  parsedAnchors: d.HydrateAnchorElement[],
+  parsedAnchors: d.HydrateAnchorElement[]
 ) => {
   if (!Array.isArray(parsedAnchors) || parsedAnchors.length === 0) {
     return [];
@@ -20,7 +20,7 @@ export const crawlAnchorsForNextUrls = (
   // normalizeHref(): normalize URL objects into href strings
 
   return parsedAnchors
-    .filter(anchor => {
+    .filter((anchor) => {
       // filter which anchors to actually crawl
       if (typeof prerenderConfig.filterAnchor === 'function') {
         // user filterAnchor()
@@ -40,7 +40,7 @@ export const crawlAnchorsForNextUrls = (
       return standardFilterAnchor(diagnostics, anchor, currentUrl);
     })
 
-    .map(anchor => {
+    .map((anchor) => {
       // normalize href strings into URL objects
       if (typeof prerenderConfig.normalizeUrl === 'function') {
         try {
@@ -59,7 +59,7 @@ export const crawlAnchorsForNextUrls = (
       return standardNormalizeUrl(diagnostics, anchor.href, currentUrl);
     })
 
-    .filter(url => {
+    .filter((url) => {
       // filter which urls to actually crawl
       if (typeof prerenderConfig.filterUrl === 'function') {
         // user filterUrl()
@@ -79,7 +79,7 @@ export const crawlAnchorsForNextUrls = (
       return standardFilterUrl(diagnostics, url, currentUrl, basePathParts);
     })
 
-    .map(url => {
+    .map((url) => {
       // standard normalize href
       // normalize URL objects into href strings
       return standardNormalizeHref(prerenderConfig, diagnostics, url);

@@ -10,6 +10,6 @@ function _lazyRequire(moduleId) {
         const importedModule = require(moduleId);
         return Reflect.set(importedModule, propertyKey, value);
       },
-    },
+    }
   );
 }

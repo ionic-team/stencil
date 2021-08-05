@@ -1,7 +1,7 @@
 import { Component, Listen, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'lifecycle-async-a'
+  tag: 'lifecycle-async-a',
 })
 export class LifecycleAsyncA {
   @State() value = '';
@@ -52,26 +52,22 @@ export class LifecycleAsyncA {
 
     return (
       <div>
-        <button onClick={this.testClick.bind(this)} class='test'>
+        <button onClick={this.testClick.bind(this)} class="test">
           Update
         </button>
-        <hr/>
-        <div>
-          LifecycleAsyncA {this.value}
-        </div>
-        <div class='rendered-a'>
-          rendered a: {this.rendered}
-        </div>
+        <hr />
+        <div>LifecycleAsyncA {this.value}</div>
+        <div class="rendered-a">rendered a: {this.rendered}</div>
         <div>loads a:</div>
-        <ol class='lifecycle-loads-a'>
-          {this.loads.map(load => {
-            return <li>{load}</li>
+        <ol class="lifecycle-loads-a">
+          {this.loads.map((load) => {
+            return <li>{load}</li>;
           })}
         </ol>
         <div>updates a:</div>
-        <ol class='lifecycle-updates-a'>
-          {this.updates.map(update => {
-            return <li>{update}</li>
+        <ol class="lifecycle-updates-a">
+          {this.updates.map((update) => {
+            return <li>{update}</li>;
           })}
         </ol>
         <lifecycle-async-b value={this.value} />

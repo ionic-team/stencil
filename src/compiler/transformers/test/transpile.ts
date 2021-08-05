@@ -12,7 +12,7 @@ export function transpileModule(
   compilerCtx?: d.CompilerCtx,
   sys?: d.CompilerSystem,
   beforeTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
-  afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
+  afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = []
 ) {
   const options = ts.getDefaultCompilerOptions();
   options.isolatedModules = true;
@@ -55,14 +55,14 @@ export function transpileModule(
   };
 
   const compilerHost: ts.CompilerHost = {
-    getSourceFile: fileName => (fileName === inputFileName ? sourceFile : undefined),
+    getSourceFile: (fileName) => (fileName === inputFileName ? sourceFile : undefined),
     writeFile: emitCallback,
     getDefaultLibFileName: () => 'lib.d.ts',
     useCaseSensitiveFileNames: () => false,
-    getCanonicalFileName: fileName => fileName,
+    getCanonicalFileName: (fileName) => fileName,
     getCurrentDirectory: () => '',
     getNewLine: () => '',
-    fileExists: fileName => fileName === inputFileName,
+    fileExists: (fileName) => fileName === inputFileName,
     readFile: () => '',
     directoryExists: () => true,
     getDirectories: () => [],
@@ -89,7 +89,10 @@ export function transpileModule(
 
   tsProgram.emit(undefined, undefined, undefined, undefined, {
     before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker), ...beforeTransformers],
-    after: [convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts), ...afterTransformers],
+    after: [
+      convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts),
+      ...afterTransformers,
+    ],
   });
 
   while (outputText.includes('  ')) {

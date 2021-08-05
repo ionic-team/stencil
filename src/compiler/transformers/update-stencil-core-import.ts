@@ -3,7 +3,7 @@ import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 
 export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.TransformerFactory<ts.SourceFile> => {
   return () => {
-    return tsSourceFile => {
+    return (tsSourceFile) => {
       if (STENCIL_CORE_ID === updatedCoreImportPath) {
         return tsSourceFile;
       }
@@ -11,22 +11,31 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
       let madeChanges = false;
       const newStatements: ts.Statement[] = [];
 
-      tsSourceFile.statements.forEach(s => {
+      tsSourceFile.statements.forEach((s) => {
         if (ts.isImportDeclaration(s)) {
           if (s.moduleSpecifier != null && ts.isStringLiteral(s.moduleSpecifier)) {
             if (s.moduleSpecifier.text === STENCIL_CORE_ID) {
-              if (s.importClause && s.importClause.namedBindings && s.importClause.namedBindings.kind === ts.SyntaxKind.NamedImports) {
+              if (
+                s.importClause &&
+                s.importClause.namedBindings &&
+                s.importClause.namedBindings.kind === ts.SyntaxKind.NamedImports
+              ) {
                 const origImports = s.importClause.namedBindings.elements;
 
-                const keepImports = origImports.map(e => e.getText()).filter(name => KEEP_IMPORTS.has(name));
+                const keepImports = origImports.map((e) => e.getText()).filter((name) => KEEP_IMPORTS.has(name));
 
                 if (keepImports.length > 0) {
                   const newImport = ts.updateImportDeclaration(
                     s,
                     undefined,
                     undefined,
-                    ts.createImportClause(undefined, ts.createNamedImports(keepImports.map(name => ts.createImportSpecifier(undefined, ts.createIdentifier(name))))),
-                    ts.createStringLiteral(updatedCoreImportPath),
+                    ts.createImportClause(
+                      undefined,
+                      ts.createNamedImports(
+                        keepImports.map((name) => ts.createImportSpecifier(undefined, ts.createIdentifier(name)))
+                      )
+                    ),
+                    ts.createStringLiteral(updatedCoreImportPath)
                   );
                   newStatements.push(newImport);
                 }
@@ -47,7 +56,7 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
           tsSourceFile.referencedFiles,
           tsSourceFile.typeReferenceDirectives,
           tsSourceFile.hasNoDefaultLib,
-          tsSourceFile.libReferenceDirectives,
+          tsSourceFile.libReferenceDirectives
         );
       }
 
@@ -72,5 +81,5 @@ const KEEP_IMPORTS = new Set([
   'forceUpdate',
   'getRenderingRef',
   'forceModeUpdate',
-  'setErrorHandler'
+  'setErrorHandler',
 ]);

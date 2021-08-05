@@ -8,15 +8,10 @@ import { Component, h } from '@stencil/core';
       color: white;
     }
   `,
-  shadow: true
+  shadow: true,
 })
 export class ShadowDomBasic {
-
   render() {
-    return [
-    <div>shadow</div>,
-    <slot/>
-    ];
+    return [<div>shadow</div>, <slot />];
   }
-
 }

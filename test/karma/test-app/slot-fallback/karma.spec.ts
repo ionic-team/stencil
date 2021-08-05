@@ -1,6 +1,5 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
 // TODO(STENCIL-18) Restore this test and fix the underlying issue.
 xdescribe('slot-fallback', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
@@ -10,7 +9,6 @@ xdescribe('slot-fallback', () => {
     app = await setupDom('/slot-fallback/index.html');
   });
   afterEach(tearDownDom);
-
 
   it('renders fallback', async () => {
     let result: HTMLElement;
@@ -166,5 +164,4 @@ xdescribe('slot-fallback', () => {
     result = app.querySelector('.results1 article span content-end');
     expect(result.textContent).toBe('slot light dom 2 : end');
   });
-
 });

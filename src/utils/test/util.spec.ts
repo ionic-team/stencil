@@ -161,7 +161,9 @@ describe('util', () => {
   });
 
   it('createJsVarName', () => {
-    expect(util.createJsVarName('./scoped-style-import.css?tag=my-button&encapsulation=scoped')).toBe('scopedStyleImportCss');
+    expect(util.createJsVarName('./scoped-style-import.css?tag=my-button&encapsulation=scoped')).toBe(
+      'scopedStyleImportCss'
+    );
     expect(util.createJsVarName('./scoped-style-import.css#hash')).toBe('scopedStyleImportCss');
     expect(util.createJsVarName('./scoped-style-import.css&data')).toBe('scopedStyleImportCss');
     expect(util.createJsVarName('./scoped-style-import.css=data')).toBe('scopedStyleImportCss');

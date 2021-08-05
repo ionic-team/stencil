@@ -45,14 +45,14 @@ export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   if (Object.keys(buildCtx.stylesUpdated).length > 0) {
     hmr.inlineStylesUpdated = sortBy(
-      buildCtx.stylesUpdated.map(s => {
+      buildCtx.stylesUpdated.map((s) => {
         return {
           styleId: getScopeId(s.styleTag, s.styleMode),
           styleTag: s.styleTag,
           styleText: s.styleText,
         } as d.HmrStyleUpdate;
       }),
-      s => s.styleId,
+      (s) => s.styleId
     );
   }
 
@@ -75,7 +75,7 @@ const getComponentsUpdated = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
     return null;
   }
 
-  const filesToLookForImporters = buildCtx.filesChanged.filter(f => {
+  const filesToLookForImporters = buildCtx.filesChanged.filter((f) => {
     return f.endsWith('.ts') || f.endsWith('.tsx') || f.endsWith('.js') || f.endsWith('.jsx');
   });
 
@@ -85,7 +85,7 @@ const getComponentsUpdated = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
 
   const changedScriptFiles: string[] = [];
   const checkedFiles = new Set<string>();
-  const allModuleFiles = buildCtx.moduleFiles.filter(m => m.localImports && m.localImports.length > 0);
+  const allModuleFiles = buildCtx.moduleFiles.filter((m) => m.localImports && m.localImports.length > 0);
 
   while (filesToLookForImporters.length > 0) {
     const scriptFile = filesToLookForImporters.shift();
@@ -95,7 +95,7 @@ const getComponentsUpdated = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
   const tags = changedScriptFiles.reduce((tags, changedTsFile) => {
     const moduleFile = compilerCtx.moduleMap.get(changedTsFile);
     if (moduleFile != null) {
-      moduleFile.cmps.forEach(cmp => {
+      moduleFile.cmps.forEach((cmp) => {
         if (typeof cmp.tagName === 'string') {
           if (!tags.includes(cmp.tagName)) {
             tags.push(cmp.tagName);
@@ -113,7 +113,13 @@ const getComponentsUpdated = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
   return tags.sort();
 };
 
-const addTsFileImporters = (allModuleFiles: d.Module[], filesToLookForImporters: string[], checkedFiles: Set<string>, changedScriptFiles: string[], scriptFile: string) => {
+const addTsFileImporters = (
+  allModuleFiles: d.Module[],
+  filesToLookForImporters: string[],
+  checkedFiles: Set<string>,
+  changedScriptFiles: string[],
+  scriptFile: string
+) => {
   if (!changedScriptFiles.includes(scriptFile)) {
     // add it to our list of files to transpile
     changedScriptFiles.push(scriptFile);
@@ -127,7 +133,7 @@ const addTsFileImporters = (allModuleFiles: d.Module[], filesToLookForImporters:
 
   // get all the ts files that import this ts file
   const tsFilesThatImportsThisTsFile = allModuleFiles.reduce((arr, moduleFile) => {
-    moduleFile.localImports.forEach(localImport => {
+    moduleFile.localImports.forEach((localImport) => {
       let checkFile = localImport;
 
       if (checkFile === scriptFile) {
@@ -157,7 +163,7 @@ const addTsFileImporters = (allModuleFiles: d.Module[], filesToLookForImporters:
   }, [] as string[]);
 
   // add all the files that import this ts file to the list of ts files we need to look through
-  tsFilesThatImportsThisTsFile.forEach(tsFileThatImportsThisTsFile => {
+  tsFilesThatImportsThisTsFile.forEach((tsFileThatImportsThisTsFile) => {
     // if we add to this array, then the while look will keep working until it's empty
     filesToLookForImporters.push(tsFileThatImportsThisTsFile);
   });
@@ -168,12 +174,12 @@ const getExternalStylesUpdated = (buildCtx: d.BuildCtx, outputTargetsWww: d.Outp
     return null;
   }
 
-  const cssFiles = buildCtx.filesWritten.filter(f => f.endsWith('.css'));
+  const cssFiles = buildCtx.filesWritten.filter((f) => f.endsWith('.css'));
   if (cssFiles.length === 0) {
     return null;
   }
 
-  return cssFiles.map(cssFile => basename(cssFile)).sort();
+  return cssFiles.map((cssFile) => basename(cssFile)).sort();
 };
 
 const getImagesUpdated = (buildCtx: d.BuildCtx, outputTargetsWww: d.OutputTargetWww[]) => {
@@ -182,7 +188,7 @@ const getImagesUpdated = (buildCtx: d.BuildCtx, outputTargetsWww: d.OutputTarget
   }
 
   const imageFiles = buildCtx.filesChanged.reduce((arr, filePath) => {
-    if (IMAGE_EXT.some(ext => filePath.toLowerCase().endsWith(ext))) {
+    if (IMAGE_EXT.some((ext) => filePath.toLowerCase().endsWith(ext))) {
       const fileName = basename(filePath);
       if (!arr.includes(fileName)) {
         arr.push(fileName);
@@ -205,9 +211,9 @@ const excludeHmrFiles = (config: d.Config, excludeHmr: string[], filesChanged: s
     return excludeFiles;
   }
 
-  excludeHmr.forEach(excludeHmr => {
+  excludeHmr.forEach((excludeHmr) => {
     return filesChanged
-      .map(fileChanged => {
+      .map((fileChanged) => {
         let shouldExclude = false;
 
         if (isGlob(excludeHmr)) {
@@ -223,7 +229,7 @@ const excludeHmrFiles = (config: d.Config, excludeHmr: string[], filesChanged: s
 
         return shouldExclude;
       })
-      .some(r => r);
+      .some((r) => r);
   });
 
   return excludeFiles.sort();

@@ -4,7 +4,6 @@ import { Component, Host, h } from '@stencil/core';
   tag: 'stencil-sibling',
 })
 export class StencilSibling {
-
   render() {
     return (
       <Host>

@@ -8,7 +8,7 @@ export const parseStaticEvents = (staticMembers: ts.ClassElement[]): d.Component
     return [];
   }
 
-  return parsedEvents.map(parsedEvent => {
+  return parsedEvents.map((parsedEvent) => {
     return {
       name: parsedEvent.name,
       method: parsedEvent.method,

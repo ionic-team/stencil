@@ -4,9 +4,9 @@ export const removeStaticMetaProperties = (classNode: ts.ClassDeclaration) => {
   if (classNode.members == null) {
     return [];
   }
-  return classNode.members.filter(classMember => {
+  return classNode.members.filter((classMember) => {
     if (classMember.modifiers) {
-      if (classMember.modifiers.some(m => m.kind === ts.SyntaxKind.StaticKeyword)) {
+      if (classMember.modifiers.some((m) => m.kind === ts.SyntaxKind.StaticKeyword)) {
         const memberName = (classMember.name as any).escapedText;
         if (REMOVE_STATIC_GETTERS.has(memberName)) {
           return false;

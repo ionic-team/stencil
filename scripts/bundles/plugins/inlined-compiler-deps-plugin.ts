@@ -54,7 +54,7 @@ async function bundleCompilerDeps(opts: BuildOptions, inputDir: string) {
     format: 'es',
     file: cacheFile,
     preferConst: true,
-    banner: `// Rollup ${opts.rollupVersion}`
+    banner: `// Rollup ${opts.rollupVersion}`,
   });
 
   return await fs.readFile(cacheFile, 'utf8');

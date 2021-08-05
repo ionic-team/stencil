@@ -16,5 +16,4 @@ describe('tag-names', () => {
     const tag88 = app.querySelector('tag-88');
     expect(tag88.textContent.trim()).toBe('tag-88');
   });
-
 });
