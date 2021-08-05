@@ -50,6 +50,7 @@
     "test.watch": "jest --watch"
   },
   "devDependencies": {
+    "@ionic/prettier-config": "^2.0.0",
     "@rollup/plugin-commonjs": "15.1.0",
     "@rollup/plugin-json": "4.1.0",
     "@rollup/plugin-node-resolve": "9.0.0",
@@ -104,7 +105,7 @@
     "path-browserify": "^1.0.1",
     "pixelmatch": "4.0.2",
     "postcss": "^8.2.8",
-    "prettier": "^2.2.1",
+    "prettier": "^2.3.2",
     "prompts": "2.4.0",
     "puppeteer": "~10.0.0",
     "rollup": "2.42.3",
@@ -137,5 +138,6 @@
     "custom elements",
     "pwa",
     "progressive web app"
-  ]
+  ],
+  "prettier": "@ionic/prettier-config"
 }
