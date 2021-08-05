@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('listen-jsx', function() {
+describe('listen-jsx', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -18,5 +17,4 @@ describe('listen-jsx', function() {
     expect(app.querySelector('#result').textContent).toBe('Host event');
     expect(app.querySelector('#result-root').textContent).toBe('Parent event');
   });
-
 });

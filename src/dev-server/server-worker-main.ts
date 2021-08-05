@@ -5,7 +5,7 @@ import path from 'path';
 export function initServerProcessWorkerProxy(sendToMain: (msg: d.DevServerMessage) => void) {
   const workerPath = require.resolve(path.join(__dirname, 'server-worker-thread.js'));
 
-  const filteredExecArgs = process.execArgv.filter(v => !/^--(debug|inspect)/.test(v));
+  const filteredExecArgs = process.execArgv.filter((v) => !/^--(debug|inspect)/.test(v));
 
   const forkOpts: any = {
     execArgv: filteredExecArgs,

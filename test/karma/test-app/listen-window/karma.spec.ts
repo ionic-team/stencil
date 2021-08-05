@@ -20,5 +20,4 @@ describe('listen-window', () => {
 
     expect(clicked.textContent.trim()).toBe('Clicked: 1');
   });
-
 });

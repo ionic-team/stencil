@@ -14,7 +14,7 @@ describe('method', () => {
 
       @Method()
       promiseMethod(val: string) {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           this.someState = val;
           resolve();
         });

@@ -1,14 +1,14 @@
 import { newE2EPage } from '@stencil/core/testing';
 
-
 describe('@Event', () => {
-
   it('should fire custom event on window', async () => {
     // create a new puppeteer page
     // and load the page with html content
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <event-cmp></event-cmp>
-    `});
+    `,
+    });
 
     // select the "event-cmp" element within the page (same as querySelector)
     const elm = await page.find('event-cmp');
@@ -37,9 +37,11 @@ describe('@Event', () => {
   });
 
   it('should fire custom event on document', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <event-cmp></event-cmp>
-    `});
+    `,
+    });
 
     const elm = await page.find('event-cmp');
     const elmEventSpy = await elm.spyOnEvent('myDocumentEvent');
@@ -60,9 +62,11 @@ describe('@Event', () => {
   });
 
   it('should fire custom event w/ no options', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <event-cmp></event-cmp>
-    `});
+    `,
+    });
 
     const elm = await page.find('event-cmp');
     const elmEventSpy = await elm.spyOnEvent('my-event-with-options');
@@ -79,9 +83,11 @@ describe('@Event', () => {
   });
 
   it('spyOnEvent, toHaveReceivedEventTimes', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <event-cmp></event-cmp>
-    `});
+    `,
+    });
 
     const elm = await page.find('event-cmp');
     const elmEventSpy = await elm.spyOnEvent('my-event-with-options');
@@ -94,9 +100,11 @@ describe('@Event', () => {
   });
 
   it('element spyOnEvent', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <event-cmp></event-cmp>
-    `});
+    `,
+    });
 
     const elm = await page.find('event-cmp');
     const elmEventSpy = await elm.spyOnEvent('my-event-with-options');
@@ -111,9 +119,11 @@ describe('@Event', () => {
   });
 
   it('page spyOnEvent, default window', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <event-cmp></event-cmp>
-    `});
+    `,
+    });
 
     const eventSpy = await page.spyOnEvent('someEvent');
 
@@ -126,9 +136,11 @@ describe('@Event', () => {
   });
 
   it('page spyOnEvent, set document selector', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <event-cmp></event-cmp>
-    `});
+    `,
+    });
 
     const eventSpy = await page.spyOnEvent('someEvent', 'document');
 
@@ -141,9 +153,11 @@ describe('@Event', () => {
   });
 
   it('page waitForEvent', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <event-cmp></event-cmp>
-    `});
+    `,
+    });
 
     setTimeout(async () => {
       const elm = await page.find('event-cmp');
@@ -156,5 +170,4 @@ describe('@Event', () => {
     expect(ev.type).toBe('someEvent');
     expect(ev.detail).toBe(88);
   });
-
 });

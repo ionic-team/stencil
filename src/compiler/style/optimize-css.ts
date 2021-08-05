@@ -2,7 +2,13 @@ import type * as d from '../../declarations';
 import { optimizeCssId } from '../../version';
 import { hasError, normalizePath } from '@utils';
 
-export const optimizeCss = async (config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], styleText: string, filePath: string) => {
+export const optimizeCss = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  diagnostics: d.Diagnostic[],
+  styleText: string,
+  filePath: string
+) => {
   if (typeof styleText !== 'string' || !styleText.length) {
     //  don't bother with invalid data
     return styleText;
@@ -32,7 +38,7 @@ export const optimizeCss = async (config: d.Config, compilerCtx: d.CompilerCtx, 
   }
 
   const minifyResults = await compilerCtx.worker.optimizeCss(opts);
-  minifyResults.diagnostics.forEach(d => {
+  minifyResults.diagnostics.forEach((d) => {
     // collect up any diagnostics from minifying
     diagnostics.push(d);
   });

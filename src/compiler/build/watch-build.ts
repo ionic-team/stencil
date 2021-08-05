@@ -24,7 +24,7 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     rebuild: () => void;
   };
   let closeResolver: Function;
-  const watchWaiter = new Promise<d.WatcherCloseResults>(resolve => (closeResolver = resolve));
+  const watchWaiter = new Promise<d.WatcherCloseResults>((resolve) => (closeResolver = resolve));
 
   const dirsAdded = new Set<string>();
   const dirsDeleted = new Set<string>();
@@ -112,8 +112,8 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   };
 
   const close = async () => {
-    watchingDirs.forEach(w => w.close());
-    watchingFiles.forEach(w => w.close());
+    watchingDirs.forEach((w) => w.close());
+    watchingFiles.forEach((w) => w.close());
     watchingDirs.clear();
     watchingFiles.clear();
 
@@ -131,7 +131,7 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
 
   const request = async (data: d.CompilerRequest) => compilerRequest(config, compilerCtx, data);
 
-  compilerCtx.addWatchFile = filePath => {
+  compilerCtx.addWatchFile = (filePath) => {
     if (isString(filePath) && !watchingFiles.has(filePath) && !isWatchIgnorePath(config, filePath)) {
       watchingFiles.set(filePath, config.sys.watchFile(filePath, onFsChange));
     }
@@ -208,7 +208,7 @@ const updateCompilerCtxCache = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   path: string,
-  kind: d.CompilerFileWatcherEvent,
+  kind: d.CompilerFileWatcherEvent
 ) => {
   compilerCtx.fs.clearFileCache(path);
   compilerCtx.changedFiles.add(path);

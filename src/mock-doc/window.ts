@@ -271,7 +271,7 @@ export class MockWindow {
 
           const observedAttributes = (this.constructor as any).observedAttributes;
           if (Array.isArray(observedAttributes) && typeof (this as any).attributeChangedCallback === 'function') {
-            observedAttributes.forEach(attrName => {
+            observedAttributes.forEach((attrName) => {
               const attrValue = this.getAttribute(attrName);
               if (attrValue != null) {
                 (this as any).attributeChangedCallback(attrName, null, attrValue);
@@ -482,7 +482,7 @@ export class MockWindow {
 
     ms = Math.min(ms, this.__maxTimeout);
 
-    const timeoutId = (this.__setTimeout(() => {
+    const timeoutId = this.__setTimeout(() => {
       if (this.__timeouts) {
         this.__timeouts.delete(timeoutId);
 
@@ -496,7 +496,7 @@ export class MockWindow {
           }
         }
       }
-    }, ms) as any) as number;
+    }, ms) as any as number;
 
     if (this.__timeouts) {
       this.__timeouts.add(timeoutId);
@@ -836,7 +836,7 @@ export function constrainTimeouts(win: any) {
 function resetWindow(win: MockWindow) {
   if (win != null) {
     if (win.__timeouts) {
-      win.__timeouts.forEach(timeoutId => {
+      win.__timeouts.forEach((timeoutId) => {
         nativeClearInterval(timeoutId);
         nativeClearTimeout(timeoutId);
       });

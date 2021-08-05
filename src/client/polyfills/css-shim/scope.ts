@@ -16,7 +16,7 @@ export function parseCSS(original: string): CSSScope {
 }
 
 export function addGlobalStyle(globalScopes: CSSScope[], styleEl: HTMLStyleElement) {
-  if (globalScopes.some(css => css.styleEl === styleEl)) {
+  if (globalScopes.some((css) => css.styleEl === styleEl)) {
     return false;
   }
   const css = parseCSS(styleEl.textContent);
@@ -28,7 +28,7 @@ export function addGlobalStyle(globalScopes: CSSScope[], styleEl: HTMLStyleEleme
 export function updateGlobalScopes(scopes: CSSScope[]) {
   const selectors = getSelectorsForScopes(scopes);
   const props = resolveValues(selectors);
-  scopes.forEach(scope => {
+  scopes.forEach((scope) => {
     if (scope.usesCssVars) {
       scope.styleEl.textContent = executeTemplate(scope.template, props);
     }
@@ -36,11 +36,11 @@ export function updateGlobalScopes(scopes: CSSScope[]) {
 }
 
 export function reScope(scope: CSSScope, scopeId: string): CSSScope {
-  const template = scope.template.map(segment => {
+  const template = scope.template.map((segment) => {
     return typeof segment === 'string' ? replaceScope(segment, scope.scopeId, scopeId) : segment;
   });
 
-  const selectors = scope.selectors.map(sel => {
+  const selectors = scope.selectors.map((sel) => {
     return {
       ...sel,
       selector: replaceScope(sel.selector, scope.scopeId, scopeId),

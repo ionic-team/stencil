@@ -23,7 +23,7 @@ export const outputCustomElements = async (config: d.Config, compilerCtx: d.Comp
 
   const timespan = buildCtx.createTimeSpan(`generate custom elements started`);
 
-  await Promise.all(outputTargets.map(o => bundleCustomElements(config, compilerCtx, buildCtx, o)));
+  await Promise.all(outputTargets.map((o) => bundleCustomElements(config, compilerCtx, buildCtx, o)));
 
   timespan.finish(`generate custom elements finished`);
 };
@@ -32,7 +32,7 @@ const bundleCustomElements = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistCustomElements,
+  outputTarget: d.OutputTargetDistCustomElements
 ) => {
   try {
     const bundleOpts: BundleOptions = {
@@ -66,7 +66,7 @@ const bundleCustomElements = async (
       });
 
       const minify = outputTarget.externalRuntime || outputTarget.minify !== true ? false : config.minifyJs;
-      const files = rollupOutput.output.map(async bundle => {
+      const files = rollupOutput.output.map(async (bundle) => {
         if (bundle.type === 'chunk') {
           let code = bundle.code;
           const optimizeResults = await optimizeModule(config, compilerCtx, {
@@ -93,10 +93,10 @@ const bundleCustomElements = async (
 const addCustomElementInputs = (
   _outputTarget: d.OutputTargetDistCustomElements,
   buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions,
+  bundleOpts: BundleOptions
 ) => {
   const components = buildCtx.components;
-  components.forEach(cmp => {
+  components.forEach((cmp) => {
     const exp: string[] = [];
     const exportName = dashToPascalCase(cmp.tagName);
     const importName = cmp.componentClassName;
@@ -124,7 +124,7 @@ const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements, _bui
 
   imp.push(
     `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
-    `export * from '${USER_INDEX_ENTRY_ID}';`,
+    `export * from '${USER_INDEX_ENTRY_ID}';`
   );
 
   if (outputTarget.includeGlobalScripts !== false) {

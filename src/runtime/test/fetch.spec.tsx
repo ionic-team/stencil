@@ -37,13 +37,13 @@ describe('fetch', () => {
       return (
         <Host>
           <ul>
-            {this.headers.map(n => (
+            {this.headers.map((n) => (
               <li>{n}</li>
             ))}
           </ul>
           {this.names ? (
             <ul>
-              {this.names.map(n => (
+              {this.names.map((n) => (
                 <li>{n}</li>
               ))}
             </ul>

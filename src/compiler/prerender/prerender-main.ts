@@ -27,7 +27,7 @@ const runPrerender = async (
   hydrateAppFilePath: string,
   componentGraph: d.BuildResultsComponentGraph,
   srcIndexHtmlPath: string,
-  buildId: string,
+  buildId: string
 ) => {
   const startTime = Date.now();
   const diagnostics: d.Diagnostic[] = [];
@@ -38,7 +38,7 @@ const runPrerender = async (
     duration: 0,
     average: 0,
   };
-  const outputTargets = config.outputTargets.filter(isOutputTargetWww).filter(o => isString(o.indexHtml));
+  const outputTargets = config.outputTargets.filter(isOutputTargetWww).filter((o) => isString(o.indexHtml));
 
   if (!isString(results.buildId)) {
     results.buildId = createHydrateBuildId();
@@ -88,7 +88,7 @@ const runPrerender = async (
 
     try {
       await Promise.all(
-        outputTargets.map(outputTarget => {
+        outputTargets.map((outputTarget) => {
           return runPrerenderOutputTarget(
             workerCtx,
             results,
@@ -98,9 +98,9 @@ const runPrerender = async (
             hydrateAppFilePath,
             componentGraph,
             srcIndexHtmlPath,
-            outputTarget,
+            outputTarget
           );
-        }),
+        })
       );
     } catch (e) {
       catchError(diagnostics, e);
@@ -131,7 +131,7 @@ const runPrerenderOutputTarget = async (
   hydrateAppFilePath: string,
   componentGraph: d.BuildResultsComponentGraph,
   srcIndexHtmlPath: string,
-  outputTarget: d.OutputTargetWww,
+  outputTarget: d.OutputTargetWww
 ) => {
   try {
     const timeSpan = config.logger.createTimeSpan(`prerendering started`);
@@ -192,7 +192,7 @@ const runPrerenderOutputTarget = async (
       srcIndexHtmlPath,
       outputTarget,
       hydrateOpts,
-      manager,
+      manager
     );
     if (diagnostics.length > 0 || !templateData || !isString(templateData.html)) {
       return;
@@ -202,13 +202,13 @@ const runPrerenderOutputTarget = async (
     manager.staticSite = templateData.staticSite;
     manager.componentGraphPath = await createComponentGraphPath(config, componentGraph, outputTarget);
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       manager.resolve = resolve;
       config.sys.nextTick(() => drainPrerenderQueue(results, manager));
     });
 
     if (manager.isDebug) {
-      const debugDiagnostics = prerenderDiagnostics.filter(d => d.level === 'debug');
+      const debugDiagnostics = prerenderDiagnostics.filter((d) => d.level === 'debug');
       if (debugDiagnostics.length > 0) {
         config.logger.printDiagnostics(debugDiagnostics);
       }
@@ -219,8 +219,8 @@ const runPrerenderOutputTarget = async (
     const sitemapResults = await generateSitemapXml(manager);
     await generateRobotsTxt(manager, sitemapResults);
 
-    const prerenderBuildErrors = prerenderDiagnostics.filter(d => d.level === 'error');
-    const prerenderRuntimeErrors = prerenderDiagnostics.filter(d => d.type === 'runtime');
+    const prerenderBuildErrors = prerenderDiagnostics.filter((d) => d.level === 'error');
+    const prerenderRuntimeErrors = prerenderDiagnostics.filter((d) => d.type === 'runtime');
 
     if (prerenderBuildErrors.length > 0) {
       // convert to just runtime errors so the other build files still write
@@ -264,7 +264,7 @@ const createPrerenderTemplate = async (config: d.Config, templateHtml: string) =
 const createComponentGraphPath = async (
   config: d.Config,
   componentGraph: d.BuildResultsComponentGraph,
-  outputTarget: d.OutputTargetWww,
+  outputTarget: d.OutputTargetWww
 ) => {
   if (componentGraph) {
     const content = getComponentPathContent(componentGraph, outputTarget);
@@ -282,7 +282,7 @@ const getComponentPathContent = (componentGraph: { [scopeId: string]: string[] }
   const object: { [key: string]: string[] } = {};
   const entries = Object.entries(componentGraph);
   for (const [key, chunks] of entries) {
-    object[key] = chunks.map(filename => join(buildDir, filename));
+    object[key] = chunks.map((filename) => join(buildDir, filename));
   }
   return JSON.stringify(object);
 };

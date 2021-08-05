@@ -13,7 +13,7 @@ export const parseStaticStates = (staticMembers: ts.ClassElement[]): d.Component
     return [];
   }
 
-  return stateNames.map(stateName => {
+  return stateNames.map((stateName) => {
     return {
       name: stateName,
     };

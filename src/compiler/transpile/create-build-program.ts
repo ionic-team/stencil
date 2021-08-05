@@ -3,7 +3,10 @@ import { getTsOptionsToExtend } from './ts-config';
 import { GENERATED_DTS } from '../output-targets/output-utils';
 import ts from 'typescript';
 
-export const createTsBuildProgram = async (config: d.Config, buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>) => {
+export const createTsBuildProgram = async (
+  config: d.Config,
+  buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>
+) => {
   let isRunning = false;
   let timeoutId: any;
 
@@ -47,15 +50,15 @@ export const createTsBuildProgram = async (config: d.Config, buildCallback: (tsB
     optionsToExtend,
     tsWatchSys,
     ts.createEmitAndSemanticDiagnosticsBuilderProgram,
-    reportDiagnostic => {
+    (reportDiagnostic) => {
       config.logger.debug('watch reportDiagnostic:' + reportDiagnostic.messageText);
     },
-    reportWatchStatus => {
+    (reportWatchStatus) => {
       config.logger.debug(reportWatchStatus.messageText);
-    },
+    }
   );
 
-  tsWatchHost.afterProgramCreate = async tsBuilder => {
+  tsWatchHost.afterProgramCreate = async (tsBuilder) => {
     isRunning = true;
     await buildCallback(tsBuilder);
     isRunning = false;

@@ -74,11 +74,12 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
       const executionContext = this._elmHandle.executionContext();
 
       isVisible = await executionContext.evaluate((elm: HostElement) => {
-        return new Promise<boolean>(resolve => {
+        return new Promise<boolean>((resolve) => {
           window.requestAnimationFrame(() => {
             if (elm.isConnected) {
               const style = window.getComputedStyle(elm);
-              const isVisible = !!style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+              const isVisible =
+                !!style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
 
               if (isVisible) {
                 window.requestAnimationFrame(() => {
@@ -172,7 +173,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
         return elm[propertyName];
       },
       this._elmHandle,
-      propertyName,
+      propertyName
     );
 
     return propValue;
@@ -213,14 +214,14 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   get classList() {
     const api: any = {
       add: (...classNames: string[]) => {
-        classNames.forEach(className => {
+        classNames.forEach((className) => {
           this._queueAction({
             classAdd: className,
           });
         });
       },
       remove: (...classNames: string[]) => {
-        classNames.forEach(className => {
+        classNames.forEach((className) => {
           this._queueAction({
             classRemove: className,
           });
@@ -364,7 +365,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
         const keys = Object.keys(computedStyle);
 
-        keys.forEach(key => {
+        keys.forEach((key) => {
           if (isNaN(key as any)) {
             const value = computedStyle[key as any];
             if (value != null) {
@@ -384,7 +385,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
         return rtn;
       },
       this._elmHandle,
-      pseudoElt,
+      pseudoElt
     );
 
     style.getPropertyValue = (propName: string) => {
@@ -408,7 +409,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
         return (elm as any).componentOnReady().then(() => {
           let rtn: any = null;
 
-          queuedActions.forEach(queuedAction => {
+          queuedActions.forEach((queuedAction) => {
             if (queuedAction.methodName) {
               rtn = (elm as any)[queuedAction.methodName].apply(elm, queuedAction.methodArgs);
             } else if (queuedAction.setPropertyName) {
@@ -459,7 +460,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
         });
       },
       this._elmHandle,
-      this._queuedActions as any,
+      this._queuedActions as any
     );
 
     this._queuedActions.length = 0;
@@ -541,7 +542,12 @@ export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.Eleme
   return elm;
 }
 
-async function findWithCssSelector(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, lightSelector: string, shadowSelector: string) {
+async function findWithCssSelector(
+  page: pd.E2EPageInternal,
+  rootHandle: puppeteer.ElementHandle,
+  lightSelector: string,
+  shadowSelector: string
+) {
   let elmHandle = await rootHandle.$(lightSelector);
 
   if (!elmHandle) {
@@ -558,7 +564,7 @@ async function findWithCssSelector(page: pd.E2EPageInternal, rootHandle: puppete
         return elm.shadowRoot.querySelector(shadowSelector);
       },
       elmHandle,
-      shadowSelector,
+      shadowSelector
     );
 
     await elmHandle.dispose();
@@ -573,7 +579,12 @@ async function findWithCssSelector(page: pd.E2EPageInternal, rootHandle: puppete
   return elmHandle;
 }
 
-async function findWithText(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, text: string, contains: string) {
+async function findWithText(
+  page: pd.E2EPageInternal,
+  rootHandle: puppeteer.ElementHandle,
+  text: string,
+  contains: string
+) {
   const jsHandle = await page.evaluateHandle(
     (rootElm: HTMLElement, text: string, contains: string) => {
       let foundElm: any = null;
@@ -611,7 +622,7 @@ async function findWithText(page: pd.E2EPageInternal, rootHandle: puppeteer.Elem
     },
     rootHandle,
     text,
-    contains,
+    contains
   );
 
   if (jsHandle) {
@@ -621,7 +632,11 @@ async function findWithText(page: pd.E2EPageInternal, rootHandle: puppeteer.Elem
   return null;
 }
 
-export async function findAll(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, selector: pd.FindSelector) {
+export async function findAll(
+  page: pd.E2EPageInternal,
+  rootHandle: puppeteer.ElementHandle,
+  selector: pd.FindSelector
+) {
   const foundElms: E2EElement[] = [];
 
   const { lightSelector, shadowSelector } = getSelector(selector);
@@ -645,7 +660,7 @@ export async function findAll(page: pd.E2EPageInternal, rootHandle: puppeteer.El
           return elm.shadowRoot.querySelectorAll(shadowSelector);
         },
         lightElmHandles[i],
-        shadowSelector,
+        shadowSelector
       );
 
       await lightElmHandles[i].dispose();

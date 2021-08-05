@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('slot-nested-order', function() {
+describe('slot-nested-order', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -9,7 +8,6 @@ describe('slot-nested-order', function() {
     app = await setupDom('/slot-nested-order/index.html');
   });
   afterEach(tearDownDom);
-
 
   it('correct nested order', async () => {
     const root = app.querySelector('slot-nested-order-parent');
@@ -19,5 +17,4 @@ describe('slot-nested-order', function() {
     const hiddenCmp = root.querySelector('[hidden]');
     expect(hiddenCmp).toBe(null);
   });
-
 });

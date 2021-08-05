@@ -1,11 +1,9 @@
 import { Component, h, Build, Host } from '@stencil/core';
 
-
 @Component({
-  tag: 'build-data'
+  tag: 'build-data',
 })
 export class BuildData {
-
   render() {
     return (
       <Host>

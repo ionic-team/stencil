@@ -104,7 +104,7 @@ export async function telemetryAction(action?: TelemetryCallback) {
 
 export function hasAppTarget(): boolean {
   return getStencilCLIConfig().validatedConfig.config.outputTargets.some(
-    target => target.type === 'www' && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/')),
+    (target) => target.type === 'www' && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/'))
   );
 }
 
@@ -113,7 +113,7 @@ export function isUsingYarn() {
 }
 
 export async function getActiveTargets(): Promise<string[]> {
-  const result = getStencilCLIConfig().validatedConfig.config.outputTargets.map(t => t.type);
+  const result = getStencilCLIConfig().validatedConfig.config.outputTargets.map((t) => t.type);
   return Array.from(new Set(result));
 }
 
@@ -122,7 +122,7 @@ export const prepareData = async (duration_ms: number, component_count: number =
   const { typescript, rollup } = getCoreCompiler()?.versions || { typescript: 'unknown', rollup: 'unknown' };
   const packages = await getInstalledPackages();
   const targets = await getActiveTargets();
-  const yarn = isUsingYarn()
+  const yarn = isUsingYarn();
   const stencil = getCoreCompiler()?.version || 'unknown';
   const system = `${sys.name} ${sys.version}`;
   const os_name = sys.details.platform;
@@ -149,7 +149,7 @@ export const prepareData = async (duration_ms: number, component_count: number =
     rollup,
     has_app_pwa_config,
   };
-}
+};
 
 /**
  * Reads package-lock.json and package.json files in order to cross references the dependencies and devDependencies properties. Pull the current installed version of each package under the @stencil, @ionic, and @capacitor scopes.
@@ -162,12 +162,12 @@ async function getInstalledPackages() {
 
     const packageJson: PackageJsonData = await tryFn(
       readJson,
-      getCompilerSystem().resolvePath(appRootDir + '/package.json'),
+      getCompilerSystem().resolvePath(appRootDir + '/package.json')
     );
 
     const packageLockJson: any = await tryFn(
       readJson,
-      getCompilerSystem().resolvePath(appRootDir + '/package-lock.json'),
+      getCompilerSystem().resolvePath(appRootDir + '/package-lock.json')
     );
 
     // They don't have a package.json for some reason? Eject button.
@@ -183,13 +183,13 @@ async function getInstalledPackages() {
     // Collect packages only in the stencil, ionic, or capacitor org's:
     // https://www.npmjs.com/org/stencil
     const ionicPackages = packages.filter(
-      ([k]) => k.startsWith('@stencil/') || k.startsWith('@ionic/') || k.startsWith('@capacitor/'),
+      ([k]) => k.startsWith('@stencil/') || k.startsWith('@ionic/') || k.startsWith('@capacitor/')
     );
 
     const versions = packageLockJson
       ? ionicPackages.map(
           ([k, v]) =>
-            `${k}@${packageLockJson?.dependencies[k]?.version ?? packageLockJson?.devDependencies[k]?.version ?? v}`,
+            `${k}@${packageLockJson?.dependencies[k]?.version ?? packageLockJson?.devDependencies[k]?.version ?? v}`
         )
       : ionicPackages.map(([k, v]) => `${k}@${v}`);
 

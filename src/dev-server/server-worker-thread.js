@@ -1,13 +1,13 @@
 const { initServerProcess } = require('./server-process.js');
 let closeTmr = null;
 
-const sendHandle = err => {
+const sendHandle = (err) => {
   if (err && err.code === 'ERR_IPC_CHANNEL_CLOSED') {
     process.exit(0);
   }
 };
 
-const receiveMessageFromMain = initServerProcess(msg => {
+const receiveMessageFromMain = initServerProcess((msg) => {
   // send message from worker going to main
   process.send(msg, sendHandle);
 
@@ -17,7 +17,7 @@ const receiveMessageFromMain = initServerProcess(msg => {
   }
 });
 
-process.on('message', msg => {
+process.on('message', (msg) => {
   // receive a message from the main going to worker
   if (msg && msg.closeServer) {
     closeTmr = setTimeout(() => {
@@ -29,11 +29,11 @@ process.on('message', msg => {
   receiveMessageFromMain(msg);
 });
 
-process.on('unhandledRejection', e => {
+process.on('unhandledRejection', (e) => {
   process.send(
     {
       error: { message: 'unhandledRejection: ' + e, stack: typeof e.stack === 'string' ? e.stack : null },
     },
-    sendHandle,
+    sendHandle
   );
 });

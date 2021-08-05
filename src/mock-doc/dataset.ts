@@ -29,7 +29,7 @@ function toDataAttribute(str: string) {
   return (
     'data-' +
     String(str)
-      .replace(/([A-Z0-9])/g, g => ' ' + g[0])
+      .replace(/([A-Z0-9])/g, (g) => ' ' + g[0])
       .trim()
       .replace(/ /g, '-')
       .toLowerCase()

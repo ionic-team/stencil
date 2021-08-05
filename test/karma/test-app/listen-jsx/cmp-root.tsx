@@ -1,20 +1,16 @@
 import { Component, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'listen-jsx-root'
+  tag: 'listen-jsx-root',
 })
 export class AttributeBasicRoot {
-
   @State() wasClicked = '';
 
   private onClick = () => {
     this.wasClicked = 'Parent event';
-  }
+  };
 
   render() {
-    return [
-      <span id="result-root">{this.wasClicked}</span>,
-      <listen-jsx onClick={this.onClick}></listen-jsx>
-    ];
+    return [<span id="result-root">{this.wasClicked}</span>, <listen-jsx onClick={this.onClick}></listen-jsx>];
   }
 }

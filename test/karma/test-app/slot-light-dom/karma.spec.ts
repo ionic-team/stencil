@@ -87,5 +87,4 @@ describe('slot-light-dom', () => {
     const hiddenCmp = app.querySelector('[hidden]');
     expect(hiddenCmp).toBe(null);
   });
-
 });

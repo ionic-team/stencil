@@ -1,10 +1,9 @@
 import { Component, Method, Prop } from '@stencil/core';
 
 @Component({
-  tag: 'method-cmp'
+  tag: 'method-cmp',
 })
 export class MethodCmp {
-
   @Prop() someProp = 0;
 
   @Method()

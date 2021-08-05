@@ -1,10 +1,9 @@
 import { Component, Prop, h } from '@stencil/core';
 
 @Component({
-  tag: 'lifecycle-update-b'
+  tag: 'lifecycle-update-b',
 })
 export class LifecycleUpdateB {
-
   @Prop() value = 0;
   start?: number;
 
@@ -15,7 +14,7 @@ export class LifecycleUpdateB {
     li.innerHTML = `<span style="color:red">lifecycle-update-b</span> <span style="color:blue">componentWillLoad</span> ${this.value}`;
     document.getElementById('output')!.appendChild(li);
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(resolve, 20);
     });
   }

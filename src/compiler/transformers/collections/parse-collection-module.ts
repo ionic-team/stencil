@@ -3,11 +3,18 @@ import { dirname, join, relative } from 'path';
 import { normalizePath } from '@utils';
 import { parseCollectionManifest } from './parse-collection-manifest';
 
-export const parseCollection = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleId: string, pkgJsonFilePath: string, pkgData: d.PackageJsonData) => {
+export const parseCollection = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  moduleId: string,
+  pkgJsonFilePath: string,
+  pkgData: d.PackageJsonData
+) => {
   // note this MUST be synchronous because this is used during transpile
   const collectionName = pkgData.name;
 
-  let collection: d.CollectionCompilerMeta = compilerCtx.collections.find(c => c.collectionName === collectionName);
+  let collection: d.CollectionCompilerMeta = compilerCtx.collections.find((c) => c.collectionName === collectionName);
   if (collection != null) {
     // we've already cached the collection, no need for another resolve/readFile/parse
     // thought being that /node_modules/ isn't changing between watch builds

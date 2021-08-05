@@ -1,7 +1,10 @@
 import type * as d from '../../declarations';
 import { TASK_CANCELED_MSG } from '@utils';
 
-export const createDenoWorkerMainController = (sys: d.CompilerSystem, maxConcurrentWorkers: number): d.WorkerMainController => {
+export const createDenoWorkerMainController = (
+  sys: d.CompilerSystem,
+  maxConcurrentWorkers: number
+): d.WorkerMainController => {
   let msgIds = 0;
   let isDestroyed = false;
   let isQueued = false;
@@ -61,7 +64,7 @@ export const createDenoWorkerMainController = (sys: d.CompilerSystem, maxConcurr
       sendQueue: [],
     };
     worker.onerror = onWorkerError;
-    worker.onmessage = ev => onMsgsFromWorker(workerChild, ev);
+    worker.onmessage = (ev) => onMsgsFromWorker(workerChild, ev);
 
     return workerChild;
   };
@@ -133,9 +136,9 @@ export const createDenoWorkerMainController = (sys: d.CompilerSystem, maxConcurr
 
   const destroy = () => {
     isDestroyed = true;
-    tasks.forEach(t => t.reject(TASK_CANCELED_MSG));
+    tasks.forEach((t) => t.reject(TASK_CANCELED_MSG));
     tasks.clear();
-    workers.forEach(w => w.worker.terminate());
+    workers.forEach((w) => w.worker.terminate());
     workers.length = 0;
   };
 

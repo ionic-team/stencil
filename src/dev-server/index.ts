@@ -48,7 +48,7 @@ function startServer(
   watcher: CompilerWatcher,
   initServerProcess: InitServerProcess,
   resolve: (devServer: DevServer) => void,
-  reject: (err: any) => void,
+  reject: (err: any) => void
 ) {
   const timespan = logger.createTimeSpan(`starting dev server`, true);
 
@@ -69,7 +69,7 @@ function startServer(
 
   let sendToWorker: (msg: DevServerMessage) => void = null;
 
-  const closePromise = new Promise<void>(resolve => (closeResolve = resolve));
+  const closePromise = new Promise<void>((resolve) => (closeResolve = resolve));
 
   const close = async () => {
     clearTimeout(startupTimeout);
@@ -135,11 +135,11 @@ function startServer(
         logger.info(logger.red(`${msg.requestLog.method} ${msg.requestLog.url} (${msg.requestLog.status})`));
       } else if (msg.requestLog.status >= 400) {
         logger.info(
-          logger.dim(logger.red(`${msg.requestLog.method} ${msg.requestLog.url} (${msg.requestLog.status})`)),
+          logger.dim(logger.red(`${msg.requestLog.method} ${msg.requestLog.url} (${msg.requestLog.status})`))
         );
       } else if (msg.requestLog.status >= 300) {
         logger.info(
-          logger.dim(logger.magenta(`${msg.requestLog.method} ${msg.requestLog.url} (${msg.requestLog.status})`)),
+          logger.dim(logger.magenta(`${msg.requestLog.method} ${msg.requestLog.url} (${msg.requestLog.status})`))
         );
       } else {
         logger.info(logger.dim(`${logger.cyan(msg.requestLog.method)} ${msg.requestLog.url}`));

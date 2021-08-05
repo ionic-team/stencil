@@ -1,10 +1,9 @@
 import { Component, Element, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'custom-event-root'
+  tag: 'custom-event-root',
 })
 export class CustomEventCmp {
-
   @Element() elm!: HTMLElement;
 
   @State() output = '';
@@ -32,16 +31,17 @@ export class CustomEventCmp {
     return (
       <div>
         <div>
-          <button id="btnNoDetail" onClick={this.fireCustomEventNoDetail.bind(this)}>Fire Custom Event, no detail</button>
+          <button id="btnNoDetail" onClick={this.fireCustomEventNoDetail.bind(this)}>
+            Fire Custom Event, no detail
+          </button>
         </div>
         <div>
-          <button id="btnWithDetail" onClick={this.fireCustomEventWithDetail.bind(this)}>Fire Custom Event, with detail</button>
+          <button id="btnWithDetail" onClick={this.fireCustomEventWithDetail.bind(this)}>
+            Fire Custom Event, with detail
+          </button>
         </div>
-        <pre id="output">
-          {this.output}
-        </pre>
+        <pre id="output">{this.output}</pre>
       </div>
     );
   }
-
 }

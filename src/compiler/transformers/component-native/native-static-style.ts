@@ -17,10 +17,14 @@ export const addNativeStaticStyle = (classMembers: ts.ClassElement[], cmp: d.Com
   }
 };
 
-const addMultipleModeStyleGetter = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, styles: d.StyleCompiler[]) => {
+const addMultipleModeStyleGetter = (
+  classMembers: ts.ClassElement[],
+  cmp: d.ComponentCompilerMeta,
+  styles: d.StyleCompiler[]
+) => {
   const styleModes: ts.ObjectLiteralElementLike[] = [];
 
-  styles.forEach(style => {
+  styles.forEach((style) => {
     if (typeof style.styleStr === 'string') {
       // inline the style string
       // static get style() { return { "ios": "string" }; }
@@ -49,7 +53,11 @@ const addMultipleModeStyleGetter = (classMembers: ts.ClassElement[], cmp: d.Comp
   classMembers.push(createStaticGetter('style', styleObj));
 };
 
-const addSingleStyleGetter = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+const addSingleStyleGetter = (
+  classMembers: ts.ClassElement[],
+  cmp: d.ComponentCompilerMeta,
+  style: d.StyleCompiler
+) => {
   if (typeof style.styleStr === 'string') {
     // inline the style string
     // static get style() { return "string"; }

@@ -13,5 +13,4 @@ describe('svg attr', () => {
     const img = app.querySelector('img');
     expect(img.src.startsWith('data:image/svg+xml;base64,PD94bW')).toBe(true);
   });
-
 });

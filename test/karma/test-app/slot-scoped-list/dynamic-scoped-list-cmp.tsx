@@ -2,7 +2,7 @@ import { Component, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'slot-dynamic-scoped-list',
-  scoped: true
+  scoped: true,
 })
 export class DynamicListScopedComponent {
   @Prop() items: Array<string> = [];
@@ -10,7 +10,7 @@ export class DynamicListScopedComponent {
   render() {
     return (
       <slot-light-scoped-list>
-        {this.items.map(item => (
+        {this.items.map((item) => (
           <div>{item}</div>
         ))}
       </slot-light-scoped-list>

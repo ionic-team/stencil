@@ -1,13 +1,11 @@
 import { Component, Element, Event, EventEmitter, Listen, Method, Prop, State, h } from '@stencil/core';
 
-
 @Component({
   tag: 'esm-import',
   styleUrl: 'esm-import.css',
-  shadow: true
+  shadow: true,
 })
 export class EsmImport {
-
   @Element() el!: any;
   @Prop() propVal = 0;
   @State() isReady = 'false';
@@ -50,7 +48,9 @@ export class EsmImport {
         <p id="propVal">propVal: {this.propVal}</p>
         <p id="stateVal">stateVal: {this.stateVal}</p>
         <p id="listenVal">listenVal: {this.listenVal}</p>
-        <p><button onClick={this.testMethod.bind(this)}>Test</button></p>
+        <p>
+          <button onClick={this.testMethod.bind(this)}>Test</button>
+        </p>
         <p id="isReady">componentOnReady: {this.isReady}</p>
       </div>
     );

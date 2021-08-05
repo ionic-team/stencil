@@ -18,7 +18,8 @@ export async function internalTesting(opts: BuildOptions) {
   // write @stencil/core/internal/testing/package.json
   writePkgJson(opts, outputTestingPlatformDir, {
     name: '@stencil/core/internal/testing',
-    description: 'Stencil internal testing platform to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
+    description:
+      'Stencil internal testing platform to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
     main: 'index.js',
   });
 

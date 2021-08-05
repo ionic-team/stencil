@@ -3,7 +3,7 @@ import output from './output';
 
 @Component({
   tag: 'lifecycle-nested-c',
-  shadow: true
+  shadow: true,
 })
 export class Cmpc {
   async componentWillLoad() {
@@ -15,6 +15,10 @@ export class Cmpc {
   }
 
   render() {
-    return( <Host><div>hello</div></Host>);
+    return (
+      <Host>
+        <div>hello</div>
+      </Host>
+    );
   }
 }
