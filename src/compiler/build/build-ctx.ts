@@ -66,7 +66,9 @@ export class BuildContext implements d.BuildCtx {
   start() {
     // get the build id from the incremented activeBuildId
     // print out a good message
-    const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${this.config.fsNamespace}, ${this.config.devMode ? 'dev' : 'prod'} mode, started`;
+    const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${this.config.fsNamespace}, ${
+      this.config.devMode ? 'dev' : 'prod'
+    } mode, started`;
 
     const buildLog: d.BuildLog = {
       buildId: this.buildId,

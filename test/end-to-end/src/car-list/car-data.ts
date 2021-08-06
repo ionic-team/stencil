@@ -1,4 +1,3 @@
-
 export class CarData {
   make: string;
   model: string;

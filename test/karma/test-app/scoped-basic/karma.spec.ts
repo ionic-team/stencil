@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('scoped-basic', function() {
+describe('scoped-basic', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -15,8 +14,9 @@ describe('scoped-basic', function() {
     expect(doc.classList.toString()).toEqual('sc-scoped-basic-root-md-h sc-scoped-basic-root-md-s hydrated');
 
     const scopedEl = doc.querySelector('scoped-basic');
-    expect(scopedEl.classList.toString()).toEqual('sc-scoped-basic-root-md sc-scoped-basic-h sc-scoped-basic-s hydrated');
-
+    expect(scopedEl.classList.toString()).toEqual(
+      'sc-scoped-basic-root-md sc-scoped-basic-h sc-scoped-basic-s hydrated'
+    );
 
     const scopedStyles = window.getComputedStyle(scopedEl);
     expect(scopedStyles.backgroundColor).toEqual('rgb(0, 0, 0)');
@@ -36,5 +36,4 @@ describe('scoped-basic', function() {
     const scopedSlotStyles = window.getComputedStyle(scopedSlot);
     expect(scopedSlotStyles.color).toEqual('rgb(255, 255, 0)');
   });
-
 });

@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('slot-map-order', function() {
+describe('slot-map-order', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -9,7 +8,6 @@ describe('slot-map-order', function() {
     app = await setupDom('/slot-map-order/index.html');
   });
   afterEach(tearDownDom);
-
 
   it('render', async () => {
     const result = app.querySelector('slot-map-order');
@@ -21,5 +19,4 @@ describe('slot-map-order', function() {
     const hiddenCmp = app.querySelector('[hidden]');
     expect(hiddenCmp).toBe(null);
   });
-
 });

@@ -19,19 +19,24 @@ export const propDecoratorsToStatic = (
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
   watchable: Set<string>,
-  newMembers: ts.ClassElement[],
+  newMembers: ts.ClassElement[]
 ) => {
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map(prop => parsePropDecorator(diagnostics, typeChecker, prop, watchable))
-    .filter(prop => prop != null);
+    .map((prop) => parsePropDecorator(diagnostics, typeChecker, prop, watchable))
+    .filter((prop) => prop != null);
 
   if (properties.length > 0) {
     newMembers.push(createStaticGetter('properties', ts.createObjectLiteral(properties, true)));
   }
 };
 
-const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, watchable: Set<string>) => {
+const parsePropDecorator = (
+  diagnostics: d.Diagnostic[],
+  typeChecker: ts.TypeChecker,
+  prop: ts.PropertyDeclaration,
+  watchable: Set<string>
+) => {
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
@@ -44,7 +49,8 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
 
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);
-    err.messageText = 'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
+    err.messageText =
+      'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
     augmentDiagnosticWithNode(err, prop.modifiers[0]);
   }
 
@@ -113,7 +119,11 @@ const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, pr
   return false;
 };
 
-const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration, type: ts.Type): d.ComponentCompilerPropertyComplexType => {
+const getComplexType = (
+  typeChecker: ts.TypeChecker,
+  node: ts.PropertyDeclaration,
+  type: ts.Type
+): d.ComponentCompilerPropertyComplexType => {
   const nodeType = node.type;
   return {
     original: nodeType ? nodeType.getText() : typeToString(typeChecker, type),
@@ -154,7 +164,7 @@ export const propTypeFromTSType = (type: ts.Type) => {
 const checkType = (type: ts.Type, check: (type: ts.Type) => boolean) => {
   if (type.flags & ts.TypeFlags.Union) {
     const union = type as ts.UnionType;
-    if (union.types.some(type => checkType(type, check))) {
+    if (union.types.some((type) => checkType(type, check))) {
       return true;
     }
   }

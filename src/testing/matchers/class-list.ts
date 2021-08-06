@@ -32,12 +32,15 @@ export function toHaveClasses(elm: HTMLElement, expectClassNames: string[]) {
     throw new Error(`expect toHaveClasses value is not an element`);
   }
 
-  const pass = expectClassNames.every(expectClassName => {
+  const pass = expectClassNames.every((expectClassName) => {
     return elm.classList.contains(expectClassName);
   });
 
   return {
-    message: () => `expected to ${pass ? 'not ' : ''}have css classes "${expectClassNames.join(' ')}", but className is "${elm.className}"`,
+    message: () =>
+      `expected to ${pass ? 'not ' : ''}have css classes "${expectClassNames.join(' ')}", but className is "${
+        elm.className
+      }"`,
     pass: pass,
   };
 }
@@ -49,7 +52,10 @@ export function toMatchClasses(elm: HTMLElement, expectClassNames: string[]) {
   }
 
   return {
-    message: () => `expected to ${pass ? 'not ' : ''}match css classes "${expectClassNames.join(' ')}", but className is "${elm.className}"`,
+    message: () =>
+      `expected to ${pass ? 'not ' : ''}match css classes "${expectClassNames.join(' ')}", but className is "${
+        elm.className
+      }"`,
     pass: pass,
   };
 }

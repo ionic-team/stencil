@@ -1,7 +1,10 @@
 import type * as d from '../../../declarations';
 import { TASK_CANCELED_MSG } from '@utils';
 
-export const createWebWorkerMainController = (sys: d.CompilerSystem, maxConcurrentWorkers: number): d.WorkerMainController => {
+export const createWebWorkerMainController = (
+  sys: d.CompilerSystem,
+  maxConcurrentWorkers: number
+): d.WorkerMainController => {
   let msgIds = 0;
   let isDestroyed = false;
   let isQueued = false;
@@ -67,7 +70,7 @@ export const createWebWorkerMainController = (sys: d.CompilerSystem, maxConcurre
       sendQueue: [],
     };
     worker.onerror = onWorkerError;
-    worker.onmessage = ev => onMsgsFromWorker(workerChild, ev);
+    worker.onmessage = (ev) => onMsgsFromWorker(workerChild, ev);
 
     return workerChild;
   };
@@ -138,9 +141,9 @@ export const createWebWorkerMainController = (sys: d.CompilerSystem, maxConcurre
 
   const destroy = () => {
     isDestroyed = true;
-    tasks.forEach(t => t.reject(TASK_CANCELED_MSG));
+    tasks.forEach((t) => t.reject(TASK_CANCELED_MSG));
     tasks.clear();
-    workers.forEach(w => w.worker.terminate());
+    workers.forEach((w) => w.worker.terminate());
     workers.length = 0;
   };
 

@@ -4,7 +4,7 @@ export class MockClassList {
   add(...classNames: string[]) {
     const clsNames = getItems(this.elm);
     let updated = false;
-    classNames.forEach(className => {
+    classNames.forEach((className) => {
       className = String(className);
       validateClass(className);
       if (clsNames.includes(className) === false) {
@@ -20,7 +20,7 @@ export class MockClassList {
   remove(...classNames: string[]) {
     const clsNames = getItems(this.elm);
     let updated = false;
-    classNames.forEach(className => {
+    classNames.forEach((className) => {
       className = String(className);
       validateClass(className);
       const index = clsNames.indexOf(className);
@@ -30,7 +30,7 @@ export class MockClassList {
       }
     });
     if (updated) {
-      this.elm.setAttributeNS(null, 'class', clsNames.filter(c => c.length > 0).join(' '));
+      this.elm.setAttributeNS(null, 'class', clsNames.filter((c) => c.length > 0).join(' '));
     }
   }
 
@@ -66,7 +66,9 @@ function validateClass(className: string) {
     throw new Error('The token provided must not be empty.');
   }
   if (/\s/.test(className)) {
-    throw new Error(`The token provided ('${className}') contains HTML space characters, which are not valid in tokens.`);
+    throw new Error(
+      `The token provided ('${className}') contains HTML space characters, which are not valid in tokens.`
+    );
   }
 }
 
@@ -76,7 +78,7 @@ function getItems(elm: HTMLElement) {
     return className
       .trim()
       .split(' ')
-      .filter(c => c.length > 0);
+      .filter((c) => c.length > 0);
   }
   return [];
 }

@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('attribute-html', function() {
+describe('attribute-html', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -15,5 +14,4 @@ describe('attribute-html', function() {
     expect(app.querySelector('#any-attr').textContent).toBe('0 string');
     expect(app.querySelector('#nu-attr').textContent).toBe('12 number');
   });
-
 });

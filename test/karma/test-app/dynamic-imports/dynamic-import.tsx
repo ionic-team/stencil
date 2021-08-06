@@ -1,10 +1,9 @@
 import { Component, Method, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'dynamic-import'
+  tag: 'dynamic-import',
 })
 export class DynamicImport {
-
   @State() value?: string;
 
   async componentWillLoad() {
@@ -21,9 +20,6 @@ export class DynamicImport {
   }
 
   render() {
-    return (
-      <div>{this.value}</div>
-    );
+    return <div>{this.value}</div>;
   }
-
 }

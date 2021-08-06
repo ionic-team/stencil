@@ -22,7 +22,7 @@ export class CustomStyle implements CssVarShim {
     }
 
     this.didInit = true;
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       this.win.requestAnimationFrame(() => {
         startWatcher(this.doc, this.globalScopes);
         loadDocument(this.doc, this.globalScopes).then(() => resolve());

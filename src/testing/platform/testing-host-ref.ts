@@ -31,8 +31,8 @@ export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     $instanceValues$: new Map(),
     $renderCount$: 0,
   };
-  hostRef.$onInstancePromise$ = new Promise(r => (hostRef.$onInstanceResolve$ = r));
-  hostRef.$onReadyPromise$ = new Promise(r => (hostRef.$onReadyResolve$ = r));
+  hostRef.$onInstancePromise$ = new Promise((r) => (hostRef.$onInstanceResolve$ = r));
+  hostRef.$onReadyPromise$ = new Promise((r) => (hostRef.$onReadyResolve$ = r));
   elm['s-p'] = [];
   elm['s-rc'] = [];
   addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);

@@ -3,7 +3,7 @@ import { getTextDocs } from '@utils';
 
 export const generatePropTypes = (cmpMeta: d.ComponentCompilerMeta): d.TypeInfo => {
   return [
-    ...cmpMeta.properties.map(cmpProp => ({
+    ...cmpMeta.properties.map((cmpProp) => ({
       name: cmpProp.name,
       type: cmpProp.complexType.original,
       optional: cmpProp.optional,
@@ -11,7 +11,7 @@ export const generatePropTypes = (cmpMeta: d.ComponentCompilerMeta): d.TypeInfo 
       internal: cmpProp.internal,
       jsdoc: getTextDocs(cmpProp.docs),
     })),
-    ...cmpMeta.virtualProperties.map(cmpProp => ({
+    ...cmpMeta.virtualProperties.map((cmpProp) => ({
       name: cmpProp.name,
       type: cmpProp.type,
       optional: true,

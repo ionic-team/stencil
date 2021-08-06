@@ -190,17 +190,20 @@ describe('fixRelativeUrls', () => {
     `);
   });
 
-  it.each(['data:,ABC123', 'data:text/plain,ABC123', 'data:text/plain;base64,ABC123'])('should keep data url', dataURL => {
-    const text = `
+  it.each(['data:,ABC123', 'data:text/plain,ABC123', 'data:text/plain;base64,ABC123'])(
+    'should keep data url',
+    (dataURL) => {
+      const text = `
       div {
         background-image: url('${dataURL}');
       }
     `;
 
-    expect(fixRelativeUrls(text, '/assets/css/styles.css')).toBe(`
+      expect(fixRelativeUrls(text, '/assets/css/styles.css')).toBe(`
       div {
         background-image: url('${dataURL}');
       }
     `);
-  });
+    }
+  );
 });

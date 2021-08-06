@@ -58,7 +58,7 @@ describe('parseFlags', () => {
 
     args.push('serve', '--address', '127.0.0.1', '--port', '8888', '4444');
 
-    sys.getEnvironmentVar = key => {
+    sys.getEnvironmentVar = (key) => {
       if (key === 'npm_config_argv') {
         return JSON.stringify({
           original: ['run', 'serve', '--port', '4444'],

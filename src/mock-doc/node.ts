@@ -42,7 +42,7 @@ export class MockNode {
   }
 
   append(...items: (MockNode | string)[]) {
-    items.forEach(item => {
+    items.forEach((item) => {
       const isNode = typeof item === 'object' && item !== null && 'nodeType' in item;
       this.appendChild(isNode ? item : this.ownerDocument.createTextNode(String(item)));
     });
@@ -50,7 +50,7 @@ export class MockNode {
 
   prepend(...items: (MockNode | string)[]) {
     const firstChild = this.firstChild;
-    items.forEach(item => {
+    items.forEach((item) => {
       const isNode = typeof item === 'object' && item !== null && 'nodeType' in item;
       this.insertBefore(isNode ? item : this.ownerDocument.createTextNode(String(item)), firstChild);
     });
@@ -123,7 +123,7 @@ export class MockNode {
   }
 
   get parentElement() {
-    return ((this.parentNode as any) as MockElement) || null;
+    return (this.parentNode as any as MockElement) || null;
   }
   set parentElement(value: any) {
     this.parentNode = value;
@@ -251,11 +251,11 @@ export class MockElement extends MockNode {
   }
 
   get children() {
-    return this.childNodes.filter(n => n.nodeType === NODE_TYPES.ELEMENT_NODE) as MockElement[];
+    return this.childNodes.filter((n) => n.nodeType === NODE_TYPES.ELEMENT_NODE) as MockElement[];
   }
 
   get childElementCount() {
-    return this.childNodes.filter(n => n.nodeType === NODE_TYPES.ELEMENT_NODE).length;
+    return this.childNodes.filter((n) => n.nodeType === NODE_TYPES.ELEMENT_NODE).length;
   }
 
   get className() {
@@ -494,7 +494,9 @@ export class MockElement extends MockNode {
     const parentElement = this.parentElement;
     if (
       parentElement != null &&
-      (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)
+      (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE ||
+        parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE ||
+        parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)
     ) {
       const children = parentElement.children;
       const index = children.indexOf(this) + 1;
@@ -515,7 +517,9 @@ export class MockElement extends MockNode {
     const parentElement = this.parentElement;
     if (
       parentElement != null &&
-      (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)
+      (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE ||
+        parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE ||
+        parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)
     ) {
       const children = parentElement.children;
       const index = children.indexOf(this) - 1;
@@ -528,7 +532,7 @@ export class MockElement extends MockNode {
     const classes = classNames
       .trim()
       .split(' ')
-      .filter(c => c.length > 0);
+      .filter((c) => c.length > 0);
     const results: MockElement[] = [];
     getElementsByClassName(this, classes, results);
     return results;

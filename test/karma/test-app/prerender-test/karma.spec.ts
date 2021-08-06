@@ -60,9 +60,7 @@ describe('prerender', () => {
     const greenTextStyle = getComputedStyle(greenText.querySelector('text-green'));
     expect(greenTextStyle.color).toBe('rgb(0, 255, 0)');
   });
-
 });
-
 
 function testScopedStyles(app: HTMLElement) {
   const cmpScopedA = app.querySelector('cmp-scoped-a');
